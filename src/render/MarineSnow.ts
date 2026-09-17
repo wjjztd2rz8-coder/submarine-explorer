@@ -1,0 +1,164 @@
+/**
+ * Marine snow: the permanent drizzle of organic detritus falling through the
+ * water column. The reference photos (art-direction §6) never show clear
+ * "aquarium" water, so this field is on at every depth -- only its density and
+ * drift rate change with the band.
+ *
+ * Implementation is entirely GPU-side. The points are generated once inside a
+ * cube of edge `Config.water.snowBoxM`; every frame the vertex shader drifts
+ * them and wraps them modulo the cube *around the current camera position*, so
+ * the field follows the camera forever with no CPU work and no re-upload. A
+ * per-point random seed decides which points are visible at the current
+ * density, so changing density does not reallocate the buffer.
+ */
+
+import * as THREE from 'three';
+import type { AtmosphereTier, WaterConfig } from '../core/Config.js';
+import type { AtmosphereSample } from './Atmosphere.js';
+
+export class MarineSnow {
+  readonly points: THREE.Points | null;
+
+  private readonly material: THREE.ShaderMaterial | null;
+  private readonly geometry: THREE.BufferGeometry | null;
+  private elapsed = 0;
+
+  constructor(config: WaterConfig, tier: AtmosphereTier) {
+    const count = tier.snowCount;
+    if (count <= 0) {
+      this.points = null;
+      this.material = null;
+      this.geometry = null;
+      return;
+    }
+
+    const box = config.snowBoxM;
+    const positions = new Float32Array(count * 3);
+    const seeds = new Float32Array(count);
+    // Deterministic: the same field every run, so screenshots are comparable.
+    let rng = 0x2f6e2b1;
+    const rand = (): number => {
+      rng = (rng * 1664525 + 1013904223) >>> 0;
+      return rng / 0x100000000;
+    };
+    for (let i = 0; i < count; i++) {
+      positions[i * 3] = rand() * box;
+      positions[i * 3 + 1] = rand() * box;
+      positions[i * 3 + 2] = rand() * box;
+      seeds[i] = rand();
+    }
+
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    this.geometry.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
+    // The shader relocates every point around the camera, so Three must never
+    // cull the object on its authored bounds.
+    this.geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(), Infinity);
+
+    this.material = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uCam: { value: new THREE.Vector3() },
+        uBox: { value: box },
+        uDensity: { value: 1 },
+        uDrift: { value: 0.2 },
+        uSizeM: { value: config.snowSizeM },
+        uScale: { value: 500 },
+        uColor: { value: new THREE.Color(0xdfe9ec) },
+        uBrightness: { value: 1 },
+        fogDensity: { value: 0 },
+      },
+      vertexShader: SNOW_VERT,
+      fragmentShader: SNOW_FRAG,
+      transparent: true,
+      depthWrite: false,
+    });
+
+    this.points = new THREE.Points(this.geometry, this.material);
+    this.points.frustumCulled = false;
+    this.points.renderOrder = 1;
+    this.points.name = 'marineSnow';
+  }
+
+  /**
+   * @param camera      the rendering camera (position + FOV drive attenuation)
+   * @param atmosphere  current depth sample: density, drift and fog
+   * @param frameDelta  real seconds since the last frame
+   * @param viewportH   drawing-buffer height in pixels
+   */
+  update(
+    camera: THREE.PerspectiveCamera,
+    atmosphere: AtmosphereSample,
+    frameDelta: number,
+    viewportH: number,
+  ): void {
+    if (!this.material) return;
+    this.elapsed += frameDelta;
+    const u = this.material.uniforms;
+    u.uTime!.value = this.elapsed;
+    (u.uCam!.value as THREE.Vector3).copy(camera.position);
+    u.uDensity!.value = atmosphere.snowDensity;
+    u.uDrift!.value = atmosphere.snowDriftMps;
+    u.fogDensity!.value = atmosphere.fogDensity;
+    // Perspective size attenuation: metres -> pixels at one metre of distance.
+    u.uScale!.value = viewportH / (2 * Math.tan(((camera.fov * Math.PI) / 180) / 2));
+    // Particles are lit by whatever light there is; in the abyss they catch
+    // only the headlights, which we approximate with a floor.
+    u.uBrightness!.value = 0.35 + 0.65 * Math.min(1, atmosphere.ambientIntensity / 2);
+  }
+
+  dispose(): void {
+    this.geometry?.dispose();
+    this.material?.dispose();
+  }
+}
+
+const SNOW_VERT = /* glsl */ `
+uniform float uTime;
+uniform vec3  uCam;
+uniform float uBox;
+uniform float uDensity;
+uniform float uDrift;
+uniform float uSizeM;
+uniform float uScale;
+attribute float aSeed;
+varying float vAlpha;
+
+void main() {
+  // Drift: mostly sinking, with a slow per-particle lateral sway.
+  vec3 p = position;
+  p.y -= uDrift * uTime * (0.6 + aSeed * 0.8);
+  p.x += sin(uTime * 0.11 + aSeed * 31.4) * 1.5;
+  p.z += cos(uTime * 0.09 + aSeed * 17.7) * 1.5;
+
+  // Wrap into the cube centred on the camera. mod() is always in [0, uBox).
+  vec3 world = uCam + mod(p - uCam + 0.5 * uBox, uBox) - 0.5 * uBox;
+
+  vec4 mv = viewMatrix * vec4(world, 1.0);
+  float dist = -mv.z;
+  gl_Position = projectionMatrix * mv;
+  gl_PointSize = max(1.0, uSizeM * uScale / max(1.0, dist));
+
+  // Fade out at the edge of the cube so wrapping never pops, and drop the
+  // points the current density does not pay for.
+  vec3 d = abs(world - uCam) / (0.5 * uBox);
+  float edge = 1.0 - smoothstep(0.7, 1.0, max(d.x, max(d.y, d.z)));
+  vAlpha = edge * step(aSeed, uDensity);
+  if (vAlpha <= 0.0) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+}
+`;
+
+const SNOW_FRAG = /* glsl */ `
+precision highp float;
+uniform vec3  uColor;
+uniform float uBrightness;
+varying float vAlpha;
+
+void main() {
+  vec2 d = gl_PointCoord - 0.5;
+  float r = dot(d, d);
+  if (r > 0.25) discard;
+  float soft = 1.0 - smoothstep(0.05, 0.25, r);
+  gl_FragColor = vec4(uColor * uBrightness, vAlpha * soft * 0.75);
+}
+`;

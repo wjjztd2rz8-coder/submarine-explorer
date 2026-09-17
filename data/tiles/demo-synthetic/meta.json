@@ -1,0 +1,27 @@
+{
+  "id": "demo-synthetic",
+  "source": "synthetic",
+  "source_url": "tools/make_synthetic_tile.py",
+  "fetched_at": "2026-09-17T01:00:31Z",
+  "bbox": {
+    "north": 41.88,
+    "south": 41.58,
+    "east": -49.8,
+    "west": -50.1
+  },
+  "cols": 384,
+  "rows": 384,
+  "cellsize_deg": 0.0007812500000000111,
+  "cellsize_m_x": 64.90388810025642,
+  "cellsize_m_y": 86.96875000000124,
+  "min_m": -4367.398964875592,
+  "max_m": -3072.312307429383,
+  "nodata_count": 0,
+  "center": {
+    "lat": 41.730000000000004,
+    "lon": -49.95
+  },
+  "attribution": "Synthetic procedural bathymetry (not real data).",
+  "synthetic": true,
+  "seed": 1912
+}

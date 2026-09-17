@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.vite/
+test-results/
+playwright-report/
+tests/e2e/screenshots/*.png
+__pycache__/
+*.pyc
+.DS_Store

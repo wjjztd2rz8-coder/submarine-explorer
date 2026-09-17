@@ -1,0 +1,33 @@
+{
+  "id": "titanic",
+  "source": "GMRT",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=41.88&south=41.58&east=-49.8&west=-50.1&layer=topo&format=esriascii&resolution=high",
+  "fetched_at": "2026-09-17T00:59:40Z",
+  "bbox": {
+    "north": 41.87976848296845,
+    "south": 41.57984172515595,
+    "east": -49.7999267578125,
+    "west": -50.1009521484375
+  },
+  "cols": 548,
+  "rows": 546,
+  "cellsize_deg": 0.00054931640625,
+  "cellsize_m_x": 45.6356847734511,
+  "cellsize_m_y": 61.14990234375,
+  "min_m": -3977.53,
+  "max_m": -3338.74,
+  "nodata_count": 0,
+  "center": {
+    "lat": 41.7298051040622,
+    "lon": -49.950439453125
+  },
+  "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
+  "requested_bbox": {
+    "north": 41.88,
+    "south": 41.58,
+    "east": -49.8,
+    "west": -50.1
+  },
+  "resolution": "high",
+  "layer": "topo"
+}

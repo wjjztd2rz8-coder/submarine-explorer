@@ -1,0 +1,33 @@
+{
+  "id": "lost-city",
+  "source": "GMRT",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=30.2&south=30.03&east=-42.02&west=-42.22&layer=topo&format=esriascii&resolution=high",
+  "fetched_at": "2026-09-17T01:25:34Z",
+  "bbox": {
+    "north": 30.200466099547846,
+    "south": 30.030178013610346,
+    "east": -42.0194091796875,
+    "west": -42.22100830078125
+  },
+  "cols": 367,
+  "rows": 310,
+  "cellsize_deg": 0.00054931640625,
+  "cellsize_m_x": 52.895721920443094,
+  "cellsize_m_y": 61.14990234375,
+  "min_m": -5002.18,
+  "max_m": -724.1,
+  "nodata_count": 0,
+  "center": {
+    "lat": 30.115322056579096,
+    "lon": -42.120208740234375
+  },
+  "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
+  "requested_bbox": {
+    "north": 30.2,
+    "south": 30.03,
+    "east": -42.02,
+    "west": -42.22
+  },
+  "resolution": "high",
+  "layer": "topo"
+}

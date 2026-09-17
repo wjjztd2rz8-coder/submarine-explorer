@@ -1,0 +1,33 @@
+{
+  "id": "monterey-canyon",
+  "source": "GMRT",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=36.95&south=36.6&east=-121.75&west=-122.2&layer=topo&format=esriascii&resolution=high",
+  "fetched_at": "2026-09-17T00:59:49Z",
+  "bbox": {
+    "north": 36.95022534394903,
+    "south": 36.59976147676153,
+    "east": -121.74993896484375,
+    "west": -122.20037841796875
+  },
+  "cols": 820,
+  "rows": 638,
+  "cellsize_deg": 0.00054931640625,
+  "cellsize_m_x": 48.98062764088544,
+  "cellsize_m_y": 61.14990234375,
+  "min_m": -2332.81,
+  "max_m": 265.41,
+  "nodata_count": 0,
+  "center": {
+    "lat": 36.77499341035528,
+    "lon": -121.97515869140625
+  },
+  "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
+  "requested_bbox": {
+    "north": 36.95,
+    "south": 36.6,
+    "east": -121.75,
+    "west": -122.2
+  },
+  "resolution": "high",
+  "layer": "topo"
+}

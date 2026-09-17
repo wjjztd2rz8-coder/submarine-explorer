@@ -1,0 +1,2432 @@
+{
+  "version": 1,
+  "generated": "2026-09-16",
+  "count": 68,
+  "landmarks": [
+    {
+      "id": "lost-city",
+      "name": "Lost City Hydrothermal Field",
+      "type": "vent",
+      "lat": 30.1167,
+      "lon": -42.1167,
+      "depth_m": 800,
+      "depth_range_m": [750, 900],
+      "bbox": {
+        "north": 30.2,
+        "south": 30.03,
+        "east": -42.02,
+        "west": -42.22
+      },
+      "region": "Mid-Atlantic Ridge",
+      "country_eez": "international waters",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field",
+      "summary": "A field of towering carbonate chimneys on the Atlantis Massif, venting warm alkaline fluid driven by serpentinization rather than magma, hosting unique microbial life relevant to origin-of-life research.",
+      "facts": [
+        "Chimneys are carbonate, not sulfide, and among the tallest known vent structures (~60 m, 'Poseidon')",
+        "Powered by serpentinization of mantle rock, not magmatic heat",
+        "Discovered in December 2000 using DSV Alvin",
+        "Considered a model for possible life on icy moons like Enceladus"
+      ],
+      "gameplay_hooks": [
+        "Climb and sample the Poseidon carbonate tower",
+        "Compare alkaline vent chemistry to black smokers",
+        "Astrobiology research side-quest referencing icy moons"
+      ],
+      "hazards": ["fragile/protected formations", "moderate currents"],
+      "notable_species": ["novel archaea and bacteria", "limited macrofauna vs black smokers"],
+      "external_links": [
+        "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field",
+        "https://vents-data.interridge.org/"
+      ],
+      "wreck_meta": null
+    },
+    {
+      "id": "tag-vent-field",
+      "name": "TAG Hydrothermal Field",
+      "type": "vent",
+      "lat": 26.1417,
+      "lon": -44.8283,
+      "depth_m": 3650,
+      "depth_range_m": [3630, 3670],
+      "bbox": {
+        "north": 26.2,
+        "south": 26.08,
+        "east": -44.76,
+        "west": -44.9
+      },
+      "region": "Mid-Atlantic Ridge",
+      "country_eez": "international waters",
+      "confidence": "high",
+      "coordinate_source": "https://vents-data.interridge.org/ventfield/tag",
+      "summary": "Trans-Atlantic Geotraverse (TAG) hydrothermal field, a classic black-smoker sulfide mound on the Mid-Atlantic Ridge, studied since the 1980s and a model site for seafloor massive sulfide deposits.",
+      "facts": [
+        "One of the best-studied black smoker sites, active for tens of thousands of years",
+        "Sulfide mound is roughly 200 m in diameter and 50 m tall",
+        "Drilled by ODP Leg 158 to study sub-seafloor sulfide structure",
+        "Fluids reach temperatures over 360 degrees C"
+      ],
+      "gameplay_hooks": [
+        "Core-drill the sulfide mound for mineral samples",
+        "Black-smoker chimney temperature-mapping mission"
+      ],
+      "hazards": ["scalding vent fluid (>360C)", "toxic sulfide plumes"],
+      "notable_species": ["shrimp (Rimicaris exoculata)", "vent mussels"],
+      "external_links": ["https://vents-data.interridge.org/ventfield/tag"],
+      "wreck_meta": null
+    },
+    {
+      "id": "rainbow-vent-field",
+      "name": "Rainbow Hydrothermal Field",
+      "type": "vent",
+      "lat": 36.2333,
+      "lon": -33.9,
+      "depth_m": 2300,
+      "depth_range_m": [2270, 2320],
+      "bbox": {
+        "north": 36.3,
+        "south": 36.17,
+        "east": -33.83,
+        "west": -33.97
+      },
+      "region": "Mid-Atlantic Ridge (near Azores)",
+      "country_eez": "international waters",
+      "confidence": "high",
+      "coordinate_source": "https://vents-data.interridge.org/ventfield/rainbow",
+      "summary": "An ultramafic-hosted hydrothermal field on the Mid-Atlantic Ridge near the Azores, producing metal-rich, highly acidic fluids from serpentinizing peridotite.",
+      "facts": [
+        "Hosted in mantle peridotite rather than typical basalt",
+        "Fluids are notably rich in iron, hydrogen, and methane",
+        "Supports dense shrimp swarms similar to TAG and Snake Pit",
+        "Within the OSPAR Rainbow Hydrothermal Field Marine Protected Area"
+      ],
+      "gameplay_hooks": [
+        "Compare ultramafic vs basaltic vent chemistry",
+        "Marine-protected-area conservation mission"
+      ],
+      "hazards": ["acidic metal-rich fluids", "protected area restrictions"],
+      "notable_species": ["Rimicaris exoculata shrimp", "vent-endemic gastropods"],
+      "external_links": ["https://vents-data.interridge.org/ventfield/rainbow"],
+      "wreck_meta": null
+    },
+    {
+      "id": "snake-pit-vent-field",
+      "name": "Snake Pit Hydrothermal Field",
+      "type": "vent",
+      "lat": 23.3667,
+      "lon": -44.95,
+      "depth_m": 3480,
+      "depth_range_m": [3460, 3500],
+      "bbox": {
+        "north": 23.43,
+        "south": 23.3,
+        "east": -44.88,
+        "west": -45.02
+      },
+      "region": "Mid-Atlantic Ridge",
+      "country_eez": "international waters",
+      "confidence": "medium",
+      "coordinate_source": "https://vents-data.interridge.org/ventfield/snake-pit",
+      "summary": "A basalt-hosted black smoker field on the Mid-Atlantic Ridge south of the Kane Fracture Zone, named for its dense clusters of eel-like zoarcid fish and vent shrimp.",
+      "facts": [
+        "Discovered in 1985 during Alvin dives",
+        "Named for dense aggregations of shrimp and fish resembling a pit of snakes",
+        "Classic basalt-hosted black smoker chemistry"
+      ],
+      "gameplay_hooks": [
+        "Fish-and-shrimp biodiversity survey",
+        "Black smoker chimney growth time-lapse mission"
+      ],
+      "hazards": ["scalding vent fluid", "toxic sulfide plumes"],
+      "notable_species": ["Rimicaris exoculata shrimp", "zoarcid eelpouts"],
+      "external_links": ["https://vents-data.interridge.org/ventfield/snake-pit"],
+      "wreck_meta": null
+    },
+    {
+      "id": "endeavour-vent-field",
+      "name": "Endeavour Hydrothermal Vents",
+      "type": "vent",
+      "lat": 47.95,
+      "lon": -129.1,
+      "depth_m": 2200,
+      "depth_range_m": [2190, 2250],
+      "bbox": {
+        "north": 48.02,
+        "south": 47.88,
+        "east": -129.02,
+        "west": -129.18
+      },
+      "region": "Juan de Fuca Ridge, NE Pacific",
+      "country_eez": "international waters (Canada EEZ vicinity)",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Endeavour_Hydrothermal_Vents",
+      "summary": "A cluster of large black-smoker sulfide edifices on the Juan de Fuca Ridge, designated Canada's first Marine Protected Area and monitored by the NEPTUNE/Ocean Networks Canada cabled observatory.",
+      "facts": [
+        "Canada's first Marine Protected Area, designated 2003",
+        "Hosts massive sulfide structures including 'Godzilla' (since collapsed)",
+        "Continuously monitored via the Ocean Networks Canada NEPTUNE cabled array",
+        "Located on the fast-spreading Juan de Fuca Ridge"
+      ],
+      "gameplay_hooks": [
+        "Live-data tie-in with real-time seismic/vent sensors",
+        "Track chimney growth using NEPTUNE observatory feeds"
+      ],
+      "hazards": ["scalding fluids", "toxic plumes", "protected MPA restrictions"],
+      "notable_species": ["tubeworms (Ridgeia)", "vent crabs"],
+      "external_links": [
+        "https://en.wikipedia.org/wiki/Endeavour_Hydrothermal_Vents",
+        "https://www.oceannetworks.ca/"
+      ],
+      "wreck_meta": null
+    },
+    {
+      "id": "axial-seamount-ashes",
+      "name": "Axial Seamount / ASHES Vent Field",
+      "type": "vent",
+      "lat": 45.95,
+      "lon": -130.0089,
+      "depth_m": 1530,
+      "depth_range_m": [1400, 1550],
+      "bbox": {
+        "north": 46.02,
+        "south": 45.88,
+        "east": -129.92,
+        "west": -130.08
+      },
+      "region": "Juan de Fuca Ridge, NE Pacific",
+      "country_eez": "international waters",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Axial_Seamount",
+      "summary": "The most active submarine volcano on the Juan de Fuca Ridge, hosting the ASHES vent field within its caldera; instrumented by the NOAA/University of Washington cabled observatory network for real-time eruption monitoring.",
+      "facts": [
+        "Erupted in 1998, 2011, and 2015; monitored for future eruptions",
+        "Hosts the Ocean Observatories Initiative cabled array with real-time sensors",
+        "Summit caldera is roughly 3 by 8 km",
+        "ASHES vent field lies within the caldera's western wall"
+      ],
+      "gameplay_hooks": [
+        "Eruption-prediction mission using live seismic/pressure data",
+        "Caldera-floor exploration with lava-flow hazard timer"
+      ],
+      "hazards": ["active volcanic eruption risk", "scalding vent fluids", "toxic gases"],
+      "notable_species": ["tubeworms", "limpets", "palm worms"],
+      "external_links": [
+        "https://en.wikipedia.org/wiki/Axial_Seamount",
+        "https://interactiveoceans.washington.edu/"
+      ],
+      "wreck_meta": null
+    },
+    {
+      "id": "guaymas-basin",
+      "name": "Guaymas Basin Vent Field",
+      "type": "vent",
+      "lat": 27.0083,
+      "lon": -111.4083,
+      "depth_m": 2000,
+      "depth_range_m": [1980, 2020],
+      "bbox": {
+        "north": 27.08,
+        "south": 26.94,
+        "east": -111.32,
+        "west": -111.5
+      },
+      "region": "Gulf of California",
+      "country_eez": "Mexico",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Guaymas_Basin",
+      "summary": "A sediment-covered spreading center in the Gulf of California where hydrothermal fluids percolate through thick organic-rich sediment, producing oil-like hydrocarbons and unique microbial mats instead of bare-rock black smokers.",
+      "facts": [
+        "Sediment-hosted vents create petroleum-like hydrocarbons via thermal alteration of organic matter",
+        "Home to thick white mats of the giant sulfur bacterium Beggiatoa",
+        "Studied extensively by Alvin and, in 2022, by DSV Limiting Factor and remote teams",
+        "Site of unusual 'methane ice worms' and abundant tubeworms"
+      ],
+      "gameplay_hooks": [
+        "Sample hydrocarbon seep chemistry vs vent chemistry",
+        "Beggiatoa mat mapping minigame"
+      ],
+      "hazards": ["soft unstable sediment", "toxic hydrogen sulfide", "scalding fluids"],
+      "notable_species": ["Beggiatoa sulfur bacteria mats", "tubeworms", "vent crabs"],
+      "external_links": ["https://en.wikipedia.org/wiki/Guaymas_Basin"],
+      "wreck_meta": null
+    },
+    {
+      "id": "lokis-castle",
+      "name": "Loki's Castle Vent Field",
+      "type": "vent",
+      "lat": 73.7,
+      "lon": -8.4667,
+      "depth_m": 2352,
+      "depth_range_m": [2320, 2400],
+      "bbox": {
+        "north": 73.77,
+        "south": 73.63,
+        "east": -8.36,
+        "west": -8.57
+      },
+      "region": "Arctic Mid-Atlantic Ridge (Norwegian-Greenland Sea)",
+      "country_eez": "international waters",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Loki%27s_Castle",
+      "summary": "The northernmost known hydrothermal vent field at the time of its 2008 discovery, located at the junction of the Mohns and Knipovich ridges, named for its two paired sulfide mounds.",
+      "facts": [
+        "Discovered in 2008 by University of Bergen researchers",
+        "Named after Norse mythology's Loki, referencing its castle-like twin sulfide towers",
+        "Hosted the discovery of the Lokiarchaeota, an archaeal lineage important to understanding eukaryote origins",
+        "Located at the boundary of the Mohns and Knipovich Ridges"
+      ],
+      "gameplay_hooks": [
+        "Archaea-sampling mission tied to Lokiarchaeota discovery lore",
+        "Arctic vent-field mapping under polar conditions"
+      ],
+      "hazards": ["extreme cold", "remote Arctic access", "scalding vent fluids"],
+      "notable_species": ["Lokiarchaeota (archaea)", "vent shrimp"],
+      "external_links": ["https://en.wikipedia.org/wiki/Loki%27s_Castle"],
+      "wreck_meta": null
+    },
+    {
+      "id": "beebe-vent-field",
+      "name": "Beebe Hydrothermal Vent Field (Von Damm/Piccard)",
+      "type": "vent",
+      "lat": 18.5464,
+      "lon": -81.718,
+      "depth_m": 4960,
+      "depth_range_m": [4957, 4987],
+      "bbox": {
+        "north": 18.62,
+        "south": 18.47,
+        "east": -81.63,
+        "west": -81.8
+      },
+      "region": "Cayman Trough, Caribbean",
+      "country_eez": "international waters (Cayman Islands vicinity)",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field",
+      "summary": "The deepest known hydrothermal vent field on Earth, on the ultraslow-spreading Mid-Cayman Spreading Centre, venting fluids exceeding 400 degrees C that approach supercritical conditions.",
+      "facts": [
+        "World's deepest known active hydrothermal vent field at ~4,960 m",
+        "Fluids exceed 400C and show evidence of supercritical (phase-separated) venting",
+        "Named after ocean explorer William Beebe",
+        "On the ultraslow-spreading Mid-Cayman Spreading Centre alongside the shallower Von Damm field"
+      ],
+      "gameplay_hooks": [
+        "Deepest-vent-field record dive",
+        "Supercritical fluid sampling challenge"
+      ],
+      "hazards": ["extreme pressure", "scalding supercritical fluids", "crush depth"],
+      "notable_species": ["Rimicaris hybisae shrimp", "anemones"],
+      "external_links": [
+        "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field",
+        "https://vents-data.interridge.org/ventfield/beebe"
+      ],
+      "wreck_meta": null
+    },
+    {
+      "id": "rose-garden-galapagos-rift",
+      "name": "Rose Garden / Galápagos Rift Vent Field",
+      "type": "vent",
+      "lat": 0.7833,
+      "lon": -86.1667,
+      "depth_m": 2500,
+      "depth_range_m": [2450, 2550],
+      "bbox": {
+        "north": 0.85,
+        "south": 0.72,
+        "east": -86.09,
+        "west": -86.24
+      },
+      "region": "Galápagos Rift, East Pacific",
+      "country_eez": "international waters",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Hydrothermal_vent",
+      "summary": "Site of the 1977 discovery of hydrothermal vents and chemosynthetic life on the Galápagos Rift, which overturned prior assumptions that life depended entirely on sunlight; the original 'Rose Garden' site has since gone dormant and was succeeded by 'Rosebud'.",
+      "facts": [
+        "Site of the 1977 Alvin dive that discovered chemosynthesis-based ecosystems",
+        "Original Rose Garden vents went extinct by the 1990s after volcanic resurfacing",
+        "A successor field, 'Rosebud', later grew in nearly the same area",
+        "Giant tubeworms (Riftia pachyptila) were first described here"
+      ],
+      "gameplay_hooks": [
+        "Historical-discovery reenactment of the first vent-life find",
+        "Track ecosystem succession from Rose Garden to Rosebud"
+      ],
+      "hazards": ["scalding vent fluids", "shifting lava flows"],
+      "notable_species": ["giant tubeworms (Riftia pachyptila)", "vent clams"],
+      "external_links": ["https://en.wikipedia.org/wiki/Hydrothermal_vent"],
+      "wreck_meta": null
+    },
+    {
+      "id": "epr-9-50n",
+      "name": "East Pacific Rise 9°50'N Vent Field",
+      "type": "vent",
+      "lat": 9.8333,
+      "lon": -104.2833,
+      "depth_m": 2500,
+      "depth_range_m": [2490, 2520],
+      "bbox": {
+        "north": 9.9,
+        "south": 9.77,
+        "east": -104.21,
+        "west": -104.36
+      },
+      "region": "East Pacific Rise",
+      "country_eez": "international waters",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/East_Pacific_Rise",
+      "summary": "One of the most intensively studied fast-spreading mid-ocean-ridge vent sites, monitored for decades to observe eruption cycles and rapid post-eruption ecological succession.",
+      "facts": [
+        "Subject of long-term time-series studies since the 1980s (WHOI, Rutgers)",
+        "Experienced documented eruptions in 1991 and 2005-06 that reset local ecosystems",
+        "Fast-spreading ridge produces frequent volcanic resurfacing events",
+        "Key site for studying colonization and succession after eruptions"
+      ],
+      "gameplay_hooks": [
+        "Before/after eruption ecosystem-recovery challenge",
+        "Fast-spreading ridge volcanic hazard simulation"
+      ],
+      "hazards": ["active volcanic/eruption risk", "scalding fluids"],
+      "notable_species": ["giant tubeworms", "vent crabs (Bythograea)"],
+      "external_links": ["https://en.wikipedia.org/wiki/East_Pacific_Rise"],
+      "wreck_meta": null
+    },
+    {
+      "id": "challenger-deep",
+      "name": "Challenger Deep",
+      "type": "trench",
+      "lat": 11.3733,
+      "lon": 142.5917,
+      "depth_m": 10925,
+      "depth_range_m": [10902, 10935],
+      "bbox": {
+        "north": 11.55,
+        "south": 11.2,
+        "east": 142.75,
+        "west": 142.4
+      },
+      "region": "Western Pacific",
+      "country_eez": "Federated States of Micronesia / international (Mariana Trench)",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Challenger_Deep",
+      "summary": "The deepest known point in Earth's oceans, located in the southern Mariana Trench; consists of three en echelon basins with the eastern pool deepest.",
+      "facts": [
+        "Deepest confirmed point on Earth's seafloor",
+        "First crewed descent 1960 (Trieste, Piccard & Walsh)",
+        "2019 Five Deeps Expedition surveyed three sub-basins",
+        "Pressure exceeds 1,000 atmospheres",
+        "Named after HMS Challenger, first sounded it in 1875"
+      ],
+      "gameplay_hooks": [
+        "Full-ocean-depth descent sequence with hull-stress mechanic",
+        "Locate and compare the three sub-basins",
+        "Deploy a lander to the eastern pool"
+      ],
+      "hazards": ["crush depth", "near-total darkness", "extreme pressure", "long transit time"],
+      "notable_species": [
+        "Amphipods (Hirondellea gigas)",
+        "Xenophyophores",
+        "Deep-sea holothurians"
+      ],
+      "external_links": ["https://en.wikipedia.org/wiki/Challenger_Deep", "https://fivedeeps.com/"],
+      "wreck_meta": null
+    },
+    {
+      "id": "sirena-deep",
+      "name": "Sirena Deep",
+      "type": "trench",
+      "lat": 12.0653,
+      "lon": 144.8058,
+      "depth_m": 10714,
+      "depth_range_m": [10666, 10714],
+      "bbox": {
+        "north": 12.25,
+        "south": 11.9,
+        "east": 145.0,
+        "west": 144.6
+      },
+      "region": "Western Pacific",
+      "country_eez": "international (Mariana Trench)",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Mariana_Trench",
+      "summary": "Third-deepest oceanic point on Earth, located in the Mariana Trench roughly 200 km east of Challenger Deep.",
+      "facts": [
+        "First surveyed in detail by a Japanese sonar expedition in 1997",
+        "Depth estimates vary 10,666-10,714 m across surveys",
+        "Lies along the same subduction trench as Challenger Deep"
+      ],
+      "gameplay_hooks": [
+        "Comparative depth-survey mission against Challenger Deep",
+        "Sonar-mapping minigame to resolve conflicting depth readings"
+      ],
+      "hazards": ["crush depth", "extreme pressure"],
+      "notable_species": ["amphipods", "foraminifera"],
+      "external_links": ["https://en.wikipedia.org/wiki/Mariana_Trench"],
+      "wreck_meta": null
+    },
+    {
+      "id": "horizon-deep",
+      "name": "Horizon Deep (Tonga Trench)",
+      "type": "trench",
+      "lat": -23.2583,
+      "lon": -174.7267,
+      "depth_m": 10823,
+      "depth_range_m": [10800, 10823],
+      "bbox": {
+        "north": -23.05,
+        "south": -23.45,
+        "east": -174.5,
+        "west": -174.95
+      },
+      "region": "South Pacific",
+      "country_eez": "international (Tonga Trench)",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Tonga_Trench",
+      "summary": "Second-deepest point on Earth and deepest in the Southern Hemisphere, in the Tonga Trench where the Pacific plate subducts fastest on the planet.",
+      "facts": [
+        "Deepest point in the Southern Hemisphere",
+        "Subduction here is the fastest on Earth, ~24 cm/yr",
+        "Named for research vessel Horizon, which found it in 1952",
+        "Only ~105 m shallower than Challenger Deep"
+      ],
+      "gameplay_hooks": [
+        "Race-the-plate mission illustrating subduction speed",
+        "Southern-hemisphere depth record challenge"
+      ],
+      "hazards": ["crush depth", "seismic activity"],
+      "notable_species": ["amphipods"],
+      "external_links": ["https://en.wikipedia.org/wiki/Tonga_Trench"],
+      "wreck_meta": null
+    },
+    {
+      "id": "molloy-deep",
+      "name": "Molloy Deep",
+      "type": "trench",
+      "lat": 79.14,
+      "lon": 2.83,
+      "depth_m": 5550,
+      "depth_range_m": [5540, 5607],
+      "bbox": {
+        "north": 79.35,
+        "south": 78.95,
+        "east": 3.3,
+        "west": 2.3
+      },
+      "region": "Arctic Ocean (Fram Strait)",
+      "country_eez": "international / Svalbard vicinity",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Molloy_Deep",
+      "summary": "Deepest point of the Arctic Ocean, located in the Molloy Hole/Fram Strait between Greenland and Svalbard on the Molloy Transform Fault.",
+      "facts": [
+        "Deepest point in the entire Arctic Ocean",
+        "Sits on the Molloy Transform Fault linking the Knipovich and Lena Trough spreading ridges",
+        "Named after oceanographer Arthur Molloy"
+      ],
+      "gameplay_hooks": [
+        "Under-ice descent mission with sea-ice navigation puzzle",
+        "Compare Arctic vs. tropical trench ecosystems"
+      ],
+      "hazards": ["sea ice cover", "extreme cold", "crush depth", "remote location"],
+      "notable_species": ["Arctic amphipods"],
+      "external_links": ["https://en.wikipedia.org/wiki/Molloy_Deep"],
+      "wreck_meta": null
+    },
+    {
+      "id": "milwaukee-deep",
+      "name": "Milwaukee Deep (Puerto Rico Trench)",
+      "type": "trench",
+      "lat": 19.613,
+      "lon": -66.5,
+      "depth_m": 8376,
+      "depth_range_m": [8340, 8408],
+      "bbox": {
+        "north": 19.85,
+        "south": 19.4,
+        "east": -66.2,
+        "west": -66.8
+      },
+      "region": "North Atlantic (Caribbean)",
+      "country_eez": "international (near Puerto Rico)",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Puerto_Rico_Trench",
+      "summary": "Deepest point in the Atlantic Ocean, located in the Puerto Rico Trench north of Puerto Rico.",
+      "facts": [
+        "Deepest point in the Atlantic basin",
+        "Associated with the boundary between the Caribbean and North American plates",
+        "Region capable of generating tsunamis threatening the Caribbean"
+      ],
+      "gameplay_hooks": ["Atlantic depth-record dive", "Tsunami-source seismic survey mission"],
+      "hazards": ["crush depth", "seismic/tsunami hazard zone"],
+      "notable_species": ["deep-sea amphipods"],
+      "external_links": ["https://en.wikipedia.org/wiki/Puerto_Rico_Trench"],
+      "wreck_meta": null
+    },
+    {
+      "id": "java-trench",
+      "name": "Java Trench (Sunda Trench)",
+      "type": "trench",
+      "lat": -10.19,
+      "lon": 109.47,
+      "depth_m": 7290,
+      "depth_range_m": [7186, 7450],
+      "bbox": {
+        "north": -9.8,
+        "south": -10.6,
+        "east": 109.9,
+        "west": 109.0
+      },
+      "region": "Indian Ocean",
+      "country_eez": "Indonesia (international waters offshore)",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Sunda_Trench",
+      "summary": "Deepest point in the Indian Ocean, formed where the Indo-Australian plate subducts beneath the Sunda plate; source region of the 2004 Indian Ocean earthquake.",
+      "facts": [
+        "Deepest point of the Indian Ocean",
+        "Segment that ruptured in the 2004 Sumatra-Andaman earthquake and tsunami",
+        "Also called the Sunda Trench"
+      ],
+      "gameplay_hooks": [
+        "Tsunami-genesis educational mission",
+        "Plate-subduction visualization dive"
+      ],
+      "hazards": ["seismic activity", "crush depth", "strong currents"],
+      "notable_species": ["deep-sea fish"],
+      "external_links": ["https://en.wikipedia.org/wiki/Sunda_Trench"],
+      "wreck_meta": null
+    },
+    {
+      "id": "kuril-kamchatka-trench",
+      "name": "Kuril-Kamchatka Trench",
+      "type": "trench",
+      "lat": 44.0,
+      "lon": 150.5,
+      "depth_m": 9604,
+      "depth_range_m": [9500, 9783],
+      "bbox": {
+        "north": 45.0,
+        "south": 43.0,
+        "east": 152.0,
+        "west": 149.0
+      },
+      "region": "Northwest Pacific",
+      "country_eez": "international / Russia vicinity",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Kuril%E2%80%93Kamchatka_Trench",
+      "summary": "A deep subduction trench off the Kuril Islands and Kamchatka Peninsula, part of the Pacific Ring of Fire.",
+      "facts": [
+        "One of the deepest trenches in the Pacific, exceeding 9,600 m",
+        "Formed by subduction of the Pacific plate beneath the Okhotsk plate",
+        "Highly seismically active, produces major earthquakes and tsunamis"
+      ],
+      "gameplay_hooks": ["Ring-of-Fire seismic monitoring mission"],
+      "hazards": ["seismic activity", "crush depth", "cold water"],
+      "notable_species": ["deep-sea grenadiers"],
+      "external_links": ["https://en.wikipedia.org/wiki/Kuril%E2%80%93Kamchatka_Trench"],
+      "wreck_meta": null
+    },
+    {
+      "id": "atacama-trench",
+      "name": "Atacama Trench (Peru-Chile Trench)",
+      "type": "trench",
+      "lat": -23.37,
+      "lon": -71.5,
+      "depth_m": 8065,
+      "depth_range_m": [8000, 8065],
+      "bbox": {
+        "north": -22.5,
+        "south": -24.2,
+        "east": -70.8,
+        "west": -72.2
+      },
+      "region": "Southeast Pacific",
+      "country_eez": "Chile / international",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Atacama_Trench",
+      "summary": "Deep subduction trench off the coast of Chile and Peru where the Nazca plate subducts beneath South America; site of dedicated hadal biology research (Atacama Trench expeditions).",
+      "facts": [
+        "Deepest trench in the eastern Pacific",
+        "Target of the 2018 Atacama Trench hadal expedition (HADES)",
+        "Home to endemic hadal snailfish species"
+      ],
+      "gameplay_hooks": ["Hadal snailfish tagging mission", "Nazca-plate subduction visualization"],
+      "hazards": ["crush depth", "seismic activity"],
+      "notable_species": ["Atacama snailfish (Notoliparis)", "amphipods"],
+      "external_links": ["https://en.wikipedia.org/wiki/Atacama_Trench"],
+      "wreck_meta": null
+    },
+    {
+      "id": "meteor-deep",
+      "name": "Meteor Deep (South Sandwich Trench)",
+      "type": "trench",
+      "lat": -55.3325,
+      "lon": -26.0,
+      "depth_m": 8202,
+      "depth_range_m": [8202, 8264],
+      "bbox": {
+        "north": -54.9,
+        "south": -55.7,
+        "east": -25.4,
+        "west": -26.6
+      },
+      "region": "Southern Ocean / South Atlantic",
+      "country_eez": "international (near South Sandwich Islands, UK claim)",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/South_Sandwich_Trench",
+      "summary": "Deepest point of the Southern Ocean, in the South Sandwich Trench where the South American plate subducts beneath the Sandwich microplate.",
+      "facts": [
+        "Deepest point of the Southern Ocean",
+        "Named after German research vessel Meteor",
+        "Surveyed by the Five Deeps Expedition in 2019"
+      ],
+      "gameplay_hooks": ["Southern Ocean depth-record dive amid strong currents and icebergs"],
+      "hazards": ["crush depth", "icebergs", "extreme cold", "remote location"],
+      "notable_species": ["hadal amphipods"],
+      "external_links": ["https://en.wikipedia.org/wiki/South_Sandwich_Trench"],
+      "wreck_meta": null
+    },
+    {
+      "id": "kamaehuakanaloa",
+      "name": "Kama'ehuakanaloa (Lo'ihi) Seamount",
+      "type": "seamount",
+      "lat": 18.9167,
+      "lon": -155.2667,
+      "depth_m": 975,
+      "depth_range_m": [975, 975],
+      "bbox": {
+        "north": 19.05,
+        "south": 18.78,
+        "east": -155.15,
+        "west": -155.38
+      },
+      "region": "Hawaii, North Pacific",
+      "country_eez": "United States",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount",
+      "summary": "An active submarine shield volcano rising over 3,000 m from the seafloor southeast of the Big Island of Hawaii; the presumed next Hawaiian island in the making.",
+      "facts": [
+        "Renamed from Lo'ihi to Kama'ehuakanaloa in 2021, honoring Hawaiian tradition",
+        "Summit lies about 975 m below sea level, could breach the surface in tens of thousands of years",
+        "Hosts active hydrothermal venting and iron-oxidizing microbial mats",
+        "Experienced a major seismic swarm and collapse event in 1996"
+      ],
+      "gameplay_hooks": [
+        "Watch a future-island-in-the-making volcanic vent field",
+        "Iron-mat microbial sampling mission"
+      ],
+      "hazards": ["volcanic activity", "seismic swarms", "acidic vent fluids"],
+      "notable_species": ["iron-oxidizing bacteria mats", "hydroid colonies"],
+      "external_links": ["https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount"],
+      "wreck_meta": null
+    },
+    {
+      "id": "davidson-seamount",
+      "name": "Davidson Seamount",
+      "type": "seamount",
+      "lat": 35.7167,
+      "lon": -122.7167,
+      "depth_m": 1250,
+      "depth_range_m": [1250, 2400],
+      "bbox": {
+        "north": 35.83,
+        "south": 35.6,
+        "east": -122.55,
+        "west": -122.88
+      },
+      "region": "Central California coast, NE Pacific",
+      "country_eez": "United States",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Davidson_Seamount",
+      "summary": "A large extinct volcanic seamount off central California within Monterey Bay National Marine Sanctuary, renowned for dense deep-sea coral and sponge gardens.",
+      "facts": [
+        "Rises about 2,400 m from the seafloor but its summit stays 1,250 m below the surface, never reaching shallow water",
+        "Protected as part of Monterey Bay National Marine Sanctuary",
+        "Hosts extensive gardens of bubblegum coral and other deep-sea corals",
+        "First surveyed in detail via ROV in the early 2000s"
+      ],
+      "gameplay_hooks": [
+        "Deep coral garden biodiversity survey",
+        "Marine sanctuary conservation patrol mission"
+      ],
+      "hazards": ["moderate depth", "strong currents"],
+      "notable_species": ["bubblegum coral (Paragorgia)", "brisingid sea stars", "rockfish"],
+      "external_links": ["https://en.wikipedia.org/wiki/Davidson_Seamount"],
+      "wreck_meta": null
+    },
+    {
+      "id": "bowie-seamount",
+      "name": "Bowie Seamount",
+      "type": "seamount",
+      "lat": 53.3167,
+      "lon": -135.6667,
+      "depth_m": 24,
+      "depth_range_m": [24, 3000],
+      "bbox": {
+        "north": 53.42,
+        "south": 53.21,
+        "east": -135.55,
+        "west": -135.78
+      },
+      "region": "NE Pacific, off British Columbia",
+      "country_eez": "Canada",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Bowie_Seamount",
+      "summary": "A shallow-summit seamount off the coast of British Columbia, designated as SGaan Kinghlas-Bowie Seamount Marine Protected Area, rich in productive upwelling-driven marine life.",
+      "facts": [
+        "Summit is only about 24 m below the surface, unusually shallow for an offshore seamount",
+        "Protected as Canada's SGaan Kinghlas-Bowie Seamount Marine Protected Area since 2008",
+        "Name 'SGaan Kinghlas' means 'supernatural being looking outward' in Haida",
+        "Supports a highly productive food web due to upwelling around the peak"
+      ],
+      "gameplay_hooks": [
+        "Shallow-summit kelp-and-fish productivity survey",
+        "Indigenous-named MPA conservation questline"
+      ],
+      "hazards": ["strong currents", "fishing gear entanglement"],
+      "notable_species": ["rockfish", "sea lions", "kelp"],
+      "external_links": ["https://en.wikipedia.org/wiki/Bowie_Seamount"],
+      "wreck_meta": null
+    },
+    {
+      "id": "great-meteor-seamount",
+      "name": "Great Meteor Seamount",
+      "type": "seamount",
+      "lat": 29.9667,
+      "lon": -28.5833,
+      "depth_m": 270,
+      "depth_range_m": [270, 4000],
+      "bbox": {
+        "north": 30.15,
+        "south": 29.78,
+        "east": -28.35,
+        "west": -28.8
+      },
+      "region": "North Atlantic (New England-Corner Rise area)",
+      "country_eez": "international waters",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Great_Meteor_Seamount",
+      "summary": "One of the largest guyots (flat-topped seamounts) in the Atlantic, rising over 4,000 m from the abyssal plain, an important biodiversity hotspot for pelagic and benthic species.",
+      "facts": [
+        "A guyot with a flat summit formed by ancient wave erosion before subsiding",
+        "Rises roughly 4,000 m above the surrounding abyssal seafloor",
+        "Important feeding ground for seabirds, tuna, and marine mammals",
+        "Studied extensively by German research vessel Meteor, its namesake"
+      ],
+      "gameplay_hooks": [
+        "Flat-top guyot exploration and ancient shoreline forensic mission",
+        "Pelagic megafauna aggregation encounter"
+      ],
+      "hazards": ["strong currents", "open-ocean exposure"],
+      "notable_species": ["tuna", "seabirds", "deep-sea corals"],
+      "external_links": ["https://en.wikipedia.org/wiki/Great_Meteor_Seamount"],
+      "wreck_meta": null
+    },
+    {
+      "id": "vema-seamount",
+      "name": "Vema Seamount",
+      "type": "seamount",
+      "lat": -31.6167,
+      "lon": 8.3333,
+      "depth_m": 26,
+      "depth_range_m": [26, 4600],
+      "bbox": {
+        "north": -31.48,
+        "south": -31.75,
+        "east": 8.47,
+        "west": 8.2
+      },
+      "region": "South Atlantic",
+      "country_eez": "international waters",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Vema_Seamount",
+      "summary": "A remarkably shallow-summit seamount in the South Atlantic rising over 4,600 m from the abyssal plain, discovered by the research vessel Vema in 1959.",
+      "facts": [
+        "Summit lies only about 26 m below the surface",
+        "Rises more than 4,600 m from the surrounding seafloor, comparable in height to major mountains",
+        "Hosts kelp and rock lobster despite its remote mid-ocean location",
+        "Named after the research vessel Vema that discovered it in 1959"
+      ],
+      "gameplay_hooks": [
+        "Mid-ocean shallow-reef 'oasis' exploration far from any coastline",
+        "Rock-lobster survey minigame"
+      ],
+      "hazards": ["strong swell near summit", "remote open-ocean location"],
+      "notable_species": ["rock lobster", "kelp"],
+      "external_links": ["https://en.wikipedia.org/wiki/Vema_Seamount"],
+      "wreck_meta": null
+    },
+    {
+      "id": "hunga-tonga-caldera",
+      "name": "Hunga Tonga-Hunga Ha'apai Caldera",
+      "type": "seamount",
+      "lat": -20.55,
+      "lon": -175.4,
+      "depth_m": 850,
+      "depth_range_m": [150, 850],
+      "bbox": {
+        "north": -20.45,
+        "south": -20.65,
+        "east": -175.3,
+        "west": -175.5
+      },
+      "region": "Tonga, South Pacific",
+      "country_eez": "Tonga",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Hunga_Tonga%E2%80%93Hunga_Ha%CA%BBapai",
+      "summary": "Submarine volcano whose catastrophic January 2022 eruption produced the most powerful volcanic explosion recorded in the modern instrumental era and dramatically deepened and widened its underwater caldera.",
+      "facts": [
+        "The 15 January 2022 eruption was the largest atmospheric explosion recorded by modern instruments",
+        "Caldera floor deepened from roughly 150 m to about 850 m after the eruption",
+        "Caldera widened to about 4 km across",
+        "Generated a Pacific-wide tsunami and unprecedented atmospheric shockwaves"
+      ],
+      "gameplay_hooks": [
+        "Post-eruption bathymetric resurvey mission",
+        "Tsunami-generation and shockwave educational sequence"
+      ],
+      "hazards": [
+        "active volcanic hazard",
+        "unstable steep caldera walls",
+        "turbid ash-laden water"
+      ],
+      "notable_species": ["early pioneer microbial colonizers"],
+      "external_links": ["https://en.wikipedia.org/wiki/Hunga_Tonga%E2%80%93Hunga_Ha%CA%BBapai"],
+      "wreck_meta": null
+    },
+    {
+      "id": "kick-em-jenny",
+      "name": "Kick 'em Jenny",
+      "type": "seamount",
+      "lat": 12.3,
+      "lon": -61.6383,
+      "depth_m": 180,
+      "depth_range_m": [180, 180],
+      "bbox": {
+        "north": 12.38,
+        "south": 12.22,
+        "east": -61.56,
+        "west": -61.72
+      },
+      "region": "Caribbean, north of Grenada",
+      "country_eez": "Grenada",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Kick_%27em_Jenny",
+      "summary": "The Caribbean's most active submarine volcano, located about 8 km north of Grenada, which has erupted more than a dozen times since its first recorded eruption in 1939.",
+      "facts": [
+        "Most active submarine volcano in the Caribbean, with 12+ recorded eruptions since 1939",
+        "Summit lies about 180 m below sea level and continues to grow",
+        "Monitored by the University of the West Indies Seismic Research Centre",
+        "A shipping exclusion zone is enforced around it during unrest"
+      ],
+      "gameplay_hooks": [
+        "Active-volcano exclusion-zone monitoring mission",
+        "Eruption-risk seismic survey"
+      ],
+      "hazards": ["active eruption risk", "gas emissions", "exclusion zone restrictions"],
+      "notable_species": ["reef fish on flanks"],
+      "external_links": ["https://en.wikipedia.org/wiki/Kick_%27em_Jenny"],
+      "wreck_meta": null
+    },
+    {
+      "id": "havre-seamount",
+      "name": "Havre Seamount",
+      "type": "seamount",
+      "lat": -31.1167,
+      "lon": -179.0333,
+      "depth_m": 1100,
+      "depth_range_m": [900, 1500],
+      "bbox": {
+        "north": -31.02,
+        "south": -31.22,
+        "east": -178.93,
+        "west": -179.13
+      },
+      "region": "Kermadec Arc, South Pacific",
+      "country_eez": "New Zealand",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Havre_Seamount",
+      "summary": "A submarine volcano on the Kermadec Arc that produced the largest deep-ocean silicic eruption ever documented in 2012, creating a vast raft of floating pumice.",
+      "facts": [
+        "2012 eruption created a pumice raft covering over 400 sq km of ocean surface",
+        "Largest known deep-sea silicic (rhyolite) eruption ever recorded/surveyed",
+        "Studied in detail via post-eruption ROV mapping expeditions",
+        "Part of the highly active Kermadec volcanic arc"
+      ],
+      "gameplay_hooks": ["Pumice-raft tracking and eruption-deposit mapping mission"],
+      "hazards": ["volcanic hazard", "unstable pumice/ash deposits"],
+      "notable_species": ["pioneer colonizing invertebrates"],
+      "external_links": ["https://en.wikipedia.org/wiki/Havre_Seamount"],
+      "wreck_meta": null
+    },
+    {
+      "id": "tamu-massif",
+      "name": "Tamu Massif",
+      "type": "seamount",
+      "lat": 33.0,
+      "lon": 158.0,
+      "depth_m": 1980,
+      "depth_range_m": [1980, 6448],
+      "bbox": {
+        "north": 34.5,
+        "south": 31.5,
+        "east": 160.0,
+        "west": 156.0
+      },
+      "region": "Shatsky Rise, NW Pacific",
+      "country_eez": "international waters",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Tamu_Massif",
+      "summary": "The largest single volcano yet identified on Earth, forming the bulk of the Shatsky Rise plateau about 1,600 km east of Japan; an extinct shield volcano roughly the size of the British Isles.",
+      "facts": [
+        "Largest known single shield volcano on Earth by area, comparable to the size of New Mexico",
+        "Summit lies about 1,980 m deep; base extends to roughly 6.4 km depth",
+        "Formed about 145 million years ago near a triple junction of tectonic plates",
+        "Named after Texas A&M University, whose researchers helped identify it"
+      ],
+      "gameplay_hooks": [
+        "Scale-of-the-largest-volcano-on-Earth showcase traverse",
+        "Ancient triple-junction tectonic history exploration"
+      ],
+      "hazards": ["vast featureless terrain", "extreme size complicates navigation"],
+      "notable_species": ["deep-sea sponges"],
+      "external_links": ["https://en.wikipedia.org/wiki/Tamu_Massif"],
+      "wreck_meta": null
+    },
+    {
+      "id": "monterey-canyon",
+      "name": "Monterey Canyon",
+      "type": "canyon",
+      "lat": 36.8,
+      "lon": -121.9,
+      "depth_m": 3600,
+      "depth_range_m": [0, 3600],
+      "bbox": {
+        "north": 36.95,
+        "south": 36.55,
+        "east": -121.75,
+        "west": -122.15
+      },
+      "region": "Central California coast, NE Pacific",
+      "country_eez": "United States",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Monterey_Canyon",
+      "summary": "The largest submarine canyon on the US West Coast, comparable in scale to the Grand Canyon, extending from Moss Landing beach out to abyssal depths in Monterey Bay.",
+      "facts": [
+        "Comparable in size and depth to the Grand Canyon",
+        "Reaches depths of over 3,600 m within roughly 100 km of the shoreline",
+        "Intensively studied by MBARI using ROVs and cabled observatories",
+        "Hosts frequent turbidity-current sediment flows that reshape the canyon floor"
+      ],
+      "gameplay_hooks": [
+        "Follow a simulated turbidity current down-canyon",
+        "MBARI-style ROV midwater biology transect"
+      ],
+      "hazards": ["turbidity currents", "strong upwelling currents", "fishing gear"],
+      "notable_species": ["Humboldt squid", "giant larvacean 'ghost' filters", "deep-sea corals"],
+      "external_links": ["https://en.wikipedia.org/wiki/Monterey_Canyon", "https://www.mbari.org/"],
+      "wreck_meta": null
+    },
+    {
+      "id": "hudson-canyon",
+      "name": "Hudson Canyon",
+      "type": "canyon",
+      "lat": 39.4,
+      "lon": -72.4,
+      "depth_m": 3000,
+      "depth_range_m": [100, 3000],
+      "bbox": {
+        "north": 39.65,
+        "south": 39.15,
+        "east": -72.1,
+        "west": -72.7
+      },
+      "region": "US East Coast, North Atlantic",
+      "country_eez": "United States",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Hudson_Canyon",
+      "summary": "The largest submarine canyon off the US East Coast, an offshore extension of the ancient Hudson River channel, designated a National Marine Sanctuary in 2025.",
+      "facts": [
+        "Largest submarine canyon on the US Atlantic seaboard",
+        "Formed as an extension of the Hudson River during past glacial low sea-level periods",
+        "Designated Hudson Canyon National Marine Sanctuary in 2025",
+        "Supports deep-sea coral communities and important fish spawning habitat"
+      ],
+      "gameplay_hooks": [
+        "Trace the ancient drowned river channel from shelf to abyss",
+        "New-sanctuary conservation-baseline survey mission"
+      ],
+      "hazards": ["strong currents", "commercial fishing activity"],
+      "notable_species": ["deep-sea corals", "sand tiger sharks", "squid"],
+      "external_links": ["https://en.wikipedia.org/wiki/Hudson_Canyon"],
+      "wreck_meta": null
+    },
+    {
+      "id": "zhemchug-canyon",
+      "name": "Zhemchug Canyon",
+      "type": "canyon",
+      "lat": 58.101,
+      "lon": -174.902,
+      "depth_m": 2600,
+      "depth_range_m": [200, 2600],
+      "bbox": {
+        "north": 58.35,
+        "south": 57.85,
+        "east": -174.4,
+        "west": -175.4
+      },
+      "region": "Bering Sea",
+      "country_eez": "United States",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Zhemchug_Canyon",
+      "summary": "The largest submarine canyon in the world by volume and cross-sectional area, cutting into the edge of the Bering Sea continental shelf.",
+      "facts": [
+        "Largest submarine canyon on Earth by volume (~5,800 cubic km) and area",
+        "Vertical relief of about 2,600 m, deeper than the Grand Canyon",
+        "Important habitat for pollock and other commercially vital fish stocks",
+        "Named after the Russian research vessel Zhemchug"
+      ],
+      "gameplay_hooks": [
+        "World's-largest-canyon scale showcase dive",
+        "Fisheries/ecosystem survey along the shelf break"
+      ],
+      "hazards": ["cold subarctic water", "strong currents", "heavy fishing traffic"],
+      "notable_species": ["walleye pollock", "king crab"],
+      "external_links": ["https://en.wikipedia.org/wiki/Zhemchug_Canyon"],
+      "wreck_meta": null
+    },
+    {
+      "id": "congo-canyon",
+      "name": "Congo Canyon",
+      "type": "canyon",
+      "lat": -6.0,
+      "lon": 11.3,
+      "depth_m": 4000,
+      "depth_range_m": [0, 4000],
+      "bbox": {
+        "north": -5.6,
+        "south": -6.4,
+        "east": 11.7,
+        "west": 10.9
+      },
+      "region": "West Africa, South Atlantic",
+      "country_eez": "Angola / Democratic Republic of the Congo",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Congo_Canyon",
+      "summary": "One of the largest submarine canyons in the world, a direct continuation of the Congo River that channels sediment and organic debris far into the deep Atlantic.",
+      "facts": [
+        "Extends over 800 km from the Congo River mouth into the deep Atlantic",
+        "One of only a few submarine canyons connected directly to a major river without an intervening delta plain",
+        "Hosts periodic dense turbidity-current flows that can snap seafloor cables",
+        "Nutrient input supports distinct deep-sea faunal communities"
+      ],
+      "gameplay_hooks": [
+        "Trace terrestrial river sediment into the deep sea",
+        "Turbidity-current cable-break hazard event"
+      ],
+      "hazards": ["turbidity currents", "submarine cable infrastructure"],
+      "notable_species": ["deep-sea shrimp", "mud-dwelling worms"],
+      "external_links": ["https://en.wikipedia.org/wiki/Congo_Canyon"],
+      "wreck_meta": null
+    },
+    {
+      "id": "nazare-canyon",
+      "name": "Nazaré Canyon",
+      "type": "canyon",
+      "lat": 39.6,
+      "lon": -9.5,
+      "depth_m": 5000,
+      "depth_range_m": [50, 5000],
+      "bbox": {
+        "north": 39.75,
+        "south": 39.45,
+        "east": -9.2,
+        "west": -9.8
+      },
+      "region": "Off Nazaré, Portugal, North Atlantic",
+      "country_eez": "Portugal",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Nazar%C3%A9_Canyon",
+      "summary": "One of the largest submarine canyons in Europe, funneling deep swells that make Nazaré, Portugal famous for record-breaking big-wave surfing at the surface above.",
+      "facts": [
+        "Canyon's underwater topography focuses ocean swell energy, producing some of the largest surfable waves on Earth at Nazaré",
+        "Extends over 200 km and reaches depths near 5,000 m",
+        "Hosts cold-water coral habitats along its steep flanks",
+        "Studied for both geohazard (turbidity current) and biological interest"
+      ],
+      "gameplay_hooks": [
+        "Wave-focusing physics tie-in with famous surf break above",
+        "Cold-water coral wall exploration on canyon flanks"
+      ],
+      "hazards": ["strong internal waves and currents", "steep unstable canyon walls"],
+      "notable_species": ["cold-water corals", "deep-sea sharks"],
+      "external_links": ["https://en.wikipedia.org/wiki/Nazar%C3%A9_Canyon"],
+      "wreck_meta": null
+    },
+    {
+      "id": "whittard-canyon",
+      "name": "Whittard Canyon",
+      "type": "canyon",
+      "lat": 48.5,
+      "lon": -10.5,
+      "depth_m": 4000,
+      "depth_range_m": [200, 4000],
+      "bbox": {
+        "north": 48.75,
+        "south": 48.25,
+        "east": -10.1,
+        "west": -10.9
+      },
+      "region": "Celtic Sea margin, NE Atlantic",
+      "country_eez": "international waters / UK-Ireland vicinity",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Whittard_Canyon",
+      "summary": "A branching submarine canyon system on the Celtic Sea continental margin known for extensive cold-water coral gardens and unusual seafloor chemosynthetic communities near canyon-head landslides.",
+      "facts": [
+        "Complex branching, multi-headed canyon system cutting the Celtic margin",
+        "Hosts extensive Lophelia and Madrepora cold-water coral gardens",
+        "Canyon heads have exposed methane-related authigenic carbonate and chemosynthetic fauna",
+        "Studied extensively by UK and Irish marine research cruises"
+      ],
+      "gameplay_hooks": [
+        "Multi-branch canyon-head coral garden survey",
+        "Chemosynthetic seep discovery within a canyon head"
+      ],
+      "hazards": ["submarine landslides", "strong currents"],
+      "notable_species": ["Lophelia pertusa coral", "Madrepora coral", "squat lobsters"],
+      "external_links": ["https://en.wikipedia.org/wiki/Whittard_Canyon"],
+      "wreck_meta": null
+    },
+    {
+      "id": "perth-canyon",
+      "name": "Perth Canyon",
+      "type": "canyon",
+      "lat": -32.05,
+      "lon": 114.85,
+      "depth_m": 4000,
+      "depth_range_m": [300, 4000],
+      "bbox": {
+        "north": -31.85,
+        "south": -32.25,
+        "east": 115.05,
+        "west": 114.65
+      },
+      "region": "Off Perth, Western Australia",
+      "country_eez": "Australia",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Perth_Canyon",
+      "summary": "A large submarine canyon off Western Australia comparable in scale to the Grand Canyon, an important feeding ground for pygmy blue whales.",
+      "facts": [
+        "Comparable in scale to the Grand Canyon in both depth and length",
+        "Seasonal upwelling within the canyon draws krill swarms and feeding pygmy blue whales",
+        "Located within the Perth Canyon Marine Park",
+        "Cuts across the edge of the Australian continental shelf"
+      ],
+      "gameplay_hooks": [
+        "Pygmy blue whale feeding-aggregation encounter",
+        "Upwelling-driven krill swarm tracking mission"
+      ],
+      "hazards": ["strong upwelling currents", "open-ocean swell"],
+      "notable_species": ["pygmy blue whales", "krill"],
+      "external_links": ["https://en.wikipedia.org/wiki/Perth_Canyon"],
+      "wreck_meta": null
+    },
+    {
+      "id": "mar-azores-segment",
+      "name": "Mid-Atlantic Ridge near Azores (Lucky Strike)",
+      "type": "ridge",
+      "lat": 37.29,
+      "lon": -32.28,
+      "depth_m": 1700,
+      "depth_range_m": [1600, 2300],
+      "bbox": {
+        "north": 37.42,
+        "south": 37.16,
+        "east": -32.15,
+        "west": -32.42
+      },
+      "region": "North Atlantic, near Azores",
+      "country_eez": "Portugal (Azores) / international waters",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Lucky_Strike_(hydrothermal_vent_field)",
+      "summary": "A segment of the Mid-Atlantic Ridge near the Azores hosting the well-studied Lucky Strike hydrothermal vent field atop a large volcanic lava lake structure, monitored by the EMSO-Azores cabled observatory.",
+      "facts": [
+        "Home to the Lucky Strike vent field, sited over a large sub-seafloor magma lake",
+        "Monitored continuously by the EMSO-Azores deep-sea observatory",
+        "One of the most-visited vent sites for scientific research due to proximity to the Azores",
+        "Hosts dense mussel beds distinct from Pacific vent fauna"
+      ],
+      "gameplay_hooks": [
+        "Cabled-observatory live-data tie-in mission",
+        "Magma-lake-below-the-vents geology lesson"
+      ],
+      "hazards": ["scalding vent fluids", "moderate depth technical constraints"],
+      "notable_species": ["Bathymodiolus mussels", "vent shrimp"],
+      "external_links": ["https://en.wikipedia.org/wiki/Lucky_Strike_(hydrothermal_vent_field)"],
+      "wreck_meta": null
+    },
+    {
+      "id": "juan-de-fuca-ridge",
+      "name": "Juan de Fuca Ridge",
+      "type": "ridge",
+      "lat": 47.0,
+      "lon": -129.5,
+      "depth_m": 2200,
+      "depth_range_m": [1500, 2500],
+      "bbox": {
+        "north": 48.5,
+        "south": 44.5,
+        "east": -128.0,
+        "west": -131.0
+      },
+      "region": "NE Pacific, off Pacific Northwest",
+      "country_eez": "international waters (US/Canada vicinity)",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Juan_de_Fuca_Ridge",
+      "summary": "A mid-ocean spreading ridge off the Pacific Northwest coast, one of the most heavily instrumented seafloor regions on Earth via the NEPTUNE and Ocean Observatories Initiative cabled networks.",
+      "facts": [
+        "Spreads at an intermediate rate, generating frequent volcanic and hydrothermal activity",
+        "Hosts both the Endeavour vent field and Axial Seamount",
+        "One of the most densely cabled and monitored stretches of seafloor on Earth",
+        "Subducts beneath North America at the nearby Cascadia subduction zone"
+      ],
+      "gameplay_hooks": [
+        "Regional overview mission linking Axial Seamount and Endeavour vents",
+        "Cabled-observatory data-relay side missions"
+      ],
+      "hazards": ["volcanic and seismic activity", "scalding vent fluids"],
+      "notable_species": ["tubeworms", "vent crabs"],
+      "external_links": ["https://en.wikipedia.org/wiki/Juan_de_Fuca_Ridge"],
+      "wreck_meta": null
+    },
+    {
+      "id": "bermuda-rise",
+      "name": "Bermuda Rise",
+      "type": "ridge",
+      "lat": 32.0,
+      "lon": -64.5,
+      "depth_m": 4000,
+      "depth_range_m": [2000, 5500],
+      "bbox": {
+        "north": 33.0,
+        "south": 31.0,
+        "east": -63.0,
+        "west": -66.0
+      },
+      "region": "North Atlantic, near Bermuda",
+      "country_eez": "Bermuda / international waters",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Bermuda_Rise",
+      "summary": "A broad topographic swell of the Atlantic seafloor around Bermuda, thought to be a mantle hotspot-related uplift, with the volcanic Bermuda Pedestal rising near its center.",
+      "facts": [
+        "A broad regional seafloor swell roughly 1,000 km across",
+        "Believed to result from a mantle hotspot beneath the Atlantic seafloor",
+        "Bermuda itself sits atop a small volcanic peak (the Bermuda Pedestal) on the rise",
+        "Region associated with the popular 'Bermuda Triangle' folklore"
+      ],
+      "gameplay_hooks": [
+        "Mantle-hotspot geology explainer traverse",
+        "Explore the Bermuda Pedestal volcanic core beneath the island"
+      ],
+      "hazards": ["open-ocean currents", "seasonal hurricanes at surface"],
+      "notable_species": ["deep-sea corals"],
+      "external_links": ["https://en.wikipedia.org/wiki/Bermuda_Rise"],
+      "wreck_meta": null
+    },
+    {
+      "id": "blake-plateau-corals",
+      "name": "Blake Plateau Coral Mound Province",
+      "type": "ridge",
+      "lat": 30.0,
+      "lon": -79.5,
+      "depth_m": 750,
+      "depth_range_m": [500, 1000],
+      "bbox": {
+        "north": 31.0,
+        "south": 29.0,
+        "east": -78.5,
+        "west": -80.5
+      },
+      "region": "Off southeastern US, North Atlantic",
+      "country_eez": "United States",
+      "confidence": "high",
+      "coordinate_source": "https://oceanexplorer.noaa.gov/",
+      "summary": "The largest known deep-sea coral reef province on Earth, an expanse of thousands of Lophelia coral mounds spanning roughly the area of Florida beneath the Gulf Stream off the southeastern US.",
+      "facts": [
+        "Announced by NOAA in 2024 as the largest deep-sea coral reef habitat yet mapped, roughly 500 km long",
+        "Comprises thousands of individual coral mounds up to tens of meters tall",
+        "Sits beneath the Gulf Stream at depths of roughly 200-1,000 m",
+        "Provides critical deep-sea fish and invertebrate habitat despite total darkness"
+      ],
+      "gameplay_hooks": [
+        "Vast coral-mound-field exploration and mapping mission",
+        "Gulf Stream current-navigation challenge"
+      ],
+      "hazards": ["strong Gulf Stream currents", "fragile coral habitat (no-touch)"],
+      "notable_species": ["Lophelia pertusa coral", "deep-sea sharks", "squat lobsters"],
+      "external_links": ["https://oceanexplorer.noaa.gov/"],
+      "wreck_meta": null
+    },
+    {
+      "id": "deans-blue-hole",
+      "name": "Dean's Blue Hole",
+      "type": "hole",
+      "lat": 23.1064,
+      "lon": -75.0086,
+      "depth_m": 202,
+      "depth_range_m": [202, 202],
+      "bbox": {
+        "north": 23.115,
+        "south": 23.098,
+        "east": -75.0,
+        "west": -75.017
+      },
+      "region": "Long Island, Bahamas",
+      "country_eez": "Bahamas",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Dean%27s_Blue_Hole",
+      "summary": "The world's deepest known ocean blue hole accessible from a beach, a near-vertical flooded sinkhole on Long Island, Bahamas, popular for competitive freediving.",
+      "facts": [
+        "Depth of about 202 m, among the deepest blue holes on Earth",
+        "Opens directly from a sandy beach into a nearly vertical shaft",
+        "Hosts the annual Vertical Blue freediving competition",
+        "Widens dramatically into a large cavern below about 20 m depth"
+      ],
+      "gameplay_hooks": [
+        "Freediving depth-record challenge minigame",
+        "Cavern-widening navigation puzzle below the entrance"
+      ],
+      "hazards": [
+        "extreme depth for recreational diving",
+        "halocline/thermocline layers",
+        "cavern disorientation"
+      ],
+      "notable_species": ["reef fish near entrance", "sparse deep fauna"],
+      "external_links": ["https://en.wikipedia.org/wiki/Dean%27s_Blue_Hole"],
+      "wreck_meta": null
+    },
+    {
+      "id": "great-blue-hole",
+      "name": "Great Blue Hole",
+      "type": "hole",
+      "lat": 17.3153,
+      "lon": -87.5346,
+      "depth_m": 124,
+      "depth_range_m": [124, 124],
+      "bbox": {
+        "north": 17.325,
+        "south": 17.305,
+        "east": -87.524,
+        "west": -87.545
+      },
+      "region": "Lighthouse Reef, Belize",
+      "country_eez": "Belize",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Great_Blue_Hole",
+      "summary": "A giant marine sinkhole on Belize's Lighthouse Reef, formed as a limestone karst cave during past ice ages before being flooded by rising seas; a UNESCO World Heritage Site.",
+      "facts": [
+        "Roughly 318 m across and 124 m deep, near-perfectly circular",
+        "Formed as a limestone cave system during Pleistocene low sea levels, then collapsed and flooded",
+        "Popularized by Jacques Cousteau's 1971 expedition",
+        "Part of the Belize Barrier Reef Reserve System UNESCO World Heritage Site"
+      ],
+      "gameplay_hooks": [
+        "Explore ancient stalactite formations proving past dry-cave origin",
+        "Cousteau-expedition historical reenactment dive"
+      ],
+      "hazards": ["low oxygen layer at depth", "dark cavern interior", "narrow submerged ledges"],
+      "notable_species": ["Caribbean reef sharks", "groupers"],
+      "external_links": ["https://en.wikipedia.org/wiki/Great_Blue_Hole"],
+      "wreck_meta": null
+    },
+    {
+      "id": "orca-basin-brine-pool",
+      "name": "Orca Basin Brine Pool ('Jacuzzi of Despair')",
+      "type": "seep",
+      "lat": 26.95,
+      "lon": -91.33,
+      "depth_m": 2400,
+      "depth_range_m": [2400, 2400],
+      "bbox": {
+        "north": 27.05,
+        "south": 26.85,
+        "east": -91.2,
+        "west": -91.46
+      },
+      "region": "Gulf of Mexico",
+      "country_eez": "United States",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Orca_Basin",
+      "summary": "A vast pool of super-saline brine sitting in a seafloor depression in the Gulf of Mexico, so dense it forms a distinct underwater 'lake' with its own shoreline, toxic to most marine life that enters it.",
+      "facts": [
+        "Brine is roughly 4-5 times saltier than normal seawater, creating a visible underwater lake surface",
+        "Toxic and low-oxygen, preserving carcasses of animals that wander in ('pickled' remains found at its edges)",
+        "Surrounded by chemosynthetic mussel beds fed by methane and sulfide seepage",
+        "Named for the nearby killer-whale-shaped seafloor contour"
+      ],
+      "gameplay_hooks": [
+        "Navigate the eerie underwater 'lake' shoreline without entering toxic brine",
+        "Chemosynthetic mussel-bed sampling at the pool's edge"
+      ],
+      "hazards": [
+        "toxic hypersaline/anoxic brine",
+        "dissolves/preserves organic matter",
+        "disorientating underwater 'lake' optics"
+      ],
+      "notable_species": ["Bathymodiolus mussels", "tube worms at margins"],
+      "external_links": ["https://en.wikipedia.org/wiki/Orca_Basin"],
+      "wreck_meta": null
+    },
+    {
+      "id": "cape-hatteras-seeps",
+      "name": "Cape Hatteras Methane Seeps",
+      "type": "seep",
+      "lat": 35.5,
+      "lon": -74.9,
+      "depth_m": 1500,
+      "depth_range_m": [1000, 2000],
+      "bbox": {
+        "north": 35.7,
+        "south": 35.3,
+        "east": -74.7,
+        "west": -75.1
+      },
+      "region": "US East Coast, North Atlantic",
+      "country_eez": "United States",
+      "confidence": "medium",
+      "coordinate_source": "https://oceanexplorer.noaa.gov/",
+      "summary": "A cluster of active methane cold seeps discovered along the US Atlantic margin near Cape Hatteras, part of hundreds of newly identified seeps along the eastern seaboard.",
+      "facts": [
+        "Part of a broader field of 500+ methane seeps discovered along the US Atlantic margin since 2012",
+        "Supports chemosynthetic mussel and tubeworm communities fueled by seeping methane",
+        "Methane bubble plumes ('flares') detectable via ship sonar",
+        "Seeps are linked to destabilizing methane hydrate deposits in the sediment"
+      ],
+      "gameplay_hooks": [
+        "Sonar bubble-plume tracking minigame",
+        "Chemosynthetic community discovery mission distinct from hydrothermal vents"
+      ],
+      "hazards": ["methane gas release", "unstable sediment"],
+      "notable_species": ["Bathymodiolus seep mussels", "seep tubeworms"],
+      "external_links": ["https://oceanexplorer.noaa.gov/"],
+      "wreck_meta": null
+    },
+    {
+      "id": "diamantina-fracture-zone",
+      "name": "Diamantina Fracture Zone",
+      "type": "ridge",
+      "lat": -35.0,
+      "lon": 104.0,
+      "depth_m": 7079,
+      "depth_range_m": [6000, 7079],
+      "bbox": {
+        "north": -33.5,
+        "south": -36.5,
+        "east": 106.0,
+        "west": 102.0
+      },
+      "region": "Southeast Indian Ocean",
+      "country_eez": "international waters",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Diamantina_Fracture_Zone",
+      "summary": "A deep transform fault scar in the Indian Ocean south of Australia, containing some of the deepest points in the Indian Ocean basin outside the Java Trench, notably searched during the MH370 investigation.",
+      "facts": [
+        "Contains the Diamantina Deep and Dordrecht Deep, among the deepest points of the Indian Ocean",
+        "Searched extensively during the 2014-2017 hunt for missing flight MH370",
+        "Formed as a transform fault scarring the ocean floor as Australia and Antarctica separated",
+        "Rugged terrain with escarpments over 6 km deep"
+      ],
+      "gameplay_hooks": [
+        "MH370-search-style deep-sonar mapping mission",
+        "Transform-fault escarpment traverse"
+      ],
+      "hazards": ["crush depth", "extremely rugged and largely unmapped terrain"],
+      "notable_species": ["hadal amphipods"],
+      "external_links": ["https://en.wikipedia.org/wiki/Diamantina_Fracture_Zone"],
+      "wreck_meta": null
+    },
+    {
+      "id": "chicxulub-rim",
+      "name": "Chicxulub Crater Offshore Rim",
+      "type": "other",
+      "lat": 21.3,
+      "lon": -89.5,
+      "depth_m": 100,
+      "depth_range_m": [20, 200],
+      "bbox": {
+        "north": 21.6,
+        "south": 21.0,
+        "east": -89.0,
+        "west": -90.0
+      },
+      "region": "Gulf of Mexico, off Yucatán",
+      "country_eez": "Mexico",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Chicxulub_crater",
+      "summary": "The partially offshore rim of the Chicxulub impact crater, formed by the asteroid strike 66 million years ago linked to the end-Cretaceous mass extinction; much of the ring lies beneath the Gulf of Mexico continental shelf.",
+      "facts": [
+        "Crater is roughly 180 km in diameter, straddling the Yucatán coastline and the Gulf of Mexico shelf",
+        "Formed by an asteroid impact ~66 million years ago implicated in the extinction of non-avian dinosaurs",
+        "The 'cenote ring' of sinkholes onshore traces the buried crater rim",
+        "IODP Expedition 364 drilled the offshore peak ring in 2016"
+      ],
+      "gameplay_hooks": [
+        "Drill-core geology mission tracing the extinction-event impact layer",
+        "Trace the submerged crater rim toward the onshore cenote ring"
+      ],
+      "hazards": ["shallow shelf currents", "limited visibility from sediment"],
+      "notable_species": ["shelf reef fish"],
+      "external_links": ["https://en.wikipedia.org/wiki/Chicxulub_crater"],
+      "wreck_meta": null
+    },
+    {
+      "id": "lomonosov-ridge",
+      "name": "Lomonosov Ridge",
+      "type": "ridge",
+      "lat": 88.0,
+      "lon": 140.0,
+      "depth_m": 1650,
+      "depth_range_m": [954, 2500],
+      "bbox": {
+        "north": 89.5,
+        "south": 86.5,
+        "east": 150.0,
+        "west": 130.0
+      },
+      "region": "Arctic Ocean",
+      "country_eez": "international waters (disputed extended-shelf claims: Russia, Canada, Denmark)",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Lomonosov_Ridge",
+      "summary": "A submerged continental ridge spanning nearly the entire Arctic Ocean between Siberia and Ellesmere Island, at the center of overlapping extended-continental-shelf claims by Russia, Canada, and Denmark.",
+      "facts": [
+        "Stretches roughly 1,800 km across the Arctic Ocean near the North Pole",
+        "Subject of competing UN continental-shelf claims by Russia, Canada, and Denmark/Greenland",
+        "A 2007 Russian expedition planted a titanium flag on the seabed at the North Pole nearby",
+        "Rises roughly 3,000 m above the adjacent Arctic basin floor"
+      ],
+      "gameplay_hooks": [
+        "Under-ice traverse toward the North Pole along the ridge crest",
+        "Geopolitical territorial-claim narrative questline"
+      ],
+      "hazards": ["permanent sea ice cover", "extreme cold", "near-total darkness in winter"],
+      "notable_species": ["Arctic cod", "ice-associated amphipods"],
+      "external_links": ["https://en.wikipedia.org/wiki/Lomonosov_Ridge"],
+      "wreck_meta": null
+    },
+    {
+      "id": "thwaites-grounding-zone",
+      "name": "Thwaites Glacier Grounding Zone",
+      "type": "other",
+      "lat": -75.05,
+      "lon": -106.8,
+      "depth_m": 800,
+      "depth_range_m": [600, 1200],
+      "bbox": {
+        "north": -74.7,
+        "south": -75.4,
+        "east": -105.5,
+        "west": -108.0
+      },
+      "region": "Amundsen Sea, West Antarctica",
+      "country_eez": "international waters (Antarctic Treaty area)",
+      "confidence": "low",
+      "coordinate_source": "https://thwaitesglacier.org/",
+      "summary": "The submerged zone where the rapidly retreating Thwaites Glacier ('Doomsday Glacier') meets the seafloor in the Amundsen Sea, a critical site for understanding future sea-level rise; exact grounding-line position shifts yearly and is only approximated here.",
+      "facts": [
+        "Thwaites Glacier alone could raise global sea level by over 60 cm if fully lost",
+        "Warm Circumpolar Deep Water intruding beneath the ice shelf is accelerating melt",
+        "The International Thwaites Glacier Collaboration deployed the Icefin ROV beneath the ice in 2019-2020",
+        "Grounding line has retreated several kilometers in recent decades, so its precise position is a moving target, hence low confidence here"
+      ],
+      "gameplay_hooks": [
+        "Under-ice-shelf ROV mission (Icefin-style) mapping the grounding line",
+        "Climate-science time-pressure narrative: document retreat before it's gone"
+      ],
+      "hazards": [
+        "under-ice-shelf entrapment risk",
+        "extreme cold",
+        "calving ice hazards",
+        "rapidly changing, poorly mapped terrain"
+      ],
+      "notable_species": ["ice-shelf amphipods", "Antarctic silverfish"],
+      "external_links": ["https://thwaitesglacier.org/"],
+      "wreck_meta": null
+    },
+    {
+      "id": "zealandia-rise",
+      "name": "Chatham Rise (Zealandia)",
+      "type": "ridge",
+      "lat": -43.5,
+      "lon": 178.0,
+      "depth_m": 400,
+      "depth_range_m": [300, 1000],
+      "bbox": {
+        "north": -42.5,
+        "south": -44.5,
+        "east": 180.0,
+        "west": 176.0
+      },
+      "region": "South Pacific, east of New Zealand",
+      "country_eez": "New Zealand",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Zealandia",
+      "summary": "A broad, relatively shallow submerged plateau east of New Zealand, part of the largely submerged continent of Zealandia, roughly 94% of which lies underwater.",
+      "facts": [
+        "Part of Zealandia, a nearly 5 million sq km submerged continent, ~94% underwater",
+        "Chatham Rise supports one of New Zealand's most productive fisheries",
+        "Zealandia separated from Gondwana roughly 80 million years ago and subsided beneath the waves",
+        "Confirmed as a distinct continent by geologists in 2017"
+      ],
+      "gameplay_hooks": [
+        "Sunken-continent exploration narrative highlighting Zealandia's discovery",
+        "Continental-shelf fishery ecosystem survey"
+      ],
+      "hazards": ["strong currents", "commercial fishing traffic"],
+      "notable_species": ["orange roughy", "hoki"],
+      "external_links": ["https://en.wikipedia.org/wiki/Zealandia"],
+      "wreck_meta": null
+    },
+    {
+      "id": "rost-reef",
+      "name": "Røst Reef",
+      "type": "reef",
+      "lat": 67.48,
+      "lon": 9.4,
+      "depth_m": 350,
+      "depth_range_m": [300, 400],
+      "bbox": {
+        "north": 67.6,
+        "south": 67.36,
+        "east": 9.65,
+        "west": 9.15
+      },
+      "region": "Norwegian Sea, off Lofoten, Norway",
+      "country_eez": "Norway",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/R%C3%B8st_Reef",
+      "summary": "The world's largest known cold-water coral reef, discovered in 2002 off the Lofoten Islands, Norway, stretching over 40 km and built by the coral Lophelia pertusa.",
+      "facts": [
+        "Largest known cold-water Lophelia coral reef on Earth, roughly 40 x 3 km",
+        "Discovered in 2002 during Norwegian mapping surveys (MAREANO program)",
+        "Lies within an important cod-spawning ground, prompting fishing restrictions",
+        "Coral framework has built up over thousands of years in near-freezing water"
+      ],
+      "gameplay_hooks": [
+        "Vast cold-water reef traverse in near-freezing Nordic waters",
+        "Cod spawning-ground conservation mission"
+      ],
+      "hazards": ["cold water", "strong currents", "fragile fishing-sensitive habitat"],
+      "notable_species": ["Lophelia pertusa coral", "Atlantic cod", "redfish"],
+      "external_links": ["https://en.wikipedia.org/wiki/R%C3%B8st_Reef"],
+      "wreck_meta": null
+    },
+    {
+      "id": "darwin-mounds",
+      "name": "Darwin Mounds",
+      "type": "reef",
+      "lat": 59.85,
+      "lon": -6.75,
+      "depth_m": 1000,
+      "depth_range_m": [950, 1080],
+      "bbox": {
+        "north": 59.95,
+        "south": 59.75,
+        "east": -6.6,
+        "west": -6.9
+      },
+      "region": "NE Atlantic, north of Scotland",
+      "country_eez": "United Kingdom",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Darwin_Mounds",
+      "summary": "A field of hundreds of sand-and-coral mounds northwest of Scotland, discovered in 1998, notable for cold-water Lophelia coral colonizing sediment mounds shaped by underlying gas escape structures, and for pioneering EU trawling bans that protect it.",
+      "facts": [
+        "Discovered in 1998 during UK continental shelf mapping surveys",
+        "Mounds are built on sediment structures linked to ancient gas/fluid escape from below",
+        "Protected in 2003 by an emergency EU trawling ban, an early precedent for deep-sea habitat protection",
+        "Home to distinctive xenophyophore (giant single-celled organism) aggregations"
+      ],
+      "gameplay_hooks": [
+        "Trawling-damage-vs-protected-zone comparison mission",
+        "Xenophyophore giant-single-cell-organism discovery encounter"
+      ],
+      "hazards": ["cold water", "historic trawling damage in unprotected areas"],
+      "notable_species": ["Lophelia pertusa coral", "xenophyophores"],
+      "external_links": ["https://en.wikipedia.org/wiki/Darwin_Mounds"],
+      "wreck_meta": null
+    },
+    {
+      "id": "gbr-outer-slope",
+      "name": "Great Barrier Reef Outer Slope (Ribbon Reefs)",
+      "type": "reef",
+      "lat": -16.0,
+      "lon": 145.9,
+      "depth_m": 40,
+      "depth_range_m": [0, 40],
+      "bbox": {
+        "north": -15.7,
+        "south": -16.3,
+        "east": 146.1,
+        "west": 145.7
+      },
+      "region": "Coral Sea, off Queensland, Australia",
+      "country_eez": "Australia",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Great_Barrier_Reef",
+      "summary": "The outer drop-off of the world's largest coral reef system, where the shallow reef flat plunges into the Coral Sea, a globally iconic biodiversity showcase.",
+      "facts": [
+        "World's largest coral reef system, visible from space, spanning over 2,300 km",
+        "Outer 'Ribbon Reefs' drop steeply from shallow reef flats into deep Coral Sea water",
+        "Home to over 1,500 fish species and 400 coral species",
+        "Severely impacted by repeated mass coral bleaching events since 2016"
+      ],
+      "gameplay_hooks": [
+        "Shallow-to-deep drop-off wall dive showcasing biodiversity",
+        "Coral bleaching before/after comparison mission"
+      ],
+      "hazards": ["strong currents at the drop-off", "sharks", "coral bleaching stress zones"],
+      "notable_species": ["clownfish", "reef sharks", "manta rays", "hard corals"],
+      "external_links": ["https://en.wikipedia.org/wiki/Great_Barrier_Reef"],
+      "wreck_meta": null
+    },
+    {
+      "id": "molokini",
+      "name": "Molokini Crater",
+      "type": "reef",
+      "lat": 20.6317,
+      "lon": -156.4975,
+      "depth_m": 60,
+      "depth_range_m": [3, 60],
+      "bbox": {
+        "north": 20.65,
+        "south": 20.61,
+        "east": -156.47,
+        "west": -156.52
+      },
+      "region": "Hawaii, North Pacific",
+      "country_eez": "United States",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Molokini",
+      "summary": "A partially submerged volcanic crescent-shaped crater between Maui and Kaho'olawe, Hawaii, whose sheltered inner cove and outer back-wall drop-off make it a premier shallow snorkeling and diving showcase.",
+      "facts": [
+        "A crescent-shaped tuff cone, remnant of a volcanic crater rim",
+        "Protected as a Hawaii State Marine Life Conservation District and seabird sanctuary",
+        "Back wall on the ocean side drops steeply from the surface to over 100 m",
+        "Exceptionally clear water due to lack of nearby freshwater runoff"
+      ],
+      "gameplay_hooks": [
+        "Sheltered-cove beginner showcase dive vs dramatic back-wall drop-off",
+        "Seabird sanctuary and marine-protected-area tour"
+      ],
+      "hazards": ["strong currents on the outer back wall", "boat traffic in cove"],
+      "notable_species": ["butterflyfish", "manta rays", "reef sharks"],
+      "external_links": ["https://en.wikipedia.org/wiki/Molokini"],
+      "wreck_meta": null
+    },
+    {
+      "id": "silfra",
+      "name": "Silfra Fissure",
+      "type": "ridge",
+      "lat": 64.2558,
+      "lon": -21.1183,
+      "depth_m": 63,
+      "depth_range_m": [0, 63],
+      "bbox": {
+        "north": 64.265,
+        "south": 64.246,
+        "east": -21.1,
+        "west": -21.14
+      },
+      "region": "Þingvellir, Iceland (Mid-Atlantic Ridge, terrestrial rift)",
+      "country_eez": "Iceland",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Silfra",
+      "summary": "A water-filled fissure in Þingvellir National Park, Iceland, formed along the divergent boundary between the North American and Eurasian tectonic plates, uniquely accessible as a dive/snorkel site where the mid-ocean ridge reaches the surface.",
+      "facts": [
+        "One of very few places where the Mid-Atlantic Ridge rift is directly accessible to divers on land",
+        "Filled with glacial meltwater filtered through lava rock, giving over 100 m of visibility",
+        "Water temperature stays near 2-4 degrees C year-round",
+        "Fissure continues to widen a few centimeters per year as the plates diverge"
+      ],
+      "gameplay_hooks": [
+        "Touch-both-tectonic-plates showcase swim (North America and Europe)",
+        "Extreme-visibility long-range sightline challenge"
+      ],
+      "hazards": ["near-freezing water", "narrow rock channels"],
+      "notable_species": ["troll hair algae", "Arctic char"],
+      "external_links": ["https://en.wikipedia.org/wiki/Silfra"],
+      "wreck_meta": null
+    },
+    {
+      "id": "titanic",
+      "name": "RMS Titanic",
+      "type": "wreck",
+      "lat": 41.7325,
+      "lon": -49.9469,
+      "depth_m": 3800,
+      "depth_range_m": [3780, 3800],
+      "bbox": {
+        "north": 41.75,
+        "south": 41.71,
+        "east": -49.9,
+        "west": -49.99
+      },
+      "region": "North Atlantic",
+      "country_eez": "international waters (high seas)",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
+      "summary": "The famous ocean liner that sank on 15 April 1912 after striking an iceberg; the wreck was found by Robert Ballard's expedition in 1985 and lies in two main pieces about 600 m apart.",
+      "facts": [
+        "Discovered September 1, 1985 by Robert Ballard/Jean-Louis Michel",
+        "Bow and stern sections lie ~600 m apart with a debris field between",
+        "Sits in international waters and is protected under a 2004 UNESCO-linked agreement",
+        "The 2023 Titan submersible implosion occurred during a dive to this wreck"
+      ],
+      "gameplay_hooks": [
+        "Photograph the iconic bow railing",
+        "Trace the debris field between bow and stern",
+        "Compare pre- and post-2000s deterioration imagery"
+      ],
+      "hazards": [
+        "strong currents",
+        "rusticle-covered unstable structure",
+        "cold, near-freezing water",
+        "total darkness"
+      ],
+      "notable_species": ["rusticle-forming bacteria", "deep-sea corals", "grenadier fish"],
+      "wreck_meta": {
+        "vessel_type": "ocean liner",
+        "sunk_year": 1912,
+        "length_m": 269,
+        "orientation_notes": "broken into separate bow and stern sections roughly 600 m apart, both upright-ish; stern heavily collapsed"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"]
+    },
+    {
+      "id": "bismarck",
+      "name": "Bismarck",
+      "type": "wreck",
+      "lat": 48.3336,
+      "lon": -16.1067,
+      "depth_m": 4791,
+      "depth_range_m": [4700, 4791],
+      "bbox": {
+        "north": 48.36,
+        "south": 48.3,
+        "east": -16.06,
+        "west": -16.15
+      },
+      "region": "North Atlantic",
+      "country_eez": "international waters",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/German_battleship_Bismarck",
+      "summary": "German WWII battleship sunk on 27 May 1941 after a major Royal Navy pursuit; discovered by Robert Ballard in 1989 sitting upright on an underwater mountain.",
+      "facts": [
+        "Sunk after a three-day pursuit by the Royal Navy",
+        "Found by Robert Ballard in June 1989",
+        "Sits upright on the seabed, largely intact despite scuttling charges",
+        "One of the largest battleships ever built by Germany"
+      ],
+      "gameplay_hooks": [
+        "Survey main gun turrets",
+        "Investigate torpedo damage on the hull",
+        "Compare scuttling vs shelling damage theories"
+      ],
+      "hazards": ["deep cold water", "strong currents", "unstable ordnance"],
+      "notable_species": ["deep-sea corals", "sponges"],
+      "wreck_meta": {
+        "vessel_type": "battleship",
+        "sunk_year": 1941,
+        "length_m": 251,
+        "orientation_notes": "upright on seabed, bow separated from main hull"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/German_battleship_Bismarck"]
+    },
+    {
+      "id": "uss-yorktown",
+      "name": "USS Yorktown (CV-5)",
+      "type": "wreck",
+      "lat": 30.7,
+      "lon": -176.62,
+      "depth_m": 5029,
+      "depth_range_m": [5000, 5029],
+      "bbox": {
+        "north": 30.75,
+        "south": 30.65,
+        "east": -176.55,
+        "west": -176.7
+      },
+      "region": "North Pacific (Midway)",
+      "country_eez": "international waters",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/USS_Yorktown_(CV-5)",
+      "summary": "US aircraft carrier sunk during the Battle of Midway in June 1942; discovered by Robert Ballard in 1998 remarkably well preserved on the seafloor.",
+      "facts": [
+        "Sunk at the Battle of Midway, June 1942",
+        "Discovered by Robert Ballard's team in May 1998",
+        "Sits upright and remarkably intact with aircraft still visible nearby",
+        "Battle of Midway was a turning point in the Pacific War"
+      ],
+      "gameplay_hooks": [
+        "Locate intact aircraft on the surrounding seafloor",
+        "Survey the flight deck",
+        "Document anti-aircraft gun emplacements"
+      ],
+      "hazards": ["extreme depth", "cold water", "remote location"],
+      "notable_species": ["deep-sea corals"],
+      "wreck_meta": {
+        "vessel_type": "aircraft carrier",
+        "sunk_year": 1942,
+        "length_m": 246,
+        "orientation_notes": "upright, well preserved"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/USS_Yorktown_(CV-5)"]
+    },
+    {
+      "id": "uss-johnston",
+      "name": "USS Johnston (DD-557)",
+      "type": "wreck",
+      "lat": 10.5,
+      "lon": 126.5,
+      "depth_m": 6456,
+      "depth_range_m": [6456, 6456],
+      "bbox": {
+        "north": 10.6,
+        "south": 10.4,
+        "east": 126.6,
+        "west": 126.4
+      },
+      "region": "Philippine Sea",
+      "country_eez": "Philippines (deep sea, international waters)",
+      "confidence": "low",
+      "coordinate_source": "https://en.wikipedia.org/wiki/USS_Johnston_(DD-557)",
+      "summary": "US Navy destroyer sunk during the Battle off Samar (1944); its wreck, found in 2019-2021, held the record for deepest shipwreck ever surveyed by crewed submersible.",
+      "facts": [
+        "Sunk during the Battle off Samar, October 1944, part of Leyte Gulf",
+        "Located and surveyed by Victor Vescovo's Limiting Factor submersible in 2019 and 2021",
+        "One of the deepest shipwrecks ever visited by a crewed vehicle",
+        "Crew fought a numerically superior Japanese force to protect escort carriers"
+      ],
+      "gameplay_hooks": [
+        "Deepest-wreck-dive achievement",
+        "Recreate the 'Small Boy' destroyer charge tactically"
+      ],
+      "hazards": ["extreme crush-depth pressure", "total darkness"],
+      "notable_species": ["hadal amphipods"],
+      "wreck_meta": {
+        "vessel_type": "destroyer",
+        "sunk_year": 1944,
+        "length_m": 115,
+        "orientation_notes": "broken into multiple sections down a slope; exact position estimates vary between 2019/2021 surveys, hence low coordinate confidence"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/USS_Johnston_(DD-557)"]
+    },
+    {
+      "id": "uss-samuel-b-roberts",
+      "name": "USS Samuel B. Roberts (DE-413)",
+      "type": "wreck",
+      "lat": 10.5,
+      "lon": 126.75,
+      "depth_m": 6895,
+      "depth_range_m": [6895, 6895],
+      "bbox": {
+        "north": 10.6,
+        "south": 10.4,
+        "east": 126.85,
+        "west": 126.65
+      },
+      "region": "Philippine Sea",
+      "country_eez": "Philippines vicinity / international waters",
+      "confidence": "low",
+      "coordinate_source": "https://en.wikipedia.org/wiki/USS_Samuel_B._Roberts_(DE-413)",
+      "summary": "US Navy destroyer escort sunk at the Battle off Samar in 1944; located in 2022 by the Caladan Oceanic expedition, currently the deepest shipwreck ever surveyed.",
+      "facts": [
+        "Sunk during the Battle off Samar, October 1944",
+        "Located June 2022 by Victor Vescovo's Caladan Oceanic team, surpassing USS Johnston as deepest known wreck",
+        "Nicknamed 'the destroyer escort that fought like a battleship'"
+      ],
+      "gameplay_hooks": [
+        "Deepest-wreck record chase mission",
+        "WWII 'small boy' last-stand narrative dive"
+      ],
+      "hazards": ["extreme crush-depth pressure", "total darkness"],
+      "notable_species": ["hadal fauna"],
+      "wreck_meta": {
+        "vessel_type": "destroyer escort",
+        "sunk_year": 1944,
+        "length_m": 93,
+        "orientation_notes": "scattered debris field on a slope; position approximate, low confidence"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/USS_Samuel_B._Roberts_(DE-413)"]
+    },
+    {
+      "id": "endurance",
+      "name": "Endurance",
+      "type": "wreck",
+      "lat": -68.7297,
+      "lon": -52.319,
+      "depth_m": 3008,
+      "depth_range_m": [3008, 3008],
+      "bbox": {
+        "north": -68.68,
+        "south": -68.78,
+        "east": -52.25,
+        "west": -52.4
+      },
+      "region": "Weddell Sea, Antarctica",
+      "country_eez": "international waters (Antarctic Treaty area)",
+      "confidence": "high",
+      "coordinate_source": "https://endurance22.org/endurance-is-found",
+      "summary": "Sir Ernest Shackleton's polar expedition ship, crushed by pack ice in 1915; found on 5 March 2022 by the Endurance22 expedition almost perfectly preserved in the cold, low-oxygen Weddell Sea.",
+      "facts": [
+        "Found exactly 100 years after Shackleton's burial at South Georgia",
+        "Discovered ~6.4 km south of the position recorded by Captain Frank Worsley",
+        "Extraordinarily well preserved due to cold, wood-boring-organism-free Weddell Sea water",
+        "Designated a protected historic site and monument under the Antarctic Treaty"
+      ],
+      "gameplay_hooks": [
+        "Photogrammetry survey to recreate a 3D model",
+        "Compare wreck condition to historic expedition photos",
+        "Icebreaker approach sequence through Weddell Sea pack ice"
+      ],
+      "hazards": [
+        "sea ice cover",
+        "extreme cold",
+        "remote/hazardous access",
+        "protected heritage site (look-don't-touch)"
+      ],
+      "notable_species": ["cold-water sea stars", "brittle stars"],
+      "wreck_meta": {
+        "vessel_type": "barquentine (polar expedition ship)",
+        "sunk_year": 1915,
+        "length_m": 44,
+        "orientation_notes": "upright and remarkably intact on flat seabed"
+      },
+      "external_links": [
+        "https://endurance22.org/endurance-is-found",
+        "https://ukaht.org/places/endurance-shipwreck/"
+      ]
+    },
+    {
+      "id": "lusitania",
+      "name": "RMS Lusitania",
+      "type": "wreck",
+      "lat": 51.4167,
+      "lon": -8.5667,
+      "depth_m": 93,
+      "depth_range_m": [90, 100],
+      "bbox": {
+        "north": 51.44,
+        "south": 51.4,
+        "east": -8.54,
+        "west": -8.6
+      },
+      "region": "Celtic Sea, off Ireland",
+      "country_eez": "Ireland",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/RMS_Lusitania",
+      "summary": "British ocean liner torpedoed by German U-boat U-20 off the Old Head of Kinsale, Ireland in May 1915, a pivotal event in drawing the US toward WWI.",
+      "facts": [
+        "Torpedoed by U-20 on 7 May 1915, sinking in about 18 minutes",
+        "1,198 of 1,959 aboard died, including 128 Americans",
+        "Lies on its starboard side, partially collapsed",
+        "A single torpedo hit triggered a mysterious secondary explosion, still debated"
+      ],
+      "gameplay_hooks": [
+        "Investigate the secondary-explosion mystery",
+        "Survey cargo holds for munitions controversy",
+        "Compare wreck orientation to sinking accounts"
+      ],
+      "hazards": ["strong tidal currents", "fishing net entanglement", "collapsed superstructure"],
+      "notable_species": ["conger eels", "pollack"],
+      "wreck_meta": {
+        "vessel_type": "ocean liner",
+        "sunk_year": 1915,
+        "length_m": 239,
+        "orientation_notes": "lies on starboard side, increasingly collapsed by trawling damage"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/RMS_Lusitania"]
+    },
+    {
+      "id": "britannic",
+      "name": "HMHS Britannic",
+      "type": "wreck",
+      "lat": 37.6942,
+      "lon": 24.3239,
+      "depth_m": 120,
+      "depth_range_m": [115, 122],
+      "bbox": {
+        "north": 37.71,
+        "south": 37.68,
+        "east": 24.34,
+        "west": 24.31
+      },
+      "region": "Aegean Sea, Greece",
+      "country_eez": "Greece",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/HMHS_Britannic",
+      "summary": "Titanic's sister ship, serving as a WWI hospital ship, sunk by a mine near the Greek island of Kea in 1916; the largest ship lost in WWI.",
+      "facts": [
+        "Sank in November 1916 after striking a German mine near Kea, Greece",
+        "Largest ship lost in the First World War",
+        "Discovered by Jacques Cousteau in 1975",
+        "Lies on its starboard side, largely intact due to shallower, warmer wreck-diving depth"
+      ],
+      "gameplay_hooks": [
+        "Compare hull design to sister ship Titanic",
+        "Explore hospital-ship medical bay compartments"
+      ],
+      "hazards": ["moderate depth technical-diving currents", "penetration hazards inside hull"],
+      "notable_species": ["Mediterranean groupers", "sea sponges"],
+      "wreck_meta": {
+        "vessel_type": "ocean liner / hospital ship",
+        "sunk_year": 1916,
+        "length_m": 269,
+        "orientation_notes": "lies on starboard side, largely intact"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/HMHS_Britannic"]
+    },
+    {
+      "id": "andrea-doria",
+      "name": "Andrea Doria",
+      "type": "wreck",
+      "lat": 40.4936,
+      "lon": -69.8494,
+      "depth_m": 73,
+      "depth_range_m": [60, 73],
+      "bbox": {
+        "north": 40.51,
+        "south": 40.48,
+        "east": -69.83,
+        "west": -69.87
+      },
+      "region": "North Atlantic, off Nantucket",
+      "country_eez": "United States",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/SS_Andrea_Doria",
+      "summary": "Italian ocean liner that collided with MS Stockholm off Nantucket in 1956 and sank; a popular but hazardous technical-diving 'Mount Everest of scuba diving' wreck.",
+      "facts": [
+        "Sank after collision with MS Stockholm on 25-26 July 1956",
+        "Nicknamed the 'Mount Everest of scuba diving' due to strong currents and depth",
+        "Lies on its starboard side, progressively collapsing over decades",
+        "Most passengers and crew were rescued before it sank"
+      ],
+      "gameplay_hooks": [
+        "Technical wreck-penetration challenge",
+        "Document structural collapse progression over time"
+      ],
+      "hazards": [
+        "strong currents",
+        "cold water",
+        "structural collapse",
+        "has caused multiple diver fatalities"
+      ],
+      "notable_species": ["Atlantic cod", "monkfish"],
+      "wreck_meta": {
+        "vessel_type": "ocean liner",
+        "sunk_year": 1956,
+        "length_m": 212,
+        "orientation_notes": "lies on starboard side, increasingly collapsed"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/SS_Andrea_Doria"]
+    },
+    {
+      "id": "uss-indianapolis",
+      "name": "USS Indianapolis (CA-35)",
+      "type": "wreck",
+      "lat": 12.0119,
+      "lon": 134.7011,
+      "depth_m": 5500,
+      "depth_range_m": [5500, 5500],
+      "bbox": {
+        "north": 12.1,
+        "south": 11.9,
+        "east": 134.8,
+        "west": 134.6
+      },
+      "region": "Philippine Sea",
+      "country_eez": "international waters",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/USS_Indianapolis_(CA-35)",
+      "summary": "US Navy cruiser torpedoed by a Japanese submarine in July 1945 days after delivering atomic bomb components; survivors suffered a notorious multi-day ordeal with shark attacks before rescue. Wreck found by a Paul Allen-funded expedition in 2017.",
+      "facts": [
+        "Sank in 12 minutes after being torpedoed on 30 July 1945",
+        "Had just delivered parts for the Hiroshima atomic bomb",
+        "Of ~1,195 crew, only 316 survived days adrift with exposure, dehydration, and shark attacks",
+        "Wreck located in August 2017 by RV Petrel (Paul Allen expedition)"
+      ],
+      "gameplay_hooks": [
+        "Historical rescue-timeline documentary mission",
+        "Survey torpedo impact points"
+      ],
+      "hazards": ["deep water", "remote location"],
+      "notable_species": ["deep-sea sharks", "grenadiers"],
+      "wreck_meta": {
+        "vessel_type": "heavy cruiser",
+        "sunk_year": 1945,
+        "length_m": 186,
+        "orientation_notes": "debris field on seafloor slope"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/USS_Indianapolis_(CA-35)"]
+    },
+    {
+      "id": "musashi",
+      "name": "Musashi",
+      "type": "wreck",
+      "lat": 12.9583,
+      "lon": 122.5333,
+      "depth_m": 1000,
+      "depth_range_m": [915, 1000],
+      "bbox": {
+        "north": 13.05,
+        "south": 12.86,
+        "east": 122.63,
+        "west": 122.43
+      },
+      "region": "Sibuyan Sea, Philippines",
+      "country_eez": "Philippines",
+      "confidence": "medium",
+      "coordinate_source": "https://en.wikipedia.org/wiki/Japanese_battleship_Musashi",
+      "summary": "One of the largest battleships ever built, sunk by US carrier aircraft in the Sibuyan Sea in October 1944 during the Battle of Leyte Gulf; wreck located by Paul Allen's team in 2015.",
+      "facts": [
+        "Sister ship to Yamato, among the heaviest and most heavily armed battleships ever built",
+        "Sunk 24 October 1944 after sustained air attack",
+        "Wreck discovered March 2015 by Paul Allen's RV Octopus expedition",
+        "Broke apart into large separate sections on the seafloor"
+      ],
+      "gameplay_hooks": [
+        "Compare scale to sister ship Yamato",
+        "Survey the shattered hull sections"
+      ],
+      "hazards": ["moderate-deep water", "steep slope terrain"],
+      "notable_species": ["reef and deep-slope fish"],
+      "wreck_meta": {
+        "vessel_type": "battleship",
+        "sunk_year": 1944,
+        "length_m": 263,
+        "orientation_notes": "broken into multiple large sections down a slope"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/Japanese_battleship_Musashi"]
+    },
+    {
+      "id": "san-jose-galleon",
+      "name": "San José Galleon (approximate)",
+      "type": "wreck",
+      "lat": 10.0,
+      "lon": -75.8,
+      "depth_m": 600,
+      "depth_range_m": [600, 600],
+      "bbox": {
+        "north": 10.2,
+        "south": 9.8,
+        "east": -75.6,
+        "west": -76.0
+      },
+      "region": "Caribbean Sea, off Cartagena, Colombia",
+      "country_eez": "Colombia",
+      "confidence": "low",
+      "coordinate_source": "https://en.wikipedia.org/wiki/San_Jos%C3%A9_(1698_ship)",
+      "summary": "Spanish galleon sunk by the British Navy in 1708 off Cartagena, reportedly carrying an immense treasure of gold, silver, and emeralds; located in 2015 but Colombia has not released precise coordinates.",
+      "facts": [
+        "Sunk 8 June 1708 during the Battle of Barú, part of the War of Spanish Succession",
+        "Cargo estimated at billions of dollars, subject to ongoing international ownership disputes",
+        "Location announced by Colombia in 2015/2018 but exact coordinates kept confidential",
+        "Sits roughly 600 m deep off Cartagena, Colombia"
+      ],
+      "gameplay_hooks": [
+        "Treasure-legal-dispute narrative quest",
+        "Careful non-disturbance archaeological survey mission"
+      ],
+      "hazards": [
+        "contested/protected site",
+        "moderate depth",
+        "legal sensitivity (coordinates intentionally undisclosed)"
+      ],
+      "notable_species": ["Caribbean reef fish"],
+      "wreck_meta": {
+        "vessel_type": "galleon",
+        "sunk_year": 1708,
+        "length_m": 40,
+        "orientation_notes": "unknown publicly; position here is an approximate placeholder, not the true government-held location"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/San_Jos%C3%A9_(1698_ship)"]
+    },
+    {
+      "id": "uss-monitor",
+      "name": "USS Monitor",
+      "type": "wreck",
+      "lat": 35.0011,
+      "lon": -75.4083,
+      "depth_m": 70,
+      "depth_range_m": [64, 70],
+      "bbox": {
+        "north": 35.02,
+        "south": 34.98,
+        "east": -75.39,
+        "west": -75.43
+      },
+      "region": "Off Cape Hatteras, North Carolina",
+      "country_eez": "United States",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/USS_Monitor",
+      "summary": "Pioneering ironclad warship of the American Civil War, famous for its 1862 battle with CSS Virginia; sank in a storm off Cape Hatteras later that year and now lies within a NOAA National Marine Sanctuary.",
+      "facts": [
+        "Fought the first battle between ironclad warships (Battle of Hampton Roads, 1862)",
+        "Sank in a storm off Cape Hatteras on 31 December 1862",
+        "Wreck discovered in 1973 and designated the first US National Marine Sanctuary (Monitor NMS) in 1975",
+        "Its revolutionary rotating gun turret was recovered and is displayed at The Mariners' Museum"
+      ],
+      "gameplay_hooks": [
+        "Recreate the ironclad duel historically",
+        "Survey the recovered-vs-remaining turret site"
+      ],
+      "hazards": ["strong Gulf Stream currents", "shifting sands", "moderate depth"],
+      "notable_species": ["Atlantic spadefish", "sand tiger sharks"],
+      "wreck_meta": {
+        "vessel_type": "ironclad warship",
+        "sunk_year": 1862,
+        "length_m": 52,
+        "orientation_notes": "capsized, turret separated and later recovered"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/USS_Monitor", "https://monitor.noaa.gov/"]
+    },
+    {
+      "id": "edmund-fitzgerald",
+      "name": "SS Edmund Fitzgerald",
+      "type": "wreck",
+      "lat": 46.9425,
+      "lon": -85.1183,
+      "depth_m": 162,
+      "depth_range_m": [160, 162],
+      "bbox": {
+        "north": 46.97,
+        "south": 46.92,
+        "east": -85.08,
+        "west": -85.16
+      },
+      "region": "Lake Superior (Great Lakes)",
+      "country_eez": "United States / Canada (Lake Superior)",
+      "confidence": "high",
+      "coordinate_source": "https://en.wikipedia.org/wiki/SS_Edmund_Fitzgerald",
+      "summary": "American Great Lakes freighter that sank in a violent Lake Superior storm in November 1975 with the loss of all 29 crew, memorialized in Gordon Lightfoot's ballad.",
+      "facts": [
+        "Sank 10 November 1975 during a severe Lake Superior storm",
+        "All 29 crew members were lost, no bodies recovered",
+        "Broke into two main sections on the lake bed",
+        "Subject of Gordon Lightfoot's famous 1976 song"
+      ],
+      "gameplay_hooks": [
+        "Storm-survival historical reenactment dive",
+        "Freshwater vs saltwater wreck-preservation comparison (optional bonus lake landmark)"
+      ],
+      "hazards": [
+        "cold freshwater",
+        "strong seasonal storms",
+        "protected gravesite (no penetration)"
+      ],
+      "notable_species": ["lake trout", "freshwater quagga mussels"],
+      "wreck_meta": {
+        "vessel_type": "lake freighter",
+        "sunk_year": 1975,
+        "length_m": 222,
+        "orientation_notes": "broken into bow and stern sections lying near each other, upside-down stern"
+      },
+      "external_links": ["https://en.wikipedia.org/wiki/SS_Edmund_Fitzgerald"]
+    }
+  ]
+}
