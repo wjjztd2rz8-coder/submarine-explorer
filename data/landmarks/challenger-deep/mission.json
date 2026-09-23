@@ -44,42 +44,48 @@
       "type": "scan",
       "poi": "cd-eastern-pool-deepest",
       "primary": true,
-      "title": "Scan the deepest surveyed point in the Eastern Pool"
+      "title": "Scan the deepest surveyed point in the Eastern Pool",
+      "hint": "Find the Eastern Pool's deepest cell in this tile's survey grid, around 10,930 m."
     },
     {
       "id": "leggo-site",
       "type": "scan",
       "poi": "cd-leggo-amphipod-site",
       "primary": true,
-      "title": "Scan the Leggo lander's amphipod bait site"
+      "title": "Scan the Leggo lander's amphipod bait site",
+      "hint": "The illustrative Leggo lander marker lies southwest of the Eastern Pool's deepest cell, near 10,925 m; it is not a model of the lander."
     },
     {
       "id": "published-coordinate",
       "type": "scan",
       "poi": "cd-published-coordinate",
       "primary": false,
-      "title": "Check the long-published catalog coordinate"
+      "title": "Check the long-published catalog coordinate",
+      "hint": "The long-published catalog coordinate lies west of the Eastern Pool's deepest cell, near 10,920 m on this tile."
     },
     {
       "id": "north-wall",
       "type": "scan",
       "poi": "cd-north-wall",
       "primary": false,
-      "title": "Survey the steep north inner wall"
+      "title": "Survey the steep north inner wall",
+      "hint": "The north inner wall rises northwest of the Eastern Pool floor, to around 9,980 m at this marker."
     },
     {
       "id": "central-basin",
       "type": "scan",
       "poi": "cd-central-basin",
       "primary": false,
-      "title": "Cross to the Central Pool, the trench's second basin"
+      "title": "Cross to the Central Pool, the trench's second basin",
+      "hint": "Follow the trench axis far west from the Eastern Pool to the Central Pool, near 10,930 m."
     },
     {
       "id": "axis-sill",
       "type": "scan",
       "poi": "cd-axis-sill",
       "primary": false,
-      "title": "Find the sill separating the Central and Eastern Pools"
+      "title": "Find the sill separating the Central and Eastern Pools",
+      "hint": "The higher sill along the trench axis lies west of the Eastern Pool, between it and the Central Pool, near 10,700 m."
     }
   ],
   "completion": "all_primary",

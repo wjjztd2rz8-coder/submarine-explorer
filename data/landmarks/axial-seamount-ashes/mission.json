@@ -36,42 +36,48 @@
       "type": "scan",
       "poi": "axial-ashes-mushroom",
       "primary": true,
-      "title": "Locate and scan the Mushroom chimney"
+      "title": "Locate and scan the Mushroom chimney",
+      "hint": "Mushroom's illustrative chimney marker is in the ASHES field at the western caldera wall's base, around 1,540 m."
     },
     {
       "id": "inferno",
       "type": "scan",
       "poi": "axial-ashes-inferno",
       "primary": true,
-      "title": "Locate and scan the Inferno chimney"
+      "title": "Locate and scan the Inferno chimney",
+      "hint": "Inferno's illustrative black-smoker marker is beside Mushroom in ASHES, near the western wall at around 1,540 m."
     },
     {
       "id": "minor-chimneys",
       "type": "scan",
       "poi": "axial-ashes-minor-chimneys",
       "primary": false,
-      "title": "Survey the Hell, Phoenix and Virgin chimneys"
+      "title": "Survey the Hell, Phoenix and Virgin chimneys",
+      "hint": "The illustrative Hell, Phoenix and Virgin chimney group is just east of Mushroom in ASHES, around 1,540 m."
     },
     {
       "id": "caldera-wall",
       "type": "scan",
       "poi": "axial-caldera-wall",
       "primary": false,
-      "title": "Survey the base of the western caldera wall"
+      "title": "Survey the base of the western caldera wall",
+      "hint": "The western caldera wall rises west of ASHES; find its base on the slope near 1,420 m."
     },
     {
       "id": "caldera-floor",
       "type": "scan",
       "poi": "axial-caldera-floor",
       "primary": false,
-      "title": "Survey a resurfaced patch of the caldera floor"
+      "title": "Survey a resurfaced patch of the caldera floor",
+      "hint": "The caldera floor lava terrain lies south of ASHES on a broad rise, around 1,460 m; individual lava flows are not resolved here."
     },
     {
       "id": "caldera-summit",
       "type": "scan",
       "poi": "axial-caldera-summit",
       "primary": false,
-      "title": "Reach the caldera rim's shallowest point on this tile"
+      "title": "Reach the caldera rim's shallowest point on this tile",
+      "hint": "The tile's shallow caldera rim high is northwest of ASHES, near 1,395 m."
     }
   ],
   "completion": "all_primary"

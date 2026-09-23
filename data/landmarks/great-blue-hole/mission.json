@@ -36,28 +36,32 @@
       "type": "scan",
       "poi": "great-blue-hole-centre",
       "primary": true,
-      "title": "Find the Great Blue Hole's real coordinates"
+      "title": "Find the Great Blue Hole's real coordinates",
+      "hint": "The Great Blue Hole coordinate marker is on the shallow reef flat, around 4 m in this coarse tile; the real 124 m sinkhole is unresolved."
     },
     {
       "id": "reef-rim",
       "type": "scan",
       "poi": "great-blue-hole-reef-rim",
       "primary": false,
-      "title": "Survey the reef flat surrounding the hole"
+      "title": "Survey the reef flat surrounding the hole",
+      "hint": "Survey Lighthouse Reef's real, shallow reef flat northwest of the hole marker, only a few metres deep."
     },
     {
       "id": "outer-dropoff",
       "type": "scan",
       "poi": "great-blue-hole-outer-dropoff",
       "primary": false,
-      "title": "Follow the outer drop-off into open water"
+      "title": "Follow the outer drop-off into open water",
+      "hint": "The atoll's outer drop-off is east of the hole marker, where the mapped seabed falls to around 200 m."
     },
     {
       "id": "reef-life",
       "type": "scan",
       "poi": "great-blue-hole-reef-life",
       "primary": false,
-      "title": "Observe reef life along the rim"
+      "title": "Observe reef life along the rim",
+      "hint": "The illustrative reef-life marker shares the shallow reef-flat area northwest of the hole; it is not a species sighting at this point."
     }
   ],
   "completion": "all_primary"

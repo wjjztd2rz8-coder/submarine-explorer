@@ -14,7 +14,8 @@ Checks:
   * guide.json: an `overview` entry, titles/paragraphs/facts/sources shapes
   * mission.json: tile exists, spawn inside the bbox and above the seabed,
     briefing summary/facts/hazards, objectives (>= 2 primary, or 1 primary +
-    >= 1 secondary) that reference existing POIs, `hull_class` A/B/C (read from
+    >= 1 secondary) that reference existing POIs and have nonblank hints,
+    `hull_class` A/B/C (read from
     src/core/Config.ts) whose crush depth clears the deepest POI, and
     `environment.preset` from the Phase C list
   * props.json: tools/validate_props.py rules plus `reconstruction: true`
@@ -447,6 +448,8 @@ def check_mission(doc, report, landmark, poi_depths, tile, hulls, folder, tiles_
                 report.err(where, 'poi "%s" does not exist in pois.json' % (o.get("poi"),))
             if not _nonempty_str(o.get("title")):
                 report.err(where, 'missing "title"')
+            if not _nonempty_str(o.get("hint")):
+                report.err(where, '"hint" must be a nonblank string')
             if o.get("primary") is True:
                 primary += 1
             else:

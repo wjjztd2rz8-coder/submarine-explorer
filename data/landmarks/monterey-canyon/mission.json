@@ -6,7 +6,10 @@
   "hull_class": "B",
   "environment": {
     "preset": "canyon",
-    "overrides": { "currentDirDeg": 255, "currentSpeedMps": 0.5 }
+    "overrides": {
+      "currentDirDeg": 255,
+      "currentSpeedMps": 0.5
+    }
   },
   "species_file": "species.json",
   "spawn": {
@@ -38,42 +41,48 @@
       "type": "scan",
       "poi": "monterey-canyon-head",
       "primary": true,
-      "title": "Locate and scan the canyon head"
+      "title": "Locate and scan the canyon head",
+      "hint": "The canyon head starts just offshore from Moss Landing, on shallow seabed around 45 m."
     },
     {
       "id": "upper-channel",
       "type": "scan",
       "poi": "monterey-canyon-upper-channel",
       "primary": true,
-      "title": "Follow the channel onto the shelf break"
+      "title": "Follow the channel onto the shelf break",
+      "hint": "Follow the canyon channel west from the head across the shelf break, descending to around 265 m."
     },
     {
       "id": "canyon-wall",
       "type": "scan",
       "poi": "monterey-canyon-wall",
       "primary": false,
-      "title": "Survey a canyon wall (optional, further down-canyon)"
+      "title": "Survey a canyon wall (optional, further down-canyon)",
+      "hint": "The north canyon wall is far west and down-canyon from the head, around 750 m at its marker."
     },
     {
       "id": "axis-1000",
       "type": "scan",
       "poi": "monterey-canyon-axis-1000m",
       "primary": false,
-      "title": "Reach the canyon axis at about 1,000 m (optional)"
+      "title": "Reach the canyon axis at about 1,000 m (optional)",
+      "hint": "The canyon axis lies just south of the north-wall marker, around 1,000 m deep."
     },
     {
       "id": "axis-2000",
       "type": "scan",
       "poi": "monterey-canyon-axis-2000m",
       "primary": false,
-      "title": "Continue down-canyon to about 2,000 m (optional)"
+      "title": "Continue down-canyon to about 2,000 m (optional)",
+      "hint": "Continue southwest down the canyon axis to mapped seabed around 2,000 m."
     },
     {
       "id": "mars-node",
       "type": "scan",
       "poi": "mbari-mars-node",
       "primary": false,
-      "title": "Find the MARS observatory node (optional, long transit)"
+      "title": "Find the MARS observatory node (optional, long transit)",
+      "hint": "The illustrative MARS observatory-node marker lies far west of the head, near 890 m; this tile does not survey the equipment."
     }
   ],
   "completion": "all_primary"

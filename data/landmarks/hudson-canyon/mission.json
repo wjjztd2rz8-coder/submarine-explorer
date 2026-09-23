@@ -35,42 +35,48 @@
       "type": "scan",
       "poi": "hc-canyon-wall",
       "primary": true,
-      "title": "Scan the north wall of the upper canyon"
+      "title": "Scan the north wall of the upper canyon",
+      "hint": "The upper canyon's north wall is a steep mapped slope near 540 m."
     },
     {
       "id": "coral-ledge",
       "type": "scan",
       "poi": "hc-coral-ledge",
       "primary": true,
-      "title": "Survey the coral-habitat ledge"
+      "title": "Survey the coral-habitat ledge",
+      "hint": "The illustrative coral-habitat ledge marker lies southeast along the canyon wall, around 940 m; no coral colony is surveyed at this exact point."
     },
     {
       "id": "upper-floor",
       "type": "scan",
       "poi": "hc-upper-floor",
       "primary": false,
-      "title": "Follow the axis to the upper canyon floor"
+      "title": "Follow the axis to the upper canyon floor",
+      "hint": "Follow the canyon axis southeast from the wall to the upper floor, around 1,220 m."
     },
     {
       "id": "deepest",
       "type": "scan",
       "poi": "hc-deepest-sounding",
       "primary": false,
-      "title": "Reach the deepest point in this survey"
+      "title": "Reach the deepest point in this survey",
+      "hint": "Continue southeast along the canyon axis to this tile's deepest sounding, around 1,680 m."
     },
     {
       "id": "shelf-valley",
       "type": "scan",
       "poi": "hc-shelf-valley",
       "primary": false,
-      "title": "Trace the drowned Hudson Shelf Valley"
+      "title": "Trace the drowned Hudson Shelf Valley",
+      "hint": "The drowned Hudson Shelf Valley lies far west and upslope of the canyon wall, around 130 m here."
     },
     {
       "id": "head",
       "type": "scan",
       "poi": "hc-shelf-edge-head",
       "primary": false,
-      "title": "Find the canyon's head on the outer shelf"
+      "title": "Find the canyon's head on the outer shelf",
+      "hint": "The canyon head is far northwest on the outer shelf edge, around 70 m in this tile."
     }
   ],
   "completion": "all_primary",

@@ -37,28 +37,32 @@
       "type": "scan",
       "poi": "titanic-bow",
       "primary": true,
-      "title": "Locate and scan the bow section"
+      "title": "Locate and scan the bow section",
+      "hint": "The reconstructed bow rests upright at the north end of Titanic's wreck area, around 3,790 m."
     },
     {
       "id": "find-stern",
       "type": "scan",
       "poi": "titanic-stern",
       "primary": true,
-      "title": "Locate and scan the stern section"
+      "title": "Locate and scan the stern section",
+      "hint": "The reconstructed, damaged stern lies roughly 700 m south of the bow, around 3,795 m."
     },
     {
       "id": "boilers",
       "type": "scan",
       "poi": "titanic-boilers",
       "primary": false,
-      "title": "Survey the boiler field"
+      "title": "Survey the boiler field",
+      "hint": "The illustrative boiler-field marker is east of the stern in the debris area, around 3,795 m."
     },
     {
       "id": "memorial",
       "type": "scan",
       "poi": "titanic-memorial",
       "primary": false,
-      "title": "Pause at the memorial plaque site on the stern"
+      "title": "Pause at the memorial plaque site on the stern",
+      "hint": "The illustrative memorial-plaque marker is at the stern, south of the bow near 3,790 m; its exact in-game placement is not surveyed."
     }
   ],
   "completion": "all_primary"

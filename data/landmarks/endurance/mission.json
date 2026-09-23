@@ -37,42 +37,48 @@
       "type": "scan",
       "poi": "endurance-hull",
       "primary": true,
-      "title": "Locate and scan the main hull"
+      "title": "Locate and scan the main hull",
+      "hint": "The reconstructed Endurance hull is at her documented Weddell Sea position, upright on seabed around 3,000 m."
     },
     {
       "id": "find-nameplate",
       "type": "scan",
       "poi": "endurance-stern-nameplate",
       "primary": true,
-      "title": "Scan the stern, where her name is still legible"
+      "title": "Scan the stern, where her name is still legible",
+      "hint": "The illustrative nameplate marker is at Endurance's stern, just south of the hull centre at around 3,000 m."
     },
     {
       "id": "helm",
       "type": "scan",
       "poi": "endurance-helm",
       "primary": false,
-      "title": "Find the ship's wheel and the life growing on the hull"
+      "title": "Find the ship's wheel and the life growing on the hull",
+      "hint": "The illustrative wheel marker is by the stern, just east of the hull centre near 3,000 m."
     },
     {
       "id": "rigging",
       "type": "scan",
       "poi": "endurance-rigging-debris",
       "primary": false,
-      "title": "Survey the fallen masts and funnel"
+      "title": "Survey the fallen masts and funnel",
+      "hint": "Look for the illustrative fallen masts and funnel beside the hull, near 3,000 m; their exact placement is not surveyed here."
     },
     {
       "id": "worsley",
       "type": "scan",
       "poi": "endurance-worsley-position",
       "primary": false,
-      "title": "Visit Worsley's 1915 recorded position, far to the north-west"
+      "title": "Visit Worsley's 1915 recorded position, far to the north-west",
+      "hint": "Worsley's recorded 1915 position lies far northwest of the discovered wreck, over seabed around 2,980 m."
     },
     {
       "id": "abyssal-plain",
       "type": "scan",
       "poi": "endurance-abyssal-plain",
       "primary": false,
-      "title": "Sample the real, unusually flat seabed nearby"
+      "title": "Sample the real, unusually flat seabed nearby",
+      "hint": "The real, nearly level Weddell Sea abyssal plain lies west of Endurance, near 2,990 m."
     }
   ],
   "completion": "all_primary"

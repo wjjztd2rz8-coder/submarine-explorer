@@ -38,35 +38,40 @@
       "type": "scan",
       "poi": "bismarck-hull",
       "primary": true,
-      "title": "Locate and scan the main hull"
+      "title": "Locate and scan the main hull",
+      "hint": "The reconstructed Bismarck hull stands on the seamount's southeastern flank, around 4,210 m."
     },
     {
       "id": "turrets",
       "type": "scan",
       "poi": "bismarck-turret-debris",
       "primary": false,
-      "title": "Survey the detached gun turrets down-slope"
+      "title": "Survey the detached gun turrets down-slope",
+      "hint": "Look for an illustrative detached-turret marker east of the hull on the seamount slope, around 4,120 m; exact turret positions are uncertain."
     },
     {
       "id": "damage",
       "type": "scan",
       "poi": "bismarck-damage",
       "primary": false,
-      "title": "Examine the battle-damage debated by historians"
+      "title": "Examine the battle-damage debated by historians",
+      "hint": "The illustrative battle-damage marker is close to Bismarck's main hull, around 4,210 m; it does not map individual hits."
     },
     {
       "id": "skid-trail",
       "type": "scan",
       "poi": "bismarck-skid-trail",
       "primary": false,
-      "title": "Sample the real seamount slope below the wreck"
+      "title": "Sample the real seamount slope below the wreck",
+      "hint": "Survey the real seamount flank east and upslope of the hull, around 4,180 m; this is terrain, not a surveyed skid trail."
     },
     {
       "id": "memorial",
       "type": "scan",
       "poi": "bismarck-memorial",
       "primary": false,
-      "title": "Pay respects at the memorial marker"
+      "title": "Pay respects at the memorial marker",
+      "hint": "The memorial marker is beside the hull on the seamount flank, around 4,210 m."
     }
   ],
   "completion": "all_primary"

@@ -36,35 +36,40 @@
       "type": "scan",
       "poi": "blake-mound-field-core",
       "primary": true,
-      "title": "Survey the dense coral mound cluster"
+      "title": "Survey the dense coral mound cluster",
+      "hint": "The dense coral mound cluster is on the Blake Plateau seabed, in the mid-700 m depth range."
     },
     {
       "id": "coral-thicket",
       "type": "scan",
       "poi": "blake-coral-thicket",
       "primary": false,
-      "title": "Examine a living Desmophyllum pertusum thicket"
+      "title": "Examine a living Desmophyllum pertusum thicket",
+      "hint": "An illustrative Desmophyllum pertusum thicket marker lies northeast of the mound cluster, near 770 m."
     },
     {
       "id": "second-mound",
       "type": "scan",
       "poi": "blake-second-mound",
       "primary": false,
-      "title": "Chart a neighbouring mound"
+      "title": "Chart a neighbouring mound",
+      "hint": "A neighbouring mapped mound lies southwest of the main cluster, near 780 m."
     },
     {
       "id": "gulf-stream",
       "type": "scan",
       "poi": "blake-gulf-stream",
       "primary": false,
-      "title": "Sample the Gulf Stream current"
+      "title": "Sample the Gulf Stream current",
+      "hint": "The Gulf Stream passes overhead; scan its marker northeast of the mound cluster on seabed near 700 m, not a current feature in the terrain."
     },
     {
       "id": "inter-mound-channel",
       "type": "scan",
       "poi": "blake-inter-mound-channel",
       "primary": false,
-      "title": "Survey the channel between mounds"
+      "title": "Survey the channel between mounds",
+      "hint": "The lower channel between mapped mounds is just northwest of the main cluster, near 780 m."
     }
   ],
   "completion": "all_primary"

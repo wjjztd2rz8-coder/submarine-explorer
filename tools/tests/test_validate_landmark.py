@@ -62,9 +62,12 @@ def good_content():
                "spawn": {"lat": lat1, "lon": lon1, "depth_m": 5, "heading_deg": 90},
                "briefing": {"summary": "S.", "depth_m": 1300, "facts": ["f"], "hazards": ["h"]},
                "objectives": [
-                   {"id": "o1", "type": "scan", "poi": "p-main", "primary": True, "title": "Scan main"},
-                   {"id": "o2", "type": "scan", "poi": "p-two", "primary": True, "title": "Scan two"},
-                   {"id": "o3", "type": "scan", "poi": "p-side", "primary": False, "title": "Side"}],
+                   {"id": "o1", "type": "scan", "poi": "p-main", "primary": True, "title": "Scan main",
+                    "hint": "Main: near the western side of the test tile, around 1,300 m."},
+                   {"id": "o2", "type": "scan", "poi": "p-two", "primary": True, "title": "Scan two",
+                    "hint": "Two: east of Main on the seabed, around 1,500 m."},
+                   {"id": "o3", "type": "scan", "poi": "p-side", "primary": False, "title": "Side",
+                    "hint": "Side: northwest of Main, around 1,080 m."}],
                "completion": "all_primary",
                "environment": {"preset": "vent", "overrides": {"fluid": "carbonate"}},
                "species_file": "species.json"}
@@ -286,6 +289,21 @@ class ValidateLandmarkTests(unittest.TestCase):
         rep = self.mutate("mission.json", lambda d: d.update(objectives=[d["objectives"][0],
                                                                          d["objectives"][2]]))
         self.assertEqual(rep.errors, [])
+
+    def test_objective_hint_required_string_and_nonblank(self):
+        missing = object()
+        for invalid in (missing, None, "", " \t\n", 12, False, ["near the main POI"]):
+            with self.subTest(hint=invalid):
+                docs = good_content()
+                if invalid is missing:
+                    del docs["mission.json"]["objectives"][0]["hint"]
+                else:
+                    docs["mission.json"]["objectives"][0]["hint"] = invalid
+                self.write({"mission.json": docs["mission.json"]})
+                self.assertError(self.validate(), '"hint" must be a nonblank string')
+
+    def test_valid_objective_hints(self):
+        self.assertEqual(self.validate().errors, [])
 
     def test_environment_and_briefing(self):
         rep = self.mutate("mission.json", lambda d: d["environment"].update(preset="lava"))

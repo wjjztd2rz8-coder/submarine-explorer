@@ -36,28 +36,32 @@
       "type": "scan",
       "poi": "hunga-tonga-caldera-floor",
       "primary": true,
-      "title": "Survey the pre-2022 caldera floor"
+      "title": "Survey the pre-2022 caldera floor",
+      "hint": "The pre-2022 summit caldera floor is a broad basin near 130 m in this historical tile."
     },
     {
       "id": "island-saddle",
       "type": "scan",
       "poi": "hunga-tonga-island-saddle",
       "primary": false,
-      "title": "Chart the reef saddle between the islands (pre-2022 survey)"
+      "title": "Chart the reef saddle between the islands (pre-2022 survey)",
+      "hint": "The pre-2022 saddle between the islands lies northwest of the caldera-floor marker, at the surface; the islands are no longer joined."
     },
     {
       "id": "rim-wall",
       "type": "scan",
       "poi": "hunga-tonga-rim-wall",
       "primary": false,
-      "title": "Follow the inner caldera wall (pre-2022 survey)"
+      "title": "Follow the inner caldera wall (pre-2022 survey)",
+      "hint": "The pre-2022 inner caldera wall lies west of the floor marker, descending toward 470 m."
     },
     {
       "id": "outer-flank",
       "type": "scan",
       "poi": "hunga-tonga-outer-flank",
       "primary": false,
-      "title": "Descend the outer submarine flank"
+      "title": "Descend the outer submarine flank",
+      "hint": "Beyond the old rim, the volcano's outer submarine flank lies northwest of the caldera floor, around 1,030 m."
     }
   ],
   "completion": "all_primary"

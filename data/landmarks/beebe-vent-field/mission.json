@@ -36,35 +36,40 @@
       "type": "scan",
       "poi": "bvf-main-vents",
       "primary": true,
-      "title": "Scan the Beebe 1-5 black smokers"
+      "title": "Scan the Beebe 1-5 black smokers",
+      "hint": "The Beebe 1–5 black-smoker complex is on the Mid-Cayman seafloor, close to 4,990 m."
     },
     {
       "id": "shrimp",
       "type": "scan",
       "poi": "bvf-shrimp-swarm",
       "primary": true,
-      "title": "Survey the Rimicaris hybisae swarm"
+      "title": "Survey the Rimicaris hybisae swarm",
+      "hint": "The illustrative Rimicaris hybisae swarm marker sits beside the Beebe chimneys, around 4,980 m."
     },
     {
       "id": "western-mound",
       "type": "scan",
       "poi": "bvf-sulfide-mound-west",
       "primary": false,
-      "title": "Survey the western sulfide mound"
+      "title": "Survey the western sulfide mound",
+      "hint": "The western sulfide mound is southwest of the main Beebe chimneys, near 4,960 m."
     },
     {
       "id": "eastern-margin",
       "type": "scan",
       "poi": "bvf-eastern-margin",
       "primary": false,
-      "title": "Check the field's eastern margin"
+      "title": "Check the field's eastern margin",
+      "hint": "The field's eastern-margin marker is northeast of the main chimneys, around 4,950 m."
     },
     {
       "id": "spreading-axis",
       "type": "scan",
       "poi": "bvf-spreading-axis",
       "primary": false,
-      "title": "Reach the Mid-Cayman spreading axis"
+      "title": "Reach the Mid-Cayman spreading axis",
+      "hint": "The Mid-Cayman spreading-axis point lies far west of Beebe in the axial valley, around 5,400 m."
     }
   ],
   "completion": "all_primary",

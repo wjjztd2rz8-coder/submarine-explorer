@@ -6,7 +6,9 @@
   "hull_class": "B",
   "environment": {
     "preset": "vent",
-    "overrides": { "fluid": "carbonate" }
+    "overrides": {
+      "fluid": "carbonate"
+    }
   },
   "species_file": "species.json",
   "spawn": {
@@ -36,42 +38,48 @@
       "type": "scan",
       "poi": "lost-city-poseidon",
       "primary": true,
-      "title": "Locate and scan the Poseidon tower"
+      "title": "Locate and scan the Poseidon tower",
+      "hint": "The reconstructed Poseidon carbonate tower marks the Lost City field on the Atlantis Massif, around 775 m."
     },
     {
       "id": "beehive",
       "type": "scan",
       "poi": "lost-city-beehive",
       "primary": false,
-      "title": "Scan the Beehive chimney"
+      "title": "Scan the Beehive chimney",
+      "hint": "The illustrative Beehive marker is beside Poseidon on its flank, near 760 m; the chimney itself was reported gone by 2018."
     },
     {
       "id": "imax-tower",
       "type": "scan",
       "poi": "lost-city-imax-tower",
       "primary": false,
-      "title": "Scan the IMAX Tower"
+      "title": "Scan the IMAX Tower",
+      "hint": "The illustrative IMAX Tower marker is just northwest of Poseidon, near 790 m; its exact footprint is not surveyed here."
     },
     {
       "id": "microbial-mat",
       "type": "scan",
       "poi": "lost-city-microbial-mat",
       "primary": false,
-      "title": "Sample a microbial biofilm site"
+      "title": "Sample a microbial biofilm site",
+      "hint": "The illustrative microbial biofilm marker is beside Poseidon's carbonate chimneys, near 790 m; it is not an exact sampling site."
     },
     {
       "id": "summit",
       "type": "scan",
       "poi": "lost-city-summit",
       "primary": false,
-      "title": "Survey the Atlantis Massif summit"
+      "title": "Survey the Atlantis Massif summit",
+      "hint": "The Atlantis Massif summit is northeast of the Lost City chimney markers, at the tile's shallow high near 725 m."
     },
     {
       "id": "south-wall",
       "type": "scan",
       "poi": "lost-city-south-wall",
       "primary": false,
-      "title": "Check the catalog's published coordinate against the real terrain"
+      "title": "Check the catalog's published coordinate against the real terrain",
+      "hint": "The catalog's rounded Lost City coordinate falls south of the vent field on the real massif wall, around 1,330 m, not at the chimneys."
     }
   ],
   "completion": "all_primary"
