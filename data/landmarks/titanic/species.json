@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "landmark": "titanic",
+  "source": "OBIS",
+  "source_url": "https://api.obis.org/v3/checklist?geometry=POLYGON((-50.100952+41.579842,-49.799927+41.579842,-49.799927+41.879768,-50.100952+41.879768,-50.100952+41.579842))&startdepth=3600.0&enddepth=4000.0&size=1000&skip=0",
+  "fetched_at": "2026-09-23T11:59:17Z",
+  "bbox": {
+    "north": 41.87976848296845,
+    "south": 41.57984172515595,
+    "east": -49.7999267578125,
+    "west": -50.1009521484375
+  },
+  "depth_filter_m": [3600.0, 4000.0],
+  "rank_filter": "species",
+  "taxa_in_bbox": 4,
+  "taxa_matching_rank": 4,
+  "records_in_bbox": 6,
+  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Placement of animals in the game is invented.",
+  "species": [
+    {
+      "scientificName": "Ophiosphalma armigerum",
+      "aphiaID": 124901,
+      "records": 3,
+      "depthRange_m": [3615, 3788],
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Amphiophiura convexa",
+      "aphiaID": 182962,
+      "records": 1,
+      "depthRange_m": [3615, 3615],
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Anthophiura ingolfi",
+      "aphiaID": 124837,
+      "records": 1,
+      "depthRange_m": [3788, 3788],
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Chrysogorgia campanula",
+      "aphiaID": 125352,
+      "records": 1,
+      "depthRange_m": [3800, 3800],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    }
+  ]
+}

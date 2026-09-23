@@ -1097,11 +1097,18 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* QA-C #2: flex items don't shrink below their content size by default,
+     so the ellipsis above never kicked in and a long title wrapped the
+     row, pushing .obj-speed to a second line. min-width: 0 lets it shrink;
+     obj-speed gets flex-shrink: 0 so the sim-speed badge never wraps. */
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .obj-speed {
   font-variant-numeric: tabular-nums;
   opacity: 0.8;
+  flex-shrink: 0;
 }
 
 .obj-speed.is-fast {
@@ -1168,11 +1175,6 @@ body {
 
 .obj-nav span:empty {
   display: none;
-}
-
-/* The HUD's warning banner shares the top centre; drop it under the panel. */
-body:has(.objectives-panel:not([hidden])) .hud-warning {
-  top: calc(170px + env(safe-area-inset-top, 0px));
 }
 
 /* ---- mission select: MISSIONS section + collapse toggle ---- */
@@ -1265,10 +1267,15 @@ body:has(.mission-debrief:not([hidden])) .scan-overlay {
   outline: 1px solid var(--b3-hair-dim);
 }
 
-/* --- fix S (QA-B) --- */
-/* QA-B #14: the proximity banner touched the objectives panel by 1.4 px. */
+/* --- fix S (QA-B), revised QA-C #1 --- */
+/* QA-B #14 fixed this at a static 180px, which broke again at Challenger
+   Deep (QA-C #1): the panel there is taller than the fixture used to tune
+   that number (obj-alert strip / long nav line). ObjectivesPanel.ts now
+   keeps --obj-panel-bottom in sync with the panel's live rendered height
+   via a ResizeObserver, so the banner tracks it regardless of content.
+   The 180px fallback covers the first paint before the observer fires. */
 body:has(.objectives-panel:not([hidden])) .hud-warning {
-  top: calc(180px + env(safe-area-inset-top, 0px));
+  top: calc(var(--obj-panel-bottom, 180px) + 10px);
 }
 
 /* Hull failure: the amber strip on the objectives panel replaces the HUD banner. */

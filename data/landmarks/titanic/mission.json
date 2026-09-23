@@ -4,6 +4,9 @@
   "tile": "titanic",
   "title": "Titanic dive",
   "hull_class": "B",
+  "environment": {
+    "preset": "wreck"
+  },
   "spawn": {
     "lat": 41.7481,
     "lon": -49.959,

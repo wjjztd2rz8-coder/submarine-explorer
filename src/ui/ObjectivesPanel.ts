@@ -54,6 +54,7 @@ export class ObjectivesPanel {
   private readonly alertEl: HTMLDivElement;
   private readonly navText = new Map<string, HTMLSpanElement>();
   private readonly cache = new Map<string, string>();
+  private resizeObserver: ResizeObserver | null = null;
 
   constructor(parent: HTMLElement = document.body) {
     this.root = el('div', 'objectives-panel');
@@ -75,6 +76,22 @@ export class ObjectivesPanel {
     this.alertEl.hidden = true;
     this.root.append(head, this.alertEl, this.listEl, this.navEl);
     parent.appendChild(this.root);
+
+    // QA-C #1: the HUD warning banner sits below this panel (styles.css);
+    // its exact height varies with title wrap, the alert strip and the
+    // objective count, so track it live via --obj-panel-bottom rather than
+    // a static offset that breaks on taller content (e.g. Challenger Deep).
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => this.syncPanelBottom());
+      this.resizeObserver.observe(this.root);
+    }
+  }
+
+  private syncPanelBottom(): void {
+    const bottom = this.root.hidden ? 0 : this.root.getBoundingClientRect().bottom;
+    if (bottom > 0) {
+      document.documentElement.style.setProperty('--obj-panel-bottom', `${Math.ceil(bottom)}px`);
+    }
   }
 
   /** Show (or with null, clear) the amber alert strip under the title. */
@@ -88,7 +105,11 @@ export class ObjectivesPanel {
   }
 
   setTitle(title: string): void {
-    this.titleEl.textContent = `MISSION · ${title.toUpperCase()}`;
+    const text = `MISSION · ${title.toUpperCase()}`;
+    this.titleEl.textContent = text;
+    // QA-C #2: long titles (e.g. "Beebe Vent Field: The Deepest Black …")
+    // are truncated by CSS; the full text stays available on hover/focus.
+    this.titleEl.title = text;
   }
 
   setSimSpeed(multiplier: number): void {
@@ -141,6 +162,7 @@ export class ObjectivesPanel {
   }
 
   dispose(): void {
+    this.resizeObserver?.disconnect();
     this.root.remove();
   }
 }
