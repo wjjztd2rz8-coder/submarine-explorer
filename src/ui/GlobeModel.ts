@@ -308,6 +308,8 @@ export type OrbitTunables = Pick<
   | 'startDistance'
   | 'dragDegPerPx'
   | 'inertiaDamping'
+  | 'maxFlingDegPerS'
+  | 'flingStaleS'
   | 'autoRotateDegPerS'
   | 'idleBeforeAutoRotateS'
   | 'keyRotateDegPerS'
@@ -357,16 +359,33 @@ export class OrbitState {
     this.lon = wrapDeg(this.lon + dLon);
     this.lat = this.clampLat(this.lat + dLat);
     if (dt > 0) {
-      // Smoothed release velocity.
-      this.vLon = 0.5 * this.vLon + 0.5 * (dLon / dt);
-      this.vLat = 0.5 * this.vLat + 0.5 * (dLat / dt);
+      // Smoothed release velocity. Coalesced or synthetic pointer events can
+      // arrive a millisecond apart, so dt is floored at one 120 Hz frame.
+      const step = Math.max(dt, 1 / 120);
+      this.vLon = 0.5 * this.vLon + 0.5 * (dLon / step);
+      this.vLat = 0.5 * this.vLat + 0.5 * (dLat / step);
     }
     this.idle = 0;
   }
 
-  endDrag(): void {
+  /**
+   * Release. `sinceLastMoveS`: time between the last pointer move and the
+   * release; a pointer that stopped before letting go does not fling.
+   */
+  endDrag(sinceLastMoveS = 0): void {
     this.dragging = false;
     this.idle = 0;
+    if (sinceLastMoveS > this.t.flingStaleS) {
+      this.vLon = 0;
+      this.vLat = 0;
+      return;
+    }
+    const speed = Math.hypot(this.vLon, this.vLat);
+    const max = this.t.maxFlingDegPerS;
+    if (speed > max) {
+      this.vLon *= max / speed;
+      this.vLat *= max / speed;
+    }
   }
 
   /** Multiply the altitude above the surface by `factor` (> 1 zooms out). */

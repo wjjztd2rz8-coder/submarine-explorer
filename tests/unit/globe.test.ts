@@ -242,6 +242,27 @@ describe('orbit', () => {
     expect(Math.abs(wrapDeg(o.lon - settled))).toBeLessThanOrEqual(t.autoRotateDegPerS / 60 + 1e-9);
   });
 
+  it('caps the fling speed and does not fling after the pointer stopped', () => {
+    const o = new OrbitState(t);
+    o.lon = 0;
+    o.lat = 0;
+    o.beginDrag();
+    // Synthetic events 1 ms apart: an absurd raw speed.
+    for (let i = 0; i < 5; i++) o.drag(40, 0, 0.001);
+    o.endDrag(0);
+    const before = o.lon;
+    o.update(0.01);
+    expect(Math.abs(wrapDeg(o.lon - before))).toBeLessThanOrEqual(t.maxFlingDegPerS * 0.01 + 1e-9);
+
+    const s = new OrbitState(t);
+    s.beginDrag();
+    s.drag(40, 0, 1 / 60);
+    s.endDrag(t.flingStaleS * 2);
+    const held = s.lon;
+    s.update(1 / 60);
+    expect(s.lon).toBe(held);
+  });
+
   it('auto-rotates only after the idle delay', () => {
     const o = new OrbitState(t);
     const lon0 = o.lon;

@@ -814,6 +814,10 @@ export interface GlobeConfig {
   dragDegPerPx: number;
   /** Exponential decay rate (1/s) of the released-drag spin. */
   inertiaDamping: number;
+  /** Cap on the released-drag spin (deg/s), so a flick cannot whirl the globe. */
+  maxFlingDegPerS: number;
+  /** A pointer held still this long (s) before release does not fling at all. */
+  flingStaleS: number;
   autoRotateDegPerS: number;
   /** Seconds without interaction before auto-rotate starts. */
   idleBeforeAutoRotateS: number;
@@ -1408,10 +1412,12 @@ export const DEFAULT_CONFIG: GameConfig = {
     textureUrl: publicUrl('/assets/globe/earth-bmng-topo-bathy-4096.jpg'),
     minDistance: 1.35,
     maxDistance: 4.5,
-    startDistance: 2.9,
+    startDistance: 3.5,
     fovDeg: 35,
-    dragDegPerPx: 0.22,
+    dragDegPerPx: 0.2,
     inertiaDamping: 3.5,
+    maxFlingDegPerS: 240,
+    flingStaleS: 0.1,
     autoRotateDegPerS: 3,
     idleBeforeAutoRotateS: 5,
     keyRotateDegPerS: 50,
@@ -1421,14 +1427,14 @@ export const DEFAULT_CONFIG: GameConfig = {
     focusLerpPerS: 5,
     pinOverlapPx: 16,
     pinHorizonFade: 0.18,
-    landDim: 0.34,
+    landDim: 0.22,
     landSaturation: 0.35,
     oceanGain: 1.15,
     graticuleDeg: 30,
     graticuleOpacity: 0.14,
     accentColor: 0x2ed9d9,
-    atmosphereStrength: 0.55,
-    atmosphereScale: 1.045,
+    atmosphereStrength: 0.8,
+    atmosphereScale: 1.012,
     maxPixelRatio: 2,
   },
   // C3: environment presets. See docs/presets.md for what each key does.

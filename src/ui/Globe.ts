@@ -4,7 +4,7 @@
  *
  * - Earth: NASA Blue Marble Next Generation with topography and bathymetry
  *   (public domain; ATTRIBUTION.md), styled ocean-forward in the shader: land
- *   and ice dimmed and desaturated, a cyan hairline graticule, a thin rim.
+ *   and ice dimmed and desaturated, a cyan hairline graticule, a hairline rim.
  * - Pins: one real `<button>` per landmark in data/landmarks.json, projected
  *   over the canvas every frame, so Tab / Enter / screen readers work without
  *   a custom focus model. Three states (GlobeModel.resolvePinState): mission,
@@ -486,9 +486,10 @@ export class Globe {
       d.t = now;
     };
     const onUp = (e: PointerEvent): void => {
-      if (!this.drag || this.drag.id !== e.pointerId) return;
+      const d = this.drag;
+      if (!d || d.id !== e.pointerId) return;
       this.drag = null;
-      this.orbit.endDrag();
+      this.orbit.endDrag(e.type === 'pointercancel' ? Infinity : (performance.now() - d.t) / 1000);
       this.root.classList.remove('is-dragging');
     };
     const onWheel = (e: WheelEvent): void => {
@@ -520,9 +521,13 @@ export class Globe {
     };
     const onKeyDown = (e: KeyboardEvent): void => {
       if (!this.open_) return;
-      // The game never sees keys while the globe is up (FocusTrap listens on
-      // this same node and phase, so Tab cycling still works).
-      e.stopPropagation();
+      // Nothing behind the globe sees keys while it is up: not the game's
+      // Input, the guide, the briefing, nor capture listeners on window
+      // registered after this one (mission router, settings; the globe is
+      // built first). Tab only stops propagating, so the FocusTrap listener on
+      // this same node and phase still cycles focus.
+      if (e.code === 'Tab') e.stopPropagation();
+      else e.stopImmediatePropagation();
       const code = e.code;
       if (code === 'Escape' || (!e.repeat && this.opts.isToggleKey?.(code))) {
         e.preventDefault();
