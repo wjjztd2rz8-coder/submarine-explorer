@@ -17,6 +17,7 @@
  */
 
 import type { GlobeConfig } from '../core/Config.js';
+import { publicUrl } from '../util/publicUrl.js';
 import { CONTENT_ROOT, fetchContentJson, type FetchJson } from '../game/ContentPath.js';
 import {
   loadMissionSummaries,
@@ -190,7 +191,7 @@ export interface GlobeCatalog {
 }
 
 /** URL of the landmark catalogue. */
-export const CATALOGUE_URL = '/data/landmarks.json';
+export const CATALOGUE_URL = publicUrl('/data/landmarks.json');
 
 /**
  * Load everything the globe needs. `loadMissionSummaries` runs with a silent

@@ -64,7 +64,10 @@ export type HelpActionMap = ReadonlyArray<{ id: string; keys: readonly string[] 
  * Resolve the help lines against an action map: `[[keys, text], ...]` per
  * line, e.g. `['W/S', 'thrust']`. An unbound action shows `--`.
  */
-export function helpLines(actions: HelpActionMap, lines = HELP_LINES): Array<Array<[string, string]>> {
+export function helpLines(
+  actions: HelpActionMap,
+  lines = HELP_LINES,
+): Array<Array<[string, string]>> {
   const byId = new Map(actions.map((a) => [a.id, a]));
   return lines.map((line) =>
     line

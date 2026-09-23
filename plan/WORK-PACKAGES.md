@@ -2,6 +2,11 @@
 
 How to use: pick a package, paste the "Common preamble" followed by the package brief into a fresh Opus or Sonnet session (or an Agent-tool subagent). Packages in the same phase may run concurrently because they own disjoint files. Read `plan/MASTER-PLAN.md` §6 for the phase overview and model recommendations.
 
+For OpenAI sessions, the owner maps Fable to **GPT-6 Astra** and both Opus and
+Sonnet to **GPT-6 Sol**. Use Sol subagents for the briefs below and have the
+orchestrator review and iterate on each completed package. The original model
+labels are retained for Claude sessions.
+
 ---
 
 ## Common preamble (paste at the top of every brief)

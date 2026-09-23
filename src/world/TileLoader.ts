@@ -11,8 +11,9 @@
  */
 
 import type { Tile, TileIndex, TileIndexEntry, TileMeta } from '../util/types.js';
+import { publicUrl } from '../util/publicUrl.js';
 
-export const DEFAULT_TILE_ROOT = '/data/tiles';
+export const DEFAULT_TILE_ROOT = publicUrl('/data/tiles');
 
 export class TileLoadError extends Error {
   constructor(

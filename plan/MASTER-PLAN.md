@@ -2,6 +2,11 @@
 
 Status: v0.1 draft, 2026-09-16. Author: Fable 5.1 (planning pass). Intended readers: the project owner and the Opus/Sonnet subagents that will build the game.
 
+OpenAI model mapping (owner instruction, 2026-09-22): **GPT-6 Astra** takes the
+Fable planning/orchestration role; **GPT-6 Sol** takes every Opus and Sonnet
+implementation, QA, and documentation role. Original Claude briefs remain
+below. Consult `plan/STATUS.md` for the latest verified implementation state.
+
 Companion documents (written in this same planning pass):
 
 | Doc                                                                                  | What it holds                                                        |
@@ -122,16 +127,16 @@ Conventions for all packages: each is sized for one agent session; lists files i
 
 ### Phase C — World tour (Tier 2) — high parallelism, one Sonnet agent per 2–3 landmarks
 
-> Status 2026-09-22: C2 shipped early, alongside Phase B (13 Tier-2 tiles, gzip + 16-bit variant). The rest of Phase C has not started. Live status: `plan/STATUS.md`.
+> Status 2026-09-22: C2 shipped early. C3 is integrated and C6 is prepared and locally verified; C1, C4 and C5 remain partial. Live status and verification: `plan/STATUS.md`.
 
-| #       | Package                                                                                                                                          | Model     | Done when                                              | Status                                             |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------ | -------------------------------------------------- |
-| C1      | Globe mission select: Three.js sphere with Natural Earth texture, landmark pins from `landmarks.json`, hover cards, tile-availability badges     | Opus      | Selecting a pin launches its mission                   | not started                                        |
-| C2      | Tile batch fetch: fetch all Tier-2 landmark tiles via pipeline, choose resolutions, add `tools/fetch_all.py`, size report, brotli precompression | Sonnet    | `data/tiles/index.json` lists ≥ 10 tiles ≤ 80 MB total | shipped — `docs/tiles-inventory.md` (no `.br` yet) |
-| C3      | Environment presets per landmark type (vent smoke, brine-pool shimmer layer, canyon current push, reef light shafts)                             | Opus      | Each preset has a screenshot in docs                   | not started                                        |
-| C4a–C4d | Landmark content packs (3 landmarks each): POIs, props, field guide, hazards, species list from OBIS export                                      | Sonnet ×4 | Each landmark playable start → debrief                 | not started                                        |
-| C5      | Save/settings/accessibility: settings screen, key remap, colour-blind sonar palette, motion-reduction toggle, subtitles for audio cues           | Sonnet    | Axe/lighthouse a11y pass ≥ 90                          | not started                                        |
-| C6      | Deployment: GitHub Actions build+test, Pages deploy, tile CDN caching headers, `ATTRIBUTION.md` check                                            | Sonnet    | Public URL live                                        | not started                                        |
+| #       | Package                                                                                                                                          | Model     | Done when                                              | Status                                                                        |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| C1      | Globe mission select: Three.js sphere with Natural Earth texture, landmark pins from `landmarks.json`, hover cards, tile-availability badges     | Opus      | Selecting a pin launches its mission                   | partial — globe works; dedicated e2e/docs and polish remain                   |
+| C2      | Tile batch fetch: fetch all Tier-2 landmark tiles via pipeline, choose resolutions, add `tools/fetch_all.py`, size report, brotli precompression | Sonnet    | `data/tiles/index.json` lists ≥ 10 tiles ≤ 80 MB total | shipped — `docs/tiles-inventory.md` (no `.br` yet)                            |
+| C3      | Environment presets per landmark type (vent smoke, brine-pool shimmer layer, canyon current push, reef light shafts)                             | Opus      | Each preset has a screenshot in docs                   | integrated — `docs/presets.md`; eight presets verified                        |
+| C4a–C4d | Landmark content packs (3 landmarks each): POIs, props, field guide, hazards, species list from OBIS export                                      | Sonnet ×4 | Each landmark playable start → debrief                 | partial — Lost City draft validates; Monterey incomplete; other packs pending |
+| C5      | Save/settings/accessibility: settings screen, key remap, colour-blind sonar palette, motion-reduction toggle, subtitles for audio cues           | Sonnet    | Axe/lighthouse a11y pass ≥ 90                          | partial — persistence/caption components; no settings UI or wiring            |
+| C6      | Deployment: GitHub Actions build+test, Pages deploy, tile CDN caching headers, `ATTRIBUTION.md` check                                            | Sonnet    | Public URL live                                        | prepared — project-base browser test passes; not published                    |
 
 ### Phase D — Systems (Tier 3), scheduled after C playtest
 

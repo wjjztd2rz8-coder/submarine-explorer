@@ -22,7 +22,9 @@ import type {
   PresetParamValue,
 } from '../../core/Config.js';
 import type { EventBus } from '../../core/EventBus.js';
+import { contentUrl } from '../../game/ContentPath.js';
 import type { AtmosphereSample } from '../../render/Atmosphere.js';
+import { publicUrl } from '../../util/publicUrl.js';
 import { BrinePreset } from './BrinePreset.js';
 import { CanyonPreset } from './CanyonPreset.js';
 import { DefaultPreset } from './DefaultPreset.js';
@@ -175,8 +177,14 @@ export function mergePresetParams(
   for (const [key, value] of Object.entries(overrides)) {
     const has = Object.prototype.hasOwnProperty.call(defaults, key);
     const def = has ? defaults[key] : undefined;
+    const validNumber =
+      typeof value !== 'number' ||
+      (Number.isFinite(value) &&
+        Math.abs(value) <= (key.toLowerCase().includes('color') ? 0xffffff : 1_000_000) &&
+        (typeof def !== 'number' || def < 0 || value >= 0));
     const ok =
       has &&
+      validNumber &&
       ((def === null && (typeof value === 'number' || value === null)) ||
         (def !== null &&
           typeof value === typeof def &&
@@ -334,8 +342,8 @@ export class PresetSystem {
     const o = this.o;
     const folder = o.missionId ?? o.landmarkId;
     const [mission, landmarks] = await Promise.all([
-      o.fetchJson(`/data/landmarks/${encodeURIComponent(folder)}/mission.json`),
-      o.fetchJson('/data/landmarks.json'),
+      o.fetchJson(contentUrl(folder, 'mission.json')),
+      o.fetchJson(publicUrl('/data/landmarks.json')),
     ]);
     const environment =
       mission && typeof mission === 'object'

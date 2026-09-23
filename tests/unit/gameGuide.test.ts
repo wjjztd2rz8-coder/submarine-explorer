@@ -53,6 +53,7 @@ describe('parseGuide', () => {
   it('safeUrl allows http(s) and site-relative only', () => {
     expect(safeUrl('/data/landmarks/t/img/a.jpg')).toBe('/data/landmarks/t/img/a.jpg');
     expect(safeUrl('//evil.example/x')).toBeUndefined();
+    expect(safeUrl('/\\evil.example/x')).toBeUndefined();
     expect(safeUrl('data:image/png;base64,xx')).toBeUndefined();
   });
 });

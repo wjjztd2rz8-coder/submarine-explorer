@@ -13,6 +13,7 @@
  */
 
 import type * as THREE from 'three';
+import { publicUrl } from '../util/publicUrl.js';
 import type {
   HullEnd,
   PropCollisionKind,
@@ -26,7 +27,7 @@ export const PROCEDURAL_KINDS: readonly ProceduralPropKind[] = ['hull-block', 'd
 export const HULL_ENDS: readonly HullEnd[] = ['prow', 'cut', 'rounded'];
 /** GLB/glTF models must live here (served from `public/assets/models`). */
 export const MODEL_URL_PREFIX = '/assets/models/';
-export const DRACO_DECODER_PATH = '/assets/decoders/draco/';
+export const DRACO_DECODER_PATH = publicUrl('/assets/decoders/draco/');
 
 /** A validated, defaults-filled props.json entry. */
 export interface PropDef {
@@ -93,6 +94,11 @@ export function parseModel(model: string): ProceduralPropKind | null | undefined
     return null;
   }
   return undefined;
+}
+
+/** Content models use the site base; explicit cache URLs retain their meaning. */
+export function modelLoadUrl(url: string, base = import.meta.env.BASE_URL): string {
+  return url.startsWith(MODEL_URL_PREFIX) ? publicUrl(url, base) : url;
 }
 
 /**
@@ -308,7 +314,8 @@ export class ModelCache {
   async get(url: string): Promise<THREE.Object3D> {
     let p = this.pending.get(url);
     if (!p) {
-      p = this.getLoader().then((l) => l.loadAsync(url).then((g) => g.scene));
+      const loadUrl = modelLoadUrl(url);
+      p = this.getLoader().then((l) => l.loadAsync(loadUrl).then((g) => g.scene));
       this.pending.set(url, p);
     }
     const scene = await p;

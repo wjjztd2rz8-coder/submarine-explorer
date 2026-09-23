@@ -5,6 +5,7 @@
  */
 
 import { contentUrl, fetchContentJson, type FetchJson } from './ContentPath.js';
+import { publicUrl } from '../util/publicUrl.js';
 import type { Confidence } from './Pois.js';
 
 export interface GuideFact {
@@ -56,7 +57,10 @@ function strList(v: unknown): string[] {
 export function safeUrl(v: unknown): string | undefined {
   const s = str(v);
   if (!s) return undefined;
-  if (/^https?:\/\//i.test(s) || (s.startsWith('/') && !s.startsWith('//'))) return s;
+  if (/^https?:\/\//i.test(s)) return s;
+  if (s.startsWith('/') && !s.startsWith('//') && !/[\\\u0000-\u001f]/.test(s)) {
+    return publicUrl(s);
+  }
   return undefined;
 }
 

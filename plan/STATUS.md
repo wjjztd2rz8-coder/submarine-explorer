@@ -1,4 +1,69 @@
-# Status — 2026-09-22 (after Phase B and C2; docs reconciled)
+# Status — 2026-09-22
+
+## OpenAI continuation checkpoint (latest; supersedes historical notes below)
+
+The owner requested codebase review followed by GPT-6 Sol implementation
+subagents and orchestrator review. GPT-6 Astra replaces Fable; GPT-6 Sol
+replaces both Sonnet and Opus. Original Claude instructions remain in the
+plan and `CONTRIBUTING-AGENTS.md`.
+
+The owner then reported approximately 30% usage remaining and noted that work
+may need to continue later. Finish C6/C3 verification before starting another
+package; preserve a reviewable working-tree checkpoint. Do not launch C5 or
+new content work in this session.
+
+### What the codebase review established
+
+- A/B and C2 are already implemented, with known polish/hardware-validation
+  gaps. The old statement that only the scaffold is committed is obsolete:
+  `git log` includes Phase B integration and the Phase C checkpoint `dc66674`.
+- C1 globe works but still needs its dedicated browser coverage and docs.
+- C5 has `Save.ts`, `Captions.ts`, sonar palettes and HUD binding support, but
+  no settings screen or runtime wiring.
+- The two initially untracked content folders are prior work: preserve them.
+  `lost-city` passes the landmark validator (three single-source warnings).
+  `monterey-canyon` lacks `species.json` and `sources.md`; its declared
+  `species_file` is therefore a validation error.
+- Monterey's two required targets are about 17.5 km apart. Make the long
+  transect optional when finishing that pack; even an optimistic 18 m/s
+  transit takes over 16 minutes, before scanning/descent.
+
+### This session
+
+- Added the OpenAI model mapping without removing the Claude briefs.
+- C6: deployment-base URL fixes, unit coverage and an opt-in project-base
+  browser test. See `plan/progress/C6.md` and `docs/deploy.md`.
+- C3: preset integration and review in progress; see `plan/progress/C3.md`
+  for final verification and remaining visual limitations.
+- Initial baseline: 344 unit tests, 104 Python tests, attribution check.
+  The first integrated root-base build passed all 24 pre-existing browser
+  tests (2.2 minutes); the orchestrator inspected the briefing screenshot.
+  Final verification is recorded below when complete.
+- Nothing was pushed or deployed; GitHub workflows remain unverified on
+  GitHub itself. Local browser checks do not establish the owner's hardware
+  performance target.
+
+### Resume order
+
+1. Review `git status`, this checkpoint, and C6/C3 progress notes. Preserve
+   the existing content folders and all completed working-tree changes.
+2. C5 settings/accessibility on GPT-6 Sol, then orchestrator review. Check
+   saved rebinding conflicts after reload: `Input.loadBindings()` currently
+   ignores empty key arrays, so displaced bindings may regain defaults.
+   `resetBindings()` also needs guarded storage removal. Verify modal input,
+   actual pause, captions, reduced motion, and keyboard/axe accessibility.
+3. Finish and validate Lost City/Monterey content, including Monterey pacing;
+   then the remaining C4 packs using the existing tools and honesty rules.
+4. Finish C1 browser coverage, globe polish and `docs/globe.md`.
+5. Phase C QA and documentation reconciliation. Phase D remains gated on
+   the Phase C playtest and retrospective; no detailed D brief exists yet.
+
+Use at most two Sol subagents at once. Review each package before progressing.
+Do not push, create a repository or enable Pages without the owner's go-ahead.
+
+---
+
+## Historical checkpoint (retained for context; use latest section above)
 
 ## Phase C checkpoint — resume here (2026-09-22)
 

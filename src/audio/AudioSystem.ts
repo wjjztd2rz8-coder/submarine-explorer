@@ -23,6 +23,9 @@ import {
 import { AmbientBeds, ThrusterLoop } from './Loops.js';
 import { castSonarRay } from './Sonar.js';
 import { CaptionBus, type AudioFrameInput, type TerrainSampler } from './events.js';
+// --- C3 begin ---
+import { HADAL_TOP_M } from '../world/presets/maths.js';
+// --- C3 end ---
 
 export class AudioSystem {
   /** Accessibility captions for every cue this system plays (A4 deliverable #5). */
@@ -92,6 +95,25 @@ export class AudioSystem {
         });
       }),
     );
+    // --- C3 begin ---
+    // Trench events supply the depth-dependent cadence. Share the existing
+    // cooldown with pressure stress so both sources cannot creak at once.
+    this.unsubs.push(
+      this.bus.on('env:trench', ({ depth }) => {
+        if (!this.engine) return;
+        const now = this.engine.ctx.currentTime;
+        if (now - this.lastCreakAt < this.config.hullCreakMinGapS) return;
+        this.lastCreakAt = now;
+        const stress = Math.min(1, Math.max(0, -depth / HADAL_TOP_M - 1));
+        playHullCreak(this.engine, this.config, stress);
+        this.captions.emit({
+          id: 'trench-creak',
+          text: 'Hull creaks under deep pressure',
+          durationS: 1.2,
+        });
+      }),
+    );
+    // --- C3 end ---
     // B1's scan beam: a new catalogue entry gets the chime, a repeat scan of
     // something already logged gets a quiet tick so it still confirms.
     this.unsubs.push(

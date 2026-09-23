@@ -123,6 +123,7 @@ Defaults from `defaultActions()` in `src/core/Input.ts`. Keys are rebindable
 | `G` (hold)           | scan the POI you are facing            | right bumper               |
 | `T`                  | sim speed 1× / 2× / 3×                 | D-pad up                   |
 | `J`                  | field guide                            | —                          |
+| `N`                  | globe dive-site picker                 | —                          |
 | `Enter`              | begin dive (mission briefing)          | —                          |
 | `Esc`                | close field guide, then debrief        | —                          |
 
@@ -144,6 +145,8 @@ Gamepad buttons are not rebindable yet.
 | `?at=lat,lon[,heading]`   | spawn at a coordinate, facing `heading` degrees (default north) (`docs/props.md`)                                    |
 | `?debrief=1`              | open the debrief 3 s after boot                                                                                      |
 | `?debugProps=1`           | prop placement tool: select, nudge, rotate, copy JSON (`docs/props.md`)                                              |
+| `?globe=1`                | open the globe dive-site picker at boot; the globe pauses piloting                                                   |
+| `?preset=<name>`          | override the environment preset for visual checks; see `docs/presets.md`                                             |
 
 Examples: `/?mission=titanic`, `/?tile=titanic&landmark=_test&poi=test-bow`
 (then hold `G`), `/?tile=titanic&depth=3790&at=41.7290,-49.9500,0`.

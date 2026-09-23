@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "landmark": "lost-city",
+  "source": "OBIS",
+  "source_url": "https://api.obis.org/v3/checklist?geometry=POLYGON((-42.221008+30.030178,-42.019409+30.030178,-42.019409+30.200466,-42.221008+30.200466,-42.221008+30.030178))&size=1000&skip=0",
+  "fetched_at": "2026-09-23T04:03:09Z",
+  "bbox": {
+    "north": 30.200466099547846,
+    "south": 30.030178013610346,
+    "east": -42.0194091796875,
+    "west": -42.22100830078125
+  },
+  "rank_filter": "any",
+  "taxa_in_bbox": 200,
+  "taxa_matching_rank": 200,
+  "records_in_bbox": 1192,
+  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Placement of animals in the game is invented.",
+  "species": [
+    {
+      "scientificName": "Rhodobacteraceae",
+      "aphiaID": 393084,
+      "records": 88,
+      "group": "microbe",
+      "taxonRank": "Family"
+    },
+    {
+      "scientificName": "Alphaproteobacteria",
+      "aphiaID": 392750,
+      "records": 77,
+      "group": "microbe",
+      "taxonRank": "Class"
+    },
+    {
+      "scientificName": "Bacteria",
+      "aphiaID": 6,
+      "records": 77,
+      "group": "microbe",
+      "taxonRank": "Kingdom"
+    },
+    {
+      "scientificName": "Gammaproteobacteria",
+      "aphiaID": 393018,
+      "records": 76,
+      "group": "microbe",
+      "taxonRank": "Class"
+    },
+    {
+      "scientificName": "Methanosarcinaceae",
+      "aphiaID": 416261,
+      "records": 46,
+      "group": "microbe",
+      "taxonRank": "Family"
+    },
+    {
+      "scientificName": "Euryarchaeota",
+      "aphiaID": 416226,
+      "records": 43,
+      "group": "microbe",
+      "taxonRank": "Phylum"
+    },
+    {
+      "scientificName": "Proteobacteria",
+      "aphiaID": 178054,
+      "records": 41,
+      "group": "microbe",
+      "taxonRank": "Phylum"
+    },
+    {
+      "scientificName": "Thiomicrospira",
+      "aphiaID": 394042,
+      "records": 35,
+      "group": "microbe",
+      "taxonRank": "Genus"
+    },
+    {
+      "scientificName": "Flavobacteriaceae",
+      "aphiaID": 559995,
+      "records": 28,
+      "group": "microbe",
+      "taxonRank": "Family"
+    },
+    {
+      "scientificName": "Bacteroidetes",
+      "aphiaID": 559844,
+      "records": 20,
+      "group": "microbe",
+      "taxonRank": "Phylum"
+    },
+    {
+      "scientificName": "Deltaproteobacteria",
+      "aphiaID": 392754,
+      "records": 20,
+      "group": "microbe",
+      "taxonRank": "Class"
+    },
+    {
+      "scientificName": "Clostridiales",
+      "aphiaID": 393070,
+      "records": 19,
+      "group": "microbe",
+      "taxonRank": "Order"
+    },
+    {
+      "scientificName": "Acidobacteriaceae",
+      "aphiaID": 571179,
+      "records": 17,
+      "group": "microbe",
+      "taxonRank": "Family"
+    },
+    {
+      "scientificName": "Crenarchaeota",
+      "aphiaID": 559440,
+      "records": 16,
+      "group": "microbe",
+      "taxonRank": "Phylum"
+    },
+    {
+      "scientificName": "Flavobacteriales",
+      "aphiaID": 559998,
+      "records": 15,
+      "group": "microbe",
+      "taxonRank": "Order"
+    },
+    {
+      "scientificName": "Sulfurovum",
+      "aphiaID": 393925,
+      "records": 15,
+      "group": "microbe",
+      "taxonRank": "Genus"
+    },
+    {
+      "scientificName": "Thermoprotei",
+      "aphiaID": 559441,
+      "records": 14,
+      "group": "microbe",
+      "taxonRank": "Class"
+    },
+    {
+      "scientificName": "Rhizobiales",
+      "aphiaID": 393148,
+      "records": 13,
+      "group": "microbe",
+      "taxonRank": "Order"
+    },
+    {
+      "scientificName": "Actinobacteria",
+      "aphiaID": 559510,
+      "records": 12,
+      "group": "microbe",
+      "taxonRank": "Class"
+    },
+    {
+      "scientificName": "Cryomorphaceae",
+      "aphiaID": 559981,
+      "records": 11,
+      "group": "microbe",
+      "taxonRank": "Family"
+    }
+  ]
+}

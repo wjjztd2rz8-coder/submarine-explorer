@@ -8,8 +8,10 @@
  * B4 (props) and B3 (missions), so keep this file tiny and dependency-free.
  */
 
+import { publicUrl } from '../util/publicUrl.js';
+
 /** Root URL of the per-landmark content folders (served via public/data). */
-export const CONTENT_ROOT = '/data/landmarks';
+export const CONTENT_ROOT = publicUrl('/data/landmarks');
 
 /** Landmark ids are folder names: letters, digits, `_` and `-` only. */
 const SAFE_ID = /^[A-Za-z0-9_-]{1,64}$/;

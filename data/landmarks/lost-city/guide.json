@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "landmark": "lost-city",
+  "entries": [
+    {
+      "id": "overview",
+      "title": "Lost City Hydrothermal Field",
+      "paragraphs": [
+        "The Lost City Hydrothermal Field sits on the southern summit of the Atlantis Massif, a dome-shaped mountain of mantle rock exposed on the Mid-Atlantic Ridge near 30°N. Unlike the famous 'black smoker' vents that run on volcanic heat, Lost City is powered by serpentinization: seawater reacting with olivine-rich mantle rock, producing heat, hydrogen and methane without any magma nearby.",
+        "The field was found on 4 December 2000 by scientists diving in DSV Alvin with the robotic camera sled ArgoII, working from the research vessel Atlantis. Its towering white carbonate chimneys, some over 60 m tall, made it one of the most striking hydrothermal discoveries ever made.",
+        "The vent fluid is warm (40-90 degC) and strongly alkaline (pH over 9) rather than the scalding, acidic fluid of a black smoker. It carries abundant hydrogen and methane but little of the metal and sulfide that colour a black smoker's plume, so Lost City's towers are built of pale carbonate minerals rather than dark metal sulfides. What you see rendered here is basalt-grey rather than white: the game's chimney model has no colour option yet for carbonate rock, so treat every tower in this mission as actually pale grey-white.",
+        "The field is tiny: about 500 square metres, smaller than a single cell of the open bathymetry used for this tile (roughly 53 x 61 m per cell). The seabed terrain here is real survey data, but no individual chimney is resolved in it -- every tower you see is a placed reconstruction at an approximate position within the real depth band."
+      ],
+      "facts": [
+        { "label": "Depth range", "value": "750-900 m" },
+        { "label": "Discovered", "value": "4 December 2000 (DSV Alvin, RV Atlantis)" },
+        { "label": "Power source", "value": "serpentinization, not magma" },
+        { "label": "Fluid temperature", "value": "40-90 degC" },
+        { "label": "Fluid pH", "value": "over 9 (alkaline)" },
+        { "label": "Field extent", "value": "about 500 sq m" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "Lost City Hydrothermal Field — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
+        },
+        {
+          "title": "Atlantis Massif — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Atlantis_Massif"
+        },
+        {
+          "title": "GMRT Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "poseidon",
+      "title": "Poseidon, the tallest tower",
+      "paragraphs": [
+        "Poseidon is the field's largest carbonate structure, standing about 60 m tall. It is the closest thing Lost City has to a landmark within a landmark: a ragged, spired tower built up over tens of thousands of years as vent fluid met cold seawater and precipitated calcium carbonate, layer on layer.",
+        "Chemical dating of Lost City's carbonate puts some chimneys at more than 100,000 years old and shows the field has vented, on and off, for at least 30,000 years -- making it vastly older than any known black smoker, which typically last only decades to a few centuries before they collapse or fizzle out.",
+        "Because it needs only olivine rock and liquid water, serpentinization like this could in principle happen anywhere those two things meet -- including on icy moons such as Europa or Enceladus, which is one reason Lost City is studied as a possible model for life beyond Earth.",
+        "Artist's reconstruction: a tapered column at the corrected field position (see sources.md for the coordinate discrepancy). No survey has published Poseidon's exact footprint or shape."
+      ],
+      "facts": [
+        { "label": "Height", "value": "about 60 m" },
+        {
+          "label": "Age",
+          "value": "chimneys dated older than 120,000 years; field active 30,000+ years"
+        },
+        {
+          "label": "Built from",
+          "value": "calcium carbonate, precipitated from alkaline vent fluid"
+        }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "Lost City Hydrothermal Field — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "beehive",
+      "title": "Beehive",
+      "paragraphs": [
+        "Beehive is one of several named smaller spires clustered around Poseidon. Real hydrothermal fields like this one contain dozens of chimneys and flanges of every size, from fist-sized knobs to multi-storey towers, and only a handful have been individually named and described in the literature.",
+        "No published coordinate, height or photograph description for Beehive was found during this research pass, so its size and exact position here are estimates, placed near Poseidon within the field's real depth range."
+      ],
+      "facts": [{ "label": "Position/height", "value": "not published; estimated" }],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "Lost City Hydrothermal Field — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
+        }
+      ],
+      "confidence": "low"
+    },
+    {
+      "id": "imax-tower",
+      "title": "IMAX Tower",
+      "paragraphs": [
+        "IMAX Tower takes its name from the giant-screen documentary crew that filmed the field. At about 8 m tall, it is modest next to Poseidon, but still a substantial mineral spire built the same way: cold seawater meeting warm, alkaline vent fluid and dropping carbonate out of solution.",
+        "Its exact coordinate is not published; it is placed here near Poseidon, within the field's real depth range."
+      ],
+      "facts": [{ "label": "Height", "value": "about 8 m" }],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "Lost City Hydrothermal Field — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
+        }
+      ],
+      "confidence": "low"
+    },
+    {
+      "id": "microbial-mat",
+      "title": "Microbial life on the chimneys",
+      "paragraphs": [
+        "Lost City's chimneys are coated inside and out with thick biofilms of archaea and bacteria that live on the vent's own chemistry: hydrogen and methane, produced abiotically by the serpentinization reaction, with almost no help from sunlight or photosynthesis at all. A group of archaea related to the order Methanosarcinales dominates the warmest, most active surfaces.",
+        "Larger animals are scarce compared with a black-smoker field: there are no tubeworms or giant clams here, the signature animals of sulfide vents. Instead, small corals, snails, bivalves, worms and crustaceans graze on the microbial mats and on each other.",
+        "This POI sits near a real cluster of OBIS occurrence records from a 2003 International Census of Marine Microbes survey of the field -- almost entirely archaea and bacteria identified from DNA, with no reported collection depth. What you see rendered here (a visible mat) is invented; the sampling location is grounded in real data. See species.json for the taxa found in this tile's bounding box."
+      ],
+      "facts": [
+        {
+          "label": "Dominant microbes",
+          "value": "Methanosarcinales-like archaea, hydrogen/methane-oxidising bacteria"
+        },
+        {
+          "label": "Large fauna",
+          "value": "small corals, snails, bivalves, polychaetes, amphipods, ostracods -- no tubeworms or vent clams"
+        }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "Lost City Hydrothermal Field — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
+        },
+        { "title": "Ocean Biodiversity Information System (OBIS)", "url": "https://obis.org/" }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "summit",
+      "title": "The Atlantis Massif summit",
+      "paragraphs": [
+        "The Atlantis Massif is an oceanic core complex: a dome of deep mantle and lower-crust rock, normally buried many kilometres down, exposed at the seafloor by a long-lived detachment fault that slides one tectonic block up and over another. Its summit, the shallowest point in this tile at 724 m, sits about 15 km from the main Mid-Atlantic Ridge spreading axis -- unusually far for hydrothermal activity, another sign that Lost City is not driven by fresh volcanic heat like a ridge-axis black smoker field.",
+        "This point is real GMRT bathymetry, not a reconstruction: the actual shallowest terrain sampled anywhere in this tile."
+      ],
+      "facts": [
+        { "label": "Depth", "value": "724 m (tile minimum)" },
+        { "label": "Feature type", "value": "oceanic core complex summit" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Atlantis Massif — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Atlantis_Massif"
+        },
+        {
+          "title": "GMRT Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "south-wall",
+      "title": "A coordinate discrepancy",
+      "paragraphs": [
+        "This point is worth a look because of what it teaches about working with real data. Both Wikipedia's infobox and this game's landmark catalog give Lost City's position as a rounded 30 degrees 07' N, 42 degrees 07' W -- a coordinate precise only to the nearest arc-minute, about 1.8 km. On this tile's real bathymetry, that exact point lands here, 1,332 m deep, partway down the Atlantis Massif's steep south wall -- far below the field's true 750-900 m depth range.",
+        "The real Lost City field sits about 665 m north of this point, up on the massif's southern summit flank, which is where every vent POI in this mission is actually placed. This POI is kept at the catalog's literal coordinate so you can compare the two and see the gap for yourself: rounded coordinates plus steep terrain can put a 'X marks the spot' pin on the wrong feature entirely.",
+        "This is real GMRT terrain, not a reconstruction: an ordinary stretch of the massif's south-facing slope."
+      ],
+      "facts": [
+        { "label": "Depth here", "value": "1,332 m" },
+        { "label": "Distance to real field", "value": "about 665 m north" },
+        { "label": "Cause", "value": "arc-minute-rounded published coordinate on steep terrain" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Lost City Hydrothermal Field — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
+        },
+        {
+          "title": "GMRT Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        }
+      ],
+      "confidence": "high"
+    }
+  ]
+}

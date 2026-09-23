@@ -3,6 +3,15 @@
 This scaffold is meant to be built on by many agents, often concurrently. These
 rules exist so that parallel work merges cleanly.
 
+## OpenAI model mapping (2026-09-22)
+
+When working with OpenAI models, use **GPT-6 Astra** for the Fable planning and
+orchestration role, and **GPT-6 Sol** for every Sonnet or Opus implementation,
+QA, and documentation role. Preserve the original Claude-specific briefs;
+this mapping supplements them. The owner requested Sol subagents with review
+and iteration by the orchestrator. Follow the resume order in
+`plan/RESUME-PROMPT.md`, with at most two subagents working at once.
+
 ## 1. File ownership
 
 Change files in your own lane. If you need something from another lane, add it

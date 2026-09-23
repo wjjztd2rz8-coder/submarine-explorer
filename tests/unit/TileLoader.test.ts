@@ -34,6 +34,21 @@ function fetchWith16(tile: Tile, bin16: ArrayBuffer | null, seen: string[]): Fet
 }
 
 describe('TileLoader', () => {
+  it('uses an explicit root unchanged', async () => {
+    const urls: string[] = [];
+    const loader = new TileLoader('https://tiles.example/custom', async (url) => {
+      urls.push(url);
+      return {
+        ok: false,
+        status: 404,
+        json: async () => ({}),
+        arrayBuffer: async () => new ArrayBuffer(0),
+      };
+    });
+    await loader.loadIndex();
+    expect(urls).toEqual(['https://tiles.example/custom/index.json']);
+  });
+
   it('loads a synthetic tile end to end', async () => {
     const tile = makeSyntheticTile({ id: 'fixture', cols: 5, rows: 4 });
     const loader = new TileLoader('/data/tiles', makeFakeFetch(tile));

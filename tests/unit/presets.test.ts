@@ -89,6 +89,21 @@ describe('override merge', () => {
     mergePresetParams('canyon', defaults, over, warn);
     expect(warn).toHaveBeenCalledTimes(2);
   });
+
+  it('rejects nonfinite, negative and unbounded numeric mission overrides', () => {
+    const warn = vi.fn();
+    const defaults = presetDefaults(DEFAULT_CONFIG.presets, 'canyon');
+    const out = mergePresetParams(
+      'canyon',
+      defaults,
+      { currentDirDeg: Infinity, currentSpeedMps: -1, plumeParticles: 1e12 },
+      warn,
+    );
+    expect(out.currentDirDeg).toBeNull();
+    expect(out.currentSpeedMps).toBe(defaults.currentSpeedMps);
+    expect(out.plumeParticles).toBe(defaults.plumeParticles);
+    expect(warn).toHaveBeenCalledTimes(3);
+  });
 });
 
 describe('current maths', () => {
@@ -149,6 +164,11 @@ describe('current maths', () => {
     expect(out.x).toBe(0); // already faster downstream: left alone
     const up = currentCouplingDelta({ x: -1, y: 0, z: 0 }, cur, 0.5, 100, out);
     expect(up.x).toBeCloseTo(1.5); // converges on the current speed, never past it
+    const normal = { x: 0.3, y: -0.2, z: 0.5 };
+    currentCouplingDelta(normal, { x: 0, y: 0, z: 0 }, 0.5, 1, out);
+    expect(out).toEqual({ x: 0, y: 0, z: 0 });
+    currentCouplingDelta(normal, cur, 0.5, 0, out);
+    expect(out).toEqual({ x: 0, y: 0, z: 0 });
   });
 
   it('wraps particle coordinates into the box around the centre', () => {

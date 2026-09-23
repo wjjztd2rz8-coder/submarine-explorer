@@ -31,6 +31,11 @@ import { Landmarks } from './world/Landmarks.js';
 import { Terrain } from './world/Terrain.js';
 import { TileLoader } from './world/TileLoader.js';
 import { Water } from './world/Water.js';
+// --- C3 begin ---
+import { PresetSystem } from './world/presets/Presets.js';
+import { latLonToWorld } from './util/geo.js';
+import { fetchContentJson } from './game/ContentPath.js';
+// --- C3 end ---
 // --- B1 begin ---
 import { landmarkIdFor } from './game/ContentPath.js';
 import { Discovery } from './game/Discovery.js';
@@ -262,6 +267,26 @@ async function main(): Promise<void> {
   }
   const propContact = new PropContact(props, bus, config.props, config.submarine.hullRadius);
   // --- B4 end ---
+  // --- C3 begin ---
+  const presets = new PresetSystem({
+    scene,
+    bus,
+    config,
+    tier,
+    params,
+    tileId: meta.id,
+    landmarkId: contentLandmark,
+    missionId: route?.missionId ?? null,
+    terrain,
+    sub,
+    props,
+    discovery,
+    atmosphere,
+    headlights,
+    toWorld: (lat, lon) => latLonToWorld(meta, lat, lon),
+    fetchJson: fetchContentJson,
+  });
+  // --- C3 end ---
   const missionSelect = new MissionSelect(index, {
     currentTileId: meta.id,
     currentMissionId: route?.missionId,
@@ -404,6 +429,16 @@ async function main(): Promise<void> {
       focus: scanFocus,
     });
     const atmo = atmosphere.update(rig.camera.position.y, sub.position, time.frameDelta);
+    // --- C3 begin ---
+    presets.update(
+      frozen ? 0 : time.frameDelta,
+      steps * time.fixedDelta * sub.simSpeed,
+      atmo,
+      rig.camera,
+      renderer.domElement.height,
+      time.elapsed,
+    );
+    // --- C3 end ---
     const fogNow = { color: atmo.fogColor, density: atmo.fogDensity };
     headlights.update(sub.position, forward, fogNow);
     snow.update(rig.camera, atmo, time.frameDelta, renderer.domElement.height);
@@ -512,6 +547,9 @@ async function main(): Promise<void> {
     props,
     propsDebug,
     // --- B4 end ---
+    // --- C3 begin ---
+    presets,
+    // --- C3 end ---
     // --- B3 begin ---
     mission: missionRouter?.mission ?? null,
     missionRouter,

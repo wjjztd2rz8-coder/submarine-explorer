@@ -69,22 +69,22 @@ served from a sub-path, so the deploy workflow builds with
   uses it in place of `/<repo>/`. Then set the domain under Settings → Pages →
   Custom domain, add the DNS record GitHub shows, and tick "Enforce HTTPS".
 - **Local check of a sub-path build**:
-  `VITE_BASE=/submarine-explorer/ npm run build -- --outDir dist-base`, then
-  `npx vite preview --outDir dist-base` and open
-  `http://localhost:4173/submarine-explorer/`.
 
-> **Known blocker for sub-path hosting (tracked for a `src/` fix).** Vite
-> prefixes the base onto the URLs in `index.html` and the bundled JS/CSS, but
-> not onto runtime `fetch` / loader URLs written as string literals. Several
-> modules build URLs from root-absolute constants (`'/data/tiles'`,
-> `'/data/landmarks'`, `'/data/landmarks.json'`, `'/assets/models/'`,
-> `'/assets/decoders/draco/'`, `'/assets/globe/…'`). Under `/<repo>/` those
-> requests go to `https://<owner>.github.io/data/...` and 404. The fix is to
-> build them from `import.meta.env.BASE_URL`, which always ends in `/`, e.g.
-> `` `${import.meta.env.BASE_URL}data/tiles` ``, and to resolve site-relative
-> paths from JSON content (`props.json` `"model": "/assets/models/x.glb"`) the
-> same way at load time. Until that lands, deploy with `PAGES_BASE=/`
-> (custom domain or `<owner>.github.io` repository).
+  ```bash
+  VITE_BASE=/submarine-explorer/ npm run build -- --outDir dist-base
+  PW_BASE=/submarine-explorer/ VITE_BASE=/submarine-explorer/ \
+    PW_OUTDIR=dist-base PW_PORT=4197 npx playwright test tests/e2e/base-url.spec.ts
+  ```
+
+  The browser test checks the tile and content requests, fixture GLBs, and
+  globe texture under the project path; it saves globe and dive screenshots in
+  `test-results/`.
+
+Runtime requests for tiles, content, models, decoder files, the globe texture,
+and local guide links use `import.meta.env.BASE_URL`. Authored JSON keeps
+site-relative paths such as `"model": "/assets/models/x.glb"`; the loader
+resolves those paths under the deployment base. An explicit URL supplied to a
+tile loader or the globe texture setting stays under caller control.
 
 ## 4. What ships, and how big it is
 

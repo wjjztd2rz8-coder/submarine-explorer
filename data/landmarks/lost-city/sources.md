@@ -1,0 +1,100 @@
+# Lost City content: sources and notes (package C4a)
+
+Researched 2026-09-22/23. Files: `pois.json`, `guide.json`, `props.json`, `mission.json`, `species.json` in this
+folder. Tile: `data/tiles/lost-city` (GMRT, bbox N 30.2005 / S 30.0302 / E -42.0194 / W -42.2210, cellsize
+52.9 x 61.1 m, summit 724.1 m, min/max -5002.2 / -724.1 m).
+
+## Sources consulted
+
+| #   | Source                                                                                           | URL                                                        | Used for                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| --- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Lost City Hydrothermal Field — Wikipedia                                                         | https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field | Discovery (4 Dec 2000, Alvin + ArgoII, RV Atlantis); depth range 750-900 m; nominal coordinate 30°07'0"N 42°07'0"W; field extent ~500 sq m; serpentinization power source; fluid 40-90 degC, pH >9, rich in H2/CH4, low in CO2/H2S/metals; Poseidon ~60 m tall / ~100 m wide (edifice); Beehive and IMAX Tower named structures, IMAX Tower ~8 m; Methanosarcinales-like archaea biofilms; fauna present (small corals, snails, bivalves, polychaetes, amphipods, ostracods) and absent (tubeworms, giant clams); comparison to black smokers; age (chimneys >120,000 yr, field active 30,000+ yr); astrobiology relevance (Europa, Enceladus); UNESCO protection-wishlist status |
+| 2   | Atlantis Massif — Wikipedia                                                                      | https://en.wikipedia.org/wiki/Atlantis_Massif              | Oceanic core complex, detachment-fault uplift of mantle/lower-crust rock, ~15 km off-axis from the Mid-Atlantic Ridge                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 3   | Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 | https://www.gmrt.org/                                      | Seabed depths (this tile), grid resolution                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 4   | Ocean Biodiversity Information System (OBIS)                                                     | https://obis.org/                                          | `species.json` occurrence data (via `tools/obis_export.py`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| 5   | data/landmarks.json (this repo)                                                                  | —                                                          | Catalog entry: nominal position 30.1167, -42.1167; depth_range_m [750, 900]; facts/hooks used as a starting checklist                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+
+The InterRidge vents-data site (`https://vents-data.interridge.org/`) was attempted but its TLS certificate is
+currently expired (fetch failed with "certificate has expired" on 2026-09-23); it was not used. Everything above
+is corroborated by the landmarks.json catalog entry, which independently cites the same Wikipedia article plus
+InterRidge.
+
+## Terrain survey (this session, via `tools/inspect_tile.py` and a bilinear sampler built on
+
+`validate_landmark.Tile`)
+
+- Tile summit (shallowest cell): 724.4 m at 30.1255 N, -42.1181 W (grid search over the tile).
+- The data/landmarks.json pin (30.1167, -42.1167, = the rounded 30°07'N 42°07'W published coordinate) reads
+  **1,332.3 m** here — on the massif's south wall, not the 750-900 m field. A profile straight south from the
+  summit (30.1255, -42.1181) shows a steady, monotonic drop from 725 m to over 2,500 m across roughly 4 km; there
+  is no local flattening or bench near 1,332 m that would suggest a second, deeper vent terrace — it is simply a
+  point partway down a slope.
+- A grid search for the nearest terrain to that pin actually inside the field's published 750-900 m range found
+  it about 665 m north (bearing ~340°) of the pin, centred near 30.1223-30.1250 N, -42.118 to -42.121 W, on the
+  summit's southern flank. All vent POIs and props in this pack are placed inside that patch (see coordinates in
+  `pois.json`/`props.json`), each individually re-checked against the terrain.
+- The whole real field is only ~500 sq m (source 1) — smaller than one cell of this tile's ~53 x 61 m grid — so
+  GMRT cannot resolve any internal structure of the field (individual chimneys, the exact footprint). Placement of
+  every chimney within the corrected patch is illustrative, at a real seabed depth but an invented position.
+
+## Discrepancy: catalog position vs. real terrain (task-flagged)
+
+**Confirmed.** The `data/landmarks.json` entry's coordinate (30.1167, -42.1167) is the same rounded, arc-minute
+coordinate Wikipedia's infobox gives (30°07'0"N 42°07'0"W), which is precise only to about 1.8 km. On this tile's
+real bathymetry it lands on the massif's south wall at 1,332 m, roughly 550-600 m deeper than the published
+750-900 m field depth. This is documented in-game: `lost-city-south-wall` is a POI at the literal catalog
+coordinate (kind `geology`, `reconstruction: false`, since the terrain there is real), and its guide entry and the
+mission briefing both explain the gap. All vent-related POIs/props use the corrected, terrain-matched location
+instead, about 665 m away.
+
+## Chimney colour (engine limitation, task-flagged)
+
+Per `docs/props.md`, `procedural:chimney` is deterministically basalt-grey (`#3B3A3D`) with no colour/material
+option. Lost City's chimneys are pale carbonate, not basalt — closer to white/light-grey — because they form by
+mineral precipitation from alkaline fluid rather than the dark metal-sulfide deposits of a black smoker. This is
+called out in `mission.json` hazards, in the `overview` and `poseidon` guide entries, and here: **the engine needs
+a colour or `material_hint` option on `procedural:chimney` (or a dedicated `procedural:carbonate-chimney` variant)
+to render Lost City accurately.** Until then, every chimney in this mission should be read as "actually pale
+white/grey" despite rendering basalt-grey.
+
+## OBIS species data
+
+`python3 tools/obis_export.py --landmark lost-city --tile-bbox --rank any --max 20 --out
+data/landmarks/lost-city/species.json` (checklist endpoint, 200 taxa matched in the bbox, 1,192 records). Run with
+`--rank any` per the prior session's notes: essentially every OBIS record in this bbox is archaea/bacteria from a
+2003 International Census of Marine Microbes (ICoMM) survey, with no reported collection depth, so filtering to
+species/genus rank or a depth window would return almost nothing. `species.json.note` says placement of any
+visible mat is invented. The `lost-city-microbial-mat` POI sits near the OBIS sample cluster at ~30.124,
+-42.1193 (real coordinate; the visible biofilm itself is a reconstruction).
+
+## Hull class
+
+Deepest POI is `lost-city-south-wall` at 1,332 m (real terrain), which exceeds Class A's 1,000 m crush-depth
+rating, so `mission.json` uses `hull_class: "B"` (crush depth 4,500 m). All vent POIs are far shallower
+(758-801 m seabed).
+
+## Fabricated vs. sourced
+
+| Item                                             | Sourced                                                        | Reconstructed / estimated                                                                                                  |
+| ------------------------------------------------ | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Seabed terrain                                   | GMRT bathymetry (real survey)                                  | Render-time detail noise (engine)                                                                                          |
+| Field depth range, power source, fluid chemistry | Wikipedia (source 1)                                           | —                                                                                                                          |
+| Poseidon height (~60 m)                          | Wikipedia                                                      | Exact shape, footprint, base diameter (edifice "100 m wide" reinterpreted as a single tower's base, ~70 m, is an estimate) |
+| Beehive                                          | Name only (Wikipedia)                                          | Height, exact position                                                                                                     |
+| IMAX Tower height (~8 m)                         | Wikipedia                                                      | Exact position                                                                                                             |
+| 2 unnamed small chimneys                         | Real fields have many more chimneys than are named (source 1)  | Existence at these positions, heights (6-9 m)                                                                              |
+| Microbial mat POI                                | OBIS occurrence cluster location (real)                        | Visible mat rendering, exact taxa shown                                                                                    |
+| Atlantis Massif summit POI                       | Real GMRT terrain, oceanic-core-complex description (source 2) | —                                                                                                                          |
+| South-wall (discrepancy) POI                     | Real GMRT terrain; catalog coordinate is real                  | Framing as a "teaching" POI                                                                                                |
+| Spawn point                                      | —                                                              | Chosen for gameplay: ~750 m north-east of Poseidon, heading 207°                                                           |
+
+## Not verified / open
+
+- No individually published coordinates were found for any chimney other than the field's single rounded
+  30°07'N/42°07'W reference point — not even for Poseidon specifically. All relative placements within the
+  corrected patch are this session's estimates.
+- InterRidge's vents-data site (an independent source used for other vent fields in `data/landmarks.json`) could
+  not be reached (expired TLS certificate); a retry later might add a second citation for the coordinate.
+- `procedural:chimney`'s basalt-only colour is a known engine gap, flagged above and in `docs/props.md`'s "Adding
+  a GLB" section is unaffected — no GLB work was needed here, both because no CC0 pale-mineral-tower model was
+  sought and because the schema already supports procedural chimneys.

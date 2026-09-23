@@ -4,6 +4,8 @@
  * seconds, radians unless a name says Deg).
  */
 
+import { publicUrl } from '../util/publicUrl.js';
+
 export interface SubmarineConfig {
   /** Forward thrust acceleration at full throttle (m/s^2). */
   thrustAccel: number;
@@ -612,14 +614,7 @@ export interface MissionConfig {
 // --- C3: environment presets (docs/presets.md) ------------------------------
 /** Environment preset names (plan/PHASE-C-CONTRACTS.md §1). */
 export type EnvPresetName =
-  | 'vent'
-  | 'brine'
-  | 'canyon'
-  | 'reef'
-  | 'trench'
-  | 'wreck'
-  | 'seamount'
-  | 'default';
+  'vent' | 'brine' | 'canyon' | 'reef' | 'trench' | 'wreck' | 'seamount' | 'default';
 
 /** A preset tunable: what `mission.json` `environment.overrides` may set. */
 export type PresetParamValue = number | string | boolean | null;
@@ -1410,7 +1405,7 @@ export const DEFAULT_CONFIG: GameConfig = {
   },
   // C1: globe mission select (docs/globe.md).
   globe: {
-    textureUrl: '/assets/globe/earth-bmng-topo-bathy-4096.jpg',
+    textureUrl: publicUrl('/assets/globe/earth-bmng-topo-bathy-4096.jpg'),
     minDistance: 1.35,
     maxDistance: 4.5,
     startDistance: 2.9,

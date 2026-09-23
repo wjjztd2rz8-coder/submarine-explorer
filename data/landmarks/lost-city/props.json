@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "landmark": "lost-city",
+  "props": [
+    {
+      "id": "poseidon-tower",
+      "model": "procedural:chimney",
+      "lat": 30.124,
+      "lon": -42.1195,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [70, 70, 60],
+      "lod_distance_m": 1200,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Poseidon, the tallest carbonate spire in the field: about 60 m tall (Wikipedia, 'Lost City Hydrothermal Field'). Wikipedia also gives '100 metres wide', which describes the whole multi-spire edifice rather than one column; dimensions_m[0]=70 is an estimate for a single tapered tower's base. Placed at the corrected field location (see pois.json note); exact position within the ~500 sq m field is not published and the GMRT grid (~53 x 61 m/cell) cannot resolve it. Colour: chimneys currently render basalt-grey (procedural:chimney has no material_hint yet); Lost City's carbonate towers are actually pale white/grey. See sources.md."
+    },
+    {
+      "id": "beehive-chimney",
+      "model": "procedural:chimney",
+      "lat": 30.1245,
+      "lon": -42.119,
+      "snap_to_seabed": true,
+      "heading_deg": 40,
+      "scale": 1,
+      "dimensions_m": [0, 0, 12],
+      "lod_distance_m": 600,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "'Beehive' is a real named structure in the field (Wikipedia). No published height or coordinate; 12 m and this position are estimates, placed near Poseidon within the sourced depth band."
+    },
+    {
+      "id": "imax-tower",
+      "model": "procedural:chimney",
+      "lat": 30.1248,
+      "lon": -42.12,
+      "snap_to_seabed": true,
+      "heading_deg": 160,
+      "scale": 1,
+      "dimensions_m": [0, 0, 8],
+      "lod_distance_m": 600,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "'IMAX Tower', named for the IMAX documentary crew that filmed it; height ~8 m (Wikipedia, 'Lost City Hydrothermal Field'). No published coordinate; placed near Poseidon within the sourced depth band."
+    },
+    {
+      "id": "unnamed-chimney-1",
+      "model": "procedural:chimney",
+      "lat": 30.1238,
+      "lon": -42.1205,
+      "snap_to_seabed": true,
+      "heading_deg": 260,
+      "scale": 1,
+      "dimensions_m": [0, 0, 6],
+      "lod_distance_m": 500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Illustrative minor chimney; the field has dozens of spires and flanges of varying size (Kelley et al. 2005 describe a dense cluster), most unnamed and unmapped individually. Height and position are invented."
+    },
+    {
+      "id": "unnamed-chimney-2",
+      "model": "procedural:chimney",
+      "lat": 30.123,
+      "lon": -42.1195,
+      "snap_to_seabed": true,
+      "heading_deg": 100,
+      "scale": 1,
+      "dimensions_m": [0, 0, 9],
+      "lod_distance_m": 500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Illustrative minor chimney (see unnamed-chimney-1). Height and position are invented."
+    }
+  ]
+}

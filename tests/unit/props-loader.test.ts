@@ -4,6 +4,7 @@ import { DEFAULT_CONFIG, makeConfig } from '../../src/core/Config.js';
 import { latLonToWorld } from '../../src/util/geo.js';
 import {
   parseModel,
+  modelLoadUrl,
   parsePropsDoc,
   validatePropEntry,
   type PropDef,
@@ -74,6 +75,15 @@ describe('PropLoader validation', () => {
     expect(parseModel('https://evil.example/x.glb')).toBeUndefined();
     expect(parseModel('/assets/models/../../secret.glb')).toBeUndefined();
     expect(parseModel('/assets/models/rock.obj')).toBeUndefined();
+  });
+
+  it('loads authored models under the site base and preserves explicit URLs', () => {
+    expect(modelLoadUrl('/assets/models/rock_09.glb', '/submarine-explorer/')).toBe(
+      '/submarine-explorer/assets/models/rock_09.glb',
+    );
+    expect(modelLoadUrl('https://cdn.example/rock.glb', '/submarine-explorer/')).toBe(
+      'https://cdn.example/rock.glb',
+    );
   });
 
   it('skips bad entries and keeps good ones', () => {

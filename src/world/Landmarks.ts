@@ -22,6 +22,7 @@
 import * as THREE from 'three';
 import { DEFAULT_CONFIG, type LandmarksConfig } from '../core/Config.js';
 import { bboxContains, latLonToWorld } from '../util/geo.js';
+import { publicUrl } from '../util/publicUrl.js';
 import type { Landmark, TileMeta } from '../util/types.js';
 import type { Terrain } from './Terrain.js';
 
@@ -159,7 +160,7 @@ export class Landmarks {
   }
 
   /** Fetch and place landmarks. Never throws -- a missing file just means none. */
-  async load(terrain: Terrain, url = '/data/landmarks.json'): Promise<PlacedLandmark[]> {
+  async load(terrain: Terrain, url = publicUrl('/data/landmarks.json')): Promise<PlacedLandmark[]> {
     let doc: unknown;
     try {
       const res = await fetch(url);

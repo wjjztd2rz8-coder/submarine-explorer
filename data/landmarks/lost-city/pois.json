@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "landmark": "lost-city",
+  "pois": [
+    {
+      "id": "lost-city-poseidon",
+      "name": "Poseidon carbonate tower",
+      "lat": 30.124,
+      "lon": -42.1195,
+      "depth_m": 775,
+      "radius_m": 150,
+      "kind": "vent",
+      "primary": true,
+      "scan_seconds": 6,
+      "guide_entry": "poseidon",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field",
+        "https://www.gmrt.org/"
+      ],
+      "note": "The published field position is a rounded 30°07'0\"N 42°07'0\"W (= 30.1167, -42.1167), which is also the data/landmarks.json pin; on this tile that point reads 1,332 m, on the massif's south wall, far outside the field's real 750-900 m depth range. The nearest terrain in the correct depth band is about 665 m north of that pin. This POI is placed there instead; seabed here is 801 m, and depth_m (775 m) sits partway up the ~60 m tower. See sources.md."
+    },
+    {
+      "id": "lost-city-beehive",
+      "name": "Beehive chimney",
+      "lat": 30.1245,
+      "lon": -42.119,
+      "depth_m": 758,
+      "radius_m": 60,
+      "kind": "vent",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "beehive",
+      "confidence": "low",
+      "reconstruction": true,
+      "sources": ["https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"],
+      "note": "Beehive is a real named structure in the field, but no published coordinate or height was found. Placed illustratively ~140 m from Poseidon, within the sourced depth range."
+    },
+    {
+      "id": "lost-city-imax-tower",
+      "name": "IMAX Tower",
+      "lat": 30.1248,
+      "lon": -42.12,
+      "depth_m": 787,
+      "radius_m": 40,
+      "kind": "vent",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "imax-tower",
+      "confidence": "low",
+      "reconstruction": true,
+      "sources": ["https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"],
+      "note": "Real named structure, height sourced (~8 m). No published coordinate; placed illustratively near Poseidon within the sourced depth range."
+    },
+    {
+      "id": "lost-city-microbial-mat",
+      "name": "Microbial biofilm sampling site",
+      "lat": 30.124,
+      "lon": -42.1193,
+      "depth_m": 790,
+      "radius_m": 80,
+      "kind": "biology",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "microbial-mat",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://obis.org/",
+        "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
+      ],
+      "note": "Coordinate near an OBIS occurrence cluster (2003 International Census of Marine Microbes samples) inside this bbox; nearly all records are archaea/bacteria with no reported depth. The visible mat/biofilm is an invented reconstruction; the sampling location is real."
+    },
+    {
+      "id": "lost-city-summit",
+      "name": "Atlantis Massif summit",
+      "lat": 30.1255,
+      "lon": -42.1181,
+      "snap_to_seabed": true,
+      "radius_m": 200,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "summit",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/", "https://en.wikipedia.org/wiki/Atlantis_Massif"],
+      "note": "Real GMRT terrain: the shallowest point in this tile, 724 m, on the domed summit of the Atlantis Massif oceanic core complex. This is survey data, not a reconstruction."
+    },
+    {
+      "id": "lost-city-south-wall",
+      "name": "South wall (catalog position)",
+      "lat": 30.1167,
+      "lon": -42.1167,
+      "snap_to_seabed": true,
+      "radius_m": 200,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "south-wall",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://www.gmrt.org/",
+        "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
+      ],
+      "note": "The rounded 30°07'N 42°07'W field coordinate used by Wikipedia and data/landmarks.json lands here: real GMRT terrain on the massif's steep south wall, 1,332 m deep, about 665 m south of the actual vent field. Kept as a POI to show players the discrepancy directly. This is survey data, not a reconstruction."
+    }
+  ]
+}
