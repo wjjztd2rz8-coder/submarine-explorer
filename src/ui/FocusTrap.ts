@@ -1,0 +1,82 @@
+/**
+ * Keyboard focus trap for the DOM modals (briefing, debrief, field guide),
+ * QA-B #12. While a trap is active, Tab / Shift+Tab cycle through the
+ * focusable descendants of its root only, so buttons behind the card (DIVE
+ * SITES, the mission list) cannot be reached and triggered with Enter.
+ *
+ * Traps stack: when the field guide opens over a debrief, only the guide (the
+ * most recently activated trap) handles Tab until it closes.
+ *
+ * Opening a modal does not move focus into it on purpose: Space is the
+ * ballast-blow key, and a focused "Dive again" button would turn a held Space
+ * into a reload. Instead, activation blurs any focused element *outside* the
+ * modal (so Enter cannot fire a button behind it), and the first Tab lands on
+ * the modal's first control.
+ */
+
+const FOCUSABLE =
+  'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), ' +
+  'textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const stack: FocusTrap[] = [];
+let listening = false;
+
+function onKeyDown(e: KeyboardEvent): void {
+  if (e.key !== 'Tab' && e.code !== 'Tab') return;
+  const top = stack[stack.length - 1];
+  if (!top) return;
+  top.handleTab(e);
+}
+
+export class FocusTrap {
+  constructor(private readonly root: HTMLElement) {}
+
+  get active(): boolean {
+    return stack.includes(this);
+  }
+
+  activate(): void {
+    if (typeof document === 'undefined') return;
+    const i = stack.indexOf(this);
+    if (i >= 0) stack.splice(i, 1);
+    stack.push(this);
+    if (!listening) {
+      // Capture phase: runs before any other handler moves focus.
+      window.addEventListener('keydown', onKeyDown, true);
+      listening = true;
+    }
+    const a = document.activeElement;
+    if (a instanceof HTMLElement && a !== document.body && !this.root.contains(a)) a.blur();
+  }
+
+  deactivate(): void {
+    if (typeof document === 'undefined') return;
+    const i = stack.indexOf(this);
+    if (i >= 0) stack.splice(i, 1);
+    const a = document.activeElement;
+    if (a instanceof HTMLElement && this.root.contains(a)) a.blur();
+    if (!stack.length && listening) {
+      window.removeEventListener('keydown', onKeyDown, true);
+      listening = false;
+    }
+  }
+
+  /** Focusable descendants in DOM order, skipping anything inside a `hidden` subtree. */
+  focusables(): HTMLElement[] {
+    return [...this.root.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
+      (el) => !el.closest('[hidden]'),
+    );
+  }
+
+  handleTab(e: KeyboardEvent): void {
+    e.preventDefault();
+    const items = this.focusables();
+    if (!items.length) return;
+    const a = document.activeElement;
+    const i = a instanceof HTMLElement ? items.indexOf(a) : -1;
+    let next: number;
+    if (i < 0) next = e.shiftKey ? items.length - 1 : 0;
+    else next = (i + (e.shiftKey ? -1 : 1) + items.length) % items.length;
+    items[next]?.focus();
+  }
+}
