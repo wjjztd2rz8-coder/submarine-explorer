@@ -101,7 +101,7 @@ export class MarineSnow {
     u.uDrift!.value = atmosphere.snowDriftMps;
     u.fogDensity!.value = atmosphere.fogDensity;
     // Perspective size attenuation: metres -> pixels at one metre of distance.
-    u.uScale!.value = viewportH / (2 * Math.tan(((camera.fov * Math.PI) / 180) / 2));
+    u.uScale!.value = viewportH / (2 * Math.tan((camera.fov * Math.PI) / 180 / 2));
     // Particles are lit by whatever light there is; in the abyss they catch
     // only the headlights, which we approximate with a floor.
     u.uBrightness!.value = 0.35 + 0.65 * Math.min(1, atmosphere.ambientIntensity / 2);

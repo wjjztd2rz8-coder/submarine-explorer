@@ -31,6 +31,29 @@ import { Landmarks } from './world/Landmarks.js';
 import { Terrain } from './world/Terrain.js';
 import { TileLoader } from './world/TileLoader.js';
 import { Water } from './world/Water.js';
+// --- B1 begin ---
+import { landmarkIdFor } from './game/ContentPath.js';
+import { Discovery } from './game/Discovery.js';
+// --- B1 end ---
+// --- B4 begin ---
+import { contentUrl, landmarkIdFor as propsLandmarkIdFor } from './game/ContentPath.js';
+import { Props } from './world/Props.js';
+import { PlacementDebug } from './world/props/PlacementDebug.js';
+import { PropContact, atSpawnPose, parseAtParam } from './world/props/Wiring.js';
+// --- B4 end ---
+// --- B3 begin ---
+import { loadMissionSummaries } from './game/Mission.js';
+import {
+  FROZEN_INPUT,
+  MissionRouter,
+  applyMissionLoadout,
+  chooseTileId,
+  resolveMissionRoute,
+} from './game/MissionRouter.js';
+// --- B3 end ---
+// --- fix S begin ---
+import { applyFreeDiveHull, chooseSpawn, spawnSettings } from './game/Spawn.js';
+// --- fix S end ---
 
 declare global {
   interface Window {
@@ -62,9 +85,13 @@ function showFatal(message: string): void {
 async function main(): Promise<void> {
   const params = new URLSearchParams(window.location.search);
   const loader = new TileLoader();
-  const index = await loader.loadIndex();
-  const requested = params.get('tile');
-  const tileId = requested ?? index[0]?.id ?? config.defaultTileId;
+  // --- B3 begin ---
+  // `?mission=<id>` (docs/missions.md) names the tile and the content folder;
+  // without it (or if its mission.json is missing) this is the free dive.
+  const [index, route] = await Promise.all([loader.loadIndex(), resolveMissionRoute(params)]);
+  const requested = route?.tileId ?? params.get('tile');
+  const tileId = chooseTileId(requested, index, config.defaultTileId);
+  // --- B3 end ---
   // Graphics tier: `?tier=low|medium|high` (see docs/terrain.md).
   const tier = resolveGraphicsTier(params.get('tier'), config.graphicsTier);
   const debugTerrain = params.get('debugTerrain') === '1';
@@ -126,7 +153,10 @@ async function main(): Promise<void> {
   if (snow.points) scene.add(snow.points);
   const water = new Water(scene, config.water, Math.max(terrain.widthM, terrain.depthM));
 
-  const landmarks = new Landmarks(meta);
+  const landmarks = new Landmarks(meta, config.landmarks);
+  // QA-B #1: in a mission the POI reticle and objectives guide you; the
+  // free-dive markers would only clutter the wreck. Sonar blips stay.
+  landmarks.setVisible(route === null);
   scene.add(landmarks.group);
   void landmarks.load(terrain).then((placed) => {
     if (placed.length) bus.emit('landmarks:loaded', { landmarks: placed.map((p) => p.landmark) });
@@ -134,16 +164,38 @@ async function main(): Promise<void> {
 
   // --------------------------------------------------------------- submarine
   const sub = new Submarine(config.submarine, terrain);
-  // Spawn above the centre of the tile, comfortably clear of the seabed.
-  const spawnGround = terrain.sampleHeight(0, 0);
-  // Close enough to the seabed that it is inside the fog's visual range.
-  const spawnY =
-    spawnDepth !== null
-      ? Math.max(spawnGround + 40, Math.min(-config.submarine.hullRadius, -spawnDepth))
-      : Math.min(-config.submarine.hullRadius, spawnGround + 90);
-  sub.reset(0, spawnY, 0, 0);
+  // --- fix S begin ---
+  // Free-dive spawn (QA-B #3): over the tile centre, or the nearest cell at
+  // least `minSpawnSeabedM` deep if the centre is a reef flat / caldera rim;
+  // `?depth=` clamped between the surface and the seabed. Free dive also fits
+  // the lowest hull class rated for the tile's deepest cell (QA-B #2).
+  const spawn = chooseSpawn(terrain, meta, spawnDepth, spawnSettings(config));
+  sub.reset(spawn.x, spawn.y, spawn.z, spawn.yaw);
+  if (spawn.moved) {
+    console.info(
+      `[main] shallow tile centre: spawning ${Math.hypot(spawn.x, spawn.z).toFixed(0)} m out, seabed ${spawn.ground.toFixed(0)} m`,
+    );
+  }
+  const freeDiveHull = route ? null : applyFreeDiveHull(sub, config, meta.min_m);
+  // --- fix S end ---
+  // --- B3 begin ---
+  // Mission surface start + hull class + sim speed. `?poi=` / `?at=` below
+  // still override the pose (tests rely on them).
+  if (route) {
+    const pose = applyMissionLoadout(sub, route.def, config, meta, terrain);
+    sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+  }
+  // Content folder for POIs, guide and props: the mission's, else `?landmark=` / the tile.
+  const contentLandmark = route?.landmarkId ?? landmarkIdFor(params, meta.id);
+  // --- B3 end ---
 
-  const subMesh = new SubMesh({ length: 26 });
+  const subMesh = new SubMesh({
+    length: 26,
+    // fix S (QA-B #6): faint rim + ambient floor so the hull reads below 300 m.
+    rimColor: config.submarine.hullRimColor,
+    rimStrength: config.submarine.hullRimStrength,
+    emissive: config.submarine.hullEmissive,
+  });
   scene.add(subMesh.group);
 
   // A3: the rig samples the terrain so the camera never clips below the seabed.
@@ -151,12 +203,87 @@ async function main(): Promise<void> {
   rig.snap(sub.position, sub.yaw, sub.pitch);
 
   // ---------------------------------------------------------------------- UI
-  const hud = new HUD(meta);
+  // --- fix S begin ---
+  const hud = new HUD(meta, document.body, {
+    hullRadius: config.submarine.hullRadius,
+    seabedWarnAltitudeM: config.submarine.seabedWarnAltitudeM,
+    seabedWarnTimeToContactS: config.submarine.seabedWarnTimeToContactS,
+    seabedApproachAltitudeM: config.submarine.seabedApproachAltitudeM,
+    contactAltitudeM: config.submarine.hullRadius + config.submarine.seabedClearance,
+  });
+  if (freeDiveHull && !freeDiveHull.cleared) hud.setHullNote('at rating limit');
+  // --- fix S end ---
   const sonar = new Sonar(terrain, landmarks.placed);
-  new MissionSelect(index, { currentTileId: meta.id });
+  // --- B1 begin ---
+  // POIs, scan beam, discoveries, field guide (J), debrief. `?landmark=` picks
+  // the content folder, `?poi=` spawns next to a POI, `?debrief=1` opens the
+  // debrief after a few seconds. See docs/discovery.md.
+  const discovery = new Discovery({
+    bus,
+    config,
+    meta,
+    seabed: terrain,
+    landmarkId: contentLandmark,
+    params,
+    // `input` is constructed below; this is only called once frames run.
+    keyLabel: (action) => input.primaryKeyLabel(action),
+    teleport: (pose) => {
+      sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+      rig.snap(sub.position, sub.yaw, sub.pitch);
+    },
+  });
+  // --- B1 end ---
+  // --- B4 begin ---
+  // Placed props (docs/props.md). `?at=lat,lon[,heading]` spawns the boat there
+  // (at `?depth=` if given); `?debugProps=1` opens the placement tool.
+  const props = new Props(meta, terrain, config.props);
+  scene.add(props.group);
+  const propsDebug =
+    params.get('debugProps') === '1'
+      ? new PlacementDebug(props, scene, rig.camera, canvas, config.props)
+      : null;
+  const propsLandmark = route ? contentLandmark : propsLandmarkIdFor(params, meta.id);
+  void props.load(contentUrl(propsLandmark, 'props.json'), propsLandmark).then((st) => {
+    const { landmarkId, count, models, procedural } = st;
+    bus.emit('props:loaded', { landmarkId, count, models, procedural });
+    if (count || st.skipped) console.info(`[props] ${landmarkId}: ${props.debugString()}`);
+    propsDebug?.refresh();
+  });
+  const at = parseAtParam(params.get('at'));
+  if (at) {
+    const c = config.props.atSpawnClearanceM;
+    const pose = atSpawnPose(at, meta, terrain, spawnDepth, c, config.submarine.hullRadius);
+    sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+    rig.snap(sub.position, sub.yaw, sub.pitch);
+  }
+  const propContact = new PropContact(props, bus, config.props, config.submarine.hullRadius);
+  // --- B4 end ---
+  const missionSelect = new MissionSelect(index, {
+    currentTileId: meta.id,
+    currentMissionId: route?.missionId,
+    collapsed: route !== null,
+  });
+  void loadMissionSummaries().then((list) => missionSelect.setMissions(list));
 
   const input = new Input(canvas);
   input.attach();
+
+  // --- B3 begin ---
+  // Briefing (freezes the game until "Begin dive" / Enter), objectives panel,
+  // completion -> debrief. `?skipBriefing=1` starts immediately.
+  const missionRouter = route
+    ? new MissionRouter({
+        route,
+        bus,
+        config,
+        meta,
+        discovery,
+        simSpeed: sub.simSpeed,
+        keyLabel: (action) =>
+          input.primaryKeyLabel(action as Parameters<Input['primaryKeyLabel']>[0]),
+      })
+    : null;
+  // --- B3 end ---
 
   // Audio: WebAudio can only start from inside a user-gesture handler, so we
   // wait for the first keydown/pointerdown rather than starting at load.
@@ -191,9 +318,19 @@ async function main(): Promise<void> {
   function frame(nowMs: number): void {
     requestAnimationFrame(frame);
 
-    const state = input.sample();
-    const steps = time.tick(nowMs);
+    const sampled = input.sample();
+    const realSteps = time.tick(nowMs);
+    // --- B3 begin ---
+    // While the mission briefing is up nothing simulates and input is ignored
+    // (sampling still runs, so edge presses do not queue up behind the card).
+    const frozen = missionRouter?.frozen ?? false;
+    const state = frozen ? FROZEN_INPUT : sampled;
+    const steps = frozen ? 0 : realSteps;
+    // --- B3 end ---
     for (let i = 0; i < steps; i++) sub.step(state, time.fixedDelta);
+    // --- B4 begin ---
+    propContact.resolve(sub, time.frameDelta); // prop push-out, after physics (contracts §3)
+    // --- B4 end ---
 
     if (state.toggleCamera) {
       // Mouse-look only makes sense from the first-person viewport.
@@ -232,17 +369,20 @@ async function main(): Promise<void> {
     }
 
     // Present the boat.
-    subMesh.group.position.copy(sub.position);
-    subMesh.group.rotation.set(sub.pitch, sub.yaw, sub.roll, 'YXZ');
+    subMesh.setPose(sub.position, sub.yaw, sub.pitch, sub.roll);
     subMesh.update(state.throttle, time.frameDelta);
     // Hide our own hull in first person so it does not fill the screen.
     subMesh.group.visible = rig.mode === 'chase';
 
     sub.getForward(forward);
+    // fix S (QA-B #6): a scan target in range (last frame's scanner view)
+    // makes the chase camera frame it clear of our own hull.
+    const scanFocus = discovery.focusPoint();
     rig.update(sub.position, sub.yaw, sub.pitch, time.frameDelta, {
       roll: sub.roll,
       velocity: sub.velocity,
       hullStress: s.hullStress,
+      focus: scanFocus,
     });
     const atmo = atmosphere.update(rig.camera.position.y, sub.position, time.frameDelta);
     const fogNow = { color: atmo.fogColor, density: atmo.fogDensity };
@@ -250,8 +390,33 @@ async function main(): Promise<void> {
     snow.update(rig.camera, atmo, time.frameDelta, renderer.domElement.height);
     water.update(rig.camera.position.y, sub.position, time.elapsed, fogNow);
 
-    hud.update(s);
+    hud.update(s, { nearScanTarget: scanFocus !== null }); // fix S (QA-B #14)
     sonar.update(s);
+    // fix S (QA-B #10): mission clock and DIVE TIME count real seconds of
+    // unfrozen play, not capped physics time.
+    const clockDt = frozen ? 0 : time.frameDelta;
+    // --- B1 begin ---
+    discovery.update(
+      steps * time.fixedDelta,
+      time.frameDelta,
+      sub.position,
+      forward,
+      missionRouter?.debriefOpen ? { ...state, scan: false } : state, // B3: no beam under the debrief
+      rig.camera,
+      clockDt,
+    );
+    // --- B1 end ---
+    // --- B3 begin ---
+    // fix S: `s` lets the router turn the end of an emergency blow into the
+    // "Dive aborted" debrief (plan/DECISIONS.md failure model).
+    missionRouter?.update(clockDt, time.frameDelta, sub.position, s.headingDeg, s);
+    // --- B3 end ---
+    // --- B4 begin ---
+    props.update(rig.camera);
+    if (debugTerrain && nowMs - lastTerrainLog > 1000) {
+      console.info(`[props] ${props.debugString()}`);
+    }
+    // --- B4 end ---
     audio.update({
       depth: s.depth,
       throttle: state.throttle,
@@ -284,7 +449,9 @@ async function main(): Promise<void> {
     if (debugTerrain && nowMs - lastTerrainLog > 1000) {
       lastTerrainLog = nowMs;
       console.info(
-        `[terrain] ${terrain.debugString()} | ${atmosphere.debugString()} | draws ${renderer.info.render.calls} | ` +
+        // The post quad's own render() auto-resets info, so add the scene's calls it captured.
+        `[terrain] ${terrain.debugString()} | ${atmosphere.debugString()} | ` +
+          `draws ${(atmoTier.post ? post.sceneDrawCalls : 0) + renderer.info.render.calls} | ` +
           `${(1 / Math.max(1e-3, time.frameDelta)).toFixed(0)} fps`,
       );
     }
@@ -310,6 +477,23 @@ async function main(): Promise<void> {
     bus,
     config,
     meta,
+    // --- B1 begin ---
+    scanner: discovery.scanner,
+    discoveries: discovery.store,
+    discovery,
+    debrief: discovery.debrief,
+    fieldGuide: discovery.guide,
+    // --- B1 end ---
+    // --- B4 begin ---
+    props,
+    propsDebug,
+    // --- B4 end ---
+    // --- B3 begin ---
+    mission: missionRouter?.mission ?? null,
+    missionRouter,
+    missionSelect,
+    sonar,
+    // --- B3 end ---
   };
   requestAnimationFrame(frame);
 }

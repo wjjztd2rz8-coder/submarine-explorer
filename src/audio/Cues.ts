@@ -11,7 +11,12 @@ import type { AudioConfig } from '../core/Config.js';
 import type { AudioEngine } from './AudioEngine.js';
 
 /** A single sonar chirp: a fast downward sine sweep. Reused for the echo. */
-export function playPing(engine: AudioEngine, _config: AudioConfig, gain = 0.5, pitchScale = 1): void {
+export function playPing(
+  engine: AudioEngine,
+  _config: AudioConfig,
+  gain = 0.5,
+  pitchScale = 1,
+): void {
   const ctx = engine.ctx;
   const t0 = ctx.currentTime;
 
@@ -31,7 +36,11 @@ export function playPing(engine: AudioEngine, _config: AudioConfig, gain = 0.5, 
 }
 
 /** Low thud + filtered noise, sized by impact speed (sub:collided). */
-export function playCollisionThud(engine: AudioEngine, config: AudioConfig, speedMps: number): void {
+export function playCollisionThud(
+  engine: AudioEngine,
+  config: AudioConfig,
+  speedMps: number,
+): void {
   const ctx = engine.ctx;
   const t0 = ctx.currentTime;
   const gainVal = Math.min(1, Math.max(0.08, speedMps * config.collisionThudGainPerMps));
@@ -151,4 +160,25 @@ export function playDiscoveryChime(engine: AudioEngine, _config: AudioConfig): v
     osc.start(start);
     osc.stop(start + 1.05);
   });
+}
+
+/**
+ * A soft single "tick" for a scan of something already catalogued: confirms
+ * the scan finished without re-celebrating it (`scan:complete`, firstTime false).
+ */
+export function playScanTick(engine: AudioEngine, _config: AudioConfig): void {
+  const ctx = engine.ctx;
+  const t0 = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.value = 1046.5; // C6, an octave above the chime's root
+
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.08, t0 + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.18);
+
+  osc.connect(g).connect(engine.bus('ui'));
+  osc.start(t0);
+  osc.stop(t0 + 0.2);
 }

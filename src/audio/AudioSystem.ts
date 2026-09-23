@@ -18,6 +18,7 @@ import {
   playEmergencyAlarm,
   playHullCreak,
   playPing,
+  playScanTick,
 } from './Cues.js';
 import { AmbientBeds, ThrusterLoop } from './Loops.js';
 import { castSonarRay } from './Sonar.js';
@@ -84,7 +85,19 @@ export class AudioSystem {
         if (now - this.lastCreakAt < minGap) return;
         this.lastCreakAt = now;
         playHullCreak(this.engine, this.config, stress);
-        this.captions.emit({ id: 'hull-creak', text: 'Hull creaks under pressure', durationS: 1.2 });
+        this.captions.emit({
+          id: 'hull-creak',
+          text: 'Hull creaks under pressure',
+          durationS: 1.2,
+        });
+      }),
+    );
+    // B1's scan beam: a new catalogue entry gets the chime, a repeat scan of
+    // something already logged gets a quiet tick so it still confirms.
+    this.unsubs.push(
+      this.bus.on('scan:complete', ({ firstTime }) => {
+        if (firstTime) this.playDiscoveryChime();
+        else this.playScanTick();
       }),
     );
     this.unsubs.push(
@@ -163,15 +176,22 @@ export class AudioSystem {
     this.lastBallastSign = ballastSign;
   }
 
-  /**
-   * Play the discovery chime. Nothing in the repo emits a discovery event yet
-   * (B1's DiscoveryStore is a later package) -- call this directly once it
-   * lands; see docs/audio.md #6.
-   */
+  /** The discovery chime, played on `scan:complete` with `firstTime: true`. */
   playDiscoveryChime(): void {
     if (!this.engine) return;
     playDiscoveryChime(this.engine, this.config);
     this.captions.emit({ id: 'discovery', text: 'New discovery logged', durationS: 1.5 });
+  }
+
+  /** The quiet confirmation for re-scanning something already catalogued. */
+  playScanTick(): void {
+    if (!this.engine) return;
+    playScanTick(this.engine, this.config);
+    this.captions.emit({
+      id: 'scan-repeat',
+      text: 'Scan complete, already catalogued',
+      durationS: 1,
+    });
   }
 
   dispose(): void {

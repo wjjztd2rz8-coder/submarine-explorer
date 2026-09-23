@@ -189,7 +189,15 @@ export class TerrainChunk {
         pushQuad(idx, w, i0, i1, runNorth + i0, runNorth + i1, false);
         w += 6;
         // south edge (row nz-1), outward normal +Z
-        pushQuad(idx, w, (nz - 1) * nx + i0, (nz - 1) * nx + i1, runSouth + i0, runSouth + i1, true);
+        pushQuad(
+          idx,
+          w,
+          (nz - 1) * nx + i0,
+          (nz - 1) * nx + i1,
+          runSouth + i0,
+          runSouth + i1,
+          true,
+        );
         w += 6;
       }
       for (let rj = 0; rj < rows.length - 1; rj++) {

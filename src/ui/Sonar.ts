@@ -12,9 +12,41 @@ import type { PlacedLandmark } from '../world/Landmarks.js';
 import type { SubmarineState } from '../sub/Submarine.js';
 
 export interface SonarOptions {
-  /** On-screen size in CSS pixels. */
+  /** On-screen length of the map's LONG side in CSS pixels. */
   size?: number;
   parent?: HTMLElement;
+}
+
+/**
+ * Canvas size (CSS px) for a tile: the long side is `maxPx`, the short side
+ * follows the tile's aspect, so the map fills the canvas with no letterbox
+ * (QA-A #1: the 25 x 33 km Titanic tile used to draw as a narrow strip
+ * between transparent bars).
+ */
+export function sonarCanvasSize(
+  widthM: number,
+  depthM: number,
+  maxPx: number,
+): { width: number; height: number } {
+  const aspect = widthM > 0 && depthM > 0 ? widthM / depthM : 1;
+  return aspect >= 1
+    ? { width: maxPx, height: Math.max(1, Math.round(maxPx / aspect)) }
+    : { width: Math.max(1, Math.round(maxPx * aspect)), height: maxPx };
+}
+
+/** World XZ (origin at tile centre, +Z south) -> canvas pixel on a full-bleed map. */
+export function sonarProject(
+  x: number,
+  z: number,
+  widthM: number,
+  depthM: number,
+  canvasW: number,
+  canvasH: number,
+): { px: number; py: number } {
+  return {
+    px: ((x + widthM / 2) / widthM) * canvasW,
+    py: ((z + depthM / 2) / depthM) * canvasH,
+  };
 }
 
 export class Sonar {
@@ -24,9 +56,9 @@ export class Sonar {
 
   private readonly ctx: CanvasRenderingContext2D;
   private readonly base: HTMLCanvasElement;
-  private readonly size: number;
-  private readonly halfW: number;
-  private readonly halfD: number;
+  /** Canvas size in CSS px, matching the tile's aspect. */
+  private readonly w: number;
+  private readonly h: number;
   private trail: Array<{ x: number; z: number }> = [];
 
   constructor(
@@ -34,18 +66,18 @@ export class Sonar {
     private readonly landmarks: PlacedLandmark[] = [],
     options: SonarOptions = {},
   ) {
-    this.size = options.size ?? 220;
-    this.halfW = terrain.widthM / 2;
-    this.halfD = terrain.depthM / 2;
+    const size = sonarCanvasSize(terrain.widthM, terrain.depthM, options.size ?? 220);
+    this.w = size.width;
+    this.h = size.height;
 
     this.root = document.createElement('div');
     this.root.className = 'sonar';
     this.canvas = document.createElement('canvas');
     const dpr = Math.min(2, globalThis.devicePixelRatio || 1);
-    this.canvas.width = this.size * dpr;
-    this.canvas.height = this.size * dpr;
-    this.canvas.style.width = `${this.size}px`;
-    this.canvas.style.height = `${this.size}px`;
+    this.canvas.width = Math.round(this.w * dpr);
+    this.canvas.height = Math.round(this.h * dpr);
+    this.canvas.style.width = `${this.w}px`;
+    this.canvas.style.height = `${this.h}px`;
     this.root.appendChild(this.canvas);
     (options.parent ?? document.body).appendChild(this.root);
 
@@ -57,38 +89,27 @@ export class Sonar {
     this.base = this.renderBathymetry();
   }
 
-  /** Rasterise the heightmap once into an offscreen canvas. */
+  /** Rasterise the heightmap once into an offscreen canvas the size of the map. */
   private renderBathymetry(): HTMLCanvasElement {
     const { meta } = this.terrain;
-    const n = this.size;
+    const w = this.w;
+    const h = this.h;
     const c = document.createElement('canvas');
-    c.width = n;
-    c.height = n;
+    c.width = w;
+    c.height = h;
     const ctx = c.getContext('2d');
     if (!ctx) return c;
 
-    const img = ctx.createImageData(n, n);
+    const img = ctx.createImageData(w, h);
     const data = img.data;
-    // Preserve the tile's aspect ratio inside a square canvas.
-    const aspect = this.terrain.widthM / this.terrain.depthM;
-    const drawW = aspect >= 1 ? n : n * aspect;
-    const drawH = aspect >= 1 ? n / aspect : n;
-    const ox = (n - drawW) / 2;
-    const oy = (n - drawH) / 2;
-
-    for (let py = 0; py < n; py++) {
-      for (let px = 0; px < n; px++) {
-        const i = (py * n + px) * 4;
-        if (px < ox || px >= ox + drawW || py < oy || py >= oy + drawH) {
-          data[i + 3] = 0; // transparent letterbox
-          continue;
-        }
-        const col = Math.round(((px - ox) / drawW) * (meta.cols - 1));
-        // Canvas +y runs down the screen, and so does +Z (south): same order
-        // as the heightmap rows, so no flip.
-        const row = Math.round(((py - oy) / drawH) * (meta.rows - 1));
-        const h = this.terrain.heightAtCell(col, row);
-        const color = this.terrain.colorForDepth(h);
+    for (let py = 0; py < h; py++) {
+      // Canvas +y runs down the screen, and so does +Z (south): same order
+      // as the heightmap rows, so no flip.
+      const row = Math.round((py / Math.max(1, h - 1)) * (meta.rows - 1));
+      for (let px = 0; px < w; px++) {
+        const i = (py * w + px) * 4;
+        const col = Math.round((px / Math.max(1, w - 1)) * (meta.cols - 1));
+        const color = this.terrain.colorForDepth(this.terrain.heightAtCell(col, row));
         // Push toward a green sonar palette while keeping the depth ordering.
         const lum = 0.25 + 0.75 * (color.r * 0.3 + color.g * 0.5 + color.b * 0.2);
         data[i] = Math.round(30 * lum);
@@ -103,14 +124,7 @@ export class Sonar {
 
   /** World XZ -> canvas pixel. */
   private project(x: number, z: number): { px: number; py: number } {
-    const n = this.size;
-    const aspect = this.terrain.widthM / this.terrain.depthM;
-    const drawW = aspect >= 1 ? n : n * aspect;
-    const drawH = aspect >= 1 ? n / aspect : n;
-    return {
-      px: (n - drawW) / 2 + ((x + this.halfW) / this.terrain.widthM) * drawW,
-      py: (n - drawH) / 2 + ((z + this.halfD) / this.terrain.depthM) * drawH,
-    };
+    return sonarProject(x, z, this.terrain.widthM, this.terrain.depthM, this.w, this.h);
   }
 
   toggle(): boolean {
@@ -122,10 +136,10 @@ export class Sonar {
   /** Redraw. Cheap enough to call every frame. */
   update(s: SubmarineState): void {
     if (!this.visible) return;
-    const n = this.size;
+    const { w, h } = this;
     const ctx = this.ctx;
-    ctx.clearRect(0, 0, n, n);
-    ctx.drawImage(this.base, 0, 0, n, n);
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(this.base, 0, 0, w, h);
 
     // Breadcrumb trail.
     const last = this.trail[this.trail.length - 1];
@@ -174,7 +188,7 @@ export class Sonar {
     // Frame.
     ctx.strokeStyle = 'rgba(120, 255, 180, 0.6)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(0.5, 0.5, n - 1, n - 1);
+    ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
   }
 
   dispose(): void {

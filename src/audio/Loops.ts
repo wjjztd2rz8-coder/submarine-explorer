@@ -46,7 +46,8 @@ export class ThrusterLoop {
   update(throttle: number): void {
     const ctx = this.osc.context;
     const mag = Math.min(1, Math.abs(throttle));
-    const hz = this.config.thrusterMinHz + mag * (this.config.thrusterMaxHz - this.config.thrusterMinHz);
+    const hz =
+      this.config.thrusterMinHz + mag * (this.config.thrusterMaxHz - this.config.thrusterMinHz);
     this.osc.frequency.setTargetAtTime(hz, ctx.currentTime, 0.2);
     const targetGain = mag > 0.02 ? 0.05 + mag * 0.12 : 0.0001;
     this.gain.gain.setTargetAtTime(targetGain, ctx.currentTime, 0.3);

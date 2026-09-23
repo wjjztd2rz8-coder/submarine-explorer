@@ -100,6 +100,37 @@ export interface SubmarineConfig {
   simSpeeds: number[];
   /** Index into {@link simSpeeds} used at spawn. */
   defaultSimSpeedIndex: number;
+
+  // --- fix S (QA-B) --------------------------------------------------------
+  /**
+   * QA-B #15. When false (the default) the yaw/pitch *input* is divided by the
+   * sim-speed multiplier inside each physics tick, so the boat turns at its 1x
+   * real-time rate while translation still runs 2x/3x. True restores the
+   * Phase A behaviour (turn rate scales with sim speed too).
+   */
+  simSpeedScalesTurnRate: boolean;
+  /**
+   * QA-B #2. Free dive fits the lowest hull class whose crush depth clears the
+   * tile's deepest cell (`meta.min_m`) by this many metres. Soft: if no class
+   * clears it, the deepest class is fitted and the HUD says the margin is thin.
+   */
+  freeDiveHullMarginM: number;
+  /**
+   * QA-B #14. The HUD's SEABED PROXIMITY banner: shown below this altitude
+   * (hull centre above the seabed; contact is at hullRadius + seabedClearance).
+   */
+  seabedWarnAltitudeM: number;
+  /**
+   * ...or when closing on the seabed fast: below `seabedApproachAltitudeM`
+   * and less than this many seconds from contact at the current sink rate.
+   * This half of the warning is never suppressed near a scan target.
+   */
+  seabedWarnTimeToContactS: number;
+  seabedApproachAltitudeM: number;
+  /** QA-B #6. Hull look below 300 m: a faint fresnel rim and an ambient floor. */
+  hullRimColor: number;
+  hullRimStrength: number;
+  hullEmissive: number;
 }
 
 /** A hull rating: how deep this boat may legally go before it fails. */
@@ -180,6 +211,16 @@ export interface TerrainConfig {
   sandDepthShallow: number;
   /** Depth (m, negative) below which there is no sand at all. */
   sandDepthDeep: number;
+  /** Basalt albedo (art-direction §0 `#3B3A3D`) that steep rock blends toward. */
+  rockColor: number;
+  /** 0..1: how far fully-steep rock is pulled from the depth ramp to `rockColor`. */
+  rockColorMix: number;
+  /**
+   * Resident-vertex budget for the whole tile, skirts excluded. If
+   * `cols*rows*subdiv^2` exceeds it, `detailSubdiv` is stepped down (3 -> 2 -> 1)
+   * until it fits; `debugString()` reports the downgrade. See docs/terrain.md.
+   */
+  maxVertices: number;
 
   tiers: Record<GraphicsTier, TerrainTier>;
 }
@@ -334,6 +375,21 @@ export interface CameraConfig {
   /** Photo-mode free orbit: radius and starting elevation (radians). */
   orbitRadius: number;
   orbitElevation: number;
+
+  // --- fix S: scan-target framing (QA-B #6) ---------------------------------
+  /**
+   * While a scan target is in range (`CameraUpdateOptions.focus`), the chase
+   * camera slides this far sideways (to the target's side) and up, so the
+   * line of sight to the target clears the boat's own hull.
+   */
+  focusSideM: number;
+  focusRaiseM: number;
+  /** Fraction of the aim point pulled toward the focus target (0..1). */
+  focusLookBlend: number;
+  /** Half-life (s) of the blend in and out of the focus framing. */
+  focusHalfLife: number;
+  /** Target lateral offset (m, boat frame) needed before the camera swaps sides. */
+  focusSideHysteresisM: number;
 }
 
 export interface AudioConfig {
@@ -376,6 +432,183 @@ export interface AudioConfig {
   collisionThudGainPerMps: number;
 }
 
+/**
+ * Free-dive landmark markers (src/world/Landmarks.ts). Deliberately quiet
+ * (art-direction pillar 3, "found, not signposted"): a small depth-tested dot and
+ * a fixed-pixel-size label that both fade out as you arrive. Hidden entirely
+ * while a mission route is active -- the POI reticle and objectives do that job.
+ */
+export interface LandmarksConfig {
+  /** Metres the marker sits above the landmark's depth / the seabed. */
+  markerLiftM: number;
+  /** Marker dot radius, metres. */
+  markerRadiusM: number;
+  markerColor: number;
+  markerOpacity: number;
+  /** The dot is invisible inside `[0]` m of the camera and fully shown beyond `[1]` m. */
+  markerFadeM: [number, number];
+  /** On-screen label height in CSS pixels, independent of distance. */
+  labelHeightPx: number;
+  /** Names longer than this are cut and end in an ellipsis. */
+  labelMaxChars: number;
+  labelColor: string;
+  labelBackground: string;
+  /** The label is invisible inside `[0]` m and fully shown beyond `[1]` m. */
+  labelFadeM: [number, number];
+}
+
+// --- B1: scan & discovery (docs/discovery.md) ------------------------------
+export interface ScanConfig {
+  /** Seconds of continuous beam time to scan a POI that has no `scan_seconds`. */
+  defaultSeconds: number;
+  /** Scan radius (m) for a POI that has no `radius_m`. */
+  defaultRadiusM: number;
+  /**
+   * Half-angle of the scan beam, degrees: the angle between `sub.getForward()`
+   * and the sub->POI direction must be below this. Generous, because POIs sit
+   * on the seabed below the boat and pitch is limited to 45 deg.
+   */
+  coneHalfAngleDeg: number;
+  /** Inside this 3D distance (m) the facing test is waived: you are on top of it. */
+  closeRangeM: number;
+  /** Progress fraction (0..1) lost per second while a scan is interrupted. */
+  decayPerSecond: number;
+  /** Upper bound on `scan:progress` emissions per second. */
+  progressEventHz: number;
+  /** The overlay shows a contact hint from `radius_m * hintRangeFactor` away. */
+  hintRangeFactor: number;
+  /** Diameter (CSS px) and stroke (CSS px) of the scan progress ring. */
+  ringSizePx: number;
+  ringStrokePx: number;
+  /** Size (CSS px) of the corner-bracket reticle drawn over the target. */
+  reticleSizePx: number;
+  /** How long the "NEW ENTRY" confirmation stays up, seconds. */
+  completeBannerSeconds: number;
+  /** `?poi=` debug spawn: horizontal distance from the POI (m), capped to 80% of its radius. */
+  spawnDistanceM: number;
+  /** `?poi=` debug spawn: compass bearing FROM the POI to the spawn point, degrees. */
+  spawnBearingDeg: number;
+  /** Extra metres above the sub's own seabed floor when the spawn is clamped. */
+  spawnClearanceM: number;
+  /** SessionStats ignores a per-frame move longer than this (a teleport/reset). */
+  teleportThresholdM: number;
+  /** `?debrief=1`: open the debrief this many ms after boot (e2e screenshot hook). */
+  debugDebriefDelayMs: number;
+}
+
+// --- B4: props (docs/props.md) ---------------------------------------------
+export type PropCollisionKind = 'none' | 'sphere' | 'box';
+export type ProceduralPropKind = 'hull-block' | 'debris' | 'chimney';
+/** Shape of one end of a procedural:hull-block (docs/props.md). */
+export type HullEnd = 'prow' | 'cut' | 'rounded';
+
+export interface PropsConfig {
+  /** Camera distance (m) inside which a prop draws its full mesh, unless the entry sets `lod_distance_m`. */
+  defaultLodDistanceM: number;
+  /** Camera distance (m) beyond which a prop is hidden entirely, impostor included. */
+  cullDistanceM: number;
+  /** A prop is never culled closer than `lod distance * cullLodFactor`, so big LODs still get an impostor band. */
+  cullLodFactor: number;
+  /** Opacity of the bounding-box silhouette impostor used for GLB models. */
+  impostorOpacity: number;
+  /** Debris impostor keeps only this many of the largest pieces. */
+  debrisImpostorPieces: number;
+  /** Fraction of the penetration removed per `collide()` call (1 = rigid push-out). */
+  collisionPushStiffness: number;
+  /** Fraction of the into-surface velocity removed on contact (1 = no bounce). */
+  collisionVelocityDamping: number;
+  /** Minimum seconds between `sub:collided` events raised by props. */
+  collisionEventCooldownS: number;
+  /** Sphere collider radius = mean bbox half-extent x this. */
+  sphereColliderFit: number;
+  /** Hard cap on props per landmark; extra entries are skipped with a warning. */
+  maxProps: number;
+  /** Collision used when an entry omits `collision`, by model kind. */
+  defaultCollision: Record<ProceduralPropKind | 'model', PropCollisionKind>;
+  /** `dimensions_m` used when a procedural entry omits it. */
+  defaultDimensionsM: Record<ProceduralPropKind, [number, number, number]>;
+  /** procedural:debris piece count and size range (m). */
+  debrisMinPieces: number;
+  debrisMaxPieces: number;
+  debrisMinSizeM: number;
+  debrisMaxSizeM: number;
+  /** procedural:chimney base radius as a fraction of height when `dimensions_m[0]` is 0. */
+  chimneyRadiusFraction: number;
+  /** procedural:chimney top radius as a fraction of the base radius. */
+  chimneyTopFraction: number;
+  /** procedural:hull-block: metres of hull per horizontal repeat of the rust texture. */
+  hullTextureRepeatM: number;
+  /** procedural:hull-block: width of the keel line as a fraction of the beam (bilge taper). */
+  hullKeelFraction: number;
+  /** procedural:hull-block end shapes when an entry omits `ends`: [forward (-Z), aft (+Z)]. */
+  hullDefaultEnds: [HullEnd, HullEnd];
+  /** Prow: length of the pointed entry as a fraction of hull length. */
+  hullProwLengthFraction: number;
+  /** Prow: waterline taper exponent (1 = straight wedge, 2 = parabola; lower is sharper). */
+  hullProwTaperExponent: number;
+  /** Prow: how far the stem is set back at the keel (rake), as a fraction of hull height. */
+  hullProwRakeFraction: number;
+  /** Prow: deck sheer (rise toward the stem) as a fraction of hull height. */
+  hullProwSheerFraction: number;
+  /** Prow: raised forecastle deck, length as a fraction of hull length. */
+  hullForecastleLengthFraction: number;
+  /** Prow: forecastle deck height as a fraction of hull height. */
+  hullForecastleHeightFraction: number;
+  /** Cut end: depth of the ragged break as a fraction of hull length (clamped to 2-12 m). */
+  hullCutDepthFraction: number;
+  /** Cut end: how far the upper decks sag toward the break, as a fraction of hull height. */
+  hullCutCollapseFraction: number;
+  /** Cut end: vertex-colour multiplier at the break (dark torn interior), 0-1. */
+  hullCutShade: number;
+  /** Cut end: vertical spacing of the exposed deck slabs (m). */
+  hullDeckSpacingM: number;
+  /** Rounded (counter) stern: plan-view length of the curve as a fraction of the beam. */
+  hullRoundedLengthFraction: number;
+  /** Rounded stern: undercut of the counter at the keel, as a fraction of hull height. */
+  hullCounterTuckFraction: number;
+  /** Side of the generated canvas textures (px). */
+  textureSize: number;
+  /** Material base colours (docs/art-direction.md §0, §4). */
+  colors: {
+    rust: number;
+    growth: number;
+    basalt: number;
+    mineral: number;
+    sediment: number;
+  };
+  /** `?debugProps=1` placement tool steps. */
+  debugNudgeM: number;
+  debugNudgeFastM: number;
+  debugRotateDeg: number;
+  /** `?at=lat,lon` debug spawn: minimum clearance above the seabed (m). */
+  atSpawnClearanceM: number;
+}
+
+/** B3: mission flow (docs/missions.md). */
+export interface MissionConfig {
+  /**
+   * Sim-speed multiplier a mission starts at (must be one of
+   * `submarine.simSpeeds`). The Titanic descent is 3.8 km at ~5.4 m/s
+   * terminal ballast speed, so at 1x the descent alone is ~12 min.
+   */
+  defaultSimSpeed: number;
+  /** Seconds between the last primary scan and `mission:complete` + debrief. */
+  completeDelayS: number;
+  /** Minimum spawn clearance above the seabed, on top of hull radius + seabedClearance (m). */
+  spawnClearanceM: number;
+  /** Objectives-panel nav line refresh rate (Hz). Text writes are skipped when unchanged. */
+  navUpdateHz: number;
+
+  // --- fix S (QA-B #3) -------------------------------------------------------
+  /**
+   * Free dive: if the tile centre's seabed is shallower than this (negative
+   * metres), spawn over the nearest grid cell at least this deep instead.
+   */
+  minSpawnSeabedM: number;
+  /** Free-dive spawn altitude above the seabed without `?depth=` (m). */
+  freeDiveSpawnAltitudeM: number;
+}
+
 export interface GameConfig {
   defaultTileId: string;
   /** Graphics quality tier. Override at runtime with `?tier=low|medium|high`. */
@@ -385,6 +618,14 @@ export interface GameConfig {
   water: WaterConfig;
   camera: CameraConfig;
   audio: AudioConfig;
+  /** Free-dive landmark markers and labels. */
+  landmarks: LandmarksConfig;
+  /** B1: scan beam, discovery and debrief tunables. */
+  scan: ScanConfig;
+  /** B4: placed props (wrecks, rocks, chimneys). */
+  props: PropsConfig;
+  /** B3: mission flow. */
+  mission: MissionConfig;
   physicsHz: number;
 }
 
@@ -450,6 +691,17 @@ export const DEFAULT_CONFIG: GameConfig = {
 
     simSpeeds: [1, 2, 3],
     defaultSimSpeedIndex: 0,
+
+    simSpeedScalesTurnRate: false,
+    freeDiveHullMarginM: 300,
+    // Contact is at 12 m (hullRadius 8 + seabedClearance 4); wreck scans sit
+    // at 12-25 m altitude, so the static banner only fires in the last 3 m.
+    seabedWarnAltitudeM: 15,
+    seabedWarnTimeToContactS: 4,
+    seabedApproachAltitudeM: 60,
+    hullRimColor: 0x6f93a3,
+    hullRimStrength: 0.55,
+    hullEmissive: 0x0b1318,
   },
   terrain: {
     // 64 source cells x subdiv 2 = a 129x129 vertex chunk, which still fits in
@@ -458,22 +710,20 @@ export const DEFAULT_CONFIG: GameConfig = {
     chunkCells: 64,
     verticalExaggeration: 1.0,
     /**
-     * Deepest -> shallowest, interpolated linearly in RGB.
-     *
-     * NOTE: these are ALBEDO values, not final pixel colours. Fog and the depth
-     * falloff in Water.ts already darken the scene a great deal, so even the
-     * abyssal end of the ramp is kept at a mid luminance -- a near-black albedo
-     * down there renders as a featureless black screen.
+     * Deepest -> shallowest, interpolated linearly in RGB. These are the
+     * docs/art-direction.md §0 seabed albedos (sRGB hex): sand #C9B489 above
+     * ~200 m, sediment #7A6E5C below it, drifting slightly greyer on the
+     * abyssal plain. Hue comes from here and from the lights; keep every stop
+     * low-saturation -- a green or teal stop multiplied by the cyan water light
+     * is what turned the shallow tiles neon (QA-B #4).
      */
     colorRamp: [
-      { depth: -6000, color: 0x5d7a99 },
-      { depth: -4000, color: 0x6a8aa5 },
-      { depth: -2500, color: 0x74a0a8 },
-      { depth: -1200, color: 0x7bb3a2 },
-      { depth: -400, color: 0x86c090 },
-      { depth: -120, color: 0xa8c47e },
-      { depth: -20, color: 0xcdbe86 },
-      { depth: 0, color: 0xe0cf9c },
+      { depth: -6000, color: 0x6f6a62 },
+      { depth: -3000, color: 0x756d60 },
+      { depth: -400, color: 0x7a6e5c },
+      { depth: -260, color: 0x8f8068 },
+      { depth: -120, color: 0xbfab83 },
+      { depth: 0, color: 0xc9b489 },
       { depth: 300, color: 0xb39a72 },
     ],
 
@@ -501,6 +751,9 @@ export const DEFAULT_CONFIG: GameConfig = {
     rockSlopeHiDeg: 32,
     sandDepthShallow: -120,
     sandDepthDeep: -260,
+    rockColor: 0x3b3a3d,
+    rockColorMix: 0.6,
+    maxVertices: 4_000_000,
 
     tiers: {
       low: { detailSubdiv: 1, detailOctaves: 2, textureSize: 128, lodDistanceScale: 0.55 },
@@ -536,9 +789,11 @@ export const DEFAULT_CONFIG: GameConfig = {
         fogColor: 0x5aafc4,
         fogDensity: 0.01,
         ambientColor: 0xbfe4e8,
-        ambientIntensity: 3.0,
+        // Intensities assume the post pass tone-maps and sRGB-encodes (it did
+        // not before QA-B #4, and these were ~3x hotter to compensate).
+        ambientIntensity: 0.9,
         // Warm sun highlight #FFE9B8 lives on the directional light.
-        sunIntensity: 3.2,
+        sunIntensity: 1.0,
         grade: { tint: 0xeaf6ff, gain: 1.0, saturation: 1.06, vignette: 0.22 },
         snowDensity: 0.35,
         snowDriftMps: 0.35,
@@ -550,8 +805,8 @@ export const DEFAULT_CONFIG: GameConfig = {
         fogColor: 0x2a5568,
         fogDensity: 0.02,
         ambientColor: 0x86b9c9,
-        ambientIntensity: 1.5,
-        sunIntensity: 1.1,
+        ambientIntensity: 0.55,
+        sunIntensity: 0.35,
         grade: { tint: 0xbfe4f2, gain: 0.98, saturation: 1.0, vignette: 0.3 },
         snowDensity: 0.7,
         snowDriftMps: 0.25,
@@ -593,7 +848,7 @@ export const DEFAULT_CONFIG: GameConfig = {
     headlightConeOpacity: 0.05,
     causticsStartM: -20,
     causticsEndM: -60,
-    causticsIntensity: 2.6,
+    causticsIntensity: 1.1,
     causticsFootprintM: 900,
     causticsFps: 12,
     snowBoxM: 160,
@@ -651,6 +906,12 @@ export const DEFAULT_CONFIG: GameConfig = {
     bankFollow: 0.55,
     orbitRadius: 90,
     orbitElevation: 0.35,
+
+    focusSideM: 38,
+    focusRaiseM: 18,
+    focusLookBlend: 0.35,
+    focusHalfLife: 0.6,
+    focusSideHysteresisM: 6,
   },
   audio: {
     masterVolume: 0.6,
@@ -676,6 +937,100 @@ export const DEFAULT_CONFIG: GameConfig = {
     hullCreakMaxGapS: 2.5,
     collisionThudGainPerMps: 0.05,
   },
+  landmarks: {
+    markerLiftM: 12,
+    markerRadiusM: 2,
+    markerColor: 0x2ed9d9, // HUD cyan: navigation, not treasure
+    markerOpacity: 0.85,
+    markerFadeM: [150, 300],
+    labelHeightPx: 14,
+    labelMaxChars: 28,
+    labelColor: '#2ed9d9',
+    labelBackground: 'rgba(6, 14, 18, 0.55)',
+    labelFadeM: [250, 500],
+  },
+  // B1: scan & discovery. See docs/discovery.md.
+  scan: {
+    defaultSeconds: 4, // the master plan's "hold the beam 3-5 s"
+    defaultRadiusM: 150,
+    coneHalfAngleDeg: 35,
+    closeRangeM: 25,
+    decayPerSecond: 0.35, // a full ring drains in ~3 s, so a brief wobble is forgiven
+    progressEventHz: 10,
+    hintRangeFactor: 3,
+    ringSizePx: 76,
+    ringStrokePx: 2,
+    reticleSizePx: 44,
+    completeBannerSeconds: 6,
+    spawnDistanceM: 80,
+    spawnBearingDeg: 180, // spawn south of the POI, looking north at it
+    spawnClearanceM: 16, // ~28 m altitude: clear of the HUD's 20 m proximity warning
+    teleportThresholdM: 250,
+    debugDebriefDelayMs: 3000,
+  },
+  // B4: props. See docs/props.md.
+  props: {
+    // Titanic's fog (abyss band) hides almost everything past ~1.5 km, so
+    // full meshes out to 900 m and silhouettes to 2.5 km are invisible swaps.
+    defaultLodDistanceM: 900,
+    cullDistanceM: 2500,
+    cullLodFactor: 1.5,
+    impostorOpacity: 0.55,
+    debrisImpostorPieces: 8,
+    collisionPushStiffness: 1.0,
+    collisionVelocityDamping: 1.0,
+    collisionEventCooldownS: 0.6,
+    sphereColliderFit: 1.1,
+    maxProps: 400,
+    defaultCollision: { 'hull-block': 'box', debris: 'none', chimney: 'box', model: 'sphere' },
+    defaultDimensionsM: {
+      'hull-block': [40, 12, 10],
+      debris: [60, 60, 4],
+      chimney: [0, 0, 20],
+    },
+    debrisMinPieces: 20,
+    debrisMaxPieces: 60,
+    debrisMinSizeM: 1,
+    debrisMaxSizeM: 6,
+    chimneyRadiusFraction: 0.12,
+    chimneyTopFraction: 0.4,
+    hullTextureRepeatM: 24,
+    hullKeelFraction: 0.7,
+    hullDefaultEnds: ['prow', 'cut'], // a bow section: prow forward, torn aft
+    hullProwLengthFraction: 0.28,
+    hullProwTaperExponent: 1.5, // ~26 deg half-entrance on the Titanic bow
+    hullProwRakeFraction: 0.35,
+    hullProwSheerFraction: 0.08,
+    hullForecastleLengthFraction: 0.2,
+    hullForecastleHeightFraction: 0.15,
+    hullCutDepthFraction: 0.06,
+    hullCutCollapseFraction: 0.25,
+    hullCutShade: 0.42,
+    hullDeckSpacingM: 3, // Titanic deck-to-deck ~2.7-3 m
+    hullRoundedLengthFraction: 0.5, // semicircular counter in plan
+    hullCounterTuckFraction: 0.35,
+    textureSize: 256,
+    colors: {
+      rust: 0x7a3b22, // rusted steel
+      growth: 0x4e5a3e, // patchy marine growth
+      basalt: 0x3b3a3d, // vent chimney rock
+      mineral: 0xc9a27a, // pale orange/white vent precipitate
+      sediment: 0x4a4038, // silt darkening at the foot of vertical surfaces
+    },
+    debugNudgeM: 1,
+    debugNudgeFastM: 10,
+    debugRotateDeg: 5,
+    atSpawnClearanceM: 22, // just outside the HUD's 20 m seabed-proximity warning
+  },
+  // B3: mission flow. See docs/missions.md for the timeline these produce.
+  mission: {
+    defaultSimSpeed: 3, // keeps the Titanic descent under 4 min real time
+    completeDelayS: 3, // let the scan's "NEW ENTRY" banner land before the debrief
+    spawnClearanceM: 10,
+    navUpdateHz: 5,
+    minSpawnSeabedM: -60,
+    freeDiveSpawnAltitudeM: 90,
+  },
 };
 
 /** Parse a `?tier=` value, falling back to the default tier if unrecognised. */
@@ -696,5 +1051,9 @@ export function makeConfig(overrides: Partial<GameConfig> = {}): GameConfig {
     water: { ...DEFAULT_CONFIG.water, ...overrides.water },
     camera: { ...DEFAULT_CONFIG.camera, ...overrides.camera },
     audio: { ...DEFAULT_CONFIG.audio, ...overrides.audio },
+    landmarks: { ...DEFAULT_CONFIG.landmarks, ...overrides.landmarks },
+    scan: { ...DEFAULT_CONFIG.scan, ...overrides.scan },
+    props: { ...DEFAULT_CONFIG.props, ...overrides.props },
+    mission: { ...DEFAULT_CONFIG.mission, ...overrides.mission },
   };
 }

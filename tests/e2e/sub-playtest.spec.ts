@@ -138,7 +138,9 @@ test.describe('A3 submarine feel', () => {
     await page.keyboard.press('t');
     await page.waitForTimeout(300);
     expect((await probe(page)).simSpeed).toBe(2);
+    // Two separate frames: presses inside one frame collapse into one edge.
     await page.keyboard.press('t');
+    await page.waitForTimeout(150);
     await page.keyboard.press('t');
     await page.waitForTimeout(300);
     expect((await probe(page)).simSpeed).toBe(1);
@@ -146,6 +148,52 @@ test.describe('A3 submarine feel', () => {
     await page.screenshot({ path: 'tests/e2e/screenshots/a3-playtest.png' });
     await page.screenshot({ path: testInfo.outputPath('a3-playtest.png') });
     expect(consoleErrors, consoleErrors.join(' | ')).toEqual([]);
+  });
+
+  // B3 / F1: the hull and chase camera were mirrored across the N-S axis.
+  test('after turning to ~090 the chase camera sits west of the boat, behind it', async ({
+    page,
+  }) => {
+    await page.goto('/?tile=titanic', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
+    await page.waitForTimeout(500);
+
+    // Turn to starboard from north until the HUD heading reads ~90 deg.
+    await page.keyboard.down('d');
+    await page.waitForFunction(
+      () => {
+        const g = window.__game as { sub: { getState(): { headingDeg: number } } };
+        const h = g.sub.getState().headingDeg;
+        return h > 75 && h < 180;
+      },
+      undefined,
+      { timeout: 15_000 },
+    );
+    await page.keyboard.up('d');
+    await page.waitForTimeout(1500); // rotation coasts a little, then the camera settles
+
+    const r = await page.evaluate(() => {
+      type V = { x: number; y: number; z: number };
+      const g = window.__game as {
+        sub: { position: V; getState(): { headingDeg: number }; getForward(): V };
+        rig: { camera: { position: V & { clone(): V }; getWorldDirection(out: V): V } };
+      };
+      const f = g.sub.getForward();
+      const cam = g.rig.camera;
+      const dir = cam.getWorldDirection(cam.position.clone()); // any Vector3 will do as `out`
+      return {
+        heading: g.sub.getState().headingDeg,
+        subX: g.sub.position.x,
+        camX: cam.position.x,
+        fwd: f,
+        lookDotFwd: (dir.x * f.x + dir.z * f.z) / Math.hypot(dir.x, dir.z),
+      };
+    });
+    expect(r.heading).toBeGreaterThan(60);
+    expect(r.heading).toBeLessThan(135);
+    expect(r.fwd.x).toBeGreaterThan(0.4); // physics: heading ~90 = east = +X
+    expect(r.camX).toBeLessThan(r.subX); // camera behind (west of) the boat
+    expect(r.lookDotFwd).toBeGreaterThan(0.8); // and looking the way it travels
   });
 
   test('flying into the seabed pushes out, shakes the camera, and never clips', async ({
@@ -215,5 +263,91 @@ test.describe('A3 submarine feel', () => {
     await hold(page, 'Shift', 2000);
     const after = await probe(page);
     expect(after.depth).toBeGreaterThan(during.depth);
+  });
+});
+
+test.describe('fix S: free-dive loadout and spawn', () => {
+  async function bootTile(page: Page, url: string): Promise<void> {
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
+  }
+  async function subInfo(page: Page): Promise<{
+    y: number;
+    altitude: number;
+    hullClass: string;
+    crushDepth: number;
+    hullBreached: boolean;
+    emergencyBlow: boolean;
+    hullRadius: number;
+    tile: string;
+    depthText: string;
+  }> {
+    return page.evaluate(() => {
+      const g = window.__game as {
+        sub: { getState(): Record<string, unknown> & { position: { y: number } } };
+        config: { submarine: { hullRadius: number } };
+        meta: { id: string };
+      };
+      const s = g.sub.getState();
+      return {
+        y: s.position.y,
+        altitude: s.altitude as number,
+        hullClass: s.hullClass as string,
+        crushDepth: s.crushDepth as number,
+        hullBreached: s.hullBreached as boolean,
+        emergencyBlow: s.emergencyBlow as boolean,
+        hullRadius: g.config.submarine.hullRadius,
+        tile: g.meta.id,
+        depthText: document.querySelector('.hud-value[data-field="depth"]')?.textContent ?? '',
+      };
+    });
+  }
+
+  test('QA-B #2: deep tiles fit a hull rated for them; no breach at spawn', async ({ page }) => {
+    for (const [tile, cls] of [
+      ['bismarck', 'C'],
+      ['challenger-deep', 'C'],
+      ['titanic', 'B'],
+    ] as const) {
+      await bootTile(page, `/?tile=${tile}`);
+      await page.waitForTimeout(1500);
+      const s = await subInfo(page);
+      expect(s.hullClass, tile).toBe(cls);
+      expect(s.hullBreached, tile).toBe(false);
+      expect(s.emergencyBlow, tile).toBe(false);
+      const line = (await page.locator('.hud-value[data-field="tile"]').textContent()) ?? '';
+      expect(line).toContain(`hull ${cls}`);
+      if (tile === 'challenger-deep') expect(line).toContain('at rating limit');
+    }
+  });
+
+  test('QA-B #3: shallow tile centres spawn submerged over deep water; ?depth= is honoured', async ({
+    page,
+  }) => {
+    await bootTile(page, '/?tile=great-blue-hole');
+    await page.waitForTimeout(2500);
+    const gbh = await subInfo(page);
+    expect(gbh.y).toBeLessThanOrEqual(-gbh.hullRadius + 1e-6);
+    // The old spawn rested on a -5 m reef flat, 6.6 m above sea level. Now:
+    // mid-water over the nearest >= 60 m seabed, well clear of both.
+    expect(gbh.altitude).toBeGreaterThan(25);
+    expect(gbh.y).toBeLessThan(-gbh.hullRadius - 5);
+    expect(gbh.depthText).toMatch(/^\d+ m$/); // not SURFACED
+    await page.screenshot({ path: 'tests/e2e/screenshots/fix-s-great-blue-hole.png' });
+
+    await bootTile(page, '/?tile=hunga-tonga-caldera&depth=30');
+    const ht = await subInfo(page);
+    expect(ht.y).toBeCloseTo(-30, 0);
+  });
+
+  test('QA-B #13: an unknown ?tile= boots the default tile with a warning', async ({ page }) => {
+    const warnings: string[] = [];
+    page.on('console', (m) => {
+      if (m.type() === 'warning') warnings.push(m.text());
+    });
+    await bootTile(page, '/?tile=does-not-exist');
+    await expect(page.locator('.fatal')).toHaveCount(0);
+    expect((await subInfo(page)).tile).toBe('titanic');
+    expect(warnings.some((w) => w.includes('does-not-exist'))).toBe(true);
   });
 });

@@ -72,6 +72,8 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
     uCosRockEnd: { value: Math.cos((config.rockSlopeLoDeg * Math.PI) / 180) },
     uSandDeep: { value: config.sandDepthDeep },
     uSandShallow: { value: config.sandDepthShallow },
+    uRockColor: { value: new THREE.Color(config.rockColor) },
+    uRockColorMix: { value: config.rockColorMix },
     uRampMinDepth: { value: opts.rampMinDepth },
     uRampSpan: { value: opts.rampMaxDepth - opts.rampMinDepth },
     uExaggeration: { value: exaggeration },

@@ -26,7 +26,8 @@ export class AudioEngine {
   constructor(private readonly config: AudioConfig) {
     // Safari still exposes webkitAudioContext only in some versions.
     const Ctor: typeof AudioContext =
-      window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     this.ctx = new Ctor();
 
     this.master = this.ctx.createGain();

@@ -20,15 +20,85 @@ const FIELDS = [
 ] as const;
 type Field = (typeof FIELDS)[number];
 
+/** Warning thresholds (Config.submarine); see {@link seabedWarning}. */
+export interface HudWarnConfig {
+  hullRadius: number;
+  seabedWarnAltitudeM: number;
+  seabedWarnTimeToContactS: number;
+  seabedApproachAltitudeM: number;
+  /** Altitude of first contact (hullRadius + seabedClearance). */
+  contactAltitudeM: number;
+}
+
+const DEFAULT_WARN: HudWarnConfig = {
+  hullRadius: 8,
+  seabedWarnAltitudeM: 15,
+  seabedWarnTimeToContactS: 4,
+  seabedApproachAltitudeM: 60,
+  contactAltitudeM: 12,
+};
+
+/** Per-frame context the physics snapshot does not carry. */
+export interface HudContext {
+  /** A scan target is within its scan radius: suppress the static proximity banner. */
+  nearScanTarget?: boolean;
+}
+
+/**
+ * QA-B #3c: the depth readout. Engine depth is negative below sea level; a
+ * boat at the surface ceiling (-hullRadius) or above it reads SURFACED, and
+ * never as a positive depth. Keeps a leading number so "N m" parsers work.
+ */
+export function formatDepth(depthY: number, hullRadius: number): string {
+  const m = Math.max(0, -depthY);
+  if (depthY >= -(hullRadius + 0.5)) return `${m.toFixed(0)} m · SURFACED`;
+  return `${m.toFixed(0)} m`;
+}
+
+/**
+ * QA-B #14: SEABED PROXIMITY. Two triggers:
+ *  - static: altitude below `seabedWarnAltitudeM` (3 m above contact by
+ *    default). Suppressed while a scan target is in range, because wreck
+ *    inspection happens at 12-25 m altitude on purpose;
+ *  - approach: below `seabedApproachAltitudeM` and closing on the seabed
+ *    fast enough to touch within `seabedWarnTimeToContactS`. Never suppressed.
+ */
+export function seabedWarning(
+  altitude: number,
+  verticalSpeed: number,
+  warn: HudWarnConfig,
+  nearScanTarget = false,
+): boolean {
+  if (altitude < warn.seabedWarnAltitudeM && !nearScanTarget) return true;
+  if (altitude < warn.seabedApproachAltitudeM && verticalSpeed < 0) {
+    const gap = Math.max(0, altitude - warn.contactAltitudeM);
+    if (gap / -verticalSpeed < warn.seabedWarnTimeToContactS) return true;
+  }
+  return false;
+}
+
+/** The tile line: tile id + fitted hull class and rating (QA-B #2). */
+export function formatTileLine(
+  meta: Pick<TileMeta, 'id' | 'cols' | 'rows'>,
+  hullClass: string,
+  crushDepth: number,
+  note = '',
+): string {
+  const rating = Math.round(Math.abs(crushDepth)).toLocaleString('en-US');
+  return `${meta.id} · hull ${hullClass} ${rating} m${note ? ` · ${note}` : ''}`;
+}
+
 export class HUD {
   readonly root: HTMLDivElement;
   private readonly values = new Map<Field, HTMLSpanElement>();
   private readonly cache = new Map<Field, string>();
   private readonly warningEl: HTMLDivElement;
+  private hullNote = '';
 
   constructor(
     private readonly meta: TileMeta,
     parent: HTMLElement = document.body,
+    private readonly warn: HudWarnConfig = DEFAULT_WARN,
   ) {
     this.root = document.createElement('div');
     this.root.className = 'hud';
@@ -42,9 +112,9 @@ export class HUD {
       </div>
       <div class="hud-warning" hidden></div>
       <div class="hud-panel hud-help">
-        <b>W/S</b> thrust &nbsp; <b>A/D</b> yaw &nbsp; <b>R/F</b> pitch<br />
-        <b>Space</b> blow ballast (up) &nbsp; <b>Shift</b> flood (down)<br />
-        <b>X</b> boost &nbsp; <b>C</b> camera &nbsp; <b>M</b> sonar
+        <b>W/S</b> thrust &nbsp; <b>A/D</b> yaw &nbsp; <b>R/F</b> pitch &nbsp; <b>X</b> boost<br />
+        <b>Space</b> blow (up) &nbsp; <b>Shift</b> flood (down) &nbsp; <b>L</b> lights &nbsp; <b>T</b> sim speed<br />
+        <b>G</b> scan (hold) &nbsp; <b>J</b> guide &nbsp; <b>Q</b> ping &nbsp; <b>M</b> sonar &nbsp; <b>C</b> camera &nbsp; <b>P</b> photo
       </div>
       <div class="hud-attribution"></div>
     `;
@@ -59,6 +129,11 @@ export class HUD {
     this.set('tile', `${meta.id} (${meta.cols}×${meta.rows})`);
   }
 
+  /** A short note after the hull rating on the tile line, e.g. "thin margin". */
+  setHullNote(note: string): void {
+    this.hullNote = note;
+  }
+
   private set(field: Field, text: string): void {
     if (this.cache.get(field) === text) return;
     this.cache.set(field, text);
@@ -67,9 +142,10 @@ export class HUD {
   }
 
   /** Update from a physics snapshot. Safe to call every rendered frame. */
-  update(s: SubmarineState): void {
+  update(s: SubmarineState, ctx: HudContext = {}): void {
     const ll = worldToLatLon(this.meta, s.position.x, s.position.z);
-    this.set('depth', `${Math.abs(s.depth).toFixed(0)} m`);
+    this.set('depth', formatDepth(s.depth, this.warn.hullRadius));
+    this.set('tile', formatTileLine(this.meta, s.hullClass, s.crushDepth, this.hullNote));
     this.set('altitude', `${s.altitude.toFixed(0)} m`);
     this.set('heading', `${s.headingDeg.toFixed(0)}° ${compass(s.headingDeg)}`);
     // Knots are the natural unit for a boat; 1 m/s = 1.94384 kn.
@@ -83,7 +159,7 @@ export class HUD {
     } else if (s.crushWarning) {
       this.set('status', 'pressure high');
       this.showWarning(`HULL PRESSURE ${(s.crushRatio * 100).toFixed(0)}% — ASCEND`);
-    } else if (s.altitude < 20) {
+    } else if (seabedWarning(s.altitude, s.velocity.y, this.warn, ctx.nearScanTarget)) {
       this.set('status', 'seabed proximity');
       this.showWarning('SEABED PROXIMITY');
     } else {

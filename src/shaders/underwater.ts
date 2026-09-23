@@ -51,6 +51,13 @@ void main() {
   color *= clamp(vig, 0.0, 1.0);
 
   gl_FragColor = vec4(color, 1.0);
+
+  // The scene was rendered into a linear half-float target, where Three skips
+  // tone mapping and output encoding. Apply both here, once, on the way to the
+  // screen -- without these the frame is shown as raw linear values, which
+  // crushes the darks and over-saturates every mid-tone (QA-B #4).
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }
 `;
 
@@ -80,7 +87,9 @@ export class UnderwaterPass {
     this.target = new THREE.WebGLRenderTarget(Math.max(1, width), Math.max(1, height), {
       minFilter: THREE.LinearFilter,
       magFilter: THREE.LinearFilter,
-      type: THREE.UnsignedByteType,
+      // Linear HDR: an 8-bit linear target bands badly in the abyss and clips
+      // the headlight hot spot before ACES can roll it off.
+      type: THREE.HalfFloatType,
       depthBuffer: true,
     });
 
@@ -107,8 +116,18 @@ export class UnderwaterPass {
     this.target.setSize(Math.max(1, width), Math.max(1, height));
   }
 
+  /**
+   * Draw calls of the scene render that preceded the last `render()`. The
+   * pass's own `renderer.render` auto-resets `renderer.info`, so without this
+   * the debug readout only ever sees the post quad (QA-B #8).
+   */
+  sceneDrawCalls = 0;
+  sceneTriangles = 0;
+
   /** @param depthFactor 0 at the surface, 1 at maximum murk. */
   render(renderer: THREE.WebGLRenderer, elapsed: number, depthFactor: number): void {
+    this.sceneDrawCalls = renderer.info.render.calls;
+    this.sceneTriangles = renderer.info.render.triangles;
     this.material.uniforms.uTime!.value = elapsed;
     this.material.uniforms.uDepthFactor!.value = Math.min(1, Math.max(0, depthFactor));
     renderer.setRenderTarget(null);

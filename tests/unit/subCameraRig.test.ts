@@ -7,7 +7,8 @@ import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
-import type { HeightField } from '../../src/sub/Submarine.js';
+import { SubMesh } from '../../src/sub/SubMesh.js';
+import { Submarine, type HeightField } from '../../src/sub/Submarine.js';
 
 const cam = DEFAULT_CONFIG.camera;
 const DT = 1 / 60;
@@ -133,5 +134,81 @@ describe('CameraRig look-ahead and bank', () => {
     calm.snap(pos, 0, 0);
     for (let i = 0; i < 120; i++) calm.update(pos, 0, 0, DT, { roll: 0.4 });
     expect(Math.abs(calm.camera.rotation.z)).toBeLessThan(1e-6);
+  });
+});
+
+// B3 / F1: the hull and the chase camera used to be mirrored across the N-S
+// axis. Physics yaw is a compass angle (+yaw = east, Submarine.getForward);
+// a raw Three.js +Y rotation turns -Z to the west, so the presentation side
+// has to negate it.
+describe('CameraRig + SubMesh follow the physics heading (F1)', () => {
+  const east = Math.PI / 2;
+
+  function forwardOf(yaw: number, pitch: number): Vector3 {
+    const sub = new Submarine(DEFAULT_CONFIG.submarine, flatSeabed(-5000));
+    sub.reset(0, 0, 0, yaw);
+    sub.pitch = pitch;
+    return sub.getForward(new Vector3());
+  }
+
+  it('at yaw +pi/2 (east) the settled chase camera is WEST of the boat, looking east', () => {
+    const pos = new Vector3(500, -3000, -200);
+    const rig = new CameraRig(cam, 16 / 9);
+    rig.snap(pos, east, 0);
+    settle(rig, pos, east, 0);
+    expect(rig.camera.position.x).toBeLessThan(pos.x - 50);
+    expect(Math.abs(rig.camera.position.z - pos.z)).toBeLessThan(1);
+    const dir = rig.camera.getWorldDirection(new Vector3());
+    expect(dir.x).toBeGreaterThan(0.5); // toward +X, dipped by chaseLookDrop
+    expect(Math.abs(dir.z)).toBeLessThan(1e-6);
+  });
+
+  it('at yaw -pi/2 (west) the chase camera is east of the boat', () => {
+    const pos = new Vector3(0, -3000, 0);
+    const rig = new CameraRig(cam, 16 / 9);
+    settle(rig, pos, -east, 0);
+    expect(rig.camera.position.x).toBeGreaterThan(pos.x + 50);
+  });
+
+  it('the first-person camera looks along Submarine.getForward at any heading', () => {
+    const pos = new Vector3(0, -3000, 0);
+    for (const [yaw, pitch] of [
+      [east, 0],
+      [2.6, 0.3], // ~150 deg, nose up
+      [-2.2, -0.4],
+      [0, 0],
+    ] as const) {
+      const rig = new CameraRig(cam, 16 / 9);
+      rig.setMode('first-person');
+      rig.snap(pos, yaw, pitch);
+      const dir = rig.camera.getWorldDirection(new Vector3());
+      expect(dir.dot(forwardOf(yaw, pitch))).toBeGreaterThan(0.999);
+    }
+  });
+
+  it('SubMesh.setPose points the nose (local -Z) along getForward and leans into turns', () => {
+    const mesh = new SubMesh({ length: 26 });
+    for (const [yaw, pitch] of [
+      [east, 0],
+      [2.6, 0.25],
+      [-1, -0.3],
+    ] as const) {
+      mesh.setPose(new Vector3(1, 2, 3), yaw, pitch, 0);
+      mesh.group.updateMatrixWorld(true);
+      const nose = new Vector3(0, 0, -1).applyQuaternion(mesh.group.quaternion);
+      expect(nose.dot(forwardOf(yaw, pitch))).toBeGreaterThan(0.9999);
+      expect(mesh.group.position.toArray()).toEqual([1, 2, 3]);
+    }
+    // A starboard turn gives a negative roll (Submarine): the starboard side
+    // (local +X) must dip, i.e. the hull leans into the turn.
+    mesh.setPose(new Vector3(), east, 0, -0.3);
+    const starboard = new Vector3(1, 0, 0).applyQuaternion(mesh.group.quaternion);
+    expect(starboard.y).toBeLessThan(-0.2);
+    // ... and the camera banks the same way (its right side dips).
+    const rig = new CameraRig(cam, 16 / 9);
+    const pos = new Vector3(0, -3000, 0);
+    for (let i = 0; i < 180; i++) rig.update(pos, east, 0, DT, { roll: -0.3 });
+    const camRight = new Vector3(1, 0, 0).applyQuaternion(rig.camera.quaternion);
+    expect(camRight.y).toBeLessThan(-0.05);
   });
 });

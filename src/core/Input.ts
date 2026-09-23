@@ -43,6 +43,11 @@ export interface InputState {
   cycleSimSpeed: boolean;
   /** Cycle the camera into and out of free-orbit photo mode. */
   togglePhotoMode: boolean;
+  /**
+   * Open/close the field guide (B1). Edge-triggered. Optional so existing
+   * hand-built InputState literals (tests, Submarine's locked input) still type.
+   */
+  toggleGuide?: boolean;
 }
 
 /** One rebindable thing the player can do. */
@@ -72,7 +77,8 @@ export type ActionId =
   | 'ping'
   | 'scan'
   | 'cycleSimSpeed'
-  | 'togglePhotoMode';
+  | 'togglePhotoMode'
+  | 'toggleGuide';
 
 /** Factory, not a constant: callers get their own mutable copy. */
 export function defaultActions(): ActionBinding[] {
@@ -155,6 +161,7 @@ export function defaultActions(): ActionBinding[] {
     { id: 'toggleCamera', label: 'Camera view', category: 'View', keys: ['KeyC'], pad: 'Y' },
     { id: 'toggleSonar', label: 'Sonar map', category: 'View', keys: ['KeyM'], pad: 'Back' },
     { id: 'togglePhotoMode', label: 'Photo mode', category: 'View', keys: ['KeyP'], pad: 'Start' },
+    { id: 'toggleGuide', label: 'Field guide', category: 'View', keys: ['KeyJ'] },
   ];
 }
 
@@ -208,6 +215,7 @@ export class Input {
     scan: false,
     cycleSimSpeed: false,
     togglePhotoMode: false,
+    toggleGuide: false,
   };
 
   /** The live, rebindable action map. Read it to render a controls screen. */
@@ -448,6 +456,7 @@ export class Input {
       if (this.edgeArmed.has('ping')) s.ping = true;
       if (this.edgeArmed.has('cycleSimSpeed')) s.cycleSimSpeed = true;
       if (this.edgeArmed.has('togglePhotoMode')) s.togglePhotoMode = true;
+      if (this.edgeArmed.has('toggleGuide')) s.toggleGuide = true;
       this.edgeArmed.clear();
     }
 
@@ -502,6 +511,7 @@ export class Input {
     s.ping = false;
     s.cycleSimSpeed = false;
     s.togglePhotoMode = false;
+    s.toggleGuide = false;
   }
 }
 

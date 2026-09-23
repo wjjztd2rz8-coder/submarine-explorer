@@ -14,7 +14,8 @@
 // nothing tiles visibly on the abyssal plain:
 //
 //   sediment   the default: fine, soft, slightly warm grey
-//   rock       where the surface is steeper than ~25 degrees (basalt / scarp)
+//   rock       where the surface is steeper than ~25 degrees (basalt / scarp);
+//              its tint is also pulled toward uRockColor (#3B3A3D)
 //   sand       above ~200 m, where light and currents keep the bed clean
 //
 // The textures are pure *modulation* (mean luminance uAlbedoGain^-1), so the
@@ -36,6 +37,8 @@ uniform float uCosRockStart;    // cos(steep angle): fully rock at or below
 uniform float uCosRockEnd;      // cos(shallow angle): fully sediment at or above
 uniform float uSandDeep;        // metres (negative): no sand deeper than this
 uniform float uSandShallow;     // metres (negative): all sand above this
+uniform vec3 uRockColor;        // linear basalt albedo
+uniform float uRockColorMix;    // 0..1 pull of steep rock toward uRockColor
 uniform float uRampMinDepth;
 uniform float uRampSpan;
 uniform float uExaggeration;
@@ -75,6 +78,8 @@ vec3 terrainSrgbToLinear(vec3 c) {
 
   float rampT = clamp((depthM - uRampMinDepth) / max(uRampSpan, 1e-3), 0.0, 1.0);
   vec3 tint = terrainSrgbToLinear(texture2D(tRamp, vec2(rampT, 0.5)).rgb);
+  // Scarps and seamount flanks read as dark basalt, not as sediment-coloured stone.
+  tint = mix(tint, uRockColor, rockT * uRockColorMix);
 
   diffuseColor.rgb *= tint * surfaceAlbedo;
 }

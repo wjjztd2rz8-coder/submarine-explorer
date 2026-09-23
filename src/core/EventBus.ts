@@ -36,6 +36,22 @@ export interface GameEvents {
     previous: DepthBandName | null;
     depth: number;
   };
+  // --- B1: scan & discovery --------------------------------------------------
+  'scan:started': { poiId: string };
+  /** 0..1, emitted at most ~10 Hz. */
+  'scan:progress': { poiId: string; progress: number };
+  'scan:aborted': { poiId: string; reason: 'range' | 'facing' | 'released' };
+  'scan:complete': { poiId: string; landmarkId: string; firstTime: boolean };
+  'guide:opened': { entryId: string };
+  // --- B3: mission flow ------------------------------------------------------
+  'mission:started': { missionId: string; tileId: string };
+  'mission:objective': { missionId: string; objectiveId: string; complete: boolean };
+  'mission:complete': { missionId: string; durationS: number };
+  'mission:restart': { missionId: string };
+  /** Fix S: the dive failed (crush depth -> emergency ascent), before the aborted debrief. */
+  'mission:aborted': { missionId: string; reason: 'crush' };
+  // --- B4: props -------------------------------------------------------------
+  'props:loaded': { landmarkId: string; count: number; models: number; procedural: number };
   'game:ready': { tileId: string };
   'ui:selectTile': { id: string };
 }

@@ -41,10 +41,30 @@ export interface TerrainStats {
   drawnTriangles: number;
   /** How many visible chunks sit at each LOD level. */
   lodCounts: number[];
-  /** Vertex subdivisions per source cell edge. */
+  /** Vertex subdivisions per source cell edge actually used. */
   subdiv: number;
+  /** What the tier asked for; larger than `subdiv` when the vertex budget capped it. */
+  requestedSubdiv: number;
   tier: GraphicsTier;
   textureSize: number;
+}
+
+/**
+ * The largest subdivision <= `requested` whose surface vertex estimate
+ * `cols * rows * subdiv^2` fits in `maxVertices`, never below 1. Big tiles
+ * (blake-plateau-corals 1202x1201, endurance 1202 wide) would otherwise hold
+ * 6-13M vertices at medium/high; see docs/terrain.md.
+ */
+export function fitSubdivToBudget(
+  cols: number,
+  rows: number,
+  requested: number,
+  maxVertices: number,
+): number {
+  let sub = Math.max(1, Math.round(requested));
+  if (!(maxVertices > 0)) return sub;
+  while (sub > 1 && cols * rows * sub * sub > maxVertices) sub--;
+  return sub;
 }
 
 interface RampStop {
@@ -130,7 +150,10 @@ export class Terrain {
     this.textures = built.textures;
 
     this.group.name = `terrain:${tile.meta.id}`;
-    this.stats = this.build(config, tier, tierCfg.detailSubdiv, built.textureSize);
+    const requested = Math.max(1, Math.round(tierCfg.detailSubdiv));
+    const subdiv = fitSubdivToBudget(this.cols, this.rows, requested, config.maxVertices);
+    this.stats = this.build(config, tier, subdiv, built.textureSize);
+    this.stats.requestedSubdiv = requested;
   }
 
   // ---------------------------------------------------------------- sampling
@@ -180,8 +203,12 @@ export class Terrain {
    * its own amplitude would make the field non-deterministic across chunks.
    */
   dataSlopeDeg(x: number, z: number): number {
-    const gx = (this.sampleDataHeight(x + this.dx, z) - this.sampleDataHeight(x - this.dx, z)) / (2 * this.dx);
-    const gz = (this.sampleDataHeight(x, z + this.dz) - this.sampleDataHeight(x, z - this.dz)) / (2 * this.dz);
+    const gx =
+      (this.sampleDataHeight(x + this.dx, z) - this.sampleDataHeight(x - this.dx, z)) /
+      (2 * this.dx);
+    const gz =
+      (this.sampleDataHeight(x, z + this.dz) - this.sampleDataHeight(x, z - this.dz)) /
+      (2 * this.dz);
     return (Math.atan(Math.hypot(gx, gz)) * 180) / Math.PI;
   }
 
@@ -283,7 +310,9 @@ export class Terrain {
     const s = this.stats;
     return (
       `terrain ${this.meta.id} [${s.tier}] ` +
-      `${s.chunks} chunks / ${(s.vertices / 1e6).toFixed(2)}M verts (subdiv ${s.subdiv}) | ` +
+      `${s.chunks} chunks / ${(s.vertices / 1e6).toFixed(2)}M verts (subdiv ${s.subdiv}` +
+      (s.requestedSubdiv > s.subdiv ? `, capped from ${s.requestedSubdiv} by vertex budget` : '') +
+      `) | ` +
       `drawn ${s.visibleChunks} chunks, ${(s.drawnTriangles / 1e3).toFixed(0)}k tris | ` +
       `lod ${s.lodCounts.join('/')} | tex ${s.textureSize}px`
     );
@@ -345,6 +374,7 @@ export class Terrain {
       drawnTriangles: triangles,
       lodCounts: new Array(LOD_LEVELS).fill(0),
       subdiv: sub,
+      requestedSubdiv: sub,
       tier,
       textureSize,
     };

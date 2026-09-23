@@ -118,8 +118,7 @@ export function sampleAtmosphere(
 
   // Caustics ease out between the two config depths rather than cutting off.
   const span = config.causticsStartM - config.causticsEndM;
-  out.causticsStrength =
-    span <= 0 ? 0 : 1 - smoothstep((config.causticsStartM - depth) / span);
+  out.causticsStrength = span <= 0 ? 0 : 1 - smoothstep((config.causticsStartM - depth) / span);
   return out;
 }
 

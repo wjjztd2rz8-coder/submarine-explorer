@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { bandWeights } from '../../src/audio/DepthBands.js';
 import { castSonarRay } from '../../src/audio/Sonar.js';
 
@@ -23,7 +23,9 @@ describe('audio: sonar echo maths', () => {
     expect(hit!.delayS).toBeCloseTo(expectedDelay, 9);
     // The direction descends 0.1 m per 1 m forward-ish; range to reach 100 m
     // of descent should be roughly consistent (within the 1 m step size).
-    expect(Math.abs(hit!.rangeM - 100 / Math.abs(dir.y / Math.hypot(dir.x, dir.y, dir.z)))).toBeLessThan(2);
+    expect(
+      Math.abs(hit!.rangeM - 100 / Math.abs(dir.y / Math.hypot(dir.x, dir.y, dir.z))),
+    ).toBeLessThan(2);
   });
 
   it('returns null when nothing is within range', () => {
@@ -52,12 +54,7 @@ describe('audio: sonar echo maths', () => {
 });
 
 describe('audio: ambient depth-band crossfade', () => {
-  const bands = [
-    { depth: 0 },
-    { depth: -20 },
-    { depth: -200 },
-    { depth: -1000 },
-  ];
+  const bands = [{ depth: 0 }, { depth: -20 }, { depth: -200 }, { depth: -1000 }];
 
   it('weights sum to 1 and are fully on band 0 at the surface', () => {
     const w = bandWeights(0, bands);
@@ -84,5 +81,28 @@ describe('audio: ambient depth-band crossfade', () => {
       const w = bandWeights(d, bands);
       expect(w.reduce((a, b) => a + b, 0)).toBeCloseTo(1, 9);
     }
+  });
+});
+
+describe('audio: scan:complete cues', () => {
+  it('chimes on a first-time scan and ticks on a repeat', async () => {
+    const { AudioSystem } = await import('../../src/audio/AudioSystem.js');
+    const { EventBus } = await import('../../src/core/EventBus.js');
+    const { DEFAULT_CONFIG } = await import('../../src/core/Config.js');
+    const bus = new EventBus();
+    const sys = new AudioSystem(DEFAULT_CONFIG.audio, bus, { sampleHeight: () => -100 });
+    const chime = vi.spyOn(sys, 'playDiscoveryChime').mockImplementation(() => {});
+    const tick = vi.spyOn(sys, 'playScanTick').mockImplementation(() => {});
+    // unlock() needs a real AudioContext; the bus wiring is what is under test.
+    (sys as unknown as { wireBusEvents(): void }).wireBusEvents();
+
+    bus.emit('scan:complete', { poiId: 'bow', landmarkId: 'titanic', firstTime: true });
+    expect(chime).toHaveBeenCalledTimes(1);
+    expect(tick).not.toHaveBeenCalled();
+
+    bus.emit('scan:complete', { poiId: 'bow', landmarkId: 'titanic', firstTime: false });
+    expect(chime).toHaveBeenCalledTimes(1);
+    expect(tick).toHaveBeenCalledTimes(1);
+    sys.dispose();
   });
 });

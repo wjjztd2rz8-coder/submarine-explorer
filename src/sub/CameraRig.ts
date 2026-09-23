@@ -10,6 +10,12 @@
  *    metres above the seabed, so flying low never puts the view inside rock.
  *  - **Shake.** Hull stress displaces the camera on a decaying oscillation.
  *    `reduceMotion` disables it, and the banking follow, outright (C5).
+ *
+ * And one thing stops the boat ruining the shot (QA-B #6): with a scan target
+ * in range (`CameraUpdateOptions.focus`), the chase camera slides sideways, to
+ * the target's side, and up, and pulls its aim part-way toward the target, so
+ * the line of sight to the wreck clears the hull instead of running through
+ * it. The blend in and out is smoothed with `focusHalfLife`.
  */
 
 import * as THREE from 'three';
@@ -26,6 +32,37 @@ export interface CameraUpdateOptions {
   velocity?: THREE.Vector3;
   /** Hull stress 0..1. Anything above the previous peak re-triggers the shake. */
   hullStress?: number;
+  /**
+   * A scan target in range (world position), or null/undefined for none. In
+   * chase mode the camera is offset so the boat does not hide it.
+   */
+  focus?: THREE.Vector3 | null;
+}
+
+/**
+ * Which side (+1 starboard, -1 port) the chase camera slides to for a focus
+ * target `lateralM` metres to starboard of the boat's axis. Keeps `prevSide`
+ * unless the target is clearly (more than `hysteresisM`) on the other side,
+ * so a target dead ahead does not make the camera flip-flop.
+ */
+export function chooseFocusSide(lateralM: number, prevSide: 1 | -1, hysteresisM: number): 1 | -1 {
+  if (lateralM > hysteresisM) return 1;
+  if (lateralM < -hysteresisM) return -1;
+  return prevSide;
+}
+
+/** Chase offset (boat frame) with the focus framing blended in by `weight` (0..1). */
+export function focusedChaseOffset(
+  c: Pick<CameraConfig, 'chaseOffset' | 'focusSideM' | 'focusRaiseM'>,
+  weight: number,
+  side: 1 | -1,
+  out: { x: number; y: number; z: number } = { x: 0, y: 0, z: 0 },
+): { x: number; y: number; z: number } {
+  const w = clamp(weight, 0, 1);
+  out.x = c.chaseOffset.x + w * side * c.focusSideM;
+  out.y = c.chaseOffset.y + w * c.focusRaiseM;
+  out.z = c.chaseOffset.z;
+  return out;
 }
 
 export class CameraRig {
@@ -51,6 +88,12 @@ export class CameraRig {
   private shake = 0;
   private shakePhase = 0;
   private bank = 0;
+  /** 0..1 blend of the scan-target framing (QA-B #6), and the side it uses. */
+  focusWeight = 0;
+  focusSide: 1 | -1 = 1;
+  private readonly lastFocus = new THREE.Vector3();
+  private hasFocus = false;
+  private readonly chaseOffsetNow = { x: 0, y: 0, z: 0 };
   /** Mode the camera returns to when photo mode is switched off. */
   private modeBeforeOrbit: CameraMode = 'chase';
 
@@ -110,7 +153,7 @@ export class CameraRig {
 
   /**
    * @param subPos  submarine position
-   * @param yaw     submarine yaw (radians, 0 = north)
+   * @param yaw     submarine yaw (radians, 0 = north, +pi/2 = east: physics convention)
    * @param pitch   submarine pitch (radians)
    * @param dt      real frame delta in seconds
    * @param opts    roll / velocity / hull stress
@@ -125,8 +168,12 @@ export class CameraRig {
     const c = this.config;
     if (opts.hullStress !== undefined) this.addShake(opts.hullStress);
 
-    // The boat's orientation as a quaternion (YXZ: yaw then pitch).
-    this.euler.set(pitch, yaw, 0);
+    // The boat's orientation as a quaternion (YXZ: yaw then pitch). Physics
+    // yaw is a compass angle (+yaw turns toward +X = east, see
+    // Submarine.getForward), but a Three.js +Y rotation turns -Z toward -X
+    // (west), so the Euler takes -yaw. Without the sign the chase camera sat
+    // mirrored across the N-S axis at any heading but 0 / 180.
+    this.euler.set(pitch, -yaw, 0);
     this.quat.setFromEuler(this.euler);
 
     const speed = opts.velocity ? opts.velocity.length() : 0;
@@ -142,7 +189,11 @@ export class CameraRig {
       this.desiredPosition.multiplyScalar(this.orbitRadius).add(subPos);
       this.desiredTarget.copy(subPos);
     } else {
-      const o = this.mode === 'chase' ? c.chaseOffset : c.firstPersonOffset;
+      this.updateFocus(subPos, yaw, dt, opts.focus ?? null);
+      const o =
+        this.mode === 'chase'
+          ? focusedChaseOffset(c, this.focusWeight, this.focusSide, this.chaseOffsetNow)
+          : c.firstPersonOffset;
       this.offset.set(o.x, o.y, o.z).applyQuaternion(this.quat);
       this.desiredPosition.copy(subPos).add(this.offset);
 
@@ -154,7 +205,12 @@ export class CameraRig {
         .applyQuaternion(this.quat)
         .multiplyScalar(base + speed * c.lookAheadPerSpeed)
         .add(subPos);
-      if (this.mode === 'chase') this.desiredTarget.y -= c.chaseLookDrop;
+      if (this.mode === 'chase') {
+        this.desiredTarget.y -= c.chaseLookDrop;
+        if (this.hasFocus && this.focusWeight > 1e-4) {
+          this.desiredTarget.lerp(this.lastFocus, clamp(c.focusLookBlend, 0, 1) * this.focusWeight);
+        }
+      }
     }
 
     // Orbit is a tripod, not a chase: it tracks exactly, so a drag moves the
@@ -172,6 +228,35 @@ export class CameraRig {
     this.clampToTerrain();
     this.camera.lookAt(this.currentTarget);
     this.applyBank(opts.roll ?? 0, dt);
+  }
+
+  /**
+   * Blend the scan-target framing in (focus given, chase mode) or out. The
+   * last focus position is kept so the aim eases back instead of snapping.
+   */
+  private updateFocus(
+    subPos: THREE.Vector3,
+    yaw: number,
+    dt: number,
+    focus: THREE.Vector3 | null,
+  ): void {
+    const c = this.config;
+    const active = this.mode === 'chase' && focus !== null;
+    if (active) {
+      this.lastFocus.copy(focus);
+      this.hasFocus = true;
+      // Lateral offset of the target in the boat's (yaw-only) frame: +X is
+      // starboard, i.e. (cos yaw, 0, sin yaw) with +yaw toward east.
+      const lateral = (focus.x - subPos.x) * Math.cos(yaw) + (focus.z - subPos.z) * Math.sin(yaw);
+      this.focusSide = chooseFocusSide(lateral, this.focusSide, c.focusSideHysteresisM);
+    }
+    const want = active ? 1 : 0;
+    if (!this.initialised) this.focusWeight = want;
+    else this.focusWeight += (want - this.focusWeight) * decay(c.focusHalfLife, dt);
+    if (this.focusWeight < 1e-4 && !active) {
+      this.focusWeight = 0;
+      this.hasFocus = false;
+    }
   }
 
   /** Decaying oscillation on two axes; not a random walk, so it reads as impact. */

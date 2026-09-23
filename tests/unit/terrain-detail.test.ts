@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
-import { Terrain } from '../../src/world/Terrain.js';
+import { Terrain, fitSubdivToBudget } from '../../src/world/Terrain.js';
 import { detailAmplitude, fbm2, valueNoise2 } from '../../src/world/TerrainNoise.js';
 import { makeSyntheticTile } from './helpers.js';
 
@@ -24,8 +24,8 @@ function ridgedTile(cols = 40, rows = 34) {
 describe('TerrainNoise', () => {
   it('value noise is deterministic and bounded to [0, 1)', () => {
     for (let i = 0; i < 2000; i++) {
-      const x = (i * 37.13) % 500 - 250;
-      const y = (i * 11.7) % 500 - 250;
+      const x = ((i * 37.13) % 500) - 250;
+      const y = ((i * 11.7) % 500) - 250;
       const v = valueNoise2(x, y, 17);
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThan(1);
@@ -259,6 +259,41 @@ describe('Terrain chunk LOD', () => {
     const high = new Terrain(tile, base, 'high').stats.vertices;
     expect(med).toBeGreaterThan(low);
     expect(high).toBeGreaterThan(med);
+  });
+});
+
+describe('Terrain vertex budget (Config.terrain.maxVertices)', () => {
+  it('steps a big tile down 3 -> 2 -> 1 until cols*rows*subdiv^2 fits', () => {
+    const budget = 4_000_000;
+    // blake-plateau-corals: 1202 x 1201 cells.
+    expect(fitSubdivToBudget(1202, 1201, 3, budget)).toBe(1); // 13.0M, 5.8M, 1.44M
+    // endurance-sized, 1202 x 700: 7.6M at subdiv 3, 3.37M at 2 -> fits at 2.
+    expect(fitSubdivToBudget(1202, 700, 3, budget)).toBe(2);
+    expect(fitSubdivToBudget(1202, 700, 2, budget)).toBe(2);
+    // Titanic 548 x 546 keeps high.
+    expect(fitSubdivToBudget(548, 546, 3, budget)).toBe(3);
+    // Never below 1, whatever the budget; a non-positive budget disables the cap.
+    expect(fitSubdivToBudget(5000, 5000, 3, budget)).toBe(1);
+    expect(fitSubdivToBudget(5000, 5000, 3, 0)).toBe(3);
+  });
+
+  it('a synthetic large tile is built at the reduced subdivision and says so', () => {
+    const tile = ridgedTile(60, 50);
+    // 60*50 = 3000 cells: 27k verts at subdiv 3, 12k at 2, 3k at 1.
+    const cfg = { ...base, maxVertices: 15_000 };
+    const t = new Terrain(tile, cfg, 'high');
+    expect(t.stats.requestedSubdiv).toBe(3);
+    expect(t.stats.subdiv).toBe(2);
+    expect(t.debugString()).toContain('capped from 3');
+    const surface = t.stats.vertices; // skirts included, still well under 2x budget
+    expect(surface).toBeLessThan(2 * cfg.maxVertices);
+
+    const tiny = new Terrain(tile, { ...base, maxVertices: 5_000 }, 'high');
+    expect(tiny.stats.subdiv).toBe(1);
+
+    const roomy = new Terrain(tile, { ...base, maxVertices: 1e9 }, 'high');
+    expect(roomy.stats.subdiv).toBe(3);
+    expect(roomy.debugString()).not.toContain('capped');
   });
 });
 

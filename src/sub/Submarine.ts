@@ -241,8 +241,13 @@ export class Submarine {
     // Spinning up uses `*Accel`; coasting back to zero once the stick is
     // centred uses `*Damping`, so "how fast it responds" and "how long it
     // carries" are separately tunable.
-    const yawTarget = clamp(cmd.yaw, -1, 1) * c.yawRate;
-    const pitchTarget = clamp(cmd.pitch, -1, 1) * c.pitchRate;
+    // QA-B #15: at 2x/3x this tick runs 2-3 times per frame, so scale the
+    // stick down by the multiplier and the boat still turns at its 1x real
+    // rate (translation keeps the full speed-up). `simSpeedScalesTurnRate`
+    // restores the Phase A behaviour.
+    const turnScale = this.turnScale();
+    const yawTarget = clamp(cmd.yaw, -1, 1) * c.yawRate * turnScale;
+    const pitchTarget = clamp(cmd.pitch, -1, 1) * c.pitchRate * turnScale;
     const kYaw = Math.abs(yawTarget) > 1e-6 ? c.yawAccel : c.yawDamping;
     const kPitch = Math.abs(pitchTarget) > 1e-6 ? c.pitchAccel : c.pitchDamping;
     this.yawRate += (yawTarget - this.yawRate) * Math.min(1, kYaw * dt);
@@ -262,7 +267,7 @@ export class Submarine {
     // stationary boat pivoting on the spot should not lean.
     const speedNow = this.velocity.length();
     const bankTarget =
-      -(this.yawRate / Math.max(1e-6, c.yawRate)) *
+      -(this.yawRate / Math.max(1e-6, c.yawRate * turnScale)) *
       c.maxBankAngle *
       clamp(speedNow / Math.max(1e-6, c.bankFullSpeed), 0, 1);
     this.roll += (bankTarget - this.roll) * decay(c.bankHalfLife, dt);
@@ -305,12 +310,20 @@ export class Submarine {
     this.position.addScaledVector(v, dt);
 
     // --- constraints --------------------------------------------------------
-    // Never breach the surface: the conning tower stops at sea level.
-    if (this.position.y > -c.hullRadius) {
-      this.position.y = -c.hullRadius;
+    // Seabed first, surface last (QA-B #3): the surface clamp used to run
+    // first, so in water shallower than ~20 m the push-out then lifted the
+    // hull clean out of the sea. The floor is relaxed in shallow water (see
+    // floorFor), and the surface ceiling never pushes the hull into rock.
+    const ground = this.terrain.sampleHeight(this.position.x, this.position.z);
+    const floor = this.floorFor(ground);
+    this.resolveTerrain(floor);
+    // Never breach the surface: the conning tower stops at sea level -- unless
+    // the water is too shallow to float the hull at all, then it sits aground.
+    const ceiling = Math.max(-c.hullRadius, floor);
+    if (this.position.y > ceiling) {
+      this.position.y = ceiling;
       if (v.y > 0) v.y = 0;
     }
-    this.resolveTerrain();
 
     // --- hull integrity -----------------------------------------------------
     this.impactStress *= Math.pow(0.5, dt / Math.max(1e-6, c.hullStressHalfLife));
@@ -333,11 +346,29 @@ export class Submarine {
     return clamp((ratio - w) / Math.max(1e-6, 1 - w), 0, 1);
   }
 
-  /** Push the hull out of the seabed and bleed speed if it hit. */
-  private resolveTerrain(): void {
+  /** 1, or 1/simSpeed when the turn rate is held at the 1x real rate. */
+  private turnScale(): number {
+    if (this.config.simSpeedScalesTurnRate) return 1;
+    return 1 / Math.max(1, this.simSpeed);
+  }
+
+  /**
+   * Lowest hull-centre Y allowed over a seabed at `ground`. Normally
+   * `ground + hullRadius + seabedClearance`; where that would be above the
+   * surface ceiling (-hullRadius), the clearance gives way first, so the boat
+   * stays submerged whenever the hull physically fits (`ground + hullRadius`
+   * <= -hullRadius). Continuous in `ground`, so there is no step to snag on.
+   */
+  floorFor(ground: number): number {
     const c = this.config;
-    const ground = this.terrain.sampleHeight(this.position.x, this.position.z);
-    const floor = ground + c.hullRadius + c.seabedClearance;
+    const full = ground + c.hullRadius + c.seabedClearance;
+    if (full <= -c.hullRadius) return full;
+    return Math.max(ground + c.hullRadius, -c.hullRadius);
+  }
+
+  /** Push the hull out of the seabed and bleed speed if it hit. */
+  private resolveTerrain(floor: number): void {
+    const c = this.config;
     if (this.position.y >= floor) return;
 
     const n = this.terrain.getNormal(this.position.x, this.position.z, this.normal);

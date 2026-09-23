@@ -7,7 +7,8 @@
  *     const model = await new GLTFLoader().loadAsync('/assets/sub.glb');
  *     rig.add(model.scene);
  *
- * Convention: the model faces -Z (north at yaw 0), matching Submarine.getForward.
+ * Convention: the model faces local -Z; {@link SubMesh.setPose} turns it so the
+ * nose follows Submarine.getForward (north at yaw 0, east at yaw +pi/2).
  */
 
 import * as THREE from 'three';
@@ -17,6 +18,41 @@ export interface SubMeshOptions {
   length?: number;
   hullColor?: number;
   accentColor?: number;
+  /**
+   * QA-B #6: below ~300 m the only light is the boat's own, which points
+   * away from the hull, so the model rendered as a pure black cut-out. A
+   * faint view-dependent (fresnel) rim plus a small emissive floor keeps its
+   * outline readable without making it glow. `Config.submarine.hullRim*`.
+   */
+  rimColor?: number;
+  /** 0 disables the rim. */
+  rimStrength?: number;
+  /** Constant emissive floor on every hull material. */
+  emissive?: number;
+}
+
+/**
+ * Add a fresnel rim to a standard material's emissive term. `normal` and
+ * `vViewPosition` are in scope after `normal_fragment_begin`, which runs
+ * before `emissivemap_fragment` in MeshStandardMaterial's fragment shader.
+ */
+function addRim(mat: THREE.MeshStandardMaterial, color: number, strength: number): void {
+  if (strength <= 0) return;
+  const rim = new THREE.Color(color).multiplyScalar(strength);
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.uRimColor = { value: rim };
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nuniform vec3 uRimColor;')
+      .replace(
+        '#include <emissivemap_fragment>',
+        [
+          '#include <emissivemap_fragment>',
+          'float subRim = 1.0 - saturate( dot( normal, normalize( vViewPosition ) ) );',
+          'totalEmissiveRadiance += uRimColor * ( subRim * subRim * subRim );',
+        ].join('\n'),
+      );
+  };
+  mat.customProgramCacheKey = () => 'sub-hull-rim';
 }
 
 export class SubMesh {
@@ -28,16 +64,23 @@ export class SubMesh {
   constructor(options: SubMeshOptions = {}) {
     const length = options.length ?? 24;
     const radius = length * 0.09;
+    const emissive = options.emissive ?? 0x0b1318;
     const hullMat = new THREE.MeshStandardMaterial({
       color: options.hullColor ?? 0x3a4550,
       roughness: 0.55,
       metalness: 0.65,
+      emissive,
     });
     const accentMat = new THREE.MeshStandardMaterial({
       color: options.accentColor ?? 0xd8b43c,
       roughness: 0.5,
       metalness: 0.3,
+      emissive,
     });
+    const rimColor = options.rimColor ?? 0x6f93a3;
+    const rimStrength = options.rimStrength ?? 0.55;
+    addRim(hullMat, rimColor, rimStrength);
+    addRim(accentMat, rimColor, rimStrength);
     this.materials.push(hullMat, accentMat);
 
     // Hull: a capsule lying along Z (capsules are built along Y, so rotate).
@@ -101,6 +144,18 @@ export class SubMesh {
     this.group.add(this.propeller);
 
     this.group.name = 'submarine';
+  }
+
+  /**
+   * Place the model from the physics pose. `yaw` is the physics compass angle
+   * (+yaw = toward east, Submarine.getForward), so the Three.js Y rotation is
+   * `-yaw`; pitch and the cosmetic roll are applied in the hull's own frame
+   * (Euler order YXZ), and a negative roll (starboard turn) dips the
+   * starboard side, i.e. the hull leans into the turn.
+   */
+  setPose(position: THREE.Vector3, yaw: number, pitch: number, roll: number): void {
+    this.group.position.copy(position);
+    this.group.rotation.set(pitch, -yaw, roll, 'YXZ');
   }
 
   /** Spin the propeller. `throttle` is -1..1, `dt` seconds. */
