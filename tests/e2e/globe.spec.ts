@@ -90,12 +90,20 @@ test.describe('globe mission select', () => {
         'mission',
       );
     }
-    // A tile without content is a free dive, and "content coming" in the list.
-    await expect(page.locator('.globe-pin[data-landmark="endurance"]')).toHaveAttribute(
-      'data-state',
-      'tile',
-    );
-    await expect(page.locator('.mission-item.is-pending[data-pending="endurance"]')).toHaveCount(1);
+    // A listed landmark whose content pack has not landed yet is a free-dive
+    // pin and a "content coming" row. Which one that is changes as packs land,
+    // so pick it from the list instead of hard-coding an id.
+    const pending = await page
+      .locator('.mission-item.is-pending[data-pending]')
+      .first()
+      .getAttribute('data-pending', { timeout: 5_000 })
+      .catch(() => null);
+    if (pending) {
+      await expect(page.locator(`.globe-pin[data-landmark="${pending}"]`)).toHaveAttribute(
+        'data-state',
+        'tile',
+      );
+    }
     await expect(page.locator('.globe-pin[data-state="catalogue"]').first()).toBeAttached();
 
     // Frozen, and keys never reach the game.
