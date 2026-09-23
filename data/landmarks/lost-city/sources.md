@@ -47,15 +47,13 @@ coordinate (kind `geology`, `reconstruction: false`, since the terrain there is 
 mission briefing both explain the gap. All vent-related POIs/props use the corrected, terrain-matched location
 instead, about 665 m away.
 
-## Chimney colour (engine limitation, task-flagged)
+## Chimney colour
 
-Per `docs/props.md`, `procedural:chimney` is deterministically basalt-grey (`#3B3A3D`) with no colour/material
-option. Lost City's chimneys are pale carbonate, not basalt — closer to white/light-grey — because they form by
-mineral precipitation from alkaline fluid rather than the dark metal-sulfide deposits of a black smoker. This is
-called out in `mission.json` hazards, in the `overview` and `poseidon` guide entries, and here: **the engine needs
-a colour or `material_hint` option on `procedural:chimney` (or a dedicated `procedural:carbonate-chimney` variant)
-to render Lost City accurately.** Until then, every chimney in this mission should be read as "actually pale
-white/grey" despite rendering basalt-grey.
+Lost City's chimneys are pale carbonate (calcite/aragonite and brucite), not basalt: closer to white/light grey,
+because they form by mineral precipitation from alkaline fluid rather than the dark metal-sulfide deposits of a
+black smoker. Every chimney in `props.json` sets `"material_hint": "carbonate"` (see `docs/props.md`), which
+renders a cream-grey body with whiter tips instead of the default basalt grey. The exact shade is an art choice,
+not a measured colour.
 
 ## OBIS species data
 
@@ -95,6 +93,5 @@ rating, so `mission.json` uses `hull_class: "B"` (crush depth 4,500 m). All vent
   corrected patch are this session's estimates.
 - InterRidge's vents-data site (an independent source used for other vent fields in `data/landmarks.json`) could
   not be reached (expired TLS certificate); a retry later might add a second citation for the coordinate.
-- `procedural:chimney`'s basalt-only colour is a known engine gap, flagged above and in `docs/props.md`'s "Adding
-  a GLB" section is unaffected — no GLB work was needed here, both because no CC0 pale-mineral-tower model was
-  sought and because the schema already supports procedural chimneys.
+- Chimney colour is now handled by `material_hint: "carbonate"` (see above). No GLB work was needed: no CC0
+  pale-mineral-tower model was sought, and the schema already supports procedural chimneys.

@@ -67,6 +67,30 @@ describe('PropLoader validation', () => {
     expect(warnings.join(' ')).toContain('only applies to procedural:hull-block');
   });
 
+  it('parses chimney "material_hint"; absent is null (basalt), unknown is an error', () => {
+    const chim = { model: 'procedural:chimney', snap_to_seabed: true };
+    expect(def(chim).materialHint).toBeNull();
+    for (const m of ['basalt', 'carbonate', 'sulfide']) {
+      const w: string[] = [];
+      const d = validatePropEntry({ ...base, ...chim, material_hint: m }, cfg, w);
+      expect((d as PropDef).materialHint).toBe(m);
+      expect(w.join(' ')).not.toContain('material_hint');
+    }
+    for (const bad of ['granite', 'Carbonate', '', 3, null, ['carbonate']]) {
+      const res = validatePropEntry({ ...base, ...chim, material_hint: bad }, cfg);
+      expect(typeof res).toBe('string');
+      expect(res as string).toContain('"material_hint"');
+    }
+    const warnings: string[] = [];
+    const hull = validatePropEntry(
+      { ...base, snap_to_seabed: true, material_hint: 'sulfide' },
+      cfg,
+      warnings,
+    );
+    expect((hull as PropDef).materialHint).toBeNull();
+    expect(warnings.join(' ')).toContain('only applies to procedural:chimney');
+  });
+
   it('recognises model kinds', () => {
     expect(parseModel('procedural:debris')).toBe('debris');
     expect(parseModel('procedural:chimney')).toBe('chimney');
@@ -239,6 +263,27 @@ describe('Props.placeAll', () => {
     expect(props.problems).toHaveLength(2);
     expect(props.debugString()).toMatch(/props 3/);
     warn.mockRestore();
+  });
+
+  it('passes a chimney material_hint through to the built palette', async () => {
+    const props = new Props(meta, slope, cfg);
+    const chim = { ...base, model: 'procedural:chimney', depth_m: 3790, dimensions_m: [0, 0, 20] };
+    await props.placeAll(
+      {
+        props: [
+          { ...chim, id: 'plain' },
+          { ...chim, id: 'white', material_hint: 'carbonate' },
+        ],
+      },
+      't',
+    );
+    const imp = (id: string): number =>
+      (
+        (props.placed.find((p) => p.def.id === id)!.impostor as THREE.Mesh)
+          .material as THREE.MeshStandardMaterial
+      ).color.getHex();
+    expect(imp('plain')).toBe(cfg.colors.basalt);
+    expect(imp('white')).toBe(cfg.chimneyMaterials.carbonate.rock);
   });
 
   it('treats a missing file as no props and never throws', async () => {

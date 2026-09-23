@@ -238,7 +238,7 @@ export class Props {
       case 'hull-block':
         return buildHullBlock(dims, seed, this.cfg, def.hullEnds ?? this.cfg.hullDefaultEnds);
       case 'chimney':
-        return buildChimney(dims, seed, this.cfg);
+        return buildChimney(dims, seed, this.cfg, def.materialHint ?? 'basalt');
       case 'debris':
         return buildDebris(dims[0], seed, this.cfg, this.debrisHeightFn(def));
       case null: {

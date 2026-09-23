@@ -15,6 +15,7 @@
 import type * as THREE from 'three';
 import { publicUrl } from '../util/publicUrl.js';
 import type {
+  ChimneyMaterial,
   HullEnd,
   PropCollisionKind,
   ProceduralPropKind,
@@ -25,6 +26,8 @@ export const PROCEDURAL_PREFIX = 'procedural:';
 export const PROCEDURAL_KINDS: readonly ProceduralPropKind[] = ['hull-block', 'debris', 'chimney'];
 /** Allowed values in a hull-block's `ends: [forward, aft]`. */
 export const HULL_ENDS: readonly HullEnd[] = ['prow', 'cut', 'rounded'];
+/** Allowed values of `material_hint` (procedural:chimney rock type). */
+export const CHIMNEY_MATERIALS: readonly ChimneyMaterial[] = ['basalt', 'carbonate', 'sulfide'];
 /** GLB/glTF models must live here (served from `public/assets/models`). */
 export const MODEL_URL_PREFIX = '/assets/models/';
 export const DRACO_DECODER_PATH = publicUrl('/assets/decoders/draco/');
@@ -49,6 +52,8 @@ export interface PropDef {
   dimensionsM: [number, number, number] | null;
   /** hull-block only: [forward (-Z) end, aft (+Z) end] shapes; null for other kinds. */
   hullEnds: [HullEnd, HullEnd] | null;
+  /** chimney only: rock palette from `material_hint`; null (= basalt) when absent or another kind. */
+  materialHint: ChimneyMaterial | null;
   lodDistanceM: number;
   collision: PropCollisionKind;
   /** Tilt the prop to the terrain normal (only meaningful when snapping). */
@@ -199,6 +204,16 @@ export function validatePropEntry(
   }
   if (procedural === 'hull-block' && !hullEnds) hullEnds = [...config.hullDefaultEnds];
 
+  let materialHint: ChimneyMaterial | null = null;
+  if (entry.material_hint !== undefined) {
+    const m = entry.material_hint;
+    if (!CHIMNEY_MATERIALS.includes(m as ChimneyMaterial)) {
+      return `${where}: "material_hint" must be one of ${CHIMNEY_MATERIALS.join(' | ')}`;
+    }
+    if (procedural === 'chimney') materialHint = m as ChimneyMaterial;
+    else warnings.push(`${where}: "material_hint" only applies to procedural:chimney; ignored`);
+  }
+
   let lodDistanceM = config.defaultLodDistanceM;
   if (entry.lod_distance_m !== undefined) {
     if (!isNum(entry.lod_distance_m) || entry.lod_distance_m <= 0) {
@@ -231,6 +246,7 @@ export function validatePropEntry(
     scale,
     dimensionsM,
     hullEnds,
+    materialHint,
     lodDistanceM,
     collision,
     alignToSlope: alignToSlope && snap,

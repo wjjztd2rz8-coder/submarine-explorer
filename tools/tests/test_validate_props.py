@@ -81,6 +81,30 @@ class HullEndsTests(unittest.TestCase):
         self.assertTrue(any("only applies to procedural:hull-block" in m for m in w))
 
 
+class MaterialHintTests(unittest.TestCase):
+    CHIMNEY = {"model": "procedural:chimney", "dimensions_m": [0, 0, 20]}
+
+    def test_valid_hints_and_absent(self):
+        for m in ("basalt", "carbonate", "sulfide"):
+            w = []
+            self.assertIsNone(vp.validate_entry(entry(material_hint=m, **self.CHIMNEY), w))
+            self.assertEqual(w, [])
+        self.assertIsNone(vp.validate_entry(entry(**self.CHIMNEY), []))
+
+    def test_unknown_hint_is_error(self):
+        for bad in ("granite", "Carbonate", "", 1, None, ["carbonate"]):
+            err = vp.validate_entry(entry(material_hint=bad, **self.CHIMNEY), [])
+            self.assertIsNotNone(err)
+            self.assertIn('"material_hint"', err)
+
+    def test_hint_on_other_kinds_warns(self):
+        w = []
+        self.assertIsNone(vp.validate_entry(entry(material_hint="sulfide"), w))
+        self.assertTrue(any("only applies to procedural:chimney" in m for m in w))
+        # An unknown value is still an error on other kinds.
+        self.assertIsNotNone(vp.validate_entry(entry(material_hint="granite"), []))
+
+
 class ValidateDocTests(unittest.TestCase):
     def test_counts_duplicates_and_bbox(self):
         doc = {"version": 1, "landmark": "t", "props": [

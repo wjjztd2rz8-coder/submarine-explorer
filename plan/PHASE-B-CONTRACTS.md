@@ -172,6 +172,9 @@ get a row in `ATTRIBUTION.md`; otherwise omit `image`.
 - (B4 addition) Optional `y_offset_m` (number, added to the resolved Y) and
   `align_to_slope` (bool, tilt a snapped prop to the terrain normal). A negative
   `depth_m` is an error (entry skipped), not flipped. Full rules: `docs/props.md`.
+- (Props addition, post-C) Optional `material_hint`: `basalt | carbonate | sulfide`,
+  the `procedural:chimney` rock palette (absent = `basalt`, the original look).
+  An unknown value is an error; on other kinds it is ignored with a warning.
 
 ### 2.4 `mission.json` (B3 defines loader; B2 authors)
 

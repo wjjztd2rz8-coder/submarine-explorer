@@ -4,7 +4,8 @@
  *   procedural:hull-block  a hull section, dimensions_m = [length, width, height],
  *                          length along the prop's local -Z (its heading)
  *   procedural:debris      20-60 small plates/pipes scattered within dimensions_m[0] m
- *   procedural:chimney     a knobbly tapered basalt column, height dimensions_m[2]
+ *   procedural:chimney     a knobbly tapered rock column, height dimensions_m[2];
+ *                          palette from material_hint (basalt | carbonate | sulfide)
  *
  * Every builder is deterministic from its seed (hash of the prop id), so a prop
  * looks the same on every load and in every test. Local frame: base at y = 0,
@@ -20,7 +21,7 @@
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import type { HullEnd, PropsConfig } from '../../core/Config.js';
+import type { ChimneyMaterial, HullEnd, PropsConfig } from '../../core/Config.js';
 
 export interface BuiltProp {
   /** Full-detail object. */
@@ -856,16 +857,30 @@ export function buildDebris(
 
 // ------------------------------------------------------------------ chimney
 
+/** Body and top-stain colours for a chimney `material_hint`. */
+export function chimneyPalette(
+  material: ChimneyMaterial,
+  cfg: PropsConfig,
+): { rock: number; stain: number } {
+  return material === 'basalt'
+    ? { rock: cfg.colors.basalt, stain: cfg.colors.mineral }
+    : cfg.chimneyMaterials[material];
+}
+
 /**
- * A hydrothermal chimney: tapered, knobbly basalt column with pale mineral
+ * A hydrothermal chimney: tapered, knobbly rock column with pale mineral
  * staining toward the top and one or two side spires. dims[2] is the height;
- * dims[0], if > 0, the base diameter.
+ * dims[0], if > 0, the base diameter. `material` picks the palette (basalt
+ * grey by default; carbonate white/cream; sulfide near-black); geometry is the
+ * same for all three.
  */
 export function buildChimney(
   dims: readonly [number, number, number],
   seed: number,
   cfg: PropsConfig,
+  material: ChimneyMaterial = 'basalt',
 ): BuiltProp {
+  const palette = chimneyPalette(material, cfg);
   const H = dims[2];
   const baseR = dims[0] > 0 ? dims[0] / 2 : H * cfg.chimneyRadiusFraction;
   const rnd = mulberry32(seed);
@@ -909,10 +924,10 @@ export function buildChimney(
   if (!merged) throw new Error('chimney: geometry merge failed');
   for (const p of pieces) p.dispose();
 
-  // Absolute vertex colours: basalt, mineral staining near the top, a little growth at the foot.
+  // Absolute vertex colours: rock, mineral staining near the top, a little growth at the foot.
   const pos = merged.getAttribute('position');
-  const basalt = new THREE.Color(cfg.colors.basalt);
-  const mineral = new THREE.Color(cfg.colors.mineral);
+  const basalt = new THREE.Color(palette.rock);
+  const mineral = new THREE.Color(palette.stain);
   const growth = new THREE.Color(cfg.colors.growth);
   const col = new Float32Array(pos.count * 3);
   const c = new THREE.Color();
@@ -948,7 +963,7 @@ export function buildChimney(
 
   const imp = new THREE.Mesh(
     new THREE.CylinderGeometry(baseR * cfg.chimneyTopFraction, baseR, H, 6).translate(0, H / 2, 0),
-    new THREE.MeshStandardMaterial({ color: cfg.colors.basalt, roughness: 1, metalness: 0 }),
+    new THREE.MeshStandardMaterial({ color: palette.rock, roughness: 1, metalness: 0 }),
   );
   imp.name = 'chimney-impostor';
   return { full, impostor: imp, bounds: merged.boundingBox!.clone() };

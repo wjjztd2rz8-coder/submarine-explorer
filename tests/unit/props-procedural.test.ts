@@ -5,6 +5,7 @@ import {
   buildChimney,
   buildDebris,
   buildHullBlock,
+  chimneyPalette,
   hashString,
   layoutDebris,
   makeBoxSilhouette,
@@ -282,6 +283,31 @@ describe('procedural:chimney', () => {
     const r = 20 * cfg.chimneyRadiusFraction;
     expect(bounds.getSize(new THREE.Vector3()).x).toBeGreaterThan(r);
     expect(bounds.getSize(new THREE.Vector3()).x).toBeLessThan(r * 2 * 1.3);
+  });
+
+  it('material_hint changes only the palette: carbonate pale, sulfide dark, basalt = default', () => {
+    const colours = (o: THREE.Object3D): Float32Array =>
+      (o as THREE.Mesh).geometry.getAttribute('color').array as Float32Array;
+    const mean = (a: Float32Array): number => a.reduce((s, v) => s + v, 0) / a.length;
+    const dflt = buildChimney([5, 5, 18], 77, cfg);
+    const basalt = buildChimney([5, 5, 18], 77, cfg, 'basalt');
+    const carb = buildChimney([5, 5, 18], 77, cfg, 'carbonate');
+    const sulf = buildChimney([5, 5, 18], 77, cfg, 'sulfide');
+    // Absence of a hint is exactly today's basalt chimney.
+    expect(colours(basalt.full)).toEqual(colours(dflt.full));
+    expect(positions(carb.full)).toEqual(positions(dflt.full));
+    expect(positions(sulf.full)).toEqual(positions(dflt.full));
+    expect(mean(colours(carb.full))).toBeGreaterThan(mean(colours(dflt.full)) * 2);
+    expect(mean(colours(sulf.full))).toBeLessThan(mean(colours(dflt.full)));
+    expect(chimneyPalette('basalt', cfg)).toEqual({
+      rock: cfg.colors.basalt,
+      stain: cfg.colors.mineral,
+    });
+    const impHex = (b: typeof dflt): number =>
+      ((b.impostor as THREE.Mesh).material as THREE.MeshStandardMaterial).color.getHex();
+    expect(impHex(dflt)).toBe(cfg.colors.basalt);
+    expect(impHex(carb)).toBe(cfg.chimneyMaterials.carbonate.rock);
+    expect(impHex(sulf)).toBe(cfg.chimneyMaterials.sulfide.rock);
   });
 
   it('is deterministic', () => {

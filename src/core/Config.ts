@@ -503,6 +503,12 @@ export type PropCollisionKind = 'none' | 'sphere' | 'box';
 export type ProceduralPropKind = 'hull-block' | 'debris' | 'chimney';
 /** Shape of one end of a procedural:hull-block (docs/props.md). */
 export type HullEnd = 'prow' | 'cut' | 'rounded';
+/**
+ * procedural:chimney rock type from props.json `material_hint` (docs/props.md):
+ * `basalt` (default, today's grey), `carbonate` (white/cream brucite-calcite,
+ * Lost City), `sulfide` (dark metal-sulphide black smokers).
+ */
+export type ChimneyMaterial = 'basalt' | 'carbonate' | 'sulfide';
 
 export interface PropsConfig {
   /** Camera distance (m) inside which a prop draws its full mesh, unless the entry sets `lod_distance_m`. */
@@ -578,6 +584,12 @@ export interface PropsConfig {
     mineral: number;
     sediment: number;
   };
+  /**
+   * procedural:chimney palettes for non-default `material_hint`s: `rock` is the
+   * body albedo, `stain` the precipitate toward the top. `basalt` uses
+   * `colors.basalt` / `colors.mineral`.
+   */
+  chimneyMaterials: Record<Exclude<ChimneyMaterial, 'basalt'>, { rock: number; stain: number }>;
   /** `?debugProps=1` placement tool steps. */
   debugNudgeM: number;
   debugNudgeFastM: number;
@@ -1322,6 +1334,10 @@ export const DEFAULT_CONFIG: GameConfig = {
       basalt: 0x3b3a3d, // vent chimney rock
       mineral: 0xc9a27a, // pale orange/white vent precipitate
       sediment: 0x4a4038, // silt darkening at the foot of vertical surfaces
+    },
+    chimneyMaterials: {
+      carbonate: { rock: 0xa9a393, stain: 0xd6d1c4 }, // Lost City: cream-grey calcite, fresh white brucite tips
+      sulfide: { rock: 0x24201e, stain: 0x7a4e2c }, // black smoker sulphide, rusty Fe-oxide staining
     },
     debugNudgeM: 1,
     debugNudgeFastM: 10,

@@ -30,6 +30,7 @@ PROCEDURAL_KINDS = ("hull-block", "debris", "chimney")
 MODEL_URL_PREFIX = "/assets/models/"
 COLLISIONS = ("none", "sphere", "box")
 HULL_ENDS = ("prow", "cut", "rounded")  # hull-block "ends": [forward, aft]
+CHIMNEY_MATERIALS = ("basalt", "carbonate", "sulfide")  # chimney "material_hint"
 DEFAULT_MAX_PROPS = 400  # Config.props.maxProps
 DEFAULT_MAX_MODEL_MB = 2.0
 
@@ -127,6 +128,13 @@ def validate_entry(entry, warnings):
             return '%s: "ends" must be [forward, aft], each one of %s' % (where, " | ".join(HULL_ENDS))
         if kind != "hull-block":
             warnings.append('%s: "ends" only applies to procedural:hull-block; ignored' % where)
+
+    if "material_hint" in entry:
+        m = entry["material_hint"]
+        if not (isinstance(m, str) and m in CHIMNEY_MATERIALS):
+            return '%s: "material_hint" must be one of %s' % (where, " | ".join(CHIMNEY_MATERIALS))
+        if kind != "chimney":
+            warnings.append('%s: "material_hint" only applies to procedural:chimney; ignored' % where)
 
     if "lod_distance_m" in entry:
         v = entry["lod_distance_m"]
