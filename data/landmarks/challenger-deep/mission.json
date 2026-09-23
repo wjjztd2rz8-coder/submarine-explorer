@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "landmark": "challenger-deep",
+  "tile": "challenger-deep",
+  "title": "Challenger Deep: full ocean depth",
+  "hull_class": "C",
+  "environment": {
+    "preset": "trench"
+  },
+  "species_file": "species.json",
+  "spawn": {
+    "lat": 11.373,
+    "lon": 142.594,
+    "depth_m": 6000,
+    "heading_deg": 140
+  },
+  "briefing": {
+    "summary": "Descend into the Eastern Pool of the Challenger Deep, the deepest known point in Earth's oceans, and scan the real seabed at the deepest sounded cell in this survey. Then visit the site of the 2014 benthic lander \"Leggo\", which recorded hadal amphipods feeding at full ocean depth. This dive starts at 6,000 m rather than the surface: at this submarine's ~5.37 m/s vertical terminal speed, a surface-to-floor descent here would take roughly half an hour even at maximum sim speed, so the first ~6 km are skipped to keep the dive to a reasonable length. The remaining ~4.9 km still takes about 5 minutes of vertical descent at 3x sim speed.",
+    "depth_m": 10931,
+    "facts": [
+      "The Challenger Deep's Eastern Pool is the deepest known point in Earth's oceans; the deepest cell surveyed in this tile is 10,930.9 m.",
+      "This hull is Class C, rated to 11,000 m -- only about 70 m of margin below the deepest terrain in this mission. Expect hull-stress warnings on the way down; that tight margin is real, not a bug.",
+      "First crewed descent: Trieste, 23 January 1960 (Jacques Piccard, Don Walsh). Most recent well-instrumented survey used here: the Five Deeps Expedition's DSV Limiting Factor, 2019.",
+      "Nothing lives here that you can see with the naked eye except hadal amphipods (Hirondellea gigas) at bait -- no fish have been confirmed this deep."
+    ],
+    "hazards": [
+      "Crush depth: this hull fails at 11,000 m. The deepest terrain in this mission (10,930.9 m) is inside the crush-warning band, which starts at 9,900 m (90% of crush depth) -- treat every metre below that as the real margin it is.",
+      "Total darkness below a few hundred metres; only your lights work.",
+      "Long vertical transit even from the shortened 6,000 m spawn: budget several minutes of descent before reaching the objectives.",
+      "Extreme, uniform pressure (about 1,086 bar at the bottom) and near-freezing water (1-4 degC)."
+    ]
+  },
+  "objectives": [
+    {
+      "id": "eastern-pool",
+      "type": "scan",
+      "poi": "cd-eastern-pool-deepest",
+      "primary": true,
+      "title": "Scan the deepest surveyed point in the Eastern Pool"
+    },
+    {
+      "id": "leggo-site",
+      "type": "scan",
+      "poi": "cd-leggo-amphipod-site",
+      "primary": true,
+      "title": "Scan the Leggo lander's amphipod bait site"
+    },
+    {
+      "id": "published-coordinate",
+      "type": "scan",
+      "poi": "cd-published-coordinate",
+      "primary": false,
+      "title": "Check the long-published catalog coordinate"
+    },
+    {
+      "id": "north-wall",
+      "type": "scan",
+      "poi": "cd-north-wall",
+      "primary": false,
+      "title": "Survey the steep north inner wall"
+    },
+    {
+      "id": "central-basin",
+      "type": "scan",
+      "poi": "cd-central-basin",
+      "primary": false,
+      "title": "Cross to the Central Pool, the trench's second basin"
+    },
+    {
+      "id": "axis-sill",
+      "type": "scan",
+      "poi": "cd-axis-sill",
+      "primary": false,
+      "title": "Find the sill separating the Central and Eastern Pools"
+    }
+  ],
+  "completion": "all_primary",
+  "notable_species": [
+    "Hirondellea gigas (hadal amphipod)",
+    "Xenophyophores (giant single-celled foraminifera, Monothalamea)"
+  ]
+}
