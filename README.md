@@ -31,7 +31,9 @@ file sizes, multibeam coverage and caveats: [`docs/tiles-inventory.md`](docs/til
 
 Cells are ~40–60 m (22 m E-W on `endurance`). `great-blue-hole` and
 `hunga-tonga-caldera` do not show the feature they are named for; see the
-inventory. One site, `titanic`, has a full mission (`?mission=titanic`).
+inventory. All 13 landmark sites have a full mission (`data/landmarks/index.json`);
+`demo-synthetic` is a tile-only offline stand-in with no mission. Try
+`?mission=titanic` or open the globe (`N`) to pick any of the 13.
 
 ## Setup
 
@@ -61,17 +63,32 @@ python3 tools/make_synthetic_tile.py --id demo-synthetic --cols 384 --rows 384
 
 ## Commands
 
-| Command                           | What it does                                                           |
-| --------------------------------- | ---------------------------------------------------------------------- |
-| `npm run dev`                     | Vite dev server with HMR on :5173                                      |
-| `npm run build`                   | type-check (`tsc --noEmit`) then production build to `dist/`           |
-| `npm run preview`                 | serve `dist/` on :4173                                                 |
-| `npm test`                        | vitest unit tests (`tests/unit/`)                                      |
-| `npm run test:watch`              | vitest in watch mode                                                   |
-| `npm run test:py`                 | Python unit tests (`tools/tests/`: parser, fetch_all, compress, props) |
-| `npm run test:e2e`                | Playwright suite (`tests/e2e/`); needs a build first                   |
-| `npm run typecheck`               | type-check only                                                        |
-| `npm run format` / `format:check` | prettier over the whole repo (see CONTRIBUTING-AGENTS.md before use)   |
+| Command                           | What it does                                                                                    |
+| --------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `npm run dev`                     | Vite dev server with HMR on :5173                                                               |
+| `npm run build`                   | type-check (`tsc --noEmit`) then production build to `dist/`                                    |
+| `npm run preview`                 | serve `dist/` on :4173                                                                          |
+| `npm test`                        | vitest unit tests (`tests/unit/`)                                                               |
+| `npm run test:watch`              | vitest in watch mode                                                                            |
+| `npm run test:py`                 | Python unit tests (`tools/tests/`: parser, fetch_all, compress, props)                          |
+| `npm run test:e2e`                | Playwright suite (`tests/e2e/`); needs a build first                                            |
+| `npm run typecheck`               | type-check only                                                                                 |
+| `npm run format` / `format:check` | prettier over the whole repo (see CONTRIBUTING-AGENTS.md before use)                            |
+| `npm run check:attribution`       | fails if a `public/assets/`/`public/audio/` file has no `ATTRIBUTION.md` row                    |
+| `npm run check:content`           | strict validation of all 13 mission packs                                                       |
+| `npm run test:e2e:base`           | separate project-base build and browser check at `/submarine-explorer/`                         |
+| `npm run ci`                      | Python/content checks, build, unit/browser tests, project-base test, attribution and formatting |
+
+Content validators (not npm scripts; run directly with `python3`):
+
+| Command                                                 | What it does                                                                                      |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `tools/validate_landmark.py <id>... [--all] [--strict]` | checks a landmark's pois/guide/mission/props/species against the contracts and the tile's terrain |
+| `tools/validate_props.py <props.json> --tile <id>`      | props.json schema, bbox, GLB size, attribution                                                    |
+| `tools/check_attribution.py`                            | every asset under `public/assets/`/`public/audio/` has an `ATTRIBUTION.md` row                    |
+
+`tools/resume.sh [--headless]` restarts an agent orchestration session from
+`plan/RESUME-PROMPT.md` after a usage-limit reset (see `CONTRIBUTING-AGENTS.md`).
 
 e2e environment variables (`playwright.config.ts`, `tests/e2e/smoke.spec.ts`):
 
@@ -108,24 +125,25 @@ and licences ([`LICENSE`](LICENSE), [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md)).
 Defaults from `defaultActions()` in `src/core/Input.ts`. Keys are rebindable
 (`Input.rebind`, saved to `localStorage` key `subexplorer.bindings.v1`).
 
-| Key                  | Action                                 | Gamepad (standard mapping) |
-| -------------------- | -------------------------------------- | -------------------------- |
-| `W` / `S` (or ↑ / ↓) | ahead / astern                         | left stick                 |
-| `A` / `D` (or ← / →) | yaw to port / starboard                | left stick                 |
-| `R` / `F`            | nose up / down                         | right stick                |
-| `Space` / `Shift`    | blow ballast (rise) / flood (dive)     | A / B                      |
-| `X`                  | boost                                  | right trigger              |
-| `C`                  | chase / first-person camera            | Y                          |
-| `P`                  | free-orbit photo mode                  | Start                      |
-| `M`                  | sonar minimap                          | Back                       |
-| `L`                  | headlights                             | X                          |
-| `Q` (or `Tab`)       | sonar ping (echo delay = 2·range/1500) | left bumper                |
-| `G` (hold)           | scan the POI you are facing            | right bumper               |
-| `T`                  | sim speed 1× / 2× / 3×                 | D-pad up                   |
-| `J`                  | field guide                            | —                          |
-| `N`                  | globe dive-site picker                 | —                          |
-| `Enter`              | begin dive (mission briefing)          | —                          |
-| `Esc`                | close field guide, then debrief        | —                          |
+| Key                  | Action                                         | Gamepad (standard mapping) |
+| -------------------- | ---------------------------------------------- | -------------------------- |
+| `W` / `S` (or ↑ / ↓) | ahead / astern                                 | left stick                 |
+| `A` / `D` (or ← / →) | yaw to port / starboard                        | left stick                 |
+| `R` / `F`            | nose up / down                                 | right stick                |
+| `Space` / `Shift`    | blow ballast (rise) / flood (dive)             | A / B                      |
+| `X`                  | boost                                          | right trigger              |
+| `C`                  | chase / first-person camera                    | Y                          |
+| `P`                  | free-orbit photo mode                          | Start                      |
+| `M`                  | sonar minimap                                  | Back                       |
+| `L`                  | headlights                                     | X                          |
+| `Q` (or `Tab`)       | sonar ping (echo delay = 2·range/1500)         | left bumper                |
+| `G` (hold)           | scan the POI you are facing                    | right bumper               |
+| `T`                  | sim speed 1× / 2× / 3×                         | D-pad up                   |
+| `J`                  | field guide (species tab included)             | —                          |
+| `N`                  | globe dive-site picker                         | —                          |
+| `O`                  | settings (graphics, captions, bindings, reset) | —                          |
+| `Enter`              | begin dive (mission briefing)                  | —                          |
+| `Esc`                | close field guide, then debrief                | —                          |
 
 A gamepad takes over automatically whenever a stick or button is deflected.
 Gamepad buttons are not rebindable yet.

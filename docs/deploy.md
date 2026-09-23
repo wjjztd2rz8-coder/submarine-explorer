@@ -16,23 +16,31 @@ push to the same branch or PR cancels the older run (`concurrency`). One job on
 | ------------------------------------------------------------------------------- | --------------------------------------------- |
 | Install                                                                         | `npm ci` (Node 22, npm cache)                 |
 | Python pipeline tests                                                           | `python3 -m unittest discover -s tools/tests` |
+| Mission content (strict)                                                        | `npm run check:content`                       |
 | Typecheck and build                                                             | `npm run build`                               |
 | Unit tests                                                                      | `npm test`                                    |
 | Browser                                                                         | `npx playwright install --with-deps chromium` |
 | End-to-end                                                                      | `npm run test:e2e -- --reporter=list,html`    |
+| Project-base build and browser test                                             | `npm run test:e2e:base`                       |
 | Attribution                                                                     | `python3 tools/check_attribution.py`          |
 | Formatting                                                                      | `npx prettier --check .`                      |
 | On failure: upload `tests/e2e/screenshots`, `playwright-report`, `test-results` | `actions/upload-artifact` (14 days)           |
 
 GitHub runners have no GPU, so Chromium renders WebGL on SwiftShader. The GPU
 flags in `playwright.config.ts` are harmless there. The suite runs with one
-worker; locally it takes about 2–3 minutes, and CI can take several times
+worker; the all-mission scan suite adds to the original 2–3 minute run, and CI can take several times
 longer. The tiles are committed, so e2e needs no network access.
 
 To reproduce CI locally, run `npm run ci`, which runs the same checks in order
 after `npm ci`. When other people or agents share the checkout, use the isolated
 form from `CONTRIBUTING-AGENTS.md` (`--outDir dist-<you>`,
 `PW_PORT`/`PW_OUTDIR`) instead.
+
+`check:content` fails on unreviewed warnings as well as errors. An explicit
+pressure-band review is checked against the mission and hull configuration;
+it is printed as a reviewed note. `test:e2e:base` builds into
+`dist-project-base/` and checks `/submarine-explorer/` on port 4211, with
+artifacts in `test-results-project-base/` (also uploaded on CI failure).
 
 ## 2. Enabling GitHub Pages (owner, once)
 

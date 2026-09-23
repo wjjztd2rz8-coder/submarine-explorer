@@ -1,3 +1,12 @@
+Current owner direction (2026-09-23): finish Phase C close-out and prepare
+Phase D briefs. The owner has not playtested Phase C; do not start Phase D
+code. Read the current `plan/STATUS.md` first; older session checklists below
+are historical context where they conflict with completed work.
+
+OpenAI mapping: GPT-6 Astra replaces Fable; GPT-6 Sol replaces both Opus and
+Sonnet. Use Sol subagents with orchestrator review, at most two at once.
+Original Claude instructions are retained below for Claude sessions.
+
 Resume Submarine Explorer orchestration (repo /home/vijay/submarine-explorer). Headless run; the owner is away.
 
 1. Read plan/STATUS.md (top sections), plan/QA-C.md, plan/progress/*.md and your memory notes (budget: $20 plan; 1–2 agents at a time; Sonnet for content/QA/docs, Opus for engine; commit a green checkpoint before the window ends).

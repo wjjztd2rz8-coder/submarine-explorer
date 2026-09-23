@@ -29,8 +29,12 @@ state, current and debug statistics. See [presets.md](./presets.md).
 Public data and asset defaults resolve through `util/publicUrl.ts` using
 Vite's deployment base. Explicit loader roots retain their caller-provided
 meaning. See [deploy.md](./deploy.md) for the project-base browser check.
-`core/Save.ts` and `ui/Captions.ts` remain partial C5 work: the settings screen
-and runtime wiring are not yet implemented.
+C5 is now wired end to end: `core/Save.ts` persists `subexplorer.settings.v1`
+(graphics tier, post-fx, terrain detail, default sim speed, reduce-motion,
+captions, sonar palette), `ui/Settings.ts` is the `O` screen that reads and
+writes it, and `ui/Captions.ts` renders the on-screen caption
+line from `AudioSystem`'s `CaptionBus` (sonar ping/echo, scan chimes). See
+[settings.md](./settings.md) and [audio.md](./audio.md).
 
 ```mermaid
 flowchart TD
@@ -71,6 +75,7 @@ flowchart TD
       INPUT["Input\naction map, keyboard / mouse / gamepad"]
       BUS["EventBus\ntyped GameEvents"]
       CFG["Config\nall tuning constants"]
+      SAVE["Save (C5)\nsettings persistence, localStorage v1"]
     end
 
     subgraph world["world/"]
@@ -80,6 +85,7 @@ flowchart TD
       LMK["Landmarks\nmarkers + labels"]
       PROPS["Props + PropLoader\nplacement, LOD/impostor, collide()"]
       PSUB["props/\nProcedural, Collision, Wiring, PlacementDebug"]
+      PRE["presets/ (C3)\nPresetSystem + vent/brine/canyon/reef/\ntrench/wreck/seamount/default"]
     end
 
     subgraph render["render/"]
@@ -97,6 +103,7 @@ flowchart TD
       DISC["Discovery\nwires scan, guide, debrief"]
       MIS["Mission\nmanifest + state machine"]
       MR["MissionRouter\n?mission=, loadout, nav"]
+      SPEC["Species (C4)\nloads species.json for the guide's SPECIES tab"]
     end
 
     subgraph sub["sub/"]
@@ -118,6 +125,9 @@ flowchart TD
       DB["Debrief"]
       BR["Briefing"]
       OP["ObjectivesPanel"]
+      GL["Globe + GlobeModel (C1)\nN / ?globe=1 dive-site picker"]
+      SET["Settings (C5)\nO screen: tier, postFx, captions, bindings"]
+      CAPT["Captions (C5)\nrenders AudioSystem's CaptionBus"]
     end
 
     SHD["shaders/underwater.ts\nfull-screen post pass"]
@@ -143,6 +153,12 @@ flowchart TD
   ATM --> SHD
   GEO --> TER & HUD & LMK & POI & PROPS & MR
   BUS -.-> AUD & DISC & MIS & MR & ATM
+  TER & PACK & DISC --> PRE
+  PRE --> ATM
+  LM --> GL
+  CP --> SPEC --> FG
+  MAIN --> SAVE --> SET
+  AUD --> CAPT
 ```
 
 Solid arrows are construction-time dependencies or per-frame data; dashed
@@ -183,8 +199,11 @@ responses in `.cache/gmrt-raw/`, retries with backoff and falls back to ETOPO.
 8. `Props` loads `props.json` asynchronously → `props:loaded`; `?at=` re-spawns
    the sub; `PropContact` is created; `?debugProps=1` adds `PlacementDebug`.
 9. `MissionSelect` lists tiles and (via `loadMissionSummaries`) missions.
-10. `Input`, then `MissionRouter` (briefing, objectives, completion) if routed.
-11. `AudioSystem` (unlocked by the first pointerdown/keydown), `UnderwaterPass`.
+10. `Input`, settings screen, then `MissionRouter` (briefing, objectives,
+    completion) if routed. Saved tier/detail apply before terrain construction;
+    saved sim speed applies after the mission loadout.
+11. `AudioSystem` (unlocked by the first pointerdown/keydown), captions and
+    live settings subscriptions, `UnderwaterPass`.
 12. `window.__game` is populated and the first frame is requested.
 
 Every content loader treats a missing or malformed file as "none" and never
@@ -196,18 +215,19 @@ throws at boot.
 requestAnimationFrame
   └─ Input.sample()                          normalise keyboard/mouse/gamepad
   └─ Time.tick(now) -> N                     60 Hz steps owed (max 8)
-  └─ MissionRouter.frozen?                   briefing up: N = 0, FROZEN_INPUT
+  └─ briefing/globe/settings frozen?        N = 0, FROZEN_INPUT
   └─ N x Submarine.step(input, 1/60)         each runs simSpeed (1-3) fixed sub-steps
   └─ PropContact.resolve(sub, dt)            push the hull out of prop colliders
   └─ edge actions                            camera, photo mode, sonar, lights, sim speed
   └─ Submarine.getState()                    snapshot; emits sub:collided, sub:crushWarning,
                                              sub:hullStress, sub:emergencyBlow
   └─ SubMesh / CameraRig                     presentation, using the REAL frame delta
-  └─ Atmosphere.update -> Headlights /       depth band (env:depthBand), fog, lights
+  └─ Atmosphere.update -> PresetSystem ->    depth band, preset modifiers, current
+     Headlights /
      MarineSnow / Water.update
   └─ HUD.update / Sonar.update               DOM + 2D canvas
   └─ Discovery.update(N/60, dt, ...)         scan beam, field guide (J), overlays
-  └─ MissionRouter.update(N/60, dt, ...)     objectives panel, nav line, completion
+  └─ MissionRouter.update(clockDt, dt, ...)  objectives panel, nav line, completion
   └─ Props.update(camera)                    per-prop full / impostor / hidden
   └─ AudioSystem.update(frame)               depth low-pass, thruster, beds, ping
   └─ Terrain.update(camera)                  chunk LOD + draw-call accounting
@@ -219,9 +239,10 @@ requestAnimationFrame
 
 Physics is fixed-step so behaviour does not change with frame rate; sim speed
 runs more whole sub-steps inside `Submarine.step` rather than a larger `dt`.
-Scan progress and the mission clock take `N/60` seconds: frame-rate independent,
-zero while the briefing freezes the game, and not multiplied by sim speed. Everything
-visual uses the variable frame delta, and camera smoothing is expressed as a
+Scan progress takes `N/60` seconds. The mission clock uses the unfrozen frame
+delta so fixed-step backlog limits do not slow the displayed dive time.
+Both stop during briefing/globe/settings pauses and are not multiplied by sim
+speed. Everything visual uses the variable frame delta, and camera smoothing is expressed as a
 half-life so it feels identical at 30 and 144 fps.
 
 ## Coordinate conventions
@@ -282,6 +303,7 @@ never repurpose one.
 | `props:loaded`      | `{ landmarkId, count, models, procedural }`            | `main.ts` when `Props.load` resolves           |
 | `game:ready`        | `{ tileId }`                                           | `main.ts`, first presented frame               |
 | `ui:selectTile`     | `{ id }`                                               | declared, not emitted or handled yet           |
+| `settings:changed`  | `{ key, value }`                                       | declared (C5), not emitted or handled yet      |
 
 Current subscribers: `AudioSystem` (`sub:collided`, `sub:hullStress`,
 `sub:emergencyBlow`), `Discovery` (`scan:complete`, `landmarks:loaded`),
@@ -289,18 +311,28 @@ Current subscribers: `AudioSystem` (`sub:collided`, `sub:hullStress`,
 subscribes to `env:depthBand` yet (the audio beds compute their own band
 weights from depth). `AudioSystem` also handles `scan:complete` (chime/tick)
 and `env:trench` (pressure creak, sharing the hull-stress cooldown).
+`ui/Settings.ts` writes through `core/Save.ts` (`save.save()`); `main.ts`
+subscribes to `save.onChange()` directly for live changes (captions,
+reduce-motion, palette and post-FX). Tier/detail/default speed apply on reload.
+Changes do not use `settings:changed` — that event is
+declared for a future decoupled listener but nothing emits it yet, same as
+`ui:selectTile`.
 
 Audio captions use a separate `CaptionBus` (`AudioSystem.captions`), not the
 EventBus; see [`docs/audio.md`](./audio.md).
 
 ## Persistence
 
-| localStorage key             | Owner                    | Shape                                                              |
-| ---------------------------- | ------------------------ | ------------------------------------------------------------------ |
-| `subexplorer.bindings.v1`    | `core/Input.ts`          | versioned key bindings                                             |
-| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }` |
+| localStorage key             | Owner                    | Shape                                                                                                         |
+| ---------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `subexplorer.bindings.v1`    | `core/Input.ts`          | versioned key bindings                                                                                        |
+| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }`                                            |
+| `subexplorer.settings.v1`    | `core/Save.ts`           | `{ version: 1, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette }` |
 
-Both are versioned, guarded (no storage → in-memory), and never throw.
+All three are versioned, guarded (no storage → in-memory), and never throw.
+`Save` also points at the other two keys by name (`SAVE_KEYS`) so a future
+"reset everything" screen can find them without importing `Input` or
+`DiscoveryStore`.
 
 ## Performance budget
 
@@ -322,13 +354,15 @@ owner's Mac) and a "high" tier for a discrete-GPU Linux desktop, selected with
 | Post-process     | single full-screen pass into one `WebGLRenderTarget`; skipped on the low tier                                                                                                                                        | 1 extra full-screen fill                                                                            |
 
 Chunk counts follow from `ceil((cols-1)/64) × ceil((rows-1)/64)` and do not
-depend on the tier. Resident vertices do: the largest tile
-(`blake-plateau-corals`, 1202×1201) is roughly 6M vertices at medium and 13M at
-high, above the master plan's 4M budget. No fps figure has been recorded for
-the medium tier yet (plan/QA-A.md #4).
+depend on the tier. `fitSubdivToBudget` lowers requested terrain subdivision
+to fit the `Config.terrain.maxVertices` surface-vertex estimate, with a minimum
+subdivision of one. Blake Plateau (1202×1201) therefore uses subdivision one
+instead of the roughly 6M/13M vertices requested by medium/high. Chunk borders
+and skirts add overhead, so this is not an exact resident-vertex ceiling.
+The owner's medium-tier 1080p/60 fps target remains unmeasured.
 
 Not implemented: streaming chunks from a Web Worker, neighbouring-tile
-streaming (Tier 4), and a draw-call or vertex cap enforced from Config.
+streaming (Tier 4), and a hard draw-call cap.
 
 ## Extension points
 

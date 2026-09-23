@@ -25,6 +25,20 @@ Code: `src/ui/Settings.ts` (screen), `src/core/Save.ts` (persistence),
 | Sonar map colours | immediately        | `Sonar.setPalette`: sonar green, colour-blind safe blue-yellow, high contrast. |
 
 **Reset settings** restores the defaults and removes the stored copy.
+When graphics tier, terrain detail, or default sim speed differs from its boot
+value, **Apply and reload** appears. It reloads the current URL, preserving the
+mission and query parameters. A `?tier=` URL override remains in force; changing
+the saved tier alone cannot replace it. If settings storage is protected or
+fails to save, the screen reports that reload may restore previous values and
+does not offer Apply and reload.
+
+**Reset discoveries** opens an in-dialog confirmation. Confirming clears the
+discovery and scan-history key, then reloads the current dive so the guide,
+scanner and objectives reflect an empty record. Settings and key bindings are
+preserved. A discovery record from a newer app version is protected, and a
+storage removal that fails or cannot be verified is reported without claiming
+progress was erased. If storage is absent, the current session can be reset,
+but progress cannot be persisted in that browser.
 
 ## Key bindings
 
@@ -54,7 +68,7 @@ and bindings then last for the session only.
 
 - Dialog: `role="dialog"`, `aria-modal`, labelled by its heading; every
   control has a `<label>`; notes are linked with `aria-describedby`; rebind
-  results are announced through a `role="status"` live region.
+  results and reset outcomes are announced through a `role="status"` live region.
 - Focus moves into the dialog on open and returns to the opener on close.
 - Captions are an `aria-live="polite"` region, so screen readers read them.
 - The colour-blind and high-contrast sonar palettes carry depth by luminance
