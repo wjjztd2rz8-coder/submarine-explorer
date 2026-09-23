@@ -16,7 +16,9 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "check:attribution": "python3 tools/check_attribution.py",
+    "ci": "npm run test:py && npm run build && npm test && npm run test:e2e && npm run check:attribution && npm run format:check"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +28,7 @@
     "three": "^0.186.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
     "@types/three": "^0.186.0",
     "prettier": "^3.9.7",

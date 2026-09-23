@@ -1,0 +1,74 @@
+# Continuous integration: Python pipeline tests, typecheck + build, unit tests,
+# Playwright e2e (Chromium on SwiftShader), attribution and formatting checks.
+# See docs/deploy.md. Every step can be reproduced locally with `npm run ci`.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# A newer push to the same branch or PR cancels the run it supersedes.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: build and test
+    runs-on: ubuntu-latest
+    # Runners have no GPU, so Chromium renders WebGL on SwiftShader (a few fps).
+    # The e2e suite is single-worker by design (playwright.config.ts); give it room.
+    timeout-minutes: 60
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Python pipeline tests (stdlib unittest)
+        run: python3 -m unittest discover -s tools/tests
+
+      - name: Typecheck and build
+        run: npm run build
+
+      - name: Unit tests (vitest)
+        run: npm test
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests (Playwright)
+        # Tiles are committed under data/tiles/, so the e2e suite needs no network.
+        run: npm run test:e2e -- --reporter=list,html
+
+      - name: Attribution check
+        run: python3 tools/check_attribution.py
+
+      - name: Prettier
+        run: npx prettier --check .
+
+      - name: Upload e2e screenshots and report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artifacts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            tests/e2e/screenshots
+            playwright-report
+            test-results
+          if-no-files-found: ignore
+          retention-days: 14

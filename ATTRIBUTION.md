@@ -38,6 +38,7 @@ Freesound CC0 uploads with an authenticated download).
 - "Black Smoker Vent" — NOAA Ocean Exploration, 2016 Deepwater Exploration of the Marianas, https://oceanexplorer.noaa.gov/wp-content/uploads/2025/08/1605vent-hires.jpg — Public domain, credit requested. Used in `docs/img/moodboard/black-smoker-vent.jpg`.
 - "Hydrothermal Vent Chimney" — NOAA Ocean Exploration, Okeanos Explorer EX1605, https://archive.oceanexplorer.noaa.gov/okeanos/explorations/ex1605/dailyupdates/media/may2-hires.jpg — Public domain, credit requested. Used in `docs/img/moodboard/vent-chimney.jpg`.
 - "ROV Control Room" — NOAA Ocean Exploration, Escanaba Trough expedition, https://oceanexplorer.noaa.gov/wp-content/uploads/2022/06/control-room-hires.jpg — Public domain, credit requested. Used in `docs/img/moodboard/rov-control-room.jpg`.
+- "Blue Marble Next Generation w/ Topography and Bathymetry" (December 2004) — NASA Earth Observatory / Reto Stöckli, NASA Goddard Space Flight Center, https://visibleearth.nasa.gov/images/73909/december-blue-marble-next-generation-w-topography-and-bathymetry (file: https://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73909/world.topo.bathy.200412.3x5400x2700.jpg) — Public domain (NASA imagery is generally not subject to US copyright; NASA requests acknowledgement as the source). Used as `public/assets/globe/earth-bmng-topo-bathy-4096.jpg`: resized from 5400×2700 to 4096×2048 and re-encoded as JPEG q88 (1.3 MB) for the globe mission select (C1).
 
 ## Fonts
 

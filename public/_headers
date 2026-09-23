@@ -1,0 +1,14 @@
+# Cache headers for Netlify and Cloudflare Pages. GitHub Pages cannot set
+# custom headers and simply serves this file as an unused static asset.
+# See docs/deploy.md ("Caching") for the reasoning and how to verify.
+#
+# A tile's files are immutable by path: once published, a tile id's
+# heightmap.bin and meta.json are never rewritten in place (re-surveyed data
+# ships under a new id). /data/tiles/index.json is deliberately NOT listed: it
+# changes whenever a tile is added, so it keeps the host's default caching.
+
+/data/tiles/:id/heightmap.bin
+  Cache-Control: public, max-age=31536000, immutable
+
+/data/tiles/:id/meta.json
+  Cache-Control: public, max-age=31536000, immutable

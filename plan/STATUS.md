@@ -1,5 +1,23 @@
 # Status — 2026-09-22 (after Phase B and C2; docs reconciled)
 
+## Phase C checkpoint — resume here (2026-09-22)
+
+Paused for the owner's usage budget ($20/month plan, 5-hour window). Tree is
+green at this commit: build, 344 unit, 104 Python, 24 e2e, attribution check.
+Per-package notes with exact next steps are in `plan/progress/<pkg>.md`.
+
+| Pkg           | State                                                              | Next session                                                                                                                 |
+| ------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| C6 CI/deploy  | done, verified locally                                             | fix 6 absolute `/data` `/assets` URLs to use `import.meta.env.BASE_URL` (list in progress/C6.md); owner decides when to push |
+| C1 globe      | works in browser (`?globe=1`, key N), unit-tested                  | e2e spec, docs/globe.md, thinner cyan rim                                                                                    |
+| C3 presets    | 8 presets written + unit-tested, **not wired** into main.ts        | wire per progress/C3.md, e2e screenshots, docs/presets.md, Atmosphere knobs                                                  |
+| C4a tools     | `tools/obis_export.py`, `tools/validate_landmark.py` done + tested | —                                                                                                                            |
+| C4a–d content | no landmark folders yet                                            | 12 landmarks on **Sonnet**, one pack at a time; terrain notes in progress/C4a.md                                             |
+| C5 settings   | Save.ts, Captions.ts, Sonar/HUD edits partial, not wired           | resume the C5 brief (Opus)                                                                                                   |
+
+Pacing rule (owner): at most 1–2 agents at a time; Sonnet for content, QA and
+docs; Opus for engine work; commit a green checkpoint before the window ends.
+
 Phases A and B are integrated in the working tree, along with C2 (tiles). The
 commit covering A + B + C2 is still pending: the only commit is the initial
 scaffold. The QA pass for Phase B is being written to `plan/QA-B.md`.

@@ -11,10 +11,22 @@
  * swap tiles while the engine has no teardown path yet, and it keeps the URL
  * shareable. During a mission the panel starts collapsed behind a small
  * toggle so it is not in the way.
+ *
+ * C1: landmarks listed in index.json whose mission.json has not loaded (the
+ * content packs are still being written) are shown as "content coming" rows
+ * via {@link MissionSelect.setPending}; a GLOBE button opens the globe
+ * mission select ({@link MissionSelect.setGlobeHandler}).
  */
 
 import type { MissionSummary } from '../game/Mission.js';
 import type { TileIndexEntry } from '../util/types.js';
+
+/** C1: a landmark listed in index.json whose mission.json has not loaded yet. */
+export interface PendingMission {
+  id: string;
+  name: string;
+  tileAvailable: boolean;
+}
 
 export interface MissionSelectOptions {
   parent?: HTMLElement;
@@ -42,6 +54,7 @@ export function tileUrl(href: string, tileId: string): string {
   const url = new URL(href);
   url.searchParams.delete('mission');
   url.searchParams.delete('skipBriefing');
+  url.searchParams.delete('globe'); // C1: do not reopen the globe after choosing from it
   url.searchParams.set('tile', tileId);
   return url.toString();
 }
@@ -52,6 +65,10 @@ export class MissionSelect {
   private readonly missionsEl: HTMLDivElement;
   private readonly toggleEl: HTMLButtonElement;
   private readonly tileIds: Set<string>;
+  // C1
+  private readonly globeBtn: HTMLButtonElement;
+  private missions: MissionSummary[] = [];
+  private pending: PendingMission[] = [];
 
   constructor(
     tiles: TileIndexEntry[],
@@ -71,6 +88,15 @@ export class MissionSelect {
     this.body = document.createElement('div');
     this.body.className = 'mission-select-body';
     this.root.appendChild(this.body);
+
+    // C1: GLOBE button, shown once a handler is set.
+    this.globeBtn = document.createElement('button');
+    this.globeBtn.type = 'button';
+    this.globeBtn.className = 'mission-globe-btn';
+    this.globeBtn.textContent = 'GLOBE';
+    this.globeBtn.title = 'Choose a dive site on the globe';
+    this.globeBtn.hidden = true;
+    this.body.appendChild(this.globeBtn);
 
     this.missionsEl = document.createElement('div');
     this.missionsEl.className = 'mission-missions';
@@ -129,12 +155,37 @@ export class MissionSelect {
     this.toggleEl.hidden = !collapsed && !this.options.currentMissionId;
   }
 
-  /** Fill the MISSIONS section. An empty list hides it. */
+  /** C1: show the GLOBE button; clicking it calls `open`. */
+  setGlobeHandler(open: () => void, keyHint = ''): void {
+    this.globeBtn.hidden = false;
+    this.globeBtn.textContent = keyHint ? `GLOBE  ${keyHint}` : 'GLOBE';
+    this.globeBtn.onclick = () => open();
+  }
+
+  /** Fill the MISSIONS section. An empty list (and nothing pending) hides it. */
   setMissions(missions: MissionSummary[]): void {
+    this.missions = missions;
+    this.renderMissions();
+  }
+
+  /**
+   * C1: index.json ids whose mission.json did not load, shown as "content
+   * coming" rows (a free dive on the tile when one exists).
+   */
+  setPending(pending: PendingMission[]): void {
+    const loaded = new Set(this.missions.map((m) => m.id));
+    this.pending = pending.filter((p) => !loaded.has(p.id));
+    this.renderMissions();
+  }
+
+  private renderMissions(): void {
+    const missions = this.missions;
+    const loaded = new Set(missions.map((m) => m.id));
+    const pending = this.pending.filter((p) => !loaded.has(p.id));
     const box = this.missionsEl;
     box.replaceChildren();
-    box.hidden = missions.length === 0;
-    if (!missions.length) return;
+    box.hidden = missions.length === 0 && pending.length === 0;
+    if (box.hidden) return;
 
     const title = document.createElement('div');
     title.className = 'mission-title';
@@ -181,6 +232,35 @@ export class MissionSelect {
         }
         window.location.href = missionUrl(window.location.href, m.id);
       });
+      box.appendChild(btn);
+    }
+
+    for (const p of pending) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mission-item is-pending';
+      btn.dataset.pending = p.id;
+      const name = document.createElement('span');
+      name.className = 'mission-item-name';
+      name.textContent = p.name;
+      const badge = document.createElement('span');
+      badge.className = 'mission-badge is-coming';
+      badge.textContent = 'CONTENT COMING';
+      const row = document.createElement('span');
+      row.className = 'mission-item-row';
+      row.append(name, badge);
+      const meta = document.createElement('span');
+      meta.className = 'mission-item-meta';
+      meta.textContent = p.tileAvailable ? 'free dive on the survey tile' : 'no tile yet';
+      btn.append(row, meta);
+      if (p.tileAvailable) {
+        btn.addEventListener('click', () => {
+          if (this.options.onSelect) this.options.onSelect(p.id);
+          else window.location.href = tileUrl(window.location.href, p.id);
+        });
+      } else {
+        btn.disabled = true;
+      }
       box.appendChild(btn);
     }
   }

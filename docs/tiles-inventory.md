@@ -33,7 +33,7 @@ bbox is the **actual** grid bbox as N / S / E / W. The cell size is x × y in me
 
 Two numbers are **not** in the table. The pre-existing `demo-synthetic` tile (589,824 B f32) is not a landmark. `heightmap16.bin.gz` comes to 12,191,778 B for the Tier-2 tiles.
 
-On disk, `data/tiles/` is about 79 MB. That covers the f32, gz and u16 files for all 14 tiles plus u16.gz and the 2.7 MB `_samples/` .asc.
+On disk, `data/tiles/` is about 79 MB. That covers the f32, gz and u16 files for all 14 tiles plus u16.gz and the 2.7 MB sample .asc (now `tools/fixtures/titanic_gmrt.asc`, outside `data/tiles/`).
 The raw download cache `.cache/gmrt-raw/` (gitignored, outside `data/` so `vite build` does not copy it) is 60 MB.
 
 ### Plausibility checks (`python3 tools/fetch_all.py --report --coverage`)

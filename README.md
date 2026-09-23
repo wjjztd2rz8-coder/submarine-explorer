@@ -92,6 +92,17 @@ PW_PORT=4190 PW_OUTDIR=dist-mine npm run test:e2e
 The suite boots the built game, waits for `window.__gameReady`, asserts there
 were no console errors, and writes screenshots to `tests/e2e/screenshots/`.
 
+### Deploying
+
+The site is a static build. `.github/workflows/ci.yml` runs every check above on
+pushes and pull requests to `main` (`npm run ci` runs the same steps locally),
+and `.github/workflows/deploy.yml` publishes `dist/` to GitHub Pages after CI
+passes on `main`. Set `VITE_BASE=/<repo>/` when building for a sub-path.
+`npm run check:attribution` fails when a file under `public/assets/` or
+`public/audio/` has no row in `ATTRIBUTION.md`. See
+[`docs/deploy.md`](docs/deploy.md) for enabling Pages, custom domains, caching
+and licences ([`LICENSE`](LICENSE), [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md)).
+
 ## Controls
 
 Defaults from `defaultActions()` in `src/core/Input.ts`. Keys are rebindable

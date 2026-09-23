@@ -70,7 +70,7 @@ Result:
   ```
   (cellsize in degrees ≈ 5.493e-4° ≈ 61 m north-south at this latitude — this is GMRT's native high-resolution multibeam grid spacing, i.e. "100 m/node" in the docs is an upper bound, not what you always get in a well-surveyed area like the Titanic site.)
 - **Observed min/max depth in the tile:** min = **-3982.31 m**, max (shallowest) not applicable here since whole tile is submerged; for this specific titanic tile the values I actually computed were min **-3982.31** / max **-3319.20** is from the Monterey test — for the **Titanic tile itself**, values ranged roughly **-3661 m to about -3985 m** (Titanic sits at ~3800 m; the tile is a broad abyssal-plain/slope area, consistent with known site depth).
-- Saved to: `/Users/vijay/submarine-explorer/data/tiles/_samples/titanic_gmrt.asc`
+- Saved to: `tools/fixtures/titanic_gmrt.asc`
 
 ### Test 2: Monterey Canyon head, 0.05° box, resolution=max
 
@@ -297,4 +297,4 @@ MGDS/IEDA portal: https://www.marine-geo.org — search tool at https://www.mari
 
 ## Test artifacts
 
-- Sample GMRT tile (Titanic site, esriascii, ~61 m/pixel, 2,693,539 bytes): `/Users/vijay/submarine-explorer/data/tiles/_samples/titanic_gmrt.asc`
+- Sample GMRT tile (Titanic site, esriascii, ~61 m/pixel, 2,693,539 bytes): `tools/fixtures/titanic_gmrt.asc`

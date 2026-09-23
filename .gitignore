@@ -16,3 +16,6 @@ dist-*/
 data/tiles/*/heightmap*.bin.gz
 data/tiles/*/heightmap*.bin.br
 data/tiles/*/heightmap16.bin
+
+# Per-agent Playwright output dirs (e.g. --output=test-results-c6)
+test-results-*/

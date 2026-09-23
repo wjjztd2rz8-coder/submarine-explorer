@@ -4,6 +4,7 @@
  * writes (which we skip when the value has not changed).
  */
 
+import { defaultActions, keyLabel } from '../core/Input.js';
 import { formatLat, formatLon, worldToLatLon } from '../util/geo.js';
 import type { TileMeta } from '../util/types.js';
 import type { SubmarineState } from '../sub/Submarine.js';
@@ -19,6 +20,66 @@ const FIELDS = [
   'status',
 ] as const;
 type Field = (typeof FIELDS)[number];
+
+/** One help item: the action ids whose primary keys are shown (joined by `/`), and a verb. */
+export interface HelpItem {
+  actions: string[];
+  text: string;
+}
+
+/**
+ * C5: the three help lines, by action id rather than by key, so remapping a
+ * key in the settings screen updates the help. Items whose actions do not
+ * exist in the action map are skipped (e.g. an action another lane removed).
+ */
+export const HELP_LINES: HelpItem[][] = [
+  [
+    { actions: ['thrustForward', 'thrustReverse'], text: 'thrust' },
+    { actions: ['yawPort', 'yawStarboard'], text: 'yaw' },
+    { actions: ['pitchUp', 'pitchDown'], text: 'pitch' },
+    { actions: ['boost'], text: 'boost' },
+    { actions: ['toggleSettings'], text: 'settings' },
+  ],
+  [
+    { actions: ['ballastBlow'], text: 'blow (up)' },
+    { actions: ['ballastFlood'], text: 'flood (down)' },
+    { actions: ['toggleLights'], text: 'lights' },
+    { actions: ['cycleSimSpeed'], text: 'sim speed' },
+    { actions: ['toggleGlobe'], text: 'globe' },
+  ],
+  [
+    { actions: ['scan'], text: 'scan (hold)' },
+    { actions: ['toggleGuide'], text: 'guide' },
+    { actions: ['ping'], text: 'ping' },
+    { actions: ['toggleSonar'], text: 'sonar' },
+    { actions: ['toggleCamera'], text: 'camera' },
+    { actions: ['togglePhotoMode'], text: 'photo' },
+  ],
+];
+
+/** The action map shape the help needs (`Input.actions` satisfies it). */
+export type HelpActionMap = ReadonlyArray<{ id: string; keys: readonly string[] }>;
+
+/**
+ * Resolve the help lines against an action map: `[[keys, text], ...]` per
+ * line, e.g. `['W/S', 'thrust']`. An unbound action shows `--`.
+ */
+export function helpLines(actions: HelpActionMap, lines = HELP_LINES): Array<Array<[string, string]>> {
+  const byId = new Map(actions.map((a) => [a.id, a]));
+  return lines.map((line) =>
+    line
+      .filter((item) => item.actions.every((id) => byId.has(id)))
+      .map((item): [string, string] => [
+        item.actions
+          .map((id) => {
+            const k = byId.get(id)?.keys[0];
+            return k ? keyLabel(k) : '--';
+          })
+          .join('/'),
+        item.text,
+      ]),
+  );
+}
 
 /** Warning thresholds (Config.submarine); see {@link seabedWarning}. */
 export interface HudWarnConfig {
@@ -93,6 +154,8 @@ export class HUD {
   private readonly values = new Map<Field, HTMLSpanElement>();
   private readonly cache = new Map<Field, string>();
   private readonly warningEl: HTMLDivElement;
+  private readonly helpEl: HTMLDivElement;
+  private helpActions: HelpActionMap = defaultActions();
   private hullNote = '';
 
   constructor(
@@ -111,22 +174,48 @@ export class HUD {
         ).join('')}
       </div>
       <div class="hud-warning" hidden></div>
-      <div class="hud-panel hud-help">
-        <b>W/S</b> thrust &nbsp; <b>A/D</b> yaw &nbsp; <b>R/F</b> pitch &nbsp; <b>X</b> boost<br />
-        <b>Space</b> blow (up) &nbsp; <b>Shift</b> flood (down) &nbsp; <b>L</b> lights &nbsp; <b>T</b> sim speed<br />
-        <b>G</b> scan (hold) &nbsp; <b>J</b> guide &nbsp; <b>Q</b> ping &nbsp; <b>M</b> sonar &nbsp; <b>C</b> camera &nbsp; <b>P</b> photo
-      </div>
+      <div class="hud-panel hud-help" aria-label="Controls"></div>
       <div class="hud-attribution"></div>
     `;
     for (const el of this.root.querySelectorAll<HTMLSpanElement>('[data-field]')) {
       this.values.set(el.dataset.field as Field, el);
     }
     this.warningEl = this.root.querySelector('.hud-warning') as HTMLDivElement;
+    this.helpEl = this.root.querySelector('.hud-help') as HTMLDivElement;
+    this.renderHelp();
     const attr = this.root.querySelector('.hud-attribution') as HTMLDivElement;
     attr.textContent = meta.attribution;
 
     parent.appendChild(this.root);
     this.set('tile', `${meta.id} (${meta.cols}×${meta.rows})`);
+  }
+
+  /**
+   * C5: render the help from a live action map (`Input.actions`). Call
+   * {@link refreshHelp} after a rebind; the array is mutated in place.
+   */
+  bindHelp(actions: HelpActionMap): void {
+    this.helpActions = actions;
+    this.renderHelp();
+  }
+
+  /** Re-render the help lines (after a key was remapped). */
+  refreshHelp(): void {
+    this.renderHelp();
+  }
+
+  private renderHelp(): void {
+    const frag = document.createDocumentFragment();
+    helpLines(this.helpActions).forEach((line, li) => {
+      if (li > 0) frag.append(document.createElement('br'));
+      line.forEach(([keys, text], i) => {
+        if (i > 0) frag.append(' \u00a0 ');
+        const b = document.createElement('b');
+        b.textContent = keys;
+        frag.append(b, ` ${text}`);
+      });
+    });
+    this.helpEl.replaceChildren(frag);
   }
 
   /** A short note after the hull rating on the tile line, e.g. "thin margin". */

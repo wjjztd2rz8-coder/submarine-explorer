@@ -48,6 +48,8 @@ export interface InputState {
    * hand-built InputState literals (tests, Submarine's locked input) still type.
    */
   toggleGuide?: boolean;
+  /** Open/close the globe mission select (C1). Edge-triggered; optional like toggleGuide. */
+  toggleGlobe?: boolean;
 }
 
 /** One rebindable thing the player can do. */
@@ -78,7 +80,9 @@ export type ActionId =
   | 'scan'
   | 'cycleSimSpeed'
   | 'togglePhotoMode'
-  | 'toggleGuide';
+  | 'toggleSettings'
+  | 'toggleGuide'
+  | 'toggleGlobe';
 
 /** Factory, not a constant: callers get their own mutable copy. */
 export function defaultActions(): ActionBinding[] {
@@ -161,7 +165,11 @@ export function defaultActions(): ActionBinding[] {
     { id: 'toggleCamera', label: 'Camera view', category: 'View', keys: ['KeyC'], pad: 'Y' },
     { id: 'toggleSonar', label: 'Sonar map', category: 'View', keys: ['KeyM'], pad: 'Back' },
     { id: 'togglePhotoMode', label: 'Photo mode', category: 'View', keys: ['KeyP'], pad: 'Start' },
+    // C5: the settings overlay reads this binding directly (it must open over
+    // the frozen briefing too), so there is no InputState edge for it.
+    { id: 'toggleSettings', label: 'Settings', category: 'View', keys: ['KeyO'] },
     { id: 'toggleGuide', label: 'Field guide', category: 'View', keys: ['KeyJ'] },
+    { id: 'toggleGlobe', label: 'Globe (dive sites)', category: 'View', keys: ['KeyN'] },
   ];
 }
 
@@ -216,6 +224,7 @@ export class Input {
     cycleSimSpeed: false,
     togglePhotoMode: false,
     toggleGuide: false,
+    toggleGlobe: false,
   };
 
   /** The live, rebindable action map. Read it to render a controls screen. */
@@ -457,6 +466,7 @@ export class Input {
       if (this.edgeArmed.has('cycleSimSpeed')) s.cycleSimSpeed = true;
       if (this.edgeArmed.has('togglePhotoMode')) s.togglePhotoMode = true;
       if (this.edgeArmed.has('toggleGuide')) s.toggleGuide = true;
+      if (this.edgeArmed.has('toggleGlobe')) s.toggleGlobe = true;
       this.edgeArmed.clear();
     }
 
@@ -512,6 +522,7 @@ export class Input {
     s.cycleSimSpeed = false;
     s.togglePhotoMode = false;
     s.toggleGuide = false;
+    s.toggleGlobe = false;
   }
 }
 

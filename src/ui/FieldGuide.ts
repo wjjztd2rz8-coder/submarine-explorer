@@ -8,15 +8,29 @@
  * URLs were already filtered to http(s)/site-relative by Guide.ts.
  *
  * The game keeps running while this is open; the caller suppresses scanning.
+ *
+ * C1: a SPECIES tab lists the site's OBIS survey species (`species.json`,
+ * game/Species.ts). It is survey data, so it is never locked; the "placement
+ * is invented" disclaimer and the OBIS source link are always shown.
  */
 
 import type { GameEvents } from '../core/EventBus.js';
 import type { GuideEntry } from '../game/Guide.js';
+import {
+  formatDepthRange,
+  OBIS_HOME_URL,
+  obisTaxonUrl,
+  SPECIES_DISCLAIMER,
+  type SpeciesDoc,
+} from '../game/Species.js';
 import { FocusTrap } from './FocusTrap.js';
 
 export interface GuideEmitter {
   emit<K extends keyof GameEvents>(name: K, payload: GameEvents[K]): void;
 }
+
+/** Which pane the guide shows: catalogued entries or the survey species list (C1). */
+export type FieldGuideTab = 'entries' | 'species';
 
 export interface FieldGuideContent {
   landmarkName: string;
@@ -43,6 +57,12 @@ export class FieldGuide {
   private readonly list: HTMLUListElement;
   private readonly body: HTMLDivElement;
   private readonly footer: HTMLDivElement;
+  // C1: species tab
+  private readonly tabEntries: HTMLButtonElement;
+  private readonly tabSpecies: HTMLButtonElement;
+  private readonly speciesEl: HTMLDivElement;
+  private species: SpeciesDoc | null = null;
+  private tab_: FieldGuideTab = 'entries';
   private content: FieldGuideContent = {
     landmarkName: '',
     entries: [],
@@ -73,12 +93,29 @@ export class FieldGuide {
     const close = el('button', 'fg-close', 'ESC  CLOSE');
     close.type = 'button';
     close.addEventListener('click', () => this.close());
-    header.append(heading, this.countEl, close);
+    // C1: GUIDE / SPECIES tabs.
+    const tabs = el('div', 'fg-tabs');
+    tabs.setAttribute('role', 'tablist');
+    this.tabEntries = el('button', 'fg-tab', 'GUIDE');
+    this.tabSpecies = el('button', 'fg-tab fg-tab-species', 'SPECIES');
+    for (const [b, t] of [
+      [this.tabEntries, 'entries'],
+      [this.tabSpecies, 'species'],
+    ] as const) {
+      b.type = 'button';
+      b.setAttribute('role', 'tab');
+      b.dataset.tab = t;
+      b.addEventListener('click', () => this.showTab(t));
+      tabs.append(b);
+    }
+    header.append(heading, tabs, this.countEl, close);
 
     const main = el('div', 'fg-main');
     this.list = el('ul', 'fg-list');
     this.body = el('div', 'fg-entry');
-    main.append(this.list, this.body);
+    this.speciesEl = el('div', 'fg-species');
+    this.speciesEl.hidden = true;
+    main.append(this.list, this.body, this.speciesEl);
 
     this.footer = el('div', 'fg-footer');
     panel.append(header, main, this.footer);
@@ -94,6 +131,25 @@ export class FieldGuide {
   /** Currently displayed entry id (null when none / closed). */
   get selectedId(): string | null {
     return this.selected;
+  }
+
+  /** Which pane is showing. */
+  get tab(): FieldGuideTab {
+    return this.tab_;
+  }
+
+  /** C1: the survey species list (null or empty -> an empty-state message). */
+  setSpecies(doc: SpeciesDoc | null): void {
+    this.species = doc;
+    if (this.open_) this.render();
+    else this.renderTabs();
+  }
+
+  /** Switch between the GUIDE entries and the SPECIES list. */
+  showTab(tab: FieldGuideTab): void {
+    this.tab_ = tab;
+    if (this.open_) this.render();
+    else this.renderTabs();
   }
 
   setContent(content: FieldGuideContent): void {
@@ -118,6 +174,8 @@ export class FieldGuide {
 
   open(entryId?: string): void {
     const entries = this.content.entries;
+    // An explicit entry (a scan just catalogued it) always shows the GUIDE pane.
+    if (entryId ?? this.pendingFocus) this.tab_ = 'entries';
     const want = entryId ?? this.pendingFocus ?? this.selected;
     this.pendingFocus = null;
     const exists = (id: string | null): id is string => !!id && entries.some((e) => e.id === id);
@@ -149,12 +207,18 @@ export class FieldGuide {
   }
 
   private announce(): void {
+    if (this.tab_ !== 'entries') return;
     if (this.selected && this.content.isUnlocked(this.selected)) {
       this.bus?.emit('guide:opened', { entryId: this.selected });
     }
   }
 
   private render(): void {
+    this.renderTabs();
+    if (this.tab_ === 'species') {
+      this.renderSpecies();
+      return;
+    }
     const { entries, isUnlocked } = this.content;
     const unlocked = entries.filter((e) => isUnlocked(e.id)).length;
     this.countEl.textContent = entries.length
@@ -260,6 +324,95 @@ export class FieldGuide {
       }
       this.body.append(ol);
     }
+  }
+
+  private renderTabs(): void {
+    const species = this.tab_ === 'species';
+    this.root.classList.toggle('is-species', species);
+    this.tabEntries.classList.toggle('is-active', !species);
+    this.tabSpecies.classList.toggle('is-active', species);
+    this.tabEntries.setAttribute('aria-selected', String(!species));
+    this.tabSpecies.setAttribute('aria-selected', String(species));
+    const n = this.species?.species.length ?? 0;
+    this.tabSpecies.textContent = n ? `SPECIES ${n}` : 'SPECIES';
+    this.list.hidden = species;
+    this.body.hidden = species;
+    this.speciesEl.hidden = !species;
+  }
+
+  /** C1: survey species table. Everything via textContent (untrusted JSON). */
+  private renderSpecies(): void {
+    const doc = this.species;
+    const box = this.speciesEl;
+    box.replaceChildren();
+    box.scrollTop = 0;
+    const list = doc?.species ?? [];
+    this.countEl.textContent = list.length ? `${list.length} SURVEY SPECIES` : 'NO SURVEY SPECIES';
+
+    const titleRow = el('div', 'fg-title-row');
+    titleRow.append(el('h2', 'fg-title', 'Species recorded here'));
+    titleRow.append(el('span', 'fg-badge fg-badge-survey', 'SURVEY DATA'));
+    box.append(titleRow);
+    box.append(el('p', 'fg-species-note', doc?.note ?? SPECIES_DISCLAIMER));
+
+    if (!list.length) {
+      box.append(
+        el('p', 'fg-empty', 'No occurrence records have been exported for this site yet.'),
+      );
+    } else {
+      const table = el('table', 'fg-species-table');
+      const head = el('tr');
+      for (const h of ['SPECIES', 'COMMON NAME', 'RECORDS', 'DEPTH'])
+        head.append(el('th', undefined, h));
+      const thead = el('thead');
+      thead.append(head);
+      const tbody = el('tbody');
+      for (const r of list) {
+        const tr = el('tr', 'fg-species-row');
+        const name = el('td', 'fg-species-name');
+        const i = el('i', undefined, r.scientificName);
+        const taxon = obisTaxonUrl(r);
+        if (taxon) {
+          const a = el('a');
+          a.href = taxon;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.append(i);
+          name.append(a);
+        } else {
+          name.append(i);
+        }
+        if (r.group) name.append(el('span', 'fg-species-group', r.group));
+        tr.append(
+          name,
+          el('td', 'fg-species-common', r.commonName ?? '—'),
+          el('td', 'fg-species-records', r.records.toLocaleString('en-US')),
+          el('td', 'fg-species-depth', formatDepthRange(r.depthRange_m)),
+        );
+        tbody.append(tr);
+      }
+      table.append(thead, tbody);
+      box.append(table);
+    }
+
+    box.append(el('h3', 'fg-sources-title', 'SOURCE'));
+    const src = el('p', 'fg-species-source');
+    const a = el(
+      'a',
+      undefined,
+      doc?.source_url
+        ? `${doc.source} occurrence query`
+        : 'OBIS — Ocean Biodiversity Information System',
+    );
+    a.href = doc?.source_url ?? OBIS_HOME_URL;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    src.append(a);
+    const meta: string[] = [];
+    if (doc?.fetched_at) meta.push(`fetched ${doc.fetched_at.slice(0, 10)}`);
+    if (doc?.depth_filter_m) meta.push(`depth filter ${formatDepthRange(doc.depth_filter_m)}`);
+    if (meta.length) src.append(el('span', 'fg-species-meta', ` · ${meta.join(' · ')}`));
+    box.append(src);
   }
 
   dispose(): void {

@@ -9,7 +9,7 @@
  *     bus.emit('sub:crushWarning', { depth: -3900 });
  */
 
-import type { DepthBandName } from './Config.js';
+import type { DepthBandName, EnvPresetName } from './Config.js';
 import type { Landmark, TileMeta } from '../util/types.js';
 
 export interface GameEvents {
@@ -52,8 +52,23 @@ export interface GameEvents {
   'mission:aborted': { missionId: string; reason: 'crush' };
   // --- B4: props -------------------------------------------------------------
   'props:loaded': { landmarkId: string; count: number; models: number; procedural: number };
+  // --- C3: environment presets (docs/presets.md) -----------------------------
+  /** The environment preset chosen for this dive (after mission/landmark lookup). */
+  'env:preset': { preset: EnvPresetName; landmarkId: string };
+  /** The water current at the sub changed noticeably (compass bearing it flows toward). */
+  'env:current': { dirDeg: number; speedMps: number };
+  /** Hadal pressure ambience tick, at intervals that shorten with depth (for audio creaks). */
+  'env:trench': { depth: number };
+  // --- C1: globe mission select ---------------------------------------------
+  /** The globe overlay opened (`?globe=1`, the GLOBE button or the toggleGlobe key). */
+  'globe:opened': { source: 'url' | 'button' | 'key' | 'api' };
+  /** A launchable pin was chosen (click / Enter), just before navigating. */
+  'globe:pinSelected': { landmarkId: string };
   'game:ready': { tileId: string };
   'ui:selectTile': { id: string };
+  // --- C5: settings ------------------------------------------------------------
+  /** One setting changed (docs/settings.md); emitted once per changed key. */
+  'settings:changed': { key: string; value: unknown };
 }
 
 export type EventName = keyof GameEvents;

@@ -1,0 +1,87 @@
+# Deploy the static build to GitHub Pages. Runs after CI succeeds on main, or
+# on demand from the Actions tab. One-time setup (repository owner):
+#   Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+# See docs/deploy.md for custom domains and the PAGES_BASE variable.
+name: Deploy to GitHub Pages
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; let an in-progress deployment finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # For workflow_run, only deploy commits whose CI passed and that were pushed
+    # to this repository's main (never a fork's PR).
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Project Pages are served from https://<owner>.github.io/<repo>/.
+      # For a custom domain or a <owner>.github.io repository, set the
+      # repository variable PAGES_BASE to "/" (Settings -> Secrets and
+      # variables -> Actions -> Variables).
+      VITE_BASE: ${{ vars.PAGES_BASE || format('/{0}/', github.event.repository.name) }}
+    steps:
+      - name: Checkout the commit CI tested
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Attribution check
+        run: python3 tools/check_attribution.py
+
+      - name: Build (base ${{ env.VITE_BASE }})
+        run: npm run build
+
+      - name: Report build size
+        run: |
+          du -sh dist dist/data dist/assets
+          if find dist -name '*.gz' -o -name 'heightmap16.bin' -o -path '*/_samples/*' | grep -q .; then
+            echo "::error::dist/ contains files that must not ship (see vite.config.ts)"; exit 1
+          fi
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

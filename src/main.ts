@@ -51,6 +51,10 @@ import {
   resolveMissionRoute,
 } from './game/MissionRouter.js';
 // --- B3 end ---
+// --- C1 begin ---
+import { loadSpecies } from './game/Species.js';
+import { Globe } from './ui/Globe.js';
+// --- C1 end ---
 // --- fix S begin ---
 import { applyFreeDiveHull, chooseSpawn, spawnSettings } from './game/Spawn.js';
 // --- fix S end ---
@@ -264,6 +268,21 @@ async function main(): Promise<void> {
     collapsed: route !== null,
   });
   void loadMissionSummaries().then((list) => missionSelect.setMissions(list));
+  // --- C1 begin ---
+  // Globe mission select (docs/globe.md): `?globe=1`, the GLOBE button, key N.
+  // While open it freezes the game like the briefing. SPECIES tab in the guide.
+  const globe = new Globe({
+    config: config.globe,
+    bus,
+    tileIds: index.map((t) => t.id),
+    currentId: contentLandmark,
+    isToggleKey: (code) => input.getAction('toggleGlobe')?.keys.includes(code) ?? false,
+  });
+  missionSelect.setGlobeHandler(() => globe.open('button'));
+  void globe.catalog.then((c) => missionSelect.setPending(c.pending));
+  void loadSpecies(contentLandmark).then((doc) => discovery.guide.setSpecies(doc));
+  if (params.get('globe') === '1') globe.open('url');
+  // --- C1 end ---
 
   const input = new Input(canvas);
   input.attach();
@@ -323,7 +342,7 @@ async function main(): Promise<void> {
     // --- B3 begin ---
     // While the mission briefing is up nothing simulates and input is ignored
     // (sampling still runs, so edge presses do not queue up behind the card).
-    const frozen = missionRouter?.frozen ?? false;
+    const frozen = (missionRouter?.frozen ?? false) || globe.isOpen; // C1: the globe freezes too
     const state = frozen ? FROZEN_INPUT : sampled;
     const steps = frozen ? 0 : realSteps;
     // --- B3 end ---
@@ -427,6 +446,11 @@ async function main(): Promise<void> {
       pingPressed: state.ping,
     });
 
+    // --- C1 begin ---
+    if (sampled.toggleGlobe) globe.toggle('key');
+    globe.update(time.frameDelta);
+    // --- C1 end ---
+
     // Chunk LOD selection + draw-call accounting; must run before render.
     terrain.update(rig.camera);
 
@@ -494,6 +518,9 @@ async function main(): Promise<void> {
     missionSelect,
     sonar,
     // --- B3 end ---
+    // --- C1 begin ---
+    globe,
+    // --- C1 end ---
   };
   requestAnimationFrame(frame);
 }

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "landmark": "_test",
+  "source": "OBIS",
+  "source_url": "https://api.obis.org/v3/occurrence?geometry=POLYGON((-50.1%2041.58,-49.8%2041.58,-49.8%2041.88,-50.1%2041.88,-50.1%2041.58))",
+  "fetched_at": "2026-09-22T00:00:00Z",
+  "bbox": { "north": 41.88, "south": 41.58, "east": -49.8, "west": -50.1 },
+  "depth_filter_m": [3000, 4200],
+  "note": "TEST FIXTURE (C1 e2e): hand-written rows, not a real OBIS export; placement in the game is invented.",
+  "species": [
+    {
+      "scientificName": "Coryphaenoides armatus",
+      "commonName": "abyssal grenadier",
+      "aphiaID": 158960,
+      "records": 12,
+      "depthRange_m": [3200, 4100],
+      "group": "fish"
+    },
+    {
+      "scientificName": "Halomonas titanicae",
+      "records": 3,
+      "depthRange_m": [3800, 3800],
+      "group": "bacteria"
+    },
+    { "commonName": "row without a scientific name (dropped)", "records": 9 }
+  ]
+}
