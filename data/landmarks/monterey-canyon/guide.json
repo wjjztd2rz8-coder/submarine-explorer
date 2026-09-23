@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "landmark": "monterey-canyon",
+  "entries": [
+    {
+      "id": "overview",
+      "title": "Monterey Canyon",
+      "paragraphs": [
+        "Monterey Canyon is the largest submarine canyon on the US West Coast, and one of the largest in the world. It begins right offshore of Moss Landing, a small harbour roughly midway around Monterey Bay -- so close to shore that the Monterey Bay Aquarium Research Institute (MBARI), headquartered at Moss Landing, calls it their 'backyard'. From there its main channel runs about 153 km (95 mi) out under the Pacific, with walls up to 1.6-1.7 km high from floor to rim and a maximum depth of about 3,600 m at its mouth -- a scale often compared to the Grand Canyon.",
+        "The canyon most likely began as the drowned outlet of an ancient river system, possibly linked to the Central Valley or to the catastrophic draining of a prehistoric lake, then was deepened and maintained over millions of years by turbidity currents: fast-moving underwater avalanches of sediment and water. In the shallow upper canyon these can happen several times a year, triggered by storm waves, seismic shaking or simple wall collapses, and can reach speeds of several metres per second and travel tens of kilometres down-canyon.",
+        "This tile's open bathymetry covers the canyon from its head to about 2,333 m deep, roughly two-thirds of the way to its published 3,600 m mouth, which lies beyond the western edge of this tile. Every POI in this mission sits on real terrain; nothing here is a placed reconstruction except the MARS node marker."
+      ],
+      "facts": [
+        { "label": "Length", "value": "about 153 km (95 mi), main channel" },
+        { "label": "Wall height", "value": "up to 1.6-1.7 km" },
+        { "label": "Maximum depth (mouth)", "value": "about 3,600 m (outside this tile)" },
+        { "label": "This tile's deepest cell", "value": "2,332.8 m" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Monterey Canyon — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Monterey_Canyon"
+        },
+        {
+          "title": "Monterey Canyon — MBARI, Know Your Ocean",
+          "url": "https://www.mbari.org/know-your-ocean/monterey-canyon/"
+        },
+        {
+          "title": "GMRT Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "canyon-head",
+      "title": "The canyon head",
+      "paragraphs": [
+        "Unlike most submarine canyons, which start out on the continental slope far from land, Monterey Canyon's head lies right off the beach at Moss Landing. The seafloor here drops off far faster than it does along most of the rest of Monterey Bay's coastline, and MBARI's research vessels can reach canyon depths of over a mile within a few hours of leaving the dock.",
+        "This closeness to shore is part of why the canyon is so well studied: it puts deep-sea habitats and processes within easy reach of a shore-based marine laboratory, something almost nowhere else on Earth offers.",
+        "This point is real GMRT terrain, about 2.5 km offshore, where the incision into the shelf becomes clearly visible in the survey data."
+      ],
+      "facts": [
+        { "label": "Depth here", "value": "about 44 m" },
+        { "label": "Distance offshore", "value": "about 2.5 km" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Monterey Canyon — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Monterey_Canyon"
+        },
+        {
+          "title": "Monterey Canyon — MBARI, Know Your Ocean",
+          "url": "https://www.mbari.org/know-your-ocean/monterey-canyon/"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "canyon-wall",
+      "title": "A canyon wall",
+      "paragraphs": [
+        "From the axis out to the rim, Monterey Canyon's walls climb as much as 1.6-1.7 km, comparable to the depth of the Grand Canyon. Along the way they are cut by smaller side gullies, and repeated small slope failures feed sediment into the turbidity currents that scour the canyon floor below.",
+        "This point sits on the canyon's north wall, about 700 m from the axis at the same longitude and roughly 270 m higher, giving a sense of the canyon's cross-section at this depth."
+      ],
+      "facts": [
+        { "label": "Depth here", "value": "about 748 m" },
+        { "label": "Relief to nearby axis", "value": "about 270 m over roughly 700 m" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Monterey Canyon — MBARI, Know Your Ocean",
+          "url": "https://www.mbari.org/know-your-ocean/monterey-canyon/"
+        },
+        {
+          "title": "GMRT Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "canyon-axis",
+      "title": "Following the canyon floor",
+      "paragraphs": [
+        "The canyon's axis, or thalweg, is its deepest, most continuously carved line -- the path a turbidity current follows on its way downhill. Tracing it through this tile's survey data shows a fairly steady deepening from the shallow head out past 2,000 m, punctuated by side channels and terraces where sediment has piled up between major flow events.",
+        "Multiple turbidity currents have been directly measured moving down this canyon at up to about 7 m/s (16 mph), some travelling more than 50 km before losing momentum -- among the fastest and best-documented examples of this process anywhere in the world, largely because MBARI's cabled instruments sit right in the canyon to record them.",
+        "A single large turbidity flow can carry away as much organic carbon as the rest of the year combined, which makes this canyon floor an unusually efficient conveyor belt moving carbon from the coast to the deep sea."
+      ],
+      "facts": [
+        { "label": "Turbidity current speed (measured)", "value": "up to about 7 m/s (16 mph)" },
+        { "label": "Turbidity current travel distance", "value": "50+ km" },
+        { "label": "Frequency (upper canyon)", "value": "several times a year" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Monterey Canyon — MBARI, Know Your Ocean",
+          "url": "https://www.mbari.org/know-your-ocean/monterey-canyon/"
+        },
+        {
+          "title": "Large underwater experiment in Monterey Canyon shows turbidity currents involve movement of the seafloor — USGS",
+          "url": "https://www.usgs.gov/center-news/large-underwater-experiment-monterey-canyon-shows-turbidity-currents-involve-seafloor"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "upper-canyon",
+      "title": "Onto the shelf break",
+      "paragraphs": [
+        "A few kilometres down-canyon from the head, the seafloor steepens sharply as the canyon cuts across the continental shelf break. In under 3 km of horizontal distance the bottom drops from under 50 m to more than 250 m, a much faster descent than the open shelf on either side -- the clearest sign in this stretch that a canyon, not just a sloping shelf, is underfoot.",
+        "This transition marks where the canyon leaves the shallow, wave- and current-swept shelf environment behind and becomes a true deep-sea conduit. It is also close enough to the head, and to the shore, to reach on a short dive before continuing on to the deeper axis and MARS node further out.",
+        "This point is real GMRT terrain, traced by sampling depth along the line from the canyon head toward the axis."
+      ],
+      "facts": [
+        { "label": "Depth here", "value": "about 265 m" },
+        { "label": "Distance from canyon head", "value": "about 2.8 km" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Monterey Canyon — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Monterey_Canyon"
+        },
+        {
+          "title": "GMRT Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "mars-node",
+      "title": "MARS: a deep-sea power outlet",
+      "paragraphs": [
+        "The Monterey Accelerated Research System (MARS) is a cabled seafloor observatory: a science node on the canyon floor connected to shore by a 52 km (32 mi) power and data cable. It converts 10,000 volts from shore down to 375 and 48 volts DC for scientific instruments, and offers up to 100 megabits per second of data bandwidth per instrument across eight ports, so researchers can run experiments for months or years without worrying about battery life.",
+        "Its trawl-resistant frame, about 3.7 by 4.6 m at the base and 1.2 m tall, has smoothed corners and sloping sides so fishing gear and anchors slide off rather than snag, while still letting a remotely operated vehicle open its side doors to plug in new instruments.",
+        "MARS has been continuously supported by the US National Science Foundation since 2002. It sits at 891 m depth, about 20 km from the canyon head, deep enough to be a genuine deep-sea site but shallow enough to service relatively often.",
+        "The marker placed here stands in for the frame; its real shape is not modelled."
+      ],
+      "facts": [
+        { "label": "Depth", "value": "891 m" },
+        { "label": "Shore cable length", "value": "52 km (32 mi)" },
+        { "label": "Power", "value": "10,000 V from shore, stepped down to 375/48 V DC" },
+        { "label": "Data", "value": "up to 100 Mbps per instrument, 8 ports" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "Monterey Accelerated Research System (MARS) — MBARI",
+          "url": "https://www.mbari.org/technology/monterey-accelerated-research-system-mars/"
+        },
+        {
+          "title": "Monterey Accelerated Research System — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Monterey_Accelerated_Research_System"
+        }
+      ],
+      "confidence": "high"
+    }
+  ]
+}

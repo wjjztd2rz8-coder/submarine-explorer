@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "landmark": "monterey-canyon",
+  "props": [
+    {
+      "id": "mars-node-marker",
+      "model": "procedural:debris",
+      "lat": 36.712468,
+      "lon": -122.186898,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [15, 15, 3],
+      "lod_distance_m": 500,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Stands in for the MARS observatory's trawl-resistant science node, a real instrument frame about 3.7 x 4.6 m at the base and 1.2 m tall with eight instrument ports and a 52 km shore cable (MBARI). No CC0 GLB of the actual hardware was available, and the engine's procedural kinds do not include an instrument-frame shape, so a small debris cluster marks the position instead; it does not depict the real frame's shape."
+    }
+  ]
+}

@@ -1,4 +1,13 @@
-# Status — 2026-09-22
+# Status — 2026-09-23
+
+## Claude session 2026-09-23 (latest)
+
+- Reviewed and re-ran gates on the C6/C3/Lost City working tree: build,
+  348 unit, 104 Python, 35 e2e (+1 opt-in skip), attribution — all green.
+  Committed as `cc2cfbc`. C6 and C3 are done; see their progress notes.
+- `monterey-canyon` was held out of the commit (validator error); a Sonnet
+  agent is finishing it (species, sources, pacing). C5 is running on Opus.
+- `challenger-deep` was never written; it remains in the C4 queue.
 
 ## OpenAI continuation checkpoint (latest; supersedes historical notes below)
 

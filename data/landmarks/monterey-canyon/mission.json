@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "landmark": "monterey-canyon",
+  "tile": "monterey-canyon",
+  "title": "Monterey Canyon dive",
+  "hull_class": "B",
+  "environment": {
+    "preset": "canyon",
+    "overrides": { "currentDirDeg": 255, "currentSpeedMps": 0.5 }
+  },
+  "species_file": "species.json",
+  "spawn": {
+    "lat": 36.8011,
+    "lon": -121.824,
+    "depth_m": 5,
+    "heading_deg": 258
+  },
+  "briefing": {
+    "summary": "Follow the largest submarine canyon on the US West Coast from its head just offshore of Moss Landing onto the steep shelf break nearby. From there, continue further down-canyon if you can: a canyon wall, the traced axis at about 1,000 m and 2,000 m, and the MARS seafloor observatory node are all optional deeper objectives.",
+    "depth_m": 2000,
+    "facts": [
+      "Monterey Canyon begins right off the beach at Moss Landing -- so close to shore that MBARI, headquartered there, calls it their 'backyard'.",
+      "The main channel runs about 153 km out to sea, with walls up to 1.6-1.7 km high; its published maximum depth, about 3,600 m, lies beyond this tile's western edge.",
+      "Just past the head, the seafloor drops from under 50 m to more than 250 m in under 3 km, where the canyon cuts across the continental shelf break.",
+      "Turbidity currents -- fast underwater avalanches of sediment -- have been measured moving down this canyon at up to about 7 m/s, some travelling more than 50 km. They happen several times a year in the upper canyon.",
+      "The MBARI-operated MARS observatory node, at 891 m, is a real cabled power-and-data outlet for deep-sea science instruments, connected to shore by a 52 km cable."
+    ],
+    "hazards": [
+      "Turbidity currents: sudden, fast-moving sediment flows can occur without warning, especially in the upper canyon.",
+      "Strong currents generally, including upwelling-driven flow near the canyon rim.",
+      "Fishing gear may be present, especially in shallower water near the head.",
+      "Total darkness below a few hundred metres."
+    ]
+  },
+  "objectives": [
+    {
+      "id": "canyon-head",
+      "type": "scan",
+      "poi": "monterey-canyon-head",
+      "primary": true,
+      "title": "Locate and scan the canyon head"
+    },
+    {
+      "id": "upper-channel",
+      "type": "scan",
+      "poi": "monterey-canyon-upper-channel",
+      "primary": true,
+      "title": "Follow the channel onto the shelf break"
+    },
+    {
+      "id": "canyon-wall",
+      "type": "scan",
+      "poi": "monterey-canyon-wall",
+      "primary": false,
+      "title": "Survey a canyon wall (optional, further down-canyon)"
+    },
+    {
+      "id": "axis-1000",
+      "type": "scan",
+      "poi": "monterey-canyon-axis-1000m",
+      "primary": false,
+      "title": "Reach the canyon axis at about 1,000 m (optional)"
+    },
+    {
+      "id": "axis-2000",
+      "type": "scan",
+      "poi": "monterey-canyon-axis-2000m",
+      "primary": false,
+      "title": "Continue down-canyon to about 2,000 m (optional)"
+    },
+    {
+      "id": "mars-node",
+      "type": "scan",
+      "poi": "mbari-mars-node",
+      "primary": false,
+      "title": "Find the MARS observatory node (optional, long transit)"
+    }
+  ],
+  "completion": "all_primary"
+}

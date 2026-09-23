@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "landmark": "monterey-canyon",
+  "pois": [
+    {
+      "id": "monterey-canyon-head",
+      "name": "Canyon head, off Moss Landing",
+      "lat": 36.8019,
+      "lon": -121.8185,
+      "snap_to_seabed": true,
+      "radius_m": 250,
+      "kind": "geology",
+      "primary": true,
+      "scan_seconds": 4,
+      "guide_entry": "canyon-head",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Monterey_Canyon",
+        "https://www.mbari.org/know-your-ocean/monterey-canyon/"
+      ],
+      "note": "Real GMRT terrain, 2.5 km offshore of Moss Landing harbour on a bearing of 260 degrees, seabed 44 m. No source gives an exact head coordinate; this point marks where the terrain trace (this session, tools/inspect_tile.py + a bilinear sampler) first shows the canyon's steep-walled incision beginning, close to shore as the sources describe."
+    },
+    {
+      "id": "monterey-canyon-upper-channel",
+      "name": "Upper canyon channel, shelf break",
+      "lat": 36.7985,
+      "lon": -121.8502,
+      "snap_to_seabed": true,
+      "radius_m": 250,
+      "kind": "geology",
+      "primary": true,
+      "scan_seconds": 4,
+      "guide_entry": "upper-canyon",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Monterey_Canyon",
+        "https://www.gmrt.org/"
+      ],
+      "note": "Real GMRT terrain, 265 m deep, about 2.8 km down-canyon from the canyon-head POI along a straight line toward the traced axis, where the shelf break steepens sharply. Located by sampling terrain along that line, this session; no published coordinate for this specific transition point."
+    },
+    {
+      "id": "monterey-canyon-wall",
+      "name": "North canyon wall",
+      "lat": 36.7872,
+      "lon": -122.0133,
+      "snap_to_seabed": true,
+      "radius_m": 200,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "canyon-wall",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": ["https://www.mbari.org/know-your-ocean/monterey-canyon/"],
+      "note": "Real GMRT terrain: 748 m deep, about 700 m (and 270 m of relief) north of the axis-1000m POI at the same longitude, on the canyon's steep north wall. No specific coordinate is published for a 'wall'; this point was located by sampling terrain perpendicular to the traced axis."
+    },
+    {
+      "id": "monterey-canyon-axis-1000m",
+      "name": "Canyon axis, ~1,000 m",
+      "lat": 36.7812,
+      "lon": -122.0133,
+      "snap_to_seabed": true,
+      "radius_m": 250,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "canyon-axis",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Monterey_Canyon",
+        "https://www.mbari.org/know-your-ocean/monterey-canyon/"
+      ],
+      "note": "Real GMRT terrain, 1,016.5 m deep, about 20 km from Moss Landing along the traced canyon thalweg (deepest-path search over the heightmap, this session). No published coordinate for a specific axis point; located by terrain tracing."
+    },
+    {
+      "id": "monterey-canyon-axis-2000m",
+      "name": "Canyon axis, ~2,000 m",
+      "lat": 36.6703,
+      "lon": -122.1076,
+      "snap_to_seabed": true,
+      "radius_m": 250,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "canyon-axis",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Monterey_Canyon",
+        "https://www.mbari.org/know-your-ocean/monterey-canyon/"
+      ],
+      "note": "Real GMRT terrain, 2,033.5 m deep, about 32 km from Moss Landing along the traced canyon thalweg. This tile only reaches 2,332.8 m at its deepest cell, well short of the published 3,600 m mouth depth, which lies outside the tile's bbox (see sources.md)."
+    },
+    {
+      "id": "mbari-mars-node",
+      "name": "MARS cabled observatory node",
+      "lat": 36.712468,
+      "lon": -122.186898,
+      "depth_m": 888,
+      "radius_m": 100,
+      "kind": "other",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "mars-node",
+      "confidence": "high",
+      "reconstruction": true,
+      "sources": ["https://www.mbari.org/technology/monterey-accelerated-research-system-mars/"],
+      "note": "Published position 36 deg 42.7481'N, 122 deg 11.2139'W, depth 891 m (MBARI). GMRT seabed here is 888 m, within 3 m of the published depth. The real trawl-resistant frame (about 3.7 x 4.6 m at the base, 1.2 m tall) is not modelled in detail; the placed prop is a simplified marker."
+    }
+  ]
+}
