@@ -61,7 +61,8 @@ import { loadSpecies } from './game/Species.js';
 import { Globe } from './ui/Globe.js';
 // --- C1 end ---
 // --- C5 begin ---
-import { Save } from './core/Save.js';
+import { SAVE_KEYS, Save } from './core/Save.js';
+import { DISCOVERY_VERSION } from './game/DiscoveryStore.js';
 import { Captions } from './ui/Captions.js';
 import { SettingsScreen } from './ui/Settings.js';
 // --- C5 end ---
@@ -337,9 +338,40 @@ async function main(): Promise<void> {
     input,
     config,
     activeTier: tier,
+    activeDetailStrength: settings.detailStrength,
+    activeSimSpeedDefault: settings.simSpeedDefault,
     tierFromUrl: params.get('tier') !== null && params.get('tier') === tier,
     canOpen: () => !globe.isOpen,
     onBindingsChanged: () => hud.refreshHelp(),
+    onResetProgress: () => {
+      if (discovery.store.readOnly) return 'protected';
+      let storage: Storage | null;
+      try {
+        storage = window.localStorage;
+      } catch {
+        discovery.store.reset();
+        return 'sessionOnly';
+      }
+      try {
+        if (storage) {
+          const raw = storage.getItem(SAVE_KEYS.discoveries);
+          if (raw) {
+            try {
+              const version = (JSON.parse(raw) as { version?: unknown }).version;
+              if (typeof version === 'number' && version > DISCOVERY_VERSION) return 'protected';
+            } catch {
+              // A malformed save is safe to discard after confirmation.
+            }
+          }
+          storage.removeItem(SAVE_KEYS.discoveries);
+          if (storage.getItem(SAVE_KEYS.discoveries) !== null) return 'unavailable';
+        }
+      } catch {
+        return 'unavailable';
+      }
+      discovery.store.reset();
+      return storage ? 'cleared' : 'sessionOnly';
+    },
   });
   hud.bindHelp(input.actions);
   hud.setHelpAction('toggleSettings', () => settingsScreen.open());

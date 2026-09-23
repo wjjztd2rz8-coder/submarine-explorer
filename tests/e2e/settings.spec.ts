@@ -164,4 +164,197 @@ test.describe('settings screen', () => {
     await expect(dialog).toBeHidden();
     await expect(page.locator('.briefing')).toBeVisible();
   });
+
+  test('reset discoveries confirms, preserves other saves, and refreshes this dive', async ({
+    page,
+  }) => {
+    await boot(page, '/?mission=titanic&skipBriefing=1');
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'subexplorer.discoveries.v1',
+        JSON.stringify({
+          version: 1,
+          discovered: { 'titanic/test': { at: '2026-01-01T00:00:00.000Z', count: 2 } },
+          stats: { scans: 2, firstAt: '2026-01-01T00:00:00.000Z' },
+        }),
+      );
+      localStorage.setItem(
+        'subexplorer.settings.v1',
+        JSON.stringify({
+          version: 1,
+          graphicsTier: 'medium',
+          postFx: true,
+          detailStrength: 1,
+          simSpeedDefault: 0,
+          reduceMotion: true,
+          captions: false,
+          sonarPalette: 'default',
+        }),
+      );
+      localStorage.setItem(
+        'subexplorer.bindings.v1',
+        JSON.stringify({
+          version: 1,
+          keys: { toggleSettings: ['KeyO'] },
+        }),
+      );
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.__gameReady === true);
+    expect(
+      await page.evaluate(() =>
+        (window.__game as { discoveries: { keys(): string[] } }).discoveries.keys(),
+      ),
+    ).toContain('titanic/test');
+
+    await page.keyboard.press('KeyO');
+    const dialog = page.getByRole('dialog', { name: 'Settings' });
+    await dialog.getByRole('button', { name: 'Reset settings' }).click();
+    expect(
+      await page.evaluate(() => localStorage.getItem('subexplorer.discoveries.v1')),
+    ).not.toBeNull();
+    expect(
+      await page.evaluate(() => localStorage.getItem('subexplorer.bindings.v1')),
+    ).not.toBeNull();
+    await dialog.getByLabel('Reduce motion').check();
+    await dialog.getByRole('button', { name: 'Reset discoveries' }).click();
+    await expect(dialog).toContainText('Your settings and key bindings stay saved');
+    await page.screenshot({ path: 'test-results-settings-closeout/settings-confirm.png' });
+    const axe = await new AxeBuilder({ page }).include('.settings').analyze();
+    expect(axe.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+    await dialog.getByRole('button', { name: 'Cancel' }).click();
+    expect(
+      await page.evaluate(() => localStorage.getItem('subexplorer.discoveries.v1')),
+    ).not.toBeNull();
+    await dialog.getByRole('button', { name: 'Reset discoveries' }).click();
+    const reloaded = page.waitForEvent('load');
+    await dialog.getByRole('button', { name: 'Clear discoveries' }).click();
+    await reloaded;
+    await page.waitForFunction(() => window.__gameReady === true);
+    expect(new URL(page.url()).search).toBe('?mission=titanic&skipBriefing=1');
+    const saved = await page.evaluate(() => ({
+      discoveries: localStorage.getItem('subexplorer.discoveries.v1'),
+      settings: localStorage.getItem('subexplorer.settings.v1'),
+      bindings: localStorage.getItem('subexplorer.bindings.v1'),
+      keys: (window.__game as { discoveries: { keys(): string[] } }).discoveries.keys(),
+    }));
+    expect(saved.discoveries).toBeNull();
+    expect(saved.settings).toContain('reduceMotion');
+    expect(saved.bindings).toContain('toggleSettings');
+    expect(saved.keys).toEqual([]);
+  });
+
+  test('Apply and reload uses saved boot settings and respects the tier URL override', async ({
+    page,
+  }) => {
+    await boot(page, '/?tile=challenger-deep&tier=low');
+    await page.keyboard.press('KeyO');
+    const dialog = page.getByRole('dialog', { name: 'Settings' });
+    await dialog.getByLabel('Graphics tier').selectOption('high');
+    await expect(dialog.getByRole('button', { name: 'Apply and reload' })).toBeHidden();
+    await dialog.getByLabel('Terrain detail on top of the survey data').fill('0.5');
+    await dialog.getByLabel('Default sim speed').selectOption('2');
+    await dialog.getByRole('button', { name: 'Apply and reload' }).scrollIntoViewIfNeeded();
+    await page.screenshot({ path: 'test-results-settings-closeout/settings-apply.png' });
+    const reloaded = page.waitForEvent('load');
+    await dialog.getByRole('button', { name: 'Apply and reload' }).click();
+    await reloaded;
+    await page.waitForFunction(() => window.__gameReady === true);
+    expect(new URL(page.url()).search).toBe('?tile=challenger-deep&tier=low');
+    const applied = await page.evaluate(() => {
+      const g = window.__game as {
+        config: { terrain: { detailStrength: number } };
+        sub: { simSpeed: number };
+        save: { get(): { graphicsTier: string } };
+      };
+      return {
+        detail: g.config.terrain.detailStrength,
+        speed: g.sub.simSpeed,
+        savedTier: g.save.get().graphicsTier,
+      };
+    });
+    expect(applied).toEqual({ detail: 0.5, speed: 2, savedTier: 'high' });
+    await page.keyboard.press('KeyO');
+    await expect(dialog.getByRole('button', { name: 'Apply and reload' })).toBeHidden();
+  });
+
+  test('reset reports protected and inaccessible discovery storage honestly', async ({ page }) => {
+    await boot(page, '/');
+    const newer = JSON.stringify({ version: 2, discovered: { future: true } });
+    await page.evaluate(
+      (value) => localStorage.setItem('subexplorer.discoveries.v1', value),
+      newer,
+    );
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.__gameReady === true);
+    await page.keyboard.press('KeyO');
+    const dialog = page.getByRole('dialog', { name: 'Settings' });
+    await dialog.getByRole('button', { name: 'Reset discoveries' }).click();
+    await dialog.getByRole('button', { name: 'Clear discoveries' }).click();
+    await expect(dialog.locator('.settings-status')).toContainText('newer version');
+    expect(await page.evaluate(() => localStorage.getItem('subexplorer.discoveries.v1'))).toBe(
+      newer,
+    );
+
+    // A newer save may arrive from another tab after this dive has booted.
+    await page.evaluate(() => localStorage.removeItem('subexplorer.discoveries.v1'));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.__gameReady === true);
+    await page.evaluate(
+      (value) => localStorage.setItem('subexplorer.discoveries.v1', value),
+      newer,
+    );
+    await page.keyboard.press('KeyO');
+    await dialog.getByRole('button', { name: 'Reset discoveries' }).click();
+    await dialog.getByRole('button', { name: 'Clear discoveries' }).click();
+    await expect(dialog.locator('.settings-status')).toContainText('newer version');
+    expect(await page.evaluate(() => localStorage.getItem('subexplorer.discoveries.v1'))).toBe(
+      newer,
+    );
+
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'subexplorer.discoveries.v1',
+        JSON.stringify({
+          version: 1,
+          discovered: { 'titanic/test': true },
+          stats: { scans: 1 },
+        }),
+      );
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.__gameReady === true);
+    await page.evaluate(() => {
+      const original = Storage.prototype.removeItem;
+      Storage.prototype.removeItem = function (key: string) {
+        if (key === 'subexplorer.discoveries.v1') throw new Error('denied');
+        return original.call(this, key);
+      };
+    });
+    await page.keyboard.press('KeyO');
+    await dialog.getByRole('button', { name: 'Reset discoveries' }).click();
+    await dialog.getByRole('button', { name: 'Clear discoveries' }).click();
+    await expect(dialog.locator('.settings-status')).toContainText('Nothing was reset');
+    expect(
+      await page.evaluate(() => localStorage.getItem('subexplorer.discoveries.v1')),
+    ).not.toBeNull();
+  });
+
+  test('protected settings cannot be offered as a reloadable change', async ({ page }) => {
+    await boot(page, '/');
+    const newer = JSON.stringify({ version: 2, detailStrength: 0.25 });
+    await page.evaluate((value) => localStorage.setItem('subexplorer.settings.v1', value), newer);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.__gameReady === true);
+    await page.keyboard.press('KeyO');
+    const dialog = page.getByRole('dialog', { name: 'Settings' });
+    await dialog.getByLabel('Terrain detail on top of the survey data').fill('0.5');
+    await expect(dialog.getByRole('button', { name: 'Apply and reload' })).toBeHidden();
+    await expect(dialog.locator('.settings-reload-note')).toContainText('newer version');
+    await dialog.getByRole('button', { name: 'Reset settings' }).click();
+    await expect(dialog.locator('.settings-status')).toContainText(
+      'newer saved version was left intact',
+    );
+    expect(await page.evaluate(() => localStorage.getItem('subexplorer.settings.v1'))).toBe(newer);
+  });
 });

@@ -62,6 +62,15 @@ overrides): `vent→vent`, `seep→brine`, `canyon→canyon`, `reef|hole→reef`
   `Config.presets`; unknown keys are ignored with a warning.
 - `species_file`: defaults to `species.json` in the same folder; C1's field-guide
   species tab reads it (see §3).
+- `pressure_band_review` is an optional content review record for a real POI
+  deeper than the runtime `crushWarnRatio` (currently 90%) of its assigned hull's crush depth. It records `poi`,
+  `hull_class`, `poi_depth_m`, `warning_start_m`, `crush_depth_m`, and a nonempty
+  `reason`. The briefing hazards must state the three depths. The validator
+  compares this record with the actual terrain-sampled POI and runtime hull and
+  warning-ratio settings:
+  an exact match prints a visible `reviewed` note and lets `--strict` pass;
+  any drift restores the strict warning. An acknowledgement outside the warning
+  band is an error. This is review metadata only; it does not alter hull physics.
 
 ## 3. `species.json` (C4a writes `tools/obis_export.py`; every pack produces the file)
 

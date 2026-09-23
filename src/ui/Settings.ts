@@ -87,12 +87,17 @@ export interface SettingsScreenOptions {
   config: Pick<GameConfig, 'settings' | 'sonarPalettes'>;
   /** The tier this dive actually runs at. */
   activeTier: GraphicsTier;
+  /** Boot values; these settings cannot change the current terrain or dive. */
+  activeDetailStrength: number;
+  activeSimSpeedDefault: number;
   /** True when `?tier=` overrides the saved tier. */
   tierFromUrl?: boolean;
   /** False while something else owns the keyboard (e.g. the globe). */
   canOpen?: () => boolean;
   /** After any rebind / reset (the HUD help re-renders). */
   onBindingsChanged?: () => void;
+  /** Clears the discovery key and current store only when it can be verified. */
+  onResetProgress?: () => 'cleared' | 'sessionOnly' | 'protected' | 'unavailable';
   parent?: HTMLElement;
 }
 
@@ -113,6 +118,10 @@ export class SettingsScreen {
   readonly root: HTMLDivElement;
   private readonly panel: HTMLDivElement;
   private readonly status: HTMLParagraphElement;
+  private readonly reloadButton: HTMLButtonElement;
+  private readonly reloadNote: HTMLParagraphElement;
+  private readonly resetProgressButton: HTMLButtonElement;
+  private readonly resetConfirm: HTMLDivElement;
   private readonly bindingsList: HTMLDivElement;
   private readonly trap: FocusTrap;
   private readonly controls = new Map<keyof SettingsValues, HTMLInputElement | HTMLSelectElement>();
@@ -212,13 +221,69 @@ export class SettingsScreen {
     this.status.setAttribute('role', 'status');
     this.status.setAttribute('aria-live', 'polite');
 
+    this.resetConfirm = el('div', 'settings-confirm');
+    this.resetConfirm.hidden = true;
+    this.resetConfirm.append(
+      el(
+        'p',
+        undefined,
+        'Clear all discoveries and scan history? This cannot be undone. Your settings and key bindings stay saved. This dive will restart at the same URL.',
+      ),
+    );
+    const confirmReset = el('button', undefined, 'Clear discoveries');
+    confirmReset.type = 'button';
+    confirmReset.addEventListener('click', () => {
+      this.resetConfirm.hidden = true;
+      let result: ReturnType<NonNullable<SettingsScreenOptions['onResetProgress']>> = 'unavailable';
+      try {
+        result = this.opts.onResetProgress?.() ?? 'unavailable';
+      } catch {
+        result = 'unavailable';
+      }
+      if (result === 'cleared' || result === 'sessionOnly') {
+        this.say(
+          result === 'cleared'
+            ? 'Discoveries cleared. Reloading this dive…'
+            : 'Session discoveries cleared. Saved progress was inaccessible and may return. Reloading this dive…',
+        );
+        window.setTimeout(() => window.location.reload(), 600);
+      } else {
+        this.say(
+          result === 'protected'
+            ? 'Saved discoveries use a newer version and were left intact.'
+            : 'Could not verify that saved discoveries were cleared. Nothing was reset.',
+        );
+        this.resetProgressButton.focus();
+      }
+    });
+    const cancelReset = el('button', undefined, 'Cancel');
+    cancelReset.type = 'button';
+    cancelReset.addEventListener('click', () => {
+      this.resetConfirm.hidden = true;
+      this.resetProgressButton.focus();
+      this.say('Reset cancelled.');
+    });
+    this.resetConfirm.append(confirmReset, cancelReset);
+
     const footer = el('div', 'settings-footer');
+    this.reloadButton = el('button', 'settings-reload', 'Apply and reload');
+    this.reloadButton.type = 'button';
+    this.reloadButton.hidden = true;
+    this.reloadButton.addEventListener('click', () => window.location.reload());
+    this.reloadNote = el('p', 'settings-note settings-reload-note');
+    this.reloadNote.hidden = true;
     const resetSettings = el('button', 'settings-reset', 'Reset settings');
     resetSettings.type = 'button';
     resetSettings.addEventListener('click', () => {
       this.opts.save.reset();
       this.sync();
-      this.say('Settings reset to defaults.');
+      this.say(
+        this.opts.save.reloadSafe
+          ? 'Settings reset to defaults.'
+          : this.opts.save.protectedVersion
+            ? 'Settings reset for this session. The newer saved version was left intact.'
+            : 'Settings reset for this session. Storage is unavailable or could not be cleared.',
+      );
     });
     const resetKeys = el('button', 'settings-reset-keys', 'Reset key bindings');
     resetKeys.type = 'button';
@@ -229,9 +294,26 @@ export class SettingsScreen {
       this.opts.onBindingsChanged?.();
       this.say('Key bindings reset to defaults.');
     });
-    footer.append(resetSettings, resetKeys);
+    this.resetProgressButton = el('button', 'settings-reset-progress', 'Reset discoveries');
+    this.resetProgressButton.type = 'button';
+    this.resetProgressButton.addEventListener('click', () => {
+      this.resetConfirm.hidden = false;
+      this.say('Confirm to clear discoveries and scan history.');
+      confirmReset.focus();
+    });
+    footer.append(this.reloadButton, resetSettings, resetKeys, this.resetProgressButton);
 
-    this.panel.append(header, graphics, game, access, keys, this.status, footer);
+    this.panel.append(
+      header,
+      graphics,
+      game,
+      access,
+      keys,
+      this.status,
+      this.resetConfirm,
+      this.reloadNote,
+      footer,
+    );
     this.root.append(this.panel);
     (opts.parent ?? document.body).appendChild(this.root);
     this.trap = new FocusTrap(this.root);
@@ -269,6 +351,7 @@ export class SettingsScreen {
     if (!this.open_) return;
     this.open_ = false;
     this.capturing = null;
+    this.resetConfirm.hidden = true;
     this.root.hidden = true;
     this.trap.deactivate();
     if (this.returnFocus?.isConnected) this.returnFocus.focus();
@@ -382,6 +465,19 @@ export class SettingsScreen {
         c.setAttribute('aria-valuetext', Number(v).toFixed(2));
       }
     }
+    const pending =
+      (!this.opts.tierFromUrl && s.graphicsTier !== this.opts.activeTier) ||
+      s.detailStrength !== this.opts.activeDetailStrength ||
+      s.simSpeedDefault !== this.opts.activeSimSpeedDefault;
+    this.reloadButton.hidden = !pending || !this.opts.save.reloadSafe;
+    this.reloadNote.hidden = !pending;
+    if (!this.reloadNote.hidden) {
+      this.reloadNote.textContent = this.opts.save.reloadSafe
+        ? 'Applying these settings restarts this dive at the same URL.'
+        : this.opts.save.protectedVersion
+          ? 'Saved settings use a newer version. Changes cannot survive a reload.'
+          : 'These settings could not be saved. Reloading may restore the previous values.';
+    }
   }
 
   // -------------------------------------------------------------- bindings
@@ -493,6 +589,13 @@ export class SettingsScreen {
         if (e.repeat) return;
         if (e.code === 'Escape') this.cancelCapture();
         else this.commitCapture(e.code);
+        return;
+      }
+      if (!this.resetConfirm.hidden && e.code === 'Escape') {
+        e.preventDefault();
+        this.resetConfirm.hidden = true;
+        this.resetProgressButton.focus();
+        this.say('Reset cancelled.');
         return;
       }
       if (e.code === 'Escape' || (!e.repeat && this.isToggleKey(e.code))) {

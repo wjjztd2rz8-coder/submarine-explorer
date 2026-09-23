@@ -48,6 +48,7 @@ OBJECTIVE_TYPES = ("scan",)
 COMPLETIONS = ("all_primary",)
 # Fallback when src/core/Config.ts cannot be read (values are crush depths, m, negative).
 DEFAULT_HULLS = {"A": -1000, "B": -4500, "C": -11000}
+DEFAULT_CRUSH_WARN_RATIO = 0.9
 DEFAULT_DEPTH_TOLERANCE_M = 60.0
 REQUIRED_FILES = ("mission.json", "pois.json", "guide.json")
 
@@ -126,6 +127,18 @@ def load_hull_classes(repo=REPO):
     return found or dict(DEFAULT_HULLS)
 
 
+def load_crush_warn_ratio(repo=REPO):
+    """Read the runtime submarine pressure-warning threshold from Config.ts."""
+    path = os.path.join(repo, "src", "core", "Config.ts")
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            source = f.read()
+    except OSError:
+        return DEFAULT_CRUSH_WARN_RATIO
+    match = re.search(r"\bcrushWarnRatio:\s*(\d+(?:\.\d+)?)", source)
+    return float(match.group(1)) if match else DEFAULT_CRUSH_WARN_RATIO
+
+
 # --------------------------------------------------------------------------- report
 
 
@@ -134,12 +147,16 @@ class Report:
         self.landmark = landmark
         self.errors = []
         self.warnings = []
+        self.notes = []
 
     def err(self, where, msg):
         self.errors.append("%s: %s" % (where, msg))
 
     def warn(self, where, msg):
         self.warnings.append("%s: %s" % (where, msg))
+
+    def note(self, where, msg):
+        self.notes.append("%s: %s" % (where, msg))
 
 
 def _load_json(path, report, name):
@@ -320,7 +337,8 @@ def check_pois(doc, report, landmark, guide_ids, tile, tolerance):
 # --------------------------------------------------------------------------- mission
 
 
-def check_mission(doc, report, landmark, poi_depths, tile, hulls, folder, tiles_root):
+def check_mission(doc, report, landmark, poi_depths, tile, hulls, folder, tiles_root,
+                  crush_warn_ratio=DEFAULT_CRUSH_WARN_RATIO):
     if not _check_header(doc, report, "mission.json", landmark):
         return
     tile_id = doc.get("tile", landmark)
@@ -331,6 +349,7 @@ def check_mission(doc, report, landmark, poi_depths, tile, hulls, folder, tiles_
     if not _nonempty_str(doc.get("title")):
         report.err("mission.json", 'missing "title"')
 
+    review = doc.get("pressure_band_review")
     hull = doc.get("hull_class")
     if hull not in hulls:
         report.err("mission.json", '"hull_class" must be one of %s (got %r)'
@@ -343,9 +362,39 @@ def check_mission(doc, report, landmark, poi_depths, tile, hulls, folder, tiles_
             if deepest >= crush:
                 report.err("mission.json", 'hull_class %s (crush %.0f m) does not clear the deepest POI '
                            '"%s" at %.0f m' % (hull, crush, pid, deepest))
-            elif deepest > 0.9 * crush:
-                report.warn("mission.json", 'deepest POI "%s" (%.0f m) is inside the crush-warning band '
-                            'of hull %s (%.0f m)' % (pid, deepest, hull, crush))
+            elif deepest > crush_warn_ratio * crush:
+                band_message = ('deepest POI "%s" (%.0f m) is inside the crush-warning band '
+                                'of hull %s (%.0f m)' % (pid, deepest, hull, crush))
+                # An explicit review only acknowledges this exact POI/hull/depth.
+                # A changed POI or hull rating brings back the strict warning.
+                briefing = doc.get("briefing")
+                hazards = briefing.get("hazards", []) if isinstance(briefing, dict) else []
+                valid_review = (
+                    isinstance(review, dict)
+                    and review.get("poi") == pid
+                    and review.get("hull_class") == hull
+                    and _is_num(review.get("poi_depth_m"))
+                    and abs(review["poi_depth_m"] - deepest) <= 0.5
+                    and review.get("crush_depth_m") == crush
+                    and review.get("warning_start_m") == crush_warn_ratio * crush
+                    and _nonempty_str(review.get("reason"))
+                    and isinstance(hazards, list)
+                    and any(isinstance(h, str) and all(
+                            str(round(n)) in h or format(round(n), ',d') in h for n in
+                            (deepest, crush, crush_warn_ratio * crush)) for h in hazards)
+                )
+                if valid_review:
+                    report.note("mission.json", band_message +
+                                "; " + review["reason"])
+                else:
+                    report.warn("mission.json", band_message)
+    if review is not None and not (
+        hull in hulls and poi_depths
+        and any(d is not None and d > crush_warn_ratio * abs(hulls[hull])
+                and d < abs(hulls[hull])
+                for d in poi_depths.values())
+    ):
+        report.err("mission.json", '"pressure_band_review" requires a POI inside the hull warning band')
 
     spawn = doc.get("spawn")
     if not isinstance(spawn, dict):
@@ -541,7 +590,8 @@ def validate_landmark(landmark, repo=REPO, tolerance=DEFAULT_DEPTH_TOLERANCE_M, 
     if docs.get("pois.json") is not None:
         poi_depths = check_pois(docs["pois.json"], report, landmark, guide_ids, tile, tolerance)
     if mission is not None:
-        check_mission(mission, report, landmark, poi_depths, tile, hulls, folder, tiles_root)
+        check_mission(mission, report, landmark, poi_depths, tile, hulls, folder, tiles_root,
+                      load_crush_warn_ratio(repo))
     if docs.get("props.json") is not None:
         check_props(docs["props.json"], report, landmark, tile)
     if docs.get("species.json") is not None:
@@ -584,6 +634,8 @@ def main(argv=None):
         if not args.quiet:
             for w in rep.warnings:
                 print("warning: [%s] %s" % (lid, w))
+            for n in rep.notes:
+                print("reviewed: [%s] %s" % (lid, n))
         for e in rep.errors:
             print("error: [%s] %s" % (lid, e))
         bad = bool(rep.errors) or (args.strict and bool(rep.warnings))

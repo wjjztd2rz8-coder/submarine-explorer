@@ -4,6 +4,14 @@
   "tile": "challenger-deep",
   "title": "Challenger Deep: full ocean depth",
   "hull_class": "C",
+  "pressure_band_review": {
+    "poi": "cd-eastern-pool-deepest",
+    "hull_class": "C",
+    "poi_depth_m": 10931,
+    "warning_start_m": 9900,
+    "crush_depth_m": 11000,
+    "reason": "The POI follows surveyed terrain; the Class C hull clears it by about 69 m, and the briefing states the warning threshold and crush depth."
+  },
   "environment": {
     "preset": "trench"
   },
@@ -24,7 +32,7 @@
       "Nothing lives here that you can see with the naked eye except hadal amphipods (Hirondellea gigas) at bait -- no fish have been confirmed this deep."
     ],
     "hazards": [
-      "Crush depth: this hull fails at 11,000 m. The deepest terrain in this mission (10,930.9 m) is inside the crush-warning band, which starts at 9,900 m (90% of crush depth) -- treat every metre below that as the real margin it is.",
+      "Crush depth: this hull fails at 11,000 m. The deepest terrain in this mission (10,931 m rounded; 10,930.9 m sampled) is inside the crush-warning band, which starts at 9,900 m (90% of crush depth) -- treat every metre below that as the real margin it is.",
       "Total darkness below a few hundred metres; only your lights work.",
       "Long vertical transit even from the shortened 6,000 m spawn: budget several minutes of descent before reaching the objectives.",
       "Extreme, uniform pressure (about 1,086 bar at the bottom) and near-freezing water (1-4 degC)."

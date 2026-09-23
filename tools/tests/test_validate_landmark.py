@@ -230,6 +230,48 @@ class ValidateLandmarkTests(unittest.TestCase):
         rep = vl.validate_landmark(LM, repo=self.repo, hulls={"B": -1400.0})
         self.assertError(rep, '"p-two" at 1500 m')
 
+    def test_pressure_band_review_requires_exact_depth_hull_and_briefing(self):
+        hulls = {**HULLS, "B": -1600.0}
+        docs = good_content()
+        review = {"poi": "p-two", "hull_class": "B", "poi_depth_m": 1500,
+                  "warning_start_m": 1440, "crush_depth_m": 1600,
+                  "reason": "Surveyed POI and limited hull margin."}
+        docs["mission.json"]["pressure_band_review"] = review
+        docs["mission.json"]["briefing"]["hazards"] = [
+            "At 1500 m the 1600 m hull is past its 1440 m warning threshold."]
+        self.write({"mission.json": docs["mission.json"]})
+        rep = vl.validate_landmark(LM, repo=self.repo, hulls=hulls)
+        self.assertEqual(rep.errors, [])
+        self.assertEqual(rep.warnings, [])
+        self.assertTrue(any("p-two" in n for n in rep.notes))
+
+        for field, changed in (("poi", "p-main"), ("poi_depth_m", 1498),
+                               ("crush_depth_m", 1700), ("hull_class", "C"),
+                               ("warning_start_m", 1400), ("reason", "")):
+            altered = copy.deepcopy(docs["mission.json"])
+            altered["pressure_band_review"][field] = changed
+            self.write({"mission.json": altered})
+            rep = vl.validate_landmark(LM, repo=self.repo, hulls=hulls)
+            self.assertTrue(any("crush-warning band" in w for w in rep.warnings), field)
+
+        altered = copy.deepcopy(docs["mission.json"])
+        altered["briefing"]["hazards"] = ["Watch hull pressure."]
+        self.write({"mission.json": altered})
+        rep = vl.validate_landmark(LM, repo=self.repo, hulls=hulls)
+        self.assertTrue(any("crush-warning band" in w for w in rep.warnings))
+
+        # A changed hull rating must invalidate the same recorded review.
+        self.write({"mission.json": docs["mission.json"]})
+        rep = vl.validate_landmark(LM, repo=self.repo, hulls={**HULLS, "B": -1550.0})
+        self.assertTrue(any("crush-warning band" in w for w in rep.warnings))
+
+        config_dir = os.path.join(self.repo, "src", "core")
+        os.makedirs(config_dir)
+        with open(os.path.join(config_dir, "Config.ts"), "w") as f:
+            f.write("crushWarnRatio: 0.85,\n")
+        rep = vl.validate_landmark(LM, repo=self.repo, hulls=hulls)
+        self.assertTrue(any("crush-warning band" in w for w in rep.warnings))
+
     def test_spawn_checks(self):
         rep = self.mutate("mission.json", lambda d: d["spawn"].update(lon=25.0))
         self.assertError(rep, "spawn: ")

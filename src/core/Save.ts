@@ -174,9 +174,13 @@ export class Save {
   private readonly listeners = new Set<SettingsListener>();
   /** True when the stored copy is a newer version we must not overwrite. */
   private readOnly = false;
+  /** Whether the last edit was verified in storage and can survive a reload. */
+  private reloadSafe_ = true;
 
   constructor(options: SaveOptions) {
-    this.config = options.config;
+    // main.ts applies the saved detail to the live terrain config at boot;
+    // keep the original defaults so Reset settings still restores that value.
+    this.config = { ...options.config, terrain: { ...options.config.terrain } };
     this.storage = options.storage !== undefined ? options.storage : safeStorage();
     this.data = defaultSettings(this.config);
     this.load();
@@ -193,6 +197,7 @@ export class Save {
     }
     const v = (raw as { version?: unknown } | null)?.version;
     this.readOnly = typeof v === 'number' && v > SETTINGS_VERSION;
+    this.reloadSafe_ = !this.readOnly;
     if (this.readOnly) {
       console.warn(
         `[save] ${SETTINGS_STORAGE_KEY} is version ${v}; using defaults and not overwriting it`,
@@ -205,6 +210,14 @@ export class Save {
   /** A copy of the current settings. */
   get(): SettingsData {
     return { ...this.data };
+  }
+
+  get reloadSafe(): boolean {
+    return this.reloadSafe_;
+  }
+
+  get protectedVersion(): boolean {
+    return this.readOnly;
   }
 
   /** The defaults this save falls back to. */
@@ -231,8 +244,10 @@ export class Save {
     const changed = SETTING_KEYS.filter((k) => next[k] !== this.data[k]);
     this.data = next;
     if (!this.readOnly) {
+      this.reloadSafe_ = false;
       try {
         this.storage?.removeItem(SETTINGS_STORAGE_KEY);
+        this.reloadSafe_ = this.storage?.getItem(SETTINGS_STORAGE_KEY) === null;
       } catch {
         // not fatal
       }
@@ -259,9 +274,12 @@ export class Save {
   }
 
   private persist(): void {
+    this.reloadSafe_ = false;
     if (!this.storage || this.readOnly) return;
     try {
-      this.storage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(this.data));
+      const text = JSON.stringify(this.data);
+      this.storage.setItem(SETTINGS_STORAGE_KEY, text);
+      this.reloadSafe_ = this.storage.getItem(SETTINGS_STORAGE_KEY) === text;
     } catch {
       // Quota / privacy mode: settings live for this session only.
     }

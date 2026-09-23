@@ -1880,6 +1880,29 @@ body:has(.mission-debrief:not([hidden])) .hud-warning {
 .settings-footer {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+.settings-confirm {
+  padding: 8px 10px;
+  border: 1px solid var(--b1-amber);
+}
+
+.settings-confirm[hidden],
+.settings-reload[hidden] {
+  display: none;
+}
+
+.settings-confirm p {
+  margin: 0 0 8px;
+}
+
+.settings-confirm button + button {
+  margin-left: 8px;
+}
+
+.settings-reload {
+  border-color: var(--b1-cyan) !important;
 }
 
 .captions {

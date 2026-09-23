@@ -91,6 +91,7 @@ describe('Save', () => {
     const seen: string[][] = [];
     a.onChange((_s, changed) => seen.push(changed));
     a.save({ captions: true, reduceMotion: false });
+    expect(a.reloadSafe).toBe(true);
     expect(seen).toEqual([['captions']]);
     a.save({ captions: true });
     expect(seen).toHaveLength(1);
@@ -107,6 +108,7 @@ describe('Save', () => {
     expect(s.get()).toEqual(defaultSettings(config));
     expect(() => s.save({ captions: true })).not.toThrow();
     expect(s.get().captions).toBe(true);
+    expect(s.reloadSafe).toBe(false);
     expect(() => s.reset()).not.toThrow();
     expect(() => s.load()).not.toThrow();
   });
@@ -131,7 +133,9 @@ describe('Save', () => {
     store.setItem(SETTINGS_STORAGE_KEY, newer);
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const s = new Save({ config, storage: store });
+    expect(s.protectedVersion).toBe(true);
     s.save({ reduceMotion: true });
+    expect(s.reloadSafe).toBe(false);
     s.reset();
     expect(store.getItem(SETTINGS_STORAGE_KEY)).toBe(newer);
     warn.mockRestore();
@@ -140,5 +144,15 @@ describe('Save', () => {
   it('works with no storage at all', () => {
     const s = new Save({ config, storage: null });
     expect(s.save({ sonarPalette: 'highContrast' }).sonarPalette).toBe('highContrast');
+    expect(s.reloadSafe).toBe(false);
+  });
+
+  it('keeps the original detail default after live config changes', () => {
+    const live = structuredClone(config);
+    const s = new Save({ config: live, storage: null });
+    const original = live.terrain.detailStrength;
+    live.terrain.detailStrength = 0.25;
+    s.save({ detailStrength: 0.75 });
+    expect(s.reset().detailStrength).toBe(original);
   });
 });

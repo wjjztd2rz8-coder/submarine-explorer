@@ -42,6 +42,9 @@ jobs:
       - name: Python pipeline tests (stdlib unittest)
         run: python3 -m unittest discover -s tools/tests
 
+      - name: Validate every mission pack
+        run: npm run check:content
+
       - name: Typecheck and build
         run: npm run build
 
@@ -58,6 +61,9 @@ jobs:
       - name: Attribution check
         run: python3 tools/check_attribution.py
 
+      - name: Project-base build and browser check
+        run: npm run test:e2e:base
+
       - name: Prettier
         run: npx prettier --check .
 
@@ -70,5 +76,6 @@ jobs:
             tests/e2e/screenshots
             playwright-report
             test-results
+            test-results-project-base
           if-no-files-found: ignore
           retention-days: 14
