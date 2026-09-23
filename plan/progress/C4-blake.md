@@ -17,7 +17,7 @@ new) plus this note; did not touch `src/`, `tests/` or any other landmark folder
 2. Sourcing: NOAA Ocean Exploration's own January 2024 announcement (primary — NOAA
    led the mapping), Wikipedia and Live Science as secondary corroboration, and the
    GMRT Synthesis for terrain readings. The underlying peer-reviewed paper (Sowers
-   et al. 2024, *Geomatics*) was **not directly fetched** this session; its key
+   et al. 2024, _Geomatics_) was **not directly fetched** this session; its key
    figures (83,908 mounds, province dimensions, mound-height range) are corroborated
    by two independent secondary sources that both name and describe it directly, and
    this limitation is stated explicitly in `sources.md`.
@@ -39,11 +39,11 @@ new) plus this note; did not touch `src/`, `tests/` or any other landmark folder
    near-continuous field), the Gulf Stream, and the inter-mound channel. No
    memorial content needed (not a grave/historic site).
 6. `mission.json`: `hull_class: "B"` per the task brief, `environment.preset:
-   "reef"`, spawn directly above the mound cluster at the surface, heading 140°,
+"reef"`, spawn directly above the mound cluster at the surface, heading 140°,
    checked to be in well over 60 m of water. Descent to ~780 m at 3x sim speed
    (16.2 m/s) is under a minute, so no mid-water-spawn warning needed.
 7. `species.json`: `tools/obis_export.py --landmark blake-plateau-corals --tile-bbox
-   --depth-min 500 --depth-max 1000` returned 25 taxa / 843 records. Desmophyllum
+--depth-min 500 --depth-max 1000` returned 25 taxa / 843 records. Desmophyllum
    pertusum itself is directly present in the OBIS export, alongside other deep-sea
    corals (Madrepora oculata, Enallopsammia profunda, several octocorals) and
    associated invertebrates — a strong match to the described habitat. Noted in the

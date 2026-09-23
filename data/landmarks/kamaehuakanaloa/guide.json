@@ -18,9 +18,18 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Kama'ehuakanaloa Seamount — Wikipedia", "url": "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount" },
-        { "title": "Volcano Watch: Treasures of the Deep Sea: Lo'ihi Hosts Hydrothermal Vents — USGS Hawaiian Volcano Observatory", "url": "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents" },
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 (value read directly from this tile's grid)", "url": "https://www.gmrt.org/" }
+        {
+          "title": "Kama'ehuakanaloa Seamount — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount"
+        },
+        {
+          "title": "Volcano Watch: Treasures of the Deep Sea: Lo'ihi Hosts Hydrothermal Vents — USGS Hawaiian Volcano Observatory",
+          "url": "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents"
+        },
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 (value read directly from this tile's grid)",
+          "url": "https://www.gmrt.org/"
+        }
       ],
       "confidence": "high"
     },
@@ -34,12 +43,21 @@
       "facts": [
         { "label": "Renamed", "value": "July 2021, Hawai'i Board on Geographic Names (unanimous)" },
         { "label": "Former name", "value": "Lo'ihi (\"long\"), given 1955" },
-        { "label": "Namer of the 1955 name", "value": "Kenneth O. Emery, with M.K. Pukui, M. Hohu and G.A. Macdonald" }
+        {
+          "label": "Namer of the 1955 name",
+          "value": "Kenneth O. Emery, with M.K. Pukui, M. Hohu and G.A. Macdonald"
+        }
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Volcano Watch: Kama'ehuakanaloa — the volcano formerly known as Lo'ihi Seamount — USGS Hawaiian Volcano Observatory", "url": "https://www.usgs.gov/observatories/hvo/news/volcano-watch-kamaehuakanaloa-volcano-formerly-known-loihi-seamount" },
-        { "title": "United States Board on Geographic Names — Undersea Feature Name Proposal, Kama'ehuakanaloa — Hawai'i Board on Geographic Names", "url": "https://files.hawaii.gov/dbedt/op/gis/bgn/HBGN_Meeting_20210803-06-ACUF_Kama%CA%BBehuakanaloa.pdf" }
+        {
+          "title": "Volcano Watch: Kama'ehuakanaloa — the volcano formerly known as Lo'ihi Seamount — USGS Hawaiian Volcano Observatory",
+          "url": "https://www.usgs.gov/observatories/hvo/news/volcano-watch-kamaehuakanaloa-volcano-formerly-known-loihi-seamount"
+        },
+        {
+          "title": "United States Board on Geographic Names — Undersea Feature Name Proposal, Kama'ehuakanaloa — Hawai'i Board on Geographic Names",
+          "url": "https://files.hawaii.gov/dbedt/op/gis/bgn/HBGN_Meeting_20210803-06-ACUF_Kama%CA%BBehuakanaloa.pdf"
+        }
       ],
       "confidence": "high"
     },
@@ -52,15 +70,24 @@
         "This tile's grid (about 58 x 61 m per cell) is coarser than Pele's Pit's roughly 600 m diameter, so this mission does not attempt to trace the crater's rim; the summit and Hiolo vent POIs sit on real terrain inside the collapsed summit area without claiming to outline the pit itself."
       ],
       "facts": [
-        { "label": "Collapse event", "value": "July-August 1996, largest Hawaiian earthquake swarm on record" },
+        {
+          "label": "Collapse event",
+          "value": "July-August 1996, largest Hawaiian earthquake swarm on record"
+        },
         { "label": "Pele's Pit diameter / depth", "value": "~600 m / ~300 m" },
         { "label": "Crater wall height / thickness", "value": "~700 ft (210 m) / ~70 ft (21 m)" },
         { "label": "Peak post-collapse fluid temperature (1997)", "value": ">200 degC" }
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Volcano Watch: Treasures of the Deep Sea: Lo'ihi Hosts Hydrothermal Vents — USGS Hawaiian Volcano Observatory", "url": "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents" },
-        { "title": "Kama'ehuakanaloa Seamount — Wikipedia", "url": "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount" }
+        {
+          "title": "Volcano Watch: Treasures of the Deep Sea: Lo'ihi Hosts Hydrothermal Vents — USGS Hawaiian Volcano Observatory",
+          "url": "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents"
+        },
+        {
+          "title": "Kama'ehuakanaloa Seamount — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount"
+        }
       ],
       "confidence": "high"
     },
@@ -80,8 +107,14 @@
       ],
       "reconstruction": true,
       "sources": [
-        { "title": "Quantitative PCR Analysis of Functional Genes in Iron-Rich Microbial Mats at an Active Hydrothermal Vent System (Lo'ihi Seamount, Hawai'i) — Applied and Environmental Microbiology (accessed via search summary; direct fetch returned HTTP 403)", "url": "https://journals.asm.org/doi/10.1128/aem.03608-14" },
-        { "title": "Volcano Watch: Treasures of the Deep Sea: Lo'ihi Hosts Hydrothermal Vents — USGS Hawaiian Volcano Observatory", "url": "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents" }
+        {
+          "title": "Quantitative PCR Analysis of Functional Genes in Iron-Rich Microbial Mats at an Active Hydrothermal Vent System (Lo'ihi Seamount, Hawai'i) — Applied and Environmental Microbiology (accessed via search summary; direct fetch returned HTTP 403)",
+          "url": "https://journals.asm.org/doi/10.1128/aem.03608-14"
+        },
+        {
+          "title": "Volcano Watch: Treasures of the Deep Sea: Lo'ihi Hosts Hydrothermal Vents — USGS Hawaiian Volcano Observatory",
+          "url": "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents"
+        }
       ],
       "confidence": "medium"
     },
@@ -94,12 +127,21 @@
       ],
       "facts": [
         { "label": "South rift length", "value": "~12 mi (published)" },
-        { "label": "This tile's south-rift depth at 1.4 km / 3.4 km from summit", "value": "-1,281 m / -1,897 m" }
+        {
+          "label": "This tile's south-rift depth at 1.4 km / 3.4 km from summit",
+          "value": "-1,281 m / -1,897 m"
+        }
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Kama'ehuakanaloa Seamount — Wikipedia", "url": "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount" },
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009 (value read directly from this tile's grid)", "url": "https://www.gmrt.org/" }
+        {
+          "title": "Kama'ehuakanaloa Seamount — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount"
+        },
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009 (value read directly from this tile's grid)",
+          "url": "https://www.gmrt.org/"
+        }
       ],
       "confidence": "medium"
     }

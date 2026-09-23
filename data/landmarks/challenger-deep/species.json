@@ -27,10 +27,7 @@
       "scientificName": "Nitrospina",
       "aphiaID": 570084,
       "records": 5,
-      "depthRange_m": [
-        0.2,
-        1.6
-      ],
+      "depthRange_m": [0.2, 1.6],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -38,10 +35,7 @@
       "scientificName": "Acinetobacter",
       "aphiaID": 570612,
       "records": 4,
-      "depthRange_m": [
-        0,
-        1.6
-      ],
+      "depthRange_m": [0, 1.6],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -49,10 +43,7 @@
       "scientificName": "Pseudomonas",
       "aphiaID": 570642,
       "records": 4,
-      "depthRange_m": [
-        0,
-        1.6
-      ],
+      "depthRange_m": [0, 1.6],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -60,10 +51,7 @@
       "scientificName": "Rhodopirellula",
       "aphiaID": 565570,
       "records": 4,
-      "depthRange_m": [
-        0.2,
-        0.9
-      ],
+      "depthRange_m": [0.2, 0.9],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -71,10 +59,7 @@
       "scientificName": "Alteromonas",
       "aphiaID": 393611,
       "records": 3,
-      "depthRange_m": [
-        0.2,
-        0.9
-      ],
+      "depthRange_m": [0.2, 0.9],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -82,10 +67,7 @@
       "scientificName": "Bradyrhizobium",
       "aphiaID": 571022,
       "records": 3,
-      "depthRange_m": [
-        0,
-        1.6
-      ],
+      "depthRange_m": [0, 1.6],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -93,10 +75,7 @@
       "scientificName": "Deinococcus",
       "aphiaID": 571138,
       "records": 3,
-      "depthRange_m": [
-        0.9,
-        0.9
-      ],
+      "depthRange_m": [0.9, 0.9],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -104,10 +83,7 @@
       "scientificName": "Haliangium",
       "aphiaID": 393223,
       "records": 3,
-      "depthRange_m": [
-        0.2,
-        0.5
-      ],
+      "depthRange_m": [0.2, 0.5],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -115,10 +91,7 @@
       "scientificName": "Methylobacterium",
       "aphiaID": 567521,
       "records": 3,
-      "depthRange_m": [
-        0,
-        1.6
-      ],
+      "depthRange_m": [0, 1.6],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -126,10 +99,7 @@
       "scientificName": "Mycobacterium",
       "aphiaID": 178089,
       "records": 3,
-      "depthRange_m": [
-        0.2,
-        0.9
-      ],
+      "depthRange_m": [0.2, 0.9],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -137,10 +107,7 @@
       "scientificName": "Sphingomonas",
       "aphiaID": 568285,
       "records": 3,
-      "depthRange_m": [
-        0,
-        1.6
-      ],
+      "depthRange_m": [0, 1.6],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -148,10 +115,7 @@
       "scientificName": "Aerococcus",
       "aphiaID": 395088,
       "records": 2,
-      "depthRange_m": [
-        0.9,
-        1.6
-      ],
+      "depthRange_m": [0.9, 1.6],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -159,10 +123,7 @@
       "scientificName": "Bacteriovorax",
       "aphiaID": 570029,
       "records": 2,
-      "depthRange_m": [
-        0,
-        0.9
-      ],
+      "depthRange_m": [0, 0.9],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -170,10 +131,7 @@
       "scientificName": "Craurococcus",
       "aphiaID": 571121,
       "records": 2,
-      "depthRange_m": [
-        0.9,
-        0.9
-      ],
+      "depthRange_m": [0.9, 0.9],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -181,10 +139,7 @@
       "scientificName": "Flavobacterium",
       "aphiaID": 562615,
       "records": 2,
-      "depthRange_m": [
-        0,
-        0.2
-      ],
+      "depthRange_m": [0, 0.2],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -192,10 +147,7 @@
       "scientificName": "Geodermatophilus",
       "aphiaID": 559564,
       "records": 2,
-      "depthRange_m": [
-        0.9,
-        1.6
-      ],
+      "depthRange_m": [0.9, 1.6],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -203,10 +155,7 @@
       "scientificName": "Kordiimonas",
       "aphiaID": 393990,
       "records": 2,
-      "depthRange_m": [
-        0,
-        0.2
-      ],
+      "depthRange_m": [0, 0.2],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -214,10 +163,7 @@
       "scientificName": "Leptospirillum",
       "aphiaID": 571377,
       "records": 2,
-      "depthRange_m": [
-        0.2,
-        0.5
-      ],
+      "depthRange_m": [0.2, 0.5],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -225,10 +171,7 @@
       "scientificName": "Neisseria",
       "aphiaID": 571370,
       "records": 2,
-      "depthRange_m": [
-        0,
-        0.9
-      ],
+      "depthRange_m": [0, 0.9],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -236,10 +179,7 @@
       "scientificName": "Novosphingobium",
       "aphiaID": 568281,
       "records": 2,
-      "depthRange_m": [
-        0.2,
-        0.9
-      ],
+      "depthRange_m": [0.2, 0.9],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -247,10 +187,7 @@
       "scientificName": "Pelagicoccus",
       "aphiaID": 564190,
       "records": 2,
-      "depthRange_m": [
-        0.2,
-        0.5
-      ],
+      "depthRange_m": [0.2, 0.5],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -258,10 +195,7 @@
       "scientificName": "Psychrobacter",
       "aphiaID": 393048,
       "records": 2,
-      "depthRange_m": [
-        0.9,
-        1.6
-      ],
+      "depthRange_m": [0.9, 1.6],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -269,10 +203,7 @@
       "scientificName": "Sneathiella",
       "aphiaID": 568239,
       "records": 2,
-      "depthRange_m": [
-        0.2,
-        0.5
-      ],
+      "depthRange_m": [0.2, 0.5],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -280,10 +211,7 @@
       "scientificName": "Staphylococcus",
       "aphiaID": 416009,
       "records": 2,
-      "depthRange_m": [
-        0,
-        1.6
-      ],
+      "depthRange_m": [0, 1.6],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -291,10 +219,7 @@
       "scientificName": "Turneriella",
       "aphiaID": 571338,
       "records": 2,
-      "depthRange_m": [
-        0.2,
-        0.5
-      ],
+      "depthRange_m": [0.2, 0.5],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -302,10 +227,7 @@
       "scientificName": "Achromobacter",
       "aphiaID": 570906,
       "records": 1,
-      "depthRange_m": [
-        0.9,
-        0.9
-      ],
+      "depthRange_m": [0.9, 0.9],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -313,10 +235,7 @@
       "scientificName": "Acidovorax",
       "aphiaID": 570916,
       "records": 1,
-      "depthRange_m": [
-        0.9,
-        0.9
-      ],
+      "depthRange_m": [0.9, 0.9],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -324,10 +243,7 @@
       "scientificName": "Alkanindiges",
       "aphiaID": 570930,
       "records": 1,
-      "depthRange_m": [
-        0,
-        0
-      ],
+      "depthRange_m": [0, 0],
       "group": "microbe",
       "taxonRank": "Genus"
     },
@@ -335,10 +251,7 @@
       "scientificName": "Amaricoccus",
       "aphiaID": 570940,
       "records": 1,
-      "depthRange_m": [
-        0.9,
-        0.9
-      ],
+      "depthRange_m": [0.9, 0.9],
       "group": "microbe",
       "taxonRank": "Genus"
     }

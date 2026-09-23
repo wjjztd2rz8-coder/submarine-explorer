@@ -16,7 +16,10 @@
         { "label": "Trench length / width", "value": "~2,550 km / ~69 km average" },
         { "label": "Overlying pressure", "value": "~16,000 psi (~1,100 bar)" },
         { "label": "First sounded", "value": "1875, HMS Challenger (4,475 fathoms / 8,184 m)" },
-        { "label": "Protected-area status", "value": "outside the Marianas Trench Marine National Monument" }
+        {
+          "label": "Protected-area status",
+          "value": "outside the Marianas Trench Marine National Monument"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -53,9 +56,18 @@
       ],
       "facts": [
         { "label": "This tile's deepest cell", "value": "-10,930.89 m (GMRT, Ryan et al. 2009)" },
-        { "label": "Nakanishi & Hashimoto (2011), RV Kairei 1998/99", "value": "11.371 N, 142.593 E, 10,920 +/- 5 m" },
-        { "label": "GEBCO Gazetteer position", "value": "11.373333 N, 142.591667 E, 10,920 +/- 10 m" },
-        { "label": "Five Deeps Expedition, Eastern Pool (2019)", "value": "10,927-10,928 m (two solo dives)" }
+        {
+          "label": "Nakanishi & Hashimoto (2011), RV Kairei 1998/99",
+          "value": "11.371 N, 142.593 E, 10,920 +/- 5 m"
+        },
+        {
+          "label": "GEBCO Gazetteer position",
+          "value": "11.373333 N, 142.591667 E, 10,920 +/- 10 m"
+        },
+        {
+          "label": "Five Deeps Expedition, Eastern Pool (2019)",
+          "value": "10,927-10,928 m (two solo dives)"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -83,9 +95,18 @@
         "The Five Deeps Expedition, led by Victor Vescovo in the submersible DSV Limiting Factor, dove to the Challenger Deep four times between 28 April and 5 May 2019: three dives (two of them solo) to the Eastern Pool, including a lander-salvage/commercial-certification dive, and a fourth, crewed by Patrick Lahey and sub designer John Ramsay, dedicated to video survey and biological sampling in the Central Pool, focused on the trench's north and south subduction-zone edges. The expedition also became the first to dive the Challenger Deep more than once, and the first submersible in this depth class to earn commercial (DNV GL) certification."
       ],
       "facts": [
-        { "label": "1960 Trieste", "value": "Piccard & Walsh, ~5h descent, ~20 min on bottom, reported fish sighting" },
-        { "label": "2012 Deepsea Challenger", "value": "James Cameron solo, ~2.5h descent, 10,908 m, cut short by a hydraulic leak" },
-        { "label": "2019 Five Deeps / Limiting Factor", "value": "Victor Vescovo, 4 dives (28 Apr-5 May), Eastern + Central Pools" }
+        {
+          "label": "1960 Trieste",
+          "value": "Piccard & Walsh, ~5h descent, ~20 min on bottom, reported fish sighting"
+        },
+        {
+          "label": "2012 Deepsea Challenger",
+          "value": "James Cameron solo, ~2.5h descent, 10,908 m, cut short by a hydraulic leak"
+        },
+        {
+          "label": "2019 Five Deeps / Limiting Factor",
+          "value": "Victor Vescovo, 4 dives (28 Apr-5 May), Eastern + Central Pools"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -115,10 +136,22 @@
       ],
       "facts": [
         { "label": "Dominant scavenger", "value": "Hirondellea gigas, hadal amphipod" },
-        { "label": "Leggo lander (Schmidt Ocean, Dec 2014)", "value": "11.368536 N, 142.5875166 E, 10,929 m" },
-        { "label": "ASHURA lander (JAMSTEC, Sep 2009)", "value": "11 22.11' N, 142 25.86' E, 10,897 m, 185 amphipods in 2.5 h" },
-        { "label": "Deepest fish filmed anywhere", "value": "~8,075 m (Mariana snailfish) — well above the trench floor" },
-        { "label": "Xenophyophore depth record", "value": "10,641 m, Sirena Deep (a different deep, ~128 mi NE of Challenger Deep)" }
+        {
+          "label": "Leggo lander (Schmidt Ocean, Dec 2014)",
+          "value": "11.368536 N, 142.5875166 E, 10,929 m"
+        },
+        {
+          "label": "ASHURA lander (JAMSTEC, Sep 2009)",
+          "value": "11 22.11' N, 142 25.86' E, 10,897 m, 185 amphipods in 2.5 h"
+        },
+        {
+          "label": "Deepest fish filmed anywhere",
+          "value": "~8,075 m (Mariana snailfish) — well above the trench floor"
+        },
+        {
+          "label": "Xenophyophore depth record",
+          "value": "10,641 m, Sirena Deep (a different deep, ~128 mi NE of Challenger Deep)"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -155,7 +188,10 @@
       "facts": [
         { "label": "Catalog coordinate depth (this tile)", "value": "10,917.9 m" },
         { "label": "Distance from surveyed deepest cell", "value": "~0.6 km" },
-        { "label": "Published depth estimates surveyed (Stewart & Jamieson 2019)", "value": "10,744-10,994 m across >18 sources" }
+        {
+          "label": "Published depth estimates surveyed (Stewart & Jamieson 2019)",
+          "value": "10,744-10,994 m across >18 sources"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -178,9 +214,15 @@
         "This mission's north-wall scan point, on the trench's landward (subducting) inner wall, reads 9,977.7 m on this tile's real GMRT bathymetry, with a locally measured slope of roughly 25-29 deg depending on how widely the surrounding cells are sampled -- steep for a ~60 m-per-cell survey grid, and almost certainly an underestimate of how sharp the true wall is at a scale this coarse grid cannot resolve."
       ],
       "facts": [
-        { "label": "Plate boundary type", "value": "convergent; Pacific Plate subducts beneath the Mariana Arc / Philippine Plate" },
+        {
+          "label": "Plate boundary type",
+          "value": "convergent; Pacific Plate subducts beneath the Mariana Arc / Philippine Plate"
+        },
         { "label": "North wall depth (this scan point)", "value": "9,977.7 m" },
-        { "label": "North wall slope (grid-measured)", "value": "~25-29 deg, smoothed by the ~60 m grid" }
+        {
+          "label": "North wall slope (grid-measured)",
+          "value": "~25-29 deg, smoothed by the ~60 m grid"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -211,7 +253,10 @@
         { "label": "Central Pool depth (this tile)", "value": "10,926.5 m" },
         { "label": "Central-to-Eastern Pool distance", "value": "~18.6 km" },
         { "label": "Sill depth between them (terrain trace)", "value": "~10,704 m" },
-        { "label": "Five Deeps 2019 dives by pool", "value": "3 dives Eastern Pool, 1 dive Central Pool" }
+        {
+          "label": "Five Deeps 2019 dives by pool",
+          "value": "3 dives Eastern Pool, 1 dive Central Pool"
+        }
       ],
       "reconstruction": false,
       "sources": [

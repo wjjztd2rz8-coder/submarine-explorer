@@ -36,10 +36,7 @@
       "scientificName": "Anasterias pedicellaris",
       "aphiaID": 248006,
       "records": 4,
-      "depthRange_m": [
-        84,
-        90
-      ],
+      "depthRange_m": [84, 90],
       "group": "echinoderm",
       "taxonRank": "Species"
     },
@@ -47,10 +44,7 @@
       "scientificName": "Cycethra verrucosa",
       "aphiaID": 172748,
       "records": 2,
-      "depthRange_m": [
-        84,
-        90
-      ],
+      "depthRange_m": [84, 90],
       "group": "echinoderm",
       "taxonRank": "Species"
     },
@@ -58,10 +52,7 @@
       "scientificName": "Diplasterias brandti",
       "aphiaID": 178790,
       "records": 2,
-      "depthRange_m": [
-        84,
-        90
-      ],
+      "depthRange_m": [84, 90],
       "group": "echinoderm",
       "taxonRank": "Species"
     },
@@ -69,10 +60,7 @@
       "scientificName": "Paralophaster antarcticus",
       "aphiaID": 172789,
       "records": 2,
-      "depthRange_m": [
-        84,
-        90
-      ],
+      "depthRange_m": [84, 90],
       "group": "echinoderm",
       "taxonRank": "Species"
     },
@@ -122,10 +110,7 @@
       "scientificName": "Haploniscus cassilatus",
       "aphiaID": 344983,
       "records": 1,
-      "depthRange_m": [
-        5639,
-        5639
-      ],
+      "depthRange_m": [5639, 5639],
       "group": "crustacean",
       "taxonRank": "Species"
     },

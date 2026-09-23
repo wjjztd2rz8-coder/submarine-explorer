@@ -22,10 +22,22 @@
       ],
       "reconstruction": true,
       "sources": [
-        { "title": "German battleship Bismarck — Wikipedia", "url": "https://en.wikipedia.org/wiki/German_battleship_Bismarck" },
-        { "title": "The Wreck of the Bismarck — kbismarck.com", "url": "https://www.kbismarck.com/wreck.html" },
-        { "title": "vROV Pilot: Bismarck — Magellan", "url": "https://www.magellan.gg/vrov-pilot-bismarck/" },
-        { "title": "Who Sank the Bismarck? — U.S. Naval Institute Proceedings, June 1991", "url": "https://www.usni.org/magazines/proceedings/1991/june/who-sank-bismarck" }
+        {
+          "title": "German battleship Bismarck — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/German_battleship_Bismarck"
+        },
+        {
+          "title": "The Wreck of the Bismarck — kbismarck.com",
+          "url": "https://www.kbismarck.com/wreck.html"
+        },
+        {
+          "title": "vROV Pilot: Bismarck — Magellan",
+          "url": "https://www.magellan.gg/vrov-pilot-bismarck/"
+        },
+        {
+          "title": "Who Sank the Bismarck? — U.S. Naval Institute Proceedings, June 1991",
+          "url": "https://www.usni.org/magazines/proceedings/1991/june/who-sank-bismarck"
+        }
       ],
       "confidence": "high"
     },
@@ -39,15 +51,30 @@
       ],
       "facts": [
         { "label": "Length / beam", "value": "251 m / 36 m" },
-        { "label": "Orientation", "value": "upright, largely intact (accounts vary on the bow/stern)" },
+        {
+          "label": "Orientation",
+          "value": "upright, largely intact (accounts vary on the bow/stern)"
+        },
         { "label": "Debris trail (published)", "value": "~1 km down the seamount flank" },
-        { "label": "Survey", "value": "Ballard 1989; multiple later expeditions, most recently Magellan (2019)" }
+        {
+          "label": "Survey",
+          "value": "Ballard 1989; multiple later expeditions, most recently Magellan (2019)"
+        }
       ],
       "reconstruction": true,
       "sources": [
-        { "title": "The Wreck of the Bismarck — kbismarck.com", "url": "https://www.kbismarck.com/wreck.html" },
-        { "title": "vROV Pilot: Bismarck — Magellan", "url": "https://www.magellan.gg/vrov-pilot-bismarck/" },
-        { "title": "German battleship Bismarck — Wikipedia", "url": "https://en.wikipedia.org/wiki/German_battleship_Bismarck" }
+        {
+          "title": "The Wreck of the Bismarck — kbismarck.com",
+          "url": "https://www.kbismarck.com/wreck.html"
+        },
+        {
+          "title": "vROV Pilot: Bismarck — Magellan",
+          "url": "https://www.magellan.gg/vrov-pilot-bismarck/"
+        },
+        {
+          "title": "German battleship Bismarck — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/German_battleship_Bismarck"
+        }
       ],
       "confidence": "medium"
     },
@@ -66,8 +93,14 @@
       ],
       "reconstruction": true,
       "sources": [
-        { "title": "Bismarck Wreck: Main Gun Barrels — Naval History Forums (kbismarck.org)", "url": "https://www.kbismarck.org/forum/viewtopic.php?t=1470" },
-        { "title": "vROV Pilot: Bismarck — Magellan", "url": "https://www.magellan.gg/vrov-pilot-bismarck/" }
+        {
+          "title": "Bismarck Wreck: Main Gun Barrels — Naval History Forums (kbismarck.org)",
+          "url": "https://www.kbismarck.org/forum/viewtopic.php?t=1470"
+        },
+        {
+          "title": "vROV Pilot: Bismarck — Magellan",
+          "url": "https://www.magellan.gg/vrov-pilot-bismarck/"
+        }
       ],
       "confidence": "low"
     },
@@ -87,9 +120,18 @@
       ],
       "reconstruction": true,
       "sources": [
-        { "title": "German battleship Bismarck — Wikipedia", "url": "https://en.wikipedia.org/wiki/German_battleship_Bismarck" },
-        { "title": "Who Sank the Bismarck? — U.S. Naval Institute Proceedings, June 1991", "url": "https://www.usni.org/magazines/proceedings/1991/june/who-sank-bismarck" },
-        { "title": "The Wreck of the Bismarck — kbismarck.com", "url": "https://www.kbismarck.com/wreck.html" }
+        {
+          "title": "German battleship Bismarck — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/German_battleship_Bismarck"
+        },
+        {
+          "title": "Who Sank the Bismarck? — U.S. Naval Institute Proceedings, June 1991",
+          "url": "https://www.usni.org/magazines/proceedings/1991/june/who-sank-bismarck"
+        },
+        {
+          "title": "The Wreck of the Bismarck — kbismarck.com",
+          "url": "https://www.kbismarck.com/wreck.html"
+        }
       ],
       "confidence": "medium"
     },
@@ -104,14 +146,26 @@
       "facts": [
         { "label": "Terrain at hull", "value": "4,218.5 m (this tile)" },
         { "label": "Terrain 500 m up-slope (NE)", "value": "4,182.1 m (this tile)" },
-        { "label": "Published wreck depth", "value": "4,790-4,791 m (deeper than this tile reads here)" },
+        {
+          "label": "Published wreck depth",
+          "value": "4,790-4,791 m (deeper than this tile reads here)"
+        },
         { "label": "Published debris trail", "value": "~1 km, down a ~14.5° slope" },
-        { "label": "Data source", "value": "GMRT Synthesis (coarse fill here, not a dedicated survey)" }
+        {
+          "label": "Data source",
+          "value": "GMRT Synthesis (coarse fill here, not a dedicated survey)"
+        }
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" },
-        { "title": "vROV Pilot: Bismarck — Magellan", "url": "https://www.magellan.gg/vrov-pilot-bismarck/" }
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "vROV Pilot: Bismarck — Magellan",
+          "url": "https://www.magellan.gg/vrov-pilot-bismarck/"
+        }
       ],
       "confidence": "medium"
     },
@@ -130,8 +184,14 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "German battleship Bismarck — Wikipedia", "url": "https://en.wikipedia.org/wiki/German_battleship_Bismarck" },
-        { "title": "The Wreck of the Bismarck — kbismarck.com", "url": "https://www.kbismarck.com/wreck.html" }
+        {
+          "title": "German battleship Bismarck — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/German_battleship_Bismarck"
+        },
+        {
+          "title": "The Wreck of the Bismarck — kbismarck.com",
+          "url": "https://www.kbismarck.com/wreck.html"
+        }
       ],
       "confidence": "high"
     }

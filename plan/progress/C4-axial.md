@@ -45,14 +45,14 @@ Followed `plan/PHASE-C-CONTRACTS.md` SS1-3, SS5 (vent type, `vent` preset, black
 6. `guide.json` (8 entries): overview, Mushroom/Inferno, the minor-chimney cluster, vent-floor life
    (tube worms, palm worms, limpets, scale worms, spider crabs -- matches `data/landmarks.json`'s
    `notable_species`), the western caldera wall, the resurfaced caldera floor, an eruption-forecast
-   entry (1998/2011/2015 history plus the *current*, dated 2026-09-20 Chadwick/Nooner forecast
+   entry (1998/2011/2015 history plus the _current_, dated 2026-09-20 Chadwick/Nooner forecast
    status -- "nothing seems imminent at the moment" -- since today's date in this session is
    2026-09-23, this is a live, sourced hook rather than a stale fact), and the caldera rim/OOI
    cabled-array entry.
 7. `species.json`: `tools/obis_export.py --landmark axial-seamount-ashes --tile-bbox --depth-min
-   1300 --depth-max 1700 --max 30` (checklist endpoint): 157 taxa in the bbox, 39 at species rank in
+1300 --depth-max 1700 --max 30` (checklist endpoint): 157 taxa in the bbox, 39 at species rank in
    the depth window, top 30 by record count kept (823 records). Strong match to the sourced biology
-   -- includes *Ridgeia piscesae* (the tube worm named in the guide), *Lepetodrilus fucensis* (a vent
+   -- includes _Ridgeia piscesae_ (the tube worm named in the guide), _Lepetodrilus fucensis_ (a vent
    limpet), several vent-associated copepod/polychaete genera, plus non-vent deep-sea fauna typical
    of this depth on the wider seamount (blob sculpin, bubblegum coral, a deep-sea octopus).
    `species.json.note` states placement of any animal in the mission is invented.

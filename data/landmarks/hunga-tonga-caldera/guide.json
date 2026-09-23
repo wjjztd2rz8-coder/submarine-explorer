@@ -20,9 +20,18 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Mapping the Tongan eruption — NIWA (Earth Sciences New Zealand)", "url": "https://niwa.co.nz/hazards/mapping-tongan-eruption" },
-        { "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, Geochemistry, Geophysics, Geosystems (AGU)", "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685" },
-        { "title": "2022 Hunga Tonga-Hunga Ha'apai eruption and tsunami — Wikipedia", "url": "https://en.wikipedia.org/wiki/2022_Hunga_Tonga%E2%80%93Hunga_Ha%CA%BBapai_eruption_and_tsunami" }
+        {
+          "title": "Mapping the Tongan eruption — NIWA (Earth Sciences New Zealand)",
+          "url": "https://niwa.co.nz/hazards/mapping-tongan-eruption"
+        },
+        {
+          "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, Geochemistry, Geophysics, Geosystems (AGU)",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685"
+        },
+        {
+          "title": "2022 Hunga Tonga-Hunga Ha'apai eruption and tsunami — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/2022_Hunga_Tonga%E2%80%93Hunga_Ha%CA%BBapai_eruption_and_tsunami"
+        }
       ],
       "confidence": "high"
     },
@@ -37,12 +46,21 @@
       "facts": [
         { "label": "Depth here (this tile)", "value": "~132 m" },
         { "label": "Published pre-eruption depth", "value": "~150 m" },
-        { "label": "Pre-eruption survey", "value": "WASSP multibeam, Nov 2015; further multibeam, Sep 2017" }
+        {
+          "label": "Pre-eruption survey",
+          "value": "WASSP multibeam, Nov 2015; further multibeam, Sep 2017"
+        }
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, AGU", "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685" },
-        { "title": "Mapping the Tongan eruption — NIWA", "url": "https://niwa.co.nz/hazards/mapping-tongan-eruption" }
+        {
+          "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, AGU",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685"
+        },
+        {
+          "title": "Mapping the Tongan eruption — NIWA",
+          "url": "https://niwa.co.nz/hazards/mapping-tongan-eruption"
+        }
       ],
       "confidence": "high"
     },
@@ -60,8 +78,14 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Mapping the Tongan eruption — NIWA", "url": "https://niwa.co.nz/hazards/mapping-tongan-eruption" },
-        { "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, AGU", "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685" }
+        {
+          "title": "Mapping the Tongan eruption — NIWA",
+          "url": "https://niwa.co.nz/hazards/mapping-tongan-eruption"
+        },
+        {
+          "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, AGU",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685"
+        }
       ],
       "confidence": "high"
     },
@@ -72,13 +96,17 @@
         "Descending from the shallow caldera floor, the terrain steepens into the caldera's inner wall -- part of the crater rim that, before 2022, enclosed the summit basin. This tile reads roughly 469 m deep along this stretch of slope.",
         "No source consulted names this exact point specifically; it is picked out from this tile's own pre-eruption bathymetry as a representative section of the caldera wall, rather than a feature with its own published survey description. Treat the depth as a real reading from this tile, and the description of it as a 'caldera wall' as an interpretation of the surrounding terrain."
       ],
-      "facts": [
-        { "label": "Depth here (this tile)", "value": "~469 m" }
-      ],
+      "facts": [{ "label": "Depth here (this tile)", "value": "~469 m" }],
       "reconstruction": false,
       "sources": [
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" },
-        { "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, AGU", "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685" }
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, AGU",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685"
+        }
       ],
       "confidence": "medium"
     },
@@ -95,8 +123,14 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, AGU", "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685" },
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" }
+        {
+          "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, AGU",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685"
+        },
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        }
       ],
       "confidence": "high"
     }

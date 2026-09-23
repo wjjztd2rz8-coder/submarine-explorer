@@ -34,8 +34,11 @@
       "guide_entry": "beehive",
       "confidence": "low",
       "reconstruction": true,
-      "sources": ["https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"],
-      "note": "Beehive is a real named structure in the field, but no published coordinate or height was found. Placed illustratively ~140 m from Poseidon, within the sourced depth range."
+      "sources": [
+        "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869",
+        "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023GC011011"
+      ],
+      "note": "Beehive was a roughly 1 m vent on Poseidon; Aquino et al. 2024 report the chimney was absent by the 2018 visit. This separately scannable marker is placed illustratively about 140 m from Poseidon, not at a surveyed Beehive footprint."
     },
     {
       "id": "lost-city-imax-tower",
@@ -50,8 +53,11 @@
       "guide_entry": "imax-tower",
       "confidence": "low",
       "reconstruction": true,
-      "sources": ["https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"],
-      "note": "Real named structure, height sourced (~8 m). No published coordinate; placed illustratively near Poseidon within the sourced depth range."
+      "sources": [
+        "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf",
+        "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869"
+      ],
+      "note": "IMAX is a parasitic chimney and flange on Poseidon's north face; a 2005 account gives about 8 m and a 2016 survey describes a roughly 30 m multipronged structure. This separate marker is placed illustratively near Poseidon."
     },
     {
       "id": "lost-city-microbial-mat",

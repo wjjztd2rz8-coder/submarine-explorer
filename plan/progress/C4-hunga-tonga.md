@@ -10,7 +10,7 @@ new) plus this note; did not touch `src/`, `tests/` or any other landmark folder
 1. Read `data/landmarks.json`'s entry and `data/tiles/hunga-tonga-caldera/meta.json`,
    sampled `heightmap.bin` (bilinear, same convention as `validate_landmark.py`) to
    find real terrain: a shallow basin (~0 to ~150 m) around the islands, consistent
-   with the caldera floor and island saddle *before* the eruption, and deeper outer
+   with the caldera floor and island saddle _before_ the eruption, and deeper outer
    flanks down to ~1,950 m. `min_m`/`max_m` in the tile's own meta.json (-1951.36 to
    +82.09, part of the tile being the two islands above sea level) already implies
    this is pre-eruption data: the real post-eruption caldera floor is ~850 m, far

@@ -106,7 +106,10 @@
           "label": "Chimney fauna",
           "value": "Ridgeia tube worms, palm worms, sulfide worms, limpets, scale worms, spider crabs"
         },
-        { "label": "Absent from chimneys", "value": "large clams (found at diffuse-flow sites instead)" }
+        {
+          "label": "Absent from chimneys",
+          "value": "large clams (found at diffuse-flow sites instead)"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -182,7 +185,10 @@
         { "label": "1998 co-eruption deflation", "value": "3.2 m" },
         { "label": "2011 co-eruption deflation", "value": "2.4 m" },
         { "label": "2015 eruption forecast lead time", "value": "about 7 months (September 2014)" },
-        { "label": "Status as of Sept. 2026", "value": "fully re-inflated; low seismicity; no eruption imminent" }
+        {
+          "label": "Status as of Sept. 2026",
+          "value": "fully re-inflated; low seismicity; no eruption imminent"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -211,7 +217,10 @@
       "facts": [
         { "label": "This POI's depth", "value": "1,395 m (tile's shallowest point)" },
         { "label": "Boundary-fault relief", "value": "up to 150 m" },
-        { "label": "Monitoring network", "value": "OOI Regional Cabled Array (University of Washington)" }
+        {
+          "label": "Monitoring network",
+          "value": "OOI Regional Cabled Array (University of Washington)"
+        }
       ],
       "reconstruction": false,
       "sources": [

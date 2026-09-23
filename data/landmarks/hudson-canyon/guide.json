@@ -18,9 +18,18 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Proposed Designation of Hudson Canyon National Marine Sanctuary — NOAA Office of National Marine Sanctuaries", "url": "https://sanctuaries.noaa.gov/hudson-canyon/" },
-        { "title": "Hudson Canyon — Britannica", "url": "https://www.britannica.com/place/Hudson-Canyon" },
-        { "title": "Proposed Designation of Hudson Canyon National Marine Sanctuary — Mid-Atlantic Fishery Management Council", "url": "https://www.mafmc.org/actions/hudson-canyon" }
+        {
+          "title": "Proposed Designation of Hudson Canyon National Marine Sanctuary — NOAA Office of National Marine Sanctuaries",
+          "url": "https://sanctuaries.noaa.gov/hudson-canyon/"
+        },
+        {
+          "title": "Hudson Canyon — Britannica",
+          "url": "https://www.britannica.com/place/Hudson-Canyon"
+        },
+        {
+          "title": "Proposed Designation of Hudson Canyon National Marine Sanctuary — Mid-Atlantic Fishery Management Council",
+          "url": "https://www.mafmc.org/actions/hudson-canyon"
+        }
       ],
       "confidence": "high"
     },
@@ -33,16 +42,34 @@
         "In September 2025, NOAA and partners ran a two-week live-streamed expedition using the ROV Global Explorer to survey Hudson Canyon's coral, sponge and fish communities and collect environmental DNA -- explicitly framed as filling data gaps to support the sanctuary review, not as evidence the sanctuary already exists."
       ],
       "facts": [
-        { "label": "Designation status", "value": "proposed, not yet designated (process opened June 2022)" },
+        {
+          "label": "Designation status",
+          "value": "proposed, not yet designated (process opened June 2022)"
+        },
         { "label": "Public comments received (2022 scoping)", "value": "17,000+" },
-        { "label": "Existing coral protection", "value": "Frank R. Lautenberg Deep Sea Coral Protection Area (~38,000 sq mi, bans bottom gear)" },
-        { "label": "Most recent survey expedition", "value": "Sept 2025, ROV Global Explorer, live-streamed" }
+        {
+          "label": "Existing coral protection",
+          "value": "Frank R. Lautenberg Deep Sea Coral Protection Area (~38,000 sq mi, bans bottom gear)"
+        },
+        {
+          "label": "Most recent survey expedition",
+          "value": "Sept 2025, ROV Global Explorer, live-streamed"
+        }
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Proposed Designation of Hudson Canyon National Marine Sanctuary — NOAA Office of National Marine Sanctuaries", "url": "https://sanctuaries.noaa.gov/hudson-canyon/" },
-        { "title": "Frank R. Lautenberg Deep-Sea Coral Protection Area — Wikipedia (NOAA/MAFMC rule summary)", "url": "https://en.wikipedia.org/wiki/Frank_R._Lautenberg_Deep-Sea_Coral_Protection_Area" },
-        { "title": "Explore the Depths: Hudson Canyon Live! — NOAA Office of National Marine Sanctuaries", "url": "https://sanctuaries.noaa.gov/news/2025/explore-the-depths-hudson-canyon-live.html" }
+        {
+          "title": "Proposed Designation of Hudson Canyon National Marine Sanctuary — NOAA Office of National Marine Sanctuaries",
+          "url": "https://sanctuaries.noaa.gov/hudson-canyon/"
+        },
+        {
+          "title": "Frank R. Lautenberg Deep-Sea Coral Protection Area — Wikipedia (NOAA/MAFMC rule summary)",
+          "url": "https://en.wikipedia.org/wiki/Frank_R._Lautenberg_Deep-Sea_Coral_Protection_Area"
+        },
+        {
+          "title": "Explore the Depths: Hudson Canyon Live! — NOAA Office of National Marine Sanctuaries",
+          "url": "https://sanctuaries.noaa.gov/news/2025/explore-the-depths-hudson-canyon-live.html"
+        }
       ],
       "confidence": "high"
     },
@@ -61,8 +88,14 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "A catastrophic meltwater flood event and the formation of the Hudson Shelf Valley — USGS", "url": "https://pubs.usgs.gov/publication/70030018" },
-        { "title": "Hudson Canyon — Britannica", "url": "https://www.britannica.com/place/Hudson-Canyon" }
+        {
+          "title": "A catastrophic meltwater flood event and the formation of the Hudson Shelf Valley — USGS",
+          "url": "https://pubs.usgs.gov/publication/70030018"
+        },
+        {
+          "title": "Hudson Canyon — Britannica",
+          "url": "https://www.britannica.com/place/Hudson-Canyon"
+        }
       ],
       "confidence": "medium"
     },
@@ -75,12 +108,21 @@
       ],
       "facts": [
         { "label": "Wall slope (this survey's wall POI)", "value": "~18-19 deg" },
-        { "label": "Habitat protection here", "value": "Frank R. Lautenberg Deep Sea Coral Protection Area" }
+        {
+          "label": "Habitat protection here",
+          "value": "Frank R. Lautenberg Deep Sea Coral Protection Area"
+        }
       ],
       "reconstruction": true,
       "sources": [
-        { "title": "Proposed Designation of Hudson Canyon National Marine Sanctuary — Mid-Atlantic Fishery Management Council", "url": "https://www.mafmc.org/actions/hudson-canyon" },
-        { "title": "Explore the Depths: Hudson Canyon Live! — NOAA Office of National Marine Sanctuaries", "url": "https://sanctuaries.noaa.gov/news/2025/explore-the-depths-hudson-canyon-live.html" }
+        {
+          "title": "Proposed Designation of Hudson Canyon National Marine Sanctuary — Mid-Atlantic Fishery Management Council",
+          "url": "https://www.mafmc.org/actions/hudson-canyon"
+        },
+        {
+          "title": "Explore the Depths: Hudson Canyon Live! — NOAA Office of National Marine Sanctuaries",
+          "url": "https://sanctuaries.noaa.gov/news/2025/explore-the-depths-hudson-canyon-live.html"
+        }
       ],
       "confidence": "medium"
     },
@@ -99,8 +141,14 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 (values read directly from this tile's grid)", "url": "https://www.gmrt.org/" },
-        { "title": "Hudson Canyon — Britannica", "url": "https://www.britannica.com/place/Hudson-Canyon" }
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 (values read directly from this tile's grid)",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Hudson Canyon — Britannica",
+          "url": "https://www.britannica.com/place/Hudson-Canyon"
+        }
       ],
       "confidence": "high"
     }

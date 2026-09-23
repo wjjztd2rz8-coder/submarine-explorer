@@ -73,7 +73,7 @@ shows no regressions in the other four packs. `npm run test:py` -> 107 tests, al
 - **stern-nameplate** -- FMHT survey page, HISTORY.
 - **helm-and-life** -- HISTORY, Smithsonian (wildlife article, quoting a BAS scientist).
 - **structural-damage** -- FMHT survey page, HISTORY, Wikipedia.
-- **worsley-position** -- Squire & Bell 2022, *Journal of Navigation* (peer-reviewed), UKAHT.
+- **worsley-position** -- Squire & Bell 2022, _Journal of Navigation_ (peer-reviewed), UKAHT.
 - **abyssal-plain** -- GMRT (Ryan et al. 2009), Wikipedia.
 - **protection** -- UKAHT, FMHT press release, Smithsonian (protection-update article).
 

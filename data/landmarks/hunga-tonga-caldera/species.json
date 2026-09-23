@@ -20,10 +20,7 @@
       "scientificName": "Pycnochromis margaritifer",
       "aphiaID": 1605310,
       "records": 70,
-      "depthRange_m": [
-        4,
-        10
-      ],
+      "depthRange_m": [4, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -31,10 +28,7 @@
       "scientificName": "Pomacentrus vaiuli",
       "aphiaID": 277176,
       "records": 52,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -42,10 +36,7 @@
       "scientificName": "Pycnochromis vanderbilti",
       "aphiaID": 320883,
       "records": 37,
-      "depthRange_m": [
-        4,
-        10
-      ],
+      "depthRange_m": [4, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -53,10 +44,7 @@
       "scientificName": "Chromis chrysura",
       "aphiaID": 212824,
       "records": 33,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -64,10 +52,7 @@
       "scientificName": "Plectroglyphidodon fasciolatus",
       "aphiaID": 1592381,
       "records": 33,
-      "depthRange_m": [
-        4,
-        10
-      ],
+      "depthRange_m": [4, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -75,10 +60,7 @@
       "scientificName": "Plectroglyphidodon johnstonianus",
       "aphiaID": 212859,
       "records": 28,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -86,10 +68,7 @@
       "scientificName": "Thalassoma amblycephalum",
       "aphiaID": 212216,
       "records": 28,
-      "depthRange_m": [
-        4,
-        10
-      ],
+      "depthRange_m": [4, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -97,10 +76,7 @@
       "scientificName": "Thalassoma lutescens",
       "aphiaID": 273585,
       "records": 26,
-      "depthRange_m": [
-        4,
-        10
-      ],
+      "depthRange_m": [4, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -108,10 +84,7 @@
       "scientificName": "Pycnochromis agilis",
       "aphiaID": 1592293,
       "records": 22,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -119,10 +92,7 @@
       "scientificName": "Acanthurus nigrofuscus",
       "aphiaID": 219640,
       "records": 20,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -130,10 +100,7 @@
       "scientificName": "Lutjanus fulvus",
       "aphiaID": 218475,
       "records": 19,
-      "depthRange_m": [
-        4,
-        8
-      ],
+      "depthRange_m": [4, 8],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -141,10 +108,7 @@
       "scientificName": "Plectroglyphidodon dickii",
       "aphiaID": 212855,
       "records": 19,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -152,10 +116,7 @@
       "scientificName": "Pycnochromis iomelas",
       "aphiaID": 1592380,
       "records": 19,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -163,10 +124,7 @@
       "scientificName": "Labroides dimidiatus",
       "aphiaID": 219014,
       "records": 18,
-      "depthRange_m": [
-        4,
-        10
-      ],
+      "depthRange_m": [4, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -174,10 +132,7 @@
       "scientificName": "Naso lituratus",
       "aphiaID": 219665,
       "records": 18,
-      "depthRange_m": [
-        4,
-        10
-      ],
+      "depthRange_m": [4, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -185,10 +140,7 @@
       "scientificName": "Stegastes lacrymatus",
       "aphiaID": 1551095,
       "records": 17,
-      "depthRange_m": [
-        4,
-        10
-      ],
+      "depthRange_m": [4, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -196,10 +148,7 @@
       "scientificName": "Zebrasoma scopas",
       "aphiaID": 219679,
       "records": 17,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -207,10 +156,7 @@
       "scientificName": "Ctenochaetus cyanocheilus",
       "aphiaID": 277559,
       "records": 16,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -218,10 +164,7 @@
       "scientificName": "Halichoeres hortulanus",
       "aphiaID": 218985,
       "records": 16,
-      "depthRange_m": [
-        4,
-        10
-      ],
+      "depthRange_m": [4, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -229,10 +172,7 @@
       "scientificName": "Pomacentrus coelestis",
       "aphiaID": 277145,
       "records": 16,
-      "depthRange_m": [
-        4,
-        4
-      ],
+      "depthRange_m": [4, 4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -240,10 +180,7 @@
       "scientificName": "Zebrasoma velifer",
       "aphiaID": 712902,
       "records": 16,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -251,10 +188,7 @@
       "scientificName": "Chromis xanthura",
       "aphiaID": 212819,
       "records": 15,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -262,10 +196,7 @@
       "scientificName": "Chaetodon pelewensis",
       "aphiaID": 273353,
       "records": 13,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -273,10 +204,7 @@
       "scientificName": "Paracirrhites arcatus",
       "aphiaID": 218866,
       "records": 13,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -284,10 +212,7 @@
       "scientificName": "Centropyge bispinosa",
       "aphiaID": 278830,
       "records": 12,
-      "depthRange_m": [
-        8,
-        10
-      ],
+      "depthRange_m": [8, 10],
       "group": "fish",
       "taxonRank": "Species"
     }

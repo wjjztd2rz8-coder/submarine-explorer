@@ -111,9 +111,7 @@
       "guide_entry": "abyssal-plain",
       "confidence": "medium",
       "reconstruction": false,
-      "sources": [
-        "https://www.gmrt.org/"
-      ],
+      "sources": ["https://www.gmrt.org/"],
       "note": "Real survey data, 2 km west of the wreck: seabed 2,988 m here vs 3,000 m at the wreck, a gentle ~12 m rise over 2 km. This tile has no dedicated multibeam swath at the wreck site; the grid is GMRT's coarser GEBCO-derived fill (Ryan et al. 2009), which is why it cannot show the wreck itself and why relief across the whole tile is unusually smooth (min -3,096.4 m, max -2,915.3 m over ~70 x 33 km)."
     }
   ]

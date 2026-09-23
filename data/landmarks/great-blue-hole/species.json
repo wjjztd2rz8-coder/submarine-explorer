@@ -10,10 +10,7 @@
     "east": -87.37646484375,
     "west": -87.6917724609375
   },
-  "depth_filter_m": [
-    null,
-    200.0
-  ],
+  "depth_filter_m": [null, 200.0],
   "rank_filter": "species",
   "taxa_in_bbox": 82,
   "taxa_matching_rank": 71,
@@ -24,10 +21,7 @@
       "scientificName": "Pseudodiploria strigosa",
       "aphiaID": 718718,
       "records": 176,
-      "depthRange_m": [
-        3,
-        11
-      ],
+      "depthRange_m": [3, 11],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -35,10 +29,7 @@
       "scientificName": "Orbicella faveolata",
       "aphiaID": 758261,
       "records": 88,
-      "depthRange_m": [
-        3,
-        10.9
-      ],
+      "depthRange_m": [3, 10.9],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -46,10 +37,7 @@
       "scientificName": "Diploria labyrinthiformis",
       "aphiaID": 289826,
       "records": 84,
-      "depthRange_m": [
-        3,
-        11
-      ],
+      "depthRange_m": [3, 11],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -57,10 +45,7 @@
       "scientificName": "Montastraea cavernosa",
       "aphiaID": 287962,
       "records": 78,
-      "depthRange_m": [
-        3,
-        10.9
-      ],
+      "depthRange_m": [3, 10.9],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -68,10 +53,7 @@
       "scientificName": "Acanthurus coeruleus",
       "aphiaID": 159581,
       "records": 72,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -79,10 +61,7 @@
       "scientificName": "Sparisoma aurofrenatum",
       "aphiaID": 273772,
       "records": 62,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -90,10 +69,7 @@
       "scientificName": "Colpophyllia natans",
       "aphiaID": 289697,
       "records": 59,
-      "depthRange_m": [
-        3.8,
-        9.4
-      ],
+      "depthRange_m": [3.8, 9.4],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -101,10 +77,7 @@
       "scientificName": "Haemulon flavolineatum",
       "aphiaID": 275727,
       "records": 56,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -112,10 +85,7 @@
       "scientificName": "Sparisoma viride",
       "aphiaID": 273780,
       "records": 56,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -123,10 +93,7 @@
       "scientificName": "Acanthurus bahianus",
       "aphiaID": 159578,
       "records": 53,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -134,10 +101,7 @@
       "scientificName": "Cephalopholis cruentata",
       "aphiaID": 279146,
       "records": 52,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -145,10 +109,7 @@
       "scientificName": "Siderastrea siderea",
       "aphiaID": 207516,
       "records": 52,
-      "depthRange_m": [
-        3,
-        11
-      ],
+      "depthRange_m": [3, 11],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -156,10 +117,7 @@
       "scientificName": "Orbicella annularis",
       "aphiaID": 758260,
       "records": 51,
-      "depthRange_m": [
-        3,
-        9.4
-      ],
+      "depthRange_m": [3, 9.4],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -167,10 +125,7 @@
       "scientificName": "Microspathodon chrysurus",
       "aphiaID": 281571,
       "records": 48,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -178,10 +133,7 @@
       "scientificName": "Chaetodon capistratus",
       "aphiaID": 159661,
       "records": 45,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -189,10 +141,7 @@
       "scientificName": "Scarus iseri",
       "aphiaID": 276052,
       "records": 38,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -200,10 +149,7 @@
       "scientificName": "Porites astreoides",
       "aphiaID": 288889,
       "records": 37,
-      "depthRange_m": [
-        4.5,
-        11
-      ],
+      "depthRange_m": [4.5, 11],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -211,10 +157,7 @@
       "scientificName": "Holacanthus tricolor",
       "aphiaID": 276017,
       "records": 31,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -222,10 +165,7 @@
       "scientificName": "Ocyurus chrysurus",
       "aphiaID": 159803,
       "records": 31,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -233,10 +173,7 @@
       "scientificName": "Cephalopholis fulva",
       "aphiaID": 279148,
       "records": 26,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -244,10 +181,7 @@
       "scientificName": "Haemulon plumierii",
       "aphiaID": 158808,
       "records": 25,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -255,10 +189,7 @@
       "scientificName": "Lutjanus apodus",
       "aphiaID": 159793,
       "records": 24,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -266,10 +197,7 @@
       "scientificName": "Agaricia tenuifolia",
       "aphiaID": 287916,
       "records": 23,
-      "depthRange_m": [
-        5.9,
-        9.9
-      ],
+      "depthRange_m": [5.9, 9.9],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -277,10 +205,7 @@
       "scientificName": "Porites porites",
       "aphiaID": 207238,
       "records": 22,
-      "depthRange_m": [
-        3,
-        9.2
-      ],
+      "depthRange_m": [3, 9.2],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -288,10 +213,7 @@
       "scientificName": "Scarus taeniopterus",
       "aphiaID": 276062,
       "records": 19,
-      "depthRange_m": [
-        4.2,
-        9.4
-      ],
+      "depthRange_m": [4.2, 9.4],
       "group": "fish",
       "taxonRank": "Species"
     }

@@ -75,10 +75,7 @@
       "guide_entry": "seamount-flank",
       "confidence": "medium",
       "reconstruction": false,
-      "sources": [
-        "https://www.gmrt.org/",
-        "https://www.magellan.gg/vrov-pilot-bismarck/"
-      ],
+      "sources": ["https://www.gmrt.org/", "https://www.magellan.gg/vrov-pilot-bismarck/"],
       "note": "Real survey data, repositioned 2026-09 with the wreck: this tile's terrain shoals from 4,218.5 m at the hull to about 4,182 m here, roughly 500 m up-slope (north-east) toward the seamount summit (which reaches ~4,024 m about 3 km further along the same line). Published accounts describe the real debris trail as about 1 km long down a much steeper (~14.5 degree) slope, formed when the turrets hit the seamount first and triggered a landslide that carried the hull further down -- so this point sits between the turret-debris marker (further up-slope) and the hull (down-slope), on the same real slope. This tile's grid, built from GMRT's coarser global (GEBCO-derived) fill rather than a dedicated survey of the wreck site, is far too coarse to resolve the true trail or slope angle -- what you scan here is real but smoothed terrain, not the skid mark itself."
     },
     {
@@ -94,9 +91,7 @@
       "guide_entry": "memorial",
       "confidence": "high",
       "reconstruction": false,
-      "sources": [
-        "https://en.wikipedia.org/wiki/German_battleship_Bismarck"
-      ],
+      "sources": ["https://en.wikipedia.org/wiki/German_battleship_Bismarck"],
       "note": "A respectful marker near the hull, not a surveyed structure or a prop. Of Bismarck's crew of 2,221, only around 114 were rescued; roughly 2,100 died. This game has no salvage, collection or loot of any kind at any site."
     }
   ]

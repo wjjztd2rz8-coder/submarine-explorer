@@ -7,17 +7,17 @@ Researched 2026-09-23. Files: `pois.json`, `guide.json`, `mission.json`, `props.
 
 ## Sources consulted (WebSearch/WebFetch this session)
 
-| # | Source | URL | Used for |
-| - | ------ | --- | -------- |
-| 1 | Proposed Designation of Hudson Canyon National Marine Sanctuary — NOAA Office of National Marine Sanctuaries | https://sanctuaries.noaa.gov/hudson-canyon/ | Sanctuary designation status (proposed, not designated; process opened June 2022; 17,000+ scoping comments; no target date published), canyon location/size, depth range |
-| 2 | Proposed Designation of Hudson Canyon National Marine Sanctuary — Mid-Atlantic Fishery Management Council | https://www.mafmc.org/actions/hudson-canyon | Canyon size (350 mi seaward, up to 7.5 mi wide, 2-2.5 mi deep), habitat description (steep slopes, rock outcrops, nutrient flux), Frank R. Lautenberg Deep Sea Coral Protection Area (~100,000 km^2 / ~38,000 sq mi, bans bottom-tending gear), fishing-grounds importance, MAFMC's designation-process concerns |
-| 3 | Frank R. Lautenberg Deep-Sea Coral Protection Area — Wikipedia | https://en.wikipedia.org/wiki/Frank_R._Lautenberg_Deep-Sea_Coral_Protection_Area | Cross-check on the coral protection area's existence and scope (kept as a secondary corroboration alongside source 2, which independently states the same area/rule) |
-| 4 | Explore the Depths: Hudson Canyon Live! — NOAA Office of National Marine Sanctuaries | https://sanctuaries.noaa.gov/news/2025/explore-the-depths-hudson-canyon-live.html | Sept 2025 ROV Global Explorer expedition: two-week live-streamed survey of coral/sponge/fish communities and eDNA collection, explicitly to support the sanctuary review |
-| 5 | Hudson Canyon — Britannica | https://www.britannica.com/place/Hudson-Canyon | Canyon location (~100 mi SE of New York City), general description, corroborates depth figures |
-| 6 | A catastrophic meltwater flood event and the formation of the Hudson Shelf Valley — USGS | https://pubs.usgs.gov/publication/70030018 | Hudson Shelf Valley formation: catastrophic glacial meltwater flood, 15 m banks, 120 sq km bedform field, outer-shelf delta deposit |
-| 7 | A catastrophic meltwater flood event and formation Hudson Shelf Valley — USGS (mirror/search summary) | https://www.usgs.gov/publications/a-catastrophic-meltwater-flood-event-and-formation-hudson-shelf-valley | Valley length (~150 km), head/tail depths (~30 m near the harbor mouth, ~85 m near the canyon head), "largest physiographic feature on the mid-Atlantic shelf," not infilled with Holocene sediment |
-| 8 | Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 | https://www.gmrt.org/ | Every terrain-derived POI depth and the wall-slope calculation -- read directly from this tile's grid via `.probe_terrain.py` (an ad hoc script built this session on `validate_landmark.py`'s `Tile` class; not part of the shipped toolset) |
-| 9 | Ocean Biodiversity Information System (OBIS) | https://obis.org/ | `species.json` (via `tools/obis_export.py --landmark hudson-canyon --tile-bbox --max 30`) |
+| #   | Source                                                                                                       | URL                                                                                                      | Used for                                                                                                                                                                                                                                                                                                         |
+| --- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Proposed Designation of Hudson Canyon National Marine Sanctuary — NOAA Office of National Marine Sanctuaries | https://sanctuaries.noaa.gov/hudson-canyon/                                                              | Sanctuary designation status (proposed, not designated; process opened June 2022; 17,000+ scoping comments; no target date published), canyon location/size, depth range                                                                                                                                         |
+| 2   | Proposed Designation of Hudson Canyon National Marine Sanctuary — Mid-Atlantic Fishery Management Council    | https://www.mafmc.org/actions/hudson-canyon                                                              | Canyon size (350 mi seaward, up to 7.5 mi wide, 2-2.5 mi deep), habitat description (steep slopes, rock outcrops, nutrient flux), Frank R. Lautenberg Deep Sea Coral Protection Area (~100,000 km^2 / ~38,000 sq mi, bans bottom-tending gear), fishing-grounds importance, MAFMC's designation-process concerns |
+| 3   | Frank R. Lautenberg Deep-Sea Coral Protection Area — Wikipedia                                               | https://en.wikipedia.org/wiki/Frank_R._Lautenberg_Deep-Sea_Coral_Protection_Area                         | Cross-check on the coral protection area's existence and scope (kept as a secondary corroboration alongside source 2, which independently states the same area/rule)                                                                                                                                             |
+| 4   | Explore the Depths: Hudson Canyon Live! — NOAA Office of National Marine Sanctuaries                         | https://sanctuaries.noaa.gov/news/2025/explore-the-depths-hudson-canyon-live.html                        | Sept 2025 ROV Global Explorer expedition: two-week live-streamed survey of coral/sponge/fish communities and eDNA collection, explicitly to support the sanctuary review                                                                                                                                         |
+| 5   | Hudson Canyon — Britannica                                                                                   | https://www.britannica.com/place/Hudson-Canyon                                                           | Canyon location (~100 mi SE of New York City), general description, corroborates depth figures                                                                                                                                                                                                                   |
+| 6   | A catastrophic meltwater flood event and the formation of the Hudson Shelf Valley — USGS                     | https://pubs.usgs.gov/publication/70030018                                                               | Hudson Shelf Valley formation: catastrophic glacial meltwater flood, 15 m banks, 120 sq km bedform field, outer-shelf delta deposit                                                                                                                                                                              |
+| 7   | A catastrophic meltwater flood event and formation Hudson Shelf Valley — USGS (mirror/search summary)        | https://www.usgs.gov/publications/a-catastrophic-meltwater-flood-event-and-formation-hudson-shelf-valley | Valley length (~150 km), head/tail depths (~30 m near the harbor mouth, ~85 m near the canyon head), "largest physiographic feature on the mid-Atlantic shelf," not infilled with Holocene sediment                                                                                                              |
+| 8   | Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332             | https://www.gmrt.org/                                                                                    | Every terrain-derived POI depth and the wall-slope calculation -- read directly from this tile's grid via `.probe_terrain.py` (an ad hoc script built this session on `validate_landmark.py`'s `Tile` class; not part of the shipped toolset)                                                                    |
+| 9   | Ocean Biodiversity Information System (OBIS)                                                                 | https://obis.org/                                                                                        | `species.json` (via `tools/obis_export.py --landmark hudson-canyon --tile-bbox --max 30`)                                                                                                                                                                                                                        |
 
 Wikipedia was used once, for source 3, only as a secondary corroboration of a fact (the coral
 protection area's existence and scope) that is independently and more specifically stated by
@@ -36,6 +36,7 @@ task's explicit instruction to get this right. `data/landmarks.json` itself was 
 of scope for this package; C1/globe content owns it).
 
 ## Terrain survey (this session, via `.probe_terrain.py`, a small script built on
+
 `tools/validate_landmark.py`'s `Tile` class -- bilinear elevation sampling, grid extrema and
 straight-line transects)
 
@@ -102,22 +103,22 @@ deepest terrain (1,682.6 m); no crush-warning band is approached anywhere in thi
   reproducing that GIS centerline exactly -- documented as "medium" confidence on the
   `hc-shelf-valley` POI.
 - `notable_species` in `mission.json` was checked against this landmark's actual OBIS export
-  (`species.json`) rather than invented: blue shark (*Prionace glauca*) and piked/spiny dogfish
-  (*Squalus acanthias*) both appear in the bbox's OBIS records.
+  (`species.json`) rather than invented: blue shark (_Prionace glauca_) and piked/spiny dogfish
+  (_Squalus acanthias_) both appear in the bbox's OBIS records.
 
 ## Fabricated vs. sourced
 
-| Item | Sourced | Reconstructed / estimated |
-| ---- | ------- | -------------------------- |
-| Seabed terrain (all POIs) | GMRT bathymetry, Ryan et al. 2009 | Render-time detail noise (engine) |
-| Canyon size, sanctuary proposal status | NOAA (1), MAFMC (2) | -- |
-| Frank R. Lautenberg Deep Sea Coral Protection Area | MAFMC (2), Wikipedia (3) | -- |
-| Sept 2025 ROV survey expedition | NOAA (4) | -- |
-| Hudson Shelf Valley formation/geometry | USGS (6, 7) | Exact valley centerline vs. this tile's coarse grid; `hc-shelf-valley`'s point is an approximation |
-| Canyon head position | Britannica (5) | This tile's shallowest cell stands in for the (slightly out-of-tile) literal head |
-| Coral-ledge habitat type and protection status | MAFMC (2), NOAA (4) | Exact colony position: invented, flagged `reconstruction: true` |
-| Species list | OBIS occurrence data (9) | Placement in the mission is invented (field guide only; no species POIs beyond the habitat-type biology POI) |
-| Spawn point | -- | Chosen for gameplay: surface start above the primary-objective cluster |
+| Item                                               | Sourced                           | Reconstructed / estimated                                                                                    |
+| -------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Seabed terrain (all POIs)                          | GMRT bathymetry, Ryan et al. 2009 | Render-time detail noise (engine)                                                                            |
+| Canyon size, sanctuary proposal status             | NOAA (1), MAFMC (2)               | --                                                                                                           |
+| Frank R. Lautenberg Deep Sea Coral Protection Area | MAFMC (2), Wikipedia (3)          | --                                                                                                           |
+| Sept 2025 ROV survey expedition                    | NOAA (4)                          | --                                                                                                           |
+| Hudson Shelf Valley formation/geometry             | USGS (6, 7)                       | Exact valley centerline vs. this tile's coarse grid; `hc-shelf-valley`'s point is an approximation           |
+| Canyon head position                               | Britannica (5)                    | This tile's shallowest cell stands in for the (slightly out-of-tile) literal head                            |
+| Coral-ledge habitat type and protection status     | MAFMC (2), NOAA (4)               | Exact colony position: invented, flagged `reconstruction: true`                                              |
+| Species list                                       | OBIS occurrence data (9)          | Placement in the mission is invented (field guide only; no species POIs beyond the habitat-type biology POI) |
+| Spawn point                                        | --                                | Chosen for gameplay: surface start above the primary-objective cluster                                       |
 
 ## Final validator run
 

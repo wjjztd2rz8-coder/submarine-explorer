@@ -15,10 +15,7 @@
       "guide_entry": "canyon-wall",
       "confidence": "high",
       "reconstruction": false,
-      "sources": [
-        "https://www.gmrt.org/",
-        "https://www.mafmc.org/actions/hudson-canyon"
-      ],
+      "sources": ["https://www.gmrt.org/", "https://www.mafmc.org/actions/hudson-canyon"],
       "note": "Real GMRT terrain (Ryan et al. 2009; value and slope read directly from this tile's grid this session): 541.9 m deep, on a locally steep flank of the upper canyon's north wall. Central-difference slope sampling over one grid cell (~50-60 m) gives roughly 18-19 deg here -- steep for this ~50 m grid, and the true wall relief (rock outcrops and ledges per MAFMC's habitat description) is almost certainly sharper than this coarse sampling can resolve."
     },
     {

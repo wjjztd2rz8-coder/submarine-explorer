@@ -9,17 +9,17 @@ throughout, and there is no salvage framing anywhere.
 
 ## Sources consulted
 
-| # | Source | URL | Used for | Primary? |
-| - | ------ | --- | -------- | -------- |
-| 1 | German battleship Bismarck — Wikipedia | https://en.wikipedia.org/wiki/German_battleship_Bismarck | Pursuit narrative (Denmark Strait, Hood, torpedo hits, final battle), dimensions (251 m / 36 m), crew complement (2,221), casualties (~114 survivors), sinking date/time, discovery date, infobox coordinates | Secondary, but the most complete single account found |
-| 2 | The Wreck of the Bismarck — kbismarck.com | https://www.kbismarck.com/wreck.html | Hull condition ("surprisingly good condition", "intact" except a small stern piece), turret orientation (upside-down), 2001 McDowell expedition using Ballard's coordinates, approximate depth/distance from Brest | Enthusiast reference site, treated as secondary but detailed and long-standing |
-| 3 | vROV Pilot: Bismarck — Magellan | https://www.magellan.gg/vrov-pilot-bismarck/ | 2019 digital-twin survey, ~1 km debris trail, turrets/armour/Admiral's Bridge in the debris field, depth (~4,790 m) | Primary for the 2019 survey (the company that ran it) |
-| 4 | H.M.S. Hood Association, 2001 Expedition — Wreck of Battleship Bismarck | https://www.hmshood.org.uk/hoodtoday/2001expedition/bismarck/encrypt.htm | Coordinate "vicinity of 4809N 01607W" (48.15N, 16.117W), 14.5° slope, hull slid ~1.5 km after impact, one turret (possibly Caesar) found with smashed rotating structure, other three not located by this expedition | Secondary (expedition report, not the primary surveyors) |
-| 5 | Bismarck Wreck: Main Gun Barrels — Naval History Forums (kbismarck.org) | https://www.kbismarck.org/forum/viewtopic.php?t=1470 | Turrets unbolted from below, broke free and fell separately; roughly in line on the seabed, one pushed out of line by the sliding hull | Enthusiast forum, secondary |
-| 6 | Who Sank the Bismarck? — U.S. Naval Institute Proceedings, June 1991 | https://www.usni.org/magazines/proceedings/1991/june/who-sank-bismarck | Shellfire-vs-scuttling historiographical debate | Secondary, professional naval journal |
-| 7 | Wikipedia geocoordinate API (`action=query&prop=coordinates`) | (API call, same article as #1) | Confirmed the infobox coordinate is 48.16667N, 16.2W (the commonly quoted "48°10'N 16°12'W") | Same as #1 |
-| 8 | GMRT Synthesis (Ryan et al. 2009), doi:10.1029/2008GC002332 | https://www.gmrt.org/ | Tile terrain, seamount summit/flank readings | Primary — the dataset itself |
-| 9 | `data/landmarks.json` (repo) | — | Landmark id/bbox/coordinate/`wreck_meta` (bow "separated from main hull", 251 m length) | Repo data, not an external source; flagged where it conflicts with #1/#2 below |
+| #   | Source                                                                  | URL                                                                      | Used for                                                                                                                                                                                                             | Primary?                                                                       |
+| --- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| 1   | German battleship Bismarck — Wikipedia                                  | https://en.wikipedia.org/wiki/German_battleship_Bismarck                 | Pursuit narrative (Denmark Strait, Hood, torpedo hits, final battle), dimensions (251 m / 36 m), crew complement (2,221), casualties (~114 survivors), sinking date/time, discovery date, infobox coordinates        | Secondary, but the most complete single account found                          |
+| 2   | The Wreck of the Bismarck — kbismarck.com                               | https://www.kbismarck.com/wreck.html                                     | Hull condition ("surprisingly good condition", "intact" except a small stern piece), turret orientation (upside-down), 2001 McDowell expedition using Ballard's coordinates, approximate depth/distance from Brest   | Enthusiast reference site, treated as secondary but detailed and long-standing |
+| 3   | vROV Pilot: Bismarck — Magellan                                         | https://www.magellan.gg/vrov-pilot-bismarck/                             | 2019 digital-twin survey, ~1 km debris trail, turrets/armour/Admiral's Bridge in the debris field, depth (~4,790 m)                                                                                                  | Primary for the 2019 survey (the company that ran it)                          |
+| 4   | H.M.S. Hood Association, 2001 Expedition — Wreck of Battleship Bismarck | https://www.hmshood.org.uk/hoodtoday/2001expedition/bismarck/encrypt.htm | Coordinate "vicinity of 4809N 01607W" (48.15N, 16.117W), 14.5° slope, hull slid ~1.5 km after impact, one turret (possibly Caesar) found with smashed rotating structure, other three not located by this expedition | Secondary (expedition report, not the primary surveyors)                       |
+| 5   | Bismarck Wreck: Main Gun Barrels — Naval History Forums (kbismarck.org) | https://www.kbismarck.org/forum/viewtopic.php?t=1470                     | Turrets unbolted from below, broke free and fell separately; roughly in line on the seabed, one pushed out of line by the sliding hull                                                                               | Enthusiast forum, secondary                                                    |
+| 6   | Who Sank the Bismarck? — U.S. Naval Institute Proceedings, June 1991    | https://www.usni.org/magazines/proceedings/1991/june/who-sank-bismarck   | Shellfire-vs-scuttling historiographical debate                                                                                                                                                                      | Secondary, professional naval journal                                          |
+| 7   | Wikipedia geocoordinate API (`action=query&prop=coordinates`)           | (API call, same article as #1)                                           | Confirmed the infobox coordinate is 48.16667N, 16.2W (the commonly quoted "48°10'N 16°12'W")                                                                                                                         | Same as #1                                                                     |
+| 8   | GMRT Synthesis (Ryan et al. 2009), doi:10.1029/2008GC002332             | https://www.gmrt.org/                                                    | Tile terrain, seamount summit/flank readings                                                                                                                                                                         | Primary — the dataset itself                                                   |
+| 9   | `data/landmarks.json` (repo)                                            | —                                                                        | Landmark id/bbox/coordinate/`wreck_meta` (bow "separated from main hull", 251 m length)                                                                                                                              | Repo data, not an external source; flagged where it conflicts with #1/#2 below |
 
 ## Position discrepancy -- resolved 2026-09
 
@@ -93,13 +93,13 @@ discrepancy (`plan/progress/C4-endurance.md`): report both, do not silently pick
 
 ## Depth check (superseded 2026-09; kept for context on the old tile)
 
-| Point | lat, lon | Tile terrain | Published |
-| ----- | -------- | ------------ | --------- |
-| bismarck-hull (old tile centre) | 48.33372, -16.10678 | 4,874.9 m | 4,790-4,791 m (sources 1-2) |
-| bismarck-turret-debris (old) | 48.3387, -16.1168 | 4,891.8 m | (illustrative, no published coordinate) |
-| bismarck-skid-trail (old) | 48.336, -16.112 | 4,885.3 m | (illustrative) |
-| Old tile shallowest cell (summit) | 48.46336, -16.32980 | 3,812.9 m | (GMRT only) |
-| Old tile deepest cell | 48.24528, -16.22543 | 5,009.0 m | (GMRT only) |
+| Point                             | lat, lon            | Tile terrain | Published                               |
+| --------------------------------- | ------------------- | ------------ | --------------------------------------- |
+| bismarck-hull (old tile centre)   | 48.33372, -16.10678 | 4,874.9 m    | 4,790-4,791 m (sources 1-2)             |
+| bismarck-turret-debris (old)      | 48.3387, -16.1168   | 4,891.8 m    | (illustrative, no published coordinate) |
+| bismarck-skid-trail (old)         | 48.336, -16.112     | 4,885.3 m    | (illustrative)                          |
+| Old tile shallowest cell (summit) | 48.46336, -16.32980 | 3,812.9 m    | (GMRT only)                             |
+| Old tile deepest cell             | 48.24528, -16.22543 | 5,009.0 m    | (GMRT only)                             |
 
 The old hull reading was 84 m deeper than the commonly published 4,790-4,791 m — a
 larger gap than Endurance's 7.7 m, consistent with the position discrepancy above:
@@ -108,13 +108,13 @@ depth figure.
 
 ## Depth check on the new tile (2026-09, bilinear sample of `heightmap.bin`)
 
-| Point | lat, lon | Tile terrain | Published |
-| ----- | -------- | ------------ | --------- |
-| bismarck-hull | 48.15, -16.117 | 4,218.5 m | 4,790-4,791 m (sources 1-2) |
-| bismarck-turret-debris | 48.15114, -16.10497 | 4,129.2 m | (illustrative, no published coordinate) |
-| bismarck-skid-trail | 48.15063, -16.11032 | 4,182.1 m | (illustrative) |
-| Tile shallowest cell (summit) | 48.15504, -16.08147 | 4,023.8 m | (GMRT only) |
-| Tile deepest cell | (unsampled; see meta.json `min_m`) | 5,009.1 m | (GMRT only) |
+| Point                         | lat, lon                           | Tile terrain | Published                               |
+| ----------------------------- | ---------------------------------- | ------------ | --------------------------------------- |
+| bismarck-hull                 | 48.15, -16.117                     | 4,218.5 m    | 4,790-4,791 m (sources 1-2)             |
+| bismarck-turret-debris        | 48.15114, -16.10497                | 4,129.2 m    | (illustrative, no published coordinate) |
+| bismarck-skid-trail           | 48.15063, -16.11032                | 4,182.1 m    | (illustrative)                          |
+| Tile shallowest cell (summit) | 48.15504, -16.08147                | 4,023.8 m    | (GMRT only)                             |
+| Tile deepest cell             | (unsampled; see meta.json `min_m`) | 5,009.1 m    | (GMRT only)                             |
 
 The new hull reading is about 570 m shallower than the commonly published depth --
 a much larger gap than the old tile's, because the sourced coordinate marks a
@@ -128,7 +128,7 @@ above for why this was not corrected by moving the coordinate further.
 separated from main hull." kbismarck.com (source 2) instead describes the hull as
 "intact" with only "a small part of the stern that broke away at frame 10.5." These
 are hard to reconcile from the sources gathered this session — they may describe
-different things (a detached bow *section* vs. a small stern *fragment*), or one may
+different things (a detached bow _section_ vs. a small stern _fragment_), or one may
 be imprecise. Per `docs/props.md`'s hull-block `ends` field and the task brief's
 explicit instruction, `props.json`'s hull uses `ends: ["prow", "rounded"]` (an intact
 bow and stern shape, matching the "surprisingly good condition" account), and
@@ -137,19 +137,19 @@ them.
 
 ## Fabricated vs. sourced
 
-| Item | Sourced (measured/published) | Reconstructed / estimated |
-| ---- | ----------------------------- | -------------------------- |
-| Seabed terrain | GMRT Synthesis (real, coarse) | Render-time detail noise (engine) |
-| Wreck position | Conflicting published coordinates (see above) | Tile-centre coordinate used, flagged medium confidence |
-| Wreck depth | 4,790-4,791 m published; terrain reads 4,874.9 m at the used coordinate | — |
-| Hull length / beam | 251 m / 36 m (published) | Box shape; 15 m height (unsourced estimate) |
-| Hull heading | "Upright" (qualitative) | Exact 20° value (arbitrary; no heading published) |
-| Hull end shapes | "Intact" per kbismarck.com | `[prow, rounded]`; conflicts with landmarks.json's "bow separated" note (both stated in guide.json) |
-| Turret debris | Turrets broke free and fell separately (multiple sources); Ballard found 1 of 4 | Exact positions (illustrative, up-slope of hull); debris-cluster stand-in shape |
-| Battle-damage POI | Pursuit, sinking timeline, scuttling-vs-shellfire debate (well sourced) | Marker position (illustrative; no single "damage site" is surveyed) |
-| Seamount-flank POI | Real tile terrain readings | Interpretation ("this is a smoothed version of the real slope"), inference flagged as such |
-| Casualty figures | 2,221 aboard, ~114 rescued, ~2,100 died (Wikipedia) | — |
-| Spawn point | — | Chosen for gameplay: 1.5 km NE of the hull, heading 225° |
+| Item               | Sourced (measured/published)                                                    | Reconstructed / estimated                                                                           |
+| ------------------ | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Seabed terrain     | GMRT Synthesis (real, coarse)                                                   | Render-time detail noise (engine)                                                                   |
+| Wreck position     | Conflicting published coordinates (see above)                                   | Tile-centre coordinate used, flagged medium confidence                                              |
+| Wreck depth        | 4,790-4,791 m published; terrain reads 4,874.9 m at the used coordinate         | —                                                                                                   |
+| Hull length / beam | 251 m / 36 m (published)                                                        | Box shape; 15 m height (unsourced estimate)                                                         |
+| Hull heading       | "Upright" (qualitative)                                                         | Exact 20° value (arbitrary; no heading published)                                                   |
+| Hull end shapes    | "Intact" per kbismarck.com                                                      | `[prow, rounded]`; conflicts with landmarks.json's "bow separated" note (both stated in guide.json) |
+| Turret debris      | Turrets broke free and fell separately (multiple sources); Ballard found 1 of 4 | Exact positions (illustrative, up-slope of hull); debris-cluster stand-in shape                     |
+| Battle-damage POI  | Pursuit, sinking timeline, scuttling-vs-shellfire debate (well sourced)         | Marker position (illustrative; no single "damage site" is surveyed)                                 |
+| Seamount-flank POI | Real tile terrain readings                                                      | Interpretation ("this is a smoothed version of the real slope"), inference flagged as such          |
+| Casualty figures   | 2,221 aboard, ~114 rescued, ~2,100 died (Wikipedia)                             | —                                                                                                   |
+| Spawn point        | —                                                                               | Chosen for gameplay: 1.5 km NE of the hull, heading 225°                                            |
 
 ## Not verified / open
 

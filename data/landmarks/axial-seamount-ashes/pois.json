@@ -107,10 +107,7 @@
       "guide_entry": "caldera-summit",
       "confidence": "high",
       "reconstruction": false,
-      "sources": [
-        "https://en.wikipedia.org/wiki/Axial_Seamount",
-        "https://www.gmrt.org/"
-      ],
+      "sources": ["https://en.wikipedia.org/wiki/Axial_Seamount", "https://www.gmrt.org/"],
       "note": "Real GMRT terrain: the shallowest point sampled anywhere in this tile, 1,395.3 m, about 1.4 km north-east of Mushroom on the caldera floor/rim high. Wikipedia gives the seamount's summit depth as 1,410 m, close to this tile's reading given GMRT's grid resolution. An optional longer detour, per the pacing note that caldera transects beyond the ASHES cluster are exploration, not a requirement."
     }
   ]

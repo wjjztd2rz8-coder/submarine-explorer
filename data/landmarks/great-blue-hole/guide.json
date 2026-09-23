@@ -14,12 +14,21 @@
         { "label": "Real hole diameter", "value": "~318 m" },
         { "label": "Real hole depth", "value": "~124 m" },
         { "label": "Terrain reading at hole coordinates (this tile)", "value": "~4.2 m" },
-        { "label": "Protection", "value": "Belize Barrier Reef Reserve System, UNESCO World Heritage Site" }
+        {
+          "label": "Protection",
+          "value": "Belize Barrier Reef Reserve System, UNESCO World Heritage Site"
+        }
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Great Blue Hole — Wikipedia", "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole" },
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" }
+        {
+          "title": "Great Blue Hole — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole"
+        },
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        }
       ],
       "confidence": "high"
     },
@@ -34,16 +43,31 @@
       ],
       "facts": [
         { "label": "Diameter / depth", "value": "~318 m / ~124 m" },
-        { "label": "Formed during", "value": "ice-age low sea levels (dated to ~153,000-15,000 years ago)" },
+        {
+          "label": "Formed during",
+          "value": "ice-age low sea levels (dated to ~153,000-15,000 years ago)"
+        },
         { "label": "Charted by", "value": "Jacques Cousteau, 1971 (RV Calypso)" },
-        { "label": "3D sonar-mapped by", "value": "Blue Hole Belize Expedition, Nov-Dec 2018 (Aquatica Submarines, Kongsberg)" },
+        {
+          "label": "3D sonar-mapped by",
+          "value": "Blue Hole Belize Expedition, Nov-Dec 2018 (Aquatica Submarines, Kongsberg)"
+        },
         { "label": "Anoxic layer", "value": "~90 m depth" }
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Great Blue Hole — Wikipedia", "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole" },
-        { "title": "Jacques Cousteau's Grandson to Map Depths of Massive Blue Hole Off Belize's Coast — Live Science", "url": "https://www.livescience.com/63950-belize-blue-hole-expedition.html" },
-        { "title": "Belize's Great Blue Hole revealed in expedition survey — GPS World", "url": "https://www.gpsworld.com/belizes-great-blue-hole-revealed-in-expedition-survey/" }
+        {
+          "title": "Great Blue Hole — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole"
+        },
+        {
+          "title": "Jacques Cousteau's Grandson to Map Depths of Massive Blue Hole Off Belize's Coast — Live Science",
+          "url": "https://www.livescience.com/63950-belize-blue-hole-expedition.html"
+        },
+        {
+          "title": "Belize's Great Blue Hole revealed in expedition survey — GPS World",
+          "url": "https://www.gpsworld.com/belizes-great-blue-hole-revealed-in-expedition-survey/"
+        }
       ],
       "confidence": "high"
     },
@@ -60,8 +84,14 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" },
-        { "title": "Lighthouse Reef — Wikipedia", "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef" }
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Lighthouse Reef — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef"
+        }
       ],
       "confidence": "high"
     },
@@ -78,8 +108,14 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" },
-        { "title": "Lighthouse Reef — Wikipedia", "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef" }
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Lighthouse Reef — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef"
+        }
       ],
       "confidence": "high"
     },
@@ -96,8 +132,14 @@
       ],
       "reconstruction": true,
       "sources": [
-        { "title": "Great Blue Hole — Wikipedia", "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole" },
-        { "title": "Lighthouse Reef — Wikipedia", "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef" }
+        {
+          "title": "Great Blue Hole — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole"
+        },
+        {
+          "title": "Lighthouse Reef — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef"
+        }
       ],
       "confidence": "medium"
     }

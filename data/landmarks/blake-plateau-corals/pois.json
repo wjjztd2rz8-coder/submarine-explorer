@@ -91,9 +91,7 @@
       "guide_entry": "inter-mound-channel",
       "confidence": "high",
       "reconstruction": false,
-      "sources": [
-        "https://www.gmrt.org/"
-      ],
+      "sources": ["https://www.gmrt.org/"],
       "note": "Real survey terrain: a lower stretch of seabed (779.7 m at the sample coordinate) between the two mapped mounds, part of the same tile data used for the mound POIs."
     }
   ]

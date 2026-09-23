@@ -61,6 +61,14 @@
         {
           "title": "Lost City Hydrothermal Field — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
+        },
+        {
+          "title": "Denny et al. 2016, Geologic evolution of the Lost City Hydrothermal Field",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869"
+        },
+        {
+          "title": "Ludwig et al. 2011, U–Th ages of Lost City chimneys",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S0016703711000135"
         }
       ],
       "confidence": "medium"
@@ -69,15 +77,25 @@
       "id": "beehive",
       "title": "Beehive",
       "paragraphs": [
-        "Beehive is one of several named smaller spires clustered around Poseidon. Real hydrothermal fields like this one contain dozens of chimneys and flanges of every size, from fist-sized knobs to multi-storey towers, and only a handful have been individually named and described in the literature.",
-        "No published coordinate, height or photograph description for Beehive was found during this research pass, so its size and exact position here are estimates, placed near Poseidon within the field's real depth range."
+        "Beehive was a small, roughly 1 m high vent on Poseidon's flank. It released some of the hottest fluid measured at Lost City, about 91 degC during earlier surveys. Later researchers reported that the chimney itself was gone by their 2018 visit, although fluid still vented from its former opening.",
+        "Its marker here is offset from Poseidon so you can scan it separately. The marker's position and size are illustrative, not a survey of Beehive's footprint."
       ],
-      "facts": [{ "label": "Position/height", "value": "not published; estimated" }],
+      "facts": [
+        { "label": "Historical height", "value": "about 1 m; structure absent in 2018 survey" }
+      ],
       "reconstruction": true,
       "sources": [
         {
           "title": "Lost City Hydrothermal Field — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
+        },
+        {
+          "title": "Denny et al. 2016, Geologic evolution of the Lost City Hydrothermal Field",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869"
+        },
+        {
+          "title": "Aquino et al. 2024, Lost City chimney fluid mixing",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023GC011011"
         }
       ],
       "confidence": "low"
@@ -86,15 +104,28 @@
       "id": "imax-tower",
       "title": "IMAX Tower",
       "paragraphs": [
-        "IMAX Tower takes its name from the giant-screen documentary crew that filmed the field. At about 8 m tall, it is modest next to Poseidon, but still a substantial mineral spire built the same way: cold seawater meeting warm, alkaline vent fluid and dropping carbonate out of solution.",
-        "Its exact coordinate is not published; it is placed here near Poseidon, within the field's real depth range."
+        "IMAX is a parasitic chimney and flange on Poseidon's north face, built as warm, alkaline vent fluid mixed with seawater and deposited carbonate minerals. A 2005 expedition account described the chimney as about 8 m tall; a later detailed geologic survey described a roughly 30 m multipronged structure. Those measurements may refer to different parts of the growing complex.",
+        "The separately scannable tower here is an illustrative marker near Poseidon, not a surveyed coordinate or a full reconstruction of the flange complex."
       ],
-      "facts": [{ "label": "Height", "value": "about 8 m" }],
+      "facts": [
+        {
+          "label": "Published heights",
+          "value": "about 8 m (2005 account); roughly 30 m (2016 survey)"
+        }
+      ],
       "reconstruction": true,
       "sources": [
         {
           "title": "Lost City Hydrothermal Field — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
+        },
+        {
+          "title": "Kelley et al. 2005, The Lost City Hydrothermal Field",
+          "url": "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"
+        },
+        {
+          "title": "Denny et al. 2016, Geologic evolution of the Lost City Hydrothermal Field",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869"
         }
       ],
       "confidence": "low"

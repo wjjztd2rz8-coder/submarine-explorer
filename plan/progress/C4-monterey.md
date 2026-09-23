@@ -7,7 +7,7 @@ Picked up from `plan/progress/C4a.md`'s Monterey notes. Only edited
 ## What was done
 
 1. `species.json`: ran `tools/obis_export.py --landmark monterey-canyon
-   --tile-bbox --depth-min 200 --depth-max 3600 --max 40` live against
+--tile-bbox --depth-min 200 --depth-max 3600 --max 40` live against
    `api.obis.org` (worked fine, ~41 requests, a few minutes). 885 taxa in the
    bbox, 449 at species rank in the depth window, top 40 by record count kept
    (129,124 records total). `note` says species placement in the mission is
@@ -17,8 +17,8 @@ Picked up from `plan/progress/C4a.md`'s Monterey notes. Only edited
    hull-class justification, and a fabricated-vs-sourced table, matching the
    titanic/lost-city pack format.
 3. Second real source added to two guide entries that had only one:
-   - `canyon-axis` (turbidity currents): added Paull et al. 2018, *Nature
-     Communications* 9:4114 (doi:10.1038/s41467-018-06254-6) — the
+   - `canyon-axis` (turbidity currents): added Paull et al. 2018, _Nature
+     Communications_ 9:4114 (doi:10.1038/s41467-018-06254-6) — the
      peer-reviewed paper behind the ~7 m/s figure — and a USGS news page
      corroborating the 50 km monitored stretch. Used the USGS URL as the
      `sources` entry (govt., freely fetchable); the Nature paper is cited in

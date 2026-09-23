@@ -11,15 +11,27 @@
       ],
       "facts": [
         { "label": "Depth range", "value": "4,957-4,987 m (Connelly et al. 2012)" },
-        { "label": "Discovery", "value": "2009-2010, RV Cape Hatteras / RRS James Cook (Nereus, Autosub6000, HyBIS)" },
+        {
+          "label": "Discovery",
+          "value": "2009-2010, RV Cape Hatteras / RRS James Cook (Nereus, Autosub6000, HyBIS)"
+        },
         { "label": "Publication", "value": "Connelly et al., Nature Communications 3:620 (2012)" },
         { "label": "Named for", "value": "William Beebe (naturalist, Bathysphere pioneer)" }
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Connelly, D.P. et al. 2012, \"Hydrothermal vent fields and chemosynthetic biota on the world's deepest seafloor spreading centre\", Nature Communications 3:620", "url": "https://www.nature.com/articles/ncomms1636" },
-        { "title": "Beebe Hydrothermal Vent Field — Wikipedia", "url": "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field" },
-        { "title": "InterRidge Vents Database — Beebe vent field", "url": "https://vents-data.interridge.org/ventfield/beebe" }
+        {
+          "title": "Connelly, D.P. et al. 2012, \"Hydrothermal vent fields and chemosynthetic biota on the world's deepest seafloor spreading centre\", Nature Communications 3:620",
+          "url": "https://www.nature.com/articles/ncomms1636"
+        },
+        {
+          "title": "Beebe Hydrothermal Vent Field — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field"
+        },
+        {
+          "title": "InterRidge Vents Database — Beebe vent field",
+          "url": "https://vents-data.interridge.org/ventfield/beebe"
+        }
       ],
       "confidence": "high"
     },
@@ -38,8 +50,14 @@
       ],
       "reconstruction": true,
       "sources": [
-        { "title": "Connelly, D.P. et al. 2012, Nature Communications 3:620", "url": "https://www.nature.com/articles/ncomms1636" },
-        { "title": "Webber, A.P. et al. 2015, \"Geology, sulfide geochemistry and supercritical venting at the Beebe Hydrothermal Vent Field, Cayman Trough\", Geochemistry, Geophysics, Geosystems 16", "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879" }
+        {
+          "title": "Connelly, D.P. et al. 2012, Nature Communications 3:620",
+          "url": "https://www.nature.com/articles/ncomms1636"
+        },
+        {
+          "title": "Webber, A.P. et al. 2015, \"Geology, sulfide geochemistry and supercritical venting at the Beebe Hydrothermal Vent Field, Cayman Trough\", Geochemistry, Geophysics, Geosystems 16",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879"
+        }
       ],
       "confidence": "high"
     },
@@ -52,14 +70,26 @@
       ],
       "facts": [
         { "label": "Species", "value": "Rimicaris hybisae (Nye et al. 2012)" },
-        { "label": "Eyes", "value": "lost with age; replaced functionally by a dorsal light-sensing organ" },
+        {
+          "label": "Eyes",
+          "value": "lost with age; replaced functionally by a dorsal light-sensing organ"
+        },
         { "label": "Feeding", "value": "chemosynthetic, via episymbiotic bacteria" },
-        { "label": "Closest relative", "value": "Rimicaris exoculata (Mid-Atlantic Ridge, ~4,000 km away)" }
+        {
+          "label": "Closest relative",
+          "value": "Rimicaris exoculata (Mid-Atlantic Ridge, ~4,000 km away)"
+        }
       ],
       "reconstruction": true,
       "sources": [
-        { "title": "Nye, V. et al. 2012, \"A new species of Rimicaris (Crustacea: Decapoda: Caridea: Alvinocarididae) from hydrothermal vent fields on the Mid-Cayman Spreading Centre\", Zootaxa", "url": "http://www.joncopley.com/docs/Rimicaris_hybisae.pdf" },
-        { "title": "Connelly, D.P. et al. 2012, Nature Communications 3:620", "url": "https://www.nature.com/articles/ncomms1636" }
+        {
+          "title": "Nye, V. et al. 2012, \"A new species of Rimicaris (Crustacea: Decapoda: Caridea: Alvinocarididae) from hydrothermal vent fields on the Mid-Cayman Spreading Centre\", Zootaxa",
+          "url": "http://www.joncopley.com/docs/Rimicaris_hybisae.pdf"
+        },
+        {
+          "title": "Connelly, D.P. et al. 2012, Nature Communications 3:620",
+          "url": "https://www.nature.com/articles/ncomms1636"
+        }
       ],
       "confidence": "high"
     },
@@ -76,9 +106,18 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Hydrothermal vent fields and chemosynthetic biota on the world's deepest seafloor spreading centre — Connelly et al. 2012, Nature Communications 3:620", "url": "https://www.nature.com/articles/ncomms1636" },
-        { "title": "Diverse styles of submarine venting on the ultraslow spreading Mid-Cayman Rise — PNAS", "url": "https://www.pnas.org/doi/full/10.1073/pnas.1009205107" },
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009 (value read directly from this tile's grid)", "url": "https://www.gmrt.org/" }
+        {
+          "title": "Hydrothermal vent fields and chemosynthetic biota on the world's deepest seafloor spreading centre — Connelly et al. 2012, Nature Communications 3:620",
+          "url": "https://www.nature.com/articles/ncomms1636"
+        },
+        {
+          "title": "Diverse styles of submarine venting on the ultraslow spreading Mid-Cayman Rise — PNAS",
+          "url": "https://www.pnas.org/doi/full/10.1073/pnas.1009205107"
+        },
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009 (value read directly from this tile's grid)",
+          "url": "https://www.gmrt.org/"
+        }
       ],
       "confidence": "medium"
     }

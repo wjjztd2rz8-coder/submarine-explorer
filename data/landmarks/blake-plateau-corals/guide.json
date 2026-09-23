@@ -21,9 +21,18 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Multi-Partner Mapping Effort Reveals Largest Known Deep-sea Coral Reef Habitat — NOAA Ocean Exploration", "url": "https://oceanexplorer.noaa.gov/news/million-mounds-news/" },
-        { "title": "Blake Plateau — Wikipedia", "url": "https://en.wikipedia.org/wiki/Blake_Plateau" },
-        { "title": "World's largest deep-sea coral reef found lurking beneath the Gulf Stream — Live Science", "url": "https://www.livescience.com/planet-earth/rivers-oceans/worlds-largest-deep-sea-coral-reef-found-lurking-beneath-the-gulf-stream-right-on-the-doorstep-of-us-coast" }
+        {
+          "title": "Multi-Partner Mapping Effort Reveals Largest Known Deep-sea Coral Reef Habitat — NOAA Ocean Exploration",
+          "url": "https://oceanexplorer.noaa.gov/news/million-mounds-news/"
+        },
+        {
+          "title": "Blake Plateau — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Blake_Plateau"
+        },
+        {
+          "title": "World's largest deep-sea coral reef found lurking beneath the Gulf Stream — Live Science",
+          "url": "https://www.livescience.com/planet-earth/rivers-oceans/worlds-largest-deep-sea-coral-reef-found-lurking-beneath-the-gulf-stream-right-on-the-doorstep-of-us-coast"
+        }
       ],
       "confidence": "high"
     },
@@ -42,8 +51,14 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Multi-Partner Mapping Effort Reveals Largest Known Deep-sea Coral Reef Habitat — NOAA Ocean Exploration", "url": "https://oceanexplorer.noaa.gov/news/million-mounds-news/" },
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" }
+        {
+          "title": "Multi-Partner Mapping Effort Reveals Largest Known Deep-sea Coral Reef Habitat — NOAA Ocean Exploration",
+          "url": "https://oceanexplorer.noaa.gov/news/million-mounds-news/"
+        },
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        }
       ],
       "confidence": "high"
     },
@@ -63,8 +78,14 @@
       ],
       "reconstruction": true,
       "sources": [
-        { "title": "Multi-Partner Mapping Effort Reveals Largest Known Deep-sea Coral Reef Habitat — NOAA Ocean Exploration", "url": "https://oceanexplorer.noaa.gov/news/million-mounds-news/" },
-        { "title": "Blake Plateau — Wikipedia", "url": "https://en.wikipedia.org/wiki/Blake_Plateau" }
+        {
+          "title": "Multi-Partner Mapping Effort Reveals Largest Known Deep-sea Coral Reef Habitat — NOAA Ocean Exploration",
+          "url": "https://oceanexplorer.noaa.gov/news/million-mounds-news/"
+        },
+        {
+          "title": "Blake Plateau — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Blake_Plateau"
+        }
       ],
       "confidence": "medium"
     },
@@ -81,8 +102,14 @@
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" },
-        { "title": "Multi-Partner Mapping Effort Reveals Largest Known Deep-sea Coral Reef Habitat — NOAA Ocean Exploration", "url": "https://oceanexplorer.noaa.gov/news/million-mounds-news/" }
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Multi-Partner Mapping Effort Reveals Largest Known Deep-sea Coral Reef Habitat — NOAA Ocean Exploration",
+          "url": "https://oceanexplorer.noaa.gov/news/million-mounds-news/"
+        }
       ],
       "confidence": "high"
     },
@@ -95,12 +122,21 @@
       ],
       "facts": [
         { "label": "Current", "value": "Gulf Stream (western boundary current)" },
-        { "label": "Role here", "value": "delivers food particles and moderates temperature for the reef" }
+        {
+          "label": "Role here",
+          "value": "delivers food particles and moderates temperature for the reef"
+        }
       ],
       "reconstruction": false,
       "sources": [
-        { "title": "World's largest deep-sea coral reef found lurking beneath the Gulf Stream — Live Science", "url": "https://www.livescience.com/planet-earth/rivers-oceans/worlds-largest-deep-sea-coral-reef-found-lurking-beneath-the-gulf-stream-right-on-the-doorstep-of-us-coast" },
-        { "title": "Blake Plateau — Wikipedia", "url": "https://en.wikipedia.org/wiki/Blake_Plateau" }
+        {
+          "title": "World's largest deep-sea coral reef found lurking beneath the Gulf Stream — Live Science",
+          "url": "https://www.livescience.com/planet-earth/rivers-oceans/worlds-largest-deep-sea-coral-reef-found-lurking-beneath-the-gulf-stream-right-on-the-doorstep-of-us-coast"
+        },
+        {
+          "title": "Blake Plateau — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Blake_Plateau"
+        }
       ],
       "confidence": "high"
     },
@@ -111,13 +147,17 @@
         "Not every part of the Blake Plateau is covered in coral: between mounds, the seabed dips into lower channels and open sediment, visible here as a modest local low point between two mapped mounds.",
         "This is real survey terrain, not a reconstruction, from the same tile data used for the neighbouring mound POIs."
       ],
-      "facts": [
-        { "label": "Depth here (this tile)", "value": "~780 m" }
-      ],
+      "facts": [{ "label": "Depth here (this tile)", "value": "~780 m" }],
       "reconstruction": false,
       "sources": [
-        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" },
-        { "title": "Multi-Partner Mapping Effort Reveals Largest Known Deep-sea Coral Reef Habitat — NOAA Ocean Exploration", "url": "https://oceanexplorer.noaa.gov/news/million-mounds-news/" }
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Multi-Partner Mapping Effort Reveals Largest Known Deep-sea Coral Reef Habitat — NOAA Ocean Exploration",
+          "url": "https://oceanexplorer.noaa.gov/news/million-mounds-news/"
+        }
       ],
       "confidence": "medium"
     }

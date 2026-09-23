@@ -46,7 +46,7 @@ resolution limit and describes the real hole from sources). Only edited
    the hole marker. Briefing and hazards state the resolution limit plainly, per the
    task brief's honesty requirement.
 7. `species.json`: `tools/obis_export.py --landmark great-blue-hole --tile-bbox
-   --depth-max 200` returned 25 taxa / 1,674 records — reef-building corals
+--depth-max 200` returned 25 taxa / 1,674 records — reef-building corals
    (Orbicella, Diploria, Montastraea, Porites, Siderastrea, Colpophyllia),
    parrotfish, surgeonfish, grunts, snapper, groupers: a strong match to Caribbean
    reef habitat. No shark species were returned; the sharks named in `guide.json`

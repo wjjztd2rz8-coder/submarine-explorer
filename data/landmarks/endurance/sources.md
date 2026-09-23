@@ -14,17 +14,17 @@ monument, not a grave.
 
 ## Sources consulted
 
-| # | Source | URL | Used for | Primary? |
-| - | ------ | --- | -------- | -------- |
-| 1 | UK Antarctic Heritage Trust, "Endurance Shipwreck" | https://ukaht.org/places/endurance-shipwreck/ | Discovery date/depth, HSM No. 93 (2019, predates discovery), 500 m -> 1,500 m protection radius, Conservation Management Plan (UKAHT + Historic England), Worsley "~4 miles south" figure, wreck condition | **Yes** -- the organisation that leads the site's official Conservation Management Plan |
-| 2 | Falklands Maritime Heritage Trust, "Endurance is Found" press release (PR Newswire, 9 Mar 2022) | https://www.prnewswire.com/news-releases/endurance-is-found-301498505.html | Depth 3,008 m, "~4 miles south" of Worsley's position, Mensun Bound quote ("finest wooden shipwreck..."), name visible below the taffrail, Saab Sabertooth AUVs, S.A. Agulhas II, expedition leader Dr John Shears, Antarctic Treaty HSM protection, no-touch survey rule | **Yes** -- FMHT's own official statement, organised and led the Endurance22 expedition |
-| 3 | Falklands Maritime Heritage Trust, "Endurance at the bottom of the sea" | https://fmht.co.uk/shackletons-endurance-revealed/endurance-at-the-bottom-of-the-sea/ | Hull "remarkably well preserved... cold and absence of wood-consuming marine parasites" (Bound quote), masts down, funnel toppled, damage around poop/waist, Voyis laser scanners, ~25,000 images, 44 m bow-to-stern 3D composite, deck items (flare gun, tableware, boot, linoleum) | **Yes** -- FMHT's own site |
-| 4 | Endurance (1912 ship) -- Wikipedia | https://en.wikipedia.org/wiki/Endurance_(1912_ship) | Build (Framnæs yard, launched as Polaris, Dec 1912), dimensions (144 ft/44 m x 25 ft/7.6 m, 350 GRT), keel (4 layers of oak, 2.2 m), planking (oak/fir to 30 in, greenheart-sheathed), purchase/renaming Jan 1914, beset/abandoned/sank dates, captain Worsley, exact decimal coordinate 68°44′21″S 52°19′47″W | Secondary corroboration only |
-| 5 | Squire & Bell, "On the Location of Shackleton's Vessel Endurance" -- Journal of Navigation (Cambridge University Press) | https://www.cambridge.org/core/journals/journal-of-navigation/article/abs/on-the-location-of-shackletons-vessel-endurance/5F1AD80B3445C2653F1C24EAD4B7460D | Worsley's logged position 68°39′30″S 52°26′30″W; navigational-uncertainty analysis (few sights, chronometer drift, error of several nautical miles) | **Yes** -- peer-reviewed |
-| 6 | HISTORY, "Photos of the Wreck of Shackleton's Endurance" | https://www.history.com/articles/endurance-shackleton-shipwreck-discovery-photos | Name + five-pointed star (from Polaris) on the stern, "the helm of the Endurance" photographed, apparent bow/keel-first impact, Sabertooth deployment/sonar-then-camera method | Secondary (magazine), corroborates FMHT facts |
-| 7 | Smithsonian Magazine, "Shackleton's 'Endurance' Shipwreck Is Teeming With Bizarre Ocean Life" | https://www.smithsonianmag.com/smart-news/shackletons-endurance-shipwreck-is-teeming-with-bizarre-ocean-life-180979719/ | Species on the hull: brisingid sea stars, glass sponges, a large white anemone near the wheel, sea squirts, a yellow stalked sea lily, a squat lobster (cf. Munidopsis, first regional record); quotes from BAS marine biogeographer Huw Griffiths and zoologist Louise Allcock | Secondary (magazine), names a national-institute (BAS) scientist as the source of the identifications |
-| 8 | Smithsonian Magazine, "Wreck of Shackleton's 'Endurance' Gets New Protections" | https://www.smithsonianmag.com/smart-news/the-endurance-shipwreck-gets-new-protections-amid-warming-antarctic-waters-180984683/ | 500 m -> 1,500 m protection-radius expansion, reasons (warming waters, tourism/fishing traffic), ASPA designation goal | Secondary, corroborates source 1 |
-| 9 | GMRT Synthesis (Ryan et al. 2009), doi:10.1029/2008GC002332 | https://www.gmrt.org/ | Seabed depths, tile relief, the abyssal-plain and terrain-limit notes | **Yes** -- the dataset itself; every depth cited "read from this tile" |
+| #   | Source                                                                                                                  | URL                                                                                                                                                        | Used for                                                                                                                                                                                                                                                                                                       | Primary?                                                                                              |
+| --- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| 1   | UK Antarctic Heritage Trust, "Endurance Shipwreck"                                                                      | https://ukaht.org/places/endurance-shipwreck/                                                                                                              | Discovery date/depth, HSM No. 93 (2019, predates discovery), 500 m -> 1,500 m protection radius, Conservation Management Plan (UKAHT + Historic England), Worsley "~4 miles south" figure, wreck condition                                                                                                     | **Yes** -- the organisation that leads the site's official Conservation Management Plan               |
+| 2   | Falklands Maritime Heritage Trust, "Endurance is Found" press release (PR Newswire, 9 Mar 2022)                         | https://www.prnewswire.com/news-releases/endurance-is-found-301498505.html                                                                                 | Depth 3,008 m, "~4 miles south" of Worsley's position, Mensun Bound quote ("finest wooden shipwreck..."), name visible below the taffrail, Saab Sabertooth AUVs, S.A. Agulhas II, expedition leader Dr John Shears, Antarctic Treaty HSM protection, no-touch survey rule                                      | **Yes** -- FMHT's own official statement, organised and led the Endurance22 expedition                |
+| 3   | Falklands Maritime Heritage Trust, "Endurance at the bottom of the sea"                                                 | https://fmht.co.uk/shackletons-endurance-revealed/endurance-at-the-bottom-of-the-sea/                                                                      | Hull "remarkably well preserved... cold and absence of wood-consuming marine parasites" (Bound quote), masts down, funnel toppled, damage around poop/waist, Voyis laser scanners, ~25,000 images, 44 m bow-to-stern 3D composite, deck items (flare gun, tableware, boot, linoleum)                           | **Yes** -- FMHT's own site                                                                            |
+| 4   | Endurance (1912 ship) -- Wikipedia                                                                                      | https://en.wikipedia.org/wiki/Endurance_(1912_ship)                                                                                                        | Build (Framnæs yard, launched as Polaris, Dec 1912), dimensions (144 ft/44 m x 25 ft/7.6 m, 350 GRT), keel (4 layers of oak, 2.2 m), planking (oak/fir to 30 in, greenheart-sheathed), purchase/renaming Jan 1914, beset/abandoned/sank dates, captain Worsley, exact decimal coordinate 68°44′21″S 52°19′47″W | Secondary corroboration only                                                                          |
+| 5   | Squire & Bell, "On the Location of Shackleton's Vessel Endurance" -- Journal of Navigation (Cambridge University Press) | https://www.cambridge.org/core/journals/journal-of-navigation/article/abs/on-the-location-of-shackletons-vessel-endurance/5F1AD80B3445C2653F1C24EAD4B7460D | Worsley's logged position 68°39′30″S 52°26′30″W; navigational-uncertainty analysis (few sights, chronometer drift, error of several nautical miles)                                                                                                                                                            | **Yes** -- peer-reviewed                                                                              |
+| 6   | HISTORY, "Photos of the Wreck of Shackleton's Endurance"                                                                | https://www.history.com/articles/endurance-shackleton-shipwreck-discovery-photos                                                                           | Name + five-pointed star (from Polaris) on the stern, "the helm of the Endurance" photographed, apparent bow/keel-first impact, Sabertooth deployment/sonar-then-camera method                                                                                                                                 | Secondary (magazine), corroborates FMHT facts                                                         |
+| 7   | Smithsonian Magazine, "Shackleton's 'Endurance' Shipwreck Is Teeming With Bizarre Ocean Life"                           | https://www.smithsonianmag.com/smart-news/shackletons-endurance-shipwreck-is-teeming-with-bizarre-ocean-life-180979719/                                    | Species on the hull: brisingid sea stars, glass sponges, a large white anemone near the wheel, sea squirts, a yellow stalked sea lily, a squat lobster (cf. Munidopsis, first regional record); quotes from BAS marine biogeographer Huw Griffiths and zoologist Louise Allcock                                | Secondary (magazine), names a national-institute (BAS) scientist as the source of the identifications |
+| 8   | Smithsonian Magazine, "Wreck of Shackleton's 'Endurance' Gets New Protections"                                          | https://www.smithsonianmag.com/smart-news/the-endurance-shipwreck-gets-new-protections-amid-warming-antarctic-waters-180984683/                            | 500 m -> 1,500 m protection-radius expansion, reasons (warming waters, tourism/fishing traffic), ASPA designation goal                                                                                                                                                                                         | Secondary, corroborates source 1                                                                      |
+| 9   | GMRT Synthesis (Ryan et al. 2009), doi:10.1029/2008GC002332                                                             | https://www.gmrt.org/                                                                                                                                      | Seabed depths, tile relief, the abyssal-plain and terrain-limit notes                                                                                                                                                                                                                                          | **Yes** -- the dataset itself; every depth cited "read from this tile"                                |
 
 ## Position and depth notes
 
@@ -37,13 +37,13 @@ monument, not a grave.
   agreement below, not because Wikipedia is treated as primary.
 - **Seabed-depth check** (this tile, bilinear sample of `heightmap.bin`):
 
-  | Point | lat, lon | GMRT/GEBCO seabed | Published |
-  | ----- | -------- | ------------------ | --------- |
-  | endurance-hull (wreck) | -68.739167, -52.329722 | 3,000.3 m | 3,008 m (sources 1-4) |
-  | endurance-worsley-position | -68.658333, -52.441667 | 2,976.6 m | -- (not separately published) |
-  | `data/landmarks.json` pin | -68.7297, -52.319 | 3,003.9 m | 3,008 m |
-  | Tile deepest cell | -68.5807, -52.2035 | 3,096.4 m | (GMRT/GEBCO only) |
-  | Tile shallowest cell | (tile-wide max) | 2,915.3 m | (GMRT/GEBCO only) |
+  | Point                      | lat, lon               | GMRT/GEBCO seabed | Published                     |
+  | -------------------------- | ---------------------- | ----------------- | ----------------------------- |
+  | endurance-hull (wreck)     | -68.739167, -52.329722 | 3,000.3 m         | 3,008 m (sources 1-4)         |
+  | endurance-worsley-position | -68.658333, -52.441667 | 2,976.6 m         | -- (not separately published) |
+  | `data/landmarks.json` pin  | -68.7297, -52.319      | 3,003.9 m         | 3,008 m                       |
+  | Tile deepest cell          | -68.5807, -52.2035     | 3,096.4 m         | (GMRT/GEBCO only)             |
+  | Tile shallowest cell       | (tile-wide max)        | 2,915.3 m         | (GMRT/GEBCO only)             |
 
   The wreck-position reading (3,000.3 m) is only 7.7 m shallower than the published 3,008 m --
   closer agreement than Titanic's tile achieved, despite this tile's coarser GEBCO-derived fill
@@ -51,6 +51,7 @@ monument, not a grave.
   reads a very similar depth, because the whole site is nearly flat (see the `abyssal-plain`
   guide entry and POI). We used the more precisely sourced Wikipedia coordinate for the wreck
   POI/prop rather than the landmarks.json pin.
+
 - **Worsley's position and the discrepancy we flagged.** The peer-reviewed Journal of Navigation
   paper (source 5) gives Worsley's own logged fix, 68°39′30″S 52°26′30″W. Using this tile's
   planar/haversine maths, that point is **~10.06 km** from the wreck's published coordinate, at a
@@ -72,21 +73,21 @@ monument, not a grave.
 
 ## Fabricated vs. sourced
 
-| Item | Sourced (measured/published) | Reconstructed / estimated |
-| ---- | ----------------------------- | -------------------------- |
-| Seabed terrain | GMRT Synthesis (real, if coarse, data) | Render-time detail noise (engine) |
-| Wreck position | Published coordinate (2 independent numeric confirmations) | -- |
-| Wreck depth | 3,008 m published; terrain reads 3,000.3 m | -- |
-| Hull length / beam | 44 m / 7.6 m (published ship dimensions) | Box shape; 8 m height (unsourced estimate) |
-| Hull heading | "Upright... intact" (qualitative) | Exact 0° value (arbitrary; no heading published) |
-| Hull end shapes | "Intact" (not broken, unlike Titanic/Bismarck) | `[prow, rounded]` chosen instead of a torn `cut` end |
-| Stern nameplate/star | Location ("below the taffrail"), meaning (old name Polaris) | Exact offset from hull centre (~20 m, illustrative) |
-| Wheel | Photographed by Endurance22; marine life nearby (named species) | Exact position; debris-cluster stand-in shape; individual animals not modelled |
-| Masts/funnel damage | Down/toppled, damage near poop and waist (qualitative) | Debris-cluster position and size (illustrative) |
-| Worsley's position | Logged coordinate (peer-reviewed source) | -- (real terrain marker, no structure) |
-| Abyssal-plain POI | GMRT/GEBCO depths | Interpretation of why the grid is this smooth (inference, flagged as such) |
-| HSM No. 93 / protection radii | Published (2 sources) | -- |
-| Spawn point | -- | Chosen for gameplay: 1.5 km north of the wreck, heading 180° |
+| Item                          | Sourced (measured/published)                                    | Reconstructed / estimated                                                      |
+| ----------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Seabed terrain                | GMRT Synthesis (real, if coarse, data)                          | Render-time detail noise (engine)                                              |
+| Wreck position                | Published coordinate (2 independent numeric confirmations)      | --                                                                             |
+| Wreck depth                   | 3,008 m published; terrain reads 3,000.3 m                      | --                                                                             |
+| Hull length / beam            | 44 m / 7.6 m (published ship dimensions)                        | Box shape; 8 m height (unsourced estimate)                                     |
+| Hull heading                  | "Upright... intact" (qualitative)                               | Exact 0° value (arbitrary; no heading published)                               |
+| Hull end shapes               | "Intact" (not broken, unlike Titanic/Bismarck)                  | `[prow, rounded]` chosen instead of a torn `cut` end                           |
+| Stern nameplate/star          | Location ("below the taffrail"), meaning (old name Polaris)     | Exact offset from hull centre (~20 m, illustrative)                            |
+| Wheel                         | Photographed by Endurance22; marine life nearby (named species) | Exact position; debris-cluster stand-in shape; individual animals not modelled |
+| Masts/funnel damage           | Down/toppled, damage near poop and waist (qualitative)          | Debris-cluster position and size (illustrative)                                |
+| Worsley's position            | Logged coordinate (peer-reviewed source)                        | -- (real terrain marker, no structure)                                         |
+| Abyssal-plain POI             | GMRT/GEBCO depths                                               | Interpretation of why the grid is this smooth (inference, flagged as such)     |
+| HSM No. 93 / protection radii | Published (2 sources)                                           | --                                                                             |
+| Spawn point                   | --                                                              | Chosen for gameplay: 1.5 km north of the wreck, heading 180°                   |
 
 ## Not verified / open
 

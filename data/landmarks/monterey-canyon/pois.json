@@ -34,10 +34,7 @@
       "guide_entry": "upper-canyon",
       "confidence": "medium",
       "reconstruction": false,
-      "sources": [
-        "https://en.wikipedia.org/wiki/Monterey_Canyon",
-        "https://www.gmrt.org/"
-      ],
+      "sources": ["https://en.wikipedia.org/wiki/Monterey_Canyon", "https://www.gmrt.org/"],
       "note": "Real GMRT terrain, 265 m deep, about 2.8 km down-canyon from the canyon-head POI along a straight line toward the traced axis, where the shelf break steepens sharply. Located by sampling terrain along that line, this session; no published coordinate for this specific transition point."
     },
     {

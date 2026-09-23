@@ -8,15 +8,15 @@ Picked up from `plan/progress/C4a.md`'s Challenger Deep notes and
 ## What was done
 
 1. `species.json`: `tools/obis_export.py --landmark challenger-deep --tile-bbox
-   --depth-min 6000 --depth-max 11000` (species, then genus, then any rank)
+--depth-min 6000 --depth-max 11000` (species, then genus, then any rank)
    returned 0 taxa at every rank -- OBIS has essentially no hadal-depth
    occurrence records in this tile's ~50x50 km bbox. Fell back to `--rank
-   genus` with no depth filter: 180 taxa in the bbox, 69 at species/genus
+genus` with no depth filter: 180 taxa in the bbox, 69 at species/genus
    rank, top 30 by record count kept. Nearly all are bacteria/archaea genera
    whose occurrence records report 0-1.6 m depth (near-surface water samples,
    not hadal fauna) -- documented explicitly in `species.json.note` so it
    isn't mistaken for trench-floor life. The one metazoan present is
-   *Hirondellea gigas* (the hadal amphipod), independently corroborating the
+   _Hirondellea gigas_ (the hadal amphipod), independently corroborating the
    Wikipedia-sourced amphipod facts used in the guide.
 2. `pois.json` (6 POIs): the deepest surveyed cell in the tile
    (`cd-eastern-pool-deepest`, 10,930.9 m, matches `meta.json`'s `min_m`); the
@@ -97,8 +97,8 @@ note:
 
 - Used WebFetch/WebSearch to locate and actually read primary/authoritative
   sources for every fact (two as PDFs, run through `pdftotext -layout` after
-  WebFetch returned raw bytes): Stewart & Jamieson (2019, *Earth-Science
-  Reviews*, open access), Greenaway et al. (2021, *Deep-Sea Research I*, via
+  WebFetch returned raw bytes): Stewart & Jamieson (2019, _Earth-Science
+  Reviews_, open access), Greenaway et al. (2021, _Deep-Sea Research I_, via
   the NOAA repository record), NOAA NCEI, U.S. Fish & Wildlife Service, the
   Five Deeps Expedition's own 13 May 2019 press release, the official
   DEEPSEA CHALLENGE site, National Geographic, Kobayashi et al. (2012, PLoS
@@ -136,5 +136,5 @@ note:
   -- Stewart & Jamieson 2019, NOAA NCEI, GMRT. **three-pools** -- Five Deeps
   press release, Stewart & Jamieson 2019, GMRT.
 - Re-ran the gates: `python3 tools/validate_landmark.py challenger-deep
-  --strict` -> 0 errors, 1 warning (only the accepted crush-band warning).
+--strict` -> 0 errors, 1 warning (only the accepted crush-band warning).
   `npm run test:py` -> 104 tests, all pass.

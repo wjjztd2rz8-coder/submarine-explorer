@@ -15,22 +15,22 @@ through sourced text in `guide.json`, per the task brief.
 
 ## Sources consulted
 
-| # | Source | URL | Used for | Primary? |
-| - | ------ | --- | -------- | -------- |
-| 1 | Great Blue Hole — Wikipedia | https://en.wikipedia.org/wiki/Great_Blue_Hole | Diameter/depth (318 m/124 m), UNESCO status, ice-age formation dates, Cousteau's 1971 ledges (21/49/91 m), stalactites, species (sharks, groupers, squirrelfish, angelfish) | Secondary, but the most complete single account found |
-| 2 | Jacques Cousteau's Grandson to Map Depths of Massive Blue Hole Off Belize's Coast — Live Science | https://www.livescience.com/63950-belize-blue-hole-expedition.html | 2018 Blue Hole Belize Expedition background, Fabien Cousteau's involvement | Secondary |
-| 3 | Belize's Great Blue Hole revealed in expedition survey — GPS World | https://www.gpsworld.com/belizes-great-blue-hole-revealed-in-expedition-survey/ | 2018 expedition dates (27 Nov - 13 Dec), Aquatica Submarines, Kongsberg sonar, RV Brooks McCall, first complete 3D sonar map, conch graveyard, new stalactite fields, hydrogen-sulfide anoxic layer | Secondary (industry trade press, detailed and specific) |
-| 4 | Lighthouse Reef — Wikipedia | https://en.wikipedia.org/wiki/Lighthouse_Reef | Atoll context for the reef-rim/reef-biology entries | Secondary |
-| 5 | GMRT Synthesis (Ryan et al. 2009), doi:10.1029/2008GC002332 | https://www.gmrt.org/ | This tile's own terrain readings (hole coordinates, reef flat, outer drop-off) | **Yes** — the dataset itself, and the direct evidence for the resolution-limit claim |
+| #   | Source                                                                                           | URL                                                                             | Used for                                                                                                                                                                                            | Primary?                                                                             |
+| --- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| 1   | Great Blue Hole — Wikipedia                                                                      | https://en.wikipedia.org/wiki/Great_Blue_Hole                                   | Diameter/depth (318 m/124 m), UNESCO status, ice-age formation dates, Cousteau's 1971 ledges (21/49/91 m), stalactites, species (sharks, groupers, squirrelfish, angelfish)                         | Secondary, but the most complete single account found                                |
+| 2   | Jacques Cousteau's Grandson to Map Depths of Massive Blue Hole Off Belize's Coast — Live Science | https://www.livescience.com/63950-belize-blue-hole-expedition.html              | 2018 Blue Hole Belize Expedition background, Fabien Cousteau's involvement                                                                                                                          | Secondary                                                                            |
+| 3   | Belize's Great Blue Hole revealed in expedition survey — GPS World                               | https://www.gpsworld.com/belizes-great-blue-hole-revealed-in-expedition-survey/ | 2018 expedition dates (27 Nov - 13 Dec), Aquatica Submarines, Kongsberg sonar, RV Brooks McCall, first complete 3D sonar map, conch graveyard, new stalactite fields, hydrogen-sulfide anoxic layer | Secondary (industry trade press, detailed and specific)                              |
+| 4   | Lighthouse Reef — Wikipedia                                                                      | https://en.wikipedia.org/wiki/Lighthouse_Reef                                   | Atoll context for the reef-rim/reef-biology entries                                                                                                                                                 | Secondary                                                                            |
+| 5   | GMRT Synthesis (Ryan et al. 2009), doi:10.1029/2008GC002332                                      | https://www.gmrt.org/                                                           | This tile's own terrain readings (hole coordinates, reef flat, outer drop-off)                                                                                                                      | **Yes** — the dataset itself, and the direct evidence for the resolution-limit claim |
 
 ## Terrain check (this tile, bilinear sample of `heightmap.bin`) -- the key verification
 
-| Point | lat, lon | This tile's reading | Real feature |
-| ----- | -------- | -------------------- | -------------- |
-| Hole's published centre | 17.3153, -87.5346 | **-4.2 m** | Real: 124 m deep, 318 m across |
-| Reef flat, 1.3 km NW of centre | 17.3273, -87.5466 | -2.5 m | Consistent with a shallow atoll reef flat |
-| Radial scan east of centre (0-15 km) | 17.3153, various | -4 to -6 m (0-3 km) -> -92 m (4 km) -> -873 m (5 km) -> -3,600+ m (12+ km) | Real, steep atoll-margin drop-off |
-| Radial scan west of centre (0-15 km) | 17.3153, various | -2 to -4 m (0-5 km) -> -42 m (6 km) -> -942 m (9 km) -> -1,300+ m (12 km) | Real, gentler drop-off on this side |
+| Point                                | lat, lon          | This tile's reading                                                        | Real feature                              |
+| ------------------------------------ | ----------------- | -------------------------------------------------------------------------- | ----------------------------------------- |
+| Hole's published centre              | 17.3153, -87.5346 | **-4.2 m**                                                                 | Real: 124 m deep, 318 m across            |
+| Reef flat, 1.3 km NW of centre       | 17.3273, -87.5466 | -2.5 m                                                                     | Consistent with a shallow atoll reef flat |
+| Radial scan east of centre (0-15 km) | 17.3153, various  | -4 to -6 m (0-3 km) -> -92 m (4 km) -> -873 m (5 km) -> -3,600+ m (12+ km) | Real, steep atoll-margin drop-off         |
+| Radial scan west of centre (0-15 km) | 17.3153, various  | -2 to -4 m (0-5 km) -> -42 m (6 km) -> -942 m (9 km) -> -1,300+ m (12 km)  | Real, gentler drop-off on this side       |
 
 This directly confirms the task brief's premise: the tile is flat, shallow reef terrain
 at and immediately around the hole's real coordinates, with no trace of a depression.
@@ -39,13 +39,13 @@ real reef-flat/drop-off features used for the other three POIs.
 
 ## Fabricated vs. sourced
 
-| Item | Sourced (measured/published) | Reconstructed / estimated |
-| ---- | ----------------------------- | -------------------------- |
-| Reef flat and outer drop-off terrain | GMRT Synthesis (real) | Render-time detail noise (engine) |
-| Hole's real diameter/depth/formation/history | Wikipedia, Live Science, GPS World | — |
-| Hole's terrain in-game | This tile's real (shallow) reading, honestly marked | Nothing invented; no depression prop added |
-| Reef-biology species | Documented for Lighthouse Reef/the hole's rim generally (Wikipedia) | Placement at this specific POI is illustrative (`reconstruction: true`), not a site record |
-| Spawn point | — | Chosen for gameplay: over the outer slope (67.4 m water), heading 270° toward the reef |
+| Item                                         | Sourced (measured/published)                                        | Reconstructed / estimated                                                                  |
+| -------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Reef flat and outer drop-off terrain         | GMRT Synthesis (real)                                               | Render-time detail noise (engine)                                                          |
+| Hole's real diameter/depth/formation/history | Wikipedia, Live Science, GPS World                                  | —                                                                                          |
+| Hole's terrain in-game                       | This tile's real (shallow) reading, honestly marked                 | Nothing invented; no depression prop added                                                 |
+| Reef-biology species                         | Documented for Lighthouse Reef/the hole's rim generally (Wikipedia) | Placement at this specific POI is illustrative (`reconstruction: true`), not a site record |
+| Spawn point                                  | —                                                                   | Chosen for gameplay: over the outer slope (67.4 m water), heading 270° toward the reef     |
 
 ## Not verified / open
 

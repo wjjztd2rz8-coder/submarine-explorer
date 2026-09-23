@@ -26,11 +26,11 @@
       "snap_to_seabed": true,
       "heading_deg": 40,
       "scale": 1,
-      "dimensions_m": [0, 0, 12],
+      "dimensions_m": [0, 0, 1],
       "lod_distance_m": 600,
       "collision": "box",
       "reconstruction": true,
-      "note": "'Beehive' is a real named structure in the field (Wikipedia). No published height or coordinate; 12 m and this position are estimates, placed near Poseidon within the sourced depth band."
+      "note": "Beehive was a roughly 1 m parasitic vent on Poseidon (Denny et al. 2016); Aquino et al. 2024 report that its chimney was absent in 2018. This separately scannable marker is illustrative and offset from Poseidon, not a claim that the historical structure survives or stood here."
     },
     {
       "id": "imax-tower",
@@ -45,7 +45,7 @@
       "lod_distance_m": 600,
       "collision": "box",
       "reconstruction": true,
-      "note": "'IMAX Tower', named for the IMAX documentary crew that filmed it; height ~8 m (Wikipedia, 'Lost City Hydrothermal Field'). No published coordinate; placed near Poseidon within the sourced depth band."
+      "note": "IMAX is a parasitic flange and chimney on Poseidon's north face. Kelley et al. 2005 report ~8 m; Denny et al. 2016 describe a ~30 m multipronged structure. This 8 m separate marker is illustrative; its offset position is for scanning and not a surveyed footprint."
     },
     {
       "id": "unnamed-chimney-1",

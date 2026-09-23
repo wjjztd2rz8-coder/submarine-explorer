@@ -53,7 +53,10 @@
       "guide_entry": "vents",
       "confidence": "medium",
       "reconstruction": false,
-      "sources": ["https://www.gmrt.org/", "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879"],
+      "sources": [
+        "https://www.gmrt.org/",
+        "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879"
+      ],
       "note": "Real GMRT terrain, -4,957.1 m, about 1.4 km west of the main vent POI and within the field's published depth range. Webber et al. (2015) describe seven sulfide mounds spread across the field's western side; this point is a real-terrain candidate within that footprint, not a citation to one specific named mound."
     },
     {

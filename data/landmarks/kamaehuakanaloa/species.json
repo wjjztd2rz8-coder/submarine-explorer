@@ -20,10 +20,7 @@
       "scientificName": "Chrysogorgia geniculata",
       "aphiaID": 286122,
       "records": 88,
-      "depthRange_m": [
-        1049,
-        1976
-      ],
+      "depthRange_m": [1049, 1976],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -31,10 +28,7 @@
       "scientificName": "Iridogorgia bella",
       "aphiaID": 286152,
       "records": 64,
-      "depthRange_m": [
-        1126,
-        1878
-      ],
+      "depthRange_m": [1126, 1878],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -42,10 +36,7 @@
       "scientificName": "Metallogorgia melanotrichos",
       "aphiaID": 125355,
       "records": 49,
-      "depthRange_m": [
-        1180,
-        2012
-      ],
+      "depthRange_m": [1180, 2012],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -53,10 +44,7 @@
       "scientificName": "Paragorgia regalis",
       "aphiaID": 286605,
       "records": 39,
-      "depthRange_m": [
-        1515,
-        1939
-      ],
+      "depthRange_m": [1515, 1939],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -64,10 +52,7 @@
       "scientificName": "Candidella gigantea",
       "aphiaID": 286505,
       "records": 38,
-      "depthRange_m": [
-        1612,
-        2050
-      ],
+      "depthRange_m": [1612, 2050],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -75,10 +60,7 @@
       "scientificName": "Parachrysogorgia chryseis",
       "aphiaID": 1671461,
       "records": 30,
-      "depthRange_m": [
-        1660,
-        1976
-      ],
+      "depthRange_m": [1660, 1976],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -86,10 +68,7 @@
       "scientificName": "Iridogorgia magnispiralis",
       "aphiaID": 286154,
       "records": 28,
-      "depthRange_m": [
-        1411,
-        1950
-      ],
+      "depthRange_m": [1411, 1950],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -97,10 +76,7 @@
       "scientificName": "Lepidisis olapa",
       "aphiaID": 286334,
       "records": 27,
-      "depthRange_m": [
-        1230,
-        1915
-      ],
+      "depthRange_m": [1230, 1915],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -115,10 +91,7 @@
       "scientificName": "Parachrysogorgia stellata",
       "aphiaID": 1671474,
       "records": 19,
-      "depthRange_m": [
-        1500,
-        1880
-      ],
+      "depthRange_m": [1500, 1880],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -126,10 +99,7 @@
       "scientificName": "Narella gigas",
       "aphiaID": 409563,
       "records": 16,
-      "depthRange_m": [
-        1666,
-        1878
-      ],
+      "depthRange_m": [1666, 1878],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -137,10 +107,7 @@
       "scientificName": "Hemicorallium abyssale",
       "aphiaID": 1311238,
       "records": 12,
-      "depthRange_m": [
-        1495,
-        1919
-      ],
+      "depthRange_m": [1495, 1919],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -148,10 +115,7 @@
       "scientificName": "Bathypathes pseudoalternata",
       "aphiaID": 1578714,
       "records": 10,
-      "depthRange_m": [
-        1415,
-        1934
-      ],
+      "depthRange_m": [1415, 1934],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -159,10 +123,7 @@
       "scientificName": "Synaphobranchus brevidorsalis",
       "aphiaID": 221388,
       "records": 9,
-      "depthRange_m": [
-        547,
-        1689
-      ],
+      "depthRange_m": [547, 1689],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -170,10 +131,7 @@
       "scientificName": "Enallopsammia rostrata",
       "aphiaID": 135190,
       "records": 7,
-      "depthRange_m": [
-        1121,
-        1190
-      ],
+      "depthRange_m": [1121, 1190],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -181,10 +139,7 @@
       "scientificName": "Aldrovandia phalacra",
       "aphiaID": 126638,
       "records": 6,
-      "depthRange_m": [
-        1140,
-        1302
-      ],
+      "depthRange_m": [1140, 1302],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -192,10 +147,7 @@
       "scientificName": "Sladenia remiger",
       "aphiaID": 282815,
       "records": 6,
-      "depthRange_m": [
-        1101,
-        1155
-      ],
+      "depthRange_m": [1101, 1155],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -203,10 +155,7 @@
       "scientificName": "Acanella weberi",
       "aphiaID": 286307,
       "records": 5,
-      "depthRange_m": [
-        1753,
-        1975
-      ],
+      "depthRange_m": [1753, 1975],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -214,10 +163,7 @@
       "scientificName": "Barbourisia rufa",
       "aphiaID": 159425,
       "records": 4,
-      "depthRange_m": [
-        1203,
-        1291
-      ],
+      "depthRange_m": [1203, 1291],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -225,10 +171,7 @@
       "scientificName": "Rimicaris loihi",
       "aphiaID": 1736282,
       "records": 4,
-      "depthRange_m": [
-        980,
-        980
-      ],
+      "depthRange_m": [980, 980],
       "group": "crustacean",
       "taxonRank": "Species"
     },
@@ -236,10 +179,7 @@
       "scientificName": "Telestula spiculicola",
       "aphiaID": 517835,
       "records": 4,
-      "depthRange_m": [
-        1939,
-        1939
-      ],
+      "depthRange_m": [1939, 1939],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -247,10 +187,7 @@
       "scientificName": "Keratoisis grandis",
       "aphiaID": 286316,
       "records": 3,
-      "depthRange_m": [
-        1709,
-        1709
-      ],
+      "depthRange_m": [1709, 1709],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -258,10 +195,7 @@
       "scientificName": "Narella muzikae",
       "aphiaID": 409564,
       "records": 3,
-      "depthRange_m": [
-        1714,
-        1808
-      ],
+      "depthRange_m": [1714, 1808],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -269,10 +203,7 @@
       "scientificName": "Alternatipathes alternata",
       "aphiaID": 994319,
       "records": 2,
-      "depthRange_m": [
-        1690,
-        1719
-      ],
+      "depthRange_m": [1690, 1719],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -280,10 +211,7 @@
       "scientificName": "Hahella ganghwensis",
       "aphiaID": 570430,
       "records": 2,
-      "depthRange_m": [
-        1298,
-        1302
-      ],
+      "depthRange_m": [1298, 1302],
       "group": "microbe",
       "taxonRank": "Species"
     },
@@ -291,10 +219,7 @@
       "scientificName": "Hydrolagus purpurescens",
       "aphiaID": 271417,
       "records": 2,
-      "depthRange_m": [
-        1620,
-        1620
-      ],
+      "depthRange_m": [1620, 1620],
       "group": "fish",
       "taxonRank": "Species"
     },
@@ -302,10 +227,7 @@
       "scientificName": "Narella dichotoma",
       "aphiaID": 286515,
       "records": 2,
-      "depthRange_m": [
-        1180,
-        1714
-      ],
+      "depthRange_m": [1180, 1714],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -313,10 +235,7 @@
       "scientificName": "Paragorgia coralloides",
       "aphiaID": 286602,
       "records": 2,
-      "depthRange_m": [
-        3000,
-        3000
-      ],
+      "depthRange_m": [3000, 3000],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -324,10 +243,7 @@
       "scientificName": "Pleurocorallium porcellanum",
       "aphiaID": 1311286,
       "records": 2,
-      "depthRange_m": [
-        1420,
-        1425
-      ],
+      "depthRange_m": [1420, 1425],
       "group": "cnidarian",
       "taxonRank": "Species"
     },
@@ -335,10 +251,7 @@
       "scientificName": "Porphyra purpurea",
       "aphiaID": 144434,
       "records": 2,
-      "depthRange_m": [
-        1302,
-        1302
-      ],
+      "depthRange_m": [1302, 1302],
       "group": "alga",
       "taxonRank": "Species"
     }

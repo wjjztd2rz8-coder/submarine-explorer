@@ -6,7 +6,7 @@ or `data/landmarks.json`.
 ## What was done
 
 1. `species.json`: `tools/obis_export.py --landmark beebe-vent-field --tile-bbox --max 30` — 8
-   taxa (all matching, 20 records in bbox), including *Rimicaris hybisae* (aphiaID 762988) — an
+   taxa (all matching, 20 records in bbox), including _Rimicaris hybisae_ (aphiaID 762988) — an
    independent OBIS confirmation of the vent shrimp inside this exact tile bbox, corroborating
    the guide's Nye et al. (2012) sourcing from a different database.
 2. `pois.json` (5 POIs, 2 primary): the real Beebe 1-5 black-smoker complex (`bvf-main-vents`,

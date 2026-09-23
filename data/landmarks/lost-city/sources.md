@@ -1,5 +1,16 @@
 # Lost City content: sources and notes (package C4a)
 
+## Source review, 2026-09-23
+
+The initial research pass relied heavily on Wikipedia. A later check against the original field accounts and research corrected the named-structure entries:
+
+- [Denny et al. (2016), _Geologic evolution of the Lost City Hydrothermal Field_](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869) describes Poseidon as a 60 m composite edifice, Beehive as a roughly 1 m vent on its flank, and IMAX as a roughly 30 m multipronged chimney on its north face. The paper also supplies a geologic survey basis for the field's long history.
+- [Aquino et al. (2024), _Fluid Mixing and Spatial Geochemical Variability in the Lost City Hydrothermal Field Chimneys_](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023GC011011) reports that the Beehive chimney was absent during the 2018 sampling visit, though fluid still emerged at its former opening. The in-game marker therefore depicts the historical vent, with a deliberately offset position for scanning.
+- [Kelley et al. (2005), _The Lost City Hydrothermal Field_](https://tos.org/oceanography/assets/docs/18-3_kelley.pdf) describes the IMAX chimney as about 8 m tall. Denny et al. (2016) later describe a roughly 30 m structure; the sources may measure different parts or stages of this growing complex. The prop retains an 8 m illustrative marker, and the guide states both measurements.
+- [Ludwig et al. (2011), _U-Th systematics and 230Th ages of carbonate chimneys_](https://www.sciencedirect.com/science/article/abs/pii/S0016703711000135) supports the old carbonate age. Individual prop coordinates remain illustrative because this terrain grid does not resolve chimney footprints.
+
+The original source table below records the first pass; use the corrections above for Beehive and IMAX dimensions and placement.
+
 Researched 2026-09-22/23. Files: `pois.json`, `guide.json`, `props.json`, `mission.json`, `species.json` in this
 folder. Tile: `data/tiles/lost-city` (GMRT, bbox N 30.2005 / S 30.0302 / E -42.0194 / W -42.2210, cellsize
 52.9 x 61.1 m, summit 724.1 m, min/max -5002.2 / -724.1 m).
