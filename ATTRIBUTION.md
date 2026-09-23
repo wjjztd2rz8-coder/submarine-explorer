@@ -6,7 +6,9 @@ legally require attribution.
 
 ## 3D Models
 
-(none yet)
+- "Rock 09" by Poly Haven (polyhaven.com), https://polyhaven.com/a/rock_09 (1K glTF: https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/rock_09/rock_09_1k.gltf) — CC0 1.0 (licence verified on the asset page and https://polyhaven.com/license). Used as `public/assets/models/rock_09.glb`: packed to a single GLB, JPEGs re-encoded at q85, root node scaled so the rock is 1 m long.
+- "Barrel Stove" by Poly Haven (polyhaven.com), https://polyhaven.com/a/barrel_stove (1K glTF: https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/barrel_stove/barrel_stove_1k.gltf) — CC0 1.0 (licence verified on the asset page and https://polyhaven.com/license). Used as `public/assets/models/barrel_stove.glb`, a boiler stand-in: packed to a single GLB, JPEGs re-encoded at q80, root node scaled to 1 m diameter and laid on its side along local Z.
+- Draco glTF decoder (`public/assets/decoders/draco/*`), copied from `three/examples/jsm/libs/draco/gltf/` — Google Draco, Apache License 2.0, https://github.com/google/draco
 
 ## Textures
 
