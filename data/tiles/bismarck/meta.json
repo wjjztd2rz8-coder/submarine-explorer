@@ -1,35 +1,35 @@
 {
   "id": "bismarck",
   "source": "GMRT",
-  "source_url": "https://www.gmrt.org/services/GridServer?north=48.4836&south=48.1836&east=-15.8811&west=-16.3323&layer=topo&format=esriascii&resolution=max",
-  "fetched_at": "2026-09-23T02:03:42Z",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=48.3&south=48.0&east=-15.8922&west=-16.3418&layer=topo&format=esriascii&resolution=max",
+  "fetched_at": "2026-09-23T11:32:18Z",
   "bbox": {
-    "north": 48.48396150001537,
-    "south": 48.18348542579662,
-    "east": -15.88018798828125,
-    "west": -16.3333740234375
+    "north": 48.29977364859482,
+    "south": 48.00039620718857,
+    "east": -15.8917236328125,
+    "west": -16.3421630859375
   },
-  "cols": 825,
-  "rows": 547,
+  "cols": 820,
+  "rows": 545,
   "cellsize_deg": 0.00054931640625,
-  "cellsize_m_x": 40.65189121920417,
+  "cellsize_m_x": 40.79809352385028,
   "cellsize_m_y": 61.14990234375,
-  "min_m": -5009.03,
-  "max_m": -3812.92,
+  "min_m": -5009.06,
+  "max_m": -4023.82,
   "nodata_count": 0,
   "center": {
-    "lat": 48.33372346290599,
-    "lon": -16.106781005859375
+    "lat": 48.1500849278917,
+    "lon": -16.116943359375
   },
   "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
   "requested_bbox": {
-    "north": 48.4836,
-    "south": 48.1836,
-    "east": -15.8811,
-    "west": -16.3323
+    "north": 48.3,
+    "south": 48.0,
+    "east": -15.8922,
+    "west": -16.3418
   },
   "resolution": "max",
   "layer": "topo",
-  "quant_min_m": -5009.03,
-  "quant_scale": 0.018251469872968638
+  "quant_min_m": -5009.06005859375,
+  "quant_scale": 0.015033799627584494
 }

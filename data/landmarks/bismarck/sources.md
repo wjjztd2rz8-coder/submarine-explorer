@@ -21,7 +21,45 @@ throughout, and there is no salvage framing anywhere.
 | 8 | GMRT Synthesis (Ryan et al. 2009), doi:10.1029/2008GC002332 | https://www.gmrt.org/ | Tile terrain, seamount summit/flank readings | Primary — the dataset itself |
 | 9 | `data/landmarks.json` (repo) | — | Landmark id/bbox/coordinate/`wreck_meta` (bow "separated from main hull", 251 m length) | Repo data, not an external source; flagged where it conflicts with #1/#2 below |
 
-## Position discrepancy (read this before touching pois/props)
+## Position discrepancy -- resolved 2026-09
+
+Follow-up session, 2026-09-23: chose the H.M.S. Hood Association's 2001 expedition
+fix ("vicinity of 4809N 01607W" = 48.15N, 16.117W, source 4) as the wreck position,
+since it is the most specific sourced coordinate of the three found (an expedition
+report giving a location to the minute, versus Wikipedia's rounded DMS infobox
+figure). A targeted web search this session for a more precise primary source (an
+official 1989 survey report with a decimal coordinate) turned up nothing more
+authoritative, but did surface a third independent figure, "approximately
+48°09'N, 016°07'W", matching the Hood Association's point rather than Wikipedia's
+48°10'N/16°12'W -- treated as corroboration, not proof.
+
+`data/landmarks.json`, `pois.json`, `props.json`, `mission.json` and this file were
+updated to use 48.15N, 16.117W, and `data/tiles/bismarck` was regenerated around it
+(GMRT Synthesis; new bbox N 48.3/S 48.0/E -15.8922/W -16.3418, ~0.3° square, 820x545
+cells at ~41x61 m/cell). The old tile centred on the unsourced 48.3336N/-16.1067W
+point (see the retained discussion below for the original three-way discrepancy) is
+gone; the new tile's south edge no longer needs to reach it.
+
+**New residual gap, found this session:** at 48.15N, 16.117W the new tile's terrain
+reads about 4,218.5 m -- roughly 570 m shallower than the 4,790-4,791 m commonly
+published for the wreck's depth, and a much larger gap than the old tile's 84 m
+mismatch. Sampling the terrain around this point shows a seamount summit about 3 km
+north-east (shoaling to ~4,024 m) and depths matching the published 4,790 m appear a
+few kilometres south-west, well outside the "vicinity of" precision the Hood
+Association source claims. Per the task brief's explicit instruction, we did not
+walk the coordinate further to chase a depth match -- multiple points on this coarse,
+undulating terrain happen to read close to 4,790 m, and picking one would fabricate
+precision no source supports. Instead this gap is reported plainly in `guide.json`
+(`wreck-hull`, `seamount-flank` entries), `mission.json`'s briefing facts, and the
+`bismarck-hull` POI note: the chosen coordinate is a sourced "vicinity" position on
+the seamount's upper flank, not a survey fix guaranteed to land exactly on the hull's
+final resting depth. `bismarck-skid-trail` and `bismarck-turret-debris` were moved
+up-slope (north-east, toward the summit) of the hull to be physically consistent with
+accounts of the turrets striking the seamount first and the hull sliding further
+downslope afterward -- this is an inference from the account, not a surveyed
+position, and is flagged as such.
+
+## Position discrepancy (original discussion, kept for context)
 
 `data/landmarks.json`'s `bismarck` entry gives lat 48.3336, lon -16.1067, and cites the
 Wikipedia article as `coordinate_source`. **Wikipedia's own infobox coordinate is
@@ -53,19 +91,36 @@ and `mission.json`'s facts state the conflict plainly rather than presenting eit
 coordinate as settled. This is analogous to the Endurance pack's Worsley-position
 discrepancy (`plan/progress/C4-endurance.md`): report both, do not silently pick one.
 
-## Depth check (this tile, bilinear sample of `heightmap.bin`)
+## Depth check (superseded 2026-09; kept for context on the old tile)
 
 | Point | lat, lon | Tile terrain | Published |
 | ----- | -------- | ------------ | --------- |
-| bismarck-hull (tile centre) | 48.33372, -16.10678 | 4,874.9 m | 4,790-4,791 m (sources 1-2) |
-| bismarck-turret-debris | 48.3387, -16.1168 | 4,891.8 m | (illustrative, no published coordinate) |
-| bismarck-skid-trail | 48.336, -16.112 | 4,885.3 m | (illustrative) |
-| Tile shallowest cell (summit) | 48.46336, -16.32980 | 3,812.9 m | (GMRT only) |
-| Tile deepest cell | 48.24528, -16.22543 | 5,009.0 m | (GMRT only) |
+| bismarck-hull (old tile centre) | 48.33372, -16.10678 | 4,874.9 m | 4,790-4,791 m (sources 1-2) |
+| bismarck-turret-debris (old) | 48.3387, -16.1168 | 4,891.8 m | (illustrative, no published coordinate) |
+| bismarck-skid-trail (old) | 48.336, -16.112 | 4,885.3 m | (illustrative) |
+| Old tile shallowest cell (summit) | 48.46336, -16.32980 | 3,812.9 m | (GMRT only) |
+| Old tile deepest cell | 48.24528, -16.22543 | 5,009.0 m | (GMRT only) |
 
-The hull reading is 84 m deeper than the commonly published 4,790-4,791 m — a larger
-gap than Endurance's 7.7 m, consistent with the position discrepancy above: this tile
-is centred on a different point than the one most sources use for the depth figure.
+The old hull reading was 84 m deeper than the commonly published 4,790-4,791 m — a
+larger gap than Endurance's 7.7 m, consistent with the position discrepancy above:
+that tile was centred on a different point than the one most sources use for the
+depth figure.
+
+## Depth check on the new tile (2026-09, bilinear sample of `heightmap.bin`)
+
+| Point | lat, lon | Tile terrain | Published |
+| ----- | -------- | ------------ | --------- |
+| bismarck-hull | 48.15, -16.117 | 4,218.5 m | 4,790-4,791 m (sources 1-2) |
+| bismarck-turret-debris | 48.15114, -16.10497 | 4,129.2 m | (illustrative, no published coordinate) |
+| bismarck-skid-trail | 48.15063, -16.11032 | 4,182.1 m | (illustrative) |
+| Tile shallowest cell (summit) | 48.15504, -16.08147 | 4,023.8 m | (GMRT only) |
+| Tile deepest cell | (unsampled; see meta.json `min_m`) | 5,009.1 m | (GMRT only) |
+
+The new hull reading is about 570 m shallower than the commonly published depth --
+a much larger gap than the old tile's, because the sourced coordinate marks a
+"vicinity" position on the seamount's upper flank rather than a decimal survey fix at
+the hull's exact final resting spot. See "Position discrepancy -- resolved 2026-09"
+above for why this was not corrected by moving the coordinate further.
 
 ## Bow/stern condition conflict
 
@@ -90,7 +145,7 @@ them.
 | Hull length / beam | 251 m / 36 m (published) | Box shape; 15 m height (unsourced estimate) |
 | Hull heading | "Upright" (qualitative) | Exact 20° value (arbitrary; no heading published) |
 | Hull end shapes | "Intact" per kbismarck.com | `[prow, rounded]`; conflicts with landmarks.json's "bow separated" note (both stated in guide.json) |
-| Turret debris | Turrets broke free and fell separately (multiple sources); Ballard found 1 of 4 | Exact positions (illustrative, down-slope of hull); debris-cluster stand-in shape |
+| Turret debris | Turrets broke free and fell separately (multiple sources); Ballard found 1 of 4 | Exact positions (illustrative, up-slope of hull); debris-cluster stand-in shape |
 | Battle-damage POI | Pursuit, sinking timeline, scuttling-vs-shellfire debate (well sourced) | Marker position (illustrative; no single "damage site" is surveyed) |
 | Seamount-flank POI | Real tile terrain readings | Interpretation ("this is a smoothed version of the real slope"), inference flagged as such |
 | Casualty figures | 2,221 aboard, ~114 rescued, ~2,100 died (Wikipedia) | — |
@@ -98,9 +153,16 @@ them.
 
 ## Not verified / open
 
-- **The three-way position discrepancy** above (landmarks.json / Wikipedia / 2001
-  H.M.S. Hood Association report) is the main open item in this pack. No source
-  consulted this session resolves it.
+- **The wreck-depth-vs-terrain gap** (see "Depth check on the new tile" above) is
+  now the main open item: the chosen coordinate (H.M.S. Hood Association 2001 fix)
+  reads ~570 m shallower on this tile than the published wreck depth. No source
+  consulted resolves whether this is because the "vicinity of" coordinate is
+  imprecise, because the hull is further downslope than this point, or because
+  GMRT's coarse fill here is simply wrong at this scale.
+- **The original three-way position discrepancy** (landmarks.json's old unsourced
+  point / Wikipedia's rounded infobox / the Hood Association fix) was resolved this
+  session by choosing the Hood Association point, corroborated by a third published
+  figure; see "Position discrepancy -- resolved 2026-09" above.
 - **Bow-separated vs. stern-fragment-only** hull condition (previous section) is
   stated as an open conflict in `guide.json` rather than resolved.
 - **Hull height (15 m) and heading (20°)** in `props.json` are unsourced estimates,
