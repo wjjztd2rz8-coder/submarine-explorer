@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "landmark": "endurance",
+  "props": [
+    {
+      "id": "main-hull",
+      "model": "procedural:hull-block",
+      "lat": -68.739167,
+      "lon": -52.329722,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [44, 7.6, 8],
+      "ends": ["prow", "rounded"],
+      "lod_distance_m": 1200,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Endurance's hull at the published position 68°44′21″S 52°19′47″W. Length 44 m (144 ft) and beam 7.6 m (25 ft) are the ship's published dimensions (Wikipedia \"Endurance (1912 ship)\"). Height 8 m is an unsourced estimate -- no source found publishes a keel-to-deck figure -- for a wooden barquentine of this tonnage (350 GRT) found upright and largely intact (UKAHT; FMHT press release). ends [prow, rounded]: unlike the broken Titanic and Bismarck hulls, Endurance is reported intact, so this uses a pointed bow and a rounded counter stern rather than a torn 'cut' end. heading_deg 0 is arbitrary: no source found publishes the ship's actual compass orientation on the seabed."
+    },
+    {
+      "id": "rigging-debris",
+      "model": "procedural:debris",
+      "lat": -68.738946,
+      "lon": -52.32983,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [35, 35, 3],
+      "lod_distance_m": 600,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Stands in for the fallen masts and toppled funnel that FMHT's Endurance22 survey found on and around the hull, with the heaviest damage around the poop and waist (fmht.co.uk, 'Endurance at the bottom of the sea'). No coordinates are published for the fallen rigging itself; placed forward of the hull, illustrative position and size."
+    },
+    {
+      "id": "helm-marker",
+      "model": "procedural:debris",
+      "lat": -68.739319,
+      "lon": -52.329569,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [4, 4, 2],
+      "lod_distance_m": 400,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Stands in for the ship's wheel, photographed by Endurance22 near the stern (HISTORY, 'Photos of the Wreck of Shackleton's Endurance'), and the marine life documented around it -- sea stars, sponges, an anemone and sea squirts (Smithsonian Magazine). The engine's procedural kinds do not include a wheel or marine-growth shape, so a small debris cluster marks the site instead; it does not depict the wheel's real form. No coordinate is published for the wheel itself, so placement near the stern is illustrative."
+    }
+  ]
+}

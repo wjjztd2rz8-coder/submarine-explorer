@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "landmark": "endurance",
+  "tile": "endurance",
+  "title": "Endurance dive",
+  "hull_class": "B",
+  "environment": {
+    "preset": "wreck"
+  },
+  "species_file": "species.json",
+  "spawn": {
+    "lat": -68.725677,
+    "lon": -52.329722,
+    "depth_m": 5,
+    "heading_deg": 180
+  },
+  "briefing": {
+    "summary": "Dive 3,008 m into the Weddell Sea to Sir Ernest Shackleton's ship Endurance, crushed by pack ice and lost on 21 November 1915, and found again on 5 March 2022. Scan the hull and the stern, where her name is still legible, then look for the wheel, the marine life that has colonised her, and the fallen masts and funnel.",
+    "depth_m": 3008,
+    "facts": [
+      "Every one of the 28 men aboard survived the sinking; Shackleton got them off onto the ice before she went down. This is a protected monument, not a grave.",
+      "Endurance was found upright, intact and \"in a brilliant state of preservation\" by the Endurance22 expedition, 100 years to the day after Shackleton's burial at South Georgia.",
+      "You start at the surface about 1.5 km north of the wreck. Head south (about 180°) and descend.",
+      "The hull is an artist's reconstruction at the real position. Open bathymetry here has no dedicated survey of the wreck site and falls back to a coarse global fill, far too coarse to show a 44 m wooden ship."
+    ],
+    "hazards": [
+      "Total darkness below a few hundred metres; only your lights work.",
+      "Crushing pressure: about 300 atmospheres at the seabed. Your Class B hull is rated to 4,500 m, well within margin here.",
+      "Near-freezing water, close to the surface freezing point of seawater year-round.",
+      "This is a protected Antarctic Treaty Historic Site and Monument (HSM No. 93). Keep a respectful distance and do not touch."
+    ],
+    "memorial_note": "Endurance is a protected historic site and monument under the Antarctic Treaty (HSM No. 93), not a war grave -- nobody died when she sank. Please still explore her with the same respect: the game has no salvage, collection or loot of any kind, in keeping with the international law that protects the site."
+  },
+  "objectives": [
+    {
+      "id": "find-hull",
+      "type": "scan",
+      "poi": "endurance-hull",
+      "primary": true,
+      "title": "Locate and scan the main hull"
+    },
+    {
+      "id": "find-nameplate",
+      "type": "scan",
+      "poi": "endurance-stern-nameplate",
+      "primary": true,
+      "title": "Scan the stern, where her name is still legible"
+    },
+    {
+      "id": "helm",
+      "type": "scan",
+      "poi": "endurance-helm",
+      "primary": false,
+      "title": "Find the ship's wheel and the life growing on the hull"
+    },
+    {
+      "id": "rigging",
+      "type": "scan",
+      "poi": "endurance-rigging-debris",
+      "primary": false,
+      "title": "Survey the fallen masts and funnel"
+    },
+    {
+      "id": "worsley",
+      "type": "scan",
+      "poi": "endurance-worsley-position",
+      "primary": false,
+      "title": "Visit Worsley's 1915 recorded position, far to the north-west"
+    },
+    {
+      "id": "abyssal-plain",
+      "type": "scan",
+      "poi": "endurance-abyssal-plain",
+      "primary": false,
+      "title": "Sample the real, unusually flat seabed nearby"
+    }
+  ],
+  "completion": "all_primary"
+}

@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "landmark": "endurance",
+  "memorial_note": "Endurance is a protected historic site and monument under the Antarctic Treaty (HSM No. 93), and Shackleton's crew abandoned her in good order -- nobody died when she sank. She is still a monument to a famous and dangerous expedition, not a grave, so please treat her the way the international agreement protecting her intends: look, learn, and leave her exactly as she lies. The game has no salvage, collection or loot of any kind.",
+  "entries": [
+    {
+      "id": "overview",
+      "title": "Endurance: Shackleton's polar ship",
+      "paragraphs": [
+        "Endurance carried Sir Ernest Shackleton's Imperial Trans-Antarctic Expedition into the Weddell Sea in 1914-15. Built in 1912 at the Framnæs yard in Sandefjord, Norway, and launched under the name Polaris, she was a three-masted barquentine reinforced for polar ice; Shackleton bought and renamed her in January 1914. Pack ice closed around her in January 1915, and after ten months drifting, beset, the ice finally crushed her hull. Captain Frank Worsley recorded her sinking position on 21 November 1915. All 28 men aboard survived; they camped on the drifting ice and eventually reached Elephant Island, from where Shackleton and five others made the 1,300 km open-boat journey to South Georgia for rescue.",
+        "The wreck was found on 5 March 2022 by the Endurance22 expedition, organised by the Falklands Maritime Heritage Trust (FMHT) aboard the South African polar vessel S.A. Agulhas II -- exactly 100 years to the day after Shackleton was buried at Grytviken, South Georgia. She lies 3,008 m deep in the Weddell Sea, within the search area the team had defined before departure. Mensun Bound, the expedition's Director of Exploration, called her \"by far the finest wooden shipwreck I have ever seen. It is upright, well proud of the seabed, intact, and in a brilliant state of preservation.\"",
+        "The wreck had already been designated a protected Historic Site and Monument (HSM No. 93) under the Antarctic Treaty System in 2019, three years before anyone knew exactly where she lay. The UK Antarctic Heritage Trust (UKAHT), working with Historic England, now leads the Conservation Management Plan for the site.",
+        "What you see here: the seabed is real bathymetry from the GMRT Synthesis, but this part of the Weddell Sea has no dedicated multibeam survey, so the grid falls back to GEBCO's coarser global fill -- far too coarse to show a 44 m wooden hull, and unusually smooth even by the standards of this game's other sites. The ship and everything on her are artist reconstructions built from Endurance22's published photographs, survey report and the ship's known dimensions."
+      ],
+      "facts": [
+        { "label": "Position", "value": "68°44′21″S 52°19′47″W" },
+        { "label": "Depth", "value": "3,008 m" },
+        { "label": "Sank", "value": "21 November 1915" },
+        { "label": "Found", "value": "5 March 2022, by Endurance22 (FMHT)" },
+        { "label": "Length / beam", "value": "44 m (144 ft) / 7.6 m (25 ft)" },
+        { "label": "Displacement", "value": "350 gross register tons" },
+        { "label": "Crew, all survived", "value": "28" },
+        { "label": "Protection", "value": "Antarctic Treaty Historic Site and Monument No. 93 (2019)" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        { "title": "Endurance Shipwreck — UK Antarctic Heritage Trust", "url": "https://ukaht.org/places/endurance-shipwreck/" },
+        { "title": "\"Endurance is Found\" — Falklands Maritime Heritage Trust press release (PR Newswire, 9 Mar 2022)", "url": "https://www.prnewswire.com/news-releases/endurance-is-found-301498505.html" },
+        { "title": "Endurance (1912 ship) — Wikipedia", "url": "https://en.wikipedia.org/wiki/Endurance_(1912_ship)" },
+        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "wreck-hull",
+      "title": "The hull, upright and intact",
+      "paragraphs": [
+        "Endurance rests upright on the seabed, her hull essentially intact -- a rare survival for a wooden ship a century after sinking. Her keel was four layers of solid oak, 2.2 m thick in total, and her planking was oak and Norwegian fir up to 30 in thick, sheathed in greenheart for extra strength against ice: exactly the build that let her hold together against the pack for ten months, and that has kept her hull sound on the seabed since.",
+        "The Falklands Maritime Heritage Trust's team, led by Director of Exploration Mensun Bound, surveyed her with Saab Sabertooth hybrid underwater vehicles fitted with Voyis optical laser scanners, capturing about 25,000 high-resolution images that were digitally stitched into a precise 44 m bow-to-stern 3D composite.",
+        "Artist's reconstruction: the block you see here uses the published position, the hull's length and beam, and a north-facing heading. No source found gives the ship's actual compass heading or an as-built survey shape, so this is illustrative, not a surveyed model."
+      ],
+      "facts": [
+        { "label": "Position", "value": "68°44′21″S 52°19′47″W" },
+        { "label": "Depth", "value": "3,008 m (seabed in this tile: 3,000.3 m)" },
+        { "label": "Length / beam", "value": "44 m (144 ft) / 7.6 m (25 ft)" },
+        { "label": "Hull", "value": "oak keel, oak and fir planking, greenheart-sheathed" },
+        { "label": "Orientation", "value": "upright, largely intact" },
+        { "label": "Survey", "value": "Saab Sabertooth AUVs with Voyis laser scanners, ~25,000 images" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        { "title": "Endurance Shipwreck — UK Antarctic Heritage Trust", "url": "https://ukaht.org/places/endurance-shipwreck/" },
+        { "title": "\"Endurance is Found\" — Falklands Maritime Heritage Trust press release (PR Newswire, 9 Mar 2022)", "url": "https://www.prnewswire.com/news-releases/endurance-is-found-301498505.html" },
+        { "title": "Endurance at the bottom of the sea — Falklands Maritime Heritage Trust", "url": "https://fmht.co.uk/shackletons-endurance-revealed/endurance-at-the-bottom-of-the-sea/" },
+        { "title": "Endurance (1912 ship) — Wikipedia", "url": "https://en.wikipedia.org/wiki/Endurance_(1912_ship)" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "stern-nameplate",
+      "title": "\"ENDURANCE\", and the star of her old name",
+      "paragraphs": [
+        "The ship's name is still clearly legible on the stern, painted directly below the taffrail. Above it is a five-pointed star -- a survival of her original name, Polaris, the pole star, under which she was launched at the Framnæs yard in 1912 before Shackleton bought and renamed her.",
+        "Finding the name intact after 106 years on the seabed was one of the expedition's most striking moments, and it is the clearest piece of evidence that this is, beyond doubt, Shackleton's ship.",
+        "Artist's reconstruction, position approximate: placed on the stern of the reconstructed hull block, about 20 m from its centre. No coordinate or heading is published for the nameplate itself or for the ship's orientation, so its exact placement on the model is illustrative."
+      ],
+      "facts": [
+        { "label": "Location", "value": "stern, below the taffrail" },
+        { "label": "Emblem", "value": "five-pointed star, from the ship's original name Polaris" },
+        { "label": "Significance", "value": "confirmed the wreck's identity" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        { "title": "Endurance at the bottom of the sea — Falklands Maritime Heritage Trust", "url": "https://fmht.co.uk/shackletons-endurance-revealed/endurance-at-the-bottom-of-the-sea/" },
+        { "title": "Photos of the Wreck of Shackleton's Endurance — HISTORY", "url": "https://www.history.com/articles/endurance-shackleton-shipwreck-discovery-photos" }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "helm-and-life",
+      "title": "The wheel, and life in total darkness",
+      "paragraphs": [
+        "Endurance22's cameras also captured the ship's wheel, still standing at her stern. No sunlight reaches 3,008 m, so nothing here photosynthesises; instead the hull has become a deep-sea oasis of filter feeders that strain edible particles from the passing water.",
+        "Marine biologists reviewing the footage identified sea stars (including brisingid sea stars), glass sponges, sea squirts, a bright yellow stalked sea lily (a crinoid), and a large white anemone near the wheel. They also spotted a ghostly white squat lobster, likely of the genus Munidopsis -- the first record of that kind of animal in this part of the Weddell Sea. \"The ship is cool,\" said British Antarctic Survey marine biogeographer Huw Griffiths, \"but look at those things living on it.\"",
+        "Artist's reconstruction: the wheel is placed near the stern, an illustrative position (no coordinate is published for it). The animals themselves are not modelled as individual props; see species.json for the wider region's recorded fauna, which is placed elsewhere in the mission, not on the wreck itself."
+      ],
+      "facts": [
+        { "label": "Depth", "value": "3,008 m; no sunlight" },
+        { "label": "Species seen on the hull", "value": "sea stars, glass sponges, sea squirts, a sea lily, an anemone, a squat lobster (Munidopsis sp.)" },
+        { "label": "Notable find", "value": "first regional record of this squat lobster genus" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        { "title": "Photos of the Wreck of Shackleton's Endurance — HISTORY", "url": "https://www.history.com/articles/endurance-shackleton-shipwreck-discovery-photos" },
+        { "title": "Shackleton's 'Endurance' Shipwreck Is Teeming With Bizarre Ocean Life — Smithsonian Magazine", "url": "https://www.smithsonianmag.com/smart-news/shackletons-endurance-shipwreck-is-teeming-with-bizarre-ocean-life-180979719/" }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "structural-damage",
+      "title": "Masts down, funnel toppled",
+      "paragraphs": [
+        "Although the hull is remarkably sound, Endurance did not come through entirely undamaged. FMHT's survey found her masts down and her funnel toppled, with the heaviest damage concentrated around the poop deck at the stern and the waist amidships. Photographs of the wreck suggest she struck the seabed bow- or keel-first as she went down.",
+        "The damage is consistent with how she sank: crushed by pack ice over months, then going down stern-first as recorded by witnesses in 1915, after a fall of 3 km through freezing water.",
+        "Artist's reconstruction, position approximate: a debris scatter placed forward of the hull, standing in for the fallen rigging and funnel. No coordinates are published for individual pieces."
+      ],
+      "facts": [
+        { "label": "Masts", "value": "down" },
+        { "label": "Funnel", "value": "toppled" },
+        { "label": "Heaviest damage", "value": "poop deck and waist" },
+        { "label": "Sank", "value": "21 November 1915, after ~10 months beset in pack ice" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        { "title": "Endurance at the bottom of the sea — Falklands Maritime Heritage Trust", "url": "https://fmht.co.uk/shackletons-endurance-revealed/endurance-at-the-bottom-of-the-sea/" },
+        { "title": "Photos of the Wreck of Shackleton's Endurance — HISTORY", "url": "https://www.history.com/articles/endurance-shackleton-shipwreck-discovery-photos" },
+        { "title": "Endurance (1912 ship) — Wikipedia", "url": "https://en.wikipedia.org/wiki/Endurance_(1912_ship)" }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "worsley-position",
+      "title": "Worsley's position, and the search that found her",
+      "paragraphs": [
+        "Captain Frank Worsley, Endurance's navigator, logged the ship's sinking position from the ice as 68°39′30″S 52°26′30″W. A 2022 peer-reviewed study of his navigation log (Squire & Bell, Journal of Navigation) found the fix itself was sound work under brutal conditions, but flagged real sources of uncertainty: few navigational sights were possible around the time of the sinking, and chronometer error accumulates the longer it goes unchecked at sea. The authors estimate the combined uncertainty at several nautical miles in both latitude and longitude.",
+        "The Endurance22 team used Worsley's position, adjusted for that uncertainty, to define their search box -- and found the wreck within it. UKAHT and other secondary sources describe the wreck as roughly four miles (6.4 km) south of Worsley's recorded position; this game's own distance between the peer-reviewed log coordinate and the wreck's published coordinate works out closer to 10 km, to the south-south-east. Both figures describe the same real discrepancy; we report ours rather than silently adopting the more common one (see sources.md).",
+        "This point marks real seabed terrain at Worsley's logged coordinate. Nothing was built or lost here -- it is included to show how good historical navigation, and 107 years of searching, finally led back to the ship."
+      ],
+      "facts": [
+        { "label": "Worsley's position", "value": "68°39′30″S 52°26′30″W" },
+        { "label": "Logged", "value": "21 November 1915" },
+        { "label": "Distance to wreck (commonly cited)", "value": "~4 mi / 6.4 km south" },
+        { "label": "Distance to wreck (this tile's coordinates)", "value": "~10 km, south-south-east" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Squire & Bell, \"On the Location of Shackleton's Vessel Endurance\" — Journal of Navigation (Cambridge University Press, peer-reviewed)", "url": "https://www.cambridge.org/core/journals/journal-of-navigation/article/abs/on-the-location-of-shackletons-vessel-endurance/5F1AD80B3445C2653F1C24EAD4B7460D" },
+        { "title": "Endurance Shipwreck — UK Antarctic Heritage Trust", "url": "https://ukaht.org/places/endurance-shipwreck/" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "abyssal-plain",
+      "title": "A very flat piece of ocean floor",
+      "paragraphs": [
+        "Away from the wreck, this part of the Weddell Sea floor is remarkably featureless: across the whole ~70 x 33 km tile the terrain ranges only from about 2,915 m to 3,096 m, a relief of under 200 m. Two kilometres west of the wreck the seabed is about 2,988 m deep, a gentle 12 m rise from the 3,000 m reading at the wreck itself.",
+        "That flatness is partly real -- deep Weddell Sea abyssal plain, far from any ridge or canyon -- and partly a limit of the data. This tile has no dedicated multibeam survey at the wreck site, so the grid falls back to GMRT's coarser GEBCO-derived global fill, which smooths out any seabed feature smaller than a few kilometres. That is a second, independent reason (besides scale) that the wreck itself cannot appear in the terrain: even a large seabed feature here would barely register.",
+        "This point is real survey data, not a reconstruction."
+      ],
+      "facts": [
+        { "label": "Tile relief", "value": "≈ 2,915–3,096 m (< 200 m across ~70 x 33 km)" },
+        { "label": "2 km west of the wreck", "value": "2,988 m" },
+        { "label": "Data source", "value": "GMRT Synthesis (GEBCO-derived fill here, not a dedicated multibeam survey)" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" },
+        { "title": "Endurance (1912 ship) — Wikipedia", "url": "https://en.wikipedia.org/wiki/Endurance_(1912_ship)" }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "protection",
+      "title": "A protected monument, not a grave",
+      "paragraphs": [
+        "Every man aboard Endurance survived her sinking; Shackleton had already led the crew off onto the ice before she went down. So unlike Titanic or Bismarck, this wreck is not a war grave or a gravesite -- but she is still one of the best-preserved and most significant wrecks in the world, and international law protects her accordingly.",
+        "The Antarctic Treaty System designated the (then still unfound) wreck a Historic Site and Monument, HSM No. 93, in 2019 -- three years before anyone located her. That status makes it an offence to touch, disturb, or remove anything from the site; Endurance22's own survey and filming work had to be carried out without any contact with the wreck.",
+        "Since the discovery, the UK Antarctic Heritage Trust and Historic England have led a Conservation Management Plan for the site, and have proposed expanding the protection zone from its original 500 m radius to 1,500 m to cover the full debris field, with a longer-term goal of a formal Antarctic Specially Protected Area designation. Warming Antarctic waters and increasing ship traffic in the region are cited as growing risks.",
+        "This game has no salvage, collection or loot of any kind at any site; here, that policy simply matches the law."
+      ],
+      "facts": [
+        { "label": "Designation", "value": "Antarctic Treaty Historic Site and Monument No. 93 (2019)" },
+        { "label": "Protection radius (original)", "value": "500 m" },
+        { "label": "Protection radius (proposed)", "value": "1,500 m" },
+        { "label": "Managed by", "value": "UK Antarctic Heritage Trust, with Historic England" },
+        { "label": "Lives lost in the sinking", "value": "none — all 28 crew survived" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Endurance Shipwreck — UK Antarctic Heritage Trust", "url": "https://ukaht.org/places/endurance-shipwreck/" },
+        { "title": "\"Endurance is Found\" — Falklands Maritime Heritage Trust press release (PR Newswire, 9 Mar 2022)", "url": "https://www.prnewswire.com/news-releases/endurance-is-found-301498505.html" },
+        { "title": "Wreck of Shackleton's 'Endurance' Gets New Protections — Smithsonian Magazine", "url": "https://www.smithsonianmag.com/smart-news/the-endurance-shipwreck-gets-new-protections-amid-warming-antarctic-waters-180984683/" }
+      ],
+      "confidence": "high"
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "landmark": "endurance",
+  "pois": [
+    {
+      "id": "endurance-hull",
+      "name": "Endurance: main hull",
+      "lat": -68.739167,
+      "lon": -52.329722,
+      "depth_m": 2995,
+      "radius_m": 60,
+      "kind": "wreck",
+      "primary": true,
+      "scan_seconds": 5,
+      "guide_entry": "wreck-hull",
+      "confidence": "high",
+      "reconstruction": true,
+      "sources": [
+        "https://ukaht.org/places/endurance-shipwreck/",
+        "https://www.prnewswire.com/news-releases/endurance-is-found-301498505.html",
+        "https://en.wikipedia.org/wiki/Endurance_(1912_ship)"
+      ],
+      "note": "Published position 68°44′21″S 52°19′47″W (Wikipedia \"Endurance (1912 ship)\", matching the FMHT-sourced 3,008 m depth). This tile's terrain here reads 3,000.3 m, 7.7 m shallower than the published 3,008 m -- close agreement for a smooth GEBCO-derived fill (see sources.md). depth_m sits ~5 m above the seabed for a scan target at roughly deck height on the intact, upright hull."
+    },
+    {
+      "id": "endurance-stern-nameplate",
+      "name": "Stern: \"ENDURANCE\" and the pole star",
+      "lat": -68.739347,
+      "lon": -52.329722,
+      "depth_m": 2996,
+      "radius_m": 30,
+      "kind": "wreck",
+      "primary": true,
+      "scan_seconds": 4,
+      "guide_entry": "stern-nameplate",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://fmht.co.uk/shackletons-endurance-revealed/endurance-at-the-bottom-of-the-sea/",
+        "https://www.history.com/articles/endurance-shackleton-shipwreck-discovery-photos"
+      ],
+      "note": "The ship's name is visible on the stern \"directly below the taffrail\" (FMHT), above a five-pointed star that stood for her original name Polaris (History.com). Placed 20 m from endurance-hull's centre, toward the assumed stern; no source publishes the ship's exact heading (see sources.md), so this offset is illustrative, not surveyed."
+    },
+    {
+      "id": "endurance-helm",
+      "name": "The ship's wheel",
+      "lat": -68.739319,
+      "lon": -52.329569,
+      "depth_m": 2994,
+      "radius_m": 25,
+      "kind": "artifact",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "helm-and-life",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://www.history.com/articles/endurance-shackleton-shipwreck-discovery-photos",
+        "https://www.smithsonianmag.com/smart-news/shackletons-endurance-shipwreck-is-teeming-with-bizarre-ocean-life-180979719/"
+      ],
+      "note": "Endurance22 photographed \"the helm of the Endurance\" (History.com) and a large white anemone near the wheel, among sea stars, sponges and sea squirts colonising the hull (Smithsonian, quoting BAS marine biogeographer Huw Griffiths). Placed near the stern, illustrative position (no coordinate published for the wheel itself)."
+    },
+    {
+      "id": "endurance-rigging-debris",
+      "name": "Fallen masts and funnel",
+      "lat": -68.738946,
+      "lon": -52.32983,
+      "depth_m": 2999,
+      "radius_m": 40,
+      "kind": "debris",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "structural-damage",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://fmht.co.uk/shackletons-endurance-revealed/endurance-at-the-bottom-of-the-sea/",
+        "https://www.history.com/articles/endurance-shackleton-shipwreck-discovery-photos"
+      ],
+      "note": "FMHT's survey team (Mensun Bound) found the masts down and the funnel toppled, with damage concentrated around the poop and waist; History.com's photo set shows the ship appears to have struck the seabed bow/keel-first. No coordinates are published for the fallen rigging itself; placed forward of the hull centre, illustrative position."
+    },
+    {
+      "id": "endurance-worsley-position",
+      "name": "Worsley's 1915 recorded position",
+      "lat": -68.658333,
+      "lon": -52.441667,
+      "snap_to_seabed": true,
+      "radius_m": 400,
+      "kind": "other",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "worsley-position",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://www.cambridge.org/core/journals/journal-of-navigation/article/abs/on-the-location-of-shackletons-vessel-endurance/5F1AD80B3445C2653F1C24EAD4B7460D",
+        "https://ukaht.org/places/endurance-shipwreck/"
+      ],
+      "note": "Captain Frank Worsley's logged sinking position, 68°39′30″S 52°26′30″W (Squire & Bell, \"On the Location of Shackleton's Vessel Endurance\", Journal of Navigation, peer-reviewed). This point marks real seabed terrain, not a structure -- nothing was built or lost here; it is roughly 10 km from the surveyed wreck position by this tile's coordinates (see sources.md for the discrepancy with the commonly quoted \"~4 miles/6.4 km\" figure, e.g. UKAHT). Optional long detour from the wreck; not required."
+    },
+    {
+      "id": "endurance-abyssal-plain",
+      "name": "The Weddell Sea abyssal plain",
+      "lat": -68.73916,
+      "lon": -52.379324,
+      "snap_to_seabed": true,
+      "radius_m": 300,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "abyssal-plain",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": [
+        "https://www.gmrt.org/"
+      ],
+      "note": "Real survey data, 2 km west of the wreck: seabed 2,988 m here vs 3,000 m at the wreck, a gentle ~12 m rise over 2 km. This tile has no dedicated multibeam swath at the wreck site; the grid is GMRT's coarser GEBCO-derived fill (Ryan et al. 2009), which is why it cannot show the wreck itself and why relief across the whole tile is unusually smooth (min -3,096.4 m, max -2,915.3 m over ~70 x 33 km)."
+    }
+  ]
+}

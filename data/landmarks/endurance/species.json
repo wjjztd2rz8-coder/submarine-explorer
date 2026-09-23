@@ -1,0 +1,252 @@
+{
+  "version": 1,
+  "landmark": "endurance",
+  "source": "OBIS",
+  "source_url": "https://api.obis.org/v3/checklist?geometry=POLYGON((-55+-70,-50+-70,-50+-67.5,-55+-67.5,-55+-70))&size=1000&skip=0",
+  "fetched_at": "2026-09-23T06:32:57Z",
+  "bbox": {
+    "north": -67.5,
+    "south": -70.0,
+    "east": -50.0,
+    "west": -55.0
+  },
+  "rank_filter": "any",
+  "taxa_in_bbox": 37,
+  "taxa_matching_rank": 37,
+  "records_in_bbox": 316,
+  "note": "The tile's own bbox (data/tiles/endurance/meta.json, ~70 x 33 km) returned 0 taxa at every rank, so this file uses a wider ~550 x 280 km box (67.5-70.0 S, 50.0-55.0 W) covering the north-western Weddell Sea shelf and slope, and 'any' rank (species/genus/family/...) rather than the default species-only filter; both widenings are noted per Phase C contracts SS3. No depth filter is applied: filtering to the wreck's own depth (3,008 m, +-500 m) returned 0 taxa even in the wide box -- OBIS has effectively no deep abyssal Weddell Sea occurrence records near this site. Most kept taxa are brittle stars and sea stars (Ophiuroidea, Asteroidea) sampled on the shelf at depths of tens to a few hundred metres (e.g. 84-90 m for the four with a reported depthRange_m), i.e. far shallower than the 3,008 m wreck -- consistent with the wreck-colonising fauna (sea stars, sponges, anemones, sea squirts) photographed directly on Endurance by the Endurance22 expedition and used in guide.json, which comes from that expedition's own footage, not OBIS. Pygoscelis adeliae (Adelie penguin) and Mirounga leonina (southern elephant seal) are surface/ice species swept in by the wide bbox, not deep-sea fauna; they are kept in this file (OBIS record of what has been observed in the region) but are not placed in the game. Species placement in the mission (which POI or depth a given animal appears near) is invented; nothing here was invented as a species record.",
+  "species": [
+    {
+      "scientificName": "Pygoscelis adeliae",
+      "commonName": "Adelie penguin",
+      "aphiaID": 225757,
+      "records": 197,
+      "group": "bird",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Mirounga leonina",
+      "commonName": "Southern elephant seal",
+      "aphiaID": 231413,
+      "records": 78,
+      "group": "mammal",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Anasterias pedicellaris",
+      "aphiaID": 248006,
+      "records": 4,
+      "depthRange_m": [
+        84,
+        90
+      ],
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Cycethra verrucosa",
+      "aphiaID": 172748,
+      "records": 2,
+      "depthRange_m": [
+        84,
+        90
+      ],
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Diplasterias brandti",
+      "aphiaID": 178790,
+      "records": 2,
+      "depthRange_m": [
+        84,
+        90
+      ],
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Paralophaster antarcticus",
+      "aphiaID": 172789,
+      "records": 2,
+      "depthRange_m": [
+        84,
+        90
+      ],
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Amphioplus affinis",
+      "aphiaID": 236009,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Astrochlamys bruneus",
+      "aphiaID": 173160,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Astrohamma tuberculatum",
+      "aphiaID": 173164,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Diastylis hammoniae",
+      "aphiaID": 181950,
+      "records": 1,
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Diastylis planifrons",
+      "aphiaID": 181975,
+      "records": 1,
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Glaciacantha dubium",
+      "aphiaID": 173540,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Haploniscus cassilatus",
+      "aphiaID": 344983,
+      "records": 1,
+      "depthRange_m": [
+        5639,
+        5639
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Holostylis helleri",
+      "aphiaID": 231742,
+      "records": 1,
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophiacantha frigida",
+      "aphiaID": 173224,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophiocamax gigas",
+      "aphiaID": 173188,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophiocten bisquamatum",
+      "aphiaID": 173466,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophiocten megaloplax",
+      "aphiaID": 173530,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophiogona doederleini",
+      "aphiaID": 243663,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophioleuce regulare",
+      "aphiaID": 173753,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophiolimna antarctica",
+      "aphiaID": 173257,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophiomastus conveniens",
+      "aphiaID": 173324,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophiomastus ludwigi",
+      "aphiaID": 173327,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophiomastus serratus",
+      "aphiaID": 173335,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophioperla koehleri",
+      "aphiaID": 173596,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophioplinthus brevirima",
+      "aphiaID": 322561,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophioplinthus frigida",
+      "aphiaID": 322566,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophioplinthus gelida",
+      "aphiaID": 322567,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophioplinthus grisea",
+      "aphiaID": 243977,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophioplinthus tuberosa",
+      "aphiaID": 322581,
+      "records": 1,
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    }
+  ]
+}
