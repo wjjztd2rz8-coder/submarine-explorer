@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "landmark": "bismarck",
+  "props": [
+    {
+      "id": "main-hull",
+      "model": "procedural:hull-block",
+      "lat": 48.33372,
+      "lon": -16.10678,
+      "snap_to_seabed": true,
+      "heading_deg": 20,
+      "scale": 1,
+      "dimensions_m": [251, 36, 15],
+      "ends": ["prow", "rounded"],
+      "lod_distance_m": 1500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Bismarck's hull at the coordinate this tile is centred on (see sources.md for the unresolved conflict with the published Wikipedia/press position). Length 251 m and beam 36 m are the ship's published overall dimensions (Wikipedia, data/landmarks.json wreck_meta). Height 15 m is an unsourced estimate for a battleship hull of this displacement; no source found publishes a keel-to-deck figure for the wreck. ends [prow, rounded]: surveys (kbismarck.com) describe the hull as largely intact and in surprisingly good condition, so this uses a pointed bow and a rounded stern rather than a torn 'cut' end; note that data/landmarks.json's own wreck_meta separately describes the bow as 'separated from main hull', which conflicts with the intact-hull account -- see sources.md. heading_deg 20 is arbitrary: no source found publishes the ship's actual compass orientation on the seabed."
+    },
+    {
+      "id": "turret-debris",
+      "model": "procedural:debris",
+      "lat": 48.3387,
+      "lon": -16.1168,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [50, 50, 6],
+      "lod_distance_m": 700,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Stands in for Bismarck's four detached main-battery (38 cm) gun turrets, which broke free during the sinking and came to rest roughly in a line down the seamount flank (kbismarck.org forum, citing 1989 and later survey accounts; Magellan's 2019 digital-twin survey). The engine's procedural kinds have no turret shape, so a debris cluster marks the general area; it does not depict the turrets' real form. No public coordinates were found for the individual turrets, so this placement, down-slope and north-west of the hull, is illustrative only -- hence low confidence on the matching POI."
+    }
+  ]
+}

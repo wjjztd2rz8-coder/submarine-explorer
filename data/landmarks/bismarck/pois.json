@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "landmark": "bismarck",
+  "pois": [
+    {
+      "id": "bismarck-hull",
+      "name": "Bismarck: main hull",
+      "lat": 48.33372,
+      "lon": -16.10678,
+      "depth_m": 4870,
+      "radius_m": 100,
+      "kind": "wreck",
+      "primary": true,
+      "scan_seconds": 5,
+      "guide_entry": "wreck-hull",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/German_battleship_Bismarck",
+        "https://www.kbismarck.com/wreck.html",
+        "https://www.magellan.gg/vrov-pilot-bismarck/"
+      ],
+      "note": "This tile is centred on data/landmarks.json's coordinate (48.3337N, 16.1068W), 20 km+ from the coordinate published by Wikipedia and 1989-era press reports of Ballard's expedition (48.1667N, 16.2W, itself described as the scuttling/action position, not necessarily a precise wreck fix -- Ballard's team reportedly kept the exact navigational coordinates private at the time). We could not reconcile the two this session; see sources.md. depth_m 4870 sits ~5 m above this tile's own terrain reading of 4,874.9 m here, for a scan target at roughly deck height; the commonly published depth is 4,790-4,791 m. Confidence is medium because of the unresolved position discrepancy, not because the ship's identity or general condition is in doubt."
+    },
+    {
+      "id": "bismarck-turret-debris",
+      "name": "Detached main gun turrets",
+      "lat": 48.3387,
+      "lon": -16.1168,
+      "depth_m": 4886,
+      "radius_m": 60,
+      "kind": "debris",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "turret-debris",
+      "confidence": "low",
+      "reconstruction": true,
+      "sources": [
+        "https://www.kbismarck.org/forum/viewtopic.php?t=1470",
+        "https://www.magellan.gg/vrov-pilot-bismarck/"
+      ],
+      "note": "Bismarck's four main-battery turrets broke free of their barbettes, being unbolted from below, and dropped separately during the sinking; Ballard's 1989 survey located only one, upside-down and half-buried, and could not find the other three. Later surveys (Magellan/Parks Stephenson, 2019) mapped more of the debris field, roughly a line of turret positions along the slope. No public coordinates were found for the individual turrets, so this marker is an illustrative placement down-slope (north-west) of the reconstructed hull, not a surveyed position -- hence the low confidence."
+    },
+    {
+      "id": "bismarck-damage",
+      "name": "Battle damage: shell and torpedo hits",
+      "lat": 48.3335,
+      "lon": -16.1075,
+      "depth_m": 4871,
+      "radius_m": 50,
+      "kind": "wreck",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "sinking-and-debate",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/German_battleship_Bismarck",
+        "https://www.usni.org/magazines/proceedings/1991/june/who-sank-bismarck",
+        "https://www.kbismarck.com/wreck.html"
+      ],
+      "note": "Marks the historical question, not a single surveyed feature: whether British shellfire and torpedoes, or the crew's own scuttling charges, caused the final sinking. kbismarck.com's survey notes describe the hull as in surprisingly good condition given the battering it took, with the stern the most heavily damaged section. Illustrative placement near the hull."
+    },
+    {
+      "id": "bismarck-skid-trail",
+      "name": "The seamount flank",
+      "lat": 48.336,
+      "lon": -16.112,
+      "snap_to_seabed": true,
+      "radius_m": 150,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "seamount-flank",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": [
+        "https://www.gmrt.org/",
+        "https://www.magellan.gg/vrov-pilot-bismarck/"
+      ],
+      "note": "Real survey data: this tile's terrain deepens gently from 4,874.9 m at the hull to about 4,891.8 m here, roughly 750 m north-west. Published accounts describe the real debris trail as about 1 km long down a much steeper (~14.5 degree) slope, formed when the turrets hit the seamount first and triggered a landslide that carried the hull further down. This tile's grid, built from GMRT's coarser global (GEBCO-derived) fill rather than a dedicated survey of the wreck site, is far too coarse to resolve that trail or the true slope angle -- what you scan here is real but smoothed terrain, not the skid mark itself."
+    },
+    {
+      "id": "bismarck-memorial",
+      "name": "Memorial marker",
+      "lat": 48.334,
+      "lon": -16.1065,
+      "depth_m": 4870,
+      "radius_m": 40,
+      "kind": "memorial",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "memorial",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://en.wikipedia.org/wiki/German_battleship_Bismarck"
+      ],
+      "note": "A respectful marker near the hull, not a surveyed structure or a prop. Of Bismarck's crew of 2,221, only around 114 were rescued; roughly 2,100 died. This game has no salvage, collection or loot of any kind at any site."
+    }
+  ]
+}

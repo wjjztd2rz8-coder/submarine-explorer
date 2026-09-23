@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "landmark": "bismarck",
+  "source": "OBIS",
+  "source_url": "https://api.obis.org/v3/checklist?geometry=POLYGON((-16.333374+48.183485,-15.880188+48.183485,-15.880188+48.483962,-16.333374+48.483962,-16.333374+48.183485))&size=1000&skip=0",
+  "fetched_at": "2026-09-23T11:16:55Z",
+  "bbox": {
+    "north": 48.48396150001537,
+    "south": 48.18348542579662,
+    "east": -15.88018798828125,
+    "west": -16.3333740234375
+  },
+  "rank_filter": "species",
+  "taxa_in_bbox": 75,
+  "taxa_matching_rank": 30,
+  "records_in_bbox": 462,
+  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Every kept taxon has a reported depthRange_m of about 5-10 m -- surface plankton and near-surface plankton net tows, far shallower than the wreck at ~4,790 m. OBIS has no occurrence records at abyssal depth for this bbox; no depth filter or widening recovered any. The deep-sea corals and sponges named in data/landmarks.json's notable_species (used qualitatively in guide.json) are not represented in this OBIS export and are not placed as species records here. Placement of any animal in the game is invented; this file only reports what OBIS has recorded in the area.",
+  "species": [
+    {
+      "scientificName": "Tripos furca",
+      "aphiaID": 840627,
+      "records": 16,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Tripos fusus",
+      "aphiaID": 840626,
+      "records": 14,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Centropages typicus",
+      "aphiaID": 104499,
+      "records": 10,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pseudo-nitzschia delicatissima",
+      "aphiaID": 149153,
+      "records": 8,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Thalassionema nitzschioides",
+      "aphiaID": 149093,
+      "records": 8,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Tripos macroceros",
+      "aphiaID": 841260,
+      "records": 8,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pleuromamma gracilis",
+      "aphiaID": 104639,
+      "records": 6,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Thalassiothrix longissima",
+      "aphiaID": 157083,
+      "records": 6,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Calanus helgolandicus",
+      "aphiaID": 104466,
+      "records": 4,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Euchaeta acuta",
+      "aphiaID": 104550,
+      "records": 4,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Nannocalanus minor",
+      "aphiaID": 104469,
+      "records": 4,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pleuromamma borealis",
+      "aphiaID": 104638,
+      "records": 4,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pleuromamma robusta",
+      "aphiaID": 104642,
+      "records": 4,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Proboscia alata",
+      "aphiaID": 149168,
+      "records": 4,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Tripos muelleri",
+      "aphiaID": 495363,
+      "records": 4,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Undeuchaeta plumosa",
+      "aphiaID": 104343,
+      "records": 4,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Centropages hamatus",
+      "aphiaID": 104496,
+      "records": 2,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Limacina retroversa",
+      "aphiaID": 140227,
+      "records": 2,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Neocalanus gracilis",
+      "aphiaID": 104471,
+      "records": 2,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pleuromamma abdominalis",
+      "aphiaID": 104637,
+      "records": 2,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pleuromamma xiphias",
+      "aphiaID": 104643,
+      "records": 2,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Proboscia inermis",
+      "aphiaID": 341501,
+      "records": 2,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pseudo-nitzschia seriata",
+      "aphiaID": 149152,
+      "records": 2,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Rhizosolenia bergonii",
+      "aphiaID": 196811,
+      "records": 2,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Tripos azoricus",
+      "aphiaID": 837310,
+      "records": 2,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "protist",
+      "taxonRank": "Species"
+    }
+  ]
+}
