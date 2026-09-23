@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "landmark": "beebe-vent-field",
+  "pois": [
+    {
+      "id": "bvf-main-vents",
+      "name": "Beebe 1-5 black smokers",
+      "lat": 18.5464,
+      "lon": -81.718,
+      "snap_to_seabed": true,
+      "radius_m": 150,
+      "kind": "vent",
+      "primary": true,
+      "scan_seconds": 6,
+      "guide_entry": "vents",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://www.nature.com/articles/ncomms1636",
+        "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field"
+      ],
+      "note": "Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): -4,987.9 m, within a few tens of metres of Wikipedia's published coordinate for the Beebe Hydrothermal Vent Field (18 32'48\"N 81 43'6\"W = 18.5467, -81.7183) and inside Connelly et al. (2012)'s published depth range for the field, 4,957-4,987 m. The field's five main endmember vents (Beebe 1-5) branch from the same sulfide mound here and are the source of the field's record 403-410 degC supercritical fluid measurements."
+    },
+    {
+      "id": "bvf-shrimp-swarm",
+      "name": "Rimicaris hybisae swarm",
+      "lat": 18.5462,
+      "lon": -81.7175,
+      "snap_to_seabed": true,
+      "radius_m": 120,
+      "kind": "biology",
+      "primary": true,
+      "scan_seconds": 5,
+      "guide_entry": "shrimp",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "http://www.joncopley.com/docs/Rimicaris_hybisae.pdf",
+        "https://www.nature.com/articles/ncomms1636"
+      ],
+      "note": "Real GMRT terrain, -4,979.2 m, ~35 m from the main vent POI, inside the same real vent complex where Nye et al. (2012) described Rimicaris hybisae swarming by the thousand around Beebe's chimneys. `reconstruction: true` because no published survey gives exact individual-shrimp or swarm-density coordinates to place -- the swarm's real presence at this vent field is sourced, its precise mapped position here is not."
+    },
+    {
+      "id": "bvf-sulfide-mound-west",
+      "name": "Western sulfide mound",
+      "lat": 18.5445,
+      "lon": -81.7206,
+      "snap_to_seabed": true,
+      "radius_m": 150,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "vents",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/", "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879"],
+      "note": "Real GMRT terrain, -4,957.1 m, about 1.4 km west of the main vent POI and within the field's published depth range. Webber et al. (2015) describe seven sulfide mounds spread across the field's western side; this point is a real-terrain candidate within that footprint, not a citation to one specific named mound."
+    },
+    {
+      "id": "bvf-eastern-margin",
+      "name": "Eastern field margin",
+      "lat": 18.5514,
+      "lon": -81.71,
+      "snap_to_seabed": true,
+      "radius_m": 200,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "vents",
+      "confidence": "low",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/"],
+      "note": "Real GMRT terrain, -4,952.6 m, about 1 km east-northeast of the main vent POI, near the shallow edge of the field's published depth range. No source consulted maps the field's full lateral extent precisely; this point shows the terrain stays in-range this far out, not a confirmed vent location. Optional, distant objective."
+    },
+    {
+      "id": "bvf-spreading-axis",
+      "name": "Mid-Cayman spreading axis",
+      "lat": 18.57667,
+      "lon": -81.80333,
+      "snap_to_seabed": true,
+      "radius_m": 300,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 5,
+      "guide_entry": "spreading-axis",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/", "https://www.pnas.org/doi/full/10.1073/pnas.1009205107"],
+      "note": "Real GMRT terrain, -5,395.8 m, the deepest point this session found along a NW-SE transect through the tile that follows the general trend of the ultraslow-spreading Mid-Cayman Spreading Centre's axial valley (published vent-field literature places Beebe on/near this ridge axis). This is a terrain trace of the axial trough's general direction and depth, not a citation to a precisely mapped plate-boundary line. About 13 km from the main vent POI -- optional, distant objective."
+    }
+  ]
+}

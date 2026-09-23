@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "landmark": "beebe-vent-field",
+  "entries": [
+    {
+      "id": "overview",
+      "title": "The Beebe Hydrothermal Vent Field",
+      "paragraphs": [
+        "The Beebe Hydrothermal Vent Field sits on the Mid-Cayman Spreading Centre in the Cayman Trough, south of Grand Cayman -- the deepest known active hydrothermal system on Earth, discovered on the world's deepest and slowest-spreading mid-ocean ridge. A 2010 research cruise on the RRS James Cook first detected a hydrothermal plume here (nicknamed 'Piccard' at the time) using the hybrid remotely operated vehicle Nereus, then confirmed the vent field itself with the AUV Autosub6000 and the towed vehicle HyBIS; it was later renamed Beebe, after pioneering deep-sea naturalist William Beebe, who dove in the Bathysphere decades before powered submersibles existed. Connelly et al. published the discovery in Nature Communications in 2012.",
+        "This tile covers only the Beebe field and the axial valley to its northwest; Von Damm, the Mid-Cayman Spreading Centre's other well-studied vent field, sits about 13 km further southwest at roughly 2,300 m depth -- entirely outside this survey's bounding box -- so it is described here for context only and is not a scan target."
+      ],
+      "facts": [
+        { "label": "Depth range", "value": "4,957-4,987 m (Connelly et al. 2012)" },
+        { "label": "Discovery", "value": "2009-2010, RV Cape Hatteras / RRS James Cook (Nereus, Autosub6000, HyBIS)" },
+        { "label": "Publication", "value": "Connelly et al., Nature Communications 3:620 (2012)" },
+        { "label": "Named for", "value": "William Beebe (naturalist, Bathysphere pioneer)" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Connelly, D.P. et al. 2012, \"Hydrothermal vent fields and chemosynthetic biota on the world's deepest seafloor spreading centre\", Nature Communications 3:620", "url": "https://www.nature.com/articles/ncomms1636" },
+        { "title": "Beebe Hydrothermal Vent Field — Wikipedia", "url": "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field" },
+        { "title": "InterRidge Vents Database — Beebe vent field", "url": "https://vents-data.interridge.org/ventfield/beebe" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "vents",
+      "title": "Supercritical black smokers",
+      "paragraphs": [
+        "Beebe's main vent complex, Beebe 1-5, consists of black-smoker chimneys and sulfide mounds venting fluid measured up to 403-410 degC -- hot and pressurized enough at this depth (roughly 298 bar) to become supercritical, a state where the fluid is neither fully liquid nor fully gas. Beebe is one of only a handful of vent sites anywhere shown to sustain supercritical venting, and the deepest. The chimneys and mounds are built from pyrite, pyrrhotite and other metal sulfides -- the same iron- and copper-rich minerals that build black smokers on shallower ridges, but concentrated by fluids hot enough to leach far more metal out of the surrounding rock.",
+        "Webber et al. (2015) mapped seven sulfide mounds across the field's western side, built from repeated generations of chimney growth and collapse. This mission's chimney props (`material_hint: \"sulfide\"`, the near-black, rust-streaked palette reserved for true black smokers) mark the Beebe 1-5 complex; their exact individual shapes are not photogrammetrically documented, so their specific form is a reconstruction even though the mound's existence, chemistry and record temperature are directly sourced."
+      ],
+      "facts": [
+        { "label": "Max measured temperature", "value": "403-410 degC" },
+        { "label": "Fluid state", "value": "supercritical (~298 bar at this depth)" },
+        { "label": "Mapped sulfide mounds", "value": "7 (Webber et al. 2015)" },
+        { "label": "Chimney minerals", "value": "pyrite, pyrrhotite, other metal sulfides" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        { "title": "Connelly, D.P. et al. 2012, Nature Communications 3:620", "url": "https://www.nature.com/articles/ncomms1636" },
+        { "title": "Webber, A.P. et al. 2015, \"Geology, sulfide geochemistry and supercritical venting at the Beebe Hydrothermal Vent Field, Cayman Trough\", Geochemistry, Geophysics, Geosystems 16", "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "shrimp",
+      "title": "Rimicaris hybisae",
+      "paragraphs": [
+        "Thousands of a previously unknown shrimp swarm Beebe's chimneys: Rimicaris hybisae, described by Nye et al. (2012) and named after HyBIS, the towed vehicle used to collect the first specimens. Like its relative Rimicaris exoculata, found some 4,000 km away on Mid-Atlantic Ridge vents, R. hybisae has no image-forming eyes -- adults lose them entirely -- but carries a light-sensing organ on its back, thought to detect the faint thermal glow of the vents themselves in total darkness.",
+        "The shrimp's enlarged cephalothorax hosts episymbiotic bacteria on its gills and mouthparts, which it farms and grazes for organic carbon -- a chemosynthetic partnership that lets it live without ever needing sunlight-derived food. Vent iron tints the swarm a faint brown. No published dataset maps individual shrimp positions at Beebe, so the swarm rendered at this mission's biology POI is a reconstruction: its real presence and biology here are sourced, its exact placement is not."
+      ],
+      "facts": [
+        { "label": "Species", "value": "Rimicaris hybisae (Nye et al. 2012)" },
+        { "label": "Eyes", "value": "lost with age; replaced functionally by a dorsal light-sensing organ" },
+        { "label": "Feeding", "value": "chemosynthetic, via episymbiotic bacteria" },
+        { "label": "Closest relative", "value": "Rimicaris exoculata (Mid-Atlantic Ridge, ~4,000 km away)" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        { "title": "Nye, V. et al. 2012, \"A new species of Rimicaris (Crustacea: Decapoda: Caridea: Alvinocarididae) from hydrothermal vent fields on the Mid-Cayman Spreading Centre\", Zootaxa", "url": "http://www.joncopley.com/docs/Rimicaris_hybisae.pdf" },
+        { "title": "Connelly, D.P. et al. 2012, Nature Communications 3:620", "url": "https://www.nature.com/articles/ncomms1636" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "spreading-axis",
+      "title": "The Mid-Cayman spreading axis",
+      "paragraphs": [
+        "The Cayman Trough is the world's deepest and one of its slowest-spreading mid-ocean ridge systems -- the Mid-Cayman Spreading Centre pulls apart at only about 15 mm per year, less than a tenth the rate of a fast-spreading ridge like the East Pacific Rise. That sluggish spreading means thin, patchy volcanic crust and long-lived faults reaching deep into the mantle, which is part of why Beebe's vent fluids run hot enough for supercritical venting: heat sources here sit closer to a thinned crust than on a typical ridge.",
+        "This tile's real terrain shows a deep, elongated trough running northwest-southeast through its western half, reaching -5,395.8 m at its deepest sounded point here -- consistent with the ridge's axial valley, the rift where new seafloor is created. This is a terrain trace of that trough's general depth and direction on this tile's real GMRT grid, not a citation to a precisely surveyed plate-boundary line."
+      ],
+      "facts": [
+        { "label": "Spreading rate", "value": "~15 mm/yr (ultraslow)" },
+        { "label": "Deepest axial-trough sounding (this tile)", "value": "-5,395.8 m" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Hydrothermal vent fields and chemosynthetic biota on the world's deepest seafloor spreading centre — Connelly et al. 2012, Nature Communications 3:620", "url": "https://www.nature.com/articles/ncomms1636" },
+        { "title": "Diverse styles of submarine venting on the ultraslow spreading Mid-Cayman Rise — PNAS", "url": "https://www.pnas.org/doi/full/10.1073/pnas.1009205107" },
+        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009 (value read directly from this tile's grid)", "url": "https://www.gmrt.org/" }
+      ],
+      "confidence": "medium"
+    }
+  ]
+}

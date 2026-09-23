@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "landmark": "beebe-vent-field",
+  "source": "OBIS",
+  "source_url": "https://api.obis.org/v3/checklist?geometry=POLYGON((-81.877258+18.396258,-81.559204+18.396258,-81.559204+18.696185,-81.877258+18.696185,-81.877258+18.396258))&size=1000&skip=0",
+  "fetched_at": "2026-09-23T11:31:41Z",
+  "bbox": {
+    "north": 18.69618496689091,
+    "south": 18.39625820907841,
+    "east": -81.5592041015625,
+    "west": -81.87725830078125
+  },
+  "rank_filter": "species",
+  "taxa_in_bbox": 20,
+  "taxa_matching_rank": 8,
+  "records_in_bbox": 47,
+  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Placement of animals in the game is invented.",
+  "species": [
+    {
+      "scientificName": "Rimicaris hybisae",
+      "aphiaID": 762988,
+      "records": 21,
+      "depthRange_m": [
+        4960,
+        4960
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Platybelone argalus",
+      "aphiaID": 126377,
+      "records": 2,
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Coryphaena equiselis",
+      "aphiaID": 126845,
+      "records": 1,
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Euleptorhamphus velox",
+      "aphiaID": 159276,
+      "records": 1,
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Hemiramphus balao",
+      "aphiaID": 159278,
+      "records": 1,
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Oxyporhamphus micropterus",
+      "aphiaID": 217871,
+      "records": 1,
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Symbolophorus rufinus",
+      "aphiaID": 158918,
+      "records": 1,
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Xanthichthys ringens",
+      "aphiaID": 159486,
+      "records": 1,
+      "group": "fish",
+      "taxonRank": "Species"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "landmark": "beebe-vent-field",
+  "tile": "beebe-vent-field",
+  "title": "Beebe Vent Field: the deepest black smokers",
+  "hull_class": "C",
+  "environment": {
+    "preset": "vent"
+  },
+  "species_file": "species.json",
+  "spawn": {
+    "lat": 18.548,
+    "lon": -81.716,
+    "depth_m": 5,
+    "heading_deg": 220
+  },
+  "briefing": {
+    "summary": "Descend to the Beebe Hydrothermal Vent Field on the Mid-Cayman Spreading Centre, the deepest known active hydrothermal system on Earth, and scan its supercritical black-smoker chimneys and the shrimp swarms living on them. Optional objectives survey a second sulfide mound, the field's shallow eastern margin, and the ultraslow-spreading ridge's axial valley to the northwest.",
+    "depth_m": 4987.9,
+    "facts": [
+      "Beebe is the deepest known active hydrothermal vent field, confirmed at 4,957-4,987 m (Connelly et al. 2012, Nature Communications).",
+      "Its main chimneys vent fluid measured at 403-410 degC -- hot and pressurized enough here to be supercritical, a state sustained at only a handful of vent sites worldwide.",
+      "Thousands of a shrimp new to science, Rimicaris hybisae, swarm the chimneys; it has no adult eyes but carries a light-sensing organ that may detect the vents' own faint glow.",
+      "The field sits on the Mid-Cayman Spreading Centre, the world's deepest and one of its slowest-spreading mid-ocean ridges (~15 mm/yr)."
+    ],
+    "hazards": [
+      "Crush depth: this Class C hull is rated to 11,000 m, giving wide margin here, but treat the pressure at nearly 5,000 m as real and unforgiving.",
+      "Scalding, chemically hostile fluid at the chimney mouths -- some of it supercritical, hotter than 400 degC. Do not linger inside a plume.",
+      "Total darkness; only your lights and the chimneys' own faint thermal signature illuminate anything here.",
+      "Von Damm, this ridge's other major vent field, lies about 13 km southwest at ~2,300 m -- well outside this survey's tile and not reachable in this mission."
+    ]
+  },
+  "objectives": [
+    {
+      "id": "main-vents",
+      "type": "scan",
+      "poi": "bvf-main-vents",
+      "primary": true,
+      "title": "Scan the Beebe 1-5 black smokers"
+    },
+    {
+      "id": "shrimp",
+      "type": "scan",
+      "poi": "bvf-shrimp-swarm",
+      "primary": true,
+      "title": "Survey the Rimicaris hybisae swarm"
+    },
+    {
+      "id": "western-mound",
+      "type": "scan",
+      "poi": "bvf-sulfide-mound-west",
+      "primary": false,
+      "title": "Survey the western sulfide mound"
+    },
+    {
+      "id": "eastern-margin",
+      "type": "scan",
+      "poi": "bvf-eastern-margin",
+      "primary": false,
+      "title": "Check the field's eastern margin"
+    },
+    {
+      "id": "spreading-axis",
+      "type": "scan",
+      "poi": "bvf-spreading-axis",
+      "primary": false,
+      "title": "Reach the Mid-Cayman spreading axis"
+    }
+  ],
+  "completion": "all_primary",
+  "notable_species": [
+    "Rimicaris hybisae (Beebe/Mid-Cayman vent shrimp)"
+  ]
+}

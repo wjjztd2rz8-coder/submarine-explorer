@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "landmark": "beebe-vent-field",
+  "props": [
+    {
+      "id": "beebe-chimney-1",
+      "model": "procedural:chimney",
+      "lat": 18.54635,
+      "lon": -81.71795,
+      "snap_to_seabed": true,
+      "heading_deg": 15,
+      "scale": 1,
+      "dimensions_m": [4, 4, 12],
+      "material_hint": "sulfide",
+      "lod_distance_m": 700,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Tall black-smoker chimney standing in for the Beebe 1-5 vent complex (403-410 degC supercritical fluid, Connelly et al. 2012). `material_hint: \"sulfide\"` for the near-black, rust-streaked palette. No photogrammetric model of the real chimneys was found, so shape and exact height are a reconstruction; the mound's location and the field's record temperature are sourced."
+    },
+    {
+      "id": "beebe-chimney-2",
+      "model": "procedural:chimney",
+      "lat": 18.5465,
+      "lon": -81.7183,
+      "snap_to_seabed": true,
+      "heading_deg": 190,
+      "scale": 1,
+      "dimensions_m": [3, 3, 8],
+      "material_hint": "sulfide",
+      "lod_distance_m": 700,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Second, shorter black-smoker chimney in the Beebe 1-5 mound cluster, same rationale as beebe-chimney-1."
+    },
+    {
+      "id": "beebe-chimney-3",
+      "model": "procedural:chimney",
+      "lat": 18.54425,
+      "lon": -81.72065,
+      "snap_to_seabed": true,
+      "heading_deg": 260,
+      "scale": 1,
+      "dimensions_m": [3.5, 3.5, 9],
+      "material_hint": "sulfide",
+      "lod_distance_m": 700,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Chimney on the western sulfide mound (bvf-sulfide-mound-west POI), representing one of the seven mounds mapped by Webber et al. (2015). Reconstruction: general mound location and count are sourced, this specific chimney's shape is not."
+    }
+  ]
+}
