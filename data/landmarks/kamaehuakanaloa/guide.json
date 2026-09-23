@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "landmark": "kamaehuakanaloa",
+  "entries": [
+    {
+      "id": "overview",
+      "title": "Kama'ehuakanaloa",
+      "paragraphs": [
+        "Kama'ehuakanaloa is an active submarine shield volcano about 30 km (20 miles) off the southeast shore of the island of Hawai'i -- the youngest volcano in the Hawaiian chain, and the only one still entirely underwater. It rises more than 3,000 m (10,000 ft) from the surrounding seafloor, taller than Mount St. Helens stood before its 1980 eruption, yet its summit still sits under roughly 975-1,000 m of water: this tile's shallowest sounded point reads -975.2 m, right at the published figure.",
+        "Two rift zones radiate from the summit: a shorter, roughly 7-mile-long north rift, and a longer, roughly 12-mile-long south rift that hosts most of the volcano's recent lava flows and virtually all of its hydrothermal venting. At current growth rates scientists estimate Kama'ehuakanaloa could breach the sea surface and become Hawai'i's newest island in another 10,000 to 100,000 years.",
+        "This tile covers the volcano's summit and upper south rift; it does not reach the volcano's base or the north rift."
+      ],
+      "facts": [
+        { "label": "Summit depth", "value": "~975-1,000 m" },
+        { "label": "Height above surrounding seafloor", "value": ">3,000 m (10,000 ft)" },
+        { "label": "North rift / south rift length", "value": "~7 mi / ~12 mi" },
+        { "label": "Projected time to breach the surface", "value": "~10,000-100,000 years" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Kama'ehuakanaloa Seamount — Wikipedia", "url": "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount" },
+        { "title": "Volcano Watch: Treasures of the Deep Sea: Lo'ihi Hosts Hydrothermal Vents — USGS Hawaiian Volcano Observatory", "url": "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents" },
+        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 (value read directly from this tile's grid)", "url": "https://www.gmrt.org/" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "renaming",
+      "title": "A name restored: Lo'ihi to Kama'ehuakanaloa",
+      "paragraphs": [
+        "For decades this volcano was known on charts as Lo'ihi, Hawaiian for 'long,' a purely descriptive name chosen in 1955. That year, USC geologist Kenneth O. Emery -- after a 1954 bathymetric survey found several seamounts off Hawai'i's south coast -- asked Bishop Museum staff Mary Kawena Pukui and Martha Hohu, together with Hawaiian Volcano Observatory director Gordon A. Macdonald, to name them; they picked 'Lo'ihi' for this one's elongated shape. Emery originally thought it was a passive, parasitic bump on Kilauea's flank; it was only later recognized as its own active volcano.",
+        "In July 2021 the Hawai'i Board on Geographic Names voted unanimously to rename it Kama'ehuakanaloa. The new name is not invented for the occasion -- it comes from mele (chants) documented decades before Emery's 1954 survey, describing an undersea volcano by that name. As Ku'ulei Kanahele of the Edith Kanaka'ole Foundation put it, Kama'ehuakanaloa 'is a powerful name that invokes the name of Pelehonuamea and her birth out of Kanaloa [the ocean]' -- restoring Hawaiian cultural knowledge of the volcano that the 1955 descriptive name had left out entirely."
+      ],
+      "facts": [
+        { "label": "Renamed", "value": "July 2021, Hawai'i Board on Geographic Names (unanimous)" },
+        { "label": "Former name", "value": "Lo'ihi (\"long\"), given 1955" },
+        { "label": "Namer of the 1955 name", "value": "Kenneth O. Emery, with M.K. Pukui, M. Hohu and G.A. Macdonald" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Volcano Watch: Kama'ehuakanaloa — the volcano formerly known as Lo'ihi Seamount — USGS Hawaiian Volcano Observatory", "url": "https://www.usgs.gov/observatories/hvo/news/volcano-watch-kamaehuakanaloa-volcano-formerly-known-loihi-seamount" },
+        { "title": "United States Board on Geographic Names — Undersea Feature Name Proposal, Kama'ehuakanaloa — Hawai'i Board on Geographic Names", "url": "https://files.hawaii.gov/dbedt/op/gis/bgn/HBGN_Meeting_20210803-06-ACUF_Kama%CA%BBehuakanaloa.pdf" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "peles-pit",
+      "title": "Pele's Pit: the 1996 collapse",
+      "paragraphs": [
+        "In July and early August 1996, Kama'ehuakanaloa produced the largest earthquake swarm ever recorded at any Hawaiian volcano -- thousands of quakes over about two weeks. The seismic crisis accompanied a collapse of the volcano's summit: 'Pele's Vents,' until then the volcano's main hydrothermal site at about 980 m depth, dropped away entirely, leaving a new pit crater roughly 600 m across and about 300 m deep, since named Pele's Pit. Its walls stand about 700 feet (210 m) high and are unusually thick -- about 70 feet (21 m) -- suggesting the crater rim has been built up by repeated lava flows over a long history, not created in a single event.",
+        "Hydrothermal venting did not stop after the collapse; it moved and changed. Diffuse ~30 degC vents that had existed on the pre-collapse summit gave way, within Pele's Pit itself, to much hotter fluids -- around 80 degC soon after the collapse, and exceeding 200 degC by late 1997 during submersible dives -- before settling into the cooler, iron-rich venting the pit hosts today.",
+        "This tile's grid (about 58 x 61 m per cell) is coarser than Pele's Pit's roughly 600 m diameter, so this mission does not attempt to trace the crater's rim; the summit and Hiolo vent POIs sit on real terrain inside the collapsed summit area without claiming to outline the pit itself."
+      ],
+      "facts": [
+        { "label": "Collapse event", "value": "July-August 1996, largest Hawaiian earthquake swarm on record" },
+        { "label": "Pele's Pit diameter / depth", "value": "~600 m / ~300 m" },
+        { "label": "Crater wall height / thickness", "value": "~700 ft (210 m) / ~70 ft (21 m)" },
+        { "label": "Peak post-collapse fluid temperature (1997)", "value": ">200 degC" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Volcano Watch: Treasures of the Deep Sea: Lo'ihi Hosts Hydrothermal Vents — USGS Hawaiian Volcano Observatory", "url": "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents" },
+        { "title": "Kama'ehuakanaloa Seamount — Wikipedia", "url": "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "vents",
+      "title": "Pele's and Hiolo vents: iron, not sulfide",
+      "paragraphs": [
+        "Today's main hydrothermal sites sit inside Pele's Pit: Hiolo North, around 1,300 m deep, and Hiolo South, around 1,274 m deep and roughly 330 m away, both venting warm fluid diffusely rather than the fast, scalding jets of a black smoker. Measured fluid temperatures run about 20-50 degC, with Hiolo South's mean (~47 degC) running about 7 degC hotter than Hiolo North's.",
+        "Kama'ehuakanaloa's vent fluids are unusual: compared to typical mid-ocean-ridge vents they are low in sulfide and rich in CO2 and dissolved ferrous iron (Fe2+). That chemistry starves out the sulfide-oxidizing bacteria that build black-smoker chimneys elsewhere, and instead feeds mats of iron-oxidizing Zetaproteobacteria, which convert Fe2+ to insoluble, rust-colored ferric iron oxyhydroxide. Those mats can grow up to half a metre thick, draping over low mounds and any hard surface near a vent orifice -- at Hiolo North they form over small venting chimneys; at Hiolo South they form a distinctive 'cauliflower' texture around the active orifice.",
+        "The small chimney props placed at both Hiolo sites in this mission are a generic stand-in for that low-relief, iron-stained venting -- no published survey gives their exact individual shapes or a photogrammetric model to reproduce, so their placement and form here are reconstructions, flagged accordingly."
+      ],
+      "facts": [
+        { "label": "Hiolo North depth / temperature", "value": "~1,300 m / ~20-40 degC" },
+        { "label": "Hiolo South depth / temperature", "value": "~1,274 m / ~47 degC mean" },
+        { "label": "Iron mat thickness", "value": "up to ~0.5 m" },
+        { "label": "Dominant microbe", "value": "Zetaproteobacteria (iron-oxidizing)" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        { "title": "Quantitative PCR Analysis of Functional Genes in Iron-Rich Microbial Mats at an Active Hydrothermal Vent System (Lo'ihi Seamount, Hawai'i) — Applied and Environmental Microbiology (accessed via search summary; direct fetch returned HTTP 403)", "url": "https://journals.asm.org/doi/10.1128/aem.03608-14" },
+        { "title": "Volcano Watch: Treasures of the Deep Sea: Lo'ihi Hosts Hydrothermal Vents — USGS Hawaiian Volcano Observatory", "url": "https://www.usgs.gov/news/volcano-watch-treasures-deep-sea-loihi-hosts-hydrothermal-vents" }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "south-rift",
+      "title": "The south rift zone",
+      "paragraphs": [
+        "Kama'ehuakanaloa's south rift zone runs roughly 12 miles from the summit and is the volcano's most volcanically and hydrothermally active feature -- the source of its most recent lava flows, including young flows likely erupted during the 1996 event, and host to additional hydrothermal sites (published literature names one, Naha Vents, further along the rift than this tile reaches). This tile's real terrain deepens steadily south of the summit and Pele's Pit along that same bearing, from about -1,281 m roughly 1.4 km south of the summit to about -1,897 m at 3.4 km -- a terrain trace of the rift's general direction, not a mapped rift-zone boundary.",
+        "By contrast, the shorter north rift (~7 miles) is quieter: most of the seismicity, the freshest lava and essentially all of the documented hydrothermal activity concentrate on the south side, which is why this mission's rift objective heads south from the summit rather than north."
+      ],
+      "facts": [
+        { "label": "South rift length", "value": "~12 mi (published)" },
+        { "label": "This tile's south-rift depth at 1.4 km / 3.4 km from summit", "value": "-1,281 m / -1,897 m" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Kama'ehuakanaloa Seamount — Wikipedia", "url": "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount" },
+        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009 (value read directly from this tile's grid)", "url": "https://www.gmrt.org/" }
+      ],
+      "confidence": "medium"
+    }
+  ]
+}

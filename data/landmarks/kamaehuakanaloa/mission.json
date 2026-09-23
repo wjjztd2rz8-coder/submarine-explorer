@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "landmark": "kamaehuakanaloa",
+  "tile": "kamaehuakanaloa",
+  "title": "Kama'ehuakanaloa: the next Hawaiian island",
+  "hull_class": "B",
+  "environment": {
+    "preset": "seamount"
+  },
+  "species_file": "species.json",
+  "spawn": {
+    "lat": 18.9205,
+    "lon": -155.263,
+    "depth_m": 5,
+    "heading_deg": 190
+  },
+  "briefing": {
+    "summary": "Dive on the summit of Kama'ehuakanaloa, the youngest and only fully submarine volcano in the Hawaiian chain, then scan the low-temperature, iron-rich hydrothermal vents inside Pele's Pit -- the crater left by the volcano's 1996 summit collapse. Optional objectives trace the south rift zone, the volcano's most active flank.",
+    "depth_m": 1300,
+    "facts": [
+      "Renamed from Lo'ihi to Kama'ehuakanaloa in July 2021 by the Hawai'i Board on Geographic Names, restoring a name drawn from Hawaiian mele recorded decades before the 1955 descriptive name.",
+      "The summit sits under roughly 975-1,000 m of water; the volcano rises more than 3,000 m from the surrounding seafloor and could breach the surface as a new Hawaiian island in 10,000-100,000 years.",
+      "A July-August 1996 earthquake swarm -- the largest ever recorded at any Hawaiian volcano -- collapsed the old summit hydrothermal site, forming the ~600 m-wide, ~300 m-deep Pele's Pit.",
+      "Vent fluids here are low in sulfide and rich in dissolved iron, feeding iron-oxidizing microbial mats instead of the black-smoker chimneys found at sulfide-rich vent fields."
+    ],
+    "hazards": [
+      "This is an active volcano: seismic swarms and eruptions have reshaped the summit before (1996) and could again.",
+      "Vent fluids run warm (20-50 degC) rather than scalding, but stay clear of active orifices.",
+      "Steep local relief around Pele's Pit and the south rift; watch altitude near the vent sites."
+    ]
+  },
+  "objectives": [
+    {
+      "id": "summit",
+      "type": "scan",
+      "poi": "kh-summit",
+      "primary": true,
+      "title": "Scan the summit"
+    },
+    {
+      "id": "hiolo-north",
+      "type": "scan",
+      "poi": "kh-hiolo-north",
+      "primary": true,
+      "title": "Survey the Hiolo North vent site"
+    },
+    {
+      "id": "hiolo-south",
+      "type": "scan",
+      "poi": "kh-hiolo-south",
+      "primary": false,
+      "title": "Survey the Hiolo South vent site"
+    },
+    {
+      "id": "south-rift",
+      "type": "scan",
+      "poi": "kh-south-rift",
+      "primary": false,
+      "title": "Trace the south rift zone"
+    },
+    {
+      "id": "flank",
+      "type": "scan",
+      "poi": "kh-flank-relief",
+      "primary": false,
+      "title": "Survey the lower south flank"
+    }
+  ],
+  "completion": "all_primary",
+  "notable_species": [
+    "iron-oxidizing Zetaproteobacteria mats",
+    "Chrysogorgia geniculata (bamboo/gold coral)",
+    "Synaphobranchus brevidorsalis (deep-sea eel)"
+  ]
+}
