@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "landmark": "hunga-tonga-caldera",
+  "source": "OBIS",
+  "source_url": "https://api.obis.org/v3/checklist?geometry=POLYGON((-175.560974+-20.699565,-175.239075+-20.699565,-175.239075+-20.399638,-175.560974+-20.399638,-175.560974+-20.699565))&size=1000&skip=0",
+  "fetched_at": "2026-09-23T11:21:56Z",
+  "bbox": {
+    "north": -20.399638027068868,
+    "south": -20.699564784881368,
+    "east": -175.23907470703125,
+    "west": -175.56097412109375
+  },
+  "rank_filter": "species",
+  "taxa_in_bbox": 175,
+  "taxa_matching_rank": 134,
+  "records_in_bbox": 1068,
+  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Kept taxa are mostly reef fish (damselfish, wrasses, surgeonfish, butterflyfish) typical of shallow Tongan reef habitat around the islands -- most records likely predate the 15 January 2022 eruption, which devastated shallow reef life at the site; some may postdate it and reflect early recolonisation, but OBIS records consulted here do not reliably distinguish before/after. This file makes no claim about which. Placement of any animal in the game is invented.",
+  "species": [
+    {
+      "scientificName": "Pycnochromis margaritifer",
+      "aphiaID": 1605310,
+      "records": 70,
+      "depthRange_m": [
+        4,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pomacentrus vaiuli",
+      "aphiaID": 277176,
+      "records": 52,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pycnochromis vanderbilti",
+      "aphiaID": 320883,
+      "records": 37,
+      "depthRange_m": [
+        4,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Chromis chrysura",
+      "aphiaID": 212824,
+      "records": 33,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Plectroglyphidodon fasciolatus",
+      "aphiaID": 1592381,
+      "records": 33,
+      "depthRange_m": [
+        4,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Plectroglyphidodon johnstonianus",
+      "aphiaID": 212859,
+      "records": 28,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Thalassoma amblycephalum",
+      "aphiaID": 212216,
+      "records": 28,
+      "depthRange_m": [
+        4,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Thalassoma lutescens",
+      "aphiaID": 273585,
+      "records": 26,
+      "depthRange_m": [
+        4,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pycnochromis agilis",
+      "aphiaID": 1592293,
+      "records": 22,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Acanthurus nigrofuscus",
+      "aphiaID": 219640,
+      "records": 20,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Lutjanus fulvus",
+      "aphiaID": 218475,
+      "records": 19,
+      "depthRange_m": [
+        4,
+        8
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Plectroglyphidodon dickii",
+      "aphiaID": 212855,
+      "records": 19,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pycnochromis iomelas",
+      "aphiaID": 1592380,
+      "records": 19,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Labroides dimidiatus",
+      "aphiaID": 219014,
+      "records": 18,
+      "depthRange_m": [
+        4,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Naso lituratus",
+      "aphiaID": 219665,
+      "records": 18,
+      "depthRange_m": [
+        4,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Stegastes lacrymatus",
+      "aphiaID": 1551095,
+      "records": 17,
+      "depthRange_m": [
+        4,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Zebrasoma scopas",
+      "aphiaID": 219679,
+      "records": 17,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ctenochaetus cyanocheilus",
+      "aphiaID": 277559,
+      "records": 16,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Halichoeres hortulanus",
+      "aphiaID": 218985,
+      "records": 16,
+      "depthRange_m": [
+        4,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pomacentrus coelestis",
+      "aphiaID": 277145,
+      "records": 16,
+      "depthRange_m": [
+        4,
+        4
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Zebrasoma velifer",
+      "aphiaID": 712902,
+      "records": 16,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Chromis xanthura",
+      "aphiaID": 212819,
+      "records": 15,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Chaetodon pelewensis",
+      "aphiaID": 273353,
+      "records": 13,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Paracirrhites arcatus",
+      "aphiaID": 218866,
+      "records": 13,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Centropyge bispinosa",
+      "aphiaID": 278830,
+      "records": 12,
+      "depthRange_m": [
+        8,
+        10
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    }
+  ]
+}

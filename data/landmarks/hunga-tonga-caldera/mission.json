@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "landmark": "hunga-tonga-caldera",
+  "tile": "hunga-tonga-caldera",
+  "title": "Hunga Tonga: pre-2022 survey",
+  "hull_class": "B",
+  "environment": {
+    "preset": "seamount"
+  },
+  "species_file": "species.json",
+  "spawn": {
+    "lat": -20.558,
+    "lon": -175.388,
+    "depth_m": 5,
+    "heading_deg": 250
+  },
+  "briefing": {
+    "summary": "This dive replays a pre-2022 survey of the Hunga Tonga-Hunga Ha'apai volcano, a submarine caldera rising about 2 km from the seafloor to two small islands near sea level. Chart the caldera floor, the reef saddle between the islands, the inner caldera wall, and the outer flank as they were surveyed before 15 January 2022.",
+    "depth_m": 155,
+    "facts": [
+      "This terrain predates the 15 January 2022 eruption, the most powerful volcanic explosion recorded by modern instruments. The caldera you see here no longer exists in this shape.",
+      "Before the eruption, the caldera floor sat about 150 m deep and the two islands, Hunga Tonga and Hunga Ha'apai, were joined by a shallow saddle just above sea level.",
+      "After the eruption, NIWA and the Nippon Foundation's Tonga Eruption Seabed Mapping Project (TESMaP) surveyed the site and found the caldera floor had collapsed to about 850 m and widened to roughly 4.8 km across; the islands are now smaller and separated. None of that post-eruption terrain is modelled here -- see the field guide for what the surveys found.",
+      "You start at the surface above the pre-eruption caldera. Head south-west (about 250°) and descend to survey the floor."
+    ],
+    "hazards": [
+      "This is a pre-2022 survey; the real site is now a much deeper, active volcanic caldera and would be far more hazardous today.",
+      "Steep caldera walls and volcanic terrain even in this earlier survey.",
+      "Total darkness below the top few hundred metres; only your lights work.",
+      "Moderate pressure: about 200 atmospheres at the caldera floor. Your Class B hull is rated to 4,500 m, well within margin."
+    ]
+  },
+  "objectives": [
+    {
+      "id": "caldera-floor",
+      "type": "scan",
+      "poi": "hunga-tonga-caldera-floor",
+      "primary": true,
+      "title": "Survey the pre-2022 caldera floor"
+    },
+    {
+      "id": "island-saddle",
+      "type": "scan",
+      "poi": "hunga-tonga-island-saddle",
+      "primary": false,
+      "title": "Chart the reef saddle between the islands (pre-2022 survey)"
+    },
+    {
+      "id": "rim-wall",
+      "type": "scan",
+      "poi": "hunga-tonga-rim-wall",
+      "primary": false,
+      "title": "Follow the inner caldera wall (pre-2022 survey)"
+    },
+    {
+      "id": "outer-flank",
+      "type": "scan",
+      "poi": "hunga-tonga-outer-flank",
+      "primary": false,
+      "title": "Descend the outer submarine flank"
+    }
+  ],
+  "completion": "all_primary"
+}

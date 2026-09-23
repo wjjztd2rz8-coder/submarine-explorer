@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "landmark": "hunga-tonga-caldera",
+  "pois": [
+    {
+      "id": "hunga-tonga-caldera-floor",
+      "name": "Caldera floor (pre-2022 survey)",
+      "lat": -20.56,
+      "lon": -175.39,
+      "depth_m": 130,
+      "radius_m": 250,
+      "kind": "geology",
+      "primary": true,
+      "scan_seconds": 4,
+      "guide_entry": "caldera-floor",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://niwa.co.nz/hazards/mapping-tongan-eruption",
+        "https://www.gmrt.org/"
+      ],
+      "note": "Real survey terrain, this tile's own reading: 131.6 m deep here, closely matching the widely cited pre-eruption caldera-floor depth of ~150 m (NIWA). This tile predates the 15 January 2022 eruption (see mission.json/guide.json); nothing about the post-eruption caldera is shown at this point."
+    },
+    {
+      "id": "hunga-tonga-island-saddle",
+      "name": "Island saddle (pre-2022 survey)",
+      "lat": -20.553,
+      "lon": -175.4075,
+      "snap_to_seabed": true,
+      "radius_m": 200,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "island-saddle",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://niwa.co.nz/hazards/mapping-tongan-eruption",
+        "https://www.gmrt.org/"
+      ],
+      "note": "Real survey terrain, at or just above sea level in this tile, consistent with the shallow saddle that connected the islands of Hunga Tonga and Hunga Ha'apai before the eruption. NIWA reports the islands are 'smaller and no longer joined together' since 15 January 2022; this tile shows only the earlier, connected state."
+    },
+    {
+      "id": "hunga-tonga-rim-wall",
+      "name": "Inner caldera wall (pre-2022 survey)",
+      "lat": -20.57,
+      "lon": -175.42,
+      "snap_to_seabed": true,
+      "radius_m": 250,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "rim-wall",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": [
+        "https://www.gmrt.org/"
+      ],
+      "note": "Real survey terrain: this tile reads about 468.6 m deep here, on the steep inner slope between the shallow caldera floor and the deeper flanks. No source consulted names this specific point; it is identified from the tile's own bathymetry as a representative stretch of the pre-eruption caldera wall, hence medium rather than high confidence."
+    },
+    {
+      "id": "hunga-tonga-outer-flank",
+      "name": "Outer submarine flank",
+      "lat": -20.518,
+      "lon": -175.432,
+      "snap_to_seabed": true,
+      "radius_m": 300,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "outer-flank",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685",
+        "https://www.gmrt.org/"
+      ],
+      "note": "Real survey terrain, about 1,029 m deep here, on the outer flank of the roughly 2-km-high volcanic edifice whose summit forms the islands and caldera. This part of the tile is unaffected by the eruption's caldera collapse, which was confined to the summit area."
+    }
+  ]
+}
