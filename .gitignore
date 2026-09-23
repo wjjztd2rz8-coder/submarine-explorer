@@ -3,7 +3,16 @@ dist/
 .vite/
 test-results/
 playwright-report/
-tests/e2e/screenshots/*.png
+tests/e2e/screenshots/**/*.png
 __pycache__/
 *.pyc
 .DS_Store
+dist-*/
+
+# Tile pipeline (tools/fetch_all.py, tools/compress_tiles.py)
+# Raw GMRT/ERDDAP download cache -- re-runs read from here instead of the network.
+.cache/
+# Derived compressed copies; regenerate with tools/compress_tiles.py.
+data/tiles/*/heightmap*.bin.gz
+data/tiles/*/heightmap*.bin.br
+data/tiles/*/heightmap16.bin
