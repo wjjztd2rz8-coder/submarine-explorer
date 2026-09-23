@@ -1,0 +1,340 @@
+{
+  "version": 1,
+  "landmark": "hudson-canyon",
+  "source": "OBIS",
+  "source_url": "https://api.obis.org/v3/checklist?geometry=POLYGON((-72.700378+39.150208,-72.099976+39.150208,-72.099976+39.650086,-72.700378+39.650086,-72.700378+39.150208))&size=1000&skip=0",
+  "fetched_at": "2026-09-23T11:14:47Z",
+  "bbox": {
+    "north": 39.65008596781058,
+    "south": 39.15020803812308,
+    "east": -72.0999755859375,
+    "west": -72.70037841796875
+  },
+  "rank_filter": "species",
+  "taxa_in_bbox": 1524,
+  "taxa_matching_rank": 786,
+  "records_in_bbox": 45826,
+  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Placement of animals in the game is invented.",
+  "species": [
+    {
+      "scientificName": "Larus argentatus",
+      "commonName": "Herring gull",
+      "aphiaID": 137138,
+      "records": 6063,
+      "group": "bird",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Thunnus albacares",
+      "aphiaID": 127027,
+      "records": 1621,
+      "depthRange_m": [
+        0,
+        900
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Larus marinus",
+      "commonName": "Great black-backed gull",
+      "aphiaID": 137146,
+      "records": 1383,
+      "group": "bird",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Xiphias gladius",
+      "aphiaID": 127094,
+      "records": 1344,
+      "depthRange_m": [
+        0,
+        900
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Thunnus obesus",
+      "aphiaID": 127028,
+      "records": 1141,
+      "depthRange_m": [
+        0,
+        900
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Morus bassanus",
+      "commonName": "Northern gannet",
+      "aphiaID": 148776,
+      "records": 1134,
+      "depthRange_m": [
+        0,
+        0
+      ],
+      "group": "bird",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Thunnus alalunga",
+      "aphiaID": 127026,
+      "records": 1041,
+      "depthRange_m": [
+        0,
+        900
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Phalaropus fulicarius",
+      "commonName": "Red phalarope",
+      "aphiaID": 137168,
+      "records": 776,
+      "group": "bird",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Fratercula arctica",
+      "commonName": "Atlantic puffin",
+      "aphiaID": 137131,
+      "records": 681,
+      "group": "bird",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Delphinus delphis",
+      "commonName": "Short-beaked common dolphin",
+      "aphiaID": 137094,
+      "records": 606,
+      "group": "mammal",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Coryphaena hippurus",
+      "commonName": "Dolphinfish",
+      "aphiaID": 126846,
+      "records": 530,
+      "depthRange_m": [
+        0,
+        274
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Oceanites oceanicus",
+      "commonName": "Wilson's Storm-petrel",
+      "aphiaID": 137190,
+      "records": 421,
+      "depthRange_m": [
+        0,
+        0
+      ],
+      "group": "bird",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Prionace glauca",
+      "commonName": "Blue shark",
+      "aphiaID": 105801,
+      "records": 415,
+      "depthRange_m": [
+        52,
+        900
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Merluccius bilinearis",
+      "aphiaID": 158962,
+      "records": 391,
+      "depthRange_m": [
+        64,
+        440
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Hippoglossina oblonga",
+      "aphiaID": 158833,
+      "records": 378,
+      "depthRange_m": [
+        69,
+        348
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Squalus acanthias",
+      "commonName": "Piked dogfish",
+      "aphiaID": 105923,
+      "records": 376,
+      "depthRange_m": [
+        70,
+        440
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Peprilus triacanthus",
+      "aphiaID": 159828,
+      "records": 357,
+      "depthRange_m": [
+        69,
+        430
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Alle alle",
+      "commonName": "Dovekie",
+      "aphiaID": 137129,
+      "records": 350,
+      "depthRange_m": [
+        0,
+        0
+      ],
+      "group": "bird",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Centropages typicus",
+      "aphiaID": 104499,
+      "records": 346,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Illex illecebrosus",
+      "aphiaID": 153087,
+      "records": 334,
+      "depthRange_m": [
+        64,
+        430
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Tursiops truncatus",
+      "commonName": "Common bottlenose dolphin",
+      "aphiaID": 137111,
+      "records": 316,
+      "group": "mammal",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Homarus americanus",
+      "aphiaID": 156134,
+      "records": 306,
+      "depthRange_m": [
+        73,
+        430
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Urophycis regia",
+      "aphiaID": 158991,
+      "records": 300,
+      "depthRange_m": [
+        69,
+        355
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Doryteuthis pealeii",
+      "aphiaID": 574541,
+      "records": 289,
+      "depthRange_m": [
+        64,
+        440
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Citharichthys arctifrons",
+      "aphiaID": 158791,
+      "records": 258,
+      "depthRange_m": [
+        69,
+        430
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Grampus griseus",
+      "commonName": "Risso's dolphin",
+      "aphiaID": 137098,
+      "records": 242,
+      "depthRange_m": [
+        100,
+        800
+      ],
+      "group": "mammal",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Calanus finmarchicus",
+      "aphiaID": 104464,
+      "records": 234,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Helicolenus dactylopterus",
+      "aphiaID": 127251,
+      "records": 229,
+      "depthRange_m": [
+        107,
+        440
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Metridia lucens",
+      "aphiaID": 104633,
+      "records": 223,
+      "depthRange_m": [
+        5,
+        10
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Fulmarus glacialis",
+      "commonName": "Northern fulmar",
+      "aphiaID": 137195,
+      "records": 219,
+      "depthRange_m": [
+        0,
+        0
+      ],
+      "group": "bird",
+      "taxonRank": "Species"
+    }
+  ]
+}

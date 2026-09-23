@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "landmark": "hudson-canyon",
+  "tile": "hudson-canyon",
+  "title": "Hudson Canyon: down the wall",
+  "hull_class": "B",
+  "environment": {
+    "preset": "canyon"
+  },
+  "species_file": "species.json",
+  "spawn": {
+    "lat": 39.45,
+    "lon": -72.27,
+    "depth_m": 5,
+    "heading_deg": 135
+  },
+  "briefing": {
+    "summary": "Descend into the upper reaches of Hudson Canyon, the largest submarine canyon on the US Atlantic seaboard, and scan its steep north wall and a coral-habitat ledge nearby. Further down-canyon and far up onto the shelf, four optional objectives trace the canyon's full story: its deepest sounding in this survey, the drowned Hudson Shelf Valley, and the canyon's head on the outer shelf.",
+    "depth_m": 1682.6,
+    "facts": [
+      "Hudson Canyon begins about 100 miles southeast of New York City and runs roughly 350 miles seaward; its lower reaches (beyond this survey tile) reach 2-2.5 miles (3,200-4,000 m) deep.",
+      "It is the drowned seaward extension of the ancestral Hudson River, carved into today's shape in part by a catastrophic glacial meltwater flood (USGS).",
+      "A NOAA-led sanctuary designation for Hudson Canyon is proposed, not yet finalized -- the process opened in 2022 and remains under review as of this survey.",
+      "Part of the canyon is already protected today: the Frank R. Lautenberg Deep Sea Coral Protection Area bans bottom-tending fishing gear across much of it."
+    ],
+    "hazards": [
+      "Strong local currents along the canyon walls, especially near the shelf break.",
+      "Steep, rocky flanks (measured here at roughly 18-19 deg): watch altitude near the wall and coral-ledge scan points.",
+      "Active commercial fishing grounds -- expect gear and vessel traffic near the shelf in a real-world dive."
+    ]
+  },
+  "objectives": [
+    {
+      "id": "wall",
+      "type": "scan",
+      "poi": "hc-canyon-wall",
+      "primary": true,
+      "title": "Scan the north wall of the upper canyon"
+    },
+    {
+      "id": "coral-ledge",
+      "type": "scan",
+      "poi": "hc-coral-ledge",
+      "primary": true,
+      "title": "Survey the coral-habitat ledge"
+    },
+    {
+      "id": "upper-floor",
+      "type": "scan",
+      "poi": "hc-upper-floor",
+      "primary": false,
+      "title": "Follow the axis to the upper canyon floor"
+    },
+    {
+      "id": "deepest",
+      "type": "scan",
+      "poi": "hc-deepest-sounding",
+      "primary": false,
+      "title": "Reach the deepest point in this survey"
+    },
+    {
+      "id": "shelf-valley",
+      "type": "scan",
+      "poi": "hc-shelf-valley",
+      "primary": false,
+      "title": "Trace the drowned Hudson Shelf Valley"
+    },
+    {
+      "id": "head",
+      "type": "scan",
+      "poi": "hc-shelf-edge-head",
+      "primary": false,
+      "title": "Find the canyon's head on the outer shelf"
+    }
+  ],
+  "completion": "all_primary",
+  "notable_species": [
+    "deep-sea corals and sponges (Frank R. Lautenberg Deep Sea Coral Protection Area)",
+    "blue shark (Prionace glauca)",
+    "piked dogfish (Squalus acanthias)"
+  ]
+}

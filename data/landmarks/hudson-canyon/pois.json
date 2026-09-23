@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "landmark": "hudson-canyon",
+  "pois": [
+    {
+      "id": "hc-canyon-wall",
+      "name": "North wall of the upper canyon",
+      "lat": 39.42,
+      "lon": -72.21,
+      "snap_to_seabed": true,
+      "radius_m": 200,
+      "kind": "geology",
+      "primary": true,
+      "scan_seconds": 5,
+      "guide_entry": "canyon-wall",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://www.gmrt.org/",
+        "https://www.mafmc.org/actions/hudson-canyon"
+      ],
+      "note": "Real GMRT terrain (Ryan et al. 2009; value and slope read directly from this tile's grid this session): 541.9 m deep, on a locally steep flank of the upper canyon's north wall. Central-difference slope sampling over one grid cell (~50-60 m) gives roughly 18-19 deg here -- steep for this ~50 m grid, and the true wall relief (rock outcrops and ledges per MAFMC's habitat description) is almost certainly sharper than this coarse sampling can resolve."
+    },
+    {
+      "id": "hc-coral-ledge",
+      "name": "Coral-habitat ledge",
+      "lat": 39.41,
+      "lon": -72.18,
+      "snap_to_seabed": true,
+      "radius_m": 180,
+      "kind": "biology",
+      "primary": true,
+      "scan_seconds": 5,
+      "guide_entry": "canyon-wall",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://sanctuaries.noaa.gov/news/2025/explore-the-depths-hudson-canyon-live.html",
+        "https://en.wikipedia.org/wiki/Frank_R._Lautenberg_Deep-Sea_Coral_Protection_Area"
+      ],
+      "note": "Real GMRT terrain (941.9 m deep, steep mid-canyon flank a little over 2.5 km from the wall POI) inside the Frank R. Lautenberg Deep Sea Coral Protection Area, which closes bottom-tending fishing gear across roughly 38,000 sq mi of Mid-Atlantic canyon and slope habitat including Hudson Canyon. In September 2025 a NOAA/Ocean Exploration Trust expedition used ROV Global Explorer to survey Hudson Canyon's coral and sponge communities for the first time in years, live-streamed as part of the sanctuary-designation science effort. No public dataset from that cruise gives an exact coral colony position usable here, so this POI's precise coordinate is an invented stand-in for that habitat type on a real steep ledge; `reconstruction: true` because no coral model is rendered -- the field guide entry, not a placed prop, carries the biology."
+    },
+    {
+      "id": "hc-upper-floor",
+      "name": "Upper canyon floor",
+      "lat": 39.4,
+      "lon": -72.16,
+      "snap_to_seabed": true,
+      "radius_m": 220,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "axis-floor",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/"],
+      "note": "Real GMRT terrain: 1,220.1 m deep, on the canyon axis (thalweg) below the wall/coral cluster. About 4.9 km southeast of the wall POI."
+    },
+    {
+      "id": "hc-deepest-sounding",
+      "name": "Deepest point in this survey",
+      "lat": 39.369,
+      "lon": -72.1,
+      "snap_to_seabed": true,
+      "radius_m": 250,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 5,
+      "guide_entry": "axis-floor",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/", "https://www.britannica.com/place/Hudson-Canyon"],
+      "note": "Real GMRT terrain, this tile's single deepest cell: -1,682.59 m (matches data/tiles/hudson-canyon/meta.json min_m), at the tile's southeast (offshore) edge. Hudson Canyon itself continues much deeper -- published figures put its lower reaches at 2-2.5 miles (roughly 3,200-4,000 m) -- well beyond this ~52x56 km survey tile, which only covers the canyon's upper/middle reaches from the shelf break outward. Optional: a deliberate long transit from the required objectives, about 9.4 km southeast of the wall POI."
+    },
+    {
+      "id": "hc-shelf-valley",
+      "name": "Hudson Shelf Valley (drowned river channel)",
+      "lat": 39.478,
+      "lon": -72.399,
+      "snap_to_seabed": true,
+      "radius_m": 300,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "shelf-valley",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": [
+        "https://pubs.usgs.gov/publication/70030018",
+        "https://www.usgs.gov/publications/a-catastrophic-meltwater-flood-event-and-formation-hudson-shelf-valley"
+      ],
+      "note": "Real GMRT terrain, 126.5 m deep, on the diagonal transect this session traced from the tile's shallow northwest corner toward its deep southeast corner as an approximation of the Hudson Shelf Valley/canyon axis (the valley's own USGS-mapped centerline is not reproduced exactly; this point sits within it on the coarse ~50-60 m grid). About 26 km northwest of the wall POI -- optional long-range objective, not required. Confidence 'medium' because the exact USGS valley thalweg was not cross-checked point-by-point against this tile's grid."
+    },
+    {
+      "id": "hc-shelf-edge-head",
+      "name": "Canyon head, outer shelf edge",
+      "lat": 39.589,
+      "lon": -72.698,
+      "snap_to_seabed": true,
+      "radius_m": 300,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "shelf-valley",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": [
+        "https://www.britannica.com/place/Hudson-Canyon",
+        "https://en.wikipedia.org/wiki/Hudson_Canyon"
+      ],
+      "note": "Real GMRT terrain, this tile's shallowest cell: -67.86 m (matches meta.json max_m), at the tile's northwest corner near the outer continental shelf. Published sources place the true canyon head (where the Hudson Shelf Valley funnels onto the shelf break) a little further north and east, around 39.66-39.67 N / 72.47-72.48 W, just outside this tile's north edge -- so this point is this survey's closest real approach to the head, not the literal head coordinate. About 34 km northwest of the wall POI; optional, distant lore objective."
+    }
+  ]
+}

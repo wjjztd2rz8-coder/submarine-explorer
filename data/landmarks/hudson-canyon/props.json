@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "landmark": "hudson-canyon",
+  "props": [],
+  "note": "No procedural prop kind fits deep-sea coral (no coral builder in docs/props.md), and no public dataset gives a publishable exact colony position to place one at. The coral-habitat ledge is represented by pois.json's hc-coral-ledge (kind: biology, reconstruction: true) and guide.json's canyon-wall entry, with no rendered model."
+}
