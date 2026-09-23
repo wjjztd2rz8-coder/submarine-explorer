@@ -14,11 +14,12 @@
  */
 
 import * as THREE from 'three';
-import type { AtmosphereTier, WaterConfig } from '../core/Config.js';
+import type { AtmosphereTier, LightPreset, WaterConfig } from '../core/Config.js';
 
 export class Headlights {
   readonly group = new THREE.Group();
   readonly lights: THREE.SpotLight[] = [];
+  readonly fill = new THREE.PointLight(0xfff3dd, 0, 0, 1);
 
   private readonly cones: THREE.Mesh[] = [];
   private readonly coneMaterial: THREE.ShaderMaterial | null;
@@ -26,6 +27,7 @@ export class Headlights {
   private readonly right = new THREE.Vector3();
   private readonly up = new THREE.Vector3(0, 1, 0);
   private enabled = true;
+  private preset: LightPreset | null = null;
 
   constructor(
     private readonly config: WaterConfig,
@@ -45,6 +47,8 @@ export class Headlights {
       this.lights.push(light);
       this.group.add(light, light.target);
     }
+    this.fill.name = 'headlightFill';
+    this.group.add(this.fill);
 
     if (tier.headlightCones) {
       // A cone whose apex sits at the lamp. The shader fades it out at the
@@ -94,6 +98,32 @@ export class Headlights {
     this.enabled = on;
     for (const l of this.lights) l.visible = on;
     for (const c of this.cones) c.visible = on;
+    this.fill.visible = on && this.fill.intensity > 0;
+  }
+
+  setPreset(preset: LightPreset): void {
+    this.preset = preset;
+    const angle = (preset.angleDeg * Math.PI) / 180;
+    for (const light of this.lights) {
+      light.intensity = preset.intensity;
+      light.distance = preset.distance;
+      light.angle = angle;
+    }
+    this.fill.intensity = preset.fillIntensity;
+    this.fill.distance = preset.fillDistance;
+    const length = Math.min(preset.distance, 420);
+    if (this.cones.length) {
+      const radius = Math.tan(angle) * length;
+      const geo = new THREE.ConeGeometry(radius, length, 20, 1, true);
+      geo.translate(0, -length / 2, 0);
+      geo.rotateX(-Math.PI / 2);
+      const old = this.cones[0]!.geometry;
+      for (const cone of this.cones) cone.geometry = geo;
+      old.dispose();
+      this.coneMaterial!.uniforms.uOpacity!.value = preset.coneOpacity;
+      this.coneMaterial!.uniforms.uLength!.value = length;
+    }
+    this.setEnabled(this.enabled);
   }
 
   /**
@@ -108,6 +138,7 @@ export class Headlights {
     fog?: { color: THREE.Color; density: number },
   ): void {
     if (!this.enabled) return;
+    if (this.preset) this.fill.position.copy(origin).addScaledVector(forward, 10);
     this.right.crossVectors(forward, this.up).normalize();
     const half = this.config.headlightSeparationM / 2;
 
@@ -132,7 +163,7 @@ export class Headlights {
   }
 
   dispose(): void {
-    for (const c of this.cones) c.geometry.dispose();
+    this.cones[0]?.geometry.dispose();
     this.coneMaterial?.dispose();
   }
 }

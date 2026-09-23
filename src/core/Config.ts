@@ -33,6 +33,8 @@ export interface SubmarineConfig {
   buoyancyAccel: number;
   /** Speed above which we clamp, as a safety net (m/s). */
   maxSpeed: number;
+  /** Independent vertical velocity cap; a forward boost cannot increase descent speed. */
+  maxVerticalSpeed: number;
   /** Depth (negative metres) at which the hull fails. */
   crushDepth: number;
   /** Fraction of crush depth at which the HUD starts warning. */
@@ -917,6 +919,48 @@ export interface SettingsConfig {
   captionMaxLines: number;
   /** A caption stays up at least this long, even if its cue is shorter (readability). */
   captionMinDurationS: number;
+  gameplayPresets: Record<'arcade' | 'realistic', GameplayOptions>;
+  gameplayOptions: { [K in keyof GameplayOptions]: readonly GameplayOptions[K][] };
+}
+
+export interface GameplayOptions {
+  speedProfile: 'research' | 'standard' | 'fast';
+  lights: 'realistic' | 'enhanced';
+  sensors: 'realistic' | 'extended';
+  visualHints: boolean;
+  startPosition: 'near-site' | 'surface';
+  batteryOxygen: boolean;
+  currents: 'off' | 'gentle' | 'realistic';
+  descentProfile: 'research' | 'standard' | 'fast';
+  simSpeed: 1 | 2 | 3;
+}
+
+export type SpeedProfile = Pick<
+  SubmarineConfig,
+  | 'thrustAccel'
+  | 'boostMultiplier'
+  | 'dragLinear'
+  | 'dragQuadratic'
+  | 'yawRate'
+  | 'reverseAccel'
+  | 'maxSpeed'
+> & { cruiseSpeed: number; cameraLookAheadPerSpeed: number };
+export type DescentProfile = Pick<
+  SubmarineConfig,
+  'ballastAccel' | 'maxVerticalSpeed' | 'ballastHalfLife'
+>;
+export interface LightPreset {
+  intensity: number;
+  distance: number;
+  angleDeg: number;
+  coneOpacity: number;
+  fillIntensity: number;
+  fillDistance: number;
+}
+export interface SensorPreset {
+  scanRadiusMultiplier: number;
+  hintRangeMultiplier: number;
+  sonarPoiRange: number;
 }
 
 export interface GameConfig {
@@ -938,6 +982,10 @@ export interface GameConfig {
   mission: MissionConfig;
   /** C5: settings screen defaults and ranges (docs/settings.md). */
   settings: SettingsConfig;
+  speedProfiles: Record<GameplayOptions['speedProfile'], SpeedProfile>;
+  descentProfiles: Record<GameplayOptions['descentProfile'], DescentProfile>;
+  lightPresets: Record<GameplayOptions['lights'], LightPreset>;
+  sensorPresets: Record<GameplayOptions['sensors'], SensorPreset>;
   /** C5: sonar minimap palettes (`Sonar.setPalette`). */
   sonarPalettes: Record<SonarPaletteName, SonarPalette>;
   /** C1: globe mission select. */
@@ -952,12 +1000,7 @@ export const DEFAULT_CONFIG: GameConfig = {
   graphicsTier: 'medium',
   physicsHz: 60,
   submarine: {
-    // Terminal speed under full thrust is the positive root of
-    //   thrustAccel = (dragLinear + dragQuadratic * v) * v
-    // which for these numbers is ~6.0 m/s, and ~8.4 m/s with boost. Real
-    // research submersibles do 1-2 kn; this is the x2-x3 "sim speed"
-    // exaggeration the design doc allows, and the simSpeeds multiplier on top
-    // of it is what makes a 25 km tile crossable in a sitting.
+    // Runtime gameplay profiles replace these legacy baseline values at boot.
     thrustAccel: 2.0,
     reverseAccel: 0.9,
     ballastAccel: 3.0,
@@ -969,6 +1012,7 @@ export const DEFAULT_CONFIG: GameConfig = {
     verticalDragScale: 1.8,
     buoyancyAccel: 0.05,
     maxSpeed: 40,
+    maxVerticalSpeed: 8,
     // Mirrors hullClasses[hullClass].crushDepth; kept as a plain field because
     // it is the value the physics and the HUD actually read.
     crushDepth: -4500,
@@ -1367,6 +1411,103 @@ export const DEFAULT_CONFIG: GameConfig = {
     detailStrengthStep: 0.05,
     captionMaxLines: 2,
     captionMinDurationS: 1.5,
+    gameplayPresets: {
+      arcade: {
+        speedProfile: 'fast',
+        lights: 'enhanced',
+        sensors: 'extended',
+        visualHints: true,
+        startPosition: 'near-site',
+        batteryOxygen: false,
+        currents: 'off',
+        descentProfile: 'fast',
+        simSpeed: 1,
+      },
+      realistic: {
+        speedProfile: 'research',
+        lights: 'realistic',
+        sensors: 'realistic',
+        visualHints: false,
+        startPosition: 'near-site',
+        batteryOxygen: true,
+        currents: 'realistic',
+        descentProfile: 'research',
+        simSpeed: 1,
+      },
+    },
+    gameplayOptions: {
+      speedProfile: ['research', 'standard', 'fast'],
+      lights: ['realistic', 'enhanced'],
+      sensors: ['realistic', 'extended'],
+      visualHints: [false, true],
+      startPosition: ['near-site', 'surface'],
+      batteryOxygen: [false, true],
+      currents: ['off', 'gentle', 'realistic'],
+      descentProfile: ['research', 'standard', 'fast'],
+      simSpeed: [1, 2, 3],
+    },
+  },
+  speedProfiles: {
+    research: {
+      cruiseSpeed: 1,
+      maxSpeed: 1.4,
+      thrustAccel: 0.25,
+      boostMultiplier: 1.8,
+      dragLinear: 0.05,
+      dragQuadratic: 0.2,
+      yawRate: 0.55,
+      reverseAccel: 0.14,
+      cameraLookAheadPerSpeed: 12,
+    },
+    standard: {
+      cruiseSpeed: 4,
+      maxSpeed: 6.8,
+      thrustAccel: 1.6,
+      boostMultiplier: 2.8,
+      dragLinear: 0.08,
+      dragQuadratic: 0.08,
+      yawRate: 0.4,
+      reverseAccel: 0.75,
+      cameraLookAheadPerSpeed: 8,
+    },
+    fast: {
+      cruiseSpeed: 12,
+      maxSpeed: 20.6,
+      thrustAccel: 3,
+      boostMultiplier: 2.7,
+      dragLinear: 0.05,
+      dragQuadratic: 0.0165,
+      yawRate: 0.45,
+      reverseAccel: 1.4,
+      cameraLookAheadPerSpeed: 4,
+    },
+  },
+  descentProfiles: {
+    research: { ballastAccel: 0.18, maxVerticalSpeed: 0.5, ballastHalfLife: 0.7 },
+    standard: { ballastAccel: 1.2, maxVerticalSpeed: 2.5, ballastHalfLife: 0.5 },
+    fast: { ballastAccel: 3, maxVerticalSpeed: 8, ballastHalfLife: 0.35 },
+  },
+  lightPresets: {
+    realistic: {
+      intensity: 1100,
+      distance: 2000,
+      angleDeg: 38,
+      coneOpacity: 0.05,
+      fillIntensity: 0,
+      fillDistance: 0,
+    },
+    enhanced: {
+      intensity: 1800,
+      distance: 2500,
+      angleDeg: 52,
+      coneOpacity: 0.075,
+      fillIntensity: 160,
+      fillDistance: 350,
+    },
+  },
+  sensorPresets: {
+    realistic: { scanRadiusMultiplier: 1, hintRangeMultiplier: 1, sonarPoiRange: 500 },
+    extended: { scanRadiusMultiplier: 2, hintRangeMultiplier: 2, sonarPoiRange: 2000 },
   },
   // C5: sonar palettes. `default` reproduces the original green look exactly
   // (lum = 0.25 + 0.75 * terrain luminance, times rgb(30, 235, 120)).
@@ -1599,7 +1740,22 @@ export function makeConfig(overrides: Partial<GameConfig> = {}): GameConfig {
     scan: { ...DEFAULT_CONFIG.scan, ...overrides.scan },
     props: { ...DEFAULT_CONFIG.props, ...overrides.props },
     mission: { ...DEFAULT_CONFIG.mission, ...overrides.mission },
-    settings: { ...DEFAULT_CONFIG.settings, ...overrides.settings },
+    settings: {
+      ...DEFAULT_CONFIG.settings,
+      ...overrides.settings,
+      gameplayPresets: {
+        ...DEFAULT_CONFIG.settings.gameplayPresets,
+        ...overrides.settings?.gameplayPresets,
+      },
+      gameplayOptions: {
+        ...DEFAULT_CONFIG.settings.gameplayOptions,
+        ...overrides.settings?.gameplayOptions,
+      },
+    },
+    speedProfiles: { ...DEFAULT_CONFIG.speedProfiles, ...overrides.speedProfiles },
+    descentProfiles: { ...DEFAULT_CONFIG.descentProfiles, ...overrides.descentProfiles },
+    lightPresets: { ...DEFAULT_CONFIG.lightPresets, ...overrides.lightPresets },
+    sensorPresets: { ...DEFAULT_CONFIG.sensorPresets, ...overrides.sensorPresets },
     sonarPalettes: { ...DEFAULT_CONFIG.sonarPalettes, ...overrides.sonarPalettes },
     globe: { ...DEFAULT_CONFIG.globe, ...overrides.globe },
     presets: { ...DEFAULT_CONFIG.presets, ...overrides.presets },

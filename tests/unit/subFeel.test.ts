@@ -286,3 +286,60 @@ describe('A3/11 sim speed', () => {
     expect(-sub.position.z).toBeCloseTo(at1x, 3);
   });
 });
+
+describe('Phase D mode profiles', () => {
+  it.each(['research', 'standard', 'fast'] as const)(
+    '%s cruise and boost stay inside the configured speed cap',
+    (name) => {
+      const tuned = structuredClone(DEFAULT_CONFIG.submarine);
+      const sub = new Submarine(tuned, flatSeabed(-20000));
+      const speed = DEFAULT_CONFIG.speedProfiles[name];
+      sub.applyProfiles(speed, DEFAULT_CONFIG.descentProfiles[name]);
+      sub.reset(0, -1000, 0);
+      run(sub, input({ throttle: 1 }), 90 * 60);
+      expect(Math.abs(sub.getState().speed - speed.cruiseSpeed)).toBeLessThan(0.15);
+      sub.reset(0, -1000, 0);
+      run(sub, input({ throttle: 1, boost: true }), 90 * 60);
+      expect(sub.getState().speed).toBeLessThanOrEqual(speed.maxSpeed + 1e-6);
+      expect(sub.getState().speed).toBeGreaterThan(speed.cruiseSpeed);
+    },
+  );
+
+  it.each(['research', 'standard', 'fast'] as const)(
+    '%s descent is capped separately from forward thrust',
+    (name) => {
+      const tuned = structuredClone(DEFAULT_CONFIG.submarine);
+      const sub = new Submarine(tuned, flatSeabed(-20000));
+      const descent = DEFAULT_CONFIG.descentProfiles[name];
+      sub.applyProfiles(DEFAULT_CONFIG.speedProfiles.fast, descent);
+      sub.reset(0, -1000, 0);
+      run(sub, input({ ballast: -1, throttle: 1, boost: true, pitch: -1 }), 20 * 60);
+      expect(-sub.velocity.y).toBeLessThanOrEqual(descent.maxVerticalSpeed + 1e-6);
+    },
+  );
+
+  it('changes profiles in place without resetting pose or hull', () => {
+    const tuned = structuredClone(DEFAULT_CONFIG.submarine);
+    const sub = new Submarine(tuned, flatSeabed(-20000));
+    sub.reset(10, -1000, 20);
+    sub.applyProfiles(
+      DEFAULT_CONFIG.speedProfiles.research,
+      DEFAULT_CONFIG.descentProfiles.research,
+    );
+    expect(sub.position.toArray()).toEqual([10, -1000, 20]);
+    expect(sub.getState().hullClass).toBe(tuned.hullClass);
+    expect(tuned.yawRate).toBe(0.55);
+    expect(tuned.maxSpeed).toBe(1.4);
+  });
+
+  it('fast steering turns progressively without exceeding its yaw rate', () => {
+    const tuned = structuredClone(DEFAULT_CONFIG.submarine);
+    const sub = new Submarine(tuned, flatSeabed(-20000));
+    sub.applyProfiles(DEFAULT_CONFIG.speedProfiles.fast, DEFAULT_CONFIG.descentProfiles.fast);
+    sub.reset(0, -1000, 0);
+    sub.velocity.z = -20;
+    run(sub, input({ yaw: 1 }), 60);
+    expect(sub.yaw).toBeGreaterThan(0.1);
+    expect(sub.yaw).toBeLessThan(DEFAULT_CONFIG.speedProfiles.fast.yawRate);
+  });
+});

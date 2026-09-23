@@ -134,7 +134,7 @@ test.describe('B3 mission flow', () => {
     await expect(panel.locator('.obj-item[data-primary="true"]')).toHaveCount(2);
     await expect(panel.locator('.obj-item[data-primary="false"]')).toHaveCount(2);
     await expect(panel.locator('.obj-item.is-complete')).toHaveCount(0);
-    await expect(panel.locator('.obj-speed')).toHaveText('SIM 3×');
+    await expect(panel.locator('.obj-speed')).toHaveText('SIM 1×');
     // Bearing to the bow from the NNW start is about the briefed 150 deg.
     await expect(panel.locator('.obj-nav-target')).toHaveText('→ BOW SECTION');
     const brg = Number(
@@ -152,7 +152,7 @@ test.describe('B3 mission flow', () => {
     expect((await subPos(page)).y).toBeLessThan(y0 - 1);
     // T cycles the sim speed and the panel follows.
     await page.keyboard.press('t');
-    await expect(panel.locator('.obj-speed')).toHaveText('SIM 1×');
+    await expect(panel.locator('.obj-speed')).toHaveText('SIM 2×');
 
     // F3: the help panel lists the systems keys.
     const help = (await page.locator('.hud-help').textContent()) ?? '';

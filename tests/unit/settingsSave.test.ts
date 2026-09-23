@@ -5,6 +5,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import { EventBus } from '../../src/core/EventBus.js';
 import {
   SAVE_KEYS,
   SETTINGS_STORAGE_KEY,
@@ -44,7 +45,9 @@ const config = DEFAULT_CONFIG;
 describe('settings defaults and migrate', () => {
   it('defaults come from Config', () => {
     const d = defaultSettings(config);
-    expect(d.version).toBe(1);
+    expect(d.version).toBe(2);
+    expect(d.gameplayMode).toBe('arcade');
+    expect(d.gameplay).toEqual(config.settings.gameplayPresets.arcade);
     expect(d.graphicsTier).toBe(config.graphicsTier);
     expect(d.detailStrength).toBe(config.terrain.detailStrength);
     expect(d.captions).toBe(config.settings.defaults.captions);
@@ -78,7 +81,7 @@ describe('settings defaults and migrate', () => {
     const d = defaultSettings(config);
     expect(migrate(null, config)).toEqual(d);
     expect(migrate([1, 2], config)).toEqual(d);
-    expect(migrate({ version: 2, captions: true }, config)).toEqual(d);
+    expect(migrate({ version: 3, captions: true }, config)).toEqual(d);
     expect(migrate({ captions: true }, config).captions).toBe(true); // unversioned v0
     expect(migrate({ sonarPalette: 'constructor' }, config).sonarPalette).toBe('default');
   });
@@ -99,7 +102,7 @@ describe('Save', () => {
     const b = new Save({ config, storage: store });
     expect(b.get().captions).toBe(true);
     b.reset();
-    expect(store.getItem(SETTINGS_STORAGE_KEY)).toBeNull();
+    expect(JSON.parse(store.getItem(SETTINGS_STORAGE_KEY)!)).toEqual(defaultSettings(config));
     expect(b.get().captions).toBe(config.settings.defaults.captions);
   });
 
@@ -129,7 +132,7 @@ describe('Save', () => {
 
   it('does not overwrite a newer stored version', () => {
     const store = new MemoryStore();
-    const newer = JSON.stringify({ version: 2, captions: true });
+    const newer = JSON.stringify({ version: 3, captions: true });
     store.setItem(SETTINGS_STORAGE_KEY, newer);
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const s = new Save({ config, storage: store });
@@ -154,5 +157,93 @@ describe('Save', () => {
     live.terrain.detailStrength = 0.25;
     s.save({ detailStrength: 0.75 });
     expect(s.reset().detailStrength).toBe(original);
+  });
+});
+
+describe('Phase D gameplay settings', () => {
+  it('migrates v1 display settings once while preserving the old key', () => {
+    const store = new MemoryStore();
+    store.setItem(
+      'subexplorer.settings.v1',
+      JSON.stringify({ version: 1, postFx: false, captions: true, sonarPalette: 'highContrast' }),
+    );
+    const save = new Save({ config, storage: store });
+    expect(save.get()).toMatchObject({
+      version: 2,
+      postFx: false,
+      captions: true,
+      sonarPalette: 'highContrast',
+      gameplayMode: 'arcade',
+      uiScale: 100,
+    });
+    expect(store.getItem(SETTINGS_STORAGE_KEY)).toContain('"version":2');
+    expect(store.getItem('subexplorer.settings.v1')).not.toBeNull();
+    save.reset();
+    expect(new Save({ config, storage: store }).get()).toEqual(defaultSettings(config));
+  });
+
+  it('switches whole presets and preserves every other option on one edit', () => {
+    const save = new Save({ config, storage: null });
+    save.setGameplayMode('realistic');
+    expect(save.get().gameplay).toEqual(config.settings.gameplayPresets.realistic);
+    save.setGameplayOption('lights', 'enhanced');
+    expect(save.get().gameplayMode).toBe('custom');
+    expect(save.get().gameplay.speedProfile).toBe('research');
+    save.setGameplayOption('lights', 'enhanced');
+    save.setGameplayMode('custom');
+    expect(save.get().gameplay.lights).toBe('enhanced');
+    save.setGameplayMode('arcade');
+    expect(save.get().gameplay).toEqual(config.settings.gameplayPresets.arcade);
+  });
+
+  it('repairs invalid Custom fields individually and overrides mismatched named presets', () => {
+    const custom = migrate(
+      {
+        version: 2,
+        gameplayMode: 'custom',
+        gameplay: { speedProfile: 'research', lights: 'bad', simSpeed: 99 },
+        uiScale: 999,
+      },
+      config,
+    );
+    expect(custom.gameplay).toMatchObject({
+      speedProfile: 'research',
+      lights: 'enhanced',
+      simSpeed: 1,
+    });
+    expect(custom.uiScale).toBe(150);
+    const named = migrate(
+      { version: 2, gameplayMode: 'realistic', gameplay: { speedProfile: 'fast' } },
+      config,
+    );
+    expect(named.gameplay).toEqual(config.settings.gameplayPresets.realistic);
+  });
+
+  it('emits once per changed settings key, including a Custom mode transition', () => {
+    const events: Array<{ key: string; value: unknown }> = [];
+    const bus = new EventBus();
+    bus.on('settings:changed', (payload) => events.push(payload));
+    const save = new Save({
+      config,
+      storage: null,
+      bus,
+    });
+    save.save({ captions: true });
+    save.save({ captions: true });
+    save.setGameplayOption('lights', 'enhanced');
+    expect(events.map((event) => event.key)).toEqual(['captions', 'gameplayMode']);
+    expect(events.at(-1)?.value).toBe('custom');
+  });
+
+  it('leaves a newer legacy save untouched when v2 is absent', () => {
+    const store = new MemoryStore();
+    const future = JSON.stringify({ version: 4, captions: true });
+    store.setItem('subexplorer.settings.v1', future);
+    const save = new Save({ config, storage: store });
+    expect(save.protectedVersion).toBe(true);
+    expect(store.getItem(SETTINGS_STORAGE_KEY)).toBeNull();
+    save.save({ captions: true });
+    expect(store.getItem('subexplorer.settings.v1')).toBe(future);
+    expect(store.getItem(SETTINGS_STORAGE_KEY)).toBeNull();
   });
 });

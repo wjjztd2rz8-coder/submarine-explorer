@@ -1927,3 +1927,36 @@ body:has(.mission-debrief:not([hidden])) .hud-warning {
   font-size: 15px;
   border-radius: 2px;
 }
+
+/* --- D-MODES --- */
+.settings-section:has([data-gameplay]) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20px;
+}
+.settings-section:has([data-gameplay]) .settings-heading,
+.settings-section:has([data-gameplay]) .settings-row:has([data-setting='gameplayMode']) {
+  grid-column: 1 / -1;
+}
+.settings-section:has([data-gameplay]) .settings-row {
+  justify-content: space-between;
+}
+.settings-section:has([data-gameplay]) .settings-label {
+  min-width: 0;
+}
+.settings-section:has([data-gameplay]) select {
+  min-width: 120px;
+}
+@media (max-width: 560px) {
+  .settings-section:has([data-gameplay]) {
+    grid-template-columns: 1fr;
+  }
+}
+.settings input[data-setting='uiScale'] {
+  width: 6ch;
+  font: inherit;
+  color: var(--b1-text);
+  background: rgba(10, 30, 36, 0.9);
+  border: 1px solid var(--b1-hair);
+  padding: 3px 10px;
+}

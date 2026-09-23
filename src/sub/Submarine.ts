@@ -29,7 +29,7 @@
  */
 
 import * as THREE from 'three';
-import type { SubmarineConfig } from '../core/Config.js';
+import type { DescentProfile, SpeedProfile, SubmarineConfig } from '../core/Config.js';
 import type { InputState } from '../core/Input.js';
 
 /** The only thing the physics needs from the world. */
@@ -183,6 +183,24 @@ export class Submarine {
     return this.simSpeed;
   }
 
+  /** Change handling in place without resetting pose, velocity, or hull state. */
+  applyProfiles(speed: SpeedProfile, descent: DescentProfile): void {
+    Object.assign(this.config, speed, descent);
+    this.velocity.y = clamp(
+      this.velocity.y,
+      -this.config.maxVerticalSpeed,
+      this.config.maxVerticalSpeed,
+    );
+    const horizontal = Math.hypot(this.velocity.x, this.velocity.z);
+    if (horizontal > this.config.maxSpeed) {
+      const scale = this.config.maxSpeed / horizontal;
+      this.velocity.x *= scale;
+      this.velocity.z *= scale;
+    }
+    const total = this.velocity.length();
+    if (total > this.config.maxSpeed) this.velocity.multiplyScalar(this.config.maxSpeed / total);
+  }
+
   /** Place the boat and zero its motion. */
   reset(x: number, y: number, z: number, yaw = 0): void {
     this.position.set(x, y, z);
@@ -305,8 +323,17 @@ export class Submarine {
     // Semi-implicit Euler: update velocity first, then integrate position with
     // the new velocity. Stable for this kind of damped system.
     v.addScaledVector(a, dt);
-    const newSpeed = v.length();
-    if (newSpeed > c.maxSpeed) v.multiplyScalar(c.maxSpeed / newSpeed);
+    // Horizontal and ballast limits are independent: pitch/boost cannot turn
+    // the forward cap into an unsafe descent rate.
+    v.y = clamp(v.y, -c.maxVerticalSpeed, c.maxVerticalSpeed);
+    const horizontalSpeed = Math.hypot(v.x, v.z);
+    if (horizontalSpeed > c.maxSpeed) {
+      const scale = c.maxSpeed / horizontalSpeed;
+      v.x *= scale;
+      v.z *= scale;
+    }
+    const totalSpeed = v.length();
+    if (totalSpeed > c.maxSpeed) v.multiplyScalar(c.maxSpeed / totalSpeed);
     this.position.addScaledVector(v, dt);
 
     // --- constraints --------------------------------------------------------

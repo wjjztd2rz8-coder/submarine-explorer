@@ -22,7 +22,12 @@
  * reload. Escape cancels a capture; Escape and Tab cannot be bound.
  */
 
-import type { GameConfig, GraphicsTier, SonarPaletteName } from '../core/Config.js';
+import type {
+  GameConfig,
+  GameplayOptions,
+  GraphicsTier,
+  SonarPaletteName,
+} from '../core/Config.js';
 import { keyLabel, type ActionBinding, type ActionId } from '../core/Input.js';
 import type { Save, SettingsData, SettingsValues } from '../core/Save.js';
 import { FocusTrap } from './FocusTrap.js';
@@ -125,6 +130,10 @@ export class SettingsScreen {
   private readonly bindingsList: HTMLDivElement;
   private readonly trap: FocusTrap;
   private readonly controls = new Map<keyof SettingsValues, HTMLInputElement | HTMLSelectElement>();
+  private readonly gameplayControls = new Map<
+    keyof GameplayOptions,
+    HTMLInputElement | HTMLSelectElement
+  >();
   private readonly detailOut: HTMLOutputElement;
   private readonly bindButtons = new Map<ActionId, HTMLButtonElement>();
   private open_ = false;
@@ -184,14 +193,83 @@ export class SettingsScreen {
     game.append(
       this.select(
         'simSpeedDefault',
-        'Default sim speed',
+        'Legacy default sim speed (Gameplay takes precedence)',
         cfg.settings.simSpeedOptions.map((v): [string, string] => [
           String(v),
           v === 0 ? 'Auto (free dive 1×, missions their own)' : `${v}×`,
         ]),
-        'Applies from the next dive.',
+        'Kept for older saves. Gameplay → Simulation speed controls every dive.',
       ),
     );
+
+    // --- D-MODES begin ---
+    const gameplay = this.section(`${id}-gameplay`, 'Gameplay');
+    const mode = el('select');
+    mode.dataset.setting = 'gameplayMode';
+    for (const [value, label] of [
+      ['arcade', 'Arcade'],
+      ['realistic', 'Realistic'],
+      ['custom', 'Custom'],
+    ]) {
+      const option = el('option', undefined, label);
+      option.value = value;
+      mode.append(option);
+    }
+    mode.addEventListener('change', () =>
+      opts.save.setGameplayMode(mode.value as SettingsData['gameplayMode']),
+    );
+    this.controls.set('gameplayMode', mode);
+    gameplay.append(
+      this.field(
+        'Mode',
+        mode,
+        'Fast travel is a game setting across hull classes; Alvin-like research speed is about 1 m/s.',
+      ),
+    );
+    const labels: Record<keyof GameplayOptions, string> = {
+      speedProfile: 'Forward speed',
+      lights: 'Lights',
+      sensors: 'Sensors',
+      visualHints: 'Visual hints',
+      startPosition: 'Start position',
+      batteryOxygen: 'Battery and oxygen',
+      currents: 'Currents',
+      descentProfile: 'Descent speed',
+      simSpeed: 'Simulation speed',
+    };
+    for (const key of Object.keys(cfg.settings.gameplayOptions) as Array<keyof GameplayOptions>) {
+      const choices = cfg.settings.gameplayOptions[key] as readonly (string | number | boolean)[];
+      const input = el('select');
+      input.dataset.gameplay = key;
+      for (const choice of choices) {
+        const option = el(
+          'option',
+          undefined,
+          typeof choice === 'boolean'
+            ? choice
+              ? 'On'
+              : 'Off'
+            : choice === 'near-site'
+              ? 'Near site'
+              : String(choice).replaceAll('-', ' '),
+        );
+        option.value = String(choice);
+        input.append(option);
+      }
+      input.addEventListener('change', () => {
+        const sample = choices[0];
+        const value =
+          typeof sample === 'number'
+            ? Number(input.value)
+            : typeof sample === 'boolean'
+              ? input.value === 'true'
+              : input.value;
+        opts.save.setGameplayOption(key, value as never);
+      });
+      this.gameplayControls.set(key, input);
+      gameplay.append(this.field(labels[key], input));
+    }
+    // --- D-MODES end ---
 
     const access = this.section(`${id}-a11y`, 'Accessibility');
     access.append(
@@ -206,6 +284,15 @@ export class SettingsScreen {
         ]),
       ),
     );
+    const uiScale = el('input');
+    uiScale.type = 'number';
+    uiScale.min = '80';
+    uiScale.max = '150';
+    uiScale.step = '1';
+    uiScale.dataset.setting = 'uiScale';
+    uiScale.addEventListener('change', () => opts.save.save({ uiScale: Number(uiScale.value) }));
+    this.controls.set('uiScale', uiScale);
+    access.append(this.field('UI scale (%)', uiScale));
 
     const keys = this.section(`${id}-keys`, 'Controls');
     const keysHint = el(
@@ -307,6 +394,7 @@ export class SettingsScreen {
       header,
       graphics,
       game,
+      gameplay,
       access,
       keys,
       this.status,
@@ -465,6 +553,7 @@ export class SettingsScreen {
         c.setAttribute('aria-valuetext', Number(v).toFixed(2));
       }
     }
+    for (const [key, control] of this.gameplayControls) control.value = String(s.gameplay[key]);
     const pending =
       (!this.opts.tierFromUrl && s.graphicsTier !== this.opts.activeTier) ||
       s.detailStrength !== this.opts.activeDetailStrength ||

@@ -1,73 +1,48 @@
-/**
- * Player settings persistence (C5, plan/PHASE-C-CONTRACTS.md §4, docs/settings.md).
- *
- * localStorage key `subexplorer.settings.v1`, JSON:
- *
- *     { version: 1, graphicsTier, postFx, detailStrength, simSpeedDefault,
- *       reduceMotion, captions, sonarPalette, bindings? }
- *
- * `bindings` is only a pointer to the key the action map already persists to
- * (`subexplorer.bindings.v1`, owned by `Input`); discoveries likewise stay in
- * `subexplorer.discoveries.v1` (owned by `DiscoveryStore`). {@link SAVE_KEYS}
- * lists all three so a "reset" screen can find them.
- *
- * Every read and write is guarded: a hostile or missing storage (privacy
- * mode, quota, a throwing getter, corrupt JSON, a newer version) never throws
- * and never bricks the game; the settings simply fall back to the defaults,
- * which come from Config (`graphicsTier`, `terrain.detailStrength`,
- * `settings.defaults`).
- */
+/** Versioned player settings and v1 display migration. Gameplay presets live in Config. */
+import type { GameConfig, GameplayOptions, GraphicsTier, SonarPaletteName } from './Config.js';
+import type { EventBus } from './EventBus.js';
 
-import type { GameConfig, GraphicsTier, SonarPaletteName } from './Config.js';
-
-export const SETTINGS_STORAGE_KEY = 'subexplorer.settings.v1';
-export const SETTINGS_VERSION = 1;
-
-/** Every localStorage key the game writes. Settings wraps the other two by pointer only. */
+export const SETTINGS_STORAGE_KEY = 'subexplorer.settings.v2';
+export const SETTINGS_VERSION = 2;
+const LEGACY_SETTINGS_KEY = 'subexplorer.settings.v1';
 export const SAVE_KEYS = {
   settings: SETTINGS_STORAGE_KEY,
-  bindings: 'subexplorer.bindings.v1',
+  bindings: 'subexplorer.bindings.v2',
   discoveries: 'subexplorer.discoveries.v1',
 } as const;
 
+export type GameplayMode = 'arcade' | 'realistic' | 'custom';
 export interface SettingsValues {
   graphicsTier: GraphicsTier;
   postFx: boolean;
-  /** Procedural terrain detail on top of the survey data; 0 = survey only. */
   detailStrength: number;
-  /** 0 = auto (free dive 1x, missions at their own default), else 1 / 2 / 3. */
+  /** Legacy display preference; gameplay.simSpeed controls the dive. */
   simSpeedDefault: number;
   reduceMotion: boolean;
   captions: boolean;
   sonarPalette: SonarPaletteName;
+  uiScale: number;
+  gameplayMode: GameplayMode;
+  gameplay: GameplayOptions;
 }
-
 export type SettingKey = keyof SettingsValues;
-
 export interface SettingsData extends SettingsValues {
-  version: 1;
-  /** Pointer to the bindings key (the action map persists itself there). */
+  version: 2;
   bindings?: string;
 }
-
-/** The subset of `Storage` used. */
 export interface SettingsStorage {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
   removeItem(key: string): void;
 }
-
-/** What {@link defaultSettings} reads from Config. */
 export type SettingsConfigSource = Pick<
   GameConfig,
   'graphicsTier' | 'settings' | 'sonarPalettes'
 > & {
   terrain: Pick<GameConfig['terrain'], 'detailStrength'>;
 };
-
 const TIERS: readonly GraphicsTier[] = ['low', 'medium', 'high'];
-
-export const SETTING_KEYS: readonly SettingKey[] = [
+const DISPLAY_KEYS = [
   'graphicsTier',
   'postFx',
   'detailStrength',
@@ -75,12 +50,29 @@ export const SETTING_KEYS: readonly SettingKey[] = [
   'reduceMotion',
   'captions',
   'sonarPalette',
+] as const;
+const GAMEPLAY_KEYS = [
+  'speedProfile',
+  'lights',
+  'sensors',
+  'visualHints',
+  'startPosition',
+  'batteryOxygen',
+  'currents',
+  'descentProfile',
+  'simSpeed',
+] as const;
+export const SETTING_KEYS: readonly SettingKey[] = [
+  ...DISPLAY_KEYS,
+  'uiScale',
+  'gameplayMode',
+  'gameplay',
 ];
 
 export function defaultSettings(config: SettingsConfigSource): SettingsData {
   const d = config.settings.defaults;
   return {
-    version: 1,
+    version: 2,
     graphicsTier: config.graphicsTier,
     postFx: d.postFx,
     detailStrength: config.terrain.detailStrength,
@@ -88,69 +80,79 @@ export function defaultSettings(config: SettingsConfigSource): SettingsData {
     reduceMotion: d.reduceMotion,
     captions: d.captions,
     sonarPalette: d.sonarPalette,
+    uiScale: 100,
+    gameplayMode: 'arcade',
+    gameplay: { ...config.settings.gameplayPresets.arcade },
     bindings: SAVE_KEYS.bindings,
   };
 }
-
-/** One field, validated; anything off falls back to the default for that field. */
-function sanitizeField<K extends SettingKey>(
-  key: K,
-  v: unknown,
-  fallback: SettingsValues[K],
+function sanitizeDisplay(
+  key: (typeof DISPLAY_KEYS)[number],
+  value: unknown,
+  fallback: unknown,
   config: SettingsConfigSource,
-): SettingsValues[K] {
-  const s = config.settings;
+): unknown {
   switch (key) {
     case 'graphicsTier':
-      return (TIERS.includes(v as GraphicsTier) ? v : fallback) as SettingsValues[K];
+      return TIERS.includes(value as GraphicsTier) ? value : fallback;
     case 'postFx':
     case 'reduceMotion':
     case 'captions':
-      return (typeof v === 'boolean' ? v : fallback) as SettingsValues[K];
-    case 'detailStrength': {
-      if (typeof v !== 'number' || !Number.isFinite(v)) return fallback;
-      return Math.min(s.detailStrengthMax, Math.max(0, v)) as SettingsValues[K];
-    }
+      return typeof value === 'boolean' ? value : fallback;
+    case 'detailStrength':
+      return typeof value === 'number' && Number.isFinite(value)
+        ? Math.min(config.settings.detailStrengthMax, Math.max(0, value))
+        : fallback;
     case 'simSpeedDefault':
-      return (
-        typeof v === 'number' && s.simSpeedOptions.includes(v) ? v : fallback
-      ) as SettingsValues[K];
+      return typeof value === 'number' && config.settings.simSpeedOptions.includes(value)
+        ? value
+        : fallback;
     case 'sonarPalette':
-      return (
-        typeof v === 'string' && Object.hasOwn(config.sonarPalettes, v) ? v : fallback
-      ) as SettingsValues[K];
-    default:
-      return fallback;
+      return typeof value === 'string' && Object.hasOwn(config.sonarPalettes, value)
+        ? value
+        : fallback;
   }
 }
-
-/**
- * Upgrade any stored shape into the current one. Understood inputs:
- * - v1: sanitised field by field (a bad field falls back alone);
- * - "v0": the same fields with no `version` (hand-edited / pre-release);
- * - anything else (garbage, a non-object, a newer version) -> defaults.
- * A newer version is never overwritten by accident: see {@link Save}.
- */
+function sanitizeGameplay(raw: unknown, config: SettingsConfigSource): GameplayOptions {
+  const fallback = config.settings.gameplayPresets.arcade;
+  const source =
+    raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
+  const result = { ...fallback };
+  for (const key of GAMEPLAY_KEYS) {
+    const value = source[key];
+    const choices = config.settings.gameplayOptions[key] as readonly unknown[];
+    if (choices.includes(value)) (result as unknown as Record<string, unknown>)[key] = value;
+  }
+  return result;
+}
+/** Sanitize v2, or translate a v1/v0 object into Arcade plus its display choices. */
 export function migrate(raw: unknown, config: SettingsConfigSource): SettingsData {
   const out = defaultSettings(config);
-  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return out;
-  const o = raw as Record<string, unknown>;
-  const version = o.version;
-  if (version !== undefined && version !== 1) return out;
-  for (const key of SETTING_KEYS) {
-    if (key in o) {
-      // One generic assignment per key keeps the per-field types intact.
-      (out as unknown as Record<string, unknown>)[key] = sanitizeField(
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
+  const value = raw as Record<string, unknown>;
+  if (value.version !== undefined && value.version !== 1 && value.version !== 2) return out;
+  for (const key of DISPLAY_KEYS) {
+    if (key in value)
+      (out as unknown as Record<string, unknown>)[key] = sanitizeDisplay(
         key,
-        o[key],
+        value[key],
         out[key],
         config,
       );
+  }
+  if (value.version === 2) {
+    if (typeof value.uiScale === 'number' && Number.isFinite(value.uiScale))
+      out.uiScale = Math.max(80, Math.min(150, Math.round(value.uiScale)));
+    if (value.gameplayMode === 'arcade' || value.gameplayMode === 'realistic') {
+      out.gameplayMode = value.gameplayMode;
+      out.gameplay = { ...config.settings.gameplayPresets[value.gameplayMode] };
+    } else if (value.gameplayMode === 'custom') {
+      out.gameplayMode = 'custom';
+      out.gameplay = sanitizeGameplay(value.gameplay, config);
     }
   }
   return out;
 }
-
 function safeStorage(): SettingsStorage | null {
   try {
     return (globalThis as { localStorage?: SettingsStorage }).localStorage ?? null;
@@ -158,13 +160,11 @@ function safeStorage(): SettingsStorage | null {
     return null;
   }
 }
-
 export interface SaveOptions {
   config: SettingsConfigSource;
-  /** Defaults to `window.localStorage` when it exists; `null` = do not persist. */
   storage?: SettingsStorage | null;
+  bus?: Pick<EventBus, 'emit'>;
 }
-
 export type SettingsListener = (settings: SettingsData, changed: SettingKey[]) => void;
 
 export class Save {
@@ -172,107 +172,123 @@ export class Save {
   private readonly storage: SettingsStorage | null;
   private readonly config: SettingsConfigSource;
   private readonly listeners = new Set<SettingsListener>();
-  /** True when the stored copy is a newer version we must not overwrite. */
   private readOnly = false;
-  /** Whether the last edit was verified in storage and can survive a reload. */
   private reloadSafe_ = true;
-
-  constructor(options: SaveOptions) {
-    // main.ts applies the saved detail to the live terrain config at boot;
-    // keep the original defaults so Reset settings still restores that value.
+  constructor(private readonly options: SaveOptions) {
     this.config = { ...options.config, terrain: { ...options.config.terrain } };
     this.storage = options.storage !== undefined ? options.storage : safeStorage();
     this.data = defaultSettings(this.config);
     this.load();
   }
-
-  /** Re-read the stored copy (defaults when absent or unreadable). Never throws. */
   load(): SettingsData {
     let raw: unknown = null;
+    let absent = true;
     try {
       const text = this.storage?.getItem(SETTINGS_STORAGE_KEY) ?? null;
-      if (typeof text === 'string' && text) raw = JSON.parse(text);
+      absent = text === null;
+      if (text) raw = JSON.parse(text);
     } catch {
-      raw = null; // throwing getter or corrupt JSON
+      /* Storage or JSON is hostile; use defaults. */
     }
-    const v = (raw as { version?: unknown } | null)?.version;
-    this.readOnly = typeof v === 'number' && v > SETTINGS_VERSION;
+    const version = (raw as { version?: unknown } | null)?.version;
+    this.readOnly = typeof version === 'number' && version > SETTINGS_VERSION;
     this.reloadSafe_ = !this.readOnly;
-    if (this.readOnly) {
+    if (this.readOnly)
       console.warn(
-        `[save] ${SETTINGS_STORAGE_KEY} is version ${v}; using defaults and not overwriting it`,
+        `[save] ${SETTINGS_STORAGE_KEY} is version ${version}; using defaults and not overwriting it`,
       );
+    if (absent) {
+      try {
+        const legacy = this.storage?.getItem(LEGACY_SETTINGS_KEY);
+        if (legacy) raw = JSON.parse(legacy);
+      } catch {
+        raw = null;
+      }
+      const legacyVersion = (raw as { version?: unknown } | null)?.version;
+      if (typeof legacyVersion === 'number' && legacyVersion > 1) {
+        this.readOnly = true;
+        this.reloadSafe_ = false;
+      }
     }
     this.data = migrate(raw, this.config);
+    if (absent && !this.readOnly) this.persist();
     return this.get();
   }
-
-  /** A copy of the current settings. */
   get(): SettingsData {
-    return { ...this.data };
+    return { ...this.data, gameplay: { ...this.data.gameplay } };
   }
-
   get reloadSafe(): boolean {
     return this.reloadSafe_;
   }
-
   get protectedVersion(): boolean {
     return this.readOnly;
   }
-
-  /** The defaults this save falls back to. */
   defaults(): SettingsData {
     return defaultSettings(this.config);
   }
-
-  /**
-   * Merge `partial` (each field validated), persist, and notify listeners
-   * with the keys whose value actually changed. Never throws.
-   */
+  /** A preset replaces every option; Custom alone preserves current options. */
+  setGameplayMode(mode: GameplayMode): SettingsData {
+    return this.commit({
+      ...this.data,
+      gameplayMode: mode,
+      gameplay:
+        mode === 'custom'
+          ? { ...this.data.gameplay }
+          : { ...this.config.settings.gameplayPresets[mode] },
+    });
+  }
+  /** Editing even an unchanged option explicitly enters Custom mode. */
+  setGameplayOption<K extends keyof GameplayOptions>(
+    key: K,
+    value: GameplayOptions[K],
+  ): SettingsData {
+    return this.commit({
+      ...this.data,
+      gameplayMode: 'custom',
+      gameplay: { ...this.data.gameplay, [key]: value },
+    });
+  }
   save(partial: Partial<SettingsValues>): SettingsData {
-    const next = migrate({ ...this.data, ...partial, version: 1 }, this.config);
-    const changed = SETTING_KEYS.filter((k) => next[k] !== this.data[k]);
-    this.data = next;
-    this.persist();
-    if (changed.length) this.emit(changed);
-    return this.get();
+    const editingGameplay = partial.gameplay !== undefined;
+    const mode = partial.gameplayMode ?? (editingGameplay ? 'custom' : this.data.gameplayMode);
+    const gameplay =
+      partial.gameplayMode && partial.gameplayMode !== 'custom'
+        ? { ...this.config.settings.gameplayPresets[partial.gameplayMode] }
+        : { ...this.data.gameplay, ...partial.gameplay };
+    return this.commit({ ...this.data, ...partial, gameplayMode: mode, gameplay });
   }
-
-  /** Back to the defaults; the stored copy is removed. Notifies changed keys. */
   reset(): SettingsData {
-    const next = defaultSettings(this.config);
-    const changed = SETTING_KEYS.filter((k) => next[k] !== this.data[k]);
-    this.data = next;
-    if (!this.readOnly) {
-      this.reloadSafe_ = false;
-      try {
-        this.storage?.removeItem(SETTINGS_STORAGE_KEY);
-        this.reloadSafe_ = this.storage?.getItem(SETTINGS_STORAGE_KEY) === null;
-      } catch {
-        // not fatal
-      }
-    }
-    if (changed.length) this.emit(changed);
-    return this.get();
+    // Persist defaults in v2. Removing the key would re-import old v1 choices
+    // on the next launch while the legacy key is intentionally preserved.
+    return this.commit(defaultSettings(this.config));
   }
-
-  /** Subscribe to changes; returns an unsubscribe function. */
   onChange(listener: SettingsListener): () => void {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
   }
-
-  private emit(changed: SettingKey[]): void {
-    const snapshot = this.get();
-    for (const l of [...this.listeners]) {
-      try {
-        l(snapshot, changed);
-      } catch (err) {
-        console.error('[save] settings listener threw', err);
+  private commit(next: SettingsData, persist = true): SettingsData {
+    const clean = migrate(next, this.config);
+    const changed = SETTING_KEYS.filter((key) =>
+      key === 'gameplay'
+        ? GAMEPLAY_KEYS.some((k) => clean.gameplay[k] !== this.data.gameplay[k])
+        : clean[key] !== this.data[key],
+    );
+    this.data = clean;
+    if (persist) this.persist();
+    if (changed.length) {
+      const snapshot = this.get();
+      for (const key of changed)
+        this.options.bus?.emit('settings:changed', { key, value: snapshot[key] });
+      for (const listener of [...this.listeners]) {
+        try {
+          listener(snapshot, changed);
+        } catch (error) {
+          console.error('[save] settings listener threw', error);
+        }
       }
     }
+    return this.get();
   }
-
   private persist(): void {
     this.reloadSafe_ = false;
     if (!this.storage || this.readOnly) return;
@@ -281,7 +297,7 @@ export class Save {
       this.storage.setItem(SETTINGS_STORAGE_KEY, text);
       this.reloadSafe_ = this.storage.getItem(SETTINGS_STORAGE_KEY) === text;
     } catch {
-      // Quota / privacy mode: settings live for this session only.
+      /* Quota or privacy mode: session only. */
     }
   }
 }

@@ -110,8 +110,20 @@ async function main(): Promise<void> {
   // --- C5 begin ---
   // Saved settings (docs/settings.md). The saved graphics tier applies unless
   // `?tier=` is given; terrain detail is read once, when the terrain is built.
-  const save = new Save({ config });
+  const save = new Save({ config, bus });
   const settings = save.get();
+  // --- D-MODES begin ---
+  Object.assign(
+    config.submarine,
+    config.speedProfiles[settings.gameplay.speedProfile],
+    config.descentProfiles[settings.gameplay.descentProfile],
+  );
+  config.camera.lookAheadPerSpeed =
+    config.speedProfiles[settings.gameplay.speedProfile].cameraLookAheadPerSpeed;
+  const baseHintRangeFactor = config.scan.hintRangeFactor;
+  config.scan.hintRangeFactor =
+    baseHintRangeFactor * config.sensorPresets[settings.gameplay.sensors].hintRangeMultiplier;
+  // --- D-MODES end ---
   config.terrain.detailStrength = settings.detailStrength;
   let postFxOn = settings.postFx;
   // Graphics tier: `?tier=low|medium|high` (see docs/terrain.md).
@@ -171,6 +183,9 @@ async function main(): Promise<void> {
   const atmoTier = atmosphereTier(config.water, tier);
   const atmosphere = new Atmosphere(scene, config.water, atmoTier, bus);
   const headlights = new Headlights(config.water, atmoTier);
+  // --- D-MODES begin ---
+  headlights.setPreset(config.lightPresets[settings.gameplay.lights]);
+  // --- D-MODES end ---
   scene.add(headlights.group);
   const snow = new MarineSnow(config.water, atmoTier);
   if (snow.points) scene.add(snow.points);
@@ -212,8 +227,9 @@ async function main(): Promise<void> {
   const contentLandmark = route?.landmarkId ?? landmarkIdFor(params, meta.id);
   // --- B3 end ---
   // --- C5 begin ---
-  // Default sim speed (0 = auto: free dive 1x, missions their own default).
-  if (settings.simSpeedDefault > 0) sub.setSimSpeed(settings.simSpeedDefault);
+  // --- D-MODES begin ---
+  sub.setSimSpeed(settings.gameplay.simSpeed);
+  // --- D-MODES end ---
   // --- C5 end ---
 
   const subMesh = new SubMesh({
@@ -259,6 +275,15 @@ async function main(): Promise<void> {
       rig.snap(sub.position, sub.yaw, sub.pitch);
     },
   });
+  // --- D-MODES begin ---
+  const baseScanRadii = new Map<string, number>();
+  void discovery.ready.then(() => {
+    for (const poi of discovery.pois) baseScanRadii.set(poi.id, poi.radius);
+    const factor = config.sensorPresets[save.get().gameplay.sensors].scanRadiusMultiplier;
+    for (const poi of discovery.pois)
+      poi.radius = (baseScanRadii.get(poi.id) ?? poi.radius) * factor;
+  });
+  // --- D-MODES end ---
   // --- B1 end ---
   // --- B4 begin ---
   // Placed props (docs/props.md). `?at=lat,lon[,heading]` spawns the boat there
@@ -413,6 +438,23 @@ async function main(): Promise<void> {
     if (changed.includes('sonarPalette')) sonar.setPalette(next.sonarPalette);
     if (changed.includes('postFx')) postFxOn = next.postFx;
   });
+  // --- D-MODES begin ---
+  save.onChange((next, changed) => {
+    if (!changed.includes('gameplay')) return;
+    sub.applyProfiles(
+      config.speedProfiles[next.gameplay.speedProfile],
+      config.descentProfiles[next.gameplay.descentProfile],
+    );
+    config.camera.lookAheadPerSpeed =
+      config.speedProfiles[next.gameplay.speedProfile].cameraLookAheadPerSpeed;
+    headlights.setPreset(config.lightPresets[next.gameplay.lights]);
+    const sensor = config.sensorPresets[next.gameplay.sensors];
+    config.scan.hintRangeFactor = baseHintRangeFactor * sensor.hintRangeMultiplier;
+    for (const poi of discovery.pois)
+      poi.radius = (baseScanRadii.get(poi.id) ?? poi.radius) * sensor.scanRadiusMultiplier;
+    sub.setSimSpeed(next.gameplay.simSpeed);
+  });
+  // --- D-MODES end ---
   // --- C5 end ---
   const unlockAudio = (): void => audio.unlock();
   window.addEventListener('pointerdown', unlockAudio, { once: true });

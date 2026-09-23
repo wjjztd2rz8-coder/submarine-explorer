@@ -234,7 +234,7 @@ test.describe('settings screen', () => {
     expect(new URL(page.url()).search).toBe('?mission=titanic&skipBriefing=1');
     const saved = await page.evaluate(() => ({
       discoveries: localStorage.getItem('subexplorer.discoveries.v1'),
-      settings: localStorage.getItem('subexplorer.settings.v1'),
+      settings: localStorage.getItem('subexplorer.settings.v2'),
       bindings: localStorage.getItem('subexplorer.bindings.v1'),
       keys: (window.__game as { discoveries: { keys(): string[] } }).discoveries.keys(),
     }));
@@ -253,7 +253,7 @@ test.describe('settings screen', () => {
     await dialog.getByLabel('Graphics tier').selectOption('high');
     await expect(dialog.getByRole('button', { name: 'Apply and reload' })).toBeHidden();
     await dialog.getByLabel('Terrain detail on top of the survey data').fill('0.5');
-    await dialog.getByLabel('Default sim speed').selectOption('2');
+    await dialog.getByLabel('Simulation speed').selectOption('2');
     await dialog.getByRole('button', { name: 'Apply and reload' }).scrollIntoViewIfNeeded();
     await page.screenshot({ path: 'test-results-settings-closeout/settings-apply.png' });
     const reloaded = page.waitForEvent('load');
@@ -342,8 +342,8 @@ test.describe('settings screen', () => {
 
   test('protected settings cannot be offered as a reloadable change', async ({ page }) => {
     await boot(page, '/');
-    const newer = JSON.stringify({ version: 2, detailStrength: 0.25 });
-    await page.evaluate((value) => localStorage.setItem('subexplorer.settings.v1', value), newer);
+    const newer = JSON.stringify({ version: 3, detailStrength: 0.25 });
+    await page.evaluate((value) => localStorage.setItem('subexplorer.settings.v2', value), newer);
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__gameReady === true);
     await page.keyboard.press('KeyO');
@@ -355,6 +355,6 @@ test.describe('settings screen', () => {
     await expect(dialog.locator('.settings-status')).toContainText(
       'newer saved version was left intact',
     );
-    expect(await page.evaluate(() => localStorage.getItem('subexplorer.settings.v1'))).toBe(newer);
+    expect(await page.evaluate(() => localStorage.getItem('subexplorer.settings.v2'))).toBe(newer);
   });
 });
