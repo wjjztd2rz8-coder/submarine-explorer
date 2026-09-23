@@ -1,5 +1,24 @@
 #!/usr/bin/env python3
+"""Build data/landmarks.json, the catalogue of candidate dive sites.
+
+    python3 tools/build_landmarks.py            # writes data/landmarks.json
+    python3 tools/build_landmarks.py --out /tmp/landmarks.json
+
+The output path defaults to data/landmarks.json under the repo root, resolved
+from this file's location, so the script works from any working directory.
+Importing the module only builds the in-memory list `L`; nothing is written.
+
+Python 3.9, standard library only.
+"""
+import argparse
+import collections
 import json
+import os
+import sys
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DEFAULT_OUT = os.path.join(REPO, "data", "landmarks.json")
+VALID_TYPES = {"trench", "wreck", "vent", "seamount", "canyon", "ridge", "reef", "seep", "hole", "other"}
 
 L = []
 
@@ -789,30 +808,46 @@ add(id="edmund-fitzgerald", name="SS Edmund Fitzgerald", type="wreck", lat=46.94
     external_links=["https://en.wikipedia.org/wiki/SS_Edmund_Fitzgerald"])
 
 
-import sys, collections
+def build_doc(landmarks=None):
+    """Check ids and types, fill defaults, and return the landmarks.json document.
 
-ids = [x["id"] for x in L]
-dupes = [i for i,c in collections.Counter(ids).items() if c>1]
-if dupes:
-    print("DUPLICATE IDS:", dupes); sys.exit(1)
+    Raises ValueError on duplicate ids or an unknown type.
+    """
+    items = [dict(x) for x in (L if landmarks is None else landmarks)]
+    ids = [x["id"] for x in items]
+    dupes = [i for i, c in collections.Counter(ids).items() if c > 1]
+    if dupes:
+        raise ValueError("duplicate ids: %s" % dupes)
+    for x in items:
+        if x["type"] not in VALID_TYPES:
+            raise ValueError("bad type %r for %s" % (x["type"], x["id"]))
+        x.setdefault("wreck_meta", None)
+    return {
+        "version": 1,
+        "generated": "2026-09-16",
+        "count": len(items),
+        "landmarks": items,
+    }
 
-valid_types = {"trench","wreck","vent","seamount","canyon","ridge","reef","seep","hole","other"}
-for x in L:
-    if x["type"] not in valid_types:
-        print("BAD TYPE", x["id"], x["type"]); sys.exit(1)
-    x.setdefault("wreck_meta", None)
 
-out = {
-    "version": 1,
-    "generated": "2026-09-16",
-    "count": len(L),
-    "landmarks": L
-}
+def main(argv=None):
+    ap = argparse.ArgumentParser(description="Build the landmark catalogue (data/landmarks.json).")
+    ap.add_argument("--out", default=DEFAULT_OUT,
+                    help="output path (default: data/landmarks.json under the repo root)")
+    args = ap.parse_args(argv)
+    try:
+        out = build_doc()
+    except ValueError as e:
+        print("error: %s" % e, file=sys.stderr)
+        return 1
+    with open(args.out, "w", encoding="utf-8") as f:
+        json.dump(out, f, indent=2, ensure_ascii=False)
+    print("Wrote", out["count"], "landmarks to", args.out)
+    type_counts = collections.Counter(x["type"] for x in out["landmarks"])
+    for t, c in sorted(type_counts.items()):
+        print(t, c)
+    return 0
 
-with open("/Users/vijay/submarine-explorer/data/landmarks.json", "w") as f:
-    json.dump(out, f, indent=2, ensure_ascii=False)
 
-print("Wrote", len(L), "landmarks")
-type_counts = collections.Counter(x["type"] for x in L)
-for t,c in sorted(type_counts.items()):
-    print(t, c)
+if __name__ == "__main__":
+    sys.exit(main())

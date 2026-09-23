@@ -1,0 +1,35 @@
+{
+  "id": "kamaehuakanaloa",
+  "source": "GMRT",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=19.0667&south=18.7667&east=-155.1081&west=-155.4253&layer=topo&format=esriascii&resolution=max",
+  "fetched_at": "2026-09-23T02:03:21Z",
+  "bbox": {
+    "north": 19.06693938125242,
+    "south": 18.76646330703367,
+    "east": -155.107177734375,
+    "west": -155.42578125
+  },
+  "cols": 580,
+  "rows": 547,
+  "cellsize_deg": 0.00054931640625,
+  "cellsize_m_x": 57.847251081599694,
+  "cellsize_m_y": 61.14990234375,
+  "min_m": -5027.22,
+  "max_m": -975.17,
+  "nodata_count": 0,
+  "center": {
+    "lat": 18.916701344143046,
+    "lon": -155.2664794921875
+  },
+  "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
+  "requested_bbox": {
+    "north": 19.0667,
+    "south": 18.7667,
+    "east": -155.1081,
+    "west": -155.4253
+  },
+  "resolution": "max",
+  "layer": "topo",
+  "quant_min_m": -5027.22021484375,
+  "quant_scale": 0.06183032321558852
+}

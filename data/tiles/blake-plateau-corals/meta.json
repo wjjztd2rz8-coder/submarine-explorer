@@ -1,0 +1,35 @@
+{
+  "id": "blake-plateau-corals",
+  "source": "GMRT",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=30.3296&south=29.6704&east=-79.1704&west=-79.8296&layer=topo&format=esriascii&resolution=max",
+  "fetched_at": "2026-09-23T02:04:09Z",
+  "bbox": {
+    "north": 30.330195443583815,
+    "south": 29.670466439677565,
+    "east": -79.169677734375,
+    "west": -79.8299560546875
+  },
+  "cols": 1202,
+  "rows": 1201,
+  "cellsize_deg": 0.00054931640625,
+  "cellsize_m_x": 52.95719226617897,
+  "cellsize_m_y": 61.14990234375,
+  "min_m": -960.1,
+  "max_m": -579.93,
+  "nodata_count": 0,
+  "center": {
+    "lat": 30.00033094163069,
+    "lon": -79.49981689453125
+  },
+  "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
+  "requested_bbox": {
+    "north": 30.3296,
+    "south": 29.6704,
+    "east": -79.1704,
+    "west": -79.8296
+  },
+  "resolution": "max",
+  "layer": "topo",
+  "quant_min_m": -960.1,
+  "quant_scale": 0.0058010224662274935
+}

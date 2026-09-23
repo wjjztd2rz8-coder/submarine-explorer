@@ -16,7 +16,9 @@ data/
     index.json                 list of every tile (rewritten on every tile write)
     <tile-id>/
       meta.json                metadata for one tile
-      heightmap.bin            the elevation grid
+      heightmap.bin            the elevation grid (canonical)
+      heightmap16.bin          optional 16-bit quantised copy (see below)
+      heightmap*.bin.gz / .br  optional pre-compressed copies (gitignored)
 ```
 
 Tile ids are directory names: lowercase, `[a-z0-9-]`, e.g. `titanic`,
@@ -79,24 +81,25 @@ consumer can tell how much of a tile is interpolated rather than measured.
 }
 ```
 
-| Key                   | Meaning                                                                                                                                                            |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `id`                  | tile id; must equal the directory name                                                                                                                             |
-| `source`              | `"GMRT"` for fetched tiles, `"synthetic"` for generated ones                                                                                                       |
-| `source_url`          | the exact request URL (or the generator script path)                                                                                                               |
-| `fetched_at`          | ISO-8601 UTC, second precision                                                                                                                                     |
-| `bbox`                | the **actual** grid bounds. GMRT snaps requests to its own grid, so this differs from what you asked for by up to a cell — always use this, never `requested_bbox` |
-| `cols`, `rows`        | grid dimensions; `cols * rows * 4` must equal the heightmap size                                                                                                   |
-| `cellsize_deg`        | cell size in degrees (square in GMRT's ESRI ASCII output)                                                                                                          |
-| `cellsize_m_x`        | `cellsize_deg * 111320 * cos(center.lat)`                                                                                                                          |
-| `cellsize_m_y`        | `cellsize_deg * 111320`                                                                                                                                            |
-| `min_m`, `max_m`      | elevation extremes **after** NODATA filling                                                                                                                        |
-| `nodata_count`        | number of cells that were holes in the source data                                                                                                                 |
-| `center`              | bbox centre; the world-space origin (see below)                                                                                                                    |
-| `attribution`         | human-readable credit; the HUD renders this verbatim                                                                                                               |
-| `requested_bbox`      | optional; what the CLI was asked for                                                                                                                               |
-| `resolution`, `layer` | optional; the GMRT parameters actually used                                                                                                                        |
-| `synthetic`, `seed`   | optional; present only on `make_synthetic_tile.py` output                                                                                                          |
+| Key                          | Meaning                                                                                                                                                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`                         | tile id; must equal the directory name                                                                                                                             |
+| `source`                     | `"GMRT"` for fetched tiles, `"ETOPO 2022"` for the fetch_all.py fallback, `"synthetic"` for generated ones                                                         |
+| `source_url`                 | the exact request URL (or the generator script path)                                                                                                               |
+| `fetched_at`                 | ISO-8601 UTC, second precision                                                                                                                                     |
+| `bbox`                       | the **actual** grid bounds. GMRT snaps requests to its own grid, so this differs from what you asked for by up to a cell — always use this, never `requested_bbox` |
+| `cols`, `rows`               | grid dimensions; `cols * rows * 4` must equal the heightmap size                                                                                                   |
+| `cellsize_deg`               | cell size in degrees (square in GMRT's ESRI ASCII output)                                                                                                          |
+| `cellsize_m_x`               | `cellsize_deg * 111320 * cos(center.lat)`                                                                                                                          |
+| `cellsize_m_y`               | `cellsize_deg * 111320`                                                                                                                                            |
+| `min_m`, `max_m`             | elevation extremes **after** NODATA filling                                                                                                                        |
+| `nodata_count`               | number of cells that were holes in the source data                                                                                                                 |
+| `center`                     | bbox centre; the world-space origin (see below)                                                                                                                    |
+| `attribution`                | human-readable credit; the HUD renders this verbatim                                                                                                               |
+| `requested_bbox`             | optional; what the CLI was asked for                                                                                                                               |
+| `resolution`, `layer`        | optional; the GMRT parameters actually used                                                                                                                        |
+| `synthetic`, `seed`          | optional; present only on `make_synthetic_tile.py` output                                                                                                          |
+| `quant_min_m`, `quant_scale` | optional; present only when `heightmap16.bin` exists (`tools/compress_tiles.py --quant16`). metres = `quant_min_m + q * quant_scale`                               |
 
 ### Metres per degree
 
@@ -111,6 +114,36 @@ The whole project uses one spherical approximation, defined in
 Longitude scale is evaluated **once, at the bbox centre latitude**, and the tile
 is then treated as a flat local plane. Across a sub-degree tile the resulting
 error is well under a metre.
+
+## Optional derived files
+
+Written by `tools/compress_tiles.py`; `heightmap.bin` stays the canonical
+data and the loader reads it by default. `tile_writer.write_tile()` deletes all
+of these whenever it rewrites a tile, so they can never go stale silently.
+
+### `heightmap16.bin` (16-bit quantised variant)
+
+| Property     | Value                                                                 |
+| ------------ | --------------------------------------------------------------------- |
+| Element type | unsigned 16-bit integer, **little-endian**                            |
+| Order        | identical to `heightmap.bin` (row-major, north row first)             |
+| Decoding     | `metres = quant_min_m + q * quant_scale` (both keys in meta)          |
+| Encoding     | `q = round((v - quant_min_m) / quant_scale)`, clamped to 0…65535      |
+| Scale        | `quant_scale = (max_m - min_m) / 65535` (1.0 for a flat tile)         |
+| Error        | at most `quant_scale / 2` (≈ 0.04 m for Challenger Deep's 5 km range) |
+| Length       | exactly `cols * rows * 2` bytes                                       |
+
+`TileLoader` uses it only when constructed with `{ prefer16: true }` **and**
+`meta.json` has both quant keys; on any fetch/decode failure it falls back to
+`heightmap.bin`. `python3 tools/inspect_tile.py <id> --variant u16` decodes it
+and prints the max error against float32.
+
+### `*.gz` / `*.br`
+
+Byte-identical gzip (level 9, `mtime=0`) / brotli (quality 11) copies of
+`heightmap.bin` and `heightmap16.bin`, for static hosts that serve
+pre-compressed files with `Content-Encoding` (the browser then hands the loader
+the decompressed bytes, so no loader change is involved). Not committed.
 
 ## `index.json`
 

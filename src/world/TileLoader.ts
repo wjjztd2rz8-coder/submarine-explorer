@@ -4,6 +4,7 @@
  * On-disk layout (see docs/tile-format.md):
  *   /data/tiles/<id>/meta.json       metadata
  *   /data/tiles/<id>/heightmap.bin   little-endian Float32, row-major, north row first
+ *   /data/tiles/<id>/heightmap16.bin optional uint16 variant (opt-in, see TileLoaderOptions)
  *   /data/tiles/index.json           list of available tiles
  *
  * Those paths are served by Vite via the `public/data -> ../data` symlink.
@@ -76,6 +77,34 @@ export function decodeHeightmap(buffer: ArrayBuffer, meta: TileMeta): Float32Arr
   return out;
 }
 
+/**
+ * Decode the optional 16-bit quantised heightmap (`heightmap16.bin`):
+ * little-endian uint16, same row order, metres = quant_min_m + q * quant_scale.
+ */
+export function decodeHeightmap16(buffer: ArrayBuffer, meta: TileMeta): Float32Array {
+  const { quant_min_m: min, quant_scale: scale } = meta;
+  if (typeof min !== 'number' || typeof scale !== 'number' || !(scale > 0)) {
+    throw new TileLoadError('meta.json has no valid quant_min_m/quant_scale', meta.id);
+  }
+  const n = meta.cols * meta.rows;
+  if (buffer.byteLength !== n * 2) {
+    throw new TileLoadError(
+      `heightmap16.bin is ${buffer.byteLength} bytes, expected ${n * 2} ` +
+        `(${meta.cols}x${meta.rows} uint16)`,
+      meta.id,
+    );
+  }
+  const view = new DataView(buffer);
+  const out = new Float32Array(n);
+  for (let i = 0; i < n; i++) out[i] = min + view.getUint16(i * 2, true) * scale;
+  return out;
+}
+
+/** True if meta.json advertises a 16-bit variant. */
+export function hasHeightmap16(meta: TileMeta): boolean {
+  return typeof meta.quant_min_m === 'number' && typeof meta.quant_scale === 'number';
+}
+
 let littleEndian: boolean | null = null;
 function isLittleEndian(): boolean {
   if (littleEndian === null) {
@@ -85,11 +114,21 @@ function isLittleEndian(): boolean {
   return littleEndian;
 }
 
+export interface TileLoaderOptions {
+  /**
+   * Fetch `heightmap16.bin` (half the bytes, <= quant_scale/2 error) when the
+   * tile's meta.json advertises it, falling back to float32 on any failure.
+   * Default false: float32 `heightmap.bin` is the canonical path.
+   */
+  prefer16?: boolean;
+}
+
 export class TileLoader {
   constructor(
     private readonly root: string = DEFAULT_TILE_ROOT,
     private readonly fetchFn: FetchLike = (input) =>
       fetch(input) as unknown as ReturnType<FetchLike>,
+    private readonly options: TileLoaderOptions = {},
   ) {}
 
   /** Load `index.json`. Returns an empty list if the pipeline has not run yet. */
@@ -113,6 +152,15 @@ export class TileLoader {
       throw new TileLoadError(`could not fetch ${base}/meta.json (${metaRes.status})`, tileId);
     }
     const meta = validateMeta(await metaRes.json(), tileId);
+
+    if (this.options.prefer16 && hasHeightmap16(meta)) {
+      try {
+        const res16 = await this.fetchFn(`${base}/heightmap16.bin`);
+        if (res16.ok) return { meta, heights: decodeHeightmap16(await res16.arrayBuffer(), meta) };
+      } catch {
+        // Fall through to the canonical float32 heightmap.
+      }
+    }
 
     const binRes = await this.fetchFn(`${base}/heightmap.bin`);
     if (!binRes.ok) {

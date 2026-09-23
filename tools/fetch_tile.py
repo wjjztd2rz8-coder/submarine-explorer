@@ -67,6 +67,17 @@ def http_get(url, timeout=300):
         return resp.read().decode("utf-8", errors="replace")
 
 
+def metadata_url(north, south, east, west, resolution):
+    """URL of GMRT's size/metadata probe for a bbox (see probe_metadata)."""
+    params = {
+        "north": north, "south": south, "east": east, "west": west,
+        "format": "esriascii", "mformat": "json",
+    }
+    if resolution:
+        params["resolution"] = resolution
+    return METADATA_URL + "?" + urllib.parse.urlencode(params)
+
+
 def probe_metadata(north, south, east, west, resolution):
     """Ask GMRT how big this grid would be. Returns a dict or None on failure.
 
@@ -74,13 +85,7 @@ def probe_metadata(north, south, east, west, resolution):
     include one it silently returns the actual grid data instead of the JSON
     metadata. Verified 2026-09-16.
     """
-    params = {
-        "north": north, "south": south, "east": east, "west": west,
-        "format": "esriascii", "mformat": "json",
-    }
-    if resolution:
-        params["resolution"] = resolution
-    url = METADATA_URL + "?" + urllib.parse.urlencode(params)
+    url = metadata_url(north, south, east, west, resolution)
     try:
         return json.loads(http_get(url, timeout=60))
     except (urllib.error.URLError, ValueError, OSError) as exc:
@@ -183,6 +188,36 @@ def bbox_from_landmarks(path, tile_id):
     raise SystemExit("no landmark with id %r in %s" % (tile_id, path))
 
 
+def write_grid_tile(out_root, tile_id, grid, url, source, extra=None):
+    """Fill NODATA in a parsed EsriGrid and write it as tile `tile_id`.
+
+    Shared by this CLI and tools/fetch_all.py. Returns the written meta dict.
+    """
+    print("[grid] %d cols x %d rows, cellsize %g deg" % (grid.ncols, grid.nrows, grid.cellsize))
+    values, nodata_count = fill_nodata(
+        list(grid.values), grid.ncols, grid.nrows, grid.nodata_value
+    )
+    if nodata_count:
+        print("[nodata] filled %d cells (%.3f%%)"
+              % (nodata_count, 100.0 * nodata_count / len(values)))
+
+    # Use the grid's OWN bounds, not the requested ones -- GMRT snaps to its
+    # internal tile grid, so the returned extent differs by up to a cell.
+    actual_bbox = {"north": grid.north, "south": grid.south,
+                   "east": grid.east, "west": grid.west}
+
+    meta = build_meta(
+        tile_id, values, grid.ncols, grid.nrows, actual_bbox, grid.cellsize,
+        nodata_count, source, url, extra=extra,
+    )
+    tile_dir = write_tile(out_root, meta, values)
+    print("[write] %s" % tile_dir)
+    print("[stats] cols=%d rows=%d min=%.1fm max=%.1fm nodata=%d"
+          % (meta["cols"], meta["rows"], meta["min_m"], meta["max_m"], meta["nodata_count"]))
+    print("[stats] cellsize %.1f m x  %.1f m y" % (meta["cellsize_m_x"], meta["cellsize_m_y"]))
+    return meta
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -221,29 +256,9 @@ def main(argv=None):
         args.resolution, args.layer, args.force, args.timeout,
     )
 
-    print("[grid] %d cols x %d rows, cellsize %g deg" % (grid.ncols, grid.nrows, grid.cellsize))
-    values, nodata_count = fill_nodata(
-        list(grid.values), grid.ncols, grid.nrows, grid.nodata_value
-    )
-    if nodata_count:
-        print("[nodata] filled %d cells (%.3f%%)"
-              % (nodata_count, 100.0 * nodata_count / len(values)))
-
-    # Use the grid's OWN bounds, not the requested ones -- GMRT snaps to its
-    # internal tile grid, so the returned extent differs by up to a cell.
-    actual_bbox = {"north": grid.north, "south": grid.south,
-                   "east": grid.east, "west": grid.west}
-
-    meta = build_meta(
-        args.id, values, grid.ncols, grid.nrows, actual_bbox, grid.cellsize,
-        nodata_count, "GMRT", url,
-        extra={"requested_bbox": bbox, "resolution": used_res, "layer": args.layer},
-    )
-    tile_dir = write_tile(args.out, meta, values)
-    print("[write] %s" % tile_dir)
-    print("[stats] cols=%d rows=%d min=%.1fm max=%.1fm nodata=%d"
-          % (meta["cols"], meta["rows"], meta["min_m"], meta["max_m"], meta["nodata_count"]))
-    print("[stats] cellsize %.1f m x  %.1f m y" % (meta["cellsize_m_x"], meta["cellsize_m_y"]))
+    write_grid_tile(args.out, args.id, grid, url, "GMRT",
+                    extra={"requested_bbox": bbox, "resolution": used_res,
+                           "layer": args.layer})
     return 0
 
 

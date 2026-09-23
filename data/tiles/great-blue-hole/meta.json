@@ -1,0 +1,35 @@
+{
+  "id": "great-blue-hole",
+  "source": "GMRT",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=17.4653&south=17.1653&east=-87.3775&west=-87.6917&layer=topo&format=esriascii&resolution=max",
+  "fetched_at": "2026-09-23T02:03:34Z",
+  "bbox": {
+    "north": 17.465435576277116,
+    "south": 17.164959502058366,
+    "east": -87.37646484375,
+    "west": -87.6917724609375
+  },
+  "cols": 574,
+  "rows": 547,
+  "cellsize_deg": 0.00054931640625,
+  "cellsize_m_x": 58.37870422636605,
+  "cellsize_m_y": 61.14990234375,
+  "min_m": -3642.63,
+  "max_m": 97.5,
+  "nodata_count": 0,
+  "center": {
+    "lat": 17.31519753916774,
+    "lon": -87.53411865234375
+  },
+  "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
+  "requested_bbox": {
+    "north": 17.4653,
+    "south": 17.1653,
+    "east": -87.3775,
+    "west": -87.6917
+  },
+  "resolution": "max",
+  "layer": "topo",
+  "quant_min_m": -3642.63,
+  "quant_scale": 0.05707072556649119
+}

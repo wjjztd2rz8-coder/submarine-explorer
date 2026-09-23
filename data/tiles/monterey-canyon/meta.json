@@ -29,5 +29,7 @@
     "west": -122.2
   },
   "resolution": "high",
-  "layer": "topo"
+  "layer": "topo",
+  "quant_min_m": -2332.81005859375,
+  "quant_scale": 0.0396462968223981
 }

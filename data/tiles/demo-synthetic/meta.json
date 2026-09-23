@@ -23,5 +23,7 @@
   },
   "attribution": "Synthetic procedural bathymetry (not real data).",
   "synthetic": true,
-  "seed": 1912
+  "seed": 1912,
+  "quant_min_m": -4367.398964875592,
+  "quant_scale": 0.01976175645099897
 }

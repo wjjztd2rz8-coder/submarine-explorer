@@ -1,0 +1,35 @@
+{
+  "id": "beebe-vent-field",
+  "source": "GMRT",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=18.6964&south=18.3964&east=-81.5598&west=-81.8762&layer=topo&format=esriascii&resolution=max",
+  "fetched_at": "2026-09-23T02:03:28Z",
+  "bbox": {
+    "north": 18.69618496689091,
+    "south": 18.39625820907841,
+    "east": -81.5592041015625,
+    "west": -81.87725830078125
+  },
+  "cols": 579,
+  "rows": 546,
+  "cellsize_deg": 0.00054931640625,
+  "cellsize_m_x": 57.974227151309705,
+  "cellsize_m_y": 61.14990234375,
+  "min_m": -6575.34,
+  "max_m": -2087.0,
+  "nodata_count": 0,
+  "center": {
+    "lat": 18.54622158798466,
+    "lon": -81.71823120117188
+  },
+  "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
+  "requested_bbox": {
+    "north": 18.6964,
+    "south": 18.3964,
+    "east": -81.5598,
+    "west": -81.8762
+  },
+  "resolution": "max",
+  "layer": "topo",
+  "quant_min_m": -6575.34,
+  "quant_scale": 0.06848767833981842
+}

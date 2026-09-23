@@ -1,0 +1,35 @@
+{
+  "id": "hudson-canyon",
+  "source": "GMRT",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=39.65&south=39.15&east=-72.1&west=-72.7&layer=topo&format=esriascii&resolution=max",
+  "fetched_at": "2026-09-23T02:03:15Z",
+  "bbox": {
+    "north": 39.65008596781058,
+    "south": 39.15020803812308,
+    "east": -72.0999755859375,
+    "west": -72.70037841796875
+  },
+  "cols": 1093,
+  "rows": 910,
+  "cellsize_deg": 0.00054931640625,
+  "cellsize_m_x": 47.25248297316341,
+  "cellsize_m_y": 61.14990234375,
+  "min_m": -1683.08,
+  "max_m": -67.86,
+  "nodata_count": 0,
+  "center": {
+    "lat": 39.40014700296683,
+    "lon": -72.40017700195312
+  },
+  "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
+  "requested_bbox": {
+    "north": 39.65,
+    "south": 39.15,
+    "east": -72.1,
+    "west": -72.7
+  },
+  "resolution": "max",
+  "layer": "topo",
+  "quant_min_m": -1683.08,
+  "quant_scale": 0.024646677347981996
+}

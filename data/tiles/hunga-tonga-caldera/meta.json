@@ -1,0 +1,35 @@
+{
+  "id": "hunga-tonga-caldera",
+  "source": "GMRT",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=-20.4&south=-20.7&east=-175.2398&west=-175.5602&layer=topo&format=esriascii&resolution=max",
+  "fetched_at": "2026-09-23T02:03:53Z",
+  "bbox": {
+    "north": -20.399638027068868,
+    "south": -20.699564784881368,
+    "east": -175.23907470703125,
+    "west": -175.56097412109375
+  },
+  "cols": 586,
+  "rows": 546,
+  "cellsize_deg": 0.00054931640625,
+  "cellsize_m_x": 57.25885217871876,
+  "cellsize_m_y": 61.14990234375,
+  "min_m": -1951.36,
+  "max_m": 82.09,
+  "nodata_count": 0,
+  "center": {
+    "lat": -20.549601405975118,
+    "lon": -175.4000244140625
+  },
+  "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
+  "requested_bbox": {
+    "north": -20.4,
+    "south": -20.7,
+    "east": -175.2398,
+    "west": -175.5602
+  },
+  "resolution": "max",
+  "layer": "topo",
+  "quant_min_m": -1951.36,
+  "quant_scale": 0.031028458075837335
+}

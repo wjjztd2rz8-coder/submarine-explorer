@@ -1,0 +1,35 @@
+{
+  "id": "challenger-deep",
+  "source": "GMRT",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=11.6233&south=11.1233&east=142.8417&west=142.3417&layer=topo&format=esriascii&resolution=max",
+  "fetched_at": "2026-09-23T02:02:47Z",
+  "bbox": {
+    "north": 11.623327954044425,
+    "south": 11.122900707950675,
+    "east": 142.842041015625,
+    "west": 142.34161376953125
+  },
+  "cols": 911,
+  "rows": 911,
+  "cellsize_deg": 0.00054931640625,
+  "cellsize_m_x": 59.94915161629647,
+  "cellsize_m_y": 61.14990234375,
+  "min_m": -10930.89,
+  "max_m": -5936.3,
+  "nodata_count": 0,
+  "center": {
+    "lat": 11.37311433099755,
+    "lon": 142.59182739257812
+  },
+  "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
+  "requested_bbox": {
+    "north": 11.6233,
+    "south": 11.1233,
+    "east": 142.8417,
+    "west": 142.3417
+  },
+  "resolution": "max",
+  "layer": "topo",
+  "quant_min_m": -10930.89,
+  "quant_scale": 0.07621256115529869
+}

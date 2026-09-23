@@ -43,6 +43,13 @@ export interface TileMeta {
   synthetic?: boolean;
   resolution?: string;
   layer?: string;
+  /**
+   * Present only when tools/compress_tiles.py --quant16 wrote the optional
+   * `heightmap16.bin` (uint16 LE): metres = quant_min_m + q * quant_scale.
+   * Float32 `heightmap.bin` stays canonical and is what the loader reads by default.
+   */
+  quant_min_m?: number;
+  quant_scale?: number;
 }
 
 /** A loaded tile: metadata plus its heightmap. */

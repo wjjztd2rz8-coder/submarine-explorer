@@ -1,0 +1,35 @@
+{
+  "id": "axial-seamount-ashes",
+  "source": "GMRT",
+  "source_url": "https://www.gmrt.org/services/GridServer?north=46.15&south=45.75&east=-129.7212&west=-130.2966&layer=topo&format=esriascii&resolution=max",
+  "fetched_at": "2026-09-23T02:03:04Z",
+  "bbox": {
+    "north": 46.149795900891085,
+    "south": 45.750442873547335,
+    "east": -129.72052001953125,
+    "west": -130.29730224609375
+  },
+  "cols": 1050,
+  "rows": 727,
+  "cellsize_deg": 0.00054931640625,
+  "cellsize_m_x": 42.51657014306033,
+  "cellsize_m_y": 61.14990234375,
+  "min_m": -2853.27,
+  "max_m": -1392.43,
+  "nodata_count": 0,
+  "center": {
+    "lat": 45.95011938721921,
+    "lon": -130.0089111328125
+  },
+  "attribution": "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, doi:10.1029/2008GC002332.",
+  "requested_bbox": {
+    "north": 46.15,
+    "south": 45.75,
+    "east": -129.7212,
+    "west": -130.2966
+  },
+  "resolution": "max",
+  "layer": "topo",
+  "quant_min_m": -2853.27001953125,
+  "quant_scale": 0.02229098984559777
+}
