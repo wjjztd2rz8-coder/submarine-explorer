@@ -6,18 +6,40 @@ Writes the on-disk tile format documented in docs/tile-format.md:
                                          FIRST ROW = NORTH edge, metres (neg = below sea level)
     data/tiles/<tile-id>/meta.json       metadata (see build_meta)
     data/tiles/index.json                list of available tiles for the UI
+
+Optional derived files (tools/compress_tiles.py; float32 stays canonical):
+
+    data/tiles/<tile-id>/heightmap16.bin little-endian uint16, same order;
+                                         metres = quant_min_m + q * quant_scale
+    data/tiles/<tile-id>/*.gz, *.br      byte-identical compressed copies
 """
 
+import array
 import datetime
 import json
 import math
 import os
 import struct
+import sys
 from typing import Dict, List, Optional, Sequence
 
 # Metres per degree of latitude (spherical approximation used throughout the
 # project -- see docs/tile-format.md; good to ~0.5% and plenty for a game).
 METERS_PER_DEG_LAT = 111320.0
+
+# 16-bit quantisation: q in [0, QUANT16_MAX] maps linearly onto [min_m, max_m].
+QUANT16_MAX = 65535
+HEIGHTMAP16 = "heightmap16.bin"
+
+# Files derived from heightmap.bin. write_tile() deletes them so a re-fetched
+# tile can never be served next to a stale compressed/quantised copy.
+DERIVED_FILES = (
+    "heightmap.bin.gz",
+    "heightmap.bin.br",
+    HEIGHTMAP16,
+    HEIGHTMAP16 + ".gz",
+    HEIGHTMAP16 + ".br",
+)
 
 GMRT_ATTRIBUTION = (
     "Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis. "
@@ -83,17 +105,58 @@ def write_tile(out_root: str, meta: Dict, values: Sequence[float]) -> str:
     tile_dir = os.path.join(out_root, meta["id"])
     os.makedirs(tile_dir, exist_ok=True)
 
+    for name in DERIVED_FILES:
+        stale = os.path.join(tile_dir, name)
+        if os.path.isfile(stale):
+            os.remove(stale)
+
     bin_path = os.path.join(tile_dir, "heightmap.bin")
     with open(bin_path, "wb") as fh:
         # "<" = little-endian, "f" = 32-bit float. Row-major, north row first.
         fh.write(struct.pack("<%df" % len(values), *values))
 
+    _write_meta(tile_dir, meta)
+    update_index(out_root)
+    return tile_dir
+
+
+def _write_meta(tile_dir: str, meta: Dict) -> None:
     with open(os.path.join(tile_dir, "meta.json"), "w") as fh:
         json.dump(meta, fh, indent=2)
         fh.write("\n")
 
-    update_index(out_root)
-    return tile_dir
+
+def quantize16(values: Sequence[float], lo: float, hi: float) -> "tuple[array.array, float, float]":
+    """Return (uint16 array, quant_min_m, quant_scale) for `values` in [lo, hi].
+
+    Max reconstruction error is quant_scale / 2 (e.g. 0.05 m over an 7 km range).
+    """
+    lo = min(lo, min(values))
+    hi = max(hi, max(values))
+    scale = (hi - lo) / QUANT16_MAX if hi > lo else 1.0
+    inv = 1.0 / scale
+    q = array.array("H", (min(QUANT16_MAX, max(0, int(round((v - lo) * inv)))) for v in values))
+    return q, lo, scale
+
+
+def dequantize16(q: Sequence[int], quant_min_m: float, quant_scale: float) -> List[float]:
+    return [quant_min_m + x * quant_scale for x in q]
+
+
+def write_heightmap16(tile_dir: str, meta: Dict, values: Sequence[float]) -> Dict:
+    """Write heightmap16.bin next to heightmap.bin and add its meta keys.
+
+    Returns the updated meta. Float32 heightmap.bin remains the canonical data;
+    the loader only uses this file when explicitly asked to.
+    """
+    q, lo, scale = quantize16(values, meta["min_m"], meta["max_m"])
+    if sys.byteorder == "big":
+        q.byteswap()
+    with open(os.path.join(tile_dir, HEIGHTMAP16), "wb") as fh:
+        fh.write(q.tobytes())
+    meta = dict(meta, quant_min_m=lo, quant_scale=scale)
+    _write_meta(tile_dir, meta)
+    return meta
 
 
 def update_index(out_root: str) -> List[Dict]:

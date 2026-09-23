@@ -1,29 +1,103 @@
-# Status — 2026-09-16 (end of Fable planning session)
+# Status — 2026-09-22 (after Phase B and C2; docs reconciled)
 
-Done: research docs, 68-landmark catalog, Tier-0 scaffold (green), master plan, work packages, owner decisions (plan/DECISIONS.md), A5 art direction.
-In flight when session ended (agents write directly into this repo): A1 terrain detail/LOD, A2 atmosphere/post, A3 sub feel/input, A4 audio.
+Phases A and B are integrated in the working tree, along with C2 (tiles). The
+commit covering A + B + C2 is still pending: the only commit is the initial
+scaffold. The QA pass for Phase B is being written to `plan/QA-B.md`.
 
-## Integration checklist — run by Fable (Opus/Sonnet subscription is near its cap; keep them for build packages only)
+## Shipped
 
-1. `git status` to see what A1–A4 produced; read each package's doc (docs/terrain.md, docs/atmosphere.md, docs/playtest-A3.md, docs/audio.md).
-2. `npm run build && npm test && npm run test:py && npm run test:e2e`; fix conflicts in the shared files src/core/Config.ts and src/main.ts (each agent was told to make only additive edits).
-3. Read tests/e2e/screenshots/_.png and docs/img/atmosphere-_.png; confirm no black frames, no visible cell grid, distinct looks at 10 / 300 / 3800 m.
-4. `npm run dev` and play ?tile=monterey-canyon and ?tile=titanic at ?tier=medium on this Mac; confirm 60 fps.
-5. Run the QA pass brief (plan/WORK-PACKAGES.md, "Cross-cutting") to write plan/QA-A.md, then commit Phase A.
-6. Start Phase B (B1–B4) from plan/WORK-PACKAGES.md; B2 and B3 can start immediately, B1 and B4 are Opus.
-   Budget note: subscription models at 88% as of 2026-09-16 evening; launch at most 2 build packages at a time until it resets.
+| Pkg | What                                                                                                                                   | Doc                                              |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| A1  | Terrain detail noise, triplanar procedural material, 3-level chunk LOD with skirts, graphics tiers (`?tier=`)                          | `docs/terrain.md`                                |
+| A2  | Depth bands (`env:depthBand`), fog/lights, headlights (L), marine snow, caustics, surface lid, post pass (tint + vignette), `?depth=`  | `docs/atmosphere.md`                             |
+| A3  | Tuned physics, sim speed (T), hull classes, crush depth + emergency blow, hull stress, chase/first-person/orbit rig, remappable input  | `docs/playtest-A3.md`                            |
+| A4  | WebAudio graph, depth low-pass, sonar ping with 2d/1500 echo, ambient beds, thruster/ballast/creak/thud/alarm cues, captions bus       | `docs/audio.md`                                  |
+| A5  | Art direction and mood board                                                                                                           | `docs/art-direction.md`                          |
+| B1  | POIs, scan beam (hold G), `DiscoveryStore` (`subexplorer.discoveries.v1`), field guide (J), debrief, `?poi=`/`?landmark=`/`?debrief=1` | `docs/discovery.md`                              |
+| B2  | Titanic content pack: 8 POIs, 9 guide entries, 5 procedural props, mission with 2 primary + 2 secondary objectives, sources            | `data/landmarks/titanic/sources.md`              |
+| B3  | `?mission=` router, briefing (freezes game), objectives panel + nav line, completion → debrief, MISSIONS list, `?skipBriefing=1`       | `docs/missions.md`                               |
+| B4  | `props.json` loader + validator, procedural hull/debris/chimney, 2 CC0 GLBs, LOD + impostors, prop collision, `?at=`, `?debugProps=1`  | `docs/props.md`                                  |
+| C2  | 13 Tier-2 GMRT tiles (`tools/fetch_all.py`), gzip + 16-bit variant (`tools/compress_tiles.py`), coverage report                        | `docs/tiles-inventory.md`, `docs/tile-format.md` |
+| fix | QA-A #1: sonar minimap takes the tile's aspect (F2); HUD help lists the systems keys (F3)                                              | `tests/unit/uiSonar.test.ts`                     |
 
-## Phase A agents were stopped at 2026-09-16 evening (subscription cap). Where each was:
+Contracts for the Phase B packages: `plan/PHASE-B-CONTRACTS.md`.
 
-- A1 terrain: code done, unit tests passing; was about to run build + e2e. Needs: e2e run, screenshot check, docs/terrain.md check.
-- A2 atmosphere: code mostly done; was adding the depth-band EventBus event. Needs: finish event, three depth screenshots, docs/atmosphere.md.
-- A3 sub feel: code + tests done; was writing docs/playtest-A3.md. Needs: that doc, e2e run.
-- A4 audio: build passing; was about to run e2e. Needs: e2e run, ATTRIBUTION rows check, docs/audio.md check.
-  State after stop: `tsc` clean, 107 unit tests pass (was 51). e2e not yet re-run. Each package can be resumed by re-pasting its brief with "the previous agent got this far: <line above>; finish it".
+## Gates (measured 2026-09-22 by the docs pass)
 
-## Update 2026-09-16 late: Phase A finished by Fable
+| Gate               | Result                                                                                                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run build`    | green: `tsc` has zero errors and vite builds 65 modules. Main chunk is 732.7 kB (198.0 kB gzip), which trips vite's 500 kB chunk warning. Dist is 84 MB.            |
+| `npm test`         | green: 258 tests in 23 files                                                                                                                                        |
+| `npm run test:py`  | green: 42 tests                                                                                                                                                     |
+| `npm run test:e2e` | not run by the docs pass because the QA agent is using the ports. Specs: smoke (×2 tiles), atmosphere, sub-playtest, discovery, mission, props. See `plan/QA-B.md`. |
 
-- A2 render modules wired into main.ts (Atmosphere, Headlights, MarineSnow, surface lid); `?depth=` spawn param; L toggles headlights; post pass driven by band grade; low tier renders without post.
-- Docs written: docs/terrain.md, docs/atmosphere.md. QA findings: plan/QA-A.md (sonar minimap bug on Titanic tile is the one real defect).
-- Gates: tsc clean, 107 unit, 9 py, 9 e2e all green. Nothing committed yet.
-- Next: commit Phase A (owner to say when), then Phase B (B1–B4) after the subscription resets Thursday 12:10 AM CST. B2/B3 are Sonnet, B1/B4 Opus. Fix QA-A #1 in the same Sonnet session as B3.
+## Known gaps
+
+Rendering / feel
+
+- Chromatic aberration and god rays: Config has them (`aberrationStrength`,
+  `godRayStrength`, `tiers.*.godRays`), but the post shader reads none of them.
+- No Fresnel/reflective surface lid. The lid is a tinted translucent plane.
+  The grade is a single tint rather than a LUT.
+- There is still a faint cell-aligned pattern visible from altitude (QA-A #2).
+  No fps figure has been recorded for the medium tier (QA-A #4).
+- Large tiles are kept under the 4M resident-vertex budget by automatically
+  lowering the per-cell subdivision (`Config.terrain.maxVertices`); e.g.
+  `blake-plateau-corals` renders at subdiv 1 on every tier (fixed after QA-B).
+- Pointer lock is not requested. Gamepad buttons are not rebindable. Nothing
+  sets `CameraRig.reduceMotion` yet (C5). The HUD help text is hardcoded, so it
+  does not follow rebinding.
+
+Game
+
+- Crush depth in a mission now shows a HULL FAILURE strip during the emergency
+  blow and then opens a "Dive aborted" debrief (`mission:aborted`), per the
+  DECISIONS failure model (fixed after QA-B). In free dive the HUD keeps showing
+  HULL BREACH after the blow.
+- Mission objectives count only scans made during the current run, not saved
+  discoveries, so a repeat dive has to find everything again. Only the `scan`
+  objective type and the `all_primary` rule exist.
+- Audio plays the discovery chime on `scan:complete` (quiet tick on repeats).
+  Nothing subscribes to `env:depthBand` (ambient already crossfades from depth).
+  Captions have no on-screen consumer (C5).
+  `ui:selectTile` is declared but never emitted.
+- No CC0 wreck GLB was found, so `procedural:hull-block` stands in for hulls.
+  Impostors are silhouettes, not sprites.
+- Only `titanic` has a mission. The other 12 tiles are free dives (C4a–d).
+
+Data / build
+
+- `great-blue-hole`: the hole is below GMRT's grid resolution (GEBCO fill, 0 %
+  multibeam). `hunga-tonga-caldera`: the terrain is pre-2022-eruption
+  multibeam, so there is no caldera. `endurance` and `bismarck` have 0 %
+  multibeam. `lost-city` (367×310) is below the 500-cell target. See
+  `docs/tiles-inventory.md`.
+- No `.br` files exist yet, because the brotli CLI is absent on the build
+  machine.
+- Tile copies nobody requests are shipped in `dist/`. `vite build` copies all
+  of `data/`, including `heightmap*.bin.gz` (31 MB), `heightmap16.bin` (15 MB)
+  and `_samples/` (2.6 MB). The loader never requests any of them, because
+  `main.ts` does not pass `prefer16`.
+- Draco decoders are in the bundle twice. Vite emits hashed copies of the
+  `three/examples` decoders (two `.wasm`, two wrappers, the JS decoder) in
+  addition to `public/assets/decoders/draco/`, which is the only copy
+  `PropLoader` uses.
+- `tools/build_landmarks.py` writes to a hardcoded
+  `/Users/vijay/submarine-explorer/...` path and has no argparse. Even
+  `--help` crashes on this machine.
+
+## Next
+
+Phase C:
+
+- C1: globe mission select.
+- C3: environment presets.
+- C4a–d: content packs for the other 12 landmarks, using the Titanic pack as
+  the template (README "How to add a landmark mission").
+- C5: settings and accessibility, which will also close the reduce-motion,
+  captions and rebind-UI gaps.
+- C6: CI and Pages deploy, including the attribution check and pruning the
+  unused tile variants from `dist/`.
+
+C2 is done. Phase D follows the Phase C playtest. The owner decides when to
+commit A + B + C2.

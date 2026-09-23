@@ -33,6 +33,7 @@ Run them with `npm test` and `npm run test:e2e`.
 | `Q` (or `Tab`) | sonar ping (A4 owns the sound)  | `ping`                            |
 | `G` (hold)     | scan beam (B1 owns the beam)    | `scan`                            |
 | `T`            | sim speed 1x / 2x / 3x          | `cycleSimSpeed`                   |
+| `J`            | field guide (B1)                | `toggleGuide`                     |
 
 Gamepads use the W3C standard mapping and take over the instant a stick moves:
 left stick throttle/yaw, right stick pitch, A/B ballast, RT boost, Y camera,
@@ -123,6 +124,16 @@ must not walk the boat through it.
 Pinned by `subFeel` A3/8 and the e2e "flying into the seabed" test, which also
 asserts the camera never ends up below the seabed.
 
+**Shallow water (QA-B #3).** Each tick resolves the seabed first and the
+surface last. The floor is `seabed + hullRadius + seabedClearance`; where
+that would be above the surface ceiling (`-hullRadius`, water under ~20 m) the
+clearance gives way first (`Submarine.floorFor`), so the boat stays submerged
+whenever the hull fits (`seabed + hullRadius ≤ -hullRadius`) and only sits
+aground at `seabed + hullRadius` when it cannot (a 6 m reef flat). The old
+order clamped to the surface and then pushed out, lifting the hull out of the
+sea. Pinned by `subFixS.test.ts`. The HUD reads `N m · SURFACED` at the
+surface ceiling or above it, never a positive depth.
+
 ### 9. Impacts are felt
 
 A 6 m/s head-on impact produces hull stress 1.0, which halves every 0.9 s and is
@@ -150,16 +161,33 @@ Pinned by `subFeel` A3/10 and A3/10b, and the e2e "crush depth" test.
 Tunables: `hullClass`, `hullClasses`, `crushWarnRatio`, `emergencyBlowAccel`,
 `emergencyBlowLockSeconds`.
 
+Free dive fits the lowest class rated for the tile's deepest cell plus
+`freeDiveHullMarginM` (docs/missions.md); in a mission the end of the blow
+opens the "Dive aborted" debrief.
+
+The SEABED PROXIMITY banner (QA-B #14) fires below `seabedWarnAltitudeM`
+(15 m; contact is at 12 m) unless a scan target is in range, or whenever the
+boat is under `seabedApproachAltitudeM` (60 m) and less than
+`seabedWarnTimeToContactS` (4 s) from contact at its sink rate.
+
 ## Sim speed
 
 `T` cycles the `simSpeeds` multiplier. It runs that many **whole** 60 Hz ticks
 per frame rather than scaling `dt`, so the integrator's step size — and
-therefore the handling — is bit-for-bit identical at 1×, 2× and 3×; only
+therefore the translation — is bit-for-bit identical at 1×, 2× and 3×; only
 wall-clock changes. That is what makes a 25 km tile crossable in a sitting while
 keeping the boat's real speed honest, and it is why the settings screen can
 label it "sim speed" rather than "make the sub faster".
 
-Pinned by `subFeel` A3/11 and the e2e script.
+**Turning is the exception (QA-B #15).** Running 3 ticks per frame also tripled
+the turn rate (~90°/s real at 3×), which made fine aiming at a wreck twitchy.
+By default (`simSpeedScalesTurnRate: false`) each tick divides the yaw and
+pitch stick by the multiplier, so the sustained turn rate stays at `yawRate`
+(~31°/s) of _real_ time at every sim speed; spin-up and coast are
+proportionally quicker. Set `simSpeedScalesTurnRate: true` for the Phase A
+behaviour. Bank still reaches `maxBankAngle` at full stick.
+
+Pinned by `subFeel` A3/11 (translation), `subFixS` (turn rate) and the e2e script.
 
 ## Camera
 
@@ -173,6 +201,16 @@ Three modes, one rig:
 - **orbit** (`P`) — a tripod on a sphere around the boat, no lag, driven by
   `rig.orbit(dAzimuth, dElevation, dRadius)`. This is the hook photo mode
   (Tier 3) will drive; leaving it returns you to whichever view you came from.
+
+**Scan-target framing (QA-B #6).** With a scan target in range
+(`CameraUpdateOptions.focus`, from `discovery.focusPoint()`), the chase camera
+slides `focusSideM` (38 m) toward the target's side and `focusRaiseM` (18 m)
+up, and aims `focusLookBlend` (35 %) of the way at the target, blended in and
+out with `focusHalfLife` (0.6 s); a side hysteresis keeps a target dead ahead
+from flipping it. The hull also carries a faint fresnel rim and an emissive
+floor (`hullRim*`, `hullEmissive`), so below 300 m it is no longer a pure
+black cut-out. Pinned by `subCameraFocus.test.ts` and the e2e bow test
+(`fix-s-bow-offset.png`).
 
 Look-ahead grows with speed (`lookAheadPerSpeed`), which is what makes speed
 legible in fog. The camera is lifted to stay `terrainClearance` metres above the

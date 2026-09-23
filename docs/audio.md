@@ -14,7 +14,7 @@ and raw WebAudio is simple enough here that a wrapper isn't worth it).
 can't be transcoded/shrunk to a safe size, and Freesound's real audio files
 require an authenticated API download (only preview URLs are guessable
 without one). NOAA PMEL's public-domain files (`bloop.wav`, `upsweep.wav`)
-*are* directly downloadable and were verified reachable, but they are
+_are_ directly downloadable and were verified reachable, but they are
 "monster sound" curiosities, not sonar pings or thruster loops, so using them
 for the actual gameplay cues would have meant fabricating fit that doesn't
 exist. Given the brief's explicit fallback ("ffmpeg may be absent; if so,
@@ -48,27 +48,28 @@ autoplay attempt and so no autoplay console error.
 
 ## Files
 
-| File                        | What it owns                                                             |
-| ---------------------------- | ------------------------------------------------------------------------- |
-| `src/audio/events.ts`        | `TerrainSampler` (structural, avoids importing world/sub), `CaptionBus`, `CaptionEvent`, `AudioFrameInput` |
-| `src/audio/AudioEngine.ts`   | The WebAudio graph: buses, shared depth low-pass, noise-buffer helper    |
-| `src/audio/Sonar.ts`         | `castSonarRay` -- pure ray-march + echo-delay maths, unit tested         |
-| `src/audio/DepthBands.ts`    | `bandWeights` -- pure ambient-band crossfade maths, unit tested          |
-| `src/audio/Cues.ts`          | One-shot synthesised sounds (ping, thud, creak, hiss, chime, alarm)      |
-| `src/audio/Loops.ts`         | Continuous sounds (`ThrusterLoop`, `AmbientBeds`)                        |
-| `src/audio/AudioSystem.ts`   | Facade: EventBus wiring, per-frame `update()`, `ping()`, captions        |
-| `src/audio/index.ts`         | Public re-exports                                                        |
+| File                       | What it owns                                                                                               |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `src/audio/events.ts`      | `TerrainSampler` (structural, avoids importing world/sub), `CaptionBus`, `CaptionEvent`, `AudioFrameInput` |
+| `src/audio/AudioEngine.ts` | The WebAudio graph: buses, shared depth low-pass, noise-buffer helper                                      |
+| `src/audio/Sonar.ts`       | `castSonarRay` -- pure ray-march + echo-delay maths, unit tested                                           |
+| `src/audio/DepthBands.ts`  | `bandWeights` -- pure ambient-band crossfade maths, unit tested                                            |
+| `src/audio/Cues.ts`        | One-shot synthesised sounds (ping, thud, creak, hiss, chime, scan tick, alarm)                             |
+| `src/audio/Loops.ts`       | Continuous sounds (`ThrusterLoop`, `AmbientBeds`)                                                          |
+| `src/audio/AudioSystem.ts` | Facade: EventBus wiring, per-frame `update()`, `ping()`, captions                                          |
+| `src/audio/index.ts`       | Public re-exports                                                                                          |
 
 ## Events used (and why no new ones were added to `EventBus`)
 
 Per CONTRIBUTING-AGENTS.md, `GameEvents` is a shared contract. This package
-only *subscribes*, using events other lanes already emit:
+only _subscribes_, using events other lanes already emit:
 
-| Event               | Payload                                     | What audio does with it                                   |
-| -------------------- | -------------------------------------------- | ------------------------------------------------------------ |
-| `sub:collided`       | `{ depth, speed }`                          | Collision thud, gain scaled by impact speed                 |
-| `sub:hullStress`     | `{ stress, cause: 'impact' \| 'pressure', depth }` | `cause: 'pressure'` plays a hull creak (rate limited, see below); `cause: 'impact'` is skipped since `sub:collided` already covers that moment |
-| `sub:emergencyBlow`  | `{ depth, lockSeconds }`                    | Klaxon alarm cue + caption                                   |
+| Event               | Payload                                            | What audio does with it                                                                                                                        |
+| ------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sub:collided`      | `{ depth, speed }`                                 | Collision thud, gain scaled by impact speed                                                                                                    |
+| `sub:hullStress`    | `{ stress, cause: 'impact' \| 'pressure', depth }` | `cause: 'pressure'` plays a hull creak (rate limited, see below); `cause: 'impact'` is skipped since `sub:collided` already covers that moment |
+| `sub:emergencyBlow` | `{ depth, lockSeconds }`                           | Klaxon alarm cue + caption                                                                                                                     |
+| `scan:complete`     | `{ poiId, landmarkId, firstTime }`                 | Discovery chime when `firstTime`, otherwise a quiet tick; both with a caption (see "Discovery chime")                                          |
 
 Creak repeat rate is throttled by `Config.audio.hullCreakMinGapS` /
 `hullCreakMaxGapS`, interpolated by `stress` (0..1): ~2.5 s apart near the
@@ -77,14 +78,14 @@ audibly accelerate as the hull nears failure.
 
 Two things genuinely didn't exist anywhere yet and are defined in
 `src/audio/events.ts` rather than in `EventBus.ts`, precisely because they
-are *not* shared-bus material:
+are _not_ shared-bus material:
 
 - **Continuous per-frame state** (depth, throttle, ballast, position,
   forward, `pingPressed`) -- broadcasting this every frame as bus events
   would be spam. Instead it is pushed once per frame via
-  `AudioSystem.update(frame: AudioFrameInput)`, called from the small
-  additive hook added to `src/main.ts`'s render loop (right after
-  `sonar.update(s)`).
+  `AudioSystem.update(frame: AudioFrameInput)`, called once per frame from
+  `src/main.ts`'s loop (after the HUD/sonar, discovery, mission and props
+  updates, before `terrain.update`).
 - **Captions**, via `AudioSystem.captions` (a `CaptionBus`). Every cue this
   system plays also emits a `CaptionEvent { id, text, durationS }` on it.
   This is for the accessibility package (C5): subscribe to
@@ -138,11 +139,19 @@ since ballast is usually held only briefly.
 
 ## Discovery chime
 
-`AudioSystem.playDiscoveryChime()` plays a bright C-E-G arpeggio. B1's
-`DiscoveryStore` (a later package) doesn't exist yet, so nothing calls this
-automatically; call it directly once a discovery fires, e.g.
-`window.__game.audio.playDiscoveryChime()` from the console today, or a real
-call from B1's scan-complete handler once that lands.
+`AudioSystem` subscribes to B1's `scan:complete { poiId, landmarkId, firstTime }`:
+
+- `firstTime: true` plays `playDiscoveryChime()`, a bright C-E-G arpeggio, with
+  caption `discovery` ("New discovery logged").
+- `firstTime: false` (a re-scan of something already catalogued) plays
+  `playScanTick()`, a single quiet C6 tick, with caption `scan-repeat`.
+
+Like every bus cue, both play only after the first user gesture has unlocked audio.
+Unit test: `tests/unit/audio.test.ts` ("scan:complete cues").
+
+`env:depthBand` is deliberately not subscribed: the ambient beds already
+crossfade continuously from `frame.depth` every frame (`AmbientBeds.update`,
+`bandWeights`), which is smoother than switching on a band event.
 
 ## Manual test checklist
 
@@ -159,8 +168,10 @@ call from B1's scan-complete handler once that lands.
 5. Press `Space`/`Shift` (ballast): hear a short hiss on each direction
    change, not a continuous drone.
 6. Drive into the seabed at speed: a low thud plays, louder for harder hits.
-7. Approach crush depth (or lower `Config.submarine.crushDepth` for testing):
-   hull creaks start and audibly speed up as depth approaches the limit.
+7. Approach crush depth (for testing, fit a shallower hull: `hullClass: 'A'`
+   is 1,000 m; `Config.submarine.crushDepth` alone is ignored while the fitted
+   class exists in `hullClasses`): hull creaks start and audibly speed up as
+   depth approaches the limit.
 8. Force an emergency blow (100% crush ratio): klaxon alarm plays once.
 9. Confirm zero WAV/OGG files under `public/audio/` -- everything above is
    synthesised, so there is nothing to attribute for size or licensing.

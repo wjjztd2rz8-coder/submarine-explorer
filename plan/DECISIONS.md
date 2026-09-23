@@ -2,20 +2,20 @@
 
 Answers given by the owner to `plan/OPEN-QUESTIONS.md`. Where an item is not listed here, the default in OPEN-QUESTIONS.md stands. Subagents: treat this file as authoritative.
 
-| Topic | Decision |
-|---|---|
-| Engine | Web: Vite + TypeScript + Three.js (default) |
-| Tone | Serene, educational exploration; mild darkness/pressure tension; no combat, no horror |
-| Player craft | Crewed research submersible (Alvin / Limiting Factor class); ROV deployable later |
-| Fabrication | Placed 3D props at real coordinates, marked "artist's reconstruction" in the field guide |
-| Failure model | Soft: crush depth triggers emergency ascent + restart; collisions cost hull integrity but never kill |
-| Sub speed | 2–3x real speed with a visible "simulation speed" setting |
-| Audience | Teens and adults, classroom-usable; memorial/war-grave sites included respectfully, memorial note, no loot/salvage mechanics |
-| Commercial | Public, non-commercial, open source. Attribution-only data; CC0/CC-BY assets; NC-licensed sources acceptable if attributed |
-| Art style | Realistic-leaning: real colours, PBR materials, restrained post-processing |
-| Assets & music | Free assets only; procedural where none exist; generative ambient music via WebAudio; no paid assets |
-| Hosting | Public GitHub repo + GitHub Pages; MIT code, CC-BY-SA 4.0 content; working title "Submarine Explorer" |
+| Topic               | Decision                                                                                                                                                                                                                                                                           |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Engine              | Web: Vite + TypeScript + Three.js (default)                                                                                                                                                                                                                                        |
+| Tone                | Serene, educational exploration; mild darkness/pressure tension; no combat, no horror                                                                                                                                                                                              |
+| Player craft        | Crewed research submersible (Alvin / Limiting Factor class); ROV deployable later                                                                                                                                                                                                  |
+| Fabrication         | Placed 3D props at real coordinates, marked "artist's reconstruction" in the field guide                                                                                                                                                                                           |
+| Failure model       | Soft: crush depth triggers emergency ascent + restart; collisions cost hull integrity but never kill                                                                                                                                                                               |
+| Sub speed           | 2–3x real speed with a visible "simulation speed" setting                                                                                                                                                                                                                          |
+| Audience            | Teens and adults, classroom-usable; memorial/war-grave sites included respectfully, memorial note, no loot/salvage mechanics                                                                                                                                                       |
+| Commercial          | Public, non-commercial, open source. Attribution-only data; CC0/CC-BY assets; NC-licensed sources acceptable if attributed                                                                                                                                                         |
+| Art style           | Realistic-leaning: real colours, PBR materials, restrained post-processing                                                                                                                                                                                                         |
+| Assets & music      | Free assets only; procedural where none exist; generative ambient music via WebAudio; no paid assets                                                                                                                                                                               |
+| Hosting             | Public GitHub repo + GitHub Pages; MIT code, CC-BY-SA 4.0 content; working title "Submarine Explorer"                                                                                                                                                                              |
 | **Hardware target** | **Two targets: (1) this Mac must hold 60 fps at 1080p; (2) a Linux desktop with an AMD Radeon 9600 XT (discrete GPU) is the "high" tier. Build a graphics-tier setting (low/medium/high) and make the Mac the medium-tier 60 fps floor. Test in Chromium on both where possible.** |
-| Agent budget | Moderate: 5–10 Opus/Sonnet sessions per week; 3–4 packages in parallel |
-| Tier-2 landmarks | Proposed list accepted: Titanic, Challenger Deep, Lost City, Monterey Canyon, Endurance, Axial Seamount, Hudson Canyon, Kamaʻehuakanaloa, Beebe vents, Great Blue Hole, Bismarck, Hunga Tonga caldera, Blake Plateau coral mounds |
-| Review gate | None requested before Phase B; owner reviews at end of each phase |
+| Agent budget        | Moderate: 5–10 Opus/Sonnet sessions per week; 3–4 packages in parallel                                                                                                                                                                                                             |
+| Tier-2 landmarks    | Proposed list accepted: Titanic, Challenger Deep, Lost City, Monterey Canyon, Endurance, Axial Seamount, Hudson Canyon, Kamaʻehuakanaloa, Beebe vents, Great Blue Hole, Bismarck, Hunga Tonga caldera, Blake Plateau coral mounds                                                  |
+| Review gate         | None requested before Phase B; owner reviews at end of each phase                                                                                                                                                                                                                  |

@@ -7,7 +7,7 @@ How to use: pick a package, paste the "Common preamble" followed by the package 
 ## Common preamble (paste at the top of every brief)
 
 ```
-You are working on Submarine Explorer, a browser game (Vite + TypeScript strict + Three.js, vitest, Playwright) that renders real ocean-floor bathymetry and lets players pilot a research submersible to real landmarks. Repo: /Users/vijay/submarine-explorer.
+You are working on Submarine Explorer, a browser game (Vite + TypeScript strict + Three.js, vitest, Playwright) that renders real ocean-floor bathymetry and lets players pilot a research submersible to real landmarks. Repo: /home/vijay/submarine-explorer.
 
 Before writing code read, in order: README.md, CONTRIBUTING-AGENTS.md, docs/architecture.md, docs/tile-format.md, and plan/MASTER-PLAN.md sections 1–5. Respect the design pillars (real data, depth is felt, discovery is the reward, learn by doing, runs in a browser).
 
@@ -97,11 +97,15 @@ Deliver: palette per depth band (hex values), fog/lighting reference images (pub
 
 ### B1 · Scan, discovery, field guide, debrief (Opus)
 
+> **Shipped 2026-09-22** — `docs/discovery.md`. Scan key is G (not F); contracts: `plan/PHASE-B-CONTRACTS.md`.
+
 OWNS: `src/game/` (new: `Scanner.ts`, `DiscoveryStore.ts`, `Objectives.ts`), `src/ui/FieldGuide.ts`, `src/ui/Debrief.ts`, `tests/unit/game*.test.ts`, `tests/e2e/discovery.spec.ts`.
 
 Deliver: scan beam (hold F while within range and facing the POI; 3–5 s progress ring; interrupted if you look away), POI definition schema (`data/landmarks/<id>/pois.json`: id, name, lat, lon, depth, radius, kind, guide_entry), `DiscoveryStore` in localStorage with schema version + migration, field-guide overlay (DOM; entries with title, image, text, sources, "reconstruction" badge when applicable), debrief screen (distance, max depth, time, discoveries, "new entries"). e2e test: load Titanic, teleport near bow POI via debug param, scan, reload, assert persisted.
 
 ### B2 · Titanic site content (Sonnet)
+
+> **Shipped 2026-09-22** — `data/landmarks/titanic/` (`guide.json` rather than `guide.md`; also `mission.json`), sources in `sources.md`.
 
 OWNS: `data/landmarks/titanic/*` (`pois.json`, `props.json`, `guide.md`, `sources.md`).
 
@@ -109,11 +113,15 @@ Deliver: bow and stern positions (~600 m apart, stern ~ south-east of bow; verif
 
 ### B3 · Mission flow (Sonnet)
 
+> **Shipped 2026-09-22** — `docs/missions.md`. Missions start at 3× sim speed to meet the 10-minute budget.
+
 OWNS: `src/game/Mission.ts`, `src/game/MissionRouter.ts`, `src/ui/Briefing.ts`, `src/ui/MissionSelect.ts` (extend), `tests/e2e/mission.spec.ts`.
 
 Deliver: `?mission=<landmark-id>` router loading tile + POIs + props; briefing card (facts, depth, hazards, controls reminder); surface spawn and descent; objectives HUD; completion condition (primary POI scanned) → debrief → back to select; restart. Playable start to finish in under 10 minutes at 2× sim speed.
 
 ### B4 · Prop pipeline (Opus)
+
+> **Shipped 2026-09-22** — `docs/props.md`. No CC0 wreck GLB was found; `procedural:hull-block` stands in.
 
 OWNS: `src/world/Props.ts`, `src/world/PropLoader.ts`, `tools/validate_props.py`, `docs/props.md`, `public/assets/models/*`.
 
@@ -129,7 +137,9 @@ OWNS: `src/ui/Globe.ts`, `src/ui/MissionSelect.ts`, `public/assets/globe/*`. Nat
 
 ### C2 · Tile batch fetch and compression (Sonnet)
 
-OWNS: `tools/fetch_all.py`, `tools/compress_tiles.py`, `data/tiles/*` (new tiles), `docs/tiles-inventory.md`. Fetch tiles for the Tier-2 landmark list (see `docs/landmarks.md` proposal; owner may override), choose per-landmark resolution to keep each ≤ 8 MB, generate `index.json`, add optional 16-bit quantised variant + brotli, report total size. Respect GMRT rate limits (sleep between requests; cache raw `.asc` in gitignored `data/raw/`).
+> **Shipped 2026-09-22 (early, with Phase B)** — `docs/tiles-inventory.md`, `docs/tile-format.md`. No `.br` yet (brotli CLI absent).
+
+OWNS: `tools/fetch_all.py`, `tools/compress_tiles.py`, `data/tiles/*` (new tiles), `docs/tiles-inventory.md`. Fetch tiles for the Tier-2 landmark list (see `docs/landmarks.md` proposal; owner may override), choose per-landmark resolution to keep each ≤ 8 MB, generate `index.json`, add optional 16-bit quantised variant + brotli, report total size. Respect GMRT rate limits (sleep between requests; cache raw `.asc` in gitignored `.cache/gmrt-raw/`).
 
 ### C3 · Environment presets by landmark type (Opus)
 

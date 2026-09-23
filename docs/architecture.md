@@ -1,16 +1,19 @@
 # Architecture
 
 Submarine Explorer renders **real ocean-floor bathymetry** from the GMRT
-synthesis as a navigable 3D world. There are two halves that meet at one
-documented interface:
+synthesis as a navigable 3D world, with scan-and-discover missions on top.
+There are three parts that meet at documented interfaces:
 
 1. an **offline Python pipeline** (`tools/`) that downloads bathymetry and
-   writes tiles, and
-2. a **browser engine** (`src/`) that loads tiles and simulates a submarine.
+   writes tiles,
+2. **content packs** (`data/landmarks.json`, `data/landmarks/<id>/`): JSON that
+   places POIs, props, field-guide text and missions on a tile, and
+3. a **browser engine** (`src/`) that loads both and simulates a submarine.
 
-The interface between them is the tile format — see
-[`docs/tile-format.md`](./tile-format.md). Neither half knows anything else
-about the other.
+The pipeline/engine interface is the tile format —
+[`docs/tile-format.md`](./tile-format.md). The content schemas are in
+[`plan/PHASE-B-CONTRACTS.md`](../plan/PHASE-B-CONTRACTS.md) §2. Neither the
+pipeline nor the content knows anything else about the engine.
 
 ## Module diagram
 
@@ -18,47 +21,88 @@ about the other.
 flowchart TD
   subgraph pipeline["Offline pipeline (Python 3.9, stdlib only)"]
     GMRT[("GMRT GridServer\nESRI ASCII")]
+    ETOPO[("ETOPO 2022 via ERDDAP\nfallback")]
+    CACHE[(".cache/gmrt-raw/\n(gitignored)")]
+    FA["tools/fetch_all.py\nTier-2 batch: plan, probe, retry"]
     FT["tools/fetch_tile.py"]
     EA["tools/esri_ascii.py\nparse + NODATA fill"]
     TW["tools/tile_writer.py\nmeta + float32 + index"]
+    CT["tools/compress_tiles.py\n.gz / .br / heightmap16.bin"]
     MS["tools/make_synthetic_tile.py"]
     IT["tools/inspect_tile.py"]
+    VP["tools/validate_props.py"]
+    GMRT --> FA
+    ETOPO -.-> FA
+    FA <--> CACHE
+    FA --> FT
     GMRT --> FT --> EA --> TW
     MS --> TW
     TW --> DISK
+    DISK --> CT --> DISK
     DISK --> IT
   end
 
-  DISK[("data/tiles/&lt;id&gt;/\nmeta.json + heightmap.bin\ndata/tiles/index.json")]
+  DISK[("data/tiles/&lt;id&gt;/\nmeta.json, heightmap.bin, heightmap16.bin\ndata/tiles/index.json")]
   LM[("data/landmarks.json")]
+  PACK[("data/landmarks/&lt;id&gt;/\nmission, pois, guide, props\ndata/landmarks/index.json")]
+  GLB[("public/assets/models/*.glb\npublic/assets/decoders/draco/")]
+  PACK --> VP
 
   subgraph engine["Browser engine (TypeScript + Three.js)"]
-    MAIN["main.ts\nbootstrap + fixed-step loop"]
+    MAIN["main.ts\nbootstrap + frame loop"]
 
     subgraph core["core/"]
       TIME["Time\n60 Hz accumulator"]
-      INPUT["Input\nkeyboard / mouse / gamepad"]
-      BUS["EventBus"]
+      INPUT["Input\naction map, keyboard / mouse / gamepad"]
+      BUS["EventBus\ntyped GameEvents"]
       CFG["Config\nall tuning constants"]
     end
 
     subgraph world["world/"]
       TL["TileLoader\nfetch + validate + decode"]
-      TER["Terrain\nchunked mesh, sampleHeight, getNormal"]
-      WAT["Water\nsurface, depth fog, lights"]
+      TER["Terrain / TerrainChunk / TerrainNoise / TerrainMaterial\nchunks, detail, LOD, sampleHeight"]
+      WAT["Water\nsurface lid"]
       LMK["Landmarks\nmarkers + labels"]
+      PROPS["Props + PropLoader\nplacement, LOD/impostor, collide()"]
+      PSUB["props/\nProcedural, Collision, Wiring, PlacementDebug"]
+    end
+
+    subgraph render["render/"]
+      ATM["Atmosphere\ndepth bands, fog, lights, caustics"]
+      HL["Headlights"]
+      SNOW["MarineSnow"]
+    end
+
+    subgraph game["game/"]
+      CP["ContentPath"]
+      POI["Pois / Guide"]
+      SCAN["Scanner"]
+      DS["DiscoveryStore\nlocalStorage v1"]
+      OBJ["Objectives + SessionStats"]
+      DISC["Discovery\nwires scan, guide, debrief"]
+      MIS["Mission\nmanifest + state machine"]
+      MR["MissionRouter\n?mission=, loadout, nav"]
     end
 
     subgraph sub["sub/"]
-      PHY["Submarine\narcade 6-DOF-ish physics"]
+      PHY["Submarine\narcade physics, hull stress, crush"]
       SM["SubMesh\nprocedural placeholder hull"]
-      CAM["CameraRig\nchase / first-person"]
+      CAM["CameraRig\nchase / first-person / orbit"]
     end
 
-    subgraph ui["ui/"]
-      HUD["HUD (DOM)"]
+    subgraph audio["audio/"]
+      AUD["AudioSystem\nengine, sonar echo, beds, cues"]
+    end
+
+    subgraph ui["ui/ (DOM overlays)"]
+      HUD["HUD"]
       SON["Sonar (2D canvas)"]
-      MSEL["MissionSelect (DOM)"]
+      MSEL["MissionSelect"]
+      SO["ScanOverlay"]
+      FG["FieldGuide"]
+      DB["Debrief"]
+      BR["Briefing"]
+      OP["ObjectivesPanel"]
     end
 
     SHD["shaders/underwater.ts\nfull-screen post pass"]
@@ -67,46 +111,101 @@ flowchart TD
 
   DISK --> TL --> TER
   LM --> LMK
+  PACK --> CP
+  CP --> POI & PROPS & MIS
+  GLB --> PROPS
+  PROPS --> PSUB
   MAIN --> TIME & INPUT & CFG
-  TER --> PHY
-  TER --> SON
-  TER --> LMK
+  TER --> PHY & SON & LMK & PROPS & CAM & AUD & DISC
+  PSUB --> PHY
   PHY --> CAM & HUD & SON & SM
-  WAT --> MAIN
-  SHD --> MAIN
-  GEO --> TER & HUD & LMK
-  BUS -.-> MAIN
+  POI --> DISC
+  SCAN & DS & OBJ --> DISC
+  DISC --> SO & FG & DB
+  MR --> MIS
+  MR --> BR & OP & DB
+  MR --> DISC
+  ATM --> SHD
+  GEO --> TER & HUD & LMK & POI & PROPS & MR
+  BUS -.-> AUD & DISC & MIS & MR & ATM
 ```
+
+Solid arrows are construction-time dependencies or per-frame data; dashed
+arrows are EventBus traffic. `Submarine` depends only on the narrow
+`HeightField` interface, and props reach it through `PropContact`
+(`world/props/Wiring.ts`), not by import.
 
 ## Data flow
 
 **Build a tile (offline, once per dive site).**
 `fetch_tile.py` probes the GMRT metadata endpoint for the grid size, applies the
 4M-cell guard, downloads ESRI ASCII, parses it, fills NODATA, and writes
-`heightmap.bin` + `meta.json` + a refreshed `index.json`.
+`heightmap.bin` + `meta.json` + a refreshed `index.json`. `fetch_all.py` does
+this for every Tier-2 landmark: it plans the bbox from `data/landmarks.json`,
+picks the finest resolution under 8 MB / 1500 cells a side, caches raw
+responses in `.cache/gmrt-raw/`, retries with backoff and falls back to ETOPO.
+`compress_tiles.py` then writes `.gz` (and `.br` when the CLI exists) and, with
+`--quant16`, `heightmap16.bin` + the `quant_*` meta keys. See
+[`docs/tiles-inventory.md`](./tiles-inventory.md).
 
-**Boot (per page load).**
-`main.ts` reads `?tile=<id>` (falling back to the first entry of `index.json`),
-`TileLoader` fetches and validates the pair, `Terrain` meshes it, `Water`
-installs fog and lights, `Landmarks` overlays any markers inside the bbox, and
-the submarine spawns 90 m above the seabed at the tile centre.
+**Boot (per page load, `main.ts`).**
 
-**Per frame.**
+1. In parallel: `TileLoader.loadIndex()` and `resolveMissionRoute(params)`
+   (fetches `data/landmarks/<id>/mission.json` for `?mission=`).
+2. `chooseTileId`: the mission's tile, else `?tile=`, else
+   `Config.defaultTileId` (`titanic`) if indexed, else the first indexed tile.
+3. `TileLoader.load` → `tile:loaded` (or `tile:error` + a fatal overlay).
+4. `Terrain` meshes the tile → `terrain:built`. `Atmosphere`, `Headlights`,
+   `MarineSnow`, `Water` install lighting and effects. `Landmarks` loads
+   `data/landmarks.json` asynchronously → `landmarks:loaded`.
+5. `Submarine` spawns 90 m above the seabed at the tile centre (or at `?depth=`),
+   then `applyMissionLoadout` (hull class, sim speed, surface spawn) if a
+   mission is routed.
+6. `SubMesh`, `CameraRig`, `HUD`, `Sonar`.
+7. `Discovery` loads `pois.json` + `guide.json` for the content folder
+   (mission landmark, else `?landmark=`, else the tile id); `?poi=` re-spawns the
+   sub next to a POI once they load.
+8. `Props` loads `props.json` asynchronously → `props:loaded`; `?at=` re-spawns
+   the sub; `PropContact` is created; `?debugProps=1` adds `PlacementDebug`.
+9. `MissionSelect` lists tiles and (via `loadMissionSummaries`) missions.
+10. `Input`, then `MissionRouter` (briefing, objectives, completion) if routed.
+11. `AudioSystem` (unlocked by the first pointerdown/keydown), `UnderwaterPass`.
+12. `window.__game` is populated and the first frame is requested.
+
+Every content loader treats a missing or malformed file as "none" and never
+throws at boot.
+
+**Per frame (`frame()` in `main.ts`, in order).**
 
 ```
 requestAnimationFrame
-  └─ Input.sample()                      normalise keyboard/mouse/gamepad
-  └─ Time.tick(now) -> N                 how many 60 Hz steps are owed
-  └─ N x Submarine.step(input, 1/60)     deterministic physics
-  └─ Submarine.getState()                snapshot for the UI
-  └─ SubMesh / CameraRig / Water.update  presentation, using the REAL frame delta
-  └─ HUD.update / Sonar.update           DOM + 2D canvas
-  └─ render scene -> WebGLRenderTarget
-  └─ UnderwaterPass -> screen
-  └─ Input.endFrame()                    clear edge-triggered state
+  └─ Input.sample()                          normalise keyboard/mouse/gamepad
+  └─ Time.tick(now) -> N                     60 Hz steps owed (max 8)
+  └─ MissionRouter.frozen?                   briefing up: N = 0, FROZEN_INPUT
+  └─ N x Submarine.step(input, 1/60)         each runs simSpeed (1-3) fixed sub-steps
+  └─ PropContact.resolve(sub, dt)            push the hull out of prop colliders
+  └─ edge actions                            camera, photo mode, sonar, lights, sim speed
+  └─ Submarine.getState()                    snapshot; emits sub:collided, sub:crushWarning,
+                                             sub:hullStress, sub:emergencyBlow
+  └─ SubMesh / CameraRig                     presentation, using the REAL frame delta
+  └─ Atmosphere.update -> Headlights /       depth band (env:depthBand), fog, lights
+     MarineSnow / Water.update
+  └─ HUD.update / Sonar.update               DOM + 2D canvas
+  └─ Discovery.update(N/60, dt, ...)         scan beam, field guide (J), overlays
+  └─ MissionRouter.update(N/60, dt, ...)     objectives panel, nav line, completion
+  └─ Props.update(camera)                    per-prop full / impostor / hidden
+  └─ AudioSystem.update(frame)               depth low-pass, thruster, beds, ping
+  └─ Terrain.update(camera)                  chunk LOD + draw-call accounting
+  └─ render scene -> WebGLRenderTarget       (low tier: straight to screen)
+  └─ UnderwaterPass -> screen                band grade tint + vignette
+  └─ Input.endFrame()                        clear edge-triggered state
+  └─ first frame only: window.__gameReady = true, game:ready
 ```
 
-Physics is fixed-step so behaviour does not change with frame rate; everything
+Physics is fixed-step so behaviour does not change with frame rate; sim speed
+runs more whole sub-steps inside `Submarine.step` rather than a larger `dt`.
+Scan progress and the mission clock take `N/60` seconds: frame-rate independent,
+zero while the briefing freezes the game, and not multiplied by sim speed. Everything
 visual uses the variable frame delta, and camera smoothing is expressed as a
 half-life so it feels identical at 30 and 144 fps.
 
@@ -126,50 +225,114 @@ row order (row 0 = north edge) maps directly onto increasing Z with no flip
 anywhere in the engine. Every module depends on this; `src/util/geo.ts` is the
 single place the conversion lives, and `tests/unit/geo.test.ts` pins it down.
 
-Depths are always **negative metres**. The HUD shows `Math.abs(depth)` because
-crews say "three thousand metres", not "minus three thousand".
+Depths in the engine are always **negative metres**. Depths in content files
+(`depth_m` in `data/landmarks.json` and `data/landmarks/<id>/*.json`) are
+**positive magnitudes**; loaders convert with `y = -depth_m`. The HUD shows
+`Math.abs(depth)` because crews say "three thousand metres", not "minus three
+thousand". Content `heading_deg` is a compass heading (0 = north, 90 = east),
+the same as the sub's yaw.
+
+## EventBus
+
+`GameEvents` in `src/core/EventBus.ts` is the complete list. Add events there;
+never repurpose one.
+
+| Event               | Payload                                                | Emitted by                                   |
+| ------------------- | ------------------------------------------------------ | -------------------------------------------- |
+| `tile:loaded`       | `{ meta: TileMeta }`                                   | `main.ts` after `TileLoader.load`            |
+| `tile:error`        | `{ id, error }`                                        | `main.ts` on a failed load                   |
+| `terrain:built`     | `{ chunks, vertices }`                                 | `main.ts` after `Terrain` construction       |
+| `landmarks:loaded`  | `{ landmarks: Landmark[] }`                            | `main.ts` when any landmark is placed        |
+| `sub:collided`      | `{ depth, speed }`                                     | `main.ts` (seabed); `PropContact` (props)    |
+| `sub:crushWarning`  | `{ depth, ratio }`                                     | `main.ts`, every frame past the warn ratio   |
+| `sub:hullStress`    | `{ stress, cause: 'impact' \| 'pressure', depth }`     | `main.ts`, on a change above threshold       |
+| `sub:emergencyBlow` | `{ depth, lockSeconds }`                               | `main.ts`, once per blow                     |
+| `sub:simSpeed`      | `{ multiplier }`                                       | `main.ts` on `T`                             |
+| `env:depthBand`     | `{ band, previous, depth }`                            | `Atmosphere.update` on a band change         |
+| `scan:started`      | `{ poiId }`                                            | `Scanner`                                    |
+| `scan:progress`     | `{ poiId, progress }` (0..1, ≤ 10 Hz)                  | `Scanner`                                    |
+| `scan:aborted`      | `{ poiId, reason: 'range' \| 'facing' \| 'released' }` | `Scanner`                                    |
+| `scan:complete`     | `{ poiId, landmarkId, firstTime }`                     | `Scanner`                                    |
+| `guide:opened`      | `{ entryId }`                                          | `FieldGuide` when an unlocked entry is shown |
+| `mission:started`   | `{ missionId, tileId }`                                | `Mission` on Begin dive                      |
+| `mission:objective` | `{ missionId, objectiveId, complete }`                 | `Mission`                                    |
+| `mission:complete`  | `{ missionId, durationS }`                             | `Mission` after `completeDelayS`             |
+| `mission:restart`   | `{ missionId }`                                        | `Mission.restart()` (debrief Dive again)     |
+| `mission:aborted`   | `{ missionId, reason: 'crush' }`                       | `MissionRouter` when an emergency blow ends  |
+| `props:loaded`      | `{ landmarkId, count, models, procedural }`            | `main.ts` when `Props.load` resolves         |
+| `game:ready`        | `{ tileId }`                                           | `main.ts`, first presented frame             |
+| `ui:selectTile`     | `{ id }`                                               | declared, not emitted or handled yet         |
+
+Current subscribers: `AudioSystem` (`sub:collided`, `sub:hullStress`,
+`sub:emergencyBlow`), `Discovery` (`scan:complete`, `landmarks:loaded`),
+`Mission` (`scan:complete`), `MissionRouter` (`sub:simSpeed`). Nothing
+subscribes to `env:depthBand` yet (the audio beds compute their own band
+weights from depth), and nothing plays the discovery chime on `scan:complete`.
+
+Audio captions use a separate `CaptionBus` (`AudioSystem.captions`), not the
+EventBus; see [`docs/audio.md`](./audio.md).
+
+## Persistence
+
+| localStorage key             | Owner                    | Shape                                                              |
+| ---------------------------- | ------------------------ | ------------------------------------------------------------------ |
+| `subexplorer.bindings.v1`    | `core/Input.ts`          | versioned key bindings                                             |
+| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }` |
+
+Both are versioned, guarded (no storage → in-memory), and never throw.
 
 ## Performance budget
 
-Target: **60 fps at 1080p on integrated graphics**, for tiles up to **4M cells**
-(the pipeline's hard guard).
+Target (`plan/DECISIONS.md`): **60 fps at 1080p** on the medium tier (the
+owner's Mac) and a "high" tier for a discrete-GPU Linux desktop, selected with
+`?tier=low|medium|high`.
 
-| Cost             | Approach                                                                                                                    | Budget                                      |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| Terrain vertices | one `BufferGeometry` per 128x128-cell chunk; adjacent chunks share their boundary row/column so seams stay watertight       | <= 4M vertices, ~16 k per chunk             |
-| Draw calls       | one per chunk, all sharing a single `MeshStandardMaterial`; `frustumCulled` is on, so only the chunks in view are submitted | ~250 chunks worst case, typically <30 drawn |
-| Mesh build       | once at load, on the main thread; ~500x500 cells takes a few tens of ms                                                     | < 400 ms for 4M cells                       |
-| Physics          | fixed 60 Hz, at most 8 steps per frame, pure scalar maths, zero allocation in `step()`                                      | < 0.1 ms/frame                              |
-| HUD              | DOM writes guarded by a value cache, so an unchanged field costs nothing                                                    | < 0.1 ms/frame                              |
-| Sonar            | bathymetry rasterised **once** into an offscreen canvas; per frame it is one `drawImage` plus a few paths                   | < 0.3 ms/frame                              |
-| Post-process     | single full-screen pass into one `WebGLRenderTarget`                                                                        | 1 extra full-screen fill                    |
+| Cost             | Approach                                                                                                                                                                                                             | Notes                                                                                               |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Terrain vertices | one `BufferGeometry` per 64×64-source-cell chunk, sampled at the tier's `detailSubdiv` (1/2/3) vertices per cell, plus a perimeter skirt                                                                             | 129×129 vertices per chunk at medium, 193×193 at high                                               |
+| Terrain LOD      | three index buffers per chunk (stride 1/2/4) over the one vertex buffer, picked by camera distance (`lodDistancesM` 1400/4200 m × tier `lodDistanceScale`); skirts hide LOD cracks                                   | see [`docs/terrain.md`](./terrain.md)                                                               |
+| Draw calls       | one per visible chunk, all sharing one patched `MeshStandardMaterial`; Three frustum-culls per chunk                                                                                                                 | 81 chunks on `titanic`, 130 on `monterey-canyon`, 361 on `blake-plateau-corals`                     |
+| Props            | full mesh inside `lod_distance_m` (default 900 m); impostor (box silhouette / 8-piece debris / cone) out to `max(cullDistanceM 2500, lod × 1.5)`; hidden beyond or outside the frustum                               | hull blocks merge to one draw call; debris is two `InstancedMesh`es ([`docs/props.md`](./props.md)) |
+| Mesh build       | once at load, on the main thread                                                                                                                                                                                     | no worker yet                                                                                       |
+| Tile download    | loader reads float32 `heightmap.bin`; `heightmap16.bin` (half size) only with `new TileLoader(root, fetch, { prefer16: true })`, which `main.ts` does not use; `.gz`/`.br` for hosts that serve pre-compressed files | 1.2 MB (`titanic`) to 5.8 MB (`blake-plateau-corals`) float32                                       |
+| Physics          | fixed 60 Hz, at most 8 steps per frame, pure scalar maths, zero allocation in `step()`                                                                                                                               | < 0.1 ms/frame                                                                                      |
+| HUD / overlays   | DOM writes guarded by a value cache, so an unchanged field costs nothing                                                                                                                                             | < 0.1 ms/frame                                                                                      |
+| Sonar            | bathymetry rasterised **once** into an offscreen canvas at the tile's aspect; per frame it is one `drawImage` plus a few paths                                                                                       | < 0.3 ms/frame                                                                                      |
+| Post-process     | single full-screen pass into one `WebGLRenderTarget`; skipped on the low tier                                                                                                                                        | 1 extra full-screen fill                                                                            |
 
-The two current tiles (548x546 and 820x638) are around 0.3–0.5M cells and draw
-in 25 and 42 chunks respectively.
+Chunk counts follow from `ceil((cols-1)/64) × ceil((rows-1)/64)` and do not
+depend on the tier. Resident vertices do: the largest tile
+(`blake-plateau-corals`, 1202×1201) is roughly 6M vertices at medium and 13M at
+high, above the master plan's 4M budget. No fps figure has been recorded for
+the medium tier yet (plan/QA-A.md #4).
 
-**Future LOD plan** (not implemented). The chunk grid exists precisely to make
-this cheap to add later:
-
-1. Build 2–3 decimated index buffers per chunk (stride 1, 2, 4) sharing the one
-   vertex buffer, and pick by camera distance. Stitch seams with skirts rather
-   than by matching edge resolution.
-2. Move the mesh build into a Web Worker and stream chunks in by distance, so a
-   4M-cell tile has no load-time hitch.
-3. Replace the per-vertex colour with a depth-ramp lookup in a fragment shader,
-   which removes the colour attribute (a third of the vertex bandwidth) and lets
-   the ramp be changed at runtime.
+Not implemented: streaming chunks from a Web Worker, neighbouring-tile
+streaming (Tier 4), and a draw-call or vertex cap enforced from Config.
 
 ## Extension points
 
-| I want to...                          | Do this                                                                                                                                                                                                         |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Add a dive site                       | run `tools/fetch_tile.py`; `index.json` and the mission list pick it up automatically                                                                                                                           |
-| Add a landmark                        | add it to `data/landmarks.json`; `Landmarks` places anything with a `lat`/`lon` inside the tile bbox                                                                                                            |
-| Retune handling, fog, colours, camera | `src/core/Config.ts` — every constant in the game lives there                                                                                                                                                   |
-| Swap the placeholder hull for a model | replace the `SubMesh` construction in `main.ts` with a `GLTFLoader` result; the rig only needs an `Object3D` facing -Z                                                                                          |
-| React to game events                  | `EventBus`: add your event to the `GameEvents` interface and `bus.on(...)`. Already emitted: `tile:loaded`, `tile:error`, `terrain:built`, `landmarks:loaded`, `sub:collided`, `sub:crushWarning`, `game:ready` |
-| Add a control scheme                  | extend `Input.sample()`; consumers only read the normalised axes, so touch or a new pad needs no changes elsewhere                                                                                              |
-| Add a visual effect                   | `shaders/underwater.ts` is already a render-target + full-screen-quad pass; add uniforms, or chain a second pass                                                                                                |
-| Add a new data source                 | write a `tools/fetch_*.py` that ends in `tile_writer.write_tile()`; the engine only knows the tile format                                                                                                       |
-| Query the terrain from new code       | `Terrain.sampleHeight(x, z)` (bilinear, metres) and `Terrain.getNormal(x, z)`; both clamp outside the tile                                                                                                      |
-| Debug in the browser                  | `window.__game` exposes `{ scene, renderer, terrain, sub, rig, water, bus, config, meta }`                                                                                                                      |
+| I want to...                          | Do this                                                                                                                                                                                |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add a dive site                       | `tools/fetch_tile.py` (one bbox) or add the id to `TIER2` and run `tools/fetch_all.py --only <id>`; `index.json` and the DIVE SITES list pick it up                                    |
+| Add a tile variant                    | `tools/compress_tiles.py --quant16` writes `heightmap16.bin` + `quant_*` meta keys; opt in with `TileLoader`'s `{ prefer16: true }`. Any new variant must update `docs/tile-format.md` |
+| Add a landmark marker                 | add it to `data/landmarks.json`; `Landmarks` places anything with a `lat`/`lon` inside the tile bbox                                                                                   |
+| Add a mission                         | create `data/landmarks/<id>/mission.json` (contracts §2.4, [`docs/missions.md`](./missions.md)) and append `<id>` to `data/landmarks/index.json`; open with `?mission=<id>`            |
+| Add a POI / field-guide entry         | add to `data/landmarks/<id>/pois.json` and `guide.json` (contracts §2.1–2.2, [`docs/discovery.md`](./discovery.md)); test with `?poi=<poiId>`                                          |
+| Add a prop                            | add an entry to `data/landmarks/<id>/props.json` (contracts §2.3); run `tools/validate_props.py`; place it live with `?debugProps=1` ([`docs/props.md`](./props.md))                   |
+| Add a prop model                      | CC0/CC-BY `.glb` ≤ 2 MB in `public/assets/models/`, 1 unit = 1 m, front −Z, plus an `ATTRIBUTION.md` row; or a new `procedural:<kind>` in `world/props/Procedural.ts` + `PropLoader`   |
+| Add an objective type                 | extend `Mission.ts` (only `scan` and `all_primary` exist) and the contracts file                                                                                                       |
+| Retune handling, fog, colours, camera | `src/core/Config.ts` — sections `submarine`, `terrain`, `water`, `camera`, `audio`, `scan`, `props`, `mission`                                                                         |
+| Swap the placeholder hull for a model | replace the `SubMesh` construction in `main.ts` with a `GLTFLoader` result; the rig only needs an `Object3D` facing -Z                                                                 |
+| React to game events                  | `bus.on(...)` any event in the table above; add new ones to `GameEvents`                                                                                                               |
+| Add a control                         | add an `ActionId` + entry to `defaultActions()` in `Input.ts`; consumers read `InputState`, so touch or a new pad needs no changes elsewhere                                           |
+| Add a visual effect                   | `shaders/underwater.ts` is a render-target + full-screen-quad pass; add uniforms, or chain a second pass. Per-band values come from `Atmosphere.update()`                              |
+| Add a new data source                 | write a `tools/fetch_*.py` that ends in `tile_writer.write_tile()`; the engine only knows the tile format                                                                              |
+| Query the terrain from new code       | `Terrain.sampleHeight(x, z)` (data + detail, metres) and `Terrain.getNormal(x, z)`; `sampleDataHeight` for survey-only; all clamp outside the tile                                     |
+| Debug in the browser                  | `window.__game` (see below), `?debugTerrain=1`, `?debugProps=1`                                                                                                                        |
+
+`window.__game` keys (`main.ts`): `scene`, `renderer`, `terrain`, `sub`, `rig`,
+`water`, `atmosphere`, `headlights`, `audio`, `bus`, `config`, `meta`,
+`scanner`, `discoveries`, `discovery`, `debrief`, `fieldGuide`, `props`,
+`propsDebug`, `mission`, `missionRouter`, `missionSelect`, `sonar`.
+`window.__gameReady` flips to `true` after the first presented frame;
+`window.__gameError` holds a fatal startup message.

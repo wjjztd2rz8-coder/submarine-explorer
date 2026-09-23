@@ -12,23 +12,23 @@ Owner: docs/art-direction.md and docs/img/moodboard/* (package A5). Do not edit 
 
 **Depth-band palettes (hex), fog and lighting** — use these directly in `Water.ts` / `Atmosphere.ts` (A2) and terrain material tinting (A1):
 
-| Band | Depth | Water colour (mid) | Fog colour | Fog density (exp2 coeff) | Ambient light | Notes |
-|---|---|---|---|---|---|---|
-| Surface | 0–20 m | `#3E9DB8` | `#5AAFC4` | 0.010 | bright, sun-shaft ready | caustics on, warm sun highlight `#FFE9B8` |
-| Twilight | 20–200 m | `#1C5C74` | `#2A5568` | 0.020 | dims fast, blue dominant | caustics fade out by ~60 m |
-| Midnight | 200–1000 m | `#0A2C3D` | `#0E2530` | 0.035 | near-black ambient, headlights primary | bioluminescent specks allowed, sparse |
-| Abyss | >1000 m | `#040F16` | `#050C10` | 0.050 | headlights only, no ambient | crush-depth tension band; vignette slightly heavier |
+| Band     | Depth      | Water colour (mid) | Fog colour | Fog density (exp2 coeff) | Ambient light                          | Notes                                               |
+| -------- | ---------- | ------------------ | ---------- | ------------------------ | -------------------------------------- | --------------------------------------------------- |
+| Surface  | 0–20 m     | `#3E9DB8`          | `#5AAFC4`  | 0.010                    | bright, sun-shaft ready                | caustics on, warm sun highlight `#FFE9B8`           |
+| Twilight | 20–200 m   | `#1C5C74`          | `#2A5568`  | 0.020                    | dims fast, blue dominant               | caustics fade out by ~60 m                          |
+| Midnight | 200–1000 m | `#0A2C3D`          | `#0E2530`  | 0.035                    | near-black ambient, headlights primary | bioluminescent specks allowed, sparse               |
+| Abyss    | >1000 m    | `#040F16`          | `#050C10`  | 0.050                    | headlights only, no ambient            | crush-depth tension band; vignette slightly heavier |
 
 Interpolate these four stops smoothly by depth (don't hard-cut); fog density scales the same curve. Sun shafts/caustics only above ~60 m (Twilight upper edge).
 
 **Seabed material palette** (albedo base hex, tune roughness/normal per A1's triplanar shader):
 
-| Material | Base hex | Where |
-|---|---|---|
-| Sediment (silt/mud) | `#7A6E5C` | flat abyssal plain, low slope |
-| Basalt / volcanic rock | `#3B3A3D` | slope > 25°, seamounts, vent fields |
-| Sand (shallow) | `#C9B489` | < 200 m, coastal/reef tiles |
-| Rust (wreck hull) | `#7A3B22` | prop shader only, weathered steel |
+| Material                         | Base hex  | Where                                                         |
+| -------------------------------- | --------- | ------------------------------------------------------------- |
+| Sediment (silt/mud)              | `#7A6E5C` | flat abyssal plain, low slope                                 |
+| Basalt / volcanic rock           | `#3B3A3D` | slope > 25°, seamounts, vent fields                           |
+| Sand (shallow)                   | `#C9B489` | < 200 m, coastal/reef tiles                                   |
+| Rust (wreck hull)                | `#7A3B22` | prop shader only, weathered steel                             |
 | Marine growth (rust/algae blend) | `#4E5A3E` | patchy overlay on wrecks & rock at any depth, denser < 1000 m |
 
 **HUD visual language:** monospace only, thin 1px hairlines, dark translucent panels (`rgba(6,14,18,0.55)`), no drop shadows or gradients. Two accent colours only: **amber `#FFB020`** for warnings/hull-stress/crush-depth countdown, **cyan `#2ED9D9`** for sonar/nav/normal readouts. Fonts: **Space Mono** (readouts/body) or **Oxanium** (alt, more geometric) for HUD numerals, **Orbitron** for title/mission-select headers — all OFL, listed in `docs/assets.md` §4.
@@ -48,7 +48,7 @@ Reference images below are all NOAA Ocean Exploration public-domain stills (US f
 - Placed 3D props are marked "artist's reconstruction" in the field guide when fabricated.
 - Memorial/war-grave sites (Titanic, Endurance, Bismarck) included respectfully: a memorial note, no loot/salvage mechanics, no sensationalism.
 - Audience: teens and adults, classroom-usable. Keep imagery and captions factual and calm — this doc's own reference images and captions should read like a museum placard, not a thriller poster.
-- Depth must be *felt* (pillar 2): colour, light, fog density and HUD urgency all shift with the depth bands in §0.
+- Depth must be _felt_ (pillar 2): colour, light, fog density and HUD urgency all shift with the depth bands in §0.
 
 ## 2. Palette rationale and depth interpolation
 
@@ -99,6 +99,7 @@ Beyond the base hex values in §0:
 ## 7. Do / don't list
 
 **Do**
+
 - Real, cited colours and depth behaviour (§0–§2).
 - Restrained post-processing: vignette, slight chromatic aberration, caustics only above 60 m (per plan/MASTER-PLAN.md §5).
 - Two-colour HUD accent system (amber/cyan), monospace type.
@@ -106,6 +107,7 @@ Beyond the base hex values in §0:
 - Quiet, respectful treatment of memorial sites — no music stingers, no combat framing, a memorial note in guide text.
 
 **Don't**
+
 - Neon/saturated sci-fi lighting, lens flares, heavy bloom.
 - Cartoon outlines, toon shading, or stylised low-poly look (A1's terrain and props should read as realistic, not "cute").
 - Loot-game visual language: glowing interactables, sparkle particles, treasure framing on wrecks.
@@ -119,14 +121,14 @@ Beyond the base hex values in §0:
 
 All images below are hosted at `docs/img/moodboard/`, downloaded at reduced resolution (each under 1 MB; originals are higher-res on NOAA's site) for repo size. All are U.S. federal government works via **NOAA Ocean Exploration** (oceanexplorer.noaa.gov), which states its expedition photos and video are in the public domain (17 U.S.C. §105) with credit requested but not legally required. No CC-BY or third-party-credited images were used, to keep the licensing chain unambiguous for a non-commercial open-source project.
 
-| File | Subject / use | Source URL | Licence |
-|---|---|---|---|
-| `titanic-bow.jpg` | Titanic bow, hazy blue-green working-depth water column, turbidity/marine-snow reference, wreck silhouette reference | https://oceanexplorer.noaa.gov/wp-content/uploads/2021/04/20210415-hires.jpg (NOAA/Russian Academy of Sciences, RMS Titanic Expedition 2003) | Public domain (NOAA Ocean Exploration) |
-| `titanic-rusticles.jpg` | Rusticles on Titanic hull — rust + marine-growth material reference for wreck props | https://oceanexplorer.noaa.gov/wp-content/uploads/2020/10/20201014-hires.jpg (Lori Johnston, RMS Titanic Expedition 2003, NOAA Ocean Exploration) | Public domain (NOAA Ocean Exploration) |
-| `basalt-nodules.jpg` | Manganese-encrusted basalt + polymetallic nodules — basalt/rock seabed material reference | https://oceanexplorer.noaa.gov/wp-content/uploads/2026/07/ex2605-dive08-basaltandnodules.jpg (NOAA Ocean Exploration, 2026 Cook Islands ROV Exploration) | Public domain (NOAA Ocean Exploration) |
-| `champagne-vent.jpg` | NW Eifuku "Champagne" vent — vent-field lighting (headlight-only illumination), mineral-stained basalt prop reference | https://archive.oceanexplorer.noaa.gov/explorations/14fire/background/missionplan/media/eifuku_champagne_vent_hires.jpg (NOAA Ocean Exploration) | Public domain (NOAA Ocean Exploration) |
-| `black-smoker-vent.jpg` | Black smoker chimney, 2016 Marianas expedition — deep-water darkness and vent-fluid glow reference | https://oceanexplorer.noaa.gov/wp-content/uploads/2025/08/1605vent-hires.jpg (NOAA Ocean Exploration, 2016 Deepwater Exploration of the Marianas) | Public domain (NOAA Ocean Exploration) |
-| `vent-chimney.jpg` | Hydrothermal vent chimney close-up, dark plume against ROV lights | https://archive.oceanexplorer.noaa.gov/okeanos/explorations/ex1605/dailyupdates/media/may2-hires.jpg (NOAA Ocean Exploration, Okeanos Explorer EX1605) | Public domain (NOAA Ocean Exploration) |
-| `rov-control-room.jpg` | ROV control room — dark room, many small glowing monochrome/cyan displays; HUD *mood* reference only | https://oceanexplorer.noaa.gov/wp-content/uploads/2022/06/control-room-hires.jpg (NOAA Ocean Exploration, Escanaba Trough expedition) | Public domain (NOAA Ocean Exploration) |
+| File                    | Subject / use                                                                                                         | Source URL                                                                                                                                               | Licence                                |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `titanic-bow.jpg`       | Titanic bow, hazy blue-green working-depth water column, turbidity/marine-snow reference, wreck silhouette reference  | https://oceanexplorer.noaa.gov/wp-content/uploads/2021/04/20210415-hires.jpg (NOAA/Russian Academy of Sciences, RMS Titanic Expedition 2003)             | Public domain (NOAA Ocean Exploration) |
+| `titanic-rusticles.jpg` | Rusticles on Titanic hull — rust + marine-growth material reference for wreck props                                   | https://oceanexplorer.noaa.gov/wp-content/uploads/2020/10/20201014-hires.jpg (Lori Johnston, RMS Titanic Expedition 2003, NOAA Ocean Exploration)        | Public domain (NOAA Ocean Exploration) |
+| `basalt-nodules.jpg`    | Manganese-encrusted basalt + polymetallic nodules — basalt/rock seabed material reference                             | https://oceanexplorer.noaa.gov/wp-content/uploads/2026/07/ex2605-dive08-basaltandnodules.jpg (NOAA Ocean Exploration, 2026 Cook Islands ROV Exploration) | Public domain (NOAA Ocean Exploration) |
+| `champagne-vent.jpg`    | NW Eifuku "Champagne" vent — vent-field lighting (headlight-only illumination), mineral-stained basalt prop reference | https://archive.oceanexplorer.noaa.gov/explorations/14fire/background/missionplan/media/eifuku_champagne_vent_hires.jpg (NOAA Ocean Exploration)         | Public domain (NOAA Ocean Exploration) |
+| `black-smoker-vent.jpg` | Black smoker chimney, 2016 Marianas expedition — deep-water darkness and vent-fluid glow reference                    | https://oceanexplorer.noaa.gov/wp-content/uploads/2025/08/1605vent-hires.jpg (NOAA Ocean Exploration, 2016 Deepwater Exploration of the Marianas)        | Public domain (NOAA Ocean Exploration) |
+| `vent-chimney.jpg`      | Hydrothermal vent chimney close-up, dark plume against ROV lights                                                     | https://archive.oceanexplorer.noaa.gov/okeanos/explorations/ex1605/dailyupdates/media/may2-hires.jpg (NOAA Ocean Exploration, Okeanos Explorer EX1605)   | Public domain (NOAA Ocean Exploration) |
+| `rov-control-room.jpg`  | ROV control room — dark room, many small glowing monochrome/cyan displays; HUD _mood_ reference only                  | https://oceanexplorer.noaa.gov/wp-content/uploads/2022/06/control-room-hires.jpg (NOAA Ocean Exploration, Escanaba Trough expedition)                    | Public domain (NOAA Ocean Exploration) |
 
 Re-verify licence status before any commercial redistribution; NOAA's public-domain policy can change and image credit lines (e.g. co-sponsoring institutions) should be re-checked against the live page if these images are ever re-sourced at higher resolution.
