@@ -1,0 +1,234 @@
+{
+  "version": 1,
+  "landmark": "axial-seamount-ashes",
+  "entries": [
+    {
+      "id": "overview",
+      "title": "Axial Seamount",
+      "paragraphs": [
+        "Axial Seamount is a basaltic submarine volcano about 480 km off the Oregon coast, sitting where the Cobb hotspot passes beneath the Juan de Fuca Ridge. That combination -- a hotspot's steady magma supply layered onto a spreading ridge -- makes it the most active, most closely watched submarine volcano in the northeast Pacific.",
+        "Its summit holds an unusually shaped rectangular caldera, about 3 km by 8 km, bounded by faults with as much as 150 m of relief; the caldera floor is roughly 50 m deeper on its north side than its south. The shallowest point on this tile, 1,395 m, sits on that summit high, close to the 1,410 m summit depth published for the volcano.",
+        "Axial has erupted at least three times since routine monitoring began: January 1998, April 2011 and April 2015. Each event is tracked by seafloor pressure and tilt instruments that catch the volcano visibly deflating as magma drains out beneath it, then slowly re-inflating over the following years -- the basis for the eruption forecasts described later in this guide."
+      ],
+      "facts": [
+        { "label": "Distance from Oregon coast", "value": "about 480 km" },
+        { "label": "Caldera dimensions", "value": "about 3 x 8 km" },
+        { "label": "Summit depth", "value": "about 1,410 m (published); 1,395 m on this tile" },
+        { "label": "Recorded eruptions", "value": "1998, 2011, 2015" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Axial Seamount -- Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Axial_Seamount"
+        },
+        {
+          "title": "Axial Caldera -- OOI Regional Cabled Array, University of Washington Interactive Oceans",
+          "url": "https://interactiveoceans.washington.edu/research-sites/axial-caldera"
+        },
+        {
+          "title": "GMRT Synthesis -- Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Axial Seamount, ASHES -- Marine Regions Gazetteer (InterRidge Global Database of Active Submarine Hydrothermal Vent Fields v3.4)",
+          "url": "https://marineregions.org/gazetteer.php?p=details&id=64780"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "mushroom-inferno",
+      "title": "Mushroom and Inferno",
+      "paragraphs": [
+        "The ASHES (Axial Seamount Hydrothermal Emissions Study) vent field sits near the base of the caldera's western wall, at about 1,540-1,552 m, and has been studied since it was first surveyed in the late 1980s. Its two best-known chimneys, Mushroom and Inferno, sit roughly 10 m apart.",
+        "Mushroom is a black-smoker chimney about 4 m tall whose overall size has stayed similar since the 1980s even as its individual discharge points shift, with fluid exceeding 275 degC pouring from small orifices near its top. It is the site of the OOI cabled array's own HD video camera (CAMHDS301), so this is one of the very few active seafloor chimneys with a live, permanent video feed.",
+        "Inferno vents high-temperature fluid too and hosts one of the densest clusters of animals at ASHES: tube worms and palm worms cling directly to its metal-sulfide-rich walls, tolerant of both scalding vent fluid and near-freezing seawater within centimetres of each other.",
+        "Neither chimney's exact footprint is published, and the field is far smaller than a single cell of this tile's open bathymetry (about 2,826 sq m against roughly 43 x 61 m per grid cell), so the seabed here is real but the chimneys themselves are placed reconstructions."
+      ],
+      "facts": [
+        { "label": "ASHES depth", "value": "about 1,540-1,552 m" },
+        { "label": "Mushroom height / temperature", "value": "about 4 m; fluid over 275 degC" },
+        { "label": "Mushroom-Inferno separation", "value": "about 10 m" },
+        { "label": "Known since", "value": "late 1980s survey" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "ASHES Vent Field (RS03ASHS) -- Ocean Observatories Initiative",
+          "url": "https://oceanobservatories.org/site/rs03ashs/"
+        },
+        {
+          "title": "ASHES -- Axial Caldera, OOI Regional Cabled Array, University of Washington Interactive Oceans",
+          "url": "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
+        },
+        {
+          "title": "Inferno Vent at Axial -- OOI Regional Cabled Array",
+          "url": "https://interactiveoceans.washington.edu/inferno-vent-at-axial/"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "minor-chimneys",
+      "title": "Hell, Phoenix, Virgin and Virgin Mound",
+      "paragraphs": [
+        "ASHES holds several smaller sulfide structures beyond Mushroom and Inferno, all generally under 4 m tall with multiple narrow discharge orifices: Hell, Phoenix and Virgin. A separate, much smaller feature, Virgin Mound, is a sub-metre anhydrite spire venting some of the most CO2-rich fluid found anywhere in the caldera.",
+        "None of these has a published coordinate or height beyond 'less than about 4 m,' so they are represented here as an illustrative cluster near Mushroom rather than at individually verified positions -- real named features, invented exact placement."
+      ],
+      "facts": [
+        { "label": "Height", "value": "generally under 4 m" },
+        { "label": "Virgin Mound", "value": "sub-metre anhydrite spire, CO2-rich fluid" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "ASHES -- Axial Caldera, OOI Regional Cabled Array, University of Washington Interactive Oceans",
+          "url": "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
+        },
+        {
+          "title": "ASHES Venting -- NOAA Ocean Exploration",
+          "url": "https://oceanexplorer.noaa.gov/multimedia/ashes-venting/"
+        }
+      ],
+      "confidence": "low"
+    },
+    {
+      "id": "vent-life",
+      "title": "Life on the chimneys",
+      "paragraphs": [
+        "ASHES supports a dense community built entirely on chemosynthesis: bacteria that oxidise hydrogen sulfide from the vent fluid form the base of a food web with no sunlight at all. Ridgeia tube worms, palm worms and sulfide worms crowd the warmest chimney surfaces, while limpets and scale worms graze among them and spider crabs pick through the debris.",
+        "Filamentous bacterial mats and lavender-blue ciliate protists coat rock surfaces near diffuse, lower-temperature flow. Notably, the large clams common at many black-smoker fields are absent from ASHES's chimney faces -- they turn up instead at the field's diffuse-flow sites, away from the hottest fluid.",
+        "This entry describes real, sourced biology; where and how densely it is rendered on any individual chimney in this mission is illustrative, since no photograph-level survey of every structure is published."
+      ],
+      "facts": [
+        {
+          "label": "Chimney fauna",
+          "value": "Ridgeia tube worms, palm worms, sulfide worms, limpets, scale worms, spider crabs"
+        },
+        { "label": "Absent from chimneys", "value": "large clams (found at diffuse-flow sites instead)" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "ASHES -- Axial Caldera, OOI Regional Cabled Array, University of Washington Interactive Oceans",
+          "url": "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
+        },
+        {
+          "title": "data/landmarks.json notable_species (this repo, sourced from Wikipedia's Axial Seamount article)",
+          "url": "https://en.wikipedia.org/wiki/Axial_Seamount"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "caldera-wall",
+      "title": "The caldera's western wall",
+      "paragraphs": [
+        "ASHES sits close to the base of the caldera's western boundary fault, the scarp that marks the edge of the collapsed summit. On this tile's real bathymetry, the seabed rises steadily from about 1,540 m at the vent field to around 1,416 m only 300 m to the west, consistent with the toe of that wall.",
+        "The fault trace itself -- described in the literature as roughly 130 m west of ASHES -- is finer than this tile's ~43 x 61 m grid cells can resolve individually, so this POI marks the real, surveyed rising terrain rather than a specific fault line."
+      ],
+      "facts": [
+        { "label": "Depth at ASHES", "value": "about 1,540 m" },
+        { "label": "Depth 300 m west", "value": "about 1,416 m" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "ASHES Vent Field (RS03ASHS) -- Ocean Observatories Initiative",
+          "url": "https://oceanobservatories.org/site/rs03ashs/"
+        },
+        {
+          "title": "GMRT Synthesis -- Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "caldera-floor",
+      "title": "A resurfaced caldera floor",
+      "paragraphs": [
+        "Axial's caldera floor has been repeatedly paved over by lava from its recorded eruptions: a 1998 flow up to 13 m thick, a 2011 flow roughly three times larger, and a further flow in 2015, the first submarine eruption ever recorded live by a seafloor cabled observatory.",
+        "This POI sits on a broad, shallow rise on the caldera floor south of ASHES, about 1,460 m deep against roughly 1,530-1,540 m on the surrounding floor -- the kind of low, hummocky high left behind by a lava flow. No source maps this specific rise to one dated eruption, so it is described here as caldera-floor lava terrain in general rather than attributed to a single flow."
+      ],
+      "facts": [
+        { "label": "1998 flow thickness", "value": "up to 13 m" },
+        { "label": "2011 flow", "value": "about 3x the 1998 flow's extent" },
+        { "label": "This POI's depth", "value": "about 1,460 m (vs. ~1,530-1,540 m nearby)" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Axial Seamount -- Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Axial_Seamount"
+        },
+        {
+          "title": "Axial Seamount inflation threshold forecasts -- NOAA Pacific Marine Environmental Laboratory",
+          "url": "https://www.pmel.noaa.gov/eoi/rsn/Forecasts3.html"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "eruption-forecast",
+      "title": "Forecasting the next eruption",
+      "paragraphs": [
+        "Axial Seamount inflates like a slow-filling balloon between eruptions as magma accumulates beneath the caldera, then deflates abruptly when an eruption drains that reservoir -- 3.2 m of sudden subsidence in 1998, 2.4 m in 2011. Bill Chadwick (Oregon State University / NOAA PMEL) and Scott Nooner (University of North Carolina Wilmington) noticed this repeating pattern and, in September 2014, used it to forecast the 2015 eruption about seven months before it happened -- the first successful forecast of a submarine volcanic eruption.",
+        "The same team has kept tracking Axial's inflation since 2015 looking for the next event. As of this mission's writing (their most recent public update, 20 September 2026), the seafloor has fully re-inflated past its pre-2015 threshold, but uplift has slowed to about 6.5 cm/year and earthquake activity remains low -- commonly under 100 events a day, far below the thousands per day recorded just before the 2015 eruption. Their working estimate has repeatedly shifted later, and their own words are blunt: 'nothing seems imminent at the moment.'",
+        "That means a diver here today is looking at a volcano between eruptions, not one about to erupt on any fixed date -- and a live demonstration of how uncertain even a well-studied eruption forecast can be."
+      ],
+      "facts": [
+        { "label": "1998 co-eruption deflation", "value": "3.2 m" },
+        { "label": "2011 co-eruption deflation", "value": "2.4 m" },
+        { "label": "2015 eruption forecast lead time", "value": "about 7 months (September 2014)" },
+        { "label": "Status as of Sept. 2026", "value": "fully re-inflated; low seismicity; no eruption imminent" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Researchers Think Axial Seamount is Erupting -- Right on Schedule -- NOAA Pacific Marine Environmental Laboratory",
+          "url": "https://www.pmel.noaa.gov/news-and-media/highlights/researchers-think-axial-seamount-erupting-"
+        },
+        {
+          "title": "Blog to chronicle eruption forecasts at Axial Seamount -- Bill Chadwick, Oregon State University / CEOAS",
+          "url": "https://axial.ceoas.oregonstate.edu/axial_blog.html"
+        },
+        {
+          "title": "Axial Seamount -- Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Axial_Seamount"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "caldera-summit",
+      "title": "The caldera rim and cabled observatory",
+      "paragraphs": [
+        "The shallowest terrain on this tile, 1,395 m, sits on the caldera's summit high about 1.4 km north-east of the ASHES chimneys -- close to the 1,410 m summit depth published for the volcano, given this grid's resolution. It marks the top of the rectangular caldera whose bounding faults drop as much as 150 m to the floor.",
+        "Axial is wired for real-time science: the Ocean Observatories Initiative's Regional Cabled Array, run by the University of Washington, threads hundreds of kilometres of fibre-optic cable across the seamount to more than a dozen instrument sites, including ASHES, streaming live seismic, pressure, temperature, chemistry and HD video data to shore continuously. It is one of the only deep hydrothermal systems on Earth monitored this way, which is what makes eruption forecasts like the one above possible at all."
+      ],
+      "facts": [
+        { "label": "This POI's depth", "value": "1,395 m (tile's shallowest point)" },
+        { "label": "Boundary-fault relief", "value": "up to 150 m" },
+        { "label": "Monitoring network", "value": "OOI Regional Cabled Array (University of Washington)" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Axial Seamount -- Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Axial_Seamount"
+        },
+        {
+          "title": "Axial Caldera -- OOI Regional Cabled Array, University of Washington Interactive Oceans",
+          "url": "https://interactiveoceans.washington.edu/research-sites/axial-caldera"
+        },
+        {
+          "title": "GMRT Synthesis -- Ryan et al. 2009, doi:10.1029/2008GC002332",
+          "url": "https://www.gmrt.org/"
+        }
+      ],
+      "confidence": "high"
+    }
+  ]
+}

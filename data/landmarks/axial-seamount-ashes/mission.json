@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "landmark": "axial-seamount-ashes",
+  "tile": "axial-seamount-ashes",
+  "title": "ASHES vent field dive, Axial Seamount",
+  "hull_class": "B",
+  "environment": {
+    "preset": "vent"
+  },
+  "species_file": "species.json",
+  "spawn": {
+    "lat": 45.938,
+    "lon": -130.011,
+    "depth_m": 5,
+    "heading_deg": 205
+  },
+  "briefing": {
+    "summary": "Descend about 1,540 m to the ASHES hydrothermal field, a cluster of black-smoker chimneys near the base of Axial Seamount's western caldera wall. Find and scan the Mushroom and Inferno chimneys, then survey the field's smaller vents and the real caldera terrain around them.",
+    "depth_m": 1540,
+    "facts": [
+      "Axial Seamount is the most active submarine volcano in the northeast Pacific, erupting in 1998, 2011 and 2015; researchers have forecast eruptions here from seafloor deformation data, though none is imminent as this mission was written.",
+      "ASHES is one of the only hydrothermal fields on Earth wired for real-time monitoring: the Ocean Observatories Initiative's Regional Cabled Array streams live seismic, pressure, chemistry and HD video data to shore continuously.",
+      "The whole field is only about 2,826 sq m -- smaller than a single cell of this tile's open bathymetry -- so no individual chimney appears in the real terrain. Every chimney here is a placed reconstruction on real seabed, using the engine's sulfide material so they render dark and rust-streaked like true black smokers rather than the pale carbonate towers of Lost City.",
+      "Mushroom and Inferno, the field's two best-documented chimneys, sit only about 10 m apart -- keep an eye on your position so you scan both without leaving the immediate vent cluster."
+    ],
+    "hazards": [
+      "Scalding vent fluid: Mushroom and Inferno vent over 275 degC just centimetres from near-freezing seawater.",
+      "Fragile mineral chimneys; keep a respectful distance to avoid damaging delicate spires.",
+      "Total darkness below a few hundred metres; only your lights work.",
+      "This is an active volcanic caldera. Eruptions here are rare and currently judged not imminent, but the seabed can shift with inflation and deflation over months to years."
+    ]
+  },
+  "objectives": [
+    {
+      "id": "mushroom",
+      "type": "scan",
+      "poi": "axial-ashes-mushroom",
+      "primary": true,
+      "title": "Locate and scan the Mushroom chimney"
+    },
+    {
+      "id": "inferno",
+      "type": "scan",
+      "poi": "axial-ashes-inferno",
+      "primary": true,
+      "title": "Locate and scan the Inferno chimney"
+    },
+    {
+      "id": "minor-chimneys",
+      "type": "scan",
+      "poi": "axial-ashes-minor-chimneys",
+      "primary": false,
+      "title": "Survey the Hell, Phoenix and Virgin chimneys"
+    },
+    {
+      "id": "caldera-wall",
+      "type": "scan",
+      "poi": "axial-caldera-wall",
+      "primary": false,
+      "title": "Survey the base of the western caldera wall"
+    },
+    {
+      "id": "caldera-floor",
+      "type": "scan",
+      "poi": "axial-caldera-floor",
+      "primary": false,
+      "title": "Survey a resurfaced patch of the caldera floor"
+    },
+    {
+      "id": "caldera-summit",
+      "type": "scan",
+      "poi": "axial-caldera-summit",
+      "primary": false,
+      "title": "Reach the caldera rim's shallowest point on this tile"
+    }
+  ],
+  "completion": "all_primary"
+}

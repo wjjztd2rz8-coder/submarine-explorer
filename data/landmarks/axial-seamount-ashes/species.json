@@ -1,0 +1,354 @@
+{
+  "version": 1,
+  "landmark": "axial-seamount-ashes",
+  "source": "OBIS",
+  "source_url": "https://api.obis.org/v3/checklist?geometry=POLYGON((-130.297302+45.750443,-129.72052+45.750443,-129.72052+46.149796,-130.297302+46.149796,-130.297302+45.750443))&startdepth=1300.0&enddepth=1700.0&size=1000&skip=0",
+  "fetched_at": "2026-09-23T06:47:18Z",
+  "bbox": {
+    "north": 46.149795900891085,
+    "south": 45.750442873547335,
+    "east": -129.72052001953125,
+    "west": -130.29730224609375
+  },
+  "depth_filter_m": [
+    1300.0,
+    1700.0
+  ],
+  "rank_filter": "species",
+  "taxa_in_bbox": 157,
+  "taxa_matching_rank": 39,
+  "records_in_bbox": 823,
+  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Placement of animals in the game is invented.",
+  "species": [
+    {
+      "scientificName": "Heteropolypus ritteri",
+      "aphiaID": 724715,
+      "records": 47,
+      "depthRange_m": [
+        1406,
+        1697
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Paragorgia arborea var. pacifica",
+      "aphiaID": 1647393,
+      "records": 13,
+      "depthRange_m": [
+        1670,
+        1671
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Variety"
+    },
+    {
+      "scientificName": "Mamiwata piscesae",
+      "aphiaID": 1782894,
+      "records": 7,
+      "depthRange_m": [
+        1546,
+        1592
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Psychrolutes phrictus",
+      "aphiaID": 274678,
+      "records": 6,
+      "depthRange_m": [
+        1541.2,
+        1542.3
+      ],
+      "group": "fish",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Lepetodrilus fucensis",
+      "aphiaID": 449972,
+      "records": 5,
+      "depthRange_m": [
+        1525,
+        1553
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Pyropelta musaica",
+      "aphiaID": 450016,
+      "records": 5,
+      "depthRange_m": [
+        1545,
+        1592
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Callistephanus kofoidi",
+      "aphiaID": 1608731,
+      "records": 4,
+      "depthRange_m": [
+        1648,
+        1695
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Cladopolynoe tunnicliffeae",
+      "aphiaID": 1782892,
+      "records": 4,
+      "depthRange_m": [
+        1553,
+        1553
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Nereis piscesae",
+      "aphiaID": 329723,
+      "records": 4,
+      "depthRange_m": [
+        1545,
+        1575
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Parougia wolfi",
+      "aphiaID": 330418,
+      "records": 4,
+      "depthRange_m": [
+        1545,
+        1575
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Cladopolynoe sandersi",
+      "aphiaID": 1783169,
+      "records": 3,
+      "depthRange_m": [
+        1592,
+        1592
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Methanococcus aeolicus",
+      "aphiaID": 573651,
+      "records": 3,
+      "depthRange_m": [
+        1515,
+        1524
+      ],
+      "group": "microbe",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Thenea muricata",
+      "aphiaID": 134106,
+      "records": 3,
+      "depthRange_m": [
+        1569,
+        1569
+      ],
+      "group": "sponge",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Vampiropolynoe embleyi",
+      "aphiaID": 332669,
+      "records": 3,
+      "depthRange_m": [
+        1521,
+        1522
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Acanthascus (Staurocalyptus) fuca",
+      "aphiaID": 171997,
+      "records": 2,
+      "depthRange_m": [
+        1570,
+        1570
+      ],
+      "group": "sponge",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Clypeosectus curvus",
+      "aphiaID": 449948,
+      "records": 2,
+      "depthRange_m": [
+        1545,
+        1575
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Depressigyra globulus",
+      "aphiaID": 413442,
+      "records": 2,
+      "depthRange_m": [
+        1525,
+        1553
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Harmothoe globosa",
+      "aphiaID": 328242,
+      "records": 2,
+      "depthRange_m": [
+        1570,
+        1570
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Levensteiniella kincaidi",
+      "aphiaID": 328835,
+      "records": 2,
+      "depthRange_m": [
+        1553,
+        1553
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophryotrocha globopalpata",
+      "aphiaID": 330201,
+      "records": 2,
+      "depthRange_m": [
+        1545,
+        1592
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Provanna variabilis",
+      "aphiaID": 450012,
+      "records": 2,
+      "depthRange_m": [
+        1546,
+        1553
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ridgeia piscesae",
+      "aphiaID": 266009,
+      "records": 2,
+      "depthRange_m": [
+        1530,
+        1570
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Stygiopontius quadrispinosus",
+      "aphiaID": 355923,
+      "records": 2,
+      "depthRange_m": [
+        1570,
+        1570
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Temnocinclis euripes",
+      "aphiaID": 450023,
+      "records": 2,
+      "depthRange_m": [
+        1575,
+        1575
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Aphotopontius forcipatus",
+      "aphiaID": 348893,
+      "records": 1,
+      "depthRange_m": [
+        1545,
+        1545
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Benthoxynus spiculifer",
+      "aphiaID": 349207,
+      "records": 1,
+      "depthRange_m": [
+        1592,
+        1592
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Eusergestes similis",
+      "aphiaID": 514127,
+      "records": 1,
+      "depthRange_m": [
+        1541.1,
+        1541.1
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Graneledone boreopacifica",
+      "aphiaID": 342222,
+      "records": 1,
+      "depthRange_m": [
+        1542.4,
+        1542.4
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Hesiodeira glabra",
+      "aphiaID": 328336,
+      "records": 1,
+      "depthRange_m": [
+        1592,
+        1592
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Humesipontius arthuri",
+      "aphiaID": 362264,
+      "records": 1,
+      "depthRange_m": [
+        1520,
+        1520
+      ],
+      "group": "crustacean",
+      "taxonRank": "Species"
+    }
+  ]
+}

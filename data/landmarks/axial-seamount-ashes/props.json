@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "landmark": "axial-seamount-ashes",
+  "props": [
+    {
+      "id": "mushroom-chimney",
+      "model": "procedural:chimney",
+      "material_hint": "sulfide",
+      "lat": 45.9337,
+      "lon": -130.0139,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [4, 4, 4],
+      "lod_distance_m": 700,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Mushroom, ASHES's best-known black smoker: about 4 m tall, largely unchanged in size since the late 1980s survey (UW Interactive Oceans, oceanobservatories.org RS03ASHS). dimensions_m[0] (base) is an estimate; no footprint is published. material_hint sulfide renders the near-black metal-sulfide body and rusty staining of a black smoker, unlike Lost City's pale carbonate towers. See sources.md."
+    },
+    {
+      "id": "inferno-chimney",
+      "model": "procedural:chimney",
+      "material_hint": "sulfide",
+      "lat": 45.93388,
+      "lon": -130.0139,
+      "snap_to_seabed": true,
+      "heading_deg": 180,
+      "scale": 1,
+      "dimensions_m": [3, 3, 5],
+      "lod_distance_m": 700,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Inferno: high-temperature venting about 10 m from Mushroom, hosting one of ASHES's densest macrofaunal clusters (UW Interactive Oceans). No published height; 5 m is an estimate consistent with the field's other named chimneys being under ~4-5 m. Position is an illustrative 10 m offset from Mushroom (bearing not sourced)."
+    },
+    {
+      "id": "hell-chimney",
+      "model": "procedural:chimney",
+      "material_hint": "sulfide",
+      "lat": 45.93393,
+      "lon": -130.01365,
+      "snap_to_seabed": true,
+      "heading_deg": 90,
+      "scale": 1,
+      "dimensions_m": [2, 2, 3.5],
+      "lod_distance_m": 500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Hell: a real named ASHES chimney, 'generally less than about 4 m tall' with several narrow discharge orifices (UW Interactive Oceans). No published coordinate or exact height; placed illustratively in the minor-chimney cluster near Mushroom."
+    },
+    {
+      "id": "phoenix-chimney",
+      "model": "procedural:chimney",
+      "material_hint": "sulfide",
+      "lat": 45.93398,
+      "lon": -130.01355,
+      "snap_to_seabed": true,
+      "heading_deg": 210,
+      "scale": 1,
+      "dimensions_m": [2, 2, 3],
+      "lod_distance_m": 500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Phoenix: a real named ASHES chimney, 'generally less than about 4 m tall' (UW Interactive Oceans). No published coordinate or exact height; placed illustratively in the minor-chimney cluster near Mushroom."
+    },
+    {
+      "id": "virgin-chimney",
+      "model": "procedural:chimney",
+      "material_hint": "sulfide",
+      "lat": 45.93391,
+      "lon": -130.01345,
+      "snap_to_seabed": true,
+      "heading_deg": 300,
+      "scale": 1,
+      "dimensions_m": [2, 2, 2.5],
+      "lod_distance_m": 500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Virgin: a real named ASHES chimney, 'generally less than about 4 m tall' (UW Interactive Oceans). No published coordinate or exact height; placed illustratively in the minor-chimney cluster near Mushroom. (Virgin Mound, a separate sub-metre anhydrite spire mentioned in the same source, is below this engine's minimum practical prop scale and is not modelled separately.)"
+    }
+  ]
+}
