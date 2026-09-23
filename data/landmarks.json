@@ -1041,11 +1041,11 @@
       "country_eez": "United States",
       "confidence": "high",
       "coordinate_source": "https://en.wikipedia.org/wiki/Hudson_Canyon",
-      "summary": "The largest submarine canyon off the US East Coast, an offshore extension of the ancient Hudson River channel, designated a National Marine Sanctuary in 2025.",
+      "summary": "The largest submarine canyon off the US East Coast, an offshore extension of the ancient Hudson River channel; NOAA has proposed it as a National Marine Sanctuary.",
       "facts": [
         "Largest submarine canyon on the US Atlantic seaboard",
         "Formed as an extension of the Hudson River during past glacial low sea-level periods",
-        "Designated Hudson Canyon National Marine Sanctuary in 2025",
+        "Proposed as Hudson Canyon National Marine Sanctuary (NOAA, 2022); not yet designated",
         "Supports deep-sea coral communities and important fish spawning habitat"
       ],
       "gameplay_hooks": [
