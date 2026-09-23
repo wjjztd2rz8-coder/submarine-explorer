@@ -159,6 +159,7 @@ export class HUD {
   private readonly warningEl: HTMLDivElement;
   private readonly helpEl: HTMLDivElement;
   private helpActions: HelpActionMap = defaultActions();
+  private readonly helpHandlers = new Map<string, () => void>();
   private hullNote = '';
 
   constructor(
@@ -202,6 +203,15 @@ export class HUD {
     this.renderHelp();
   }
 
+  /**
+   * C5: make the help item for a single action clickable (e.g. the settings
+   * hint opens the settings screen). Rendered as a real button.
+   */
+  setHelpAction(actionId: string, handler: () => void): void {
+    this.helpHandlers.set(actionId, handler);
+    this.renderHelp();
+  }
+
   /** Re-render the help lines (after a key was remapped). */
   refreshHelp(): void {
     this.renderHelp();
@@ -209,13 +219,28 @@ export class HUD {
 
   private renderHelp(): void {
     const frag = document.createDocumentFragment();
+    const items = HELP_LINES.map((line) =>
+      line.filter((item) => item.actions.every((id) => this.helpActions.some((a) => a.id === id))),
+    );
     helpLines(this.helpActions).forEach((line, li) => {
       if (li > 0) frag.append(document.createElement('br'));
       line.forEach(([keys, text], i) => {
         if (i > 0) frag.append(' \u00a0 ');
         const b = document.createElement('b');
         b.textContent = keys;
-        frag.append(b, ` ${text}`);
+        const item = items[li]?.[i];
+        const handler =
+          item && item.actions.length === 1 ? this.helpHandlers.get(item.actions[0] ?? '') : null;
+        if (handler) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'hud-help-link';
+          btn.append(b, ` ${text}`);
+          btn.addEventListener('click', handler);
+          frag.append(btn);
+        } else {
+          frag.append(b, ` ${text}`);
+        }
       });
     });
     this.helpEl.replaceChildren(frag);

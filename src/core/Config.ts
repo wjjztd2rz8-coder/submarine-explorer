@@ -846,7 +846,7 @@ export interface GlobeConfig {
   maxPixelRatio: number;
 }
 
-// --- C5: settings, save, accessibility (docs/settings.md, docs/accessibility.md) ---
+// --- C5: settings, save, accessibility (docs/settings.md) ---
 /** Sonar minimap colour schemes (`Sonar.setPalette`). */
 export type SonarPaletteName = 'default' | 'deuteranopia' | 'highContrast';
 

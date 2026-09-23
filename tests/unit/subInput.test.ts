@@ -142,6 +142,59 @@ describe('Input rebinding', () => {
   });
 });
 
+describe('Input bindings across reloads (C5)', () => {
+  it('a binding displaced by a conflict stays unbound after reload', () => {
+    const first = makeInput();
+    first.rebind('thrustForward', ['KeyX']); // takes X from boost
+    expect(first.getAction('boost')?.keys).toEqual([]);
+
+    const second = makeInput();
+    expect(second.getAction('boost')?.keys).toEqual([]);
+    expect(second.getAction('thrustForward')?.keys).toEqual(['KeyX']);
+    second.injectKey('KeyX', true);
+    const s = second.sample();
+    expect(s.throttle).toBe(1);
+    expect(s.boost).toBe(false);
+  });
+
+  it('an action missing from the save does not reclaim a key another action saved', () => {
+    const payload = { version: 1, keys: { boost: ['KeyW'] } };
+    store.setItem(BINDINGS_STORAGE_KEY, JSON.stringify(payload));
+    const input = makeInput();
+    expect(input.getAction('boost')?.keys).toEqual(['KeyW']);
+    expect(input.getAction('thrustForward')?.keys).toEqual(['ArrowUp']);
+  });
+
+  it('resetBindings survives a storage that throws', () => {
+    const hostile: BindingStore = {
+      getItem: () => null,
+      setItem: () => {
+        throw new Error('quota');
+      },
+      removeItem: () => {
+        throw new Error('denied');
+      },
+    };
+    const input = new Input({ storage: hostile });
+    expect(input.rebind('boost', ['KeyZ'])).toBe(true);
+    expect(() => input.resetBindings()).not.toThrow();
+    expect(input.getAction('boost')?.keys).toEqual(['KeyX']);
+  });
+
+  it('a throwing getItem keeps the defaults', () => {
+    const input = new Input({
+      storage: {
+        getItem: () => {
+          throw new Error('denied');
+        },
+        setItem: () => {},
+        removeItem: () => {},
+      },
+    });
+    expect(input.getAction('boost')?.keys).toEqual(['KeyX']);
+  });
+});
+
 describe('Input mouse look', () => {
   it('turns accumulated pixels into a clamped virtual stick, only when enabled', () => {
     const input = makeInput();

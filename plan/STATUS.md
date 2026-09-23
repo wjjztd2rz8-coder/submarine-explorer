@@ -6,8 +6,9 @@
   348 unit, 104 Python, 35 e2e (+1 opt-in skip), attribution — all green.
   Committed as `cc2cfbc`. C6 and C3 are done; see their progress notes.
 - `monterey-canyon` was held out of the commit (validator error); a Sonnet
-  agent is finishing it (species, sources, pacing). C5 is running on Opus.
-- `challenger-deep` was never written; it remains in the C4 queue.
+  agent finished it (`42c6e42`). C5 settings done on Opus (371 unit, 38 e2e);
+  see `plan/progress/C5.md` for the unbuilt items (reset progress, LOD
+  setting, reload button, gamepad). Challenger Deep is in progress (Sonnet).
 
 ## OpenAI continuation checkpoint (latest; supersedes historical notes below)
 

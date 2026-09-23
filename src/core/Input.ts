@@ -299,7 +299,11 @@ export class Input {
       const d = defaults.find((a) => a.id === this.actions[i]?.id);
       if (d) (this.actions[i] as ActionBinding).keys = [...d.keys];
     }
-    this.storage?.removeItem(BINDINGS_STORAGE_KEY);
+    try {
+      this.storage?.removeItem(BINDINGS_STORAGE_KEY);
+    } catch {
+      // Privacy mode / hostile storage: the defaults still apply this session.
+    }
   }
 
   private saveBindings(): void {
@@ -318,7 +322,9 @@ export class Input {
   /**
    * Merge a saved override over the defaults. Unknown action ids and malformed
    * payloads are ignored rather than thrown: a stale save must never brick the
-   * controls.
+   * controls. An empty array is a real value (C5): the action lost its key to
+   * a rebinding conflict and must stay unbound, not regain its default (which
+   * another action may now hold). A key saved on two actions keeps the first.
    */
   private loadBindings(): void {
     if (!this.storage) return;
@@ -331,12 +337,23 @@ export class Input {
     if (!raw) return;
     try {
       const parsed = JSON.parse(raw) as { version?: number; keys?: Record<string, unknown> };
-      if (parsed.version !== 1 || !parsed.keys) return;
+      if (parsed.version !== 1 || !parsed.keys || typeof parsed.keys !== 'object') return;
+      const saved = new Map<ActionId, string[]>();
       for (const action of this.actions) {
         const keys = parsed.keys[action.id];
-        if (Array.isArray(keys) && keys.every((k) => typeof k === 'string') && keys.length) {
-          action.keys = keys as string[];
+        if (Array.isArray(keys) && keys.every((k) => typeof k === 'string')) {
+          saved.set(action.id, keys as string[]);
         }
+      }
+      // A default key that another action was saved with is taken: drop it
+      // from actions that fall back to their defaults (e.g. a new action).
+      const taken = new Set<string>();
+      for (const keys of saved.values()) for (const k of keys) taken.add(k);
+      const claimed = new Set<string>();
+      for (const action of this.actions) {
+        const keys = saved.get(action.id) ?? action.keys.filter((k) => !taken.has(k));
+        action.keys = keys.filter((k) => !claimed.has(k));
+        for (const k of action.keys) claimed.add(k);
       }
     } catch {
       // Corrupt JSON: keep defaults.

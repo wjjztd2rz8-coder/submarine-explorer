@@ -1,5 +1,5 @@
 /**
- * Closed captions for audio cues (C5, docs/accessibility.md).
+ * Closed captions for audio cues (C5, docs/settings.md).
  *
  * `AudioSystem.captions` (a `CaptionBus`, docs/audio.md) emits a
  * `{ id, text, durationS }` for every cue it plays. This overlay shows up to

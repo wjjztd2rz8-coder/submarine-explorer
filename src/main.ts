@@ -60,6 +60,11 @@ import {
 import { loadSpecies } from './game/Species.js';
 import { Globe } from './ui/Globe.js';
 // --- C1 end ---
+// --- C5 begin ---
+import { Save } from './core/Save.js';
+import { Captions } from './ui/Captions.js';
+import { SettingsScreen } from './ui/Settings.js';
+// --- C5 end ---
 // --- fix S begin ---
 import { applyFreeDiveHull, chooseSpawn, spawnSettings } from './game/Spawn.js';
 // --- fix S end ---
@@ -101,8 +106,16 @@ async function main(): Promise<void> {
   const requested = route?.tileId ?? params.get('tile');
   const tileId = chooseTileId(requested, index, config.defaultTileId);
   // --- B3 end ---
+  // --- C5 begin ---
+  // Saved settings (docs/settings.md). The saved graphics tier applies unless
+  // `?tier=` is given; terrain detail is read once, when the terrain is built.
+  const save = new Save({ config });
+  const settings = save.get();
+  config.terrain.detailStrength = settings.detailStrength;
+  let postFxOn = settings.postFx;
   // Graphics tier: `?tier=low|medium|high` (see docs/terrain.md).
-  const tier = resolveGraphicsTier(params.get('tier'), config.graphicsTier);
+  const tier = resolveGraphicsTier(params.get('tier'), settings.graphicsTier);
+  // --- C5 end ---
   const debugTerrain = params.get('debugTerrain') === '1';
   // A2: `?depth=300` spawns the boat 300 m down (clamped above the seabed),
   // for the depth-band screenshots in docs/atmosphere.md.
@@ -197,6 +210,10 @@ async function main(): Promise<void> {
   // Content folder for POIs, guide and props: the mission's, else `?landmark=` / the tile.
   const contentLandmark = route?.landmarkId ?? landmarkIdFor(params, meta.id);
   // --- B3 end ---
+  // --- C5 begin ---
+  // Default sim speed (0 = auto: free dive 1x, missions their own default).
+  if (settings.simSpeedDefault > 0) sub.setSimSpeed(settings.simSpeedDefault);
+  // --- C5 end ---
 
   const subMesh = new SubMesh({
     length: 26,
@@ -312,6 +329,24 @@ async function main(): Promise<void> {
   const input = new Input(canvas);
   input.attach();
 
+  // --- C5 begin ---
+  // Built before the mission router so its capture-phase key handler runs
+  // first and can keep keys from the briefing/debrief while open.
+  const settingsScreen = new SettingsScreen({
+    save,
+    input,
+    config,
+    activeTier: tier,
+    tierFromUrl: params.get('tier') !== null && params.get('tier') === tier,
+    canOpen: () => !globe.isOpen,
+    onBindingsChanged: () => hud.refreshHelp(),
+  });
+  hud.bindHelp(input.actions);
+  hud.setHelpAction('toggleSettings', () => settingsScreen.open());
+  rig.reduceMotion = settings.reduceMotion;
+  sonar.setPalette(settings.sonarPalette);
+  // --- C5 end ---
+
   // --- B3 begin ---
   // Briefing (freezes the game until "Begin dive" / Enter), objectives panel,
   // completion -> debrief. `?skipBriefing=1` starts immediately.
@@ -334,6 +369,19 @@ async function main(): Promise<void> {
   // `terrain` already satisfies the audio module's minimal TerrainSampler
   // interface (sampleHeight), so no adapter is needed.
   const audio = new AudioSystem(config.audio, bus, terrain);
+  // --- C5 begin ---
+  const captions = new Captions(audio.captions, {
+    enabled: settings.captions,
+    maxLines: config.settings.captionMaxLines,
+    minDurationS: config.settings.captionMinDurationS,
+  });
+  save.onChange((next, changed) => {
+    if (changed.includes('reduceMotion')) rig.reduceMotion = next.reduceMotion;
+    if (changed.includes('captions')) captions.setEnabled(next.captions);
+    if (changed.includes('sonarPalette')) sonar.setPalette(next.sonarPalette);
+    if (changed.includes('postFx')) postFxOn = next.postFx;
+  });
+  // --- C5 end ---
   const unlockAudio = (): void => audio.unlock();
   window.addEventListener('pointerdown', unlockAudio, { once: true });
   window.addEventListener('keydown', unlockAudio, { once: true });
@@ -367,7 +415,7 @@ async function main(): Promise<void> {
     // --- B3 begin ---
     // While the mission briefing is up nothing simulates and input is ignored
     // (sampling still runs, so edge presses do not queue up behind the card).
-    const frozen = (missionRouter?.frozen ?? false) || globe.isOpen; // C1: the globe freezes too
+    const frozen = (missionRouter?.frozen ?? false) || globe.isOpen || settingsScreen.isOpen; // C1/C5: globe and settings freeze too
     const state = frozen ? FROZEN_INPUT : sampled;
     const steps = frozen ? 0 : realSteps;
     // --- B3 end ---
@@ -490,7 +538,9 @@ async function main(): Promise<void> {
     terrain.update(rig.camera);
 
     // Scene -> offscreen target, then the post-process pass to the screen.
-    if (atmoTier.post) {
+    // --- C5 begin ---
+    if (atmoTier.post && postFxOn) {
+      // --- C5 end ---
       // Grade and vignette come from the current depth band (A2).
       (post.material.uniforms.uTint!.value as THREE.Color).copy(atmo.gradeTint);
       post.material.uniforms.uVignette!.value = atmo.vignette;
@@ -559,6 +609,12 @@ async function main(): Promise<void> {
     // --- C1 begin ---
     globe,
     // --- C1 end ---
+    // --- C5 begin ---
+    save,
+    settings: settingsScreen,
+    captions,
+    input,
+    // --- C5 end ---
   };
   requestAnimationFrame(frame);
 }
