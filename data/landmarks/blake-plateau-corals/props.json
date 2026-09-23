@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "landmark": "blake-plateau-corals",
+  "props": [
+    {
+      "id": "coral-mound-boulder-1",
+      "model": "/assets/models/rock_09.glb",
+      "lat": 30.1613,
+      "lon": -79.7893,
+      "snap_to_seabed": true,
+      "heading_deg": 40,
+      "scale": 6,
+      "lod_distance_m": 600,
+      "collision": "sphere",
+      "reconstruction": true,
+      "note": "A basalt boulder stand-in marking a coral-encrusted mound outcrop at the Desmophyllum pertusum thicket POI. The engine has no coral-colony model, so this generic rock (Poly Haven, CC0) stands in for the reef structure; it is not a depiction of coral itself. Scale 6 gives a ~6 m outcrop, a modest estimate for a colonised mound feature."
+    },
+    {
+      "id": "coral-mound-boulder-2",
+      "model": "/assets/models/rock_09.glb",
+      "lat": 30.16145,
+      "lon": -79.78905,
+      "snap_to_seabed": true,
+      "heading_deg": 210,
+      "scale": 4,
+      "lod_distance_m": 600,
+      "collision": "sphere",
+      "reconstruction": true,
+      "note": "Second boulder stand-in, part of the same thicket cluster as coral-mound-boulder-1. Same caveats: a generic rock model in place of an unmodelled coral colony, purely illustrative."
+    }
+  ]
+}

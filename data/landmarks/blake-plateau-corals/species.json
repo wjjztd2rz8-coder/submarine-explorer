@@ -1,0 +1,299 @@
+{
+  "version": 1,
+  "landmark": "blake-plateau-corals",
+  "source": "OBIS",
+  "source_url": "https://api.obis.org/v3/checklist?geometry=POLYGON((-79.829956+29.670466,-79.169678+29.670466,-79.169678+30.330195,-79.829956+30.330195,-79.829956+29.670466))&startdepth=500.0&enddepth=1000.0&size=1000&skip=0",
+  "fetched_at": "2026-09-23T11:26:12Z",
+  "bbox": {
+    "north": 30.330195443583815,
+    "south": 29.670466439677565,
+    "east": -79.169677734375,
+    "west": -79.8299560546875
+  },
+  "depth_filter_m": [
+    500.0,
+    1000.0
+  ],
+  "rank_filter": "species",
+  "taxa_in_bbox": 95,
+  "taxa_matching_rank": 32,
+  "records_in_bbox": 843,
+  "note": "Occurrence records within the tile bbox from OBIS, filtered to 500-1,000 m depth (the province's published depth range). Desmophyllum pertusum (the reef-building coral named in guide.json's coral-thicket entry) is directly present in this export, alongside other deep-sea corals (Madrepora oculata, Enallopsammia profunda, several octocorals) and associated fauna (brittle stars, sea urchins, molluscs, a glass sponge) consistent with a cold-water coral mound habitat. Record counts reflect sampling effort, not abundance. Placement of any animal at a specific POI in the game is invented; this file only reports what OBIS has recorded in the wider bbox.",
+  "species": [
+    {
+      "scientificName": "Enallopsammia profunda",
+      "aphiaID": 157965,
+      "records": 33,
+      "depthRange_m": [
+        585,
+        871
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Desmophyllum pertusum",
+      "aphiaID": 1245747,
+      "records": 15,
+      "depthRange_m": [
+        585,
+        866
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Echinocyamus grandiporus",
+      "aphiaID": 124270,
+      "records": 15,
+      "depthRange_m": [
+        720,
+        871
+      ],
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Stylaster erubescens",
+      "aphiaID": 117964,
+      "records": 8,
+      "depthRange_m": [
+        727,
+        871
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Chrysopathes micracantha",
+      "aphiaID": 447844,
+      "records": 7,
+      "depthRange_m": [
+        746,
+        871
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Antalis circumcincta",
+      "aphiaID": 344432,
+      "records": 6,
+      "depthRange_m": [
+        720,
+        870
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Madrepora oculata",
+      "aphiaID": 135209,
+      "records": 6,
+      "depthRange_m": [
+        648,
+        866
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Keratoisis flexibilis",
+      "aphiaID": 125375,
+      "records": 5,
+      "depthRange_m": [
+        624,
+        780
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Plumarella pourtalesii",
+      "aphiaID": 177840,
+      "records": 4,
+      "depthRange_m": [
+        585,
+        622
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Thecopsammia socialis",
+      "aphiaID": 291210,
+      "records": 4,
+      "depthRange_m": [
+        727,
+        871
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Gracilechinus affinis",
+      "aphiaID": 532039,
+      "records": 3,
+      "depthRange_m": [
+        777,
+        779
+      ],
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Ophiacantha bidentata",
+      "aphiaID": 124978,
+      "records": 3,
+      "depthRange_m": [
+        777,
+        777
+      ],
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Stenocyathus vermiformis",
+      "aphiaID": 135208,
+      "records": 3,
+      "depthRange_m": [
+        779,
+        779
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Anthothela tropicalis",
+      "aphiaID": 286581,
+      "records": 2,
+      "depthRange_m": [
+        742,
+        828
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Bathypsammia tintinnabulum",
+      "aphiaID": 289503,
+      "records": 2,
+      "depthRange_m": [
+        871,
+        871
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Oligobrachia floridana",
+      "aphiaID": 265741,
+      "records": 2,
+      "depthRange_m": [
+        800,
+        800
+      ],
+      "group": "worm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Plumarella dichotoma",
+      "aphiaID": 287665,
+      "records": 2,
+      "depthRange_m": [
+        585,
+        622
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Acanthogorgia aspera",
+      "aphiaID": 177735,
+      "records": 1,
+      "depthRange_m": [
+        836,
+        836
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Alternatipathes alternata",
+      "aphiaID": 994319,
+      "records": 1,
+      "depthRange_m": [
+        744,
+        866
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Amphiura (Amphiura) grandisquama natalensis",
+      "aphiaID": 224130,
+      "records": 1,
+      "depthRange_m": [
+        660,
+        660
+      ],
+      "group": "echinoderm",
+      "taxonRank": "Subspecies"
+    },
+    {
+      "scientificName": "Aphrocallistes beatrix",
+      "aphiaID": 134380,
+      "records": 1,
+      "depthRange_m": [
+        800,
+        800
+      ],
+      "group": "sponge",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Asterias forbesi",
+      "aphiaID": 158489,
+      "records": 1,
+      "depthRange_m": [
+        731.5,
+        731.5
+      ],
+      "group": "echinoderm",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Calliostoma torrei",
+      "aphiaID": 419433,
+      "records": 1,
+      "depthRange_m": [
+        836,
+        836
+      ],
+      "group": "mollusc",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Dercitus (Dercitus) bucklandi",
+      "aphiaID": 555677,
+      "records": 1,
+      "depthRange_m": [
+        809,
+        809
+      ],
+      "group": "sponge",
+      "taxonRank": "Species"
+    },
+    {
+      "scientificName": "Keratoisis grayi",
+      "aphiaID": 125376,
+      "records": 1,
+      "depthRange_m": [
+        836,
+        836
+      ],
+      "group": "cnidarian",
+      "taxonRank": "Species"
+    }
+  ]
+}
