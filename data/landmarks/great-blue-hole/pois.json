@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "landmark": "great-blue-hole",
+  "pois": [
+    {
+      "id": "great-blue-hole-centre",
+      "name": "Great Blue Hole: survey marker",
+      "lat": 17.3153,
+      "lon": -87.5346,
+      "snap_to_seabed": true,
+      "radius_m": 200,
+      "kind": "geology",
+      "primary": true,
+      "scan_seconds": 4,
+      "guide_entry": "the-hole",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Great_Blue_Hole",
+        "https://www.gmrt.org/"
+      ],
+      "note": "This marks the Great Blue Hole's real, published coordinates (17.3153N, 87.5346W). It is not a reconstruction -- there is no fabricated depression here. This tile's own terrain reads only about 4.2 m deep at this point: the open bathymetry behind this game has no dedicated high-resolution survey of the hole, so the real 124 m sinkhole (318 m across) does not appear. See the field guide entry for what the real hole looks like, drawn entirely from sources, not from this tile's terrain."
+    },
+    {
+      "id": "great-blue-hole-reef-rim",
+      "name": "Reef flat around the hole",
+      "lat": 17.3273,
+      "lon": -87.5466,
+      "snap_to_seabed": true,
+      "radius_m": 300,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "reef-rim",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://www.gmrt.org/",
+        "https://en.wikipedia.org/wiki/Lighthouse_Reef"
+      ],
+      "note": "Real survey terrain: the shallow reef flat of Lighthouse Reef atoll surrounding the hole, reading about 2.5 m deep here. This is genuine bathymetry, unlike the hole itself, which this tile cannot resolve."
+    },
+    {
+      "id": "great-blue-hole-outer-dropoff",
+      "name": "Outer reef drop-off",
+      "lat": 17.3153,
+      "lon": -87.4946,
+      "snap_to_seabed": true,
+      "radius_m": 300,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "outer-dropoff",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": [
+        "https://www.gmrt.org/"
+      ],
+      "note": "Real survey terrain: about 4.3 km east of the hole marker, the reef flat gives way to a steep drop-off, from a few metres deep to about 196 m here and falling to well over 3,000 m further out. This transition is genuine atoll-margin bathymetry, resolved at this tile's ~58 x 61 m cell size."
+    },
+    {
+      "id": "great-blue-hole-reef-life",
+      "name": "Reef life along the rim",
+      "lat": 17.3273,
+      "lon": -87.5466,
+      "snap_to_seabed": true,
+      "radius_m": 150,
+      "kind": "biology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "reef-biology",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Great_Blue_Hole",
+        "https://en.wikipedia.org/wiki/Lighthouse_Reef"
+      ],
+      "note": "Co-located with the reef-rim geology POI: the terrain here is real, but no individual animals are modelled as props. Species named in the guide entry (Caribbean reef sharks, nurse sharks, groupers, squirrelfish, angelfish) are documented for Lighthouse Reef and the hole's rim generally, not surveyed at this exact point, hence medium confidence and reconstruction: true for the framing (not for the terrain)."
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "landmark": "great-blue-hole",
+  "tile": "great-blue-hole",
+  "title": "Lighthouse Reef and the Great Blue Hole",
+  "hull_class": "A",
+  "environment": {
+    "preset": "reef"
+  },
+  "species_file": "species.json",
+  "spawn": {
+    "lat": 17.3153,
+    "lon": -87.4979,
+    "depth_m": 5,
+    "heading_deg": 270
+  },
+  "briefing": {
+    "summary": "Survey Lighthouse Reef atoll in Belize: the shallow reef flat, its outer drop-off into open water, the reef life along the rim, and a marker at the real coordinates of the Great Blue Hole -- a famous 124 m sinkhole that this survey's bathymetry is too coarse to show.",
+    "depth_m": 226,
+    "facts": [
+      "The Great Blue Hole is real and famous, but this open bathymetry has no dedicated high-resolution survey of it: at its published coordinates, this tile reads only a few metres deep, not the true 124 m sinkhole. The field guide explains what a proper 2018 sonar survey actually found there.",
+      "The reef flat around the hole is shallow, mostly under 10 m, then drops steeply to open ocean a few kilometres out -- both features are real, if coarse, survey terrain.",
+      "You start at the surface over the outer slope, in water well over 60 m deep. Head west (about 270°) toward the reef flat and the hole's marked position.",
+      "This is part of the Belize Barrier Reef Reserve System, a UNESCO World Heritage Site. Keep a respectful distance from the reef."
+    ],
+    "hazards": [
+      "Shallow reef structure near the rim -- watch your depth and avoid contact with coral.",
+      "A steep drop-off from the reef flat to open ocean; currents can be stronger there.",
+      "Total darkness below a few hundred metres on the outer slope; only your lights work.",
+      "Your Class A hull is rated to 1,000 m, comfortably beyond anything on this survey."
+    ]
+  },
+  "objectives": [
+    {
+      "id": "hole-marker",
+      "type": "scan",
+      "poi": "great-blue-hole-centre",
+      "primary": true,
+      "title": "Find the Great Blue Hole's real coordinates"
+    },
+    {
+      "id": "reef-rim",
+      "type": "scan",
+      "poi": "great-blue-hole-reef-rim",
+      "primary": false,
+      "title": "Survey the reef flat surrounding the hole"
+    },
+    {
+      "id": "outer-dropoff",
+      "type": "scan",
+      "poi": "great-blue-hole-outer-dropoff",
+      "primary": false,
+      "title": "Follow the outer drop-off into open water"
+    },
+    {
+      "id": "reef-life",
+      "type": "scan",
+      "poi": "great-blue-hole-reef-life",
+      "primary": false,
+      "title": "Observe reef life along the rim"
+    }
+  ],
+  "completion": "all_primary"
+}

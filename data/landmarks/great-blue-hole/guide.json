@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "landmark": "great-blue-hole",
+  "entries": [
+    {
+      "id": "overview",
+      "title": "Lighthouse Reef and the Great Blue Hole",
+      "paragraphs": [
+        "Important: this survey's bathymetry cannot show the Great Blue Hole itself. At the hole's published coordinates, this tile reads only a few metres deep -- the open, global bathymetry this game is built on has no dedicated high-resolution survey of the site, and the real sinkhole, about 318 m across and 124 m deep, is far too small and steep-sided for it to resolve. Rather than invent a depression that isn't in the data, this mission marks the hole's real location honestly and tells you what it actually looks like, drawn entirely from published sources -- see the next entry.",
+        "What this survey can show is real: the shallow reef flat of Lighthouse Reef atoll, which surrounds the hole, and the dramatic drop-off where that reef flat gives way to open ocean a few kilometres out. Both are genuine terrain in this tile, at the resolution this data allows.",
+        "Lighthouse Reef, along with the Great Blue Hole itself, is part of the Belize Barrier Reef Reserve System, a UNESCO World Heritage Site -- the second-longest barrier reef system in the world after Australia's Great Barrier Reef."
+      ],
+      "facts": [
+        { "label": "Real hole diameter", "value": "~318 m" },
+        { "label": "Real hole depth", "value": "~124 m" },
+        { "label": "Terrain reading at hole coordinates (this tile)", "value": "~4.2 m" },
+        { "label": "Protection", "value": "Belize Barrier Reef Reserve System, UNESCO World Heritage Site" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Great Blue Hole — Wikipedia", "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole" },
+        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "the-hole",
+      "title": "What the hole really looks like",
+      "paragraphs": [
+        "The Great Blue Hole formed as a limestone cave system on dry land, during several ice-age periods when sea levels were far lower than today. As the ice ages ended and the sea rose, the caves flooded and their roof eventually collapsed, leaving a near-perfectly circular sinkhole about 318 m across and 124 m deep, ringed by the shallow reef flat you can survey here.",
+        "Jacques Cousteau brought his research vessel Calypso to chart the hole in 1971, confirming its karst limestone origin and identifying ledges at roughly 21 m, 49 m and 91 m -- steps left behind as the cave systems formed at different sea levels. His team also recovered stalactites, mineral icicles that can only form in dry air above water, direct proof the hole was once a cave open to the sky.",
+        "A more recent expedition, in late 2018, used Aquatica Submarines' crewed subs and Kongsberg sonar aboard the research vessel Brooks McCall to build the first complete high-resolution 3D sonar map of the interior. It found dense fields of stalactites never mapped before, a 'graveyard' of conch shells that had fallen in and could not climb back out, and a layer of hydrogen-sulfide-rich water around 90 m down where oxygen runs out and the hole becomes lifeless.",
+        "None of this is modelled in this game: the shape, ledges, stalactites and chemistry described here come entirely from the sources below, not from any terrain you can scan. The marker at this entry's matching POI sits on this tile's real (shallow) seabed reading, honestly, rather than a fabricated pit."
+      ],
+      "facts": [
+        { "label": "Diameter / depth", "value": "~318 m / ~124 m" },
+        { "label": "Formed during", "value": "ice-age low sea levels (dated to ~153,000-15,000 years ago)" },
+        { "label": "Charted by", "value": "Jacques Cousteau, 1971 (RV Calypso)" },
+        { "label": "3D sonar-mapped by", "value": "Blue Hole Belize Expedition, Nov-Dec 2018 (Aquatica Submarines, Kongsberg)" },
+        { "label": "Anoxic layer", "value": "~90 m depth" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Great Blue Hole — Wikipedia", "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole" },
+        { "title": "Jacques Cousteau's Grandson to Map Depths of Massive Blue Hole Off Belize's Coast — Live Science", "url": "https://www.livescience.com/63950-belize-blue-hole-expedition.html" },
+        { "title": "Belize's Great Blue Hole revealed in expedition survey — GPS World", "url": "https://www.gpsworld.com/belizes-great-blue-hole-revealed-in-expedition-survey/" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "reef-rim",
+      "title": "The reef flat",
+      "paragraphs": [
+        "Surrounding the hole, Lighthouse Reef's reef flat is real, if coarse, survey terrain -- shallow water, mostly under 10 m deep in this tile, typical of the top of a Caribbean atoll. It is this shallow platform, not open ocean, that the Great Blue Hole punches straight through.",
+        "This is genuine bathymetry, not a reconstruction."
+      ],
+      "facts": [
+        { "label": "Depth here (this tile)", "value": "~2.5 m" },
+        { "label": "Setting", "value": "atoll reef flat, Lighthouse Reef" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" },
+        { "title": "Lighthouse Reef — Wikipedia", "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "outer-dropoff",
+      "title": "Where the atoll ends",
+      "paragraphs": [
+        "A few kilometres east of the hole, the reef flat ends abruptly: this tile's terrain plunges from a few metres deep to nearly 200 m within about half a kilometre, then keeps falling past 3,000 m further out into the open Caribbean. That is the outer wall of the Lighthouse Reef atoll -- a real, steep undersea cliff, and one of the more dramatic features this tile's bathymetry does resolve well.",
+        "Real survey terrain throughout; the depths quoted are direct readings from this tile."
+      ],
+      "facts": [
+        { "label": "Depth at ~4.3 km east of the hole", "value": "~196 m" },
+        { "label": "Depth further out", "value": "> 3,000 m" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        { "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332", "url": "https://www.gmrt.org/" },
+        { "title": "Lighthouse Reef — Wikipedia", "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef" }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "reef-biology",
+      "title": "Life on the rim",
+      "paragraphs": [
+        "Although the interior of the Great Blue Hole itself is largely lifeless below its anoxic layer, its rim and the surrounding reef flat teem with life typical of a healthy Caribbean atoll: groupers, squirrelfish and angelfish among the coral, and reef sharks -- nurse sharks and Caribbean reef sharks -- patrolling the drop-off.",
+        "These species are documented for Lighthouse Reef and the hole's rim generally, not individually surveyed at this exact point, so their placement here is illustrative rather than a site-specific record."
+      ],
+      "facts": [
+        { "label": "Sharks", "value": "Caribbean reef shark, nurse shark" },
+        { "label": "Fish", "value": "groupers, squirrelfish, angelfish" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        { "title": "Great Blue Hole — Wikipedia", "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole" },
+        { "title": "Lighthouse Reef — Wikipedia", "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef" }
+      ],
+      "confidence": "medium"
+    }
+  ]
+}
