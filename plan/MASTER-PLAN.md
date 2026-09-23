@@ -52,7 +52,7 @@ Mission select on a 3D globe (Natural Earth texture). Landmarks across all types
 
 ### Tier 3 — Systems depth
 
-Battery/oxygen as a _pacing_ mechanism (not death spiral), sample collection, marine life encounters from OBIS-informed spawn tables, photo mode, ROV deployment from the sub for tight spaces (wreck interiors), currents from ocean model data, day/night at the surface, optional VR later.
+Phase D prioritizes playable dives and then adds optional battery/oxygen, offline currents, ROV and photo mode. Marine life encounters move to Phase E; surface day/night is dropped. Sample collection, inventory and VR have no scheduled package.
 
 ### Tier 4 — Stretch
 
@@ -141,9 +141,13 @@ Conventions for all packages: each is sized for one agent session; lists files i
 | C5      | Save/settings/accessibility: settings screen, key remap, colour-blind sonar palette, motion-reduction toggle, subtitles for audio cues           | Sonnet    | Axe/lighthouse a11y pass ≥ 90                          | shipped — `docs/settings.md`, `tests/e2e/settings.spec.ts`; O opens/freezes, reduce-motion and deuteranopia palette persist across reload, captions render (QA-C) |
 | C6      | Deployment: GitHub Actions build+test, Pages deploy, tile CDN caching headers, `ATTRIBUTION.md` check                                            | Sonnet    | Public URL live                                        | prepared — project-base browser test passes; not published (owner decision)                                                                                       |
 
-### Phase D — Systems (Tier 3), scheduled after C playtest
+### Phase D — Playability, scoped after the owner's first playtest
 
-Battery/oxygen pacing, samples & inventory, marine life agents (boids + species tables), ROV mode, photo mode, currents field, surface day/night. Proposed briefs are in `plan/PHASE-D-BRIEFS.md`, informed by Phase C QA. The owner confirmed that Phase C has not yet been playtested; refine the briefs after that feedback and write contracts before any Phase D code.
+Arcade-default gameplay modes, faster and better-lit dives, near-site starts, usable controls/HUD/sonar, home and pause menus, objective hints, per-dive scan state, Journal and honest debrief flow. Then battery/oxygen, offline currents, ROV and purposeful photo mode. [Plan](PHASE-D-PLAN.md), [contracts](PHASE-D-CONTRACTS.md), and [briefs](PHASE-D-BRIEFS.md) supersede the pre-playtest proposal. **Old D7 (surface day/night) is dropped.** Samples and inventory have no Phase D package.
+
+### Phase E — Future expansions: marine life encounters (formerly D4)
+
+OBIS-informed animal encounters and their behavior are deferred until after Phase D playability and a later owner scope decision. Existing `species.json` remains an occurrence-based survey list; in-world placement would be reconstructed and labeled as such.
 
 ### Ongoing / cross-cutting
 

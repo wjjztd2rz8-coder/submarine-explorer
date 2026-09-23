@@ -23,8 +23,12 @@ gate content npm run check:content
 gate attribution python3 tools/check_attribution.py
 gate prettier npx prettier --check .
 if [[ "${1:-}" != "--no-e2e" ]]; then
-  gate e2e npm run test:e2e
-  gate e2e-base npm run test:e2e:base
+  # PW_PORT (default 4173) lets parallel worktrees run e2e side by side.
+  port="${PW_PORT:-4173}"; bport=$((port + 100))
+  gate e2e env PW_PORT="$port" npm run test:e2e
+  gate e2e-base bash -c "VITE_BASE=/submarine-explorer/ npm run build -- --outDir dist-project-base && \
+    VITE_BASE=/submarine-explorer/ PW_BASE=/submarine-explorer/ PW_PORT=$bport PW_OUTDIR=dist-project-base \
+    npx playwright test tests/e2e/base-url.spec.ts --output=test-results-project-base"
   rm -rf dist-project-base
 fi
 exit $fail

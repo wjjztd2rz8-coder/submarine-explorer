@@ -10,11 +10,26 @@
 # Screenshots: if the brief's work writes PNGs to .cache/codex/shots/<name>/,
 # they are attached to the next round so Codex can see the UI.
 # On a Codex usage limit, sleeps until the stated reset time and retries.
+#
+# Parallel tasks: set WT=1 and a distinct PW_PORT. The task then runs in its
+# own git worktree (../subexp-wt/<name>, branch codex/<name>, from HEAD) with
+# node_modules symlinked, so builds, e2e ports and gate feedback never mix.
+# Logs and results still land in this checkout's .cache/codex/.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.local/node/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
 brief="$1"; name="$2"; max_rounds="${3:-3}"
-dir=.cache/codex; mkdir -p "$dir/shots/$name"
+dir="$PWD/.cache/codex"; mkdir -p "$dir/shots/$name"
+brief="$(realpath "$brief")"
+if [[ "${WT:-0}" == 1 ]]; then
+  wt="$(realpath ..)/subexp-wt/$name"
+  if [[ ! -d "$wt" ]]; then
+    git worktree add -q -b "codex/$name" "$wt" HEAD || exit 1
+    ln -s "$PWD/node_modules" "$wt/node_modules"
+  fi
+  mkdir -p "$wt/.cache/codex"; ln -sfn "$dir/shots" "$wt/.cache/codex/shots"
+  cd "$wt"
+fi
 log="$dir/$name.log"; result="$dir/$name-result.md"; last="$dir/$name-last.md"
 : > "$log"
 common=(-m gpt-6-sol -c model_reasoning_effort=high -c 'sandbox_mode="workspace-write"')
