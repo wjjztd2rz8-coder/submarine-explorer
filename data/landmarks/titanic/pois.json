@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "landmark": "titanic",
+  "pois": [
+    {
+      "id": "titanic-bow",
+      "name": "Bow section",
+      "lat": 41.7325,
+      "lon": -49.94694,
+      "depth_m": 3790,
+      "radius_m": 200,
+      "kind": "wreck",
+      "primary": true,
+      "scan_seconds": 4,
+      "guide_entry": "bow",
+      "confidence": "high",
+      "reconstruction": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
+        "https://www.titanicstory.com/discover.htm",
+        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+      ],
+      "note": "Published position 41°43′57″N 49°56′49″W. depth_m is the scan target at roughly mid-hull height; GMRT seabed here is 3,802 m."
+    },
+    {
+      "id": "titanic-stern",
+      "name": "Stern section",
+      "lat": 41.72639,
+      "lon": -49.94833,
+      "depth_m": 3795,
+      "radius_m": 180,
+      "kind": "wreck",
+      "primary": true,
+      "scan_seconds": 4,
+      "guide_entry": "stern",
+      "confidence": "high",
+      "reconstruction": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
+        "https://www.titanicstory.com/discover.htm",
+        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+      ],
+      "note": "Published position 41°43′35″N 49°56′54″W. GMRT seabed here is 3,801 m."
+    },
+    {
+      "id": "titanic-boilers",
+      "name": "Boiler field",
+      "lat": 41.7256,
+      "lon": -49.9469,
+      "depth_m": 3796,
+      "radius_m": 100,
+      "kind": "debris",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "boilers",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
+        "https://www.titanicstory.com/discover.htm",
+        "https://www.whoi.edu/ocean-learning-hub/ocean-topics/ocean-human-lives/underwater-archaeology/rms-titanic/1985-discovery-of-rms-titanic/",
+        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+      ],
+      "note": "Centre of the boiler field, 41°43′32″N 49°56′49″W: the Wikipedia \"Wreck of the Titanic\" infobox coordinate, footnoted \"the centre of the boiler field\" (Ballard 1987, p. 199); titanicstory.com gives the same coordinate for the boilers. That puts it ~150 m south-east of the published stern position; Wikipedia says the boilers are about 600 ft (180 m) east of the stern."
+    },
+    {
+      "id": "titanic-debris-field",
+      "name": "Debris field (mid-site)",
+      "lat": 41.73,
+      "lon": -49.946,
+      "depth_m": 3797,
+      "radius_m": 150,
+      "kind": "debris",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "debris-field",
+      "confidence": "low",
+      "reconstruction": true,
+      "sources": [
+        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf",
+        "http://www.thehistoryblog.com/archives/15523",
+        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
+      ],
+      "note": "Representative point in the gap between the sections. The two dense debris fields are each 600–800 m long (about 5 km² together), and the 2010 survey mapped 15–20 sq mi (39–52 km²) of seafloor; neither extent is published as coordinates."
+    },
+    {
+      "id": "titanic-deck-fittings",
+      "name": "Deck fittings and bollards",
+      "lat": 41.73,
+      "lon": -49.949,
+      "depth_m": 3799,
+      "radius_m": 100,
+      "kind": "artifact",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "deck-fittings",
+      "confidence": "low",
+      "reconstruction": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
+        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+      ],
+      "note": "Illustrative location in the mid-site debris; individual fittings are scattered through the field and their positions are not published."
+    },
+    {
+      "id": "titanic-big-piece",
+      "name": "Where the \"Big Piece\" lay",
+      "lat": 41.7252,
+      "lon": -49.9497,
+      "depth_m": 3798,
+      "radius_m": 100,
+      "kind": "debris",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "big-piece",
+      "confidence": "low",
+      "reconstruction": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/The_Big_Piece",
+        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
+        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+      ],
+      "note": "Approximate: hull plating that broke from the stern lies in the stern-side debris, which trails south-west from the stern (Wikipedia, 'Wreck of the Titanic', section 'Debris fields', citing Ballard 1987, p. 207). Placed ~175 m south-west of the stern. The Big Piece itself was raised in 1998 and is not on the seabed."
+    },
+    {
+      "id": "titanic-memorial",
+      "name": "Memorial plaque site (stern)",
+      "lat": 41.7268,
+      "lon": -49.9485,
+      "depth_m": 3792,
+      "radius_m": 80,
+      "kind": "memorial",
+      "primary": false,
+      "scan_seconds": 5,
+      "guide_entry": "memorial",
+      "confidence": "medium",
+      "reconstruction": true,
+      "sources": [
+        "https://www.upi.com/Archives/1986/07/21/Scientists-placed-a-memorial-plaque-on-the-stern-of/6073522302400/",
+        "https://www.thecrimson.com/article/1986/7/22/explorers-memorialize-the-titanics-dead-pwoods/",
+        "https://www.paullee.com/titanic/THSplaque.php"
+      ],
+      "note": "Aft starboard corner of the stern section, where Ballard fixed the Titanic Historical Society plaque in July 1986. Exact placement is approximate; the plaque itself was gone by 1996 and is not modelled."
+    },
+    {
+      "id": "titanic-channel",
+      "name": "Unnamed seabed channel",
+      "lat": 41.7616,
+      "lon": -49.99,
+      "depth_m": 3865,
+      "radius_m": 250,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "channel",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/"],
+      "note": "Eastern flank of a shallow NNE–SSW channel visible in the GMRT tile, ~4.8 km north-west of the bow (seabed 3,871 m here, axis ~3,890 m). This is survey data, not a reconstruction."
+    }
+  ]
+}

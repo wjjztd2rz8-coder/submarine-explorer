@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "landmark": "_test",
+  "title": "Test site · Titanic tile",
+  "memorial_note": "Fixture text for automated tests. The real Titanic site is a grave: more than 1,500 people died in the sinking on 15 April 1912.",
+  "entries": [
+    {
+      "id": "site",
+      "title": "About this test site",
+      "paragraphs": [
+        "This landmark folder is a test fixture. It reuses the Titanic tile's real GMRT bathymetry so the scan, discovery and field-guide systems can be exercised without the authored Titanic content.",
+        "It is referenced by no scan target, so it is unlocked from the start."
+      ],
+      "facts": [
+        { "label": "Tile", "value": "titanic (GMRT, ~46 x 61 m cells)" },
+        { "label": "Seabed", "value": "about 3,800 m" }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Ryan et al. (2009), Global Multi-Resolution Topography synthesis",
+          "url": "https://doi.org/10.1029/2008GC002332"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "bow",
+      "title": "The bow section",
+      "paragraphs": [
+        "The forward part of the hull came to rest upright on the abyssal plain, about 3,800 m down, after the ship broke apart during the sinking.",
+        "The wreck was located on 1 September 1985 by a joint French-American expedition. The stern section lies roughly 600 m away.",
+        "What you see here is a placed model at the recorded position, not survey data: the bathymetry grid is far too coarse to resolve a 269 m hull."
+      ],
+      "facts": [
+        { "label": "Depth", "value": "~3,800 m" },
+        { "label": "Found", "value": "1 September 1985" },
+        { "label": "Bow to stern", "value": "~600 m" }
+      ],
+      "reconstruction": true,
+      "sources": [
+        {
+          "title": "Wreck of the Titanic — Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "debris",
+      "title": "Debris field",
+      "paragraphs": [
+        "Fixture entry for a secondary scan target that snaps to the seabed. Unlocked by scanning the debris POI."
+      ],
+      "facts": [{ "label": "Kind", "value": "debris" }],
+      "reconstruction": false,
+      "sources": [],
+      "confidence": "medium"
+    }
+  ]
+}

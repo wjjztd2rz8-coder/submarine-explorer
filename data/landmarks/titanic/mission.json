@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "landmark": "titanic",
+  "tile": "titanic",
+  "title": "Titanic dive",
+  "hull_class": "B",
+  "spawn": {
+    "lat": 41.7481,
+    "lon": -49.959,
+    "depth_m": 5,
+    "heading_deg": 150
+  },
+  "briefing": {
+    "summary": "Dive 3,800 m to the wreck of RMS Titanic, lost on 15 April 1912. Find and scan the bow and stern sections, which lie about 600 m apart on the seabed, then survey the boiler field and debris near the stern.",
+    "depth_m": 3800,
+    "facts": [
+      "The wreck was found on 1 September 1985 by a French–American team led by Jean-Louis Michel and Robert Ballard.",
+      "The ship broke apart as it sank. The bow faces roughly north, and the stern turned around as it fell, so its rear end points back at the bow.",
+      "You start at the surface about 2 km north-north-west of the bow. Head south-south-east (about 150°) and descend.",
+      "The hull shapes are artist's reconstructions at the real coordinates. The open bathymetry is too coarse to show the wreck itself."
+    ],
+    "hazards": [
+      "Total darkness: sunlight fades out within the top few hundred metres, and below that only your lights work.",
+      "Crushing pressure: about 380 atmospheres at the seabed. Your Class B hull is rated to 4,500 m.",
+      "Near-freezing water, about 1–2 °C.",
+      "Fragile, collapsing structure: decks and railings are still falling. Keep a respectful distance and do not touch.",
+      "Deep currents sweep the site and stir up sediment that reduces visibility."
+    ],
+    "memorial_note": "The Titanic is the final resting place of about 1,500 people who died on 15 April 1912. Please explore it as you would a memorial. The game has no salvage, collection or loot of any kind; you observe and learn only, in keeping with the international agreement that protects the site."
+  },
+  "objectives": [
+    {
+      "id": "find-bow",
+      "type": "scan",
+      "poi": "titanic-bow",
+      "primary": true,
+      "title": "Locate and scan the bow section"
+    },
+    {
+      "id": "find-stern",
+      "type": "scan",
+      "poi": "titanic-stern",
+      "primary": true,
+      "title": "Locate and scan the stern section"
+    },
+    {
+      "id": "boilers",
+      "type": "scan",
+      "poi": "titanic-boilers",
+      "primary": false,
+      "title": "Survey the boiler field"
+    },
+    {
+      "id": "memorial",
+      "type": "scan",
+      "poi": "titanic-memorial",
+      "primary": false,
+      "title": "Pause at the memorial plaque site on the stern"
+    }
+  ],
+  "completion": "all_primary"
+}

@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "landmark": "titanic",
+  "props": [
+    {
+      "id": "bow-hull",
+      "model": "procedural:hull-block",
+      "lat": 41.7325,
+      "lon": -49.94694,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [143, 28, 16],
+      "ends": ["prow", "cut"],
+      "lod_distance_m": 1500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Bow section at the published position 41°43′57″N 49°56′49″W. Length ~470 ft / 143 m (Wikipedia 'Wreck of the Titanic'); width = the ship's beam, 28.2 m (Wikipedia 'RMS Titanic'). Height 16 m is an estimate of the hull visible above the mud: keel to boat deck is ~29 m (waterline to boat deck ~18 m plus 10.5 m draught), and the bow is buried up to ~18 m at the prow and less further aft. Heading 0° because sources say the bow 'faces north' (titanicstory.com); the exact heading is unpublished. ends [prow, cut]: prow forward (north), torn end aft, facing the stern."
+    },
+    {
+      "id": "stern-hull",
+      "model": "procedural:hull-block",
+      "lat": 41.72639,
+      "lon": -49.94833,
+      "snap_to_seabed": true,
+      "heading_deg": 190,
+      "scale": 1,
+      "dimensions_m": [107, 32, 10],
+      "ends": ["cut", "rounded"],
+      "lod_distance_m": 1500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Stern section at the published position 41°43′35″N 49°56′54″W. Length ~350 ft / 107 m (Wikipedia). Width 32 m is slightly more than the 28.2 m beam because the hull plating is splayed outwards (estimate). Height 10 m is lower because the decks collapsed onto one another (estimate). heading_deg is the direction of the ship's original forward end, 190°, so the rear end points ~10° back at the bow: WHOI Oceanus 2012 says 'its rear points to the bow section', and the bearing from stern to bow is 9.6°. ends [cut, rounded]: the forward end (facing 190°, away from the bow) is where the ship tore apart; the aft end is the rounded counter stern, pointing back at the bow."
+    },
+    {
+      "id": "boiler-field",
+      "model": "procedural:debris",
+      "lat": 41.7256,
+      "lon": -49.9469,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [25, 25, 5],
+      "lod_distance_m": 600,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Five single-ended boilers (~4.8 m diameter, Wikipedia \"RMS Titanic\") from Boiler Room No. 1, at the boiler-field centre 41°43′32″N 49°56′49″W (Wikipedia \"Wreck of the Titanic\" infobox, footnoted to Ballard 1987 p. 199; same coordinate on titanicstory.com), ~150 m south-east of the stern. Cluster radius 25 m and height 5 m are estimates (\"tight cluster\")."
+    },
+    {
+      "id": "debris-midfield",
+      "model": "procedural:debris",
+      "lat": 41.73,
+      "lon": -49.9475,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [150, 150, 2],
+      "lod_distance_m": 600,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Representative scatter between the sections, covering the debris-field and deck-fittings POIs. The two dense debris fields are each 600–800 m long and cover about 5 km² (Wikipedia 'Wreck of the Titanic', 'Debris fields'), and the 2010 survey mapped 15–20 sq mi / 39–52 km² of seafloor (WHOI Oceanus 2012); this 150 m cluster stands in for the debris crossed between the sections. The densest debris is near the stern (Wikipedia citing Ballard 1987, p. 150). Position approximate."
+    },
+    {
+      "id": "debris-stern",
+      "model": "procedural:debris",
+      "lat": 41.7252,
+      "lon": -49.9497,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [80, 80, 3],
+      "lod_distance_m": 600,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Stern-side debris (hull plating broken from the stern, where the 'Big Piece' lay before it was raised in 1998). Radius 80 m is an estimate; position approximate, ~175 m south-west of the stern, along the stern's south-west debris trail (Wikipedia 'Wreck of the Titanic', section 'Debris fields', citing Ballard 1987, p. 207)."
+    }
+  ]
+}

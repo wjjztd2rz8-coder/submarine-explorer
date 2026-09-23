@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "landmark": "_test",
+  "props": [
+    {
+      "id": "_test-hull",
+      "model": "procedural:hull-block",
+      "lat": 41.729674,
+      "lon": -49.95,
+      "snap_to_seabed": true,
+      "y_offset_m": -1.5,
+      "heading_deg": 90,
+      "dimensions_m": [80, 16, 14],
+      "lod_distance_m": 1500,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Test fixture: hull section broadside to a sub spawned at ?at=41.7290,-49.9500 heading north."
+    },
+    {
+      "id": "_test-rock",
+      "model": "/assets/models/rock_09.glb",
+      "lat": 41.729503,
+      "lon": -49.949687,
+      "snap_to_seabed": true,
+      "align_to_slope": true,
+      "heading_deg": 120,
+      "scale": 16,
+      "lod_distance_m": 600,
+      "collision": "sphere",
+      "note": "Poly Haven rock_09 (CC0), baked to 1 m long, so scale = metres."
+    },
+    {
+      "id": "_test-boiler",
+      "model": "/assets/models/barrel_stove.glb",
+      "lat": 41.729494,
+      "lon": -49.950313,
+      "snap_to_seabed": true,
+      "heading_deg": 20,
+      "scale": [4.8, 4.8, 4.2],
+      "lod_distance_m": 800,
+      "collision": "sphere",
+      "note": "Poly Haven barrel_stove (CC0) as a boiler stand-in: baked to 1 m diameter lying along its heading."
+    },
+    {
+      "id": "_test-debris",
+      "model": "procedural:debris",
+      "lat": 41.730347,
+      "lon": -49.94988,
+      "snap_to_seabed": true,
+      "dimensions_m": [60, 60, 4],
+      "collision": "none"
+    },
+    {
+      "id": "_test-chimney",
+      "model": "procedural:chimney",
+      "lat": 41.730662,
+      "lon": -49.949157,
+      "snap_to_seabed": true,
+      "dimensions_m": [7, 7, 26],
+      "collision": "box"
+    }
+  ]
+}

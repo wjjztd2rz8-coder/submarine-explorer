@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "landmark": "_test",
+  "pois": [
+    {
+      "id": "test-bow",
+      "name": "Bow section (fixture)",
+      "lat": 41.7325,
+      "lon": -49.9469,
+      "depth_m": 3800,
+      "radius_m": 150,
+      "kind": "wreck",
+      "primary": true,
+      "scan_seconds": 3,
+      "guide_entry": "bow",
+      "confidence": "high",
+      "reconstruction": true,
+      "sources": ["https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"]
+    },
+    {
+      "id": "test-debris",
+      "name": "Debris field (fixture)",
+      "lat": 41.728,
+      "lon": -49.944,
+      "snap_to_seabed": true,
+      "radius_m": 120,
+      "kind": "debris",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "debris",
+      "confidence": "medium"
+    }
+  ]
+}
