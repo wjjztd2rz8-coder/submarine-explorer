@@ -7,11 +7,11 @@ import { keysText, planRebind, rebindMessage } from '../../src/ui/Settings.js';
 describe('planRebind', () => {
   it('makes the key primary, keeps secondaries and lists displaced actions', () => {
     const actions = defaultActions();
-    const plan = planRebind(actions, 'thrustForward', 'KeyX');
-    expect(plan?.keys).toEqual(['KeyX', 'ArrowUp']);
-    expect(plan?.displaced).toEqual([{ id: 'boost', label: 'Boost', remaining: [] }]);
-    expect(rebindMessage('Ahead', 'KeyX', plan!)).toBe(
-      'Ahead is now X. X was taken from Boost, which is now unbound.',
+    const plan = planRebind(actions, 'thrustForward', 'ShiftLeft');
+    expect(plan?.keys).toEqual(['ShiftLeft', 'ArrowUp']);
+    expect(plan?.displaced).toEqual([{ id: 'boost', label: 'Boost', remaining: ['ShiftRight'] }]);
+    expect(rebindMessage('Ahead', 'ShiftLeft', plan!)).toBe(
+      'Ahead is now Shift. Shift was removed from Boost (still Shift).',
     );
   });
 

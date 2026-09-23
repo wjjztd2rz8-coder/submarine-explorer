@@ -22,7 +22,7 @@ test('project-base build loads data, models, and globe texture', async ({ page }
 
   await page.goto(`${base}?tile=titanic`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true);
-  await page.getByRole('button', { name: 'GLOBE', exact: true }).click();
+  await page.keyboard.press('KeyN');
   await page.waitForFunction(
     () => (window.__game?.globe as { textureReady?: boolean } | undefined)?.textureReady === true,
   );

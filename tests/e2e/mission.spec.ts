@@ -6,7 +6,7 @@ import { expect, test, type Page } from '@playwright/test';
  *      starts the mission at the surface with the objectives panel up.
  *  (b) `?poi=titanic-bow&skipBriefing=1`: scan the bow, teleport to the stern
  *      and scan it -> `mission:complete` -> the mission debrief.
- *  (c) the free-dive start page lists the mission above DIVE SITES.
+ *  (c) the free-dive view keeps mission select off the HUD while deep links still work.
  * Also covers F2 (sonar canvas takes the tile aspect) and F3 (HUD help keys).
  *
  * State is read through `window.__game.{mission, missionRouter, discovery, scanner}`.
@@ -64,7 +64,7 @@ async function subPos(page: Page): Promise<{ x: number; y: number; z: number }> 
 }
 
 async function holdScanUntil(page: Page, objectiveId: string): Promise<void> {
-  await page.keyboard.down('g');
+  await page.keyboard.down('f');
   await page.waitForFunction(
     (id) =>
       (
@@ -75,7 +75,7 @@ async function holdScanUntil(page: Page, objectiveId: string): Promise<void> {
     objectiveId,
     { timeout: 20_000 },
   );
-  await page.keyboard.up('g');
+  await page.keyboard.up('f');
 }
 
 test.describe('B3 mission flow', () => {
@@ -92,7 +92,7 @@ test.describe('B3 mission flow', () => {
     await expect(page.locator('.briefing-objectives li.is-secondary')).toHaveCount(2);
     await expect(page.locator('.briefing-section.is-hazards li')).not.toHaveCount(0);
     await expect(page.locator('.briefing-memorial')).toBeVisible();
-    await expect(page.locator('.briefing-controls')).toContainText('scan (hold)');
+    await expect(page.locator('.briefing-controls button')).toHaveText('View controls');
     await expect(page.locator('.briefing-begin')).toHaveText('Begin dive');
     await expect(page.locator('.objectives-panel')).toBeHidden();
     // The mission picker is collapsed out of the way during a mission.
@@ -104,9 +104,9 @@ test.describe('B3 mission flow', () => {
     // Frozen: holding thrust + flood does nothing while the card is up.
     const before = await subPos(page);
     await page.keyboard.down('w');
-    await page.keyboard.down('Shift');
+    await page.keyboard.down('c');
     await page.waitForTimeout(800);
-    await page.keyboard.up('Shift');
+    await page.keyboard.up('c');
     await page.keyboard.up('w');
     const during = await subPos(page);
     expect(Math.hypot(during.x - before.x, during.y - before.y, during.z - before.z)).toBeLessThan(
@@ -146,19 +146,16 @@ test.describe('B3 mission flow', () => {
 
     // Now it simulates: flooding the tanks takes the boat down.
     const y0 = (await subPos(page)).y;
-    await page.keyboard.down('Shift');
+    await page.keyboard.down('c');
     await page.waitForTimeout(1500);
-    await page.keyboard.up('Shift');
+    await page.keyboard.up('c');
     expect((await subPos(page)).y).toBeLessThan(y0 - 1);
     // T cycles the sim speed and the panel follows.
     await page.keyboard.press('t');
     await expect(panel.locator('.obj-speed')).toHaveText('SIM 2×');
 
-    // F3: the help panel lists the systems keys.
-    const help = (await page.locator('.hud-help').textContent()) ?? '';
-    for (const k of ['L lights', 'G scan (hold)', 'J guide', 'Q ping', 'T sim speed', 'P photo']) {
-      expect(help.replace(/\s+/g, ' ')).toContain(k);
-    }
+    await expect(page.locator('.hud-help')).toHaveCount(0);
+    await expect(page.locator('.hud-sim-speed')).toHaveText('2× SIM SPEED');
     // F2: on the portrait Titanic tile the sonar canvas is portrait too (no letterbox).
     const sonar = await page.evaluate(() => {
       const c = document.querySelector('.sonar canvas') as HTMLCanvasElement;
@@ -279,26 +276,16 @@ test.describe('B3 mission flow', () => {
     expect(errors, errors.join(' | ')).toEqual([]);
   });
 
-  test('the bare start page boots titanic and lists the mission above the dive sites', async ({
-    page,
-  }) => {
+  test('the bare start page boots titanic without a docked mission picker', async ({ page }) => {
     const errors = collectErrors(page);
-    // A bare URL boots Config.defaultTileId (titanic), not the alphabetically first tile.
     await boot(page, '/');
     expect(await page.evaluate(() => (window.__game as { meta: { id: string } }).meta.id)).toBe(
       'titanic',
     );
     await expect(page.locator('.briefing')).toHaveCount(0);
     await expect(page.locator('.objectives-panel')).toHaveCount(0);
-    const select = page.locator('.mission-select');
-    await expect(select).not.toHaveClass(/is-collapsed/);
-    const item = select.locator('.mission-item.is-mission[data-mission="titanic"]');
-    await expect(item).toBeVisible();
-    await expect(item.locator('.mission-item-name')).toHaveText('Titanic dive');
-    await expect(item.locator('.mission-badge')).toHaveText('TILE AVAILABLE');
-    await expect(select.locator('.mission-title')).toHaveText(['MISSIONS', 'DIVE SITES']);
-    await page.screenshot({ path: 'tests/e2e/screenshots/mission-select.png' });
-    await Promise.all([page.waitForURL(/\?mission=titanic$/), item.click()]);
+    await expect(page.locator('.mission-select')).toBeHidden();
+    await page.goto('/?mission=titanic');
     await expect(page.locator('.briefing')).toBeVisible({ timeout: 45_000 });
     expect(errors, errors.join(' | ')).toEqual([]);
   });

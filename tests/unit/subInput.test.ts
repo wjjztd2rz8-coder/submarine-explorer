@@ -5,8 +5,12 @@
  */
 
 import { beforeEach, describe, expect, it } from 'vitest';
+import { Vector3 } from 'three';
+import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import { CameraRig } from '../../src/sub/CameraRig.js';
 import {
   BINDINGS_STORAGE_KEY,
+  LEGACY_BINDINGS_STORAGE_KEY,
   Input,
   defaultActions,
   keyLabel,
@@ -45,14 +49,14 @@ describe('Input action map', () => {
       expect(a.keys.length).toBeGreaterThan(0);
     }
     expect(input.primaryKeyLabel('thrustForward')).toBe('W');
-    expect(input.primaryKeyLabel('ballastFlood')).toBe('Shift');
+    expect(input.primaryKeyLabel('ballastFlood')).toBe('Ctrl');
   });
 
   it('maps keys to normalised axes', () => {
     const input = makeInput();
     input.injectKey('KeyW', true);
     input.injectKey('KeyD', true);
-    input.injectKey('ShiftLeft', true);
+    input.injectKey('ControlLeft', true);
     const s = input.sample();
     expect(s.throttle).toBe(1);
     expect(s.yaw).toBe(1);
@@ -72,23 +76,23 @@ describe('Input action map', () => {
 
   it('edge actions fire once and clear on endFrame', () => {
     const input = makeInput();
-    input.injectKey('KeyC', true);
+    input.injectKey('KeyQ', true);
     expect(input.sample().toggleCamera).toBe(true);
     input.endFrame();
     // Still held, but the edge has been consumed.
     expect(input.sample().toggleCamera).toBe(false);
-    input.injectKey('KeyC', false);
-    input.injectKey('KeyC', true);
+    input.injectKey('KeyQ', false);
+    input.injectKey('KeyQ', true);
     expect(input.sample().toggleCamera).toBe(true);
   });
 
   it('scan is level-triggered, not an edge', () => {
     const input = makeInput();
-    input.injectKey('KeyG', true);
+    input.injectKey('KeyF', true);
     expect(input.sample().scan).toBe(true);
     input.endFrame();
     expect(input.sample().scan).toBe(true);
-    input.injectKey('KeyG', false);
+    input.injectKey('KeyF', false);
     expect(input.sample().scan).toBe(false);
   });
 });
@@ -110,7 +114,7 @@ describe('Input rebinding', () => {
 
     const saved = store.getItem(BINDINGS_STORAGE_KEY);
     expect(saved).toBeTruthy();
-    expect(JSON.parse(saved as string).version).toBe(1);
+    expect(JSON.parse(saved as string).version).toBe(2);
   });
 
   it('reloads saved bindings in a fresh session and resets cleanly', () => {
@@ -130,35 +134,35 @@ describe('Input rebinding', () => {
   it('refuses an empty binding and survives a corrupt save', () => {
     const input = makeInput();
     expect(input.rebind('boost', [])).toBe(false);
-    expect(input.getAction('boost')?.keys).toEqual(['KeyX']);
+    expect(input.getAction('boost')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
 
     store.setItem(BINDINGS_STORAGE_KEY, '{not json');
     const recovered = makeInput();
-    expect(recovered.getAction('boost')?.keys).toEqual(['KeyX']);
+    expect(recovered.getAction('boost')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
 
     store.setItem(BINDINGS_STORAGE_KEY, JSON.stringify({ version: 99, keys: { boost: ['KeyZ'] } }));
     const wrongVersion = makeInput();
-    expect(wrongVersion.getAction('boost')?.keys).toEqual(['KeyX']);
+    expect(wrongVersion.getAction('boost')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
   });
 });
 
 describe('Input bindings across reloads (C5)', () => {
   it('a binding displaced by a conflict stays unbound after reload', () => {
     const first = makeInput();
-    first.rebind('thrustForward', ['KeyX']); // takes X from boost
+    first.rebind('thrustForward', ['ShiftLeft', 'ShiftRight']); // takes both boost keys
     expect(first.getAction('boost')?.keys).toEqual([]);
 
     const second = makeInput();
     expect(second.getAction('boost')?.keys).toEqual([]);
-    expect(second.getAction('thrustForward')?.keys).toEqual(['KeyX']);
-    second.injectKey('KeyX', true);
+    expect(second.getAction('thrustForward')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
+    second.injectKey('ShiftLeft', true);
     const s = second.sample();
     expect(s.throttle).toBe(1);
     expect(s.boost).toBe(false);
   });
 
   it('an action missing from the save does not reclaim a key another action saved', () => {
-    const payload = { version: 1, keys: { boost: ['KeyW'] } };
+    const payload = { version: 2, keys: { boost: ['KeyW'] } };
     store.setItem(BINDINGS_STORAGE_KEY, JSON.stringify(payload));
     const input = makeInput();
     expect(input.getAction('boost')?.keys).toEqual(['KeyW']);
@@ -178,7 +182,7 @@ describe('Input bindings across reloads (C5)', () => {
     const input = new Input({ storage: hostile });
     expect(input.rebind('boost', ['KeyZ'])).toBe(true);
     expect(() => input.resetBindings()).not.toThrow();
-    expect(input.getAction('boost')?.keys).toEqual(['KeyX']);
+    expect(input.getAction('boost')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
   });
 
   it('a throwing getItem keeps the defaults', () => {
@@ -191,26 +195,53 @@ describe('Input bindings across reloads (C5)', () => {
         removeItem: () => {},
       },
     });
-    expect(input.getAction('boost')?.keys).toEqual(['KeyX']);
+    expect(input.getAction('boost')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
   });
 });
 
-describe('Input mouse look', () => {
-  it('turns accumulated pixels into a clamped virtual stick, only when enabled', () => {
+describe('Input camera delta', () => {
+  it('leaves piloting axes alone and clears camera movement after the frame', () => {
     const input = makeInput();
     input.state.lookDx = 280;
     input.state.lookDy = -70;
-    expect(input.sample().yaw).toBe(0); // mouse-look off by default
-
-    input.setMouseLook(true);
-    input.state.lookDx = 280; // 2x the full-deflection distance
-    input.state.lookDy = -70;
-    const s = input.sample();
-    expect(s.yaw).toBe(1);
-    expect(s.pitch).toBeCloseTo(0.5, 6);
-
-    input.setMouseLook(false);
+    expect(input.sample().yaw).toBe(0);
+    expect(input.sample().pitch).toBe(0);
+    input.endFrame();
     expect(input.state.lookDx).toBe(0);
+    expect(input.state.lookDy).toBe(0);
+  });
+});
+
+describe('v1 binding migration', () => {
+  it('keeps custom choices and explicit unbound actions, while applying new defaults', () => {
+    store.setItem(
+      LEGACY_BINDINGS_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        keys: {
+          ...Object.fromEntries(defaultActions().map((a) => [a.id, a.keys])),
+          thrustForward: ['KeyI'],
+          boost: [],
+          toggleGuide: ['KeyH'],
+          pitchDown: ['KeyF'],
+          ballastFlood: ['ShiftLeft', 'ShiftRight'],
+          scan: ['KeyG'],
+          toggleCamera: ['KeyC'],
+        },
+      }),
+    );
+    const input = makeInput();
+    expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
+    expect(input.getAction('boost')?.keys).toEqual([]);
+    expect(input.getAction('toggleJournal')?.keys).toEqual(['KeyH']);
+    expect(input.getAction('ballastFlood')?.keys).toEqual(['ControlLeft', 'ControlRight', 'KeyC']);
+    expect(input.getAction('scan')?.keys).toEqual(['KeyF']);
+    expect(JSON.parse(store.getItem(BINDINGS_STORAGE_KEY)!).version).toBe(2);
+    expect(store.getItem(LEGACY_BINDINGS_STORAGE_KEY)).not.toBeNull();
+    input.resetBindings();
+    expect(store.getItem(BINDINGS_STORAGE_KEY)).toBeNull();
+    expect(store.getItem(LEGACY_BINDINGS_STORAGE_KEY)).toBeNull();
+    expect(makeInput().getAction('thrustForward')?.keys).toEqual(['KeyW', 'ArrowUp']);
   });
 });
 
@@ -220,5 +251,30 @@ describe('keyLabel', () => {
     expect(keyLabel('ArrowLeft')).toBe('Left');
     expect(keyLabel('ShiftRight')).toBe('Shift');
     expect(keyLabel('Space')).toBe('Space');
+  });
+});
+
+describe('drag camera', () => {
+  it('orbits in chase and first person, with a bounded chase zoom', () => {
+    const rig = new CameraRig(
+      { ...DEFAULT_CONFIG.camera, chaseOffset: { x: 0, y: 24, z: 65 } },
+      16 / 9,
+    );
+    const pos = new Vector3(0, -1000, 0);
+    rig.snap(pos, 0, 0);
+    const before = rig.camera.position.clone();
+    rig.orbit(0.5, 0.2);
+    rig.update(pos, 0, 0, 1);
+    expect(rig.camera.position.distanceTo(before)).toBeGreaterThan(5);
+    rig.orbit(0, 0, -100);
+    expect(rig.chaseRadius).toBe(25);
+    rig.orbit(0, 0, 100);
+    expect(rig.chaseRadius).toBe(180);
+    rig.setMode('first-person');
+    rig.snap(pos, 0, 0);
+    const facing = rig.camera.getWorldDirection(new Vector3());
+    rig.orbit(0.3, 0);
+    rig.update(pos, 0, 0, 1);
+    expect(rig.camera.getWorldDirection(new Vector3()).distanceTo(facing)).toBeGreaterThan(0.1);
   });
 });

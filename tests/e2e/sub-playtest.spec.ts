@@ -118,18 +118,18 @@ test.describe('A3 submarine feel', () => {
 
     // --- ballast: flood to dive, blow to rise -------------------------------
     const beforeDive = await probe(page);
-    await hold(page, 'Shift', 4000);
+    await hold(page, 'c', 4000);
     const dived = await probe(page);
     expect(dived.depth).toBeLessThan(beforeDive.depth - 3);
     await hold(page, ' ', 5000);
     expect((await probe(page)).depth).toBeGreaterThan(dived.depth);
 
-    // --- camera: C cycles chase <-> first person ----------------------------
+    // --- camera: Q cycles chase <-> first person ----------------------------
     expect((await probe(page)).cameraMode).toBe('chase');
-    await page.keyboard.press('c');
+    await page.keyboard.press('q');
     await page.waitForTimeout(300);
     expect((await probe(page)).cameraMode).toBe('first-person');
-    await page.keyboard.press('c');
+    await page.keyboard.press('q');
     await page.waitForTimeout(300);
     expect((await probe(page)).cameraMode).toBe('chase');
 
@@ -260,7 +260,7 @@ test.describe('A3 submarine feel', () => {
     expect(during.hullStress).toBeGreaterThan(0.5);
 
     // Full-down ballast must not stop the ascent while the controls are locked.
-    await hold(page, 'Shift', 2000);
+    await hold(page, 'c', 2000);
     const after = await probe(page);
     expect(after.depth).toBeGreaterThan(during.depth);
   });

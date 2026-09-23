@@ -2,7 +2,7 @@
  * Scan HUD (DOM + inline SVG only, never the WebGL canvas).
  *
  * - A thin corner-bracket reticle over the nearest POI's screen position.
- * - A small panel: target name, range/facing hint or "HOLD G TO SCAN", and a
+ * - A small panel: target name, range/facing hint or "HOLD F TO SCAN", and a
  *   cyan progress ring while the beam is on. Amber marks states that need the
  *   pilot's attention (interrupted, out of range, turn to face).
  * - After a completion, a "NEW ENTRY" confirmation with the field-guide key.
@@ -133,7 +133,7 @@ export class ScanOverlay {
     this.setText(
       this.hint,
       'hint',
-      firstTime ? `PRESS ${keys.guide} · FIELD GUIDE` : `ALREADY CATALOGUED · ${keys.guide} GUIDE`,
+      firstTime ? `PRESS ${keys.guide} · JOURNAL` : `ALREADY LOGGED · SEE JOURNAL`,
     );
     this.setRing(1, 'OK');
     this.panel.classList.add('is-complete');
@@ -158,7 +158,7 @@ export class ScanOverlay {
 
     const hasTarget = view.nearestId !== null || view.activeId !== null;
     // Reticle over the nearest contact.
-    if (screen && view.nearestId !== null) {
+    if (screen && view.nearestId !== null && view.nearestInRange) {
       this.reticle.hidden = false;
       this.reticle.style.transform = `translate(${screen.x.toFixed(1)}px, ${screen.y.toFixed(1)}px)`;
       this.reticle.classList.toggle('is-locked', view.phase === 'scanning');
@@ -168,7 +168,7 @@ export class ScanOverlay {
     }
 
     if (this.bannerLeft > 0) return;
-    if (!hasTarget) {
+    if (!hasTarget || (view.phase === 'idle' && !view.nearestInRange)) {
       this.panel.hidden = true;
       return;
     }

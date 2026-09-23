@@ -26,7 +26,7 @@ export interface InputState {
   yaw: number;
   pitch: number;
   ballast: number;
-  /** Mouse delta since the previous read, in pixels (pointer-lock look). */
+  /** Camera drag or pointer-lock delta since the previous frame, in pixels. */
   lookDx: number;
   lookDy: number;
   /** Edge-triggered actions; cleared by {@link Input.endFrame}. */
@@ -35,7 +35,7 @@ export interface InputState {
   boost: boolean;
   /** Headlights (A2 owns the lights themselves; this is just the edge). */
   toggleLights: boolean;
-  /** Sonar ping (A4 owns the sound). */
+  /** Legacy audio edge kept for consumers; no player action drives it. */
   ping: boolean;
   /** Hold-to-scan beam (B1). Level-triggered, not an edge. */
   scan: boolean;
@@ -76,12 +76,12 @@ export type ActionId =
   | 'toggleCamera'
   | 'toggleSonar'
   | 'toggleLights'
-  | 'ping'
   | 'scan'
   | 'cycleSimSpeed'
   | 'togglePhotoMode'
   | 'toggleSettings'
   | 'toggleGuide'
+  | 'toggleJournal'
   | 'toggleGlobe';
 
 /** Factory, not a constant: callers get their own mutable copy. */
@@ -126,7 +126,7 @@ export function defaultActions(): ActionBinding[] {
       id: 'pitchDown',
       label: 'Nose down',
       category: 'Piloting',
-      keys: ['KeyF'],
+      keys: ['KeyV'],
       pad: 'Right stick down',
     },
     {
@@ -140,21 +140,18 @@ export function defaultActions(): ActionBinding[] {
       id: 'ballastFlood',
       label: 'Flood ballast (dive)',
       category: 'Piloting',
-      keys: ['ShiftLeft', 'ShiftRight'],
+      keys: ['ControlLeft', 'ControlRight', 'KeyC'],
       pad: 'B / circle',
     },
-    { id: 'boost', label: 'Boost', category: 'Piloting', keys: ['KeyX'], pad: 'Right trigger' },
-    { id: 'toggleLights', label: 'Headlights', category: 'Systems', keys: ['KeyL'], pad: 'X' },
     {
-      // Tab is a secondary binding only. It is deliberately NOT swallowed, so
-      // keyboard focus navigation on the DOM overlays keeps working (C5).
-      id: 'ping',
-      label: 'Sonar ping',
-      category: 'Systems',
-      keys: ['KeyQ', 'Tab'],
-      pad: 'Left bumper',
+      id: 'boost',
+      label: 'Boost',
+      category: 'Piloting',
+      keys: ['ShiftLeft', 'ShiftRight'],
+      pad: 'Right trigger',
     },
-    { id: 'scan', label: 'Scan (hold)', category: 'Systems', keys: ['KeyG'], pad: 'Right bumper' },
+    { id: 'toggleLights', label: 'Headlights', category: 'Systems', keys: ['KeyL'], pad: 'X' },
+    { id: 'scan', label: 'Scan (hold)', category: 'Systems', keys: ['KeyF'], pad: 'Right bumper' },
     {
       id: 'cycleSimSpeed',
       label: 'Sim speed',
@@ -162,33 +159,46 @@ export function defaultActions(): ActionBinding[] {
       keys: ['KeyT'],
       pad: 'D-pad up',
     },
-    { id: 'toggleCamera', label: 'Camera view', category: 'View', keys: ['KeyC'], pad: 'Y' },
+    { id: 'toggleCamera', label: 'Camera view', category: 'View', keys: ['KeyQ'], pad: 'Y' },
     { id: 'toggleSonar', label: 'Sonar map', category: 'View', keys: ['KeyM'], pad: 'Back' },
     { id: 'togglePhotoMode', label: 'Photo mode', category: 'View', keys: ['KeyP'], pad: 'Start' },
     // C5: the settings overlay reads this binding directly (it must open over
     // the frozen briefing too), so there is no InputState edge for it.
     { id: 'toggleSettings', label: 'Settings', category: 'View', keys: ['KeyO'] },
-    { id: 'toggleGuide', label: 'Field guide', category: 'View', keys: ['KeyJ'] },
+    { id: 'toggleJournal', label: 'Journal', category: 'View', keys: ['KeyJ'] },
     { id: 'toggleGlobe', label: 'Globe (dive sites)', category: 'View', keys: ['KeyN'] },
   ];
 }
 
-export const BINDINGS_STORAGE_KEY = 'subexplorer.bindings.v1';
+export const BINDINGS_STORAGE_KEY = 'subexplorer.bindings.v2';
+export const LEGACY_BINDINGS_STORAGE_KEY = 'subexplorer.bindings.v1';
+
+const V1_DEFAULTS: Record<string, string[]> = {
+  thrustForward: ['KeyW', 'ArrowUp'],
+  thrustReverse: ['KeyS', 'ArrowDown'],
+  yawPort: ['KeyA', 'ArrowLeft'],
+  yawStarboard: ['KeyD', 'ArrowRight'],
+  pitchUp: ['KeyR'],
+  pitchDown: ['KeyF'],
+  ballastBlow: ['Space'],
+  ballastFlood: ['ShiftLeft', 'ShiftRight'],
+  boost: ['KeyX'],
+  toggleLights: ['KeyL'],
+  ping: ['KeyQ', 'Tab'],
+  scan: ['KeyG'],
+  cycleSimSpeed: ['KeyT'],
+  toggleCamera: ['KeyC'],
+  toggleSonar: ['KeyM'],
+  togglePhotoMode: ['KeyP'],
+  toggleSettings: ['KeyO'],
+  toggleGuide: ['KeyJ'],
+  toggleGlobe: ['KeyN'],
+};
 
 const DEAD_ZONE = 0.15;
-/**
- * Mouse pixels of movement that count as a full stick deflection. Mouse-look is
- * expressed as a virtual stick rather than a direct rotation so that it feeds
- * the same fixed-step physics as everything else.
- */
-const MOUSE_PIXELS_PER_UNIT = 140;
 
 function applyDeadZone(v: number): number {
   return Math.abs(v) < DEAD_ZONE ? 0 : v;
-}
-
-function clamp1(v: number): number {
-  return v < -1 ? -1 : v > 1 ? 1 : v;
 }
 
 /** Minimal storage shape, so tests can inject a stub and Node has no globals. */
@@ -203,7 +213,7 @@ export interface InputOptions {
   target?: HTMLElement | null;
   /** Defaults to `window.localStorage` when it exists. */
   storage?: BindingStore | null;
-  /** Start with mouse-look active (first-person). Toggle later with `setMouseLook`. */
+  /** Pointer lock is opt-in; drag works by default. */
   mouseLook?: boolean;
 }
 
@@ -241,6 +251,7 @@ export class Input {
   private readonly target: HTMLElement | null;
   private readonly storage: BindingStore | null;
   private readonly edgeArmed = new Set<ActionId>();
+  wheelDelta = 0;
 
   constructor(options: InputOptions | HTMLElement | null = null) {
     // Back-compatible: `new Input(canvas)` still works alongside the options form.
@@ -270,7 +281,7 @@ export class Input {
 
   /** Pretty-print the primary key of an action, e.g. `W`, `Space`, `Shift`. */
   primaryKeyLabel(id: ActionId): string {
-    const key = this.byId.get(id)?.keys[0];
+    const key = this.byId.get(id === 'toggleGuide' ? 'toggleJournal' : id)?.keys[0];
     return key ? keyLabel(key) : '--';
   }
 
@@ -301,6 +312,7 @@ export class Input {
     }
     try {
       this.storage?.removeItem(BINDINGS_STORAGE_KEY);
+      this.storage?.removeItem(LEGACY_BINDINGS_STORAGE_KEY);
     } catch {
       // Privacy mode / hostile storage: the defaults still apply this session.
     }
@@ -309,7 +321,7 @@ export class Input {
   private saveBindings(): void {
     if (!this.storage) return;
     const payload = {
-      version: 1,
+      version: 2,
       keys: Object.fromEntries(this.actions.map((a) => [a.id, a.keys])),
     };
     try {
@@ -319,50 +331,61 @@ export class Input {
     }
   }
 
-  /**
-   * Merge a saved override over the defaults. Unknown action ids and malformed
-   * payloads are ignored rather than thrown: a stale save must never brick the
-   * controls. An empty array is a real value (C5): the action lost its key to
-   * a rebinding conflict and must stay unbound, not regain its default (which
-   * another action may now hold). A key saved on two actions keeps the first.
-   */
+  /** Migrate only changed v1 choices, so new defaults are not shadowed by old defaults. */
   private loadBindings(): void {
     if (!this.storage) return;
-    let raw: string | null = null;
+    let v2: string | null;
+    let v1: string | null;
     try {
-      raw = this.storage.getItem(BINDINGS_STORAGE_KEY);
+      v2 = this.storage.getItem(BINDINGS_STORAGE_KEY);
+      v1 = v2 === null ? this.storage.getItem(LEGACY_BINDINGS_STORAGE_KEY) : null;
     } catch {
       return;
     }
+    const raw = v2 ?? v1;
     if (!raw) return;
     try {
       const parsed = JSON.parse(raw) as { version?: number; keys?: Record<string, unknown> };
-      if (parsed.version !== 1 || !parsed.keys || typeof parsed.keys !== 'object') return;
-      const saved = new Map<ActionId, string[]>();
+      const version = v2 !== null ? 2 : 1;
+      if (parsed.version !== version || !parsed.keys || typeof parsed.keys !== 'object') return;
+      const custom = new Map<ActionId, string[]>();
       for (const action of this.actions) {
-        const keys = parsed.keys[action.id];
-        if (Array.isArray(keys) && keys.every((k) => typeof k === 'string')) {
-          saved.set(action.id, keys as string[]);
+        const oldId = version === 1 && action.id === 'toggleJournal' ? 'toggleGuide' : action.id;
+        const value = parsed.keys[oldId];
+        if (!Array.isArray(value) || !value.every((k) => typeof k === 'string')) continue;
+        const keys = value as string[];
+        if (version === 2 || JSON.stringify(keys) !== JSON.stringify(V1_DEFAULTS[oldId])) {
+          custom.set(action.id, keys);
         }
       }
-      // A default key that another action was saved with is taken: drop it
-      // from actions that fall back to their defaults (e.g. a new action).
-      const taken = new Set<string>();
-      for (const keys of saved.values()) for (const k of keys) taken.add(k);
       const claimed = new Set<string>();
+      // Saved choices win conflicts with new defaults, including explicit unbound actions.
       for (const action of this.actions) {
-        const keys = saved.get(action.id) ?? action.keys.filter((k) => !taken.has(k));
-        action.keys = keys.filter((k) => !claimed.has(k));
-        for (const k of action.keys) claimed.add(k);
+        const keys = custom.get(action.id);
+        if (!keys) continue;
+        action.keys = keys.filter((key) => {
+          if (claimed.has(key)) return false;
+          claimed.add(key);
+          return true;
+        });
       }
+      for (const action of this.actions) {
+        if (custom.has(action.id)) continue;
+        action.keys = action.keys.filter((key) => {
+          if (claimed.has(key)) return false;
+          claimed.add(key);
+          return true;
+        });
+      }
+      if (version === 1) this.saveBindings();
     } catch {
-      // Corrupt JSON: keep defaults.
+      /* A corrupt save leaves the defaults usable. */
     }
   }
 
   // ------------------------------------------------------------- listeners
 
-  /** Enable or disable mouse-look (the caller decides, e.g. first-person only). */
+  /** Enable or disable free mouse movement while the canvas holds pointer lock. */
   setMouseLook(enabled: boolean): void {
     this.mouseLook = enabled;
     if (!enabled) {
@@ -385,6 +408,7 @@ export class Input {
       // which the DOM overlays need for focus navigation.
       if (
         e.code !== 'Tab' &&
+        !(e.ctrlKey && e.code === 'KeyW') &&
         (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) ||
           this.isBound(e.code))
       ) {
@@ -392,9 +416,14 @@ export class Input {
       }
     };
     const onKeyUp = (e: KeyboardEvent) => this.keys.delete(e.code);
-    const onBlur = () => this.keys.clear();
-    const onMouseDown = () => {
-      this.mouseDown = true;
+    const onBlur = () => {
+      this.keys.clear();
+      this.mouseDown = false;
+      this.state.lookDx = 0;
+      this.state.lookDy = 0;
+    };
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button === 0) this.mouseDown = true;
     };
     const onMouseUp = () => {
       this.mouseDown = false;
@@ -413,6 +442,11 @@ export class Input {
     el.addEventListener('mousedown', onMouseDown as EventListener);
     window.addEventListener('mouseup', onMouseUp);
     window.addEventListener('mousemove', onMouseMove);
+    const onWheel = (e: WheelEvent) => {
+      this.wheelDelta += e.deltaY;
+      e.preventDefault();
+    };
+    this.target?.addEventListener('wheel', onWheel, { passive: false });
 
     this.disposers = [
       () => window.removeEventListener('keydown', onKeyDown),
@@ -421,6 +455,7 @@ export class Input {
       () => el.removeEventListener('mousedown', onMouseDown as EventListener),
       () => window.removeEventListener('mouseup', onMouseUp),
       () => window.removeEventListener('mousemove', onMouseMove),
+      () => this.target?.removeEventListener('wheel', onWheel),
     ];
   }
 
@@ -479,22 +514,11 @@ export class Input {
       if (this.edgeArmed.has('toggleCamera')) s.toggleCamera = true;
       if (this.edgeArmed.has('toggleSonar')) s.toggleSonar = true;
       if (this.edgeArmed.has('toggleLights')) s.toggleLights = true;
-      if (this.edgeArmed.has('ping')) s.ping = true;
       if (this.edgeArmed.has('cycleSimSpeed')) s.cycleSimSpeed = true;
       if (this.edgeArmed.has('togglePhotoMode')) s.togglePhotoMode = true;
-      if (this.edgeArmed.has('toggleGuide')) s.toggleGuide = true;
+      if (this.edgeArmed.has('toggleJournal')) s.toggleGuide = true;
       if (this.edgeArmed.has('toggleGlobe')) s.toggleGlobe = true;
       this.edgeArmed.clear();
-    }
-
-    // Mouse-look as a virtual stick: the accumulated pixel delta becomes an
-    // axis deflection for this frame, so it drives the same fixed-step physics
-    // as the keyboard and never double-applies across variable step counts.
-    if (this.mouseLook && (s.lookDx || s.lookDy)) {
-      const mYaw = clamp1(s.lookDx / MOUSE_PIXELS_PER_UNIT);
-      const mPitch = clamp1(-s.lookDy / MOUSE_PIXELS_PER_UNIT);
-      if (mYaw) s.yaw = clamp1(s.yaw + mYaw);
-      if (mPitch) s.pitch = clamp1(s.pitch + mPitch);
     }
 
     // Gamepad overrides whenever a stick or button is actually deflected.
@@ -516,7 +540,6 @@ export class Input {
       if (ballast) s.ballast = ballast;
       if (pad.buttons[3]?.pressed) s.toggleCamera = true; // Y
       if (pad.buttons[2]?.pressed) s.toggleLights = true; // X
-      if (pad.buttons[4]?.pressed) s.ping = true; // LB
       s.scan = s.scan || (pad.buttons[5]?.pressed ?? false); // RB
       if (pad.buttons[8]?.pressed) s.toggleSonar = true; // Back / view
       if (pad.buttons[9]?.pressed) s.togglePhotoMode = true; // Start
@@ -532,6 +555,7 @@ export class Input {
     const s = this.state;
     s.lookDx = 0;
     s.lookDy = 0;
+    this.wheelDelta = 0;
     s.toggleCamera = false;
     s.toggleSonar = false;
     s.toggleLights = false;

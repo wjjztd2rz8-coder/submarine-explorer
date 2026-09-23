@@ -156,7 +156,7 @@ describe('CameraRig + SubMesh follow the physics heading (F1)', () => {
     const rig = new CameraRig(cam, 16 / 9);
     rig.snap(pos, east, 0);
     settle(rig, pos, east, 0);
-    expect(rig.camera.position.x).toBeLessThan(pos.x - 50);
+    expect(rig.camera.position.x).toBeLessThan(pos.x - 0.75 * cam.chaseOffset.z);
     expect(Math.abs(rig.camera.position.z - pos.z)).toBeLessThan(1);
     const dir = rig.camera.getWorldDirection(new Vector3());
     expect(dir.x).toBeGreaterThan(0.5); // toward +X, dipped by chaseLookDrop
@@ -167,7 +167,7 @@ describe('CameraRig + SubMesh follow the physics heading (F1)', () => {
     const pos = new Vector3(0, -3000, 0);
     const rig = new CameraRig(cam, 16 / 9);
     settle(rig, pos, -east, 0);
-    expect(rig.camera.position.x).toBeGreaterThan(pos.x + 50);
+    expect(rig.camera.position.x).toBeGreaterThan(pos.x + 0.75 * cam.chaseOffset.z);
   });
 
   it('the first-person camera looks along Submarine.getForward at any heading', () => {

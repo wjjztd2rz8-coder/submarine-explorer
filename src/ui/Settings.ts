@@ -83,7 +83,7 @@ export function rebindMessage(label: string, code: string, plan: RebindPlan): st
 
 /** Button text for an action's keys. */
 export function keysText(keys: readonly string[]): string {
-  return keys.length ? keys.map(keyLabel).join(' / ') : 'Unbound';
+  return keys.length ? [...new Set(keys.map(keyLabel))].join(' / ') : 'Unbound';
 }
 
 export interface SettingsScreenOptions {
@@ -101,6 +101,8 @@ export interface SettingsScreenOptions {
   canOpen?: () => boolean;
   /** After any rebind / reset (the HUD help re-renders). */
   onBindingsChanged?: () => void;
+  onRequestPointerLock?: () => void;
+  onOpen?: () => void;
   /** Clears the discovery key and current store only when it can be verified. */
   onResetProgress?: () => 'cleared' | 'sessionOnly' | 'protected' | 'unavailable';
   parent?: HTMLElement;
@@ -128,6 +130,11 @@ export class SettingsScreen {
   private readonly resetProgressButton: HTMLButtonElement;
   private readonly resetConfirm: HTMLDivElement;
   private readonly bindingsList: HTMLDivElement;
+  private readonly controlsSection: HTMLElement;
+  private readonly normalSections: HTMLElement[];
+  private readonly title: HTMLHeadingElement;
+  private readonly controlsButton: HTMLButtonElement;
+  private readonly backButton: HTMLButtonElement;
   private readonly trap: FocusTrap;
   private readonly controls = new Map<keyof SettingsValues, HTMLInputElement | HTMLSelectElement>();
   private readonly gameplayControls = new Map<
@@ -154,11 +161,19 @@ export class SettingsScreen {
 
     const header = el('div', 'settings-header');
     const title = el('h2', 'settings-title', 'Settings');
+    this.title = title;
     title.id = `${id}-title`;
     const close = el('button', 'settings-close', 'Close (Esc)');
     close.type = 'button';
     close.addEventListener('click', () => this.close());
-    header.append(title, close);
+    this.controlsButton = el('button', 'settings-controls-open', 'Controls');
+    this.controlsButton.type = 'button';
+    this.controlsButton.addEventListener('click', () => this.showControls(true));
+    this.backButton = el('button', 'settings-controls-back', 'Back to Settings');
+    this.backButton.type = 'button';
+    this.backButton.hidden = true;
+    this.backButton.addEventListener('click', () => this.showControls(false));
+    header.append(title, this.controlsButton, this.backButton, close);
 
     const cfg = opts.config;
     const tierNote = opts.tierFromUrl
@@ -188,19 +203,6 @@ export class SettingsScreen {
     );
     this.detailOut = detail.querySelector('output') as HTMLOutputElement;
     graphics.append(detail);
-
-    const game = this.section(`${id}-game`, 'Game');
-    game.append(
-      this.select(
-        'simSpeedDefault',
-        'Legacy default sim speed (Gameplay takes precedence)',
-        cfg.settings.simSpeedOptions.map((v): [string, string] => [
-          String(v),
-          v === 0 ? 'Auto (free dive 1×, missions their own)' : `${v}×`,
-        ]),
-        'Kept for older saves. Gameplay → Simulation speed controls every dive.',
-      ),
-    );
 
     // --- D-MODES begin ---
     const gameplay = this.section(`${id}-gameplay`, 'Gameplay');
@@ -251,7 +253,9 @@ export class SettingsScreen {
               : 'Off'
             : choice === 'near-site'
               ? 'Near site'
-              : String(choice).replaceAll('-', ' '),
+              : typeof choice === 'number' && key === 'simSpeed'
+                ? `${choice}×`
+                : String(choice).replaceAll('-', ' '),
         );
         option.value = String(choice);
         input.append(option);
@@ -295,6 +299,8 @@ export class SettingsScreen {
     access.append(this.field('UI scale (%)', uiScale));
 
     const keys = this.section(`${id}-keys`, 'Controls');
+    this.controlsSection = keys;
+    keys.hidden = true;
     const keysHint = el(
       'p',
       'settings-note',
@@ -302,7 +308,18 @@ export class SettingsScreen {
     );
     this.bindingsList = el('div', 'settings-bindings');
     this.bindingsList.setAttribute('role', 'list');
-    keys.append(keysHint, this.bindingsList);
+    const pointerLock = el('button', 'settings-pointer-lock', 'Enable pointer lock');
+    pointerLock.type = 'button';
+    pointerLock.addEventListener('click', () => {
+      this.close();
+      this.opts.onRequestPointerLock?.();
+    });
+    const cameraNote = el(
+      'p',
+      'settings-note',
+      'Drag on the dive view to orbit; use the wheel to zoom. Pointer lock is optional. C also descends.',
+    );
+    keys.append(keysHint, cameraNote, pointerLock, this.bindingsList);
 
     this.status = el('p', 'settings-status');
     this.status.setAttribute('role', 'status');
@@ -393,7 +410,6 @@ export class SettingsScreen {
     this.panel.append(
       header,
       graphics,
-      game,
       gameplay,
       access,
       keys,
@@ -402,6 +418,7 @@ export class SettingsScreen {
       this.reloadNote,
       footer,
     );
+    this.normalSections = [graphics, gameplay, access];
     this.root.append(this.panel);
     (opts.parent ?? document.body).appendChild(this.root);
     this.trap = new FocusTrap(this.root);
@@ -425,9 +442,11 @@ export class SettingsScreen {
     if (this.open_) return;
     if (this.opts.canOpen && !this.opts.canOpen()) return;
     this.open_ = true;
+    this.opts.onOpen?.();
     const a = document.activeElement;
     this.returnFocus = a instanceof HTMLElement && a !== document.body ? a : null;
     this.root.hidden = false;
+    this.showControls(false);
     this.renderBindings();
     this.sync();
     this.say('');
@@ -441,6 +460,7 @@ export class SettingsScreen {
     this.capturing = null;
     this.resetConfirm.hidden = true;
     this.root.hidden = true;
+    this.showControls(false);
     this.trap.deactivate();
     if (this.returnFocus?.isConnected) this.returnFocus.focus();
     this.returnFocus = null;
@@ -455,6 +475,15 @@ export class SettingsScreen {
     this.close();
     for (const d of this.disposers) d();
     this.root.remove();
+  }
+
+  showControls(show: boolean): void {
+    this.controlsSection.hidden = !show;
+    for (const section of this.normalSections) section.hidden = show;
+    this.title.textContent = show ? 'Controls' : 'Settings';
+    this.controlsButton.hidden = show;
+    this.backButton.hidden = !show;
+    if (this.open_) (show ? this.backButton : this.controlsButton).focus();
   }
 
   // -------------------------------------------------------------- controls
@@ -573,20 +602,24 @@ export class SettingsScreen {
 
   private renderBindings(): void {
     this.bindButtons.clear();
-    const rows = this.opts.input.actions.map((a) => {
-      const row = el('div', 'settings-binding');
-      row.setAttribute('role', 'listitem');
-      const name = el('span', 'settings-binding-label', a.label);
-      const btn = el('button', 'settings-binding-key');
-      btn.type = 'button';
-      btn.dataset.action = a.id;
-      btn.addEventListener('click', () => this.startCapture(a.id));
-      this.bindButtons.set(a.id, btn);
-      this.paintBinding(a);
-      row.append(name, btn);
-      if (a.pad) row.append(el('span', 'settings-binding-pad', a.pad));
-      return row;
-    });
+    const rows = this.opts.input.actions
+      .filter(
+        (a) => a.id !== 'toggleSettings' && a.id !== 'toggleGlobe' && a.id !== 'togglePhotoMode',
+      )
+      .map((a) => {
+        const row = el('div', 'settings-binding');
+        row.setAttribute('role', 'listitem');
+        const name = el('span', 'settings-binding-label', a.label);
+        const btn = el('button', 'settings-binding-key');
+        btn.type = 'button';
+        btn.dataset.action = a.id;
+        btn.addEventListener('click', () => this.startCapture(a.id));
+        this.bindButtons.set(a.id, btn);
+        this.paintBinding(a);
+        row.append(name, btn);
+        if (a.pad) row.append(el('span', 'settings-binding-pad', a.pad));
+        return row;
+      });
     this.bindingsList.replaceChildren(...rows);
   }
 

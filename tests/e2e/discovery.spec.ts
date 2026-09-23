@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 /**
  * B1 discovery loop, end to end, against the `_test` fixture landmark on the
- * real Titanic tile: spawn next to a POI (`?poi=`), hold G until the scan
+ * real Titanic tile: spawn next to a POI (`?poi=`), hold F until the scan
  * completes, check it persisted across a reload, open the field guide (J),
  * and screenshot the guide and the debrief (`?debrief=1`).
  *
@@ -81,7 +81,7 @@ test.describe('B1 scan, discovery, field guide', () => {
     );
     const before = await probe(page);
     expect(before.discovered).toBe(false);
-    await expect(page.locator('.scan-panel .scan-hint')).toHaveText(/HOLD G TO SCAN/);
+    await expect(page.locator('.scan-panel .scan-hint')).toHaveText(/HOLD F TO SCAN/);
 
     // Record bus events from inside the page.
     await page.evaluate(() => {
@@ -94,7 +94,7 @@ test.describe('B1 scan, discovery, field guide', () => {
     });
 
     // Hold G for longer than scan_seconds (3 s in the fixture).
-    await page.keyboard.down('g');
+    await page.keyboard.down('f');
     await page.waitForTimeout(1500);
     const mid = await probe(page);
     expect(mid.phase).toBe('scanning');
@@ -107,7 +107,7 @@ test.describe('B1 scan, discovery, field guide', () => {
       { timeout: 15_000 },
     );
     await page.waitForTimeout(300);
-    await page.keyboard.up('g');
+    await page.keyboard.up('f');
 
     const events = await page.evaluate(
       () => (window as unknown as { __b1: Array<{ name: string; payload: unknown }> }).__b1,

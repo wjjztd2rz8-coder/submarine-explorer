@@ -23,7 +23,7 @@ import { MarineSnow } from './render/MarineSnow.js';
 import { CameraRig } from './sub/CameraRig.js';
 import { SubMesh } from './sub/SubMesh.js';
 import { Submarine } from './sub/Submarine.js';
-import { HUD } from './ui/HUD.js';
+import { HUD, uiScaleFactors } from './ui/HUD.js';
 import { MissionSelect } from './ui/MissionSelect.js';
 import { Sonar } from './ui/Sonar.js';
 import { UnderwaterPass } from './shaders/underwater.js';
@@ -242,7 +242,9 @@ async function main(): Promise<void> {
   scene.add(subMesh.group);
 
   // A3: the rig samples the terrain so the camera never clips below the seabed.
+  // --- D-INPUT-HUD begin ---
   const rig = new CameraRig(config.camera, window.innerWidth / window.innerHeight, terrain);
+  // --- D-INPUT-HUD end ---
   rig.snap(sub.position, sub.yaw, sub.pitch);
 
   // ---------------------------------------------------------------------- UI
@@ -336,6 +338,9 @@ async function main(): Promise<void> {
     collapsed: route !== null,
   });
   void loadMissionSummaries().then((list) => missionSelect.setMissions(list));
+  // --- D-INPUT-HUD begin ---
+  missionSelect.root.hidden = true;
+  // --- D-INPUT-HUD end ---
   // --- C1 begin ---
   // Globe mission select (docs/globe.md): `?globe=1`, the GLOBE button, key N.
   // While open it freezes the game like the briefing. SPECIES tab in the guide.
@@ -354,6 +359,77 @@ async function main(): Promise<void> {
 
   const input = new Input(canvas);
   input.attach();
+  // --- D-INPUT-HUD begin ---
+  const lockKeyboard = async (): Promise<void> => {
+    const keyboard = (
+      navigator as Navigator & {
+        keyboard?: { lock?: (keys: string[]) => Promise<void>; unlock?: () => void };
+      }
+    ).keyboard;
+    if (!document.fullscreenElement || !keyboard?.lock) return;
+    try {
+      await keyboard.lock(['ControlLeft', 'ControlRight', 'KeyW']);
+    } catch {
+      keyboard.unlock?.();
+    }
+  };
+  const unlockKeyboard = (): void => {
+    (navigator as Navigator & { keyboard?: { unlock?: () => void } }).keyboard?.unlock?.();
+  };
+  document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) void lockKeyboard();
+    else unlockKeyboard();
+  });
+  document.addEventListener('pointerlockchange', () =>
+    input.setMouseLook(document.pointerLockElement === canvas),
+  );
+  let ctrlTipShown = false;
+  try {
+    ctrlTipShown = JSON.parse(localStorage.getItem('subexplorer.tips.v1') ?? '{}').ctrlW === true;
+  } catch {
+    /* A session-only tip is still useful. */
+  }
+  const ctrlTip = document.createElement('div');
+  ctrlTip.className = 'hud-ctrl-tip';
+  ctrlTip.hidden = true;
+  ctrlTip.innerHTML = '<span>Ctrl+W may close this tab. Use C or fullscreen.</span>';
+  const dismissTip = document.createElement('button');
+  dismissTip.type = 'button';
+  dismissTip.textContent = 'Dismiss';
+  dismissTip.addEventListener('click', () => {
+    ctrlTip.hidden = true;
+  });
+  const fullscreenTip = document.createElement('button');
+  fullscreenTip.type = 'button';
+  fullscreenTip.textContent = 'Fullscreen';
+  fullscreenTip.addEventListener('click', () => {
+    void canvas.requestFullscreen?.().catch(() => {});
+    ctrlTip.hidden = true;
+  });
+  ctrlTip.append(fullscreenTip, dismissTip);
+  document.body.append(ctrlTip);
+  window.addEventListener('keydown', (e) => {
+    const target = e.target as HTMLElement | null;
+    if (
+      ctrlTipShown ||
+      !['ControlLeft', 'ControlRight'].includes(e.code) ||
+      e.repeat ||
+      globe.isOpen ||
+      settingsScreen.isOpen ||
+      (missionRouter?.frozen ?? false) ||
+      (target &&
+        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable))
+    )
+      return;
+    ctrlTipShown = true;
+    ctrlTip.hidden = false;
+    try {
+      localStorage.setItem('subexplorer.tips.v1', JSON.stringify({ ctrlW: true }));
+    } catch {
+      /* Private storage is optional. */
+    }
+  });
+  // --- D-INPUT-HUD end ---
 
   // --- C5 begin ---
   // Built before the mission router so its capture-phase key handler runs
@@ -367,7 +443,13 @@ async function main(): Promise<void> {
     activeSimSpeedDefault: settings.simSpeedDefault,
     tierFromUrl: params.get('tier') !== null && params.get('tier') === tier,
     canOpen: () => !globe.isOpen,
-    onBindingsChanged: () => hud.refreshHelp(),
+    onRequestPointerLock: () => {
+      void canvas.requestPointerLock?.();
+    },
+    onOpen: () => {
+      document.exitPointerLock?.();
+      unlockKeyboard();
+    },
     onResetProgress: () => {
       if (discovery.store.readOnly) return 'protected';
       let storage: Storage | null;
@@ -398,8 +480,7 @@ async function main(): Promise<void> {
       return storage ? 'cleared' : 'sessionOnly';
     },
   });
-  hud.bindHelp(input.actions);
-  hud.setHelpAction('toggleSettings', () => settingsScreen.open());
+
   rig.reduceMotion = settings.reduceMotion;
   sonar.setPalette(settings.sonarPalette);
   // --- C5 end ---
@@ -420,6 +501,19 @@ async function main(): Promise<void> {
       })
     : null;
   // --- B3 end ---
+  // --- D-INPUT-HUD begin ---
+  const briefingControls = missionRouter?.briefing?.root.querySelector('.briefing-controls');
+  if (briefingControls) {
+    const controlsButton = document.createElement('button');
+    controlsButton.type = 'button';
+    controlsButton.textContent = 'View controls';
+    controlsButton.addEventListener('click', () => {
+      settingsScreen.open();
+      settingsScreen.showControls(true);
+    });
+    briefingControls.replaceChildren(controlsButton);
+  }
+  // --- D-INPUT-HUD end ---
 
   // Audio: WebAudio can only start from inside a user-gesture handler, so we
   // wait for the first keydown/pointerdown rather than starting at load.
@@ -437,6 +531,10 @@ async function main(): Promise<void> {
     if (changed.includes('captions')) captions.setEnabled(next.captions);
     if (changed.includes('sonarPalette')) sonar.setPalette(next.sonarPalette);
     if (changed.includes('postFx')) postFxOn = next.postFx;
+    // --- D-INPUT-HUD begin ---
+    if (changed.includes('uiScale'))
+      document.documentElement.style.setProperty('--ui-user-scale', String(next.uiScale / 100));
+    // --- D-INPUT-HUD end ---
   });
   // --- D-MODES begin ---
   save.onChange((next, changed) => {
@@ -469,6 +567,11 @@ async function main(): Promise<void> {
     renderer.setSize(w, h, false);
     rig.setAspect(w / h);
     post.setSize(w * renderer.getPixelRatio(), h * renderer.getPixelRatio());
+    // --- D-INPUT-HUD begin ---
+    const scale = uiScaleFactors(w, save.get().uiScale);
+    document.documentElement.style.setProperty('--ui-auto-scale', String(scale.auto));
+    document.documentElement.style.setProperty('--ui-user-scale', String(scale.user));
+    // --- D-INPUT-HUD end ---
   }
   window.addEventListener('resize', resize);
   resize();
@@ -478,6 +581,7 @@ async function main(): Promise<void> {
   const forward = new THREE.Vector3();
   let ready = false;
   let lastTerrainLog = 0;
+  let wasFrozen = false;
   let emergencyBlowAnnounced = false;
   let lastHullStress = 0;
 
@@ -490,6 +594,10 @@ async function main(): Promise<void> {
     // While the mission briefing is up nothing simulates and input is ignored
     // (sampling still runs, so edge presses do not queue up behind the card).
     const frozen = (missionRouter?.frozen ?? false) || globe.isOpen || settingsScreen.isOpen; // C1/C5: globe and settings freeze too
+    // --- D-INPUT-HUD begin ---
+    if (wasFrozen && !frozen) void lockKeyboard();
+    wasFrozen = frozen;
+    // --- D-INPUT-HUD end ---
     const state = frozen ? FROZEN_INPUT : sampled;
     const steps = frozen ? 0 : realSteps;
     // --- B3 end ---
@@ -499,10 +607,16 @@ async function main(): Promise<void> {
     // --- B4 end ---
 
     if (state.toggleCamera) {
-      // Mouse-look only makes sense from the first-person viewport.
-      input.setMouseLook(rig.toggleMode() === 'first-person');
+      rig.toggleMode();
     }
     if (state.togglePhotoMode) rig.togglePhotoMode();
+    // --- D-INPUT-HUD begin ---
+    if (!frozen) {
+      if (sampled.lookDx || sampled.lookDy)
+        rig.orbit(-sampled.lookDx * 0.004, sampled.lookDy * 0.004);
+      if (input.wheelDelta) rig.orbit(0, 0, input.wheelDelta * 0.001);
+    } else unlockKeyboard();
+    // --- D-INPUT-HUD end ---
     if (state.toggleSonar) sonar.toggle();
     if (state.toggleLights) headlights.toggle();
     if (state.cycleSimSpeed) bus.emit('sub:simSpeed', { multiplier: sub.cycleSimSpeed() });
@@ -566,7 +680,6 @@ async function main(): Promise<void> {
     snow.update(rig.camera, atmo, time.frameDelta, renderer.domElement.height);
     water.update(rig.camera.position.y, sub.position, time.elapsed, fogNow);
 
-    hud.update(s, { nearScanTarget: scanFocus !== null }); // fix S (QA-B #14)
     sonar.update(s);
     // fix S (QA-B #10): mission clock and DIVE TIME count real seconds of
     // unfrozen play, not capped physics time.
@@ -582,6 +695,20 @@ async function main(): Promise<void> {
       clockDt,
     );
     // --- B1 end ---
+    // --- D-INPUT-HUD begin ---
+    const scanView = discovery.scanner.view;
+    const objective =
+      missionRouter?.mission.objectives.find((o) => o.resolved && !o.complete && o.primary) ??
+      missionRouter?.mission.objectives.find((o) => o.resolved && !o.complete);
+    hud.update(s, {
+      nearScanTarget: scanFocus !== null,
+      objective: objective?.title,
+      scanPrompt: scanView.candidateId
+        ? `${input.primaryKeyLabel('scan')} Scan · ${scanView.nearestName}`
+        : null,
+      simSpeed: sub.simSpeed,
+    });
+    // --- D-INPUT-HUD end ---
     // --- B3 begin ---
     // fix S: `s` lets the router turn the end of an emergency blow into the
     // "Dive aborted" debrief (plan/DECISIONS.md failure model).

@@ -4,84 +4,18 @@
  * writes (which we skip when the value has not changed).
  */
 
-import { defaultActions, keyLabel } from '../core/Input.js';
-import { formatLat, formatLon, worldToLatLon } from '../util/geo.js';
 import type { TileMeta } from '../util/types.js';
 import type { SubmarineState } from '../sub/Submarine.js';
 
-const FIELDS = [
-  'depth',
-  'altitude',
-  'heading',
-  'speed',
-  'pitch',
-  'position',
-  'tile',
-  'status',
-] as const;
+const FIELDS = ['depth', 'heading', 'speed', 'status', 'tile'] as const;
 type Field = (typeof FIELDS)[number];
 
-/** One help item: the action ids whose primary keys are shown (joined by `/`), and a verb. */
-export interface HelpItem {
-  actions: string[];
-  text: string;
-}
-
-/**
- * C5: the three help lines, by action id rather than by key, so remapping a
- * key in the settings screen updates the help. Items whose actions do not
- * exist in the action map are skipped (e.g. an action another lane removed).
- */
-export const HELP_LINES: HelpItem[][] = [
-  [
-    { actions: ['thrustForward', 'thrustReverse'], text: 'thrust' },
-    { actions: ['yawPort', 'yawStarboard'], text: 'yaw' },
-    { actions: ['pitchUp', 'pitchDown'], text: 'pitch' },
-    { actions: ['boost'], text: 'boost' },
-    { actions: ['toggleSettings'], text: 'settings' },
-  ],
-  [
-    { actions: ['ballastBlow'], text: 'blow (up)' },
-    { actions: ['ballastFlood'], text: 'flood (down)' },
-    { actions: ['toggleLights'], text: 'lights' },
-    { actions: ['cycleSimSpeed'], text: 'sim speed' },
-    { actions: ['toggleGlobe'], text: 'globe' },
-  ],
-  [
-    { actions: ['scan'], text: 'scan (hold)' },
-    { actions: ['toggleGuide'], text: 'guide' },
-    { actions: ['ping'], text: 'ping' },
-    { actions: ['toggleSonar'], text: 'sonar' },
-    { actions: ['toggleCamera'], text: 'camera' },
-    { actions: ['togglePhotoMode'], text: 'photo' },
-  ],
-];
-
-/** The action map shape the help needs (`Input.actions` satisfies it). */
-export type HelpActionMap = ReadonlyArray<{ id: string; keys: readonly string[] }>;
-
-/**
- * Resolve the help lines against an action map: `[[keys, text], ...]` per
- * line, e.g. `['W/S', 'thrust']`. An unbound action shows `--`.
- */
-export function helpLines(
-  actions: HelpActionMap,
-  lines = HELP_LINES,
-): Array<Array<[string, string]>> {
-  const byId = new Map(actions.map((a) => [a.id, a]));
-  return lines.map((line) =>
-    line
-      .filter((item) => item.actions.every((id) => byId.has(id)))
-      .map((item): [string, string] => [
-        item.actions
-          .map((id) => {
-            const k = byId.get(id)?.keys[0];
-            return k ? keyLabel(k) : '--';
-          })
-          .join('/'),
-        item.text,
-      ]),
-  );
+/** Numeric scale factors; CSS clamps individual text sizes for legibility. */
+export function uiScaleFactors(width: number, percent: number): { auto: number; user: number } {
+  return {
+    auto: Math.max(0.8, Math.min(1.25, width / 1920)),
+    user: Math.max(80, Math.min(150, Math.round(percent))) / 100,
+  };
 }
 
 /** Warning thresholds (Config.submarine); see {@link seabedWarning}. */
@@ -106,6 +40,9 @@ const DEFAULT_WARN: HudWarnConfig = {
 export interface HudContext {
   /** A scan target is within its scan radius: suppress the static proximity banner. */
   nearScanTarget?: boolean;
+  objective?: string | null;
+  scanPrompt?: string | null;
+  simSpeed?: number;
 }
 
 /**
@@ -157,9 +94,9 @@ export class HUD {
   private readonly values = new Map<Field, HTMLSpanElement>();
   private readonly cache = new Map<Field, string>();
   private readonly warningEl: HTMLDivElement;
-  private readonly helpEl: HTMLDivElement;
-  private helpActions: HelpActionMap = defaultActions();
-  private readonly helpHandlers = new Map<string, () => void>();
+  private readonly objectiveEl: HTMLDivElement;
+  private readonly promptEl: HTMLDivElement;
+  private readonly speedEl: HTMLDivElement;
   private hullNote = '';
 
   constructor(
@@ -178,15 +115,18 @@ export class HUD {
         ).join('')}
       </div>
       <div class="hud-warning" hidden></div>
-      <div class="hud-panel hud-help" aria-label="Controls"></div>
+      <div class="hud-objective" hidden></div>
+      <div class="hud-prompt" hidden></div>
+      <div class="hud-sim-speed" hidden></div>
       <div class="hud-attribution"></div>
     `;
     for (const el of this.root.querySelectorAll<HTMLSpanElement>('[data-field]')) {
       this.values.set(el.dataset.field as Field, el);
     }
     this.warningEl = this.root.querySelector('.hud-warning') as HTMLDivElement;
-    this.helpEl = this.root.querySelector('.hud-help') as HTMLDivElement;
-    this.renderHelp();
+    this.objectiveEl = this.root.querySelector('.hud-objective') as HTMLDivElement;
+    this.promptEl = this.root.querySelector('.hud-prompt') as HTMLDivElement;
+    this.speedEl = this.root.querySelector('.hud-sim-speed') as HTMLDivElement;
     const attr = this.root.querySelector('.hud-attribution') as HTMLDivElement;
     attr.textContent = meta.attribution;
 
@@ -194,56 +134,10 @@ export class HUD {
     this.set('tile', `${meta.id} (${meta.cols}×${meta.rows})`);
   }
 
-  /**
-   * C5: render the help from a live action map (`Input.actions`). Call
-   * {@link refreshHelp} after a rebind; the array is mutated in place.
-   */
-  bindHelp(actions: HelpActionMap): void {
-    this.helpActions = actions;
-    this.renderHelp();
-  }
-
-  /**
-   * C5: make the help item for a single action clickable (e.g. the settings
-   * hint opens the settings screen). Rendered as a real button.
-   */
-  setHelpAction(actionId: string, handler: () => void): void {
-    this.helpHandlers.set(actionId, handler);
-    this.renderHelp();
-  }
-
-  /** Re-render the help lines (after a key was remapped). */
-  refreshHelp(): void {
-    this.renderHelp();
-  }
-
-  private renderHelp(): void {
-    const frag = document.createDocumentFragment();
-    const items = HELP_LINES.map((line) =>
-      line.filter((item) => item.actions.every((id) => this.helpActions.some((a) => a.id === id))),
-    );
-    helpLines(this.helpActions).forEach((line, li) => {
-      if (li > 0) frag.append(document.createElement('br'));
-      line.forEach(([keys, text], i) => {
-        if (i > 0) frag.append(' \u00a0 ');
-        const b = document.createElement('b');
-        b.textContent = keys;
-        const item = items[li]?.[i];
-        const handler =
-          item && item.actions.length === 1 ? this.helpHandlers.get(item.actions[0] ?? '') : null;
-        if (handler) {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'hud-help-link';
-          btn.append(b, ` ${text}`);
-          btn.addEventListener('click', handler);
-          frag.append(btn);
-        } else {
-          frag.append(b, ` ${text}`);
-        }
-      });
-    });
-    this.helpEl.replaceChildren(frag);
+  private showContext(el: HTMLDivElement, text: string | null | undefined): void {
+    const value = text ?? '';
+    if (el.textContent !== value) el.textContent = value;
+    el.hidden = value.length === 0;
   }
 
   /** A short note after the hull rating on the tile line, e.g. "thin margin". */
@@ -260,15 +154,17 @@ export class HUD {
 
   /** Update from a physics snapshot. Safe to call every rendered frame. */
   update(s: SubmarineState, ctx: HudContext = {}): void {
-    const ll = worldToLatLon(this.meta, s.position.x, s.position.z);
     this.set('depth', formatDepth(s.depth, this.warn.hullRadius));
     this.set('tile', formatTileLine(this.meta, s.hullClass, s.crushDepth, this.hullNote));
-    this.set('altitude', `${s.altitude.toFixed(0)} m`);
     this.set('heading', `${s.headingDeg.toFixed(0)}° ${compass(s.headingDeg)}`);
     // Knots are the natural unit for a boat; 1 m/s = 1.94384 kn.
     this.set('speed', `${(s.speed * 1.94384).toFixed(1)} kn  (${s.speed.toFixed(1)} m/s)`);
-    this.set('pitch', `${((s.pitch * 180) / Math.PI).toFixed(0)}°`);
-    this.set('position', `${formatLat(ll.lat)}  ${formatLon(ll.lon)}`);
+    this.showContext(this.objectiveEl, ctx.objective ? `OBJECTIVE · ${ctx.objective}` : null);
+    this.showContext(this.promptEl, ctx.scanPrompt);
+    this.showContext(
+      this.speedEl,
+      ctx.simSpeed && ctx.simSpeed !== 1 ? `${ctx.simSpeed}× SIM SPEED` : null,
+    );
 
     if (s.hullBreached) {
       this.set('status', 'HULL BREACH');
@@ -300,7 +196,7 @@ export class HUD {
 }
 
 function labelOf(f: Field): string {
-  return f === 'position' ? 'POSITION' : f.toUpperCase();
+  return f === 'status' ? 'HULL' : f.toUpperCase();
 }
 
 const POINTS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];

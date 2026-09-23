@@ -6,6 +6,7 @@ import {
   formatDepth,
   formatTileLine,
   seabedWarning,
+  uiScaleFactors,
   type HudWarnConfig,
 } from '../../src/ui/HUD.js';
 
@@ -51,5 +52,13 @@ describe('formatTileLine', () => {
     expect(formatTileLine(meta, 'C', -11000, 'at rating limit')).toBe(
       'challenger-deep · hull C 11,000 m · at rating limit',
     );
+  });
+});
+
+describe('UI scale factors', () => {
+  it('clamps viewport and saved scale independently', () => {
+    expect(uiScaleFactors(1280, 150)).toEqual({ auto: 0.8, user: 1.5 });
+    expect(uiScaleFactors(1920, 100)).toEqual({ auto: 1, user: 1 });
+    expect(uiScaleFactors(3000, 60)).toEqual({ auto: 1.25, user: 0.8 });
   });
 });

@@ -1,5 +1,5 @@
 /**
- * Camera rig: a smoothed chase camera, a first-person viewport, and a free
+ * Camera rig: a draggable chase camera, a first-person viewport, and a free
  * orbit mode that photo mode hangs off.
  *
  * Smoothing is frame-rate independent (exponential decay expressed as a
@@ -74,7 +74,10 @@ export class CameraRig {
   /** Free-orbit state, driven by `orbit()` from a photo-mode UI. */
   orbitAzimuth = 0;
   orbitElevation: number;
+  lookAzimuth = 0;
+  lookElevation = 0;
   orbitRadius: number;
+  chaseRadius: number;
 
   private readonly desiredPosition = new THREE.Vector3();
   private readonly desiredTarget = new THREE.Vector3();
@@ -106,6 +109,7 @@ export class CameraRig {
     this.camera = new THREE.PerspectiveCamera(config.fovDeg, aspect, config.near, config.far);
     this.camera.name = 'mainCamera';
     this.orbitRadius = config.orbitRadius;
+    this.chaseRadius = Math.hypot(config.chaseOffset.x, config.chaseOffset.y, config.chaseOffset.z);
     this.orbitElevation = config.orbitElevation;
   }
 
@@ -133,13 +137,17 @@ export class CameraRig {
     return this.mode;
   }
 
-  /** Drag the free-orbit camera. Radians; no-op outside orbit mode. */
+  /** Drag to orbit in any camera mode; the wheel adjusts chase distance. */
   orbit(dAzimuth: number, dElevation: number, dRadius = 0): void {
-    if (this.mode !== 'orbit') return;
-    this.orbitAzimuth += dAzimuth;
-    // Stop short of the poles so the up-vector never flips.
-    this.orbitElevation = clamp(this.orbitElevation + dElevation, -1.4, 1.4);
-    this.orbitRadius = clamp(this.orbitRadius * (1 + dRadius), 15, 4000);
+    if (this.mode === 'orbit') {
+      this.orbitAzimuth += dAzimuth;
+      this.orbitElevation = clamp(this.orbitElevation + dElevation, -1.4, 1.4);
+      this.orbitRadius = clamp(this.orbitRadius * (1 + dRadius), 15, 4000);
+    } else {
+      this.lookAzimuth += dAzimuth;
+      this.lookElevation = clamp(this.lookElevation + dElevation, -1.4, 1.4);
+      this.chaseRadius = clamp(this.chaseRadius * (1 + dRadius), 25, 180);
+    }
   }
 
   /**
@@ -194,7 +202,15 @@ export class CameraRig {
         this.mode === 'chase'
           ? focusedChaseOffset(c, this.focusWeight, this.focusSide, this.chaseOffsetNow)
           : c.firstPersonOffset;
-      this.offset.set(o.x, o.y, o.z).applyQuaternion(this.quat);
+      this.offset.set(o.x, o.y, o.z);
+      if (this.mode === 'chase')
+        this.offset.multiplyScalar(
+          this.chaseRadius / Math.hypot(c.chaseOffset.x, c.chaseOffset.y, c.chaseOffset.z),
+        );
+      this.offset.applyAxisAngle(new THREE.Vector3(1, 0, 0), this.lookElevation * 0.55);
+      this.offset
+        .applyAxisAngle(new THREE.Vector3(0, 1, 0), this.lookAzimuth)
+        .applyQuaternion(this.quat);
       this.desiredPosition.copy(subPos).add(this.offset);
 
       // Look ahead of the boat rather than at it, which reads better in fog,
@@ -202,6 +218,8 @@ export class CameraRig {
       const base = this.mode === 'chase' ? c.chaseLookAhead : c.firstPersonLookAhead;
       this.desiredTarget
         .set(0, 0, -1)
+        .applyAxisAngle(new THREE.Vector3(1, 0, 0), this.lookElevation * 0.55)
+        .applyAxisAngle(new THREE.Vector3(0, 1, 0), this.lookAzimuth)
         .applyQuaternion(this.quat)
         .multiplyScalar(base + speed * c.lookAheadPerSpeed)
         .add(subPos);
@@ -220,8 +238,14 @@ export class CameraRig {
       this.currentTarget.copy(this.desiredTarget);
       this.initialised = true;
     } else {
-      this.camera.position.lerp(this.desiredPosition, decay(c.positionHalfLife, dt));
-      this.currentTarget.lerp(this.desiredTarget, decay(c.rotationHalfLife, dt));
+      this.camera.position.lerp(
+        this.desiredPosition,
+        this.reduceMotion ? 1 : decay(c.positionHalfLife, dt),
+      );
+      this.currentTarget.lerp(
+        this.desiredTarget,
+        this.reduceMotion ? 1 : decay(c.rotationHalfLife, dt),
+      );
     }
 
     this.applyShake(dt);
@@ -251,7 +275,7 @@ export class CameraRig {
       this.focusSide = chooseFocusSide(lateral, this.focusSide, c.focusSideHysteresisM);
     }
     const want = active ? 1 : 0;
-    if (!this.initialised) this.focusWeight = want;
+    if (!this.initialised || this.reduceMotion) this.focusWeight = want;
     else this.focusWeight += (want - this.focusWeight) * decay(c.focusHalfLife, dt);
     if (this.focusWeight < 1e-4 && !active) {
       this.focusWeight = 0;
@@ -292,7 +316,8 @@ export class CameraRig {
    */
   private applyBank(roll: number, dt: number): void {
     const target = this.reduceMotion || this.mode === 'orbit' ? 0 : roll * this.config.bankFollow;
-    this.bank += (target - this.bank) * decay(this.config.rotationHalfLife, dt);
+    this.bank +=
+      (target - this.bank) * (this.reduceMotion ? 1 : decay(this.config.rotationHalfLife, dt));
     if (Math.abs(this.bank) > 1e-5) {
       this.camera.rotateZ(this.bank);
     }

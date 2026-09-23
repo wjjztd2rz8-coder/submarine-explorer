@@ -6,7 +6,7 @@ import { expect, test, type Page } from '@playwright/test';
  *  (a) O opens it and the game freezes (a held key moves nothing); settings
  *      apply live; a rebinding conflict unbinds the loser; Escape closes;
  *      after a reload settings and the displaced binding persist, and
- *      captions show a sonar ping.
+ *      controls are in their own view.
  *  (b) the HUD hint opens it; Tab stays inside; axe finds no violations.
  *  (c) over the mission briefing it swallows Enter (the dive does not start).
  */
@@ -68,7 +68,7 @@ test.describe('settings screen', () => {
   }) => {
     const errors = collectErrors(page);
     await boot(page, '/');
-    const dialog = page.getByRole('dialog', { name: 'Settings' });
+    const dialog = page.locator('.settings');
     await expect(dialog).toBeHidden();
 
     await page.keyboard.press('KeyO');
@@ -78,9 +78,9 @@ test.describe('settings screen', () => {
     // Frozen: holding thrust and flood for a second moves nothing.
     const before = await subPos(page);
     await page.keyboard.down('KeyW');
-    await page.keyboard.down('ShiftLeft');
+    await page.keyboard.down('KeyC');
     await page.waitForTimeout(1000);
-    await page.keyboard.up('ShiftLeft');
+    await page.keyboard.up('KeyC');
     await page.keyboard.up('KeyW');
     expect(await subPos(page)).toEqual(before);
 
@@ -93,15 +93,16 @@ test.describe('settings screen', () => {
     expect(p.captions).toBe(true);
     expect(p.palette).toBe('highContrast');
 
-    // Rebind Ahead to X, which Boost holds: Boost becomes unbound.
+    // Rebind Ahead to a boost key; Boost keeps its second key.
+    await dialog.getByRole('button', { name: 'Controls' }).click();
     await dialog.locator('[data-action="thrustForward"]').click();
     await expect(dialog.locator('[data-action="thrustForward"]')).toHaveText('Press a key…');
-    await page.keyboard.press('KeyX');
-    await expect(dialog.locator('[data-action="boost"]')).toHaveText('Unbound');
-    await expect(dialog.locator('.settings-status')).toContainText('Boost, which is now unbound');
+    await page.keyboard.press('ShiftLeft');
+    await expect(dialog.locator('[data-action="boost"]')).toContainText('Shift');
+    await expect(dialog.locator('.settings-status')).toContainText('removed from Boost');
     p = await probe(page);
-    expect(p.ahead).toEqual(['KeyX', 'ArrowUp']);
-    expect(p.boost).toEqual([]);
+    expect(p.ahead).toEqual(['ShiftLeft', 'ArrowUp']);
+    expect(p.boost).toEqual(['ShiftRight']);
     await page.screenshot({ path: 'tests/e2e/screenshots/settings.png' });
 
     await page.keyboard.press('Escape');
@@ -116,25 +117,27 @@ test.describe('settings screen', () => {
       reduceMotion: true,
       captions: true,
       palette: 'highContrast',
-      boost: [],
-      ahead: ['KeyX', 'ArrowUp'],
+      boost: ['ShiftRight'],
+      ahead: ['ShiftLeft', 'ArrowUp'],
     });
-    await expect(page.locator('.hud-help')).toContainText('X/S thrust');
-
-    // Captions: the first key press unlocks audio, then Q pings.
-    await page.keyboard.press('KeyQ');
-    await page.waitForTimeout(200);
-    await page.keyboard.press('KeyQ');
-    await expect(page.locator('.captions .caption-line')).toContainText('Sonar ping');
+    await expect(page.locator('.hud-help')).toHaveCount(0);
+    await page.keyboard.press('q');
+    expect(await page.evaluate(() => (window.__game as { rig: { mode: string } }).rig.mode)).toBe(
+      'first-person',
+    );
 
     expect(errors).toEqual([]);
   });
 
-  test('HUD hint opens it; focus stays inside; no axe violations', async ({ page }) => {
+  test('Controls view opens from Settings; focus stays inside; no axe violations', async ({
+    page,
+  }) => {
     await boot(page, '/');
-    await page.locator('.hud-help-link').click();
-    const dialog = page.getByRole('dialog', { name: 'Settings' });
+    await page.keyboard.press('KeyO');
+    const dialog = page.locator('.settings');
     await expect(dialog).toBeVisible();
+    await dialog.getByRole('button', { name: 'Controls' }).click();
+    await expect(dialog.getByText('Drag on the dive view')).toBeVisible();
     for (let i = 0; i < 40; i++) await page.keyboard.press('Tab');
     const inside = await page.evaluate(
       () => document.querySelector('.settings')?.contains(document.activeElement) ?? false,
