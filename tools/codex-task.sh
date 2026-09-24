@@ -9,7 +9,10 @@
 #         .cache/codex/<name>.log        (full Codex log)
 # Screenshots: if the brief's work writes PNGs to .cache/codex/shots/<name>/,
 # they are attached to the next round so Codex can see the UI.
-# On a Codex usage limit, sleeps until the stated reset time and retries.
+# On a Codex usage limit: ON_LIMIT=wait (default) sleeps until the stated reset
+# time and retries; ON_LIMIT=exit stops at once with exit code 75 and a result
+# file starting "# codex-task <name> — CODEX LIMIT", so the orchestrator can
+# hand the unfinished package (same worktree) to a Claude subagent.
 #
 # Parallel tasks: set WT=1 and a distinct PW_PORT. The task then runs in its
 # own git worktree (../subexp-wt/<name>, branch codex/<name>, from HEAD) with
@@ -57,7 +60,17 @@ run_codex() {  # run_codex <round-log> <prompt> [images...]
       codex exec resume "${common[@]}" -o "$last" "${imgs[@]}" "$session" "$prompt" < /dev/null > "$rlog" 2>&1
     fi
     cat "$rlog" >> "$log"
-    grep -qiE "usage limit" "$rlog" && ! [[ -s "$last" ]] && wait_for_limit "$rlog" && continue
+    if grep -qiE "usage limit" "$rlog" && ! [[ -s "$last" ]]; then
+      if [[ "${ON_LIMIT:-wait}" == exit ]]; then
+        { echo "# codex-task $name — CODEX LIMIT at $(date) (round ${round:-1})"
+          echo "session: ${session:-none}"; echo "worktree: $PWD"
+          grep -oiE 'try again at [0-9]{1,2}:[0-9]{2} ?[AP]M' "$rlog" | tail -1
+          echo; echo "Work so far is uncommitted in the worktree; continue it with a Claude subagent."
+        } > "$result"
+        echo "codex-task $name: CODEX LIMIT; see $result"; exit 75
+      fi
+      wait_for_limit "$rlog" && continue
+    fi
     break
   done
 }

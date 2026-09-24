@@ -1,0 +1,15 @@
+Current owner direction (2026-09-23): finish Phase C close-out and prepare
+Phase D briefs. The owner has not playtested Phase C; do not start Phase D
+code. Read the current `plan/STATUS.md` first; older session checklists below
+are historical context where they conflict with completed work.
+
+OpenAI mapping: GPT-6 Astra replaces Fable; GPT-6 Sol replaces both Opus and
+Sonnet. Use Sol subagents with orchestrator review, at most two at once.
+Original Claude instructions are retained below for Claude sessions.
+
+Resume Submarine Explorer orchestration (repo /home/vijay/submarine-explorer). Headless run; the owner is away.
+
+1. Read plan/STATUS.md (top sections), plan/QA-C.md, plan/progress/*.md and your memory notes (budget: $20 plan; 1–2 agents at a time; Sonnet for content/QA/docs, Opus for engine; commit a green checkpoint before the window ends).
+2. `git log --oneline -15` and `git status`. A Sonnet close-out agent was fixing QA-C findings #1 (HUD warning overlapping the objectives panel), #2 (long mission titles), #5 (titanic species.json + wreck preset) and then reconciling docs (README, architecture, MASTER-PLAN §6, STATUS "Phase C complete" section). Other agents (including a GPT-6 session) may also have committed. Review whatever landed; finish anything missing (Sonnet agent), run the gates (`npm run build`, `npm test`, `npm run test:py`, `npm run test:e2e`, `python3 tools/check_attribution.py`, `python3 tools/validate_landmark.py --all --strict`) and commit.
+3. If Phase C is closed and budget remains: write Phase D briefs only (no code) in plan/PHASE-D-BRIEFS.md, per plan/MASTER-PLAN.md §2 Tier 3 and §6 Phase D, informed by QA-B/QA-C and plan/DECISIONS.md (serene tone, soft failure, no survival death spiral). Mark the owner's playtest as the gate before any Phase D code. Commit it.
+4. Do not start Phase D code, push, create a repo or enable Pages.
