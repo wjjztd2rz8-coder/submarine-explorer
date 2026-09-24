@@ -27,6 +27,7 @@ export class Headlights {
   private readonly right = new THREE.Vector3();
   private readonly up = new THREE.Vector3(0, 1, 0);
   private enabled = true;
+  private conesSuppressed = false;
   private preset: LightPreset | null = null;
 
   constructor(
@@ -97,8 +98,14 @@ export class Headlights {
   setEnabled(on: boolean): void {
     this.enabled = on;
     for (const l of this.lights) l.visible = on;
-    for (const c of this.cones) c.visible = on;
+    for (const c of this.cones) c.visible = on && !this.conesSuppressed;
     this.fill.visible = on && this.fill.intensity > 0;
+  }
+
+  /** Hide additive beam geometry near a separate vehicle camera, keeping real illumination. */
+  setConesSuppressed(suppressed: boolean): void {
+    this.conesSuppressed = suppressed;
+    for (const c of this.cones) c.visible = this.enabled && !suppressed;
   }
 
   setPreset(preset: LightPreset): void {

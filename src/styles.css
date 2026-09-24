@@ -3052,3 +3052,27 @@ body:has(.objectives-panel:not([hidden])) .d-scan-objective-hint {
   }
 }
 /* --- D-FLOW end --- */
+/* --- D-ROV --- */
+.hud-rov {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid var(--hud-border);
+  color: #bfefff;
+  font-size: clamp(12px, calc(13px * var(--ui-scale)), 18px);
+  letter-spacing: 0.025em;
+}
+.hud-rov[hidden] {
+  display: none;
+}
+.hud-rov.is-limit {
+  color: #ffd078;
+}
+.hud-rov-badge {
+  display: inline-block;
+  margin-right: 7px;
+  padding: 1px 5px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 0.85em;
+  letter-spacing: 0.1em;
+}

@@ -50,6 +50,8 @@ export interface InputState {
   toggleGuide?: boolean;
   /** Open/close the globe mission select (C1). Edge-triggered; optional like toggleGuide. */
   toggleGlobe?: boolean;
+  /** Deploy or recall the tethered ROV. */
+  toggleRov?: boolean;
 }
 
 /** One rebindable thing the player can do. */
@@ -82,7 +84,8 @@ export type ActionId =
   | 'toggleSettings'
   | 'toggleGuide'
   | 'toggleJournal'
-  | 'toggleGlobe';
+  | 'toggleGlobe'
+  | 'toggleRov';
 
 /** Factory, not a constant: callers get their own mutable copy. */
 export function defaultActions(): ActionBinding[] {
@@ -152,6 +155,7 @@ export function defaultActions(): ActionBinding[] {
     },
     { id: 'toggleLights', label: 'Headlights', category: 'Systems', keys: ['KeyL'], pad: 'X' },
     { id: 'scan', label: 'Scan (hold)', category: 'Systems', keys: ['KeyF'], pad: 'Right bumper' },
+    { id: 'toggleRov', label: 'Deploy / retrieve ROV', category: 'Systems', keys: ['KeyE'] },
     {
       id: 'cycleSimSpeed',
       label: 'Sim speed',
@@ -231,6 +235,7 @@ export class Input {
     togglePhotoMode: false,
     toggleGuide: false,
     toggleGlobe: false,
+    toggleRov: false,
   };
 
   /** The live, rebindable action map. Read it to render a controls screen. */
@@ -373,7 +378,8 @@ export class Input {
           return true;
         });
       }
-      if (version === 1) this.saveBindings();
+      if (version === 1 || !Object.prototype.hasOwnProperty.call(parsed.keys, 'toggleRov'))
+        this.saveBindings();
     } catch {
       /* A corrupt save leaves the defaults usable. */
     }
@@ -514,6 +520,7 @@ export class Input {
       if (this.edgeArmed.has('togglePhotoMode')) s.togglePhotoMode = true;
       if (this.edgeArmed.has('toggleJournal')) s.toggleGuide = true;
       if (this.edgeArmed.has('toggleGlobe')) s.toggleGlobe = true;
+      if (this.edgeArmed.has('toggleRov')) s.toggleRov = true;
       this.edgeArmed.clear();
     }
 
@@ -560,6 +567,7 @@ export class Input {
     s.togglePhotoMode = false;
     s.toggleGuide = false;
     s.toggleGlobe = false;
+    s.toggleRov = false;
   }
 }
 

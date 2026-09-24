@@ -84,6 +84,11 @@ import { missionStartPose } from './game/MissionRouter.js';
 import type { MissionStartPosition } from './game/MissionRouter.js';
 import { spawnHeight } from './game/Spawn.js';
 // --- D-START end ---
+// --- D-ROV begin ---
+import { Rov } from './rov/Rov.js';
+import { RovVisual } from './rov/RovVisual.js';
+import { RovHUD } from './ui/RovHUD.js';
+// --- D-ROV end ---
 
 declare global {
   interface Window {
@@ -989,6 +994,39 @@ async function main(): Promise<void> {
   // -------------------------------------------------------------------- loop
   const time = new Time(config.physicsHz);
   const forward = new THREE.Vector3();
+  // --- D-ROV begin ---
+  const rov = new Rov(config.rov, terrain);
+  const rovVisual = new RovVisual(config.rov);
+  rovVisual.setLightPreset(config.lightPresets[settings.gameplay.lights]);
+  save.onChange((next, changed) => {
+    if (changed.includes('gameplay'))
+      rovVisual.setLightPreset(config.lightPresets[next.gameplay.lights]);
+  });
+  const rovHud = new RovHUD(hud.root.querySelector('.hud-readouts') as HTMLElement);
+  scene.add(rovVisual.group);
+  const rovCurrent = new THREE.Vector3();
+  const cameraFromSub = new THREE.Vector3();
+  const rovCameraAim = new THREE.Vector3();
+  let savedChaseRadius = rig.chaseRadius;
+  const abortRov = (): void => {
+    if (!rov.deployed) return;
+    rov.abort();
+    rig.chaseRadius = savedChaseRadius;
+    rig.setMode('chase');
+    rig.snap(sub.position, sub.yaw, sub.pitch);
+    rovHud.update(rov);
+    rovVisual.update(rov, sub.position);
+    headlights.setConesSuppressed(false);
+  };
+  bus.on('app:state', ({ state }) => {
+    if (state !== 'dive') abortRov();
+  });
+  bus.on('mission:ended', abortRov);
+  bus.on('mission:aborted', abortRov);
+  bus.on('mission:restart', abortRov);
+  bus.on('mission:started', abortRov);
+  bus.on('sub:emergencyBlow', abortRov);
+  // --- D-ROV end ---
   let ready = false;
   let lastTerrainLog = 0;
   let wasFrozen = false;
@@ -1024,30 +1062,66 @@ async function main(): Promise<void> {
     const state = frozen ? FROZEN_INPUT : sampled;
     const steps = frozen ? 0 : realSteps;
     // --- B3 end ---
-    for (let i = 0; i < steps; i++) sub.step(state, time.fixedDelta);
+    // --- D-ROV begin ---
+    if (frozen || missionRouter?.debriefOpen || discovery.debrief.isOpen) abortRov();
+    if (!frozen && state.toggleRov && !sub.getState().emergencyBlow) {
+      if (rov.mode === 'piloting') rov.retrieve();
+      else if (!rov.deployed && rov.deploy(sub.position, sub.yaw)) {
+        sub.velocity.set(0, 0, 0);
+        rig.setMode('chase');
+        savedChaseRadius = rig.chaseRadius;
+        rig.chaseRadius = config.rov.cameraDistanceM;
+        rig.snap(rov.position, rov.yaw, 0);
+      }
+    }
+    const currentMode = save.get().gameplay.currents;
+    for (let i = 0; i < steps; i++) {
+      if (rov.deployed) {
+        currents.sample(rov.position.x, rov.position.z, rovCurrent);
+        rovCurrent.multiplyScalar(
+          currentMode === 'off' ? 0 : currentMode === 'gentle' ? config.currents.gentleScale : 1,
+        );
+        rov.step(time.fixedDelta * sub.simSpeed, state, sub.position, rovCurrent);
+        if (!rov.deployed) {
+          rig.chaseRadius = savedChaseRadius;
+          rig.snap(sub.position, sub.yaw, sub.pitch);
+        }
+      } else sub.step(state, time.fixedDelta);
+    }
+    // --- D-ROV end ---
     // --- D-POWER begin ---
     if (steps) {
       const empty = power.step(steps * time.fixedDelta * sub.simSpeed, {
-        throttle: state.throttle,
-        ballast: state.ballast,
-        boost: state.boost,
+        throttle: rov.deployed ? 0 : state.throttle,
+        ballast: rov.deployed ? 0 : state.ballast,
+        boost: rov.deployed ? false : state.boost,
         lights: headlights.on,
         sensors: state.scan || sonar.visible,
       });
-      if (empty && !powerEmergencyStarted) {
+      // --- D-ROV begin ---
+      if (rov.deployed && power.state.enabled) {
+        const p = power.state;
+        power.setLevels(
+          p.battery -
+            (steps * time.fixedDelta * sub.simSpeed) / (config.rov.batteryDrainPerHour * 3600),
+          p.oxygen,
+        );
+      }
+      // --- D-ROV end ---
+      if ((empty || power.state.depleted) && !powerEmergencyStarted) {
         sub.startEmergencyAscent();
         powerEmergencyStarted = true;
       }
     }
     // --- D-POWER end ---
     // --- B4 begin ---
-    if (!frozen) propContact.resolve(sub, time.frameDelta); // prop push-out, after physics
+    if (!frozen && !rov.deployed) propContact.resolve(sub, time.frameDelta); // prop push-out, after physics
     // --- B4 end ---
 
-    if (state.toggleCamera) {
+    if (state.toggleCamera && !rov.deployed) {
       rig.toggleMode();
     }
-    if (state.togglePhotoMode) rig.togglePhotoMode();
+    if (state.togglePhotoMode && !rov.deployed) rig.togglePhotoMode();
     // --- D-INPUT-HUD begin ---
     if (!frozen) {
       if (sampled.lookDx || sampled.lookDy)
@@ -1100,25 +1174,58 @@ async function main(): Promise<void> {
 
     // Present the boat.
     subMesh.setPose(sub.position, sub.yaw, sub.pitch, sub.roll);
-    subMesh.update(state.throttle, time.frameDelta);
+    subMesh.update(rov.deployed ? 0 : state.throttle, time.frameDelta);
     // Hide our own hull in first person so it does not fill the screen.
     subMesh.group.visible = rig.mode === 'chase';
+    // --- D-ROV begin ---
+    rovVisual.update(rov, sub.position);
+    rovHud.update(rov);
+    // Only the additive beam geometry is hidden; the sub's actual lamps stay on.
+    headlights.setConesSuppressed(rov.deployed);
+    // --- D-ROV end ---
 
     sub.getForward(forward);
     // fix S (QA-B #6): a scan target in range (last frame's scanner view)
     // makes the chase camera frame it clear of our own hull.
-    const scanFocus = discovery.focusPoint();
-    rig.update(sub.position, sub.yaw, sub.pitch, time.frameDelta, {
-      roll: sub.roll,
-      velocity: sub.velocity,
-      hullStress: s.hullStress,
-      focus: scanFocus,
-    });
+    const scanFocus = rov.deployed ? null : discovery.focusPoint();
+    // --- D-ROV begin ---
+    const pilotPosition = rov.deployed ? rov.position : sub.position;
+    const pilotForward = rov.deployed ? rov.forward : forward;
+    // --- D-ROV end ---
+    rig.update(
+      pilotPosition,
+      rov.deployed ? rov.yaw : sub.yaw,
+      rov.deployed ? 0 : sub.pitch,
+      time.frameDelta,
+      {
+        roll: sub.roll,
+        velocity: rov.deployed ? rov.velocity : sub.velocity,
+        hullStress: s.hullStress,
+        focus: scanFocus,
+      },
+    );
+    // --- D-ROV begin ---
+    if (rov.deployed) {
+      rig.camera.position.y += config.rov.cameraRaiseM;
+      cameraFromSub.copy(rig.camera.position).sub(sub.position);
+      const distance = cameraFromSub.length();
+      if (distance < config.rov.mothershipCameraClearanceM) {
+        if (distance < 0.001) cameraFromSub.copy(rov.forward);
+        cameraFromSub.normalize().multiplyScalar(config.rov.mothershipCameraClearanceM);
+        rig.camera.position.copy(sub.position).add(cameraFromSub);
+      }
+      rovCameraAim.copy(rov.position).addScaledVector(rov.forward, config.rov.cameraLookAheadM);
+      rovCameraAim.y += config.rov.cameraAimAboveM;
+      rig.camera.lookAt(rovCameraAim);
+      subMesh.group.visible =
+        rig.camera.position.distanceTo(sub.position) > config.rov.mothershipCameraClearanceM + 3;
+    }
+    // --- D-ROV end ---
     const atmo = atmosphere.update(rig.camera.position.y, sub.position, time.frameDelta);
     // --- C3 begin ---
     presets.update(
       frozen ? 0 : time.frameDelta,
-      steps * time.fixedDelta * sub.simSpeed,
+      rov.deployed ? 0 : steps * time.fixedDelta * sub.simSpeed,
       atmo,
       rig.camera,
       renderer.domElement.height,
@@ -1133,17 +1240,32 @@ async function main(): Promise<void> {
     // fix S (QA-B #10): mission clock and DIVE TIME count real seconds of
     // unfrozen play, not capped physics time.
     const clockDt = frozen ? 0 : time.frameDelta;
+    // --- D-ROV begin ---
+    const rovScanRadii = rov.deployed
+      ? discovery.pois.map((poi) => {
+          const radius = poi.radius;
+          poi.radius *= config.rov.scanRangeFactor;
+          return radius;
+        })
+      : null;
+    // --- D-ROV end ---
     // --- B1 begin ---
     discovery.update(
       steps * time.fixedDelta,
       time.frameDelta,
-      sub.position,
-      forward,
+      pilotPosition,
+      pilotForward,
       missionRouter?.debriefOpen ? { ...state, scan: false } : state, // B3: no beam under the debrief
       rig.camera,
       clockDt,
     );
     // --- B1 end ---
+    // --- D-ROV begin ---
+    if (rovScanRadii)
+      discovery.pois.forEach((poi, index) => {
+        poi.radius = rovScanRadii[index]!;
+      });
+    // --- D-ROV end ---
     // --- D-SCAN begin ---
     const nextScanObjective =
       missionRouter?.mission.objectives.find((o) => o.resolved && !o.complete && o.primary) ??
@@ -1152,7 +1274,7 @@ async function main(): Promise<void> {
       { hint?: string } | undefined;
     waypoints.update(
       rig.camera,
-      sub.position,
+      pilotPosition,
       nextScanObjective
         ? {
             poiId: nextScanObjective.poiId,
@@ -1175,6 +1297,9 @@ async function main(): Promise<void> {
     // --- D-CURRENTS end ---
     // --- D-INPUT-HUD begin ---
     const scanView = discovery.scanner.view;
+    // --- D-ROV begin ---
+    const rovControlTips = `${input.primaryKeyLabel('thrustForward')}/${input.primaryKeyLabel('thrustReverse')} fly · ${input.primaryKeyLabel('yawPort')}/${input.primaryKeyLabel('yawStarboard')} turn · ${input.primaryKeyLabel('ballastBlow')}/${input.primaryKeyLabel('ballastFlood')} rise/sink · ${input.primaryKeyLabel('scan')} scan · ${input.primaryKeyLabel('toggleRov')} retrieve ROV`;
+    // --- D-ROV end ---
     hud.update(s, {
       nearScanTarget: scanFocus !== null,
       // The objectives panel already shows the current objective; a second
@@ -1186,7 +1311,9 @@ async function main(): Promise<void> {
       simSpeed: sub.simSpeed,
       controlTips:
         !frozen && rig.mode !== 'orbit' && save.get().controlTips
-          ? `${input.primaryKeyLabel('thrustForward')}/${input.primaryKeyLabel('thrustReverse')} speed · ${input.primaryKeyLabel('boost')} boost · ${input.primaryKeyLabel('pitchUp')}/${input.primaryKeyLabel('pitchDown')} pitch · ${input.primaryKeyLabel('ballastBlow')}/${input.primaryKeyLabel('ballastFlood')} rise/sink · ${input.primaryKeyLabel('cycleSimSpeed')} sim speed${scanView.candidateId ? ` · ${input.primaryKeyLabel('scan')} scan` : ''}`
+          ? rov.deployed
+            ? rovControlTips
+            : `${input.primaryKeyLabel('thrustForward')}/${input.primaryKeyLabel('thrustReverse')} speed · ${input.primaryKeyLabel('boost')} boost · ${input.primaryKeyLabel('pitchUp')}/${input.primaryKeyLabel('pitchDown')} pitch · ${input.primaryKeyLabel('ballastBlow')}/${input.primaryKeyLabel('ballastFlood')} rise/sink · ${input.primaryKeyLabel('cycleSimSpeed')} sim speed · ${input.primaryKeyLabel('toggleRov')} deploy ROV${scanView.candidateId ? ` · ${input.primaryKeyLabel('scan')} scan` : ''}`
           : null,
     });
     // --- D-INPUT-HUD end ---
@@ -1204,8 +1331,8 @@ async function main(): Promise<void> {
     if (!frozen)
       audio.update({
         depth: s.depth,
-        throttle: state.throttle,
-        ballast: state.ballast,
+        throttle: rov.deployed ? 0 : state.throttle,
+        ballast: rov.deployed ? 0 : state.ballast,
         speed: s.speed,
         position: sub.position,
         forward,
@@ -1276,6 +1403,11 @@ async function main(): Promise<void> {
     // --- D-CURRENTS begin ---
     currents,
     // --- D-CURRENTS end ---
+    // --- D-ROV begin ---
+    rov,
+    rovHud,
+    rovVisual,
+    // --- D-ROV end ---
     meta,
     // --- B1 begin ---
     scanner: discovery.scanner,

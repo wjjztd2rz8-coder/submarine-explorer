@@ -999,6 +999,32 @@ export interface PowerConfig {
   criticalThreshold: number;
 }
 
+export interface RovConfig {
+  tetherLengthM: number;
+  radiusM: number;
+  clearanceM: number;
+  deployAheadM: number;
+  deployBelowM: number;
+  maxSpeedMps: number;
+  verticalSpeedMps: number;
+  yawRateRadS: number;
+  responsePerSecond: number;
+  returnSpeedMps: number;
+  scanRangeFactor: number;
+  cameraDistanceM: number;
+  cameraRaiseM: number;
+  cameraLookAheadM: number;
+  cameraAimAboveM: number;
+  mothershipCameraClearanceM: number;
+  batteryDrainPerHour: number;
+  currentScale: number;
+  spotIntensityFactor: number;
+  spotDistanceFactor: number;
+  fillMinIntensity: number;
+  fillIntensityFactor: number;
+  fillDistanceM: number;
+}
+
 export interface GameConfig {
   defaultTileId: string;
   /** Graphics quality tier. Override at runtime with `?tier=low|medium|high`. */
@@ -1024,6 +1050,7 @@ export interface GameConfig {
   sensorPresets: Record<GameplayOptions['sensors'], SensorPreset>;
   power: PowerConfig;
   currents: CurrentsConfig;
+  rov: RovConfig;
   /** C5: sonar minimap palettes (`Sonar.setPalette`). */
   sonarPalettes: Record<SonarPaletteName, SonarPalette>;
   sonarZoom: SonarZoomConfig;
@@ -1567,6 +1594,32 @@ export const DEFAULT_CONFIG: GameConfig = {
     terrainLookaheadS: 0.5,
     terrainGuardM: 1,
   },
+  // --- D-ROV: small tethered vehicle. All motion rates are simulated 1x time. ---
+  rov: {
+    tetherLengthM: 150,
+    radiusM: 0.75,
+    clearanceM: 0.5,
+    deployAheadM: 32,
+    deployBelowM: 5,
+    maxSpeedMps: 2,
+    verticalSpeedMps: 1.4,
+    yawRateRadS: 1.8,
+    responsePerSecond: 5,
+    returnSpeedMps: 30,
+    scanRangeFactor: 0.6,
+    cameraDistanceM: 14,
+    cameraRaiseM: 8,
+    cameraLookAheadM: 5,
+    cameraAimAboveM: 1.5,
+    mothershipCameraClearanceM: 18,
+    batteryDrainPerHour: 36,
+    currentScale: 1,
+    spotIntensityFactor: 0.45,
+    spotDistanceFactor: 0.04,
+    fillMinIntensity: 40,
+    fillIntensityFactor: 0.6,
+    fillDistanceM: 12,
+  },
   // --- D-SONAR: survey relief and map spans ---
   sonarZoom: {
     levels: [250, 500, 1000, 2000, 'tile'],
@@ -1823,6 +1876,7 @@ export function makeConfig(overrides: Partial<GameConfig> = {}): GameConfig {
     sensorPresets: { ...DEFAULT_CONFIG.sensorPresets, ...overrides.sensorPresets },
     power: { ...DEFAULT_CONFIG.power, ...overrides.power },
     currents: { ...DEFAULT_CONFIG.currents, ...overrides.currents },
+    rov: { ...DEFAULT_CONFIG.rov, ...overrides.rov },
     sonarPalettes: { ...DEFAULT_CONFIG.sonarPalettes, ...overrides.sonarPalettes },
     sonarZoom: { ...DEFAULT_CONFIG.sonarZoom, ...overrides.sonarZoom },
     globe: { ...DEFAULT_CONFIG.globe, ...overrides.globe },
