@@ -11,9 +11,9 @@ the field guide marks as reconstructions.
 `npm run dev` and open the printed `localhost` URL. The **home screen** opens
 first with the globe from the dive-site picker behind a menu: **Continue**
 (your last dive, disabled until you've started one), **Dive sites**, **Free
-dive**, **Journal**, **Settings** and **Controls**. Picking a site launches its
-briefing, which shows the real facts for that dive and, if the mission allows
-it, a choice of start position (see Dives and objectives below).
+dive**, **Journal**, **Settings** and **Controls**. The Arcade / Realistic / Custom mode selector is
+visible above the menu. Picking a site opens a briefing with Dive settings
+(mode, start position and more options); its preview matches the actual spawn.
 
 While diving, **Esc** opens the pause menu: Resume, Objectives (the full list
 with hints), Mission select, Journal, Settings, Controls and Quit to home.
@@ -24,7 +24,7 @@ screen and starts a dive directly (see URL parameters).
 
 ### Modes: Arcade, Realistic, Custom
 
-Settings → Gameplay has three modes, styled after War Thunder's preset-plus-override
+Home, the mission briefing and Settings → Gameplay expose three modes, using the preset-plus-override
 approach (`Config.settings.gameplayPresets` in `src/core/Config.ts`). Picking
 Arcade or Realistic replaces every gameplay option at once; changing any single
 option afterwards (in either preset, or from scratch) switches the label to
@@ -36,7 +36,8 @@ Custom and keeps the rest of your choices.
 | Descent profile  | `fast`                                   | `research`                               | Ballast (vertical) acceleration and speed cap                                                     |
 | Lights           | `enhanced` — brighter, wider, plus fill  | `realistic` — today's narrower spots     | Headlight intensity, distance and cone angle                                                      |
 | Sensors          | `extended` — 2× scan/sonar/hint range    | `realistic` — 1× (unmodified) range      | Scan radius, waypoint hint range, sonar POI pickup range                                          |
-| Visual hints     | on                                       | off                                      | World-space waypoint, off-screen edge arrow and objective hint text                               |
+| Visual waypoints | on                                       | off                                      | World-space waypoint, off-screen edge arrow and objective hint text                               |
+| Sonar markers    | on                                       | on                                       | POI, objective and scanned icons on sonar; seabed relief stays visible when off                   |
 | Start position   | near-site                                | near-site (surface is opt-in either way) | See Dives and objectives                                                                          |
 | Battery / oxygen | off                                      | on                                       | See Battery, oxygen and currents                                                                  |
 | Currents         | off                                      | `realistic` (full strength)              | See Battery, oxygen and currents                                                                  |
@@ -74,7 +75,7 @@ Cells are ~40–60 m (22 m E-W on `endurance`). `great-blue-hole` and
 `hunga-tonga-caldera` do not show the feature they are named for; see the
 inventory. All 13 landmark sites have a full mission (`data/landmarks/index.json`);
 `demo-synthetic` is a tile-only offline stand-in with no mission. Try
-`?mission=titanic` or open the globe (`N`) to pick any of the 13.
+`?mission=titanic` or choose **Dive sites** on Home or **Mission select** from pause to pick any of the 13.
 
 ## Setup
 
@@ -168,32 +169,33 @@ from Settings -> Controls (`Input.rebind`, saved to `localStorage` key
 `subexplorer.bindings.v3`); a gamepad takes over automatically whenever a
 stick or button is deflected, but its buttons are not rebindable yet.
 
-| Key                         | Action                                                                                       | Gamepad (standard mapping) |
-| --------------------------- | -------------------------------------------------------------------------------------------- | -------------------------- |
-| `W` / `S` (or up / down)    | ahead / astern                                                                               | left stick                 |
-| `A` / `D` (or left / right) | yaw to port / starboard                                                                      | left stick                 |
-| `R` / `F`                   | pitch nose up / down                                                                         | right stick                |
-| `Space`                     | rise (blow ballast)                                                                          | A / cross                  |
-| `Ctrl` or `C`               | sink (flood ballast); `C` is a full alias                                                    | B / circle                 |
-| `Shift`                     | boost                                                                                        | right trigger              |
-| `G` (hold)                  | scan the target in range; "Already logged" once it's scanned this dive                       | right bumper               |
-| `L`                         | headlights                                                                                   | X                          |
-| `M`                         | sonar map; mouse wheel zooms it (250 m / 500 m / 1 km / 2 km / whole tile) when it has focus | Back / view                |
-| `X`                         | reset camera to default chase view                                                           | --                         |
-| `Q`                         | camera view (chase / first-person)                                                           | Y                          |
-| `T`                         | sim speed 1x / 2x / 3x (a HUD badge shows it whenever it isn't 1x)                           | D-pad up                   |
-| `J`                         | Journal (site, POI and species entries, plus your photo gallery)                             | --                         |
-| `E`                         | deploy / retrieve the tethered ROV                                                           | --                         |
-| `P`                         | photo mode (free-orbit camera, hidden HUD); `Enter` or `Space` captures                      | Start                      |
-| `Esc`                       | pause menu; closes the top-most open dialog first                                            | --                         |
-| mouse drag                  | free look; camera keeps its world angle as the boat turns                                    | --                         |
-| mouse wheel                 | zoom the chase camera (35-180 m) when the sonar doesn't have focus                           | --                         |
-| double-click game view      | reset camera to default chase view                                                           | --                         |
+| Key                         | Action                                                                                                          | Gamepad (standard mapping) |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| `W` / `S` (or up / down)    | ahead / astern                                                                                                  | left stick                 |
+| `A` / `D` (or left / right) | yaw to port / starboard                                                                                         | left stick                 |
+| `R` / `F`                   | pitch nose up / down                                                                                            | right stick                |
+| `Space`                     | rise (blow ballast)                                                                                             | A / cross                  |
+| `Ctrl` or `C`               | sink (flood ballast); `C` is a full alias                                                                       | B / circle                 |
+| `Shift`                     | boost                                                                                                           | right trigger              |
+| `G` (hold)                  | scan the target in range; "Already logged" once it's scanned this dive                                          | right bumper               |
+| `L`                         | headlights                                                                                                      | X                          |
+| `M`                         | sonar map; its buttons, `+`/`-`, or the wheel zoom it (250 m / 500 m / 1 km / 2 km / whole tile) while expanded | Back / view                |
+| `X`                         | reset camera to default chase view                                                                              | --                         |
+| `Q`                         | camera view (chase / first-person)                                                                              | Y                          |
+| `T`                         | sim speed 1x / 2x / 3x (a HUD badge shows it whenever it isn't 1x)                                              | D-pad up                   |
+| `J`                         | Journal (site, POI and species entries, plus your photo gallery)                                                | --                         |
+| `E`                         | deploy / retrieve the tethered ROV                                                                              | --                         |
+| `P`                         | photo mode (free-orbit camera, hidden HUD)                                                                      | Start                      |
+| `Enter`                     | capture a photo in photo mode; `Space` and the Capture button also work                                         | --                         |
+| `Esc`                       | pause menu; closes the top-most open dialog first                                                               | --                         |
+| mouse drag                  | free look; camera keeps its world angle as the boat turns                                                       | --                         |
+| mouse wheel                 | zoom the chase camera (35–180 m) unless sonar is expanded                                                       | --                         |
+| double-click game view      | reset camera to default chase view                                                                              | --                         |
 
-Pointer look is optional in Settings -> Controls. Its lock ends when a menu opens; losing the lock during a dive opens pause.
+Pointer look is optional via **Enable pointer look** in Settings → Controls; pressing it closes Settings and locks the dive view. Menus release the pointer; losing lock during a dive opens pause. The chase camera follows yaw by default, not pitch; after free look, its world angle stays fixed until reset.
 
-Settings, the globe and Journal no longer have dedicated hotkeys (the old `O`
-and `N`) -- open them from the home screen or the `Esc` pause menu instead.
+Settings and the globe no longer have dedicated hotkeys (the old `O` and
+`N`) -- open them from the home screen or the `Esc` pause menu instead.
 
 ## URL parameters
 
@@ -214,23 +216,24 @@ and `N`) -- open them from the home screen or the `Esc` pause menu instead.
 | `?preset=<name>`          | override the environment preset for visual checks; see `docs/presets.md`                                             |
 
 Examples: `/?mission=titanic`, `/?tile=titanic&landmark=_test&poi=test-bow`
-(then hold `F`), `/?tile=titanic&depth=3790&at=41.7290,-49.9500,0`.
+(then hold `G`), `/?tile=titanic&depth=3790&at=41.7290,-49.9500,0`.
 
 ## Dives and objectives
 
 A mission's briefing offers a start position: **near-site** (default) puts you
-roughly 100-200 m from the first primary objective, at a safe height above the seabed,
+roughly 350–600 m from the first primary objective, at a safe height above the seabed,
 facing it, lights on — usually reachable in under a minute at Arcade speed.
 **Surface start** descends from the surface instead, for the full descent.
+The briefing previews whichever start you choose and begins there without a teleport.
 Realistic mode still defaults to near-site; surface start is opt-in either way
 (`plan/PHASE-D-CONTRACTS.md` §3).
 
 Every objective carries a plain-language hint saying what it is and roughly
-where (bearing, feature or depth). With **visual hints** on (Arcade default,
+where (bearing, feature or depth). With **Visual waypoints** on (Arcade default,
 off in Realistic, toggle in Custom) the current objective also gets a
 world-space waypoint marker, an off-screen edge arrow with distance and depth
 difference, and an "in range" cue. Once you scan a target it is marked scanned
-in the world, on the sonar and in the objective tracker for the rest of that
+in the world, on the sonar (when Sonar markers is on) and in the objective tracker for the rest of that
 dive; scanning it again just says "Already logged — see Journal" — nothing is
 lost, since the discovery itself is already in your Journal.
 
@@ -255,11 +258,11 @@ across reloads (`subexplorer.discoveries.v1`); the per-dive "already scanned"
 state that blocks re-scanning is separate and always resets on a new dive.
 
 **Photo mode** (`P`) swings a free-orbit camera around your sub — or the
-ROV, while it's deployed — and hides the HUD. `Enter` or `Space` captures a
-JPEG thumbnail (≤ 640 px wide) captioned with whichever site or POI is in
+ROV, while it's deployed — and hides the HUD. `Enter`, `Space` or the visible
+**Capture** button captures a JPEG thumbnail (≤ 640 px wide) captioned with whichever site or POI is in
 frame, and saves it into the Journal's photo gallery
 (`subexplorer.photos.v1`, the newest 24 kept, oldest dropped with a notice
-when it's full).
+when it's full). The gallery can download a single JPEG or all photos as a ZIP.
 
 ## Battery, oxygen and currents
 
@@ -267,7 +270,8 @@ Two optional realism systems, off by default in Arcade and on by default in
 Realistic (independently switchable in Custom):
 
 - **Battery and oxygen** (`docs/power.md`) drain with elapsed time, thrust,
-  ballast, lights and sensors. Low levels warn clearly; running out locks
+  ballast, lights and sensors. Realistic near-site dives start with reserves
+  reduced for the descent skipped by the spawn; surface starts begin full. Low levels warn clearly; running out locks
   manual control and forces a safe automatic emergency ascent rather than a
   fail screen. Tuning is anchored to WHOI's published Alvin endurance figures,
   not a literal life-support simulation.
@@ -275,7 +279,19 @@ Realistic (independently switchable in Custom):
   sampled once from an archived HYCOM ocean-model snapshot and checked into
   the repo — the game never calls out to a live ocean-data service. The
   gameplay setting is off, gentle or realistic (Arcade is off, Realistic is
-  full strength; gentle is reachable through Custom).
+  full sampled strength; gentle is 35% through Custom). Marine snow drifts
+  with the current.
+
+## Hull depth
+
+When selected, the HUD gauge compares current depth with the fitted hull's
+**rated** operating depth.
+Settings → Accessibility → Hull warning selects gauge, vignette or both (both
+by default); the vignette begins beyond the rating, with no screen shake.
+The simulated **crush** threshold is separately set 10% deeper than each rating
+and triggers an emergency ascent. Classes A, B and C are rated to 1,000 m,
+6,500 m and 11,000 m respectively; Challenger Deep uses the full-ocean-depth
+Class C. The margin is game tuning, not a certification claim.
 
 ## Honesty note
 

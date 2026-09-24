@@ -1,10 +1,10 @@
-# Settings, save and accessibility (C5, D-MODES, D-SHELL)
+# Settings, save and accessibility (Phase D2)
 
 Open Settings from the **home screen** or the **Esc pause menu** (both have a
 Settings entry and a Controls entry). There is no dedicated hotkey any more —
-D-SHELL retired the old `O` binding, and `Input`'s `defaultActions()` no
-longer defines a `toggleSettings` or `toggleGlobe` action at all. It is a
-modal dialog: while open the game is frozen (no physics, mission clock
+D-SHELL retired the old `O` and `N` bindings; `Input`'s `defaultActions()` no
+longer binds Settings or the globe. Settings is a modal dialog: while open the
+game is frozen (no physics, mission clock
 stopped, like the briefing and the globe) and every key press goes to the
 dialog only. **Escape** closes it; **Tab** cycles its controls. It can open
 over the mission briefing, but not over the globe (`canOpen: () =>
@@ -12,23 +12,24 @@ over the mission briefing, but not over the globe (`canOpen: () =>
 
 Code: `src/ui/Settings.ts` (screen), `src/core/Save.ts` (persistence),
 `src/core/Input.ts` (key bindings), `src/ui/Captions.ts` (captions overlay),
-wiring in the `C5`/`D-MODES`/`D-SHELL` fenced blocks of `src/main.ts`.
+wiring in the `C5`/`D-MODES`/`D-SHELL`/`D2` fenced blocks of `src/main.ts`.
 Defaults and ranges: `Config.settings` (display settings, gameplay presets and
 options), `Config.sonarPalettes`.
 
 ## Settings
 
-| Setting           | Applies            | Notes                                                                                                                                                                                        |
-| ----------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Graphics tier     | after reload       | `?tier=low\|medium\|high` in the URL overrides the saved tier.                                                                                                                               |
-| Post-processing   | immediately        | Colour grade + vignette pass; off also when the tier has no post stack.                                                                                                                      |
-| Terrain detail    | after reload       | Procedural detail on top of the survey data, 0 to 1.5; 0 = survey data only.                                                                                                                 |
-| Default sim speed | next dive (reload) | Auto = free dive 1×, missions at their own default; else 1×, 2× or 3×. This is a legacy display default — `gameplay.simSpeed` (below) is what a launched dive actually starts at.            |
-| Reduce motion     | immediately        | `CameraRig.reduceMotion`: no camera shake, no banking follow.                                                                                                                                |
-| Captions          | immediately        | Text for every audio cue (`AudioSystem.captions`), bottom centre, live region.                                                                                                               |
-| Sonar map colours | immediately        | `Sonar.setPalette`: sonar green, colour-blind safe blue-yellow, high contrast.                                                                                                               |
-| UI scale (%)      | immediately        | Integer 80–150, default 100. Combines with an automatic viewport-based factor (`clamp(innerWidth/1920, 0.8, 1.25)`) through the `--ui-scale` CSS variable; does not resize the WebGL canvas. |
-| Control tips      | immediately        | Shows/hides the HUD's control-tip line (e.g. the F-scan prompt copy, the one-time Ctrl+W fullscreen tip). Default on.                                                                        |
+| Setting           | Applies            | Notes                                                                                                                                                                                                                                                              |
+| ----------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Graphics tier     | after reload       | `?tier=low\|medium\|high` in the URL overrides the saved tier.                                                                                                                                                                                                     |
+| Post-processing   | immediately        | Colour grade + vignette pass; off also when the tier has no post stack.                                                                                                                                                                                            |
+| Terrain detail    | after reload       | Procedural detail on top of the survey data, 0 to 1.5; 0 = survey data only.                                                                                                                                                                                       |
+| Default sim speed | next dive (reload) | Auto = free dive 1×, missions at their own default; else 1×, 2× or 3×. This is a legacy display default — `gameplay.simSpeed` (below) is what a launched dive actually starts at.                                                                                  |
+| Reduce motion     | immediately        | `CameraRig.reduceMotion`: disables camera banking. Hull warnings never shake the screen.                                                                                                                                                                           |
+| Captions          | immediately        | Text for every audio cue (`AudioSystem.captions`), bottom centre, live region.                                                                                                                                                                                     |
+| Sonar map colours | immediately        | `Sonar.setPalette`: sonar green, colour-blind safe blue-yellow, high contrast.                                                                                                                                                                                     |
+| UI scale (%)      | immediately        | Integer 80–150, default 100, adjustable by slider and step buttons with a separate readable value. Combines with an automatic viewport-based factor (`clamp(innerWidth/1920, 0.8, 1.25)`) through the `--ui-scale` CSS variable; does not resize the WebGL canvas. |
+| Control tips      | immediately        | Shows/hides the HUD's control-tip line (including the G-scan prompt and start-of-dive camera tips). Default on.                                                                                                                                                    |
+| Hull warning      | immediately        | Vignette, gauge or both (default). The gauge shows depth against the fitted hull rating; the vignette begins beyond that rating. Simulated crush is 10% deeper and triggers emergency ascent.                                                                      |
 
 **Reset settings** restores the defaults (Arcade gameplay mode, `uiScale`
 100, `controlTips` on, and the display settings above) and removes the stored
@@ -49,7 +50,8 @@ but progress cannot be persisted in that browser.
 
 ## Gameplay (D-MODES)
 
-A **Gameplay** section sits between Graphics and Accessibility. **Mode** is
+The **Gameplay** section sits between Graphics and Accessibility. The mode
+selector is also visible on Home and in the mission briefing. **Mode** is
 `Arcade` (default), `Realistic` or `Custom`. Choosing Arcade or Realistic
 replaces every option below atomically with that preset
 (`Config.settings.gameplayPresets`); changing any single option afterward —
@@ -57,17 +59,20 @@ in either preset, or starting from nothing — flips the mode label to
 `Custom` and keeps every other value (`Save.setGameplayOption`). Choosing
 Custom by itself just copies the current values; it never guesses a preset.
 
-| Option             | Arcade     | Realistic   | Effect                                                                                                  |
-| ------------------ | ---------- | ----------- | ------------------------------------------------------------------------------------------------------- |
-| Forward speed      | `fast`     | `research`  | `Config.speedProfiles`: `research` ≈ Alvin (1 m/s cruise), `standard`, or `fast` (up to ~40 kn boosted) |
-| Descent speed      | `fast`     | `research`  | `Config.descentProfiles`: ballast acceleration and vertical speed cap                                   |
-| Lights             | `enhanced` | `realistic` | `Config.lightPresets`: brighter/wider spots plus a fill light, or today's narrower realistic spots      |
-| Sensors            | `extended` | `realistic` | `Config.sensorPresets`: 2× or 1× scan radius, waypoint hint range and sonar POI pickup range            |
-| Visual hints       | on         | off         | Waypoint marker, off-screen edge arrow and objective hint text (`ui/Waypoints.ts`)                      |
-| Start position     | near-site  | near-site   | `near-site` or `surface`; surface is opt-in in either mode, chosen in the briefing or here              |
-| Battery and oxygen | off        | on          | `game/Power.ts` (`docs/power.md`)                                                                       |
-| Currents           | off        | `realistic` | `off` / `gentle` / `realistic`; `world/Currents.ts` (`docs/currents.md`)                                |
-| Simulation speed   | 1×         | 1×          | Initial simulated-time rate at the start of a dive; `T` still cycles 1×/2×/3× regardless of mode        |
+| Option             | Arcade     | Realistic   | Effect                                                                                                                             |
+| ------------------ | ---------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Forward speed      | `fast`     | `research`  | `Config.speedProfiles`: `research` ≈ Alvin (1 m/s cruise), `standard`, or `fast` (up to ~40 kn boosted)                            |
+| Descent speed      | `fast`     | `research`  | `Config.descentProfiles`: ballast acceleration and vertical speed cap                                                              |
+| Lights             | `enhanced` | `realistic` | `Config.lightPresets`: brighter/wider spots plus a fill light, or today's narrower realistic spots                                 |
+| Sensors            | `extended` | `realistic` | `Config.sensorPresets`: 2× or 1× scan radius, waypoint hint range and sonar POI pickup range                                       |
+| Visual waypoints   | on         | off         | Waypoint marker, off-screen edge arrow and objective hint text (`ui/Waypoints.ts`)                                                 |
+| Sonar markers      | on         | on          | POI, objective and scanned icons on sonar; terrain relief remains visible when off                                                 |
+| Start position     | near-site  | near-site   | `near-site` or `surface`; surface is opt-in in either mode, chosen in the briefing or here; the briefing previews the actual spawn |
+| Battery and oxygen | off        | on          | `game/Power.ts` (`docs/power.md`)                                                                                                  |
+| Currents           | off        | `realistic` | `off` / `gentle` / `realistic`; `world/Currents.ts` (`docs/currents.md`)                                                           |
+| Simulation speed   | 1×         | 1×          | Initial simulated-time rate at the start of a dive; `T` still cycles 1×/2×/3× regardless of mode                                   |
+
+The briefing’s **Dive settings** shows mode and start position directly; **More options** exposes Visual waypoints, Sonar markers, Battery and oxygen, Currents and Forward speed. Changing an individual option makes the mode Custom. In Realistic, near-site starts begin with battery and oxygen reduced by a simulated descent; surface starts begin full.
 
 Physics values are always simulated at 1×; 2×/3× makes the same simulated
 motion play out faster per wall-clock second rather than raising the vehicle's
@@ -86,36 +91,37 @@ shows **Unbound** and stays unbound after a reload (it does not silently
 regain its default, which another action may now own). Escape cancels a
 capture; Escape and Tab cannot be bound. **Reset key bindings** restores the
 shipped map (`defaultActions()` in `src/core/Input.ts` — see the README's
-controls table for the current defaults: W/S, A/D, R/V pitch, Space rise,
-Ctrl-or-C sink, Shift boost, F scan, L lights, M sonar, Q camera, T sim
-speed, J Journal, E ROV, P photo). The pane also has a note that dragging the
+controls table for the current defaults: W/S, A/D, R/F pitch, Space rise,
+Ctrl-or-C sink, Shift boost, hold G to scan, L lights, M sonar, Q camera,
+X reset camera, T sim speed, J Journal, E ROV, P photo, Enter capture photo). The pane also has a note that dragging the
 dive view orbits the camera and the wheel zooms it, an **Enable pointer
-lock** button, and a sonar note (`M` expands the map; `+`/`-` or the wheel
-over it changes range). The retired `toggleSettings`/`toggleGlobe` action ids
+look** button (closes Settings and locks the dive view; menus release it, and
+losing lock while diving opens pause), and a sonar note (`M` expands the map; `+`/`-` or the wheel
+anywhere while expanded changes range, leaving camera zoom alone). The retired `toggleSettings`/`toggleGlobe` action ids
 are filtered out of the rendered list even though `defaultActions()` no
 longer produces them either, so the list only ever shows live, keyboard-bound
 actions.
 
 ## Storage
 
-| Key                          | Owner                    | Shape                                                                                                                                                                  |
-| ---------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `subexplorer.settings.v2`    | `core/Save.ts`           | `{ version: 2, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette, uiScale, controlTips, gameplayMode, gameplay, bindings? }` |
-| `subexplorer.bindings.v2`    | `core/Input.ts`          | `{ version: 2, keys: { <actionId>: string[] } }`, `[]` = deliberately unbound                                                                                          |
-| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | unchanged since Phase B                                                                                                                                                |
-| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | photo-mode captures, newest 24 (see `docs/architecture.md`); separate from discoveries                                                                                 |
-| `subexplorer.lastSite.v1`    | `main.ts`                | `{ missionId: string }`, written when a mission starts; drives the home screen's Continue button                                                                       |
-| `subexplorer.tips.v1`        | `main.ts`                | `{ ctrlW: true }` once the one-time "Ctrl+W may close this tab" tip has been dismissed                                                                                 |
+| Key                          | Owner                    | Shape                                                                                                                                                                                    |
+| ---------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `subexplorer.settings.v2`    | `core/Save.ts`           | `{ version: 2, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette, uiScale, controlTips, hullWarningStyle, gameplayMode, gameplay, bindings? }` |
+| `subexplorer.bindings.v3`    | `core/Input.ts`          | `{ version: 3, keys: { <actionId>: string[] } }`, `[]` = deliberately unbound                                                                                                            |
+| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | unchanged since Phase B                                                                                                                                                                  |
+| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | photo-mode captures, newest 24 (see `docs/architecture.md`); separate from discoveries                                                                                                   |
+| `subexplorer.lastSite.v1`    | `main.ts`                | `{ missionId: string }`, written when a mission starts; drives the home screen's Continue button                                                                                         |
+| `subexplorer.tips.v1`        | `main.ts`                | `{ ctrlW: true }` once the one-time "Ctrl+W may close this tab" tip has been dismissed                                                                                                   |
 
 `bindings` in the settings record is only a pointer to the bindings key
-(`subexplorer.bindings.v2`). `Save.load` reads `subexplorer.settings.v2`
+(`subexplorer.bindings.v3`). `Save.load` reads `subexplorer.settings.v2`
 first; if absent, it reads the legacy `subexplorer.settings.v1`, keeps its
 seven display fields, assigns the Arcade gameplay preset and `uiScale: 100`,
 and writes v2 once if storage allows — the v1 key itself is left untouched,
-never deleted. `Input` does the same v1→v2 migration for bindings: a saved
-**nondefault** v1 choice is preserved, every untouched action is filled from
-the current (D-era) defaults, and the result is written to
-`subexplorer.bindings.v2` once. Each field is validated on load; a bad field
+never deleted. `Input` migrates v2 bindings to v3: unchanged `V` pitch-down and `F` scan
+defaults become `F` and `G`; saved custom bindings are retained and `X` reset
+camera is added. A saved v1 map also migrates through the supported defaults.
+The earlier keys remain untouched. Each field is validated on load; a bad field
 falls back to its default alone, and an invalid `gameplay` value sanitizes
 field by field against `Config.settings.gameplayOptions`. A newer stored
 version (of either key) is read as defaults and left on disk, never

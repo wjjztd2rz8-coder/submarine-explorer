@@ -51,19 +51,21 @@ Both retire the old `O` (settings) and `N` (globe) hotkeys — `Input`'s
 those screens open only from a menu button now. `Save`'s settings record is
 versioned `v2` and gained a `gameplay` block (`Config.settings.gameplayPresets`
 'arcade' | 'realistic', plus 'custom') covering speed/descent profile, lights,
-sensors, visual hints, start position, battery/oxygen and currents —
+sensors, visual waypoints, sonar markers, start position, battery/oxygen and currents —
 `src/core/Config.ts` `speedProfiles` / `descentProfiles` / `lightPresets` /
 `sensorPresets` hold the numeric presets. `Input`'s bindings are versioned
-`v2` too, with new defaults (R/V pitch, Space rise, Ctrl-or-C sink, Shift
-boost, F scan, Q camera, no `ping` action). `ui/Journal.ts` (`game/JournalData.ts`)
+`v3` (migrating v2), with defaults R/F pitch, Space rise, Ctrl-or-C sink,
+Shift boost, G scan, Q camera, X reset camera and no `ping` action. `ui/Journal.ts` (`game/JournalData.ts`)
 replaces the field guide as the `J` destination: a Civilopedia-style catalogue
 of site/POI/species entries built from existing content files, still reading
 `DiscoveryStore`'s unchanged `subexplorer.discoveries.v1` for unlocks, plus a
 photo gallery tab (`ui/PhotoGallery.ts`). `ui/Waypoints.ts` draws the D-SCAN
 world-space waypoint, off-screen edge arrow and objective hint text when the
-`visualHints` gameplay option is on. `ui/Sonar.ts` gained POI/objective icons
+`visualHints` gameplay option is on. `sonarMarkers` separately controls
+POI/objective/scanned icons on the sonar; seabed relief remains visible. `ui/Sonar.ts` gained POI/objective icons
 and zoom levels (`Config.sonarZoom`: 250/500/1000/2000 m or the whole tile,
-`M` plus the mouse wheel while it has focus). `game/Power.ts` is the optional
+`M` to expand, buttons or `+`/`-` to change range, and the mouse wheel
+anywhere while expanded; the camera does not zoom in that state). `game/Power.ts` is the optional
 battery/oxygen system (`docs/power.md`); `world/Currents.ts` loads an offline
 per-tile HYCOM current grid from `data/currents/<tile>.json`
 (`docs/currents.md`); both are gated by the `gameplay.batteryOxygen` and
@@ -72,9 +74,19 @@ are the tethered ROV (`E` to deploy/retrieve; it flies, scans and returns, with
 its own chase camera). `ui/PhotoMode.ts` + `game/PhotoStore.ts` are photo mode
 (`P`; `Enter`/`Space` captures): a free-orbit camera around the sub or the
 deployed ROV, saving captioned JPEG thumbnails to `subexplorer.photos.v1`,
-newest 24 kept. `MissionState` gained a `primaries-complete` stage between
+newest 24 kept. A visible Capture button records photos, and the gallery
+downloads individual JPEGs or one ZIP. `MissionState` gained a `primaries-complete` stage between
 `diving` and `debrief` (`mission:primaryComplete`, `mission:ended`), so
-finishing the primaries no longer force-opens the debrief.
+finishing the primaries no longer force-opens the debrief. The D2 chase camera starts farther behind and higher above the
+sub, follows yaw but not pitch, and keeps a world-fixed direction after manual
+free look. `X`, the HUD button or a double-click restores the chase view.
+Pointer look is started from Settings → Controls and released by menus. The
+briefing now previews the chosen start pose before Begin and does not move the
+sub after the dive starts. The hull gauge compares depth with the fitted
+class’s rated depth; the optional vignette starts beyond that rating, while
+the separate crush depth is 10% deeper and triggers an emergency blow. Class C
+is rated to 11,000 m for Challenger Deep. Realistic near-site starts deduct a
+simulated descent from battery and oxygen, and marine snow follows currents.
 
 ```mermaid
 flowchart TD
@@ -361,7 +373,7 @@ never repurpose one.
 | `terrain:built`           | `{ chunks, vertices }`                                 | `main.ts` after `Terrain` construction                     |
 | `landmarks:loaded`        | `{ landmarks: Landmark[] }`                            | `main.ts` when any landmark is placed                      |
 | `sub:collided`            | `{ depth, speed }`                                     | `main.ts` (seabed); `PropContact` (props)                  |
-| `sub:crushWarning`        | `{ depth, ratio }`                                     | `main.ts`, every frame past the warn ratio                 |
+| `sub:crushWarning`        | `{ depth, ratio }` (ratio is depth / crush depth)      | `main.ts`, every frame beyond the rated depth              |
 | `sub:hullStress`          | `{ stress, cause: 'impact' \| 'pressure', depth }`     | `main.ts`, on a change above threshold                     |
 | `sub:emergencyBlow`       | `{ depth, lockSeconds, cause?: 'crush' \| 'power' }`   | `main.ts`, once per blow                                   |
 | `sub:simSpeed`            | `{ multiplier }`                                       | `main.ts` on `T`                                           |
@@ -410,18 +422,18 @@ EventBus; see [`docs/audio.md`](./audio.md).
 
 ## Persistence
 
-| localStorage key             | Owner                    | Shape                                                                                                                                                                                                                   |
-| ---------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `subexplorer.bindings.v2`    | `core/Input.ts`          | `{ version: 2, keys: Record<ActionId, string[]> }`; migrates a saved `subexplorer.bindings.v1` once, then leaves v1 untouched                                                                                           |
-| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }` — unchanged since Phase B, now also read by the Journal                                                                                              |
-| `subexplorer.settings.v2`    | `core/Save.ts`           | `{ version: 2, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette, uiScale, controlTips, gameplayMode, gameplay, bindings? }`; migrates a saved `subexplorer.settings.v1` once |
-| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | `{ version: 1, photos: [{ id, image (JPEG data URL, ≤640 px), siteId, siteName, poiId, poiName, at, depthM }] }`, newest 24 (D-PHOTO)                                                                                   |
-| `subexplorer.lastSite.v1`    | `main.ts`                | `{ missionId: string }`, written when a mission starts; enables the home screen's Continue button (D-SHELL)                                                                                                             |
-| `subexplorer.tips.v1`        | `main.ts`                | `{ ctrlW: true }` once the one-time "Ctrl+W may close this tab" tip has been dismissed (D-INPUT+HUD)                                                                                                                    |
+| localStorage key             | Owner                    | Shape                                                                                                                                                                                                                                     |
+| ---------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `subexplorer.bindings.v3`    | `core/Input.ts`          | `{ version: 3, keys: Record<ActionId, string[]> }`; migrates saved v2 and v1 bindings, preserving custom keys                                                                                                                             |
+| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }` — unchanged since Phase B, now also read by the Journal                                                                                                                |
+| `subexplorer.settings.v2`    | `core/Save.ts`           | `{ version: 2, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette, uiScale, controlTips, hullWarningStyle, gameplayMode, gameplay, bindings? }`; migrates a saved `subexplorer.settings.v1` once |
+| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | `{ version: 1, photos: [{ id, image (JPEG data URL, ≤640 px), siteId, siteName, poiId, poiName, at, depthM }] }`, newest 24 (D-PHOTO)                                                                                                     |
+| `subexplorer.lastSite.v1`    | `main.ts`                | `{ missionId: string }`, written when a mission starts; enables the home screen's Continue button (D-SHELL)                                                                                                                               |
+| `subexplorer.tips.v1`        | `main.ts`                | `{ ctrlW: true }` once the one-time "Ctrl+W may close this tab" tip has been dismissed (D-INPUT+HUD)                                                                                                                                      |
 
 All are versioned, guarded (no storage → in-memory), and never throw. The
-legacy `subexplorer.bindings.v1` and `subexplorer.settings.v1` keys are read
-once for migration and then left alone, never deleted. `Save` also points at
+legacy `subexplorer.bindings.v1` / `.v2` and `subexplorer.settings.v1` keys
+are read for migration and then left alone, never deleted. `Save` also points at
 the bindings and discoveries keys by name (`SAVE_KEYS`) so a future "reset
 everything" screen can find them without importing `Input` or `DiscoveryStore`;
 `subexplorer.photos.v1`, `subexplorer.lastSite.v1` and `subexplorer.tips.v1`
