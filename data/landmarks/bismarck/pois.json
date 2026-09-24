@@ -31,7 +31,7 @@
       "depth_m": 4124,
       "radius_m": 60,
       "kind": "debris",
-      "primary": false,
+      "primary": true,
       "scan_seconds": 4,
       "guide_entry": "turret-debris",
       "confidence": "low",
@@ -61,38 +61,6 @@
         "https://www.kbismarck.com/wreck.html"
       ],
       "note": "Marks the historical question, not a single surveyed feature: whether British shellfire and torpedoes, or the crew's own scuttling charges, caused the final sinking. kbismarck.com's survey notes describe the hull as in surprisingly good condition given the battering it took, with the stern the most heavily damaged section. Illustrative placement near the hull; moved 2026-09 with the hull to the sourced wreck position (see sources.md)."
-    },
-    {
-      "id": "bismarck-skid-trail",
-      "name": "The seamount flank",
-      "lat": 48.15063,
-      "lon": -16.11032,
-      "snap_to_seabed": true,
-      "radius_m": 150,
-      "kind": "geology",
-      "primary": false,
-      "scan_seconds": 3,
-      "guide_entry": "seamount-flank",
-      "confidence": "medium",
-      "reconstruction": false,
-      "sources": ["https://www.gmrt.org/", "https://www.magellan.gg/vrov-pilot-bismarck/"],
-      "note": "Real survey data, repositioned 2026-09 with the wreck: this tile's terrain shoals from 4,218.5 m at the hull to about 4,182 m here, roughly 500 m up-slope (north-east) toward the seamount summit (which reaches ~4,024 m about 3 km further along the same line). Published accounts describe the real debris trail as about 1 km long down a much steeper (~14.5 degree) slope, formed when the turrets hit the seamount first and triggered a landslide that carried the hull further down -- so this point sits between the turret-debris marker (further up-slope) and the hull (down-slope), on the same real slope. This tile's grid, built from GMRT's coarser global (GEBCO-derived) fill rather than a dedicated survey of the wreck site, is far too coarse to resolve the true trail or slope angle -- what you scan here is real but smoothed terrain, not the skid mark itself."
-    },
-    {
-      "id": "bismarck-memorial",
-      "name": "Memorial marker",
-      "lat": 48.15028,
-      "lon": -16.11672,
-      "depth_m": 4212,
-      "radius_m": 40,
-      "kind": "memorial",
-      "primary": false,
-      "scan_seconds": 3,
-      "guide_entry": "memorial",
-      "confidence": "high",
-      "reconstruction": false,
-      "sources": ["https://en.wikipedia.org/wiki/German_battleship_Bismarck"],
-      "note": "A respectful marker near the hull, not a surveyed structure or a prop. Of Bismarck's crew of 2,221, only around 114 were rescued; roughly 2,100 died. This game has no salvage, collection or loot of any kind at any site."
     }
   ]
 }

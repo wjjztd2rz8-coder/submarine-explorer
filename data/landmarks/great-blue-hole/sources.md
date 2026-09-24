@@ -5,13 +5,10 @@ Researched 2026-09-23. Files: `pois.json`, `guide.json`, `props.json` (empty),
 (GMRT; bbox N 17.46544/S 17.16496/E -87.37646/W -87.69177, ~58 x 61 m cells;
 `min_m` -3642.6, `max_m` +97.5 m -- part of the tile is Lighthouse Reef's cays).
 
-**Central honesty constraint, per `plan/PHASE-C-CONTRACTS.md` §5: the GMRT tile does
-not resolve the ~300 m sinkhole.** Verified directly this session (see below): at the
-hole's published coordinates, this tile reads only ~4.2 m deep, nowhere near the
-real ~124 m. No terrain was faked and no "depression" props were added; the mission
-places a single real-coordinate marker (`great-blue-hole-centre`, `kind: geology`,
-`reconstruction: false`) and explains the limitation and the real hole entirely
-through sourced text in `guide.json`, per the task brief.
+**The GMRT tile does not resolve the ~300 m sinkhole.** At the hole's published
+coordinates it reads only ~4.2 m deep, nowhere near the real ~124 m. No terrain
+or physical marker was invented. The D3 scan objectives now use the mapped east
+and west atoll drop-offs, while the Journal describes the hole itself.
 
 ## Sources consulted
 
@@ -32,10 +29,14 @@ through sourced text in `guide.json`, per the task brief.
 | Radial scan east of centre (0-15 km) | 17.3153, various  | -4 to -6 m (0-3 km) -> -92 m (4 km) -> -873 m (5 km) -> -3,600+ m (12+ km) | Real, steep atoll-margin drop-off         |
 | Radial scan west of centre (0-15 km) | 17.3153, various  | -2 to -4 m (0-5 km) -> -42 m (6 km) -> -942 m (9 km) -> -1,300+ m (12 km)  | Real, gentler drop-off on this side       |
 
-This directly confirms the task brief's premise: the tile is flat, shallow reef terrain
-at and immediately around the hole's real coordinates, with no trace of a depression.
-The radial scans (run this session, not from any external source) also located the
-real reef-flat/drop-off features used for the other three POIs.
+The tile is flat, shallow reef terrain at and immediately around the hole's real
+coordinates, with no trace of a depression. The radial scans located the real
+reef-flat and drop-off terrain used by the scan targets.
+
+For D3, a westward profile along 17.3153° N gives 2.1 m depth at 87.58° W,
+29.1 m at 87.59° W and 303.5 m at 87.60° W (GMRT source 5, sampled using
+`tools/validate_landmark.Tile`). The western drop-off target at 87.596° W lies
+on that visible slope. The eastern target is on the opposite atoll margin.
 
 ## Fabricated vs. sourced
 
@@ -43,7 +44,7 @@ real reef-flat/drop-off features used for the other three POIs.
 | -------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | Reef flat and outer drop-off terrain         | GMRT Synthesis (real)                                               | Render-time detail noise (engine)                                                          |
 | Hole's real diameter/depth/formation/history | Wikipedia, Live Science, GPS World                                  | —                                                                                          |
-| Hole's terrain in-game                       | This tile's real (shallow) reading, honestly marked                 | Nothing invented; no depression prop added                                                 |
+| Hole's terrain in-game                       | This tile's real (shallow) reading                                  | Nothing invented; no depression prop added                                                 |
 | Reef-biology species                         | Documented for Lighthouse Reef/the hole's rim generally (Wikipedia) | Placement at this specific POI is illustrative (`reconstruction: true`), not a site record |
 | Spawn point                                  | —                                                                   | Chosen for gameplay: over the outer slope (67.4 m water), heading 270° toward the reef     |
 

@@ -54,44 +54,6 @@
       "note": "Real GMRT terrain: 748 m deep, about 700 m (and 270 m of relief) north of the axis-1000m POI at the same longitude, on the canyon's steep north wall. No specific coordinate is published for a 'wall'; this point was located by sampling terrain perpendicular to the traced axis."
     },
     {
-      "id": "monterey-canyon-axis-1000m",
-      "name": "Canyon axis, ~1,000 m",
-      "lat": 36.7812,
-      "lon": -122.0133,
-      "snap_to_seabed": true,
-      "radius_m": 250,
-      "kind": "geology",
-      "primary": false,
-      "scan_seconds": 4,
-      "guide_entry": "canyon-axis",
-      "confidence": "medium",
-      "reconstruction": false,
-      "sources": [
-        "https://en.wikipedia.org/wiki/Monterey_Canyon",
-        "https://www.mbari.org/know-your-ocean/monterey-canyon/"
-      ],
-      "note": "Real GMRT terrain, 1,016.5 m deep, about 20 km from Moss Landing along the traced canyon thalweg (deepest-path search over the heightmap, this session). No published coordinate for a specific axis point; located by terrain tracing."
-    },
-    {
-      "id": "monterey-canyon-axis-2000m",
-      "name": "Canyon axis, ~2,000 m",
-      "lat": 36.6703,
-      "lon": -122.1076,
-      "snap_to_seabed": true,
-      "radius_m": 250,
-      "kind": "geology",
-      "primary": false,
-      "scan_seconds": 4,
-      "guide_entry": "canyon-axis",
-      "confidence": "medium",
-      "reconstruction": false,
-      "sources": [
-        "https://en.wikipedia.org/wiki/Monterey_Canyon",
-        "https://www.mbari.org/know-your-ocean/monterey-canyon/"
-      ],
-      "note": "Real GMRT terrain, 2,033.5 m deep, about 32 km from Moss Landing along the traced canyon thalweg. This tile only reaches 2,332.8 m at its deepest cell, well short of the published 3,600 m mouth depth, which lies outside the tile's bbox (see sources.md)."
-    },
-    {
       "id": "mbari-mars-node",
       "name": "MARS cabled observatory node",
       "lat": 36.712468,

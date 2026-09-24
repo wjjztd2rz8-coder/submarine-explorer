@@ -11,9 +11,18 @@
         "Lighthouse Reef, along with the Great Blue Hole itself, is part of the Belize Barrier Reef Reserve System, a UNESCO World Heritage Site -- the second-longest barrier reef system in the world after Australia's Great Barrier Reef."
       ],
       "facts": [
-        { "label": "Real hole diameter", "value": "~318 m" },
-        { "label": "Real hole depth", "value": "~124 m" },
-        { "label": "Terrain reading at hole coordinates (this tile)", "value": "~4.2 m" },
+        {
+          "label": "Real hole diameter",
+          "value": "~318 m"
+        },
+        {
+          "label": "Real hole depth",
+          "value": "~124 m"
+        },
+        {
+          "label": "Terrain reading at hole coordinates (this tile)",
+          "value": "~4.2 m"
+        },
         {
           "label": "Protection",
           "value": "Belize Barrier Reef Reserve System, UNESCO World Heritage Site"
@@ -42,17 +51,26 @@
         "None of this is modelled in this game: the shape, ledges, stalactites and chemistry described here come entirely from the sources below, not from any terrain you can scan. The marker at this entry's matching POI sits on this tile's real (shallow) seabed reading, honestly, rather than a fabricated pit."
       ],
       "facts": [
-        { "label": "Diameter / depth", "value": "~318 m / ~124 m" },
+        {
+          "label": "Diameter / depth",
+          "value": "~318 m / ~124 m"
+        },
         {
           "label": "Formed during",
           "value": "ice-age low sea levels (dated to ~153,000-15,000 years ago)"
         },
-        { "label": "Charted by", "value": "Jacques Cousteau, 1971 (RV Calypso)" },
+        {
+          "label": "Charted by",
+          "value": "Jacques Cousteau, 1971 (RV Calypso)"
+        },
         {
           "label": "3D sonar-mapped by",
           "value": "Blue Hole Belize Expedition, Nov-Dec 2018 (Aquatica Submarines, Kongsberg)"
         },
-        { "label": "Anoxic layer", "value": "~90 m depth" }
+        {
+          "label": "Anoxic layer",
+          "value": "~90 m depth"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -79,8 +97,14 @@
         "Shaped by wave action and slow coral growth over thousands of years, this shallow rim stands in sharp contrast to the sinkhole plunging through its centre."
       ],
       "facts": [
-        { "label": "Depth here (this tile)", "value": "~2.5 m" },
-        { "label": "Setting", "value": "atoll reef flat, Lighthouse Reef" }
+        {
+          "label": "Depth here (this tile)",
+          "value": "~2.5 m"
+        },
+        {
+          "label": "Setting",
+          "value": "atoll reef flat, Lighthouse Reef"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -103,8 +127,14 @@
         "Real survey terrain throughout; the depths quoted are direct readings from this tile."
       ],
       "facts": [
-        { "label": "Depth at ~4.3 km east of the hole", "value": "~196 m" },
-        { "label": "Depth further out", "value": "> 3,000 m" }
+        {
+          "label": "Depth at ~4.3 km east of the hole",
+          "value": "~196 m"
+        },
+        {
+          "label": "Depth further out",
+          "value": "> 3,000 m"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -127,8 +157,14 @@
         "These species are documented for Lighthouse Reef and the hole's rim generally, not for this exact point."
       ],
       "facts": [
-        { "label": "Sharks", "value": "Caribbean reef shark, nurse shark" },
-        { "label": "Fish", "value": "groupers, squirrelfish, angelfish" }
+        {
+          "label": "Sharks",
+          "value": "Caribbean reef shark, nurse shark"
+        },
+        {
+          "label": "Fish",
+          "value": "groupers, squirrelfish, angelfish"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -142,6 +178,40 @@
         }
       ],
       "confidence": "medium"
+    },
+    {
+      "id": "western-dropoff",
+      "title": "The western atoll slope",
+      "paragraphs": [
+        "West of the Great Blue Hole, Lighthouse Reef stays almost level for several kilometres before its outer edge drops into deeper water. Along this latitude the mapped seabed is about 2 to 4 m deep over the platform, around 30 m at 87.59° W, 157 m at this scan point, and more than 300 m deep at 87.60° W.",
+        "The eastern edge falls away closer to the hole. Scanning both sides shows the width and uneven profile of the atoll platform surrounding the sinkhole."
+      ],
+      "facts": [
+        {
+          "label": "Western platform at 87.58° W",
+          "value": "about 2 m deep"
+        },
+        {
+          "label": "This scan point at 87.596° W",
+          "value": "about 157 m deep"
+        },
+        {
+          "label": "Western slope at 87.60° W",
+          "value": "about 304 m deep"
+        }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "GMRT Synthesis — Ryan et al. 2009; depths sampled from this tile",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Lighthouse Reef atoll overview",
+          "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef"
+        }
+      ],
+      "confidence": "high"
     }
   ]
 }

@@ -135,7 +135,7 @@ for (const id of missionIds) {
     const doc = (await response.json()) as MissionDoc;
     expect(doc.landmark).toBe(id);
     const primary = doc.objectives.filter((o) => o.primary);
-    expect(primary.length).toBeGreaterThan(0);
+    expect(primary.length).toBeGreaterThanOrEqual(2);
 
     await page.goto(`/?mission=${id}`, {
       waitUntil: 'domcontentloaded',

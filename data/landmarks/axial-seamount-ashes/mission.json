@@ -62,22 +62,6 @@
       "primary": false,
       "title": "Survey the base of the western caldera wall",
       "hint": "The western caldera wall rises west of ASHES; find its base on the slope near 1,420 m."
-    },
-    {
-      "id": "caldera-floor",
-      "type": "scan",
-      "poi": "axial-caldera-floor",
-      "primary": false,
-      "title": "Survey a resurfaced patch of the caldera floor",
-      "hint": "The caldera floor lava terrain lies south of ASHES on a broad rise, around 1,460 m; individual lava flows are not resolved here."
-    },
-    {
-      "id": "caldera-summit",
-      "type": "scan",
-      "poi": "axial-caldera-summit",
-      "primary": false,
-      "title": "Reach the caldera rim's shallowest point on this tile",
-      "hint": "The tile's shallow caldera rim high is northwest of ASHES, near 1,395 m."
     }
   ],
   "completion": "all_primary"

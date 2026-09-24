@@ -63,22 +63,6 @@
       "primary": false,
       "title": "Survey the fallen masts and funnel",
       "hint": "The fallen masts and funnel lie beside the hull, near 3,000 m."
-    },
-    {
-      "id": "worsley",
-      "type": "scan",
-      "poi": "endurance-worsley-position",
-      "primary": false,
-      "title": "Visit Worsley's 1915 recorded position, far to the north-west",
-      "hint": "Worsley's recorded 1915 position lies far northwest of the discovered wreck, over seabed around 2,980 m."
-    },
-    {
-      "id": "abyssal-plain",
-      "type": "scan",
-      "poi": "endurance-abyssal-plain",
-      "primary": false,
-      "title": "Sample the real, unusually flat seabed nearby",
-      "hint": "The real, nearly level Weddell Sea abyssal plain lies west of Endurance, near 2,990 m."
     }
   ],
   "completion": "all_primary"

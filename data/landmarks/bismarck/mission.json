@@ -15,7 +15,7 @@
     "heading_deg": 225
   },
   "briefing": {
-    "summary": "Dive to the German battleship Bismarck, scuttled and sunk on 27 May 1941 after a three-day Royal Navy pursuit, and found by Robert Ballard's expedition on 8 June 1989. Scan the main hull, resting upright on the flank of an extinct seamount, then survey the detached gun turrets and the slope below her.",
+    "summary": "Dive to the battleship Bismarck on the flank of an extinct seamount. Scan the upright main hull and the detached gun turrets higher on the slope, then inspect the hull for battle damage.",
     "depth_m": 4791,
     "facts": [
       "This is a war grave. Roughly 2,100 of the 2,221 men aboard died; only about 114 were rescued. The game has no salvage, collection or loot of any kind.",
@@ -45,8 +45,8 @@
       "id": "turrets",
       "type": "scan",
       "poi": "bismarck-turret-debris",
-      "primary": false,
-      "title": "Survey the detached gun turrets down-slope",
+      "primary": true,
+      "title": "Survey the detached gun turrets up-slope",
       "hint": "The detached gun turrets lie east of the hull on the seamount slope, around 4,120 m."
     },
     {
@@ -56,22 +56,6 @@
       "primary": false,
       "title": "Examine the battle-damage debated by historians",
       "hint": "The battle-damage site is close to Bismarck's main hull, around 4,210 m."
-    },
-    {
-      "id": "skid-trail",
-      "type": "scan",
-      "poi": "bismarck-skid-trail",
-      "primary": false,
-      "title": "Sample the real seamount slope below the wreck",
-      "hint": "Survey the seamount flank east and upslope of the hull, around 4,180 m."
-    },
-    {
-      "id": "memorial",
-      "type": "scan",
-      "poi": "bismarck-memorial",
-      "primary": false,
-      "title": "Pay respects at the memorial marker",
-      "hint": "The memorial marker is beside the hull on the seamount flank, around 4,210 m."
     }
   ],
   "completion": "all_primary"

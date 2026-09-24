@@ -366,7 +366,7 @@ test.describe('D-FLOW Journal', () => {
     await expect(journal.locator('.jr-site-card')).toHaveCount(13);
     await expect(journal.locator('.jr-site-card[data-target="titanic"] .jr-card-count')).toHaveText(
       // The bow, plus the site-level overview that opens with any scan there.
-      '2 of 9 entries logged',
+      '2 of 8 entries logged',
     );
     await expect(journal.locator('.jr-spoilers input')).not.toBeChecked();
     await shot(page, 'journal-home');

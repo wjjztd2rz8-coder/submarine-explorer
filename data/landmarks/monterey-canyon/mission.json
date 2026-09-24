@@ -19,7 +19,7 @@
     "heading_deg": 258
   },
   "briefing": {
-    "summary": "Follow the largest submarine canyon on the US West Coast from its head just offshore of Moss Landing onto the steep shelf break nearby. From there, continue further down-canyon if you can: a canyon wall, the traced axis at about 1,000 m and 2,000 m, and the MARS seafloor observatory node are all optional deeper objectives.",
+    "summary": "Follow Monterey Canyon from its head just offshore of Moss Landing onto the steep shelf break nearby. Continue along the north wall or visit the MARS seafloor observatory node farther down-canyon.",
     "depth_m": 2000,
     "facts": [
       "Monterey Canyon begins right off the beach at Moss Landing -- so close to shore that MBARI, headquartered there, calls it their 'backyard'.",
@@ -59,22 +59,6 @@
       "primary": false,
       "title": "Survey a canyon wall (optional, further down-canyon)",
       "hint": "The north canyon wall is far west and down-canyon from the head, around 750 m at its marker."
-    },
-    {
-      "id": "axis-1000",
-      "type": "scan",
-      "poi": "monterey-canyon-axis-1000m",
-      "primary": false,
-      "title": "Reach the canyon axis at about 1,000 m (optional)",
-      "hint": "The canyon axis lies just south of the north-wall marker, around 1,000 m deep."
-    },
-    {
-      "id": "axis-2000",
-      "type": "scan",
-      "poi": "monterey-canyon-axis-2000m",
-      "primary": false,
-      "title": "Continue down-canyon to about 2,000 m (optional)",
-      "hint": "Continue southwest down the canyon axis to mapped seabed around 2,000 m."
     },
     {
       "id": "mars-node",

@@ -316,40 +316,6 @@
       "confidence": "low"
     },
     {
-      "id": "deck-fittings",
-      "title": "Deck fittings and bollards",
-      "paragraphs": [
-        "Fittings from the ship lie scattered through the debris field. They include engine-room and deck telegraphs, crockery, bottles, and deck hardware such as mooring bollards and fairleads (rope guides) torn from the breaking hull. Many are coated in rusticles and fine sediment.",
-        "Fittings like these help archaeologists work out how the ship broke apart. Each one can be matched to its original place on the deck plans, so where it lies records the order in which the ship came apart."
-      ],
-      "facts": [
-        {
-          "label": "Examples",
-          "value": "telegraphs, crockery, bottles, deck hardware"
-        },
-        {
-          "label": "Depth",
-          "value": "about 3,800 m"
-        },
-        {
-          "label": "Position confidence",
-          "value": "low (illustrative)"
-        }
-      ],
-      "reconstruction": true,
-      "sources": [
-        {
-          "title": "Wreck of the Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
-        },
-        {
-          "title": "The Quest to Map Titanic — WHOI Oceanus Vol. 49 No. 2 (2012)",
-          "url": "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
-        }
-      ],
-      "confidence": "low"
-    },
-    {
       "id": "big-piece",
       "title": "Where the \"Big Piece\" lay",
       "paragraphs": [
