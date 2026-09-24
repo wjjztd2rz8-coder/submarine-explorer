@@ -34,7 +34,7 @@
     "hazards": [
       "Crush depth: this hull fails at 11,000 m. The deepest terrain in this mission (10,931 m rounded; 10,930.9 m sampled) is inside the crush-warning band, which starts at 9,900 m (90% of crush depth) -- treat every metre below that as the real margin it is.",
       "Total darkness below a few hundred metres; only your lights work.",
-      "Long vertical transit even from the shortened 6,000 m spawn: budget several minutes of descent before reaching the objectives.",
+      "With a surface start, expect a long descent from the 6,000 m spawn; the default near-site start skips it.",
       "Extreme, uniform pressure (about 1,086 bar at the bottom) and near-freezing water (1-4 degC)."
     ]
   },

@@ -19,7 +19,7 @@
     "facts": [
       "The wreck was found on 1 September 1985 by a French–American team led by Jean-Louis Michel and Robert Ballard.",
       "The ship broke apart as it sank. The bow faces roughly north, and the stern turned around as it fell, so its rear end points back at the bow.",
-      "You start at the surface about 2 km north-north-west of the bow. Head south-south-east (about 150°) and descend.",
+      "By default you start beside the first objective. With a surface start you begin at the surface about 2 km north-north-west of the bow. Head south-south-east (about 150°) and descend.",
       "The open bathymetry is too coarse to show the wreck itself."
     ],
     "hazards": [

@@ -21,7 +21,7 @@
       "This terrain predates the 15 January 2022 eruption, the most powerful volcanic explosion recorded by modern instruments. The caldera you see here no longer exists in this shape.",
       "Before the eruption, the caldera floor sat about 150 m deep and the two islands, Hunga Tonga and Hunga Ha'apai, were joined by a shallow saddle just above sea level.",
       "After the eruption, NIWA and the Nippon Foundation's Tonga Eruption Seabed Mapping Project (TESMaP) surveyed the site and found the caldera floor had collapsed to about 850 m and widened to roughly 4.8 km across; the islands are now smaller and separated. None of that post-eruption terrain is modelled here -- see the field guide for what the surveys found.",
-      "You start at the surface above the pre-eruption caldera. Head south-west (about 250°) and descend to survey the floor."
+      "By default you start beside the first objective. With a surface start you begin at the surface above the pre-eruption caldera. Head south-west (about 250°) and descend to survey the floor."
     ],
     "hazards": [
       "This is a pre-2022 survey; the real site is now a much deeper, active volcanic caldera and would be far more hazardous today.",

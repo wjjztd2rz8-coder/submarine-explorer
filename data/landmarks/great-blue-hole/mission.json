@@ -20,7 +20,7 @@
     "facts": [
       "The Great Blue Hole is real and famous, but this open bathymetry has no dedicated high-resolution survey of it: at its published coordinates, this tile reads only a few metres deep, not the true 124 m sinkhole. The field guide explains what a proper 2018 sonar survey actually found there.",
       "The reef flat around the hole is shallow, mostly under 10 m, then drops steeply to open ocean a few kilometres out -- both features are real, if coarse, survey terrain.",
-      "You start at the surface over the outer slope, in water well over 60 m deep. Head west (about 270°) toward the reef flat and the hole's marked position.",
+      "By default you start beside the first objective. With a surface start you begin at the surface over the outer slope, in water well over 60 m deep. Head west (about 270°) toward the reef flat and the hole's marked position.",
       "This is part of the Belize Barrier Reef Reserve System, a UNESCO World Heritage Site. Keep a respectful distance from the reef."
     ],
     "hazards": [

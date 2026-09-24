@@ -21,7 +21,7 @@
       "NOAA and partners announced this discovery in January 2024 (Sowers et al., Geomatics): a nearly continuous province of cold-water coral mounds stretching about 500 km along the southeastern US coast, covering roughly 6.4 million acres.",
       "Mapping identified 83,908 individual mound-like peak features across the wider province; the tallest known mounds rise up to about 90 m off the seafloor.",
       "The reef-building coral here is Desmophyllum pertusum (formerly Lophelia pertusa), a stony coral that needs no sunlight and instead filters food from the current.",
-      "You start at the surface directly above a dense mound cluster. Head south-east (about 140°) and descend."
+      "By default you start beside the first objective. With a surface start you begin at the surface directly above a dense mound cluster. Head south-east (about 140°) and descend."
     ],
     "hazards": [
       "Total darkness below the top couple hundred metres; only your lights work.",
