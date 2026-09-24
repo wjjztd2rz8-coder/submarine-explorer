@@ -62,7 +62,7 @@ run_codex() {  # run_codex <round-log> <prompt> [images...]
   done
 }
 
-session=""
+session="${SESSION:-}"   # SESSION=<id> resumes an earlier Codex session (follow-up fixes)
 run_codex "$dir/$name-r1.log" "$(cat "$brief")"
 round=1; status=FAIL
 while :; do
