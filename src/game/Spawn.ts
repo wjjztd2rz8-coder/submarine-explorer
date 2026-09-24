@@ -15,6 +15,10 @@
  */
 
 import type { GameConfig, HullClass } from '../core/Config.js';
+import { headingFromForward, latLonToWorld } from '../util/geo.js';
+import type { TileMeta } from '../util/types.js';
+import type { MissionSpawn } from './Mission.js';
+import type { SeabedSampler, SpawnPose } from './Pois.js';
 
 // ---------------------------------------------------------------- hull class
 
@@ -82,6 +86,69 @@ export interface FreeDiveSpawn {
   ground: number;
   /** True when the centre was too shallow and the search moved the spawn. */
   moved: boolean;
+}
+
+/** A near-site pose selected from safe approaches around the first primary POI. */
+export function nearSiteSpawnPose(
+  target: { x: number; y: number; z: number },
+  meta: TileMeta,
+  seabed: SeabedSampler,
+  settings: SpawnSettings,
+  crushDepth: number,
+  override?: MissionSpawn,
+): SpawnPose | null {
+  const clearance = settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM;
+  const northWest = latLonToWorld(meta, meta.bbox.north, meta.bbox.west);
+  const southEast = latLonToWorld(meta, meta.bbox.south, meta.bbox.east);
+  const inside = (x: number, z: number): boolean =>
+    x >= northWest.x && x <= southEast.x && z >= northWest.z && z <= southEast.z;
+  const poseAt = (x: number, z: number, authoredY?: number): SpawnPose | null => {
+    if (!inside(x, z)) return null;
+    const horizontal = Math.hypot(target.x - x, target.z - z);
+    if (horizontal > 200 || horizontal < 1) return null;
+    let floor = -Infinity;
+    // Check the straight approach, not only the point where the hull spawns.
+    for (let step = 0; step <= 12; step++) {
+      const t = step / 12;
+      floor = Math.max(floor, seabed.sampleHeight(x + (target.x - x) * t, z + (target.z - z) * t));
+    }
+    const y = Math.max(
+      floor + clearance,
+      crushDepth + settings.hullRadius,
+      authoredY ?? target.y + 12,
+    );
+    if (y > -settings.hullRadius) return null;
+    let yaw = (headingFromForward(target.x - x, target.z - z) * Math.PI) / 180;
+    if (yaw > Math.PI) yaw -= 2 * Math.PI;
+    return { x, y, z, yaw };
+  };
+  if (override) {
+    const at = latLonToWorld(meta, override.lat, override.lon);
+    const explicit = poseAt(at.x, at.z, -override.depth_m);
+    if (explicit) {
+      let yaw = ((override.heading_deg % 360) * Math.PI) / 180;
+      if (yaw > Math.PI) yaw -= 2 * Math.PI;
+      return { ...explicit, yaw };
+    }
+  }
+  let best: SpawnPose | null = null;
+  let bestScore = Infinity;
+  for (const distance of [120, 150, 180, 100, 200]) {
+    for (let bearing = 0; bearing < 16; bearing++) {
+      const angle = (bearing * Math.PI) / 8;
+      const pose = poseAt(
+        target.x + Math.sin(angle) * distance,
+        target.z + Math.cos(angle) * distance,
+      );
+      if (!pose) continue;
+      const score = Math.abs(pose.y - target.y) * 2 + distance + (distance === 150 ? -10 : 0);
+      if (score < bestScore) {
+        best = pose;
+        bestScore = score;
+      }
+    }
+  }
+  return best;
 }
 
 /**

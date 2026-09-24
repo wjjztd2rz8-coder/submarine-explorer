@@ -2493,3 +2493,28 @@ body:has(.field-guide:not([hidden])) .pause-menu {
   }
 }
 /* --- D-SHELL end --- */
+/* --- D-START begin --- */
+.briefing-start {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-left: auto;
+}
+.briefing-start .briefing-section-title {
+  margin: 0;
+}
+.briefing-start-option {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  cursor: pointer;
+}
+.briefing-start-option small {
+  opacity: 0.7;
+}
+.briefing-start-option input {
+  accent-color: #57d3dd;
+  align-self: center;
+}
+/* --- D-START end --- */

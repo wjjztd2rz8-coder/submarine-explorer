@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 /**
  * B3 mission flow, end to end, on B2's real Titanic content:
  *  (a) `/?mission=titanic` shows the briefing with the game frozen; Enter
- *      starts the mission at the surface with the objectives panel up.
+ *      starts the mission near the first primary objective with the objectives panel up.
  *  (b) `?poi=titanic-bow&skipBriefing=1`: scan the bow, teleport to the stern
  *      and scan it -> `mission:complete` -> the mission debrief.
  *  (c) the free-dive view keeps mission select off the HUD while deep links still work.
@@ -79,7 +79,7 @@ async function holdScanUntil(page: Page, objectiveId: string): Promise<void> {
 }
 
 test.describe('B3 mission flow', () => {
-  test('briefing freezes the game; Enter starts a surface dive with objectives', async ({
+  test('briefing freezes the game; Enter starts near the site with objectives', async ({
     page,
   }) => {
     const errors = collectErrors(page);
@@ -125,9 +125,14 @@ test.describe('B3 mission flow', () => {
     );
     expect(payload).toEqual({ missionId: 'titanic', tileId: 'titanic' });
 
-    // Surface start: the HUD depth is shallow.
-    const depthText = (await page.locator('.hud-value[data-field="depth"]').textContent()) ?? '';
-    expect(Number.parseFloat(depthText)).toBeLessThan(20);
+    // Arcade starts near the bow, deep enough to see the site immediately.
+    // The HUD refreshes on the next rendered frame after Begin moves the sub.
+    await expect
+      .poll(async () => {
+        const text = (await page.locator('.hud-value[data-field="depth"]').textContent()) ?? '';
+        return Number.parseFloat(text.replaceAll(',', ''));
+      })
+      .toBeGreaterThan(3000);
 
     const panel = page.locator('.objectives-panel');
     await expect(panel).toBeVisible();
@@ -135,14 +140,23 @@ test.describe('B3 mission flow', () => {
     await expect(panel.locator('.obj-item[data-primary="false"]')).toHaveCount(2);
     await expect(panel.locator('.obj-item.is-complete')).toHaveCount(0);
     await expect(panel.locator('.obj-speed')).toHaveText('SIM 1×');
-    // Bearing to the bow from the NNW start is about the briefed 150 deg.
+    // Near-site start (D-START): the bow is close and dead ahead.
     await expect(panel.locator('.obj-nav-target')).toHaveText('→ BOW SECTION');
+    const heading = await page.evaluate(
+      () => ((window.__game as { sub: { yaw: number } }).sub.yaw * 180) / Math.PI,
+    );
     const brg = Number(
       ((await panel.locator('.obj-nav-bearing').textContent()) ?? '').replace(/\D/g, ''),
     );
-    expect(Math.abs(brg - 150)).toBeLessThan(15);
-    // RNG is the 3D slant range (QA-B #11): ~2 km across and 3.8 km down.
-    await expect(panel.locator('.obj-nav-range')).toHaveText(/RNG 4\.\d\d km/);
+    const off = Math.abs(((brg - heading + 540) % 360) - 180);
+    expect(off).toBeLessThan(15);
+    // RNG is the 3D slant range (QA-B #11): the near-site offset is 100-200 m.
+    await expect(panel.locator('.obj-nav-range')).toHaveText(/RNG (\d{2,3}) m/);
+    const rng = Number(
+      ((await panel.locator('.obj-nav-range').textContent()) ?? '').replace(/\D/g, ''),
+    );
+    expect(rng).toBeGreaterThan(50);
+    expect(rng).toBeLessThan(300);
 
     // Now it simulates: flooding the tanks takes the boat down.
     const y0 = (await subPos(page)).y;

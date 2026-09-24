@@ -72,6 +72,11 @@ import { SettingsScreen } from './ui/Settings.js';
 // --- fix S begin ---
 import { applyFreeDiveHull, chooseSpawn, spawnSettings } from './game/Spawn.js';
 // --- fix S end ---
+// --- D-START begin ---
+import { missionStartPose } from './game/MissionRouter.js';
+import type { MissionStartPosition } from './game/MissionRouter.js';
+import { spawnHeight } from './game/Spawn.js';
+// --- D-START end ---
 
 declare global {
   interface Window {
@@ -262,6 +267,18 @@ async function main(): Promise<void> {
     const pose = applyMissionLoadout(sub, route.def, config, meta, terrain);
     sub.reset(pose.x, pose.y, pose.z, pose.yaw);
   }
+  // --- D-START begin ---
+  // Keep URL probes deterministic even when a mission uses a near-site default.
+  if (route && spawnDepth !== null && !params.has('at') && !params.has('poi')) {
+    const p = sub.position;
+    sub.reset(
+      p.x,
+      spawnHeight(terrain.sampleHeight(p.x, p.z), spawnDepth, spawnSettings(config)),
+      p.z,
+      sub.yaw,
+    );
+  }
+  // --- D-START end ---
   // Content folder for POIs, guide and props: the mission's, else `?landmark=` / the tile.
   const contentLandmark = route?.landmarkId ?? landmarkIdFor(params, meta.id);
   // --- B3 end ---
@@ -666,6 +683,16 @@ async function main(): Promise<void> {
         config,
         meta,
         discovery,
+        // --- D-START begin ---
+        defaultStartPosition: settings.gameplay.startPosition,
+        applyStart: (choice: MissionStartPosition) => {
+          if (params.has('poi') || params.has('at') || params.has('depth')) return;
+          const pose = missionStartPose(route.def, choice, discovery.pois, meta, terrain, config);
+          sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+          rig.snap(sub.position, sub.yaw, sub.pitch);
+          headlights.setEnabled(true);
+        },
+        // --- D-START end ---
         simSpeed: sub.simSpeed,
         keyLabel: (action) =>
           input.primaryKeyLabel(action as Parameters<Input['primaryKeyLabel']>[0]),

@@ -281,6 +281,26 @@ class ValidateLandmarkTests(unittest.TestCase):
         rep = self.mutate("mission.json", lambda d: d["spawn"].update(depth_m=5000))
         self.assertError(rep, "at or below the seabed")
 
+    def test_optional_near_site_start_checks(self):
+        base = good_content()
+        poi = base["pois.json"]["pois"][0]
+        valid = {"lat": poi["lat"], "lon": poi["lon"] + 0.001,
+                 "depth_m": 1200, "heading_deg": 270}
+        base["mission.json"]["start"] = {"near_site": valid}
+        self.write({"mission.json": base["mission.json"]})
+        self.assertEqual(self.validate().errors, [])
+        for change, message in [
+            ({"lat": 100}, "out of range"),
+            ({"depth_m": -1}, "out of range"),
+            ({"depth_m": 5000}, "hull depth rating"),
+            ({"lon": poi["lon"] + 0.1}, "more than 200 m"),
+            ({"heading_deg": 90}, "must face the first primary POI"),
+        ]:
+            with self.subTest(change=change):
+                base["mission.json"]["start"] = {"near_site": {**valid, **change}}
+                self.write({"mission.json": base["mission.json"]})
+                self.assertError(self.validate(), message)
+
     def test_objectives(self):
         rep = self.mutate("mission.json", lambda d: d["objectives"][0].update(poi="ghost"))
         self.assertError(rep, 'poi "ghost" does not exist')
