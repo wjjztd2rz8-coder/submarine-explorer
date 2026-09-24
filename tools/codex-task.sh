@@ -36,6 +36,8 @@ fi
 log="$dir/$name.log"; result="$dir/$name-result.md"; last="$dir/$name-last.md"
 : > "$log"
 common=(-m gpt-6-sol -c model_reasoning_effort=high -c 'sandbox_mode="workspace-write"')
+# NET=1 lets the task reach the network (e.g. to fetch open datasets).
+[[ "${NET:-0}" == 1 ]] && common+=(-c sandbox_workspace_write.network_access=true)
 
 wait_for_limit() {  # returns 0 if we slept for a usage-limit reset
   local t
