@@ -13,6 +13,8 @@ import type { DepthBandName, EnvPresetName } from './Config.js';
 import type { Landmark, TileMeta } from '../util/types.js';
 
 export interface GameEvents {
+  'app:state': { state: 'home' | 'dive' | 'pause' };
+  'app:siteSelected': { missionId: string | null; tileId: string };
   'tile:loaded': { meta: TileMeta };
   'tile:error': { id: string; error: string };
   'terrain:built': { chunks: number; vertices: number };

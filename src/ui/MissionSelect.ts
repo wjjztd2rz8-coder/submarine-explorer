@@ -19,6 +19,7 @@
  */
 
 import type { MissionSummary } from '../game/Mission.js';
+import { contentUrl, fetchContentJson } from '../game/ContentPath.js';
 import type { TileIndexEntry } from '../util/types.js';
 
 /** C1: a landmark listed in index.json whose mission.json has not loaded yet. */
@@ -37,6 +38,10 @@ export interface MissionSelectOptions {
   collapsed?: boolean;
   onSelect?: (id: string) => void;
   onSelectMission?: (id: string) => void;
+  presentation?: 'legacy' | 'shell';
+  /** Journal progress for this site, for example "3/5 logged". */
+  completion?: (id: string, objectivePois: string[]) => string;
+  onSiteFocus?: (id: string) => void;
 }
 
 /** URL for a mission: only `?mission=` (plus `?tier=`, a machine setting). */
@@ -78,6 +83,7 @@ export class MissionSelect {
     this.tileIds = new Set(tiles.map((t) => t.id));
     this.root = document.createElement('div');
     this.root.className = 'mission-select';
+    if (options.presentation === 'shell') this.root.classList.add('is-shell');
 
     this.toggleEl = document.createElement('button');
     this.toggleEl.type = 'button';
@@ -135,6 +141,10 @@ export class MissionSelect {
         }
         window.location.href = tileUrl(window.location.href, tile.id);
       });
+      if (options.presentation === 'shell') {
+        btn.addEventListener('focus', () => options.onSiteFocus?.(tile.id));
+        btn.addEventListener('pointerenter', () => options.onSiteFocus?.(tile.id));
+      }
       this.body.appendChild(btn);
     }
 
@@ -147,12 +157,27 @@ export class MissionSelect {
   }
 
   setCollapsed(collapsed: boolean): void {
+    if (this.options.presentation === 'shell') collapsed = false;
     this.root.classList.toggle('is-collapsed', collapsed);
     this.body.hidden = collapsed;
     this.toggleEl.textContent = collapsed ? 'DIVE SITES ▸' : 'HIDE ◂';
     this.toggleEl.setAttribute('aria-expanded', String(!collapsed));
     // Outside a mission there is nothing to collapse for; keep the old look.
     this.toggleEl.hidden = !collapsed && !this.options.currentMissionId;
+    if (this.options.presentation === 'shell') this.toggleEl.hidden = true;
+  }
+
+  showFreeDive(show: boolean): void {
+    this.root.classList.toggle('is-free-dive', show);
+  }
+
+  highlightSite(id: string): void {
+    for (const item of this.root.querySelectorAll<HTMLElement>('[data-mission], [data-pending]')) {
+      item.classList.toggle(
+        'is-highlighted',
+        item.dataset.mission === id || item.dataset.pending === id,
+      );
+    }
   }
 
   /** C1: show the GLOBE button; clicking it calls `open`. */
@@ -204,12 +229,15 @@ export class MissionSelect {
       const name = document.createElement('span');
       name.className = 'mission-item-name';
       name.textContent = m.title;
-      const badge = document.createElement('span');
-      badge.className = `mission-badge${available ? ' is-available' : ''}`;
-      badge.textContent = available ? 'TILE AVAILABLE' : 'TILE MISSING';
       const row = document.createElement('span');
       row.className = 'mission-item-row';
-      row.append(name, badge);
+      row.append(name);
+      if (!available) {
+        const badge = document.createElement('span');
+        badge.className = 'mission-badge';
+        badge.textContent = 'TILE MISSING';
+        row.append(badge);
+      }
 
       const meta = document.createElement('span');
       meta.className = 'mission-item-meta';
@@ -223,6 +251,37 @@ export class MissionSelect {
       summary.className = 'mission-item-summary';
       summary.textContent = m.summary;
       btn.append(row, meta, summary);
+      if (this.options.presentation === 'shell') {
+        const progress = document.createElement('span');
+        progress.className = 'mission-item-progress';
+        progress.textContent = 'Journal · 0 logged';
+        btn.append(progress);
+        void fetchContentJson(contentUrl(m.id, 'mission.json')).then((raw) => {
+          if (!btn.isConnected || typeof raw !== 'object' || raw === null) return;
+          const doc = raw as { hull_class?: unknown; objectives?: unknown };
+          const hull =
+            typeof doc.hull_class === 'string'
+              ? `Class ${doc.hull_class} hull`
+              : 'Hull class unknown';
+          meta.textContent = [
+            m.depthM !== null ? `${Math.round(m.depthM).toLocaleString('en-US')} m` : '',
+            hull,
+          ]
+            .filter(Boolean)
+            .join(' · ');
+          const pois = Array.isArray(doc.objectives)
+            ? doc.objectives.flatMap((o: unknown) => {
+                const poi = (o as { poi?: unknown } | null)?.poi;
+                return typeof poi === 'string' ? [poi] : [];
+              })
+            : [];
+          progress.textContent = this.options.completion?.(m.id, pois) ?? `0/${pois.length} logged`;
+        });
+        btn.addEventListener('focus', () => this.highlightSite(m.id));
+        btn.addEventListener('pointerenter', () => this.highlightSite(m.id));
+        btn.addEventListener('focus', () => this.options.onSiteFocus?.(m.id));
+        btn.addEventListener('pointerenter', () => this.options.onSiteFocus?.(m.id));
+      }
       btn.title = m.summary;
 
       btn.addEventListener('click', () => {
@@ -254,6 +313,10 @@ export class MissionSelect {
       meta.textContent = p.tileAvailable ? 'free dive on the survey tile' : 'no tile yet';
       btn.append(row, meta);
       if (p.tileAvailable) {
+        if (this.options.presentation === 'shell') {
+          btn.addEventListener('focus', () => this.options.onSiteFocus?.(p.id));
+          btn.addEventListener('pointerenter', () => this.options.onSiteFocus?.(p.id));
+        }
         btn.addEventListener('click', () => {
           if (this.options.onSelect) this.options.onSelect(p.id);
           else window.location.href = tileUrl(window.location.href, p.id);

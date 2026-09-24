@@ -17,7 +17,7 @@ test('readable contextual HUD, controls and UI scale survive reload', async ({ p
   await mkdir(shots, { recursive: true });
   await ready(page);
   await expect(page.locator('.hud-help')).toHaveCount(0);
-  await expect(page.locator('.mission-select')).toBeHidden();
+  await expect(page.locator('body > .mission-select')).toBeHidden();
   await expect(page.locator('.hud-prompt')).toContainText('F Scan');
   await page.screenshot({ path: `${shots}/hud-1280.png` });
   await page.screenshot({ path: `${shots}/dive.png` });
@@ -28,7 +28,8 @@ test('readable contextual HUD, controls and UI scale survive reload', async ({ p
   expect(fontSize).toBeGreaterThanOrEqual(14);
   await page.screenshot({ path: `${shots}/hud-1920.png` });
 
-  await page.keyboard.press('KeyO');
+  await page.keyboard.press('Escape');
+  await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
   const settings = page.locator('.settings');
   await expect(settings.getByLabel('Legacy default sim speed')).toHaveCount(0);
   await settings.getByRole('button', { name: 'Controls' }).click();

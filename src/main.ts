@@ -59,6 +59,9 @@ import {
 // --- C1 begin ---
 import { loadSpecies } from './game/Species.js';
 import { Globe } from './ui/Globe.js';
+import { Home } from './ui/Home.js';
+import { PauseMenu } from './ui/PauseMenu.js';
+import { missionUrl, tileUrl } from './ui/MissionSelect.js';
 // --- C1 end ---
 // --- C5 begin ---
 import { SAVE_KEYS, Save } from './core/Save.js';
@@ -99,6 +102,42 @@ function showFatal(message: string): void {
 
 async function main(): Promise<void> {
   const params = new URLSearchParams(window.location.search);
+  // --- D-SHELL begin ---
+  const bypassHome = [
+    'mission',
+    'tile',
+    'skipBriefing',
+    'poi',
+    'at',
+    'depth',
+    'debrief',
+    'globe',
+    'landmark',
+    'preset',
+    'debugTerrain',
+    'debugProps',
+  ].some((key) => params.has(key));
+  let appState: 'home' | 'dive' | 'pause' = bypassHome ? 'dive' : 'home';
+  document.body.dataset.appState = appState;
+  const lastSiteKey = 'subexplorer.lastSite.v1';
+  const readLastSite = (): string | null => {
+    try {
+      const value = JSON.parse(localStorage.getItem(lastSiteKey) ?? 'null') as unknown;
+      if (typeof value !== 'object' || value === null) return null;
+      const id = (value as { missionId?: unknown }).missionId;
+      return typeof id === 'string' && /^[a-z0-9-]+$/.test(id) ? id : null;
+    } catch {
+      return null;
+    }
+  };
+  let lastSite = readLastSite();
+  const shellBaseHref = (): string => {
+    const base = new URL('.', window.location.href);
+    const tier = params.get('tier');
+    if (tier) base.searchParams.set('tier', tier);
+    return base.toString();
+  };
+  // --- D-SHELL end ---
   const loader = new TileLoader();
   // --- B3 begin ---
   // `?mission=<id>` (docs/missions.md) names the tile and the content folder;
@@ -337,20 +376,152 @@ async function main(): Promise<void> {
     currentMissionId: route?.missionId,
     collapsed: route !== null,
   });
-  void loadMissionSummaries().then((list) => missionSelect.setMissions(list));
+  // --- D-SHELL begin ---
+  const home = new Home({
+    continueDive: () => {
+      if (lastSite) {
+        const m = missionSummaries.find((entry) => entry.id === lastSite);
+        bus.emit('app:siteSelected', { missionId: lastSite, tileId: m?.tile ?? lastSite });
+        window.location.href = missionUrl(shellBaseHref(), lastSite);
+      }
+    },
+    journal: () => discovery.guide.open(),
+    settings: () => settingsScreen.open(),
+    controls: () => {
+      settingsScreen.open();
+      settingsScreen.showControls(true);
+    },
+  });
+  home.setContinue(lastSite);
+  const completion = (id: string, pois: string[]): string =>
+    `${pois.filter((poi) => discovery.store.isDiscovered(id, poi)).length}/${pois.length} logged`;
+  const summaries = loadMissionSummaries();
+  const selectMission = (id: string): void => {
+    const m = missionSummaries.find((entry) => entry.id === id);
+    bus.emit('app:siteSelected', { missionId: id, tileId: m?.tile ?? id });
+    window.location.href = missionUrl(shellBaseHref(), id);
+  };
+  const selectTile = (id: string): void => {
+    bus.emit('app:siteSelected', { missionId: null, tileId: id });
+    window.location.href = tileUrl(shellBaseHref(), id);
+  };
+  let missionSummaries: Awaited<typeof summaries> = [];
+  const homeSites = new MissionSelect(index, {
+    parent: home.sitesSlot,
+    presentation: 'shell',
+    onSelect: selectTile,
+    onSelectMission: selectMission,
+    completion,
+    onSiteFocus: (id) => homeGlobe.previewSite(id),
+  });
+  const pause = new PauseMenu({
+    resume: () => setAppState('dive'),
+    journal: () => discovery.guide.open(),
+    settings: () => settingsScreen.open(),
+    controls: () => {
+      settingsScreen.open();
+      settingsScreen.showControls(true);
+    },
+    quit: () => {
+      history.pushState({}, '', new URL('.', window.location.href));
+      setAppState('home');
+    },
+    objectives: () =>
+      missionRouter?.mission.objectives.map((objective) => ({
+        title: objective.title,
+        hint: objectiveHints.get(objective.id) ?? 'Explore the site to locate this objective.',
+        complete: objective.complete,
+        primary: objective.primary,
+      })) ?? [],
+  });
+  const pauseSites = new MissionSelect(index, {
+    parent: pause.sitesSlot,
+    presentation: 'shell',
+    onSelect: selectTile,
+    onSelectMission: selectMission,
+    completion,
+  });
+  const objectiveHints = new Map<string, string>();
+  if (route)
+    void fetchContentJson(contentUrl(route.missionId, 'mission.json')).then((raw) => {
+      if (typeof raw !== 'object' || raw === null) return;
+      const objectives = (raw as { objectives?: unknown }).objectives;
+      if (!Array.isArray(objectives)) return;
+      for (const entry of objectives) {
+        if (typeof entry?.id === 'string' && typeof entry?.hint === 'string')
+          objectiveHints.set(entry.id, entry.hint);
+      }
+    });
+  void summaries.then((list) => {
+    missionSummaries = list;
+    missionSelect.setMissions(list);
+    homeSites.setMissions(list);
+    pauseSites.setMissions(list);
+    if (!list.some((m) => m.id === lastSite)) home.setContinue(null);
+  });
+  bus.on('mission:started', ({ missionId }) => {
+    lastSite = missionId;
+    home.setContinue(missionId);
+    try {
+      localStorage.setItem(lastSiteKey, JSON.stringify({ missionId }));
+    } catch {
+      /* optional */
+    }
+  });
+  const setAppState = (state: 'home' | 'dive' | 'pause'): void => {
+    appState = state;
+    document.body.dataset.appState = state;
+    if (state === 'home') {
+      pause.close();
+      home.show();
+      homeGlobe.open('api');
+    } else {
+      home.hide();
+      homeGlobe.close();
+      if (state === 'pause') {
+        document.exitPointerLock?.();
+        pause.open();
+      } else pause.close();
+    }
+    bus.emit('app:state', { state });
+  };
+  // --- D-SHELL end ---
   // --- D-INPUT-HUD begin ---
   missionSelect.root.hidden = true;
   // --- D-INPUT-HUD end ---
   // --- C1 begin ---
-  // Globe mission select (docs/globe.md): `?globe=1`, the GLOBE button, key N.
+  // Globe mission select (docs/globe.md): `?globe=1` and shell site pins.
   // While open it freezes the game like the briefing. SPECIES tab in the guide.
   const globe = new Globe({
     config: config.globe,
     bus,
     tileIds: index.map((t) => t.id),
     currentId: contentLandmark,
-    isToggleKey: (code) => input.getAction('toggleGlobe')?.keys.includes(code) ?? false,
+    onSiteSelected: (site) =>
+      bus.emit('app:siteSelected', {
+        missionId: site.state === 'mission' ? site.id : null,
+        tileId: missionSummaries.find((m) => m.id === site.id)?.tile ?? site.id,
+      }),
   });
+  // --- D-SHELL begin ---
+  const homeGlobe = new Globe({
+    config: config.globe,
+    bus,
+    tileIds: index.map((t) => t.id),
+    currentId: contentLandmark,
+    parent: home.globeSlot,
+    embedded: true,
+    onSiteFocus: (id) => homeSites.highlightSite(id),
+    onSiteSelected: (site) =>
+      bus.emit('app:siteSelected', {
+        missionId: site.state === 'mission' ? site.id : null,
+        tileId: missionSummaries.find((m) => m.id === site.id)?.tile ?? site.id,
+      }),
+  });
+  void homeGlobe.catalog.then((c) => homeSites.setPending(c.pending));
+  void globe.catalog.then((c) => pauseSites.setPending(c.pending));
+  if (appState === 'home') setAppState('home');
+  // --- D-SHELL end ---
   missionSelect.setGlobeHandler(() => globe.open('button'));
   void globe.catalog.then((c) => missionSelect.setPending(c.pending));
   void loadSpecies(contentLandmark).then((doc) => discovery.guide.setSpecies(doc));
@@ -520,6 +691,43 @@ async function main(): Promise<void> {
   // `terrain` already satisfies the audio module's minimal TerrainSampler
   // interface (sampleHeight), so no adapter is needed.
   const audio = new AudioSystem(config.audio, bus, terrain);
+  // --- D-SHELL begin ---
+  audio.setPaused(appState !== 'dive');
+  bus.on('app:state', ({ state }) => audio.setPaused(state !== 'dive'));
+  const onShellKey = (e: KeyboardEvent): void => {
+    if (appState !== 'dive' && (e.code === 'ControlLeft' || e.code === 'ControlRight')) {
+      e.stopPropagation();
+      return;
+    }
+    if (
+      e.code !== 'Escape' ||
+      e.repeat ||
+      settingsScreen.isOpen ||
+      globe.isOpen ||
+      discovery.guide.isOpen ||
+      discovery.debrief.isOpen ||
+      missionRouter?.briefing?.isOpen ||
+      missionRouter?.debriefOpen
+    )
+      return;
+    if (document.pointerLockElement) {
+      document.exitPointerLock?.();
+    }
+    if (appState === 'home') {
+      if (home.sitesOpen) {
+        e.preventDefault();
+        home.closeSites();
+      }
+      return;
+    }
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (appState === 'pause') pause.escape();
+    else setAppState('pause');
+  };
+  window.addEventListener('keydown', onShellKey, true);
+  if (appState === 'dive') bus.emit('app:state', { state: 'dive' });
+  // --- D-SHELL end ---
   // --- C5 begin ---
   const captions = new Captions(audio.captions, {
     enabled: settings.captions,
@@ -593,7 +801,14 @@ async function main(): Promise<void> {
     // --- B3 begin ---
     // While the mission briefing is up nothing simulates and input is ignored
     // (sampling still runs, so edge presses do not queue up behind the card).
-    const frozen = (missionRouter?.frozen ?? false) || globe.isOpen || settingsScreen.isOpen; // C1/C5: globe and settings freeze too
+    // --- D-SHELL begin ---
+    const frozen =
+      appState !== 'dive' ||
+      (missionRouter?.frozen ?? false) ||
+      globe.isOpen ||
+      settingsScreen.isOpen ||
+      discovery.guide.isOpen;
+    // --- D-SHELL end ---
     // --- D-INPUT-HUD begin ---
     if (wasFrozen && !frozen) void lockKeyboard();
     wasFrozen = frozen;
@@ -603,7 +818,7 @@ async function main(): Promise<void> {
     // --- B3 end ---
     for (let i = 0; i < steps; i++) sub.step(state, time.fixedDelta);
     // --- B4 begin ---
-    propContact.resolve(sub, time.frameDelta); // prop push-out, after physics (contracts §3)
+    if (!frozen) propContact.resolve(sub, time.frameDelta); // prop push-out, after physics
     // --- B4 end ---
 
     if (state.toggleCamera) {
@@ -720,19 +935,22 @@ async function main(): Promise<void> {
       console.info(`[props] ${props.debugString()}`);
     }
     // --- B4 end ---
-    audio.update({
-      depth: s.depth,
-      throttle: state.throttle,
-      ballast: state.ballast,
-      speed: s.speed,
-      position: sub.position,
-      forward,
-      pingPressed: state.ping,
-    });
+    if (!frozen)
+      audio.update({
+        depth: s.depth,
+        throttle: state.throttle,
+        ballast: state.ballast,
+        speed: s.speed,
+        position: sub.position,
+        forward,
+        pingPressed: state.ping,
+      });
 
     // --- C1 begin ---
-    if (sampled.toggleGlobe) globe.toggle('key');
     globe.update(time.frameDelta);
+    // --- D-SHELL begin ---
+    homeGlobe.update(time.frameDelta);
+    // --- D-SHELL end ---
     // --- C1 end ---
 
     // Chunk LOD selection + draw-call accounting; must run before render.
@@ -809,6 +1027,14 @@ async function main(): Promise<void> {
     // --- B3 end ---
     // --- C1 begin ---
     globe,
+    // --- D-SHELL begin ---
+    home,
+    homeGlobe,
+    pause,
+    get appState() {
+      return appState;
+    },
+    // --- D-SHELL end ---
     // --- C1 end ---
     // --- C5 begin ---
     save,
