@@ -38,3 +38,19 @@ This is the current handoff. The [previous Phase D status](archive/STATUS-before
 Run owner playtest #4 and record findings. **No push, GitHub repository creation or Pages activation without the owner's explicit confirmation after playtest #4.** The site remains unpublished; local CI/deployment preparation is not publication.
 
 Known carried limits: target-device 1080p/60 fps remains unmeasured, gamepad bindings are fixed, and the existing large-JS-chunk and duplicate Draco build warnings are nonblocking. Source and bathymetry limits are documented in the site guides and tile inventory.
+
+## Phase D3 — playtest #4 fixes (2026-09-24)
+
+- **D3-FEEL:**
+  - Free look orbits centred on the sub, blending in over 0.2 s.
+  - Pointer look is a lasting preference: menus release the lock and closing them restores it. After Esc, a "Click to resume mouse look" hint appears.
+  - Sonar range changes ease over 250 ms, one step per wheel flick.
+- **D3-POIS:** bare-coordinate scan targets were replaced with documented features or removed. The per-site table is in `progress/D3-POIS-audit.md`. Hudson Canyon, Hunga Tonga and the Great Blue Hole now have 2 objectives each.
+
+Playtest #5 quick checks:
+
+- [ ] Drag the camera: the sub stays centred. X resets.
+- [ ] With pointer look on: open and close menus with the mouse, and the lock returns. After Esc, the resume hint appears.
+- [ ] Sonar zoom (buttons, wheel, expanded map) animates smoothly.
+- [ ] Every objective at a site or two leads to something visible and informative.
+- [ ] Currents: Blake Plateau in Realistic mode (about 0.3 m/s under the Gulf Stream).
