@@ -99,22 +99,14 @@ long for a mission. Per the task brief, `mission.json` sets `spawn.depth_m` to 6
 and the briefing says so explicitly. The remaining descent to the Eastern Pool floor (~4,931 m) takes about
 918 s sim time: ~15.3 min real time at 1x, ~7.6 min at 2x, ~5.1 min at 3x sim speed.
 
-## Hull class and the crush-warning band (reviewed condition)
+## Hull rating
 
-`mission.json` uses `hull_class: "C"` (crush depth -11,000 m per `src/core/Config.ts`), the only class that
-clears any Challenger Deep terrain at all. The deepest POI, `cd-eastern-pool-deepest` at 10,930.9 m, is real
-terrain and sits well inside `validate_landmark.py`'s crush-warning band (>90% of crush depth, i.e. deeper than
-9,900 m). `mission.json.pressure_band_review` records the measured POI, hull class, the 9,900 m warning threshold,
-the 11,000 m crush depth, and the review reason. The validator checks each against the live content and hull config;
-when all match, this condition prints a **reviewed note** and strict validation succeeds:
-
-```
-reviewed: [challenger-deep] mission.json: deepest POI "cd-eastern-pool-deepest" (10931 m) is inside the crush-warning
-band of hull C (11000 m)
-```
-
-This is called out in this mission's own `briefing.hazards`. The recorded review is specific to these depths; a
-changed POI or hull config restores the strict warning. It does not suppress any other validator warning.
+`mission.json` uses `hull_class: "C"`, rated to 11,000 m, the only class rated
+for Challenger Deep. The deepest POI, `cd-eastern-pool-deepest` at 10,930.9 m,
+is real terrain and stays within that rating. The game crush threshold is
+12,100 m; the 10% separation is a gameplay safety margin. Triton publishes an
+11,000 m dive depth for Limiting Factor (https://tritonsubs.com/subs/t36000-2/).
+The content validator reads the separate rating and crush depths from Config.
 
 ## OBIS species data
 
@@ -152,12 +144,10 @@ the mission is invented; there are no species POIs or props at all.
 
 ```
 $ python3 tools/validate_landmark.py challenger-deep --strict
-reviewed: [challenger-deep] mission.json: deepest POI "cd-eastern-pool-deepest" (10931 m) is inside the crush-warning
-band of hull C (11000 m)
 OK: challenger-deep, 0 error(s), 0 warning(s)
 ```
 
-0 errors and 0 unreviewed warnings. The visible reviewed note preserves the intentional tight hull margin.
+0 errors and 0 warnings.
 
 ## Not verified / open
 
@@ -165,7 +155,6 @@ OK: challenger-deep, 0 error(s), 0 warning(s)
   located by tracing this tile's real GMRT terrain, not by citation.
 - Leggo's physical dimensions are not published anywhere found during this research pass; the debris marker's
   size (`props.json`) is an arbitrary small estimate.
-- The reviewed crush-warning-band condition remains visible in validation output (see above).
 - Three facts present in the first draft (170-Myr crust age, FSM-EEZ-specific jurisdiction, and the
   "JAMSTEC first mapped the three pools" historical claim) were removed in this revision because no source
   fetched this session confirmed them outside Wikipedia; see "Facts dropped for lack of a confirmed source"

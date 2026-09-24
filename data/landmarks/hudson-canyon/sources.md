@@ -85,8 +85,8 @@ is needed (unlike Challenger Deep).
 
 ## Hull class
 
-`hull_class: "B"` (crush depth -4,500 m) per the task brief -- ample margin below this tile's
-deepest terrain (1,682.6 m); no crush-warning band is approached anywhere in this mission.
+`hull_class: "B"` (rated depth -6,500 m) leaves ample margin below this tile's
+deepest terrain (1,682.6 m); no hull warning is approached anywhere in this mission.
 
 ## Not found / not used
 

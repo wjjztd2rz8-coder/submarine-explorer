@@ -1,7 +1,7 @@
 /**
  * Free-dive loadout and spawn (fix S, QA-B #2 / #3). Pure TS, no DOM.
  *
- *  - {@link chooseFreeDiveHull}: the lowest hull class whose crush depth
+ *  - {@link chooseFreeDiveHull}: the lowest hull class whose rated depth
  *    clears the tile's deepest cell by a margin, so deep tiles (Bismarck,
  *    Beebe, Challenger Deep) no longer breach at spawn. Missions keep
  *    `mission.hull_class`.
@@ -30,7 +30,7 @@ export interface HullChoice {
 }
 
 /**
- * Lowest-rated class with `crushDepth <= minM - marginM` (depths negative).
+ * Lowest-rated class with `ratedDepth <= minM - marginM` (depths negative).
  * If none clears, the deepest-rated class (soft margin). Null for an empty table.
  */
 export function chooseFreeDiveHull(
@@ -39,11 +39,11 @@ export function chooseFreeDiveHull(
   marginM: number,
 ): HullChoice | null {
   // Shallowest rating first; ties keep table order.
-  const ranked = Object.entries(hullClasses).sort((a, b) => b[1].crushDepth - a[1].crushDepth);
+  const ranked = Object.entries(hullClasses).sort((a, b) => b[1].ratedDepth - a[1].ratedDepth);
   if (!ranked.length) return null;
   const need = Math.min(0, minM) - Math.max(0, marginM);
   for (const [classId, hull] of ranked) {
-    if (hull.crushDepth <= need) return { classId, hull, cleared: true };
+    if (hull.ratedDepth <= need) return { classId, hull, cleared: true };
   }
   const [classId, hull] = ranked[ranked.length - 1] as [string, HullClass];
   return { classId, hull, cleared: false };

@@ -36,7 +36,7 @@ import { Water } from './world/Water.js';
 import { Currents } from './world/Currents.js';
 // --- D-CURRENTS end ---
 // --- D-POWER begin ---
-import { Power } from './game/Power.js';
+import { Power, startingReserves } from './game/Power.js';
 // --- D-POWER end ---
 // --- C3 begin ---
 import { PresetSystem } from './world/presets/Presets.js';
@@ -270,6 +270,24 @@ async function main(): Promise<void> {
   bus.on('mission:started', () => {
     power.reset();
     powerEmergencyStarted = false;
+    // --- D2-HAZARD begin ---
+    void discovery.ready.then(() =>
+      queueMicrotask(() => {
+        if (!save.get().gameplay.batteryOxygen || !route) return;
+        const depth = Math.max(0, -sub.position.y);
+        if (depth < 25) return;
+        const reserve = startingReserves(
+          depth,
+          config.descentProfiles[save.get().gameplay.descentProfile],
+          config.power,
+        );
+        power.setLevels(reserve.battery, reserve.oxygen);
+        hud.notice(
+          `Descent to ${Math.round(depth).toLocaleString('en-US')} m used ${Math.round((1 - reserve.battery) * 100)}% battery`,
+        );
+      }),
+    );
+    // --- D2-HAZARD end ---
   });
   // --- D-POWER end ---
   // --- fix S begin ---
@@ -344,6 +362,12 @@ async function main(): Promise<void> {
     config.currents.hudMinMps,
   );
   if (freeDiveHull && !freeDiveHull.cleared) hud.setHullNote('at rating limit');
+  // --- D2-HAZARD begin ---
+  hud.setHullWarningStyle(settings.hullWarningStyle);
+  save.onChange((next, changed) => {
+    if (changed.includes('hullWarningStyle')) hud.setHullWarningStyle(next.hullWarningStyle);
+  });
+  // --- D2-HAZARD end ---
   // --- D-CURRENTS begin ---
   hud.setCurrentMode(settings.gameplay.currents);
   bus.on('env:current', (current) => hud.setCurrent(current));
@@ -1372,7 +1396,9 @@ async function main(): Promise<void> {
     // --- C3 end ---
     const fogNow = { color: atmo.fogColor, density: atmo.fogDensity };
     headlights.update(sub.position, forward, fogNow);
-    snow.update(rig.camera, atmo, time.frameDelta, renderer.domElement.height);
+    // --- D2-HAZARD begin ---
+    snow.update(rig.camera, atmo, time.frameDelta, renderer.domElement.height, presets.current);
+    // --- D2-HAZARD end ---
     water.update(rig.camera.position.y, sub.position, time.elapsed, fogNow);
 
     // fix S (QA-B #10): mission clock and DIVE TIME count real seconds of

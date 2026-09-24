@@ -78,8 +78,8 @@ visible mat is invented. The `lost-city-microbial-mat` POI sits near the OBIS sa
 
 ## Hull class
 
-Deepest POI is `lost-city-south-wall` at 1,332 m (real terrain), which exceeds Class A's 1,000 m crush-depth
-rating, so `mission.json` uses `hull_class: "B"` (crush depth 4,500 m). All vent POIs are far shallower
+Deepest POI is `lost-city-south-wall` at 1,332 m (real terrain), which exceeds Class A's 1,000 m
+rating, so `mission.json` uses `hull_class: "B"` (rated depth 6,500 m). All vent POIs are far shallower
 (758-801 m seabed).
 
 ## Fabricated vs. sourced

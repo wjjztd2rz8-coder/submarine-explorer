@@ -689,7 +689,7 @@ export class MissionRouter {
       ]);
     }
     if (hull) {
-      const rating = Math.abs(hull.crushDepth).toLocaleString('en-US');
+      const rating = Math.abs(hull.ratedDepth).toLocaleString('en-US');
       content.meta.push(['HULL', `${hull.name} (rated ${rating} m)`]);
     }
     content.startPosition = this.opts.defaultStartPosition ?? 'near-site';

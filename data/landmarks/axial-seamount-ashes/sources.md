@@ -89,8 +89,8 @@ City which had to override the preset toward its cooler, carbonate look.
 ## Hull class
 
 Every POI on this mission sits between 1,395 m and 1,540 m of real terrain (deepest: the ASHES
-chimneys at ~1,540 m). Class A's crush depth (-1,000 m) does not clear that, so `mission.json` uses
-`hull_class: "B"` (crush depth -4,500 m), giving nearly 3,000 m of margin -- comfortable, matching
+chimneys at ~1,540 m). Class A's rating (-1,000 m) does not clear that, so `mission.json` uses
+`hull_class: "B"` (rated depth -6,500 m), giving nearly 5,000 m of margin -- comfortable, matching
 Lost City's own Class B choice for a similar depth range.
 
 ## OBIS species data

@@ -2690,6 +2690,59 @@ body:has(.objectives-panel:not([hidden])) .d-scan-objective-hint {
   transform-origin: center;
 }
 
+/* --- D2-HAZARD --- */
+.hud-warning {
+  animation: none;
+}
+.hull-gauge {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--hud-border);
+  font-size: clamp(12px, calc(13px * var(--ui-scale)), 18px);
+  font-variant-numeric: tabular-nums;
+}
+.hull-gauge[hidden],
+.hull-vignette[hidden],
+.hud-notice[hidden] {
+  display: none;
+}
+.hull-gauge-label {
+  color: #c9e8e5;
+  margin-bottom: 4px;
+}
+.hull-gauge-track {
+  height: 5px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #315d5c 0 90%, #cd9053 90% 100%);
+  overflow: hidden;
+}
+.hull-gauge-track i {
+  display: block;
+  height: 100%;
+  background: #8de5d9;
+}
+.hull-gauge.is-danger .hull-gauge-track i {
+  background: #ff9167;
+}
+.hull-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(ellipse at center, transparent 42%, var(--hull-vignette-color) 100%);
+}
+.hud-notice {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 7px 12px;
+  color: #e5f5f3;
+  background: rgba(5, 24, 31, 0.9);
+  border: 1px solid var(--hud-border);
+  border-radius: 4px;
+}
+
 /* The Journal. */
 .journal {
   z-index: 95;

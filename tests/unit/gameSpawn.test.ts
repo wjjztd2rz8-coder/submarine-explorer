@@ -24,8 +24,8 @@ describe('chooseFreeDiveHull', () => {
   it('fits the lowest class that clears the tile depth by the margin', () => {
     expect(chooseFreeDiveHull(HULLS, -535, MARGIN)?.classId).toBe('A'); // monterey
     expect(chooseFreeDiveHull(HULLS, -3978, MARGIN)?.classId).toBe('B'); // titanic
-    expect(chooseFreeDiveHull(HULLS, -4300, MARGIN)?.classId).toBe('C'); // inside B's margin
-    expect(chooseFreeDiveHull(HULLS, -5009, MARGIN)?.classId).toBe('C'); // bismarck
+    expect(chooseFreeDiveHull(HULLS, -4300, MARGIN)?.classId).toBe('B'); // within B's rating
+    expect(chooseFreeDiveHull(HULLS, -5009, MARGIN)?.classId).toBe('B'); // bismarck
     expect(chooseFreeDiveHull(HULLS, -6575, MARGIN)?.classId).toBe('C'); // beebe
     expect(chooseFreeDiveHull(HULLS, -1000, 0)?.classId).toBe('A'); // exactly at rating
   });
@@ -49,8 +49,8 @@ describe('chooseFreeDiveHull', () => {
       DEFAULT_CONFIG,
       -5009,
     );
-    expect(choice?.classId).toBe('C');
-    expect(fitted).toEqual(['C']);
+    expect(choice?.classId).toBe('B');
+    expect(fitted).toEqual(['B']);
   });
 });
 

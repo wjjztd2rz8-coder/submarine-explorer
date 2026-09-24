@@ -1,5 +1,5 @@
 /** Optional dive supplies. All time here is simulated time at 1×. */
-import type { PowerConfig } from '../core/Config.js';
+import type { DescentProfile, PowerConfig } from '../core/Config.js';
 
 export type Supply = 'battery' | 'oxygen';
 export interface PowerState {
@@ -20,6 +20,25 @@ export interface PowerLoad {
 }
 
 const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
+
+/** Simulated descent with half ballast duty, lights on, and a 3% maneuver margin. */
+export function startingReserves(
+  depthM: number,
+  profile: DescentProfile,
+  config: PowerConfig,
+): { battery: number; oxygen: number; descentSeconds: number } {
+  const depth = Math.max(0, Number.isFinite(depthM) ? depthM : 0);
+  if (depth === 0) return { battery: 1, oxygen: 1, descentSeconds: 0 };
+  const descentSeconds = depth / profile.maxVerticalSpeed;
+  const margin = 1.03;
+  const batteryRate =
+    1 / config.batteryIdleHours + 0.5 / config.batteryThrustHours + 1 / config.batteryLightsHours;
+  return {
+    battery: clamp01(1 - (descentSeconds * margin * batteryRate) / 3600),
+    oxygen: clamp01(1 - (descentSeconds * margin) / (config.oxygenHours * 3600)),
+    descentSeconds,
+  };
+}
 
 export class Power {
   private battery = 1;

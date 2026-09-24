@@ -301,6 +301,11 @@ export class SettingsScreen {
     access.append(
       this.checkbox('reduceMotion', 'Reduce motion (no camera shake or banking)'),
       this.checkbox('captions', 'Captions for sounds'),
+      this.select('hullWarningStyle', 'Hull warning', [
+        ['both', 'Vignette and gauge'],
+        ['vignette', 'Vignette'],
+        ['gauge', 'Gauge'],
+      ]),
       this.select(
         'sonarPalette',
         'Sonar map colours',
