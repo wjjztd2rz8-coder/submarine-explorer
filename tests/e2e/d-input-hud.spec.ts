@@ -37,7 +37,8 @@ test('readable contextual HUD, controls and UI scale survive reload', async ({ p
   await expect(settings.locator('[data-action="scan"]')).toHaveText('F');
   await expect(settings.locator('[data-action="ballastFlood"]')).toContainText('Ctrl');
   await expect(settings.locator('[data-action="ping"]')).toHaveCount(0);
-  await expect(settings.locator('[data-action="togglePhotoMode"]')).toHaveCount(0);
+  await expect(settings.locator('[data-action="togglePhotoMode"]')).toHaveText('P');
+  await expect(settings.locator('[data-action="capturePhoto"]')).toHaveText('Enter');
   await page.screenshot({ path: `${shots}/controls.png` });
   await settings.getByRole('button', { name: 'Back to Settings' }).click();
   await settings.getByLabel('UI scale (%)').fill('150');

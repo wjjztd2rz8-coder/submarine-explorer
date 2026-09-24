@@ -43,6 +43,8 @@ export interface InputState {
   cycleSimSpeed: boolean;
   /** Cycle the camera into and out of free-orbit photo mode. */
   togglePhotoMode: boolean;
+  /** Enter or Space captures the current photo-mode frame. */
+  capturePhoto?: boolean;
   /**
    * Open/close the field guide (B1). Edge-triggered. Optional so existing
    * hand-built InputState literals (tests, Submarine's locked input) still type.
@@ -81,6 +83,7 @@ export type ActionId =
   | 'scan'
   | 'cycleSimSpeed'
   | 'togglePhotoMode'
+  | 'capturePhoto'
   | 'toggleSettings'
   | 'toggleGuide'
   | 'toggleJournal'
@@ -166,6 +169,7 @@ export function defaultActions(): ActionBinding[] {
     { id: 'toggleCamera', label: 'Camera view', category: 'View', keys: ['KeyQ'], pad: 'Y' },
     { id: 'toggleSonar', label: 'Sonar map', category: 'View', keys: ['KeyM'], pad: 'Back' },
     { id: 'togglePhotoMode', label: 'Photo mode', category: 'View', keys: ['KeyP'], pad: 'Start' },
+    { id: 'capturePhoto', label: 'Capture photo', category: 'View', keys: ['Enter'] },
     { id: 'toggleJournal', label: 'Journal', category: 'View', keys: ['KeyJ'] },
   ];
 }
@@ -406,10 +410,14 @@ export class Input {
       for (const action of this.actions) {
         if (action.keys.includes(e.code)) this.edgeArmed.add(action.id);
       }
+      if (e.code === 'Space') this.edgeArmed.add('capturePhoto');
       // Swallow keys we consume so the page does not scroll -- but never Tab,
       // which the DOM overlays need for focus navigation.
       if (
         e.code !== 'Tab' &&
+        // Enter (capture photo) must still activate focused menu buttons.
+        e.code !== 'Enter' &&
+        e.code !== 'NumpadEnter' &&
         !(e.ctrlKey && e.code === 'KeyW') &&
         (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) ||
           this.isBound(e.code))
@@ -495,6 +503,7 @@ export class Input {
       for (const action of this.actions) {
         if (action.keys.includes(code)) this.edgeArmed.add(action.id);
       }
+      if (code === 'Space') this.edgeArmed.add('capturePhoto');
     } else {
       this.keys.delete(code);
     }
@@ -518,6 +527,7 @@ export class Input {
       if (this.edgeArmed.has('toggleLights')) s.toggleLights = true;
       if (this.edgeArmed.has('cycleSimSpeed')) s.cycleSimSpeed = true;
       if (this.edgeArmed.has('togglePhotoMode')) s.togglePhotoMode = true;
+      if (this.edgeArmed.has('capturePhoto')) s.capturePhoto = true;
       if (this.edgeArmed.has('toggleJournal')) s.toggleGuide = true;
       if (this.edgeArmed.has('toggleGlobe')) s.toggleGlobe = true;
       if (this.edgeArmed.has('toggleRov')) s.toggleRov = true;
@@ -565,6 +575,7 @@ export class Input {
     s.ping = false;
     s.cycleSimSpeed = false;
     s.togglePhotoMode = false;
+    s.capturePhoto = false;
     s.toggleGuide = false;
     s.toggleGlobe = false;
     s.toggleRov = false;
