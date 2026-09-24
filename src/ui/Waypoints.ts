@@ -34,6 +34,8 @@ export class Waypoints {
   readonly root: HTMLDivElement;
   private readonly edge: HTMLDivElement;
   private readonly hint: HTMLDivElement;
+  private readonly edgeName = document.createElement('span');
+  private readonly edgeInfo = document.createElement('span');
   private readonly markers = new Map<string, HTMLDivElement>();
   private readonly sonarMarkers = new Map<string, HTMLDivElement>();
   private readonly projection = new Vector3();
@@ -53,6 +55,10 @@ export class Waypoints {
     this.root.className = 'd-scan-waypoints';
     this.edge = document.createElement('div');
     this.edge.className = 'd-scan-edge';
+    // Two fixed lines (name, then range/depth) so the chip never wraps mid-phrase.
+    this.edgeName.className = 'd-scan-edge-name';
+    this.edgeInfo.className = 'd-scan-edge-info';
+    this.edge.append(this.edgeName, this.edgeInfo);
     this.hint = document.createElement('div');
     this.hint.className = 'd-scan-objective-hint';
     this.root.append(this.edge, this.hint);
@@ -154,7 +160,8 @@ export class Waypoints {
     const angle = Math.atan2(-y, x);
     this.edge.style.left = `${Math.max(130, Math.min(width - 130, ((x + 1) / 2) * width))}px`;
     this.edge.style.top = `${Math.max(100, Math.min(height - 145, ((1 - y) / 2) * height))}px`;
-    this.edge.textContent = `${current.name} · ${waypointReadout(position, current.position, current.radius)}`;
+    this.edgeName.textContent = current.name;
+    this.edgeInfo.textContent = waypointReadout(position, current.position, current.radius);
     this.edge.style.setProperty('--direction', `${angle}rad`);
   }
 

@@ -2161,7 +2161,8 @@ body:has(.field-guide:not([hidden])) .pause-menu {
 .d-scan-edge {
   position: absolute;
   transform: translate(-50%, -50%);
-  max-width: 280px;
+  width: max-content;
+  max-width: 250px;
   padding: 6px 10px;
   border: 1px solid currentColor;
   border-radius: 4px;
@@ -2173,8 +2174,20 @@ body:has(.field-guide:not([hidden])) .pause-menu {
 .d-scan-edge::before {
   content: '➤';
   display: inline-block;
+  float: left;
   margin-right: 6px;
   transform: rotate(var(--direction, 0rad));
+}
+.d-scan-edge-name,
+.d-scan-edge-info {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.d-scan-edge-info {
+  font-size: 0.85em;
+  opacity: 0.85;
 }
 .d-scan-edge.is-onscreen {
   border-color: rgba(46, 217, 217, 0.45);
