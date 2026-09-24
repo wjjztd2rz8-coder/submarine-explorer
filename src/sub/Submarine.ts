@@ -56,6 +56,9 @@ export interface SubmarineState {
   speed: number;
   /** depth / crushDepth, clamped to [0,1]; 1 means the hull has failed. */
   crushRatio: number;
+  /** Operating depth divided by the hull's rated depth. */
+  ratedRatio: number;
+  ratedDepth: number;
   crushWarning: boolean;
   hullBreached: boolean;
   /** True on the step the hull touched bottom. */
@@ -64,8 +67,8 @@ export interface SubmarineState {
   impactSpeed: number;
   /**
    * Combined hull stress, 0..1. The larger of a decaying impact spike and the
-   * steady pressure load above `crushWarnRatio`. Drives camera shake, the HUD
-   * gauge and the creak/groan audio cues.
+   * steady pressure load beyond the rated depth. Drives the warning and
+   * creak/groan audio cues.
    */
   hullStress: number;
   /** True while the emergency blow is running and the controls are locked. */
@@ -123,6 +126,7 @@ export class Submarine {
   /** Physics steps run per call to {@link step}. 1, 2 or 3. */
   private simSpeedIndex: number;
   private crushDepth: number;
+  private ratedDepth: number;
   private hullClassId: string;
 
   private yawRate = 0;
@@ -148,6 +152,7 @@ export class Submarine {
     );
     this.hullClassId = config.hullClass;
     this.crushDepth = this.resolveCrushDepth(config.hullClass);
+    this.ratedDepth = this.resolveRatedDepth(config.hullClass);
   }
 
   private resolveCrushDepth(classId: string): number {
@@ -156,11 +161,19 @@ export class Submarine {
     return this.config.hullClasses?.[classId]?.crushDepth ?? this.config.crushDepth;
   }
 
+  private resolveRatedDepth(classId: string): number {
+    return (
+      this.config.hullClasses?.[classId]?.ratedDepth ??
+      this.config.crushDepth * this.config.crushWarnRatio
+    );
+  }
+
   /** Fit a different hull. Unknown ids are ignored. */
   setHullClass(classId: string): boolean {
     if (!this.config.hullClasses?.[classId]) return false;
     this.hullClassId = classId;
     this.crushDepth = this.resolveCrushDepth(classId);
+    this.ratedDepth = this.resolveRatedDepth(classId);
     return true;
   }
 
@@ -382,13 +395,10 @@ export class Submarine {
     }
   }
 
-  /** Steady load from being near (or past) the crush depth, 0..1. */
+  /** Steady load between the rated and crush depths, 0..1. */
   private pressureStress(): number {
-    const c = this.config;
-    const ratio = clamp(this.position.y / this.crushDepth, 0, 1);
-    const w = c.crushWarnRatio;
-    if (ratio <= w) return 0;
-    return clamp((ratio - w) / Math.max(1e-6, 1 - w), 0, 1);
+    if (this.position.y >= this.ratedDepth) return 0;
+    return clamp((this.position.y - this.ratedDepth) / (this.crushDepth - this.ratedDepth), 0, 1);
   }
 
   /** 1, or 1/simSpeed when the turn rate is held at the 1x real rate. */
@@ -437,10 +447,10 @@ export class Submarine {
 
   /** Snapshot of everything the UI needs. Allocates; call once per frame. */
   getState(): SubmarineState {
-    const c = this.config;
     const depth = this.position.y;
     const ground = this.terrain.sampleHeight(this.position.x, this.position.z);
     const crushRatio = clamp(depth / this.crushDepth, 0, 1);
+    const ratedRatio = Math.max(0, depth / this.ratedDepth);
     return {
       position: this.position.clone(),
       velocity: this.velocity.clone(),
@@ -452,7 +462,9 @@ export class Submarine {
       headingDeg: ((((this.yaw * 180) / Math.PI) % 360) + 360) % 360,
       speed: this.velocity.length(),
       crushRatio,
-      crushWarning: crushRatio >= c.crushWarnRatio,
+      ratedRatio,
+      ratedDepth: this.ratedDepth,
+      crushWarning: ratedRatio > 1,
       hullBreached: this.hullBreached,
       touchedBottom: this.touchedBottom,
       impactSpeed: this.impactSpeed,

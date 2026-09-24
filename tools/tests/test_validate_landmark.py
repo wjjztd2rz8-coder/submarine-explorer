@@ -372,6 +372,15 @@ class RepoTests(unittest.TestCase):
     def test_hull_classes_fallback(self):
         self.assertEqual(vl.load_hull_classes("/nonexistent"), vl.DEFAULT_HULLS)
 
+    def test_separate_hull_ratings_keep_challenger_out_of_warning_band(self):
+        ratings = vl.load_hull_ratings()
+        crush = vl.load_hull_classes()
+        self.assertEqual(ratings["C"], -11000)
+        self.assertLess(crush["C"], ratings["C"])
+        rep = vl.validate_landmark("challenger-deep")
+        self.assertEqual(rep.errors, [])
+        self.assertEqual(rep.warnings, [])
+
     def test_titanic_exemplar_has_no_errors(self):
         self.assertEqual(vl.validate_landmark("titanic").errors, [])
 

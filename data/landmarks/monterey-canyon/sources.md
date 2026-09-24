@@ -67,8 +67,8 @@ species appear.
 
 ## Hull class
 
-Deepest POI is the axis-2000m point at 2,033.5 m (real terrain), which exceeds Class A's 1,000 m crush-depth
-rating, so `mission.json` uses `hull_class: "B"` (crush depth 4,500 m; MARS at 891 m and the rest of the tile,
+Deepest POI is the axis-2000m point at 2,033.5 m (real terrain), which exceeds Class A's 1,000 m
+rating, so `mission.json` uses `hull_class: "B"` (rated depth 6,500 m; MARS at 891 m and the rest of the tile,
 down to 2,332.8 m, all clear this too).
 
 ## Fabricated vs. sourced

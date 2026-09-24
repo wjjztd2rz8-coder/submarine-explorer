@@ -9,6 +9,8 @@ import type { SubmarineState } from '../sub/Submarine.js';
 import type { PowerState } from '../game/Power.js';
 import type { GameplayOptions } from '../core/Config.js';
 import type { CurrentStatus } from '../world/Currents.js';
+import type { HullWarningStyle } from '../core/Save.js';
+import { HullGauge } from './HullGauge.js';
 
 const FIELDS = ['depth', 'heading', 'speed', 'status', 'tile'] as const;
 type Field = (typeof FIELDS)[number];
@@ -86,10 +88,10 @@ export function seabedWarning(
 export function formatTileLine(
   meta: Pick<TileMeta, 'id' | 'cols' | 'rows'>,
   hullClass: string,
-  crushDepth: number,
+  ratedDepth: number,
   note = '',
 ): string {
-  const rating = Math.round(Math.abs(crushDepth)).toLocaleString('en-US');
+  const rating = Math.round(Math.abs(ratedDepth)).toLocaleString('en-US');
   return `${meta.id} · hull ${hullClass} ${rating} m${note ? ` · ${note}` : ''}`;
 }
 
@@ -98,6 +100,8 @@ export class HUD {
   private readonly values = new Map<Field, HTMLSpanElement>();
   private readonly cache = new Map<Field, string>();
   private readonly warningEl: HTMLDivElement;
+  private readonly hullGauge: HullGauge;
+  private readonly noticeEl: HTMLDivElement;
   private readonly objectiveEl: HTMLDivElement;
   private readonly promptEl: HTMLDivElement;
   private readonly speedEl: HTMLDivElement;
@@ -133,6 +137,7 @@ export class HUD {
         <div class="hud-sim-speed" hidden></div>
       </div>
       <div class="hud-warning" hidden></div>
+      <div class="hud-notice" hidden></div>
       <div class="hud-objective" hidden></div>
       <div class="hud-prompt" hidden></div>
       <div class="hud-control-tips" hidden></div>
@@ -142,6 +147,8 @@ export class HUD {
       this.values.set(el.dataset.field as Field, el);
     }
     this.warningEl = this.root.querySelector('.hud-warning') as HTMLDivElement;
+    this.noticeEl = this.root.querySelector('.hud-notice') as HTMLDivElement;
+    this.hullGauge = new HullGauge(this.root);
     this.objectiveEl = this.root.querySelector('.hud-objective') as HTMLDivElement;
     this.promptEl = this.root.querySelector('.hud-prompt') as HTMLDivElement;
     this.speedEl = this.root.querySelector('.hud-sim-speed') as HTMLDivElement;
@@ -164,6 +171,18 @@ export class HUD {
   /** A short note after the hull rating on the tile line, e.g. "thin margin". */
   setHullNote(note: string): void {
     this.hullNote = note;
+  }
+
+  setHullWarningStyle(style: HullWarningStyle): void {
+    this.hullGauge.setStyle(style);
+  }
+
+  notice(message: string): void {
+    this.noticeEl.textContent = message;
+    this.noticeEl.hidden = false;
+    window.setTimeout(() => {
+      if (this.noticeEl.textContent === message) this.noticeEl.hidden = true;
+    }, 6000);
   }
 
   setPowerState(state: PowerState): void {
@@ -205,7 +224,7 @@ export class HUD {
       label.textContent = 'CURRENT · offline data unavailable';
     } else {
       arrow.style.transform = `rotate(${Number.isFinite(this.current.dirDeg) ? this.current.dirDeg : 0}deg)`;
-      label.textContent = `CURRENT · ${speed.toFixed(2)} m/s · ${Math.round(this.current.dirDeg)}°`;
+      label.textContent = `CURRENT · ${(speed * 1.94384).toFixed(2)} kn · ${speed.toFixed(2)} m/s · ${Math.round(this.current.dirDeg)}°`;
     }
   }
 
@@ -219,7 +238,8 @@ export class HUD {
   /** Update from a physics snapshot. Safe to call every rendered frame. */
   update(s: SubmarineState, ctx: HudContext = {}): void {
     this.set('depth', formatDepth(s.depth, this.warn.hullRadius));
-    this.set('tile', formatTileLine(this.meta, s.hullClass, s.crushDepth, this.hullNote));
+    this.hullGauge.update(s);
+    this.set('tile', formatTileLine(this.meta, s.hullClass, s.ratedDepth, this.hullNote));
     this.set('heading', `${s.headingDeg.toFixed(0)}° ${compass(s.headingDeg)}`);
     // Knots are the natural unit for a boat; 1 m/s = 1.94384 kn.
     this.set('speed', `${(s.speed * 1.94384).toFixed(1)} kn  (${s.speed.toFixed(1)} m/s)`);
@@ -242,7 +262,7 @@ export class HUD {
       this.showWarning('HULL BREACH — CRUSH DEPTH EXCEEDED');
     } else if (s.crushWarning) {
       this.set('status', 'pressure high');
-      this.showWarning(`HULL PRESSURE ${(s.crushRatio * 100).toFixed(0)}% — ASCEND`);
+      this.showWarning(`HULL RATING EXCEEDED — ASCEND`);
     } else if (this.powerState?.enabled && s.emergencyCause === 'power' && s.emergencyBlow) {
       this.set('status', 'emergency ascent');
       this.showWarning('SUPPLIES EXHAUSTED — EMERGENCY ASCENT');

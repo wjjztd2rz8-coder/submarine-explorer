@@ -74,12 +74,9 @@ the task brief, so no mid-water spawn shortcut (as used at Challenger Deep) is n
 
 ## Hull class
 
-`hull_class: "C"` (crush depth -11,000 m) per the task brief -- it is the only class that clears
-this tile's terrain at all: hull B's -4,500 m crush depth is shallower than every POI in this
-mission (the shallowest, `bvf-eastern-margin`, is already -4,952.6 m) and would fail outright,
-not just warn. With hull C, the deepest POI (`bvf-spreading-axis`, -5,395.8 m) leaves roughly
-5,600 m of margin to crush depth -- nowhere near the 90%-of-crush-depth warning band, so this
-mission produces no crush-warning, unlike Challenger Deep.
+`hull_class: "C"` is rated to -11,000 m. Hull B's -6,500 m rating also clears
+this tile's terrain; Class C remains the authored mission loadout. The deepest POI
+(`bvf-spreading-axis`, -5,395.8 m) is well within its operating rating.
 
 ## Chimney props
 

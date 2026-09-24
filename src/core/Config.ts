@@ -37,7 +37,7 @@ export interface SubmarineConfig {
   maxVerticalSpeed: number;
   /** Depth (negative metres) at which the hull fails. */
   crushDepth: number;
-  /** Fraction of crush depth at which the HUD starts warning. */
+  /** Legacy fractional pressure threshold for bare-number test hulls. */
   crushWarnRatio: number;
   /** Collision sphere radius around the sub's origin (m). */
   hullRadius: number;
@@ -114,7 +114,7 @@ export interface SubmarineConfig {
    */
   simSpeedScalesTurnRate: boolean;
   /**
-   * QA-B #2. Free dive fits the lowest hull class whose crush depth clears the
+   * QA-B #2. Free dive fits the lowest hull class whose rated depth clears the
    * tile's deepest cell (`meta.min_m`) by this many metres. Soft: if no class
    * clears it, the deepest class is fitted and the HUD says the margin is thin.
    */
@@ -137,10 +137,12 @@ export interface SubmarineConfig {
   hullEmissive: number;
 }
 
-/** A hull rating: how deep this boat may legally go before it fails. */
+/** An operating rating and a separate game failure threshold. */
 export interface HullClass {
   name: string;
-  /** Depth (negative metres) at which the hull fails. */
+  /** Certified operating depth (negative metres). */
+  ratedDepth: number;
+  /** Game failure threshold below the rating, with a 10% safety margin. */
   crushDepth: number;
 }
 
@@ -1082,9 +1084,8 @@ export const DEFAULT_CONFIG: GameConfig = {
     buoyancyAccel: 0.05,
     maxSpeed: 40,
     maxVerticalSpeed: 8,
-    // Mirrors hullClasses[hullClass].crushDepth; kept as a plain field because
-    // it is the value the physics and the HUD actually read.
-    crushDepth: -4500,
+    // Fallback game failure threshold when no named hull is fitted.
+    crushDepth: -7150,
     crushWarnRatio: 0.9,
     hullRadius: 8,
     seabedClearance: 4,
@@ -1106,12 +1107,14 @@ export const DEFAULT_CONFIG: GameConfig = {
 
     hullClass: 'B',
     hullClasses: {
-      // Depth ratings loosely after real classes: a coastal tourist sub, a
-      // deep-ocean research boat (Alvin/Nautile territory) and a full-ocean-
-      // depth vehicle (Limiting Factor). Unlocked by discoveries later.
-      A: { name: 'Class A - coastal', crushDepth: -1000 },
-      B: { name: 'Class B - deep ocean', crushDepth: -4500 },
-      C: { name: 'Class C - full ocean depth', crushDepth: -11000 },
+      // A: Triton 3300/3 rated 1,000 m (https://tritonsubs.com/subs/t3300-3/).
+      // B: WHOI Alvin rated 6,500 m (https://ndsf.whoi.edu/alvin/specifications/).
+      // C: Triton 36000/2 rated 11,000 m for repeated full-ocean-depth dives
+      // (https://tritonsubs.com/subs/t36000-2/).
+      // The 10% simulated crush margin is gameplay tuning, not a certification claim.
+      A: { name: 'Class A - coastal', ratedDepth: -1000, crushDepth: -1100 },
+      B: { name: 'Class B - deep ocean', ratedDepth: -6500, crushDepth: -7150 },
+      C: { name: 'Class C - full ocean depth', ratedDepth: -11000, crushDepth: -12100 },
     },
     impactStressSpeed: 6.0,
     hullStressHalfLife: 0.9,
@@ -1596,7 +1599,7 @@ export const DEFAULT_CONFIG: GameConfig = {
   // --- D-CURRENTS: the full field is the archived HYCOM sample. ---
   currents: {
     gentleScale: 0.35,
-    hudMinMps: 0.01,
+    hudMinMps: 0.001,
     terrainLookaheadS: 0.5,
     terrainGuardM: 1,
   },

@@ -305,7 +305,7 @@ test.describe('fix S: free-dive loadout and spawn', () => {
 
   test('QA-B #2: deep tiles fit a hull rated for them; no breach at spawn', async ({ page }) => {
     for (const [tile, cls] of [
-      ['bismarck', 'C'],
+      ['bismarck', 'B'],
       ['challenger-deep', 'C'],
       ['titanic', 'B'],
     ] as const) {

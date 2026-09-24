@@ -4,14 +4,6 @@
   "tile": "challenger-deep",
   "title": "Challenger Deep: full ocean depth",
   "hull_class": "C",
-  "pressure_band_review": {
-    "poi": "cd-eastern-pool-deepest",
-    "hull_class": "C",
-    "poi_depth_m": 10931,
-    "warning_start_m": 9900,
-    "crush_depth_m": 11000,
-    "reason": "The POI follows surveyed terrain; the Class C hull clears it by about 69 m, and the briefing states the warning threshold and crush depth."
-  },
   "environment": {
     "preset": "trench"
   },
@@ -27,12 +19,12 @@
     "depth_m": 10931,
     "facts": [
       "The Challenger Deep's Eastern Pool is the deepest known point in Earth's oceans; the deepest cell surveyed in this tile is 10,930.9 m.",
-      "This hull is Class C, rated to 11,000 m -- only about 70 m of margin below the deepest terrain in this mission. Expect hull-stress warnings on the way down; that tight margin is real, not a bug.",
+      "This full-ocean-depth hull is rated to 11,000 m, clearing the deepest terrain in this mission.",
       "First crewed descent: Trieste, 23 January 1960 (Jacques Piccard, Don Walsh). Most recent well-instrumented survey used here: the Five Deeps Expedition's DSV Limiting Factor, 2019.",
       "Nothing lives here that you can see with the naked eye except hadal amphipods (Hirondellea gigas) at bait -- no fish have been confirmed this deep."
     ],
     "hazards": [
-      "Crush depth: this hull fails at 11,000 m. The deepest terrain in this mission (10,931 m rounded; 10,930.9 m sampled) is inside the crush-warning band, which starts at 9,900 m (90% of crush depth) -- treat every metre below that as the real margin it is.",
+      "Rated depth: 11,000 m. The deepest terrain in this mission is 10,931 m; the hull warning begins beyond its rating.",
       "Total darkness below a few hundred metres; only your lights work.",
       "With a surface start, expect a long descent from the 6,000 m spawn; the default near-site start skips it.",
       "Extreme, uniform pressure (about 1,086 bar at the bottom) and near-freezing water (1-4 degC)."

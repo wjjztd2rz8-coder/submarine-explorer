@@ -35,8 +35,7 @@ own source citation rather than presented as a direct read.
 
 - Grid extrema: shallowest cell -975.17 m at 18.91725, -155.26401 (matches published summit
   depth closely); deepest cell -5027.22 m at 18.76784, -155.10745, well south of the summit and
-  outside this mission's scope (would exceed hull B's -4,500 m crush depth, so no POI is placed
-  there or anywhere near it).
+  outside this mission's scope (still within hull B's -6,500 m rating).
 - `kh-summit` (18.91725, -155.26401): -975.2 m, the tile's shallowest cell.
 - A fine local grid search around the summit found the seabed deepening to the southwest/south,
   not a clean closed depression -- Pele's Pit's ~600 m-diameter crater rim is finer than this
@@ -63,12 +62,10 @@ Spawn is at the surface (`depth_m: 5`); the deepest required objective (`kh-hiol
 1,300.3 m) takes well under two minutes of vertical descent at this submarine's ~5.4 m/s x3
 sim-speed descent rate, so no mid-water spawn shortcut is needed.
 
-## Hull class and crush-depth margin
+## Hull class and rating margin
 
-`hull_class: "B"` (crush depth -4,500 m) per the task brief. This tile's deepest cell
-(-5,027.22 m) exceeds hull B's crush depth, so no POI is placed anywhere near it; every POI in
-this mission stays at or above -1,896.6 m, leaving well over 2,600 m of margin to the crush
-depth and no crush-warning-band issue.
+`hull_class: "B"` (rated depth -6,500 m). This tile's deepest cell (-5,027.22 m)
+and every mission POI stay within the rating. The deepest POI is at -1,896.6 m.
 
 ## Chimney props
 

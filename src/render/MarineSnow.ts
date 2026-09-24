@@ -15,6 +15,15 @@
 import * as THREE from 'three';
 import type { AtmosphereTier, WaterConfig } from '../core/Config.js';
 import type { AtmosphereSample } from './Atmosphere.js';
+import type { CurrentVector } from '../world/Currents.js';
+
+export function snowFlowStep(
+  offset: { x: number; z: number },
+  current: Pick<CurrentVector, 'x' | 'z'>,
+  seconds: number,
+): { x: number; z: number } {
+  return { x: offset.x + current.x * seconds, z: offset.z + current.z * seconds };
+}
 
 export class MarineSnow {
   readonly points: THREE.Points | null;
@@ -22,6 +31,7 @@ export class MarineSnow {
   private readonly material: THREE.ShaderMaterial | null;
   private readonly geometry: THREE.BufferGeometry | null;
   private elapsed = 0;
+  private flow = { x: 0, z: 0 };
 
   constructor(config: WaterConfig, tier: AtmosphereTier) {
     const count = tier.snowCount;
@@ -62,6 +72,7 @@ export class MarineSnow {
         uBox: { value: box },
         uDensity: { value: 1 },
         uDrift: { value: 0.2 },
+        uFlow: { value: new THREE.Vector2() },
         uSizeM: { value: config.snowSizeM },
         uScale: { value: 500 },
         uColor: { value: new THREE.Color(0xdfe9ec) },
@@ -91,14 +102,17 @@ export class MarineSnow {
     atmosphere: AtmosphereSample,
     frameDelta: number,
     viewportH: number,
+    current: Pick<CurrentVector, 'x' | 'z'> = { x: 0, z: 0 },
   ): void {
     if (!this.material) return;
     this.elapsed += frameDelta;
+    this.flow = snowFlowStep(this.flow, current, frameDelta);
     const u = this.material.uniforms;
     u.uTime!.value = this.elapsed;
     (u.uCam!.value as THREE.Vector3).copy(camera.position);
     u.uDensity!.value = atmosphere.snowDensity;
     u.uDrift!.value = atmosphere.snowDriftMps;
+    (u.uFlow!.value as THREE.Vector2).set(this.flow.x, this.flow.z);
     u.fogDensity!.value = atmosphere.fogDensity;
     // Perspective size attenuation: metres -> pixels at one metre of distance.
     u.uScale!.value = viewportH / (2 * Math.tan((camera.fov * Math.PI) / 180 / 2));
@@ -119,6 +133,7 @@ uniform vec3  uCam;
 uniform float uBox;
 uniform float uDensity;
 uniform float uDrift;
+uniform vec2 uFlow;
 uniform float uSizeM;
 uniform float uScale;
 attribute float aSeed;
@@ -130,6 +145,7 @@ void main() {
   p.y -= uDrift * uTime * (0.6 + aSeed * 0.8);
   p.x += sin(uTime * 0.11 + aSeed * 31.4) * 1.5;
   p.z += cos(uTime * 0.09 + aSeed * 17.7) * 1.5;
+  p.xz += uFlow;
 
   // Wrap into the cube centred on the camera. mod() is always in [0, uBox).
   vec3 world = uCam + mod(p - uCam + 0.5 * uBox, uBox) - 0.5 * uBox;

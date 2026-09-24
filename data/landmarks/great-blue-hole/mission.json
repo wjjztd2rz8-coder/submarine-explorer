@@ -3,7 +3,7 @@
   "landmark": "great-blue-hole",
   "tile": "great-blue-hole",
   "title": "Lighthouse Reef and the Great Blue Hole",
-  "hull_class": "A",
+  "hull_class": "B",
   "environment": {
     "preset": "reef"
   },
@@ -27,7 +27,7 @@
       "Shallow reef structure near the rim -- watch your depth and avoid contact with coral.",
       "A steep drop-off from the reef flat to open ocean; currents can be stronger there.",
       "Total darkness below a few hundred metres on the outer slope; only your lights work.",
-      "Your Class A hull is rated to 1,000 m, comfortably beyond anything on this survey."
+      "Your Class B hull is rated to 6,500 m, clearing the deepest cell in this survey."
     ]
   },
   "objectives": [
