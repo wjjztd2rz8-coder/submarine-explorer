@@ -7,7 +7,7 @@ export const SETTINGS_VERSION = 2;
 const LEGACY_SETTINGS_KEY = 'subexplorer.settings.v1';
 export const SAVE_KEYS = {
   settings: SETTINGS_STORAGE_KEY,
-  bindings: 'subexplorer.bindings.v2',
+  bindings: 'subexplorer.bindings.v3',
   discoveries: 'subexplorer.discoveries.v1',
 } as const;
 

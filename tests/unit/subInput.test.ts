@@ -11,6 +11,7 @@ import { CameraRig } from '../../src/sub/CameraRig.js';
 import {
   BINDINGS_STORAGE_KEY,
   LEGACY_BINDINGS_STORAGE_KEY,
+  PREVIOUS_BINDINGS_STORAGE_KEY,
   Input,
   defaultActions,
   keyLabel,
@@ -88,11 +89,11 @@ describe('Input action map', () => {
 
   it('scan is level-triggered, not an edge', () => {
     const input = makeInput();
-    input.injectKey('KeyF', true);
+    input.injectKey('KeyG', true);
     expect(input.sample().scan).toBe(true);
     input.endFrame();
     expect(input.sample().scan).toBe(true);
-    input.injectKey('KeyF', false);
+    input.injectKey('KeyG', false);
     expect(input.sample().scan).toBe(false);
   });
 });
@@ -114,7 +115,7 @@ describe('Input rebinding', () => {
 
     const saved = store.getItem(BINDINGS_STORAGE_KEY);
     expect(saved).toBeTruthy();
-    expect(JSON.parse(saved as string).version).toBe(2);
+    expect(JSON.parse(saved as string).version).toBe(3);
   });
 
   it('reloads saved bindings in a fresh session and resets cleanly', () => {
@@ -162,7 +163,7 @@ describe('Input bindings across reloads (C5)', () => {
   });
 
   it('an action missing from the save does not reclaim a key another action saved', () => {
-    const payload = { version: 2, keys: { boost: ['KeyW'] } };
+    const payload = { version: 3, keys: { boost: ['KeyW'] } };
     store.setItem(BINDINGS_STORAGE_KEY, JSON.stringify(payload));
     const input = makeInput();
     expect(input.getAction('boost')?.keys).toEqual(['KeyW']);
@@ -235,8 +236,8 @@ describe('v1 binding migration', () => {
     expect(input.getAction('boost')?.keys).toEqual([]);
     expect(input.getAction('toggleJournal')?.keys).toEqual(['KeyH']);
     expect(input.getAction('ballastFlood')?.keys).toEqual(['ControlLeft', 'ControlRight', 'KeyC']);
-    expect(input.getAction('scan')?.keys).toEqual(['KeyF']);
-    expect(JSON.parse(store.getItem(BINDINGS_STORAGE_KEY)!).version).toBe(2);
+    expect(input.getAction('scan')?.keys).toEqual(['KeyG']);
+    expect(JSON.parse(store.getItem(BINDINGS_STORAGE_KEY)!).version).toBe(3);
     expect(store.getItem(LEGACY_BINDINGS_STORAGE_KEY)).not.toBeNull();
     input.resetBindings();
     expect(store.getItem(BINDINGS_STORAGE_KEY)).toBeNull();
@@ -267,7 +268,7 @@ describe('drag camera', () => {
     rig.update(pos, 0, 0, 1);
     expect(rig.camera.position.distanceTo(before)).toBeGreaterThan(5);
     rig.orbit(0, 0, -100);
-    expect(rig.chaseRadius).toBe(25);
+    expect(rig.chaseRadius).toBe(35);
     rig.orbit(0, 0, 100);
     expect(rig.chaseRadius).toBe(180);
     rig.setMode('first-person');
@@ -276,5 +277,35 @@ describe('drag camera', () => {
     rig.orbit(0.3, 0);
     rig.update(pos, 0, 0, 1);
     expect(rig.camera.getWorldDirection(new Vector3()).distanceTo(facing)).toBeGreaterThan(0.1);
+  });
+});
+
+describe('v2 binding migration', () => {
+  it('reverts untouched pitch and scan while keeping custom keys and resolving new-default conflicts', () => {
+    store.setItem(
+      PREVIOUS_BINDINGS_STORAGE_KEY,
+      JSON.stringify({
+        version: 2,
+        keys: {
+          pitchUp: ['KeyR'],
+          pitchDown: ['KeyV'],
+          scan: ['KeyF'],
+          thrustForward: ['KeyI'],
+          boost: [],
+          toggleJournal: ['KeyH'],
+          toggleSonar: ['KeyG'],
+        },
+      }),
+    );
+    const input = makeInput();
+    expect(input.getAction('pitchDown')?.keys).toEqual(['KeyF']);
+    expect(input.getAction('scan')?.keys).toEqual(['KeyG']);
+    expect(input.getAction('resetCamera')?.keys).toEqual(['KeyX']);
+    expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
+    expect(input.getAction('boost')?.keys).toEqual([]);
+    expect(input.getAction('toggleJournal')?.keys).toEqual(['KeyH']);
+    expect(input.getAction('toggleSonar')?.keys).toEqual([]);
+    expect(JSON.parse(store.getItem(BINDINGS_STORAGE_KEY)!).version).toBe(3);
+    expect(store.getItem(PREVIOUS_BINDINGS_STORAGE_KEY)).not.toBeNull();
   });
 });

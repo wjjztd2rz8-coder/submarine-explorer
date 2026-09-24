@@ -25,7 +25,7 @@ function settle(rig: CameraRig, pos: Vector3, yaw = 0, pitch = 0, seconds = 3): 
 }
 
 describe('CameraRig modes', () => {
-  it('cycles chase <-> first person on C, and in and out of photo mode on P', () => {
+  it('cycles chase <-> first person on Q, and in and out of photo mode on P', () => {
     const rig = new CameraRig(cam, 16 / 9);
     expect(rig.mode).toBe('chase');
     expect(rig.toggleMode()).toBe('first-person');
@@ -103,36 +103,8 @@ describe('CameraRig terrain collision', () => {
   });
 });
 
-describe('CameraRig shake', () => {
-  it('displaces on impact and decays back, and honours reduceMotion', () => {
-    const pos = new Vector3(0, -2000, 0);
-    const rig = new CameraRig(cam, 16 / 9);
-    rig.snap(pos, 0, 0);
-    const rest = rig.camera.position.clone();
-
-    // A few frames of a full-strength hit must move the camera off the rest pose.
-    let peak = 0;
-    for (let i = 0; i < 10; i++) {
-      rig.update(pos, 0, 0, DT, { hullStress: 1 });
-      peak = Math.max(peak, rig.camera.position.distanceTo(rest));
-    }
-    expect(peak).toBeGreaterThan(0.2);
-
-    // Two seconds later (many half-lives) it is back.
-    for (let i = 0; i < 120; i++) rig.update(pos, 0, 0, DT);
-    expect(rig.camera.position.distanceTo(rest)).toBeLessThan(0.05);
-
-    const calm = new CameraRig(cam, 16 / 9);
-    calm.reduceMotion = true;
-    calm.snap(pos, 0, 0);
-    const calmRest = calm.camera.position.clone();
-    for (let i = 0; i < 10; i++) calm.update(pos, 0, 0, DT, { hullStress: 1 });
-    expect(calm.camera.position.distanceTo(calmRest)).toBeLessThan(1e-6);
-  });
-});
-
 describe('CameraRig look-ahead and bank', () => {
-  it('keeps the boat centred at both cruise and boost speeds', () => {
+  it('keeps the boat in the lower third at both cruise and boost speeds', () => {
     const pos = new Vector3(0, -2000, 0);
     const slow = new CameraRig(cam, 16 / 9);
     const fast = new CameraRig(cam, 16 / 9);
@@ -141,9 +113,11 @@ describe('CameraRig look-ahead and bank', () => {
     slow.update(pos, 0, 0, DT, { velocity: new Vector3(0, 0, -0.1) });
     fast.update(pos, 0, 0, DT, { velocity: new Vector3(0, 0, -8) });
     for (const rig of [slow, fast]) {
+      rig.camera.updateMatrixWorld();
       const screen = pos.clone().project(rig.camera);
       expect(Math.abs(screen.x)).toBeLessThan(0.05);
-      expect(Math.abs(screen.y)).toBeLessThan(0.05);
+      expect(screen.y).toBeGreaterThan(-0.9);
+      expect(screen.y).toBeLessThan(-0.35);
     }
   });
 
@@ -181,15 +155,50 @@ describe('CameraRig mouse response and framing', () => {
     }
   });
 
-  it('holds the sub within 5% of screen centre, including near an objective', () => {
+  it('keeps free-look orbit fixed in world space through boat yaw and pitch', () => {
     const rig = new CameraRig(cam, 16 / 9);
     rig.snap(sub, 0, 0);
-    for (const focus of [null, new Vector3(30, -3820, -100)]) {
-      for (let i = 0; i < 120; i++) rig.update(sub, 0, 0, DT, { focus });
-      const screen = sub.clone().project(rig.camera);
-      expect(Math.abs(screen.x)).toBeLessThan(0.05);
-      expect(Math.abs(screen.y)).toBeLessThan(0.05);
-    }
+    rig.orbit(0.4, -0.15);
+    rig.update(sub, 0, 0, DT);
+    expect(rig.freeLook).toBe(true);
+    const offset = rig.camera.position.clone().sub(sub);
+    const direction = rig.camera.getWorldDirection(new Vector3());
+    rig.update(sub.clone().add(new Vector3(10, 5, -20)), 1.5, 0.4, DT);
+    expect(
+      rig.camera.position
+        .clone()
+        .sub(sub)
+        .sub(new Vector3(10, 5, -20))
+        .distanceTo(offset),
+    ).toBeLessThan(1e-6);
+    expect(rig.camera.getWorldDirection(new Vector3()).distanceTo(direction)).toBeLessThan(1e-6);
+    rig.resetView();
+    rig.update(sub, 1.5, 0.4, DT);
+    expect(rig.mode).toBe('chase');
+    expect(rig.freeLook).toBe(false);
+    expect(rig.camera.position.x).toBeLessThan(sub.x - cam.chaseOffset.z * 0.8);
+  });
+
+  it('enters free look after several small direct pointer deltas', () => {
+    const rig = new CameraRig(cam, 16 / 9);
+    rig.snap(sub, 0, 0);
+    rig.orbit(0.005, 0.002);
+    rig.orbit(0.005, 0.002);
+    expect(rig.freeLook).toBe(false);
+    rig.orbit(0.005, 0.002);
+    expect(rig.freeLook).toBe(true);
+    expect(rig.lookAzimuth).toBeCloseTo(0.015);
+  });
+
+  it('camera view toggle leaves free look and restores chase on the next toggle', () => {
+    const rig = new CameraRig(cam, 16 / 9);
+    rig.snap(sub, 0, 0);
+    rig.orbit(0.3, 0.1);
+    expect(rig.freeLook).toBe(true);
+    expect(rig.toggleMode()).toBe('first-person');
+    expect(rig.freeLook).toBe(false);
+    expect(rig.toggleMode()).toBe('chase');
+    expect(rig.lookAzimuth).toBe(0);
   });
 });
 
@@ -215,7 +224,7 @@ describe('CameraRig + SubMesh follow the physics heading (F1)', () => {
     expect(rig.camera.position.x).toBeLessThan(pos.x - 0.75 * cam.chaseOffset.z);
     expect(Math.abs(rig.camera.position.z - pos.z)).toBeLessThan(1);
     const dir = rig.camera.getWorldDirection(new Vector3());
-    expect(dir.x).toBeGreaterThan(0.5); // toward +X, dipped by chaseLookDrop
+    expect(dir.x).toBeGreaterThan(0.5); // toward +X
     expect(Math.abs(dir.z)).toBeLessThan(1e-6);
   });
 

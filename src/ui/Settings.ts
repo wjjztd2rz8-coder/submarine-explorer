@@ -299,7 +299,7 @@ export class SettingsScreen {
 
     const access = this.section(`${id}-a11y`, 'Accessibility');
     access.append(
-      this.checkbox('reduceMotion', 'Reduce motion (no camera shake or banking)'),
+      this.checkbox('reduceMotion', 'Reduce motion (no camera banking)'),
       this.checkbox('captions', 'Captions for sounds'),
       this.select(
         'sonarPalette',
@@ -336,7 +336,7 @@ export class SettingsScreen {
     );
     this.bindingsList = el('div', 'settings-bindings');
     this.bindingsList.setAttribute('role', 'list');
-    const pointerLock = el('button', 'settings-pointer-lock', 'Enable pointer lock');
+    const pointerLock = el('button', 'settings-pointer-lock', 'Enable pointer look');
     pointerLock.type = 'button';
     pointerLock.addEventListener('click', () => {
       this.close();
@@ -345,7 +345,7 @@ export class SettingsScreen {
     const cameraNote = el(
       'p',
       'settings-note',
-      'Drag on the dive view to orbit; use the wheel to zoom. Pointer lock is optional. C also descends.',
+      'Drag on the dive view to look; use the wheel to zoom. The HUD button and a double-click reset the camera. Pointer look is optional.',
     );
     keys.append(keysHint, cameraNote, pointerLock, this.bindingsList);
 

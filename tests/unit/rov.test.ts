@@ -2,7 +2,11 @@ import { PointLight, SpotLight, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
-import { BINDINGS_STORAGE_KEY, Input } from '../../src/core/Input.js';
+import {
+  BINDINGS_STORAGE_KEY,
+  PREVIOUS_BINDINGS_STORAGE_KEY,
+  Input,
+} from '../../src/core/Input.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
 import { Scanner } from '../../src/game/Scanner.js';
 import { Rov } from '../../src/rov/Rov.js';
@@ -45,7 +49,7 @@ describe('tethered ROV', () => {
 
   it('exposes E as an edge action and adds it to earlier v2 bindings', () => {
     const values = new Map([
-      [BINDINGS_STORAGE_KEY, JSON.stringify({ version: 2, keys: { scan: ['KeyG'] } })],
+      [PREVIOUS_BINDINGS_STORAGE_KEY, JSON.stringify({ version: 2, keys: { scan: ['KeyF'] } })],
     ]);
     const input = new Input({
       storage: {
@@ -60,6 +64,7 @@ describe('tethered ROV', () => {
     });
     expect(input.primaryKeyLabel('toggleRov')).toBe('E');
     expect(input.primaryKeyLabel('scan')).toBe('G');
+    expect(JSON.parse(values.get(BINDINGS_STORAGE_KEY)!).version).toBe(3);
     expect(JSON.parse(values.get(BINDINGS_STORAGE_KEY)!).keys.toggleRov).toEqual(['KeyE']);
     input.injectKey('KeyE', true);
     expect(input.sample().toggleRov).toBe(true);

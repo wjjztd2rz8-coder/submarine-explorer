@@ -159,7 +159,7 @@ for (const id of missionIds) {
         () =>
           (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed,
       );
-      await page.keyboard.down('f');
+      await page.keyboard.down('g');
       try {
         await page.waitForFunction(
           (objectiveId) =>
@@ -172,7 +172,7 @@ for (const id of missionIds) {
           { timeout: 30_000 },
         );
       } finally {
-        await page.keyboard.up('f');
+        await page.keyboard.up('g');
       }
       const completed = await page.evaluate(
         () =>

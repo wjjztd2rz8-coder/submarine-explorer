@@ -196,9 +196,7 @@ test.describe('A3 submarine feel', () => {
     expect(r.lookDotFwd).toBeGreaterThan(0.8); // and looking the way it travels
   });
 
-  test('flying into the seabed pushes out, shakes the camera, and never clips', async ({
-    page,
-  }) => {
+  test('flying into the seabed pushes out and never clips', async ({ page }) => {
     await page.goto('/?tile=titanic', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
     await page.waitForTimeout(500);

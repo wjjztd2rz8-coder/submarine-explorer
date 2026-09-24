@@ -342,8 +342,7 @@ export interface WaterConfig {
 export interface CameraConfig {
   /** Chase offset in the sub's local frame (x right, y up, z back). */
   chaseOffset: { x: number; y: number; z: number };
-  /** Exponential smoothing half-life in seconds (lower = snappier). */
-  positionHalfLife: number;
+  /** Bank-follow smoothing half-life in seconds. Pointer motion stays direct. */
   rotationHalfLife: number;
   fovDeg: number;
   near: number;
@@ -351,11 +350,10 @@ export interface CameraConfig {
   /** Eye offset used in first-person mode. */
   firstPersonOffset: { x: number; y: number; z: number };
   /**
-   * Metres the chase camera's aim point is dropped below the boat's forward
-   * axis. Without it the camera stares at the fogged horizon and the seabed
-   * only occupies a sliver at the bottom of the frame.
+   * Metres the chase camera aims above the boat's forward axis, placing the
+   * hull in the lower third while leaving the site ahead in view.
    */
-  chaseLookDrop: number;
+  chaseLookRise: number;
 
   // --- A3: rig -------------------------------------------------------------
   /**
@@ -371,31 +369,11 @@ export interface CameraConfig {
   lookAheadPerSpeed: number;
   /** Metres the camera is kept above the seabed; it never clips through. */
   terrainClearance: number;
-  /** Peak camera shake displacement (m) at hull stress 1.0. */
-  shakeAmplitude: number;
-  /** Shake decay half-life (s) and oscillation frequency (Hz). */
-  shakeHalfLife: number;
-  shakeFrequency: number;
   /** Fraction of the boat's visual roll the chase camera copies. */
   bankFollow: number;
   /** Photo-mode free orbit: radius and starting elevation (radians). */
   orbitRadius: number;
   orbitElevation: number;
-
-  // --- fix S: scan-target framing (QA-B #6) ---------------------------------
-  /**
-   * While a scan target is in range (`CameraUpdateOptions.focus`), the chase
-   * camera slides this far sideways (to the target's side) and up, so the
-   * line of sight to the target clears the boat's own hull.
-   */
-  focusSideM: number;
-  focusRaiseM: number;
-  /** Fraction of the aim point pulled toward the focus target (0..1). */
-  focusLookBlend: number;
-  /** Half-life (s) of the blend in and out of the focus framing. */
-  focusHalfLife: number;
-  /** Target lateral offset (m, boat frame) needed before the camera swaps sides. */
-  focusSideHysteresisM: number;
 }
 
 export interface AudioConfig {
@@ -1321,31 +1299,21 @@ export const DEFAULT_CONFIG: GameConfig = {
     },
   },
   camera: {
-    chaseOffset: { x: 0, y: 16, z: 40 },
-    positionHalfLife: 0.16,
+    chaseOffset: { x: 0, y: 38, z: 90 },
     rotationHalfLife: 0.12,
     fovDeg: 62,
     near: 0.5,
     far: 60000,
     firstPersonOffset: { x: 0, y: 4, z: -12 },
-    chaseLookDrop: 15,
+    chaseLookRise: 15,
 
-    chaseLookAhead: 52,
+    chaseLookAhead: 80,
     firstPersonLookAhead: 300,
     lookAheadPerSpeed: 12,
     terrainClearance: 6,
-    shakeAmplitude: 2.2,
-    shakeHalfLife: 0.22,
-    shakeFrequency: 17,
     bankFollow: 0.55,
     orbitRadius: 90,
     orbitElevation: 0.35,
-
-    focusSideM: 22,
-    focusRaiseM: 8,
-    focusLookBlend: 0.35,
-    focusHalfLife: 0.025,
-    focusSideHysteresisM: 6,
   },
   audio: {
     masterVolume: 0.6,

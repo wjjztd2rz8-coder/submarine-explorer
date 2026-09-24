@@ -106,6 +106,7 @@ export class HUD {
   private readonly promptEl: HTMLDivElement;
   private readonly speedEl: HTMLDivElement;
   private readonly tipsEl: HTMLDivElement;
+  private readonly resetCameraEl: HTMLButtonElement;
   private readonly powerEl: HTMLDivElement;
   private readonly currentEl: HTMLDivElement;
   private currentMode: GameplayOptions['currents'] = 'off';
@@ -141,6 +142,7 @@ export class HUD {
       <div class="hud-objective" hidden></div>
       <div class="hud-prompt" hidden></div>
       <div class="hud-control-tips" hidden></div>
+      <button class="hud-reset-camera" type="button" aria-label="Reset camera">Reset camera</button>
       <div class="hud-attribution"></div>
     `;
     for (const el of this.root.querySelectorAll<HTMLSpanElement>('[data-field]')) {
@@ -153,6 +155,7 @@ export class HUD {
     this.promptEl = this.root.querySelector('.hud-prompt') as HTMLDivElement;
     this.speedEl = this.root.querySelector('.hud-sim-speed') as HTMLDivElement;
     this.tipsEl = this.root.querySelector('.hud-control-tips') as HTMLDivElement;
+    this.resetCameraEl = this.root.querySelector('.hud-reset-camera') as HTMLButtonElement;
     this.powerEl = this.root.querySelector('.hud-power') as HTMLDivElement;
     this.currentEl = this.root.querySelector('.hud-current') as HTMLDivElement;
     const attr = this.root.querySelector('.hud-attribution') as HTMLDivElement;
@@ -160,6 +163,10 @@ export class HUD {
 
     parent.appendChild(this.root);
     this.set('tile', `${meta.id} (${meta.cols}×${meta.rows})`);
+  }
+
+  onResetCamera(handler: () => void): void {
+    this.resetCameraEl.addEventListener('click', handler);
   }
 
   private showContext(el: HTMLDivElement, text: string | null | undefined): void {

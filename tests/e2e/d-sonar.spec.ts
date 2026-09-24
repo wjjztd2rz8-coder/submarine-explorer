@@ -115,14 +115,14 @@ test('sonar follows the sub, zooms by keys and wheel, and marks dive scan state'
   await shot(page, 'expanded');
   await page.keyboard.press('m');
 
-  await page.keyboard.down('f');
+  await page.keyboard.down('g');
   await page.waitForFunction(
     () =>
       (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed === 1,
     undefined,
     { timeout: 15_000 },
   );
-  await page.keyboard.up('f');
+  await page.keyboard.up('g');
   await expect.poll(() => marker(page, 'titanic-bow')).toMatchObject({ scanned: true, icon: '✓' });
   await page.evaluate(() => {
     (window.__game as { sonar: { setPalette(name: 'highContrast'): void } }).sonar.setPalette(

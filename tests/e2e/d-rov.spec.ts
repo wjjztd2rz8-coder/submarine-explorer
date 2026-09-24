@@ -87,14 +87,14 @@ test('deploy, scan through the shared discovery path, and retrieve', async ({ pa
   const deployedExposure = await exposure(page, `${shots}/deployed.png`);
   expect(deployedExposure.nearWhite).toBeLessThan(0.05);
   expect(deployedExposure.centreMean).toBeGreaterThan(35);
-  await page.keyboard.down('f');
+  await page.keyboard.down('g');
   await page.waitForFunction(
     () =>
       (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed === 1,
     undefined,
     { timeout: 15000 },
   );
-  await page.keyboard.up('f');
+  await page.keyboard.up('g');
   expect(
     await page.evaluate(
       () =>
@@ -115,6 +115,16 @@ test('tether limit and pause return control safely; controls show E', async ({ p
   await mkdir(shots, { recursive: true });
   await page.goto('/?tile=titanic');
   await page.waitForFunction(() => window.__gameReady);
+  // Use an open-water anchor so the world-edge or terrain clamp cannot shorten
+  // the intended 150 m tether setup.
+  await page.evaluate(() => {
+    const g = window.__game as {
+      sub: { reset(x: number, y: number, z: number, yaw: number): void };
+      terrain: { sampleHeight(x: number, z: number): number };
+    };
+    const floor = Math.max(g.terrain.sampleHeight(0, 0), g.terrain.sampleHeight(0, -150));
+    g.sub.reset(0, floor + 100, 0, 0);
+  });
   await page.keyboard.press('e');
   await expect
     .poll(() => page.evaluate(() => (window.__game as { rov: { deployed: boolean } }).rov.deployed))
@@ -126,6 +136,15 @@ test('tether limit and pause return control safely; controls show E', async ({ p
     };
     g.rov.position.set(g.sub.position.x, g.sub.position.y, g.sub.position.z - 149.6);
   });
+  expect(
+    await page.evaluate(() => {
+      const g = window.__game as {
+        rov: { position: { distanceTo(p: unknown): number } };
+        sub: { position: unknown };
+      };
+      return g.rov.position.distanceTo(g.sub.position);
+    }),
+  ).toBeGreaterThan(149);
   await page.keyboard.down('w');
   await expect(page.locator('.hud-rov')).toContainText('TETHER LIMIT');
   await page.keyboard.up('w');
