@@ -41,6 +41,7 @@ export class CameraRig {
   private readonly currentTarget = new THREE.Vector3();
   private readonly lastSubPos = new THREE.Vector3();
   private readonly freeLookTargetOffset = new THREE.Vector3();
+  private freeLookAimElapsed = 0;
   private readonly offset = new THREE.Vector3();
   private readonly quat = new THREE.Quaternion();
   private readonly euler = new THREE.Euler(0, 0, 0, 'YXZ');
@@ -123,6 +124,7 @@ export class CameraRig {
     this.pendingLookAzimuth = 0;
     this.pendingLookElevation = 0;
     this.freeLookTargetOffset.set(0, 0, 0);
+    this.freeLookAimElapsed = 0;
     this.chaseRadius = Math.hypot(
       this.config.chaseOffset.x,
       this.config.chaseOffset.y,
@@ -153,6 +155,7 @@ export class CameraRig {
           this.lookAzimuth = Math.atan2(o.x, o.z);
           this.lookElevation = Math.asin(clamp(o.y / Math.max(radius, 1), -1, 1));
           this.freeLookTargetOffset.copy(this.currentTarget).sub(this.lastSubPos);
+          this.freeLookAimElapsed = 0;
           this.bank = 0;
           this.freeLook = true;
           dAzimuth = this.pendingLookAzimuth;
@@ -233,8 +236,15 @@ export class CameraRig {
       this.desiredPosition.copy(subPos).add(this.offset);
 
       if (this.mode === 'chase') {
-        if (this.freeLook) this.desiredTarget.copy(subPos).add(this.freeLookTargetOffset);
-        else
+        if (this.freeLook) {
+          this.freeLookAimElapsed = Math.min(
+            c.freeLookAimSeconds,
+            this.freeLookAimElapsed + Math.max(0, dt),
+          );
+          const t = clamp(this.freeLookAimElapsed / c.freeLookAimSeconds, 0, 1);
+          const eased = t * t * (3 - 2 * t);
+          this.desiredTarget.copy(subPos).addScaledVector(this.freeLookTargetOffset, 1 - eased);
+        } else
           this.desiredTarget
             .set(0, c.chaseLookRise, -c.chaseLookAhead)
             .applyAxisAngle(new THREE.Vector3(0, 1, 0), -yaw)

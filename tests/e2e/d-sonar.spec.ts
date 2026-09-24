@@ -36,6 +36,15 @@ async function d2Shot(page: Page, name: string): Promise<void> {
   await page.screenshot({ path: `${d2Shots}/${name}.png` });
 }
 
+async function waitForZoom(page: Page): Promise<void> {
+  await page.waitForFunction(() => {
+    const sonar = (
+      window.__game as { sonar: { zoom: number | 'tile'; targetZoom: number | 'tile' } }
+    ).sonar;
+    return sonar.zoom === sonar.targetZoom;
+  });
+}
+
 test('visible sonar controls, expanded wheel routing, and live marker setting', async ({
   page,
 }) => {
@@ -49,6 +58,7 @@ test('visible sonar controls, expanded wheel routing, and live marker setting', 
   await d2Shot(page, 'mini-sonar');
   await sonar.getByRole('button', { name: 'Sonar zoom in' }).click();
   await expect(sonar.locator('.d-sonar-range')).toHaveText('500 m');
+  await waitForZoom(page);
   await page.keyboard.press('m');
   await expect(sonar).toHaveClass(/d-sonar-expanded/);
   await d2Shot(page, 'expanded-sonar');
@@ -58,6 +68,7 @@ test('visible sonar controls, expanded wheel routing, and live marker setting', 
   await page.mouse.move(1100, 450);
   await page.mouse.wheel(0, -100);
   await expect(sonar.locator('.d-sonar-range')).toHaveText('250 m');
+  await waitForZoom(page);
   await page.waitForTimeout(100);
   expect(
     await page.evaluate(() => (window.__game as { rig: { chaseRadius: number } }).rig.chaseRadius),
@@ -99,15 +110,18 @@ test('sonar follows the sub, zooms by keys and wheel, and marks dive scan state'
 
   await page.keyboard.press('Equal');
   await expect(sonar.locator('.d-sonar-range')).toHaveText('500 m');
+  await waitForZoom(page);
   await expect.poll(async () => (await marker(page, 'titanic-bow'))?.py).not.toBe(beforeZoom?.py);
   await shot(page, 'zoomed');
   await shot(page, 'zoomed-in');
   await sonar.hover();
   await page.mouse.wheel(0, -100);
   await expect(sonar.locator('.d-sonar-range')).toHaveText('250 m');
+  await waitForZoom(page);
   await expect.poll(() => marker(page, 'titanic-stern')).toMatchObject({ visible: false });
   await page.keyboard.press('Minus');
   await expect(sonar.locator('.d-sonar-range')).toHaveText('500 m');
+  await waitForZoom(page);
   await page.keyboard.press('m');
   await expect(sonar).toHaveClass(/d-sonar-expanded/);
   await expect(page.locator('.d-sonar-backdrop')).toBeVisible();
@@ -140,6 +154,7 @@ test('whole-tile step remains available and sensor range gates POIs', async ({ p
   });
   const sonar = page.locator('.sonar');
   await expect(sonar.locator('.d-sonar-range')).toHaveText('Whole tile');
+  await waitForZoom(page);
   await expect
     .poll(() => marker(page, 'titanic-stern'))
     .toMatchObject({ icon: '·', visible: true });
@@ -174,6 +189,7 @@ test('whole-tile step remains available and sensor range gates POIs', async ({ p
     map.setZoom(1000);
     map.setSensorRange(1);
   });
+  await waitForZoom(page);
   await expect.poll(() => marker(page, 'titanic-bow')).toMatchObject({ visible: false });
   await page.evaluate(() => {
     (window.__game as { sonar: { setSensorRange(range: number): void } }).sonar.setSensorRange(
@@ -207,5 +223,6 @@ test('local canyon relief shows measured depth bands and labelled contours', asy
     ).sonar.relief;
     return relief.spanM > 40 && Number.isFinite(relief.contourIntervalM);
   });
+  await waitForZoom(page);
   await shot(page, 'relief-canyon');
 });

@@ -354,6 +354,8 @@ export interface CameraConfig {
    * hull in the lower third while leaving the site ahead in view.
    */
   chaseLookRise: number;
+  /** Time to bring the free-look aim from chase framing onto the hull. */
+  freeLookAimSeconds: number;
 
   // --- A3: rig -------------------------------------------------------------
   /**
@@ -1306,6 +1308,7 @@ export const DEFAULT_CONFIG: GameConfig = {
     far: 60000,
     firstPersonOffset: { x: 0, y: 4, z: -12 },
     chaseLookRise: 15,
+    freeLookAimSeconds: 0.2,
 
     chaseLookAhead: 80,
     firstPersonLookAhead: 300,

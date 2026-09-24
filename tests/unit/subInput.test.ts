@@ -12,9 +12,12 @@ import {
   BINDINGS_STORAGE_KEY,
   LEGACY_BINDINGS_STORAGE_KEY,
   PREVIOUS_BINDINGS_STORAGE_KEY,
+  POINTER_LOOK_STORAGE_KEY,
   Input,
   defaultActions,
   keyLabel,
+  shouldPauseAfterPointerLookLoss,
+  shouldRequestPointerLook,
   type BindingStore,
 } from '../../src/core/Input.js';
 
@@ -38,6 +41,27 @@ function makeInput(): Input {
 
 beforeEach(() => {
   store = new MemoryStore();
+});
+
+describe('pointer look preference and lock decisions', () => {
+  it('persists the preference independently of the current browser lock', () => {
+    const input = makeInput();
+    input.setPointerLookPreference(true);
+    expect(store.getItem(POINTER_LOOK_STORAGE_KEY)).toBe('true');
+    expect(input.pointerLookEnabled).toBe(true);
+    expect(input.pointerLookActive).toBe(false);
+    expect(makeInput().pointerLookEnabled).toBe(true);
+  });
+
+  it('requests only on a clear dive and pauses only for unexpected lock loss', () => {
+    expect(shouldRequestPointerLook(true, true, false, false)).toBe(true);
+    expect(shouldRequestPointerLook(true, true, true, false)).toBe(false);
+    expect(shouldRequestPointerLook(true, false, false, false)).toBe(false);
+    expect(shouldRequestPointerLook(false, true, false, false)).toBe(false);
+    expect(shouldPauseAfterPointerLookLoss(true, true, true, false)).toBe(true);
+    expect(shouldPauseAfterPointerLookLoss(true, true, true, true)).toBe(false);
+    expect(shouldPauseAfterPointerLookLoss(true, false, true, false)).toBe(false);
+  });
 });
 
 describe('Input action map', () => {

@@ -230,6 +230,28 @@ export interface InputOptions {
   mouseLook?: boolean;
 }
 
+export const POINTER_LOOK_STORAGE_KEY = 'subexplorer.pointerLook.v1';
+
+/** Browser lock requests are useful only during an unobstructed dive. */
+export function shouldRequestPointerLook(
+  enabled: boolean,
+  diving: boolean,
+  overlayOpen: boolean,
+  locked: boolean,
+): boolean {
+  return enabled && diving && !overlayOpen && !locked;
+}
+
+/** An unexpected lock loss is the browser's exit gesture. */
+export function shouldPauseAfterPointerLookLoss(
+  enabled: boolean,
+  wasLocked: boolean,
+  diving: boolean,
+  overlayOpen: boolean,
+): boolean {
+  return enabled && wasLocked && diving && !overlayOpen;
+}
+
 export class Input {
   readonly state: InputState = {
     throttle: 0,
@@ -262,6 +284,10 @@ export class Input {
   private byId = new Map<ActionId, ActionBinding>();
   private mouseDown = false;
   private mouseLook: boolean;
+  private pointerLookPreference = false;
+  get pointerLookEnabled(): boolean {
+    return this.pointerLookPreference;
+  }
   get pointerLookActive(): boolean {
     return this.mouseLook;
   }
@@ -281,6 +307,11 @@ export class Input {
     this.target = opts.target ?? null;
     this.mouseLook = opts.mouseLook ?? false;
     this.storage = opts.storage !== undefined ? opts.storage : safeStorage();
+    try {
+      this.pointerLookPreference = this.storage?.getItem(POINTER_LOOK_STORAGE_KEY) === 'true';
+    } catch {
+      // Storage is optional; this session still works.
+    }
     this.reindex();
     this.loadBindings();
   }
@@ -414,6 +445,15 @@ export class Input {
   // ------------------------------------------------------------- listeners
 
   /** Enable or disable free mouse movement while the canvas holds pointer lock. */
+  setPointerLookPreference(enabled: boolean): void {
+    this.pointerLookPreference = enabled;
+    try {
+      this.storage?.setItem(POINTER_LOOK_STORAGE_KEY, String(enabled));
+    } catch {
+      // Storage is optional; this session still works.
+    }
+  }
+
   setMouseLook(enabled: boolean): void {
     this.mouseLook = enabled;
     if (!enabled) {
