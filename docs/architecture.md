@@ -328,13 +328,14 @@ EventBus; see [`docs/audio.md`](./audio.md).
 
 ## Persistence
 
-| localStorage key             | Owner                    | Shape                                                                                                         |
-| ---------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| `subexplorer.bindings.v1`    | `core/Input.ts`          | versioned key bindings                                                                                        |
-| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }`                                            |
-| `subexplorer.settings.v1`    | `core/Save.ts`           | `{ version: 1, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette }` |
+| localStorage key             | Owner                    | Shape                                                                                                                       |
+| ---------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `subexplorer.bindings.v1`    | `core/Input.ts`          | versioned key bindings                                                                                                      |
+| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }`                                                          |
+| `subexplorer.settings.v1`    | `core/Save.ts`           | `{ version: 1, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette }`               |
+| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | `{ version: 1, photos: [{ id, image (JPEG data URL, ≤640 px), siteId, siteName, poiId, poiName, at, depthM }] }`, newest 24 |
 
-All three are versioned, guarded (no storage → in-memory), and never throw.
+All are versioned, guarded (no storage → in-memory), and never throw.
 `Save` also points at the other two keys by name (`SAVE_KEYS`) so a future
 "reset everything" screen can find them without importing `Input` or
 `DiscoveryStore`.

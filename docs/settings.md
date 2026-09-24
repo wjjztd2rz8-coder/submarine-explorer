@@ -57,6 +57,7 @@ restores the shipped map. The HUD help follows the live bindings.
 | `subexplorer.settings.v1`    | `Save`           | `{ version: 1, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette, bindings }` |
 | `subexplorer.bindings.v1`    | `Input`          | `{ version: 1, keys: { <actionId>: string[] } }`, `[]` = deliberately unbound                                           |
 | `subexplorer.discoveries.v1` | `DiscoveryStore` | unchanged                                                                                                               |
+| `subexplorer.photos.v1`      | `PhotoStore`     | photo-mode captures, newest 24 (see `docs/architecture.md`); separate from discoveries                                  |
 
 `bindings` in the settings record is only a pointer to the bindings key. Each
 field is validated on load; a bad field falls back to its default alone. A

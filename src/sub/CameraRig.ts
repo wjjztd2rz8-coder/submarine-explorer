@@ -22,6 +22,13 @@ import type { HeightField } from './Submarine.js';
 
 export type CameraMode = 'chase' | 'first-person' | 'orbit';
 
+/**
+ * Photo-mode orbit radius limits (metres): close enough to fill the frame with
+ * the hull, never so far that the subject is lost in the fog.
+ */
+export const PHOTO_ORBIT_MIN_M = 6;
+export const PHOTO_ORBIT_MAX_M = 220;
+
 /** Per-frame extras. All optional so a bare `update(pos, yaw, pitch, dt)` works. */
 export interface CameraUpdateOptions {
   /** Cosmetic bank angle of the boat (radians). */
@@ -127,6 +134,32 @@ export class CameraRig {
     return this.setMode('orbit');
   }
 
+  // --- D-PHOTO begin ---
+  /**
+   * Enter photo mode without a jump: the orbit starts on the current line of
+   * sight, `target` metres away (clamped), looking at `target`.
+   */
+  enterPhotoMode(target: THREE.Vector3): CameraMode {
+    if (this.mode === 'orbit') return this.mode;
+    this.modeBeforeOrbit = this.mode;
+    const back = this.camera.getWorldDirection(this.offset).negate();
+    const r = this.camera.position.distanceTo(target);
+    this.orbitRadius = clamp(
+      this.mode === 'first-person' ? this.config.orbitRadius : r,
+      PHOTO_ORBIT_MIN_M,
+      PHOTO_ORBIT_MAX_M,
+    );
+    this.orbitElevation = clamp(Math.asin(clamp(back.y, -1, 1)), -1.4, 1.4);
+    this.orbitAzimuth = Math.atan2(back.x, back.z);
+    return this.setMode('orbit');
+  }
+
+  /** Leave photo mode for exactly the view it was entered from. */
+  exitPhotoMode(): CameraMode {
+    return this.mode === 'orbit' ? this.setMode(this.modeBeforeOrbit) : this.mode;
+  }
+  // --- D-PHOTO end ---
+
   setMode(mode: CameraMode): CameraMode {
     if (mode !== this.mode) this.initialised = false; // snap rather than sweep
     this.mode = mode;
@@ -138,7 +171,11 @@ export class CameraRig {
     if (this.mode === 'orbit') {
       this.orbitAzimuth += dAzimuth;
       this.orbitElevation = clamp(this.orbitElevation + dElevation, -1.4, 1.4);
-      this.orbitRadius = clamp(this.orbitRadius * (1 + dRadius), 15, 4000);
+      this.orbitRadius = clamp(
+        this.orbitRadius * (1 + dRadius),
+        PHOTO_ORBIT_MIN_M,
+        PHOTO_ORBIT_MAX_M,
+      );
     } else {
       this.lookAzimuth += dAzimuth;
       this.lookElevation = clamp(this.lookElevation + dElevation, -1.4, 1.4);

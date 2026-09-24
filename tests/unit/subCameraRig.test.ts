@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
-import { CameraRig } from '../../src/sub/CameraRig.js';
+import { CameraRig, PHOTO_ORBIT_MAX_M, PHOTO_ORBIT_MIN_M } from '../../src/sub/CameraRig.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 import { Submarine, type HeightField } from '../../src/sub/Submarine.js';
 
@@ -32,6 +32,29 @@ describe('CameraRig modes', () => {
     expect(rig.togglePhotoMode()).toBe('orbit');
     // Leaving photo mode returns to the view you were in, not to the default.
     expect(rig.togglePhotoMode()).toBe('first-person');
+  });
+
+  it('photo mode starts on the current view, stays in range and restores it exactly', () => {
+    const pos = new Vector3(0, -3000, 0);
+    const rig = new CameraRig(cam, 16 / 9, flatSeabed(-3040));
+    rig.orbit(0.4, 0.1, 0.3); // a dragged, zoomed chase view
+    rig.snap(pos, 0.7, 0);
+    const chase = rig.camera.position.clone();
+    const chaseLook = rig.camera.getWorldDirection(new Vector3());
+    expect(rig.enterPhotoMode(pos)).toBe('orbit');
+    rig.update(pos, 0.7, 0, DT);
+    expect(rig.camera.position.distanceTo(chase)).toBeLessThan(0.5);
+    expect(rig.camera.getWorldDirection(new Vector3()).angleTo(chaseLook)).toBeLessThan(0.01);
+    rig.orbit(1.2, -1.3, 50); // far below and far out
+    rig.update(pos, 0.7, 0, DT);
+    expect(rig.camera.position.distanceTo(pos)).toBeLessThanOrEqual(PHOTO_ORBIT_MAX_M + 1e-6);
+    expect(rig.camera.position.y).toBeGreaterThanOrEqual(-3040 + cam.terrainClearance - 1e-6);
+    rig.orbit(0, 0, -0.99);
+    rig.update(pos, 0.7, 0, DT);
+    expect(rig.orbitRadius).toBe(PHOTO_ORBIT_MIN_M);
+    expect(rig.exitPhotoMode()).toBe('chase');
+    rig.update(pos, 0.7, 0, DT);
+    expect(rig.camera.position.distanceTo(chase)).toBeLessThan(1e-6);
   });
 
   it('sits behind and above the boat in chase, and at the eye point in FP', () => {

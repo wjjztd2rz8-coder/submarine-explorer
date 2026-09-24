@@ -30,6 +30,10 @@ import {
 } from '../game/JournalData.js';
 import { formatDepthRange, OBIS_HOME_URL, obisTaxonUrl, type SpeciesDoc } from '../game/Species.js';
 import { FocusTrap } from './FocusTrap.js';
+// --- D-PHOTO begin ---
+import { PhotoGallery } from './PhotoGallery.js';
+import { PHOTO_LIMIT, type PhotoStore } from '../game/PhotoStore.js';
+// --- D-PHOTO end ---
 
 export interface GuideEmitter {
   emit<K extends keyof GameEvents>(name: K, payload: GameEvents[K]): void;
@@ -49,7 +53,11 @@ export const JOURNAL_HONESTY =
   'recreations placed from published sources; their entries carry a Recreation tag. ' +
   'Species lists are OBIS occurrence records for each survey area.';
 
-type View = { kind: 'front' } | { kind: 'site'; siteId: string } | { kind: 'entry'; key: string };
+type View =
+  | { kind: 'front' }
+  | { kind: 'photos' }
+  | { kind: 'site'; siteId: string }
+  | { kind: 'entry'; key: string };
 
 const NO_STORE: DiscoveryReader = { isDiscovered: () => false };
 
@@ -92,6 +100,10 @@ export class Journal {
   private pendingFocus: string | null = null;
   private open_ = false;
   private opened = false;
+  // --- D-PHOTO begin ---
+  private photos: PhotoStore | null = null;
+  private photoGallery: PhotoGallery | null = null;
+  // --- D-PHOTO end ---
 
   constructor(
     private readonly bus: GuideEmitter | null = null,
@@ -150,8 +162,31 @@ export class Journal {
   /** What is on screen: 'front', a site id, or an entry key (for tests). */
   get viewKey(): string {
     const v = this.view;
-    return v.kind === 'front' ? 'front' : v.kind === 'site' ? v.siteId : v.key;
+    return v.kind === 'front' || v.kind === 'photos'
+      ? v.kind
+      : v.kind === 'site'
+        ? v.siteId
+        : v.key;
   }
+
+  // --- D-PHOTO begin ---
+  setPhotoGallery(store: PhotoStore, gallery: PhotoGallery): void {
+    this.photos = store;
+    this.photoGallery = gallery;
+    this.refresh();
+  }
+
+  /** The catalogue name of a site, or its id in title case until the catalogue loads. */
+  siteName(id: string): string {
+    return (
+      this.sites.find((site) => site.id === id)?.name ??
+      id
+        .replace(/[-_]+/g, ' ')
+        .trim()
+        .replace(/\b\w/g, (c) => c.toUpperCase())
+    );
+  }
+  // --- D-PHOTO end ---
 
   /** The persistent discovery store the unlocks read. */
   setStore(store: DiscoveryReader): void {
@@ -251,6 +286,7 @@ export class Journal {
   /** Show the front page, a site page (site id) or an entry (entry key). */
   show(target: 'front' | string): void {
     if (target === 'front') this.view = { kind: 'front' };
+    else if (target === 'photos') this.view = { kind: 'photos' };
     else if (this.sites.some((s) => s.id === target)) this.view = { kind: 'site', siteId: target };
     else this.view = { kind: 'entry', key: target };
     this.render();
@@ -305,10 +341,17 @@ export class Journal {
     const entry = v.kind === 'entry' ? this.entryByKey(v.key) : null;
     const siteId = v.kind === 'site' ? v.siteId : (entry?.siteId ?? null);
     const site = sites.find((s) => s.id === siteId) ?? null;
-    this.crumbEl.textContent = site ? site.name : 'All dive sites';
+    this.crumbEl.textContent = site ? site.name : v.kind === 'photos' ? 'Photos' : 'All dive sites';
     this.renderNav(sites, site, entry);
 
     this.body.replaceChildren();
+    // --- D-PHOTO begin ---
+    if (v.kind === 'photos' && this.photoGallery) {
+      const list = this.photos?.photos ?? [];
+      this.photoGallery.render(this.body, list, `Photos · ${list.length} of ${PHOTO_LIMIT}`);
+      return;
+    }
+    // --- D-PHOTO end ---
     if (!this.sites.length) {
       this.body.append(el('p', 'jr-empty', 'Loading the Journal…'));
       return;
@@ -345,6 +388,18 @@ export class Journal {
     const scrollTop = this.nav.scrollTop;
     const ul = el('ul', 'jr-nav-list');
     ul.append(this.navButton('Front page', '', 'is-front', 'front', this.view.kind === 'front'));
+    // --- D-PHOTO begin ---
+    if (this.photoGallery)
+      ul.append(
+        this.navButton(
+          'Photos',
+          String(this.photos?.photos.length ?? 0),
+          'is-photos',
+          'photos',
+          this.view.kind === 'photos',
+        ),
+      );
+    // --- D-PHOTO end ---
     for (const s of sites) {
       const p = siteProgress(s, this.store);
       const cur = s.id === this.currentSiteId && !this.homeMode;
@@ -500,6 +555,7 @@ export class Journal {
             : 'Find this target during a dive and hold the scanner on it to log it. Or show spoilers.',
         ),
       );
+      this.renderEntryPhotos(site, entry);
       return;
     }
     const titleRow = el('div', 'jr-title-row');
@@ -514,7 +570,10 @@ export class Journal {
       return;
     }
     const g = entry.guide;
-    if (!g) return;
+    if (!g) {
+      this.renderEntryPhotos(site, entry);
+      return;
+    }
     if (site.memorialNote && entry.kind === 'poi')
       b.append(el('p', 'jr-memorial', site.memorialNote));
     if (g.image) {
@@ -539,7 +598,22 @@ export class Journal {
       b.append(table);
     }
     this.renderSources(g.sources);
+    this.renderEntryPhotos(site, entry);
   }
+
+  // --- D-PHOTO begin ---
+  private renderEntryPhotos(site: JournalSite, entry: JournalEntry): void {
+    if (entry.kind !== 'poi' || !this.photoGallery || !this.photos) return;
+    const photos = this.photos.photos.filter(
+      (photo) =>
+        photo.siteId === site.id && photo.poiId !== null && entry.poiIds.includes(photo.poiId),
+    );
+    if (!photos.length) return;
+    const section = el('section', 'jr-entry-photos');
+    this.body.append(section);
+    this.photoGallery.render(section, photos, 'Photos of this place');
+  }
+  // --- D-PHOTO end ---
 
   private renderSpecies(site: JournalSite, entry: JournalEntry): void {
     const b = this.body;

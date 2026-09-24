@@ -89,6 +89,12 @@ import { Rov } from './rov/Rov.js';
 import { RovVisual } from './rov/RovVisual.js';
 import { RovHUD } from './ui/RovHUD.js';
 // --- D-ROV end ---
+// --- D-PHOTO begin ---
+import { PHOTO_LIMIT, PhotoStore, poiInPhoto } from './game/PhotoStore.js';
+import type { PlacedPoi } from './game/Pois.js';
+import { PhotoGallery } from './ui/PhotoGallery.js';
+import { PhotoMode, canvasThumbnail } from './ui/PhotoMode.js';
+// --- D-PHOTO end ---
 
 declare global {
   interface Window {
@@ -834,6 +840,16 @@ async function main(): Promise<void> {
   journal.setCurrentSite(contentLandmark);
   journal.setHomeMode(appState === 'home');
   bus.on('app:state', ({ state }) => journal.setHomeMode(state === 'home'));
+  // --- D-PHOTO begin ---
+  // Photos live in their own store (subexplorer.photos.v1) and show in the
+  // Journal's Photos page and on each POI entry. The viewfinder is PhotoMode.
+  const photos = new PhotoStore();
+  journal.setPhotoGallery(photos, new PhotoGallery(photos, () => journal.refresh()));
+  let photoCaptureRequested = false;
+  const photoMode = new PhotoMode(() => {
+    photoCaptureRequested = true;
+  });
+  // --- D-PHOTO end ---
   if (missionRouter) {
     const surface = document.createElement('button');
     surface.type = 'button';
@@ -892,6 +908,14 @@ async function main(): Promise<void> {
       missionRouter?.debriefOpen
     )
       return;
+    // --- D-PHOTO begin ---
+    if (photoMode.active) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      exitPhotoMode();
+      return;
+    }
+    // --- D-PHOTO end ---
     if (document.pointerLockElement) {
       document.exitPointerLock?.();
     }
@@ -1027,6 +1051,59 @@ async function main(): Promise<void> {
   bus.on('mission:started', abortRov);
   bus.on('sub:emergencyBlow', abortRov);
   // --- D-ROV end ---
+  // --- D-PHOTO begin ---
+  // Photo mode freezes the sim like pause; the camera orbits whatever is being
+  // piloted (the ROV when deployed) and leaving restores the previous view.
+  let photoPoi: PlacedPoi | null = null;
+  let lastCaptureMs = -Infinity;
+  const enterPhotoMode = (): void => {
+    document.exitPointerLock?.();
+    void journal.load(); // site names for the caption
+    rig.enterPhotoMode(rov.deployed ? rov.position : sub.position);
+    photoMode.setActive(true, input.primaryKeyLabel('capturePhoto'));
+    photoCaptureRequested = false;
+  };
+  function exitPhotoMode(): void {
+    if (!photoMode.active) return;
+    photoMode.setActive(false);
+    rig.exitPhotoMode();
+    photoCaptureRequested = false;
+    // Orbit drag/wheel still queued for this frame must not move the old view.
+    input.state.lookDx = 0;
+    input.state.lookDy = 0;
+    input.wheelDelta = 0;
+  }
+  bus.on('app:state', ({ state }) => {
+    if (state !== 'dive') exitPhotoMode();
+  });
+  const capturePhoto = (target: THREE.Vector3): void => {
+    const now = performance.now();
+    if (now - lastCaptureMs < 400) return; // Enter on the focused button fires twice
+    lastCaptureMs = now;
+    const image = canvasThumbnail(renderer.domElement);
+    if (!image) {
+      photoMode.toast('This browser could not create the photo.', true);
+      return;
+    }
+    const result = photos.save({
+      id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      image,
+      siteId: contentLandmark,
+      siteName: journal.siteName(contentLandmark),
+      poiId: photoPoi?.id ?? null,
+      poiName: photoPoi?.name ?? null,
+      at: new Date().toISOString(),
+      depthM: Math.round(Math.max(0, -target.y) * 10) / 10,
+    });
+    if (!result.saved) photoMode.toast(result.error, true);
+    else if (result.dropped)
+      photoMode.toast(
+        `Saved to Journal · oldest ${result.dropped === 1 ? 'photo' : `${result.dropped} photos`} removed (keeps ${PHOTO_LIMIT})`,
+      );
+    else photoMode.toast('Saved to Journal');
+    journal.refresh();
+  };
+  // --- D-PHOTO end ---
   let ready = false;
   let lastTerrainLog = 0;
   let wasFrozen = false;
@@ -1053,8 +1130,17 @@ async function main(): Promise<void> {
       discovery.guide.isOpen;
     // --- D-SHELL end ---
     // --- D-POWER begin ---
-    const frozen = shellFrozen || discovery.debrief.isOpen;
+    const blocked =
+      shellFrozen || discovery.debrief.isOpen || (missionRouter?.debriefOpen ?? false);
     // --- D-POWER end ---
+    // --- D-PHOTO begin ---
+    if (photoMode.active && blocked) exitPhotoMode();
+    else if (sampled.togglePhotoMode) {
+      if (photoMode.active) exitPhotoMode();
+      else if (!blocked) enterPhotoMode();
+    }
+    const frozen = shellFrozen || discovery.debrief.isOpen || photoMode.active;
+    // --- D-PHOTO end ---
     // --- D-INPUT-HUD begin ---
     if (wasFrozen && !frozen) void lockKeyboard();
     wasFrozen = frozen;
@@ -1063,7 +1149,7 @@ async function main(): Promise<void> {
     const steps = frozen ? 0 : realSteps;
     // --- B3 end ---
     // --- D-ROV begin ---
-    if (frozen || missionRouter?.debriefOpen || discovery.debrief.isOpen) abortRov();
+    if (blocked) abortRov(); // D-PHOTO: photo mode keeps the ROV out
     if (!frozen && state.toggleRov && !sub.getState().emergencyBlow) {
       if (rov.mode === 'piloting') rov.retrieve();
       else if (!rov.deployed && rov.deploy(sub.position, sub.yaw)) {
@@ -1121,9 +1207,8 @@ async function main(): Promise<void> {
     if (state.toggleCamera && !rov.deployed) {
       rig.toggleMode();
     }
-    if (state.togglePhotoMode && !rov.deployed) rig.togglePhotoMode();
     // --- D-INPUT-HUD begin ---
-    if (!frozen) {
+    if (!frozen || photoMode.active) {
       if (sampled.lookDx || sampled.lookDy)
         rig.orbit(-sampled.lookDx * 0.004, sampled.lookDy * 0.004);
       if (input.wheelDelta) rig.orbit(0, 0, input.wheelDelta * 0.001);
@@ -1176,7 +1261,7 @@ async function main(): Promise<void> {
     subMesh.setPose(sub.position, sub.yaw, sub.pitch, sub.roll);
     subMesh.update(rov.deployed ? 0 : state.throttle, time.frameDelta);
     // Hide our own hull in first person so it does not fill the screen.
-    subMesh.group.visible = rig.mode === 'chase';
+    subMesh.group.visible = rig.mode !== 'first-person'; // D-PHOTO: and in the photo orbit
     // --- D-ROV begin ---
     rovVisual.update(rov, sub.position);
     rovHud.update(rov);
@@ -1205,7 +1290,7 @@ async function main(): Promise<void> {
       },
     );
     // --- D-ROV begin ---
-    if (rov.deployed) {
+    if (rov.deployed && rig.mode !== 'orbit') {
       rig.camera.position.y += config.rov.cameraRaiseM;
       cameraFromSub.copy(rig.camera.position).sub(sub.position);
       const distance = cameraFromSub.length();
@@ -1221,6 +1306,13 @@ async function main(): Promise<void> {
         rig.camera.position.distanceTo(sub.position) > config.rov.mothershipCameraClearanceM + 3;
     }
     // --- D-ROV end ---
+    // --- D-PHOTO begin ---
+    if (photoMode.active) {
+      photoPoi = poiInPhoto(rig.camera, discovery.pois, pilotPosition);
+      photoMode.setCaption(journal.siteName(contentLandmark), photoPoi?.name ?? null);
+      if (sampled.capturePhoto) photoCaptureRequested = true;
+    }
+    // --- D-PHOTO end ---
     const atmo = atmosphere.update(rig.camera.position.y, sub.position, time.frameDelta);
     // --- C3 begin ---
     presets.update(
@@ -1364,6 +1456,13 @@ async function main(): Promise<void> {
       renderer.setRenderTarget(null);
       renderer.render(scene, rig.camera);
     }
+    // --- D-PHOTO begin ---
+    // Read the canvas in the same task as the render, before it is composited.
+    if (photoCaptureRequested) {
+      photoCaptureRequested = false;
+      if (photoMode.active) capturePhoto(pilotPosition);
+    }
+    // --- D-PHOTO end ---
 
     input.endFrame();
 
@@ -1408,6 +1507,10 @@ async function main(): Promise<void> {
     rovHud,
     rovVisual,
     // --- D-ROV end ---
+    // --- D-PHOTO begin ---
+    photos,
+    photoMode,
+    // --- D-PHOTO end ---
     meta,
     // --- B1 begin ---
     scanner: discovery.scanner,
