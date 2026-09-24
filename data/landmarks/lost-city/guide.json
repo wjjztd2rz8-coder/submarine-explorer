@@ -8,8 +8,8 @@
       "paragraphs": [
         "The Lost City Hydrothermal Field sits on the southern summit of the Atlantis Massif, a dome-shaped mountain of mantle rock exposed on the Mid-Atlantic Ridge near 30°N. Unlike the famous 'black smoker' vents that run on volcanic heat, Lost City is powered by serpentinization: seawater reacting with olivine-rich mantle rock, producing heat, hydrogen and methane without any magma nearby.",
         "The field was found on 4 December 2000 by scientists diving in DSV Alvin with the robotic camera sled ArgoII, working from the research vessel Atlantis. Its towering white carbonate chimneys, some over 60 m tall, made it one of the most striking hydrothermal discoveries ever made.",
-        "The vent fluid is warm (40-90 degC) and strongly alkaline (pH over 9) rather than the scalding, acidic fluid of a black smoker. It carries abundant hydrogen and methane but little of the metal and sulfide that colour a black smoker's plume, so Lost City's towers are built of pale carbonate minerals rather than dark metal sulfides. The towers here are rendered in that pale cream-white carbonate colour; their shapes are simplified reconstructions.",
-        "The field is tiny: about 500 square metres, smaller than a single cell of the open bathymetry used for this tile (roughly 53 x 61 m per cell). The seabed terrain here is real survey data, but no individual chimney is resolved in it -- every tower you see is a placed reconstruction at an approximate position within the real depth band."
+        "The vent fluid is warm (40-90 degC) and strongly alkaline (pH over 9) rather than the scalding, acidic fluid of a black smoker. It carries abundant hydrogen and methane but little of the metal and sulfide that colour a black smoker's plume, so Lost City's towers are built of pale carbonate minerals rather than dark metal sulfides. The towers here are rendered in that pale cream-white carbonate colour.",
+        "The field is tiny: about 500 square metres, smaller than a single cell of the open bathymetry used for this tile (roughly 53 x 61 m per cell). The seabed terrain here is real survey data, but no individual chimney is resolved in it."
       ],
       "facts": [
         { "label": "Depth range", "value": "750-900 m" },
@@ -43,7 +43,7 @@
         "Poseidon is the field's largest carbonate structure, standing about 60 m tall. It is the closest thing Lost City has to a landmark within a landmark: a ragged, spired tower built up over tens of thousands of years as vent fluid met cold seawater and precipitated calcium carbonate, layer on layer.",
         "Chemical dating of Lost City's carbonate puts some chimneys at more than 100,000 years old and shows the field has vented, on and off, for at least 30,000 years -- making it vastly older than any known black smoker, which typically last only decades to a few centuries before they collapse or fizzle out.",
         "Because it needs only olivine rock and liquid water, serpentinization like this could in principle happen anywhere those two things meet -- including on icy moons such as Europa or Enceladus, which is one reason Lost City is studied as a possible model for life beyond Earth.",
-        "Artist's reconstruction: a tapered column at the corrected field position (see sources.md for the coordinate discrepancy). No survey has published Poseidon's exact footprint or shape."
+        "No survey has published Poseidon's exact footprint or shape."
       ],
       "facts": [
         { "label": "Height", "value": "about 60 m" },
@@ -78,7 +78,7 @@
       "title": "Beehive",
       "paragraphs": [
         "Beehive was a small, roughly 1 m high vent on Poseidon's flank. It released some of the hottest fluid measured at Lost City, about 91 degC during earlier surveys. Later researchers reported that the chimney itself was gone by their 2018 visit, although fluid still vented from its former opening.",
-        "Its marker here is offset from Poseidon so you can scan it separately. The marker's position and size are illustrative, not a survey of Beehive's footprint."
+        "Its marker here is offset from Poseidon so you can scan it separately."
       ],
       "facts": [
         { "label": "Historical height", "value": "about 1 m; structure absent in 2018 survey" }
@@ -105,7 +105,7 @@
       "title": "IMAX Tower",
       "paragraphs": [
         "IMAX is a parasitic chimney and flange on Poseidon's north face, built as warm, alkaline vent fluid mixed with seawater and deposited carbonate minerals. A 2005 expedition account described the chimney as about 8 m tall; a later detailed geologic survey described a roughly 30 m multipronged structure. Those measurements may refer to different parts of the growing complex.",
-        "The separately scannable tower here is an illustrative marker near Poseidon, not a surveyed coordinate or a full reconstruction of the flange complex."
+        "Its perch on Poseidon's flank makes it an easy stop right after the main tower, without a long swim across the field."
       ],
       "facts": [
         {
@@ -136,7 +136,7 @@
       "paragraphs": [
         "Lost City's chimneys are coated inside and out with thick biofilms of archaea and bacteria that live on the vent's own chemistry: hydrogen and methane, produced abiotically by the serpentinization reaction, with almost no help from sunlight or photosynthesis at all. A group of archaea related to the order Methanosarcinales dominates the warmest, most active surfaces.",
         "Larger animals are scarce compared with a black-smoker field: there are no tubeworms or giant clams here, the signature animals of sulfide vents. Instead, small corals, snails, bivalves, worms and crustaceans graze on the microbial mats and on each other.",
-        "This POI sits near a real cluster of OBIS occurrence records from a 2003 International Census of Marine Microbes survey of the field -- almost entirely archaea and bacteria identified from DNA, with no reported collection depth. What you see rendered here (a visible mat) is invented; the sampling location is grounded in real data. See species.json for the taxa found in this tile's bounding box."
+        "This POI sits near a real cluster of OBIS occurrence records from a 2003 International Census of Marine Microbes survey of the field -- almost entirely archaea and bacteria identified from DNA, with no reported collection depth."
       ],
       "facts": [
         {
@@ -163,7 +163,7 @@
       "title": "The Atlantis Massif summit",
       "paragraphs": [
         "The Atlantis Massif is an oceanic core complex: a dome of deep mantle and lower-crust rock, normally buried many kilometres down, exposed at the seafloor by a long-lived detachment fault that slides one tectonic block up and over another. Its summit, the shallowest point in this tile at 724 m, sits about 15 km from the main Mid-Atlantic Ridge spreading axis -- unusually far for hydrothermal activity, another sign that Lost City is not driven by fresh volcanic heat like a ridge-axis black smoker field.",
-        "This point is real GMRT bathymetry, not a reconstruction: the actual shallowest terrain sampled anywhere in this tile."
+        "This is the actual shallowest terrain sampled anywhere in this tile."
       ],
       "facts": [
         { "label": "Depth", "value": "724 m (tile minimum)" },
@@ -188,7 +188,7 @@
       "paragraphs": [
         "This point is worth a look because of what it teaches about working with real data. Both Wikipedia's infobox and this game's landmark catalog give Lost City's position as a rounded 30 degrees 07' N, 42 degrees 07' W -- a coordinate precise only to the nearest arc-minute, about 1.8 km. On this tile's real bathymetry, that exact point lands here, 1,332 m deep, partway down the Atlantis Massif's steep south wall -- far below the field's true 750-900 m depth range.",
         "The real Lost City field sits about 665 m north of this point, up on the massif's southern summit flank, which is where every vent POI in this mission is actually placed. This POI is kept at the catalog's literal coordinate so you can compare the two and see the gap for yourself: rounded coordinates plus steep terrain can put a 'X marks the spot' pin on the wrong feature entirely.",
-        "This is real GMRT terrain, not a reconstruction: an ordinary stretch of the massif's south-facing slope."
+        "This is an ordinary stretch of the massif's south-facing slope."
       ],
       "facts": [
         { "label": "Depth here", "value": "1,332 m" },

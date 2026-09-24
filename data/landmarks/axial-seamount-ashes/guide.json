@@ -44,7 +44,7 @@
         "The ASHES (Axial Seamount Hydrothermal Emissions Study) vent field sits near the base of the caldera's western wall, at about 1,540-1,552 m, and has been studied since it was first surveyed in the late 1980s. Its two best-known chimneys, Mushroom and Inferno, sit roughly 10 m apart.",
         "Mushroom is a black-smoker chimney about 4 m tall whose overall size has stayed similar since the 1980s even as its individual discharge points shift, with fluid exceeding 275 degC pouring from small orifices near its top. It is the site of the OOI cabled array's own HD video camera (CAMHDS301), so this is one of the very few active seafloor chimneys with a live, permanent video feed.",
         "Inferno vents high-temperature fluid too and hosts one of the densest clusters of animals at ASHES: tube worms and palm worms cling directly to its metal-sulfide-rich walls, tolerant of both scalding vent fluid and near-freezing seawater within centimetres of each other.",
-        "Neither chimney's exact footprint is published, and the field is far smaller than a single cell of this tile's open bathymetry (about 2,826 sq m against roughly 43 x 61 m per grid cell), so the seabed here is real but the chimneys themselves are placed reconstructions."
+        "Neither chimney's exact footprint is published, and the field is far smaller than a single cell of this tile's open bathymetry (about 2,826 sq m against roughly 43 x 61 m per grid cell)."
       ],
       "facts": [
         { "label": "ASHES depth", "value": "about 1,540-1,552 m" },
@@ -74,7 +74,7 @@
       "title": "Hell, Phoenix, Virgin and Virgin Mound",
       "paragraphs": [
         "ASHES holds several smaller sulfide structures beyond Mushroom and Inferno, all generally under 4 m tall with multiple narrow discharge orifices: Hell, Phoenix and Virgin. A separate, much smaller feature, Virgin Mound, is a sub-metre anhydrite spire venting some of the most CO2-rich fluid found anywhere in the caldera.",
-        "None of these has a published coordinate or height beyond 'less than about 4 m,' so they are represented here as an illustrative cluster near Mushroom rather than at individually verified positions -- real named features, invented exact placement."
+        "None of these has a published coordinate or height beyond 'less than about 4 m.'"
       ],
       "facts": [
         { "label": "Height", "value": "generally under 4 m" },
@@ -98,8 +98,7 @@
       "title": "Life on the chimneys",
       "paragraphs": [
         "ASHES supports a dense community built entirely on chemosynthesis: bacteria that oxidise hydrogen sulfide from the vent fluid form the base of a food web with no sunlight at all. Ridgeia tube worms, palm worms and sulfide worms crowd the warmest chimney surfaces, while limpets and scale worms graze among them and spider crabs pick through the debris.",
-        "Filamentous bacterial mats and lavender-blue ciliate protists coat rock surfaces near diffuse, lower-temperature flow. Notably, the large clams common at many black-smoker fields are absent from ASHES's chimney faces -- they turn up instead at the field's diffuse-flow sites, away from the hottest fluid.",
-        "This entry describes real, sourced biology; where and how densely it is rendered on any individual chimney in this mission is illustrative, since no photograph-level survey of every structure is published."
+        "Filamentous bacterial mats and lavender-blue ciliate protists coat rock surfaces near diffuse, lower-temperature flow. Notably, the large clams common at many black-smoker fields are absent from ASHES's chimney faces -- they turn up instead at the field's diffuse-flow sites, away from the hottest fluid."
       ],
       "facts": [
         {

@@ -22,7 +22,7 @@
       "Bismarck struck the seamount's flank, triggering a small landslide, and slid some distance down-slope before coming to rest upright and largely intact.",
       "You start at the surface about 1.5 km north-east of the hull. Head south-west (about 225°) and descend.",
       "This mission is set at the H.M.S. Hood Association's 2001 expedition fix (48.15N, 16.117W, 'vicinity of 4809N 01607W'), the most specific sourced coordinate found -- about 20 km south of an earlier, unsourced coordinate this pack previously used. The commonly quoted 48°10'N 16°12'W (Wikipedia's rounded infobox figure) sits about 6 km away. This tile's own terrain reads roughly 4,220 m at the hull -- shallower than the published 4,790-4,791 m wreck depth -- because this point sits higher on the seamount's flank than where the hull is reported to have finally settled; see the field guide's overview entry.",
-      "The hull is an artist's reconstruction at that coordinate. Open bathymetry here has no dedicated survey of the wreck itself and cannot show the ship or the real debris trail."
+      "Open bathymetry here has no dedicated survey of the wreck itself and cannot show the ship or the real debris trail."
     ],
     "hazards": [
       "Total darkness below a few hundred metres; only your lights work.",
@@ -39,7 +39,7 @@
       "poi": "bismarck-hull",
       "primary": true,
       "title": "Locate and scan the main hull",
-      "hint": "The reconstructed Bismarck hull stands on the seamount's southeastern flank, around 4,210 m."
+      "hint": "Bismarck's hull stands on the seamount's southeastern flank, around 4,210 m."
     },
     {
       "id": "turrets",
@@ -47,7 +47,7 @@
       "poi": "bismarck-turret-debris",
       "primary": false,
       "title": "Survey the detached gun turrets down-slope",
-      "hint": "Look for an illustrative detached-turret marker east of the hull on the seamount slope, around 4,120 m; exact turret positions are uncertain."
+      "hint": "The detached gun turrets lie east of the hull on the seamount slope, around 4,120 m."
     },
     {
       "id": "damage",
@@ -55,7 +55,7 @@
       "poi": "bismarck-damage",
       "primary": false,
       "title": "Examine the battle-damage debated by historians",
-      "hint": "The illustrative battle-damage marker is close to Bismarck's main hull, around 4,210 m; it does not map individual hits."
+      "hint": "The battle-damage site is close to Bismarck's main hull, around 4,210 m."
     },
     {
       "id": "skid-trail",
@@ -63,7 +63,7 @@
       "poi": "bismarck-skid-trail",
       "primary": false,
       "title": "Sample the real seamount slope below the wreck",
-      "hint": "Survey the real seamount flank east and upslope of the hull, around 4,180 m; this is terrain, not a surveyed skid trail."
+      "hint": "Survey the seamount flank east and upslope of the hull, around 4,180 m."
     },
     {
       "id": "memorial",

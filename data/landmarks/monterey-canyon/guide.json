@@ -8,7 +8,7 @@
       "paragraphs": [
         "Monterey Canyon is the largest submarine canyon on the US West Coast, and one of the largest in the world. It begins right offshore of Moss Landing, a small harbour roughly midway around Monterey Bay -- so close to shore that the Monterey Bay Aquarium Research Institute (MBARI), headquartered at Moss Landing, calls it their 'backyard'. From there its main channel runs about 153 km (95 mi) out under the Pacific, with walls up to 1.6-1.7 km high from floor to rim and a maximum depth of about 3,600 m at its mouth -- a scale often compared to the Grand Canyon.",
         "The canyon most likely began as the drowned outlet of an ancient river system, possibly linked to the Central Valley or to the catastrophic draining of a prehistoric lake, then was deepened and maintained over millions of years by turbidity currents: fast-moving underwater avalanches of sediment and water. In the shallow upper canyon these can happen several times a year, triggered by storm waves, seismic shaking or simple wall collapses, and can reach speeds of several metres per second and travel tens of kilometres down-canyon.",
-        "This tile's open bathymetry covers the canyon from its head to about 2,333 m deep, roughly two-thirds of the way to its published 3,600 m mouth, which lies beyond the western edge of this tile. Every POI in this mission sits on real terrain; nothing here is a placed reconstruction except the MARS node marker."
+        "This tile's open bathymetry covers the canyon from its head to about 2,333 m deep, roughly two-thirds of the way to its published 3,600 m mouth, which lies beyond the western edge of this tile."
       ],
       "facts": [
         { "label": "Length", "value": "about 153 km (95 mi), main channel" },

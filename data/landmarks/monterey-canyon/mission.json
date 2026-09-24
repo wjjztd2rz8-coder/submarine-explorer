@@ -82,7 +82,7 @@
       "poi": "mbari-mars-node",
       "primary": false,
       "title": "Find the MARS observatory node (optional, long transit)",
-      "hint": "The illustrative MARS observatory-node marker lies far west of the head, near 890 m; this tile does not survey the equipment."
+      "hint": "The MARS observatory node lies far west of the head, near 890 m."
     }
   ],
   "completion": "all_primary"

@@ -104,7 +104,7 @@
       "title": "Steep walls, hard ground, deep-sea corals",
       "paragraphs": [
         "Unlike the soft, muddy plains of the open shelf, canyon walls like this one expose steep rock outcrops and mixed hard sediments, shaped by nutrient-rich currents that sweep along and up the canyon flanks. That combination -- hard substrate plus strong local flow -- is exactly what slow-growing, reef-forming deep-sea corals and sponges need to attach and filter-feed, and it is why NOAA and the Mid-Atlantic Fishery Management Council treat Mid-Atlantic canyon walls as biodiversity hotspots worth protecting from bottom-contact fishing gear.",
-        "No public dataset from recent Hudson Canyon survey cruises gives an exact, publishable coral-colony position usable for a specific scan point, so the coral-ledge marker in this mission stands in for that habitat type on a real, steep stretch of wall rather than mapping one documented colony -- this pack renders no coral model at all, so what you're scanning is the terrain and the idea, not a specific organism."
+        "No public dataset from recent Hudson Canyon survey cruises gives an exact, publishable coral-colony position for a specific scan point, so this marker stands in for that habitat type on a real, steep stretch of wall."
       ],
       "facts": [
         { "label": "Wall slope (this survey's wall POI)", "value": "~18-19 deg" },

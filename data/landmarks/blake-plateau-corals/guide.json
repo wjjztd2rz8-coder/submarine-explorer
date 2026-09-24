@@ -9,7 +9,7 @@
         "In January 2024, NOAA Ocean Exploration and a coalition of partners (Ocean Exploration Trust, the University of New Hampshire, the Bureau of Ocean Energy Management, Temple University and the U.S. Geological Survey) announced the results of a multi-year mapping campaign: a nearly continuous province of cold-water coral mounds on the Blake Plateau, off the south-eastern United States, that is the largest known deep-sea coral reef habitat on Earth.",
         "Published as Sowers et al. 2024 in the journal Geomatics, the study synthesised 31 multibeam sonar surveys and 23 submersible dives gathered over more than a decade. The full coral province stretches up to about 500 km long and 110 km wide, with a especially dense core area -- nicknamed 'Million Mounds' -- some 254 km long and 42 km wide. Across the whole province, automated mapping identified 83,908 individual mound-like peak features, covering roughly 6.4 million acres, an area larger than the state of Vermont.",
         "The reef sits beneath the Gulf Stream, which sweeps warm water and a steady supply of food particles across the plateau at depths of roughly 500-1,000 m -- exactly the conditions the reef-building coral here needs, since it lives far below where sunlight reaches and depends entirely on filtering food from the current rather than photosynthesis.",
-        "What you see here: the seabed is real bathymetry from the GMRT Synthesis, showing genuine relief consistent with the mapped mound field, though at this tile's resolution (roughly 53 x 61 m per cell) individual coral colonies and the smallest mounds are not resolved. The coral itself, and a couple of illustrative rock stand-ins marking mound outcrops, are reconstructions; see each entry below for what is real terrain and what is placed."
+        "What you see here: the seabed is real bathymetry from the GMRT Synthesis, showing genuine relief consistent with the mapped mound field, though at this tile's resolution (roughly 53 x 61 m per cell) individual coral colonies and the smallest mounds are not resolved."
       ],
       "facts": [
         { "label": "Announced", "value": "January 2024 (Sowers et al., Geomatics)" },
@@ -42,7 +42,7 @@
       "paragraphs": [
         "This stretch of seabed shows real, mapped terrain relief consistent with the dense mound clusters described across the wider Blake Plateau province -- roughly 72 m of local relief around this point, with depths in the low 700s to high 700s of metres nearby.",
         "Individual coral mounds in the province vary hugely in scale: most are modest, tens of metres across, but the tallest known mounds rise as much as 90 m (about 300 ft) off the surrounding seafloor. This tile's resolution cannot distinguish individual mounds at the smallest end of that range, but the broad relief you can scan here is genuine survey terrain.",
-        "This is real survey data, not a reconstruction; only the specific claim that any single bump here is a named, individually-mapped mound (rather than general provincial relief) is an inference, not a direct match to a published mound catalogue entry."
+        "Only the specific claim that any single bump here is a named, individually-mapped mound (rather than general provincial relief) is an inference, not a direct match to a published mound catalogue entry."
       ],
       "facts": [
         { "label": "Local relief here", "value": "~72 m (this tile)" },
@@ -67,8 +67,7 @@
       "title": "Desmophyllum pertusum, reef-builder of the deep",
       "paragraphs": [
         "The coral that builds these mounds is Desmophyllum pertusum, until recently known as Lophelia pertusa -- a stony, cold-water coral that thrives in total darkness at depths of roughly 200-1,000 m and water temperatures around 4 degrees C. Unlike shallow tropical corals, it has no symbiotic algae and gets no energy from sunlight; instead its polyps filter zooplankton and organic particles carried past by the current.",
-        "Over thousands of years, generation after generation of coral skeleton accumulates into the mounds you see across this province -- among the slowest-built, longest-lived structures in the ocean, and correspondingly fragile: a single mound can represent millennia of growth that a moment's careless contact could damage.",
-        "Reconstruction: the terrain mound beneath this marker is real, but the coral colonies themselves, and the two boulder-shaped stand-ins placed here, are illustrative. The engine has no coral-colony model; the rocks (a generic Poly Haven CC0 model) mark where a thicket would realistically be found on a mound like this, without attempting to depict actual coral structure."
+        "Over thousands of years, generation after generation of coral skeleton accumulates into the mounds you see across this province -- among the slowest-built, longest-lived structures in the ocean, and correspondingly fragile: a single mound can represent millennia of growth that a moment's careless contact could damage."
       ],
       "facts": [
         { "label": "Species", "value": "Desmophyllum pertusum (formerly Lophelia pertusa)" },
@@ -94,7 +93,7 @@
       "title": "One mound among thousands",
       "paragraphs": [
         "A few hundred metres from the main cluster, this second mound illustrates how the Blake Plateau's coral mounds are not isolated features but part of a near-continuous field -- the mapping behind this province identified 83,908 individual mound-like peaks across the wider area, a first-ever estimate of just how many of these structures exist here.",
-        "This is real survey terrain, not a reconstruction."
+        "At about 776 m deep and roughly 400 m from the main cluster, it sits close enough to reach on the same dive, a reminder of just how densely packed this coral province really is."
       ],
       "facts": [
         { "label": "Depth here (this tile)", "value": "~776 m" },
@@ -145,7 +144,7 @@
       "title": "Between the mounds",
       "paragraphs": [
         "Not every part of the Blake Plateau is covered in coral: between mounds, the seabed dips into lower channels and open sediment, visible here as a modest local low point between two mapped mounds.",
-        "This is real survey terrain, not a reconstruction, from the same tile data used for the neighbouring mound POIs."
+        "These lower channels let bottom currents and drifting food particles move between mounds, rather than pooling around any single one -- part of what lets a field this dense keep so many mounds fed at once."
       ],
       "facts": [{ "label": "Depth here (this tile)", "value": "~780 m" }],
       "reconstruction": false,

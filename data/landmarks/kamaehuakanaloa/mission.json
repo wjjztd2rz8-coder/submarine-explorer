@@ -44,7 +44,7 @@
       "poi": "kh-hiolo-north",
       "primary": true,
       "title": "Survey the Hiolo North vent site",
-      "hint": "The illustrative Hiolo North vent marker lies southwest of the summit inside Pele's Pit, around 1,300 m."
+      "hint": "The Hiolo North vent site lies southwest of the summit inside Pele's Pit, around 1,300 m."
     },
     {
       "id": "hiolo-south",
@@ -52,7 +52,7 @@
       "poi": "kh-hiolo-south",
       "primary": false,
       "title": "Survey the Hiolo South vent site",
-      "hint": "The illustrative Hiolo South vent marker lies south of the summit inside Pele's Pit, around 1,275 m."
+      "hint": "The Hiolo South vent site lies south of the summit inside Pele's Pit, around 1,275 m."
     },
     {
       "id": "south-rift",

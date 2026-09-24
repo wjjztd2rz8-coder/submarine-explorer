@@ -20,7 +20,7 @@
       "The wreck was found on 1 September 1985 by a French–American team led by Jean-Louis Michel and Robert Ballard.",
       "The ship broke apart as it sank. The bow faces roughly north, and the stern turned around as it fell, so its rear end points back at the bow.",
       "You start at the surface about 2 km north-north-west of the bow. Head south-south-east (about 150°) and descend.",
-      "The hull shapes are artist's reconstructions at the real coordinates. The open bathymetry is too coarse to show the wreck itself."
+      "The open bathymetry is too coarse to show the wreck itself."
     ],
     "hazards": [
       "Total darkness: sunlight fades out within the top few hundred metres, and below that only your lights work.",
@@ -38,7 +38,7 @@
       "poi": "titanic-bow",
       "primary": true,
       "title": "Locate and scan the bow section",
-      "hint": "The reconstructed bow rests upright at the north end of Titanic's wreck area, around 3,790 m."
+      "hint": "The bow rests upright at the north end of Titanic's wreck area, around 3,790 m."
     },
     {
       "id": "find-stern",
@@ -46,7 +46,7 @@
       "poi": "titanic-stern",
       "primary": true,
       "title": "Locate and scan the stern section",
-      "hint": "The reconstructed, damaged stern lies roughly 700 m south of the bow, around 3,795 m."
+      "hint": "The damaged stern lies roughly 700 m south of the bow, around 3,795 m."
     },
     {
       "id": "boilers",
@@ -54,7 +54,7 @@
       "poi": "titanic-boilers",
       "primary": false,
       "title": "Survey the boiler field",
-      "hint": "The illustrative boiler-field marker is east of the stern in the debris area, around 3,795 m."
+      "hint": "The boiler field is east of the stern in the debris area, around 3,795 m."
     },
     {
       "id": "memorial",
@@ -62,7 +62,7 @@
       "poi": "titanic-memorial",
       "primary": false,
       "title": "Pause at the memorial plaque site on the stern",
-      "hint": "The illustrative memorial-plaque marker is at the stern, south of the bow near 3,790 m; its exact in-game placement is not surveyed."
+      "hint": "The memorial-plaque site is at the stern, south of the bow, near 3,790 m."
     }
   ],
   "completion": "all_primary"

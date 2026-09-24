@@ -40,7 +40,7 @@
       "title": "Supercritical black smokers",
       "paragraphs": [
         "Beebe's main vent complex, Beebe 1-5, consists of black-smoker chimneys and sulfide mounds venting fluid measured up to 403-410 degC -- hot and pressurized enough at this depth (roughly 298 bar) to become supercritical, a state where the fluid is neither fully liquid nor fully gas. Beebe is one of only a handful of vent sites anywhere shown to sustain supercritical venting, and the deepest. The chimneys and mounds are built from pyrite, pyrrhotite and other metal sulfides -- the same iron- and copper-rich minerals that build black smokers on shallower ridges, but concentrated by fluids hot enough to leach far more metal out of the surrounding rock.",
-        "Webber et al. (2015) mapped seven sulfide mounds across the field's western side, built from repeated generations of chimney growth and collapse. This mission's chimney props (`material_hint: \"sulfide\"`, the near-black, rust-streaked palette reserved for true black smokers) mark the Beebe 1-5 complex; their exact individual shapes are not photogrammetrically documented, so their specific form is a reconstruction even though the mound's existence, chemistry and record temperature are directly sourced."
+        "Webber et al. (2015) mapped seven sulfide mounds across the field's western side, built from repeated generations of chimney growth and collapse."
       ],
       "facts": [
         { "label": "Max measured temperature", "value": "403-410 degC" },
@@ -66,7 +66,7 @@
       "title": "Rimicaris hybisae",
       "paragraphs": [
         "Thousands of a previously unknown shrimp swarm Beebe's chimneys: Rimicaris hybisae, described by Nye et al. (2012) and named after HyBIS, the towed vehicle used to collect the first specimens. Like its relative Rimicaris exoculata, found some 4,000 km away on Mid-Atlantic Ridge vents, R. hybisae has no image-forming eyes -- adults lose them entirely -- but carries a light-sensing organ on its back, thought to detect the faint thermal glow of the vents themselves in total darkness.",
-        "The shrimp's enlarged cephalothorax hosts episymbiotic bacteria on its gills and mouthparts, which it farms and grazes for organic carbon -- a chemosynthetic partnership that lets it live without ever needing sunlight-derived food. Vent iron tints the swarm a faint brown. No published dataset maps individual shrimp positions at Beebe, so the swarm rendered at this mission's biology POI is a reconstruction: its real presence and biology here are sourced, its exact placement is not."
+        "The shrimp's enlarged cephalothorax hosts episymbiotic bacteria on its gills and mouthparts, which it farms and grazes for organic carbon -- a chemosynthetic partnership that lets it live without ever needing sunlight-derived food. Vent iron tints the swarm a faint brown."
       ],
       "facts": [
         { "label": "Species", "value": "Rimicaris hybisae (Nye et al. 2012)" },

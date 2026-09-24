@@ -21,7 +21,7 @@
       "Every one of the 28 men aboard survived the sinking; Shackleton got them off onto the ice before she went down. This is a protected monument, not a grave.",
       "Endurance was found upright, intact and \"in a brilliant state of preservation\" by the Endurance22 expedition, 100 years to the day after Shackleton's burial at South Georgia.",
       "You start at the surface about 1.5 km north of the wreck. Head south (about 180°) and descend.",
-      "The hull is an artist's reconstruction at the real position. Open bathymetry here has no dedicated survey of the wreck site and falls back to a coarse global fill, far too coarse to show a 44 m wooden ship."
+      "Open bathymetry here has no dedicated survey of the wreck site and falls back to a coarse global fill, far too coarse to show a 44 m wooden ship."
     ],
     "hazards": [
       "Total darkness below a few hundred metres; only your lights work.",
@@ -38,7 +38,7 @@
       "poi": "endurance-hull",
       "primary": true,
       "title": "Locate and scan the main hull",
-      "hint": "The reconstructed Endurance hull is at her documented Weddell Sea position, upright on seabed around 3,000 m."
+      "hint": "The Endurance hull is at her documented Weddell Sea position, upright on seabed around 3,000 m."
     },
     {
       "id": "find-nameplate",
@@ -46,7 +46,7 @@
       "poi": "endurance-stern-nameplate",
       "primary": true,
       "title": "Scan the stern, where her name is still legible",
-      "hint": "The illustrative nameplate marker is at Endurance's stern, just south of the hull centre at around 3,000 m."
+      "hint": "The nameplate is at Endurance's stern, just south of the hull centre, around 3,000 m."
     },
     {
       "id": "helm",
@@ -54,7 +54,7 @@
       "poi": "endurance-helm",
       "primary": false,
       "title": "Find the ship's wheel and the life growing on the hull",
-      "hint": "The illustrative wheel marker is by the stern, just east of the hull centre near 3,000 m."
+      "hint": "The ship's wheel is by the stern, just east of the hull centre, near 3,000 m."
     },
     {
       "id": "rigging",
@@ -62,7 +62,7 @@
       "poi": "endurance-rigging-debris",
       "primary": false,
       "title": "Survey the fallen masts and funnel",
-      "hint": "Look for the illustrative fallen masts and funnel beside the hull, near 3,000 m; their exact placement is not surveyed here."
+      "hint": "The fallen masts and funnel lie beside the hull, near 3,000 m."
     },
     {
       "id": "worsley",
