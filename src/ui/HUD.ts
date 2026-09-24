@@ -6,6 +6,7 @@
 
 import type { TileMeta } from '../util/types.js';
 import type { SubmarineState } from '../sub/Submarine.js';
+import type { PowerState } from '../game/Power.js';
 
 const FIELDS = ['depth', 'heading', 'speed', 'status', 'tile'] as const;
 type Field = (typeof FIELDS)[number];
@@ -99,6 +100,8 @@ export class HUD {
   private readonly promptEl: HTMLDivElement;
   private readonly speedEl: HTMLDivElement;
   private readonly tipsEl: HTMLDivElement;
+  private readonly powerEl: HTMLDivElement;
+  private powerState: PowerState | undefined;
   private hullNote = '';
 
   constructor(
@@ -115,6 +118,10 @@ export class HUD {
             `<div class="hud-row"><span class="hud-label">${labelOf(f)}</span>` +
             `<span class="hud-value" data-field="${f}">--</span></div>`,
         ).join('')}
+        <div class="hud-power" hidden aria-label="Dive supplies">
+          <div class="hud-power-line" data-supply="battery"><span>BATTERY</span><meter min="0" max="1" value="1"></meter><strong>100%</strong></div>
+          <div class="hud-power-line" data-supply="oxygen"><span>OXYGEN</span><meter min="0" max="1" value="1"></meter><strong>100%</strong></div>
+        </div>
         <div class="hud-sim-speed" hidden></div>
       </div>
       <div class="hud-warning" hidden></div>
@@ -131,6 +138,7 @@ export class HUD {
     this.promptEl = this.root.querySelector('.hud-prompt') as HTMLDivElement;
     this.speedEl = this.root.querySelector('.hud-sim-speed') as HTMLDivElement;
     this.tipsEl = this.root.querySelector('.hud-control-tips') as HTMLDivElement;
+    this.powerEl = this.root.querySelector('.hud-power') as HTMLDivElement;
     const attr = this.root.querySelector('.hud-attribution') as HTMLDivElement;
     attr.textContent = meta.attribution;
 
@@ -149,6 +157,10 @@ export class HUD {
     this.hullNote = note;
   }
 
+  setPowerState(state: PowerState): void {
+    this.powerState = state;
+  }
+
   private set(field: Field, text: string): void {
     if (this.cache.get(field) === text) return;
     this.cache.set(field, text);
@@ -165,7 +177,13 @@ export class HUD {
     this.set('speed', `${(s.speed * 1.94384).toFixed(1)} kn  (${s.speed.toFixed(1)} m/s)`);
     this.showContext(this.objectiveEl, ctx.objective ? `OBJECTIVE · ${ctx.objective}` : null);
     this.showContext(this.promptEl, ctx.scanPrompt);
-    this.showContext(this.tipsEl, ctx.controlTips);
+    this.showContext(
+      this.tipsEl,
+      ctx.controlTips && this.powerState?.enabled && this.powerState.low.length
+        ? `${ctx.controlTips} · supplies low`
+        : ctx.controlTips,
+    );
+    this.updatePower(this.powerState);
     this.showContext(
       this.speedEl,
       ctx.simSpeed && ctx.simSpeed !== 1 ? `${ctx.simSpeed}× SIM SPEED` : null,
@@ -177,12 +195,38 @@ export class HUD {
     } else if (s.crushWarning) {
       this.set('status', 'pressure high');
       this.showWarning(`HULL PRESSURE ${(s.crushRatio * 100).toFixed(0)}% — ASCEND`);
+    } else if (this.powerState?.enabled && s.emergencyCause === 'power' && s.emergencyBlow) {
+      this.set('status', 'emergency ascent');
+      this.showWarning('SUPPLIES EXHAUSTED — EMERGENCY ASCENT');
+    } else if (this.powerState?.enabled && this.powerState.critical.length) {
+      this.set('status', 'supplies critical');
+      this.showWarning(`${this.powerState.critical.join(' & ').toUpperCase()} CRITICAL — ASCEND`);
+    } else if (this.powerState?.enabled && this.powerState.low.length) {
+      this.set('status', 'supplies low');
+      this.showWarning(`${this.powerState.low.join(' & ').toUpperCase()} LOW — PLAN ASCENT`);
     } else if (seabedWarning(s.altitude, s.velocity.y, this.warn, ctx.nearScanTarget)) {
       this.set('status', 'seabed proximity');
       this.showWarning('SEABED PROXIMITY');
     } else {
       this.set('status', 'nominal');
       this.hideWarning();
+    }
+  }
+
+  private updatePower(power: PowerState | undefined): void {
+    this.powerEl.hidden = !power?.enabled;
+    if (!power?.enabled) return;
+    for (const key of ['battery', 'oxygen'] as const) {
+      const line = this.powerEl.querySelector<HTMLElement>(`[data-supply="${key}"]`);
+      if (!line) continue;
+      const value = power[key];
+      const label = `${Math.round(value * 100)}%`;
+      const strong = line.querySelector('strong');
+      if (strong && strong.textContent !== label) strong.textContent = label;
+      const meter = line.querySelector('meter');
+      if (meter) meter.value = value;
+      line.classList.toggle('is-low', power.low.includes(key));
+      line.classList.toggle('is-critical', power.critical.includes(key));
     }
   }
 
@@ -201,7 +245,7 @@ export class HUD {
 }
 
 function labelOf(f: Field): string {
-  return f === 'status' ? 'HULL' : f.toUpperCase();
+  return f.toUpperCase();
 }
 
 const POINTS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];

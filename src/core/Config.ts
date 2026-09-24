@@ -975,6 +975,18 @@ export interface SensorPreset {
   sonarPoiRange: number;
 }
 
+/** Supply rates are fractions of a full tank per simulated second. */
+export interface PowerConfig {
+  batteryIdleHours: number;
+  batteryThrustHours: number;
+  batteryLightsHours: number;
+  batterySensorsHours: number;
+  oxygenHours: number;
+  boostCostMultiplier: number;
+  lowThreshold: number;
+  criticalThreshold: number;
+}
+
 export interface GameConfig {
   defaultTileId: string;
   /** Graphics quality tier. Override at runtime with `?tier=low|medium|high`. */
@@ -998,6 +1010,7 @@ export interface GameConfig {
   descentProfiles: Record<GameplayOptions['descentProfile'], DescentProfile>;
   lightPresets: Record<GameplayOptions['lights'], LightPreset>;
   sensorPresets: Record<GameplayOptions['sensors'], SensorPreset>;
+  power: PowerConfig;
   /** C5: sonar minimap palettes (`Sonar.setPalette`). */
   sonarPalettes: Record<SonarPaletteName, SonarPalette>;
   sonarZoom: SonarZoomConfig;
@@ -1523,6 +1536,17 @@ export const DEFAULT_CONFIG: GameConfig = {
     realistic: { scanRadiusMultiplier: 1, hintRangeMultiplier: 1, sonarPoiRange: 500 },
     extended: { scanRadiusMultiplier: 2, hintRangeMultiplier: 2, sonarPoiRange: 2000 },
   },
+  // --- D-POWER: normal research dives last roughly 6–10 simulated hours. ---
+  power: {
+    batteryIdleHours: 18,
+    batteryThrustHours: 12,
+    batteryLightsHours: 22,
+    batterySensorsHours: 24,
+    oxygenHours: 10,
+    boostCostMultiplier: 2.5,
+    lowThreshold: 0.25,
+    criticalThreshold: 0.1,
+  },
   // --- D-SONAR: survey relief and map spans ---
   sonarZoom: {
     levels: [250, 500, 1000, 2000, 'tile'],
@@ -1777,6 +1801,7 @@ export function makeConfig(overrides: Partial<GameConfig> = {}): GameConfig {
     descentProfiles: { ...DEFAULT_CONFIG.descentProfiles, ...overrides.descentProfiles },
     lightPresets: { ...DEFAULT_CONFIG.lightPresets, ...overrides.lightPresets },
     sensorPresets: { ...DEFAULT_CONFIG.sensorPresets, ...overrides.sensorPresets },
+    power: { ...DEFAULT_CONFIG.power, ...overrides.power },
     sonarPalettes: { ...DEFAULT_CONFIG.sonarPalettes, ...overrides.sonarPalettes },
     sonarZoom: { ...DEFAULT_CONFIG.sonarZoom, ...overrides.sonarZoom },
     globe: { ...DEFAULT_CONFIG.globe, ...overrides.globe },
