@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 /**
  * C5 settings screen (docs/settings.md), end to end:
- *  (a) O opens it and the game freezes (a held key moves nothing); settings
+ *  (a) The pause menu opens it and the game freezes (a held key moves nothing); settings
  *      apply live; a rebinding conflict unbinds the loser; Escape closes;
  *      after a reload settings and the displaced binding persist, and
  *      controls are in their own view.
@@ -23,6 +23,15 @@ function collectErrors(page: Page): string[] {
 async function boot(page: Page, url: string): Promise<void> {
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
+}
+
+async function openSettings(page: Page): Promise<void> {
+  if (await page.locator('.home-screen').isVisible()) {
+    await page.locator('.home-menu').getByRole('button', { name: 'Settings' }).click();
+  } else {
+    await page.keyboard.press('Escape');
+    await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
+  }
 }
 
 async function subPos(page: Page): Promise<number[]> {
@@ -63,15 +72,15 @@ async function probe(page: Page): Promise<Probe> {
 }
 
 test.describe('settings screen', () => {
-  test('O opens and freezes; changes apply and persist; conflicts survive reload', async ({
+  test('Pause settings freezes; changes apply and persist; conflicts survive reload', async ({
     page,
   }) => {
     const errors = collectErrors(page);
-    await boot(page, '/');
+    await boot(page, '/?tile=titanic');
     const dialog = page.locator('.settings');
     await expect(dialog).toBeHidden();
 
-    await page.keyboard.press('KeyO');
+    await openSettings(page);
     await expect(dialog).toBeVisible();
     expect((await probe(page)).open).toBe(true);
 
@@ -122,9 +131,9 @@ test.describe('settings screen', () => {
     });
     await expect(page.locator('.hud-help')).toHaveCount(0);
     await page.keyboard.press('q');
-    expect(await page.evaluate(() => (window.__game as { rig: { mode: string } }).rig.mode)).toBe(
-      'first-person',
-    );
+    await expect
+      .poll(() => page.evaluate(() => (window.__game as { rig: { mode: string } }).rig.mode))
+      .toBe('first-person');
 
     expect(errors).toEqual([]);
   });
@@ -132,8 +141,8 @@ test.describe('settings screen', () => {
   test('Controls view opens from Settings; focus stays inside; no axe violations', async ({
     page,
   }) => {
-    await boot(page, '/');
-    await page.keyboard.press('KeyO');
+    await boot(page, '/?tile=titanic');
+    await openSettings(page);
     const dialog = page.locator('.settings');
     await expect(dialog).toBeVisible();
     await dialog.getByRole('button', { name: 'Controls' }).click();
@@ -151,21 +160,25 @@ test.describe('settings screen', () => {
     await expect(dialog).toBeHidden();
   });
 
-  test('over the mission briefing it keeps Enter from starting the dive', async ({ page }) => {
+  test('briefing keeps Escape; Settings opens from pause after the dive begins', async ({
+    page,
+  }) => {
     await boot(page, '/?mission=titanic');
     await expect(page.locator('.briefing')).toBeVisible();
-    await page.keyboard.press('KeyO');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.briefing')).toBeVisible();
+    await expect(page.locator('.pause-menu')).toBeHidden();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.briefing')).toBeHidden();
+    await openSettings(page);
     const dialog = page.getByRole('dialog', { name: 'Settings' });
     await expect(dialog).toBeVisible();
     await page.keyboard.press('Enter');
     await page.waitForTimeout(300);
-    const state = await page.evaluate(
-      () => (window.__game as { mission: { state: string } }).mission.state,
-    );
-    expect(state).toBe('briefing');
+    await expect(page.locator('.pause-menu')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
-    await expect(page.locator('.briefing')).toBeVisible();
+    await expect(page.locator('.pause-menu')).toBeVisible();
   });
 
   test('reset discoveries confirms, preserves other saves, and refreshes this dive', async ({
@@ -210,7 +223,7 @@ test.describe('settings screen', () => {
       ),
     ).toContain('titanic/test');
 
-    await page.keyboard.press('KeyO');
+    await openSettings(page);
     const dialog = page.getByRole('dialog', { name: 'Settings' });
     await dialog.getByRole('button', { name: 'Reset settings' }).click();
     expect(
@@ -251,7 +264,7 @@ test.describe('settings screen', () => {
     page,
   }) => {
     await boot(page, '/?tile=challenger-deep&tier=low');
-    await page.keyboard.press('KeyO');
+    await openSettings(page);
     const dialog = page.getByRole('dialog', { name: 'Settings' });
     await dialog.getByLabel('Graphics tier').selectOption('high');
     await expect(dialog.getByRole('button', { name: 'Apply and reload' })).toBeHidden();
@@ -277,7 +290,7 @@ test.describe('settings screen', () => {
       };
     });
     expect(applied).toEqual({ detail: 0.5, speed: 2, savedTier: 'high' });
-    await page.keyboard.press('KeyO');
+    await openSettings(page);
     await expect(dialog.getByRole('button', { name: 'Apply and reload' })).toBeHidden();
   });
 
@@ -290,7 +303,7 @@ test.describe('settings screen', () => {
     );
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__gameReady === true);
-    await page.keyboard.press('KeyO');
+    await openSettings(page);
     const dialog = page.getByRole('dialog', { name: 'Settings' });
     await dialog.getByRole('button', { name: 'Reset discoveries' }).click();
     await dialog.getByRole('button', { name: 'Clear discoveries' }).click();
@@ -307,7 +320,7 @@ test.describe('settings screen', () => {
       (value) => localStorage.setItem('subexplorer.discoveries.v1', value),
       newer,
     );
-    await page.keyboard.press('KeyO');
+    await openSettings(page);
     await dialog.getByRole('button', { name: 'Reset discoveries' }).click();
     await dialog.getByRole('button', { name: 'Clear discoveries' }).click();
     await expect(dialog.locator('.settings-status')).toContainText('newer version');
@@ -334,7 +347,7 @@ test.describe('settings screen', () => {
         return original.call(this, key);
       };
     });
-    await page.keyboard.press('KeyO');
+    await openSettings(page);
     await dialog.getByRole('button', { name: 'Reset discoveries' }).click();
     await dialog.getByRole('button', { name: 'Clear discoveries' }).click();
     await expect(dialog.locator('.settings-status')).toContainText('Nothing was reset');
@@ -349,7 +362,7 @@ test.describe('settings screen', () => {
     await page.evaluate((value) => localStorage.setItem('subexplorer.settings.v2', value), newer);
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__gameReady === true);
-    await page.keyboard.press('KeyO');
+    await openSettings(page);
     const dialog = page.getByRole('dialog', { name: 'Settings' });
     await dialog.getByLabel('Terrain detail on top of the survey data').fill('0.5');
     await expect(dialog.getByRole('button', { name: 'Apply and reload' })).toBeHidden();

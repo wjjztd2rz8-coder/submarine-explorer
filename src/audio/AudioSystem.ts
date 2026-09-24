@@ -38,6 +38,7 @@ export class AudioSystem {
   private lastBallastSign = 0;
   private lastCreakAt = -Infinity;
   private readonly unsubs: Array<() => void> = [];
+  private paused = false;
 
   constructor(
     private readonly config: AudioConfig,
@@ -52,11 +53,12 @@ export class AudioSystem {
    */
   unlock(): void {
     if (this.engine) {
-      this.engine.unlock();
+      if (!this.paused) this.engine.unlock();
       return;
     }
     this.engine = new AudioEngine(this.config);
-    this.engine.unlock();
+    if (!this.paused) this.engine.unlock();
+    else void this.engine.ctx.suspend();
     this.thruster = new ThrusterLoop(this.engine, this.config);
     this.ambient = new AmbientBeds(this.engine, this.config);
     this.wireBusEvents();
@@ -64,6 +66,14 @@ export class AudioSystem {
 
   get isReady(): boolean {
     return this.engine !== null;
+  }
+
+  /** Suspend continuous audio while the app shell has frozen the dive. */
+  setPaused(paused: boolean): void {
+    this.paused = paused;
+    if (!this.engine) return;
+    if (paused) void this.engine.ctx.suspend();
+    else void this.engine.ctx.resume();
   }
 
   private wireBusEvents(): void {

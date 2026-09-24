@@ -26,7 +26,8 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
     };
   });
   expect(initial).toEqual({ mode: 'arcade', speed: 1, light: 1800, scanRadius: 400 });
-  await page.keyboard.press('KeyO');
+  await page.keyboard.press('Escape');
+  await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
   const dialog = page.getByRole('dialog', { name: 'Settings' });
   await expect(dialog.getByLabel('Mode', { exact: true })).toHaveValue('arcade');
   await dialog.screenshot({ path: `${shots}/arcade-settings.png` });
@@ -62,10 +63,12 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
   await expect(dialog.getByLabel('Mode', { exact: true })).toHaveValue('custom');
   await expect(dialog.getByLabel('Forward speed')).toHaveValue('research');
   await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape'); // resume from the pause menu
   await page.screenshot({ path: `${shots}/enhanced-lights.png` });
   await page.reload();
   await page.waitForFunction(() => window.__gameReady === true);
-  await page.keyboard.press('KeyO');
+  await page.keyboard.press('Escape');
+  await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
   await expect(dialog.getByLabel('Mode', { exact: true })).toHaveValue('custom');
   await expect(dialog.getByLabel('Lights', { exact: true })).toHaveValue('enhanced');
   await expect(dialog.getByLabel('Forward speed')).toHaveValue('research');

@@ -60,6 +60,10 @@ export interface GlobeOptions {
   /** Inject the catalogue (tests); default loads it from /data. */
   catalog?: Promise<GlobeCatalog>;
   parent?: HTMLElement;
+  /** In the home shell the globe shares focus with the menu and site grid. */
+  embedded?: boolean;
+  onSiteFocus?: (id: string) => void;
+  onSiteSelected?: (site: GlobeSite) => void;
 }
 
 interface Pin {
@@ -187,6 +191,8 @@ export class Globe {
   private scene: THREE.Scene | null = null;
   private camera: THREE.PerspectiveCamera | null = null;
   private glFailed = false;
+  private resizeObserver: ResizeObserver | null = null;
+  private size = { width: 0, height: 0 };
   private readonly tmp = new THREE.Vector3();
   private readonly disposers: Array<() => void> = [];
 
@@ -199,6 +205,11 @@ export class Globe {
     this.root.setAttribute('role', 'dialog');
     this.root.setAttribute('aria-modal', 'true');
     this.root.setAttribute('aria-label', 'Dive sites globe');
+    if (opts.embedded) {
+      this.root.classList.add('is-embedded');
+      this.root.setAttribute('role', 'group');
+      this.root.removeAttribute('aria-modal');
+    }
 
     this.canvas = el('canvas', 'globe-canvas');
     this.canvas.setAttribute('aria-hidden', 'true');
@@ -242,6 +253,12 @@ export class Globe {
     };
     window.addEventListener('resize', onResize);
     this.disposers.push(() => window.removeEventListener('resize', onResize));
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.open_) this.resize();
+      });
+      this.resizeObserver.observe(this.root);
+    }
 
     this.catalog = opts.catalog ?? loadGlobeCatalog(opts.tileIds);
     void this.catalog.then((c) => this.setSites(c.sites));
@@ -260,13 +277,22 @@ export class Globe {
     return this.hovered ?? this.focused ?? this.pinned;
   }
 
+  /** Preview a list selection on the globe without moving keyboard focus. */
+  previewSite(id: string): void {
+    const site = this.sites.find((entry) => entry.id === id);
+    if (!site) return;
+    this.pinned = site;
+    this.orbit.faceLatLon(site.lat, site.lon);
+    this.renderCard();
+  }
+
   open(source: GlobeOpenSource = 'api'): void {
     if (this.open_) return;
     this.open_ = true;
     this.root.hidden = false;
     this.initGl();
     this.resize();
-    this.trap.activate();
+    if (!this.opts.embedded) this.trap.activate();
     this.orbit.poke();
     this.opts.bus?.emit('globe:opened', { source });
   }
@@ -280,7 +306,7 @@ export class Globe {
     this.drag = null;
     this.orbit.endDrag();
     this.hovered = null;
-    this.trap.deactivate();
+    if (!this.opts.embedded) this.trap.deactivate();
   }
 
   toggle(source: GlobeOpenSource = 'api'): void {
@@ -291,11 +317,33 @@ export class Globe {
   /** Once per rendered frame (main.ts); does nothing while closed. */
   update(dt: number): void {
     if (!this.open_) return;
+    // CSS can change the embedded container without a window resize. This also
+    // covers browsers without ResizeObserver before the next presented frame.
+    if (this.root.clientWidth !== this.size.width || this.root.clientHeight !== this.size.height)
+      this.resize();
     this.orbit.update(Math.min(dt, 0.1));
-    const cam = this.orbit.cameraPosition();
+    const orbitCam = this.orbit.cameraPosition();
     const w = this.root.clientWidth || window.innerWidth;
     const h = this.root.clientHeight || window.innerHeight;
+    // The home globe may live in a narrow panel. Fit the outer atmosphere
+    // shell to the smaller field of view so neither limb is cropped.
+    const halfVertical = (this.opts.config.fovDeg * Math.PI) / 360;
+    const halfHorizontal = Math.atan(Math.tan(halfVertical) * (w / h));
+    const fitDistance = this.opts.embedded
+      ? this.opts.config.atmosphereScale / Math.sin(Math.min(halfVertical, halfHorizontal) * 0.9)
+      : 0;
+    const cameraDistance = Math.max(this.orbit.distance, fitDistance);
+    const scale = cameraDistance / this.orbit.distance;
+    const cam = {
+      x: orbitCam.x * scale,
+      y: orbitCam.y * scale,
+      z: orbitCam.z * scale,
+    };
     if (this.camera) {
+      if (cameraDistance + this.opts.config.atmosphereScale >= this.camera.far) {
+        this.camera.far = cameraDistance + this.opts.config.atmosphereScale + 1;
+        this.camera.updateProjectionMatrix();
+      }
       this.camera.position.set(cam.x, cam.y, cam.z);
       this.camera.lookAt(0, 0, 0);
       this.camera.updateMatrixWorld();
@@ -312,6 +360,7 @@ export class Globe {
       return;
     }
     this.opts.bus?.emit('globe:pinSelected', { landmarkId: site.id });
+    this.opts.onSiteSelected?.(site);
     const href = window.location.href;
     const url = site.state === 'mission' ? missionUrl(href, site.id) : tileUrl(href, site.id);
     if (this.opts.navigate) this.opts.navigate(url);
@@ -319,6 +368,7 @@ export class Globe {
   }
 
   dispose(): void {
+    this.resizeObserver?.disconnect();
     for (const d of this.disposers) d();
     this.trap.deactivate();
     this.renderer?.dispose();
@@ -344,6 +394,7 @@ export class Globe {
       b.append(el('span', 'globe-pin-dot'));
       b.addEventListener('pointerenter', () => {
         this.hovered = site;
+        this.opts.onSiteFocus?.(site.id);
         this.orbit.poke();
         this.renderCard();
       });
@@ -353,6 +404,7 @@ export class Globe {
       });
       b.addEventListener('focus', () => {
         this.focused = site;
+        this.opts.onSiteFocus?.(site.id);
         this.orbit.faceLatLon(site.lat, site.lon);
         this.renderCard();
       });
@@ -521,6 +573,10 @@ export class Globe {
     };
     const onKeyDown = (e: KeyboardEvent): void => {
       if (!this.open_) return;
+      if (this.opts.embedded) {
+        if (!this.root.contains(document.activeElement)) return;
+        if (e.code === 'Tab' || e.code === 'Escape') return;
+      }
       // Nothing behind the globe sees keys while it is up: not the game's
       // Input, the guide, the briefing, nor capture listeners on window
       // registered after this one (mission router, settings; the globe is
@@ -580,7 +636,12 @@ export class Globe {
     const cfg = this.opts.config;
     let renderer: THREE.WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true });
+      renderer = new THREE.WebGLRenderer({
+        canvas: this.canvas,
+        antialias: true,
+        alpha: true,
+        preserveDrawingBuffer: this.opts.embedded === true,
+      });
     } catch (err) {
       this.glFailed = true;
       console.warn('[globe] WebGL unavailable; showing pins only', err);
@@ -644,6 +705,7 @@ export class Globe {
   private resize(): void {
     const w = this.root.clientWidth || window.innerWidth;
     const h = this.root.clientHeight || window.innerHeight;
+    this.size = { width: w, height: h };
     if (this.renderer) {
       this.renderer.setPixelRatio(
         Math.min(this.opts.config.maxPixelRatio, window.devicePixelRatio || 1),

@@ -2096,3 +2096,400 @@ body {
   cursor: pointer;
 }
 /* --- D-INPUT-HUD end --- */
+
+/* --- D-SHELL begin --- */
+body[data-app-state='home'] > .hud,
+body[data-app-state='home'] > .sonar,
+body[data-app-state='home'] > .objectives-panel,
+body[data-app-state='home'] > .scan-overlay,
+body[data-app-state='home'] > .hud-ctrl-tip,
+body[data-app-state='pause'] > .hud-ctrl-tip {
+  visibility: hidden;
+}
+
+.home-screen,
+.pause-menu {
+  position: fixed;
+  inset: 0;
+  color: #e5f4f5;
+  font-family: Inter, 'Segoe UI', system-ui, sans-serif;
+}
+.home-screen[hidden],
+.pause-menu[hidden],
+.home-sites[hidden],
+.home-menu[hidden],
+.pause-actions[hidden],
+.pause-detail[hidden],
+.pause-objectives[hidden],
+.pause-sites-scroll[hidden] {
+  display: none;
+}
+.home-screen {
+  z-index: 72;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 65% 40%, #0a2936 0%, #06121e 53%, #020710 100%);
+}
+.home-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(2, 8, 15, 0.8) 0%, transparent 67%);
+  z-index: 1;
+}
+.home-copy,
+.home-menu {
+  position: absolute;
+  z-index: 3;
+  left: clamp(24px, 5vw, 90px);
+  width: min(490px, 40vw);
+}
+.home-copy {
+  top: clamp(35px, 10vh, 140px);
+}
+.home-kicker,
+.pause-kicker {
+  color: #76e5d4;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+.home-copy h1 {
+  margin: 14px 0;
+  font-size: clamp(40px, 5vw, 82px);
+  line-height: 1.03;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+.home-tagline {
+  max-width: 30rem;
+  color: #c3d5da;
+  font-size: clamp(15px, 1.3vw, 19px);
+  line-height: 1.55;
+}
+.home-menu {
+  bottom: clamp(30px, 9vh, 120px);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.home-menu button,
+.home-sites-head button,
+.pause-actions button,
+.pause-detail > button {
+  min-height: 52px;
+  padding: 11px 16px;
+  border: 1px solid rgba(129, 222, 224, 0.4);
+  border-radius: 4px;
+  background: rgba(4, 27, 39, 0.86);
+  color: #e9fbfc;
+  font:
+    600 16px/1.25 Inter,
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.home-menu button:first-child,
+.home-menu button:nth-child(2) {
+  grid-column: span 2;
+  font-size: 19px;
+}
+.home-menu button:hover,
+.home-sites-head button:hover,
+.pause-actions button:hover,
+.pause-detail > button:hover {
+  background: #124056;
+  border-color: #79f4e3;
+}
+.home-menu button:focus-visible,
+.home-sites button:focus-visible,
+.pause-menu button:focus-visible {
+  outline: 3px solid #8affeb;
+  outline-offset: 3px;
+}
+.home-menu button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.home-globe-wrap {
+  position: absolute;
+  inset: 0 0 0 32%;
+}
+.home-globe-slot {
+  position: absolute;
+  inset: 0;
+}
+.globe.is-embedded {
+  position: absolute;
+  z-index: 0;
+  background: transparent;
+}
+.globe.is-embedded .globe-header,
+.globe.is-embedded .globe-hint {
+  display: none;
+}
+.globe.is-embedded .globe-card {
+  left: auto;
+  right: 30px;
+  bottom: 30px;
+  width: min(390px, 43vw);
+  font-size: 14px;
+}
+.globe.is-embedded .globe-pin {
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+}
+.globe.is-embedded .globe-pin-dot {
+  width: 12px;
+  height: 12px;
+}
+.home-sites {
+  position: absolute;
+  z-index: 5;
+  right: clamp(18px, 3vw, 52px);
+  top: 5vh;
+  bottom: 5vh;
+  width: min(520px, 44vw);
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  border: 1px solid #456976;
+  border-radius: 8px;
+  background: rgba(4, 17, 28, 0.96);
+  box-shadow: 0 24px 80px #0009;
+}
+.home-sites-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.home-sites-head h2 {
+  margin: 0;
+  font-size: 29px;
+}
+.home-sites-head button,
+.pause-detail > button {
+  min-height: 40px;
+  font-size: 14px;
+}
+.home-sites-scroll,
+.pause-sites-scroll {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin-top: 18px;
+  scrollbar-color: #6fb5b9 transparent;
+}
+.home-screen.has-sites .home-menu {
+  display: none;
+}
+.home-screen.has-sites .home-globe-wrap {
+  inset: 0 39% 0 17%;
+}
+.home-screen.has-sites .home-copy {
+  top: 35px;
+}
+.home-screen.has-sites .home-copy h1 {
+  font-size: clamp(28px, 3vw, 46px);
+}
+.home-screen.has-sites .home-tagline {
+  display: none;
+}
+.mission-select.is-shell {
+  position: static;
+  left: auto;
+  top: auto;
+  transform: none;
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: auto;
+}
+.mission-select.is-shell .mission-select-body {
+  max-height: none;
+  overflow: visible;
+}
+.mission-select.is-shell .mission-globe-btn {
+  display: none;
+}
+.mission-select.is-shell:not(.is-free-dive) .mission-select-body > .mission-item,
+.mission-select.is-shell:not(.is-free-dive) .mission-select-body > .mission-title,
+.mission-select.is-shell.is-free-dive .mission-missions {
+  display: none;
+}
+.mission-select.is-shell .mission-missions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  border: 0;
+}
+.mission-select.is-shell .mission-missions > .mission-title {
+  display: none;
+}
+.mission-select.is-shell .mission-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  min-height: 108px;
+  padding: 15px;
+  background: #0a2735;
+  border: 1px solid #365b69;
+  border-radius: 5px;
+  text-align: left;
+  color: #dff2f4;
+  font-size: 14px;
+}
+.mission-select.is-shell .mission-item:hover,
+.mission-select.is-shell .mission-item.is-highlighted {
+  border-color: #85eee1;
+  background: #123a4c;
+}
+.mission-select.is-shell .mission-item-name {
+  color: #f2ffff;
+  font-size: 18px;
+  font-weight: 700;
+}
+.mission-select.is-shell .mission-item-meta {
+  color: #a9cbd0;
+  font-size: 13px;
+}
+.mission-select.is-shell .mission-item-summary {
+  font-size: 13px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.mission-select.is-shell .mission-item-progress {
+  color: #81ead8;
+  font-size: 12px;
+  font-weight: 700;
+}
+.mission-select.is-shell .mission-badge {
+  font-size: 11px;
+}
+
+.pause-menu {
+  z-index: 78;
+  display: grid;
+  place-items: center;
+  background: rgba(1, 8, 15, 0.78);
+  backdrop-filter: blur(9px);
+}
+.pause-panel {
+  width: min(740px, 94vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(22px, 4vw, 44px);
+  border: 1px solid #56808c;
+  border-radius: 9px;
+  background: #071b28;
+  box-shadow: 0 30px 90px #000b;
+}
+.pause-panel h1 {
+  margin: 4px 0 22px;
+  font-size: clamp(32px, 3vw, 48px);
+}
+.pause-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  overflow-y: auto;
+}
+.pause-actions button:first-child,
+.pause-actions button:last-child {
+  grid-column: span 2;
+}
+.pause-actions button:last-child {
+  border-color: #8b786b;
+}
+.pause-detail {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.pause-detail h2 {
+  font-size: 25px;
+}
+.pause-objectives {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.pause-objectives li {
+  margin-bottom: 10px;
+  padding: 13px;
+  border: 1px solid #3c6270;
+  background: #0a2836;
+}
+.pause-objectives li.is-complete {
+  opacity: 0.65;
+}
+.pause-objectives strong {
+  display: block;
+  font-size: 17px;
+}
+.pause-objectives small {
+  color: #78ebd8;
+}
+.pause-objectives p {
+  margin: 7px 0 0;
+  color: #c2dce0;
+  font-size: 14px;
+}
+.home-screen ~ .settings,
+.pause-menu ~ .settings,
+.settings {
+  z-index: 90;
+}
+.field-guide {
+  z-index: 95;
+}
+body:has(.field-guide:not([hidden])) .home-screen,
+body:has(.field-guide:not([hidden])) .pause-menu {
+  pointer-events: none;
+}
+@media (max-width: 760px) {
+  .home-globe-wrap {
+    inset: 17% -26% 20% 15%;
+    opacity: 0.64;
+  }
+  .home-copy,
+  .home-menu {
+    left: 22px;
+    width: calc(100% - 44px);
+  }
+  .home-copy {
+    top: 25px;
+  }
+  .home-copy h1 {
+    font-size: 42px;
+  }
+  .home-menu {
+    bottom: 24px;
+  }
+  .home-screen.has-sites .home-copy,
+  .home-screen.has-sites .home-globe-wrap {
+    display: none;
+  }
+  .home-sites {
+    inset: 12px;
+    width: auto;
+  }
+}
+/* --- D-SHELL end --- */

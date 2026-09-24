@@ -96,7 +96,7 @@ test.describe('B3 mission flow', () => {
     await expect(page.locator('.briefing-begin')).toHaveText('Begin dive');
     await expect(page.locator('.objectives-panel')).toBeHidden();
     // The mission picker is collapsed out of the way during a mission.
-    await expect(page.locator('.mission-select')).toHaveClass(/is-collapsed/);
+    await expect(page.locator('body > .mission-select')).toHaveClass(/is-collapsed/);
     expect((await missionProbe(page)).state).toBe('briefing');
     await page.waitForTimeout(400);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-briefing.png' });
@@ -284,7 +284,7 @@ test.describe('B3 mission flow', () => {
     );
     await expect(page.locator('.briefing')).toHaveCount(0);
     await expect(page.locator('.objectives-panel')).toHaveCount(0);
-    await expect(page.locator('.mission-select')).toBeHidden();
+    await expect(page.locator('body > .mission-select')).toBeHidden();
     await page.goto('/?mission=titanic');
     await expect(page.locator('.briefing')).toBeVisible({ timeout: 45_000 });
     expect(errors, errors.join(' | ')).toEqual([]);

@@ -162,11 +162,7 @@ export function defaultActions(): ActionBinding[] {
     { id: 'toggleCamera', label: 'Camera view', category: 'View', keys: ['KeyQ'], pad: 'Y' },
     { id: 'toggleSonar', label: 'Sonar map', category: 'View', keys: ['KeyM'], pad: 'Back' },
     { id: 'togglePhotoMode', label: 'Photo mode', category: 'View', keys: ['KeyP'], pad: 'Start' },
-    // C5: the settings overlay reads this binding directly (it must open over
-    // the frozen briefing too), so there is no InputState edge for it.
-    { id: 'toggleSettings', label: 'Settings', category: 'View', keys: ['KeyO'] },
     { id: 'toggleJournal', label: 'Journal', category: 'View', keys: ['KeyJ'] },
-    { id: 'toggleGlobe', label: 'Globe (dive sites)', category: 'View', keys: ['KeyN'] },
   ];
 }
 

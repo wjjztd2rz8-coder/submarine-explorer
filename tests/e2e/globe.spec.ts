@@ -5,8 +5,8 @@ import { expect, test, type Page } from '@playwright/test';
  * C1 globe mission select (docs/globe.md) and the field guide SPECIES tab:
  *  (a) `?globe=1` opens the globe with a loaded texture and pins; content
  *      packs with a mission.json are mission pins; the game is frozen and
- *      keys do not reach it; settings (O) cannot open over it; Tab focuses a
- *      pin; Escape closes and the sub moves again; N reopens it.
+ *      keys do not reach it; retired O/N shortcuts do nothing; Tab focuses a
+ *      pin; Escape closes and the sub moves again.
  *  (b) Enter on the Titanic pin navigates to `?mission=titanic`.
  *  (c) axe finds no violations in the open overlay.
  *  (d) J opens the field guide; the SPECIES tab lists the fixture's rows and
@@ -77,18 +77,17 @@ async function tabToPin(page: Page, id: string): Promise<void> {
 }
 
 test.describe('globe mission select', () => {
-  test('opens, freezes the game, pins, Tab, Escape, N; screenshot', async ({ page }) => {
+  test('opens, freezes the game, pins, Tab and Escape; screenshot', async ({ page }) => {
     const errors = collectErrors(page);
     await boot(page, '/?tile=titanic&globe=1');
     await globeReady(page);
-    await expect(page.locator('.globe')).toBeVisible();
+    await expect(page.locator('.globe:not(.is-embedded)')).toBeVisible();
 
     // Content packs with a mission.json are launchable mission pins.
     for (const id of ['titanic', 'lost-city', 'monterey-canyon']) {
-      await expect(page.locator(`.globe-pin[data-landmark="${id}"]`)).toHaveAttribute(
-        'data-state',
-        'mission',
-      );
+      await expect(
+        page.locator(`.globe:not(.is-embedded) .globe-pin[data-landmark="${id}"]`),
+      ).toHaveAttribute('data-state', 'mission');
     }
     // A listed landmark whose content pack has not landed yet is a free-dive
     // pin and a "content coming" row. Which one that is changes as packs land,
@@ -99,12 +98,13 @@ test.describe('globe mission select', () => {
       .getAttribute('data-pending', { timeout: 5_000 })
       .catch(() => null);
     if (pending) {
-      await expect(page.locator(`.globe-pin[data-landmark="${pending}"]`)).toHaveAttribute(
-        'data-state',
-        'tile',
-      );
+      await expect(
+        page.locator(`.globe:not(.is-embedded) .globe-pin[data-landmark="${pending}"]`),
+      ).toHaveAttribute('data-state', 'tile');
     }
-    await expect(page.locator('.globe-pin[data-state="catalogue"]').first()).toBeAttached();
+    await expect(
+      page.locator('.globe:not(.is-embedded) .globe-pin[data-state="catalogue"]').first(),
+    ).toBeAttached();
 
     // Frozen, and keys never reach the game.
     const before = await subPos(page);
@@ -122,15 +122,15 @@ test.describe('globe mission select', () => {
 
     // Tab lands on a pin and shows its card.
     await page.keyboard.press('Tab');
-    await expect(page.locator('.globe-pin:focus')).toHaveCount(1);
-    await expect(page.locator('.globe-card')).toBeVisible();
+    await expect(page.locator('.globe:not(.is-embedded) .globe-pin:focus')).toHaveCount(1);
+    await expect(page.locator('.globe:not(.is-embedded) .globe-card')).toBeVisible();
 
     await page.waitForTimeout(1500); // let the camera ease to the focused pin
     await page.screenshot({ path: 'tests/e2e/screenshots/globe.png' });
 
     await page.keyboard.press('Escape');
     expect(await globeOpen(page)).toBe(false);
-    await expect(page.locator('.globe')).toBeHidden();
+    await expect(page.locator('.globe:not(.is-embedded)')).toBeHidden();
     const closed = await subPos(page);
     await holdForward(page, 1000);
     const moved = await subPos(page);
@@ -139,9 +139,12 @@ test.describe('globe mission select', () => {
     ).toBeGreaterThan(0.1);
 
     await page.keyboard.press('KeyN');
-    await expect.poll(() => globeOpen(page)).toBe(true);
-    await page.keyboard.press('KeyN');
     await expect.poll(() => globeOpen(page)).toBe(false);
+    await page.keyboard.press('Escape');
+    await page.locator('.pause-menu').getByRole('button', { name: 'Mission select' }).click();
+    await expect(
+      page.locator('.pause-sites-scroll .mission-item.is-mission').first(),
+    ).toBeVisible();
 
     expect(errors).toEqual([]);
   });
@@ -151,7 +154,7 @@ test.describe('globe mission select', () => {
     await boot(page, '/?tile=lost-city&globe=1');
     await globeReady(page);
     await tabToPin(page, 'titanic');
-    await expect(page.locator('.globe-card')).toContainText('MISSION');
+    await expect(page.locator('.globe:not(.is-embedded) .globe-card')).toContainText('MISSION');
     await Promise.all([page.waitForURL(/[?&]mission=titanic\b/), page.keyboard.press('Enter')]);
     const url = new URL(page.url());
     expect(url.searchParams.get('mission')).toBe('titanic');
@@ -163,8 +166,8 @@ test.describe('globe mission select', () => {
     await boot(page, '/?tile=titanic&globe=1');
     await globeReady(page);
     await page.keyboard.press('Tab'); // show the card as well
-    await expect(page.locator('.globe-card')).toBeVisible();
-    const axe = await new AxeBuilder({ page }).include('.globe').analyze();
+    await expect(page.locator('.globe:not(.is-embedded) .globe-card')).toBeVisible();
+    const axe = await new AxeBuilder({ page }).include('.globe:not(.is-embedded)').analyze();
     expect(axe.violations.map((v) => `${v.id}: ${v.nodes.length} (${v.help})`)).toEqual([]);
   });
 });
