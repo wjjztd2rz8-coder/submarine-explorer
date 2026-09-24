@@ -355,6 +355,7 @@ async function main(): Promise<void> {
     zoom: config.sonarZoom,
   });
   sonar.setSensorRange(config.sensorPresets[settings.gameplay.sensors].sonarPoiRange);
+  sonar.setMarkersVisible(settings.gameplay.sonarMarkers);
   // --- D-SONAR end ---
   // --- B1 begin ---
   // POIs, scan beam, discoveries, field guide (J), debrief. `?landmark=` picks
@@ -792,6 +793,16 @@ async function main(): Promise<void> {
     else return;
     event.preventDefault();
   });
+  window.addEventListener(
+    'wheel',
+    (event) => {
+      if (!sonar.expanded || appState !== 'dive') return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      sonar.zoomBy(event.deltaY < 0 ? -1 : 1);
+    },
+    { capture: true, passive: false },
+  );
   // --- D-SONAR end ---
 
   rig.reduceMotion = settings.reduceMotion;
@@ -981,8 +992,10 @@ async function main(): Promise<void> {
   });
   // --- D-SONAR begin ---
   save.onChange((next, changed) => {
-    if (changed.includes('gameplay'))
+    if (changed.includes('gameplay')) {
       sonar.setSensorRange(config.sensorPresets[next.gameplay.sensors].sonarPoiRange);
+      sonar.setMarkersVisible(next.gameplay.sonarMarkers);
+    }
   });
   // --- D-SONAR end ---
   // --- D-SCAN begin ---
@@ -1125,11 +1138,15 @@ async function main(): Promise<void> {
       depthM: Math.round(Math.max(0, -target.y) * 10) / 10,
     });
     if (!result.saved) photoMode.toast(result.error, true);
-    else if (result.dropped)
+    else if (result.dropped) {
+      photoMode.shutter();
       photoMode.toast(
         `Saved to Journal · oldest ${result.dropped === 1 ? 'photo' : `${result.dropped} photos`} removed (keeps ${PHOTO_LIMIT})`,
       );
-    else photoMode.toast('Saved to Journal');
+    } else {
+      photoMode.shutter();
+      photoMode.toast('Saved to Journal');
+    }
     journal.refresh();
   };
   // --- D-PHOTO end ---

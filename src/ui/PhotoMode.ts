@@ -36,7 +36,10 @@ export class PhotoMode {
   private readonly caption: HTMLParagraphElement;
   private readonly tips: HTMLParagraphElement;
   private readonly toastEl: HTMLParagraphElement;
+  private readonly captureButton: HTMLButtonElement;
+  private readonly flash: HTMLDivElement;
   private toastTimer = 0;
+  private flashTimer = 0;
   private active_ = false;
 
   constructor(onCapture: () => void, parent: HTMLElement = document.body) {
@@ -60,6 +63,9 @@ export class PhotoMode {
     this.toastEl.className = 'photo-mode-toast';
     this.toastEl.setAttribute('role', 'status');
     this.toastEl.hidden = true;
+    this.flash = document.createElement('div');
+    this.flash.className = 'd2-photo-flash';
+    this.flash.setAttribute('aria-hidden', 'true');
 
     const bottom = document.createElement('div');
     bottom.className = 'photo-mode-bottom';
@@ -68,11 +74,11 @@ export class PhotoMode {
     const capture = document.createElement('button');
     capture.type = 'button';
     capture.className = 'photo-mode-capture';
-    capture.textContent = 'Capture';
+    this.captureButton = capture;
     capture.addEventListener('click', onCapture);
     bottom.append(this.tips, capture);
 
-    this.root.append(top, this.toastEl, bottom);
+    this.root.append(this.flash, top, this.toastEl, bottom);
     parent.append(this.root);
   }
 
@@ -85,8 +91,18 @@ export class PhotoMode {
     this.active_ = on;
     this.root.hidden = !on;
     document.body.classList.toggle('photo-active', on);
-    this.tips.textContent = `${captureKey} capture · Esc exit · drag orbit · wheel zoom`;
+    const keys = captureKey === 'Space' ? 'Space' : `${captureKey} / Space`;
+    this.captureButton.textContent = `Capture (${keys})`;
+    this.tips.textContent = 'Esc: exit photo mode · drag orbit · wheel zoom';
     if (!on) this.hideToast();
+  }
+
+  shutter(): void {
+    this.flash.classList.remove('is-active');
+    void this.flash.offsetWidth;
+    this.flash.classList.add('is-active');
+    window.clearTimeout(this.flashTimer);
+    this.flashTimer = window.setTimeout(() => this.flash.classList.remove('is-active'), 350);
   }
 
   /** "Titanic · Bow section"; the site alone when nothing is in frame. */

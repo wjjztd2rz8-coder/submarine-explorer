@@ -182,6 +182,7 @@ export class Sonar {
   private readonly zoomConfig: SonarZoomConfig;
   private zoomIndex: number;
   private sensorRangeM = 2000;
+  private showMarkers = true;
   private pois: readonly PlacedPoi[] = [];
   private objectivePoiId: string | null = null;
   private lastPosition = { x: 0, z: 0 };
@@ -221,7 +222,21 @@ export class Sonar {
     header.innerHTML = '<span>SONAR <span class="d-sonar-north">N ↑</span></span>';
     this.rangeLabel = document.createElement('span');
     this.rangeLabel.className = 'd-sonar-range';
-    header.append(this.rangeLabel);
+    const controls = document.createElement('span');
+    controls.className = 'd2-sonar-controls';
+    const zoomIn = document.createElement('button');
+    zoomIn.type = 'button';
+    zoomIn.textContent = '+';
+    zoomIn.setAttribute('aria-label', 'Sonar zoom in');
+    zoomIn.addEventListener('click', () => this.zoomBy(-1));
+    const zoomOut = document.createElement('button');
+    zoomOut.type = 'button';
+    zoomOut.textContent = '−';
+    zoomOut.setAttribute('aria-label', 'Sonar zoom out');
+    zoomOut.addEventListener('click', () => this.zoomBy(1));
+    controls.append(zoomOut, this.rangeLabel, zoomIn);
+    header.append(controls);
+    this.root.title = 'Sonar range: + / − keys or mouse wheel. M expands the map.';
     this.root.append(header);
     this.canvas = document.createElement('canvas');
     const dpr = Math.min(2, globalThis.devicePixelRatio || 1);
@@ -306,6 +321,10 @@ export class Sonar {
   }
   setSensorRange(rangeM: number): void {
     this.sensorRangeM = rangeM;
+  }
+  setMarkersVisible(visible: boolean): void {
+    this.showMarkers = visible;
+    this.root.classList.toggle('d2-sonar-markers-hidden', !visible);
   }
 
   private updateRangeLabel(): void {
@@ -541,7 +560,7 @@ export class Sonar {
     ctx.fillStyle = pal.blip;
     ctx.strokeStyle = pal.blipOutline ?? pal.blip;
     ctx.lineWidth = 1;
-    for (const lm of this.pois.length ? [] : this.landmarks) {
+    for (const lm of this.showMarkers ? (this.pois.length ? [] : this.landmarks) : []) {
       const { px, py } = this.project(lm.position.x, lm.position.z);
       if (
         !sonarPoiVisible(
@@ -576,7 +595,7 @@ export class Sonar {
         icon: sonarPoiIcon(scanned, current),
         // Contacts outside the current view are hidden, including those in
         // sensor range; zoom out or move the boat to reveal them.
-        visible: sonarPoiVisible(distanceM, this.sensorRangeM, px, py, w, h),
+        visible: this.showMarkers && sonarPoiVisible(distanceM, this.sensorRangeM, px, py, w, h),
       };
     });
     for (const marker of this.markers.filter((m) => m.visible && !m.current))

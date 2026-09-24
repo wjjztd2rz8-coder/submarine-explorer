@@ -9,6 +9,7 @@ import { mkdir } from 'node:fs/promises';
  */
 
 const shots = '.cache/codex/shots/d-photo';
+const d2Shots = '.cache/codex/shots/d2-sonarphoto';
 const PHOTOS_KEY = 'subexplorer.photos.v1';
 const DIVE = '/?mission=titanic&poi=titanic-bow&skipBriefing=1';
 
@@ -66,6 +67,7 @@ function storedPhotos(page: Page) {
 
 test('photo mode freezes the sim, saves to the Journal, persists and deletes', async ({ page }) => {
   await mkdir(shots, { recursive: true });
+  await mkdir(d2Shots, { recursive: true });
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto(DIVE);
@@ -86,8 +88,9 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   await expect(page.locator('.objectives-panel')).toBeHidden();
   await expect(mode.locator('.photo-mode-caption')).toHaveText(/^.*Titanic.* · Bow section$/);
   await expect(mode.locator('.photo-mode-tips')).toHaveText(
-    'Enter capture · Esc exit · drag orbit · wheel zoom',
+    'Esc: exit photo mode · drag orbit · wheel zoom',
   );
+  await expect(mode.getByRole('button', { name: 'Capture (Enter / Space)' })).toBeVisible();
   expect((await cameraSnapshot(page)).mode).toBe('orbit');
 
   // ---- frozen: throttle held, nothing moves or drains.
@@ -129,6 +132,7 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   await expect(mode.locator('.photo-mode-caption')).toContainText('Bow section');
   await page.waitForTimeout(300);
   await page.screenshot({ path: `${shots}/photo-mode.png` });
+  await page.screenshot({ path: `${d2Shots}/photo-mode.png` });
 
   // ---- capture.
   await page.keyboard.press('Enter');
@@ -200,6 +204,23 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   await expect(journal.locator('.jr-photo-card')).toContainText('Bow section');
   await page.waitForTimeout(300);
   await page.screenshot({ path: `${shots}/journal-photos.png` });
+  await expect(journal.getByRole('button', { name: 'Download all' })).toBeVisible();
+  await expect(
+    journal.getByRole('button', { name: 'Download RMS Titanic · Bow section' }),
+  ).toBeVisible();
+  await page.screenshot({ path: `${d2Shots}/gallery.png` });
+  const oneDownload = page.waitForEvent('download');
+  await journal.getByRole('button', { name: 'Download RMS Titanic · Bow section' }).click();
+  const one = await oneDownload;
+  expect(one.suggestedFilename()).toMatch(/^rms-titanic-bow-section-\d{4}-\d{2}-\d{2}\.jpg$/);
+  const allDownload = page.waitForEvent('download');
+  await journal.getByRole('button', { name: 'Download all' }).click();
+  const all = await allDownload;
+  expect(all.suggestedFilename()).toBe('journal-photos.zip');
+  // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+  const { readFile } = await import('node:fs/promises');
+  const zip = await readFile((await all.path()) as string);
+  expect([...zip.subarray(0, 4)]).toEqual([0x50, 0x4b, 0x03, 0x04]);
   await journal.locator('.jr-photo-card').click();
   await expect(journal.locator('.jr-photo-caption')).toHaveText(/Titanic.* · Bow section$/);
   await expect(journal.locator('.jr-photo-detail')).toContainText('m deep');

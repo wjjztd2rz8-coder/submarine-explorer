@@ -3,6 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 
 const shots = '.cache/codex/shots/d-sonar';
+const d2Shots = '.cache/codex/shots/d2-sonarphoto';
 
 interface MarkerState {
   poiId: string;
@@ -29,6 +30,53 @@ async function shot(page: Page, name: string): Promise<void> {
   await page.waitForTimeout(100);
   await page.screenshot({ path: `${shots}/${name}.png` });
 }
+
+async function d2Shot(page: Page, name: string): Promise<void> {
+  await mkdir(d2Shots, { recursive: true });
+  await page.screenshot({ path: `${d2Shots}/${name}.png` });
+}
+
+test('visible sonar controls, expanded wheel routing, and live marker setting', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/?mission=titanic&poi=titanic-bow&skipBriefing=1');
+  await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
+  const sonar = page.locator('.sonar');
+  await expect(sonar.getByRole('button', { name: 'Sonar zoom in' })).toBeVisible();
+  await expect(sonar.getByRole('button', { name: 'Sonar zoom out' })).toBeVisible();
+  await expect(sonar).toHaveAttribute('title', /mouse wheel/);
+  await d2Shot(page, 'mini-sonar');
+  await sonar.getByRole('button', { name: 'Sonar zoom in' }).click();
+  await expect(sonar.locator('.d-sonar-range')).toHaveText('500 m');
+  await page.keyboard.press('m');
+  await expect(sonar).toHaveClass(/d-sonar-expanded/);
+  await d2Shot(page, 'expanded-sonar');
+  const cameraRadius = await page.evaluate(
+    () => (window.__game as { rig: { chaseRadius: number } }).rig.chaseRadius,
+  );
+  await page.mouse.move(1100, 450);
+  await page.mouse.wheel(0, -100);
+  await expect(sonar.locator('.d-sonar-range')).toHaveText('250 m');
+  await page.waitForTimeout(100);
+  expect(
+    await page.evaluate(() => (window.__game as { rig: { chaseRadius: number } }).rig.chaseRadius),
+  ).toBe(cameraRadius);
+  await page.evaluate(() =>
+    (
+      window.__game as { save: { setGameplayOption(key: 'sonarMarkers', value: boolean): void } }
+    ).save.setGameplayOption('sonarMarkers', false),
+  );
+  await expect.poll(() => marker(page, 'titanic-bow')).toMatchObject({ visible: false });
+  await expect(sonar).toHaveClass(/d2-sonar-markers-hidden/);
+  await d2Shot(page, 'markers-off');
+  await page.evaluate(() =>
+    (
+      window.__game as { save: { setGameplayOption(key: 'sonarMarkers', value: boolean): void } }
+    ).save.setGameplayOption('sonarMarkers', true),
+  );
+  await expect.poll(() => marker(page, 'titanic-bow')).toMatchObject({ visible: true });
+});
 
 test('sonar follows the sub, zooms by keys and wheel, and marks dive scan state', async ({
   page,
