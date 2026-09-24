@@ -275,6 +275,7 @@ describe('bearing and range', () => {
     ): ObjectiveStatus => ({
       id,
       title: id,
+      hint: '',
       poiId,
       primary,
       complete: false,

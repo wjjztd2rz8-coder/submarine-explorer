@@ -1,16 +1,18 @@
 /**
- * Mission flow core (B3): the `mission.json` schema (plan/PHASE-B-CONTRACTS.md
- * §2.4), its validator/loader, the `data/landmarks/index.json` manifest, and
- * the {@link Mission} state machine that turns `scan:complete` events into
- * objective progress and, with `completion: "all_primary"`, a
- * `mission:complete`.
+ * Mission flow core (B3, D-FLOW): the `mission.json` schema
+ * (plan/PHASE-B-CONTRACTS.md §2.4), its validator/loader, the
+ * `data/landmarks/index.json` manifest, and the {@link Mission} state machine
+ * that turns `scan:complete` events into objective progress. Finishing the
+ * primary objectives (`completion: "all_primary"`) no longer ends the dive:
+ * the player keeps exploring until they choose to surface
+ * (plan/PHASE-D-CONTRACTS.md §4).
  *
  * Pure TS: no DOM, no Three.js. The DOM overlays (Briefing, ObjectivesPanel,
  * the debrief) and the engine wiring live in MissionRouter.ts.
  *
- * Objectives count scans made *during this mission*, not the persisted
- * discovery store: a player who already found the bow last week still has to
- * dive to it again for the mission to complete (docs/missions.md).
+ * Objectives count scans made *during this dive*, not the persisted discovery
+ * store (the Journal): a player who already found the bow last week still has
+ * to dive to it again for the mission to complete (docs/missions.md).
  */
 
 import type { EventBus, GameEvents } from '../core/EventBus.js';
@@ -48,6 +50,8 @@ export interface MissionObjectiveDef {
   poi: string;
   primary: boolean;
   title: string;
+  /** What the target is and roughly where (D-CONTENT). Empty when the file has none. */
+  hint: string;
 }
 
 export type CompletionRule = 'all_primary';
@@ -147,6 +151,7 @@ export function parseMission(
       poi: o.poi,
       primary: o.primary !== false,
       title: isStr(o.title) ? o.title : o.id,
+      hint: isStr(o.hint) ? o.hint.trim() : '',
     });
   });
   if (!objectives.length) {
@@ -258,14 +263,24 @@ export async function loadMissionSummaries(
 
 // ------------------------------------------------------------ state machine
 
-export type MissionState = 'briefing' | 'running' | 'completing' | 'complete' | 'aborted';
+/**
+ * `briefing → diving → primaries-complete → debrief`, plus
+ * `aborted → debrief` after an emergency ascent (plan/PHASE-D-CONTRACTS.md §4).
+ * "Keep exploring" returns from `debrief` to the state the dive was in.
+ */
+export type MissionState = 'briefing' | 'diving' | 'primaries-complete' | 'debrief' | 'aborted';
 
 /** Why a dive was aborted. Only crush depth for now (plan/DECISIONS.md failure model). */
 export type AbortReason = 'crush';
 
+/** Why the debrief opened: a voluntary surface, everything done, or an abort. */
+export type EndReason = GameEvents['mission:ended']['reason'];
+
 export interface ObjectiveStatus {
   id: string;
   title: string;
+  /** What and roughly where; empty when the content has no hint. */
+  hint: string;
   poiId: string;
   primary: boolean;
   complete: boolean;
@@ -279,41 +294,51 @@ export type MissionBus = Pick<EventBus, 'on' | 'emit'>;
 export interface MissionOptions {
   def: MissionDef;
   bus: MissionBus;
-  /** Seconds from the last primary scan to `mission:complete`. */
-  completeDelayS: number;
   warn?: Warn;
 }
 
 type MissionEventName =
   | 'mission:started'
   | 'mission:objective'
+  | 'mission:primaryComplete'
   | 'mission:complete'
+  | 'mission:ended'
   | 'mission:restart'
   | 'mission:aborted';
+
+/** A dive in progress: scans count and the clock runs. */
+const DIVING: ReadonlySet<MissionState> = new Set(['diving', 'primaries-complete']);
 
 /**
  * Tracks one mission run. Lifecycle:
  *
- *     briefing --start()--> running --last primary scanned--> completing
- *              --completeDelayS of update()--> complete
- *     running | completing --abort('crush')--> aborted
+ *     briefing --start()--> diving --last primary scanned--> primaries-complete
+ *     diving | primaries-complete --end()--> debrief --resume()--> (previous)
+ *     diving | primaries-complete --abort('crush')--> aborted --end()--> debrief
  *
- * Only scans while `running` count. `update(dt)` must be fed real (unpaused)
- * seconds; it accumulates the dive duration and runs the completion delay.
+ * Nothing finishes the dive automatically. `mission:primaryComplete` fires
+ * once per dive, on the scan that completes the last primary. `mission:complete`
+ * fires once, on the first voluntary end after that; `mission:ended` fires on
+ * every transition into the debrief. `update(dt)` must be fed real (unpaused)
+ * seconds; it accumulates the dive duration.
  */
 export class Mission {
   readonly def: MissionDef;
   readonly id: string;
   state: MissionState = 'briefing';
   readonly objectives: ObjectiveStatus[];
-  /** Seconds spent `running`/`completing` (the briefing does not count). */
+  /** Seconds spent diving (the briefing and the debrief do not count). */
   elapsedS = 0;
-  /** Duration reported by `mission:complete`, once complete. */
+  /** Dive time at the most recent end of the dive; null while diving. */
   durationS: number | null = null;
+  /** Why the most recent debrief opened; null until the dive ends. */
+  endReason: EndReason | null = null;
   /** Every mission event this instance emitted, oldest first (for tests / `__game`). */
   readonly emitted: Array<{ name: MissionEventName; payload: unknown }> = [];
 
-  private completeTimer = 0;
+  /** The state "Keep exploring" returns to; null when the dive cannot resume. */
+  private resumeState: MissionState | null = null;
+  private completeEmitted = false;
   private readonly listeners: Array<(m: Mission) => void> = [];
   private readonly off: () => void;
 
@@ -323,6 +348,7 @@ export class Mission {
     this.objectives = opts.def.objectives.map((o) => ({
       id: o.id,
       title: o.title,
+      hint: o.hint,
       poiId: o.poi,
       primary: o.primary,
       complete: false,
@@ -359,50 +385,106 @@ export class Mission {
     return p.length > 0 && p.every((o) => o.complete);
   }
 
+  /** True when every resolvable objective, primary or not, is complete (and there is one). */
+  get allComplete(): boolean {
+    const r = this.objectives.filter((o) => o.resolved);
+    return r.length > 0 && r.every((o) => o.complete);
+  }
+
+  /** True while the dive is on (scans count, the clock runs). */
+  get diving(): boolean {
+    return DIVING.has(this.state);
+  }
+
+  /** True when the debrief can return to the dive ("Keep exploring"). */
+  get canResume(): boolean {
+    return this.state === 'debrief' && this.resumeState !== null;
+  }
+
+  /** "X of Y objectives": completed and total resolvable objectives. */
+  counts(): { completed: number; total: number } {
+    const r = this.objectives.filter((o) => o.resolved);
+    return { completed: r.filter((o) => o.complete).length, total: r.length };
+  }
+
   /** Close the briefing and begin the dive. Idempotent. */
   start(tileId: string): void {
     if (this.state !== 'briefing') return;
-    this.state = 'running';
+    this.state = 'diving';
     this.emit('mission:started', { missionId: this.id, tileId });
     this.changed();
   }
 
   /** Called per frame with real seconds (0 while paused). */
   update(dt: number): void {
-    if (this.state !== 'running' && this.state !== 'completing') return;
-    const step = Math.max(0, dt);
-    this.elapsedS += step;
-    if (this.state === 'completing') {
-      this.completeTimer -= step;
-      if (this.completeTimer <= 0) {
-        this.state = 'complete';
-        this.durationS = this.elapsedS;
-        this.emit('mission:complete', { missionId: this.id, durationS: this.elapsedS });
-        this.changed();
-      }
-    }
+    if (!this.diving) return;
+    this.elapsedS += Math.max(0, dt);
   }
 
   /**
    * The dive failed (crush depth: the emergency blow has brought the boat
    * back up). Stops the clock, ignores further scans and emits
-   * `mission:aborted`. Only a running (or completing) mission can abort.
+   * `mission:aborted`. Only a dive in progress can abort; `end()` then opens
+   * the debrief, which cannot resume.
    */
   abort(reason: AbortReason): void {
-    if (this.state !== 'running' && this.state !== 'completing') return;
+    if (!this.diving) return;
     this.state = 'aborted';
     this.durationS = this.elapsedS;
+    this.resumeState = null;
     this.emit('mission:aborted', { missionId: this.id, reason });
     this.changed();
   }
 
-  /** "Dive again": announce the restart and reset to the briefing state. */
+  /**
+   * End the dive and move to the debrief: the player surfaced, or an abort
+   * finished. Emits `mission:complete` (once per dive, only when the primaries
+   * are done and this is not an abort) and then `mission:ended`. Returns false
+   * when there is no dive to end.
+   */
+  end(): boolean {
+    const from = this.state;
+    if (!DIVING.has(from) && from !== 'aborted') return false;
+    const reason: EndReason = from === 'aborted' ? 'abort' : this.allComplete ? 'all' : 'surface';
+    this.durationS = this.elapsedS;
+    this.endReason = reason;
+    this.resumeState = from === 'aborted' ? null : from;
+    this.state = 'debrief';
+    if (reason !== 'abort' && this.primaryComplete && !this.completeEmitted) {
+      this.completeEmitted = true;
+      this.emit('mission:complete', { missionId: this.id, durationS: this.elapsedS });
+    }
+    const { completed, total } = this.counts();
+    this.emit('mission:ended', {
+      missionId: this.id,
+      reason,
+      completed,
+      total,
+      durationS: this.elapsedS,
+    });
+    this.changed();
+    return true;
+  }
+
+  /** "Keep exploring": back from the debrief to the dive it interrupted. */
+  resume(): boolean {
+    if (!this.canResume || !this.resumeState) return false;
+    this.state = this.resumeState;
+    this.resumeState = null;
+    this.durationS = null;
+    this.changed();
+    return true;
+  }
+
+  /** "Dive again": announce the restart and reset to a fresh briefing. */
   restart(): void {
     this.emit('mission:restart', { missionId: this.id });
     this.state = 'briefing';
     this.elapsedS = 0;
     this.durationS = null;
-    this.completeTimer = 0;
+    this.endReason = null;
+    this.resumeState = null;
+    this.completeEmitted = false;
     for (const o of this.objectives) o.complete = false;
     this.changed();
   }
@@ -422,7 +504,7 @@ export class Mission {
   }
 
   private onScan(poiId: string): void {
-    if (this.state !== 'running') return;
+    if (!this.diving) return;
     let any = false;
     for (const o of this.objectives) {
       if (o.poiId !== poiId || o.complete || !o.resolved) continue;
@@ -431,11 +513,9 @@ export class Mission {
       this.emit('mission:objective', { missionId: this.id, objectiveId: o.id, complete: true });
     }
     if (!any) return;
-    if (this.primaryComplete) {
-      this.state = 'completing';
-      this.completeTimer = Math.max(0, this.opts.completeDelayS);
-      // A zero delay completes on the next update(), never re-entrantly inside
-      // the scan:complete handler.
+    if (this.state === 'diving' && this.primaryComplete) {
+      this.state = 'primaries-complete';
+      this.emit('mission:primaryComplete', { missionId: this.id, ...this.counts() });
     }
     this.changed();
   }

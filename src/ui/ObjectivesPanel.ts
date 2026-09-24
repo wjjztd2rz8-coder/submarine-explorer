@@ -1,7 +1,10 @@
 /**
- * Mission objectives HUD panel (B3): the objective checklist (primary first,
- * secondary dimmer), a nav line with bearing and range to the nearest open
- * primary objective, and the current sim-speed multiplier.
+ * Mission objectives HUD panel (B3, compacted in D-FLOW): the single place
+ * the current objective shows during a dive. Top centre, three short lines:
+ * the mission title, a nav line (target, bearing, range, depth, turn) and an
+ * "n of m" progress line. The full list with hints lives in the Esc menu's
+ * Objectives view. Under it: the amber alert strip and the completion banner
+ * ("Primary objectives complete" with Keep exploring / Surface and debrief).
  *
  * Bearings use the HUD's compass convention (0 = north, 90 = east); the
  * router computes them with `headingFromForward` from geo.ts, the same maths
@@ -23,6 +26,14 @@ export interface NavReadout {
   relativeDeg: number;
 }
 
+/** The completion banner: a title, a detail line and the two end-of-dive choices. */
+export interface CompletionBanner {
+  title: string;
+  detail: string;
+  onKeepExploring: () => void;
+  onSurface: () => void;
+}
+
 export function formatRange(m: number): string {
   return m >= 1000 ? `${(m / 1000).toFixed(2)} km` : `${Math.round(m)} m`;
 }
@@ -32,6 +43,18 @@ export function formatTurn(relativeDeg: number, aheadDeg = 10): string {
   const a = Math.round(Math.abs(relativeDeg));
   if (a <= aheadDeg) return 'AHEAD';
   return `${a}° ${relativeDeg > 0 ? 'STBD' : 'PORT'}`;
+}
+
+/** The progress line: "1 of 4 objectives · 1 of 2 primary" (resolvable objectives only). */
+export function formatProgress(objectives: readonly ObjectiveStatus[]): string {
+  const live = objectives.filter((o) => o.resolved);
+  const done = live.filter((o) => o.complete).length;
+  const primary = live.filter((o) => o.primary);
+  const primaryDone = primary.filter((o) => o.complete).length;
+  const all = `${done} of ${live.length} objectives`;
+  if (live.length && done === live.length) return `${all} · all complete`;
+  if (primary.length && primaryDone === primary.length) return `${all} · primaries done`;
+  return `${all} · ${primaryDone} of ${primary.length} primary`;
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(
@@ -48,39 +71,63 @@ function el<K extends keyof HTMLElementTagNameMap>(
 export class ObjectivesPanel {
   readonly root: HTMLDivElement;
   private readonly titleEl: HTMLSpanElement;
-  private readonly speedEl: HTMLSpanElement;
-  private readonly listEl: HTMLUListElement;
   private readonly navEl: HTMLDivElement;
+  private readonly progressEl: HTMLDivElement;
   private readonly alertEl: HTMLDivElement;
+  private readonly bannerEl: HTMLDivElement;
+  private readonly bannerTitle: HTMLElement;
+  private readonly bannerDetail: HTMLElement;
+  private banner: CompletionBanner | null = null;
   private readonly navText = new Map<string, HTMLSpanElement>();
   private readonly cache = new Map<string, string>();
   private resizeObserver: ResizeObserver | null = null;
 
   constructor(parent: HTMLElement = document.body) {
     this.root = el('div', 'objectives-panel');
-    this.root.setAttribute('aria-label', 'Mission objectives');
+    this.root.setAttribute('aria-label', 'Current objective');
     const head = el('div', 'obj-head');
     this.titleEl = el('span', 'obj-title', 'MISSION');
-    this.speedEl = el('span', 'obj-speed', 'SIM 1×');
-    head.append(this.titleEl, this.speedEl);
-    this.listEl = el('ul', 'obj-list');
+    head.append(this.titleEl);
     this.navEl = el('div', 'obj-nav');
     for (const f of ['target', 'bearing', 'range', 'depth', 'turn']) {
       const span = el('span', `obj-nav-${f}`);
       this.navText.set(f, span);
       this.navEl.append(span);
     }
+    this.progressEl = el('div', 'obj-progress');
     // Amber alert strip (e.g. HULL FAILURE — EMERGENCY ASCENT); hidden when empty.
     this.alertEl = el('div', 'obj-alert');
     this.alertEl.setAttribute('role', 'alert');
     this.alertEl.hidden = true;
-    this.root.append(head, this.alertEl, this.listEl, this.navEl);
+
+    // Completion banner. Never takes focus: the player's hands are on the
+    // flight keys, and Space/Enter on a focused button would end the dive.
+    this.bannerEl = el('div', 'obj-banner');
+    this.bannerEl.setAttribute('role', 'status');
+    this.bannerEl.hidden = true;
+    this.bannerTitle = el('strong', 'obj-banner-title');
+    this.bannerDetail = el('span', 'obj-banner-detail');
+    const text = el('div', 'obj-banner-text');
+    text.append(this.bannerTitle, this.bannerDetail);
+    const actions = el('div', 'obj-banner-actions');
+    const keep = el('button', 'obj-banner-btn is-keep', 'Keep exploring');
+    const surface = el('button', 'obj-banner-btn is-surface', 'Surface and debrief');
+    for (const b of [keep, surface]) {
+      b.type = 'button';
+      b.tabIndex = -1;
+      // Keep keyboard focus on the page so flight keys keep working.
+      b.addEventListener('mousedown', (e) => e.preventDefault());
+    }
+    keep.addEventListener('click', () => this.banner?.onKeepExploring());
+    surface.addEventListener('click', () => this.banner?.onSurface());
+    actions.append(keep, surface);
+    this.bannerEl.append(text, actions);
+
+    this.root.append(head, this.navEl, this.progressEl, this.alertEl, this.bannerEl);
     parent.appendChild(this.root);
 
     // QA-C #1: the HUD warning banner sits below this panel (styles.css);
-    // its exact height varies with title wrap, the alert strip and the
-    // objective count, so track it live via --obj-panel-bottom rather than
-    // a static offset that breaks on taller content (e.g. Challenger Deep).
+    // track its live height via --obj-panel-bottom.
     if (typeof ResizeObserver !== 'undefined') {
       this.resizeObserver = new ResizeObserver(() => this.syncPanelBottom());
       this.resizeObserver.observe(this.root);
@@ -94,7 +141,7 @@ export class ObjectivesPanel {
     }
   }
 
-  /** Show (or with null, clear) the amber alert strip under the title. */
+  /** Show (or with null, clear) the amber alert strip. */
   setAlert(text: string | null): void {
     this.write(this.alertEl, 'alert', text ?? '');
     this.alertEl.hidden = !text;
@@ -107,35 +154,33 @@ export class ObjectivesPanel {
   setTitle(title: string): void {
     const text = `MISSION · ${title.toUpperCase()}`;
     this.titleEl.textContent = text;
-    // QA-C #2: long titles (e.g. "Beebe Vent Field: The Deepest Black …")
-    // are truncated by CSS; the full text stays available on hover/focus.
+    // QA-C #2: long titles are truncated by CSS; the full text stays on hover.
     this.titleEl.title = text;
   }
 
-  setSimSpeed(multiplier: number): void {
-    this.write(this.speedEl, 'speed', `SIM ${multiplier}×`);
-    this.speedEl.classList.toggle('is-fast', multiplier > 1);
-  }
-
-  /** Rebuild the checklist. Cheap; only called when an objective changes. */
+  /** Refresh the "n of m" progress line. Cheap; called when an objective changes. */
   setObjectives(objectives: readonly ObjectiveStatus[]): void {
-    const sorted = [...objectives].sort((a, b) => Number(b.primary) - Number(a.primary));
-    this.listEl.replaceChildren(
-      ...sorted.map((o) => {
-        const li = el('li', 'obj-item');
-        li.dataset.objective = o.id;
-        li.dataset.primary = String(o.primary);
-        li.classList.toggle('is-primary', o.primary);
-        li.classList.toggle('is-secondary', !o.primary);
-        li.classList.toggle('is-complete', o.complete);
-        li.classList.toggle('is-unresolved', !o.resolved);
-        li.append(el('span', 'obj-box', o.complete ? '☑' : '☐'), el('span', 'obj-text', o.title));
-        return li;
-      }),
-    );
+    this.write(this.progressEl, 'progress', formatProgress(objectives));
   }
 
-  /** The nav line; `allPrimaryDone` swaps in a completion notice when nothing primary is left. */
+  /** Show the completion banner (replacing any open one). */
+  showBanner(banner: CompletionBanner): void {
+    this.banner = banner;
+    this.bannerTitle.textContent = banner.title;
+    this.bannerDetail.textContent = banner.detail;
+    this.bannerEl.hidden = false;
+  }
+
+  hideBanner(): void {
+    this.banner = null;
+    this.bannerEl.hidden = true;
+  }
+
+  get bannerOpen(): boolean {
+    return !this.bannerEl.hidden;
+  }
+
+  /** The nav line; `allPrimaryDone` marks the target as optional, or shows a notice when none is left. */
   setNav(nav: NavReadout | null, allPrimaryDone: boolean): void {
     const t = (f: string, text: string): void => {
       const span = this.navText.get(f);
@@ -143,11 +188,11 @@ export class ObjectivesPanel {
     };
     this.navEl.classList.toggle('is-done', allPrimaryDone);
     if (!nav) {
-      t('target', allPrimaryDone ? 'ALL PRIMARY OBJECTIVES COMPLETE' : 'NO TARGET POSITION');
+      t('target', allPrimaryDone ? 'ALL OBJECTIVES COMPLETE' : 'NO TARGET POSITION');
       for (const f of ['bearing', 'range', 'depth', 'turn']) t(f, '');
       return;
     }
-    const prefix = allPrimaryDone ? 'PRIMARY DONE · NEXT ' : '→ ';
+    const prefix = nav.primary ? '→ ' : 'OPTIONAL → ';
     t('target', `${prefix}${nav.name.toUpperCase()}`);
     t('bearing', `BRG ${String(Math.round(nav.bearingDeg) % 360).padStart(3, '0')}°`);
     t('range', `RNG ${formatRange(nav.rangeM)}`);

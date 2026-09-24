@@ -3,8 +3,9 @@ import { expect, test, type Page } from '@playwright/test';
 /**
  * B1 discovery loop, end to end, against the `_test` fixture landmark on the
  * real Titanic tile: spawn next to a POI (`?poi=`), hold F until the scan
- * completes, check it persisted across a reload, open the field guide (J),
- * and screenshot the guide and the debrief (`?debrief=1`).
+ * completes, check it persisted across a reload, open the Journal (J; it
+ * replaced the field guide in D-FLOW), and screenshot the Journal and the
+ * debrief (`?debrief=1`).
  *
  * State is read through `window.__game.{scanner,discoveries,discovery}`.
  */
@@ -62,8 +63,8 @@ async function boot(page: Page, url: string): Promise<void> {
   );
 }
 
-test.describe('B1 scan, discovery, field guide', () => {
-  test('scan the bow, persist across reload, open the field guide', async ({ page }) => {
+test.describe('B1 scan, discovery, Journal', () => {
+  test('scan the bow, persist across reload, open the Journal', async ({ page }) => {
     const errors = collectErrors(page);
     await boot(page, URL_SCAN);
 
@@ -146,21 +147,25 @@ test.describe('B1 scan, discovery, field guide', () => {
     );
     expect((await probe(page)).discovered).toBe(true);
 
-    // --- field guide ----------------------------------------------------------
-    const guide = page.locator('.field-guide');
-    await expect(guide).toBeHidden();
+    // --- Journal (J) --------------------------------------------------------
+    const journal = page.locator('.journal');
+    await expect(journal).toBeHidden();
     await page.keyboard.press('j');
-    await expect(guide).toBeVisible();
-    await expect(page.locator('.fg-count')).toHaveText('2 / 3 CATALOGUED');
+    await expect(journal).toBeVisible();
+    // The dive's own site opens first: its overview and the bow are logged.
+    await expect(journal.locator('.jr-nav-item[data-target="_test"] .jr-nav-meta')).toHaveText(
+      'THIS DIVE · 2/3',
+    );
+    await expect(journal.locator('.jr-body .jr-title')).toHaveText('Test site · Titanic tile');
     // The debris entry is still locked; the bow is unlocked.
-    await expect(page.locator('.fg-item.is-locked')).toHaveCount(1);
-    await page.locator('.fg-item', { hasText: 'The bow section' }).click();
-    await expect(page.locator('.fg-entry .fg-title')).toHaveText('The bow section');
-    await expect(page.locator('.fg-entry .fg-badge')).toHaveText("ARTIST'S RECONSTRUCTION");
-    await expect(page.locator('.fg-entry .fg-memorial')).toBeVisible();
-    await expect(page.locator('.fg-entry .fg-facts tr')).toHaveCount(3);
-    await expect(page.locator('.fg-entry .fg-sources a')).toHaveCount(1);
-    // Scanning is suppressed while the guide is open.
+    await expect(journal.locator('.jr-site-entries li.is-locked')).toHaveCount(1);
+    await journal.locator('.jr-nav-item[data-target="_test/poi/bow"]').click();
+    await expect(journal.locator('.jr-body .jr-title')).toHaveText('The bow section');
+    await expect(journal.locator('.jr-tag.is-recreation')).toHaveText('Recreation');
+    await expect(journal.locator('.jr-memorial')).toBeVisible();
+    await expect(journal.locator('.jr-facts tr')).toHaveCount(3);
+    await expect(journal.locator('.jr-sources a')).toHaveCount(1);
+    // Scanning is suppressed while the Journal is open.
     expect(
       await page.evaluate(
         () => (window.__game as { scanner: { enabled: boolean } }).scanner.enabled,
@@ -169,7 +174,7 @@ test.describe('B1 scan, discovery, field guide', () => {
     await page.screenshot({ path: 'tests/e2e/screenshots/discovery-guide.png' });
 
     await page.keyboard.press('Escape');
-    await expect(guide).toBeHidden();
+    await expect(journal).toBeHidden();
 
     expect(errors, errors.join(' | ')).toEqual([]);
   });
@@ -183,14 +188,14 @@ test.describe('B1 scan, discovery, field guide', () => {
     await expect(page.locator('.debrief-stat[data-field="maxDepth"] .debrief-value')).toHaveText(
       /\d[\d,]* m/,
     );
-    await expect(page.locator('.debrief-btn')).toHaveText(['Dive again', 'Field guide']);
+    await expect(page.locator('.debrief-btn')).toHaveText(['Dive again', 'Journal']);
     await page.screenshot({ path: 'tests/e2e/screenshots/discovery-debrief.png' });
 
-    // "Field guide" opens the guide on top of the debrief.
-    await page.locator('.debrief-btn', { hasText: 'Field guide' }).click();
-    await expect(page.locator('.field-guide')).toBeVisible();
+    // "Journal" opens the Journal on top of the debrief.
+    await page.locator('.debrief-btn', { hasText: 'Journal' }).click();
+    await expect(page.locator('.journal')).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(page.locator('.field-guide')).toBeHidden();
+    await expect(page.locator('.journal')).toBeHidden();
     await expect(debrief).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(debrief).toBeHidden();

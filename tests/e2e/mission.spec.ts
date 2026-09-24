@@ -5,7 +5,9 @@ import { expect, test, type Page } from '@playwright/test';
  *  (a) `/?mission=titanic` shows the briefing with the game frozen; Enter
  *      starts the mission near the first primary objective with the objectives panel up.
  *  (b) `?poi=titanic-bow&skipBriefing=1`: scan the bow, teleport to the stern
- *      and scan it -> `mission:complete` -> the mission debrief.
+ *      and scan it -> "Primary objectives complete" banner -> Surface and
+ *      debrief -> `mission:complete` + `mission:ended` -> the mission debrief
+ *      (D-FLOW: nothing ends the dive on its own).
  *  (c) the free-dive view keeps mission select off the HUD while deep links still work.
  * Also covers F2 (sonar canvas takes the tile aspect) and F3 (HUD help keys).
  *
@@ -116,7 +118,7 @@ test.describe('B3 mission flow', () => {
     await page.keyboard.press('Enter');
     await expect(briefing).toBeHidden();
     const started = await missionProbe(page);
-    expect(started.state).toBe('running');
+    expect(started.state).toBe('diving');
     expect(started.emitted).toEqual(['mission:started']);
     const payload = await page.evaluate(
       () =>
@@ -136,10 +138,8 @@ test.describe('B3 mission flow', () => {
 
     const panel = page.locator('.objectives-panel');
     await expect(panel).toBeVisible();
-    await expect(panel.locator('.obj-item[data-primary="true"]')).toHaveCount(2);
-    await expect(panel.locator('.obj-item[data-primary="false"]')).toHaveCount(2);
-    await expect(panel.locator('.obj-item.is-complete')).toHaveCount(0);
-    await expect(panel.locator('.obj-speed')).toHaveText('SIM 1×');
+    // D-FLOW: one compact line of progress; the full list is in the Esc menu.
+    await expect(panel.locator('.obj-progress')).toHaveText('0 of 4 objectives · 0 of 2 primary');
     // Near-site start (D-START): the bow is close and dead ahead.
     await expect(panel.locator('.obj-nav-target')).toHaveText('→ BOW SECTION');
     const heading = await page.evaluate(
@@ -164,9 +164,8 @@ test.describe('B3 mission flow', () => {
     await page.waitForTimeout(1500);
     await page.keyboard.up('c');
     expect((await subPos(page)).y).toBeLessThan(y0 - 1);
-    // T cycles the sim speed and the panel follows.
+    // T cycles the sim speed; the HUD badge shows it.
     await page.keyboard.press('t');
-    await expect(panel.locator('.obj-speed')).toHaveText('SIM 2×');
 
     await expect(page.locator('.hud-help')).toHaveCount(0);
     await expect(page.locator('.hud-sim-speed')).toHaveText('2× SIM SPEED');
@@ -182,7 +181,7 @@ test.describe('B3 mission flow', () => {
     expect(errors, errors.join(' | ')).toEqual([]);
   });
 
-  test('scan bow and stern -> mission:complete -> debrief', async ({ page }) => {
+  test('scan bow and stern -> banner -> surface -> debrief', async ({ page }) => {
     const errors = collectErrors(page);
     await boot(page, '/?mission=titanic&poi=titanic-bow&skipBriefing=1');
     await expect(page.locator('.briefing')).toHaveCount(0);
@@ -199,16 +198,15 @@ test.describe('B3 mission flow', () => {
       undefined,
       { timeout: 15_000 },
     );
-    expect((await missionProbe(page)).state).toBe('running');
+    expect((await missionProbe(page)).state).toBe('diving');
 
     await holdScanUntil(page, 'find-bow');
     let m = await missionProbe(page);
-    expect(m.state).toBe('running');
+    expect(m.state).toBe('diving');
     expect(m.objectives.find((o) => o.id === 'find-bow')?.complete).toBe(true);
     expect(m.emitted).toEqual(['mission:started', 'mission:objective']);
     const panel = page.locator('.objectives-panel');
-    await expect(panel.locator('.obj-item.is-complete')).toHaveCount(1);
-    await expect(panel.locator('.obj-item[data-objective="find-bow"] .obj-box')).toHaveText('☑');
+    await expect(panel.locator('.obj-progress')).toHaveText('1 of 4 objectives · 1 of 2 primary');
     await expect(panel.locator('.obj-nav-target')).toHaveText('→ STERN SECTION');
     await page.waitForTimeout(300);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-objectives.png' });
@@ -243,26 +241,34 @@ test.describe('B3 mission flow', () => {
     );
     await holdScanUntil(page, 'find-stern');
     m = await missionProbe(page);
-    expect(['completing', 'complete']).toContain(m.state);
-
+    expect(m.state).toBe('primaries-complete');
+    expect(m.emitted.at(-1)).toBe('mission:primaryComplete');
+    // The dive goes on: the next target is optional, and a banner offers the choice.
+    await expect(panel.locator('.obj-nav-target')).toContainText('OPTIONAL →');
+    const banner = panel.locator('.obj-banner');
+    await expect(banner).toBeVisible({ timeout: 10_000 });
     const debrief = page.locator('.mission-debrief');
-    await expect(debrief).toBeVisible({ timeout: 10_000 });
+    await expect(debrief).toHaveCount(0);
+    await banner.locator('button', { hasText: 'Surface and debrief' }).click();
+
+    await expect(debrief).toBeVisible();
     m = await missionProbe(page);
-    expect(m.state).toBe('complete');
-    expect(m.emitted.at(-1)).toBe('mission:complete');
+    expect(m.state).toBe('debrief');
+    expect(m.emitted.slice(-2)).toEqual(['mission:complete', 'mission:ended']);
     expect(m.durationS).toBeGreaterThan(3);
     await expect(debrief.locator('.debrief-title')).toHaveText('Mission complete');
     await expect(debrief.locator('.debrief-kicker')).toHaveText('TITANIC DIVE');
     await expect(debrief.locator('.debrief-btn')).toHaveText([
+      'Keep exploring',
       'Dive again',
-      'Field guide',
       'Dive sites',
+      'Home',
+      'Journal',
     ]);
     await expect(debrief.locator('.debrief-section.is-discoveries li')).toHaveText([
       'Bow section',
       'Stern section',
     ]);
-    await expect(panel.locator('.obj-nav-target')).toContainText('PRIMARY DONE');
     await page.waitForTimeout(300);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-debrief.png' });
 
@@ -311,7 +317,7 @@ test.describe('fix S: mission failure, framing and modals', () => {
   }) => {
     const errors = collectErrors(page);
     await boot(page, '/?mission=titanic&skipBriefing=1');
-    expect((await missionProbe(page)).state).toBe('running');
+    expect((await missionProbe(page)).state).toBe('diving');
 
     // QA-B #10: the mission clock counts real seconds, not capped physics time.
     const t0 = await page.evaluate(
@@ -351,10 +357,16 @@ test.describe('fix S: mission failure, framing and modals', () => {
     await expect(debrief).toHaveClass(/is-aborted/);
     await expect(debrief.locator('.debrief-title')).toHaveText('Dive aborted');
     await expect(debrief.locator('.debrief-subtitle')).toContainText('Hull failure at');
-    await expect(debrief.locator('.debrief-btn')).toHaveText(['Dive again', 'Dive sites']);
+    // No Keep exploring after an abort: the dive is over.
+    await expect(debrief.locator('.debrief-btn')).toHaveText([
+      'Dive again',
+      'Dive sites',
+      'Home',
+      'Journal',
+    ]);
     const m = await missionProbe(page);
-    expect(m.state).toBe('aborted');
-    expect(m.emitted).toEqual(['mission:started', 'mission:aborted']);
+    expect(m.state).toBe('debrief');
+    expect(m.emitted).toEqual(['mission:started', 'mission:aborted', 'mission:ended']);
     expect(
       await page.evaluate(() => (window as unknown as { __aborted: unknown[] }).__aborted),
     ).toEqual([{ missionId: 'titanic', reason: 'crush' }]);
@@ -421,7 +433,7 @@ test.describe('fix S: mission failure, framing and modals', () => {
     expect((await missionProbe(page)).state).toBe('briefing');
     await page.keyboard.press('Enter');
     await expect(briefing).toBeHidden();
-    expect((await missionProbe(page)).state).toBe('running');
+    expect((await missionProbe(page)).state).toBe('diving');
     expect(errors, errors.join(' | ')).toEqual([]);
   });
 

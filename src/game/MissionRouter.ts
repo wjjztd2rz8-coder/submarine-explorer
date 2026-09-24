@@ -12,17 +12,21 @@
  *   and returns the surface-start pose. `?poi=` (B1) and `?at=` (B4) still
  *   override the pose afterwards, because tests depend on them.
  *
- * Flow (`MissionRouter`, constructed once Discovery and Input exist):
+ * Flow (`MissionRouter`, constructed once Discovery and Input exist; D-FLOW):
  *   briefing (game frozen) -> Begin dive / Enter -> `mission:started` ->
  *   objectives panel with bearing/range -> last primary scanned ->
- *   `completeDelayS` -> `mission:complete` -> debrief (Dive again / Dive sites).
+ *   `mission:primaryComplete` -> after `completeDelayS`, the banner "Primary
+ *   objectives complete" (Keep exploring / Surface and debrief). The dive only
+ *   ends when the player surfaces (banner, or the pause menu) or aborts:
+ *   `mission:complete` (once) + `mission:ended` -> debrief (Keep exploring,
+ *   Dive again, Dive sites, Home, Journal). The debrief freezes the game.
  */
 
 import type { GameConfig } from '../core/Config.js';
 import type { EventBus } from '../core/EventBus.js';
 import type { InputState } from '../core/Input.js';
 import { Briefing, type BriefingContent } from '../ui/Briefing.js';
-import { Debrief, formatDuration } from '../ui/Debrief.js';
+import { Debrief, formatDuration, type DebriefAction } from '../ui/Debrief.js';
 import { ObjectivesPanel, type NavReadout } from '../ui/ObjectivesPanel.js';
 import { headingFromForward, latLonToWorld, normalizeHeadingDeg } from '../util/geo.js';
 import type { TileMeta } from '../util/types.js';
@@ -297,12 +301,16 @@ export interface MissionRouterOptions {
   discovery: MissionDiscovery;
   defaultStartPosition?: MissionStartPosition;
   applyStart?: (choice: MissionStartPosition) => void;
-  /** Initial sim speed for the panel (the sub's, after the loadout). */
-  simSpeed: number;
+  /** Unused since D-FLOW (the HUD shows a non-1× sim speed); kept for callers. */
+  simSpeed?: number;
   /** Primary key label for an input action, e.g. `input.primaryKeyLabel`. */
   keyLabel?: (action: string) => string;
   /** Navigate: a URL, or null to reload the current one. */
   navigate?: (url: string | null) => void;
+  /** Debrief "Dive sites": open the site chooser (home). Default: navigate to the home page. */
+  onDiveSites?: () => void;
+  /** Debrief "Home". Default: navigate to the home page. */
+  onHome?: () => void;
   parent?: HTMLElement;
 }
 
@@ -315,6 +323,30 @@ export interface MissionHullState {
 /** Banner shown on the objectives panel while the emergency blow runs. */
 export const HULL_FAILURE_ALERT = 'HULL FAILURE — EMERGENCY ASCENT';
 
+/** Debrief heading and subtitle for how the dive ended. Pure, for tests. */
+export function debriefText(
+  reason: 'surface' | 'all' | 'abort',
+  primaryComplete: boolean,
+  counts: { completed: number; total: number },
+  durationS: number,
+  failedAtM = 0,
+): { title: string; subtitle: string } {
+  const tally = `${counts.completed} of ${counts.total} objectives · ${formatDuration(durationS)}`;
+  if (reason === 'abort') {
+    const rating = Math.round(Math.abs(failedAtM)).toLocaleString('en-US');
+    return {
+      title: 'Dive aborted',
+      subtitle: `Hull failure at ${rating} m · emergency ascent completed · ${tally}`,
+    };
+  }
+  if (reason === 'all')
+    return { title: 'Mission complete', subtitle: `Every objective · ${tally}` };
+  if (primaryComplete) {
+    return { title: 'Mission complete', subtitle: `All primary objectives · ${tally}` };
+  }
+  return { title: 'Dive ended', subtitle: `Primary objectives unfinished · ${tally}` };
+}
+
 export class MissionRouter {
   readonly mission: Mission;
   readonly briefing: Briefing | null;
@@ -323,25 +355,27 @@ export class MissionRouter {
 
   private navClock = 0;
   private readonly disposers: Array<() => void> = [];
-  /** Set by `sub:emergencyBlow` during a running mission; cleared when the blow ends. */
+  /** Set by `sub:emergencyBlow` during a dive; cleared when the blow ends. */
   private blow: { depth: number } | null = null;
-  private debriefVariant: 'complete' | 'aborted' | null = null;
+  /** Depth of the last hull failure, for the aborted debrief. */
+  private failedAt = 0;
+  /** Real seconds until the pending completion banner shows; null when none is pending. */
+  private bannerDelay: number | null = null;
+  /** Real seconds until an open banner applies its default (Keep exploring). */
+  private bannerLeft = 0;
+  private pendingBanner: 'primary' | 'all' | null = null;
+  private allAnnounced = false;
 
   constructor(private readonly opts: MissionRouterOptions) {
-    const { route, bus, config, meta } = opts;
-    this.mission = new Mission({
-      def: route.def,
-      bus,
-      completeDelayS: config.mission.completeDelayS,
-    });
+    const { route, bus, meta } = opts;
+    this.mission = new Mission({ def: route.def, bus });
     this.panel = new ObjectivesPanel(opts.parent);
     this.panel.setTitle(route.def.title);
-    this.panel.setSimSpeed(opts.simSpeed);
     this.panel.setObjectives(this.mission.objectives);
 
     this.disposers.push(
       this.mission.onChange((m) => this.onMissionChange(m)),
-      bus.on('sub:simSpeed', ({ multiplier }) => this.panel.setSimSpeed(multiplier)),
+      bus.on('mission:primaryComplete', () => this.queueBanner('primary')),
       bus.on('sub:emergencyBlow', ({ depth }) => this.onEmergencyBlow(depth)),
     );
 
@@ -353,12 +387,13 @@ export class MissionRouter {
 
     const onKey = (e: KeyboardEvent): void => {
       // Capture phase, so this runs before Discovery's Escape handler: if the
-      // field guide is open over the debrief, Escape closes only the guide.
+      // Journal is open over the debrief, Escape closes only the Journal.
       if (e.code !== 'Escape' || !this.debrief?.isOpen || opts.discovery.guide.isOpen) return;
-      // The aborted debrief is a decision point (Dive again / Dive sites), not
-      // a summary to dismiss: the mission is over and the game stays frozen.
-      if (this.debriefVariant === 'aborted') return;
-      this.debrief.hide();
+      // Escape is "Keep exploring". The aborted debrief is a decision point
+      // (Dive again / Dive sites / Home), not a summary to dismiss.
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      this.keepExploring();
     };
     window.addEventListener('keydown', onKey, true);
     this.disposers.push(() => window.removeEventListener('keydown', onKey, true));
@@ -385,17 +420,21 @@ export class MissionRouter {
   }
 
   /**
-   * True while the briefing is up, or the "Dive aborted" debrief is: main.ts
-   * runs no physics and ignores input.
+   * True while the briefing or the debrief is up: main.ts runs no physics and
+   * ignores input, so "Keep exploring" resumes the exact pose.
    */
   get frozen(): boolean {
-    if (this.briefing?.isOpen) return true;
-    return this.debriefVariant === 'aborted' && (this.debrief?.isOpen ?? false);
+    return (this.briefing?.isOpen ?? false) || this.debriefOpen;
   }
 
-  /** True between `sub:emergencyBlow` and the end of the blow, in a running mission. */
+  /** True between `sub:emergencyBlow` and the end of the blow, during a dive. */
   get emergencyAscent(): boolean {
     return this.blow !== null;
+  }
+
+  /** True while "Surface and debrief" is available (a dive in progress, no blow). */
+  get canEndDive(): boolean {
+    return this.mission.diving && !this.blow;
   }
 
   /** Close the briefing and start the mission clock. */
@@ -406,6 +445,25 @@ export class MissionRouter {
       this.panel.setVisible(true);
       this.mission.start(this.opts.meta.id);
     });
+  }
+
+  /** "Surface and debrief": end the dive voluntarily and open the debrief. */
+  endDive(): boolean {
+    if (!this.canEndDive) return false;
+    this.clearBanner();
+    if (!this.mission.end()) return false;
+    this.showDebrief();
+    return true;
+  }
+
+  /** "Keep exploring": close the banner, or the debrief, and carry on diving. */
+  keepExploring(): void {
+    this.clearBanner();
+    if (!this.debrief?.isOpen || !this.mission.canResume) return;
+    this.mission.resume();
+    this.debrief.hide();
+    this.panel.setVisible(true);
+    this.navClock = Infinity;
   }
 
   /**
@@ -425,6 +483,7 @@ export class MissionRouter {
   ): void {
     this.mission.update(dt);
     if (this.blow && hull && !hull.emergencyBlow) this.onBlowComplete();
+    this.updateBanner(dt);
     this.navClock += realDt;
     if (this.navClock < 1 / Math.max(1, this.opts.config.mission.navUpdateHz)) return;
     this.navClock = 0;
@@ -446,14 +505,67 @@ export class MissionRouter {
   private onMissionChange(m: Mission): void {
     this.panel.setObjectives(m.objectives);
     this.navClock = Infinity;
-    if (m.state === 'complete') this.showDebrief('complete');
+    // Everything done after the primaries: suggest surfacing, never force it.
+    if (m.state === 'primaries-complete' && m.allComplete && !this.allAnnounced) {
+      this.allAnnounced = true;
+      this.queueBanner('all');
+    }
+  }
+
+  private queueBanner(kind: 'primary' | 'all'): void {
+    if (kind === 'primary' && this.mission.allComplete) this.allAnnounced = true;
+    if (kind === 'all' && this.pendingBanner === 'primary' && this.bannerDelay !== null) {
+      this.pendingBanner = 'all';
+      return;
+    }
+    this.pendingBanner = this.mission.allComplete ? 'all' : kind;
+    this.bannerDelay = Math.max(0, this.opts.config.mission.completeDelayS);
+    this.panel.hideBanner();
+  }
+
+  /** Banner clocks run on unfrozen real time: nothing moves under the pause menu. */
+  private updateBanner(dt: number): void {
+    if (this.bannerDelay !== null && this.pendingBanner) {
+      this.bannerDelay -= dt;
+      if (this.bannerDelay > 0 || !this.mission.diving) return;
+      this.bannerDelay = null;
+      this.showBanner(this.pendingBanner);
+      this.pendingBanner = null;
+      return;
+    }
+    if (!this.panel.bannerOpen) return;
+    this.bannerLeft -= dt;
+    if (this.bannerLeft <= 0) this.keepExploring();
+  }
+
+  private showBanner(kind: 'primary' | 'all'): void {
+    const { completed, total } = this.mission.counts();
+    const left = total - completed;
+    const detail =
+      kind === 'all'
+        ? `${completed} of ${total} objectives. Surface when you are ready.`
+        : `${completed} of ${total} objectives. ` +
+          (left ? `${left} optional ${left === 1 ? 'target remains' : 'targets remain'}.` : '');
+    this.bannerLeft = Math.max(1, this.opts.config.mission.completionBannerS);
+    this.panel.showBanner({
+      title: kind === 'all' ? 'All objectives complete' : 'Primary objectives complete',
+      detail: detail.trim(),
+      onKeepExploring: () => this.keepExploring(),
+      onSurface: () => this.endDive(),
+    });
+  }
+
+  private clearBanner(): void {
+    this.bannerDelay = null;
+    this.pendingBanner = null;
+    this.panel.hideBanner();
   }
 
   /** Crush depth: amber banner now, the aborted debrief once the blow ends. */
   private onEmergencyBlow(depth: number): void {
-    const s = this.mission.state;
-    if (s !== 'running' && s !== 'completing') return;
+    if (!this.mission.diving) return;
     this.blow = { depth };
+    this.clearBanner();
     this.panel.setAlert(HULL_FAILURE_ALERT);
   }
 
@@ -463,52 +575,66 @@ export class MissionRouter {
     this.panel.setAlert(null);
     if (!at) return;
     this.mission.abort('crush');
-    if (this.mission.state === 'aborted') this.showDebrief('aborted', at.depth);
+    if (this.mission.state !== 'aborted') return;
+    this.failedAt = at.depth;
+    this.mission.end();
+    this.showDebrief();
   }
 
-  private showDebrief(variant: 'complete' | 'aborted', failedAt = 0): void {
+  private showDebrief(): void {
     const { discovery, route } = this.opts;
     const m = this.mission;
-    const done = m.objectives.filter((o) => o.complete).length;
-    const time = formatDuration(m.durationS ?? m.elapsedS);
-    const rating = Math.round(Math.abs(failedAt)).toLocaleString('en-US');
-    const subtitle =
-      variant === 'aborted'
-        ? `Hull failure at ${rating} m · emergency ascent completed · ` +
-          `${done} of ${m.objectives.length} objectives · ${time}`
-        : `All primary objectives scanned · ${done} of ${m.objectives.length} objectives · ${time}`;
+    const reason = m.endReason ?? 'surface';
+    const counts = m.counts();
+    const { title, subtitle } = debriefText(
+      reason,
+      m.primaryComplete,
+      counts,
+      m.durationS ?? m.elapsedS,
+      this.failedAt,
+    );
     const stats = discovery.stats.snapshot({
-      title: variant === 'aborted' ? 'Dive aborted' : 'Mission complete',
+      title,
       subtitle,
       landmarkName: route.def.title,
+      objectives: counts,
     });
-    this.debriefVariant = variant;
     if (!this.debrief) {
-      this.debrief = new Debrief({
-        parent: this.opts.parent,
-        onDiveAgain: () => {
-          m.restart();
-          this.navigate(null);
-        },
-        onFieldGuide: () => discovery.guide.open(),
-      });
+      this.debrief = new Debrief({ parent: this.opts.parent });
       this.debrief.root.classList.add('mission-debrief');
     }
-    this.debrief.root.classList.toggle('is-aborted', variant === 'aborted');
-    this.debrief.show(stats);
-    const actions = this.debrief.root.querySelector('.debrief-actions');
-    const sites = document.createElement('button');
-    sites.type = 'button';
-    sites.className = 'debrief-btn mission-debrief-sites';
-    sites.textContent = 'Dive sites';
-    sites.addEventListener('click', () => this.navigate('/'));
-    actions?.append(sites);
-    // The aborted variant is a two-way choice: Dive again / Dive sites.
-    if (variant === 'aborted') {
-      for (const b of actions?.querySelectorAll('.debrief-btn') ?? []) {
-        if (b.textContent === 'Field guide') b.remove();
-      }
+    const aborted = reason === 'abort';
+    this.debrief.root.classList.toggle('is-aborted', aborted);
+    const actions: DebriefAction[] = [];
+    if (m.canResume) {
+      actions.push({
+        id: 'keep-exploring',
+        label: 'Keep exploring',
+        primary: true,
+        run: () => this.keepExploring(),
+      });
     }
+    actions.push(
+      { id: 'dive-again', label: 'Dive again', primary: aborted, run: () => this.diveAgain() },
+      { id: 'dive-sites', label: 'Dive sites', run: () => this.leave(this.opts.onDiveSites) },
+      { id: 'home', label: 'Home', run: () => this.leave(this.opts.onHome) },
+      { id: 'journal', label: 'Journal', run: () => discovery.guide.open() },
+    );
+    this.debrief.show(stats, actions);
+    this.panel.setVisible(false);
+  }
+
+  /** "Dive again": a fresh dive of the same mission (reload: briefing unless the URL skips it). */
+  private diveAgain(): void {
+    this.mission.restart();
+    this.navigate(null);
+  }
+
+  /** "Dive sites" / "Home": leave the debrief for the shell, without launching a dive. */
+  private leave(action: (() => void) | undefined): void {
+    this.debrief?.hide();
+    if (action) action();
+    else this.navigate(new URL('.', window.location.href).toString());
   }
 
   private navigate(url: string | null): void {
@@ -535,16 +661,13 @@ export class MissionRouter {
       controls: [
         [`${k('thrustForward', 'W')}/${k('thrustReverse', 'S')}`, 'thrust'],
         [`${k('yawPort', 'A')}/${k('yawStarboard', 'D')}`, 'yaw'],
-        [`${k('pitchUp', 'R')}/${k('pitchDown', 'F')}`, 'pitch'],
-        [k('ballastBlow', 'Space'), 'blow ballast (rise)'],
-        [k('ballastFlood', 'Shift'), 'flood ballast (dive)'],
+        [k('ballastBlow', 'Space'), 'rise'],
+        [k('ballastFlood', 'Ctrl'), 'dive'],
         [k('toggleLights', 'L'), 'headlights'],
-        [k('scan', 'G'), 'scan (hold)'],
-        [k('toggleGuide', 'J'), 'field guide'],
-        [k('ping', 'Q'), 'sonar ping'],
-        [k('cycleSimSpeed', 'T'), `sim speed (starts ${config.mission.defaultSimSpeed}×)`],
+        [k('scan', 'F'), 'scan (hold)'],
+        [k('toggleJournal', 'J'), 'Journal'],
+        [k('cycleSimSpeed', 'T'), 'sim speed'],
         [k('toggleSonar', 'M'), 'sonar map'],
-        [k('toggleCamera', 'C'), 'camera'],
       ],
     };
     if (def.briefing.depth_m !== undefined) {

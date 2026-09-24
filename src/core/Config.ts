@@ -608,8 +608,14 @@ export interface MissionConfig {
    * terminal ballast speed, so at 1x the descent alone is ~12 min.
    */
   defaultSimSpeed: number;
-  /** Seconds between the last primary scan and `mission:complete` + debrief. */
+  /**
+   * Seconds between the scan that completes the primaries and the "Primary
+   * objectives complete" banner (D-FLOW), so the scan's NEW ENTRY card lands
+   * first. Nothing ends the dive automatically any more.
+   */
   completeDelayS: number;
+  /** D-FLOW: real seconds the completion banner stays up before "Keep exploring" applies. */
+  completionBannerS: number;
   /** Minimum spawn clearance above the seabed, on top of hull radius + seabedClearance (m). */
   spawnClearanceM: number;
   /** Objectives-panel nav line refresh rate (Hz). Text writes are skipped when unchanged. */
@@ -1391,7 +1397,8 @@ export const DEFAULT_CONFIG: GameConfig = {
   // B3: mission flow. See docs/missions.md for the timeline these produce.
   mission: {
     defaultSimSpeed: 3, // keeps the Titanic descent under 4 min real time
-    completeDelayS: 3, // let the scan's "NEW ENTRY" banner land before the debrief
+    completeDelayS: 3, // let the scan's "NEW ENTRY" banner land before the completion banner
+    completionBannerS: 20, // D-FLOW: then Keep exploring (the default) applies
     spawnClearanceM: 10,
     navUpdateHz: 5,
     minSpawnSeabedM: -60,

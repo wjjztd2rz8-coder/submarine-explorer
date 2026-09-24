@@ -226,7 +226,7 @@ requestAnimationFrame
      Headlights /
      MarineSnow / Water.update
   └─ HUD.update / Sonar.update               DOM + 2D canvas
-  └─ Discovery.update(N/60, dt, ...)         scan beam, field guide (J), overlays
+  └─ Discovery.update(N/60, dt, ...)         scan beam, Journal (J), overlays
   └─ MissionRouter.update(clockDt, dt, ...)  objectives panel, nav line, completion
   └─ Props.update(camera)                    per-prop full / impostor / hidden
   └─ AudioSystem.update(frame)               depth low-pass, thruster, beds, ping
@@ -273,37 +273,39 @@ the same as the sub's yaw.
 `GameEvents` in `src/core/EventBus.ts` is the complete list. Add events there;
 never repurpose one.
 
-| Event               | Payload                                                | Emitted by                                     |
-| ------------------- | ------------------------------------------------------ | ---------------------------------------------- |
-| `tile:loaded`       | `{ meta: TileMeta }`                                   | `main.ts` after `TileLoader.load`              |
-| `tile:error`        | `{ id, error }`                                        | `main.ts` on a failed load                     |
-| `terrain:built`     | `{ chunks, vertices }`                                 | `main.ts` after `Terrain` construction         |
-| `landmarks:loaded`  | `{ landmarks: Landmark[] }`                            | `main.ts` when any landmark is placed          |
-| `sub:collided`      | `{ depth, speed }`                                     | `main.ts` (seabed); `PropContact` (props)      |
-| `sub:crushWarning`  | `{ depth, ratio }`                                     | `main.ts`, every frame past the warn ratio     |
-| `sub:hullStress`    | `{ stress, cause: 'impact' \| 'pressure', depth }`     | `main.ts`, on a change above threshold         |
-| `sub:emergencyBlow` | `{ depth, lockSeconds }`                               | `main.ts`, once per blow                       |
-| `sub:simSpeed`      | `{ multiplier }`                                       | `main.ts` on `T`                               |
-| `env:depthBand`     | `{ band, previous, depth }`                            | `Atmosphere.update` on a band change           |
-| `env:preset`        | `{ preset, landmarkId }`                               | `PresetSystem` after selection                 |
-| `env:current`       | `{ dirDeg, speedMps }`                                 | `PresetSystem` on a significant current change |
-| `env:trench`        | `{ depth }` (negative engine metres)                   | `TrenchPreset`; audio plays a pressure creak   |
-| `globe:opened`      | `{ source }`                                           | `Globe` on opening                             |
-| `globe:pinSelected` | `{ landmarkId }`                                       | `Globe` on selection                           |
-| `scan:started`      | `{ poiId }`                                            | `Scanner`                                      |
-| `scan:progress`     | `{ poiId, progress }` (0..1, ≤ 10 Hz)                  | `Scanner`                                      |
-| `scan:aborted`      | `{ poiId, reason: 'range' \| 'facing' \| 'released' }` | `Scanner`                                      |
-| `scan:complete`     | `{ poiId, landmarkId, firstTime }`                     | `Scanner`                                      |
-| `guide:opened`      | `{ entryId }`                                          | `FieldGuide` when an unlocked entry is shown   |
-| `mission:started`   | `{ missionId, tileId }`                                | `Mission` on Begin dive                        |
-| `mission:objective` | `{ missionId, objectiveId, complete }`                 | `Mission`                                      |
-| `mission:complete`  | `{ missionId, durationS }`                             | `Mission` after `completeDelayS`               |
-| `mission:restart`   | `{ missionId }`                                        | `Mission.restart()` (debrief Dive again)       |
-| `mission:aborted`   | `{ missionId, reason: 'crush' }`                       | `MissionRouter` when an emergency blow ends    |
-| `props:loaded`      | `{ landmarkId, count, models, procedural }`            | `main.ts` when `Props.load` resolves           |
-| `game:ready`        | `{ tileId }`                                           | `main.ts`, first presented frame               |
-| `ui:selectTile`     | `{ id }`                                               | declared, not emitted or handled yet           |
-| `settings:changed`  | `{ key, value }`                                       | declared (C5), not emitted or handled yet      |
+| Event                     | Payload                                                | Emitted by                                     |
+| ------------------------- | ------------------------------------------------------ | ---------------------------------------------- |
+| `tile:loaded`             | `{ meta: TileMeta }`                                   | `main.ts` after `TileLoader.load`              |
+| `tile:error`              | `{ id, error }`                                        | `main.ts` on a failed load                     |
+| `terrain:built`           | `{ chunks, vertices }`                                 | `main.ts` after `Terrain` construction         |
+| `landmarks:loaded`        | `{ landmarks: Landmark[] }`                            | `main.ts` when any landmark is placed          |
+| `sub:collided`            | `{ depth, speed }`                                     | `main.ts` (seabed); `PropContact` (props)      |
+| `sub:crushWarning`        | `{ depth, ratio }`                                     | `main.ts`, every frame past the warn ratio     |
+| `sub:hullStress`          | `{ stress, cause: 'impact' \| 'pressure', depth }`     | `main.ts`, on a change above threshold         |
+| `sub:emergencyBlow`       | `{ depth, lockSeconds }`                               | `main.ts`, once per blow                       |
+| `sub:simSpeed`            | `{ multiplier }`                                       | `main.ts` on `T`                               |
+| `env:depthBand`           | `{ band, previous, depth }`                            | `Atmosphere.update` on a band change           |
+| `env:preset`              | `{ preset, landmarkId }`                               | `PresetSystem` after selection                 |
+| `env:current`             | `{ dirDeg, speedMps }`                                 | `PresetSystem` on a significant current change |
+| `env:trench`              | `{ depth }` (negative engine metres)                   | `TrenchPreset`; audio plays a pressure creak   |
+| `globe:opened`            | `{ source }`                                           | `Globe` on opening                             |
+| `globe:pinSelected`       | `{ landmarkId }`                                       | `Globe` on selection                           |
+| `scan:started`            | `{ poiId }`                                            | `Scanner`                                      |
+| `scan:progress`           | `{ poiId, progress }` (0..1, ≤ 10 Hz)                  | `Scanner`                                      |
+| `scan:aborted`            | `{ poiId, reason: 'range' \| 'facing' \| 'released' }` | `Scanner`                                      |
+| `scan:complete`           | `{ poiId, landmarkId, firstTime }`                     | `Scanner`                                      |
+| `guide:opened`            | `{ entryId }`                                          | `Journal` when an unlocked entry is shown      |
+| `mission:started`         | `{ missionId, tileId }`                                | `Mission` on Begin dive                        |
+| `mission:objective`       | `{ missionId, objectiveId, complete }`                 | `Mission`                                      |
+| `mission:primaryComplete` | `{ missionId, completed, total }`                      | `Mission` on the last primary scan             |
+| `mission:complete`        | `{ missionId, durationS }`                             | `Mission.end()`, once, after the primaries     |
+| `mission:ended`           | `{ missionId, reason, completed, total, durationS }`   | `Mission.end()`, every debrief                 |
+| `mission:restart`         | `{ missionId }`                                        | `Mission.restart()` (debrief Dive again)       |
+| `mission:aborted`         | `{ missionId, reason: 'crush' }`                       | `MissionRouter` when an emergency blow ends    |
+| `props:loaded`            | `{ landmarkId, count, models, procedural }`            | `main.ts` when `Props.load` resolves           |
+| `game:ready`              | `{ tileId }`                                           | `main.ts`, first presented frame               |
+| `ui:selectTile`           | `{ id }`                                               | declared, not emitted or handled yet           |
+| `settings:changed`        | `{ key, value }`                                       | declared (C5), not emitted or handled yet      |
 
 Current subscribers: `AudioSystem` (`sub:collided`, `sub:hullStress`,
 `sub:emergencyBlow`), `Discovery` (`scan:complete`, `landmarks:loaded`),
@@ -387,7 +389,8 @@ streaming (Tier 4), and a hard draw-call cap.
 
 `window.__game` keys (`main.ts`): `scene`, `renderer`, `terrain`, `sub`, `rig`,
 `water`, `atmosphere`, `headlights`, `audio`, `bus`, `config`, `meta`,
-`scanner`, `discoveries`, `discovery`, `debrief`, `fieldGuide`, `props`,
-`propsDebug`, `mission`, `missionRouter`, `missionSelect`, `sonar`.
+`scanner`, `discoveries`, `discovery`, `debrief`, `fieldGuide` (the Journal),
+`props`, `propsDebug`, `mission`, `missionRouter`, `missionSelect`, `sonar`,
+`journal`.
 `window.__gameReady` flips to `true` after the first presented frame;
 `window.__gameError` holds a fatal startup message.

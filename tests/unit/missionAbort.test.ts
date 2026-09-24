@@ -10,7 +10,7 @@ function make(): { m: Mission; bus: EventBus } {
   const def = parseMission(titanicMission, 'titanic', quiet);
   if (!def) throw new Error('titanic mission.json did not parse');
   const bus = new EventBus();
-  return { m: new Mission({ def, bus, completeDelayS: 3, warn: quiet }), bus };
+  return { m: new Mission({ def, bus, warn: quiet }), bus };
 }
 
 describe('Mission.abort', () => {
@@ -32,7 +32,29 @@ describe('Mission.abort', () => {
     expect(m.emitted.map((e) => e.name)).toEqual(['mission:started', 'mission:aborted']);
   });
 
-  it('only a running (or completing) mission can abort; restart clears it', () => {
+  it('an aborted dive ends in a debrief that cannot resume, without mission:complete', () => {
+    const { m, bus } = make();
+    const ended: unknown[] = [];
+    bus.on('mission:ended', (p) => ended.push(p));
+    m.start('titanic');
+    for (const o of m.requiredPrimaries()) {
+      bus.emit('scan:complete', { poiId: o.poiId, landmarkId: 'titanic', firstTime: false });
+    }
+    expect(m.state).toBe('primaries-complete');
+    m.update(4);
+    m.abort('crush');
+    expect(m.end()).toBe(true);
+    expect(m.state).toBe('debrief');
+    expect(m.endReason).toBe('abort');
+    expect(m.canResume).toBe(false);
+    expect(m.resume()).toBe(false);
+    expect(m.emitted.map((e) => e.name)).not.toContain('mission:complete');
+    expect(ended).toEqual([
+      { missionId: 'titanic', reason: 'abort', completed: 2, total: 4, durationS: 4 },
+    ]);
+  });
+
+  it('only a dive in progress can abort; restart clears it', () => {
     const { m } = make();
     m.abort('crush');
     expect(m.state).toBe('briefing');

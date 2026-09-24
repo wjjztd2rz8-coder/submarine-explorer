@@ -172,17 +172,20 @@ test.describe('globe mission select', () => {
   });
 });
 
-test('field guide SPECIES tab lists survey rows and the disclaimer', async ({ page }) => {
+test('Journal lists the survey species with their OBIS sources', async ({ page }) => {
   const errors = collectErrors(page);
   await boot(page, '/?tile=titanic&landmark=_test');
   await page.keyboard.press('KeyJ');
-  await expect(page.locator('.field-guide')).toBeVisible();
-  await page.locator('.fg-tab-species').click();
-  const rows = page.locator('.fg-species-row');
+  const journal = page.locator('.journal');
+  await expect(journal).toBeVisible();
+  // D-FLOW: no species is linked to a scanned POI yet, so they are spoilers.
+  await expect(journal.locator('.jr-hidden-note')).toContainText('2 species not yet identified');
+  await journal.locator('.jr-spoilers input').check();
+  const rows = journal.locator('.jr-site-entries .jr-nav-item.is-species');
   await expect(rows).toHaveCount(2); // the row without a scientific name is dropped
-  await expect(rows.first().locator('.fg-species-name')).toContainText('Coryphaenoides armatus');
-  await expect(rows.first().locator('.fg-species-common')).toHaveText('abyssal grenadier');
-  await expect(page.locator('.fg-species-note')).toContainText(/placement .* invented/i);
-  await expect(page.locator('.fg-species-source a')).toHaveAttribute('href', /api\.obis\.org/);
+  await rows.first().click();
+  await expect(journal.locator('.jr-body .jr-title')).toHaveText('abyssal grenadier');
+  await expect(journal.locator('.jr-latin i')).toHaveText('Coryphaenoides armatus');
+  await expect(journal.locator('.jr-sources a').last()).toHaveAttribute('href', /api\.obis\.org/);
   expect(errors).toEqual([]);
 });

@@ -30,7 +30,7 @@ const MINIMAL = {
   spawn: { lat: 41.74, lon: -49.97, depth_m: 5, heading_deg: 150 },
   briefing: { summary: 'Go.', depth_m: 3800, facts: ['a'], hazards: ['b'], memorial_note: 'quiet' },
   objectives: [
-    { id: 'p1', type: 'scan', poi: 'poi-a', primary: true, title: 'A' },
+    { id: 'p1', type: 'scan', poi: 'poi-a', primary: true, title: 'A', hint: '  North end.  ' },
     { id: 'p2', type: 'scan', poi: 'poi-b', primary: true, title: 'B' },
     { id: 's1', type: 'scan', poi: 'poi-c', primary: false, title: 'C' },
   ],
@@ -61,6 +61,8 @@ describe('parseMission', () => {
     expect(d.spawn).toEqual({ lat: 41.74, lon: -49.97, depth_m: 5, heading_deg: 150 });
     expect(d.briefing.memorial_note).toBe('quiet');
     expect(d.objectives.map((o) => o.id)).toEqual(['p1', 'p2', 's1']);
+    // D-FLOW: the content hint passes through, trimmed; absent is empty.
+    expect(d.objectives.map((o) => o.hint)).toEqual(['North end.', '', '']);
     expect(d.completion).toBe('all_primary');
   });
 
@@ -152,19 +154,20 @@ describe('manifest + loaders', () => {
   });
 });
 
-describe('Mission state machine', () => {
-  function setup(delay = 3): { m: Mission; bus: EventBus; log: string[] } {
+describe('Mission state machine (D-FLOW)', () => {
+  const NAMES = [
+    'mission:started',
+    'mission:objective',
+    'mission:primaryComplete',
+    'mission:complete',
+    'mission:ended',
+    'mission:restart',
+  ] as const;
+  function setup(): { m: Mission; bus: EventBus; log: string[] } {
     const bus = new EventBus();
     const log: string[] = [];
-    for (const n of [
-      'mission:started',
-      'mission:objective',
-      'mission:complete',
-      'mission:restart',
-    ] as const) {
-      bus.on(n, (p) => log.push(`${n} ${JSON.stringify(p)}`));
-    }
-    const m = new Mission({ def: def(), bus, completeDelayS: delay, warn: quiet });
+    for (const n of NAMES) bus.on(n, (p) => log.push(`${n} ${JSON.stringify(p)}`));
+    const m = new Mission({ def: def(), bus, warn: quiet });
     m.resolve(['poi-a', 'poi-b', 'poi-c']);
     return { m, bus, log };
   }
@@ -178,58 +181,101 @@ describe('Mission state machine', () => {
     expect(m.objectives[0]?.complete).toBe(false);
     m.start('site-tile');
     m.start('site-tile'); // idempotent
-    expect(m.state).toBe('running');
+    expect(m.state).toBe('diving');
     expect(log).toEqual(['mission:started {"missionId":"site","tileId":"site-tile"}']);
   });
 
-  it('completes all_primary after the delay, secondaries optional', () => {
-    const { m, bus, log } = setup(3);
+  it('the last primary emits one primaryComplete and the dive carries on', () => {
+    const { m, bus, log } = setup();
     m.start('site-tile');
     m.update(10);
-    scan(bus, 'poi-c'); // secondary
     scan(bus, 'poi-a');
-    expect(m.state).toBe('running');
+    expect(m.state).toBe('diving');
     scan(bus, 'poi-a'); // repeat scan: no second event
     scan(bus, 'poi-b');
-    expect(m.state).toBe('completing');
+    expect(m.state).toBe('primaries-complete');
     expect(m.primaryComplete).toBe(true);
-    m.update(2.9);
-    expect(m.state).toBe('completing');
-    m.update(0.2);
-    expect(m.state).toBe('complete');
-    expect(m.durationS).toBeCloseTo(13.1, 6);
-    expect(log.filter((l) => l.startsWith('mission:objective'))).toEqual([
-      'mission:objective {"missionId":"site","objectiveId":"s1","complete":true}',
-      'mission:objective {"missionId":"site","objectiveId":"p1","complete":true}',
-      'mission:objective {"missionId":"site","objectiveId":"p2","complete":true}',
-    ]);
-    expect(log.at(-1)).toMatch(/^mission:complete \{"missionId":"site","durationS":13\.1/);
+    expect(log.at(-1)).toBe('mission:primaryComplete {"missionId":"site","completed":2,"total":3}');
+    // Nothing finishes on its own.
+    m.update(600);
+    expect(m.state).toBe('primaries-complete');
+    expect(m.durationS).toBeNull();
+    // Secondary scans still count after the primaries.
+    scan(bus, 'poi-c');
+    expect(m.allComplete).toBe(true);
+    expect(m.state).toBe('primaries-complete');
     expect(m.emitted.map((e) => e.name)).toEqual([
       'mission:started',
       'mission:objective',
       'mission:objective',
+      'mission:primaryComplete',
       'mission:objective',
-      'mission:complete',
     ]);
-    // Scans after completion change nothing.
-    m.update(100);
-    expect(m.durationS).toBeCloseTo(13.1, 6);
   });
 
-  it('a zero delay completes on the next update, not inside the scan handler', () => {
-    const { m, bus } = setup(0);
+  it('ending after the primaries emits complete then ended, once each; resume returns', () => {
+    const { m, bus, log } = setup();
     m.start('t');
     scan(bus, 'poi-a');
     scan(bus, 'poi-b');
-    expect(m.state).toBe('completing');
-    m.update(0);
-    expect(m.state).toBe('complete');
+    m.update(13.1);
+    log.length = 0;
+    expect(m.end()).toBe(true);
+    expect(m.state).toBe('debrief');
+    expect(m.endReason).toBe('surface');
+    expect(m.durationS).toBeCloseTo(13.1, 6);
+    expect(log).toEqual([
+      'mission:complete {"missionId":"site","durationS":13.1}',
+      'mission:ended {"missionId":"site","reason":"surface","completed":2,"total":3,"durationS":13.1}',
+    ]);
+    // The debrief does not count as dive time; Keep exploring resumes the dive.
+    m.update(50);
+    expect(m.elapsedS).toBeCloseTo(13.1, 6);
+    expect(m.canResume).toBe(true);
+    expect(m.resume()).toBe(true);
+    expect(m.state).toBe('primaries-complete');
+    expect(m.durationS).toBeNull();
+    scan(bus, 'poi-c');
+    m.update(1);
+    log.length = 0;
+    m.end();
+    // mission:complete fired once already; ended fires on every debrief.
+    expect(log).toEqual([
+      'mission:ended {"missionId":"site","reason":"all","completed":3,"total":3,"durationS":14.1}',
+    ]);
+    expect(m.end()).toBe(false); // already in the debrief
+  });
+
+  it('surfacing before the primaries ends without mission:complete', () => {
+    const { m, bus, log } = setup();
+    m.start('t');
+    scan(bus, 'poi-c');
+    log.length = 0;
+    m.end();
+    expect(m.state).toBe('debrief');
+    expect(log).toEqual([
+      'mission:ended {"missionId":"site","reason":"surface","completed":1,"total":3,"durationS":0}',
+    ]);
+    m.resume();
+    expect(m.state).toBe('diving');
+    scan(bus, 'poi-a');
+    scan(bus, 'poi-b');
+    log.length = 0;
+    m.end();
+    expect(log.map((l) => l.split(' ')[0])).toEqual(['mission:complete', 'mission:ended']);
+  });
+
+  it('cannot end or resume outside a dive', () => {
+    const { m } = setup();
+    expect(m.end()).toBe(false);
+    expect(m.resume()).toBe(false);
+    expect(m.state).toBe('briefing');
   });
 
   it('unresolved objectives neither count nor block', () => {
     const bus = new EventBus();
     const warnings: string[] = [];
-    const m = new Mission({ def: def(), bus, completeDelayS: 0, warn: (w) => warnings.push(w) });
+    const m = new Mission({ def: def(), bus, warn: (w) => warnings.push(w) });
     m.resolve(['poi-a', 'poi-c']); // poi-b is missing from pois.json
     expect(warnings).toHaveLength(1);
     expect(m.requiredPrimaries().map((o) => o.id)).toEqual(['p1']);
@@ -237,38 +283,47 @@ describe('Mission state machine', () => {
     scan(bus, 'poi-b');
     expect(m.objectives[1]?.complete).toBe(false);
     scan(bus, 'poi-a');
-    m.update(0);
-    expect(m.state).toBe('complete');
+    expect(m.state).toBe('primaries-complete');
+    expect(m.counts()).toEqual({ completed: 1, total: 2 });
   });
 
   it('never completes with no resolvable primary', () => {
     const bus = new EventBus();
-    const m = new Mission({ def: def(), bus, completeDelayS: 0, warn: quiet });
+    const m = new Mission({ def: def(), bus, warn: quiet });
     m.resolve(['poi-c']);
     m.start('t');
     scan(bus, 'poi-c');
     m.update(1);
     expect(m.primaryComplete).toBe(false);
-    expect(m.state).toBe('running');
+    expect(m.state).toBe('diving');
   });
 
-  it('restart emits mission:restart and resets progress; onChange fires', () => {
-    const { m, bus, log } = setup(0);
+  it('restart emits mission:restart and resets to a fresh dive; onChange fires', () => {
+    const { m, bus, log } = setup();
     let changes = 0;
     const off = m.onChange(() => changes++);
     m.start('t');
     scan(bus, 'poi-a');
+    scan(bus, 'poi-b');
+    m.end();
     m.restart();
     expect(log.at(-1)).toBe('mission:restart {"missionId":"site"}');
     expect(m.state).toBe('briefing');
+    expect(m.endReason).toBeNull();
     expect(m.objectives.every((o) => !o.complete)).toBe(true);
-    expect(changes).toBe(3);
+    expect(changes).toBe(5);
+    // A fresh dive can complete (and emit mission:complete) again.
+    m.start('t');
+    scan(bus, 'poi-a');
+    scan(bus, 'poi-b');
+    m.end();
+    expect(m.emitted.filter((e) => e.name === 'mission:complete')).toHaveLength(2);
     off();
     m.dispose();
+    m.restart();
     m.start('t');
     scan(bus, 'poi-a'); // disposed: no longer listening
     expect(m.objectives[0]?.complete).toBe(false);
-    expect(changes).toBe(3);
   });
 
   it('the briefing time is not dive time', () => {
@@ -290,12 +345,7 @@ describe('Titanic content (B2) against the mission loader', () => {
     expect(d?.spawn.depth_m).toBe(5);
     const pois = parsePois(titanicPois, quiet);
     const bus = new EventBus();
-    const m = new Mission({
-      def: d as MissionDef,
-      bus,
-      completeDelayS: 3,
-      warn: (w) => warnings.push(w),
-    });
+    const m = new Mission({ def: d as MissionDef, bus, warn: (w) => warnings.push(w) });
     m.resolve(pois.map((p) => p.id));
     expect(warnings).toEqual([]);
     expect(m.requiredPrimaries().map((o) => o.poiId)).toEqual(['titanic-bow', 'titanic-stern']);

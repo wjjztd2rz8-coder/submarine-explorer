@@ -1,15 +1,26 @@
 /**
- * End-of-dive debrief (DOM): distance, max depth, elapsed time, what was
- * scanned this dive and which field-guide entries are new. B3's mission flow
- * calls `show()` on completion; `?debrief=1` opens it for screenshots.
+ * End-of-dive debrief (DOM): objectives, distance, max depth, elapsed time,
+ * what was scanned this dive and which Journal entries are new. The mission
+ * router (D-FLOW) opens it when the player surfaces and passes its own
+ * actions (Keep exploring, Dive again, Dive sites, Home, Journal);
+ * `?debrief=1` opens the free-dive variant for screenshots.
  */
 
 import type { DebriefStats } from '../game/Objectives.js';
 import { FocusTrap } from './FocusTrap.js';
 
+/** One debrief button. `id` becomes `data-action` (stable for tests and CSS). */
+export interface DebriefAction {
+  id: string;
+  label: string;
+  primary?: boolean;
+  run: () => void;
+}
+
 export interface DebriefOptions {
-  /** Default: reload the same URL. */
+  /** Default: reload the same URL. Used when `show()` gets no actions. */
   onDiveAgain?: () => void;
+  /** Opens the Journal. Used when `show()` gets no actions. */
   onFieldGuide?: () => void;
   parent?: HTMLElement;
 }
@@ -64,7 +75,8 @@ export class Debrief {
     return this.open_;
   }
 
-  show(stats: DebriefStats): void {
+  /** @param actions the buttons, in order; default Dive again + Journal. */
+  show(stats: DebriefStats, actions?: DebriefAction[]): void {
     this.last = stats;
     const p = this.panel;
     p.replaceChildren();
@@ -88,6 +100,10 @@ export class Debrief {
       cell.append(el('span', 'debrief-label', label), el('span', 'debrief-value', value));
       grid.append(cell);
     };
+    if (stats.objectives) {
+      const { completed, total } = stats.objectives;
+      stat('OBJECTIVES', `${completed} of ${total}`, 'objectives');
+    }
     stat('DISTANCE', formatDistance(stats.distanceM), 'distance');
     stat('MAX DEPTH', `${Math.round(stats.maxDepthM).toLocaleString('en-US')} m`, 'maxDepth');
     stat('DIVE TIME', formatDuration(stats.elapsedS), 'elapsed');
@@ -114,25 +130,34 @@ export class Debrief {
       'is-discoveries',
     );
     section(
-      'NEW FIELD-GUIDE ENTRIES',
+      'NEW JOURNAL ENTRIES',
       stats.newEntries.map((e) => e.title),
       'No new entries.',
       'is-new',
     );
     p.append(lists);
 
-    const actions = el('div', 'debrief-actions');
-    const again = el('button', 'debrief-btn is-primary', 'Dive again');
-    again.type = 'button';
-    again.addEventListener('click', () => {
-      if (this.options.onDiveAgain) this.options.onDiveAgain();
-      else window.location.reload();
-    });
-    const guide = el('button', 'debrief-btn', 'Field guide');
-    guide.type = 'button';
-    guide.addEventListener('click', () => this.options.onFieldGuide?.());
-    actions.append(again, guide);
-    p.append(actions);
+    const row = el('div', 'debrief-actions');
+    const list = actions ?? [
+      {
+        id: 'dive-again',
+        label: 'Dive again',
+        primary: true,
+        run: () => {
+          if (this.options.onDiveAgain) this.options.onDiveAgain();
+          else window.location.reload();
+        },
+      },
+      { id: 'journal', label: 'Journal', run: () => this.options.onFieldGuide?.() },
+    ];
+    for (const a of list) {
+      const b = el('button', a.primary ? 'debrief-btn is-primary' : 'debrief-btn', a.label);
+      b.type = 'button';
+      b.dataset.action = a.id;
+      b.addEventListener('click', () => a.run());
+      row.append(b);
+    }
+    p.append(row);
 
     this.open_ = true;
     this.root.hidden = false;

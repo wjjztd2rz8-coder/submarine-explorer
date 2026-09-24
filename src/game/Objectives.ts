@@ -1,10 +1,11 @@
 /**
- * Progress bookkeeping for the current landmark, plus per-dive session stats.
+ * Journal progress for the current landmark, plus per-dive session stats.
  *
- * `Objectives` answers "which POIs of this landmark are discovered, and are all
- * the primary ones done?" from the {@link DiscoveryStore}; B3's mission flow
- * reads it (docs/discovery.md). `SessionStats` accumulates what the debrief
- * shows: distance, max depth, time, and what was scanned this dive.
+ * `Objectives` answers "which POIs of this landmark are logged in the Journal?"
+ * from the {@link DiscoveryStore}. It is persistent, across dives: it never
+ * decides mission objectives, which count scans made during this dive only
+ * (`Mission`, plan/PHASE-D-CONTRACTS.md §4). `SessionStats` accumulates what
+ * the debrief shows: distance, max depth, time, and what was scanned this dive.
  */
 
 import type { Vector3 } from 'three';
@@ -95,9 +96,11 @@ export interface DebriefStats {
   /** Positive metres. */
   maxDepthM: number;
   elapsedS: number;
+  /** Mission objectives done this dive ("X of Y objectives"); absent in a free dive. */
+  objectives?: { completed: number; total: number };
   /** POIs scanned this session (first-time or repeat). */
   discoveries: Array<{ poiId: string; name: string }>;
-  /** Field-guide entries first unlocked this session. */
+  /** Journal entries first unlocked this session. */
   newEntries: Array<{ id: string; title: string }>;
 }
 

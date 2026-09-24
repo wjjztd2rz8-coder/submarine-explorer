@@ -1,5 +1,9 @@
 # Scan, discovery, field guide, debrief (B1)
 
+> D-FLOW replaced the field guide with the Journal (`src/ui/Journal.ts`); see
+> [missions.md](missions.md#journal). `FieldGuide.ts` re-exports it, so the
+> `discovery.guide` API below still applies.
+
 The Tier 1 discovery loop: approach a point of interest (POI), hold the scan
 beam on it, unlock its field-guide entry, and see what you found in the
 debrief. Schemas are authoritative in `plan/PHASE-B-CONTRACTS.md` §2.1–2.2;

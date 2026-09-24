@@ -61,36 +61,58 @@ seabed + hullRadius + seabedClearance + mission.spawnClearanceM]`. The
    behind it to return to, and starting the dive on Escape would surprise.
    Opening a modal does not pull focus into it (Space is ballast blow; a focused
    "Dive again" would turn a held Space into a reload); the first Tab does.
-4. **Running.** The objectives panel (top centre) lists primary objectives
-   first, secondary dimmer, with ☐/☑, the sim speed, and a nav line to the
-   nearest open primary: bearing (0 = north, `headingFromForward`, the same
+4. **Diving** (`state: 'diving'`). The objectives panel (top centre, D-FLOW)
+   is the one place the current objective shows: the mission title, a nav
+   line and an "n of m" progress line (`1 of 4 objectives · 1 of 2 primary`).
+   The full list with each objective's `hint` is in the Esc menu's Objectives
+   view. The nav line points at the nearest open primary: bearing (0 = north, `headingFromForward`, the same
    maths as the HUD heading), `RNG` = the 3D slant range (the same metric as
    the scan panel's distance and the scanner's `radius_m` test; QA-B #11, so
    the surface start reads ~4.3 km to a bow 2 km away and 3.8 km down), target
    depth, and a turn cue.
-   Once every primary is done it points at the nearest open secondary.
-5. **Completion** (`all_primary`). Objectives count scans (`scan:complete`)
-   made during this run, not the persisted discovery store, so a repeat dive
-   has to find the wreck again. Objectives whose POI is missing from
-   `pois.json` are shown struck through and do not block. After the last primary
-   scan, `mission.completeDelayS` (3 s) passes, then `mission:complete` and the
-   debrief: B1's session stats plus "Dive again" (`mission:restart`, then reload),
-   "Field guide", and "Dive sites" (to `/`).
-6. **Failure: crush depth** (plan/DECISIONS.md: emergency ascent + restart).
+   Once every primary is done it points at the nearest open secondary
+   (`OPTIONAL → …`).
+5. **Primaries complete** (`all_primary`, D-FLOW). Objectives count scans
+   (`scan:complete`) made during this dive, not the persisted discovery store
+   (the Journal), so every dive, including "Dive again", starts with every
+   objective open. Objectives whose POI is missing from `pois.json` do not
+   count or block. The scan that completes the last primary emits
+   `mission:primaryComplete {missionId, completed, total}` and moves to
+   `primaries-complete`; nothing ends the dive on its own. After
+   `mission.completeDelayS` (3 s, so the scan's NEW ENTRY card lands first) a
+   banner under the panel reads **Primary objectives complete** with **Keep
+   exploring** (the default; it applies after `mission.completionBannerS`,
+   20 s) and **Surface and debrief**. Secondary scans keep counting; when
+   everything is done the banner returns as **All objectives complete**. The
+   banner buttons never take keyboard focus.
+6. **Debrief.** Only the player ends a dive: the banner's Surface and debrief,
+   or **Surface and debrief** in the Esc menu (any time during a mission dive;
+   before the primaries it is titled **Dive ended**). `Mission.end()` emits
+   `mission:complete {missionId, durationS}` once per dive, only when the
+   primaries are done, then `mission:ended {missionId, reason:
+'surface'|'all'|'abort', completed, total, durationS}` on every debrief. The
+   debrief shows `X of Y objectives`, B1's session stats and the new Journal
+   entries, and freezes the game. Its buttons: **Keep exploring** (Escape too;
+   back to the same state and pose), **Dive again** (`mission:restart`, then a
+   reload of the same URL: a fresh dive with the briefing unless the URL skips
+   it), **Dive sites** (the home screen's site chooser, without launching a
+   dive), **Home**, and **Journal** (over the debrief; Escape closes only it).
+7. **Failure: crush depth** (plan/DECISIONS.md: emergency ascent + restart).
    On `sub:emergencyBlow` during a running mission the objectives panel shows
    an amber `HULL FAILURE — EMERGENCY ASCENT` strip (it replaces the HUD's red
    banner while up). When the blow ends (the sub's `emergencyBlow` goes false,
    i.e. the control lock ran out _and_ the boat is back above its rating),
    `Mission.abort('crush')` emits `mission:aborted {missionId, reason:
-'crush'}` and the debrief opens as **Dive aborted** (amber, "Hull failure at
-   N m · emergency ascent completed · …") with only "Dive again"
-   (`mission:restart`, reload) and "Dive sites". The game is frozen under it
-   (`missionRouter.frozen`) and Escape does not dismiss it. Free dive keeps the
+'crush'}`, then `Mission.end()` emits `mission:ended` (reason `abort`, no
+   `mission:complete`) and the debrief opens as **Dive aborted** (amber, "Hull
+   failure at N m · emergency ascent completed · …") without Keep exploring.
+   The game is frozen under it (`missionRouter.frozen`) and Escape does not
+   dismiss it. Free dive keeps the
    Phase A behaviour (blow, then carry on).
 
 **Clock.** The mission clock (`Mission.elapsedS`, `durationS`) and the
 debrief's DIVE TIME count real (wall-clock) seconds of unfrozen play —
-`time.frameDelta` while neither the briefing nor the aborted debrief is up —
+`time.frameDelta` while neither the briefing, the debrief nor a menu is up —
 not physics dt, which the 8-steps-per-frame cap in `Time.ts` shortens at low
 frame rates (QA-B #10). Scan progress still runs on physics time.
 
@@ -100,12 +122,36 @@ to triple the yaw/pitch rate too (~90°/s real at 3×; QA-B #15). By default
 the boat turns at its 1× real rate while translation keeps the full speed-up.
 `Config.submarine.simSpeedScalesTurnRate: true` restores the old behaviour.
 
+States: `briefing → diving → primaries-complete → debrief`, plus `aborted →
+debrief`; Keep exploring returns from `debrief` to the state before it.
 Events: `mission:started {missionId, tileId}`, `mission:objective {missionId,
-objectiveId, complete}`, `mission:complete {missionId, durationS}` (real seconds
-since Begin dive), `mission:restart {missionId}`, `mission:aborted {missionId,
-reason: 'crush'}`. `window.__game.mission` is the
-`Mission` (`state`, `objectives`, `emitted[]`); `window.__game.missionRouter` is
-the controller.
+objectiveId, complete}`, `mission:primaryComplete {missionId, completed,
+total}`, `mission:complete {missionId, durationS}` (real seconds of diving),
+`mission:ended {missionId, reason, completed, total, durationS}`,
+`mission:restart {missionId}`, `mission:aborted {missionId, reason: 'crush'}`.
+`window.__game.mission` is the `Mission` (`state`, `objectives`, `emitted[]`,
+`endReason`); `window.__game.missionRouter` is the controller (`endDive()`,
+`keepExploring()`).
+
+## Journal
+
+The Journal (`src/ui/Journal.ts`, model in `src/game/JournalData.ts`)
+replaced the field guide; `src/ui/FieldGuide.ts` re-exports it under the old
+name, so it is still `discovery.guide` (and `window.__game.journal`). It opens
+with J in a dive (on this dive's site), from the home screen (front page), the
+Esc menu and the debrief. It lists every mission site from
+`data/landmarks/index.json`, plus the dive's own content folder when that is
+not listed, with entries per site (guide entries no POI points at), per POI
+(`guide.json` entries, or a stand-in per POI) and per species
+(`species.json`), built from `landmarks.json`, `guide.json`, `pois.json` and
+`species.json`. Unlocks read `subexplorer.discoveries.v1`, which the Journal
+never writes: a site opens on any scan there, a POI entry on its POI's scan,
+and a species only when a scanned POI's entry names it; other species stay
+spoiler-only until a future encounter system. "Show undiscovered entries
+(spoilers)" is an in-memory toggle. The front page says once that the seabed
+is real survey data and that wrecks, structures and markers are recreations;
+entries for POIs with `reconstruction: true` carry a small **Recreation** tag,
+and every entry lists its sources.
 
 ## Titanic time budget
 

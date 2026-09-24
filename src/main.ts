@@ -718,12 +718,53 @@ async function main(): Promise<void> {
           headlights.setEnabled(true);
         },
         // --- D-START end ---
+        // --- D-FLOW begin ---
+        // Debrief "Dive sites" / "Home" go to the shell without launching a dive.
+        onDiveSites: () => {
+          history.pushState({}, '', shellBaseHref());
+          setAppState('home');
+          home.showSites(false);
+        },
+        onHome: () => {
+          history.pushState({}, '', shellBaseHref());
+          setAppState('home');
+        },
+        // --- D-FLOW end ---
         simSpeed: sub.simSpeed,
         keyLabel: (action) =>
           input.primaryKeyLabel(action as Parameters<Input['primaryKeyLabel']>[0]),
       })
     : null;
   // --- B3 end ---
+  // --- D-FLOW begin ---
+  // The Journal (docs/missions.md): reads the persistent discovery store for
+  // every site, lists this dive's site first, and opens on its front page from
+  // home. The pause menu offers "Surface and debrief" while a mission dive is on.
+  const journal = discovery.guide;
+  journal.setStore(discovery.store);
+  journal.setCurrentSite(contentLandmark);
+  journal.setHomeMode(appState === 'home');
+  bus.on('app:state', ({ state }) => journal.setHomeMode(state === 'home'));
+  if (missionRouter) {
+    const surface = document.createElement('button');
+    surface.type = 'button';
+    surface.className = 'pause-surface';
+    surface.textContent = 'Surface and debrief';
+    surface.hidden = true;
+    surface.addEventListener('click', () => {
+      setAppState('dive');
+      missionRouter.endDive();
+    });
+    const pauseActions = pause.root.querySelector('.pause-actions');
+    const quitButton = [...(pauseActions?.querySelectorAll('button') ?? [])].find(
+      (b) => b.textContent === 'Quit to home',
+    );
+    pauseActions?.insertBefore(surface, quitButton ?? null);
+    bus.on('app:state', ({ state }) => {
+      if (state === 'pause') surface.hidden = !missionRouter.canEndDive;
+    });
+  }
+  // --- D-FLOW end ---
   // --- D-INPUT-HUD begin ---
   const briefingControls = missionRouter?.briefing?.root.querySelector('.briefing-controls');
   if (briefingControls) {
@@ -1104,6 +1145,9 @@ async function main(): Promise<void> {
     // --- D-SCAN begin ---
     waypoints,
     // --- D-SCAN end ---
+    // --- D-FLOW begin ---
+    journal,
+    // --- D-FLOW end ---
     // --- C1 begin ---
     globe,
     // --- D-SHELL begin ---

@@ -1,6 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
 
-/** Retained Phase C smoke: each shipped pack completes through real scans. */
+/**
+ * Retained Phase C smoke: each shipped pack completes through real scans.
+ * D-FLOW: primary scans -> "Primary objectives complete" banner -> the
+ * player surfaces voluntarily -> debrief.
+ */
 type Objective = { id: string; poi: string; primary: boolean };
 type MissionDoc = { landmark: string; objectives: Objective[] };
 const missionIds = [
@@ -177,17 +181,21 @@ for (const id of missionIds) {
       expect(completed, `${id}: ${objective.id} should complete through a scan`).toBeGreaterThan(
         before,
       );
-      await expect(page.locator(`.obj-item[data-objective="${objective.id}"]`)).toHaveClass(
-        /is-complete/,
-      );
     }
+    await expect(page.locator('.obj-progress')).toHaveText(/primaries done|all complete/);
 
-    await expect(page.locator('.mission-debrief')).toBeVisible({ timeout: 15_000 });
+    // Nothing ends the dive on its own: the banner offers the choice.
+    const banner = page.locator('.obj-banner');
+    await expect(banner).toBeVisible({ timeout: 15_000 });
+    await expect(banner.locator('.obj-banner-title')).toHaveText(/objectives complete$/);
+    await expect(page.locator('.mission-debrief')).toHaveCount(0);
+    await banner.locator('button', { hasText: 'Surface and debrief' }).click();
+    await expect(page.locator('.mission-debrief')).toBeVisible();
     await expect(page.locator('.mission-debrief .debrief-title')).toHaveText('Mission complete');
     const state = await page.evaluate(
       () => (window.__game as { mission: { state: string } }).mission.state,
     );
-    expect(state).toBe('complete');
+    expect(state).toBe('debrief');
     expect(errors, errors.join(' | ')).toEqual([]);
   });
 }

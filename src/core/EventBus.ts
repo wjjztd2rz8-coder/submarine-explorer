@@ -48,10 +48,22 @@ export interface GameEvents {
   // --- B3: mission flow ------------------------------------------------------
   'mission:started': { missionId: string; tileId: string };
   'mission:objective': { missionId: string; objectiveId: string; complete: boolean };
+  /** D-FLOW: once per dive, when the player ends it after the primaries are done. */
   'mission:complete': { missionId: string; durationS: number };
   'mission:restart': { missionId: string };
   /** Fix S: the dive failed (crush depth -> emergency ascent), before the aborted debrief. */
   'mission:aborted': { missionId: string; reason: 'crush' };
+  // --- D-FLOW: dive flow (plan/PHASE-D-CONTRACTS.md §4) -----------------------
+  /** The scan that completed the last primary objective; the dive continues. */
+  'mission:primaryComplete': { missionId: string; completed: number; total: number };
+  /** Every transition into the debrief (after `mission:complete`, when that fires). */
+  'mission:ended': {
+    missionId: string;
+    reason: 'surface' | 'all' | 'abort';
+    completed: number;
+    total: number;
+    durationS: number;
+  };
   // --- B4: props -------------------------------------------------------------
   'props:loaded': { landmarkId: string; count: number; models: number; procedural: number };
   // --- C3: environment presets (docs/presets.md) -----------------------------
