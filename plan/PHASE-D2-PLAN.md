@@ -82,7 +82,7 @@ The briefs are in `.cache/codex/brief-d2-*.md`.
 
 ## 5. Budget rule (owner, 2026-09-24)
 
-Keep at least 20% of Claude's 5-hour window and 5% of Codex's (5-hour and weekly; the owner lowered the Codex floor on 2026-09-24). Check with
+Floors: on the 5-hour window, Claude keeps at least 20% and Codex at least 5%; on the weekly window, both keep at least 5%. Check with
 the private `ai-limits` tool (`~/.local/bin/ai-limits --gate 20 5`; it is not
 part of this repo). Codex's weekly window is the tighter one this week (34%
 left on 2026-09-24, resetting Mon 2026-09-28), so three packages go to Codex and
