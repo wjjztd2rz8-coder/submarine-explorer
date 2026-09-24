@@ -9,12 +9,6 @@ export interface WaypointObjective {
   hint?: string;
 }
 
-export interface WaypointSonar {
-  root: HTMLElement;
-  canvas: HTMLCanvasElement;
-  visible: boolean;
-}
-
 export function waypointReadout(
   from: { x: number; y: number; z: number },
   target: { x: number; y: number; z: number },
@@ -37,7 +31,6 @@ export class Waypoints {
   private readonly edgeName = document.createElement('span');
   private readonly edgeInfo = document.createElement('span');
   private readonly markers = new Map<string, HTMLDivElement>();
-  private readonly sonarMarkers = new Map<string, HTMLDivElement>();
   private readonly projection = new Vector3();
   private pois: readonly PlacedPoi[] = [];
   private visualHints = true;
@@ -46,9 +39,6 @@ export class Waypoints {
 
   constructor(
     private readonly scanner: Scanner,
-    private readonly sonar: WaypointSonar,
-    private readonly worldWidthM: number,
-    private readonly worldDepthM: number,
     parent: HTMLElement = document.body,
   ) {
     this.root = document.createElement('div');
@@ -74,12 +64,6 @@ export class Waypoints {
       marker.setAttribute('aria-label', poi.name);
       this.root.appendChild(marker);
       this.markers.set(poi.id, marker);
-      const sonarMarker = document.createElement('div');
-      sonarMarker.className = 'd-scan-sonar-marker';
-      sonarMarker.dataset.poi = poi.id;
-      sonarMarker.setAttribute('aria-label', poi.name);
-      this.sonar.root.appendChild(sonarMarker);
-      this.sonarMarkers.set(poi.id, sonarMarker);
     }
   }
 
@@ -94,7 +78,6 @@ export class Waypoints {
 
   setPalette(name: string): void {
     this.root.dataset.palette = name;
-    this.sonar.root.dataset.scanPalette = name;
   }
 
   update(camera: Camera, position: Vector3, objective: WaypointObjective | null): void {
@@ -110,8 +93,6 @@ export class Waypoints {
       this.hint.textContent = objective?.hint ?? '';
     }
     this.hint.hidden = !hintKey || performance.now() - this.hintShownAt > HINT_VISIBLE_MS;
-    const canvasWidth = this.sonar.canvas.clientWidth;
-    const canvasHeight = this.sonar.canvas.clientHeight;
     for (const poi of this.pois) {
       const scanned = this.scanner.isScanned(poi.landmarkId, poi.id);
       const isCurrent = poi === current && this.visualHints && !scanned;
@@ -132,16 +113,6 @@ export class Waypoints {
           marker.style.left = `${((projected.x + 1) / 2) * width}px`;
           marker.style.top = `${((1 - projected.y) / 2) * height}px`;
         }
-      }
-      const sonarMarker = this.sonarMarkers.get(poi.id);
-      if (sonarMarker) {
-        sonarMarker.hidden = !this.sonar.visible;
-        sonarMarker.classList.toggle('is-scanned', scanned);
-        sonarMarker.classList.toggle('is-current', isCurrent);
-        sonarMarker.textContent = scanned ? '✓' : isCurrent ? '◇' : '·';
-        sonarMarker.title = scanned ? `${poi.name} · scanned this dive` : poi.name;
-        sonarMarker.style.left = `${6 + ((poi.position.x + this.worldWidthM / 2) / this.worldWidthM) * canvasWidth}px`;
-        sonarMarker.style.top = `${6 + ((poi.position.z + this.worldDepthM / 2) / this.worldDepthM) * canvasHeight}px`;
       }
     }
     if (!current || !this.visualHints) {
@@ -167,6 +138,5 @@ export class Waypoints {
 
   dispose(): void {
     this.root.remove();
-    for (const marker of this.sonarMarkers.values()) marker.remove();
   }
 }

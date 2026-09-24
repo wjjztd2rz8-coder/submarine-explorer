@@ -36,4 +36,21 @@ describe('sonar palettes', () => {
     expect(paletteColor(stops, 0.5)).toEqual([50, 100, 25]);
     expect(paletteColor([], 0.5)).toEqual([0, 0, 0]);
   });
+
+  it('default survey relief has several clearly separated depth bands', () => {
+    const pal = DEFAULT_CONFIG.sonarPalettes.default;
+    expect(pal.stops.length).toBeGreaterThanOrEqual(4);
+    const depths = [0, 0.25, 0.5, 0.75, 1].map((t) =>
+      relativeLuminance(...paletteColor(pal.stops, t)),
+    );
+    for (let i = 1; i < depths.length; i++)
+      expect(depths[i]! - depths[i - 1]!).toBeGreaterThan(0.015);
+  });
+
+  it('alternate palettes keep separate channel signatures', () => {
+    const midpoint = (name: keyof typeof DEFAULT_CONFIG.sonarPalettes) =>
+      paletteColor(DEFAULT_CONFIG.sonarPalettes[name].stops, 0.5);
+    expect(midpoint('deuteranopia')).not.toEqual(midpoint('default'));
+    expect(midpoint('highContrast')).not.toEqual(midpoint('deuteranopia'));
+  });
 });

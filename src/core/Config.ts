@@ -878,19 +878,11 @@ export interface SonarPalette {
   /** Shown in the settings screen. */
   label: string;
   /**
-   * What drives the colour ramp: `terrain` = luminance of the terrain colour
-   * ramp at that cell (the original green sonar look), `depth` = the cell's
-   * depth normalised over the tile (0 = deepest, 1 = shallowest).
-   */
-  source: 'terrain' | 'depth';
-  /**
    * Colour stops `[at, r, g, b]`, `at` ascending in 0..1, channels 0..255.
-   * Low `at` is deep / dark; relative luminance must rise with `at` so depth
+   * Local deep = 0 and local shallow = 1; luminance rises with `at` so depth
    * ordering reads without hue (pinned by tests/unit/settingsPalette.test.ts).
    */
   stops: Array<[number, number, number, number]>;
-  /** Bitmap alpha 0..255. */
-  alpha: number;
   /** Landmark blip fill, and an optional outline (null = none). */
   blip: string;
   blipOutline: string | null;
@@ -900,6 +892,20 @@ export interface SonarPalette {
   /** Breadcrumb trail stroke and the map frame. */
   trail: string;
   frame: string;
+}
+
+/** Long-axis map span in metres; `tile` fits the complete survey. */
+export type SonarZoom = 250 | 500 | 1000 | 2000 | 'tile';
+
+export interface SonarZoomConfig {
+  levels: SonarZoom[];
+  initial: SonarZoom;
+  minReliefSpanM: Record<SonarZoom, number>;
+  contourIntervalM: Record<SonarZoom, number>;
+  rasterMarginPx: number;
+  refreshShiftPx: number;
+  hillshadeGain: number;
+  maxContours: number;
 }
 
 export interface SettingsConfig {
@@ -994,6 +1000,7 @@ export interface GameConfig {
   sensorPresets: Record<GameplayOptions['sensors'], SensorPreset>;
   /** C5: sonar minimap palettes (`Sonar.setPalette`). */
   sonarPalettes: Record<SonarPaletteName, SonarPalette>;
+  sonarZoom: SonarZoomConfig;
   /** C1: globe mission select. */
   globe: GlobeConfig;
   physicsHz: number;
@@ -1516,17 +1523,27 @@ export const DEFAULT_CONFIG: GameConfig = {
     realistic: { scanRadiusMultiplier: 1, hintRangeMultiplier: 1, sonarPoiRange: 500 },
     extended: { scanRadiusMultiplier: 2, hintRangeMultiplier: 2, sonarPoiRange: 2000 },
   },
-  // C5: sonar palettes. `default` reproduces the original green look exactly
-  // (lum = 0.25 + 0.75 * terrain luminance, times rgb(30, 235, 120)).
+  // --- D-SONAR: survey relief and map spans ---
+  sonarZoom: {
+    levels: [250, 500, 1000, 2000, 'tile'],
+    initial: 1000,
+    minReliefSpanM: { 250: 8, 500: 12, 1000: 20, 2000: 40, tile: 100 },
+    contourIntervalM: { 250: 5, 500: 10, 1000: 25, 2000: 50, tile: 100 },
+    rasterMarginPx: 24,
+    refreshShiftPx: 12,
+    hillshadeGain: 2.2,
+    maxContours: 20,
+  },
   sonarPalettes: {
     default: {
-      label: 'Sonar green',
-      source: 'terrain',
+      label: 'Sonar relief',
       stops: [
-        [0, 7.5, 58.75, 30],
-        [1, 30, 235, 120],
+        [0, 3, 26, 28],
+        [0.25, 9, 57, 55],
+        [0.5, 30, 94, 83],
+        [0.75, 78, 142, 113],
+        [1, 155, 198, 144],
       ],
-      alpha: 235,
       blip: '#ffd24a',
       blipOutline: null,
       sub: '#ffffff',
@@ -1538,7 +1555,6 @@ export const DEFAULT_CONFIG: GameConfig = {
       // Cividis-like blue -> yellow ramp: readable with red-green colour
       // blindness because depth is carried by luminance and the blue/yellow axis.
       label: 'Colour-blind safe (blue to yellow)',
-      source: 'depth',
       stops: [
         [0, 0, 34, 78],
         [0.25, 53, 69, 108],
@@ -1546,7 +1562,6 @@ export const DEFAULT_CONFIG: GameConfig = {
         [0.75, 168, 157, 116],
         [1, 254, 232, 56],
       ],
-      alpha: 240,
       blip: '#ffffff',
       blipOutline: '#000000',
       sub: '#000000',
@@ -1557,12 +1572,10 @@ export const DEFAULT_CONFIG: GameConfig = {
     highContrast: {
       // White symbols on a black-to-grey map.
       label: 'High contrast (white on black)',
-      source: 'depth',
       stops: [
         [0, 0, 0, 0],
         [1, 110, 110, 110],
       ],
-      alpha: 255,
       blip: '#ffffff',
       blipOutline: '#000000',
       sub: '#ffffff',
@@ -1571,6 +1584,7 @@ export const DEFAULT_CONFIG: GameConfig = {
       frame: '#ffffff',
     },
   },
+  // --- D-SONAR end ---
   // C1: globe mission select (docs/globe.md).
   globe: {
     textureUrl: publicUrl('/assets/globe/earth-bmng-topo-bathy-4096.jpg'),
@@ -1764,6 +1778,7 @@ export function makeConfig(overrides: Partial<GameConfig> = {}): GameConfig {
     lightPresets: { ...DEFAULT_CONFIG.lightPresets, ...overrides.lightPresets },
     sensorPresets: { ...DEFAULT_CONFIG.sensorPresets, ...overrides.sensorPresets },
     sonarPalettes: { ...DEFAULT_CONFIG.sonarPalettes, ...overrides.sonarPalettes },
+    sonarZoom: { ...DEFAULT_CONFIG.sonarZoom, ...overrides.sonarZoom },
     globe: { ...DEFAULT_CONFIG.globe, ...overrides.globe },
     presets: { ...DEFAULT_CONFIG.presets, ...overrides.presets },
   };

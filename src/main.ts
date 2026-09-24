@@ -315,7 +315,13 @@ async function main(): Promise<void> {
   });
   if (freeDiveHull && !freeDiveHull.cleared) hud.setHullNote('at rating limit');
   // --- fix S end ---
-  const sonar = new Sonar(terrain, landmarks.placed);
+  // --- D-SONAR begin ---
+  const sonar = new Sonar(terrain, landmarks.placed, {
+    palettes: config.sonarPalettes,
+    zoom: config.sonarZoom,
+  });
+  sonar.setSensorRange(config.sensorPresets[settings.gameplay.sensors].sonarPoiRange);
+  // --- D-SONAR end ---
   // --- B1 begin ---
   // POIs, scan beam, discoveries, field guide (J), debrief. `?landmark=` picks
   // the content folder, `?poi=` spawns next to a POI, `?debrief=1` opens the
@@ -335,11 +341,15 @@ async function main(): Promise<void> {
     },
   });
   // --- D-SCAN begin ---
-  const waypoints = new Waypoints(discovery.scanner, sonar, terrain.widthM, terrain.depthM);
+  const waypoints = new Waypoints(discovery.scanner);
   waypoints.setVisualHints(settings.gameplay.visualHints);
   waypoints.setReducedMotion(settings.reduceMotion);
   waypoints.setPalette(settings.sonarPalette);
   void discovery.ready.then(() => waypoints.setPois(discovery.pois));
+  // --- D-SONAR begin ---
+  sonar.setScanState((poi) => discovery.scanner.isScanned(poi.landmarkId, poi.id));
+  void discovery.ready.then(() => sonar.setPois(discovery.pois));
+  // --- D-SONAR end ---
   // Mission's current parser drops the content hint, so read the authored
   // sentence here until that field is passed through by the mission owner.
   const scanObjectiveHints = new Map<string, string>();
@@ -694,6 +704,33 @@ async function main(): Promise<void> {
     },
   });
 
+  // --- D-SONAR begin ---
+  const sonarControls = document.createElement('p');
+  sonarControls.className = 'settings-note d-sonar-controls';
+  sonarControls.textContent =
+    'Sonar: M expands the map; + / − change range. Wheel over the map also changes range.';
+  settingsScreen.root.querySelector('.settings-bindings')?.before(sonarControls);
+  window.addEventListener('keydown', (event) => {
+    if (
+      appState !== 'dive' ||
+      settingsScreen.isOpen ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey
+    )
+      return;
+    if (
+      event.target instanceof HTMLElement &&
+      event.target.closest('input, select, textarea, button, [contenteditable="true"]')
+    )
+      return;
+    if (event.code === 'Equal' || event.code === 'NumpadAdd') sonar.zoomBy(-1);
+    else if (event.code === 'Minus' || event.code === 'NumpadSubtract') sonar.zoomBy(1);
+    else return;
+    event.preventDefault();
+  });
+  // --- D-SONAR end ---
+
   rig.reduceMotion = settings.reduceMotion;
   sonar.setPalette(settings.sonarPalette);
   // --- C5 end ---
@@ -837,6 +874,12 @@ async function main(): Promise<void> {
       document.documentElement.style.setProperty('--ui-user-scale', String(next.uiScale / 100));
     // --- D-INPUT-HUD end ---
   });
+  // --- D-SONAR begin ---
+  save.onChange((next, changed) => {
+    if (changed.includes('gameplay'))
+      sonar.setSensorRange(config.sensorPresets[next.gameplay.sensors].sonarPoiRange);
+  });
+  // --- D-SONAR end ---
   // --- D-SCAN begin ---
   save.onChange((next, changed) => {
     if (changed.includes('gameplay')) waypoints.setVisualHints(next.gameplay.visualHints);
@@ -932,7 +975,9 @@ async function main(): Promise<void> {
       if (input.wheelDelta) rig.orbit(0, 0, input.wheelDelta * 0.001);
     } else unlockKeyboard();
     // --- D-INPUT-HUD end ---
+    // --- D-SONAR begin ---
     if (state.toggleSonar) sonar.toggle();
+    // --- D-SONAR end ---
     if (state.toggleLights) headlights.toggle();
     if (state.cycleSimSpeed) bus.emit('sub:simSpeed', { multiplier: sub.cycleSimSpeed() });
 
@@ -995,7 +1040,6 @@ async function main(): Promise<void> {
     snow.update(rig.camera, atmo, time.frameDelta, renderer.domElement.height);
     water.update(rig.camera.position.y, sub.position, time.elapsed, fogNow);
 
-    sonar.update(s);
     // fix S (QA-B #10): mission clock and DIVE TIME count real seconds of
     // unfrozen play, not capped physics time.
     const clockDt = frozen ? 0 : time.frameDelta;
@@ -1028,6 +1072,10 @@ async function main(): Promise<void> {
         : null,
     );
     // --- D-SCAN end ---
+    // --- D-SONAR begin ---
+    sonar.setObjective(nextScanObjective?.poiId ?? null);
+    sonar.update(s);
+    // --- D-SONAR end ---
     // --- D-INPUT-HUD begin ---
     const scanView = discovery.scanner.view;
     hud.update(s, {

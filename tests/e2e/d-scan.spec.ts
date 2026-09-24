@@ -37,7 +37,19 @@ test('scanned contacts stay marked and cannot be rescanned until a new dive', as
     { timeout: 15_000 },
   );
   await page.keyboard.up('f');
-  await expect(page.locator('.d-scan-sonar-marker[data-poi="test-bow"]')).toHaveClass(/is-scanned/);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (
+          window.__game as {
+            sonar: {
+              markers: Array<{ poiId: string; icon: string; scanned: boolean; visible: boolean }>;
+            };
+          }
+        ).sonar.markers.find((m) => m.poiId === 'test-bow'),
+      ),
+    )
+    .toMatchObject({ icon: '✓', scanned: true, visible: true });
   await expect(page.locator('.d-scan-world-marker[data-poi="test-bow"]')).toHaveClass(/is-scanned/);
   await screenshot(page, 'scanned-marker');
   await screenshot(page, 'scanned');
