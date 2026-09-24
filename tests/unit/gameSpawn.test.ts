@@ -60,15 +60,15 @@ describe('nearSiteSpawnPose', () => {
     bbox: { north: 0.01, south: -0.01, west: -0.01, east: 0.01 },
   } as import('../../src/util/types.js').TileMeta;
   const target = { x: 0, y: -480, z: 0 };
-  it('stays 100–200 m from the target, above the seabed, facing it', () => {
+  it('stays 350–600 m from the target, above the seabed, facing it', () => {
     const p = nearSiteSpawnPose(target, meta, { sampleHeight: () => -500 }, S, -1000)!;
-    expect(Math.hypot(p.x, p.z)).toBeGreaterThanOrEqual(100);
-    expect(Math.hypot(p.x, p.z)).toBeLessThanOrEqual(200);
+    expect(Math.hypot(p.x, p.z)).toBeGreaterThanOrEqual(350);
+    expect(Math.hypot(p.x, p.z)).toBeLessThanOrEqual(600);
     expect(p.y).toBeGreaterThanOrEqual(-500 + R + S.seabedClearance + S.spawnClearanceM);
     expect(Math.sin(p.yaw) * -p.x - Math.cos(p.yaw) * -p.z).toBeGreaterThan(0);
   });
 
-  it('stays inside a small tile and above a shallow slope', () => {
+  it('falls back when a small tile cannot fit the required approach band', () => {
     const small = { ...meta, bbox: { north: 0.001, south: -0.001, west: -0.001, east: 0.001 } };
     const p = nearSiteSpawnPose(
       target,
@@ -76,11 +76,8 @@ describe('nearSiteSpawnPose', () => {
       { sampleHeight: (x) => (x > 0 ? -60 : -500) },
       S,
       -1000,
-    )!;
-    expect(Math.abs(p.x)).toBeLessThan(112);
-    expect(Math.abs(p.z)).toBeLessThan(112);
-    expect(p.y).toBeLessThan(-R);
-    expect(p.y).toBeGreaterThan(-500 + R + S.seabedClearance + S.spawnClearanceM);
+    );
+    expect(p).toBeNull();
   });
 
   it('clamps to hull rating and rejects an unsafe explicit coordinate', () => {
@@ -91,7 +88,8 @@ describe('nearSiteSpawnPose', () => {
       heading_deg: 0,
     })!;
     expect(p.y).toBeGreaterThanOrEqual(-450 + R);
-    expect(Math.hypot(p.x, p.z)).toBeLessThanOrEqual(200);
+    expect(Math.hypot(p.x, p.z)).toBeGreaterThanOrEqual(350);
+    expect(Math.hypot(p.x, p.z)).toBeLessThanOrEqual(600);
   });
 });
 

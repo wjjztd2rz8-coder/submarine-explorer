@@ -57,7 +57,7 @@ describe('all mission near-site starts', () => {
         // fit there, so the existing outer-slope surface pose is intentional.
         const surface = missionStartPose(def, 'surface', pois, meta, seabed, DEFAULT_CONFIG);
         expect(pose).toEqual(surface);
-        expect(Math.hypot(pose.x - target.x, pose.z - target.z)).toBeGreaterThan(200);
+        expect(Math.hypot(pose.x - target.x, pose.z - target.z)).toBeGreaterThan(600);
         return;
       }
       const nw = latLonToWorld(meta, meta.bbox.north, meta.bbox.west);
@@ -79,8 +79,8 @@ describe('all mission near-site starts', () => {
       expect(pose.y, `${id}: hull rating`).toBeGreaterThanOrEqual(
         crush + DEFAULT_CONFIG.submarine.hullRadius,
       );
-      expect(range, `${id}: horizontal distance`).toBeGreaterThanOrEqual(99.9);
-      expect(range, `${id}: horizontal distance`).toBeLessThanOrEqual(200.01);
+      expect(range, `${id}: horizontal distance`).toBeGreaterThanOrEqual(349.9);
+      expect(range, `${id}: horizontal distance`).toBeLessThanOrEqual(600.01);
       const travelSeconds = Math.max(range / 12, Math.abs(pose.y - target.y) / 8);
       expect(
         travelSeconds,

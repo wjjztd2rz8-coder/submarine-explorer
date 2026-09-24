@@ -1275,10 +1275,10 @@ export const DEFAULT_CONFIG: GameConfig = {
     orbitRadius: 90,
     orbitElevation: 0.35,
 
-    focusSideM: 38,
-    focusRaiseM: 18,
+    focusSideM: 22,
+    focusRaiseM: 8,
     focusLookBlend: 0.35,
-    focusHalfLife: 0.6,
+    focusHalfLife: 0.025,
     focusSideHysteresisM: 6,
   },
   audio: {

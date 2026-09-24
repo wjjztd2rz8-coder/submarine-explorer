@@ -109,7 +109,7 @@ describe('CameraRig shake', () => {
 });
 
 describe('CameraRig look-ahead and bank', () => {
-  it('aims further ahead the faster the boat is moving', () => {
+  it('keeps the boat centred at both cruise and boost speeds', () => {
     const pos = new Vector3(0, -2000, 0);
     const slow = new CameraRig(cam, 16 / 9);
     const fast = new CameraRig(cam, 16 / 9);
@@ -117,9 +117,11 @@ describe('CameraRig look-ahead and bank', () => {
     fast.snap(pos, 0, 0);
     slow.update(pos, 0, 0, DT, { velocity: new Vector3(0, 0, -0.1) });
     fast.update(pos, 0, 0, DT, { velocity: new Vector3(0, 0, -8) });
-    // Pitch (x-rotation) is the same; the difference is how far the aim point
-    // is pushed, which tilts the camera's forward vector less steeply downward.
-    expect(fast.camera.rotation.x).toBeGreaterThan(slow.camera.rotation.x);
+    for (const rig of [slow, fast]) {
+      const screen = pos.clone().project(rig.camera);
+      expect(Math.abs(screen.x)).toBeLessThan(0.05);
+      expect(Math.abs(screen.y)).toBeLessThan(0.05);
+    }
   });
 
   it('copies a fraction of the boat roll, and none of it under reduceMotion', () => {
@@ -134,6 +136,37 @@ describe('CameraRig look-ahead and bank', () => {
     calm.snap(pos, 0, 0);
     for (let i = 0; i < 120; i++) calm.update(pos, 0, 0, DT, { roll: 0.4 });
     expect(Math.abs(calm.camera.rotation.z)).toBeLessThan(1e-6);
+  });
+});
+
+describe('CameraRig mouse response and framing', () => {
+  const sub = new Vector3(0, -3800, 0);
+
+  it('maps drag directly and changes orbit angle less than 2% after release', () => {
+    for (const mode of ['chase', 'first-person', 'orbit'] as const) {
+      const rig = new CameraRig(cam, 16 / 9);
+      rig.setMode(mode);
+      rig.snap(sub, 0, 0);
+      const drag = 0.4;
+      rig.orbit(drag, -0.2);
+      rig.update(sub, 0, 0, DT);
+      expect(mode === 'orbit' ? rig.orbitAzimuth : rig.lookAzimuth).toBeCloseTo(drag, 8);
+      const atRelease = Math.atan2(rig.camera.position.x - sub.x, rig.camera.position.z - sub.z);
+      for (let i = 0; i < 12; i++) rig.update(sub, 0, 0, DT);
+      const atRest = Math.atan2(rig.camera.position.x - sub.x, rig.camera.position.z - sub.z);
+      expect(Math.abs(atRest - atRelease)).toBeLessThan(drag * 0.02);
+    }
+  });
+
+  it('holds the sub within 5% of screen centre, including near an objective', () => {
+    const rig = new CameraRig(cam, 16 / 9);
+    rig.snap(sub, 0, 0);
+    for (const focus of [null, new Vector3(30, -3820, -100)]) {
+      for (let i = 0; i < 120; i++) rig.update(sub, 0, 0, DT, { focus });
+      const screen = sub.clone().project(rig.camera);
+      expect(Math.abs(screen.x)).toBeLessThan(0.05);
+      expect(Math.abs(screen.y)).toBeLessThan(0.05);
+    }
   });
 });
 

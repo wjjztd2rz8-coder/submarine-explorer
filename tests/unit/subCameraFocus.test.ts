@@ -42,6 +42,8 @@ describe('chase camera scan-target framing', () => {
     // The hull is 26 m long, ~2.3 m radius; dive planes span ~7.5 m.
     expect(segDist(sub, rig.camera.position, bow)).toBeGreaterThan(15);
     expect(rig.camera.position.y).toBeGreaterThan(sub.y + cam.chaseOffset.y);
+    const direction = rig.camera.getWorldDirection(new Vector3());
+    expect(-direction.z / Math.hypot(direction.x, direction.z)).toBeGreaterThan(0.8);
   });
 
   it('slides toward the target side, and holds the side for a target dead ahead', () => {
@@ -64,8 +66,8 @@ describe('chase camera scan-target framing', () => {
     rig.snap(sub, 0, 0);
     const steps = Math.round(cam.focusHalfLife / DT);
     for (let i = 0; i < steps; i++) rig.update(sub, 0, 0, DT, { focus: bow });
-    expect(rig.focusWeight).toBeGreaterThan(0.45);
-    expect(rig.focusWeight).toBeLessThan(0.55);
+    expect(cam.focusHalfLife).toBeLessThanOrEqual(0.04);
+    expect(rig.focusWeight).toBeCloseTo(1 - 2 ** (-(steps * DT) / cam.focusHalfLife), 6);
     settle(rig, sub, 0, null, 12);
     expect(rig.focusWeight).toBe(0);
   });

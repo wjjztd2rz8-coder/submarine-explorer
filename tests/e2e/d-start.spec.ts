@@ -66,8 +66,8 @@ test('Arcade near-site starts show the first target at deep and shallow sites', 
         y: p.y,
       };
     });
-    expect(near.range).toBeGreaterThanOrEqual(99);
-    expect(near.range).toBeLessThanOrEqual(201);
+    expect(near.range).toBeGreaterThanOrEqual(349);
+    expect(near.range).toBeLessThanOrEqual(601);
     expect(near.altitude).toBeGreaterThanOrEqual(near.minAltitude - 0.5);
     expect(near.y).toBeGreaterThan(near.rating);
   }

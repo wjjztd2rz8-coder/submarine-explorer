@@ -11,11 +11,9 @@
  *  - **Shake.** Hull stress displaces the camera on a decaying oscillation.
  *    `reduceMotion` disables it, and the banking follow, outright (C5).
  *
- * And one thing stops the boat ruining the shot (QA-B #6): with a scan target
- * in range (`CameraUpdateOptions.focus`), the chase camera slides sideways, to
- * the target's side, and up, and pulls its aim part-way toward the target, so
- * the line of sight to the wreck clears the hull instead of running through
- * it. The blend in and out is smoothed with `focusHalfLife`.
+ * With a scan target in range (`CameraUpdateOptions.focus`), the chase camera
+ * shifts sideways and up so the target can clear the hull. Its aim stays on
+ * the boat, and the short `focusHalfLife` prevents a visible swing.
  */
 
 import * as THREE from 'three';
@@ -94,8 +92,6 @@ export class CameraRig {
   /** 0..1 blend of the scan-target framing (QA-B #6), and the side it uses. */
   focusWeight = 0;
   focusSide: 1 | -1 = 1;
-  private readonly lastFocus = new THREE.Vector3();
-  private hasFocus = false;
   private readonly chaseOffsetNow = { x: 0, y: 0, z: 0 };
   /** Mode the camera returns to when photo mode is switched off. */
   private modeBeforeOrbit: CameraMode = 'chase';
@@ -213,40 +209,26 @@ export class CameraRig {
         .applyQuaternion(this.quat);
       this.desiredPosition.copy(subPos).add(this.offset);
 
-      // Look ahead of the boat rather than at it, which reads better in fog,
-      // and further ahead the faster you are going.
-      const base = this.mode === 'chase' ? c.chaseLookAhead : c.firstPersonLookAhead;
-      this.desiredTarget
-        .set(0, 0, -1)
-        .applyAxisAngle(new THREE.Vector3(1, 0, 0), this.lookElevation * 0.55)
-        .applyAxisAngle(new THREE.Vector3(0, 1, 0), this.lookAzimuth)
-        .applyQuaternion(this.quat)
-        .multiplyScalar(base + speed * c.lookAheadPerSpeed)
-        .add(subPos);
       if (this.mode === 'chase') {
-        this.desiredTarget.y -= c.chaseLookDrop;
-        if (this.hasFocus && this.focusWeight > 1e-4) {
-          this.desiredTarget.lerp(this.lastFocus, clamp(c.focusLookBlend, 0, 1) * this.focusWeight);
-        }
+        // Aim at the boat even when a scan target is near. The lateral focus
+        // offset can clear the sight line without moving the boat on screen.
+        this.desiredTarget.copy(subPos);
+      } else {
+        this.desiredTarget
+          .set(0, 0, -1)
+          .applyAxisAngle(new THREE.Vector3(1, 0, 0), this.lookElevation * 0.55)
+          .applyAxisAngle(new THREE.Vector3(0, 1, 0), this.lookAzimuth)
+          .applyQuaternion(this.quat)
+          .multiplyScalar(c.firstPersonLookAhead + speed * c.lookAheadPerSpeed)
+          .add(subPos);
       }
     }
 
-    // Orbit is a tripod, not a chase: it tracks exactly, so a drag moves the
-    // view immediately instead of sliding after the pointer.
-    if (!this.initialised || this.mode === 'orbit') {
-      this.camera.position.copy(this.desiredPosition);
-      this.currentTarget.copy(this.desiredTarget);
-      this.initialised = true;
-    } else {
-      this.camera.position.lerp(
-        this.desiredPosition,
-        this.reduceMotion ? 1 : decay(c.positionHalfLife, dt),
-      );
-      this.currentTarget.lerp(
-        this.desiredTarget,
-        this.reduceMotion ? 1 : decay(c.rotationHalfLife, dt),
-      );
-    }
+    // Pointer motion is already a direct angular delta. Follow and aim move
+    // with it on this frame so no camera travel remains after release.
+    this.camera.position.copy(this.desiredPosition);
+    this.currentTarget.copy(this.desiredTarget);
+    this.initialised = true;
 
     this.applyShake(dt);
     this.clampToTerrain();
@@ -267,8 +249,6 @@ export class CameraRig {
     const c = this.config;
     const active = this.mode === 'chase' && focus !== null;
     if (active) {
-      this.lastFocus.copy(focus);
-      this.hasFocus = true;
       // Lateral offset of the target in the boat's (yaw-only) frame: +X is
       // starboard, i.e. (cos yaw, 0, sin yaw) with +yaw toward east.
       const lateral = (focus.x - subPos.x) * Math.cos(yaw) + (focus.z - subPos.z) * Math.sin(yaw);
@@ -279,7 +259,6 @@ export class CameraRig {
     else this.focusWeight += (want - this.focusWeight) * decay(c.focusHalfLife, dt);
     if (this.focusWeight < 1e-4 && !active) {
       this.focusWeight = 0;
-      this.hasFocus = false;
     }
   }
 

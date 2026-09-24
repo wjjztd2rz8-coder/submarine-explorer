@@ -1039,6 +1039,10 @@ async function main(): Promise<void> {
         ? `${input.primaryKeyLabel('scan')} Scan · ${scanView.nearestName}`
         : null,
       simSpeed: sub.simSpeed,
+      controlTips:
+        !frozen && rig.mode !== 'orbit' && save.get().controlTips
+          ? `${input.primaryKeyLabel('thrustForward')}/${input.primaryKeyLabel('thrustReverse')} speed · ${input.primaryKeyLabel('boost')} boost · ${input.primaryKeyLabel('pitchUp')}/${input.primaryKeyLabel('pitchDown')} pitch · ${input.primaryKeyLabel('ballastBlow')}/${input.primaryKeyLabel('ballastFlood')} rise/sink · ${input.primaryKeyLabel('cycleSimSpeed')} sim speed${scanView.candidateId ? ` · ${input.primaryKeyLabel('scan')} scan` : ''}`
+          : null,
     });
     // --- D-INPUT-HUD end ---
     // --- B3 begin ---
