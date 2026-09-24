@@ -5,6 +5,33 @@
  */
 
 import type { Photo, PhotoStore } from '../game/PhotoStore.js';
+import { writeZip } from '../util/zip.js';
+
+export function photoFilename(photo: Pick<Photo, 'siteName' | 'poiName' | 'at'>): string {
+  const slug = (value: string): string =>
+    value
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'photo';
+  const date = Number.isNaN(Date.parse(photo.at)) ? 'undated' : photo.at.slice(0, 10);
+  return `${slug(photo.siteName)}-${slug(photo.poiName ?? 'photo')}-${date}.jpg`;
+}
+
+function download(url: string, name: string): void {
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = name;
+  document.body.append(link);
+  link.click();
+  link.remove();
+}
+
+function imageBytes(image: string): Uint8Array {
+  const binary = atob(image.slice(image.indexOf(',') + 1));
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+}
 
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -41,7 +68,32 @@ export class PhotoGallery {
   /** A titled grid of `photos` (newest first); a thumbnail click opens the viewer. */
   render(container: HTMLElement, photos: readonly Photo[], title = 'Photos'): void {
     container.replaceChildren();
-    container.append(el('h2', 'jr-photo-title', title));
+    const heading = el('div', 'd2-photo-heading');
+    heading.append(el('h2', 'jr-photo-title', title));
+    if (photos.length) {
+      const all = el('button', 'd2-photo-download-all', 'Download all');
+      all.type = 'button';
+      all.addEventListener('click', () => {
+        const names = new Map<string, number>();
+        const entries = photos.map((photo) => {
+          const base = photoFilename(photo);
+          const count = names.get(base) ?? 0;
+          names.set(base, count + 1);
+          return {
+            name: count ? base.replace(/\.jpg$/, `-${count + 1}.jpg`) : base,
+            data: imageBytes(photo.image),
+          };
+        });
+        const bytes = writeZip(entries);
+        const url = URL.createObjectURL(
+          new Blob([bytes.buffer as ArrayBuffer], { type: 'application/zip' }),
+        );
+        download(url, 'journal-photos.zip');
+        window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
+      });
+      heading.append(all);
+    }
+    container.append(heading);
     if (!photos.length) {
       container.append(
         el(
@@ -63,7 +115,13 @@ export class PhotoGallery {
       image.alt = photoCaption(photo);
       card.append(image, el('span', 'jr-photo-card-caption', photoCaption(photo)));
       card.addEventListener('click', () => this.renderViewer(container, photos, photo, title));
-      grid.append(card);
+      const item = el('div', 'd2-photo-item');
+      const single = el('button', 'd2-photo-download', 'Download');
+      single.type = 'button';
+      single.setAttribute('aria-label', `Download ${photoCaption(photo)}`);
+      single.addEventListener('click', () => download(photo.image, photoFilename(photo)));
+      item.append(card, single);
+      grid.append(item);
     }
     container.append(grid);
   }
@@ -91,7 +149,10 @@ export class PhotoGallery {
       else remove.after(el('p', 'jr-photo-error', 'Could not delete this photo.'));
     });
     const actions = el('div', 'jr-photo-actions');
-    actions.append(back, remove);
+    const single = el('button', 'd2-photo-download', 'Download');
+    single.type = 'button';
+    single.addEventListener('click', () => download(photo.image, photoFilename(photo)));
+    actions.append(back, single, remove);
     container.append(figure, detail, actions);
     back.focus();
   }

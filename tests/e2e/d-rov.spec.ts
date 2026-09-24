@@ -116,6 +116,9 @@ test('tether limit and pause return control safely; controls show E', async ({ p
   await page.goto('/?tile=titanic');
   await page.waitForFunction(() => window.__gameReady);
   await page.keyboard.press('e');
+  await expect
+    .poll(() => page.evaluate(() => (window.__game as { rov: { deployed: boolean } }).rov.deployed))
+    .toBe(true);
   await page.evaluate(() => {
     const g = window.__game as {
       rov: { position: { set(x: number, y: number, z: number): void } };
