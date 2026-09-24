@@ -161,9 +161,21 @@ describe('CameraRig mouse response and framing', () => {
     rig.orbit(0.4, -0.15);
     rig.update(sub, 0, 0, DT);
     expect(rig.freeLook).toBe(true);
+    settle(rig, sub, 0, 0, 0.25);
+    rig.camera.updateMatrixWorld();
+    const centred = sub.clone().project(rig.camera);
+    expect(Math.abs(centred.x)).toBeLessThan(0.05);
+    expect(Math.abs(centred.y)).toBeLessThan(0.05);
     const offset = rig.camera.position.clone().sub(sub);
     const direction = rig.camera.getWorldDirection(new Vector3());
     rig.update(sub.clone().add(new Vector3(10, 5, -20)), 1.5, 0.4, DT);
+    rig.camera.updateMatrixWorld();
+    const moved = sub
+      .clone()
+      .add(new Vector3(10, 5, -20))
+      .project(rig.camera);
+    expect(Math.abs(moved.x)).toBeLessThan(0.05);
+    expect(Math.abs(moved.y)).toBeLessThan(0.05);
     expect(
       rig.camera.position
         .clone()
@@ -177,6 +189,18 @@ describe('CameraRig mouse response and framing', () => {
     expect(rig.mode).toBe('chase');
     expect(rig.freeLook).toBe(false);
     expect(rig.camera.position.x).toBeLessThan(sub.x - cam.chaseOffset.z * 0.8);
+  });
+
+  it('blends from chase aim to the hull without an entry jump', () => {
+    const rig = new CameraRig(cam, 16 / 9);
+    rig.snap(sub, 0, 0);
+    const before = rig.camera.getWorldDirection(new Vector3());
+    rig.orbit(0.02, 0);
+    rig.update(sub, 0, 0, DT);
+    expect(rig.camera.getWorldDirection(new Vector3()).angleTo(before)).toBeLessThan(0.06);
+    settle(rig, sub, 0, 0, 0.25);
+    rig.camera.updateMatrixWorld();
+    expect(Math.abs(sub.clone().project(rig.camera).y)).toBeLessThan(0.05);
   });
 
   it('enters free look after several small direct pointer deltas', () => {

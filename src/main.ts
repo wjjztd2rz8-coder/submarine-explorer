@@ -15,7 +15,7 @@ import * as THREE from 'three';
 import { AudioSystem } from './audio/AudioSystem.js';
 import { makeConfig, resolveGraphicsTier } from './core/Config.js';
 import { EventBus } from './core/EventBus.js';
-import { Input } from './core/Input.js';
+import { Input, shouldPauseAfterPointerLookLoss, shouldRequestPointerLook } from './core/Input.js';
 import { Time } from './core/Time.js';
 import { Atmosphere, atmosphereTier } from './render/Atmosphere.js';
 import { Headlights } from './render/Headlights.js';
@@ -715,26 +715,111 @@ async function main(): Promise<void> {
     if (document.fullscreenElement) void lockKeyboard();
     else unlockKeyboard();
   });
-  // --- D2-CAMERA begin ---
+  // --- D3-FEEL begin ---
+  const pointerLookHint = document.createElement('div');
+  pointerLookHint.className = 'd3-pointer-look-hint';
+  pointerLookHint.textContent = 'Click to resume mouse look';
+  pointerLookHint.hidden = true;
+  pointerLookHint.style.cssText =
+    'position:fixed;left:50%;bottom:5.5rem;transform:translateX(-50%);z-index:25;' +
+    'padding:.35rem .7rem;border-radius:4px;background:#061318cc;color:#d8eef0;' +
+    'font:12px sans-serif;pointer-events:none';
+  document.body.append(pointerLookHint);
+  const pointerLookBlocked = (): boolean =>
+    appState !== 'dive' ||
+    pause.isOpen ||
+    settingsScreen.isOpen ||
+    globe.isOpen ||
+    discovery.guide.isOpen ||
+    discovery.debrief.isOpen ||
+    (missionRouter?.frozen ?? false) ||
+    (missionRouter?.debriefOpen ?? false) ||
+    photoMode.active;
+  let pointerLookWasBlocked = true;
+  let pointerLockPending = false;
+  let swallowPointerLookClick = false;
+  const updatePointerLookHint = (): void => {
+    pointerLookHint.hidden =
+      !shouldRequestPointerLook(
+        input.pointerLookEnabled,
+        appState === 'dive',
+        pointerLookBlocked(),
+        document.pointerLockElement === canvas,
+      ) || pointerLockPending;
+  };
+  const requestPointerLook = (): void => {
+    if (
+      pointerLockPending ||
+      !shouldRequestPointerLook(
+        input.pointerLookEnabled,
+        appState === 'dive',
+        pointerLookBlocked(),
+        document.pointerLockElement === canvas,
+      )
+    )
+      return;
+    pointerLockPending = true;
+    updatePointerLookHint();
+    try {
+      void Promise.resolve(canvas.requestPointerLock()).catch(() => {
+        pointerLockPending = false;
+        updatePointerLookHint();
+      });
+    } catch {
+      pointerLockPending = false;
+      updatePointerLookHint();
+    }
+  };
   document.addEventListener('pointerlockchange', () => {
     const locked = document.pointerLockElement === canvas;
     const wasLocked = input.pointerLookActive;
+    pointerLockPending = false;
     input.setMouseLook(locked);
     if (
-      wasLocked &&
       !locked &&
-      appState === 'dive' &&
-      !settingsScreen.isOpen &&
-      !globe.isOpen &&
-      !discovery.guide.isOpen &&
-      !(missionRouter?.frozen ?? false) &&
-      !photoMode.active &&
-      !discovery.debrief.isOpen &&
-      !(missionRouter?.debriefOpen ?? false)
-    )
+      shouldPauseAfterPointerLookLoss(
+        input.pointerLookEnabled,
+        wasLocked,
+        appState === 'dive',
+        pointerLookBlocked(),
+      )
+    ) {
       setAppState('pause');
+    }
+    updatePointerLookHint();
   });
-  // --- D2-CAMERA end ---
+  document.addEventListener('pointerlockerror', () => {
+    pointerLockPending = false;
+    updatePointerLookHint();
+  });
+  document.addEventListener('click', () => {
+    if (pointerLookWasBlocked && !pointerLookBlocked()) requestPointerLook();
+    pointerLookWasBlocked = pointerLookBlocked();
+    updatePointerLookHint();
+  });
+  canvas.addEventListener(
+    'mousedown',
+    (event) => {
+      if (event.button !== 0 || pointerLookHint.hidden) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      swallowPointerLookClick = true;
+      requestPointerLook();
+    },
+    true,
+  );
+  canvas.addEventListener(
+    'click',
+    (event) => {
+      if (swallowPointerLookClick) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        swallowPointerLookClick = false;
+      }
+    },
+    true,
+  );
+  // --- D3-FEEL end ---
   let ctrlTipShown = false;
   try {
     ctrlTipShown = JSON.parse(localStorage.getItem('subexplorer.tips.v1') ?? '{}').ctrlW === true;
@@ -795,21 +880,6 @@ async function main(): Promise<void> {
     activeSimSpeedDefault: settings.simSpeedDefault,
     tierFromUrl: params.get('tier') !== null && params.get('tier') === tier,
     canOpen: () => !globe.isOpen,
-    onRequestPointerLock: () => {
-      // --- D2-CAMERA begin ---
-      if (appState === 'pause' && !(missionRouter?.frozen ?? false)) setAppState('dive');
-      if (
-        appState === 'dive' &&
-        !settingsScreen.isOpen &&
-        !pause.isOpen &&
-        !globe.isOpen &&
-        !discovery.guide.isOpen &&
-        !(missionRouter?.frozen ?? false)
-      ) {
-        void canvas.requestPointerLock?.();
-      }
-      // --- D2-CAMERA end ---
-    },
     onOpen: () => {
       document.exitPointerLock?.();
       unlockKeyboard();
@@ -844,6 +914,29 @@ async function main(): Promise<void> {
       return storage ? 'cleared' : 'sessionOnly';
     },
   });
+  // --- D3-FEEL begin ---
+  const pointerLookButton =
+    settingsScreen.root.querySelector<HTMLButtonElement>('.settings-pointer-lock');
+  const syncPointerLookButton = (): void => {
+    if (pointerLookButton)
+      pointerLookButton.textContent = input.pointerLookEnabled
+        ? 'Disable pointer look'
+        : 'Enable pointer look';
+  };
+  syncPointerLookButton();
+  settingsScreen.root.addEventListener(
+    'click',
+    (event) => {
+      if (event.target !== pointerLookButton) return;
+      event.preventDefault();
+      event.stopPropagation();
+      input.setPointerLookPreference(!input.pointerLookEnabled);
+      syncPointerLookButton();
+      updatePointerLookHint();
+    },
+    true,
+  );
+  // --- D3-FEEL end ---
 
   // --- D-SONAR begin ---
   const sonarControls = document.createElement('p');
@@ -876,7 +969,7 @@ async function main(): Promise<void> {
       if (!sonar.expanded || appState !== 'dive') return;
       event.preventDefault();
       event.stopImmediatePropagation();
-      sonar.zoomBy(event.deltaY < 0 ? -1 : 1);
+      sonar.zoomWheel(event.deltaY < 0 ? -1 : 1);
     },
     { capture: true, passive: false },
   );
@@ -1267,6 +1360,11 @@ async function main(): Promise<void> {
     // --- D2-CAMERA begin ---
     if (frozen && document.pointerLockElement === canvas) document.exitPointerLock?.();
     // --- D2-CAMERA end ---
+    // --- D3-FEEL begin ---
+    if (pointerLookWasBlocked && !pointerLookBlocked()) updatePointerLookHint();
+    pointerLookWasBlocked = pointerLookBlocked();
+    if (pointerLookWasBlocked) pointerLookHint.hidden = true;
+    // --- D3-FEEL end ---
     // --- D-INPUT-HUD begin ---
     if (wasFrozen && !frozen) void lockKeyboard();
     wasFrozen = frozen;

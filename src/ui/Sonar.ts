@@ -165,6 +165,17 @@ export interface SonarRelief {
   contourIntervalM: number;
 }
 
+/** Logarithmic range easing keeps equal zoom ratios moving at equal visual speed. */
+export function easeSonarRange(from: number, to: number, progress: number): number {
+  const t = Math.min(1, Math.max(0, progress));
+  const eased = t * t * (3 - 2 * t);
+  return from * Math.pow(to / from, eased);
+}
+
+export function canSonarWheelStep(now: number, lastStepAt: number): boolean {
+  return now - lastStepAt >= 150;
+}
+
 export class Sonar {
   readonly root: HTMLDivElement;
   readonly canvas: HTMLCanvasElement;
@@ -181,6 +192,12 @@ export class Sonar {
   private readonly palettes: Record<SonarPaletteName, SonarPalette>;
   private readonly zoomConfig: SonarZoomConfig;
   private zoomIndex: number;
+  private displayedZoom: number | 'tile';
+  private zoomFrom = 0;
+  private zoomStartedAt: number | null = null;
+  private tileCenterFraction = 0;
+  private zoomFromCenterFraction = 0;
+  private lastWheelZoomAt = -Infinity;
   private sensorRangeM = 2000;
   private showMarkers = true;
   private pois: readonly PlacedPoi[] = [];
@@ -204,6 +221,7 @@ export class Sonar {
     this.palette = this.palettes[this.paletteName_] ?? this.palettes.default;
     this.zoomConfig = options.zoom ?? DEFAULT_CONFIG.sonarZoom;
     this.zoomIndex = Math.max(0, this.zoomConfig.levels.indexOf(this.zoomConfig.initial));
+    this.displayedZoom = this.zoomConfig.initial;
     const size = sonarCanvasSize(terrain.widthM, terrain.depthM, options.size ?? 220);
     this.w = size.width;
     this.h = size.height;
@@ -260,7 +278,7 @@ export class Sonar {
       'wheel',
       (event) => {
         event.preventDefault();
-        this.zoomBy(event.deltaY < 0 ? -1 : 1);
+        this.zoomWheel(event.deltaY < 0 ? -1 : 1);
       },
       { passive: false },
     );
@@ -282,7 +300,10 @@ export class Sonar {
     this.updateRangeLabel();
   }
 
-  get zoom(): SonarZoom {
+  get zoom(): number | 'tile' {
+    return this.displayedZoom;
+  }
+  get targetZoom(): SonarZoom {
     return this.zoomConfig.levels[this.zoomIndex] ?? this.zoomConfig.initial;
   }
   get expanded(): boolean {
@@ -295,19 +316,50 @@ export class Sonar {
       0,
       Math.min(this.zoomConfig.levels.length - 1, this.zoomIndex + direction),
     );
-    if (before !== this.zoomIndex) this.reliefDirty = true;
+    if (before !== this.zoomIndex) this.beginZoom();
     this.updateRangeLabel();
-    return this.zoom;
+    return this.targetZoom;
+  }
+
+  /** A wheel burst counts as one range step. Buttons and keys remain immediate to use. */
+  zoomWheel(direction: number, now = performance.now()): SonarZoom {
+    if (!canSonarWheelStep(now, this.lastWheelZoomAt)) return this.targetZoom;
+    this.lastWheelZoomAt = now;
+    return this.zoomBy(direction);
   }
 
   setZoom(level: SonarZoom): SonarZoom {
     const index = this.zoomConfig.levels.indexOf(level);
     if (index >= 0 && index !== this.zoomIndex) {
       this.zoomIndex = index;
-      this.reliefDirty = true;
+      this.beginZoom();
     }
     this.updateRangeLabel();
-    return this.zoom;
+    return this.targetZoom;
+  }
+
+  private numericRange(level: number | 'tile'): number {
+    return level === 'tile' ? Math.max(this.terrain.widthM, this.terrain.depthM) : level;
+  }
+
+  private beginZoom(): void {
+    this.zoomFrom = this.numericRange(this.displayedZoom);
+    this.zoomFromCenterFraction = this.tileCenterFraction;
+    this.zoomStartedAt = performance.now();
+  }
+
+  private advanceZoom(now: number): void {
+    if (this.zoomStartedAt === null) return;
+    const t = Math.min(1, Math.max(0, (now - this.zoomStartedAt) / 250));
+    const target = this.targetZoom;
+    const eased = t * t * (3 - 2 * t);
+    this.displayedZoom =
+      t === 1 ? target : easeSonarRange(this.zoomFrom, this.numericRange(target), t);
+    this.tileCenterFraction =
+      this.zoomFromCenterFraction +
+      ((target === 'tile' ? 1 : 0) - this.zoomFromCenterFraction) * eased;
+    this.reliefDirty = true;
+    if (t === 1) this.zoomStartedAt = null;
   }
 
   setPois(pois: readonly PlacedPoi[]): void {
@@ -328,8 +380,9 @@ export class Sonar {
   }
 
   private updateRangeLabel(): void {
-    this.rangeLabel.textContent = this.zoom === 'tile' ? 'Whole tile' : `${this.zoom} m`;
-    this.root.dataset.zoom = String(this.zoom);
+    this.rangeLabel.textContent =
+      this.targetZoom === 'tile' ? 'Whole tile' : `${this.targetZoom} m`;
+    this.root.dataset.zoom = String(this.targetZoom);
   }
 
   /** The active palette's name. */
@@ -380,9 +433,17 @@ export class Sonar {
       }
     }
     const actualSpan = hi - lo;
-    const { low, span } = sonarReliefRange(lo, hi, this.zoomConfig.minReliefSpanM[zoom]);
+    const reference =
+      zoom === 'tile'
+        ? 'tile'
+        : ((this.zoomConfig.levels.filter((level) => level !== 'tile') as number[]).reduce(
+            (nearest, level) =>
+              Math.abs(level - zoom) < Math.abs(nearest - zoom) ? level : nearest,
+            this.numericRange(this.zoomConfig.initial),
+          ) as SonarZoom);
+    const { low, span } = sonarReliefRange(lo, hi, this.zoomConfig.minReliefSpanM[reference]);
     const contourInterval = sonarContourInterval(
-      this.zoomConfig.contourIntervalM[zoom],
+      this.zoomConfig.contourIntervalM[reference],
       actualSpan,
       this.zoomConfig.maxContours,
     );
@@ -496,8 +557,8 @@ export class Sonar {
       : sonarProjectZoomed(
           x,
           z,
-          this.lastPosition.x,
-          this.lastPosition.z,
+          this.lastPosition.x * (1 - this.tileCenterFraction),
+          this.lastPosition.z * (1 - this.tileCenterFraction),
           this.zoom,
           this.w,
           this.h,
@@ -513,28 +574,24 @@ export class Sonar {
   /** Redraw. Cheap enough to call every frame. */
   update(s: SubmarineState): void {
     if (!this.visible) return;
+    this.advanceZoom(performance.now());
     const { w, h } = this;
     this.lastPosition = { x: s.position.x, z: s.position.z };
     const ctx = this.ctx;
     ctx.clearRect(0, 0, w, h);
     const scale = this.zoom === 'tile' ? 0 : Math.max(w, h) / this.zoom;
-    const shiftX = (this.reliefCenter.x - s.position.x) * scale;
-    const shiftY = (this.reliefCenter.z - s.position.z) * scale;
+    const centerX = s.position.x * (1 - this.tileCenterFraction);
+    const centerZ = s.position.z * (1 - this.tileCenterFraction);
+    const shiftX = (this.reliefCenter.x - centerX) * scale;
+    const shiftY = (this.reliefCenter.z - centerZ) * scale;
     if (
       this.reliefDirty ||
       (this.zoom !== 'tile' &&
         Math.max(Math.abs(shiftX), Math.abs(shiftY)) > this.zoomConfig.refreshShiftPx)
     )
-      this.renderBathymetry(
-        this.zoom === 'tile' ? 0 : s.position.x,
-        this.zoom === 'tile' ? 0 : s.position.z,
-      );
+      this.renderBathymetry(centerX, centerZ);
     const margin = this.zoom === 'tile' ? 0 : this.zoomConfig.rasterMarginPx;
-    ctx.drawImage(
-      this.base,
-      -margin + (this.reliefCenter.x - s.position.x) * scale,
-      -margin + (this.reliefCenter.z - s.position.z) * scale,
-    );
+    ctx.drawImage(this.base, -margin + shiftX, -margin + shiftY);
 
     // Breadcrumb trail.
     const last = this.trail[this.trail.length - 1];

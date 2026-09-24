@@ -6,6 +6,8 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  canSonarWheelStep,
+  easeSonarRange,
   sonarCanvasSize,
   sonarContourInterval,
   sonarPoiIcon,
@@ -45,6 +47,18 @@ describe('sonar canvas sizing', () => {
 });
 
 describe('D-SONAR sub-centred map', () => {
+  it('eases zoom through intermediate ranges in both directions', () => {
+    expect(easeSonarRange(1000, 500, 0)).toBe(1000);
+    expect(easeSonarRange(1000, 500, 0.5)).toBeCloseTo(Math.sqrt(500_000));
+    expect(easeSonarRange(1000, 500, 1)).toBe(500);
+    expect(easeSonarRange(500, 1000, 0.5)).toBeCloseTo(Math.sqrt(500_000));
+  });
+
+  it('allows one wheel zoom step per 150 ms', () => {
+    expect(canSonarWheelStep(1000, -Infinity)).toBe(true);
+    expect(canSonarWheelStep(1149, 1000)).toBe(false);
+    expect(canSonarWheelStep(1150, 1000)).toBe(true);
+  });
   it('starts at a 1 km span and offers every contracted range plus the tile', () => {
     expect(DEFAULT_CONFIG.sonarZoom.initial).toBe(1000);
     expect(DEFAULT_CONFIG.sonarZoom.levels).toEqual([250, 500, 1000, 2000, 'tile']);
