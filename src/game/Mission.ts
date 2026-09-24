@@ -271,7 +271,7 @@ export async function loadMissionSummaries(
 export type MissionState = 'briefing' | 'diving' | 'primaries-complete' | 'debrief' | 'aborted';
 
 /** Why a dive was aborted. Only crush depth for now (plan/DECISIONS.md failure model). */
-export type AbortReason = 'crush';
+export type AbortReason = 'crush' | 'power';
 
 /** Why the debrief opened: a voluntary surface, everything done, or an abort. */
 export type EndReason = GameEvents['mission:ended']['reason'];

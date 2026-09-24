@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { EventBus } from '../../src/core/EventBus.js';
 import { Mission, parseMission } from '../../src/game/Mission.js';
+import { debriefText } from '../../src/game/MissionRouter.js';
 import titanicMission from '../../data/landmarks/titanic/mission.json';
 
 const quiet = (): void => {};
@@ -14,6 +15,19 @@ function make(): { m: Mission; bus: EventBus } {
 }
 
 describe('Mission.abort', () => {
+  it('records a supply abort honestly without claiming hull failure', () => {
+    const { m, bus } = make();
+    const seen: unknown[] = [];
+    bus.on('mission:aborted', (payload) => seen.push(payload));
+    m.start('titanic');
+    m.abort('power');
+    m.end();
+    expect(seen).toEqual([{ missionId: 'titanic', reason: 'power' }]);
+    expect(m.endReason).toBe('abort');
+    expect(debriefText('abort', false, m.counts(), 20, 0, 'power').subtitle).toContain(
+      'Supplies exhausted',
+    );
+  });
   it('a running mission aborts, stops its clock and ignores later scans', () => {
     const { m, bus } = make();
     const seen: unknown[] = [];

@@ -32,6 +32,9 @@ import { Landmarks } from './world/Landmarks.js';
 import { Terrain } from './world/Terrain.js';
 import { TileLoader } from './world/TileLoader.js';
 import { Water } from './world/Water.js';
+// --- D-POWER begin ---
+import { Power } from './game/Power.js';
+// --- D-POWER end ---
 // --- C3 begin ---
 import { PresetSystem } from './world/presets/Presets.js';
 import { latLonToWorld } from './util/geo.js';
@@ -247,6 +250,14 @@ async function main(): Promise<void> {
 
   // --------------------------------------------------------------- submarine
   const sub = new Submarine(config.submarine, terrain);
+  // --- D-POWER begin ---
+  const power = new Power(config.power, settings.gameplay.batteryOxygen);
+  let powerEmergencyStarted = false;
+  bus.on('mission:started', () => {
+    power.reset();
+    powerEmergencyStarted = false;
+  });
+  // --- D-POWER end ---
   // --- fix S begin ---
   // Free-dive spawn (QA-B #3): over the tile centre, or the nearest cell at
   // least `minSpawnSeabedM` deep if the centre is a reef flat / caldera rim;
@@ -340,6 +351,23 @@ async function main(): Promise<void> {
       rig.snap(sub.position, sub.yaw, sub.pitch);
     },
   });
+  // --- D-POWER begin ---
+  window.addEventListener(
+    'keydown',
+    (event) => {
+      if (
+        event.code === 'Escape' &&
+        freeDivePowerDebriefShown &&
+        discovery.debrief.isOpen &&
+        !discovery.guide.isOpen
+      ) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    },
+    true,
+  );
+  // --- D-POWER end ---
   // --- D-SCAN begin ---
   const waypoints = new Waypoints(discovery.scanner);
   waypoints.setVisualHints(settings.gameplay.visualHints);
@@ -904,6 +932,11 @@ async function main(): Promise<void> {
     sub.setSimSpeed(next.gameplay.simSpeed);
   });
   // --- D-MODES end ---
+  // --- D-POWER begin ---
+  save.onChange((next, changed) => {
+    if (changed.includes('gameplay')) power.setEnabled(next.gameplay.batteryOxygen);
+  });
+  // --- D-POWER end ---
   // --- C5 end ---
   const unlockAudio = (): void => audio.unlock();
   window.addEventListener('pointerdown', unlockAudio, { once: true });
@@ -934,6 +967,9 @@ async function main(): Promise<void> {
   let lastTerrainLog = 0;
   let wasFrozen = false;
   let emergencyBlowAnnounced = false;
+  // --- D-POWER begin ---
+  let freeDivePowerDebriefShown = false;
+  // --- D-POWER end ---
   let lastHullStress = 0;
 
   function frame(nowMs: number): void {
@@ -945,13 +981,16 @@ async function main(): Promise<void> {
     // While the mission briefing is up nothing simulates and input is ignored
     // (sampling still runs, so edge presses do not queue up behind the card).
     // --- D-SHELL begin ---
-    const frozen =
+    const shellFrozen =
       appState !== 'dive' ||
       (missionRouter?.frozen ?? false) ||
       globe.isOpen ||
       settingsScreen.isOpen ||
       discovery.guide.isOpen;
     // --- D-SHELL end ---
+    // --- D-POWER begin ---
+    const frozen = shellFrozen || discovery.debrief.isOpen;
+    // --- D-POWER end ---
     // --- D-INPUT-HUD begin ---
     if (wasFrozen && !frozen) void lockKeyboard();
     wasFrozen = frozen;
@@ -960,6 +999,21 @@ async function main(): Promise<void> {
     const steps = frozen ? 0 : realSteps;
     // --- B3 end ---
     for (let i = 0; i < steps; i++) sub.step(state, time.fixedDelta);
+    // --- D-POWER begin ---
+    if (steps) {
+      const empty = power.step(steps * time.fixedDelta * sub.simSpeed, {
+        throttle: state.throttle,
+        ballast: state.ballast,
+        boost: state.boost,
+        lights: headlights.on,
+        sensors: state.scan || sonar.visible,
+      });
+      if (empty && !powerEmergencyStarted) {
+        sub.startEmergencyAscent();
+        powerEmergencyStarted = true;
+      }
+    }
+    // --- D-POWER end ---
     // --- B4 begin ---
     if (!frozen) propContact.resolve(sub, time.frameDelta); // prop push-out, after physics
     // --- B4 end ---
@@ -1003,10 +1057,20 @@ async function main(): Promise<void> {
       bus.emit('sub:emergencyBlow', {
         depth: s.depth,
         lockSeconds: config.submarine.emergencyBlowLockSeconds,
+        cause: s.emergencyCause ?? 'crush',
       });
     } else if (!s.emergencyBlow) {
       emergencyBlowAnnounced = false;
     }
+    // --- D-POWER begin ---
+    if (powerEmergencyStarted && !s.emergencyBlow && !missionRouter && !freeDivePowerDebriefShown) {
+      freeDivePowerDebriefShown = true;
+      discovery.showDebrief({
+        title: 'Dive aborted',
+        subtitle: 'Supplies exhausted · safe ascent completed',
+      });
+    }
+    // --- D-POWER end ---
 
     // Present the boat.
     subMesh.setPose(sub.position, sub.yaw, sub.pitch, sub.roll);
@@ -1076,6 +1140,10 @@ async function main(): Promise<void> {
     sonar.setObjective(nextScanObjective?.poiId ?? null);
     sonar.update(s);
     // --- D-SONAR end ---
+    // --- D-POWER begin ---
+    const powerState = power.state;
+    hud.setPowerState(powerState);
+    // --- D-POWER end ---
     // --- D-INPUT-HUD begin ---
     const scanView = discovery.scanner.view;
     hud.update(s, {
@@ -1173,6 +1241,9 @@ async function main(): Promise<void> {
     audio,
     bus,
     config,
+    // --- D-POWER begin ---
+    power,
+    // --- D-POWER end ---
     meta,
     // --- B1 begin ---
     scanner: discovery.scanner,

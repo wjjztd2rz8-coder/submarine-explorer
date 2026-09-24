@@ -25,7 +25,7 @@ export interface GameEvents {
   /** Hull stress crossed the reporting threshold. Drives creaks, shake, HUD. */
   'sub:hullStress': { stress: number; cause: 'impact' | 'pressure'; depth: number };
   /** Crush depth reached: the boat is blowing tanks and the controls are locked. */
-  'sub:emergencyBlow': { depth: number; lockSeconds: number };
+  'sub:emergencyBlow': { depth: number; lockSeconds: number; cause?: 'crush' | 'power' };
   /** Sim-speed multiplier changed (1x / 2x / 3x). */
   'sub:simSpeed': { multiplier: number };
   // --- A2: atmosphere -------------------------------------------------------
@@ -52,7 +52,7 @@ export interface GameEvents {
   'mission:complete': { missionId: string; durationS: number };
   'mission:restart': { missionId: string };
   /** Fix S: the dive failed (crush depth -> emergency ascent), before the aborted debrief. */
-  'mission:aborted': { missionId: string; reason: 'crush' };
+  'mission:aborted': { missionId: string; reason: 'crush' | 'power' };
   // --- D-FLOW: dive flow (plan/PHASE-D-CONTRACTS.md §4) -----------------------
   /** The scan that completed the last primary objective; the dive continues. */
   'mission:primaryComplete': { missionId: string; completed: number; total: number };

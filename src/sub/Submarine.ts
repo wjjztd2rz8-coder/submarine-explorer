@@ -70,6 +70,8 @@ export interface SubmarineState {
   hullStress: number;
   /** True while the emergency blow is running and the controls are locked. */
   emergencyBlow: boolean;
+  /** Supply-triggered blows run until the boat reaches the surface. */
+  emergencyCause: 'crush' | 'power' | null;
   /** Seconds of control lockout left, 0 when the pilot is in charge. */
   controlLockRemaining: number;
   /** The active sim-speed multiplier (1, 2 or 3). */
@@ -129,6 +131,7 @@ export class Submarine {
   private impactStress = 0;
   private controlLock = 0;
   private emergencyBlowActive = false;
+  private emergencyCause: 'crush' | 'power' | null = null;
 
   private readonly forward = new THREE.Vector3();
   private readonly normal = new THREE.Vector3();
@@ -217,6 +220,15 @@ export class Submarine {
     this.impactStress = 0;
     this.controlLock = 0;
     this.emergencyBlowActive = false;
+    this.emergencyCause = null;
+  }
+
+  /** Power failure uses the existing blow acceleration and control lock. */
+  startEmergencyAscent(): void {
+    if (this.emergencyBlowActive || this.hullBreached) return;
+    this.emergencyBlowActive = true;
+    this.emergencyCause = 'power';
+    this.controlLock = this.config.emergencyBlowLockSeconds;
   }
 
   /** Unit forward vector in world space. +Z is south, so yaw 0 faces north. */
@@ -248,7 +260,7 @@ export class Submarine {
       // otherwise read as "still locked" to the HUD.
       if (this.controlLock < 1e-9) {
         this.controlLock = 0;
-        this.emergencyBlowActive = false;
+        if (this.emergencyCause !== 'power') this.emergencyBlowActive = false;
       }
     }
     const cmd = this.emergencyBlowActive ? LOCKED_INPUT : input;
@@ -351,6 +363,11 @@ export class Submarine {
       this.position.y = ceiling;
       if (v.y > 0) v.y = 0;
     }
+    if (this.emergencyCause === 'power' && this.position.y >= ceiling) {
+      this.emergencyBlowActive = false;
+      this.emergencyCause = null;
+      this.controlLock = 0;
+    }
 
     // --- hull integrity -----------------------------------------------------
     this.impactStress *= Math.pow(0.5, dt / Math.max(1e-6, c.hullStressHalfLife));
@@ -359,6 +376,7 @@ export class Submarine {
       this.hullBreached = true;
       if (!this.emergencyBlowActive) {
         this.emergencyBlowActive = true;
+        this.emergencyCause = 'crush';
         this.controlLock = c.emergencyBlowLockSeconds;
       }
     }
@@ -440,6 +458,7 @@ export class Submarine {
       impactSpeed: this.impactSpeed,
       hullStress: this.hullStress,
       emergencyBlow: this.emergencyBlowActive,
+      emergencyCause: this.emergencyCause,
       controlLockRemaining: this.controlLock,
       simSpeed: this.simSpeed,
       hullClass: this.hullClassId,

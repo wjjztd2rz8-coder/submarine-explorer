@@ -282,7 +282,7 @@ never repurpose one.
 | `sub:collided`            | `{ depth, speed }`                                     | `main.ts` (seabed); `PropContact` (props)      |
 | `sub:crushWarning`        | `{ depth, ratio }`                                     | `main.ts`, every frame past the warn ratio     |
 | `sub:hullStress`          | `{ stress, cause: 'impact' \| 'pressure', depth }`     | `main.ts`, on a change above threshold         |
-| `sub:emergencyBlow`       | `{ depth, lockSeconds }`                               | `main.ts`, once per blow                       |
+| `sub:emergencyBlow`       | `{ depth, lockSeconds, cause?: 'crush' \| 'power' }`   | `main.ts`, once per blow                       |
 | `sub:simSpeed`            | `{ multiplier }`                                       | `main.ts` on `T`                               |
 | `env:depthBand`           | `{ band, previous, depth }`                            | `Atmosphere.update` on a band change           |
 | `env:preset`              | `{ preset, landmarkId }`                               | `PresetSystem` after selection                 |
@@ -301,7 +301,7 @@ never repurpose one.
 | `mission:complete`        | `{ missionId, durationS }`                             | `Mission.end()`, once, after the primaries     |
 | `mission:ended`           | `{ missionId, reason, completed, total, durationS }`   | `Mission.end()`, every debrief                 |
 | `mission:restart`         | `{ missionId }`                                        | `Mission.restart()` (debrief Dive again)       |
-| `mission:aborted`         | `{ missionId, reason: 'crush' }`                       | `MissionRouter` when an emergency blow ends    |
+| `mission:aborted`         | `{ missionId, reason: 'crush' \| 'power' }`            | `MissionRouter` when an emergency blow ends    |
 | `props:loaded`            | `{ landmarkId, count, models, procedural }`            | `main.ts` when `Props.load` resolves           |
 | `game:ready`              | `{ tileId }`                                           | `main.ts`, first presented frame               |
 | `ui:selectTile`           | `{ id }`                                               | declared, not emitted or handled yet           |
@@ -391,6 +391,6 @@ streaming (Tier 4), and a hard draw-call cap.
 `water`, `atmosphere`, `headlights`, `audio`, `bus`, `config`, `meta`,
 `scanner`, `discoveries`, `discovery`, `debrief`, `fieldGuide` (the Journal),
 `props`, `propsDebug`, `mission`, `missionRouter`, `missionSelect`, `sonar`,
-`journal`.
+`journal`, `power` (see [`power.md`](./power.md)).
 `window.__gameReady` flips to `true` after the first presented frame;
 `window.__gameError` holds a fatal startup message.

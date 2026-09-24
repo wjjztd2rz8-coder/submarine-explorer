@@ -330,9 +330,15 @@ export function debriefText(
   counts: { completed: number; total: number },
   durationS: number,
   failedAtM = 0,
+  abortCause: 'crush' | 'power' = 'crush',
 ): { title: string; subtitle: string } {
   const tally = `${counts.completed} of ${counts.total} objectives · ${formatDuration(durationS)}`;
   if (reason === 'abort') {
+    if (abortCause === 'power')
+      return {
+        title: 'Dive aborted',
+        subtitle: `Supplies exhausted · safe ascent completed · ${tally}`,
+      };
     const rating = Math.round(Math.abs(failedAtM)).toLocaleString('en-US');
     return {
       title: 'Dive aborted',
@@ -356,9 +362,10 @@ export class MissionRouter {
   private navClock = 0;
   private readonly disposers: Array<() => void> = [];
   /** Set by `sub:emergencyBlow` during a dive; cleared when the blow ends. */
-  private blow: { depth: number } | null = null;
+  private blow: { depth: number; cause: 'crush' | 'power' } | null = null;
   /** Depth of the last hull failure, for the aborted debrief. */
   private failedAt = 0;
+  private abortCause: 'crush' | 'power' = 'crush';
   /** Real seconds until the pending completion banner shows; null when none is pending. */
   private bannerDelay: number | null = null;
   /** Real seconds until an open banner applies its default (Keep exploring). */
@@ -376,7 +383,7 @@ export class MissionRouter {
     this.disposers.push(
       this.mission.onChange((m) => this.onMissionChange(m)),
       bus.on('mission:primaryComplete', () => this.queueBanner('primary')),
-      bus.on('sub:emergencyBlow', ({ depth }) => this.onEmergencyBlow(depth)),
+      bus.on('sub:emergencyBlow', ({ depth, cause }) => this.onEmergencyBlow(depth, cause)),
     );
 
     void opts.discovery.ready.then(() => {
@@ -563,11 +570,13 @@ export class MissionRouter {
   }
 
   /** Crush depth: amber banner now, the aborted debrief once the blow ends. */
-  private onEmergencyBlow(depth: number): void {
+  private onEmergencyBlow(depth: number, cause: 'crush' | 'power' = 'crush'): void {
     if (!this.mission.diving) return;
-    this.blow = { depth };
+    this.blow = { depth, cause };
     this.clearBanner();
-    this.panel.setAlert(HULL_FAILURE_ALERT);
+    this.panel.setAlert(
+      cause === 'power' ? 'SUPPLIES EXHAUSTED — EMERGENCY ASCENT' : HULL_FAILURE_ALERT,
+    );
   }
 
   private onBlowComplete(): void {
@@ -575,9 +584,10 @@ export class MissionRouter {
     this.blow = null;
     this.panel.setAlert(null);
     if (!at) return;
-    this.mission.abort('crush');
+    this.mission.abort(at.cause);
     if (this.mission.state !== 'aborted') return;
-    this.failedAt = at.depth;
+    this.failedAt = at.cause === 'crush' ? at.depth : 0;
+    this.abortCause = at.cause;
     this.mission.end();
     this.showDebrief();
   }
@@ -593,6 +603,7 @@ export class MissionRouter {
       counts,
       m.durationS ?? m.elapsedS,
       this.failedAt,
+      this.abortCause,
     );
     const stats = discovery.stats.snapshot({
       title,

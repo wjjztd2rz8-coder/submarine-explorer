@@ -67,6 +67,23 @@ describe('Submarine orientation', () => {
   });
 });
 
+describe('power emergency ascent', () => {
+  it('holds controls until the surface and clears on a fresh reset', () => {
+    const sub = new Submarine(cfg, flatSeabed(-5000));
+    sub.reset(0, -100, 0);
+    sub.startEmergencyAscent();
+    expect(sub.getState().emergencyCause).toBe('power');
+    run(sub, input({ ballast: -1, throttle: 1 }), 360);
+    expect(sub.getState().emergencyBlow).toBe(true);
+    expect(sub.position.y).toBeGreaterThan(-100);
+    for (let i = 0; i < 1800 && sub.getState().emergencyBlow; i++) sub.step(input(), DT);
+    expect(sub.getState().emergencyBlow).toBe(false);
+    expect(sub.position.y).toBeCloseTo(-cfg.hullRadius);
+    sub.reset(0, -100, 0);
+    expect(sub.getState().emergencyCause).toBeNull();
+  });
+});
+
 describe('Submarine drag', () => {
   it('reaches a terminal velocity under constant thrust', () => {
     const sub = new Submarine(cfg, flatSeabed(-9000));
