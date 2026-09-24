@@ -951,7 +951,10 @@ export interface GameplayOptions {
   speedProfile: 'research' | 'standard' | 'fast';
   lights: 'realistic' | 'enhanced';
   sensors: 'realistic' | 'extended';
+  /** In-world waypoint marker, edge arrow and in-range cue ("Visual waypoints"). */
   visualHints: boolean;
+  /** POI / objective / scanned icons on the sonar display (terrain relief always shows). */
+  sonarMarkers: boolean;
   startPosition: 'near-site' | 'surface';
   batteryOxygen: boolean;
   currents: 'off' | 'gentle' | 'realistic';
@@ -1484,6 +1487,7 @@ export const DEFAULT_CONFIG: GameConfig = {
         lights: 'enhanced',
         sensors: 'extended',
         visualHints: true,
+        sonarMarkers: true,
         startPosition: 'near-site',
         batteryOxygen: false,
         currents: 'off',
@@ -1495,6 +1499,7 @@ export const DEFAULT_CONFIG: GameConfig = {
         lights: 'realistic',
         sensors: 'realistic',
         visualHints: false,
+        sonarMarkers: true,
         startPosition: 'near-site',
         batteryOxygen: true,
         currents: 'realistic',
@@ -1507,6 +1512,7 @@ export const DEFAULT_CONFIG: GameConfig = {
       lights: ['realistic', 'enhanced'],
       sensors: ['realistic', 'extended'],
       visualHints: [false, true],
+      sonarMarkers: [false, true],
       startPosition: ['near-site', 'surface'],
       batteryOxygen: [false, true],
       currents: ['off', 'gentle', 'realistic'],

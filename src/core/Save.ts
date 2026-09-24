@@ -12,6 +12,8 @@ export const SAVE_KEYS = {
 } as const;
 
 export type GameplayMode = 'arcade' | 'realistic' | 'custom';
+export type HullWarningStyle = 'vignette' | 'gauge' | 'both';
+export const HULL_WARNING_STYLES: readonly HullWarningStyle[] = ['vignette', 'gauge', 'both'];
 export interface SettingsValues {
   graphicsTier: GraphicsTier;
   postFx: boolean;
@@ -23,6 +25,8 @@ export interface SettingsValues {
   sonarPalette: SonarPaletteName;
   uiScale: number;
   controlTips: boolean;
+  /** How nearing the hull's rated depth is shown (never screen shake). */
+  hullWarningStyle: HullWarningStyle;
   gameplayMode: GameplayMode;
   gameplay: GameplayOptions;
 }
@@ -57,6 +61,7 @@ const GAMEPLAY_KEYS = [
   'lights',
   'sensors',
   'visualHints',
+  'sonarMarkers',
   'startPosition',
   'batteryOxygen',
   'currents',
@@ -67,6 +72,7 @@ export const SETTING_KEYS: readonly SettingKey[] = [
   ...DISPLAY_KEYS,
   'uiScale',
   'controlTips',
+  'hullWarningStyle',
   'gameplayMode',
   'gameplay',
 ];
@@ -84,6 +90,7 @@ export function defaultSettings(config: SettingsConfigSource): SettingsData {
     sonarPalette: d.sonarPalette,
     uiScale: 100,
     controlTips: true,
+    hullWarningStyle: 'both',
     gameplayMode: 'arcade',
     gameplay: { ...config.settings.gameplayPresets.arcade },
     bindings: SAVE_KEYS.bindings,
@@ -145,6 +152,8 @@ export function migrate(raw: unknown, config: SettingsConfigSource): SettingsDat
   }
   if (value.version === 2) {
     if (typeof value.controlTips === 'boolean') out.controlTips = value.controlTips;
+    if (HULL_WARNING_STYLES.includes(value.hullWarningStyle as HullWarningStyle))
+      out.hullWarningStyle = value.hullWarningStyle as HullWarningStyle;
     if (typeof value.uiScale === 'number' && Number.isFinite(value.uiScale))
       out.uiScale = Math.max(80, Math.min(150, Math.round(value.uiScale)));
     if (value.gameplayMode === 'arcade' || value.gameplayMode === 'realistic') {
