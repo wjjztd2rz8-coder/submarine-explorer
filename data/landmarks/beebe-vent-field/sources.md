@@ -61,9 +61,9 @@ no POI, no prop and no objective in this mission.
 ## Pacing
 
 Primary objectives (`bvf-main-vents`, `bvf-shrimp-swarm`) are ~35 m apart and both ~500-700 m
-from `mission.json`'s spawn point (18.548, -81.716) -- well inside a 10-minute budget. Three
-secondary objectives fan out from ~1 km (`bvf-eastern-margin`) to ~13 km (`bvf-spreading-axis`)
-as optional further exploration.
+from `mission.json`'s spawn point (18.548, -81.716) -- well inside a 10-minute budget. The
+western sulfide mound remains the optional scan; the unmarked eastern margin and regional
+spreading-axis points were removed in D3.
 
 ## Descent time
 

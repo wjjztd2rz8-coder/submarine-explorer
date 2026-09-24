@@ -15,7 +15,7 @@
     "heading_deg": 140
   },
   "briefing": {
-    "summary": "Descend into the Eastern Pool of the Challenger Deep, the deepest known point in Earth's oceans, and scan the real seabed at the deepest sounded cell in this survey. Then visit the site of the 2014 benthic lander \"Leggo\", which recorded hadal amphipods feeding at full ocean depth. This dive starts at 6,000 m rather than the surface: at this submarine's ~5.37 m/s vertical terminal speed, a surface-to-floor descent here would take roughly half an hour even at maximum sim speed, so the first ~6 km are skipped to keep the dive to a reasonable length. The remaining ~4.9 km still takes about 5 minutes of vertical descent at 3x sim speed.",
+    "summary": "Descend to the Leggo lander's 2014 bait-station site on the floor of the Eastern Pool, then climb the steep north inner wall of the trench. The near-site start skips the first 6 km of descent and leaves nearly 5 km to explore.",
     "depth_m": 10931,
     "facts": [
       "The Challenger Deep's Eastern Pool is the deepest known point in Earth's oceans; the deepest cell surveyed in this tile is 10,930.9 m.",
@@ -32,36 +32,20 @@
   },
   "objectives": [
     {
-      "id": "eastern-pool",
-      "type": "scan",
-      "poi": "cd-eastern-pool-deepest",
-      "primary": true,
-      "title": "Scan the deepest surveyed point in the Eastern Pool",
-      "hint": "Find the Eastern Pool's deepest cell in this tile's survey grid, around 10,930 m."
-    },
-    {
       "id": "leggo-site",
       "type": "scan",
       "poi": "cd-leggo-amphipod-site",
       "primary": true,
       "title": "Scan the Leggo lander's amphipod bait site",
-      "hint": "The Leggo lander's amphipod bait site lies southwest of the Eastern Pool's deepest cell, near 10,925 m."
-    },
-    {
-      "id": "published-coordinate",
-      "type": "scan",
-      "poi": "cd-published-coordinate",
-      "primary": false,
-      "title": "Check the long-published catalog coordinate",
-      "hint": "The long-published catalog coordinate lies west of the Eastern Pool's deepest cell, near 10,920 m on this tile."
+      "hint": "The Leggo lander site is on the Eastern Pool floor, near 10,925 m."
     },
     {
       "id": "north-wall",
       "type": "scan",
       "poi": "cd-north-wall",
-      "primary": false,
+      "primary": true,
       "title": "Survey the steep north inner wall",
-      "hint": "The north inner wall rises northwest of the Eastern Pool floor, to around 9,980 m at this marker."
+      "hint": "The north inner wall rises northwest of the Leggo site, near 9,980 m."
     },
     {
       "id": "central-basin",

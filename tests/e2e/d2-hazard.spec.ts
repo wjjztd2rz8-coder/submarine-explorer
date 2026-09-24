@@ -31,7 +31,7 @@ test('live hull warning styles show vignette, gauge, and both near the rating', 
       };
     };
     await game.discovery.ready;
-    const target = game.discovery.pois.find((poi) => poi.id === 'cd-eastern-pool-deepest')!;
+    const target = game.discovery.pois.find((poi) => poi.id === 'cd-leggo-amphipod-site')!;
     const { x, z } = target.position;
     game.sub.reset(x, game.terrain.sampleHeight(x, z) + 28, z, game.sub.yaw);
     game.rig.snap(game.sub.position, game.sub.yaw, game.sub.pitch);

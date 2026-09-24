@@ -15,7 +15,7 @@
     "heading_deg": 135
   },
   "briefing": {
-    "summary": "Descend into the upper reaches of Hudson Canyon, the largest submarine canyon on the US Atlantic seaboard, and scan its steep north wall and a coral-habitat ledge nearby. Further down-canyon and far up onto the shelf, four optional objectives trace the canyon's full story: its deepest sounding in this survey, the drowned Hudson Shelf Valley, and the canyon's head on the outer shelf.",
+    "summary": "Descend into Hudson Canyon and scan its steep north wall and a deeper coral-habitat ledge. The two scans reveal how the canyon slopes create different seafloor habitats.",
     "depth_m": 1682.6,
     "facts": [
       "Hudson Canyon begins about 100 miles southeast of New York City and runs roughly 350 miles seaward; its lower reaches (beyond this survey tile) reach 2-2.5 miles (3,200-4,000 m) deep.",
@@ -45,38 +45,6 @@
       "primary": true,
       "title": "Survey the coral-habitat ledge",
       "hint": "The coral-habitat ledge lies southeast along the canyon wall, around 940 m."
-    },
-    {
-      "id": "upper-floor",
-      "type": "scan",
-      "poi": "hc-upper-floor",
-      "primary": false,
-      "title": "Follow the axis to the upper canyon floor",
-      "hint": "Follow the canyon axis southeast from the wall to the upper floor, around 1,220 m."
-    },
-    {
-      "id": "deepest",
-      "type": "scan",
-      "poi": "hc-deepest-sounding",
-      "primary": false,
-      "title": "Reach the deepest point in this survey",
-      "hint": "Continue southeast along the canyon axis to this tile's deepest sounding, around 1,680 m."
-    },
-    {
-      "id": "shelf-valley",
-      "type": "scan",
-      "poi": "hc-shelf-valley",
-      "primary": false,
-      "title": "Trace the drowned Hudson Shelf Valley",
-      "hint": "The drowned Hudson Shelf Valley lies far west and upslope of the canyon wall, around 130 m here."
-    },
-    {
-      "id": "head",
-      "type": "scan",
-      "poi": "hc-shelf-edge-head",
-      "primary": false,
-      "title": "Find the canyon's head on the outer shelf",
-      "hint": "The canyon head is far northwest on the outer shelf edge, around 70 m in this tile."
     }
   ],
   "completion": "all_primary",

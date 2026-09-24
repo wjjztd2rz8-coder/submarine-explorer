@@ -52,7 +52,11 @@ def good_content():
                    {"title": "B", "url": "https://example.org/b"}]
 
     def entry(eid):
-        return {"id": eid, "title": eid.title(), "paragraphs": ["One.", "Two."],
+        return {"id": eid, "title": eid.title(), "paragraphs": [
+            "This named feature lies on the mapped seabed at a measured depth of 1,300 metres. "
+            "The survey records a clear change in the slope around the target location.",
+            "Scanning the feature reveals how its relief differs from the surrounding plain "
+            "and why the second site provides a useful comparison for this dive."],
                 "facts": [{"label": "Depth", "value": "1,300 m"}], "confidence": "high",
                 "reconstruction": False, "sources": two_sources}
 
@@ -305,10 +309,17 @@ class ValidateLandmarkTests(unittest.TestCase):
         rep = self.mutate("mission.json", lambda d: d["objectives"][0].update(poi="ghost"))
         self.assertError(rep, 'poi "ghost" does not exist')
         rep = self.mutate("mission.json", lambda d: d.update(objectives=d["objectives"][:1]))
-        self.assertError(rep, "1 primary + >= 1 secondary")
+        self.assertError(rep, "needs >= 2 primary objectives")
         rep = self.mutate("mission.json", lambda d: d.update(objectives=[d["objectives"][0],
                                                                          d["objectives"][2]]))
-        self.assertEqual(rep.errors, [])
+        self.assertError(rep, "needs >= 2 primary objectives")
+
+    def test_objective_needs_substantive_guide_entry(self):
+        docs = good_content()
+        docs["guide.json"]["entries"][1]["paragraphs"] = ["A seabed point."]
+        docs["guide.json"]["entries"][1]["facts"] = []
+        self.write({"guide.json": docs["guide.json"]})
+        self.assertError(self.validate(), "guide entry needs >= 250 characters")
 
     def test_objective_hint_required_string_and_nonblank(self):
         missing = object()

@@ -29,7 +29,7 @@
       "snap_to_seabed": true,
       "radius_m": 100,
       "kind": "biology",
-      "primary": false,
+      "primary": true,
       "scan_seconds": 4,
       "guide_entry": "coral-thicket",
       "confidence": "medium",
@@ -58,25 +58,6 @@
         "https://oceanexplorer.noaa.gov/news/million-mounds-news/"
       ],
       "note": "Real survey terrain, about 400 m south-west of the core cluster (775.5 m at the sample coordinate), illustrating that the province's 83,908 mapped mound-like peaks form a near-continuous field rather than isolated features."
-    },
-    {
-      "id": "blake-gulf-stream",
-      "name": "The Gulf Stream, overhead",
-      "lat": 30.162,
-      "lon": -79.787,
-      "snap_to_seabed": true,
-      "radius_m": 150,
-      "kind": "other",
-      "primary": false,
-      "scan_seconds": 3,
-      "guide_entry": "gulf-stream",
-      "confidence": "high",
-      "reconstruction": false,
-      "sources": [
-        "https://www.livescience.com/planet-earth/rivers-oceans/worlds-largest-deep-sea-coral-reef-found-lurking-beneath-the-gulf-stream-right-on-the-doorstep-of-us-coast",
-        "https://en.wikipedia.org/wiki/Blake_Plateau"
-      ],
-      "note": "Marks a point on real seabed terrain to anchor the Gulf Stream current, not a surveyed current-meter site; the current itself is not a terrain feature and is not modelled in the engine's physics beyond the mission briefing's hazard note."
     },
     {
       "id": "blake-inter-mound-channel",

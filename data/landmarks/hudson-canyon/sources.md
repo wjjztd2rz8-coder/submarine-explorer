@@ -71,10 +71,9 @@ straight-line transects)
 Both primary objectives (`hc-canyon-wall`, `hc-coral-ledge`) are ~2.8 km apart and both are
 ~6-9 km from `mission.json`'s spawn point (39.45, -72.27), well inside a 10-minute budget at this
 submarine's ~6.0 m/s terminal horizontal speed x3 sim speed (~18 m/s): roughly 5-9 minutes of
-transit for both required objectives combined. The four secondary objectives fan out from
-~4.9 km (`hc-upper-floor`) to ~34 km (`hc-shelf-edge-head`) as optional further exploration, the
-same pattern used by the Challenger Deep and Monterey Canyon packs for distant lore/geology
-points.
+transit for both required objectives combined. D3 removed the four unmarked secondary points:
+the generic upper floor, the tile-edge deepest cell, the coarse shelf-valley approximation and
+the shallow corner used as a stand-in for the out-of-tile canyon head.
 
 ## Descent time
 

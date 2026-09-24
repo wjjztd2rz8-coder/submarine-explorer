@@ -15,7 +15,7 @@
     "heading_deg": 140
   },
   "briefing": {
-    "summary": "Dive to a dense cluster within the Blake Plateau coral mound province, the largest known deep-sea coral reef habitat on Earth, mapped in 2024. Survey the mound field, the Desmophyllum pertusum thickets growing on it, a neighbouring mound, and the Gulf Stream current that feeds this whole 500-km-long ecosystem.",
+    "summary": "Dive to a dense cluster within the Blake Plateau coral mound province. Survey the raised mound terrain, the Desmophyllum pertusum thicket, a neighbouring mound and the channel between mounds.",
     "depth_m": 750,
     "facts": [
       "NOAA and partners announced this discovery in January 2024 (Sowers et al., Geomatics): a nearly continuous province of cold-water coral mounds stretching about 500 km along the southeastern US coast, covering roughly 6.4 million acres.",
@@ -43,7 +43,7 @@
       "id": "coral-thicket",
       "type": "scan",
       "poi": "blake-coral-thicket",
-      "primary": false,
+      "primary": true,
       "title": "Examine a living Desmophyllum pertusum thicket",
       "hint": "A Desmophyllum pertusum thicket lies northeast of the mound cluster, near 770 m."
     },
@@ -54,14 +54,6 @@
       "primary": false,
       "title": "Chart a neighbouring mound",
       "hint": "A neighbouring mapped mound lies southwest of the main cluster, near 780 m."
-    },
-    {
-      "id": "gulf-stream",
-      "type": "scan",
-      "poi": "blake-gulf-stream",
-      "primary": false,
-      "title": "Sample the Gulf Stream current",
-      "hint": "The Gulf Stream passes overhead; scan its marker northeast of the mound cluster on seabed near 700 m, not a current feature in the terrain."
     },
     {
       "id": "inter-mound-channel",

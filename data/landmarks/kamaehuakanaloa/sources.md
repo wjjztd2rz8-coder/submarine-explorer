@@ -50,11 +50,9 @@ own source citation rather than presented as a direct read.
 
 ## Pacing
 
-Primary objectives (`kh-summit`, `kh-hiolo-north`) are ~0.66 km apart, both close to
-`mission.json`'s spawn point (18.9205, -155.263, ~0.7-1 km away) -- comfortably inside a 10-minute
-budget at this submarine's ~6.0 m/s terminal horizontal speed x3 sim speed. Three secondary
-objectives (Hiolo South ~0.33 km from Hiolo North, south rift ~1.4 km from the summit, lower
-flank ~3.4 km from the summit) are optional further exploration.
+The D3 primaries are Hiolo North and Hiolo South, two named vent sites roughly 0.3 km apart.
+Both are close to `mission.json`'s spawn point (18.9205, -155.263). The south rift remains an
+optional terrain scan; the generic summit and lower-flank scans were removed.
 
 ## Descent time
 

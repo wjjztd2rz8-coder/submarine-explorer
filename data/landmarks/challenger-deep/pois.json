@@ -3,26 +3,6 @@
   "landmark": "challenger-deep",
   "pois": [
     {
-      "id": "cd-eastern-pool-deepest",
-      "name": "Eastern Pool — deepest point in this survey",
-      "lat": 11.3737,
-      "lon": 142.5973,
-      "snap_to_seabed": true,
-      "radius_m": 250,
-      "kind": "geology",
-      "primary": true,
-      "scan_seconds": 8,
-      "guide_entry": "eastern-pool",
-      "confidence": "high",
-      "reconstruction": false,
-      "sources": [
-        "http://nora.nerc.ac.uk/id/eprint/524544/1/Stewart_and_Jamieson_2019_The%20five%20deeps.pdf",
-        "https://fivedeeps.com/wp-content/uploads/2019/05/FDE-Challenger-Release-FINAL-5132019.pdf",
-        "https://www.gmrt.org/"
-      ],
-      "note": "Real GMRT terrain (Ryan et al. 2009, GMRT Synthesis, doi:10.1029/2008GC002332; value read directly from this tile's grid): the single deepest cell anywhere in this tile, -10,930.89 m (data/tiles/challenger-deep/meta.json min_m), in the Eastern Pool of the Challenger Deep. This is survey-grid bathymetry, not a reconstruction. It sits within a few tens of metres of independent surveys landing on almost the same point: Nakanishi & Hashimoto (2011, RV Kairei 1998/99), 11.371 N/142.593 E, 10,920+/-5 m, and the Five Deeps Expedition's DSV Limiting Factor dives to the Eastern Pool (10,927-10,928 m, 28 Apr-1 May 2019) -- both per Stewart & Jamieson (2019) Table 1 and the Five Deeps press release. All such figures carry several-metre uncertainty at this depth, so exact agreement between independent surveys is not expected."
-    },
-    {
       "id": "cd-leggo-amphipod-site",
       "name": "\"Leggo\" lander site — amphipod bait station",
       "lat": 11.36854,
@@ -42,25 +22,6 @@
       "note": "Real event and real position, corrected this session against Schmidt Ocean Institute's own cruise page (previously mis-sourced to Wikipedia and mis-dated 2018): the benthic lander 'Leggo', deployed from RV Falkor during the December 2014 'Expanding Mariana Trench Perspectives' cruise (FK141215), recorded amphipods (Hirondellea gigas) feeding on bait at 11.368536 N, 142.5875166 E, 10,929 m, on 19 December 2014. This tile's terrain reads 10,925.1 m at that point, 4 m away. `reconstruction: true` because Leggo was recovered after the cruise and nothing physical remains on the seabed here; the marker/prop at this position stands in for the historic sampling event, not a permanent structure."
     },
     {
-      "id": "cd-published-coordinate",
-      "name": "Catalog coordinate (11°22.4'N 142°35.5'E)",
-      "lat": 11.3733,
-      "lon": 142.5917,
-      "snap_to_seabed": true,
-      "radius_m": 200,
-      "kind": "geology",
-      "primary": false,
-      "scan_seconds": 3,
-      "guide_entry": "published-coordinate",
-      "confidence": "high",
-      "reconstruction": false,
-      "sources": [
-        "http://nora.nerc.ac.uk/id/eprint/524544/1/Stewart_and_Jamieson_2019_The%20five%20deeps.pdf",
-        "https://www.gmrt.org/"
-      ],
-      "note": "Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): 10,917.9 m deep, about 0.6 km southwest of the eastern-pool minimum and within its depth tolerance. This is the long-published, rounded IHO-IOC GEBCO Gazetteer coordinate (11.373333 N, 142.591667 E, cited as 10,920+/-10 m by Stewart & Jamieson 2019, Table 1) carried by this game's own data/landmarks.json pin -- close enough to the true deepest cell that (unlike Lost City's catalog pin) it does not land on the wrong feature, but it predates the precision multibeam and CTD-pressure surveys (2019-2020) that pinned down the Eastern/Central Pool basins individually."
-    },
-    {
       "id": "cd-north-wall",
       "name": "North inner wall",
       "lat": 11.4055,
@@ -68,7 +29,7 @@
       "snap_to_seabed": true,
       "radius_m": 200,
       "kind": "geology",
-      "primary": false,
+      "primary": true,
       "scan_seconds": 4,
       "guide_entry": "trench-walls",
       "confidence": "high",

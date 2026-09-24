@@ -86,10 +86,9 @@ unread.
 
 ## Pacing
 
-Both required (`primary: true`) objectives, `cd-eastern-pool-deepest` and `cd-leggo-amphipod-site`, are about
-1.2 km apart (haversine) -- comfortably inside the ~3 km guideline from the Monterey Canyon pack's pacing
-lesson. The four secondary/optional objectives fan out from there: `cd-published-coordinate` (~0.6 km),
-`cd-north-wall` (~3.8 km), `cd-axis-sill` (~9 km) and `cd-central-basin` (~18.6 km).
+The D3 primaries are the Leggo lander site on the Eastern Pool floor and the steep north inner wall,
+about 4 km apart. The sill and Central Pool remain optional terrain scans farther west. The bare
+deepest-cell and catalog-coordinate scans were removed; their survey comparisons remain in the Journal.
 
 ## Spawn depth and descent time (task-specified)
 

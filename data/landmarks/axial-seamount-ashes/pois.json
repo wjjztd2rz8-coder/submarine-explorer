@@ -74,41 +74,6 @@
         "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
       ],
       "note": "Real GMRT terrain, about 288 m west of Mushroom: the seabed rises here from ~1,540 m to ~1,416 m, a slope consistent with the caldera's western boundary fault -- OOI states ASHES sits 'near the base of the western caldera wall' and 'about 130 m east of the caldera boundary fault' (the exact fault trace itself is not resolved at this tile's ~43-61 m cell size, so this POI marks the rising wall terrain rather than a specific scarp line)."
-    },
-    {
-      "id": "axial-caldera-floor",
-      "name": "Caldera floor lava terrain",
-      "lat": 45.925,
-      "lon": -130.014,
-      "snap_to_seabed": true,
-      "radius_m": 250,
-      "kind": "geology",
-      "primary": false,
-      "scan_seconds": 4,
-      "guide_entry": "caldera-floor",
-      "confidence": "medium",
-      "reconstruction": false,
-      "sources": [
-        "https://www.pmel.noaa.gov/eoi/rsn/Forecasts3.html",
-        "https://en.wikipedia.org/wiki/Axial_Seamount"
-      ],
-      "note": "Real GMRT terrain, about 940 m south of Mushroom: a broad shallow rise on the caldera floor (~1,460 m, versus ~1,530-1,540 m on the surrounding floor). The caldera has been repeatedly resurfaced by lava from the 1998, 2011 and 2015 eruptions (Wikipedia; NOAA PMEL), which is consistent with this kind of low, hummocky high, but no source maps this specific feature to a named flow, so it is described generically as caldera-floor lava terrain rather than attributed to one eruption."
-    },
-    {
-      "id": "axial-caldera-summit",
-      "name": "Caldera rim, shallowest point on this tile",
-      "lat": 45.94612585694577,
-      "lon": -130.02621459960938,
-      "snap_to_seabed": true,
-      "radius_m": 200,
-      "kind": "geology",
-      "primary": false,
-      "scan_seconds": 3,
-      "guide_entry": "caldera-summit",
-      "confidence": "high",
-      "reconstruction": false,
-      "sources": ["https://en.wikipedia.org/wiki/Axial_Seamount", "https://www.gmrt.org/"],
-      "note": "Real GMRT terrain: the shallowest point sampled anywhere in this tile, 1,395.3 m, about 1.4 km north-east of Mushroom on the caldera floor/rim high. Wikipedia gives the seamount's summit depth as 1,410 m, close to this tile's reading given GMRT's grid resolution. An optional longer detour, per the pacing note that caldera transects beyond the ASHES cluster are exploration, not a requirement."
     }
   ]
 }

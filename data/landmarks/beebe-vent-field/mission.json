@@ -15,7 +15,7 @@
     "heading_deg": 220
   },
   "briefing": {
-    "summary": "Descend to the Beebe Hydrothermal Vent Field on the Mid-Cayman Spreading Centre, the deepest known active hydrothermal system on Earth, and scan its supercritical black-smoker chimneys and the shrimp swarms living on them. Optional objectives survey a second sulfide mound, the field's shallow eastern margin, and the ultraslow-spreading ridge's axial valley to the northwest.",
+    "summary": "Descend to the Beebe Hydrothermal Vent Field on the Mid-Cayman Spreading Centre and scan its black-smoker chimneys and the Rimicaris shrimp swarms living around them. A western sulfide mound offers another nearby target.",
     "depth_m": 4987.9,
     "facts": [
       "Beebe is the deepest known active hydrothermal vent field, confirmed at 4,957-4,987 m (Connelly et al. 2012, Nature Communications).",
@@ -54,22 +54,6 @@
       "primary": false,
       "title": "Survey the western sulfide mound",
       "hint": "The western sulfide mound is southwest of the main Beebe chimneys, near 4,960 m."
-    },
-    {
-      "id": "eastern-margin",
-      "type": "scan",
-      "poi": "bvf-eastern-margin",
-      "primary": false,
-      "title": "Check the field's eastern margin",
-      "hint": "The field's eastern-margin marker is northeast of the main chimneys, around 4,950 m."
-    },
-    {
-      "id": "spreading-axis",
-      "type": "scan",
-      "poi": "bvf-spreading-axis",
-      "primary": false,
-      "title": "Reach the Mid-Cayman spreading axis",
-      "hint": "The Mid-Cayman spreading-axis point lies far west of Beebe in the axial valley, around 5,400 m."
     }
   ],
   "completion": "all_primary",

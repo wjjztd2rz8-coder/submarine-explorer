@@ -53,12 +53,10 @@ describe('all mission near-site starts', () => {
       const target = pois.find((p) => p.id === primary.poi)!.position;
       const pose = missionStartPose(def, 'near-site', pois, meta, seabed, DEFAULT_CONFIG);
       if (id === 'great-blue-hole') {
-        // Its first primary is at a surveyed 4 m reef flat: the hull cannot
-        // fit there, so the existing outer-slope surface pose is intentional.
+        // The first primary now sits on the mapped eastern atoll slope, deep
+        // enough for a safe near-site pose instead of the old reef-flat fallback.
         const surface = missionStartPose(def, 'surface', pois, meta, seabed, DEFAULT_CONFIG);
-        expect(pose).toEqual(surface);
-        expect(Math.hypot(pose.x - target.x, pose.z - target.z)).toBeGreaterThan(600);
-        return;
+        expect(pose).not.toEqual(surface);
       }
       const nw = latLonToWorld(meta, meta.bbox.north, meta.bbox.west);
       const se = latLonToWorld(meta, meta.bbox.south, meta.bbox.east);

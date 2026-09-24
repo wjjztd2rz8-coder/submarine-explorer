@@ -84,25 +84,6 @@
       "note": "Representative point in the gap between the sections. The two dense debris fields are each 600–800 m long (about 5 km² together), and the 2010 survey mapped 15–20 sq mi (39–52 km²) of seafloor; neither extent is published as coordinates."
     },
     {
-      "id": "titanic-deck-fittings",
-      "name": "Deck fittings and bollards",
-      "lat": 41.73,
-      "lon": -49.949,
-      "depth_m": 3799,
-      "radius_m": 100,
-      "kind": "artifact",
-      "primary": false,
-      "scan_seconds": 3,
-      "guide_entry": "deck-fittings",
-      "confidence": "low",
-      "reconstruction": true,
-      "sources": [
-        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
-        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
-      ],
-      "note": "Illustrative location in the mid-site debris; individual fittings are scattered through the field and their positions are not published."
-    },
-    {
       "id": "titanic-big-piece",
       "name": "Where the \"Big Piece\" lay",
       "lat": 41.7252,

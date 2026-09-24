@@ -70,10 +70,36 @@ test('polished dive HUD keeps mission, telemetry, speed and live tips readable',
   await expect(page.locator('.hud-control-tips')).toContainText('I/S speed');
 });
 
-test('six-objective missions show the current target and the next few', async ({ page }) => {
+test('a long objective list shows the current target and the next few', async ({ page }) => {
   await page.goto('/?mission=lost-city&skipBriefing=1');
   await page.waitForFunction(() => window.__gameReady === true);
+  await page.waitForFunction(
+    () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
+  );
+  await page.evaluate(() => {
+    const g = window.__game as {
+      mission: { objectives: Array<{ id: string; title: string }> };
+      missionRouter: {
+        panel: { setObjectives(objectives: Array<{ id: string; title: string }>): void };
+      };
+    };
+    const objectives = g.mission.objectives;
+    g.missionRouter.panel.setObjectives([
+      ...objectives,
+      { ...objectives[2]!, id: 'extra-vent-1', title: 'Extra vent one' },
+      { ...objectives[3]!, id: 'extra-vent-2', title: 'Extra vent two' },
+    ]);
+  });
   await expect(page.locator('.obj-item')).toHaveCount(4);
-  await expect(page.locator('.obj-item.is-current')).toHaveCount(1);
+  await expect(page.locator('.obj-item.is-current')).toContainText(
+    'Locate and scan the Poseidon tower',
+  );
+  await expect(page.locator('.obj-item-title')).toHaveText([
+    'Locate and scan the Poseidon tower',
+    'Scan the IMAX Tower',
+    'Extra vent one',
+    'Scan the Beehive chimney',
+  ]);
   await expect(page.locator('.obj-more')).toHaveText('+2 more · Esc for all');
+  await expect(page.locator('.obj-item', { hasText: 'Extra vent two' })).toHaveCount(0);
 });

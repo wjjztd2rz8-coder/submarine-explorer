@@ -13,8 +13,8 @@ Checks:
     `depth_m` within --depth-tolerance (60 m) of the terrain at that point
   * guide.json: an `overview` entry, titles/paragraphs/facts/sources shapes
   * mission.json: tile exists, spawn inside the bbox and above the seabed,
-    briefing summary/facts/hazards, objectives (>= 2 primary, or 1 primary +
-    >= 1 secondary) that reference existing POIs and have nonblank hints,
+    briefing summary/facts/hazards, >= 2 primary objectives that reference
+    existing POIs and have nonblank hints and substantive guide entries,
     `hull_class` A/B/C (read from
     src/core/Config.ts) whose crush depth clears the deepest POI, and
     `environment.preset` from the Phase C list
@@ -507,10 +507,8 @@ def check_mission(doc, report, landmark, poi_depths, tile, hulls, folder, tiles_
                 primary += 1
             else:
                 secondary += 1
-        if primary == 0:
-            report.err("mission.json", "no primary objective")
-        elif primary == 1 and secondary == 0:
-            report.err("mission.json", "needs >= 2 primary objectives, or 1 primary + >= 1 secondary")
+        if primary < 2:
+            report.err("mission.json", "needs >= 2 primary objectives")
     if "completion" in doc and doc["completion"] not in COMPLETIONS:
         report.err("mission.json", '"completion" must be one of %s' % "|".join(COMPLETIONS))
 
@@ -648,6 +646,31 @@ def validate_landmark(landmark, repo=REPO, tolerance=DEFAULT_DEPTH_TOLERANCE_M, 
     if mission is not None:
         check_mission(mission, report, landmark, poi_depths, tile, hulls, folder, tiles_root,
                       load_crush_warn_ratio(repo), docs.get("pois.json"), load_hull_ratings(repo))
+        pois_doc, guide_doc = docs.get("pois.json"), docs.get("guide.json")
+        if isinstance(mission, dict) and isinstance(pois_doc, dict) and isinstance(guide_doc, dict):
+            poi_items = pois_doc.get("pois")
+            guide_items = guide_doc.get("entries")
+            poi_by_id = {p["id"]: p for p in poi_items if isinstance(p, dict) and
+                         isinstance(p.get("id"), str)} if isinstance(poi_items, list) else {}
+            guide_by_id = {e["id"]: e for e in guide_items if isinstance(e, dict) and
+                           isinstance(e.get("id"), str)} if isinstance(guide_items, list) else {}
+            objectives = mission.get("objectives")
+            for obj in objectives if isinstance(objectives, list) else []:
+                if not isinstance(obj, dict):
+                    continue
+                poi_id = obj.get("poi")
+                poi = poi_by_id.get(poi_id) if isinstance(poi_id, str) else None
+                guide_id = poi.get("guide_entry") if poi else None
+                entry = guide_by_id.get(guide_id) if isinstance(guide_id, str) else None
+                where = 'objective "%s"' % obj.get("id")
+                if not entry:
+                    report.err(where, "needs a POI with a guide entry")
+                    continue
+                paragraphs = entry.get("paragraphs")
+                length = len(" ".join(paragraphs)) if isinstance(paragraphs, list) and all(
+                    isinstance(p, str) for p in paragraphs) else 0
+                if length < 250 or not entry.get("facts"):
+                    report.err(where, "guide entry needs >= 250 characters of explanation and a specific fact")
     if docs.get("props.json") is not None:
         check_props(docs["props.json"], report, landmark, tile)
     if docs.get("species.json") is not None:

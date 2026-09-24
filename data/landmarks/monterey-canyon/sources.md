@@ -47,11 +47,10 @@ mandatory pair of objectives.
 
 Fix: added a new primary POI, `monterey-canyon-upper-channel`, about 2.8 km down-canyon from the head (real
 terrain, guide entry `upper-canyon`), and made it the second required objective alongside the head. The former
-axis-1000m objective, plus the canyon wall, axis-2000m and MARS node objectives, are now all secondary/optional —
-an invitation to continue further down-canyon after the two nearby required scans, rather than a second mandatory
-long transit. `mission.json.completion` is still `all_primary`, so the mission now completes on the two nearby
-scans; the deeper canyon is fully explorable but optional. Straight-line distances (haversine, this session):
-head-to-upper-channel ~2.8 km; head-to-axis-1000m (formerly required) ~17.5 km.
+axis-1000m objective was first made optional, then removed in D3 along with the axis-2000m point because both
+were unmarked depth crossings. The canyon wall and MARS node remain optional. `mission.json.completion` is
+still `all_primary`, so the mission completes on the two nearby scans. Straight-line distances (haversine):
+head-to-upper-channel ~2.8 km; head-to-the former axis-1000m target ~17.5 km.
 
 ## OBIS species data
 
@@ -67,9 +66,9 @@ species appear.
 
 ## Hull class
 
-Deepest POI is the axis-2000m point at 2,033.5 m (real terrain), which exceeds Class A's 1,000 m
-rating, so `mission.json` uses `hull_class: "B"` (rated depth 6,500 m; MARS at 891 m and the rest of the tile,
-down to 2,332.8 m, all clear this too).
+D3 removed the 2,033.5 m axis point. `mission.json` retains the Class B hull (rated depth
+6,500 m) so players can explore the canyon below the optional MARS node at 891 m. The tile
+reaches 2,332.8 m, within this hull's rating.
 
 ## Fabricated vs. sourced
 

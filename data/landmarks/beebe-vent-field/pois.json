@@ -58,38 +58,6 @@
         "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879"
       ],
       "note": "Real GMRT terrain, -4,957.1 m, about 1.4 km west of the main vent POI and within the field's published depth range. Webber et al. (2015) describe seven sulfide mounds spread across the field's western side; this point is a real-terrain candidate within that footprint, not a citation to one specific named mound."
-    },
-    {
-      "id": "bvf-eastern-margin",
-      "name": "Eastern field margin",
-      "lat": 18.5514,
-      "lon": -81.71,
-      "snap_to_seabed": true,
-      "radius_m": 200,
-      "kind": "geology",
-      "primary": false,
-      "scan_seconds": 4,
-      "guide_entry": "vents",
-      "confidence": "low",
-      "reconstruction": false,
-      "sources": ["https://www.gmrt.org/"],
-      "note": "Real GMRT terrain, -4,952.6 m, about 1 km east-northeast of the main vent POI, near the shallow edge of the field's published depth range. No source consulted maps the field's full lateral extent precisely; this point shows the terrain stays in-range this far out, not a confirmed vent location. Optional, distant objective."
-    },
-    {
-      "id": "bvf-spreading-axis",
-      "name": "Mid-Cayman spreading axis",
-      "lat": 18.57667,
-      "lon": -81.80333,
-      "snap_to_seabed": true,
-      "radius_m": 300,
-      "kind": "geology",
-      "primary": false,
-      "scan_seconds": 5,
-      "guide_entry": "spreading-axis",
-      "confidence": "medium",
-      "reconstruction": false,
-      "sources": ["https://www.gmrt.org/", "https://www.pnas.org/doi/full/10.1073/pnas.1009205107"],
-      "note": "Real GMRT terrain, -5,395.8 m, the deepest point this session found along a NW-SE transect through the tile that follows the general trend of the ultraslow-spreading Mid-Cayman Spreading Centre's axial valley (published vent-field literature places Beebe on/near this ridge axis). This is a terrain trace of the axial trough's general direction and depth, not a citation to a precisely mapped plate-boundary line. About 13 km from the main vent POI -- optional, distant objective."
     }
   ]
 }

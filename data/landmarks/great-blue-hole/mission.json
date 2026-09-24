@@ -15,13 +15,13 @@
     "heading_deg": 270
   },
   "briefing": {
-    "summary": "Survey Lighthouse Reef atoll in Belize: the shallow reef flat, its outer drop-off into open water, the reef life along the rim, and a marker at the real coordinates of the Great Blue Hole -- a famous 124 m sinkhole that this survey's bathymetry is too coarse to show.",
+    "summary": "Cross the shallow Lighthouse Reef platform and survey its steep eastern and western edges around the Great Blue Hole.",
     "depth_m": 226,
     "facts": [
-      "The Great Blue Hole is real and famous, but this open bathymetry has no dedicated high-resolution survey of it: at its published coordinates, this tile reads only a few metres deep, not the true 124 m sinkhole. The field guide explains what a proper 2018 sonar survey actually found there.",
-      "The reef flat around the hole is shallow, mostly under 10 m, then drops steeply to open ocean a few kilometres out -- both features are real, if coarse, survey terrain.",
-      "By default you start beside the first objective. With a surface start you begin at the surface over the outer slope, in water well over 60 m deep. Head west (about 270°) toward the reef flat and the hole's marked position.",
-      "This is part of the Belize Barrier Reef Reserve System, a UNESCO World Heritage Site. Keep a respectful distance from the reef."
+      "The Great Blue Hole is 318 m across and about 124 m deep; it sits inside Lighthouse Reef atoll.",
+      "The reef platform stays shallow for kilometres before dropping sharply into deeper water on either side.",
+      "With a surface start you begin over the eastern slope, facing west toward the reef.",
+      "Lighthouse Reef is part of the Belize Barrier Reef Reserve System, a UNESCO World Heritage Site."
     ],
     "hazards": [
       "Shallow reef structure near the rim -- watch your depth and avoid contact with coral.",
@@ -32,36 +32,20 @@
   },
   "objectives": [
     {
-      "id": "hole-marker",
-      "type": "scan",
-      "poi": "great-blue-hole-centre",
-      "primary": true,
-      "title": "Find the Great Blue Hole's real coordinates",
-      "hint": "The Great Blue Hole coordinate marker is on the shallow reef flat, around 4 m in this coarse tile; the real 124 m sinkhole is unresolved."
-    },
-    {
-      "id": "reef-rim",
-      "type": "scan",
-      "poi": "great-blue-hole-reef-rim",
-      "primary": false,
-      "title": "Survey the reef flat surrounding the hole",
-      "hint": "Survey Lighthouse Reef's real, shallow reef flat northwest of the hole marker, only a few metres deep."
-    },
-    {
       "id": "outer-dropoff",
       "type": "scan",
       "poi": "great-blue-hole-outer-dropoff",
-      "primary": false,
-      "title": "Follow the outer drop-off into open water",
-      "hint": "The atoll's outer drop-off is east of the hole marker, where the mapped seabed falls to around 200 m."
+      "primary": true,
+      "title": "Survey the eastern atoll drop-off",
+      "hint": "The eastern atoll drop-off lies east of the hole, where the seabed falls to about 200 m."
     },
     {
-      "id": "reef-life",
+      "id": "western-dropoff",
       "type": "scan",
-      "poi": "great-blue-hole-reef-life",
-      "primary": false,
-      "title": "Observe reef life along the rim",
-      "hint": "Reef life can be found in the shallow reef-flat area northwest of the hole."
+      "poi": "great-blue-hole-western-dropoff",
+      "primary": true,
+      "title": "Survey the western atoll drop-off",
+      "hint": "The western atoll drop-off lies west of the hole, where the reef flat steepens toward 200 m."
     }
   ],
   "completion": "all_primary"

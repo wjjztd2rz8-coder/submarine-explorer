@@ -31,14 +31,6 @@
   },
   "objectives": [
     {
-      "id": "summit",
-      "type": "scan",
-      "poi": "kh-summit",
-      "primary": true,
-      "title": "Scan the summit",
-      "hint": "The volcano's shallow summit is the high point of this tile, near 975 m."
-    },
-    {
       "id": "hiolo-north",
       "type": "scan",
       "poi": "kh-hiolo-north",
@@ -50,7 +42,7 @@
       "id": "hiolo-south",
       "type": "scan",
       "poi": "kh-hiolo-south",
-      "primary": false,
+      "primary": true,
       "title": "Survey the Hiolo South vent site",
       "hint": "The Hiolo South vent site lies south of the summit inside Pele's Pit, around 1,275 m."
     },
@@ -61,14 +53,6 @@
       "primary": false,
       "title": "Trace the south rift zone",
       "hint": "Trace the south rift zone south from the summit through the deepening volcanic slope, around 1,280 m here."
-    },
-    {
-      "id": "flank",
-      "type": "scan",
-      "poi": "kh-flank-relief",
-      "primary": false,
-      "title": "Survey the lower south flank",
-      "hint": "The volcano's lower south flank lies farther south along the slope, near 1,900 m."
     }
   ],
   "completion": "all_primary",

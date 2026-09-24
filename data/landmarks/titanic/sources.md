@@ -91,5 +91,5 @@ Pages re-fetched (Wikipedia as raw wikitext, the Oceanus PDF as text) to check t
 
 - No numeric headings for either section were found in any source consulted. A georeferenced 2010 sonar mosaic (RMST/WHOI) would settle both headings and the debris-item positions, but it is not openly published.
 - The 1986 Explorers Club plaque on a bow capstan comes from a single source (Paul Lee, citing Ballard's autobiography).
-- Individual bollards and deck cranes in the debris field were not confirmed in any source consulted; the deck-fittings entry names them only as types of deck hardware, and its position is illustrative.
+- Individual bollards and deck cranes in the debris field were not confirmed in any source consulted. D3 removed the unmarked deck-fittings POI and its guide entry; the mapped seabed channel remains a terrain scan.
 - The Magellan 2022 scan (source 21) would give exact geometry but is proprietary.

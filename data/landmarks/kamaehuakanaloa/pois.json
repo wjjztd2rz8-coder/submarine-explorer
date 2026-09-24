@@ -3,25 +3,6 @@
   "landmark": "kamaehuakanaloa",
   "pois": [
     {
-      "id": "kh-summit",
-      "name": "Summit",
-      "lat": 18.91725,
-      "lon": -155.26401,
-      "snap_to_seabed": true,
-      "radius_m": 150,
-      "kind": "geology",
-      "primary": true,
-      "scan_seconds": 5,
-      "guide_entry": "overview",
-      "confidence": "high",
-      "reconstruction": false,
-      "sources": [
-        "https://www.gmrt.org/",
-        "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount"
-      ],
-      "note": "Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): this tile's single shallowest cell, -975.17 m (matches data/tiles/kamaehuakanaloa/meta.json max_m), matching published summit-depth figures (~1,000 m / 3,200 ft) closely. This is the current high point on the post-1996-collapse summit, not necessarily the exact pre-1996 'Pele's Vents' high point (see kh-hiolo-north/south)."
-    },
-    {
       "id": "kh-hiolo-north",
       "name": "Hiolo North vent site",
       "lat": 18.91245,
@@ -48,7 +29,7 @@
       "snap_to_seabed": true,
       "radius_m": 120,
       "kind": "vent",
-      "primary": false,
+      "primary": true,
       "scan_seconds": 5,
       "guide_entry": "vents",
       "confidence": "medium",
@@ -77,25 +58,6 @@
         "https://www.gmrt.org/"
       ],
       "note": "Real GMRT terrain, -1,281.3 m, about 1.4 km south of the summit on the ridge this session traced running south from the summit -- the general direction of the seamount's south rift zone, published as its longest (~12 mile) and most volcanically/hydrothermally active rift. This point is a terrain trace along that bearing, not a citation to a mapped rift-zone boundary."
-    },
-    {
-      "id": "kh-flank-relief",
-      "name": "Lower south flank",
-      "lat": 18.8878,
-      "lon": -155.2655,
-      "snap_to_seabed": true,
-      "radius_m": 400,
-      "kind": "geology",
-      "primary": false,
-      "scan_seconds": 4,
-      "guide_entry": "overview",
-      "confidence": "high",
-      "reconstruction": false,
-      "sources": [
-        "https://www.gmrt.org/",
-        "https://en.wikipedia.org/wiki/Kama%CA%BBehuakanaloa_Seamount"
-      ],
-      "note": "Real GMRT terrain, -1,896.6 m, about 3.4 km south of the summit along the same south-rift transect. Included to show the seamount's real scale (published as rising over 3,000 m / 10,000 ft above the surrounding seafloor); this tile does not reach its base. Optional, distant objective."
     }
   ]
 }

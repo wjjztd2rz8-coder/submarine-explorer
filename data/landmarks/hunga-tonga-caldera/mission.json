@@ -15,7 +15,7 @@
     "heading_deg": 250
   },
   "briefing": {
-    "summary": "This dive replays a pre-2022 survey of the Hunga Tonga-Hunga Ha'apai volcano, a submarine caldera rising about 2 km from the seafloor to two small islands near sea level. Chart the caldera floor, the reef saddle between the islands, the inner caldera wall, and the outer flank as they were surveyed before 15 January 2022.",
+    "summary": "Explore the Hunga Tonga-Hunga Ha’apai volcano in a pre-2022 bathymetric survey. Scan the broad caldera floor and climb its steep inner wall.",
     "depth_m": 155,
     "facts": [
       "This terrain predates the 15 January 2022 eruption, the most powerful volcanic explosion recorded by modern instruments. The caldera you see here no longer exists in this shape.",
@@ -37,31 +37,15 @@
       "poi": "hunga-tonga-caldera-floor",
       "primary": true,
       "title": "Survey the pre-2022 caldera floor",
-      "hint": "The pre-2022 summit caldera floor is a broad basin near 130 m in this historical tile."
-    },
-    {
-      "id": "island-saddle",
-      "type": "scan",
-      "poi": "hunga-tonga-island-saddle",
-      "primary": false,
-      "title": "Chart the reef saddle between the islands (pre-2022 survey)",
-      "hint": "The pre-2022 saddle between the islands lies northwest of the caldera-floor marker, at the surface; the islands are no longer joined."
+      "hint": "The caldera floor is the broad basin near 130 m, east of the inner wall."
     },
     {
       "id": "rim-wall",
       "type": "scan",
       "poi": "hunga-tonga-rim-wall",
-      "primary": false,
+      "primary": true,
       "title": "Follow the inner caldera wall (pre-2022 survey)",
-      "hint": "The pre-2022 inner caldera wall lies west of the floor marker, descending toward 470 m."
-    },
-    {
-      "id": "outer-flank",
-      "type": "scan",
-      "poi": "hunga-tonga-outer-flank",
-      "primary": false,
-      "title": "Descend the outer submarine flank",
-      "hint": "Beyond the old rim, the volcano's outer submarine flank lies northwest of the caldera floor, around 1,030 m."
+      "hint": "The inner caldera wall lies west of the floor, descending toward 470 m."
     }
   ],
   "completion": "all_primary"
