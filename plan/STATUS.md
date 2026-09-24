@@ -1,152 +1,40 @@
-# Status — 2026-09-24 Phase D (playability) complete
+# Status — 2026-09-24, Phase D2 complete
 
-This is the current handoff. Earlier checkpoints, including the Phase C
-close-out and the original Claude pacing/model instructions, are preserved in
-[the status archive](archive/STATUS-before-2026-09-23-closeout.md) and
-[the Phase C close-out snapshot](archive/STATUS-before-2026-09-24-phase-d.md).
-Do not use historical pending lists to repeat completed work.
+This is the current handoff. The [previous Phase D status](archive/STATUS-before-2026-09-24-phase-d2.md) is archived; its playtest #3 checklist and pending work are historical. Phase D2 answers that playtest and is merged locally. See [the D2 plan](PHASE-D2-PLAN.md) for the findings and package ownership.
 
-## Phase D (playability) — complete
+## Phase D2 changes
 
-All Phase D packages from [`plan/PHASE-D-PLAN.md`](PHASE-D-PLAN.md) and
-[`plan/PHASE-D-CONTRACTS.md`](PHASE-D-CONTRACTS.md) are implemented and merged
-to `main`:
+| Package       | Shipped change                                                                                                                                                                                                              |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Foundation    | Separate Visual waypoints and Sonar markers settings; Hull warning display choice (vignette, gauge, both).                                                                                                                  |
+| D2-CAMERA     | Removed scan-target auto-framing and hull shake; wider chase framing, world-fixed free look and reset (`X`, HUD button, double-click); `R`/`F` pitch and hold `G` scan; pointer look exits cleanly. Bindings migrate to v3. |
+| D2-HAZARD     | Rated-depth hull gauge and optional vignette; separate crush threshold; full-ocean-depth Class C for Challenger Deep; Realistic near-site reserves account for the skipped descent; marine snow follows currents.           |
+| D2-PREDIVE    | Mode selector on Home, briefing and Settings; briefing Dive settings (mode, start and more options) preview the actual spawn; UI-scale control no longer clips.                                                             |
+| D2-SONARPHOTO | Sonar zoom buttons and range label; wheel zooms expanded sonar; independent sonar-marker toggle; photo capture button and individual JPEG / all-photos ZIP downloads.                                                       |
 
-| Package     | One line                                                                                                                                                                                                                          |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D-MODES     | Arcade (default) / Realistic / Custom gameplay modes: speed, descent, lights, sensors, visual hints, start position, battery/oxygen, currents, sim speed                                                                          |
-| D-CONTENT   | A plain-language what/where `hint` on every objective in all 13 `mission.json` files; the validator now requires it                                                                                                               |
-| D-INPUT+HUD | New key defaults (R/V pitch, Space rise, Ctrl-or-C sink, Shift boost, F scan, Q camera, `ping` removed), mouse-drag/wheel camera, UI-scale HUD, contextual F prompt, sim-speed badge                                              |
-| D-SHELL     | Home title screen (globe + Continue/Dive sites/Free dive/Journal/Settings/Controls) and `Esc` pause menu; retires the old `O`/`N` hotkeys                                                                                         |
-| D-SCAN      | Per-dive scan state (no free re-scans), scanned markers in the world/sonar/objectives, `Waypoints` (world marker, edge arrow, in-range cue) gated by the visual-hints setting                                                     |
-| D-START     | Near-site default spawn (~100–200 m from the first primary objective, lights on); surface start is an explicit briefing/settings option                                                                                           |
-| D-FLOW      | Fresh objectives every dive, a "Primary objectives complete" banner with Keep exploring / Surface and debrief, an honest X-of-Y debrief, and the Journal (Civilopedia-style site/POI/species catalogue) replacing the field guide |
-| D-SONAR     | POI/objective/scanned-state icons, zoom levels (250 m/500 m/1 km/2 km/whole tile) via `M` and the mouse wheel, clearer default-palette relief                                                                                     |
-| D-POWER     | Optional battery/oxygen (off in Arcade, on in Realistic), clear warnings, a safe automatic emergency ascent on depletion, sourced to WHOI's Alvin specs                                                                           |
-| D-CURRENTS  | Offline per-site HYCOM current grid (`data/currents/<tile>.json`), off / gentle / realistic toggle                                                                                                                                |
-| D-ROV       | Tethered ROV (`E`) that flies, scans and returns, with its own visible, lit chase camera                                                                                                                                          |
-| D-PHOTO     | Photo mode (`P`): free-orbit camera, hidden HUD, captioned JPEG captures saved to a Journal photo gallery                                                                                                                         |
+## Owner decisions and open question
 
-### Owner decisions this phase
+- Objectives stay fixed across dives. Each dive starts fresh; Journal discoveries persist.
+- Arcade remains the default, with realism options available through Realistic or Custom. ROV differentiation is deferred until tight spaces or otherwise unreachable details exist. Visual detail is deferred to a later art pass.
+- GPT-6 Astra handles planning and orchestration; GPT-6 Sol handles implementation, QA and docs. The D2 package assignment used three Sol packages and one Claude subagent package under the budget rule.
+- Budget floors: Claude ≥20% and Codex ≥5% in the 5-hour window; both ≥5% in the weekly window. Check the private `ai-limits` gate before further agent work (`~/.local/bin/ai-limits --gate 20 5`).
+- **Owner question — current strength:** Realistic currently uses the archived HYCOM field at full sampled strength, Gentle uses 35%, and physics caps the applied current at 0.8 m/s. Across the 13 site grids, nonmasked samples span about 0.001–0.624 m/s; Challenger Deep is 0.001–0.032 m/s, Titanic 0.004–0.172 m/s, and Blake Plateau 0.127–0.624 m/s. Should a separate, clearly labelled **Exaggerated currents** option amplify the sampled field for playability? No multiplier or default change has been chosen.
 
-- **Arcade is the default; every realism system is opt-in.** Research-sub
-  speed, realistic lights/sensors, battery/oxygen and currents all live behind
-  Realistic or Custom — a new player never has to configure anything to get
-  the intended "fun" experience.
-- **Caveat-free player-facing text.** Hints, briefings, the Journal and field
-  guide state what's real versus reconstructed once, in the relevant entry,
-  rather than repeating a disclaimer in every string (`content: plain-language
-hints and guide text without repeated recreation caveats`, commit `3a09672`).
-- **Old D4 (marine life encounters) moved to Phase E** (future expansions,
-  `plan/MASTER-PLAN.md` §6) — not a priority for playability and potentially
-  expensive; deferred until after Phase D and a further owner scope decision.
-- **Old D7 (surface day/night) dropped** entirely, not deferred.
-- Samples, inventory and VR remain unscheduled (Tier 4 stretch in
-  `plan/MASTER-PLAN.md`).
+## Owner playtest #4
 
-### Known nits
+- [ ] At dive start, inspect the wider chase framing. Drag to look freely; turn and pitch the sub and confirm the camera keeps its world direction. Reset with `X`, the HUD button and a double-click.
+- [ ] Pilot with `R`/`F` pitch and hold `G` to scan; check `Space`, `Ctrl`/`C` and `Shift` still behave as expected.
+- [ ] Enable pointer look from Settings → Controls; confirm it resumes the dive, menus release the pointer, and losing lock during a dive pauses it.
+- [ ] Find the game mode on Home, in the briefing and in Settings. Change a briefing Dive setting, including start position, and confirm the preview and actual dive start agree without a teleport.
+- [ ] Adjust UI scale through and above 100%; confirm its value remains readable and controls work.
+- [ ] Observe the hull gauge and selected vignette style near the rated depth, then test Challenger Deep without premature hull warnings. Confirm the separate crush threshold still triggers emergency ascent.
+- [ ] In Realistic near-site starts, confirm battery and oxygen begin below full according to the skipped descent; compare a surface start.
+- [ ] Try Realistic and Gentle currents at several sites; watch sub motion, HUD readout and marine-snow drift. Note whether they are perceptible and whether stronger game currents would help.
+- [ ] Expand sonar, use its zoom buttons and range label, then wheel anywhere while it is expanded; confirm the camera does not zoom. Turn Sonar markers off and confirm terrain remains while POI/objective icons disappear; compare Visual waypoints separately.
+- [ ] In photo mode, use the visible Capture button, then download one JPEG and all photos as a ZIP from the Journal.
 
-- No independent gamepad rebinding; gamepad buttons remain fixed to their
-  Phase A/C mapping.
-- Hardware/target-device performance (60 fps at 1080p on the owner's medium
-  tier) is still unmeasured beyond automated checks — carried over from the
-  Phase C close-out.
-- Large-JS-chunk build warning and duplicate emitted Draco decoder assets are
-  still present and still nonblocking (carried over from the Phase C
-  close-out; not reverified in this pass).
+## Next step
 
-### What's left for the owner
+Run owner playtest #4 and record findings. **No push, GitHub repository creation or Pages activation without the owner's explicit confirmation after playtest #4.** The site remains unpublished; local CI/deployment preparation is not publication.
 
-1. **Playtest #3.** The owner has not yet played the Phase D build. Use the
-   checklist below; file findings the same way as playtests #1 and #2 did
-   (which produced `plan/PHASE-D-PLAN.md` and the D-POLISH fixes,
-   respectively).
-2. **After playtest #3 fixes land:** the owner's go-ahead to create the
-   GitHub repository and enable GitHub Pages. This was approved as a to-do on
-   2026-09-23 for after Phase D (`plan/PHASE-D-PLAN.md` §3, step 10). It still
-   requires the owner's **explicit confirmation before any push or repo
-   creation** — nothing has been pushed or made public.
-
-### Playtest #3 checklist
-
-- [ ] Home screen: Continue / Dive sites / Free dive / Journal / Settings /
-      Controls all work; Continue stays disabled until a dive has started once.
-- [ ] Try Arcade, Realistic and Custom: speed, lights, sensors, visual hints,
-      start position, battery/oxygen and currents change as described, and
-      editing any single option flips the mode label to Custom.
-- [ ] Controls feel right: R/V pitch, Space rise, Ctrl and C both sink, Shift
-      boost, F scan (hold), Q camera, mouse-drag orbit plus wheel zoom, `Esc`
-      pause menu.
-- [ ] Scan a POI: it's marked scanned in the world, sonar and objective
-      tracker, re-scanning says "Already logged", and the Journal entry has
-      unlocked.
-- [ ] Finish every primary objective mid-dive and confirm "Keep exploring"
-      keeps the dive going instead of forcing a debrief; then debrief and
-      check Dive again / Dive sites / Home / Journal each do what they say.
-- [ ] Sonar: zoom in and out (`M` plus wheel), and confirm POIs, objectives
-      and the sub show distinct icons with readable depth relief.
-- [ ] Deploy the ROV (`E`), fly it to a target, scan with it, retrieve it, and
-      confirm the sub's camera returns cleanly afterward.
-- [ ] Enter photo mode (`P`), orbit, capture with `Enter`/`Space`, and find
-      the photo in the Journal's gallery.
-
-## Owner direction and model mapping
-
-- GPT-6 Astra takes the orchestration/planning role; GPT-6 Sol takes
-  implementation, QA and documentation roles (Claude-specific instructions
-  are preserved for Claude sessions). Phase D packages were built by GPT-6 Sol
-  subagents through `tools/codex-task.sh`, reviewed by the orchestrator, and
-  committed at green (`plan/PHASE-D-PLAN.md` §4).
-- At most two implementation subagents at once (`D-MODES ∥ D-CONTENT` and
-  `D-SCAN ∥ D-START` were the only scheduled parallel pairs); the orchestrator
-  reviews each package's diff and screenshots before progressing.
-- No push, repository creation or Pages activation without the owner's
-  go-ahead — see "What's left for the owner" above. Local CI/deployment
-  preparation does not mean the site is live.
-
-## Prior phase state (verified at Phase C close-out, unchanged by Phase D)
-
-| Package | Implementation state                                                              | Remaining acceptance / limitations                                                                               |
-| ------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| A/B     | Existing foundation, atmosphere, controls, audio, Titanic discovery/mission/props | Superseded by Phase D controls/HUD; hardware performance still unverified                                        |
-| C1      | Globe, keyboard controls, species tab, thinner rim, e2e and axe checks            | Globe is now opened from Home/Pause rather than a dedicated key (D-SHELL); no measured target-device performance |
-| C2      | 13 real landmark tiles, inventory, compression tooling                            | No brotli files; runtime uses float32                                                                            |
-| C3      | All eight presets integrated; currents, trench creaks, carbonate material support | Shimmer/brine are visual approximations; source limits documented                                                |
-| C4      | All 13 landmark missions, guides, props and species files exist                   | Every objective now also carries a D-CONTENT hint                                                                |
-| C5      | Settings, bindings, captions, palettes, reduced motion wired                      | Settings/bindings storage is now v2 (D-MODES/D-INPUT+HUD); still no gamepad rebinding or separate LOD slider     |
-| C6      | CI and deployment workflows, filtered build and project-base URLs                 | Site unpublished; workflows not yet verified on GitHub — see "What's left for the owner"                         |
-
-## Verification
-
-Reviewed baseline at the Phase C close-out: build, 375 unit tests, 107 Python
-tests, 42 browser tests (+1 opt-in project-base skip), attribution all pass.
-Each Phase D package added its own unit/e2e coverage and Playwright
-screenshots (`.cache/codex/shots/<package-name>/`) reviewed before commit,
-per `plan/PHASE-D-CONTRACTS.md` §6. Re-run before the next round of work:
-
-```bash
-npm run check:content
-npm run ci
-```
-
-During concurrent work, use isolated build/output directories and ports per
-`CONTRIBUTING-AGENTS.md`. `npm run test:e2e:base` separately builds and
-verifies `/submarine-explorer/` hosting; the ordinary browser run skips that
-test.
-
-## Next session
-
-1. Read this status and `plan/PHASE-D-PLAN.md`/`plan/PHASE-D-CONTRACTS.md`;
-   inspect git status and log. Preserve existing work; only repeat checks
-   when changes justify it.
-2. Run playtest #3 (checklist above) and record findings.
-3. Address any findings; keep packages small and reviewed the same way as
-   Phase D.
-4. Once the owner is satisfied, get explicit confirmation, then create the
-   GitHub repository and enable GitHub Pages (`plan/PHASE-D-PLAN.md` §3,
-   step 10; `docs/deploy.md`).
-
-Known nonblocking limits: existing large-JS-chunk warning, duplicate emitted
-Draco decoder assets, software-rendering versus real GPU performance, no
-independent gamepad bindings, no true refraction/reflections, and bathymetry
-resolution/time limitations documented in the site guides and tile inventory.
+Known carried limits: target-device 1080p/60 fps remains unmeasured, gamepad bindings are fixed, and the existing large-JS-chunk and duplicate Draco build warnings are nonblocking. Source and bathymetry limits are documented in the site guides and tile inventory.
