@@ -1564,7 +1564,7 @@ body:has(.mission-debrief:not([hidden])) .hud-warning {
   column-gap: 20px;
 }
 .settings-section:has([data-gameplay]) .settings-heading,
-.settings-section:has([data-gameplay]) .settings-row:has([data-setting='gameplayMode']) {
+.settings-section:has([data-gameplay]) .settings-mode-row {
   grid-column: 1 / -1;
 }
 .settings-section:has([data-gameplay]) .settings-row {
@@ -1580,14 +1580,6 @@ body:has(.mission-debrief:not([hidden])) .hud-warning {
   .settings-section:has([data-gameplay]) {
     grid-template-columns: 1fr;
   }
-}
-.settings input[data-setting='uiScale'] {
-  width: 6ch;
-  font: inherit;
-  color: var(--b1-text);
-  background: rgba(10, 30, 36, 0.9);
-  border: 1px solid var(--b1-hair);
-  padding: 3px 10px;
 }
 
 /* --- D-INPUT-HUD begin --- */
@@ -1823,8 +1815,8 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
     background 0.15s,
     border-color 0.15s;
 }
-.home-menu button:first-child,
-.home-menu button:nth-child(2) {
+.home-menu button:first-of-type,
+.home-menu button:nth-of-type(2) {
   grid-column: span 2;
   font-size: 19px;
 }
@@ -3281,3 +3273,296 @@ body.photo-active > :not(#viewport, .photo-mode) {
   color: #ffc2bb;
 }
 /* --- D-PHOTO end --- */
+
+/* --- D2-PREDIVE --- */
+/* Game mode segmented control: home screen, briefing Dive settings, Settings. */
+.mode-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.mode-selector-label {
+  color: #76e5d4;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.mode-segments {
+  display: flex;
+  align-self: flex-start;
+  max-width: 100%;
+  border: 1px solid rgba(129, 222, 224, 0.55);
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(4, 27, 39, 0.86);
+}
+.mode-seg {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 7px 16px;
+  color: #cfe6ea;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.mode-seg + .mode-seg {
+  border-left: 1px solid rgba(129, 222, 224, 0.35);
+}
+.mode-seg input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.mode-seg:hover {
+  background: #124056;
+}
+.mode-seg:has(input:checked) {
+  background: #1d6b74;
+  color: #ffffff;
+  box-shadow: inset 0 -3px 0 #8affeb;
+}
+.mode-seg:has(input:focus-visible) {
+  outline: 3px solid #8affeb;
+  outline-offset: -3px;
+}
+.mode-desc {
+  margin: 0;
+  color: #c3d5da;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Home: full width above the menu buttons; the description keeps two lines
+   so the buttons below never jump when the mode changes. */
+.mode-selector.is-home {
+  grid-column: 1 / -1;
+  margin-bottom: 6px;
+}
+.mode-selector.is-home .mode-segments {
+  align-self: stretch;
+}
+.mode-selector.is-home .mode-seg {
+  min-height: 44px;
+  font-size: 16px;
+}
+.mode-selector.is-home .mode-desc {
+  min-height: 2.8em;
+}
+/* Short windows (1280x720): tighten the title and menu so the mode fits
+   between the tagline and the buttons. */
+@media (max-height: 860px) and (min-width: 761px) {
+  .home-copy {
+    top: clamp(24px, 5vh, 60px);
+  }
+  .home-copy h1 {
+    margin: 10px 0;
+    font-size: clamp(36px, 4.2vw, 60px);
+  }
+  .home-tagline {
+    margin: 0;
+  }
+  .home-menu {
+    bottom: clamp(24px, 6vh, 60px);
+    gap: 8px;
+  }
+  .home-menu button {
+    min-height: 46px;
+    padding: 9px 16px;
+  }
+}
+
+/* Settings: Gameplay starts with the mode, full width. */
+.mode-selector.is-settings {
+  flex: 1 1 100%;
+}
+.mode-selector.is-settings .mode-seg {
+  min-width: 7.5em;
+}
+.mode-selector.is-settings .mode-desc {
+  font-size: inherit;
+}
+.settings-section:has([data-gameplay]) {
+  align-items: start;
+}
+
+/* Briefing: Dive settings and Begin share the sticky footer. */
+.briefing-actions {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding-bottom: 2px;
+  /* Opaque, so the scrolled facts never show through the settings. */
+  background: rgb(6, 14, 18);
+}
+.briefing-dive .briefing-section-title {
+  margin-bottom: 8px;
+}
+.briefing-dive-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px 32px;
+}
+.mode-selector.is-briefing {
+  flex: 1 1 360px;
+  gap: 5px;
+}
+.mode-selector.is-briefing .mode-selector-label,
+.briefing-start-label {
+  color: var(--b3-cyan);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.mode-selector.is-briefing .mode-segments {
+  border-color: var(--b3-hair);
+  background: transparent;
+}
+.mode-selector.is-briefing .mode-seg {
+  min-width: 8.5em;
+  padding: 6px 14px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+.mode-selector.is-briefing .mode-desc {
+  color: var(--b3-text);
+  font-size: 12px;
+  opacity: 0.8;
+}
+.briefing-start {
+  flex: 0 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  margin-left: 0;
+}
+.briefing-start-option {
+  padding: 3px 0;
+}
+.briefing-more {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px 20px;
+  padding: 10px 12px;
+  border: 1px solid var(--b3-hair-dim);
+  border-radius: 2px;
+  font-size: 13px;
+}
+@media (max-width: 760px) {
+  .briefing-more {
+    grid-template-columns: 1fr;
+  }
+}
+.briefing-more[hidden] {
+  display: none;
+}
+.briefing-more-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.briefing-more-field.is-select {
+  gap: 10px;
+}
+.briefing-more-field input {
+  accent-color: #57d3dd;
+  margin: 0;
+}
+.briefing-more-field select,
+.briefing-more-toggle {
+  font: inherit;
+  color: var(--b3-text);
+  background: rgba(10, 30, 36, 0.9);
+  border: 1px solid var(--b3-hair);
+  border-radius: 2px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.briefing-more-toggle {
+  padding: 7px 12px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.briefing-more-toggle::after {
+  content: ' ▾';
+}
+.briefing-more-toggle[aria-expanded='true']::after {
+  content: ' ▴';
+}
+.briefing-more-toggle[hidden] {
+  display: none;
+}
+.briefing-more-toggle:hover,
+.briefing-more-field select:hover {
+  border-color: var(--b3-cyan);
+}
+.briefing-more-toggle:focus-visible,
+.briefing-more-field select:focus-visible,
+.briefing-more-field input:focus-visible,
+.briefing-start-option input:focus-visible {
+  outline: 2px solid var(--b3-cyan);
+  outline-offset: 2px;
+}
+.briefing-go {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.briefing-go .briefing-hint {
+  margin-left: auto;
+}
+.briefing-go .briefing-begin {
+  padding: 10px 34px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #031418;
+  background: var(--b3-cyan);
+}
+.briefing-go .briefing-begin:hover,
+.briefing-go .briefing-begin:focus-visible {
+  background: #7af0f0;
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Settings: UI scale as − / slider / + and a separate readout that is wide
+   enough for "150%" at every UI scale, so nothing overlaps the value. */
+.settings-scale {
+  display: flex;
+  flex: 1 1 260px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.settings-scale input[type='range'] {
+  flex: 1 1 120px;
+  min-width: 80px;
+  accent-color: #57d3dd;
+}
+.settings-scale-step {
+  flex: none;
+  min-width: 2.2em;
+  font-weight: 700;
+  text-align: center;
+}
+.settings-scale-value {
+  flex: none;
+  display: inline-block;
+  min-width: 5ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

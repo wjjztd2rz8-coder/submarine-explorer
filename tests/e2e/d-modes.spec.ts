@@ -29,9 +29,9 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
   await page.keyboard.press('Escape');
   await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
   const dialog = page.getByRole('dialog', { name: 'Settings' });
-  await expect(dialog.getByLabel('Mode', { exact: true })).toHaveValue('arcade');
+  await expect(dialog.getByRole('radio', { name: 'Arcade' })).toBeChecked();
   await dialog.screenshot({ path: `${shots}/arcade-settings.png` });
-  await dialog.getByLabel('Mode', { exact: true }).selectOption('realistic');
+  await dialog.getByRole('radio', { name: 'Realistic' }).check();
   await expect(dialog.getByLabel('Forward speed')).toHaveValue('research');
   await expect(dialog.getByLabel('Lights', { exact: true })).toHaveValue('realistic');
   await dialog.screenshot({ path: `${shots}/realistic-settings.png` });
@@ -60,7 +60,7 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
     scanRadius: 200,
   });
   await dialog.getByLabel('Lights', { exact: true }).selectOption('enhanced');
-  await expect(dialog.getByLabel('Mode', { exact: true })).toHaveValue('custom');
+  await expect(dialog.getByRole('radio', { name: 'Custom' })).toBeChecked();
   await expect(dialog.getByLabel('Forward speed')).toHaveValue('research');
   await page.keyboard.press('Escape');
   await page.keyboard.press('Escape'); // resume from the pause menu
@@ -69,7 +69,7 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
   await page.waitForFunction(() => window.__gameReady === true);
   await page.keyboard.press('Escape');
   await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
-  await expect(dialog.getByLabel('Mode', { exact: true })).toHaveValue('custom');
+  await expect(dialog.getByRole('radio', { name: 'Custom' })).toBeChecked();
   await expect(dialog.getByLabel('Lights', { exact: true })).toHaveValue('enhanced');
   await expect(dialog.getByLabel('Forward speed')).toHaveValue('research');
 });

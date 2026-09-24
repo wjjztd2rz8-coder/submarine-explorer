@@ -15,9 +15,9 @@ test('Arcade hides supplies; Custom enables them; depletion ascends and debriefs
   await page.keyboard.press('Escape');
   await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
   const dialog = page.getByRole('dialog', { name: 'Settings' });
-  await expect(dialog.getByLabel('Mode', { exact: true })).toHaveValue('arcade');
+  await expect(dialog.getByRole('radio', { name: 'Arcade' })).toBeChecked();
   await dialog.getByLabel('Battery and oxygen').selectOption('true');
-  await expect(dialog.getByLabel('Mode', { exact: true })).toHaveValue('custom');
+  await expect(dialog.getByRole('radio', { name: 'Custom' })).toBeChecked();
   await dialog.screenshot({ path: `${shots}/settings-custom-battery.png` });
   await page.keyboard.press('Escape');
   await page.keyboard.press('Escape');

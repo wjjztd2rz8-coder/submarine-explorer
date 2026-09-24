@@ -38,7 +38,7 @@ test('off, gentle and realistic scale the same offline canyon field', async ({ p
   await openSettings(page);
   const dialog = page.getByRole('dialog', { name: 'Settings' });
   await expect(dialog.getByLabel('Currents')).toHaveValue('off');
-  await dialog.getByLabel('Mode', { exact: true }).selectOption('realistic');
+  await dialog.getByRole('radio', { name: 'Realistic' }).check();
   await expect(dialog.getByLabel('Currents')).toHaveValue('realistic');
   await dialog.screenshot({ path: `${shots}/settings-currents.png` });
   await closeSettings(page);
@@ -50,7 +50,7 @@ test('off, gentle and realistic scale the same offline canyon field', async ({ p
 
   await openSettings(page);
   await dialog.getByLabel('Currents').selectOption('gentle');
-  await expect(dialog.getByLabel('Mode', { exact: true })).toHaveValue('custom');
+  await expect(dialog.getByRole('radio', { name: 'Custom' })).toBeChecked();
   await expect.poll(async () => (await speed(page)) / full).toBeCloseTo(0.35, 1);
   const gentle = await speed(page);
   expect(gentle).toBeGreaterThan(0);

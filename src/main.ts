@@ -487,21 +487,26 @@ async function main(): Promise<void> {
     collapsed: route !== null,
   });
   // --- D-SHELL begin ---
-  const home = new Home({
-    continueDive: () => {
-      if (lastSite) {
-        const m = missionSummaries.find((entry) => entry.id === lastSite);
-        bus.emit('app:siteSelected', { missionId: lastSite, tileId: m?.tile ?? lastSite });
-        window.location.href = missionUrl(shellBaseHref(), lastSite);
-      }
+  const home = new Home(
+    {
+      continueDive: () => {
+        if (lastSite) {
+          const m = missionSummaries.find((entry) => entry.id === lastSite);
+          bus.emit('app:siteSelected', { missionId: lastSite, tileId: m?.tile ?? lastSite });
+          window.location.href = missionUrl(shellBaseHref(), lastSite);
+        }
+      },
+      journal: () => discovery.guide.open(),
+      settings: () => settingsScreen.open(),
+      controls: () => {
+        settingsScreen.open();
+        settingsScreen.showControls(true);
+      },
     },
-    journal: () => discovery.guide.open(),
-    settings: () => settingsScreen.open(),
-    controls: () => {
-      settingsScreen.open();
-      settingsScreen.showControls(true);
-    },
-  });
+    // D2-PREDIVE: the game mode selector on the home screen.
+    document.body,
+    save,
+  );
   home.setContinue(lastSite);
   const completion = (id: string, pois: string[]): string =>
     `${pois.filter((poi) => discovery.store.isDiscovered(id, poi)).length}/${pois.length} logged`;
@@ -796,6 +801,17 @@ async function main(): Promise<void> {
   // --- B3 begin ---
   // Briefing (freezes the game until "Begin dive" / Enter), objectives panel,
   // completion -> debrief. `?skipBriefing=1` starts immediately.
+  // --- D-START begin ---
+  // D2-PREDIVE: also used to preview the start behind the briefing, so Begin
+  // resolves the same pose and the dive starts without a teleport.
+  const applyMissionStart = (choice: MissionStartPosition): void => {
+    if (!route || params.has('poi') || params.has('at') || params.has('depth')) return;
+    const pose = missionStartPose(route.def, choice, discovery.pois, meta, terrain, config);
+    sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+    rig.snap(sub.position, sub.yaw, sub.pitch);
+    headlights.setEnabled(true);
+  };
+  // --- D-START end ---
   const missionRouter = route
     ? new MissionRouter({
         route,
@@ -805,13 +821,7 @@ async function main(): Promise<void> {
         discovery,
         // --- D-START begin ---
         defaultStartPosition: settings.gameplay.startPosition,
-        applyStart: (choice: MissionStartPosition) => {
-          if (params.has('poi') || params.has('at') || params.has('depth')) return;
-          const pose = missionStartPose(route.def, choice, discovery.pois, meta, terrain, config);
-          sub.reset(pose.x, pose.y, pose.z, pose.yaw);
-          rig.snap(sub.position, sub.yaw, sub.pitch);
-          headlights.setEnabled(true);
-        },
+        applyStart: applyMissionStart,
         // --- D-START end ---
         // --- D-FLOW begin ---
         // Debrief "Dive sites" / "Home" go to the shell without launching a dive.
@@ -883,6 +893,25 @@ async function main(): Promise<void> {
     briefingControls.replaceChildren(controlsButton);
   }
   // --- D-INPUT-HUD end ---
+  // --- D2-PREDIVE begin ---
+  // The briefing's Dive settings edit the saved gameplay settings; while the
+  // card is up the sub already sits where the dive will start (near site or
+  // surface) and moves when the start choice changes.
+  const briefing = missionRouter?.briefing ?? null;
+  if (briefing) {
+    const previewStart = (choice: MissionStartPosition): void => {
+      void discovery.ready.then(() => {
+        if (briefing.isOpen && briefing.startChoice === choice) applyMissionStart(choice);
+      });
+    };
+    briefing.attachDiveSettings({
+      settings: save,
+      choices: config.settings.gameplayOptions,
+      onStartChange: previewStart,
+    });
+    previewStart(briefing.startChoice);
+  }
+  // --- D2-PREDIVE end ---
 
   // Audio: WebAudio can only start from inside a user-gesture handler, so we
   // wait for the first keydown/pointerdown rather than starting at load.
