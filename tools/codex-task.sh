@@ -24,7 +24,7 @@ brief="$(realpath "$brief")"
 if [[ "${WT:-0}" == 1 ]]; then
   wt="$(realpath ..)/subexp-wt/$name"
   if [[ ! -d "$wt" ]]; then
-    git worktree add -q -b "codex/$name" "$wt" HEAD || exit 1
+    git worktree add -q -b "${WT_BRANCH:-codex/$name}" "$wt" HEAD || exit 1
     ln -s "$PWD/node_modules" "$wt/node_modules"
   fi
   mkdir -p "$wt/.cache/codex"; ln -sfn "$dir/shots" "$wt/.cache/codex/shots"
