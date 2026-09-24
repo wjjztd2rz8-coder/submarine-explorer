@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "site": "bismarck",
+  "tile": "bismarck",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 3000
+  },
+  "bounds": {
+    "x_min": -16727.218,
+    "x_max": 16727.218,
+    "z_min": -16663.348,
+    "z_max": 16663.348
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [
+      [0.082, 0.053],
+      [0.09, 0.057],
+      [0.059, 0.042]
+    ],
+    [
+      [0.07, 0.058],
+      [0.015, 0.025],
+      [-0.004, 0.019]
+    ],
+    [
+      [0.014, 0.071],
+      [0.076, 0.047],
+      [0.132, 0.075]
+    ]
+  ]
+}

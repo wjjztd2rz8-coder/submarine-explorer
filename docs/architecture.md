@@ -24,7 +24,10 @@ enters an environment after props/POIs load. Its per-frame update follows
 `Atmosphere.update`, before fog, headlights, snow and post-processing consume
 the sample. Current coupling receives zero simulated time while the briefing
 or globe freezes the game. `window.__game.presets` exposes selection, entry
-state, current and debug statistics. See [presets.md](./presets.md).
+state, current and debug statistics. `world/Currents.ts` loads the offline
+HYCOM grid for each tile; `window.__game.currents` exposes its load status.
+The gameplay current setting scales or disables both that field and preset
+force. See [presets.md](./presets.md) and [currents.md](./currents.md).
 
 Public data and asset defaults resolve through `util/publicUrl.ts` using
 Vite's deployment base. Explicit loader roots retain their caller-provided

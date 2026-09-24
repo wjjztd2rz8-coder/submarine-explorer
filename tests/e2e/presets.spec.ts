@@ -9,6 +9,24 @@ async function waitForPreset(page: Page): Promise<void> {
   );
 }
 
+async function enableCurrents(page: Page): Promise<void> {
+  await page.keyboard.press('Escape');
+  await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
+  await page
+    .getByRole('dialog', { name: 'Settings' })
+    .getByLabel('Currents')
+    .selectOption('realistic');
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => {
+    const g = window.__game as {
+      currents: { status: string };
+      presets: { current: { length(): number } };
+    };
+    return g.currents.status === 'ready' && g.presets.current.length() > 0;
+  });
+}
+
 for (const { name, url, draws, source } of [
   {
     name: 'vent',
@@ -89,6 +107,7 @@ test('low tier keeps canyon physics without preset geometry', async ({ page }) =
     waitUntil: 'domcontentloaded',
   });
   await waitForPreset(page);
+  await enableCurrents(page);
   const state = await page.evaluate(() => {
     const p = window.__game!.presets as {
       active: string;
@@ -109,6 +128,7 @@ test('low tier keeps canyon physics without preset geometry', async ({ page }) =
 test('a frozen frame does not apply canyon current to sub velocity', async ({ page }) => {
   await page.goto('/?tile=monterey-canyon&preset=canyon', { waitUntil: 'domcontentloaded' });
   await waitForPreset(page);
+  await enableCurrents(page);
   const result = await page.evaluate(() => {
     const g = window.__game!;
     const p = g.presets as {

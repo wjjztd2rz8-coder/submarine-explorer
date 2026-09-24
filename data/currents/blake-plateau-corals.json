@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "site": "blake-plateau-corals",
+  "tile": "blake-plateau-corals",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 500
+  },
+  "bounds": {
+    "x_min": -31827.273,
+    "x_max": 31827.273,
+    "z_min": -36720.516,
+    "z_max": 36720.516
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [
+      [0.064, 0.13],
+      [0.199, 0.591],
+      [0.028, 0.163]
+    ],
+    [
+      [0.02, 0.312],
+      [-0.081, 0.503],
+      [-0.113, -0.072]
+    ],
+    [
+      [-0.044, 0.2],
+      [-0.173, 0.407],
+      [-0.127, 0.001]
+    ]
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "site": "endurance",
+  "tile": "endurance",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 2000
+  },
+  "bounds": {
+    "x_min": -13332.239,
+    "x_max": 13332.239,
+    "z_min": -16663.348,
+    "z_max": 16663.348
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [
+      [-0.052, -0.017],
+      [-0.029, -0.001],
+      [-0.021, 0.014]
+    ],
+    [
+      [-0.023, -0.011],
+      [-0.013, 0.018],
+      [-0.007, 0.009]
+    ],
+    [
+      [0.017, 0.038],
+      [0.037, 0.018],
+      [0.015, 0.028]
+    ]
+  ]
+}

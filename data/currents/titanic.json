@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "site": "titanic",
+  "tile": "titanic",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 3000
+  },
+  "bounds": {
+    "x_min": -12504.178,
+    "x_max": 12504.178,
+    "z_min": -16693.923,
+    "z_max": 16693.923
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [
+      [0.097, 0.009],
+      [0.035, 0.01],
+      [0.004, -0.002]
+    ],
+    [
+      [-0.042, -0.021],
+      [-0.018, 0.003],
+      [0.049, 0.1]
+    ],
+    [
+      [0.007, 0.07],
+      [0.057, 0.151],
+      [0.099, 0.141]
+    ]
+  ]
+}

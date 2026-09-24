@@ -7,6 +7,8 @@
 import type { TileMeta } from '../util/types.js';
 import type { SubmarineState } from '../sub/Submarine.js';
 import type { PowerState } from '../game/Power.js';
+import type { GameplayOptions } from '../core/Config.js';
+import type { CurrentStatus } from '../world/Currents.js';
 
 const FIELDS = ['depth', 'heading', 'speed', 'status', 'tile'] as const;
 type Field = (typeof FIELDS)[number];
@@ -101,6 +103,10 @@ export class HUD {
   private readonly speedEl: HTMLDivElement;
   private readonly tipsEl: HTMLDivElement;
   private readonly powerEl: HTMLDivElement;
+  private readonly currentEl: HTMLDivElement;
+  private currentMode: GameplayOptions['currents'] = 'off';
+  private currentStatus: CurrentStatus = 'loading';
+  private current = { dirDeg: 0, speedMps: 0 };
   private powerState: PowerState | undefined;
   private hullNote = '';
 
@@ -108,6 +114,7 @@ export class HUD {
     private readonly meta: TileMeta,
     parent: HTMLElement = document.body,
     private readonly warn: HudWarnConfig = DEFAULT_WARN,
+    private readonly currentMinMps = 0.01,
   ) {
     this.root = document.createElement('div');
     this.root.className = 'hud';
@@ -122,6 +129,7 @@ export class HUD {
           <div class="hud-power-line" data-supply="battery"><span>BATTERY</span><meter min="0" max="1" value="1"></meter><strong>100%</strong></div>
           <div class="hud-power-line" data-supply="oxygen"><span>OXYGEN</span><meter min="0" max="1" value="1"></meter><strong>100%</strong></div>
         </div>
+        <div class="hud-current" hidden aria-label="Current direction and speed"><span class="hud-current-arrow">↑</span><span class="hud-current-text"></span></div>
         <div class="hud-sim-speed" hidden></div>
       </div>
       <div class="hud-warning" hidden></div>
@@ -139,6 +147,7 @@ export class HUD {
     this.speedEl = this.root.querySelector('.hud-sim-speed') as HTMLDivElement;
     this.tipsEl = this.root.querySelector('.hud-control-tips') as HTMLDivElement;
     this.powerEl = this.root.querySelector('.hud-power') as HTMLDivElement;
+    this.currentEl = this.root.querySelector('.hud-current') as HTMLDivElement;
     const attr = this.root.querySelector('.hud-attribution') as HTMLDivElement;
     attr.textContent = meta.attribution;
 
@@ -159,6 +168,45 @@ export class HUD {
 
   setPowerState(state: PowerState): void {
     this.powerState = state;
+  }
+
+  /** `env:current` is the single source of the indicator's direction/speed. */
+  setCurrent(current: { dirDeg: number; speedMps: number }): void {
+    this.current = current;
+    this.updateCurrent();
+  }
+
+  setCurrentMode(mode: GameplayOptions['currents']): void {
+    this.currentMode = mode;
+    this.updateCurrent();
+  }
+
+  setCurrentStatus(status: CurrentStatus): void {
+    if (this.currentStatus === status) return;
+    this.currentStatus = status;
+    this.updateCurrent();
+  }
+
+  private updateCurrent(): void {
+    const missing = this.currentMode !== 'off' && this.currentStatus === 'missing';
+    const speed = this.current.speedMps;
+    const show =
+      missing ||
+      (this.currentMode !== 'off' &&
+        this.currentStatus === 'ready' &&
+        Number.isFinite(speed) &&
+        speed >= this.currentMinMps);
+    this.currentEl.hidden = !show;
+    if (!show) return;
+    const arrow = this.currentEl.querySelector<HTMLElement>('.hud-current-arrow')!;
+    const label = this.currentEl.querySelector<HTMLElement>('.hud-current-text')!;
+    arrow.hidden = missing;
+    if (missing) {
+      label.textContent = 'CURRENT · offline data unavailable';
+    } else {
+      arrow.style.transform = `rotate(${Number.isFinite(this.current.dirDeg) ? this.current.dirDeg : 0}deg)`;
+      label.textContent = `CURRENT · ${speed.toFixed(2)} m/s · ${Math.round(this.current.dirDeg)}°`;
+    }
   }
 
   private set(field: Field, text: string): void {

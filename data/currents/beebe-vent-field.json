@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "site": "beebe-vent-field",
+  "tile": "beebe-vent-field",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 3000
+  },
+  "bounds": {
+    "x_min": -16783.539,
+    "x_max": 16783.539,
+    "z_min": -16693.923,
+    "z_max": 16693.923
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [
+      [0.007, 0.02],
+      [0.003, 0.016],
+      [-0.001, -0.009]
+    ],
+    [
+      [-0.006, 0.022],
+      [-0.019, 0.013],
+      [-0.026, -0.006]
+    ],
+    [
+      [-0.018, 0.009],
+      [-0.031, -0.002],
+      [-0.037, -0.007]
+    ]
+  ]
+}

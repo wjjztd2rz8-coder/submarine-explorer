@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "site": "great-blue-hole",
+  "tile": "great-blue-hole",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 50
+  },
+  "bounds": {
+    "x_min": -16754.688,
+    "x_max": 16754.688,
+    "z_min": -16724.498,
+    "z_max": 16724.498
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [
+      [0.011, -0.027],
+      [-0.027, -0.027],
+      [-0.076, -0.064]
+    ],
+    [
+      [-0.002, -0.016],
+      [-0.035, -0.054],
+      [-0.071, -0.105]
+    ],
+    [
+      [-0.045, -0.019],
+      [-0.059, -0.072],
+      [-0.076, -0.116]
+    ]
+  ]
+}

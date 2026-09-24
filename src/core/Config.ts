@@ -821,6 +821,18 @@ export interface PresetsConfig {
   seamount: SeamountPresetConfig;
 }
 
+/** D-CURRENTS: controls for the attributed offline water field. */
+export interface CurrentsConfig {
+  /** Fraction of the full field used by the Gentle setting. */
+  gentleScale: number;
+  /** The HUD hides flows below this speed (m/s). */
+  hudMinMps: number;
+  /** Predictive interval for guarding current impulses against terrain. */
+  terrainLookaheadS: number;
+  /** Reserve this much clearance above the hull's physics floor. */
+  terrainGuardM: number;
+}
+
 /** C1: globe mission select overlay (docs/globe.md). Distances in globe radii. */
 export interface GlobeConfig {
   /** Equirectangular Earth texture (public/assets/globe, ATTRIBUTION.md). */
@@ -1011,6 +1023,7 @@ export interface GameConfig {
   lightPresets: Record<GameplayOptions['lights'], LightPreset>;
   sensorPresets: Record<GameplayOptions['sensors'], SensorPreset>;
   power: PowerConfig;
+  currents: CurrentsConfig;
   /** C5: sonar minimap palettes (`Sonar.setPalette`). */
   sonarPalettes: Record<SonarPaletteName, SonarPalette>;
   sonarZoom: SonarZoomConfig;
@@ -1547,6 +1560,13 @@ export const DEFAULT_CONFIG: GameConfig = {
     lowThreshold: 0.25,
     criticalThreshold: 0.1,
   },
+  // --- D-CURRENTS: the full field is the archived HYCOM sample. ---
+  currents: {
+    gentleScale: 0.35,
+    hudMinMps: 0.01,
+    terrainLookaheadS: 0.5,
+    terrainGuardM: 1,
+  },
   // --- D-SONAR: survey relief and map spans ---
   sonarZoom: {
     levels: [250, 500, 1000, 2000, 'tile'],
@@ -1644,7 +1664,7 @@ export const DEFAULT_CONFIG: GameConfig = {
     maxCurrentMps: 0.8,
     currentCouplingPerS: 0.5,
     currentEventDirDeg: 10,
-    currentEventSpeedMps: 0.05,
+    currentEventSpeedMps: 0.005,
     currentEventMinIntervalS: 1,
     lowTierCurrents: true,
     tierParticleScale: { low: 0, medium: 0.5, high: 1 },
@@ -1802,6 +1822,7 @@ export function makeConfig(overrides: Partial<GameConfig> = {}): GameConfig {
     lightPresets: { ...DEFAULT_CONFIG.lightPresets, ...overrides.lightPresets },
     sensorPresets: { ...DEFAULT_CONFIG.sensorPresets, ...overrides.sensorPresets },
     power: { ...DEFAULT_CONFIG.power, ...overrides.power },
+    currents: { ...DEFAULT_CONFIG.currents, ...overrides.currents },
     sonarPalettes: { ...DEFAULT_CONFIG.sonarPalettes, ...overrides.sonarPalettes },
     sonarZoom: { ...DEFAULT_CONFIG.sonarZoom, ...overrides.sonarZoom },
     globe: { ...DEFAULT_CONFIG.globe, ...overrides.globe },

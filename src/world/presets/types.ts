@@ -76,9 +76,13 @@ export interface PresetFrameContext {
   /** Drawing-buffer height in px, for point-size attenuation. */
   viewportH: number;
   headlightsOn: boolean;
+  /** Offline site flow before preset modulation (world m/s). */
+  baseCurrent: THREE.Vector3;
+  /** C3 canyon speed setting before mission overrides; sets its scale reference. */
+  canyonReferenceSpeedMps: number;
   /**
    * Write the water velocity at the sub here (m/s, world frame). The system
-   * sums, caps to `Config.presets.maxCurrentMps` and couples it to the sub.
+   * caps to `Config.presets.maxCurrentMps` and couples it to the sub.
    */
   current: THREE.Vector3;
   /** Multiplier on the caustic projector's intensity this frame (default 1). */

@@ -32,6 +32,9 @@ import { Landmarks } from './world/Landmarks.js';
 import { Terrain } from './world/Terrain.js';
 import { TileLoader } from './world/TileLoader.js';
 import { Water } from './world/Water.js';
+// --- D-CURRENTS begin ---
+import { Currents } from './world/Currents.js';
+// --- D-CURRENTS end ---
 // --- D-POWER begin ---
 import { Power } from './game/Power.js';
 // --- D-POWER end ---
@@ -317,14 +320,23 @@ async function main(): Promise<void> {
 
   // ---------------------------------------------------------------------- UI
   // --- fix S begin ---
-  const hud = new HUD(meta, document.body, {
-    hullRadius: config.submarine.hullRadius,
-    seabedWarnAltitudeM: config.submarine.seabedWarnAltitudeM,
-    seabedWarnTimeToContactS: config.submarine.seabedWarnTimeToContactS,
-    seabedApproachAltitudeM: config.submarine.seabedApproachAltitudeM,
-    contactAltitudeM: config.submarine.hullRadius + config.submarine.seabedClearance,
-  });
+  const hud = new HUD(
+    meta,
+    document.body,
+    {
+      hullRadius: config.submarine.hullRadius,
+      seabedWarnAltitudeM: config.submarine.seabedWarnAltitudeM,
+      seabedWarnTimeToContactS: config.submarine.seabedWarnTimeToContactS,
+      seabedApproachAltitudeM: config.submarine.seabedApproachAltitudeM,
+      contactAltitudeM: config.submarine.hullRadius + config.submarine.seabedClearance,
+    },
+    config.currents.hudMinMps,
+  );
   if (freeDiveHull && !freeDiveHull.cleared) hud.setHullNote('at rating limit');
+  // --- D-CURRENTS begin ---
+  hud.setCurrentMode(settings.gameplay.currents);
+  bus.on('env:current', (current) => hud.setCurrent(current));
+  // --- D-CURRENTS end ---
   // --- fix S end ---
   // --- D-SONAR begin ---
   const sonar = new Sonar(terrain, landmarks.placed, {
@@ -431,6 +443,9 @@ async function main(): Promise<void> {
   }
   const propContact = new PropContact(props, bus, config.props, config.submarine.hullRadius);
   // --- B4 end ---
+  // --- D-CURRENTS begin ---
+  const currents = new Currents(meta.id, meta.id, fetchContentJson);
+  // --- D-CURRENTS end ---
   // --- C3 begin ---
   const presets = new PresetSystem({
     scene,
@@ -443,6 +458,10 @@ async function main(): Promise<void> {
     missionId: route?.missionId ?? null,
     terrain,
     sub,
+    // --- D-CURRENTS begin ---
+    currents,
+    currentMode: settings.gameplay.currents,
+    // --- D-CURRENTS end ---
     props,
     discovery,
     atmosphere,
@@ -937,6 +956,13 @@ async function main(): Promise<void> {
     if (changed.includes('gameplay')) power.setEnabled(next.gameplay.batteryOxygen);
   });
   // --- D-POWER end ---
+  // --- D-CURRENTS begin ---
+  save.onChange((next, changed) => {
+    if (!changed.includes('gameplay')) return;
+    hud.setCurrentMode(next.gameplay.currents);
+    presets.setCurrentMode(next.gameplay.currents);
+  });
+  // --- D-CURRENTS end ---
   // --- C5 end ---
   const unlockAudio = (): void => audio.unlock();
   window.addEventListener('pointerdown', unlockAudio, { once: true });
@@ -1144,6 +1170,9 @@ async function main(): Promise<void> {
     const powerState = power.state;
     hud.setPowerState(powerState);
     // --- D-POWER end ---
+    // --- D-CURRENTS begin ---
+    hud.setCurrentStatus(currents.status);
+    // --- D-CURRENTS end ---
     // --- D-INPUT-HUD begin ---
     const scanView = discovery.scanner.view;
     hud.update(s, {
@@ -1244,6 +1273,9 @@ async function main(): Promise<void> {
     // --- D-POWER begin ---
     power,
     // --- D-POWER end ---
+    // --- D-CURRENTS begin ---
+    currents,
+    // --- D-CURRENTS end ---
     meta,
     // --- B1 begin ---
     scanner: discovery.scanner,

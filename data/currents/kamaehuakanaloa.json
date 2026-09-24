@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "site": "kamaehuakanaloa",
+  "tile": "kamaehuakanaloa",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 1000
+  },
+  "bounds": {
+    "x_min": -16775.703,
+    "x_max": 16775.703,
+    "z_min": -16724.498,
+    "z_max": 16724.498
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [
+      [-0.004, -0.005],
+      [-0.024, -0.02],
+      [-0.041, -0.022]
+    ],
+    [
+      [-0.036, -0.043],
+      [-0.04, -0.03],
+      [-0.036, -0.017]
+    ],
+    [
+      [-0.057, -0.042],
+      [-0.046, -0.031],
+      [-0.037, 0.002]
+    ]
+  ]
+}

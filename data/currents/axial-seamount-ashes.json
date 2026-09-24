@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "site": "axial-seamount-ashes",
+  "tile": "axial-seamount-ashes",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 1000
+  },
+  "bounds": {
+    "x_min": -22321.199,
+    "x_max": 22321.199,
+    "z_min": -22227.99,
+    "z_max": 22227.99
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [
+      [0.017, -0.046],
+      [0.008, -0.006],
+      [0.001, 0.025]
+    ],
+    [
+      [0.039, -0.042],
+      [-0.002, 0.005],
+      [0.023, -0.002]
+    ],
+    [
+      [0.038, -0.013],
+      [0.029, -0.001],
+      [0.018, 0.005]
+    ]
+  ]
+}

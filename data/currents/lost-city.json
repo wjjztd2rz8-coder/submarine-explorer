@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "site": "lost-city",
+  "tile": "lost-city",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 700
+  },
+  "bounds": {
+    "x_min": -9706.365,
+    "x_max": 9706.365,
+    "z_min": -9478.235,
+    "z_max": 9478.235
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [
+      [-0.042, -0.013],
+      [-0.061, 0.013],
+      [-0.111, 0.063]
+    ],
+    [
+      [-0.01, -0.036],
+      [-0.032, 0.005],
+      [-0.084, 0.07]
+    ],
+    [
+      [-0.007, -0.052],
+      [-0.028, -0.008],
+      [-0.055, 0.075]
+    ]
+  ]
+}

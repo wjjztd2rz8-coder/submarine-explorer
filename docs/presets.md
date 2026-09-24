@@ -26,7 +26,9 @@ allocates no preset draw geometry or glow lights; current force and trench
 events still run. `medium` uses half the high-tier particle count. The global
 `maxParticles` cap applies to each preset.
 
-The current's bearing is the direction water flows **toward**: 0° north
+The base current is the attributed [offline HYCOM site grid](currents.md).
+The canyon bends and scales that base flow; it does not add a separate fixed
+current. The current's bearing is the direction water flows **toward**: 0° north
 (`-Z`), 90° east (`+X`). Its vector is capped at `maxCurrentMps`, then coupled
 toward the submarine's velocity at `currentCouplingPerS` over the fixed-step
 simulation time. Zero current leaves ordinary submarine velocity and drag

@@ -4,6 +4,10 @@ This project uses third-party assets under the following licenses.
 CC0 / Public Domain assets are listed for transparency but do not
 legally require attribution.
 
+## Ocean-current data
+
+- NRL HYCOM GOFS 3.1 GLBy0.08 experiment 93.0, eastward and northward water velocity at 2024-01-15 12:00 UTC, https://www.hycom.org/dataserver/gofs-3pt1/analysis (subset service: https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0). DoD Distribution A: approved for public release; distribution unlimited. Sampled into the 13 `data/currents/*.json` files on 2026-09-24 UTC. See [docs/currents.md](docs/currents.md) for depths, transformation and limitations.
+
 ## 3D Models
 
 - "Rock 09" by Poly Haven (polyhaven.com), https://polyhaven.com/a/rock_09 (1K glTF: https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/rock_09/rock_09_1k.gltf) — CC0 1.0 (licence verified on the asset page and https://polyhaven.com/license). Used as `public/assets/models/rock_09.glb`: packed to a single GLB, JPEGs re-encoded at q85, root node scaled so the rock is 1 m long.

@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "site": "hudson-canyon",
+  "tile": "hudson-canyon",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 100
+  },
+  "bounds": {
+    "x_min": -25823.482,
+    "x_max": 25823.482,
+    "z_min": -27823.206,
+    "z_max": 27823.206
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [null, [0.072, -0.011], [0.198, -0.063]],
+    [null, [0.048, -0.085], [0.066, 0.036]],
+    [
+      [0.027, 0.073],
+      [0.138, -0.027],
+      [-0.038, -0.076]
+    ]
+  ]
+}

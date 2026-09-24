@@ -18,6 +18,7 @@ import * as THREE from 'three';
 import type {
   EnvPresetName,
   GameConfig,
+  GameplayOptions,
   GraphicsTier,
   PresetParamValue,
 } from '../../core/Config.js';
@@ -25,6 +26,7 @@ import type { EventBus } from '../../core/EventBus.js';
 import { contentUrl } from '../../game/ContentPath.js';
 import type { AtmosphereSample } from '../../render/Atmosphere.js';
 import { publicUrl } from '../../util/publicUrl.js';
+import { Currents, guardCurrentDelta } from '../Currents.js';
 import { BrinePreset } from './BrinePreset.js';
 import { CanyonPreset } from './CanyonPreset.js';
 import { DefaultPreset } from './DefaultPreset.js';
@@ -263,7 +265,9 @@ export interface PresetSystemOptions {
   /** Mission folder for `mission.json` (null in free dive: the landmark folder is tried). */
   missionId: string | null;
   terrain: PresetTerrain;
-  sub: { position: THREE.Vector3; velocity: THREE.Vector3 };
+  sub: { position: THREE.Vector3; velocity: THREE.Vector3; floorFor(ground: number): number };
+  currents: Currents;
+  currentMode: GameplayOptions['currents'];
   props: PresetPropSource;
   discovery: PresetPoiSource;
   atmosphere: { ambient: THREE.AmbientLight; caustics: THREE.SpotLight | null };
@@ -312,9 +316,11 @@ export class PresetSystem {
   private readonly spawn: THREE.Vector3;
   private waited = 0;
   private lastCurrent = { dir: 0, speed: 0, at: -Infinity };
+  private currentMode: GameplayOptions['currents'];
 
   constructor(private readonly o: PresetSystemOptions) {
     const pc = o.config.presets;
+    this.currentMode = o.currentMode;
     this.visuals = o.tier !== 'low' && pc.tierParticleScale[o.tier] > 0;
     this.look = {
       ambient: pc.particleAmbient,
@@ -331,11 +337,24 @@ export class PresetSystem {
       elapsed: 0,
       viewportH: 1,
       headlightsOn: true,
+      baseCurrent: new THREE.Vector3(),
+      canyonReferenceSpeedMps: pc.canyon.currentSpeedMps,
       current: new THREE.Vector3(),
       causticsScale: 1,
       bus: o.bus,
     };
     this.ready = this.resolve();
+  }
+
+  setCurrentMode(mode: GameplayOptions['currents']): void {
+    if (mode === this.currentMode) return;
+    this.currentMode = mode;
+    this.lastCurrent.at = -Infinity;
+    if (mode === 'off') {
+      this.current.set(0, 0, 0);
+      this.lastCurrent.speed = 0;
+      this.emit('env:current', { dirDeg: 0, speedMps: 0 });
+    }
   }
 
   private async resolve(): Promise<void> {
@@ -416,17 +435,24 @@ export class PresetSystem {
     elapsed: number,
   ): void {
     this.tryEnter(frameDt);
-    if (!this.preset || !this.entered) return;
     const f = this.frame;
     f.camera = camera;
     f.atmo = atmo;
     f.elapsed = elapsed;
     f.viewportH = viewportH;
     f.headlightsOn = this.o.headlights.on;
-    f.current.set(0, 0, 0);
+    this.o.currents.sample(this.o.sub.position.x, this.o.sub.position.z, f.baseCurrent);
+    if (this.currentMode === 'off' || this.o.currents.status !== 'ready')
+      f.baseCurrent.set(0, 0, 0);
+    // Canyon replaces the regional vector with a slope-bent version. Other
+    // presets may add local effects such as a vent updraft to that base.
+    if (this.active === 'canyon' && this.entered) f.current.set(0, 0, 0);
+    else f.current.copy(f.baseCurrent);
     f.causticsScale = 1;
-    this.preset.update(frameDt, f);
-    if (this.visuals) this.syncAtmosphere(atmo, f.causticsScale);
+    if (this.preset && this.entered) {
+      this.preset.update(frameDt, f);
+      if (this.visuals) this.syncAtmosphere(atmo, f.causticsScale);
+    }
     this.applyCurrent(simDt, elapsed);
   }
 
@@ -446,10 +472,22 @@ export class PresetSystem {
   private applyCurrent(simDt: number, elapsed: number): void {
     const pc = this.o.config.presets;
     const c = this.current.copy(this.frame.current);
+    if (this.currentMode === 'off' || this.o.currents.status !== 'ready') c.set(0, 0, 0);
+    else if (this.currentMode === 'gentle') c.multiplyScalar(this.o.config.currents.gentleScale);
     if (!this.visuals && !pc.lowTierCurrents) c.set(0, 0, 0);
     capVector(c, pc.maxCurrentMps);
     if (simDt > 0) {
       currentCouplingDelta(this.o.sub.velocity, c, pc.currentCouplingPerS, simDt, this.delta);
+      const guard = this.o.config.currents;
+      guardCurrentDelta(
+        this.delta,
+        this.o.sub.position,
+        this.o.sub.velocity,
+        this.o.terrain,
+        (ground) => this.o.sub.floorFor(ground),
+        guard.terrainLookaheadS,
+        guard.terrainGuardM,
+      );
       this.o.sub.velocity.add(this.delta);
     }
     const speed = Math.hypot(c.x, c.z);

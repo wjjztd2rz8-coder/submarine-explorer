@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "site": "monterey-canyon",
+  "tile": "monterey-canyon",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 100
+  },
+  "bounds": {
+    "x_min": -20082.057,
+    "x_max": 20082.057,
+    "z_min": -19506.819,
+    "z_max": 19506.819
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [null, null, null],
+    [[0.017, -0.007], [0.017, 0.065], null],
+    [[0.065, -0.061], [0.026, 0.128], null]
+  ]
+}

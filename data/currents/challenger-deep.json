@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "site": "challenger-deep",
+  "tile": "challenger-deep",
+  "source": {
+    "name": "NRL HYCOM GOFS 3.1 GLBy0.08 expt_93.0",
+    "url": "https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0",
+    "sampled_at": "2024-01-15T12:00:00Z",
+    "fetched_at": "2026-09-24T04:34:00Z",
+    "license": "DoD Distribution A: approved for public release; distribution unlimited",
+    "depth_m": 5000
+  },
+  "bounds": {
+    "x_min": -27306.839,
+    "x_max": 27306.839,
+    "z_min": -27853.781,
+    "z_max": 27853.781
+  },
+  "cols": 3,
+  "rows": 3,
+  "vectors": [
+    [
+      [0.005, -0.005],
+      [0.007, 0.0],
+      [0.001, 0.0]
+    ],
+    [
+      [-0.014, 0.009],
+      [-0.003, 0.004],
+      [0.009, -0.021]
+    ],
+    [
+      [-0.019, 0.01],
+      [-0.029, 0.013],
+      [-0.011, -0.017]
+    ]
+  ]
+}

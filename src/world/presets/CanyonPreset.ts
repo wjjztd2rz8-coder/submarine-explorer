@@ -13,7 +13,13 @@
 
 import * as THREE from 'three';
 import type { EnvPresetName } from '../../core/Config.js';
-import { canyonCurrent, channelConfinement, mulberry, particleBudget } from './maths.js';
+import {
+  canyonCurrent,
+  channelConfinement,
+  mulberry,
+  particleBudget,
+  vectorToBearing,
+} from './maths.js';
 import {
   COMMON_VERT,
   SOFT_FRAG,
@@ -100,7 +106,12 @@ export class CanyonPreset implements EnvPreset {
   }
 
   /** Sample the terrain and recompute the current at `pos`. */
-  sampleCurrent(pos: THREE.Vector3, terrain: PresetFrameContext['terrain']): void {
+  sampleCurrent(
+    pos: THREE.Vector3,
+    terrain: PresetFrameContext['terrain'],
+    base: THREE.Vector3,
+    referenceSpeedMps: number,
+  ): void {
     const p = this.params;
     const R = num(p.confinementRadiusM, 400);
     // Regional slope: average normal over a small cross, so local detail
@@ -123,9 +134,13 @@ export class CanyonPreset implements EnvPreset {
       ring.push(terrain.sampleHeight(pos.x + Math.cos(a) * R, pos.z + Math.sin(a) * R));
     }
     const dir = p.currentDirDeg;
+    const baseSpeed =
+      Math.hypot(base.x, base.z) *
+      (num(p.currentSpeedMps, referenceSpeedMps) / Math.max(1e-6, referenceSpeedMps));
     const c = canyonCurrent({
-      baseDirDeg: typeof dir === 'number' ? dir : null,
-      baseSpeedMps: num(p.currentSpeedMps, 0.35),
+      baseDirDeg:
+        typeof dir === 'number' ? dir : baseSpeed > 0 ? vectorToBearing(base.x, base.z) : null,
+      baseSpeedMps: baseSpeed,
       slopeBias: num(p.slopeBias, 0.7),
       axisGain: num(p.axisGain, 0.8),
       confinement: channelConfinement(centre, ring, num(p.confinementReliefM, 120)),
@@ -139,9 +154,17 @@ export class CanyonPreset implements EnvPreset {
 
   update(dt: number, ctx: PresetFrameContext): void {
     this.sampleClock += dt;
-    if (this.sampleClock >= SAMPLE_PERIOD_S) {
+    if (ctx.baseCurrent.lengthSq() === 0) {
+      this.flow.set(0, 0, 0);
+      this.sampleClock = Infinity;
+    } else if (this.sampleClock >= SAMPLE_PERIOD_S) {
       this.sampleClock = 0;
-      this.sampleCurrent(ctx.subPosition, ctx.terrain);
+      this.sampleCurrent(
+        ctx.subPosition,
+        ctx.terrain,
+        ctx.baseCurrent,
+        ctx.canyonReferenceSpeedMps,
+      );
     }
     ctx.current.add(this.flow);
 
