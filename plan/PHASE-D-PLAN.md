@@ -4,6 +4,16 @@ Written 2026-09-23 by the orchestrator (Claude Fable) from the owner's first
 full playtest. This replaces the pre-playtest `plan/archive/PHASE-D-BRIEFS-pre-playtest.md`.
 **Playability comes before art.** Visual and artistic polish waits until after this phase.
 
+**Status (2026-09-24): all packages below are implemented and merged to
+`main`** — D-MODES, D-CONTENT, D-INPUT+HUD, D-SHELL, D-SCAN, D-START, D-FLOW,
+D-SONAR, D-POWER, D-CURRENTS, D-ROV and D-PHOTO. The owner's second playtest
+findings were delivered as the D-POLISH package (top-right objectives list
+and telemetry, control tips, the 350–600 m near-site start range, a snappier
+camera) between the QA/playtest-#2 gate in §3 step 8 and the D-POWER/
+D-CURRENTS/D-ROV/D-PHOTO run in step 9. See `plan/STATUS.md` for the
+package-by-package summary, owner decisions, known nits and what's left
+(playtest #3, then the owner's go-ahead to publish).
+
 ## 0. Direction
 
 - **Arcade by default, realism by choice.** Follow War Thunder's model: preset

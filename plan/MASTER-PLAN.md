@@ -141,13 +141,13 @@ Conventions for all packages: each is sized for one agent session; lists files i
 | C5      | Save/settings/accessibility: settings screen, key remap, colour-blind sonar palette, motion-reduction toggle, subtitles for audio cues           | Sonnet    | Axe/lighthouse a11y pass ≥ 90                          | shipped — `docs/settings.md`, `tests/e2e/settings.spec.ts`; O opens/freezes, reduce-motion and deuteranopia palette persist across reload, captions render (QA-C) |
 | C6      | Deployment: GitHub Actions build+test, Pages deploy, tile CDN caching headers, `ATTRIBUTION.md` check                                            | Sonnet    | Public URL live                                        | prepared — project-base browser test passes; not published (owner decision)                                                                                       |
 
-### Phase D — Playability, scoped after the owner's first playtest
+### Phase D — Playability, scoped after the owner's first playtest — **done, 2026-09-24**
 
-Arcade-default gameplay modes, faster and better-lit dives, near-site starts, usable controls/HUD/sonar, home and pause menus, objective hints, per-dive scan state, Journal and honest debrief flow. Then battery/oxygen, offline currents, ROV and purposeful photo mode. [Plan](PHASE-D-PLAN.md), [contracts](PHASE-D-CONTRACTS.md), and [briefs](PHASE-D-BRIEFS.md) supersede the pre-playtest proposal. **Old D7 (surface day/night) is dropped.** Samples and inventory have no Phase D package.
+Arcade-default gameplay modes, faster and better-lit dives, near-site starts, usable controls/HUD/sonar, home and pause menus, objective hints, per-dive scan state, Journal and honest debrief flow. Then battery/oxygen, offline currents, ROV and purposeful photo mode. [Plan](PHASE-D-PLAN.md), [contracts](PHASE-D-CONTRACTS.md), and [briefs](PHASE-D-BRIEFS.md) supersede the pre-playtest proposal. **Old D7 (surface day/night) is dropped.** Samples and inventory have no Phase D package. All twelve packages (D-MODES, D-CONTENT, D-INPUT+HUD, D-SHELL, D-SCAN, D-START, D-FLOW, D-SONAR, D-POWER, D-CURRENTS, D-ROV, D-PHOTO) are implemented and merged; see [`plan/STATUS.md`](STATUS.md) for the package-by-package summary and what remains for the owner (playtest #3, then the go-ahead to publish).
 
-### Phase E — Future expansions: marine life encounters (formerly D4)
+### Phase E — Future expansions: marine life encounters (formerly D4) — **future, not started**
 
-OBIS-informed animal encounters and their behavior are deferred until after Phase D playability and a later owner scope decision. Existing `species.json` remains an occurrence-based survey list; in-world placement would be reconstructed and labeled as such.
+OBIS-informed animal encounters and their behavior are deferred until a further owner scope decision, now that Phase D playability is complete. Existing `species.json` remains an occurrence-based survey list; in-world placement would be reconstructed and labeled as such.
 
 ### Ongoing / cross-cutting
 
@@ -172,8 +172,8 @@ OBIS-informed animal encounters and their behavior are deferred until after Phas
 1. **M0 Foundation** — scaffold green, two real tiles load. _(this pass)_
 2. **M1 Looks like the ocean** — Phase A merged; screenshot set approved.
 3. **M2 Titanic dive** — Phase B; owner completes a mission start to debrief.
-4. **M3 World tour** — Phase C; ≥ 10 landmarks, public URL.
-5. **M4 Systems** — Phase D as scoped after M3.
+4. **M3 World tour** — Phase C; ≥ 10 landmarks, public URL. Content/engine work is done; the public URL itself is still pending the owner's go-ahead to create the repo and enable Pages (see `plan/STATUS.md`).
+5. **M4 Playability** — Phase D as scoped after M3, **done 2026-09-24**; owner playtest #3 pending (see `plan/STATUS.md`).
 
 ## 9. What the owner must decide (summary; full list in `plan/OPEN-QUESTIONS.md`)
 

@@ -6,6 +6,47 @@ Topography synthesis. No invented terrain: what you see is measured seafloor,
 plus a small procedural detail layer (`docs/terrain.md`) and placed props that
 the field guide marks as reconstructions.
 
+## Playing it
+
+`npm run dev` and open the printed `localhost` URL. The **home screen** opens
+first with the globe from the dive-site picker behind a menu: **Continue**
+(your last dive, disabled until you've started one), **Dive sites**, **Free
+dive**, **Journal**, **Settings** and **Controls**. Picking a site launches its
+briefing, which shows the real facts for that dive and, if the mission allows
+it, a choice of start position (see Dives and objectives below).
+
+While diving, **Esc** opens the pause menu: Resume, Objectives (the full list
+with hints), Mission select, Journal, Settings, Controls and Quit to home.
+Opening the pause menu, Settings, the globe or a briefing card freezes the
+simulation — nothing drains, moves or times out while a menu is open.
+Deep-linking with `?mission=`, `?tile=` or `?skipBriefing=1` skips the home
+screen and starts a dive directly (see URL parameters).
+
+### Modes: Arcade, Realistic, Custom
+
+Settings → Gameplay has three modes, styled after War Thunder's preset-plus-override
+approach (`Config.settings.gameplayPresets` in `src/core/Config.ts`). Picking
+Arcade or Realistic replaces every gameplay option at once; changing any single
+option afterwards (in either preset, or from scratch) switches the label to
+Custom and keeps the rest of your choices.
+
+| Option           | Arcade (default)                         | Realistic                                | What it does                                                                                      |
+| ---------------- | ---------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Speed profile    | `fast` — up to ~40 kn (20.6 m/s) boosted | `research` — ~1–1.4 m/s, Alvin-like      | Cruise/boost speed, acceleration and drag; `fast` is a game capability, not a real cruising speed |
+| Descent profile  | `fast`                                   | `research`                               | Ballast (vertical) acceleration and speed cap                                                     |
+| Lights           | `enhanced` — brighter, wider, plus fill  | `realistic` — today's narrower spots     | Headlight intensity, distance and cone angle                                                      |
+| Sensors          | `extended` — 2× scan/sonar/hint range    | `realistic` — 1× (unmodified) range      | Scan radius, waypoint hint range, sonar POI pickup range                                          |
+| Visual hints     | on                                       | off                                      | World-space waypoint, off-screen edge arrow and objective hint text                               |
+| Start position   | near-site                                | near-site (surface is opt-in either way) | See Dives and objectives                                                                          |
+| Battery / oxygen | off                                      | on                                       | See Battery, oxygen and currents                                                                  |
+| Currents         | off                                      | `realistic` (full strength)              | See Battery, oxygen and currents                                                                  |
+| Sim speed        | 1×                                       | 1×                                       | Initial simulated-time rate at the start of a dive; `T` still cycles 1×/2×/3× in either mode      |
+
+Speed and descent numbers are simulated time at 1×; running at 2×/3× makes the
+same simulated motion play out faster per wall-clock second, it does not
+change the vehicle's own top speed. Display, accessibility and UI-scale
+settings are independent of the gameplay mode.
+
 ## Dive sites
 
 Thirteen GMRT tiles (one per Tier-2 landmark, tile id = landmark id) plus a
@@ -123,30 +164,32 @@ and licences ([`LICENSE`](LICENSE), [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md)).
 ## Controls
 
 Defaults from `defaultActions()` in `src/core/Input.ts`. Keys are rebindable
-(`Input.rebind`, saved to `localStorage` key `subexplorer.bindings.v1`).
+from Settings -> Controls (`Input.rebind`, saved to `localStorage` key
+`subexplorer.bindings.v2`); a gamepad takes over automatically whenever a
+stick or button is deflected, but its buttons are not rebindable yet.
 
-| Key                  | Action                                         | Gamepad (standard mapping) |
-| -------------------- | ---------------------------------------------- | -------------------------- |
-| `W` / `S` (or ↑ / ↓) | ahead / astern                                 | left stick                 |
-| `A` / `D` (or ← / →) | yaw to port / starboard                        | left stick                 |
-| `R` / `F`            | nose up / down                                 | right stick                |
-| `Space` / `Shift`    | blow ballast (rise) / flood (dive)             | A / B                      |
-| `X`                  | boost                                          | right trigger              |
-| `C`                  | chase / first-person camera                    | Y                          |
-| `P`                  | free-orbit photo mode                          | Start                      |
-| `M`                  | sonar minimap                                  | Back                       |
-| `L`                  | headlights                                     | X                          |
-| `Q` (or `Tab`)       | sonar ping (echo delay = 2·range/1500)         | left bumper                |
-| `G` (hold)           | scan the POI you are facing                    | right bumper               |
-| `T`                  | sim speed 1× / 2× / 3×                         | D-pad up                   |
-| `J`                  | field guide (species tab included)             | —                          |
-| `N`                  | globe dive-site picker                         | —                          |
-| `O`                  | settings (graphics, captions, bindings, reset) | —                          |
-| `Enter`              | begin dive (mission briefing)                  | —                          |
-| `Esc`                | close field guide, then debrief                | —                          |
+| Key                         | Action                                                                                       | Gamepad (standard mapping) |
+| --------------------------- | -------------------------------------------------------------------------------------------- | -------------------------- |
+| `W` / `S` (or up / down)    | ahead / astern                                                                               | left stick                 |
+| `A` / `D` (or left / right) | yaw to port / starboard                                                                      | left stick                 |
+| `R` / `V`                   | pitch nose up / down                                                                         | right stick                |
+| `Space`                     | rise (blow ballast)                                                                          | A / cross                  |
+| `Ctrl` or `C`               | sink (flood ballast) -- `C` is a full alias, so `Ctrl+W` never closes the tab                | B / circle                 |
+| `Shift`                     | boost                                                                                        | right trigger              |
+| `F` (hold)                  | scan the target in range; "Already logged" once it's scanned this dive                       | right bumper               |
+| `L`                         | headlights                                                                                   | X                          |
+| `M`                         | sonar map; mouse wheel zooms it (250 m / 500 m / 1 km / 2 km / whole tile) when it has focus | Back / view                |
+| `Q`                         | camera view (chase / first-person)                                                           | Y                          |
+| `T`                         | sim speed 1x / 2x / 3x (a HUD badge shows it whenever it isn't 1x)                           | D-pad up                   |
+| `J`                         | Journal (site, POI and species entries, plus your photo gallery)                             | --                         |
+| `E`                         | deploy / retrieve the tethered ROV                                                           | --                         |
+| `P`                         | photo mode (free-orbit camera, hidden HUD); `Enter` or `Space` captures                      | Start                      |
+| `Esc`                       | pause menu; closes the top-most open dialog first                                            | --                         |
+| mouse drag                  | orbit the camera                                                                             | --                         |
+| mouse wheel                 | zoom the chase camera (35-180 m) when the sonar doesn't have focus                           | --                         |
 
-A gamepad takes over automatically whenever a stick or button is deflected.
-Gamepad buttons are not rebindable yet.
+Settings, the globe and Journal no longer have dedicated hotkeys (the old `O`
+and `N`) -- open them from the home screen or the `Esc` pause menu instead.
 
 ## URL parameters
 
@@ -167,7 +210,78 @@ Gamepad buttons are not rebindable yet.
 | `?preset=<name>`          | override the environment preset for visual checks; see `docs/presets.md`                                             |
 
 Examples: `/?mission=titanic`, `/?tile=titanic&landmark=_test&poi=test-bow`
-(then hold `G`), `/?tile=titanic&depth=3790&at=41.7290,-49.9500,0`.
+(then hold `F`), `/?tile=titanic&depth=3790&at=41.7290,-49.9500,0`.
+
+## Dives and objectives
+
+A mission's briefing offers a start position: **near-site** (default) puts you
+roughly 100-200 m from the first primary objective, at a safe height above the seabed,
+facing it, lights on — usually reachable in under a minute at Arcade speed.
+**Surface start** descends from the surface instead, for the full descent.
+Realistic mode still defaults to near-site; surface start is opt-in either way
+(`plan/PHASE-D-CONTRACTS.md` §3).
+
+Every objective carries a plain-language hint saying what it is and roughly
+where (bearing, feature or depth). With **visual hints** on (Arcade default,
+off in Realistic, toggle in Custom) the current objective also gets a
+world-space waypoint marker, an off-screen edge arrow with distance and depth
+difference, and an "in range" cue. Once you scan a target it is marked scanned
+in the world, on the sonar and in the objective tracker for the rest of that
+dive; scanning it again just says "Already logged — see Journal" — nothing is
+lost, since the discovery itself is already in your Journal.
+
+Dives start with objectives fresh every time, including "Dive again" — your
+Journal discoveries persist, but objectives never arrive pre-completed. When
+every primary objective is done, a banner offers **Keep exploring** (default:
+the dive continues, secondaries remain open) or **Surface and debrief**.
+Nothing forces a debrief while you still want to explore. The debrief reports
+X of Y objectives completed and offers Keep exploring, Dive again (fresh
+objectives, same mission), Dive sites, Home and Journal.
+
+## Journal and photos
+
+**Journal** (`J`, or from the home/pause menu) is a Civilopedia-style
+catalogue built from `landmarks.json`, `guide.json`, `pois.json` and
+`species.json`: one entry per site, per POI and per surveyed species. A site
+unlocks the moment you scan any of its POIs; a POI entry unlocks when you scan
+it; a species entry unlocks only when a scanned POI or guide entry names it
+(species without that documented link stay spoiler-only). A "show undiscovered
+entries" toggle lets you preview what you haven't found yet. Discoveries persist
+across reloads (`subexplorer.discoveries.v1`); the per-dive "already scanned"
+state that blocks re-scanning is separate and always resets on a new dive.
+
+**Photo mode** (`P`) swings a free-orbit camera around your sub — or the
+ROV, while it's deployed — and hides the HUD. `Enter` or `Space` captures a
+JPEG thumbnail (≤ 640 px wide) captioned with whichever site or POI is in
+frame, and saves it into the Journal's photo gallery
+(`subexplorer.photos.v1`, the newest 24 kept, oldest dropped with a notice
+when it's full).
+
+## Battery, oxygen and currents
+
+Two optional realism systems, off by default in Arcade and on by default in
+Realistic (independently switchable in Custom):
+
+- **Battery and oxygen** (`docs/power.md`) drain with elapsed time, thrust,
+  ballast, lights and sensors. Low levels warn clearly; running out locks
+  manual control and forces a safe automatic emergency ascent rather than a
+  fail screen. Tuning is anchored to WHOI's published Alvin endurance figures,
+  not a literal life-support simulation.
+- **Currents** (`docs/currents.md`) are an offline per-site vector field
+  sampled once from an archived HYCOM ocean-model snapshot and checked into
+  the repo — the game never calls out to a live ocean-data service. The
+  gameplay setting is off, gentle or realistic (Arcade is off, Realistic is
+  full strength; gentle is reachable through Custom).
+
+## Honesty note
+
+The seafloor you fly over is real, measured bathymetry (see Dive sites,
+above) — nothing about the terrain itself is invented. Wrecks, vent chimneys
+and other placed props are **recreations**: procedural or CC0/CC-BY models
+positioned at real, cited coordinates, and every field-guide and Journal
+entry that describes one says so along with its sources. Waypoints, hints,
+the Journal's spoiler toggle and photo captions are UI conveniences layered on
+top of that data; none of them change a survey value.
 
 ## Architecture overview
 

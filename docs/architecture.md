@@ -18,8 +18,9 @@ pipeline nor the content knows anything else about the engine.
 ## Module diagram
 
 Phase C integration (2026-09-22): `ui/Globe.ts` and `GlobeModel.ts` provide
-the globe picker (`N` / `?globe=1`) and the field guide has an OBIS species
-tab through `game/Species.ts`. `world/presets/Presets.ts` now selects and
+the globe picker (opened from the home/pause menu or `?globe=1`; the standalone
+`N` key was retired in D-SHELL) and the field guide has an OBIS species tab
+through `game/Species.ts`. `world/presets/Presets.ts` now selects and
 enters an environment after props/POIs load. Its per-frame update follows
 `Atmosphere.update`, before fog, headlights, snow and post-processing consume
 the sample. Current coupling receives zero simulated time while the briefing
@@ -32,12 +33,48 @@ force. See [presets.md](./presets.md) and [currents.md](./currents.md).
 Public data and asset defaults resolve through `util/publicUrl.ts` using
 Vite's deployment base. Explicit loader roots retain their caller-provided
 meaning. See [deploy.md](./deploy.md) for the project-base browser check.
-C5 is now wired end to end: `core/Save.ts` persists `subexplorer.settings.v1`
-(graphics tier, post-fx, terrain detail, default sim speed, reduce-motion,
-captions, sonar palette), `ui/Settings.ts` is the `O` screen that reads and
-writes it, and `ui/Captions.ts` renders the on-screen caption
-line from `AudioSystem`'s `CaptionBus` (sonar ping/echo, scan chimes). See
-[settings.md](./settings.md) and [audio.md](./audio.md).
+C5 is now wired end to end: `core/Save.ts` persists settings (graphics tier,
+post-fx, terrain detail, default sim speed, reduce-motion, captions, sonar
+palette), `ui/Settings.ts` is the settings screen (opened from the home or
+pause menu, not a dedicated key) that reads and writes it, and
+`ui/Captions.ts` renders the on-screen caption line from `AudioSystem`'s
+`CaptionBus` (sonar ping/echo, scan chimes). See [settings.md](./settings.md)
+and [audio.md](./audio.md).
+
+**Phase D — playability (2026-09-24).** The app shell gained explicit
+`'home' | 'dive' | 'pause'` states (`GameEvents['app:state']`), driven by two
+new full-screen overlays: `ui/Home.ts` (title screen: globe, Continue/Dive
+sites/Free dive/Journal/Settings/Controls) and `ui/PauseMenu.ts` (`Esc`:
+Resume/Objectives/Mission select/Journal/Settings/Controls/Quit to home).
+Both retire the old `O` (settings) and `N` (globe) hotkeys — `Input`'s
+`defaultActions()` no longer binds `toggleSettings` or `toggleGlobe` at all;
+those screens open only from a menu button now. `Save`'s settings record is
+versioned `v2` and gained a `gameplay` block (`Config.settings.gameplayPresets`
+'arcade' | 'realistic', plus 'custom') covering speed/descent profile, lights,
+sensors, visual hints, start position, battery/oxygen and currents —
+`src/core/Config.ts` `speedProfiles` / `descentProfiles` / `lightPresets` /
+`sensorPresets` hold the numeric presets. `Input`'s bindings are versioned
+`v2` too, with new defaults (R/V pitch, Space rise, Ctrl-or-C sink, Shift
+boost, F scan, Q camera, no `ping` action). `ui/Journal.ts` (`game/JournalData.ts`)
+replaces the field guide as the `J` destination: a Civilopedia-style catalogue
+of site/POI/species entries built from existing content files, still reading
+`DiscoveryStore`'s unchanged `subexplorer.discoveries.v1` for unlocks, plus a
+photo gallery tab (`ui/PhotoGallery.ts`). `ui/Waypoints.ts` draws the D-SCAN
+world-space waypoint, off-screen edge arrow and objective hint text when the
+`visualHints` gameplay option is on. `ui/Sonar.ts` gained POI/objective icons
+and zoom levels (`Config.sonarZoom`: 250/500/1000/2000 m or the whole tile,
+`M` plus the mouse wheel while it has focus). `game/Power.ts` is the optional
+battery/oxygen system (`docs/power.md`); `world/Currents.ts` loads an offline
+per-tile HYCOM current grid from `data/currents/<tile>.json`
+(`docs/currents.md`); both are gated by the `gameplay.batteryOxygen` and
+`gameplay.currents` settings. `rov/Rov.ts` + `rov/RovVisual.ts` + `ui/RovHUD.ts`
+are the tethered ROV (`E` to deploy/retrieve; it flies, scans and returns, with
+its own chase camera). `ui/PhotoMode.ts` + `game/PhotoStore.ts` are photo mode
+(`P`; `Enter`/`Space` captures): a free-orbit camera around the sub or the
+deployed ROV, saving captioned JPEG thumbnails to `subexplorer.photos.v1`,
+newest 24 kept. `MissionState` gained a `primaries-complete` stage between
+`diving` and `debrief` (`mission:primaryComplete`, `mission:ended`), so
+finishing the primaries no longer force-opens the debrief.
 
 ```mermaid
 flowchart TD
@@ -89,6 +126,7 @@ flowchart TD
       PROPS["Props + PropLoader\nplacement, LOD/impostor, collide()"]
       PSUB["props/\nProcedural, Collision, Wiring, PlacementDebug"]
       PRE["presets/ (C3)\nPresetSystem + vent/brine/canyon/reef/\ntrench/wreck/seamount/default"]
+      CUR["Currents (D-CURRENTS)\noffline per-tile HYCOM grid, data/currents/*"]
     end
 
     subgraph render["render/"]
@@ -107,12 +145,20 @@ flowchart TD
       MIS["Mission\nmanifest + state machine"]
       MR["MissionRouter\n?mission=, loadout, nav"]
       SPEC["Species (C4)\nloads species.json for the guide's SPECIES tab"]
+      JD["JournalData (D-FLOW)\nsite/POI/species entries from content + DiscoveryStore"]
+      PWR["Power (D-POWER)\nbattery/oxygen drain, warnings, emergency ascent"]
+      PS["PhotoStore (D-PHOTO)\nlocalStorage v1, newest 24"]
     end
 
     subgraph sub["sub/"]
       PHY["Submarine\narcade physics, hull stress, crush"]
       SM["SubMesh\nprocedural placeholder hull"]
-      CAM["CameraRig\nchase / first-person / orbit"]
+      CAM["CameraRig\nchase / first-person / orbit / photo"]
+    end
+
+    subgraph rov["rov/ (D-ROV)"]
+      ROV["Rov\ntethered flight, scan, return"]
+      RVIS["RovVisual\nlit chase-view model"]
     end
 
     subgraph audio["audio/"]
@@ -120,16 +166,22 @@ flowchart TD
     end
 
     subgraph ui["ui/ (DOM overlays)"]
+      HOME["Home (D-SHELL)\ntitle screen: globe, Continue/Dive sites/Free dive/Journal/Settings/Controls"]
+      PM["PauseMenu (D-SHELL)\nEsc: Resume/Objectives/Mission select/Journal/Settings/Controls/Quit"]
       HUD["HUD"]
-      SON["Sonar (2D canvas)"]
+      SON["Sonar (2D canvas)\nPOI/objective icons, zoom levels"]
       MSEL["MissionSelect"]
       SO["ScanOverlay"]
-      FG["FieldGuide"]
+      WP["Waypoints (D-SCAN)\nworld marker, edge arrow, objective hint"]
+      JRN["Journal (D-FLOW)\nreplaces FieldGuide; site/POI/species + photo gallery tab"]
+      PGAL["PhotoGallery (D-PHOTO)"]
+      PHM["PhotoMode (D-PHOTO)\nfree-orbit viewfinder"]
+      RHUD["RovHUD (D-ROV)"]
       DB["Debrief"]
       BR["Briefing"]
       OP["ObjectivesPanel"]
-      GL["Globe + GlobeModel (C1)\nN / ?globe=1 dive-site picker"]
-      SET["Settings (C5)\nO screen: tier, postFx, captions, bindings"]
+      GL["Globe + GlobeModel (C1)\ndive-site picker, opened from Home/PauseMenu or ?globe=1"]
+      SET["Settings (C5/D-MODES)\nopened from Home/PauseMenu: tier, postFx, captions, bindings, Gameplay mode"]
       CAPT["Captions (C5)\nrenders AudioSystem's CaptionBus"]
     end
 
@@ -149,7 +201,7 @@ flowchart TD
   PHY --> CAM & HUD & SON & SM
   POI --> DISC
   SCAN & DS & OBJ --> DISC
-  DISC --> SO & FG & DB
+  DISC --> SO & WP & DB
   MR --> MIS
   MR --> BR & OP & DB
   MR --> DISC
@@ -159,9 +211,19 @@ flowchart TD
   TER & PACK & DISC --> PRE
   PRE --> ATM
   LM --> GL
-  CP --> SPEC --> FG
+  CP --> SPEC --> JRN
+  DS --> JD --> JRN
   MAIN --> SAVE --> SET
   AUD --> CAPT
+  MAIN --> HOME & PM
+  GL --> HOME & PM
+  SET --> HOME & PM
+  CUR --> PHY
+  MAIN --> PWR
+  PHY --> PWR --> HUD
+  MAIN --> ROV --> RVIS & RHUD
+  TER --> ROV
+  MAIN --> PHM --> PS --> PGAL --> JRN
 ```
 
 Solid arrows are construction-time dependencies or per-frame data; dashed
@@ -182,7 +244,17 @@ responses in `.cache/gmrt-raw/`, retries with backoff and falls back to ETOPO.
 `--quant16`, `heightmap16.bin` + the `quant_*` meta keys. See
 [`docs/tiles-inventory.md`](./tiles-inventory.md).
 
-**Boot (per page load, `main.ts`).**
+**Boot (per page load, `main.ts`).** The app shell starts in one of three
+states — `'home' | 'dive' | 'pause'` (`GameEvents['app:state']`). Plain `/`
+boots into `'home'`: `ui/Home.ts` shows the C1 globe as the site picker behind
+Continue/Dive sites/Free dive/Journal/Settings/Controls, and the world behind
+it loads but stays paused (no physics, no audio, no mission clock) until a
+site is chosen. `?mission=`, `?tile=` or `?skipBriefing=1` (and the existing
+debug params `?poi=`, `?at=`, `?depth=`, `?debrief=1`, `?globe=1`) bypass home
+and boot straight to `'dive'`, as they did before D-SHELL. `Esc` during a dive
+enters `'pause'` (`ui/PauseMenu.ts`), which freezes the sim the same way the
+briefing, globe and settings dialog already did; `Escape` again, or Resume,
+returns to `'dive'`.
 
 1. In parallel: `TileLoader.loadIndex()` and `resolveMissionRoute(params)`
    (fetches `data/landmarks/<id>/mission.json` for `?mission=`).
@@ -201,10 +273,14 @@ responses in `.cache/gmrt-raw/`, retries with backoff and falls back to ETOPO.
    sub next to a POI once they load.
 8. `Props` loads `props.json` asynchronously → `props:loaded`; `?at=` re-spawns
    the sub; `PropContact` is created; `?debugProps=1` adds `PlacementDebug`.
-9. `MissionSelect` lists tiles and (via `loadMissionSummaries`) missions.
-10. `Input`, settings screen, then `MissionRouter` (briefing, objectives,
-    completion) if routed. Saved tier/detail apply before terrain construction;
-    saved sim speed applies after the mission loadout.
+9. `MissionSelect` lists tiles and (via `loadMissionSummaries`) missions; the
+   `Home` and `PauseMenu` overlays share it for their site pickers.
+10. `Input`, `Settings` (a dialog opened from Home/PauseMenu, not a key),
+    `Power`, `Currents`, `Rov`/`RovVisual`/`RovHUD`, `PhotoMode`/`PhotoStore`,
+    then `MissionRouter` (briefing, objectives, completion) if routed. Saved
+    tier/detail apply before terrain construction; saved sim speed and the
+    saved gameplay mode's speed/descent/light/sensor profile apply after the
+    mission loadout.
 11. `AudioSystem` (unlocked by the first pointerdown/keydown), captions and
     live settings subscriptions, `UnderwaterPass`.
 12. `window.__game` is populated and the first frame is requested.
@@ -276,39 +352,41 @@ the same as the sub's yaw.
 `GameEvents` in `src/core/EventBus.ts` is the complete list. Add events there;
 never repurpose one.
 
-| Event                     | Payload                                                | Emitted by                                     |
-| ------------------------- | ------------------------------------------------------ | ---------------------------------------------- |
-| `tile:loaded`             | `{ meta: TileMeta }`                                   | `main.ts` after `TileLoader.load`              |
-| `tile:error`              | `{ id, error }`                                        | `main.ts` on a failed load                     |
-| `terrain:built`           | `{ chunks, vertices }`                                 | `main.ts` after `Terrain` construction         |
-| `landmarks:loaded`        | `{ landmarks: Landmark[] }`                            | `main.ts` when any landmark is placed          |
-| `sub:collided`            | `{ depth, speed }`                                     | `main.ts` (seabed); `PropContact` (props)      |
-| `sub:crushWarning`        | `{ depth, ratio }`                                     | `main.ts`, every frame past the warn ratio     |
-| `sub:hullStress`          | `{ stress, cause: 'impact' \| 'pressure', depth }`     | `main.ts`, on a change above threshold         |
-| `sub:emergencyBlow`       | `{ depth, lockSeconds, cause?: 'crush' \| 'power' }`   | `main.ts`, once per blow                       |
-| `sub:simSpeed`            | `{ multiplier }`                                       | `main.ts` on `T`                               |
-| `env:depthBand`           | `{ band, previous, depth }`                            | `Atmosphere.update` on a band change           |
-| `env:preset`              | `{ preset, landmarkId }`                               | `PresetSystem` after selection                 |
-| `env:current`             | `{ dirDeg, speedMps }`                                 | `PresetSystem` on a significant current change |
-| `env:trench`              | `{ depth }` (negative engine metres)                   | `TrenchPreset`; audio plays a pressure creak   |
-| `globe:opened`            | `{ source }`                                           | `Globe` on opening                             |
-| `globe:pinSelected`       | `{ landmarkId }`                                       | `Globe` on selection                           |
-| `scan:started`            | `{ poiId }`                                            | `Scanner`                                      |
-| `scan:progress`           | `{ poiId, progress }` (0..1, ≤ 10 Hz)                  | `Scanner`                                      |
-| `scan:aborted`            | `{ poiId, reason: 'range' \| 'facing' \| 'released' }` | `Scanner`                                      |
-| `scan:complete`           | `{ poiId, landmarkId, firstTime }`                     | `Scanner`                                      |
-| `guide:opened`            | `{ entryId }`                                          | `Journal` when an unlocked entry is shown      |
-| `mission:started`         | `{ missionId, tileId }`                                | `Mission` on Begin dive                        |
-| `mission:objective`       | `{ missionId, objectiveId, complete }`                 | `Mission`                                      |
-| `mission:primaryComplete` | `{ missionId, completed, total }`                      | `Mission` on the last primary scan             |
-| `mission:complete`        | `{ missionId, durationS }`                             | `Mission.end()`, once, after the primaries     |
-| `mission:ended`           | `{ missionId, reason, completed, total, durationS }`   | `Mission.end()`, every debrief                 |
-| `mission:restart`         | `{ missionId }`                                        | `Mission.restart()` (debrief Dive again)       |
-| `mission:aborted`         | `{ missionId, reason: 'crush' \| 'power' }`            | `MissionRouter` when an emergency blow ends    |
-| `props:loaded`            | `{ landmarkId, count, models, procedural }`            | `main.ts` when `Props.load` resolves           |
-| `game:ready`              | `{ tileId }`                                           | `main.ts`, first presented frame               |
-| `ui:selectTile`           | `{ id }`                                               | declared, not emitted or handled yet           |
-| `settings:changed`        | `{ key, value }`                                       | declared (C5), not emitted or handled yet      |
+| Event                     | Payload                                                | Emitted by                                                 |
+| ------------------------- | ------------------------------------------------------ | ---------------------------------------------------------- |
+| `app:state`               | `{ state: 'home' \| 'dive' \| 'pause' }`               | `main.ts` on every shell-state transition (D-SHELL)        |
+| `app:siteSelected`        | `{ missionId: string \| null, tileId: string }`        | `main.ts` from Home/PauseMenu/Globe site pickers (D-SHELL) |
+| `tile:loaded`             | `{ meta: TileMeta }`                                   | `main.ts` after `TileLoader.load`                          |
+| `tile:error`              | `{ id, error }`                                        | `main.ts` on a failed load                                 |
+| `terrain:built`           | `{ chunks, vertices }`                                 | `main.ts` after `Terrain` construction                     |
+| `landmarks:loaded`        | `{ landmarks: Landmark[] }`                            | `main.ts` when any landmark is placed                      |
+| `sub:collided`            | `{ depth, speed }`                                     | `main.ts` (seabed); `PropContact` (props)                  |
+| `sub:crushWarning`        | `{ depth, ratio }`                                     | `main.ts`, every frame past the warn ratio                 |
+| `sub:hullStress`          | `{ stress, cause: 'impact' \| 'pressure', depth }`     | `main.ts`, on a change above threshold                     |
+| `sub:emergencyBlow`       | `{ depth, lockSeconds, cause?: 'crush' \| 'power' }`   | `main.ts`, once per blow                                   |
+| `sub:simSpeed`            | `{ multiplier }`                                       | `main.ts` on `T`                                           |
+| `env:depthBand`           | `{ band, previous, depth }`                            | `Atmosphere.update` on a band change                       |
+| `env:preset`              | `{ preset, landmarkId }`                               | `PresetSystem` after selection                             |
+| `env:current`             | `{ dirDeg, speedMps }`                                 | `PresetSystem` on a significant current change             |
+| `env:trench`              | `{ depth }` (negative engine metres)                   | `TrenchPreset`; audio plays a pressure creak               |
+| `globe:opened`            | `{ source }`                                           | `Globe` on opening                                         |
+| `globe:pinSelected`       | `{ landmarkId }`                                       | `Globe` on selection                                       |
+| `scan:started`            | `{ poiId }`                                            | `Scanner`                                                  |
+| `scan:progress`           | `{ poiId, progress }` (0..1, ≤ 10 Hz)                  | `Scanner`                                                  |
+| `scan:aborted`            | `{ poiId, reason: 'range' \| 'facing' \| 'released' }` | `Scanner`                                                  |
+| `scan:complete`           | `{ poiId, landmarkId, firstTime }`                     | `Scanner`                                                  |
+| `guide:opened`            | `{ entryId }`                                          | `Journal` when an unlocked entry is shown                  |
+| `mission:started`         | `{ missionId, tileId }`                                | `Mission` on Begin dive                                    |
+| `mission:objective`       | `{ missionId, objectiveId, complete }`                 | `Mission`                                                  |
+| `mission:primaryComplete` | `{ missionId, completed, total }`                      | `Mission` on the last primary scan                         |
+| `mission:complete`        | `{ missionId, durationS }`                             | `Mission.end()`, once, after the primaries                 |
+| `mission:ended`           | `{ missionId, reason, completed, total, durationS }`   | `Mission.end()`, every debrief                             |
+| `mission:restart`         | `{ missionId }`                                        | `Mission.restart()` (debrief Dive again)                   |
+| `mission:aborted`         | `{ missionId, reason: 'crush' \| 'power' }`            | `MissionRouter` when an emergency blow ends                |
+| `props:loaded`            | `{ landmarkId, count, models, procedural }`            | `main.ts` when `Props.load` resolves                       |
+| `game:ready`              | `{ tileId }`                                           | `main.ts`, first presented frame                           |
+| `ui:selectTile`           | `{ id }`                                               | declared, not emitted or handled yet                       |
+| `settings:changed`        | `{ key, value }`                                       | declared (C5), not emitted or handled yet                  |
 
 Current subscribers: `AudioSystem` (`sub:collided`, `sub:hullStress`,
 `sub:emergencyBlow`), `Discovery` (`scan:complete`, `landmarks:loaded`),
@@ -318,27 +396,36 @@ weights from depth). `AudioSystem` also handles `scan:complete` (chime/tick)
 and `env:trench` (pressure creak, sharing the hull-stress cooldown).
 `ui/Settings.ts` writes through `core/Save.ts` (`save.save()`); `main.ts`
 subscribes to `save.onChange()` directly for live changes (captions,
-reduce-motion, palette and post-FX). Tier/detail/default speed apply on reload.
-Changes do not use `settings:changed` — that event is
-declared for a future decoupled listener but nothing emits it yet, same as
-`ui:selectTile`.
+reduce-motion, palette, post-FX and the live gameplay profile). Tier/detail/
+default-speed apply on reload. `main.ts` also subscribes to `app:state`
+itself (D-SHELL) to pause/resume audio, close photo mode and abort a deployed
+ROV outside the `'dive'` state, and `journal.setHomeMode` toggles the
+Journal's home-mode framing. `settings:changed` **is** emitted now (`Save.commit`,
+once per changed key), but still has no subscriber — `main.ts` keeps using
+`save.onChange()` directly. `ui:selectTile` remains declared only, with
+nothing emitting or handling it.
 
 Audio captions use a separate `CaptionBus` (`AudioSystem.captions`), not the
 EventBus; see [`docs/audio.md`](./audio.md).
 
 ## Persistence
 
-| localStorage key             | Owner                    | Shape                                                                                                                       |
-| ---------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `subexplorer.bindings.v1`    | `core/Input.ts`          | versioned key bindings                                                                                                      |
-| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }`                                                          |
-| `subexplorer.settings.v1`    | `core/Save.ts`           | `{ version: 1, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette }`               |
-| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | `{ version: 1, photos: [{ id, image (JPEG data URL, ≤640 px), siteId, siteName, poiId, poiName, at, depthM }] }`, newest 24 |
+| localStorage key             | Owner                    | Shape                                                                                                                                                                                                                   |
+| ---------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `subexplorer.bindings.v2`    | `core/Input.ts`          | `{ version: 2, keys: Record<ActionId, string[]> }`; migrates a saved `subexplorer.bindings.v1` once, then leaves v1 untouched                                                                                           |
+| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }` — unchanged since Phase B, now also read by the Journal                                                                                              |
+| `subexplorer.settings.v2`    | `core/Save.ts`           | `{ version: 2, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette, uiScale, controlTips, gameplayMode, gameplay, bindings? }`; migrates a saved `subexplorer.settings.v1` once |
+| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | `{ version: 1, photos: [{ id, image (JPEG data URL, ≤640 px), siteId, siteName, poiId, poiName, at, depthM }] }`, newest 24 (D-PHOTO)                                                                                   |
+| `subexplorer.lastSite.v1`    | `main.ts`                | `{ missionId: string }`, written when a mission starts; enables the home screen's Continue button (D-SHELL)                                                                                                             |
+| `subexplorer.tips.v1`        | `main.ts`                | `{ ctrlW: true }` once the one-time "Ctrl+W may close this tab" tip has been dismissed (D-INPUT+HUD)                                                                                                                    |
 
-All are versioned, guarded (no storage → in-memory), and never throw.
-`Save` also points at the other two keys by name (`SAVE_KEYS`) so a future
-"reset everything" screen can find them without importing `Input` or
-`DiscoveryStore`.
+All are versioned, guarded (no storage → in-memory), and never throw. The
+legacy `subexplorer.bindings.v1` and `subexplorer.settings.v1` keys are read
+once for migration and then left alone, never deleted. `Save` also points at
+the bindings and discoveries keys by name (`SAVE_KEYS`) so a future "reset
+everything" screen can find them without importing `Input` or `DiscoveryStore`;
+`subexplorer.photos.v1`, `subexplorer.lastSite.v1` and `subexplorer.tips.v1`
+are not in `SAVE_KEYS`.
 
 ## Performance budget
 
@@ -392,9 +479,14 @@ streaming (Tier 4), and a hard draw-call cap.
 | Debug in the browser                  | `window.__game` (see below), `?debugTerrain=1`, `?debugProps=1`                                                                                                                        |
 
 `window.__game` keys (`main.ts`): `scene`, `renderer`, `terrain`, `sub`, `rig`,
-`water`, `atmosphere`, `headlights`, `audio`, `bus`, `config`, `meta`,
-`scanner`, `discoveries`, `discovery`, `debrief`, `fieldGuide` (the Journal),
-`props`, `propsDebug`, `mission`, `missionRouter`, `missionSelect`, `sonar`,
-`journal`, `power` (see [`power.md`](./power.md)).
+`water`, `atmosphere`, `headlights`, `audio`, `bus`, `config`, `power` (see
+[`power.md`](./power.md)), `currents` (see [`currents.md`](./currents.md)),
+`rov`, `rovHud`, `rovVisual`, `photos`, `photoMode`, `meta`, `scanner`,
+`discoveries`, `discovery`, `debrief`, `fieldGuide` (the `Guide` instance
+`discovery.guide` wraps; `Journal` is the separate `journal` key below),
+`props`, `propsDebug`, `presets`, `mission`, `missionRouter`, `missionSelect`,
+`sonar`, `waypoints`, `journal`, `globe`, `home`, `homeGlobe`, `pause`,
+`appState` (a live getter for `'home' | 'dive' | 'pause'`), `save`,
+`settings`, `captions`, `input`.
 `window.__gameReady` flips to `true` after the first presented frame;
 `window.__gameError` holds a fatal startup message.
