@@ -73,17 +73,16 @@ test('Arcade near-site starts show the first target at deep and shallow sites', 
   }
 });
 
-test('Surface choice applies only to this briefing; saved preference survives reload', async ({
-  page,
-}) => {
+test('The briefing start choice persists as the saved start position', async ({ page }) => {
   await boot(page, 'titanic');
   await page.locator('.briefing-start input[value="surface"]').check();
   await page.locator('.briefing-begin').click();
   await expect(page.locator('.briefing')).toBeHidden();
   expect((await pose(page)).y).toBeGreaterThan(-20);
   await page.screenshot({ path: `${shots}/surface.png` });
+  // D2-PREDIVE: the Dive settings panel writes the setting (and so Custom).
   await boot(page, 'titanic');
-  await expect(page.locator('.briefing-start input[value="near-site"]')).toBeChecked();
+  await expect(page.locator('.briefing-start input[value="surface"]')).toBeChecked();
   await page.evaluate(() => {
     const save = (
       window.__game as {
@@ -103,5 +102,5 @@ test('Surface choice applies only to this briefing; saved preference survives re
   await expect(page.locator('.briefing')).toBeHidden();
   expect((await pose(page)).y).toBeLessThan(-3000);
   await boot(page, 'titanic');
-  await expect(page.locator('.briefing-start input[value="surface"]')).toBeChecked();
+  await expect(page.locator('.briefing-start input[value="near-site"]')).toBeChecked();
 });

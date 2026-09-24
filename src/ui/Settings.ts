@@ -31,6 +31,72 @@ import type {
 import { keyLabel, type ActionBinding, type ActionId } from '../core/Input.js';
 import type { Save, SettingsData, SettingsValues } from '../core/Save.js';
 import { FocusTrap } from './FocusTrap.js';
+import { ModeSelector, gameplayValueLabel, parseGameplayValue } from './ModeSelector.js';
+
+export const UI_SCALE_MIN = 80;
+export const UI_SCALE_MAX = 150;
+export const UI_SCALE_STEP = 5;
+
+/** A UI scale percent, rounded and clamped to [80, 150]. */
+export function clampUiScale(value: number): number {
+  if (!Number.isFinite(value)) return 100;
+  return Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, Math.round(value)));
+}
+
+/** The − / + buttons: the next multiple of 5 in that direction, clamped. */
+export function stepUiScale(value: number, dir: -1 | 1): number {
+  const v = clampUiScale(value);
+  const next =
+    dir > 0
+      ? Math.floor(v / UI_SCALE_STEP) * UI_SCALE_STEP + UI_SCALE_STEP
+      : Math.ceil(v / UI_SCALE_STEP) * UI_SCALE_STEP - UI_SCALE_STEP;
+  return clampUiScale(next);
+}
+
+/** Settings > Gameplay labels. */
+export const GAMEPLAY_LABELS: Record<keyof GameplayOptions, string> = {
+  speedProfile: 'Forward speed',
+  lights: 'Lights',
+  sensors: 'Sensors',
+  visualHints: 'Visual waypoints',
+  sonarMarkers: 'Sonar markers',
+  startPosition: 'Start position',
+  batteryOxygen: 'Battery and oxygen',
+  currents: 'Currents',
+  descentProfile: 'Descent speed',
+  simSpeed: 'Simulation speed',
+};
+
+/** Settings > Gameplay order: pairs side by side (speeds, aids, hazards). */
+export const GAMEPLAY_ORDER: ReadonlyArray<keyof GameplayOptions> = [
+  'speedProfile',
+  'descentProfile',
+  'lights',
+  'sensors',
+  'visualHints',
+  'sonarMarkers',
+  'batteryOxygen',
+  'currents',
+  'startPosition',
+  'simSpeed',
+];
+
+/** The configured gameplay options in display order; unknown extras go last. */
+export function gameplayKeysInOrder(options: object): Array<keyof GameplayOptions> {
+  const keys = Object.keys(options) as Array<keyof GameplayOptions>;
+  return [
+    ...GAMEPLAY_ORDER.filter((k) => keys.includes(k)),
+    ...keys.filter((k) => !GAMEPLAY_ORDER.includes(k)),
+  ];
+}
+
+/** One-line descriptions under some Gameplay options. */
+export const GAMEPLAY_NOTES: Partial<Record<keyof GameplayOptions, string>> = {
+  speedProfile: 'Research is about 1 m/s, like Alvin. Fast is a game speed for any hull.',
+  descentProfile: "Research is about 0.5 m/s, like Alvin's descent. Fast is a game speed.",
+  visualHints: 'Marker, edge arrow and in-range cue for objectives in the dive view.',
+  sonarMarkers: 'Objective and discovery icons on the sonar map. The seabed always shows.',
+};
 
 /** Keys the dialog itself needs; never offered as a binding. */
 export const RESERVED_KEYS: readonly string[] = ['Escape', 'Tab'];
@@ -142,6 +208,8 @@ export class SettingsScreen {
     HTMLInputElement | HTMLSelectElement
   >();
   private readonly detailOut: HTMLOutputElement;
+  private readonly modeSelector: ModeSelector;
+  private uiScaleOut: HTMLOutputElement | null = null;
   private readonly bindButtons = new Map<ActionId, HTMLButtonElement>();
   private open_ = false;
   private capturing: ActionId | null = null;
@@ -206,73 +274,26 @@ export class SettingsScreen {
 
     // --- D-MODES begin ---
     const gameplay = this.section(`${id}-gameplay`, 'Gameplay');
-    const mode = el('select');
-    mode.dataset.setting = 'gameplayMode';
-    for (const [value, label] of [
-      ['arcade', 'Arcade'],
-      ['realistic', 'Realistic'],
-      ['custom', 'Custom'],
-    ]) {
-      const option = el('option', undefined, label);
-      option.value = value;
-      mode.append(option);
-    }
-    mode.addEventListener('change', () =>
-      opts.save.setGameplayMode(mode.value as SettingsData['gameplayMode']),
-    );
-    this.controls.set('gameplayMode', mode);
-    gameplay.append(
-      this.field(
-        'Mode',
-        mode,
-        'Fast travel is a game setting across hull classes; Alvin-like research speed is about 1 m/s.',
-      ),
-    );
-    const labels: Record<keyof GameplayOptions, string> = {
-      speedProfile: 'Forward speed',
-      lights: 'Lights',
-      sensors: 'Sensors',
-      visualHints: 'Visual waypoints',
-      sonarMarkers: 'Sonar markers',
-      startPosition: 'Start position',
-      batteryOxygen: 'Battery and oxygen',
-      currents: 'Currents',
-      descentProfile: 'Descent speed',
-      simSpeed: 'Simulation speed',
-    };
-    for (const key of Object.keys(cfg.settings.gameplayOptions) as Array<keyof GameplayOptions>) {
+    // D2-PREDIVE: the mode is a segmented control at the top of Gameplay,
+    // the same control as on the home screen and in the briefing.
+    this.modeSelector = new ModeSelector('is-settings', opts.save);
+    const modeRow = el('div', 'settings-row settings-mode-row');
+    modeRow.append(this.modeSelector.root);
+    gameplay.append(modeRow);
+    for (const key of gameplayKeysInOrder(cfg.settings.gameplayOptions)) {
       const choices = cfg.settings.gameplayOptions[key] as readonly (string | number | boolean)[];
       const input = el('select');
       input.dataset.gameplay = key;
       for (const choice of choices) {
-        const option = el(
-          'option',
-          undefined,
-          typeof choice === 'boolean'
-            ? choice
-              ? 'On'
-              : 'Off'
-            : choice === 'near-site'
-              ? 'Near site'
-              : typeof choice === 'number' && key === 'simSpeed'
-                ? `${choice}×`
-                : String(choice).replaceAll('-', ' '),
-        );
+        const option = el('option', undefined, gameplayValueLabel(key, choice));
         option.value = String(choice);
         input.append(option);
       }
       input.addEventListener('change', () => {
-        const sample = choices[0];
-        const value =
-          typeof sample === 'number'
-            ? Number(input.value)
-            : typeof sample === 'boolean'
-              ? input.value === 'true'
-              : input.value;
-        opts.save.setGameplayOption(key, value as never);
+        opts.save.setGameplayOption(key, parseGameplayValue(choices, input.value) as never);
       });
       this.gameplayControls.set(key, input);
-      gameplay.append(this.field(labels[key], input));
+      gameplay.append(this.field(GAMEPLAY_LABELS[key], input, GAMEPLAY_NOTES[key]));
     }
     // --- D-MODES end ---
 
@@ -289,15 +310,20 @@ export class SettingsScreen {
         ]),
       ),
     );
-    const uiScale = el('input');
-    uiScale.type = 'number';
-    uiScale.min = '80';
-    uiScale.max = '150';
-    uiScale.step = '1';
-    uiScale.dataset.setting = 'uiScale';
-    uiScale.addEventListener('change', () => opts.save.save({ uiScale: Number(uiScale.value) }));
-    this.controls.set('uiScale', uiScale);
-    access.append(this.field('UI scale (%)', uiScale));
+    // --- D2-PREDIVE: UI scale and hull warning ---
+    access.append(this.uiScaleRow());
+    access.append(
+      this.select(
+        'hullWarningStyle',
+        'Hull warning',
+        [
+          ['vignette', 'Vignette'],
+          ['gauge', 'Gauge'],
+          ['both', 'Both'],
+        ],
+        "How the HUD warns you as the sub nears its hull's rated depth.",
+      ),
+    );
     access.append(this.checkbox('controlTips', 'Control tips'));
 
     const keys = this.section(`${id}-keys`, 'Controls');
@@ -475,6 +501,7 @@ export class SettingsScreen {
 
   dispose(): void {
     this.close();
+    this.modeSelector.dispose();
     for (const d of this.disposers) d();
     this.root.remove();
   }
@@ -530,7 +557,7 @@ export class SettingsScreen {
   }
 
   private select(
-    key: 'graphicsTier' | 'simSpeedDefault' | 'sonarPalette',
+    key: 'graphicsTier' | 'simSpeedDefault' | 'sonarPalette' | 'hullWarningStyle',
     label: string,
     options: Array<[string, string]>,
     note?: string,
@@ -575,6 +602,45 @@ export class SettingsScreen {
     return row;
   }
 
+  /**
+   * D2-PREDIVE (playtest #3): the old number box clipped its last digit
+   * behind the spinner at 100% and above. Now − / slider / + and a separate
+   * readout sized for "150%", so nothing overlaps at any scale.
+   */
+  private uiScaleRow(): HTMLDivElement {
+    const range = el('input');
+    range.type = 'range';
+    range.min = String(UI_SCALE_MIN);
+    range.max = String(UI_SCALE_MAX);
+    range.step = '1';
+    range.dataset.setting = 'uiScale';
+    const out = el('output', 'settings-scale-value');
+    this.uiScaleOut = out;
+    const commit = (value: number): void => {
+      this.opts.save.save({ uiScale: clampUiScale(value) });
+    };
+    range.addEventListener('input', () => {
+      out.value = `${range.value}%`;
+      range.setAttribute('aria-valuetext', `${range.value}%`);
+    });
+    range.addEventListener('change', () => commit(Number(range.value)));
+    const step = (dir: -1 | 1, text: string, label: string): HTMLButtonElement => {
+      const b = el('button', 'settings-scale-step', text);
+      b.type = 'button';
+      b.setAttribute('aria-label', label);
+      b.addEventListener('click', () => commit(stepUiScale(this.opts.save.get().uiScale, dir)));
+      return b;
+    };
+    this.controls.set('uiScale', range);
+    const row = this.field('UI scale', range, 'Text and panel size for the HUD and menus.');
+    row.classList.add('settings-scale-row');
+    const group = el('div', 'settings-scale');
+    range.replaceWith(group);
+    group.append(step(-1, '−', 'Decrease UI scale'), range, step(1, '+', 'Increase UI scale'), out);
+    out.htmlFor.add(range.id);
+    return row;
+  }
+
   /** Push the saved values into the controls. */
   private sync(): void {
     const s: SettingsData = this.opts.save.get();
@@ -582,6 +648,10 @@ export class SettingsScreen {
       const v = s[key];
       if (c instanceof HTMLInputElement && c.type === 'checkbox') c.checked = Boolean(v);
       else c.value = String(v);
+      if (key === 'uiScale' && this.uiScaleOut) {
+        this.uiScaleOut.value = `${v}%`;
+        c.setAttribute('aria-valuetext', `${v}%`);
+      }
       if (key === 'detailStrength') {
         this.detailOut.value = Number(v).toFixed(2);
         c.setAttribute('aria-valuetext', Number(v).toFixed(2));

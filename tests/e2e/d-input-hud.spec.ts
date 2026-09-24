@@ -41,8 +41,9 @@ test('readable contextual HUD, controls and UI scale survive reload', async ({ p
   await expect(settings.locator('[data-action="capturePhoto"]')).toHaveText('Enter');
   await page.screenshot({ path: `${shots}/controls.png` });
   await settings.getByRole('button', { name: 'Back to Settings' }).click();
-  await settings.getByLabel('UI scale (%)').fill('150');
-  await settings.getByLabel('UI scale (%)').blur();
+  await settings.getByLabel('UI scale', { exact: true }).focus();
+  await page.keyboard.press('End'); // the slider's maximum, 150%
+  await expect(settings.locator('.settings-scale-value')).toHaveText('150%');
   await page.keyboard.press('Escape');
   await page.reload();
   await page.waitForFunction(() => window.__gameReady === true);

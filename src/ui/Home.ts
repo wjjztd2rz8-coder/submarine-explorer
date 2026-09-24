@@ -1,4 +1,5 @@
 import { FocusTrap } from './FocusTrap.js';
+import { ModeSelector, type GameplaySettingsSource } from './ModeSelector.js';
 
 export interface HomeActions {
   continueDive(): void;
@@ -13,12 +14,19 @@ export class Home {
   readonly globeSlot: HTMLDivElement;
   readonly sitesSlot: HTMLDivElement;
   readonly continueButton: HTMLButtonElement;
+  /** D2-PREDIVE: the Arcade / Realistic / Custom selector above the menu (with a settings source). */
+  readonly modeSelector: ModeSelector | null;
+  private readonly diveSitesButton: HTMLButtonElement;
   private readonly menu: HTMLElement;
   private readonly sites: HTMLElement;
   private readonly trap: FocusTrap;
   private open_ = false;
 
-  constructor(actions: HomeActions, parent: HTMLElement = document.body) {
+  constructor(
+    actions: HomeActions,
+    parent: HTMLElement = document.body,
+    gameplay?: GameplaySettingsSource,
+  ) {
     this.root = document.createElement('div');
     this.root.className = 'home-screen';
     this.root.hidden = true;
@@ -40,6 +48,10 @@ export class Home {
     menu.className = 'home-menu';
     menu.setAttribute('aria-label', 'Main menu');
     this.menu = menu;
+    // D2-PREDIVE (playtest #3): the game mode sits right above the menu, so it
+    // is seen before choosing a dive rather than hunted for in Settings.
+    this.modeSelector = gameplay ? new ModeSelector('is-home', gameplay) : null;
+    if (this.modeSelector) menu.append(this.modeSelector.root);
     const entry = (label: string, act: () => void): HTMLButtonElement => {
       const button = document.createElement('button');
       button.type = 'button';
@@ -50,7 +62,7 @@ export class Home {
     };
     this.continueButton = entry('Continue', actions.continueDive);
     this.continueButton.disabled = true;
-    entry('Dive sites', () => this.showSites(false));
+    this.diveSitesButton = entry('Dive sites', () => this.showSites(false));
     entry('Free dive', () => this.showSites(true));
     entry('Journal', actions.journal);
     entry('Settings', actions.settings);
@@ -125,6 +137,6 @@ export class Home {
     this.sites.hidden = true;
     this.menu.hidden = false;
     this.root.classList.remove('has-sites');
-    this.root.querySelector<HTMLButtonElement>('.home-menu button:nth-child(2)')?.focus();
+    this.diveSitesButton.focus();
   }
 }
