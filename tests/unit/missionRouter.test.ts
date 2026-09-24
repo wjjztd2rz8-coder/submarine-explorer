@@ -152,6 +152,43 @@ describe('missionSpawnPose', () => {
   });
 });
 
+describe('optional near-site content', () => {
+  it('parses a valid override without changing the surface spawn', () => {
+    const raw = {
+      ...titanicMission,
+      start: {
+        near_site: {
+          lat: META.center.lat,
+          lon: META.center.lon,
+          depth_m: 3800,
+          heading_deg: 450,
+        },
+      },
+    };
+    const def = parseMission(raw, 'titanic', quiet)!;
+    expect(def.start?.near_site?.heading_deg).toBe(90);
+    expect(def.spawn).toEqual(titanic().spawn);
+  });
+
+  it('warns and computes a pose when the optional override is invalid', () => {
+    const warnings: string[] = [];
+    const raw = {
+      ...titanicMission,
+      start: {
+        near_site: {
+          lat: 100,
+          lon: 0,
+          depth_m: -20,
+          heading_deg: 0,
+        },
+      },
+    };
+    const def = parseMission(raw, 'titanic', (m) => warnings.push(m))!;
+    expect(def.start).toBeUndefined();
+    expect(warnings).toHaveLength(1);
+  });
+});
+
 describe('applyMissionLoadout', () => {
   it('fits the hull class and the mission sim speed', () => {
     const config = makeConfig();

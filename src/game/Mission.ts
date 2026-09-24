@@ -28,6 +28,10 @@ export interface MissionSpawn {
   heading_deg: number;
 }
 
+export interface MissionStart {
+  near_site?: MissionSpawn;
+}
+
 export interface MissionBriefing {
   summary: string;
   /** Positive metres; the target depth shown on the card. */
@@ -57,6 +61,8 @@ export interface MissionDef {
   title: string;
   hull_class?: string;
   spawn: MissionSpawn;
+  /** Optional authored near-site pose; otherwise the first primary POI determines it. */
+  start?: MissionStart;
   briefing: MissionBriefing;
   objectives: MissionObjectiveDef[];
   completion: CompletionRule;
@@ -164,6 +170,28 @@ export function parseMission(
     completion: 'all_primary',
   };
   if (isStr(doc.hull_class)) def.hull_class = doc.hull_class;
+  if (isObj(doc.start)) {
+    const near = doc.start.near_site;
+    if (
+      isObj(near) &&
+      isNum(near.lat) &&
+      Math.abs(near.lat) <= 90 &&
+      isNum(near.lon) &&
+      Math.abs(near.lon) <= 180 &&
+      isNum(near.depth_m) &&
+      near.depth_m > 0 &&
+      isNum(near.heading_deg)
+    ) {
+      def.start = {
+        near_site: {
+          lat: near.lat,
+          lon: near.lon,
+          depth_m: near.depth_m,
+          heading_deg: ((near.heading_deg % 360) + 360) % 360,
+        },
+      };
+    } else if (near !== undefined) warn(`${id}: invalid start.near_site; computing a safe pose`);
+  } else if (doc.start !== undefined) warn(`${id}: invalid start; computing a safe pose`);
   return def;
 }
 

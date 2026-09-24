@@ -11,6 +11,7 @@ import {
   nearestDeepCell,
   spawnHeight,
   spawnSettings,
+  nearSiteSpawnPose,
   type SpawnGrid,
 } from '../../src/game/Spawn.js';
 
@@ -50,6 +51,47 @@ describe('chooseFreeDiveHull', () => {
     );
     expect(choice?.classId).toBe('C');
     expect(fitted).toEqual(['C']);
+  });
+});
+
+describe('nearSiteSpawnPose', () => {
+  const meta = {
+    center: { lat: 0, lon: 0 },
+    bbox: { north: 0.01, south: -0.01, west: -0.01, east: 0.01 },
+  } as import('../../src/util/types.js').TileMeta;
+  const target = { x: 0, y: -480, z: 0 };
+  it('stays 100–200 m from the target, above the seabed, facing it', () => {
+    const p = nearSiteSpawnPose(target, meta, { sampleHeight: () => -500 }, S, -1000)!;
+    expect(Math.hypot(p.x, p.z)).toBeGreaterThanOrEqual(100);
+    expect(Math.hypot(p.x, p.z)).toBeLessThanOrEqual(200);
+    expect(p.y).toBeGreaterThanOrEqual(-500 + R + S.seabedClearance + S.spawnClearanceM);
+    expect(Math.sin(p.yaw) * -p.x - Math.cos(p.yaw) * -p.z).toBeGreaterThan(0);
+  });
+
+  it('stays inside a small tile and above a shallow slope', () => {
+    const small = { ...meta, bbox: { north: 0.001, south: -0.001, west: -0.001, east: 0.001 } };
+    const p = nearSiteSpawnPose(
+      target,
+      small,
+      { sampleHeight: (x) => (x > 0 ? -60 : -500) },
+      S,
+      -1000,
+    )!;
+    expect(Math.abs(p.x)).toBeLessThan(112);
+    expect(Math.abs(p.z)).toBeLessThan(112);
+    expect(p.y).toBeLessThan(-R);
+    expect(p.y).toBeGreaterThan(-500 + R + S.seabedClearance + S.spawnClearanceM);
+  });
+
+  it('clamps to hull rating and rejects an unsafe explicit coordinate', () => {
+    const p = nearSiteSpawnPose(target, meta, { sampleHeight: () => -1000 }, S, -450, {
+      lat: 1,
+      lon: 1,
+      depth_m: 900,
+      heading_deg: 0,
+    })!;
+    expect(p.y).toBeGreaterThanOrEqual(-450 + R);
+    expect(Math.hypot(p.x, p.z)).toBeLessThanOrEqual(200);
   });
 });
 

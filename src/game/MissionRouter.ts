@@ -36,6 +36,9 @@ import {
 } from './Mission.js';
 import type { DebriefStats } from './Objectives.js';
 import type { SeabedSampler, SpawnPose } from './Pois.js';
+import { nearSiteSpawnPose, spawnSettings } from './Spawn.js';
+
+export type MissionStartPosition = 'near-site' | 'surface';
 
 // -------------------------------------------------------------------- boot
 
@@ -154,6 +157,37 @@ export function applyMissionLoadout(
   });
 }
 
+/** Resolve the selected start after POIs have loaded; surface is the safe fallback. */
+export function missionStartPose(
+  def: MissionDef,
+  choice: MissionStartPosition,
+  pois: ReadonlyArray<{ id: string; position: XYZ }>,
+  meta: TileMeta,
+  seabed: SeabedSampler,
+  config: GameConfig,
+): SpawnPose {
+  const limits = spawnSettings(config);
+  const surface = missionSpawnPose(def.spawn, meta, seabed, limits);
+  if (choice === 'surface') return surface;
+  const first = def.objectives.find(
+    (objective) => objective.primary && pois.some((p) => p.id === objective.poi),
+  );
+  const target = pois.find((poi) => poi.id === first?.poi)?.position;
+  if (!target) {
+    console.warn(`[mission] ${def.id}: no resolved primary POI; using surface start`);
+    return surface;
+  }
+  const crushDepth = def.hull_class
+    ? (config.submarine.hullClasses[def.hull_class]?.crushDepth ?? config.submarine.crushDepth)
+    : config.submarine.crushDepth;
+  const near = nearSiteSpawnPose(target, meta, seabed, limits, crushDepth, def.start?.near_site);
+  if (!near) {
+    console.warn(`[mission] ${def.id}: no safe near-site pose; using surface start`);
+    return surface;
+  }
+  return near;
+}
+
 /** Neutral input used while the briefing freezes the game. */
 export const FROZEN_INPUT: Readonly<InputState> = Object.freeze({
   throttle: 0,
@@ -261,6 +295,8 @@ export interface MissionRouterOptions {
   config: GameConfig;
   meta: TileMeta;
   discovery: MissionDiscovery;
+  defaultStartPosition?: MissionStartPosition;
+  applyStart?: (choice: MissionStartPosition) => void;
   /** Initial sim speed for the panel (the sub's, after the loadout). */
   simSpeed: number;
   /** Primary key label for an input action, e.g. `input.primaryKeyLabel`. */
@@ -330,8 +366,14 @@ export class MissionRouter {
     if (route.skipBriefing) {
       this.briefing = null;
       this.mission.start(meta.id);
+      void opts.discovery.ready.then(() =>
+        opts.applyStart?.(opts.defaultStartPosition ?? 'near-site'),
+      );
     } else {
-      this.briefing = new Briefing({ parent: opts.parent, onBegin: () => this.begin() });
+      this.briefing = new Briefing({
+        parent: opts.parent,
+        onBegin: (choice) => this.begin(choice),
+      });
       this.briefing.show(this.briefingContent());
       this.panel.setVisible(false);
     }
@@ -357,10 +399,13 @@ export class MissionRouter {
   }
 
   /** Close the briefing and start the mission clock. */
-  begin(): void {
-    this.briefing?.hide();
-    this.panel.setVisible(true);
-    this.mission.start(this.opts.meta.id);
+  begin(choice: MissionStartPosition = this.opts.defaultStartPosition ?? 'near-site'): void {
+    void this.opts.discovery.ready.then(() => {
+      this.opts.applyStart?.(choice);
+      this.briefing?.hide();
+      this.panel.setVisible(true);
+      this.mission.start(this.opts.meta.id);
+    });
   }
 
   /**
@@ -512,8 +557,7 @@ export class MissionRouter {
       const rating = Math.abs(hull.crushDepth).toLocaleString('en-US');
       content.meta.push(['HULL', `${hull.name} (rated ${rating} m)`]);
     }
-    const start = def.spawn.depth_m <= 10 ? 'surface' : `${Math.round(def.spawn.depth_m)} m`;
-    content.meta.push(['START', `${start} · heading ${Math.round(def.spawn.heading_deg)}°`]);
+    content.startPosition = this.opts.defaultStartPosition ?? 'near-site';
     if (def.briefing.memorial_note) content.memorialNote = def.briefing.memorial_note;
     return content;
   }

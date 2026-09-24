@@ -339,7 +339,7 @@ def check_pois(doc, report, landmark, guide_ids, tile, tolerance):
 
 
 def check_mission(doc, report, landmark, poi_depths, tile, hulls, folder, tiles_root,
-                  crush_warn_ratio=DEFAULT_CRUSH_WARN_RATIO):
+                  crush_warn_ratio=DEFAULT_CRUSH_WARN_RATIO, poi_doc=None):
     if not _check_header(doc, report, "mission.json", landmark):
         return
     tile_id = doc.get("tile", landmark)
@@ -415,6 +415,42 @@ def check_mission(doc, report, landmark, poi_depths, tile, hulls, folder, tiles_
             report.err("mission.json spawn", '"depth_m" must be a non-negative number')
         if "heading_deg" in spawn and not _is_num(spawn["heading_deg"]):
             report.err("mission.json spawn", '"heading_deg" must be a number')
+
+    start = doc.get("start")
+    if start is not None:
+        near = start.get("near_site") if isinstance(start, dict) else None
+        where = "mission.json start.near_site"
+        if not isinstance(near, dict) or not all(
+                _is_num(near.get(key)) for key in ("lat", "lon", "depth_m", "heading_deg")):
+            report.err(where, 'needs numeric lat, lon, depth_m and heading_deg')
+        else:
+            lat, lon, depth = near["lat"], near["lon"], near["depth_m"]
+            if not (-90 <= lat <= 90 and -180 <= lon <= 180 and depth > 0):
+                report.err(where, "coordinates or depth_m out of range")
+            elif tile is not None and not tile.inside(lat, lon):
+                report.err(where, "coordinates are outside the tile bbox")
+            elif tile is not None and depth > tile.seabed_depth(lat, lon) - 28:
+                report.err(where, "depth_m does not clear the seabed by 28 m")
+            if hull in hulls and depth > abs(hulls[hull]) - 8:
+                report.err(where, "depth_m exceeds the hull depth rating")
+            primary = next((o.get("poi") for o in doc.get("objectives", [])
+                            if isinstance(o, dict) and o.get("primary") is True), None)
+            entries = poi_doc.get("pois", []) if isinstance(poi_doc, dict) else []
+            poi = next((p for p in entries if isinstance(p, dict) and p.get("id") == primary), None)
+            if poi and _is_num(poi.get("lat")) and _is_num(poi.get("lon")):
+                dx = (lon - poi["lon"]) * 111320 * math.cos(math.radians(lat))
+                dz = (lat - poi["lat"]) * 111320
+                if math.hypot(dx, dz) > 200:
+                    report.err(where, "coordinates are more than 200 m from first primary POI")
+                if math.hypot(dx, dz) > 1:
+                    toward = math.degrees(math.atan2(-dx, -dz)) % 360
+                    turn = (near["heading_deg"] - toward + 180) % 360 - 180
+                    if abs(turn) > 30:
+                        report.err(where, "heading_deg must face the first primary POI (within 30 degrees)")
+                target_depth = poi_depths.get(primary)
+                if target_depth is not None and max(math.hypot(dx, dz) / 12,
+                                                    abs(depth - target_depth) / 8) > 60:
+                    report.err(where, "first primary POI exceeds the 60 s Arcade approach budget")
 
     b = doc.get("briefing")
     if not isinstance(b, dict):
@@ -594,7 +630,7 @@ def validate_landmark(landmark, repo=REPO, tolerance=DEFAULT_DEPTH_TOLERANCE_M, 
         poi_depths = check_pois(docs["pois.json"], report, landmark, guide_ids, tile, tolerance)
     if mission is not None:
         check_mission(mission, report, landmark, poi_depths, tile, hulls, folder, tiles_root,
-                      load_crush_warn_ratio(repo))
+                      load_crush_warn_ratio(repo), docs.get("pois.json"))
     if docs.get("props.json") is not None:
         check_props(docs["props.json"], report, landmark, tile)
     if docs.get("species.json") is not None:

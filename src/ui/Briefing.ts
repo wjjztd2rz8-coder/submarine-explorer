@@ -14,6 +14,7 @@
  */
 
 import { FocusTrap } from './FocusTrap.js';
+import type { MissionStartPosition } from '../game/MissionRouter.js';
 
 export interface BriefingContent {
   kicker: string;
@@ -27,10 +28,11 @@ export interface BriefingContent {
   objectives: Array<{ title: string; primary: boolean }>;
   /** Key label / what it does. */
   controls: Array<[string, string]>;
+  startPosition?: MissionStartPosition;
 }
 
 export interface BriefingOptions {
-  onBegin: () => void;
+  onBegin: (choice: MissionStartPosition) => void;
   parent?: HTMLElement;
 }
 
@@ -51,6 +53,7 @@ export class Briefing {
   private open_ = false;
   private readonly onKey: (e: KeyboardEvent) => void;
   private readonly trap: FocusTrap;
+  private choice: MissionStartPosition = 'near-site';
 
   constructor(private readonly options: BriefingOptions) {
     this.root = el('div', 'briefing');
@@ -78,6 +81,7 @@ export class Briefing {
   show(c: BriefingContent): void {
     const p = this.panel;
     p.replaceChildren();
+    this.choice = c.startPosition ?? 'near-site';
 
     const head = el('div', 'briefing-head');
     head.append(el('div', 'briefing-kicker', c.kicker), el('h1', 'briefing-title', c.title));
@@ -137,11 +141,33 @@ export class Briefing {
     cols.append(left, right);
     p.append(cols);
 
+    // The start choice sits in the sticky footer beside Begin, so it is
+    // always visible even when the card scrolls.
+    const start = el('div', 'briefing-start');
+    start.setAttribute('role', 'radiogroup');
+    start.setAttribute('aria-label', 'Start position');
+    start.append(el('span', 'briefing-section-title', 'START'));
+    for (const [value, label, detail] of [
+      ['near-site', 'Near site', 'next to the first objective'],
+      ['surface', 'Surface', 'full descent'],
+    ] as const) {
+      const option = el('label', 'briefing-start-option');
+      const input = el('input');
+      input.type = 'radio';
+      input.name = 'briefing-start';
+      input.value = value;
+      input.checked = this.choice === value;
+      input.addEventListener('change', () => {
+        if (input.checked) this.choice = value;
+      });
+      option.append(input, el('span', undefined, label), el('small', undefined, detail));
+      start.append(option);
+    }
     const foot = el('div', 'briefing-actions');
     const begin = el('button', 'briefing-begin', 'Begin dive');
     begin.type = 'button';
     begin.addEventListener('click', () => this.begin());
-    foot.append(begin, el('span', 'briefing-hint', 'OR PRESS ENTER'));
+    foot.append(begin, el('span', 'briefing-hint', 'OR PRESS ENTER'), start);
     p.append(foot);
 
     this.open_ = true;
@@ -153,7 +179,7 @@ export class Briefing {
   private begin(): void {
     if (!this.open_) return;
     this.hide();
-    this.options.onBegin();
+    this.options.onBegin(this.choice);
   }
 
   hide(): void {
