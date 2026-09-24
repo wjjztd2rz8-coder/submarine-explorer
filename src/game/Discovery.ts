@@ -96,6 +96,7 @@ export class Discovery {
 
     this.disposers.push(
       bus.on('scan:complete', (e) => this.onComplete(e.poiId, e.firstTime)),
+      bus.on('mission:restart', () => this.resetDive()),
       bus.on('landmarks:loaded', ({ landmarks }) => {
         const l = landmarks.find((x) => x.id === landmarkId);
         if (l?.name) {
@@ -184,9 +185,15 @@ export class Discovery {
   private keys(): ScanOverlayKeys {
     const label = this.opts.keyLabel;
     return {
-      scan: label ? label('scan') : 'G',
+      scan: label ? label('scan') : 'F',
       guide: label ? label('toggleGuide') : 'J',
     };
+  }
+
+  /** Clear dive-local scan and session state while retaining Journal unlocks. */
+  resetDive(): void {
+    this.scanner.resetDive();
+    this.stats.reset();
   }
 
   private onComplete(poiId: string, firstTime: boolean): void {

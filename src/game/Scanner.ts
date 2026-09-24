@@ -7,6 +7,8 @@
  * control, drifting out of range or turning away interrupts the scan: one
  * `scan:aborted` is emitted and the progress *decays* rather than resetting,
  * so re-acquiring the same target quickly resumes where it left off.
+ * Completed targets stay unavailable for the rest of this dive, regardless of
+ * whether the control is released. resetDive() clears only that session state.
  *
  * Pure TypeScript (Vector3 is the only Three.js type used) and driven by an
  * explicit `dt`, so it runs headless in vitest and is fixed-step friendly.
@@ -64,6 +66,8 @@ export interface ScanView {
   nearestRadius: number;
   nearestInRange: boolean;
   nearestFacing: boolean;
+  /** The nearest contact has already been scanned during this dive. */
+  nearestScanned: boolean;
   /** Angle between forward and the nearest POI, degrees. */
   nearestAngleDeg: number;
   /**
@@ -100,6 +104,7 @@ export class Scanner {
     nearestRadius: 0,
     nearestInRange: false,
     nearestFacing: false,
+    nearestScanned: false,
     nearestAngleDeg: 180,
     nearestTurnDeg: 0,
     lastAbort: null,
@@ -112,9 +117,9 @@ export class Scanner {
   enabled = true;
 
   private targets: ScanTarget[] = [];
+  /** Public per-dive state for sonar, objectives and other presentation layers. */
+  readonly scannedThisDive = new Set<string>();
   private active: ScanTarget | null = null;
-  /** After a completion, the control must be released before rescanning that POI. */
-  private latchedId: string | null = null;
   private sinceProgressEmit = Infinity;
   private readonly cosCone: number;
 
@@ -139,6 +144,22 @@ export class Scanner {
     return this.view.phase === 'scanning';
   }
 
+  isScanned(landmarkId: string, poiId: string): boolean {
+    return this.scannedThisDive.has(`${landmarkId}/${poiId}`);
+  }
+
+  /** A new dive may scan a Journal entry again; persistence is unaffected. */
+  resetDive(): void {
+    this.scannedThisDive.clear();
+    this.clearActive();
+    this.view.completed = 0;
+    this.view.lastCompleteId = null;
+    this.view.lastCompleteFirstTime = false;
+    this.view.candidateId = null;
+    this.view.nearestId = null;
+    this.view.nearestScanned = false;
+  }
+
   /**
    * Advance by `dt` seconds.
    * @param forward unit forward vector of the sub (`sub.getForward()`).
@@ -146,7 +167,6 @@ export class Scanner {
   update(dt: number, position: Vector3, forward: Vector3, scanHeld: boolean): void {
     const v = this.view;
     const held = scanHeld && this.enabled;
-    if (!held) this.latchedId = null;
 
     // Nearest target (for hints) and best scannable candidate.
     let candidate: ScanTarget | null = null;
@@ -157,7 +177,14 @@ export class Scanner {
     for (const t of this.targets) {
       const g = this.geometry(t, position, forward);
       if (t === this.active) activeGeo = g;
-      if (g.inRange && g.facing && g.distance < candidateDist && t.id !== this.latchedId) {
+      if (this.isScanned(t.landmarkId, t.id)) {
+        if (g.inRange && (!nearestGeo || g.distance < nearestGeo.distance)) {
+          nearest = t;
+          nearestGeo = g;
+        }
+        continue;
+      }
+      if (g.inRange && g.facing && g.distance < candidateDist) {
         candidate = t;
         candidateDist = g.distance;
       }
@@ -173,7 +200,7 @@ export class Scanner {
       this.active &&
       activeGeo?.inRange &&
       activeGeo.facing &&
-      this.active.id !== this.latchedId
+      !this.isScanned(this.active.landmarkId, this.active.id)
     ) {
       candidate = this.active;
     }
@@ -185,6 +212,7 @@ export class Scanner {
     v.nearestRadius = nearest?.radius ?? 0;
     v.nearestInRange = nearestGeo?.inRange ?? false;
     v.nearestFacing = nearestGeo?.facing ?? false;
+    v.nearestScanned = nearest ? this.isScanned(nearest.landmarkId, nearest.id) : false;
     v.nearestAngleDeg = nearestGeo?.angleDeg ?? 180;
     v.nearestTurnDeg = nearestGeo?.turnDeg ?? 0;
 
@@ -240,13 +268,14 @@ export class Scanner {
 
   private complete(t: ScanTarget): void {
     const v = this.view;
+    if (this.isScanned(t.landmarkId, t.id)) return;
+    this.scannedThisDive.add(`${t.landmarkId}/${t.id}`);
     const firstTime = this.recorder ? this.recorder.record(t.landmarkId, t.id).firstTime : true;
     this.bus.emit('scan:progress', { poiId: t.id, progress: 1 });
     this.bus.emit('scan:complete', { poiId: t.id, landmarkId: t.landmarkId, firstTime });
     v.completed += 1;
     v.lastCompleteId = t.id;
     v.lastCompleteFirstTime = firstTime;
-    this.latchedId = t.id;
     this.clearActive();
     v.candidateId = null;
   }
