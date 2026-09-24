@@ -640,6 +640,30 @@ async function main(): Promise<void> {
 
   const input = new Input(canvas);
   input.attach();
+  // --- D2-CAMERA begin ---
+  let cameraTipsUntil = performance.now() + 20_000;
+  bus.on('mission:started', () => {
+    rig.resetView();
+    cameraTipsUntil = performance.now() + 20_000;
+  });
+  hud.onResetCamera(() => {
+    if (appState === 'dive') {
+      rig.resetView();
+      cameraTipsUntil = 0;
+    }
+  });
+  canvas.addEventListener('dblclick', () => {
+    if (
+      appState === 'dive' &&
+      !settingsScreen.isOpen &&
+      !globe.isOpen &&
+      !(missionRouter?.frozen ?? false)
+    ) {
+      rig.resetView();
+      cameraTipsUntil = 0;
+    }
+  });
+  // --- D2-CAMERA end ---
   // --- D-INPUT-HUD begin ---
   const lockKeyboard = async (): Promise<void> => {
     const keyboard = (
@@ -661,9 +685,26 @@ async function main(): Promise<void> {
     if (document.fullscreenElement) void lockKeyboard();
     else unlockKeyboard();
   });
-  document.addEventListener('pointerlockchange', () =>
-    input.setMouseLook(document.pointerLockElement === canvas),
-  );
+  // --- D2-CAMERA begin ---
+  document.addEventListener('pointerlockchange', () => {
+    const locked = document.pointerLockElement === canvas;
+    const wasLocked = input.pointerLookActive;
+    input.setMouseLook(locked);
+    if (
+      wasLocked &&
+      !locked &&
+      appState === 'dive' &&
+      !settingsScreen.isOpen &&
+      !globe.isOpen &&
+      !discovery.guide.isOpen &&
+      !(missionRouter?.frozen ?? false) &&
+      !photoMode.active &&
+      !discovery.debrief.isOpen &&
+      !(missionRouter?.debriefOpen ?? false)
+    )
+      setAppState('pause');
+  });
+  // --- D2-CAMERA end ---
   let ctrlTipShown = false;
   try {
     ctrlTipShown = JSON.parse(localStorage.getItem('subexplorer.tips.v1') ?? '{}').ctrlW === true;
@@ -725,7 +766,19 @@ async function main(): Promise<void> {
     tierFromUrl: params.get('tier') !== null && params.get('tier') === tier,
     canOpen: () => !globe.isOpen,
     onRequestPointerLock: () => {
-      void canvas.requestPointerLock?.();
+      // --- D2-CAMERA begin ---
+      if (appState === 'pause' && !(missionRouter?.frozen ?? false)) setAppState('dive');
+      if (
+        appState === 'dive' &&
+        !settingsScreen.isOpen &&
+        !pause.isOpen &&
+        !globe.isOpen &&
+        !discovery.guide.isOpen &&
+        !(missionRouter?.frozen ?? false)
+      ) {
+        void canvas.requestPointerLock?.();
+      }
+      // --- D2-CAMERA end ---
     },
     onOpen: () => {
       document.exitPointerLock?.();
@@ -1141,6 +1194,9 @@ async function main(): Promise<void> {
     }
     const frozen = shellFrozen || discovery.debrief.isOpen || photoMode.active;
     // --- D-PHOTO end ---
+    // --- D2-CAMERA begin ---
+    if (frozen && document.pointerLockElement === canvas) document.exitPointerLock?.();
+    // --- D2-CAMERA end ---
     // --- D-INPUT-HUD begin ---
     if (wasFrozen && !frozen) void lockKeyboard();
     wasFrozen = frozen;
@@ -1204,14 +1260,26 @@ async function main(): Promise<void> {
     if (!frozen && !rov.deployed) propContact.resolve(sub, time.frameDelta); // prop push-out, after physics
     // --- B4 end ---
 
-    if (state.toggleCamera && !rov.deployed) {
+    // --- D2-CAMERA begin ---
+    if (!frozen && !rov.deployed && state.toggleCamera) {
       rig.toggleMode();
+      cameraTipsUntil = 0;
     }
+    if (!frozen && !rov.deployed && state.resetCamera) {
+      rig.resetView();
+      cameraTipsUntil = 0;
+    }
+    // --- D2-CAMERA end ---
     // --- D-INPUT-HUD begin ---
     if (!frozen || photoMode.active) {
-      if (sampled.lookDx || sampled.lookDy)
+      if (sampled.lookDx || sampled.lookDy) {
         rig.orbit(-sampled.lookDx * 0.004, sampled.lookDy * 0.004);
-      if (input.wheelDelta) rig.orbit(0, 0, input.wheelDelta * 0.001);
+        cameraTipsUntil = 0;
+      }
+      if (input.wheelDelta) {
+        rig.orbit(0, 0, input.wheelDelta * 0.001);
+        cameraTipsUntil = 0;
+      }
     } else unlockKeyboard();
     // --- D-INPUT-HUD end ---
     // --- D-SONAR begin ---
@@ -1270,9 +1338,6 @@ async function main(): Promise<void> {
     // --- D-ROV end ---
 
     sub.getForward(forward);
-    // fix S (QA-B #6): a scan target in range (last frame's scanner view)
-    // makes the chase camera frame it clear of our own hull.
-    const scanFocus = rov.deployed ? null : discovery.focusPoint();
     // --- D-ROV begin ---
     const pilotPosition = rov.deployed ? rov.position : sub.position;
     const pilotForward = rov.deployed ? rov.forward : forward;
@@ -1285,8 +1350,6 @@ async function main(): Promise<void> {
       {
         roll: sub.roll,
         velocity: rov.deployed ? rov.velocity : sub.velocity,
-        hullStress: s.hullStress,
-        focus: scanFocus,
       },
     );
     // --- D-ROV begin ---
@@ -1393,7 +1456,7 @@ async function main(): Promise<void> {
     const rovControlTips = `${input.primaryKeyLabel('thrustForward')}/${input.primaryKeyLabel('thrustReverse')} fly · ${input.primaryKeyLabel('yawPort')}/${input.primaryKeyLabel('yawStarboard')} turn · ${input.primaryKeyLabel('ballastBlow')}/${input.primaryKeyLabel('ballastFlood')} rise/sink · ${input.primaryKeyLabel('scan')} scan · ${input.primaryKeyLabel('toggleRov')} retrieve ROV`;
     // --- D-ROV end ---
     hud.update(s, {
-      nearScanTarget: scanFocus !== null,
+      nearScanTarget: discovery.focusPoint() !== null,
       // The objectives panel already shows the current objective; a second
       // copy here crowded the screen (owner playtest).
       objective: undefined,
@@ -1402,10 +1465,13 @@ async function main(): Promise<void> {
         : null,
       simSpeed: sub.simSpeed,
       controlTips:
-        !frozen && rig.mode !== 'orbit' && save.get().controlTips
+        !frozen &&
+        rig.mode !== 'orbit' &&
+        save.get().controlTips &&
+        performance.now() < cameraTipsUntil
           ? rov.deployed
             ? rovControlTips
-            : `${input.primaryKeyLabel('thrustForward')}/${input.primaryKeyLabel('thrustReverse')} speed · ${input.primaryKeyLabel('boost')} boost · ${input.primaryKeyLabel('pitchUp')}/${input.primaryKeyLabel('pitchDown')} pitch · ${input.primaryKeyLabel('ballastBlow')}/${input.primaryKeyLabel('ballastFlood')} rise/sink · ${input.primaryKeyLabel('cycleSimSpeed')} sim speed · ${input.primaryKeyLabel('toggleRov')} deploy ROV${scanView.candidateId ? ` · ${input.primaryKeyLabel('scan')} scan` : ''}`
+            : `${input.primaryKeyLabel('thrustForward')}/${input.primaryKeyLabel('thrustReverse')} speed · ${input.primaryKeyLabel('yawPort')}/${input.primaryKeyLabel('yawStarboard')} turn · ${input.primaryKeyLabel('ballastBlow')}/${input.primaryKeyLabel('ballastFlood')} rise/sink · Drag: look · Wheel: zoom · ${input.primaryKeyLabel('resetCamera')}: reset camera`
           : null,
     });
     // --- D-INPUT-HUD end ---

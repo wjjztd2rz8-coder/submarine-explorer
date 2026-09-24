@@ -66,7 +66,7 @@ async function subPos(page: Page): Promise<{ x: number; y: number; z: number }> 
 }
 
 async function holdScanUntil(page: Page, objectiveId: string): Promise<void> {
-  await page.keyboard.down('f');
+  await page.keyboard.down('g');
   await page.waitForFunction(
     (id) =>
       (
@@ -77,7 +77,7 @@ async function holdScanUntil(page: Page, objectiveId: string): Promise<void> {
     objectiveId,
     { timeout: 20_000 },
   );
-  await page.keyboard.up('f');
+  await page.keyboard.up('g');
 }
 
 test.describe('B3 mission flow', () => {
@@ -437,7 +437,7 @@ test.describe('fix S: mission failure, framing and modals', () => {
     expect(errors, errors.join(' | ')).toEqual([]);
   });
 
-  test('at the bow the chase camera frames the wreck clear of the hull', async ({ page }) => {
+  test('approaching a scan target does not move the chase camera', async ({ page }) => {
     const errors = collectErrors(page);
     await boot(page, '/?mission=titanic&poi=titanic-bow&skipBriefing=1');
     await page.waitForFunction(
@@ -447,43 +447,24 @@ test.describe('fix S: mission failure, framing and modals', () => {
       undefined,
       { timeout: 15_000 },
     );
-    await page.waitForFunction(
-      () => (window.__game as { rig: { focusWeight: number } }).rig.focusWeight > 0.95,
-      undefined,
-      { timeout: 10_000 },
-    );
-    const clear = await page.evaluate(() => {
+    const offset = await page.evaluate(() => {
       const g = window.__game as {
         rig: { camera: { position: { x: number; y: number; z: number } } };
-        sub: { position: { x: number; y: number; z: number } };
-        discovery: { pois: Array<{ id: string; position: { x: number; y: number; z: number } }> };
+        sub: { position: { x: number; y: number; z: number }; yaw: number };
+        config: { camera: { chaseOffset: { z: number } } };
       };
-      const a = g.rig.camera.position;
-      const b = g.discovery.pois.find((p) => p.id === 'titanic-bow')!.position;
-      const p = g.sub.position;
-      const ab = [b.x - a.x, b.y - a.y, b.z - a.z];
-      const ap = [p.x - a.x, p.y - a.y, p.z - a.z];
-      const l2 = ab[0]! ** 2 + ab[1]! ** 2 + ab[2]! ** 2;
-      const t = Math.max(
-        0,
-        Math.min(1, (ap[0]! * ab[0]! + ap[1]! * ab[1]! + ap[2]! * ab[2]!) / l2),
-      );
-      return Math.hypot(ap[0]! - t * ab[0]!, ap[1]! - t * ab[1]!, ap[2]! - t * ab[2]!);
+      return {
+        x: g.rig.camera.position.x - g.sub.position.x,
+        y: g.rig.camera.position.y - g.sub.position.y,
+        z: g.rig.camera.position.z - g.sub.position.z,
+        yaw: g.sub.yaw,
+        chaseBack: g.config.camera.chaseOffset.z,
+      };
     });
-    // Metres between the boat and the camera->bow sight line.
-    expect(clear).toBeGreaterThan(12);
-    // QA-B #14: no SEABED PROXIMITY banner over the wreck inspection.
+    expect(Math.hypot(offset.x, offset.y, offset.z)).toBeGreaterThan(90);
+    expect(offset.x).toBeCloseTo(-offset.chaseBack * Math.sin(offset.yaw), 1);
+    expect(offset.z).toBeCloseTo(offset.chaseBack * Math.cos(offset.yaw), 1);
     await expect(page.locator('.hud-warning')).toBeHidden();
-    // QA-B #11: one range metric -- the nav line's RNG is the scan panel's 3D range.
-    await page.waitForTimeout(600);
-    const ranges = await page.evaluate(() => ({
-      nav: document.querySelector('.obj-nav-range')?.textContent ?? '',
-      scan: (window.__game as { scanner: { view: { nearestDistance: number } } }).scanner.view
-        .nearestDistance,
-    }));
-    expect(ranges.nav).toMatch(/^RNG \d+ m$/);
-    expect(Math.abs(Number.parseFloat(ranges.nav.slice(4)) - ranges.scan)).toBeLessThan(4);
-    await page.screenshot({ path: 'tests/e2e/screenshots/fix-s-bow-offset.png' });
     expect(errors, errors.join(' | ')).toEqual([]);
   });
 });

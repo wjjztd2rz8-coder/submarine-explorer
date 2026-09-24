@@ -3281,3 +3281,33 @@ body.photo-active > :not(#viewport, .photo-mode) {
   color: #ffc2bb;
 }
 /* --- D-PHOTO end --- */
+
+/* --- D2-CAMERA --- */
+.hud-control-tips {
+  max-width: min(870px, calc(100vw - 160px));
+  opacity: 0.95;
+  font-size: clamp(14px, calc(14px * var(--ui-scale)), 18px);
+}
+.hud-reset-camera {
+  position: absolute;
+  right: 12px;
+  bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+  pointer-events: auto;
+  padding: 5px 9px;
+  border: 1px solid var(--hud-border);
+  border-radius: 4px;
+  background: var(--hud-bg);
+  color: var(--hud-text);
+  font: inherit;
+  font-size: clamp(12px, calc(12px * var(--ui-scale)), 16px);
+  cursor: pointer;
+}
+.hud-reset-camera:hover,
+.hud-reset-camera:focus-visible {
+  color: var(--hud-accent);
+  border-color: var(--hud-accent);
+}
+body:not([data-app-state='dive']) .hud-reset-camera,
+body.photo-active .hud-reset-camera {
+  display: none;
+}

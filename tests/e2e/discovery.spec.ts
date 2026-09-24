@@ -82,7 +82,7 @@ test.describe('B1 scan, discovery, Journal', () => {
     );
     const before = await probe(page);
     expect(before.discovered).toBe(false);
-    await expect(page.locator('.scan-panel .scan-hint')).toHaveText(/HOLD F TO SCAN/);
+    await expect(page.locator('.scan-panel .scan-hint')).toHaveText(/HOLD G TO SCAN/);
 
     // Record bus events from inside the page.
     await page.evaluate(() => {
@@ -95,7 +95,7 @@ test.describe('B1 scan, discovery, Journal', () => {
     });
 
     // Hold F for longer than scan_seconds (3 s in the fixture).
-    await page.keyboard.down('f');
+    await page.keyboard.down('g');
     await page.waitForTimeout(1500);
     const mid = await probe(page);
     expect(mid.phase).toBe('scanning');
@@ -108,7 +108,7 @@ test.describe('B1 scan, discovery, Journal', () => {
       { timeout: 15_000 },
     );
     await page.waitForTimeout(300);
-    await page.keyboard.up('f');
+    await page.keyboard.up('g');
 
     const events = await page.evaluate(
       () => (window as unknown as { __b1: Array<{ name: string; payload: unknown }> }).__b1,

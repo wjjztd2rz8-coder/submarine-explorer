@@ -18,7 +18,7 @@ test('readable contextual HUD, controls and UI scale survive reload', async ({ p
   await ready(page);
   await expect(page.locator('.hud-help')).toHaveCount(0);
   await expect(page.locator('body > .mission-select')).toBeHidden();
-  await expect(page.locator('.hud-prompt')).toContainText('F Scan');
+  await expect(page.locator('.hud-prompt')).toContainText('G Scan');
   await page.screenshot({ path: `${shots}/hud-1280.png` });
   await page.screenshot({ path: `${shots}/dive.png` });
   await page.setViewportSize({ width: 1920, height: 1080 });
@@ -34,7 +34,7 @@ test('readable contextual HUD, controls and UI scale survive reload', async ({ p
   await expect(settings.getByLabel('Legacy default sim speed')).toHaveCount(0);
   await settings.getByRole('button', { name: 'Controls' }).click();
   await expect(page.getByRole('dialog', { name: 'Controls' })).toBeVisible();
-  await expect(settings.locator('[data-action="scan"]')).toHaveText('F');
+  await expect(settings.locator('[data-action="scan"]')).toHaveText('G');
   await expect(settings.locator('[data-action="ballastFlood"]')).toContainText('Ctrl');
   await expect(settings.locator('[data-action="ping"]')).toHaveCount(0);
   await expect(settings.locator('[data-action="togglePhotoMode"]')).toHaveText('P');
@@ -51,7 +51,7 @@ test('readable contextual HUD, controls and UI scale survive reload', async ({ p
       () => (window.__game as { save: { get(): { uiScale: number } } }).save.get().uiScale,
     ),
   ).toBe(150);
-  await expect(page.locator('.hud-prompt')).toContainText('F Scan');
+  await expect(page.locator('.hud-prompt')).toContainText('G Scan');
   await page.screenshot({ path: `${shots}/scaled-150.png` });
   await page.keyboard.press('t');
   await expect(page.locator('.hud-sim-speed')).toHaveText('2× SIM SPEED');
@@ -144,7 +144,7 @@ test('canvas drag orbits chase camera and wheel zooms without pointer lock', asy
 test('v1 custom bindings migrate without taking new one-handed defaults', async ({ page }) => {
   await ready(page, '/?tile=titanic');
   await page.evaluate(() => {
-    localStorage.removeItem('subexplorer.bindings.v2');
+    localStorage.removeItem('subexplorer.bindings.v3');
     localStorage.setItem(
       'subexplorer.bindings.v1',
       JSON.stringify({
@@ -171,15 +171,15 @@ test('v1 custom bindings migrate without taking new one-handed defaults', async 
       scan: input.getAction('scan')?.keys,
       descend: input.getAction('ballastFlood')?.keys,
       journal: input.getAction('toggleJournal')?.keys,
-      saved: JSON.parse(localStorage.getItem('subexplorer.bindings.v2') ?? '{}').version,
+      saved: JSON.parse(localStorage.getItem('subexplorer.bindings.v3') ?? '{}').version,
     };
   });
   expect(bindings).toEqual({
     ahead: ['KeyI'],
     boost: [],
-    scan: ['KeyF'],
+    scan: ['KeyG'],
     descend: ['ControlLeft', 'ControlRight', 'KeyC'],
     journal: ['KeyH'],
-    saved: 2,
+    saved: 3,
   });
 });

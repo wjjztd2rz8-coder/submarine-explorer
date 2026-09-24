@@ -165,28 +165,32 @@ and licences ([`LICENSE`](LICENSE), [`LICENSE-CONTENT.md`](LICENSE-CONTENT.md)).
 
 Defaults from `defaultActions()` in `src/core/Input.ts`. Keys are rebindable
 from Settings -> Controls (`Input.rebind`, saved to `localStorage` key
-`subexplorer.bindings.v2`); a gamepad takes over automatically whenever a
+`subexplorer.bindings.v3`); a gamepad takes over automatically whenever a
 stick or button is deflected, but its buttons are not rebindable yet.
 
 | Key                         | Action                                                                                       | Gamepad (standard mapping) |
 | --------------------------- | -------------------------------------------------------------------------------------------- | -------------------------- |
 | `W` / `S` (or up / down)    | ahead / astern                                                                               | left stick                 |
 | `A` / `D` (or left / right) | yaw to port / starboard                                                                      | left stick                 |
-| `R` / `V`                   | pitch nose up / down                                                                         | right stick                |
+| `R` / `F`                   | pitch nose up / down                                                                         | right stick                |
 | `Space`                     | rise (blow ballast)                                                                          | A / cross                  |
-| `Ctrl` or `C`               | sink (flood ballast) -- `C` is a full alias, so `Ctrl+W` never closes the tab                | B / circle                 |
+| `Ctrl` or `C`               | sink (flood ballast); `C` is a full alias                                                    | B / circle                 |
 | `Shift`                     | boost                                                                                        | right trigger              |
-| `F` (hold)                  | scan the target in range; "Already logged" once it's scanned this dive                       | right bumper               |
+| `G` (hold)                  | scan the target in range; "Already logged" once it's scanned this dive                       | right bumper               |
 | `L`                         | headlights                                                                                   | X                          |
 | `M`                         | sonar map; mouse wheel zooms it (250 m / 500 m / 1 km / 2 km / whole tile) when it has focus | Back / view                |
+| `X`                         | reset camera to default chase view                                                           | --                         |
 | `Q`                         | camera view (chase / first-person)                                                           | Y                          |
 | `T`                         | sim speed 1x / 2x / 3x (a HUD badge shows it whenever it isn't 1x)                           | D-pad up                   |
 | `J`                         | Journal (site, POI and species entries, plus your photo gallery)                             | --                         |
 | `E`                         | deploy / retrieve the tethered ROV                                                           | --                         |
 | `P`                         | photo mode (free-orbit camera, hidden HUD); `Enter` or `Space` captures                      | Start                      |
 | `Esc`                       | pause menu; closes the top-most open dialog first                                            | --                         |
-| mouse drag                  | orbit the camera                                                                             | --                         |
+| mouse drag                  | free look; camera keeps its world angle as the boat turns                                    | --                         |
 | mouse wheel                 | zoom the chase camera (35-180 m) when the sonar doesn't have focus                           | --                         |
+| double-click game view      | reset camera to default chase view                                                           | --                         |
+
+Pointer look is optional in Settings -> Controls. Its lock ends when a menu opens; losing the lock during a dive opens pause.
 
 Settings, the globe and Journal no longer have dedicated hotkeys (the old `O`
 and `N`) -- open them from the home screen or the `Esc` pause menu instead.

@@ -109,7 +109,7 @@ async function teleport(page: Page, poiId: string): Promise<void> {
 }
 
 async function scan(page: Page, objectiveId: string): Promise<void> {
-  await page.keyboard.down('f');
+  await page.keyboard.down('g');
   try {
     await page.waitForFunction(
       (id) =>
@@ -120,7 +120,7 @@ async function scan(page: Page, objectiveId: string): Promise<void> {
       { timeout: 20_000 },
     );
   } finally {
-    await page.keyboard.up('f');
+    await page.keyboard.up('g');
   }
 }
 

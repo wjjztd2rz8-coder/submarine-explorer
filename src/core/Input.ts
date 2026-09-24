@@ -31,6 +31,7 @@ export interface InputState {
   lookDy: number;
   /** Edge-triggered actions; cleared by {@link Input.endFrame}. */
   toggleCamera: boolean;
+  resetCamera?: boolean;
   toggleSonar: boolean;
   boost: boolean;
   /** Headlights (A2 owns the lights themselves; this is just the edge). */
@@ -78,6 +79,7 @@ export type ActionId =
   | 'ballastFlood'
   | 'boost'
   | 'toggleCamera'
+  | 'resetCamera'
   | 'toggleSonar'
   | 'toggleLights'
   | 'scan'
@@ -132,7 +134,7 @@ export function defaultActions(): ActionBinding[] {
       id: 'pitchDown',
       label: 'Nose down',
       category: 'Piloting',
-      keys: ['KeyV'],
+      keys: ['KeyF'],
       pad: 'Right stick down',
     },
     {
@@ -157,7 +159,7 @@ export function defaultActions(): ActionBinding[] {
       pad: 'Right trigger',
     },
     { id: 'toggleLights', label: 'Headlights', category: 'Systems', keys: ['KeyL'], pad: 'X' },
-    { id: 'scan', label: 'Scan (hold)', category: 'Systems', keys: ['KeyF'], pad: 'Right bumper' },
+    { id: 'scan', label: 'Scan (hold)', category: 'Systems', keys: ['KeyG'], pad: 'Right bumper' },
     { id: 'toggleRov', label: 'Deploy / retrieve ROV', category: 'Systems', keys: ['KeyE'] },
     {
       id: 'cycleSimSpeed',
@@ -167,6 +169,7 @@ export function defaultActions(): ActionBinding[] {
       pad: 'D-pad up',
     },
     { id: 'toggleCamera', label: 'Camera view', category: 'View', keys: ['KeyQ'], pad: 'Y' },
+    { id: 'resetCamera', label: 'Reset camera', category: 'View', keys: ['KeyX'] },
     { id: 'toggleSonar', label: 'Sonar map', category: 'View', keys: ['KeyM'], pad: 'Back' },
     { id: 'togglePhotoMode', label: 'Photo mode', category: 'View', keys: ['KeyP'], pad: 'Start' },
     { id: 'capturePhoto', label: 'Capture photo', category: 'View', keys: ['Enter'] },
@@ -174,8 +177,14 @@ export function defaultActions(): ActionBinding[] {
   ];
 }
 
-export const BINDINGS_STORAGE_KEY = 'subexplorer.bindings.v2';
+export const BINDINGS_STORAGE_KEY = 'subexplorer.bindings.v3';
+export const PREVIOUS_BINDINGS_STORAGE_KEY = 'subexplorer.bindings.v2';
 export const LEGACY_BINDINGS_STORAGE_KEY = 'subexplorer.bindings.v1';
+const V2_DEFAULTS: Record<string, string[]> = Object.fromEntries(
+  defaultActions()
+    .filter((a) => a.id !== 'resetCamera')
+    .map((a) => [a.id, a.id === 'pitchDown' ? ['KeyV'] : a.id === 'scan' ? ['KeyF'] : a.keys]),
+);
 
 const V1_DEFAULTS: Record<string, string[]> = {
   thrustForward: ['KeyW', 'ArrowUp'],
@@ -230,6 +239,7 @@ export class Input {
     lookDx: 0,
     lookDy: 0,
     toggleCamera: false,
+    resetCamera: false,
     toggleSonar: false,
     boost: false,
     toggleLights: false,
@@ -252,6 +262,9 @@ export class Input {
   private byId = new Map<ActionId, ActionBinding>();
   private mouseDown = false;
   private mouseLook: boolean;
+  get pointerLookActive(): boolean {
+    return this.mouseLook;
+  }
   private disposers: Array<() => void> = [];
   private readonly target: HTMLElement | null;
   private readonly storage: BindingStore | null;
@@ -317,6 +330,7 @@ export class Input {
     }
     try {
       this.storage?.removeItem(BINDINGS_STORAGE_KEY);
+      this.storage?.removeItem(PREVIOUS_BINDINGS_STORAGE_KEY);
       this.storage?.removeItem(LEGACY_BINDINGS_STORAGE_KEY);
     } catch {
       // Privacy mode / hostile storage: the defaults still apply this session.
@@ -326,7 +340,7 @@ export class Input {
   private saveBindings(): void {
     if (!this.storage) return;
     const payload = {
-      version: 2,
+      version: 3,
       keys: Object.fromEntries(this.actions.map((a) => [a.id, a.keys])),
     };
     try {
@@ -336,22 +350,28 @@ export class Input {
     }
   }
 
-  /** Migrate only changed v1 choices, so new defaults are not shadowed by old defaults. */
+  /** Keep choices that differ from the defaults of their saved version. */
   private loadBindings(): void {
     if (!this.storage) return;
-    let v2: string | null;
-    let v1: string | null;
+    let raw: string | null;
+    let version: number;
     try {
-      v2 = this.storage.getItem(BINDINGS_STORAGE_KEY);
-      v1 = v2 === null ? this.storage.getItem(LEGACY_BINDINGS_STORAGE_KEY) : null;
+      raw = this.storage.getItem(BINDINGS_STORAGE_KEY);
+      version = 3;
+      if (raw === null) {
+        raw = this.storage.getItem(PREVIOUS_BINDINGS_STORAGE_KEY);
+        version = 2;
+      }
+      if (raw === null) {
+        raw = this.storage.getItem(LEGACY_BINDINGS_STORAGE_KEY);
+        version = 1;
+      }
     } catch {
       return;
     }
-    const raw = v2 ?? v1;
     if (!raw) return;
     try {
       const parsed = JSON.parse(raw) as { version?: number; keys?: Record<string, unknown> };
-      const version = v2 !== null ? 2 : 1;
       if (parsed.version !== version || !parsed.keys || typeof parsed.keys !== 'object') return;
       const custom = new Map<ActionId, string[]>();
       for (const action of this.actions) {
@@ -359,31 +379,33 @@ export class Input {
         const value = parsed.keys[oldId];
         if (!Array.isArray(value) || !value.every((k) => typeof k === 'string')) continue;
         const keys = value as string[];
-        if (version === 2 || JSON.stringify(keys) !== JSON.stringify(V1_DEFAULTS[oldId])) {
+        const oldDefault =
+          version === 1 ? V1_DEFAULTS[oldId] : version === 2 ? V2_DEFAULTS[oldId] : undefined;
+        if (version === 3 || JSON.stringify(keys) !== JSON.stringify(oldDefault))
           custom.set(action.id, keys);
-        }
       }
       const claimed = new Set<string>();
-      // Saved choices win conflicts with new defaults, including explicit unbound actions.
-      for (const action of this.actions) {
-        const keys = custom.get(action.id);
-        if (!keys) continue;
+      const assign = (action: ActionBinding, keys: string[]): void => {
         action.keys = keys.filter((key) => {
           if (claimed.has(key)) return false;
           claimed.add(key);
           return true;
         });
+      };
+      // Changed defaults get their new keys when the action was untouched.
+      for (const id of ['pitchDown', 'scan', 'resetCamera'] as const) {
+        const action = this.byId.get(id)!;
+        if (!custom.has(id)) assign(action, action.keys);
       }
       for (const action of this.actions) {
-        if (custom.has(action.id)) continue;
-        action.keys = action.keys.filter((key) => {
-          if (claimed.has(key)) return false;
-          claimed.add(key);
-          return true;
-        });
+        const keys = custom.get(action.id);
+        if (keys) assign(action, keys);
       }
-      if (version === 1 || !Object.prototype.hasOwnProperty.call(parsed.keys, 'toggleRov'))
-        this.saveBindings();
+      for (const action of this.actions) {
+        if (!custom.has(action.id) && !['pitchDown', 'scan', 'resetCamera'].includes(action.id))
+          assign(action, action.keys);
+      }
+      if (version !== 3) this.saveBindings();
     } catch {
       /* A corrupt save leaves the defaults usable. */
     }
@@ -523,6 +545,7 @@ export class Input {
 
     if (this.edgeArmed.size) {
       if (this.edgeArmed.has('toggleCamera')) s.toggleCamera = true;
+      if (this.edgeArmed.has('resetCamera')) s.resetCamera = true;
       if (this.edgeArmed.has('toggleSonar')) s.toggleSonar = true;
       if (this.edgeArmed.has('toggleLights')) s.toggleLights = true;
       if (this.edgeArmed.has('cycleSimSpeed')) s.cycleSimSpeed = true;
@@ -570,6 +593,7 @@ export class Input {
     s.lookDy = 0;
     this.wheelDelta = 0;
     s.toggleCamera = false;
+    s.resetCamera = false;
     s.toggleSonar = false;
     s.toggleLights = false;
     s.ping = false;
