@@ -93,7 +93,7 @@ test.describe('B1 scan, discovery, field guide', () => {
       }
     });
 
-    // Hold G for longer than scan_seconds (3 s in the fixture).
+    // Hold F for longer than scan_seconds (3 s in the fixture).
     await page.keyboard.down('f');
     await page.waitForTimeout(1500);
     const mid = await probe(page);

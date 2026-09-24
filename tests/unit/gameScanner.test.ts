@@ -144,17 +144,26 @@ describe('Scanner', () => {
     expect(scanner.view.activeId).toBe('near');
   });
 
-  it('needs a release before re-scanning, and reports repeat scans as not first-time', () => {
+  it('suppresses rescans for the dive, then allows a repeat in a new dive without losing Journal state', () => {
     const { scanner, log, store } = setup();
     run(scanner, 2.2, AT, NORTH, true);
     run(scanner, 3, AT, NORTH, true); // still held: latched, no second scan
     expect(log.filter(([n]) => n === 'scan:complete')).toHaveLength(1);
     scanner.update(DT, AT, NORTH, false);
     run(scanner, 2.2, AT, NORTH, true);
+    expect(log.filter(([n]) => n === 'scan:complete')).toHaveLength(1);
+    expect(scanner.view.nearestScanned).toBe(true);
+    expect(scanner.view.candidateId).toBeNull();
+    expect(scanner.isScanned('lm', 'bow')).toBe(true);
+    expect(store.get('lm', 'bow')?.count).toBe(1);
+    scanner.resetDive();
+    expect(scanner.isScanned('lm', 'bow')).toBe(false);
+    run(scanner, 2.2, AT, NORTH, true);
     const completes = log.filter(([n]) => n === 'scan:complete');
     expect(completes).toHaveLength(2);
     expect((completes[1]?.[1] as { firstTime: boolean }).firstTime).toBe(false);
     expect(store.get('lm', 'bow')?.count).toBe(2);
+    expect(store.isDiscovered('lm', 'bow')).toBe(true);
   });
 
   it('is suppressed while disabled (an overlay is open)', () => {

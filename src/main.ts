@@ -26,6 +26,7 @@ import { Submarine } from './sub/Submarine.js';
 import { HUD, uiScaleFactors } from './ui/HUD.js';
 import { MissionSelect } from './ui/MissionSelect.js';
 import { Sonar } from './ui/Sonar.js';
+import { Waypoints } from './ui/Waypoints.js';
 import { UnderwaterPass } from './shaders/underwater.js';
 import { Landmarks } from './world/Landmarks.js';
 import { Terrain } from './world/Terrain.js';
@@ -316,6 +317,30 @@ async function main(): Promise<void> {
       rig.snap(sub.position, sub.yaw, sub.pitch);
     },
   });
+  // --- D-SCAN begin ---
+  const waypoints = new Waypoints(discovery.scanner, sonar, terrain.widthM, terrain.depthM);
+  waypoints.setVisualHints(settings.gameplay.visualHints);
+  waypoints.setReducedMotion(settings.reduceMotion);
+  waypoints.setPalette(settings.sonarPalette);
+  void discovery.ready.then(() => waypoints.setPois(discovery.pois));
+  // Mission's current parser drops the content hint, so read the authored
+  // sentence here until that field is passed through by the mission owner.
+  const scanObjectiveHints = new Map<string, string>();
+  if (route) {
+    void fetchContentJson(contentUrl(route.missionId, 'mission.json')).then((raw) => {
+      if (!raw || typeof raw !== 'object') return;
+      const objectives = (raw as { objectives?: unknown }).objectives;
+      if (!Array.isArray(objectives)) return;
+      for (const value of objectives) {
+        if (!value || typeof value !== 'object') continue;
+        const { id, hint } = value as { id?: unknown; hint?: unknown };
+        if (typeof id === 'string' && typeof hint === 'string' && hint.trim()) {
+          scanObjectiveHints.set(id, hint.trim());
+        }
+      }
+    });
+  }
+  // --- D-SCAN end ---
   // --- D-MODES begin ---
   const baseScanRadii = new Map<string, number>();
   void discovery.ready.then(() => {
@@ -744,6 +769,13 @@ async function main(): Promise<void> {
       document.documentElement.style.setProperty('--ui-user-scale', String(next.uiScale / 100));
     // --- D-INPUT-HUD end ---
   });
+  // --- D-SCAN begin ---
+  save.onChange((next, changed) => {
+    if (changed.includes('gameplay')) waypoints.setVisualHints(next.gameplay.visualHints);
+    if (changed.includes('reduceMotion')) waypoints.setReducedMotion(next.reduceMotion);
+    if (changed.includes('sonarPalette')) waypoints.setPalette(next.sonarPalette);
+  });
+  // --- D-SCAN end ---
   // --- D-MODES begin ---
   save.onChange((next, changed) => {
     if (!changed.includes('gameplay')) return;
@@ -910,14 +942,31 @@ async function main(): Promise<void> {
       clockDt,
     );
     // --- B1 end ---
-    // --- D-INPUT-HUD begin ---
-    const scanView = discovery.scanner.view;
-    const objective =
+    // --- D-SCAN begin ---
+    const nextScanObjective =
       missionRouter?.mission.objectives.find((o) => o.resolved && !o.complete && o.primary) ??
       missionRouter?.mission.objectives.find((o) => o.resolved && !o.complete);
+    const scanContent = route?.def.objectives.find((o) => o.id === nextScanObjective?.id) as
+      { hint?: string } | undefined;
+    waypoints.update(
+      rig.camera,
+      sub.position,
+      nextScanObjective
+        ? {
+            poiId: nextScanObjective.poiId,
+            title: nextScanObjective.title,
+            hint: scanContent?.hint ?? scanObjectiveHints.get(nextScanObjective.id),
+          }
+        : null,
+    );
+    // --- D-SCAN end ---
+    // --- D-INPUT-HUD begin ---
+    const scanView = discovery.scanner.view;
     hud.update(s, {
       nearScanTarget: scanFocus !== null,
-      objective: objective?.title,
+      // The objectives panel already shows the current objective; a second
+      // copy here crowded the screen (owner playtest).
+      objective: undefined,
       scanPrompt: scanView.candidateId
         ? `${input.primaryKeyLabel('scan')} Scan · ${scanView.nearestName}`
         : null,
@@ -1025,6 +1074,9 @@ async function main(): Promise<void> {
     missionSelect,
     sonar,
     // --- B3 end ---
+    // --- D-SCAN begin ---
+    waypoints,
+    // --- D-SCAN end ---
     // --- C1 begin ---
     globe,
     // --- D-SHELL begin ---

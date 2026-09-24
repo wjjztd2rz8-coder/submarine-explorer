@@ -163,6 +163,7 @@ export class ScanOverlay {
       this.reticle.style.transform = `translate(${screen.x.toFixed(1)}px, ${screen.y.toFixed(1)}px)`;
       this.reticle.classList.toggle('is-locked', view.phase === 'scanning');
       this.reticle.classList.toggle('is-ready', view.candidateId !== null);
+      this.reticle.classList.toggle('is-scanned', view.nearestScanned);
     } else {
       this.reticle.hidden = true;
     }
@@ -183,6 +184,15 @@ export class ScanOverlay {
       this.setText(this.nameEl, 'name', view.activeName);
       this.setText(this.hint, 'hint', `HOLD ${keys.scan} · KEEP ON TARGET`);
       this.setRing(view.progress, `${Math.floor(view.progress * 100)}%`);
+      return;
+    }
+
+    if (view.nearestScanned && view.nearestInRange) {
+      this.setTone('dim');
+      this.setText(this.kicker, 'kicker', '✓ SCANNED THIS DIVE');
+      this.setText(this.nameEl, 'name', view.nearestName);
+      this.setText(this.hint, 'hint', 'Already logged — see Journal');
+      this.setRing(1, '✓');
       return;
     }
     if (view.phase === 'interrupted') {
