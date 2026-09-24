@@ -2,7 +2,7 @@ Resume Submarine Explorer orchestration (repo /home/vijay/submarine-explorer). T
 
 ## 0. Guard (do this first)
 
-- Lock: if `.cache/orchestrator.active` exists and its mtime is under 90 minutes old, another orchestrator (the owner's interactive thread or an earlier timed run) is active. Append one line to `plan/OVERNIGHT-LOG.md` ("skipped: orchestrator active") and exit. Otherwise write your PID and time to `.cache/orchestrator.active`, `touch` it after each major step, and delete it when you finish.
+- Lock: if `.cache/orchestrator.active` exists and its mtime is under 90 minutes old, another orchestrator (the owner's interactive thread or an earlier timed run) is active. Append one line to `plan/OVERNIGHT-LOG.md` ("skipped: orchestrator active") and exit. Otherwise write `headless <PID> <time>` to `.cache/orchestrator.active`, `touch` it after each major step, and delete it when you finish.
 - Read your memory notes (codex-subagents, playtest-direction, content-tone, usage-budget), plan/PHASE-D-PLAN.md §2–3, plan/PHASE-D-CONTRACTS.md and the tail of plan/OVERNIGHT-LOG.md.
 
 ## 1. Collect finished work
