@@ -175,6 +175,7 @@ describe('Phase D gameplay settings', () => {
       sonarPalette: 'highContrast',
       gameplayMode: 'arcade',
       uiScale: 100,
+      controlTips: true,
     });
     expect(store.getItem(SETTINGS_STORAGE_KEY)).toContain('"version":2');
     expect(store.getItem('subexplorer.settings.v1')).not.toBeNull();
@@ -194,6 +195,9 @@ describe('Phase D gameplay settings', () => {
     expect(save.get().gameplay.lights).toBe('enhanced');
     save.setGameplayMode('arcade');
     expect(save.get().gameplay).toEqual(config.settings.gameplayPresets.arcade);
+    save.save({ controlTips: false });
+    expect(save.get().controlTips).toBe(false);
+    expect(save.get().gameplayMode).toBe('arcade');
   });
 
   it('repairs invalid Custom fields individually and overrides mismatched named presets', () => {
@@ -212,6 +216,8 @@ describe('Phase D gameplay settings', () => {
       simSpeed: 1,
     });
     expect(custom.uiScale).toBe(150);
+    expect(custom.controlTips).toBe(true);
+    expect(migrate({ version: 2, controlTips: false }, config).controlTips).toBe(false);
     const named = migrate(
       { version: 2, gameplayMode: 'realistic', gameplay: { speedProfile: 'fast' } },
       config,

@@ -22,6 +22,7 @@ export interface SettingsValues {
   captions: boolean;
   sonarPalette: SonarPaletteName;
   uiScale: number;
+  controlTips: boolean;
   gameplayMode: GameplayMode;
   gameplay: GameplayOptions;
 }
@@ -65,6 +66,7 @@ const GAMEPLAY_KEYS = [
 export const SETTING_KEYS: readonly SettingKey[] = [
   ...DISPLAY_KEYS,
   'uiScale',
+  'controlTips',
   'gameplayMode',
   'gameplay',
 ];
@@ -81,6 +83,7 @@ export function defaultSettings(config: SettingsConfigSource): SettingsData {
     captions: d.captions,
     sonarPalette: d.sonarPalette,
     uiScale: 100,
+    controlTips: true,
     gameplayMode: 'arcade',
     gameplay: { ...config.settings.gameplayPresets.arcade },
     bindings: SAVE_KEYS.bindings,
@@ -141,6 +144,7 @@ export function migrate(raw: unknown, config: SettingsConfigSource): SettingsDat
       );
   }
   if (value.version === 2) {
+    if (typeof value.controlTips === 'boolean') out.controlTips = value.controlTips;
     if (typeof value.uiScale === 'number' && Number.isFinite(value.uiScale))
       out.uiScale = Math.max(80, Math.min(150, Math.round(value.uiScale)));
     if (value.gameplayMode === 'arcade' || value.gameplayMode === 'realistic') {

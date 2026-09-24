@@ -105,7 +105,7 @@ export function nearSiteSpawnPose(
   const poseAt = (x: number, z: number, authoredY?: number): SpawnPose | null => {
     if (!inside(x, z)) return null;
     const horizontal = Math.hypot(target.x - x, target.z - z);
-    if (horizontal > 200 || horizontal < 1) return null;
+    if (horizontal > 600 || horizontal < 350) return null;
     let floor = -Infinity;
     // Check the straight approach, not only the point where the hull spawns.
     for (let step = 0; step <= 12; step++) {
@@ -126,14 +126,12 @@ export function nearSiteSpawnPose(
     const at = latLonToWorld(meta, override.lat, override.lon);
     const explicit = poseAt(at.x, at.z, -override.depth_m);
     if (explicit) {
-      let yaw = ((override.heading_deg % 360) * Math.PI) / 180;
-      if (yaw > Math.PI) yaw -= 2 * Math.PI;
-      return { ...explicit, yaw };
+      return explicit;
     }
   }
   let best: SpawnPose | null = null;
   let bestScore = Infinity;
-  for (const distance of [120, 150, 180, 100, 200]) {
+  for (const distance of [450, 400, 500, 350, 550, 600]) {
     for (let bearing = 0; bearing < 16; bearing++) {
       const angle = (bearing * Math.PI) / 8;
       const pose = poseAt(
@@ -141,7 +139,7 @@ export function nearSiteSpawnPose(
         target.z + Math.cos(angle) * distance,
       );
       if (!pose) continue;
-      const score = Math.abs(pose.y - target.y) * 2 + distance + (distance === 150 ? -10 : 0);
+      const score = Math.abs(pose.y - target.y) * 2 + Math.abs(distance - 450);
       if (score < bestScore) {
         best = pose;
         bestScore = score;

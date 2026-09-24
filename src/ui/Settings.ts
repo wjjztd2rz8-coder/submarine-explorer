@@ -297,6 +297,7 @@ export class SettingsScreen {
     uiScale.addEventListener('change', () => opts.save.save({ uiScale: Number(uiScale.value) }));
     this.controls.set('uiScale', uiScale);
     access.append(this.field('UI scale (%)', uiScale));
+    access.append(this.checkbox('controlTips', 'Control tips'));
 
     const keys = this.section(`${id}-keys`, 'Controls');
     this.controlsSection = keys;
@@ -513,7 +514,10 @@ export class SettingsScreen {
     return row;
   }
 
-  private checkbox(key: 'postFx' | 'reduceMotion' | 'captions', label: string): HTMLDivElement {
+  private checkbox(
+    key: 'postFx' | 'reduceMotion' | 'captions' | 'controlTips',
+    label: string,
+  ): HTMLDivElement {
     const input = el('input');
     input.type = 'checkbox';
     input.dataset.setting = key;

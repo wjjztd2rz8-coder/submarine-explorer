@@ -43,6 +43,7 @@ export interface HudContext {
   objective?: string | null;
   scanPrompt?: string | null;
   simSpeed?: number;
+  controlTips?: string | null;
 }
 
 /**
@@ -97,6 +98,7 @@ export class HUD {
   private readonly objectiveEl: HTMLDivElement;
   private readonly promptEl: HTMLDivElement;
   private readonly speedEl: HTMLDivElement;
+  private readonly tipsEl: HTMLDivElement;
   private hullNote = '';
 
   constructor(
@@ -113,11 +115,12 @@ export class HUD {
             `<div class="hud-row"><span class="hud-label">${labelOf(f)}</span>` +
             `<span class="hud-value" data-field="${f}">--</span></div>`,
         ).join('')}
+        <div class="hud-sim-speed" hidden></div>
       </div>
       <div class="hud-warning" hidden></div>
       <div class="hud-objective" hidden></div>
       <div class="hud-prompt" hidden></div>
-      <div class="hud-sim-speed" hidden></div>
+      <div class="hud-control-tips" hidden></div>
       <div class="hud-attribution"></div>
     `;
     for (const el of this.root.querySelectorAll<HTMLSpanElement>('[data-field]')) {
@@ -127,6 +130,7 @@ export class HUD {
     this.objectiveEl = this.root.querySelector('.hud-objective') as HTMLDivElement;
     this.promptEl = this.root.querySelector('.hud-prompt') as HTMLDivElement;
     this.speedEl = this.root.querySelector('.hud-sim-speed') as HTMLDivElement;
+    this.tipsEl = this.root.querySelector('.hud-control-tips') as HTMLDivElement;
     const attr = this.root.querySelector('.hud-attribution') as HTMLDivElement;
     attr.textContent = meta.attribution;
 
@@ -161,6 +165,7 @@ export class HUD {
     this.set('speed', `${(s.speed * 1.94384).toFixed(1)} kn  (${s.speed.toFixed(1)} m/s)`);
     this.showContext(this.objectiveEl, ctx.objective ? `OBJECTIVE · ${ctx.objective}` : null);
     this.showContext(this.promptEl, ctx.scanPrompt);
+    this.showContext(this.tipsEl, ctx.controlTips);
     this.showContext(
       this.speedEl,
       ctx.simSpeed && ctx.simSpeed !== 1 ? `${ctx.simSpeed}× SIM SPEED` : null,

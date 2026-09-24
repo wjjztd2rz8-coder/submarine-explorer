@@ -150,13 +150,13 @@ test.describe('B3 mission flow', () => {
     );
     const off = Math.abs(((brg - heading + 540) % 360) - 180);
     expect(off).toBeLessThan(15);
-    // RNG is the 3D slant range (QA-B #11): the near-site offset is 100-200 m.
-    await expect(panel.locator('.obj-nav-range')).toHaveText(/RNG (\d{2,3}) m/);
+    // RNG is slant range; the near-site horizontal offset is 350-600 m.
+    await expect(panel.locator('.obj-nav-range')).toHaveText(/RNG (\d{3}) m/);
     const rng = Number(
       ((await panel.locator('.obj-nav-range').textContent()) ?? '').replace(/\D/g, ''),
     );
-    expect(rng).toBeGreaterThan(50);
-    expect(rng).toBeLessThan(300);
+    expect(rng).toBeGreaterThanOrEqual(350);
+    expect(rng).toBeLessThan(700);
 
     // Now it simulates: flooding the tanks takes the boat down.
     const y0 = (await subPos(page)).y;

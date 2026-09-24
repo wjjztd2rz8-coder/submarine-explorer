@@ -491,6 +491,7 @@ export class MissionRouter {
     let nav: NavReadout | null = null;
     if (t) {
       nav = {
+        id: t.objective.id,
         name: t.name,
         primary: t.objective.primary,
         bearingDeg: t.bearingDeg,
