@@ -1,28 +1,41 @@
-Resume Submarine Explorer orchestration (repo /home/vijay/submarine-explorer). This is a headless timed run; the owner is asleep. Several runs fire overnight (hourly); each does a bounded amount of work, leaves the repo clean and green, and exits.
+Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-explorer). This is a headless timed run. The owner is away for several days and has pre-approved the scope and pushing (see memory note phase-f-direction). Each timed run does a bounded amount of work, leaves main green and clean, and exits.
 
 ## 0. Guard (do this first)
 
-- Lock: if `.cache/orchestrator.active` exists and its mtime is under 90 minutes old, another orchestrator (the owner's interactive thread or an earlier timed run) is active. Append one line to `plan/OVERNIGHT-LOG.md` ("skipped: orchestrator active") and exit. Otherwise write `headless <PID> <time>` to `.cache/orchestrator.active`, `touch` it after each major step, and delete it when you finish.
-- Read your memory notes (codex-subagents, playtest-direction, content-tone, usage-budget), plan/PHASE-D-PLAN.md §2–3, plan/PHASE-D-CONTRACTS.md and the tail of plan/OVERNIGHT-LOG.md.
+- `tools/resume.sh` has already checked the budget gate and the lock. Write `headless <PID> <time>` to `.cache/orchestrator.active`, `touch` it after each major step, and delete it when you finish.
+- Read your memory notes: phase-f-direction, usage-budget, codex-subagents, content-tone and playtest-direction. Then read plan/PHASE-F-PLAN.md (the waves, packages, ownership and operating rules) and the tail of plan/OVERNIGHT-LOG.md.
 
 ## 1. Collect finished work
 
-- `git worktree list`, `git status`, `git log --oneline -8`, and `tools/codex-status.sh`.
-- For each worktree under /home/vijay/subexp-wt/ whose task is not running (no `codex-task.sh` process for it):
-  - If `.cache/codex/<name>-result.md` says "gates PASS", review the diff briefly and look at the screenshots in `.cache/codex/shots/<name>/` (Read tool). Commit in the worktree with a descriptive message and `Co-Authored-By` lines (GPT-6 Sol and/or Claude), merge into main, run `tools/gates.sh` on main, and remove the worktree and branch.
-  - If it says "CODEX LIMIT", or the gates failed, finish the package with a Claude subagent working in that same worktree (see §3).
+- Run `git worktree list`, `git status`, `git log --oneline -10` and `tools/codex-status.sh`. Check `plan/progress/` for package notes.
+- For each worktree under /home/vijay/subexp-wt/ whose task is not running (no `codex-task.sh` process and no live Claude agent: a Claude package is finished when it has `plan/progress/<PKG>.md`):
+  - Run `PW_PORT=<unique> tools/gates.sh` in the worktree. If it passes, review the diff briefly and look at the screenshots in `.cache/codex/shots/<name>/` (Read tool). Then commit in the worktree with a descriptive message and Co-Authored-By lines, merge into main, rerun the gates on main, and remove the worktree and branch.
+  - If it is unfinished or failing, finish it with a Claude subagent in that same worktree (§2).
 
 ## 2. Next package
 
-Remaining Phase D order: D-POWER (if not merged), D-CURRENTS, D-ROV, D-PHOTO, then docs reconciliation (README, docs/architecture.md, plan/STATUS.md "Phase D" section, MASTER-PLAN §6). Briefs are in plan/PHASE-D-BRIEFS.md; the orchestrator notes in `.cache/codex/brief-d-*.md` show the house style (quote the owner, list screenshots).
-
-- Check Codex with `tools/codex-available.sh`.
-  - If available: write `.cache/codex/brief-<pkg>.md` and launch detached so it survives this run: `systemd-run --user --unit=subexp-<pkg> --working-directory=$PWD env WT=1 ON_LIMIT=exit PW_PORT=<unique 4312+> tools/codex-task.sh .cache/codex/brief-<pkg>.md <pkg> 3`. A later run collects it (§1).
-  - If limited: implement with a Claude subagent (Agent tool, run synchronously, not in the background). Use `model: "opus"` for engine and UI work and `"sonnet"` for docs and content. Run one at a time. Create the worktree first (`git worktree add -b claude/<pkg> ../subexp-wt/<pkg> HEAD` and symlink node_modules). Tell the agent to work only there, run `PW_PORT=<port> tools/gates.sh` itself until everything passes, and write screenshots to .cache/codex/shots/<pkg>/ in the main repo.
+- Pick the next package from PHASE-F-PLAN.md §3 whose owned files don't overlap work in flight. Write its brief in the style of the earlier ones (see `.cache/codex/brief-f-*.md` and the F0-CORE prompt style: why, tasks, constraints, gates, screenshots, progress note, final report).
+- Implementation goes to Claude subagents (Agent tool). Use `model: "opus"` for engine, rendering, vehicle, UI and gameplay work, and `"sonnet"` for docs, content and small fixes.
+  - Create the worktree first: `git worktree add -b claude/<pkg> ../subexp-wt/<pkg> HEAD`, symlink node_modules, and symlink `.cache/codex/shots`.
+  - In a headless run, run the agent synchronously (not in the background) so it finishes before you exit, and run at most 2 packages per run.
+- Exploratory work (audits, bug hunts, research) goes to Codex: `systemd-run --user --unit=subexp-<name> --working-directory=$PWD env WT=1 ON_LIMIT=exit [NET=1] PW_PORT=<unique> tools/codex-task.sh <brief> <name> 2`.
+- After each merged wave, or a large package, that is green and screenshot-reviewed:
+  - `git push origin main`;
+  - tag it (`git tag f<N> && git push origin f<N>`);
+  - check that the Pages deploy succeeded (`gh run list -L 3`).
 
 ## 3. Rules
 
-- Commit only green work (all of tools/gates.sh). Never push, never create a GitHub repo or enable Pages (that waits for the owner).
-- Owner direction: arcade defaults with realism toggles; no repeated "illustrative/reconstructed" caveats in player text; keep the HUD uncluttered.
-- Stop starting new work if your Claude budget looks low (for example, after one package). Always leave main green and clean.
-- Before exiting, append a short entry to `plan/OVERNIGHT-LOG.md` (time, what merged, what is running or where, problems, decisions made for the owner to review), commit it, and delete `.cache/orchestrator.active`.
+- Commit only green work (all of tools/gates.sh).
+- Check `~/.local/bin/ai-limits --gate 20 5` before each new Claude package. If Claude's 5-hour window is below 30%, start no new package. If any weekly window is at or below 5%, stop; the timer will retry, and runs skip until the reset.
+- Owner direction:
+  - Cinematic realism that is readable and never frustratingly dark.
+  - Arcade-simple controls; Arcade is the default.
+  - Real sites stay factual; plausible additions are tagged once in the Journal.
+  - No repeated "illustrative/reconstructed" caveats.
+  - Keep the HUD uncluttered.
+  - Log every cut in CHANGELOG.md.
+- Before exiting:
+  - append a short entry to `plan/OVERNIGHT-LOG.md`: the time, what merged, what is running or where, problems, and decisions for the owner to review;
+  - commit it;
+  - delete `.cache/orchestrator.active`.
