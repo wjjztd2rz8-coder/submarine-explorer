@@ -20,6 +20,7 @@
 # Logs and results still land in this checkout's .cache/codex/.
 set -uo pipefail
 cd "$(dirname "$0")/.."
+model="${CODEX_MODEL:-$(tools/codex-model.sh)}"
 export PATH="$HOME/.local/node/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
 brief="$1"; name="$2"; max_rounds="${3:-3}"
 dir="$PWD/.cache/codex"; mkdir -p "$dir/shots/$name"
@@ -35,7 +36,7 @@ if [[ "${WT:-0}" == 1 ]]; then
 fi
 log="$dir/$name.log"; result="$dir/$name-result.md"; last="$dir/$name-last.md"
 : > "$log"
-common=(-m gpt-6-sol -c model_reasoning_effort=high -c 'sandbox_mode="workspace-write"')
+common=(-m "$model" -c model_reasoning_effort=high -c 'sandbox_mode="workspace-write"')
 # NET=1 lets the task reach the network (e.g. to fetch open datasets).
 [[ "${NET:-0}" == 1 ]] && common+=(-c sandbox_workspace_write.network_access=true)
 
