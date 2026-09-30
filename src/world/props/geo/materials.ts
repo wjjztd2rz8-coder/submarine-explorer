@@ -5,7 +5,10 @@ import type { GeoDetail } from './detail.js';
 import { detailTexture, type GeoTexKind } from './textures.js';
 
 /** Overall albedo multiplier for geo rock (vertex colours are authored in natural colours). */
-export const ALBEDO = 0.42;
+export const ALBEDO = 0.24;
+
+/** Tint for instanced life (colonies, worms, sponges, mats): brighter than rock, but not clipping. */
+export const LIFE_TINT = 0x8c8c8c;
 
 export interface GeoMaterialOpts {
   roughness?: number;
@@ -27,7 +30,8 @@ export function geoMaterial(
     roughness: o.roughness ?? 0.92,
     metalness: 0,
     map,
-    bumpMap: d.bump ? map : null,
+    // Banded strata alias badly as a bump map at range; they read fine from colour alone.
+    bumpMap: d.bump && kind !== 'strata' ? map : null,
     bumpScale: o.bumpScale ?? 0.9,
     side: o.side ?? THREE.FrontSide,
   });

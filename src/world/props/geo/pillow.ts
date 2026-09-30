@@ -7,7 +7,7 @@
 
 import * as THREE from 'three';
 import { geoDetail } from './detail.js';
-import { geoMaterial } from './materials.js';
+import { geoMaterial, LIFE_TINT } from './materials.js';
 import { shimmerPlume } from './plume.js';
 import {
   boxCH,
@@ -36,18 +36,21 @@ const FE_MAT = new THREE.Color(0xd08a45);
 
 export function buildPillowField(input: GeoBuildInput): BuiltProp {
   const { dims, seed, tier } = input;
+  const gnd = input.groundHeight() ?? ((): number => 0);
   const d = geoDetail(tier);
   const [L, W, H] = dims;
   const rnd = mulberry32(seed);
-  const env = (x: number, z: number): number => {
+  const shape = (x: number, z: number): number => {
     const r = Math.hypot(x / (L / 2), z / (W / 2));
-    if (r >= 1) return -1.5;
+    if (r >= 1) return -3;
     return Math.max(
-      -0.4,
+      -3,
       H * 0.75 * Math.pow(1 - r * r, 0.8) * (0.7 + 0.5 * fbm3(x * 0.15, 1, z * 0.15, seed, 3)) -
         smooth(0.85, 1, r) * 0.5,
     );
   };
+  /** Heap surface: the shape lifted onto the terrain. */
+  const env = (x: number, z: number): number => shape(x, z) + gnd(x, z);
   const parts: THREE.BufferGeometry[] = [
     heightMesh(L, W, Math.round(30 * d.meshDensity), Math.round(30 * d.meshDensity), env),
   ];
@@ -58,8 +61,8 @@ export function buildPillowField(input: GeoBuildInput): BuiltProp {
     const rr = Math.pow(rnd(), 0.65) * 0.9;
     const x = Math.cos(a) * rr * L * 0.5;
     const z = Math.sin(a) * rr * W * 0.5;
+    if (shape(x, z) < -0.2) continue;
     const base = env(x, z);
-    if (base < -0.2) continue;
     const s = (0.45 + rnd() * rnd() * 1.5) * (H > 4 ? 1.3 : 1);
     parts.push(
       place(tmpl[i % tmpl.length]!.clone(), {
@@ -120,7 +123,7 @@ export function buildPillowField(input: GeoBuildInput): BuiltProp {
       instanced(
         disc,
         new THREE.MeshStandardMaterial({
-          color: 0xffffff,
+          color: LIFE_TINT,
           roughness: 0.85,
           polygonOffset: true,
           polygonOffsetFactor: -2,
@@ -144,9 +147,9 @@ export function buildPillowField(input: GeoBuildInput): BuiltProp {
 
   const bounds = geom.boundingBox!.clone();
   const colliders: THREE.Box3[] = [
-    boxCH(0, H * 0.32, 0, L * 0.32, H * 0.34, W * 0.32),
-    boxCH(-L * 0.26, H * 0.18, W * 0.05, L * 0.12, H * 0.2, W * 0.16),
-    boxCH(L * 0.26, H * 0.18, -W * 0.05, L * 0.12, H * 0.2, W * 0.16),
+    boxCH(0, gnd(0, 0) + H * 0.32, 0, L * 0.32, H * 0.34, W * 0.32),
+    boxCH(-L * 0.26, gnd(-L * 0.26, W * 0.05) + H * 0.18, W * 0.05, L * 0.12, H * 0.2, W * 0.16),
+    boxCH(L * 0.26, gnd(L * 0.26, -W * 0.05) + H * 0.18, -W * 0.05, L * 0.12, H * 0.2, W * 0.16),
   ];
   void clamp01;
   return { full, impostor: impostorFromBoxes(colliders, bounds, 0x3a3230), bounds, colliders };

@@ -94,10 +94,11 @@
       "title": "The inner caldera wall",
       "paragraphs": [
         "Descending from the shallow caldera floor, the terrain steepens into the caldera's inner wall -- part of the crater rim that, before 2022, enclosed the summit basin. This tile reads roughly 469 m deep along this stretch of slope.",
-        "No source consulted names this exact point specifically; it is picked out from this tile's own pre-eruption bathymetry as a representative section of the caldera wall, rather than a feature with its own published survey description. Treat the depth as a real reading from this tile, and the description of it as a 'caldera wall' as an interpretation of the surrounding terrain."
+        "No source consulted names this exact point specifically; it is picked out from this tile's own pre-eruption bathymetry as a representative section of the caldera wall, rather than a feature with its own published survey description. Treat the depth as a real reading from this tile, and the description of it as a 'caldera wall' as an interpretation of the surrounding terrain.",
+        "The banded tuff wall on the rim is a game addition, modelled on the layered volcanic deposits of the caldera walls."
       ],
       "facts": [{ "label": "Depth here (this tile)", "value": "~469 m" }],
-      "reconstruction": false,
+      "reconstruction": true,
       "sources": [
         {
           "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",

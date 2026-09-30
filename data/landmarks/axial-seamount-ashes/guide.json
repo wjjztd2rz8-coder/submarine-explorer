@@ -44,7 +44,8 @@
         "The ASHES (Axial Seamount Hydrothermal Emissions Study) vent field sits near the base of the caldera's western wall, at about 1,540-1,552 m, and has been studied since it was first surveyed in the late 1980s. Its two best-known chimneys, Mushroom and Inferno, sit roughly 10 m apart.",
         "Mushroom is a black-smoker chimney about 4 m tall whose overall size has stayed similar since the 1980s even as its individual discharge points shift, with fluid exceeding 275 degC pouring from small orifices near its top. It is the site of the OOI cabled array's own HD video camera (CAMHDS301), so this is one of the very few active seafloor chimneys with a live, permanent video feed.",
         "Inferno vents high-temperature fluid too and hosts one of the densest clusters of animals at ASHES: tube worms and palm worms cling directly to its metal-sulfide-rich walls, tolerant of both scalding vent fluid and near-freezing seawater within centimetres of each other.",
-        "Neither chimney's exact footprint is published, and the field is far smaller than a single cell of this tile's open bathymetry (about 2,826 sq m against roughly 43 x 61 m per grid cell)."
+        "Neither chimney's exact footprint is published, and the field is far smaller than a single cell of this tile's open bathymetry (about 2,826 sq m against roughly 43 x 61 m per grid cell).",
+        "The sulfide mound with its cluster of smokers, tubeworms and bacterial mats beside Inferno is a game addition, modelled on how chimneys group on real ASHES mounds."
       ],
       "facts": [
         { "label": "ASHES depth", "value": "about 1,540-1,552 m" },

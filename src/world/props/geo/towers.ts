@@ -32,17 +32,20 @@ const STAIN = new THREE.Color(0x5c5445);
 
 export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
   const { dims, seed, tier } = input;
+  const gnd = input.groundHeight() ?? ((): number => 0);
   const d = geoDetail(tier);
   const [W, D, H] = dims;
   const rnd = mulberry32(seed);
   const skirtH = H * 0.16;
   const root = H * 0.5; // the foundation sinks into the seabed on the downhill side
-  const skirt = (x: number, z: number): number => {
+  const skirtShape = (x: number, z: number): number => {
     const r = Math.hypot(x / (W / 2), z / (D / 2));
     const n = (fbm3(x * 0.12, 5, z * 0.12, seed, 4) - 0.5) * skirtH * 0.7;
     const top = skirtH * Math.pow(Math.max(0, 1 - Math.min(r, 1) ** 2), 1.3);
     return top + n * clamp01(1 - r) - smooth(0.78, 1.02, r) * root;
   };
+  /** The talus skirt lifted onto the terrain, so the edifice sits on the slope. */
+  const skirt = (x: number, z: number): number => skirtShape(x, z) + gnd(x, z);
 
   interface Spire {
     x: number;
@@ -53,7 +56,13 @@ export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
   }
   const spires: Spire[] = [];
   const mk = (x: number, z: number, h: number): void => {
-    spires.push({ x, z, y: Math.max(skirt(x, z), 0) - 0.4, h, r0: h * 0.135 + 0.4 });
+    spires.push({
+      x,
+      z,
+      y: Math.max(skirtShape(x, z), 0) + gnd(x, z) - 0.4,
+      h,
+      r0: h * 0.135 + 0.4,
+    });
   };
   mk(0, 0, H);
   const n = 4 + Math.floor(rnd() * 2);
@@ -144,7 +153,7 @@ export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
     const n1 = fbm3(x * 0.16, y * 0.1, z * 0.16, seed ^ 0x77, 4);
     const n2 = fbm3(x * 0.7, y * 0.35, z * 0.7, seed ^ 0x99, 3);
     // Fresh white on the upper parts and tips, weathered grey-tan low down and on the skirt.
-    const up = smooth(0.15, 0.95, y / H + (n1 - 0.5) * 0.7);
+    const up = smooth(0.15, 0.95, (y - gnd(x, z)) / H + (n1 - 0.5) * 0.7);
     out.copy(OLD).lerp(LIVE, up * 0.9 + 0.1 * n2);
     out.lerp(STAIN, smooth(0.6, 0.85, n2) * 0.35 * (1 - up));
     out.multiplyScalar(0.85 + 0.3 * n2);
@@ -160,7 +169,9 @@ export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
   );
 
   const bounds = geom.boundingBox!.clone();
-  const colliders: THREE.Box3[] = [boxCH(0, skirtH * 0.3, 0, W * 0.3, skirtH * 0.3, D * 0.3)];
+  const colliders: THREE.Box3[] = [
+    boxCH(0, gnd(0, 0) + skirtH * 0.3, 0, W * 0.3, skirtH * 0.3, D * 0.3),
+  ];
   for (const s of spires) {
     for (const [a, b, k] of [
       [0, 0.34, 0.95],

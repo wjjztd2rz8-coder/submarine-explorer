@@ -56,7 +56,7 @@
       "snap_to_seabed": true,
       "heading_deg": 0,
       "scale": 1,
-      "dimensions_m": [30, 24, 4],
+      "dimensions_m": [36, 30, 5],
       "lod_distance_m": 700,
       "collision": "box",
       "reconstruction": true,

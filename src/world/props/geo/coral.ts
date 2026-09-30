@@ -7,7 +7,7 @@
 
 import * as THREE from 'three';
 import { geoDetail, type GeoDetail } from './detail.js';
-import { geoMaterial } from './materials.js';
+import { geoMaterial, LIFE_TINT } from './materials.js';
 import {
   boxCH,
   clamp01,
@@ -71,17 +71,20 @@ function branchingColony(depth: number, seed: number): THREE.BufferGeometry {
 
 export function buildCoralMound(input: GeoBuildInput): BuiltProp {
   const { dims, seed, tier } = input;
+  const gnd = input.groundHeight() ?? ((): number => 0);
   const d: GeoDetail = geoDetail(tier);
   const [L, W, H] = dims;
   const rnd = mulberry32(seed);
-  const mound = (x: number, z: number): number => {
+  const shape = (x: number, z: number): number => {
     const r = Math.hypot(x / (L / 2), z / (W / 2));
-    if (r >= 1) return -2;
+    if (r >= 1) return -3;
     const ridge = 0.65 + 0.35 * fbm3(x * 0.09, 1, z * 0.09, seed + 3, 3) * 2;
     const base = H * Math.pow(1 - r * r, 0.9) * ridge;
     const n = (fbm3(x * 0.4, 9, z * 0.4, seed, 3) - 0.5) * H * 0.18;
-    return Math.max(-2, base + n * clamp01(base / H) - smooth(0.85, 1, r) * 0.6);
+    return Math.max(-3, base + n * clamp01(base / H) - smooth(0.85, 1, r) * 0.6);
   };
+  /** Mound surface: the shape lifted onto the terrain. */
+  const mound = (x: number, z: number): number => shape(x, z) + gnd(x, z);
   const dens = d.meshDensity;
   const geom = heightMesh(L, W, Math.round(48 * dens), Math.round(48 * dens), mound);
   // Coral rubble knobs on the mound body.
@@ -125,7 +128,7 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
   const total = Math.round(700 * Math.min(d.growth, 1.15));
   const templates = [0, 1, 2].map((k) => branchingColony(d.branchDepth, seed + 100 + k * 37));
   const cmat = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
+    color: LIFE_TINT,
     vertexColors: true,
     roughness: 0.75,
     metalness: 0,
@@ -140,8 +143,8 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
     // Thickets cluster: keep colonies where a slow noise field is high, and prefer the slopes.
     const cluster = fbm3(x * 0.16, 2, z * 0.16, seed + 9, 3);
     if (cluster < 0.45 && rnd() < 0.92) continue;
+    if (shape(x, z) < 0) continue;
     const y = mound(x, z);
-    if (y < 0) continue;
     const s = 0.8 + rnd() * rnd() * 2.6;
     const c = new THREE.Color()
       .copy(IVORY)
@@ -174,8 +177,8 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
     const rr = Math.sqrt(rnd()) * 0.9;
     const x = Math.cos(a) * rr * L * 0.5;
     const z = Math.sin(a) * rr * W * 0.5;
+    if (shape(x, z) < 0) continue;
     const y = mound(x, z);
-    if (y < 0) continue;
     const s = 0.6 + rnd() * 1.6;
     sp.push({
       t: { x, y: y - 0.05, z, sx: s, sy: s * (0.8 + rnd() * 0.8), sz: s },
@@ -186,7 +189,11 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
     full.add(
       instanced(
         sponge,
-        new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8, side: THREE.DoubleSide }),
+        new THREE.MeshStandardMaterial({
+          color: LIFE_TINT,
+          roughness: 0.8,
+          side: THREE.DoubleSide,
+        }),
         sp,
         'sponges',
       ),
@@ -196,8 +203,8 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
   const bounds = body.boundingBox!.clone();
   bounds.max.y += 1.5;
   const colliders: THREE.Box3[] = [
-    boxCH(0, H * 0.32, 0, L * 0.3, H * 0.32, W * 0.3),
-    boxCH(0, H * 0.7, 0, L * 0.14, H * 0.14, W * 0.14),
+    boxCH(0, gnd(0, 0) + H * 0.32, 0, L * 0.3, H * 0.32, W * 0.3),
+    boxCH(0, gnd(0, 0) + H * 0.7, 0, L * 0.14, H * 0.14, W * 0.14),
   ];
   return { full, impostor: impostorFromBoxes(colliders, bounds, 0x9b937f), bounds, colliders };
 }

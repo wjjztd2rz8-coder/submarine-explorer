@@ -7,7 +7,7 @@
 
 import * as THREE from 'three';
 import { geoDetail } from './detail.js';
-import { geoMaterial } from './materials.js';
+import { geoMaterial, LIFE_TINT } from './materials.js';
 import { shimmerPlume, smokePlume } from './plume.js';
 import {
   boxCH,
@@ -37,19 +37,22 @@ const MAT = new THREE.Color(0xb9ad98);
 
 export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   const { dims, seed, tier, def } = input;
+  const gnd = input.groundHeight() ?? ((): number => 0);
   const d = geoDetail(tier);
   const [L, W, H] = dims;
   const rnd = mulberry32(seed);
   const shrimp = def.raw.variant === 'shrimp';
   const moundH = THREE.MathUtils.clamp(H * 0.32, 0.8, 5);
 
-  const mound = (x: number, z: number): number => {
+  const shape = (x: number, z: number): number => {
     const r = Math.hypot(x / (L / 2), z / (W / 2));
-    if (r >= 1) return -1.4;
+    if (r >= 1) return -3;
     const base = moundH * Math.pow(1 - r * r, 0.75);
     const n = (fbm3(x * 0.25, 3, z * 0.25, seed, 3) - 0.5) * moundH * 0.6;
-    return Math.max(-1.4, base + n * clamp01(base / moundH) - smooth(0.82, 1, r) * 0.5);
+    return Math.max(-3, base + n * clamp01(base / moundH) - smooth(0.82, 1, r) * 0.5);
   };
+  /** Mound surface: the shape lifted onto the terrain. */
+  const mound = (x: number, z: number): number => shape(x, z) + gnd(x, z);
 
   interface Stack {
     x: number;
@@ -118,7 +121,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   paint(geom, (x, y, z, ny, out) => {
     const nz = fbm3(x * 0.6, y * 0.5, z * 0.6, seed ^ 0x51, 4);
     const onMound =
-      clamp01((moundH * 1.5 - y) / (moundH * 1.5)) *
+      clamp01((moundH * 1.5 - (y - gnd(x, z))) / (moundH * 1.5)) *
       (1 - smooth(0.8, 1, Math.hypot(x / (L / 2), z / (W / 2))) * 0);
     // Chimney body: charcoal sulfide; oxidised rust bands; pale anhydrite near the lips.
     let best = 0;
@@ -141,7 +144,10 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
       out.copy(MOUND).multiplyScalar(0.8 + 0.6 * nz);
       out.lerp(RUST, smooth(0.55, 0.85, nz) * 0.35 * onMound);
     }
-    out.lerp(c1.copy(MOUND).multiplyScalar(1.1), (1 - smooth(0, 0.6, y - 0)) * 0.3 * (1 - best));
+    out.lerp(
+      c1.copy(MOUND).multiplyScalar(1.1),
+      (1 - smooth(0, 0.6, y - gnd(x, z))) * 0.3 * (1 - best),
+    );
     if (ny > 0.85 && best === 0) out.multiplyScalar(1.08);
   });
   projectUVs(geom, 3);
@@ -233,7 +239,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
       instanced(
         disc,
         new THREE.MeshStandardMaterial({
-          color: 0xffffff,
+          color: LIFE_TINT,
           roughness: 0.9,
           polygonOffset: true,
           polygonOffsetFactor: -2,
@@ -268,7 +274,9 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   }
 
   // ---- colliders and impostor.
-  const colliders: THREE.Box3[] = [boxCH(0, moundH * 0.3, 0, L * 0.36, moundH * 0.35, W * 0.36)];
+  const colliders: THREE.Box3[] = [
+    boxCH(0, gnd(0, 0) + moundH * 0.3, 0, L * 0.36, moundH * 0.35, W * 0.36),
+  ];
   for (const s of stacks) {
     const lo = s.h * 0.45;
     colliders.push(boxCH(s.x, s.y + lo, s.z, s.r0 * 0.9, lo, s.r0 * 0.9));

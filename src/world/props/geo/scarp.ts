@@ -55,7 +55,7 @@ interface Preset {
 
 const PRESETS: Record<ScarpPresetId, Preset> = {
   tuff: {
-    tex: 'strata',
+    tex: 'rock',
     profile: [
       [-0.12, -0.55],
       [0, -0.5],
@@ -83,7 +83,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     rough: 0.95,
   },
   canyon: {
-    tex: 'strata',
+    tex: 'rock',
     profile: [
       [-0.12, -0.5],
       [0, -0.42],
@@ -174,20 +174,25 @@ export function extrudeProfile(
   ny: number,
   disp: (x: number, y: number, z: number) => number,
   height: number,
+  lift?: (x: number, y: number, z: number) => number,
+  edgeStart = 0.4,
 ): THREE.BufferGeometry {
   const pts = resample(profile, ny);
   const pos = new Float32Array((nx + 1) * (ny + 1) * 3);
   const idx: number[] = [];
   for (let i = 0; i <= nx; i++) {
     const x = (i / nx - 0.5) * width;
-    const edge = smooth(0.78, 1, Math.abs(x) / (width / 2));
+    const edge = smooth(edgeStart, 1, Math.abs(x) / (width / 2));
+    // A ragged skyline: the crest varies along the wall and slopes away at both ends.
+    const skyline =
+      edgeStart < 0.6 ? 0.8 + 0.4 * fbm3(x * 0.045, 1, width, Math.round(width * 31), 3) : 1;
     for (let j = 0; j <= ny; j++) {
       const [y0, z0] = pts[j]!;
-      const y = y0 > 0 ? y0 * (1 - 0.7 * edge * edge) : y0;
+      const y = y0 > 0 ? y0 * (1 - 0.85 * edge * edge) * skyline : y0;
       const z = (z0 + disp(x, y0, z0) * (1 - edge * 0.6)) * (1 - edge * 0.55);
       const k = (i * (ny + 1) + j) * 3;
       pos[k] = x;
-      pos[k + 1] = y;
+      pos[k + 1] = y + (lift ? lift(x, y0, z0) : 0);
       pos[k + 2] = z;
     }
   }
@@ -224,14 +229,17 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     const s = (y / H) * P.bands + (fbm3(x * 0.03, 5, seed, seed + 7, 2) - 0.5) * 1.2;
     const saw = s - Math.floor(s);
     const ledge = -Math.pow(saw, 2.2) * P.ledge * scale * 2.4; // strata protrude, then step back
-    const fine = (fbm3(x * 0.9, y * 0.9, z * 0.9, seed + 4, 3) - 0.5) * 0.6 * scale;
+    const fine = (fbm3(x * 0.3, y * 0.3, z * 0.3, seed + 4, 2) - 0.5) * 0.9 * scale;
     const bulge = (fbm3(x * 0.045, y * 0.05, seed + 8, seed + 6, 3) - 0.5) * 0.5 * H * 0.35;
     return (gully + ledge + bulge) * env + fine;
   };
   const nx = Math.round(Math.max(24, W / 1.4) * d.meshDensity);
   const ny = Math.round(Math.max(28, H * 1.3) * d.meshDensity);
-  const wall = extrudeProfile(profile, W, Math.min(nx, 170), Math.min(ny, 110), disp, H);
-  paint(wall, (x, y, z, ny_, out) => {
+  const gnd = input.groundHeight() ?? ((): number => 0);
+  const lift = wallLift(gnd, H);
+  const wall = extrudeProfile(profile, W, Math.min(nx, 170), Math.min(ny, 110), disp, H, lift);
+  paint(wall, (x, yAbs, z, ny_, out) => {
+    const y = yAbs - gnd(x, 0);
     const s = (y / H) * P.bands + (fbm3(x * 0.03, 5, seed, seed + 7, 2) - 0.5) * 1.2;
     const saw = s - Math.floor(s);
     const tone = fbm3(x * 0.25, y * 0.2, z * 0.25, seed ^ 0x3c, 4);
@@ -275,7 +283,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       groups[i % 3]!.push({
         t: {
           x,
-          y: y0 * (1 - 0.7 * edge * edge) + s * 0.15,
+          y: y0 * (1 - 0.7 * edge * edge) + s * 0.15 + gnd(x, z0),
           z: (z0 + disp(x, y0, z0) * 0.3) * (1 - edge * 0.55),
           rx: rnd() * 3,
           ry: rnd() * 6,
@@ -306,13 +314,50 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   }
 
   const bounds = wall.boundingBox!.clone();
-  const colliders = profileColliders(profile, W, D, H, 9);
+  const colliders = wallColliders(profile, W, D, H, 9, gnd);
   return {
     full,
     impostor: impostorFromBoxes(colliders, bounds, P.base.getHex()),
     bounds,
     colliders,
   };
+}
+
+/**
+ * Terrain-following lift for an extruded wall: the apron follows the ground
+ * under it, the upper wall follows the ground under its foot (so it stays
+ * upright). `gnd` is the local ground height (0 when the prop is not snapped).
+ */
+export function wallLift(
+  gnd: (x: number, z: number) => number,
+  H: number,
+): (x: number, y: number, z: number) => number {
+  return (x, y, z) => {
+    const t = smooth(0, 0.35 * H, y);
+    return gnd(x, z) * (1 - t) + gnd(x, 0) * t;
+  };
+}
+
+/** `profileColliders` in three x segments, each lifted to the ground under it. */
+export function wallColliders(
+  profile: [number, number][],
+  W: number,
+  D: number,
+  H: number,
+  slices: number,
+  gnd: (x: number, z: number) => number,
+): THREE.Box3[] {
+  const out: THREE.Box3[] = [];
+  const seg = 3;
+  for (let k = 0; k < seg; k++) {
+    const xc = ((k + 0.5) / seg - 0.5) * W;
+    for (const b of profileColliders(profile, W / seg, D, H, slices)) {
+      const dy = gnd(xc, 0);
+      b.translate(new THREE.Vector3(xc, dy, 0));
+      out.push(b);
+    }
+  }
+  return out;
 }
 
 /** One box per height slice at the slice's most protruding profile point (a stepped wall collider). */
