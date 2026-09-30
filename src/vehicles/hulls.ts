@@ -295,8 +295,8 @@ export function classB(low: boolean): Blueprint {
   );
 
   const decals: DecalSpec[] = [
-    ...sidePair(fair, 'name', 0.45, 0.42, 2.3, 0.38),
-    ...sidePair(fair, 'number', -1.05, 0.5, 0.95, 0.34),
+    ...sidePair(fair, 'name', 0.6, 0.42, 2.2, 0.38),
+    ...sidePair(fair, 'number', -1.3, 0.5, 0.85, 0.32),
     ...sidePair(sail, 'rating', 0.15, 1.38, 0.78, 0.3),
     ...sidePair(fair, 'flag', 1.95, 0.45, 0.5, 0.33),
     ...sidePair(fair, 'warning', 2.75, 0.22, 0.75, 0.2),
@@ -500,15 +500,15 @@ export function classA(low: boolean): Blueprint {
     }),
   );
   props.push(
-    thruster(pb, V(-1.78, 0.2, 0.5), V(0, -1, 0), 0.2, 'vertical', 1, {
+    thruster(pb, V(-1.78, 0.2, -0.62), V(0, -1, 0), 0.2, 'vertical', 1, {
       bandColor: PAINT.yellow,
-      mount: V(-1.58, 0.2, 0.5),
+      mount: V(-1.58, 0.2, -0.62),
     }),
   );
   props.push(
-    thruster(pb, V(1.78, 0.2, 0.5), V(0, -1, 0), 0.2, 'vertical', -1, {
+    thruster(pb, V(1.78, 0.2, -0.62), V(0, -1, 0), 0.2, 'vertical', -1, {
       bandColor: PAINT.yellow,
-      mount: V(1.58, 0.2, 0.5),
+      mount: V(1.58, 0.2, -0.62),
     }),
   );
   props.push(
@@ -550,9 +550,9 @@ export function classA(low: boolean): Blueprint {
   for (const sx of [-1, 1]) {
     const x = sx * (1.2 + sideX(pont(0.3), 0.12) + 0.012);
     const n = V(sx, 0, 0);
-    decals.push({ kind: 'name', pos: V(x, 0.12, 0.3), w: 1.9, h: 0.32, normal: n });
+    decals.push({ kind: 'name', pos: V(x, 0.12, 0.47), w: 1.55, h: 0.3, normal: n });
     decals.push({ kind: 'rating', pos: V(x, 0.12, 1.55), w: 0.55, h: 0.22, normal: n });
-    decals.push({ kind: 'flag', pos: V(x, 0.12, -1.1), w: 0.36, h: 0.24, normal: n });
+    decals.push({ kind: 'flag', pos: V(x, 0.12, -1.3), w: 0.32, h: 0.22, normal: n });
   }
   decals.push({ kind: 'number', pos: V(0, 0.8 + 0.012, 1.45), w: 0.8, h: 0.3, normal: V(0, 1, 0) });
 
@@ -631,7 +631,7 @@ export function classC(low: boolean): Blueprint {
     6,
     5,
   );
-  pb.add('frame', body(bay, -1.0, 2.32, low ? 12 : 28, radial), undefined, PAINT.charcoal);
+  pb.add('foam', body(bay, -1.0, 2.32, low ? 12 : 28, radial), undefined, PAINT.charcoal);
   const sc = V(0, -0.72, -1.5);
   crewSphere(pb, sc, 0.82, [
     [0, -0.18],

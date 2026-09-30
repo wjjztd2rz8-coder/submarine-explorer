@@ -44,7 +44,9 @@ export class RovVisual {
       this.body.add(light, light.target);
     }
     this.fill = new THREE.PointLight(0xffb973, config.fillMinIntensity, config.fillDistanceM, 2);
-    this.fill.position.set(0, 2, 2);
+    // Above and behind the float, so it lights the work area without blowing
+    // out the float's top.
+    this.fill.position.set(0, 3.6, 2.6);
     this.body.add(this.fill);
     this.group.add(this.body);
     this.tether = low

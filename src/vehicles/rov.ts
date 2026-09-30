@@ -47,7 +47,7 @@ export function rovBlueprint(low: boolean): Blueprint {
     loft(-0.98, 0.98, low ? 10 : 24, radial, (_t, z) => float(z)),
     undefined,
     (c, n) =>
-      n.y < -0.5 ? PAINT.charcoal : c.y < 0.27 && n.y < 0.3 ? PAINT.charcoal : PAINT.yellow,
+      n.y < -0.5 ? PAINT.charcoal : c.y < 0.27 && n.y < 0.3 ? PAINT.charcoal : PAINT.orange,
   );
   // Thruster wells through the float.
   for (const z of [-0.42, 0.42]) {

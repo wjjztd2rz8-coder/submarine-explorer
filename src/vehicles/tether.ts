@@ -86,7 +86,7 @@ export class TetherMesh {
         color: 0xf2b20f,
         roughness: 0.65,
         metalness: 0,
-        emissive: 0x3a2800,
+        emissive: 0x6b4a06,
       });
       const ring = this.radial + 1;
       const pos = new Float32Array(this.pts.length * ring * 3);

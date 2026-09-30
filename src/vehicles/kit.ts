@@ -91,23 +91,40 @@ export function normalise(geo: THREE.BufferGeometry, color?: Rgb | Painter): THR
   color ??= PAINT.white;
   const colors = new Float32Array(pos.count * 3);
   if (typeof color === 'function') {
+    // Paint whole quads where two consecutive triangles share an edge (the
+    // layout of lofts, lathes and Three's primitives), so paint boundaries
+    // follow the grid instead of zigzagging across each quad's diagonal.
     const nrm = g.getAttribute('normal');
     const c = new THREE.Vector3();
     const n = new THREE.Vector3();
-    for (let i = 0; i < pos.count; i += 3) {
+    const tris = pos.count / 3;
+    const same = (a: number, b: number): boolean =>
+      Math.abs(pos.getX(a) - pos.getX(b)) < 1e-7 &&
+      Math.abs(pos.getY(a) - pos.getY(b)) < 1e-7 &&
+      Math.abs(pos.getZ(a) - pos.getZ(b)) < 1e-7;
+    const shared = (t: number, u: number): number => {
+      let k = 0;
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (same(t * 3 + i, u * 3 + j)) k++;
+      return k;
+    };
+    for (let t = 0; t < tris; ) {
+      const pair = t + 1 < tris && shared(t, t + 1) === 2 ? 2 : 1;
+      const verts = pair * 3;
+      const i0 = t * 3;
       c.set(0, 0, 0);
       n.set(0, 0, 0);
-      for (let k = 0; k < 3; k++) {
-        c.x += pos.getX(i + k) / 3;
-        c.y += pos.getY(i + k) / 3;
-        c.z += pos.getZ(i + k) / 3;
-        n.x += nrm.getX(i + k);
-        n.y += nrm.getY(i + k);
-        n.z += nrm.getZ(i + k);
+      for (let k = 0; k < verts; k++) {
+        c.x += pos.getX(i0 + k) / verts;
+        c.y += pos.getY(i0 + k) / verts;
+        c.z += pos.getZ(i0 + k) / verts;
+        n.x += nrm.getX(i0 + k);
+        n.y += nrm.getY(i0 + k);
+        n.z += nrm.getZ(i0 + k);
       }
       n.normalize();
       const rgb = color(c, n);
-      for (let k = 0; k < 3; k++) colors.set(rgb, (i + k) * 3);
+      for (let k = 0; k < verts; k++) colors.set(rgb, (i0 + k) * 3);
+      t += pair;
     }
   } else {
     for (let i = 0; i < pos.count; i++) colors.set(color, i * 3);

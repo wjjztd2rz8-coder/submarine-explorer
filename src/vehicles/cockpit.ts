@@ -5,7 +5,7 @@
  * firstPersonOffset); this overlay only frames it as the view out of the
  * pressure sphere's forward viewport: a thick titanium bezel with a bolt
  * circle, a faint acrylic sheen, and the lower edge of the pilot's console
- * with a few lit screens. It is drawn last with no depth test, so terrain can
+ * with a few lit screens. It is drawn last and always passes the depth test, so terrain can
  * never cut into it, and it follows whatever camera renders it (the matrix is
  * set in `onBeforeRender`, after the rig has moved the camera this frame).
  *
@@ -76,28 +76,20 @@ export class CockpitView {
   constructor(detailed = true) {
     this.object.name = 'cockpit-view';
     this.object.visible = false;
-    const overlay = { depthTest: false, depthWrite: false, fog: false } as const;
-    const bezelMat = new THREE.MeshStandardMaterial({
-      color: 0x2a3136,
-      roughness: 0.45,
-      metalness: 0.8,
-      emissive: 0x0e1418,
-      ...overlay,
-    });
-    const boltMat = new THREE.MeshStandardMaterial({
-      color: 0x8a949a,
-      roughness: 0.35,
-      metalness: 0.9,
-      emissive: 0x151b1f,
-      ...overlay,
-    });
-    const consoleMat = new THREE.MeshStandardMaterial({
-      color: 0x14191c,
-      roughness: 0.8,
-      metalness: 0.2,
-      emissive: 0x0a0f12,
-      ...overlay,
-    });
+    // Always passes the depth test (terrain can never cut in) and writes depth,
+    // so the additive beams and snow drawn later stay behind the frame. (With
+    // the depth test disabled, WebGL would skip the depth write too.)
+    const overlay = {
+      depthTest: true,
+      depthFunc: THREE.AlwaysDepth,
+      depthWrite: true,
+      fog: false,
+    } as const;
+    // Unlit with baked shading: the sub's own lamps and fill light sit right
+    // next to the camera and would otherwise blow the frame out to white.
+    const bezelMat = new THREE.MeshBasicMaterial({ vertexColors: true, ...overlay });
+    const boltMat = new THREE.MeshBasicMaterial({ color: 0x39434a, ...overlay });
+    const consoleMat = new THREE.MeshBasicMaterial({ color: 0x0b1013, ...overlay });
     const screenMat = new THREE.MeshBasicMaterial({ vertexColors: true, ...overlay });
     this.materials.push(bezelMat, boltMat, consoleMat, screenMat);
 
@@ -116,9 +108,10 @@ export class CockpitView {
       const sheenMat = new THREE.MeshBasicMaterial({
         color: 0x9fd3e0,
         transparent: true,
-        opacity: 0.035,
+        opacity: 0.011,
         blending: THREE.AdditiveBlending,
         ...overlay,
+        depthWrite: false,
       });
       this.materials.push(sheenMat);
       this.sheen = new THREE.Mesh(new THREE.BufferGeometry(), sheenMat);
@@ -165,6 +158,7 @@ export class CockpitView {
       curveSegments: 72,
     });
     bezelG.translate(0, 0, -bevel);
+    shadeBezel(bezelG, a);
     this.bezel.geometry.dispose();
     this.bezel.geometry = bezelG;
 
@@ -242,6 +236,29 @@ export class CockpitView {
     for (const m of this.materials) m.dispose();
     this.object.removeFromParent();
   }
+}
+
+/**
+ * Bake the bezel's shading: dark gunmetal, a soft highlight on the machined
+ * inner lip, and a touch of top light on upward-facing bevels.
+ */
+function shadeBezel(g: THREE.BufferGeometry, a: Aperture): void {
+  const pos = g.getAttribute('position') as THREE.BufferAttribute;
+  const nrm = g.getAttribute('normal') as THREE.BufferAttribute;
+  const col = new Float32Array(pos.count * 3);
+  for (let i = 0; i < pos.count; i++) {
+    // Only the bevel carries the lip highlight: the flat front face is a few
+    // huge triangles, and a highlight on its vertices would smear across it.
+    const d = Math.hypot(pos.getX(i) / a.rx, pos.getY(i) / a.ry);
+    const bevel = Math.abs(nrm.getZ(i)) < 0.95;
+    const lip = bevel ? Math.exp(-Math.max(0, d - 1) * 30) * 0.13 : 0;
+    const top = Math.max(0, nrm.getY(i)) * 0.05 + Math.max(0, nrm.getZ(i)) * 0.015;
+    const v = 0.03 + lip + top;
+    col[i * 3] = v * 0.92;
+    col[i * 3 + 1] = v * 1.02;
+    col[i * 3 + 2] = v * 1.1;
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
 }
 
 /** Concatenate non-indexed geometries with position + color. */

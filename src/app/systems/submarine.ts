@@ -69,7 +69,7 @@ export function createSubmarineSystem(): GameSystem {
       });
       ctx.subMesh = subMesh;
       scene.add(subMesh.group);
-      ctx.expose({ sub });
+      ctx.expose({ sub, subMesh });
     },
     frame: {
       'controls.vehicle': (f, ctx) => {
