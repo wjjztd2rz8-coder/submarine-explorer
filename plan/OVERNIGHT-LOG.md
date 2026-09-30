@@ -25,3 +25,4 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Open audit findings (F0-CORE-AUDIT.md): P2 `?tier=auto` Settings reload hint wrong; P2 dynamic-resolution oscillation; P3 no system dispose. Not yet fixed.
 - Deferred by agents: cockpit interior is minimal; chase camera distance (CameraRig) hides hull detail; ROV headlight rig.
 - Next: F1-OCEAN, F1-TERRAIN, F1-GEO, F1-TOUCH remain in wave 1. No tag yet (wave 1 incomplete).
+- Pushed main (6ed8221, no tag). Pages deploy succeeded. GitHub CI e2e shards failed on the previous commit with timeouts (d2-predive, mission.spec: software-rendering runners are slow, 90 s test timeouts), while local gates are green. Owner/next run: consider raising CI timeouts or trimming shard load. Run 36692039151 is in progress for the new push.
