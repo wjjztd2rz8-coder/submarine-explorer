@@ -26,7 +26,9 @@ import * as THREE from 'three';
 import type { GraphicsTier, TerrainConfig } from '../core/Config.js';
 import type { Tile, TileMeta } from '../util/types.js';
 import { LOD_LEVELS, TerrainChunk } from './TerrainChunk.js';
+import { biomeFor, type Biome } from './TerrainBiome.js';
 import { createTerrainMaterial } from './TerrainMaterial.js';
+import { Scatter } from './scatter/Scatter.js';
 import { detailAt, type DetailParams } from './TerrainNoise.js';
 
 export interface TerrainStats {
@@ -67,6 +69,13 @@ export function fitSubdivToBudget(
   return sub;
 }
 
+/** FNV-1a, so each tile gets its own scatter layout. */
+function hashString(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return h | 0;
+}
+
 interface RampStop {
   depth: number;
   r: number;
@@ -80,6 +89,8 @@ export class Terrain {
   readonly meta: TileMeta;
   readonly heights: Float32Array;
   readonly stats: TerrainStats;
+  /** The site's seabed palette and scatter table (TerrainBiome.ts). */
+  readonly biome: Biome;
 
   /** Tile extent in metres. */
   readonly widthM: number;
@@ -99,6 +110,8 @@ export class Terrain {
   private readonly lodFar: number;
   private readonly textures: THREE.Texture[];
   private readonly material: THREE.Material;
+  /** Instanced boulders, corals and mounds streamed around the camera. */
+  readonly scatter: Scatter;
 
   private readonly frustum = new THREE.Frustum();
   private readonly projScreen = new THREE.Matrix4();
@@ -138,13 +151,12 @@ export class Terrain {
     this.lodNear = config.lodDistancesM[0] * tierCfg.lodDistanceScale;
     this.lodFar = config.lodDistancesM[1] * tierCfg.lodDistanceScale;
 
+    this.biome = biomeFor(tile.meta.id);
     const built = createTerrainMaterial({
       config,
       tier,
+      biome: this.biome,
       exaggeration: this.exaggeration,
-      colorForDepth: (d, out) => this.colorForDepth(d, out),
-      rampMinDepth: (this.ramp[0] as RampStop).depth,
-      rampMaxDepth: (this.ramp[this.ramp.length - 1] as RampStop).depth,
     });
     this.material = built.material;
     this.textures = built.textures;
@@ -154,6 +166,28 @@ export class Terrain {
     const subdiv = fitSubdivToBudget(this.cols, this.rows, requested, config.maxVertices);
     this.stats = this.build(config, tier, subdiv, built.textureSize);
     this.stats.requestedSubdiv = requested;
+
+    const normal = new THREE.Vector3();
+    this.scatter = new Scatter({
+      ground: {
+        sampleHeight: (x, z) => this.sampleHeight(x, z),
+        normalAt: (x, z, out) => {
+          this.getNormal(x, z, normal);
+          out[0] = normal.x;
+          out[1] = normal.y;
+          out[2] = normal.z;
+        },
+        contains: (x, z) => this.contains(x, z),
+      },
+      biome: this.biome,
+      density: tierCfg.scatterDensity,
+      rangeM: tierCfg.scatterRangeM,
+      seed: config.detailSeed ^ hashString(tile.meta.id),
+      rockLo: 1 - Math.cos((config.rockSlopeLoDeg * Math.PI) / 180),
+      rockHi: 1 - Math.cos((config.rockSlopeHiDeg * Math.PI) / 180),
+      rockTexture: built.rockTexture,
+    });
+    this.group.add(this.scatter.group);
   }
 
   // ---------------------------------------------------------------- sampling
@@ -300,6 +334,7 @@ export class Terrain {
         counts[chunk.currentLod] = (counts[chunk.currentLod] as number) + 1;
       }
     }
+    this.scatter.update(camera);
     this.stats.visibleChunks = visible;
     this.stats.drawnTriangles = drawn;
     this.stats.lodCounts = counts;
@@ -319,6 +354,7 @@ export class Terrain {
   }
 
   dispose(): void {
+    this.scatter.dispose();
     for (const chunk of this.chunks) chunk.dispose();
     this.chunks.length = 0;
     this.material.dispose();

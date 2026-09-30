@@ -26,6 +26,13 @@
  * stride, so its top edge is exactly the surface edge at that LOD and the wall
  * plugs whatever gap the neighbour leaves.
  *
+ * Cavity
+ * ------
+ * Each vertex also carries `aCavity`, a 0..1 byte (0.5 flat, above 0.5 a hollow,
+ * below a crest): the mean of the four neighbours minus the vertex, from the same
+ * grid the normals use, so seams agree. The seabed shader darkens hollows with it
+ * and lets sediment fill them.
+ *
  * Normals are computed from the sampled height grid rather than from the
  * triangles (`computeVertexNormals`). Triangle normals would differ between two
  * chunks meeting at a seam and would also be polluted by the skirt walls;
@@ -89,6 +96,8 @@ export class TerrainChunk {
     const positions = new Float32Array(total * 3);
     const normals = new Float32Array(total * 3);
     const ys = new Float64Array(surfaceCount);
+    const cavity = new Uint8Array(total).fill(128);
+    const cavityScale = 1 / (0.06 * Math.min(stepX, stepZ));
 
     // --- sample the surface ------------------------------------------------
     for (let j = 0; j < nz; j++) {
@@ -118,6 +127,9 @@ export class TerrainChunk {
         const hR = i < nx - 1 ? (ys[k + 1] as number) : field.surfaceY(x + stepX, z);
         const hN = j > 0 ? (ys[k - nx] as number) : field.surfaceY(x, z - stepZ);
         const hS = j < nz - 1 ? (ys[k + nx] as number) : field.surfaceY(x, z + stepZ);
+        const lap = (hL + hR + hN + hS) * 0.25 - (ys[k] as number);
+        const cv = lap * cavityScale;
+        cavity[k] = Math.round((cv < -1 ? -1 : cv > 1 ? 1 : cv) * 127.5 + 127.5);
         const gx = (hR - hL) * invX;
         const gz = (hS - hN) * invZ;
         const inv = 1 / Math.sqrt(gx * gx + gz * gz + 1);
@@ -140,6 +152,7 @@ export class TerrainChunk {
       normals[dst * 3] = normals[src * 3] as number;
       normals[dst * 3 + 1] = normals[src * 3 + 1] as number;
       normals[dst * 3 + 2] = normals[src * 3 + 2] as number;
+      cavity[dst] = cavity[src] as number;
     };
     for (let i = 0; i < nx; i++) {
       copyDown(runNorth + i, i);
@@ -218,6 +231,7 @@ export class TerrainChunk {
     const geom = new THREE.BufferGeometry();
     geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geom.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+    geom.setAttribute('aCavity', new THREE.BufferAttribute(cavity, 1, true));
     geom.setIndex(this.lodIndex[0] as THREE.BufferAttribute);
     // Includes the skirt, so the sphere is conservative for frustum culling.
     geom.computeBoundingSphere();

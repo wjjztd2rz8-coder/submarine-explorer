@@ -11,8 +11,16 @@ export interface TerrainTier {
   detailSubdiv: number;
   /** Octaves of detail noise evaluated per vertex. */
   detailOctaves: number;
-  /** Edge length of the generated seabed textures, in pixels. */
+  /** Edge length (px) of the seabed albedo maps as shipped; informational. */
   textureSize: number;
+  /** Load the packed normal/roughness maps and evaluate texture normals (F1-TERRAIN). */
+  pbrNormals: boolean;
+  /** Blend a second, larger sample of the primary slot in so the repeat never reads. */
+  textureBreakup: boolean;
+  /** Instanced scatter density multiplier, 0 = none (F1-TERRAIN). */
+  scatterDensity: number;
+  /** Scatter streaming radius around the camera, metres. */
+  scatterRangeM: number;
   /** Multiplier on the LOD switch distances (higher = keep detail further out). */
   lodDistanceScale: number;
 }
@@ -55,24 +63,22 @@ export interface TerrainConfig {
   skirtDepthM: number;
 
   // --- triplanar material --------------------------------------------------
-  /** Metres per repeat of the seabed albedo textures. */
+  /** Metres per repeat of the seabed albedo and normal textures. */
   materialTextureScaleM: number;
-  /** Metres per repeat of the detail slope (normal) texture. */
-  materialGradScaleM: number;
+  /** Metres per repeat of the largest macro colour variation. */
+  materialMacroScaleM: number;
+  /** Global multiplier on the per-set pattern contrast (`SET_CONTRAST`). */
+  materialContrast: number;
   /** Strength of the normal-map detail. 0 = geometry normals only. */
   materialNormalStrength: number;
+  /** Camera distances (m) over which texture normals / ripples / bioturbation fade out. */
+  detailFadeNormalM: [number, number];
+  detailFadeRippleM: [number, number];
+  detailFadeBurrowM: [number, number];
   /** Below this slope the material is pure sediment. */
   rockSlopeLoDeg: number;
   /** Above this slope the material is pure rock. */
   rockSlopeHiDeg: number;
-  /** Depth (m, negative) above which the bed is pure sand. */
-  sandDepthShallow: number;
-  /** Depth (m, negative) below which there is no sand at all. */
-  sandDepthDeep: number;
-  /** Basalt albedo (art-direction §0 `#3B3A3D`) that steep rock blends toward. */
-  rockColor: number;
-  /** 0..1: how far fully-steep rock is pulled from the depth ramp to `rockColor`. */
-  rockColorMix: number;
   /**
    * Resident-vertex budget for the whole tile, skirts excluded. If
    * `cols*rows*subdiv^2` exceeds it, `detailSubdiv` is stepped down (3 -> 2 -> 1)
@@ -124,22 +130,57 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
   // amplitude plus half a coarse cell of height error).
   skirtDepthM: 60,
 
-  materialTextureScaleM: 34,
-  materialGradScaleM: 7,
-  materialNormalStrength: 0.7,
+  materialTextureScaleM: 3.4,
+  materialMacroScaleM: 55,
+  materialContrast: 1,
+  materialNormalStrength: 0.9,
+  detailFadeNormalM: [30, 110],
+  detailFadeRippleM: [22, 75],
+  detailFadeBurrowM: [14, 50],
   rockSlopeLoDeg: 18,
   rockSlopeHiDeg: 32,
-  sandDepthShallow: -120,
-  sandDepthDeep: -260,
-  rockColor: 0x3b3a3d,
-  rockColorMix: 0.6,
   maxVertices: 4_000_000,
 
   tiers: {
-    low: { detailSubdiv: 1, detailOctaves: 2, textureSize: 128, lodDistanceScale: 0.55 },
-    medium: { detailSubdiv: 2, detailOctaves: 3, textureSize: 256, lodDistanceScale: 1.0 },
-    high: { detailSubdiv: 3, detailOctaves: 4, textureSize: 512, lodDistanceScale: 1.8 },
-    // F0-CORE: ultra starts as high; wave-1 packages raise its budgets.
-    ultra: { detailSubdiv: 3, detailOctaves: 4, textureSize: 512, lodDistanceScale: 1.8 },
+    low: {
+      detailSubdiv: 1,
+      detailOctaves: 2,
+      textureSize: 1024,
+      lodDistanceScale: 0.55,
+      pbrNormals: false,
+      textureBreakup: false,
+      scatterDensity: 0.25,
+      scatterRangeM: 90,
+    },
+    medium: {
+      detailSubdiv: 2,
+      detailOctaves: 3,
+      textureSize: 1024,
+      lodDistanceScale: 1.0,
+      pbrNormals: true,
+      textureBreakup: true,
+      scatterDensity: 0.6,
+      scatterRangeM: 150,
+    },
+    high: {
+      detailSubdiv: 3,
+      detailOctaves: 4,
+      textureSize: 1024,
+      lodDistanceScale: 1.8,
+      pbrNormals: true,
+      textureBreakup: true,
+      scatterDensity: 1,
+      scatterRangeM: 220,
+    },
+    ultra: {
+      detailSubdiv: 3,
+      detailOctaves: 4,
+      textureSize: 1024,
+      lodDistanceScale: 1.8,
+      pbrNormals: true,
+      textureBreakup: true,
+      scatterDensity: 1.8,
+      scatterRangeM: 320,
+    },
   },
 };
