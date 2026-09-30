@@ -1,0 +1,145 @@
+/* B1: Journal (was the field guide) and free-dive debrief overlays.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+/* ---- Journal (was the field guide) and debrief overlays ---- */
+.field-guide,
+.debrief {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--b1-text);
+}
+
+.field-guide {
+  z-index: 40;
+}
+
+.debrief {
+  z-index: 30;
+  background: rgba(2, 6, 10, 0.45);
+  pointer-events: auto;
+}
+
+.field-guide[hidden],
+.debrief[hidden] {
+  display: none;
+}
+
+.debrief-panel {
+  pointer-events: auto;
+  background: var(--b1-panel-solid);
+  border: 1px solid var(--b1-hair);
+  border-radius: 3px;
+  backdrop-filter: blur(6px);
+}
+
+.debrief-btn {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--b1-hair-dim);
+  border-radius: 2px;
+}
+
+.debrief-btn:hover {
+  border-color: var(--b1-cyan);
+}
+
+/* ---- debrief ---- */
+.debrief-panel {
+  width: min(640px, 92vw);
+  padding: 22px 26px;
+}
+
+.debrief-kicker {
+  color: var(--b1-cyan);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+
+.debrief-title {
+  margin: 4px 0 2px;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.debrief-subtitle {
+  margin: 0;
+  opacity: 0.7;
+}
+
+.debrief-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 18px 0;
+  border-top: 1px solid var(--b1-hair-dim);
+  border-bottom: 1px solid var(--b1-hair-dim);
+}
+
+.debrief-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 0;
+}
+
+.debrief-stat + .debrief-stat {
+  padding-left: 14px;
+  border-left: 1px solid var(--b1-hair-dim);
+}
+
+.debrief-label {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  opacity: 0.65;
+}
+
+.debrief-value {
+  color: var(--b1-cyan);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.debrief-lists {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.debrief-section-title {
+  margin: 0 0 6px;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: var(--b1-cyan);
+}
+
+.debrief-section ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.debrief-empty {
+  margin: 0;
+  opacity: 0.55;
+}
+
+.debrief-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.debrief-btn {
+  padding: 8px 16px;
+  letter-spacing: 0.08em;
+}
+
+.debrief-btn.is-primary {
+  border-color: var(--b1-cyan);
+  color: var(--b1-cyan);
+}

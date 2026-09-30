@@ -1,5 +1,10 @@
 /** Versioned player settings and v1 display migration. Gameplay presets live in Config. */
-import type { GameConfig, GameplayOptions, GraphicsTier, SonarPaletteName } from './Config.js';
+import type {
+  GameConfig,
+  GameplayOptions,
+  GraphicsTierSetting,
+  SonarPaletteName,
+} from './Config.js';
 import type { EventBus } from './EventBus.js';
 
 export const SETTINGS_STORAGE_KEY = 'subexplorer.settings.v2';
@@ -15,7 +20,8 @@ export type GameplayMode = 'arcade' | 'realistic' | 'custom';
 export type HullWarningStyle = 'vignette' | 'gauge' | 'both';
 export const HULL_WARNING_STYLES: readonly HullWarningStyle[] = ['vignette', 'gauge', 'both'];
 export interface SettingsValues {
-  graphicsTier: GraphicsTier;
+  /** `auto` (the default for new players) or a fixed tier. Saved tiers are kept. */
+  graphicsTier: GraphicsTierSetting;
   postFx: boolean;
   detailStrength: number;
   /** Legacy display preference; gameplay.simSpeed controls the dive. */
@@ -46,7 +52,7 @@ export type SettingsConfigSource = Pick<
 > & {
   terrain: Pick<GameConfig['terrain'], 'detailStrength'>;
 };
-const TIERS: readonly GraphicsTier[] = ['low', 'medium', 'high'];
+const TIERS: readonly GraphicsTierSetting[] = ['auto', 'low', 'medium', 'high', 'ultra'];
 const DISPLAY_KEYS = [
   'graphicsTier',
   'postFx',
@@ -104,7 +110,7 @@ function sanitizeDisplay(
 ): unknown {
   switch (key) {
     case 'graphicsTier':
-      return TIERS.includes(value as GraphicsTier) ? value : fallback;
+      return TIERS.includes(value as GraphicsTierSetting) ? value : fallback;
     case 'postFx':
     case 'reduceMotion':
     case 'captions':

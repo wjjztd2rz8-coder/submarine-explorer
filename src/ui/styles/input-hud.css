@@ -1,0 +1,136 @@
+/* D-INPUT-HUD: UI scale variables, HUD layout, control tips.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+html,
+body {
+  font-size: 14px;
+}
+:root {
+  --ui-auto-scale: 1;
+  --ui-user-scale: 1;
+  --ui-scale: calc(var(--ui-auto-scale) * var(--ui-user-scale));
+}
+.hud {
+  font-size: clamp(14px, calc(16px * var(--ui-scale)), 24px);
+  line-height: 1.5;
+}
+.hud-readouts {
+  min-width: clamp(230px, calc(285px * var(--ui-scale)), 430px);
+  padding: clamp(10px, calc(13px * var(--ui-scale)), 20px);
+}
+.hud-row {
+  gap: 24px;
+}
+.hud-label {
+  font-size: clamp(14px, calc(14px * var(--ui-scale)), 21px);
+}
+.hud-value {
+  font-size: clamp(15px, calc(17px * var(--ui-scale)), 26px);
+  font-weight: 600;
+}
+.hud-row:has([data-field='tile']) {
+  border-top: 1px solid var(--hud-border);
+  margin-top: 7px;
+  padding-top: 6px;
+}
+.hud-row:has([data-field='tile']) .hud-label,
+.hud-row:has([data-field='tile']) .hud-value {
+  font-size: clamp(14px, calc(14px * var(--ui-scale)), 21px);
+  font-weight: 400;
+}
+.hud-objective,
+.hud-prompt,
+.hud-sim-speed {
+  position: absolute;
+  left: 12px;
+  padding: 8px 12px;
+  max-width: min(440px, 50vw);
+  border: 1px solid var(--hud-border);
+  border-radius: 5px;
+  background: var(--hud-bg);
+  font-size: clamp(14px, calc(16px * var(--ui-scale)), 24px);
+  font-weight: 600;
+}
+.hud-objective {
+  top: clamp(205px, calc(220px * var(--ui-scale)), 300px);
+}
+.hud-prompt {
+  bottom: 24px;
+  color: var(--hud-accent);
+}
+.hud-sim-speed {
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffcb70;
+}
+.hud-objective[hidden],
+.hud-prompt[hidden],
+.hud-sim-speed[hidden],
+.hud-ctrl-tip[hidden],
+.settings-section[hidden],
+.settings-controls-back[hidden],
+.settings-controls-open[hidden] {
+  display: none !important;
+}
+.scan-panel {
+  font-size: clamp(14px, calc(15px * var(--ui-scale)), 23px);
+}
+.scan-name,
+.scan-hint {
+  font-size: inherit;
+}
+.hud-attribution {
+  font-size: clamp(11px, calc(12px * var(--ui-scale)), 18px);
+}
+.settings {
+  font-size: clamp(14px, calc(15px * var(--ui-scale)), 22px);
+}
+.settings-note,
+.settings-binding-pad {
+  font-size: clamp(14px, calc(14px * var(--ui-scale)), 20px);
+}
+.settings-binding {
+  grid-template-columns: minmax(13ch, 1fr) minmax(11ch, 1fr) 1fr;
+  min-height: 32px;
+}
+.settings-panel {
+  max-height: 90vh;
+}
+.briefing-controls {
+  display: block;
+}
+.briefing-controls button {
+  font: inherit;
+  color: var(--hud-text);
+  background: #173e48;
+  border: 1px solid var(--hud-accent);
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.settings-pointer-lock {
+  margin: 8px 0 14px;
+}
+.hud-ctrl-tip {
+  position: fixed;
+  z-index: 65;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid #ffb020;
+  background: rgba(13, 25, 31, 0.95);
+  color: #fff;
+  font-size: 15px;
+}
+.hud-ctrl-tip button {
+  font: inherit;
+  padding: 4px 9px;
+  color: #fff;
+  background: #173e48;
+  border: 1px solid #6ee7c8;
+  cursor: pointer;
+}

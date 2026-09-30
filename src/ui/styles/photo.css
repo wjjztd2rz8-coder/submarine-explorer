@@ -1,0 +1,205 @@
+/* D-PHOTO: photo mode viewfinder and Journal photos.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+/* Photo mode: everything but the scene and the viewfinder hides. */
+body.photo-active > :not(#viewport, .photo-mode) {
+  visibility: hidden !important;
+}
+.photo-mode {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  color: var(--hud-text);
+  font-size: clamp(13px, calc(14px * var(--ui-scale)), 20px);
+}
+.photo-mode[hidden],
+.photo-mode-toast[hidden] {
+  display: none;
+}
+/* Thin viewfinder corners mark the framed area. */
+.photo-mode::before {
+  content: '';
+  position: absolute;
+  inset: 7.5%;
+  --c: rgba(207, 239, 230, 0.55);
+  background:
+    linear-gradient(var(--c), var(--c)) top left / 28px 1px,
+    linear-gradient(var(--c), var(--c)) top left / 1px 28px,
+    linear-gradient(var(--c), var(--c)) top right / 28px 1px,
+    linear-gradient(var(--c), var(--c)) top right / 1px 28px,
+    linear-gradient(var(--c), var(--c)) bottom left / 28px 1px,
+    linear-gradient(var(--c), var(--c)) bottom left / 1px 28px,
+    linear-gradient(var(--c), var(--c)) bottom right / 28px 1px,
+    linear-gradient(var(--c), var(--c)) bottom right / 1px 28px;
+  background-repeat: no-repeat;
+}
+.photo-mode-top {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  padding: 6px 14px;
+  border: 1px solid var(--hud-border);
+  border-radius: 4px;
+  background: var(--hud-bg);
+  text-align: center;
+}
+.photo-mode-kicker {
+  display: block;
+  font-size: 0.72em;
+  letter-spacing: 0.18em;
+  color: var(--hud-accent);
+}
+.photo-mode-caption {
+  margin: 1px 0 0;
+  font-size: 1.12em;
+}
+.photo-mode-caption.is-empty {
+  opacity: 0.7;
+}
+.photo-mode-toast {
+  position: absolute;
+  top: calc(84px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 6px 14px;
+  border: 1px solid var(--hud-accent);
+  border-radius: 4px;
+  background: rgba(6, 30, 32, 0.85);
+  color: #e6fff8;
+  white-space: nowrap;
+}
+.photo-mode-toast.is-error {
+  border-color: var(--hud-warn);
+  background: rgba(40, 8, 8, 0.88);
+  color: #ffd9d4;
+  white-space: normal;
+  max-width: min(560px, calc(100vw - 32px));
+}
+.photo-mode-bottom {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.photo-mode-tips {
+  margin: 0;
+  padding: 5px 8px;
+  border: 1px solid var(--hud-border);
+  border-radius: 4px;
+  background: var(--hud-bg);
+  opacity: 0.85;
+  font-size: clamp(11px, calc(12px * var(--ui-scale)), 16px);
+}
+.photo-mode-capture {
+  pointer-events: auto;
+  font: inherit;
+  padding: 6px 16px;
+  color: #fff;
+  background: #173e48;
+  border: 1px solid var(--hud-accent);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.photo-mode-capture:hover,
+.photo-mode-capture:focus-visible {
+  background: #21586a;
+}
+
+/* Journal photos: grid, viewer, per-entry strip. */
+.jr-photo-title {
+  margin: 0 0 12px;
+  font-size: 1.3em;
+  font-weight: 400;
+}
+.jr-entry-photos {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--b1-hair-dim);
+}
+.jr-entry-photos .jr-photo-title {
+  font-size: 1.1em;
+}
+.jr-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.jr-photo-card,
+.jr-photo-back,
+.jr-photo-delete {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--b1-hair-dim);
+  border-radius: 3px;
+}
+.jr-photo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  text-align: left;
+}
+.jr-photo-card:hover,
+.jr-photo-card:focus-visible,
+.jr-photo-back:hover {
+  border-color: var(--b1-cyan);
+}
+.jr-photo-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  background: #02060c;
+}
+.jr-photo-card-caption {
+  font-size: 0.85em;
+  line-height: 1.35;
+}
+.jr-photo-viewer {
+  margin: 0;
+}
+.jr-photo-viewer img {
+  display: block;
+  width: 100%;
+  max-height: 52vh;
+  object-fit: contain;
+  background: #02060c;
+  border: 1px solid var(--b1-hair-dim);
+}
+.jr-photo-caption {
+  margin-top: 8px;
+  font-size: 1.15em;
+}
+.jr-photo-detail {
+  margin: 2px 0 12px;
+  color: var(--b1-cyan);
+  font-size: 0.9em;
+}
+.jr-photo-actions {
+  display: flex;
+  gap: 10px;
+}
+.jr-photo-back,
+.jr-photo-delete {
+  padding: 5px 12px;
+}
+.jr-photo-delete {
+  border-color: rgba(255, 107, 94, 0.55);
+  color: #ffc2bb;
+}
+.jr-photo-delete:hover {
+  border-color: var(--hud-warn);
+}
+.jr-photo-error {
+  color: #ffc2bb;
+}

@@ -54,11 +54,17 @@ describe('settings defaults and migrate', () => {
     expect(d.bindings).toBe(SAVE_KEYS.bindings);
   });
 
+  it('keeps saved tiers from before quality tiers v2 and accepts auto and ultra', () => {
+    for (const tier of ['low', 'medium', 'high', 'ultra', 'auto'] as const) {
+      expect(migrate({ version: 1, graphicsTier: tier }, config).graphicsTier).toBe(tier);
+    }
+  });
+
   it('keeps valid fields and replaces bad ones one by one', () => {
     const m = migrate(
       {
         version: 1,
-        graphicsTier: 'ultra',
+        graphicsTier: 'extreme',
         postFx: false,
         detailStrength: 99,
         simSpeedDefault: 7,

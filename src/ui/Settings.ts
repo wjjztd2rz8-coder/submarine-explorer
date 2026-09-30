@@ -26,6 +26,7 @@ import type {
   GameConfig,
   GameplayOptions,
   GraphicsTier,
+  GraphicsTierSetting,
   SonarPaletteName,
 } from '../core/Config.js';
 import { keyLabel, type ActionBinding, type ActionId } from '../core/Input.js';
@@ -158,6 +159,11 @@ export interface SettingsScreenOptions {
   config: Pick<GameConfig, 'settings' | 'sonarPalettes'>;
   /** The tier this dive actually runs at. */
   activeTier: GraphicsTier;
+  /**
+   * The saved tier setting the dive booted with (`auto` or a tier); a change
+   * from it needs a reload. Defaults to `activeTier`.
+   */
+  activeTierSetting?: GraphicsTierSetting;
   /** Boot values; these settings cannot change the current terrain or dive. */
   activeDetailStrength: number;
   activeSimSpeedDefault: number;
@@ -254,9 +260,11 @@ export class SettingsScreen {
         'graphicsTier',
         'Graphics tier',
         [
+          ['auto', 'Auto'],
           ['low', 'Low'],
           ['medium', 'Medium'],
           ['high', 'High'],
+          ['ultra', 'Ultra'],
         ],
         tierNote,
       ),
@@ -659,7 +667,8 @@ export class SettingsScreen {
     }
     for (const [key, control] of this.gameplayControls) control.value = String(s.gameplay[key]);
     const pending =
-      (!this.opts.tierFromUrl && s.graphicsTier !== this.opts.activeTier) ||
+      (!this.opts.tierFromUrl &&
+        s.graphicsTier !== (this.opts.activeTierSetting ?? this.opts.activeTier)) ||
       s.detailStrength !== this.opts.activeDetailStrength ||
       s.simSpeedDefault !== this.opts.activeSimSpeedDefault;
     this.reloadButton.hidden = !pending || !this.opts.save.reloadSafe;
