@@ -22,6 +22,7 @@ import type {
   ProceduralPropKind,
   PropsConfig,
 } from '../core/Config.js';
+import { isWreckHull, isWreckScatter, type WreckId } from './props/wrecks/variants.js';
 
 export const PROCEDURAL_PREFIX = 'procedural:';
 export const PROCEDURAL_KINDS: readonly ProceduralPropKind[] = ['hull-block', 'debris', 'chimney'];
@@ -55,6 +56,11 @@ export interface PropDef {
   hullEnds: [HullEnd, HullEnd] | null;
   /** chimney only: rock palette from `material_hint`; null (= basalt) when absent or another kind. */
   materialHint: ChimneyMaterial | null;
+  /**
+   * Named hand-built wreck (`"wreck"`, docs/props.md): a hull id on a
+   * hull-block or a scatter-kit id on debris; null = the generic builder.
+   */
+  wreck: WreckId | null;
   lodDistanceM: number;
   collision: PropCollisionKind;
   /** Tilt the prop to the terrain normal (only meaningful when snapping). */
@@ -215,6 +221,18 @@ export function validatePropEntry(
     else warnings.push(`${where}: "material_hint" only applies to procedural:chimney; ignored`);
   }
 
+  let wreck: WreckId | null = null;
+  if (entry.wreck !== undefined) {
+    const w = entry.wreck;
+    if (procedural === 'hull-block' && isWreckHull(w)) wreck = w;
+    else if (procedural === 'debris' && isWreckScatter(w)) wreck = w;
+    else {
+      warnings.push(
+        `${where}: "wreck" ${JSON.stringify(w)} does not match procedural:${procedural ?? 'model'}; generic builder used`,
+      );
+    }
+  }
+
   let lodDistanceM = config.defaultLodDistanceM;
   if (entry.lod_distance_m !== undefined) {
     if (!isNum(entry.lod_distance_m) || entry.lod_distance_m <= 0) {
@@ -248,6 +266,7 @@ export function validatePropEntry(
     dimensionsM,
     hullEnds,
     materialHint,
+    wreck,
     lodDistanceM,
     collision,
     alignToSlope: alignToSlope && snap,

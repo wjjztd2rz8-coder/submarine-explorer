@@ -17,6 +17,7 @@ import {
   type BuiltProp,
   type ProceduralBuilder,
 } from './shared.js';
+import { buildWreck } from '../wrecks/index.js';
 
 // ---------------------------------------------------------------- textures
 
@@ -609,6 +610,9 @@ export function buildHullBlock(
 
 /** Registry entries for this family (`builders/index.ts`). */
 export const WRECK_BUILDERS = {
-  'hull-block': ({ dims, seed, cfg, def }) =>
-    buildHullBlock(dims, seed, cfg, def.hullEnds ?? cfg.hullDefaultEnds),
+  // A `wreck` id picks a hand-built hull (props/wrecks/); otherwise the generic block.
+  'hull-block': ({ dims, seed, cfg, def, tier }) =>
+    def.wreck
+      ? buildWreck(def.wreck, dims, seed, tier)
+      : buildHullBlock(dims, seed, cfg, def.hullEnds ?? cfg.hullDefaultEnds),
 } satisfies Record<'hull-block', ProceduralBuilder>;

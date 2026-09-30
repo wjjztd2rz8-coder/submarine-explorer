@@ -16,6 +16,12 @@ export interface BuiltProp {
   impostor: THREE.Object3D;
   /** Local-space bounds of `full` (before the prop's own scale). */
   bounds: THREE.Box3;
+  /**
+   * Optional compound collision boxes in the local, unscaled frame (hand-built
+   * wrecks). When present and the entry's collision is `box`, each becomes its
+   * own collider instead of one box around `bounds`.
+   */
+  colliders?: THREE.Box3[];
 }
 
 /** Signature for terrain-following debris: local (x, z) -> ground Y relative to the prop origin. */
@@ -125,6 +131,8 @@ export interface ProceduralBuildInput {
   /** Stable seed from the prop id (`hashString`). */
   seed: number;
   cfg: PropsConfig;
+  /** Graphics tier (`low` / `medium` / `high` / `ultra`); detail budgets key off it. */
+  tier: string;
   /**
    * Terrain-following in the prop's local frame (local x, z -> ground Y), or
    * undefined when the prop does not snap. Computed on demand.

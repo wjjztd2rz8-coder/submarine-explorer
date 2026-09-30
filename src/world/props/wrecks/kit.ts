@@ -255,6 +255,28 @@ export function loftSides(spec: LoftSpec): THREE.BufferGeometry {
   return merged;
 }
 
+/**
+ * Turn a non-indexed geometry inside out in place (swap each triangle's
+ * winding, negate normals): the inner walls of an open cavity.
+ */
+export function flipFaces(geom: THREE.BufferGeometry): THREE.BufferGeometry {
+  const pos = geom.getAttribute('position');
+  const nrm = geom.getAttribute('normal');
+  for (let i = 0; i + 2 < pos.count; i += 3) {
+    for (const a of [pos, nrm]) {
+      const x = a.getX(i + 1);
+      const y = a.getY(i + 1);
+      const z = a.getZ(i + 1);
+      a.setXYZ(i + 1, a.getX(i + 2), a.getY(i + 2), a.getZ(i + 2));
+      a.setXYZ(i + 2, x, y, z);
+    }
+  }
+  for (let i = 0; i < nrm.count; i++) nrm.setXYZ(i, -nrm.getX(i), -nrm.getY(i), -nrm.getZ(i));
+  pos.needsUpdate = true;
+  nrm.needsUpdate = true;
+  return geom;
+}
+
 /** Closing face across the hull at station s (normal toward the nearer end). */
 export function loftCap(spec: LoftSpec, s: number, facing: -1 | 1): THREE.BufferGeometry {
   const nl = spec.levels + 1;

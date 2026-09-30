@@ -5,21 +5,23 @@
     {
       "id": "main-hull",
       "model": "procedural:hull-block",
+      "wreck": "bismarck",
       "lat": 48.15,
       "lon": -16.117,
       "snap_to_seabed": true,
       "heading_deg": 20,
       "scale": 1,
       "dimensions_m": [251, 36, 15],
-      "ends": ["prow", "rounded"],
+      "ends": ["prow", "cut"],
       "lod_distance_m": 1500,
       "collision": "box",
       "reconstruction": true,
-      "note": "Bismarck's hull, repositioned 2026-09 to the H.M.S. Hood Association's 2001 expedition fix (48.15N, 16.117W; see sources.md for the position discrepancy this replaced and the residual depth-vs-terrain gap at this point). Length 251 m and beam 36 m are the ship's published overall dimensions (Wikipedia, data/landmarks.json wreck_meta). Height 15 m is an unsourced estimate for a battleship hull of this displacement; no source found publishes a keel-to-deck figure for the wreck. ends [prow, rounded]: surveys (kbismarck.com) describe the hull as largely intact and in surprisingly good condition, so this uses a pointed bow and a rounded stern rather than a torn 'cut' end; note that data/landmarks.json's own wreck_meta separately describes the bow as 'separated from main hull', which conflicts with the intact-hull account -- see sources.md. heading_deg 20 is arbitrary: no source found publishes the ship's actual compass orientation on the seabed."
+      "note": "Bismarck's hull, repositioned 2026-09 to the H.M.S. Hood Association's 2001 expedition fix (48.15N, 16.117W; see sources.md for the position discrepancy this replaced and the residual depth-vs-terrain gap at this point). Length 251 m and beam 36 m are the ship's published overall dimensions (Wikipedia, data/landmarks.json wreck_meta). Height 15 m is an unsourced estimate for a battleship hull of this displacement; no source found publishes a keel-to-deck figure for the wreck. ends [prow, rounded]: surveys (kbismarck.com) describe the hull as largely intact and in surprisingly good condition, so this uses a pointed bow and a rounded stern rather than a torn 'cut' end; note that data/landmarks.json's own wreck_meta separately describes the bow as 'separated from main hull', which conflicts with the intact-hull account -- see sources.md. heading_deg 20 is arbitrary: no source found publishes the ship's actual compass orientation on the seabed. 2026-09 (F1-WRECKS): the hand-built hull (\"wreck\": \"bismarck\") follows docs/research/sites.md instead: upright, stern broken away aft of turret Dora (never found), so 'ends' is now [prow, cut]; the four main turrets fell out on capsizing, leaving empty barbettes. Turret, superstructure and barbette stations follow the ship's general arrangement."
     },
     {
       "id": "turret-debris",
       "model": "procedural:debris",
+      "wreck": "bismarck-turrets",
       "lat": 48.15114,
       "lon": -16.10497,
       "snap_to_seabed": true,
@@ -30,6 +32,36 @@
       "collision": "none",
       "reconstruction": true,
       "note": "Stands in for Bismarck's four detached main-battery (38 cm) gun turrets, which broke free during the sinking and came to rest roughly in a line down the seamount flank (kbismarck.org forum, citing 1989 and later survey accounts; Magellan's 2019 digital-twin survey). The engine's procedural kinds have no turret shape, so a debris cluster marks the general area; it does not depict the turrets' real form. No public coordinates were found for the individual turrets, so this placement, roughly 1.2 km up-slope (north-east, toward the seamount summit) of the hull, is illustrative only -- hence low confidence on the matching POI. Repositioned 2026-09 with the hull; see sources.md."
+    },
+    {
+      "id": "hull-debris",
+      "model": "procedural:debris",
+      "wreck": "bismarck-field",
+      "lat": 48.148903,
+      "lon": -16.117595,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [60, 60, 3],
+      "lod_distance_m": 600,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Hull plating, frames and pipes around the torn aft end, where the stern broke away (kbismarck.com wreck summary; the stern itself has never been found). Centred ~130 m astern of the hull (bearing 200 deg from the hull fix, i.e. off the torn end for heading 20). Position, radius and piece counts are illustrative."
+    },
+    {
+      "id": "slide-scar",
+      "model": "procedural:debris",
+      "wreck": "bismarck-landslide",
+      "lat": 48.150314,
+      "lon": -16.11366,
+      "snap_to_seabed": true,
+      "heading_deg": 82,
+      "scale": 1,
+      "dimensions_m": [200, 45, 4],
+      "lod_distance_m": 900,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "The underwater landslide the hull set off as it hit the seamount flank and slid down it (Ballard 1989 survey; docs/research/sites.md: 'build a scrape, small slide blocks'). Sediment blocks and edge berms in an ellipse 400 m long and 90 m wide (dimensions_m = [half-length, half-width, height] for this kit), laid from the hull up-slope toward the turret area (bearing 82 deg). The coarse terrain does not resolve the real scar; its length, width and course here are a reconstruction."
     }
   ]
 }

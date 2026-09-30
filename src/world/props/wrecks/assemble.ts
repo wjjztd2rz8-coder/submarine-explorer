@@ -25,9 +25,11 @@ export interface WreckParts {
   anchors: THREE.Object3D[];
 }
 
-/** A wreck prop: the standard built prop plus compound colliders. */
+/** A wreck prop: the standard built prop plus compound colliders and hook anchors. */
 export interface WreckBuilt extends BuiltProp {
   colliders: THREE.Box3[];
+  /** Named empty nodes (also children of `full`), e.g. `interior-entry`. */
+  anchors: THREE.Object3D[];
 }
 
 const _cam = new THREE.Vector3();
@@ -68,10 +70,16 @@ export function assembleWreck(name: string, parts: WreckParts, detail: WreckDeta
   const mid = new THREE.Group();
   mid.name = `${name}-mid`;
   for (const m of parts.core) {
-    m.geometry.computeBoundingBox();
-    bounds.union(m.geometry.boundingBox!);
+    const inst = (m as THREE.InstancedMesh).isInstancedMesh === true;
+    if (inst) {
+      bounds.union(new THREE.Box3().setFromObject(m));
+    } else {
+      m.geometry.computeBoundingBox();
+      bounds.union(m.geometry.boundingBox!);
+    }
     near.add(m);
-    const twin = new THREE.Mesh(m.geometry, m.material);
+    // Shares geometry and material; an instanced twin copies its (small) matrix buffer.
+    const twin = inst ? m.clone() : new THREE.Mesh(m.geometry, m.material);
     twin.name = `${m.name}-mid`;
     mid.add(twin);
   }
@@ -93,7 +101,7 @@ export function assembleWreck(name: string, parts: WreckParts, detail: WreckDeta
   for (const a of parts.anchors) full.add(a);
 
   parts.far.name = `${name}-far`;
-  return { full, impostor: parts.far, bounds, colliders: parts.colliders };
+  return { full, impostor: parts.far, bounds, colliders: parts.colliders, anchors: parts.anchors };
 }
 
 /** Wrap a merged geometry as a named mesh. */

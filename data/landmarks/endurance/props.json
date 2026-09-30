@@ -5,6 +5,7 @@
     {
       "id": "main-hull",
       "model": "procedural:hull-block",
+      "wreck": "endurance",
       "lat": -68.739167,
       "lon": -52.329722,
       "snap_to_seabed": true,
@@ -20,6 +21,7 @@
     {
       "id": "rigging-debris",
       "model": "procedural:debris",
+      "wreck": "endurance-rigging",
       "lat": -68.738946,
       "lon": -52.32983,
       "snap_to_seabed": true,
@@ -34,6 +36,7 @@
     {
       "id": "helm-marker",
       "model": "procedural:debris",
+      "wreck": "endurance-stern",
       "lat": -68.739319,
       "lon": -52.329569,
       "snap_to_seabed": true,

@@ -51,7 +51,11 @@ export interface PlacedProp {
   localBounds: THREE.Box3;
   /** World-space bounding sphere, for distance LOD and frustum culling. */
   sphere: THREE.Sphere;
+  /** The first (or only) collider; `colliders` holds every part of a compound one. */
   collider: Collider | null;
+  colliders: Collider[];
+  /** Compound collision boxes from the builder (local, unscaled), or null. */
+  localColliders: THREE.Box3[] | null;
   lod: PropLod;
 }
 
@@ -159,10 +163,15 @@ export class Props {
   private readonly frustum = new THREE.Frustum();
   private readonly projView = new THREE.Matrix4();
 
+  /**
+   * @param tier graphics tier for procedural detail budgets (hand-built wrecks);
+   *   defaults to `medium`, the fixed default tier.
+   */
   constructor(
     private readonly meta: TileMeta,
     private readonly hf: PropsHeightField,
     private readonly cfg: PropsConfig,
+    private readonly tier = 'medium',
   ) {
     this.group.name = 'props';
     this.stats = emptyStats('');
@@ -239,6 +248,7 @@ export class Props {
         dims,
         seed,
         cfg: this.cfg,
+        tier: this.tier,
         groundHeight: () => this.debrisHeightFn(def),
       });
     }
@@ -291,6 +301,8 @@ export class Props {
       localBounds: built.bounds,
       sphere: new THREE.Sphere(),
       collider: null,
+      colliders: [],
+      localColliders: built.colliders?.length ? built.colliders : null,
       lod: 'full',
     };
     this.placed.push(prop);
@@ -316,15 +328,25 @@ export class Props {
       .add(root.position);
     prop.sphere.set(centre, half.length());
 
-    if (prop.collider) this.colliders.splice(this.colliders.indexOf(prop.collider), 1);
-    prop.collider = null;
-    if (def.collision === 'box') {
-      prop.collider = makeBoxCollider(centre, half, root.quaternion);
+    for (const c of prop.colliders) this.colliders.splice(this.colliders.indexOf(c), 1);
+    prop.colliders = [];
+    if (def.collision === 'box' && prop.localColliders) {
+      // A hand-built wreck: one oriented box per part, so the sub can get down
+      // onto the decks between the deck houses.
+      for (const b of prop.localColliders) {
+        const c = b.getCenter(new THREE.Vector3()).multiply(scale);
+        const h = b.getSize(new THREE.Vector3()).multiply(scale).multiplyScalar(0.5);
+        c.applyQuaternion(root.quaternion).add(root.position);
+        prop.colliders.push(makeBoxCollider(c, h, root.quaternion));
+      }
+    } else if (def.collision === 'box') {
+      prop.colliders.push(makeBoxCollider(centre, half, root.quaternion));
     } else if (def.collision === 'sphere') {
       const r = ((half.x + half.y + half.z) / 3) * this.cfg.sphereColliderFit;
-      prop.collider = makeSphereCollider(centre, r);
+      prop.colliders.push(makeSphereCollider(centre, r));
     }
-    if (prop.collider) this.colliders.push(prop.collider);
+    prop.collider = prop.colliders[0] ?? null;
+    this.colliders.push(...prop.colliders);
     this.stats.colliders = this.colliders.length;
   }
 
@@ -339,6 +361,7 @@ export class Props {
       prop.full = built.full;
       prop.impostor = built.impostor;
       prop.localBounds = built.bounds;
+      prop.localColliders = built.colliders?.length ? built.colliders : null;
       prop.root.add(built.full, built.impostor);
       prop.full.visible = prop.lod === 'full';
       prop.impostor.visible = prop.lod === 'impostor';

@@ -15,7 +15,7 @@ export const propsSystem: GameSystem = {
   init(ctx) {
     const { meta, terrain, config, scene, params, rig, canvas, route, contentLandmark, bus } = ctx;
     const { sub, spawnDepth } = ctx;
-    const props = new Props(meta, terrain, config.props);
+    const props = new Props(meta, terrain, config.props, ctx.tier);
     ctx.props = props;
     scene.add(props.group);
     const propsDebug =

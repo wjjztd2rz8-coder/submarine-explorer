@@ -13,6 +13,7 @@ import {
   type LocalHeightFn,
   type ProceduralBuilder,
 } from './shared.js';
+import { buildWreck } from '../wrecks/index.js';
 import { makeRustTexture } from './wrecks.js';
 
 export interface DebrisPiece {
@@ -153,5 +154,9 @@ export function buildDebris(
 
 /** Registry entries for this family (`builders/index.ts`). */
 export const DEBRIS_BUILDERS = {
-  debris: ({ dims, seed, cfg, groundHeight }) => buildDebris(dims[0], seed, cfg, groundHeight()),
+  // A `wreck` id picks a hand-built scatter kit (props/wrecks/); otherwise generic debris.
+  debris: ({ dims, seed, cfg, def, tier, groundHeight }) =>
+    def.wreck
+      ? buildWreck(def.wreck, dims, seed, tier, groundHeight())
+      : buildDebris(dims[0], seed, cfg, groundHeight()),
 } satisfies Record<'debris', ProceduralBuilder>;

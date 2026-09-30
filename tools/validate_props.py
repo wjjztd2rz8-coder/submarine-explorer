@@ -31,6 +31,10 @@ MODEL_URL_PREFIX = "/assets/models/"
 COLLISIONS = ("none", "sphere", "box")
 HULL_ENDS = ("prow", "cut", "rounded")  # hull-block "ends": [forward, aft]
 CHIMNEY_MATERIALS = ("basalt", "carbonate", "sulfide")  # chimney "material_hint"
+# "wreck": hand-built wreck ids (src/world/props/wrecks/variants.ts); keep in step.
+WRECK_HULLS = ("titanic-bow", "titanic-stern", "bismarck", "endurance")
+WRECK_SCATTERS = ("titanic-boilers", "titanic-field", "titanic-stern-field", "bismarck-turrets",
+                  "bismarck-field", "bismarck-landslide", "endurance-rigging", "endurance-stern")
 DEFAULT_MAX_PROPS = 400  # Config.props.maxProps
 DEFAULT_MAX_MODEL_MB = 2.0
 
@@ -128,6 +132,13 @@ def validate_entry(entry, warnings):
             return '%s: "ends" must be [forward, aft], each one of %s' % (where, " | ".join(HULL_ENDS))
         if kind != "hull-block":
             warnings.append('%s: "ends" only applies to procedural:hull-block; ignored' % where)
+
+    if "wreck" in entry:
+        w = entry["wreck"]
+        ok = (kind == "hull-block" and w in WRECK_HULLS) or (kind == "debris" and w in WRECK_SCATTERS)
+        if not ok:
+            warnings.append('%s: "wreck" %r does not match procedural:%s; generic builder used'
+                            % (where, w, kind))
 
     if "material_hint" in entry:
         m = entry["material_hint"]

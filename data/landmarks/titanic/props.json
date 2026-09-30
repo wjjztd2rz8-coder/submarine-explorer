@@ -5,6 +5,7 @@
     {
       "id": "bow-hull",
       "model": "procedural:hull-block",
+      "wreck": "titanic-bow",
       "lat": 41.7325,
       "lon": -49.94694,
       "snap_to_seabed": true,
@@ -20,6 +21,7 @@
     {
       "id": "stern-hull",
       "model": "procedural:hull-block",
+      "wreck": "titanic-stern",
       "lat": 41.72639,
       "lon": -49.94833,
       "snap_to_seabed": true,
@@ -35,6 +37,7 @@
     {
       "id": "boiler-field",
       "model": "procedural:debris",
+      "wreck": "titanic-boilers",
       "lat": 41.7256,
       "lon": -49.9469,
       "snap_to_seabed": true,
@@ -49,6 +52,7 @@
     {
       "id": "debris-midfield",
       "model": "procedural:debris",
+      "wreck": "titanic-field",
       "lat": 41.73,
       "lon": -49.9475,
       "snap_to_seabed": true,
@@ -63,6 +67,7 @@
     {
       "id": "debris-stern",
       "model": "procedural:debris",
+      "wreck": "titanic-stern-field",
       "lat": 41.7252,
       "lon": -49.9497,
       "snap_to_seabed": true,

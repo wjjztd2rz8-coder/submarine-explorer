@@ -105,6 +105,27 @@ class MaterialHintTests(unittest.TestCase):
         self.assertIsNotNone(vp.validate_entry(entry(material_hint="granite"), []))
 
 
+class WreckTests(unittest.TestCase):
+    def test_matching_ids_pass_without_warnings(self):
+        w = []
+        self.assertIsNone(vp.validate_entry(entry(wreck="titanic-bow"), w))
+        self.assertIsNone(vp.validate_entry(entry(model="procedural:debris", wreck="titanic-field"), w))
+        self.assertEqual(w, [])
+
+    def test_mismatch_warns_but_keeps_entry(self):
+        w = []
+        self.assertIsNone(vp.validate_entry(entry(wreck="titanic-field"), w))
+        self.assertIsNone(vp.validate_entry(entry(wreck="nope"), w))
+        self.assertEqual(len(w), 2)
+
+    def test_ids_match_the_engine(self):
+        src = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",
+                           "src", "world", "props", "wrecks", "variants.ts")
+        text = open(src, encoding="utf-8").read()
+        for wid in vp.WRECK_HULLS + vp.WRECK_SCATTERS:
+            self.assertIn("'%s'" % wid, text)
+
+
 class ValidateDocTests(unittest.TestCase):
     def test_counts_duplicates_and_bbox(self):
         doc = {"version": 1, "landmark": "t", "props": [

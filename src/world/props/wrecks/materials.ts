@@ -104,6 +104,15 @@ export function fittingMaterial(): THREE.MeshStandardMaterial {
   });
 }
 
+/** Mud and slide blocks: vertex-coloured, fully rough, not metallic. */
+export function sedimentMaterial(): THREE.MeshStandardMaterial {
+  return cachedMat('sediment', () => {
+    const m = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 1, metalness: 0 });
+    m.name = 'wreck-sediment';
+    return m;
+  });
+}
+
 /** Rusticles and sessile animals: soft, matte, vertex + instance coloured. */
 export function growthMaterial(): THREE.MeshStandardMaterial {
   return cachedMat('growth', () => {
