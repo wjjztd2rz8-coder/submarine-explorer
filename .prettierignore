@@ -2,3 +2,4 @@ dist
 node_modules
 data/tiles
 tests/e2e/screenshots
+public/assets/decoders

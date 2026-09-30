@@ -120,7 +120,7 @@ flowchart TD
   PACK --> VP
 
   subgraph engine["Browser engine (TypeScript + Three.js)"]
-    MAIN["main.ts\nbootstrap + frame loop"]
+    MAIN["main.ts + app/\nboot, ordered systems, frame loop"]
 
     subgraph core["core/"]
       TIME["Time\n60 Hz accumulator"]
@@ -256,7 +256,8 @@ responses in `.cache/gmrt-raw/`, retries with backoff and falls back to ETOPO.
 `--quant16`, `heightmap16.bin` + the `quant_*` meta keys. See
 [`docs/tiles-inventory.md`](./tiles-inventory.md).
 
-**Boot (per page load, `main.ts`).** The app shell starts in one of three
+**Boot (per page load, `app/boot.ts`, then each system's `init` in
+`app/systems.ts` order).** The app shell starts in one of three
 states — `'home' | 'dive' | 'pause'` (`GameEvents['app:state']`). Plain `/`
 boots into `'home'`: `ui/Home.ts` shows the C1 globe as the site picker behind
 Continue/Dive sites/Free dive/Journal/Settings/Controls, and the world behind
@@ -300,7 +301,8 @@ returns to `'dive'`.
 Every content loader treats a missing or malformed file as "none" and never
 throws at boot.
 
-**Per frame (`frame()` in `main.ts`, in order).**
+**Per frame (`app/loop.ts`; system hooks run in `FRAME_STAGES` order, see
+"Phase F structure" below).**
 
 ```
 requestAnimationFrame
@@ -335,6 +337,63 @@ delta so fixed-step backlog limits do not slow the displayed dive time.
 Both stop during briefing/globe/settings pauses and are not multiplied by sim
 speed. Everything visual uses the variable frame delta, and camera smoothing is expressed as a
 half-life so it feels identical at 30 and 144 fps.
+
+## Phase F structure
+
+F0-CORE split the old merge hotspots so that parallel packages each edit their
+own files.
+
+- **App systems (`src/app/`).** `main.ts` only boots, initialises the systems
+  and starts the loop. `boot.ts` builds the `BootContext`: params, config, bus,
+  save, quality tier, tile, renderer and scene. Each file in `app/systems/`
+  exports a `GameSystem` with the following parts:
+  - `init(ctx)` builds its objects and publishes them on the shared
+    `GameContext`.
+  - Optional `start(ctx)` runs after every system's init.
+  - `frame` holds per-stage hooks.
+  - Optional `dispose()` tears the system down.
+
+  `app/systems.ts` is the ordered list. Init order equals the pre-F0 build
+  order, which DOM, key-listener and `app:state` listener order depend on (the
+  list is annotated, and `tests/unit/appSystems.test.ts` pins the
+  constraints). `FRAME_STAGES` in `app/System.ts` is the frame, in order.
+  Systems sharing a stage run in list order. A system adds debug handles with
+  `ctx.expose({...})`, and they end up on `window.__game`.
+
+- **Config (`src/core/config/`).** There is one file per domain (types and
+  defaults), and `types.ts` holds the `GameConfig` contract.
+  `src/core/Config.ts` assembles `DEFAULT_CONFIG`, owns `makeConfig` and
+  re-exports everything, so imports are unchanged.
+- **Styles (`src/styles/`).** There is one file per module. `src/styles.css`
+  `@import`s them in cascade order, so append new files at the end.
+- **Procedural props (`src/world/props/builders/`).** There is one file per
+  family: `wrecks`, `debris`, `vents`, `reefs`, `geology`, `generic`, and
+  `shared` for helpers and types. `PROCEDURAL_BUILDERS` maps each kind to its
+  builder. `props/Procedural.ts` is a compatibility barrel.
+- **Quality tiers v2 (`src/core/Quality.ts`).** There are four tiers, `low`,
+  `medium`, `high` and `ultra`, plus the `auto` setting. `detectTier()` is a
+  pure heuristic over a `DeviceCaps` snapshot and checks, in order:
+  1. A software renderer gives `low`.
+  2. Tiny GPU limits, or 2 cores or 2 GB or less, give `low`.
+  3. A phone gives `low`, or `medium` with a flagship GPU.
+  4. A tablet gives `medium`, or `low` when small.
+  5. A discrete GPU gives `high`.
+  6. Old Intel gives `low`.
+  7. Anything else gives `medium`.
+
+  `ultra` is never automatic. Precedence is `?tier=` (including `?tier=auto`),
+  then the saved setting, then detection. The default setting is `medium`.
+  Dynamic resolution (`DynamicResolution`, run by `app/systems/quality.ts`)
+  runs only for auto-detected tiers or with `?dynres=1`. `window.__game.perf`
+  exposes `drawCalls`, `triangles`, `frameMs`, `tier`, `tierSource`,
+  `pixelRatio`, `maxPixelRatio`, `resolutionScale` and `dynamicResolution`.
+
+- **Assets (`src/core/assets/`).** `assets.loadGLTF(url)` handles Draco,
+  Meshopt and KTX2. `assets.loadTexture(url, { srgb, repeat })` loads PNG, JPEG,
+  WebP or KTX2. `assets.preload(manifest.assets)` never rejects. KTX2 needs
+  `assets.setRenderer(renderer)` first. The decoders live in
+  `public/assets/decoders/{draco,basis}/`, and the Vite config stops three
+  from emitting its own copies.
 
 ## Coordinate conventions
 

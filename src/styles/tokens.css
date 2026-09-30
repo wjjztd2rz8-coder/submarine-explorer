@@ -1,0 +1,36 @@
+/* Colour variables, reset and the full-screen canvas.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+:root {
+  color-scheme: dark;
+  --hud-bg: rgba(6, 18, 28, 0.66);
+  --hud-border: rgba(110, 220, 200, 0.28);
+  --hud-text: #cfefe6;
+  --hud-accent: #6ee7c8;
+  --hud-warn: #ff6b5e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #02060c;
+  color: var(--hud-text);
+  font:
+    13px/1.45 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
+}
+
+#viewport {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}

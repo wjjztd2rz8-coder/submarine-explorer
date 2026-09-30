@@ -26,14 +26,12 @@ import {
   type Collider,
 } from './props/Collision.js';
 import {
-  buildChimney,
-  buildDebris,
-  buildHullBlock,
+  PROCEDURAL_BUILDERS,
   hashString,
   makeBoxSilhouette,
   type BuiltProp,
   type LocalHeightFn,
-} from './props/Procedural.js';
+} from './props/builders/index.js';
 
 /** The narrow terrain interface props need (Terrain satisfies it). */
 export interface PropsHeightField {
@@ -234,38 +232,35 @@ export class Props {
   private async build(def: PropDef): Promise<BuiltProp> {
     const seed = hashString(def.id);
     const dims = def.dimensionsM ?? this.cfg.defaultDimensionsM[def.procedural ?? 'hull-block'];
-    switch (def.procedural) {
-      case 'hull-block':
-        return buildHullBlock(dims, seed, this.cfg, def.hullEnds ?? this.cfg.hullDefaultEnds);
-      case 'chimney':
-        return buildChimney(dims, seed, this.cfg, def.materialHint ?? 'basalt');
-      case 'debris':
-        return buildDebris(dims[0], seed, this.cfg, this.debrisHeightFn(def));
-      case null: {
-        const model = await this.models.get(def.model);
-        model.traverse((o) => {
-          const mesh = o as THREE.Mesh;
-          if (!mesh.isMesh) return;
-          // GLTFLoader already yields MeshStandard/Physical materials (fogged,
-          // lit by the headlights) with sRGB colour maps; make sure nothing
-          // glows, per art-direction §4 "no loot glow".
-          for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
-            const std = m as THREE.MeshStandardMaterial;
-            if (std.isMeshStandardMaterial) {
-              std.emissive.setRGB(0, 0, 0);
-              std.emissiveMap = null;
-            }
-          }
-        });
-        const bounds = new THREE.Box3().setFromObject(model);
-        const impostor = makeBoxSilhouette(
-          bounds,
-          this.cfg.colors.basalt,
-          this.cfg.impostorOpacity,
-        );
-        return { full: model, impostor, bounds };
-      }
+    // Procedural kinds come from the family registry (props/builders/index.ts).
+    if (def.procedural) {
+      return PROCEDURAL_BUILDERS[def.procedural]({
+        def,
+        dims,
+        seed,
+        cfg: this.cfg,
+        groundHeight: () => this.debrisHeightFn(def),
+      });
     }
+    // A GLB model.
+    const model = await this.models.get(def.model);
+    model.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      // GLTFLoader already yields MeshStandard/Physical materials (fogged,
+      // lit by the headlights) with sRGB colour maps; make sure nothing
+      // glows, per art-direction §4 "no loot glow".
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        const std = m as THREE.MeshStandardMaterial;
+        if (std.isMeshStandardMaterial) {
+          std.emissive.setRGB(0, 0, 0);
+          std.emissiveMap = null;
+        }
+      }
+    });
+    const bounds = new THREE.Box3().setFromObject(model);
+    const impostor = makeBoxSilhouette(bounds, this.cfg.colors.basalt, this.cfg.impostorOpacity);
+    return { full: model, impostor, bounds };
   }
 
   /** Terrain-following for debris pieces, in the prop's local frame. */

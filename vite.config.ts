@@ -114,10 +114,31 @@ function copyPublicFiltered(): Plugin {
   };
 }
 
+/**
+ * three's DRACOLoader and KTX2Loader name default decoder URLs with
+ * `new URL('../libs/…', import.meta.url)`, which makes the bundler emit a
+ * second, hashed copy of every decoder file next to the vendored ones in
+ * `public/assets/decoders/`. The game always sets the decoder path
+ * (`src/core/assets/AssetService.ts`), so blank those defaults out.
+ */
+function stripLoaderDefaultDecoderUrls(): Plugin {
+  const target = /three\/examples\/jsm\/loaders\/(DRACOLoader|KTX2Loader)\.js$/;
+  const defaultUrl =
+    /new URL\(\s*'\.\.\/libs\/(?:draco|basis)\/[^']+',\s*import\.meta\.url\s*\)\.toString\(\)/g;
+  return {
+    name: 'submarine:strip-loader-default-decoder-urls',
+    enforce: 'pre',
+    transform(code, id) {
+      if (!target.test(id.replace(/\\/g, '/'))) return null;
+      return { code: code.replace(defaultUrl, "''"), map: null };
+    },
+  };
+}
+
 export default defineConfig({
   base: resolveBase(env.VITE_BASE),
   publicDir: 'public',
-  plugins: [copyPublicFiltered()],
+  plugins: [stripLoaderDefaultDecoderUrls(), copyPublicFiltered()],
   server: { port: 5173 },
   preview: { port: 4173 },
   build: { outDir: 'dist', sourcemap: true, target: 'es2022', copyPublicDir: false },

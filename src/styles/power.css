@@ -1,0 +1,42 @@
+/* D-POWER: battery and oxygen readouts.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+.hud-power {
+  display: grid;
+  gap: 3px;
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid var(--hud-border);
+}
+.hud-power[hidden] {
+  display: none;
+}
+.hud-power-line {
+  display: grid;
+  grid-template-columns: 72px minmax(54px, 1fr) 42px;
+  align-items: center;
+  gap: 7px;
+  color: var(--hud-text);
+  font-size: clamp(12px, calc(12px * var(--ui-scale)), 17px);
+}
+.hud-power-line meter {
+  width: 100%;
+  height: 9px;
+  accent-color: #70d2c8;
+}
+.hud-power-line strong {
+  text-align: right;
+  font-size: inherit;
+}
+.hud-power-line.is-low {
+  color: #ffd38a;
+}
+.hud-power-line.is-critical {
+  color: #ff8d6f;
+}
+.hud-power-line.is-low meter {
+  accent-color: #ffc365;
+}
+.hud-power-line.is-critical meter {
+  accent-color: #ff7559;
+}

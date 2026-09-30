@@ -1,0 +1,318 @@
+/* C1: globe mission select and the Journal SPECIES tab.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+/* Globe mission select overlay (docs/globe.md) and the field guide SPECIES tab.
+   Art direction §0: flat dark panels, 1px hairlines, cyan for navigation;
+   amber stays reserved for warnings, so pin states use cyan fill / cyan ring /
+   dim grey. */
+.globe {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(1, 5, 9, 0.96);
+  color: var(--b1-text);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  overflow: hidden;
+}
+
+.globe[hidden] {
+  display: none;
+}
+
+.globe.is-dragging {
+  cursor: grabbing;
+}
+
+.globe-canvas,
+.globe-leaders,
+.globe-pins {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.globe-canvas {
+  display: block;
+}
+
+.globe-leaders {
+  pointer-events: none;
+}
+
+.globe-leaders line {
+  stroke: var(--b1-cyan);
+  stroke-width: 1;
+  opacity: 0;
+}
+
+.globe-pins {
+  pointer-events: none;
+}
+
+.globe-pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  will-change: transform;
+}
+
+.globe-pin.is-back {
+  pointer-events: none;
+}
+
+.globe-pin-dot {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
+}
+
+.globe-pin.is-mission .globe-pin-dot,
+.globe-legend-item.is-mission .globe-legend-dot {
+  background: var(--b1-cyan);
+  box-shadow: 0 0 0 1px rgba(1, 5, 9, 0.9);
+}
+
+.globe-pin.is-tile .globe-pin-dot,
+.globe-legend-item.is-tile .globe-legend-dot {
+  background: rgba(1, 5, 9, 0.6);
+  border: 1.5px solid var(--b1-cyan);
+}
+
+.globe-pin.is-catalogue .globe-pin-dot,
+.globe-legend-item.is-catalogue .globe-legend-dot {
+  width: 5px;
+  height: 5px;
+  background: rgba(205, 224, 229, 0.45);
+}
+
+.globe-pin.is-current .globe-pin-dot {
+  box-shadow:
+    0 0 0 1px rgba(1, 5, 9, 0.9),
+    0 0 0 4px rgba(46, 217, 217, 0.35);
+}
+
+.globe-pin:hover .globe-pin-dot,
+.globe-pin.is-active .globe-pin-dot {
+  transform: scale(1.5);
+}
+
+.globe-pin:focus {
+  outline: none;
+}
+
+.globe-pin:focus-visible::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--b1-cyan);
+  border-radius: 50%;
+}
+
+.globe-header {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  pointer-events: none;
+}
+
+.globe-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex: 1;
+}
+
+.globe-kicker {
+  color: var(--b1-cyan);
+  letter-spacing: 0.18em;
+  font-size: 11px;
+}
+
+.globe-title {
+  font-size: 15px;
+}
+
+.globe-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  opacity: 0.85;
+}
+
+.globe-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.globe-legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.globe-close {
+  pointer-events: auto;
+  font: inherit;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: inherit;
+  cursor: pointer;
+  background: var(--b1-panel);
+  border: 1px solid var(--b1-hair-dim);
+  border-radius: 2px;
+  padding: 3px 8px;
+}
+
+.globe-close:hover,
+.globe-close:focus-visible {
+  border-color: var(--b1-cyan);
+  outline: none;
+}
+
+.globe-card {
+  position: absolute;
+  left: 16px;
+  bottom: 44px;
+  width: min(360px, 44vw);
+  padding: 12px 14px;
+  background: var(--b1-panel-solid);
+  border: 1px solid var(--b1-hair);
+  border-radius: 3px;
+  cursor: default;
+}
+
+.globe-card[hidden] {
+  display: none;
+}
+
+.globe-badge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  padding: 1px 6px;
+  border: 1px solid var(--b1-hair-dim);
+  border-radius: 2px;
+}
+
+.globe-badge.is-mission {
+  color: #02121a;
+  background: var(--b1-cyan);
+  border-color: var(--b1-cyan);
+}
+
+.globe-badge.is-tile {
+  color: var(--b1-cyan);
+  border-color: var(--b1-hair);
+}
+
+.globe-badge.is-catalogue {
+  opacity: 0.7;
+}
+
+.globe-card-name {
+  margin: 8px 0 2px;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.globe-card-site,
+.globe-card-meta {
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.globe-card-summary {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.globe-card-action {
+  margin-top: 10px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--b1-cyan);
+}
+
+.globe-card-action.is-catalogue {
+  color: inherit;
+  opacity: 0.6;
+  letter-spacing: normal;
+}
+
+.globe-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* MissionSelect: GLOBE button and "content coming" rows. */
+.mission-globe-btn {
+  pointer-events: auto;
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--b1-cyan);
+  background: transparent;
+  border: 1px solid var(--b1-hair);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.mission-globe-btn[hidden] {
+  display: none;
+}
+
+.mission-globe-btn:hover,
+.mission-globe-btn:focus-visible {
+  border-color: var(--b1-cyan);
+  outline: none;
+}
+
+.mission-item.is-pending {
+  opacity: 0.6;
+}
+
+.mission-item.is-pending:disabled {
+  cursor: default;
+}
+
+.mission-badge.is-coming {
+  color: var(--b1-text);
+  border-color: var(--b1-hair-dim);
+}

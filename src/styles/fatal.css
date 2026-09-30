@@ -1,0 +1,36 @@
+/* Fatal startup error card.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+.fatal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  background: #06121c;
+}
+
+.fatal h1 {
+  margin: 0;
+  color: var(--hud-warn);
+  font-size: 20px;
+}
+
+.fatal code {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 11px;
+}
+
+.fatal-hint {
+  opacity: 0.7;
+  max-width: 70ch;
+}

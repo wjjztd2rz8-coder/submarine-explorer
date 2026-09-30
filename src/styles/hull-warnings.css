@@ -1,0 +1,50 @@
+/* fix S (QA-B, QA-C): warning placement next to the objectives panel, aborted debrief.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+/* QA-B #14 fixed this at a static 180px, which broke again at Challenger
+   Deep (QA-C #1): the panel there is taller than the fixture used to tune
+   that number (obj-alert strip / long nav line). ObjectivesPanel.ts now
+   keeps --obj-panel-bottom in sync with the panel's live rendered height
+   via a ResizeObserver, so the banner tracks it regardless of content.
+   The 180px fallback covers the first paint before the observer fires. */
+body:has(.objectives-panel:not([hidden])) .hud-warning {
+  top: calc(var(--obj-panel-bottom, 180px) + 10px);
+}
+
+/* Hull failure: the amber strip on the objectives panel replaces the HUD banner. */
+.obj-alert {
+  margin: 0 0 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--b3-amber);
+  border-radius: 2px;
+  background: rgba(255, 176, 32, 0.12);
+  color: var(--b3-amber);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-align: center;
+  animation: hud-pulse 1.1s ease-in-out infinite;
+}
+
+.obj-alert[hidden] {
+  display: none;
+}
+
+body:has(.obj-alert:not([hidden])) .hud-warning {
+  display: none !important;
+}
+
+/* "Dive aborted" debrief: amber kicker/title, the memorial-quiet tone kept. */
+.mission-debrief.is-aborted .debrief-kicker,
+.mission-debrief.is-aborted .debrief-title {
+  color: var(--b3-amber);
+}
+
+.mission-debrief.is-aborted .debrief-panel {
+  border-color: var(--b3-amber);
+}
+
+/* Warnings stay behind the mission debrief (the aborted variant is up after a hull failure). */
+body:has(.mission-debrief:not([hidden])) .hud-warning {
+  display: none !important;
+}

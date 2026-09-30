@@ -1,0 +1,56 @@
+/* In-dive mission / tile list (MissionSelect).
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+.mission-select {
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  border-radius: 6px;
+  padding: 8px;
+  max-width: 230px;
+}
+
+.mission-title {
+  color: var(--hud-accent);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  padding: 2px 6px 8px;
+}
+
+.mission-empty {
+  padding: 4px 6px;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.mission-item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 2px;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.mission-item:hover {
+  background: rgba(110, 231, 200, 0.14);
+}
+
+.mission-item.is-current {
+  border-color: var(--hud-accent);
+}
+
+.mission-item-meta {
+  font-size: 10px;
+  opacity: 0.6;
+}

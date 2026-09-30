@@ -1,0 +1,81 @@
+/* B4: ?debugProps=1 placement tool. Debug only.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+/* ?debugProps=1 placement tool (src/world/props/PlacementDebug.ts). Debug only. */
+.props-debug {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 40;
+  width: 300px;
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  padding: 10px 12px;
+  background: rgba(6, 14, 18, 0.82);
+  border: 1px solid rgba(205, 224, 229, 0.25);
+  color: #cde0e5;
+  font:
+    11px/1.45 'Space Mono',
+    ui-monospace,
+    monospace;
+}
+
+.props-debug-title {
+  margin-bottom: 6px;
+  letter-spacing: 0.14em;
+  color: #2ed9d9;
+}
+
+.props-debug-list {
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.props-debug-list li {
+  padding: 2px 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.props-debug-list li:hover {
+  background: rgba(46, 217, 217, 0.08);
+}
+
+.props-debug-list li.selected {
+  color: #2ed9d9;
+  background: rgba(46, 217, 217, 0.14);
+}
+
+.props-debug-json {
+  margin: 0 0 8px;
+  padding: 6px;
+  max-height: 260px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: rgba(0, 0, 0, 0.35);
+  user-select: text;
+}
+
+.props-debug-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.props-debug-copy {
+  padding: 3px 8px;
+  background: transparent;
+  border: 1px solid #2ed9d9;
+  color: #2ed9d9;
+  font: inherit;
+  cursor: pointer;
+}
+
+.props-debug-help {
+  margin-top: 8px;
+  opacity: 0.6;
+}

@@ -13,6 +13,7 @@
  */
 
 import type * as THREE from 'three';
+import { DECODER_PATHS, assets } from '../core/assets/index.js';
 import { publicUrl } from '../util/publicUrl.js';
 import type {
   ChimneyMaterial,
@@ -30,7 +31,7 @@ export const HULL_ENDS: readonly HullEnd[] = ['prow', 'cut', 'rounded'];
 export const CHIMNEY_MATERIALS: readonly ChimneyMaterial[] = ['basalt', 'carbonate', 'sulfide'];
 /** GLB/glTF models must live here (served from `public/assets/models`). */
 export const MODEL_URL_PREFIX = '/assets/models/';
-export const DRACO_DECODER_PATH = publicUrl('/assets/decoders/draco/');
+export const DRACO_DECODER_PATH = DECODER_PATHS.draco;
 
 /** A validated, defaults-filled props.json entry. */
 export interface PropDef {
@@ -300,46 +301,23 @@ export function parsePropsDoc(doc: unknown, config: PropsConfig): ParseResult {
 // ------------------------------------------------------------------ models
 
 /**
- * Loads each GLB once and hands out clones. The three.js loaders are imported
- * lazily so the rest of this module (and its unit tests) never pull in the
- * decoders unless a props.json actually references a model.
+ * Loads each GLB once (through the shared asset service, `core/assets/`)
+ * and hands out clones. The service imports the three.js loaders lazily, so
+ * the rest of this module (and its unit tests) never pull in the decoders
+ * unless a props.json actually references a model.
  */
 export class ModelCache {
-  private readonly pending = new Map<string, Promise<THREE.Object3D>>();
-  private loader: Promise<{ loadAsync(url: string): Promise<{ scene: THREE.Group }> }> | null =
-    null;
-
-  private getLoader(): Promise<{ loadAsync(url: string): Promise<{ scene: THREE.Group }> }> {
-    this.loader ??= (async () => {
-      const [{ GLTFLoader }, { DRACOLoader }, { MeshoptDecoder }] = await Promise.all([
-        import('three/examples/jsm/loaders/GLTFLoader.js'),
-        import('three/examples/jsm/loaders/DRACOLoader.js'),
-        import('three/examples/jsm/libs/meshopt_decoder.module.js'),
-      ]);
-      const draco = new DRACOLoader();
-      draco.setDecoderPath(DRACO_DECODER_PATH);
-      const gltf = new GLTFLoader();
-      gltf.setDRACOLoader(draco);
-      gltf.setMeshoptDecoder(MeshoptDecoder);
-      return gltf;
-    })();
-    return this.loader;
-  }
+  private readonly requested = new Set<string>();
 
   /** Resolve to a fresh clone of the model's scene (geometry and materials shared). */
   async get(url: string): Promise<THREE.Object3D> {
-    let p = this.pending.get(url);
-    if (!p) {
-      const loadUrl = modelLoadUrl(url);
-      p = this.getLoader().then((l) => l.loadAsync(loadUrl).then((g) => g.scene));
-      this.pending.set(url, p);
-    }
-    const scene = await p;
-    return scene.clone(true);
+    this.requested.add(url);
+    const gltf = await assets.loadGLTF(modelLoadUrl(url));
+    return gltf.scene.clone(true);
   }
 
   /** Number of distinct model files requested. */
   get size(): number {
-    return this.pending.size;
+    return this.requested.size;
   }
 }

@@ -1,0 +1,285 @@
+/* D-FLOW: compact objectives, completion banner, mission debrief; D-POLISH right-hand stack.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+/* Compact objectives panel: title, current target + nav line, "n of m". */
+.objectives-panel {
+  width: min(calc(520px * var(--ui-scale)), 62vw);
+  padding: 7px 14px 8px;
+  text-align: center;
+  font-size: clamp(14px, calc(15px * var(--ui-scale)), 22px);
+}
+.obj-head {
+  justify-content: center;
+  padding-bottom: 0;
+  margin-bottom: 3px;
+  border-bottom: 0;
+  font-size: clamp(12px, calc(12px * var(--ui-scale)), 18px);
+}
+.obj-title {
+  flex: 0 1 auto;
+}
+.obj-nav {
+  justify-content: center;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+  font-size: clamp(14px, calc(14px * var(--ui-scale)), 21px);
+}
+.obj-nav-target {
+  font-weight: 600;
+}
+.obj-nav-turn {
+  margin-left: 0;
+}
+.obj-progress {
+  margin-top: 3px;
+  font-size: clamp(13px, calc(13px * var(--ui-scale)), 19px);
+  opacity: 0.75;
+}
+.obj-alert {
+  margin: 6px 0 0;
+  font-size: clamp(12px, calc(12px * var(--ui-scale)), 18px);
+}
+/* "Primary objectives complete": the dive keeps going unless the player surfaces. */
+.obj-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  pointer-events: auto;
+  border: 1px solid var(--b3-cyan);
+  border-radius: 3px;
+  background: rgba(46, 217, 217, 0.12);
+  animation: d-flow-banner-in 0.35s ease-out;
+}
+.obj-banner[hidden] {
+  display: none;
+}
+.obj-banner-title {
+  display: block;
+  color: var(--b3-cyan);
+  font-size: clamp(16px, calc(17px * var(--ui-scale)), 25px);
+  letter-spacing: 0.04em;
+}
+.obj-banner-detail {
+  display: block;
+  font-size: clamp(13px, calc(13px * var(--ui-scale)), 19px);
+  opacity: 0.85;
+}
+.obj-banner-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.obj-banner-btn {
+  font: inherit;
+  font-size: clamp(13px, calc(13px * var(--ui-scale)), 19px);
+  color: inherit;
+  cursor: pointer;
+  background: rgba(6, 14, 18, 0.6);
+  border: 1px solid var(--b3-hair);
+  border-radius: 3px;
+  padding: 6px 12px;
+}
+.obj-banner-btn.is-keep {
+  border-color: var(--b3-cyan);
+  color: var(--b3-cyan);
+}
+.obj-banner-btn:hover {
+  background: rgba(46, 217, 217, 0.16);
+}
+@keyframes d-flow-banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .obj-banner {
+    animation: none;
+  }
+}
+.pause-surface[hidden] {
+  display: none !important;
+}
+
+/* Debrief: five stats (objectives first), readable sizes, wrapping actions. */
+.debrief-panel {
+  width: min(calc(820px * var(--ui-scale)), 94vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  font-size: clamp(14px, calc(15px * var(--ui-scale)), 22px);
+}
+.debrief-kicker,
+.debrief-label,
+.debrief-section-title {
+  font-size: clamp(12px, calc(12px * var(--ui-scale)), 18px);
+}
+.debrief-title {
+  font-size: clamp(22px, calc(28px * var(--ui-scale)), 40px);
+}
+.debrief-value {
+  font-size: clamp(17px, calc(20px * var(--ui-scale)), 30px);
+}
+.debrief-stats {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+}
+.debrief-stat[data-field='objectives'] .debrief-value {
+  color: var(--b1-text);
+  font-weight: 600;
+}
+.debrief-actions {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.debrief-btn {
+  padding: 8px 12px;
+  letter-spacing: 0.04em;
+  font-size: clamp(14px, calc(14px * var(--ui-scale)), 20px);
+}
+/* Nothing of the dive HUD competes with the end-of-dive choices. */
+body:has(.mission-debrief:not([hidden])) .d-scan-waypoints,
+body:has(.mission-debrief:not([hidden])) .objectives-panel {
+  display: none;
+}
+
+/* D-POLISH: mission and telemetry form one right-hand stack. */
+.objectives-panel {
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: 12px;
+  left: auto;
+  transform: none;
+  width: min(360px, calc(100vw - 24px));
+  padding: 8px 10px;
+  text-align: left;
+  font-size: clamp(12px, calc(13px * var(--ui-scale)), 18px);
+}
+.obj-head {
+  justify-content: flex-start;
+  margin-bottom: 5px;
+}
+.obj-list {
+  display: grid;
+  gap: 2px;
+}
+.obj-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  padding: 1px 4px;
+  border-left: 2px solid transparent;
+}
+.obj-item.is-current {
+  border-left-color: var(--b3-cyan);
+  background: rgba(46, 217, 217, 0.1);
+  color: var(--b3-cyan);
+}
+.obj-item.is-complete {
+  opacity: 0.68;
+}
+.obj-check {
+  flex: none;
+  width: 1.2em;
+}
+.obj-item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.obj-optional {
+  margin-left: auto;
+  font-size: 0.75em;
+  letter-spacing: 0.07em;
+  opacity: 0.7;
+}
+.obj-more {
+  padding: 2px 4px;
+  opacity: 0.7;
+  font-size: 0.85em;
+}
+.obj-nav {
+  justify-content: flex-start;
+  gap: 1px 9px;
+  margin-top: 5px;
+  padding-top: 4px;
+  border-top: 1px solid var(--b3-hair-dim);
+  font-size: clamp(12px, calc(12px * var(--ui-scale)), 17px);
+}
+.obj-hint {
+  margin-top: 3px;
+  line-height: 1.25;
+  opacity: 0.78;
+  font-size: clamp(11px, calc(11px * var(--ui-scale)), 16px);
+}
+.obj-hint[hidden] {
+  display: none;
+}
+.obj-progress {
+  font-size: clamp(11px, calc(11px * var(--ui-scale)), 16px);
+}
+body:has(.objectives-panel:not([hidden])) .hud-readouts {
+  top: calc(var(--obj-panel-bottom, 240px) + 8px);
+}
+.hud-readouts {
+  right: 12px;
+  left: auto;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  width: min(360px, calc(100vw - 24px));
+  min-width: 0;
+  padding: 7px 10px;
+}
+.hud-row {
+  gap: 10px;
+}
+.hud-row:has([data-field='tile']) {
+  display: none;
+}
+.hud-label {
+  font-size: clamp(12px, calc(12px * var(--ui-scale)), 18px);
+}
+.hud-value {
+  font-size: clamp(14px, calc(14px * var(--ui-scale)), 20px);
+}
+.hud-sim-speed {
+  position: static;
+  display: block;
+  transform: none;
+  max-width: none;
+  margin-top: 4px;
+  padding: 2px 0 0;
+  border: 0;
+  border-top: 1px solid var(--hud-border);
+  border-radius: 0;
+  background: none;
+  color: #ffcb70;
+  font-size: clamp(12px, calc(13px * var(--ui-scale)), 18px);
+}
+.hud-control-tips {
+  position: absolute;
+  left: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  max-width: min(720px, calc(100vw - 24px));
+  padding: 5px 8px;
+  border: 1px solid var(--hud-border);
+  border-radius: 4px;
+  background: var(--hud-bg);
+  color: var(--hud-text);
+  opacity: 0.75;
+  font-size: clamp(11px, calc(12px * var(--ui-scale)), 16px);
+  line-height: 1.3;
+}
+.hud-control-tips[hidden] {
+  display: none;
+}
+.hud-prompt {
+  bottom: 56px;
+}
+body:has(.objectives-panel:not([hidden])) .hud-warning {
+  top: 12px;
+}
+body:has(.objectives-panel:not([hidden])) .d-scan-objective-hint {
+  display: none;
+}

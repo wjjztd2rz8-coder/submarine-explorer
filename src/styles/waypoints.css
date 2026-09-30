@@ -1,0 +1,133 @@
+/* D-SCAN: in-world waypoints, objective hint and sonar markers.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+/* ScanOverlay is the only contextual scan prompt; leave the objective chip visible. */
+.hud-prompt {
+  display: none !important;
+}
+.scan-panel {
+  bottom: calc(3% + env(safe-area-inset-bottom, 0px));
+}
+.scan-reticle.is-scanned .scan-reticle-corner {
+  border-color: #cde0e5;
+  opacity: 0.5;
+  animation: none;
+}
+.d-scan-waypoints {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  color: #2ed9d9;
+}
+.d-scan-world-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  min-width: 36px;
+  text-align: center;
+  font-size: clamp(24px, calc(30px * var(--ui-scale)), 40px);
+  font-weight: 700;
+  text-shadow:
+    0 1px 5px #061018,
+    0 0 12px #061018;
+}
+.d-scan-world-marker.is-scanned {
+  color: #cde0e5;
+  opacity: 0.7;
+}
+.d-scan-edge {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  max-width: 250px;
+  padding: 6px 10px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: rgba(6, 14, 18, 0.85);
+  font-size: clamp(14px, calc(15px * var(--ui-scale)), 23px);
+  text-align: center;
+  text-shadow: 0 1px 3px #061018;
+}
+.d-scan-edge::before {
+  content: '➤';
+  display: inline-block;
+  float: left;
+  margin-right: 6px;
+  transform: rotate(var(--direction, 0rad));
+}
+.d-scan-edge-name,
+.d-scan-edge-info {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.d-scan-edge-info {
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+.d-scan-edge.is-onscreen {
+  border-color: rgba(46, 217, 217, 0.45);
+}
+.d-scan-edge.is-onscreen::before {
+  content: '◇';
+  transform: none;
+}
+.d-scan-objective-hint {
+  position: absolute;
+  top: calc(var(--obj-panel-bottom, 155px) + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(560px, 70vw);
+  padding: 7px 12px;
+  border: 1px solid rgba(46, 217, 217, 0.45);
+  border-radius: 4px;
+  background: rgba(6, 14, 18, 0.8);
+  font-size: clamp(14px, calc(14px * var(--ui-scale)), 21px);
+  text-align: center;
+}
+.d-scan-waypoints[data-hints='false'] .d-scan-edge,
+.d-scan-waypoints[data-hints='false'] .d-scan-world-marker.is-current {
+  display: none;
+}
+.d-scan-sonar-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  color: #2ed9d9;
+  font: bold 19px/1 monospace;
+  text-shadow: 0 0 3px #061018;
+  pointer-events: none;
+}
+.d-scan-sonar-marker.is-scanned {
+  color: #cde0e5;
+  opacity: 0.75;
+}
+body:has(.sonar[style*='display: none']) .d-scan-sonar-marker,
+body[data-app-state='home'] .d-scan-waypoints,
+body[data-app-state='pause'] .d-scan-waypoints {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scan-reticle,
+  .scan-ring-arc {
+    transition: none;
+    animation: none;
+  }
+}
+.d-scan-waypoints[data-reduce-motion='true'] *,
+.d-scan-waypoints[data-reduce-motion='true'] *::before {
+  animation: none !important;
+  transition: none !important;
+}
+body:has(.sonar) .d-scan-sonar-marker.is-current {
+  outline: 1px solid currentColor;
+  border-radius: 50%;
+}
+.d-scan-waypoints[data-palette='deuteranopia'],
+.sonar[data-scan-palette='deuteranopia'] .d-scan-sonar-marker {
+  color: #ffe36e;
+}
+.d-scan-waypoints[data-palette='highContrast'],
+.sonar[data-scan-palette='highContrast'] .d-scan-sonar-marker {
+  color: #fff;
+}

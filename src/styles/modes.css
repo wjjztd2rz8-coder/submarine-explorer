@@ -1,0 +1,26 @@
+/* D-MODES: gameplay mode controls.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+.settings-section:has([data-gameplay]) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20px;
+}
+.settings-section:has([data-gameplay]) .settings-heading,
+.settings-section:has([data-gameplay]) .settings-mode-row {
+  grid-column: 1 / -1;
+}
+.settings-section:has([data-gameplay]) .settings-row {
+  justify-content: space-between;
+}
+.settings-section:has([data-gameplay]) .settings-label {
+  min-width: 0;
+}
+.settings-section:has([data-gameplay]) select {
+  min-width: 120px;
+}
+@media (max-width: 560px) {
+  .settings-section:has([data-gameplay]) {
+    grid-template-columns: 1fr;
+  }
+}

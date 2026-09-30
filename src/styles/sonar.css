@@ -1,0 +1,68 @@
+/* D-SONAR: expanded sonar map, zoom controls and legend.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+.d-sonar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 17;
+  background: rgba(0, 7, 10, 0.48);
+  pointer-events: none;
+}
+.d-sonar-backdrop[hidden],
+body[data-app-state='home'] .d-sonar-backdrop {
+  display: none;
+}
+.sonar {
+  left: 12px;
+  right: auto;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  pointer-events: auto;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  transform-origin: center;
+}
+.sonar:focus-visible {
+  outline: 2px solid #d9f4d5;
+  outline-offset: 2px;
+}
+.sonar.d-sonar-expanded {
+  left: 50%;
+  top: 50%;
+  right: auto;
+  transform: translate(-50%, -50%) scale(1.8);
+  z-index: 18;
+  background: #061318;
+  border-color: #8ebdab;
+  box-shadow: 0 12px 40px #000;
+}
+.d-sonar-header,
+.d-sonar-legend {
+  gap: 6px;
+  color: #e1f7ea;
+  white-space: nowrap;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+.d-sonar-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.d-sonar-north {
+  color: #ffdf80;
+}
+.d-sonar-range {
+  color: #ffdf80;
+}
+.d-sonar-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 5px;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+@media (max-width: 700px) {
+  .sonar.d-sonar-expanded {
+    transform: translate(-50%, -50%) scale(1.35);
+  }
+}

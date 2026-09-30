@@ -1,0 +1,166 @@
+/* B1: scan beam HUD, scan overlay and colour tokens.
+   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+
+/* Scan beam HUD, field guide, debrief. docs/art-direction.md §5: monospace,
+   1px hairlines, flat dark translucent panels, cyan for nav/scan, amber for
+   attention, neutral grey for labels. */
+:root {
+  --b1-panel: rgba(6, 14, 18, 0.55);
+  --b1-panel-solid: rgba(6, 14, 18, 0.9);
+  --b1-cyan: #2ed9d9;
+  --b1-amber: #ffb020;
+  --b1-text: #cde0e5;
+  --b1-hair: rgba(46, 217, 217, 0.35);
+  --b1-hair-dim: rgba(205, 224, 229, 0.16);
+}
+
+.scan-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none;
+  color: var(--b1-text);
+}
+
+.scan-reticle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--scan-reticle-size, 44px);
+  height: var(--scan-reticle-size, 44px);
+  margin: calc(var(--scan-reticle-size, 44px) / -2) 0 0 calc(var(--scan-reticle-size, 44px) / -2);
+  opacity: 0.55;
+  transition: opacity 0.25s ease;
+}
+
+.scan-reticle[hidden] {
+  display: none;
+}
+
+.scan-reticle.is-ready,
+.scan-reticle.is-locked {
+  opacity: 0.95;
+}
+
+.scan-reticle-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 0 solid var(--b1-cyan);
+}
+
+.scan-reticle-corner.tl {
+  left: 0;
+  top: 0;
+  border-left-width: 1px;
+  border-top-width: 1px;
+}
+
+.scan-reticle-corner.tr {
+  right: 0;
+  top: 0;
+  border-right-width: 1px;
+  border-top-width: 1px;
+}
+
+.scan-reticle-corner.bl {
+  left: 0;
+  bottom: 0;
+  border-left-width: 1px;
+  border-bottom-width: 1px;
+}
+
+.scan-reticle-corner.br {
+  right: 0;
+  bottom: 0;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
+
+.scan-reticle.is-locked .scan-reticle-corner {
+  animation: b1-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes b1-breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.scan-panel {
+  position: absolute;
+  left: 50%;
+  bottom: calc(18% + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 300px;
+  padding: 10px 16px 10px 10px;
+  background: var(--b1-panel);
+  border: 1px solid var(--b1-hair);
+  border-radius: 3px;
+  --tone: var(--b1-cyan);
+}
+
+.scan-panel[hidden] {
+  display: none;
+}
+
+.scan-panel[data-tone='amber'] {
+  --tone: var(--b1-amber);
+  border-color: rgba(255, 176, 32, 0.45);
+}
+
+.scan-panel[data-tone='dim'] {
+  --tone: var(--b1-text);
+  border-color: var(--b1-hair-dim);
+}
+
+.scan-ring {
+  flex: none;
+  display: block;
+}
+
+.scan-ring-track {
+  stroke: var(--b1-hair-dim);
+}
+
+.scan-ring-arc {
+  stroke: var(--tone);
+  transition: stroke-dashoffset 0.12s linear;
+}
+
+.scan-ring-text {
+  fill: var(--b1-text);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.scan-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scan-kicker {
+  color: var(--tone);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+.scan-name {
+  font-size: 15px;
+  color: var(--b1-text);
+}
+
+.scan-hint {
+  color: var(--tone);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  opacity: 0.9;
+}
+
+.scan-panel.is-complete {
+  border-color: var(--tone);
+}
