@@ -56,6 +56,13 @@ Freesound CC0 uploads with an authenticated download).
 - "Oxanium" — Google Fonts — SIL Open Font License 1.1
 - "Orbitron" — designed by Matt McInerney (Google Fonts) — SIL Open Font License 1.1
 
+## Vehicles
+
+- All submarine, ROV and tether geometry, textures (canvas-generated tiling
+  surfaces, decal atlas) and livery in `src/vehicles/` are procedural and
+  original to this project. No third-party models or images are used. Hull
+  names and numbers are fictional.
+
 ## Libraries
 
 - three.js — MIT — https://threejs.org

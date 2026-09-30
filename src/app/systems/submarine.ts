@@ -59,6 +59,9 @@ export function createSubmarineSystem(): GameSystem {
 
       const subMesh = new SubMesh({
         length: 26,
+        // F1-VEHICLES: the fitted hull class picks the model; the tier its detail.
+        hullClass: sub.getState().hullClass,
+        tier: ctx.tier,
         // fix S (QA-B #6): faint rim + ambient floor so the hull reads below 300 m.
         rimColor: config.submarine.hullRimColor,
         rimStrength: config.submarine.hullRimStrength,
@@ -66,7 +69,7 @@ export function createSubmarineSystem(): GameSystem {
       });
       ctx.subMesh = subMesh;
       scene.add(subMesh.group);
-      ctx.expose({ sub });
+      ctx.expose({ sub, subMesh });
     },
     frame: {
       'controls.vehicle': (f, ctx) => {
@@ -108,10 +111,20 @@ export function createSubmarineSystem(): GameSystem {
       pose: (f, ctx) => {
         const { sub, subMesh, rov, rig } = ctx;
         // Present the boat.
+        subMesh.setHullClass(f.sub.hullClass);
         subMesh.setPose(sub.position, sub.yaw, sub.pitch, sub.roll);
-        subMesh.update(rov.deployed ? 0 : f.state.throttle, f.dt);
-        // Hide our own hull in first person so it does not fill the screen.
-        subMesh.group.visible = rig.mode !== 'first-person'; // D-PHOTO: and in the photo orbit
+        const live = !rov.deployed;
+        subMesh.update(live ? f.state.throttle : 0, f.dt, {
+          yaw: live ? f.state.yaw : 0,
+          vertical: live ? f.state.ballast : 0,
+          pitch: live ? f.state.pitch : 0,
+          scanning: ctx.discovery.scanner.isScanning,
+          lightsOn: ctx.headlights.on,
+        });
+        // First person looks out through the cockpit viewport instead of the
+        // hull (which would fill the screen); chase and the photo orbit show it.
+        subMesh.group.visible = true;
+        subMesh.setView(rig.mode);
       },
       'camera.pilot': (f, ctx) => {
         const { sub } = ctx;
