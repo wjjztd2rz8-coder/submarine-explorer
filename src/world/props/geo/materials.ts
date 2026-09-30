@@ -5,10 +5,10 @@ import type { GeoDetail } from './detail.js';
 import { detailTexture, type GeoTexKind } from './textures.js';
 
 /** Overall albedo multiplier for geo rock (vertex colours are authored in natural colours). */
-export const ALBEDO = 0.24;
+export const ALBEDO = 0.07;
 
 /** Tint for instanced life (colonies, worms, sponges, mats): brighter than rock, but not clipping. */
-export const LIFE_TINT = 0x8c8c8c;
+export const LIFE_TINT = 0x666666;
 
 export interface GeoMaterialOpts {
   roughness?: number;
