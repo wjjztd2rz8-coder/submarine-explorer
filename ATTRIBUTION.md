@@ -17,11 +17,11 @@ legally require attribution.
 
 ## Textures
 
-- "Ground095A" by ambientCG (ambientcg.com), https://ambientcg.com/view?id=Ground095A — CC0 1.0. Used as `public/assets/terrain/silt_{a,n}.jpg`: 1K albedo with AO baked in, desaturated and luminance-normalised (the site palette supplies colour), plus a 512 px packed normal/roughness map (tools/make_terrain_textures.py).
-- "Ground094C" by ambientCG, https://ambientcg.com/view?id=Ground094C — CC0 1.0. Used as `public/assets/terrain/sand_{a,n}.jpg` (rippled sand), same processing.
-- "Rock035" by ambientCG, https://ambientcg.com/view?id=Rock035 — CC0 1.0. Used as `public/assets/terrain/basalt_{a,n}.jpg` (volcanic rock on slopes), same processing.
-- "Coral Mud 01" by Poly Haven (polyhaven.com), https://polyhaven.com/a/coral_mud_01 — CC0 1.0 (https://polyhaven.com/license). Used as `public/assets/terrain/rubble_{a,n}.jpg` (coral rubble), same processing.
-- "Coral Ground 02" by Poly Haven, https://polyhaven.com/a/coral_ground_02 — CC0 1.0. Used as `public/assets/terrain/carbonate_{a,n}.jpg` (porous carbonate), same processing.
+- "Ground095A" by ambientCG (ambientcg.com), https://ambientcg.com/view?id=Ground095A — CC0 1.0. Used as `public/assets/terrain/silt_a.jpg` and `public/assets/terrain/silt_n.jpg`: 1K albedo with AO baked in, desaturated and luminance-normalised (the site palette supplies colour), plus a 512 px packed normal/roughness map (tools/make_terrain_textures.py).
+- "Ground094C" by ambientCG, https://ambientcg.com/view?id=Ground094C — CC0 1.0. Used as `public/assets/terrain/sand_a.jpg` and `public/assets/terrain/sand_n.jpg` (rippled sand), same processing.
+- "Rock035" by ambientCG, https://ambientcg.com/view?id=Rock035 — CC0 1.0. Used as `public/assets/terrain/basalt_a.jpg` and `public/assets/terrain/basalt_n.jpg` (volcanic rock on slopes), same processing.
+- "Coral Mud 01" by Poly Haven (polyhaven.com), https://polyhaven.com/a/coral_mud_01 — CC0 1.0 (https://polyhaven.com/license). Used as `public/assets/terrain/rubble_a.jpg` and `public/assets/terrain/rubble_n.jpg` (coral rubble), same processing.
+- "Coral Ground 02" by Poly Haven, https://polyhaven.com/a/coral_ground_02 — CC0 1.0. Used as `public/assets/terrain/carbonate_a.jpg` and `public/assets/terrain/carbonate_n.jpg` (porous carbonate), same processing.
 
 F1-WRECKS adds no third-party files. The wreck hulls, rusticles, debris kits and their
 surface textures (plate seams, rust, planking, growth, normal maps) are generated in
