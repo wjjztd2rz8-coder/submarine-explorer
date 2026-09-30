@@ -4,6 +4,9 @@ import * as THREE from 'three';
 import type { GeoDetail } from './detail.js';
 import { detailTexture, type GeoTexKind } from './textures.js';
 
+/** Overall albedo multiplier for geo rock (vertex colours are authored in natural colours). */
+export const ALBEDO = 0.42;
+
 export interface GeoMaterialOpts {
   roughness?: number;
   bumpScale?: number;
@@ -25,9 +28,11 @@ export function geoMaterial(
     metalness: 0,
     map,
     bumpMap: d.bump ? map : null,
-    bumpScale: o.bumpScale ?? 1.4,
+    bumpScale: o.bumpScale ?? 0.9,
     side: o.side ?? THREE.FrontSide,
   });
-  if (map) m.color.setScalar(1 / Math.max(0.05, map.userData.meanLinear as number));
+  // The game's headlights are strong up close and the art direction keeps rock dark: scale the
+  // albedo down so pale rock (carbonate, tuff) does not clip to white.
+  m.color.setScalar(ALBEDO / (map ? Math.max(0.05, map.userData.meanLinear as number) : 1));
   return m;
 }

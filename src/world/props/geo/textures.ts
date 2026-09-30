@@ -11,6 +11,15 @@ import { mulberry32 } from './shared.js';
 
 export type GeoTexKind = 'rock' | 'flow' | 'pillow' | 'strata' | 'sediment';
 
+/** Texture contrast per kind (0.5 = full range around mid grey); gentle for smooth carbonate and strata. */
+const CONTRAST: Record<GeoTexKind, number> = {
+  rock: 0.5,
+  flow: 0.28,
+  pillow: 0.5,
+  strata: 0.3,
+  sediment: 0.4,
+};
+
 const cache = new Map<string, THREE.Texture | null>();
 
 const srgbToLinear = (v: number): number =>
@@ -75,15 +84,15 @@ function heightField(kind: GeoTexKind, size: number, seed: number): Float32Array
         case 'rock': {
           const base = pfbm(u, v, 8, 8, 5, seed);
           const crack =
-            1 - THREE.MathUtils.smoothstep(Math.abs(pfbm(u, v, 3, 3, 3, seed + 9) - 0.5), 0, 0.045);
-          val = base * 0.85 - crack * 0.35 + 0.1;
+            1 - THREE.MathUtils.smoothstep(Math.abs(pfbm(u, v, 5, 5, 3, seed + 9) - 0.5), 0, 0.02);
+          val = base * 0.9 - crack * 0.14 + 0.1;
           break;
         }
         case 'flow': {
           // Flowstone: vertical drips and ridges.
           const streak = pfbm(u, v, 14, 2, 4, seed);
           const ridge =
-            0.5 + 0.5 * Math.sin((v * 8 + pfbm(u, v, 3, 2, 3, seed + 5) * 2.2) * Math.PI * 2);
+            0.5 + 0.5 * Math.sin((v * 3 + pfbm(u, v, 3, 2, 3, seed + 5) * 2.2) * Math.PI * 2);
           val = streak * 0.65 + ridge * 0.25 + 0.1;
           break;
         }
@@ -114,7 +123,7 @@ function heightField(kind: GeoTexKind, size: number, seed: number): Float32Array
         }
         case 'strata': {
           const band =
-            0.5 + 0.5 * Math.sin((v * 12 + pfbm(u, v, 4, 1, 3, seed) * 1.6) * Math.PI * 2);
+            0.5 + 0.5 * Math.sin((v * 3 + pfbm(u, v, 4, 1, 3, seed) * 1.6) * Math.PI * 2);
           val = band * 0.5 + pfbm(u, v, 10, 10, 4, seed + 1) * 0.45 + 0.05;
           break;
         }
@@ -139,10 +148,11 @@ export function detailTexture(kind: GeoTexKind, size: number): THREE.Texture | n
     const ctx = c.getContext('2d');
     if (ctx) {
       const h = heightField(kind, size, 0x9e01 + kind.length * 101);
+      const contrast = CONTRAST[kind];
       const img = ctx.createImageData(size, size);
       let sum = 0;
       for (let i = 0; i < h.length; i++) {
-        const g = 0.5 + 0.5 * h[i]!;
+        const g = 1 - contrast + contrast * h[i]!;
         const b = Math.round(g * 255);
         img.data[i * 4] = img.data[i * 4 + 1] = img.data[i * 4 + 2] = b;
         img.data[i * 4 + 3] = 255;

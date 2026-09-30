@@ -79,7 +79,7 @@
     },
     {
       "id": "ashes-smoker-mound",
-      "model": "procedural:geo",
+      "model": "procedural:chimney",
       "feature": "smoker-cluster",
       "lat": 45.9339,
       "lon": -130.01415,

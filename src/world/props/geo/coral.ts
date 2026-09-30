@@ -29,6 +29,7 @@ import type { GeoBuildInput } from './types.js';
 
 const SEDIMENT = new THREE.Color(0x77705f);
 const FRAMEWORK = new THREE.Color(0xb8b09b); // dead coral framework
+const COVER = new THREE.Color(0xd8ccb2);
 const IVORY = new THREE.Color(0xf0e8d8);
 const PEACH = new THREE.Color(0xf0a678);
 
@@ -44,7 +45,7 @@ function branchingColony(depth: number, seed: number): THREE.BufferGeometry {
     r: number,
     level: number,
   ): void => {
-    const seg = new THREE.CylinderGeometry(r * 0.72, r, len, 5, 1, true);
+    const seg = new THREE.CylinderGeometry(r * 0.72, r, len, 4, 1, true);
     seg.translate(0, len / 2, 0);
     const q = new THREE.Quaternion().setFromUnitVectors(up, dir);
     seg.applyMatrix4(new THREE.Matrix4().compose(base, q, new THREE.Vector3(1, 1, 1)));
@@ -61,7 +62,7 @@ function branchingColony(depth: number, seed: number): THREE.BufferGeometry {
       grow(tip, nd, len * (0.62 + rnd() * 0.15), r * 0.72, level + 1);
     }
   };
-  grow(new THREE.Vector3(0, 0, 0), up.clone(), 0.32, 0.05, 0);
+  grow(new THREE.Vector3(0, 0, 0), up.clone(), 0.4, 0.075, 0);
   const g = mergeAll(parts);
   // Rounded polyp-tip look: vertex colour brightens toward the tips.
   paint(g, (_x, y, _z, _ny, out) => out.setScalar(0.8 + 0.3 * clamp01(y / 0.9)));
@@ -75,11 +76,11 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
   const rnd = mulberry32(seed);
   const mound = (x: number, z: number): number => {
     const r = Math.hypot(x / (L / 2), z / (W / 2));
-    if (r >= 1) return -0.5;
+    if (r >= 1) return -2;
     const ridge = 0.65 + 0.35 * fbm3(x * 0.09, 1, z * 0.09, seed + 3, 3) * 2;
     const base = H * Math.pow(1 - r * r, 0.9) * ridge;
     const n = (fbm3(x * 0.4, 9, z * 0.4, seed, 3) - 0.5) * H * 0.18;
-    return Math.max(-0.5, base + n * clamp01(base / H) - smooth(0.85, 1, r) * 0.6);
+    return Math.max(-2, base + n * clamp01(base / H) - smooth(0.85, 1, r) * 0.6);
   };
   const dens = d.meshDensity;
   const geom = heightMesh(L, W, Math.round(48 * dens), Math.round(48 * dens), mound);
@@ -110,6 +111,8 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
       .copy(SEDIMENT)
       .lerp(FRAMEWORK, smooth(0.3, 0.75, n) * smooth(0.1, 0.5, ny + 0.2))
       .multiplyScalar(0.82 + 0.4 * n);
+    // Live thickets tint the ground where colonies are dense.
+    out.lerp(COVER, smooth(0.42, 0.62, fbm3(x * 0.16, 2, z * 0.16, seed + 9, 3)) * 0.55);
   });
   projectUVs(body, 2.5);
   body.computeBoundingBox();
@@ -119,7 +122,7 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
   full.add(new THREE.Mesh(body, geoMaterial('sediment', d, { roughness: 0.95, bumpScale: 1 })));
 
   // Live colonies: three templates, instanced.
-  const total = Math.round(520 * d.growth);
+  const total = Math.round(700 * Math.min(d.growth, 1.15));
   const templates = [0, 1, 2].map((k) => branchingColony(d.branchDepth, seed + 100 + k * 37));
   const cmat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
@@ -136,10 +139,10 @@ export function buildCoralMound(input: GeoBuildInput): BuiltProp {
     const z = Math.sin(a) * rr * W * 0.5;
     // Thickets cluster: keep colonies where a slow noise field is high, and prefer the slopes.
     const cluster = fbm3(x * 0.16, 2, z * 0.16, seed + 9, 3);
-    if (cluster < 0.42 && rnd() < 0.85) continue;
+    if (cluster < 0.45 && rnd() < 0.92) continue;
     const y = mound(x, z);
     if (y < 0) continue;
-    const s = 0.45 + rnd() * rnd() * 2.2;
+    const s = 0.8 + rnd() * rnd() * 2.6;
     const c = new THREE.Color()
       .copy(IVORY)
       .lerp(PEACH, rnd() < 0.35 ? 0.4 + rnd() * 0.5 : rnd() * 0.15);

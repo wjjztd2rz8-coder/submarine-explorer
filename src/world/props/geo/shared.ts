@@ -238,6 +238,8 @@ export function column(o: {
   rings: number;
   wobble?: number;
   ridges?: number;
+  /** Flute depth as a fraction of the radius (default 0.07). */
+  ridgeAmp?: number;
   lip?: number;
   flare?: number;
 }): THREE.BufferGeometry {
@@ -265,7 +267,7 @@ export function column(o: {
       3,
     );
     let f = 1 + (n - 0.5) * 2 * wob;
-    if (o.ridges) f *= 1 + 0.07 * Math.sin(ang * o.ridges + n * 6);
+    if (o.ridges) f *= 1 + (o.ridgeAmp ?? 0.07) * Math.sin(ang * o.ridges + n * 6);
     if (o.lip) f *= 1 + o.lip * smooth(0.86, 1, t);
     if (o.flare) f *= 1 + o.flare * (1 - smooth(0, 0.18, t));
     p.setXYZ(i, x * f, y, z * f);

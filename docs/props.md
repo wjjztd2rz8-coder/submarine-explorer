@@ -35,6 +35,7 @@ count 0), and `window.__game.props` exposes `loaded`, `stats`, `placed` and `deb
 | `dimensions_m`           | `[length, width, height]`      | procedural only; defaults from `Config.props.defaultDimensionsM` with a warning                                                                                                                                                                                                                                                                              |
 | `ends`                   | `[forward, aft]`               | hull-block only: the shape of each end, each one of `prow` / `cut` / `rounded`. Forward is the end facing `heading_deg`. Default `Config.props.hullDefaultEnds` = `["prow", "cut"]` (a bow section). A bad value is an error; on other kinds it is ignored with a warning                                                                                    |
 | `material_hint`          | `basalt`/`carbonate`/`sulfide` | chimney only: rock palette. `basalt` (default when absent) is grey rock with pale orange staining; `carbonate` is white/cream calcite-brucite (Lost City); `sulfide` is near-black metal sulphide with rusty staining (black smokers). Colours in `Config.props.chimneyMaterials`. An unknown value is an error; on other kinds it is ignored with a warning |
+| `feature`                | string                         | `procedural:geo` (or a `procedural:chimney` given a vent set piece): which set piece, one of `smoker-cluster`, `carbonate-tower`, `coral-mound`, `stalactite-cluster`, `pillow-field`, `tuff-cliff`, `canyon-ledge`, `hadal-scarp`. Ignored with a warning elsewhere                                                                                         |
 | `lod_distance_m`         | number > 0                     | full mesh inside this camera distance; default `Config.props.defaultLodDistanceM` (900)                                                                                                                                                                                                                                                                      |
 | `collision`              | `none`/`sphere`/`box`          | default by kind: hull-block and chimney use `box`, debris `none`, GLB models `sphere`                                                                                                                                                                                                                                                                        |
 | `reconstruction`, `note` | bool, string                   | carried through for content and the field guide                                                                                                                                                                                                                                                                                                              |
@@ -47,7 +48,7 @@ With `align_to_slope` it sits on the centre sample and tilts instead.
 
 ## Procedural kinds
 
-All three builders are deterministic from `hashString(id)` and use `MeshStandardMaterial`, so
+All four builders are deterministic from `hashString(id)` and use `MeshStandardMaterial`, so
 fog and the headlights light them like the terrain. None of them glow (art-direction §4).
 
 - **`procedural:hull-block`**: `dimensions_m` = [length along heading, beam, height]. Every hull has a
@@ -84,6 +85,26 @@ fog and the headlights light them like the terrain. None of them glow (art-direc
   (`Config.props.chimneyMaterials`): `carbonate` is cream-grey with white tips (Lost City),
   `sulfide` near-black with rusty staining (black smokers). The shape is the same for every hint.
   The impostor is a 6-sided cone in the rock colour.
+
+- **`procedural:geo`** (F1-GEO, `src/world/props/geo/`): hand-built geology and biology set pieces
+  chosen by `feature`, with `dimensions_m` as [length, width, height] of the piece. Vertex colours
+  times one neutral canvas detail texture (rock, flow, pillow, strata, sediment; no binary assets),
+  instanced life (tubeworms or shrimp, coral colonies, sponges, boulders, bacterial mats) and
+  compound colliders. Detail follows the quality tier (`geo/detail.ts`: instance counts, mesh
+  density, branching depth, texture size, bump map). Face is local −Z; heading picks the direction.
+  A feature on a `procedural:chimney` keeps the vent preset's smoke, glow and shimmer (the preset
+  looks for chimney props); use that for vent pieces. Preview: `/preview/geo.html` on the dev server.
+  - `smoker-cluster`: sulfide mound + 3–7 black smokers, `variant: "shrimp"` swaps tubeworms for
+    shrimp swarms. Stacks 2 and 3 have their own shader-animated smoke plumes.
+  - `carbonate-tower`: Lost City edifice: a tall fluted spire, a ring of lesser ones, flanges, on a
+    talus skirt that sinks into the seabed downhill. dims = [width, depth, tallest height].
+  - `coral-mound`: rubble mound with hundreds of instanced branching colonies and vase sponges.
+  - `stalactite-cluster`: limestone wall with an overhanging ledge, fluted stalactites and sponges.
+  - `pillow-field`: heap of basalt pillows with iron-oxide staining and orange iron mats.
+  - `tuff-cliff` / `canyon-ledge` / `hadal-scarp`: extruded scarps (banded tuff, terraced mudstone
+    with a shelf, fractured silty trench wall) with a boulder apron.
+    Terrain in these tiles has 50–60 m cells, so big pieces sink a skirt below their base; use
+    `y_offset_m` to lift a piece that would otherwise be buried on a slope.
 
 ## Adding a GLB
 

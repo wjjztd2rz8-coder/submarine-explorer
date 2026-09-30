@@ -45,10 +45,10 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
 
   const mound = (x: number, z: number): number => {
     const r = Math.hypot(x / (L / 2), z / (W / 2));
-    if (r >= 1) return -0.45;
+    if (r >= 1) return -1.4;
     const base = moundH * Math.pow(1 - r * r, 0.75);
     const n = (fbm3(x * 0.25, 3, z * 0.25, seed, 3) - 0.5) * moundH * 0.6;
-    return Math.max(-0.45, base + n * clamp01(base / moundH) - smooth(0.82, 1, r) * 0.5);
+    return Math.max(-1.4, base + n * clamp01(base / moundH) - smooth(0.82, 1, r) * 0.5);
   };
 
   interface Stack {
@@ -247,7 +247,8 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
 
   // ---- plumes: smoke from the tallest stacks, shimmer from the mound.
   const byHeight = [...stacks].sort((a, b) => b.h - a.h);
-  byHeight.slice(0, 3).forEach((s, i) => {
+  // The vent preset smokes the tallest stack (the origin); the next two get their own.
+  byHeight.slice(1, 3).forEach((s, i) => {
     const ph = THREE.MathUtils.clamp(s.h * 2.6 + 4, 7, 34);
     const smoke = smokePlume(ph, s.r0 * 0.3, Math.round(120 * d.plume), seed + 31 * i);
     if (smoke) {

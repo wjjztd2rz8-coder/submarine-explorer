@@ -67,7 +67,8 @@ export interface PropDef {
    * hull-block or a scatter-kit id on debris; null = the generic builder.
    */
   wreck: WreckId | null;
-  /** `procedural:geo` only: which geology / biology set piece (`props/geo/features.ts`); null = a generic outcrop. */
+  /** `procedural:geo` (or a `procedural:chimney` given a vent set piece, so the vent preset still finds it): which
+   * geology / biology set piece (`props/geo/features.ts`); null = the generic builder. */
   feature: GeoFeatureId | null;
   lodDistanceM: number;
   collision: PropCollisionKind;
@@ -243,8 +244,9 @@ export function validatePropEntry(
 
   let feature: GeoFeatureId | null = null;
   if (entry.feature !== undefined) {
-    if (procedural === 'geo' && isGeoFeature(entry.feature)) feature = entry.feature;
-    else {
+    if ((procedural === 'geo' || procedural === 'chimney') && isGeoFeature(entry.feature)) {
+      feature = entry.feature;
+    } else {
       warnings.push(
         `${where}: "feature" ${JSON.stringify(entry.feature)} does not match procedural:${procedural ?? 'model'}; ignored`,
       );

@@ -144,7 +144,7 @@ def validate_entry(entry, warnings):
                             % (where, w, kind))
 
     if "feature" in entry:
-        if not (kind == "geo" and entry["feature"] in GEO_FEATURES):
+        if not (kind in ("geo", "chimney") and entry["feature"] in GEO_FEATURES):
             warnings.append('%s: "feature" %r does not match procedural:%s; ignored'
                             % (where, entry["feature"], kind))
 

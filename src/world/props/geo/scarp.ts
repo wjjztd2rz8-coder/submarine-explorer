@@ -66,6 +66,9 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
       [0.92, -0.05],
       [1, 0],
       [1.02, 0.4],
+      [0.7, 0.85],
+      [0.3, 1.25],
+      [-0.12, 1.7],
     ],
     bands: 9,
     ledge: 0.9,
@@ -94,6 +97,9 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
       [0.73, -0.02],
       [1, 0.05],
       [1.02, 0.5],
+      [0.7, 0.95],
+      [0.3, 1.35],
+      [-0.12, 1.8],
     ],
     bands: 12,
     ledge: 1.4,
@@ -117,6 +123,9 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
       [0.78, -0.02],
       [1, 0.08],
       [1.02, 0.5],
+      [0.7, 0.95],
+      [0.3, 1.35],
+      [-0.12, 1.8],
     ],
     bands: 5,
     ledge: 0.7,
@@ -195,19 +204,7 @@ export function extrudeProfile(
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   g.setIndex(idx);
   g.computeVertexNormals();
-  // Face the normals toward -Z (the open side): flip if the winding came out backwards.
-  const n = g.getAttribute('normal');
-  let sum = 0;
-  for (let i = 0; i < n.count; i++) sum += n.getZ(i);
-  if (sum > 0) {
-    const ix = g.getIndex()!;
-    for (let i = 0; i < ix.count; i += 3) {
-      const t = ix.getX(i + 1);
-      ix.setX(i + 1, ix.getX(i + 2));
-      ix.setX(i + 2, t);
-    }
-    g.computeVertexNormals();
-  }
+  // The profile runs up the front and down the back, so the winding is outward all round.
   void height;
   return g;
 }
@@ -222,12 +219,14 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const scale = Math.max(0.6, H / 30);
   const disp = (x: number, y: number, z: number): number => {
     const env = smooth(-0.05 * H, 0.2 * H, y);
-    const gully = (fbm3(x * P.gullyFreq, y * 0.025, seed + 1, seed, 4) - 0.5) * 2 * P.gully * scale;
+    const gully =
+      (fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, 4) - 0.5) * 2 * P.gully * scale * 2.4;
     const s = (y / H) * P.bands + (fbm3(x * 0.03, 5, seed, seed + 7, 2) - 0.5) * 1.2;
     const saw = s - Math.floor(s);
-    const ledge = -Math.pow(saw, 3) * P.ledge * scale; // strata protrude, then step back
+    const ledge = -Math.pow(saw, 2.2) * P.ledge * scale * 2.4; // strata protrude, then step back
     const fine = (fbm3(x * 0.9, y * 0.9, z * 0.9, seed + 4, 3) - 0.5) * 0.6 * scale;
-    return (gully + ledge) * env + fine;
+    const bulge = (fbm3(x * 0.045, y * 0.05, seed + 8, seed + 6, 3) - 0.5) * 0.5 * H * 0.35;
+    return (gully + ledge + bulge) * env + fine;
   };
   const nx = Math.round(Math.max(24, W / 1.4) * d.meshDensity);
   const ny = Math.round(Math.max(28, H * 1.3) * d.meshDensity);
@@ -236,7 +235,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     const s = (y / H) * P.bands + (fbm3(x * 0.03, 5, seed, seed + 7, 2) - 0.5) * 1.2;
     const saw = s - Math.floor(s);
     const tone = fbm3(x * 0.25, y * 0.2, z * 0.25, seed ^ 0x3c, 4);
-    out.copy(P.base).lerp(P.band, smooth(0.55, 0.95, saw) * 0.75 * (0.5 + tone));
+    out.copy(P.base).lerp(P.band, smooth(0.5, 0.95, saw) * 0.95 * (0.5 + tone));
     out.multiplyScalar(0.8 + 0.5 * tone);
     out.lerp(P.crest, smooth(0.75, 1, y / H) * 0.6);
     // Sediment drape on gentle slopes and at the toe; exposed rock on steep faces.

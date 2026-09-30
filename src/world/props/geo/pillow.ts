@@ -41,7 +41,7 @@ export function buildPillowField(input: GeoBuildInput): BuiltProp {
   const rnd = mulberry32(seed);
   const env = (x: number, z: number): number => {
     const r = Math.hypot(x / (L / 2), z / (W / 2));
-    if (r >= 1) return -0.4;
+    if (r >= 1) return -1.5;
     return Math.max(
       -0.4,
       H * 0.75 * Math.pow(1 - r * r, 0.8) * (0.7 + 0.5 * fbm3(x * 0.15, 1, z * 0.15, seed, 3)) -
@@ -51,17 +51,18 @@ export function buildPillowField(input: GeoBuildInput): BuiltProp {
   const parts: THREE.BufferGeometry[] = [
     heightMesh(L, W, Math.round(30 * d.meshDensity), Math.round(30 * d.meshDensity), env),
   ];
-  const n = Math.round(230 * d.meshDensity);
+  const n = Math.round(340 * d.meshDensity);
+  const tmpl = [0, 1, 2, 3, 4, 5].map((k) => lump(d.sphereDetail, seed + k * 17, 0.16, 1.8));
   for (let i = 0; i < n; i++) {
     const a = rnd() * 6.283;
-    const rr = Math.sqrt(rnd()) * 0.92;
+    const rr = Math.pow(rnd(), 0.65) * 0.9;
     const x = Math.cos(a) * rr * L * 0.5;
     const z = Math.sin(a) * rr * W * 0.5;
     const base = env(x, z);
     if (base < -0.2) continue;
     const s = (0.45 + rnd() * rnd() * 1.5) * (H > 4 ? 1.3 : 1);
     parts.push(
-      place(lump(d.sphereDetail, seed + i, 0.16, 1.8), {
+      place(tmpl[i % tmpl.length]!.clone(), {
         x,
         y: base + s * 0.35 + rnd() * s * 0.5,
         z,
@@ -75,6 +76,7 @@ export function buildPillowField(input: GeoBuildInput): BuiltProp {
     );
   }
   const geom = mergeAll(parts);
+  for (const t of tmpl) t.dispose();
   paint(geom, (x, y, z, ny, out) => {
     const n1 = fbm3(x * 0.5, y * 0.5, z * 0.5, seed ^ 0x81, 3);
     const n2 = fbm3(x * 0.15, y * 0.15, z * 0.15, seed ^ 0x82, 3);

@@ -14,6 +14,20 @@ without an entry here is not done.
 
 ### Added
 
+- Phase F, F1-GEO: **geology and biology set pieces** (`src/world/props/geo/`,
+  new prop kind `procedural:geo` and props.json `feature`). A black-smoker mound
+  (Axial ASHES; Beebe, with shrimp swarms) with tubeworm clumps, bacterial mats
+  and animated smoke plumes; the Poseidon carbonate tower at Lost City (fluted
+  spires, flanges, talus skirt); Lophelia coral mounds with instanced branching
+  colonies and vase sponges (Blake Plateau, Hudson Canyon); a drowned karst
+  alcove with fluted stalactites and sponges on the Lighthouse Reef drop-off; a
+  pillow-lava heap with iron mats at Kamaehuakanaloa; and extruded scarps with
+  strata, gullies and boulder aprons for the Hunga Tonga caldera wall, the
+  Monterey Canyon wall and the Challenger Deep north wall. Existing chimneys gain
+  a flowstone or cracked-rock detail texture. Every piece is procedural (canvas
+  textures, no third-party assets), has compound colliders and scales with the
+  quality tier (colony and plume counts, mesh density, texture size, bump map).
+  Plumes animate entirely in the vertex shader. Dev preview: `/preview/geo.html`.
 - Phase F, F1-WRECKS: **hand-built wrecks** (`src/world/props/wrecks/`). Titanic
   bow and stern, Bismarck and Endurance are now lofted hulls with decks, deck
   houses, funnels, turrets, masts, rigging, rusticle curtains, sessile growth and
@@ -57,6 +71,12 @@ without an entry here is not done.
 - Phase F, F0-CORE: **Auto** and **Ultra** entries in Settings → Graphics tier.
 
 ### Changed
+
+- Phase F, F1-GEO: `poseidon-tower` (Lost City) and `beebe-chimney-1` are now
+  hand-built vent set pieces instead of plain chimney columns; they stay
+  `procedural:chimney` with a `feature`, so the vent preset still smokes them. Blake
+  Plateau keeps its two boulder stand-ins beside the new coral mound. The Hudson
+  Canyon `props.json` note that no coral model exists was removed (one now does).
 
 - F1-VEHICLES: the ROV fill light moved from 3.6 m to about 9 m from the float (intensity x3) and vehicle materials gained a highlight shoulder, because pale livery inside the boat's own headlight beams clipped to flat white. The old single-mesh hull and ROV models are replaced, not kept as an option.
 - Phase F, F0-CORE: **`main.ts` split into systems** (`src/app/`). There is one

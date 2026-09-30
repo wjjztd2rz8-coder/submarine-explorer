@@ -46,6 +46,9 @@ const PROFILE: [number, number][] = [
   [0.9, 0],
   [1, 0.1],
   [1.02, 0.45],
+  [0.7, 0.9],
+  [0.3, 1.3],
+  [-0.12, 1.75],
 ];
 
 /** Height of the ledge underside at horizontal projection `f` (0 = wall, 1 = lip), in fractions of H. */

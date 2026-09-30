@@ -9,7 +9,6 @@
 import * as THREE from 'three';
 import { geoDetail } from './detail.js';
 import { geoMaterial } from './materials.js';
-import { shimmerPlume } from './plume.js';
 import {
   boxCH,
   clamp01,
@@ -27,9 +26,9 @@ import {
 } from './shared.js';
 import type { GeoBuildInput } from './types.js';
 
-const OLD = new THREE.Color(0x8c8676); // weathered, inactive carbonate
-const LIVE = new THREE.Color(0xe9e5d9); // fresh white carbonate and brucite
-const STAIN = new THREE.Color(0x6f6656);
+const OLD = new THREE.Color(0x77725f); // weathered, inactive carbonate
+const LIVE = new THREE.Color(0xc4bfb0); // fresh white carbonate and brucite
+const STAIN = new THREE.Color(0x5c5445);
 
 export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
   const { dims, seed, tier } = input;
@@ -37,14 +36,12 @@ export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
   const [W, D, H] = dims;
   const rnd = mulberry32(seed);
   const skirtH = H * 0.16;
+  const root = H * 0.5; // the foundation sinks into the seabed on the downhill side
   const skirt = (x: number, z: number): number => {
     const r = Math.hypot(x / (W / 2), z / (D / 2));
-    if (r >= 1) return -0.5;
     const n = (fbm3(x * 0.12, 5, z * 0.12, seed, 4) - 0.5) * skirtH * 0.7;
-    return Math.max(
-      -0.5,
-      skirtH * Math.pow(1 - r * r, 1.3) + n * clamp01(1 - r) - smooth(0.85, 1, r) * 0.6,
-    );
+    const top = skirtH * Math.pow(Math.max(0, 1 - Math.min(r, 1) ** 2), 1.3);
+    return top + n * clamp01(1 - r) - smooth(0.78, 1.02, r) * root;
   };
 
   interface Spire {
@@ -56,7 +53,7 @@ export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
   }
   const spires: Spire[] = [];
   const mk = (x: number, z: number, h: number): void => {
-    spires.push({ x, z, y: skirt(x, z) - 0.3, h, r0: h * 0.125 + 0.4 });
+    spires.push({ x, z, y: Math.max(skirt(x, z), 0) - 0.4, h, r0: h * 0.135 + 0.4 });
   };
   mk(0, 0, H);
   const n = 4 + Math.floor(rnd() * 2);
@@ -81,7 +78,8 @@ export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
           segs: 16 * dens + 4,
           rings: (s.h / 1.2) * dens + 6,
           wobble: 0.22,
-          ridges: 8,
+          ridges: 9,
+          ridgeAmp: 0.13,
           lip: 0.12,
           flare: 0.6,
         }),
@@ -93,7 +91,7 @@ export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
     for (let f = 0; f < nf; f++) {
       const t = 0.14 + rnd() * 0.5;
       const rAt = s.r0 * (1 - 0.7 * t);
-      const rr = rAt * (1.7 + rnd() * 1.1);
+      const rr = rAt * (2 + rnd() * 1.3);
       const flange = new THREE.CylinderGeometry(
         rr * 0.8,
         rr,
@@ -160,19 +158,6 @@ export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
   full.add(
     new THREE.Mesh(geom, geoMaterial('flow', d, { roughness: 0.88, side: THREE.DoubleSide })),
   );
-
-  spires.slice(0, 4).forEach((s, i) => {
-    const sh = shimmerPlume(
-      Math.min(10, s.h * 0.2),
-      s.r0 * 0.25,
-      Math.round(38 * d.plume),
-      seed + i * 5,
-    );
-    if (sh) {
-      sh.position.set(s.x, s.y + s.h, s.z);
-      full.add(sh);
-    }
-  });
 
   const bounds = geom.boundingBox!.clone();
   const colliders: THREE.Box3[] = [boxCH(0, skirtH * 0.3, 0, W * 0.3, skirtH * 0.3, D * 0.3)];
