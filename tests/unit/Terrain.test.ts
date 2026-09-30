@@ -1,3 +1,4 @@
+import type * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { Terrain } from '../../src/world/Terrain.js';
@@ -106,7 +107,7 @@ describe('Terrain meshing', () => {
     const t = new Terrain(tile, { ...cfg, chunkCells: 128 }, 'low');
     // ceil(299/128) = 3 columns of chunks, ceil(199/128) = 2 rows.
     expect(t.stats.chunks).toBe(6);
-    expect(t.group.children.length).toBe(6);
+    expect(t.group.children.filter((c) => (c as THREE.Mesh).isMesh).length).toBe(6);
     // At the 'low' tier subdiv is 1, so the surface is exactly the data grid;
     // the extra triangles are the per-chunk crack-hiding skirts.
     const surfaceTris = (300 - 1) * (200 - 1) * 2;

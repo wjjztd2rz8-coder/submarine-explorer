@@ -1,4 +1,5 @@
 import { defineConfig, type Plugin, type ResolvedConfig } from 'vite';
+import { pwaPlugin } from './tools/pwaPlugin.js';
 
 /**
  * Static data serving
@@ -138,7 +139,7 @@ function stripLoaderDefaultDecoderUrls(): Plugin {
 export default defineConfig({
   base: resolveBase(env.VITE_BASE),
   publicDir: 'public',
-  plugins: [stripLoaderDefaultDecoderUrls(), copyPublicFiltered()],
+  plugins: [stripLoaderDefaultDecoderUrls(), copyPublicFiltered(), pwaPlugin()],
   server: { port: 5173 },
   preview: { port: 4173 },
   build: { outDir: 'dist', sourcemap: true, target: 'es2022', copyPublicDir: false },

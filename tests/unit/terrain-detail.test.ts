@@ -119,7 +119,7 @@ describe('Terrain mesh matches sampleHeight', () => {
 
       let checked = 0;
       let maxErr = 0;
-      for (const child of t.group.children) {
+      for (const child of t.group.children.filter((c) => (c as THREE.Mesh).isMesh)) {
         const geom = (child as THREE.Mesh).geometry as THREE.BufferGeometry;
         const pos = geom.getAttribute('position');
         // Surface vertices only: the trailing run is the skirt, which is
@@ -141,7 +141,7 @@ describe('Terrain mesh matches sampleHeight', () => {
   it('chunk corners and centres agree with sampleHeight', () => {
     const tile = ridgedTile(33, 33);
     const t = new Terrain(tile, { ...base, chunkCells: 8 });
-    for (const child of t.group.children) {
+    for (const child of t.group.children.filter((c) => (c as THREE.Mesh).isMesh)) {
       const geom = (child as THREE.Mesh).geometry as THREE.BufferGeometry;
       const pos = geom.getAttribute('position');
       const sphere = geom.boundingSphere as THREE.Sphere;
@@ -165,7 +165,7 @@ describe('Terrain mesh matches sampleHeight', () => {
     // Key every surface vertex by its XZ; any duplicate must agree exactly.
     const seen = new Map<string, number>();
     let shared = 0;
-    for (const child of t.group.children) {
+    for (const child of t.group.children.filter((c) => (c as THREE.Mesh).isMesh)) {
       const geom = (child as THREE.Mesh).geometry as THREE.BufferGeometry;
       const pos = geom.getAttribute('position');
       const surface = pos.count - skirtVertexCount(geom);
@@ -187,7 +187,7 @@ describe('Terrain mesh matches sampleHeight', () => {
     const tile = ridgedTile();
     const t = new Terrain(tile, { ...base, chunkCells: 8 });
     const v = new THREE.Vector3();
-    for (const child of t.group.children) {
+    for (const child of t.group.children.filter((c) => (c as THREE.Mesh).isMesh)) {
       const geom = (child as THREE.Mesh).geometry as THREE.BufferGeometry;
       const pos = geom.getAttribute('position');
       const sphere = geom.boundingSphere as THREE.Sphere;

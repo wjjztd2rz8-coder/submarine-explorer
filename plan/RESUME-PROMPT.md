@@ -12,6 +12,10 @@ Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-expl
   - Run `PW_PORT=<unique> tools/gates.sh` in the worktree. If it passes, review the diff briefly and look at the screenshots in `.cache/codex/shots/<name>/` (Read tool). Then commit in the worktree with a descriptive message and Co-Authored-By lines, merge into main, rerun the gates on main, and remove the worktree and branch.
   - If it is unfinished or failing, finish it with a Claude subagent in that same worktree (§2).
 
+## 1b. Paused packages
+
+- If `.cache/claude/paused-packages.md` exists, resume those worktrees FIRST, one Sonnet agent at a time, following that file. Remove each entry once its package is merged.
+
 ## 2. Next package
 
 - Pick the next package from PHASE-F-PLAN.md §3 whose owned files don't overlap work in flight. Write its brief in the style of the earlier ones (see `.cache/codex/brief-f-*.md` and the F0-CORE prompt style: why, tasks, constraints, gates, screenshots, progress note, final report).
