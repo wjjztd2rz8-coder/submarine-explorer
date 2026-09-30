@@ -69,10 +69,14 @@ function normalFromHeight(
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const dx =
-        h(x + 1, y - 1) + 2 * h(x + 1, y) + h(x + 1, y + 1) -
+        h(x + 1, y - 1) +
+        2 * h(x + 1, y) +
+        h(x + 1, y + 1) -
         (h(x - 1, y - 1) + 2 * h(x - 1, y) + h(x - 1, y + 1));
       const dy =
-        h(x - 1, y + 1) + 2 * h(x, y + 1) + h(x + 1, y + 1) -
+        h(x - 1, y + 1) +
+        2 * h(x, y + 1) +
+        h(x + 1, y + 1) -
         (h(x - 1, y - 1) + 2 * h(x, y - 1) + h(x + 1, y - 1));
       let nx = -dx * strength;
       let ny = dy * strength;
@@ -261,7 +265,8 @@ function drawWood(size: number, _h: boolean): THREE.CanvasTexture | null {
       ctx.lineWidth = Math.max(0.6, size / 900);
       ctx.beginPath();
       ctx.moveTo(0, gy);
-      for (let x = 0; x <= size; x += size / 16) ctx.lineTo(x, gy + Math.sin(x * 0.05 + g) * ph * 0.08);
+      for (let x = 0; x <= size; x += size / 16)
+        ctx.lineTo(x, gy + Math.sin(x * 0.05 + g) * ph * 0.08);
       ctx.stroke();
     }
     // Butt joints, staggered plank to plank.

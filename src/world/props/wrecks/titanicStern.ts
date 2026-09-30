@@ -160,13 +160,23 @@ export function buildTitanicStern(
   flipFaces(walls);
   hull.add(walls, C.interior);
   const floorY = 0.6;
-  hull.add(deckStrip(spec, 0, T.cavity, () => floorY, 0.8, 4), C.interior);
+  hull.add(
+    deckStrip(spec, 0, T.cavity, () => floorY, 0.8, 4),
+    C.interior,
+  );
   hull.add(loftCap(spec, T.cavity, -1), C.interior);
-  dark.add(new THREE.BoxGeometry(W * 0.7, 0.1, 3).translate(0, floorY + 0.06, zOf(T.cavity - 1.6)), 0);
+  dark.add(
+    new THREE.BoxGeometry(W * 0.7, 0.1, 3).translate(0, floorY + 0.06, zOf(T.cavity - 1.6)),
+    0,
+  );
   const cavityOpen = new THREE.Object3D();
   cavityOpen.name = 'interior-entry';
   cavityOpen.position.set(0, top(4) * 0.5, zOf(2));
-  cavityOpen.userData = { kind: 'interior-entry', wreck: 'titanic-stern', note: 'engine room, open at the tear' };
+  cavityOpen.userData = {
+    kind: 'interior-entry',
+    wreck: 'titanic-stern',
+    note: 'engine room, open at the tear',
+  };
   for (const side of [-1, 1] as const) {
     // Four cylinders per engine, the largest aft, in a row fore-and-aft.
     const x = side * W * 0.19;
@@ -187,7 +197,16 @@ export function buildTitanicStern(
       hull.add(cover, C.rust);
     });
     // Valve chest and a pipe run along the top.
-    hull.add(beam(v3(x - side * 2.3, floorY + 5.4, zOf(2.2)), v3(x - side * 2.3, floorY + 5.4, zOf(12.6)), 0.35, 0.35, 8), C.rustDark);
+    hull.add(
+      beam(
+        v3(x - side * 2.3, floorY + 5.4, zOf(2.2)),
+        v3(x - side * 2.3, floorY + 5.4, zOf(12.6)),
+        0.35,
+        0.35,
+        8,
+      ),
+      C.rustDark,
+    );
   }
   // Deck slabs pancaked above the cavity, hanging out over the tear.
   const layers = [0.62, 0.78, 0.92];
@@ -210,12 +229,21 @@ export function buildTitanicStern(
     g.translate(0, 0, -len / 2);
     curl(g, len, -side * (0.5 + rnd() * 1.1));
     jitter(g, 0.12, 1.1, seed ^ (i * 29));
-    g.applyMatrix4(trs(p.x, p.y, p.z, Math.PI / 2 - 0.2 + rnd() * 0.4, side * (0.3 + rnd() * 0.6), 0));
+    g.applyMatrix4(
+      trs(p.x, p.y, p.z, Math.PI / 2 - 0.2 + rnd() * 0.4, side * (0.3 + rnd() * 0.6), 0),
+    );
     hull.add(g, C.blackPaint);
   }
   for (let i = 0; i < 7; i++) {
     const from = v3((rnd() - 0.5) * W * 0.6, top(3) * (0.5 + rnd() * 0.4), zOf(1 + rnd() * 3));
-    catenary(hull, from, from.clone().add(v3((rnd() - 0.5) * 3, -2 - rnd() * 3, -1.5 - rnd() * 2.5)), 0.7, 0.1, C.rustDark);
+    catenary(
+      hull,
+      from,
+      from.clone().add(v3((rnd() - 0.5) * 3, -2 - rnd() * 3, -1.5 - rnd() * 2.5)),
+      0.7,
+      0.1,
+      C.rustDark,
+    );
   }
 
   // ---- pancaked superstructure: layered, splayed slabs with dark gaps between
@@ -227,16 +255,27 @@ export function buildTitanicStern(
     const y = top(s0 + len / 2) + 0.15 + rnd() * 0.7;
     const g = new THREE.BoxGeometry(w, 0.35, len, 4, 1, 5);
     jitter(g, v3(0.25, 0.35, 0.25), 0.5, seed ^ (i * 41));
-    g.applyMatrix4(trs(x, y, zOf(s0 + len / 2), (rnd() - 0.5) * 0.08, (rnd() - 0.5) * 0.3, (rnd() - 0.5) * 0.1));
+    g.applyMatrix4(
+      trs(x, y, zOf(s0 + len / 2), (rnd() - 0.5) * 0.08, (rnd() - 0.5) * 0.3, (rnd() - 0.5) * 0.1),
+    );
     hull.add(g, rnd() < 0.6 ? white : C.rust);
-    dark.add(new THREE.BoxGeometry(w * 0.92, 0.12, len * 0.92).translate(x, y - 0.26, zOf(s0 + len / 2)), 0);
+    dark.add(
+      new THREE.BoxGeometry(w * 0.92, 0.12, len * 0.92).translate(x, y - 0.26, zOf(s0 + len / 2)),
+      0,
+    );
   }
   // The No. 4 funnel's base (a dummy uptake that vented the galleys), a torn ring.
   const f4 = 22;
   const ring = new THREE.CylinderGeometry(1, 1, 1.2, 20, 2, true).scale(3.7, 1, 2.9);
   ring.translate(0, top(f4) + 0.6, zOf(f4));
   hull.add(jitter(ring, v3(0.2, 0.5, 0.2), 0.9, seed ^ 0x4f), C.rustDark);
-  dark.add(new THREE.CircleGeometry(1, 20).rotateX(-Math.PI / 2).scale(3.5, 1, 2.7).translate(0, top(f4) + 0.1, zOf(f4)), 0);
+  dark.add(
+    new THREE.CircleGeometry(1, 20)
+      .rotateX(-Math.PI / 2)
+      .scale(3.5, 1, 2.7)
+      .translate(0, top(f4) + 0.1, zOf(f4)),
+    0,
+  );
   for (const [s, x] of [
     [32, -8],
     [40, 7],
@@ -251,12 +290,18 @@ export function buildTitanicStern(
   dark.add(new THREE.BoxGeometry(4.3, 0.2, 4.3).translate(0, top(wS) + 0.15, zOf(wS)), 0);
   const craneA = v3(-5, top(T.wellEnd - 2), zOf(T.wellEnd - 2));
   hull.add(new THREE.BoxGeometry(1.4, 2.2, 1.4).translate(craneA.x, craneA.y + 1.1, craneA.z), fit);
-  hull.add(strut(craneA.clone().add(v3(0, 2.3, 0)), craneA.clone().add(v3(-2.5, 5.2, -5.2)), 0.42, 0.34), fit);
+  hull.add(
+    strut(craneA.clone().add(v3(0, 2.3, 0)), craneA.clone().add(v3(-2.5, 5.2, -5.2)), 0.42, 0.34),
+    fit,
+  );
   const craneB = v3(5, top(T.wellEnd - 2), zOf(T.wellEnd - 2));
   const fallen = new THREE.BoxGeometry(1.4, 2.2, 1.4);
   fallen.applyMatrix4(trs(craneB.x + 0.8, craneB.y + 0.6, craneB.z, 0, 0, -1.2));
   hull.add(fallen, fit);
-  hull.add(strut(craneB.clone().add(v3(1.6, 0.8, 0)), craneB.clone().add(v3(4, -1.2, -6)), 0.42, 0.34), fit);
+  hull.add(
+    strut(craneB.clone().add(v3(1.6, 0.8, 0)), craneB.clone().add(v3(4, -1.2, -6)), 0.42, 0.34),
+    fit,
+  );
 
   // ---- poop deck: peeled back and folded forward over itself
   // A tight hinge where it bent, then the torn-off deck lying doubled on top,
@@ -273,14 +318,26 @@ export function buildTitanicStern(
   const foldM = trs(1.2, top(foldS) + 0.15, zOf(foldS), 0, 0.12);
   hull.add(hinge, C.teak, foldM);
   hull.add(flap, C.teak, foldM);
-  dark.add(new THREE.BoxGeometry(W * 0.5, 0.1, 10).translate(1.2, top(foldS - 5) + 0.05, zOf(foldS - 5)), 0);
+  dark.add(
+    new THREE.BoxGeometry(W * 0.5, 0.1, 10).translate(1.2, top(foldS - 5) + 0.05, zOf(foldS - 5)),
+    0,
+  );
   // The docking bridge, fallen across the poop deck.
   const db = new THREE.BoxGeometry(W * 0.8, 0.35, 1.8, 6, 1, 1);
   jitter(db, v3(0.1, 0.3, 0.1), 0.4, seed ^ 0x3d);
   db.applyMatrix4(trs(-1, top(L - 20) + 0.6, zOf(L - 20), 0.2, 0.35, 0.12));
   hull.add(db, white);
   for (const x of [-W * 0.28, W * 0.3]) {
-    hull.add(beam(v3(x, top(L - 20), zOf(L - 21)), v3(x * 0.8, top(L - 20) + 1.4, zOf(L - 20.3)), 0.12, 0.1, 5), fit);
+    hull.add(
+      beam(
+        v3(x, top(L - 20), zOf(L - 21)),
+        v3(x * 0.8, top(L - 20) + 1.4, zOf(L - 20.3)),
+        0.12,
+        0.1,
+        5,
+      ),
+      fit,
+    );
   }
   // Poop-deck cranes, the steering-gear house and bollards.
   for (const [s, x, yaw] of [
@@ -290,7 +347,10 @@ export function buildTitanicStern(
     const y0 = top(s);
     hull.add(new THREE.BoxGeometry(1.3, 2, 1.3).translate(x, y0 + 1, zOf(s)), fit);
     const root = v3(x, y0 + 2.1, zOf(s));
-    hull.add(strut(root, root.clone().add(v3(Math.sin(yaw) * 5.5, 2.4, Math.cos(yaw) * 5.5)), 0.4, 0.32), fit);
+    hull.add(
+      strut(root, root.clone().add(v3(Math.sin(yaw) * 5.5, 2.4, Math.cos(yaw) * 5.5)), 0.4, 0.32),
+      fit,
+    );
   }
   const sg = L - 9;
   hull.add(new THREE.BoxGeometry(6, 2.1, 4.5).translate(0, top(sg) + 1.05, zOf(sg)), white);
@@ -330,7 +390,12 @@ export function buildTitanicStern(
     );
   }
   if (detail.openings) {
-    const ph = makeInstanced(portholeGeometry(), fittingMaterial(), portholes, 'titanic-stern-portholes');
+    const ph = makeInstanced(
+      portholeGeometry(),
+      fittingMaterial(),
+      portholes,
+      'titanic-stern-portholes',
+    );
     if (ph) near.push(ph);
   }
   if (detail.railings) {
@@ -358,9 +423,18 @@ export function buildTitanicStern(
   for (const side of [-1, 1] as const) {
     const o = v3(side, 0, 0);
     rusticlesAlong(rust, edgePath(spec, 2, L - 1, 1, top, side, -0.05), 1.2, 0.3, 1.7, rnd, o);
-    rusticlesAlong(rust, edgePath(spec, 16, L - 6, 1.5, () => 6.5, side, -0.1), 0.35, 0.2, 1, rnd, o);
+    rusticlesAlong(
+      rust,
+      edgePath(spec, 16, L - 6, 1.5, () => 6.5, side, -0.1),
+      0.35,
+      0.2,
+      1,
+      rnd,
+      o,
+    );
   }
-  for (const p of under) if (rnd() < 0.4) hangRusticle(rust, p.clone().add(v3(0, -0.28, 0)), 0.25 + rnd() * 0.6, rnd);
+  for (const p of under)
+    if (rnd() < 0.4) hangRusticle(rust, p.clone().add(v3(0, -0.28, 0)), 0.25 + rnd() * 0.6, rnd);
   for (let i = 0; i < 180; i++) {
     // Curtains at the tear and under the pancaked slabs.
     const s = rnd() < 0.55 ? rnd() * 9 : T.cavity + rnd() * (T.superEnd - T.cavity);
@@ -382,14 +456,26 @@ export function buildTitanicStern(
   const sil = new PartBin();
   sil.add(loftSides(coarse), 0xffffff);
   sil.add(loftCap(coarse, 0, -1), 0xffffff);
-  sil.add(deckStrip(coarse, 0, L, (s) => top(s) - 0.03, 0, 1), 0xffffff);
+  sil.add(
+    deckStrip(coarse, 0, L, (s) => top(s) - 0.03, 0, 1),
+    0xffffff,
+  );
   const far = new THREE.Mesh(sil.merge()!, silhouetteMaterial(0x40221a));
 
   // ---- colliders
   const colliders = [
-    new THREE.Box3(v3(-hB * 0.92, -2.5, zOf(T.cavity)), v3(hB * 0.92, top(30) + 0.8, zOf(T.superEnd))),
-    new THREE.Box3(v3(-hB * 0.9, -2.5, zOf(T.superEnd)), v3(hB * 0.9, (T.wellY * H) / 10 + 0.8, zOf(T.wellEnd))),
-    new THREE.Box3(v3(-hB * 0.9, -2.5, zOf(T.wellEnd)), v3(hB * 0.9, (T.poopY * H) / 10 + 1.5, zOf(L - 8))),
+    new THREE.Box3(
+      v3(-hB * 0.92, -2.5, zOf(T.cavity)),
+      v3(hB * 0.92, top(30) + 0.8, zOf(T.superEnd)),
+    ),
+    new THREE.Box3(
+      v3(-hB * 0.9, -2.5, zOf(T.superEnd)),
+      v3(hB * 0.9, (T.wellY * H) / 10 + 0.8, zOf(T.wellEnd)),
+    ),
+    new THREE.Box3(
+      v3(-hB * 0.9, -2.5, zOf(T.wellEnd)),
+      v3(hB * 0.9, (T.poopY * H) / 10 + 1.5, zOf(L - 8)),
+    ),
     new THREE.Box3(v3(-hB * 0.5, -2.5, zOf(L - 8)), v3(hB * 0.5, (T.poopY * H) / 10 + 0.5, L / 2)),
     // Cavity: the two side walls and the engines, so the sub can nose in.
     new THREE.Box3(v3(-hB, -2.5, zOf(0)), v3(-hB + 2, top(8) + 0.5, zOf(T.cavity))),
@@ -397,6 +483,12 @@ export function buildTitanicStern(
     new THREE.Box3(v3(-W * 0.3, -2.5, zOf(1.5)), v3(W * 0.3, floorY + 6, zOf(T.cavity))),
   ];
 
-  const parts: WreckParts = { core: [hullMesh, voidMesh], near, far, colliders, anchors: [cavityOpen] };
+  const parts: WreckParts = {
+    core: [hullMesh, voidMesh],
+    near,
+    far,
+    colliders,
+    anchors: [cavityOpen],
+  };
   return assembleWreck('titanic-stern', parts, detail);
 }

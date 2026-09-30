@@ -107,7 +107,12 @@ export function fittingMaterial(): THREE.MeshStandardMaterial {
 /** Mud and slide blocks: vertex-coloured, fully rough, not metallic. */
 export function sedimentMaterial(): THREE.MeshStandardMaterial {
   return cachedMat('sediment', () => {
-    const m = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 1, metalness: 0 });
+    const m = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      vertexColors: true,
+      roughness: 1,
+      metalness: 0,
+    });
     m.name = 'wreck-sediment';
     return m;
   });
@@ -194,9 +199,17 @@ export function paintWreck(geom: THREE.BufferGeometry, o: PaintOptions): void {
     if (o.wood) {
       _c.copy(_base).multiplyScalar(0.75 + 0.45 * mid);
     } else {
-      const rustMix = THREE.MathUtils.clamp(o.rustiness + (big - 0.5) * 0.9 + (streak - 0.5) * 0.5, 0, 1);
-      _r.copy(RUST_DARK).lerp(RUST, S(mid, 0.15, 0.6)).lerp(RUST_ORANGE, S(streak, 0.62, 0.92) * 0.8);
-      _c.copy(_base).lerp(_r, rustMix).multiplyScalar(0.8 + 0.35 * mid);
+      const rustMix = THREE.MathUtils.clamp(
+        o.rustiness + (big - 0.5) * 0.9 + (streak - 0.5) * 0.5,
+        0,
+        1,
+      );
+      _r.copy(RUST_DARK)
+        .lerp(RUST, S(mid, 0.15, 0.6))
+        .lerp(RUST_ORANGE, S(streak, 0.62, 0.92) * 0.8);
+      _c.copy(_base)
+        .lerp(_r, rustMix)
+        .multiplyScalar(0.8 + 0.35 * mid);
     }
     const g = S(valueNoise3(x * 0.12, y * 0.2, z * 0.12, o.seed ^ 0x9e), 0.58, 0.85) * o.growth;
     _c.lerp(GROWTH, g * 0.7);
@@ -208,7 +221,10 @@ export function paintWreck(geom: THREE.BufferGeometry, o: PaintOptions): void {
     }
     const up = S(nrm.getY(i), 0.55, 0.9);
     if (up > 0 && o.silt > 0) {
-      _c.lerp(SILT, up * o.silt * (0.35 + 0.65 * valueNoise3(x * 0.11, 5.3, z * 0.11, o.seed ^ 0x5)));
+      _c.lerp(
+        SILT,
+        up * o.silt * (0.35 + 0.65 * valueNoise3(x * 0.11, 5.3, z * 0.11, o.seed ^ 0x5)),
+      );
     }
     if (o.shadeAt) _c.multiplyScalar(o.shadeAt(x, y, z));
     col.setXYZ(i, _c.r, _c.g, _c.b);

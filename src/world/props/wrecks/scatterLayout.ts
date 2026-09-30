@@ -16,7 +16,9 @@ export interface ScatterKind {
   /** Pieces at density 1. */
   count: number;
   /** Uniform scale range, or per-axis [min, max] triples for (x, y, z). */
-  size: readonly [number, number] | readonly [readonly [number, number], readonly [number, number], readonly [number, number]];
+  size:
+    | readonly [number, number]
+    | readonly [readonly [number, number], readonly [number, number], readonly [number, number]];
   /** Share the same random factor across axes for triple sizes (keeps proportions). */
   proportional?: boolean;
   /** `lie`: random yaw, small tilt; `upright`: yaw only; `tumble`: any orientation. */
@@ -75,7 +77,11 @@ export function scatterCount(kind: ScatterKind, o: ScatterOptions): number {
 }
 
 /** Lay out every kind of a kit. Deterministic from `rnd` (a seeded PRNG). */
-export function layoutScatter(spec: ScatterSpec, rnd: () => number, o: ScatterOptions): ScatterPlacement[] {
+export function layoutScatter(
+  spec: ScatterSpec,
+  rnd: () => number,
+  o: ScatterOptions,
+): ScatterPlacement[] {
   const out: ScatterPlacement[] = [];
   for (const kind of spec.kinds) {
     const n = scatterCount(kind, o);
@@ -96,7 +102,8 @@ export function layoutScatter(spec: ScatterSpec, rnd: () => number, o: ScatterOp
         x = Math.cos(a) * r * spec.rx;
         z = Math.sin(a) * r * spec.rz;
         yaw = rnd() * Math.PI * 2;
-        if (kind.align !== undefined) yaw = (yaw < Math.PI ? 0 : Math.PI) + (rnd() - 0.5) * kind.align;
+        if (kind.align !== undefined)
+          yaw = (yaw < Math.PI ? 0 : Math.PI) + (rnd() - 0.5) * kind.align;
       }
       let sx: number;
       let sy: number;

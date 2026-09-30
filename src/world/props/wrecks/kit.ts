@@ -165,7 +165,11 @@ export function jitter(
  * arc that turns through `angle` radians over `length` metres: positive curls
  * up (+Y), negative down. Arc length is preserved, so the plate keeps its size.
  */
-export function curl(geom: THREE.BufferGeometry, length: number, angle: number): THREE.BufferGeometry {
+export function curl(
+  geom: THREE.BufferGeometry,
+  length: number,
+  angle: number,
+): THREE.BufferGeometry {
   if (Math.abs(angle) < 1e-4) return geom;
   const r = length / angle;
   const pos = geom.getAttribute('position');

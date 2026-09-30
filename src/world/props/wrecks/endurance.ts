@@ -143,11 +143,21 @@ export function buildEndurance(
     half: (s, y) => Math.max(0, half(s, y) - 0.18),
   };
   wood.add(flipFaces(loftSides(inner)), oak);
-  wood.add(deckStrip(spec, 0.3, L - 0.3, (s) => deck(s) - 0.02, 0.2, 4), C.teak);
+  wood.add(
+    deckStrip(spec, 0.3, L - 0.3, (s) => deck(s) - 0.02, 0.2, 4),
+    C.teak,
+  );
   // Break-of-forecastle and break-of-poop bulkheads.
   for (const s of [fcEnd, poop]) {
     const w = half(s, deck(s)) * 2 - 0.4;
-    wood.add(new THREE.BoxGeometry(w, (E.raisedY - E.deckY) * hk, 0.2).translate(0, hk * E.deckY + ((E.raisedY - E.deckY) * hk) / 2, zOf(s)), oak);
+    wood.add(
+      new THREE.BoxGeometry(w, (E.raisedY - E.deckY) * hk, 0.2).translate(
+        0,
+        hk * E.deckY + ((E.raisedY - E.deckY) * hk) / 2,
+        zOf(s),
+      ),
+      oak,
+    );
   }
   // Rail caps along the bulwark tops (the "intact rail contours").
   for (const side of [-1, 1] as const) {
@@ -161,17 +171,37 @@ export function buildEndurance(
   // Stem, and the stump of the bowsprit.
   const stemTop = v3(0, top(0.2), zOf(0.2));
   wood.add(beam(v3(0, 0, zOf(0.1)), stemTop, 0.28, 0.28, 6), oak);
-  wood.add(beam(stemTop.clone().add(v3(0, -0.3, 0.6)), stemTop.clone().add(v3(0, 0.9, -3.4 * k)), 0.3, 0.24, 8), oak);
+  wood.add(
+    beam(
+      stemTop.clone().add(v3(0, -0.3, 0.6)),
+      stemTop.clone().add(v3(0, 0.9, -3.4 * k)),
+      0.3,
+      0.24,
+      8,
+    ),
+    oak,
+  );
   // Hawse holes.
   for (const side of [-1, 1] as const) {
     const { p, n } = hullFrame(spec, 1.6 * k, deck(1.6 * k) - 0.4, side);
-    dark.add(new THREE.CircleGeometry(0.2, 10).applyMatrix4(new THREE.Matrix4().lookAt(v3(0, 0, 0), n.clone().negate(), v3(0, 1, 0))).translate(p.x + n.x * 0.04, p.y, p.z), 0);
+    dark.add(
+      new THREE.CircleGeometry(0.2, 10)
+        .applyMatrix4(new THREE.Matrix4().lookAt(v3(0, 0, 0), n.clone().negate(), v3(0, 1, 0)))
+        .translate(p.x + n.x * 0.04, p.y, p.z),
+      0,
+    );
   }
 
   // ---- forecastle: windlass, catheads
   const wl = 4 * k;
-  fit.add(new THREE.CylinderGeometry(0.35, 0.35, 3, 12).rotateZ(Math.PI / 2).translate(0, deck(wl) + 0.6, zOf(wl)), C.rustDark);
-  for (const x of [-1.7, 1.7]) wood.add(new THREE.BoxGeometry(0.3, 0.9, 1).translate(x, deck(wl) + 0.45, zOf(wl)), oak);
+  fit.add(
+    new THREE.CylinderGeometry(0.35, 0.35, 3, 12)
+      .rotateZ(Math.PI / 2)
+      .translate(0, deck(wl) + 0.6, zOf(wl)),
+    C.rustDark,
+  );
+  for (const x of [-1.7, 1.7])
+    wood.add(new THREE.BoxGeometry(0.3, 0.9, 1).translate(x, deck(wl) + 0.45, zOf(wl)), oak);
 
   // ---- mast stubs (broken off), the fallen funnel, deck gear
   const stub = (s: number, h: number, r: number, lean: number): void => {
@@ -181,7 +211,14 @@ export function buildEndurance(
     // Splintered top.
     jitter(g, 0.05, 3, seed ^ Math.round(s * 10), (_x, y) => (y > tip.y - 0.4 ? 1 : 0));
     wood.add(g, oak);
-    wood.add(new THREE.CylinderGeometry(r * 1.6, r * 1.8, 0.35, 10).translate(base.x, base.y + 0.17, base.z), oak);
+    wood.add(
+      new THREE.CylinderGeometry(r * 1.6, r * 1.8, 0.35, 10).translate(
+        base.x,
+        base.y + 0.17,
+        base.z,
+      ),
+      oak,
+    );
   };
   stub(E.foremast, 2.6, 0.3, 0.25);
   stub(E.mainmast, 3.8, 0.29, -0.15);
@@ -192,8 +229,14 @@ export function buildEndurance(
   funnel.rotateY(0.35);
   funnel.translate(-1.5, deck(fs) + 0.75, zOf(fs + 1));
   fit.add(jitter(funnel, 0.06, 1.3, seed ^ 0xf0), 0x1d1a18);
-  fit.add(new THREE.CylinderGeometry(0.66, 0.7, 0.4, 14, 1, true).translate(0, deck(fs) + 0.2, zOf(fs)), 0x1d1a18);
-  dark.add(new THREE.CircleGeometry(0.6, 14).rotateX(-Math.PI / 2).translate(0, deck(fs) + 0.05, zOf(fs)), 0);
+  fit.add(
+    new THREE.CylinderGeometry(0.66, 0.7, 0.4, 14, 1, true).translate(0, deck(fs) + 0.2, zOf(fs)),
+    0x1d1a18,
+  );
+  dark.add(
+    new THREE.CircleGeometry(0.6, 14).rotateX(-Math.PI / 2).translate(0, deck(fs) + 0.05, zOf(fs)),
+    0,
+  );
   // Main hatch, its cover gone: the way into the hold (anchor for later interiors).
   const hs = E.hatch * k;
   wood.add(ringBox(2.6, 0.6, 3.2, 0.2).translate(0, deck(hs) + 0.3, zOf(hs)), oak);
@@ -211,10 +254,22 @@ export function buildEndurance(
   for (let i = 0; i < 8; i++) {
     const s = (26 + rnd() * 10) * k;
     const g = new THREE.BoxGeometry(0.22, 0.08, 1.5 + rnd() * 2.5);
-    g.applyMatrix4(trs((rnd() - 0.5) * B * 0.6, deck(s) + 0.1, zOf(s), (rnd() - 0.5) * 0.6, rnd() * 3, (rnd() - 0.5) * 0.4));
+    g.applyMatrix4(
+      trs(
+        (rnd() - 0.5) * B * 0.6,
+        deck(s) + 0.1,
+        zOf(s),
+        (rnd() - 0.5) * 0.6,
+        rnd() * 3,
+        (rnd() - 0.5) * 0.4,
+      ),
+    );
     wood.add(g, C.teak);
   }
-  dark.add(new THREE.BoxGeometry(1.8, 0.05, 1.2).translate(1.2, deck(33 * k) + 0.02, zOf(33 * k)), 0);
+  dark.add(
+    new THREE.BoxGeometry(1.8, 0.05, 1.2).translate(1.2, deck(33 * k) + 0.02, zOf(33 * k)),
+    0,
+  );
   // Boat davits (the boats went onto the ice in 1915).
   for (const side of [-1, 1] as const) {
     for (const s of [26 * k, 31 * k]) {
@@ -250,7 +305,10 @@ export function buildEndurance(
     const tip = v3(Math.cos(a) * 0.95, Math.sin(a) * 0.95, 0);
     wood.add(beam(v3(0, 0, 0), tip, 0.03, 0.035, 4), oak, wheelM);
   }
-  wood.add(beam(v3(0, wy + 1.45, zOf(ws) - 0.45), v3(0, wy + 1.45, zOf(ws) + 0.2), 0.05, 0.05, 6), oak);
+  wood.add(
+    beam(v3(0, wy + 1.45, zOf(ws) - 0.45), v3(0, wy + 1.45, zOf(ws) + 0.2), 0.05, 0.05, 6),
+    oak,
+  );
 
   // ---- silt: drifts in the corners of the decks and against the bulwarks
   for (let i = 0; i < 16; i++) {
@@ -301,11 +359,21 @@ export function buildEndurance(
     } else if (r < 0.8) {
       // On the outer planking below the rail.
       const { p, n } = hullFrame(spec, s, deck(s) - rnd() * 3, side);
-      place(rnd() < 0.5 ? anem : squirt, p.addScaledVector(n, 0.02), n.add(v3(0, 0.6, 0)).normalize(), 0.08 + rnd() * 0.12);
+      place(
+        rnd() < 0.5 ? anem : squirt,
+        p.addScaledVector(n, 0.02),
+        n.add(v3(0, 0.6, 0)).normalize(),
+        0.08 + rnd() * 0.12,
+      );
     } else {
       // On deck, by the bulwarks.
       const hw = half(s, deck(s)) - 0.3;
-      place(squirt, v3(side * hw * (0.7 + rnd() * 0.3), deck(s), zOf(s)), v3(0, 1, 0), 0.08 + rnd() * 0.1);
+      place(
+        squirt,
+        v3(side * hw * (0.7 + rnd() * 0.3), deck(s), zOf(s)),
+        v3(0, 1, 0),
+        0.08 + rnd() * 0.1,
+      );
     }
   }
   const am = makeInstanced(anemoneGeometry(), growthMaterial(), anem, 'endurance-anemones');
@@ -317,13 +385,25 @@ export function buildEndurance(
   const coarse: LoftSpec = { ...spec, stations: makeStations(L, 4, 2, [[0, 8 * k]]), levels: 2 };
   const sil = new PartBin();
   sil.add(loftSides(coarse), 0xffffff);
-  sil.add(deckStrip(coarse, 0, L, (s) => deck(s), 0, 1), 0xffffff);
-  sil.add(beam(v3(0, deck(E.mainmast * k), zOf(E.mainmast * k)), v3(0, deck(E.mainmast * k) + 3.8 * hk, zOf(E.mainmast * k)), 0.35, 0.3, 5), 0xffffff);
+  sil.add(
+    deckStrip(coarse, 0, L, (s) => deck(s), 0, 1),
+    0xffffff,
+  );
+  sil.add(
+    beam(
+      v3(0, deck(E.mainmast * k), zOf(E.mainmast * k)),
+      v3(0, deck(E.mainmast * k) + 3.8 * hk, zOf(E.mainmast * k)),
+      0.35,
+      0.3,
+      5,
+    ),
+    0xffffff,
+  );
   const far = new THREE.Mesh(sil.merge()!, silhouetteMaterial(0x2e2721));
 
   // ---- colliders
   const colliders = [
-    new THREE.Box3(v3(-halfB * 0.6, -1.5, -L / 2), v3(halfB * 0.6, top(0) , zOf(5 * k))),
+    new THREE.Box3(v3(-halfB * 0.6, -1.5, -L / 2), v3(halfB * 0.6, top(0), zOf(5 * k))),
     new THREE.Box3(v3(-halfB, -1.5, zOf(5 * k)), v3(halfB, deck(20 * k) + 0.4, zOf(L - 5 * k))),
     new THREE.Box3(v3(-halfB * 0.75, -1.5, zOf(L - 5 * k)), v3(halfB * 0.75, top(L - 3), L / 2)),
   ];

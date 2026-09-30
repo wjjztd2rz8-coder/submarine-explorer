@@ -57,7 +57,14 @@ import {
   voidMaterial,
   woodMaterial,
 } from './materials.js';
-import { bollards, edgePath, hullFrame, openingRow, rusticlesAlong, stocklessAnchor } from './ship.js';
+import {
+  bollards,
+  edgePath,
+  hullFrame,
+  openingRow,
+  rusticlesAlong,
+  stocklessAnchor,
+} from './ship.js';
 import { mulberry32, valueNoise3 } from './shared.js';
 
 /** Stations along the hull (m from the stem), from the ship's general arrangement. */
@@ -99,7 +106,9 @@ export function buildBismarck(
   // Sheer: the high "Atlantic bow", level amidships.
   const top = (s: number): number =>
     hScale *
-    (K.deckMid + (K.deckBow - K.deckMid) * Math.pow(1 - S(s, 0, 70), 1.6) - (K.deckMid - K.deckAft) * S(s, 150, 230));
+    (K.deckMid +
+      (K.deckBow - K.deckMid) * Math.pow(1 - S(s, 0, 70), 1.6) -
+      (K.deckMid - K.deckAft) * S(s, 150, 230));
   const half = (s: number, y: number): number => {
     const yh = THREE.MathUtils.clamp(y / 10, 0, 1);
     // Fine entry, flared above; flat-sided amidships; slowly narrowing aft.
@@ -122,15 +131,10 @@ export function buildBismarck(
   const d = detail.meshDensity;
   const spec: LoftSpec = {
     L,
-    stations: makeStations(
-      endS,
-      6 / d,
-      1.8 / d,
-      [
-        [0, 30],
-        [endS - 16, endS],
-      ],
-    ),
+    stations: makeStations(endS, 6 / d, 1.8 / d, [
+      [0, 30],
+      [endS - 16, endS],
+    ]),
     yBottom: -2.5,
     levels: Math.max(5, Math.round(11 * d)),
     top,
@@ -146,7 +150,10 @@ export function buildBismarck(
   // ---- hull, teak deck, torn aft end
   hull.add(loftSides(spec), grey);
   hull.add(loftCap(spec, endS, 1), C.interior);
-  deck.add(deckStrip(spec, 0, endS, (s) => top(s) - 0.03, 0.15, 6), C.teak);
+  deck.add(
+    deckStrip(spec, 0, endS, (s) => top(s) - 0.03, 0.15, 6),
+    C.teak,
+  );
   // Armour belt: a slight step down each side (the belt's top edge).
   for (const side of [-1, 1] as const) {
     const pts = edgePath(spec, 55, 205, 6, () => 3.2 * hScale, side, -0.18);
@@ -162,8 +169,14 @@ export function buildBismarck(
     stocklessAnchor(hull, p, n, 1.7, C.rustDark);
     const chain = loftPoint(spec, 16, top(16), side, new THREE.Vector3());
     chain.x *= 0.7;
-    dark.add(new THREE.CylinderGeometry(0.5, 0.5, 0.1, 10).translate(chain.x, top(16) + 0.03, chain.z), 0);
-    hull.add(beam(chain.clone().setY(top(16) + 0.2), v3(side * 2.2, top(30) + 0.2, zOf(30)), 0.2, 0.2, 5), C.rustDark);
+    dark.add(
+      new THREE.CylinderGeometry(0.5, 0.5, 0.1, 10).translate(chain.x, top(16) + 0.03, chain.z),
+      0,
+    );
+    hull.add(
+      beam(chain.clone().setY(top(16) + 0.2), v3(side * 2.2, top(30) + 0.2, zOf(30)), 0.2, 0.2, 5),
+      C.rustDark,
+    );
   }
   // Breakwater forward of Anton, capstans and bollards.
   const bw = K.barbettes[0]!.s - 12;
@@ -174,7 +187,10 @@ export function buildBismarck(
     grey,
   );
   for (const x of [-2.4, 2.4]) {
-    hull.add(new THREE.CylinderGeometry(0.7, 0.8, 0.9, 12).translate(x, top(30) + 0.45, zOf(30)), grey);
+    hull.add(
+      new THREE.CylinderGeometry(0.7, 0.8, 0.9, 12).translate(x, top(30) + 0.45, zOf(30)),
+      grey,
+    );
   }
   for (const side of [-1, 1] as const) {
     for (const s of [22, 40, 214, 228]) {
@@ -200,17 +216,33 @@ export function buildBismarck(
     const lip = new THREE.RingGeometry(r, r + 0.6, 28).rotateX(-Math.PI / 2);
     lip.translate(0, y0 + h, zOf(b.s));
     hull.add(lip, C.rust);
-    dark.add(new THREE.CircleGeometry(r, 28).rotateX(-Math.PI / 2).translate(0, y0 + 0.4, zOf(b.s)), 0);
+    dark.add(
+      new THREE.CircleGeometry(r, 28).rotateX(-Math.PI / 2).translate(0, y0 + 0.4, zOf(b.s)),
+      0,
+    );
     // Stubs of the roller path and training gear inside the rim.
     for (let k = 0; k < 10; k++) {
       const a = (k / 10) * Math.PI * 2 + rnd() * 0.3;
       const pp = v3(Math.cos(a) * (r - 0.4), y0 + h - 0.3, zOf(b.s) + Math.sin(a) * (r - 0.4));
-      hull.add(beam(pp, pp.clone().add(v3(-Math.cos(a) * 0.8, -0.7 - rnd(), -Math.sin(a) * 0.8)), 0.12, 0.08, 4), C.rustDark);
+      hull.add(
+        beam(
+          pp,
+          pp.clone().add(v3(-Math.cos(a) * 0.8, -0.7 - rnd(), -Math.sin(a) * 0.8)),
+          0.12,
+          0.08,
+          4,
+        ),
+        C.rustDark,
+      );
     }
     const a = new THREE.Object3D();
     a.name = `barbette-${b.name}`;
     a.position.set(0, y0 + 0.4, zOf(b.s));
-    a.userData = { kind: 'interior-entry', wreck: 'bismarck', note: `${b.name} barbette (turret gone)` };
+    a.userData = {
+      kind: 'interior-entry',
+      wreck: 'bismarck',
+      note: `${b.name} barbette (turret gone)`,
+    };
     anchors.push(a);
   }
 
@@ -244,7 +276,11 @@ export function buildBismarck(
   hull.add(jitter(ct, 0.08, 1, seed ^ 0x77), grey);
   for (const x of [-1.8, 0, 1.8]) {
     dark.add(
-      new THREE.PlaneGeometry(1.2, 0.3).translate(x, sY(K.conningTower) + 4.9 * hScale, zOf(K.conningTower) - 4.72),
+      new THREE.PlaneGeometry(1.2, 0.3).translate(
+        x,
+        sY(K.conningTower) + 4.9 * hScale,
+        zOf(K.conningTower) - 4.72,
+      ),
       0,
     );
   }
@@ -253,12 +289,34 @@ export function buildBismarck(
   const casing = new THREE.CylinderGeometry(1, 1, 1.6, 22, 2, true).scale(5.2, 1, 7.5);
   casing.translate(0, fY + 0.8, zOf(K.funnel));
   hull.add(jitter(casing, v3(0.2, 0.55, 0.2), 0.8, seed ^ 0xf1), C.rustDark);
-  dark.add(new THREE.CircleGeometry(1, 22).rotateX(-Math.PI / 2).scale(5, 1, 7.2).translate(0, fY + 0.06, zOf(K.funnel)), 0);
+  dark.add(
+    new THREE.CircleGeometry(1, 22)
+      .rotateX(-Math.PI / 2)
+      .scale(5, 1, 7.2)
+      .translate(0, fY + 0.06, zOf(K.funnel)),
+    0,
+  );
   // Aft superstructure and the stump of the aft fire-control position.
   block(146, 170, B * 0.3, 2.8 * hScale, sY(146) + 2.6 * hScale, 0.9);
-  hull.add(new THREE.CylinderGeometry(2.2, 2.5, 2 * hScale, 14).translate(0, sY(162) + 6.4 * hScale, zOf(162)), grey);
+  hull.add(
+    new THREE.CylinderGeometry(2.2, 2.5, 2 * hScale, 14).translate(
+      0,
+      sY(162) + 6.4 * hScale,
+      zOf(162),
+    ),
+    grey,
+  );
   // Mainmast stump.
-  hull.add(beam(v3(0, sY(145) + 2.6 * hScale, zOf(145)), v3(0.4, sY(145) + 5.5 * hScale, zOf(145.5)), 0.8, 0.6, 10), grey);
+  hull.add(
+    beam(
+      v3(0, sY(145) + 2.6 * hScale, zOf(145)),
+      v3(0.4, sY(145) + 5.5 * hScale, zOf(145.5)),
+      0.8,
+      0.6,
+      10,
+    ),
+    grey,
+  );
   // Crushed shelter deck plating at the island's edges.
   for (let i = 0; i < 10; i++) {
     const len = 3 + rnd() * 5;
@@ -268,7 +326,9 @@ export function buildBismarck(
     jitter(g, 0.15, 0.9, seed ^ (i * 17));
     const s = ss0 + rnd() * (ss1 - ss0);
     const x = (rnd() < 0.5 ? -1 : 1) * B * (0.22 + rnd() * 0.1);
-    g.applyMatrix4(trs(x, sY(s) + 2.6 * hScale, zOf(s), rnd() * 0.6, rnd() * 6, (rnd() - 0.5) * 0.5));
+    g.applyMatrix4(
+      trs(x, sY(s) + 2.6 * hScale, zOf(s), rnd() * 0.6, rnd() * 6, (rnd() - 0.5) * 0.5),
+    );
     hull.add(g, grey);
   }
 
@@ -286,7 +346,10 @@ export function buildBismarck(
     const x = side * B * 0.24;
     const y0 = secDeck(s);
     if (i === 2 || i === 4) {
-      dark.add(new THREE.CircleGeometry(2.4, 16).rotateX(-Math.PI / 2).translate(x, y0 + 0.05, zOf(s)), 0);
+      dark.add(
+        new THREE.CircleGeometry(2.4, 16).rotateX(-Math.PI / 2).translate(x, y0 + 0.05, zOf(s)),
+        0,
+      );
       continue;
     }
     const house = new THREE.BoxGeometry(5, 2.3, 6.6, 2, 1, 2);
@@ -317,8 +380,17 @@ export function buildBismarck(
     [150, -1],
   ] as const) {
     const x = side * B * 0.27;
-    hull.add(new THREE.CylinderGeometry(1.3, 1.5, 1.1, 12).translate(x, secDeck(s) + 0.55, zOf(s)), grey);
-    const g = beam(v3(x, secDeck(s) + 1.2, zOf(s)), v3(x + side * 0.6, secDeck(s) + 2.2, zOf(s) - 4.5), 0.12, 0.14, 6);
+    hull.add(
+      new THREE.CylinderGeometry(1.3, 1.5, 1.1, 12).translate(x, secDeck(s) + 0.55, zOf(s)),
+      grey,
+    );
+    const g = beam(
+      v3(x, secDeck(s) + 1.2, zOf(s)),
+      v3(x + side * 0.6, secDeck(s) + 2.2, zOf(s) - 4.5),
+      0.12,
+      0.14,
+      6,
+    );
     hull.add(g, grey);
   }
 
@@ -333,7 +405,9 @@ export function buildBismarck(
     g.translate(0, 0, len / 2);
     curl(g, len, side * (0.4 + rnd() * 1.1));
     jitter(g, 0.12, 1.1, seed ^ (i * 23));
-    g.applyMatrix4(trs(p.x, p.y, p.z, Math.PI / 2 - 0.2 + rnd() * 0.4, side * (0.4 + rnd() * 0.6), 0));
+    g.applyMatrix4(
+      trs(p.x, p.y, p.z, Math.PI / 2 - 0.2 + rnd() * 0.4, side * (0.4 + rnd() * 0.6), 0),
+    );
     hull.add(g, grey);
   }
   for (let i = 0; i < 3; i++) {
@@ -348,17 +422,35 @@ export function buildBismarck(
   const tornEntry = new THREE.Object3D();
   tornEntry.name = 'interior-entry';
   tornEntry.position.set(0, top(endS) * 0.5, zOf(endS));
-  tornEntry.userData = { kind: 'interior-entry', wreck: 'bismarck', note: 'torn aft end (stern missing)' };
+  tornEntry.userData = {
+    kind: 'interior-entry',
+    wreck: 'bismarck',
+    note: 'torn aft end (stern missing)',
+  };
   anchors.push(tornEntry);
 
   // ---- merge + paint
   const hullGeom = hull.merge()!;
   const endShade = (_x: number, _y: number, z: number): number =>
     THREE.MathUtils.lerp(1, 0.5, S(z + L / 2, endS - 12, endS - 1));
-  paintWreck(hullGeom, { seed, rustiness: 0.5, growth: 0.2, silt: 0.65, mudBand: 2.4, shadeAt: endShade });
+  paintWreck(hullGeom, {
+    seed,
+    rustiness: 0.5,
+    growth: 0.2,
+    silt: 0.65,
+    mudBand: 2.4,
+    shadeAt: endShade,
+  });
   projectUVs(hullGeom, 8);
   const deckGeom = deck.merge()!;
-  paintWreck(deckGeom, { seed: seed ^ 0xd, rustiness: 0, growth: 0.2, silt: 0.55, mudBand: 0, wood: true });
+  paintWreck(deckGeom, {
+    seed: seed ^ 0xd,
+    rustiness: 0,
+    growth: 0.2,
+    silt: 0.55,
+    mudBand: 0,
+    wood: true,
+  });
   projectUVs(deckGeom, 6, true);
   const core = [
     meshOf(hullGeom, steelMaterial(detail), 'bismarck-hull')!,
@@ -373,11 +465,28 @@ export function buildBismarck(
   for (const side of [-1, 1] as const) {
     under.push(
       ...openingRow(portholes, spec, side, 16, 52, (s) => top(s) - 2.2, 2.6, 0.42, 0.42, rnd, 0.25),
-      ...openingRow(portholes, spec, side, 206, endS - 8, (s) => top(s) - 2.2, 2.6, 0.42, 0.42, rnd, 0.35),
+      ...openingRow(
+        portholes,
+        spec,
+        side,
+        206,
+        endS - 8,
+        (s) => top(s) - 2.2,
+        2.6,
+        0.42,
+        0.42,
+        rnd,
+        0.35,
+      ),
     );
   }
   if (detail.openings) {
-    const ph = makeInstanced(portholeGeometry(), fittingMaterial(), portholes, 'bismarck-portholes');
+    const ph = makeInstanced(
+      portholeGeometry(),
+      fittingMaterial(),
+      portholes,
+      'bismarck-portholes',
+    );
     if (ph) near.push(ph);
   }
   if (detail.railings) {
@@ -385,7 +494,12 @@ export function buildBismarck(
     const rails = new InstanceList();
     const outward = (p: THREE.Vector3): THREE.Vector3 => v3(Math.sign(p.x) || 1, 0, 0);
     for (const side of [-1, 1] as const) {
-      railing(rails, edgePath(spec, 3, 48, 1.8, top, side, 0.3), rnd, { outward, bend: 0.7, missing: 0.45, height: 1 });
+      railing(rails, edgePath(spec, 3, 48, 1.8, top, side, 0.3), rnd, {
+        outward,
+        bend: 0.7,
+        missing: 0.45,
+        height: 1,
+      });
       railing(rails, edgePath(spec, 205, endS - 6, 1.8, top, side, 0.3), rnd, {
         outward,
         bend: 0.8,
@@ -400,15 +514,29 @@ export function buildBismarck(
   // grey steel), along deck edges, the barbette rims and the torn end.
   const rust = new InstanceList();
   for (const side of [-1, 1] as const) {
-    rusticlesAlong(rust, edgePath(spec, 1, endS, 1.5, top, side, -0.05), 0.45, 0.2, 0.9, rnd, v3(side, 0, 0));
+    rusticlesAlong(
+      rust,
+      edgePath(spec, 1, endS, 1.5, top, side, -0.05),
+      0.45,
+      0.2,
+      0.9,
+      rnd,
+      v3(side, 0, 0),
+    );
   }
-  for (const p of under) if (rnd() < 0.3) hangRusticle(rust, p.clone().add(v3(0, -0.25, 0)), 0.2 + rnd() * 0.4, rnd);
+  for (const p of under)
+    if (rnd() < 0.3) hangRusticle(rust, p.clone().add(v3(0, -0.25, 0)), 0.2 + rnd() * 0.4, rnd);
   for (const b of K.barbettes) {
     for (let k = 0; k < 18; k++) {
       const a = rnd() * Math.PI * 2;
       const r = K.barbetteR - 0.05;
       const y0 = top(b.s) + 1.2 + b.raised * hScale;
-      hangRusticle(rust, v3(Math.cos(a) * r, y0, zOf(b.s) + Math.sin(a) * r), 0.3 + rnd() * 0.9, rnd);
+      hangRusticle(
+        rust,
+        v3(Math.cos(a) * r, y0, zOf(b.s) + Math.sin(a) * r),
+        0.3 + rnd() * 0.9,
+        rnd,
+      );
     }
   }
   for (let i = 0; i < 90; i++) {
@@ -427,9 +555,22 @@ export function buildBismarck(
   const sil = new PartBin();
   sil.add(loftSides(coarse), 0xffffff);
   sil.add(loftCap(coarse, endS, 1), 0xffffff);
-  sil.add(deckStrip(coarse, 0, endS, (s) => top(s) - 0.03, 0, 1), 0xffffff);
-  sil.add(new THREE.BoxGeometry(B * 0.62, 2.6 * hScale, ss1 - ss0).translate(0, sY(ss0) + 1.3 * hScale, zOf((ss0 + ss1) / 2)), 0xffffff);
-  sil.add(new THREE.BoxGeometry(B * 0.3, 5.6 * hScale, 24).translate(0, sY(ss0) + 5.4 * hScale, zOf(104)), 0xffffff);
+  sil.add(
+    deckStrip(coarse, 0, endS, (s) => top(s) - 0.03, 0, 1),
+    0xffffff,
+  );
+  sil.add(
+    new THREE.BoxGeometry(B * 0.62, 2.6 * hScale, ss1 - ss0).translate(
+      0,
+      sY(ss0) + 1.3 * hScale,
+      zOf((ss0 + ss1) / 2),
+    ),
+    0xffffff,
+  );
+  sil.add(
+    new THREE.BoxGeometry(B * 0.3, 5.6 * hScale, 24).translate(0, sY(ss0) + 5.4 * hScale, zOf(104)),
+    0xffffff,
+  );
   const far = new THREE.Mesh(sil.merge()!, silhouetteMaterial(0x3b3530));
 
   // ---- colliders
@@ -437,9 +578,18 @@ export function buildBismarck(
     new THREE.Box3(v3(-halfB * 0.45, -2.5, -L / 2), v3(halfB * 0.45, top(0) + 0.5, zOf(35))),
     new THREE.Box3(v3(-halfB * 0.9, -2.5, zOf(35)), v3(halfB * 0.9, top(35) + 0.5, zOf(ss0))),
     new THREE.Box3(v3(-halfB, -2.5, zOf(ss0)), v3(halfB, top(ss0) + 0.3, zOf(ss1))),
-    new THREE.Box3(v3(-halfB * 0.95, -2.5, zOf(ss1)), v3(halfB * 0.95, top(ss1) + 0.5, zOf(endS - 2))),
-    new THREE.Box3(v3(-B * 0.31, top(ss0), zOf(ss0)), v3(B * 0.31, top(ss0) + 2.6 * hScale, zOf(ss1))),
-    new THREE.Box3(v3(-B * 0.17, top(ss0), zOf(ss0 + 2)), v3(B * 0.17, top(ss0) + 8.2 * hScale, zOf(116))),
+    new THREE.Box3(
+      v3(-halfB * 0.95, -2.5, zOf(ss1)),
+      v3(halfB * 0.95, top(ss1) + 0.5, zOf(endS - 2)),
+    ),
+    new THREE.Box3(
+      v3(-B * 0.31, top(ss0), zOf(ss0)),
+      v3(B * 0.31, top(ss0) + 2.6 * hScale, zOf(ss1)),
+    ),
+    new THREE.Box3(
+      v3(-B * 0.17, top(ss0), zOf(ss0 + 2)),
+      v3(B * 0.17, top(ss0) + 8.2 * hScale, zOf(116)),
+    ),
   ];
 
   const parts: WreckParts = { core, near, far, colliders, anchors };

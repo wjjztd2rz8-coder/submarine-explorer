@@ -10,7 +10,12 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { buildWreck, WRECK_HULLS, WRECK_SCATTERS, type WreckId } from '../src/world/props/wrecks/index.js';
+import {
+  buildWreck,
+  WRECK_HULLS,
+  WRECK_SCATTERS,
+  type WreckId,
+} from '../src/world/props/wrecks/index.js';
 import { countTriangles } from '../src/world/props/wrecks/kit.js';
 import { hashString } from '../src/world/props/wrecks/shared.js';
 
@@ -79,7 +84,9 @@ const bed = new THREE.PlaneGeometry(3000, 3000, 120, 120).rotateX(-Math.PI / 2);
   bed.setAttribute('color', new THREE.BufferAttribute(col, 3));
   bed.computeVertexNormals();
 }
-scene.add(new THREE.Mesh(bed, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 })));
+scene.add(
+  new THREE.Mesh(bed, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 })),
+);
 
 const root = new THREE.Group();
 scene.add(root);
@@ -118,8 +125,12 @@ function applyLod(): void {
 }
 
 function aimSpot(): void {
-  const az = THREE.MathUtils.degToRad(Number((document.getElementById('spotAz') as HTMLInputElement).value));
-  const el = THREE.MathUtils.degToRad(Number((document.getElementById('spotEl') as HTMLInputElement).value));
+  const az = THREE.MathUtils.degToRad(
+    Number((document.getElementById('spotAz') as HTMLInputElement).value),
+  );
+  const el = THREE.MathUtils.degToRad(
+    Number((document.getElementById('spotEl') as HTMLInputElement).value),
+  );
   const size = current ? current.bounds.getSize(new THREE.Vector3()).length() : 100;
   const r = Math.max(40, size * 0.9);
   spot.target.position.copy(controls.target);
@@ -163,7 +174,8 @@ lodSel.onchange = () => {
 };
 const fog = document.getElementById('fog') as HTMLInputElement;
 fog.oninput = () => ((scene.fog as THREE.FogExp2).density = Number(fog.value));
-for (const id of ['spotAz', 'spotEl']) document.getElementById(id)!.addEventListener('input', aimSpot);
+for (const id of ['spotAz', 'spotEl'])
+  document.getElementById(id)!.addEventListener('input', aimSpot);
 addEventListener('keydown', (e) => {
   if (e.key === 'h' || e.key === 'H') document.getElementById('panel')!.classList.toggle('hidden');
 });

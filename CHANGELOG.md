@@ -14,6 +14,15 @@ without an entry here is not done.
 
 ### Added
 
+- Phase F, F1-WRECKS: **hand-built wrecks** (`src/world/props/wrecks/`). Titanic
+  bow and stern, Bismarck and Endurance are now lofted hulls with decks, deck
+  houses, funnels, turrets, masts, rigging, rusticle curtains, sessile growth and
+  procedural plate/rust textures, replacing the plain hull block. Debris fields
+  (boilers, Titanic field, Bismarck turrets and landslide, Endurance rigging) use
+  instanced scatter kits. Detail scales with the quality tier (growth, railings,
+  openings, texture size, normal maps, LOD distances). Each wreck has an
+  `interior-entry` anchor for later interior work. Hulls use compound colliders so
+  the sub can drop between deck houses. Dev preview: `/preview/wrecks.html`.
 - Phase F, F0-CORE: **quality tiers v2** (`src/core/Quality.ts`,
   `src/core/config/quality.ts`). There are now four tiers (`low`, `medium`,
   `high`, `ultra`) plus an `auto` setting. `auto` detects a tier from the GPU

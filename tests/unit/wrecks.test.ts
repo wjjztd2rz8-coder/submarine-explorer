@@ -1,3 +1,4 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
@@ -122,14 +123,21 @@ describe('wreck builders', () => {
 
   it('low tier drops small debris; ultra has more scatter than medium', () => {
     const count = (tier: string): number =>
-      buildWreck('titanic-field', DIMS['titanic-field'], 3, tier, () => 0).full.getObjectsByProperty('isInstancedMesh', true).length;
+      buildWreck(
+        'titanic-field',
+        DIMS['titanic-field'],
+        3,
+        tier,
+        () => 0,
+      ).full.getObjectsByProperty('isInstancedMesh', true).length;
     const low = buildWreck('titanic-field', DIMS['titanic-field'], 3, 'low', () => 0);
     expect(low.full.getObjectByName('titanic-field-crockery')).toBeUndefined();
     expect(count('medium')).toBeGreaterThan(count('low'));
     const inst = (tier: string): number => {
       let n = 0;
       buildWreck('titanic-field', DIMS['titanic-field'], 3, tier, () => 0).full.traverse((o) => {
-        if ((o as THREE.InstancedMesh).isInstancedMesh && !o.name.endsWith('-mid')) n += (o as THREE.InstancedMesh).count;
+        if ((o as THREE.InstancedMesh).isInstancedMesh && !o.name.endsWith('-mid'))
+          n += (o as THREE.InstancedMesh).count;
       });
       return n;
     };
@@ -137,12 +145,19 @@ describe('wreck builders', () => {
   });
 
   it('exports interior anchor points for later ROV interiors', () => {
-    const names = (id: WreckId): string[] => buildWreck(id, DIMS[id], 1, 'medium').anchors.map((a) => a.name);
+    const names = (id: WreckId): string[] =>
+      buildWreck(id, DIMS[id], 1, 'medium').anchors.map((a) => a.name);
     expect(names('titanic-bow')).toContain('interior-entry');
     expect(names('titanic-stern')).toContain('interior-entry');
     expect(names('endurance')).toContain('interior-entry');
     expect(names('bismarck')).toEqual(
-      expect.arrayContaining(['barbette-anton', 'barbette-bruno', 'barbette-caesar', 'barbette-dora', 'interior-entry']),
+      expect.arrayContaining([
+        'barbette-anton',
+        'barbette-bruno',
+        'barbette-caesar',
+        'barbette-dora',
+        'interior-entry',
+      ]),
     );
     for (const id of WRECK_HULLS) {
       const b = buildWreck(id, DIMS[id], 1, 'medium');
@@ -190,7 +205,9 @@ describe('scatter layout', () => {
   it('is deterministic from the seed', () => {
     const o = { density: 1, smallDebris: true };
     expect(layoutScatter(spec, mulberry32(4), o)).toEqual(layoutScatter(spec, mulberry32(4), o));
-    expect(layoutScatter(spec, mulberry32(4), o)).not.toEqual(layoutScatter(spec, mulberry32(5), o));
+    expect(layoutScatter(spec, mulberry32(4), o)).not.toEqual(
+      layoutScatter(spec, mulberry32(5), o),
+    );
   });
 
   it('keeps pieces inside the area and scales counts with density', () => {
@@ -203,7 +220,9 @@ describe('scatter layout', () => {
   });
 
   it('keeps fixed pieces fixed regardless of density', () => {
-    const boilers = wreckScatterSpec('titanic-boilers', [25, 25, 5]).kinds.find((k) => k.name === 'boilers')!;
+    const boilers = wreckScatterSpec('titanic-boilers', [25, 25, 5]).kinds.find(
+      (k) => k.name === 'boilers',
+    )!;
     expect(scatterCount(boilers, { density: 0.2, smallDebris: false })).toBe(5);
     expect(scatterCount(boilers, { density: 3, smallDebris: true })).toBe(5);
   });
@@ -225,7 +244,9 @@ describe('kit helpers', () => {
     expect(st[st.length - 1]).toBe(100);
     for (let i = 1; i < st.length; i++) expect(st[i]!).toBeGreaterThan(st[i - 1]!);
     expect(st.filter((s) => s <= 20).length).toBeGreaterThan(8);
-    expect(st.some((s) => Math.abs(s - 49.98) < 1e-6) && st.some((s) => Math.abs(s - 50.02) < 1e-6)).toBe(true);
+    expect(
+      st.some((s) => Math.abs(s - 49.98) < 1e-6) && st.some((s) => Math.abs(s - 50.02) < 1e-6),
+    ).toBe(true);
   });
 
   it('flipFaces reverses winding and normals', () => {
@@ -234,7 +255,12 @@ describe('kit helpers', () => {
     flipFaces(g);
     const n1 = new THREE.Vector3().fromBufferAttribute(g.getAttribute('normal'), 0);
     expect(n1.dot(n0)).toBeCloseTo(-1);
-    const tri = new THREE.Triangle().setFromAttributeAndIndices(g.getAttribute('position'), 0, 1, 2);
+    const tri = new THREE.Triangle().setFromAttributeAndIndices(
+      g.getAttribute('position'),
+      0,
+      1,
+      2,
+    );
     expect(tri.getNormal(new THREE.Vector3()).dot(n1)).toBeCloseTo(1);
   });
 
@@ -262,22 +288,42 @@ describe('kit helpers', () => {
 
 describe('props.json wiring', () => {
   const cfg = DEFAULT_CONFIG.props;
-  const entry = { id: 'w', lat: 41.73, lon: -49.95, snap_to_seabed: true, dimensions_m: [143, 28, 16] };
+  const entry = {
+    id: 'w',
+    lat: 41.73,
+    lon: -49.95,
+    snap_to_seabed: true,
+    dimensions_m: [143, 28, 16],
+  };
 
   it('accepts a wreck id matching the procedural kind', () => {
-    const d = validatePropEntry({ ...entry, model: 'procedural:hull-block', wreck: 'titanic-bow' }, cfg) as PropDef;
+    const d = validatePropEntry(
+      { ...entry, model: 'procedural:hull-block', wreck: 'titanic-bow' },
+      cfg,
+    ) as PropDef;
     expect(d.wreck).toBe('titanic-bow');
-    const s = validatePropEntry({ ...entry, model: 'procedural:debris', wreck: 'titanic-field' }, cfg) as PropDef;
+    const s = validatePropEntry(
+      { ...entry, model: 'procedural:debris', wreck: 'titanic-field' },
+      cfg,
+    ) as PropDef;
     expect(s.wreck).toBe('titanic-field');
   });
 
   it('warns and falls back to the generic builder on a mismatched or unknown id', () => {
     const w: string[] = [];
-    const d = validatePropEntry({ ...entry, model: 'procedural:debris', wreck: 'titanic-bow' }, cfg, w) as PropDef;
+    const d = validatePropEntry(
+      { ...entry, model: 'procedural:debris', wreck: 'titanic-bow' },
+      cfg,
+      w,
+    ) as PropDef;
     expect(d.wreck).toBeNull();
-    expect(validatePropEntry({ ...entry, model: 'procedural:hull-block', wreck: 'nope' }, cfg, w)).not.toBeTypeOf('string');
+    expect(
+      validatePropEntry({ ...entry, model: 'procedural:hull-block', wreck: 'nope' }, cfg, w),
+    ).not.toBeTypeOf('string');
     expect(w).toHaveLength(2);
-    expect((validatePropEntry({ ...entry, model: 'procedural:hull-block' }, cfg) as PropDef).wreck).toBeNull();
+    expect(
+      (validatePropEntry({ ...entry, model: 'procedural:hull-block' }, cfg) as PropDef).wreck,
+    ).toBeNull();
   });
 
   it('every wreck site names hand-built wrecks for its hulls and keeps the old prop ids', () => {
@@ -290,14 +336,19 @@ describe('props.json wiring', () => {
         'debris-stern': 'titanic-stern-field',
       },
       bismarck: { 'main-hull': 'bismarck', 'turret-debris': 'bismarck-turrets' },
-      endurance: { 'main-hull': 'endurance', 'rigging-debris': 'endurance-rigging', 'helm-marker': 'endurance-stern' },
+      endurance: {
+        'main-hull': 'endurance',
+        'rigging-debris': 'endurance-rigging',
+        'helm-marker': 'endurance-stern',
+      },
     };
     for (const [site, ids] of Object.entries(expected)) {
       const doc = JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8')) as unknown;
       const parsed = parsePropsDoc(doc, cfg);
       expect(parsed.errors, site).toEqual([]);
       const byId = new Map(parsed.props.map((p) => [p.id, p]));
-      for (const [id, wreck] of Object.entries(ids)) expect(byId.get(id)?.wreck, `${site}/${id}`).toBe(wreck);
+      for (const [id, wreck] of Object.entries(ids))
+        expect(byId.get(id)?.wreck, `${site}/${id}`).toBe(wreck);
     }
   });
 
@@ -309,7 +360,11 @@ describe('props.json wiring', () => {
     };
     const props = new Props(meta, flat, cfg, 'low');
     await props.placeAll(
-      { props: [{ ...entry, model: 'procedural:hull-block', wreck: 'titanic-bow', collision: 'box' }] },
+      {
+        props: [
+          { ...entry, model: 'procedural:hull-block', wreck: 'titanic-bow', collision: 'box' },
+        ],
+      },
       't',
     );
     expect(props.stats.failed).toBe(0);

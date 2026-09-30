@@ -112,7 +112,14 @@ export function rusticlesAlong(
 // --------------------------------------------------------------- fittings
 
 /** A pair of mooring bollards (bitts) on a common base plate. */
-export function bollards(bin: PartBin, x: number, y: number, z: number, rotY: number, color: number): void {
+export function bollards(
+  bin: PartBin,
+  x: number,
+  y: number,
+  z: number,
+  rotY: number,
+  color: number,
+): void {
   const m = trs(x, y, z, 0, rotY);
   const base = new THREE.BoxGeometry(0.7, 0.15, 1.7);
   base.translate(0, 0.075, 0);
@@ -128,7 +135,14 @@ export function bollards(bin: PartBin, x: number, y: number, z: number, rotY: nu
 }
 
 /** A capstan: a waisted drum with a cap and whelps. */
-export function capstan(bin: PartBin, x: number, y: number, z: number, r: number, color: number): void {
+export function capstan(
+  bin: PartBin,
+  x: number,
+  y: number,
+  z: number,
+  r: number,
+  color: number,
+): void {
   const pts = [
     new THREE.Vector2(r * 1.25, 0),
     new THREE.Vector2(r * 1.2, 0.12),
@@ -186,7 +200,8 @@ export function welinDavit(
     v3(x + out * (0.9 + lean), y + 3.1, z),
     v3(x + out * (1.9 + lean * 1.5), y + 3.3 - lean, z),
   ];
-  for (let i = 0; i < pts.length - 1; i++) bin.add(beam(pts[i]!, pts[i + 1]!, 0.13, 0.11, 6), color);
+  for (let i = 0; i < pts.length - 1; i++)
+    bin.add(beam(pts[i]!, pts[i + 1]!, 0.13, 0.11, 6), color);
 }
 
 /**
@@ -254,6 +269,13 @@ export function deckHouse(
 }
 
 /** Thin plate from a to b (its long axis), `w` wide, a box of thickness t. */
-export function plate(bin: PartBin, a: THREE.Vector3, b: THREE.Vector3, w: number, t: number, color: number): void {
+export function plate(
+  bin: PartBin,
+  a: THREE.Vector3,
+  b: THREE.Vector3,
+  w: number,
+  t: number,
+  color: number,
+): void {
   bin.add(strut(a, b, w, t), color);
 }

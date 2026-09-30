@@ -104,7 +104,8 @@ export function buildTitanicBow(
   const halfB = B / 2;
   const pitch = (s: number): number => (T.pitchM * s) / L;
   const sheer = (s: number): number => 0.9 * Math.pow(Math.max(0, 1 - s / 42), 2);
-  const tornT = (s: number): number => THREE.MathUtils.clamp((s - T.tornStart) / (L - T.tornStart), 0, 1);
+  const tornT = (s: number): number =>
+    THREE.MathUtils.clamp((s - T.tornStart) / (L - T.tornStart), 0, 1);
 
   const top = (s: number): number => {
     if (s < T.forecastleEnd) return T.forecastleY + sheer(s) + pitch(s);
@@ -125,7 +126,10 @@ export function buildTitanicBow(
     const n2 = valueNoise3(s * 0.3, y * 0.4, side * 1.7, seed ^ 0x2d);
     p.y -= Math.pow(t, 1.6) * Math.max(0, y - 3) * 0.3 * (0.5 + n);
     p.x *= 1 + 0.14 * Math.pow(t, 1.4) * THREE.MathUtils.clamp((y - 2) / 10, 0, 1) * (0.4 + n2);
-    const jag = 9 * THREE.MathUtils.smoothstep(t, 0.55, 1) * valueNoise3(y * 0.35, side * 2.1, 4.4, seed ^ 0x61);
+    const jag =
+      9 *
+      THREE.MathUtils.smoothstep(t, 0.55, 1) *
+      valueNoise3(y * 0.35, side * 2.1, 4.4, seed ^ 0x61);
     p.z -= jag;
     p.x += (n2 - 0.5) * 0.9 * t;
   };
@@ -160,16 +164,28 @@ export function buildTitanicBow(
   hull.add(loftCap(spec, L, 1), C.interior);
   const deckY = (s: number): number => top(s) - 0.02;
   hull.add(deckStrip(spec, 0, T.forecastleEnd, deckY, 0, 3), C.blackPaint);
-  hull.add(deckStrip(spec, T.forecastleEnd, T.wellEnd, (s) => T.wellY + pitch(s), 0.3, 3), C.blackPaint);
+  hull.add(
+    deckStrip(spec, T.forecastleEnd, T.wellEnd, (s) => T.wellY + pitch(s), 0.3, 3),
+    C.blackPaint,
+  );
   hull.add(
     deckStrip(spec, T.wellEnd, L, deckY, 0, 6, (p, s) => {
       const t = tornT(s);
-      if (t > 0) p.y -= Math.pow(t, 1.6) * (p.y - 3) * 0.3 * (0.5 + valueNoise3(s * 0.12, p.x * 0.1, 1.1, seed));
+      if (t > 0)
+        p.y -=
+          Math.pow(t, 1.6) * (p.y - 3) * 0.3 * (0.5 + valueNoise3(s * 0.12, p.x * 0.1, 1.1, seed));
     }),
     white,
   );
   // Forecastle break and superstructure front: cross walls down to the well deck.
-  crossWall(hull, spec, T.forecastleEnd, T.wellY + pitch(T.forecastleEnd), top(T.forecastleEnd - 0.1), fit);
+  crossWall(
+    hull,
+    spec,
+    T.forecastleEnd,
+    T.wellY + pitch(T.forecastleEnd),
+    top(T.forecastleEnd - 0.1),
+    fit,
+  );
   crossWall(hull, spec, T.wellEnd, T.wellY + pitch(T.wellEnd), top(T.wellEnd + 0.1), white);
 
   // ---- forecastle fittings
@@ -177,7 +193,10 @@ export function buildTitanicBow(
   const zOf = (s: number): number => s - L / 2;
   const crane = v3(0, fcY(6.5), zOf(6.5));
   hull.add(beam(crane, v3(0, crane.y + 2.1, crane.z), 0.45, 0.35, 10), fit);
-  hull.add(beam(v3(0, crane.y + 1.9, crane.z), v3(0.2, crane.y + 0.5, zOf(13.5)), 0.2, 0.14, 6), fit);
+  hull.add(
+    beam(v3(0, crane.y + 1.9, crane.z), v3(0.2, crane.y + 0.5, zOf(13.5)), 0.2, 0.14, 6),
+    fit,
+  );
   dark.add(new THREE.BoxGeometry(1.3, 0.1, 2.2).translate(0, fcY(3) + 0.03, zOf(3)), 0);
   for (const x of [-2.8, 2.8]) capstan(hull, x, fcY(12), zOf(12), 0.62, fit);
   capstan(hull, 0, fcY(17.5), zOf(17.5), 0.62, fit);
@@ -185,7 +204,10 @@ export function buildTitanicBow(
   // Anchor chains from the hawse pipes aft to the capstans and down the chain pipes.
   for (const side of [-1, 1] as const) {
     const hx = side * half(3.2, 10) * 0.8;
-    dark.add(new THREE.CylinderGeometry(0.4, 0.4, 0.1, 10).translate(hx, fcY(3.2) + 0.02, zOf(3.2)), 0);
+    dark.add(
+      new THREE.CylinderGeometry(0.4, 0.4, 0.1, 10).translate(hx, fcY(3.2) + 0.02, zOf(3.2)),
+      0,
+    );
     const a = v3(hx, fcY(3.2) + 0.15, zOf(3.2));
     const b = v3(side * 2.8, fcY(12) + 0.2, zOf(12));
     const c = v3(side * 1.6, fcY(15.5) + 0.15, zOf(15.5));
@@ -209,7 +231,16 @@ export function buildTitanicBow(
   // Its crosstree and a couple of stays still hanging off it.
   const along = mastTop.clone().sub(mastBase);
   const tree = mastBase.clone().addScaledVector(along, 0.78);
-  hull.add(beam(tree.clone().add(v3(-2.2, 0.3, 0.4)), tree.clone().add(v3(2.2, -0.3, -0.4)), 0.12, 0.12, 5), fit);
+  hull.add(
+    beam(
+      tree.clone().add(v3(-2.2, 0.3, 0.4)),
+      tree.clone().add(v3(2.2, -0.3, -0.4)),
+      0.12,
+      0.12,
+      5,
+    ),
+    fit,
+  );
   for (const [f, tx, ts] of [
     [0.55, -12.5, 44],
     [0.7, 11.5, 50],
@@ -242,7 +273,10 @@ export function buildTitanicBow(
   // Grand Staircase, expansion joint, gymnasium
   const bY = (s: number): number => T.boatDeckY + pitch(s);
   // Bridge wings across the full width, with wreckage where the wheelhouse was.
-  hull.add(new THREE.BoxGeometry(B * 0.98, 0.3, 2.2).translate(0, bY(T.bridge) + 0.15, zOf(T.bridge)), white);
+  hull.add(
+    new THREE.BoxGeometry(B * 0.98, 0.3, 2.2).translate(0, bY(T.bridge) + 0.15, zOf(T.bridge)),
+    white,
+  );
   for (let i = 0; i < 7; i++) {
     const x = (rnd() - 0.5) * 12;
     const w = 1 + rnd() * 3;
@@ -254,11 +288,29 @@ export function buildTitanicBow(
   }
   // The telemotor stand: all that is left of the wheelhouse.
   const tel = v3(0, bY(T.bridge + 1.6), zOf(T.bridge + 1.6));
-  hull.add(new THREE.CylinderGeometry(0.2, 0.32, 1.05, 10).translate(tel.x, tel.y + 0.52, tel.z), C.brass);
+  hull.add(
+    new THREE.CylinderGeometry(0.2, 0.32, 1.05, 10).translate(tel.x, tel.y + 0.52, tel.z),
+    C.brass,
+  );
   hull.add(new THREE.BoxGeometry(0.55, 0.45, 0.45).translate(tel.x, tel.y + 1.25, tel.z), C.brass);
-  hull.add(new THREE.CylinderGeometry(0.34, 0.34, 0.1, 12).rotateX(Math.PI / 2).translate(tel.x, tel.y + 1.25, tel.z - 0.28), C.brass);
+  hull.add(
+    new THREE.CylinderGeometry(0.34, 0.34, 0.1, 12)
+      .rotateX(Math.PI / 2)
+      .translate(tel.x, tel.y + 1.25, tel.z - 0.28),
+    C.brass,
+  );
   // Officers' quarters, roof pushed in.
-  deckHouse(hull, 0, bY(63), zOf((63 + T.officersEnd) / 2), 17, 2.7, T.officersEnd - 63, white, 0.9);
+  deckHouse(
+    hull,
+    0,
+    bY(63),
+    zOf((63 + T.officersEnd) / 2),
+    17,
+    2.7,
+    T.officersEnd - 63,
+    white,
+    0.9,
+  );
   // Funnel openings: a torn casing stub around a dark hole.
   for (const s of [T.funnel1, T.funnel2]) {
     const y0 = bY(s);
@@ -266,7 +318,13 @@ export function buildTitanicBow(
     casing.scale(3.7, 1, 2.9);
     casing.translate(0, y0 + 0.7, zOf(s));
     hull.add(jitter(casing, v3(0.15, 0.45, 0.15), 0.9, seed ^ Math.round(s)), C.rustDark);
-    dark.add(new THREE.CircleGeometry(1, 20).rotateX(-Math.PI / 2).scale(3.5, 1, 2.7).translate(0, y0 + 0.08, zOf(s)), 0);
+    dark.add(
+      new THREE.CircleGeometry(1, 20)
+        .rotateX(-Math.PI / 2)
+        .scale(3.5, 1, 2.7)
+        .translate(0, y0 + 0.08, zOf(s)),
+      0,
+    );
   }
   // Grand Staircase well: a black chasm framed by the remains of the dome's coaming.
   const [g0, g1] = T.staircase;
@@ -323,7 +381,9 @@ export function buildTitanicBow(
     stocklessAnchor(hull, p, n, 1.25, C.rustDark);
     const hawse = hullFrame(spec, 4.2, 6.2, side);
     dark.add(
-      new THREE.CircleGeometry(0.5, 12).applyMatrix4(facingMatrix(hawse.p.addScaledVector(hawse.n, 0.05), hawse.n, 1, 1)),
+      new THREE.CircleGeometry(0.5, 12).applyMatrix4(
+        facingMatrix(hawse.p.addScaledVector(hawse.n, 0.05), hawse.n, 1, 1),
+      ),
       0,
     );
   }
@@ -338,7 +398,15 @@ export function buildTitanicBow(
     curl(g, len, -(0.3 + rnd() * 0.8));
     jitter(g, 0.25, 0.7, seed + i * 7);
     const s = L - 7 - rnd() * 4;
-    g.applyMatrix4(trs((rnd() - 0.5) * (B - w) * 0.6, y + pitch(s) - tornT(s) * y * 0.15, zOf(s), 0, (rnd() - 0.5) * 0.4));
+    g.applyMatrix4(
+      trs(
+        (rnd() - 0.5) * (B - w) * 0.6,
+        y + pitch(s) - tornT(s) * y * 0.15,
+        zOf(s),
+        0,
+        (rnd() - 0.5) * 0.4,
+      ),
+    );
     hull.add(g, i === tornDecks.length - 1 ? white : C.blackPaint);
   }
   for (let i = 0; i < 8; i++) {
@@ -352,7 +420,9 @@ export function buildTitanicBow(
     curl(g, len, side * (0.5 + rnd() * 1.2));
     jitter(g, 0.12, 1.1, seed ^ (i * 31));
     // Peel outward and aft from the side.
-    g.applyMatrix4(trs(p.x, p.y, p.z, Math.PI / 2 - 0.2 + rnd() * 0.4, side * (0.4 + rnd() * 0.7), 0));
+    g.applyMatrix4(
+      trs(p.x, p.y, p.z, Math.PI / 2 - 0.2 + rnd() * 0.4, side * (0.4 + rnd() * 0.7), 0),
+    );
     hull.add(g, C.blackPaint);
   }
   // Boat-deck plating curling up at the break.
@@ -369,7 +439,14 @@ export function buildTitanicBow(
   for (let i = 0; i < 6; i++) {
     const s = L - 3 - rnd() * 6;
     const from = v3((rnd() - 0.5) * B * 0.7, 5 + rnd() * 7, zOf(s));
-    catenary(hull, from, from.clone().add(v3((rnd() - 0.5) * 3, -3 - rnd() * 4, 2 + rnd() * 3)), 0.8, 0.12, C.rustDark);
+    catenary(
+      hull,
+      from,
+      from.clone().add(v3((rnd() - 0.5) * 3, -3 - rnd() * 4, 2 + rnd() * 3)),
+      0.8,
+      0.12,
+      C.rustDark,
+    );
   }
 
   // ---- merge + paint
@@ -398,13 +475,73 @@ export function buildTitanicBow(
   const under: THREE.Vector3[] = [];
   for (const side of [-1, 1] as const) {
     under.push(
-      ...openingRow(portholes, spec, side, 7, T.tornStart - 2, (s) => 3.9 + pitch(s), 2.3, 0.46, 0.46, rnd, 0.3),
-      ...openingRow(portholes, spec, side, 5, T.tornStart - 2, (s) => 6.4 + pitch(s), 2.1, 0.46, 0.46, rnd, 0.2),
-      ...openingRow(portholes, spec, side, 3, T.forecastleEnd - 2, (s) => 8.9 + pitch(s), 2.4, 0.46, 0.46, rnd, 0.25),
-      ...openingRow(windows, spec, side, T.wellEnd + 2, T.tornStart - 1, (s) => 9.9 + pitch(s), 2.4, 0.8, 0.95, rnd, 0.15),
+      ...openingRow(
+        portholes,
+        spec,
+        side,
+        7,
+        T.tornStart - 2,
+        (s) => 3.9 + pitch(s),
+        2.3,
+        0.46,
+        0.46,
+        rnd,
+        0.3,
+      ),
+      ...openingRow(
+        portholes,
+        spec,
+        side,
+        5,
+        T.tornStart - 2,
+        (s) => 6.4 + pitch(s),
+        2.1,
+        0.46,
+        0.46,
+        rnd,
+        0.2,
+      ),
+      ...openingRow(
+        portholes,
+        spec,
+        side,
+        3,
+        T.forecastleEnd - 2,
+        (s) => 8.9 + pitch(s),
+        2.4,
+        0.46,
+        0.46,
+        rnd,
+        0.25,
+      ),
+      ...openingRow(
+        windows,
+        spec,
+        side,
+        T.wellEnd + 2,
+        T.tornStart - 1,
+        (s) => 9.9 + pitch(s),
+        2.4,
+        0.8,
+        0.95,
+        rnd,
+        0.15,
+      ),
     );
     // A-deck promenade: the long run of big openings under the boat deck.
-    openingRow(windows, spec, side, T.wellEnd + 2, T.tornStart, (s) => 12.3 + pitch(s), 1.95, 1.35, 1.5, rnd, 0.08);
+    openingRow(
+      windows,
+      spec,
+      side,
+      T.wellEnd + 2,
+      T.tornStart,
+      (s) => 12.3 + pitch(s),
+      1.95,
+      1.35,
+      1.5,
+      rnd,
+      0.08,
+    );
   }
   // Superstructure front, facing the well deck.
   for (const y of [9.9, 12.3]) {
@@ -419,7 +556,12 @@ export function buildTitanicBow(
     windows.push(facingMatrix(v3(12.5, bY(s) + 1.7, zOf(s)), v3(1, 0, 0), 1.5, 2.0));
   }
   if (detail.openings) {
-    const ph = makeInstanced(portholeGeometry(), fittingMaterial(), portholes, 'titanic-bow-portholes');
+    const ph = makeInstanced(
+      portholeGeometry(),
+      fittingMaterial(),
+      portholes,
+      'titanic-bow-portholes',
+    );
     const wi = makeInstanced(windowGeometry(), fittingMaterial(), windows, 'titanic-bow-windows');
     if (ph) near.push(ph);
     if (wi) near.push(wi);
@@ -438,10 +580,18 @@ export function buildTitanicBow(
       [T.wellEnd + 0.3, bY(T.wellEnd + 0.3)],
     ] as const) {
       const w = half(s, 10) - 0.4;
-      railing(rails, [v3(-w, y, zOf(s)), v3(w, y, zOf(s))], rnd, { outward: () => v3(0, 0, -1), bend: 0.3 });
+      railing(rails, [v3(-w, y, zOf(s)), v3(w, y, zOf(s))], rnd, {
+        outward: () => v3(0, 0, -1),
+        bend: 0.3,
+      });
     }
     for (const side of [-1, 1] as const) {
-      railing(rails, edgePath(spec, T.forecastleEnd, T.wellEnd, 2, (s) => top(s), side, 0.2), rnd, { outward, bend: 0.4 });
+      railing(
+        rails,
+        edgePath(spec, T.forecastleEnd, T.wellEnd, 2, (s) => top(s), side, 0.2),
+        rnd,
+        { outward, bend: 0.4 },
+      );
       railing(rails, edgePath(spec, T.wellEnd + 0.5, T.tornStart, 2, bY, side, 0.3), rnd, {
         outward,
         bend: 0.9,
@@ -455,13 +605,47 @@ export function buildTitanicBow(
   // Rusticles: deck edges, the stem, under portholes, the torn end.
   for (const side of [-1, 1] as const) {
     const o = v3(side, 0, 0);
-    rusticlesAlong(rust, edgePath(spec, 0.5, T.forecastleEnd, 1, fcY, side, -0.05), 1.3, 0.3, 1.8, rnd, o);
-    rusticlesAlong(rust, edgePath(spec, T.forecastleEnd, T.wellEnd, 1, top, side, -0.05), 1.1, 0.3, 1.4, rnd, o);
-    rusticlesAlong(rust, edgePath(spec, T.wellEnd, T.tornStart + 10, 1, bY, side, -0.05), 1.1, 0.3, 1.6, rnd, o);
-    rusticlesAlong(rust, edgePath(spec, T.wellEnd, T.tornStart, 1, (s) => 11 + pitch(s), side, -0.08), 0.5, 0.2, 0.9, rnd, o);
+    rusticlesAlong(
+      rust,
+      edgePath(spec, 0.5, T.forecastleEnd, 1, fcY, side, -0.05),
+      1.3,
+      0.3,
+      1.8,
+      rnd,
+      o,
+    );
+    rusticlesAlong(
+      rust,
+      edgePath(spec, T.forecastleEnd, T.wellEnd, 1, top, side, -0.05),
+      1.1,
+      0.3,
+      1.4,
+      rnd,
+      o,
+    );
+    rusticlesAlong(
+      rust,
+      edgePath(spec, T.wellEnd, T.tornStart + 10, 1, bY, side, -0.05),
+      1.1,
+      0.3,
+      1.6,
+      rnd,
+      o,
+    );
+    rusticlesAlong(
+      rust,
+      edgePath(spec, T.wellEnd, T.tornStart, 1, (s) => 11 + pitch(s), side, -0.08),
+      0.5,
+      0.2,
+      0.9,
+      rnd,
+      o,
+    );
   }
-  for (let y = 1; y < T.forecastleY; y += 0.6) hangRusticle(rust, v3(0, y, -L / 2 - 0.05), 0.3 + rnd() * 0.9, rnd);
-  for (const p of under) if (rnd() < 0.45) hangRusticle(rust, p.clone().add(v3(0, -0.28, 0)), 0.25 + rnd() * 0.7, rnd);
+  for (let y = 1; y < T.forecastleY; y += 0.6)
+    hangRusticle(rust, v3(0, y, -L / 2 - 0.05), 0.3 + rnd() * 0.9, rnd);
+  for (const p of under)
+    if (rnd() < 0.45) hangRusticle(rust, p.clone().add(v3(0, -0.28, 0)), 0.25 + rnd() * 0.7, rnd);
   for (let i = 0; i < 160; i++) {
     const s = L - rnd() * 12;
     const y = 2 + rnd() * 11;
@@ -472,33 +656,58 @@ export function buildTitanicBow(
   }
   for (let i = 0; i < 60; i++) {
     // Along the well-deck crane jibs and the fallen mast.
-    const p = mastBase.clone().lerp(mastTop, rnd()).add(v3(0, -0.4, 0));
+    const p = mastBase
+      .clone()
+      .lerp(mastTop, rnd())
+      .add(v3(0, -0.4, 0));
     hangRusticle(rust, p, 0.3 + rnd() * 1.1, rnd);
   }
   rust.thin(detail.growth);
   if (detail.growth > 1) {
     // Ultra: a second pass of short ones along the boat-deck edges.
     for (const side of [-1, 1] as const) {
-      rusticlesAlong(rust, edgePath(spec, T.wellEnd, T.tornStart, 1, bY, side, -0.05), detail.growth - 1, 0.2, 0.6, rnd, v3(side, 0, 0));
+      rusticlesAlong(
+        rust,
+        edgePath(spec, T.wellEnd, T.tornStart, 1, bY, side, -0.05),
+        detail.growth - 1,
+        0.2,
+        0.6,
+        rnd,
+        v3(side, 0, 0),
+      );
     }
   }
   const rm = makeInstanced(rusticleGeometry(), growthMaterial(), rust, 'titanic-bow-rusticles');
   if (rm) near.push(rm);
 
   // ---- far silhouette: coarse loft + the superstructure block
-  const coarse: LoftSpec = { ...spec, stations: makeStations(L, 12, 6, [[0, 30]], [T.forecastleEnd, T.wellEnd]), levels: 2, deform };
+  const coarse: LoftSpec = {
+    ...spec,
+    stations: makeStations(L, 12, 6, [[0, 30]], [T.forecastleEnd, T.wellEnd]),
+    levels: 2,
+    deform,
+  };
   const sil = new PartBin();
   sil.add(loftSides(coarse), 0xffffff);
   sil.add(loftCap(coarse, L, 1), 0xffffff);
-  sil.add(deckStrip(coarse, 0, L, (s) => top(s) - 0.02, 0, 1), 0xffffff);
+  sil.add(
+    deckStrip(coarse, 0, L, (s) => top(s) - 0.02, 0, 1),
+    0xffffff,
+  );
   sil.add(new THREE.BoxGeometry(17, 2.7, 60).translate(0, bY(90) + 1.35, zOf(92)), 0xffffff);
   const far = new THREE.Mesh(sil.merge()!, silhouetteMaterial(0x4a2618));
 
   // ---- colliders (local): the fine bow, the full-beam body, the deck houses
   const colliders = [
     new THREE.Box3(v3(-halfB * 0.45, -2.5, -L / 2), v3(halfB * 0.45, T.forecastleY + 1, zOf(18))),
-    new THREE.Box3(v3(-halfB * 0.85, -2.5, zOf(18)), v3(halfB * 0.85, T.forecastleY + 0.6, zOf(T.forecastleEnd))),
-    new THREE.Box3(v3(-halfB, -2.5, zOf(T.forecastleEnd)), v3(halfB, T.wellY + 0.5, zOf(T.wellEnd))),
+    new THREE.Box3(
+      v3(-halfB * 0.85, -2.5, zOf(18)),
+      v3(halfB * 0.85, T.forecastleY + 0.6, zOf(T.forecastleEnd)),
+    ),
+    new THREE.Box3(
+      v3(-halfB, -2.5, zOf(T.forecastleEnd)),
+      v3(halfB, T.wellY + 0.5, zOf(T.wellEnd)),
+    ),
     new THREE.Box3(v3(-halfB, -2.5, zOf(T.wellEnd)), v3(halfB, T.boatDeckY + T.pitchM, L / 2 - 4)),
     new THREE.Box3(v3(-9, T.boatDeckY, zOf(62)), v3(12.6, T.boatDeckY + T.pitchM + 2.6, zOf(122))),
   ];
@@ -514,7 +723,14 @@ export function buildTitanicBow(
 }
 
 /** A wall across the hull at station s from y0 to y1 (forecastle break, superstructure front). */
-function crossWall(bin: PartBin, spec: LoftSpec, s: number, y0: number, y1: number, color: number): void {
+function crossWall(
+  bin: PartBin,
+  spec: LoftSpec,
+  s: number,
+  y0: number,
+  y1: number,
+  color: number,
+): void {
   const w0 = spec.half(s, y0) * 2;
   const w1 = spec.half(s, y1) * 2;
   const g = new THREE.BoxGeometry(1, 1, 0.35, 6, 3, 1);

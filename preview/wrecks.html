@@ -11,7 +11,9 @@
         height: 100%;
         background: #03080b;
         color: #cde0e5;
-        font: 12px/1.4 'Space Mono', monospace;
+        font:
+          12px/1.4 'Space Mono',
+          monospace;
         overflow: hidden;
       }
       canvas {
@@ -41,10 +43,26 @@
   </head>
   <body>
     <div id="panel">
-      <label>wreck <select id="wreck"></select></label>
-      <label>tier <select id="tier"></select></label>
-      <label>lod <select id="lod"><option>auto</option><option>near</option><option>mid</option><option>far</option></select></label>
-      <label>fog <input id="fog" type="range" min="0" max="0.03" step="0.001" value="0.008" /></label>
+      <label
+        >wreck
+        <select id="wreck"></select
+      ></label>
+      <label
+        >tier
+        <select id="tier"></select
+      ></label>
+      <label
+        >lod
+        <select id="lod">
+          <option>auto</option>
+          <option>near</option>
+          <option>mid</option>
+          <option>far</option>
+        </select></label
+      >
+      <label
+        >fog <input id="fog" type="range" min="0" max="0.03" step="0.001" value="0.008"
+      /></label>
       <label>spot az <input id="spotAz" type="range" min="0" max="360" value="220" /></label>
       <label>spot el <input id="spotEl" type="range" min="5" max="85" value="35" /></label>
       <div>drag: orbit · right-drag: pan · wheel: zoom · H: hide panel</div>

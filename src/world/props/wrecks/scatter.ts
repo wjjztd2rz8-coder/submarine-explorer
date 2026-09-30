@@ -27,7 +27,13 @@
 import * as THREE from 'three';
 import { assembleWreck, type WreckBuilt } from './assemble.js';
 import type { WreckDetail } from './detail.js';
-import { InstanceList, LIFE_TINTS, anemoneGeometry, makeInstanced, squirtGeometry } from './instances.js';
+import {
+  InstanceList,
+  LIFE_TINTS,
+  anemoneGeometry,
+  makeInstanced,
+  squirtGeometry,
+} from './instances.js';
 import { PartBin, beam, curl, jitter, projectUVs, v3 } from './kit.js';
 import {
   WRECK_COLORS as C,
@@ -99,10 +105,17 @@ function piece(id: PieceId): THREE.BufferGeometry {
 }
 
 /** Merge a bin, weather it (steel/wood) and give it box-projected UVs. */
-function finish(bin: PartBin, paint: 'steel' | 'wood' | 'none', seed: number, uvRepeat = 4): THREE.BufferGeometry {
+function finish(
+  bin: PartBin,
+  paint: 'steel' | 'wood' | 'none',
+  seed: number,
+  uvRepeat = 4,
+): THREE.BufferGeometry {
   const g = bin.merge()!;
-  if (paint === 'steel') paintWreck(g, { seed, rustiness: 0.8, growth: 0.2, silt: 0.5, mudBand: 0.6 });
-  if (paint === 'wood') paintWreck(g, { seed, rustiness: 0, growth: 0.15, silt: 0.7, mudBand: 0.3, wood: true });
+  if (paint === 'steel')
+    paintWreck(g, { seed, rustiness: 0.8, growth: 0.2, silt: 0.5, mudBand: 0.6 });
+  if (paint === 'wood')
+    paintWreck(g, { seed, rustiness: 0, growth: 0.15, silt: 0.7, mudBand: 0.3, wood: true });
   projectUVs(g, uvRepeat);
   g.computeBoundingBox();
   g.computeBoundingSphere();
@@ -125,7 +138,9 @@ function makePiece(id: PieceId): THREE.BufferGeometry {
         b.add(ring, C.rustDark);
       }
       for (const x of [-1.25, 0, 1.25]) {
-        const mouth = new THREE.CylinderGeometry(0.55, 0.55, 0.25, 14).rotateX(Math.PI / 2).translate(x, r - 0.55, 1.86);
+        const mouth = new THREE.CylinderGeometry(0.55, 0.55, 0.25, 14)
+          .rotateX(Math.PI / 2)
+          .translate(x, r - 0.55, 1.86);
         b.add(mouth, C.rustDark);
         const hole = new THREE.CircleGeometry(0.44, 14).translate(x, r - 0.55, 2.0);
         b.add(hole, 0x050303);
@@ -152,7 +167,9 @@ function makePiece(id: PieceId): THREE.BufferGeometry {
       return finish(b, 'steel', 0x3f, 1);
     }
     case 'pipe': {
-      const g = new THREE.CylinderGeometry(0.5, 0.5, 1, 10, 3, true).rotateX(Math.PI / 2).translate(0, 0.5, 0);
+      const g = new THREE.CylinderGeometry(0.5, 0.5, 1, 10, 3, true)
+        .rotateX(Math.PI / 2)
+        .translate(0, 0.5, 0);
       b.add(jitter(g, 0.04, 3, 0x21), C.rust);
       return finish(b, 'steel', 0x21, 1);
     }
@@ -164,15 +181,23 @@ function makePiece(id: PieceId): THREE.BufferGeometry {
     case 'crockery': {
       // A stack of plates and a cup, silted over (1 = a 25 cm plate).
       for (let i = 0; i < 4; i++) {
-        const p = new THREE.CylinderGeometry(0.5, 0.4, 0.05, 14).translate(0.03 * i, 0.03 + i * 0.05, 0.02 * i);
+        const p = new THREE.CylinderGeometry(0.5, 0.4, 0.05, 14).translate(
+          0.03 * i,
+          0.03 + i * 0.05,
+          0.02 * i,
+        );
         b.add(p, 0xb9b1a2);
       }
       b.add(new THREE.CylinderGeometry(0.2, 0.15, 0.3, 10).translate(0.7, 0.15, 0.1), 0xa9a092);
       return finish(b, 'none', 0);
     }
     case 'bottle': {
-      const g = new THREE.CylinderGeometry(0.12, 0.12, 0.6, 8).rotateZ(Math.PI / 2).translate(0, 0.12, 0);
-      const neck = new THREE.CylinderGeometry(0.04, 0.1, 0.25, 8).rotateZ(Math.PI / 2).translate(0.42, 0.12, 0);
+      const g = new THREE.CylinderGeometry(0.12, 0.12, 0.6, 8)
+        .rotateZ(Math.PI / 2)
+        .translate(0, 0.12, 0);
+      const neck = new THREE.CylinderGeometry(0.04, 0.1, 0.25, 8)
+        .rotateZ(Math.PI / 2)
+        .translate(0.42, 0.12, 0);
       b.add(g, 0x2e3a24);
       b.add(neck, 0x2e3a24);
       return finish(b, 'none', 0);
@@ -205,7 +230,9 @@ function makePiece(id: PieceId): THREE.BufferGeometry {
       return turretPiece(id);
     case 'barrel': {
       // A 15 cm secondary gun barrel, 8 m, lying half in the mud.
-      const g = new THREE.CylinderGeometry(0.2, 0.3, 8, 10).rotateX(Math.PI / 2).translate(0, 0.25, 0);
+      const g = new THREE.CylinderGeometry(0.2, 0.3, 8, 10)
+        .rotateX(Math.PI / 2)
+        .translate(0, 0.25, 0);
       b.add(g, C.greyPaint);
       return finish(b, 'steel', 0x8a, 2);
     }
@@ -219,7 +246,14 @@ function makePiece(id: PieceId): THREE.BufferGeometry {
       g.computeVertexNormals();
       b.add(g, C.silt);
       const out = b.merge()!;
-      paintWreck(out, { seed: 0x5ed, rustiness: 0, growth: 0, silt: 0.6, mudBand: 0.5, wood: true });
+      paintWreck(out, {
+        seed: 0x5ed,
+        rustiness: 0,
+        growth: 0,
+        silt: 0.6,
+        mudBand: 0.5,
+        wood: true,
+      });
       return out;
     }
     case 'berm': {
@@ -234,7 +268,9 @@ function makePiece(id: PieceId): THREE.BufferGeometry {
     }
     case 'spar': {
       // A spar, 1 m long along Z before scaling (length set per instance), tapered.
-      const g = new THREE.CylinderGeometry(0.35, 0.5, 1, 9, 4).rotateX(Math.PI / 2).translate(0, 0.45, 0);
+      const g = new THREE.CylinderGeometry(0.35, 0.5, 1, 9, 4)
+        .rotateX(Math.PI / 2)
+        .translate(0, 0.45, 0);
       b.add(jitter(g, 0.02, 4, 0x5a), C.oak);
       return finish(b, 'wood', 0x5a, 0.5);
     }
@@ -246,7 +282,12 @@ function makePiece(id: PieceId): THREE.BufferGeometry {
     }
     case 'coil': {
       for (let i = 0; i < 3; i++) {
-        b.add(new THREE.TorusGeometry(0.5 - i * 0.1, 0.07, 5, 16).rotateX(Math.PI / 2).translate(0, 0.07 + i * 0.1, 0), 0x3a3024);
+        b.add(
+          new THREE.TorusGeometry(0.5 - i * 0.1, 0.07, 5, 16)
+            .rotateX(Math.PI / 2)
+            .translate(0, 0.07 + i * 0.1, 0),
+          0x3a3024,
+        );
       }
       return finish(b, 'wood', 0xc1, 0.5);
     }
@@ -282,10 +323,20 @@ function turretPiece(id: 'turretInverted' | 'turretSide' | 'turretUpright'): THR
   }
   house.computeVertexNormals();
   b.add(house, C.greyPaint);
-  b.add(new THREE.BoxGeometry(W * 1.08, 1, 1.5).translate(0, H / 2 - 0.9, Lh / 2 - 0.3), C.greyPaint);
-  const trunk = new THREE.CylinderGeometry(5.3, 5.3, 5.5, 24, 2, true).translate(0, -H / 2 - 2.75, 0);
+  b.add(
+    new THREE.BoxGeometry(W * 1.08, 1, 1.5).translate(0, H / 2 - 0.9, Lh / 2 - 0.3),
+    C.greyPaint,
+  );
+  const trunk = new THREE.CylinderGeometry(5.3, 5.3, 5.5, 24, 2, true).translate(
+    0,
+    -H / 2 - 2.75,
+    0,
+  );
   b.add(jitter(trunk, 0.1, 0.8, 0x7e), C.rustDark);
-  b.add(new THREE.CircleGeometry(5.2, 24).rotateX(Math.PI / 2).translate(0, -H / 2 - 5.4, 0), C.interior);
+  b.add(
+    new THREE.CircleGeometry(5.2, 24).rotateX(Math.PI / 2).translate(0, -H / 2 - 5.4, 0),
+    C.interior,
+  );
   for (const x of [-2.1, 2.1]) {
     const barrel = new THREE.CylinderGeometry(0.33, 0.55, 19.6, 12);
     barrel.rotateX(Math.PI / 2).translate(x, -0.3, -Lh / 2 - 8.5);
@@ -307,7 +358,10 @@ function turretPiece(id: 'turretInverted' | 'turretSide' | 'turretUpright'): THR
 
 // ------------------------------------------------------------ kits
 
-const disc = (dims: readonly [number, number, number]): { rx: number; rz: number } => ({ rx: dims[0], rz: dims[0] });
+const disc = (dims: readonly [number, number, number]): { rx: number; rz: number } => ({
+  rx: dims[0],
+  rz: dims[0],
+});
 const CREAM = [0xd7d0c4, 0xcfc6b5, 0xbdb3a2] as const;
 
 const KITS: Record<WreckScatterId, Kit> = {
@@ -333,9 +387,46 @@ const KITS: Record<WreckScatterId, Kit> = {
             [3.4, 4.6, 1.95],
           ],
         },
-        { name: 'coal', geom: 'coal', mat: 'fitting', count: 160, size: [0.25, 0.7], pose: 'tumble', sink: 0.35, cluster: 0.7, small: true },
-        { name: 'plates', geom: 'plate', mat: 'steel', big: true, count: 8, size: [[1.5, 4], [1, 1], [1.5, 5]], pose: 'lie', sink: 0.02, ring: [0.35, 1] },
-        { name: 'pipes', geom: 'pipe', mat: 'steel', count: 7, size: [[0.2, 0.35], [0.2, 0.35], [2, 6]], proportional: true, pose: 'lie', sink: 0.3 },
+        {
+          name: 'coal',
+          geom: 'coal',
+          mat: 'fitting',
+          count: 160,
+          size: [0.25, 0.7],
+          pose: 'tumble',
+          sink: 0.35,
+          cluster: 0.7,
+          small: true,
+        },
+        {
+          name: 'plates',
+          geom: 'plate',
+          mat: 'steel',
+          big: true,
+          count: 8,
+          size: [
+            [1.5, 4],
+            [1, 1],
+            [1.5, 5],
+          ],
+          pose: 'lie',
+          sink: 0.02,
+          ring: [0.35, 1],
+        },
+        {
+          name: 'pipes',
+          geom: 'pipe',
+          mat: 'steel',
+          count: 7,
+          size: [
+            [0.2, 0.35],
+            [0.2, 0.35],
+            [2, 6],
+          ],
+          proportional: true,
+          pose: 'lie',
+          sink: 0.3,
+        },
       ],
     }),
   },
@@ -343,14 +434,99 @@ const KITS: Record<WreckScatterId, Kit> = {
     spec: (dims) => ({
       ...disc(dims),
       kinds: [
-        { name: 'plates', geom: 'plate', mat: 'steel', big: true, count: 55, size: [[1.5, 6], [1, 1.5], [1.5, 7]], pose: 'lie', sink: 0.02 },
-        { name: 'frames', geom: 'frame', mat: 'steel', big: true, count: 30, size: [[1, 1.4], [1, 1.4], [3, 9]], pose: 'lie', sink: 0.05 },
-        { name: 'pipes', geom: 'pipe', mat: 'steel', count: 26, size: [[0.15, 0.35], [0.15, 0.35], [1.5, 6]], proportional: true, pose: 'lie', sink: 0.3 },
-        { name: 'cowls', geom: 'cowl', mat: 'steel', count: 5, size: [0.8, 1.2], pose: 'upright', sink: 0.15 },
-        { name: 'benches', geom: 'bench', mat: 'fitting', count: 10, size: [0.9, 1.1], pose: 'upright', sink: 0.05, small: true },
-        { name: 'crockery', geom: 'crockery', mat: 'fitting', count: 70, size: [0.22, 0.3], pose: 'lie', sink: 0.2, cluster: 0.4, small: true, tints: CREAM },
-        { name: 'bottles', geom: 'bottle', mat: 'fitting', count: 50, size: [0.8, 1.1], pose: 'lie', sink: 0.25, small: true },
-        { name: 'coal', geom: 'coal', mat: 'fitting', count: 160, size: [0.15, 0.5], pose: 'tumble', sink: 0.35, small: true },
+        {
+          name: 'plates',
+          geom: 'plate',
+          mat: 'steel',
+          big: true,
+          count: 55,
+          size: [
+            [1.5, 6],
+            [1, 1.5],
+            [1.5, 7],
+          ],
+          pose: 'lie',
+          sink: 0.02,
+        },
+        {
+          name: 'frames',
+          geom: 'frame',
+          mat: 'steel',
+          big: true,
+          count: 30,
+          size: [
+            [1, 1.4],
+            [1, 1.4],
+            [3, 9],
+          ],
+          pose: 'lie',
+          sink: 0.05,
+        },
+        {
+          name: 'pipes',
+          geom: 'pipe',
+          mat: 'steel',
+          count: 26,
+          size: [
+            [0.15, 0.35],
+            [0.15, 0.35],
+            [1.5, 6],
+          ],
+          proportional: true,
+          pose: 'lie',
+          sink: 0.3,
+        },
+        {
+          name: 'cowls',
+          geom: 'cowl',
+          mat: 'steel',
+          count: 5,
+          size: [0.8, 1.2],
+          pose: 'upright',
+          sink: 0.15,
+        },
+        {
+          name: 'benches',
+          geom: 'bench',
+          mat: 'fitting',
+          count: 10,
+          size: [0.9, 1.1],
+          pose: 'upright',
+          sink: 0.05,
+          small: true,
+        },
+        {
+          name: 'crockery',
+          geom: 'crockery',
+          mat: 'fitting',
+          count: 70,
+          size: [0.22, 0.3],
+          pose: 'lie',
+          sink: 0.2,
+          cluster: 0.4,
+          small: true,
+          tints: CREAM,
+        },
+        {
+          name: 'bottles',
+          geom: 'bottle',
+          mat: 'fitting',
+          count: 50,
+          size: [0.8, 1.1],
+          pose: 'lie',
+          sink: 0.25,
+          small: true,
+        },
+        {
+          name: 'coal',
+          geom: 'coal',
+          mat: 'fitting',
+          count: 160,
+          size: [0.15, 0.5],
+          pose: 'tumble',
+          sink: 0.35,
+          small: true,
+        },
       ],
     }),
   },
@@ -358,12 +534,79 @@ const KITS: Record<WreckScatterId, Kit> = {
     spec: (dims) => ({
       ...disc(dims),
       kinds: [
-        { name: 'plates', geom: 'plate', mat: 'steel', big: true, count: 45, size: [[2, 8], [1, 2], [2, 9]], pose: 'lie', sink: 0.03, cluster: 0.3 },
-        { name: 'frames', geom: 'frame', mat: 'steel', big: true, count: 26, size: [[1.2, 2], [1.2, 2], [4, 12]], pose: 'lie', sink: 0.05 },
-        { name: 'pipes', geom: 'pipe', mat: 'steel', count: 18, size: [[0.2, 0.5], [0.2, 0.5], [2, 8]], proportional: true, pose: 'lie', sink: 0.3 },
-        { name: 'cowls', geom: 'cowl', mat: 'steel', count: 3, size: [0.9, 1.3], pose: 'upright', sink: 0.15 },
-        { name: 'crockery', geom: 'crockery', mat: 'fitting', count: 30, size: [0.22, 0.3], pose: 'lie', sink: 0.2, small: true, tints: CREAM },
-        { name: 'coal', geom: 'coal', mat: 'fitting', count: 120, size: [0.15, 0.6], pose: 'tumble', sink: 0.35, small: true },
+        {
+          name: 'plates',
+          geom: 'plate',
+          mat: 'steel',
+          big: true,
+          count: 45,
+          size: [
+            [2, 8],
+            [1, 2],
+            [2, 9],
+          ],
+          pose: 'lie',
+          sink: 0.03,
+          cluster: 0.3,
+        },
+        {
+          name: 'frames',
+          geom: 'frame',
+          mat: 'steel',
+          big: true,
+          count: 26,
+          size: [
+            [1.2, 2],
+            [1.2, 2],
+            [4, 12],
+          ],
+          pose: 'lie',
+          sink: 0.05,
+        },
+        {
+          name: 'pipes',
+          geom: 'pipe',
+          mat: 'steel',
+          count: 18,
+          size: [
+            [0.2, 0.5],
+            [0.2, 0.5],
+            [2, 8],
+          ],
+          proportional: true,
+          pose: 'lie',
+          sink: 0.3,
+        },
+        {
+          name: 'cowls',
+          geom: 'cowl',
+          mat: 'steel',
+          count: 3,
+          size: [0.9, 1.3],
+          pose: 'upright',
+          sink: 0.15,
+        },
+        {
+          name: 'crockery',
+          geom: 'crockery',
+          mat: 'fitting',
+          count: 30,
+          size: [0.22, 0.3],
+          pose: 'lie',
+          sink: 0.2,
+          small: true,
+          tints: CREAM,
+        },
+        {
+          name: 'coal',
+          geom: 'coal',
+          mat: 'fitting',
+          count: 120,
+          size: [0.15, 0.6],
+          pose: 'tumble',
+          sink: 0.35,
+          small: true,
+        },
       ],
     }),
   },
@@ -373,11 +616,67 @@ const KITS: Record<WreckScatterId, Kit> = {
       return {
         ...disc(dims),
         kinds: [
-          { name: 'inverted', geom: 'turretInverted', mat: 'steel', big: true, count: 2, size: [1, 1], pose: 'upright', fixed: [[-0.55 * r, -0.35 * r, 0.6], [0.1 * r, 0.05 * r, 2.3]] },
-          { name: 'side', geom: 'turretSide', mat: 'steel', big: true, count: 1, size: [1, 1], pose: 'upright', fixed: [[0.6 * r, 0.3 * r, 4.1]] },
-          { name: 'upright', geom: 'turretUpright', mat: 'steel', big: true, count: 1, size: [1, 1], pose: 'upright', fixed: [[-0.2 * r, 0.62 * r, 5.4]] },
-          { name: 'plates', geom: 'plate', mat: 'steel', big: true, count: 20, size: [[1.5, 5], [1, 1.5], [1.5, 6]], pose: 'lie', sink: 0.03 },
-          { name: 'mud', geom: 'mudBlock', mat: 'sediment', count: 24, size: [[2, 5], [0.8, 1.6], [2, 6]], pose: 'upright', sink: 0.15, ring: [0.1, 1] },
+          {
+            name: 'inverted',
+            geom: 'turretInverted',
+            mat: 'steel',
+            big: true,
+            count: 2,
+            size: [1, 1],
+            pose: 'upright',
+            fixed: [
+              [-0.55 * r, -0.35 * r, 0.6],
+              [0.1 * r, 0.05 * r, 2.3],
+            ],
+          },
+          {
+            name: 'side',
+            geom: 'turretSide',
+            mat: 'steel',
+            big: true,
+            count: 1,
+            size: [1, 1],
+            pose: 'upright',
+            fixed: [[0.6 * r, 0.3 * r, 4.1]],
+          },
+          {
+            name: 'upright',
+            geom: 'turretUpright',
+            mat: 'steel',
+            big: true,
+            count: 1,
+            size: [1, 1],
+            pose: 'upright',
+            fixed: [[-0.2 * r, 0.62 * r, 5.4]],
+          },
+          {
+            name: 'plates',
+            geom: 'plate',
+            mat: 'steel',
+            big: true,
+            count: 20,
+            size: [
+              [1.5, 5],
+              [1, 1.5],
+              [1.5, 6],
+            ],
+            pose: 'lie',
+            sink: 0.03,
+          },
+          {
+            name: 'mud',
+            geom: 'mudBlock',
+            mat: 'sediment',
+            count: 24,
+            size: [
+              [2, 5],
+              [0.8, 1.6],
+              [2, 6],
+            ],
+            pose: 'upright',
+            sink: 0.15,
+            ring: [0.1, 1],
+          },
         ],
       };
     },
@@ -386,12 +685,81 @@ const KITS: Record<WreckScatterId, Kit> = {
     spec: (dims) => ({
       ...disc(dims),
       kinds: [
-        { name: 'plates', geom: 'plate', mat: 'steel', big: true, count: 45, size: [[2, 7], [1, 2], [2, 8]], pose: 'lie', sink: 0.03, cluster: 0.3 },
-        { name: 'frames', geom: 'frame', mat: 'steel', big: true, count: 24, size: [[1.2, 2], [1.2, 2], [4, 11]], pose: 'lie', sink: 0.05 },
-        { name: 'pipes', geom: 'pipe', mat: 'steel', count: 16, size: [[0.2, 0.5], [0.2, 0.5], [2, 8]], proportional: true, pose: 'lie', sink: 0.3 },
-        { name: 'barrels', geom: 'barrel', mat: 'steel', count: 2, size: [1, 1], pose: 'lie', sink: 0.3 },
-        { name: 'mud', geom: 'mudBlock', mat: 'sediment', count: 30, size: [[1.5, 4], [0.5, 1.2], [1.5, 5]], pose: 'upright', sink: 0.1 },
-        { name: 'coal', geom: 'coal', mat: 'fitting', count: 60, size: [0.2, 0.6], pose: 'tumble', sink: 0.3, small: true },
+        {
+          name: 'plates',
+          geom: 'plate',
+          mat: 'steel',
+          big: true,
+          count: 45,
+          size: [
+            [2, 7],
+            [1, 2],
+            [2, 8],
+          ],
+          pose: 'lie',
+          sink: 0.03,
+          cluster: 0.3,
+        },
+        {
+          name: 'frames',
+          geom: 'frame',
+          mat: 'steel',
+          big: true,
+          count: 24,
+          size: [
+            [1.2, 2],
+            [1.2, 2],
+            [4, 11],
+          ],
+          pose: 'lie',
+          sink: 0.05,
+        },
+        {
+          name: 'pipes',
+          geom: 'pipe',
+          mat: 'steel',
+          count: 16,
+          size: [
+            [0.2, 0.5],
+            [0.2, 0.5],
+            [2, 8],
+          ],
+          proportional: true,
+          pose: 'lie',
+          sink: 0.3,
+        },
+        {
+          name: 'barrels',
+          geom: 'barrel',
+          mat: 'steel',
+          count: 2,
+          size: [1, 1],
+          pose: 'lie',
+          sink: 0.3,
+        },
+        {
+          name: 'mud',
+          geom: 'mudBlock',
+          mat: 'sediment',
+          count: 30,
+          size: [
+            [1.5, 4],
+            [0.5, 1.2],
+            [1.5, 5],
+          ],
+          pose: 'upright',
+          sink: 0.1,
+        },
+        {
+          name: 'coal',
+          geom: 'coal',
+          mat: 'fitting',
+          count: 60,
+          size: [0.2, 0.6],
+          pose: 'tumble',
+          sink: 0.3,
+          small: true,
+        },
       ],
     }),
   },
@@ -400,9 +768,52 @@ const KITS: Record<WreckScatterId, Kit> = {
       rx: dims[1],
       rz: dims[0],
       kinds: [
-        { name: 'blocks', geom: 'mudBlock', mat: 'sediment', big: true, count: 140, size: [[3, 12], [1, 3.5], [3, 14]], pose: 'upright', sink: 0.2, align: 1.2, cluster: 0.2 },
-        { name: 'berms', geom: 'berm', mat: 'sediment', big: true, count: 26, size: [[4, 7], [1.5, 2.5], [25, 45]], pose: 'upright', sink: 0.25, align: 0.12, ring: [0.8, 1] },
-        { name: 'clods', geom: 'mudBlock', mat: 'sediment', count: 160, size: [[0.6, 2], [0.3, 0.8], [0.6, 2.4]], pose: 'upright', sink: 0.15, small: true },
+        {
+          name: 'blocks',
+          geom: 'mudBlock',
+          mat: 'sediment',
+          big: true,
+          count: 140,
+          size: [
+            [3, 12],
+            [1, 3.5],
+            [3, 14],
+          ],
+          pose: 'upright',
+          sink: 0.2,
+          align: 1.2,
+          cluster: 0.2,
+        },
+        {
+          name: 'berms',
+          geom: 'berm',
+          mat: 'sediment',
+          big: true,
+          count: 26,
+          size: [
+            [4, 7],
+            [1.5, 2.5],
+            [25, 45],
+          ],
+          pose: 'upright',
+          sink: 0.25,
+          align: 0.12,
+          ring: [0.8, 1],
+        },
+        {
+          name: 'clods',
+          geom: 'mudBlock',
+          mat: 'sediment',
+          count: 160,
+          size: [
+            [0.6, 2],
+            [0.3, 0.8],
+            [0.6, 2.4],
+          ],
+          pose: 'upright',
+          sink: 0.15,
+          small: true,
+        },
       ],
     }),
   },
@@ -410,12 +821,82 @@ const KITS: Record<WreckScatterId, Kit> = {
     spec: (dims) => ({
       ...disc(dims),
       kinds: [
-        { name: 'spars', geom: 'spar', mat: 'wood', big: true, count: 9, size: [[0.5, 0.75], [0.5, 0.75], [9, 18]], proportional: true, pose: 'lie', sink: 0.25, cluster: 0.4 },
-        { name: 'yards', geom: 'spar', mat: 'wood', big: true, count: 5, size: [[0.35, 0.5], [0.35, 0.5], [11, 16]], proportional: true, pose: 'lie', sink: 0.3 },
-        { name: 'blocks', geom: 'block', mat: 'wood', count: 16, size: [0.8, 1.3], pose: 'tumble', sink: 0.3, small: true },
-        { name: 'coils', geom: 'coil', mat: 'wood', count: 8, size: [0.8, 1.4], pose: 'lie', sink: 0.1, small: true },
-        { name: 'planks', geom: 'plank', mat: 'wood', count: 30, size: [[0.8, 1.2], [1, 1.5], [2, 5]], pose: 'lie', sink: 0.2 },
-        { name: 'anemones', geom: 'anemone', mat: 'growth', count: 60, size: [0.1, 0.22], pose: 'upright', sink: 0, small: true, tints: LIFE_TINTS, cluster: 0.4 },
+        {
+          name: 'spars',
+          geom: 'spar',
+          mat: 'wood',
+          big: true,
+          count: 9,
+          size: [
+            [0.5, 0.75],
+            [0.5, 0.75],
+            [9, 18],
+          ],
+          proportional: true,
+          pose: 'lie',
+          sink: 0.25,
+          cluster: 0.4,
+        },
+        {
+          name: 'yards',
+          geom: 'spar',
+          mat: 'wood',
+          big: true,
+          count: 5,
+          size: [
+            [0.35, 0.5],
+            [0.35, 0.5],
+            [11, 16],
+          ],
+          proportional: true,
+          pose: 'lie',
+          sink: 0.3,
+        },
+        {
+          name: 'blocks',
+          geom: 'block',
+          mat: 'wood',
+          count: 16,
+          size: [0.8, 1.3],
+          pose: 'tumble',
+          sink: 0.3,
+          small: true,
+        },
+        {
+          name: 'coils',
+          geom: 'coil',
+          mat: 'wood',
+          count: 8,
+          size: [0.8, 1.4],
+          pose: 'lie',
+          sink: 0.1,
+          small: true,
+        },
+        {
+          name: 'planks',
+          geom: 'plank',
+          mat: 'wood',
+          count: 30,
+          size: [
+            [0.8, 1.2],
+            [1, 1.5],
+            [2, 5],
+          ],
+          pose: 'lie',
+          sink: 0.2,
+        },
+        {
+          name: 'anemones',
+          geom: 'anemone',
+          mat: 'growth',
+          count: 60,
+          size: [0.1, 0.22],
+          pose: 'upright',
+          sink: 0,
+          small: true,
+          tints: LIFE_TINTS,
+          cluster: 0.4,
+        },
       ],
     }),
   },
@@ -423,18 +904,77 @@ const KITS: Record<WreckScatterId, Kit> = {
     spec: (dims) => ({
       ...disc(dims),
       kinds: [
-        { name: 'planks', geom: 'plank', mat: 'wood', big: true, count: 18, size: [[0.8, 1.3], [1, 1.5], [1.5, 4]], pose: 'lie', sink: 0.2 },
-        { name: 'timbers', geom: 'spar', mat: 'wood', big: true, count: 3, size: [[0.3, 0.45], [0.3, 0.45], [2.5, 4]], proportional: true, pose: 'lie', sink: 0.3 },
-        { name: 'coils', geom: 'coil', mat: 'wood', count: 2, size: [0.8, 1.1], pose: 'lie', sink: 0.1, small: true },
-        { name: 'anemones', geom: 'anemone', mat: 'growth', count: 40, size: [0.08, 0.18], pose: 'upright', sink: 0, small: true, tints: LIFE_TINTS },
-        { name: 'squirts', geom: 'squirt', mat: 'growth', count: 25, size: [0.06, 0.12], pose: 'upright', sink: 0, small: true, tints: LIFE_TINTS },
+        {
+          name: 'planks',
+          geom: 'plank',
+          mat: 'wood',
+          big: true,
+          count: 18,
+          size: [
+            [0.8, 1.3],
+            [1, 1.5],
+            [1.5, 4],
+          ],
+          pose: 'lie',
+          sink: 0.2,
+        },
+        {
+          name: 'timbers',
+          geom: 'spar',
+          mat: 'wood',
+          big: true,
+          count: 3,
+          size: [
+            [0.3, 0.45],
+            [0.3, 0.45],
+            [2.5, 4],
+          ],
+          proportional: true,
+          pose: 'lie',
+          sink: 0.3,
+        },
+        {
+          name: 'coils',
+          geom: 'coil',
+          mat: 'wood',
+          count: 2,
+          size: [0.8, 1.1],
+          pose: 'lie',
+          sink: 0.1,
+          small: true,
+        },
+        {
+          name: 'anemones',
+          geom: 'anemone',
+          mat: 'growth',
+          count: 40,
+          size: [0.08, 0.18],
+          pose: 'upright',
+          sink: 0,
+          small: true,
+          tints: LIFE_TINTS,
+        },
+        {
+          name: 'squirts',
+          geom: 'squirt',
+          mat: 'growth',
+          count: 25,
+          size: [0.06, 0.12],
+          pose: 'upright',
+          sink: 0,
+          small: true,
+          tints: LIFE_TINTS,
+        },
       ],
     }),
   },
 };
 
 /** The layout spec of a kit at given dims (exported for tests). */
-export function wreckScatterSpec(id: WreckScatterId, dims: readonly [number, number, number]): ScatterSpec {
+export function wreckScatterSpec(
+  id: WreckScatterId,
+  dims: readonly [number, number, number],
+): ScatterSpec {
   return KITS[id].spec(dims);
 }
 
@@ -480,7 +1020,11 @@ export function buildWreckScatter(
     let list = byKind.get(p.kind);
     if (!list) byKind.set(p.kind, (list = new InstanceList()));
     _e.set(p.rx, p.ry, p.rz, 'YXZ');
-    const m = new THREE.Matrix4().compose(_p.set(p.x, p.y, p.z), _q.setFromEuler(_e), _s.set(p.sx, p.sy, p.sz));
+    const m = new THREE.Matrix4().compose(
+      _p.set(p.x, p.y, p.z),
+      _q.setFromEuler(_e),
+      _s.set(p.sx, p.sy, p.sz),
+    );
     const tint = kind.tints
       ? new THREE.Color(kind.tints[Math.floor(tintRnd() * kind.tints.length)]!)
       : new THREE.Color().setScalar(0.8 + tintRnd() * 0.35);
@@ -491,7 +1035,12 @@ export function buildWreckScatter(
   for (const kind of spec.kinds) {
     const list = byKind.get(kind.name);
     if (!list) continue;
-    const mesh = makeInstanced(piece(kind.geom), material(kind.mat, detail), list, `${id}-${kind.name}`);
+    const mesh = makeInstanced(
+      piece(kind.geom),
+      material(kind.mat, detail),
+      list,
+      `${id}-${kind.name}`,
+    );
     if (!mesh) continue;
     if (kind.big) core.push(mesh);
     else near.push(mesh);

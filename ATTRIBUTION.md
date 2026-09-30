@@ -19,6 +19,11 @@ legally require attribution.
 
 (none yet)
 
+F1-WRECKS adds no third-party files. The wreck hulls, rusticles, debris kits and their
+surface textures (plate seams, rust, planking, growth, normal maps) are generated in
+code from procedural geometry and canvas noise (`src/world/props/wrecks/`). Wreck
+dimensions and layout follow the public sources cited in each landmark's `sources.md`.
+
 ## Audio
 
 No third-party audio files ship with the client. `ffmpeg` is unavailable in
