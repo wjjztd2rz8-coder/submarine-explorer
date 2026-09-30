@@ -51,9 +51,10 @@ per-frame CPU. Build time is under 0.1 s per piece at medium.
 - Visual polish left: tower flanges are flat plates; the alcove reads a little boxy
   from the side; strata are colour bands only (the strata bump map aliased, so
   scarps use the rock texture); sponge colours are pastel under the preview light.
-- Everything is dark beyond ~50-100 m at the vent sites (atmosphere, not this
-  package), so heroes only read inside the sub's lights. Albedo is scaled down
-  (`ALBEDO` in `materials.ts`) because vertical faces facing the headlights clip to
+- Everything is dark beyond ~50-100 m at the vent sites (atmosphere, not this package), so
+  heroes only read inside the sub's lights. Those lights are strong and face-on walls
+  receive far more than the seabed, so rock albedo is scaled well down (`ALBEDO` in
+  `materials.ts`, 0.07) and instanced life is tinted (`LIFE_TINT`); pale rock clipped to
   white otherwise.
 - The chase camera hides the sub's surroundings behind the hull in stills; the
   screenshots hide the hull. No profile on a real phone yet.
