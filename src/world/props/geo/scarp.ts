@@ -384,7 +384,7 @@ function crossings(profile: [number, number][], y: number): number[] {
 export function wallColliders(
   profile: [number, number][],
   W: number,
-  D: number,
+  _D: number,
   H: number,
   slices: number,
   gnd: (x: number, z: number) => number,

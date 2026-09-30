@@ -261,6 +261,9 @@ void main() {
   a *= smoothstep(1.5, 14.0, vDepth);
   // Additive light still gets eaten by the water it shines through.
   float f = exp(-fogDensity * fogDensity * vDepth * vDepth);
-  gl_FragColor = vec4(uColor * a * f, a * f);
+  // Unpremultiplied: AdditiveBlending already weights RGB by alpha (once, not twice).
+  gl_FragColor = vec4(uColor, a * f);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }
 `;

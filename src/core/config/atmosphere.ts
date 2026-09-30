@@ -205,7 +205,7 @@ export const DEFAULT_WATER: WaterConfig = {
   fogDensityScale: 0.02,
   headlightColor: 0xfff3dd,
   headlightSeparationM: 3.2,
-  headlightConeOpacity: 0.05,
+  headlightConeOpacity: 0.012,
   causticsStartM: -20,
   causticsEndM: -60,
   causticsIntensity: 3.6,

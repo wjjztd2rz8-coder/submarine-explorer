@@ -56,6 +56,8 @@ export const renderSystem: GameSystem = {
       const { renderer, scene, rig, post, atmoTier, renderStats, config } = ctx;
       // C5: post-processing can be switched off in Settings.
       if (atmoTier.post && ctx.postFx) {
+        // The composite applies the band gain itself: undo any direct-path exposure.
+        renderer.toneMappingExposure = baseExposure;
         renderer.setRenderTarget(post.target);
         renderer.clear();
         renderer.render(scene, rig.camera);

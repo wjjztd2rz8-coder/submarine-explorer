@@ -86,11 +86,11 @@
       "snap_to_seabed": true,
       "heading_deg": 40,
       "scale": 1,
-      "dimensions_m": [22, 18, 9],
+      "dimensions_m": [22, 18, 3.6],
       "lod_distance_m": 700,
       "collision": "box",
       "reconstruction": true,
-      "note": "Game addition: a sulfide mound carrying a group of black-smoker chimneys, tubeworm clumps and bacterial mats, modelled on the way ASHES chimneys cluster on their mounds (UW Interactive Oceans). Height and layout are invented; chimneys of this field are generally under about 4-5 m, so the tallest stack here is deliberately a little taller for readability."
+      "note": "Game addition: a sulfide mound carrying a group of black-smoker chimneys, tubeworm clumps and bacterial mats, modelled on the way ASHES chimneys cluster on their mounds (UW Interactive Oceans). Layout is invented; stack heights follow the field, where chimneys are generally under about 4-5 m (Mushroom and Inferno are both roughly 4 m)."
     }
   ]
 }

@@ -339,6 +339,8 @@ void main() {
   // Denser, darker cores; ragged, lighter rims.
   vec3 col = mix(vColor, fogColor, vFog) * (0.45 + 0.95 * n);
   gl_FragColor = vec4(col, vAlpha * a * (1.0 - 0.6 * vFog));
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }
 `;
 
