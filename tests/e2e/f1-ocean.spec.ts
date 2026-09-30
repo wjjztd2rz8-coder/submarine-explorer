@@ -26,6 +26,8 @@ const CASES = [
   { name: 'deep', tile: 'titanic', depth: 3800, tier: 'high' },
   { name: 'shallow', tile: 'monterey-canyon', depth: 12, tier: 'low' },
   { name: 'mid', tile: 'monterey-canyon', depth: 150, tier: 'medium' },
+  { name: 'reef', tile: 'great-blue-hole', depth: 9, tier: 'high' },
+  { name: 'reef', tile: 'great-blue-hole', depth: 9, tier: 'low' },
   { name: 'deep', tile: 'titanic', depth: 3800, tier: 'low' },
 ];
 
@@ -53,6 +55,18 @@ for (const c of CASES) {
       });
       await page.waitForTimeout(1500);
       await page.screenshot({ path: `${shots}/lookup-${c.tier}.png` });
+    }
+    if (c.name === 'reef') {
+      // Under the surface, level with the boat, so the sunlit water column shows.
+      await page.evaluate(() => {
+        const rig = (window.__game as unknown as G).rig;
+        rig.orbitRadius = 34;
+        rig.orbitAzimuth = 0.7;
+        rig.orbitElevation = 0.05;
+        rig.setMode('orbit');
+      });
+      await page.waitForTimeout(1500);
+      await page.screenshot({ path: `${shots}/reef-under-${c.tier}.png` });
     }
     if (c.name === 'deep') {
       // The beams from the side: where the volume shows.

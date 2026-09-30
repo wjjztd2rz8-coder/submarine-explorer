@@ -23,7 +23,12 @@ export const atmosphereSystem: GameSystem = {
     scene.add(headlights.group);
     const snow = new MarineSnow(config.water, atmoTier);
     if (snow.points) scene.add(snow.points);
-    const water = new Water(scene, config.water, Math.max(terrain.widthM, terrain.depthM), atmoTier.beamDetail);
+    const water = new Water(
+      scene,
+      config.water,
+      Math.max(terrain.widthM, terrain.depthM),
+      atmoTier.beamDetail,
+    );
     Object.assign(ctx, { atmoTier, atmosphere, headlights, snow, water });
     ctx.expose({ water, atmosphere, headlights });
   },
