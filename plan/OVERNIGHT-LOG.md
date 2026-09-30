@@ -26,3 +26,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Deferred by agents: cockpit interior is minimal; chase camera distance (CameraRig) hides hull detail; ROV headlight rig.
 - Next: F1-OCEAN, F1-TERRAIN, F1-GEO, F1-TOUCH remain in wave 1. No tag yet (wave 1 incomplete).
 - Pushed main (6ed8221, no tag). Pages deploy succeeded. GitHub CI e2e shards failed on the previous commit with timeouts (d2-predive, mission.spec: software-rendering runners are slow, 90 s test timeouts), while local gates are green. Owner/next run: consider raising CI timeouts or trimming shard load. Run 36692039151 is in progress for the new push.
+
+## 2026-09-30 06:03 headless run
+
+- Merged (Sonnet agents, gates green on main): F1-OCEAN (filmic post stack, bloom, god rays, Snell's window, headlight beams, marine snow, caustics) and F1-GEO (procedural hero set pieces for every non-wreck site, smoker plumes, coral mounds, carbonate towers; kit in src/world/props/geo/). CHANGELOG conflict resolved by keeping both.
+- Remaining wave 1: F1-TERRAIN, F1-TOUCH. No tag yet.
+- Claude 5h window ended at ~1% after the two agents, so nothing else was started.
+- For owner: F1-GEO plumes are large stylised cones; tower flanges/Kamaehuakanaloa heap look rough; Journal tag unchecked in-game; Lava tube and gas plume cut. F1-OCEAN frame cost unmeasured (SwiftShader). F0-CORE P2s still open. CI e2e shards timed out earlier on software rendering.
