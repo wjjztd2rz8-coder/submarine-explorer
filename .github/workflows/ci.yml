@@ -23,7 +23,13 @@ jobs:
     runs-on: ubuntu-latest
     # Runners have no GPU, so Chromium renders WebGL on SwiftShader (a few fps).
     # The e2e suite is single-worker by design (playwright.config.ts); give it room.
-    timeout-minutes: 60
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        # SwiftShader makes the single-worker e2e suite take over an hour, so
+        # split it across runners. The full gates also run locally before merge.
+        shard: [1, 2, 3, 4]
     env:
       CI: true
     steps:
@@ -56,12 +62,13 @@ jobs:
 
       - name: End-to-end tests (Playwright)
         # Tiles are committed under data/tiles/, so the e2e suite needs no network.
-        run: npm run test:e2e -- --reporter=list,html
+        run: npm run test:e2e -- --reporter=list,html --shard=${{ matrix.shard }}/4
 
       - name: Attribution check
         run: python3 tools/check_attribution.py
 
       - name: Project-base build and browser check
+        if: matrix.shard == 1
         run: npm run test:e2e:base
 
       - name: Prettier
@@ -71,7 +78,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-artifacts-${{ github.run_id }}-${{ github.run_attempt }}
+          name: e2e-artifacts-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
           path: |
             tests/e2e/screenshots
             playwright-report

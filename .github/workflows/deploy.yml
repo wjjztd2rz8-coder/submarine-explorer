@@ -1,13 +1,15 @@
-# Deploy the static build to GitHub Pages. Runs after CI succeeds on main, or
-# on demand from the Actions tab. One-time setup (repository owner):
+# Deploy the static build to GitHub Pages on each push to main, or on demand
+# from the Actions tab. One-time setup (repository owner):
 #   Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
 # See docs/deploy.md for custom domains and the PAGES_BASE variable.
 name: Deploy to GitHub Pages
 
+# Deploys every push to main. The orchestrator pushes only after the full local
+# gates (build, unit, e2e, attribution, prettier) pass; CI's e2e shards run in
+# parallel as an extra check rather than a deploy gate (SwiftShader e2e on
+# hosted runners takes over an hour).
 on:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
+  push:
     branches: [main]
   workflow_dispatch:
 
@@ -23,13 +25,6 @@ concurrency:
 
 jobs:
   build:
-    # For workflow_run, only deploy commits whose CI passed and that were pushed
-    # to this repository's main (never a fork's PR).
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -39,10 +34,10 @@ jobs:
       # variables -> Actions -> Variables).
       VITE_BASE: ${{ vars.PAGES_BASE || format('/{0}/', github.event.repository.name) }}
     steps:
-      - name: Checkout the commit CI tested
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ github.sha }}
 
       - name: Set up Node 22
         uses: actions/setup-node@v4
