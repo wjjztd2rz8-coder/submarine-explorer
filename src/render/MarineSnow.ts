@@ -194,7 +194,7 @@ void main() {
 
   // A wide spread of sizes: most are fine dust, a few are proper flakes.
   float sizeMul = 0.35 + 1.6 * aSeed * aSeed;
-  gl_PointSize = clamp(uSizeM * sizeMul * (1.0 + 0.7 * vLit) * uScale / max(1.0, dist), 1.0, 28.0);
+  gl_PointSize = clamp(uSizeM * sizeMul * (1.0 + 0.7 * vLit) * uScale / max(1.0, dist), 1.0, 18.0);
 
   // Fade out at the edge of the cube so wrapping never pops, and drop the
   // points the current density does not pay for. Distant motes sink into the fog.

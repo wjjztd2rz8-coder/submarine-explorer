@@ -32,10 +32,10 @@ export class Water {
     extentM: number,
     detail = 1,
   ) {
-    // Oversized so it always reaches the fog horizon; segmented so the
-    // vertex wobble has something to move.
+    // Oversized so it always reaches the fog horizon. One quad: the swell is
+    // shaded per fragment.
     const size = Math.min(extentM * 3, 60000);
-    const geometry = new THREE.PlaneGeometry(size, size, 96, 96);
+    const geometry = new THREE.PlaneGeometry(size, size, 1, 1);
     this.material = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
@@ -99,25 +99,13 @@ export class Water {
 }
 
 const SURFACE_VERT = /* glsl */ `
-uniform float uTime;
-uniform float uAmp;
-uniform float uLen;
 varying float vFogDepth;
 varying vec3 vWorld;
-varying vec3 vNormalW;
 void main() {
-  vec3 p = position;
-  // Two crossed sine trains; enough motion to read as a surface, cheap enough
-  // to leave on at every tier. The plane is rotated -90 degrees about X, so its
-  // local Z is world Y and its local Y is world -Z.
-  float k = 6.28318 / max(1.0, uLen);
-  float a1 = p.x * k + uTime * 0.9;
-  float a2 = p.y * k * 1.7 - uTime * 0.7;
-  p.z += uAmp * (sin(a1) + 0.6 * sin(a2));
-  float hx = uAmp * k * cos(a1);
-  float hy = uAmp * k * 1.02 * cos(a2);
-  vNormalW = normalize(vec3(-hx, 1.0, hy));
-  vec4 world = modelMatrix * vec4(p, 1.0);
+  // The plane is huge (tens of km) but only has 96 segments, so displacing its
+  // vertices would alias a 22 m swell into garbage. It stays flat; the swell is
+  // an analytic normal in the fragment shader instead.
+  vec4 world = modelMatrix * vec4(position, 1.0);
   vWorld = world.xyz;
   vec4 mv = viewMatrix * world;
   vFogDepth = -mv.z;
@@ -132,23 +120,36 @@ uniform float fogDensity;
 uniform vec3 uCam;
 uniform float uLight;
 uniform float uTime;
+uniform float uAmp;
+uniform float uLen;
 varying float vFogDepth;
 varying vec3 vWorld;
-varying vec3 vNormalW;
 
 const vec3 SUN = vec3(0.2306, 0.9226, 0.1384);
 const float CRIT_COS = 0.6614; // cos of asin(1 / 1.333)
 
 void main() {
-  vec3 n = normalize(vNormalW);
+  // Swell: two crossed sine trains, as an analytic slope. Slopes flatten with
+  // distance so the far surface does not shimmer.
+  float k = 6.28318 / max(1.0, uLen);
+  vec2 q = vWorld.xz;
+  float a1 = q.x * k + uTime * 0.9;
+  float a2 = -q.y * k * 1.7 - uTime * 0.7;
+  vec2 slope = 0.6 * uAmp * k * vec2(cos(a1), -1.02 * cos(a2));
   #if WATER_DETAIL
     // Fine ripples on top of the swell, so the window rim shimmers.
-    vec2 q = vWorld.xz;
-    n.xz += 0.05 * vec2(
-      sin(q.x * 0.9 + q.y * 0.35 + uTime * 1.7) + sin(q.x * 2.3 - q.y * 1.9 - uTime * 2.3),
-      sin(q.y * 1.1 - q.x * 0.4 + uTime * 1.3) + sin(q.y * 2.7 + q.x * 1.6 + uTime * 2.1));
-    n = normalize(n);
+    // Four waves at unrelated headings, so no lattice shows in the window rim.
+    vec2 w1 = vec2(0.83, 0.56); vec2 w2 = vec2(-0.41, 0.91);
+    vec2 w3 = vec2(0.97, -0.24); vec2 w4 = vec2(-0.66, -0.75);
+    slope += 0.022 * (
+      w1 * cos(dot(q, w1) * 0.71 + uTime * 1.3) +
+      w2 * cos(dot(q, w2) * 1.13 - uTime * 1.7) +
+      w3 * cos(dot(q, w3) * 1.71 + uTime * 2.1) +
+      w4 * cos(dot(q, w4) * 2.37 - uTime * 1.9));
   #endif
+  slope *= 1.0 / (1.0 + vFogDepth / 140.0);
+  vec3 n = normalize(vec3(-slope.x, 1.0, -slope.y));
+
   vec3 v = normalize(vWorld - uCam);          // eye -> surface
   float fog = 1.0 - exp(-fogDensity * fogDensity * vFogDepth * vFogDepth);
   vec3 color;
@@ -157,27 +158,28 @@ void main() {
   if (uCam.y < 0.0) {
     // Below the surface, looking up.
     float cosI = dot(v, n);
-    float window = smoothstep(CRIT_COS - 0.035, CRIT_COS + 0.05, cosI);
+    float window = smoothstep(CRIT_COS - 0.06, CRIT_COS + 0.08, cosI);
     // Bright sky through the window, deeper blue toward its rim, and a warm sun
     // glint where the refracted ray meets the sun.
-    vec3 sky = mix(vec3(0.55, 0.86, 1.0), vec3(0.95, 0.99, 1.0), smoothstep(CRIT_COS, 1.0, cosI));
+    vec3 sky = mix(vec3(0.22, 0.55, 0.85), vec3(0.55, 0.82, 0.98), smoothstep(CRIT_COS, 1.0, cosI));
     float glint = pow(max(dot(refract(v, -n, 1.333), SUN), 0.0), 40.0);
     // The rim of the window is a thin bright ring where the sky is squeezed.
     float rim = exp(-pow((cosI - CRIT_COS) * 14.0, 2.0));
-    vec3 through = sky * 1.35 + vec3(1.0, 0.92, 0.7) * glint * 2.5 + vec3(0.6, 0.9, 1.0) * rim * 0.5;
+    vec3 through = sky * 0.95 + vec3(1.0, 0.92, 0.7) * glint * 1.2 + vec3(0.5, 0.85, 1.0) * rim * 0.25;
     // Outside the window the surface is a mirror of the water below.
     vec3 mirror = fogColor * 0.9;
     color = mix(mirror, through * mix(0.35, 1.0, uLight), window * uLight);
-    alpha = mix(0.55, 0.9, window * uLight);
+    alpha = mix(0.45, 0.9, window * uLight);
   } else {
     // Above the surface, looking down: Fresnel between water and sky.
     float cosI = max(dot(-v, n), 0.0);
     float f = 0.02 + 0.98 * pow(1.0 - cosI, 5.0);
     vec3 r = reflect(v, n);
-    vec3 sky = mix(vec3(0.55, 0.78, 0.95), vec3(0.85, 0.94, 1.0), clamp(r.y, 0.0, 1.0));
+    vec3 sky = mix(vec3(0.5, 0.75, 0.95), vec3(0.8, 0.92, 1.0), clamp(r.y, 0.0, 1.0));
     float glint = pow(max(dot(r, SUN), 0.0), 120.0);
-    color = mix(uColor * 0.9, sky, f) + vec3(1.0, 0.95, 0.8) * glint * 3.0;
-    alpha = 0.8;
+    float diffuse = 0.8 + 0.4 * dot(n, SUN);
+    color = mix(uColor * diffuse, sky, f * 0.6) + vec3(1.0, 0.95, 0.8) * glint * 1.5;
+    alpha = mix(0.45, 0.7, f);
   }
   color = mix(color, fogColor, clamp(fog, 0.0, 1.0) * 0.85);
   gl_FragColor = vec4(color, alpha * (1.0 - 0.7 * fog));

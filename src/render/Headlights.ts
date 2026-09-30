@@ -187,7 +187,7 @@ export class Headlights {
  * axis once `lookAt` has aimed it). Segment count follows the beam detail.
  */
 function coneGeometry(radius: number, length: number, detail: number): THREE.BufferGeometry {
-  const segments = detail >= 2 ? 32 : detail === 1 ? 20 : 10;
+  const segments = detail >= 2 ? 32 : detail === 1 ? 22 : 16;
   const geo = new THREE.ConeGeometry(radius, length, segments, 1, true);
   geo.translate(0, -length / 2, 0); // apex at the origin, opening along -Y
   geo.rotateX(-Math.PI / 2); // ...then along +Z
@@ -247,13 +247,13 @@ void main() {
   // Looking squarely through the shell means the longest chord of lit water: a
   // bright core with soft edges, and no hard silhouette.
   float chord = abs(dot(normalize(vNormalV), normalize(vViewDir)));
-  chord = pow(chord, 1.3);
-  float a = uOpacity * 6.0 * body * chord * mix(0.6, 1.5, clamp(uMurk, 0.0, 1.0));
+  chord = 0.12 + 0.88 * pow(chord, 1.5);
+  float a = uOpacity * 2.6 * body * chord * mix(0.6, 1.5, clamp(uMurk, 0.0, 1.0));
   #if BEAM_DUST
     // Slow drifting streaks: suspended particles catching the light.
-    float streak = vnoise(vec2(vAngle * 5.0, vAlong * 0.05 - uTime * 0.25));
-    float fine = vnoise(vec2(vAngle * 19.0 + uTime * 0.05, vAlong * 0.22 - uTime * 0.6));
-    a *= 0.55 + 0.6 * streak + 0.35 * fine;
+    float streak = vnoise(vec2(vAngle * 4.0, vAlong * 0.012 - uTime * 0.12));
+    float fine = vnoise(vec2(vAngle * 14.0 + uTime * 0.04, vAlong * 0.05 - uTime * 0.3));
+    a *= 0.8 + 0.3 * streak + 0.15 * fine;
   #endif
   // Never fly into a solid wedge: fade out close to the camera.
   a *= smoothstep(1.5, 14.0, vDepth);

@@ -68,9 +68,9 @@ export const renderSystem: GameSystem = {
           vignette: a.vignette,
           fogColor: a.fogColor,
           fogDensity: a.fogDensity,
-          aberration: config.water.aberrationStrength * atmoTier.aberration,
+          aberration: config.water.aberrationStrength * atmoTier.aberration * 0.5,
           rayStrength: atmoTier.godRays ? godRayStrength(config.water.godRayStrength, a.depth) : 0,
-          bloomStrength: 0.3,
+          bloomStrength: 0.22,
           camera: rig.camera,
         };
         post.render(renderer, frame);

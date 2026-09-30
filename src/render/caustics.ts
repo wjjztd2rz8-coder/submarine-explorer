@@ -15,12 +15,23 @@
 
 import * as THREE from 'three';
 
-const FRAMES = 10;
+/**
+ * Frames in the loop: more on the bigger textures, where the finer web moves
+ * faster per frame and a short loop would visibly step.
+ */
+const framesFor = (size: number): number => (size >= 256 ? 16 : 10);
+
+/**
+ * How many caustic cells span the texture. F1-OCEAN: the projector footprint
+ * is a few hundred metres, and real caustics are metres across, so the web is
+ * tiled to keep roughly 14 texels per cell whatever the texture size.
+ */
+const tilesFor = (size: number): number => Math.max(3, Math.round(size / 14));
 
 /** Intensity of the caustic web at (u, v) in [0,1) and loop phase `t`. */
-function causticAt(u: number, v: number, t: number): number {
-  const px = u * 6.2831853 - 3.14159;
-  const py = v * 6.2831853 - 3.14159;
+function causticAt(u: number, v: number, t: number, tiles: number): number {
+  const px = u * 6.2831853 * tiles - 3.14159;
+  const py = v * 6.2831853 * tiles - 3.14159;
   let ix = px;
   let iy = py;
   let c = 1;
@@ -47,9 +58,11 @@ function causticAt(u: number, v: number, t: number): number {
 export function makeCausticFrames(size: number): THREE.Texture[] {
   const out: THREE.Texture[] = [];
   const half = size / 2;
-  for (let f = 0; f < FRAMES; f++) {
+  const frames = framesFor(size);
+  const tiles = tilesFor(size);
+  for (let f = 0; f < frames; f++) {
     // 2*pi over the loop keeps the cycle seamless.
-    const phase = (f / FRAMES) * Math.PI * 2;
+    const phase = (f / frames) * Math.PI * 2;
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
@@ -63,7 +76,7 @@ export function makeCausticFrames(size: number): THREE.Texture[] {
         const rx = (x - half) / half;
         const ry = (y - half) / half;
         const fall = Math.max(0, 1 - Math.sqrt(rx * rx + ry * ry));
-        const value = causticAt(x / size, y / size, phase) * fall * fall;
+        const value = causticAt(x / size, y / size, phase, tiles) * fall * fall;
         const byte = Math.round(255 * Math.min(1, value));
         const i = (y * size + x) * 4;
         data[i] = byte;

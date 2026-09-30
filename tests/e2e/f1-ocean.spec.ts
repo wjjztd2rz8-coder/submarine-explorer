@@ -54,6 +54,18 @@ for (const c of CASES) {
       await page.waitForTimeout(1500);
       await page.screenshot({ path: `${shots}/lookup-${c.tier}.png` });
     }
+    if (c.name === 'deep') {
+      // The beams from the side: where the volume shows.
+      await page.evaluate(() => {
+        const rig = (window.__game as unknown as G).rig;
+        rig.orbitRadius = 45;
+        rig.orbitAzimuth = 1.3;
+        rig.orbitElevation = 0.12;
+        rig.setMode('orbit');
+      });
+      await page.waitForTimeout(1500);
+      await page.screenshot({ path: `${shots}/beams-${c.tier}.png` });
+    }
     expect(errors).toEqual([]);
   });
 }

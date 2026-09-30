@@ -238,11 +238,13 @@ void main() {
   // Sunlit shallows: warm highlights over blue-green shadows.
   float hi = smoothstep(0.25, 1.4, l);
   color *= mix(vec3(1.0), mix(vec3(0.94, 0.99, 1.04), vec3(1.07, 1.02, 0.92), hi), uPhotic * 0.6);
+  // Highlight shoulder: lamp pools on pale sand would otherwise clip to flat white.
+  color *= 1.0 / (1.0 + 1.6 * max(luma(color) - 0.45, 0.0));
   // Readability floor: shadows never fall below a faint lift in the water's own
   // hue, so terrain and hulls stay legible outside the lamps, without flattening
   // the lit areas.
   vec3 floorHue = uFogColor / max(luma(uFogColor), 1e-3);
-  float floorAmt = 0.011 * (1.0 - smoothstep(0.0, 0.05, luma(color)));
+  float floorAmt = 0.02 * (1.0 - smoothstep(0.0, 0.06, luma(color)));
   color += floorHue * floorAmt;
 
   // Vignette. dot(d,d) peaks at 0.5 in the corners, so keep uVignette small.
@@ -352,7 +354,7 @@ export class UnderwaterPass {
     this.prefilter = new FullscreenMaterial(PREFILTER_FRAG, {
       tSrc: { value: this.target.texture },
       uTexel: { value: new THREE.Vector2(1, 1) },
-      uThreshold: { value: 0.9 },
+      uThreshold: { value: 1.1 },
     });
     this.downsample = new FullscreenMaterial(DOWNSAMPLE_FRAG, {
       tSrc: { value: null },
@@ -453,6 +455,7 @@ export class UnderwaterPass {
         (bu.uDir!.value as THREE.Vector2).set(0, 1 / b.height);
         this.run(renderer, this.blur, a);
       };
+      blur(t[0]!, t[1]!);
       blur(t[0]!, t[1]!);
       if (t.length > 2) {
         const du = this.downsample.material.uniforms;
