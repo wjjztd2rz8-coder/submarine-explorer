@@ -21,7 +21,13 @@ fi
 echo "== state =="; git log --oneline -3; git status --short | head -20
 PROMPT="$(cat plan/RESUME-PROMPT.md)"
 if [[ "${1:-}" == "--headless" ]]; then
-  claude -p "$PROMPT" --permission-mode bypassPermissions > ".cache/resume-$(date +%Y%m%d-%H%M).log" 2>&1 || true
+  claude -p "$PROMPT" --permission-mode bypassPermissions > ".cache/resume-$(date +%Y%m%d-%H%M).log" 2>&1 &
+  cpid=$!
+  # Watch usage for the whole run; the watchdog kills the run before a floor.
+  tools/budget-watchdog.sh "$cpid" > /dev/null 2>&1 &
+  wpid=$!
+  wait "$cpid" || true
+  kill "$wpid" 2>/dev/null || true
   # A crashed timed run must not block the next hour (never clear an interactive lock).
   grep -qs '^headless' .cache/orchestrator.active && rm -f .cache/orchestrator.active
 else

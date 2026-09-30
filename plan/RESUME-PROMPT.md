@@ -27,6 +27,7 @@ Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-expl
 ## 3. Rules
 
 - Commit only green work (all of tools/gates.sh).
+- `tools/resume.sh` runs `tools/budget-watchdog.sh` for this whole run. It polls usage every 2 minutes, stops Codex units below 7% (5h) or 7% (weekly), and kills this run if Claude falls below 23% (5h) or 7% (weekly). Uncommitted worktree files survive; commit `wip(<pkg>)` checkpoints often.
 - Check `~/.local/bin/ai-limits` before EACH new Claude agent and after each one finishes. Start a new agent only if Claude's 5-hour window is at least 45% left. Once it falls below 30%, start nothing new; finish collecting and exit. Never let the window fall under the 20% floor: an agent that hits the session limit dies mid-work. If any weekly window is at or below 5%, stop; the timer will retry, and runs skip until the reset.
 - Owner direction:
   - Cinematic realism that is readable and never frustratingly dark.
