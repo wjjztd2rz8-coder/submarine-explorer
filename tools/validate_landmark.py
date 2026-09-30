@@ -111,12 +111,30 @@ class Tile:
         return -self.elevation(lat, lon)
 
 
+def read_config_source(repo=REPO):
+    """Text of src/core/Config.ts plus the per-domain src/core/config/*.ts files
+    (F0-CORE split Config.ts by domain). Raises OSError when none can be read."""
+    paths = [os.path.join(repo, "src", "core", "Config.ts")]
+    config_dir = os.path.join(repo, "src", "core", "config")
+    if os.path.isdir(config_dir):
+        paths += sorted(os.path.join(config_dir, n) for n in os.listdir(config_dir)
+                        if n.endswith(".ts"))
+    parts = []
+    for path in paths:
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                parts.append(f.read())
+        except OSError:
+            continue
+    if not parts:
+        raise OSError("no config source under %s" % os.path.join(repo, "src", "core"))
+    return "\n".join(parts)
+
+
 def load_hull_classes(repo=REPO):
-    """{class: crushDepth (negative m)} parsed from src/core/Config.ts, else DEFAULT_HULLS."""
-    path = os.path.join(repo, "src", "core", "Config.ts")
+    """{class: crushDepth (negative m)} parsed from the config source, else DEFAULT_HULLS."""
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            text = f.read()
+        text = read_config_source(repo)
     except OSError:
         return dict(DEFAULT_HULLS)
     m = re.search(r"hullClasses:\s*\{(.*?)\n\s*\},", text, re.S)
@@ -130,10 +148,8 @@ def load_hull_classes(repo=REPO):
 
 def load_hull_ratings(repo=REPO):
     """{class: ratedDepth (negative m)} when the runtime defines separate ratings."""
-    path = os.path.join(repo, "src", "core", "Config.ts")
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            text = f.read()
+        text = read_config_source(repo)
     except OSError:
         return {}
     m = re.search(r"hullClasses:\s*\{(.*?)\n\s*\},", text, re.S)
@@ -144,11 +160,9 @@ def load_hull_ratings(repo=REPO):
 
 
 def load_crush_warn_ratio(repo=REPO):
-    """Read the runtime submarine pressure-warning threshold from Config.ts."""
-    path = os.path.join(repo, "src", "core", "Config.ts")
+    """Read the runtime submarine pressure-warning threshold from the config source."""
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            source = f.read()
+        source = read_config_source(repo)
     except OSError:
         return DEFAULT_CRUSH_WARN_RATIO
     match = re.search(r"\bcrushWarnRatio:\s*(\d+(?:\.\d+)?)", source)

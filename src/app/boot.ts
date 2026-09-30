@@ -6,6 +6,7 @@
  */
 
 import * as THREE from 'three';
+import { assets } from '../core/assets/index.js';
 import { makeConfig } from '../core/Config.js';
 import { EventBus } from '../core/EventBus.js';
 import { readDeviceCaps, resolveQuality } from '../core/Quality.js';
@@ -118,6 +119,9 @@ export async function boot(): Promise<BootContext | null> {
   // headlight's hot spot from clipping to white.
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.25;
+
+  // KTX2 textures pick a GPU format from the renderer (core/assets).
+  assets.setRenderer(renderer);
 
   const scene = new THREE.Scene();
 
