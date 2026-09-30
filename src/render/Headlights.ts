@@ -10,7 +10,11 @@
  *
  * Toggled with `L` (the edge comes from `Input.toggleLights`, which A3 owns).
  * The cones are geometry, not a post effect, so they respect the scene fog and
- * cost one extra transparent draw call each; they are off on the `low` tier.
+ * cost one extra transparent draw call each. F1-OCEAN: the shell is shaded by
+ * how squarely the eye looks through it (so the beam has soft edges and a
+ * bright core), it thickens with the water's particulate load and carries a
+ * drifting dust texture on the medium tier and up. The `low` tier keeps a
+ * plain, low-segment cone with the same shading and no dust.
  */
 
 import * as THREE from 'three';
@@ -32,7 +36,7 @@ export class Headlights {
 
   constructor(
     private readonly config: WaterConfig,
-    tier: AtmosphereTier,
+    private readonly tier: AtmosphereTier,
   ) {
     const angle = (config.headlightAngleDeg * Math.PI) / 180;
     for (let i = 0; i < 2; i++) {
@@ -57,16 +61,17 @@ export class Headlights {
       // and at the rim (so the cone has no visible hard edge).
       const length = Math.min(config.headlightDistance, 420);
       const radius = Math.tan(angle) * length;
-      const geo = new THREE.ConeGeometry(radius, length, 20, 1, true);
-      geo.translate(0, -length / 2, 0); // apex at the origin, opening along -Y
-      geo.rotateX(-Math.PI / 2); // ...then along -Z, the boat's forward axis
+      const geo = coneGeometry(radius, length, tier.beamDetail);
       this.coneMaterial = new THREE.ShaderMaterial({
         uniforms: {
           uColor: { value: new THREE.Color(config.headlightColor) },
           uOpacity: { value: config.headlightConeOpacity },
           uLength: { value: length },
+          uTime: { value: 0 },
+          uMurk: { value: 1 },
           fogDensity: { value: 0 },
         },
+        defines: { BEAM_DUST: tier.beamDetail > 0 ? 1 : 0 },
         vertexShader: CONE_VERT,
         fragmentShader: CONE_FRAG,
         transparent: true,
@@ -121,9 +126,7 @@ export class Headlights {
     const length = Math.min(preset.distance, 420);
     if (this.cones.length) {
       const radius = Math.tan(angle) * length;
-      const geo = new THREE.ConeGeometry(radius, length, 20, 1, true);
-      geo.translate(0, -length / 2, 0);
-      geo.rotateX(-Math.PI / 2);
+      const geo = coneGeometry(radius, length, this.tier.beamDetail);
       const old = this.cones[0]!.geometry;
       for (const cone of this.cones) cone.geometry = geo;
       old.dispose();
@@ -143,6 +146,8 @@ export class Headlights {
     origin: THREE.Vector3,
     forward: THREE.Vector3,
     fog?: { color: THREE.Color; density: number },
+    elapsed = 0,
+    murk = 1,
   ): void {
     if (!this.enabled) return;
     if (this.preset) this.fill.position.copy(origin).addScaledVector(forward, 10);
@@ -166,6 +171,8 @@ export class Headlights {
 
     if (this.coneMaterial && fog) {
       this.coneMaterial.uniforms.fogDensity!.value = fog.density;
+      this.coneMaterial.uniforms.uTime!.value = elapsed;
+      this.coneMaterial.uniforms.uMurk!.value = murk;
     }
   }
 
@@ -175,16 +182,32 @@ export class Headlights {
   }
 }
 
+/**
+ * A cone with its apex at the origin, opening along +Z (the boat's forward
+ * axis once `lookAt` has aimed it). Segment count follows the beam detail.
+ */
+function coneGeometry(radius: number, length: number, detail: number): THREE.BufferGeometry {
+  const segments = detail >= 2 ? 32 : detail === 1 ? 20 : 10;
+  const geo = new THREE.ConeGeometry(radius, length, segments, 1, true);
+  geo.translate(0, -length / 2, 0); // apex at the origin, opening along -Y
+  geo.rotateX(-Math.PI / 2); // ...then along +Z
+  return geo;
+}
+
 const CONE_VERT = /* glsl */ `
 varying float vAlong;   // metres from the apex, along the beam
-varying float vRadial;  // metres off the beam axis
-varying float vDepth;   // metres from the camera, for fog
+varying float vAngle;   // angle around the beam axis
+varying float vDepth;   // metres from the camera, for fog and near fade
+varying vec3 vNormalV;  // view-space shell normal
+varying vec3 vViewDir;  // view-space direction from the fragment to the eye
 void main() {
-  // The geometry was built with its apex at the origin, opening along -Z.
-  vAlong = -position.z;
-  vRadial = length(position.xy);
+  // The geometry was built with its apex at the origin, opening along +Z.
+  vAlong = position.z;
+  vAngle = atan(position.y, position.x);
   vec4 mv = modelViewMatrix * vec4(position, 1.0);
   vDepth = -mv.z;
+  vNormalV = normalize(normalMatrix * normal);
+  vViewDir = normalize(-mv.xyz);
   gl_Position = projectionMatrix * mv;
 }
 `;
@@ -194,18 +217,46 @@ precision highp float;
 uniform vec3  uColor;
 uniform float uOpacity;
 uniform float uLength;
+uniform float uTime;
+uniform float uMurk;
 uniform float fogDensity;
 varying float vAlong;
-varying float vRadial;
+varying float vAngle;
 varying float vDepth;
+varying vec3 vNormalV;
+varying vec3 vViewDir;
+
+float hash21(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float vnoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash21(i), hash21(i + vec2(1.0, 0.0)), f.x),
+             mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), f.x), f.y);
+}
 
 void main() {
-  // Fade along the beam and towards the rim, so there is no hard silhouette
-  // and the camera never flies into a solid wedge in first person.
   float along = clamp(vAlong / uLength, 0.0, 1.0);
-  float body  = (1.0 - along) * (1.0 - along) * smoothstep(0.0, 0.08, along);
-  float rim   = 1.0 - clamp(vRadial / max(1.0, vAlong * 0.85 + 1.0), 0.0, 1.0);
-  float a = uOpacity * body * mix(0.25, 1.0, rim);
+  // Beam brightness falls off with range but keeps a long tail: light that far
+  // out still reads as a shaft. The apex fades in so the lamp is not a hard dot.
+  float body = pow(1.0 - along, 1.5) * smoothstep(0.0, 0.02, along);
+  // Looking squarely through the shell means the longest chord of lit water: a
+  // bright core with soft edges, and no hard silhouette.
+  float chord = abs(dot(normalize(vNormalV), normalize(vViewDir)));
+  chord = pow(chord, 1.3);
+  float a = uOpacity * 6.0 * body * chord * mix(0.6, 1.5, clamp(uMurk, 0.0, 1.0));
+  #if BEAM_DUST
+    // Slow drifting streaks: suspended particles catching the light.
+    float streak = vnoise(vec2(vAngle * 5.0, vAlong * 0.05 - uTime * 0.25));
+    float fine = vnoise(vec2(vAngle * 19.0 + uTime * 0.05, vAlong * 0.22 - uTime * 0.6));
+    a *= 0.55 + 0.6 * streak + 0.35 * fine;
+  #endif
+  // Never fly into a solid wedge: fade out close to the camera.
+  a *= smoothstep(1.5, 14.0, vDepth);
   // Additive light still gets eaten by the water it shines through.
   float f = exp(-fogDensity * fogDensity * vDepth * vDepth);
   gl_FragColor = vec4(uColor * a * f, a * f);

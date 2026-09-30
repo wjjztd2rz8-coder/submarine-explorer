@@ -52,6 +52,14 @@ export interface AtmosphereTier {
   headlightCones: boolean;
   /** Chromatic-aberration strength multiplier. */
   aberration: number;
+  /** F1-OCEAN: bloom blur levels (0 = off, 1 = one quarter-res level, 2 = adds an eighth-res level). */
+  bloomLevels: 0 | 1 | 2;
+  /** F1-OCEAN: god-ray noise octaves in the post pass (0 = off). */
+  rayOctaves: 0 | 1 | 2;
+  /** F1-OCEAN: MSAA samples on the scene render target (0 = none). */
+  msaa: 0 | 2 | 4;
+  /** F1-OCEAN: headlight beam detail: 0 = plain cheap cone, 1 = dusty, 2 = dusty with more segments. */
+  beamDetail: 0 | 1 | 2;
 }
 
 export interface WaterConfig {
@@ -201,32 +209,40 @@ export const DEFAULT_WATER: WaterConfig = {
   causticsStartM: -20,
   causticsEndM: -60,
   causticsIntensity: 1.1,
-  causticsFootprintM: 900,
+  causticsFootprintM: 320,
   causticsFps: 12,
   snowBoxM: 160,
   snowSizeM: 0.32,
-  surfaceVisibleAboveM: -100,
+  surfaceVisibleAboveM: -160,
   surfaceWaveAmpM: 0.9,
   surfaceWaveLengthM: 22,
   aberrationStrength: 0.0016,
   godRayStrength: 0.35,
   tiers: {
-    // low = the brief's floor: fog + headlights, nothing else.
+    // low = the floor: fog, headlights, a plain beam cone and a little marine snow; no post pass.
     low: {
       post: false,
       godRays: false,
-      snowCount: 0,
+      snowCount: 600,
       causticsSize: 0,
-      headlightCones: false,
+      headlightCones: true,
       aberration: 0,
+      bloomLevels: 0,
+      rayOctaves: 0,
+      msaa: 0,
+      beamDetail: 0,
     },
     medium: {
       post: true,
-      godRays: false,
+      godRays: true,
       snowCount: 3000,
       causticsSize: 128,
       headlightCones: true,
       aberration: 1,
+      bloomLevels: 1,
+      rayOctaves: 1,
+      msaa: 0,
+      beamDetail: 1,
     },
     high: {
       post: true,
@@ -235,6 +251,10 @@ export const DEFAULT_WATER: WaterConfig = {
       causticsSize: 256,
       headlightCones: true,
       aberration: 1.4,
+      bloomLevels: 2,
+      rayOctaves: 2,
+      msaa: 4,
+      beamDetail: 2,
     },
     // F0-CORE: ultra starts as high; wave-1 packages raise its budgets.
     ultra: {
@@ -244,6 +264,10 @@ export const DEFAULT_WATER: WaterConfig = {
       causticsSize: 256,
       headlightCones: true,
       aberration: 1.4,
+      bloomLevels: 2,
+      rayOctaves: 2,
+      msaa: 4,
+      beamDetail: 2,
     },
   },
 };

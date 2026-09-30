@@ -23,7 +23,7 @@ export const atmosphereSystem: GameSystem = {
     scene.add(headlights.group);
     const snow = new MarineSnow(config.water, atmoTier);
     if (snow.points) scene.add(snow.points);
-    const water = new Water(scene, config.water, Math.max(terrain.widthM, terrain.depthM));
+    const water = new Water(scene, config.water, Math.max(terrain.widthM, terrain.depthM), atmoTier.beamDetail);
     Object.assign(ctx, { atmoTier, atmosphere, headlights, snow, water });
     ctx.expose({ water, atmosphere, headlights });
   },
@@ -34,10 +34,17 @@ export const atmosphereSystem: GameSystem = {
     'env.lighting': (f, ctx) => {
       const { rig, sub, renderer } = ctx;
       f.fog = { color: f.atmo.fogColor, density: f.atmo.fogDensity };
-      ctx.headlights.update(sub.position, f.forward, f.fog);
+      ctx.headlights.update(sub.position, f.forward, f.fog, f.elapsed, f.atmo.snowDensity);
       // D2-HAZARD: snow drifts with the preset's current.
-      ctx.snow.update(rig.camera, f.atmo, f.dt, renderer.domElement.height, ctx.presets.current);
-      ctx.water.update(rig.camera.position.y, sub.position, f.elapsed, f.fog);
+      const lamp = ctx.headlights.lights[0]!;
+      ctx.snow.update(rig.camera, f.atmo, f.dt, renderer.domElement.height, ctx.presets.current, {
+        origin: sub.position,
+        forward: f.forward,
+        angle: lamp.angle,
+        range: lamp.distance,
+        on: ctx.headlights.on,
+      });
+      ctx.water.update(rig.camera.position.y, sub.position, f.elapsed, f.fog, rig.camera.position);
     },
   },
 };
