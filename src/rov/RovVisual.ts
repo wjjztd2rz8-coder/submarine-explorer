@@ -8,6 +8,9 @@ import type { Rov } from './Rov.js';
 /** ROV model scale (the blueprint is life size, ~2 m long). */
 const ROV_SCALE = 1.15;
 
+/** Intensity gain for the fill light that sits further from the float. */
+const FILL_STANDOFF_GAIN = 3;
+
 /**
  * The work ROV (F1-VEHICLES): the detailed procedural model from
  * `vehicles/rov.ts`, two lamps (SpotLights at the lamp housings) and a warm
@@ -44,9 +47,10 @@ export class RovVisual {
       this.body.add(light, light.target);
     }
     this.fill = new THREE.PointLight(0xffb973, config.fillMinIntensity, config.fillDistanceM, 2);
-    // Above and behind the float, so it lights the work area without blowing
-    // out the float's top.
-    this.fill.position.set(0, 3.6, 2.6);
+    // Well above and behind the float (inverse-square: close in, it blows the
+    // float's top out to flat orange); intensity is scaled up to keep the work
+    // area lit as before.
+    this.fill.position.set(0, 7.5, 6);
     this.body.add(this.fill);
     this.group.add(this.body);
     this.tether = low
@@ -61,10 +65,12 @@ export class RovVisual {
       spot.intensity = preset.intensity * this.config.spotIntensityFactor;
       spot.distance = preset.distance * this.config.spotDistanceFactor;
     }
-    this.fill.intensity = Math.max(
-      this.config.fillMinIntensity,
-      preset.fillIntensity * this.config.fillIntensityFactor,
-    );
+    this.fill.intensity =
+      FILL_STANDOFF_GAIN *
+      Math.max(
+        this.config.fillMinIntensity,
+        preset.fillIntensity * this.config.fillIntensityFactor,
+      );
   }
 
   /**

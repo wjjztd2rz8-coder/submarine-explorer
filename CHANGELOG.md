@@ -14,6 +14,17 @@ without an entry here is not done.
 
 ### Added
 
+- Phase F, F1-VEHICLES: **procedural vehicle kit** (`src/vehicles/`). The hero
+  sub is now a detailed deep-submergence vehicle in three distinct hull
+  classes (A coastal, B deep ocean, C full ocean depth; chosen by the fitted
+  hull): pressure-sphere viewport, syntactic-foam fairings, thrusters with
+  animated props, strobes, manipulator arms, sled, decals and bubbles. The ROV
+  is a detailed work-class vehicle with a sagging tether that straightens at the
+  limit. First person looks out through a cockpit viewport frame that is
+  never dark. Detail scales with the quality tier (the low tier builds a
+  simplified LOD with no textures, wash or decals). `SubMesh` and `RovVisual`
+  keep their public API.
+
 - Phase F, F0-CORE: **quality tiers v2** (`src/core/Quality.ts`,
   `src/core/config/quality.ts`). There are now four tiers (`low`, `medium`,
   `high`, `ultra`) plus an `auto` setting. `auto` detects a tier from the GPU
@@ -38,6 +49,7 @@ without an entry here is not done.
 
 ### Changed
 
+- F1-VEHICLES: the ROV fill light moved from 3.6 m to about 9 m from the float (intensity x3) and vehicle materials gained a highlight shoulder, because pale livery inside the boat's own headlight beams clipped to flat white. The old single-mesh hull and ROV models are replaced, not kept as an option.
 - Phase F, F0-CORE: **`main.ts` split into systems** (`src/app/`). There is one
   file per system under `src/app/systems/`, each with init, per-frame stage
   hooks and dispose. The ordered registration list lives in

@@ -107,7 +107,7 @@ export function normalise(geo: THREE.BufferGeometry, color?: Rgb | Painter): THR
       for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (same(t * 3 + i, u * 3 + j)) k++;
       return k;
     };
-    for (let t = 0; t < tris; ) {
+    for (let t = 0; t < tris;) {
       const pair = t + 1 < tris && shared(t, t + 1) === 2 ? 2 : 1;
       const verts = pair * 3;
       const i0 = t * 3;

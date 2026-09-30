@@ -98,9 +98,25 @@ function addKeyAndRim(mat: THREE.MeshStandardMaterial, u: LitUniforms, rimScale 
           '    + kSpecCol * kSpec * ( 1.0 - roughnessFactor ) * 1.6 );',
           '}',
         ].join('\n'),
+      )
+      .replace(
+        '#include <opaque_fragment>',
+        [
+          // Highlight shoulder: pale livery under a close headlight (the ROV
+          // 30 m ahead of the boat, the bow inside its own beams) would clip
+          // to flat white. Compress the top of the range, keeping hue.
+          '{',
+          '  float hi = max( max( outgoingLight.r, outgoingLight.g ), outgoingLight.b );',
+          '  if ( hi > 0.5 ) {',
+          '    float sh = 0.5 + 0.4 * tanh( ( hi - 0.5 ) / 0.4 );',
+          '    outgoingLight *= sh / hi;',
+          '  }',
+          '}',
+          '#include <opaque_fragment>',
+        ].join('\n'),
       );
   };
-  mat.customProgramCacheKey = () => `vehicle-key-rim-${rimScale}`;
+  mat.customProgramCacheKey = () => `vehicle-key-rim-shoulder-${rimScale}`;
 }
 
 /** Owns one vehicle's materials. */
