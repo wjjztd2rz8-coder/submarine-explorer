@@ -162,7 +162,7 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
       guide: g,
       poiIds: linked.map((p) => p.id),
       linkedEntryIds: [],
-      recreation: linked.some((p) => p.def.reconstruction === true),
+      recreation: linked.some((p) => p.def.reconstruction === true) || g.reconstruction === true,
     };
     (kind === 'poi' ? poiEntries : siteEntries).push(entry);
   }

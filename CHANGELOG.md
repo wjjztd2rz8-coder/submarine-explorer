@@ -106,6 +106,22 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F1-FIXES: **wave-1 audit fixes.** Wall colliders (scarps, canyon ledge,
+  stalactite alcove) now follow the deformed mesh: overlapping x segments (no
+  gaps), end heights capped to the pinched crest, real front and back extents;
+  the far-LOD alcove impostor keeps the whole wall. Post-FX toggling no longer
+  changes exposure; custom shaders (water, marine snow, beams, wash, plumes,
+  smoke) finish with Three's tone-mapping and colour-space chunks so direct
+  rendering matches the post path. The additive headlight beam no longer
+  multiplies alpha twice (`headlightConeOpacity` 0.05 to 0.012 to keep the
+  brightness). Lost City's main edifice is 60 m total relief (was about 70 m).
+  Bismarck shows four overturned turrets (was two inverted, one on its side, one
+  upright). ASHES hero stacks are about 4 m (was 9 m), matching the field.
+  Beebe's hero is recorded as a flank fragment of the roughly 80 m by 50 m
+  mound; the full mound is deferred (it would bury the neighbouring chimneys).
+  Smoker culling bounds now include the smoke; Journal entries without a linked
+  POI show the Recreation tag when the guide entry is flagged.
+
 - Phase F, F1-TERRAIN: the old depth-ramp vertex-colour seabed and its
   height/slope colour ramp are replaced by the biome material (config
   `colorForDepth`/ramp inputs removed from the material); reason: PBR realism.
