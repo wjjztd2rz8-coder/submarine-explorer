@@ -137,8 +137,8 @@ export class Headlights {
   }
 
   /**
-   * @param origin  boat position
-   * @param forward boat forward direction, unit length
+   * @param origin  boat (or, while deployed, ROV) position
+   * @param forward its forward direction, unit length
    * @param fog     current fog colour / density, so the cones sit in the same
    *                water as everything else
    */
@@ -148,11 +148,13 @@ export class Headlights {
     fog?: { color: THREE.Color; density: number },
     elapsed = 0,
     murk = 1,
+    /** Lamp spacing scale: 1 for the sub, smaller for the ROV's tighter light bar. */
+    separationScale = 1,
   ): void {
     if (!this.enabled) return;
     if (this.preset) this.fill.position.copy(origin).addScaledVector(forward, 10);
     this.right.crossVectors(forward, this.up).normalize();
-    const half = this.config.headlightSeparationM / 2;
+    const half = (this.config.headlightSeparationM * separationScale) / 2;
 
     for (let i = 0; i < this.lights.length; i++) {
       const side = i === 0 ? -half : half;

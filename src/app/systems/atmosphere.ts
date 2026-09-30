@@ -11,6 +11,9 @@ import { MarineSnow } from '../../render/MarineSnow.js';
 import { Water } from '../../world/Water.js';
 import type { GameSystem } from '../System.js';
 
+/** The ROV's lamp bar is this share of the sub's headlight separation. */
+const ROV_LAMP_SCALE = 0.3;
+
 export const atmosphereSystem: GameSystem = {
   name: 'atmosphere',
   init(ctx) {
@@ -42,12 +45,24 @@ export const atmosphereSystem: GameSystem = {
       // Beams show in dark, particle-laden water and wash out in daylight.
       const dark = 1 - Math.min(1, f.atmo.ambientIntensity / 0.9);
       const murk = f.atmo.snowDensity * (0.25 + 0.75 * dark);
-      ctx.headlights.update(sub.position, f.forward, f.fog, f.elapsed, murk);
+      // F1-FIXES: while the ROV is out, the rig rides the ROV (its own lamps on a
+      // narrower bar) instead of lighting it from behind through the mothership.
+      const lit = ctx.rov.deployed ? ctx.rov : null;
+      const lampOrigin = lit ? lit.position : sub.position;
+      const lampForward = lit ? lit.forward : f.forward;
+      ctx.headlights.update(
+        lampOrigin,
+        lampForward,
+        f.fog,
+        f.elapsed,
+        murk,
+        lit ? ROV_LAMP_SCALE : 1,
+      );
       // D2-HAZARD: snow drifts with the preset's current.
       const lamp = ctx.headlights.lights[0]!;
       ctx.snow.update(rig.camera, f.atmo, f.dt, renderer.domElement.height, ctx.presets.current, {
-        origin: sub.position,
-        forward: f.forward,
+        origin: lampOrigin,
+        forward: lampForward,
         angle: lamp.angle,
         range: lamp.distance,
         on: ctx.headlights.on,
