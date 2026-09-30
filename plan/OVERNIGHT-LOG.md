@@ -16,4 +16,4 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged: D-PHOTO (Codex started it, and a Claude Opus subagent finished it after the Codex limit), then the docs reconciliation (README controls table, architecture, settings, STATUS with a playtest #3 checklist, MASTER-PLAN). Full gates are green on main (fe918dc).
 - The overnight timer was stopped: no Phase D work remains. Nothing has been pushed.
 - Next for the owner: playtest #3 (checklist in plan/STATUS.md), then the go-ahead for the GitHub repo and Pages.
-- 2026-09-29 19:45 CDT headless run: skipped: budget gate (claude  5h   0.0% left (resets Tue Sep 29 20:59) | 7d  63.0% left (resets Thu Oct 01 06:59) codex   5h  49.0% left (resets Tue Sep 29 21:29) | 7d  92.0% left (resets Tue Oct 06 16:29)  [as of 174 min ago] )
+- 2026-09-29 19:45 CDT headless run: skipped: budget gate (claude 5h 0.0% left (resets Tue Sep 29 20:59) | 7d 63.0% left (resets Thu Oct 01 06:59) codex 5h 49.0% left (resets Tue Sep 29 21:29) | 7d 92.0% left (resets Tue Oct 06 16:29) [as of 174 min ago] )
