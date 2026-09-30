@@ -19,7 +19,6 @@ import { clamp01, mulberry, particleBudget } from './maths.js';
 import {
   COMMON_VERT,
   GlowLights,
-  SOFT_FRAG,
   commonUniforms,
   disposeObjects,
   makePoints,
@@ -60,6 +59,8 @@ export class VentPreset implements EnvPreset {
   private scene: THREE.Scene | null = null;
   private readonly objects: THREE.Points[] = [];
   private smoke: THREE.ShaderMaterial | null = null;
+  private smokeLifeS = 60;
+  private smokeRiseH = 70;
   private shimmer: THREE.ShaderMaterial | null = null;
   private glow: GlowLights | null = null;
   private sources: VentSource[] = [];
@@ -130,6 +131,8 @@ export class VentPreset implements EnvPreset {
     const riseMps = Math.max(0.05, num(p.riseMps, 1.2));
     // h(t) = H (1 - (1-t)^1.8) leaves the orifice at 1.8 H / life m/s.
     const life = (1.8 * riseH) / riseMps;
+    this.smokeLifeS = life;
+    this.smokeRiseH = riseH;
     const opacity =
       (carbonate ? num(p.smokeOpacityCarbonate, 0.16) : num(p.smokeOpacitySulfide, 0.55)) *
       (0.5 + 0.5 * intensity);
@@ -150,9 +153,10 @@ export class VentPreset implements EnvPreset {
           value: new THREE.Color(num(p.glowColor, 0xff9a4a)).multiplyScalar(carbonate ? 0.15 : 0.6),
         },
         uOpacity: { value: opacity },
+        uDrift: { value: new THREE.Vector2() },
       },
       vertexShader: SMOKE_VERT,
-      fragmentShader: SOFT_FRAG,
+      fragmentShader: PUFF_FRAG,
       transparent: true,
       depthWrite: false,
     });
@@ -203,7 +207,15 @@ export class VentPreset implements EnvPreset {
   }
 
   update(_dt: number, ctx: PresetFrameContext): void {
-    if (this.smoke) updateCommonUniforms(this.smoke, ctx, this.look);
+    if (this.smoke) {
+      updateCommonUniforms(this.smoke, ctx, this.look);
+      // Bend the column downstream: half the drift a particle would make over its life,
+      // capped so a strong current cannot fling the smoke off the site.
+      const drift = this.smoke.uniforms.uDrift!.value as THREE.Vector2;
+      drift.set(ctx.current.x, ctx.current.z).multiplyScalar(this.smokeLifeS * 0.5);
+      const cap = this.smokeRiseH * 0.6;
+      if (drift.length() > cap) drift.setLength(cap);
+    }
     if (this.shimmer) updateCommonUniforms(this.shimmer, ctx, this.look);
     this.glow?.update(ctx.elapsed);
 
@@ -248,28 +260,85 @@ uniform float uSize1;
 uniform vec3  uColor;
 uniform vec3  uGlow;
 uniform float uOpacity;
+uniform vec2  uDrift;
 attribute vec4 aSeed; // phase, angle, radial, jitter
 varying vec3 vColor;
 varying float vAlpha;
 varying float vFog;
 
+varying float vSeed;
+varying float vRot;
+
 void main() {
   float t = fract(uTime / uLife + aSeed.x);
   // Buoyant plume: fast out of the orifice, slowing and spreading as it rises.
   float h = uRiseH * (1.0 - pow(1.0 - t, 1.8));
-  float r = uSpread * pow(t, 0.8) * aSeed.z;
+  // A narrow stem that billows outward: radius grows faster than linearly.
+  float r = uSpread * (0.06 + 0.94 * pow(t, 1.35)) * aSeed.z;
   float a = aSeed.y + sin(uTime * 0.35 + aSeed.w * 12.0) * 0.6 * t;
   vec3 w = position + vec3(cos(a) * r, h, sin(a) * r);
+  // The whole column meanders (phase per chimney) and bends downstream with the current.
+  float ph = position.x * 0.13 + position.z * 0.17;
+  w.x += sin(h * 0.09 + uTime * 0.21 + ph) * 0.11 * uSpread * t;
+  w.z += cos(h * 0.07 + uTime * 0.17 + ph * 1.7) * 0.11 * uSpread * t;
+  w.xz += uDrift * t * t;
   // Turbulent wobble grows with height.
   w.x += sin(uTime * 0.9 + aSeed.w * 40.0 + h * 0.2) * 0.8 * t;
   w.z += cos(uTime * 0.7 + aSeed.w * 23.0 + h * 0.15) * 0.8 * t;
 
-  float size = mix(uSize0, uSize1, t) * (0.7 + 0.6 * aSeed.w);
+  // Puffs bloom quickly near the source, then keep swelling slowly.
+  float size = mix(uSize0, uSize1, sqrt(t)) * (0.7 + 0.6 * aSeed.w);
   float dist = placePoint(w, size);
   // Lit by the headlights, plus the warm orifice glow for the first few metres.
   vColor = uColor * presetLight(w) + uGlow * exp(-h / 5.0);
   vAlpha = uOpacity * smoothstep(0.0, 0.04, t) * (1.0 - smoothstep(0.5, 1.0, t));
   vFog = presetFog(dist);
+  vSeed = aSeed.w + aSeed.y;
+  vRot = aSeed.y + uTime * 0.12 * (aSeed.z - 0.6);
+}
+`;
+
+/**
+ * A billowing smoke puff: each sprite is a rotated, domain-warped noise blob
+ * with an eroded edge, so overlapping puffs read as turbulent smoke rather
+ * than stacked soft discs.
+ */
+const PUFF_FRAG = /* glsl */ `
+precision highp float;
+uniform float uTime;
+uniform vec3 fogColor;
+varying vec3 vColor;
+varying float vAlpha;
+varying float vFog;
+varying float vSeed;
+varying float vRot;
+float hash21(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+float vnoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash21(i), hash21(i + vec2(1.0, 0.0)), f.x),
+             mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+void main() {
+  vec2 d = (gl_PointCoord - 0.5) * 2.0;
+  float c = cos(vRot);
+  float s = sin(vRot);
+  d = mat2(c, -s, s, c) * d;
+  float r2 = dot(d, d);
+  if (r2 > 1.0) discard;
+  vec2 q = d * 2.0 + vSeed * 31.0 + vec2(0.0, uTime * 0.05);
+  float n = vnoise(q) * 0.6 + vnoise(q * 2.3 + vnoise(q) * 1.6) * 0.4;
+  float body = 1.0 - r2 * (0.5 + 1.0 * n);
+  float a = smoothstep(0.0, 0.55, body - 0.3 * (1.0 - n));
+  if (a <= 0.003) discard;
+  // Denser, darker cores; ragged, lighter rims.
+  vec3 col = mix(vColor, fogColor, vFog) * (0.45 + 0.95 * n);
+  gl_FragColor = vec4(col, vAlpha * a * (1.0 - 0.6 * vFog));
 }
 `;
 

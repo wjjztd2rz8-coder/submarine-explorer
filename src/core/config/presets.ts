@@ -217,7 +217,7 @@ export const DEFAULT_PRESETS: PresetsConfig = {
     riseHeightM: 70,
     spreadM: 14,
     sizeStartM: 1.6,
-    sizeEndM: 7,
+    sizeEndM: 4.6,
     smokeColorSulfide: 0x2b2a28,
     smokeColorCarbonate: 0xd6ddd8,
     smokeOpacitySulfide: 0.55,
