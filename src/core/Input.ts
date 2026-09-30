@@ -297,6 +297,34 @@ export class Input {
   private readonly edgeArmed = new Set<ActionId>();
   wheelDelta = 0;
 
+  // F1-TOUCH ---------------------------------------------------------------
+  /**
+   * Analog axes written by the on-screen controls (`ui/TouchControls.ts`). A
+   * non-zero axis overrides the keyboard value, like a deflected gamepad stick.
+   */
+  readonly touchAxes = { throttle: 0, yaw: 0, pitch: 0, ballast: 0 };
+  /** Level-triggered actions held by an on-screen button (`boost`, `scan`). */
+  readonly touchHeld = new Set<ActionId>();
+  /** True while the touch controls are the player's primary input. */
+  touchActive = false;
+
+  /** Arm an edge action from an on-screen button (same path as a key press). */
+  touchEdge(id: ActionId): void {
+    this.edgeArmed.add(id);
+  }
+
+  /** Add a camera-look delta from a touch drag (pixels, like a mouse drag). */
+  touchLook(dx: number, dy: number): void {
+    this.state.lookDx += dx;
+    this.state.lookDy += dy;
+  }
+
+  /** Add a zoom delta from a pinch, in wheel units (positive = zoom out). */
+  touchZoom(delta: number): void {
+    this.wheelDelta += delta;
+  }
+  // ------------------------------------------------------------------------
+
   constructor(options: InputOptions | HTMLElement | null = null) {
     // Back-compatible: `new Input(canvas)` still works alongside the options form.
     const isElement =
@@ -536,6 +564,7 @@ export class Input {
     this.disposers = [];
     this.keys.clear();
     this.edgeArmed.clear();
+    this.touchHeld.clear();
   }
 
   private isBound(code: string): boolean {
@@ -582,6 +611,15 @@ export class Input {
     s.ballast = this.axis('ballastFlood', 'ballastBlow');
     s.boost = this.isDown('boost');
     s.scan = this.isDown('scan');
+
+    // F1-TOUCH: on-screen controls override like a deflected stick.
+    const ta = this.touchAxes;
+    if (ta.throttle) s.throttle = ta.throttle;
+    if (ta.yaw) s.yaw = ta.yaw;
+    if (ta.pitch) s.pitch = ta.pitch;
+    if (ta.ballast) s.ballast = ta.ballast;
+    if (this.touchHeld.has('boost')) s.boost = true;
+    if (this.touchHeld.has('scan')) s.scan = true;
 
     if (this.edgeArmed.size) {
       if (this.edgeArmed.has('toggleCamera')) s.toggleCamera = true;

@@ -14,6 +14,16 @@ without an entry here is not done.
 
 ### Added
 
+- Phase F, F1-TOUCH: **full touch play and a PWA install** (`src/ui/TouchControls.ts`,
+  `src/core/Touch.ts`, `src/styles/touch.css`, `public/sw.js`). A left stick
+  (thrust and turn), a right rise/sink slider, Scan (hold), Boost (hold), Lights,
+  Sonar, Photo and Pause buttons, drag to look, pinch to zoom (the map while the
+  sonar is expanded) and double-tap to reset the camera. They show while touch is
+  the primary input and follow the last input used. Menus get 44 px targets on
+  coarse pointers and mouse-only settings hide. A web manifest, icons and a
+  service worker (network-first shell, cache-first tiles and assets, versioned per
+  build, production and non-automated pages only) make it installable and
+  playable offline for visited sites.
 - Phase F, F1-OCEAN: **the water column, lit like a documentary** (`src/render/`,
   `src/shaders/underwater.ts`, `src/world/Water.ts`). The post stack now has a
   depth-aware composite: bloom (one quarter-resolution level on medium, plus an

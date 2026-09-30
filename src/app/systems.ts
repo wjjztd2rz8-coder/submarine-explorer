@@ -32,6 +32,7 @@ import { createRovSystem } from './systems/rov.js';
 import { settingsSystem } from './systems/settings.js';
 import { globeSystem, shellKeysSystem, shellSystem } from './systems/shell.js';
 import { sonarControlsSystem, sonarSystem } from './systems/sonar.js';
+import { createTouchSystem } from './systems/touch.js';
 import { createSubmarineSystem } from './systems/submarine.js';
 import { waypointsSystem } from './systems/waypoints.js';
 import { landmarksSystem, terrainSystem } from './systems/world.js';
@@ -63,6 +64,7 @@ export function createSystems(): GameSystem[] {
     inputSystem,
     cameraControlsSystem,
     createPointerSystem(),
+    createTouchSystem(),
     // Before the mission router, so its capture-phase key handler runs first.
     settingsSystem,
     sonarControlsSystem,
