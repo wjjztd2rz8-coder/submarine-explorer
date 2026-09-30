@@ -82,7 +82,8 @@ before; the before/after screenshots are in `.cache/codex/shots/f0-core/`.
   - `window.__game.perf` exposes `{ tier, tierSource, drawCalls, triangles,
 frameMs, pixelRatio, maxPixelRatio, resolutionScale, dynamicResolution }`.
     The draw and triangle counts include the post pass (renderer.info plus
-    `UnderwaterPass.scene*`).
+    `UnderwaterPass.scene*`). Checked on a real GPU: titanic at medium draws
+    56 calls and 218k triangles; `?tier=ultra` draws 597k triangles.
 - **`core/assets/`**
   - `assets.loadGLTF(url)` handles Draco, Meshopt and KTX2 inside the glTF.
   - `assets.loadTexture(url, { srgb, repeat })` loads PNG, JPEG, WebP or
@@ -119,6 +120,10 @@ frameMs, pixelRatio, maxPixelRatio, resolutionScale, dynamicResolution }`.
   rows copied from `high`. F1 packages should give `ultra` its own content.
 
 ## Follow-ups
+
+0. Detection misses some discrete AMD GPUs whose renderer string lacks "RX"
+   (e.g. `AMD Radeon Graphics (RADV GFX1200)` on Linux, which gets `medium`).
+   Extend `DISCRETE_RE` if that matters; on the default fixed tier it has no effect.
 
 1. Once F1 has tuned the tiers and there is a mobile layout, switch the default
    `graphicsTier` to `auto`. Log it in CHANGELOG.md; it is a default change.
