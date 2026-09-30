@@ -9,9 +9,13 @@ import { SAVE_KEYS } from '../../core/Save.js';
 import { DISCOVERY_VERSION } from '../../game/DiscoveryStore.js';
 import { SettingsScreen } from '../../ui/Settings.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export const settingsSystem: GameSystem = {
   name: 'settings',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { save, input, config, tier, quality, settings, discovery } = ctx;
     const settingsScreen = new SettingsScreen({
@@ -22,7 +26,7 @@ export const settingsSystem: GameSystem = {
       activeTierSetting: quality.setting,
       activeDetailStrength: settings.detailStrength,
       activeSimSpeedDefault: settings.simSpeedDefault,
-      tierFromUrl: quality.source === 'url',
+      tierFromUrl: quality.urlForced,
       canOpen: () => !ctx.globe.isOpen,
       onOpen: () => {
         document.exitPointerLock?.();
@@ -86,15 +90,17 @@ export const settingsSystem: GameSystem = {
     // Saved display settings, at boot and live.
     ctx.rig.reduceMotion = settings.reduceMotion;
     ctx.sonar.setPalette(settings.sonarPalette);
-    save.onChange((next, changed) => {
-      if (changed.includes('reduceMotion')) ctx.rig.reduceMotion = next.reduceMotion;
-      if (changed.includes('captions')) ctx.captions.setEnabled(next.captions);
-      if (changed.includes('sonarPalette')) ctx.sonar.setPalette(next.sonarPalette);
-      if (changed.includes('postFx')) ctx.postFx = next.postFx;
-      // D-INPUT-HUD
-      if (changed.includes('uiScale'))
-        document.documentElement.style.setProperty('--ui-user-scale', String(next.uiScale / 100));
-    });
+    cleanup.add(
+      save.onChange((next, changed) => {
+        if (changed.includes('reduceMotion')) ctx.rig.reduceMotion = next.reduceMotion;
+        if (changed.includes('captions')) ctx.captions.setEnabled(next.captions);
+        if (changed.includes('sonarPalette')) ctx.sonar.setPalette(next.sonarPalette);
+        if (changed.includes('postFx')) ctx.postFx = next.postFx;
+        // D-INPUT-HUD
+        if (changed.includes('uiScale'))
+          document.documentElement.style.setProperty('--ui-user-scale', String(next.uiScale / 100));
+      }),
+    );
     ctx.expose({ save, settings: settingsScreen });
   },
 };

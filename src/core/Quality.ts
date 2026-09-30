@@ -169,6 +169,11 @@ export interface QualityResolution {
   /** What detection would pick, even when the URL or setting overrides it. */
   detected: TierDecision;
   reason: string;
+  /**
+   * True when `?tier=` (a tier or `auto`) decided this dive, so a saved-setting
+   * change cannot take effect by reloading the same URL.
+   */
+  urlForced: boolean;
 }
 
 /**
@@ -182,7 +187,14 @@ export function resolveQuality(
 ): QualityResolution {
   const detected = detectTier(caps);
   if (isGraphicsTier(urlTier))
-    return { tier: urlTier, source: 'url', setting, detected, reason: '?tier= URL parameter' };
+    return {
+      tier: urlTier,
+      source: 'url',
+      setting,
+      detected,
+      reason: '?tier= URL parameter',
+      urlForced: true,
+    };
   if (urlTier === 'auto')
     return {
       tier: detected.tier,
@@ -190,11 +202,29 @@ export function resolveQuality(
       setting,
       detected,
       reason: `?tier=auto: ${detected.reason}`,
+      urlForced: true,
     };
   if (setting !== 'auto')
-    return { tier: setting, source: 'setting', setting, detected, reason: 'saved setting' };
-  return { tier: detected.tier, source: 'auto', setting, detected, reason: detected.reason };
+    return {
+      tier: setting,
+      source: 'setting',
+      setting,
+      detected,
+      reason: 'saved setting',
+      urlForced: false,
+    };
+  return {
+    tier: detected.tier,
+    source: 'auto',
+    setting,
+    detected,
+    reason: detected.reason,
+    urlForced: false,
+  };
 }
+
+/** A rejected upper ratio is retried only when the lower ratio now runs this much faster than before. */
+const REJECTED_RETRY_FACTOR = 0.8;
 
 /**
  * Dynamic resolution controller. Feed it the real frame time every frame;
@@ -205,7 +235,10 @@ export function resolveQuality(
  * `budget x headroomFactor` for `upHoldS`, and after each change the
  * controller waits `cooldownS`. If a step up is followed by a step down
  * within `4 x upHoldS`, the next step up waits twice as long (up to 60 s),
- * so an unstable ratio is not retried every few seconds.
+ * so an unstable ratio is not retried every few seconds. The rejected upper
+ * ratio is also remembered with the lower-ratio frame time at the time; it is
+ * only retried once that frame time has dropped materially, so a stable
+ * ratio-dependent workload settles instead of cycling between two ratios.
  */
 export class DynamicResolution {
   private ratio: number;
@@ -215,6 +248,10 @@ export class DynamicResolution {
   private cooldownS = 0;
   private upHoldS: number;
   private sinceUpS = Infinity;
+  /** Smoothed frame time at the ratio below the last up-step. */
+  private emaBeforeUp = 0;
+  /** An upper ratio a recent up-step showed to be too heavy, and the lower-ratio frame time then. */
+  private rejected: { ratio: number; lowerMs: number } | null = null;
 
   constructor(
     private readonly cfg: DynamicResolutionConfig,
@@ -267,12 +304,24 @@ export class DynamicResolution {
       this.underS = 0;
     }
     if (this.overS >= this.cfg.downHoldS && this.ratio > this.minRatio + 1e-6) {
-      if (this.sinceUpS < this.cfg.upHoldS * 4) this.upHoldS = Math.min(60, this.upHoldS * 2);
+      if (this.sinceUpS < this.cfg.upHoldS * 4) {
+        this.upHoldS = Math.min(60, this.upHoldS * 2);
+        this.rejected = { ratio: this.ratio, lowerMs: this.emaBeforeUp };
+      }
       return this.apply(Math.max(this.minRatio, this.ratio - this.cfg.step));
     }
     if (this.underS >= this.upHoldS && this.ratio < this.maxRatio - 1e-6) {
+      const next = Math.min(this.maxRatio, this.ratio + this.cfg.step);
+      if (this.rejected && next >= this.rejected.ratio - 1e-6) {
+        if (this.ema > this.rejected.lowerMs * REJECTED_RETRY_FACTOR) {
+          this.underS = 0;
+          return null;
+        }
+        this.rejected = null;
+      }
       this.sinceUpS = 0;
-      return this.apply(Math.min(this.maxRatio, this.ratio + this.cfg.step));
+      this.emaBeforeUp = this.ema;
+      return this.apply(next);
     }
     return null;
   }

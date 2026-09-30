@@ -13,6 +13,9 @@ import { MissionSelect, missionUrl, tileUrl } from '../../ui/MissionSelect.js';
 import { PauseMenu } from '../../ui/PauseMenu.js';
 import type { AppState } from '../context.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 /** localStorage key for the last mission dived (Continue). */
 export const LAST_SITE_KEY = 'subexplorer.lastSite.v1';
@@ -31,6 +34,7 @@ export function readLastSite(): string | null {
 
 export const shellSystem: GameSystem = {
   name: 'shell',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { index, meta, route, bus, save, discovery, app } = ctx;
     const missionSelect = new MissionSelect(index, {
@@ -133,15 +137,17 @@ export const shellSystem: GameSystem = {
       pauseSites.setMissions(list);
       if (!list.some((m) => m.id === app.lastSite)) home.setContinue(null);
     });
-    bus.on('mission:started', ({ missionId }) => {
-      app.lastSite = missionId;
-      home.setContinue(missionId);
-      try {
-        localStorage.setItem(LAST_SITE_KEY, JSON.stringify({ missionId }));
-      } catch {
-        /* optional */
-      }
-    });
+    cleanup.add(
+      bus.on('mission:started', ({ missionId }) => {
+        app.lastSite = missionId;
+        home.setContinue(missionId);
+        try {
+          localStorage.setItem(LAST_SITE_KEY, JSON.stringify({ missionId }));
+        } catch {
+          /* optional */
+        }
+      }),
+    );
     ctx.setAppState = (state: AppState): void => {
       app.state = state;
       document.body.dataset.appState = state;
@@ -245,6 +251,7 @@ export const globeSystem: GameSystem = {
  */
 export const shellKeysSystem: GameSystem = {
   name: 'shellKeys',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { app, discovery, home, pause } = ctx;
     const onShellKey = (e: KeyboardEvent): void => {
@@ -285,7 +292,7 @@ export const shellKeysSystem: GameSystem = {
       if (app.state === 'pause') pause.escape();
       else ctx.setAppState('pause');
     };
-    window.addEventListener('keydown', onShellKey, true);
+    cleanup.listen(window, 'keydown', onShellKey, true);
     if (app.state === 'dive') ctx.bus.emit('app:state', { state: 'dive' });
   },
 };

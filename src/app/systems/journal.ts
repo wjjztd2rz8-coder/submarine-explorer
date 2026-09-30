@@ -6,9 +6,13 @@
  */
 
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export const journalSystem: GameSystem = {
   name: 'journal',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { discovery, contentLandmark, app, bus, missionRouter, pause } = ctx;
     const journal = discovery.guide;
@@ -16,7 +20,7 @@ export const journalSystem: GameSystem = {
     journal.setStore(discovery.store);
     journal.setCurrentSite(contentLandmark);
     journal.setHomeMode(app.state === 'home');
-    bus.on('app:state', ({ state }) => journal.setHomeMode(state === 'home'));
+    cleanup.add(bus.on('app:state', ({ state }) => journal.setHomeMode(state === 'home')));
     if (missionRouter) {
       const surface = document.createElement('button');
       surface.type = 'button';
@@ -32,9 +36,11 @@ export const journalSystem: GameSystem = {
         (b) => b.textContent === 'Quit to home',
       );
       pauseActions?.insertBefore(surface, quitButton ?? null);
-      bus.on('app:state', ({ state }) => {
-        if (state === 'pause') surface.hidden = !missionRouter.canEndDive;
-      });
+      cleanup.add(
+        bus.on('app:state', ({ state }) => {
+          if (state === 'pause') surface.hidden = !missionRouter.canEndDive;
+        }),
+      );
     }
     ctx.expose({ journal });
   },
