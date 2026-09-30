@@ -46,6 +46,21 @@
       "collision": "box",
       "reconstruction": true,
       "note": "Vent mound at Hiolo South (~1,274 m, ~47 degC mean fluid temperature -- the warmest of the Hiolo sites), near the 'cauliflower' iron-mat orifice described in the source literature. All three chimneys are kept at or under 5 m tall per the task brief -- these are diffuse, low-relief iron-oxide mounds, not tall sulfide edifices."
+    },
+    {
+      "id": "hiolo-north-pillows",
+      "model": "procedural:geo",
+      "feature": "pillow-field",
+      "lat": 18.91232,
+      "lon": -155.26765,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [30, 24, 4],
+      "lod_distance_m": 700,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: pillow-lava heap with iron-oxide staining and orange iron-bacteria mats beside the Hiolo North chimneys; the seamount is basaltic and its summit vents host Fe-oxidising mats (Emerson & Moyer 2002). Exact layout and size are invented."
     }
   ]
 }

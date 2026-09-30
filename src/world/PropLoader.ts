@@ -22,10 +22,16 @@ import type {
   ProceduralPropKind,
   PropsConfig,
 } from '../core/Config.js';
+import { isGeoFeature, type GeoFeatureId } from './props/geo/features.js';
 import { isWreckHull, isWreckScatter, type WreckId } from './props/wrecks/variants.js';
 
 export const PROCEDURAL_PREFIX = 'procedural:';
-export const PROCEDURAL_KINDS: readonly ProceduralPropKind[] = ['hull-block', 'debris', 'chimney'];
+export const PROCEDURAL_KINDS: readonly ProceduralPropKind[] = [
+  'hull-block',
+  'debris',
+  'chimney',
+  'geo',
+];
 /** Allowed values in a hull-block's `ends: [forward, aft]`. */
 export const HULL_ENDS: readonly HullEnd[] = ['prow', 'cut', 'rounded'];
 /** Allowed values of `material_hint` (procedural:chimney rock type). */
@@ -61,6 +67,8 @@ export interface PropDef {
    * hull-block or a scatter-kit id on debris; null = the generic builder.
    */
   wreck: WreckId | null;
+  /** `procedural:geo` only: which geology / biology set piece (`props/geo/features.ts`); null = a generic outcrop. */
+  feature: GeoFeatureId | null;
   lodDistanceM: number;
   collision: PropCollisionKind;
   /** Tilt the prop to the terrain normal (only meaningful when snapping). */
@@ -233,6 +241,16 @@ export function validatePropEntry(
     }
   }
 
+  let feature: GeoFeatureId | null = null;
+  if (entry.feature !== undefined) {
+    if (procedural === 'geo' && isGeoFeature(entry.feature)) feature = entry.feature;
+    else {
+      warnings.push(
+        `${where}: "feature" ${JSON.stringify(entry.feature)} does not match procedural:${procedural ?? 'model'}; ignored`,
+      );
+    }
+  }
+
   let lodDistanceM = config.defaultLodDistanceM;
   if (entry.lod_distance_m !== undefined) {
     if (!isNum(entry.lod_distance_m) || entry.lod_distance_m <= 0) {
@@ -267,6 +285,7 @@ export function validatePropEntry(
     hullEnds,
     materialHint,
     wreck,
+    feature,
     lodDistanceM,
     collision,
     alignToSlope: alignToSlope && snap,

@@ -8,9 +8,13 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { ChimneyMaterial, PropsConfig } from '../../../core/Config.js';
+import { geoDetail } from '../geo/detail.js';
+import { geoMaterial } from '../geo/materials.js';
+import { shimmerPlume, smokePlume } from '../geo/plume.js';
 import {
   mulberry32,
   normalise,
+  projectUVs,
   valueNoise3,
   type BuiltProp,
   type ProceduralBuilder,
@@ -130,8 +134,56 @@ export function buildChimney(
   return { full, impostor: imp, bounds: merged.boundingBox!.clone() };
 }
 
+/**
+ * A chimney as placed in a landmark: the base column plus a detail texture
+ * (flowstone on carbonate, cracked rock otherwise) and a tier-scaled animated
+ * plume: black smoke from sulfide stacks, clear shimmer from carbonate and
+ * low-temperature (basalt) vents. Only `full` gets the extras; `buildChimney`
+ * stays the plain geometry.
+ */
+export function buildPlacedChimney(
+  dims: readonly [number, number, number],
+  seed: number,
+  cfg: PropsConfig,
+  material: ChimneyMaterial,
+  tier: string,
+): BuiltProp {
+  const built = buildChimney(dims, seed, cfg, material);
+  const d = geoDetail(tier);
+  const body = built.full as THREE.Mesh;
+  projectUVs(body.geometry, material === 'carbonate' ? 5 : 3);
+  const old = body.material as THREE.Material;
+  body.material = geoMaterial(material === 'carbonate' ? 'flow' : 'rock', d, {
+    roughness: 0.93,
+    bumpScale: 1.2,
+  });
+  old.dispose();
+  const H = dims[2];
+  const baseR = dims[0] > 0 ? dims[0] / 2 : H * cfg.chimneyRadiusFraction;
+  const topR = baseR * cfg.chimneyTopFraction;
+  const plume =
+    material === 'sulfide'
+      ? smokePlume(
+          THREE.MathUtils.clamp(H * 2.6 + 4, 7, 34),
+          topR * 0.35,
+          Math.round(110 * d.plume),
+          seed ^ 0x5a5a,
+        )
+      : shimmerPlume(
+          THREE.MathUtils.clamp(H * 0.4, 1.5, 8),
+          topR * 0.5,
+          Math.round((material === 'carbonate' ? 30 : 24) * d.plume),
+          seed ^ 0xa5a5,
+        );
+  if (plume) {
+    plume.position.set(0, H, 0);
+    body.add(plume);
+  }
+  return built;
+}
+
 /** Registry entries for this family (`builders/index.ts`). */
 export const VENT_BUILDERS = {
-  chimney: ({ dims, seed, cfg, def }) =>
-    buildChimney(dims, seed, cfg, def.materialHint ?? 'basalt'),
+  chimney: ({ dims, seed, cfg, def, tier }) =>
+    buildPlacedChimney(dims, seed, cfg, def.materialHint ?? 'basalt', tier),
 } satisfies Record<'chimney', ProceduralBuilder>;

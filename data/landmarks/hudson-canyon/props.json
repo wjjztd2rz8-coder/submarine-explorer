@@ -1,6 +1,21 @@
 {
   "version": 1,
   "landmark": "hudson-canyon",
-  "props": [],
-  "note": "No procedural prop kind fits deep-sea coral (no coral builder in docs/props.md), and no public dataset gives a publishable exact colony position to place one at. The coral-habitat ledge is represented by pois.json's hc-coral-ledge (kind: biology, reconstruction: true) and guide.json's canyon-wall entry, with no rendered model."
+  "props": [
+    {
+      "id": "coral-ledge-mound",
+      "model": "procedural:geo",
+      "feature": "coral-mound",
+      "lat": 39.41,
+      "lon": -72.18,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [60, 44, 10],
+      "lod_distance_m": 800,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: a cold-water coral mound with thickets and sponges on the canyon's coral-habitat ledge (Hudson Canyon hosts deep-sea coral habitat, NOAA). No published colony position exists, so the placement and layout are invented."
+    }
+  ]
 }
