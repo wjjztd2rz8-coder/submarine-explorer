@@ -22,7 +22,7 @@ The owner is away for several days after one round of questions. This plan runs 
 | Cuts           | Free to cut, merge or redesign. Every cut and its reason goes in `CHANGELOG.md`.                                                                                                                                               |
 | Audio          | Richer SFX plus an adaptive ambient score with its own volume slider.                                                                                                                                                          |
 | Branding       | A full rebrand (name, logo, UI style) is allowed.                                                                                                                                                                              |
-| Agents         | Claude Opus 5.5 and Sonnet 5.5 subagents do almost all coding. Codex "newest Sol" (gpt-6.1-sol when it appears, else gpt-6-sol, high effort) does exploratory work: research, bug hunts and audits of new work.                |
+| Agents         | Update (owner, same evening): **Sonnet 5.5 is the main contributor** (Opus only when truly needed), with as many parallel agents as ownership allows; GPT-6.1 Sol (or gpt-6-sol until 6.1 is available) does detail work (audits, verification, bug hunts), not primary building. Originally: Claude Opus 5.5 and Sonnet 5.5 subagents do almost all coding. Codex "newest Sol" (gpt-6.1-sol when it appears, else gpt-6-sol, high effort) does exploratory work: research, bug hunts and audits of new work.                |
 
 Standing direction still applies:
 

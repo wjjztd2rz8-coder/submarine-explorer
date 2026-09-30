@@ -15,7 +15,7 @@ log_skip() { echo "- $(date '+%Y-%m-%d %H:%M %Z') headless run: skipped: $1" >> 
 if [[ -f .cache/orchestrator.active ]] && (( $(date +%s) - $(stat -c %Y .cache/orchestrator.active) < 5400 )); then
   echo "orchestrator active; exiting"; exit 0
 fi
-if [[ "${1:-}" == "--headless" ]] && ! ai-limits --gate 30 5 > .cache/resume-gate.txt 2>&1; then
+if [[ "${1:-}" == "--headless" ]] && ! ai-limits --gate 50 5 > .cache/resume-gate.txt 2>&1; then
   log_skip "budget gate ($(head -2 .cache/resume-gate.txt | tr '\n' ' '))"; exit 0
 fi
 echo "== state =="; git log --oneline -3; git status --short | head -20
