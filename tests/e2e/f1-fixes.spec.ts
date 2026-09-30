@@ -8,8 +8,9 @@ import { expect, test } from '@playwright/test';
  * throws.
  */
 const shots = '.cache/codex/shots/f1-fixes';
-const tag = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
-  ?.SHOT_TAG ?? 'after';
+const tag =
+  (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
+    ?.SHOT_TAG ?? 'after';
 
 type G = {
   rig: {
@@ -24,7 +25,13 @@ const CASES = [
   { name: 'beebe', tile: 'beebe-vent-field', at: '18.54628,-81.71795', depth: 2240, tier: 'high' },
   { name: 'lostcity', tile: 'lost-city', at: '30.1233,-42.1195', depth: 780, tier: 'high' },
   { name: 'kama', tile: 'kamaehuakanaloa', at: '18.9122,-155.2677', depth: 1150, tier: 'high' },
-  { name: 'axial', tile: 'axial-seamount-ashes', at: '45.93385,-130.0139', depth: 1520, tier: 'high' },
+  {
+    name: 'axial',
+    tile: 'axial-seamount-ashes',
+    at: '45.93385,-130.0139',
+    depth: 1520,
+    tier: 'high',
+  },
 ];
 
 for (const c of CASES) {
