@@ -1,33 +1,33 @@
 /*
- * Stylesheet entry. Each module owns one file under src/ui/styles/; the order
+ * Stylesheet entry. Each module owns one file under src/styles/; the order
  * below is the cascade order (later files win ties), so keep it and append new
  * files at the end unless a rule must lose to an existing one.
  */
 
-@import './ui/styles/base.css';
-@import './ui/styles/hud.css';
-@import './ui/styles/mission-select.css';
-@import './ui/styles/fatal.css';
-@import './ui/styles/scan.css';
-@import './ui/styles/journal-debrief.css';
-@import './ui/styles/props-debug.css';
-@import './ui/styles/mission.css';
-@import './ui/styles/hull-warnings.css';
-@import './ui/styles/globe.css';
-@import './ui/styles/settings.css';
-@import './ui/styles/modes.css';
-@import './ui/styles/input-hud.css';
-@import './ui/styles/menus.css';
-@import './ui/styles/waypoints.css';
-@import './ui/styles/sonar.css';
-@import './ui/styles/start.css';
-@import './ui/styles/flow.css';
-@import './ui/styles/power.css';
-@import './ui/styles/currents.css';
-@import './ui/styles/hazard.css';
-@import './ui/styles/journal.css';
-@import './ui/styles/rov.css';
-@import './ui/styles/photo.css';
-@import './ui/styles/predive.css';
-@import './ui/styles/sonar-photo.css';
-@import './ui/styles/camera.css';
+@import './styles/tokens.css';
+@import './styles/hud.css';
+@import './styles/mission-select.css';
+@import './styles/fatal.css';
+@import './styles/scan.css';
+@import './styles/journal-debrief.css';
+@import './styles/props-debug.css';
+@import './styles/mission.css';
+@import './styles/hull-warnings.css';
+@import './styles/globe.css';
+@import './styles/settings.css';
+@import './styles/modes.css';
+@import './styles/input-hud.css';
+@import './styles/menus.css';
+@import './styles/waypoints.css';
+@import './styles/sonar.css';
+@import './styles/start.css';
+@import './styles/flow.css';
+@import './styles/power.css';
+@import './styles/currents.css';
+@import './styles/hazard.css';
+@import './styles/journal.css';
+@import './styles/rov.css';
+@import './styles/photo.css';
+@import './styles/predive.css';
+@import './styles/sonar-photo.css';
+@import './styles/camera.css';

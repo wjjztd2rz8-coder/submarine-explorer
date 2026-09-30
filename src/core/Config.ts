@@ -5,19 +5,16 @@
  *
  * F0-CORE: each domain's types and defaults now live in `core/config/*.ts`
  * (submarine, terrain, atmosphere, camera, audio, discovery, props, mission,
- * presets, gameplay, ui, quality). This file assembles `GameConfig` and
- * re-exports every domain, so `import … from '../core/Config.js'` keeps working.
- * A package that owns a domain edits only that domain's file.
+ * presets, gameplay, ui, quality) and the `GameConfig` contract in
+ * `core/config/types.ts`. This file assembles `DEFAULT_CONFIG`, owns
+ * `makeConfig` and re-exports every domain, so `import … from
+ * '../core/Config.js'` keeps working. A package that owns a domain edits only
+ * that domain's file.
  */
 
-import { DEFAULT_AUDIO, type AudioConfig } from './config/audio.js';
-import { DEFAULT_CAMERA, type CameraConfig } from './config/camera.js';
-import {
-  DEFAULT_LANDMARKS,
-  DEFAULT_SCAN,
-  type LandmarksConfig,
-  type ScanConfig,
-} from './config/discovery.js';
+import { DEFAULT_AUDIO } from './config/audio.js';
+import { DEFAULT_CAMERA } from './config/camera.js';
+import { DEFAULT_LANDMARKS, DEFAULT_SCAN } from './config/discovery.js';
 import {
   DEFAULT_CURRENTS,
   DEFAULT_DESCENT_PROFILES,
@@ -26,39 +23,21 @@ import {
   DEFAULT_ROV,
   DEFAULT_SENSOR_PRESETS,
   DEFAULT_SPEED_PROFILES,
-  type CurrentsConfig,
-  type DescentProfile,
-  type GameplayOptions,
-  type LightPreset,
-  type PowerConfig,
-  type RovConfig,
-  type SensorPreset,
-  type SpeedProfile,
 } from './config/gameplay.js';
-import { DEFAULT_MISSION, type MissionConfig } from './config/mission.js';
-import { DEFAULT_PRESETS, type PresetsConfig } from './config/presets.js';
-import { DEFAULT_PROPS, type PropsConfig } from './config/props.js';
-import {
-  DEFAULT_QUALITY,
-  GRAPHICS_TIERS,
-  type GraphicsTier,
-  type GraphicsTierSetting,
-  type QualityConfig,
-} from './config/quality.js';
-import { DEFAULT_SUBMARINE, type SubmarineConfig } from './config/submarine.js';
-import { DEFAULT_TERRAIN, type TerrainConfig } from './config/terrain.js';
-import { DEFAULT_WATER, type WaterConfig } from './config/atmosphere.js';
+import { DEFAULT_MISSION } from './config/mission.js';
+import { DEFAULT_PRESETS } from './config/presets.js';
+import { DEFAULT_PROPS } from './config/props.js';
+import { DEFAULT_QUALITY, GRAPHICS_TIERS, type GraphicsTier } from './config/quality.js';
+import { DEFAULT_SUBMARINE } from './config/submarine.js';
+import { DEFAULT_TERRAIN } from './config/terrain.js';
+import { DEFAULT_WATER } from './config/atmosphere.js';
 import {
   DEFAULT_GLOBE,
   DEFAULT_SETTINGS,
   DEFAULT_SONAR_PALETTES,
   DEFAULT_SONAR_ZOOM,
-  type GlobeConfig,
-  type SettingsConfig,
-  type SonarPalette,
-  type SonarPaletteName,
-  type SonarZoomConfig,
 } from './config/ui.js';
+import type { GameConfig } from './config/types.js';
 
 export * from './config/atmosphere.js';
 export * from './config/audio.js';
@@ -72,49 +51,7 @@ export * from './config/quality.js';
 export * from './config/submarine.js';
 export * from './config/terrain.js';
 export * from './config/ui.js';
-
-export interface GameConfig {
-  defaultTileId: string;
-  /**
-   * Default graphics setting for new players: a fixed tier, or `auto`
-   * (detected at boot by `core/Quality.ts`). `medium` keeps the pre-Phase-F
-   * default; switching the default to `auto` is a Phase F follow-up once the
-   * tiers are tuned. Override at runtime with `?tier=low|medium|high|ultra|auto`.
-   */
-  graphicsTier: GraphicsTierSetting;
-  submarine: SubmarineConfig;
-  terrain: TerrainConfig;
-  water: WaterConfig;
-  camera: CameraConfig;
-  audio: AudioConfig;
-  /** Free-dive landmark markers and labels. */
-  landmarks: LandmarksConfig;
-  /** B1: scan beam, discovery and debrief tunables. */
-  scan: ScanConfig;
-  /** B4: placed props (wrecks, rocks, chimneys). */
-  props: PropsConfig;
-  /** B3: mission flow. */
-  mission: MissionConfig;
-  /** C5: settings screen defaults and ranges (docs/settings.md). */
-  settings: SettingsConfig;
-  speedProfiles: Record<GameplayOptions['speedProfile'], SpeedProfile>;
-  descentProfiles: Record<GameplayOptions['descentProfile'], DescentProfile>;
-  lightPresets: Record<GameplayOptions['lights'], LightPreset>;
-  sensorPresets: Record<GameplayOptions['sensors'], SensorPreset>;
-  power: PowerConfig;
-  currents: CurrentsConfig;
-  rov: RovConfig;
-  /** C5: sonar minimap palettes (`Sonar.setPalette`). */
-  sonarPalettes: Record<SonarPaletteName, SonarPalette>;
-  sonarZoom: SonarZoomConfig;
-  /** C1: globe mission select. */
-  globe: GlobeConfig;
-  physicsHz: number;
-  /** C3: environment presets by landmark type (docs/presets.md). */
-  presets: PresetsConfig;
-  /** F0-CORE: per-tier pixel-ratio caps and dynamic resolution. */
-  quality: QualityConfig;
-}
+export type * from './config/types.js';
 
 export const DEFAULT_CONFIG: GameConfig = {
   defaultTileId: 'titanic',

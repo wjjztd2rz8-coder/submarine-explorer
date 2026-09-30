@@ -14,7 +14,7 @@ import {
   valueNoise3,
   type BuiltProp,
   type ProceduralBuilder,
-} from './util.js';
+} from './shared.js';
 
 // ------------------------------------------------------------------ chimney
 
