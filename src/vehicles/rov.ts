@@ -20,7 +20,10 @@ import type { DecalSpec } from './decals.js';
 const V = (x: number, y: number, z: number): THREE.Vector3 => new THREE.Vector3(x, y, z);
 
 /** Where RovVisual's spotlights sit (ROV metres). Lamp housings match. */
-export const ROV_LAMPS: ReadonlyArray<THREE.Vector3> = [V(-0.62, 0.12, -1.06), V(0.62, 0.12, -1.06)];
+export const ROV_LAMPS: ReadonlyArray<THREE.Vector3> = [
+  V(-0.62, 0.12, -1.06),
+  V(0.62, 0.12, -1.06),
+];
 
 export function rovBlueprint(low: boolean): Blueprint {
   const pb = new PartBuilder(slotMapFor(low));
@@ -39,19 +42,29 @@ export function rovBlueprint(low: boolean): Blueprint {
     6,
     10,
   );
-  pb.add('foam', loft(-0.98, 0.98, low ? 10 : 24, radial, (_t, z) => float(z)), undefined, (c, n) =>
-    n.y < -0.5 ? PAINT.charcoal : c.y < 0.27 && n.y < 0.3 ? PAINT.charcoal : PAINT.yellow,
+  pb.add(
+    'foam',
+    loft(-0.98, 0.98, low ? 10 : 24, radial, (_t, z) => float(z)),
+    undefined,
+    (c, n) =>
+      n.y < -0.5 ? PAINT.charcoal : c.y < 0.27 && n.y < 0.3 ? PAINT.charcoal : PAINT.yellow,
   );
   // Thruster wells through the float.
   for (const z of [-0.42, 0.42]) {
-    pb.add('frame', new THREE.CylinderGeometry(0.2, 0.22, 0.06, 24, 1, true), T(0, 0.67, z), PAINT.black);
+    pb.add(
+      'frame',
+      new THREE.CylinderGeometry(0.2, 0.22, 0.06, 24, 1, true),
+      T(0, 0.67, z),
+      PAINT.black,
+    );
   }
 
   // Frame: corner posts, rails, cross members.
   const f = PAINT.gunmetal;
   for (const sx of [-1, 1]) {
     const x = sx * 0.62;
-    for (const z of [-0.9, 0, 0.9]) pb.add('frame', bar([x, -0.6, z], [x, 0.22, z], 0.028, 6), undefined, f);
+    for (const z of [-0.9, 0, 0.9])
+      pb.add('frame', bar([x, -0.6, z], [x, 0.22, z], 0.028, 6), undefined, f);
     pb.add('frame', bar([x, 0.2, -0.95], [x, 0.2, 0.95], 0.025, 6), undefined, f);
     pb.add('frame', bar([x, -0.28, -0.95], [x, -0.28, 0.95], 0.025, 6), undefined, f);
     pb.add('frame', bar([x, -0.58, -0.9], [x, -0.28, 0], 0.018, 6), undefined, f);
@@ -63,10 +76,25 @@ export function rovBlueprint(low: boolean): Blueprint {
   skids(pb, 0.55, -0.64, -0.95, 0.95, 0.035, PAINT.charcoal);
 
   // Electronics bottles and the hydraulic power unit inside the frame.
-  pb.add('metal', new THREE.CylinderGeometry(0.13, 0.13, 1.1, 18), T(-0.25, -0.12, 0.15, Math.PI / 2, 0, 0), PAINT.titanium);
-  pb.add('metal', new THREE.CylinderGeometry(0.11, 0.11, 0.9, 18), T(0.22, -0.1, 0.25, Math.PI / 2, 0, 0), PAINT.steel);
+  pb.add(
+    'metal',
+    new THREE.CylinderGeometry(0.13, 0.13, 1.1, 18),
+    T(-0.25, -0.12, 0.15, Math.PI / 2, 0, 0),
+    PAINT.titanium,
+  );
+  pb.add(
+    'metal',
+    new THREE.CylinderGeometry(0.11, 0.11, 0.9, 18),
+    T(0.22, -0.1, 0.25, Math.PI / 2, 0, 0),
+    PAINT.steel,
+  );
   pb.add('frame', new THREE.BoxGeometry(0.42, 0.26, 0.42), T(0.05, -0.42, 0.45), PAINT.charcoal);
-  pb.add('frame', new THREE.CylinderGeometry(0.12, 0.12, 0.34, 14), T(-0.28, -0.42, 0.55), PAINT.orange);
+  pb.add(
+    'frame',
+    new THREE.CylinderGeometry(0.12, 0.12, 0.34, 14),
+    T(-0.28, -0.42, 0.55),
+    PAINT.orange,
+  );
 
   // Thrusters: four vectored horizontal at the corners, two vertical, wash outward.
   const props: PropSpec[] = [];
@@ -78,7 +106,11 @@ export function rovBlueprint(low: boolean): Blueprint {
   ];
   for (const [sx, sz, ch, hand] of hor) {
     const axis = V(sx * 0.5, 0, 0.87).normalize();
-    props.push(thruster(pb, V(sx * 0.7, -0.05, sz * 0.72), axis, 0.11, ch, hand, { mount: V(sx * 0.62, -0.05, sz * 0.62) }));
+    props.push(
+      thruster(pb, V(sx * 0.7, -0.05, sz * 0.72), axis, 0.11, ch, hand, {
+        mount: V(sx * 0.62, -0.05, sz * 0.62),
+      }),
+    );
   }
   for (const [z, hand] of [
     [-0.42, 1],
@@ -93,7 +125,12 @@ export function rovBlueprint(low: boolean): Blueprint {
   }
   pb.add('frame', bar([-0.5, 0.26, -1.0], [0.5, 0.26, -1.0], 0.03, 6), undefined, PAINT.charcoal);
   for (let i = -3; i <= 3; i++) {
-    pb.add('lens', new THREE.CylinderGeometry(0.024, 0.024, 0.02, 10), T(i * 0.13, 0.26, -1.03, Math.PI / 2, 0, 0), [2.6, 2.5, 2.3]);
+    pb.add(
+      'lens',
+      new THREE.CylinderGeometry(0.024, 0.024, 0.02, 10),
+      T(i * 0.13, 0.26, -1.03, Math.PI / 2, 0, 0),
+      [2.6, 2.5, 2.3],
+    );
   }
 
   // Sample drawer and tether termination (bend restrictor).

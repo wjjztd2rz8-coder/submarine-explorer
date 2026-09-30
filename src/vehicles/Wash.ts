@@ -98,9 +98,18 @@ export class Wash {
     this.size = new Float32Array(count);
     this.kind = new Float32Array(count);
     const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage));
-    g.setAttribute('aAlpha', new THREE.BufferAttribute(this.alpha, 1).setUsage(THREE.DynamicDrawUsage));
-    g.setAttribute('aSize', new THREE.BufferAttribute(this.size, 1).setUsage(THREE.DynamicDrawUsage));
+    g.setAttribute(
+      'position',
+      new THREE.BufferAttribute(this.pos, 3).setUsage(THREE.DynamicDrawUsage),
+    );
+    g.setAttribute(
+      'aAlpha',
+      new THREE.BufferAttribute(this.alpha, 1).setUsage(THREE.DynamicDrawUsage),
+    );
+    g.setAttribute(
+      'aSize',
+      new THREE.BufferAttribute(this.size, 1).setUsage(THREE.DynamicDrawUsage),
+    );
     g.setAttribute('aKind', new THREE.BufferAttribute(this.kind, 1));
     this.material = new THREE.ShaderMaterial({
       uniforms: { uScale: { value: 400 } },

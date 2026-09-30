@@ -17,6 +17,7 @@ export function createRovSystem(): GameSystem {
   const rovCurrent = new THREE.Vector3();
   const cameraFromSub = new THREE.Vector3();
   const rovCameraAim = new THREE.Vector3();
+  const tetherAnchor = new THREE.Vector3();
   let savedChaseRadius = 0;
   let abortRov: () => void = () => {};
   let rovScanRadii: number[] | null = null;
@@ -25,7 +26,7 @@ export function createRovSystem(): GameSystem {
     init(ctx) {
       const { config, terrain, settings, save, hud, scene, rig, sub, headlights, bus } = ctx;
       const rov = new Rov(config.rov, terrain);
-      const rovVisual = new RovVisual(config.rov);
+      const rovVisual = new RovVisual(config.rov, ctx.tier);
       rovVisual.setLightPreset(config.lightPresets[settings.gameplay.lights]);
       save.onChange((next, changed) => {
         if (changed.includes('gameplay'))
@@ -89,9 +90,9 @@ export function createRovSystem(): GameSystem {
           } else sub.step(state, f.fixedDt);
         }
       },
-      pose: (_f, ctx) => {
-        const { rov, rovVisual, rovHud, sub, headlights } = ctx;
-        rovVisual.update(rov, sub.position);
+      pose: (f, ctx) => {
+        const { rov, rovVisual, rovHud, subMesh, headlights } = ctx;
+        rovVisual.update(rov, subMesh.tetherAnchor(tetherAnchor), f.dt);
         rovHud.update(rov);
         // Only the additive beam geometry is hidden; the sub's actual lamps stay on.
         headlights.setConesSuppressed(rov.deployed);

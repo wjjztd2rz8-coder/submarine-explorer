@@ -20,7 +20,7 @@
  */
 
 import * as THREE from 'three';
-import { vehicleEnvironment, vehicleSurfaces } from './textures.js';
+import { vehicleEnvironment, vehicleSurfaces, type SurfaceSet } from './textures.js';
 
 /** Material slots. Static geometry is merged per slot. */
 export type Slot =
@@ -113,13 +113,19 @@ export class VehicleMaterials {
   private readonly lensBase = new THREE.Color(1, 1, 1);
   private readonly extra: THREE.Material[] = [];
 
-  constructor(look: VehicleLook, withHalo: boolean) {
+  /**
+   * @param withHalo  strobe halo sprite (not on the low LOD)
+   * @param textured  tiling albedo/normal/roughness maps; the low tier skips
+   *                  them and keeps vertex paint only (no texture memory)
+   */
+  constructor(look: VehicleLook, withHalo: boolean, textured = true) {
     this.uniforms = litUniforms(look);
-    const surf = vehicleSurfaces();
+    const surf = textured ? vehicleSurfaces() : null;
     const env = vehicleEnvironment();
     const emissive = new THREE.Color(look.emissive);
 
-    const withTiling = (set: typeof surf.foam, m: THREE.MeshStandardMaterial): void => {
+    const withTiling = (set: SurfaceSet | undefined, m: THREE.MeshStandardMaterial): void => {
+      if (!set) return;
       // The textures are shared between materials; the repeat lives on each
       // material's own clone of the texture object (same image, no re-upload).
       const rep = 1 / set.tileM;
@@ -141,7 +147,7 @@ export class VehicleMaterials {
       envMap: env,
       envMapIntensity: 0.55,
     });
-    withTiling(surf.foam, foam);
+    withTiling(surf?.foam, foam);
     foam.normalScale.set(0.9, 0.9);
     addKeyAndRim(foam, this.uniforms);
 
@@ -154,7 +160,7 @@ export class VehicleMaterials {
       envMap: env,
       envMapIntensity: 0.7,
     });
-    withTiling(surf.frame, frame);
+    withTiling(surf?.frame, frame);
     addKeyAndRim(frame, this.uniforms);
 
     const metal = new THREE.MeshStandardMaterial({
@@ -166,7 +172,7 @@ export class VehicleMaterials {
       envMap: env,
       envMapIntensity: 1.1,
     });
-    withTiling(surf.metal, metal);
+    withTiling(surf?.metal, metal);
     addKeyAndRim(metal, this.uniforms);
 
     // Unlit and HDR: vertex colours above 1 feed the bloom pass where there is one.
@@ -202,7 +208,9 @@ export class VehicleMaterials {
 
   /** Lamp lenses dim when the headlights are switched off. */
   setLensesOn(on: boolean): void {
-    (this.bySlot.lens as THREE.MeshBasicMaterial).color.copy(this.lensBase).multiplyScalar(on ? 1 : 0.08);
+    (this.bySlot.lens as THREE.MeshBasicMaterial).color
+      .copy(this.lensBase)
+      .multiplyScalar(on ? 1 : 0.08);
   }
 
   /** Decal material over a canvas atlas (browser only). */

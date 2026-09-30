@@ -79,8 +79,7 @@ function fbm(seed: number, base: number, octaves: number): (u: number, v: number
 /** Height field -> tangent-space normal map (RGBA8), wrapping at the edges. */
 function normalsFromHeight(h: Float32Array, size: number, strength: number): Uint8Array {
   const out = new Uint8Array(size * size * 4);
-  const at = (x: number, y: number): number =>
-    h[((y + size) % size) * size + ((x + size) % size)]!;
+  const at = (x: number, y: number): number => h[((y + size) % size) * size + ((x + size) % size)]!;
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const dx = (at(x + 1, y) - at(x - 1, y)) * strength;

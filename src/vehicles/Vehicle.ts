@@ -131,7 +131,7 @@ export class Vehicle {
     this.root.scale.setScalar(opts.scale);
     this.cockpitEye = bp.cockpitEye.clone().multiplyScalar(opts.scale);
     this.tetherAnchor = bp.tetherAnchor.clone().multiplyScalar(opts.scale);
-    this.materials = new VehicleMaterials(opts.look, !low);
+    this.materials = new VehicleMaterials(opts.look, !low, !low);
     const mats = this.materials;
     const frameMat = mats.bySlot.frame;
 
@@ -216,7 +216,11 @@ export class Vehicle {
     this.propSpecs = bp.props;
     const propG = propellerGeometry(bp.blades ?? 5, low);
     this.geometries.push(propG);
-    this.props = new THREE.InstancedMesh(propG, low ? mats.bySlot.frame : mats.bySlot.metal, bp.props.length);
+    this.props = new THREE.InstancedMesh(
+      propG,
+      low ? mats.bySlot.frame : mats.bySlot.metal,
+      bp.props.length,
+    );
     this.props.name = 'vehicle-props';
     this.props.frustumCulled = false;
     this.root.add(this.props);
@@ -284,7 +288,8 @@ export class Vehicle {
       const spec = this.propSpecs[i]!;
       const target = Vehicle.thrustFor(spec.channel, drive) * SPIN_MAX_RPS;
       this.propRps[i] = this.propRps[i]! + (target - this.propRps[i]!) * spool;
-      this.propAngle[i] = (this.propAngle[i]! + this.propRps[i]! * spec.hand * Math.PI * 2 * dt) % (Math.PI * 2);
+      this.propAngle[i] =
+        (this.propAngle[i]! + this.propRps[i]! * spec.hand * Math.PI * 2 * dt) % (Math.PI * 2);
     }
     this.writeProps();
 
@@ -305,7 +310,11 @@ export class Vehicle {
     const phase = t % STROBE_PERIOD_S;
     const flash = phase < STROBE_FLASH_S ? 1 - phase / STROBE_FLASH_S : 0;
     if (this.strobe) {
-      (this.strobe.material as THREE.MeshBasicMaterial).color.setRGB(0.55 + flash * 7, 0.62 + flash * 7.5, 0.7 + flash * 8);
+      (this.strobe.material as THREE.MeshBasicMaterial).color.setRGB(
+        0.55 + flash * 7,
+        0.62 + flash * 7.5,
+        0.7 + flash * 8,
+      );
     }
     if (this.halo) (this.halo.material as THREE.SpriteMaterial).opacity = flash * 0.95;
 
@@ -322,7 +331,11 @@ export class Vehicle {
         const thrust = this.propRps[i]! / SPIN_MAX_RPS;
         const sign = thrust >= 0 ? 1 : -1;
         e.dir.copy(spec.axis).multiplyScalar(sign).transformDirection(mw);
-        e.pos.copy(spec.axis).multiplyScalar(sign * spec.radius * 0.9).add(spec.pos).applyMatrix4(mw);
+        e.pos
+          .copy(spec.axis)
+          .multiplyScalar(sign * spec.radius * 0.9)
+          .add(spec.pos)
+          .applyMatrix4(mw);
         e.radius = spec.radius * s;
         e.strength = Math.abs(thrust);
       }
@@ -338,7 +351,11 @@ export class Vehicle {
     const lerp = (i: number): number => a[i]! + (b[i]! - a[i]!) * s;
     const wob = s * s;
     const [turret, upper, fore, wrist] = arm.joints;
-    turret.rotation.set(0, (lerp(0) + Math.sin(t * 0.5 + arm.spec.side) * 0.12 * wob) * arm.spec.side, 0);
+    turret.rotation.set(
+      0,
+      (lerp(0) + Math.sin(t * 0.5 + arm.spec.side) * 0.12 * wob) * arm.spec.side,
+      0,
+    );
     upper.rotation.set(lerp(1) + Math.sin(t * 0.7) * 0.06 * wob, 0, 0);
     fore.rotation.set(lerp(2) + Math.sin(t * 0.9 + 1) * 0.1 * wob, 0, 0);
     wrist.rotation.set(lerp(3), 0, Math.sin(t * 1.3) * 0.6 * wob);
@@ -367,7 +384,9 @@ export class Vehicle {
       const g = r.geometry as THREE.BufferGeometry | undefined;
       if (!g || (o as THREE.Points).isPoints) return;
       const n = g.index ? g.index.count : g.getAttribute('position').count;
-      const inst = (o as THREE.InstancedMesh).isInstancedMesh ? (o as THREE.InstancedMesh).count : 1;
+      const inst = (o as THREE.InstancedMesh).isInstancedMesh
+        ? (o as THREE.InstancedMesh).count
+        : 1;
       triangles += (n / 3) * inst;
     });
     return { drawCalls, triangles: Math.round(triangles) };

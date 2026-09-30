@@ -83,7 +83,8 @@ export function normalise(geo: THREE.BufferGeometry, color?: Rgb | Painter): THR
     if (name !== 'position' && name !== 'normal' && name !== 'uv') g.deleteAttribute(name);
   }
   const pos = g.getAttribute('position');
-  if (!g.getAttribute('uv')) g.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(pos.count * 2), 2));
+  if (!g.getAttribute('uv'))
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(pos.count * 2), 2));
   g.morphAttributes = {};
   g.clearGroups();
   if (keepColor) return g;
@@ -255,11 +256,37 @@ export function smooth(a: number, b: number, x: number): number {
   return t * t * (3 - 2 * t);
 }
 
+// ---------------------------------------------------------------- detail
+
+let detail = 1;
+
+/**
+ * Radial segment count scaled by the current build detail (see
+ * {@link withDetail}), never below `min`.
+ */
+export function seg(n: number, min = 4): number {
+  return Math.max(min, Math.round(n * detail));
+}
+
+/**
+ * Run a build at a detail factor: every `lathe`, `bar`, `tube` and `seg()`
+ * inside scales its radial segments (the low LOD builds at 0.5).
+ */
+export function withDetail<T>(factor: number, fn: () => T): T {
+  const prev = detail;
+  detail = factor;
+  try {
+    return fn();
+  } finally {
+    detail = prev;
+  }
+}
+
 /** A lathe from [radius, y] pairs, around +Y. */
 export function lathe(profile: Array<[number, number]>, segments = 24): THREE.BufferGeometry {
   return new THREE.LatheGeometry(
     profile.map(([r, y]) => new THREE.Vector2(Math.max(0, r), y)),
-    segments,
+    seg(segments, 6),
   );
 }
 
@@ -280,7 +307,13 @@ export function tube(
     for (let i = 0; i < pts.length - 1; i++) curve.add(new THREE.LineCurve3(pts[i]!, pts[i + 1]!));
   }
   const segs = Math.max(1, (pts.length - 1) * segmentsPerSpan);
-  return new THREE.TubeGeometry(curve as THREE.Curve<THREE.Vector3>, segs, radius, radial, false);
+  return new THREE.TubeGeometry(
+    curve as THREE.Curve<THREE.Vector3>,
+    segs,
+    radius,
+    seg(radial),
+    false,
+  );
 }
 
 /** Straight bar between two points (a thin cylinder), with optional end caps. */
@@ -293,13 +326,19 @@ export function bar(
   const va = new THREE.Vector3(...a);
   const vb = new THREE.Vector3(...b);
   const len = va.distanceTo(vb);
-  const g = new THREE.CylinderGeometry(radius, radius, len, radial, 1, false);
+  const g = new THREE.CylinderGeometry(radius, radius, len, seg(radial), 1, false);
   g.applyMatrix4(alongY(va.clone().add(vb).multiplyScalar(0.5), vb.clone().sub(va)));
   return g;
 }
 
 /** Rounded box via an extruded rounded rectangle (depth along Z). */
-export function roundedBox(w: number, h: number, d: number, r: number, bevel = 0.3): THREE.BufferGeometry {
+export function roundedBox(
+  w: number,
+  h: number,
+  d: number,
+  r: number,
+  bevel = 0.3,
+): THREE.BufferGeometry {
   const rr = Math.min(r, w / 2 - 1e-3, h / 2 - 1e-3);
   const s = new THREE.Shape();
   const x0 = -w / 2;
@@ -328,7 +367,11 @@ export function roundedBox(w: number, h: number, d: number, r: number, bevel = 0
 }
 
 /** A flat extruded profile in the YZ plane (x thickness), e.g. fins and skids. */
-export function sideProfile(points: Array<[number, number]>, thickness: number, bevel = 0.01): THREE.BufferGeometry {
+export function sideProfile(
+  points: Array<[number, number]>,
+  thickness: number,
+  bevel = 0.01,
+): THREE.BufferGeometry {
   const s = new THREE.Shape(points.map(([z, y]) => new THREE.Vector2(z, y)));
   const g = new THREE.ExtrudeGeometry(s, {
     depth: Math.max(1e-3, thickness - 2 * bevel),
@@ -339,7 +382,13 @@ export function sideProfile(points: Array<[number, number]>, thickness: number, 
     curveSegments: 6,
   });
   // Shape x -> z, shape y -> y, extrude z -> x.
-  g.applyMatrix4(new THREE.Matrix4().makeBasis(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 1, 0), new THREE.Vector3(1, 0, 0)));
+  g.applyMatrix4(
+    new THREE.Matrix4().makeBasis(
+      new THREE.Vector3(0, 0, 1),
+      new THREE.Vector3(0, 1, 0),
+      new THREE.Vector3(1, 0, 0),
+    ),
+  );
   g.translate(-(thickness - 2 * bevel) / 2, 0, 0);
   return g;
 }

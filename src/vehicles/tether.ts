@@ -74,7 +74,11 @@ export class TetherMesh {
     this.radius = opts.radius ?? 0.045;
     this.pts = Array.from({ length: segments + 1 }, () => new THREE.Vector3());
     if (opts.line) {
-      this.material = new THREE.LineBasicMaterial({ color: 0xffc23a, transparent: true, opacity: 0.85 });
+      this.material = new THREE.LineBasicMaterial({
+        color: 0xffc23a,
+        transparent: true,
+        opacity: 0.85,
+      });
       const g = new THREE.BufferGeometry().setFromPoints(this.pts);
       this.object = new THREE.Line(g, this.material);
     } else {
@@ -96,7 +100,10 @@ export class TetherMesh {
         }
       }
       const g = new THREE.BufferGeometry();
-      g.setAttribute('position', new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage));
+      g.setAttribute(
+        'position',
+        new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage),
+      );
       g.setAttribute('normal', new THREE.BufferAttribute(nrm, 3).setUsage(THREE.DynamicDrawUsage));
       g.setIndex(index);
       this.object = new THREE.Mesh(g, this.material);

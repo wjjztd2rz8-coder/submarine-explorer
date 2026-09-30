@@ -60,7 +60,13 @@ export function slotMapFor(low: boolean): Partial<Record<Slot, Slot | null>> {
 }
 
 /** Loft a body from a profile function between z0 and z1. */
-function body(fn: (z: number) => Section, z0: number, z1: number, steps: number, radial: number): THREE.BufferGeometry {
+function body(
+  fn: (z: number) => Section,
+  z0: number,
+  z1: number,
+  steps: number,
+  radial: number,
+): THREE.BufferGeometry {
   return loft(z0, z1, steps, radial, (_t, z) => fn(z));
 }
 
@@ -158,7 +164,8 @@ export function classB(low: boolean): Blueprint {
   const frameC = PAINT.charcoal;
   for (const sx of [-1, 1]) {
     const x = sx * 0.95;
-    for (const z of [-1.0, 0.7, 2.3]) pb.add('frame', bar([x, -1.85, z], [x, -0.32, z], 0.05, 8), undefined, frameC);
+    for (const z of [-1.0, 0.7, 2.3])
+      pb.add('frame', bar([x, -1.85, z], [x, -0.32, z], 0.05, 8), undefined, frameC);
     pb.add('frame', bar([x, -0.42, -2.2], [x, -0.42, 2.6], 0.045, 8), undefined, frameC);
     pb.add('frame', bar([x, -1.8, -1.0], [x, -0.42, 0.7], 0.035, 6), undefined, frameC);
     pb.add('frame', bar([x, -1.8, 2.3], [x, -0.42, 0.7], 0.035, 6), undefined, frameC);
@@ -166,26 +173,52 @@ export function classB(low: boolean): Blueprint {
     pb.add('frame', bar([x, -1.72, -3.2], [x, -0.42, -2.2], 0.045, 8), undefined, frameC);
     pb.add('frame', bar([x * 1.1, -0.95, -3.3], [x, -0.42, -2.2], 0.045, 8), undefined, frameC);
   }
-  for (const z of [-1.0, 2.3]) pb.add('frame', bar([-0.95, -1.35, z], [0.95, -1.35, z], 0.04, 6), undefined, frameC);
+  for (const z of [-1.0, 2.3])
+    pb.add('frame', bar([-0.95, -1.35, z], [0.95, -1.35, z], 0.04, 6), undefined, frameC);
   skids(pb, 0.95, -1.88, -3.45, 2.95, 0.065, PAINT.charcoal);
 
   // Batteries and trim spheres.
   for (const sx of [-1, 1]) {
     batteryPod(pb, V(sx * 0.48, -1.05, 0.95), 0.34, 3.0);
-    pb.add('metal', new THREE.SphereGeometry(0.27, 20, 14), T(sx * 0.52, -0.95, 2.85), PAINT.titanium);
+    pb.add(
+      'metal',
+      new THREE.SphereGeometry(0.27, 20, 14),
+      T(sx * 0.52, -0.95, 2.85),
+      PAINT.titanium,
+    );
   }
 
   // Sample basket, supported off the skid toes.
   basket(pb, V(0, -1.45, -3.88), 1.6, 0.5, 0.85);
   for (const sx of [-1, 1]) {
-    pb.add('frame', bar([sx * 0.8, -1.7, -3.45], [sx * 0.95, -1.8, -3.2], 0.035, 6), undefined, PAINT.steel);
-    pb.add('frame', bar([sx * 0.8, -1.2, -3.45], [sx * 0.95, -0.9, -3.0], 0.03, 6), undefined, PAINT.steel);
+    pb.add(
+      'frame',
+      bar([sx * 0.8, -1.7, -3.45], [sx * 0.95, -1.8, -3.2], 0.035, 6),
+      undefined,
+      PAINT.steel,
+    );
+    pb.add(
+      'frame',
+      bar([sx * 0.8, -1.2, -3.45], [sx * 0.95, -0.9, -3.0], 0.03, 6),
+      undefined,
+      PAINT.steel,
+    );
   }
 
   // Light bar under the nose: main lamps at the headlight positions (+/-0.44).
-  pb.add('frame', bar([-1.18, 0.5, -3.22], [1.18, 0.5, -3.22], 0.045, 8), undefined, PAINT.charcoal);
+  pb.add(
+    'frame',
+    bar([-1.18, 0.5, -3.22], [1.18, 0.5, -3.22], 0.045, 8),
+    undefined,
+    PAINT.charcoal,
+  );
   for (const sx of [-1, 1]) {
-    pb.add('frame', bar([sx * 0.7, 0.5, -3.22], [sx * 0.7, 0.62, -2.95], 0.04, 6), undefined, PAINT.charcoal);
+    pb.add(
+      'frame',
+      bar([sx * 0.7, 0.5, -3.22], [sx * 0.7, 0.62, -2.95], 0.04, 6),
+      undefined,
+      PAINT.charcoal,
+    );
     lamp(pb, V(sx * 0.44, 0.5, -3.34), V(0, -0.12, -1), 0.11);
     lamp(pb, V(sx * 1.08, 0.5, -3.3), V(sx * 0.28, -0.2, -1), 0.085);
     lamp(pb, V(sx * 0.62, -1.25, -4.36), V(0, -0.15, -1), 0.07, { lens: [2.4, 2.3, 2.1] });
@@ -193,25 +226,73 @@ export function classB(low: boolean): Blueprint {
 
   // Thrusters: two aft, two vertical on outriggers, one lateral under the tail.
   const props: PropSpec[] = [];
-  props.push(thruster(pb, V(-0.98, 0.18, 3.28), V(0, 0, 1), 0.24, 'port', 1, { bandColor: PAINT.orange, mount: V(-0.55, 0.18, 3.0) }));
-  props.push(thruster(pb, V(0.98, 0.18, 3.28), V(0, 0, 1), 0.24, 'starboard', -1, { bandColor: PAINT.orange, mount: V(0.55, 0.18, 3.0) }));
-  props.push(thruster(pb, V(-1.62, 0.32, 0.35), V(0, -1, 0), 0.26, 'vertical', 1, { bandColor: PAINT.orange, mount: V(-1.22, 0.32, 0.35) }));
-  props.push(thruster(pb, V(1.62, 0.32, 0.35), V(0, -1, 0), 0.26, 'vertical', -1, { bandColor: PAINT.orange, mount: V(1.22, 0.32, 0.35) }));
-  props.push(thruster(pb, V(0, -0.62, 3.05), V(1, 0, 0), 0.19, 'lateral', 1, { mount: V(0, -0.2, 2.85) }));
+  props.push(
+    thruster(pb, V(-0.98, 0.18, 3.28), V(0, 0, 1), 0.24, 'port', 1, {
+      bandColor: PAINT.orange,
+      mount: V(-0.55, 0.18, 3.0),
+    }),
+  );
+  props.push(
+    thruster(pb, V(0.98, 0.18, 3.28), V(0, 0, 1), 0.24, 'starboard', -1, {
+      bandColor: PAINT.orange,
+      mount: V(0.55, 0.18, 3.0),
+    }),
+  );
+  props.push(
+    thruster(pb, V(-1.62, 0.32, 0.35), V(0, -1, 0), 0.26, 'vertical', 1, {
+      bandColor: PAINT.orange,
+      mount: V(-1.22, 0.32, 0.35),
+    }),
+  );
+  props.push(
+    thruster(pb, V(1.62, 0.32, 0.35), V(0, -1, 0), 0.26, 'vertical', -1, {
+      bandColor: PAINT.orange,
+      mount: V(1.22, 0.32, 0.35),
+    }),
+  );
+  props.push(
+    thruster(pb, V(0, -0.62, 3.05), V(1, 0, 0), 0.19, 'lateral', 1, { mount: V(0, -0.2, 2.85) }),
+  );
   // Outrigger struts for the vertical thrusters (a second, lower strut each).
-  for (const sx of [-1, 1]) pb.add('frame', bar([sx * 1.5, 0.05, 0.35], [sx * 0.95, -0.42, 0.35], 0.04, 6), undefined, PAINT.charcoal);
+  for (const sx of [-1, 1])
+    pb.add(
+      'frame',
+      bar([sx * 1.5, 0.05, 0.35], [sx * 0.95, -0.42, 0.35], 0.04, 6),
+      undefined,
+      PAINT.charcoal,
+    );
 
   // Deck hardware.
   liftingBail(pb, V(0, 1.1, 1.55), 0.18);
   const railSec = fair(0);
   const railY = topY(railSec, 0.86);
-  for (const sx of [-1, 1]) handrail(pb, [[sx * 0.86, railY, -1.3], [sx * 0.86, railY, 0.2], [sx * 0.86, railY - 0.03, 1.9]], 0.12, 0.018);
+  for (const sx of [-1, 1])
+    handrail(
+      pb,
+      [
+        [sx * 0.86, railY, -1.3],
+        [sx * 0.86, railY, 0.2],
+        [sx * 0.86, railY - 0.03, 1.9],
+      ],
+      0.12,
+      0.018,
+    );
   antenna(pb, V(0.12, 1.86, 0.3), 1.0);
   // Recovery beacon and a transponder on the sail.
-  pb.add('metal', new THREE.CylinderGeometry(0.05, 0.05, 0.22, 10), T(-0.12, 1.96, 0.35), PAINT.charcoal);
+  pb.add(
+    'metal',
+    new THREE.CylinderGeometry(0.05, 0.05, 0.22, 10),
+    T(-0.12, 1.96, 0.35),
+    PAINT.charcoal,
+  );
   pb.add('glow', new THREE.SphereGeometry(0.035, 8, 6), T(-0.12, 2.09, 0.35), [0.2, 1.4, 0.4]);
   // Hydrophone and a CTD sensor on the tail.
-  pb.add('metal', new THREE.CylinderGeometry(0.04, 0.04, 0.4, 8), T(0.3, 0.8, 2.9, Math.PI / 2, 0, 0), PAINT.steel);
+  pb.add(
+    'metal',
+    new THREE.CylinderGeometry(0.04, 0.04, 0.4, 8),
+    T(0.3, 0.8, 2.9, Math.PI / 2, 0, 0),
+    PAINT.steel,
+  );
 
   const decals: DecalSpec[] = [
     ...sidePair(fair, 'name', 0.45, 0.42, 2.3, 0.38),
@@ -219,7 +300,13 @@ export function classB(low: boolean): Blueprint {
     ...sidePair(sail, 'rating', 0.15, 1.38, 0.78, 0.3),
     ...sidePair(fair, 'flag', 1.95, 0.45, 0.5, 0.33),
     ...sidePair(fair, 'warning', 2.75, 0.22, 0.75, 0.2),
-    { kind: 'placard', pos: V(0, topY(fair(2.1), 0) + 0.012, 2.1), w: 0.7, h: 0.28, normal: V(0, 1, 0) },
+    {
+      kind: 'placard',
+      pos: V(0, topY(fair(2.1), 0) + 0.012, 2.1),
+      w: 0.7,
+      h: 0.28,
+      normal: V(0, 1, 0),
+    },
   ];
 
   return {
@@ -239,7 +326,13 @@ export function classB(low: boolean): Blueprint {
     camera: { pos: V(0, 0.77, -3.18), size: 0.26 },
     strobe: { pos: V(0, 1.86, 0.66), radius: 0.07 },
     decals,
-    decalText: { name: 'MERIDIAN', number: 'DSV-2', rating: '6500', ink: '#16191c', accent: '#ffffff' },
+    decalText: {
+      name: 'MERIDIAN',
+      number: 'DSV-2',
+      rating: '6500',
+      ink: '#16191c',
+      accent: '#ffffff',
+    },
     cockpitEye: V(0, -0.5, -2.92),
     tetherAnchor: V(0, -1.6, -3.3),
   };
@@ -267,7 +360,8 @@ export function classA(low: boolean): Blueprint {
     2.6,
     3,
   );
-  const pontPaint: Painter = (_c, n) => (n.y > 0.45 ? PAINT.yellow : n.y < -0.35 ? PAINT.offWhite : PAINT.white);
+  const pontPaint: Painter = (_c, n) =>
+    n.y > 0.45 ? PAINT.yellow : n.y < -0.35 ? PAINT.offWhite : PAINT.white;
   for (const sx of [-1, 1]) {
     const g = body(pont, -1.95, 2.14, steps, radial);
     pb.add('foam', g, T(sx * 1.2, 0, 0), pontPaint);
@@ -310,54 +404,147 @@ export function classA(low: boolean): Blueprint {
   const R = 1.02;
   if (!low) pb.add('acrylic', new THREE.SphereGeometry(R, 40, 28), T(sc.x, sc.y, sc.z));
   else pb.add('acrylic', new THREE.SphereGeometry(R, 24, 16), T(sc.x, sc.y, sc.z));
-  pb.add('metal', new THREE.TorusGeometry(R * 0.42, 0.05, 8, 32), T(sc.x, sc.y + R * 0.9, sc.z, Math.PI / 2, 0, 0), PAINT.steel);
-  pb.add('metal', lathe([[R * 0.42, 0], [R * 0.4, 0.06], [0, 0.07]], 24), T(sc.x, sc.y + R * 0.9, sc.z), PAINT.steel);
-  pb.add('metal', new THREE.TorusGeometry(R * 0.72, 0.06, 8, 40), T(sc.x, sc.y - R * 0.68, sc.z, Math.PI / 2, 0, 0), PAINT.gunmetal);
+  pb.add(
+    'metal',
+    new THREE.TorusGeometry(R * 0.42, 0.05, 8, 32),
+    T(sc.x, sc.y + R * 0.9, sc.z, Math.PI / 2, 0, 0),
+    PAINT.steel,
+  );
+  pb.add(
+    'metal',
+    lathe(
+      [
+        [R * 0.42, 0],
+        [R * 0.4, 0.06],
+        [0, 0.07],
+      ],
+      24,
+    ),
+    T(sc.x, sc.y + R * 0.9, sc.z),
+    PAINT.steel,
+  );
+  pb.add(
+    'metal',
+    new THREE.TorusGeometry(R * 0.72, 0.06, 8, 40),
+    T(sc.x, sc.y - R * 0.68, sc.z, Math.PI / 2, 0, 0),
+    PAINT.gunmetal,
+  );
   // Interior: floor, three seats, the pilot's console with lit screens.
-  pb.add('frame', new THREE.CylinderGeometry(R * 0.66, R * 0.66, 0.05, 28), T(sc.x, sc.y - R * 0.6, sc.z), PAINT.charcoal);
+  pb.add(
+    'frame',
+    new THREE.CylinderGeometry(R * 0.66, R * 0.66, 0.05, 28),
+    T(sc.x, sc.y - R * 0.6, sc.z),
+    PAINT.charcoal,
+  );
   for (const [x, z, ry] of [
     [0, 0.2, 0],
     [-0.42, -0.2, 0.7],
     [0.42, -0.2, -0.7],
   ] as const) {
-    pb.add('frame', roundedBox(0.4, 0.14, 0.42, 0.05), T(sc.x + x, sc.y - 0.42, sc.z + z, 0, ry, 0), PAINT.seat);
-    pb.add('frame', roundedBox(0.4, 0.5, 0.1, 0.05), T(sc.x + x * 1.15, sc.y - 0.15, sc.z + z + 0.22, -0.15, ry, 0), PAINT.seat);
+    pb.add(
+      'frame',
+      roundedBox(0.4, 0.14, 0.42, 0.05),
+      T(sc.x + x, sc.y - 0.42, sc.z + z, 0, ry, 0),
+      PAINT.seat,
+    );
+    pb.add(
+      'frame',
+      roundedBox(0.4, 0.5, 0.1, 0.05),
+      T(sc.x + x * 1.15, sc.y - 0.15, sc.z + z + 0.22, -0.15, ry, 0),
+      PAINT.seat,
+    );
   }
-  pb.add('frame', roundedBox(0.7, 0.2, 0.22, 0.04), T(sc.x, sc.y - 0.38, sc.z - 0.62, 0.4, 0, 0), PAINT.charcoal);
-  pb.add('glow', new THREE.PlaneGeometry(0.26, 0.12), T(sc.x - 0.17, sc.y - 0.3, sc.z - 0.66, -1.17, 0, 0), [0.25, 0.9, 1.1]);
-  pb.add('glow', new THREE.PlaneGeometry(0.26, 0.12), T(sc.x + 0.17, sc.y - 0.3, sc.z - 0.66, -1.17, 0, 0), [1.0, 0.65, 0.2]);
+  pb.add(
+    'frame',
+    roundedBox(0.7, 0.2, 0.22, 0.04),
+    T(sc.x, sc.y - 0.38, sc.z - 0.62, 0.4, 0, 0),
+    PAINT.charcoal,
+  );
+  pb.add(
+    'glow',
+    new THREE.PlaneGeometry(0.26, 0.12),
+    T(sc.x - 0.17, sc.y - 0.3, sc.z - 0.66, -1.17, 0, 0),
+    [0.25, 0.9, 1.1],
+  );
+  pb.add(
+    'glow',
+    new THREE.PlaneGeometry(0.26, 0.12),
+    T(sc.x + 0.17, sc.y - 0.3, sc.z - 0.66, -1.17, 0, 0),
+    [1.0, 0.65, 0.2],
+  );
 
   // Frame: side rails under the pontoons, cross members, skids, batteries.
   for (const sx of [-1, 1]) {
     const x = sx * 1.2;
-    for (const z of [-1.3, 0.1, 1.5]) pb.add('frame', bar([x, -0.95, z], [x, -0.3, z], 0.045, 8), undefined, PAINT.gunmetal);
+    for (const z of [-1.3, 0.1, 1.5])
+      pb.add('frame', bar([x, -0.95, z], [x, -0.3, z], 0.045, 8), undefined, PAINT.gunmetal);
     batteryPod(pb, V(x, -0.62, 0.2), 0.22, 2.4, PAINT.yellow);
   }
-  for (const z of [-1.3, 0.1, 1.5]) pb.add('frame', bar([-1.2, -0.72, z], [1.2, -0.72, z], 0.04, 6), undefined, PAINT.gunmetal);
+  for (const z of [-1.3, 0.1, 1.5])
+    pb.add('frame', bar([-1.2, -0.72, z], [1.2, -0.72, z], 0.04, 6), undefined, PAINT.gunmetal);
   pb.add('frame', bar([-1.2, -0.72, -1.3], [1.2, -0.72, 1.5], 0.03, 6), undefined, PAINT.gunmetal);
   skids(pb, 1.2, -0.98, -1.9, 2.0, 0.055, PAINT.gunmetal);
 
   // Thrusters: two aft on the pontoon tails, two vertical on the pontoons, one lateral.
   const props: PropSpec[] = [];
-  props.push(thruster(pb, V(-1.2, 0.12, 2.42), V(0, 0, 1), 0.2, 'port', 1, { bandColor: PAINT.yellow, mount: V(-1.2, 0.12, 2.12) }));
-  props.push(thruster(pb, V(1.2, 0.12, 2.42), V(0, 0, 1), 0.2, 'starboard', -1, { bandColor: PAINT.yellow, mount: V(1.2, 0.12, 2.12) }));
-  props.push(thruster(pb, V(-1.78, 0.2, 0.5), V(0, -1, 0), 0.2, 'vertical', 1, { bandColor: PAINT.yellow, mount: V(-1.58, 0.2, 0.5) }));
-  props.push(thruster(pb, V(1.78, 0.2, 0.5), V(0, -1, 0), 0.2, 'vertical', -1, { bandColor: PAINT.yellow, mount: V(1.58, 0.2, 0.5) }));
-  props.push(thruster(pb, V(0, 0.95, 1.2), V(1, 0, 0), 0.15, 'lateral', 1, { mount: V(0, 0.79, 1.2) }));
+  props.push(
+    thruster(pb, V(-1.2, 0.12, 2.42), V(0, 0, 1), 0.2, 'port', 1, {
+      bandColor: PAINT.yellow,
+      mount: V(-1.2, 0.12, 2.12),
+    }),
+  );
+  props.push(
+    thruster(pb, V(1.2, 0.12, 2.42), V(0, 0, 1), 0.2, 'starboard', -1, {
+      bandColor: PAINT.yellow,
+      mount: V(1.2, 0.12, 2.12),
+    }),
+  );
+  props.push(
+    thruster(pb, V(-1.78, 0.2, 0.5), V(0, -1, 0), 0.2, 'vertical', 1, {
+      bandColor: PAINT.yellow,
+      mount: V(-1.58, 0.2, 0.5),
+    }),
+  );
+  props.push(
+    thruster(pb, V(1.78, 0.2, 0.5), V(0, -1, 0), 0.2, 'vertical', -1, {
+      bandColor: PAINT.yellow,
+      mount: V(1.58, 0.2, 0.5),
+    }),
+  );
+  props.push(
+    thruster(pb, V(0, 0.95, 1.2), V(1, 0, 0), 0.15, 'lateral', 1, { mount: V(0, 0.79, 1.2) }),
+  );
 
   // Lights: a bar across the front under the sphere, lamps on the pontoon noses.
   pb.add('frame', bar([-1.2, -0.62, -1.6], [1.2, -0.62, -1.6], 0.04, 8), undefined, PAINT.gunmetal);
   for (const sx of [-1, 1]) {
-    pb.add('frame', bar([sx * 1.2, -0.62, -1.6], [sx * 1.2, -0.3, -1.3], 0.035, 6), undefined, PAINT.gunmetal);
+    pb.add(
+      'frame',
+      bar([sx * 1.2, -0.62, -1.6], [sx * 1.2, -0.3, -1.3], 0.035, 6),
+      undefined,
+      PAINT.gunmetal,
+    );
     lamp(pb, V(sx * 0.44, -0.6, -1.72), V(0, -0.1, -1), 0.1);
-    lamp(pb, V(sx * 1.2, 0.2, -2.02), V(sx * 0.15, -0.1, -1), 0.075, { bracketTo: V(sx * 1.2, 0.2, -1.86) });
+    lamp(pb, V(sx * 1.2, 0.2, -2.02), V(sx * 0.15, -0.1, -1), 0.075, {
+      bracketTo: V(sx * 1.2, 0.2, -1.86),
+    });
   }
   basket(pb, V(0, -0.82, -1.95), 1.1, 0.32, 0.55, { contents: true });
 
   // Deck hardware.
   liftingBail(pb, V(0, 0.82, 1.05), 0.14);
   antenna(pb, V(0.35, 0.8, 1.7), 0.8);
-  for (const sx of [-1, 1]) handrail(pb, [[sx * 1.2, 0.6, -1.2], [sx * 1.2, 0.6, 0], [sx * 1.2, 0.6, 1.2]], 0.1, 0.016);
+  for (const sx of [-1, 1])
+    handrail(
+      pb,
+      [
+        [sx * 1.2, 0.6, -1.2],
+        [sx * 1.2, 0.6, 0],
+        [sx * 1.2, 0.6, 1.2],
+      ],
+      0.1,
+      0.016,
+    );
 
   const decals: DecalSpec[] = [];
   for (const sx of [-1, 1]) {
@@ -388,7 +575,13 @@ export function classA(low: boolean): Blueprint {
     camera: { pos: V(0, -0.42, -1.62), size: 0.2 },
     strobe: { pos: V(-0.3, 0.84, 1.8), radius: 0.06 },
     decals,
-    decalText: { name: 'PETREL', number: 'DSV-1', rating: '1000', ink: '#16191c', accent: '#16191c' },
+    decalText: {
+      name: 'PETREL',
+      number: 'DSV-1',
+      rating: '1000',
+      ink: '#16191c',
+      accent: '#16191c',
+    },
     cockpitEye: V(0, 0.05, -0.95),
     tetherAnchor: V(0, -0.85, -1.7),
     blades: 4,
@@ -446,7 +639,12 @@ export function classC(low: boolean): Blueprint {
     [0.7, -0.22],
   ]);
   // A foam collar framing the sphere from above.
-  pb.add('foam', new THREE.TorusGeometry(0.86, 0.08, 10, 40, Math.PI), T(sc.x, sc.y + 0.02, sc.z, 0, 0, 0), PAINT.red);
+  pb.add(
+    'foam',
+    new THREE.TorusGeometry(0.86, 0.08, 10, 40, Math.PI),
+    T(sc.x, sc.y + 0.02, sc.z, 0, 0, 0),
+    PAINT.red,
+  );
 
   // Aft fins carrying the aft thrusters.
   for (const sx of [-1, 1]) {
@@ -467,30 +665,75 @@ export function classC(low: boolean): Blueprint {
 
   // Thrusters: aft pair high and low on the fins, two vertical through the deck, one lateral.
   const props: PropSpec[] = [];
-  props.push(thruster(pb, V(-0.95, 1.0, 2.75), V(0, 0, 1), 0.22, 'port', 1, { bandColor: PAINT.red, mount: V(-0.64, 1.0, 2.6) }));
-  props.push(thruster(pb, V(0.95, 1.0, 2.75), V(0, 0, 1), 0.22, 'starboard', -1, { bandColor: PAINT.red, mount: V(0.64, 1.0, 2.6) }));
-  props.push(thruster(pb, V(0, 2.32, -0.95), V(0, -1, 0), 0.24, 'vertical-fore', 1, { bandColor: PAINT.red }));
-  props.push(thruster(pb, V(0, 2.32, 1.35), V(0, -1, 0), 0.24, 'vertical-aft', -1, { bandColor: PAINT.red }));
-  props.push(thruster(pb, V(0, -0.55, 2.55), V(1, 0, 0), 0.18, 'lateral', 1, { mount: V(0, -0.5, 2.3) }));
+  props.push(
+    thruster(pb, V(-0.95, 1.0, 2.75), V(0, 0, 1), 0.22, 'port', 1, {
+      bandColor: PAINT.red,
+      mount: V(-0.64, 1.0, 2.6),
+    }),
+  );
+  props.push(
+    thruster(pb, V(0.95, 1.0, 2.75), V(0, 0, 1), 0.22, 'starboard', -1, {
+      bandColor: PAINT.red,
+      mount: V(0.64, 1.0, 2.6),
+    }),
+  );
+  props.push(
+    thruster(pb, V(0, 2.32, -0.95), V(0, -1, 0), 0.24, 'vertical-fore', 1, {
+      bandColor: PAINT.red,
+    }),
+  );
+  props.push(
+    thruster(pb, V(0, 2.32, 1.35), V(0, -1, 0), 0.24, 'vertical-aft', -1, { bandColor: PAINT.red }),
+  );
+  props.push(
+    thruster(pb, V(0, -0.55, 2.55), V(1, 0, 0), 0.18, 'lateral', 1, { mount: V(0, -0.5, 2.3) }),
+  );
   // Wells: dark collars where the vertical thrusters sit into the crown.
   for (const z of [-0.95, 1.35]) {
-    pb.add('frame', new THREE.CylinderGeometry(0.4, 0.44, 0.1, 28, 1, true), T(0, 2.19, z), PAINT.black);
+    pb.add(
+      'frame',
+      new THREE.CylinderGeometry(0.4, 0.44, 0.1, 28, 1, true),
+      T(0, 2.19, z),
+      PAINT.black,
+    );
   }
 
   // Frame, skids and batteries under the bay.
   for (const sx of [-1, 1]) {
-    for (const z of [-0.6, 0.8, 2.0]) pb.add('frame', bar([sx * 0.7, -1.75, z], [sx * 0.7, -1.3, z], 0.05, 8), undefined, PAINT.gunmetal);
+    for (const z of [-0.6, 0.8, 2.0])
+      pb.add(
+        'frame',
+        bar([sx * 0.7, -1.75, z], [sx * 0.7, -1.3, z], 0.05, 8),
+        undefined,
+        PAINT.gunmetal,
+      );
     batteryPod(pb, V(sx * 0.42, -1.55, 0.85), 0.2, 2.4, PAINT.red);
   }
   skids(pb, 0.7, -1.78, -2.1, 2.5, 0.06, PAINT.gunmetal);
-  for (const sx of [-1, 1]) pb.add('frame', bar([sx * 0.7, -1.7, -1.9], [sx * 0.5, -1.2, -0.9], 0.045, 8), undefined, PAINT.gunmetal);
+  for (const sx of [-1, 1])
+    pb.add(
+      'frame',
+      bar([sx * 0.7, -1.7, -1.9], [sx * 0.5, -1.2, -0.9], 0.045, 8),
+      undefined,
+      PAINT.gunmetal,
+    );
 
   // Lights on booms either side of the sphere and a bar under the bow.
   for (const sx of [-1, 1]) {
-    pb.add('frame', bar([sx * 0.7, 0.05, -1.75], [sx * 0.7, 0.05, -2.45], 0.045, 8), undefined, PAINT.charcoal);
+    pb.add(
+      'frame',
+      bar([sx * 0.7, 0.05, -1.75], [sx * 0.7, 0.05, -2.45], 0.045, 8),
+      undefined,
+      PAINT.charcoal,
+    );
     lamp(pb, V(sx * 0.44, 0.05, -2.45), V(0, -0.12, -1), 0.1);
     lamp(pb, V(sx * 0.82, 0.05, -2.4), V(sx * 0.25, -0.18, -1), 0.08);
-    pb.add('frame', bar([sx * 0.44, 0.05, -2.35], [sx * 0.7, 0.05, -2.35], 0.035, 6), undefined, PAINT.charcoal);
+    pb.add(
+      'frame',
+      bar([sx * 0.44, 0.05, -2.35], [sx * 0.7, 0.05, -2.35], 0.035, 6),
+      undefined,
+      PAINT.charcoal,
+    );
     lamp(pb, V(sx * 0.5, -1.55, -2.4), V(0, -0.2, -1), 0.065, { lens: [2.4, 2.3, 2.1] });
   }
   pb.add('frame', bar([-0.7, -1.55, -2.3], [0.7, -1.55, -2.3], 0.04, 6), undefined, PAINT.charcoal);
@@ -499,11 +742,25 @@ export function classC(low: boolean): Blueprint {
   // Deck hardware.
   liftingBail(pb, V(0, 2.22, 0.2), 0.16);
   antenna(pb, V(0.3, 2.2, 1.9), 0.9);
-  pb.add('metal', new THREE.CylinderGeometry(0.05, 0.05, 0.2, 10), T(-0.3, 2.28, 1.95), PAINT.charcoal);
+  pb.add(
+    'metal',
+    new THREE.CylinderGeometry(0.05, 0.05, 0.2, 10),
+    T(-0.3, 2.28, 1.95),
+    PAINT.charcoal,
+  );
   pb.add('glow', new THREE.SphereGeometry(0.035, 8, 6), T(-0.3, 2.4, 1.95), [0.2, 1.4, 0.4]);
   for (const sx of [-1, 1]) {
     const y = topY(hull(0), 0.62);
-    handrail(pb, [[sx * 0.62, y, -1.6], [sx * 0.62, y, 0.2], [sx * 0.62, y, 1.9]], 0.1, 0.016);
+    handrail(
+      pb,
+      [
+        [sx * 0.62, y, -1.6],
+        [sx * 0.62, y, 0.2],
+        [sx * 0.62, y, 1.9],
+      ],
+      0.1,
+      0.016,
+    );
   }
 
   const decals: DecalSpec[] = [
@@ -511,7 +768,13 @@ export function classC(low: boolean): Blueprint {
     ...sidePair(hull, 'rating', 0.3, 0.75, 1.1, 0.34),
     ...sidePair(hull, 'number', -1.35, 1.25, 0.9, 0.32),
     ...sidePair(hull, 'flag', 1.65, 1.3, 0.48, 0.32),
-    { kind: 'placard', pos: V(0, topY(hull(0.2), 0) + 0.012, 0.75), w: 0.7, h: 0.28, normal: V(0, 1, 0) },
+    {
+      kind: 'placard',
+      pos: V(0, topY(hull(0.2), 0) + 0.012, 0.75),
+      w: 0.7,
+      h: 0.28,
+      normal: V(0, 1, 0),
+    },
   ];
 
   return {
@@ -533,7 +796,13 @@ export function classC(low: boolean): Blueprint {
     camera: { pos: V(0, 0.32, -2.2), size: 0.22 },
     strobe: { pos: V(0, 2.26, 2.1), radius: 0.065 },
     decals,
-    decalText: { name: 'HADAL', number: 'DSV-3', rating: '11000', ink: '#16191c', accent: '#16191c' },
+    decalText: {
+      name: 'HADAL',
+      number: 'DSV-3',
+      rating: '11000',
+      ink: '#16191c',
+      accent: '#16191c',
+    },
     cockpitEye: V(0, -0.66, -1.95),
     tetherAnchor: V(0, -1.6, -2.4),
   };

@@ -14,6 +14,8 @@
 import { DEFAULT_LOOK, type VehicleLook } from './materials.js';
 import { blueprintFor, type HullClassId } from './hulls.js';
 import { Vehicle, type VehicleLod } from './Vehicle.js';
+import { withDetail } from './kit.js';
+import { rovBlueprint } from './rov.js';
 
 export { Vehicle, type VehicleDrive, type VehicleLod, type VehicleStats } from './Vehicle.js';
 export type { HullClassId } from './hulls.js';
@@ -48,16 +50,43 @@ export interface BuildOptions {
   scaleFactor?: number;
 }
 
+/** Radial detail factor for the low LOD's cylinders, lathes and spheres. */
+export const LOW_DETAIL = 0.5;
+
+function washFor(tier: string): number {
+  return WASH_PARTICLES[(tier in WASH_PARTICLES ? tier : 'high') as VehicleTier];
+}
+
 /** Build the vehicle for a hull class at a graphics tier. */
-export function buildVehicle(hullClass: string, tier: string = 'high', opts: BuildOptions = {}): Vehicle {
+export function buildVehicle(
+  hullClass: string,
+  tier: string = 'high',
+  opts: BuildOptions = {},
+): Vehicle {
   const lod = lodForTier(tier);
-  const bp = blueprintFor(hullClass, lod === 'low');
-  const id = bp.id as HullClassId;
-  const washCount = WASH_PARTICLES[(tier in WASH_PARTICLES ? tier : 'high') as VehicleTier];
-  return new Vehicle(bp, {
-    scale: VEHICLE_SCALE[id] * (opts.scaleFactor ?? 1),
-    lod,
-    look: { ...DEFAULT_LOOK, ...opts.look },
-    washCount,
+  return withDetail(lod === 'low' ? LOW_DETAIL : 1, () => {
+    const bp = blueprintFor(hullClass, lod === 'low');
+    const id = bp.id as HullClassId;
+    return new Vehicle(bp, {
+      scale: VEHICLE_SCALE[id] * (opts.scaleFactor ?? 1),
+      lod,
+      look: { ...DEFAULT_LOOK, ...opts.look },
+      washCount: washFor(tier),
+    });
   });
+}
+
+/** Build the work ROV at a graphics tier (life size times `scale`). */
+export function buildRov(tier: string = 'high', scale = 1, opts: BuildOptions = {}): Vehicle {
+  const lod = lodForTier(tier);
+  return withDetail(
+    lod === 'low' ? LOW_DETAIL : 1,
+    () =>
+      new Vehicle(rovBlueprint(lod === 'low'), {
+        scale: scale * (opts.scaleFactor ?? 1),
+        lod,
+        look: { ...DEFAULT_LOOK, ...opts.look },
+        washCount: Math.round(washFor(tier) * 0.4),
+      }),
+  );
 }
