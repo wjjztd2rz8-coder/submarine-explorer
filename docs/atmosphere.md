@@ -41,31 +41,41 @@ GPU point field of `snowCount` particles in a `snowBoxM` cube that wraps around 
 
 ## Surface lid
 
-`Water.ts` draws a camera-following plane at y = 0 with a two-sine vertex wobble and a facing-angle brightness term, only while the camera is shallower than `surfaceVisibleAboveM` (−100 m). **Not done:** a true Fresnel/reflective lid (A2 item 6); the current one is a tinted translucent plane.
+`Water.ts` draws a camera-following flat quad at y = 0, only while the camera is shallower than `surfaceVisibleAboveM` (−160 m). F1-OCEAN shades it per fragment from the optics. The swell is an analytic slope (two crossed sine trains plus four fine ripples on medium and up) that flattens with distance.
+
+- **From below:** inside Snell's window (angle from vertical under 48.6°) you see sky-blue light with a bright rippled rim and a warm sun glint; outside it the surface is a total-internal-reflection mirror, drawn as the fog colour so the horizon stays continuous. Window brightness fades with depth (`uLight`, gone by 160 m).
+- **From above:** a Fresnel mix of water colour and sky, with a sun glint.
 
 ## Post pass
 
-`UnderwaterPass` is a single full-screen shader: slow UV wobble (fades with depth), per-band colour grade tint (`gradeTint`) and vignette (`vignette`), driven from the current `AtmosphereSample`.
+`UnderwaterPass` (`src/shaders/underwater.ts`) renders the scene into a half-float target with a depth texture (4x MSAA on high and ultra), then:
+
+1. **Bloom**: soft-knee bright pass into a quarter-resolution target, two separable blurs, and on high/ultra an eighth-resolution second level. Added in linear light before tone mapping.
+2. **Composite** in one full-screen shader: slow UV wobble (fades with depth); chromatic fringing toward the frame edge; **view-direction scattering** (the water is brighter looking up, darker looking down, weighted by the fog fraction rebuilt from the depth texture so the far terrain still melts into the open-water colour); **god rays** (noise around the sun axis, 1 or 2 octaves by tier, strongest in the top tens of metres, `godRayStrength()` in `app/systems/render.ts`); bloom; the per-band grade (gain, tint, saturation), warm highlights over blue-green shadows while sunlit; a highlight shoulder so lamp pools keep detail; the **readability floor** (a faint lift in the fog hue on the darkest pixels); vignette; ACES and sRGB; a hair of dither.
 
 **Colour pipeline.** The scene renders into a linear **half-float** target, and Three skips tone mapping and output encoding for render targets. The pass therefore ends with `#include <tonemapping_fragment>` and `<colorspace_fragment>`: ACES with `toneMappingExposure`, then sRGB, applied once on the way to the screen.
 
 - Before QA-B #4 it did neither, so medium/high showed raw linear values: crushed darks, over-saturated mid-tones.
-- `toneMappingExposure` had no effect, and the displayed fog was not the art-direction hex.
-- The band light intensities were about 3× hotter to compensate. They are now surface ambient 0.9 / sun 1.0, twilight 0.55 / 0.35, and caustics 1.1.
-- The low tier (no post) always rendered correctly and now matches medium/high.
+- The band light intensities assume this pipeline: surface ambient 0.9 / sun 1.0, twilight 0.55 / 0.35.
+- The low tier renders straight to the screen, with the band `gradeGain` applied through `toneMappingExposure`.
 
-**Draw calls.** The pass's own `renderer.render` auto-resets `renderer.info`. It therefore snapshots the scene's `info.render.calls` / `triangles` first (`sceneDrawCalls`, `sceneTriangles`), and the `?debugTerrain=1` line adds them (QA-B #8). Chromatic aberration and god rays are configured per tier (`aberrationStrength`, `godRayStrength`, `tiers.*.godRays`) but **not yet implemented in the shader**; the uniforms are read by nothing. On the low tier the scene renders straight to the screen with no post pass.
+**Draw calls.** The pass's own `renderer.render` auto-resets `renderer.info`. It therefore snapshots the scene's `info.render.calls` / `triangles` first (`sceneDrawCalls`, `sceneTriangles`), and the `?debugTerrain=1` line adds them (QA-B #8).
+
+**Headlight beams.** The cone is shaded by `|N·V|` (how squarely the eye looks through the shell), fades at the apex and near the camera, thickens with the particulate load (`snowDensity` scaled down in daylight) and carries drifting dust streaks when `beamDetail` is 1 or more. Marine snow inside the lamp cone is brighter and slightly larger.
+
+**Caustics.** `makeCausticFrames` bakes a two-layer animated Voronoi web (cell borders are the filaments), 10 or 16 frames per loop, projected over `causticsFootprintM` (320 m).
 
 ## Tiers
 
-| tier   | post | god rays   | snow | caustics px | headlight cones |
-| ------ | ---- | ---------- | ---- | ----------- | --------------- |
-| low    | no   | no         | 0    | 0           | no              |
-| medium | yes  | no         | 3000 | 128         | yes             |
-| high   | yes  | yes (stub) | 9000 | 256         | yes             |
+| tier   | post | bloom levels | god-ray octaves | MSAA | snow | caustics px | beam detail |
+| ------ | ---- | ------------ | --------------- | ---- | ---- | ----------- | ----------- |
+| low    | no   | 0            | 0               | 0    | 600  | 0           | 0 (plain)   |
+| medium | yes  | 1            | 1               | 0    | 3000 | 128         | 1           |
+| high   | yes  | 2            | 2               | 4    | 9000 | 256         | 2           |
+| ultra  | yes  | 2            | 2               | 4    | 9000 | 256         | 2           |
 
 ## Follow-ups
 
-- Implement aberration and god rays in the post shader (high tier) and measure the pass cost (brief target ≤ 3 ms on this Mac).
-- Fresnel surface lid.
+- Measure the pass cost on a real GPU (brief target ≤ 3 ms on this Mac); the headless runs use SwiftShader.
 - LUT-based grade instead of a single tint multiply.
+- Occlude god rays with terrain silhouettes; depth-aware soft particles for the beam cones.
