@@ -27,9 +27,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # SwiftShader makes the single-worker e2e suite take over an hour, so
-        # split it across runners. The full gates also run locally before merge.
-        shard: [1, 2, 3, 4]
+        # Keep one browser worker per runner; extra shards leave room for the
+        # CI-only timeouts and retry without competing for software-renderer CPU.
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     env:
       CI: true
     steps:
@@ -57,12 +57,20 @@ jobs:
       - name: Unit tests (vitest)
         run: npm test
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ hashFiles('package-lock.json') }}
+
       - name: Install Playwright Chromium
+        # Always ensure OS dependencies, even when the browser cache was restored.
         run: npx playwright install --with-deps chromium
 
       - name: End-to-end tests (Playwright)
         # Tiles are committed under data/tiles/, so the e2e suite needs no network.
-        run: npm run test:e2e -- --reporter=list,html --shard=${{ matrix.shard }}/4
+        # Derive the denominator from the matrix to keep shard coverage complete.
+        run: npm run test:e2e -- --reporter=list,html --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
       - name: Attribution check
         run: python3 tools/check_attribution.py
@@ -81,8 +89,10 @@ jobs:
           name: e2e-artifacts-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
           path: |
             tests/e2e/screenshots
+            .cache/codex/shots
             playwright-report
             test-results
             test-results-project-base
           if-no-files-found: ignore
+          include-hidden-files: true
           retention-days: 14
