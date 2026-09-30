@@ -26,7 +26,7 @@ import sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 PROCEDURAL_PREFIX = "procedural:"
-PROCEDURAL_KINDS = ("hull-block", "debris", "chimney")
+PROCEDURAL_KINDS = ("hull-block", "debris", "chimney", "geo")
 MODEL_URL_PREFIX = "/assets/models/"
 COLLISIONS = ("none", "sphere", "box")
 HULL_ENDS = ("prow", "cut", "rounded")  # hull-block "ends": [forward, aft]
@@ -35,6 +35,9 @@ CHIMNEY_MATERIALS = ("basalt", "carbonate", "sulfide")  # chimney "material_hint
 WRECK_HULLS = ("titanic-bow", "titanic-stern", "bismarck", "endurance")
 WRECK_SCATTERS = ("titanic-boilers", "titanic-field", "titanic-stern-field", "bismarck-turrets",
                   "bismarck-field", "bismarck-landslide", "endurance-rigging", "endurance-stern")
+# "feature": procedural:geo set pieces (src/world/props/geo/features.ts); keep in step.
+GEO_FEATURES = ("smoker-cluster", "carbonate-tower", "coral-mound", "stalactite-cluster",
+                "pillow-field", "tuff-cliff", "canyon-ledge", "hadal-scarp")
 DEFAULT_MAX_PROPS = 400  # Config.props.maxProps
 DEFAULT_MAX_MODEL_MB = 2.0
 
@@ -139,6 +142,11 @@ def validate_entry(entry, warnings):
         if not ok:
             warnings.append('%s: "wreck" %r does not match procedural:%s; generic builder used'
                             % (where, w, kind))
+
+    if "feature" in entry:
+        if not (kind in ("geo", "chimney") and entry["feature"] in GEO_FEATURES):
+            warnings.append('%s: "feature" %r does not match procedural:%s; ignored'
+                            % (where, entry["feature"], kind))
 
     if "material_hint" in entry:
         m = entry["material_hint"]

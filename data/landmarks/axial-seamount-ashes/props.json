@@ -76,6 +76,21 @@
       "collision": "box",
       "reconstruction": true,
       "note": "Virgin: a real named ASHES chimney, 'generally less than about 4 m tall' (UW Interactive Oceans). No published coordinate or exact height; placed illustratively in the minor-chimney cluster near Mushroom. (Virgin Mound, a separate sub-metre anhydrite spire mentioned in the same source, is below this engine's minimum practical prop scale and is not modelled separately.)"
+    },
+    {
+      "id": "ashes-smoker-mound",
+      "model": "procedural:chimney",
+      "feature": "smoker-cluster",
+      "lat": 45.9339,
+      "lon": -130.01415,
+      "snap_to_seabed": true,
+      "heading_deg": 40,
+      "scale": 1,
+      "dimensions_m": [22, 18, 9],
+      "lod_distance_m": 700,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: a sulfide mound carrying a group of black-smoker chimneys, tubeworm clumps and bacterial mats, modelled on the way ASHES chimneys cluster on their mounds (UW Interactive Oceans). Height and layout are invented; chimneys of this field are generally under about 4-5 m, so the tallest stack here is deliberately a little taller for readability."
     }
   ]
 }

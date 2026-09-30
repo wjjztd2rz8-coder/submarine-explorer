@@ -1,5 +1,21 @@
 {
   "version": 1,
   "landmark": "hunga-tonga-caldera",
-  "props": []
+  "props": [
+    {
+      "id": "caldera-tuff-wall",
+      "model": "procedural:geo",
+      "feature": "tuff-cliff",
+      "lat": -20.57,
+      "lon": -175.418,
+      "snap_to_seabed": true,
+      "heading_deg": 270,
+      "scale": 1,
+      "dimensions_m": [90, 30, 45],
+      "lod_distance_m": 900,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: a banded pyroclastic tuff scarp with gullies and a talus apron, representing the layered volcaniclastic walls of the pre-2022 caldera rim (Hunga Tonga-Hunga Haapai). Size and position within the rim are invented."
+    }
+  ]
 }

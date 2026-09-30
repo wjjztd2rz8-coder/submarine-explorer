@@ -27,6 +27,21 @@
       "collision": "sphere",
       "reconstruction": true,
       "note": "Second boulder stand-in, part of the same thicket cluster as coral-mound-boulder-1. Same caveats: a generic rock model in place of an unmodelled coral colony, purely illustrative."
+    },
+    {
+      "id": "lophelia-mound",
+      "model": "procedural:geo",
+      "feature": "coral-mound",
+      "lat": 30.16033,
+      "lon": -79.78982,
+      "snap_to_seabed": true,
+      "heading_deg": 20,
+      "scale": 1,
+      "dimensions_m": [64, 48, 14],
+      "lod_distance_m": 900,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: a Desmophyllum pertusum (Lophelia) coral mound with live thickets, vase sponges and rubble, standing for the Blake Plateau mound field (NOAA Okeanos Explorer). The layout is invented; real mounds are far larger."
     }
   ]
 }

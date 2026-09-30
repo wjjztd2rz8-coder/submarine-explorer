@@ -5,17 +5,18 @@
     {
       "id": "beebe-chimney-1",
       "model": "procedural:chimney",
+      "feature": "smoker-cluster",
       "lat": 18.54635,
       "lon": -81.71795,
       "snap_to_seabed": true,
       "heading_deg": 15,
       "scale": 1,
-      "dimensions_m": [4, 4, 12],
-      "material_hint": "sulfide",
-      "lod_distance_m": 700,
+      "dimensions_m": [26, 20, 12],
+      "lod_distance_m": 800,
       "collision": "box",
       "reconstruction": true,
-      "note": "Tall black-smoker chimney standing in for the Beebe 1-5 vent complex (403-410 degC supercritical fluid, Connelly et al. 2012). `material_hint: \"sulfide\"` for the near-black, rust-streaked palette. No photogrammetric model of the real chimneys was found, so shape and exact height are a reconstruction; the mound's location and the field's record temperature are sourced."
+      "note": "Tall black-smoker chimney standing in for the Beebe 1-5 vent complex (403-410 degC supercritical fluid, Connelly et al. 2012). `material_hint: \"sulfide\"` for the near-black, rust-streaked palette. No photogrammetric model of the real chimneys was found, so shape and exact height are a reconstruction; the mound's location and the field's record temperature are sourced. Rendered as a sulfide mound with the tall chimney, its neighbours, animated smoke and Rimicaris-style shrimp swarms on the walls (variant shrimp); the cluster layout is a game reconstruction.",
+      "variant": "shrimp"
     },
     {
       "id": "beebe-chimney-2",

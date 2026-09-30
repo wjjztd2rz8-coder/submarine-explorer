@@ -126,6 +126,29 @@ class WreckTests(unittest.TestCase):
             self.assertIn("'%s'" % wid, text)
 
 
+class GeoFeatureTests(unittest.TestCase):
+    def test_geo_kind_and_feature_pass(self):
+        w = []
+        self.assertIsNone(vp.validate_entry(
+            entry(model="procedural:geo", feature="coral-mound", dimensions_m=[60, 40, 10]), w))
+        self.assertIsNone(vp.validate_entry(
+            entry(model="procedural:chimney", feature="carbonate-tower", dimensions_m=[70, 60, 60]), w))
+        self.assertEqual(w, [])
+
+    def test_mismatch_warns_but_keeps_entry(self):
+        w = []
+        self.assertIsNone(vp.validate_entry(entry(model="procedural:geo", feature="nope"), w))
+        self.assertIsNone(vp.validate_entry(entry(feature="coral-mound"), w))
+        self.assertEqual(len(w), 2)
+
+    def test_ids_match_the_engine(self):
+        src = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",
+                           "src", "world", "props", "geo", "features.ts")
+        text = open(src, encoding="utf-8").read()
+        for fid in vp.GEO_FEATURES:
+            self.assertIn("'%s'" % fid, text)
+
+
 class ValidateDocTests(unittest.TestCase):
     def test_counts_duplicates_and_bbox(self):
         doc = {"version": 1, "landmark": "t", "props": [

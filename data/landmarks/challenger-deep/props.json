@@ -15,6 +15,21 @@
       "collision": "none",
       "reconstruction": true,
       "note": "Stands in for the benthic lander 'Leggo', which touched down at this real position (11.368536 N, 142.5875166 E) on 19 Dec 2014 during Schmidt Ocean Institute's RV Falkor cruise FK141215 ('Expanding Mariana Trench Perspectives', schmidtocean.org) and recorded amphipods (Hirondellea gigas) feeding on baited mackerel at a depth of 10,929 m. The engine's procedural kinds do not include a lander-frame shape, so a small debris cluster marks the site instead; it does not depict Leggo's real shape or size (no published dimensions were found). Leggo was recovered after the cruise, so nothing physical remains here today -- this marker represents a historic sampling event, not a permanent structure."
+    },
+    {
+      "id": "north-wall-scarp",
+      "model": "procedural:geo",
+      "feature": "hadal-scarp",
+      "lat": 11.4055,
+      "lon": 142.583,
+      "snap_to_seabed": true,
+      "heading_deg": 180,
+      "scale": 1,
+      "dimensions_m": [100, 40, 50],
+      "lod_distance_m": 900,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: a fractured silty scarp with slump blocks on the trench's north wall, representing the mass-wasting slopes of the Mariana forearc (hadal wall sediment slumps, Oguri et al. 2013). Size and position are invented."
     }
   ]
 }

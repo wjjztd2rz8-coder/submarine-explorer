@@ -211,7 +211,8 @@
       "title": "Subduction and the trench walls",
       "paragraphs": [
         "The Mariana Trench marks a convergent plate boundary: the Pacific Plate subducts (is thrust downward) beneath the smaller Mariana Arc system, part of the Philippine Plate, to the west -- one plate diving into the Earth's mantle while the other rides up over it, the same basic mechanism that produces every ocean trench on the planet.",
-        "This mission's north-wall scan point, on the trench's landward (subducting) inner wall, reads 9,977.7 m on this tile's real GMRT bathymetry, with a locally measured slope of roughly 25-29 deg depending on how widely the surrounding cells are sampled -- steep for a ~60 m-per-cell survey grid, and almost certainly an underestimate of how sharp the true wall is at a scale this coarse grid cannot resolve."
+        "This mission's north-wall scan point, on the trench's landward (subducting) inner wall, reads 9,977.7 m on this tile's real GMRT bathymetry, with a locally measured slope of roughly 25-29 deg depending on how widely the surrounding cells are sampled -- steep for a ~60 m-per-cell survey grid, and almost certainly an underestimate of how sharp the true wall is at a scale this coarse grid cannot resolve.",
+        "The fractured scarp with slump blocks on the north wall is a game addition, modelled on the mass-wasting slopes of the trench."
       ],
       "facts": [
         {
@@ -224,7 +225,7 @@
           "value": "~25-29 deg, smoothed by the ~60 m grid"
         }
       ],
-      "reconstruction": false,
+      "reconstruction": true,
       "sources": [
         {
           "title": "Stewart, H.A. & Jamieson, A.J. 2019, \"The five deeps...\", Earth-Science Reviews 197:102896 (open access, CC BY)",

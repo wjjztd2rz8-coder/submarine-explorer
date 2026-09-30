@@ -5,17 +5,17 @@
     {
       "id": "poseidon-tower",
       "model": "procedural:chimney",
-      "material_hint": "carbonate",
+      "feature": "carbonate-tower",
       "lat": 30.124,
       "lon": -42.1195,
       "snap_to_seabed": true,
       "heading_deg": 0,
       "scale": 1,
       "dimensions_m": [70, 70, 60],
-      "lod_distance_m": 1200,
+      "lod_distance_m": 1400,
       "collision": "box",
       "reconstruction": true,
-      "note": "Poseidon, the tallest carbonate spire in the field: about 60 m tall (Wikipedia, 'Lost City Hydrothermal Field'). Wikipedia also gives '100 metres wide', which describes the whole multi-spire edifice rather than one column; dimensions_m[0]=70 is an estimate for a single tapered tower's base. Placed at the corrected field location (see pois.json note); exact position within the ~500 sq m field is not published and the GMRT grid (~53 x 61 m/cell) cannot resolve it. Colour: material_hint carbonate renders the pale white/cream carbonate-brucite of Lost City's towers. See sources.md."
+      "note": "Poseidon, the tallest carbonate spire in the field: about 60 m tall (Wikipedia, 'Lost City Hydrothermal Field'). Wikipedia also gives '100 metres wide', which describes the whole multi-spire edifice rather than one column; dimensions_m[0]=70 is an estimate for a single tapered tower's base. Placed at the corrected field location (see pois.json note); exact position within the ~500 sq m field is not published and the GMRT grid (~53 x 61 m/cell) cannot resolve it. Rendered as a fluted pale spire with flanges and lesser spires on a talus skirt; colour is the pale white/cream carbonate-brucite of Lost City's towers. See sources.md."
     },
     {
       "id": "beehive-chimney",

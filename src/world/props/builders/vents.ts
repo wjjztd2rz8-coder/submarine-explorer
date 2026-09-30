@@ -8,9 +8,13 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { ChimneyMaterial, PropsConfig } from '../../../core/Config.js';
+import { geoDetail } from '../geo/detail.js';
+import { geoMaterial } from '../geo/materials.js';
+import { buildGeo } from '../geo/index.js';
 import {
   mulberry32,
   normalise,
+  projectUVs,
   valueNoise3,
   type BuiltProp,
   type ProceduralBuilder,
@@ -130,8 +134,47 @@ export function buildChimney(
   return { full, impostor: imp, bounds: merged.boundingBox!.clone() };
 }
 
+/**
+ * A chimney as placed in a landmark: the base column plus a detail texture
+ * (flowstone on carbonate, cracked rock otherwise). Smoke, shimmer and glow come
+ * from the vent environment preset (`world/presets/VentPreset.ts`), which finds
+ * `procedural:chimney` props. `buildChimney` stays the plain geometry.
+ */
+export function buildPlacedChimney(
+  dims: readonly [number, number, number],
+  seed: number,
+  cfg: PropsConfig,
+  material: ChimneyMaterial,
+  tier: string,
+): BuiltProp {
+  const built = buildChimney(dims, seed, cfg, material);
+  const d = geoDetail(tier);
+  const body = built.full as THREE.Mesh;
+  projectUVs(body.geometry, material === 'carbonate' ? 5 : 3);
+  const old = body.material as THREE.Material;
+  body.material = geoMaterial(material === 'carbonate' ? 'flow' : 'rock', d, {
+    roughness: 0.93,
+    bumpScale: 1.2,
+  });
+  old.dispose();
+  // The flow texture restores the mean brightness; pale carbonate would still clip in the headlights.
+  if (material === 'carbonate')
+    (body.material as THREE.MeshStandardMaterial).color.multiplyScalar(0.7);
+  return built;
+}
+
 /** Registry entries for this family (`builders/index.ts`). */
 export const VENT_BUILDERS = {
-  chimney: ({ dims, seed, cfg, def }) =>
-    buildChimney(dims, seed, cfg, def.materialHint ?? 'basalt'),
+  // A chimney with a `feature` is a vent set piece (Poseidon, a smoker mound): it stays
+  // `procedural:chimney` so the vent preset still puts smoke and glow on its tallest stack.
+  chimney: (input) =>
+    input.def.feature
+      ? buildGeo(input)
+      : buildPlacedChimney(
+          input.dims,
+          input.seed,
+          input.cfg,
+          input.def.materialHint ?? 'basalt',
+          input.tier,
+        ),
 } satisfies Record<'chimney', ProceduralBuilder>;

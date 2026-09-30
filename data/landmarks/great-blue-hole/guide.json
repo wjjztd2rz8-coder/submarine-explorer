@@ -48,7 +48,8 @@
         "The Great Blue Hole formed as a limestone cave system on dry land, during several ice-age periods when sea levels were far lower than today. As the ice ages ended and the sea rose, the caves flooded and their roof eventually collapsed, leaving a near-perfectly circular sinkhole about 318 m across and 124 m deep, ringed by the shallow reef flat you can survey here.",
         "Jacques Cousteau brought his research vessel Calypso to chart the hole in 1971, confirming its karst limestone origin and identifying ledges at roughly 21 m, 49 m and 91 m -- steps left behind as the cave systems formed at different sea levels. His team also recovered stalactites, mineral icicles that can only form in dry air above water, direct proof the hole was once a cave open to the sky.",
         "A more recent expedition, in late 2018, used Aquatica Submarines' crewed subs and Kongsberg sonar aboard the research vessel Brooks McCall to build the first complete high-resolution 3D sonar map of the interior. It found dense fields of stalactites never mapped before, a 'graveyard' of conch shells that had fallen in and could not climb back out, and a layer of hydrogen-sulfide-rich water around 90 m down where oxygen runs out and the hole becomes lifeless.",
-        "None of this is modelled in this game: the shape, ledges, stalactites and chemistry described here come entirely from the sources below, not from any terrain you can scan. The marker at this entry's matching POI sits on this tile's real (shallow) seabed reading, honestly, rather than a fabricated pit."
+        "None of this is modelled in this game: the shape, ledges, stalactites and chemistry described here come entirely from the sources below, not from any terrain you can scan. The marker at this entry's matching POI sits on this tile's real (shallow) seabed reading, honestly, rather than a fabricated pit.",
+        "The limestone alcove with stalactites on the western drop-off is a game addition, modelled on the ledges and stalactites of the real Blue Hole."
       ],
       "facts": [
         {
@@ -72,7 +73,7 @@
           "value": "~90 m depth"
         }
       ],
-      "reconstruction": false,
+      "reconstruction": true,
       "sources": [
         {
           "title": "Great Blue Hole — Wikipedia",

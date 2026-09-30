@@ -63,13 +63,14 @@
       "title": "A canyon wall",
       "paragraphs": [
         "From the axis out to the rim, Monterey Canyon's walls climb as much as 1.6-1.7 km, comparable to the depth of the Grand Canyon. Along the way they are cut by smaller side gullies, and repeated small slope failures feed sediment into the turbidity currents that scour the canyon floor below.",
-        "This point sits on the canyon's north wall, about 700 m from the axis at the same longitude and roughly 270 m higher, giving a sense of the canyon's cross-section at this depth."
+        "This point sits on the canyon's north wall, about 700 m from the axis at the same longitude and roughly 270 m higher, giving a sense of the canyon's cross-section at this depth.",
+        "The terraced wall with an overhanging shelf is a game addition, modelled on the steep mudstone walls of the canyon."
       ],
       "facts": [
         { "label": "Depth here", "value": "about 748 m" },
         { "label": "Relief to nearby axis", "value": "about 270 m over roughly 700 m" }
       ],
-      "reconstruction": false,
+      "reconstruction": true,
       "sources": [
         {
           "title": "Monterey Canyon — MBARI, Know Your Ocean",

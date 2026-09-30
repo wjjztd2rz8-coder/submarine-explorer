@@ -89,6 +89,11 @@ export function headingQuaternion(
   return out.setFromAxisAngle(Y_AXIS, -THREE.MathUtils.degToRad(headingDeg));
 }
 
+/** True for props whose builder conforms to the terrain (`groundHeight`), so they need no footprint snap. */
+export function followsTerrain(def: PropDef): boolean {
+  return def.procedural === 'debris' || def.feature !== null;
+}
+
 /**
  * World position and orientation for a prop.
  *
@@ -313,8 +318,9 @@ export class Props {
   /** (Re)compute transform, bounding sphere and collider from `prop.def`. */
   place(prop: PlacedProp): void {
     const { def, root, localBounds } = prop;
-    // Debris already follows the terrain piece by piece; its origin sits on the centre sample.
-    const footprint = def.procedural === 'debris' ? null : localBounds;
+    // Debris and geo features already follow the terrain themselves (their origin is the centre
+    // sample); other props sit on the lowest sample under their footprint.
+    const footprint = followsTerrain(def) ? null : localBounds;
     computePlacement(def, this.meta, this.hf, footprint, root.position, root.quaternion);
     root.scale.set(...def.scale);
     root.updateMatrixWorld(true);
@@ -355,7 +361,7 @@ export class Props {
    * follow the terrain relative to the old origin.
    */
   async replace(prop: PlacedProp): Promise<void> {
-    if (prop.def.procedural === 'debris') {
+    if (followsTerrain(prop.def)) {
       const built = await this.build(prop.def);
       prop.root.remove(prop.full, prop.impostor);
       prop.full = built.full;

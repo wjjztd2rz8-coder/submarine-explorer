@@ -15,6 +15,21 @@
       "collision": "none",
       "reconstruction": true,
       "note": "Stands in for the MARS observatory's trawl-resistant science node, a real instrument frame about 3.7 x 4.6 m at the base and 1.2 m tall with eight instrument ports and a 52 km shore cable (MBARI). No CC0 GLB of the actual hardware was available, and the engine's procedural kinds do not include an instrument-frame shape, so a small debris cluster marks the position instead; it does not depict the real frame's shape."
+    },
+    {
+      "id": "canyon-wall-ledge",
+      "model": "procedural:geo",
+      "feature": "canyon-ledge",
+      "lat": 36.7872,
+      "lon": -122.0133,
+      "snap_to_seabed": true,
+      "heading_deg": 180,
+      "scale": 1,
+      "dimensions_m": [70, 26, 36],
+      "lod_distance_m": 900,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: a terraced mudstone canyon wall with an overhanging shelf and talus, in the manner of the steep walls of Monterey Canyon (MBARI). Size and position along the wall are invented."
     }
   ]
 }

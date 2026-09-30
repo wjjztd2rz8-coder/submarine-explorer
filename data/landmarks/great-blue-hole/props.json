@@ -1,5 +1,21 @@
 {
   "version": 1,
   "landmark": "great-blue-hole",
-  "props": []
+  "props": [
+    {
+      "id": "karst-grotto",
+      "model": "procedural:geo",
+      "feature": "stalactite-cluster",
+      "lat": 17.3153,
+      "lon": -87.5925,
+      "snap_to_seabed": true,
+      "heading_deg": 270,
+      "scale": 1,
+      "dimensions_m": [42, 16, 28],
+      "lod_distance_m": 700,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: a drowned limestone alcove on the western drop-off, modelled on the ledges and stalactites the flooded cave system of the Great Blue Hole is known for (Cousteau 1971). This wall stands on the atoll slope rather than inside the hole, whose real shape this tile cannot resolve."
+    }
+  ]
 }

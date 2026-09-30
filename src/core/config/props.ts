@@ -5,7 +5,7 @@
 
 // --- B4: props (docs/props.md) ---------------------------------------------
 export type PropCollisionKind = 'none' | 'sphere' | 'box';
-export type ProceduralPropKind = 'hull-block' | 'debris' | 'chimney';
+export type ProceduralPropKind = 'hull-block' | 'debris' | 'chimney' | 'geo';
 /** Shape of one end of a procedural:hull-block (docs/props.md). */
 export type HullEnd = 'prow' | 'cut' | 'rounded';
 /**
@@ -117,11 +117,18 @@ export const DEFAULT_PROPS: PropsConfig = {
   collisionEventCooldownS: 0.6,
   sphereColliderFit: 1.1,
   maxProps: 400,
-  defaultCollision: { 'hull-block': 'box', debris: 'none', chimney: 'box', model: 'sphere' },
+  defaultCollision: {
+    'hull-block': 'box',
+    debris: 'none',
+    chimney: 'box',
+    geo: 'box',
+    model: 'sphere',
+  },
   defaultDimensionsM: {
     'hull-block': [40, 12, 10],
     debris: [60, 60, 4],
     chimney: [0, 0, 20],
+    geo: [30, 30, 12],
   },
   debrisMinPieces: 20,
   debrisMaxPieces: 60,
