@@ -208,7 +208,7 @@ export const DEFAULT_WATER: WaterConfig = {
   headlightConeOpacity: 0.05,
   causticsStartM: -20,
   causticsEndM: -60,
-  causticsIntensity: 1.1,
+  causticsIntensity: 3.6,
   causticsFootprintM: 320,
   causticsFps: 12,
   snowBoxM: 160,

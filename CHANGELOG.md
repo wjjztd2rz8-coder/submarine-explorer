@@ -14,6 +14,22 @@ without an entry here is not done.
 
 ### Added
 
+- Phase F, F1-OCEAN: **the water column, lit like a documentary** (`src/render/`,
+  `src/shaders/underwater.ts`, `src/world/Water.ts`). The post stack now has a
+  depth-aware composite: bloom (one quarter-resolution level on medium, plus an
+  eighth-resolution level on high and ultra), light scattering that follows the
+  view direction (brighter looking up, darker looking down, weighted by the fog
+  fraction from a depth texture), god-ray shafts near the surface, chromatic
+  fringing, warm sunlit highlights over blue-green shadows, a highlight shoulder
+  so lamp pools keep detail, a readability floor that stops shadows going black,
+  and a little dither. High and ultra render the scene with 4x MSAA. The sea
+  surface follows the optics: Snell's window with a rippled bright rim and sun
+  glint from below, total internal reflection outside it, a Fresnel and sun
+  glint surface from above. Headlight beams are shaded by how squarely the eye
+  looks through them, drift with dust streaks, and grow denser in dark,
+  particle-laden water. Marine snow has a size spread, soft sprites and flares
+  inside the lamps. Low tier keeps a plain low-segment beam, a light snow field,
+  the Snell lid, and the band exposure, with no post pass.
 - Phase F, F1-WRECKS: **hand-built wrecks** (`src/world/props/wrecks/`). Titanic
   bow and stern, Bismarck and Endurance are now lofted hulls with decks, deck
   houses, funnels, turrets, masts, rigging, rusticle curtains, sessile growth and
@@ -58,6 +74,17 @@ without an entry here is not done.
 
 ### Changed
 
+- F1-OCEAN: the **caustic projector** now uses a two-layer animated Voronoi web.
+  The old interference formula was missing its domain offset and rendered an
+  almost flat texture, so shallow caustics were effectively invisible. The
+  footprint shrank from 900 m to 320 m (finer web) and the intensity rose from
+  1.1 to 3.6. The headlight cone shader was also drawing nothing (its along-beam
+  coordinate had the wrong sign); it is rebuilt.
+- F1-OCEAN: tiers gained `bloomLevels`, `rayOctaves`, `msaa` and `beamDetail`;
+  `low` now runs a plain beam cone and 600 marine-snow points (was none), and
+  medium turns god rays on. The sea surface is drawn to 160 m (was 100 m) so the
+  window fades out rather than popping, and it is a flat quad shaded per
+  fragment (the 96-segment vertex swell aliased against a 22 m wavelength).
 - F1-VEHICLES: the ROV fill light moved from 3.6 m to about 9 m from the float (intensity x3) and vehicle materials gained a highlight shoulder, because pale livery inside the boat's own headlight beams clipped to flat white. The old single-mesh hull and ROV models are replaced, not kept as an option.
 - Phase F, F0-CORE: **`main.ts` split into systems** (`src/app/`). There is one
   file per system under `src/app/systems/`, each with init, per-frame stage
