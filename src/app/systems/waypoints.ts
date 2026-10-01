@@ -6,9 +6,13 @@
 import { contentUrl, fetchContentJson } from '../../game/ContentPath.js';
 import { Waypoints } from '../../ui/Waypoints.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export const waypointsSystem: GameSystem = {
   name: 'waypoints',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { discovery, settings, sonar, route, save } = ctx;
     const waypoints = new Waypoints(discovery.scanner);
@@ -38,11 +42,13 @@ export const waypointsSystem: GameSystem = {
         }
       });
     }
-    save.onChange((next, changed) => {
-      if (changed.includes('gameplay')) waypoints.setVisualHints(next.gameplay.visualHints);
-      if (changed.includes('reduceMotion')) waypoints.setReducedMotion(next.reduceMotion);
-      if (changed.includes('sonarPalette')) waypoints.setPalette(next.sonarPalette);
-    });
+    cleanup.add(
+      save.onChange((next, changed) => {
+        if (changed.includes('gameplay')) waypoints.setVisualHints(next.gameplay.visualHints);
+        if (changed.includes('reduceMotion')) waypoints.setReducedMotion(next.reduceMotion);
+        if (changed.includes('sonarPalette')) waypoints.setPalette(next.sonarPalette);
+      }),
+    );
     ctx.expose({ waypoints });
   },
   frame: {

@@ -274,6 +274,8 @@ void main() {
   float dist = distance(cameraPosition, vWorld);
   float fog = clamp(1.0 - exp(-fogDensity * fogDensity * dist * dist), 0.0, 1.0);
   gl_FragColor = vec4(mix(col, fogColor, fog), alpha * edge * fill * (1.0 - 0.7 * fog));
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }
 `;
 

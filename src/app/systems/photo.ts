@@ -14,6 +14,9 @@ import { PhotoMode, canvasThumbnail } from '../../ui/PhotoMode.js';
 import { LIFE_ID_PREFIX } from '../../world/life/Life.js';
 import type { GameContext } from '../context.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export function createPhotoSystem(): GameSystem {
   let photoCaptureRequested = false;
@@ -66,6 +69,7 @@ export function createPhotoSystem(): GameSystem {
 
   return {
     name: 'photo',
+    dispose: () => cleanup.dispose(),
     init(ctx) {
       const { journal } = ctx;
       const photos = new PhotoStore();
@@ -89,9 +93,11 @@ export function createPhotoSystem(): GameSystem {
     },
     // After the ROV's listeners, as before F0 (it was the last app:state listener).
     start(ctx) {
-      ctx.bus.on('app:state', ({ state }) => {
-        if (state !== 'dive') ctx.exitPhotoMode();
-      });
+      cleanup.add(
+        ctx.bus.on('app:state', ({ state }) => {
+          if (state !== 'dive') ctx.exitPhotoMode();
+        }),
+      );
     },
     frame: {
       'gate.photo': (f, ctx) => {

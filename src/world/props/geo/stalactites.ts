@@ -99,7 +99,10 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   // Stalactites hang from the underside; a few are fused pillars reaching down to a stump.
   const count = Math.max(8, Math.round(30 * d.growth));
   const parts: THREE.BufferGeometry[] = [];
-  const colliders: THREE.Box3[] = wallColliders(profile, W, D, H, 8, gnd);
+  const colliders: THREE.Box3[] = wallColliders(profile, W, D, H, 8, gnd, {
+    disp: (x, y) => disp(x, y),
+    edgeStart: 0.55,
+  });
   const longest: { x: number; z: number; y: number; len: number; r: number }[] = [];
   for (let i = 0; i < count; i++) {
     const f = 0.12 + rnd() * 0.85;
@@ -188,7 +191,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   bounds.min.y = Math.min(bounds.min.y, -0.1 * H);
   return {
     full,
-    impostor: impostorFromBoxes(colliders.slice(0, 8), bounds, 0x8f8878),
+    impostor: impostorFromBoxes(colliders, bounds, 0x8f8878),
     bounds,
     colliders,
   };

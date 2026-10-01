@@ -6,9 +6,13 @@
 
 import { Sonar } from '../../ui/Sonar.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export const sonarSystem: GameSystem = {
   name: 'sonar',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { terrain, landmarks, config, settings, save } = ctx;
     const sonar = new Sonar(terrain, landmarks.placed, {
@@ -18,12 +22,14 @@ export const sonarSystem: GameSystem = {
     ctx.sonar = sonar;
     sonar.setSensorRange(config.sensorPresets[settings.gameplay.sensors].sonarPoiRange);
     sonar.setMarkersVisible(settings.gameplay.sonarMarkers);
-    save.onChange((next, changed) => {
-      if (changed.includes('gameplay')) {
-        sonar.setSensorRange(config.sensorPresets[next.gameplay.sensors].sonarPoiRange);
-        sonar.setMarkersVisible(next.gameplay.sonarMarkers);
-      }
-    });
+    cleanup.add(
+      save.onChange((next, changed) => {
+        if (changed.includes('gameplay')) {
+          sonar.setSensorRange(config.sensorPresets[next.gameplay.sensors].sonarPoiRange);
+          sonar.setMarkersVisible(next.gameplay.sonarMarkers);
+        }
+      }),
+    );
     ctx.expose({ sonar });
   },
   frame: {
@@ -39,6 +45,7 @@ export const sonarSystem: GameSystem = {
 
 export const sonarControlsSystem: GameSystem = {
   name: 'sonarControls',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { settingsScreen, sonar } = ctx;
     const sonarControls = document.createElement('p');
@@ -46,7 +53,7 @@ export const sonarControlsSystem: GameSystem = {
     sonarControls.textContent =
       'Sonar: M expands the map; + / − change range. Wheel over the map also changes range.';
     settingsScreen.root.querySelector('.settings-bindings')?.before(sonarControls);
-    window.addEventListener('keydown', (event) => {
+    cleanup.listen(window, 'keydown', (event) => {
       if (
         ctx.app.state !== 'dive' ||
         settingsScreen.isOpen ||
@@ -65,7 +72,8 @@ export const sonarControlsSystem: GameSystem = {
       else return;
       event.preventDefault();
     });
-    window.addEventListener(
+    cleanup.listen(
+      window,
       'wheel',
       (event) => {
         if (!sonar.expanded || ctx.app.state !== 'dive') return;

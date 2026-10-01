@@ -7,6 +7,9 @@
 
 import { CameraRig } from '../../sub/CameraRig.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export const cameraSystem: GameSystem = {
   name: 'camera',
@@ -30,21 +33,24 @@ export const cameraSystem: GameSystem = {
 
 export const cameraControlsSystem: GameSystem = {
   name: 'cameraControls',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { bus, rig, hud, canvas } = ctx;
     const tips = { until: performance.now() + 20_000 };
     ctx.cameraTips = tips;
-    bus.on('mission:started', () => {
-      rig.resetView();
-      tips.until = performance.now() + 20_000;
-    });
+    cleanup.add(
+      bus.on('mission:started', () => {
+        rig.resetView();
+        tips.until = performance.now() + 20_000;
+      }),
+    );
     hud.onResetCamera(() => {
       if (ctx.app.state === 'dive') {
         rig.resetView();
         tips.until = 0;
       }
     });
-    canvas.addEventListener('dblclick', () => {
+    cleanup.listen(canvas, 'dblclick', () => {
       if (
         ctx.app.state === 'dive' &&
         !ctx.settingsScreen.isOpen &&

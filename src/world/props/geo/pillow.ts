@@ -40,12 +40,25 @@ export function buildPillowField(input: GeoBuildInput): BuiltProp {
   const d = geoDetail(tier);
   const [L, W, H] = dims;
   const rnd = mulberry32(seed);
+  // On a steep slope a heap of fixed vertical thickness reads as a thin ribbon:
+  // thicken it by 1/cos(slope) (measured across the footprint) so its thickness
+  // perpendicular to the seabed stays near the nominal height.
+  const gx = (gnd(L * 0.25, 0) - gnd(-L * 0.25, 0)) / (L * 0.5);
+  const gz = (gnd(0, W * 0.25) - gnd(0, -W * 0.25)) / (W * 0.5);
+  const slopeGain = Math.min(
+    2.2,
+    Math.sqrt(1 + gx * gx + gz * gz) * (Math.hypot(gx, gz) > 0.25 ? 1.2 : 1),
+  );
   const shape = (x: number, z: number): number => {
     const r = Math.hypot(x / (L / 2), z / (W / 2));
     if (r >= 1) return -3;
     return Math.max(
       -3,
-      H * 0.75 * Math.pow(1 - r * r, 0.8) * (0.7 + 0.5 * fbm3(x * 0.15, 1, z * 0.15, seed, 3)) -
+      slopeGain *
+        H *
+        0.75 *
+        Math.pow(1 - r * r, 0.8) *
+        (0.7 + 0.5 * fbm3(x * 0.15, 1, z * 0.15, seed, 3)) -
         smooth(0.85, 1, r) * 0.5,
     );
   };

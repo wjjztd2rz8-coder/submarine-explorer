@@ -64,7 +64,9 @@ export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
       r0: h * 0.135 + 0.4,
     });
   };
-  mk(0, 0, H);
+  // H is the edifice's total local relief: the column rises from the top of its talus
+  // skirt, so it is shortened by the skirt's height under it.
+  mk(0, 0, H - (Math.max(skirtShape(0, 0), 0) - 0.4));
   const n = 4 + Math.floor(rnd() * 2);
   for (let i = 0; i < n; i++) {
     const a = (i / n) * 6.283 + rnd() * 0.6;
@@ -101,21 +103,28 @@ export function buildCarbonateTower(input: GeoBuildInput): BuiltProp {
       const t = 0.14 + rnd() * 0.5;
       const rAt = s.r0 * (1 - 0.7 * t);
       const rr = rAt * (2 + rnd() * 1.3);
+      // A scalloped, drooping shelf: extra rings and segments, lumpy rim and a thick underside.
       const flange = new THREE.CylinderGeometry(
         rr * 0.8,
         rr,
         0.5 + rr * 0.16,
-        14,
-        1,
+        Math.round(14 + 14 * d.meshDensity),
+        3,
         false,
         rnd() * 6.28,
         2 + rnd() * 2.2,
       );
       const p = flange.getAttribute('position');
       for (let k = 0; k < p.count; k++) {
-        const nz = fbm3(p.getX(k) * 0.5, p.getY(k), p.getZ(k) * 0.5, seed + f + i * 3, 3);
-        const y = p.getY(k) - Math.hypot(p.getX(k), p.getZ(k)) * 0.12 * (nz + 0.4);
-        p.setXYZ(k, p.getX(k) * (0.85 + nz * 0.3), y, p.getZ(k) * (0.85 + nz * 0.3));
+        const px = p.getX(k);
+        const pz = p.getZ(k);
+        const rad = Math.hypot(px, pz);
+        const nz = fbm3(px * 0.5, p.getY(k), pz * 0.5, seed + f + i * 3, 3);
+        const rim = fbm3(px * 1.6, 7, pz * 1.6, seed + f * 5 + i, 2); // scallops along the lip
+        const k2 = 0.78 + nz * 0.35 + (rim - 0.5) * 0.32 * smooth(0.5, 1, rad / rr);
+        const y =
+          p.getY(k) - rad * 0.14 * (nz + 0.4) - (rim - 0.5) * 0.4 * smooth(0.6, 1, rad / rr);
+        p.setXYZ(k, px * k2, y, pz * k2);
       }
       flange.deleteAttribute('uv');
       flange.computeVertexNormals();
