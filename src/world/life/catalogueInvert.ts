@@ -170,7 +170,7 @@ export const INVERTEBRATES: SpeciesDef[] = [
     speed: [0.01, 0.05],
     maxCount: 36,
     scanRadius: 10,
-    look: { W: 0.2, Hh: 0.15, sail: 1, papillae: 14, cD: 0x7a3b7b, cB: 0xb78ab3 },
+    look: { W: 0.2, Hh: 0.15, sail: 0.42, papillae: 14, cD: 0x7a3b7b, cB: 0xb78ab3 },
   }),
   def({
     id: 'amperima',
@@ -230,7 +230,7 @@ export const INVERTEBRATES: SpeciesDef[] = [
     freq: 0.6,
     maxCount: 120,
     scanRadius: 13,
-    look: { kind: 'fan', cStem: 0xe6dfcd, cPolyp: 0xf3eee1 },
+    look: { kind: 'fan', thick: 2.6, fans: 4, moreLevels: 1, cStem: 0xe6dfcd, cPolyp: 0xf3eee1 },
   }),
   def({
     id: 'brain-coral',

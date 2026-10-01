@@ -137,8 +137,8 @@ export function buildFish(look: Look, size: number, detail: 0 | 1 | 2): THREE.Bu
   // Eyes: a pale iris ring around a dark pupil, set into the head.
   if (eye > 0) {
     const t = 0.085;
-    const er = eye * L;
-    const iris = mixRgb(cEye, mixRgb(cB, [0.9, 0.85, 0.6], 0.5), 0.75);
+    const er = eye * L * 0.62;
+    const iris = mixRgb(cEye, mixRgb(cB, [0.8, 0.62, 0.3], 0.5), 0.55);
     for (const sd of [-1, 1]) {
       const c: V3 = [sd * wAt(t) * 0.9, hAt(t) * 0.22, zAt(t)];
       b.ellipsoid(c, [er * 0.5, er * 0.95, er * 0.95], 8, 7, iris, [0, 0, 0]);

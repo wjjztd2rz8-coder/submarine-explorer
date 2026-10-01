@@ -202,7 +202,7 @@ export function buildGorgonian(look: Look, size: number, detail: 0 | 1 | 2): THR
   const cStem = col(look, 'cStem', 0xd6b25a);
   const cPolyp = col(look, 'cPolyp', 0xf0d68a);
   const b = new Builder();
-  const rad = H * 0.012;
+  const rad = H * 0.012 * num(look, 'thick', 1);
   if (kind === 'spiral') {
     // Iridogorgia: the whole stem winds in a wide, open corkscrew.
     const path: V3[] = [[0, 0, 0]];
@@ -318,7 +318,7 @@ export function buildGorgonian(look: Look, size: number, detail: 0 | 1 | 2): THR
       );
     }
   };
-  const levels = [2, 3, 3][detail]!;
+  const levels = [2, 3, 3][detail]! + (detail > 0 ? num(look, 'moreLevels', 0) : 0);
   b.sweep({
     path: [
       [0, -H * 0.02, 0],
@@ -331,7 +331,15 @@ export function buildGorgonian(look: Look, size: number, detail: 0 | 1 | 2): THR
     anim: [0, 0, 0],
     caps: true,
   });
-  branch([0, H * 0.08, 0], [0, 1, 0], H * 0.34, levels, 1.3);
+  // A bush of fans (cold-water coral) or a single fan (gorgonians).
+  const fans = Math.max(1, Math.round(num(look, 'fans', 1)));
+  for (let i = 0; i < fans; i++) {
+    const ang = i * 2.4 + 0.6;
+    const tilt = i === 0 ? 0 : 0.4;
+    const d: V3 = [Math.cos(ang) * tilt, 1, Math.sin(ang) * tilt];
+    const l = Math.hypot(d[0], d[1], d[2]);
+    branch([0, H * 0.08, 0], [d[0] / l, d[1] / l, d[2] / l], H * (0.34 - 0.03 * i), levels, 1.3 + i * 2.1);
+  }
   return b.toGeometry();
 }
 
@@ -356,7 +364,7 @@ export function buildAnemone(look: Look, size: number, detail: 0 | 1 | 2): THREE
     const ring = i % 2 ? 0.55 : 1;
     const a = i * 2.399;
     const r0 = H * 0.15 * ring;
-    const len = H * (0.5 + 0.3 * hash1(i * 2.7)) * (ring === 1 ? 1 : 0.7);
+    const len = H * (0.3 + 0.2 * hash1(i * 2.7)) * (ring === 1 ? 1 : 0.7);
     b.sweep({
       path: [
         [Math.cos(a) * r0 * 0.6, H * 0.4, Math.sin(a) * r0 * 0.6],
@@ -369,7 +377,7 @@ export function buildAnemone(look: Look, size: number, detail: 0 | 1 | 2): THREE
       ],
       rings: 5,
       sides: 3,
-      radius: (t) => H * 0.024 * (1 - 0.8 * t) + 1e-4,
+      radius: (t) => H * 0.034 * (1 - 0.75 * t) + 1e-4,
       color: (t) => scaleRgb(cTent, 0.9 + 0.2 * t),
       anim: (t) => [0.35 + 0.5 * t, 0, 0],
     });
