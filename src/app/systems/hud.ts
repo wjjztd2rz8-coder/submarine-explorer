@@ -46,7 +46,6 @@ export const hudSystem: GameSystem = {
       const scanView = discovery.scanner.view;
       const key = (action: Parameters<typeof input.primaryKeyLabel>[0]): string =>
         input.primaryKeyLabel(action);
-      const rovControlTips = `${key('thrustForward')}/${key('thrustReverse')} fly · ${key('yawPort')}/${key('yawStarboard')} turn · ${key('ballastBlow')}/${key('ballastFlood')} rise/sink · ${key('scan')} scan · ${key('toggleRov')} retrieve ROV`;
       hud.update(f.sub, {
         nearScanTarget: discovery.focusPoint() !== null,
         // The objectives panel already shows the current objective; a second
@@ -59,9 +58,7 @@ export const hudSystem: GameSystem = {
           rig.mode !== 'orbit' &&
           save.get().controlTips &&
           performance.now() < cameraTips.until
-            ? rov.deployed
-              ? rovControlTips
-              : `${key('thrustForward')}/${key('thrustReverse')} speed · ${key('yawPort')}/${key('yawStarboard')} turn · ${key('ballastBlow')}/${key('ballastFlood')} rise/sink · Drag: look · Wheel: zoom · ${key('resetCamera')}: reset camera`
+            ? ctx.controlsCard.compactTips(rov.deployed)
             : null,
       });
     },
