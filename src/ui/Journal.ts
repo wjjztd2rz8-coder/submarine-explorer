@@ -22,8 +22,10 @@ import type { GuideEntry } from '../game/Guide.js';
 import {
   isEntryUnlocked,
   isSiteUnlocked,
+  lifeDiscoveryId,
   loadJournalSites,
   siteProgress,
+  wildlifeProgress,
   type DiscoveryReader,
   type JournalEntry,
   type JournalSite,
@@ -58,6 +60,9 @@ type View =
   | { kind: 'photos' }
   | { kind: 'site'; siteId: string }
   | { kind: 'entry'; key: string };
+
+/** Site and POI entries come from the guide (and fire `guide:opened`); species and wildlife do not. */
+const isGuideEntry = (e: JournalEntry): boolean => e.kind === 'site' || e.kind === 'poi';
 
 const NO_STORE: DiscoveryReader = { isDiscovered: () => false };
 
@@ -156,7 +161,7 @@ export class Journal {
   /** The guide entry id on screen when it belongs to the current dive's site, else null. */
   get selectedId(): string | null {
     const e = this.view.kind === 'entry' ? this.entryByKey(this.view.key) : null;
-    return e && e.siteId === this.currentSiteId && e.kind !== 'species' ? e.id : null;
+    return e && e.siteId === this.currentSiteId && isGuideEntry(e) ? e.id : null;
   }
 
   /** What is on screen: 'front', a site id, or an entry key (for tests). */
@@ -297,7 +302,7 @@ export class Journal {
   /** The focus id may be a site-level entry rather than a POI one. */
   private fixEntryKey(siteId: string, id: string): void {
     const site = this.sites.find((s) => s.id === siteId);
-    const e = site?.entries.find((x) => x.kind !== 'species' && x.id === id);
+    const e = site?.entries.find((x) => isGuideEntry(x) && x.id === id);
     if (e) this.view = { kind: 'entry', key: e.key };
   }
 
@@ -311,7 +316,7 @@ export class Journal {
 
   private announce(): void {
     const e = this.view.kind === 'entry' ? this.entryByKey(this.view.key) : null;
-    if (!e || e.kind === 'species' || e.siteId !== this.currentSiteId) return;
+    if (!e || !isGuideEntry(e) || e.siteId !== this.currentSiteId) return;
     const site = this.sites.find((s) => s.id === e.siteId);
     if (site && isEntryUnlocked(site, e, this.store)) {
       this.bus?.emit('guide:opened', { entryId: e.id });
@@ -425,6 +430,7 @@ export class Journal {
       ['About the site', site.entries.filter((e) => e.kind === 'site')],
       ['Points of interest', site.entries.filter((e) => e.kind === 'poi')],
       ['Species', site.entries.filter((e) => e.kind === 'species')],
+      ['Wildlife', site.entries.filter((e) => e.kind === 'life')],
     ];
     for (const [label, list] of groups) {
       if (!list.length) continue;
@@ -433,7 +439,7 @@ export class Journal {
       let hidden = 0;
       for (const e of list) {
         const open = isEntryUnlocked(site, e, this.store);
-        if (!open && !this.spoilers_ && e.kind === 'species') {
+        if (!open && !this.spoilers_ && (e.kind === 'species' || e.kind === 'life')) {
           hidden++;
           continue;
         }
@@ -448,7 +454,9 @@ export class Journal {
           el(
             'p',
             'jr-hidden-note',
-            `${hidden} species not yet identified. Show spoilers to read the survey list.`,
+            label === 'Wildlife'
+              ? `${hidden} animals not yet scanned. Hold the scan key on one during a dive.`
+              : `${hidden} species not yet identified. Show spoilers to read the survey list.`,
           ),
         );
       }
@@ -507,11 +515,13 @@ export class Journal {
     if (meta.length) b.append(el('p', 'jr-meta', meta.join(' · ')));
     if (site.memorialNote) b.append(el('p', 'jr-memorial', site.memorialNote));
     const p = siteProgress(site, this.store);
+    const wl = wildlifeProgress(site, this.store);
     b.append(
       el(
         'p',
         'jr-progress',
-        `${p.logged} of ${p.total} entries logged · ${p.species} of ${p.speciesTotal} species identified`,
+        `${p.logged} of ${p.total} entries logged · ${p.species} of ${p.speciesTotal} species identified` +
+          (wl.total ? ` · ${wl.scanned} of ${wl.total} animals scanned` : ''),
       ),
     );
     if (!unlocked && !this.spoilers_) {
@@ -532,7 +542,7 @@ export class Journal {
       go.type = 'button';
       go.addEventListener('click', () => {
         const first =
-          site.entries.find((e) => e.kind !== 'species' && isEntryUnlocked(site, e, this.store)) ??
+          site.entries.find((e) => isGuideEntry(e) && isEntryUnlocked(site, e, this.store)) ??
           firstPoi;
         this.show(first.key);
       });
@@ -550,9 +560,11 @@ export class Journal {
         el(
           'p',
           'jr-locked',
-          entry.kind === 'species'
-            ? 'Scan the place this species is recorded at to identify it. Or show spoilers.'
-            : 'Find this target during a dive and hold the scanner on it to log it. Or show spoilers.',
+          entry.kind === 'life'
+            ? 'Find this animal during a dive and hold the scanner on it to log it. Or show spoilers.'
+            : entry.kind === 'species'
+              ? 'Scan the place this species is recorded at to identify it. Or show spoilers.'
+              : 'Find this target during a dive and hold the scanner on it to log it. Or show spoilers.',
         ),
       );
       this.renderEntryPhotos(site, entry);
@@ -565,6 +577,11 @@ export class Journal {
     if (entry.recreation) titleRow.append(el('span', 'jr-tag is-recreation', 'Recreation'));
     if (!open) titleRow.append(el('span', 'jr-tag is-undiscovered', 'Undiscovered'));
     b.append(titleRow);
+    if (entry.kind === 'life' && entry.life) {
+      this.renderLife(entry);
+      this.renderEntryPhotos(site, entry);
+      return;
+    }
     if (entry.kind === 'species' && entry.species) {
       this.renderSpecies(site, entry);
       return;
@@ -603,17 +620,45 @@ export class Journal {
 
   // --- D-PHOTO begin ---
   private renderEntryPhotos(site: JournalSite, entry: JournalEntry): void {
-    if (entry.kind !== 'poi' || !this.photoGallery || !this.photos) return;
+    if ((entry.kind !== 'poi' && entry.kind !== 'life') || !this.photoGallery || !this.photos)
+      return;
+    const ids = entry.kind === 'life' ? [lifeDiscoveryId(entry.id)] : entry.poiIds;
     const photos = this.photos.photos.filter(
-      (photo) =>
-        photo.siteId === site.id && photo.poiId !== null && entry.poiIds.includes(photo.poiId),
+      (photo) => photo.siteId === site.id && photo.poiId !== null && ids.includes(photo.poiId),
     );
     if (!photos.length) return;
     const section = el('section', 'jr-entry-photos');
     this.body.append(section);
-    this.photoGallery.render(section, photos, 'Photos of this place');
+    this.photoGallery.render(
+      section,
+      photos,
+      entry.kind === 'life' ? 'Photos of this animal' : 'Photos of this place',
+    );
   }
   // --- D-PHOTO end ---
+
+  /** A scanned animal (F2-LIFE): its text, a few facts and one source. */
+  private renderLife(entry: JournalEntry): void {
+    const b = this.body;
+    const { def, info, rare } = entry.life!;
+    const name = el('p', 'jr-latin');
+    name.append(el('i', undefined, def.scientific), el('span', 'jr-group-tag', def.group));
+    if (rare) name.append(el('span', 'jr-group-tag', 'Rare sighting'));
+    b.append(name);
+    b.append(el('p', 'jr-para', info.text));
+    if (info.facts) {
+      const table = el('table', 'jr-facts');
+      for (const [k, v] of Object.entries(info.facts)) {
+        const tr = el('tr');
+        tr.append(el('th', undefined, k), el('td', undefined, v));
+        table.append(tr);
+      }
+      b.append(table);
+    }
+    this.renderSources([
+      { title: info.sourceTitle, ...(info.sourceUrl ? { url: info.sourceUrl } : {}) },
+    ]);
+  }
 
   private renderSpecies(site: JournalSite, entry: JournalEntry): void {
     const b = this.body;

@@ -52,6 +52,7 @@ import type { Tile, TileIndexEntry, TileMeta } from '../util/types.js';
 import type { Currents } from '../world/Currents.js';
 import type { Landmarks } from '../world/Landmarks.js';
 import type { PresetSystem } from '../world/presets/Presets.js';
+import type { Life } from '../world/life/Life.js';
 import type { Props } from '../world/Props.js';
 import type { PlacementDebug } from '../world/props/PlacementDebug.js';
 import type { PropContact } from '../world/props/Wiring.js';
@@ -136,6 +137,8 @@ export interface GameContext extends BootContext {
   propContact: PropContact;
   currents: Currents;
   presets: PresetSystem;
+  /** Marine life; null until `data/life/life.json` has loaded (or with `?life=0`). */
+  life: Life | null;
   // shell
   missionSelect: MissionSelect;
   home: Home;

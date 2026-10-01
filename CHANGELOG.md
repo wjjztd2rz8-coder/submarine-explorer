@@ -37,6 +37,17 @@ without an entry here is not done.
   Manipulator servos follow scan-arm deployment and retraction.
   Reduce motion softens score changes. No features were cut.
 
+
+- Phase F, F2-LIFE: **marine life** (`src/world/life/`). Instanced, steering-driven
+  animals in eight movement archetypes (schools, swarms, drifters, cruisers,
+  hoverers, crawlers, sessile, jetters) with vertex animation, reactions to the sub
+  and its lights, and bioluminescent flashes. About 30 procedural species follow
+  `docs/research/species.md`, with per-site and per-depth spawn tables
+  (`data/life/life.json`) and one rare encounter per site. Draw calls stay inside
+  the tier budget (5 on low, up to 12 on high). Animals are scannable (a first scan
+  adds a Journal wildlife entry and never touches objectives) and photo mode names
+  the animal in frame. `preview/life.html` shows a species lineup. `?life=0` turns
+  the layer off; `?lifeSeed=` fixes the spawns.
 - Phase F, F1-TOUCH: **full touch play and a PWA install** (`src/ui/TouchControls.ts`,
   `src/core/Touch.ts`, `src/styles/touch.css`, `public/sw.js`). A left stick
   (thrust and turn), a right rise/sink slider, Scan (hold), Boost (hold), Lights,

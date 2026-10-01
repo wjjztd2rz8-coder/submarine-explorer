@@ -1,0 +1,1148 @@
+{
+  "version": 1,
+  "species": {
+    "blackfin-chromis": {
+      "text": "A small damselfish of Indo-Pacific reefs. Shoals hover above coral heads and snatch plankton from the passing current, darting into the branches when a predator comes close.",
+      "facts": {
+        "Length": "6 to 8 cm",
+        "Habitat": "Coral reef, shallow water",
+        "Diet": "Plankton"
+      },
+      "sourceTitle": "FishBase: Pycnochromis vanderbilti",
+      "sourceUrl": "https://www.fishbase.se/summary/Pycnochromis-vanderbilti.html"
+    },
+    "rainbow-wrasse": {
+      "text": "A fast, bright wrasse of Indo-Pacific reefs. Groups cruise along the reef edge in the current, picking zooplankton out of the water, and change colour and sex as they age.",
+      "facts": {
+        "Length": "Up to about 16 cm",
+        "Habitat": "Reef edges and slopes",
+        "Diet": "Zooplankton"
+      },
+      "sourceTitle": "FishBase: Thalassoma amblycephalum",
+      "sourceUrl": "https://www.fishbase.se/summary/Thalassoma-amblycephalum.html"
+    },
+    "blue-tang": {
+      "text": "A surgeonfish of Caribbean reefs. Adults are a deep blue; the young are bright yellow. Schools sweep over the reef grazing algae, and a sharp scalpel-like spine at the base of the tail defends each fish.",
+      "facts": {
+        "Length": "Up to about 35 cm",
+        "Habitat": "Reefs and rubble, 1 to 40 m",
+        "Diet": "Algae"
+      },
+      "sourceTitle": "FishBase: Acanthurus coeruleus",
+      "sourceUrl": "https://www.fishbase.se/summary/Acanthurus-coeruleus.html"
+    },
+    "french-grunt": {
+      "text": "A daytime reef schooler that spreads out over seagrass at night to feed on small crustaceans and worms. The name comes from the grunting sound it makes by grinding its throat teeth together.",
+      "facts": {
+        "Length": "Up to about 25 cm",
+        "Habitat": "Reefs and seagrass, 1 to 40 m",
+        "Diet": "Small invertebrates"
+      },
+      "sourceTitle": "FishBase: Haemulon flavolineatum",
+      "sourceUrl": "https://www.fishbase.se/summary/Haemulon-flavolineatum.html"
+    },
+    "stoplight-parrotfish": {
+      "text": "A parrotfish of Caribbean reefs. It scrapes algae off dead coral with a fused beak of teeth and excretes the ground rock as fine white sand, one of the sources of reef beaches.",
+      "facts": {
+        "Length": "Up to about 50 cm",
+        "Habitat": "Coral reef, 1 to 45 m",
+        "Diet": "Algae"
+      },
+      "sourceTitle": "FishBase: Sparisoma viride",
+      "sourceUrl": "https://www.fishbase.se/summary/Sparisoma-viride.html"
+    },
+    "pacific-hake": {
+      "text": "A slender silver hake that schools over the continental shelf and slope of the northeast Pacific. It rises toward the surface at night to feed on krill and small fish, and spawns off California.",
+      "facts": {
+        "Length": "30 to 60 cm common",
+        "Depth": "Roughly 50 to 900 m",
+        "Diet": "Krill and small fish"
+      },
+      "sourceTitle": "FishBase: Merluccius productus",
+      "sourceUrl": "https://www.fishbase.se/summary/Merluccius-productus.html"
+    },
+    "silver-hake": {
+      "text": "A schooling hake of the northwest Atlantic shelf and canyon edges. By day it holds near the bottom; at night it rises into midwater to chase shrimp and small fish.",
+      "facts": {
+        "Length": "30 to 60 cm common",
+        "Depth": "Roughly 60 to 450 m",
+        "Diet": "Shrimp and small fish"
+      },
+      "sourceTitle": "FishBase: Merluccius bilinearis",
+      "sourceUrl": "https://www.fishbase.se/summary/Merluccius-bilinearis.html"
+    },
+    "nassau-grouper": {
+      "text": "A heavy-bodied reef grouper that sits near ledges and caves, alone or in small groups, and ambushes fish and crabs. It gathers in large numbers at full moon to spawn, which made it easy to overfish; it is now critically endangered.",
+      "facts": {
+        "Length": "Up to about 1.2 m",
+        "Habitat": "Reefs, 3 to 60 m",
+        "Status": "Critically endangered (IUCN)"
+      },
+      "sourceTitle": "FishBase: Epinephelus striatus",
+      "sourceUrl": "https://www.fishbase.se/summary/Epinephelus-striatus.html"
+    },
+    "wreckfish": {
+      "text": "A big, dark, slow-moving fish that lingers near wrecks, ledges and rocky outcrops on the continental slope, which is how it got its name. A deepwater fishery works the Blake Plateau for it.",
+      "facts": {
+        "Length": "Up to about 2 m, around 1 m in the game",
+        "Depth": "Roughly 100 to 1,000 m",
+        "Diet": "Fish and squid"
+      },
+      "sourceTitle": "FishBase: Polyprion americanus",
+      "sourceUrl": "https://www.fishbase.se/summary/Polyprion-americanus.html"
+    },
+    "rattail": {
+      "text": "Grenadiers, or rattails, are deep-sea fish with a big head and a long tail that tapers to a point, which they hold above the bottom while they swim head-down hunting for food. The genus Coryphaenoides is found from the upper slope to the abyssal plains.",
+      "facts": {
+        "Length": "30 cm to over 1 m, depending on species",
+        "Depth": "Roughly 200 to 5,000 m",
+        "Diet": "Crustaceans, fish and carrion"
+      },
+      "sourceTitle": "WoRMS: Coryphaenoides",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Coryphaenoides"
+    },
+    "blob-sculpin": {
+      "text": "A deep Pacific sculpin whose soft, watery flesh is only a little denser than seawater, so it can rest on the bottom with almost no muscle. One was recorded at 1,541 m at the ASHES vent field.",
+      "facts": {
+        "Length": "15 to 30 cm",
+        "Depth": "Roughly 1,000 to 2,800 m",
+        "Habitat": "Soft seabed and lava"
+      },
+      "sourceTitle": "FishBase: Psychrolutes phrictus",
+      "sourceUrl": "https://www.fishbase.se/summary/Psychrolutes-phrictus.html"
+    },
+    "cutthroat-eel": {
+      "text": "A cutthroat eel is named for the slit-like gill openings low on its throat. It cruises slowly over slopes and volcano flanks, scavenging and picking up small prey.",
+      "facts": {
+        "Length": "30 to 60 cm",
+        "Depth": "547 to 1,689 m (recorded at Kamaʻehuakanaloa)",
+        "Diet": "Small animals and carrion"
+      },
+      "sourceTitle": "FishBase: Synaphobranchus brevidorsalis",
+      "sourceUrl": "https://www.fishbase.se/summary/Synaphobranchus-brevidorsalis.html"
+    },
+    "mariana-snailfish": {
+      "text": "The Mariana snailfish is one of the deepest-living fishes known. It has a scale-free, tadpole-like body and swims in small groups over the trench walls, feeding on amphipods and other small crustaceans.",
+      "facts": {
+        "Length": "About 20 to 30 cm",
+        "Depth": "About 6,200 to 8,000 m",
+        "Habitat": "Mariana Trench slopes"
+      },
+      "sourceTitle": "FishBase: Pseudoliparis swirei",
+      "sourceUrl": "https://www.fishbase.se/summary/Pseudoliparis-swirei.html"
+    },
+    "reef-shark": {
+      "text": "The most common large shark on Caribbean reefs. It patrols reef edges and drop-offs, mostly at dusk and night, hunting fish, and often rests on the bottom by day.",
+      "facts": {
+        "Length": "About 2 to 2.5 m",
+        "Habitat": "Reef edges, 2 to 60 m",
+        "Diet": "Reef fish"
+      },
+      "sourceTitle": "FishBase: Carcharhinus perezi",
+      "sourceUrl": "https://www.fishbase.se/summary/Carcharhinus-perezi.html"
+    },
+    "blue-shark": {
+      "text": "A slender, open-ocean shark with long pectoral fins and an indigo back. It follows currents across whole ocean basins and dives deep after squid and fish.",
+      "facts": {
+        "Length": "2 to 3 m",
+        "Depth": "Surface to about 350 m, sometimes deeper",
+        "Diet": "Squid and fish"
+      },
+      "sourceTitle": "FishBase: Prionace glauca",
+      "sourceUrl": "https://www.fishbase.se/summary/Prionace-glauca.html"
+    },
+    "sixgill-shark": {
+      "text": "A large, ancient-looking shark with six gill slits and a green-glowing eye. It lives in deep water by day and rises toward the shallows at night to feed.",
+      "facts": {
+        "Length": "Up to about 5 m, 3.6 m in the game",
+        "Depth": "Surface to about 2,000 m",
+        "Diet": "Fish, squid, carrion"
+      },
+      "sourceTitle": "FishBase: Hexanchus griseus",
+      "sourceUrl": "https://www.fishbase.se/summary/Hexanchus-griseus.html"
+    },
+    "sperm-whale": {
+      "text": "The largest toothed predator on Earth. It dives for over an hour to depths beyond 1,000 m, finding squid in the dark by echolocation clicks that are among the loudest sounds made by any animal.",
+      "facts": {
+        "Length": "Males up to about 16 m",
+        "Dive depth": "Over 1,000 m",
+        "Diet": "Squid and deep-sea fish"
+      },
+      "sourceTitle": "WoRMS: Physeter macrocephalus",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Physeter%20macrocephalus"
+    },
+    "humpback-whale": {
+      "text": "A baleen whale famous for the long songs sung by males on their winter breeding grounds. Tonga is one of the places where humpbacks gather from about July to October to mate and calve.",
+      "facts": {
+        "Length": "Up to about 16 m",
+        "Habitat": "Open water, often near islands and reefs",
+        "Diet": "Krill and small fish"
+      },
+      "sourceTitle": "WoRMS: Megaptera novaeangliae",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Megaptera%20novaeangliae"
+    },
+    "sea-lion": {
+      "text": "A playful, agile eared seal of the California coast. It hunts fish and squid on dives of a few minutes and often investigates divers and boats.",
+      "facts": {
+        "Length": "Males about 2.4 m, females about 1.8 m",
+        "Dive depth": "Usually under 100 m, can exceed 250 m",
+        "Diet": "Fish and squid"
+      },
+      "sourceTitle": "WoRMS: Zalophus californianus",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Zalophus%20californianus"
+    },
+    "whale-shark": {
+      "text": "The largest fish in the sea. It filters plankton, fish eggs and small fish from the water as it cruises with its huge mouth open, and each animal's spot pattern is unique, like a fingerprint.",
+      "facts": {
+        "Length": "Commonly 9 to 12 m",
+        "Habitat": "Warm open water, often near reefs",
+        "Diet": "Plankton, fish eggs, small fish"
+      },
+      "sourceTitle": "FishBase: Rhincodon typus",
+      "sourceUrl": "https://www.fishbase.se/summary/Rhincodon-typus.html"
+    },
+    "weddell-seal": {
+      "text": "The southernmost breeding mammal. A Weddell seal dives for up to an hour or more beneath Antarctic sea ice, hunting fish and squid, and keeps its breathing holes open by rasping the ice with its teeth.",
+      "facts": {
+        "Length": "About 2.5 to 3 m",
+        "Dive depth": "Usually to 300 m, up to about 600 m",
+        "Diet": "Fish and squid"
+      },
+      "sourceTitle": "WoRMS: Leptonychotes weddellii",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Leptonychotes%20weddellii"
+    },
+    "nanomia": {
+      "text": "Not one animal but a colony: dozens of specialised, genetically identical members strung along a stem. The nectophores at the top beat to swim, others feed or reproduce. MBARI records it from near the surface down to about 700 m.",
+      "facts": {
+        "Colony length": "10 to 30 cm",
+        "Depth": "Surface to about 700 m",
+        "Light": "Bioluminescent"
+      },
+      "sourceTitle": "MBARI: Common siphonophore",
+      "sourceUrl": "https://www.mbari.org/animal/common-siphonophore/"
+    },
+    "atolla": {
+      "text": "A deep-sea crown jelly with a dark red bell. When attacked it throws out a spinning ring of bright blue light, a burglar alarm that may call a larger predator to the attacker.",
+      "facts": {
+        "Bell diameter": "Up to about 15 cm",
+        "Depth": "Roughly 400 to 4,000 m",
+        "Light": "Blue bioluminescent alarm display"
+      },
+      "sourceTitle": "WoRMS: Atolla wyvillei",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Atolla%20wyvillei"
+    },
+    "comb-jelly": {
+      "text": "A lobate comb jelly. Eight rows of beating plates move it through the water and split the light into a rainbow shimmer. In the dark, many comb jellies also flash blue-green light when bumped.",
+      "facts": {
+        "Length": "Up to about 15 cm",
+        "Habitat": "Open water, surface to over 1,000 m",
+        "Diet": "Plankton"
+      },
+      "sourceTitle": "WoRMS: Bolinopsis infundibulum",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Bolinopsis%20infundibulum"
+    },
+    "beebe-shrimp": {
+      "text": "Shrimp swarm in dense masses on the walls of the Beebe black smokers, 4,960 m down on the Mid-Cayman Rise. Bacteria growing on their mouthparts and shell feed them, and a light-sensing organ on the back may detect the faint glow of the hot vents.",
+      "facts": {
+        "Length": "3 to 6 cm",
+        "Depth": "About 4,950 m",
+        "Habitat": "Black smoker chimneys"
+      },
+      "sourceTitle": "PMC: Vent fauna of the Mid-Cayman Rise",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3612092/"
+    },
+    "hawaii-shrimp": {
+      "text": "A small vent shrimp described from Kamaʻehuakanaloa (formerly Lōʻihi) seamount, where it swarms around warm, mineral-rich vents near the summit.",
+      "facts": {
+        "Length": "2 to 4 cm",
+        "Depth": "Around 1,000 m",
+        "Habitat": "Warm vents on a young volcano"
+      },
+      "sourceTitle": "WoRMS: Opaepele loihi",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Opaepele%20loihi"
+    },
+    "hadal-amphipod": {
+      "text": "A scavenging amphipod of the deepest trenches. It swarms to food that falls from above, and its gut makes enzymes that can break down wood and plant material that has sunk into the trench.",
+      "facts": {
+        "Length": "3 to 5 cm",
+        "Depth": "About 7,000 to 10,900 m",
+        "Diet": "Sunken plant and animal remains"
+      },
+      "sourceTitle": "PMC: Hirondellea gigas wood digestion",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3419748/"
+    },
+    "sun-star": {
+      "text": "A many-armed sea star of the California slope, with thirteen or more broad arms radiating from a wide central disc. It crawls over mud and rock on rows of tiny tube feet.",
+      "facts": {
+        "Span": "20 to 50 cm",
+        "Depth": "About 200 to 1,000 m",
+        "Habitat": "Soft slope and canyon floor"
+      },
+      "sourceTitle": "WoRMS: Rathbunaster californicus",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Rathbunaster%20californicus"
+    },
+    "brittle-star": {
+      "text": "A large abyssal brittle star. Brittle stars move by whipping their slender arms in a rowing motion, unlike sea stars that glide on tube feet, and they drop an arm to escape a predator.",
+      "facts": {
+        "Span": "10 to 20 cm",
+        "Depth": "About 3,600 to 3,800 m",
+        "Habitat": "Abyssal plain and wreck debris"
+      },
+      "sourceTitle": "WoRMS: Ophiosphalma armigerum",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Ophiosphalma%20armigerum"
+    },
+    "long-tailed-cucumber": {
+      "text": "An abyssal sea cucumber with a tall tail-like extension that stands up from the rear of its body. It crawls across the mud, swallowing sediment and digesting the organic matter in it.",
+      "facts": {
+        "Length": "15 to 30 cm",
+        "Depth": "About 4,000 to 5,500 m",
+        "Diet": "Sediment and settled food"
+      },
+      "sourceTitle": "WoRMS: Psychropotes buglossa",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Psychropotes%20buglossa"
+    },
+    "amperima": {
+      "text": "A small pink sea cucumber of the abyssal north Atlantic. In the Porcupine Abyssal Plain study it became hundreds of times more common after 1996, a population boom that followed changes in the food supply from the surface.",
+      "facts": {
+        "Length": "5 to 15 cm",
+        "Depth": "About 4,800 m",
+        "Habitat": "Abyssal mud"
+      },
+      "sourceTitle": "Southampton ePrints: abyssal holothurians",
+      "sourceUrl": "https://eprints.soton.ac.uk/28690/"
+    },
+    "squat-lobster": {
+      "text": "Munidopsis is a deep-sea genus of squat lobsters with a pale, often ghost-white body and long, spiny legs. Species live on mud, wood, bones and near vents, picking at whatever organic material they find.",
+      "facts": {
+        "Length": "5 to 10 cm",
+        "Depth": "About 2,400 to 5,100 m",
+        "Habitat": "Seabed, wrecks, vents"
+      },
+      "sourceTitle": "WoRMS: Munidopsis",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Munidopsis"
+    },
+    "tubeworm": {
+      "text": "A tubeworm of the Juan de Fuca vents. It has no mouth or gut as an adult: bacteria in its body turn sulfide from the vent fluid into food, and the red plume at the top is full of the blood pigment that carries sulfide and oxygen.",
+      "facts": {
+        "Length": "0.2 to 1 m",
+        "Depth": "About 1,550 m",
+        "Habitat": "Warm vent flow, Axial Seamount"
+      },
+      "sourceTitle": "OOI: ASHES vent field",
+      "sourceUrl": "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes/"
+    },
+    "cold-water-coral": {
+      "text": "A reef-building coral that needs no sunlight. Its branching white skeletons form thickets and, over thousands of years, mounds that shelter fish, crabs and sponges. It grows from about 40 m to over 3,000 m.",
+      "facts": {
+        "Colony size": "0.3 to 2 m",
+        "Depth": "Roughly 500 to 1,000 m here",
+        "Diet": "Plankton and marine snow"
+      },
+      "sourceTitle": "WoRMS: Desmophyllum pertusum",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Desmophyllum%20pertusum"
+    },
+    "brain-coral": {
+      "text": "A reef-building coral of the Caribbean. Its rounded colony has a pattern of winding ridges and valleys like a brain, and it grows only a few millimetres a year, so a large dome can be several centuries old.",
+      "facts": {
+        "Colony size": "0.3 to 1 m",
+        "Depth": "Roughly 1 to 40 m",
+        "Habitat": "Caribbean reefs"
+      },
+      "sourceTitle": "WoRMS: Pseudodiploria strigosa",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Pseudodiploria%20strigosa"
+    },
+    "golden-coral": {
+      "text": "A golden coral has a slender stem with polyps arranged in a spiral along its length, and it can live for centuries. Colonies grow up from the seabed to catch food drifting past in the current.",
+      "facts": {
+        "Colony height": "0.2 to 1 m",
+        "Depth": "About 1,000 to 4,000 m",
+        "Habitat": "Hard seabed and rock"
+      },
+      "sourceTitle": "WoRMS: Chrysogorgia",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Chrysogorgia"
+    },
+    "deep-coral": {
+      "text": "Bubblegum corals of the genus Paramuricea form branching, fan-shaped colonies in orange, pink or lilac on hard ledges in submarine canyons, where they trap passing food and shelter small animals.",
+      "facts": {
+        "Colony height": "0.3 to 1 m",
+        "Depth": "About 350 to 1,800 m",
+        "Habitat": "Canyon walls and ledges"
+      },
+      "sourceTitle": "NOAA: Hudson Canyon",
+      "sourceUrl": "https://sanctuaries.noaa.gov/hudson-canyon/"
+    },
+    "sea-pen": {
+      "text": "A sea pen is a colony of polyps shaped like a quill pen. Its stalk is anchored in soft sediment, and the feeding polyps cluster at the top and catch plankton drifting by.",
+      "facts": {
+        "Height": "0.5 to 1.5 m",
+        "Depth": "About 375 to 1,200 m",
+        "Habitat": "Muddy canyon floors"
+      },
+      "sourceTitle": "WoRMS: Umbellula lindahli",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Umbellula%20lindahli"
+    },
+    "anemone": {
+      "text": "A sea anemone of the deep: a soft muscular column with a crown of stinging tentacles that catch drifting animals. It attaches to rock, wreckage or bones and can slowly change position.",
+      "facts": {
+        "Height": "5 to 15 cm",
+        "Depth": "About 800 to 5,000 m",
+        "Habitat": "Hard surfaces"
+      },
+      "sourceTitle": "WoRMS: Actiniaria",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Actiniaria"
+    },
+    "sea-lily": {
+      "text": "A stalked crinoid. It anchors to the bottom and holds up a crown of feathery arms to filter food from the current. Crinoids are an ancient group that has lived in the sea for more than 450 million years.",
+      "facts": {
+        "Crown size": "10 to 30 cm",
+        "Depth": "About 800 to 4,000 m",
+        "Habitat": "Hard seabed"
+      },
+      "sourceTitle": "WoRMS: Crinoidea",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Crinoidea"
+    },
+    "glass-sponge": {
+      "text": "A glass sponge builds its skeleton out of glassy silica needles. It filters bacteria and organic particles from the water, and some deep-sea glass sponges are thought to live for thousands of years.",
+      "facts": {
+        "Height": "10 to 40 cm",
+        "Depth": "About 800 to 5,000 m",
+        "Habitat": "Hard seabed"
+      },
+      "sourceTitle": "WoRMS: Hexactinellida",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Hexactinellida"
+    },
+    "deepwater-octopus": {
+      "text": "A warty octopus of continental slopes and canyon walls. It crawls on its arms across mud and rock, and also swims by pulsing its arm web, searching for crustaceans and worms.",
+      "facts": {
+        "Length": "20 to 50 cm",
+        "Depth": "About 300 to 3,200 m",
+        "Habitat": "Slope and canyon floor"
+      },
+      "sourceTitle": "NOAA: Hudson Canyon",
+      "sourceUrl": "https://sanctuaries.noaa.gov/hudson-canyon/"
+    },
+    "dumbo-octopus": {
+      "text": "A dumbo octopus swims by flapping a pair of ear-like fins on its mantle and hovers above the seabed, searching for worms and small crustaceans. Species of Grimpoteuthis live from about 400 to well over 6,000 m.",
+      "facts": {
+        "Length": "20 to 40 cm",
+        "Depth": "About 1,000 to 5,000 m",
+        "Diet": "Worms, small crustaceans"
+      },
+      "sourceTitle": "WoRMS: Grimpoteuthis",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Grimpoteuthis"
+    },
+    "vampire-squid": {
+      "text": "Neither a squid nor a vampire. It lives in the oxygen-poor midwater, drifts on its fins and sheds glowing mucus from its arm tips instead of ink. It feeds on marine snow it collects with long, sticky filaments.",
+      "facts": {
+        "Length": "About 15 to 30 cm",
+        "Depth": "About 500 to 1,500 m",
+        "Light": "Bioluminescent arm tips and fin photophores"
+      },
+      "sourceTitle": "MBARI: Vampire squid",
+      "sourceUrl": "https://www.mbari.org/animal/vampire-squid/"
+    },
+    "giant-squid": {
+      "text": "One of the largest invertebrates, with the largest eyes in the animal kingdom, about the size of a dinner plate. It hunts deep fish and squid in the dark, and sperm whales hunt it. It was first filmed alive in the deep sea in 2012.",
+      "facts": {
+        "Length": "Up to about 13 m",
+        "Depth": "About 300 to 1,000 m",
+        "Eye": "Up to about 27 cm across"
+      },
+      "sourceTitle": "WoRMS: Architeuthis dux",
+      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Architeuthis%20dux"
+    }
+  },
+  "sites": {
+    "lost-city": {
+      "spawns": [
+        {
+          "species": "wreckfish",
+          "weight": 1.0,
+          "depth": [300, 1100],
+          "group": [1, 2],
+          "star": true
+        },
+        {
+          "species": "cold-water-coral",
+          "weight": 21,
+          "depth": [500, 1000],
+          "group": [2, 8]
+        },
+        {
+          "species": "anemone",
+          "weight": 21,
+          "depth": [600, 5000],
+          "group": [1, 6]
+        },
+        {
+          "species": "rattail",
+          "weight": 1.2,
+          "depth": [400, 4500],
+          "group": [1, 2]
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 1.5,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        },
+        {
+          "species": "atolla",
+          "weight": 1.5,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        },
+        {
+          "species": "blue-shark",
+          "weight": 0.6,
+          "depth": [5, 350],
+          "group": [1, 1]
+        }
+      ],
+      "rare": {
+        "species": "sixgill-shark",
+        "depth": [200, 1200],
+        "chancePerMin": 0.12,
+        "cooldownS": 480,
+        "pass": "level"
+      }
+    },
+    "axial-seamount-ashes": {
+      "spawns": [
+        {
+          "species": "tubeworm",
+          "weight": 28,
+          "depth": [1400, 1700],
+          "group": [3, 13],
+          "star": true
+        },
+        {
+          "species": "blob-sculpin",
+          "weight": 1.2,
+          "depth": [1000, 2800],
+          "group": [1, 2]
+        },
+        {
+          "species": "rattail",
+          "weight": 1.0,
+          "depth": [400, 4500],
+          "group": [1, 2]
+        },
+        {
+          "species": "anemone",
+          "weight": 14,
+          "depth": [1000, 3000],
+          "group": [1, 5]
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 1.5,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        },
+        {
+          "species": "atolla",
+          "weight": 2,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        },
+        {
+          "species": "blue-shark",
+          "weight": 0.5,
+          "depth": [5, 350],
+          "group": [1, 1]
+        }
+      ],
+      "rare": {
+        "species": "giant-squid",
+        "depth": [300, 1400],
+        "chancePerMin": 0.1,
+        "cooldownS": 600,
+        "pass": "level"
+      }
+    },
+    "beebe-vent-field": {
+      "spawns": [
+        {
+          "species": "beebe-shrimp",
+          "weight": 3,
+          "depth": [4600, 5100],
+          "group": [30, 70],
+          "star": true
+        },
+        {
+          "species": "anemone",
+          "weight": 21,
+          "depth": [4600, 5100],
+          "group": [2, 10]
+        },
+        {
+          "species": "squat-lobster",
+          "weight": 21,
+          "depth": [2400, 5100],
+          "group": [1, 5]
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 1.2,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        },
+        {
+          "species": "atolla",
+          "weight": 2,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        },
+        {
+          "species": "blue-shark",
+          "weight": 0.5,
+          "depth": [5, 350],
+          "group": [1, 1]
+        }
+      ],
+      "rare": {
+        "species": "beebe-shrimp",
+        "depth": [4600, 5100],
+        "chancePerMin": 0.15,
+        "cooldownS": 420,
+        "pass": "level",
+        "group": [110, 160]
+      }
+    },
+    "challenger-deep": {
+      "spawns": [
+        {
+          "species": "hadal-amphipod",
+          "weight": 4,
+          "depth": [8000, 11000],
+          "group": [8, 18],
+          "star": true
+        },
+        {
+          "species": "mariana-snailfish",
+          "weight": 2,
+          "depth": [6800, 8200],
+          "group": [1, 3]
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 1.0,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        },
+        {
+          "species": "atolla",
+          "weight": 1.5,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        },
+        {
+          "species": "blue-shark",
+          "weight": 0.4,
+          "depth": [5, 350],
+          "group": [1, 1]
+        }
+      ],
+      "rare": {
+        "species": "hadal-amphipod",
+        "depth": [9500, 11000],
+        "chancePerMin": 0.15,
+        "cooldownS": 420,
+        "pass": "level",
+        "group": [70, 110]
+      }
+    },
+    "kamaehuakanaloa": {
+      "spawns": [
+        {
+          "species": "hawaii-shrimp",
+          "weight": 3,
+          "depth": [900, 1250],
+          "group": [20, 50],
+          "star": true
+        },
+        {
+          "species": "cutthroat-eel",
+          "weight": 1.5,
+          "depth": [500, 1800],
+          "group": [1, 2]
+        },
+        {
+          "species": "golden-coral",
+          "weight": 21,
+          "depth": [1000, 2000],
+          "group": [1, 5]
+        },
+        {
+          "species": "rattail",
+          "weight": 0.8,
+          "depth": [400, 4500],
+          "group": [1, 2]
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 1.5,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        },
+        {
+          "species": "atolla",
+          "weight": 2,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        },
+        {
+          "species": "blue-shark",
+          "weight": 0.5,
+          "depth": [5, 350],
+          "group": [1, 1]
+        }
+      ],
+      "rare": {
+        "species": "sperm-whale",
+        "depth": [30, 1200],
+        "chancePerMin": 0.1,
+        "cooldownS": 600,
+        "pass": "overhead"
+      }
+    },
+    "hunga-tonga-caldera": {
+      "spawns": [
+        {
+          "species": "blackfin-chromis",
+          "weight": 4,
+          "depth": [1, 30],
+          "group": [18, 40],
+          "star": true
+        },
+        {
+          "species": "rainbow-wrasse",
+          "weight": 3,
+          "depth": [1, 30],
+          "group": [6, 14]
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 1.0,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        },
+        {
+          "species": "atolla",
+          "weight": 0.8,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        }
+      ],
+      "rare": {
+        "species": "humpback-whale",
+        "depth": [3, 120],
+        "chancePerMin": 0.2,
+        "cooldownS": 420,
+        "pass": "overhead"
+      }
+    },
+    "monterey-canyon": {
+      "spawns": [
+        {
+          "species": "pacific-hake",
+          "weight": 2,
+          "depth": [150, 900],
+          "group": [12, 26]
+        },
+        {
+          "species": "nanomia",
+          "weight": 4,
+          "depth": [100, 800],
+          "group": [3, 8],
+          "star": true
+        },
+        {
+          "species": "sea-pen",
+          "weight": 14,
+          "depth": [350, 3700],
+          "group": [1, 5]
+        },
+        {
+          "species": "sun-star",
+          "weight": 14,
+          "depth": [150, 1050],
+          "group": [1, 5]
+        },
+        {
+          "species": "sea-lion",
+          "weight": 0.7,
+          "depth": [1, 80],
+          "group": [1, 2]
+        },
+        {
+          "species": "vampire-squid",
+          "weight": 1,
+          "depth": [500, 1500],
+          "group": [1, 1],
+          "star": true
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 2,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        },
+        {
+          "species": "atolla",
+          "weight": 1.5,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        },
+        {
+          "species": "rattail",
+          "weight": 1.0,
+          "depth": [400, 4500],
+          "group": [1, 2]
+        }
+      ],
+      "rare": {
+        "species": "humpback-whale",
+        "depth": [5, 120],
+        "chancePerMin": 0.12,
+        "cooldownS": 480,
+        "pass": "overhead"
+      }
+    },
+    "hudson-canyon": {
+      "spawns": [
+        {
+          "species": "silver-hake",
+          "weight": 2.5,
+          "depth": [64, 450],
+          "group": [12, 28]
+        },
+        {
+          "species": "blue-shark",
+          "weight": 0.8,
+          "depth": [5, 350],
+          "group": [1, 1]
+        },
+        {
+          "species": "deep-coral",
+          "weight": 21,
+          "depth": [350, 1800],
+          "group": [2, 8],
+          "star": true
+        },
+        {
+          "species": "deepwater-octopus",
+          "weight": 1.2,
+          "depth": [300, 1700],
+          "group": [1, 1],
+          "star": true
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 2,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        },
+        {
+          "species": "atolla",
+          "weight": 1,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        },
+        {
+          "species": "rattail",
+          "weight": 1.0,
+          "depth": [400, 4500],
+          "group": [1, 2]
+        }
+      ],
+      "rare": {
+        "species": "sperm-whale",
+        "depth": [30, 1200],
+        "chancePerMin": 0.12,
+        "cooldownS": 480,
+        "pass": "overhead"
+      }
+    },
+    "blake-plateau-corals": {
+      "spawns": [
+        {
+          "species": "cold-water-coral",
+          "weight": 35,
+          "depth": [500, 1000],
+          "group": [3, 11],
+          "star": true
+        },
+        {
+          "species": "anemone",
+          "weight": 14,
+          "depth": [500, 1000],
+          "group": [1, 5]
+        },
+        {
+          "species": "sea-lily",
+          "weight": 10.5,
+          "depth": [600, 1000],
+          "group": [1, 3]
+        },
+        {
+          "species": "wreckfish",
+          "weight": 1,
+          "depth": [250, 1200],
+          "group": [1, 2]
+        },
+        {
+          "species": "rattail",
+          "weight": 1.2,
+          "depth": [400, 4500],
+          "group": [1, 2]
+        },
+        {
+          "species": "blue-shark",
+          "weight": 0.8,
+          "depth": [5, 350],
+          "group": [1, 1]
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 1.5,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        },
+        {
+          "species": "atolla",
+          "weight": 1,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        }
+      ],
+      "rare": {
+        "species": "sixgill-shark",
+        "depth": [200, 1200],
+        "chancePerMin": 0.12,
+        "cooldownS": 480,
+        "pass": "level"
+      }
+    },
+    "great-blue-hole": {
+      "spawns": [
+        {
+          "species": "blue-tang",
+          "weight": 3,
+          "depth": [1, 40],
+          "group": [10, 24]
+        },
+        {
+          "species": "french-grunt",
+          "weight": 3,
+          "depth": [1, 40],
+          "group": [14, 30]
+        },
+        {
+          "species": "stoplight-parrotfish",
+          "weight": 2,
+          "depth": [1, 45],
+          "group": [3, 8]
+        },
+        {
+          "species": "nassau-grouper",
+          "weight": 1.2,
+          "depth": [3, 60],
+          "group": [1, 2]
+        },
+        {
+          "species": "reef-shark",
+          "weight": 1,
+          "depth": [2, 60],
+          "group": [1, 1],
+          "star": true
+        },
+        {
+          "species": "brain-coral",
+          "weight": 35,
+          "depth": [1, 40],
+          "group": [1, 5],
+          "star": true
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 1,
+          "depth": [8, 40],
+          "group": [1, 3]
+        }
+      ],
+      "rare": {
+        "species": "whale-shark",
+        "depth": [2, 120],
+        "chancePerMin": 0.1,
+        "cooldownS": 600,
+        "pass": "level"
+      }
+    },
+    "titanic": {
+      "spawns": [
+        {
+          "species": "golden-coral",
+          "weight": 14,
+          "depth": [1000, 4000],
+          "group": [1, 5],
+          "star": true
+        },
+        {
+          "species": "brittle-star",
+          "weight": 28,
+          "depth": [3400, 4900],
+          "group": [2, 10],
+          "star": true
+        },
+        {
+          "species": "rattail",
+          "weight": 1.5,
+          "depth": [400, 4500],
+          "group": [1, 2]
+        },
+        {
+          "species": "anemone",
+          "weight": 14,
+          "depth": [500, 5100],
+          "group": [1, 5]
+        },
+        {
+          "species": "atolla",
+          "weight": 2,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 1.0,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        },
+        {
+          "species": "blue-shark",
+          "weight": 0.6,
+          "depth": [5, 350],
+          "group": [1, 1]
+        }
+      ],
+      "rare": {
+        "species": "dumbo-octopus",
+        "depth": [1000, 5200],
+        "chancePerMin": 0.1,
+        "cooldownS": 600,
+        "pass": "level"
+      }
+    },
+    "bismarck": {
+      "spawns": [
+        {
+          "species": "long-tailed-cucumber",
+          "weight": 21,
+          "depth": [3500, 5600],
+          "group": [1, 5],
+          "star": true
+        },
+        {
+          "species": "amperima",
+          "weight": 28,
+          "depth": [3500, 5600],
+          "group": [2, 10]
+        },
+        {
+          "species": "brittle-star",
+          "weight": 21,
+          "depth": [3400, 4900],
+          "group": [2, 8]
+        },
+        {
+          "species": "rattail",
+          "weight": 1,
+          "depth": [400, 4500],
+          "group": [1, 2]
+        },
+        {
+          "species": "atolla",
+          "weight": 2,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 1.0,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        },
+        {
+          "species": "blue-shark",
+          "weight": 0.5,
+          "depth": [5, 350],
+          "group": [1, 1]
+        }
+      ],
+      "rare": {
+        "species": "dumbo-octopus",
+        "depth": [1000, 5200],
+        "chancePerMin": 0.1,
+        "cooldownS": 600,
+        "pass": "level"
+      }
+    },
+    "endurance": {
+      "spawns": [
+        {
+          "species": "anemone",
+          "weight": 21,
+          "depth": [2500, 3500],
+          "group": [1, 6],
+          "star": true
+        },
+        {
+          "species": "sea-lily",
+          "weight": 14,
+          "depth": [800, 4000],
+          "group": [1, 5],
+          "star": true
+        },
+        {
+          "species": "glass-sponge",
+          "weight": 14,
+          "depth": [2500, 3500],
+          "group": [1, 5]
+        },
+        {
+          "species": "squat-lobster",
+          "weight": 14,
+          "depth": [2400, 5100],
+          "group": [1, 5]
+        },
+        {
+          "species": "rattail",
+          "weight": 1,
+          "depth": [400, 4500],
+          "group": [1, 2]
+        },
+        {
+          "species": "atolla",
+          "weight": 2,
+          "depth": [350, 4000],
+          "group": [1, 3]
+        },
+        {
+          "species": "comb-jelly",
+          "weight": 1.0,
+          "depth": [8, 1200],
+          "group": [1, 3]
+        }
+      ],
+      "rare": {
+        "species": "weddell-seal",
+        "depth": [5, 600],
+        "chancePerMin": 0.14,
+        "cooldownS": 420,
+        "pass": "level"
+      }
+    }
+  }
+}

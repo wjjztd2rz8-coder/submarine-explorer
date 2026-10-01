@@ -29,8 +29,14 @@ import { MISSION_INDEX_URL, parseMissionIndex } from './Mission.js';
 import { loadPois, type PoiDef } from './Pois.js';
 import { loadSpecies, type SpeciesDoc, type SpeciesRecord } from './Species.js';
 import { publicUrl } from '../util/publicUrl.js';
+import { SPECIES_BY_ID } from '../world/life/catalogue.js';
+import { loadLifeDoc } from '../world/life/tables.js';
+import type { LifeDoc, LifeJournalEntry, SpeciesDef } from '../world/life/types.js';
 
-export type JournalEntryKind = 'site' | 'poi' | 'species';
+/** The id a scanned animal is stored under in the discovery store (`<site>/life:<species>`). */
+export const lifeDiscoveryId = (speciesId: string): string => `life:${speciesId}`;
+
+export type JournalEntryKind = 'site' | 'poi' | 'species' | 'life';
 
 export interface JournalEntry {
   /** Unique across the Journal: `<site>/<kind>/<id>`. */
@@ -48,6 +54,8 @@ export interface JournalEntry {
   linkedEntryIds: string[];
   /** A POI entry for a recreated object (`reconstruction: true` in pois.json). */
   recreation: boolean;
+  /** Wildlife only: the animal and its Journal text (F2-LIFE). */
+  life?: { def: SpeciesDef; info: LifeJournalEntry; rare: boolean };
 }
 
 /** What `landmarks.json` says about a site. */
@@ -135,6 +143,36 @@ export interface JournalSiteInput {
   guide: GuideDoc | null;
   pois: PoiDef[];
   species: SpeciesDoc | null;
+  /** The marine-life tables and texts; wildlife entries come from the site's table. */
+  life?: LifeDoc | null;
+}
+
+/** Wildlife entries for a site: every animal its spawn table can show, rare appearance included. */
+function lifeEntries(siteId: string, doc: LifeDoc | null): JournalEntry[] {
+  const table = doc?.sites[siteId];
+  if (!doc || !table) return [];
+  const out: JournalEntry[] = [];
+  const seen = new Set<string>();
+  const add = (speciesId: string, rare: boolean): void => {
+    const def = SPECIES_BY_ID.get(speciesId);
+    const info = doc.species[speciesId];
+    if (!def || !info || seen.has(speciesId)) return;
+    seen.add(speciesId);
+    out.push({
+      key: `${siteId}/life/${speciesId}`,
+      siteId,
+      kind: 'life',
+      id: speciesId,
+      title: def.common,
+      poiIds: [],
+      linkedEntryIds: [],
+      recreation: false,
+      life: { def, info, rare },
+    });
+  };
+  for (const row of table.spawns) add(row.species, false);
+  if (table.rare) add(table.rare.species, true);
+  return out;
 }
 
 /** Build one site's entries from its content files. */
@@ -182,6 +220,7 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
       recreation: false,
     };
   });
+  const wildlife = lifeEntries(id, input.life ?? null);
   const site: JournalSite = {
     id,
     name: guide?.title ?? catalogue?.name ?? input.missionTitle ?? id,
@@ -190,7 +229,7 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
     summary: catalogue?.summary ?? '',
     facts: catalogue?.facts ?? [],
     links: catalogue?.links ?? [],
-    entries: [...siteEntries, ...poiEntries, ...speciesEntries],
+    entries: [...siteEntries, ...poiEntries, ...speciesEntries, ...wildlife],
     poiIds: pois.map((p) => p.id),
     species: input.species,
   };
@@ -211,6 +250,7 @@ export function isEntryUnlocked(
 ): boolean {
   if (entry.kind === 'site') return isSiteUnlocked(site, store);
   if (entry.kind === 'poi') return entry.poiIds.some((p) => store.isDiscovered(site.id, p));
+  if (entry.kind === 'life') return store.isDiscovered(site.id, lifeDiscoveryId(entry.id));
   return entry.linkedEntryIds.some((id) => {
     const e = site.entries.find((x) => x.kind === 'poi' && x.id === id);
     return !!e && e.poiIds.some((p) => store.isDiscovered(site.id, p));
@@ -230,6 +270,7 @@ export function siteProgress(site: JournalSite, store: DiscoveryReader): SitePro
   const out: SiteProgress = { logged: 0, total: 0, species: 0, speciesTotal: 0 };
   for (const e of site.entries) {
     const open = isEntryUnlocked(site, e, store);
+    if (e.kind === 'life') continue;
     if (e.kind === 'species') {
       out.speciesTotal++;
       if (open) out.species++;
@@ -241,6 +282,21 @@ export function siteProgress(site: JournalSite, store: DiscoveryReader): SitePro
   return out;
 }
 
+/** Animals scanned / animals the site can show (F2-LIFE). */
+export function wildlifeProgress(
+  site: JournalSite,
+  store: DiscoveryReader,
+): { scanned: number; total: number } {
+  let scanned = 0;
+  let total = 0;
+  for (const e of site.entries) {
+    if (e.kind !== 'life') continue;
+    total++;
+    if (isEntryUnlocked(site, e, store)) scanned++;
+  }
+  return { scanned, total };
+}
+
 /** Fetch one site's content. Never throws; missing files are empty. */
 export async function loadJournalSite(
   id: string,
@@ -248,13 +304,15 @@ export async function loadJournalSite(
   fetchFn?: FetchJson,
 ): Promise<JournalSite> {
   const quiet = (): void => {};
-  const [guide, pois, species, mission] = await Promise.all([
+  const [guide, pois, species, mission, life] = await Promise.all([
     loadGuide(id, fetchFn),
     loadPois(id, fetchFn, quiet),
     loadSpecies(id, fetchFn, quiet),
     fetchContentJson(contentUrl(id, 'mission.json'), fetchFn),
+    // The animals' texts load with the site only for the real game (a test fetch has none).
+    fetchFn ? Promise.resolve(null) : loadLifeDoc(),
   ]);
-  const input: JournalSiteInput = { id, guide, pois, species };
+  const input: JournalSiteInput = { id, guide, pois, species, life };
   const info = catalogue.get(id);
   if (info) input.catalogue = info;
   const title = isObj(mission) ? str(mission.title) : '';
