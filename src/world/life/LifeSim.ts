@@ -688,6 +688,19 @@ export class LifeSim {
     if (this.rand() < p) this.spawnRare(sub);
   }
 
+  /**
+   * A full pool must never swallow the rare appearance: free up to `n` slots
+   * by releasing the animals farthest from the sub (unseen, so no pop).
+   */
+  private makeRoom(n: number, sub: SubInfo): void {
+    const want = Math.min(n, this.pool.length) - this.free.length;
+    if (want <= 0) return;
+    const d2 = (a: Agent): number => (a.x - sub.x) ** 2 + (a.y - sub.y) ** 2 + (a.z - sub.z) ** 2;
+    const live = this.pool.filter((a) => a.alive && !a.group.rare);
+    live.sort((a, b) => d2(b) - d2(a));
+    for (let i = 0; i < want && i < live.length; i++) this.release(live[i]!);
+  }
+
   /** Start the site's rare appearance now (also the e2e and screenshot hook). */
   spawnRare(sub: SubInfo): Group | null {
     const rule = this.rare;
@@ -696,6 +709,7 @@ export class LifeSim {
     if (!def) return null;
     this.steer.sub = sub;
     this.rareCooldown = rule.cooldownS;
+    this.makeRoom(rule.group?.[1] ?? 100, sub);
     const band = bandOverlap(rule.depth, def.depth) ?? rule.depth;
     let g: Group | null;
     if (def.archetype === 'swarm') {

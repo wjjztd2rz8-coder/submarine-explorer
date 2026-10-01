@@ -124,7 +124,7 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
       lightsOn: true,
       hullR: 7,
     };
-    return g.life!.sim.spawnNear('comb-jelly', sub, 18, 1) !== null;
+    return g.life!.sim.spawnNear('comb-jelly', sub, 9, 1) !== null;
   });
   expect(ok).toBe(true);
   await page.waitForFunction(
@@ -218,3 +218,63 @@ test('photo mode names the animal in frame', async ({ page }) => {
   // The orbit camera sits behind the sub, so the jelly 14 m ahead is in the middle of the frame.
   expect(named).toBe('comb-jelly');
 });
+
+/**
+ * One rare encounter per site, drawn on the high tier inside its 12-call
+ * budget. Also writes the per-site screenshots reviewed by hand.
+ */
+const SITES = [
+  'monterey-canyon',
+  'great-blue-hole',
+  'hunga-tonga-caldera',
+  'lost-city',
+  'beebe-vent-field',
+  'titanic',
+  'endurance',
+];
+for (const site of SITES) {
+  test(`rare encounter at ${site} (high tier, draw-call budget)`, async ({ page }) => {
+    test.setTimeout(120_000);
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await boot(page, `/?tile=${site}&skipBriefing=1&tier=high&lifeSeed=5`);
+    const mid = await page.evaluate(() => {
+      const r = (
+        window.__game as unknown as Game & { life: { sim: { rare: { depth: number[] } } } }
+      ).life!.sim.rare;
+      return r ? (r.depth[0] + r.depth[1]) / 2 : 100;
+    });
+    await park(page, Math.max(15, Math.min(mid, 400)));
+    const res = await page.evaluate(() => {
+      const g = window.__game as unknown as Game;
+      const p = g.sub.position;
+      const sub = {
+        x: p.x,
+        y: p.y,
+        z: p.z,
+        vx: 0,
+        vy: 0,
+        vz: 0,
+        fx: 0,
+        fy: 0,
+        fz: -1,
+        speed: 0,
+        lightsOn: true,
+        hullR: 7,
+      };
+      const s = g.life!.sim as unknown as { spawnRare(s: unknown): unknown };
+      return s.spawnRare(sub) !== null;
+    });
+    expect(res).toBe(true);
+    await page.waitForTimeout(2500);
+    const info = await page.evaluate(() => {
+      const g = window.__game as unknown as Game;
+      return { draw: g.life!.render.drawCalls, stats: g.life!.sim.stats() };
+    });
+    expect(info.draw.species + info.draw.sparks).toBeLessThanOrEqual(12);
+    expect(info.stats.agents).toBeGreaterThan(0);
+    await mkdir(shots, { recursive: true });
+    await page.screenshot({ path: `${shots}/site-${site}.png` });
+    expect(errors).toEqual([]);
+  });
+}
