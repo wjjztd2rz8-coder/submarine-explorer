@@ -20,6 +20,7 @@ const real = params.get('real') === '1';
 const deep = params.get('bg') !== 'day';
 const ids = params.get('ids')?.split(',').filter(Boolean);
 const cols = Number(params.get('cols') ?? 6);
+const zoom = Number(params.get('zoom') ?? 0.75);
 const list = ids ? SPECIES.filter((s) => ids.includes(s.id)) : SPECIES;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -82,7 +83,7 @@ list.forEach((def, i) => {
 });
 const centre = new THREE.Vector3(0, 0, ((Math.ceil(list.length / cols) - 1) * cell * 0.9) / 2);
 const span = Math.max(cols * cell, 8);
-camera.position.set(0, 1.4, centre.z + Math.max(span * 1.1, 11));
+camera.position.set(0, 1.4, centre.z + Math.max(span * 1.1 * zoom, 6));
 controls.target.copy(centre);
 
 const m4 = new THREE.Matrix4();
