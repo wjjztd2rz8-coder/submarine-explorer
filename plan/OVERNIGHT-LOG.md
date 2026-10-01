@@ -48,3 +48,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - 2026-09-30 19:45 CDT headless run: skipped: budget gate (claude error: <urlopen error [Errno -2] Name or service not known> codex 5h 100.0% left (resets Wed Sep 30 13:25) | 7d 84.0% left (resets Tue Oct 06 16:29) [as of 651 min ago] )
 - 2026-10-01 08:30 CDT headless run: skipped: budget gate (claude error: <urlopen error [Errno -2] Name or service not known> codex 5h 100.0% left (resets Wed Sep 30 13:25) | 7d 84.0% left (resets Tue Oct 06 16:29) [as of 1416 min ago] )
 - 2026-10-01 12:15 CDT headless run: skipped: budget gate (claude error: HTTP Error 429: Too Many Requests codex 5h 24.0% left (resets Thu Oct 01 13:32) | 7d 60.0% left (resets Tue Oct 06 16:29) [as of 84 min ago] )
+
+## 2026-10-01 14:50 headless run
+
+- Merged (gates green on main): F-VISUAL-QA (report plus screenshot spec), F2-PROGRESS (research points, upgrades workshop, hull-class unlocks, star ratings), F3-AUDIO (adaptive score, SFX, music slider), F2-LIFE (marine life engine, ~30 species, rare encounters, finished by a Sonnet agent). Added the missing hook so life scans pay species RP. Pushed main, tagged `f2`; Pages deploy was in progress.
+- Running: Codex `f-visual-fixes` (worktree /home/vijay/subexp-wt/f-visual-fixes, unit subexp-f-visual-fixes): headlight/beam, exposure, free-dive openings, chase camera below the surface, from the F-VISUAL-QA shared briefs. Collect next run.
+- Open from F-VISUAL-QA: per-site hero shape/material fixes after lighting, 3 content decisions (Blue Hole vs atoll, Bismarck depth discrepancy, Hunga era). F2-LIFE: rare animals are small in frame; deep midwater is pale from fog glare. Remaining plan: F3-BRAND-UI, F3-ONBOARD, wave 4. Claude usage endpoint returned 429 (last known 98% left).
