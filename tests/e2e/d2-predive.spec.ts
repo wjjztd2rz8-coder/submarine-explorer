@@ -1,7 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/unlocked.js';
 
 /**
  * D2-PREDIVE (playtest #3): the game mode is visible on the home screen, in

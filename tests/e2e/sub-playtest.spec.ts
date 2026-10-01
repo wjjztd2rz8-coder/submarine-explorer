@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/unlocked.js';
 
 /**
  * A3 playtest harness: drives the *real* game with scripted key presses and

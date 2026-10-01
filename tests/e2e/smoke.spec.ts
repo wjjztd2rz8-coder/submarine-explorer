@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './helpers/unlocked.js';
 
 /**
  * Visual smoke test: boot the built game against a real tile, wait for the

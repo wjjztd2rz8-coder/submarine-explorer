@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/unlocked.js';
 
 async function waitForPreset(page: Page): Promise<void> {
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });

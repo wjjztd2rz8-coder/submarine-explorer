@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/unlocked.js';
 
 /**
  * B3 mission flow, end to end, on B2's real Titanic content:

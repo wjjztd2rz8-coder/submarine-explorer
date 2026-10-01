@@ -14,6 +14,21 @@ without an entry here is not done.
 
 ### Added
 
+- Phase F, F2-PROGRESS: research points from first discoveries, objective scans,
+  species, photographs of new subjects, primary completion and best dive ratings.
+  Existing discovery and photo saves receive credit automatically. Research stays
+  separate from settings, and repeat scans do not generate more points.
+- A Research workshop on Home and Pause: ten upgrades across lights, sonar,
+  power and propulsion, with two or three levels, clear effects and 44 px buttons.
+  Purchases apply immediately and carry into future dives and gameplay modes.
+- Best dive ratings on mission cards and a stars-and-RP section in the debrief:
+  primaries earn one star, every secondary earns two, and a subject photograph or
+  species scan completes the third-star goal. Returning dives can improve a rating.
+- Hull research unlocks: Class A starts at 1,000 m, Class B unlocks at 300 lifetime
+  RP (6,500 m), and Class C at 900 RP (11,000 m). Spending RP keeps unlock progress.
+  Four shallow missions are open from the start; deeper cards and globe pins show
+  their requirements. Free dive remains open on every survey within your hull rating.
+
 - Phase F, F1-TOUCH: **full touch play and a PWA install** (`src/ui/TouchControls.ts`,
   `src/core/Touch.ts`, `src/styles/touch.css`, `public/sw.js`). A left stick
   (thrust and turn), a right rise/sink slider, Scan (hold), Boost (hold), Lights,
@@ -105,6 +120,14 @@ without an entry here is not done.
 - Phase F, F0-CORE: **Auto** and **Ultra** entries in Settings → Graphics tier.
 
 ### Changed
+
+- Phase F, F2-PROGRESS: hull selection now follows site depth and unlocked research,
+  rather than giving every deep free dive an unrestricted hull. Shared links to a
+  locked mission open a rated free dive with a dismissible requirement notice.
+  The fitted class chooses the matching existing vehicle and briefing rating.
+- Boost now uses an eight-second reserve that recharges while released; upgrades
+  extend it by 20% per level. This replaces unlimited held boost so boost research
+  has a useful effect in Arcade as well as improving battery endurance in Realistic.
 
 - Phase F, F1-FIXES: **wave-1 audit fixes.** Wall colliders (scarps, canyon ledge,
   stalactite alcove) now follow the deformed mesh: overlapping x segments (no

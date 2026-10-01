@@ -353,7 +353,28 @@ export class Globe {
   }
 
   /** Choose a site: missions and tiles navigate; catalogue pins just pin the card. */
+  private missionAccess: ((site: GlobeSite) => string | null) | null = null;
+  /** Locked mission pins stay focusable so their depth requirement can be read. */
+  setMissionAccess(check: (site: GlobeSite) => string | null): void {
+    this.missionAccess = check;
+    for (const pin of this.pins) {
+      const requirement = pin.site.state === 'mission' ? check(pin.site) : null;
+      pin.el.setAttribute('aria-disabled', String(!!requirement));
+      pin.el.setAttribute(
+        'aria-label',
+        requirement
+          ? `${pin.site.name}. ${requirement}`
+          : `${pin.site.name}, ${pin.site.type}, ${formatDepth(pin.site.depthM)}. ${pinBadge(pin.site)}`,
+      );
+    }
+    this.renderCard();
+  }
   select(site: GlobeSite): void {
+    if (site.state === 'mission' && this.missionAccess?.(site)) {
+      this.pinned = site;
+      this.renderCard();
+      return;
+    }
     if (site.state === 'catalogue') {
       this.pinned = site;
       this.renderCard();
@@ -386,10 +407,12 @@ export class Globe {
       b.type = 'button';
       b.dataset.landmark = site.id;
       b.dataset.state = site.state;
+      if (site.state === 'mission' && this.missionAccess?.(site))
+        b.setAttribute('aria-disabled', 'true');
       if (site.id === this.opts.currentId) b.classList.add('is-current');
       b.setAttribute(
         'aria-label',
-        `${site.name}, ${site.type}, ${formatDepth(site.depthM)}. ${pinBadge(site)}`,
+        `${site.name}, ${site.type}, ${formatDepth(site.depthM)}. ${site.state === 'mission' ? (this.missionAccess?.(site) ?? pinBadge(site)) : pinBadge(site)}`,
       );
       b.append(el('span', 'globe-pin-dot'));
       b.addEventListener('pointerenter', () => {
@@ -510,7 +533,8 @@ export class Globe {
         site.summary.length > 220 ? `${site.summary.slice(0, 217).trimEnd()}…` : site.summary;
       parts.push(el('p', 'globe-card-summary', text));
     }
-    parts.push(el('div', `globe-card-action is-${site.state}`, pinAction(site)));
+    const requirement = site.state === 'mission' ? this.missionAccess?.(site) : null;
+    parts.push(el('div', `globe-card-action is-${site.state}`, requirement ?? pinAction(site)));
     this.card.replaceChildren(...parts);
   }
 

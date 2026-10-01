@@ -12,6 +12,8 @@
  * every system has initialised, as before F0).
  */
 
+import type { Progress } from '../game/Progress.js';
+import type { Upgrades } from '../ui/Upgrades.js';
 import type * as THREE from 'three';
 import type { AudioSystem } from '../audio/AudioSystem.js';
 import type { AtmosphereTier, GameConfig, GraphicsTier } from '../core/Config.js';
@@ -77,6 +79,7 @@ export interface BootContext {
   route: MissionRoute | null;
   tileId: string;
   save: Save;
+  progress: Progress;
   /** Saved settings as they were at boot. */
   settings: SettingsData;
   /** `config.scan.hintRangeFactor` before the sensor preset was applied. */
@@ -102,6 +105,7 @@ export interface BootContext {
 }
 
 export interface GameContext extends BootContext {
+  upgrades: Upgrades;
   // world (terrain, atmosphere, landmarks)
   terrain: Terrain;
   atmoTier: AtmosphereTier;

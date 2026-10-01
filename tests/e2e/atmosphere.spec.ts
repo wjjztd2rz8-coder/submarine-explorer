@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './helpers/unlocked.js';
 
 /**
  * A2 acceptance: three depth bands must look clearly different. Each case

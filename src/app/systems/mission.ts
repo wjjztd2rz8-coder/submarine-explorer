@@ -32,6 +32,12 @@ export const missionSystem: GameSystem = {
     const missionRouter = route
       ? new MissionRouter({
           route,
+          rating: () =>
+            ctx.progress.finish(
+              route.missionId,
+              ctx.missionRouter!.mission.objectives,
+              ctx.missionRouter!.mission.endReason === 'abort',
+            ),
           bus,
           config,
           meta,

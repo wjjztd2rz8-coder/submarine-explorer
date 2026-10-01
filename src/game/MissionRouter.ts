@@ -22,6 +22,7 @@
  *   Dive again, Dive sites, Home, Journal). The debrief freezes the game.
  */
 
+import type { DiveRating } from './Progress.js';
 import type { GameConfig } from '../core/Config.js';
 import type { EventBus } from '../core/EventBus.js';
 import type { InputState } from '../core/Input.js';
@@ -299,6 +300,7 @@ export interface MissionRouterOptions {
   config: GameConfig;
   meta: TileMeta;
   discovery: MissionDiscovery;
+  rating?: () => DiveRating;
   defaultStartPosition?: MissionStartPosition;
   applyStart?: (choice: MissionStartPosition) => void;
   /** Unused since D-FLOW (the HUD shows a non-1× sim speed); kept for callers. */
@@ -632,7 +634,7 @@ export class MissionRouter {
       { id: 'home', label: 'Home', run: () => this.leave(this.opts.onHome) },
       { id: 'journal', label: 'Journal', run: () => discovery.guide.open() },
     );
-    this.debrief.show(stats, actions);
+    this.debrief.show(stats, actions, this.opts.rating?.());
     this.panel.setVisible(false);
   }
 

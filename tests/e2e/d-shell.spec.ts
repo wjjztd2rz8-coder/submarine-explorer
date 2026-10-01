@@ -1,6 +1,6 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/unlocked.js';
 
 const shots = '.cache/codex/shots/d-shell';
 
@@ -59,7 +59,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await page.setViewportSize({ width: 1280, height: 720 });
   await boot(page, '/');
   await expect(page.locator('.home-screen')).toBeVisible();
-  await expect(page.locator('.home-menu button')).toHaveCount(6);
+  await expect(page.locator('.home-menu button')).toHaveCount(7);
   await expect(page.getByRole('button', { name: 'Continue' })).toBeDisabled();
   await page.waitForFunction(
     () =>

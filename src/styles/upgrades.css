@@ -1,0 +1,181 @@
+.upgrades {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: #02121de8;
+  color: #e6f6ff;
+}
+.upgrades[hidden] {
+  display: none;
+}
+.upgrades-panel {
+  width: min(960px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  padding: 26px;
+  border: 1px solid #387386;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #112e3c, #061924);
+  box-shadow: 0 24px 90px #0009;
+}
+.upgrades header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.upgrades h1 {
+  font-size: 26px;
+  margin: 0;
+}
+.upgrades h2 {
+  font-size: 18px;
+  color: #78e1e8;
+}
+.upgrades h3 {
+  font-size: 15px;
+  margin: 0 0 5px;
+}
+.upgrades button,
+.progress-menu-button {
+  min-height: 44px;
+  min-width: 44px;
+}
+.upgrades button {
+  padding: 10px 16px;
+  border: 1px solid #60b4c4;
+  border-radius: 8px;
+  color: #e6f6ff;
+  background: #174653;
+  cursor: pointer;
+  font: inherit;
+}
+.upgrades button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.upgrades button:focus-visible {
+  outline: 3px solid #f2ca7b;
+  outline-offset: 3px;
+}
+.upgrades-balance {
+  font-size: 20px;
+  color: #f2ca7b;
+}
+.upgrades-hint {
+  color: #b8d0db;
+  font-size: 13px;
+}
+.upgrades-hulls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.upgrades-hulls p {
+  background: #03141e;
+  border: 1px solid #315362;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 0;
+  font-size: 13px;
+}
+.upgrades-hulls .is-unlocked {
+  border-color: #78e1e8;
+}
+.upgrades-tracks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.upgrade-card {
+  padding: 14px 0;
+  border-top: 1px solid #294a59;
+}
+.upgrade-card small {
+  color: #93bbc9;
+}
+.upgrade-card p {
+  font-size: 13px;
+  min-height: 34px;
+}
+.upgrade-card button {
+  width: 100%;
+  font-size: 13px;
+}
+.debrief-rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 20px;
+  margin: 18px 0;
+  padding: 14px;
+  background: #102d39;
+  border-radius: 10px;
+}
+.debrief-stars,
+.mission-stars {
+  color: #f2ca7b;
+  letter-spacing: 3px;
+}
+.debrief-stars {
+  font-size: 30px;
+}
+.mission-item.is-locked {
+  border-color: #695d3c;
+}
+.mission-lock {
+  color: #f2ca7b;
+  font-size: 12px;
+}
+.mission-stars {
+  font-size: 15px;
+}
+.progress-hull-notice {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 150;
+  max-width: calc(100vw - 30px);
+  padding: 14px 22px;
+  border-radius: 8px;
+  background: #102d39;
+  color: #fff;
+}
+@media (max-width: 760px) {
+  .upgrades {
+    padding: 10px;
+  }
+  .upgrades-panel {
+    padding: 18px;
+    max-height: calc(100dvh - 20px);
+  }
+  .upgrades-tracks {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .upgrades-hulls {
+    grid-template-columns: 1fr;
+  }
+  .upgrades h1 {
+    font-size: 22px;
+  }
+}
+@media (max-width: 360px) {
+  .upgrades-tracks {
+    grid-template-columns: 1fr;
+  }
+}
+.progress-hull-notice {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.progress-hull-notice button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
