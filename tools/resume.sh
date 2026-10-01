@@ -21,7 +21,8 @@ fi
 echo "== state =="; git log --oneline -3; git status --short | head -20
 PROMPT="$(cat plan/RESUME-PROMPT.md)"
 if [[ "${1:-}" == "--headless" ]]; then
-  claude -p "$PROMPT" --permission-mode bypassPermissions > ".cache/resume-$(date +%Y%m%d-%H%M).log" 2>&1 &
+  # stream-json logs every step as it happens, so tools/status.sh can show live progress.
+  claude -p "$PROMPT" --permission-mode bypassPermissions --output-format stream-json --verbose > ".cache/resume-$(date +%Y%m%d-%H%M).log" 2>&1 &
   cpid=$!
   # Watch usage for the whole run; the watchdog kills the run before a floor.
   tools/budget-watchdog.sh "$cpid" > /dev/null 2>&1 &
