@@ -273,6 +273,15 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     }
   }
 
+  // Culling bounds cover the smoke: the tallest stack's plume (from the vent preset) and the
+  // two extra ones, each with its sideways spread and drift.
+  for (const s of byHeight.slice(0, 3)) {
+    const ph = THREE.MathUtils.clamp(s.h * 2.6 + 4, 7, 34);
+    const reach = Math.max(1.2, ph * 0.16) + ph * 0.28;
+    bounds.expandByPoint(new THREE.Vector3(s.x - reach, s.y + s.h + ph, s.z - reach));
+    bounds.expandByPoint(new THREE.Vector3(s.x + reach, s.y + s.h + ph, s.z + reach));
+  }
+
   // ---- colliders and impostor.
   const colliders: THREE.Box3[] = [
     boxCH(0, gnd(0, 0) + moundH * 0.3, 0, L * 0.36, moundH * 0.35, W * 0.36),

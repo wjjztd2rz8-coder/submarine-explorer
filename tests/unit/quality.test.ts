@@ -83,6 +83,11 @@ describe('resolveQuality', () => {
     expect(resolveQuality('high', 'low', sw)).toMatchObject({ tier: 'high', source: 'url' });
     expect(resolveQuality('ultra', 'auto', sw)).toMatchObject({ tier: 'ultra', source: 'url' });
     expect(resolveQuality('auto', 'high', sw)).toMatchObject({ tier: 'low', source: 'auto' });
+    // Both URL overrides make a saved-tier change unappliable by reloading.
+    expect(resolveQuality('auto', 'high', sw).urlForced).toBe(true);
+    expect(resolveQuality('high', 'low', sw).urlForced).toBe(true);
+    expect(resolveQuality(null, 'high', sw).urlForced).toBe(false);
+    expect(resolveQuality(null, 'auto', sw).urlForced).toBe(false);
     expect(resolveQuality('bogus', 'high', sw)).toMatchObject({ tier: 'high', source: 'setting' });
   });
 
@@ -151,6 +156,39 @@ describe('DynamicResolution', () => {
     const up = run(dr, 8, 120);
     expect(up.length).toBeGreaterThan(0);
     expect(dr.pixelRatio).toBe(2);
+  });
+
+  it('settles on a stable ratio-dependent workload instead of cycling', () => {
+    // 25 ms at ratio 1, 8.5 ms at 0.75: a stable, ratio-dependent workload.
+    const dr = new DynamicResolution(cfg, 1);
+    const cost = (r: number): number => 25 * (r > 0.9 ? 1 : 0.34);
+    const changes: number[] = [];
+    for (let t = 0; t < 3600 * 1000;) {
+      const ms = cost(dr.pixelRatio);
+      t += ms;
+      const r = dr.update(ms);
+      if (r !== null) changes.push(r);
+    }
+    expect(changes.length).toBeLessThanOrEqual(3);
+    expect(dr.pixelRatio).toBeLessThan(1);
+  });
+
+  it('retries a rejected ratio once the workload gets lighter', () => {
+    const dr = new DynamicResolution(cfg, 1);
+    let load = 1;
+    const cost = (r: number): number => 25 * load * (r > 0.9 ? 1 : 0.34);
+    const step = (seconds: number): void => {
+      for (let t = 0; t < seconds * 1000;) {
+        const ms = cost(dr.pixelRatio);
+        t += ms;
+        dr.update(ms);
+      }
+    };
+    step(1200);
+    expect(dr.pixelRatio).toBeLessThan(1);
+    load = 0.4;
+    step(600);
+    expect(dr.pixelRatio).toBe(1);
   });
 
   it('ignores hidden-tab gaps', () => {

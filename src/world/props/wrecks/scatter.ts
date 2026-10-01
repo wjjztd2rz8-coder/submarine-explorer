@@ -617,37 +617,20 @@ const KITS: Record<WreckScatterId, Kit> = {
         ...disc(dims),
         kinds: [
           {
+            // The detached main-battery turrets lie upside down on the seabed.
             name: 'inverted',
             geom: 'turretInverted',
             mat: 'steel',
             big: true,
-            count: 2,
+            count: 4,
             size: [1, 1],
             pose: 'upright',
             fixed: [
               [-0.55 * r, -0.35 * r, 0.6],
               [0.1 * r, 0.05 * r, 2.3],
+              [0.6 * r, 0.3 * r, 4.1],
+              [-0.2 * r, 0.62 * r, 5.4],
             ],
-          },
-          {
-            name: 'side',
-            geom: 'turretSide',
-            mat: 'steel',
-            big: true,
-            count: 1,
-            size: [1, 1],
-            pose: 'upright',
-            fixed: [[0.6 * r, 0.3 * r, 4.1]],
-          },
-          {
-            name: 'upright',
-            geom: 'turretUpright',
-            mat: 'steel',
-            big: true,
-            count: 1,
-            size: [1, 1],
-            pose: 'upright',
-            fixed: [[-0.2 * r, 0.62 * r, 5.4]],
           },
           {
             name: 'plates',

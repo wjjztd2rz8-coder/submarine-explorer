@@ -9,23 +9,27 @@
 import { AudioSystem } from '../../audio/AudioSystem.js';
 import { Captions } from '../../ui/Captions.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export const audioSystem: GameSystem = {
   name: 'audio',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { config, bus, terrain, app, settings } = ctx;
     const audio = new AudioSystem(config.audio, bus, terrain);
     ctx.audio = audio;
     audio.setPaused(app.state !== 'dive');
-    bus.on('app:state', ({ state }) => audio.setPaused(state !== 'dive'));
+    cleanup.add(bus.on('app:state', ({ state }) => audio.setPaused(state !== 'dive')));
     ctx.captions = new Captions(audio.captions, {
       enabled: settings.captions,
       maxLines: config.settings.captionMaxLines,
       minDurationS: config.settings.captionMinDurationS,
     });
     const unlockAudio = (): void => audio.unlock();
-    window.addEventListener('pointerdown', unlockAudio, { once: true });
-    window.addEventListener('keydown', unlockAudio, { once: true });
+    cleanup.listen(window, 'pointerdown', unlockAudio, { once: true });
+    cleanup.listen(window, 'keydown', unlockAudio, { once: true });
     ctx.expose({ audio, captions: ctx.captions });
   },
   frame: {

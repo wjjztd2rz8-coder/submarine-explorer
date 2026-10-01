@@ -183,5 +183,7 @@ void main() {
   }
   color = mix(color, fogColor, clamp(fog, 0.0, 1.0) * 0.85);
   gl_FragColor = vec4(color, alpha * (1.0 - 0.7 * fog));
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }
 `;

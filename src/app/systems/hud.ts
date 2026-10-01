@@ -6,9 +6,13 @@
 
 import { HUD } from '../../ui/HUD.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export const hudSystem: GameSystem = {
   name: 'hud',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { meta, config, settings, save, bus, freeDiveHull } = ctx;
     const hud = new HUD(
@@ -27,12 +31,14 @@ export const hudSystem: GameSystem = {
     if (freeDiveHull && !freeDiveHull.cleared) hud.setHullNote('at rating limit');
     // D2-HAZARD: how nearing the rated depth is shown.
     hud.setHullWarningStyle(settings.hullWarningStyle);
-    save.onChange((next, changed) => {
-      if (changed.includes('hullWarningStyle')) hud.setHullWarningStyle(next.hullWarningStyle);
-    });
+    cleanup.add(
+      save.onChange((next, changed) => {
+        if (changed.includes('hullWarningStyle')) hud.setHullWarningStyle(next.hullWarningStyle);
+      }),
+    );
     // D-CURRENTS: the current readout.
     hud.setCurrentMode(settings.gameplay.currents);
-    bus.on('env:current', (current) => hud.setCurrent(current));
+    cleanup.add(bus.on('env:current', (current) => hud.setCurrent(current)));
   },
   frame: {
     'hud.draw': (f, ctx) => {

@@ -222,5 +222,7 @@ void main() {
   vec3 col = uColor * (uBrightness + vLit * 2.6);
   float a = vAlpha * soft * (0.5 + 0.5 * vLit);
   gl_FragColor = vec4(col, a);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }
 `;

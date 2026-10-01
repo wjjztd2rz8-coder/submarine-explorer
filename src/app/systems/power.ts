@@ -6,39 +6,46 @@
 
 import { Power, startingReserves } from '../../game/Power.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export function createPowerSystem(): GameSystem {
   let powerEmergencyStarted = false;
   let freeDivePowerDebriefShown = false;
   return {
     name: 'power',
+    dispose: () => cleanup.dispose(),
     init(ctx) {
       const { config, settings, bus, save, route, discovery } = ctx;
       const power = new Power(config.power, settings.gameplay.batteryOxygen);
       ctx.power = power;
-      bus.on('mission:started', () => {
-        power.reset();
-        powerEmergencyStarted = false;
-        // D2-HAZARD: the descent to a deep start already used some battery.
-        void discovery.ready.then(() =>
-          queueMicrotask(() => {
-            if (!save.get().gameplay.batteryOxygen || !route) return;
-            const depth = Math.max(0, -ctx.sub.position.y);
-            if (depth < 25) return;
-            const reserve = startingReserves(
-              depth,
-              config.descentProfiles[save.get().gameplay.descentProfile],
-              config.power,
-            );
-            power.setLevels(reserve.battery, reserve.oxygen);
-            ctx.hud.notice(
-              `Descent to ${Math.round(depth).toLocaleString('en-US')} m used ${Math.round((1 - reserve.battery) * 100)}% battery`,
-            );
-          }),
-        );
-      });
+      cleanup.add(
+        bus.on('mission:started', () => {
+          power.reset();
+          powerEmergencyStarted = false;
+          // D2-HAZARD: the descent to a deep start already used some battery.
+          void discovery.ready.then(() =>
+            queueMicrotask(() => {
+              if (!save.get().gameplay.batteryOxygen || !route) return;
+              const depth = Math.max(0, -ctx.sub.position.y);
+              if (depth < 25) return;
+              const reserve = startingReserves(
+                depth,
+                config.descentProfiles[save.get().gameplay.descentProfile],
+                config.power,
+              );
+              power.setLevels(reserve.battery, reserve.oxygen);
+              ctx.hud.notice(
+                `Descent to ${Math.round(depth).toLocaleString('en-US')} m used ${Math.round((1 - reserve.battery) * 100)}% battery`,
+              );
+            }),
+          );
+        }),
+      );
       // The free-dive power debrief cannot be dismissed with Escape.
-      window.addEventListener(
+      cleanup.listen(
+        window,
         'keydown',
         (event) => {
           if (
@@ -53,9 +60,11 @@ export function createPowerSystem(): GameSystem {
         },
         true,
       );
-      save.onChange((next, changed) => {
-        if (changed.includes('gameplay')) power.setEnabled(next.gameplay.batteryOxygen);
-      });
+      cleanup.add(
+        save.onChange((next, changed) => {
+          if (changed.includes('gameplay')) power.setEnabled(next.gameplay.batteryOxygen);
+        }),
+      );
       ctx.expose({ power });
     },
     frame: {

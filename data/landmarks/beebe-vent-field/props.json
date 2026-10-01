@@ -15,7 +15,7 @@
       "lod_distance_m": 800,
       "collision": "box",
       "reconstruction": true,
-      "note": "Tall black-smoker chimney standing in for the Beebe 1-5 vent complex (403-410 degC supercritical fluid, Connelly et al. 2012). `material_hint: \"sulfide\"` for the near-black, rust-streaked palette. No photogrammetric model of the real chimneys was found, so shape and exact height are a reconstruction; the mound's location and the field's record temperature are sourced. Rendered as a sulfide mound with the tall chimney, its neighbours, animated smoke and Rimicaris-style shrimp swarms on the walls (variant shrimp); the cluster layout is a game reconstruction.",
+      "note": "Tall black-smoker chimney standing in for the Beebe 1-5 vent complex (403-410 degC supercritical fluid, Connelly et al. 2012). `material_hint: \"sulfide\"` for the near-black, rust-streaked palette. No photogrammetric model of the real chimneys was found, so shape and exact height are a reconstruction; the mound's location and the field's record temperature are sourced. Rendered as a sulfide mound with the tall chimney, its neighbours, animated smoke and Rimicaris-style shrimp swarms on the walls (variant shrimp); the cluster layout is a game reconstruction. This is a flank fragment of the real sulfide mound, which the discovery paper gives as roughly 80 m across and 50 m high; the full-scale mound is not built.",
       "variant": "shrimp"
     },
     {

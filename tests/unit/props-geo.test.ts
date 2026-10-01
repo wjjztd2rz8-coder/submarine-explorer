@@ -82,8 +82,9 @@ describe('procedural:geo features', () => {
 
   it('the tower is about as tall as dimensions_m[2] and colliders stay inside the bounds', () => {
     const b = build('carbonate-tower');
-    expect(b.bounds.max.y).toBeGreaterThan(55);
-    expect(b.bounds.max.y).toBeLessThan(75);
+    // Flat ground: dimensions_m[2] is the total local relief (Lost City: up to about 60 m).
+    expect(b.bounds.max.y).toBeGreaterThan(57);
+    expect(b.bounds.max.y).toBeLessThan(63);
     for (const c of b.colliders!) {
       expect(b.bounds.containsPoint(c.getCenter(new THREE.Vector3()))).toBe(true);
     }

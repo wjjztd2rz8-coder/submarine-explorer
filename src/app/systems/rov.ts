@@ -12,6 +12,9 @@ import { Rov } from '../../rov/Rov.js';
 import { RovVisual } from '../../rov/RovVisual.js';
 import { RovHUD } from '../../ui/RovHUD.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export function createRovSystem(): GameSystem {
   const rovCurrent = new THREE.Vector3();
@@ -23,15 +26,18 @@ export function createRovSystem(): GameSystem {
   let rovScanRadii: number[] | null = null;
   return {
     name: 'rov',
+    dispose: () => cleanup.dispose(),
     init(ctx) {
       const { config, terrain, settings, save, hud, scene, rig, sub, headlights, bus } = ctx;
       const rov = new Rov(config.rov, terrain);
       const rovVisual = new RovVisual(config.rov, ctx.tier);
       rovVisual.setLightPreset(config.lightPresets[settings.gameplay.lights]);
-      save.onChange((next, changed) => {
-        if (changed.includes('gameplay'))
-          rovVisual.setLightPreset(config.lightPresets[next.gameplay.lights]);
-      });
+      cleanup.add(
+        save.onChange((next, changed) => {
+          if (changed.includes('gameplay'))
+            rovVisual.setLightPreset(config.lightPresets[next.gameplay.lights]);
+        }),
+      );
       const rovHud = new RovHUD(hud.root.querySelector('.hud-readouts') as HTMLElement);
       scene.add(rovVisual.group);
       Object.assign(ctx, { rov, rovVisual, rovHud });
@@ -46,14 +52,16 @@ export function createRovSystem(): GameSystem {
         rovVisual.update(rov, sub.position);
         headlights.setConesSuppressed(false);
       };
-      bus.on('app:state', ({ state }) => {
-        if (state !== 'dive') abortRov();
-      });
-      bus.on('mission:ended', abortRov);
-      bus.on('mission:aborted', abortRov);
-      bus.on('mission:restart', abortRov);
-      bus.on('mission:started', abortRov);
-      bus.on('sub:emergencyBlow', abortRov);
+      cleanup.add(
+        bus.on('app:state', ({ state }) => {
+          if (state !== 'dive') abortRov();
+        }),
+      );
+      cleanup.add(bus.on('mission:ended', abortRov));
+      cleanup.add(bus.on('mission:aborted', abortRov));
+      cleanup.add(bus.on('mission:restart', abortRov));
+      cleanup.add(bus.on('mission:started', abortRov));
+      cleanup.add(bus.on('sub:emergencyBlow', abortRov));
       ctx.expose({ rov, rovHud, rovVisual });
     },
     frame: {

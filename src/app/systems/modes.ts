@@ -7,6 +7,9 @@
 import type { GameConfig } from '../../core/Config.js';
 import type { SettingsData } from '../../core/Save.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 /**
  * Boot-time part, run before anything reads the config: profile values into
@@ -32,6 +35,7 @@ export function applyBootModes(
 
 export const modesSystem: GameSystem = {
   name: 'modes',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { config, discovery, save } = ctx;
     const baseScanRadii = new Map<string, number>();
@@ -42,20 +46,22 @@ export const modesSystem: GameSystem = {
       for (const poi of discovery.pois)
         poi.radius = (baseScanRadii.get(poi.id) ?? poi.radius) * factor;
     });
-    save.onChange((next, changed) => {
-      if (!changed.includes('gameplay')) return;
-      ctx.sub.applyProfiles(
-        config.speedProfiles[next.gameplay.speedProfile],
-        config.descentProfiles[next.gameplay.descentProfile],
-      );
-      config.camera.lookAheadPerSpeed =
-        config.speedProfiles[next.gameplay.speedProfile].cameraLookAheadPerSpeed;
-      ctx.headlights.setPreset(config.lightPresets[next.gameplay.lights]);
-      const sensor = config.sensorPresets[next.gameplay.sensors];
-      config.scan.hintRangeFactor = ctx.baseHintRangeFactor * sensor.hintRangeMultiplier;
-      for (const poi of discovery.pois)
-        poi.radius = (baseScanRadii.get(poi.id) ?? poi.radius) * sensor.scanRadiusMultiplier;
-      ctx.sub.setSimSpeed(next.gameplay.simSpeed);
-    });
+    cleanup.add(
+      save.onChange((next, changed) => {
+        if (!changed.includes('gameplay')) return;
+        ctx.sub.applyProfiles(
+          config.speedProfiles[next.gameplay.speedProfile],
+          config.descentProfiles[next.gameplay.descentProfile],
+        );
+        config.camera.lookAheadPerSpeed =
+          config.speedProfiles[next.gameplay.speedProfile].cameraLookAheadPerSpeed;
+        ctx.headlights.setPreset(config.lightPresets[next.gameplay.lights]);
+        const sensor = config.sensorPresets[next.gameplay.sensors];
+        config.scan.hintRangeFactor = ctx.baseHintRangeFactor * sensor.hintRangeMultiplier;
+        for (const poi of discovery.pois)
+          poi.radius = (baseScanRadii.get(poi.id) ?? poi.radius) * sensor.scanRadiusMultiplier;
+        ctx.sub.setSimSpeed(next.gameplay.simSpeed);
+      }),
+    );
   },
 };

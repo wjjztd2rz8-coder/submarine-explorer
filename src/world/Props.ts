@@ -167,6 +167,7 @@ export class Props {
   private readonly colliders: Collider[] = [];
   private readonly frustum = new THREE.Frustum();
   private readonly projView = new THREE.Matrix4();
+  private readonly camPos = new THREE.Vector3();
 
   /**
    * @param tier graphics tier for procedural detail budgets (hand-built wrecks);
@@ -380,7 +381,7 @@ export class Props {
     camera.updateMatrixWorld();
     this.projView.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     this.frustum.setFromProjectionMatrix(this.projView);
-    const cam = camera.getWorldPosition(new THREE.Vector3());
+    const cam = camera.getWorldPosition(this.camPos);
     const s = this.stats;
     s.full = s.impostor = s.hiddenDistance = s.hiddenFrustum = 0;
     for (const p of this.placed) {

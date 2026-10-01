@@ -7,6 +7,9 @@
 
 import { shouldPauseAfterPointerLookLoss, shouldRequestPointerLook } from '../../core/Input.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export function createPointerSystem(): GameSystem {
   let pointerLookWasBlocked = true;
@@ -16,6 +19,7 @@ export function createPointerSystem(): GameSystem {
   let pointerLookHint: HTMLDivElement | null = null;
   return {
     name: 'pointer',
+    dispose: () => cleanup.dispose(),
     init(ctx) {
       const { canvas, input, app } = ctx;
       const lockKeyboard = async (): Promise<void> => {
@@ -35,7 +39,7 @@ export function createPointerSystem(): GameSystem {
         (navigator as Navigator & { keyboard?: { unlock?: () => void } }).keyboard?.unlock?.();
       };
       ctx.keyboard = { lock: lockKeyboard, unlock: unlockKeyboard };
-      document.addEventListener('fullscreenchange', () => {
+      cleanup.listen(document, 'fullscreenchange', () => {
         if (document.fullscreenElement) void lockKeyboard();
         else unlockKeyboard();
       });
@@ -96,7 +100,7 @@ export function createPointerSystem(): GameSystem {
           updatePointerLookHint();
         }
       };
-      document.addEventListener('pointerlockchange', () => {
+      cleanup.listen(document, 'pointerlockchange', () => {
         const locked = document.pointerLockElement === canvas;
         const wasLocked = input.pointerLookActive;
         pointerLockPending = false;
@@ -114,16 +118,17 @@ export function createPointerSystem(): GameSystem {
         }
         updatePointerLookHint();
       });
-      document.addEventListener('pointerlockerror', () => {
+      cleanup.listen(document, 'pointerlockerror', () => {
         pointerLockPending = false;
         updatePointerLookHint();
       });
-      document.addEventListener('click', () => {
+      cleanup.listen(document, 'click', () => {
         if (pointerLookWasBlocked && !pointerLookBlocked()) requestPointerLook();
         pointerLookWasBlocked = pointerLookBlocked();
         updatePointerLookHint();
       });
-      canvas.addEventListener(
+      cleanup.listen(
+        canvas,
         'mousedown',
         (event) => {
           if (event.button !== 0 || hint.hidden) return;
@@ -134,7 +139,8 @@ export function createPointerSystem(): GameSystem {
         },
         true,
       );
-      canvas.addEventListener(
+      cleanup.listen(
+        canvas,
         'click',
         (event) => {
           if (swallowPointerLookClick) {
@@ -173,7 +179,7 @@ export function createPointerSystem(): GameSystem {
       });
       ctrlTip.append(fullscreenTip, dismissTip);
       document.body.append(ctrlTip);
-      window.addEventListener('keydown', (e) => {
+      cleanup.listen(window, 'keydown', (e) => {
         const target = e.target as HTMLElement | null;
         if (
           ctrlTipShown ||

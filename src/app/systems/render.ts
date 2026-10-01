@@ -9,6 +9,9 @@ import type { PostFrame } from '../../shaders/underwater.js';
 import { UnderwaterPass } from '../../shaders/underwater.js';
 import { uiScaleFactors } from '../../ui/HUD.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 const smooth = (a: number, b: number, x: number): number => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -24,6 +27,7 @@ let baseExposure = 1.25;
 
 export const renderSystem: GameSystem = {
   name: 'render',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { renderer, rig, save } = ctx;
     const post = new UnderwaterPass(window.innerWidth, window.innerHeight, {
@@ -44,7 +48,7 @@ export const renderSystem: GameSystem = {
       document.documentElement.style.setProperty('--ui-user-scale', String(scale.user));
     };
     ctx.resize = resize;
-    window.addEventListener('resize', resize);
+    cleanup.listen(window, 'resize', resize);
     resize();
   },
   frame: {
@@ -52,6 +56,8 @@ export const renderSystem: GameSystem = {
       const { renderer, scene, rig, post, atmoTier, renderStats, config } = ctx;
       // C5: post-processing can be switched off in Settings.
       if (atmoTier.post && ctx.postFx) {
+        // The composite applies the band gain itself: undo any direct-path exposure.
+        renderer.toneMappingExposure = baseExposure;
         renderer.setRenderTarget(post.target);
         renderer.clear();
         renderer.render(scene, rig.camera);

@@ -100,6 +100,8 @@ void main() {
   if (r > 1.0) discard;
   float soft = exp(-r * 3.0) * (1.0 - r);
   gl_FragColor = vec4(mix(vColor, fogColor, vFog), vAlpha * soft * (1.0 - 0.6 * vFog));
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
 }
 `;
 

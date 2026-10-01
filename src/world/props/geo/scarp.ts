@@ -163,6 +163,22 @@ function resample(pts: [number, number][], n: number): [number, number][] {
 }
 
 /**
+ * How the wall ends pinch: `edge` (0 mid-wall, 1 at the ends) and the ragged
+ * `skyline` multiplier on positive heights. Shared by the mesh and colliders.
+ */
+export function wallEnvelope(
+  x: number,
+  width: number,
+  edgeStart: number,
+): { edge: number; skyline: number } {
+  const edge = smooth(edgeStart, 1, Math.abs(x) / (width / 2));
+  // A ragged skyline: the crest varies along the wall and slopes away at both ends.
+  const skyline =
+    edgeStart < 0.6 ? 0.8 + 0.4 * fbm3(x * 0.045, 1, width, Math.round(width * 31), 3) : 1;
+  return { edge, skyline };
+}
+
+/**
  * Extrude a (y, z) profile along x. `disp(x, y, z0)` returns extra z offset in
  * metres. The ends pinch down so the wall does not stop abruptly. Returns an
  * indexed, smooth-shaded geometry.
@@ -182,10 +198,7 @@ export function extrudeProfile(
   const idx: number[] = [];
   for (let i = 0; i <= nx; i++) {
     const x = (i / nx - 0.5) * width;
-    const edge = smooth(edgeStart, 1, Math.abs(x) / (width / 2));
-    // A ragged skyline: the crest varies along the wall and slopes away at both ends.
-    const skyline =
-      edgeStart < 0.6 ? 0.8 + 0.4 * fbm3(x * 0.045, 1, width, Math.round(width * 31), 3) : 1;
+    const { edge, skyline } = wallEnvelope(x, width, edgeStart);
     for (let j = 0; j <= ny; j++) {
       const [y0, z0] = pts[j]!;
       const y = y0 > 0 ? y0 * (1 - 0.85 * edge * edge) * skyline : y0;
@@ -314,7 +327,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   }
 
   const bounds = wall.boundingBox!.clone();
-  const colliders = wallColliders(profile, W, D, H, 9, gnd);
+  const colliders = wallColliders(profile, W, D, H, 9, gnd, { disp, edgeStart: 0.4 });
   return {
     full,
     impostor: impostorFromBoxes(colliders, bounds, P.base.getHex()),
@@ -338,49 +351,100 @@ export function wallLift(
   };
 }
 
-/** `profileColliders` in three x segments, each lifted to the ground under it. */
-export function wallColliders(
-  profile: [number, number][],
-  W: number,
-  D: number,
-  H: number,
-  slices: number,
-  gnd: (x: number, z: number) => number,
-): THREE.Box3[] {
-  const out: THREE.Box3[] = [];
-  const seg = 3;
-  for (let k = 0; k < seg; k++) {
-    const xc = ((k + 0.5) / seg - 0.5) * W;
-    for (const b of profileColliders(profile, W / seg, D, H, slices)) {
-      const dy = gnd(xc, 0);
-      b.translate(new THREE.Vector3(xc, dy, 0));
-      out.push(b);
+/** Deformation of the rendered wall that its colliders must follow. */
+export interface WallShape {
+  /** Extra z offset at (x, profile y, profile z); the same callback given to `extrudeProfile`. */
+  disp: (x: number, y: number, z: number) => number;
+  /** Pinch start passed to `extrudeProfile` (default 0.4). */
+  edgeStart?: number;
+}
+
+/** All z values where the closed profile polyline crosses height `y` (front and back faces). */
+function crossings(profile: [number, number][], y: number): number[] {
+  const out: number[] = [];
+  for (let i = 1; i < profile.length; i++) {
+    const [y0, z0] = profile[i - 1]!;
+    const [y1, z1] = profile[i]!;
+    if ((y >= y0 && y <= y1) || (y <= y0 && y >= y1)) {
+      out.push(z0 + (z1 - z0) * ((y - y0) / (y1 - y0 || 1)));
     }
   }
   return out;
 }
 
-/** One box per height slice at the slice's most protruding profile point (a stepped wall collider). */
-export function profileColliders(
+/**
+ * Stepped wall colliders built from the same deformed profile as the mesh.
+ * The wall is cut into overlapping x segments (no gaps between boxes); each
+ * segment's slice heights are scaled by the lowest end-pinch / skyline height
+ * inside it, so a box never stands over empty water above a tapered end.
+ * Front and back extents average the displaced profile across the segment and
+ * each slice is lifted by the terrain under it. The traversable undercut of an
+ * overhanging ledge stays open: a slice only spans the profile's own extent.
+ */
+export function wallColliders(
   profile: [number, number][],
   W: number,
-  D: number,
+  _D: number,
   H: number,
   slices: number,
+  gnd: (x: number, z: number) => number,
+  shape?: WallShape,
 ): THREE.Box3[] {
   const out: THREE.Box3[] = [];
-  const thick = Math.max(2, D * 0.35);
-  for (let s = 0; s < slices; s++) {
-    const y0 = -0.1 * H + (s / slices) * 1.1 * H;
-    const y1 = -0.1 * H + ((s + 1) / slices) * 1.1 * H;
-    let zMin = 0.4 * D;
-    for (const [py, pz] of profile) if (py >= y0 && py <= y1) zMin = Math.min(zMin, pz);
-    // Include the profile at each slice edge so a slope does not leave gaps.
-    zMin = Math.min(zMin, interp(profile, y0), interp(profile, y1));
-    const zBack = Math.max(zMin + 1, 0.2 * D) + thick * 0.5;
-    out.push(
-      boxCH(0, (y0 + y1) / 2, (zMin + zBack) / 2, W * 0.4, (y1 - y0) / 2, (zBack - zMin) / 2),
-    );
+  const edgeStart = shape?.edgeStart ?? 0.4;
+  const seg = Math.min(14, Math.max(3, Math.ceil(W / 6)));
+  const lift = wallLift(gnd, H);
+  const segW = W / seg;
+  const SAMPLES = 5;
+  for (let k = 0; k < seg; k++) {
+    const x0 = (k / seg - 0.5) * W;
+    const xc = x0 + segW / 2;
+    const xs: number[] = [];
+    let hScale = Infinity;
+    for (let n = 0; n < SAMPLES; n++) {
+      const x = x0 + (n / (SAMPLES - 1)) * segW;
+      xs.push(x);
+      const { edge, skyline } = wallEnvelope(x, W, edgeStart);
+      hScale = Math.min(hScale, (1 - 0.85 * edge * edge) * skyline);
+    }
+    // Overlap neighbours slightly so sample gaps never open; the outer ends stay flush.
+    const half = segW / 2 + (k > 0 && k < seg - 1 ? segW * 0.08 : 0);
+    const left = k === 0 ? segW / 2 : half;
+    const right = k === seg - 1 ? segW / 2 : half;
+    const hx = (left + right) / 2;
+    const cx = xc + (right - left) / 2;
+    const up = (y: number): number => (y > 0 ? y * hScale : y);
+    for (let s = 0; s < slices; s++) {
+      const y0 = -0.1 * H + (s / slices) * 1.1 * H;
+      const y1 = -0.1 * H + ((s + 1) / slices) * 1.1 * H;
+      const zs = [...crossings(profile, y0), ...crossings(profile, y1)];
+      for (const [py, pz] of profile) if (py >= y0 && py <= y1) zs.push(pz);
+      let front = 0;
+      let back = 0;
+      for (const x of xs) {
+        const { edge } = wallEnvelope(x, W, edgeStart);
+        let lo = Infinity;
+        let hi = -Infinity;
+        for (const z0 of zs) {
+          const z =
+            (z0 + (shape ? shape.disp(x, (y0 + y1) / 2, z0) : 0) * (1 - edge * 0.6)) *
+            (1 - edge * 0.55);
+          lo = Math.min(lo, z);
+          hi = Math.max(hi, z);
+        }
+        front += lo / xs.length;
+        back += hi / xs.length;
+      }
+      const zBack = Math.max(back, front + 1);
+      const ya = up(y0);
+      const yb = up(y1);
+      if (yb - ya < 0.05) continue;
+      let dy = 0;
+      for (const x of xs) dy += lift(x, (y0 + y1) / 2, (front + zBack) / 2) / xs.length;
+      out.push(
+        boxCH(cx, (ya + yb) / 2 + dy, (front + zBack) / 2, hx, (yb - ya) / 2, (zBack - front) / 2),
+      );
+    }
   }
   return out;
 }
