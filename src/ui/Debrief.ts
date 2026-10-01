@@ -6,6 +6,7 @@
  * `?debrief=1` opens the free-dive variant for screenshots.
  */
 
+import type { DiveRating } from '../game/Progress.js';
 import type { DebriefStats } from '../game/Objectives.js';
 import { FocusTrap } from './FocusTrap.js';
 
@@ -76,7 +77,7 @@ export class Debrief {
   }
 
   /** @param actions the buttons, in order; default Dive again + Journal. */
-  show(stats: DebriefStats, actions?: DebriefAction[]): void {
+  show(stats: DebriefStats, actions?: DebriefAction[], rating?: DiveRating): void {
     this.last = stats;
     const p = this.panel;
     p.replaceChildren();
@@ -92,6 +93,30 @@ export class Debrief {
     head.append(el('h1', 'debrief-title', stats.title ?? 'Dive debrief'));
     if (stats.subtitle) head.append(el('p', 'debrief-subtitle', stats.subtitle));
     p.append(head);
+    if (rating) {
+      const row = el('div', 'debrief-rating');
+      const stars = el(
+        'span',
+        'debrief-stars',
+        '★'.repeat(rating.stars) + '☆'.repeat(3 - rating.stars),
+      );
+      stars.setAttribute('aria-label', `${rating.stars} of 3 stars`);
+      row.append(stars, el('span', undefined, `${rating.points} RP earned this dive`));
+      row.append(
+        el(
+          'small',
+          undefined,
+          rating.stars === 3
+            ? 'Every objective + photo or species goal'
+            : rating.stars === 2
+              ? 'Every objective · add a photo or species scan for 3 stars'
+              : rating.stars === 1
+                ? 'Primaries complete · finish secondaries for 2 stars'
+                : 'Finish the primary objectives to earn a star',
+        ),
+      );
+      p.append(row);
+    }
 
     const grid = el('div', 'debrief-stats');
     const stat = (label: string, value: string, field: string): void => {

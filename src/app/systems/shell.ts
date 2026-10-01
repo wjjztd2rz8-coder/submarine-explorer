@@ -262,6 +262,7 @@ export const shellKeysSystem: GameSystem = {
       if (
         e.code !== 'Escape' ||
         e.repeat ||
+        ctx.upgrades?.isOpen ||
         ctx.settingsScreen.isOpen ||
         ctx.globe.isOpen ||
         discovery.guide.isOpen ||

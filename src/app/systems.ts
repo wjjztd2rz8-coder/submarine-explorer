@@ -9,6 +9,7 @@
  * earlier only when another system reads its `ctx` field during `init`.
  */
 
+import { createProgressSystem } from './systems/progress.js';
 import { inputGateSystem } from './loop.js';
 import type { GameSystem } from './System.js';
 import { atmosphereSystem } from './systems/atmosphere.js';
@@ -40,6 +41,8 @@ import { landmarksSystem, terrainSystem } from './systems/world.js';
 /** A fresh list (systems with per-dive state are built by factories). */
 export function createSystems(): GameSystem[] {
   return [
+    // Research config must be applied before vehicles, power and sensors read it.
+    createProgressSystem(),
     // World and vehicle, in scene-build order.
     terrainSystem,
     atmosphereSystem,

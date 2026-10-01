@@ -5,7 +5,7 @@
  */
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
-import { devices, expect, test, type CDPSession, type Page } from '@playwright/test';
+import { devices, expect, test, type CDPSession, type Page } from './helpers/unlocked.js';
 
 const shots = '.cache/codex/shots/f1-touch';
 const diveUrl = '/?tile=titanic&landmark=_test&poi=test-bow&skipBriefing=1&touch=1';

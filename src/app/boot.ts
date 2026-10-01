@@ -5,6 +5,7 @@
  * result is the `BootContext` every system builds on.
  */
 
+import { loadSavedProgress } from './systems/progress.js';
 import * as THREE from 'three';
 import { assets } from '../core/assets/index.js';
 import { makeConfig } from '../core/Config.js';
@@ -66,7 +67,11 @@ export async function boot(): Promise<BootContext | null> {
   const loader = new TileLoader();
   // B3: `?mission=<id>` (docs/missions.md) names the tile and the content
   // folder; without it (or if its mission.json is missing) this is the free dive.
-  const [index, route] = await Promise.all([loader.loadIndex(), resolveMissionRoute(params)]);
+  const [index, route, progress] = await Promise.all([
+    loader.loadIndex(),
+    resolveMissionRoute(params),
+    loadSavedProgress(),
+  ]);
   const requested = route?.tileId ?? params.get('tile');
   const tileId = chooseTileId(requested, index, config.defaultTileId);
   // C5: saved settings (docs/settings.md). The saved graphics tier applies
@@ -136,6 +141,7 @@ export async function boot(): Promise<BootContext | null> {
     route,
     tileId,
     save,
+    progress,
     settings,
     baseHintRangeFactor,
     tier,

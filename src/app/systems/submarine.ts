@@ -42,6 +42,14 @@ export function createSubmarineSystem(): GameSystem {
         const pose = applyMissionLoadout(sub, route.def, config, meta, terrain);
         sub.reset(pose.x, pose.y, pose.z, pose.yaw);
       }
+      // F2: free dives may visit any survey, but only unlocked pressure hulls are fitted.
+      const targetDepth = route?.def.briefing.depth_m ?? Math.abs(meta.min_m);
+      sub.setHullClass(ctx.progress.hullFor(targetDepth));
+      if (!route && ctx.freeDiveHull) {
+        ctx.freeDiveHull.classId = sub.getState().hullClass;
+        ctx.freeDiveHull.hull = config.submarine.hullClasses[sub.getState().hullClass];
+        ctx.freeDiveHull.cleared &&= ctx.progress.canDive(Math.abs(meta.min_m));
+      }
       // D-START: keep URL probes deterministic even when a mission uses a
       // near-site default.
       if (route && spawnDepth !== null && !params.has('at') && !params.has('poi')) {

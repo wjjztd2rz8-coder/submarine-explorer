@@ -320,3 +320,75 @@ export class Save {
     }
   }
 }
+
+/** Research is separate from settings and discoveries, so their resets and migrations stay independent. */
+export const PROGRESS_STORAGE_KEY = 'subexplorer.progress.v1';
+export const PROGRESS_VERSION = 1;
+export interface ProgressRecord {
+  version: 1;
+  legacyCredited: boolean;
+  points: number;
+  lifetime: number;
+  awarded: string[];
+  upgrades: Record<string, number>;
+  ratings: Record<string, number>;
+}
+export function migrateProgress(raw: unknown): ProgressRecord {
+  const out: ProgressRecord = {
+    version: 1,
+    legacyCredited: false,
+    points: 0,
+    lifetime: 0,
+    awarded: [],
+    upgrades: {},
+    ratings: {},
+  };
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
+  const o = raw as Record<string, unknown>;
+  if (o.version !== undefined && o.version !== 0 && o.version !== 1) return out;
+  const integer = (v: unknown): number =>
+    typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0;
+  out.legacyCredited = o.legacyCredited === true;
+  out.points = integer(o.points ?? o.rp);
+  out.lifetime = Math.max(out.points, integer(o.lifetime ?? o.rp));
+  if (Array.isArray(o.awarded))
+    out.awarded = [
+      ...new Set(o.awarded.filter((k): k is string => typeof k === 'string' && k.length <= 300)),
+    ];
+  for (const field of ['upgrades', 'ratings'] as const) {
+    const map = o[field];
+    if (map && typeof map === 'object' && !Array.isArray(map))
+      for (const [key, value] of Object.entries(map))
+        if (/^[a-z0-9-]+$/.test(key)) out[field][key] = Math.min(3, integer(value));
+  }
+  return out;
+}
+export class ProgressSave {
+  readonly readOnly: boolean;
+  readonly storage: SettingsStorage | null;
+  private data: ProgressRecord;
+  constructor(storage: SettingsStorage | null = safeStorage()) {
+    this.storage = storage;
+    let raw: unknown = null;
+    try {
+      raw = JSON.parse(storage?.getItem(PROGRESS_STORAGE_KEY) ?? 'null');
+    } catch {
+      /* Session only. */
+    }
+    const version = (raw as { version?: unknown } | null)?.version;
+    this.readOnly = typeof version === 'number' && version > PROGRESS_VERSION;
+    this.data = migrateProgress(raw);
+  }
+  get(): ProgressRecord {
+    return structuredClone(this.data);
+  }
+  save(data: ProgressRecord): void {
+    this.data = migrateProgress(data);
+    if (this.readOnly) return;
+    try {
+      this.storage?.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(this.data));
+    } catch {
+      /* Session only. */
+    }
+  }
+}

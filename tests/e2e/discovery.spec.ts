@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './helpers/unlocked.js';
 
 /**
  * B1 discovery loop, end to end, against the `_test` fixture landmark on the

@@ -561,3 +561,32 @@ streaming (Tier 4), and a hard draw-call cap.
 `settings`, `captions`, `input`.
 `window.__gameReady` flips to `true` after the first presented frame;
 `window.__gameError` holds a fatal startup message.
+
+### Phase F research integration
+
+`app/boot.ts` waits for `loadSavedProgress()` alongside the tile index and mission
+route. Old discovery/photo records are credited before hull checks, without changing
+those records. `app/systems/progress.ts` runs first to apply saved upgrades before
+vehicles, lights, sensors and power read their config. Its workshop mounts in `start()`
+and freezes the simulation at `gate.photo`. Tuning lives in `core/config/progress.ts`.
+
+The new `subexplorer.progress.v1` save contains `version`, spendable `points`,
+`lifetime` earnings, a `legacyCredited` migration marker, reward-token `awarded` keys, upgrade levels and best site
+`ratings`. `Save.ts` sanitizes older/malformed records and protects future versions.
+Discovery saves keep the existing `subexplorer.discoveries.v1` schema and key.
+
+`ctx.progress` and `window.__game.progress` expose `award(kind, id): number`.
+Kinds are `poi`, `objective`, `species`, `photo`, `primary`, and `rating`. Use stable
+subject IDs; POIs/photos use `site/subject`, objectives use `mission/objective`,
+and species can use a global species ID. Repeated IDs earn zero. A species scan or
+subject photo also satisfies the current dive's bonus goal on repeat visits.
+F2-LIFE can call `progress.award('species', speciesId)` on a completed animal scan
+and `progress.award('photo', subjectId)` on a successfully captured animal photo.
+Migration uses `credit()` so old subjects do not count as new dive activity, and runs
+once so later discoveries across separate dives cannot generate retroactive ratings.
+
+`MissionSelect.setProgress()` adds hull requirements, free-dive ratings and best
+stars. `Globe.setMissionAccess()` keeps locked pins focusable to read their requirement
+and prevents a mission launch. The normal e2e feature specs use
+`tests/e2e/helpers/unlocked.ts` for an experienced pilot; `f2-progress.spec.ts` uses a
+fresh pilot and writes workshop, mission-select and debrief screenshots.

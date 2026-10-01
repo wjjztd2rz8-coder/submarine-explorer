@@ -1,0 +1,95 @@
+/** Research tuning: lifetime points unlock hulls independently of upgrade spending. */
+export const PROGRESS_CONFIG = {
+  rewards: { poi: 10, objective: 5, species: 15, photo: 10, primary: 30, rating: 20 },
+  hulls: [
+    { id: 'A', depthM: 1000, threshold: 0 },
+    { id: 'B', depthM: 6500, threshold: 300 },
+    { id: 'C', depthM: 11000, threshold: 900 },
+  ],
+  boostSeconds: 8,
+  boostRecoveryPerSecond: 0.5,
+} as const;
+
+export const UPGRADES = [
+  {
+    id: 'light-range',
+    track: 'Lights',
+    name: 'Long-range lamps',
+    effect: '+10% light range',
+    step: 0.1,
+    costs: [35, 65, 100],
+  },
+  {
+    id: 'light-beam',
+    track: 'Lights',
+    name: 'Wide beam',
+    effect: '+4° beam width',
+    step: 4,
+    costs: [40, 75],
+  },
+  {
+    id: 'sonar-range',
+    track: 'Sonar',
+    name: 'Extended sonar',
+    effect: '+15% contact range',
+    step: 0.15,
+    costs: [35, 65, 100],
+  },
+  {
+    id: 'sonar-detail',
+    track: 'Sonar',
+    name: 'Fine scan detail',
+    effect: '+10% scan capture range',
+    step: 0.1,
+    costs: [40, 75],
+  },
+  {
+    id: 'battery',
+    track: 'Power',
+    name: 'Battery banks',
+    effect: '+12% battery endurance in Realistic',
+    step: 0.12,
+    costs: [40, 75, 110],
+  },
+  {
+    id: 'oxygen',
+    track: 'Power',
+    name: 'Oxygen reserves',
+    effect: '+12% oxygen endurance in Realistic',
+    step: 0.12,
+    costs: [40, 75],
+  },
+  {
+    id: 'boost',
+    track: 'Power',
+    name: 'Boost reserves',
+    effect: '+20% boost duration',
+    step: 0.2,
+    costs: [35, 65, 100],
+  },
+  {
+    id: 'thrust',
+    track: 'Propulsion',
+    name: 'Efficient thrusters',
+    effect: '+8% cruise speed',
+    step: 0.08,
+    costs: [45, 80, 120],
+  },
+  {
+    id: 'turn',
+    track: 'Propulsion',
+    name: 'Turning thrusters',
+    effect: '+8% turn rate',
+    step: 0.08,
+    costs: [35, 65],
+  },
+  {
+    id: 'reverse',
+    track: 'Propulsion',
+    name: 'Reverse thrust',
+    effect: '+10% reverse thrust',
+    step: 0.1,
+    costs: [35, 65],
+  },
+] as const;
+export type UpgradeId = (typeof UPGRADES)[number]['id'];

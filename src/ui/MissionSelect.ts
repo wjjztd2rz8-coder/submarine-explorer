@@ -18,6 +18,7 @@
  * mission select ({@link MissionSelect.setGlobeHandler}).
  */
 
+import { requiredHull, type Progress } from '../game/Progress.js';
 import type { MissionSummary } from '../game/Mission.js';
 import { contentUrl, fetchContentJson } from '../game/ContentPath.js';
 import type { TileIndexEntry } from '../util/types.js';
@@ -74,6 +75,20 @@ export class MissionSelect {
   private readonly globeBtn: HTMLButtonElement;
   private missions: MissionSummary[] = [];
   private pending: PendingMission[] = [];
+  private progress: Progress | null = null;
+  setProgress(progress: Progress): void {
+    this.progress = progress;
+    for (const button of this.root.querySelectorAll<HTMLButtonElement>('[data-tile]')) {
+      let limit = button.querySelector<HTMLElement>('.mission-hull-limit');
+      if (!limit) {
+        limit = document.createElement('span');
+        limit.className = 'mission-hull-limit mission-item-meta';
+        button.append(limit);
+      }
+      limit.textContent = `Free dive · hull rated to ${progress.hull.depthM.toLocaleString('en-US')} m`;
+    }
+    this.renderMissions();
+  }
 
   constructor(
     tiles: TileIndexEntry[],
@@ -125,6 +140,7 @@ export class MissionSelect {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'mission-item';
+      btn.dataset.tile = tile.id;
       if (tile.id === currentTileId && !options.currentMissionId) btn.classList.add('is-current');
 
       const depth =
@@ -223,6 +239,12 @@ export class MissionSelect {
       btn.className = 'mission-item is-mission';
       btn.dataset.mission = m.id;
       const available = this.tileIds.has(m.tile);
+      const locked =
+        this.progress !== null && m.depthM !== null && !this.progress.canDive(m.depthM);
+      if (locked) {
+        btn.classList.add('is-locked');
+        btn.disabled = true;
+      }
       if (!available) btn.classList.add('is-unavailable');
       if (m.id === this.options.currentMissionId) btn.classList.add('is-current');
 
@@ -251,6 +273,21 @@ export class MissionSelect {
       summary.className = 'mission-item-summary';
       summary.textContent = m.summary;
       btn.append(row, meta, summary);
+      if (this.progress) {
+        const stars = document.createElement('span');
+        stars.className = 'mission-stars';
+        const best = this.progress.rating(m.id);
+        stars.textContent = '★'.repeat(best) + '☆'.repeat(3 - best);
+        stars.setAttribute('aria-label', `Best dive: ${best} of 3 stars`);
+        btn.append(stars);
+        if (locked) {
+          const hull = requiredHull(m.depthM!);
+          const lock = document.createElement('span');
+          lock.className = 'mission-lock';
+          lock.textContent = `🔒 Class ${hull.id} · ${hull.threshold} lifetime RP required (${this.progress.lifetime} earned)`;
+          btn.append(lock);
+        }
+      }
       if (this.options.presentation === 'shell') {
         const progress = document.createElement('span');
         progress.className = 'mission-item-progress';
@@ -260,9 +297,11 @@ export class MissionSelect {
           if (!btn.isConnected || typeof raw !== 'object' || raw === null) return;
           const doc = raw as { hull_class?: unknown; objectives?: unknown };
           const hull =
-            typeof doc.hull_class === 'string'
-              ? `Class ${doc.hull_class} hull`
-              : 'Hull class unknown';
+            this.progress && m.depthM !== null
+              ? `Class ${requiredHull(m.depthM).id} hull`
+              : typeof doc.hull_class === 'string'
+                ? `Class ${doc.hull_class} hull`
+                : 'Hull class unknown';
           meta.textContent = [
             m.depthM !== null ? `${Math.round(m.depthM).toLocaleString('en-US')} m` : '',
             hull,

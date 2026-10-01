@@ -1,6 +1,6 @@
 // @ts-expect-error Node types are intentionally absent from this browser-focused tsconfig.
 import { mkdir } from 'node:fs/promises';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './helpers/unlocked.js';
 
 const shots = '.cache/codex/shots/d-modes';
 

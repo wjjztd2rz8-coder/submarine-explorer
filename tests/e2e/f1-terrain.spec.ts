@@ -1,6 +1,6 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './helpers/unlocked.js';
 
 /**
  * F1-TERRAIN: the seabed at 5-15 m altitude on each biome, per tier. Frames land
