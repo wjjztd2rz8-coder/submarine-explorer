@@ -14,6 +14,16 @@ without an entry here is not done.
 
 ### Added
 
+- Phase F, F1-TOUCH: **full touch play and a PWA install** (`src/ui/TouchControls.ts`,
+  `src/core/Touch.ts`, `src/styles/touch.css`, `public/sw.js`). A left stick
+  (thrust and turn), a right rise/sink slider, Scan (hold), Boost (hold), Lights,
+  Sonar, Photo and Pause buttons, drag to look, pinch to zoom (the map while the
+  sonar is expanded) and double-tap to reset the camera. They show while touch is
+  the primary input and follow the last input used. Menus get 44 px targets on
+  coarse pointers and mouse-only settings hide. A web manifest, icons and a
+  service worker (network-first shell, cache-first tiles and assets, versioned per
+  build, production and non-automated pages only) make it installable and
+  playable offline for visited sites.
 - Phase F, F1-OCEAN: **the water column, lit like a documentary** (`src/render/`,
   `src/shaders/underwater.ts`, `src/world/Water.ts`). The post stack now has a
   depth-aware composite: bloom (one quarter-resolution level on medium, plus an
@@ -30,6 +40,14 @@ without an entry here is not done.
   particle-laden water. Marine snow has a size spread, soft sprites and flares
   inside the lamps. Low tier keeps a plain low-segment beam, a light snow field,
   the Snell lid, and the band exposure, with no post pass.
+- Phase F, F1-TERRAIN: **PBR triplanar seabed** (`TerrainMaterial.ts`,
+  `shaders/terrain.*.glsl`, five CC0 sets in `public/assets/terrain/`). Per-site
+  biome palettes (`TerrainBiome.ts`, from docs/research/sites.md) pick the soft,
+  patch and hard-substrate sets; slope/cavity blending, near-field detail
+  normals, current ripples, bioturbation and cavity darkening. Tier-scaled
+  instanced scatter (`src/world/scatter/`: boulders, dropstones, pillow lava,
+  coral rubble, sponges, sea pens, whips, mounds) streamed around the camera.
+  Low tier: fewer texture layers, no near-field detail, reduced scatter range.
 - Phase F, F1-GEO: **geology and biology set pieces** (`src/world/props/geo/`,
   new prop kind `procedural:geo` and props.json `feature`). A black-smoker mound
   (Axial ASHES; Beebe, with shrimp swarms) with tubeworm clumps, bacterial mats
@@ -88,6 +106,9 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F1-TERRAIN: the old depth-ramp vertex-colour seabed and its
+  height/slope colour ramp are replaced by the biome material (config
+  `colorForDepth`/ramp inputs removed from the material); reason: PBR realism.
 - F1-OCEAN: the **caustic projector** now uses a two-layer animated Voronoi web.
   The old interference formula was missing its domain offset and rendered an
   almost flat texture, so shallow caustics were effectively invisible. The

@@ -5,13 +5,17 @@
 // prepended to the shader source (declarations); everything after it is
 // inserted immediately after `#include <begin_vertex>`.
 //
-// We only need the world position and world normal in the fragment shader: the
-// terrain material is triplanar, so it projects textures from world space and
-// has no use for UVs at all (which is why the mesh carries no uv attribute).
+// The fragment shader needs the world position and world normal (the material
+// is triplanar, so it projects textures from world space and the mesh carries no
+// uv attribute) and `aCavity`, a per-vertex concavity value baked by
+// TerrainChunk (0.5 flat, > 0.5 hollow, < 0.5 crest).
 
+attribute float aCavity;
 varying vec3 vTerrainWorldPos;
 varying vec3 vTerrainWorldNormal;
+varying float vCavity;
 
 // @body
 vTerrainWorldPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
 vTerrainWorldNormal = normalize(mat3(modelMatrix) * objectNormal);
+vCavity = aCavity;

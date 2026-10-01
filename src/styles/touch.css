@@ -1,0 +1,332 @@
+/* F1-TOUCH: on-screen controls (ui/TouchControls.ts) and touch-friendly menus.
+   Sizes scale with --ui-scale (auto scale x the Settings UI scale). */
+
+.tc-root {
+  --tc-s: calc(var(--ui-scale, 1) * 1px);
+  --tc-edge: calc(20 * var(--tc-s));
+  --tc-fg: rgba(214, 240, 242, 0.88);
+  --tc-bg: rgba(6, 22, 28, 0.34);
+  --tc-line: rgba(190, 236, 240, 0.4);
+  --tc-hot: rgba(46, 217, 217, 0.5);
+  position: fixed;
+  inset: 0;
+  z-index: 21;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  font:
+    600 calc(11 * var(--tc-s)) / 1 system-ui,
+    sans-serif;
+  letter-spacing: 0.06em;
+  color: var(--tc-fg);
+}
+.tc-root[hidden] {
+  display: none;
+}
+
+/* Left stick. */
+.tc-stick {
+  position: absolute;
+  left: calc(env(safe-area-inset-left, 0px) + var(--tc-edge));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--tc-edge));
+  width: max(112px, calc(136 * var(--tc-s)));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--tc-bg);
+  border: 2px solid var(--tc-line);
+  pointer-events: auto;
+  touch-action: none;
+}
+.tc-stick::before,
+.tc-stick::after {
+  content: '';
+  position: absolute;
+  background: var(--tc-line);
+  opacity: 0.5;
+}
+.tc-stick::before {
+  left: 50%;
+  top: 18%;
+  bottom: 18%;
+  width: 1px;
+}
+.tc-stick::after {
+  top: 50%;
+  left: 18%;
+  right: 18%;
+  height: 1px;
+}
+.tc-stick-knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46%;
+  aspect-ratio: 1;
+  margin: -23% 0 0 -23%;
+  border-radius: 50%;
+  background: rgba(214, 240, 242, 0.32);
+  border: 2px solid var(--tc-line);
+}
+.tc-stick.is-held,
+.tc-slider.is-held {
+  border-color: var(--tc-hot);
+}
+
+/* Right ballast slider. */
+.tc-slider {
+  position: absolute;
+  right: calc(env(safe-area-inset-right, 0px) + var(--tc-edge));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--tc-edge));
+  width: max(56px, calc(64 * var(--tc-s)));
+  height: min(38vh, max(150px, calc(176 * var(--tc-s))));
+  border-radius: 999px;
+  background: var(--tc-bg);
+  border: 2px solid var(--tc-line);
+  pointer-events: auto;
+  touch-action: none;
+}
+.tc-slider::before {
+  content: '';
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  top: 50%;
+  height: 1px;
+  background: var(--tc-line);
+}
+.tc-slider-thumb {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 50%;
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: rgba(214, 240, 242, 0.32);
+  border: 2px solid var(--tc-line);
+}
+.tc-slider-tag {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: calc(9 * var(--tc-s));
+  opacity: 0.6;
+}
+.tc-slider-up {
+  top: 9%;
+}
+.tc-slider-down {
+  bottom: 9%;
+}
+
+/* Buttons: a 2 x 3 grid left of the slider. */
+.tc-buttons {
+  position: absolute;
+  right: calc(
+    env(safe-area-inset-right, 0px) + var(--tc-edge) + max(56px, calc(64 * var(--tc-s))) +
+      calc(14 * var(--tc-s))
+  );
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--tc-edge));
+  display: grid;
+  grid-template-columns: repeat(3, max(52px, calc(58 * var(--tc-s))));
+  grid-auto-rows: max(52px, calc(58 * var(--tc-s)));
+  gap: calc(10 * var(--tc-s));
+}
+.tc-btn {
+  pointer-events: auto;
+  touch-action: none;
+  border-radius: 50%;
+  border: 2px solid var(--tc-line);
+  background: var(--tc-bg);
+  color: var(--tc-fg);
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  min-width: 48px;
+  min-height: 48px;
+}
+.tc-btn.is-held {
+  background: var(--tc-hot);
+  border-color: rgba(214, 246, 248, 0.9);
+}
+.tc-btn-lights {
+  grid-column: 3;
+  grid-row: 1;
+}
+.tc-btn-sonar {
+  grid-column: 2;
+  grid-row: 1;
+}
+.tc-btn-photo {
+  grid-column: 1;
+  grid-row: 1;
+}
+.tc-btn-boost {
+  grid-column: 1;
+  grid-row: 3;
+}
+.tc-btn-scan {
+  grid-column: 2 / span 2;
+  grid-row: 2 / span 2;
+  font-size: calc(14 * var(--tc-s));
+}
+
+.tc-btn-pause {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + calc(8 * var(--tc-s)));
+  left: 34%;
+  width: max(48px, calc(50 * var(--tc-s)));
+  height: max(48px, calc(50 * var(--tc-s)));
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+}
+.tc-pause-bar {
+  width: 4px;
+  height: 40%;
+  background: var(--tc-fg);
+  border-radius: 2px;
+}
+
+.tc-rotate-hint {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translateX(-50%);
+  max-width: 78vw;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(6, 19, 24, 0.75);
+  border: 1px solid var(--tc-line);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-align: center;
+  pointer-events: auto;
+}
+.tc-rotate-hint[hidden] {
+  display: none;
+}
+
+/* Expanded sonar fills the middle: keep only the buttons. */
+.tc-root.tc-sonar-open .tc-stick,
+.tc-root.tc-sonar-open .tc-slider {
+  display: none;
+}
+
+/* Portrait: the play area is high up, so controls can sit lower and tighter. */
+@media (orientation: portrait) {
+  .tc-root {
+    --tc-edge: calc(14 * var(--tc-s));
+  }
+  .tc-stick {
+    width: max(104px, calc(118 * var(--tc-s)));
+  }
+  .tc-slider {
+    height: min(26vh, max(140px, calc(160 * var(--tc-s))));
+  }
+  .tc-buttons {
+    grid-template-columns: repeat(3, max(48px, calc(52 * var(--tc-s))));
+    grid-auto-rows: max(48px, calc(52 * var(--tc-s)));
+    gap: calc(8 * var(--tc-s));
+  }
+}
+
+/* Short landscape phones. */
+@media (orientation: landscape) and (max-height: 460px) {
+  .tc-stick {
+    width: max(104px, calc(118 * var(--tc-s)));
+  }
+  .tc-slider {
+    height: min(50vh, max(140px, calc(164 * var(--tc-s))));
+  }
+}
+
+/* ---- Touch-friendly menus (coarse pointers): 44 px targets, no hover-only UI ---- */
+@media (pointer: coarse) {
+  button,
+  select,
+  summary,
+  input[type='checkbox'],
+  input[type='range'],
+  [role='button'],
+  [role='tab'],
+  .mission-item,
+  .jr-nav-item,
+  .jr-site-card {
+    min-height: 44px;
+  }
+  button,
+  [role='button'],
+  summary {
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+  input[type='checkbox'] {
+    min-width: 24px;
+    min-height: 24px;
+  }
+  .settings label,
+  .settings-row {
+    min-height: 44px;
+  }
+  .globe-pin {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  /* Scrollable panels scroll by finger. */
+  .home-sites,
+  .pause-detail,
+  .settings-body,
+  .journal,
+  .jr-body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Mouse-only settings are hidden on touch devices. */
+html.is-touch .settings-pointer-lock,
+html.is-touch .d3-pointer-look-hint,
+html.is-touch .hud-ctrl-tip {
+  display: none !important;
+}
+
+html.is-touch,
+html.is-touch body {
+  overscroll-behavior: none;
+}
+
+/* The on-screen buttons replace these keyboard-oriented HUD bits. */
+html.is-touch .hud-control-tips,
+html.is-touch .hud-reset-camera {
+  display: none !important;
+}
+
+/* Short landscape screens: a compact pause menu that fits without scrolling. */
+@media (max-height: 460px) {
+  .pause-panel {
+    max-height: 96vh;
+    padding: 12px 22px;
+  }
+  .pause-panel h1 {
+    margin: 0 0 8px;
+    font-size: 26px;
+  }
+  .pause-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .pause-actions button {
+    padding-block: 4px;
+    min-height: 44px;
+  }
+  .pause-actions button:first-child,
+  .pause-actions button:last-child {
+    grid-column: span 3;
+  }
+}

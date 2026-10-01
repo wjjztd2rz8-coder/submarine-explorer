@@ -1,95 +1,138 @@
 /**
- * The seabed material: a `MeshStandardMaterial` with triplanar texturing and a
- * depth-ramp LUT patched in through `onBeforeCompile`.
+ * The seabed material: a `MeshStandardMaterial` with a biome-driven PBR
+ * triplanar blend patched in through `onBeforeCompile`.
  *
  * Why patch instead of a raw ShaderMaterial: the scene's exponential fog, the
- * sub's spotlight, the ambient/directional rig and ACES tone mapping all come
- * for free from Three's standard lighting chunks. Re-implementing them in a
- * custom shader would be a large amount of code for no gain, and would break the
- * moment `Water.ts` (A2) changes the lighting model.
+ * sub's spotlight, the ambient/directional rig and the filmic tone mapping all
+ * come for free from Three's standard lighting chunks, and keep following
+ * `Water.ts` and the post stack when they change.
  *
- * Textures are generated procedurally as `DataTexture`s rather than downloaded.
- * `docs/assets.md` lists CC0 sets on Poly Haven / ambientCG, but (a) the brief
- * allows procedural when download is problematic and this build has no network
- * at asset-fetch time, (b) generated noise tiles seamlessly by construction,
- * which matters a lot for a surface the player flies 5 m above, (c) it keeps the
- * repo free of binary assets and the attribution surface at zero, and (d) it is
- * `document`-free, so the unit tests can still construct a Terrain under Node.
- * Swapping in real PBR maps later is a change to `makeSeabedTexture` only.
+ * Textures are three slots (A soft bottom, B patch, C hard substrate) filled by
+ * the site's `Biome` (`TerrainBiome.ts`) from five CC0 sets shipped as compact
+ * JPGs in `public/assets/terrain/` (ambientCG and Poly Haven, see
+ * ATTRIBUTION.md; packed by tools/make_terrain_textures.py). `<set>_a.jpg` is a
+ * luminance pattern with AO baked in, `<set>_n.jpg` holds tangent normal x/y and
+ * roughness. They load asynchronously; until each arrives a neutral 1x1
+ * placeholder stands in, so the sea floor is never black and a slow network only
+ * delays the fine detail. Under Node (unit tests) nothing is fetched.
+ * Tier switches: `pbrNormals` compiles the normal path and loads the `_n` maps;
+ * `textureBreakup` adds the second larger albedo sample.
  */
 
 import * as THREE from 'three';
 import type { GraphicsTier, TerrainConfig } from '../core/Config.js';
+import { publicUrl } from '../util/publicUrl.js';
 import vertGlsl from '../shaders/terrain.vert.glsl?raw';
 import fragGlsl from '../shaders/terrain.frag.glsl?raw';
-import { valueNoise2 } from './TerrainNoise.js';
-
-/** Mean luminance the generated albedo textures are centred on. */
-const ALBEDO_MEAN = 0.85;
+import { SET_CONTRAST, type Biome, type TerrainSet } from './TerrainBiome.js';
 
 export interface TerrainMaterialOptions {
   config: TerrainConfig;
   tier: GraphicsTier;
+  biome: Biome;
   /** Vertical exaggeration, so the shader can recover true depth from world Y. */
   exaggeration: number;
-  /** Depth -> colour, used to bake the ramp LUT. Normally `Terrain.colorForDepth`. */
-  colorForDepth: (depth: number, out: THREE.Color) => THREE.Color;
-  /** Deepest and shallowest ramp stops, in metres. */
-  rampMinDepth: number;
-  rampMaxDepth: number;
 }
 
 export interface TerrainMaterialResult {
   material: THREE.MeshStandardMaterial;
   textures: THREE.Texture[];
-  /** Edge length of the generated albedo textures, for the debug readout. */
+  /** Edge length of the shipped albedo textures, for the debug readout. */
   textureSize: number;
+  /** The site's slot C (hard substrate) albedo, resolved once loaded; null under Node. */
+  rockTexture: Promise<THREE.Texture | null>;
 }
 
 export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMaterialResult {
-  const { config, tier, exaggeration } = opts;
-  const size = config.tiers[tier].textureSize;
+  const { config, tier, biome, exaggeration } = opts;
+  const tierCfg = config.tiers[tier];
+  const textures: THREE.Texture[] = [];
+  const loadable = typeof document !== 'undefined';
+  let rockTexture: Promise<THREE.Texture | null> = Promise.resolve(null);
 
-  // Warm grey silt, dark blue-grey basalt, bright carbonate sand. These are
-  // modulation patterns, not colours: the hue comes from the depth ramp.
-  const sediment = makeSeabedTexture(size, 0.14, 2.5, 4, 11, [1.0, 0.99, 0.96]);
-  const rock = makeSeabedTexture(size, 0.34, 1.2, 5, 27, [0.94, 0.96, 1.0]);
-  const sand = makeSeabedTexture(size, 0.1, 5.0, 3, 53, [1.03, 1.0, 0.93]);
-  const grad = makeGradientTexture(size, 3.0, 4, 71);
-  const ramp = makeRampTexture(opts);
+  const albPlaceholder = solidTexture(128, 128, 128);
+  const nrPlaceholder = solidTexture(128, 128, 210);
+  textures.push(albPlaceholder, nrPlaceholder);
 
   const uniforms: Record<string, THREE.IUniform> = {
-    tSediment: { value: sediment },
-    tRock: { value: rock },
-    tSand: { value: sand },
-    tDetailGrad: { value: grad },
-    tRamp: { value: ramp },
+    tAlbA: { value: albPlaceholder },
+    tNrmA: { value: nrPlaceholder },
+    tAlbB: { value: albPlaceholder },
+    tNrmB: { value: nrPlaceholder },
+    tAlbC: { value: albPlaceholder },
+    tNrmC: { value: nrPlaceholder },
+    uColA: { value: new THREE.Color(biome.colorA) },
+    uColB: { value: new THREE.Color(biome.colorB) },
+    uColC: { value: new THREE.Color(biome.colorC) },
+    uStain: { value: new THREE.Color(biome.stain) },
+    uStainAmount: { value: biome.stainAmount },
+    uPatch: { value: biome.patch },
+    uRipple: { value: biome.ripple },
+    uRippleLen: { value: biome.rippleLenM },
+    uRippleDir: { value: new THREE.Vector2(Math.cos(biome.rippleDir), Math.sin(biome.rippleDir)) },
+    uBurrow: { value: biome.burrow },
+    uRockBias: { value: biome.rockBias },
     uTexScale: { value: config.materialTextureScaleM },
-    uGradScale: { value: config.materialGradScaleM },
+    uMacroScale: { value: config.materialMacroScaleM },
     uNormalStrength: { value: config.materialNormalStrength },
-    uAlbedoGain: { value: 1 / ALBEDO_MEAN },
-    uCosRockStart: { value: Math.cos((config.rockSlopeHiDeg * Math.PI) / 180) },
-    uCosRockEnd: { value: Math.cos((config.rockSlopeLoDeg * Math.PI) / 180) },
-    uSandDeep: { value: config.sandDepthDeep },
-    uSandShallow: { value: config.sandDepthShallow },
-    uRockColor: { value: new THREE.Color(config.rockColor) },
-    uRockColorMix: { value: config.rockColorMix },
-    uRampMinDepth: { value: opts.rampMinDepth },
-    uRampSpan: { value: opts.rampMaxDepth - opts.rampMinDepth },
+    uFadeNormal: { value: new THREE.Vector2(...config.detailFadeNormalM) },
+    uFadeRipple: { value: new THREE.Vector2(...config.detailFadeRippleM) },
+    uFadeBurrow: { value: new THREE.Vector2(...config.detailFadeBurrowM) },
+    uContrast: {
+      value: new THREE.Vector3(
+        SET_CONTRAST[biome.a],
+        SET_CONTRAST[biome.b],
+        SET_CONTRAST[biome.c],
+      ).multiplyScalar(config.materialContrast),
+    },
+    uRockLo: { value: 1 - Math.cos((config.rockSlopeLoDeg * Math.PI) / 180) },
+    uRockHi: { value: 1 - Math.cos((config.rockSlopeHiDeg * Math.PI) / 180) },
     uExaggeration: { value: exaggeration },
   };
 
+  if (loadable) {
+    const slots: Array<[string, string, TerrainSet]> = [
+      ['tAlbA', 'tNrmA', biome.a],
+      ['tAlbB', 'tNrmB', biome.b],
+      ['tAlbC', 'tNrmC', biome.c],
+    ];
+    const cache = new Map<string, Promise<THREE.Texture>>();
+    const fetch = (file: string, srgb: boolean, uniform: string): Promise<THREE.Texture> => {
+      let p = cache.get(file);
+      if (!p) {
+        const tex = loadSeabedTexture(file, srgb);
+        textures.push(tex);
+        p = tex.userData.ready as Promise<THREE.Texture>;
+        cache.set(file, p);
+      }
+      // Bind only once the image is there: an unloaded texture samples as black.
+      void p.then((tex) => {
+        (uniforms[uniform] as THREE.IUniform).value = tex;
+      });
+      return p;
+    };
+    for (const [ua, un, set] of slots) {
+      const p = fetch(`${set}_a.jpg`, true, ua);
+      if (ua === 'tAlbC') rockTexture = p;
+      if (tierCfg.pbrNormals) void fetch(`${set}_n.jpg`, false, un);
+    }
+  }
+
   const vert = splitSections(vertGlsl, ['@body']);
   const frag = splitSections(fragGlsl, ['@albedo', '@rough', '@normal']);
+  const defines: string[] = [];
+  if (tierCfg.pbrNormals) defines.push('#define TERRAIN_PBR_NORMALS');
+  if (tierCfg.textureBreakup) defines.push('#define TERRAIN_BREAKUP');
 
   const material = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    roughness: 0.96,
-    metalness: 0.02,
+    roughness: 0.92,
+    metalness: 0.0,
     side: THREE.FrontSide,
   });
   material.name = 'seabed';
   material.userData.uniforms = uniforms;
+  material.customProgramCacheKey = () => `seabed-${defines.join('')}`;
 
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
@@ -101,10 +144,42 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
     let frg = after(shader.fragmentShader, 'map_fragment', frag.sections[0] as string);
     frg = after(frg, 'roughnessmap_fragment', frag.sections[1] as string);
     frg = after(frg, 'normal_fragment_begin', frag.sections[2] as string);
-    shader.fragmentShader = frag.head + '\n' + frg;
+    shader.fragmentShader = defines.join('\n') + '\n' + frag.head + '\n' + frg;
   };
 
-  return { material, textures: [sediment, rock, sand, grad, ramp], textureSize: size };
+  return { material, textures, textureSize: tierCfg.textureSize, rockTexture };
+}
+
+/** A 1x1 stand-in shown until the real map arrives. */
+function solidTexture(r: number, g: number, b: number): THREE.DataTexture {
+  const tex = new THREE.DataTexture(new Uint8Array([r, g, b, 255]), 1, 1, THREE.RGBAFormat);
+  tex.colorSpace = THREE.NoColorSpace;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+/** Start loading one packed seabed map; the returned texture fills in when it arrives. */
+function loadSeabedTexture(file: string, srgb: boolean): THREE.Texture {
+  const tex = new THREE.Texture();
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.generateMipmaps = true;
+  tex.anisotropy = 4;
+  tex.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+  tex.userData.ready = new Promise<THREE.Texture>((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      tex.image = img;
+      tex.needsUpdate = true;
+      resolve(tex);
+    };
+    // A missing map leaves the neutral placeholder in place.
+    img.onerror = () => console.warn(`[terrain] could not load seabed map ${file}`);
+    img.src = publicUrl(`assets/terrain/${file}`);
+  });
+  return tex;
 }
 
 /** Insert `code` immediately after a Three shader chunk include. */
@@ -138,154 +213,4 @@ function splitSections(source: string, markers: string[]): { head: string; secti
     rest = rest.slice(m.index + m[0].length);
     return before;
   }
-}
-
-// --------------------------------------------------------------- generators
-
-/** Seamlessly tiling value noise: the lattice wraps every `period` units. */
-function tilingNoise(x: number, y: number, period: number, octaves: number, seed: number): number {
-  let sum = 0;
-  let norm = 0;
-  let amp = 1;
-  let p = period;
-  for (let o = 0; o < octaves; o++) {
-    // Wrapping the sample coordinate into [0, period) gives a torus-periodic
-    // lattice because valueNoise2's hash is only ever fed integer corners.
-    sum += amp * wrappedValueNoise(x * p, y * p, p, seed + o * 7919);
-    norm += amp;
-    amp *= 0.5;
-    p *= 2;
-  }
-  return norm > 0 ? sum / norm : 0.5;
-}
-
-function wrappedValueNoise(x: number, y: number, period: number, seed: number): number {
-  const wrap = (v: number): number => ((v % period) + period) % period;
-  const ix = Math.floor(x);
-  const iy = Math.floor(y);
-  const fx = x - ix;
-  const fy = y - iy;
-  const ux = fx * fx * (3 - 2 * fx);
-  const uy = fy * fy * (3 - 2 * fy);
-  // valueNoise2 evaluates the same hash at integer corners; sampling it at the
-  // wrapped corner keeps tiling exact.
-  const a = valueNoise2(wrap(ix) + 0.5, wrap(iy) + 0.5, seed);
-  const b = valueNoise2(wrap(ix + 1) + 0.5, wrap(iy) + 0.5, seed);
-  const c = valueNoise2(wrap(ix) + 0.5, wrap(iy + 1) + 0.5, seed);
-  const d = valueNoise2(wrap(ix + 1) + 0.5, wrap(iy + 1) + 0.5, seed);
-  const top = a + (b - a) * ux;
-  const bottom = c + (d - c) * ux;
-  return top + (bottom - top) * uy;
-}
-
-/**
- * A tiling albedo modulation map centred on ALBEDO_MEAN.
- * `contrast` is the peak deviation, `baseFreq` the lattice period at octave 0.
- */
-function makeSeabedTexture(
-  size: number,
-  contrast: number,
-  baseFreq: number,
-  octaves: number,
-  seed: number,
-  tint: [number, number, number],
-): THREE.DataTexture {
-  const data = new Uint8Array(size * size * 4);
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const n = tilingNoise(x / size, y / size, baseFreq, octaves, seed) * 2 - 1;
-      const v = ALBEDO_MEAN * (1 + contrast * n);
-      const i = (y * size + x) * 4;
-      data[i] = clamp255(v * tint[0] * 255);
-      data[i + 1] = clamp255(v * tint[1] * 255);
-      data[i + 2] = clamp255(v * tint[2] * 255);
-      data[i + 3] = 255;
-    }
-  }
-  return finishTexture(new THREE.DataTexture(data, size, size, THREE.RGBAFormat));
-}
-
-/**
- * A tiling slope map: R and G hold d(height)/dx and d(height)/dy of a noise
- * field, biased to 0.5. The fragment shader adds them to the surface gradient,
- * which is the cheapest correct way to bump a height field.
- */
-function makeGradientTexture(
-  size: number,
-  baseFreq: number,
-  octaves: number,
-  seed: number,
-): THREE.DataTexture {
-  const height = new Float32Array(size * size);
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      height[y * size + x] = tilingNoise(x / size, y / size, baseFreq, octaves, seed);
-    }
-  }
-  const data = new Uint8Array(size * size * 4);
-  // Scaled so a full-contrast feature yields roughly a +-1 slope before the
-  // shader's uNormalStrength.
-  const gain = size / 24;
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const xl = (x - 1 + size) % size;
-      const xr = (x + 1) % size;
-      const yu = (y - 1 + size) % size;
-      const yd = (y + 1) % size;
-      const gx = ((height[y * size + xr] as number) - (height[y * size + xl] as number)) * gain;
-      const gy = ((height[yd * size + x] as number) - (height[yu * size + x] as number)) * gain;
-      const i = (y * size + x) * 4;
-      data[i] = clamp255((gx * 0.5 + 0.5) * 255);
-      data[i + 1] = clamp255((gy * 0.5 + 0.5) * 255);
-      data[i + 2] = 128;
-      data[i + 3] = 255;
-    }
-  }
-  return finishTexture(new THREE.DataTexture(data, size, size, THREE.RGBAFormat));
-}
-
-/** 256x1 depth -> colour LUT, replacing the per-vertex colour attribute. */
-function makeRampTexture(opts: TerrainMaterialOptions): THREE.DataTexture {
-  const n = 256;
-  const data = new Uint8Array(n * 4);
-  const c = new THREE.Color();
-  for (let i = 0; i < n; i++) {
-    const depth = opts.rampMinDepth + ((opts.rampMaxDepth - opts.rampMinDepth) * i) / (n - 1);
-    opts.colorForDepth(depth, c);
-    // The shader decodes sRGB itself, so store the display-referred bytes: an
-    // 8-bit linear LUT would band badly at the dark abyssal end.
-    data[i * 4] = clamp255(linearToSrgb(c.r) * 255);
-    data[i * 4 + 1] = clamp255(linearToSrgb(c.g) * 255);
-    data[i * 4 + 2] = clamp255(linearToSrgb(c.b) * 255);
-    data[i * 4 + 3] = 255;
-  }
-  const tex = new THREE.DataTexture(data, n, 1, THREE.RGBAFormat);
-  tex.wrapS = THREE.ClampToEdgeWrapping;
-  tex.wrapT = THREE.ClampToEdgeWrapping;
-  tex.minFilter = THREE.LinearFilter;
-  tex.magFilter = THREE.LinearFilter;
-  tex.colorSpace = THREE.NoColorSpace;
-  tex.needsUpdate = true;
-  return tex;
-}
-
-function finishTexture(tex: THREE.DataTexture): THREE.DataTexture {
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.wrapT = THREE.RepeatWrapping;
-  tex.minFilter = THREE.LinearMipmapLinearFilter;
-  tex.magFilter = THREE.LinearFilter;
-  tex.generateMipmaps = true;
-  tex.anisotropy = 4;
-  // These are multipliers and slopes, not colours: keep them out of the sRGB path.
-  tex.colorSpace = THREE.NoColorSpace;
-  tex.needsUpdate = true;
-  return tex;
-}
-
-function linearToSrgb(v: number): number {
-  return v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
-}
-
-function clamp255(v: number): number {
-  return v < 0 ? 0 : v > 255 ? 255 : Math.round(v);
 }
