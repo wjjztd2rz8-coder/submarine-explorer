@@ -190,3 +190,22 @@
   font-size: 15px;
   border-radius: 2px;
 }
+
+/* F3-AUDIO: volume and mute targets work on a phone without precision taps. */
+.settings-audio input[type='range'] {
+  min-height: 44px;
+  width: 100%;
+  accent-color: var(--b1-cyan);
+}
+
+.settings-audio .is-check input {
+  width: 44px;
+  height: 44px;
+  accent-color: var(--b1-cyan);
+}
+
+.settings-audio .is-check label {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}

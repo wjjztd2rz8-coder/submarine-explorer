@@ -35,18 +35,12 @@ vertex-shader animation (`src/world/props/geo/`).
 
 ## Audio
 
-No third-party audio files ship with the client. `ffmpeg` is unavailable in
-this environment (needed to transcode/shrink downloaded CC0 candidates to a
-web-friendly size) and Freesound's actual files require an authenticated API
-download, so all cues (sonar ping, thruster, ballast hiss, hull creaks,
-collision thud, discovery chime, emergency alarm, ambient depth beds) are
-synthesised at runtime via the WebAudio API instead — see `docs/audio.md` for
-the design and `src/audio/Cues.ts` / `src/audio/Loops.ts` for the generators.
-This sidesteps licensing risk entirely and keeps the bundle smaller than any
-sample file would. Candidate CC0 sources remain catalogued in
-`docs/assets.md` §1.3/§3 if a future pass wants to replace a synthesised cue
-with a recorded one (e.g. NOAA PMEL's public-domain hydrophone recordings, or
-Freesound CC0 uploads with an authenticated download).
+| File                             | Creator / source                                                                                                                                                                             | Licence                                                                                                                 | Processing                                                                                                                                                   |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `public/audio/noaa-humpback.ogg` | NOAA / PMEL, [Alaska humpback call](https://pmel.noaa.gov/acoustics/whales/sounds/sounds_akhump.html), [original WAV](https://pmel.noaa.gov/acoustics/whales/sounds/whalewav/akhumphi1x.wav) | Public domain; [NOAA audio reuse guidance](https://sos.noaa.gov/copyright/) verified 2026-10-01; no endorsement implied | Six-second excerpt at offset 25 s, edge fades, mono 8 kHz OGG/Vorbis, 9,461 bytes. PMEL describes the source as 10x speed; playback at 0.1 restores cadence. |
+
+All score, machinery, sonar, reef crackle and geological sounds are generated
+in WebAudio; no third-party samples are used for them.
 
 ## Imagery
 

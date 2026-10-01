@@ -14,6 +14,14 @@ without an entry here is not done.
 
 ### Added
 
+- Phase F, F3-AUDIO: a gentle adaptive ambient score across five depth bands,
+  discovery swells and tension near the hull rating; separate saved Music,
+  Sound effects and Master volume sliders plus Mute. Scan hum, ROV tether winch,
+  camera shutter, depth-driven hull creaks, nearby spatial vent/wreck ambience,
+  reef shrimp crackle and NOAA humpback calls add captioned sound to dives.
+  Manipulator servos follow scan-arm deployment and retraction.
+  Reduce motion softens score changes. No features were cut.
+
 - Phase F, F1-TOUCH: **full touch play and a PWA install** (`src/ui/TouchControls.ts`,
   `src/core/Touch.ts`, `src/styles/touch.css`, `public/sw.js`). A left stick
   (thrust and turn), a right rise/sink slider, Scan (hold), Boost (hold), Lights,

@@ -54,11 +54,13 @@ export function createPhotoSystem(): GameSystem {
     if (!result.saved) photoMode.toast(result.error, true);
     else if (result.dropped) {
       photoMode.shutter();
+      ctx.audio.playShutter();
       photoMode.toast(
         `Saved to Journal · oldest ${result.dropped === 1 ? 'photo' : `${result.dropped} photos`} removed (keeps ${PHOTO_LIMIT})`,
       );
     } else {
       photoMode.shutter();
+      ctx.audio.playShutter();
       photoMode.toast('Saved to Journal');
     }
     journal.refresh();

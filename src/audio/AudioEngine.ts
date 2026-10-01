@@ -1,9 +1,10 @@
 /**
  * The WebAudio graph itself.
  *
- *   bus(ambient|sub|ui|sonar) -> depthFilter (shared lowpass) -> master -> destination
+ *   bus(ambient|sub|ui|sonar) -> SFX -> depthFilter -> master -> destination
+ *   bus(music) -------------------------------------> master
  *
- * One shared depth low-pass rather than one per bus, because "the whole mix
+ * One shared depth low-pass rather than one per bus, because "the effects mix
  * gets muffled with depth" is a property of the water and hull between the
  * player's ears and every sound source, not of any one bus.
  *
@@ -14,7 +15,7 @@
 
 import type { AudioConfig } from '../core/Config.js';
 
-export type BusName = 'ambient' | 'sub' | 'ui' | 'sonar';
+export type BusName = 'ambient' | 'sub' | 'ui' | 'sonar' | 'music';
 
 export class AudioEngine {
   readonly ctx: AudioContext;
@@ -22,6 +23,7 @@ export class AudioEngine {
   readonly depthFilter: BiquadFilterNode;
   private readonly buses: Record<BusName, GainNode>;
   private unlocked = false;
+  readonly effects: GainNode;
 
   constructor(private readonly config: AudioConfig) {
     // Safari still exposes webkitAudioContext only in some versions.
@@ -39,13 +41,19 @@ export class AudioEngine {
     this.depthFilter.frequency.value = config.depthLowpassSurfaceHz;
     this.depthFilter.connect(this.master);
 
+    this.effects = this.ctx.createGain();
+    this.effects.gain.value = config.sfxVolume;
+    this.effects.connect(this.depthFilter);
     this.buses = {
+      music: this.ctx.createGain(),
       ambient: this.ctx.createGain(),
       sub: this.ctx.createGain(),
       ui: this.ctx.createGain(),
       sonar: this.ctx.createGain(),
     };
-    for (const gain of Object.values(this.buses)) gain.connect(this.depthFilter);
+    for (const [name, gain] of Object.entries(this.buses))
+      gain.connect(name === 'music' ? this.master : this.effects);
+    this.bus('music').gain.value = config.musicVolume;
   }
 
   bus(name: BusName): GainNode {
@@ -55,7 +63,7 @@ export class AudioEngine {
   /** Must be invoked from inside a user-gesture handler (autoplay policy). */
   unlock(): void {
     this.unlocked = true;
-    void this.ctx.resume();
+    void this.ctx.resume().catch(() => {});
   }
 
   get isUnlocked(): boolean {

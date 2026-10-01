@@ -5,6 +5,7 @@ import type {
   GraphicsTierSetting,
   SonarPaletteName,
 } from './Config.js';
+import { DEFAULT_AUDIO } from './config/audio.js';
 import type { EventBus } from './EventBus.js';
 
 export const SETTINGS_STORAGE_KEY = 'subexplorer.settings.v2';
@@ -28,6 +29,10 @@ export interface SettingsValues {
   simSpeedDefault: number;
   reduceMotion: boolean;
   captions: boolean;
+  masterVolume: number;
+  sfxVolume: number;
+  musicVolume: number;
+  muted: boolean;
   sonarPalette: SonarPaletteName;
   uiScale: number;
   controlTips: boolean;
@@ -51,6 +56,7 @@ export type SettingsConfigSource = Pick<
   'graphicsTier' | 'settings' | 'sonarPalettes'
 > & {
   terrain: Pick<GameConfig['terrain'], 'detailStrength'>;
+  audio?: Pick<GameConfig['audio'], 'masterVolume' | 'sfxVolume' | 'musicVolume'>;
 };
 const TIERS: readonly GraphicsTierSetting[] = ['auto', 'low', 'medium', 'high', 'ultra'];
 const DISPLAY_KEYS = [
@@ -60,6 +66,10 @@ const DISPLAY_KEYS = [
   'simSpeedDefault',
   'reduceMotion',
   'captions',
+  'masterVolume',
+  'sfxVolume',
+  'musicVolume',
+  'muted',
   'sonarPalette',
 ] as const;
 const GAMEPLAY_KEYS = [
@@ -93,6 +103,10 @@ export function defaultSettings(config: SettingsConfigSource): SettingsData {
     simSpeedDefault: d.simSpeedDefault,
     reduceMotion: d.reduceMotion,
     captions: d.captions,
+    masterVolume: config.audio?.masterVolume ?? DEFAULT_AUDIO.masterVolume,
+    sfxVolume: config.audio?.sfxVolume ?? DEFAULT_AUDIO.sfxVolume,
+    musicVolume: config.audio?.musicVolume ?? DEFAULT_AUDIO.musicVolume,
+    muted: false,
     sonarPalette: d.sonarPalette,
     uiScale: 100,
     controlTips: true,
@@ -111,6 +125,13 @@ function sanitizeDisplay(
   switch (key) {
     case 'graphicsTier':
       return TIERS.includes(value as GraphicsTierSetting) ? value : fallback;
+    case 'masterVolume':
+    case 'sfxVolume':
+    case 'musicVolume':
+      return typeof value === 'number' && Number.isFinite(value)
+        ? Math.min(1, Math.max(0, value))
+        : fallback;
+    case 'muted':
     case 'postFx':
     case 'reduceMotion':
     case 'captions':

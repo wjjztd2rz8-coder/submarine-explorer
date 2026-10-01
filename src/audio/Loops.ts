@@ -106,8 +106,8 @@ export class AmbientBeds {
     if (!ctx) return;
     const weights = bandWeights(depthM, this.config.ambientBands);
     weights.forEach((w, i) => {
-      // 0.18 keeps the loudest single band comfortably under the sonar/UI cues.
-      this.layers[i].gain.gain.setTargetAtTime(w * 0.18, ctx.currentTime, 1.5);
+      // Keep the water bed beneath the score and informational cues.
+      this.layers[i].gain.gain.setTargetAtTime(w * 0.035, ctx.currentTime, 1.5);
     });
   }
 

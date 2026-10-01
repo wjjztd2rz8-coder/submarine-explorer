@@ -1,11 +1,4 @@
-/**
- * One-shot synthesised cues. No sample files: ffmpeg is unavailable in this
- * environment to transcode/shrink downloaded CC0 audio, and Freesound's real
- * files require an authenticated API download, so everything here is
- * generated at runtime via WebAudio oscillators + noise, per the A4 brief's
- * explicit fallback ("ffmpeg may be absent; if so ... synthesise"). See
- * docs/audio.md for the rationale and per-cue design notes.
- */
+/** Synthesised one-shot cues; the NOAA wildlife sample lives in Soundscape. */
 
 import type { AudioConfig } from '../core/Config.js';
 import type { AudioEngine } from './AudioEngine.js';
