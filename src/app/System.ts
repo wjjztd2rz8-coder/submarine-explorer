@@ -52,6 +52,7 @@ export const FRAME_STAGES = [
   'env.atmosphere', // atmosphere: depth-driven fog and light
   'env.presets', // presets: environment preset for the site
   'env.lighting', // atmosphere: headlights, marine snow, water surface
+  'world.life', // life: step and draw the marine life, refresh its scan targets
   'scan.rovRange', // rov: widen scan radii while the ROV pilots
   'scan.discovery', // discovery: scan beam, POIs, journal
   'scan.rovRangeRestore', // rov: restore scan radii

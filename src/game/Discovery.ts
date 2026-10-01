@@ -215,6 +215,17 @@ export class Discovery {
     this.overlay.showComplete(entry?.title ?? poi.name, firstTime, this.keys());
   }
 
+  /**
+   * F2-LIFE: an animal was scanned. Not a POI, so objectives and the debrief's
+   * scan list are untouched; it adds a Journal entry (the store already holds
+   * the discovery) and shows the same confirmation banner.
+   */
+  onLifeScan(title: string, firstTime: boolean, entryId: string): void {
+    if (firstTime) this.stats.noteNewEntry(entryId, title);
+    this.guide.refresh();
+    this.overlay.showComplete(title, firstTime, this.keys());
+  }
+
   /** Pose for the `?poi=` spawn, or null if the POI is unknown. */
   spawnPose(poiId: string): SpawnPose | null {
     const poi = this.pois.find((p) => p.id === poiId);
@@ -267,7 +278,9 @@ export class Discovery {
     let screen: ScreenPoint | null = null;
     const nearest = this.scanner.view.nearestId;
     if (camera && nearest) {
-      const poi = this.pois.find((p) => p.id === nearest);
+      const poi =
+        this.pois.find((p) => p.id === nearest) ??
+        this.scanner.getExtraTargets().find((t) => t.id === nearest);
       if (poi) {
         const v = this.projected.copy(poi.position).project(camera);
         if (v.z > -1 && v.z < 1 && Math.abs(v.x) <= 1 && Math.abs(v.y) <= 1) {

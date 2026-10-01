@@ -7,17 +7,7 @@
  */
 
 import type * as THREE from 'three';
-import {
-  Builder,
-  clamp,
-  hash1,
-  lerp,
-  mixRgb,
-  scaleRgb,
-  smooth,
-  type RGB,
-  type V3,
-} from './kit.js';
+import { Builder, clamp, hash1, lerp, mixRgb, scaleRgb, smooth, type RGB, type V3 } from './kit.js';
 import { col, num, str, type Look } from './look.js';
 
 /** Tail-weight for the body wave: 0 at the head, 1 at the tail base and fin. */

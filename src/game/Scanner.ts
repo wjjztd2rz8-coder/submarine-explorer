@@ -117,6 +117,12 @@ export class Scanner {
   enabled = true;
 
   private targets: ScanTarget[] = [];
+  /**
+   * Live targets that come and go (F2-LIFE animals). The array is owned by the
+   * caller and may change every frame; POIs always win over these for the
+   * hint and the candidate, so objectives never lose the beam to a passing fish.
+   */
+  private extra: readonly ScanTarget[] = [];
   /** Public per-dive state for sonar, objectives and other presentation layers. */
   readonly scannedThisDive = new Set<string>();
   private active: ScanTarget | null = null;
@@ -133,7 +139,17 @@ export class Scanner {
 
   setTargets(targets: ScanTarget[]): void {
     this.targets = [...targets];
-    if (this.active && !this.targets.includes(this.active)) this.clearActive();
+    if (this.active && !this.targets.includes(this.active) && !this.extra.includes(this.active))
+      this.clearActive();
+  }
+
+  /** Hand over the live, caller-owned list of moving targets (animals). */
+  setExtraTargets(targets: readonly ScanTarget[]): void {
+    this.extra = targets;
+  }
+
+  getExtraTargets(): readonly ScanTarget[] {
+    return this.extra;
   }
 
   getTargets(): readonly ScanTarget[] {
@@ -192,6 +208,24 @@ export class Scanner {
       if (g.distance <= hintRange && (!nearestGeo || g.distance < nearestGeo.distance)) {
         nearest = t;
         nearestGeo = g;
+      }
+    }
+    // Moving targets (animals): considered only where no POI already claims the
+    // hint or the candidate, and only hinted once they are in range.
+    const poiCandidate = candidate;
+    const poiNearest = nearest;
+    for (const t of this.extra) {
+      const g = this.geometry(t, position, forward);
+      if (t === this.active) activeGeo = g;
+      // An animal already logged this dive is not hinted again.
+      if (this.isScanned(t.landmarkId, t.id)) continue;
+      if (!poiNearest && g.inRange && (!nearestGeo || g.distance < nearestGeo.distance)) {
+        nearest = t;
+        nearestGeo = g;
+      }
+      if (!poiCandidate && g.inRange && g.facing && g.distance < candidateDist) {
+        candidate = t;
+        candidateDist = g.distance;
       }
     }
     // Stickiness: keep scanning the active target while it stays valid, even

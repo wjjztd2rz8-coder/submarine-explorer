@@ -136,6 +136,7 @@ export function createLifeMaterial(o: LifeMaterialOpts): THREE.MeshStandardMater
     uTint: { value: o.tintGlow ? 1 : 0 },
     uAlphaBase: { value: o.translucent ?? 1 },
   };
+  mat.userData.life = uniforms;
   mat.defines = { LIFE_MODE: MODE[o.mode] };
   mat.customProgramCacheKey = (): string =>
     `life-${o.mode}-${o.translucent !== undefined ? 't' : 'o'}`;

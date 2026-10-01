@@ -3,6 +3,14 @@
  * simulation and the renderer both read. Pure data, no Three.js.
  */
 
+/**
+ * Arcade scale: the sub is about 3.4 times the length of a real research
+ * submersible, so every animal is drawn this much larger than life to keep
+ * the proportions between vehicle and wildlife believable and the small
+ * animals readable. Folded into `visScale` by `defs.ts`; Journal sizes stay real.
+ */
+export const LIFE_SCALE = 2.5;
+
 /** The eight movement archetypes (docs/research/species.md). */
 export type Archetype =
   | 'school' // boids: separation, alignment, cohesion, scatter from the lights
@@ -42,7 +50,7 @@ export interface SpeciesDef {
   look: Record<string, number | string | boolean | number[]>;
   /** Body length in metres, the real animal's order of magnitude. */
   size: number;
-  /** Legibility multiplier for tiny animals (arcade; shown once in the Journal note). */
+  /** Drawn scale: the per-species legibility lift for tiny animals times `LIFE_SCALE` (see `defs.ts`). */
   visScale: number;
   /** Plausible placement band, positive metres. */
   depth: [number, number];
@@ -83,6 +91,8 @@ export interface SpawnEntry {
   depth: [number, number];
   /** Individuals per group. */
   group: [number, number];
+  /** A charismatic species of the site: first in line for the draw-call budget. */
+  star?: boolean;
 }
 
 export interface RareRule {
@@ -92,6 +102,10 @@ export interface RareRule {
   chancePerMin: number;
   /** Minimum seconds between two appearances. */
   cooldownS: number;
+  /** `overhead`: crosses well above the sub; `level`: crosses at the sub's depth, at the edge of the light. */
+  pass: 'overhead' | 'level';
+  /** Individuals in the appearance (default: one; a swarm surge sets a range). */
+  group?: [number, number];
 }
 
 export interface SiteTable {

@@ -11,6 +11,10 @@ import type { SpeciesDef } from './types.js';
 
 export interface SpeciesMesh {
   def: SpeciesDef;
+  /** The always-on glow this species carries in the dark (0 for most). */
+  baseGlow: number;
+  /** The material's `uBaseGlow` uniform (scaled by how dark the water is). */
+  glowUniform: { value: number };
   mesh: THREE.InstancedMesh;
   life: THREE.InstancedBufferAttribute;
   capacity: number;
@@ -47,7 +51,8 @@ export function createSpeciesMesh(
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   mesh.frustumCulled = false;
   mesh.count = 0;
-  return { def, mesh, life, capacity };
+  const uniforms = material.userData.life as { uBaseGlow: { value: number } };
+  return { def, baseGlow, glowUniform: uniforms.uBaseGlow, mesh, life, capacity };
 }
 
 export function disposeSpeciesMesh(m: SpeciesMesh): void {

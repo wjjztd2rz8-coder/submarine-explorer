@@ -4,7 +4,16 @@
  * mode). Used by `catalogue.ts` and `catalogueInvert.ts`.
  */
 
-import type { Archetype, SpeciesDef } from './types.js';
+import { LIFE_SCALE, type Archetype, type SpeciesDef } from './types.js';
+
+/**
+ * How large an animal is drawn (metres): `LIFE_SCALE` times its real size, but
+ * never so small that it cannot be read from the chase camera, so a 8 cm fish
+ * is drawn about 0.9 m long and a 3 cm shrimp about 0.6 m.
+ */
+export function drawnSize(size: number): number {
+  return Math.max(size * LIFE_SCALE, 0.9 * Math.pow(size / 0.08, 0.4));
+}
 
 type Required2 =
   'id' | 'common' | 'scientific' | 'group' | 'archetype' | 'model' | 'look' | 'size' | 'depth';
@@ -13,7 +22,6 @@ type SpeciesInput = Pick<SpeciesDef, Required2> & Partial<Omit<SpeciesDef, Requi
 /** Per-archetype defaults; a species overrides what differs. */
 const BASE: Record<Archetype, Partial<SpeciesDef>> = {
   school: {
-    visScale: 1,
     speed: [0.5, 2.6],
     skittish: 0.5,
     attract: 0.05,
@@ -28,7 +36,6 @@ const BASE: Record<Archetype, Partial<SpeciesDef>> = {
     freq: 9,
   },
   hover: {
-    visScale: 1,
     speed: [0.15, 1.2],
     skittish: 0.25,
     attract: 0.1,
@@ -43,7 +50,6 @@ const BASE: Record<Archetype, Partial<SpeciesDef>> = {
     freq: 4,
   },
   cruiser: {
-    visScale: 1,
     speed: [1.2, 3.2],
     skittish: 0.05,
     attract: 0,
@@ -58,7 +64,6 @@ const BASE: Record<Archetype, Partial<SpeciesDef>> = {
     freq: 3.2,
   },
   drifter: {
-    visScale: 1,
     speed: [0.05, 0.35],
     skittish: 0,
     attract: 0,
@@ -73,7 +78,6 @@ const BASE: Record<Archetype, Partial<SpeciesDef>> = {
     freq: 2.4,
   },
   swarm: {
-    visScale: 1.8,
     speed: [0.1, 0.9],
     skittish: 0.3,
     attract: 0.5,
@@ -88,7 +92,6 @@ const BASE: Record<Archetype, Partial<SpeciesDef>> = {
     freq: 14,
   },
   crawler: {
-    visScale: 1,
     speed: [0.02, 0.09],
     skittish: 0,
     attract: 0,
@@ -103,7 +106,6 @@ const BASE: Record<Archetype, Partial<SpeciesDef>> = {
     freq: 2.2,
   },
   sessile: {
-    visScale: 1,
     speed: [0, 0],
     skittish: 0,
     attract: 0,
@@ -118,7 +120,6 @@ const BASE: Record<Archetype, Partial<SpeciesDef>> = {
     freq: 0.9,
   },
   cephalopod: {
-    visScale: 1,
     speed: [0.1, 1.6],
     skittish: 0.2,
     attract: 0.15,
@@ -135,6 +136,7 @@ const BASE: Record<Archetype, Partial<SpeciesDef>> = {
 };
 
 export function def(p: SpeciesInput): SpeciesDef {
-  return { ...BASE[p.archetype], ...p } as SpeciesDef;
+  const merged = { ...BASE[p.archetype], ...p } as SpeciesDef;
+  merged.visScale = drawnSize(merged.size) / merged.size;
+  return merged;
 }
-

@@ -15,6 +15,7 @@ import { atmosphereSystem } from './systems/atmosphere.js';
 import { audioSystem } from './systems/audio.js';
 import { cameraControlsSystem, cameraSystem } from './systems/camera.js';
 import { currentsSystem } from './systems/currents.js';
+import { createLifeSystem } from './systems/life.js';
 import { discoverySystem } from './systems/discovery.js';
 import { hudSystem } from './systems/hud.js';
 import { inputSystem } from './systems/input.js';
@@ -57,6 +58,7 @@ export function createSystems(): GameSystem[] {
     propsSystem,
     currentsSystem,
     presetsSystem,
+    createLifeSystem(),
     // Shell: home, pause, site lists, then the globes (which open home).
     shellSystem,
     globeSystem,
