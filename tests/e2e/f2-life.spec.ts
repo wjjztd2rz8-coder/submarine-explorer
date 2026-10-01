@@ -180,6 +180,12 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
 test('photo mode names the animal in frame', async ({ page }) => {
   await boot(page);
   await park(page, 120);
+  await page.keyboard.press('p');
+  // Bring the photo camera in close so the jelly is a clear subject.
+  await page.evaluate(() => {
+    (window.__game as unknown as Game).rig.orbitRadius = 28;
+  });
+  await page.waitForTimeout(400);
   await page.evaluate(() => {
     const g = window.__game as unknown as Game;
     const p = g.sub.position;
@@ -203,13 +209,6 @@ test('photo mode names the animal in frame', async ({ page }) => {
       1,
     );
   });
-  await page.waitForTimeout(800);
-  await page.keyboard.press('p');
-  // Bring the photo camera in close so the jelly is a clear subject.
-  await page.evaluate(() => {
-    (window.__game as unknown as Game).rig.orbitRadius = 28;
-  });
-  await page.waitForTimeout(400);
   await expect(page.locator('.photo-mode-caption')).toContainText('Lobate comb jelly');
   const named = await page.evaluate(() => {
     const g = window.__game as unknown as Game;
