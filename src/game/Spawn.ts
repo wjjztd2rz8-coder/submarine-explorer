@@ -14,11 +14,111 @@
  * `Terrain` satisfies (and a test stub can).
  */
 
-import type { GameConfig, HullClass } from '../core/Config.js';
+import type { GameConfig, HullClass, CameraConfig } from '../core/Config.js';
+import { DEFAULT_CAMERA } from '../core/config/camera.js';
+import { CameraRig } from '../sub/CameraRig.js';
 import { headingFromForward, latLonToWorld } from '../util/geo.js';
 import type { TileMeta } from '../util/types.js';
 import type { MissionSpawn } from './Mission.js';
 import type { SeabedSampler, SpawnPose } from './Pois.js';
+import { Vector3 } from 'three';
+import type { Props } from '../world/Props.js';
+
+/** Local approach bearings and clearance from each hero's actual footprint. */
+const FREE_DIVE_OPENINGS: Record<string, { hero: string; bearing: number; range: number }> = {
+  titanic: { hero: 'bow-hull', bearing: 45, range: 85 },
+  'challenger-deep': { hero: 'leggo-lander-marker', bearing: 135, range: 65 },
+  'lost-city': { hero: 'poseidon-tower', bearing: 90, range: 90 },
+  'monterey-canyon': { hero: 'canyon-wall-ledge', bearing: 0, range: 100 },
+  endurance: { hero: 'main-hull', bearing: 60, range: 70 },
+  'axial-seamount-ashes': { hero: 'mushroom-chimney', bearing: 45, range: 60 },
+  'hudson-canyon': { hero: 'coral-ledge-mound', bearing: 0, range: 75 },
+  kamaehuakanaloa: { hero: 'hiolo-north-chimney-1', bearing: 45, range: 45 },
+  'beebe-vent-field': { hero: 'beebe-chimney-1', bearing: 60, range: 65 },
+  'great-blue-hole': { hero: 'karst-grotto', bearing: 0, range: 70 },
+  bismarck: { hero: 'main-hull', bearing: 50, range: 110 },
+  'hunga-tonga-caldera': { hero: 'caldera-tuff-wall', bearing: 0, range: 100 },
+  'blake-plateau-corals': { hero: 'lophelia-mound', bearing: 45, range: 75 },
+};
+
+/**
+ * Compose a free dive after props load. Bounds follow the placed hero's real
+ * transform, so long wrecks and tall towers get different opening distances.
+ * Challenger faces its small sampling cue, preserving the quiet hadal floor.
+ * Missing content or an unsafe approach leaves the original tile spawn intact.
+ */
+export function composedFreeDiveSpawn(
+  siteId: string,
+  meta: TileMeta,
+  seabed: SeabedSampler,
+  props: Pick<Props, 'placed' | 'collide'>,
+  settings: SpawnSettings,
+  safeDepth: number,
+  cameraConfig: CameraConfig = DEFAULT_CAMERA,
+): SpawnPose | null {
+  const opening = FREE_DIVE_OPENINGS[siteId];
+  const hero = props.placed.find((p) => p.def.id === opening?.hero);
+  if (!opening || !hero || hero.localBounds.isEmpty()) return null;
+  hero.root.updateMatrixWorld(true);
+  const centre = hero.localBounds.getCenter(new Vector3());
+  // Effect/plume bounds can extend far above a chimney: frame its solid body.
+  const solidHeight = hero.def.dimensionsM?.[2];
+  if (hero.def.model === 'procedural:chimney' && solidHeight)
+    centre.y = hero.localBounds.min.y + solidHeight * 0.55;
+  const target = hero.root.localToWorld(centre.clone());
+  const half = hero.localBounds.getSize(new Vector3()).multiplyScalar(0.5);
+  const nw = latLonToWorld(meta, meta.bbox.north, meta.bbox.west);
+  const se = latLonToWorld(meta, meta.bbox.south, meta.bbox.east);
+  const clearance = settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM;
+  let best: SpawnPose | null = null;
+  let bestScore = Infinity;
+  const rig = new CameraRig(cameraConfig, 16 / 9, {
+    sampleHeight: (x, z) => seabed.sampleHeight(x, z),
+    getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+  });
+  for (const turn of [0, 22.5, -22.5, 45, -45, 90, -90, 135, -135, 180]) {
+    const bearing = ((opening.bearing + turn) * Math.PI) / 180;
+    const dx = Math.sin(bearing);
+    const dz = -Math.cos(bearing);
+    const edge = Math.min(
+      half.x / Math.max(Math.abs(dx), 1e-6),
+      half.z / Math.max(Math.abs(dz), 1e-6),
+    );
+    const boundary = hero.root.localToWorld(
+      centre.clone().add(new Vector3(dx * edge, 0, dz * edge)),
+    );
+    const direction = boundary.clone().sub(target).setY(0).normalize();
+    const p = boundary.addScaledVector(direction, opening.range);
+    if (p.x < nw.x || p.x > se.x || p.z < nw.z || p.z > se.z) continue;
+    let floor = seabed.sampleHeight(p.x, p.z);
+    // A clear line into the landscape matters as much as a safe initial hull.
+    for (let i = 1; i <= 8; i++) {
+      const t = i / 10;
+      floor = Math.max(
+        floor,
+        seabed.sampleHeight(p.x + (target.x - p.x) * t, p.z + (target.z - p.z) * t),
+      );
+    }
+    p.y = Math.max(floor + clearance, target.y + 12, safeDepth + settings.hullRadius);
+    if (p.y > -settings.hullRadius) continue;
+    if (props.collide(p.clone(), settings.hullRadius + 4, new Vector3())) continue;
+    // Reserve a clear chase arm as well as a collision-free submarine pose.
+    const yaw = Math.atan2(target.x - p.x, -(target.z - p.z));
+    rig.snap(p, yaw, 0);
+    let cameraClear = true;
+    for (let i = 1; i <= 6; i++) {
+      const eye = p.clone().lerp(rig.camera.position, i / 6);
+      if (props.collide(eye, 6, new Vector3())) cameraClear = false;
+    }
+    if (!cameraClear) continue;
+    const score = Math.abs(p.y - target.y - 12) * 3 + Math.abs(turn) * 0.12;
+    if (score < bestScore) {
+      bestScore = score;
+      best = { x: p.x, y: p.y, z: p.z, yaw };
+    }
+  }
+  return best;
+}
 
 // ---------------------------------------------------------------- hull class
 

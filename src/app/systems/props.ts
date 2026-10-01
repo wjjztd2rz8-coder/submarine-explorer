@@ -5,6 +5,7 @@
  */
 
 import { contentUrl, landmarkIdFor } from '../../game/ContentPath.js';
+import { composedFreeDiveSpawn, spawnSettings } from '../../game/Spawn.js';
 import { Props } from '../../world/Props.js';
 import { PlacementDebug } from '../../world/props/PlacementDebug.js';
 import { PropContact, atSpawnPose, parseAtParam } from '../../world/props/Wiring.js';
@@ -24,7 +25,29 @@ export const propsSystem: GameSystem = {
         : null;
     ctx.propsDebug = propsDebug;
     const propsLandmark = route ? contentLandmark : landmarkIdFor(params, meta.id);
+    const initialPosition = sub.position.clone();
     void props.load(contentUrl(propsLandmark, 'props.json'), propsLandmark).then((st) => {
+      // Explicit probes and missions keep their poses; don't teleport a pilot
+      // who has already moved while optional models were downloading.
+      if (
+        !route &&
+        !['at', 'poi', 'depth'].some((key) => params.has(key)) &&
+        sub.position.distanceTo(initialPosition) < 2
+      ) {
+        const pose = composedFreeDiveSpawn(
+          propsLandmark,
+          meta,
+          terrain,
+          props,
+          spawnSettings(config),
+          sub.getState().ratedDepth,
+          config.camera,
+        );
+        if (pose) {
+          sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+          rig.snap(sub.position, sub.yaw, sub.pitch);
+        }
+      }
       const { landmarkId, count, models, procedural } = st;
       bus.emit('props:loaded', { landmarkId, count, models, procedural });
       if (count || st.skipped) console.info(`[props] ${landmarkId}: ${props.debugString()}`);

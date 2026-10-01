@@ -123,7 +123,7 @@ export async function boot(): Promise<BootContext | null> {
   // ACES lifts the very dark midtones the abyss lives in and keeps the
   // headlight's hot spot from clipping to white.
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.25;
+  renderer.toneMappingExposure = 1.0;
 
   // KTX2 textures pick a GPU format from the renderer (core/assets).
   assets.setRenderer(renderer);

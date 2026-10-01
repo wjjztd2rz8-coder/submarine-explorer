@@ -35,6 +35,8 @@ export interface CameraConfig {
   lookAheadPerSpeed: number;
   /** Metres the camera is kept above the seabed; it never clips through. */
   terrainClearance: number;
+  /** Metres below sea level reserved for an underwater camera. */
+  surfaceClearance: number;
   /** Fraction of the boat's visual roll the chase camera copies. */
   bankFollow: number;
   /** Photo-mode free orbit: radius and starting elevation (radians). */
@@ -56,6 +58,7 @@ export const DEFAULT_CAMERA: CameraConfig = {
   firstPersonLookAhead: 300,
   lookAheadPerSpeed: 12,
   terrainClearance: 6,
+  surfaceClearance: 2,
   bankFollow: 0.55,
   orbitRadius: 90,
   orbitElevation: 0.35,

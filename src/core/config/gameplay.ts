@@ -53,6 +53,13 @@ export interface LightPreset {
   coneOpacity: number;
   fillIntensity: number;
   fillDistance: number;
+  /** The ROV camera needs a broad work pool; hull-close tuning must not dim it. */
+  workLight?: {
+    intensityFactor: number;
+    angleDeg: number;
+    fillIntensityFactor: number;
+    fillDistance: number;
+  };
 }
 export interface SensorPreset {
   scanRadiusMultiplier: number;
@@ -142,20 +149,32 @@ export const DEFAULT_DESCENT_PROFILES: Record<GameplayOptions['descentProfile'],
 
 export const DEFAULT_LIGHT_PRESETS: Record<GameplayOptions['lights'], LightPreset> = {
   realistic: {
-    intensity: 1100,
+    intensity: 500,
     distance: 2000,
-    angleDeg: 38,
-    coneOpacity: 0.05,
-    fillIntensity: 0,
-    fillDistance: 0,
+    angleDeg: 32,
+    coneOpacity: 0.008,
+    fillIntensity: 12,
+    fillDistance: 80,
+    workLight: {
+      intensityFactor: 2.75,
+      angleDeg: 38,
+      fillIntensityFactor: 1,
+      fillDistance: 80,
+    },
   },
   enhanced: {
-    intensity: 1800,
+    intensity: 750,
     distance: 2500,
-    angleDeg: 52,
-    coneOpacity: 0.075,
-    fillIntensity: 160,
-    fillDistance: 350,
+    angleDeg: 36,
+    coneOpacity: 0.012,
+    fillIntensity: 50,
+    fillDistance: 220,
+    workLight: {
+      intensityFactor: 3,
+      angleDeg: 52,
+      fillIntensityFactor: 4,
+      fillDistance: 350,
+    },
   },
 };
 

@@ -93,7 +93,10 @@ export class CameraRig {
   enterPhotoMode(target: THREE.Vector3): CameraMode {
     if (this.mode === 'orbit') return this.mode;
     this.modeBeforeOrbit = this.mode;
-    const back = this.camera.getWorldDirection(this.offset).negate();
+    const back =
+      this.mode === 'first-person'
+        ? this.camera.getWorldDirection(this.offset).negate()
+        : this.offset.copy(this.camera.position).sub(target).normalize();
     const r = this.camera.position.distanceTo(target);
     this.orbitRadius = clamp(
       this.mode === 'first-person' ? this.config.orbitRadius : r,
@@ -233,6 +236,11 @@ export class CameraRig {
           .applyAxisAngle(new THREE.Vector3(0, 1, 0), this.lookAzimuth)
           .applyQuaternion(this.quat);
       }
+      // Retract the whole chase arm as the boat rises, before resolving the
+      // terrain. This keeps the view underwater without flattening its angle.
+      if (this.mode === 'chase' && subPos.y < 0 && this.offset.y > 0) {
+        this.offset.multiplyScalar(clamp((-c.surfaceClearance - subPos.y) / this.offset.y, 0, 1));
+      }
       this.desiredPosition.copy(subPos).add(this.offset);
 
       if (this.mode === 'chase') {
@@ -265,17 +273,44 @@ export class CameraRig {
     this.camera.position.copy(this.desiredPosition);
     this.currentTarget.copy(this.desiredTarget);
 
-    this.clampToTerrain();
+    this.clampToTerrain(subPos);
     this.camera.lookAt(this.currentTarget);
     this.applyBank(opts.roll ?? 0, dt);
   }
 
   /** Never let the camera sit inside (or below) the seabed. */
-  private clampToTerrain(): void {
-    if (!this.terrain) return;
+  private clampToTerrain(subPos: THREE.Vector3): void {
     const p = this.camera.position;
-    const floor = this.terrain.sampleHeight(p.x, p.z) + this.config.terrainClearance;
-    if (p.y < floor) p.y = floor;
+    const ceiling = subPos.y < 0 ? -this.config.surfaceClearance : Infinity;
+    // A reef may leave no room between the terrain clearance and surface.
+    // Find the first obstruction along the arm and retract to its boundary;
+    // raising Y alone would put the camera above water. Refinement keeps the
+    // boundary continuous while turning and ascending, even on steep banks.
+    if (this.terrain && Number.isFinite(ceiling)) {
+      const dx = p.x - subPos.x;
+      const dz = p.z - subPos.z;
+      const dy = p.y - subPos.y;
+      const fits = (t: number): boolean =>
+        this.terrain!.sampleHeight(subPos.x + dx * t, subPos.z + dz * t) +
+          this.config.terrainClearance <=
+        ceiling;
+      for (let i = 1; i <= 24; i++) {
+        if (fits(i / 24)) continue;
+        let lo = (i - 1) / 24;
+        let hi = i / 24;
+        for (let j = 0; j < 16; j++) {
+          const mid = (lo + hi) / 2;
+          if (fits(mid)) lo = mid;
+          else hi = mid;
+        }
+        p.set(subPos.x + dx * lo, subPos.y + dy * lo, subPos.z + dz * lo);
+        break;
+      }
+    }
+    const floor = this.terrain
+      ? this.terrain.sampleHeight(p.x, p.z) + this.config.terrainClearance
+      : -Infinity;
+    p.y = Math.max(floor, Math.min(p.y, ceiling));
   }
 
   /**

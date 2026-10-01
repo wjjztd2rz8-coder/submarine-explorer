@@ -14,6 +14,11 @@ without an entry here is not done.
 
 ### Added
 
+- Phase F, F-VISUAL-FIXES: authored free-dive approaches for all thirteen sites,
+  facing the wreck, reef, chimney field or landscape route. Challenger keeps
+  its quiet floor and faces the small sampling marker. Openings check terrain,
+  hull rating and prop clearance, including the chase camera.
+
 - Phase F, F2-PROGRESS: research points from first discoveries, objective scans,
   species, photographs of new subjects, primary completion and best dive ratings.
   Existing discovery and photo saves receive credit automatically. Research stays
@@ -138,6 +143,20 @@ without an entry here is not done.
 - Phase F, F0-CORE: **Auto** and **Ultra** entries in Settings → Graphics tier.
 
 ### Changed
+
+- Phase F, F-VISUAL-FIXES: narrower, softer headlights and a weaker nearby fill
+  preserve material colour and seabed gradients. Exposure and bloom are lower;
+  marine snow is smaller. Realistic lights keep a faint local fill for the hull.
+  Beam haze follows the length of lit water through the view, replacing the
+  bright faceted shells so they no longer dominate a dive's opening.
+- F-VISUAL-FIXES follow-up: restored the ROV's broad working-light pool after
+  the close submarine lighting changes dimmed it. Submarine lamps now retain
+  more light at navigation distance, helping opening heroes stand out while
+  preserving the softer beams and close-range colour tuning.
+- The underwater camera reserves 2 m below the surface and retracts its chase
+  arm near shallow water or a reef, while retaining terrain clearance. Photo
+  orbit from chase starts at the current camera position, including a retracted arm.
+  No site models, terrain, controls or HUD features were cut.
 
 - Phase F, F2-PROGRESS: hull selection now follows site depth and unlocked research,
   rather than giving every deep free dive an unrestricted hull. Shared links to a

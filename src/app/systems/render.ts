@@ -23,7 +23,7 @@ export function godRayStrength(base: number, depthM: number): number {
   return base * smooth(0, -6, depthM) * (1 - smooth(-30, -260, depthM));
 }
 
-let baseExposure = 1.25;
+let baseExposure = 1.0;
 
 export const renderSystem: GameSystem = {
   name: 'render',
@@ -76,7 +76,7 @@ export const renderSystem: GameSystem = {
           fogDensity: a.fogDensity,
           aberration: config.water.aberrationStrength * atmoTier.aberration * 0.5,
           rayStrength: atmoTier.godRays ? godRayStrength(config.water.godRayStrength, a.depth) : 0,
-          bloomStrength: 0.22,
+          bloomStrength: 0.12,
           camera: rig.camera,
         };
         post.render(renderer, frame);
