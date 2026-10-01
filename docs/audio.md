@@ -1,185 +1,65 @@
 # Audio
 
-WebAudio-only sound system: a graph of buses feeding a shared depth low-pass,
-a physically-timed sonar ping/echo, ambient beds that crossfade with depth,
-and a handful of gameplay cues driven off `EventBus` and the sub's state.
+Phase F adds a generative documentary score and richer WebAudio sound effects.
+No runtime dependency was added. The only recording is a 9,461-byte NOAA/PMEL
+humpback excerpt; its source, licence and processing are in `ATTRIBUTION.md`.
 
-No dependency was added (`howler` was considered in `docs/assets.md` but
-CONTRIBUTING-AGENTS.md pins the runtime dependency list to exactly `three`,
-and raw WebAudio is simple enough here that a wrapper isn't worth it).
-
-## Why everything is synthesised, not sampled
-
-`ffmpeg` is not installed in this environment, so a downloaded CC0 sample
-can't be transcoded/shrunk to a safe size, and Freesound's real audio files
-require an authenticated API download (only preview URLs are guessable
-without one). NOAA PMEL's public-domain files (`bloop.wav`, `upsweep.wav`)
-_are_ directly downloadable and were verified reachable, but they are
-"monster sound" curiosities, not sonar pings or thruster loops, so using them
-for the actual gameplay cues would have meant fabricating fit that doesn't
-exist. Given the brief's explicit fallback ("ffmpeg may be absent; if so,
-keep WAV under 300 KB or synthesise"), every cue is generated at runtime with
-oscillators and filtered noise instead. This is zero bytes shipped, zero
-licensing risk, and deterministic. See `ATTRIBUTION.md` for the full note and
-`docs/assets.md` for the CC0 sources catalogued if a future pass wants to
-swap a synthesised cue for a recorded one.
-
-## Graph
+## Graph and settings
 
 ```
-bus(ambient) ----+
-bus(sub)     ----+--> depthFilter (shared lowpass) --> master --> destination
-bus(ui)      ----+
-bus(sonar)   ----+
+ambient / sub / ui / sonar -> SFX volume -> depth low-pass -> master -> destination
+music                     -> Music volume               -> master
 ```
 
-One shared low-pass rather than per-bus filters, because "the mix gets
-muffled with depth" is a property of the water and hull between the
-player and every source, not of any one bus. Cutoff is driven by
-`AudioEngine.setDepth(depthM)` every frame, interpolating between
-`Config.audio.depthLowpassSurfaceHz` (bright, ~18 kHz, effectively off) and
-`depthLowpassAbyssHz` (350 Hz, heavily muffled) as depth goes from 0 to
-`lowpassFullAt` (-1000 m).
+The score bypasses the underwater effects filter so its pads remain audible at
+depth. Master, SFX, Music and Mute are separate saved settings. Existing v1/v2
+saves receive audio defaults; invalid volumes fall back or clamp to 0..1.
+Sliders are keyboard and touch operable, with at least 44 px input height.
+Reduce motion softens discovery and pressure modulation and removes pad breathing.
 
-The `AudioContext` is created lazily, from the first `pointerdown` or
-`keydown` after page load (`src/main.ts`), because browsers refuse to start
-audio outside a user gesture. Nothing plays before that; there is no
-autoplay attempt and so no autoplay console error.
+`AudioSystem.unlock()` builds the graph on a pointer or keyboard gesture and
+resumes it on later gestures if the browser suspends it. The app shell suspends
+the context outside a dive. Disposal stops loops, cancels echoes, unsubscribes
+handlers and closes the context. Optional sample-fetch failures are silent.
 
-## Files
+## Score
 
-| File                       | What it owns                                                                                               |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `src/audio/events.ts`      | `TerrainSampler` (structural, avoids importing world/sub), `CaptionBus`, `CaptionEvent`, `AudioFrameInput` |
-| `src/audio/AudioEngine.ts` | The WebAudio graph: buses, shared depth low-pass, noise-buffer helper                                      |
-| `src/audio/Sonar.ts`       | `castSonarRay` -- pure ray-march + echo-delay maths, unit tested                                           |
-| `src/audio/DepthBands.ts`  | `bandWeights` -- pure ambient-band crossfade maths, unit tested                                            |
-| `src/audio/Cues.ts`        | One-shot synthesised sounds (ping, thud, creak, hiss, chime, scan tick, alarm)                             |
-| `src/audio/Loops.ts`       | Continuous sounds (`ThrusterLoop`, `AmbientBeds`)                                                          |
-| `src/audio/AudioSystem.ts` | Facade: EventBus wiring, per-frame `update()`, `ping()`, captions                                          |
-| `src/audio/index.ts`       | Public re-exports                                                                                          |
+`ScoreState` is pure and tested. `bandWeights` crossfades open, suspended chords
+across sunlit (0 m), twilight (200 m), midnight (1,000 m), abyssal (4,000 m), and
+hadal (6,000 m) anchor depths. `AmbientScore` uses three sine voices per band,
+slight detuning, slow independent breathing and four-second gain smoothing.
+Scan completions and completed objectives add a restrained nine-second swell;
+repeat scans have a softer accent. Species discoveries use the same first-time
+scan path. Tension begins at 80% of the fitted hull's rated depth and adds quiet
+beating rather than a sudden alarm. Audio-clock state naturally freezes on pause.
+Tuning lives in `src/core/config/audio.ts`.
 
-## Events used (and why no new ones were added to `EventBus`)
+## Vehicle and environment
 
-Per CONTRIBUTING-AGENTS.md, `GameEvents` is a shared contract. This package
-only _subscribes_, using events other lanes already emit:
+- Thruster pitch and loudness follow absolute thrust; ballast hiss follows
+  rise/flood edges. Hull creaks continue at depth and increase with hull stress.
+- Scan events start/stop a beam hum; tether movement and return mode drive the
+  ROV winch. Successful photo captures play a shutter. Scan start/end play a
+  manipulator servo as the existing vehicle arms deploy/retract;
+  `playManipulator()` also supports future sample-arm actions.
+- Two positional equal-power panners attach rumble/creaks to the nearest vent
+  and wreck props. Inverse-distance panning plus a squared distance envelope
+  fades them fully out at 240 m; mobile uses two fixed voices, no HRTF convolution.
+- Snapping-shrimp transients play near coral mound props. NOAA humpback calls
+  are sparse in Pacific sites (Monterey, Kamaʻehuakanaloa and Axial), only between
+  5 and 1,000 m. The PMEL source page identifies 10x speed; playback at 0.1
+  restores its cadence. Leaving that habitat stops an active call.
+- Important cues use `AudioSystem.captions`, including muted play. Continuous
+  ambience captions are rate limited to avoid crowding the HUD.
 
-| Event               | Payload                                            | What audio does with it                                                                                                                        |
-| ------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sub:collided`      | `{ depth, speed }`                                 | Collision thud, gain scaled by impact speed                                                                                                    |
-| `sub:hullStress`    | `{ stress, cause: 'impact' \| 'pressure', depth }` | `cause: 'pressure'` plays a hull creak (rate limited, see below); `cause: 'impact'` is skipped since `sub:collided` already covers that moment |
-| `sub:emergencyBlow` | `{ depth, lockSeconds }`                           | Klaxon alarm cue + caption                                                                                                                     |
-| `scan:complete`     | `{ poiId, landmarkId, firstTime }`                 | Discovery chime when `firstTime`, otherwise a quiet tick; both with a caption (see "Discovery chime")                                          |
+## Sonar and verification
 
-Creak repeat rate is throttled by `Config.audio.hullCreakMinGapS` /
-`hullCreakMaxGapS`, interpolated by `stress` (0..1): ~2.5 s apart near the
-reporting threshold, down to ~0.5 s apart as stress approaches 1, so creaks
-audibly accelerate as the hull nears failure.
+Sonar retains terrain ray marching and round-trip echo timing `2 * range / 1500`.
+No echo plays for open water; delayed callbacks are cancelled on disposal and
+suppressed while paused. Existing sonar tests remain unchanged.
 
-Two things genuinely didn't exist anywhere yet and are defined in
-`src/audio/events.ts` rather than in `EventBus.ts`, precisely because they
-are _not_ shared-bus material:
-
-- **Continuous per-frame state** (depth, throttle, ballast, position,
-  forward, `pingPressed`) -- broadcasting this every frame as bus events
-  would be spam. Instead it is pushed once per frame via
-  `AudioSystem.update(frame: AudioFrameInput)`, called once per frame from
-  `src/main.ts`'s loop (after the HUD/sonar, discovery, mission and props
-  updates, before `terrain.update`).
-- **Captions**, via `AudioSystem.captions` (a `CaptionBus`). Every cue this
-  system plays also emits a `CaptionEvent { id, text, durationS }` on it.
-  This is for the accessibility package (C5): subscribe to
-  `audioSystem.captions.on(handler)` and render a CC overlay. No consumer
-  exists yet, so this is currently a documented, tested extension point
-  rather than a visible feature.
-
-## Sonar ping and echo
-
-Triggered by the `ping` input action (already wired by A3: Q / Tab /
-gamepad LB -- see `Input.actions`), surfaced as `frame.pingPressed` and
-checked once per frame in `AudioSystem.update`.
-
-1. `playPing` fires immediately: a fast sine sweep 2600 Hz -> 900 Hz over
-   0.35 s.
-2. `castSonarRay` (`src/audio/Sonar.ts`) marches a ray from the sub's
-   position, along its forward vector tilted `sonarBeamDownDeg` (15°) below
-   horizontal, in `sonarRayStepM` (10 m) steps up to `sonarMaxRangeM`
-   (2000 m), against `Terrain.sampleHeight` (passed in structurally as
-   `TerrainSampler`, no import of `src/world/Terrain.ts`'s class).
-3. On a hit at range `r`, the echo delay is the textbook
-   `delayS = 2 * r / speedOfSoundMps` (1500 m/s in seawater --
-   `Config.audio.sonarSpeedOfSoundMps`), scheduled with `window.setTimeout`.
-   The echo replays the same chirp, quieter and lower-pitched
-   (`gain = 1 / (1 + r / 200)`, `pitchScale = 0.9`), plus a caption with the
-   rounded range in metres.
-4. No hit within range plays no echo (open water / off a cliff edge).
-
-**Unit test** (`tests/unit/audio.test.ts`): asserts `delayS` matches
-`2*range/1500` exactly for the ray-march's own reported range, and within 5%
-of the textbook value for a known geometric case (straight down onto a flat
-floor at -500 m, expected range exactly 500 m) -- satisfying the "ping echo
-delay equals 2d/1500 within 5%" acceptance criterion from `plan/MASTER-PLAN.md`.
-
-## Ambient beds
-
-Four depth-band layers (`Config.audio.ambientBands`, shallowest first: 0,
--20, -200, -1000 m), each a sine drone + low-passed noise. `AmbientBeds`
-crossfades adjacent bands with `bandWeights(depthM, bands)` (pure function,
-unit tested for: sum-to-1, band-0-at-surface, deepest-band-beyond-its-depth,
-and an exact 50/50 split at the midpoint between two bands).
-
-## Thruster and ballast
-
-`ThrusterLoop` is a sawtooth + filtered noise loop; `update(throttle)` slews
-its pitch between `thrusterMinHz` (55 Hz) and `thrusterMaxHz` (140 Hz) and
-its gain, by throttle magnitude, using `setTargetAtTime` so there's no
-zipper noise. Ballast hiss (`playBallastHiss`) fires once per edge -- when
-`sign(ballast)` changes and is non-zero -- rather than looping continuously,
-since ballast is usually held only briefly.
-
-## Discovery chime
-
-`AudioSystem` subscribes to B1's `scan:complete { poiId, landmarkId, firstTime }`:
-
-- `firstTime: true` plays `playDiscoveryChime()`, a bright C-E-G arpeggio, with
-  caption `discovery` ("New discovery logged").
-- `firstTime: false` (a re-scan of something already catalogued) plays
-  `playScanTick()`, a single quiet C6 tick, with caption `scan-repeat`.
-
-Like every bus cue, both play only after the first user gesture has unlocked audio.
-Unit test: `tests/unit/audio.test.ts` ("scan:complete cues").
-
-`env:depthBand` is deliberately not subscribed: the ambient beds already
-crossfade continuously from `frame.depth` every frame (`AmbientBeds.update`,
-`bandWeights`), which is smoother than switching on a band event.
-
-## Manual test checklist
-
-1. Load `?tile=titanic`, click or press a key once (unlocks audio) -- no
-   console autoplay-policy error.
-2. Hold `W`: thruster pitch and loudness rise; release: falls back to idle.
-3. Press `Q` or `Tab`: hear the ping chirp; if facing open water, no echo;
-   turn toward the seabed/a wall and ping again -- hear a delayed, quieter
-   echo, and a caption in the console-visible `captions` handler (or wire a
-   temporary `audioSystem.captions.on(console.log)` from the devtools
-   console) naming a plausible range.
-4. Descend from the surface to ~1000+ m: the whole mix audibly darkens
-   (low-pass closing), and the ambient bed crossfades through the four bands.
-5. Press `Space`/`Shift` (ballast): hear a short hiss on each direction
-   change, not a continuous drone.
-6. Drive into the seabed at speed: a low thud plays, louder for harder hits.
-7. Approach crush depth (for testing, fit a shallower hull: `hullClass: 'A'`
-   is 1,000 m; `Config.submarine.crushDepth` alone is ignored while the fitted
-   class exists in `hullClasses`): hull creaks start and audibly speed up as
-   depth approaches the limit.
-8. Force an emergency blow (100% crush ratio): klaxon alarm plays once.
-9. Confirm zero WAV/OGG files under `public/audio/` -- everything above is
-   synthesised, so there is nothing to attribute for size or licensing.
-
-## Tuning
-
-Every numeric knob lives in `Config.audio` (`src/core/Config.ts`):
-`masterVolume`, the depth low-pass pair + `lowpassFullAt`, sonar
-(`sonarSpeedOfSoundMps`, `sonarMaxRangeM`, `sonarRayStepM`,
-`sonarBeamDownDeg`), `ambientBands`, thruster pitch range, hull-creak gap
-range, and collision-thud gain-per-speed.
+`tests/unit/f3Audio.test.ts` covers depth palettes, pressure state, accent decay,
+reduce motion, spatial falloff and audio persistence. `tests/e2e/f3-audio.spec.ts`
+starts the real graph, changes independent buses, persists settings, exercises
+captions and touch targets, and writes review screenshots under
+`.cache/codex/shots/f3-audio/`. `audio.diagnostics` exposes graph state and gains.

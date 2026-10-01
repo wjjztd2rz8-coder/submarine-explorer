@@ -318,6 +318,20 @@ export class SettingsScreen {
         ]),
       ),
     );
+    const audio = this.section(`${id}-audio`, 'Audio');
+    audio.classList.add('settings-audio');
+    audio.append(this.checkbox('muted', 'Mute audio'));
+    for (const [key, label] of [
+      ['masterVolume', 'Master volume'],
+      ['sfxVolume', 'Sound effects volume'],
+      ['musicVolume', 'Music volume'],
+    ] as const) {
+      const row = this.range(key, label, 1, 0.01, '');
+      const slider = row.querySelector('input')!;
+      slider.addEventListener('input', () => opts.save.save({ [key]: Number(slider.value) }));
+      audio.append(row);
+    }
+
     // --- D2-PREDIVE: UI scale and hull warning ---
     access.append(this.uiScaleRow());
     access.append(
@@ -448,13 +462,14 @@ export class SettingsScreen {
       graphics,
       gameplay,
       access,
+      audio,
       keys,
       this.status,
       this.resetConfirm,
       this.reloadNote,
       footer,
     );
-    this.normalSections = [graphics, gameplay, access];
+    this.normalSections = [graphics, gameplay, access, audio];
     this.root.append(this.panel);
     (opts.parent ?? document.body).appendChild(this.root);
     this.trap = new FocusTrap(this.root);
@@ -551,7 +566,7 @@ export class SettingsScreen {
   }
 
   private checkbox(
-    key: 'postFx' | 'reduceMotion' | 'captions' | 'controlTips',
+    key: 'postFx' | 'reduceMotion' | 'captions' | 'controlTips' | 'muted',
     label: string,
   ): HTMLDivElement {
     const input = el('input');
@@ -586,7 +601,7 @@ export class SettingsScreen {
   }
 
   private range(
-    key: 'detailStrength',
+    key: 'detailStrength' | 'masterVolume' | 'sfxVolume' | 'musicVolume',
     label: string,
     max: number,
     step: number,
@@ -659,6 +674,11 @@ export class SettingsScreen {
       if (key === 'uiScale' && this.uiScaleOut) {
         this.uiScaleOut.value = `${v}%`;
         c.setAttribute('aria-valuetext', `${v}%`);
+      }
+      if (key === 'masterVolume' || key === 'sfxVolume' || key === 'musicVolume') {
+        const out = c.parentElement?.querySelector('output');
+        if (out) out.value = `${Math.round(Number(v) * 100)}%`;
+        c.setAttribute('aria-valuetext', `${Math.round(Number(v) * 100)}%`);
       }
       if (key === 'detailStrength') {
         this.detailOut.value = Number(v).toFixed(2);

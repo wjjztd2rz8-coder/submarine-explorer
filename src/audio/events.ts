@@ -65,6 +65,12 @@ export interface AudioFrameInput {
   ballast: number;
   /** Sub speed, m/s. */
   speed: number;
+  ratedDepth?: number;
+  hullStress?: number;
+  rovMode?: 'stowed' | 'piloting' | 'returning';
+  tetherUsedM?: number;
+  soundSites?: readonly import('./Soundscape.js').SoundSite[];
+  whaleHabitat?: boolean;
   /** Sub world position (metres), used as the sonar ping origin. */
   position: { x: number; y: number; z: number };
   /** Sub forward unit vector, used as the sonar ping direction. */

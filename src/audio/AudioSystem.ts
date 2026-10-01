@@ -21,6 +21,8 @@ import {
   playScanTick,
 } from './Cues.js';
 import { AmbientBeds, ThrusterLoop } from './Loops.js';
+import { AmbientScore } from './Score.js';
+import { MachineLoop, Soundscape, mechanicalCue } from './Soundscape.js';
 import { castSonarRay } from './Sonar.js';
 import { CaptionBus, type AudioFrameInput, type TerrainSampler } from './events.js';
 // --- C3 begin ---
@@ -39,12 +41,90 @@ export class AudioSystem {
   private lastCreakAt = -Infinity;
   private readonly unsubs: Array<() => void> = [];
   private paused = false;
+  private score: AmbientScore | null = null;
+  private soundscape: Soundscape | null = null;
+  private scanHum: MachineLoop | null = null;
+  private winch: MachineLoop | null = null;
+  private lastTether = 0;
+  private lastThrust = 0;
+  private lastRovMode = 'stowed';
+  private scanning = false;
+  private disposed = false;
+  private readonly echoes = new Set<number>();
+  private settings: {
+    masterVolume: number;
+    sfxVolume: number;
+    musicVolume: number;
+    muted: boolean;
+    reduceMotion: boolean;
+  };
+
+  setSettings(settings: Partial<typeof this.settings>): void {
+    Object.assign(this.settings, settings);
+    if (!this.engine || this.disposed) return;
+    const now = this.engine.ctx.currentTime;
+    this.engine.master.gain.setTargetAtTime(
+      this.settings.muted ? 0 : this.settings.masterVolume,
+      now,
+      0.03,
+    );
+    this.engine.effects.gain.setTargetAtTime(this.settings.sfxVolume, now, 0.03);
+    this.engine.bus('music').gain.setTargetAtTime(this.settings.musicVolume, now, 0.03);
+  }
+
+  get diagnostics() {
+    return {
+      state: this.engine?.ctx.state ?? 'locked',
+      sampleReady: this.soundscape?.sampleReady ?? false,
+      musicVolume: this.settings.musicVolume,
+      sfxVolume: this.settings.sfxVolume,
+      muted: this.settings.muted,
+      masterGain: this.engine?.master.gain.value ?? 0,
+      musicGain: this.engine?.bus('music').gain.value ?? 0,
+      sfxGain: this.engine?.effects.gain.value ?? 0,
+      contextTime: this.engine?.ctx.currentTime ?? 0,
+      score:
+        this.score?.state.mix(
+          this.lastFrame?.depth ?? 0,
+          this.lastFrame?.ratedDepth ?? -6000,
+          this.engine?.ctx.currentTime ?? 0,
+          this.settings.reduceMotion,
+        ) ?? null,
+    };
+  }
+
+  idle(): void {
+    this.thruster?.update(0);
+    this.scanHum?.update(0);
+    this.winch?.update(0);
+    this.lastThrust = 0;
+  }
+
+  playShutter(): void {
+    if (!this.engine || this.paused || this.disposed) return;
+    mechanicalCue(this.engine, 'shutter');
+    this.captions.emit({ id: 'shutter', text: 'Camera shutter', durationS: 1 });
+  }
+
+  playManipulator(): void {
+    if (!this.engine || this.paused || this.disposed) return;
+    mechanicalCue(this.engine, 'servo');
+    this.captions.emit({ id: 'servo', text: 'Manipulator servo', durationS: 1.5 });
+  }
 
   constructor(
     private readonly config: AudioConfig,
     private readonly bus: EventBus,
     private readonly terrain: TerrainSampler,
-  ) {}
+  ) {
+    this.settings = {
+      masterVolume: config.masterVolume,
+      sfxVolume: config.sfxVolume,
+      musicVolume: config.musicVolume,
+      muted: false,
+      reduceMotion: false,
+    };
+  }
 
   /**
    * Build the WebAudio graph and start the loops. MUST be called from inside
@@ -52,15 +132,25 @@ export class AudioSystem {
    * AudioContext otherwise. Safe to call more than once.
    */
   unlock(): void {
+    if (this.disposed) return;
     if (this.engine) {
       if (!this.paused) this.engine.unlock();
       return;
     }
     this.engine = new AudioEngine(this.config);
+    // Apply saved gains before any source starts, including a muted first touch.
+    this.engine.master.gain.value = this.settings.muted ? 0 : this.settings.masterVolume;
+    this.engine.effects.gain.value = this.settings.sfxVolume;
+    this.engine.bus('music').gain.value = this.settings.musicVolume;
     if (!this.paused) this.engine.unlock();
-    else void this.engine.ctx.suspend();
+    else void this.engine.ctx.suspend().catch(() => {});
     this.thruster = new ThrusterLoop(this.engine, this.config);
     this.ambient = new AmbientBeds(this.engine, this.config);
+    this.score = new AmbientScore(this.engine, this.config);
+    this.soundscape = new Soundscape(this.engine, this.config, this.captions);
+    this.scanHum = new MachineLoop(this.engine, 380);
+    this.winch = new MachineLoop(this.engine, 240);
+    this.setSettings(this.settings);
     this.wireBusEvents();
   }
 
@@ -71,15 +161,30 @@ export class AudioSystem {
   /** Suspend continuous audio while the app shell has frozen the dive. */
   setPaused(paused: boolean): void {
     this.paused = paused;
-    if (!this.engine) return;
-    if (paused) void this.engine.ctx.suspend();
-    else void this.engine.ctx.resume();
+    if (!this.engine || this.disposed) return;
+    if (paused) void this.engine.ctx.suspend().catch(() => {});
+    else void this.engine.ctx.resume().catch(() => {});
   }
 
   private wireBusEvents(): void {
     this.unsubs.push(
+      this.bus.on('scan:started', () => {
+        this.playManipulator();
+        this.scanning = true;
+        this.captions.emit({ id: 'scan-hum', text: 'Scan beam hums', durationS: 1.5 });
+      }),
+      this.bus.on('scan:aborted', () => {
+        if (this.scanning) this.playManipulator();
+        this.scanning = false;
+        this.scanHum?.update(0);
+      }),
+      this.bus.on('mission:objective', ({ complete }) => {
+        if (complete && !this.paused) this.score?.discover(1.2);
+      }),
+    );
+    this.unsubs.push(
       this.bus.on('sub:collided', ({ speed }) => {
-        if (!this.engine) return;
+        if (!this.engine || this.disposed || this.paused) return;
         playCollisionThud(this.engine, this.config, speed);
         this.captions.emit({ id: 'collision', text: 'Hull scrapes bottom', durationS: 1.5 });
       }),
@@ -91,7 +196,7 @@ export class AudioSystem {
     // the collision thud above; creaks are reserved for crush-depth pressure.
     this.unsubs.push(
       this.bus.on('sub:hullStress', ({ stress, cause }) => {
-        if (!this.engine || cause !== 'pressure') return;
+        if (!this.engine || this.paused || cause !== 'pressure') return;
         const c = this.config;
         const now = this.engine.ctx.currentTime;
         const minGap = c.hullCreakMaxGapS - stress * (c.hullCreakMaxGapS - c.hullCreakMinGapS);
@@ -110,7 +215,7 @@ export class AudioSystem {
     // cooldown with pressure stress so both sources cannot creak at once.
     this.unsubs.push(
       this.bus.on('env:trench', ({ depth }) => {
-        if (!this.engine) return;
+        if (!this.engine || this.disposed) return;
         const now = this.engine.ctx.currentTime;
         if (now - this.lastCreakAt < this.config.hullCreakMinGapS) return;
         this.lastCreakAt = now;
@@ -128,13 +233,17 @@ export class AudioSystem {
     // something already logged gets a quiet tick so it still confirms.
     this.unsubs.push(
       this.bus.on('scan:complete', ({ firstTime }) => {
+        if (this.scanning) this.playManipulator();
+        this.scanning = false;
+        this.scanHum?.update(0);
+        if (!this.paused) this.score?.discover(firstTime ? 1 : 0.45);
         if (firstTime) this.playDiscoveryChime();
         else this.playScanTick();
       }),
     );
     this.unsubs.push(
       this.bus.on('sub:emergencyBlow', ({ lockSeconds }) => {
-        if (!this.engine) return;
+        if (!this.engine || this.disposed || this.paused) return;
         playEmergencyAlarm(this.engine, this.config);
         this.captions.emit({
           id: 'emergency-blow',
@@ -152,7 +261,7 @@ export class AudioSystem {
    * call directly too, e.g. from a debug console.
    */
   ping(): void {
-    if (!this.engine || !this.lastFrame) return;
+    if (!this.engine || !this.lastFrame || this.paused) return;
     const c = this.config;
     const engine = this.engine;
 
@@ -174,7 +283,9 @@ export class AudioSystem {
     });
     if (!hit) return;
 
-    window.setTimeout(() => {
+    const timer = window.setTimeout(() => {
+      this.echoes.delete(timer);
+      if (this.disposed || this.paused) return;
       const rangeGain = 1 / (1 + hit.rangeM / 200);
       playPing(engine, c, rangeGain * 0.6, 0.9);
       this.captions.emit({
@@ -183,16 +294,58 @@ export class AudioSystem {
         durationS: 0.6,
       });
     }, hit.delayS * 1000);
+    this.echoes.add(timer);
   }
 
   /** Call once per rendered frame (small additive hook in src/main.ts). */
   update(frame: AudioFrameInput): void {
     this.lastFrame = frame;
-    if (!this.engine || !this.thruster || !this.ambient) return;
+    if (!this.engine || !this.thruster || !this.ambient || this.paused) return;
 
     this.engine.setDepth(frame.depth);
     this.thruster.update(frame.throttle);
+    if (Math.abs(frame.throttle) > 0.2 && this.lastThrust <= 0.2)
+      this.captions.emit({ id: 'thruster', text: 'Thrusters whine', durationS: 1.5 });
+    this.lastThrust = Math.abs(frame.throttle);
     this.ambient.update(frame.depth);
+    this.score?.update(frame.depth, frame.ratedDepth ?? -6000, this.settings.reduceMotion);
+    this.soundscape?.update(
+      frame.position,
+      frame.forward,
+      frame.soundSites ?? [],
+      this.settings.reduceMotion,
+      frame.whaleHabitat ?? false,
+    );
+    this.scanHum?.update(this.scanning ? 0.06 : 0);
+    const tether = frame.tetherUsedM ?? 0;
+    const mode = frame.rovMode ?? 'stowed';
+    this.winch?.update(
+      mode === 'returning'
+        ? 0.1
+        : mode === 'piloting' && Math.abs(tether - this.lastTether) > 0.005
+          ? 0.05
+          : 0,
+    );
+    if (mode !== this.lastRovMode && mode !== 'stowed')
+      this.captions.emit({
+        id: 'winch',
+        text: mode === 'returning' ? 'ROV tether reels in' : 'ROV tether pays out',
+        durationS: 2,
+      });
+    this.lastTether = tether;
+    this.lastRovMode = mode;
+    const stress = frame.hullStress ?? 0;
+    const now = this.engine.ctx.currentTime;
+    const gap = 20 - Math.min(1, stress) * 17;
+    if (frame.depth < -200 && now - this.lastCreakAt >= gap) {
+      this.lastCreakAt = now;
+      playHullCreak(
+        this.engine,
+        this.config,
+        Math.max(stress, Math.min(0.3, -frame.depth / 20000)),
+      );
+      this.captions.emit({ id: 'hull-creak', text: 'Hull creaks under pressure', durationS: 1.5 });
+    }
 
     if (frame.pingPressed) this.ping();
 
@@ -210,14 +363,15 @@ export class AudioSystem {
 
   /** The discovery chime, played on `scan:complete` with `firstTime: true`. */
   playDiscoveryChime(): void {
-    if (!this.engine) return;
+    if (!this.engine || this.disposed) return;
+    this.score?.discover();
     playDiscoveryChime(this.engine, this.config);
     this.captions.emit({ id: 'discovery', text: 'New discovery logged', durationS: 1.5 });
   }
 
   /** The quiet confirmation for re-scanning something already catalogued. */
   playScanTick(): void {
-    if (!this.engine) return;
+    if (!this.engine || this.disposed) return;
     playScanTick(this.engine, this.config);
     this.captions.emit({
       id: 'scan-repeat',
@@ -227,6 +381,15 @@ export class AudioSystem {
   }
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    for (const timer of this.echoes) window.clearTimeout(timer);
+    this.echoes.clear();
+    this.score?.stop();
+    this.soundscape?.stop();
+    this.scanHum?.stop();
+    this.winch?.stop();
+    if (this.engine) void this.engine.ctx.close().catch(() => {});
     for (const u of this.unsubs) u();
     this.unsubs.length = 0;
     this.thruster?.stop();
