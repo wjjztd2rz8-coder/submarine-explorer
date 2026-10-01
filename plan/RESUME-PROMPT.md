@@ -23,6 +23,7 @@ Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-expl
   - Create the worktree first: `git worktree add -b claude/<pkg> ../subexp-wt/<pkg> HEAD`, symlink node_modules, and symlink `.cache/codex/shots`.
   - In a headless run, run the agent synchronously (not in the background) so it finishes before you exit, and run at most 2 packages per run.
 - **Owner (2026-10-01): Codex 6.1 Sol also builds** well-specified, self-contained packages (progression, modes, audio, fix lists from audits), because a Claude window only covers ~40 min of one agent. Claude keeps visual-heavy work (marine life, set pieces, brand/UI) and reviews Codex diffs and screenshots before merging. Codex also does the detail work (audits, verification of merged work, bug hunts, research, fact checks): `systemd-run --user --unit=subexp-<name> --working-directory=$PWD env WT=1 ON_LIMIT=exit [NET=1] PW_PORT=<unique> tools/codex-task.sh <brief> <name> 2`.
+- **Keep Codex busy (owner, 2026-10-01):** every run checks `tools/codex-status.sh`. If fewer than 3 Codex tasks are running and Codex has budget (5h ≥ 30%, weekly ≥ 15%), launch the next self-contained Codex package(s) or a verification/bug-hunt task over newly merged work. Idle Codex capacity is wasted.
 - After each merged wave, or a large package, that is green and screenshot-reviewed:
   - `git push origin main`;
   - tag it (`git tag f<N> && git push origin f<N>`);
