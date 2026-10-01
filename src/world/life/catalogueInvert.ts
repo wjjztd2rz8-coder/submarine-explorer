@@ -230,7 +230,7 @@ export const INVERTEBRATES: SpeciesDef[] = [
     freq: 0.6,
     maxCount: 120,
     scanRadius: 13,
-    look: { kind: 'fan', thick: 2.6, fans: 4, moreLevels: 1, cStem: 0xe6dfcd, cPolyp: 0xf3eee1 },
+    look: { kind: 'fan', thick: 2.6, fans: 3, cStem: 0xcfc6b0, cPolyp: 0xe0d8c4 },
   }),
   def({
     id: 'brain-coral',

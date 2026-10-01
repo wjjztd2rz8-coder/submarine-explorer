@@ -12,20 +12,17 @@
 
 import * as THREE from 'three';
 import type { Agent, SubInfo } from './agent.js';
-import { clamp, smoothstep } from './rng.js';
+import { clamp, darkness, smoothstep } from './rng.js';
 import type { LifeSim } from './LifeSim.js';
 import { Sparks } from './Sparks.js';
 import { createSpeciesMesh, disposeSpeciesMesh, type SpeciesMesh } from './speciesMesh.js';
 import { bodyLen } from './steer.js';
 import type { LifeTier } from './types.js';
 
-/** Bioluminescence is only visible in the dark: 0 in daylight water, 1 below about 450 m. */
-export const darkness = (depthM: number): number => smoothstep(90, 450, depthM);
-
 export class LifeRender {
   readonly group = new THREE.Group();
   readonly sparks: Sparks;
-  private readonly meshes = new Map<string, SpeciesMesh>();
+  readonly meshes = new Map<string, SpeciesMesh>();
   private readonly counts = new Map<string, number>();
   private readonly m4 = new Float32Array(16);
   private wakeAcc = 0;

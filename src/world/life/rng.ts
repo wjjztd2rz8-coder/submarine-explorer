@@ -30,3 +30,6 @@ export const smoothstep = (a: number, b: number, v: number): number => {
   const t = clamp((v - a) / (b - a), 0, 1);
   return t * t * (3 - 2 * t);
 };
+
+/** Bioluminescence and the dark show only in dark water: 0 in daylight, 1 below about 450 m. */
+export const darkness = (depthM: number): number => smoothstep(90, 450, depthM);

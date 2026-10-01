@@ -17,7 +17,7 @@
  */
 
 import { Agent, type Group, type SimEnv, type SubInfo } from './agent.js';
-import { mulberry32, hash3, clamp, lerp, type Rand } from './rng.js';
+import { mulberry32, hash3, clamp, darkness, lerp, type Rand } from './rng.js';
 import { integrate, moveHub, tickGroup, type SteerCtx } from './steer.js';
 import {
   bandOverlap,
@@ -533,7 +533,9 @@ export class LifeSim {
     const rows = this.activeRows.filter((r) => isCellBound(r.def));
     if (!rows.length) return;
     const cell = this.tier.cell;
-    const R = this.tier.radius;
+    // In the dark only the lit patch around the sub shows, so rooted animals concentrate there;
+    // in bright water they fill the whole radius.
+    const R = this.tier.radius * (0.5 + 0.5 * (1 - darkness(-sub.y)));
     const c0x = Math.floor((sub.x - R) / cell);
     const c1x = Math.floor((sub.x + R) / cell);
     const c0z = Math.floor((sub.z - R) / cell);
@@ -541,48 +543,54 @@ export class LifeSim {
     let budget = initial ? 100000 : 14;
     const cap = Math.max(1, this.tier.maxSpecies - (this.rare ? 1 : 0));
     const sharedPool = this.pool.length * 0.62;
+    // Nearest cells first, so a full pool never starves the ground under the sub.
+    const todo: Array<[number, number, number]> = [];
     for (let cx = c0x; cx <= c1x; cx++) {
       for (let cz = c0z; cz <= c1z; cz++) {
-        const mx = (cx + 0.5) * cell;
-        const mz = (cz + 0.5) * cell;
-        if (Math.hypot(mx - sub.x, mz - sub.z) > R) continue;
-        const key = `${cx},${cz}`;
-        let st = this.cells.get(key);
-        if (!st) {
-          st = { groups: [], done: new Set() };
-          this.cells.set(key, st);
-        }
-        for (const row of rows) {
-          if (st.done.has(row.index)) continue;
-          if (budget <= 0) return;
-          const def = row.def;
-          const live = this.countOf(def.id) > 0;
-          if (!live && this.liveSpeciesCount() >= cap) continue;
-          if (this.cellLiveCount() >= sharedPool) return;
-          budget--;
-          const band = entryBand(row);
-          if (!band) {
-            st.done.add(row.index);
-            continue;
-          }
-          const gnd = this.env.groundAt(mx, mz);
-          if (!inBand(-gnd, band, 6) || Math.abs(gnd - sub.y) > R + 30) {
-            // Out of band (or the water is empty here): never roll this cell for this row.
-            if (!inBand(-gnd, band, 6)) st.done.add(row.index);
-            continue;
-          }
+        const d = Math.hypot((cx + 0.5) * cell - sub.x, (cz + 0.5) * cell - sub.z);
+        if (d <= R) todo.push([d, cx, cz]);
+      }
+    }
+    todo.sort((p, q) => p[0] - q[0]);
+    for (const [, cx, cz] of todo) {
+      const mx = (cx + 0.5) * cell;
+      const mz = (cz + 0.5) * cell;
+      const key = `${cx},${cz}`;
+      let st = this.cells.get(key);
+      if (!st) {
+        st = { groups: [], done: new Set() };
+        this.cells.set(key, st);
+      }
+      for (const row of rows) {
+        if (st.done.has(row.index)) continue;
+        if (budget <= 0) return;
+        const def = row.def;
+        const live = this.countOf(def.id) > 0;
+        if (!live && this.liveSpeciesCount() >= cap) continue;
+        if (this.cellLiveCount() >= sharedPool) return;
+        budget--;
+        const band = entryBand(row);
+        if (!band) {
           st.done.add(row.index);
-          const roll = hash3(cx, cz, row.index * 131 + this.seed);
-          const p = cellChance(
-            row.entry.weight * (row.entry.star ? 1.25 : 1),
-            this.tier.density,
-            cell,
-            R,
-          );
-          if (roll >= p) continue;
-          const g = this.placePatch(row, key, cx, cz, cell, initial);
-          if (g) st.groups.push(g);
+          continue;
         }
+        const gnd = this.env.groundAt(mx, mz);
+        if (!inBand(-gnd, band, 6) || Math.abs(gnd - sub.y) > R + 30) {
+          // Out of band (or the water is empty here): never roll this cell for this row.
+          if (!inBand(-gnd, band, 6)) st.done.add(row.index);
+          continue;
+        }
+        st.done.add(row.index);
+        const roll = hash3(cx, cz, row.index * 131 + this.seed);
+        const p = cellChance(
+          row.entry.weight * (row.entry.star ? 1.25 : 1),
+          this.tier.density,
+          cell,
+          R,
+        );
+        if (roll >= p) continue;
+        const g = this.placePatch(row, key, cx, cz, cell, initial);
+        if (g) st.groups.push(g);
       }
     }
   }

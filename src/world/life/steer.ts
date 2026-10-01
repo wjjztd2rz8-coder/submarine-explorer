@@ -688,7 +688,9 @@ export function integrate(a: Agent, env: SimEnv, dt: number): boolean {
     a.ey *= k;
     a.ez *= k;
     // Hard floor and ceiling: no animal can end a frame in rock or air.
-    if (def.archetype !== 'crawler') {
+    if (def.archetype === 'crawler') {
+      a.y = env.groundAt(a.x, a.z);
+    } else {
       const L = bodyLen(a);
       const gnd = env.groundAt(a.x, a.z) + Math.max(0.12, L * 0.25);
       if (a.y < gnd) {

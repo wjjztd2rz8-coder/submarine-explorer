@@ -338,7 +338,13 @@ export function buildGorgonian(look: Look, size: number, detail: 0 | 1 | 2): THR
     const tilt = i === 0 ? 0 : 0.4;
     const d: V3 = [Math.cos(ang) * tilt, 1, Math.sin(ang) * tilt];
     const l = Math.hypot(d[0], d[1], d[2]);
-    branch([0, H * 0.08, 0], [d[0] / l, d[1] / l, d[2] / l], H * (0.34 - 0.03 * i), levels, 1.3 + i * 2.1);
+    branch(
+      [0, H * 0.08, 0],
+      [d[0] / l, d[1] / l, d[2] / l],
+      H * (0.34 - 0.03 * i),
+      levels,
+      1.3 + i * 2.1,
+    );
   }
   return b.toGeometry();
 }

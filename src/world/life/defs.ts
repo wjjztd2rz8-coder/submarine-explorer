@@ -138,6 +138,9 @@ const BASE: Record<Archetype, Partial<SpeciesDef>> = {
 export function def(p: SpeciesInput): SpeciesDef {
   const merged = { ...BASE[p.archetype], ...p } as SpeciesDef;
   merged.visScale = drawnSize(merged.size) / merged.size;
+  // Rooted and crawling animals are the scenery: drawn larger again so a patch reads from the chase camera.
+  if (merged.archetype === 'sessile') merged.visScale *= 1.8;
+  else if (merged.archetype === 'crawler') merged.visScale *= 1.4;
   // The scanner measures from a 24 m sub; reach scales with the arcade scale too.
   merged.scanRadius = Math.round(merged.scanRadius * 1.6);
   return merged;

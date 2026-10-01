@@ -470,26 +470,26 @@
     },
     {
      "species": "cold-water-coral",
-     "weight": 3,
+     "weight": 21,
      "depth": [
       500,
       1000
      ],
      "group": [
       2,
-      5
+      8
      ]
     },
     {
      "species": "anemone",
-     "weight": 3,
+     "weight": 21,
      "depth": [
       600,
       5000
      ],
      "group": [
       1,
-      4
+      6
      ]
     },
     {
@@ -556,14 +556,14 @@
    "spawns": [
     {
      "species": "tubeworm",
-     "weight": 4,
+     "weight": 28,
      "depth": [
       1400,
       1700
      ],
      "group": [
       3,
-      8
+      13
      ],
      "star": true
     },
@@ -593,14 +593,14 @@
     },
     {
      "species": "anemone",
-     "weight": 2,
+     "weight": 14,
      "depth": [
       1000,
       3000
      ],
      "group": [
       1,
-      3
+      5
      ]
     },
     {
@@ -668,26 +668,26 @@
     },
     {
      "species": "anemone",
-     "weight": 3,
+     "weight": 21,
      "depth": [
       4600,
       5100
      ],
      "group": [
       2,
-      6
+      10
      ]
     },
     {
      "species": "squat-lobster",
-     "weight": 3,
+     "weight": 21,
      "depth": [
       2400,
       5100
      ],
      "group": [
       1,
-      3
+      5
      ]
     },
     {
@@ -850,14 +850,14 @@
     },
     {
      "species": "golden-coral",
-     "weight": 3,
+     "weight": 21,
      "depth": [
       1000,
       2000
      ],
      "group": [
       1,
-      3
+      5
      ]
     },
     {
@@ -1012,26 +1012,26 @@
     },
     {
      "species": "sea-pen",
-     "weight": 2,
+     "weight": 14,
      "depth": [
       350,
       3700
      ],
      "group": [
       1,
-      3
+      5
      ]
     },
     {
      "species": "sun-star",
-     "weight": 2,
+     "weight": 14,
      "depth": [
       150,
       1050
      ],
      "group": [
       1,
-      3
+      5
      ]
     },
     {
@@ -1135,14 +1135,14 @@
     },
     {
      "species": "deep-coral",
-     "weight": 3,
+     "weight": 21,
      "depth": [
       350,
       1800
      ],
      "group": [
       2,
-      5
+      8
      ],
      "star": true
     },
@@ -1211,39 +1211,39 @@
    "spawns": [
     {
      "species": "cold-water-coral",
-     "weight": 5,
+     "weight": 35,
      "depth": [
       500,
       1000
      ],
      "group": [
       3,
-      7
+      11
      ],
      "star": true
     },
     {
      "species": "anemone",
-     "weight": 2,
+     "weight": 14,
      "depth": [
       500,
       1000
      ],
      "group": [
       1,
-      3
+      5
      ]
     },
     {
      "species": "sea-lily",
-     "weight": 1.5,
+     "weight": 10.5,
      "depth": [
       600,
       1000
      ],
      "group": [
       1,
-      2
+      3
      ]
     },
     {
@@ -1383,14 +1383,14 @@
     },
     {
      "species": "brain-coral",
-     "weight": 5,
+     "weight": 35,
      "depth": [
       1,
       40
      ],
      "group": [
       1,
-      3
+      5
      ],
      "star": true
     },
@@ -1422,27 +1422,27 @@
    "spawns": [
     {
      "species": "golden-coral",
-     "weight": 2,
+     "weight": 14,
      "depth": [
       1000,
       4000
      ],
      "group": [
       1,
-      3
+      5
      ],
      "star": true
     },
     {
      "species": "brittle-star",
-     "weight": 4,
+     "weight": 28,
      "depth": [
       3400,
       4900
      ],
      "group": [
       2,
-      6
+      10
      ],
      "star": true
     },
@@ -1460,14 +1460,14 @@
     },
     {
      "species": "anemone",
-     "weight": 2,
+     "weight": 14,
      "depth": [
       500,
       5100
      ],
      "group": [
       1,
-      3
+      5
      ]
     },
     {
@@ -1522,39 +1522,39 @@
    "spawns": [
     {
      "species": "long-tailed-cucumber",
-     "weight": 3,
+     "weight": 21,
      "depth": [
       3500,
       5600
      ],
      "group": [
       1,
-      3
+      5
      ],
      "star": true
     },
     {
      "species": "amperima",
-     "weight": 4,
+     "weight": 28,
      "depth": [
       3500,
       5600
      ],
      "group": [
       2,
-      6
+      10
      ]
     },
     {
      "species": "brittle-star",
-     "weight": 3,
+     "weight": 21,
      "depth": [
       3400,
       4900
      ],
      "group": [
       2,
-      5
+      8
      ]
     },
     {
@@ -1621,52 +1621,52 @@
    "spawns": [
     {
      "species": "anemone",
-     "weight": 3,
+     "weight": 21,
      "depth": [
       2500,
       3500
      ],
      "group": [
       1,
-      4
+      6
      ],
      "star": true
     },
     {
      "species": "sea-lily",
-     "weight": 2,
+     "weight": 14,
      "depth": [
       800,
       4000
      ],
      "group": [
       1,
-      3
+      5
      ],
      "star": true
     },
     {
      "species": "glass-sponge",
-     "weight": 2,
+     "weight": 14,
      "depth": [
       2500,
       3500
      ],
      "group": [
       1,
-      3
+      5
      ]
     },
     {
      "species": "squat-lobster",
-     "weight": 2,
+     "weight": 14,
      "depth": [
       2400,
       5100
      ],
      "group": [
       1,
-      3
+      5
      ]
     },
     {
