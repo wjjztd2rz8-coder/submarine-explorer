@@ -21,7 +21,7 @@ export function buildTubeworm(look: Look, size: number, detail: 0 | 1 | 2): THRE
     [H * 0.16, H * 0.06, H * 0.16],
     [7, 10, 14][detail]!,
     4,
-    (t, s, c, p) =>
+    (_t, _s, _c, p) =>
       scaleRgb(cRock, 0.7 + 0.6 * hash1(Math.floor(p[0] * 60) + Math.floor(p[2] * 60) * 7)),
     [0, 0, 0],
   );

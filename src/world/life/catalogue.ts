@@ -1,146 +1,17 @@
 /**
  * The species catalogue: what each animal is, how big, where it lives and how
- * it moves. Journal text and per-site spawn tables live in `data/life.json`
+ * it moves. Journal text and per-site spawn tables live in `data/life/life.json`
  * (`tables.ts`); this file holds what the simulation and the models need.
  * Sizes are the real animal's order of magnitude; `visScale` enlarges the
- * smallest ones so they read in the lights (docs/life.md).
+ * smallest ones so they read in the lights. Fish, sharks and marine mammals
+ * are here; invertebrates are in `catalogueInvert.ts`.
  */
 
-import type { Archetype, SpeciesDef } from './types.js';
+import { INVERTEBRATES } from './catalogueInvert.js';
+import { def } from './defs.js';
+import type { SpeciesDef } from './types.js';
 
-type Required2 =
-  'id' | 'common' | 'scientific' | 'group' | 'archetype' | 'model' | 'look' | 'size' | 'depth';
-type SpeciesInput = Pick<SpeciesDef, Required2> & Partial<Omit<SpeciesDef, Required2>>;
-
-/** Per-archetype defaults; a species overrides what differs. */
-const BASE: Record<Archetype, Partial<SpeciesDef>> = {
-  school: {
-    visScale: 1,
-    speed: [0.5, 2.6],
-    skittish: 0.5,
-    attract: 0.05,
-    wash: 0.3,
-    glow: 'none',
-    glowColor: 0x66ccff,
-    scanRadius: 16,
-    scanSeconds: 2.2,
-    maxCount: 90,
-    anim: 'wave',
-    amp: 0.075,
-    freq: 9,
-  },
-  hover: {
-    visScale: 1,
-    speed: [0.15, 1.2],
-    skittish: 0.25,
-    attract: 0.1,
-    wash: 0.3,
-    glow: 'none',
-    glowColor: 0x66ccff,
-    scanRadius: 18,
-    scanSeconds: 2.4,
-    maxCount: 18,
-    anim: 'wave',
-    amp: 0.06,
-    freq: 4,
-  },
-  cruiser: {
-    visScale: 1,
-    speed: [1.2, 3.2],
-    skittish: 0.05,
-    attract: 0,
-    wash: 0,
-    glow: 'none',
-    glowColor: 0x66ccff,
-    scanRadius: 34,
-    scanSeconds: 3.2,
-    maxCount: 6,
-    anim: 'wave',
-    amp: 0.05,
-    freq: 3.2,
-  },
-  drifter: {
-    visScale: 1,
-    speed: [0.05, 0.35],
-    skittish: 0,
-    attract: 0,
-    wash: 1,
-    glow: 'flash',
-    glowColor: 0x40e8ff,
-    scanRadius: 14,
-    scanSeconds: 2.0,
-    maxCount: 30,
-    anim: 'jelly',
-    amp: 0.06,
-    freq: 2.4,
-  },
-  swarm: {
-    visScale: 1.8,
-    speed: [0.1, 0.9],
-    skittish: 0.3,
-    attract: 0.5,
-    wash: 0.7,
-    glow: 'none',
-    glowColor: 0x66ccff,
-    scanRadius: 9,
-    scanSeconds: 2.0,
-    maxCount: 120,
-    anim: 'wave',
-    amp: 0.12,
-    freq: 14,
-  },
-  crawler: {
-    visScale: 1,
-    speed: [0.02, 0.09],
-    skittish: 0,
-    attract: 0,
-    wash: 0,
-    glow: 'none',
-    glowColor: 0x66ccff,
-    scanRadius: 9,
-    scanSeconds: 2.0,
-    maxCount: 60,
-    anim: 'crawl',
-    amp: 0.05,
-    freq: 2.2,
-  },
-  sessile: {
-    visScale: 1,
-    speed: [0, 0],
-    skittish: 0,
-    attract: 0,
-    wash: 0.15,
-    glow: 'none',
-    glowColor: 0x66ccff,
-    scanRadius: 9,
-    scanSeconds: 2.0,
-    maxCount: 140,
-    anim: 'sway',
-    amp: 0.06,
-    freq: 0.9,
-  },
-  cephalopod: {
-    visScale: 1,
-    speed: [0.1, 1.6],
-    skittish: 0.2,
-    attract: 0.15,
-    wash: 0.5,
-    glow: 'none',
-    glowColor: 0x66ccff,
-    scanRadius: 18,
-    scanSeconds: 2.6,
-    maxCount: 10,
-    anim: 'ceph',
-    amp: 0.05,
-    freq: 2.6,
-  },
-};
-
-function def(p: SpeciesInput): SpeciesDef {
-  return { ...BASE[p.archetype], ...p } as SpeciesDef;
-}
-
-export const SPECIES: SpeciesDef[] = [
+const VERTEBRATES: SpeciesDef[] = [
   // ---- schooling and darting fish (shallow reef water) ----
   def({
     id: 'blackfin-chromis',
@@ -779,6 +650,91 @@ export const SPECIES: SpeciesDef[] = [
     },
   }),
   def({
+    id: 'whale-shark',
+    common: 'Whale shark',
+    scientific: 'Rhincodon typus',
+    group: 'Fish',
+    archetype: 'cruiser',
+    model: 'fish',
+    size: 9,
+    depth: [2, 120],
+    speed: [0.5, 1.4],
+    skittish: 0,
+    attract: 0.3,
+    maxCount: 1,
+    rare: true,
+    scanRadius: 40,
+    scanSeconds: 3.4,
+    amp: 0.06,
+    freq: 2.6,
+    look: {
+      H: 0.12,
+      W: 0.2,
+      peak: 0.18,
+      noseP: 0.42,
+      tailP: 1.1,
+      tail: 'hetero',
+      tailLen: 0.22,
+      dorsal: 0.1,
+      dorsalA: 0.4,
+      dorsalB: 0.5,
+      dorsal2: 0.03,
+      anal: 0.03,
+      pec: 0.2,
+      pecAngle: 0.7,
+      gills: 5,
+      eye: 0.006,
+      pattern: 'spots',
+      cP: 0xe8e6d6,
+      cD: 0x34505f,
+      cF: 0x4c6978,
+      cB: 0xdcdcd0,
+      cFin: 0x34505f,
+      ped: 0.05,
+    },
+  }),
+  def({
+    id: 'weddell-seal',
+    common: 'Weddell seal',
+    scientific: 'Leptonychotes weddellii',
+    group: 'Mammal',
+    archetype: 'cruiser',
+    model: 'fish',
+    size: 3,
+    depth: [5, 600],
+    speed: [0.8, 3.2],
+    skittish: 0,
+    attract: 0.8,
+    maxCount: 2,
+    rare: true,
+    scanRadius: 26,
+    scanSeconds: 2.8,
+    vertical: true,
+    amp: 0.05,
+    freq: 4.5,
+    look: {
+      H: 0.24,
+      W: 0.22,
+      peak: 0.36,
+      noseP: 0.5,
+      tailP: 1.3,
+      ped: 0.07,
+      tail: 'seal',
+      tailLen: 0.14,
+      dorsal: 0,
+      anal: 0,
+      pec: 0.2,
+      pecAngle: 0.6,
+      eye: 0.022,
+      pattern: 'mottle',
+      cP: 0x4a4a4a,
+      cD: 0x5b5c5e,
+      cF: 0x82827c,
+      cB: 0xb2b0a6,
+      cFin: 0x4d4d50,
+    },
+  }),
+  def({
     id: 'sea-lion',
     common: 'California sea lion',
     scientific: 'Zalophus californianus',
@@ -816,6 +772,8 @@ export const SPECIES: SpeciesDef[] = [
     },
   }),
 ];
+
+export const SPECIES: SpeciesDef[] = [...VERTEBRATES, ...INVERTEBRATES];
 
 export const SPECIES_BY_ID: ReadonlyMap<string, SpeciesDef> = new Map(
   SPECIES.map((s) => [s.id, s]),
