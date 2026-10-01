@@ -132,12 +132,11 @@ export const DEFAULT_WATER: WaterConfig = {
   // makes the terrain silhouette disappear entirely.
   deepColor: 0x17384a,
   ambientIntensity: 2.4,
-  // Spotlight decay is 1 (inverse-linear), so the effective brightness is
-  // roughly intensity / distance_in_metres. ~700 gives a readable pool of
-  // light a few hundred metres ahead without blowing out the near seabed.
-  headlightIntensity: 1100,
+  // A softened distance falloff preserves close material colour while keeping
+  // a navigable pool ahead. Gameplay presets override these standalone defaults.
+  headlightIntensity: 500,
   headlightDistance: 2000,
-  headlightAngleDeg: 38,
+  headlightAngleDeg: 32,
 
   // Colours, fog coefficients and band edges are verbatim from
   // docs/art-direction.md §0. Light intensities and grades are A2's.
@@ -212,7 +211,7 @@ export const DEFAULT_WATER: WaterConfig = {
   causticsFootprintM: 320,
   causticsFps: 12,
   snowBoxM: 160,
-  snowSizeM: 0.32,
+  snowSizeM: 0.14,
   surfaceVisibleAboveM: -160,
   surfaceWaveAmpM: 0.9,
   surfaceWaveLengthM: 22,

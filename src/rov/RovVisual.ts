@@ -61,15 +61,17 @@ export class RovVisual {
   }
 
   setLightPreset(preset: LightPreset): void {
+    const work = preset.workLight;
     for (const spot of this.spots) {
-      spot.intensity = preset.intensity * this.config.spotIntensityFactor;
+      spot.intensity =
+        preset.intensity * (work?.intensityFactor ?? 1) * this.config.spotIntensityFactor;
       spot.distance = preset.distance * this.config.spotDistanceFactor;
     }
     this.fill.intensity =
       FILL_STANDOFF_GAIN *
       Math.max(
         this.config.fillMinIntensity,
-        preset.fillIntensity * this.config.fillIntensityFactor,
+        preset.fillIntensity * (work?.fillIntensityFactor ?? 1) * this.config.fillIntensityFactor,
       );
   }
 

@@ -81,12 +81,15 @@ test.describe('A3 submarine feel', () => {
     });
     page.on('pageerror', (e) => consoleErrors.push(e.message));
 
-    await page.goto('/?tile=titanic', { waitUntil: 'domcontentloaded' });
+    // The authored free-dive opening faces the bow from the north-east. This
+    // handling script needs its original north-facing, open-water manoeuvre area.
+    await page.goto('/?tile=titanic&depth=3700', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
     await page.waitForTimeout(500);
 
     const start = await probe(page);
     expect(start.speed).toBeLessThan(1);
+    expect(start.headingDeg).toBeCloseTo(0, 1);
 
     // --- check 1: full ahead accelerates, and heads north (-Z at yaw 0) ------
     await hold(page, 'w', 6000);
@@ -154,7 +157,7 @@ test.describe('A3 submarine feel', () => {
   test('after turning to ~090 the chase camera sits west of the boat, behind it', async ({
     page,
   }) => {
-    await page.goto('/?tile=titanic', { waitUntil: 'domcontentloaded' });
+    await page.goto('/?tile=titanic&depth=3700', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
     await page.waitForTimeout(500);
 

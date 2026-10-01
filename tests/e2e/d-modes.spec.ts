@@ -25,7 +25,7 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
       scanRadius: game.discovery.pois.find((poi) => poi.id === 'titanic-bow')!.radius,
     };
   });
-  expect(initial).toEqual({ mode: 'arcade', speed: 1, light: 1800, scanRadius: 400 });
+  expect(initial).toEqual({ mode: 'arcade', speed: 1, light: 750, scanRadius: 400 });
   await page.keyboard.press('Escape');
   await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
   const dialog = page.getByRole('dialog', { name: 'Settings' });
@@ -55,8 +55,8 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
   expect(realistic).toEqual({
     forwardCap: 1.4,
     descentCap: 0.5,
-    light: 1100,
-    fill: 0,
+    light: 500,
+    fill: 12,
     scanRadius: 200,
   });
   await dialog.getByLabel('Lights', { exact: true }).selectOption('enhanced');
