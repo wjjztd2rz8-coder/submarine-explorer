@@ -15,7 +15,7 @@ import { LifeSim } from './LifeSim.js';
 import { LifeRender } from './LifeRender.js';
 import { bodyLen } from './steer.js';
 import { LIFE_TIERS, type LifeTier, type SiteTable, type SpeciesDef } from './types.js';
-import type { Rand } from './rng.js';
+import { clamp, type Rand } from './rng.js';
 
 /** Structurally a `ScanTarget` (game/Scanner.ts) so the scanner can take them as they are. */
 export interface LifeScanTarget {
@@ -150,7 +150,7 @@ export class Life {
   }
 
   /** The species a photo taken now would show: the animal nearest the frame centre. */
-  animalInView(camera: THREE.PerspectiveCamera, maxDistanceM = 70): SpeciesDef | null {
+  animalInView(camera: THREE.PerspectiveCamera): SpeciesDef | null {
     camera.updateMatrixWorld();
     let best: SpeciesDef | null = null;
     let bestScore = Infinity;
@@ -159,7 +159,8 @@ export class Life {
       const toward = this.tmp.set(a.x, a.y, a.z).sub(camera.position);
       const d = toward.length();
       const size = bodyLen(a);
-      if (d > Math.min(maxDistanceM, 18 + size * 14)) continue;
+      // Far enough that it would be a speck (about 1% of the frame) is not the subject.
+      if (d > clamp(size * 70, 40, 160)) continue;
       this.proj.set(a.x, a.y, a.z).project(camera);
       if (this.proj.z < -1 || this.proj.z > 1) continue;
       if (Math.abs(this.proj.x) > 0.85 || Math.abs(this.proj.y) > 0.85) continue;

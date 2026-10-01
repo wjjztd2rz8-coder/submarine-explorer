@@ -1,3 +1,4 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { SPECIES, SPECIES_BY_ID } from '../../src/world/life/catalogue.js';

@@ -138,5 +138,7 @@ const BASE: Record<Archetype, Partial<SpeciesDef>> = {
 export function def(p: SpeciesInput): SpeciesDef {
   const merged = { ...BASE[p.archetype], ...p } as SpeciesDef;
   merged.visScale = drawnSize(merged.size) / merged.size;
+  // The scanner measures from a 24 m sub; reach scales with the arcade scale too.
+  merged.scanRadius = Math.round(merged.scanRadius * 1.6);
   return merged;
 }
