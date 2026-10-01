@@ -37,7 +37,6 @@ without an entry here is not done.
   Manipulator servos follow scan-arm deployment and retraction.
   Reduce motion softens score changes. No features were cut.
 
-
 - Phase F, F2-LIFE: **marine life** (`src/world/life/`). Instanced, steering-driven
   animals in eight movement archetypes (schools, swarms, drifters, cruisers,
   hoverers, crawlers, sessile, jetters) with vertex animation, reactions to the sub

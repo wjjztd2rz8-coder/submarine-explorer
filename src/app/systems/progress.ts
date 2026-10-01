@@ -54,7 +54,9 @@ export function createProgressSystem(): GameSystem {
       }
       cleanup.add(
         ctx.bus.on('scan:complete', ({ landmarkId, poiId }) => {
-          const earned = progress.award('poi', `${landmarkId}/${poiId}`);
+          const earned = poiId.startsWith('life:')
+            ? progress.award('species', poiId.slice('life:'.length))
+            : progress.award('poi', `${landmarkId}/${poiId}`);
           if (earned) ctx.hud.notice(`New discovery · +${earned} RP`);
         }),
       );
