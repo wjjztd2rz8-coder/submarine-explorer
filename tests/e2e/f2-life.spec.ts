@@ -238,13 +238,23 @@ for (const site of SITES) {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await boot(page, `/?tile=${site}&skipBriefing=1&tier=high&lifeSeed=5`);
-    const mid = await page.evaluate(() => {
+    const band = await page.evaluate(() => {
       const r = (
         window.__game as unknown as Game & { life: { sim: { rare: { depth: number[] } } } }
       ).life!.sim.rare;
-      return r ? (r.depth[0] + r.depth[1]) / 2 : 100;
+      return r ? r.depth : [50, 150];
     });
-    await park(page, Math.max(15, Math.min(mid, 400)));
+    // Keep the site's own start (never inside rock), at the rare band's depth.
+    await page.evaluate((b) => {
+      const g = window.__game as unknown as Game;
+      const p = g.sub.position;
+      const gnd = g.terrain.sampleHeight(p.x, p.z);
+      // Seabed inside the rare's depth band: hover just above it, else mid-band.
+      const onBand = -gnd >= b[0] && -gnd <= b[1];
+      const y = onBand ? gnd + 10 : Math.min(-8, Math.max(-(b[0] + b[1]) / 2, gnd + 10));
+      g.sub.reset(p.x, y, p.z, 0);
+    }, band);
+    await page.waitForTimeout(500);
     const res = await page.evaluate(() => {
       const g = window.__game as unknown as Game;
       const p = g.sub.position;
@@ -266,7 +276,26 @@ for (const site of SITES) {
       return s.spawnRare(sub) !== null;
     });
     expect(res).toBe(true);
-    await page.waitForTimeout(2500);
+    await page.waitForTimeout(1500);
+    // For the screenshot, hold one of the species in the lights, centred.
+    await page.evaluate(() => {
+      const g = window.__game as unknown as Game;
+      const p = g.sub.position;
+      const l = g.life as unknown as {
+        sim: {
+          rare: { species: string };
+          spawnNear(id: string, s: unknown, a: number, c: number): unknown;
+        };
+      };
+      const sub = { x: p.x, y: p.y, z: p.z, vx: 0, vy: 0, vz: 0, fx: 0, fy: 0, fz: -1 };
+      l.sim.spawnNear(l.sim.rare.species, { ...sub, speed: 0, lightsOn: true, hullR: 7 }, 20, 1);
+    });
+    await page.waitForTimeout(1200);
+    await page.keyboard.press('p');
+    await page.evaluate(() => {
+      (window.__game as unknown as Game).rig.orbitRadius = 50;
+    });
+    await page.waitForTimeout(500);
     const info = await page.evaluate(() => {
       const g = window.__game as unknown as Game;
       return { draw: g.life!.render.drawCalls, stats: g.life!.sim.stats() };
