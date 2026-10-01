@@ -95,10 +95,7 @@ export const shellSystem: GameSystem = {
       resume: () => ctx.setAppState('dive'),
       journal: () => discovery.guide.open(),
       settings: () => ctx.settingsScreen.open(),
-      controls: () => {
-        ctx.settingsScreen.open();
-        ctx.settingsScreen.showControls(true);
-      },
+      controls: () => ctx.controlsCard.open(),
       quit: () => {
         history.pushState({}, '', new URL('.', window.location.href));
         ctx.setAppState('home');

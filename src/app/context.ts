@@ -36,6 +36,7 @@ import type { UnderwaterPass } from '../shaders/underwater.js';
 import type { CameraRig } from '../sub/CameraRig.js';
 import type { SubMesh } from '../sub/SubMesh.js';
 import type { Submarine } from '../sub/Submarine.js';
+import type { ControlsCard } from '../ui/ControlsCard.js';
 import type { Captions } from '../ui/Captions.js';
 import type { Globe } from '../ui/Globe.js';
 import type { Home } from '../ui/Home.js';
@@ -156,6 +157,8 @@ export interface GameContext extends BootContext {
   keyboard: { lock(): Promise<void>; unlock(): void };
   pointerLook: { updateHint(): void };
   settingsScreen: SettingsScreen;
+  /** F3-ONBOARD: device layout card; also supplies the compact control tips. */
+  controlsCard: ControlsCard;
   missionRouter: MissionRouter | null;
   applyMissionStart(choice: MissionStartPosition): void;
   journal: Journal;

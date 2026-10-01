@@ -21,6 +21,7 @@ import { discoverySystem } from './systems/discovery.js';
 import { hudSystem } from './systems/hud.js';
 import { inputSystem } from './systems/input.js';
 import { journalSystem } from './systems/journal.js';
+import { createOnboardSystem } from './systems/onboard.js';
 import { missionSystem } from './systems/mission.js';
 import { modesSystem } from './systems/modes.js';
 import { createPhotoSystem } from './systems/photo.js';
@@ -70,6 +71,8 @@ export function createSystems(): GameSystem[] {
     cameraControlsSystem,
     createPointerSystem(),
     createTouchSystem(),
+    // Onboarding's capture-phase Escape handler must precede Settings and the shell.
+    createOnboardSystem(),
     // Before the mission router, so its capture-phase key handler runs first.
     settingsSystem,
     sonarControlsSystem,
