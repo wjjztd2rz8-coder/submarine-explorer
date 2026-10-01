@@ -14,6 +14,16 @@ without an entry here is not done.
 
 ### Added
 
+- Phase F, F3-ONBOARD: a short first-dive tutorial (move and turn, rise and sink,
+  headlights, scan a target, photo or Journal). Each step advances when you do
+  it, never pauses play, and Skip tutorial is always on screen. One-line hints
+  appear once each for low battery, nearing the hull rating, a scannable target,
+  a nearby creature and the ROV, at most one every 20 seconds, and can be
+  dismissed. A Controls guide in Pause and a Device layout button in Settings
+  show the layout for the keyboard, gamepad or touch you last used, with 44 px
+  buttons. The bottom tip strip now follows the active device (hidden on touch,
+  where the on-screen buttons are the tips).
+
 - Phase F, F-VISUAL-FIXES: authored free-dive approaches for all thirteen sites,
   facing the wreck, reef, chimney field or landscape route. Challenger keeps
   its quiet floor and faces the small sampling marker. Openings check terrain,
