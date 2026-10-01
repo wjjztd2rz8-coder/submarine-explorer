@@ -54,3 +54,11 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged (gates green on main): F-VISUAL-QA (report plus screenshot spec), F2-PROGRESS (research points, upgrades workshop, hull-class unlocks, star ratings), F3-AUDIO (adaptive score, SFX, music slider), F2-LIFE (marine life engine, ~30 species, rare encounters, finished by a Sonnet agent). Added the missing hook so life scans pay species RP. Pushed main, tagged `f2`; Pages deploy was in progress.
 - Running: Codex `f-visual-fixes` (worktree /home/vijay/subexp-wt/f-visual-fixes, unit subexp-f-visual-fixes): headlight/beam, exposure, free-dive openings, chase camera below the surface, from the F-VISUAL-QA shared briefs. Collect next run.
 - Open from F-VISUAL-QA: per-site hero shape/material fixes after lighting, 3 content decisions (Blue Hole vs atoll, Bismarck depth discrepancy, Hunga era). F2-LIFE: rare animals are small in frame; deep midwater is pale from fog glare. Remaining plan: F3-BRAND-UI, F3-ONBOARD, wave 4. Claude usage endpoint returned 429 (last known 98% left).
+- 2026-10-01 15:15 CDT headless run: skipped: budget gate (claude error: HTTP Error 429: Too Many Requests codex 5h 88.0% left (resets Thu Oct 01 19:45) | 7d 58.0% left (resets Tue Oct 06 16:29) [as of 9 min ago] )
+- 2026-10-01 16:45 CDT headless run: skipped: budget gate (claude error: HTTP Error 429: Too Many Requests codex 5h 81.0% left (resets Thu Oct 01 19:45) | 7d 57.0% left (resets Tue Oct 06 16:29) [as of 71 min ago] )
+
+## 2026-10-01 17:50 headless run
+
+- Merged: F-VISUAL-FIXES (Codex; headlight beams, exposure, free-dive openings, chase camera ceiling) and F3-ONBOARD (Sonnet; first-dive tutorial, one-shot hints, device-aware controls card). Gates were green on each branch; main re-gated after merge.
+- Decisions for owner: onboarding state has its own save key `subexplorer.onboard.v1`; `?tutorial=0|1` URL override; on phone landscape the tutorial card overlaps the non-interactive scan panel (not the controls).
+- Remaining: F3-BRAND-UI (name choice from docs/research/brand.md: Bathyline recommended, needs owner approval), wave 4 audits/docs, F-VISUAL-QA per-site hero fixes, 3 content decisions (Blue Hole, Bismarck depth, Hunga era). Nothing running.
