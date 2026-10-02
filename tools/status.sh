@@ -8,7 +8,8 @@ export PATH="$HOME/.local/node/bin:$HOME/.local/bin:$PATH"
 b() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
 b "Usage ($(date '+%a %H:%M'))"; ai-limits 2>&1 | head -2
 b "Timed orchestrator run"
-if pid=$(pgrep -f 'claude -p Resume Submarine' | head -1); then
+pid=$(pgrep -f "claude -p Resume Submarine" | head -1)
+if [[ -n "$pid" ]]; then
   log=$(ls -t .cache/resume-*.log | head -1)
   echo "RUNNING (pid $pid) since $(ps -o lstart= -p "$pid"), log $log"
   # Last few things the orchestrator said or did (stream-json lines).

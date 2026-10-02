@@ -33,6 +33,10 @@ def left(side,key):
     return 100.0 if w.get("resets_at",0) and w["resets_at"]<now else 100.0-w["used"]
 print(left("claude","five_hour"),left("claude","seven_day"),left("codex","five_hour"),left("codex","seven_day"))' "$json")
   below() { [[ "$1" != - ]] && python3 -c "import sys; sys.exit(0 if $1 < $2 else 1)"; }
+  # Re-arm once Codex is back above its floors (e.g. after a 5-hour reset).
+  if [[ $codex_stopped == 1 ]] && [[ "$x5" != - ]] && ! below "$x5" "$CODEX_STOP" && ! below "$x7" "$WEEKLY_STOP"; then
+    log "CODEX recovered: 5h ${x5}% weekly ${x7}% left; re-armed"; codex_stopped=0
+  fi
   if [[ $codex_stopped == 0 ]] && { below "$x5" "$CODEX_STOP" || below "$x7" "$WEEKLY_STOP"; }; then
     units=$(systemctl --user list-units --type=service --state=running --no-legend 'subexp-*' | awk '{print $1}' | grep -v '^subexp-resume')
     log "CODEX floor: 5h ${x5}% weekly ${x7}% left; stopping: ${units:-none}"

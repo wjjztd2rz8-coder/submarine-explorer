@@ -15,7 +15,19 @@ log_skip() { echo "- $(date '+%Y-%m-%d %H:%M %Z') headless run: skipped: $1" >> 
 if [[ -f .cache/orchestrator.active ]] && (( $(date +%s) - $(stat -c %Y .cache/orchestrator.active) < 5400 )); then
   echo "orchestrator active; exiting"; exit 0
 fi
-if [[ "${1:-}" == "--headless" ]] && ! ai-limits --gate 50 5 > .cache/resume-gate.txt 2>&1; then
+# Claude-only start check (Codex being low must not block Claude; the run just
+# won't launch Codex tasks, and the watchdog guards Codex separately).
+claude_ok() {
+  ai-limits --json 2>/dev/null | python3 -c '
+import json,sys,time
+c=json.load(sys.stdin).get("claude",{}); now=time.time()
+def left(k):
+    w=c.get(k) or {}
+    if "used" not in w: return -1
+    return 100 if w.get("resets_at") and w["resets_at"]<now else 100-w["used"]
+sys.exit(0 if left("five_hour")>=50 and left("seven_day")>=10 else 1)'
+}
+if [[ "${1:-}" == "--headless" ]] && ! { ai-limits > .cache/resume-gate.txt 2>&1; claude_ok; }; then
   log_skip "budget gate ($(head -2 .cache/resume-gate.txt | tr '\n' ' '))"; exit 0
 fi
 echo "== state =="; git log --oneline -3; git status --short | head -20
