@@ -37,6 +37,8 @@ const FREE_DIVE_OPENINGS: Record<
     altitude?: number;
     /** Turn the sub this many degrees off the hero so the hull does not hide it (chase view). */
     yawOffset?: number;
+    /** Score cost per degree of turn away from `bearing` (default 0.12): high keeps a face-on view. */
+    turnWeight?: number;
   }
 > = {
   titanic: { hero: 'bow-hull', bearing: 40, range: 16, altitude: 14, yawOffset: 10 },
@@ -49,7 +51,14 @@ const FREE_DIVE_OPENINGS: Record<
     altitude: 18,
     yawOffset: 10,
   },
-  'monterey-canyon': { hero: 'canyon-wall-ledge', bearing: 0, range: 100 },
+  'monterey-canyon': {
+    hero: 'canyon-wall-ledge',
+    bearing: 0,
+    range: 12,
+    altitude: 10,
+    yawOffset: 10,
+    turnWeight: 3,
+  },
   endurance: { hero: 'main-hull', bearing: 60, range: 70 },
   'axial-seamount-ashes': { hero: 'mushroom-chimney', bearing: 45, range: 60 },
   'hudson-canyon': { hero: 'coral-ledge-mound', bearing: 0, range: 75 },
@@ -147,7 +156,7 @@ export function composedFreeDiveSpawn(
       if (props.collide(eye, 6, new Vector3())) cameraClear = false;
     }
     if (!cameraClear) continue;
-    const score = Math.abs(p.y - wantedY) * 3 + Math.abs(turn) * 0.12;
+    const score = Math.abs(p.y - wantedY) * 3 + Math.abs(turn) * (opening.turnWeight ?? 0.12);
     if (score < bestScore) {
       bestScore = score;
       best = { x: p.x, y: p.y, z: p.z, yaw };

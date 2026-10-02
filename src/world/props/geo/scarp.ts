@@ -21,7 +21,7 @@
 
 import * as THREE from 'three';
 import { geoDetail } from './detail.js';
-import { geoMaterial } from './materials.js';
+import { geoMaterial, vertexGlow } from './materials.js';
 import { shimmerPlume } from './plume.js';
 import type { GeoTexKind } from './textures.js';
 import {
@@ -153,7 +153,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
       ...REAR,
     ],
     join: 0.13,
-    reach: 0.72,
+    reach: 0.38,
     arc: -0.06,
     sbend: 0.24,
     sPhase: 0.4,
@@ -166,11 +166,11 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     joints: 0,
     jointStep: 0,
     benchVar: 0.025,
-    base: new THREE.Color(0x6d6b57), // olive-grey mudstone
-    band: new THREE.Color(0x4a4a3f),
-    crest: new THREE.Color(0x8a866f),
-    drape: new THREE.Color(0x857d6b), // pale silt
-    boulder: new THREE.Color(0x66624f),
+    base: new THREE.Color(0x8f8c72), // olive-grey mudstone
+    band: new THREE.Color(0x6a6a58),
+    crest: new THREE.Color(0xb0ab8f),
+    drape: new THREE.Color(0xa39a84), // pale silt
+    boulder: new THREE.Color(0x8a846b),
     boulders: 160,
     rockSize: 0.7,
     blocks: 0.04,
@@ -525,6 +525,8 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const full = new THREE.Group();
   full.name = `scarp-${id}`;
   const wallMat = geoMaterial(P.tex, d, { roughness: P.rough, side: THREE.DoubleSide });
+  // Monterey: a faint self-lit teal lift stands in for scattered light, so the wall reads in the dark.
+  if (id === 'canyon') vertexGlow(wallMat, 0.27, 0x8fc0c6, 0.4);
   full.add(new THREE.Mesh(wall, wallMat));
   const tone = new THREE.Color();
   const apron = buildTalusMesh(
@@ -543,7 +545,9 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     },
   );
   apron.computeBoundingBox();
-  full.add(new THREE.Mesh(apron, geoMaterial('rock', d, { roughness: P.rough })));
+  const apronMat = geoMaterial('rock', d, { roughness: P.rough });
+  if (id === 'canyon') vertexGlow(apronMat, 0.16, 0x8fc0c6, 0.35);
+  full.add(new THREE.Mesh(apron, apronMat));
 
   // --- rocks seated on the final apron surface (instanced)
   const rocks: RockSpot[] = [];
@@ -565,6 +569,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     });
     const bm = geoMaterial('rock', d, { roughness: 0.96 });
     bm.flatShading = true;
+    if (id === 'canyon') vertexGlow(bm, 0.16, 0x8fc0c6, 0.35);
     const meshes = tmpl.map((g, k) => {
       const m = new THREE.InstancedMesh(g, bm, Math.max(1, Math.ceil((rocks.length - k) / 3)));
       m.count = 0;

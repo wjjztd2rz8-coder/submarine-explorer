@@ -8,7 +8,10 @@
     "preset": "canyon",
     "overrides": {
       "currentDirDeg": 255,
-      "currentSpeedMps": 0.5
+      "currentSpeedMps": 0.5,
+      "ambientFill": 24,
+      "plumeOpacity": 0.1,
+      "plumeSizeM": 2.2
     }
   },
   "species_file": "species.json",

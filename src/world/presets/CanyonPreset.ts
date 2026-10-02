@@ -34,6 +34,7 @@ import type { EnvPreset, PresetEnterContext, PresetFrameContext, PresetParams } 
 
 const MAX_PLUMES = 8;
 const SAMPLE_PERIOD_S = 0.25;
+const FILL_TINT = new THREE.Color(0x4f7480);
 
 export class CanyonPreset implements EnvPreset {
   readonly name: EnvPresetName = 'canyon';
@@ -153,6 +154,11 @@ export class CanyonPreset implements EnvPreset {
   }
 
   update(dt: number, ctx: PresetFrameContext): void {
+    const fill = num(this.params.ambientFill, 0);
+    if (fill > 0) {
+      ctx.atmo.ambientIntensity += fill;
+      ctx.atmo.ambientColor.lerp(FILL_TINT, 0.75);
+    }
     this.sampleClock += dt;
     if (ctx.baseCurrent.lengthSq() === 0) {
       this.flow.set(0, 0, 0);
