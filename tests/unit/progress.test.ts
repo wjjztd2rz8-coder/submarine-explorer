@@ -90,6 +90,24 @@ describe('research rewards and save migration', () => {
 describe('ratings and hull unlocks', () => {
   const primary = { primary: true, complete: true };
   const secondary = { primary: false, complete: false };
+  it('fits every site in Arcade and Custom while keeping Realistic research gates', () => {
+    const { progress } = researcher();
+    for (const [depth, hull] of [
+      [226, 'A'],
+      [3800, 'B'],
+      [4960, 'B'],
+      [10931, 'C'],
+    ] as const) {
+      for (const mode of ['arcade', 'custom'] as const) {
+        expect(progress.canDive(depth, mode)).toBe(true);
+        expect(progress.hullFor(depth, mode)).toBe(hull);
+      }
+      expect(progress.canDive(depth, 'realistic')).toBe(depth <= 1000);
+      expect(progress.hullFor(depth, 'realistic')).toBe('A');
+    }
+    expect(progress.points).toBe(0);
+    expect(progress.lifetime).toBe(0);
+  });
   it('needs primaries, then every secondary, then a bonus; aborts earn no stars', () => {
     expect(diveStars([], true)).toBe(0);
     expect(diveStars([{ ...primary, complete: false }], true)).toBe(0);

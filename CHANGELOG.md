@@ -12,6 +12,15 @@ without an entry here is not done.
 
 ## [Unreleased]
 
+### Changed
+
+- Phase F, F-ARCADE-ACCESS: Arcade opens every site immediately and automatically
+  fits its depth-rated hull and matching vehicle. Near-site Arcade missions use
+  the existing authored hero approaches, so a fresh Titanic dive begins beside
+  the wreck at seabed depth. Hull research requirements and locks now apply only
+  to Realistic, keeping depth progression as an optional challenge. Custom mode
+  also leaves site access open; upgrades, research rewards and stars are preserved.
+
 ### Removed
 
 - Phase F, F-CONTENT-FIX: cut the enclosed Blue Hole shaft/chemocline promise and
@@ -22,6 +31,10 @@ without an entry here is not done.
   observation and photography survey.
 
 ### Added
+
+- Phase F, F-ARCADE-ACCESS: a golden-shot tool captures the five hero sites at
+  high quality in fresh profiles, with spawn, 40 m approach and 15 m detail
+  views, a contact sheet and a pose manifest for visual review.
 
 - Phase F, F3-ONBOARD: a short first-dive tutorial (move and turn, rise and sink,
   headlights, scan a target, photo or Journal). Each step advances when you do

@@ -10,6 +10,14 @@ async function ready(page: Page): Promise<void> {
     () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
 }
+async function realistic(page: Page): Promise<void> {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      'subexplorer.settings.v2',
+      JSON.stringify({ version: 2, gameplayMode: 'realistic', graphicsTier: 'low' }),
+    ),
+  );
+}
 async function shot(page: Page, name: string): Promise<void> {
   await mkdir(shots, { recursive: true });
   await page.screenshot({ path: `${shots}/${name}.png` });
@@ -79,6 +87,7 @@ test('new researcher earns RP, buys a live upgrade and earns a three-star dive',
   test.setTimeout(180_000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  await realistic(page);
   await page.goto('/?mission=blake-plateau-corals&skipBriefing=1');
   await ready(page);
   expect(
@@ -87,6 +96,11 @@ test('new researcher earns RP, buys a live upgrade and earns a three-star dive',
         (window.__game as { sub: { getState(): { hullClass: string } } }).sub.getState().hullClass,
     ),
   ).toBe('A');
+  await page.evaluate(() =>
+    (window.__game as { save: { setGameplayMode(mode: 'arcade'): void } }).save.setGameplayMode(
+      'arcade',
+    ),
+  );
   for (const id of [
     'blake-mound-field-core',
     'blake-coral-thicket',
@@ -145,6 +159,11 @@ test('new researcher earns RP, buys a live upgrade and earns a three-star dive',
   await expect(debrief.locator('.debrief-stars')).toHaveAttribute('aria-label', '3 of 3 stars');
   await expect(debrief.locator('.debrief-rating')).toContainText('160 RP earned this dive');
   await shot(page, 'debrief');
+  await page.evaluate(() =>
+    (window.__game as { save: { setGameplayMode(mode: 'realistic'): void } }).save.setGameplayMode(
+      'realistic',
+    ),
+  );
   await debrief.locator('[data-action="dive-sites"]').click();
   const sites = page.locator('.home-sites');
   await expect(sites.locator('[data-mission="blake-plateau-corals"] .mission-stars')).toHaveText(
@@ -171,6 +190,7 @@ test('new researcher earns RP, buys a live upgrade and earns a three-star dive',
 test('phone workshop is touch-operable and locks leave four starter missions open', async ({
   page,
 }) => {
+  await realistic(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await ready(page);
@@ -198,6 +218,7 @@ test('phone workshop is touch-operable and locks leave four starter missions ope
 test('deep free dive uses only unlocked hulls, shared locked mission becomes a rated free dive', async ({
   page,
 }) => {
+  await realistic(page);
   await page.goto('/?mission=challenger-deep');
   await ready(page);
   await expect(page.locator('.progress-hull-notice')).toContainText('Class C · 900 lifetime RP');

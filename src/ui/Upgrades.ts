@@ -78,7 +78,8 @@ export class Upgrades {
     }
     const note = document.createElement('p');
     note.className = 'upgrades-hint';
-    note.textContent = 'Hull classes unlock automatically. Spending RP keeps your hull progress.';
+    note.textContent =
+      'Realistic hull classes unlock automatically. Arcade fits the hull for every site. Spending RP keeps your hull progress.';
     const tracks = document.createElement('div');
     tracks.className = 'upgrades-tracks';
     for (const track of ['Lights', 'Sonar', 'Power', 'Propulsion']) {

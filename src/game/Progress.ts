@@ -1,6 +1,6 @@
 import type { GameConfig, GameplayOptions } from '../core/Config.js';
 import { PROGRESS_CONFIG, UPGRADES, type UpgradeId } from '../core/config/progress.js';
-import { ProgressSave, type ProgressRecord } from '../core/Save.js';
+import { ProgressSave, type GameplayMode, type ProgressRecord } from '../core/Save.js';
 
 export type AwardKind = keyof typeof PROGRESS_CONFIG.rewards;
 export interface DiveRating {
@@ -61,11 +61,12 @@ export class Progress {
   get hull() {
     return [...PROGRESS_CONFIG.hulls].reverse().find((h) => this.lifetime >= h.threshold)!;
   }
-  canDive(depthM: number): boolean {
-    return depthM <= this.hull.depthM;
+  /** Without a mode, report the research entitlement. Only Realistic uses it as a gate. */
+  canDive(depthM: number, mode: GameplayMode = 'realistic'): boolean {
+    return mode !== 'realistic' || depthM <= this.hull.depthM;
   }
-  hullFor(depthM: number): string {
-    return this.canDive(depthM) ? requiredHull(depthM).id : this.hull.id;
+  hullFor(depthM: number, mode: GameplayMode = 'realistic'): string {
+    return this.canDive(depthM, mode) ? requiredHull(depthM).id : this.hull.id;
   }
   rating(site: string): number {
     return this.data.ratings[site] ?? 0;

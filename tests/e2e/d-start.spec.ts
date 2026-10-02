@@ -20,9 +20,15 @@ async function pose(page: Page): Promise<{ x: number; y: number; z: number }> {
   });
 }
 
-test('Arcade near-site starts show the first target at deep and shallow sites', async ({
+test('Custom near-site starts retain the long approach at deep and shallow sites', async ({
   page,
 }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      'subexplorer.settings.v2',
+      JSON.stringify({ version: 2, gameplayMode: 'custom' }),
+    ),
+  );
   await mkdir(shots, { recursive: true });
   for (const [id, filename] of [
     ['titanic', 'near-site-titanic.png'],
