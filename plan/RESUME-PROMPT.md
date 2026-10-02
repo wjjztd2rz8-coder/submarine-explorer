@@ -5,11 +5,15 @@ Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-expl
 - `tools/resume.sh` has already checked the budget gate and the lock. Write `headless <PID> <time>` to `.cache/orchestrator.active`, `touch` it after each major step, and delete it when you finish.
 - Read your memory notes: phase-f-direction, usage-budget, codex-subagents, content-tone and playtest-direction. Then read plan/PHASE-F-PLAN.md (the waves, packages, ownership and operating rules) and the tail of plan/OVERNIGHT-LOG.md.
 
+## 0b. Direction
+
+- Read `plan/DIRECTOR.md` FIRST. It holds the current priorities and the review rubric, and it outranks PHASE-F-PLAN.md ordering. You are the creative director: judge every package against the rubric and send work back with concrete feedback rather than merging and fixing later. Items you need from the owner go under "Needs owner" there and at the top of your OVERNIGHT-LOG entry.
+
 ## 1. Collect finished work
 
 - Run `git worktree list`, `git status`, `git log --oneline -10` and `tools/codex-status.sh`. Check `plan/progress/` for package notes.
 - For each worktree under /home/vijay/subexp-wt/ whose task is not running (no `codex-task.sh` process and no live Claude agent: a Claude package is finished when it has `plan/progress/<PKG>.md`):
-  - Run `PW_PORT=<unique> tools/gates.sh` in the worktree. If it passes, review the diff briefly and look at the screenshots in `.cache/codex/shots/<name>/` (Read tool). Then commit in the worktree with a descriptive message and Co-Authored-By lines, merge into main, rerun the gates on main, and remove the worktree and branch.
+  - Run `PW_PORT=<unique> tools/gates.sh` in the worktree. If it passes, review the diff and look at the screenshots against the DIRECTOR.md rubric (send it back if it falls short) in `.cache/codex/shots/<name>/` (Read tool). Then commit in the worktree with a descriptive message and Co-Authored-By lines, merge into main, rerun the gates on main, and remove the worktree and branch.
   - If it is unfinished or failing, finish it with a Claude subagent in that same worktree (§2).
 
 ## 1b. Paused packages
