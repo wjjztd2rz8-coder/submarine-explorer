@@ -149,7 +149,7 @@
     width: var(--hl-col-width);
     min-width: 0;
   }
-  html.is-touch .onboard-card {
+  html.is-touch .onboard-card:not([hidden]) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     column-gap: 8px;
