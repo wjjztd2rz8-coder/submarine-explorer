@@ -173,7 +173,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   // Black smokers are dark but not black: lift the albedo, and give the warm fluid a faint
   // self-lit tint that follows the pale and rusty parts of the crust.
   bodyMat.color.multiplyScalar(1.25);
-  vertexGlow(bodyMat, 0.07, 0xffa070, 0.4);
+  vertexGlow(bodyMat, 0.13, 0xff9a68, 0.5);
   const body = new THREE.Mesh(geom, bodyMat);
   body.name = 'smoker-body';
   full.add(body);

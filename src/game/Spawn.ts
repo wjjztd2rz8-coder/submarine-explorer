@@ -33,7 +33,7 @@ const FREE_DIVE_OPENINGS: Record<
     range: number;
     /** Measure `range` from the hero's centre instead of its footprint edge (sprawling sets). */
     fromCentre?: boolean;
-    /** Hold this height above the seabed at the spawn instead of rising to the target. */
+    /** Hold this height above the hero's base (its local origin) instead of rising to the target. */
     altitude?: number;
     /** Turn the sub this many degrees off the hero so the hull does not hide it (chase view). */
     yawOffset?: number;
@@ -44,10 +44,10 @@ const FREE_DIVE_OPENINGS: Record<
   'lost-city': {
     hero: 'poseidon-tower',
     bearing: 90,
-    range: 32,
+    range: 44,
     fromCentre: true,
-    altitude: 12,
-    yawOffset: 50,
+    altitude: 18,
+    yawOffset: 10,
   },
   'monterey-canyon': { hero: 'canyon-wall-ledge', bearing: 0, range: 100 },
   endurance: { hero: 'main-hull', bearing: 60, range: 70 },
@@ -57,10 +57,10 @@ const FREE_DIVE_OPENINGS: Record<
   'beebe-vent-field': {
     hero: 'beebe-chimney-1',
     bearing: 60,
-    range: 26,
+    range: 46,
     fromCentre: true,
-    altitude: 9,
-    yawOffset: 42,
+    altitude: 4,
+    yawOffset: 10,
   },
   'great-blue-hole': { hero: 'karst-grotto', bearing: 0, range: 70 },
   bismarck: { hero: 'main-hull', bearing: 50, range: 110 },
@@ -99,6 +99,7 @@ export function composedFreeDiveSpawn(
   const nw = latLonToWorld(meta, meta.bbox.north, meta.bbox.west);
   const se = latLonToWorld(meta, meta.bbox.south, meta.bbox.east);
   const clearance = settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM;
+  const wantedY = opening.altitude ? hero.root.position.y + opening.altitude : target.y + 12;
   let best: SpawnPose | null = null;
   let bestScore = Infinity;
   const rig = new CameraRig(cameraConfig, 16 / 9, {
@@ -133,11 +134,7 @@ export function composedFreeDiveSpawn(
         seabed.sampleHeight(p.x + (target.x - p.x) * t, p.z + (target.z - p.z) * t),
       );
     }
-    p.y = Math.max(
-      floor + clearance,
-      opening.altitude ? seabed.sampleHeight(p.x, p.z) + opening.altitude : target.y + 12,
-      safeDepth + settings.hullRadius,
-    );
+    p.y = Math.max(floor + clearance, wantedY, safeDepth + settings.hullRadius);
     if (p.y > -settings.hullRadius) continue;
     if (props.collide(p.clone(), settings.hullRadius + 4, new Vector3())) continue;
     // Reserve a clear chase arm as well as a collision-free submarine pose.
@@ -150,12 +147,7 @@ export function composedFreeDiveSpawn(
       if (props.collide(eye, 6, new Vector3())) cameraClear = false;
     }
     if (!cameraClear) continue;
-    const score =
-      Math.abs(
-        p.y - (opening.altitude ? seabed.sampleHeight(p.x, p.z) + opening.altitude : target.y + 12),
-      ) *
-        3 +
-      Math.abs(turn) * 0.12;
+    const score = Math.abs(p.y - wantedY) * 3 + Math.abs(turn) * 0.12;
     if (score < bestScore) {
       bestScore = score;
       best = { x: p.x, y: p.y, z: p.z, yaw };
