@@ -9,6 +9,12 @@ Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-expl
 
 - Read `plan/DIRECTOR.md` FIRST. It holds the current priorities and the review rubric, and it outranks PHASE-F-PLAN.md ordering. You are the creative director: judge every package against the rubric and send work back with concrete feedback rather than merging and fixing later. Items you need from the owner go under "Needs owner" there and at the top of your OVERNIGHT-LOG entry.
 
+## 0c. Process health (once per day, or when something looks off)
+
+- Run `tools/efficiency.sh`, which reads `.cache/metrics/usage.csv` (sampled every 30 min) and the logs: idle Claude/Codex capacity, run skips by reason, watchdog trips and Codex pass/fail.
+- If you find waste (idle capacity, repeated failures, wasted skips, slow gates, duplicated work), fix the tooling or process and log the change and its reason in `plan/PROCESS-LOG.md`.
+- The owner delegated process improvement; the one hard constraint is the usage floors (Claude 5h ≥ 20%, Codex 5h ≥ 5%, both weekly ≥ 5%).
+
 ## 1. Collect finished work
 
 - Run `git worktree list`, `git status`, `git log --oneline -10` and `tools/codex-status.sh`. Check `plan/progress/` for package notes.
@@ -27,6 +33,7 @@ Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-expl
   - Create the worktree first: `git worktree add -b claude/<pkg> ../subexp-wt/<pkg> HEAD`, symlink node_modules, and symlink `.cache/codex/shots`.
   - In a headless run, run the agent synchronously (not in the background) so it finishes before you exit, and run at most 2 packages per run.
 - **Owner (2026-10-01): Codex 6.1 Sol also builds** well-specified, self-contained packages (progression, modes, audio, fix lists from audits), because a Claude window only covers ~40 min of one agent. Claude keeps visual-heavy work (marine life, set pieces, brand/UI) and reviews Codex diffs and screenshots before merging. Codex also does the detail work (audits, verification of merged work, bug hunts, research, fact checks): `systemd-run --user --unit=subexp-<name> --working-directory=$PWD env WT=1 ON_LIMIT=exit [NET=1] PW_PORT=<unique> tools/codex-task.sh <brief> <name> 2`.
+- **Codex queue:** don't launch Codex tasks directly. Write briefs to `.cache/codex/queue/NN-<name>.md` (an optional first line `<!-- env: NET=1 ROUNDS=3 -->`). `tools/codex-dispatch.sh` runs every 30 min from the timer, without needing Claude, and launches them whenever Codex has budget and fewer than 3 tasks are running. Keep 2–4 briefs queued so Codex never idles while Claude is out of budget.
 - **Keep Codex busy (owner, 2026-10-01):** every run checks `tools/codex-status.sh`. If fewer than 3 Codex tasks are running and Codex has budget (5h ≥ 30%, weekly ≥ 15%), launch the next self-contained Codex package(s) or a verification/bug-hunt task over newly merged work. Idle Codex capacity is wasted.
 - After each merged wave, or a large package, that is green and screenshot-reviewed:
   - `git push origin main`;
