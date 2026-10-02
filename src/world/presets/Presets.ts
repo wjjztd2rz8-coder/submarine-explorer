@@ -458,6 +458,11 @@ export class PresetSystem {
     if (this.preset && this.entered) {
       this.preset.update(frameDt, f);
       if (this.visuals) this.syncAtmosphere(atmo, f.causticsScale);
+      else {
+        // Low tier draws no particles, but an opt-in ambient fill must still reach the scene.
+        this.o.atmosphere.ambient.intensity = atmo.ambientIntensity;
+        this.o.atmosphere.ambient.color.copy(atmo.ambientColor);
+      }
     }
     this.applyCurrent(simDt, elapsed);
   }

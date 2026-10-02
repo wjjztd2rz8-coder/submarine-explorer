@@ -155,13 +155,13 @@ export class WreckPreset implements EnvPreset {
   }
 
   update(_dt: number, ctx: PresetFrameContext): void {
-    if (!this.visuals) return;
-    ctx.atmo.vignette += num(this.params.vignetteAdd, 0.06);
     const fill = num(this.params.ambientFill, 0);
     if (fill > 0) {
       ctx.atmo.ambientIntensity += fill;
       ctx.atmo.ambientColor.lerp(FILL_TINT, 0.7);
     }
+    if (!this.visuals) return;
+    ctx.atmo.vignette += num(this.params.vignetteAdd, 0.06);
     if (this.haze) {
       updateCommonUniforms(this.haze, ctx, this.look);
       const c = ctx.camera.position;
