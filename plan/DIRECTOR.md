@@ -15,6 +15,14 @@ The owner treats this as a curiosity project about how far current models and wo
 5. **Finish F2-MODES** (free dive, daily dive, simplified modes).
 6. **Rebrand** (name, logo, title scene) using docs/research/brand.md.
 
+## Director notes
+
+- **2026-10-02 16:55** (golden set 2026-10-02-0704):
+  - **Titanic:** much better. The bow is in frame, the new sub reads well and the HUD no longer collides. Still murky: at 110 m the wreck is a dim rust shape with little detail. Push it toward a documentary still: open closer (~50–60 m) or brighten the far field, and make the rail/deck silhouette readable.
+  - **Lost City:** still fails "readable in 10 s". The tower is a dark silhouette on a black slope, and the seabed outside the headlight pool is invisible. Check that the later vent commits (4ed8c5f+) fixed this in a fresh golden set; if not, it's the top send-back.
+  - **Both:** the "Something to scan is in range" hint duplicates the scan-target panel; show one, not both.
+  - Capture a fresh golden set at the start of the next run and compare.
+
 ## Review rubric (every package, before merge)
 
 - **Readable in the first 10 s:** you can see the sub, the seabed and something interesting.
