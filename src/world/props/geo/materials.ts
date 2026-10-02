@@ -40,3 +40,19 @@ export function geoMaterial(
   m.color.setScalar(ALBEDO / (map ? Math.max(0.05, map.userData.meanLinear as number) : 1));
   return m;
 }
+
+/**
+ * A faint self-lit lift that follows the vertex colours (and so keeps the form: pale tops,
+ * stained undersides). Stands in for scattered light so a set piece stays readable in the
+ * dark water beyond the headlight beams. `k` is the linear emissive of a white vertex.
+ */
+export function vertexGlow(m: THREE.MeshStandardMaterial, k: number, tint = 0xffffff): void {
+  m.emissive.set(tint).multiplyScalar(k);
+  m.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <emissivemap_fragment>',
+      '#include <emissivemap_fragment>\n#ifdef USE_COLOR\ntotalEmissiveRadiance *= vColor.rgb;\n#endif\n// Up-facing surfaces catch more of the faint downwelling light: gives the lift some form.\ntotalEmissiveRadiance *= 0.4 + 0.6 * (0.5 + 0.5 * dot(normal, normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz)));',
+    );
+  };
+  m.customProgramCacheKey = () => 'vertexGlow2';
+}

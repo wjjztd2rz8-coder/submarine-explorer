@@ -62,7 +62,11 @@ describe('free-dive openings on actual survey terrain and procedural hero geomet
         const hero = props.placed.find((p) => p.def.id === heroId)!;
         const centre = hero.localBounds.getCenter(new Vector3());
         if (hero.def.model === 'procedural:chimney' && hero.def.dimensionsM)
-          centre.y = hero.localBounds.min.y + hero.def.dimensionsM[2] * 0.55;
+          // Mirrors the opening: a sunk foundation must not lower the aim; vent sets aim lower.
+          centre.y =
+            Math.max(hero.localBounds.min.y, 0) +
+            hero.def.dimensionsM[2] *
+              (['lost-city', 'beebe-vent-field'].includes(site) ? 0.42 : 0.55);
         const target = hero.root.localToWorld(centre);
         const rig = new CameraRig(config.camera, 16 / 9, terrain);
         rig.snap(pos, spawn!.yaw, 0);

@@ -11,6 +11,7 @@ import type { ChimneyMaterial, PropsConfig } from '../../../core/Config.js';
 import { geoDetail } from '../geo/detail.js';
 import { geoMaterial } from '../geo/materials.js';
 import { buildGeo } from '../geo/index.js';
+import { buildCarbonateChimney } from '../geo/towers.js';
 import {
   mulberry32,
   normalise,
@@ -170,11 +171,13 @@ export const VENT_BUILDERS = {
   chimney: (input) =>
     input.def.feature
       ? buildGeo(input)
-      : buildPlacedChimney(
-          input.dims,
-          input.seed,
-          input.cfg,
-          input.def.materialHint ?? 'basalt',
-          input.tier,
-        ),
+      : input.def.materialHint === 'carbonate' && !(input.dims[0] > 0)
+        ? buildCarbonateChimney(input)
+        : buildPlacedChimney(
+            input.dims,
+            input.seed,
+            input.cfg,
+            input.def.materialHint ?? 'basalt',
+            input.tier,
+          ),
 } satisfies Record<'chimney', ProceduralBuilder>;

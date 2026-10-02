@@ -25,16 +25,42 @@ import { Vector3 } from 'three';
 import type { Props } from '../world/Props.js';
 
 /** Local approach bearings and clearance from each hero's actual footprint. */
-const FREE_DIVE_OPENINGS: Record<string, { hero: string; bearing: number; range: number }> = {
+const FREE_DIVE_OPENINGS: Record<
+  string,
+  {
+    hero: string;
+    bearing: number;
+    range: number;
+    /** Measure `range` from the hero's centre instead of its footprint edge (sprawling sets). */
+    fromCentre?: boolean;
+    /** Hold this height above the seabed at the spawn instead of rising to the target. */
+    altitude?: number;
+    /** Turn the sub this many degrees off the hero so the hull does not hide it (chase view). */
+    yawOffset?: number;
+  }
+> = {
   titanic: { hero: 'bow-hull', bearing: 45, range: 85 },
   'challenger-deep': { hero: 'leggo-lander-marker', bearing: 135, range: 65 },
-  'lost-city': { hero: 'poseidon-tower', bearing: 90, range: 90 },
+  'lost-city': {
+    hero: 'poseidon-tower',
+    bearing: 90,
+    range: 32,
+    fromCentre: true,
+    altitude: 12,
+    yawOffset: 24,
+  },
   'monterey-canyon': { hero: 'canyon-wall-ledge', bearing: 0, range: 100 },
   endurance: { hero: 'main-hull', bearing: 60, range: 70 },
   'axial-seamount-ashes': { hero: 'mushroom-chimney', bearing: 45, range: 60 },
   'hudson-canyon': { hero: 'coral-ledge-mound', bearing: 0, range: 75 },
   kamaehuakanaloa: { hero: 'hiolo-north-chimney-1', bearing: 45, range: 45 },
-  'beebe-vent-field': { hero: 'beebe-chimney-1', bearing: 60, range: 65 },
+  'beebe-vent-field': {
+    hero: 'beebe-chimney-1',
+    bearing: 60,
+    range: 26,
+    fromCentre: true,
+    altitude: 9,
+  },
   'great-blue-hole': { hero: 'karst-grotto', bearing: 0, range: 70 },
   bismarck: { hero: 'main-hull', bearing: 50, range: 110 },
   'hunga-tonga-caldera': { hero: 'caldera-tuff-wall', bearing: 0, range: 100 },
@@ -64,7 +90,9 @@ export function composedFreeDiveSpawn(
   // Effect/plume bounds can extend far above a chimney: frame its solid body.
   const solidHeight = hero.def.dimensionsM?.[2];
   if (hero.def.model === 'procedural:chimney' && solidHeight)
-    centre.y = hero.localBounds.min.y + solidHeight * 0.55;
+    // The local origin sits on the seabed; a foundation sunk below it must not drag the aim down.
+    centre.y =
+      Math.max(hero.localBounds.min.y, 0) + solidHeight * (opening?.altitude ? 0.42 : 0.55);
   const target = hero.root.localToWorld(centre.clone());
   const half = hero.localBounds.getSize(new Vector3()).multiplyScalar(0.5);
   const nw = latLonToWorld(meta, meta.bbox.north, meta.bbox.west);
@@ -80,14 +108,19 @@ export function composedFreeDiveSpawn(
     const bearing = ((opening.bearing + turn) * Math.PI) / 180;
     const dx = Math.sin(bearing);
     const dz = -Math.cos(bearing);
-    const edge = Math.min(
-      half.x / Math.max(Math.abs(dx), 1e-6),
-      half.z / Math.max(Math.abs(dz), 1e-6),
-    );
+    const edge = opening.fromCentre
+      ? 0
+      : Math.min(half.x / Math.max(Math.abs(dx), 1e-6), half.z / Math.max(Math.abs(dz), 1e-6));
     const boundary = hero.root.localToWorld(
       centre.clone().add(new Vector3(dx * edge, 0, dz * edge)),
     );
-    const direction = boundary.clone().sub(target).setY(0).normalize();
+    const direction = (
+      opening.fromCentre
+        ? hero.root.localToWorld(new Vector3(dx, 0, dz)).sub(hero.root.localToWorld(new Vector3()))
+        : boundary.clone().sub(target)
+    )
+      .setY(0)
+      .normalize();
     const p = boundary.addScaledVector(direction, opening.range);
     if (p.x < nw.x || p.x > se.x || p.z < nw.z || p.z > se.z) continue;
     let floor = seabed.sampleHeight(p.x, p.z);
@@ -99,11 +132,16 @@ export function composedFreeDiveSpawn(
         seabed.sampleHeight(p.x + (target.x - p.x) * t, p.z + (target.z - p.z) * t),
       );
     }
-    p.y = Math.max(floor + clearance, target.y + 12, safeDepth + settings.hullRadius);
+    p.y = Math.max(
+      floor + clearance,
+      opening.altitude ? seabed.sampleHeight(p.x, p.z) + opening.altitude : target.y + 12,
+      safeDepth + settings.hullRadius,
+    );
     if (p.y > -settings.hullRadius) continue;
     if (props.collide(p.clone(), settings.hullRadius + 4, new Vector3())) continue;
     // Reserve a clear chase arm as well as a collision-free submarine pose.
-    const yaw = Math.atan2(target.x - p.x, -(target.z - p.z));
+    const yaw =
+      Math.atan2(target.x - p.x, -(target.z - p.z)) + ((opening.yawOffset ?? 0) * Math.PI) / 180;
     rig.snap(p, yaw, 0);
     let cameraClear = true;
     for (let i = 1; i <= 6; i++) {
@@ -111,7 +149,12 @@ export function composedFreeDiveSpawn(
       if (props.collide(eye, 6, new Vector3())) cameraClear = false;
     }
     if (!cameraClear) continue;
-    const score = Math.abs(p.y - target.y - 12) * 3 + Math.abs(turn) * 0.12;
+    const score =
+      Math.abs(
+        p.y - (opening.altitude ? seabed.sampleHeight(p.x, p.z) + opening.altitude : target.y + 12),
+      ) *
+        3 +
+      Math.abs(turn) * 0.12;
     if (score < bestScore) {
       bestScore = score;
       best = { x: p.x, y: p.y, z: p.z, yaw };
