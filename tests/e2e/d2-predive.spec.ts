@@ -193,7 +193,8 @@ for (const start of ['near-site', 'surface'] as const) {
       expect(s.gameplayMode).toBe('custom');
       // Back and forth: the preview follows the choice.
       await page.locator('.briefing-start input[value="near-site"]').check();
-      await expect.poll(async () => dist(await pose(page), near)).toBeLessThan(1);
+      // Choosing a start makes the mode Custom, which keeps the classic long approach.
+      await expect.poll(async () => (await pose(page)).y).toBeLessThan(-3000);
       await page.locator('.briefing-start input[value="surface"]').check();
       await expect.poll(async () => (await pose(page)).y).toBeGreaterThan(-50);
     }

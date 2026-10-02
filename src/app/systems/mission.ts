@@ -35,7 +35,7 @@ export const missionSystem: GameSystem = {
       const opening =
         choice === 'near-site' &&
         !ctx.daily &&
-        save.get().gameplayMode !== 'realistic' &&
+        save.get().gameplayMode === 'arcade' &&
         ctx.props.loaded
           ? composedFreeDiveSpawn(
               route.landmarkId,
