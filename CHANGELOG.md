@@ -22,6 +22,13 @@ without an entry here is not done.
   the stalactite alcove sits on the ledge as a larger, lighter limestone overhang
   (no longer a dark curtain), and the blue tang and grunt schools are smaller and
   brighter.
+- Phase F, F-HERO-MONTEREY: the Monterey Canyon free-dive opening now starts about
+  12 m off a larger (140 m wide, 64 m high) bedded canyon wall, face-on, instead of
+  100 m away in near-black water. A teal ambient fill (canyon preset `ambientFill`),
+  a faint self-lit lift on the wall and rubble, lighter mudstone, a smaller talus
+  apron, softer sediment, more sea pens, sponges and whip corals, fainter turbidity
+  puffs and half the marine snow keep the wall and floor readable on every tier.
+
 - Phase F, F-ARCADE-ACCESS: Arcade opens every site immediately and automatically
   fits its depth-rated hull and matching vehicle. Near-site Arcade missions use
   the existing authored hero approaches, so a fresh Titanic dive begins beside
