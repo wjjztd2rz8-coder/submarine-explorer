@@ -11,10 +11,22 @@
         "Axial has erupted at least three times since routine monitoring began: January 1998, April 2011 and April 2015. Each event is tracked by seafloor pressure and tilt instruments that catch the volcano visibly deflating as magma drains out beneath it, then slowly re-inflating over the following years -- the basis for the eruption forecasts described later in this guide."
       ],
       "facts": [
-        { "label": "Distance from Oregon coast", "value": "about 480 km" },
-        { "label": "Caldera dimensions", "value": "about 3 x 8 km" },
-        { "label": "Summit depth", "value": "about 1,410 m (published); 1,395 m on this tile" },
-        { "label": "Recorded eruptions", "value": "1998, 2011, 2015" }
+        {
+          "label": "Distance from Oregon coast",
+          "value": "about 480 km"
+        },
+        {
+          "label": "Caldera dimensions",
+          "value": "about 3 x 8 km"
+        },
+        {
+          "label": "Summit depth",
+          "value": "about 1,410 m (published); 1,395 m on this tile"
+        },
+        {
+          "label": "Recorded eruptions",
+          "value": "1998, 2011, 2015"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -42,16 +54,28 @@
       "title": "Mushroom and Inferno",
       "paragraphs": [
         "The ASHES (Axial Seamount Hydrothermal Emissions Study) vent field sits near the base of the caldera's western wall, at about 1,540-1,552 m, and has been studied since it was first surveyed in the late 1980s. Its two best-known chimneys, Mushroom and Inferno, sit roughly 10 m apart.",
-        "Mushroom is a black-smoker chimney about 4 m tall whose overall size has stayed similar since the 1980s even as its individual discharge points shift, with fluid exceeding 275 degC pouring from small orifices near its top. It is the site of the OOI cabled array's own HD video camera (CAMHDS301), so this is one of the very few active seafloor chimneys with a live, permanent video feed.",
+        "Mushroom is a roughly 4 m sulfide chimney with several discharge points. OOI footage shows clear flow as well as small active black-smoker chimlets, so one chimney can carry more than one kind of discharge. The cabled observatory’s HD camera watches the chimney and the animals around it.",
         "Inferno vents high-temperature fluid too and hosts one of the densest clusters of animals at ASHES: tube worms and palm worms cling directly to its metal-sulfide-rich walls, tolerant of both scalding vent fluid and near-freezing seawater within centimetres of each other.",
-        "Neither chimney's exact footprint is published, and the field is far smaller than a single cell of this tile's open bathymetry (about 2,826 sq m against roughly 43 x 61 m per grid cell).",
+        "The compact field occupies about 2,826 square metres, roughly the area of one 43 × 61 m terrain cell. Its individual chimneys need much finer mapping to resolve.",
         "The sulfide mound with its cluster of smokers, tubeworms and bacterial mats beside Inferno is a game addition, modelled on how chimneys group on real ASHES mounds."
       ],
       "facts": [
-        { "label": "ASHES depth", "value": "about 1,540-1,552 m" },
-        { "label": "Mushroom height / temperature", "value": "about 4 m; fluid over 275 degC" },
-        { "label": "Mushroom-Inferno separation", "value": "about 10 m" },
-        { "label": "Known since", "value": "late 1980s survey" }
+        {
+          "label": "ASHES depth",
+          "value": "about 1,540-1,552 m"
+        },
+        {
+          "label": "Mushroom height / temperature",
+          "value": "about 4 m; fluid over 275 degC"
+        },
+        {
+          "label": "Mushroom-Inferno separation",
+          "value": "about 10 m"
+        },
+        {
+          "label": "Known since",
+          "value": "late 1980s survey"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -78,8 +102,14 @@
         "None of these has a published coordinate or height beyond 'less than about 4 m.'"
       ],
       "facts": [
-        { "label": "Height", "value": "generally under 4 m" },
-        { "label": "Virgin Mound", "value": "sub-metre anhydrite spire, CO2-rich fluid" }
+        {
+          "label": "Height",
+          "value": "generally under 4 m"
+        },
+        {
+          "label": "Virgin Mound",
+          "value": "sub-metre anhydrite spire, CO2-rich fluid"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -132,8 +162,14 @@
         "The fault trace itself -- described in the literature as roughly 130 m west of ASHES -- is finer than this tile's ~43 x 61 m grid cells can resolve individually, so this POI marks the real, surveyed rising terrain rather than a specific fault line."
       ],
       "facts": [
-        { "label": "Depth at ASHES", "value": "about 1,540 m" },
-        { "label": "Depth 300 m west", "value": "about 1,416 m" }
+        {
+          "label": "Depth at ASHES",
+          "value": "about 1,540 m"
+        },
+        {
+          "label": "Depth 300 m west",
+          "value": "about 1,416 m"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -156,9 +192,18 @@
         "This POI sits on a broad, shallow rise on the caldera floor south of ASHES, about 1,460 m deep against roughly 1,530-1,540 m on the surrounding floor -- the kind of low, hummocky high left behind by a lava flow. No source maps this specific rise to one dated eruption, so it is described here as caldera-floor lava terrain in general rather than attributed to a single flow."
       ],
       "facts": [
-        { "label": "1998 flow thickness", "value": "up to 13 m" },
-        { "label": "2011 flow", "value": "about 3x the 1998 flow's extent" },
-        { "label": "This POI's depth", "value": "about 1,460 m (vs. ~1,530-1,540 m nearby)" }
+        {
+          "label": "1998 flow thickness",
+          "value": "up to 13 m"
+        },
+        {
+          "label": "2011 flow",
+          "value": "about 3x the 1998 flow's extent"
+        },
+        {
+          "label": "This POI's depth",
+          "value": "about 1,460 m (vs. ~1,530-1,540 m nearby)"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -178,13 +223,21 @@
       "title": "Forecasting the next eruption",
       "paragraphs": [
         "Axial Seamount inflates like a slow-filling balloon between eruptions as magma accumulates beneath the caldera, then deflates abruptly when an eruption drains that reservoir -- 3.2 m of sudden subsidence in 1998, 2.4 m in 2011. Bill Chadwick (Oregon State University / NOAA PMEL) and Scott Nooner (University of North Carolina Wilmington) noticed this repeating pattern and, in September 2014, used it to forecast the 2015 eruption about seven months before it happened -- the first successful forecast of a submarine volcanic eruption.",
-        "The same team has kept tracking Axial's inflation since 2015 looking for the next event. As of this mission's writing (their most recent public update, 20 September 2026), the seafloor has fully re-inflated past its pre-2015 threshold, but uplift has slowed to about 6.5 cm/year and earthquake activity remains low -- commonly under 100 events a day, far below the thousands per day recorded just before the 2015 eruption. Their working estimate has repeatedly shifted later, and their own words are blunt: 'nothing seems imminent at the moment.'",
-        "That means a diver here today is looking at a volcano between eruptions, not one about to erupt on any fixed date -- and a live demonstration of how uncertain even a well-studied eruption forecast can be."
+        "Pressure sensors, tiltmeters and earthquake recordings let scientists follow the volcano as it refills. An eruption forecast changes as those measurements change; inflation alone is not a countdown."
       ],
       "facts": [
-        { "label": "1998 co-eruption deflation", "value": "3.2 m" },
-        { "label": "2011 co-eruption deflation", "value": "2.4 m" },
-        { "label": "2015 eruption forecast lead time", "value": "about 7 months (September 2014)" },
+        {
+          "label": "1998 co-eruption deflation",
+          "value": "3.2 m"
+        },
+        {
+          "label": "2011 co-eruption deflation",
+          "value": "2.4 m"
+        },
+        {
+          "label": "2015 eruption forecast lead time",
+          "value": "about 7 months (September 2014)"
+        },
         {
           "label": "Status as of Sept. 2026",
           "value": "fully re-inflated; low seismicity; no eruption imminent"
@@ -215,8 +268,14 @@
         "Axial is wired for real-time science: the Ocean Observatories Initiative's Regional Cabled Array, run by the University of Washington, threads hundreds of kilometres of fibre-optic cable across the seamount to more than a dozen instrument sites, including ASHES, streaming live seismic, pressure, temperature, chemistry and HD video data to shore continuously. It is one of the only deep hydrothermal systems on Earth monitored this way, which is what makes eruption forecasts like the one above possible at all."
       ],
       "facts": [
-        { "label": "This POI's depth", "value": "1,395 m (tile's shallowest point)" },
-        { "label": "Boundary-fault relief", "value": "up to 150 m" },
+        {
+          "label": "This POI's depth",
+          "value": "1,395 m (tile's shallowest point)"
+        },
+        {
+          "label": "Boundary-fault relief",
+          "value": "up to 150 m"
+        },
         {
           "label": "Monitoring network",
           "value": "OOI Regional Cabled Array (University of Washington)"

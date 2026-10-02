@@ -1,7 +1,7 @@
 {
   "version": 1,
   "landmark": "endurance",
-  "memorial_note": "Endurance is a protected historic site and monument under the Antarctic Treaty (HSM No. 93), and Shackleton's crew abandoned her in good order -- nobody died when she sank. She is still a monument to a famous and dangerous expedition, not a grave, so please treat her the way the international agreement protecting her intends: look, learn, and leave her exactly as she lies. The game has no salvage, collection or loot of any kind.",
+  "memorial_note": "Endurance is a protected Antarctic historic site. All 28 crew survived. Observe, photograph and leave the ship undisturbed.",
   "entries": [
     {
       "id": "overview",
@@ -13,13 +13,34 @@
         "What you see here: the seabed is real bathymetry from the GMRT Synthesis, but this part of the Weddell Sea has no dedicated multibeam survey, so the grid falls back to GEBCO's coarser global fill -- far too coarse to show a 44 m wooden hull, and unusually smooth even by the standards of this game's other sites. The ship and everything on her are built from Endurance22's published photographs, survey report and the ship's known dimensions."
       ],
       "facts": [
-        { "label": "Position", "value": "68°44′21″S 52°19′47″W" },
-        { "label": "Depth", "value": "3,008 m" },
-        { "label": "Sank", "value": "21 November 1915" },
-        { "label": "Found", "value": "5 March 2022, by Endurance22 (FMHT)" },
-        { "label": "Length / beam", "value": "44 m (144 ft) / 7.6 m (25 ft)" },
-        { "label": "Displacement", "value": "350 gross register tons" },
-        { "label": "Crew, all survived", "value": "28" },
+        {
+          "label": "Position",
+          "value": "68°44′21″S 52°19′47″W"
+        },
+        {
+          "label": "Depth",
+          "value": "3,008 m"
+        },
+        {
+          "label": "Sank",
+          "value": "21 November 1915"
+        },
+        {
+          "label": "Found",
+          "value": "5 March 2022, by Endurance22 (FMHT)"
+        },
+        {
+          "label": "Length / beam",
+          "value": "44 m (144 ft) / 7.6 m (25 ft)"
+        },
+        {
+          "label": "Gross register tonnage",
+          "value": "350 gross register tons"
+        },
+        {
+          "label": "Crew, all survived",
+          "value": "28"
+        },
         {
           "label": "Protection",
           "value": "Antarctic Treaty Historic Site and Monument No. 93 (2019)"
@@ -42,6 +63,10 @@
         {
           "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
           "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "UK Antarctic Heritage Trust — Endurance shipwreck and registered tonnage",
+          "url": "https://ukaht.org/places/endurance-shipwreck/"
         }
       ],
       "confidence": "high"
@@ -52,14 +77,29 @@
       "paragraphs": [
         "Endurance rests upright on the seabed, her hull essentially intact -- a rare survival for a wooden ship a century after sinking. Her keel was four layers of solid oak, 2.2 m thick in total, and her planking was oak and Norwegian fir up to 30 in thick, sheathed in greenheart for extra strength against ice: exactly the build that let her hold together against the pack for ten months, and that has kept her hull sound on the seabed since.",
         "The Falklands Maritime Heritage Trust's team, led by Director of Exploration Mensun Bound, surveyed her with Saab Sabertooth hybrid underwater vehicles fitted with Voyis optical laser scanners, capturing about 25,000 high-resolution images that were digitally stitched into a precise 44 m bow-to-stern 3D composite.",
-        "The block you see here uses the published position, the hull's length and beam, and a north-facing heading. No source found gives the ship's actual compass heading or an as-built survey shape."
+        "The preserved hull stands above the sediment, with deck rails, broken spars and the stern fittings still recognizable."
       ],
       "facts": [
-        { "label": "Position", "value": "68°44′21″S 52°19′47″W" },
-        { "label": "Depth", "value": "3,008 m (seabed in this tile: 3,000.3 m)" },
-        { "label": "Length / beam", "value": "44 m (144 ft) / 7.6 m (25 ft)" },
-        { "label": "Hull", "value": "oak keel, oak and fir planking, greenheart-sheathed" },
-        { "label": "Orientation", "value": "upright, largely intact" },
+        {
+          "label": "Position",
+          "value": "68°44′21″S 52°19′47″W"
+        },
+        {
+          "label": "Depth",
+          "value": "3,008 m (seabed in this tile: 3,000.3 m)"
+        },
+        {
+          "label": "Length / beam",
+          "value": "44 m (144 ft) / 7.6 m (25 ft)"
+        },
+        {
+          "label": "Hull",
+          "value": "oak keel, oak and fir planking, greenheart-sheathed"
+        },
+        {
+          "label": "Orientation",
+          "value": "upright, largely intact"
+        },
         {
           "label": "Survey",
           "value": "Saab Sabertooth AUVs with Voyis laser scanners, ~25,000 images"
@@ -95,9 +135,18 @@
         "It sits on the stern, about 20 m from the hull's centre. No coordinate or heading is published for the nameplate itself or for the ship's orientation."
       ],
       "facts": [
-        { "label": "Location", "value": "stern, below the taffrail" },
-        { "label": "Emblem", "value": "five-pointed star, from the ship's original name Polaris" },
-        { "label": "Significance", "value": "confirmed the wreck's identity" }
+        {
+          "label": "Location",
+          "value": "stern, below the taffrail"
+        },
+        {
+          "label": "Emblem",
+          "value": "five-pointed star, from the ship's original name Polaris"
+        },
+        {
+          "label": "Significance",
+          "value": "confirmed the wreck's identity"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -121,12 +170,18 @@
         "The wheel is placed near the stern; no coordinate is published for it."
       ],
       "facts": [
-        { "label": "Depth", "value": "3,008 m; no sunlight" },
+        {
+          "label": "Depth",
+          "value": "3,008 m; no sunlight"
+        },
         {
           "label": "Species seen on the hull",
           "value": "sea stars, glass sponges, sea squirts, a sea lily, an anemone, a squat lobster (Munidopsis sp.)"
         },
-        { "label": "Notable find", "value": "first regional record of this squat lobster genus" }
+        {
+          "label": "Notable find",
+          "value": "first regional record of this squat lobster genus"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -150,10 +205,22 @@
         "A debris scatter is placed forward of the hull, standing in for the fallen rigging and funnel; no coordinates are published for individual pieces."
       ],
       "facts": [
-        { "label": "Masts", "value": "down" },
-        { "label": "Funnel", "value": "toppled" },
-        { "label": "Heaviest damage", "value": "poop deck and waist" },
-        { "label": "Sank", "value": "21 November 1915, after ~10 months beset in pack ice" }
+        {
+          "label": "Masts",
+          "value": "down"
+        },
+        {
+          "label": "Funnel",
+          "value": "toppled"
+        },
+        {
+          "label": "Heaviest damage",
+          "value": "poop deck and waist"
+        },
+        {
+          "label": "Sank",
+          "value": "21 November 1915, after ~10 months beset in pack ice"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -181,9 +248,18 @@
         "This point marks real seabed terrain at Worsley's logged coordinate. Nothing was built or lost here -- it is included to show how good historical navigation, and 107 years of searching, finally led back to the ship."
       ],
       "facts": [
-        { "label": "Worsley's position", "value": "68°39′30″S 52°26′30″W" },
-        { "label": "Logged", "value": "21 November 1915" },
-        { "label": "Distance to wreck (commonly cited)", "value": "~4 mi / 6.4 km south" },
+        {
+          "label": "Worsley's position",
+          "value": "68°39′30″S 52°26′30″W"
+        },
+        {
+          "label": "Logged",
+          "value": "21 November 1915"
+        },
+        {
+          "label": "Distance to wreck (commonly cited)",
+          "value": "~4 mi / 6.4 km south"
+        },
         {
           "label": "Distance to wreck (this tile's coordinates)",
           "value": "~10 km, south-south-east"
@@ -210,8 +286,14 @@
         "That flatness is partly real -- deep Weddell Sea abyssal plain, far from any ridge or canyon -- and partly a limit of the data. This tile has no dedicated multibeam survey at the wreck site, so the grid falls back to GMRT's coarser GEBCO-derived global fill, which smooths out any seabed feature smaller than a few kilometres. That is a second, independent reason (besides scale) that the wreck itself cannot appear in the terrain: even a large seabed feature here would barely register."
       ],
       "facts": [
-        { "label": "Tile relief", "value": "≈ 2,915–3,096 m (< 200 m across ~70 x 33 km)" },
-        { "label": "2 km west of the wreck", "value": "2,988 m" },
+        {
+          "label": "Tile relief",
+          "value": "≈ 2,915–3,096 m (< 200 m across ~70 x 33 km)"
+        },
+        {
+          "label": "2 km west of the wreck",
+          "value": "2,988 m"
+        },
         {
           "label": "Data source",
           "value": "GMRT Synthesis (GEBCO-derived fill here, not a dedicated multibeam survey)"
@@ -237,17 +319,29 @@
         "Every man aboard Endurance survived her sinking; Shackleton had already led the crew off onto the ice before she went down. So unlike Titanic or Bismarck, this wreck is not a war grave or a gravesite -- but she is still one of the best-preserved and most significant wrecks in the world, and international law protects her accordingly.",
         "The Antarctic Treaty System designated the (then still unfound) wreck a Historic Site and Monument, HSM No. 93, in 2019 -- three years before anyone located her. That status makes it an offence to touch, disturb, or remove anything from the site; Endurance22's own survey and filming work had to be carried out without any contact with the wreck.",
         "Since the discovery, the UK Antarctic Heritage Trust and Historic England have led a Conservation Management Plan for the site, and have proposed expanding the protection zone from its original 500 m radius to 1,500 m to cover the full debris field, with a longer-term goal of a formal Antarctic Specially Protected Area designation. Warming Antarctic waters and increasing ship traffic in the region are cited as growing risks.",
-        "This game has no salvage, collection or loot of any kind at any site; here, that policy simply matches the law."
+        "Survey the wreck through photographs and scans, leaving its timber, fittings and surrounding debris undisturbed."
       ],
       "facts": [
         {
           "label": "Designation",
           "value": "Antarctic Treaty Historic Site and Monument No. 93 (2019)"
         },
-        { "label": "Protection radius (original)", "value": "500 m" },
-        { "label": "Protection radius (proposed)", "value": "1,500 m" },
-        { "label": "Managed by", "value": "UK Antarctic Heritage Trust, with Historic England" },
-        { "label": "Lives lost in the sinking", "value": "none — all 28 crew survived" }
+        {
+          "label": "Protection radius (original)",
+          "value": "500 m"
+        },
+        {
+          "label": "Protection radius (proposed)",
+          "value": "1,500 m"
+        },
+        {
+          "label": "Managed by",
+          "value": "UK Antarctic Heritage Trust, with Historic England"
+        },
+        {
+          "label": "Lives lost in the sinking",
+          "value": "none — all 28 crew survived"
+        }
       ],
       "reconstruction": false,
       "sources": [

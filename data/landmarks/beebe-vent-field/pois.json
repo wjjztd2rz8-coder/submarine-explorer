@@ -19,7 +19,7 @@
         "https://www.nature.com/articles/ncomms1636",
         "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field"
       ],
-      "note": "Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): -4,987.9 m, within a few tens of metres of Wikipedia's published coordinate for the Beebe Hydrothermal Vent Field (18 32'48\"N 81 43'6\"W = 18.5467, -81.7183) and inside Connelly et al. (2012)'s published depth range for the field, 4,957-4,987 m. The field's five main endmember vents (Beebe 1-5) branch from the same sulfide mound here and are the source of the field's record 403-410 degC supercritical fluid measurements."
+      "note": "Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): -4,987.9 m, within a few tens of metres of Wikipedia's published coordinate for the Beebe Hydrothermal Vent Field (18 32'48\"N 81 43'6\"W = 18.5467, -81.7183) and inside Connelly et al. (2012)'s published depth range for the field, 4,957-4,987 m. The field's five main endmember vents (Beebe 1-5) branch from the same sulfide mound here and are the source of low-salinity fluids measured around 401–403 °C at roughly 500 bar (Webber et al. 2015)."
     },
     {
       "id": "bvf-shrimp-swarm",

@@ -37,7 +37,9 @@
       "notable_species": ["novel archaea and bacteria", "limited macrofauna vs black smokers"],
       "external_links": [
         "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field",
-        "https://vents-data.interridge.org/"
+        "https://vents-data.interridge.org/",
+        "https://oceanexplorer.noaa.gov/okeanos/explorations/ex1104/background/edu/media/ex1104_tracking.pdf",
+        "https://oceanexplorer.noaa.gov/explorations/05lostcity/logs/july29/july29.html"
       ],
       "wreck_meta": null
     },
@@ -197,7 +199,7 @@
       "country_eez": "international waters",
       "confidence": "high",
       "coordinate_source": "https://en.wikipedia.org/wiki/Axial_Seamount",
-      "summary": "The most active submarine volcano on the Juan de Fuca Ridge, hosting the ASHES vent field within its caldera; instrumented by the NOAA/University of Washington cabled observatory network for real-time eruption monitoring.",
+      "summary": "The most active submarine volcano on the Juan de Fuca Ridge, hosting the ASHES vent field within its caldera; instrumented by the Ocean Observatories Initiative Regional Cabled Array for real-time eruption monitoring.",
       "facts": [
         "Erupted in 1998, 2011, and 2015; monitored for future eruptions",
         "Hosts the Ocean Observatories Initiative cabled array with real-time sensors",
@@ -286,7 +288,7 @@
     },
     {
       "id": "beebe-vent-field",
-      "name": "Beebe Hydrothermal Vent Field (Von Damm/Piccard)",
+      "name": "Beebe Hydrothermal Vent Field (Piccard)",
       "type": "vent",
       "lat": 18.5464,
       "lon": -81.718,
@@ -302,10 +304,10 @@
       "country_eez": "international waters (Cayman Islands vicinity)",
       "confidence": "high",
       "coordinate_source": "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field",
-      "summary": "The deepest known hydrothermal vent field on Earth, on the ultraslow-spreading Mid-Cayman Spreading Centre, venting fluids exceeding 400 degrees C that approach supercritical conditions.",
+      "summary": "The deepest known active hydrothermal vent field on Earth, on the ultraslow-spreading Mid-Cayman Spreading Centre. Its black smokers release low-salinity fluid measured around 401–403 °C at roughly 500 bar.",
       "facts": [
         "World's deepest known active hydrothermal vent field at ~4,960 m",
-        "Fluids exceed 400C and show evidence of supercritical (phase-separated) venting",
+        "Low-salinity fluids measured around 401–403 °C at roughly 500 bar can be supercritical (Webber et al. 2015)",
         "Named after ocean explorer William Beebe",
         "On the ultraslow-spreading Mid-Cayman Spreading Centre alongside the shallower Von Damm field"
       ],
@@ -317,7 +319,8 @@
       "notable_species": ["Rimicaris hybisae shrimp", "anemones"],
       "external_links": [
         "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field",
-        "https://vents-data.interridge.org/ventfield/beebe"
+        "https://vents-data.interridge.org/ventfield/beebe",
+        "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005879"
       ],
       "wreck_meta": null
     },
@@ -854,7 +857,7 @@
     },
     {
       "id": "hunga-tonga-caldera",
-      "name": "Hunga Tonga-Hunga Ha'apai Caldera",
+      "name": "Hunga Tonga–Hunga Ha’apai (pre-2022 survey)",
       "type": "seamount",
       "lat": -20.55,
       "lon": -175.4,
@@ -870,9 +873,9 @@
       "country_eez": "Tonga",
       "confidence": "high",
       "coordinate_source": "https://en.wikipedia.org/wiki/Hunga_Tonga%E2%80%93Hunga_Ha%CA%BBapai",
-      "summary": "Submarine volcano whose catastrophic January 2022 eruption produced the most powerful volcanic explosion recorded in the modern instrumental era and dramatically deepened and widened its underwater caldera.",
+      "summary": "Explore the earlier summit landscape of Hunga Tonga–Hunga Ha’apai, before the January 2022 eruption deepened its shallow caldera to about 850 m.",
       "facts": [
-        "The 15 January 2022 eruption was the largest atmospheric explosion recorded by modern instruments",
+        "The January 2022 eruption sent a plume about 58 km high and generated a destructive tsunami",
         "Caldera floor deepened from roughly 150 m to about 850 m after the eruption",
         "Caldera widened to about 4 km across",
         "Generated a Pacific-wide tsunami and unprecedented atmospheric shockwaves"
@@ -882,12 +885,15 @@
         "Tsunami-generation and shockwave educational sequence"
       ],
       "hazards": [
-        "active volcanic hazard",
-        "unstable steep caldera walls",
-        "turbid ash-laden water"
+        "steep volcanic slopes",
+        "loose volcanic sediment",
+        "dim water on the deeper flank"
       ],
-      "notable_species": ["early pioneer microbial colonizers"],
-      "external_links": ["https://en.wikipedia.org/wiki/Hunga_Tonga%E2%80%93Hunga_Ha%CA%BBapai"],
+      "notable_species": ["shallow-rim reef fish", "microbial communities"],
+      "external_links": [
+        "https://en.wikipedia.org/wiki/Hunga_Tonga%E2%80%93Hunga_Ha%CA%BBapai",
+        "https://www.nature.com/articles/s41561-026-02099-7"
+      ],
       "wreck_meta": null
     },
     {
@@ -1403,7 +1409,7 @@
     },
     {
       "id": "great-blue-hole",
-      "name": "Great Blue Hole",
+      "name": "Lighthouse Reef / Great Blue Hole",
       "type": "hole",
       "lat": 17.3153,
       "lon": -87.5346,
@@ -1419,9 +1425,9 @@
       "country_eez": "Belize",
       "confidence": "high",
       "coordinate_source": "https://en.wikipedia.org/wiki/Great_Blue_Hole",
-      "summary": "A giant marine sinkhole on Belize's Lighthouse Reef, formed as a limestone karst cave during past ice ages before being flooded by rising seas; a UNESCO World Heritage Site.",
+      "summary": "Survey Lighthouse Reef’s shallow platform and outer slopes around the Great Blue Hole, a roughly 320 m-wide, 125 m-deep flooded limestone sinkhole in the Belize Barrier Reef Reserve System.",
       "facts": [
-        "Roughly 318 m across and 124 m deep, near-perfectly circular",
+        "The real sinkhole is about 320 m across and 125 m deep",
         "Formed as a limestone cave system during Pleistocene low sea levels, then collapsed and flooded",
         "Popularized by Jacques Cousteau's 1971 expedition",
         "Part of the Belize Barrier Reef Reserve System UNESCO World Heritage Site"
@@ -1432,7 +1438,10 @@
       ],
       "hazards": ["low oxygen layer at depth", "dark cavern interior", "narrow submerged ledges"],
       "notable_species": ["Caribbean reef sharks", "groupers"],
-      "external_links": ["https://en.wikipedia.org/wiki/Great_Blue_Hole"],
+      "external_links": [
+        "https://en.wikipedia.org/wiki/Great_Blue_Hole",
+        "https://limnogeology.ethz.ch/GischlerMarine.pdf"
+      ],
       "wreck_meta": null
     },
     {
@@ -1874,7 +1883,7 @@
       "facts": [
         "Discovered September 1, 1985 by Robert Ballard/Jean-Louis Michel",
         "Bow and stern sections lie ~600 m apart with a debris field between",
-        "Sits in international waters and is protected under a 2004 UNESCO-linked agreement",
+        "Protected by the RMS Titanic international agreement, in force since November 2019",
         "The 2023 Titan submersible implosion occurred during a dive to this wreck"
       ],
       "gameplay_hooks": [
@@ -1895,7 +1904,10 @@
         "length_m": 269,
         "orientation_notes": "broken into separate bow and stern sections roughly 600 m apart, both upright-ish; stern heavily collapsed"
       },
-      "external_links": ["https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"]
+      "external_links": [
+        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
+        "https://www.gov.uk/government/publications/agreement-concerning-the-shipwrecked-vessel-rms-titanic-ts-no82019"
+      ]
     },
     {
       "id": "bismarck",
@@ -1934,9 +1946,12 @@
         "vessel_type": "battleship",
         "sunk_year": 1941,
         "length_m": 251,
-        "orientation_notes": "upright on seabed, bow separated from main hull"
+        "orientation_notes": "upright and embedded in sediment; bow attached, stern broken away; main turrets detached"
       },
-      "external_links": ["https://en.wikipedia.org/wiki/German_battleship_Bismarck"]
+      "external_links": [
+        "https://en.wikipedia.org/wiki/German_battleship_Bismarck",
+        "https://www.hmshood.org.uk/hoodtoday/2001expedition/bismarck/encrypt.htm"
+      ]
     },
     {
       "id": "uss-yorktown",
@@ -2073,7 +2088,7 @@
       "country_eez": "international waters (Antarctic Treaty area)",
       "confidence": "high",
       "coordinate_source": "https://endurance22.org/endurance-is-found",
-      "summary": "Sir Ernest Shackleton's polar expedition ship, crushed by pack ice in 1915; found on 5 March 2022 by the Endurance22 expedition almost perfectly preserved in the cold, low-oxygen Weddell Sea.",
+      "summary": "Sir Ernest Shackleton's polar expedition ship, crushed by pack ice in 1915; found on 5 March 2022 by the Endurance22 expedition almost perfectly preserved in the cold Weddell Sea.",
       "facts": [
         "Found exactly 100 years after Shackleton's burial at South Georgia",
         "Discovered ~6.4 km south of the position recorded by Captain Frank Worsley",

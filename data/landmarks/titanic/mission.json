@@ -23,13 +23,13 @@
       "The open bathymetry is too coarse to show the wreck itself."
     ],
     "hazards": [
-      "Total darkness: sunlight fades out within the top few hundred metres, and below that only your lights work.",
+      "Sunlight fades with depth; use your lights to read the deeper terrain.",
       "Crushing pressure: about 380 atmospheres at the seabed. Your Class B hull is rated to 6,500 m.",
       "Near-freezing water, about 1–2 °C.",
       "Fragile, collapsing structure: decks and railings are still falling. Keep a respectful distance and do not touch.",
       "Deep currents sweep the site and stir up sediment that reduces visibility."
     ],
-    "memorial_note": "The Titanic is the final resting place of about 1,500 people who died on 15 April 1912. Please explore it as you would a memorial. The game has no salvage, collection or loot of any kind; you observe and learn only, in keeping with the international agreement that protects the site."
+    "memorial_note": "Titanic is the final resting place of about 1,500 people who died on 15 April 1912. Observe, photograph and leave the wreck undisturbed."
   },
   "objectives": [
     {

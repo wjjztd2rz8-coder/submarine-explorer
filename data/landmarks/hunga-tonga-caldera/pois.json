@@ -20,7 +20,7 @@
     },
     {
       "id": "hunga-tonga-rim-wall",
-      "name": "Inner caldera wall (pre-2022 survey)",
+      "name": "Volcanic rim slope (pre-2022 survey)",
       "lat": -20.57,
       "lon": -175.42,
       "snap_to_seabed": true,
@@ -31,8 +31,8 @@
       "guide_entry": "rim-wall",
       "confidence": "medium",
       "reconstruction": false,
-      "sources": ["https://www.gmrt.org/"],
-      "note": "Real survey terrain: this tile reads about 468.6 m deep here, on the steep inner slope between the shallow caldera floor and the deeper flanks. No source consulted names this specific point; it is identified from the tile's own bathymetry as a representative stretch of the pre-eruption caldera wall, hence medium rather than high confidence."
+      "sources": ["https://www.gmrt.org/", "https://www.nature.com/articles/s41561-026-02099-7"],
+      "note": "The terrain grid reads about 468.6 m here, deeper than Hunga’s pre-eruption central basin (150–200 m). This is a volcanic slope beyond the basin, not a surveyed inner caldera wall. The authored tuff scarp shares this marker location and is explicitly a game addition."
     }
   ]
 }

@@ -16,21 +16,20 @@
   },
   "briefing": {
     "summary": "Dive to the battleship Bismarck on the flank of an extinct seamount. Scan the upright main hull and the detached gun turrets higher on the slope, then inspect the hull for battle damage.",
-    "depth_m": 4791,
+    "depth_m": 4219,
     "facts": [
-      "This is a war grave. Roughly 2,100 of the 2,221 men aboard died; only about 114 were rescued. The game has no salvage, collection or loot of any kind.",
-      "Bismarck struck the seamount's flank, triggering a small landslide, and slid some distance down-slope before coming to rest upright and largely intact.",
-      "By default you start beside the first objective. With a surface start you begin at the surface about 1.5 km north-east of the hull. Head south-west (about 225°) and descend.",
-      "This mission is set at the H.M.S. Hood Association's 2001 expedition fix (48.15N, 16.117W, 'vicinity of 4809N 01607W'), the most specific sourced coordinate found -- about 20 km south of an earlier, unsourced coordinate this pack previously used. The commonly quoted 48°10'N 16°12'W (Wikipedia's rounded infobox figure) sits about 6 km away. This tile's own terrain reads roughly 4,220 m at the hull -- shallower than the published 4,790-4,791 m wreck depth -- because this point sits higher on the seamount's flank than where the hull is reported to have finally settled; see the field guide's overview entry.",
-      "Open bathymetry here has no dedicated survey of the wreck itself and cannot show the ship or the real debris trail."
+      "Bismarck sank on 27 May 1941 after a pursuit by the Royal Navy. Robert Ballard’s team found the wreck in June 1989.",
+      "The hull rests upright on a seamount slope. Its stern broke away and the four main gun turrets fell out during the sinking.",
+      "The dive follows a roughly 4,220 m terrain slope. Published surveys place the real wreck at about 4,790 m; the Journal explains the mapping gap.",
+      "With a surface start, head southwest from the starting point and descend toward the hull."
     ],
     "hazards": [
-      "Total darkness below a few hundred metres; only your lights work.",
-      "Crushing pressure: roughly 480 atmospheres at this depth. Your Class C hull is rated well beyond it.",
+      "Sunlight fades with depth; use your lights to read the deeper terrain.",
+      "Crushing pressure: about 420 atmospheres on this route. Your Class C hull is rated beyond it.",
       "Steep, unstable seamount flank terrain near the wreck.",
       "Unexploded ordnance may remain aboard. Keep a respectful distance and do not touch anything."
     ],
-    "memorial_note": "Bismarck is a war grave. Roughly 2,100 of her crew of 2,221 died when she sank on 27 May 1941. Please treat this site the way you would any grave: look and learn, but do not disturb. There is no salvage, collection or loot of any kind, here or anywhere in this game, and nothing here is framed as treasure or salvage."
+    "memorial_note": "Bismarck is a war grave. About 2,100 crew died when she sank. Explore with care: observe, photograph and leave the wreck undisturbed."
   },
   "objectives": [
     {

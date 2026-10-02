@@ -15,19 +15,19 @@
     "heading_deg": 140
   },
   "briefing": {
-    "summary": "Descend to the Leggo lander's 2014 bait-station site on the floor of the Eastern Pool, then climb the steep north inner wall of the trench. The near-site start skips the first 6 km of descent and leaves nearly 5 km to explore.",
+    "summary": "Descend to the Leggo lander’s 2014 bait-station site on the Eastern Pool floor, then climb the steep north inner wall of the trench.",
     "depth_m": 10931,
     "facts": [
-      "The Challenger Deep's Eastern Pool is the deepest known point in Earth's oceans; the deepest cell surveyed in this tile is 10,930.9 m.",
+      "Challenger Deep contains several deep basins. This tile’s deepest sampled cell in the Eastern Pool is about 10,931 m.",
       "This full-ocean-depth hull is rated to 11,000 m, clearing the deepest terrain in this mission.",
       "First crewed descent: Trieste, 23 January 1960 (Jacques Piccard, Don Walsh). Most recent well-instrumented survey used here: the Five Deeps Expedition's DSV Limiting Factor, 2019.",
-      "Nothing lives here that you can see with the naked eye except hadal amphipods (Hirondellea gigas) at bait -- no fish have been confirmed this deep."
+      "Hadal amphipods gather at bait on the floor. No fish have been confirmed this deep."
     ],
     "hazards": [
       "Rated depth: 11,000 m. The deepest terrain in this mission is 10,931 m; the hull warning begins beyond its rating.",
-      "Total darkness below a few hundred metres; only your lights work.",
+      "Sunlight fades with depth; use your lights to read the deeper terrain.",
       "With a surface start, expect a long descent from the 6,000 m spawn; the default near-site start skips it.",
-      "Extreme, uniform pressure (about 1,086 bar at the bottom) and near-freezing water (1-4 degC)."
+      "Extreme, uniform pressure (about 1,100 bar at the bottom) and near-freezing water (1-4 degC)."
     ]
   },
   "objectives": [

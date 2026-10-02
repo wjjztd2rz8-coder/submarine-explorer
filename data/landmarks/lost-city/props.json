@@ -11,11 +11,11 @@
       "snap_to_seabed": true,
       "heading_deg": 0,
       "scale": 1,
-      "dimensions_m": [70, 70, 60],
+      "dimensions_m": [100, 100, 60],
       "lod_distance_m": 1400,
       "collision": "box",
       "reconstruction": true,
-      "note": "Poseidon, the tallest carbonate spire in the field: about 60 m tall (Wikipedia, 'Lost City Hydrothermal Field'). Wikipedia also gives '100 metres wide', which describes the whole multi-spire edifice rather than one column; dimensions_m[0]=70 is an estimate for a single tapered tower's base. Placed at the corrected field location (see pois.json note); exact position within the ~500 sq m field is not published and the GMRT grid (~53 x 61 m/cell) cannot resolve it. Rendered as a fluted pale spire with flanges and lesser spires on a talus skirt; colour is the pale white/cream carbonate-brucite of Lost City's towers. See sources.md."
+      "note": "Poseidon composite carbonate edifice: about 60 m tall and 100 m across (Denny et al. 2016, Geologic evolution of Lost City). Width and depth describe the full group of adjoining spires and foundation, not one column. The 100 m depth is a build footprint, not a measured plan outline. Snapped to the same terrain-matched terrace as before; internal layout and heading are scenic. Clear-fluid shimmer comes from the mission vent preset, with smoke and glow disabled. See sources.md."
     },
     {
       "id": "beehive-chimney",

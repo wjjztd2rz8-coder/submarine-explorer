@@ -18,16 +18,16 @@
     "summary": "Descend about 1,540 m to the ASHES hydrothermal field, a cluster of black-smoker chimneys near the base of Axial Seamount's western caldera wall. Find and scan the Mushroom and Inferno chimneys, then survey the field's smaller vents and the real caldera terrain around them.",
     "depth_m": 1540,
     "facts": [
-      "Axial Seamount is the most active submarine volcano in the northeast Pacific, erupting in 1998, 2011 and 2015; researchers have forecast eruptions here from seafloor deformation data, though none is imminent as this mission was written.",
+      "Axial Seamount erupted in 1998, 2011 and 2015. Scientists use seafloor deformation and earthquakes to track the magma reservoir between eruptions.",
       "ASHES is one of the only hydrothermal fields on Earth wired for real-time monitoring: the Ocean Observatories Initiative's Regional Cabled Array streams live seismic, pressure, chemistry and HD video data to shore continuously.",
-      "The whole field is only about 2,826 sq m -- smaller than a single cell of this tile's open bathymetry -- so no individual chimney appears in the real terrain. The chimneys here use the engine's sulfide material, so they render dark and rust-streaked like true black smokers rather than the pale carbonate towers of Lost City.",
+      "ASHES is a compact field of dark sulfide chimneys on fractured basalt, with tubeworms and pale microbial mats around cooler flow.",
       "Mushroom and Inferno, the field's two best-documented chimneys, sit only about 10 m apart -- keep an eye on your position so you scan both without leaving the immediate vent cluster."
     ],
     "hazards": [
       "Scalding vent fluid: Mushroom and Inferno vent over 275 degC just centimetres from near-freezing seawater.",
       "Fragile mineral chimneys; keep a respectful distance to avoid damaging delicate spires.",
-      "Total darkness below a few hundred metres; only your lights work.",
-      "This is an active volcanic caldera. Eruptions here are rare and currently judged not imminent, but the seabed can shift with inflation and deflation over months to years."
+      "Sunlight fades with depth; use your lights to read the deeper terrain.",
+      "Active volcanic terrain: inflation, deflation and eruptions reshape the seafloor."
     ]
   },
   "objectives": [

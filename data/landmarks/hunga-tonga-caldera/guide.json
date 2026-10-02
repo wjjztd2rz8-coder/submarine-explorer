@@ -6,17 +6,31 @@
       "id": "overview",
       "title": "Hunga Tonga-Hunga Ha'apai: a survey from before the eruption",
       "paragraphs": [
-        "Important: the terrain in this mission predates the 15 January 2022 eruption. This tile is built from bathymetry gathered before that date (surveys including a November 2015 WASSP multibeam survey and further multibeam work in September 2017), and it shows the volcano as it stood then, not as it stands now. Nothing in this game recreates the post-eruption seafloor -- see below for what the real surveys found instead.",
-        "Hunga Tonga-Hunga Ha'apai is a submarine volcano in the Tonga archipelago, the summit of a roughly 2-km-high edifice rising from the surrounding seafloor. Before 2022, its caldera -- a broad volcanic basin about 4.5 km across -- sat around 150 m below sea level, and two small islands, Hunga Tonga and Hunga Ha'apai, poked above the water on its rim, joined by a shallow saddle.",
-        "On 15 January 2022, the volcano produced one of the most powerful eruptions ever recorded by modern instruments: an eruption column that reached roughly 58 km into the atmosphere, an atmospheric pressure shockwave that circled the globe several times, and a tsunami that struck Tonga and was recorded across the Pacific. Locally, waves reached as high as 15-22 m on some islands; the eruption and tsunami killed at least 6 people in Tonga (plus further reported deaths and injuries) and caused widespread damage.",
-        "The eruption triggered a catastrophic collapse of the summit caldera. Surveys by the NIWA-Nippon Foundation Tonga Eruption Seabed Mapping Project (TESMaP), beginning within months of the eruption, found the caldera floor had dropped from about 150 m to roughly 850 m deep, and widened from about 4.5 km to about 4.8 km across. The two islands are now smaller and no longer connected. None of that post-eruption terrain is shown in this mission; this tile is the 'before' picture only."
+        "This dive follows Hunga Tonga–Hunga Ha’apai’s landscape before the 15 January 2022 eruption: a shallow summit basin, an island connection and volcanic slopes falling into deeper water.",
+        "The volcano rises roughly 2 km from the surrounding seafloor. Before 2022, its central basin lay about 150–200 m below sea level. A cone built in 2014–2015 joined the two older rim islands.",
+        "The January 2022 eruption drove a plume about 58 km high, sent pressure waves around the world and generated a destructive tsunami. Repeat seafloor mapping shows that the caldera deepened to about 850 m and widened from roughly 4.5 km to 4.8 km."
       ],
       "facts": [
-        { "label": "Caldera depth, pre-2022", "value": "~150 m" },
-        { "label": "Caldera depth, post-2022 (not shown here)", "value": "~850 m (TESMaP survey)" },
-        { "label": "Caldera diameter, pre- / post-2022", "value": "~4.5 km / ~4.8 km" },
-        { "label": "Eruption date", "value": "15 January 2022" },
-        { "label": "Edifice height", "value": "~2 km from seafloor to the islands" }
+        {
+          "label": "Caldera depth, pre-2022",
+          "value": "about 150–200 m"
+        },
+        {
+          "label": "Caldera depth, post-2022 (not shown here)",
+          "value": "~850 m (TESMaP survey)"
+        },
+        {
+          "label": "Caldera diameter, pre- / post-2022",
+          "value": "~4.5 km / ~4.8 km"
+        },
+        {
+          "label": "Eruption date",
+          "value": "15 January 2022"
+        },
+        {
+          "label": "Edifice height",
+          "value": "~2 km from seafloor to the islands"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -31,6 +45,10 @@
         {
           "title": "2022 Hunga Tonga-Hunga Ha'apai eruption and tsunami — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/2022_Hunga_Tonga%E2%80%93Hunga_Ha%CA%BBapai_eruption_and_tsunami"
+        },
+        {
+          "title": "Ribó et al. 2026 — repeat bathymetry of Hunga",
+          "url": "https://www.nature.com/articles/s41561-026-02099-7"
         }
       ],
       "confidence": "high"
@@ -39,13 +57,18 @@
       "id": "caldera-floor",
       "title": "The caldera floor, before 2022",
       "paragraphs": [
-        "This broad, gently sloping basin was the floor of Hunga Tonga-Hunga Ha'apai's summit caldera before the 2022 eruption, roughly 150 m below the surface. This tile's own terrain reads about 132 m deep here, close to that published figure.",
-        "Multibeam surveys carried out in 2015 (WASSP, aboard the vessel Pacific Rose) and again in 2017 mapped this floor and the caldera walls around it, providing the last detailed picture of the volcano before its catastrophic collapse.",
-        "The caldera you are scanning collapsed to roughly 850 m deep in January 2022; what you see here no longer exists in this form."
+        "The earlier caldera contained a broad central basin, about 150–200 m deep in detailed surveys. This terrain grid reads about 132 m at the scan point.",
+        "Multibeam mapping before and after the January 2022 eruption reveals how dramatically the basin changed. The later surveys found its deepest part around 850 m."
       ],
       "facts": [
-        { "label": "Depth here (this tile)", "value": "~132 m" },
-        { "label": "Published pre-eruption depth", "value": "~150 m" },
+        {
+          "label": "Depth here (this tile)",
+          "value": "~132 m"
+        },
+        {
+          "label": "Published pre-eruption depth",
+          "value": "about 150–200 m"
+        },
         {
           "label": "Pre-eruption survey",
           "value": "WASSP multibeam, Nov 2015; further multibeam, Sep 2017"
@@ -60,6 +83,10 @@
         {
           "title": "Mapping the Tongan eruption — NIWA",
           "url": "https://niwa.co.nz/hazards/mapping-tongan-eruption"
+        },
+        {
+          "title": "Ribó et al. 2026 — repeat bathymetry of Hunga",
+          "url": "https://www.nature.com/articles/s41561-026-02099-7"
         }
       ],
       "confidence": "high"
@@ -68,13 +95,18 @@
       "id": "island-saddle",
       "title": "The islands, joined",
       "paragraphs": [
-        "Before 2022, the volcano's two subaerial peaks, Hunga Tonga and Hunga Ha'apai, were joined by a shallow saddle of rock and reef just above sea level, visible here at the surface. Together they formed the only visible part of the roughly 2-km-tall volcanic edifice beneath them.",
-        "The 15 January 2022 eruption changed this permanently: NIWA's post-eruption survey found the islands 'smaller and no longer joined together.' A large part of the saddle, and much of the original island material, was blasted away or collapsed into the sea during the eruption.",
-        "This tile shows only the earlier, connected state, from before the eruption. No post-eruption island shape is modelled here."
+        "The 2014–2015 eruption built a tephra cone between Hunga Tonga and Hunga Ha’apai, joining the two older islands. Tephra is fragmented volcanic material thrown out during an eruption.",
+        "The January 2022 eruption removed much of this connection and left the islands smaller and separated."
       ],
       "facts": [
-        { "label": "State shown here", "value": "pre-2022: islands joined by a shallow saddle" },
-        { "label": "State since 15 Jan 2022 (not shown)", "value": "islands smaller, separated" }
+        {
+          "label": "State shown here",
+          "value": "pre-2022: islands joined by a shallow saddle"
+        },
+        {
+          "label": "State since 15 Jan 2022 (not shown)",
+          "value": "islands smaller, separated"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -85,19 +117,27 @@
         {
           "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, AGU",
           "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685"
+        },
+        {
+          "title": "Ribó et al. 2026 — island connection and caldera changes",
+          "url": "https://www.nature.com/articles/s41561-026-02099-7"
         }
       ],
       "confidence": "high"
     },
     {
       "id": "rim-wall",
-      "title": "The inner caldera wall",
+      "title": "The volcanic rim slope",
       "paragraphs": [
-        "Descending from the shallow caldera floor, the terrain steepens into the caldera's inner wall -- part of the crater rim that, before 2022, enclosed the summit basin. This tile reads roughly 469 m deep along this stretch of slope.",
-        "No source consulted names this exact point specifically; it is picked out from this tile's own pre-eruption bathymetry as a representative section of the caldera wall, rather than a feature with its own published survey description. Treat the depth as a real reading from this tile, and the description of it as a 'caldera wall' as an interpretation of the surrounding terrain.",
-        "The banded tuff wall on the rim is a game addition, modelled on the layered volcanic deposits of the caldera walls."
+        "West of the shallow basin, volcanic terrain falls toward deeper water. The scan point is about 469 m deep, beyond the central basin’s 150–200 m floor.",
+        "The banded tuff scarp is a game addition inspired by Hunga’s layered pyroclastic deposits. Its gullies and talus show how fragmented volcanic rock can form a steep slope."
       ],
-      "facts": [{ "label": "Depth here (this tile)", "value": "~469 m" }],
+      "facts": [
+        {
+          "label": "Depth here (this tile)",
+          "value": "~469 m"
+        }
+      ],
       "reconstruction": true,
       "sources": [
         {
@@ -107,6 +147,10 @@
         {
           "title": "Ongoing Activity at Hunga Submarine Volcano, Tonga — Walker et al. 2024, AGU",
           "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2024GC011685"
+        },
+        {
+          "title": "Ribó et al. 2026 — Hunga volcanic deposits and setting",
+          "url": "https://www.nature.com/articles/s41561-026-02099-7"
         }
       ],
       "confidence": "medium"
@@ -116,11 +160,17 @@
       "title": "The outer flank of a 2-km volcano",
       "paragraphs": [
         "Beyond the caldera rim, the seafloor drops away down the outer flank of the wider volcanic edifice -- this tile reads roughly 1,029 m deep here. The whole structure, from this outer base to the summit islands, rises about 2 km from the surrounding seafloor, making Hunga Tonga-Hunga Ha'apai one of the larger submarine volcanoes in the Tonga-Kermadec arc.",
-        "This part of the seafloor lies outside the caldera itself and was not directly involved in the 2022 collapse, which was confined to the summit basin. It is shown here as real, if pre-eruption, survey terrain."
+        "The flank is part of the wider volcanic edifice. The 2022 eruption also scoured slopes outside the caldera through fast-moving volcanic sediment flows."
       ],
       "facts": [
-        { "label": "Depth here (this tile)", "value": "~1,029 m" },
-        { "label": "Edifice height", "value": "~2 km, seafloor to islands" }
+        {
+          "label": "Depth here (this tile)",
+          "value": "~1,029 m"
+        },
+        {
+          "label": "Edifice height",
+          "value": "~2 km, seafloor to islands"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -131,6 +181,10 @@
         {
           "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
           "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Ribó et al. 2026 — flank erosion",
+          "url": "https://www.nature.com/articles/s41561-026-02099-7"
         }
       ],
       "confidence": "high"

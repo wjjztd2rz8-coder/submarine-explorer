@@ -24,12 +24,12 @@
       "Open bathymetry here has no dedicated survey of the wreck site and falls back to a coarse global fill, far too coarse to show a 44 m wooden ship."
     ],
     "hazards": [
-      "Total darkness below a few hundred metres; only your lights work.",
+      "Sunlight fades with depth; use your lights to read the deeper terrain.",
       "Crushing pressure: about 300 atmospheres at the seabed. Your Class B hull is rated to 6,500 m, well within margin here.",
       "Near-freezing water, close to the surface freezing point of seawater year-round.",
       "This is a protected Antarctic Treaty Historic Site and Monument (HSM No. 93). Keep a respectful distance and do not touch."
     ],
-    "memorial_note": "Endurance is a protected historic site and monument under the Antarctic Treaty (HSM No. 93), not a war grave -- nobody died when she sank. Please still explore her with the same respect: the game has no salvage, collection or loot of any kind, in keeping with the international law that protects the site."
+    "memorial_note": "Endurance is a protected Antarctic historic site. All 28 crew survived. Observe, photograph and leave the ship undisturbed."
   },
   "objectives": [
     {

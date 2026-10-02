@@ -1,5 +1,9 @@
 # Titanic site content: sources and notes (package B2)
 
+## Phase F tone and catalog review — 2026-10-01
+
+Keep the distinct bow/stern and debris targets. Shorten the memorial note to observation and non-disturbance at the wreck, without claiming the game has no sample collection anywhere. Correct the catalog’s “2004 UNESCO-linked agreement” to the Titanic international agreement entering into force in November 2019. [UK Treaty Series No. 8/2019](https://www.gov.uk/government/publications/agreement-concerning-the-shipwrecked-vessel-rms-titanic-ts-no82019) records the separate international agreement; the [2021 statutory instrument](https://www.legislation.gov.uk/uksi/2021/470/pdfs/uksi_20210470_en.pdf) confirms entry into force on 18 November 2019.
+
 Researched 2026-09-22. Files: `pois.json`, `guide.json`, `props.json`, `mission.json` in this folder.
 Tile: `data/tiles/titanic` (GMRT, ~45 x 61 m cells, bbox N 41.8798 / S 41.5798 / E -49.7999 / W -50.1010).
 

@@ -8,16 +8,34 @@
       "paragraphs": [
         "The Lost City Hydrothermal Field sits on the southern summit of the Atlantis Massif, a dome-shaped mountain of mantle rock exposed on the Mid-Atlantic Ridge near 30°N. Unlike the famous 'black smoker' vents that run on volcanic heat, Lost City is powered by serpentinization: seawater reacting with olivine-rich mantle rock, producing heat, hydrogen and methane without any magma nearby.",
         "The field was found on 4 December 2000 by scientists diving in DSV Alvin with the robotic camera sled ArgoII, working from the research vessel Atlantis. Its towering white carbonate chimneys, some over 60 m tall, made it one of the most striking hydrothermal discoveries ever made.",
-        "The vent fluid is warm (40-90 degC) and strongly alkaline (pH over 9) rather than the scalding, acidic fluid of a black smoker. It carries abundant hydrogen and methane but little of the metal and sulfide that colour a black smoker's plume, so Lost City's towers are built of pale carbonate minerals rather than dark metal sulfides. The towers here are rendered in that pale cream-white carbonate colour.",
-        "The field is tiny: about 500 square metres, smaller than a single cell of the open bathymetry used for this tile (roughly 53 x 61 m per cell). The seabed terrain here is real survey data, but no individual chimney is resolved in it."
+        "The vent fluid is warm, around 40–90 °C, and strongly alkaline. It emerges clear rather than carrying the dark mineral particles of a black smoker. Calcium carbonate and brucite build the white towers where this fluid meets seawater.",
+        "NOAA’s 2005 expedition described a field covering about 60,000 square metres. Individual chimneys are smaller than the terrain grid can resolve; their positions here follow nearby terrain in the documented depth range."
       ],
       "facts": [
-        { "label": "Depth range", "value": "750-900 m" },
-        { "label": "Discovered", "value": "4 December 2000 (DSV Alvin, RV Atlantis)" },
-        { "label": "Power source", "value": "serpentinization, not magma" },
-        { "label": "Fluid temperature", "value": "40-90 degC" },
-        { "label": "Fluid pH", "value": "over 9 (alkaline)" },
-        { "label": "Field extent", "value": "about 500 sq m" }
+        {
+          "label": "Depth range",
+          "value": "750-900 m"
+        },
+        {
+          "label": "Discovered",
+          "value": "4 December 2000 (DSV Alvin, RV Atlantis)"
+        },
+        {
+          "label": "Power source",
+          "value": "serpentinization, not magma"
+        },
+        {
+          "label": "Fluid temperature",
+          "value": "40-90 degC"
+        },
+        {
+          "label": "Fluid pH",
+          "value": "over 9 (alkaline)"
+        },
+        {
+          "label": "Field extent",
+          "value": "about 60,000 m² (NOAA 2005)"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -32,6 +50,14 @@
         {
           "title": "GMRT Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
           "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "NOAA Lost City expedition — field search area",
+          "url": "https://oceanexplorer.noaa.gov/explorations/05lostcity/logs/july29/july29.html"
+        },
+        {
+          "title": "NOAA — Tracking the Plume, Lost City fluid comparison",
+          "url": "https://oceanexplorer.noaa.gov/okeanos/explorations/ex1104/background/edu/media/ex1104_tracking.pdf"
         }
       ],
       "confidence": "high"
@@ -40,16 +66,18 @@
       "id": "poseidon",
       "title": "Poseidon, the tallest tower",
       "paragraphs": [
-        "Poseidon is the field's largest carbonate structure, standing about 60 m tall. It is the closest thing Lost City has to a landmark within a landmark: a ragged, spired tower built up over tens of thousands of years as vent fluid met cold seawater and precipitated calcium carbonate, layer on layer.",
-        "Chemical dating of Lost City's carbonate puts some chimneys at more than 100,000 years old and shows the field has vented, on and off, for at least 30,000 years -- making it vastly older than any known black smoker, which typically last only decades to a few centuries before they collapse or fizzle out.",
-        "Because it needs only olivine rock and liquid water, serpentinization like this could in principle happen anywhere those two things meet -- including on icy moons such as Europa or Enceladus, which is one reason Lost City is studied as a possible model for life beyond Earth.",
-        "No survey has published Poseidon's exact footprint or shape."
+        "Poseidon is a composite carbonate edifice about 60 m tall and 100 m across. Its adjoining towers, spires and flanges grow as warm vent fluid mixes with cold seawater and deposits minerals.",
+        "Uranium-thorium dating of carbonate samples from across Lost City gives ages up to about 120,000 years. These samples record the field’s long history; they do not date the entire active Poseidon tower.",
+        "Because it needs only olivine rock and liquid water, serpentinization like this could in principle happen anywhere those two things meet -- including on icy moons such as Europa or Enceladus, which is one reason Lost City is studied as a possible model for life beyond Earth."
       ],
       "facts": [
-        { "label": "Height", "value": "about 60 m" },
         {
-          "label": "Age",
-          "value": "chimneys dated older than 120,000 years; field active 30,000+ years"
+          "label": "Height",
+          "value": "about 60 m"
+        },
+        {
+          "label": "Oldest dated field carbonate",
+          "value": "about 120,000 years"
         },
         {
           "label": "Built from",
@@ -69,6 +97,10 @@
         {
           "title": "Ludwig et al. 2011, U–Th ages of Lost City chimneys",
           "url": "https://www.sciencedirect.com/science/article/abs/pii/S0016703711000135"
+        },
+        {
+          "title": "Denny et al. 2016 — Geologic evolution of Lost City",
+          "url": "https://repository.library.noaa.gov/view/noaa/59651"
         }
       ],
       "confidence": "medium"
@@ -81,7 +113,10 @@
         "Its marker here is offset from Poseidon so you can scan it separately."
       ],
       "facts": [
-        { "label": "Historical height", "value": "about 1 m; structure absent in 2018 survey" }
+        {
+          "label": "Historical height",
+          "value": "about 1 m; structure absent in 2018 survey"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -154,7 +189,10 @@
           "title": "Lost City Hydrothermal Field — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
         },
-        { "title": "Ocean Biodiversity Information System (OBIS)", "url": "https://obis.org/" }
+        {
+          "title": "Ocean Biodiversity Information System (OBIS)",
+          "url": "https://obis.org/"
+        }
       ],
       "confidence": "medium"
     },
@@ -166,8 +204,14 @@
         "This is the actual shallowest terrain sampled anywhere in this tile."
       ],
       "facts": [
-        { "label": "Depth", "value": "724 m (tile minimum)" },
-        { "label": "Feature type", "value": "oceanic core complex summit" }
+        {
+          "label": "Depth",
+          "value": "724 m (tile minimum)"
+        },
+        {
+          "label": "Feature type",
+          "value": "oceanic core complex summit"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -186,14 +230,22 @@
       "id": "south-wall",
       "title": "A coordinate discrepancy",
       "paragraphs": [
-        "This point is worth a look because of what it teaches about working with real data. Both Wikipedia's infobox and this game's landmark catalog give Lost City's position as a rounded 30 degrees 07' N, 42 degrees 07' W -- a coordinate precise only to the nearest arc-minute, about 1.8 km. On this tile's real bathymetry, that exact point lands here, 1,332 m deep, partway down the Atlantis Massif's steep south wall -- far below the field's true 750-900 m depth range.",
-        "The real Lost City field sits about 665 m north of this point, up on the massif's southern summit flank, which is where every vent POI in this mission is actually placed. This POI is kept at the catalog's literal coordinate so you can compare the two and see the gap for yourself: rounded coordinates plus steep terrain can put a 'X marks the spot' pin on the wrong feature entirely.",
-        "This is an ordinary stretch of the massif's south-facing slope."
+        "The Atlantis Massif’s south wall falls steeply below the carbonate terrace. At this scan point the terrain is about 1,332 m deep, more than 500 m below the main vent field.",
+        "The catalog’s rounded position lands on this wall. The dive’s tower markers lie farther north, where the terrain matches Lost City’s documented 750–900 m depth range."
       ],
       "facts": [
-        { "label": "Depth here", "value": "1,332 m" },
-        { "label": "Distance to real field", "value": "about 665 m north" },
-        { "label": "Cause", "value": "arc-minute-rounded published coordinate on steep terrain" }
+        {
+          "label": "Depth here",
+          "value": "1,332 m"
+        },
+        {
+          "label": "Distance to real field",
+          "value": "about 665 m north"
+        },
+        {
+          "label": "Cause",
+          "value": "arc-minute-rounded published coordinate on steep terrain"
+        }
       ],
       "reconstruction": false,
       "sources": [

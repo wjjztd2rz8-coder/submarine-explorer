@@ -1,5 +1,9 @@
 # Challenger Deep content: sources and notes (package C4)
 
+## Phase F text review — 2026-10-01
+
+Keep the sampled Eastern Pool and Leggo bait-station targets distinct from the invented northern wall scarp. Remove the claim that this particular pool is conclusively the ocean’s absolute deepest point. [Jamieson et al. 2023](https://www.sciencedirect.com/science/article/pii/S0967063723001711) records fish imagery at 8,336 m in the Izu–Ogasawara Trench, replacing the stale global 8,075 m record. Fish remain unsupported at Challenger Deep floor depth. Remove the obsolete “no amphipod model” statement now that the life layer exists. No changes to species occurrence provenance or prop scale/heading were made.
+
 Researched 2026-09-23, revised 2026-09-23 after coordinator review. Files: `pois.json`, `guide.json`,
 `props.json`, `mission.json`, `species.json` in this folder. Tile: `data/tiles/challenger-deep` (GMRT, bbox
 N 11.6233 / S 11.1229 / E 142.8420 / W 142.3416, cellsize ~59.9 x 61.1 m, min/max -10,930.89 / -5,936.3 m).
@@ -158,3 +162,5 @@ OK: challenger-deep, 0 error(s), 0 warning(s)
   "JAMSTEC first mapped the three pools" historical claim) were removed in this revision because no source
   fetched this session confirmed them outside Wikipedia; see "Facts dropped for lack of a confirmed source"
   above.
+
+Phase F protection and sounding wording: the [NOAA 2024 Monument Management Plan](https://www.fisheries.noaa.gov/s3/2024-06/Mariana-Trench-Marine-National-Monument-Management-Plan-202405-FINAL.pdf) places Challenger Deep just outside the Monument boundary, within the Federated States of Micronesia EEZ. The June 2020 high-precision measurement is dated rather than described as the most recent; the Western Pool placement is attributed to its 2019 review rather than asserted as consensus.

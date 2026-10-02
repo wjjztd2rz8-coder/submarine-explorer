@@ -2,7 +2,7 @@
   "version": 1,
   "landmark": "great-blue-hole",
   "tile": "great-blue-hole",
-  "title": "Lighthouse Reef and the Great Blue Hole",
+  "title": "Lighthouse Reef: around the Great Blue Hole",
   "hull_class": "B",
   "environment": {
     "preset": "reef"
@@ -18,7 +18,7 @@
     "summary": "Cross the shallow Lighthouse Reef platform and survey its steep eastern and western edges around the Great Blue Hole.",
     "depth_m": 226,
     "facts": [
-      "The Great Blue Hole is 318 m across and about 124 m deep; it sits inside Lighthouse Reef atoll.",
+      "The Great Blue Hole is about 320 m across and 125 m deep, inside the shallow Lighthouse Reef lagoon.",
       "The reef platform stays shallow for kilometres before dropping sharply into deeper water on either side.",
       "With a surface start you begin over the eastern slope, facing west toward the reef.",
       "Lighthouse Reef is part of the Belize Barrier Reef Reserve System, a UNESCO World Heritage Site."
@@ -26,7 +26,7 @@
     "hazards": [
       "Shallow reef structure near the rim -- watch your depth and avoid contact with coral.",
       "A steep drop-off from the reef flat to open ocean; currents can be stronger there.",
-      "Total darkness below a few hundred metres on the outer slope; only your lights work.",
+      "Sunlight fades with depth; use your lights to read the deeper terrain.",
       "Your Class B hull is rated to 6,500 m, clearing the deepest cell in this survey."
     ]
   },

@@ -12,6 +12,15 @@ without an entry here is not done.
 
 ## [Unreleased]
 
+### Removed
+
+- Phase F, F-CONTENT-FIX: cut the enclosed Blue Hole shaft/chemocline promise and
+  post-2022 Hunga ash/collapse staging from the current art brief because the
+  shipped routes show outer atoll slopes and the earlier volcanic landscape.
+  Removed the stale date-specific Axial eruption forecast and repeated game-wide
+  claims that sample collection does not exist; wreck interaction remains an
+  observation and photography survey.
+
 ### Added
 
 - Phase F, F-VISUAL-FIXES: authored free-dive approaches for all thirteen sites,
@@ -143,6 +152,18 @@ without an entry here is not done.
 - Phase F, F0-CORE: **Auto** and **Ultra** entries in Settings → Graphics tier.
 
 ### Changed
+
+- Phase F, F-CONTENT-FIX: Lost City now releases clear-flow shimmer, with smoke
+  and warm glow disabled. Poseidon's composite footprint follows the published
+  roughly 100 m width; field area and carbonate-age text now follow the research.
+- Lighthouse Reef leads the Great Blue Hole dive's atoll route; Hunga consistently
+  presents the historical landscape before January 2022. Its volcanic slope hero
+  now shares the scan marker, and Inferno sits about 10 m from Mushroom at ASHES.
+- Bismarck's briefing reports the current terrain route depth, while the Journal
+  preserves the real wreck depth and explains the unresolved mapping gap. Its bow
+  remains attached and its stern is described as missing. Beebe field naming and
+  fluid pressure, Endurance tonnage, Challenger depth and monument boundary,
+  white coral colour and wreck memorial text are corrected; deeper-route hints no longer call the twilight zone fully dark.
 
 - Phase F, F-VISUAL-FIXES: narrower, softer headlights and a weaker nearby fill
   preserve material colour and seabed gradients. Exposure and bloom are lower;

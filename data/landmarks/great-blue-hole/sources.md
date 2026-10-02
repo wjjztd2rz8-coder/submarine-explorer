@@ -1,5 +1,11 @@
 # Great Blue Hole site content: sources and notes (package C4)
 
+## Phase F scope decision — 2026-10-01
+
+Retain the existing Lighthouse Reef atoll route and surveyed outer slopes. The mission and catalog now lead with that experience. The western-slope grotto remains a game addition and is not the actual hole interior. An enclosed sinkhole terrain overlay, lower-shaft chemistry and interior route require a separate geometry/bathymetry package; those promises are cut from the current research brief.
+
+[Gischler et al. 2013, setting and stratification](https://limnogeology.ethz.ch/GischlerMarine.pdf) documents about 320 m width, 125 m depth, a roughly 5 m lagoon and anoxic water below 90 m. Use those rounded primary-study dimensions consistently in the new text. Oxygen depletion excludes reef fish; “lifeless” was too broad because microbial processes persist. Existing catalog depth 124 m remains the earlier survey convention, within the documented 124–125 m range.
+
 Researched 2026-09-23. Files: `pois.json`, `guide.json`, `props.json` (empty),
 `mission.json`, `species.json` in this folder. Tile: `data/tiles/great-blue-hole`
 (GMRT; bbox N 17.46544/S 17.16496/E -87.37646/W -87.69177, ~58 x 61 m cells;
