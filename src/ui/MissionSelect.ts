@@ -19,6 +19,7 @@
  */
 
 import { requiredHull, type Progress } from '../game/Progress.js';
+import type { GameplayMode } from '../core/Save.js';
 import type { MissionSummary } from '../game/Mission.js';
 import { contentUrl, fetchContentJson } from '../game/ContentPath.js';
 import type { TileIndexEntry } from '../util/types.js';
@@ -76,10 +77,16 @@ export class MissionSelect {
   private missions: MissionSummary[] = [];
   private pending: PendingMission[] = [];
   private progress: Progress | null = null;
-  setProgress(progress: Progress): void {
+  private mode: GameplayMode = 'arcade';
+  setProgress(progress: Progress, mode: GameplayMode = 'arcade'): void {
     this.progress = progress;
+    this.mode = mode;
     for (const button of this.root.querySelectorAll<HTMLButtonElement>('[data-tile]')) {
       let limit = button.querySelector<HTMLElement>('.mission-hull-limit');
+      if (mode !== 'realistic') {
+        limit?.remove();
+        continue;
+      }
       if (!limit) {
         limit = document.createElement('span');
         limit.className = 'mission-hull-limit mission-item-meta';
@@ -240,7 +247,7 @@ export class MissionSelect {
       btn.dataset.mission = m.id;
       const available = this.tileIds.has(m.tile);
       const locked =
-        this.progress !== null && m.depthM !== null && !this.progress.canDive(m.depthM);
+        this.progress !== null && m.depthM !== null && !this.progress.canDive(m.depthM, this.mode);
       if (locked) {
         btn.classList.add('is-locked');
         btn.disabled = true;

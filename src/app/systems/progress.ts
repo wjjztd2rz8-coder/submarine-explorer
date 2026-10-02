@@ -33,7 +33,10 @@ export function createProgressSystem(): GameSystem {
       ctx.config.sensorPresets = { ...ctx.config.sensorPresets };
       applyProgress(ctx.config, base, progress, ctx.settings.gameplay);
       boostLeft = PROGRESS_CONFIG.boostSeconds * (1 + progress.level('boost') * UPGRADES[6].step);
-      if (ctx.route && !progress.canDive(ctx.route.def.briefing.depth_m ?? 0)) {
+      if (
+        ctx.route &&
+        !progress.canDive(ctx.route.def.briefing.depth_m ?? 0, ctx.settings.gameplayMode)
+      ) {
         const hull = requiredHull(ctx.route.def.briefing.depth_m ?? 0);
         initialLock = `This mission needs Class ${hull.id} · ${hull.threshold} lifetime RP. Free dive is open to ${progress.hull.depthM.toLocaleString('en-US')} m.`;
         // Shared deep-site links become free dives, with the player's pressure rating.
@@ -41,7 +44,10 @@ export function createProgressSystem(): GameSystem {
         ctx.route = null;
       }
       if (ctx.route) {
-        const fitted = progress.hullFor(ctx.route.def.briefing.depth_m ?? 0);
+        const fitted = progress.hullFor(
+          ctx.route.def.briefing.depth_m ?? 0,
+          ctx.settings.gameplayMode,
+        );
         ctx.route.def.hull_class = fitted;
         const rating = Math.abs(ctx.config.submarine.hullClasses[fitted].ratedDepth).toLocaleString(
           'en-US',
@@ -134,21 +140,29 @@ export function createProgressSystem(): GameSystem {
           globe.setMissionAccess((site) => {
             const depth =
               ctx.missionSummaries.find((m) => m.id === site.id)?.depthM ?? site.depthM ?? 0;
-            if (ctx.progress.canDive(depth)) return null;
+            if (ctx.progress.canDive(depth, ctx.save.get().gameplayMode)) return null;
             const hull = requiredHull(depth);
             return `🔒 Class ${hull.id} · ${hull.threshold} lifetime RP required`;
           });
       };
-      updateGlobes();
-      for (const selector of selectors) selector.setProgress(ctx.progress);
+      const updateAccess = (): void => {
+        for (const selector of selectors)
+          selector.setProgress(ctx.progress, ctx.save.get().gameplayMode);
+        updateGlobes();
+      };
+      updateAccess();
+      cleanup.add(
+        ctx.save.onChange((_next, changed) => {
+          if (changed.includes('gameplayMode')) updateAccess();
+        }),
+      );
       let lastDisplay = '';
       cleanup.add(
         ctx.progress.onChange(() => {
           const display = `${ctx.progress.lifetime}/${JSON.stringify(ctx.progress.snapshot().ratings)}`;
           if (display === lastDisplay) return;
           lastDisplay = display;
-          for (const selector of selectors) selector.setProgress(ctx.progress);
-          updateGlobes();
+          updateAccess();
         }),
       );
       lastPhotos = ctx.photos.photos;

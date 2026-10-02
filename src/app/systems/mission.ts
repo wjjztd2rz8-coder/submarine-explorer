@@ -13,18 +13,40 @@ import {
   type MissionStartPosition,
 } from '../../game/MissionRouter.js';
 import type { GameSystem } from '../System.js';
+import { composedFreeDiveSpawn, spawnSettings } from '../../game/Spawn.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export const missionSystem: GameSystem = {
   name: 'mission',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { route, params, discovery, meta, terrain, config, sub, rig, headlights, bus } = ctx;
     const { settings, input, save, settingsScreen } = ctx;
+    let lastStart: typeof sub.position | null = null;
+    let lastChoice: MissionStartPosition = settings.gameplay.startPosition;
     // D2-PREDIVE: also used to preview the start behind the briefing, so Begin
     // resolves the same pose and the dive starts without a teleport.
     const applyMissionStart = (choice: MissionStartPosition): void => {
       if (!route || params.has('poi') || params.has('at') || params.has('depth')) return;
-      const pose = missionStartPose(route.def, choice, discovery.pois, meta, terrain, config);
+      const opening =
+        choice === 'near-site' && save.get().gameplayMode === 'arcade' && ctx.props.loaded
+          ? composedFreeDiveSpawn(
+              route.landmarkId,
+              meta,
+              terrain,
+              ctx.props,
+              spawnSettings(config),
+              sub.getState().ratedDepth,
+              config.camera,
+            )
+          : null;
+      const pose =
+        opening ?? missionStartPose(route.def, choice, discovery.pois, meta, terrain, config);
       sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+      lastStart = sub.position.clone();
+      lastChoice = choice;
       rig.snap(sub.position, sub.yaw, sub.pitch);
       headlights.setEnabled(true);
     };
@@ -60,6 +82,13 @@ export const missionSystem: GameSystem = {
         })
       : null;
     ctx.missionRouter = missionRouter;
+    // Optional models may finish after discovery. Reframe a waiting pilot once,
+    // while preserving surface choices, URL probes and anyone already moving.
+    cleanup.add(
+      bus.on('props:loaded', () => {
+        if (lastStart && sub.position.distanceTo(lastStart) < 2) applyMissionStart(lastChoice);
+      }),
+    );
 
     // D-INPUT-HUD: "View controls" in the briefing opens the Controls page.
     const briefingControls = missionRouter?.briefing?.root.querySelector('.briefing-controls');
