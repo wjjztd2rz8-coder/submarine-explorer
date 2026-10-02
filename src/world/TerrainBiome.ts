@@ -128,7 +128,17 @@ const VOLCANIC: Biome = {
 
 /** Keyed by `meta.id`. Unknown tiles fall back to `DEFAULT_BIOME`. */
 export const BIOMES: Record<string, Biome> = {
-  titanic: { ...ABYSSAL },
+  // Soft pale ooze: low-contrast so the wreck is the subject and the bed never reads black.
+  titanic: {
+    ...ABYSSAL,
+    colorA: 0x6a645b,
+    colorB: 0x726b60,
+    colorC: 0x4a4742,
+    contrast: 0.6,
+    detail: 0.6,
+    ripple: 0.25,
+    burrow: 0.5,
+  },
   bismarck: {
     ...ABYSSAL,
     colorA: 0x45403a,

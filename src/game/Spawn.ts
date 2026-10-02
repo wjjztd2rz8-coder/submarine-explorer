@@ -39,7 +39,7 @@ const FREE_DIVE_OPENINGS: Record<
     yawOffset?: number;
   }
 > = {
-  titanic: { hero: 'bow-hull', bearing: 45, range: 85 },
+  titanic: { hero: 'bow-hull', bearing: 40, range: 16, altitude: 14, yawOffset: 10 },
   'challenger-deep': { hero: 'leggo-lander-marker', bearing: 135, range: 65 },
   'lost-city': {
     hero: 'poseidon-tower',

@@ -5,7 +5,10 @@
   "title": "Titanic dive",
   "hull_class": "B",
   "environment": {
-    "preset": "wreck"
+    "preset": "wreck",
+    "overrides": {
+      "ambientFill": 12
+    }
   },
   "spawn": {
     "lat": 41.7481,

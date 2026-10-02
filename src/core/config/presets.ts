@@ -157,6 +157,8 @@ export interface WreckPresetConfig {
   moteOpacity: number;
   moteColor: number;
   vignetteAdd: number;
+  /** Extra ambient light intensity (0 = none) so the seabed near the wreck never reads black. */
+  ambientFill: number;
 }
 
 /** Seamount: the default look, plus sparse vent glow when a `vent` POI exists. */
@@ -311,6 +313,7 @@ export const DEFAULT_PRESETS: PresetsConfig = {
     moteOpacity: 0.5,
     moteColor: 0x8a4a2c,
     vignetteAdd: 0.06,
+    ambientFill: 0,
   },
   seamount: {
     glowLights: 2,
