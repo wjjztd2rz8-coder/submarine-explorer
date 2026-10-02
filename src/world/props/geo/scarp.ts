@@ -132,7 +132,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     rockSize: 0.75,
     blocks: 0.05,
     rough: 0.95,
-    edgeStart: 0.55,
+    edgeStart: 0.3,
     tile: [11, 6],
   },
   canyon: {
@@ -175,7 +175,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     rockSize: 0.7,
     blocks: 0.04,
     rough: 0.97,
-    edgeStart: 0.5,
+    edgeStart: 0.3,
     tile: [12, 5],
   },
   hadal: {
@@ -214,7 +214,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     rockSize: 0.85,
     blocks: 0.08,
     rough: 0.98,
-    edgeStart: 0.4,
+    edgeStart: 0.3,
     tile: [7, 7],
   },
 };
@@ -249,6 +249,11 @@ export function endRatio(x: number, width: number): number {
   return (Math.abs(x) / half) * (1 + 0.16 * (fbm3(x * 0.07, 9, Math.round(width), 5, 2) - 0.5));
 }
 
+/** Height multiplier of a wall at `edge` (0 mid-wall, 1 at the end): a long fading taper. */
+export function pinchScale(edge: number): number {
+  return 1 - 0.88 * Math.pow(edge, 1.5);
+}
+
 /**
  * How the wall ends pinch: `edge` (0 mid-wall, 1 at the ends) and the ragged
  * `skyline` multiplier on positive heights. Shared by the mesh and colliders.
@@ -261,7 +266,7 @@ export function wallEnvelope(
   const edge = smooth(edgeStart, 1, endRatio(x, width));
   // A ragged skyline: the crest varies along the wall and slopes away at both ends.
   const skyline =
-    edgeStart < 0.6 ? 0.8 + 0.4 * fbm3(x * 0.045, 1, width, Math.round(width * 31), 3) : 1;
+    edgeStart < 0.6 ? 0.72 + 0.5 * fbm3(x * 0.06, 1, width, Math.round(width * 31), 4) : 1;
   return { edge, skyline };
 }
 
@@ -314,7 +319,7 @@ export function extrudeProfile(
     const sink = opts.sink ? opts.sink(x) : 0;
     for (let j = 0; j <= ny; j++) {
       const [y0, z0] = pts[j]!;
-      const y = y0 > 0 ? y0 * (1 - 0.85 * edge * edge) * skyline : y0;
+      const y = y0 > 0 ? y0 * pinchScale(edge) * skyline : y0;
       const z = (z0 + disp(x, y0, z0) * (1 - edge * 0.6)) * (1 - edge * 0.55) + plan;
       const n = i * (ny + 1) + j;
       pos[n * 3] = x;
@@ -432,7 +437,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   };
   const scaleAt = (x: number): number => {
     const { edge, skyline } = wallEnvelope(x, W, P.edgeStart);
-    return (1 - 0.85 * edge * edge) * skyline;
+    return pinchScale(edge) * skyline;
   };
   const sinkAt = (x: number): number => endSink(x, W, H);
   const liftAt = (x: number): number => gnd(x, footAt(x));
@@ -725,6 +730,7 @@ export function wallColliders(
   const segW = W / seg;
   const SAMPLES = 5;
   // Solid below the wall's own base so the bottom slices never come up empty.
+  const topY = profile.reduce((m, p) => Math.max(m, p[0]), -Infinity);
   const solid: [number, number][] =
     profile[0]![0] > -0.12 * H ? [[-0.12 * H, profile[0]![1]], ...profile] : profile;
   for (let k = 0; k < seg; k++) {
@@ -737,8 +743,25 @@ export function wallColliders(
       const x = x0 + (n / (SAMPLES - 1)) * segW;
       xs.push(x);
       const { edge, skyline } = wallEnvelope(x, W, edgeStart);
-      hScale = Math.min(hScale, (1 - 0.85 * edge * edge) * skyline);
+      hScale = Math.min(hScale, pinchScale(edge) * skyline);
       sink = Math.min(sink, shape?.sinkAt ? shape.sinkAt(x) : 0);
+    }
+    // The boxes overlap their neighbours a little: the height limit must hold there too.
+    for (const x of [x0 - segW * 0.1, x0 + segW * 1.1]) {
+      const xe = Math.max(-W / 2, Math.min(W / 2, x));
+      const { edge, skyline } = wallEnvelope(xe, W, edgeStart);
+      hScale = Math.min(hScale, pinchScale(edge) * skyline);
+    }
+    // The highest the rendered wall actually reaches in this segment (crest, after pinch and sink).
+    let crest = -Infinity;
+    for (let n = 0; n <= 8; n++) {
+      const x = x0 - segW * 0.08 + (n / 8) * segW * 1.16;
+      const xe = Math.max(-W / 2, Math.min(W / 2, x));
+      const { edge, skyline } = wallEnvelope(xe, W, edgeStart);
+      crest = Math.max(
+        crest,
+        topY * pinchScale(edge) * skyline - (shape?.sinkAt ? shape.sinkAt(xe) : 0),
+      );
     }
     // Overlap neighbours slightly so sample gaps never open; the outer ends stay flush.
     const half = segW / 2 + (k > 0 && k < seg - 1 ? segW * 0.08 : 0);
@@ -784,7 +807,7 @@ export function wallColliders(
         dyB += at(y1) / xs.length;
       }
       const lo = ya + dyA;
-      const hi = yb + dyB;
+      const hi = Math.min(yb + dyB, crest + dyB + 0.3);
       if (hi - lo < 0.05) continue;
       out.push(
         boxCH(cx, (lo + hi) / 2, (front + zBack) / 2, hx, (hi - lo) / 2, (zBack - front) / 2),

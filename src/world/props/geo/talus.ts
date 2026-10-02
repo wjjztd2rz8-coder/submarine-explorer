@@ -82,7 +82,10 @@ export function buildTalusMesh(
   const c = new THREE.Color();
   for (let i = 0; i <= cols; i++) {
     const x = (i / cols - 0.5) * width;
-    const reach = Math.max(0.4, t.reach(x));
+    const rawReach = t.reach(x);
+    const reach = Math.max(0.4, rawReach);
+    // Where the apron has thinned to nothing (the wall ends) the strip sinks out of sight.
+    const fade = smooth(0.4, 3, rawReach);
     const foot = t.foot(x);
     for (let j = 0; j <= rows; j++) {
       const s = -1.5 + (j / rows) * (reach + 1.5);
@@ -90,7 +93,7 @@ export function buildTalusMesh(
       const u = Math.max(0, s / reach);
       // Rest slightly proud of the seabed (hides triangulation mismatch) and sink the rim.
       const lip = 0.3 * (1 - smooth(0.78, 1, u)) - 0.7 * smooth(0.9, 1, u);
-      const y = t.gnd(x, z) + talusDepth(t, x, z) + (s > 0 ? lip : 0.3);
+      const y = t.gnd(x, z) + (talusDepth(t, x, z) + (s > 0 ? lip : 0.3)) * fade - 0.8 * (1 - fade);
       const k = i * (rows + 1) + j;
       pos[k * 3] = x;
       pos[k * 3 + 1] = y;
@@ -171,9 +174,33 @@ export function placeRocks(
     const z = t.foot(x) - u * reach;
     const y = talusSurface(t, x, z);
     const r = o.size * (block ? 2.6 + rnd() * 1.8 : (0.3 + rnd() * rnd() * 1.9) * (0.7 + 0.8 * u));
-    out.push({ x, y, z, n: talusNormal(t, x, z), r, u });
+    const spot: RockSpot = { x, y, z, n: talusNormal(t, x, z), r, u };
+    if (isSupported(t, spot)) out.push(spot);
   }
   return out;
+}
+
+/** How far the surface may fall away around a rock's rim before it would hover (fraction of its radius). */
+export const RIM_DROP = 0.55;
+
+/**
+ * True when the surface around the rim of a rock at `spot` does not drop away from its seat by more
+ * than `RIM_DROP * r`, so the body (mostly buried at the seat) is held up on every side.
+ */
+export function isSupported(t: TalusShape, spot: RockSpot): boolean {
+  if (spot.n.y < 0.5) return false;
+  const tangent = new THREE.Vector3(spot.n.z, 0, -spot.n.x);
+  if (tangent.lengthSq() < 1e-6) tangent.set(1, 0, 0);
+  tangent.normalize();
+  const bitangent = new THREE.Vector3().crossVectors(spot.n, tangent).normalize();
+  for (const dir of [tangent, bitangent]) {
+    for (const sign of [-1, 1]) {
+      const px = spot.x + dir.x * sign * spot.r * 0.8;
+      const pz = spot.z + dir.z * sign * spot.r * 0.8;
+      if (talusSurface(t, px, pz) < spot.y - RIM_DROP * spot.r) return false;
+    }
+  }
+  return true;
 }
 
 /** Rock height above its seat point: most of the flattened body is buried in the apron. */

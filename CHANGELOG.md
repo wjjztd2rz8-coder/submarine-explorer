@@ -163,6 +163,21 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-GEO-SCARP: the wall hero pieces at Challenger Deep, Monterey Canyon,
+  Hunga Tonga and the Great Blue Hole are rebuilt so they no longer read as
+  extruded slabs. Each wall now curves in plan and tapers out under the seabed at
+  its ends. Hunga is an arcuate, jointed wall of dipping tuff beds; Monterey has
+  an S-bend with an undercut base and receding terraces, rubble on the outer bend
+  and a clear sandy passage on the inner one; Challenger is a crescentic slump
+  scarp with benches and large displaced blocks; the Blue Hole alcove has a
+  curved wall, a scalloped shelf and clustered fluted stalactites. A graded
+  rubble apron with a lobed rim, sunk into the seabed, replaces the hard toe, and
+  every boulder is seated on that apron's final surface. Rock texture is now
+  world-scale along the face, with bed-by-bed tones, instead of stretched
+  vertical projection; boulders are angular, darker underneath and tinted to
+  match the wall. The Blue Hole alcove keeps only a few sponges on the upper face
+  and none on its floor. Prop ids, sizes and placements are unchanged.
+
 - Phase F, F-CONTENT-FIX: Lost City now releases clear-flow shimmer, with smoke
   and warm glow disabled. Poseidon's composite footprint follows the published
   roughly 100 m width; field area and carbonate-age text now follow the research.

@@ -46,7 +46,8 @@ describe('wall colliders follow the rendered wall', () => {
 
     it(`${f}: no collider stands over empty water above a tapered end`, () => {
       for (const c of boxes) {
-        const inX = verts.filter((v) => v.x >= c.min.x && v.x <= c.max.x);
+        // One grid cell of slack: the mesh is interpolated between vertices.
+        const inX = verts.filter((v) => v.x >= c.min.x - 1 && v.x <= c.max.x + 1);
         const top = Math.max(...inX.map((v) => v.y));
         // Ends run out below the seabed (y = 0 on flat test ground): a box may reach the ground.
         expect(c.max.y).toBeLessThanOrEqual(Math.max(top, 0) + 0.6);

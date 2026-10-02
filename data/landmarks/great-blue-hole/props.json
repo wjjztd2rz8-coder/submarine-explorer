@@ -15,7 +15,7 @@
       "lod_distance_m": 700,
       "collision": "box",
       "reconstruction": true,
-      "note": "Game addition: a drowned limestone alcove on the western drop-off, modelled on the ledges and stalactites the flooded cave system of the Great Blue Hole is known for (Cousteau 1971). This wall stands on the atoll slope rather than inside the hole, whose real shape this tile cannot resolve."
+      "note": "Game addition: a drowned limestone alcove (curved wall, scalloped shelf and fluted stalactites) on the western drop-off, modelled on the ledges and stalactites the flooded cave system of the Great Blue Hole is known for (Cousteau 1971). This wall stands on the atoll slope rather than inside the hole, whose real shape this tile cannot resolve."
     }
   ]
 }

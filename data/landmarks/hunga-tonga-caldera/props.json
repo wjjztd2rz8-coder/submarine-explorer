@@ -15,7 +15,7 @@
       "lod_distance_m": 900,
       "collision": "box",
       "reconstruction": true,
-      "note": "Game addition: layered pyroclastic tuff scarp with gullies and a talus apron on the historical volcanic rim slope. Moved 0.002 degrees west (~208 m) to the existing rim-slope scan marker, where the grid reads 468.6 m; seabed snapping preserves support. Dimensions [90,30,45] and heading 270 degrees are scenic choices, not a measured inner wall or a post-2022 collapse scarp. See sources.md."
+      "note": "Game addition: arcuate, jointed pyroclastic tuff wall with dipping beds, gullies and a graded block-and-ash apron on the historical volcanic rim slope. Moved 0.002 degrees west (~208 m) to the existing rim-slope scan marker, where the grid reads 468.6 m; seabed snapping preserves support. Dimensions [90,30,45] and heading 270 degrees are scenic choices, not a measured inner wall or a post-2022 collapse scarp. See sources.md."
     }
   ]
 }

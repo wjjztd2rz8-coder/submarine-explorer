@@ -12,6 +12,7 @@ import { geoDetail } from './detail.js';
 import { geoMaterial, LIFE_TINT } from './materials.js';
 import {
   endRatio,
+  pinchScale,
   endSink,
   extrudeProfile,
   interp,
@@ -110,14 +111,14 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   };
   const scaleAt = (x: number): number => {
     const { edge, skyline } = wallEnvelope(x, W, EDGE_START);
-    return (1 - 0.85 * edge * edge) * skyline;
+    return pinchScale(edge) * skyline;
   };
   const sinkAt = (x: number): number => endSink(x, W, H);
   const liftAt = (x: number): number => gnd(x, footAt(x));
 
   /** How far the shelf projects at x (1 = the profile's lip): scalloped, in places hardly at all. */
   const shelf = (x: number): number =>
-    0.18 + 1.05 * smooth(0.3, 0.75, fbm3(x * 0.075 + 4, 1, seed + 61, seed + 8, 3));
+    0.42 + 0.95 * smooth(0.32, 0.62, fbm3(x * 0.075 + 4, 1, seed + 61, seed + 8, 3));
 
   const disp = (x: number, y: number, z: number): number => {
     const env = smooth(joinY, joinY + 0.15 * H, y);
