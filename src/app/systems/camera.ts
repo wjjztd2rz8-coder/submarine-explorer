@@ -11,6 +11,30 @@ import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
 
+/** F-HUD-LAYOUT: the controls hint bar is for the first dives only. */
+const LEARN_KEY = 'subexplorer.controlsLearned.v1';
+const TIPS_DIVES = 3;
+interface LearnRecord {
+  dives: number;
+  learned: boolean;
+}
+let noteControlUse: (s: { throttle: number; yaw: number; ballast: number }) => void = () => {};
+function readLearn(): LearnRecord {
+  try {
+    const raw = JSON.parse(localStorage.getItem(LEARN_KEY) ?? '{}') as Partial<LearnRecord>;
+    return { dives: Number(raw.dives) || 0, learned: raw.learned === true };
+  } catch {
+    return { dives: 0, learned: false };
+  }
+}
+function writeLearn(record: LearnRecord): void {
+  try {
+    localStorage.setItem(LEARN_KEY, JSON.stringify(record));
+  } catch {
+    // Private mode: the bar simply falls back to its 20 s timer.
+  }
+}
+
 export const cameraSystem: GameSystem = {
   name: 'camera',
   init(ctx) {
@@ -38,12 +62,34 @@ export const cameraControlsSystem: GameSystem = {
     const { bus, rig, hud, canvas } = ctx;
     const tips = { until: performance.now() + 20_000 };
     ctx.cameraTips = tips;
+    let learn = readLearn();
+    // Steering used once each: move, turn and rise/sink.
+    const used = { throttle: false, yaw: false, ballast: false };
+    const startTips = (): void => {
+      used.throttle = used.yaw = used.ballast = false;
+      learn = readLearn();
+      learn.dives += 1;
+      writeLearn(learn);
+      tips.until = learn.learned || learn.dives > TIPS_DIVES ? 0 : performance.now() + 20_000;
+    };
+    startTips();
     cleanup.add(
       bus.on('mission:started', () => {
         rig.resetView();
-        tips.until = performance.now() + 20_000;
+        startTips();
       }),
     );
+    noteControlUse = (s) => {
+      if (tips.until === 0) return;
+      if (Math.abs(s.throttle) > 0.2) used.throttle = true;
+      if (Math.abs(s.yaw) > 0.2) used.yaw = true;
+      if (Math.abs(s.ballast) > 0.2) used.ballast = true;
+      if (used.throttle && used.yaw && used.ballast) {
+        tips.until = 0;
+        learn.learned = true;
+        writeLearn(learn);
+      }
+    };
     hud.onResetCamera(() => {
       if (ctx.app.state === 'dive') {
         rig.resetView();
@@ -66,6 +112,7 @@ export const cameraControlsSystem: GameSystem = {
     'controls.camera': (f, ctx) => {
       const { rig, rov, input, cameraTips } = ctx;
       const { frozen, state, sampled } = f;
+      if (!frozen) noteControlUse(sampled);
       if (!frozen && !rov.deployed && state.toggleCamera) {
         rig.toggleMode();
         cameraTips.until = 0;

@@ -174,6 +174,19 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-HUD-LAYOUT: the dive HUD no longer stacks on the submarine. The
+  tutorial card (and hint chip) moved to the left column under the sonar; the
+  scan-target panel moved from the bottom centre, where the chase camera keeps
+  the sub, to the top centre; the controls hint bar stays bottom-left. On
+  phone landscape the sonar is smaller, the card and scan panel share a
+  top-centre column, objectives show only the current step, readouts drop the
+  heading row, and the map credit moves into the strip between stick and
+  buttons. The controls hint bar now hides once move, turn and rise/sink have
+  each been used, and only shows for the first three dives; Help (Pause >
+  Controls) still has everything. Portrait phones are unchanged (the game
+  already asks players to rotate). Reason: owner playtest and director's brief
+  priority 4. New `src/styles/hud-layout.css`; e2e `f-hud-layout.spec.ts`
+  asserts no overlaps at 1600x900, 1280x720, 844x390 touch and 1024x768 touch.
 - Phase F, F-GEO-SCARP: the wall hero pieces at Challenger Deep, Monterey Canyon,
   Hunga Tonga and the Great Blue Hole are rebuilt so they no longer read as
   extruded slabs. Each wall now curves in plan and tapers out under the seabed at
