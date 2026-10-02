@@ -281,7 +281,12 @@ export interface PresetSystemOptions {
 export function toPresetProps(placed: PresetPropSource['placed']): PresetProp[] {
   return placed.map((p) => {
     p.root.updateMatrixWorld(true);
-    const top = p.root.localToWorld(new THREE.Vector3(0, p.localBounds.max.y, 0));
+    // Set pieces name their real orifice height (their bounds also cover plume reach).
+    let topY = p.localBounds.max.y;
+    p.root.traverse((o) => {
+      if (typeof o.userData.ventTop === 'number') topY = o.userData.ventTop as number;
+    });
+    const top = p.root.localToWorld(new THREE.Vector3(0, topY, 0));
     const base = p.root.localToWorld(new THREE.Vector3(0, p.localBounds.min.y, 0));
     return {
       id: p.def.id,

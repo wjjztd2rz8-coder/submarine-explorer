@@ -146,10 +146,11 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   // Pale carbonate answers the warm headlights harder than dark rock, and a faint cool
   // emissive lift keeps the silhouette readable in the dark water beyond the beams.
   material.color.multiplyScalar(1.9);
-  vertexGlow(material, 0.16, 0xa8c4d0);
+  vertexGlow(material, 0.26, 0xb4c8cc, 0.25);
   const full = new THREE.Group();
   full.name = 'carbonate-tower';
   full.add(new THREE.Mesh(geom, material));
+  full.userData.ventTop = tips[0]!.y;
 
   // Faint clear-fluid haze at the tips of the tallest spires.
   const hazeFor = [...spires.keys()]

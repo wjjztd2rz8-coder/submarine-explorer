@@ -21,6 +21,8 @@ export interface SpireOpts {
   /** Terrace overhang as a fraction of the local radius. */
   ledge?: number;
   wobble?: number;
+  /** Fine knobbly roughness (fraction of radius, higher frequency than the wobble). */
+  rough?: number;
   /** Vertical flute count and depth (fraction of radius). */
   ridges?: number;
   ridgeAmp?: number;
@@ -69,6 +71,12 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
     const n = fbm3(Math.cos(ang) * 1.3 + 3, y * 0.09, Math.sin(ang) * 1.3 + 3, o.seed, 3);
     let f = spireRadius(o, t) / o.r0;
     f *= 1 + (n - 0.5) * 2 * wob;
+    if (o.rough)
+      f *=
+        1 +
+        (fbm3(Math.cos(ang) * 4 + 5, y * 0.6, Math.sin(ang) * 4 + 5, o.seed + 9, 2) - 0.5) *
+          2 *
+          o.rough;
     f *= 1 + amp * Math.sin(ang * flutes + n * 5 + t * 2.5);
     p.setXYZ(i, x * f, y, z * f);
   }

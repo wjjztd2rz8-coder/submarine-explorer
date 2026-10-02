@@ -5,7 +5,10 @@
   "title": "Beebe Vent Field: the deepest black smokers",
   "hull_class": "C",
   "environment": {
-    "preset": "vent"
+    "preset": "vent",
+    "overrides": {
+      "smokeOpacitySulfide": 0.85
+    }
   },
   "species_file": "species.json",
   "spawn": {

@@ -73,6 +73,9 @@ export interface Biome {
   burrow: number;
   /** Slot C coverage bias: + shows hard substrate on gentler slopes. */
   rockBias: number;
+  /** Multiplier on the texture pattern contrast and normal-map strength (default 1). */
+  contrast?: number;
+  detail?: number;
   scatter: ScatterSpec[];
 }
 
@@ -189,7 +192,20 @@ export const BIOMES: Record<string, Biome> = {
     ],
   },
   'axial-seamount-ashes': { ...VOLCANIC, colorB: 0x6a655c },
-  'beebe-vent-field': { ...VOLCANIC, stainAmount: 0.5 },
+  // Soft basalt-and-sulphide sediment: a low, even texture so the chimneys are the subject.
+  'beebe-vent-field': {
+    ...VOLCANIC,
+    a: 'sand',
+    b: 'silt',
+    colorA: 0x45403b,
+    colorB: 0x4d4741,
+    stainAmount: 0.3,
+    patch: 0.3,
+    ripple: 0.05,
+    burrow: 0.1,
+    contrast: 0.55,
+    detail: 0.5,
+  },
   'hunga-tonga-caldera': {
     ...VOLCANIC,
     a: 'silt',
