@@ -1,4 +1,4 @@
-# F2-MODES — orchestrator browser failures repaired; rerun pending
+# F2-MODES — complete; all 8 gates pass
 
 ## Player-visible changes
 
@@ -141,3 +141,7 @@ Necessary runtime/placement integration, kept limited to the relevant paths:
 - `CHANGELOG.md` and this progress note: required package reporting.
 
 No commit made.
+
+## Orchestrator close-out
+
+Merged main (F-HUD-LAYOUT, explore system); settings e2e now opens Advanced before Simulation speed (the control moved into the disclosure); Daily card given a 76 px minimum so its details line is not clipped. Gates: build, unit, python, content, attribution, prettier, e2e, e2e-base all PASS.

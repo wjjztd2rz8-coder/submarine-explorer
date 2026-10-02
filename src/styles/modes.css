@@ -107,6 +107,9 @@
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1fr auto;
+  min-height: 76px;
+  flex-shrink: 0;
+  align-content: center;
   gap: 4px 12px;
   border-color: #76e5d4;
   font-size: 14px;
