@@ -118,3 +118,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Queued for Codex: 50-f-hero-verify, 60-f-bughunt-4, 70-f-perf-budget (f-bughunt-3 already running).
 - Problem: the remote CI run for 800f96c failed after 54 min (a Pages deploy succeeded); worth checking CI timeouts (see CI-TIMEOUTS note). No Claude agents spawned this run; Claude 5h ended ~75%.
 - Still needs owner: brand name OK (Bathyline recommended).
+
+## 2026-10-02 18:30 headless run
+
+- Merged: F-BUGHUNT-3 audit note only (no code). It found three P1s: live Realistic switch can breach the sub at a deep Arcade opening, locked Realistic link spawns below crush depth, Monterey opening distance (may already be fixed), plus Daily Low-light missing ROV lamps.
+- Queued for Codex: 80-f-bughunt-3-fixes, 85-f-golden-run (golden-shots.mjs crashed when I ran it), 90-f-hint-dedupe. Running: f-hero-verify, f-bughunt-4, f-perf-budget.
+- No Claude agents spawned; golden-shot comparison deferred to Codex. Still needs owner: brand name OK (Bathyline).
