@@ -68,7 +68,7 @@ const FREE_DIVE_OPENINGS: Record<
   'great-blue-hole': {
     hero: 'karst-grotto',
     bearing: 90,
-    range: 270,
+    range: 235,
     fromCentre: true,
     altitude: 12,
     openWater: true,

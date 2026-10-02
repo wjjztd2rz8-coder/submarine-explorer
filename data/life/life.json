@@ -929,15 +929,15 @@
       "spawns": [
         {
           "species": "blue-tang",
-          "weight": 3,
+          "weight": 2,
           "depth": [1, 40],
-          "group": [10, 24]
+          "group": [6, 11]
         },
         {
           "species": "french-grunt",
           "weight": 3,
           "depth": [1, 40],
-          "group": [14, 30]
+          "group": [9, 16]
         },
         {
           "species": "stoplight-parrotfish",

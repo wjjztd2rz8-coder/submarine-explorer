@@ -11,15 +11,11 @@
       "snap_to_seabed": true,
       "heading_deg": 90,
       "scale": 1,
-      "dimensions_m": [
-        42,
-        16,
-        28
-      ],
+      "dimensions_m": [42, 16, 28],
       "lod_distance_m": 700,
       "collision": "box",
       "reconstruction": true,
-      "note": "Game addition: a drowned limestone alcove (curved wall, scalloped shelf and fluted stalactites) on the western drop-off, modelled on the ledges and stalactites the flooded cave system of the Great Blue Hole is known for (Cousteau 1971). This wall stands on the atoll slope rather than inside the hole, whose real shape this tile cannot resolve."
+      "note": "Game addition: the Blue Hole's walls are not resolved by the survey grid (cells are about 58 m), so the near-circular, ~320 m wide, 125 m deep sinkhole is a reconstruction at its reported position, with a ledge at about 40 m. This drowned limestone alcove (curved wall, scalloped shelf and fluted stalactites) sits on that ledge, modelled on the stalactites the flooded cave system is known for (Cousteau 1971). Sulphide-rich water lies below about 90 m."
     }
   ]
 }
