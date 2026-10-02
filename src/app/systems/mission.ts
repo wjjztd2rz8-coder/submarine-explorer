@@ -15,7 +15,7 @@ import {
 } from '../../game/MissionRouter.js';
 import { tileUrl } from '../../ui/MissionSelect.js';
 import type { GameSystem } from '../System.js';
-import { composedFreeDiveSpawn, spawnHeight, spawnSettings } from '../../game/Spawn.js';
+import { composedMissionSpawn, spawnHeight, spawnSettings } from '../../game/Spawn.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
@@ -33,12 +33,12 @@ export const missionSystem: GameSystem = {
     const applyMissionStart = (choice: MissionStartPosition): void => {
       if (!route || params.has('poi') || params.has('at') || params.has('depth')) return;
       const opening =
-        choice === 'near-site' &&
-        !ctx.daily &&
-        save.get().gameplayMode === 'arcade' &&
-        ctx.props.loaded
-          ? composedFreeDiveSpawn(
+        choice === 'near-site' && !ctx.daily && save.get().gameplayMode === 'arcade'
+          ? composedMissionSpawn(
               route.landmarkId,
+              discovery.pois.filter((p) =>
+                route.def.objectives.some((o) => o.primary && o.poi === p.id),
+              ),
               meta,
               terrain,
               ctx.props,

@@ -40,7 +40,7 @@ export class Progress {
   ) {
     this.data = save.get();
     this.tokens = new Set(this.data.awarded);
-    for (const key of discoveries) this.credit('poi', key);
+    for (const key of discoveries) this.creditDiscovery(key);
   }
   snapshot(): ProgressRecord {
     return structuredClone(this.data);
@@ -48,8 +48,14 @@ export class Progress {
   get legacyCredited(): boolean {
     return this.data.legacyCredited;
   }
-  completeLegacyCredit(): void {
-    if (!this.save.readOnly) this.data.legacyCredited = true;
+  get legacyPending(): readonly string[] | undefined {
+    return this.data.legacyPending;
+  }
+  completeLegacyCredit(pending: string[] = []): void {
+    if (!this.save.readOnly) {
+      this.data.legacyCredited = pending.length === 0;
+      this.data.legacyPending = pending;
+    }
     this.persist();
   }
   get points(): number {
@@ -97,6 +103,18 @@ export class Progress {
     this.award(kind, id);
     this.divePoints = points;
     this.bonus = bonus;
+  }
+  /** Modern discovery namespaces retain their original reward identities. */
+  creditDiscovery(key: string): void {
+    const slash = key.indexOf('/');
+    const subject = key.slice(slash + 1);
+    if (slash < 1 || !subject) return;
+    if (subject.startsWith('life:')) this.credit('species', subject.slice(5));
+    else if (subject.startsWith('secret:'))
+      this.credit('secret', `${key.slice(0, slash)}/${subject.slice(7)}`);
+    else if (subject.startsWith('sample:'))
+      this.credit('sample', `${key.slice(0, slash)}/${subject.slice(7)}`);
+    else this.credit('poi', key);
   }
   beginDive(): void {
     this.bonus = false;

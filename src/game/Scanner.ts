@@ -159,7 +159,32 @@ export class Scanner {
 
   /** Hand over the live, caller-owned list of moving targets (animals). */
   setExtraTargets(targets: readonly ScanTarget[]): void {
+    const removed = (id: string | null): boolean =>
+      id !== null &&
+      this.extra.some((t) => t.id === id) &&
+      ![targets, this.targets, this.supplemental].some((list) => list.some((t) => t.id === id));
+    if (removed(this.view.candidateId)) this.view.candidateId = null;
+    if (removed(this.view.nearestId)) {
+      Object.assign(this.view, {
+        nearestId: null,
+        nearestName: '',
+        nearestDistance: Infinity,
+        nearestRadius: 0,
+        nearestInRange: false,
+        nearestFacing: false,
+        nearestScanned: false,
+        nearestAngleDeg: 180,
+        nearestTurnDeg: 0,
+      });
+    }
     this.extra = targets;
+    if (
+      this.active &&
+      !targets.includes(this.active) &&
+      !this.targets.includes(this.active) &&
+      !this.supplemental.includes(this.active)
+    )
+      this.clearActive();
   }
 
   getExtraTargets(): readonly ScanTarget[] {

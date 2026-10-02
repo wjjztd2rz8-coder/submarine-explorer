@@ -54,7 +54,7 @@ describe('research rewards and save migration', () => {
       migrateProgress({ rp: 60.8, upgrades: { battery: 100, oxygen: -2 }, ratings: { site: 4 } }),
     ).toMatchObject({
       points: 60,
-      lifetime: 60,
+      lifetime: 285,
       upgrades: { battery: 3, oxygen: 0 },
       ratings: { site: 3 },
     });
@@ -210,4 +210,62 @@ describe('upgrade purchases and effects', () => {
     expect(config).toEqual(once);
     expect(base).toEqual(original);
   });
+});
+
+it('recovers damaged balances from reward tokens and purchased levels without duplicate rewards', () => {
+  const { progress, store } = researcher();
+  for (const id of ['a', 'b']) {
+    progress.award('poi', `site/${id}`);
+    progress.award('objective', `site/${id}`);
+  }
+  progress.finish('site', [
+    { primary: true, complete: true },
+    { primary: false, complete: true },
+  ]);
+  progress.completeLegacyCredit();
+  expect(progress.lifetime).toBe(100);
+  expect(progress.buy('battery')).toBe(true);
+  const original = progress.snapshot();
+  for (const damage of [
+    { points: 'corrupt', lifetime: 'corrupt' },
+    { points: 0, lifetime: 0 },
+    { points: 'corrupt' },
+    { lifetime: 'corrupt' },
+  ]) {
+    store.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ ...original, ...damage }));
+    const restored = new Progress(new ProgressSave(store));
+    expect(restored.points).toBe(60);
+    expect(restored.lifetime).toBe(100);
+    expect(restored.level('battery')).toBe(1);
+    expect(restored.rating('site')).toBe(2);
+    expect(restored.legacyCredited).toBe(true);
+    expect(restored.snapshot().awarded).toEqual(original.awarded);
+    for (const id of ['a', 'b']) {
+      expect(restored.award('poi', `site/${id}`)).toBe(0);
+      expect(restored.award('objective', `site/${id}`)).toBe(0);
+    }
+    restored.finish('site', [
+      { primary: true, complete: true },
+      { primary: false, complete: true },
+    ]);
+    expect(new Progress(new ProgressSave(store)).points).toBe(60);
+  }
+});
+
+it('restores typed discoveries and global species identity when research is missing', () => {
+  const progress = new Progress(new ProgressSave(null), [
+    'site/life:comb-jelly',
+    'other/life:comb-jelly',
+    'site/secret:arch',
+    'site/sample:sediment',
+  ]);
+  expect(progress.points).toBe(40);
+  expect(progress.snapshot().awarded).toEqual([
+    'species:comb-jelly',
+    'secret:site/arch',
+    'sample:site/sediment',
+  ]);
+  expect(progress.award('species', 'comb-jelly')).toBe(0);
+  expect(progress.award('secret', 'site/arch')).toBe(0);
+  expect(progress.award('sample', 'site/sediment')).toBe(0);
 });

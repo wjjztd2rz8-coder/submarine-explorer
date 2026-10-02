@@ -149,4 +149,93 @@ test.describe('touch viewport', () => {
     await expect(dialog).toContainText('Showing the layout for your touch');
     await shot(page, 'touch-controls-card');
   });
+
+  test('PHOTO capture, Done, movement and Pause stay reachable with touch alone', async ({
+    page,
+  }) => {
+    await boot(page, '&touch=1');
+    const card = page.locator('.onboard-card');
+    const start = await page.evaluate(() => {
+      const sub = (
+        window.__game as unknown as {
+          sub: { position: { x: number; y: number; z: number }; yaw: number };
+        }
+      ).sub;
+      return { x: sub.position.x, y: sub.position.y, z: sub.position.z, yaw: sub.yaw };
+    });
+    const touch = await page.context().newCDPSession(page);
+    const hold = async (selector: string, x: number, y: number) => {
+      const control = page.locator(selector);
+      // Touch controls refresh in late.input; exiting an overlay hides it before
+      // the next animation frame restores the stick. Wait for the gesture target.
+      await expect(control).toBeVisible();
+      const box = (await control.boundingBox())!;
+      expect(box).not.toBeNull();
+      await touch.send('Input.dispatchTouchEvent', {
+        type: 'touchStart',
+        touchPoints: [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }],
+      });
+      await touch.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: [{ x: box.x + box.width * x, y: box.y + box.height * y }],
+      });
+    };
+    const release = () =>
+      touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await hold('.tc-stick', 0.8, 0.2);
+    await expect.poll(() => stepIndex(page)).toBe(1);
+    await release();
+    await hold('.tc-slider', 0.5, 0.1);
+    await expect.poll(() => stepIndex(page)).toBe(2);
+    await release();
+    await page.locator('.tc-btn-lights').tap();
+    await expect.poll(() => stepIndex(page)).toBe(3);
+    // Return to the initial scan approach after practising thrust, turn and depth.
+    await page.evaluate(
+      (p) =>
+        (
+          window.__game as unknown as {
+            sub: { reset(x: number, y: number, z: number, yaw: number): void };
+          }
+        ).sub.reset(p.x, p.y, p.z, p.yaw),
+      start,
+    );
+    await hold('.tc-btn-scan', 0.5, 0.5);
+    await expect.poll(() => stepIndex(page)).toBe(4);
+    await release();
+    await expect(card).toContainText('Step 5 of 5');
+    await page.locator('.tc-btn-photo').tap();
+    const mode = page.locator('.photo-mode');
+    await expect(mode).toBeVisible();
+    await expect(page.locator('.tc-root')).toBeHidden();
+    for (const name of ['Done', 'Pause']) {
+      const box = (await mode.getByRole('button', { name, exact: true }).boundingBox())!;
+      expect(box.width).toBeGreaterThanOrEqual(44);
+      expect(box.height).toBeGreaterThanOrEqual(44);
+    }
+    await mode.getByRole('button', { name: /^Capture/ }).tap();
+    await expect(mode.locator('.photo-mode-toast')).toHaveText('Saved to Journal');
+    await mode.getByRole('button', { name: 'Done', exact: true }).tap();
+    await expect(mode).toBeHidden();
+    await expect(page.locator('.tc-root')).toBeVisible();
+    await expect(card).toBeHidden();
+    expect((await saved(page))?.tutorialDone).toBe(true);
+    await hold('.tc-stick', 0.5, 0.2);
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            (window.__game as unknown as { sub: { getState(): { speed: number } } }).sub.getState()
+              .speed,
+        ),
+      )
+      .toBeGreaterThan(0.1);
+    await release();
+    await page.locator('.tc-btn-photo').tap();
+    await mode.getByRole('button', { name: 'Pause', exact: true }).tap();
+    await expect(mode).toBeHidden();
+    await expect(page.locator('.pause-menu')).toBeVisible();
+    await page.locator('.pause-menu').getByRole('button', { name: 'Resume', exact: true }).tap();
+    await expect(page.locator('.tc-btn-pause')).toBeVisible();
+  });
 });

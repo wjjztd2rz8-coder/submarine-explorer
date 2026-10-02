@@ -47,6 +47,7 @@ export class Life {
   readonly targets: LifeScanTarget[] = [];
   enabled = true;
   private readonly bySpecies = new Map<string, { target: LifeScanTarget; agent: Agent }>();
+  private readonly best = new Map<string, { a: Agent | null; score: number }>();
   private readonly landmarkId: string;
   private readonly tmp = new THREE.Vector3();
   private readonly proj = new THREE.Vector3();
@@ -96,7 +97,11 @@ export class Life {
    * in range and in front, otherwise take the nearest one that faces the beam.
    */
   private updateTargets(sub: SubInfo): void {
-    const best = new Map<string, { a: Agent; score: number }>();
+    const best = this.best;
+    for (const entry of best.values()) {
+      entry.a = null;
+      entry.score = Infinity;
+    }
     for (const a of this.sim.pool) {
       if (!a.alive || a.leaving || a.fade < 0.6) continue;
       const def = a.def;
@@ -109,11 +114,19 @@ export class Life {
       const cos = d > 1e-6 ? (dx * sub.fx + dy * sub.fy + dz * sub.fz) / d : 1;
       // Prefer near and ahead; an animal behind the sub is a poor choice.
       const score = d / (0.35 + Math.max(0, cos));
-      const cur = best.get(def.id);
-      if (!cur || score < cur.score) best.set(def.id, { a, score });
+      let cur = best.get(def.id);
+      if (!cur) {
+        cur = { a: null, score: Infinity };
+        best.set(def.id, cur);
+      }
+      if (score < cur.score) {
+        cur.a = a;
+        cur.score = score;
+      }
     }
     this.targets.length = 0;
     for (const [id, { a }] of best) {
+      if (!a) continue;
       let entry = this.bySpecies.get(id);
       if (!entry) {
         entry = {
@@ -185,9 +198,12 @@ export class Life {
     this.render.clear();
     this.targets.length = 0;
     this.bySpecies.clear();
+    this.best.clear();
   }
 
   dispose(): void {
+    this.enabled = false;
+    this.clear();
     this.render.dispose();
   }
 }

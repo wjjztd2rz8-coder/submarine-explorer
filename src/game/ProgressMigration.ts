@@ -13,14 +13,19 @@ export async function creditPreviousDives(
 ): Promise<void> {
   if (progress.legacyCredited) return;
   const keys = discoveries.keys();
-  for (const key of keys) progress.credit('poi', key);
+  for (const key of keys) progress.creditDiscovery(key);
   for (const photo of photos)
     if (photo.poiId) progress.credit('photo', `${photo.siteId}/${photo.poiId}`);
-  const sites = [...new Set(keys.map((key) => key.split('/')[0]))];
-  await Promise.all(
+  const sites = progress.legacyPending ?? [...new Set(keys.map((key) => key.split('/')[0]))];
+  const pending = await Promise.all(
     sites.map(async (site) => {
-      const def = await loadMission(site, fetchJson);
-      if (!def) return;
+      let absent = false;
+      const def = await loadMission(site, async (url) => {
+        const response = await (fetchJson ?? fetch)(url);
+        absent = response.status === 404 || response.status === 410;
+        return response;
+      });
+      if (!def) return absent ? null : site;
       const statuses = def.objectives.map((o) => ({
         primary: o.primary,
         complete: discoveries.isDiscovered(def.landmark, o.poi),
@@ -33,8 +38,9 @@ export async function creditPreviousDives(
         progress.bonus = photos.some((p) => p.siteId === site && p.poiId !== null);
         progress.finish(site, statuses);
       }
+      return null;
     }),
   );
   progress.beginDive();
-  progress.completeLegacyCredit();
+  progress.completeLegacyCredit(pending.filter((site): site is string => site !== null));
 }

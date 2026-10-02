@@ -77,9 +77,13 @@ export function createPhotoSystem(): GameSystem {
       const photos = new PhotoStore();
       ctx.photos = photos;
       journal.setPhotoGallery(photos, new PhotoGallery(photos, () => journal.refresh()));
-      const photoMode = new PhotoMode(() => {
-        photoCaptureRequested = true;
-      });
+      const photoMode = new PhotoMode(
+        () => {
+          photoCaptureRequested = true;
+        },
+        () => ctx.exitPhotoMode(),
+        () => ctx.setAppState('pause'),
+      );
       ctx.photoMode = photoMode;
       ctx.exitPhotoMode = (): void => {
         if (!photoMode.active) return;

@@ -42,7 +42,12 @@ export class PhotoMode {
   private flashTimer = 0;
   private active_ = false;
 
-  constructor(onCapture: () => void, parent: HTMLElement = document.body) {
+  constructor(
+    onCapture: () => void,
+    onExit: () => void,
+    onPause: () => void,
+    parent: HTMLElement = document.body,
+  ) {
     this.root = document.createElement('div');
     this.root.className = 'photo-mode';
     this.root.hidden = true;
@@ -76,7 +81,20 @@ export class PhotoMode {
     capture.className = 'photo-mode-capture';
     this.captureButton = capture;
     capture.addEventListener('click', onCapture);
-    bottom.append(this.tips, capture);
+    const actions = document.createElement('div');
+    actions.className = 'photo-mode-actions';
+    const exit = document.createElement('button');
+    exit.type = 'button';
+    exit.className = 'photo-mode-exit';
+    exit.textContent = 'Done';
+    exit.addEventListener('click', onExit);
+    const pause = document.createElement('button');
+    pause.type = 'button';
+    pause.className = 'photo-mode-pause';
+    pause.textContent = 'Pause';
+    pause.addEventListener('click', onPause);
+    actions.append(capture, exit, pause);
+    bottom.append(this.tips, actions);
 
     this.root.append(this.flash, top, this.toastEl, bottom);
     parent.append(this.root);
@@ -93,7 +111,7 @@ export class PhotoMode {
     document.body.classList.toggle('photo-active', on);
     const keys = captureKey === 'Space' ? 'Space' : `${captureKey} / Space`;
     this.captureButton.textContent = `Capture (${keys})`;
-    this.tips.textContent = 'Esc: exit photo mode · drag orbit · wheel zoom';
+    this.tips.textContent = 'Done / Esc: exit photo mode · drag orbit · pinch or wheel zoom';
     if (!on) this.hideToast();
   }
 

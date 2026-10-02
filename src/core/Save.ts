@@ -6,6 +6,7 @@ import type {
   SonarPaletteName,
 } from './Config.js';
 import { DEFAULT_AUDIO } from './config/audio.js';
+import { PROGRESS_CONFIG, UPGRADES } from './config/progress.js';
 import type { EventBus } from './EventBus.js';
 
 export const SETTINGS_STORAGE_KEY = 'subexplorer.settings.v2';
@@ -348,6 +349,7 @@ export const PROGRESS_VERSION = 1;
 export interface ProgressRecord {
   version: 1;
   legacyCredited: boolean;
+  legacyPending?: string[];
   points: number;
   lifetime: number;
   awarded: string[];
@@ -370,6 +372,14 @@ export function migrateProgress(raw: unknown): ProgressRecord {
   const integer = (v: unknown): number =>
     typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0;
   out.legacyCredited = o.legacyCredited === true;
+  if (Array.isArray(o.legacyPending))
+    out.legacyPending = [
+      ...new Set(
+        o.legacyPending.filter(
+          (s): s is string => typeof s === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(s),
+        ),
+      ),
+    ];
   out.points = integer(o.points ?? o.rp);
   out.lifetime = Math.max(out.points, integer(o.lifetime ?? o.rp));
   if (Array.isArray(o.awarded))
@@ -382,6 +392,28 @@ export function migrateProgress(raw: unknown): ProgressRecord {
       for (const [key, value] of Object.entries(map))
         if (/^[a-z0-9-]+$/.test(key)) out[field][key] = Math.min(3, integer(value));
   }
+  // Stable reward tokens prove earned RP even when either balance is damaged.
+  // Purchases explain the gap between spendable RP and lifetime research.
+  const earned = out.awarded.reduce((sum, token) => {
+    const colon = token.indexOf(':');
+    const kind = token.slice(0, colon) as keyof typeof PROGRESS_CONFIG.rewards;
+    return (
+      sum +
+      (colon > 0 && token.length > colon + 1 && Object.hasOwn(PROGRESS_CONFIG.rewards, kind)
+        ? PROGRESS_CONFIG.rewards[kind]
+        : 0)
+    );
+  }, 0);
+  const spent = UPGRADES.reduce((sum, upgrade) => {
+    const level = Math.min(out.upgrades[upgrade.id] ?? 0, upgrade.costs.length);
+    if (Object.hasOwn(out.upgrades, upgrade.id)) out.upgrades[upgrade.id] = level;
+    return sum + upgrade.costs.slice(0, level).reduce((cost, value) => cost + value, 0);
+  }, 0);
+  out.lifetime = Math.max(out.lifetime, earned, out.points + spent);
+  out.points = Math.max(out.points, earned - spent);
+  const rawPoints = o.points ?? o.rp;
+  if (typeof rawPoints !== 'number' || !Number.isFinite(rawPoints) || rawPoints < 0)
+    out.points = Math.max(0, out.lifetime - spent);
   return out;
 }
 export class ProgressSave {

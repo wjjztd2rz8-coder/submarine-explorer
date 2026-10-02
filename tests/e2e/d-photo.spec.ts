@@ -88,7 +88,7 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   await expect(page.locator('.objectives-panel')).toBeHidden();
   await expect(mode.locator('.photo-mode-caption')).toHaveText(/^.*Titanic.* · Bow section$/);
   await expect(mode.locator('.photo-mode-tips')).toHaveText(
-    'Esc: exit photo mode · drag orbit · wheel zoom',
+    'Done / Esc: exit photo mode · drag orbit · pinch or wheel zoom',
   );
   await expect(mode.getByRole('button', { name: 'Capture (Enter / Space)' })).toBeVisible();
   expect((await cameraSnapshot(page)).mode).toBe('orbit');
@@ -188,6 +188,10 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
       );
     })
     .toBe(true);
+  // Mouse Done also returns to the dive.
+  await page.keyboard.press('p');
+  await mode.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(mode).toBeHidden();
   // P also toggles in and out.
   await page.keyboard.press('p');
   await expect(mode).toBeVisible();

@@ -38,7 +38,9 @@ export function contentUrl(landmarkId: string, file: string): string {
 }
 
 /** Minimal fetch shape so loaders can be tested without a network. */
-export type FetchJson = (url: string) => Promise<{ ok: boolean; text(): Promise<string> }>;
+export type FetchJson = (
+  url: string,
+) => Promise<{ ok: boolean; status?: number; text(): Promise<string> }>;
 
 /**
  * Fetch and parse a JSON content file. Resolves to `null` for anything other

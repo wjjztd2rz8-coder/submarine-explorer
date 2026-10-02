@@ -98,7 +98,11 @@ body.photo-active > :not(#viewport, .photo-mode) {
   opacity: 0.85;
   font-size: clamp(11px, calc(12px * var(--ui-scale)), 16px);
 }
-.photo-mode-capture {
+.photo-mode-actions {
+  display: flex;
+  gap: 8px;
+}
+.photo-mode-actions button {
   pointer-events: auto;
   font: inherit;
   padding: 6px 16px;
@@ -107,10 +111,18 @@ body.photo-active > :not(#viewport, .photo-mode) {
   border: 1px solid var(--hud-accent);
   border-radius: 4px;
   cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
 }
-.photo-mode-capture:hover,
-.photo-mode-capture:focus-visible {
+.photo-mode-actions button:hover,
+.photo-mode-actions button:focus-visible {
   background: #21586a;
+}
+@media (max-width: 700px) {
+  .photo-mode-bottom {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 
 /* Journal photos: grid, viewer, per-entry strip. */

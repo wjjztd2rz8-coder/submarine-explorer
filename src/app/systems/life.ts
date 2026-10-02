@@ -33,10 +33,14 @@ export function createLifeSystem(): GameSystem {
   };
   let life: Life | null = null;
   let disposers: Array<() => void> = [];
+  let disposed = false;
+  let owner: Parameters<NonNullable<GameSystem['init']>>[0] | null = null;
 
   return {
     name: 'life',
     init(ctx) {
+      if (disposed) return;
+      owner = ctx;
       const { params, scene, tier, contentLandmark, terrain, currents, bus, discovery, config } =
         ctx;
       ctx.life = null;
@@ -49,6 +53,7 @@ export function createLifeSystem(): GameSystem {
       if (params.get('life') === '0') return;
       const seed = Number(params.get('lifeSeed') ?? '') || undefined;
       void loadLifeDoc().then((doc) => {
+        if (disposed) return;
         const table = doc.sites[contentLandmark];
         const opts: ConstructorParameters<typeof Life>[0] = {
           tier,
@@ -106,10 +111,17 @@ export function createLifeSystem(): GameSystem {
       },
     },
     dispose() {
+      disposed = true;
       for (const d of disposers) d();
       disposers = [];
-      life?.dispose();
+      if (life) {
+        if (owner?.discovery.scanner.getExtraTargets() === life.targets)
+          owner.discovery.scanner.setExtraTargets([]);
+        if (owner?.life === life) owner.life = null;
+        life.dispose();
+      }
       life = null;
+      owner = null;
     },
   };
 }

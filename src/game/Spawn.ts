@@ -24,6 +24,51 @@ import type { SeabedSampler, SpawnPose } from './Pois.js';
 import { Vector3 } from 'three';
 import type { Props } from '../world/Props.js';
 
+/** Arcade mission openings must offer a short approach to an authored primary. */
+export function composedMissionSpawn(
+  siteId: string,
+  primaries: readonly { position: { x: number; y: number; z: number } }[],
+  meta: TileMeta,
+  seabed: SeabedSampler,
+  props: Pick<Props, 'placed' | 'collide'>,
+  settings: SpawnSettings,
+  safeDepth: number,
+  cameraConfig: CameraConfig = DEFAULT_CAMERA,
+): SpawnPose | null {
+  const opening = composedFreeDiveSpawn(
+    siteId,
+    meta,
+    seabed,
+    props,
+    settings,
+    safeDepth,
+    cameraConfig,
+  );
+  if (
+    opening &&
+    primaries.some(
+      ({ position: p }) => Math.hypot(p.x - opening.x, p.y - opening.y, p.z - opening.z) <= 300,
+    )
+  )
+    return opening;
+  for (const { position } of primaries) {
+    const pose = nearSiteSpawnPose(
+      position,
+      meta,
+      seabed,
+      settings,
+      safeDepth,
+      undefined,
+      300,
+      (p) =>
+        Math.hypot(position.x - p.x, position.y - p.y, position.z - p.z) <= 300 &&
+        !props.collide(new Vector3(p.x, p.y, p.z), settings.hullRadius + 4, new Vector3()),
+    );
+    if (pose) return pose;
+  }
+  return null;
+}
+
 /** Local approach bearings and clearance from each hero's actual footprint. */
 const FREE_DIVE_OPENINGS: Record<
   string,
@@ -232,6 +277,8 @@ export function nearSiteSpawnPose(
   settings: SpawnSettings,
   crushDepth: number,
   override?: MissionSpawn,
+  maxDistanceM = 600,
+  isClear: (pose: SpawnPose) => boolean = () => true,
 ): SpawnPose | null {
   const clearance = settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM;
   const northWest = latLonToWorld(meta, meta.bbox.north, meta.bbox.west);
@@ -241,7 +288,8 @@ export function nearSiteSpawnPose(
   const poseAt = (x: number, z: number, authoredY?: number): SpawnPose | null => {
     if (!inside(x, z)) return null;
     const horizontal = Math.hypot(target.x - x, target.z - z);
-    if (horizontal > 600 || horizontal < 350) return null;
+    if (horizontal > maxDistanceM + 1e-8 || horizontal < (350 / 600) * maxDistanceM - 1e-8)
+      return null;
     let floor = -Infinity;
     // Check the straight approach, not only the point where the hull spawns.
     for (let step = 0; step <= 12; step++) {
@@ -256,7 +304,8 @@ export function nearSiteSpawnPose(
     if (y > -settings.hullRadius) return null;
     let yaw = (headingFromForward(target.x - x, target.z - z) * Math.PI) / 180;
     if (yaw > Math.PI) yaw -= 2 * Math.PI;
-    return { x, y, z, yaw };
+    const pose = { x, y, z, yaw };
+    return isClear(pose) ? pose : null;
   };
   if (override) {
     const at = latLonToWorld(meta, override.lat, override.lon);
@@ -267,7 +316,8 @@ export function nearSiteSpawnPose(
   }
   let best: SpawnPose | null = null;
   let bestScore = Infinity;
-  for (const distance of [450, 400, 500, 350, 550, 600]) {
+  for (const baseDistance of [450, 400, 500, 350, 550, 600]) {
+    const distance = (baseDistance * maxDistanceM) / 600;
     for (let bearing = 0; bearing < 16; bearing++) {
       const angle = (bearing * Math.PI) / 8;
       const pose = poseAt(
@@ -275,7 +325,8 @@ export function nearSiteSpawnPose(
         target.z + Math.cos(angle) * distance,
       );
       if (!pose) continue;
-      const score = Math.abs(pose.y - target.y) * 2 + Math.abs(distance - 450);
+      const score =
+        Math.abs(pose.y - target.y) * 2 + Math.abs(distance - (450 * maxDistanceM) / 600);
       if (score < bestScore) {
         best = pose;
         bestScore = score;

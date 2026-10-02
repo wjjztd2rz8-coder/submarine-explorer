@@ -181,3 +181,17 @@ describe('Scanner', () => {
     expect(a.scanner.view.progress).toBeCloseTo(b.scanner.view.progress, 6);
   });
 });
+
+it('detaches an active moving target immediately when its owner disposes', () => {
+  const { scanner } = setup([]);
+  scanner.setExtraTargets([target({ id: 'life:comb-jelly' })]);
+  run(scanner, 0.5, AT, NORTH, true);
+  expect(scanner.isScanning).toBe(true);
+  scanner.setExtraTargets([]);
+  expect(scanner.isScanning).toBe(false);
+  expect(scanner.view.candidateId).toBeNull();
+  expect(scanner.view.nearestId).toBeNull();
+  expect(scanner.view.progress).toBe(0);
+  run(scanner, 0.1, AT, NORTH, true);
+  expect(scanner.view.candidateId).toBeNull();
+});
