@@ -85,3 +85,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - 2026-10-02 03:43 CDT headless run: skipped: budget gate (claude 5h 16.0% left (resets Fri Oct 02 04:39) | 7d 66.0% left (resets Thu Oct 08 06:59) codex 5h 92.0% left (resets Fri Oct 02 07:03) | 7d 29.0% left (resets Tue Oct 06 16:29) [as of 87 min ago] )
 - 2026-10-02 03:45 CDT headless run: skipped: budget gate (claude 5h 16.0% left (resets Fri Oct 02 04:39) | 7d 66.0% left (resets Thu Oct 08 06:59) [as of 2 min ago] codex 5h 89.0% left (resets Fri Oct 02 07:03) | 7d 28.0% left (resets Tue Oct 06 16:29) )
 - 2026-10-02 04:15 CDT headless run: skipped: budget gate (claude 5h 16.0% left (resets Fri Oct 02 04:39) | 7d 66.0% left (resets Thu Oct 08 06:59) [as of 2 min ago] codex 5h 75.0% left (resets Fri Oct 02 07:03) | 7d 26.0% left (resets Tue Oct 06 16:29) [as of 12 min ago] )
+
+## 2026-10-02 10:30 headless run
+
+- Merged (main gates green, pushed, tagged `f3b`): F-HERO-VENTS (Lost City terraced towers with flanges; Beebe smokers, sediment, ambient fill; Sonnet, sent back once because Beebe's seabed was black), F-HERO-TITANIC (opening 16 m off the bow, ambient fill, pale ooze, debris-bow; low-tier fill fix), F-BUGHUNT-2 (Codex fixes: hull refit on mode change, daily date and Low-light, controls-hint counting, disposal leaks), F-BUGHUNT-1 (audit doc).
+- Queued for Codex: `40-f-bughunt-fixes` (touch PHOTO exit, Monterey 14.7 km Arcade start, research save migration, life disposal).
+- Remaining hero sites: Great Blue Hole, Monterey Canyon. Titanic known gaps: sub covers mid-hull, far wreck dim, low-tier bed blotchy. Brand still needs the owner's name OK (Bathyline recommended). Claude 5h ended ~60%.
