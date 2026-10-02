@@ -150,12 +150,13 @@ test.describe('B3 mission flow', () => {
     );
     const off = Math.abs(((brg - heading + 540) % 360) - 180);
     expect(off).toBeLessThan(15);
-    // RNG is slant range; the near-site horizontal offset is 350-600 m.
+    // RNG is slant range: Arcade opens on a composed approach (tens of metres
+    // from the set piece); the classic near-site offset is 350-600 m.
     await expect(panel.locator('.obj-nav-range')).toHaveText(/RNG (\d{3}) m/);
     const rng = Number(
       ((await panel.locator('.obj-nav-range').textContent()) ?? '').replace(/\D/g, ''),
     );
-    expect(rng).toBeGreaterThanOrEqual(350);
+    expect(rng).toBeGreaterThanOrEqual(40);
     expect(rng).toBeLessThan(700);
 
     // Now it simulates: flooding the tanks takes the boat down.

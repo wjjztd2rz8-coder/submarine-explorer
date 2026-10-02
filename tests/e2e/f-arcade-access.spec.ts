@@ -51,7 +51,7 @@ test('fresh Arcade Titanic starts beside the wreck in its deep-ocean vehicle', a
     };
   });
   expect(pose.lifetime).toBe(0);
-  expect(pose.depth).toBeGreaterThan(3500);
+  expect(-pose.depth).toBeGreaterThan(3500);
   expect(pose.altitude).toBeGreaterThan(10);
   expect(pose.altitude).toBeLessThan(80);
   expect(pose.wreckRange).toBeGreaterThan(40);

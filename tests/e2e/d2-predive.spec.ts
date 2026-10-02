@@ -170,7 +170,19 @@ for (const start of ['near-site', 'surface'] as const) {
     );
     // Arcade default: near site, deep beside the bow, already behind the card.
     await expect.poll(async () => (await pose(page)).y, { timeout: 15_000 }).toBeLessThan(-3000);
-    const near = await pose(page);
+    // Props load after discovery and reframe a waiting pilot once; wait for it to settle.
+    await page.waitForFunction(
+      () => (window.__game as { props: { loaded: boolean } }).props.loaded,
+    );
+    let near = await pose(page);
+    await expect
+      .poll(async () => {
+        const now = await pose(page);
+        const moved = dist(now, near);
+        near = now;
+        return moved;
+      })
+      .toBeLessThan(0.01);
     if (start === 'surface') {
       await page.locator('.briefing-start input[value="surface"]').check();
       await expect.poll(async () => (await pose(page)).y).toBeGreaterThan(-50);
