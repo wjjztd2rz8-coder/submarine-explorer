@@ -62,7 +62,8 @@ type View =
   | { kind: 'entry'; key: string };
 
 /** Site and POI entries come from the guide (and fire `guide:opened`); species and wildlife do not. */
-const isGuideEntry = (e: JournalEntry): boolean => e.kind === 'site' || e.kind === 'poi';
+const isGuideEntry = (e: JournalEntry): boolean =>
+  e.kind === 'site' || e.kind === 'poi' || e.kind === 'secret';
 
 const NO_STORE: DiscoveryReader = { isDiscovered: () => false };
 
@@ -271,8 +272,10 @@ export class Journal {
     this.root.hidden = false;
     this.render();
     this.trap.activate();
+    const openingView = this.view;
     void this.load().then(() => {
-      if (focus && site) this.fixEntryKey(site, focus);
+      // A later click/show owns navigation, even when this load was already resolved.
+      if (focus && site && this.view === openingView) this.fixEntryKey(site, focus);
       this.refresh();
     });
   }
@@ -431,6 +434,7 @@ export class Journal {
       ['Points of interest', site.entries.filter((e) => e.kind === 'poi')],
       ['Species', site.entries.filter((e) => e.kind === 'species')],
       ['Wildlife', site.entries.filter((e) => e.kind === 'life')],
+      ['Secrets', site.entries.filter((e) => e.kind === 'secret')],
     ];
     for (const [label, list] of groups) {
       if (!list.length) continue;
@@ -439,7 +443,11 @@ export class Journal {
       let hidden = 0;
       for (const e of list) {
         const open = isEntryUnlocked(site, e, this.store);
-        if (!open && !this.spoilers_ && (e.kind === 'species' || e.kind === 'life')) {
+        if (
+          !open &&
+          !this.spoilers_ &&
+          (e.kind === 'species' || e.kind === 'life' || e.kind === 'secret')
+        ) {
           hidden++;
           continue;
         }
@@ -454,9 +462,11 @@ export class Journal {
           el(
             'p',
             'jr-hidden-note',
-            label === 'Wildlife'
-              ? `${hidden} animals not yet scanned. Hold the scan key on one during a dive.`
-              : `${hidden} species not yet identified. Show spoilers to read the survey list.`,
+            label === 'Secrets'
+              ? `${hidden} secrets remain. Follow faint nearby sonar contacts.`
+              : label === 'Wildlife'
+                ? `${hidden} animals not yet scanned. Hold the scan key on one during a dive.`
+                : `${hidden} species not yet identified. Show spoilers to read the survey list.`,
           ),
         );
       }
@@ -516,12 +526,15 @@ export class Journal {
     if (site.memorialNote) b.append(el('p', 'jr-memorial', site.memorialNote));
     const p = siteProgress(site, this.store);
     const wl = wildlifeProgress(site, this.store);
+    const secrets = site.entries.filter((e) => e.kind === 'secret');
+    const found = secrets.filter((e) => isEntryUnlocked(site, e, this.store)).length;
     b.append(
       el(
         'p',
         'jr-progress',
         `${p.logged} of ${p.total} entries logged · ${p.species} of ${p.speciesTotal} species identified` +
-          (wl.total ? ` · ${wl.scanned} of ${wl.total} animals scanned` : ''),
+          (wl.total ? ` · ${wl.scanned} of ${wl.total} animals scanned` : '') +
+          (secrets.length ? ` · Secrets found ${found}/${secrets.length}` : ''),
       ),
     );
     if (!unlocked && !this.spoilers_) {
@@ -574,6 +587,7 @@ export class Journal {
     const title = el('h2', 'jr-title', entry.title);
     if (entry.kind === 'species' && !entry.species?.commonName) title.classList.add('is-latin');
     titleRow.append(title);
+    if (entry.kind === 'secret') titleRow.append(el('span', 'jr-tag', 'Game addition'));
     if (entry.recreation) titleRow.append(el('span', 'jr-tag is-recreation', 'Recreation'));
     if (!open) titleRow.append(el('span', 'jr-tag is-undiscovered', 'Undiscovered'));
     b.append(titleRow);

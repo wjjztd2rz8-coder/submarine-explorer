@@ -123,6 +123,15 @@ export class Scanner {
    * hint and the candidate, so objectives never lose the beam to a passing fish.
    */
   private extra: readonly ScanTarget[] = [];
+  private supplemental: readonly ScanTarget[] = [];
+
+  /** Fixed curiosity targets have their own pool so wildlife cannot overwrite them. */
+  setSupplementalTargets(targets: readonly ScanTarget[]): void {
+    this.supplemental = targets;
+  }
+  getSupplementalTargets(): readonly ScanTarget[] {
+    return this.supplemental;
+  }
   /** Public per-dive state for sonar, objectives and other presentation layers. */
   readonly scannedThisDive = new Set<string>();
   private active: ScanTarget | null = null;
@@ -139,7 +148,12 @@ export class Scanner {
 
   setTargets(targets: ScanTarget[]): void {
     this.targets = [...targets];
-    if (this.active && !this.targets.includes(this.active) && !this.extra.includes(this.active))
+    if (
+      this.active &&
+      !this.targets.includes(this.active) &&
+      !this.extra.includes(this.active) &&
+      !this.supplemental.includes(this.active)
+    )
       this.clearActive();
   }
 
@@ -208,6 +222,20 @@ export class Scanner {
       if (g.distance <= hintRange && (!nearestGeo || g.distance < nearestGeo.distance)) {
         nearest = t;
         nearestGeo = g;
+      }
+    }
+    // Curiosity targets are hinted only in scan range; never reveal a name remotely.
+    for (const t of this.supplemental) {
+      const g = this.geometry(t, position, forward);
+      if (t === this.active) activeGeo = g;
+      if (this.isScanned(t.landmarkId, t.id) || !g.inRange) continue;
+      if (!nearestGeo || g.distance < nearestGeo.distance) {
+        nearest = t;
+        nearestGeo = g;
+      }
+      if (g.facing && g.distance < candidateDist) {
+        candidate = t;
+        candidateDist = g.distance;
       }
     }
     // Moving targets (animals): considered only where no POI already claims the

@@ -37,7 +37,10 @@ for (const site of [
 
 test('Lost City mission and free dive both retain clear flow', async ({ page }) => {
   await mkdir(shots, { recursive: true });
-  for (const url of ['/?tile=lost-city&skipBriefing=1', '/?mission=lost-city&skipBriefing=1']) {
+  for (const url of [
+    '/?tile=lost-city&skipBriefing=1&tier=medium',
+    '/?mission=lost-city&skipBriefing=1&tier=medium',
+  ]) {
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => {
       const p = window.__game?.presets as { entered?: boolean } | undefined;

@@ -128,32 +128,20 @@ html[data-reduce-motion='true'] .onboard-hint {
   animation: none;
 }
 
-/* Touch: keep clear of the stick (left) and slider and buttons (right). */
-html.is-touch .onboard-card {
-  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-  width: clamp(200px, calc(100vw - 520px), 440px);
-  padding: 6px 10px 8px;
-}
-html.is-touch .onboard-card-title {
-  display: none;
-}
-html.is-touch .onboard-card-text {
-  font-size: 13px;
-  margin-bottom: 4px;
-}
-html.is-touch .onboard-hint {
-  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
-  max-width: clamp(200px, calc(100vw - 520px), 440px);
-  font-size: 13px;
-}
-@media (orientation: portrait) {
+/* Touch phones: compact card (placement lives in hud-layout.css). */
+@media (max-height: 460px) {
   html.is-touch .onboard-card {
-    bottom: calc(210px + env(safe-area-inset-bottom, 0px));
-    width: calc(100vw - 24px);
+    padding: 6px 10px 8px;
+  }
+  html.is-touch .onboard-card-title {
+    display: none;
+  }
+  html.is-touch .onboard-card-text {
+    font-size: 13px;
+    margin-bottom: 4px;
   }
   html.is-touch .onboard-hint {
-    bottom: calc(300px + env(safe-area-inset-bottom, 0px));
-    max-width: calc(100vw - 24px);
+    font-size: 13px;
   }
 }
 

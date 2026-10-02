@@ -10,6 +10,7 @@
  */
 
 import { createDailySystem } from './systems/daily.js';
+import { createExploreSystem } from './systems/explore.js';
 import { createProgressSystem } from './systems/progress.js';
 import { inputGateSystem } from './loop.js';
 import type { GameSystem } from './System.js';
@@ -88,6 +89,7 @@ export function createSystems(): GameSystem[] {
     renderSystem,
     createRovSystem(),
     createQualitySystem(),
+    createExploreSystem(),
     // Frame-only: `gate.input`.
     inputGateSystem,
   ];

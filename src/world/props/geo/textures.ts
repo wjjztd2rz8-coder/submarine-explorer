@@ -16,7 +16,7 @@ const CONTRAST: Record<GeoTexKind, number> = {
   rock: 0.5,
   flow: 0.28,
   pillow: 0.5,
-  strata: 0.3,
+  strata: 0.45,
   sediment: 0.4,
 };
 
@@ -122,9 +122,16 @@ function heightField(kind: GeoTexKind, size: number, seed: number): Float32Array
           break;
         }
         case 'strata': {
-          const band =
-            0.5 + 0.5 * Math.sin((v * 3 + pfbm(u, v, 4, 1, 3, seed) * 1.6) * Math.PI * 2);
-          val = band * 0.5 + pfbm(u, v, 10, 10, 4, seed + 1) * 0.45 + 0.05;
+          // Horizontal beds of differing hardness with elongated grain and thin dark partings.
+          const nb = 5;
+          const vb = v * nb + (pfbm(u, v, 3, 1, 2, seed) - 0.5) * 0.6;
+          const bi = Math.floor(vb);
+          const fb = vb - bi;
+          const level = hash2(((bi % nb) + nb) % nb, 3, seed);
+          const parting = 1 - THREE.MathUtils.smoothstep(fb, 0.02, 0.12);
+          const grain = pfbm(u, v, 9, 54, 3, seed + 2);
+          const speck = pfbm(u, v, 40, 40, 2, seed + 6);
+          val = 0.2 + level * 0.46 + grain * 0.28 + speck * 0.12 - parting * 0.18;
           break;
         }
         default: {

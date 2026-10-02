@@ -45,6 +45,13 @@ export interface GameEvents {
   'scan:aborted': { poiId: string; reason: 'range' | 'facing' | 'released' };
   'scan:complete': { poiId: string; landmarkId: string; firstTime: boolean };
   'guide:opened': { entryId: string };
+  'discovery:secret': { landmarkId: string; secretId: string; name: string; firstTime: boolean };
+  'discovery:sample': { landmarkId: string; sampleId: string; name: string };
+  'event:witnessed': {
+    landmarkId: string;
+    eventId: string;
+    kind: 'plume' | 'turbidity' | 'snow' | 'whale';
+  };
   // --- B3: mission flow ------------------------------------------------------
   'mission:started': { missionId: string; tileId: string };
   'mission:objective': { missionId: string; objectiveId: string; complete: boolean };

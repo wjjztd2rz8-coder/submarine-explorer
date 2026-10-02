@@ -44,6 +44,17 @@ without an entry here is not done.
   show the layout for the keyboard, gamepad or touch you last used, with 44 px
   buttons. The bottom tip strip now follows the active device (hidden on touch,
   where the on-screen buttons are the tips).
+- Phase F, F2-EXPLORE: three hidden discoveries and two sample spots at every
+  site. Nearby sonar picks up faint unidentified contacts; holding Scan reveals
+  a secret and its Journal entry, tagged once as a Game addition. Secrets never
+  appear as mission objectives or waypoints.
+- Local sample collection with the scan control, animated manipulators and a
+  small sediment effect on every graphics tier. The collection resets each dive
+  and appears alongside the per-site secrets count in both debrief variants.
+- Rare, short vent surges, canyon silt puffs, marine-snow bursts and whales passing
+  above shallow canyon water. Events have a quiet cooldown, a soft sensor cue and
+  a brief caption. Watching one earns research; hidden discoveries and samples
+  also award research once per subject.
 
 - Phase F, F-VISUAL-FIXES: authored free-dive approaches for all thirteen sites,
   facing the wreck, reef, chimney field or landscape route. Challenger keeps
@@ -183,6 +194,33 @@ without an entry here is not done.
   other segment. Editing an advanced option shows a small Custom tag, and
   selecting either preset restores every option. Existing Custom saves keep
   their settings. New controls use 44 px touch targets and native keyboard input.
+- Phase F, F-HUD-LAYOUT: the dive HUD no longer stacks on the submarine. The
+  tutorial card (and hint chip) moved to the left column under the sonar; the
+  scan-target panel moved from the bottom centre, where the chase camera keeps
+  the sub, to the top centre; the controls hint bar stays bottom-left. On
+  phone landscape the sonar is smaller, the card and scan panel share a
+  top-centre column, objectives show only the current step, readouts drop the
+  heading row, and the map credit moves into the strip between stick and
+  buttons. The controls hint bar now hides once move, turn and rise/sink have
+  each been used, and only shows for the first three dives; Help (Pause >
+  Controls) still has everything. Portrait phones are unchanged (the game
+  already asks players to rotate). Reason: owner playtest and director's brief
+  priority 4. New `src/styles/hud-layout.css`; e2e `f-hud-layout.spec.ts`
+  asserts no overlaps at 1600x900, 1280x720, 844x390 touch and 1024x768 touch.
+- Phase F, F-GEO-SCARP: the wall hero pieces at Challenger Deep, Monterey Canyon,
+  Hunga Tonga and the Great Blue Hole are rebuilt so they no longer read as
+  extruded slabs. Each wall now curves in plan and tapers out under the seabed at
+  its ends. Hunga is an arcuate, jointed wall of dipping tuff beds; Monterey has
+  an S-bend with an undercut base and receding terraces, rubble on the outer bend
+  and a clear sandy passage on the inner one; Challenger is a crescentic slump
+  scarp with benches and large displaced blocks; the Blue Hole alcove has a
+  curved wall, a scalloped shelf and clustered fluted stalactites. A graded
+  rubble apron with a lobed rim, sunk into the seabed, replaces the hard toe, and
+  every boulder is seated on that apron's final surface. Rock texture is now
+  world-scale along the face, with bed-by-bed tones, instead of stretched
+  vertical projection; boulders are angular, darker underneath and tinted to
+  match the wall. The Blue Hole alcove keeps only a few sponges on the upper face
+  and none on its floor. Prop ids, sizes and placements are unchanged.
 
 - Phase F, F-CONTENT-FIX: Lost City now releases clear-flow shimmer, with smoke
   and warm glow disabled. Poseidon's composite footprint follows the published
@@ -196,6 +234,10 @@ without an entry here is not done.
   fluid pressure, Endurance tonnage, Challenger depth and monument boundary,
   white coral colour and wreck memorial text are corrected; deeper-route hints no longer call the twilight zone fully dark.
 
+- F2-EXPLORE follow-up: Journal navigation keeps the page the player selects
+  while content finishes loading. Sample confirmations now say “Stowed for this
+  dive”; compact touch scan panels clear the movement and Scan controls.
+  No features or objectives were cut.
 - Phase F, F-VISUAL-FIXES: narrower, softer headlights and a weaker nearby fill
   preserve material colour and seabed gradients. Exposure and bloom are lower;
   marine snow is smaller. Realistic lights keep a faint local fill for the hull.

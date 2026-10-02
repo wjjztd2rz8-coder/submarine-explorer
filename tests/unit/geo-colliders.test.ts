@@ -46,9 +46,11 @@ describe('wall colliders follow the rendered wall', () => {
 
     it(`${f}: no collider stands over empty water above a tapered end`, () => {
       for (const c of boxes) {
-        const inX = verts.filter((v) => v.x >= c.min.x && v.x <= c.max.x);
+        // One grid cell of slack: the mesh is interpolated between vertices.
+        const inX = verts.filter((v) => v.x >= c.min.x - 1 && v.x <= c.max.x + 1);
         const top = Math.max(...inX.map((v) => v.y));
-        expect(c.max.y).toBeLessThanOrEqual(top + 0.6);
+        // Ends run out below the seabed (y = 0 on flat test ground): a box may reach the ground.
+        expect(c.max.y).toBeLessThanOrEqual(Math.max(top, 0) + 0.6);
       }
       // The outermost wall end must not collide up to the full design height.
       const end = boxes.filter((c) => Math.abs(c.getCenter(new THREE.Vector3()).x) > W * 0.4);
@@ -58,6 +60,9 @@ describe('wall colliders follow the rendered wall', () => {
     it(`${f}: boxes overlap in x, leaving no gap through the rock`, () => {
       for (let x = -W * 0.45; x <= W * 0.45; x += 0.25) {
         const y = Math.abs(x) < W * 0.3 ? 0.3 * H : 0.04 * H;
+        // Only where the wall actually stands that high (the ends run out under the seabed).
+        const rock = verts.some((v) => Math.abs(v.x - x) < 0.6 && v.y > y + 1);
+        if (!rock) continue;
         const hit = boxes.some((c) => x >= c.min.x && x <= c.max.x && y >= c.min.y && y <= c.max.y);
         expect(hit, `x=${x}`).toBe(true);
       }

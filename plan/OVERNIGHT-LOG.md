@@ -64,3 +64,14 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Remaining: F3-BRAND-UI (name choice from docs/research/brand.md: Bathyline recommended, needs owner approval), wave 4 audits/docs, F-VISUAL-QA per-site hero fixes, 3 content decisions (Blue Hole, Bismarck depth, Hunga era). Nothing running.
 - 2026-10-01 18:15 CDT headless run: skipped: budget gate (claude 5h 48.0% left (resets Thu Oct 01 18:39) | 7d 86.0% left (resets Thu Oct 08 06:59) codex 5h 4.0% left (resets Thu Oct 01 19:45) | 7d 45.0% left (resets Tue Oct 06 16:29) )
 - 2026-10-01 19:26 CDT headless run: skipped: budget gate (claude 5h 98.0% left (resets Thu Oct 01 23:40) | 7d 86.0% left (resets Thu Oct 08 07:00) [as of 2 min ago] codex 5h 4.0% left (resets Thu Oct 01 19:45) | 7d 45.0% left (resets Tue Oct 06 16:29) [as of 72 min ago] )
+
+## 2026-10-01 22:00 headless run
+
+- Merged (main gates green): F-CONTENT-FIX (Codex, data/facts), F-GEO-SCARP (Sonnet; curved/bedded walls with seated talus at Challenger, Monterey, Hunga, Blue Hole), F2-EXPLORE (Codex; secrets, sample collection, dynamic events; also fixed the f2-life animal-preview failures). Pushed main, tagged `f2b`.
+- Running/pending: Codex F2-MODES (worktree f2-modes) failed its gates after 2 rounds; needs a Sonnet finish next run. See .cache/claude/paused-packages.md.
+- Notes: Codex auto-resumed tasks after its limit reset and edited worktrees while I worked; Claude 5h ended ~40%, so no further agents. Walls still read dark/chalky under headlights (L1 lighting tuning). Owner to review: F-GEO-SCARP left projectUVs alone (arc-length UVs instead).
+- 2026-10-01 21:34 CDT headless run: skipped: budget gate (claude 5h 41.0% left (resets Thu Oct 01 23:40) | 7d 79.0% left (resets Thu Oct 08 07:00) codex 5h 27.0% left (resets Fri Oct 02 00:50) | 7d 34.0% left (resets Tue Oct 06 16:29) [as of 33 min ago] )
+- 2026-10-01 21:45 CDT headless run: skipped: budget gate (claude 5h 41.0% left (resets Thu Oct 01 23:40) | 7d 79.0% left (resets Thu Oct 08 07:00) [as of 2 min ago] codex 5h 27.0% left (resets Fri Oct 02 00:50) | 7d 34.0% left (resets Tue Oct 06 16:29) [as of 44 min ago] )
+- 2026-10-01 22:15 CDT headless run: skipped: budget gate (claude 5h 39.0% left (resets Thu Oct 01 23:39) | 7d 78.0% left (resets Thu Oct 08 06:59) codex 5h 27.0% left (resets Fri Oct 02 00:50) | 7d 34.0% left (resets Tue Oct 06 16:29) [as of 74 min ago] )
+- 2026-10-01 22:45 CDT headless run: skipped: budget gate (claude 5h 28.0% left (resets Thu Oct 01 23:40) | 7d 77.0% left (resets Thu Oct 08 07:00) [as of 2 min ago] codex 5h 27.0% left (resets Fri Oct 02 00:50) | 7d 34.0% left (resets Tue Oct 06 16:29) [as of 103 min ago] )
+- 2026-10-01 23:15 CDT headless run: skipped: budget gate (claude 5h 24.0% left (resets Thu Oct 01 23:40) | 7d 76.0% left (resets Thu Oct 08 07:00) [as of 2 min ago] codex 5h 5.0% left (resets Fri Oct 02 00:50) | 7d 30.0% left (resets Tue Oct 06 16:29) [as of 17 min ago] )

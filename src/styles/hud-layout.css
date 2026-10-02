@@ -1,0 +1,224 @@
+/* F-HUD-LAYOUT: one place that gives each HUD element its own space, so the
+   tutorial card, scan-target panel, controls hint bar, objectives and touch
+   controls never stack on each other or on the submarine.
+
+   The chase camera keeps the sub low and central, so the bottom centre is the
+   sub's. Everything else is arranged around it:
+
+     desktop / tablet   top-left: sonar, then the tutorial card or hint chip
+                        top-centre (below warnings): scan-target panel
+                        top-right: objectives, then readouts
+                        bottom-left: controls hint bar
+     phone landscape    top-left: sonar (small); top-centre column: tutorial
+                        card or hint chip, then the scan-target panel;
+                        top-right: short objectives and readouts
+                        bottom strip between stick and buttons: map credit
+
+   Loaded last so it wins over the earlier per-feature files. */
+
+:root {
+  /* Sonar panel is at most 220 px of map plus header and legend. */
+  --hl-sonar-clear: 332px;
+  --hl-scan-width: 300px;
+}
+
+/* Tutorial card and hint chip: left column under the sonar. */
+.onboard-card,
+.onboard-hint {
+  left: calc(12px + env(safe-area-inset-left, 0px));
+  top: calc(var(--hl-sonar-clear) + env(safe-area-inset-top, 0px));
+  bottom: auto;
+  transform: none;
+  width: min(380px, calc(50vw - 150px - 24px));
+  min-width: 270px;
+  max-width: none;
+  animation-name: hl-card-in;
+}
+.onboard-hint {
+  font-size: 14px;
+}
+@keyframes hl-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Never both at once: the hint chip waits below the card. */
+.onboard-card:not([hidden]) ~ .onboard-hint:not([hidden]),
+.onboard-hint:not([hidden]) ~ .onboard-card:not([hidden]) {
+  top: calc(var(--hl-sonar-clear) + 190px + env(safe-area-inset-top, 0px));
+}
+
+/* Scan-target panel: top centre, below the hull warning and clear of the sub. */
+.scan-panel {
+  top: calc(max(84px, 15%) + env(safe-area-inset-top, 0px));
+  bottom: auto;
+  width: var(--hl-scan-width);
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Touch landscape: the map credit sits in the strip between stick and buttons. */
+@media (orientation: landscape) {
+  html.is-touch .hud-attribution {
+    right: auto;
+    left: calc(140px + env(safe-area-inset-left, 0px));
+    bottom: calc(4px + env(safe-area-inset-bottom, 0px));
+    width: calc(100vw - 140px - 300px);
+    max-width: none;
+    text-align: left;
+    font-size: 8px;
+    line-height: 1.15;
+    opacity: 0.5;
+  }
+  html.is-touch .scan-overlay .scan-panel {
+    left: calc(50% - 40px);
+    width: var(--hl-scan-width);
+    top: calc(max(84px, 15%) + env(safe-area-inset-top, 0px));
+    bottom: auto;
+  }
+}
+
+/* Phone landscape: the left column is the sonar and the stick, so the card and
+   scan panel share the top-centre column between the sonar and the readouts. */
+@media (max-height: 460px) and (orientation: landscape) {
+  :root {
+    --hl-sonar-clear: 0px;
+    --hl-col-left: calc(168px + env(safe-area-inset-left, 0px));
+    --hl-col-width: calc(100vw - 168px - 270px);
+  }
+  html.is-touch .sonar {
+    zoom: 0.62;
+  }
+  html.is-touch .d-sonar-legend {
+    display: none;
+  }
+  html.is-touch .hud-readouts {
+    padding: 4px 8px;
+    min-width: 0;
+    width: min(220px, calc(100vw - 24px));
+  }
+  html.is-touch .hud-readouts .hud-row {
+    gap: 8px;
+    line-height: 1.25;
+  }
+  html.is-touch .hud-readouts .hud-label {
+    font-size: 10px;
+  }
+  html.is-touch .hud-readouts .hud-value {
+    font-size: 13px;
+  }
+  /* Heading and tile name wait in the pause menu and sonar on a phone. */
+  html.is-touch .hud-readouts .hud-row:has([data-field='heading']),
+  html.is-touch .hud-readouts .hud-row:has([data-field='tile']) {
+    display: none;
+  }
+  html.is-touch .hull-gauge {
+    margin-top: 3px;
+    padding-top: 3px;
+    font-size: 11px;
+  }
+  html.is-touch .hull-gauge-label {
+    margin-bottom: 2px;
+  }
+  /* Objectives: the current step only; bearing lives on the waypoint marker. */
+  html.is-touch .objectives-panel {
+    box-sizing: border-box;
+    width: 250px;
+    padding: 4px 8px;
+    left: auto;
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    transform: none;
+  }
+  html.is-touch .objectives-panel .obj-item:not(.is-current),
+  html.is-touch .objectives-panel .obj-nav,
+  html.is-touch .objectives-panel .obj-more,
+  html.is-touch .objectives-panel .obj-hint,
+  html.is-touch .objectives-panel .obj-progress {
+    display: none;
+  }
+  /* Card: text on the left, buttons on the right, so it stays short. */
+  html.is-touch .onboard-card,
+  html.is-touch .onboard-hint {
+    top: calc(58px + env(safe-area-inset-top, 0px));
+    left: var(--hl-col-left);
+    width: var(--hl-col-width);
+    min-width: 0;
+  }
+  html.is-touch .onboard-card:not([hidden]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 8px;
+    align-items: center;
+  }
+  html.is-touch .onboard-card-head {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  html.is-touch .onboard-card-text {
+    grid-column: 1;
+    grid-row: 2;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.25;
+  }
+  html.is-touch .onboard-card-buttons {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+  html.is-touch .onboard-card button {
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  html.is-touch .onboard-card:not([hidden]) ~ .onboard-hint:not([hidden]),
+  html.is-touch .onboard-hint:not([hidden]) ~ .onboard-card:not([hidden]) {
+    top: calc(146px + env(safe-area-inset-top, 0px));
+  }
+  html.is-touch .scan-overlay .scan-panel {
+    left: var(--hl-col-left);
+    transform: none;
+    width: var(--hl-col-width);
+    top: calc(58px + env(safe-area-inset-top, 0px));
+    padding: 6px 10px 6px 6px;
+    gap: 10px;
+  }
+  body:has(.onboard-card:not([hidden])) .scan-overlay .scan-panel,
+  body:has(.onboard-hint:not([hidden])) .scan-overlay .scan-panel {
+    top: calc(146px + env(safe-area-inset-top, 0px));
+  }
+  html.is-touch .scan-overlay .scan-ring {
+    width: 40px;
+    height: 40px;
+  }
+  html.is-touch .hud-attribution {
+    font-size: 7px;
+    left: calc(136px + env(safe-area-inset-left, 0px));
+    width: calc(100vw - 136px - 300px);
+  }
+}
+
+/* Portrait phones: card above the controls, scan panel under the readouts. */
+@media (orientation: portrait) {
+  html.is-touch .onboard-card,
+  html.is-touch .onboard-hint {
+    top: auto;
+    bottom: calc(210px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100vw - 24px);
+    min-width: 0;
+    animation-name: onboard-in;
+  }
+  html.is-touch .onboard-hint {
+    bottom: calc(300px + env(safe-area-inset-bottom, 0px));
+  }
+  html.is-touch .scan-overlay .scan-panel {
+    left: 50%;
+    top: auto;
+    bottom: calc(360px + env(safe-area-inset-bottom, 0px));
+  }
+}
