@@ -167,13 +167,8 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   }
   geom.computeBoundingBox();
   geom.computeBoundingSphere();
+  // The haze plumes carry their own bounding spheres, so they do not widen the prop's bounds.
   const bounds = geom.boundingBox!.clone();
-  for (const k of hazeFor) {
-    const tip = tips[k]!;
-    bounds.expandByPoint(
-      new THREE.Vector3(tip.x, tip.y + Math.min(14, spires[k]!.h * 0.28 + 3) + 3, tip.z),
-    );
-  }
 
   const colliders: THREE.Box3[] = [
     boxCH(0, gnd(0, 0) + skirtH * 0.3, 0, W * 0.3, skirtH * 0.3, D * 0.3),
@@ -188,7 +183,16 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       colliders.push(boxCH(s.x, s.y + ((a + b) / 2) * s.h, s.z, rr, ((b - a) / 2) * s.h, rr));
     }
   }
-  return { full, impostor: impostorFromBoxes(colliders, bounds, 0xa39d8c), bounds, colliders };
+  return {
+    full,
+    impostor: impostorFromBoxes(
+      colliders,
+      bounds,
+      lone ? input.cfg.chimneyMaterials.carbonate.rock : 0xa39d8c,
+    ),
+    bounds,
+    colliders,
+  };
 }
 
 /** A lone carbonate chimney: the field's lesser towers (`material_hint: carbonate`). */
