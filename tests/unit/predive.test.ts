@@ -2,7 +2,6 @@
 
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
-import { BRIEFING_MORE_OPTIONS } from '../../src/ui/Briefing.js';
 import {
   GAME_MODES,
   gameplayValueLabel,
@@ -18,8 +17,9 @@ import {
 } from '../../src/ui/Settings.js';
 
 describe('game modes', () => {
-  it('lists Arcade, Realistic and Custom, each with a one-line description', () => {
-    expect(GAME_MODES.map((m) => m.id)).toEqual(['arcade', 'realistic', 'custom']);
+  it('lists only Arcade and Realistic, each with a one-line description', () => {
+    expect(GAME_MODES.map((m) => m.id)).toEqual(['arcade', 'realistic']);
+    expect(modeDescription('custom')).toBe('Your own mix of the individual options.');
     for (const mode of GAME_MODES) {
       expect(modeDescription(mode.id)).toBe(mode.description);
       expect(mode.description).not.toMatch(/\n/);
@@ -71,20 +71,19 @@ describe('gameplay option labels and values', () => {
     ).toBe('future');
   });
 
-  it('offers the briefing More options the brief asks for', () => {
-    expect(BRIEFING_MORE_OPTIONS.map((o) => o.key)).toEqual([
+  it('includes every advanced option in the shared control', () => {
+    expect(gameplayKeysInOrder(DEFAULT_CONFIG.settings.gameplayOptions)).toEqual([
+      'speedProfile',
+      'descentProfile',
+      'lights',
+      'sensors',
       'visualHints',
       'sonarMarkers',
       'batteryOxygen',
       'currents',
-      'speedProfile',
+      'startPosition',
+      'simSpeed',
     ]);
-    for (const o of BRIEFING_MORE_OPTIONS)
-      expect(o.kind).toBe(
-        typeof DEFAULT_CONFIG.settings.gameplayOptions[o.key][0] === 'boolean'
-          ? 'toggle'
-          : 'select',
-      );
   });
 });
 

@@ -15,7 +15,6 @@
 @import './styles/hull-warnings.css';
 @import './styles/globe.css';
 @import './styles/settings.css';
-@import './styles/modes.css';
 @import './styles/input-hud.css';
 @import './styles/menus.css';
 @import './styles/waypoints.css';
@@ -33,4 +32,5 @@
 @import './styles/camera.css';
 @import './styles/touch.css';
 @import './styles/onboard.css';
+@import './styles/modes.css';
 @import './styles/hud-layout.css';

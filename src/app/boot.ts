@@ -5,6 +5,10 @@
  * result is the `BootContext` every system builds on.
  */
 
+import { DailySave } from '../game/DailySave.js';
+import { dailyDive, dailyMission, utcDate } from '../game/Daily.js';
+import { loadMissionSummaries } from '../game/Mission.js';
+import { unlockedDailySites } from './systems/daily.js';
 import { loadSavedProgress } from './systems/progress.js';
 import * as THREE from 'three';
 import { assets } from '../core/assets/index.js';
@@ -67,17 +71,32 @@ export async function boot(): Promise<BootContext | null> {
   const loader = new TileLoader();
   // B3: `?mission=<id>` (docs/missions.md) names the tile and the content
   // folder; without it (or if its mission.json is missing) this is the free dive.
-  const [index, route, progress] = await Promise.all([
+  const [index, initialRoute, progress] = await Promise.all([
     loader.loadIndex(),
     resolveMissionRoute(params),
     loadSavedProgress(),
   ]);
+  let route = initialRoute;
+  let daily = null;
+  if (params.get('daily') === utcDate()) {
+    const summaries = await loadMissionSummaries();
+    daily = dailyDive(utcDate(), unlockedDailySites(summaries, index, progress));
+    if (daily) {
+      route = await resolveMissionRoute(new URLSearchParams({ mission: daily.site }));
+      if (route) route.def = dailyMission(route.def, daily);
+      else daily = null;
+    }
+  }
   const requested = route?.tileId ?? params.get('tile');
   const tileId = chooseTileId(requested, index, config.defaultTileId);
   // C5: saved settings (docs/settings.md). The saved graphics tier applies
   // unless `?tier=` is given; terrain detail is read once, when the terrain is built.
   const save = new Save({ config, bus });
   const settings = save.get();
+  if (daily) {
+    settings.gameplay.currents = daily.modifier === 'strong-currents' ? 'exaggerated' : 'off';
+    if (daily.modifier === 'low-light') settings.gameplay.lights = 'realistic';
+  }
   const { baseHintRangeFactor } = applyBootModes(config, settings);
   config.terrain.detailStrength = settings.detailStrength;
   const debugTerrain = params.get('debugTerrain') === '1';
@@ -132,6 +151,8 @@ export async function boot(): Promise<BootContext | null> {
 
   return {
     params,
+    daily,
+    dailySave: new DailySave(),
     config,
     bus,
     app: { state: appState, lastSite },

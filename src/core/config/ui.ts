@@ -168,7 +168,7 @@ export const DEFAULT_SETTINGS: SettingsConfig = {
     sonarMarkers: [false, true],
     startPosition: ['near-site', 'surface'],
     batteryOxygen: [false, true],
-    currents: ['off', 'gentle', 'realistic'],
+    currents: ['off', 'gentle', 'realistic', 'exaggerated'],
     descentProfile: ['research', 'standard', 'fast'],
     simSpeed: [1, 2, 3],
   },

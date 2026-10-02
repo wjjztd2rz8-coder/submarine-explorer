@@ -11,7 +11,7 @@
  * except on another focused button or a select, which keep their own action.
  *
  * D2-PREDIVE: the sticky footer holds "Dive settings" (game mode, start
- * position and a "More options" disclosure) beside Begin. With
+ * position and a "Advanced" disclosure) beside Begin. With
  * {@link Briefing.attachDiveSettings} they edit the saved settings, and a
  * start change is reported so the scene previews the real start pose.
  *
@@ -22,12 +22,7 @@
 import type { GameplayOptions } from '../core/Config.js';
 import { FocusTrap } from './FocusTrap.js';
 import type { MissionStartPosition } from '../game/MissionRouter.js';
-import {
-  ModeSelector,
-  gameplayValueLabel,
-  parseGameplayValue,
-  type GameplaySettingsSource,
-} from './ModeSelector.js';
+import { ModeSelector, type GameplaySettingsSource } from './ModeSelector.js';
 
 export interface BriefingContent {
   kicker: string;
@@ -61,19 +56,6 @@ export interface DiveSettingsOptions {
   onStartChange?: (choice: MissionStartPosition) => void;
 }
 
-/** Options under "More options", in order: label and control kind. */
-export const BRIEFING_MORE_OPTIONS: ReadonlyArray<{
-  key: keyof GameplayOptions;
-  label: string;
-  kind: 'toggle' | 'select';
-}> = [
-  { key: 'visualHints', label: 'Visual waypoints', kind: 'toggle' },
-  { key: 'sonarMarkers', label: 'Sonar markers', kind: 'toggle' },
-  { key: 'batteryOxygen', label: 'Battery and oxygen', kind: 'toggle' },
-  { key: 'currents', label: 'Currents', kind: 'select' },
-  { key: 'speedProfile', label: 'Forward speed', kind: 'select' },
-];
-
 const START_CHOICES = [
   ['near-site', 'Near site', 'next to the first objective'],
   ['surface', 'Surface', 'full descent'],
@@ -104,14 +86,7 @@ export class Briefing {
   private dive: DiveSettingsOptions | null = null;
   private diveDisposers: Array<() => void> = [];
   private diveSlot: HTMLDivElement | null = null;
-  private moreToggle: HTMLButtonElement | null = null;
-  private morePanel: HTMLDivElement | null = null;
-  private moreOpen = false;
   private startInputs: HTMLInputElement[] = [];
-  private readonly moreControls = new Map<
-    keyof GameplayOptions,
-    HTMLInputElement | HTMLSelectElement
-  >();
   private readonly onPanelKey: (e: KeyboardEvent) => void;
   private modeSelector: ModeSelector | null = null;
 
@@ -128,7 +103,7 @@ export class Briefing {
 
     this.onKey = (e) => {
       if (!this.open_ || (e.code !== 'Enter' && e.code !== 'NumpadEnter')) return;
-      // Enter on another focused button (More options, View controls) or a
+      // Enter on another focused button (Advanced, View controls) or a
       // select does that control's job, not Begin.
       const t = e.target;
       if (
@@ -159,14 +134,14 @@ export class Briefing {
     return this.choice;
   }
 
-  /** True while "More options" is expanded. */
-  get moreOptionsOpen(): boolean {
-    return this.moreOpen;
+  /** True while "Advanced" is expanded. */
+  get advancedOpen(): boolean {
+    return this.modeSelector ? !this.modeSelector.advancedPanel.hidden : false;
   }
 
   /**
    * D2-PREDIVE: connect the Dive settings panel to the saved settings. The
-   * mode, start position and More options then read and write `settings`;
+   * mode, start position and Advanced then read and write `settings`;
    * a start change (here, or from a preset or Settings) calls `onStartChange`.
    */
   attachDiveSettings(dive: DiveSettingsOptions): void {
@@ -175,9 +150,7 @@ export class Briefing {
     this.dive = dive;
     this.choice = dive.settings.get().gameplay.startPosition;
     this.diveDisposers.push(dive.settings.onChange(() => this.syncDive()));
-    if (this.moreToggle) this.moreToggle.hidden = false;
     this.renderDiveSettings();
-    this.setMoreOpen(this.moreOpen);
   }
 
   get isOpen(): boolean {
@@ -255,17 +228,12 @@ export class Briefing {
     this.diveSlot = el('div', 'briefing-dive-slot');
     this.renderDiveSettings();
     const go = el('div', 'briefing-go');
-    this.moreToggle = el('button', 'briefing-more-toggle', 'More options');
-    this.moreToggle.type = 'button';
-    this.moreToggle.hidden = !this.dive;
-    this.moreToggle.addEventListener('click', () => this.setMoreOpen(!this.moreOpen));
     const begin = el('button', 'briefing-begin', 'Begin dive');
     begin.type = 'button';
     begin.addEventListener('click', () => this.begin());
-    go.append(this.moreToggle, el('span', 'briefing-hint', 'OR PRESS ENTER'), begin);
+    go.append(el('span', 'briefing-hint', 'OR PRESS ENTER'), begin);
     foot.append(this.diveSlot, go);
     p.append(foot);
-    this.setMoreOpen(this.moreOpen);
 
     this.open_ = true;
     this.root.hidden = false;
@@ -279,13 +247,18 @@ export class Briefing {
     const focusedKey = (document.activeElement as HTMLElement | null)?.dataset?.diveKey;
     this.modeSelector?.dispose();
     this.modeSelector = null;
-    this.moreControls.clear();
     const section = el('section', 'briefing-dive');
     section.setAttribute('aria-label', 'Dive settings');
     section.append(el('h2', 'briefing-section-title', 'DIVE SETTINGS'));
     const row = el('div', 'briefing-dive-row');
     if (this.dive) {
-      this.modeSelector = new ModeSelector('is-briefing', this.dive.settings, 'Mode');
+      this.modeSelector = new ModeSelector(
+        'is-briefing',
+        this.dive.settings,
+        'Mode',
+        ['startPosition'],
+        this.dive.choices,
+      );
       row.append(this.modeSelector.root);
     }
     const start = el('div', 'briefing-start');
@@ -313,63 +286,8 @@ export class Briefing {
     row.append(start);
     section.append(row);
 
-    const more = el('div', 'briefing-more');
-    more.id = `briefing-more-${this.uid}`;
-    this.morePanel = more;
-    if (this.dive) {
-      const gameplay = this.dive.settings.get().gameplay;
-      for (const { key, label, kind } of BRIEFING_MORE_OPTIONS) {
-        const choices = this.dive.choices[key] as readonly (string | number | boolean)[];
-        const field = el(kind === 'toggle' ? 'label' : 'div', `briefing-more-field is-${kind}`);
-        let control: HTMLInputElement | HTMLSelectElement;
-        if (kind === 'toggle') {
-          const box = el('input');
-          box.type = 'checkbox';
-          box.checked = Boolean(gameplay[key]);
-          box.addEventListener('change', () =>
-            this.dive?.settings.setGameplayOption(key, box.checked as never),
-          );
-          control = box;
-          field.append(box, el('span', undefined, label));
-        } else {
-          const sel = el('select');
-          for (const choice of choices) {
-            const o = el('option', undefined, gameplayValueLabel(key, choice));
-            o.value = String(choice);
-            sel.append(o);
-          }
-          sel.value = String(gameplay[key]);
-          sel.addEventListener('change', () =>
-            this.dive?.settings.setGameplayOption(
-              key,
-              parseGameplayValue(choices, sel.value) as never,
-            ),
-          );
-          control = sel;
-          sel.id = `briefing-${this.uid}-${key}`;
-          const name = el('label', undefined, label);
-          name.htmlFor = sel.id;
-          field.append(name, sel);
-        }
-        control.dataset.gameplay = key;
-        control.dataset.diveKey = key;
-        this.moreControls.set(key, control);
-        more.append(field);
-      }
-    }
-    section.append(more);
     slot.replaceChildren(section);
     if (focusedKey) slot.querySelector<HTMLElement>(`[data-dive-key="${focusedKey}"]`)?.focus();
-  }
-
-  private setMoreOpen(open: boolean): void {
-    this.moreOpen = open && this.dive !== null;
-    if (this.morePanel) this.morePanel.hidden = !this.moreOpen;
-    if (this.moreToggle) {
-      this.moreToggle.setAttribute('aria-expanded', String(this.moreOpen));
-      if (this.morePanel) this.moreToggle.setAttribute('aria-controls', this.morePanel.id);
-      this.moreToggle.textContent = this.moreOpen ? 'Fewer options' : 'More options';
-    }
   }
 
   /** Repaint the Dive settings from the saved values (a preset, Settings, or this card). */
@@ -377,10 +295,6 @@ export class Briefing {
     if (!this.dive) return;
     const gameplay = this.dive.settings.get().gameplay;
     for (const input of this.startInputs) input.checked = input.value === gameplay.startPosition;
-    for (const [key, control] of this.moreControls) {
-      if (control instanceof HTMLInputElement) control.checked = Boolean(gameplay[key]);
-      else control.value = String(gameplay[key]);
-    }
     if (gameplay.startPosition !== this.choice) {
       this.choice = gameplay.startPosition;
       if (this.open_) this.dive.onStartChange?.(this.choice);

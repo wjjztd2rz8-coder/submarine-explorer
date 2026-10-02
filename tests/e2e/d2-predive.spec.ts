@@ -84,9 +84,7 @@ test('home screen shows the game mode and changes it', async ({ page }) => {
   await page.screenshot({ path: `${shots}/home-mode-1920.png` });
 });
 
-test('briefing Dive settings: mode, start and More options persist to settings', async ({
-  page,
-}) => {
+test('briefing Dive settings: mode, start and Advanced persist to settings', async ({ page }) => {
   await mkdir(shots, { recursive: true });
   await boot(page, '/?mission=titanic');
   const briefing = page.locator('.briefing');
@@ -97,8 +95,8 @@ test('briefing Dive settings: mode, start and More options persist to settings',
   await expect(dive.locator('.briefing-start input[value="near-site"]')).toBeChecked();
   // One start choice only: the old footer radiogroup merged into Dive settings.
   await expect(briefing.locator('input[value="near-site"]')).toHaveCount(1);
-  const more = dive.locator('.briefing-more');
-  const toggle = briefing.getByRole('button', { name: 'More options' });
+  const more = dive.locator('.mode-advanced');
+  const toggle = briefing.getByRole('button', { name: 'Advanced' });
   await expect(more).toBeHidden();
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(briefing.locator('.briefing-begin')).toBeInViewport();
@@ -110,7 +108,7 @@ test('briefing Dive settings: mode, start and More options persist to settings',
   await page.keyboard.press('Enter');
   await expect(more).toBeVisible();
   await expect(briefing).toBeVisible();
-  await expect(briefing.getByRole('button', { name: 'Fewer options' })).toHaveAttribute(
+  await expect(briefing.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
     'aria-expanded',
     'true',
   );
@@ -127,27 +125,27 @@ test('briefing Dive settings: mode, start and More options persist to settings',
   await page.screenshot({ path: `${shots}/briefing-expanded.png` });
 
   // Mouse: an option edit persists and flips the mode to Custom.
-  await more.getByLabel('Sonar markers', { exact: true }).uncheck();
-  await expect(dive.getByRole('radio', { name: 'Custom' })).toBeChecked();
+  await more.getByLabel('Sonar markers', { exact: true }).selectOption('false');
+  await expect(dive.locator('.mode-custom-tag')).toBeVisible();
   let s = await saved(page);
   expect(s.gameplayMode).toBe('custom');
   expect(s.gameplay.sonarMarkers).toBe(false);
   expect(s.gameplay.visualHints).toBe(true);
-  await more.getByLabel('Currents', { exact: true }).selectOption('gentle');
-  expect((await saved(page)).gameplay.currents).toBe('gentle');
+  await more.getByLabel('Currents', { exact: true }).selectOption('exaggerated');
+  expect((await saved(page)).gameplay.currents).toBe('exaggerated');
 
   // Keyboard: arrows on the mode radios apply a preset; options re-sync.
-  await dive.getByRole('radio', { name: 'Custom' }).focus();
-  await page.keyboard.press('ArrowLeft');
+  await dive.getByRole('radio', { name: 'Arcade' }).focus();
+  await page.keyboard.press('ArrowRight');
   await expect(dive.getByRole('radio', { name: 'Realistic' })).toBeChecked();
   await expect(briefing).toBeVisible();
   s = await saved(page);
   expect(s.gameplayMode).toBe('realistic');
-  await expect(more.getByLabel('Visual waypoints', { exact: true })).not.toBeChecked();
-  await expect(more.getByLabel('Battery and oxygen', { exact: true })).toBeChecked();
+  await expect(more.getByLabel('Visual waypoints', { exact: true })).toHaveValue('false');
+  await expect(more.getByLabel('Battery and oxygen', { exact: true })).toHaveValue('true');
   await expect(more.getByLabel('Forward speed', { exact: true })).toHaveValue('research');
   await dive.getByRole('radio', { name: 'Arcade' }).click();
-  await expect(more.getByLabel('Sonar markers', { exact: true })).toBeChecked();
+  await expect(more.getByLabel('Sonar markers', { exact: true })).toHaveValue('true');
   await expect(more.getByLabel('Forward speed', { exact: true })).toHaveValue('fast');
 
   // Focus stays in the card; axe is clean.
@@ -157,10 +155,9 @@ test('briefing Dive settings: mode, start and More options persist to settings',
   expect(axe.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
 
   // Reload: the choices persisted and the briefing shows them.
-  await dive.getByRole('radio', { name: 'Custom' }).click();
-  await more.getByLabel('Visual waypoints', { exact: true }).uncheck();
+  await more.getByLabel('Visual waypoints', { exact: true }).selectOption('false');
   await boot(page, '/?mission=titanic');
-  await expect(page.locator('.briefing-dive').getByRole('radio', { name: 'Custom' })).toBeChecked();
+  await expect(page.locator('.briefing-dive').locator('.mode-custom-tag')).toBeVisible();
   expect((await saved(page)).gameplay.visualHints).toBe(false);
 });
 
@@ -214,6 +211,7 @@ test('Settings: mode on top of Gameplay, separate waypoint toggles, hull warning
   await expect(gameplay.getByRole('radio', { name: 'Arcade' })).toBeChecked();
   await expect(gameplay.locator('.mode-desc')).toContainText('Fast travel');
 
+  await gameplay.getByRole('button', { name: 'Advanced' }).click();
   // Two separate waypoint settings, each with its own one-line description.
   for (const [label, words] of [
     ['Visual waypoints', 'dive view'],
@@ -226,7 +224,7 @@ test('Settings: mode on top of Gameplay, separate waypoint toggles, hull warning
     await expect(page.locator(`[id="${noteId}"]`)).toContainText(words);
   }
   await gameplay.getByLabel('Sonar markers', { exact: true }).selectOption('false');
-  await expect(gameplay.getByRole('radio', { name: 'Custom' })).toBeChecked();
+  await expect(gameplay.locator('.mode-custom-tag')).toBeVisible();
   let s = await saved(page);
   expect(s.gameplay.sonarMarkers).toBe(false);
   expect(s.gameplay.visualHints).toBe(true);

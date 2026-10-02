@@ -27,7 +27,7 @@ export interface GameplayOptions {
   sonarMarkers: boolean;
   startPosition: 'near-site' | 'surface';
   batteryOxygen: boolean;
-  currents: 'off' | 'gentle' | 'realistic';
+  currents: 'off' | 'gentle' | 'realistic' | 'exaggerated';
   descentProfile: 'research' | 'standard' | 'fast';
   simSpeed: 1 | 2 | 3;
 }

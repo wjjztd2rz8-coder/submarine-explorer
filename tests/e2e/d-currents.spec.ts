@@ -7,6 +7,8 @@ const shots = '.cache/codex/shots/d-currents';
 async function openSettings(page: Page): Promise<void> {
   await page.keyboard.press('Escape');
   await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
+  const advanced = page.locator('.settings .mode-advanced-toggle');
+  if ((await advanced.getAttribute('aria-expanded')) === 'false') await advanced.click();
 }
 
 async function closeSettings(page: Page): Promise<void> {
@@ -24,6 +26,7 @@ async function speed(page: Page): Promise<number> {
 
 test('off, gentle and realistic scale the same offline canyon field', async ({ page }) => {
   await mkdir(shots, { recursive: true });
+  await mkdir('.cache/codex/shots/f2-modes', { recursive: true });
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/?tile=monterey-canyon&preset=canyon', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true);
@@ -49,11 +52,19 @@ test('off, gentle and realistic scale the same offline canyon field', async ({ p
   await page.screenshot({ path: `${shots}/realistic.png` });
 
   await openSettings(page);
-  await dialog.getByLabel('Currents').selectOption('gentle');
-  await expect(dialog.getByRole('radio', { name: 'Custom' })).toBeChecked();
+  await page.evaluate(() =>
+    (
+      window.__game as { save: { setGameplayOption(key: string, value: string): void } }
+    ).save.setGameplayOption('currents', 'gentle'),
+  );
+  await expect(dialog.locator('.mode-custom-tag')).toBeVisible();
   await expect.poll(async () => (await speed(page)) / full).toBeCloseTo(0.35, 1);
   const gentle = await speed(page);
   expect(gentle).toBeGreaterThan(0);
+  await dialog.getByLabel('Currents').selectOption('exaggerated');
+  await expect.poll(async () => (await speed(page)) / full).toBeCloseTo(8, 1);
+  await dialog.getByLabel('Currents').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: '.cache/codex/shots/f2-modes/exaggerated-currents.png' });
   await dialog.getByLabel('Currents').selectOption('off');
   expect(await speed(page)).toBe(0);
   await closeSettings(page);
