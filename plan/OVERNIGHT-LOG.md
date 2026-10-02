@@ -110,3 +110,11 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - 2026-10-02 15:45 CDT headless run: skipped: budget gate (claude error: HTTP Error 429: Too Many Requests codex 5h 100.0% left (resets Fri Oct 02 12:20) | 7d 24.0% left (resets Tue Oct 06 16:29) [as of 471 min ago] )
 - 2026-10-02 16:15 CDT headless run: skipped: budget gate (claude error: HTTP Error 429: Too Many Requests codex 5h 100.0% left (resets Fri Oct 02 12:20) | 7d 24.0% left (resets Tue Oct 06 16:29) [as of 501 min ago] )
 - 2026-10-02 16:45 CDT headless run: skipped: budget gate (claude error: HTTP Error 429: Too Many Requests codex 5h 100.0% left (resets Fri Oct 02 12:20) | 7d 24.0% left (resets Tue Oct 06 16:29) [as of 531 min ago] )
+
+## 2026-10-02 17:50 headless run
+
+- Merged (main gates green, pushed, tagged `f5`): F-HERO-BLUEHOLE (carved sinkhole, pale sand, depth shade, composed opening; Sonnet), F-HERO-MONTEREY (face-on bedded wall, ambient fill; Sonnet, I fixed an e2e typing error and a Spawn.ts/CHANGELOG merge conflict), F-BUGHUNT-FIXES (Codex: touch photo exit, Arcade near-primary start, save recovery, life disposal).
+- All five hero sites now have a polish pass. Blue Hole gaps: grotto prop looks tiny against the hole, no halocline haze, low-tier hole interior dark.
+- Queued for Codex: 50-f-hero-verify, 60-f-bughunt-4, 70-f-perf-budget (f-bughunt-3 already running).
+- Problem: the remote CI run for 800f96c failed after 54 min (a Pages deploy succeeded); worth checking CI timeouts (see CI-TIMEOUTS note). No Claude agents spawned this run; Claude 5h ended ~75%.
+- Still needs owner: brand name OK (Bathyline recommended).
