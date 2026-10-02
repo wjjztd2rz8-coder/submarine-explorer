@@ -12,6 +12,8 @@
  * every system has initialised, as before F0).
  */
 
+import type { DailySave } from '../game/DailySave.js';
+import type { DailyDive } from '../game/Daily.js';
 import type { Progress } from '../game/Progress.js';
 import type { Upgrades } from '../ui/Upgrades.js';
 import type * as THREE from 'three';
@@ -64,6 +66,8 @@ import type { Terrain } from '../world/Terrain.js';
 export type AppState = 'home' | 'dive' | 'pause';
 
 export interface BootContext {
+  daily: DailyDive | null;
+  dailySave: DailySave;
   params: URLSearchParams;
   config: GameConfig;
   bus: EventBus;

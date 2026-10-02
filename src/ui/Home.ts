@@ -14,8 +14,9 @@ export class Home {
   readonly globeSlot: HTMLDivElement;
   readonly sitesSlot: HTMLDivElement;
   readonly continueButton: HTMLButtonElement;
-  /** D2-PREDIVE: the Arcade / Realistic / Custom selector above the menu (with a settings source). */
+  /** D2-PREDIVE: the Arcade / Realistic selector with Advanced above the menu (with a settings source). */
   readonly modeSelector: ModeSelector | null;
+  private readonly dailyCard: HTMLButtonElement;
   private readonly diveSitesButton: HTMLButtonElement;
   private readonly menu: HTMLElement;
   private readonly sites: HTMLElement;
@@ -60,6 +61,11 @@ export class Home {
       menu.append(button);
       return button;
     };
+    this.dailyCard = document.createElement('button');
+    this.dailyCard.type = 'button';
+    this.dailyCard.className = 'daily-card';
+    this.dailyCard.hidden = true;
+    menu.append(this.dailyCard);
     this.continueButton = entry('Continue', actions.continueDive);
     this.continueButton.disabled = true;
     this.diveSitesButton = entry('Dive sites', () => this.showSites(false));
@@ -122,6 +128,26 @@ export class Home {
   setContinue(missionId: string | null): void {
     this.continueButton.disabled = !missionId;
     this.continueButton.title = missionId ? `Continue ${missionId}` : 'Start a mission to continue';
+  }
+
+  setDaily(site: string, modifier: string, best: number, streak: number, launch: () => void): void {
+    this.dailyCard.hidden = false;
+    this.dailyCard.replaceChildren();
+    const title = document.createElement('span');
+    title.className = 'daily-card-title';
+    title.textContent = 'Daily dive';
+    const details = document.createElement('span');
+    details.className = 'daily-card-details';
+    details.textContent = `${site} · ${modifier}`;
+    const stars = document.createElement('span');
+    stars.className = 'daily-card-stars';
+    stars.textContent = `${'★'.repeat(best)}${'☆'.repeat(3 - best)}${streak ? ` · ${streak} day streak` : ''}`;
+    stars.setAttribute(
+      'aria-label',
+      `Best today: ${best} of 3 stars${streak ? ` · ${streak} day streak` : ''}`,
+    );
+    this.dailyCard.append(title, details, stars);
+    this.dailyCard.onclick = launch;
   }
 
   showSites(freeDive: boolean): void {

@@ -9,6 +9,7 @@
  * earlier only when another system reads its `ctx` field during `init`.
  */
 
+import { createDailySystem } from './systems/daily.js';
 import { createProgressSystem } from './systems/progress.js';
 import { inputGateSystem } from './loop.js';
 import type { GameSystem } from './System.js';
@@ -77,6 +78,7 @@ export function createSystems(): GameSystem[] {
     settingsSystem,
     sonarControlsSystem,
     missionSystem,
+    createDailySystem(),
     journalSystem,
     createPhotoSystem(),
     // `app:state` listener order: journal, audio, then the initial `dive`

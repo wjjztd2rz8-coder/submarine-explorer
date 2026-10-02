@@ -6,12 +6,15 @@
  * sub already sits where the dive will start.
  */
 
+import { dailyRatingKey } from '../../game/Daily.js';
 import type { Input } from '../../core/Input.js';
 import {
   MissionRouter,
   missionStartPose,
   type MissionStartPosition,
 } from '../../game/MissionRouter.js';
+import { spawnHeight, spawnSettings } from '../../game/Spawn.js';
+import { tileUrl } from '../../ui/MissionSelect.js';
 import type { GameSystem } from '../System.js';
 
 export const missionSystem: GameSystem = {
@@ -24,6 +27,13 @@ export const missionSystem: GameSystem = {
     const applyMissionStart = (choice: MissionStartPosition): void => {
       if (!route || params.has('poi') || params.has('at') || params.has('depth')) return;
       const pose = missionStartPose(route.def, choice, discovery.pois, meta, terrain, config);
+      if (ctx.daily) {
+        pose.x += ctx.daily.start.x;
+        pose.z += ctx.daily.start.z;
+        // Keep the small approach variation above the local seabed.
+        pose.y = spawnHeight(terrain.sampleHeight(pose.x, pose.z), -pose.y, spawnSettings(config));
+        pose.yaw = (ctx.daily.start.headingDeg * Math.PI) / 180;
+      }
       sub.reset(pose.x, pose.y, pose.z, pose.yaw);
       rig.snap(sub.position, sub.yaw, sub.pitch);
       headlights.setEnabled(true);
@@ -32,12 +42,20 @@ export const missionSystem: GameSystem = {
     const missionRouter = route
       ? new MissionRouter({
           route,
-          rating: () =>
-            ctx.progress.finish(
-              route.missionId,
+          rating: () => {
+            const rating = ctx.progress.finish(
+              ctx.daily ? dailyRatingKey(ctx.daily) : route.missionId,
               ctx.missionRouter!.mission.objectives,
               ctx.missionRouter!.mission.endReason === 'abort',
-            ),
+            );
+            if (
+              ctx.daily &&
+              rating.stars > 0 &&
+              ctx.daily.date === new Date().toISOString().slice(0, 10)
+            )
+              ctx.dailySave.complete(ctx.daily.date);
+            return rating;
+          },
           bus,
           config,
           meta,
@@ -87,6 +105,16 @@ export const missionSystem: GameSystem = {
         onStartChange: previewStart,
       });
       previewStart(briefing.startChoice);
+    }
+    if (briefing && route) {
+      const free = document.createElement('button');
+      free.type = 'button';
+      free.className = 'briefing-free-dive';
+      free.textContent = 'Free dive';
+      free.addEventListener('click', () => {
+        window.location.href = tileUrl(ctx.shellBaseHref(), route.tileId);
+      });
+      briefing.root.querySelector('.briefing-go')?.prepend(free);
     }
     ctx.expose({ mission: missionRouter?.mission ?? null, missionRouter });
   },

@@ -12,6 +12,7 @@ async function waitForPreset(page: Page): Promise<void> {
 async function enableCurrents(page: Page): Promise<void> {
   await page.keyboard.press('Escape');
   await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
+  await page.locator('.settings .mode-advanced-toggle').click();
   await page
     .getByRole('dialog', { name: 'Settings' })
     .getByLabel('Currents')

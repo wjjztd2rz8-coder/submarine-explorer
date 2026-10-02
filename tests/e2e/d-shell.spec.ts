@@ -59,7 +59,21 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await page.setViewportSize({ width: 1280, height: 720 });
   await boot(page, '/');
   await expect(page.locator('.home-screen')).toBeVisible();
-  await expect(page.locator('.home-menu button')).toHaveCount(7);
+  // Keep every existing menu action; Daily dive and Advanced add two buttons.
+  const existingActions = page.locator('.home-menu > button:not(.daily-card)');
+  await expect(existingActions).toHaveCount(7);
+  await expect(existingActions).toHaveText([
+    'Continue',
+    'Dive sites',
+    'Free dive',
+    'Journal',
+    'Settings',
+    'Controls',
+    'Upgrades',
+  ]);
+  await expect(page.locator('.home-menu .daily-card')).toHaveCount(1);
+  await expect(page.locator('.home-menu .mode-advanced-toggle')).toHaveCount(1);
+  await expect(page.locator('.home-menu button')).toHaveCount(9);
   await expect(page.getByRole('button', { name: 'Continue' })).toBeDisabled();
   await page.waitForFunction(
     () =>

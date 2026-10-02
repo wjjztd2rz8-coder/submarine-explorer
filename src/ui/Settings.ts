@@ -24,7 +24,6 @@
 
 import type {
   GameConfig,
-  GameplayOptions,
   GraphicsTier,
   GraphicsTierSetting,
   SonarPaletteName,
@@ -32,7 +31,7 @@ import type {
 import { keyLabel, type ActionBinding, type ActionId } from '../core/Input.js';
 import type { Save, SettingsData, SettingsValues } from '../core/Save.js';
 import { FocusTrap } from './FocusTrap.js';
-import { ModeSelector, gameplayValueLabel, parseGameplayValue } from './ModeSelector.js';
+import { ModeSelector } from './ModeSelector.js';
 
 export const UI_SCALE_MIN = 80;
 export const UI_SCALE_MAX = 150;
@@ -54,50 +53,12 @@ export function stepUiScale(value: number, dir: -1 | 1): number {
   return clampUiScale(next);
 }
 
-/** Settings > Gameplay labels. */
-export const GAMEPLAY_LABELS: Record<keyof GameplayOptions, string> = {
-  speedProfile: 'Forward speed',
-  lights: 'Lights',
-  sensors: 'Sensors',
-  visualHints: 'Visual waypoints',
-  sonarMarkers: 'Sonar markers',
-  startPosition: 'Start position',
-  batteryOxygen: 'Battery and oxygen',
-  currents: 'Currents',
-  descentProfile: 'Descent speed',
-  simSpeed: 'Simulation speed',
-};
-
-/** Settings > Gameplay order: pairs side by side (speeds, aids, hazards). */
-export const GAMEPLAY_ORDER: ReadonlyArray<keyof GameplayOptions> = [
-  'speedProfile',
-  'descentProfile',
-  'lights',
-  'sensors',
-  'visualHints',
-  'sonarMarkers',
-  'batteryOxygen',
-  'currents',
-  'startPosition',
-  'simSpeed',
-];
-
-/** The configured gameplay options in display order; unknown extras go last. */
-export function gameplayKeysInOrder(options: object): Array<keyof GameplayOptions> {
-  const keys = Object.keys(options) as Array<keyof GameplayOptions>;
-  return [
-    ...GAMEPLAY_ORDER.filter((k) => keys.includes(k)),
-    ...keys.filter((k) => !GAMEPLAY_ORDER.includes(k)),
-  ];
-}
-
-/** One-line descriptions under some Gameplay options. */
-export const GAMEPLAY_NOTES: Partial<Record<keyof GameplayOptions, string>> = {
-  speedProfile: 'Research is about 1 m/s, like Alvin. Fast is a game speed for any hull.',
-  descentProfile: "Research is about 0.5 m/s, like Alvin's descent. Fast is a game speed.",
-  visualHints: 'Marker, edge arrow and in-range cue for objectives in the dive view.',
-  sonarMarkers: 'Objective and discovery icons on the sonar map. The seabed always shows.',
-};
+export {
+  GAMEPLAY_LABELS,
+  GAMEPLAY_ORDER,
+  GAMEPLAY_NOTES,
+  gameplayKeysInOrder,
+} from '../core/config/modes.js';
 
 /** Keys the dialog itself needs; never offered as a binding. */
 export const RESERVED_KEYS: readonly string[] = ['Escape', 'Tab'];
@@ -209,10 +170,6 @@ export class SettingsScreen {
   private readonly backButton: HTMLButtonElement;
   private readonly trap: FocusTrap;
   private readonly controls = new Map<keyof SettingsValues, HTMLInputElement | HTMLSelectElement>();
-  private readonly gameplayControls = new Map<
-    keyof GameplayOptions,
-    HTMLInputElement | HTMLSelectElement
-  >();
   private readonly detailOut: HTMLOutputElement;
   private readonly modeSelector: ModeSelector;
   private uiScaleOut: HTMLOutputElement | null = null;
@@ -284,25 +241,16 @@ export class SettingsScreen {
     const gameplay = this.section(`${id}-gameplay`, 'Gameplay');
     // D2-PREDIVE: the mode is a segmented control at the top of Gameplay,
     // the same control as on the home screen and in the briefing.
-    this.modeSelector = new ModeSelector('is-settings', opts.save);
+    this.modeSelector = new ModeSelector(
+      'is-settings',
+      opts.save,
+      'Game mode',
+      [],
+      cfg.settings.gameplayOptions,
+    );
     const modeRow = el('div', 'settings-row settings-mode-row');
     modeRow.append(this.modeSelector.root);
     gameplay.append(modeRow);
-    for (const key of gameplayKeysInOrder(cfg.settings.gameplayOptions)) {
-      const choices = cfg.settings.gameplayOptions[key] as readonly (string | number | boolean)[];
-      const input = el('select');
-      input.dataset.gameplay = key;
-      for (const choice of choices) {
-        const option = el('option', undefined, gameplayValueLabel(key, choice));
-        option.value = String(choice);
-        input.append(option);
-      }
-      input.addEventListener('change', () => {
-        opts.save.setGameplayOption(key, parseGameplayValue(choices, input.value) as never);
-      });
-      this.gameplayControls.set(key, input);
-      gameplay.append(this.field(GAMEPLAY_LABELS[key], input, GAMEPLAY_NOTES[key]));
-    }
     // --- D-MODES end ---
 
     const access = this.section(`${id}-a11y`, 'Accessibility');
@@ -685,7 +633,6 @@ export class SettingsScreen {
         c.setAttribute('aria-valuetext', Number(v).toFixed(2));
       }
     }
-    for (const [key, control] of this.gameplayControls) control.value = String(s.gameplay[key]);
     const pending =
       (!this.opts.tierFromUrl &&
         s.graphicsTier !== (this.opts.activeTierSetting ?? this.opts.activeTier)) ||

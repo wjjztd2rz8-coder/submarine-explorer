@@ -14,6 +14,7 @@
  * (`lowTierCurrents`).
  */
 
+import { currentScale } from '../../core/config/modes.js';
 import * as THREE from 'three';
 import type {
   EnvPresetName,
@@ -473,9 +474,12 @@ export class PresetSystem {
     const pc = this.o.config.presets;
     const c = this.current.copy(this.frame.current);
     if (this.currentMode === 'off' || this.o.currents.status !== 'ready') c.set(0, 0, 0);
-    else if (this.currentMode === 'gentle') c.multiplyScalar(this.o.config.currents.gentleScale);
+    else c.multiplyScalar(currentScale(this.currentMode, this.o.config.currents));
     if (!this.visuals && !pc.lowTierCurrents) c.set(0, 0, 0);
-    capVector(c, pc.maxCurrentMps);
+    capVector(
+      c,
+      pc.maxCurrentMps * Math.max(1, currentScale(this.currentMode, this.o.config.currents)),
+    );
     if (simDt > 0) {
       currentCouplingDelta(this.o.sub.velocity, c, pc.currentCouplingPerS, simDt, this.delta);
       const guard = this.o.config.currents;

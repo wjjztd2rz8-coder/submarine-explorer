@@ -7,6 +7,7 @@
  * the ROV (when deployed) or the sub.
  */
 
+import { currentScale } from '../../core/config/modes.js';
 import * as THREE from 'three';
 import { Rov } from '../../rov/Rov.js';
 import { RovVisual } from '../../rov/RovVisual.js';
@@ -79,17 +80,15 @@ export function createRovSystem(): GameSystem {
             rig.snap(rov.position, rov.yaw, 0);
           }
         }
-        const currentMode = save.get().gameplay.currents;
+        const currentMode = ctx.daily
+          ? ctx.daily.modifier === 'strong-currents'
+            ? 'exaggerated'
+            : 'off'
+          : save.get().gameplay.currents;
         for (let i = 0; i < steps; i++) {
           if (rov.deployed) {
             currents.sample(rov.position.x, rov.position.z, rovCurrent);
-            rovCurrent.multiplyScalar(
-              currentMode === 'off'
-                ? 0
-                : currentMode === 'gentle'
-                  ? config.currents.gentleScale
-                  : 1,
-            );
+            rovCurrent.multiplyScalar(currentScale(currentMode, config.currents));
             rov.step(f.fixedDt * sub.simSpeed, state, sub.position, rovCurrent);
             if (!rov.deployed) {
               rig.chaseRadius = savedChaseRadius;

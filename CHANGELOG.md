@@ -14,6 +14,11 @@ without an entry here is not done.
 
 ### Removed
 
+- Phase F, F2-MODES: retired Gentle from new current choices to keep Off,
+  Realistic and Exaggerated clear. Existing Gentle saves still load and run.
+  Merged the briefing's separate More options panel into the shared Advanced
+  panel so home, briefing and Settings expose the same choices.
+
 - Phase F, F-CONTENT-FIX: cut the enclosed Blue Hole shaft/chemocline promise and
   post-2022 Hunga ash/collapse staging from the current art brief because the
   shipped routes show outer atoll slopes and the earlier volcanic landscape.
@@ -22,6 +27,13 @@ without an entry here is not done.
   observation and photography survey.
 
 ### Added
+
+- Phase F, F2-MODES: a Daily dive card with a UTC-seeded unlocked site, a varied
+  approach and survey goals, Calm water / Strong currents / Low light conditions,
+  best stars today and a completion streak. Daily ratings use the existing
+  progress save; streaks use `subexplorer.daily.v1`. Exaggerated currents amplify
+  the existing ocean field for the sub and ROV. Mission briefings now also offer
+  Free dive, opening the existing sandbox without mission objectives.
 
 - Phase F, F3-ONBOARD: a short first-dive tutorial (move and turn, rise and sink,
   headlights, scan a target, photo or Journal). Each step advances when you do
@@ -162,6 +174,15 @@ without an entry here is not done.
 - Phase F, F0-CORE: **Auto** and **Ultra** entries in Settings → Graphics tier.
 
 ### Changed
+
+- Phase F, F2-MODES follow-up: fixed a CSS cascade conflict that kept Advanced
+  options visible when collapsed on home, briefing and Settings screens.
+
+- Phase F, F2-MODES: Custom moves out of the three-way mode control into a
+  collapsed Advanced disclosure. Arcade remains the default; Realistic is the
+  other segment. Editing an advanced option shows a small Custom tag, and
+  selecting either preset restores every option. Existing Custom saves keep
+  their settings. New controls use 44 px touch targets and native keyboard input.
 
 - Phase F, F-CONTENT-FIX: Lost City now releases clear-flow shimmer, with smoke
   and warm glow disabled. Poseidon's composite footprint follows the published
