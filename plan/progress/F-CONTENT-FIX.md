@@ -1,6 +1,6 @@
 # F-CONTENT-FIX
 
-Completed content review on 2026-10-01. Read the owner’s Phase F plan, architecture’s Phase F structure, and the full F-VISUAL-QA report. This package changes data and text only; no renderer, shader, geometry, terrain, or species-occurrence data changed. No commit made.
+Completed content review on 2026-10-01. Read the owner’s Phase F plan, architecture’s Phase F structure, and the full F-VISUAL-QA report. This package changes data and text only; no renderer, shader, geometry, terrain, or species-occurrence data changed. No commits were created by this agent. When the task resumed after the usage-floor interruption, the content changes were already contained in commit `4729499`; that existing commit was left untouched. This validation follow-up remains uncommitted.
 
 ## Review input
 
@@ -55,11 +55,22 @@ These player-visible changes and cuts are recorded in `CHANGELOG.md`. Superseded
 
 - `python3 tools/validate_landmark.py --all --strict`: all 13 sites, zero errors/warnings.
 - Focused normal-suite `f-content-fix.spec.ts`: 8 passed; six sourced Journal views plus clear-flow mission/free-dive screenshots and Hunga support assertions.
-- Full gates: build, 680 unit tests, 121 Python tests, content, attribution, formatting, and the project-base test passed. Main e2e: **167 passed, 4 failed, 14 expected skips** (13 opt-in visual-QA captures and the base-only case). The failing cases are two F2-LIFE target-selection checks and two existing mission movement/timing thresholds. After the last naming/unit/source edits, `tools/gates.sh --no-e2e` passed all six gates again; a fresh build and focused browser repeat follow below.
+- Full normal gates were run again after resuming: **PASS** build, 680 unit tests, 121 Python tests, strict content, attribution, formatting, and the project-base test. Main e2e: **167 passed, 4 failed, 14 expected skips** in 32.7 minutes (the skips are 13 opt-in visual-QA captures and the base-only case). All eight content-package cases passed and refreshed the screenshots. The four reproduced failures are in unchanged F2-LIFE and mission tests; details are below. Logs: `.cache/gates/f-content-resume.log`, `e2e.log`, and `e2e-base.log`. Before resuming, the final-data non-browser rerun also passed all six gates; the interrupted focused repeat had passed all eight content cases.
+- A CI-mode attempt was stopped before completion because the existing generic preset cases expect medium geometry while the CI storage fixture selects low. The completed resumed run used the normal configuration.
 - Prettier run on changed files. Reviewed Journal wrapping and source visibility, plus Lost City’s smoke-free view. No new UI controls; existing touch-operable Journal remains unchanged.
-- Screenshots: `.cache/codex/shots/f-content-fix/*.png`. Full suite also recaptures the existing all-site visual views.
+- Screenshots: `.cache/codex/shots/f-content-fix/*.png`. Review [Lost City mission](../../.cache/codex/shots/f-content-fix/lost-city-mission.png), [Lighthouse Reef Journal](../../.cache/codex/shots/f-content-fix/great-blue-hole-journal.png), [Hunga Journal](../../.cache/codex/shots/f-content-fix/hunga-tonga-caldera-journal.png), and [Beebe Journal](../../.cache/codex/shots/f-content-fix/beebe-vent-field-journal.png). Full suite also recaptures the existing all-site visual views.
 - Initial browser attempt could not write through read-only worktree `node_modules` and screenshot symlinks. Replaced them with local ignored copies and reran successfully. Runtime Hunga sampling differs by ~2.5 m from the offline Float32 grid; the test checks actual runtime support.
+
+## Gate exceptions for the orchestrator
+
+The first full run and interrupted focused repeat exposed failures outside the data changes:
+
+- `tests/e2e/f2-life.spec.ts:108` and `:180`: the intended `life:comb-jelly` / Lobate comb jelly is displaced by `life:nanomia` / Common siphonophore in scanner and photo selection. `park()` resets the submarine but does not clear existing animals, despite its “clear the area” comment. In the resumed run, the scan failed earlier because `spawnNear` returned null. Its downstream `addAgent` still checks pool and per-species capacity even though the debug spawner bypasses table/group budgets. Existing ambient life can therefore prevent injection or compete for subject selection; no life code or spawn table changed here. Preserve the exact subject assertions when repairing the fixture or selection behavior.
+- `tests/e2e/mission.spec.ts:84`: after holding descent for 1.5 wall seconds, the first run moved less than the asserted 1 m (received Y -3778.62885 versus required below -3779). The resumed run also failed: Y -3778.42205 versus required below -3778.99818.
+- `tests/e2e/mission.spec.ts:315`: the first run counted only 1.05 s during a 2 s wall-time interval, below the asserted 1.6 s minimum. The resumed run counted 1.5832 s and also failed the unchanged threshold. The input gate uses `f.dt` for `clockDt`, and `Time.frameDelta` is capped at 0.25 s, so long render frames can undercount the supposedly real-time mission clock. This code was not changed by this package.
+
+No thresholds or assertions in these files were changed. The resumed normal full gate run reproduced all four failures; it exited 1. Content-package checks passed, but the overall project gates remain red until these separate issues are repaired. Bismarck’s physical depth correction likewise remains a terrain/bathymetry handoff rather than a completed scene repair.
 
 ## Deviations
 
-Required out-of-OWNS edits: `CHANGELOG.md`, this progress report, `tests/e2e/f-content-fix.spec.ts`, and the existing Lost City case in `tests/e2e/presets.spec.ts`. The latter now asserts the exact clear-flow draw count and absence of smoke/glow rather than expecting a physically wrong smoke draw. No existing assertion was weakened. The review report was already present unchanged. No implementation code changed.
+Required out-of-OWNS edits: `CHANGELOG.md`, this progress report, `tests/e2e/f-content-fix.spec.ts`, and the existing Lost City case in `tests/e2e/presets.spec.ts`. The latter now asserts the exact clear-flow draw count and absence of smoke/glow rather than expecting a physically wrong smoke draw. The Lost City effect checks explicitly select medium tier, where shimmer geometry exists; every assertion remains unchanged from the content fix. No existing assertion was weakened. The review report was already present unchanged. No implementation code changed.
