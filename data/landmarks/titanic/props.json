@@ -65,6 +65,21 @@
       "note": "Representative scatter between the sections, covering the debris-field and deck-fittings POIs. The two dense debris fields are each 600–800 m long and cover about 5 km² (Wikipedia 'Wreck of the Titanic', 'Debris fields'), and the 2010 survey mapped 15–20 sq mi / 39–52 km² of seafloor (WHOI Oceanus 2012); this 150 m cluster stands in for the debris crossed between the sections. The densest debris is near the stern (Wikipedia citing Ballard 1987, p. 150). Position approximate."
     },
     {
+      "id": "debris-bow",
+      "model": "procedural:debris",
+      "wreck": "titanic-field",
+      "lat": 41.73275,
+      "lon": -49.94632,
+      "snap_to_seabed": true,
+      "heading_deg": 0,
+      "scale": 1,
+      "dimensions_m": [60, 60, 2],
+      "lod_distance_m": 600,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "Small scatter of plating and fittings beside the bow, so the section does not sit on a bare floor. Debris lies all around both sections (Wikipedia 'Wreck of the Titanic', 'Debris fields'); this 60 m cluster, ~45 m east of the bow's centre, is an estimate and its contents are not a survey of particular objects."
+    },
+    {
       "id": "debris-stern",
       "model": "procedural:debris",
       "wreck": "titanic-stern-field",
