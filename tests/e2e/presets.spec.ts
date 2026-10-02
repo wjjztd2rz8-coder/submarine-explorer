@@ -168,7 +168,7 @@ test('Lost City uses clear carbonate flow without smoke or glow in a free dive',
     if (m.type() === 'error') errors.push(m.text());
   });
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto('/?tile=lost-city&at=30.124,-42.1195&depth=780', {
+  await page.goto('/?tile=lost-city&at=30.124,-42.1195&depth=780&tier=medium', {
     waitUntil: 'domcontentloaded',
   });
   await waitForPreset(page);
