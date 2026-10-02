@@ -88,6 +88,10 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
     uRockLo: { value: 1 - Math.cos((config.rockSlopeLoDeg * Math.PI) / 180) },
     uRockHi: { value: 1 - Math.cos((config.rockSlopeHiDeg * Math.PI) / 180) },
     uExaggeration: { value: exaggeration },
+    uDepthShade: {
+      value: new THREE.Vector2(biome.depthShade?.startM ?? 0, biome.depthShade?.endM ?? 0),
+    },
+    uDepthTint: { value: new THREE.Color(biome.depthShade?.tint ?? 0xffffff) },
   };
 
   if (loadable) {

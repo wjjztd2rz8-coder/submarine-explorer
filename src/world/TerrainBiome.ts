@@ -76,6 +76,8 @@ export interface Biome {
   /** Multiplier on the texture pattern contrast and normal-map strength (default 1). */
   contrast?: number;
   detail?: number;
+  /** Darken and blue the albedo of surfaces deeper than `startM` (full at `endM`), whatever the camera depth. */
+  depthShade?: { startM: number; endM: number; tint: number };
   scatter: ScatterSpec[];
 }
 
@@ -255,17 +257,20 @@ export const BIOMES: Record<string, Biome> = {
     a: 'silt',
     b: 'sand',
     c: 'carbonate',
-    colorA: 0x8a8471,
-    colorB: 0x958e77,
-    colorC: 0x7c7664,
-    stain: 0x5f5a3a,
-    stainAmount: 0.15,
+    colorA: 0xe2dfc9,
+    colorB: 0xebe8d3,
+    colorC: 0xbdb496,
+    contrast: 0.55,
+    detail: 0.7,
+    stain: 0x9c946f,
+    stainAmount: 0.12,
     patch: 0.45,
     ripple: 0.6,
     rippleLenM: 0.4,
     rippleDir: 0.2,
     burrow: 0.6,
     rockBias: 0.15,
+    depthShade: { startM: 14, endM: 95, tint: 0x3a6a90 },
     scatter: [
       { kind: 'rubble', density: 3, slopeMaxDeg: 30, on: 'any' },
       { kind: 'boulder', density: 0.8, slopeMaxDeg: 45, on: 'rock' },

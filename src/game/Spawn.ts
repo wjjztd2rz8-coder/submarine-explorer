@@ -37,6 +37,8 @@ const FREE_DIVE_OPENINGS: Record<
     altitude?: number;
     /** Turn the sub this many degrees off the hero so the hull does not hide it (chase view). */
     yawOffset?: number;
+    /** The approach crosses open water (a sinkhole): skip the clear-seabed-line-of-sight raise. */
+    openWater?: boolean;
   }
 > = {
   titanic: { hero: 'bow-hull', bearing: 40, range: 16, altitude: 14, yawOffset: 10 },
@@ -62,7 +64,15 @@ const FREE_DIVE_OPENINGS: Record<
     altitude: 4,
     yawOffset: 10,
   },
-  'great-blue-hole': { hero: 'karst-grotto', bearing: 0, range: 70 },
+  // Over the hole's east side, facing the ledge alcove across the dark water.
+  'great-blue-hole': {
+    hero: 'karst-grotto',
+    bearing: 90,
+    range: 235,
+    fromCentre: true,
+    altitude: 12,
+    openWater: true,
+  },
   bismarck: { hero: 'main-hull', bearing: 50, range: 110 },
   'hunga-tonga-caldera': { hero: 'caldera-tuff-wall', bearing: 0, range: 100 },
   'blake-plateau-corals': { hero: 'lophelia-mound', bearing: 45, range: 75 },
@@ -127,7 +137,7 @@ export function composedFreeDiveSpawn(
     if (p.x < nw.x || p.x > se.x || p.z < nw.z || p.z > se.z) continue;
     let floor = seabed.sampleHeight(p.x, p.z);
     // A clear line into the landscape matters as much as a safe initial hull.
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= (opening.openWater ? 0 : 8); i++) {
       const t = i / 10;
       floor = Math.max(
         floor,

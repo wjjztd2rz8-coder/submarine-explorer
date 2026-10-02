@@ -14,6 +14,14 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-HERO-BLUEHOLE: the Great Blue Hole free dive now opens over the hole
+  itself. The sinkhole (about 320 m across, 125 m deep, a ledge near 40 m) is carved
+  into the terrain at its reported position because the survey grid cannot resolve it
+  (tagged reconstruction in the grotto prop's Journal note). The seabed is pale
+  sand rather than brown, deep surfaces darken to blue, light shafts reach deeper,
+  the stalactite alcove sits on the ledge as a larger, lighter limestone overhang
+  (no longer a dark curtain), and the blue tang and grunt schools are smaller and
+  brighter.
 - Phase F, F-ARCADE-ACCESS: Arcade opens every site immediately and automatically
   fits its depth-rated hull and matching vehicle. Near-site Arcade missions use
   the existing authored hero approaches, so a fresh Titanic dive begins beside

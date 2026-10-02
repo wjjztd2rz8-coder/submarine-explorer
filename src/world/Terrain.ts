@@ -22,6 +22,7 @@
  * increases with +Z and grid column index increases with +X -- no flips needed.
  */
 
+import { terrainCarveFor, type TerrainCarve } from './terrainFeatures.js';
 import * as THREE from 'three';
 import type { GraphicsTier, TerrainConfig } from '../core/Config.js';
 import type { Tile, TileMeta } from '../util/types.js';
@@ -96,6 +97,8 @@ export class Terrain {
   readonly widthM: number;
   readonly depthM: number;
 
+  /** A site feature the grid cannot resolve (the Blue Hole), applied over the survey. */
+  private readonly carve: TerrainCarve | null;
   private readonly cols: number;
   private readonly rows: number;
   private readonly dx: number; // metres per column
@@ -120,6 +123,7 @@ export class Terrain {
   constructor(tile: Tile, config: TerrainConfig, tier: GraphicsTier = 'medium') {
     this.meta = tile.meta;
     this.heights = tile.heights;
+    this.carve = terrainCarveFor(tile.meta);
     this.cols = tile.meta.cols;
     this.rows = tile.meta.rows;
     this.dx = tile.meta.cellsize_m_x;
@@ -228,7 +232,8 @@ export class Terrain {
 
     const top = h00 + (h10 - h00) * tx;
     const bottom = h01 + (h11 - h01) * tx;
-    return (top + (bottom - top) * tz) * this.exaggeration;
+    const measured = (top + (bottom - top) * tz) * this.exaggeration;
+    return this.carve ? this.carve.apply(x, z, measured) : measured;
   }
 
   /**
