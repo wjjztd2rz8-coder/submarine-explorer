@@ -38,6 +38,8 @@ export function hullProps(props: readonly PresetProp[], max: number): PresetProp
     .slice(0, Math.max(0, max));
 }
 
+const FILL_TINT = new THREE.Color(0x7d8284);
+
 export class WreckPreset implements EnvPreset {
   readonly name: EnvPresetName = 'wreck';
   readonly stats = { draws: 0, particles: 0, lights: 0 };
@@ -153,6 +155,11 @@ export class WreckPreset implements EnvPreset {
   }
 
   update(_dt: number, ctx: PresetFrameContext): void {
+    const fill = num(this.params.ambientFill, 0);
+    if (fill > 0) {
+      ctx.atmo.ambientIntensity += fill;
+      ctx.atmo.ambientColor.lerp(FILL_TINT, 0.7);
+    }
     if (!this.visuals) return;
     ctx.atmo.vignette += num(this.params.vignetteAdd, 0.06);
     if (this.haze) {
