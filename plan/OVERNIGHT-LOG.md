@@ -88,6 +88,6 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 
 ## 2026-10-02 10:30 headless run
 
-- Merged (main gates green, pushed, tagged `f3b`): F-HERO-VENTS (Lost City terraced towers with flanges; Beebe smokers, sediment, ambient fill; Sonnet, sent back once because Beebe's seabed was black), F-HERO-TITANIC (opening 16 m off the bow, ambient fill, pale ooze, debris-bow; low-tier fill fix), F-BUGHUNT-2 (Codex fixes: hull refit on mode change, daily date and Low-light, controls-hint counting, disposal leaks), F-BUGHUNT-1 (audit doc).
+- Merged (main gates green, pushed, tagged `f4` (`f3b` already existed)): F-HERO-VENTS (Lost City terraced towers with flanges; Beebe smokers, sediment, ambient fill; Sonnet, sent back once because Beebe's seabed was black), F-HERO-TITANIC (opening 16 m off the bow, ambient fill, pale ooze, debris-bow; low-tier fill fix), F-BUGHUNT-2 (Codex fixes: hull refit on mode change, daily date and Low-light, controls-hint counting, disposal leaks), F-BUGHUNT-1 (audit doc).
 - Queued for Codex: `40-f-bughunt-fixes` (touch PHOTO exit, Monterey 14.7 km Arcade start, research save migration, life disposal).
 - Remaining hero sites: Great Blue Hole, Monterey Canyon. Titanic known gaps: sub covers mid-hull, far wreck dim, low-tier bed blotchy. Brand still needs the owner's name OK (Bathyline recommended). Claude 5h ended ~60%.
