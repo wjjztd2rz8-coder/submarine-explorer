@@ -14,6 +14,7 @@ const DIVE = '/?tile=monterey-canyon&skipBriefing=1&tier=low&lifeSeed=3';
 interface Game {
   life: {
     sim: {
+      clear(): void;
       stats(): { agents: number; groups: number; species: number; liveSpecies: string[] };
       spawnNear(id: string, sub: unknown, ahead?: number, count?: number): unknown;
     };
