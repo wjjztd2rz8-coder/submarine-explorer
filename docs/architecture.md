@@ -446,6 +446,9 @@ never repurpose one.
 | `scan:progress`           | `{ poiId, progress }` (0..1, ≤ 10 Hz)                  | `Scanner`                                                  |
 | `scan:aborted`            | `{ poiId, reason: 'range' \| 'facing' \| 'released' }` | `Scanner`                                                  |
 | `scan:complete`           | `{ poiId, landmarkId, firstTime }`                     | `Scanner`                                                  |
+| `discovery:secret`        | `{ landmarkId, secretId, name, firstTime }`            | `explore` after a hidden discovery scan                    |
+| `discovery:sample`        | `{ landmarkId, sampleId, name }`                       | `explore` after collection (once per dive)                 |
+| `event:witnessed`         | `{ landmarkId, eventId, kind }`                        | `explore` when a nearby event enters the camera view       |
 | `guide:opened`            | `{ entryId }`                                          | `Journal` when an unlocked entry is shown                  |
 | `mission:started`         | `{ missionId, tileId }`                                | `Mission` on Begin dive                                    |
 | `mission:objective`       | `{ missionId, objectiveId, complete }`                 | `Mission`                                                  |
@@ -590,3 +593,40 @@ stars. `Globe.setMissionAccess()` keeps locked pins focusable to read their requ
 and prevents a mission launch. The normal e2e feature specs use
 `tests/e2e/helpers/unlocked.ts` for an experienced pilot; `f2-progress.spec.ts` uses a
 fresh pilot and writes workshop, mission-select and debrief screenshots.
+
+### Phase F curiosity integration
+
+`app/systems/explore.ts` owns the local curiosities and the event scheduler. It
+registers after discovery, Journal, audio and ROV; its `world.life` hook runs
+before the scanner. `core/config/explore.ts` holds local range, timing and visual
+budgets. `window.__game.explore` exposes `ready`, `secrets`, `sampleTargets`,
+`faintContacts`, `samples`, `scheduler`, `summary()` and `previewEvent(kind)`.
+The preview hook bypasses quiet time for screenshots, without overlapping an event.
+Normal scheduling advances only during active dive time, uses the site's habitat,
+and waits 70–160 seconds initially, then a 100-second cooldown plus another wait.
+`kind` is `plume`, `turbidity`, `snow` or `whale`; an event lasts nine seconds.
+
+Optional `data/secrets/<site>.json` has `version: 1`, `secrets` and `samples`.
+Secret rows have `id`, `name`, `kind`, `lat`, `lon`, and Journal `text`; samples
+have `id`, `name`, `lat`, and `lon`. Secret kinds are `frame`, `alcove`, `seep`,
+`bone`, `wood`, `chain`, and `rock`. `survey_depth_m` and `placement_note` are
+content audit notes. The loader ignores invalid rows and treats missing files as
+empty. Runtime props follow `Terrain.sampleHeight` across their footprint.
+The data is based on the plausible additions in `docs/research/sites.md`.
+
+The scanner's new supplemental pool keeps these targets separate from both POIs
+and live wildlife. Secrets emit anonymous sonar blips only within 110 m in 3D,
+and scan hints only within 45 m. Samples use the same held scan action within
+22 m for 2.5 seconds; both vehicles deploy their existing arms when scanning,
+with a small particle effect for low tiers. Objectives and waypoints still read
+only the original POI pool. The unchanged discovery save stores secrets under
+`<site>/secret:<id>` and sample scans under `<site>/sample:<id>`; only the sample
+collection itself resets per dive. The Journal loads secrets for every site,
+hides undiscovered names, and labels each revealed entry once as Game addition.
+
+Both debriefs accept an optional exploration provider with persistent `found`
+and `total`, plus this dive's `secrets`, `samples` and `events` lists. Rewards call
+`window.__game.progress.award` when present, using `secret`, `sample` and `event`
+kinds with stable `site/subject` IDs. This checkout already includes F2-PROGRESS:
+its reward table adds 15/10/5 RP and its generic scan listener skips curiosity
+IDs so rewards are not doubled. Bus events are emitted even without progression.

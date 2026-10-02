@@ -80,7 +80,7 @@ export class RovVisual {
    * (SubMesh.tetherAnchor, or the sub's position). `dt` drives the thruster
    * animation; without it the frame time is measured.
    */
-  update(rov: Rov, anchor: THREE.Vector3, dt?: number): void {
+  update(rov: Rov, anchor: THREE.Vector3, dt?: number, scanning = false): void {
     this.group.visible = rov.deployed;
     const now = performance.now() / 1000;
     const step = dt ?? (this.lastT < 0 ? 0 : Math.min(0.1, now - this.lastT));
@@ -105,7 +105,7 @@ export class RovVisual {
         throttle: this.v.dot(rov.forward) / Math.max(0.1, c.maxSpeedMps),
         yaw: THREE.MathUtils.clamp(dYaw * inv * 0.8, -1, 1),
         vertical: this.v.y / Math.max(0.1, c.verticalSpeedMps),
-        scanning: false,
+        scanning,
         lightsOn: true,
       },
       step,

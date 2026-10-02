@@ -165,7 +165,7 @@ export class Life {
       if (this.proj.z < -1 || this.proj.z > 1) continue;
       if (Math.abs(this.proj.x) > 0.85 || Math.abs(this.proj.y) > 0.85) continue;
       // Centre of frame first, bigger and closer animals break ties.
-      const score = this.proj.x * this.proj.x + this.proj.y * this.proj.y + d / (40 + size * 20);
+      const score = this.proj.x * this.proj.x + this.proj.y * this.proj.y + d / (40 + size * 20) - (a.group.preview ? 4 : 0);
       if (score < bestScore) {
         bestScore = score;
         best = a.def;

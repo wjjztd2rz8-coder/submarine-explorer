@@ -753,7 +753,32 @@ export class LifeSim {
     const x = sub.x + (sub.fx / fh) * ahead;
     const z = sub.z + (sub.fz / fh) * ahead;
     const gnd = this.env.groundAt(x, z);
-    const n = count ?? (def.archetype === 'school' ? 12 : 1);
+    const n = Math.min(
+      this.capacityOf(def),
+      Math.max(1, Math.floor(count ?? (def.archetype === 'school' ? 12 : 1))),
+    );
+    if (!Number.isFinite(n)) return null;
+    // This explicit preview hook must work even after natural spawning fills the pool.
+    // Recycle the most distant animals instead of exceeding any rendering capacity.
+    const farthest = (sameSpecies = false): Agent | undefined =>
+      this.pool
+        .filter((a) => a.alive && (!sameSpecies || a.def.id === speciesId))
+        .sort(
+          (a, b) =>
+            Math.hypot(b.x - sub.x, b.y - sub.y, b.z - sub.z) -
+            Math.hypot(a.x - sub.x, a.y - sub.y, a.z - sub.z),
+        )[0];
+    while (this.countOf(speciesId) + n > this.capacityOf(def)) this.release(farthest(true)!);
+    if (!this.countOf(speciesId)) {
+      while (this.liveSpeciesCount() >= this.tier.maxSpecies) {
+        const group = farthest()!.group;
+        for (const a of [...group.members]) this.release(a);
+      }
+    }
+    while (this.free.length < n) this.release(farthest()!);
+    this.started = true;
+    this.lastX = sub.x;
+    this.lastZ = sub.z;
     if (def.archetype === 'sessile' || def.archetype === 'crawler') {
       const row = this.rows.find((r) => r.def.id === speciesId) ?? null;
       const g = this.newGroup(def, row, x, gnd, z);
@@ -770,6 +795,7 @@ export class LifeSim {
         if (a) a.yaw = this.rand() * 6.28;
       }
       if (!g.members.length) return null;
+      g.preview = true;
       this.groups.push(g);
       return g;
     }
@@ -786,12 +812,22 @@ export class LifeSim {
         g.dz = sub.fx / fh;
         m.hd = Math.atan2(g.dx, g.dz);
         m.fade = 1;
+        g.preview = true;
       }
       return g;
     }
     const y = isBedBound(def)
       ? gnd + ((def.altitude?.[0] ?? 1) + (def.altitude?.[1] ?? 3)) * 0.5
       : clamp(sub.y, gnd + 3, -3);
-    return this.placeGroup(def, null, x, y, z, n, true);
+    const group = this.placeGroup(def, null, x, y, z, n, true);
+    if (group) group.preview = true;
+    if (group && n === 1) {
+      // "Ahead" is an exact preview position, not a random group-sized cloud.
+      const a = group.members[0]!;
+      a.x = a.tx = x;
+      a.y = a.ty = y;
+      a.z = a.tz = z;
+    }
+    return group;
   }
 }

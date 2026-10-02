@@ -106,6 +106,12 @@ export class AudioSystem {
     this.captions.emit({ id: 'shutter', text: 'Camera shutter', durationS: 1 });
   }
 
+  /** Quiet sensor cue for a nearby natural event, on the existing sonar bus. */
+  playExploreCue(): void {
+    if (!this.engine || this.paused || this.disposed) return;
+    playPing(this.engine, this.config, 0.025, 0.3);
+  }
+
   playManipulator(): void {
     if (!this.engine || this.paused || this.disposed) return;
     mechanicalCue(this.engine, 'servo');

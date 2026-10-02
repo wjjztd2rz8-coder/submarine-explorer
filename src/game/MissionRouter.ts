@@ -360,6 +360,7 @@ export class MissionRouter {
   readonly briefing: Briefing | null;
   readonly panel: ObjectivesPanel;
   debrief: Debrief | null = null;
+  exploration: Debrief['exploration'] = null;
 
   private navClock = 0;
   private readonly disposers: Array<() => void> = [];
@@ -634,6 +635,7 @@ export class MissionRouter {
       { id: 'home', label: 'Home', run: () => this.leave(this.opts.onHome) },
       { id: 'journal', label: 'Journal', run: () => discovery.guide.open() },
     );
+    this.debrief.exploration = this.exploration;
     this.debrief.show(stats, actions, this.opts.rating?.());
     this.panel.setVisible(false);
   }

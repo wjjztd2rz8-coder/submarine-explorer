@@ -18,6 +18,14 @@ export interface DebriefAction {
   run: () => void;
 }
 
+export interface ExplorationSummary {
+  found: number;
+  total: number;
+  secrets: string[];
+  samples: string[];
+  events: string[];
+}
+
 export interface DebriefOptions {
   /** Default: reload the same URL. Used when `show()` gets no actions. */
   onDiveAgain?: () => void;
@@ -55,6 +63,8 @@ export class Debrief {
   readonly root: HTMLDivElement;
   private readonly panel: HTMLDivElement;
   private open_ = false;
+  /** Read when shown, so both free dives and mission debriefs include curiosity. */
+  exploration: (() => ExplorationSummary) | null = null;
   /** The stats last shown (for tests / B3). */
   last: DebriefStats | null = null;
   /** QA-B #12: Tab stays inside the debrief while it is open. */
@@ -160,6 +170,23 @@ export class Debrief {
       'No new entries.',
       'is-new',
     );
+    const exploration = this.exploration?.();
+    if (exploration && exploration.total) {
+      section(
+        `SECRETS FOUND ${exploration.found}/${exploration.total}`,
+        exploration.secrets,
+        'Follow faint nearby sonar contacts to find secrets.',
+        'is-secrets',
+      );
+      section(
+        'SAMPLES COLLECTED',
+        exploration.samples,
+        'No samples collected this dive.',
+        'is-samples',
+      );
+      if (exploration.events.length)
+        section('EVENTS WITNESSED', exploration.events, '', 'is-events');
+    }
     p.append(lists);
 
     const row = el('div', 'debrief-actions');

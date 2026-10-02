@@ -226,6 +226,11 @@ export class Discovery {
     this.overlay.showComplete(title, firstTime, this.keys());
   }
 
+  /** Samples belong to the current collection, rather than a Journal entry. */
+  onSampleCollected(title: string): void {
+    this.overlay.showComplete(title, false, this.keys(), 'sample');
+  }
+
   /** Pose for the `?poi=` spawn, or null if the POI is unknown. */
   spawnPose(poiId: string): SpawnPose | null {
     const poi = this.pois.find((p) => p.id === poiId);
@@ -280,7 +285,8 @@ export class Discovery {
     if (camera && nearest) {
       const poi =
         this.pois.find((p) => p.id === nearest) ??
-        this.scanner.getExtraTargets().find((t) => t.id === nearest);
+        this.scanner.getExtraTargets().find((t) => t.id === nearest) ??
+        this.scanner.getSupplementalTargets().find((t) => t.id === nearest);
       if (poi) {
         const v = this.projected.copy(poi.position).project(camera);
         if (v.z > -1 && v.z < 1 && Math.abs(v.x) <= 1 && Math.abs(v.y) <= 1) {

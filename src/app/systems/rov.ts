@@ -100,7 +100,12 @@ export function createRovSystem(): GameSystem {
       },
       pose: (f, ctx) => {
         const { rov, rovVisual, rovHud, subMesh, headlights } = ctx;
-        rovVisual.update(rov, subMesh.tetherAnchor(tetherAnchor), f.dt);
+        rovVisual.update(
+          rov,
+          subMesh.tetherAnchor(tetherAnchor),
+          f.frozen ? 0 : f.dt,
+          ctx.discovery.scanner.isScanning,
+        );
         rovHud.update(rov);
         // Only the additive beam geometry is hidden; the sub's actual lamps stay on.
         headlights.setConesSuppressed(rov.deployed);

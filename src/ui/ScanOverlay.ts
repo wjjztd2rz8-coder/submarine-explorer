@@ -125,15 +125,24 @@ export class ScanOverlay {
   }
 
   /** Show the completion confirmation for `completeBannerSeconds`. */
-  showComplete(title: string, firstTime: boolean, keys: ScanOverlayKeys): void {
+  showComplete(
+    title: string,
+    firstTime: boolean,
+    keys: ScanOverlayKeys,
+    kind: 'scan' | 'sample' = 'scan',
+  ): void {
     this.bannerLeft = this.config.completeBannerSeconds;
-    this.setTone(firstTime ? 'cyan' : 'dim');
+    this.setTone(firstTime || kind === 'sample' ? 'cyan' : 'dim');
     this.setText(this.kicker, 'kicker', firstTime ? 'NEW ENTRY' : 'SCAN COMPLETE');
     this.setText(this.nameEl, 'name', title);
     this.setText(
       this.hint,
       'hint',
-      firstTime ? `PRESS ${keys.guide} · JOURNAL` : `ALREADY LOGGED · SEE JOURNAL`,
+      kind === 'sample'
+        ? 'STOWED FOR THIS DIVE'
+        : firstTime
+          ? `PRESS ${keys.guide} · JOURNAL`
+          : `ALREADY LOGGED · SEE JOURNAL`,
     );
     this.setRing(1, 'OK');
     this.panel.classList.add('is-complete');
@@ -180,7 +189,11 @@ export class ScanOverlay {
       : '';
     if (view.phase === 'scanning') {
       this.setTone('cyan');
-      this.setText(this.kicker, 'kicker', 'SCANNING');
+      this.setText(
+        this.kicker,
+        'kicker',
+        view.activeId?.startsWith('sample:') ? 'COLLECTING SAMPLE' : 'SCANNING',
+      );
       this.setText(this.nameEl, 'name', view.activeName);
       this.setText(this.hint, 'hint', `HOLD ${keys.scan} · KEEP ON TARGET`);
       this.setRing(view.progress, `${Math.floor(view.progress * 100)}%`);
@@ -216,7 +229,13 @@ export class ScanOverlay {
     if (view.candidateId !== null) {
       this.setTone('cyan');
       this.setText(this.kicker, 'kicker', 'SCAN TARGET');
-      this.setText(this.hint, 'hint', `HOLD ${keys.scan} TO SCAN`);
+      this.setText(
+        this.hint,
+        'hint',
+        view.nearestId?.startsWith('sample:')
+          ? `HOLD ${keys.scan} TO COLLECT`
+          : `HOLD ${keys.scan} TO SCAN`,
+      );
     } else if (!view.nearestInRange) {
       this.setTone('dim');
       this.setText(this.kicker, 'kicker', 'CONTACT');
