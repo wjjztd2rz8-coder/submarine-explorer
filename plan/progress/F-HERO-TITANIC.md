@@ -33,3 +33,7 @@ The new debris adds one instanced draw group; low tier cuts density as for the o
 - Low-tier bed is blotchier and brighter than high (no haze there).
 - Marine-snow haze points are still busy near the camera.
 - Beebe low tier not re-shot after the Presets fix.
+
+## Test changes
+
+The old Titanic opening assertions encoded an 85 m approach. Relaxed to the new close opening: wreck range > 8 m (unit `arcadeLoadout`, e2e `f-arcade-access`), and the mission e2e accepts a 2- or 3-digit RNG. The touch-onboarding e2e failed once in the first gate run and passed on rerun (unrelated, flaky).

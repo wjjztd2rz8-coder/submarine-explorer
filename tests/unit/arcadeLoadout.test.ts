@@ -130,7 +130,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
       expect(-pos.y).toBeGreaterThan(3500);
       expect(pos.y - terrain.sampleHeight(pos.x, pos.z)).toBeGreaterThan(10);
       expect(pos.y - terrain.sampleHeight(pos.x, pos.z)).toBeLessThan(80);
-      expect(bounds.distanceToPoint(pos)).toBeGreaterThan(40);
+      expect(bounds.distanceToPoint(pos)).toBeGreaterThan(8);
       expect(bounds.distanceToPoint(pos)).toBeLessThan(150);
       expect(props.collide(pos.clone(), ctx.config.submarine.hullRadius, new Vector3())).toBe(
         false,
