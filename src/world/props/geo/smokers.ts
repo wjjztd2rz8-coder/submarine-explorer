@@ -35,7 +35,7 @@ import type { GeoBuildInput } from './types.js';
 const ROCK = new THREE.Color(0x40352f);
 const RUST = new THREE.Color(0x7a4a2c);
 const ANHYDRITE = new THREE.Color(0xcfc4b2);
-const SULFIDE = new THREE.Color(0x1c1816);
+const SULFIDE = new THREE.Color(0x15110f);
 const MOUND = new THREE.Color(0x4c4038);
 const MAT = new THREE.Color(0xb9ad98);
 
@@ -100,6 +100,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
       ridgeAmp: 0.08,
       flare: 0.75,
       lip: 0.3,
+      crater: 0.7,
     });
     pieces.push(place(c, { x: s.x, y: s.y, z: s.z }));
     // Side spire and a small parasitic vent on the taller stacks.
@@ -171,8 +172,8 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   const bodyMat = geoMaterial('rock', d, { roughness: 0.9 });
   // Black smokers are dark but not black: lift the albedo, and give the warm fluid a faint
   // self-lit tint that follows the pale and rusty parts of the crust.
-  bodyMat.color.multiplyScalar(1.5);
-  vertexGlow(bodyMat, 0.085, 0xffa070, 0.5);
+  bodyMat.color.multiplyScalar(1.25);
+  vertexGlow(bodyMat, 0.07, 0xffa070, 0.4);
   const body = new THREE.Mesh(geom, bodyMat);
   body.name = 'smoker-body';
   full.add(body);
@@ -186,29 +187,34 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     ? new THREE.IcosahedronGeometry(1, 0)
     : new THREE.CylinderGeometry(0.04, 0.05, 1, 5, 2).translate(0, 0.5, 0);
   paint(wormGeom, (_x, y, _z, _ny, out) => {
-    if (shrimp) out.set(0xf0d6c8);
+    if (shrimp) out.set(0xd9bfae);
     else if (y > 0.7) out.set(0xd0303a);
     else out.set(0xeae2d2);
   });
-  // Shrimp mats cling to the chimney walls in patches.
+  // Shrimp (Rimicaris) pile in dense patches on the lower walls of each chimney.
   if (shrimp) {
-    const perStack = Math.round(150 * d.growth);
+    const patches = Math.max(2, Math.round(6 * d.growth));
+    const perPatch = Math.max(8, Math.round(40 * d.growth));
     for (const s of stacks) {
-      for (let i = 0; i < perStack; i++) {
-        const t = 0.1 + rnd() * 0.6;
+      for (let k = 0; k < patches; k++) {
         const a = rnd() * 6.283;
-        const r = s.r0 * (1 - 0.55 * t) * 1.03;
-        items.push({
-          t: {
-            x: s.x + Math.cos(a) * r,
-            y: s.y + t * s.h,
-            z: s.z + Math.sin(a) * r,
-            ry: -a,
-            sx: 0.1,
-            sy: 0.03,
-            sz: 0.03,
-          },
-        });
+        const t0 = 0.06 + rnd() * 0.3;
+        for (let i = 0; i < perPatch; i++) {
+          const t = Math.min(0.9, t0 + (rnd() - 0.5) * 0.12);
+          const aa = a + (rnd() - 0.5) * 0.7;
+          const r = s.r0 * (1 - 0.55 * t) * 1.04;
+          items.push({
+            t: {
+              x: s.x + Math.cos(aa) * r,
+              y: s.y + t * s.h,
+              z: s.z + Math.sin(aa) * r,
+              ry: -aa + (rnd() - 0.5),
+              sx: 0.1,
+              sy: 0.035,
+              sz: 0.035,
+            },
+          });
+        }
       }
     }
   }
@@ -249,7 +255,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     full.add(instanced(wormGeom, wm, items, shrimp ? 'shrimp' : 'tubeworms'));
   }
   // Mussel beds: low dark-and-pale shells packed on the mound's flank.
-  const musselBeds = Math.max(2, Math.round(5 * d.growth));
+  const musselBeds = shrimp ? 0 : Math.max(2, Math.round(5 * d.growth));
   const shells: InstanceSpec[] = [];
   for (let k = 0; k < musselBeds; k++) {
     const a = rnd() * 6.283;
@@ -277,14 +283,15 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
       });
     }
   }
-  full.add(
-    instanced(
-      new THREE.IcosahedronGeometry(1, 0),
-      new THREE.MeshStandardMaterial({ color: LIFE_TINT, roughness: 0.55, metalness: 0.05 }),
-      shells,
-      'mussels',
-    ),
-  );
+  if (shells.length)
+    full.add(
+      instanced(
+        new THREE.IcosahedronGeometry(1, 0),
+        new THREE.MeshStandardMaterial({ color: LIFE_TINT, roughness: 0.55, metalness: 0.05 }),
+        shells,
+        'mussels',
+      ),
+    );
   // Sulfide talus: broken chimney chunks around the base and across the mound.
   const chunks: InstanceSpec[] = [];
   const nChunks = Math.round(70 * d.growth) + 10;
@@ -305,13 +312,13 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
         sy: sc * (0.5 + rnd() * 0.3),
         sz: sc * (0.7 + rnd() * 0.5),
       },
-      color: new THREE.Color(rnd() < 0.25 ? RUST : ROCK).multiplyScalar(0.7 + rnd() * 0.5),
+      color: new THREE.Color(rnd() < 0.1 ? RUST : ROCK).multiplyScalar(0.7 + rnd() * 0.5),
     });
   }
   full.add(
     instanced(
       lump(1, seed + 3, 0.3),
-      new THREE.MeshStandardMaterial({ color: 0xb0b0b0, roughness: 0.9, metalness: 0.05 }),
+      new THREE.MeshStandardMaterial({ color: 0x6a6a6a, roughness: 0.92, metalness: 0.05 }),
       chunks,
       'sulfide-talus',
     ),

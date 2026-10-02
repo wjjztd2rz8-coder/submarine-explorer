@@ -77,6 +77,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       ridgeAmp: 0.06,
       flare: main ? 0.7 : 0.5,
       lip: 0.1,
+      crater: 0.5,
       lean: main ? 0 : (rnd() - 0.5) * 0.12,
       leanA: rnd() * 6.283,
     });
@@ -145,8 +146,8 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   const material = geoMaterial('flow', d, { roughness: 0.82, side: THREE.DoubleSide });
   // Pale carbonate answers the warm headlights harder than dark rock, and a faint cool
   // emissive lift keeps the silhouette readable in the dark water beyond the beams.
-  material.color.multiplyScalar(1.9);
-  vertexGlow(material, 0.26, 0xb4c8cc, 0.25);
+  material.color.multiplyScalar(1.5);
+  vertexGlow(material, 0.22, 0xb4c8cc, 0.25);
   const full = new THREE.Group();
   full.name = 'carbonate-tower';
   full.add(new THREE.Mesh(geom, material));

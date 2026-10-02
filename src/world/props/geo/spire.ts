@@ -8,6 +8,8 @@
 import * as THREE from 'three';
 import { fbm3, smooth } from './shared.js';
 
+const TAU = Math.PI * 2;
+
 export interface SpireOpts {
   h: number;
   r0: number;
@@ -30,6 +32,8 @@ export interface SpireOpts {
   flare?: number;
   /** Flared rim at the top, as a fraction of the local radius. */
   lip?: number;
+  /** Orifice depth below the rim, as a fraction of the top radius (0 = flat cap). */
+  crater?: number;
 }
 
 /** Smooth, noise-free radius at height fraction t: the profile colliders and flanges follow. */
@@ -78,7 +82,9 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
           2 *
           o.rough;
     f *= 1 + amp * Math.sin(ang * flutes + n * 5 + t * 2.5);
-    p.setXYZ(i, x * f, y, z * f);
+    // The top cap's centre vertex sinks to make a crater: the vent orifice.
+    const sink = o.crater && t > 0.999 && Math.hypot(x, z) < 1e-6 ? o.crater * o.r0 * o.topFrac : 0;
+    p.setXYZ(i, x * f, y - sink, z * f);
   }
   g.deleteAttribute('uv');
   g.computeVertexNormals();
@@ -121,8 +127,12 @@ export function flange(o: {
     const ang = Math.atan2(z, x);
     // Scalloped rim, tapering at both ends of the arc, drooping toward the lip.
     const sc = fbm3(Math.cos(ang) * 2.2 + 9, 5, Math.sin(ang) * 2.2 + 9, o.seed, 2) - 0.5;
-    const k = 1 + sc * 0.5 * out;
-    p.setXYZ(i, x * k, y - out * out * w * 0.12 - sc * out * 0.5, z * k);
+    // Both ends of the arc pinch out to nothing so the sector has no cut face.
+    const u = ((((Math.atan2(x, z) - o.start) % TAU) + TAU) % TAU) / o.arc;
+    const end = smooth(0, 0.22, u) * smooth(0, 0.22, 1 - u);
+    const k = (1 + sc * 0.5 * out) * (1 - (1 - end) * out * 0.9);
+    const yy = y - out * out * w * 0.12 - sc * out * 0.5;
+    p.setXYZ(i, x * k, yy * (0.25 + 0.75 * end), z * k);
   }
   g.deleteAttribute('uv');
   g.computeVertexNormals();

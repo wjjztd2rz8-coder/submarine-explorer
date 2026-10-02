@@ -9,12 +9,14 @@
  *
  * Fresh, independent browser contexts; Arcade defaults, high tier, tutorial off.
  * 1600×900 PNGs: 1 = default free-dive spawn (chase); 2 = 40 m from the
- * hero footprint, 15 m above the seabed; 3 = 15 m from it, at the same altitude.
+ * hero footprint (or axis, for vent set pieces), 15 m above the seabed; 3 = 15 m from it (30 m
+ * for set pieces), at the same altitude.
  * Approach/detail use the cockpit camera aimed at the hero. Bearings are searched
  * in a fixed order for one clear side at BOTH distances, using actual prop bounds.
  * The submarine's physics step is frozen after loading to hold each exact pose.
  * A pose manifest accompanies the contact sheet for reproducible comparisons.
  * Output: .cache/golden/<UTC YYYY-MM-DD-HHMM>/<site>-<1|2|3>.png + index.html.
+ * GOLDEN_SITES=lost-city,beebe-vent-field limits the run to those sites.
  * Chromium uses SwiftShader so the tool also works without a physical GPU.
  */
 import { chromium } from '@playwright/test';
@@ -31,13 +33,14 @@ if (!['http:', 'https:'].includes(base.protocol)) throw new Error('Base URL must
 const stamp = new Date().toISOString().slice(0, 16).replace('T', '-').replace(':', '');
 const output = resolve('.cache/golden', stamp);
 await mkdir(output, { recursive: true });
+const only = process.env.GOLDEN_SITES?.split(',');
 const heroes = [
   ['titanic', 'bow-hull'],
   ['lost-city', 'poseidon-tower'],
   ['great-blue-hole', 'karst-grotto'],
   ['beebe-vent-field', 'beebe-chimney-1'],
   ['monterey-canyon', 'canyon-wall-ledge'],
-];
+].filter(([site]) => !only || only.includes(site));
 const captures = [];
 const browser = await chromium.launch({
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
@@ -106,25 +109,30 @@ try {
         const centre = hero.localBounds.getCenter(g.sub.position.clone());
         const half = hero.localBounds.getSize(g.sub.position.clone()).multiplyScalar(0.5);
         if (hero.def.model === 'procedural:chimney' && hero.def.dimensionsM?.[2])
-          centre.y = hero.localBounds.min.y + hero.def.dimensionsM[2] * 0.55;
+          centre.y = Math.max(hero.localBounds.min.y, 0) + hero.def.dimensionsM[2] * 0.45;
         for (let i = 0; i < 16; i++) {
           const angle = Math.PI / 4 + (i * Math.PI) / 8;
           const dx = Math.sin(angle),
             dz = -Math.cos(angle);
-          const edge = Math.min(
-            half.x / Math.max(Math.abs(dx), 1e-6),
-            half.z / Math.max(Math.abs(dz), 1e-6),
-          );
+          // Sprawling vent set pieces (a feature) are framed from their axis, not their footprint edge.
+          const edge = hero.def.feature
+            ? 0
+            : Math.min(
+                half.x / Math.max(Math.abs(dx), 1e-6),
+                half.z / Math.max(Math.abs(dz), 1e-6),
+              );
           const target = hero.root.localToWorld(
             centre.clone().add(g.sub.position.clone().set(dx * edge, 0, dz * edge)),
           );
-          const direction = target
-            .clone()
-            .sub(hero.root.localToWorld(centre.clone()))
-            .setY(0)
-            .normalize();
+          const direction = hero.def.feature
+            ? hero.root
+                .localToWorld(g.sub.position.clone().set(dx, 0, dz))
+                .sub(hero.root.localToWorld(g.sub.position.clone().set(0, 0, 0)))
+                .setY(0)
+                .normalize()
+            : target.clone().sub(hero.root.localToWorld(centre.clone())).setY(0).normalize();
           if (direction.lengthSq() < 0.5) continue;
-          const clear = [40, 15].every((range) => {
+          const clear = (hero.def.feature ? [40, 30] : [40, 15]).every((range) => {
             const p = target.clone().addScaledVector(direction, range);
             p.y = g.terrain.sampleHeight(p.x, p.z) + 15;
             return (
@@ -136,9 +144,15 @@ try {
         }
         throw new Error(`No clear fixed approach for ${propId}`);
       }, heroId);
+      // A feature set piece is framed from its axis, so its close shot stays outside the spires.
+      const closeRange = await page.evaluate(
+        (propId) =>
+          window.__game.props.placed.find((p) => p.def.id === propId)?.def.feature ? 30 : 15,
+        heroId,
+      );
       for (const [n, range] of [
         [2, 40],
-        [3, 15],
+        [3, closeRange],
       ]) {
         await page.evaluate(
           ({ target, direction, range }) => {
