@@ -60,19 +60,20 @@ export const cameraControlsSystem: GameSystem = {
   dispose: () => cleanup.dispose(),
   init(ctx) {
     const { bus, rig, hud, canvas } = ctx;
-    const tips = { until: performance.now() + 20_000 };
+    const tips = { until: 0 };
     ctx.cameraTips = tips;
     let learn = readLearn();
+    let started = false;
     // Steering used once each: move, turn and rise/sink.
     const used = { throttle: false, yaw: false, ballast: false };
     const startTips = (): void => {
+      started = true;
       used.throttle = used.yaw = used.ballast = false;
       learn = readLearn();
       learn.dives += 1;
       writeLearn(learn);
       tips.until = learn.learned || learn.dives > TIPS_DIVES ? 0 : performance.now() + 20_000;
     };
-    startTips();
     cleanup.add(
       bus.on('mission:started', () => {
         rig.resetView();
@@ -80,6 +81,8 @@ export const cameraControlsSystem: GameSystem = {
       }),
     );
     noteControlUse = (s) => {
+      // Home and briefing frames are frozen. Free dives have no mission:started event.
+      if (!started) startTips();
       if (tips.until === 0) return;
       if (Math.abs(s.throttle) > 0.2) used.throttle = true;
       if (Math.abs(s.yaw) > 0.2) used.yaw = true;
@@ -90,12 +93,17 @@ export const cameraControlsSystem: GameSystem = {
         writeLearn(learn);
       }
     };
-    hud.onResetCamera(() => {
-      if (ctx.app.state === 'dive') {
-        rig.resetView();
-        tips.until = 0;
-      }
+    cleanup.add(() => {
+      noteControlUse = () => {};
     });
+    cleanup.add(
+      hud.onResetCamera(() => {
+        if (ctx.app.state === 'dive') {
+          rig.resetView();
+          tips.until = 0;
+        }
+      }),
+    );
     cleanup.listen(canvas, 'dblclick', () => {
       if (
         ctx.app.state === 'dive' &&

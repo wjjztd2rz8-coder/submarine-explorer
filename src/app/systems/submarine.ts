@@ -12,13 +12,16 @@ import { applyFreeDiveHull, chooseSpawn, spawnHeight, spawnSettings } from '../.
 import { SubMesh } from '../../sub/SubMesh.js';
 import { Submarine } from '../../sub/Submarine.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
 
 export function createSubmarineSystem(): GameSystem {
+  const cleanup = new Disposables();
   const forward = new THREE.Vector3();
   let lastHullStress = 0;
   let emergencyBlowAnnounced = false;
   return {
     name: 'submarine',
+    dispose: () => cleanup.dispose(),
     init(ctx) {
       const { config, terrain, meta, route, params, spawnDepth, settings, scene } = ctx;
       const sub = new Submarine(config.submarine, terrain);
@@ -44,15 +47,25 @@ export function createSubmarineSystem(): GameSystem {
       }
       // Arcade fits each site's vehicle; Realistic retains research hull unlocks.
       const targetDepth = route?.def.briefing.depth_m ?? Math.abs(meta.min_m);
-      sub.setHullClass(ctx.progress.hullFor(targetDepth, settings.gameplayMode));
-      if (!route && ctx.freeDiveHull) {
-        ctx.freeDiveHull.classId = sub.getState().hullClass;
-        ctx.freeDiveHull.hull = config.submarine.hullClasses[sub.getState().hullClass];
-        ctx.freeDiveHull.cleared &&= ctx.progress.canDive(
-          Math.abs(meta.min_m),
-          settings.gameplayMode,
-        );
-      }
+      const fitHull = (): void => {
+        sub.setHullClass(ctx.progress.hullFor(targetDepth, ctx.save.get().gameplayMode));
+        if (!route && ctx.freeDiveHull) {
+          const state = sub.getState();
+          ctx.freeDiveHull.classId = state.hullClass;
+          ctx.freeDiveHull.hull = config.submarine.hullClasses[state.hullClass];
+          ctx.freeDiveHull.cleared =
+            Math.abs(state.ratedDepth) >=
+            Math.abs(meta.min_m) + config.submarine.freeDiveHullMarginM;
+          ctx.hud?.setHullNote(ctx.freeDiveHull.cleared ? '' : 'at rating limit');
+        }
+      };
+      fitHull();
+      cleanup.add(
+        ctx.save.onChange((_next, changed) => {
+          if (changed.includes('gameplayMode')) fitHull();
+        }),
+      );
+      cleanup.add(ctx.progress.onChange(fitHull));
       // D-START: keep URL probes deterministic even when a mission uses a
       // near-site default.
       if (route && spawnDepth !== null && !params.has('at') && !params.has('poi')) {

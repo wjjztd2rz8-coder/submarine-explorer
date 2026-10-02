@@ -165,8 +165,9 @@ export class HUD {
     this.set('tile', `${meta.id} (${meta.cols}×${meta.rows})`);
   }
 
-  onResetCamera(handler: () => void): void {
+  onResetCamera(handler: () => void): () => void {
     this.resetCameraEl.addEventListener('click', handler);
+    return () => this.resetCameraEl.removeEventListener('click', handler);
   }
 
   private showContext(el: HTMLDivElement, text: string | null | undefined): void {
