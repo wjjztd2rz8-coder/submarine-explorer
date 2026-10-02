@@ -269,6 +269,7 @@ test.describe('settings screen', () => {
     await dialog.getByLabel('Graphics tier').selectOption('high');
     await expect(dialog.getByRole('button', { name: 'Apply and reload' })).toBeHidden();
     await dialog.getByLabel('Terrain detail on top of the survey data').fill('0.5');
+    await dialog.getByRole('button', { name: 'Advanced' }).click();
     await dialog.getByLabel('Simulation speed').selectOption('2');
     await dialog.getByRole('button', { name: 'Apply and reload' }).scrollIntoViewIfNeeded();
     await page.screenshot({ path: 'test-results-settings-closeout/settings-apply.png' });
