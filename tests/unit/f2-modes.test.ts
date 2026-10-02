@@ -56,3 +56,26 @@ it('scales realistic and exaggerated flow while retaining the legacy Gentle scal
   expect(currentScale('exaggerated', c)).toBe(MODES_CONFIG.exaggeratedCurrentScale);
   expect(MODES_CONFIG.exaggeratedCurrentScale).toBeGreaterThan(1);
 });
+it('fills missing Custom keys without discarding Gentle or valid false values', () => {
+  const result = migrate(
+    {
+      version: 2,
+      gameplayMode: 'custom',
+      gameplay: { currents: 'gentle', visualHints: false, batteryOxygen: false, lights: 'retired' },
+    },
+    DEFAULT_CONFIG,
+  );
+  expect(result.gameplayMode).toBe('custom');
+  expect(result.gameplay).toEqual({
+    ...DEFAULT_CONFIG.settings.gameplayPresets.arcade,
+    currents: 'gentle',
+    visualHints: false,
+    batteryOxygen: false,
+  });
+  expect(migrate({ version: 2, gameplayMode: 'custom' }, DEFAULT_CONFIG).gameplay).toEqual(
+    DEFAULT_CONFIG.settings.gameplayPresets.arcade,
+  );
+  expect(migrate({ version: 2, gameplayMode: 'realistic' }, DEFAULT_CONFIG).gameplay).toEqual(
+    DEFAULT_CONFIG.settings.gameplayPresets.realistic,
+  );
+});

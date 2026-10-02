@@ -141,4 +141,47 @@ describe('fresh-player mission routing and vehicle loadout', () => {
       terrain.dispose();
     }
   });
+  it('refits the hull on live mode changes and removes subscriptions on dispose', () => {
+    const ctx = context('titanic', 'arcade');
+    const progress = createProgressSystem();
+    const submarine = createSubmarineSystem();
+    try {
+      progress.init?.(ctx);
+      submarine.init?.(ctx);
+      ctx.save.setGameplayMode('realistic');
+      expect(ctx.sub.getState().hullClass).toBe('A');
+      ctx.save.setGameplayMode('arcade');
+      expect(ctx.sub.getState().hullClass).toBe('B');
+      submarine.dispose?.();
+      ctx.save.setGameplayMode('realistic');
+      expect(ctx.sub.getState().hullClass).toBe('B');
+    } finally {
+      submarine.dispose?.();
+      progress.dispose?.();
+      ctx.subMesh?.dispose();
+    }
+  });
+  it('refreshes free-dive clearance and the hull note after mode changes and research unlocks', () => {
+    const ctx = context('titanic', 'arcade');
+    ctx.route = null;
+    ctx.hud = { setHullNote: vi.fn() } as unknown as GameContext['hud'];
+    const submarine = createSubmarineSystem();
+    try {
+      submarine.init?.(ctx);
+      expect(ctx.freeDiveHull?.cleared).toBe(true);
+      ctx.save.setGameplayMode('realistic');
+      expect(ctx.freeDiveHull?.cleared).toBe(false);
+      expect(ctx.hud.setHullNote).toHaveBeenLastCalledWith('at rating limit');
+      ctx.save.setGameplayMode('arcade');
+      expect(ctx.freeDiveHull?.cleared).toBe(true);
+      expect(ctx.hud.setHullNote).toHaveBeenLastCalledWith('');
+      ctx.save.setGameplayMode('realistic');
+      for (let i = 0; i < 10; i++) ctx.progress.award('primary', `site-${i}`);
+      expect(ctx.sub.getState().hullClass).toBe('B');
+      expect(ctx.freeDiveHull?.cleared).toBe(true);
+    } finally {
+      submarine.dispose?.();
+      ctx.subMesh?.dispose();
+    }
+  });
 });

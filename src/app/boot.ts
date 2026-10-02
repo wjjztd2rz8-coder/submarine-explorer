@@ -57,6 +57,8 @@ export async function boot(): Promise<BootContext | null> {
   const config = makeConfig();
   const bus = new EventBus();
   const params = new URLSearchParams(window.location.search);
+  // Capture before any loading: crossing UTC midnight must not change this run's seed.
+  const bootDate = utcDate();
   // D-SHELL: the home screen unless a dive param is present.
   const bypassHome = BYPASS_HOME_PARAMS.some((key) => params.has(key));
   const appState: AppState = bypassHome ? 'dive' : 'home';
@@ -78,9 +80,9 @@ export async function boot(): Promise<BootContext | null> {
   ]);
   let route = initialRoute;
   let daily = null;
-  if (params.get('daily') === utcDate()) {
+  if (params.get('daily') === bootDate) {
     const summaries = await loadMissionSummaries();
-    daily = dailyDive(utcDate(), unlockedDailySites(summaries, index, progress));
+    daily = dailyDive(bootDate, unlockedDailySites(summaries, index, progress));
     if (daily) {
       route = await resolveMissionRoute(new URLSearchParams({ mission: daily.site }));
       if (route) route.def = dailyMission(route.def, daily);

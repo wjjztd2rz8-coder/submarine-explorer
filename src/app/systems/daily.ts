@@ -60,6 +60,8 @@ export function createDailySystem(): GameSystem {
         };
         enforce();
         cleanup.add(ctx.save.onChange(enforce));
+        // Purchases reapply saved light preferences before this run's modifier.
+        cleanup.add(ctx.progress.onChange(enforce));
       }
       ctx.expose({ daily: ctx.daily });
     },
