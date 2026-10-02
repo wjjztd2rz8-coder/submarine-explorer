@@ -5,7 +5,13 @@
   "title": "Lighthouse Reef: around the Great Blue Hole",
   "hull_class": "B",
   "environment": {
-    "preset": "reef"
+    "preset": "reef",
+    "overrides": {
+      "shaftOpacity": 0.14,
+      "shaftMaxDepthM": 110,
+      "causticsScale": 0.8,
+      "ambientScale": 1.5
+    }
   },
   "species_file": "species.json",
   "spawn": {

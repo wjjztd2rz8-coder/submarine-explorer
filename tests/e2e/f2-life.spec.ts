@@ -14,6 +14,7 @@ const DIVE = '/?tile=monterey-canyon&skipBriefing=1&tier=low&lifeSeed=3';
 interface Game {
   life: {
     sim: {
+      clear(): void;
       stats(): { agents: number; groups: number; species: number; liveSpecies: string[] };
       spawnNear(id: string, sub: unknown, ahead?: number, count?: number): unknown;
     };
@@ -131,6 +132,8 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
       lightsOn: true,
       hullR: 7,
     };
+    // Only the deliberately placed animal should be a scan candidate (ambient wildlife varies with the site's layout).
+    g.life!.sim.clear();
     return g.life!.sim.spawnNear('comb-jelly', sub, 9, 1) !== null;
   });
   expect(ok).toBe(true);
