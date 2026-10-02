@@ -7,7 +7,10 @@
   "environment": {
     "preset": "vent",
     "overrides": {
-      "smokeOpacitySulfide": 0.85
+      "smokeOpacitySulfide": 0.85,
+      "ambientFill": 8,
+      "glowIntensity": 520,
+      "glowDistanceM": 80
     }
   },
   "species_file": "species.json",

@@ -21,6 +21,13 @@ Branch `claude/f-hero-vents`. Shots: `.cache/codex/shots/f-hero-vents/{before,af
 - `tools/golden-shots.mjs`: vent set pieces (a `feature`) are framed from their axis (shots 2 and 3 at 40 m and 30 m); same aim fix; `GOLDEN_SITES=a,b` filter.
 - `tests/unit/freeDiveComposition.test.ts`: aim mirrors the opening (assertions unchanged).
 
+## Beebe readability fix (director send-back)
+
+- Cause: the seabed is `MeshStandardMaterial`; three divides ambient by pi and the deep-band ambient colour is nearly black, so only the headlight pool lit it, and the lower-albedo sediment made that worse.
+- New vent preset param `ambientFill` (default 0, `core/config/presets.ts`; `VentPreset.update` adds it to ambient intensity and warms the ambient colour). Beebe's mission.json sets `ambientFill: 8`, `glowIntensity: 520`, `glowDistanceM: 80`. Sulfide glow lights now sit 4 m below the orifice (on the chimney body); carbonate keeps +2 m. Lost City is unchanged (fill 0).
+- Sediment albedo lifted (`0x5a544d` / `0x645d55`); chimney sulfide colour `0x2c231e` instead of near black.
+- After shots: `.cache/golden/2026-10-02-1019/` (beebe-vent-field-1..3, lost-city-1..3).
+
 ## How to see it
 
 `npm run build && npm run preview`, then `?tile=lost-city` or `?tile=beebe-vent-field` (Arcade free dive). Photo mode orbit shows the towers best.
@@ -41,5 +48,5 @@ Low tier cuts mesh density (0.55x), plume particles (0.35x), life instances (0.2
 - The Lost City cold-water-coral life agents (pale branching clumps) still read blocky; they belong to the life package.
 - Beebe's opening: the chase camera sits 90 m behind and 38 m above the sub, so a 12-18 m chimney 46 m ahead sits partly behind the hull. The plumes and orange glow carry the shot; a camera nudge or a larger `yawOffset` would need the e2e facing assertion relaxed.
 - The talus skirt under Poseidon is a broad flat apron; it could take rubble instances.
-- "Ambient fill within 40 m" is not present in this branch's tree (no code found); low-tier Beebe's seabed is dark outside the headlight pool.
+- Low-tier Beebe not re-shot after the ambient fill (the fill is tier-independent).
 - Unlit carbonate relies on the fake self-lit lift rather than real scattering.

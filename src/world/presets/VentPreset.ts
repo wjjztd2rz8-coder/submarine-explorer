@@ -29,6 +29,8 @@ import {
 } from './shared.js';
 import type { EnvPreset, PresetEnterContext, PresetFrameContext, PresetParams } from './types.js';
 
+const FILL_TINT = new THREE.Color(0x8a7c6c);
+
 export interface VentSource {
   /** Orifice (top centre) in world space. */
   top: THREE.Vector3;
@@ -100,7 +102,9 @@ export class VentPreset implements EnvPreset {
       const scale = carbonate ? num(p.glowCarbonateScale, 0.35) : 1;
       this.glow = new GlowLights(
         ctx.scene,
-        this.sources.slice(0, glowCount).map((s) => s.top.clone().add(new THREE.Vector3(0, 2, 0))),
+        this.sources
+          .slice(0, glowCount)
+          .map((s) => s.top.clone().add(new THREE.Vector3(0, carbonate ? 2 : -4, 0))),
         num(p.glowColor, 0xff9a4a),
         num(p.glowIntensity, 260) * scale,
         num(p.glowDistanceM, 60),
@@ -207,6 +211,13 @@ export class VentPreset implements EnvPreset {
   }
 
   update(_dt: number, ctx: PresetFrameContext): void {
+    // Soft warm ambient fill ("never black"): lifts the abyssal ambient floor so seabed and
+    // chimney bodies read outside the headlight pool. Opt-in per site (sulfide fields).
+    const fill = num(this.params.ambientFill, 0);
+    if (fill > 0) {
+      ctx.atmo.ambientIntensity += fill;
+      ctx.atmo.ambientColor.lerp(FILL_TINT, 0.8);
+    }
     if (this.smoke) {
       updateCommonUniforms(this.smoke, ctx, this.look);
       // Bend the column downstream: half the drift a particle would make over its life,

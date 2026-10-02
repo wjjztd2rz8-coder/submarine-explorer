@@ -43,6 +43,8 @@ export interface VentPresetConfig {
   glowDistanceM: number;
   /** Carbonate (Lost City) fluid is ~40-90 C, far cooler than a black smoker: glow x this. */
   glowCarbonateScale: number;
+  /** Extra ambient light intensity added near the field (0 = none): keeps the seabed readable. */
+  ambientFill: number;
   /** Shimmer (luminance wobble sprite over each orifice): amplitude and size (m). */
   shimmerStrength: number;
   shimmerSizeM: number;
@@ -227,6 +229,7 @@ export const DEFAULT_PRESETS: PresetsConfig = {
     glowIntensity: 260,
     glowDistanceM: 60,
     glowCarbonateScale: 0.35,
+    ambientFill: 0,
     shimmerStrength: 0.08,
     shimmerSizeM: 9,
     upwellMps: 0.35,

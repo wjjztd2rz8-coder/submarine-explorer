@@ -35,7 +35,7 @@ import type { GeoBuildInput } from './types.js';
 const ROCK = new THREE.Color(0x40352f);
 const RUST = new THREE.Color(0x7a4a2c);
 const ANHYDRITE = new THREE.Color(0xcfc4b2);
-const SULFIDE = new THREE.Color(0x15110f);
+const SULFIDE = new THREE.Color(0x2c231e);
 const MOUND = new THREE.Color(0x4c4038);
 const MAT = new THREE.Color(0xb9ad98);
 
