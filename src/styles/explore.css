@@ -47,6 +47,7 @@ html.is-touch .scan-ring {
 }
 html.is-touch .scan-text {
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 html.is-touch .scan-kicker {
   font-size: 9px;
@@ -62,7 +63,38 @@ html.is-touch .scan-hint {
 }
 @media (orientation: landscape) {
   html.is-touch .scan-panel {
-    width: min(300px, calc(100vw - 380px));
+    left: calc(50% - 40px);
+    width: min(300px, calc(100vw - 440px));
     bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* On a small landscape screen, let the name use the panel's full width. */
+@media (orientation: landscape) and (max-width: 700px) {
+  html.is-touch .scan-panel {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 4px;
+    padding: 6px 8px;
+  }
+  html.is-touch .scan-panel[hidden] {
+    display: none;
+  }
+  html.is-touch .scan-ring {
+    grid-row: 1;
+    width: 24px;
+    height: 24px;
+  }
+  html.is-touch .scan-text {
+    display: contents;
+  }
+  html.is-touch .scan-kicker {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+  }
+  html.is-touch .scan-name,
+  html.is-touch .scan-hint {
+    grid-column: 1 / -1;
   }
 }

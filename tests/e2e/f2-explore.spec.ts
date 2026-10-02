@@ -26,7 +26,13 @@ interface Game {
     reset(x: number, y: number, z: number, yaw: number): void;
   };
   terrain: { sampleHeight(x: number, z: number): number };
-  rig: { snap(p: unknown, yaw: number, pitch: number): void; orbitRadius: number };
+  rig: {
+    snap(p: unknown, yaw: number, pitch: number): void;
+    freeLook: boolean;
+    lookAzimuth: number;
+    lookElevation: number;
+    chaseRadius: number;
+  };
   scanner: {
     view: { candidateId: string | null; lastCompleteId: string | null; nearestName: string };
     getTargets(): Target[];
@@ -65,7 +71,12 @@ async function park(page: Page, index: number, sample = false, distant = false):
       const z = p.z + (distant ? 160 : sample ? 10 : 18);
       const y = Math.max(p.y + 10, g.terrain.sampleHeight(p.x, z) + 13);
       g.sub.reset(p.x, y, z, 0);
-      g.rig.orbitRadius = 38;
+      // Inspect the actual prop from above and to the side; orbitRadius only
+      // affects photo mode, and straight chase framing hides it behind the hull.
+      g.rig.freeLook = true;
+      g.rig.lookAzimuth = 1.35;
+      g.rig.lookElevation = 0.55;
+      g.rig.chaseRadius = 52;
       g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
       return target.id;
     },
@@ -218,6 +229,26 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
   ).toBeNull();
 });
 
+/** Read the actual layout: a result must stay on screen and clear thumb targets. */
+async function expectScanPanelFits(page: Page): Promise<void> {
+  const panel = await page.locator('.scan-panel').boundingBox();
+  expect(panel).not.toBeNull();
+  const viewport = page.viewportSize()!;
+  expect(panel!.x).toBeGreaterThanOrEqual(0);
+  expect(panel!.y).toBeGreaterThanOrEqual(0);
+  expect(panel!.x + panel!.width).toBeLessThanOrEqual(viewport.width);
+  expect(panel!.y + panel!.height).toBeLessThanOrEqual(viewport.height);
+  for (const selector of ['.tc-stick', '.tc-slider', '.tc-btn-scan']) {
+    const control = (await page.locator(selector).boundingBox())!;
+    const overlaps =
+      panel!.x < control.x + control.width &&
+      panel!.x + panel!.width > control.x &&
+      panel!.y < control.y + control.height &&
+      panel!.y + panel!.height > control.y;
+    expect(overlaps, `Scan result overlaps ${selector}`).toBe(false);
+  }
+}
+
 const { defaultBrowserType: _phone, ...phone } = devices['iPhone 13 landscape'];
 test.describe('phone curiosity', () => {
   test.use({ ...phone });
@@ -240,7 +271,18 @@ test.describe('phone curiosity', () => {
       { timeout: 20_000 },
     );
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await expect(page.locator('.scan-hint')).toHaveText('STOWED FOR THIS DIVE');
+    await expectScanPanelFits(page);
     await shot(page, 'phone-sample');
+    // The same touch session can rotate or run on a smaller phone.
+    for (const [name, width, height] of [
+      ['phone-small-sample', 568, 320],
+      ['phone-portrait-sample', 390, 844],
+    ] as const) {
+      await page.setViewportSize({ width, height });
+      await expectScanPanelFits(page);
+      await shot(page, name);
+    }
     expect(
       await page.evaluate(() => (window.__game as unknown as Game).explore.samples.collected.size),
     ).toBe(1);

@@ -1,6 +1,8 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import * as THREE from 'three';
+import { CameraRig } from '../../src/sub/CameraRig.js';
 import { makeConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { ProgressSave } from '../../src/core/Save.js';
@@ -49,6 +51,26 @@ describe('curiosity placements on actual site terrain', () => {
             y: Math.max(t.position.y + 10, ground(t.position.x, t.position.z + 10) + 13),
             z: t.position.z + 10,
           };
+          // Match the e2e inspection view and prove the target is inside the
+          // frame with a clear sightline past the central hull, on real terrain.
+          const view = new CameraRig(config.camera, 1280 / 720, terrain);
+          view.freeLook = true;
+          view.lookAzimuth = 1.35;
+          view.lookElevation = 0.55;
+          view.chaseRadius = 52;
+          const position = new THREE.Vector3(p.x, p.y, p.z);
+          view.snap(position, 0, 0);
+          view.camera.updateMatrixWorld();
+          const projected = t.position.clone().project(view.camera);
+          expect(Math.abs(projected.x), t.id).toBeLessThan(0.85);
+          expect(Math.abs(projected.y), t.id).toBeLessThan(0.85);
+          expect(projected.z, t.id).toBeGreaterThan(-1);
+          expect(projected.z, t.id).toBeLessThan(1);
+          const sightline = new THREE.Ray(
+            view.camera.position,
+            t.position.clone().sub(view.camera.position).normalize(),
+          );
+          expect(sightline.distanceToPoint(position), t.id).toBeGreaterThan(7);
           const aim = scanAim(p, t.position, config.submarine.maxPitch);
           sub.reset(p.x, p.y, p.z, aim.yaw);
           sub.pitch = aim.pitch;

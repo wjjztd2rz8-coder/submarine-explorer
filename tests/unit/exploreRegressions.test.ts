@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
+import { EventBus } from '../../src/core/EventBus.js';
+import { Scanner } from '../../src/game/Scanner.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { Journal } from '../../src/ui/Journal.js';
 import { buildJournalSite } from '../../src/game/JournalData.js';
@@ -119,29 +121,36 @@ describe('explicit animal encounter previews', () => {
       landmarkId: 'monterey-canyon',
       seed: 3,
     });
-    const rig = new CameraRig(DEFAULT_CONFIG.camera, 1280 / 800, { sampleHeight: env.groundAt, getNormal: (_x: number, _z: number, out = new THREE.Vector3()) => out.set(0, 1, 0) });
+    const rig = new CameraRig(DEFAULT_CONFIG.camera, 1280 / 800, {
+      sampleHeight: env.groundAt,
+      getNormal: (_x: number, _z: number, out = new THREE.Vector3()) => out.set(0, 1, 0),
+    });
     const p = new THREE.Vector3(sub.x, sub.y, sub.z);
     rig.update(p, 0, 0, 1 / 60);
     for (let i = 0; i < 60; i++) life.update(1 / 60, sub, rig.camera, 800, 0.002);
     expect(life.sim.spawnNear('comb-jelly', sub, 9, 1)).not.toBeNull();
     life.update(1 / 60, sub, rig.camera, 800, 0.002);
     expect(life.targets.some((t) => t.id === 'life:comb-jelly')).toBe(true);
+    const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus());
+    scanner.setExtraTargets(life.targets);
+    const forward = new THREE.Vector3(sub.fx, sub.fy, sub.fz);
+    for (let i = 0; i < 180 && scanner.view.completed === 0; i++) {
+      life.update(1 / 60, sub, rig.camera, 800, 0.002);
+      scanner.update(1 / 60, p, forward, true);
+    }
+    expect(scanner.view.lastCompleteId).toBe('life:comb-jelly');
     rig.enterPhotoMode(p);
     rig.orbitRadius = 28;
     rig.update(p, 0, 0, 0);
     expect(life.sim.spawnNear('comb-jelly', sub, 14, 1)).not.toBeNull();
     life.update(0, sub, rig.camera, 800, 0.002);
-    console.log(
-      life.sim.pool
-        .filter((a) => a.alive && a.fade >= 0.5)
-        .map((a) => ({
-          id: a.def.id,
-          p: new THREE.Vector3(a.x, a.y, a.z).project(rig.camera).toArray(),
-          d: new THREE.Vector3(a.x, a.y, a.z).distanceTo(rig.camera.position),
-        })),
-    );
     expect(life.animalInView(rig.camera)?.id).toBe('comb-jelly');
     expect(life.render.drawCalls.species + life.render.drawCalls.sparks).toBeLessThanOrEqual(5);
+    const previews = life.sim.pool.filter((a) => a.alive && a.group.preview);
+    for (const a of previews) a.x += 1000;
+    expect(life.animalInView(rig.camera)?.id).toBe('nanomia');
+    for (const a of life.sim.pool) if (a.alive) a.fade = 0;
+    expect(life.animalInView(rig.camera)).toBeNull();
     life.dispose();
   });
 });

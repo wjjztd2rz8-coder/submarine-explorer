@@ -154,6 +154,7 @@ export class Life {
     camera.updateMatrixWorld();
     let best: SpeciesDef | null = null;
     let bestScore = Infinity;
+    let bestPreview = false;
     for (const a of this.sim.pool) {
       if (!a.alive || a.fade < 0.5) continue;
       const toward = this.tmp.set(a.x, a.y, a.z).sub(camera.position);
@@ -165,9 +166,13 @@ export class Life {
       if (this.proj.z < -1 || this.proj.z > 1) continue;
       if (Math.abs(this.proj.x) > 0.85 || Math.abs(this.proj.y) > 0.85) continue;
       // Centre of frame first, bigger and closer animals break ties.
-      const score = this.proj.x * this.proj.x + this.proj.y * this.proj.y + d / (40 + size * 20) - (a.group.preview ? 4 : 0);
-      if (score < bestScore) {
+      const score = this.proj.x * this.proj.x + this.proj.y * this.proj.y + d / (40 + size * 20);
+      // An explicit encounter preview is the requested subject, but only after
+      // the same size, fade and framing checks as naturally spawned animals.
+      const preview = a.group.preview === true;
+      if ((preview && !bestPreview) || (preview === bestPreview && score < bestScore)) {
         bestScore = score;
+        bestPreview = preview;
         best = a.def;
       }
     }

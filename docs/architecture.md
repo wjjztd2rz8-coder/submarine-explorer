@@ -630,3 +630,10 @@ and `total`, plus this dive's `secrets`, `samples` and `events` lists. Rewards c
 kinds with stable `site/subject` IDs. This checkout already includes F2-PROGRESS:
 its reward table adds 15/10/5 RP and its generic scan listener skips curiosity
 IDs so rewards are not doubled. Bus events are emitted even without progression.
+
+The wildlife debug hook `life.sim.spawnNear` recycles distant animals to keep a
+requested encounter inside the existing agent and species budgets. A singleton
+uses the specified position without group scatter. Forced encounter groups have
+an optional `preview` marker: photo naming prefers that explicit subject only
+when it passes the normal size, fade and frame checks. Natural spawning and
+natural subject scoring remain unchanged.

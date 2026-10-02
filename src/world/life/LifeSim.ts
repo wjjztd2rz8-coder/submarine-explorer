@@ -743,7 +743,8 @@ export class LifeSim {
 
   /**
    * Put a group of `speciesId` `ahead` metres in front of the sub, bypassing
-   * the tables and the budget (e2e, screenshots and the Journal tests).
+   * the tables while recycling capacity within the tier budget. Used for
+   * explicit encounter previews, screenshots and Journal tests.
    */
   spawnNear(speciesId: string, sub: SubInfo, ahead = 14, count?: number): Group | null {
     const def = SPECIES_BY_ID.get(speciesId);

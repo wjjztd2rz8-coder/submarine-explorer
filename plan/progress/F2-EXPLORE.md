@@ -1,4 +1,4 @@
-# F2-EXPLORE — implementation ready; browser verification blocked
+# F2-EXPLORE — reported regressions fixed; remaining gate findings documented
 
 ## Player changes
 
@@ -31,27 +31,86 @@
 
 Owned additions: `src/game/{Secrets,SecretsVisual,Samples,Events,EventsVisual}.ts`,
 `src/app/systems/explore.ts`, `data/secrets/*.json`,
-`tests/unit/{gameExplore,exploreTerrain}.test.ts`, `tests/e2e/f2-explore.spec.ts`.
+`tests/unit/{gameExplore,exploreTerrain,exploreRegressions}.test.ts`, `tests/e2e/f2-explore.spec.ts`.
 Scanner and Journal integration use their existing APIs plus a supplemental
 scan-target pool, separate from wildlife and mission POIs.
 
-## Checks
+## Checks and gate follow-up
 
-- `tools/gates.sh` with `PW_PORT=4282`: build, unit, Python, content,
-  attribution and Prettier pass. Both e2e gates cannot start Vite preview:
-  `listen EPERM: operation not permitted 127.0.0.1:4282` (and base port 4382).
-- An offline Playwright request-interception attempt avoided a listening port,
-  but Chromium also cannot start in this sandbox:
-  `sandbox_host_linux.cc:41 ... shutdown: Operation not permitted`.
-  Temporary offline harness removed; normal assertions were never weakened.
-- Focused logic tests pass. Additional actual-terrain unit tests load every tile,
-  verify all 65 placements, and complete all scans through normal submarine
-  physics and the unchanged scanner cone. Rewards are tested for finite,
-  idempotent persistence. Final full unit count: 705 tests in 68 files.
-- `npx prettier --write` was run on every changed file; `git diff --check` passes.
-- Screenshots are **not captured** because Chromium is blocked. The normal e2e
-  spec writes `secret-{1,2,3}.png`, `event-marine-snow.png`, Journal, debrief and
-  phone screenshots into `.cache/codex/shots/f2-explore/` when run successfully.
+The initial sandbox blocked localhost and Chromium. The orchestrator subsequently
+ran all gates and supplied real screenshots: all non-browser gates and e2e-base
+passed; e2e had 176 passes, 14 skips and three failures (Journal site-page
+navigation, wildlife scan, wildlife photo caption). Those screenshots were
+reviewed; the phone scan result overlapped controls and the straight chase view
+hid the curiosity props behind the hull.
+
+The restored worktree contains orchestrator checkpoint `53c5722`, including the
+first regression fixes. This follow-up finishes those fixes:
+
+- `Journal.open()` only applies a pending scan focus if no later navigation has
+  changed the view. Tests cover resolved and delayed loads and newer navigation.
+- `LifeSim.spawnNear()` recycles pool/species capacity, preserves tier budgets,
+  and places a singleton at the requested position. Preview initialization
+  survives the next simulation frame. Its explicit subject marker only affects
+  photo selection after normal size, fade and framing eligibility checks.
+  Offscreen previews and invisible animals cannot supply a caption.
+- Sample confirmation says **Stowed for this dive**, with a compact opaque touch
+  panel. The e2e now checks real bounding boxes against movement and Scan controls
+  in landscape, small landscape and portrait, retaining the 44 px Scan checks.
+- Curiosity screenshots use the chase camera's actual free-look controls instead
+  of the photo-only `orbitRadius`. Real-terrain tests prove every target remains
+  in frame and has a sightline clear of the central hull. The physics and scanner
+  assertions for all 65 placements are preserved.
+- Wildlife e2e teleports now snap the camera too. Photo mode's P key is consumed
+  on the next frame and entering resets the orbit radius: the fixture waits for
+  the viewfinder before setting its zoom. It also checks the requested spawn and
+  runtime errors, keeping every prior naming/persistence assertion intact.
+- The regression test completes the jelly scan through normal simulation and
+  Scanner updates with the actual low-tier Monterey table and verifies photo
+  captions and draw-call budgets. No existing assertion was weakened.
+
+Current validation: 710 unit tests pass, including 19 focused regression/terrain
+checks. The completed normal full gate run passes build, unit, Python, content,
+attribution, formatting and e2e-base. Its browser result is **177 passed,
+14 skipped, 2 failed** in 29.8 minutes. All 26 F2-EXPLORE/F2-LIFE tests pass,
+including all three originally reported failures. The remaining failures are
+unchanged `mission.spec.ts` timing checks: one metre of descent within a fixed
+1.5-second wait, and real dive-time advancement during a two-second wait.
+They also reproduce separately at the normal default quality. On this software
+renderer, the repository's configured CI low tier passes both unchanged checks
+with `--retries=0` (2/2). The additional full CI attempt passes the six
+non-browser gates but hits an existing low-tier photo brightness assertion in
+`d-photo.spec.ts`: mean 4.25 against the unchanged >8 threshold, on both attempts.
+That photo test passed in the normal full run. The CI attempt was stopped after
+this separate rendering finding; its partial log is preserved. No assertions or
+quality configuration files were changed.
+
+The normal full-run result is recorded above from the completed gate output.
+Its saved log copy contains only startup output, so it is retained as
+`.cache/codex/f2-explore-regular-e2e-startup.log`, not as a complete transcript.
+The extra CI partial log is `.cache/codex/f2-explore-ci-e2e-partial.log`.
+Seven gates passed in the completed normal run, with e2e reporting the two
+mission timing failures. **The full gate set is not green.**
+
+The corrected wildlife photo test also passes three consecutive repeats. Its
+fixture waits for the viewfinder before adjusting zoom, avoiding the orbit-radius
+reset on entry. All three originally reported failures pass in the normal full suite.
+
+Browser startup succeeds in the resumed environment. An initial focused run hit
+`EROFS` when writing screenshots: `.cache/codex/shots` was a symlink into the
+orchestrator's read-only checkout. That local ignored symlink was renamed to
+`shots-orchestrator`, and `shots` is now a writable worktree directory. Original
+orchestrator captures are preserved. Screenshot assertions were not skipped.
+One photo repeat also raced a rebuild of its serving directory; subsequent
+checks use a completed, unchanged bundle.
+
+The real captures in `.cache/codex/shots/f2-explore/` have been reviewed:
+`secret-{1,2,3}.png`, `event-marine-snow.png`, `journal-secret.png`,
+`sample-debrief.png`, `phone-sample.png`, `phone-small-sample.png`, and
+`phone-portrait-sample.png`. Secrets sit beside the hull, the snow burst is
+visible over the seabed, and sample confirmations remain legible and clear of
+thumb controls. Existing HUD/sonar panels overlap on small phones; this is
+outside F2-EXPLORE ownership and is noted for the orchestrator.
 
 ## Deviations (minimal integration outside OWNS)
 
@@ -73,12 +132,19 @@ scan-target pool, separate from wildlife and mission POIs.
   existing sonar bus; no audio asset changes.
 - `src/ui/ExploreNotice.ts`, `src/styles/explore.css`: isolated brief caption and
   module CSS; it has no new controls. Secret Journal controls are at least 44 px.
+- `src/world/life/{LifeSim,Life,agent}.ts`: minimal explicit-preview repair for
+  the two supplied wildlife failures, preserving natural spawning and naming.
 - `docs/architecture.md`, `CHANGELOG.md`, this progress note: contracts/reporting.
 
 ## Orchestrator review
 
-Run `PW_PORT=4282 npx playwright test tests/e2e/f2-explore.spec.ts`, inspect the
-three secret screenshots plus event, Journal, sample debrief and phone capture,
-and rerun both browser gates in a runtime that permits Chromium and localhost.
-Review rock/arch readability, the small sample effect and event opacity in those
-captures before committing. No git commit was made.
+Inspect the three secrets, event and phone captures in this worktree's
+`.cache/codex/shots/f2-explore/` before committing. The local directory is no
+longer a symlink to the main checkout. The wider phone HUD/sonar overlap belongs
+to the touch/HUD layout owner; curiosity panels clear the actual touch controls.
+Review the small wildlife preview deviation alongside the regression tests.
+The default-quality software-renderer timing failures above should be reviewed
+by the performance/clock owner. The additional CI low-tier photo brightness
+finding belongs to rendering/lighting. This package does not change physics,
+Time, render exposure, or default quality to accommodate those checks.
+No git commit was made by this agent.

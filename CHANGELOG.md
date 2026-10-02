@@ -156,6 +156,10 @@ without an entry here is not done.
 
 ### Changed
 
+- F2-EXPLORE follow-up: Journal navigation keeps the page the player selects
+  while content finishes loading. Sample confirmations now say “Stowed for this
+  dive”; compact touch scan panels clear the movement and Scan controls.
+  No features or objectives were cut.
 - Phase F, F-VISUAL-FIXES: narrower, softer headlights and a weaker nearby fill
   preserve material colour and seabed gradients. Exposure and bloom are lower;
   marine snow is smaller. Realistic lights keep a faint local fill for the hull.

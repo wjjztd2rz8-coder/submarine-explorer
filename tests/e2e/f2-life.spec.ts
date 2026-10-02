@@ -31,7 +31,11 @@ interface Game {
     view: { completed: number; lastCompleteId: string | null; candidateId: string | null };
   };
   discoveries: { isDiscovered(l: string, p: string): boolean };
-  rig: { camera: unknown; orbitRadius: number };
+  rig: {
+    camera: unknown;
+    orbitRadius: number;
+    snap(p: unknown, yaw: number, pitch: number): void;
+  };
   perf: { drawCalls: number };
 }
 
@@ -63,6 +67,9 @@ async function park(page: Page, depth: number): Promise<void> {
       }
     }
     g.sub.reset(x, y, z, 0);
+    // Photo entry preserves the current camera angle. Teleport both together
+    // instead of depending on a rendered frame arriving during the short wait.
+    g.rig.snap(g.sub.position, 0, 0);
   }, depth);
   await page.waitForTimeout(500);
 }
@@ -178,37 +185,43 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
 });
 
 test('photo mode names the animal in frame', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
   await boot(page);
   await park(page, 120);
   await page.keyboard.press('p');
+  await expect(page.locator('.photo-mode')).toBeVisible();
   // Bring the photo camera in close so the jelly is a clear subject.
   await page.evaluate(() => {
     (window.__game as unknown as Game).rig.orbitRadius = 28;
   });
   await page.waitForTimeout(400);
-  await page.evaluate(() => {
+  const spawned = await page.evaluate(() => {
     const g = window.__game as unknown as Game;
     const p = g.sub.position;
-    g.life!.sim.spawnNear(
-      'comb-jelly',
-      {
-        x: p.x,
-        y: p.y,
-        z: p.z,
-        vx: 0,
-        vy: 0,
-        vz: 0,
-        fx: 0,
-        fy: 0,
-        fz: -1,
-        speed: 0,
-        lightsOn: true,
-        hullR: 7,
-      },
-      14,
-      1,
+    return (
+      g.life!.sim.spawnNear(
+        'comb-jelly',
+        {
+          x: p.x,
+          y: p.y,
+          z: p.z,
+          vx: 0,
+          vy: 0,
+          vz: 0,
+          fx: 0,
+          fy: 0,
+          fz: -1,
+          speed: 0,
+          lightsOn: true,
+          hullR: 7,
+        },
+        14,
+        1,
+      ) !== null
     );
   });
+  expect(spawned).toBe(true);
   await expect(page.locator('.photo-mode-caption')).toContainText('Lobate comb jelly');
   const named = await page.evaluate(() => {
     const g = window.__game as unknown as Game;
@@ -216,6 +229,7 @@ test('photo mode names the animal in frame', async ({ page }) => {
   });
   // The orbit camera sits behind the sub, so the jelly 14 m ahead is in the middle of the frame.
   expect(named).toBe('comb-jelly');
+  expect(errors).toEqual([]);
 });
 
 /**
