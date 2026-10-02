@@ -108,6 +108,8 @@ export interface CanyonPresetConfig {
   plumeColor: number;
   /** Extra ambient light intensity (0 = none) so the wall and floor near the sub never read black. */
   ambientFill: number;
+  /** Marine-snow density multiplier (1 = unchanged). */
+  snowScale: number;
 }
 
 /** Shallow reef: light shafts, warmer brighter ambient, stronger caustics. */
@@ -278,6 +280,7 @@ export const DEFAULT_PRESETS: PresetsConfig = {
     plumeOpacity: 0.3,
     plumeColor: 0x8a7d68,
     ambientFill: 0,
+    snowScale: 1,
   },
   reef: {
     shafts: 14,

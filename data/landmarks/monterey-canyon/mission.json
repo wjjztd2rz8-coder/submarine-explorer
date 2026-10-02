@@ -10,6 +10,7 @@
       "currentDirDeg": 255,
       "currentSpeedMps": 0.5,
       "ambientFill": 24,
+      "snowScale": 0.5,
       "plumeOpacity": 0.1,
       "plumeSizeM": 2.2
     }

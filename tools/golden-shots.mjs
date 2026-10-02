@@ -106,6 +106,8 @@ try {
         const hero = g.props.placed.find((p) => p.def.id === propId);
         if (!hero || hero.localBounds.isEmpty()) throw new Error(`Missing hero bounds: ${propId}`);
         hero.root.updateMatrixWorld(true);
+        // Vent set pieces are framed from their axis; wall scarps from their footprint edge.
+        const axis = /^(?!.*(ledge|cliff|scarp)).+/.test(hero.def.feature ?? '');
         const centre = hero.localBounds.getCenter(g.sub.position.clone());
         const half = hero.localBounds.getSize(g.sub.position.clone()).multiplyScalar(0.5);
         if (hero.def.model === 'procedural:chimney' && hero.def.dimensionsM?.[2])
@@ -115,7 +117,7 @@ try {
           const dx = Math.sin(angle),
             dz = -Math.cos(angle);
           // Sprawling vent set pieces (a feature) are framed from their axis, not their footprint edge.
-          const edge = hero.def.feature
+          const edge = axis
             ? 0
             : Math.min(
                 half.x / Math.max(Math.abs(dx), 1e-6),
@@ -124,7 +126,7 @@ try {
           const target = hero.root.localToWorld(
             centre.clone().add(g.sub.position.clone().set(dx * edge, 0, dz * edge)),
           );
-          const direction = hero.def.feature
+          const direction = axis
             ? hero.root
                 .localToWorld(g.sub.position.clone().set(dx, 0, dz))
                 .sub(hero.root.localToWorld(g.sub.position.clone().set(0, 0, 0)))
@@ -132,7 +134,7 @@ try {
                 .normalize()
             : target.clone().sub(hero.root.localToWorld(centre.clone())).setY(0).normalize();
           if (direction.lengthSq() < 0.5) continue;
-          const clear = (hero.def.feature ? [40, 30] : [40, 15]).every((range) => {
+          const clear = (axis ? [40, 30] : [40, 15]).every((range) => {
             const p = target.clone().addScaledVector(direction, range);
             p.y = g.terrain.sampleHeight(p.x, p.z) + 15;
             return (
@@ -147,7 +149,11 @@ try {
       // A feature set piece is framed from its axis, so its close shot stays outside the spires.
       const closeRange = await page.evaluate(
         (propId) =>
-          window.__game.props.placed.find((p) => p.def.id === propId)?.def.feature ? 30 : 15,
+          (window.__game.props.placed.find((p) => p.def.id === propId)?.def.feature ?? '').match(
+            /^(?!.*(ledge|cliff|scarp)).+/,
+          )
+            ? 30
+            : 15,
         heroId,
       );
       for (const [n, range] of [

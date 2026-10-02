@@ -159,6 +159,7 @@ export class CanyonPreset implements EnvPreset {
       ctx.atmo.ambientIntensity += fill;
       ctx.atmo.ambientColor.lerp(FILL_TINT, 0.75);
     }
+    ctx.atmo.snowDensity *= num(this.params.snowScale, 1);
     this.sampleClock += dt;
     if (ctx.baseCurrent.lengthSq() === 0) {
       this.flow.set(0, 0, 0);
