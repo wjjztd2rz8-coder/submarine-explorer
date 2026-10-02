@@ -58,6 +58,8 @@ uniform vec3 uContrast;         // pattern contrast for slots A, B, C
 uniform float uRockLo;          // 1 - cos(slope) where rock starts
 uniform float uRockHi;          // ... and where it is complete
 uniform float uExaggeration;
+uniform vec2 uDepthShade;       // surface depth (m) where the dark tint starts / is complete; 0,0 = off
+uniform vec3 uDepthTint;        // albedo multiplier at full depth shade
 
 varying vec3 vTerrainWorldPos;
 varying vec3 vTerrainWorldNormal;
@@ -276,6 +278,10 @@ float terrRough = 0.92;
   st *= uStainAmount * (0.55 + 0.9 * rockT + 0.5 * max(cav, 0.0));
   alb = mix(alb, uStain * lum, clamp(st, 0.0, 0.85));
 
+  if (uDepthShade.y > uDepthShade.x) {
+    float surfDepth = -P.y / max(uExaggeration, 1e-3);
+    alb *= mix(vec3(1.0), uDepthTint, smoothstep(uDepthShade.x, uDepthShade.y, surfDepth));
+  }
   diffuseColor.rgb *= alb;
 }
 

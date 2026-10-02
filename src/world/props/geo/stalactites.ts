@@ -9,7 +9,7 @@
 
 import * as THREE from 'three';
 import { geoDetail } from './detail.js';
-import { geoMaterial, LIFE_TINT } from './materials.js';
+import { geoMaterial as baseGeoMaterial, LIFE_TINT } from './materials.js';
 import {
   endRatio,
   pinchScale,
@@ -46,6 +46,14 @@ const AMBER = new THREE.Color(0xb59a6a);
 const DRAPE = new THREE.Color(0xa59d88);
 
 const EDGE_START = 0.55;
+
+/** Sunlit pale limestone: the shared rock albedo (kept dark for vents and tuff) is lifted. */
+const LIMESTONE_LIFT = 4.2;
+const geoMaterial: typeof baseGeoMaterial = (kind, d, o) => {
+  const m = baseGeoMaterial(kind, d, o);
+  m.color.multiplyScalar(LIMESTONE_LIFT);
+  return m;
+};
 
 /**
  * (y, z) profile fractions from the apron join: a wall, a thick shelf whose
