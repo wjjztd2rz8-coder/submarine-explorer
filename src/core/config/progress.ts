@@ -1,6 +1,16 @@
 /** Research tuning: lifetime points unlock hulls independently of upgrade spending. */
 export const PROGRESS_CONFIG = {
-  rewards: { poi: 10, objective: 5, species: 15, photo: 10, primary: 30, rating: 20 },
+  rewards: {
+    poi: 10,
+    objective: 5,
+    species: 15,
+    photo: 10,
+    primary: 30,
+    rating: 20,
+    secret: 15,
+    sample: 10,
+    event: 5,
+  },
   hulls: [
     { id: 'A', depthM: 1000, threshold: 0 },
     { id: 'B', depthM: 6500, threshold: 300 },

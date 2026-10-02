@@ -362,6 +362,12 @@ export class Sonar {
     if (t === 1) this.zoomStartedAt = null;
   }
 
+  /** Anonymous, nearby curiosity blips, separate from objectives and regular POIs. */
+  private faintContacts: readonly { id: string; position: { x: number; z: number } }[] = [];
+  setFaintContacts(contacts: readonly { id: string; position: { x: number; z: number } }[]): void {
+    this.faintContacts = contacts;
+  }
+
   setPois(pois: readonly PlacedPoi[]): void {
     this.pois = pois;
   }
@@ -668,6 +674,23 @@ export class Sonar {
           .join('; ') || 'no contacts in view'
       }`,
     );
+
+    ctx.save();
+    ctx.fillStyle =
+      this.paletteName_ === 'highContrast' ? 'rgba(255,255,255,.6)' : 'rgba(167,214,200,.45)';
+    for (const contact of this.showMarkers ? this.faintContacts : []) {
+      const { px, py } = this.project(contact.position.x, contact.position.z);
+      if (px < 0 || py < 0 || px > w || py > h) continue;
+      ctx.beginPath();
+      ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    if (this.showMarkers && this.faintContacts.length)
+      this.canvas.setAttribute(
+        'aria-label',
+        `${this.canvas.getAttribute('aria-label')}; faint unidentified contact`,
+      );
 
     // The sub: a triangle pointing along its heading. Canvas y grows downward
     // and so does +Z (south), so a heading of 0 (north) must point up: -y.

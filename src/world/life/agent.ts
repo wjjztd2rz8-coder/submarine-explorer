@@ -93,6 +93,8 @@ export interface Group {
   /** Grid cell this patch belongs to ('' for mobile groups). */
   cell: string;
   rare: boolean;
+  /** Placed by an explicit preview (`spawnNear`); the camera treats it as the subject. */
+  preview?: boolean;
   /** Cruisers: swing by the sub for a look before moving on. */
   curious: boolean;
   passed: boolean;

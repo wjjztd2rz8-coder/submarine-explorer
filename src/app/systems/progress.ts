@@ -54,6 +54,8 @@ export function createProgressSystem(): GameSystem {
       }
       cleanup.add(
         ctx.bus.on('scan:complete', ({ landmarkId, poiId }) => {
+          // Curiosity has its own rewards; avoid also awarding a generic POI.
+          if (poiId.startsWith('secret:') || poiId.startsWith('sample:')) return;
           const earned = poiId.startsWith('life:')
             ? progress.award('species', poiId.slice('life:'.length))
             : progress.award('poi', `${landmarkId}/${poiId}`);

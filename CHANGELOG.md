@@ -32,6 +32,17 @@ without an entry here is not done.
   show the layout for the keyboard, gamepad or touch you last used, with 44 px
   buttons. The bottom tip strip now follows the active device (hidden on touch,
   where the on-screen buttons are the tips).
+- Phase F, F2-EXPLORE: three hidden discoveries and two sample spots at every
+  site. Nearby sonar picks up faint unidentified contacts; holding Scan reveals
+  a secret and its Journal entry, tagged once as a Game addition. Secrets never
+  appear as mission objectives or waypoints.
+- Local sample collection with the scan control, animated manipulators and a
+  small sediment effect on every graphics tier. The collection resets each dive
+  and appears alongside the per-site secrets count in both debrief variants.
+- Rare, short vent surges, canyon silt puffs, marine-snow bursts and whales passing
+  above shallow canyon water. Events have a quiet cooldown, a soft sensor cue and
+  a brief caption. Watching one earns research; hidden discoveries and samples
+  also award research once per subject.
 
 - Phase F, F-VISUAL-FIXES: authored free-dive approaches for all thirteen sites,
   facing the wreck, reef, chimney field or landscape route. Challenger keeps
@@ -190,6 +201,10 @@ without an entry here is not done.
   fluid pressure, Endurance tonnage, Challenger depth and monument boundary,
   white coral colour and wreck memorial text are corrected; deeper-route hints no longer call the twilight zone fully dark.
 
+- F2-EXPLORE follow-up: Journal navigation keeps the page the player selects
+  while content finishes loading. Sample confirmations now say “Stowed for this
+  dive”; compact touch scan panels clear the movement and Scan controls.
+  No features or objectives were cut.
 - Phase F, F-VISUAL-FIXES: narrower, softer headlights and a weaker nearby fill
   preserve material colour and seabed gradients. Exposure and bloom are lower;
   marine snow is smaller. Realistic lights keep a faint local fill for the hull.

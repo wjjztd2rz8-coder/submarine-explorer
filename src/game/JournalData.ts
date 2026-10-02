@@ -14,6 +14,7 @@
  *   future encounter system.
  */
 
+import { loadSecrets, secretDiscoveryId, type SecretDef } from './Secrets.js';
 import { contentUrl, fetchContentJson, isSafeLandmarkId, type FetchJson } from './ContentPath.js';
 import {
   buildGuideEntries,
@@ -36,7 +37,7 @@ import type { LifeDoc, LifeJournalEntry, SpeciesDef } from '../world/life/types.
 /** The id a scanned animal is stored under in the discovery store (`<site>/life:<species>`). */
 export const lifeDiscoveryId = (speciesId: string): string => `life:${speciesId}`;
 
-export type JournalEntryKind = 'site' | 'poi' | 'species' | 'life';
+export type JournalEntryKind = 'site' | 'poi' | 'species' | 'life' | 'secret';
 
 export interface JournalEntry {
   /** Unique across the Journal: `<site>/<kind>/<id>`. */
@@ -145,6 +146,7 @@ export interface JournalSiteInput {
   species: SpeciesDoc | null;
   /** The marine-life tables and texts; wildlife entries come from the site's table. */
   life?: LifeDoc | null;
+  secrets?: SecretDef[];
 }
 
 /** Wildlife entries for a site: every animal its spawn table can show, rare appearance included. */
@@ -221,6 +223,24 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
     };
   });
   const wildlife = lifeEntries(id, input.life ?? null);
+  const secrets: JournalEntry[] = (input.secrets ?? []).map((d) => ({
+    key: `${id}/secret/${d.id}`,
+    siteId: id,
+    kind: 'secret',
+    id: d.id,
+    title: d.name,
+    poiIds: [secretDiscoveryId(d.id)],
+    linkedEntryIds: [],
+    recreation: false,
+    guide: {
+      id: d.id,
+      title: d.name,
+      paragraphs: [d.text],
+      facts: [],
+      reconstruction: false,
+      sources: [],
+    },
+  }));
   const site: JournalSite = {
     id,
     name: guide?.title ?? catalogue?.name ?? input.missionTitle ?? id,
@@ -229,7 +249,7 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
     summary: catalogue?.summary ?? '',
     facts: catalogue?.facts ?? [],
     links: catalogue?.links ?? [],
-    entries: [...siteEntries, ...poiEntries, ...speciesEntries, ...wildlife],
+    entries: [...siteEntries, ...poiEntries, ...speciesEntries, ...wildlife, ...secrets],
     poiIds: pois.map((p) => p.id),
     species: input.species,
   };
@@ -240,7 +260,12 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
 
 /** A site unlocks when any of its POIs has been scanned. */
 export function isSiteUnlocked(site: JournalSite, store: DiscoveryReader): boolean {
-  return site.poiIds.some((p) => store.isDiscovered(site.id, p));
+  return (
+    site.poiIds.some((p) => store.isDiscovered(site.id, p)) ||
+    site.entries.some(
+      (e) => e.kind === 'secret' && e.poiIds.some((p) => store.isDiscovered(site.id, p)),
+    )
+  );
 }
 
 export function isEntryUnlocked(
@@ -249,7 +274,8 @@ export function isEntryUnlocked(
   store: DiscoveryReader,
 ): boolean {
   if (entry.kind === 'site') return isSiteUnlocked(site, store);
-  if (entry.kind === 'poi') return entry.poiIds.some((p) => store.isDiscovered(site.id, p));
+  if (entry.kind === 'poi' || entry.kind === 'secret')
+    return entry.poiIds.some((p) => store.isDiscovered(site.id, p));
   if (entry.kind === 'life') return store.isDiscovered(site.id, lifeDiscoveryId(entry.id));
   return entry.linkedEntryIds.some((id) => {
     const e = site.entries.find((x) => x.kind === 'poi' && x.id === id);
@@ -270,7 +296,7 @@ export function siteProgress(site: JournalSite, store: DiscoveryReader): SitePro
   const out: SiteProgress = { logged: 0, total: 0, species: 0, speciesTotal: 0 };
   for (const e of site.entries) {
     const open = isEntryUnlocked(site, e, store);
-    if (e.kind === 'life') continue;
+    if (e.kind === 'life' || e.kind === 'secret') continue;
     if (e.kind === 'species') {
       out.speciesTotal++;
       if (open) out.species++;
@@ -304,15 +330,16 @@ export async function loadJournalSite(
   fetchFn?: FetchJson,
 ): Promise<JournalSite> {
   const quiet = (): void => {};
-  const [guide, pois, species, mission, life] = await Promise.all([
+  const [guide, pois, species, mission, life, secrets] = await Promise.all([
     loadGuide(id, fetchFn),
     loadPois(id, fetchFn, quiet),
     loadSpecies(id, fetchFn, quiet),
     fetchContentJson(contentUrl(id, 'mission.json'), fetchFn),
     // The animals' texts load with the site only for the real game (a test fetch has none).
     fetchFn ? Promise.resolve(null) : loadLifeDoc(),
+    loadSecrets(id, fetchFn),
   ]);
-  const input: JournalSiteInput = { id, guide, pois, species, life };
+  const input: JournalSiteInput = { id, guide, pois, species, life, secrets: secrets.secrets };
   const info = catalogue.get(id);
   if (info) input.catalogue = info;
   const title = isObj(mission) ? str(mission.title) : '';
