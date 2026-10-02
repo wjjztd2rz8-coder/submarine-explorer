@@ -75,3 +75,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - 2026-10-01 22:15 CDT headless run: skipped: budget gate (claude 5h 39.0% left (resets Thu Oct 01 23:39) | 7d 78.0% left (resets Thu Oct 08 06:59) codex 5h 27.0% left (resets Fri Oct 02 00:50) | 7d 34.0% left (resets Tue Oct 06 16:29) [as of 74 min ago] )
 - 2026-10-01 22:45 CDT headless run: skipped: budget gate (claude 5h 28.0% left (resets Thu Oct 01 23:40) | 7d 77.0% left (resets Thu Oct 08 07:00) [as of 2 min ago] codex 5h 27.0% left (resets Fri Oct 02 00:50) | 7d 34.0% left (resets Tue Oct 06 16:29) [as of 103 min ago] )
 - 2026-10-01 23:15 CDT headless run: skipped: budget gate (claude 5h 24.0% left (resets Thu Oct 01 23:40) | 7d 76.0% left (resets Thu Oct 08 07:00) [as of 2 min ago] codex 5h 5.0% left (resets Fri Oct 02 00:50) | 7d 30.0% left (resets Tue Oct 06 16:29) [as of 17 min ago] )
+
+## 2026-10-02 02:00 headless run
+
+- Merged (main gates green, pushed, tagged `f3`): F-HUD-LAYOUT (Sonnet finished; tutorial and hint chip in left column, scan panel top-centre, controls bar hides once learned), F-ARCADE-ACCESS (Codex; no depth gating in Arcade, composed near-site opening, `tools/golden-shots.mjs`), F2-MODES (Codex plus Sonnet; Arcade/Realistic with Advanced/Custom, exaggerated currents, Daily dive, Free dive in the briefing).
+- Fixed on integration: Codex's e2e had never really run (sandbox blocked ports), so three specs needed updating for the composed Arcade opening; Custom keeps the classic long approach.
+- Decisions for owner: scan panel moved to top-centre (chase camera keeps the sub low); Gentle currents retired from new choices; Custom mode hides under Advanced.
+- Queue: f-bughunt-1 and f-bughunt-2 wait for Codex budget (Codex 5h had reset to 100%; dispatcher will launch). Next: hero-site polish with golden shots, brand (needs name OK). Claude 5h ended ~69%; not started another agent because the 3 merges used the run.
