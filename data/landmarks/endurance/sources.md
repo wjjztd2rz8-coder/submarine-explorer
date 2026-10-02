@@ -1,5 +1,11 @@
 # Endurance site content: sources and notes (package C4)
 
+## Phase F tone review — 2026-10-01
+
+Retain the upright, intact 44 m timber hull and documented 3,008 m discovery depth. Remove the catalog’s low-oxygen preservation claim: [Endurance22’s discovery account](https://endurance22.org/endurance-is-found) supports excellent preservation and absence of destructive shipworms, not oxygen depletion. The abundant filter-feeding fauna also makes a low-oxygen explanation inappropriate. Replace generic-block prose with the current preserved-ship description and shorten memorial text to observation and non-disturbance at this wreck, without a stale game-wide ban on sampling.
+
+[UK Antarctic Heritage Trust](https://ukaht.org/places/endurance-shipwreck/) records 350 tons gross. The guide now labels this gross register tonnage, not displacement; register tonnage measures enclosed volume rather than ship mass.
+
 Researched 2026-09-23. Files: `pois.json`, `guide.json`, `props.json`, `mission.json`,
 `species.json` in this folder. Tile: `data/tiles/endurance` (GMRT Synthesis, falls back to
 GEBCO-derived fill at this site; ~22 x 61 m cells, bbox N -68.5798 / S -68.8792 /

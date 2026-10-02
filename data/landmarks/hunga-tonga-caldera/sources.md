@@ -1,5 +1,13 @@
 # Hunga Tonga caldera site content: sources and notes (package C4)
 
+## Phase F era and route decision — 2026-10-01
+
+Retain the historical pre-January-2022 experience. [Ribó et al. 2026, repeat bathymetry](https://www.nature.com/articles/s41561-026-02099-7) documents the pre-eruption central basin at 150–200 m, the 2014–2015 cone joining the islands, and the later ~850 m basin. The fetched tile metadata provides GMRT provenance but no per-cell survey year; its shallow ~132 m basin is consistent with the earlier morphology. This is an era choice grounded in morphology, not new verification of an exact tile survey vintage.
+
+The existing scan at ~469 m cannot be an inner wall descending into that shallow basin. Retain its objective ID, route and scan requirements, but describe the volcanic rim slope beyond the central basin. Move the authored tuff scarp 0.002° west (~208 m) onto the existing scan coordinate; it snaps to 468.6 m terrain instead of the former ~410 m slope. Height, width and heading stay scenic and unchanged. The research brief now requests older tuff and local sediment, removing fresh 2022 ash and collapse staging.
+
+Correct the basin pressure from 200 atmospheres to about 15–20. Remove the erroneous “at least six deaths in Tonga” figure (it conflated geographic totals) and the unsupported claim that outer slopes were unaffected by the eruption: the repeat-mapping paper documents flank scours. Post-eruption depths and changes remain historical context in the Journal, not scene promises.
+
 Researched 2026-09-23. Files: `pois.json`, `guide.json`, `props.json` (empty),
 `mission.json`, `species.json` in this folder. Tile: `data/tiles/hunga-tonga-caldera`
 (GMRT; bbox N -20.39964/S -20.69956/E -175.23907/W -175.56097; `min_m` -1951.36,
@@ -40,22 +48,20 @@ because that terrain is not present here (and should not be, per the task brief)
 
 ## Fabricated vs. sourced
 
-| Item                                                 | Sourced (measured/published)                                  | Reconstructed / estimated                                                                    |
-| ---------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Pre-eruption caldera terrain                         | Real pre-2022 survey data (GMRT/GEBCO)                        | —                                                                                            |
-| Post-eruption caldera (not modelled)                 | Described in guide.json from TESMaP/NIWA/AGU sources only     | Not represented in terrain or props anywhere                                                 |
-| Caldera-wall POI's exact identity                    | This tile's own depth reading                                 | "Representative stretch of the caldera wall" is an interpretation, flagged medium confidence |
-| Eruption facts (date, plume height, tsunami, deaths) | Wikipedia, cross-checked against the AGU paper's introduction | —                                                                                            |
-| Spawn point                                          | —                                                             | Chosen for gameplay: over the pre-eruption caldera, heading 250°                             |
+| Item                                         | Sourced (measured/published)                                                             | Reconstructed / estimated                                                       |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Pre-eruption caldera terrain                 | GMRT/GEBCO morphology consistent with the earlier basin; exact survey vintage unverified | —                                                                               |
+| Post-eruption caldera (not modelled)         | Described in guide.json from TESMaP/NIWA/AGU sources only                                | Not represented in terrain or props anywhere                                    |
+| Caldera-wall POI's exact identity            | This tile's own depth reading                                                            | Volcanic rim slope beyond the central basin; exact feature identity is authored |
+| Eruption facts (date, plume height, tsunami) | Wikipedia, cross-checked against the AGU paper's introduction                            | —                                                                               |
+| Spawn point                                  | —                                                                                        | Chosen for gameplay: over the pre-eruption caldera, heading 250°                |
 
 ## Not verified / open
 
-- No source consulted gives a named identity for the specific "inner caldera wall"
+- No source consulted gives a named identity for the specific volcanic rim slope
   point used for `hunga-tonga-rim-wall`; it is picked from the tile's own bathymetry
   and flagged `confidence: "medium"` rather than treated as a named surveyed feature.
-- Casualty figures for the 2022 eruption vary slightly across sources (6-9 deaths
-  cited depending on whether indirect/missing-person reports are included); `guide.json`
-  uses "at least 6" to stay conservative rather than overstate a single figure.
+- Casualty figures are omitted from the guide; the earlier figure combined reports with different geographic scopes.
 - `species.json`'s OBIS records cannot be reliably dated to before or after the
   eruption; the note says so explicitly rather than assuming either.
 

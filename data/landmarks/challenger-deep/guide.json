@@ -7,15 +7,27 @@
       "title": "Challenger Deep",
       "paragraphs": [
         "The Mariana Trench is the deepest oceanic trench on Earth: a crescent-shaped scar in the western Pacific seafloor, more than 1,500 miles (2,550 km) long and about 43 miles (69 km) wide on average. It formed as the old, dense Pacific Plate subducts (is thrust downward) beneath the smaller Mariana Arc system, part of the Philippine Plate, to the west. Near its southern end lies the Challenger Deep, the deepest known point in any ocean.",
-        "The most recent high-precision measurement comes from a June 2020 series of submersible dives: pressure sensor data, corrected for water-column properties, atmospheric pressure and gravity, gave a deepest observed seafloor depth of 10,935 m (+/- 6 m at 95% confidence). Reaching that depth means an overlying water column pressing down with roughly 16,000 psi (about 1,100 bar) of pressure -- more than a thousand times sea-level atmospheric pressure.",
-        "Challenger Deep is not one single pit but at least three separate, elongated sub-basins along the trench axis, informally called the Western, Central and Eastern Pools; peer-reviewed bathymetric review has confirmed the deepest soundings sit in the westernmost of the three. The Five Deeps Expedition's 2019 dive program explicitly targeted the Eastern and Central Pools by name. The trench takes its name from HMS Challenger, the Royal Navy survey ship whose crew first sounded a depth of 4,475 fathoms (8,184 m) near here in 1875 using a weighted rope -- a record for its time.",
-        "The Challenger Deep area itself lies outside the Marianas Trench Marine National Monument, the US-administered marine protected area covering most of the rest of the trench. This mission's spawn point is set at 6,000 m rather than the surface so the dive to the Eastern Pool floor -- still nearly 5 km further down -- fits a reasonable play session; see the briefing for the real descent-time math."
+        "Researchers measured a deepest observed seafloor depth of 10,935 m (+/- 6 m at 95% confidence) during submersible dives in June 2020. They corrected pressure readings for local gravity and water conditions. At this depth, the water presses down with roughly 16,000 psi (about 1,100 bar), more than a thousand times sea-level atmospheric pressure.",
+        "Challenger Deep is not one single pit but at least three separate, elongated sub-basins along the trench axis, informally called the Western, Central and Eastern Pools; a 2019 bathymetric review placed its deepest soundings in the Western Pool. Other surveys differ on which pool holds the deepest point. The Five Deeps Expedition's 2019 dive program explicitly targeted the Eastern and Central Pools by name. The trench takes its name from HMS Challenger, the Royal Navy survey ship whose crew first sounded a depth of 4,475 fathoms (8,184 m) near here in 1875 using a weighted rope -- a record for its time.",
+        "The Challenger Deep lies south of the Marianas Trench Marine National Monument. Its depth makes every descent a journey through kilometres of dark water."
       ],
       "facts": [
-        { "label": "Deepest measured point (2020 dives)", "value": "10,935 m +/- 6 m (95% CI)" },
-        { "label": "Trench length / width", "value": "~2,550 km / ~69 km average" },
-        { "label": "Overlying pressure", "value": "~16,000 psi (~1,100 bar)" },
-        { "label": "First sounded", "value": "1875, HMS Challenger (4,475 fathoms / 8,184 m)" },
+        {
+          "label": "Deepest measured point (2020 dives)",
+          "value": "10,935 m +/- 6 m (95% CI)"
+        },
+        {
+          "label": "Trench length / width",
+          "value": "~2,550 km / ~69 km average"
+        },
+        {
+          "label": "Overlying pressure",
+          "value": "~16,000 psi (~1,100 bar)"
+        },
+        {
+          "label": "First sounded",
+          "value": "1875, HMS Challenger (4,475 fathoms / 8,184 m)"
+        },
         {
           "label": "Protected-area status",
           "value": "outside the Marianas Trench Marine National Monument"
@@ -42,6 +54,10 @@
         {
           "title": "Deepest Submarine Dive in History, Five Deeps Expedition Conquers Challenger Deep — Five Deeps Expedition / Caladan Oceanic press release, 13 May 2019",
           "url": "https://fivedeeps.com/wp-content/uploads/2019/05/FDE-Challenger-Release-FINAL-5132019.pdf"
+        },
+        {
+          "title": "NOAA 2024 Mariana Trench Marine National Monument Management Plan — boundary excludes Challenger Deep",
+          "url": "https://www.fisheries.noaa.gov/s3/2024-06/Mariana-Trench-Marine-National-Monument-Management-Plan-202405-FINAL.pdf"
         }
       ],
       "confidence": "high"
@@ -55,7 +71,10 @@
         "A separate, independent review of published Mariana Trench soundings put the single deepest point instead in the trench's westernmost of three basins, well outside this tile (van Haren et al. 2017: 11.332417 deg N / 142.20205 deg E, 10,925 +/- 12 m, over 25 km west of this tile's western edge) -- a reminder that different careful surveys, using different instruments and methods, still do not agree on which specific pool holds the absolute deepest point on Earth. This tile's real GMRT bathymetry is used as-is: the scan point sits exactly on the deepest sampled cell, its depth read directly from the terrain grid."
       ],
       "facts": [
-        { "label": "This tile's deepest cell", "value": "-10,930.89 m (GMRT, Ryan et al. 2009)" },
+        {
+          "label": "This tile's deepest cell",
+          "value": "-10,930.89 m (GMRT, Ryan et al. 2009)"
+        },
         {
           "label": "Nakanishi & Hashimoto (2011), RV Kairei 1998/99",
           "value": "11.371 N, 142.593 E, 10,920 +/- 5 m"
@@ -129,13 +148,16 @@
       "id": "hadal-life",
       "title": "Life at full ocean depth",
       "paragraphs": [
-        "No dive to the Challenger Deep floor has confirmed a fish sighting (the 1960 Trieste report is doubted); the deepest confirmed fish anywhere are Mariana snailfish, filmed down to about 8,075 m and rare even there, well above this floor. What thrives here instead is Hirondellea gigas, a small orange hadal amphipod. In December 2014 Schmidt Ocean Institute's RV Falkor deployed the baited lander 'Leggo' to 11.368536 deg N, 142.5875166 deg E in the eastern part of the Challenger Deep, recording a depth of 10,929 m and filming swarms of pink amphipods 'scurrying gracefully' about the bait despite roughly 16,000 psi of pressure bearing down on them.",
+        "No dive to the Challenger Deep floor has confirmed a fish sighting (the 1960 Trieste report is doubted); fish filmed at over 8,300 m in the Izu–Ogasawara Trench are still far above this floor. What thrives here instead is Hirondellea gigas, a small orange hadal amphipod. In December 2014 Schmidt Ocean Institute's RV Falkor deployed the baited lander 'Leggo' to 11.368536 deg N, 142.5875166 deg E in the eastern part of the Challenger Deep, recording a depth of 10,929 m and filming swarms of pink amphipods 'scurrying gracefully' about the bait despite roughly 16,000 psi of pressure bearing down on them.",
         "A separate JAMSTEC expedition using the lander 'ASHURA' recovered 185 Hirondellea gigas individuals in a single 2.5-hour deployment at 11 deg 22.11' N, 142 deg 25.86' E, 10,897 m, on 10 September 2009. Laboratory analysis of those specimens found a unique cellulase enzyme in the amphipod's gut that becomes more active, not less, under the Challenger Deep's own pressure and cold (100 MPa, 2 degC) -- letting it digest sunken wood and plant debris as a food source in an environment with almost nothing else to eat. The Five Deeps Expedition's 2019 science team reported finding several apparently new amphipod species during their dives, including one long-appendaged form, at the bottom of the Challenger Deep.",
         "Xenophyophores -- giant single-celled foraminifera that build elaborate shells ('tests') from seafloor sediment and can exceed 10 cm across, among the largest single cells known -- have also been filmed in the Mariana Trench system, but at the Sirena Deep, a separate deep about 128 miles (206 km) northeast of Challenger Deep, not at Challenger Deep itself. A July 2011 Scripps Institution of Oceanography expedition, using National-Geographic-built 'Dropcam' landers, filmed them there down to 10,641 m, at the time nearly 3,000 m deeper than the previous xenophyophore depth record (~7,500 m, New Hebrides Trench).",
-        "No amphipod or xenophyophore model is rendered at any of this mission's POIs; every organism described here lives only in the field guide and species.json, not as a visible creature or prop. The lander marker placed at the Leggo scan point is a stand-in for a real, dated scientific event -- Leggo was recovered after its deployment and nothing physical remains on the seabed there today."
+        "Tiny amphipods and sediment-dwelling microbes fit the floor’s sparse ecology; the immense pressure keeps fish far above it."
       ],
       "facts": [
-        { "label": "Dominant scavenger", "value": "Hirondellea gigas, hadal amphipod" },
+        {
+          "label": "Dominant scavenger",
+          "value": "Hirondellea gigas, hadal amphipod"
+        },
         {
           "label": "Leggo lander (Schmidt Ocean, Dec 2014)",
           "value": "11.368536 N, 142.5875166 E, 10,929 m"
@@ -174,6 +196,10 @@
         {
           "title": "Deepest Submarine Dive in History, Five Deeps Expedition Conquers Challenger Deep — Five Deeps Expedition press release, 13 May 2019",
           "url": "https://fivedeeps.com/wp-content/uploads/2019/05/FDE-Challenger-Release-FINAL-5132019.pdf"
+        },
+        {
+          "title": "Jamieson et al. 2023 — fish filmed at 8,336 m",
+          "url": "https://www.sciencedirect.com/science/article/pii/S0967063723001711"
         }
       ],
       "confidence": "high"
@@ -186,8 +212,14 @@
         "On this tile's real terrain that catalog point reads 10,917.9 m, about 0.6 km from the deepest sampled cell and well within the surveys' own stated uncertainty of each other -- so, unlike a similarly rounded pin at this project's Lost City pack, it does not land on the wrong feature. What has changed since that figure became popular is precision, not location: the same 2019 review catalogs more than a dozen independent Challenger Deep depth estimates spanning 10,744-10,994 m from different vessels, instruments and decades, illustrating just how much technique (multibeam sonar vs. wire soundings, sound-velocity correction, in-situ CTD pressure) affects the final number even when everyone is looking at nearly the same patch of seafloor."
       ],
       "facts": [
-        { "label": "Catalog coordinate depth (this tile)", "value": "10,917.9 m" },
-        { "label": "Distance from surveyed deepest cell", "value": "~0.6 km" },
+        {
+          "label": "Catalog coordinate depth (this tile)",
+          "value": "10,917.9 m"
+        },
+        {
+          "label": "Distance from surveyed deepest cell",
+          "value": "~0.6 km"
+        },
         {
           "label": "Published depth estimates surveyed (Stewart & Jamieson 2019)",
           "value": "10,744-10,994 m across >18 sources"
@@ -219,7 +251,10 @@
           "label": "Plate boundary type",
           "value": "convergent; Pacific Plate subducts beneath the Mariana Arc / Philippine Plate"
         },
-        { "label": "North wall depth (this scan point)", "value": "9,977.7 m" },
+        {
+          "label": "North wall depth (this scan point)",
+          "value": "9,977.7 m"
+        },
         {
           "label": "North wall slope (grid-measured)",
           "value": "~25-29 deg, smoothed by the ~60 m grid"
@@ -251,9 +286,18 @@
         "The Mariana Trench also holds two other named deeps entirely separate from Challenger Deep's own sub-basins -- the Sirena Deep and the Nero Deep -- which are sometimes confused with a 'fourth pool' but are distinct features of the wider trench system, roughly 100+ miles away."
       ],
       "facts": [
-        { "label": "Central Pool depth (this tile)", "value": "10,926.5 m" },
-        { "label": "Central-to-Eastern Pool distance", "value": "~18.6 km" },
-        { "label": "Sill depth between them (terrain trace)", "value": "~10,704 m" },
+        {
+          "label": "Central Pool depth (this tile)",
+          "value": "10,926.5 m"
+        },
+        {
+          "label": "Central-to-Eastern Pool distance",
+          "value": "~18.6 km"
+        },
+        {
+          "label": "Sill depth between them (terrain trace)",
+          "value": "~10,704 m"
+        },
         {
           "label": "Five Deeps 2019 dives by pool",
           "value": "3 dives Eastern Pool, 1 dive Central Pool"

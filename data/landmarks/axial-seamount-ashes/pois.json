@@ -19,12 +19,12 @@
         "https://oceanobservatories.org/site/rs03ashs/",
         "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes"
       ],
-      "note": "Coordinate is the OOI RS03ASHS site position (45.9337 N, -130.0139 W, 1,552 m per OOI; this tile's grid reads 1,540.1 m at that point, within GMRT's ~43x61 m cell resolution). Interactive Oceans states the CAMHDS301 HD camera sits at Mushroom, so this is Mushroom's own monitored position, not an approximation. Mushroom is described as ~4 m tall with orifice temperatures over 275 degC and largely unchanged in size since the late 1980s; depth_m is set 4 m above the seabed reading. The chimney itself is a placed reconstruction: the field (about 2,826 sq m, per Wikipedia) is far smaller than this tile's grid cell, so no individual chimney is resolved in the real terrain."
+      "note": "Coordinate is the OOI RS03ASHS site position (45.9337 N, -130.0139 W, 1,552 m per OOI; this tile's grid reads 1,540.1 m at that point, within GMRT's ~43x61 m cell resolution). Interactive Oceans states the CAMHDS301 HD camera sits at Mushroom, so this is Mushroom's own monitored position, not an approximation. Mushroom is described as ~4 m tall with orifice temperatures over 275 degC and largely unchanged in size since the late 1980s; depth_m is set 4 m above the seabed reading. The chimney itself is a placed reconstruction: the field (about 2,826 sq m, per Wikipedia) is about the area of one grid cell, so no individual chimney is resolved in the real terrain."
     },
     {
       "id": "axial-ashes-inferno",
       "name": "Inferno (ASHES vent field)",
-      "lat": 45.93388,
+      "lat": 45.93379,
       "lon": -130.0139,
       "snap_to_seabed": true,
       "radius_m": 40,
@@ -38,7 +38,7 @@
         "https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes",
         "https://interactiveoceans.washington.edu/inferno-vent-at-axial/"
       ],
-      "note": "Interactive Oceans (UW/OOI) places Inferno 'approximately 10 m' from Mushroom, hosting high-temperature venting and a dense macrofaunal community, but does not publish its own coordinate or bearing from Mushroom. This POI is placed 10 m north of the Mushroom POI as an illustrative estimate; the true bearing is not sourced. Snapped to seabed since no height is published for Inferno specifically."
+      "note": "UW/OOI places Inferno about 10 m from Mushroom without publishing a bearing. This scan marker shares the prop’s 0.00009 degree (~10 m) northward offset. The bearing is authored; the marker snaps to the terrain."
     },
     {
       "id": "axial-ashes-minor-chimneys",

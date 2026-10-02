@@ -10,13 +10,22 @@
         "This tile covers only the Beebe field and the axial valley to its northwest; Von Damm, the Mid-Cayman Spreading Centre's other well-studied vent field, sits about 13 km further southwest at roughly 2,300 m depth -- entirely outside this survey's bounding box -- so it is described here for context only and is not a scan target."
       ],
       "facts": [
-        { "label": "Depth range", "value": "4,957-4,987 m (Connelly et al. 2012)" },
+        {
+          "label": "Depth range",
+          "value": "4,957-4,987 m (Connelly et al. 2012)"
+        },
         {
           "label": "Discovery",
           "value": "2009-2010, RV Cape Hatteras / RRS James Cook (Nereus, Autosub6000, HyBIS)"
         },
-        { "label": "Publication", "value": "Connelly et al., Nature Communications 3:620 (2012)" },
-        { "label": "Named for", "value": "William Beebe (naturalist, Bathysphere pioneer)" }
+        {
+          "label": "Publication",
+          "value": "Connelly et al., Nature Communications 3:620 (2012)"
+        },
+        {
+          "label": "Named for",
+          "value": "William Beebe (naturalist, Bathysphere pioneer)"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -39,15 +48,27 @@
       "id": "vents",
       "title": "Supercritical black smokers",
       "paragraphs": [
-        "Beebe's main vent complex, Beebe 1-5, consists of black-smoker chimneys and sulfide mounds venting fluid measured up to 403-410 degC -- hot and pressurized enough at this depth (roughly 298 bar) to become supercritical, a state where the fluid is neither fully liquid nor fully gas. Beebe is one of only a handful of vent sites anywhere shown to sustain supercritical venting, and the deepest. The chimneys and mounds are built from pyrite, pyrrhotite and other metal sulfides -- the same iron- and copper-rich minerals that build black smokers on shallower ridges, but concentrated by fluids hot enough to leach far more metal out of the surrounding rock.",
+        "Beebe’s black smokers release extremely hot, low-salinity fluid at roughly 500 bar of pressure. Webber and colleagues measured about 401–403 °C and showed that this fluid can be supercritical: its liquid and gas states are no longer distinct. The dark chimneys are built from iron- and copper-bearing sulfide minerals.",
         "Webber et al. (2015) mapped seven sulfide mounds across the field's western side, built from repeated generations of chimney growth and collapse.",
         "The shrimp-covered mound around the tallest chimney is a game addition, modelled on the vent mounds mapped at Beebe."
       ],
       "facts": [
-        { "label": "Max measured temperature", "value": "403-410 degC" },
-        { "label": "Fluid state", "value": "supercritical (~298 bar at this depth)" },
-        { "label": "Mapped sulfide mounds", "value": "7 (Webber et al. 2015)" },
-        { "label": "Chimney minerals", "value": "pyrite, pyrrhotite, other metal sulfides" }
+        {
+          "label": "Measured fluid temperature (2015)",
+          "value": "about 401–403 °C (Webber et al. 2015)"
+        },
+        {
+          "label": "Fluid state",
+          "value": "supercritical low-salinity fluid at about 500 bar"
+        },
+        {
+          "label": "Mapped sulfide mounds",
+          "value": "7 (Webber et al. 2015)"
+        },
+        {
+          "label": "Chimney minerals",
+          "value": "pyrite, pyrrhotite, other metal sulfides"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -70,12 +91,18 @@
         "The shrimp's enlarged cephalothorax hosts episymbiotic bacteria on its gills and mouthparts, which it farms and grazes for organic carbon -- a chemosynthetic partnership that lets it live without ever needing sunlight-derived food. Vent iron tints the swarm a faint brown."
       ],
       "facts": [
-        { "label": "Species", "value": "Rimicaris hybisae (Nye et al. 2012)" },
+        {
+          "label": "Species",
+          "value": "Rimicaris hybisae (Nye et al. 2012)"
+        },
         {
           "label": "Eyes",
           "value": "lost with age; replaced functionally by a dorsal light-sensing organ"
         },
-        { "label": "Feeding", "value": "chemosynthetic, via episymbiotic bacteria" },
+        {
+          "label": "Feeding",
+          "value": "chemosynthetic, via episymbiotic bacteria"
+        },
         {
           "label": "Closest relative",
           "value": "Rimicaris exoculata (Mid-Atlantic Ridge, ~4,000 km away)"
@@ -102,8 +129,14 @@
         "This tile's real terrain shows a deep, elongated trough running northwest-southeast through its western half, reaching -5,395.8 m at its deepest sounded point here -- consistent with the ridge's axial valley, the rift where new seafloor is created. This is a terrain trace of that trough's general depth and direction on this tile's real GMRT grid, not a citation to a precisely surveyed plate-boundary line."
       ],
       "facts": [
-        { "label": "Spreading rate", "value": "~15 mm/yr (ultraslow)" },
-        { "label": "Deepest axial-trough sounding (this tile)", "value": "-5,395.8 m" }
+        {
+          "label": "Spreading rate",
+          "value": "~15 mm/yr (ultraslow)"
+        },
+        {
+          "label": "Deepest axial-trough sounding (this tile)",
+          "value": "-5,395.8 m"
+        }
       ],
       "reconstruction": false,
       "sources": [

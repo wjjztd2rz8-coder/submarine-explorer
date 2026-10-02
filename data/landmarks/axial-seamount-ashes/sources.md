@@ -1,5 +1,11 @@
 # Axial Seamount / ASHES content: sources and notes (package C4d)
 
+## Phase F factual corrections — 2026-10-01
+
+- [UW/OOI ASHES description](https://interactiveoceans.washington.edu/research-sites/axial-caldera/ashes/) documents clear fluid and active black-smoker chimlets at Mushroom. A clear-Mushroom/dark-Inferno split is not an exclusive factual rule; no discharge geometry was changed here.
+- The published separation is about 10 m. Inferno’s old 0.00018° latitude offset was about 20 m; the prop and POI now use 0.00009° (~10.0 m) north of Mushroom. Northward bearing remains an authored choice.
+- 2,826 m² is roughly one 43 × 61 m terrain cell (2,623 m²), not far smaller than one cell. Remove the incorrect scale comparison and stale date-specific forecast from player text; describe ongoing instrumentation without promising a current eruption date.
+
 Researched 2026-09-23. Files: `pois.json`, `guide.json`, `props.json`, `mission.json`, `species.json`
 in this folder. Tile: `data/tiles/axial-seamount-ashes` (GMRT, bbox N 46.1498 / S 45.7504 /
 E -129.7205 / W -130.2973, cellsize ~42.5 x 61.1 m, min/max -2853.27 / -1392.43 m).

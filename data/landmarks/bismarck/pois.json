@@ -21,7 +21,7 @@
         "https://www.magellan.gg/vrov-pilot-bismarck/",
         "https://www.hmshood.org.uk/hoodtoday/2001expedition/bismarck/encrypt.htm"
       ],
-      "note": "Repositioned 2026-09 to the H.M.S. Hood Association's 2001 expedition fix ('vicinity of 4809N 01607W' = 48.15N, 16.117W), the most specific sourced coordinate found, and corroborated by a third published figure (48°09'N 016°07'W) distinct from Wikipedia's rounded infobox (48°10'N 16°12'W). The tile has been regenerated around this point. depth_m 4213 sits ~5 m above this tile's own terrain reading of 4,218.5 m here, for a scan target at roughly deck height -- but that terrain reading is itself ~570 m shallower than the commonly published wreck depth (4,790-4,791 m): this point sits on the upper flank of the seamount, closer to its summit (terrain shoals to ~4,024 m about 3 km north-east), not at the depth the hull is reported to have finally settled at after sliding downslope. We did not shift the coordinate further to force a depth match -- that would fabricate precision no source supports -- so this gap is reported rather than hidden; see sources.md. Confidence is medium because of this unresolved depth-vs-terrain gap, not because the ship's identity or general condition is in doubt."
+      "note": "Uses the 2001 expedition’s published vicinity (48.15 N, 16.117 W), not a precise survey fix. Terrain reads 4,218.5 m; the scan at 4,213 m is about 5 m above it. Published real wreck depth is 4,790–4,791 m. The ~570 m coordinate/grid/depth discrepancy is unresolved; no sourced cause or more precise fix was established. The hull remains supported on the current terrain. See sources.md."
     },
     {
       "id": "bismarck-turret-debris",
@@ -40,7 +40,7 @@
         "https://www.kbismarck.org/forum/viewtopic.php?t=1470",
         "https://www.magellan.gg/vrov-pilot-bismarck/"
       ],
-      "note": "Bismarck's four main-battery turrets broke free of their barbettes, being unbolted from below, and dropped separately during the sinking; Ballard's 1989 survey located only one, upside-down and half-buried, and could not find the other three. Later surveys (Magellan/Parks Stephenson, 2019) mapped more of the debris field, roughly a line of turret positions along the slope. No public coordinates were found for the individual turrets, so this marker is an illustrative placement roughly 1.2 km up-slope (north-east, toward the seamount summit) of the reconstructed hull -- consistent with published accounts that the turrets struck the seamount first and triggered the landslide that carried the hull further downslope -- not a surveyed position, hence the low confidence. Repositioned 2026-09 along with the hull; see sources.md."
+      "note": "The four main turrets fell out during capsizing. This authored marker and matching prop sit about 900 m east-northeast and upslope of the hull. Public individual turret coordinates are not available; the layout follows the general slope setting rather than surveyed turret positions."
     },
     {
       "id": "bismarck-damage",

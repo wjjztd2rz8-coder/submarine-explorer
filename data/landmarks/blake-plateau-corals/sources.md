@@ -1,5 +1,9 @@
 # Blake Plateau coral mounds site content: sources and notes (package C4)
 
+## Phase F colour review — 2026-10-01
+
+[NOAA’s mapped coral-habitat account](https://oceanexplorer.noaa.gov/news/million-mounds-news/) explicitly identifies healthy white Desmophyllum pertusum. The Journal now states that natural white colour is not bleaching. Preserve the supported mound hero; crown density, rubble and contact changes belong to the visual geometry pass.
+
 Researched 2026-09-23. Files: `pois.json`, `guide.json`, `props.json`, `mission.json`,
 `species.json` in this folder. Tile: `data/tiles/blake-plateau-corals` (GMRT; bbox
 N 30.33020/S 29.67047/E -79.16968/W -79.82996, 1202x1201 cells, ~53 x 61 m cells;

@@ -12,12 +12,30 @@
         "What you see here: the seabed is real bathymetry from the GMRT Synthesis, showing genuine relief consistent with the mapped mound field, though at this tile's resolution (roughly 53 x 61 m per cell) individual coral colonies and the smallest mounds are not resolved."
       ],
       "facts": [
-        { "label": "Announced", "value": "January 2024 (Sowers et al., Geomatics)" },
-        { "label": "Province extent", "value": "up to ~500 km x 110 km" },
-        { "label": "Core \"Million Mounds\" area", "value": "~254 km x 42 km" },
-        { "label": "Mapped mound-like peaks", "value": "83,908" },
-        { "label": "Area", "value": "~6.4 million acres" },
-        { "label": "Depth range", "value": "~500-1,000 m" }
+        {
+          "label": "Announced",
+          "value": "January 2024 (Sowers et al., Geomatics)"
+        },
+        {
+          "label": "Province extent",
+          "value": "up to ~500 km x 110 km"
+        },
+        {
+          "label": "Core \"Million Mounds\" area",
+          "value": "~254 km x 42 km"
+        },
+        {
+          "label": "Mapped mound-like peaks",
+          "value": "83,908"
+        },
+        {
+          "label": "Area",
+          "value": "~6.4 million acres"
+        },
+        {
+          "label": "Depth range",
+          "value": "~500-1,000 m"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -45,9 +63,18 @@
         "Only the specific claim that any single bump here is a named, individually-mapped mound (rather than general provincial relief) is an inference, not a direct match to a published mound catalogue entry."
       ],
       "facts": [
-        { "label": "Local relief here", "value": "~72 m (this tile)" },
-        { "label": "Typical mound height", "value": "tens of metres" },
-        { "label": "Tallest known mounds", "value": "up to ~90 m (~300 ft)" }
+        {
+          "label": "Local relief here",
+          "value": "~72 m (this tile)"
+        },
+        {
+          "label": "Typical mound height",
+          "value": "tens of metres"
+        },
+        {
+          "label": "Tallest known mounds",
+          "value": "up to ~90 m (~300 ft)"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -66,15 +93,27 @@
       "id": "coral-thicket",
       "title": "Desmophyllum pertusum, reef-builder of the deep",
       "paragraphs": [
-        "The coral that builds these mounds is Desmophyllum pertusum, until recently known as Lophelia pertusa -- a stony, cold-water coral that thrives in total darkness at depths of roughly 200-1,000 m and water temperatures around 4 degrees C. Unlike shallow tropical corals, it has no symbiotic algae and gets no energy from sunlight; instead its polyps filter zooplankton and organic particles carried past by the current.",
+        "The coral that builds these mounds is Desmophyllum pertusum, until recently known as Lophelia pertusa -- a stony, cold-water coral that thrives in total darkness at depths of roughly 200-1,000 m and water temperatures around 4 degrees C. Unlike shallow tropical corals, it has no symbiotic algae and gets no energy from sunlight; instead its polyps filter zooplankton and organic particles carried past by the current. Healthy Desmophyllum pertusum is naturally white; that colour is not a sign of bleaching.",
         "Over thousands of years, generation after generation of coral skeleton accumulates into the mounds you see across this province -- among the slowest-built, longest-lived structures in the ocean, and correspondingly fragile: a single mound can represent millennia of growth that a moment's careless contact could damage.",
         "The coral mound here is a game addition, modelled on the thickets that crown the plateau's mounds."
       ],
       "facts": [
-        { "label": "Species", "value": "Desmophyllum pertusum (formerly Lophelia pertusa)" },
-        { "label": "Depth range (species)", "value": "~200-1,000 m" },
-        { "label": "Water temperature", "value": "~4°C" },
-        { "label": "Energy source", "value": "filter-feeding on drifting particles, no sunlight" }
+        {
+          "label": "Species",
+          "value": "Desmophyllum pertusum (formerly Lophelia pertusa)"
+        },
+        {
+          "label": "Depth range (species)",
+          "value": "~200-1,000 m"
+        },
+        {
+          "label": "Water temperature",
+          "value": "~4°C"
+        },
+        {
+          "label": "Energy source",
+          "value": "filter-feeding on drifting particles, no sunlight"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -97,8 +136,14 @@
         "At about 776 m deep and roughly 400 m from the main cluster, it sits close enough to reach on the same dive, a reminder of just how densely packed this coral province really is."
       ],
       "facts": [
-        { "label": "Depth here (this tile)", "value": "~776 m" },
-        { "label": "Distance from main cluster", "value": "~400 m" }
+        {
+          "label": "Depth here (this tile)",
+          "value": "~776 m"
+        },
+        {
+          "label": "Distance from main cluster",
+          "value": "~400 m"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -118,10 +163,13 @@
       "title": "The Gulf Stream overhead",
       "paragraphs": [
         "The Blake Plateau sits directly beneath the Gulf Stream, the powerful, warm western-boundary current that carries water (and the food particles deep corals depend on) northward along the US East Coast before crossing the Atlantic. Researchers describe the current as a key reason this reef exists at all: it delivers a steady supply of drifting food to corals that cannot photosynthesise, sustaining growth across a province hundreds of kilometres long.",
-        "This marker sits on real seabed terrain and represents the current passing overhead, not a current-meter survey site of its own; the Gulf Stream itself is not modelled as a physical force in this mission beyond the briefing's hazard note."
+        "Currents above and between the mounds carry the drifting food that keeps this dark-water reef alive."
       ],
       "facts": [
-        { "label": "Current", "value": "Gulf Stream (western boundary current)" },
+        {
+          "label": "Current",
+          "value": "Gulf Stream (western boundary current)"
+        },
         {
           "label": "Role here",
           "value": "delivers food particles and moderates temperature for the reef"
@@ -147,7 +195,12 @@
         "Not every part of the Blake Plateau is covered in coral: between mounds, the seabed dips into lower channels and open sediment, visible here as a modest local low point between two mapped mounds.",
         "These lower channels let bottom currents and drifting food particles move between mounds, rather than pooling around any single one -- part of what lets a field this dense keep so many mounds fed at once."
       ],
-      "facts": [{ "label": "Depth here (this tile)", "value": "~780 m" }],
+      "facts": [
+        {
+          "label": "Depth here (this tile)",
+          "value": "~780 m"
+        }
+      ],
       "reconstruction": false,
       "sources": [
         {

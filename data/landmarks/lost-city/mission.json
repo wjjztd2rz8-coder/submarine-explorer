@@ -7,7 +7,10 @@
   "environment": {
     "preset": "vent",
     "overrides": {
-      "fluid": "carbonate"
+      "fluid": "carbonate",
+      "smokeIntensity": 0,
+      "glowLights": 0,
+      "shimmerStrength": 0.03
     }
   },
   "species_file": "species.json",
@@ -21,15 +24,15 @@
     "summary": "Descend about 800 m to the Lost City Hydrothermal Field, a cluster of towering white carbonate chimneys on the Atlantis Massif. Find and scan the Poseidon tower, then survey the smaller chimneys and the real terrain around the field.",
     "depth_m": 780,
     "facts": [
-      "Lost City runs on serpentinization, a chemical reaction between seawater and mantle rock, not on volcanic heat. Its fluid is warm (40-90 degC) and alkaline, unlike a scalding, acidic black smoker.",
-      "Poseidon, the tallest tower here, stands about 60 m tall and may be over 100,000 years old.",
-      "The published field coordinate is rounded to the nearest arc-minute and, on this tile, lands 1,332 m deep on the massif's south wall -- well outside the field's real 750-900 m range. This mission places the vents on the correct nearby terrain instead; a POI at the original catalog position shows the gap.",
-      "The field is only about 500 sq m across, smaller than a single cell of this tile's open bathymetry, so no individual chimney appears in the real terrain."
+      "Lost City runs on serpentinization: seawater reacting with mantle rock. Its warm, alkaline fluid emerges clear, leaving pale carbonate towers.",
+      "Poseidon stands about 60 m tall. Carbonate samples elsewhere in the field record activity reaching back about 120,000 years.",
+      "The towers stand on a sloping terrace of the Atlantis Massif, around 750–900 m deep.",
+      "Microbial communities use hydrogen and methane from the vent fluid as sources of energy."
     ],
     "hazards": [
       "Fragile mineral formations: the carbonate spires are delicate and slow-growing. Keep a respectful distance.",
       "Moderate currents around the summit.",
-      "Total darkness below a few hundred metres; only your lights work."
+      "Sunlight fades with depth; use your lights to read the deeper terrain."
     ]
   },
   "objectives": [
@@ -47,7 +50,7 @@
       "poi": "lost-city-beehive",
       "primary": false,
       "title": "Scan the Beehive chimney",
-      "hint": "Beehive is on Poseidon’s flank, near 760 m."
+      "hint": "The Beehive marker is northeast of Poseidon, near 760 m."
     },
     {
       "id": "imax-tower",
@@ -55,14 +58,14 @@
       "poi": "lost-city-imax-tower",
       "primary": true,
       "title": "Scan the IMAX Tower",
-      "hint": "IMAX Tower is just northwest of Poseidon, near 790 m."
+      "hint": "The IMAX marker is northwest of Poseidon, near 790 m."
     },
     {
       "id": "microbial-mat",
       "type": "scan",
       "poi": "lost-city-microbial-mat",
       "primary": false,
-      "title": "Sample a microbial biofilm site",
+      "title": "Scan a microbial biofilm site",
       "hint": "A microbial biofilm site is beside Poseidon's carbonate chimneys, near 790 m."
     }
   ],

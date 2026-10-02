@@ -21,7 +21,7 @@
       "id": "inferno-chimney",
       "model": "procedural:chimney",
       "material_hint": "sulfide",
-      "lat": 45.93388,
+      "lat": 45.93379,
       "lon": -130.0139,
       "snap_to_seabed": true,
       "heading_deg": 180,
@@ -30,7 +30,7 @@
       "lod_distance_m": 700,
       "collision": "box",
       "reconstruction": true,
-      "note": "Inferno: high-temperature venting about 10 m from Mushroom, hosting one of ASHES's densest macrofaunal clusters (UW Interactive Oceans). No published height; 5 m is an estimate consistent with the field's other named chimneys being under ~4-5 m. Position is an illustrative 10 m offset from Mushroom (bearing not sourced)."
+      "note": "Inferno vents high-temperature fluid about 10 m from Mushroom (UW/OOI ASHES field description). The 0.00009 degree northward offset is about 10 m; the bearing is a gameplay choice, not a surveyed position. Height 5 m and 3 m base are build estimates. Seabed snapping preserves ground contact."
     },
     {
       "id": "hell-chimney",

@@ -7,7 +7,7 @@
       "model": "procedural:geo",
       "feature": "tuff-cliff",
       "lat": -20.57,
-      "lon": -175.418,
+      "lon": -175.42,
       "snap_to_seabed": true,
       "heading_deg": 270,
       "scale": 1,
@@ -15,7 +15,7 @@
       "lod_distance_m": 900,
       "collision": "box",
       "reconstruction": true,
-      "note": "Game addition: a banded pyroclastic tuff scarp with gullies and a talus apron, representing the layered volcaniclastic walls of the pre-2022 caldera rim (Hunga Tonga-Hunga Haapai). Size and position within the rim are invented."
+      "note": "Game addition: layered pyroclastic tuff scarp with gullies and a talus apron on the historical volcanic rim slope. Moved 0.002 degrees west (~208 m) to the existing rim-slope scan marker, where the grid reads 468.6 m; seabed snapping preserves support. Dimensions [90,30,45] and heading 270 degrees are scenic choices, not a measured inner wall or a post-2022 collapse scarp. See sources.md."
     }
   ]
 }

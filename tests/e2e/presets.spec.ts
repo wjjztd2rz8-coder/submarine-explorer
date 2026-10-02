@@ -160,7 +160,7 @@ test('a frozen frame does not apply canyon current to sub velocity', async ({ pa
   expect(result.unchanged).toBe(true);
 });
 
-test('Lost City uses its documented pale carbonate vent override in a free dive', async ({
+test('Lost City uses clear carbonate flow without smoke or glow in a free dive', async ({
   page,
 }, testInfo) => {
   const errors: string[] = [];
@@ -178,7 +178,7 @@ test('Lost City uses its documented pale carbonate vent override in a free dive'
       source: string;
       params: { fluid: string };
       preset: {
-        stats: { draws: number };
+        stats: { draws: number; lights: number };
         smoke?: { uniforms: Record<string, { value: unknown }> };
       };
     };
@@ -187,9 +187,18 @@ test('Lost City uses its documented pale carbonate vent override in a free dive'
       source: p.source,
       fluid: p.params.fluid,
       draws: p.preset.stats.draws,
+      lights: p.preset.stats.lights,
+      smoke: p.preset.smoke,
     };
   });
-  expect(state).toEqual({ active: 'vent', source: 'mission', fluid: 'carbonate', draws: 2 });
+  expect(state).toEqual({
+    active: 'vent',
+    source: 'mission',
+    fluid: 'carbonate',
+    draws: 1,
+    lights: 0,
+    smoke: null,
+  });
   expect(errors).toEqual([]);
   await page.screenshot({ path: testInfo.outputPath('lost-city.png') });
 });

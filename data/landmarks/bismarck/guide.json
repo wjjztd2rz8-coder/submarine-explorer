@@ -1,7 +1,7 @@
 {
   "version": 1,
   "landmark": "bismarck",
-  "memorial_note": "Bismarck is a war grave. Roughly 2,100 of her crew of 2,221 died when she sank on 27 May 1941; only around 114 were rescued from the freezing North Atlantic. Please explore her the way you would any grave: look and learn, and leave her exactly as she lies. This game has no salvage, collection or loot of any kind, anywhere.",
+  "memorial_note": "Bismarck is a war grave. About 2,100 crew died when she sank on 27 May 1941. Observe, photograph and leave the wreck undisturbed.",
   "entries": [
     {
       "id": "overview",
@@ -9,16 +9,34 @@
       "paragraphs": [
         "Bismarck was one of the largest battleships ever built by Germany, commissioned in August 1940. In May 1941 she sailed into the North Atlantic with the heavy cruiser Prinz Eugen on Operation Rheinubung, a commerce raid intended to disrupt Allied shipping. The Royal Navy intercepted her, opening a three-day pursuit that became one of the most famous naval actions of the Second World War.",
         "On 24 May 1941, at the Battle of the Denmark Strait, Bismarck and Prinz Eugen engaged HMS Hood and HMS Prince of Wales. Hood was destroyed in minutes, with all but three of her 1,419 crew lost; Bismarck took damage that forced her to abandon the raid and head for occupied France for repairs. Swordfish torpedo bombers from HMS Victorious and, on 26 May, from HMS Ark Royal found and struck her; a torpedo hit near the stern jammed her rudders, leaving her unable to steer clear of the pursuing British fleet. On the morning of 27 May, HMS King George V and HMS Rodney closed in and bombarded her for almost two hours. With the ship ablaze, listing, and unable to fight back, her crew opened the sea cocks and detonated scuttling charges; she sank, stern-first, at roughly 10:40. Of her crew of 2,221, only around 114 were rescued -- most by HMS Dorsetshire and HMS Maori, who broke off the rescue early on report of a U-boat sighting.",
-        "The wreck was found on 8 June 1989 by an expedition led by Robert Ballard, the oceanographer who had located Titanic four years earlier. It has since been surveyed several more times, most extensively by Magellan's 2019 digital-twin project led by naval historian Parks Stephenson.",
-        "What you see here: the seabed is real bathymetry, but this part of the North Atlantic has no dedicated multibeam survey of the wreck site, so it falls back to a coarser global fill -- far too coarse to show a 251 m hull. The ship is built from published photographs, survey reports and the ship's known dimensions, placed at the H.M.S. Hood Association's 2001 expedition fix (48.15N, 16.117W), the most specific sourced coordinate found among several published figures."
+        "Robert Ballard’s team found the wreck on 8 June 1989. Later expeditions documented the hull, detached structures and debris with submersibles and remotely operated vehicles.",
+        "Published surveys place Bismarck at about 4,790 m. This dive uses the 2001 expedition’s published vicinity, where the terrain grid reads about 4,219 m. The roughly 570 m gap between that grid and the survey remains unresolved; the hull stays on the seabed shown here."
       ],
       "facts": [
-        { "label": "Sunk", "value": "27 May 1941" },
-        { "label": "Found", "value": "8 June 1989, by Robert Ballard's expedition" },
-        { "label": "Depth (published)", "value": "4,790-4,791 m" },
-        { "label": "Length / beam", "value": "251 m / 36 m" },
-        { "label": "Crew, lost / rescued", "value": "~2,100 died / ~114 rescued, of 2,221 aboard" },
-        { "label": "Protection", "value": "war grave; treated as such by every expedition" }
+        {
+          "label": "Sunk",
+          "value": "27 May 1941"
+        },
+        {
+          "label": "Found",
+          "value": "8 June 1989, by Robert Ballard's expedition"
+        },
+        {
+          "label": "Depth (published)",
+          "value": "4,790-4,791 m"
+        },
+        {
+          "label": "Length / beam",
+          "value": "251 m / 36 m"
+        },
+        {
+          "label": "Crew, lost / rescued",
+          "value": "~2,100 died / ~114 rescued, of 2,221 aboard"
+        },
+        {
+          "label": "Protection",
+          "value": "war grave; treated as such by every expedition"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -45,20 +63,26 @@
       "id": "wreck-hull",
       "title": "Upright on the seamount",
       "paragraphs": [
-        "Bismarck rests upright on the south-eastern flank of a large, extinct undersea volcano, roughly halfway down its slope. Survey teams describe the hull as in surprisingly good condition for its age and the violence of its final battle: essentially intact, resting embedded in mud, with only a small section of the stern reported broken away at one survey (kbismarck.com). This account sits in tension with data/landmarks.json's own summary, which describes the bow as separated from the main hull -- we found no single authoritative survey report reconciling the two claims, so both are noted here rather than one silently dropped (see sources.md).",
-        "When the turrets tore loose and struck the seamount, the impact triggered a small landslide that carried the settling hull a further distance down the slope before it came to rest -- published accounts put the debris trail at around a kilometre. Bismarck's own crew scuttled her as the British bombardment closed in, and cumulative shell and torpedo damage almost certainly would have sunk her regardless; historians still debate how much each cause contributed (see the battle-damage entry).",
-        "The block you see here uses the ship's published length and beam. No source found gives a precise hull height above the seabed or the ship's actual compass heading. It is placed at the H.M.S. Hood Association's 2001 expedition fix, the most specific sourced coordinate found; this tile's own terrain there reads roughly 4,220 m, shallower than the 4,790-4,791 m commonly published for the wreck's final resting depth, because the point sits higher on the seamount's flank than the hull's reported final position after its landslide."
+        "Bismarck rests upright on the south face of an extinct undersea volcano. Much of the hull survives, embedded in sediment, while the stern has broken away. The 2001 expedition photographed the surviving bow, empty gun barbettes and damaged upper decks.",
+        "The falling hull struck the slope and slid before settling. An impact crater, a long slide scar and detached structures trace that final journey. The 2001 survey describes a slide of roughly 1.5 km on a 14.5° slope.",
+        "Surviving teak decking and protective paint remain visible in survey images, alongside shell damage and corrosion."
       ],
       "facts": [
-        { "label": "Length / beam", "value": "251 m / 36 m" },
+        {
+          "label": "Length / beam",
+          "value": "251 m / 36 m"
+        },
         {
           "label": "Orientation",
-          "value": "upright, largely intact (accounts vary on the bow/stern)"
+          "value": "upright; bow attached, stern broken away"
         },
-        { "label": "Debris trail (published)", "value": "~1 km down the seamount flank" },
+        {
+          "label": "Slide distance (2001 survey)",
+          "value": "about 1.5 km"
+        },
         {
           "label": "Survey",
-          "value": "Ballard 1989; multiple later expeditions, most recently Magellan (2019)"
+          "value": "Ballard 1989; Mearns 2001; Cameron 2002; later ROV surveys"
         }
       ],
       "reconstruction": true,
@@ -74,6 +98,10 @@
         {
           "title": "German battleship Bismarck — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/German_battleship_Bismarck"
+        },
+        {
+          "title": "H.M.S. Hood Association — 2001 Bismarck expedition",
+          "url": "https://www.hmshood.org.uk/hoodtoday/2001expedition/bismarck/encrypt.htm"
         }
       ],
       "confidence": "medium"
@@ -82,13 +110,22 @@
       "id": "turret-debris",
       "title": "The main gun turrets",
       "paragraphs": [
-        "Bismarck's four main-battery turrets, Anton, Bruno, Caesar and Dora, each carrying a pair of 38 cm guns, were bolted from below rather than fixed rigidly to the hull. As the ship rolled and sank, they broke free of their barbettes and fell separately, striking the seamount slope before the hull itself came to rest.",
-        "Ballard's 1989 team located only one turret, lying upside-down and half-buried in sediment, and could not find the other three. Later, more thorough surveys -- notably Magellan's 2019 digital-twin project -- mapped a fuller debris field across the slope, including turrets in a roughly straight line, one pushed out of alignment as the hull slid past it."
+        "Bismarck’s four main-battery turrets, Anton, Bruno, Caesar and Dora, each carried two 38 cm guns. The turrets fell out of their barbettes as the ship capsized and sank, landing separately on the slope.",
+        "Ballard’s 1989 team found one turret. The 2001 expedition identified another, tentatively called Caesar, near the hull. Their empty barbette rings remain a striking feature of the wreck."
       ],
       "facts": [
-        { "label": "Turrets", "value": "Anton, Bruno, Caesar, Dora — 4 x twin 38 cm" },
-        { "label": "Found by Ballard (1989)", "value": "1 of 4, upside-down" },
-        { "label": "Later surveys", "value": "more of the field mapped (Magellan, 2019)" }
+        {
+          "label": "Turrets",
+          "value": "Anton, Bruno, Caesar, Dora — 4 x twin 38 cm"
+        },
+        {
+          "label": "Found by Ballard (1989)",
+          "value": "1 of 4, upside-down"
+        },
+        {
+          "label": "Later surveys",
+          "value": "2001 expedition identified another turret near the hull"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -107,15 +144,26 @@
       "id": "sinking-and-debate",
       "title": "Shellfire, torpedoes, or scuttling?",
       "paragraphs": [
-        "By the morning of 27 May 1941, Bismarck could no longer steer or fight back effectively: a torpedo hit near the stern two days earlier had jammed her rudders, and HMS King George V and HMS Rodney closed to point-blank range and battered her for nearly two hours. With the ship ablaze and listing heavily, her crew opened the sea cocks and set off scuttling charges below decks, and she went down stern-first around 10:40.",
-        "Exactly what finally sank her has been debated by historians and naval architects for decades: British gunners and a final torpedo strike from HMS Dorsetshire certainly inflicted catastrophic damage, but German survivors maintained the scuttling charges were what actually sent her under. Most researchers today conclude both contributed -- the ship was doomed by battle damage regardless, and the scuttling likely hastened an outcome already underway.",
-        "This marker is placed near the hull to represent that question rather than a single surveyed feature; the hull's true damage pattern is not modelled in detail here."
+        "By the morning of 27 May 1941, Bismarck could no longer steer or fight back effectively: a torpedo hit near the stern the evening before had jammed her rudders, and HMS King George V and HMS Rodney closed to point-blank range and battered her for nearly two hours. With the ship ablaze and listing heavily, her crew opened the sea cocks and set off scuttling charges below decks, and she went down stern-first around 10:40.",
+        "Survey teams have reached different conclusions about the final sinking. David Mearns’s 2001 expedition attributed it to combined battle damage and flooding, with scuttling hastening the end; James Cameron’s 2002 team emphasized scuttling. Both documented a heavily damaged wreck."
       ],
       "facts": [
-        { "label": "Rudder jammed", "value": "26 May 1941, Ark Royal Swordfish torpedo" },
-        { "label": "Final bombardment", "value": "27 May, HMS King George V and HMS Rodney" },
-        { "label": "Sank", "value": "~10:40, 27 May 1941, stern-first" },
-        { "label": "Cause", "value": "debated: battle damage, scuttling, or both" }
+        {
+          "label": "Rudder jammed",
+          "value": "26 May 1941, Ark Royal Swordfish torpedo"
+        },
+        {
+          "label": "Final bombardment",
+          "value": "27 May, HMS King George V and HMS Rodney"
+        },
+        {
+          "label": "Sank",
+          "value": "~10:40, 27 May 1941, stern-first"
+        },
+        {
+          "label": "Cause",
+          "value": "debated: battle damage, scuttling, or both"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -130,6 +178,10 @@
         {
           "title": "The Wreck of the Bismarck — kbismarck.com",
           "url": "https://www.kbismarck.com/wreck.html"
+        },
+        {
+          "title": "H.M.S. Hood Association — expedition findings",
+          "url": "https://www.hmshood.org.uk/hoodtoday/2001expedition/bismarck/encrypt.htm"
         }
       ],
       "confidence": "medium"
@@ -138,17 +190,26 @@
       "id": "seamount-flank",
       "title": "An extinct undersea volcano",
       "paragraphs": [
-        "Bismarck lies on the flank of a large, extinct seamount in the eastern North Atlantic. This tile's own terrain shows a broad, undulating slope: it shoals from about 4,219 m at the hull to roughly 4,182 m some 500 m up-slope to the north-east, and continues up toward the tile's shallowest point (a summit) at about 4,024 m roughly 3 km further along the same line.",
-        "That is real, if coarse, bathymetry -- but it is not a survey of the wreck site itself, and the depth here (around 4,220 m) reads noticeably shallower than the 4,790-4,791 m commonly published for the wreck: the sourced coordinate used marks the general vicinity of the wreck, not necessarily the exact point the hull settled at after sliding downslope. Published accounts describe a much steeper slope near the actual wreck, around 14.5 degrees, and a roughly 1 km debris trail down it, formed when the falling turrets triggered a small landslide that carried the settling hull further downhill. This tile's grid comes from a coarser global (GEBCO-derived) fill rather than a dedicated multibeam survey of the site, so it cannot resolve that trail, the true slope angle, or the exact depth; what you can scan here is genuine terrain, smoothed well below the scale of the wreck."
+        "The seamount rises northeast of the hull, from about 4,219 m to about 4,024 m over roughly 3 km in this terrain grid. Detached-turret markers sit upslope along the route.",
+        "The 2001 expedition’s images show an impact crater and a much steeper slide scar at the actual wreck site. The broad grid relief here gives the setting, while those survey images document the wreck’s last movement."
       ],
       "facts": [
-        { "label": "Terrain at hull", "value": "4,218.5 m (this tile)" },
-        { "label": "Terrain 500 m up-slope (NE)", "value": "4,182.1 m (this tile)" },
+        {
+          "label": "Terrain at hull",
+          "value": "4,218.5 m (this tile)"
+        },
+        {
+          "label": "Terrain 500 m up-slope (NE)",
+          "value": "4,182.1 m (this tile)"
+        },
         {
           "label": "Published wreck depth",
           "value": "4,790-4,791 m (deeper than this tile reads here)"
         },
-        { "label": "Published debris trail", "value": "~1 km, down a ~14.5° slope" },
+        {
+          "label": "Slide distance (2001 survey)",
+          "value": "about 1.5 km on a 14.5° slope"
+        },
         {
           "label": "Data source",
           "value": "GMRT Synthesis (coarse fill here, not a dedicated survey)"
@@ -172,13 +233,25 @@
       "title": "A war grave",
       "paragraphs": [
         "Bismarck went down with roughly 2,100 of the 2,221 men aboard her. HMS Dorsetshire and HMS Maori pulled about 110 survivors from the freezing water before breaking off, on the report of a possible U-boat; a few more were later picked up by a German weather ship and U-boat. It remains one of the largest single losses of life in the Battle of the Atlantic.",
-        "Every expedition to the wreck, from Ballard's in 1989 onward, has treated the site as a war grave: no recovery of remains or artefacts, cameras and sensors only. This game follows the same principle at every site it depicts, war grave or not -- there is no salvage, collection or loot of any kind."
+        "Treat the wreck as a memorial: observe its structure and learn its history while leaving it undisturbed."
       ],
       "facts": [
-        { "label": "Crew aboard", "value": "2,221" },
-        { "label": "Died", "value": "~2,100" },
-        { "label": "Rescued", "value": "~114" },
-        { "label": "Status", "value": "treated as a war grave by every expedition" }
+        {
+          "label": "Crew aboard",
+          "value": "2,221"
+        },
+        {
+          "label": "Died",
+          "value": "~2,100"
+        },
+        {
+          "label": "Rescued",
+          "value": "~114"
+        },
+        {
+          "label": "Status",
+          "value": "treated as a war grave by every expedition"
+        }
       ],
       "reconstruction": false,
       "sources": [
