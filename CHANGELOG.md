@@ -14,6 +14,11 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-LOSTCITY-4: the seabed albedo no longer aliases into a regular
+  houndstooth/checker on distant and grazing slopes (most visible at Lost City).
+  `terrain.frag.glsl` applies a distance-driven mip bias (0 within 3 m, +3 mips
+  by 40 m) to the albedo fetches; no extra texture fetch, so the Low tier gets it
+  too. Near-field detail is unchanged.
 - Phase F, F-CI-CHECK: CI distributes e2e tests across 16 single-worker runners,
   runs static and project-base gates separately, and bounds jobs below 25 minutes.
   Browser installation and suites have explicit budgets; final test failures
