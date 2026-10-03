@@ -11,6 +11,7 @@ import { createProgressSystem } from '../../src/app/systems/progress.js';
 import { createRovSystem } from '../../src/app/systems/rov.js';
 import { Scene, SpotLight, PointLight, Vector3 } from 'three';
 import { shellUrl } from '../../src/util/navigation.js';
+import { Home } from '../../src/ui/Home.js';
 
 vi.mock('../../src/ui/RovHUD.js', () => ({
   RovHUD: class {
@@ -84,6 +85,69 @@ function setup(lowLight = false, href = 'http://localhost/', includeDeep = false
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
+});
+
+it('removes an inaccessible Daily launch and restores the same card after mode changes', () => {
+  const { ctx, system, offPurchase } = setup(false, 'http://localhost/', true);
+  system.dispose?.();
+  // Only a deep site's tile is downloaded; Realistic has no eligible Daily.
+  ctx.index = ctx.index.filter((tile) => tile.id === 'deep');
+  class HomeElement extends EventTarget {
+    children: HomeElement[] = [];
+    className = '';
+    hidden = false;
+    onclick: (() => void) | null = null;
+    setAttribute() {}
+    append(...children: HomeElement[]) {
+      this.children.push(...children);
+    }
+    replaceChildren(...children: HomeElement[]) {
+      this.children = children;
+    }
+  }
+  vi.stubGlobal('document', {
+    body: new HomeElement(),
+    createElement: () => new HomeElement(),
+  });
+  ctx.home = new Home({
+    continueDive: vi.fn(),
+    journal: vi.fn(),
+    settings: vi.fn(),
+    controls: vi.fn(),
+  });
+  const root = ctx.home.root as unknown as HomeElement;
+  const card = root.children[1].children.find((el) => el.className === 'daily-card')!;
+  try {
+    system.start?.(ctx);
+    expect(card.hidden).toBe(false);
+    expect(card.onclick).toBeTypeOf('function');
+    ctx.save.setGameplayMode('realistic');
+    expect(card.hidden).toBe(true);
+    expect(card.onclick).toBeNull();
+    vi.advanceTimersByTime(1000);
+    expect(card.hidden).toBe(true);
+    ctx.save.setGameplayMode('custom');
+    expect(card.hidden).toBe(false);
+    card.onclick?.();
+    const url = new URL(window.location.href);
+    expect(url.searchParams.get('mission')).toBe('deep');
+    expect(url.searchParams.get('daily')).toBe('2026-10-02');
+    ctx.save.setGameplayMode('realistic');
+    expect(card.hidden).toBe(true);
+    // Returning within the same UTC day must also replace the cleared callback.
+    ctx.save.setGameplayMode('arcade');
+    expect(card.hidden).toBe(false);
+    expect(card.onclick).toBeTypeOf('function');
+    system.dispose?.();
+    const launch = card.onclick;
+    ctx.save.setGameplayMode('realistic');
+    expect(card.hidden).toBe(false);
+    expect(card.onclick).toBe(launch);
+    expect(vi.getTimerCount()).toBe(0);
+  } finally {
+    system.dispose?.();
+    offPurchase();
+  }
 });
 it('keeps forced touch layout when the Daily card reboots into a mission under a project base', () => {
   const { ctx, system, offPurchase } = setup(

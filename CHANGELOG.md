@@ -14,6 +14,12 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BUGHUNT-8: touch disposal clears the active input flag, and
+  interrupted gestures discard pending double taps so the camera cannot reset
+  across focus, layout, desktop, pause or photo transitions. Global listener
+  teardown and rebuilt controls now have regression coverage. Daily cards hide
+  and clear their launch action when the selected mode has no accessible
+  downloaded sites, then restore correctly when access returns.
 - Phase F, F-LOSTCITY-4: the seabed albedo no longer aliases into a regular
   houndstooth/checker on distant and grazing slopes (most visible at Lost City).
   `terrain.frag.glsl` applies a distance-driven mip bias (0 within 3 m, +3 mips

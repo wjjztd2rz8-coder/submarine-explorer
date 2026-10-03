@@ -68,7 +68,7 @@ export class TouchControls {
   // Camera gestures on the canvas.
   private readonly looks = new Map<number, { x: number; y: number; t0: number; moved: number }>();
   private pinchDist = 0;
-  private readonly doubleTap = new DoubleTap();
+  private doubleTap = new DoubleTap();
 
   constructor(opts: TouchControlsOptions) {
     this.opts = opts;
@@ -167,6 +167,7 @@ export class TouchControls {
     for (const d of this.disposers) d();
     this.disposers.length = 0;
     this.releaseAll();
+    this.input.touchActive = false;
     document.documentElement.classList.remove('is-touch');
     this.root.remove();
   }
@@ -440,6 +441,8 @@ export class TouchControls {
     this.heldPointers.clear();
     this.looks.clear();
     this.pinchDist = 0;
+    // A tap before a layout/mode interruption cannot pair with the next gesture.
+    this.doubleTap = new DoubleTap();
     for (const b of this.root.querySelectorAll('.is-held')) b.classList.remove('is-held');
   }
 
