@@ -14,6 +14,12 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BUGHUNT-10: best stars persist for every supported content ID,
+  including uppercase letters, underscores and names matching object properties.
+- Phase F, F-BUGHUNT-10: progress migration recovers missing or damaged best-star
+  summaries from saved rating reward tokens without awarding duplicate RP.
+- Phase F, F-BUGHUNT-10: legacy completed surveys count animal scans toward the
+  three-star bonus at their own site, matching current-dive rating rules.
 - Phase F, F-LOSTCITY-4: the seabed albedo no longer aliases into a regular
   houndstooth/checker on distant and grazing slopes (most visible at Lost City).
   `terrain.frag.glsl` applies a distance-driven mip bias (0 within 3 m, +3 mips

@@ -5,6 +5,36 @@ import { creditPreviousDives } from '../../src/game/ProgressMigration.js';
 import { ProgressSave } from '../../src/core/Save.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
 
+it('credits a legacy animal scan as a bonus only for its completed site', async () => {
+  const discoveries = new DiscoveryStore(null);
+  for (const site of ['with-life', 'without-life']) discoveries.record(site, 'a');
+  discoveries.record('with-life', 'life:ray');
+  const progress = new Progress(new ProgressSave(null));
+  await creditPreviousDives(progress, discoveries, [], async (url) => {
+    const site = url.split('/').at(-2)!;
+    return {
+      ok: true,
+      text: async () =>
+        JSON.stringify({
+          version: 1,
+          landmark: site,
+          tile: site,
+          title: site,
+          spawn: { lat: 0, lon: 0 },
+          objectives: [{ id: 'a', poi: 'a', primary: true }],
+          completion: 'all_primary',
+        }),
+    };
+  });
+  expect(progress.rating('with-life')).toBe(3);
+  expect(progress.rating('without-life')).toBe(2);
+  expect(progress.snapshot().awarded).toContain('species:ray');
+  expect(progress.snapshot().awarded).not.toContain('poi:with-life/life:ray');
+  expect(progress.points).toBe(205);
+  expect(progress.bonus).toBe(false);
+  expect(progress.divePoints).toBe(0);
+});
+
 it('retroactively credits objectives, completion, photos and best stars once, before hull gating', async () => {
   const discoveries = new DiscoveryStore(null);
   for (const site of ['first', 'second', 'third']) {

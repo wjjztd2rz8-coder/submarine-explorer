@@ -35,7 +35,9 @@ export async function creditPreviousDives(
       });
       const primary = statuses.filter((o) => o.primary);
       if (primary.length && primary.every((o) => o.complete)) {
-        progress.bonus = photos.some((p) => p.siteId === site && p.poiId !== null);
+        progress.bonus =
+          photos.some((p) => p.siteId === site && p.poiId !== null) ||
+          keys.some((key) => key.startsWith(`${def.landmark}/life:`));
         progress.finish(site, statuses);
       }
       return null;

@@ -577,6 +577,9 @@ The new `subexplorer.progress.v1` save contains `version`, spendable `points`,
 `lifetime` earnings, a `legacyCredited` migration marker, reward-token `awarded` keys, upgrade levels and best site
 `ratings`. `Save.ts` sanitizes older/malformed records and protects future versions.
 Discovery saves keep the existing `subexplorer.discoveries.v1` schema and key.
+Rating keys accept the same letters, digits, underscores and hyphens as content
+folder IDs, including names that match object properties. Valid rating reward
+tokens recover lost best-star summaries without generating another RP payout.
 
 `ctx.progress` and `window.__game.progress` expose `award(kind, id): number`.
 Kinds are `poi`, `objective`, `species`, `photo`, `primary`, and `rating`. Use stable
@@ -587,6 +590,8 @@ F2-LIFE can call `progress.award('species', speciesId)` on a completed animal sc
 and `progress.award('photo', subjectId)` on a successfully captured animal photo.
 Migration uses `credit()` so old subjects do not count as new dive activity, and runs
 once so later discoveries across separate dives cannot generate retroactive ratings.
+Legacy completed surveys use a subject photo or animal scan at that site for the
+three-star bonus; another site's animal scan does not supply the bonus.
 
 `MissionSelect.setProgress()` adds hull requirements, free-dive ratings and best
 stars. `Globe.setMissionAccess()` keeps locked pins focusable to read their requirement
