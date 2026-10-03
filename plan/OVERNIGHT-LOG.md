@@ -220,3 +220,11 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Queued for Codex: 250-f-bughunt-9-audio-mobile-regress, plus new 260-f-lostcity-mip-verify (checks the Lost City mip-bias shader on the other hero sites and tiers) and 270-f-bughunt-10-modes-save.
 - No Claude agents spawned (Claude 5h 82%, but the only visual package left, F3-BRAND-UI, waits on the 240 spec).
 - Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-03 headless run (started ~06:20)
+
+- Merged: Codex 220 (F-BUGHUNT-8: touch teardown/double-tap and daily card fixes), 230 (F-CI-SPLIT: local gates run smoke e2e, `--full-e2e` or CI runs all), 240 (F-TITLE-SPEC + Bathyline mark draft); Sonnet F-TITLE-B (Monterey crop) and F-TITLE-C (title scene), both unit-tested only and not yet wired into the app. Gates green on main after each step. Not pushed yet this run (no visual change).
+- Running Codex: 250, 260, 270. Queued: 280 title identity assets (fonts/icons, NET), 290 browser verification of B/C, 300 gates/CI verification.
+- Next Claude run: F-TITLE-D (home layout, needs A) then E (bridge), F, G per spec §7.
+- Spec note: F-TITLE-SPEC puts "Vehicle and lighting are illustrative." on the title scene caption; that is a single scene caption, acceptable under content-tone, but don't add more.
+- Still needs owner: brand name OK (Bathyline).
