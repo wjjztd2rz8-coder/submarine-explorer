@@ -212,7 +212,7 @@ test.describe('pwa', () => {
     expect(href).toBeTruthy();
     const res = await request.get(new URL(href!, page.url()).href);
     const manifest = await res.json();
-    expect(manifest.name).toBe('Submarine Explorer');
+    expect(manifest.name).toBe('Bathyline');
     for (const icon of manifest.icons) {
       const r = await request.get(new URL(icon.src, new URL(href!, page.url())).href);
       expect(r.ok()).toBe(true);
