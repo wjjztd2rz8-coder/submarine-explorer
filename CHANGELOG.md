@@ -14,6 +14,9 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-LOSTCITY-MIP-VERIFY: add a reproducible before/after terrain shader
+  capture and luminance report for all five hero sites on High, Medium and Low;
+  visual sign-off remains pending because this sandbox cannot run a browser.
 - Phase F, F-LOSTCITY-4: the seabed albedo no longer aliases into a regular
   houndstooth/checker on distant and grazing slopes (most visible at Lost City).
   `terrain.frag.glsl` applies a distance-driven mip bias (0 within 3 m, +3 mips
