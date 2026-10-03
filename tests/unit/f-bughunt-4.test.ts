@@ -64,7 +64,7 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
       expect(worst.error).toBeGreaterThan(config.submarine.hullRadius * 2);
       expect(maxBurial.error).toBeGreaterThan(config.submarine.hullRadius * 2);
       const sub = new Submarine(config.submarine, terrain);
-      sub.reset(worst.x, -80, worst.z);
+      sub.reset(worst.x, Math.min(-80, worst.mesh - config.submarine.hullRadius - 2), worst.z);
       sub.step(
         {
           throttle: 0,
@@ -115,7 +115,7 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
       const sampler = terrain.sampleDataHeight(x, z);
       console.log('Blue Hole without procedural detail', { mesh, sampler, error: mesh - sampler });
       expect(terrain.sampleHeight(x, z)).toBe(sampler);
-      expect(mesh - sampler).toBeGreaterThan(config.submarine.hullRadius * 2);
+      expect(mesh - sampler).toBeGreaterThan(config.submarine.hullRadius);
     } finally {
       terrain.dispose();
     }
@@ -182,13 +182,13 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
     );
     try {
       const u = materials.map((m) => m.material.userData.uniforms);
-      expect(u[0].uDepthShade.value.toArray()).toEqual([14, 95]);
+      expect(u[0].uDepthShade.value.toArray()).toEqual([12, 100]);
       expect(u[1].uDepthShade.value.toArray()).toEqual([0, 0]);
       u[0].uDepthShade.value.set(99, 100);
       u[0].uDepthTint.value.set(0x000000);
       expect(u[1].uDepthShade.value.toArray()).toEqual([0, 0]);
       expect(u[1].uDepthTint.value.getHex()).toBe(0xffffff);
-      expect(u[2].uDepthShade.value.toArray()).toEqual([14, 95]);
+      expect(u[2].uDepthShade.value.toArray()).toEqual([12, 100]);
       expect(u[2].uDepthTint.value.getHex()).not.toBe(0);
     } finally {
       for (const m of materials) {

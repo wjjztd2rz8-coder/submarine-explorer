@@ -8,13 +8,13 @@ Dated director reviews, newest first. Comprehensive reviews run about daily, aft
 
 **Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1–5 each, from golden set 2026-10-03-175107:**
 
-| Site | Score | Biggest gap |
-|---|---|---|
-| Titanic | 4/4/4/4/5/4 | Foreground marine snow too big and bright; far field near black |
-| Monterey Canyon | 3/3/4/3/5/3 | Reads as a lone mound, not a canyon; thin life on the wall |
-| Beebe | 3/3/4/3/5/3 | Plumes are smooth grey funnels, not billowing smoke |
-| Great Blue Hole | 2/3/4/2/5/3 | Floating dark dome prop at spawn; flat floor |
-| Lost City | 2/2/3/2/5/3 | Close-up tower is a smeared white blob (Codex 400 in flight) |
+| Site            | Score       | Biggest gap                                                     |
+| --------------- | ----------- | --------------------------------------------------------------- |
+| Titanic         | 4/4/4/4/5/4 | Foreground marine snow too big and bright; far field near black |
+| Monterey Canyon | 3/3/4/3/5/3 | Reads as a lone mound, not a canyon; thin life on the wall      |
+| Beebe           | 3/3/4/3/5/3 | Plumes are smooth grey funnels, not billowing smoke             |
+| Great Blue Hole | 2/3/4/2/5/3 | Floating dark dome prop at spawn; flat floor                    |
+| Lost City       | 2/2/3/2/5/3 | Close-up tower is a smeared white blob (Codex 400 in flight)    |
 
 **Play flow:** Home (Dive sites / Arcade-Realistic cards) is clear and phone-OK. Debrief is clear and rewarding, with real next steps. Clutter: the 5-line GMRT citation block bottom-right on every frame (queued 450 HUD footer).
 
