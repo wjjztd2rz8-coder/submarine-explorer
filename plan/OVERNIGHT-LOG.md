@@ -228,3 +228,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Next Claude run: F-TITLE-D (home layout, needs A) then E (bridge), F, G per spec §7.
 - Spec note: F-TITLE-SPEC puts "Vehicle and lighting are illustrative." on the title scene caption; that is a single scene caption, acceptable under content-tone, but don't add more.
 - Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-03 headless run (started ~06:45)
+
+- Merged (Codex, gates green on main): 270 F-BUGHUNT-10 (ratings recovery from reward tokens, prototype-safe keys, legacy animal bonus) and 260 F-LOSTCITY-MIP-VERIFY (comparison tool only; the browser verification itself was blocked by the Codex sandbox, so far-terrain blandness at Lost City is still unchecked).
+- Running Codex: 250, 280 (title identity), 290 (title modules review). Queued: 300 (CI verify), 310 F-COSMETICS, 320 bughunt-12.
+- No Claude agents (Claude 5h 72%, but F-TITLE-D waits on 280).
+- Needs owner: brand name OK (Bathyline). Still open: fresh golden set (needs a host with a browser).
