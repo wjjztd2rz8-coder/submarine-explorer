@@ -313,3 +313,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged `f-monterey-canyon` (Sonnet): flanking canyon walls and sponges/coral on the lit wall. Smoke gates passed in worktree and on main; full e2e not run, no tag.
 - Stalled worktrees 390/395/400 wait for the Codex 15:45 reset. Eight briefs queued.
 - Needs owner: nothing.
+
+## 2026-10-03 headless run (started ~14:28)
+
+- Merged Claude/Sonnet F-BLUEHOLE-WALL: strata banding (new optional biome `strata` shader uniform), wall alcoves, floor blocks, second grotto, repainted apron. Full-e2e on main: 278 pass, 1 fail (f-geo-scarp monterey-canyon rock support, min < -3 under load); passes 2/2 in isolation (spec 4/4), treated as a load flake; worth watching since Monterey walls merged with smoke gates only. Pushed, tagged f17. CI on main was still red (f2-life scan, Codex 440 queued).
+- Codex still at its 5% floor until 15:45; worktrees 390/395/400 hold uncommitted finished work and resume after the reset. 8 briefs queued. No Claude agent running.
+- Next Claude candidates: Lost City surroundings (after 400 merges), toast placement (after 395 merges, both touch HUD/props), Titanic far-field lift.
+- Needs owner: nothing.

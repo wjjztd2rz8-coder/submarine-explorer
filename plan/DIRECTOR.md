@@ -10,7 +10,7 @@ Claude visual backlog (Sonnet agents, in order of player impact):
 
 1. **Monterey canyon (flanking walls and wall life merged 2026-10-03, re-check in next golden set):** remaining: the west wall is barely visible at spawn; a darker depth fall-off gap; wall sponges are large pale cups at close range.
 2. **Lost City surroundings:** the tiered tower now reads (400 may still add texture). The slope around it is bare brown and the light is milky. Add carbonate rubble, flanges on the small towers, a darker ambient.
-3. **Blue Hole wall and floor:** the wall is flat tan and the rim apron is smeared. Add banding, overhangs, a second stalactite cluster and a textured floor.
+3. **Blue Hole wall and floor (merged 2026-10-03, f17: strata banding, alcoves, second grotto):** remaining: east grotto shelf tops still large pale surfaces; no golden pose covers the east alcove.
 4. **Beebe plume variety:** plumes are uniform tall columns. Vary the width and lean per vent, add a lit hot-water haze above the orifice, and a bent plume in the current.
 5. **Titanic far-field lift:** lift the dark far field slightly. Codex 460 handles the snow clutter.
 6. **Toast placement:** the "Animal nearby" toast overlaps the sonar legend at 1600x900. Move it below the legend or to the top centre.
