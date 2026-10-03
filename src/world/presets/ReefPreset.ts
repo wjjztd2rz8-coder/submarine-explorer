@@ -8,7 +8,7 @@
  * pale, wispy layers a metre or two apart at the depth where fresh and salt
  * water meet inside a sinkhole (Great Blue Hole, ~90 m). It is a depth-tested
  * disc, so only the part inside the hole shows; the surrounding reef flat
- * hides it. Skipped on the low tier with the shafts.
+ * hides it. The low tier gets one disc (shafts stay off there).
  *
  * Draw calls: 1 (all shafts are cylindrical billboards in one mesh, additive,
  * fogged) + 1 for the halocline. Shaft anchors wrap in a box around the
@@ -49,8 +49,9 @@ export class ReefPreset implements EnvPreset {
     const p = (this.params = ctx.params);
     this.scene = ctx.scene;
     this.warm.setHex(num(p.warmColor, 0xffe9b8));
-    if (!ctx.visuals) return;
+    // One cheap disc even on the low tier: it also lifts the dark hole interior there.
     this.buildHalocline(ctx);
+    if (!ctx.visuals) return;
     const n = Math.max(0, Math.min(64, Math.round(num(p.shafts, 14))));
     if (!n) return;
     const rnd = mulberry(0x5eef);
@@ -118,10 +119,10 @@ export class ReefPreset implements EnvPreset {
     if (depth <= 0 || typeof lat !== 'number' || typeof lon !== 'number') return;
     const centre = ctx.toWorld(lat, lon);
     const radius = num(p.haloclineRadiusM, 180);
-    // Three discs ~1.4 m apart read as one soft band; one draw call.
+    // Three discs ~1.4 m apart read as one soft band; one draw call. Low tier: a single disc.
     const pos: number[] = [];
     const index: number[] = [];
-    const layers = [-1.4, 0, 1.4];
+    const layers = ctx.visuals ? [-1.4, 0, 1.4] : [0];
     const ring = 40;
     layers.forEach((dy, l) => {
       const base = l * (ring + 1);
@@ -141,7 +142,7 @@ export class ReefPreset implements EnvPreset {
         uCentre: { value: new THREE.Vector3(centre.x, -depth, centre.z) },
         uRadius: { value: radius },
         uColor: { value: new THREE.Color(num(p.haloclineColor, 0xb4d8d2)) },
-        uOpacity: { value: num(p.haloclineOpacity, 0.34) },
+        uOpacity: { value: num(p.haloclineOpacity, 0.34) * (ctx.visuals ? 1 : 2.2) },
       },
       vertexShader: HALO_VERT,
       fragmentShader: HALO_FRAG,
