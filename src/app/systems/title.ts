@@ -41,9 +41,9 @@ export function titleTier(tier: GameContext['tier']): TitleTier {
   return tier === 'low' ? 'low' : tier === 'medium' ? 'medium' : 'high';
 }
 
-/** Layout rule from the spec: short landscape wins, then width. */
+/** Match home.css: min-aspect-ratio includes square viewports. */
 export function titleLayout(w: number, h: number): TitleLayout {
-  if (w > h && h <= 500) return 'short-landscape';
+  if (w >= h && h <= 500) return 'short-landscape';
   return w < 960 ? 'portrait' : 'desktop';
 }
 

@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BUGHUNT-14: short square viewports use the same title canvas
+  composition as the home CSS, keeping the scene aligned with the left plate.
 - Phase F, F-BUGHUNT-12: title navigation lights stay steady in animated and
   reduced-motion scenes, including after quality changes.
 - Phase F, F-BUGHUNT-12: downward title vehicle hover respects the title floor
