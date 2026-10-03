@@ -14,6 +14,18 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-SAVE-SOAK: settings and key bindings recover intact legacy copies
+  when current localStorage entries are empty, truncated or corrupt. Explicit v0
+  settings and bare v0 discovery maps retain their saved choices and discoveries;
+  malformed discovery records and non-finite scan counts are sanitized. Future
+  binding schemas are protected from session edits and resets.
+- Phase F, F-SAVE-SOAK: `__game.perf` now exposes scene object, geometry and texture
+  counts. A headless ten-cycle dive/mode/restart/reload soak checks persistence,
+  console errors and stable scene/resource counts, with ten additional restarts
+  in each live scene. Unit coverage loads every supported historical save shape,
+  exercises damaged storage recovery and verifies collection isolation and future
+  schema preservation.
+
 - Phase F, F-TITANIC-2: Titanic's free dive now opens broadside to the bow with the
   chase camera pulled in to 70 m (new optional `chaseRadius` on composed openings), so
   the rails, portholes and plating read and the sub no longer hides the mid-hull; the

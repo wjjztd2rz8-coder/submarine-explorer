@@ -58,9 +58,12 @@ function isoOr(v: unknown, fallback: string): string {
 function sanitizeRecord(v: unknown, fallbackAt: string): DiscoveryRecord | null {
   if (v === true) return { at: fallbackAt, count: 1 };
   if (typeof v === 'string') return { at: isoOr(v, fallbackAt), count: 1 };
-  if (typeof v !== 'object' || v === null) return null;
+  if (typeof v !== 'object' || v === null || Array.isArray(v)) return null;
   const o = v as Record<string, unknown>;
-  const count = typeof o.count === 'number' && o.count >= 1 ? Math.floor(o.count) : 1;
+  const count =
+    typeof o.count === 'number' && Number.isFinite(o.count) && o.count >= 1
+      ? Math.floor(o.count)
+      : 1;
   return { at: isoOr(o.at ?? o.first ?? o.time, fallbackAt), count };
 }
 
@@ -97,10 +100,12 @@ export function migrate(raw: unknown, fallbackAt = new Date().toISOString()): Di
     const d = o.discovered ?? o.discoveries;
     if (Array.isArray(d)) addKeys(d);
     else if (typeof d === 'object' && d !== null) addMap(d as Record<string, unknown>);
+    else if (o.version === undefined || o.version === 0) addMap(o);
     const s = o.stats;
     if (typeof s === 'object' && s !== null) {
       const so = s as Record<string, unknown>;
-      if (typeof so.scans === 'number' && so.scans >= 0) out.stats.scans = Math.floor(so.scans);
+      if (typeof so.scans === 'number' && Number.isFinite(so.scans) && so.scans >= 0)
+        out.stats.scans = Math.floor(so.scans);
       if (typeof so.firstAt === 'string') out.stats.firstAt = isoOr(so.firstAt, fallbackAt);
     }
   }
