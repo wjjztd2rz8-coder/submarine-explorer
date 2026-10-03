@@ -327,3 +327,8 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged Claude/Sonnet F-MONTEREY-POLISH: flanks face inward, far wall for depth, subtler/varied sponges. Shot 1 clearly better; golden poses 2/3 now auto-pick wall backs (follow-up pinned in DIRECTOR). Smoke + project-base green on main; full-e2e not run, no tag, not pushed beyond the review commit.
 - Codex at 5% floor until 15:45; worktrees 390/395/400 resume then. Lost City surroundings and toast placement wait on 400/395 (file overlap).
 - Needs owner: nothing.
+
+## 2026-10-03 15:30 targeted review run
+
+- Trigger "Claude idle ≥ 50% for 2 h" was a false positive (sampler bug); fixed and logged in PROCESS-LOG and REVIEWS. No merges; 8 Codex briefs queued; Codex resumes after 15:45. Claude weekly 31%, so no new package.
+- Needs owner: nothing.

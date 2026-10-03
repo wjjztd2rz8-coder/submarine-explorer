@@ -28,7 +28,7 @@ if len(ci)==3 and all(c=='failure' for c in ci): why['targeted'].append('CI red 
 try:
     rows=list(csv.DictReader(open('.cache/metrics/usage.csv')))[-4:]
     num=lambda v: float(v) if v not in ('','-') else -1
-    if len(rows)==4 and all(num(r['claude5h'])>=50 and r['run']=='0' for r in rows): why['targeted'].append('Claude idle at >=50% for 2 h')
+    if len(rows)==4 and all(num(r['claude5h'])>=50 and r['run']=='0' for r in rows) and not any(now-os.path.getmtime(os.path.join('.cache',f))<2*3600 for f in os.listdir('.cache') if f.startswith('resume-2')): why['targeted'].append('Claude idle at >=50% for 2 h')
     if len(rows)==4 and all(num(r['codex5h'])>=30 and int(r['codex_running'] or 0)<2 and int(r['codex_queued'] or 0)==0 for r in rows): why['targeted'].append('Codex starved for 2 h (empty queue)')
 except Exception: pass
 fails=sh('grep -h "^FAIL" .cache/codex/*-result.md 2>/dev/null | sort | uniq -c | sort -rn | head -1').split()

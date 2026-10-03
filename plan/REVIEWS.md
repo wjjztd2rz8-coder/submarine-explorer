@@ -2,6 +2,13 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-03 15:30 — targeted review (false positive: "Claude idle ≥ 50% for 2 h")
+
+- Claude was not idle: runs started 13:26, 14:08, 14:28, 14:57 and 15:15 (merges f16, f17, Monterey canyon and polish, Blue Hole). The sampler missed them because it matched only `claude -p Resume Submarine…` and review-run prompts start differently; runs are also short compared with the 30-min sampling.
+- Fixed `tools/usage-sample.sh` and `tools/review-triggers.sh` (see PROCESS-LOG). Idle-hours figures in `efficiency.sh` before today are overstated.
+- Real constraint: Codex is at its 5% floor until 15:45, so worktrees 390/395/400 are stalled and 8 briefs are queued (the queue is not dry). Claude weekly is 31%, so no new Claude package was started this run. CI on main was still running the f2-life scan fix (Codex 440 queued).
+- Needs owner: nothing.
+
 ## 2026-10-03 late comprehensive review (trigger: tag f17; golden set 2026-10-03-195811)
 
 **Changed since the evening review:** Monterey flanking canyon walls and wall life, Blue Hole strata banding / alcoves / second grotto (f17). Beebe plumes (f16) already scored.

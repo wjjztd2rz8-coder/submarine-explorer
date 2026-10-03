@@ -13,7 +13,8 @@ def left(s,k):
     if "used" not in w: return ""
     return 100 if w.get("resets_at") and w["resets_at"]<now else round(100-w["used"])
 print(left("claude","five_hour") or "-",left("claude","seven_day") or "-",left("codex","five_hour") or "-",left("codex","seven_day") or "-")')
-run=$(pgrep -f 'claude -p Resume Submarine' >/dev/null && echo 1 || echo 0)
+# Review runs start with "THIS RUN IS A ..." not "Resume Submarine", so match the flag, not the prompt.
+run=$({ pgrep -f 'claude -p .*--permission-mode bypassPermissions' >/dev/null || [[ -f .cache/orchestrator.active ]]; } && echo 1 || echo 0)
 cr=$(systemctl --user list-units --type=service --state=running --no-legend 'subexp-*' | awk '{print $1}' | grep -vc '^subexp-resume')
 q=$(ls .cache/codex/queue/*.md 2>/dev/null | wc -l)
 echo "$(date '+%F %H:%M'),$c5,$c7,$x5,$x7,$run,$cr,$q" >> $f
