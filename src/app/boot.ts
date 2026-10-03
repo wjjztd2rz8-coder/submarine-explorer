@@ -60,6 +60,9 @@ export async function boot(): Promise<BootContext | null> {
   const params = new URLSearchParams(window.location.search);
   // Capture before any loading: crossing UTC midnight must not change this run's seed.
   const bootDate = utcDate();
+  // Daily route selection must use the saved mode, just like ordinary missions.
+  const save = new Save({ config, bus });
+  const settings = save.get();
   // D-SHELL: the home screen unless a dive param is present.
   const bypassHome = BYPASS_HOME_PARAMS.some((key) => params.has(key));
   const appState: AppState = bypassHome ? 'dive' : 'home';
@@ -78,7 +81,10 @@ export async function boot(): Promise<BootContext | null> {
   let daily = null;
   if (params.get('daily') === bootDate) {
     const summaries = await loadMissionSummaries();
-    daily = dailyDive(bootDate, unlockedDailySites(summaries, index, progress));
+    daily = dailyDive(
+      bootDate,
+      unlockedDailySites(summaries, index, progress, settings.gameplayMode),
+    );
     if (daily) {
       route = await resolveMissionRoute(new URLSearchParams({ mission: daily.site }));
       if (route) route.def = dailyMission(route.def, daily);
@@ -89,8 +95,6 @@ export async function boot(): Promise<BootContext | null> {
   const tileId = chooseTileId(requested, index, config.defaultTileId);
   // C5: saved settings (docs/settings.md). The saved graphics tier applies
   // unless `?tier=` is given; terrain detail is read once, when the terrain is built.
-  const save = new Save({ config, bus });
-  const settings = save.get();
   if (daily) {
     settings.gameplay.currents = daily.modifier === 'strong-currents' ? 'exaggerated' : 'off';
     if (daily.modifier === 'low-light') settings.gameplay.lights = 'realistic';
