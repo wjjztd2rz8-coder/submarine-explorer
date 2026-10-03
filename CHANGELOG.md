@@ -14,7 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
-- Phase F, F-LOSTCITY-SURROUNDINGS: Lost City gets a cooler, banded grey-green slope with larger talus blocks and rubble, more ledges and flanges on the small carbonate towers, a less milky vent ambient (fill 16 to 9, lighter haze), and rooted corals (all sites) sit into the sediment with large heads at colony cores and small ones at the fringe.
+- Phase F, F-LOSTCITY-SURROUNDINGS: Lost City gets a cooler, banded grey-green slope with larger talus blocks and rubble, more ledges and flanges on the small carbonate towers, a less milky vent haze (lighter haze lift), and rooted corals (all sites) sit into the sediment with large heads at colony cores and small ones at the fringe.
 - Phase F, F-BUGHUNT-17: seat Lost City's small carbonate chimneys on their
   terrain-conforming aprons without a second footprint snap (Beehive was buried
   by about 2.2 m); rebuild their terrain-relative geometry on replacement. Add a
