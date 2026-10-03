@@ -14,6 +14,11 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-TITLE-B/C: added the (not yet wired) Bathyline title scene
+  modules: `src/render/title/TitleTerrain.ts` crops a 2,400 m real GMRT
+  Monterey Canyon square, and `TitleScene.ts` composes the research sub, lamps,
+  fog and marine snow with tier budgets and reduced-motion support. They do not
+  affect the app until the F-TITLE-E bridge lands.
 - Phase F, F-BUGHUNT-8: touch disposal clears the active input flag, and
   interrupted gestures discard pending double taps so the camera cannot reset
   across focus, layout, desktop, pause or photo transitions. Global listener
