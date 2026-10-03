@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Great Blue Hole: the wall now shows limestone strata (shader rock banding via a new biome `strata` option, plus concentric shelves in the carve), four scooped wall alcoves, floor blocks and a second stalactite alcove (`karst-grotto-east`) on the south-east ledge; the grotto's apron and shelf tops are mottled tan and grey instead of flat cream, the terrain patch colours are less bright, and boulders scatter on the floor too (f-bluehole-wall).
+
 - Monterey Canyon: two smaller flanking mudstone walls (east and west) frame the dive path so the north wall reads as a canyon, and the main wall now carries instanced sponges and cold-water coral fans on its lit face (f-monterey-canyon).
 
 - F-BEEBE-PLUMES: black-smoker smoke no longer reads as a smooth grey funnel. Prop smoke plumes (`smokePlume`) are now noise puffs with a dark dense core, ragged outline, drift growing with height and an orifice shimmer; the vent preset smoke gets height-dependent lobes, a per-puff radial bias and stronger meander so its edge is irregular (reason: director review, Beebe plumes).
