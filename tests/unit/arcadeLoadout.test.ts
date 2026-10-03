@@ -131,6 +131,10 @@ function context(site: string, mode: GameplayMode): GameContext {
   } as unknown as GameContext;
 }
 
+const catalogueSites: string[] = JSON.parse(
+  readFileSync('data/landmarks/index.json', 'utf8'),
+).landmarks;
+
 describe('fresh-player mission routing and vehicle loadout', () => {
   it('loads and applies live cosmetic selections without refitting physics and removes its listener', () => {
     const ctx = context('titanic', 'arcade');
@@ -155,7 +159,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
     }
   });
 
-  it.each(['titanic', 'lost-city', 'great-blue-hole', 'beebe-vent-field', 'monterey-canyon'])(
+  it.each(catalogueSites)(
     'fresh Arcade %s fits a hull that reaches every placed mission contact',
     (site) => {
       const ctx = context(site, 'arcade');
@@ -188,6 +192,27 @@ describe('fresh-player mission routing and vehicle loadout', () => {
       }
     },
   );
+
+  it.each(
+    JSON.parse(readFileSync('data/tiles/index.json', 'utf8')).tiles.map(
+      (tile: { id: string }) => tile.id,
+    ) as string[],
+  )('fresh default Arcade free dive reaches the deepest cell at %s', (site) => {
+    const ctx = context('titanic', 'arcade');
+    ctx.meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
+    ctx.route = null;
+    ctx.params = new URLSearchParams({ tile: site });
+    const submarine = createSubmarineSystem();
+    try {
+      submarine.init?.(ctx);
+      expect(-ctx.sub.getState().ratedDepth).toBeGreaterThanOrEqual(-ctx.meta.min_m);
+      expect(ctx.progress.lifetime).toBe(0);
+      safeTicks(ctx);
+    } finally {
+      submarine.dispose?.();
+      ctx.subMesh?.dispose();
+    }
+  });
 
   it('a direct Realistic deep tile link is pressure-safe before any props system exists', () => {
     const ctx = context('titanic', 'realistic');

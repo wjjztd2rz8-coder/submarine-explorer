@@ -22,6 +22,7 @@ describe('touch route preferences', () => {
       expect(tile.searchParams.get('tier')).toBe('low');
       expect(tile.searchParams.get('tile')).toBe('shallow');
       expect(tile.searchParams.has('mission')).toBe(false);
+      expect(tile.searchParams.has('daily')).toBe(false);
     }
   });
 

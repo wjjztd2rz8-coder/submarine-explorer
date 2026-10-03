@@ -6,7 +6,7 @@
  * sub already sits where the dive will start.
  */
 
-import { dailyRatingKey } from '../../game/Daily.js';
+import { dailyRatingKey, utcDate } from '../../game/Daily.js';
 import type { Input } from '../../core/Input.js';
 import {
   MissionRouter,
@@ -97,7 +97,8 @@ export const missionSystem: GameSystem = {
             if (
               ctx.daily &&
               rating.stars > 0 &&
-              ctx.daily.date === new Date().toISOString().slice(0, 10)
+              // Credit the date this run started, even when it ends after UTC midnight.
+              ctx.daily.date <= utcDate()
             ) {
               ctx.dailySave.complete(ctx.daily.date);
               ctx.progress.recordDailyStreak(ctx.dailySave.get().streak);

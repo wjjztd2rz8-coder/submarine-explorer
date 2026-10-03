@@ -88,7 +88,7 @@ export function createPowerSystem(): GameSystem {
             p.oxygen,
           );
         }
-        if ((empty || power.state.depleted) && !powerEmergencyStarted) {
+        if (power.state.enabled && (empty || power.state.depleted) && !powerEmergencyStarted) {
           sub.startEmergencyAscent();
           powerEmergencyStarted = true;
         }

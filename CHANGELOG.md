@@ -14,6 +14,12 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BUGHUNT-16: Free dive links clear the Daily seed so the selected
+  tile stays a sandbox; Daily completion credits its starting UTC date even
+  after midnight; disabled Arcade supplies cannot trigger a new emergency ascent.
+  Reason: mode routing, streak and live-switch regressions. Arcade remains the
+  default, and hull/site access changes still apply on the next dive. No cuts.
+
 - Great Blue Hole: the wall now shows limestone strata (shader rock banding via a new biome `strata` option, plus concentric shelves in the carve), four scooped wall alcoves, floor blocks and a second stalactite alcove (`karst-grotto-east`) on the south-east ledge; the grotto's apron and shelf tops are mottled tan and grey instead of flat cream, the terrain patch colours are less bright, and boulders scatter on the floor too (f-bluehole-wall).
 
 - Monterey Canyon: two smaller flanking mudstone walls (east and west) frame the dive path so the north wall reads as a canyon, and the main wall now carries instanced sponges and cold-water coral fans on its lit face (f-monterey-canyon).

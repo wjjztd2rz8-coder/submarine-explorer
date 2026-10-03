@@ -62,6 +62,7 @@ export function missionUrl(href: string, missionId: string): string {
 export function tileUrl(href: string, tileId: string): string {
   const url = new URL(href);
   url.searchParams.delete('mission');
+  url.searchParams.delete('daily'); // Daily routing would otherwise override the chosen tile.
   url.searchParams.delete('skipBriefing');
   url.searchParams.delete('globe'); // C1: do not reopen the globe after choosing from it
   url.searchParams.set('tile', tileId);
