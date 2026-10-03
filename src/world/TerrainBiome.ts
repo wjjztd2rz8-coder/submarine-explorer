@@ -48,6 +48,8 @@ export interface ScatterSpec {
   slopeMaxDeg: number;
   /** Which ground it prefers: 'flat' soft bottom, 'rock' hard substrate, or 'any'. */
   on: 'flat' | 'rock' | 'any';
+  /** Multiplier on the kind's size range (default 1): talus blocks on a carbonate slope. */
+  sizeMul?: number;
 }
 
 export interface Biome {
@@ -193,9 +195,9 @@ export const BIOMES: Record<string, Biome> = {
     b: 'rubble',
     c: 'carbonate',
     // Cool grey-green serpentinite and pale carbonate silt; the warm lamps do the tinting.
-    colorA: 0x585e5e,
-    colorB: 0x6a6d68,
-    colorC: 0x7c7f78,
+    colorA: 0x3f5c68,
+    colorB: 0x56696f,
+    colorC: 0x6c7e84,
     stain: 0x5a5646,
     stainAmount: 0.18,
     patch: 0.5,
@@ -207,11 +209,11 @@ export const BIOMES: Record<string, Biome> = {
     contrast: 0.7,
     detail: 0.7,
     // Massif slopes are layered serpentinite and carbonate-cemented talus: low, cool bands.
-    strata: { periodM: 3.2, amount: 0.3 },
+    strata: { periodM: 3.2, amount: 0.5 },
     scatter: [
-      { kind: 'boulder', density: 2.6, slopeMaxDeg: 50, on: 'any' },
-      { kind: 'rubble', density: 12, slopeMaxDeg: 40, on: 'any' },
-      { kind: 'dropstone', density: 1.4, slopeMaxDeg: 35, on: 'any' },
+      { kind: 'boulder', density: 4.5, slopeMaxDeg: 55, on: 'any', sizeMul: 2.4 },
+      { kind: 'rubble', density: 14, slopeMaxDeg: 45, on: 'any', sizeMul: 2.6 },
+      { kind: 'dropstone', density: 3.5, slopeMaxDeg: 40, on: 'any', sizeMul: 2.2 },
       { kind: 'sponge', density: 0.2, slopeMaxDeg: 40, on: 'rock' },
     ],
   },

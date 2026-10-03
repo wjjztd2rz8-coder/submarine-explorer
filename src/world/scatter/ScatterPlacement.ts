@@ -144,7 +144,7 @@ export function placeCell(
           ground.normalAt(mx, mz, n);
           if (slopeDeg(n) > spec.slopeMaxDeg) continue;
         }
-        list.push(makeInstance(mx, mz, def, ground, n, rnd, biome));
+        list.push(makeInstance(mx, mz, def, ground, n, rnd, biome, spec.sizeMul ?? 1));
       }
       if (placed >= seeds) break;
     }
@@ -190,8 +190,10 @@ function makeInstance(
   n: [number, number, number],
   rnd: () => number,
   biome: Biome,
+  sizeMul = 1,
 ): ScatterInstance {
-  const size = def.size[0] * Math.pow(def.size[1] / def.size[0], rnd() * rnd() * 0.5 + rnd() * 0.5);
+  const size =
+    sizeMul * def.size[0] * Math.pow(def.size[1] / def.size[0], rnd() * rnd() * 0.5 + rnd() * 0.5);
   const hMul = def.height[0] + (def.height[1] - def.height[0]) * rnd();
   const y = ground.sampleHeight(x, z) - def.embed * size * hMul;
   // Lean toward the ground normal by `align`, then wobble randomly.
