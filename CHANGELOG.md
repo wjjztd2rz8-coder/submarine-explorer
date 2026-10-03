@@ -41,6 +41,15 @@ without an entry here is not done.
 
 - F-BEEBE-PLUMES: black-smoker smoke no longer reads as a smooth grey funnel. Prop smoke plumes (`smokePlume`) are now noise puffs with a dark dense core, ragged outline, drift growing with height and an orifice shimmer; the vent preset smoke gets height-dependent lobes, a per-puff radial bias and stronger meander so its edge is irregular (reason: director review, Beebe plumes).
 
+- Phase F, F-BUGHUNT-15: compact short portrait HUD rows and separate the scan,
+  tutorial and touch controls; bound expanded portrait sonar above its action
+  buttons. Phone telemetry uses compact type to leave room for mission contacts.
+  Short portrait tutorials omit their redundant title/dots and the minimap legend;
+  the step count, instruction, 44 px buttons and expanded map remain available.
+  Portrait map credit uses one ellipsized line (full text retained in the DOM and
+  title), and the rotate tip yields to tutorial/contact panels; expanded sonar
+  temporarily hides those panels. Reason: remove phone HUD/control collisions
+  and keep the dive view uncluttered. Arcade gameplay defaults are unchanged.
 - Phase F, F-CI-MAIN-RED: preset shader checks explicitly select Medium so CI's
   Low preference does not suppress their asserted geometry; the crush-depth
   browser check samples frame-clock progress and waits for the ascent/debrief

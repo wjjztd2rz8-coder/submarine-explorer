@@ -158,10 +158,11 @@ test.describe('phone landscape', () => {
 test.describe('phone portrait', () => {
   test.use({ ...phonePortrait });
 
-  test('controls and the rotate hint show, play stays possible', async ({ page }) => {
+  test('controls show and the rotate hint yields to the scan/tutorial HUD', async ({ page }) => {
     await boot(page);
     await expect(page.locator('.tc-stick')).toBeVisible();
-    await expect(page.locator('.tc-rotate-hint')).toBeVisible();
+    await expect(page.locator('.scan-panel')).toBeVisible();
+    await expect(page.locator('.tc-rotate-hint')).toBeHidden();
     await shot(page, 'phone-portrait');
   });
 });
