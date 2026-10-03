@@ -76,7 +76,10 @@ export const cameraControlsSystem: GameSystem = {
     };
     cleanup.add(
       bus.on('mission:started', () => {
+        const openingRadius = rig.chaseRadius;
         rig.resetView();
+        if (ctx.route?.landmarkId === 'lost-city' && ctx.settings.gameplayMode === 'arcade')
+          rig.chaseRadius = openingRadius;
         startTips();
       }),
     );

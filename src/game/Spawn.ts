@@ -23,6 +23,7 @@ import type { MissionSpawn } from './Mission.js';
 import type { SeabedSampler, SpawnPose } from './Pois.js';
 import { Vector3 } from 'three';
 import type { Props } from '../world/Props.js';
+import type { GameplayMode } from '../core/Save.js';
 
 /** Arcade mission openings must offer a short approach to an authored primary. */
 export function composedMissionSpawn(
@@ -156,8 +157,15 @@ export function composedFreeDiveSpawn(
   settings: SpawnSettings,
   safeDepth: number,
   cameraConfig: CameraConfig = DEFAULT_CAMERA,
+  gameplayMode: GameplayMode = 'arcade',
 ): SpawnPose | null {
-  const opening = FREE_DIVE_OPENINGS[siteId];
+  const authored = FREE_DIVE_OPENINGS[siteId];
+  // Keep the vent pass's Realistic/Custom approach; Arcade opens with a
+  // shorter chase arm so the full tower and nearby floor share the frame.
+  const opening =
+    siteId === 'lost-city' && gameplayMode === 'arcade'
+      ? { ...authored!, range: 38, chaseRadius: 50 }
+      : authored;
   const hero = props.placed.find((p) => p.def.id === opening?.hero);
   if (!opening || !hero || hero.localBounds.isEmpty()) return null;
   hero.root.updateMatrixWorld(true);
