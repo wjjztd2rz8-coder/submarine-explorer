@@ -14,6 +14,10 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-CI-MAIN-RED: preset shader checks explicitly select Medium so CI's
+  Low preference does not suppress their asserted geometry; the crush-depth
+  browser check samples frame-clock progress and waits for the ascent/debrief
+  state, retaining its numeric and outcome assertions. No gameplay changes.
 - Phase F, F-BUGHUNT-12: title navigation lights stay steady in animated and
   reduced-motion scenes, including after quality changes.
 - Phase F, F-BUGHUNT-12: downward title vehicle hover respects the title floor
