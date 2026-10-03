@@ -34,7 +34,7 @@ const IVORY = new THREE.Color(0xf0e8d8);
 const PEACH = new THREE.Color(0xf0a678);
 
 /** One branching colony (base at the origin, ~1 m tall), a few tapered tubes per level. */
-function branchingColony(depth: number, seed: number): THREE.BufferGeometry {
+export function branchingColony(depth: number, seed: number): THREE.BufferGeometry {
   const rnd = mulberry32(seed);
   const parts: THREE.BufferGeometry[] = [];
   const up = new THREE.Vector3(0, 1, 0);

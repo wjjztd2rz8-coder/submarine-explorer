@@ -21,13 +21,16 @@
 
 import * as THREE from 'three';
 import { geoDetail } from './detail.js';
-import { geoMaterial, vertexGlow } from './materials.js';
+import { branchingColony } from './coral.js';
+import { geoMaterial, LIFE_TINT, vertexGlow } from './materials.js';
 import { shimmerPlume } from './plume.js';
 import type { GeoTexKind } from './textures.js';
 import {
   boxCH,
   fbm3,
   impostorFromBoxes,
+  instanced,
+  type InstanceSpec,
   lump,
   mulberry32,
   paint,
@@ -598,6 +601,9 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     }
   }
 
+  // Monterey: sponges and cold-water coral fans cling to the lit face of the wall.
+  if (id === 'canyon') addWallLife(full, wall, d.growth, d.branchDepth, joinY, H, seed, rnd);
+
   // A faint seep of clear fluid on the caldera wall (Hunga Tonga is volcanically active).
   if (id === 'tuff') {
     for (let i = 0; i < 3; i++) {
@@ -833,4 +839,84 @@ export function interp(profile: [number, number][], y: number): number {
     }
   }
   return profile[profile.length - 1]![1];
+}
+
+/** Sponges and gorgonian-like fans seated on the wall face, sampled from its own vertices (instanced, cheap). */
+function addWallLife(
+  full: THREE.Group,
+  wall: THREE.BufferGeometry,
+  growth: number,
+  branchDepth: number,
+  joinY: number,
+  H: number,
+  seed: number,
+  rnd: () => number,
+): void {
+  const pos = wall.getAttribute('position');
+  const nor = wall.getAttribute('normal');
+  const n = pos.count;
+  const sponges: InstanceSpec[] = [];
+  const fans: InstanceSpec[][] = [[], []];
+  const wantSponge = Math.round(90 * Math.min(growth, 1.2));
+  const wantFans = Math.round(70 * Math.min(growth, 1.2));
+  const c = new THREE.Color();
+  for (
+    let tries = 0;
+    tries < 4000 && (sponges.length < wantSponge || fans[0]!.length + fans[1]!.length < wantFans);
+    tries++
+  ) {
+    const i = Math.floor(rnd() * n);
+    const y = pos.getY(i);
+    const nz = nor.getZ(i);
+    // Lit face only: facing the viewer, between the apron and the upper terraces.
+    if (nz > -0.25 || y < joinY + 0.04 * H || y > 0.72 * H) continue;
+    if (fbm3(pos.getX(i) * 0.12, y * 0.1, seed + 55, seed + 2, 3) < 0.42) continue; // patchy
+    const out = 0.12;
+    const x = pos.getX(i) + nor.getX(i) * out;
+    const yy = y + nor.getY(i) * out;
+    const z = pos.getZ(i) + nz * out;
+    const tilt = -(0.9 + rnd() * 0.5); // lean out of the face
+    if (rnd() < 0.5 && sponges.length < wantSponge) {
+      const s = 1.4 + rnd() * 1.8;
+      sponges.push({
+        t: { x, y: yy, z, ry: rnd() * 6.28, rx: tilt, sx: s, sy: s * (0.8 + rnd() * 0.6), sz: s },
+        color: c.clone().setHSL(0.08 + rnd() * 0.07, 0.4, 0.58 + rnd() * 0.2),
+      });
+    } else if (fans[0]!.length + fans[1]!.length < wantFans) {
+      const s = 1.2 + rnd() * rnd() * 2.2;
+      fans[rnd() < 0.5 ? 0 : 1]!.push({
+        t: { x, y: yy, z, ry: rnd() * 6.28, rx: tilt, sx: s, sy: s, sz: s },
+        color: new THREE.Color(0xf0e8d8).lerp(new THREE.Color(0xf0a678), rnd() < 0.4 ? 0.5 : 0.1),
+      });
+    }
+  }
+  if (sponges.length) {
+    const g = new THREE.CylinderGeometry(0.16, 0.09, 0.6, 7, 1, true).translate(0, 0.3, 0);
+    const m = new THREE.MeshStandardMaterial({
+      color: LIFE_TINT,
+      roughness: 0.8,
+      side: THREE.DoubleSide,
+    });
+    vertexGlow(m, 0.1, 0x8fc0c6, 0.35);
+    full.add(instanced(g, m, sponges, 'wall-sponges'));
+  }
+  const cm = new THREE.MeshStandardMaterial({
+    color: LIFE_TINT,
+    vertexColors: true,
+    roughness: 0.75,
+    side: THREE.DoubleSide,
+  });
+  vertexGlow(cm, 0.1, 0x8fc0c6, 0.35);
+  fans.forEach((items, k) => {
+    if (items.length) {
+      full.add(
+        instanced(
+          branchingColony(Math.min(branchDepth, 3), seed + 300 + k * 41),
+          cm,
+          items,
+          `wall-corals-${k}`,
+        ),
+      );
+    }
+  });
 }

@@ -30,6 +30,36 @@
       "collision": "box",
       "reconstruction": true,
       "note": "Game addition: a bedded mudstone canyon wall in an S-bend, undercut at its base, with receding terraces, rubble on the outer bend and a sandy passage on the inner one, in the manner of the steep walls of Monterey Canyon (MBARI). Size and position along the wall are invented."
+    },
+    {
+      "id": "canyon-wall-east",
+      "model": "procedural:geo",
+      "feature": "canyon-ledge",
+      "lat": 36.7866,
+      "lon": -122.0123,
+      "snap_to_seabed": true,
+      "heading_deg": 90,
+      "scale": 1,
+      "dimensions_m": [90, 34, 38],
+      "lod_distance_m": 900,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: the east flank of the canyon, a smaller bedded mudstone face standing across the dive path so the passage between the walls reads as a canyon. Size and position are invented."
+    },
+    {
+      "id": "canyon-wall-west",
+      "model": "procedural:geo",
+      "feature": "canyon-ledge",
+      "lat": 36.7866,
+      "lon": -122.0143,
+      "snap_to_seabed": true,
+      "heading_deg": 270,
+      "scale": 1,
+      "dimensions_m": [90, 34, 38],
+      "lod_distance_m": 900,
+      "collision": "box",
+      "reconstruction": true,
+      "note": "Game addition: the west flank of the canyon, a smaller bedded mudstone face standing across the dive path so the passage between the walls reads as a canyon. Size and position are invented."
     }
   ]
 }
