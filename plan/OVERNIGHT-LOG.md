@@ -195,3 +195,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Queued for Codex (4): 220-f-bughunt-8-touch-regress, 230-f-ci-split, 240-f-title-scene-brief, 250-f-bughunt-9-audio-mobile-regress.
 - Next Claude run: once 240 lands, split the spec into Sonnet-sized brand/title packages; also compare a fresh golden set (needs host).
 - Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-03 headless run (started ~04:15)
+
+- Nothing merged or launched: no worktrees, main clean and pushed (74f536f). Codex 5h is 16% (resets 05:22), so the dispatcher will start 220/230/240/250 after that. F3-BRAND-UI stays blocked on the 240 spec.
+- No Claude agents spawned (Claude 5h 85%, but no unblocked visual package).
+- Still needs owner: brand name OK (Bathyline).
