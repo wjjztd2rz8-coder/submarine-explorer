@@ -10,7 +10,7 @@ Claude visual backlog (Sonnet agents, in order of player impact):
 
 1. **Great Blue Hole (follow-up):** the floating dome is fixed (merged 2026-10-03: seated alcove, stepped ledge, deeper fall-off). Remaining: the grotto's base apron has rough cream patches, only one stalactite feature exists, and the floor is still plain. Lower priority than 2–4.
 2. **Lost City close-up:** Codex 400 owns the first pass (worktree 400-f-lostcity-readable, stalled by the Codex floor). The 15–30 m view is still a smooth, smeared white tower with soft ring-shaped blobs. Needs carbonate texture (flanges, fluted columns, tan staining), triplanar UVs and a darker, less milky ambient. Review 400 before starting anything new here.
-3. **Beebe plumes:** still smooth grey funnels with a clean cone edge. Make them billowing and turbulent, widening and drifting with the current, black/dark grey and with orifice shimmer. Keep the chimney close-up as is.
+3. **Beebe plumes (DONE 2026-10-03, merged billowing plumes + preset smoke; only re-check in next golden set):** was: smooth grey funnels with a clean cone edge. Make them billowing and turbulent, widening and drifting with the current, black/dark grey and with orifice shimmer. Keep the chimney close-up as is.
 4. **Monterey:** the ridge now has strata and a lit face (improved). Remaining gaps: the canyon reads as a lone mound, not a canyon; add the opposing wall and depth fall-off, and sponges/corals on the lit face.
 5. **Titanic:** spawn view is the reference for the other sites. Lift the far field slightly; Codex 460 reduces the foreground snow clutter.
 6. **Rebrand rollout (Bathyline):** Codex 440-f-rebrand-bathyline is queued; Claude reviews the diff. A proper logo for the share image is still open.
