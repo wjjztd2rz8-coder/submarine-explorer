@@ -14,6 +14,11 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-CI-CHECK: CI distributes e2e tests across 16 single-worker runners,
+  runs static and project-base gates separately, and bounds jobs below 25 minutes.
+  Browser installation and suites have explicit budgets; final test failures
+  cancel remaining shard work. Every existing gate and assertion is retained.
+
 - Phase F, F-LOSTCITY-3: the Poseidon talus apron is no longer a flat oval. It has a ragged noise-driven outline, feathers flush into the seabed, fades into the sediment colour and carries scattered carbonate blocks (not on the low tier). Lost City also gets a little more ambient fill and a lifted distance haze (new opt-in vent params `hazeScale`, `hazeLift`) so the far ridge softens instead of cutting out black.
 
 - Phase F, F-DAILY-TOUCH: Daily dive, mission selection and home transitions

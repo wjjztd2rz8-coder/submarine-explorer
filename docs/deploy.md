@@ -9,27 +9,31 @@ repository owner does the one-time setup below.
 ## 1. Continuous integration (`.github/workflows/ci.yml`)
 
 Runs on every push to `main` and every pull request targeting `main`. A newer
-push to the same branch or PR cancels the older run (`concurrency`). One job on
-`ubuntu-latest`, with a 60-minute timeout:
+push to the same branch or PR cancels the older run (`concurrency`). Three jobs
+run independently on `ubuntu-latest` with Node 22 and npm caching:
 
-| Step                                                                            | Command                                       |
-| ------------------------------------------------------------------------------- | --------------------------------------------- |
-| Install                                                                         | `npm ci` (Node 22, npm cache)                 |
-| Python pipeline tests                                                           | `python3 -m unittest discover -s tools/tests` |
-| Mission content (strict)                                                        | `npm run check:content`                       |
-| Typecheck and build                                                             | `npm run build`                               |
-| Unit tests                                                                      | `npm test`                                    |
-| Browser                                                                         | `npx playwright install --with-deps chromium` |
-| End-to-end                                                                      | `npm run test:e2e -- --reporter=list,html`    |
-| Project-base build and browser test                                             | `npm run test:e2e:base`                       |
-| Attribution                                                                     | `python3 tools/check_attribution.py`          |
-| Formatting                                                                      | `npx prettier --check .`                      |
-| On failure: upload `tests/e2e/screenshots`, `playwright-report`, `test-results` | `actions/upload-artifact` (14 days)           |
+| Job                     | Gates                                                                                    | Job limit        |
+| ----------------------- | ---------------------------------------------------------------------------------------- | ---------------- |
+| Build and static checks | Python tests, strict mission content, typecheck/build, unit tests, attribution, Prettier | 15 min           |
+| E2e (16 shards)         | Build, Chromium install, full Playwright suite split by individual test                  | 24 min per shard |
+| Project-base            | Chromium install, project-base build and browser test                                    | 15 min           |
 
-GitHub runners have no GPU, so Chromium renders WebGL on SwiftShader. The GPU
-flags in `playwright.config.ts` are harmless there. The suite runs with one
-worker; the all-mission scan suite adds to the original 2–3 minute run, and CI can take several times
-longer. The tiles are committed, so e2e needs no network access.
+GitHub runners have no GPU, so Chromium renders WebGL on SwiftShader. Each
+shard retains one browser worker, CI's low-tier preference, existing per-test
+limits and one retry. `--fully-parallel` enables test-level sharding even for
+large files; one worker still executes tests sequentially on each runner.
+The shard denominator is derived from the matrix size. E2e has a 20-minute
+suite budget and stops after the first final failure; matrix fail-fast cancels
+other shards. Timeouts and incomplete suites fail CI. A successful run must
+pass every job and all existing tests (including the separate project-base check).
+
+Chromium is cached by OS, architecture and lockfile hash. Every browser job
+still runs `npx playwright install --with-deps chromium` on cache hits to ensure
+OS dependencies; installation has a five-minute step limit. Failure screenshots,
+reports and retry traces are uploaded for 14 days. The tiles are committed, so
+the tests need no network access. The longest job is bounded below 25 minutes;
+hosted queue delays are outside job timeouts, and passing hosted duration must
+be confirmed after merging.
 
 To reproduce CI locally, run `npm run ci`, which runs the same checks in order
 after `npm ci`. When other people or agents share the checkout, use the isolated
@@ -54,10 +58,10 @@ artifacts in `test-results-project-base/` (also uploaded on CI failure).
    The site appears at `https://<owner>.github.io/<repo>/`, and the URL is
    shown on the `github-pages` environment.
 
-`deploy.yml` runs when CI completes successfully for a push to `main` in this
-repository (`workflow_run`), and it checks out the exact commit that CI
-tested. It can also be run by hand (`workflow_dispatch`); a manual run does not
-wait for CI. The workflow runs the attribution check, builds, and fails if
+`deploy.yml` runs independently on every push to `main`, checking out that
+push's commit. It can also be run by hand (`workflow_dispatch`). Pages does
+not wait for remote CI; the existing release process requires passing local
+gates before pushing. The workflow runs the attribution check, builds, and fails if
 `dist/` contains anything that must not ship. It then uploads `dist/` with
 `actions/upload-pages-artifact` and deploys it with `actions/deploy-pages`.
 Only one deployment runs at a time. `public/.nojekyll` ships in `dist/`; it

@@ -58,7 +58,7 @@ async function settle(page: Page): Promise<void> {
 }
 
 test.describe('F-GEO-SCARP wall heroes', () => {
-  test.describe.configure({ mode: 'default', timeout: 240_000 });
+  test.describe.configure({ timeout: 240_000 });
   test.use({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
 
   for (const { id, hero } of sites) {
