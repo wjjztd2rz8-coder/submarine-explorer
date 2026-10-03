@@ -133,7 +133,8 @@ const FREE_DIVE_OPENINGS: Record<
     bearing: 90,
     range: 235,
     fromCentre: true,
-    altitude: 12,
+    // The ledge the grotto stands on is ~25 m down; open water at 30 m keeps the chase arm clear of the surface.
+    altitude: -6,
     openWater: true,
   },
   bismarck: { hero: 'main-hull', bearing: 50, range: 110 },
