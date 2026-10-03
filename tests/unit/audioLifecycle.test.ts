@@ -220,6 +220,59 @@ describe('audio lifecycle', () => {
     expect(ctx.close).toHaveBeenCalledTimes(1);
   });
 
+  it('suspends a visibility resume that finishes after the tab hides again', async () => {
+    const audio = system();
+    audio.unlock();
+    await flush();
+    const ctx = context();
+    visibility(true);
+    let finish!: () => void;
+    ctx.resume.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = () => {
+            ctx.state = 'running';
+            resolve();
+          };
+        }),
+    );
+    visibility(false);
+    visibility(true);
+    finish();
+    await flush();
+    expect(ctx.state).toBe('suspended');
+    expect(audio.diagnostics.masterGain).toBe(0);
+    visibility(false);
+    await flush();
+    expect(ctx.state).toBe('running');
+    audio.dispose();
+  });
+
+  it('resumes a late hide suspension after returning to a muted dive', async () => {
+    const audio = system();
+    audio.setSettings({ muted: true });
+    audio.unlock();
+    await flush();
+    const ctx = context();
+    let finish!: () => void;
+    ctx.suspend.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = () => {
+            ctx.state = 'suspended';
+            resolve();
+          };
+        }),
+    );
+    visibility(true);
+    visibility(false);
+    finish();
+    await flush();
+    expect(ctx.state).toBe('running');
+    expect(audio.diagnostics.masterGain).toBe(0);
+    audio.dispose();
+  });
+
   it('suppresses every discrete cue while paused or hidden and cancels old echoes', async () => {
     vi.useFakeTimers();
     Object.assign(window, { setTimeout, clearTimeout });
