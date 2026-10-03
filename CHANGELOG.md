@@ -14,6 +14,26 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BUGHUNT-12: title navigation lights stay steady in animated and
+  reduced-motion scenes, including after quality changes.
+- Phase F, F-BUGHUNT-12: downward title vehicle hover respects the 12 m floor
+  clearance when a ridge sets the starting height.
+- Phase F, F-BUGHUNT-12: the title scene accepts resolved Ultra quality with
+  the Medium+ snow and geometry budgets.
+- Phase F, F-BUGHUNT-12: title drawing observes the 30 fps cap on update loops
+  whose cadence previously exceeded it.
+- Phase F, F-BUGHUNT-12: desktop title drawing sets its own viewport and
+  scissor, restoring shared renderer state even when rendering fails.
+- Phase F, F-BUGHUNT-12: title snow follows the current anchor before the first
+  draw and immediately when terrain is replaced.
+- Phase F, F-BUGHUNT-12: canceled, dragged and multi-finger camera gestures
+  discard pending double taps, preventing unintended camera resets.
+- Phase F, F-BUGHUNT-12: touch controls restore the canvas touch-action
+  preference on teardown.
+- Phase F, F-BUGHUNT-12: repeated touch-control teardown cannot clear input
+  or layout state belonging to rebuilt controls.
+- Phase F, F-BUGHUNT-12: empty legacy animal/photo subjects no longer grant
+  a third survey star or its research reward.
 - Phase F, F-TITLE-B/C: added the (not yet wired) Bathyline title scene
   modules: `src/render/title/TitleTerrain.ts` crops a 2,400 m real GMRT
   Monterey Canyon square, and `TitleScene.ts` composes the research sub, lamps,

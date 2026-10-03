@@ -352,3 +352,139 @@ describe('TitleScene lifecycle', () => {
     expect(s.scene.children.length).toBe(0);
   });
 });
+
+describe('F-BUGHUNT-12 title regressions', () => {
+  it.each([false, true])(
+    'keeps navigation lights steady with reducedMotion=%s',
+    (reducedMotion) => {
+      const s = new TitleScene({ tier: 'high', reducedMotion });
+      const check = () => {
+        const strobe = s.scene.getObjectByName('vehicle-strobe') as THREE.Mesh;
+        const halo = s.scene.getObjectByName('vehicle-strobe-halo') as THREE.Sprite;
+        expect((strobe.material as THREE.MeshBasicMaterial).color.toArray()).toEqual([
+          0.55, 0.62, 0.7,
+        ]);
+        expect((halo.material as THREE.SpriteMaterial).opacity).toBe(0);
+      };
+      try {
+        check();
+        run(s, 2);
+        check();
+        s.setReducedMotion(!reducedMotion);
+        check();
+        s.setQuality('medium');
+        check();
+      } finally {
+        s.dispose();
+      }
+    },
+  );
+
+  it('retains clearance throughout downward hover when a ridge determines vehicle height', () => {
+    const s = new TitleScene({ tier: 'low', reducedMotion: false });
+    const crop = makeCrop();
+    crop.sampleFloor = (x) => (Math.abs(x) < 7 ? 50 : 0);
+    s.setCrop(crop);
+    const rig = s.scene.children.find((o) => o.type === 'Group')!;
+    try {
+      for (let i = 0; i < 400; i++) {
+        s.update(0.1);
+        expect(rig.position.y - crop.sampleFloor(0, 0)).toBeGreaterThanOrEqual(
+          TITLE_SHOT.clearanceM,
+        );
+      }
+    } finally {
+      s.dispose();
+    }
+  });
+
+  it.each(['construct', 'change'])('supports resolved Ultra quality on %s', (operation) => {
+    const s = new TitleScene({
+      tier: operation === 'construct' ? 'ultra' : 'low',
+      reducedMotion: false,
+    });
+    try {
+      if (operation === 'change') s.setQuality('ultra');
+      const snow = s.scene.getObjectByName('titleSnow') as THREE.Points;
+      expect(snow.geometry.getAttribute('position').count).toBe(600);
+      expect(s.stats.calls).toBeLessThanOrEqual(60);
+      expect(s.stats.triangles).toBeLessThanOrEqual(200_000);
+    } finally {
+      s.dispose();
+    }
+  });
+
+  it('does not exceed 30 fps on a 63 Hz update loop', () => {
+    const s = new TitleScene({ tier: 'low', reducedMotion: false });
+    const r = fakeRenderer();
+    try {
+      s.draw(asRenderer(r));
+      const start = s.stats.drawCount;
+      for (let i = 0; i < 630; i++) {
+        s.update(1 / 63);
+        s.draw(asRenderer(r));
+      }
+      expect(s.stats.drawCount - start).toBeLessThanOrEqual(300);
+    } finally {
+      s.dispose();
+    }
+  });
+
+  it.each(['desktop', 'portrait'] as const)(
+    'sets its own %s viewport and restores state after a render error',
+    (layout) => {
+      const s = new TitleScene({ tier: 'low', reducedMotion: true });
+      const r = fakeRenderer();
+      r.setViewport(10, 20, 30, 40);
+      r.setScissor(11, 22, 33, 44);
+      r.setScissorTest(true);
+      s.resize(390, 844, layout);
+      const region = regionFor(390, 844, layout);
+      r.render.mockImplementation(() => {
+        expect(r.vp.toArray()).toEqual([region.x, 844 - region.y - region.h, region.w, region.h]);
+        expect(r.sc.toArray()).toEqual(r.vp.toArray());
+        throw new Error('render failed');
+      });
+      try {
+        expect(() => s.draw(asRenderer(r))).toThrow('render failed');
+        expect(r.vp.toArray()).toEqual([10, 20, 30, 40]);
+        expect(r.sc.toArray()).toEqual([11, 22, 33, 44]);
+        expect(r.test).toBe(true);
+        expect(s.stats.drawCount).toBe(0);
+        r.render.mockImplementation(() => 0);
+        s.draw(asRenderer(r));
+        expect(s.stats.drawCount).toBe(1);
+      } finally {
+        s.dispose();
+      }
+    },
+  );
+
+  it('positions snow at the current crop before the first draw and after replacement', () => {
+    const s = new TitleScene({ tier: 'low', reducedMotion: false });
+    const positions = () =>
+      Array.from(
+        (s.scene.getObjectByName('titleSnow') as THREE.Points).geometry.getAttribute('position')
+          .array,
+      );
+    try {
+      const initial = positions();
+      s.update(0);
+      expect(positions()).toEqual(initial);
+      const elevated = makeCrop();
+      elevated.anchorFloorY = 400;
+      elevated.sampleFloor = () => 400;
+      s.setCrop(elevated);
+      const after = positions();
+      for (let i = 0; i < after.length; i += 3) {
+        expect(after[i]).toBeCloseTo(initial[i], 4);
+        expect(after[i + 1] - initial[i + 1]).toBeCloseTo(400, 3);
+        expect(after[i + 2]).toBeCloseTo(initial[i + 2], 4);
+      }
+      s.update(0);
+      expect(positions()).toEqual(after);
+    } finally {
+      s.dispose();
+    }
+  });
+});

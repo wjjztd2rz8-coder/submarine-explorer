@@ -5,6 +5,39 @@ import { creditPreviousDives } from '../../src/game/ProgressMigration.js';
 import { ProgressSave } from '../../src/core/Save.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
 
+it.each(['animal', 'photo'])(
+  'does not grant a legacy bonus for an empty %s subject',
+  async (kind) => {
+    const discoveries = new DiscoveryStore(null);
+    discoveries.record('legacy', 'a');
+    if (kind === 'animal') discoveries.record('legacy', 'life:');
+    const progress = new Progress(new ProgressSave(null));
+    await creditPreviousDives(
+      progress,
+      discoveries,
+      kind === 'photo' ? [{ siteId: 'legacy', poiId: '' }] : [],
+      async () => ({
+        ok: true,
+        text: async () =>
+          JSON.stringify({
+            version: 1,
+            landmark: 'legacy',
+            tile: 'legacy',
+            title: 'Legacy',
+            spawn: { lat: 0, lon: 0 },
+            objectives: [{ id: 'a', poi: 'a', primary: true }],
+            completion: 'all_primary',
+          }),
+      }),
+    );
+    expect(progress.rating('legacy')).toBe(2);
+    expect(progress.snapshot().awarded).not.toContain('rating:legacy/3');
+    expect(progress.points).toBe(85);
+    expect(progress.bonus).toBe(false);
+    expect(progress.divePoints).toBe(0);
+  },
+);
+
 it('credits a legacy animal scan as a bonus only for its completed site', async () => {
   const discoveries = new DiscoveryStore(null);
   for (const site of ['with-life', 'without-life']) discoveries.record(site, 'a');

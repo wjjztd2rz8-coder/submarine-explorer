@@ -66,9 +66,13 @@ export class TouchControls {
   private hintTimer = 0;
 
   // Camera gestures on the canvas.
-  private readonly looks = new Map<number, { x: number; y: number; t0: number; moved: number }>();
+  private readonly looks = new Map<
+    number,
+    { x: number; y: number; t0: number; moved: number; tap: boolean }
+  >();
   private pinchDist = 0;
   private doubleTap = new DoubleTap();
+  private disposed = false;
 
   constructor(opts: TouchControlsOptions) {
     this.opts = opts;
@@ -141,6 +145,7 @@ export class TouchControls {
 
   /** Force touch mode on or off (tests, `?touch=1`). */
   setTouchMode(on: boolean): void {
+    if (this.disposed) return;
     if (this.touchMode === on) return;
     this.touchMode = on;
     this.applyMode();
@@ -152,6 +157,7 @@ export class TouchControls {
    * frame is clear, look and pinch still work).
    */
   update(inDive: boolean, photo: boolean): void {
+    if (this.disposed) return;
     const show = this.touchMode && inDive && !photo;
     if (show !== this.shouldShow) {
       this.shouldShow = show;
@@ -163,6 +169,8 @@ export class TouchControls {
   }
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     window.clearTimeout(this.hintTimer);
     for (const d of this.disposers) d();
     this.disposers.length = 0;
@@ -358,7 +366,11 @@ export class TouchControls {
   /** Drag to look, two fingers to pinch, double-tap to reset (all on the view). */
   private bindCamera(): void {
     const canvas = this.opts.canvas;
+    const touchAction = canvas.style.touchAction;
     canvas.style.touchAction = 'none';
+    this.disposers.push(() => {
+      if (canvas.style.touchAction === 'none') canvas.style.touchAction = touchAction;
+    });
     const accepts = (target: EventTarget | null): boolean => {
       if (target === canvas) return true;
       // While the sonar map is expanded a pinch on it zooms the map.
@@ -383,8 +395,13 @@ export class TouchControls {
         y: e.clientY,
         t0: performance.now(),
         moved: 0,
+        tap: true,
       });
-      if (this.looks.size === 2) this.pinchDist = dist();
+      if (this.looks.size >= 2) {
+        this.pinchDist = dist();
+        for (const p of this.looks.values()) p.tap = false;
+        this.doubleTap = new DoubleTap();
+      }
     };
     const move = (e: PointerEvent): void => {
       const p = this.looks.get(e.pointerId);
@@ -410,13 +427,14 @@ export class TouchControls {
       if (!p) return;
       this.looks.delete(e.pointerId);
       this.pinchDist = dist();
-      if (
+      const tap =
         e.type === 'pointerup' &&
+        p.tap &&
         this.looks.size === 0 &&
         e.target === canvas &&
-        isTap(performance.now() - p.t0, p.moved) &&
-        this.doubleTap.tap(performance.now(), e.clientX, e.clientY)
-      ) {
+        isTap(performance.now() - p.t0, p.moved);
+      if (!tap) this.doubleTap = new DoubleTap();
+      else if (this.doubleTap.tap(performance.now(), e.clientX, e.clientY)) {
         this.input.touchEdge('resetCamera');
       }
     };

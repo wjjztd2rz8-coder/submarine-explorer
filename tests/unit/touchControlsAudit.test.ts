@@ -46,7 +46,7 @@ function pointer(target: TouchElement, type: string, pointerId: number, x = 60, 
   target.dispatchEvent(event);
 }
 
-function fixture() {
+function fixture(canvasTouchAction = '') {
   const body = new TouchElement();
   const doc = Object.assign(new EventTarget(), {
     body,
@@ -75,6 +75,7 @@ function fixture() {
     touchZoom: vi.fn(),
   };
   const canvas = new TouchElement();
+  canvas.style.touchAction = canvasTouchAction;
   const controls = new TouchControls({
     input: input as unknown as Input,
     canvas: canvas as unknown as HTMLElement,
@@ -93,6 +94,74 @@ afterEach(() => {
 });
 
 describe('touch control interruptions', () => {
+  it.each(['cancel', 'drag', 'pinch'])(
+    'does not pair taps across a %s camera gesture',
+    (gesture) => {
+      const f = fixture();
+      let now = 1000;
+      vi.spyOn(performance, 'now').mockImplementation(() => now);
+      const send = (type: string, id = 9, x = 60) => {
+        const event = new Event(type);
+        Object.assign(event, { pointerId: id, pointerType: 'touch', clientX: x, clientY: 60 });
+        Object.defineProperty(event, 'target', { value: f.canvas });
+        f.win.dispatchEvent(event);
+      };
+      const tap = () => {
+        send('pointerdown');
+        send('pointerup');
+      };
+      try {
+        tap();
+        now += 50;
+        send('pointerdown');
+        if (gesture === 'cancel') send('pointercancel');
+        else if (gesture === 'drag') {
+          send('pointermove', 9, 100);
+          send('pointerup', 9, 100);
+        } else {
+          send('pointerdown', 10, 80);
+          send('pointerup', 10, 80);
+          send('pointerup');
+        }
+        expect(f.input.touchEdge).not.toHaveBeenCalled();
+        now += 50;
+        tap();
+        expect(f.input.touchEdge).not.toHaveBeenCalled();
+        now += 50;
+        tap();
+        expect(f.input.touchEdge).toHaveBeenCalledExactlyOnceWith('resetCamera');
+      } finally {
+        f.controls.dispose();
+      }
+    },
+  );
+
+  it('restores the canvas touch-action preference on teardown', () => {
+    const f = fixture('pan-y');
+    expect(f.canvas.style.touchAction).toBe('none');
+    f.controls.dispose();
+    expect(f.canvas.style.touchAction).toBe('pan-y');
+  });
+
+  it('repeated disposal cannot disable rebuilt controls', () => {
+    const f = fixture();
+    f.controls.dispose();
+    const next = new TouchControls({
+      input: f.input as unknown as Input,
+      canvas: f.canvas as unknown as HTMLElement,
+      sonar: { expanded: false, zoomWheel: vi.fn() },
+      onPause: vi.fn(),
+    });
+    try {
+      next.update(true, false);
+      f.controls.dispose();
+      expect(f.input.touchActive).toBe(true);
+      expect(f.doc.documentElement.classList.contains('is-touch')).toBe(true);
+    } finally {
+      next.dispose();
+    }
+  });
+
   it.each(['blur', 'visibilitychange', 'resize', 'desktop', 'pause', 'photo'])(
     'starts a fresh double-tap sequence after %s',
     (interruption) => {

@@ -15,6 +15,7 @@
 
 import * as THREE from 'three';
 import { buildVehicle, type Vehicle } from '../../vehicles/index.js';
+import type { GraphicsTier } from '../../core/Config.js';
 
 /** What the terrain package hands over (type-only, defined locally). */
 export interface TitleCropInput {
@@ -27,7 +28,7 @@ export interface TitleCropInput {
   dispose(): void;
 }
 
-export type TitleTier = 'low' | 'medium' | 'high';
+export type TitleTier = GraphicsTier;
 export type TitleLayout = 'desktop' | 'portrait' | 'short-landscape';
 
 export interface TitleSceneOptions {
@@ -61,11 +62,12 @@ export const TITLE_SHOT = {
   maxFps: 30,
   maxDt: 0.1,
   fallbackColor: 0x06131f,
-  snowCount: { low: 200, medium: 600, high: 600 } as Record<TitleTier, number>,
+  snowCount: { low: 200, medium: 600, high: 600, ultra: 600 } as Record<TitleTier, number>,
   budgets: {
     low: { calls: 35, triangles: 100_000 },
     medium: { calls: 60, triangles: 200_000 },
     high: { calls: 60, triangles: 200_000 },
+    ultra: { calls: 60, triangles: 200_000 },
   } as Record<TitleTier, { calls: number; triangles: number }>,
 } as const;
 
@@ -77,7 +79,7 @@ const FRAMING: Record<TitleLayout, { x: number; y: number; silhouette: number | 
 };
 
 const SNOW_BOX = new THREE.Vector3(260, 120, 260);
-const MIN_FRAME_S = 1 / TITLE_SHOT.maxFps - 0.002;
+const MIN_FRAME_S = 1 / TITLE_SHOT.maxFps - 1e-9;
 
 /** Pixel rectangle (CSS px, origin top-left) the shot is drawn into. */
 export interface TitleRegion {
@@ -201,7 +203,6 @@ export class TitleScene {
     this.time += step;
     this.sinceDraw += step;
     this.vehicle.update({ lightsOn: true }, step);
-    this.updateSnow(step);
     this.applyMotion();
   }
 
@@ -254,27 +255,19 @@ export class TitleScene {
     }
 
     const r = this.region;
-    const partial = r.w !== this.width || r.h !== this.height;
-    let viewport: THREE.Vector4 | null = null;
-    let scissor: THREE.Vector4 | null = null;
-    let scissorTest = false;
-    if (partial) {
-      viewport = renderer.getViewport(new THREE.Vector4());
-      scissor = renderer.getScissor(new THREE.Vector4());
-      scissorTest = renderer.getScissorTest();
-      const glY = this.height - r.y - r.h; // GL origin is bottom-left
-      renderer.setViewport(r.x, glY, r.w, r.h);
-      renderer.setScissor(r.x, glY, r.w, r.h);
-      renderer.setScissorTest(true);
-    }
+    const viewport = renderer.getViewport(new THREE.Vector4());
+    const scissor = renderer.getScissor(new THREE.Vector4());
+    const scissorTest = renderer.getScissorTest();
+    const glY = this.height - r.y - r.h; // GL origin is bottom-left
+    renderer.setViewport(r.x, glY, r.w, r.h);
+    renderer.setScissor(r.x, glY, r.w, r.h);
+    renderer.setScissorTest(true);
     try {
       renderer.render(this.scene, this.camera);
     } finally {
-      if (partial && viewport && scissor) {
-        renderer.setViewport(viewport.x, viewport.y, viewport.z, viewport.w);
-        renderer.setScissor(scissor.x, scissor.y, scissor.z, scissor.w);
-        renderer.setScissorTest(scissorTest);
-      }
+      renderer.setViewport(viewport.x, viewport.y, viewport.z, viewport.w);
+      renderer.setScissor(scissor.x, scissor.y, scissor.z, scissor.w);
+      renderer.setScissorTest(scissorTest);
     }
     this.dirty = false;
     this.sinceDraw = 0;
@@ -300,6 +293,8 @@ export class TitleScene {
 
   private buildVehicle(): Vehicle {
     const v = buildVehicle('B', this.tier);
+    // The title shot uses steady lamps in every motion mode (spec §5).
+    v.reduceMotion = true;
     v.update({ lightsOn: true }, 0);
     this.rig.add(v.root);
     return v;
@@ -346,7 +341,6 @@ export class TitleScene {
     this.snow = pts;
     this.snowBase = base;
     this.scene.add(pts);
-    this.placeSnow(0);
   }
 
   private disposeSnow(): void {
@@ -357,10 +351,6 @@ export class TitleScene {
     (s.material as THREE.Material).dispose();
     this.snow = null;
     this.snowBase = null;
-  }
-
-  private updateSnow(_step: number): void {
-    this.placeSnow(this.time);
   }
 
   /** Slow sink plus lateral drift, wrapped into a box around the vehicle. */
@@ -418,7 +408,11 @@ export class TitleScene {
       this.floorNear(0, 0) + TITLE_SHOT.clearanceM,
     );
     this.basePos.set(0, vehicleY, 0);
-    this.rig.position.set(0, vehicleY + hover, 0);
+    this.rig.position.set(
+      0,
+      Math.max(vehicleY + hover, this.floorNear(0, 0) + TITLE_SHOT.clearanceM),
+      0,
+    );
     this.rig.rotation.y = -(Math.PI / 2 - TITLE_SHOT.headingAwayRad);
     this.rig.updateMatrixWorld(true);
 
@@ -438,6 +432,8 @@ export class TitleScene {
     this.yawQ.setFromAxisAngle(this.up, yaw);
     this.camera.quaternion.premultiply(this.yawQ);
     this.camera.updateMatrixWorld(true);
+    // Assets can change the anchor immediately before draw, without an update.
+    this.placeSnow(this.time);
   }
 
   /**

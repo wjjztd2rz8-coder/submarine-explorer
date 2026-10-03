@@ -1,4 +1,6 @@
 import poisRaw from '../../public/data/landmarks/monterey-canyon/pois.json?raw';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -8,6 +10,8 @@ import {
 } from '../../src/render/title/TitleTerrain.js';
 import { METERS_PER_DEG_LAT, metersPerDegLon } from '../../src/util/geo.js';
 import type { Tile } from '../../src/util/types.js';
+import { GRAPHICS_TIERS } from '../../src/core/Config.js';
+import { TitleScene, TITLE_SHOT } from '../../src/render/title/TitleScene.js';
 
 /** Synthetic tile centred on the anchor: height = gx*east + gz*south + base. */
 function tile(gx: number, gz: number, base = -300): Tile {
@@ -40,6 +44,51 @@ function tile(gx: number, gz: number, base = -300): Tile {
 }
 
 describe('TitleTerrain', () => {
+  it('loads the fixed Monterey tile through the default loader and composes within every tier budget', async () => {
+    const metaText = readFileSync('data/tiles/monterey-canyon/meta.json', 'utf8') as string;
+    const bytes = readFileSync('data/tiles/monterey-canyon/heightmap.bin');
+    const heights = bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength,
+    ) as ArrayBuffer;
+    const fetch = vi.fn(
+      async (url: string) => new Response(url.endsWith('meta.json') ? metaText : heights),
+    );
+    vi.stubGlobal('fetch', fetch);
+    try {
+      for (const tier of GRAPHICS_TIERS) {
+        const crop = await loadTitleCrop();
+        const s = new TitleScene({ tier, reducedMotion: false });
+        try {
+          s.setCrop(crop);
+          expect(s.terrainReady).toBe(true);
+          expect(s.stats.triangles).toBeGreaterThanOrEqual(51_200);
+          expect(s.stats.triangles).toBeLessThanOrEqual(TITLE_SHOT.budgets[tier].triangles);
+          expect(s.stats.calls).toBeLessThanOrEqual(TITLE_SHOT.budgets[tier].calls);
+          const rig = s.scene.children.find((o) => o.type === 'Group')!;
+          for (let i = 0; i < 400; i++) {
+            s.update(0.1);
+            const c = s.camera.position;
+            expect(c.y - crop.sampleFloor(c.x, c.z)).toBeGreaterThanOrEqual(TITLE_SHOT.clearanceM);
+            expect(rig.position.y - crop.sampleFloor(0, 0)).toBeGreaterThanOrEqual(
+              TITLE_SHOT.clearanceM,
+            );
+          }
+        } finally {
+          s.dispose();
+        }
+      }
+      expect(fetch.mock.calls.map(([url]) => url)).toEqual(
+        GRAPHICS_TIERS.flatMap(() => [
+          '/data/tiles/monterey-canyon/meta.json',
+          '/data/tiles/monterey-canyon/heightmap.bin',
+        ]),
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('matches the checked-in POI anchor', () => {
     const pois = JSON.parse(poisRaw) as { pois: { id: string; lat: number; lon: number }[] };
     const poi = pois.pois.find((p) => p.id === 'monterey-canyon-upper-channel')!;
