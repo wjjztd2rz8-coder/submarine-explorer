@@ -114,12 +114,12 @@ describe('title lifecycle', () => {
     (ctx.settingsScreen as { isOpen: boolean }).isOpen = false;
     expect(draw()).toBeGreaterThan(modal);
 
-    ctx.home.sitesOpen = true;
+    (ctx.home as { sitesOpen: boolean }).sitesOpen = true;
     const sites = draw();
     for (let i = 0; i < 5; i++) draw();
     expect(draw()).toBe(sites);
     expect(r.clear).toHaveBeenCalledTimes(1); // navy once, not every frame
-    ctx.home.sitesOpen = false;
+    (ctx.home as { sitesOpen: boolean }).sitesOpen = false;
     expect(draw()).toBeGreaterThan(sites);
   });
 
