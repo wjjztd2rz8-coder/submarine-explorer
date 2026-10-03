@@ -51,6 +51,15 @@ removed, and the 16-shard CI workflow and `npm run ci` retain full discovery.
 
 Use `PW_PORT=4197 bash tools/gates.sh --full-e2e` for the full local gate set,
 including before a release push (Pages deploy does not wait for CI).
+
+The task feedback loop in `tools/codex-task.sh` uses the same local smoke
+default. Set `FULL_E2E=1 tools/codex-task.sh <brief.md> <name>` when the
+brief requires full regression feedback or package screenshots. Queue briefs
+can opt in with `<!-- env: FULL_E2E=1 -->` as their first line. Task result
+summaries include the selected e2e mode; smoke does not run package screenshot
+specs or establish their acceptance. `tools/resume.sh` reads these review and
+release requirements from `plan/RESUME-PROMPT.md`.
+
 When `CI` is nonempty, the gate script defaults to the full suite as well.
 `--no-e2e` retains the existing explicit static-only option. Each simultaneous
 gate run needs a different `PW_PORT`; project-base uses that port plus 100.
@@ -79,7 +88,8 @@ artifacts in `test-results-project-base/` (also uploaded on CI failure).
 `deploy.yml` runs independently on every push to `main`, checking out that
 push's commit. It can also be run by hand (`workflow_dispatch`). Pages does
 not wait for remote CI; the existing release process requires passing local
-gates before pushing. The workflow runs the attribution check, builds, and fails if
+gates (`tools/gates.sh --full-e2e`, including project-base) before pushing.
+The workflow runs the attribution check, builds, and fails if
 `dist/` contains anything that must not ship. It then uploads `dist/` with
 `actions/upload-pages-artifact` and deploys it with `actions/deploy-pages`.
 Only one deployment runs at a time. `public/.nojekyll` ships in `dist/`; it

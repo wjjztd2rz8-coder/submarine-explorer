@@ -44,8 +44,8 @@ Standing direction still applies:
 The rules for every package:
 
 - Each package runs in its own worktree (`../subexp-wt/<pkg>`, branch `claude/<pkg>` or `codex/<pkg>`) and owns the files listed below.
-- It ends with `tools/gates.sh` green, screenshots in `.cache/codex/shots/<pkg>/` and a short `plan/progress/<pkg>.md`.
-- The orchestrator merges, reviews the screenshots and reruns the gates on main.
+- It ends with `tools/gates.sh` green (static, smoke e2e and project-base locally) and a short `plan/progress/<pkg>.md`. UI packages also require `tools/gates.sh --full-e2e` (or `FULL_E2E=1 tools/codex-task.sh`) to execute package specs and produce fresh screenshots in `.cache/codex/shots/<pkg>/`. Record smoke versus full coverage in the progress note.
+- The orchestrator reviews fresh screenshots, merges and reruns the gates on main. Require `tools/gates.sh --full-e2e` on the final main commit before release pushes; Pages deploy does not wait for CI.
 - After each wave, a Codex audit hunts bugs and regressions in the merged work, fix packages follow, and then comes a push and a tag.
 
 ### Wave 0 — foundation and research

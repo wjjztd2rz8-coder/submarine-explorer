@@ -67,7 +67,7 @@
   first-ten-second readability/phone FPS. Placement, opening and geometry
   checks pass, but those visual/performance concerns need fresh browser shots.
 - No browser-rendered phone, golden-shot or e2e acceptance is claimed. E2e
-  cannot run in this sandbox; run the complete `tools/gates.sh` outside it,
+  cannot run in this sandbox; run `tools/gates.sh --full-e2e` outside it,
   including existing portrait and save-soak Playwright specs.
 
 The ignored shared node_modules symlink was temporarily replaced with links
