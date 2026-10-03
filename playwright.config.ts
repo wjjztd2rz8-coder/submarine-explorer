@@ -71,7 +71,10 @@ export default defineConfig({
   webServer: {
     command: `npm run preview -- --port ${port} --strictPort --outDir ${outDir}`,
     url: `http://localhost:${port}`,
-    reuseExistingServer: !isCI,
+    // Own the preview process for the whole suite. Reusing an orchestrator's
+    // preview can lose the server halfway through when its owner cleans up.
+    // Interactive local runs may explicitly opt into their existing preview.
+    reuseExistingServer: !isCI && env.PW_REUSE_SERVER === '1',
     timeout: 60_000,
   },
 });
