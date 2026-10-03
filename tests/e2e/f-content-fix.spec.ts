@@ -70,7 +70,7 @@ test('Lost City mission and free dive both retain clear flow', async ({ page }) 
       smoke: null,
       strength: 0.03,
       lights: 0,
-      particles: 15,
+      particles: 36, // 3 shimmer sprites at each of the 12 chimneys
     });
     await page.screenshot({
       path: `${shots}/lost-city-${url.includes('mission=') ? 'mission' : 'free-dive'}.png`,
