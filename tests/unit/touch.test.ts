@@ -1,13 +1,75 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   classifyDevice,
   DoubleTap,
+  detectTouchPrimary,
   isTap,
   pinchWheelDelta,
+  rememberTouch,
   sliderAxis,
   STICK_DEAD_ZONE,
   stickAxes,
+  TOUCH_SEEN_KEY,
 } from '../../src/core/Touch.js';
+
+afterEach(() => vi.unstubAllGlobals());
+
+describe('touch detection persistence', () => {
+  it('restores the existing touch-seen flag even with desktop pointer capabilities', () => {
+    const getItem = vi.fn(() => '1');
+    vi.stubGlobal('localStorage', { getItem });
+    vi.stubGlobal('navigator', { maxTouchPoints: 0 });
+    vi.stubGlobal('window', { matchMedia: () => ({ matches: false }) });
+    expect(detectTouchPrimary()).toBe(true);
+    expect(getItem).toHaveBeenCalledWith(TOUCH_SEEN_KEY);
+  });
+
+  it.each([null, '0', 'true', 'corrupt'])('ignores a non-touch stored value %s', (value) => {
+    vi.stubGlobal('localStorage', { getItem: () => value });
+    vi.stubGlobal('navigator', { maxTouchPoints: 0 });
+    expect(detectTouchPrimary()).toBe(false);
+  });
+
+  it.each([
+    [5, true, true, true],
+    [0, true, true, false],
+    [5, false, true, false],
+    [5, true, false, false],
+  ])(
+    'detects hardware with %i touch points, coarse=%s, no-hover=%s',
+    (points, coarse, noHover, expected) => {
+      vi.stubGlobal('localStorage', {
+        getItem: () => {
+          throw new Error('storage blocked');
+        },
+        setItem: () => {
+          throw new Error('storage blocked');
+        },
+      });
+      vi.stubGlobal('navigator', { maxTouchPoints: points });
+      vi.stubGlobal('window', {
+        matchMedia: (query: string) => ({
+          matches: query === '(pointer: coarse)' ? coarse : noHover,
+        }),
+      });
+      expect(detectTouchPrimary()).toBe(expected);
+      expect(() => rememberTouch()).not.toThrow();
+    },
+  );
+
+  it('writes the same flag used by detection', () => {
+    const values = new Map<string, string>();
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => values.set(key, value),
+    });
+    vi.stubGlobal('navigator', { maxTouchPoints: 0 });
+    expect(detectTouchPrimary()).toBe(false);
+    rememberTouch();
+    expect(values.get(TOUCH_SEEN_KEY)).toBe('1');
+    expect(detectTouchPrimary()).toBe(true);
+  });
+});
 
 describe('stickAxes', () => {
   it('is zero inside the dead zone', () => {

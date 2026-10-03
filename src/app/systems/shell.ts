@@ -97,7 +97,7 @@ export const shellSystem: GameSystem = {
       settings: () => ctx.settingsScreen.open(),
       controls: () => ctx.controlsCard.open(),
       quit: () => {
-        history.pushState({}, '', new URL('.', window.location.href));
+        history.pushState({}, '', ctx.shellBaseHref());
         ctx.setAppState('home');
       },
       objectives: () =>

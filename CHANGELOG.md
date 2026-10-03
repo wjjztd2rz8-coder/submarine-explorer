@@ -14,6 +14,11 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-DAILY-TOUCH: Daily dive, mission selection and home transitions
+  retain `?touch=1` alongside the graphics tier so game reboots keep the touch
+  layout. Hardware detection, touch input and forced touch mode now save and
+  restore the existing touch-seen flag; mouse and keyboard still switch the
+  current session back to desktop controls.
 - Phase F, F-SAVE-SOAK: settings and key bindings recover intact legacy copies
   when current localStorage entries are empty, truncated or corrupt. Explicit v0
   settings and bare v0 discovery maps retain their saved choices and discoveries;

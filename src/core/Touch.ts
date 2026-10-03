@@ -1,5 +1,5 @@
 /**
- * Touch input maths (F1-TOUCH): pure helpers with no DOM, unit-tested in
+ * Touch input maths and device detection (F1-TOUCH), unit-tested in
  * tests/unit/touch.test.ts. `ui/TouchControls.ts` feeds them pointer events and
  * writes the results into `Input.touchAxes` / `Input.touchLook` / `touchZoom`.
  */
@@ -95,8 +95,25 @@ export function classifyDevice(
   return Math.min(screenW, screenH) < 600 ? 'phone' : 'tablet';
 }
 
-/** Touch is the primary input: a coarse pointer without hover, on a touch device. */
+/** localStorage key remembering that this device has been used by touch. */
+export const TOUCH_SEEN_KEY = 'subexplorer.touch.v1';
+
+/** Remember detected or forced touch mode for the next game boot. Storage is optional. */
+export function rememberTouch(): void {
+  try {
+    localStorage.setItem(TOUCH_SEEN_KEY, '1');
+  } catch {
+    /* Optional. */
+  }
+}
+
+/** Touch was previously used, or is the primary coarse pointer without hover. */
 export function detectTouchPrimary(): boolean {
+  try {
+    if (localStorage.getItem(TOUCH_SEEN_KEY) === '1') return true;
+  } catch {
+    /* Detection still works when storage is unavailable. */
+  }
   try {
     const nav = navigator;
     return (
