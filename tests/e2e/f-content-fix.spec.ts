@@ -5,10 +5,14 @@ import { expect, test } from './helpers/unlocked.js';
 const shots = '.cache/codex/shots/f-content-fix';
 
 for (const site of [
-  { id: 'great-blue-hole', text: 'This dive follows Lighthouse Reef', entry: 'overview' },
+  {
+    id: 'great-blue-hole',
+    text: 'The flooded limestone sinkhole is about 320 m wide',
+    entry: 'overview',
+  },
   { id: 'hunga-tonga-caldera', text: 'before the 15 January 2022 eruption', entry: 'overview' },
   { id: 'bismarck', text: 'roughly 570 m gap', entry: 'overview' },
-  { id: 'lost-city', text: 'It emerges clear', entry: 'overview' },
+  { id: 'lost-city', text: 'The fluid emerges clear', entry: 'overview' },
   { id: 'beebe-vent-field', text: 'roughly 500 bar', entry: 'vents' },
   { id: 'blake-plateau-corals', text: 'naturally white', entry: 'coral-thicket' },
 ]) {

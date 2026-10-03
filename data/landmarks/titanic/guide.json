@@ -10,7 +10,7 @@
         "RMS Titanic sank in the early hours of 15 April 1912 on her maiden voyage from Southampton to New York, about two hours and forty minutes after striking an iceberg. About 1,500 of the roughly 2,200 people on board died; published figures range from about 1,496 to 1,523.",
         "The wreck lies about 3,800 m down, some 325 nautical miles south-south-east of Newfoundland. It was found just after 1 a.m. on 1 September 1985 by a French–American expedition led by Jean-Louis Michel (IFREMER) and Robert Ballard (Woods Hole Oceanographic Institution). The towed camera sled Argo, working from the research vessel Knorr, followed a trail of debris until it picked out one of the ship's boilers.",
         "The ship broke apart as it sank. The bow and stern sections rest about 600–700 m apart, and they face opposite ways. Two dense debris fields, each 600–800 m long, trail south-west from the sections, and a thinner scatter spreads over many square kilometres. Most of the debris lies near the stern: boilers, hull plates, fittings, and the personal belongings of passengers and crew.",
-        "What you see here: the seabed is real GMRT bathymetry at about 45 x 61 m per cell, which is far too coarse to show the wreck. A full photogrammetric scan made by Magellan in 2022 is proprietary and is not used."
+        "The seabed is real GMRT bathymetry at about 45 x 61 m per cell, too coarse to show the wreck. The hull models and animal encounters are game recreations; Magellan’s proprietary 2022 photogrammetric scan is not used."
       ],
       "facts": [
         {
@@ -75,6 +75,10 @@
         {
           "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
           "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "WHOI — fortieth anniversary of the Titanic discovery",
+          "url": "https://www.whoi.edu/press-room/news-release/titanic-40th/"
         }
       ],
       "confidence": "high"
@@ -150,7 +154,7 @@
       "id": "stern",
       "title": "The stern section",
       "paragraphs": [
-        "The stern section, about 107 m (350 ft) long, lies about 600–700 m south of the bow. It sank more slowly than the bow and was far more badly damaged. Air trapped inside burst outwards as it went down, and the impact with the seabed collapsed its decks onto one another. Its hull plating is peeled outwards along both sides.",
+        "The stern section, about 107 m (350 ft) long, lies about 600–700 m south of the bow. It sank more slowly than the bow and was far more badly damaged. Pressure crushed its trapped air spaces as it went down, and the impact with the seabed collapsed its decks onto one another. Its hull plating is peeled outwards along both sides.",
         "The stern turned around as it sank, so its rear end now points back towards the bow. The two halves of the ship face in opposite directions.",
         "Hundreds of people were on or near the stern when it went under, because it was the last part of the ship above water. For that reason the 1986 expedition chose it for the memorial plaque."
       ],
@@ -209,7 +213,7 @@
       "id": "boilers",
       "title": "The boiler field",
       "paragraphs": [
-        "Titanic had 29 coal-fired boilers, each about 4.8 m (15 ft 9 in) across. When the hull broke apart between the second and third funnels, five boilers from Boiler Room No. 1 fell out. They landed as a tight cluster in the debris field around the stern, about 180 m (600 ft) east of it. Because heavy boilers fall almost straight down, the cluster is thought to mark the point where the ship broke up, far above.",
+        "Titanic had 29 coal-fired boilers, each about 4.8 m (15 ft 9 in) across. When the hull broke apart near the third funnel, five boilers from Boiler Room No. 1 fell out. They landed as a tight cluster in the debris field around the stern, about 180 m (600 ft) east of it. Because heavy boilers fall almost straight down, the cluster is thought to mark the point where the ship broke up, far above.",
         "One of these boilers was the first object the 1985 expedition recognised. Early on 1 September, Argo's cameras showed its round face and firebox openings on the seabed, and the team knew they had found Titanic."
       ],
       "facts": [
@@ -259,6 +263,10 @@
         {
           "title": "The Quest to Map Titanic — WHOI Oceanus Vol. 49 No. 2 (2012)",
           "url": "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+        },
+        {
+          "title": "RMS Titanic Inc. — wreck site, boilers and discovery",
+          "url": "https://rmstitanicinc.com/titanic-wreck/"
         }
       ],
       "confidence": "low"
@@ -320,7 +328,7 @@
       "title": "Where the \"Big Piece\" lay",
       "paragraphs": [
         "The \"Big Piece\" is a section of starboard hull plating about 7.9 m wide and 6.1 m high, weighing 15–20 tons. It was part of the wall of first-class cabins on C Deck, extending down to D Deck, and several portholes are still in place. It broke away from the hull and came to rest among the stern-side debris.",
-        "First seen in 1994, it was raised by RMS Titanic Inc. in August 1998 after an earlier attempt failed in 1996. It is now on display in Las Vegas. Recoveries like this were controversial, and the international agreement that came into force in 2019 favours leaving the wreck and its artifacts in place.",
+        "First seen in 1994, it was raised by RMS Titanic Inc. in August 1998 after an earlier attempt failed in 1996. After recovery it was divided: the larger piece is displayed in Las Vegas, and the smaller piece in Orlando. Recoveries like this were controversial, and the international agreement that came into force in 2019 favours leaving the wreck and its artifacts in place.",
         "This point marks the general stern-side debris area where hull plating like this lies. The Big Piece itself is no longer on the seabed."
       ],
       "facts": [
@@ -358,6 +366,10 @@
         {
           "title": "The Quest to Map Titanic — WHOI Oceanus Vol. 49 No. 2 (2012)",
           "url": "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+        },
+        {
+          "title": "RMS Titanic Inc. — 1998 recovery and division of the hull section",
+          "url": "https://rmstitanicinc.com/titanic-expeditions/"
         }
       ],
       "confidence": "low"
@@ -366,7 +378,7 @@
       "id": "memorial",
       "title": "The memorial plaque",
       "paragraphs": [
-        "In July 1986 Robert Ballard's team returned to the wreck in the crewed submersible Alvin. They fixed a bronze plaque from the Titanic Historical Society to the stern, on the aft starboard side between two fairleads (guides for mooring ropes). It reads: \"In memory of those souls who perished with the Titanic April 14-15, 1912.\" Ballard chose the stern because it was the last part of the ship to go under, and most of the dead were there.",
+        "In July 1986 Robert Ballard's team returned to the wreck in the crewed submersible Alvin. They fixed a bronze plaque from the Titanic Historical Society to the stern, on the aft starboard side between two fairleads (guides for mooring ropes). It reads: \"In memory of those souls who perished with the Titanic April 14-15, 1912.\" Ballard chose the stern because it was the last part of the ship to go under, with people still on or near it.",
         "The plaque was gone by 1996, and it is not known what happened to it. Later expeditions left other memorials at the site.",
         "The wreck is protected by the RMS Titanic Maritime Memorial Act (US, 1986), by the Agreement concerning the Shipwrecked Vessel RMS Titanic (concluded in 2003, in force since 18 November 2019), and, since April 2012, by the UNESCO 2001 Convention on the Protection of the Underwater Cultural Heritage. The agreement describes the wreck as a final resting place and favours preserving it where it lies.",
         "No plaque is modelled here. This point marks where it was placed, on the stern."
@@ -422,6 +434,10 @@
         {
           "title": "Wreck of the Titanic — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
+        },
+        {
+          "title": "UNESCO — underwater cultural heritage convention, 100-year threshold",
+          "url": "https://www.unesco.org/en/legal-affairs/convention-protection-underwater-cultural-heritage"
         }
       ],
       "confidence": "medium"

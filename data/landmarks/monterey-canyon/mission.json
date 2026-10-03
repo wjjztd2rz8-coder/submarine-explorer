@@ -27,10 +27,10 @@
     "depth_m": 2000,
     "facts": [
       "Monterey Canyon begins right off the beach at Moss Landing -- so close to shore that MBARI, headquartered there, calls it their 'backyard'.",
-      "The main channel runs about 153 km out to sea, with walls up to 1.6-1.7 km high; its published maximum depth, about 3,600 m, lies beyond this tile's western edge.",
+      "MBARI traces the main channel more than 470 km offshore, through the Monterey Deep Sea Fan to depths beyond 4,000 m; the walls reach about 1,700 m high. This tile covers only the upper part, to about 2,333 m.",
       "Just past the head, the seafloor drops from under 50 m to more than 250 m in under 3 km, where the canyon cuts across the continental shelf break.",
       "Turbidity currents -- fast underwater avalanches of sediment -- have been measured moving down this canyon at up to about 7 m/s, some travelling more than 50 km. They happen several times a year in the upper canyon.",
-      "The MBARI-operated MARS observatory node, at 891 m, is a real cabled power-and-data outlet for deep-sea science instruments, connected to shore by a 52 km cable."
+      "The MBARI-operated MARS observatory node, on the continental slope at 891 m, is a real cabled power-and-data outlet for deep-sea science instruments, connected to shore by a 52 km cable."
     ],
     "hazards": [
       "Turbidity currents: sudden, fast-moving sediment flows can occur without warning, especially in the upper canyon.",

@@ -6,9 +6,9 @@
       "id": "overview",
       "title": "Lighthouse Reef and the Great Blue Hole",
       "paragraphs": [
-        "This dive follows Lighthouse Reef’s shallow platform and its outer drop-offs around the Great Blue Hole. The sinkhole itself is about 320 m wide and 125 m deep, inside the atoll lagoon.",
-        "The terrain grid resolves the atoll’s outer slopes but smooths over the small sinkhole. Its marker records the location; the western limestone alcove is a game addition inspired by drowned cave formations.",
-        "The Great Blue Hole and Lighthouse Reef’s Half Moon Caye are protected components of the Belize Barrier Reef Reserve System, a UNESCO World Heritage Site."
+        "Explore the Great Blue Hole and Lighthouse Reef’s shallow platform and outer drop-offs. The flooded limestone sinkhole is about 320 m wide and 125 m deep, inside the atoll lagoon.",
+        "The game adds the sinkhole to the survey terrain because the raw grid smooths it over. Its carved walls, limestone alcove and animal encounters are game recreations inspired by the flooded cave and nearby reef habitat.",
+        "The Blue Hole Natural Monument and Half Moon Caye Natural Monument are protected components of the Belize Barrier Reef Reserve System, inscribed as a UNESCO World Heritage Site in 1996."
       ],
       "facts": [
         {
@@ -21,14 +21,14 @@
         },
         {
           "label": "Terrain reading at hole coordinates (this tile)",
-          "value": "~4.2 m"
+          "value": "~4.2 m in the unmodified GMRT grid; game floor about 125 m"
         },
         {
           "label": "Protection",
           "value": "Belize Barrier Reef Reserve System, UNESCO World Heritage Site"
         }
       ],
-      "reconstruction": false,
+      "reconstruction": true,
       "sources": [
         {
           "title": "Great Blue Hole — Wikipedia",
@@ -41,6 +41,14 @@
         {
           "title": "Gischler et al. 2013 — Blue Hole setting and stratification",
           "url": "https://limnogeology.ethz.ch/GischlerMarine.pdf"
+        },
+        {
+          "title": "UNESCO — Belize Barrier Reef Reserve System",
+          "url": "https://whc.unesco.org/en/list/764"
+        },
+        {
+          "title": "Gischler et al. 2025 — 30 m core from the Great Blue Hole",
+          "url": "https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"
         }
       ],
       "confidence": "high"
@@ -60,11 +68,11 @@
         },
         {
           "label": "Formed during",
-          "value": "ice-age low sea levels (dated to ~153,000-15,000 years ago)"
+          "value": "Pleistocene lower sea levels; later flooded as sea level rose"
         },
         {
           "label": "Charted by",
-          "value": "Jacques Cousteau, 1971 (RV Calypso)"
+          "value": "explored by Jacques Cousteau in 1971 (Calypso)"
         },
         {
           "label": "3D sonar-mapped by",
@@ -92,6 +100,18 @@
         {
           "title": "Gischler et al. 2013 — Blue Hole setting and stratification",
           "url": "https://limnogeology.ethz.ch/GischlerMarine.pdf"
+        },
+        {
+          "title": "Fabien Cousteau — Blue Hole expedition and 1971 exploration",
+          "url": "https://fabiencousteau.com/project/belize-blue-hole-expedition/"
+        },
+        {
+          "title": "Aquatica Submarines — Blue Hole Belize 2018 expedition report",
+          "url": "https://medium.com/aquatica-submarines/aquatica-newsletter-451da8a29470"
+        },
+        {
+          "title": "Gischler et al. 2025 — dimensions and anoxic water below about 90 m",
+          "url": "https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"
         }
       ],
       "confidence": "high"
@@ -182,6 +202,14 @@
         {
           "title": "Lighthouse Reef — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef"
+        },
+        {
+          "title": "Baremore et al. 2021 — Caribbean reef sharks at Lighthouse Reef",
+          "url": "https://2025.maralliance.org/wp-content/uploads/2022/06/Baremore-et-al-2021_Movements-residency-of-Caribbean-reef-sharks-Lighthouse-Reef-Atoll-Belize.pdf"
+        },
+        {
+          "title": "Nurse shark survey in Belize, including Lighthouse Reef (2021)",
+          "url": "https://www.maralliance.org/wp-content/uploads/2021/11/journal.pone_.0256532.pdf"
         }
       ],
       "confidence": "medium"
