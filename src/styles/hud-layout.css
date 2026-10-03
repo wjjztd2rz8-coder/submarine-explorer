@@ -91,8 +91,41 @@
     --hl-col-left: calc(168px + env(safe-area-inset-left, 0px));
     --hl-col-width: calc(100vw - 168px - 270px);
   }
-  html.is-touch .sonar {
-    zoom: 0.62;
+  /* Shrink only the map, not its range buttons or their hit areas. */
+  html.is-touch .sonar:not(.d-sonar-expanded) {
+    width: 144px;
+  }
+  html.is-touch .sonar:not(.d-sonar-expanded) canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+  html.is-touch .sonar.d-sonar-expanded {
+    width: 300px;
+    transform: translate(-50%, -50%);
+    z-index: 31;
+  }
+  html.is-touch .sonar.d-sonar-expanded canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: calc(100vh - 104px);
+    object-fit: contain;
+  }
+  html.is-touch .sonar .d-sonar-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  html.is-touch .sonar .d2-sonar-controls {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+  }
+  html.is-touch .sonar .d2-sonar-controls button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  html.is-touch .sonar .d-sonar-range {
+    white-space: normal;
+    text-align: center;
+    font-size: 10px;
   }
   html.is-touch .d-sonar-legend {
     display: none;
@@ -105,6 +138,7 @@
   html.is-touch .hud-readouts .hud-row {
     gap: 8px;
     line-height: 1.25;
+    font-size: 13px;
   }
   html.is-touch .hud-readouts .hud-label {
     font-size: 10px;
@@ -206,7 +240,7 @@
   html.is-touch .onboard-card,
   html.is-touch .onboard-hint {
     top: auto;
-    bottom: calc(210px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(230px + env(safe-area-inset-bottom, 0px));
     left: 50%;
     transform: translateX(-50%);
     width: calc(100vw - 24px);
@@ -219,7 +253,9 @@
   html.is-touch .scan-overlay .scan-panel {
     left: 50%;
     top: auto;
-    bottom: calc(360px + env(safe-area-inset-bottom, 0px));
+    /* The two-line tutorial and hint need more than the old 150 px gap. */
+    bottom: calc(400px + env(safe-area-inset-bottom, 0px));
+    max-width: calc(100vw - 24px);
   }
 }
 
@@ -281,9 +317,18 @@
     gap: 6px;
     flex-wrap: wrap;
   }
+  html.is-touch .hud-readouts .hud-row:has([data-field='heading']) {
+    display: none;
+  }
+  html.is-touch .hud-power-line {
+    grid-template-columns: minmax(0, 1fr) minmax(24px, 1fr) 36px;
+    gap: 4px;
+  }
   html.is-touch .objectives-panel .obj-item:not(.is-current),
   html.is-touch .objectives-panel .obj-more,
-  html.is-touch .objectives-panel .obj-hint {
+  html.is-touch .objectives-panel .obj-hint,
+  html.is-touch .objectives-panel .obj-nav,
+  html.is-touch .objectives-panel .obj-progress {
     display: none;
   }
   html.is-touch .objectives-panel .obj-item-title {

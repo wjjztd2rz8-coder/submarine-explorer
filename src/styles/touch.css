@@ -207,6 +207,11 @@
   letter-spacing: 0.02em;
   text-align: center;
   pointer-events: auto;
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .tc-rotate-hint[hidden] {
   display: none;
@@ -257,11 +262,19 @@
 
 /* Short landscape phones. */
 @media (orientation: landscape) and (max-height: 460px) {
+  .tc-root {
+    /* HUD reserves 270 px for this cluster. Keep enlarged controls inside it. */
+    --tc-s: min(calc(var(--ui-scale, 1) * 1px), 0.8px);
+  }
   .tc-stick {
     width: max(104px, calc(118 * var(--tc-s)));
   }
   .tc-slider {
     height: min(50vh, max(140px, calc(164 * var(--tc-s))));
+  }
+  .tc-root.tc-sonar-open .tc-btn-pause {
+    /* The expanded map occupies the centre, including the usual Pause slot. */
+    left: calc(12px + env(safe-area-inset-left, 0px));
   }
 }
 
@@ -290,8 +303,23 @@
     min-height: 24px;
   }
   .settings label,
-  .settings-row {
+  .settings-row,
+  .jr-spoilers {
     min-height: 44px;
+  }
+  .jr-header {
+    flex-wrap: wrap;
+  }
+  .jr-spoilers {
+    white-space: normal;
+    min-width: 0;
+  }
+  .jr-spoilers input {
+    flex: none;
+  }
+  .jr-inline-link {
+    display: inline-flex;
+    align-items: center;
   }
   .globe-pin {
     min-width: 44px;

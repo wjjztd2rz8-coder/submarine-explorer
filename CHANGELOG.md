@@ -18,6 +18,19 @@ without an entry here is not done.
   runs static and project-base gates separately, and bounds jobs below 25 minutes.
   Browser installation and suites have explicit budgets; final test failures
   cancel remaining shard work. Every existing gate and assertion is retained.
+- Phase F, F-TOUCH-AUDIT: phone sonar range buttons retain 44 px touch targets;
+  expanded landscape sonar stays within the screen. Portrait mission telemetry
+  and tutorial/scan panels keep clearer spacing, and enlarged landscape touch
+  controls stay in their reserved column. The landscape home menu uses a full
+  height scroll column for Daily and Advanced; Journal spoiler and inline-link
+  targets are touch friendly. Scan prompts name SCAN and Pause → Journal on touch.
+  Portrait touch omits numeric heading and secondary mission navigation/progress
+  rows to keep the active objective and telemetry separate; sonar retains its
+  heading marker and Pause retains the full objective list.
+- Phase F, F-TOUCH-AUDIT: virtual stick, ballast, Scan and Boost release on focus
+  loss, hidden tabs and resize/rotation. Multiple fingers holding Scan or Boost
+  keep the action engaged until the last finger releases. Regression coverage
+  checks real control listeners and phone layouts at 390×844 and 844×390.
 
 - Phase F, F-LOSTCITY-3: the Poseidon talus apron is no longer a flat oval. It has a ragged noise-driven outline, feathers flush into the seabed, fades into the sediment colour and carries scattered carbonate blocks (not on the low tier). Lost City also gets a little more ambient fill and a lifted distance haze (new opt-in vent params `hazeScale`, `hazeLift`) so the far ridge softens instead of cutting out black.
 
