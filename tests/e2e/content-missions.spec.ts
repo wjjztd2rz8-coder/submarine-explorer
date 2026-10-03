@@ -5,7 +5,7 @@ import { expect, test, type Page } from './helpers/unlocked.js';
  * D-FLOW: primary scans -> "Primary objectives complete" banner -> the
  * player surfaces voluntarily -> debrief.
  */
-type Objective = { id: string; poi: string; primary: boolean };
+type Objective = { id: string; poi: string; primary: boolean; title: string; hint: string };
 type MissionDoc = { landmark: string; objectives: Objective[] };
 const missionIds = [
   'titanic',
@@ -150,11 +150,23 @@ for (const id of missionIds) {
     );
     await expect(page.locator('.briefing')).toBeVisible();
     await expect(page.locator('.briefing-objectives li.is-primary')).toHaveCount(primary.length);
+    await expect(page.locator('.briefing-objectives li.is-primary .briefing-obj-title')).toHaveText(
+      primary.map((objective) => objective.title),
+    );
     await page.locator('.briefing-begin').click();
     await expect(page.locator('.objectives-panel')).toBeVisible();
 
     for (const objective of primary) {
       await teleportToPoi(page, objective.poi);
+      // Navigation picks the nearest incomplete primary; the scan candidate
+      // also depends on facing and range, so it can be a different objective.
+      await expect
+        .poll(async () => {
+          const title = await page.locator('.obj-item.is-current .obj-item-title').textContent();
+          const current = doc.objectives.find((o) => o.title === title);
+          return !!current && (await page.locator('.obj-hint').textContent()) === current.hint;
+        })
+        .toBe(true);
       const before = await page.evaluate(
         () =>
           (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed,

@@ -37,6 +37,16 @@
 .onboard-hint {
   font-size: 14px;
 }
+/* Keep the active instruction readable, including long species names in the
+   narrow portrait stack. Other objective rows retain their compact ellipsis. */
+.obj-item.is-current .obj-item-title {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.obj-optional {
+  flex: none;
+}
 @keyframes hl-card-in {
   from {
     opacity: 0;
