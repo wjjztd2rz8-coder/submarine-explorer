@@ -26,6 +26,10 @@ without an entry here is not done.
   full browser sweeps during concurrent tasks. `--full-e2e` restores the full
   local suite; CI defaults to full discovery and retains all 16 shards. No
   existing tests, assertions, retries or per-test limits are removed or reduced.
+- Phase F, F-TITLE-RESEARCH: added the provisional Bathyline title-scene spec,
+  desktop/phone layouts, real-terrain backdrop and owned implementation packages,
+  plus an unreferenced original SVG mark draft. Application names and behaviour
+  remain unchanged; this is the research handoff for the title redesign.
 - Phase F, F-LOSTCITY-4: the seabed albedo no longer aliases into a regular
   houndstooth/checker on distant and grazing slopes (most visible at Lost City).
   `terrain.frag.glsl` applies a distance-driven mip bias (0 within 3 m, +3 mips
