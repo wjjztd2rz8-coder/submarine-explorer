@@ -20,13 +20,17 @@ export const BLUE_HOLE_RADIUS_M = 160;
 /** (radius from the hole centre, absolute height) knots of the wall profile; linear between. */
 const PROFILE: readonly (readonly [number, number])[] = [
   [215, 0],
-  [182, -10],
-  [166, -22],
-  [152, -36],
-  [136, -41],
-  [124, -52],
-  [114, -96],
+  [184, -9],
+  [170, -18],
+  [160, -30],
+  [153, -38],
+  [134, -41],
+  [126, -52],
+  [119, -72],
+  [112, -78],
+  [108, -98],
   [92, -118],
+  [60, -123],
   [0, -125],
 ];
 
@@ -65,7 +69,19 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
       // A slightly irregular outline, not a drawn circle.
       const wob = 1 + 0.035 * Math.sin(3 * a + 0.8) + 0.025 * Math.sin(5 * a + 2.1);
       const r = Math.hypot(dx, dz) / wob;
-      return Math.min(height, profileAt(r));
+      // Ledge undulation, rubble hummocks and sediment ripples (a metre or two) break up the carve.
+      const rim = smoothstep(Math.min(1, Math.max(0, (r - 100) / 30)));
+      const ledge =
+        rim *
+        (1 - smoothstep(Math.min(1, Math.max(0, (r - 150) / 20)))) *
+        (2.2 * Math.sin(7 * a + 1.3 + r * 0.05) + 1.3 * Math.sin(13 * a + r * 0.11));
+      const floor = 1 - smoothstep(Math.min(1, Math.max(0, (r - 80) / 30)));
+      const ripple =
+        floor *
+        (0.5 * Math.sin(dx * 0.35 + 0.8 * Math.sin(dz * 0.09)) +
+          0.9 * Math.sin(dz * 0.13 + dx * 0.05) +
+          1.4 * Math.sin(dx * 0.045) * Math.sin(dz * 0.06));
+      return Math.min(height, profileAt(r) + ledge + ripple);
     },
   };
 }

@@ -48,7 +48,7 @@ const DRAPE = new THREE.Color(0xa59d88);
 const EDGE_START = 0.55;
 
 /** Sunlit pale limestone: the shared rock albedo (kept dark for vents and tuff) is lifted. */
-const LIMESTONE_LIFT = 4.2;
+const LIMESTONE_LIFT = 6;
 const geoMaterial: typeof baseGeoMaterial = (kind, d, o) => {
   const m = baseGeoMaterial(kind, d, o);
   m.color.multiplyScalar(LIMESTONE_LIFT);
