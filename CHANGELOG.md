@@ -14,6 +14,12 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-TITLE-D: rebuilt the home layout as Bathyline (copy, wordmark with inline
+  mark, Continue / Dive sites primary actions, Free dive, Daily, mode, then Journal /
+  Settings / Controls / Upgrades in DOM order) in a dedicated `src/styles/home.css`
+  with desktop, portrait and short-landscape plates, safe insets and 48 px targets;
+  Back and Escape from Dive sites / Free dive now return focus to the originating
+  button; first focus is Continue when enabled, else Dive sites.
 - Phase F, F-TITLE-A: finalized the original Bathyline mark with a 16 px variant,
   replaced the sonar favicon/PWA icons for the title identity, and added licensed
   self-hosted DM Sans/Source Serif 4 weights with an unimported font stylesheet.

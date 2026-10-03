@@ -152,8 +152,9 @@ for (const viewport of [
       await ready(page, '/?touch=1&tier=low');
       const home = page.locator('.home-screen');
       const menu = home.locator('.home-menu');
-      expect((await menu.boundingBox())!.height).toBeGreaterThan(300);
-      await separate(page, ['.home-copy', '.home-menu']);
+      // The menu sits in the scrolling `.home-body` (F-TITLE-D); the scroller stays on screen.
+      expect((await home.locator('.home-body').boundingBox())!.height).toBeGreaterThan(300);
+      await separate(page, ['.home-copy', '.home-body']);
       const mode = home.locator('.mode-selector');
       for (const radio of await mode.getByRole('radio').all()) await reachable(radio);
       await mode.getByRole('radio', { name: 'Realistic' }).tap();

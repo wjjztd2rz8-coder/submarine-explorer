@@ -9,27 +9,19 @@ export interface HomeActions {
 }
 
 const SCENE_FALLBACK = 'Expedition preview';
-const SVG_NS = 'http://www.w3.org/2000/svg';
+const MARK_SVG =
+  '<svg class="home-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+  '<path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Z"/>' +
+  '<path class="contour" d="M7 17h4v-3h3c3 0 4-2 4-4s-2-4-5-4H8"/>' +
+  '<path class="contour inner-contour" d="M6 13h2v-3h3c1 0 2-.5 2-1"/></svg>';
 
 /** Decorative inline Bathyline mark (public/bathyline-mark.svg geometry; currentColor ring). */
-function brandMark(): SVGSVGElement {
-  const svg = document.createElementNS(SVG_NS, 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('class', 'home-mark');
-  svg.setAttribute('aria-hidden', 'true');
-  svg.setAttribute('focusable', 'false');
-  const paths: Array<[string, string, string?]> = [
-    ['M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Z', ''],
-    ['M7 17h4v-3h3c3 0 4-2 4-4s-2-4-5-4H8', 'contour'],
-    ['M6 13h2v-3h3c1 0 2-.5 2-1', 'contour inner-contour'],
-  ];
-  for (const [d, cls] of paths) {
-    const path = document.createElementNS(SVG_NS, 'path');
-    path.setAttribute('d', d);
-    if (cls) path.setAttribute('class', cls);
-    svg.append(path);
-  }
-  return svg;
+function brandMark(): HTMLElement {
+  const box = document.createElement('span');
+  box.className = 'home-mark-box';
+  box.setAttribute('aria-hidden', 'true');
+  box.innerHTML = MARK_SVG;
+  return box;
 }
 
 /** Title screen; the C1 globe is mounted in `globeSlot` by the app. */
@@ -113,11 +105,11 @@ export class Home {
     // mode, Journal, Settings, Controls (Upgrades is appended after by progress).
     this.continueButton = entry('Continue', actions.continueDive);
     this.continueButton.disabled = true;
-    this.continueButton.classList.add('home-primary');
+    this.continueButton.className = 'home-primary';
     this.diveSitesButton = entry('Dive sites', () => this.showSites(false, this.diveSitesButton));
-    this.diveSitesButton.classList.add('home-primary');
+    this.diveSitesButton.className = 'home-primary';
     this.freeDiveButton = entry('Free dive', () => this.showSites(true, this.freeDiveButton));
-    this.freeDiveButton.classList.add('home-wide');
+    this.freeDiveButton.className = 'home-wide';
     this.dailyCard = document.createElement('button');
     this.dailyCard.type = 'button';
     this.dailyCard.className = 'daily-card';
@@ -162,7 +154,7 @@ export class Home {
     this.sitesSlot.className = 'home-sites-scroll';
     this.sites.append(sitesHead, this.sitesSlot);
 
-    this.root.append(globeWrap, panel, hero, this.sites);
+    this.root.append(panel, hero, globeWrap, this.sites);
     parent.append(this.root);
     this.trap = new FocusTrap(this.root);
     this.panel = panel;

@@ -155,6 +155,10 @@
   align-items: center;
   gap: 10px;
 }
+.home-mark-box {
+  display: flex;
+  flex: none;
+}
 .home-mark {
   flex: none;
   width: 36px;
@@ -332,11 +336,27 @@
   line-height: 1.5;
 }
 
-/* Portrait phones with little height: the whole plate scrolls (already the case);
-   below 600 px the copy is allowed to scroll away so the menu keeps its room. */
+/* Portrait: copy stays fixed and the menu scrolls; with under 600 px of height the whole
+   plate scrolls instead so the menu keeps its room. */
+.home-panel {
+  overflow: hidden;
+}
+.home-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #6fb5b9 transparent;
+  padding: 6px;
+  margin: -6px;
+}
 @media (max-height: 600px) {
   .home-panel {
     overflow-y: auto;
+  }
+  .home-body {
+    flex: none;
+    overflow: visible;
   }
 }
 

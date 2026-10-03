@@ -23,7 +23,7 @@ test('plain root opens the home shell', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
   await expect(page.locator('.home-screen')).toBeVisible();
-  await expect(page.locator('.home-screen h1')).toHaveText('Submarine Explorer');
+  await expect(page.locator('.home-screen h1')).toHaveText('Bathyline');
   await expect(page.locator('.pause-menu')).toBeHidden();
 });
 

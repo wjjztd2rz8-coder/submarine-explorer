@@ -116,7 +116,10 @@ it('removes an inaccessible Daily launch and restores the same card after mode c
     controls: vi.fn(),
   });
   const root = ctx.home.root as unknown as HomeElement;
-  const card = root.children[1].children.find((el) => el.className === 'daily-card')!;
+  // root > panel > body > menu (F-TITLE-D structure).
+  const card = root.children[0].children[1].children[0].children.find(
+    (el) => el.className === 'daily-card',
+  )!;
   try {
     system.start?.(ctx);
     expect(card.hidden).toBe(false);
