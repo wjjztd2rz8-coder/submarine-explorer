@@ -8,7 +8,7 @@ Run `tools/golden.sh` at the start of any run that merged visual work. Compare a
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
-1. **Monterey canyon:** the ridge has strata and a lit face, but it still reads as a lone mound. Add the opposing wall, depth fall-off and sponges/corals on the lit face.
+1. **Monterey canyon (flanking walls and wall life merged 2026-10-03, re-check in next golden set):** remaining: the west wall is barely visible at spawn; a darker depth fall-off gap; wall sponges are large pale cups at close range.
 2. **Lost City surroundings:** the tiered tower now reads (400 may still add texture). The slope around it is bare brown and the light is milky. Add carbonate rubble, flanges on the small towers, a darker ambient.
 3. **Blue Hole wall and floor:** the wall is flat tan and the rim apron is smeared. Add banding, overhangs, a second stalactite cluster and a textured floor.
 4. **Beebe plume variety:** plumes are uniform tall columns. Vary the width and lean per vent, add a lit hot-water haze above the orifice, and a bent plume in the current.

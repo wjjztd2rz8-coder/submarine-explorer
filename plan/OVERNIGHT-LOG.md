@@ -306,3 +306,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged Claude/Sonnet F-BEEBE-PLUMES: billowing, turbulent smoker plumes (prop plumes plus the vent-preset funnels that were the actual smooth cones), orifice shimmer, unit and e2e specs. Reviewed wide/mid shots against the golden: clearly better, readable. Full-e2e + project-base green on main. Pushed, tagged f16.
 - Worktrees 390/395/400 (Codex) are stalled at the Codex 5% floor until 15:45; 400 is camera-only and does not yet give Lost City carbonate texture. Queue holds 410-460 briefs. Claude 5h ~75% afterward; next Claude package candidates: Monterey canyon walls, Lost City texture after 400.
 - Needs owner: brand name OK (Bathyline); fresh golden set still needs a browser host.
+
+## 2026-10-03 14:50 CDT — review run (tag f16)
+
+- Comprehensive evening review recorded in plan/REVIEWS.md (Beebe +1, Blue Hole +2, Lost City +1; Monterey and Titanic unchanged). CI `fail-fast` set to false; main CI is still red on `f2-life` scan test (Codex 440 queued).
+- Merged `f-monterey-canyon` (Sonnet): flanking canyon walls and sponges/coral on the lit wall. Smoke gates passed in worktree and on main; full e2e not run, no tag.
+- Stalled worktrees 390/395/400 wait for the Codex 15:45 reset. Eight briefs queued.
+- Needs owner: nothing.
