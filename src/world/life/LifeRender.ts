@@ -170,7 +170,8 @@ export class LifeRender {
       m4[10] = cy * cp * s;
       m4[11] = 0;
       m4[12] = a.x;
-      m4[13] = a.y;
+      // Rooted animals sit into the sediment rather than on it.
+      m4[13] = a.def.archetype === 'sessile' ? a.y - 0.1 * s * Math.max(0.5, a.def.size) : a.y;
       m4[14] = a.z;
       m4[15] = 1;
       sm.mesh.instanceMatrix.array.set(m4, i * 16);

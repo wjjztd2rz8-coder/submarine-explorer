@@ -8,9 +8,9 @@
     "preset": "vent",
     "overrides": {
       "fluid": "carbonate",
-      "ambientFill": 16,
-      "hazeScale": 1.5,
-      "hazeLift": 0.4,
+      "ambientFill": 9,
+      "hazeScale": 1.25,
+      "hazeLift": 0.2,
       "smokeIntensity": 0,
       "glowLights": 0,
       "shimmerStrength": 0.03

@@ -626,12 +626,14 @@ export class LifeSim {
     g.spread = def.archetype === 'crawler' ? radius + 5 : radius;
     for (let i = 0; i < n; i++) {
       const th = h(10 + i * 3) * Math.PI * 2;
-      const rr = radius * Math.sqrt(h(11 + i * 3));
+      const rf = Math.sqrt(h(11 + i * 3));
+      const rr = radius * rf;
       const px = x + Math.cos(th) * rr;
       const pz = z + Math.sin(th) * rr;
       const a = this.addAgent(g, px, this.env.groundAt(px, pz), pz, instant);
       if (!a) break;
-      a.scale = 0.7 + 0.6 * h(12 + i * 3);
+      // Colonies: large old heads at the core, small young ones toward the fringe.
+      a.scale = (1.3 - 0.75 * rf) * (0.65 + 0.7 * h(12 + i * 3));
       a.yaw = h(13 + i) * Math.PI * 2;
       a.hd = a.yaw;
       a.vx = a.vy = a.vz = 0;

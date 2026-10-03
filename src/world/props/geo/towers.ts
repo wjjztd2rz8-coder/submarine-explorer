@@ -129,8 +129,8 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       ...scatterRubble(skirt, keep, {
         halfX: pw / 2,
         halfZ: pd / 2,
-        count: Math.min(lone ? 14 : 150, Math.round(area * 0.012 * d.growth)),
-        size: lone ? 0.5 : 1.1,
+        count: Math.min(lone ? 34 : 190, Math.round(area * (lone ? 0.03 : 0.014) * d.growth)),
+        size: lone ? 0.7 : 1.2,
         detail: Math.min(d.sphereDetail, 1),
         seed: seed + 313,
       }),
@@ -149,9 +149,9 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     );
     tips.push({ x: s.x, y: s.y + s.h, z: s.z });
     // Drooping flanges on the column: wide shelves on the main tower, one or two elsewhere.
-    const nf = lone ? 1 : i === 0 ? 6 : 1 + Math.floor(rnd() * 2);
+    const nf = lone ? 2 + Math.floor(rnd() * 2) : i === 0 ? 7 : 2 + Math.floor(rnd() * 3);
     for (let f = 0; f < nf; f++) {
-      const t = i === 0 ? 0.12 + (f / nf) * 0.6 + rnd() * 0.06 : 0.14 + rnd() * 0.5;
+      const t = i === 0 ? 0.12 + (f / nf) * 0.6 + rnd() * 0.06 : 0.1 + (f / nf) * 0.6 + rnd() * 0.08;
       const rAt = spireRadius(s, t);
       const w = rAt * (0.4 + rnd() * 0.5) + 0.6;
       pieces.push(
