@@ -26,6 +26,13 @@ without an entry here is not done.
   after midnight; disabled Arcade supplies cannot trigger a new emergency ascent.
   Reason: mode routing, streak and live-switch regressions. Arcade remains the
   default, and hull/site access changes still apply on the next dive. No cuts.
+- Phase F, F-VERIFY-420: replace title/shell fixed sleeps with frame-counted
+  observations and wait for the optional title loader's fallback warning before
+  checking its outcome. Reason: wall time alone can sample an unprocessed frame
+  under software-WebGL load. Clarified title renderer restoration, static redraws
+  and embedded globe visibility in the architecture notes; runtime fill mutation
+  confirms Titanic's readability floors fail without fill. No gameplay or visual
+  changes; browser verification is blocked by sandbox localhost restrictions.
 
 - Great Blue Hole: the wall now shows limestone strata (shader rock banding via a new biome `strata` option, plus concentric shelves in the carve), four scooped wall alcoves, floor blocks and a second stalactite alcove (`karst-grotto-east`) on the south-east ledge; the grotto's apron and shelf tops are mottled tan and grey instead of flat cream, the terrain patch colours are less bright, and boulders scatter on the floor too (f-bluehole-wall).
 

@@ -1,6 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { waitForFrames } from './helpers/frames.js';
 
 const shots = '.cache/codex/shots/d-shell';
 
@@ -102,7 +103,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.globe.is-embedded')).toBeHidden();
   const atHome = await pose(page);
   await page.keyboard.down('w');
-  await page.waitForTimeout(400);
+  await waitForFrames(page, 8, 400);
   await page.keyboard.up('w');
   expect(await pose(page)).toEqual(atHome);
   await page.screenshot({ path: `${shots}/home-1280.png` });
@@ -150,7 +151,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.pause-menu')).toBeVisible();
   const paused = await pose(page);
   await page.keyboard.down('w');
-  await page.waitForTimeout(400);
+  await waitForFrames(page, 8, 400);
   await page.keyboard.up('w');
   expect(await pose(page)).toEqual(paused);
   await page.screenshot({ path: `${shots}/pause-menu.png` });
@@ -180,7 +181,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   expect(new URL(page.url()).search).toBe('');
   await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled();
   const homeAgain = await pose(page);
-  await page.waitForTimeout(400);
+  await waitForFrames(page, 8, 400);
   expect(await pose(page)).toEqual(homeAgain);
 });
 
