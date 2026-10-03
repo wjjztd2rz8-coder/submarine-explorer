@@ -8,7 +8,7 @@ Run `tools/golden.sh` at the start of any run that merged visual work. Compare a
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
-1. **Monterey canyon polish (walls merged, golden 195811 reads as a canyon):** make the west wall visible at spawn, shrink/darken the wall sponges (pale cups at close range), add a depth fall-off.
+1. **Monterey golden poses 2/3:** after the polish merge (inward flanks, far wall, subtler sponges) the auto-chosen golden poses 2 and 3 look at wall backs or open water. Pin them to wall-life views in tools/golden-shots.mjs.
 2. **Lost City surroundings (after Codex 400 merges; it touches props.ts/Spawn.ts):** carbonate rubble and flanges on the small towers, darker ambient, textured slope.
 3. **Blue Hole east grotto shelf tops and spawn pose:** shelf tops are large pale slabs; add a golden pose for the east alcove; reduce the empty water-surface view at spawn.
 4. **Beebe plume variety:** per-vent width and lean, lit hot-water haze above orifices, a bent plume in the current.

@@ -320,3 +320,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Codex still at its 5% floor until 15:45; worktrees 390/395/400 hold uncommitted finished work and resume after the reset. 8 briefs queued. No Claude agent running.
 - Next Claude candidates: Lost City surroundings (after 400 merges), toast placement (after 395 merges, both touch HUD/props), Titanic far-field lift.
 - Needs owner: nothing.
+
+## 2026-10-03 comprehensive review + headless run (started ~14:58)
+
+- Review recorded in plan/REVIEWS.md (golden 2026-10-03-195811: Monterey +1, Blue Hole +1). DIRECTOR priorities refreshed; 8 Codex briefs queued.
+- Merged Claude/Sonnet F-MONTEREY-POLISH: flanks face inward, far wall for depth, subtler/varied sponges. Shot 1 clearly better; golden poses 2/3 now auto-pick wall backs (follow-up pinned in DIRECTOR). Smoke + project-base green on main; full-e2e not run, no tag, not pushed beyond the review commit.
+- Codex at 5% floor until 15:45; worktrees 390/395/400 resume then. Lost City surroundings and toast placement wait on 400/395 (file overlap).
+- Needs owner: nothing.
