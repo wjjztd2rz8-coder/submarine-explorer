@@ -23,6 +23,8 @@ The owner treats this as a curiosity project about how far current models and wo
   - **Both:** the "Something to scan is in range" hint duplicates the scan-target panel; show one, not both.
   - Capture a fresh golden set at the start of the next run and compare.
 
+- **2026-10-02 20:10** (reviewed F-TITANIC-2 shots): Titanic now opens broadside at 70 m chase with rails/portholes readable; sub covers a slice of the upper deck (acceptable). Blue Hole halocline haze and lighter walls work. Still open: golden-run comparison (Codex f-golden-run), Lost City fresh check, Blue Hole grotto prop size verified only by geometry.
+
 ## Review rubric (every package, before merge)
 
 - **Readable in the first 10 s:** you can see the sub, the seabed and something interesting.

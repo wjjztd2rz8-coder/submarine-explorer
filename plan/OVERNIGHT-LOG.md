@@ -124,3 +124,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged: F-BUGHUNT-3 audit note only (no code). It found three P1s: live Realistic switch can breach the sub at a deep Arcade opening, locked Realistic link spawns below crush depth, Monterey opening distance (may already be fixed), plus Daily Low-light missing ROV lamps.
 - Queued for Codex: 80-f-bughunt-3-fixes, 85-f-golden-run (golden-shots.mjs crashed when I ran it), 90-f-hint-dedupe. Running: f-hero-verify, f-bughunt-4, f-perf-budget.
 - No Claude agents spawned; golden-shot comparison deferred to Codex. Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-02 20:30 headless run
+
+- Merged: F-HERO-VERIFY (Codex: Blue Hole grotto doubled, Lost City ambientFill 8, Low-tier reef ambient parity), F-PERF-BUDGET (Codex: tools/perf-budget.mjs and tests; no rendered measurements yet because the Codex sandbox blocks Chromium, so run it on the host), F-TITANIC-2 (Sonnet: broadside 70 m opening, bed fix, Blue Hole halocline haze).
+- Running (Codex): f-bughunt-3-fixes, f-bughunt-4, f-golden-run. Queued: 90-f-hint-dedupe, 100-f-a11y-audit, 110-f-journal-factcheck, 120-f-save-soak.
+- Note: the gates e2e takes >10 min with two in parallel; ran sequentially on main.
+- Still needs owner: brand name OK (Bathyline).
