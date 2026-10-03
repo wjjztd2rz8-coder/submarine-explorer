@@ -133,8 +133,12 @@ export const BIOMES: Record<string, Biome> = {
   // Soft pale ooze: low-contrast so the wreck is the subject and the bed never reads black.
   titanic: {
     ...ABYSSAL,
+    // Same texture in both slots and a faint patch/stain: no pale blotches on the low tier.
+    b: 'silt',
+    patch: 0.12,
+    stainAmount: 0.05,
     colorA: 0x4f4a43,
-    colorB: 0x575248,
+    colorB: 0x524d45,
     colorC: 0x3e3b37,
     contrast: 0.6,
     detail: 0.6,
