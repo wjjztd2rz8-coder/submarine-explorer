@@ -67,6 +67,23 @@ without an entry here is not done.
 - Phase F, F-LOSTCITY-MIP-VERIFY: add a reproducible before/after terrain shader
   capture and luminance report for all five hero sites on High, Medium and Low;
   visual sign-off remains pending because this sandbox cannot run a browser.
+- Phase F, F-BUGHUNT-9 follow-up: compact landscape sonar bounds tall tile
+  canvases above the stick with an 8 px gap at 667×375, preserving map aspect
+  and 44 px zoom targets at 80%, 100% and 150% UI scales.
+- Phase F, F-BUGHUNT-9: late audio visibility suspend/resume completions now
+  reconcile with the current pause/hidden state, keeping the clock frozen in
+  hidden tabs and restoring playback on return, including saved mute.
+- Phase F, F-BUGHUNT-9: online navigation preserves the installed offline HTML
+  and its precached chunks while a newer deployment's worker is still installing.
+- Phase F, F-BUGHUNT-9: new deployment caches reload mutable assets from the
+  network instead of copying stale files from the browser's HTTP cache.
+- Phase F, F-BUGHUNT-9: tile-index requests with query parameters retain catalog
+  revalidation, and catalog refreshes bypass stale HTTP-cache responses.
+- Phase F, F-BUGHUNT-9: narrow landscape tutorial cards stack text and buttons
+  with scan-panel clearance at 667×375; redundant progress dots are hidden there
+  so the step count and instructions have room.
+- Phase F, F-BUGHUNT-9: expanded landscape sonar reserves the touch buttons
+  and Pause slot at both 667×375 and 844×390.
 - Phase F, F-LOSTCITY-4: the seabed albedo no longer aliases into a regular
   houndstooth/checker on distant and grazing slopes (most visible at Lost City).
   `terrain.frag.glsl` applies a distance-driven mip bias (0 within 3 m, +3 mips

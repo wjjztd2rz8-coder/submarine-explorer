@@ -188,16 +188,22 @@ export class AudioSystem {
 
   private syncPlayback(): void {
     if (!this.engine || this.disposed) return;
-    if (this.playbackBlocked) {
+    const blocked = this.playbackBlocked;
+    // Visibility and shell transitions can reverse while suspend/resume is
+    // pending. Reconcile either completion against the latest desired state.
+    const reconcile = (): void => {
+      if (!this.disposed && blocked !== this.playbackBlocked) this.syncPlayback();
+    };
+    if (blocked) {
       // Silence synchronously, including when a resume promise is still pending.
       this.engine.master.gain.cancelScheduledValues(this.engine.ctx.currentTime);
       this.engine.master.gain.value = 0;
       for (const timer of this.echoes) window.clearTimeout(timer);
       this.echoes.clear();
-      void this.engine.ctx.suspend().catch(() => {});
+      void this.engine.ctx.suspend().then(reconcile, () => {});
     } else {
       this.setSettings(this.settings);
-      void this.engine.ctx.resume().catch(() => {});
+      void this.engine.ctx.resume().then(reconcile, () => {});
     }
   }
 
