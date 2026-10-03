@@ -188,3 +188,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Codex 5h was 16% (resets 05:22), so nothing launched. Queued: 220-f-bughunt-8-touch-regress, 230-f-ci-split, 240-f-title-scene-brief, 250-f-bughunt-9-audio-mobile-regress.
 - Open: fresh golden set (needs host), Lost City far terrain may read bland now.
 - Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-03 headless run (started ~03:45)
+
+- Nothing merged or launched: no worktrees, main clean and pushed. Codex 5h was 16% (resets 05:22), and the next big Claude package (F3-BRAND-UI) is blocked on the Codex spec 240-f-title-scene-brief; hero-site polish is all merged.
+- Queued for Codex (4): 220-f-bughunt-8-touch-regress, 230-f-ci-split, 240-f-title-scene-brief, 250-f-bughunt-9-audio-mobile-regress.
+- Next Claude run: once 240 lands, split the spec into Sonnet-sized brand/title packages; also compare a fresh golden set (needs host).
+- Still needs owner: brand name OK (Bathyline).
