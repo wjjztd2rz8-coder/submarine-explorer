@@ -55,15 +55,18 @@ function isoOr(v: unknown, fallback: string): string {
   return typeof v === 'string' && !Number.isNaN(Date.parse(v)) ? v : fallback;
 }
 
+/** Counters must survive arithmetic and JSON round trips without overflow. */
+function counter(value: number): number {
+  return Math.min(Number.MAX_SAFE_INTEGER, Math.floor(value));
+}
+
 function sanitizeRecord(v: unknown, fallbackAt: string): DiscoveryRecord | null {
   if (v === true) return { at: fallbackAt, count: 1 };
   if (typeof v === 'string') return { at: isoOr(v, fallbackAt), count: 1 };
   if (typeof v !== 'object' || v === null || Array.isArray(v)) return null;
   const o = v as Record<string, unknown>;
   const count =
-    typeof o.count === 'number' && Number.isFinite(o.count) && o.count >= 1
-      ? Math.floor(o.count)
-      : 1;
+    typeof o.count === 'number' && Number.isFinite(o.count) && o.count >= 1 ? counter(o.count) : 1;
   return { at: isoOr(o.at ?? o.first ?? o.time, fallbackAt), count };
 }
 
@@ -105,13 +108,13 @@ export function migrate(raw: unknown, fallbackAt = new Date().toISOString()): Di
     if (typeof s === 'object' && s !== null) {
       const so = s as Record<string, unknown>;
       if (typeof so.scans === 'number' && Number.isFinite(so.scans) && so.scans >= 0)
-        out.stats.scans = Math.floor(so.scans);
+        out.stats.scans = counter(so.scans);
       if (typeof so.firstAt === 'string') out.stats.firstAt = isoOr(so.firstAt, fallbackAt);
     }
   }
   // Keep stats consistent with the records they summarise.
   const records = Object.values(out.discovered);
-  const minScans = records.reduce((n, r) => n + r.count, 0);
+  const minScans = records.reduce((n, r) => counter(n + r.count), 0);
   if (out.stats.scans < minScans) out.stats.scans = minScans;
   if (!out.stats.firstAt && records.length) {
     out.stats.firstAt = records.map((r) => r.at).sort()[0];
@@ -171,14 +174,14 @@ export class DiscoveryStore {
     const at = this.now().toISOString();
     let record: DiscoveryRecord;
     if (existing) {
-      existing.count += 1;
+      existing.count = counter(existing.count + 1);
       record = existing;
     } else {
       record = { at, count: 1 };
       this.data.discovered[key] = record;
       if (!this.data.stats.firstAt) this.data.stats.firstAt = at;
     }
-    this.data.stats.scans += 1;
+    this.data.stats.scans = counter(this.data.stats.scans + 1);
     this.save();
     return { firstTime: !existing, record: { ...record } };
   }
