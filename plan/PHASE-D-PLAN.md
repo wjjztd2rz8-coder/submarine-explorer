@@ -252,14 +252,17 @@ which pins schemas, settings keys, events and file ownership.
 - **How each package runs.** The orchestrator launches each package with
   `tools/codex-task.sh <brief> <name>` as a background job, so its completion
   re-invokes the orchestrator in the owner's thread. The script:
-  - runs `tools/gates.sh` (every gate, including e2e) outside Codex's sandbox
+  - runs `tools/gates.sh` (static, smoke e2e and project-base) outside Codex's
+    sandbox; launch with `FULL_E2E=1 tools/codex-task.sh <brief> <name>` for
+    full e2e and package screenshots
   - feeds failures and screenshots back into the same Codex session, for up
     to 3 rounds
   - sleeps through Codex usage limits
 - **Reviewing results.** The orchestrator reviews the diff, fixes small issues
   or sends a follow-up brief, commits at green, and launches the next package.
 - **Screenshots.** Packages that change UI write PNGs to
-  `.cache/codex/shots/<name>/` from a Playwright spec. The script attaches
-  them so Codex sees its own UI, and the orchestrator looks at them before
+  `.cache/codex/shots/<name>/` from a Playwright spec. Use `FULL_E2E=1` so the
+  feedback gate executes that spec and generates fresh evidence. The script
+  attaches them so Codex sees its own UI, and the orchestrator looks at them before
   committing.
 - **Not without the owner:** no pushes, no repo creation.

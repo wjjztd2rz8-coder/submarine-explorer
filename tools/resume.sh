@@ -34,6 +34,7 @@ if [[ "${1:-}" == "--headless" ]] && ! { ai-limits > .cache/resume-gate.txt 2>&1
   log_skip "budget gate ($(head -2 .cache/resume-gate.txt | tr '\n' ' '))"; exit 0
 fi
 echo "== state =="; git log --oneline -3; git status --short | head -20
+# The prompt distinguishes routine smoke feedback from full screenshot/release gates.
 PROMPT="$(cat plan/RESUME-PROMPT.md)"
 if [[ "${1:-}" == "--headless" ]]; then
   # stream-json logs every step as it happens, so tools/status.sh can show live progress.

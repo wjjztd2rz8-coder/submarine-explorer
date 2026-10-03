@@ -5,6 +5,9 @@
 # feeds failures (and any screenshots) back into the same Codex session.
 #
 # Usage: tools/codex-task.sh <brief.md> <name> [max_rounds=3]
+# Local feedback runs static gates, smoke e2e and project-base by default.
+# Set FULL_E2E=1 for full regression feedback and package screenshots.
+# A nonempty CI also selects the full suite through tools/gates.sh.
 # Output: .cache/codex/<name>-result.md  (Codex's last message + gate summary)
 #         .cache/codex/<name>.log        (full Codex log)
 # Screenshots: if the brief's work writes PNGs to .cache/codex/shots/<name>/,
@@ -22,6 +25,12 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 model="${CODEX_MODEL:-$(tools/codex-model.sh)}"
 export PATH="$HOME/.local/node/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
+gate_cmd=(tools/gates.sh)
+case "${FULL_E2E:-0}" in
+  0) ;;
+  1) gate_cmd+=(--full-e2e) ;;
+  *) echo 'FULL_E2E must be 0 or 1.' >&2; exit 1 ;;
+esac
 brief="$1"; name="$2"; max_rounds="${3:-3}"
 dir="$PWD/.cache/codex"; mkdir -p "$dir/shots/$name"
 brief="$(realpath "$brief")"
@@ -82,19 +91,19 @@ session="${SESSION:-}"   # SESSION=<id> resumes an earlier Codex session (follow
 run_codex "$dir/$name-r1.log" "$(cat "$brief")"
 round=1; status=FAIL
 while :; do
-  gates=$(tools/gates.sh 2>&1); gstat=$?
+  gates=$("${gate_cmd[@]}" 2>&1); gstat=$?
   if (( gstat == 0 )); then status=PASS; break; fi
   (( round >= max_rounds )) && break
   round=$((round + 1))
   shots=(); while IFS= read -r f; do shots+=("$f"); done < <(ls -t "$dir/shots/$name"/*.png 2>/dev/null | head -6)
-  run_codex "$dir/$name-r$round.log" "The orchestrator ran tools/gates.sh outside your sandbox (it can run Vite and Chromium; you cannot). Fix the root causes without weakening assertions, then reply with the same report format as before. Gate output:
+  run_codex "$dir/$name-r$round.log" "The orchestrator ran ${gate_cmd[*]} outside your sandbox (it can run Vite and Chromium; you cannot). Fix the root causes without weakening assertions, then reply with the same report format as before. Gate output:
 
 $gates" "${shots[@]}"
 done
 {
   echo "# codex-task $name — gates $status after $round round(s) — $(date)"
   echo "session: $session"
-  echo; echo "## Gate summary"; echo '```'; echo "$gates" | grep -E '^(PASS|FAIL)'; echo '```'
+  echo; echo "## Gate summary"; echo '```'; echo "$gates" | grep -E '^(PASS|FAIL|E2E mode:)'; echo '```'
   echo; echo "## Codex's final report"; cat "$last" 2>/dev/null
 } > "$result"
 echo "codex-task $name finished: gates $status after $round round(s). Result: $result"

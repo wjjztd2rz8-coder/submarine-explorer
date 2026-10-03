@@ -14,7 +14,7 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** Extend settings save/physics units for migration, math and profile switch; add e2e preset reload/custom switch and visual differences. Keep `tests/e2e/settings.spec.ts` passing after schema change. Screenshot `d-modes/arcade-settings.png`, `realistic-settings.png`, `enhanced-lights.png` from the e2e spec.
 
-**Process/report:** Run through `tools/codex-task.sh`; its `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; its `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
 
 ## D-CONTENT — objective hints
 
@@ -28,7 +28,7 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** Add Python validator tests for invalid hints; run the content gate through the loop. No screenshot (data-only package).
 
-**Process/report:** Run through `tools/codex-task.sh`; its `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; its `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
 
 ## D-INPUT+HUD — controls, camera and readable dive HUD
 
@@ -42,7 +42,7 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** Update `mission.spec.ts`, `settings.spec.ts`, `discovery.spec.ts`, `sub-playtest.spec.ts` key expectations. Add unit migration/drag/scale tests and e2e controls/reload/C/fullscreen fallback. Screenshot `d-input-hud/dive.png`, `controls.png`, `scaled-150.png` from gate-run spec.
 
-**Process/report:** Run through `tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
 
 ## D-SHELL — home and pause menu
 
@@ -56,7 +56,7 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** e2e home→site→pause→resume→home, URL bypass, vertical scroll and focus trap; update globe/settings/smoke expectations. Screenshot `d-shell/home.png`, `pause.png`, `sites.png` from gate-run spec.
 
-**Process/report:** Run through `tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
 
 ## D-SCAN — per-dive scan state and visual hints
 
@@ -70,7 +70,7 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** Unit scan suppression/reset and firstTime; e2e scanned/unscanned markers, no rescan, visual-hints toggle and reload. Screenshot `d-scan/waypoint.png`, `scanned.png`, `hints-off.png` from gate-run spec.
 
-**Process/report:** Run through `tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
 
 ## D-START — near-site starts
 
@@ -84,7 +84,7 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** Unit pose, edge/tile/hull clamps and start override parser; e2e near versus surface at deep and shallow sites, override persistence semantics. Update `mission.spec.ts` surface-start expectation. Screenshot `d-start/briefing-choice.png`, `near-site.png`, `surface.png` from gate-run spec.
 
-**Process/report:** Run through `tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
 
 ## D-FLOW — primary completion, debrief and Journal
 
@@ -98,7 +98,7 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** Unit event order/state/restart/storage; e2e primary banner, extra secondary, debrief targets, Journal reload and second dive. Screenshot `d-flow/primaries-complete.png`, `debrief.png`, `journal.png` from gate-run spec.
 
-**Process/report:** Run through `tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
 
 ## D-SONAR — useful POI map
 
@@ -112,7 +112,7 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** Unit projection/zoom/palette ordering and state icons; e2e zoom and objective/scanned icons. Screenshot `d-sonar/default.png`, `zoomed.png`, `high-contrast.png` from gate-run spec.
 
-**Process/report:** Run through `tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
 
 ## D-POWER — optional battery and oxygen
 
@@ -126,7 +126,7 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** Unit conservation/rates/zero and pause; e2e warnings and safe ascent using deterministic debug/test injection. Screenshot `d-power/normal.png`, `low-warning.png` from gate-run spec.
 
-**Process/report:** Run through `tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
 
 ## D-CURRENTS — offline field
 
@@ -140,7 +140,7 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** Unit interpolation/bounds/missing field; Python grid validation; e2e off/gentle/realistic difference. Screenshot `d-currents/off.png`, `realistic.png` from gate-run spec.
 
-**Process/report:** Run through `tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
 
 ## D-ROV — tethered scanner
 
@@ -154,7 +154,7 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** Unit tether/return and duplicate-scan behavior; e2e deploy→scan→retrieve, pause safety. Screenshot `d-rov/deployed.png`, `scan.png` from gate-run spec.
 
-**Process/report:** Run through `tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
 
 ## D-PHOTO — Journal gallery
 
@@ -168,4 +168,4 @@ Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.
 
 **Tests:** Unit metadata/store/quota; e2e capture→Journal→reload, photo-freeze/restore. Screenshot `d-photo/camera.png`, `gallery.png` from gate-run spec.
 
-**Process/report:** Run through `tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.
+**Process/report:** Run through `FULL_E2E=1 tools/codex-task.sh`; `tools/gates.sh` runs build, unit, Python, content, attribution, Prettier and full e2e outside your sandbox. You cannot run Vite or Playwright yourself; use gate feedback. Do not git commit. Report under 400 words: what changed; how to see it; checks run; deviations.

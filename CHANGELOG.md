@@ -14,6 +14,9 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BUGHUNT-11: `FULL_E2E=1 tools/codex-task.sh` opts into full
+  browser feedback and package screenshots; task summaries retain the selected
+  e2e mode. Resume instructions require explicit full gates before release pushes.
 - Phase F, F-TITLE-B/C: added the (not yet wired) Bathyline title scene
   modules: `src/render/title/TitleTerrain.ts` crops a 2,400 m real GMRT
   Monterey Canyon square, and `TitleScene.ts` composes the research sub, lamps,

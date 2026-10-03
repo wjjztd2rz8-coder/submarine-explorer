@@ -114,7 +114,7 @@ npm run build -- --outDir dist-mip-verify
 npm run preview -- --port 4260 --strictPort --outDir dist-mip-verify
 # In a second terminal:
 node tools/terrain-mip-verify.mjs http://localhost:4260/ .cache/mip-verify
-PW_PORT=4261 tools/gates.sh
+PW_PORT=4261 tools/gates.sh --full-e2e
 ```
 
 If the baseline ref is missing from a shallow clone, supply its exact shader
