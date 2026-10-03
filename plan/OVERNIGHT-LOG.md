@@ -281,3 +281,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged (full-e2e gates green on main): Codex 350 (CI red fix: crush-depth and preset e2e stabilised, unverified on the runner until the next CI run) and 340 (1200x630 share image + og/twitter meta). Pushed.
 - Running Codex: 330, 360, 370. Queued: 380, 390 (verify CI/share), 395 (touch/HUD bughunt). No Claude agents (no unblocked visual package; Claude 5h ~70%).
 - Needs owner: brand name OK (Bathyline); the share image uses the draft "P"-like mark; fresh golden set still needs a browser host.
+
+## 2026-10-03 headless run (started ~11:45)
+
+- Merged: Codex 330 (title lifecycle/render-state restore, offline title assets) and 370 (square viewports use short-landscape). Full-e2e on main: 261 pass, 1 fail (f3-onboard touch PHOTO step poll under load with 3 Codex tasks running); passes 2/2 in isolation, treated as load flake. Pushed, tagged f14. CI on main was still red before this push (390 is verifying).
+- Running Codex: 360, 380, 390. Queued: 395, 400 (Lost City readability), 410 (modes bughunt). No Claude agents (no unblocked visual package).
+- Needs owner: brand name OK (Bathyline); fresh golden set still needs a browser host.
