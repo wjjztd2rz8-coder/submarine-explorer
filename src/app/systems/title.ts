@@ -60,6 +60,11 @@ export function createTitleSystem(): GameSystem {
   let vw = 0;
   let vh = 0;
   let layout: TitleLayout | null = null;
+  let pixelRatio = 0;
+  let titleExposure = 1;
+  let presentationDirty = true;
+  let appliedTier: TitleTier | null = null;
+  let appliedReduced: boolean | null = null;
 
   const homeVisible = (ctx: GameContext): boolean => ctx.app.state === 'home' && ctx.home.isOpen;
   const covered = (ctx: GameContext): boolean =>
@@ -93,20 +98,39 @@ export function createTitleSystem(): GameSystem {
     },
     present(renderer) {
       if (!ctxRef || !scene) return;
-      if (active) {
-        cleared = false;
-        scene.draw(renderer);
-        return;
-      }
-      // Sites view: the globe is the image. Clear the shared canvas once.
-      if (ctxRef.home.sitesOpen && !cleared) {
-        const color = renderer.getClearColor(new THREE.Color());
-        const alpha = renderer.getClearAlpha();
+      if (active && !scene.animated && !presentationDirty) return;
+      if (!active && (!ctxRef.home.sitesOpen || cleared || document.hidden)) return;
+      // Gameplay may have left an offscreen target or depth-dependent exposure.
+      // The title always presents to the canvas with the boot exposure.
+      const target = renderer.getRenderTarget();
+      const exposure = renderer.toneMappingExposure;
+      const color = renderer.getClearColor(new THREE.Color());
+      const alpha = renderer.getClearAlpha();
+      const viewport = renderer.getViewport(new THREE.Vector4());
+      const scissor = renderer.getScissor(new THREE.Vector4());
+      const scissorTest = renderer.getScissorTest();
+      try {
         renderer.setRenderTarget(null);
-        renderer.setClearColor(NAVY, 1);
-        renderer.clear();
-        renderer.setClearColor(color, alpha);
+        renderer.toneMappingExposure = titleExposure;
+        if (!cleared) {
+          // Clear the entire canvas on entry/resize, including outside the hero.
+          renderer.setScissorTest(false);
+          renderer.setClearColor(NAVY, 1);
+          renderer.clear();
+        }
+        if (active) {
+          scene.draw(renderer);
+          presentationDirty = false;
+        }
         cleared = true;
+      } finally {
+        renderer.toneMappingExposure = exposure;
+        renderer.setClearColor(color, alpha);
+        renderer.setViewport(viewport.x, viewport.y, viewport.z, viewport.w);
+        renderer.setScissor(scissor.x, scissor.y, scissor.z, scissor.w);
+        renderer.setScissorTest(scissorTest);
+        // Restore last: offscreen targets have their own GL viewport/scissor.
+        renderer.setRenderTarget(target);
       }
     },
   };
@@ -118,11 +142,13 @@ export function createTitleSystem(): GameSystem {
     // After the first frame so the load never competes with `__gameReady`.
     if (!loadStarted) {
       loadStarted = true;
-      setTimeout(() => void loadCrop(ctx), 0);
+      const timer = setTimeout(() => void loadCrop(ctx), 0);
+      cleanup.add(() => clearTimeout(timer));
     }
   };
 
   const loadCrop = async (ctx: GameContext): Promise<void> => {
+    if (disposed) return;
     try {
       const crop =
         ctx.meta.id === MONTEREY_TILE
@@ -133,9 +159,11 @@ export function createTitleSystem(): GameSystem {
         return;
       }
       scene.setCrop(crop);
+      presentationDirty = true;
       terrainReady = true;
       ctx.home.setSceneCaption(true);
     } catch (error) {
+      if (disposed) return;
       terrainReady = false;
       console.warn('[title] Monterey preview unavailable; using the fallback shot.', error);
     }
@@ -145,9 +173,10 @@ export function createTitleSystem(): GameSystem {
     const should =
       homeVisible(ctx) && !ctx.home.sitesOpen && !covered(ctx) && !document.hidden && !!scene;
     active = should;
+    if (should !== wasActive) cleared = false;
     if (should && !wasActive) {
-      cleared = false;
       scene?.invalidate();
+      presentationDirty = true;
     }
     wasActive = should;
   };
@@ -156,6 +185,15 @@ export function createTitleSystem(): GameSystem {
     name: 'title',
     init(ctx) {
       ctxRef = ctx;
+      titleExposure = ctx.renderer.toneMappingExposure;
+      cleanup.listen(window, 'resize', () => {
+        cleared = false;
+        scene?.invalidate();
+        presentationDirty = true;
+      });
+      cleanup.listen(document, 'visibilitychange', () => {
+        reconcile(ctx);
+      });
       ctx.titleScene = bridge;
       ctx.expose({
         get titleScene() {
@@ -179,18 +217,41 @@ export function createTitleSystem(): GameSystem {
     frame: {
       'render.prepare': (f, ctx) => {
         reconcile(ctx);
+        // The selector's CSS hides its globe on exceptionally short screens.
+        // Stop that renderer as well; CSS alone leaves its update loop drawing.
+        if (ctx.homeGlobe && homeVisible(ctx) && ctx.home.sitesOpen) {
+          ctx.home.sizeGlobeTargets();
+          const visible =
+            !document.hidden && !covered(ctx) && ctx.home.globeSlot.getClientRects().length > 0;
+          if (visible) ctx.homeGlobe.open('api');
+          else ctx.homeGlobe.close();
+        }
         if (!scene || !active) return;
         const w = window.innerWidth;
         const h = window.innerHeight;
         const next = titleLayout(w, h);
         if (w !== vw || h !== vh || next !== layout) {
+          cleared = false;
+          presentationDirty = true;
           vw = w;
           vh = h;
           layout = next;
           scene.resize(w, h, next);
         }
-        scene.setQuality(titleTier(ctx.tier));
-        scene.setReducedMotion(ctx.rig.reduceMotion);
+        const nextPixelRatio = ctx.renderer.getPixelRatio();
+        if (nextPixelRatio !== pixelRatio) {
+          pixelRatio = nextPixelRatio;
+          cleared = false;
+          scene.invalidate();
+          presentationDirty = true;
+        }
+        const nextTier = titleTier(ctx.tier);
+        const nextReduced = ctx.rig.reduceMotion;
+        if (nextTier !== appliedTier || nextReduced !== appliedReduced) presentationDirty = true;
+        appliedTier = nextTier;
+        appliedReduced = nextReduced;
+        scene.setQuality(nextTier);
+        scene.setReducedMotion(nextReduced);
         scene.update(f.dt);
       },
     },
@@ -201,6 +262,8 @@ export function createTitleSystem(): GameSystem {
       scene?.dispose();
       scene = null;
       active = false;
+      terrainReady = false;
+      ctxRef = null;
     },
   };
 }

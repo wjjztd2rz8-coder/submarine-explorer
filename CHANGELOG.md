@@ -14,6 +14,17 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BUGHUNT-13: isolate title canvas target/exposure and restore renderer
+  state after quit-to-home; refresh static frames after resize, DPR and tab restore,
+  and cancel deferred title loading on teardown. Reduced-motion home stays idle
+  between dirty events, including avoiding renderer state calls.
+- Phase F, F-BUGHUNT-13: redirect focus from a rejected saved Continue to Dive
+  sites; expand home globe pin hit areas to 48 px without changing the dots, and
+  stop its renderer when the short-screen layout hides the selector preview.
+- Phase F, F-BUGHUNT-13: precache title fonts, both marks and the Monterey tile at
+  root/project bases; optional fetch failures preserve usable shell installation.
+  Added unit regressions and root/project-base title acceptance browser tests; the
+  motion audit matches the full Settings label and verifies both saved values.
 - Phase F, F-BUGHUNT-12: title navigation lights stay steady in animated and
   reduced-motion scenes, including after quality changes.
 - Phase F, F-BUGHUNT-12: downward title vehicle hover respects the title floor

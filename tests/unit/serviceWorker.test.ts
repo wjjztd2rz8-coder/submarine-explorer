@@ -24,7 +24,12 @@ function worker(scope = defaultScope, active = true) {
       return {
         match: async (request: Request | string) => values.get(keyOf(request))?.clone(),
         put: (request: Request | string, response: Response) => put(values, request, response),
-        add,
+        add: async (request: Request) => {
+          await add(request);
+          const response = await fetch(request);
+          if (!response.ok) throw new Error('precache unavailable');
+          await put(values, request, response);
+        },
       };
     }),
     keys: async () => [...entries.keys()],
@@ -224,6 +229,68 @@ describe('offline service worker', () => {
     await Promise.all(sw.dispatch('activate').pending);
     expect(await sw.caches.keys()).toEqual(keep);
     expect(sw.self.clients.claim).toHaveBeenCalledOnce();
+  });
+
+  it.each(['https://example.test/', defaultScope])(
+    'precaches title fonts, marks and Monterey for offline use at %s',
+    async (scope) => {
+      const sw = worker(scope);
+      const assets = [
+        'fonts/dm-sans-latin-400-normal.woff2',
+        'fonts/dm-sans-latin-600-normal.woff2',
+        'fonts/source-serif-4-latin-600-normal.woff2',
+        'bathyline-mark.svg',
+        'bathyline-mark-small.svg',
+      ];
+      const tiles = ['meta.json', 'heightmap.bin'].map(
+        (name) => `data/tiles/monterey-canyon/${name}`,
+      );
+      await Promise.all(sw.dispatch('install').pending);
+      for (const path of [...assets, ...tiles]) {
+        expect(readFileSync(`public/${path}`).byteLength).toBeGreaterThan(0);
+        expect(
+          sw.add.mock.calls.some(
+            ([request]) => request.url === `${scope}${path}` && request.cache === 'reload',
+          ),
+        ).toBe(true);
+        const cacheName = tiles.includes(path) ? 'subexp-tiles-v1' : `${sw.prefix}shell-test`;
+        expect(sw.entries.get(cacheName)!.has(`${scope}${path}`)).toBe(true);
+      }
+      await Promise.all(sw.dispatch('activate').pending);
+      sw.fetch.mockClear();
+      sw.fetch.mockRejectedValue(new Error('offline'));
+      for (const path of [...assets, ...tiles]) {
+        expect(
+          await (await sw.dispatch('fetch', new Request(`${scope}${path}`)).response!).text(),
+        ).toBe('fresh');
+      }
+      expect(sw.fetch).not.toHaveBeenCalled();
+    },
+  );
+
+  it('installs the usable shell even when optional title requests are blocked', async () => {
+    const sw = worker();
+    sw.fetch.mockImplementation(async (request) => {
+      if (/\/(fonts|bathyline-mark|data\/tiles\/monterey-canyon)/.test(request.url))
+        throw new Error('blocked title request');
+      return new Response('shell');
+    });
+    await Promise.all(sw.dispatch('install').pending);
+    expect(sw.self.skipWaiting).toHaveBeenCalledOnce();
+    sw.fetch.mockRejectedValue(new Error('offline'));
+    expect(await (await sw.dispatch('fetch', new Request(defaultScope)).response!).text()).toBe(
+      'shell',
+    );
+  });
+
+  it('reuses immutable Monterey files across worker installs', async () => {
+    const sw = worker();
+    for (const file of ['meta.json', 'heightmap.bin'])
+      await sw.seed('tiles-v1', `data/tiles/monterey-canyon/${file}`, 'existing tile');
+    await Promise.all(sw.dispatch('install').pending);
+    expect(
+      sw.add.mock.calls.filter(([request]) => request.url.includes('/monterey-canyon/')),
+    ).toEqual([]);
   });
 
   it('passes cross-origin, outside-scope, non-GET and range requests through', () => {
