@@ -5,10 +5,14 @@ import { expect, test } from './helpers/unlocked.js';
 const shots = '.cache/codex/shots/f-content-fix';
 
 for (const site of [
-  { id: 'great-blue-hole', text: 'This dive follows Lighthouse Reef', entry: 'overview' },
+  {
+    id: 'great-blue-hole',
+    text: 'The flooded limestone sinkhole is about 320 m wide',
+    entry: 'overview',
+  },
   { id: 'hunga-tonga-caldera', text: 'before the 15 January 2022 eruption', entry: 'overview' },
   { id: 'bismarck', text: 'roughly 570 m gap', entry: 'overview' },
-  { id: 'lost-city', text: 'It emerges clear', entry: 'overview' },
+  { id: 'lost-city', text: 'The fluid emerges clear', entry: 'overview' },
   { id: 'beebe-vent-field', text: 'roughly 500 bar', entry: 'vents' },
   { id: 'blake-plateau-corals', text: 'naturally white', entry: 'coral-thicket' },
 ]) {
@@ -70,7 +74,7 @@ test('Lost City mission and free dive both retain clear flow', async ({ page }) 
       smoke: null,
       strength: 0.03,
       lights: 0,
-      particles: 15,
+      particles: 36, // 3 shimmer sprites at each of the 12 chimneys
     });
     await page.screenshot({
       path: `${shots}/lost-city-${url.includes('mission=') ? 'mission' : 'free-dive'}.png`,

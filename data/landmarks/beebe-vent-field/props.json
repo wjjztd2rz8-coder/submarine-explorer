@@ -46,7 +46,7 @@
       "lod_distance_m": 700,
       "collision": "box",
       "reconstruction": true,
-      "note": "Chimney on the western sulfide mound (bvf-sulfide-mound-west POI), representing one of the seven mounds mapped by Webber et al. (2015). Reconstruction: general mound location and count are sourced, this specific chimney's shape is not."
+      "note": "Chimney on the western sulfide mound (bvf-sulfide-mound-west POI), representing one of at least six mounds mapped by Webber et al. (2015). Reconstruction: general mound location and count are sourced, this specific chimney's shape is not."
     }
   ]
 }

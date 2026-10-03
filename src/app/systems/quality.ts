@@ -31,6 +31,11 @@ export interface PerfStats {
   /** `pixelRatio / maxPixelRatio`: 1 at full resolution. */
   readonly resolutionScale: number;
   readonly dynamicResolution: boolean;
+  /** Objects attached to the main scene, including hidden meshes and groups. */
+  readonly sceneObjects: number;
+  /** Live renderer allocations; useful for restart/reload soak comparisons. */
+  readonly geometries: number;
+  readonly textures: number;
 }
 
 /** Is dynamic resolution on for this dive? */
@@ -78,6 +83,17 @@ export function createQualitySystem(): GameSystem {
           return renderer.getPixelRatio() / maxPixelRatio;
         },
         dynamicResolution: dynres !== null,
+        get sceneObjects() {
+          let count = 0;
+          ctx.scene.traverse(() => count++);
+          return count;
+        },
+        get geometries() {
+          return renderer.info.memory.geometries;
+        },
+        get textures() {
+          return renderer.info.memory.textures;
+        },
       };
       ctx.expose({ quality, perf });
     },

@@ -6,10 +6,10 @@
       "id": "overview",
       "title": "Lost City Hydrothermal Field",
       "paragraphs": [
-        "The Lost City Hydrothermal Field sits on the southern summit of the Atlantis Massif, a dome-shaped mountain of mantle rock exposed on the Mid-Atlantic Ridge near 30°N. Unlike the famous 'black smoker' vents that run on volcanic heat, Lost City is powered by serpentinization: seawater reacting with olivine-rich mantle rock, producing heat, hydrogen and methane without any magma nearby.",
-        "The field was found on 4 December 2000 by scientists diving in DSV Alvin with the robotic camera sled ArgoII, working from the research vessel Atlantis. Its towering white carbonate chimneys, some over 60 m tall, made it one of the most striking hydrothermal discoveries ever made.",
-        "The vent fluid is warm, around 40–90 °C, and strongly alkaline. It emerges clear rather than carrying the dark mineral particles of a black smoker. Calcium carbonate and brucite build the white towers where this fluid meets seawater.",
-        "NOAA’s 2005 expedition described a field covering about 60,000 square metres. Individual chimneys are smaller than the terrain grid can resolve; their positions here follow nearby terrain in the documented depth range."
+        "The Lost City Hydrothermal Field sits on the southern summit of the Atlantis Massif, a dome-shaped mountain of mantle rock exposed on the Mid-Atlantic Ridge near 30°N. Unlike the famous 'black smoker' vents that run on volcanic heat, Lost City is powered by serpentinization: seawater reacting with olivine-rich mantle rock, producing heat, hydrogen and methane rather than relying on a shallow magma chamber.",
+        "The field was found on 4 December 2000 during an Argo II camera survey from the research vessel Atlantis. The expedition’s scientific leaders were Deborah Kelley, Donna Blackman and Jeffrey Karson. Kelley and Karson visited in DSV Alvin the next day. The white carbonate towers rise as much as 60 m above the seabed.",
+        "The fluid emerges clear and alkaline, depositing calcium carbonate and brucite when it meets seawater. Kelley’s 2005 account reported about 40–91 °C; later measurements at the Beehive outlet reached 96–116 °C.",
+        "NOAA’s 2005 expedition described a field covering about 60,000 square metres. Chimney layouts, scan markers and animal encounters here are game recreations within the field’s documented setting."
       ],
       "facts": [
         {
@@ -18,7 +18,7 @@
         },
         {
           "label": "Discovered",
-          "value": "4 December 2000 (DSV Alvin, RV Atlantis)"
+          "value": "4 December 2000 (Argo II, RV Atlantis); Alvin visit 5 December"
         },
         {
           "label": "Power source",
@@ -26,11 +26,11 @@
         },
         {
           "label": "Fluid temperature",
-          "value": "40-90 degC"
+          "value": "40–91 °C (Kelley 2005); Beehive 96–116 °C (Aquino 2024)"
         },
         {
           "label": "Fluid pH",
-          "value": "over 9 (alkaline)"
+          "value": "9–11 in cooled samples; alkaline"
         },
         {
           "label": "Field extent",
@@ -58,6 +58,18 @@
         {
           "title": "NOAA — Tracking the Plume, Lost City fluid comparison",
           "url": "https://oceanexplorer.noaa.gov/okeanos/explorations/ex1104/background/edu/media/ex1104_tracking.pdf"
+        },
+        {
+          "title": "University of Washington — contemporaneous discovery report, 12 December 2000",
+          "url": "https://www.washington.edu/news/2000/12/12/hydrothermal-vent-system-unlike-any-seen-before-found-in-atlantic/"
+        },
+        {
+          "title": "Kelley 2005 — The Lost City Hydrothermal Field",
+          "url": "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"
+        },
+        {
+          "title": "Aquino et al. 2024 — fluid mixing and spatial geochemical variability",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023GC011011"
         }
       ],
       "confidence": "high"
@@ -66,7 +78,7 @@
       "id": "poseidon",
       "title": "Poseidon, the tallest tower",
       "paragraphs": [
-        "Poseidon is a composite carbonate edifice about 60 m tall and 100 m across. Its adjoining towers, spires and flanges grow as warm vent fluid mixes with cold seawater and deposits minerals.",
+        "Poseidon is a composite carbonate edifice about 60 m tall and 100 m long, with a width of many tens of metres. Its adjoining towers, spires and flanges grow as warm vent fluid mixes with cold seawater and deposits minerals.",
         "Uranium-thorium dating of carbonate samples from across Lost City gives ages up to about 120,000 years. These samples record the field’s long history; they do not date the entire active Poseidon tower.",
         "Because it needs only olivine rock and liquid water, serpentinization like this could in principle happen anywhere those two things meet -- including on icy moons such as Europa or Enceladus, which is one reason Lost City is studied as a possible model for life beyond Earth."
       ],
@@ -82,6 +94,10 @@
         {
           "label": "Built from",
           "value": "calcium carbonate, precipitated from alkaline vent fluid"
+        },
+        {
+          "label": "Length",
+          "value": "about 100 m; width of many tens of metres"
         }
       ],
       "reconstruction": true,
@@ -101,6 +117,10 @@
         {
           "title": "Denny et al. 2016 — Geologic evolution of Lost City",
           "url": "https://repository.library.noaa.gov/view/noaa/59651"
+        },
+        {
+          "title": "Kelley 2005 — measured Poseidon dimensions",
+          "url": "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"
         }
       ],
       "confidence": "medium"
@@ -109,13 +129,17 @@
       "id": "beehive",
       "title": "Beehive",
       "paragraphs": [
-        "Beehive was a small, roughly 1 m high vent on Poseidon's flank. It released some of the hottest fluid measured at Lost City, about 91 degC during earlier surveys. Later researchers reported that the chimney itself was gone by their 2018 visit, although fluid still vented from its former opening.",
+        "Beehive was a small, roughly 1 m high vent on Poseidon's flank. It released some of the hottest fluid measured at Lost City, about 91 °C in Kelley’s 2005 account and 96–116 °C in later measurements reported by Aquino and colleagues in 2024. Later researchers reported that the chimney itself was gone by their 2018 visit, although fluid still vented from its former opening.",
         "Its marker here is offset from Poseidon so you can scan it separately."
       ],
       "facts": [
         {
           "label": "Historical height",
           "value": "about 1 m; structure absent in 2018 survey"
+        },
+        {
+          "label": "Outlet temperature",
+          "value": "96–116 °C (Aquino et al. 2024)"
         }
       ],
       "reconstruction": true,
@@ -139,13 +163,13 @@
       "id": "imax-tower",
       "title": "IMAX Tower",
       "paragraphs": [
-        "IMAX is a parasitic chimney and flange on Poseidon's north face, built as warm, alkaline vent fluid mixed with seawater and deposited carbonate minerals. A 2005 expedition account described the chimney as about 8 m tall; a later detailed geologic survey described a roughly 30 m multipronged structure. Those measurements may refer to different parts of the growing complex.",
+        "IMAX is a parasitic chimney and flange on Poseidon's north face, built as warm, alkaline vent fluid mixed with seawater and deposited carbonate minerals. A 2005 expedition account described the chimney as about 8 m tall; a later detailed geologic survey described a roughly 30 m multipronged structure. The accounts describe different survey views of the complex.",
         "Its perch on Poseidon's flank makes it an easy stop right after the main tower, without a long swim across the field."
       ],
       "facts": [
         {
           "label": "Published heights",
-          "value": "about 8 m (2005 account); roughly 30 m (2016 survey)"
+          "value": "about 8 m (Kelley 2005); roughly 30 m (Denny 2016)"
         }
       ],
       "reconstruction": true,
@@ -170,7 +194,7 @@
       "title": "Microbial life on the chimneys",
       "paragraphs": [
         "Lost City's chimneys are coated inside and out with thick biofilms of archaea and bacteria that live on the vent's own chemistry: hydrogen and methane, produced abiotically by the serpentinization reaction, with almost no help from sunlight or photosynthesis at all. A group of archaea related to the order Methanosarcinales dominates the warmest, most active surfaces.",
-        "Larger animals are scarce compared with a black-smoker field: there are no tubeworms or giant clams here, the signature animals of sulfide vents. Instead, small corals, snails, bivalves, worms and crustaceans graze on the microbial mats and on each other.",
+        "Most of the invertebrates associated with the chimneys are small, often less than a centimetre long. Snails, bivalves, worms and small crustaceans inhabit the structures, alongside microbial biofilms. The dense beds of large tubeworms, mussels and clams familiar from many black-smoker fields are absent.",
         "This POI sits near a real cluster of OBIS occurrence records from a 2003 International Census of Marine Microbes survey of the field -- almost entirely archaea and bacteria identified from DNA, with no reported collection depth."
       ],
       "facts": [
@@ -180,7 +204,7 @@
         },
         {
           "label": "Large fauna",
-          "value": "small corals, snails, bivalves, polychaetes, amphipods, ostracods -- no tubeworms or vent clams"
+          "value": "low biomass; mostly small invertebrates, with occasional larger animals such as wreckfish"
         }
       ],
       "reconstruction": true,
@@ -192,6 +216,10 @@
         {
           "title": "Ocean Biodiversity Information System (OBIS)",
           "url": "https://obis.org/"
+        },
+        {
+          "title": "Kelley 2005 — Lost City microbial and animal communities",
+          "url": "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"
         }
       ],
       "confidence": "medium"
@@ -200,7 +228,7 @@
       "id": "summit",
       "title": "The Atlantis Massif summit",
       "paragraphs": [
-        "The Atlantis Massif is an oceanic core complex: a dome of deep mantle and lower-crust rock, normally buried many kilometres down, exposed at the seafloor by a long-lived detachment fault that slides one tectonic block up and over another. Its summit, the shallowest point in this tile at 724 m, sits about 15 km from the main Mid-Atlantic Ridge spreading axis -- unusually far for hydrothermal activity, another sign that Lost City is not driven by fresh volcanic heat like a ridge-axis black smoker field.",
+        "The Atlantis Massif is an oceanic core complex: a dome of deep mantle and lower-crust rock, normally buried many kilometres down, exposed at the seafloor by a long-lived detachment fault that exposes deep rocks as the overlying crust moves away. Its summit, the shallowest point in this tile at 724 m, sits about 15 km from the main Mid-Atlantic Ridge spreading axis -- unusually far for hydrothermal activity, another sign that Lost City is not driven by fresh volcanic heat like a ridge-axis black smoker field.",
         "This is the actual shallowest terrain sampled anywhere in this tile."
       ],
       "facts": [

@@ -14,7 +14,7 @@
   "taxa_in_bbox": 20,
   "taxa_matching_rank": 8,
   "records_in_bbox": 47,
-  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Placement of animals in the game is invented.",
+  "note": "OBIS occurrence records within the tile bbox, without a depth filter. Rimicaris hybisae has a recorded collection depth of 4,960 m; the listed fish have no reported depth and are regional water-column records, not evidence of vent residents. Record counts reflect sampling effort, not abundance. Exact animal encounters are authored in the game.",
   "species": [
     {
       "scientificName": "Rimicaris hybisae",

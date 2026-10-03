@@ -15,7 +15,7 @@
   "taxa_in_bbox": 82,
   "taxa_matching_rank": 71,
   "records_in_bbox": 1674,
-  "note": "Occurrence records within the tile bbox from OBIS, filtered to <= 200 m depth (reef and rim habitat, not the anoxic interior of the hole). Strong match to Caribbean reef habitat: reef-building corals (Orbicella, Diploria, Montastraea, Porites, Siderastrea, Colpophyllia), parrotfish, surgeonfish, grunts, snapper, groupers and butterflyfish. No shark species were returned by this export; the Caribbean reef shark and nurse shark named qualitatively in guide.json's reef-biology entry come from Wikipedia's Great Blue Hole and Lighthouse Reef articles, not from this OBIS export. Record counts reflect sampling effort, not abundance. Placement of any animal at a specific POI in the game is invented.",
+  "note": "Occurrence records within the tile bbox from OBIS, filtered to <= 200 m depth (reef and rim habitat, not the anoxic interior of the hole). Strong match to Caribbean reef habitat: reef-building corals (Orbicella, Diploria, Montastraea, Porites, Siderastrea, Colpophyllia), parrotfish, surgeonfish, grunts, snapper, groupers and butterflyfish. No shark species were returned by this export; the Caribbean reef shark and nurse shark named qualitatively in guide.json's reef-biology entry are supported by MarAlliance’s Lighthouse Reef shark studies (Baremore et al. 2021 and the 2021 Belize nurse shark survey), not from this OBIS export. Record counts reflect sampling effort, not abundance. Placement of any animal at a specific POI in the game is invented.",
   "species": [
     {
       "scientificName": "Pseudodiploria strigosa",

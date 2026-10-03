@@ -294,6 +294,7 @@ export class Input {
   private disposers: Array<() => void> = [];
   private readonly target: HTMLElement | null;
   private readonly storage: BindingStore | null;
+  private protectedBindings = false;
   private readonly edgeArmed = new Set<ActionId>();
   wheelDelta = 0;
 
@@ -388,6 +389,7 @@ export class Input {
       if (d) (this.actions[i] as ActionBinding).keys = [...d.keys];
     }
     try {
+      if (this.protectedBindings) return;
       this.storage?.removeItem(BINDINGS_STORAGE_KEY);
       this.storage?.removeItem(PREVIOUS_BINDINGS_STORAGE_KEY);
       this.storage?.removeItem(LEGACY_BINDINGS_STORAGE_KEY);
@@ -397,7 +399,7 @@ export class Input {
   }
 
   private saveBindings(): void {
-    if (!this.storage) return;
+    if (!this.storage || this.protectedBindings) return;
     const payload = {
       version: 3,
       keys: Object.fromEntries(this.actions.map((a) => [a.id, a.keys])),
@@ -412,26 +414,40 @@ export class Input {
   /** Keep choices that differ from the defaults of their saved version. */
   private loadBindings(): void {
     if (!this.storage) return;
-    let raw: string | null;
-    let version: number;
-    try {
-      raw = this.storage.getItem(BINDINGS_STORAGE_KEY);
-      version = 3;
-      if (raw === null) {
-        raw = this.storage.getItem(PREVIOUS_BINDINGS_STORAGE_KEY);
-        version = 2;
+    let parsed: { version?: number; keys?: Record<string, unknown> } | undefined;
+    let version = 3;
+    for (const [key, schema] of [
+      [BINDINGS_STORAGE_KEY, 3],
+      [PREVIOUS_BINDINGS_STORAGE_KEY, 2],
+      [LEGACY_BINDINGS_STORAGE_KEY, 1],
+    ] as const) {
+      try {
+        const raw = this.storage.getItem(key);
+        if (!raw) continue;
+        const value: unknown = JSON.parse(raw);
+        if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
+        const candidate = value as NonNullable<typeof parsed>;
+        // Never replace a newer save with an older legacy copy or session edits.
+        if (typeof candidate.version === 'number' && candidate.version > schema) {
+          this.protectedBindings = true;
+          return;
+        }
+        if (
+          candidate.version !== schema ||
+          !candidate.keys ||
+          typeof candidate.keys !== 'object' ||
+          Array.isArray(candidate.keys)
+        )
+          continue;
+        parsed = candidate;
+        version = schema;
+        break;
+      } catch {
+        // A damaged current copy must not hide intact earlier bindings.
       }
-      if (raw === null) {
-        raw = this.storage.getItem(LEGACY_BINDINGS_STORAGE_KEY);
-        version = 1;
-      }
-    } catch {
-      return;
     }
-    if (!raw) return;
+    if (!parsed?.keys) return;
     try {
-      const parsed = JSON.parse(raw) as { version?: number; keys?: Record<string, unknown> };
-      if (parsed.version !== version || !parsed.keys || typeof parsed.keys !== 'object') return;
       const custom = new Map<ActionId, string[]>();
       for (const action of this.actions) {
         const oldId = version === 1 && action.id === 'toggleJournal' ? 'toggleGuide' : action.id;

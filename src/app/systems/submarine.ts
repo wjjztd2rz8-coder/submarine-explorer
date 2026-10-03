@@ -8,7 +8,7 @@
 import * as THREE from 'three';
 import { landmarkIdFor } from '../../game/ContentPath.js';
 import { applyMissionLoadout } from '../../game/MissionRouter.js';
-import { applyFreeDiveHull, chooseSpawn, spawnHeight, spawnSettings } from '../../game/Spawn.js';
+import { chooseFreeDiveHull, chooseSpawn, spawnHeight, spawnSettings } from '../../game/Spawn.js';
 import { SubMesh } from '../../sub/SubMesh.js';
 import { Submarine } from '../../sub/Submarine.js';
 import type { GameSystem } from '../System.js';
@@ -31,41 +31,53 @@ export function createSubmarineSystem(): GameSystem {
       // caldera rim; `?depth=` clamped between the surface and the seabed. Free
       // dive also fits the lowest hull class rated for the tile's deepest cell
       // (QA-B #2).
+      // The loaded dive keeps its hull and access policy, including the briefing
+      // and restarts. A mode/research change takes effect on the next site load.
+      const targetDepth = route?.def.briefing.depth_m ?? Math.abs(meta.min_m);
+      const hullClass = ctx.progress.hullFor(targetDepth, settings.gameplayMode);
+      sub.setHullClass(hullClass);
       const spawn = chooseSpawn(terrain, meta, spawnDepth, spawnSettings(config));
+      // Optional props must never be responsible for pressure safety.
+      spawn.y = Math.max(spawn.y, sub.getState().ratedDepth + config.submarine.hullRadius);
       sub.reset(spawn.x, spawn.y, spawn.z, spawn.yaw);
       if (spawn.moved) {
         console.info(
           `[main] shallow tile centre: spawning ${Math.hypot(spawn.x, spawn.z).toFixed(0)} m out, seabed ${spawn.ground.toFixed(0)} m`,
         );
       }
-      ctx.freeDiveHull = route ? null : applyFreeDiveHull(sub, config, meta.min_m);
+      ctx.freeDiveHull = route
+        ? null
+        : chooseFreeDiveHull(
+            config.submarine.hullClasses,
+            meta.min_m,
+            config.submarine.freeDiveHullMarginM,
+          );
       // B3: mission surface start + hull class + sim speed. `?poi=` / `?at=`
       // later still override the pose (tests rely on them).
       if (route) {
-        const pose = applyMissionLoadout(sub, route.def, config, meta, terrain);
+        const pose = applyMissionLoadout(
+          sub,
+          { ...route.def, hull_class: hullClass },
+          config,
+          meta,
+          terrain,
+        );
         sub.reset(pose.x, pose.y, pose.z, pose.yaw);
       }
-      // Arcade fits each site's vehicle; Realistic retains research hull unlocks.
-      const targetDepth = route?.def.briefing.depth_m ?? Math.abs(meta.min_m);
-      const fitHull = (): void => {
-        sub.setHullClass(ctx.progress.hullFor(targetDepth, ctx.save.get().gameplayMode));
-        if (!route && ctx.freeDiveHull) {
-          const state = sub.getState();
-          ctx.freeDiveHull.classId = state.hullClass;
-          ctx.freeDiveHull.hull = config.submarine.hullClasses[state.hullClass];
-          ctx.freeDiveHull.cleared =
-            Math.abs(state.ratedDepth) >=
-            Math.abs(meta.min_m) + config.submarine.freeDiveHullMarginM;
-          ctx.hud?.setHullNote(ctx.freeDiveHull.cleared ? '' : 'at rating limit');
-        }
-      };
-      fitHull();
+      if (ctx.freeDiveHull) {
+        const state = sub.getState();
+        ctx.freeDiveHull.classId = state.hullClass;
+        ctx.freeDiveHull.hull = config.submarine.hullClasses[state.hullClass];
+        ctx.freeDiveHull.cleared =
+          Math.abs(state.ratedDepth) >= Math.abs(meta.min_m) + config.submarine.freeDiveHullMarginM;
+        ctx.hud?.setHullNote(ctx.freeDiveHull.cleared ? '' : 'at rating limit');
+      }
       cleanup.add(
         ctx.save.onChange((_next, changed) => {
-          if (changed.includes('gameplayMode')) fitHull();
+          if (changed.includes('gameplayMode'))
+            ctx.hud?.notice('Hull and site access changes apply when you load your next dive.');
         }),
       );
-      cleanup.add(ctx.progress.onChange(fitHull));
       // D-START: keep URL probes deterministic even when a mission uses a
       // near-site default.
       if (route && spawnDepth !== null && !params.has('at') && !params.has('poi')) {
