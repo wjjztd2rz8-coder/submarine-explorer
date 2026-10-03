@@ -14,6 +14,10 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-TITLE-F: public identity is now Bathyline ("Explore the real deep."): HTML title,
+  description, Open Graph and theme colour, manifest name/short name/description/colours, README
+  prose and new `docs/title-scene.md`. Manifest id, scope, start_url, icons, package name, save keys,
+  service worker and deployment base are unchanged. Reason: complete the title-scene rebrand.
 - Phase F, F-TITLE-D: rebuilt the home layout as Bathyline (copy, wordmark with inline
   mark, Continue / Dive sites primary actions, Free dive, Daily, mode, then Journal /
   Settings / Controls / Upgrades in DOM order) in a dedicated `src/styles/home.css`
