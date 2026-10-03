@@ -52,8 +52,8 @@ export class FocusTrap {
       window.addEventListener('keydown', onKeyDown, true);
       listening = true;
     }
-    const a = document.activeElement;
-    if (asEl(a) && a !== document.body && !this.root.contains(a)) a.blur();
+    const a = asEl(document.activeElement);
+    if (a && a !== document.body && !this.root.contains(a)) a.blur();
   }
 
   deactivate(): void {
@@ -62,8 +62,8 @@ export class FocusTrap {
     if (i < 0) return;
     const wasTop = i === stack.length - 1;
     if (i >= 0) stack.splice(i, 1);
-    const a = document.activeElement;
-    if (asEl(a) && this.root.contains(a)) a.blur();
+    const a = asEl(document.activeElement);
+    if (a && this.root.contains(a)) a.blur();
     if (!stack.length && listening) {
       window.removeEventListener('keydown', onKeyDown, true);
       listening = false;
@@ -94,8 +94,8 @@ export class FocusTrap {
     e.preventDefault();
     const items = this.focusables();
     if (!items.length) return;
-    const a = document.activeElement;
-    const i = asEl(a) ? items.indexOf(a) : -1;
+    const a = asEl(document.activeElement);
+    const i = a ? items.indexOf(a) : -1;
     let next: number;
     if (i < 0) next = e.shiftKey ? items.length - 1 : 0;
     else next = (i + (e.shiftKey ? -1 : 1) + items.length) % items.length;
