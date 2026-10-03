@@ -142,3 +142,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Director gaps: Lost City talus apron around Poseidon is a flat dark disc (lighten it); the duplicate "Something to scan" chip is still there until 90 lands. A fresh golden set needs the host (Codex sandbox cannot run Chromium).
 - CI on main failed again after 55 min while Pages deployed; check the CI-TIMEOUTS note.
 - Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-03 headless run (started ~00:20)
+
+- Merged (main gates green): F-LOSTCITY-3 (Sonnet: ragged noise-faded Poseidon apron, rubble, lifted slope and far-ridge haze; Lost City is now clearly readable on High and Low; the terrain checker texture is still visible, a known gap).
+- Running (Codex): 130-f-daily-touch, 140-f-bughunt-5, 150-f-copy-audit. Queued: 90-f-hint-dedupe, 160-f-ci-timeout-check, 170-f-touch-audit, 180-f-bughunt-6-modes.
+- Not done: no fresh golden set (needs the host); I checked the 2026-10-02-2323 set (Titanic good). Claude 5h ended ~65%.
+- Still needs owner: brand name OK (Bathyline).
