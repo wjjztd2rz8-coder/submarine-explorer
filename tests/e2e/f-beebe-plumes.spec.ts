@@ -82,9 +82,9 @@ test.describe('F-BEEBE-PLUMES', () => {
     expect(high.n).toBeGreaterThan(0);
 
     for (const v of [
-      { name: 'wide', range: 60, up: 18, pitch: 0.12 },
-      { name: 'mid', range: 34, up: 12, pitch: 0.2 },
-      { name: 'close', range: 18, up: 8, pitch: 0.35 },
+      { name: 'wide', range: 90, up: 22, pitch: 0.22 },
+      { name: 'mid', range: 55, up: 14, pitch: 0.3 },
+      { name: 'close', range: 30, up: 8, pitch: 0.45 },
     ]) {
       await page.evaluate((v) => {
         const g = window.__game as unknown as Game;
