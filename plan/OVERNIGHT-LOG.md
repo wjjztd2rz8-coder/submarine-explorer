@@ -163,3 +163,12 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Running (Codex): 160-f-ci-timeout-check, 170-f-touch-audit, 180-f-bughunt-6-modes. Queued: 90-f-hint-dedupe, 190-f-audio-audit, 200-f-mobile-lowtier-audit, 210-f-bughunt-7-copy-regress.
 - No Claude agents spawned (e2e gates took ~40 min with three Codex tasks running; a stale preview server from a timed-out gate run blocked one rerun, so use unique ports and a detached run).
 - Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-03 headless run (started ~02:05)
+
+- Merged (main gates green, pushed, no tag): F-CI-CHECK (160), F-TOUCH-AUDIT (170), F-BUGHUNT-6-MODES (180; all Codex). Fixed merge fallout: the old touchControls test stub lacked `document.addEventListener`, and the touch-audit e2e still expected the retired scan-range hint chip (removed). The 90-f-hint-dedupe brief was obsolete (copy-audit already did it) and was deleted.
+- Running (Codex): 190-f-audio-audit, 200-f-mobile-lowtier-audit, 210-f-bughunt-7-copy-regress. Queued: 220-f-bughunt-8-touch-regress, 230-f-ci-split, 240-f-title-scene-brief (rebrand spec).
+- Pitfall: a stale `dist/` or a stale preview server on the port makes gates fail misleadingly; rebuild and use fresh ports.
+- No Claude agents spawned (e2e gate waits dominated the run). Claude 5h ~60%.
+- Still open: fresh golden set (needs host), Lost City checker texture.
+- Still needs owner: brand name OK (Bathyline).
