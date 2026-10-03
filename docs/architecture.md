@@ -1,6 +1,6 @@
 # Architecture
 
-Submarine Explorer renders **real ocean-floor bathymetry** from the GMRT
+Bathyline (repository/package: Submarine Explorer) renders **real ocean-floor bathymetry** from the GMRT
 synthesis as a navigable 3D world, with scan-and-discover missions on top.
 There are three parts that meet at documented interfaces:
 
@@ -43,8 +43,8 @@ and [audio.md](./audio.md).
 
 **Phase D — playability (2026-09-24).** The app shell gained explicit
 `'home' | 'dive' | 'pause'` states (`GameEvents['app:state']`), driven by two
-new full-screen overlays: `ui/Home.ts` (title screen: globe, Continue/Dive
-sites/Free dive/Journal/Settings/Controls) and `ui/PauseMenu.ts` (`Esc`:
+new full-screen overlays: `ui/Home.ts` (Bathyline title screen: Continue/Dive
+sites/Free dive/Daily dive/mode/Journal/Settings/Controls/Upgrades) and `ui/PauseMenu.ts` (`Esc`:
 Resume/Objectives/Mission select/Journal/Settings/Controls/Quit to home).
 Both retire the old `O` (settings) and `N` (globe) hotkeys — `Input`'s
 `defaultActions()` no longer binds `toggleSettings` or `toggleGlobe` at all;
@@ -178,7 +178,7 @@ flowchart TD
     end
 
     subgraph ui["ui/ (DOM overlays)"]
-      HOME["Home (D-SHELL)\ntitle screen: globe, Continue/Dive sites/Free dive/Journal/Settings/Controls"]
+      HOME["Home (D-SHELL)\nBathyline title menu + globe after Dive sites/Free dive"]
       PM["PauseMenu (D-SHELL)\nEsc: Resume/Objectives/Mission select/Journal/Settings/Controls/Quit"]
       HUD["HUD"]
       SON["Sonar (2D canvas)\nPOI/objective icons, zoom levels"]
@@ -259,10 +259,14 @@ responses in `.cache/gmrt-raw/`, retries with backoff and falls back to ETOPO.
 **Boot (per page load, `app/boot.ts`, then each system's `init` in
 `app/systems.ts` order).** The app shell starts in one of three
 states — `'home' | 'dive' | 'pause'` (`GameEvents['app:state']`). Plain `/`
-boots into `'home'`: `ui/Home.ts` shows the C1 globe as the site picker behind
-Continue/Dive sites/Free dive/Journal/Settings/Controls, and the world behind
-it loads but stays paused (no physics, no audio, no mission clock) until a
-site is chosen. `?mission=`, `?tile=` or `?skipBriefing=1` (and the existing
+boots into `'home'`: `ui/Home.ts` shows the Bathyline menu over a decorative
+Monterey Canyon title scene. DOM and Tab order is Continue, Dive sites, Free dive,
+Daily dive (when available), mode selector, Journal, Settings, Controls, Upgrades.
+First focus is Continue when enabled, otherwise Dive sites. Dive sites and Free
+dive replace the menu with the embedded C1 globe and scrolling selector; Back or
+Escape closes the globe and restores focus to the originating button. The loaded
+gameplay world stays paused (no physics, audio or mission clock) until a site is
+chosen. `?mission=`, `?tile=` or `?skipBriefing=1` (and the existing
 debug params `?poi=`, `?at=`, `?depth=`, `?debrief=1`, `?globe=1`) bypass home
 and boot straight to `'dive'`, as they did before D-SHELL. `Esc` during a dive
 enters `'pause'` (`ui/PauseMenu.ts`), which freezes the sim the same way the
@@ -324,7 +328,8 @@ requestAnimationFrame
   └─ Props.update(camera)                    per-prop full / impostor / hidden
   └─ AudioSystem.update(frame)               depth low-pass, thruster, beds, ping
   └─ Terrain.update(camera)                  chunk LOD + draw-call accounting
-  └─ render scene -> WebGLRenderTarget       (low tier: straight to screen)
+  └─ home menu: title scene -> shared canvas (skip gameplay/post draw)
+  └─ otherwise: scene -> WebGLRenderTarget   (low tier: straight to screen)
   └─ UnderwaterPass -> screen                band grade tint + vignette
   └─ Input.endFrame()                        clear edge-triggered state
   └─ first frame only: window.__gameReady = true, game:ready
@@ -560,10 +565,41 @@ streaming (Tier 4), and a hard draw-call cap.
 `discovery.guide` wraps; `Journal` is the separate `journal` key below),
 `props`, `propsDebug`, `presets`, `mission`, `missionRouter`, `missionSelect`,
 `sonar`, `waypoints`, `journal`, `globe`, `home`, `homeGlobe`, `pause`,
+`titleScene` (read-only title diagnostics, described below),
 `appState` (a live getter for `'home' | 'dive' | 'pause'`), `save`,
 `settings`, `captions`, `input`.
 `window.__gameReady` flips to `true` after the first presented frame;
 `window.__gameError` holds a fatal startup message.
+
+### Bathyline title scene integration
+
+`app/systems/title.ts` registers before `renderSystem` and lazily constructs one
+`render/title/TitleScene.ts` scene/camera on first home entry, including quit from
+a direct dive URL. It shares the gameplay renderer and `#viewport`; it never moves
+the gameplay sub or camera. `TitleTerrain.ts` crops a 2,400 m square of real GMRT
+Monterey bathymetry around the checked-in upper-channel POI. Optional terrain loads
+after scene creation without blocking `__gameReady`, reusing the boot tile when it
+is Monterey. Failure retains the usable vehicle/fog fallback and **Expedition
+preview** caption; success labels the crop **Monterey Canyon · Real GMRT bathymetry**.
+Vehicle and lighting are illustrative. See [title-scene.md](./title-scene.md).
+
+The bridge reconciles visibility/layout, quality and motion at `render.prepare`.
+At `render.draw`, home owns the shared canvas: it presents the title or clears once
+to navy in the sites subview, skipping the gameplay/post path. Title draws stop in
+sites, dive/pause, hidden documents and covering Settings/Journal/Controls/Upgrades
+or overlay globe. Return invalidates a fresh frame; scene objects persist across
+home entries and owned resources/listeners are disposed at teardown. The embedded
+globe opens only while home and its sites subview are open.
+
+OS or saved reduced motion makes the title static; it redraws on dirty events
+such as resize, terrain readiness and re-entry. Animated drawing is capped at
+30 fps. Title budgets are 35 calls/100k triangles on Low and 60 calls/200k triangles
+on Medium and above. `window.__game.titleScene` exposes snapshots of `active`,
+`terrainReady`, `animated`, `drawCount`, `calls` and `triangles`; the counters let
+integration tests distinguish a visible canvas from a scene that actually drew.
+Home typography is self-hosted DM Sans and Source Serif 4, with system/Georgia
+fallbacks. Bathyline metadata keeps the existing save keys, manifest identity,
+service worker, package and deployment paths.
 
 ### Phase F research integration
 

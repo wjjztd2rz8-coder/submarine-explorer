@@ -170,6 +170,43 @@ for (const viewport of [
       // The menu sits in the scrolling `.home-body` (F-TITLE-D); the scroller stays on screen.
       expect((await home.locator('.home-body').boundingBox())!.height).toBeGreaterThan(300);
       await separate(page, ['.home-copy', '.home-body']);
+      await expect(page.locator('.globe.is-embedded')).toBeHidden();
+      expect(
+        await menu
+          .locator(':scope > *')
+          .evaluateAll((elements) =>
+            elements.map((element) =>
+              element.classList.contains('daily-card')
+                ? 'Daily dive'
+                : element.classList.contains('mode-selector')
+                  ? 'Mode'
+                  : element.textContent,
+            ),
+          ),
+      ).toEqual([
+        'Continue',
+        'Dive sites',
+        'Free dive',
+        'Daily dive',
+        'Mode',
+        'Journal',
+        'Settings',
+        'Controls',
+        'Upgrades',
+      ]);
+      for (const name of ['Dive sites', 'Free dive']) {
+        const origin = menu.getByRole('button', { name, exact: true });
+        await reachable(origin);
+        await origin.tap();
+        await expect(home.locator('.home-sites h2')).toHaveText(name);
+        await expect(page.locator('.globe.is-embedded')).toBeVisible();
+        await separate(page, ['.home-globe-wrap', '.home-sites']);
+        const back = home.getByRole('button', { name: 'Back to menu' });
+        await reachable(back);
+        await back.tap();
+        await expect(page.locator('.globe.is-embedded')).toBeHidden();
+        await expect(origin).toBeFocused();
+      }
       const mode = home.locator('.mode-selector');
       for (const radio of await mode.getByRole('radio').all()) await reachable(radio);
       await mode.getByRole('radio', { name: 'Realistic' }).tap();
