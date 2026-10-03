@@ -80,10 +80,7 @@ for (const viewport of [
           await reachable(page.getByRole('button', { name: label, exact: true }));
         await page.getByRole('button', { name: 'Skip tutorial', exact: true }).tap();
         await expect(page.locator('.onboard-card')).toBeHidden();
-        await expect(page.locator('.onboard-hint')).toBeVisible();
-        await separate(page, [...hud, '.onboard-hint', ...controls]);
-        await reachable(page.getByRole('button', { name: 'Dismiss hint' }));
-        await page.getByRole('button', { name: 'Dismiss hint' }).tap();
+        // The scan-range hint chip was retired (the scan panel covers it).
         await expect(page.locator('.onboard-hint')).toBeHidden();
         await page.evaluate(() => {
           const game = window.__game as {
