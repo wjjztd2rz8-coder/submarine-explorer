@@ -91,7 +91,14 @@ export function headingQuaternion(
 
 /** True for props whose builder conforms to the terrain (`groundHeight`), so they need no footprint snap. */
 export function followsTerrain(def: PropDef): boolean {
-  return def.procedural === 'debris' || def.feature !== null;
+  return (
+    def.procedural === 'debris' ||
+    def.feature !== null ||
+    // The carbonate builder makes a terrain-following apron even without a feature id.
+    (def.procedural === 'chimney' &&
+      def.materialHint === 'carbonate' &&
+      (def.dimensionsM?.[0] ?? 0) === 0)
+  );
 }
 
 /**

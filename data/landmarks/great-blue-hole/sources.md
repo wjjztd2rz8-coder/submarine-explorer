@@ -77,3 +77,12 @@ python3 tools/obis_export.py --landmark great-blue-hole --tile-bbox --depth-max 
 Returned 25 kept taxa (of 71 matching at species rank, 82 in the bbox at any rank),
 1,674 records — reef-building corals, parrotfish, surgeonfish, grunts, snapper and
 groupers, a strong match to Caribbean reef habitat. See `species.json`'s own `note`.
+
+## Opening gallery scan (F-BUGHUNT-17)
+
+`great-blue-hole-stalactites` is an optional contact at the existing authored
+`karst-grotto` prop, linked to the existing `the-hole` Journal entry. Its position
+is a game placement on the locally carved ledge, not a surveyed gallery coordinate;
+confidence is low and the Recreation tag is retained. It gives the scenic free-dive
+opening a nearby scan while the mission primaries remain the mapped atoll drop-offs.
+The gallery history and source links already present in `the-hole` are unchanged.

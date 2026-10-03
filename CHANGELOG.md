@@ -14,6 +14,14 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BUGHUNT-17: seat Lost City's small carbonate chimneys on their
+  terrain-conforming aprons without a second footprint snap (Beehive was buried
+  by about 2.2 m); rebuild their terrain-relative geometry on replacement. Add a
+  low-confidence, Recreation-tagged stalactite-gallery scan at Great Blue Hole's
+  existing grotto so the scenic free-dive opening offers a nearby Journal unlock.
+  Preserve the mapped atoll mission targets and factual gallery text. Add hero
+  geometry, opening scan, Journal coverage and replacement regressions.
+
 - Great Blue Hole: the wall now shows limestone strata (shader rock banding via a new biome `strata` option, plus concentric shelves in the carve), four scooped wall alcoves, floor blocks and a second stalactite alcove (`karst-grotto-east`) on the south-east ledge; the grotto's apron and shelf tops are mottled tan and grey instead of flat cream, the terrain patch colours are less bright, and boulders scatter on the floor too (f-bluehole-wall).
 
 - Monterey Canyon: two smaller flanking mudstone walls (east and west) frame the dive path so the north wall reads as a canyon, and the main wall now carries instanced sponges and cold-water coral fans on its lit face (f-monterey-canyon).
