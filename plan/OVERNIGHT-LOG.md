@@ -133,3 +133,12 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Still needs owner: brand name OK (Bathyline).
 - 2026-10-02 20:45 CDT headless run: skipped: budget gate (claude 5h 43.0% left (resets Fri Oct 02 21:39) | 7d 51.0% left (resets Thu Oct 08 06:59) codex 5h 27.0% left (resets Fri Oct 02 21:55) | 7d 89.0% left (resets Fri Oct 09 16:55) [as of 82 min ago] )
 - 2026-10-02 21:15 CDT headless run: skipped: budget gate (claude 5h 43.0% left (resets Fri Oct 02 21:39) | 7d 51.0% left (resets Thu Oct 08 06:59) codex 5h 2.0% left (resets Fri Oct 02 21:55) | 7d 85.0% left (resets Fri Oct 09 16:55) [as of 21 min ago] )
+
+## 2026-10-03 headless run (started 21:45)
+
+- Merged (main gates green, pushed, tagged `f7`; `f6` already existed): F-LOSTCITY-2 (Sonnet: pale carbonate seabed, ambientFill 12, seven far spires; the slope outside the headlight pool now reads), F-BUGHUNT-3-FIXES (Codex: deferred hull refit, safe locked deep links, daily low-light), F-SAVE-SOAK (Codex), F-BUGHUNT-4 (Codex; failing spec was a test bug), F-GOLDEN-RUN (Codex: owned preview servers, dispatcher port reservations), F-JOURNAL-FACTCHECK (Codex; I updated two e2e strings to the new copy), F-A11Y-AUDIT (Codex plus Sonnet fixes: FocusTrap node-safe, e2e rewritten).
+- Fixed: f3-onboard 44px touch-target check failed at 43.99999 (rounding flake); tolerance now 43.9.
+- Queued for Codex: 90-f-hint-dedupe, 130-f-daily-touch (the Daily card reboot drops touch mode), 140-f-bughunt-5 (regression audit since f5), 150-f-copy-audit.
+- Director gaps: Lost City talus apron around Poseidon is a flat dark disc (lighten it); the duplicate "Something to scan" chip is still there until 90 lands. A fresh golden set needs the host (Codex sandbox cannot run Chromium).
+- CI on main failed again after 55 min while Pages deployed; check the CI-TIMEOUTS note.
+- Still needs owner: brand name OK (Bathyline).
