@@ -1,3 +1,4 @@
+import { completeScan, scanWithKeyboard } from './helpers/scan.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { devices, expect, test, type Page } from './helpers/unlocked.js';
@@ -88,13 +89,7 @@ async function scan(page: Page, id: string): Promise<void> {
     (id) => (window.__game as unknown as Game).scanner.view.candidateId === id,
     id,
   );
-  await page.keyboard.down('g');
-  await page.waitForFunction(
-    (id) => (window.__game as unknown as Game).scanner.view.lastCompleteId === id,
-    id,
-    { timeout: 20_000 },
-  );
-  await page.keyboard.up('g');
+  await scanWithKeyboard(page, id);
 }
 async function shot(page: Page, name: string): Promise<void> {
   await mkdir(shots, { recursive: true });
@@ -265,11 +260,7 @@ test.describe('phone curiosity', () => {
       type: 'touchStart',
       touchPoints: [{ x: box!.x + box!.width / 2, y: box!.y + box!.height / 2, id: 1 }],
     });
-    await page.waitForFunction(
-      (id) => (window.__game as unknown as Game).scanner.view.lastCompleteId === id,
-      id,
-      { timeout: 20_000 },
-    );
+    await completeScan(page, id);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     await expect(page.locator('.scan-hint')).toHaveText('STOWED FOR THIS DIVE');
     await expectScanPanelFits(page);

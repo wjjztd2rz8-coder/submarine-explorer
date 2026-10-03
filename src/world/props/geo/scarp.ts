@@ -602,7 +602,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   }
 
   // Monterey: sponges and cold-water coral fans cling to the lit face of the wall.
-  if (id === 'canyon') addWallLife(full, wall, d.growth, d.branchDepth, joinY, H, seed, rnd);
+  if (id === 'canyon') addWallLife(full, wall, d.growth, d.branchDepth, joinY, H, seed, rnd, gnd);
 
   // A faint seep of clear fluid on the caldera wall (Hunga Tonga is volcanically active).
   if (id === 'tuff') {
@@ -883,6 +883,7 @@ function addWallLife(
   H: number,
   seed: number,
   rnd: () => number,
+  groundHeight: (x: number, z: number) => number,
 ): void {
   const pos = wall.getAttribute('position');
   const nor = wall.getAttribute('normal');
@@ -907,6 +908,9 @@ function addWallLife(
     const x = pos.getX(i) + nor.getX(i) * out;
     const yy = y + nor.getY(i) * out;
     const z = pos.getZ(i) + nz * out;
+    // The wall follows the ground at its foot, but a slope can cover other
+    // face vertices. Grow only on exposed rock, at the final offset anchor.
+    if (yy <= groundHeight(x, z)) continue;
     const tilt = -(0.9 + rnd() * 0.5); // lean out of the face
     if (rnd() < 0.5 && spongeCount() < wantSponge) {
       const kind = Math.min(2, Math.floor(rnd() * 3)) as SpongeKind;

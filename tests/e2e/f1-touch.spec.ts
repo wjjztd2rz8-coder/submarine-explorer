@@ -1,3 +1,4 @@
+import { completeScan } from './helpers/scan.js';
 /**
  * F1-TOUCH: touch play on emulated phones and a tablet. Real touches go through
  * the CDP `Input.dispatchTouchEvent`, so the pointer events the controls listen
@@ -113,13 +114,7 @@ test.describe('phone landscape', () => {
         ),
       )
       .toBe(true);
-    await page.waitForFunction(
-      () =>
-        (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed ===
-        1,
-      undefined,
-      { timeout: 20_000 },
-    );
+    await completeScan(page, 'test-bow');
     await touch(cdp, 'touchEnd', []);
 
     // Drag on the view to look; double-tap resets.

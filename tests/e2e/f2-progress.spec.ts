@@ -1,3 +1,4 @@
+import { scanWithKeyboard } from './helpers/scan.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
@@ -66,19 +67,16 @@ async function scan(page: Page, id: string): Promise<void> {
     id,
     { timeout: 10_000 },
   );
-  await page.keyboard.down('g');
-  try {
-    await page.waitForFunction(
+  await scanWithKeyboard(page, id);
+  expect(
+    await page.evaluate(
       (poi) =>
         (
           window.__game as { discoveries: { isDiscovered(site: string, poi: string): boolean } }
         ).discoveries.isDiscovered('blake-plateau-corals', poi),
       id,
-      { timeout: 20_000 },
-    );
-  } finally {
-    if (!page.isClosed()) await page.keyboard.up('g');
-  }
+    ),
+  ).toBe(true);
 }
 
 test('new researcher earns RP, buys a live upgrade and earns a three-star dive', async ({

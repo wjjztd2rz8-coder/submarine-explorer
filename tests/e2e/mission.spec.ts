@@ -1,3 +1,4 @@
+import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
 /**
@@ -66,18 +67,15 @@ async function subPos(page: Page): Promise<{ x: number; y: number; z: number }> 
 }
 
 async function holdScanUntil(page: Page, objectiveId: string): Promise<void> {
-  await page.keyboard.down('g');
+  await scanWithKeyboard(page);
   await page.waitForFunction(
     (id) =>
       (
-        (
-          window.__game as { mission: { objectives: Array<{ id: string; complete: boolean }> } }
-        ).mission.objectives.find((o) => o.id === id) ?? { complete: false }
-      ).complete,
+        window.__game as { mission: { objectives: Array<{ id: string; complete: boolean }> } }
+      ).mission.objectives.some((o) => o.id === id && o.complete),
     objectiveId,
     { timeout: 20_000 },
   );
-  await page.keyboard.up('g');
 }
 
 test.describe('B3 mission flow', () => {

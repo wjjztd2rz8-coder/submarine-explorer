@@ -1,3 +1,4 @@
+import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
 /**
@@ -171,21 +172,15 @@ for (const id of missionIds) {
         () =>
           (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed,
       );
-      await page.keyboard.down('g');
-      try {
-        await page.waitForFunction(
-          (objectiveId) =>
-            (
-              window.__game as {
-                mission: { objectives: Array<{ id: string; complete: boolean }> };
-              }
-            ).mission.objectives.some((o) => o.id === objectiveId && o.complete),
-          objective.id,
-          { timeout: 30_000 },
-        );
-      } finally {
-        await page.keyboard.up('g');
-      }
+      await scanWithKeyboard(page, objective.poi);
+      await page.waitForFunction(
+        (objectiveId) =>
+          (
+            window.__game as { mission: { objectives: Array<{ id: string; complete: boolean }> } }
+          ).mission.objectives.some((o) => o.id === objectiveId && o.complete),
+        objective.id,
+        { timeout: 30_000 },
+      );
       const completed = await page.evaluate(
         () =>
           (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed,

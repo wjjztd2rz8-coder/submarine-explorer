@@ -1,3 +1,4 @@
+import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
@@ -109,19 +110,15 @@ async function teleport(page: Page, poiId: string): Promise<void> {
 }
 
 async function scan(page: Page, objectiveId: string): Promise<void> {
-  await page.keyboard.down('g');
-  try {
-    await page.waitForFunction(
-      (id) =>
-        (
-          window.__game as { mission: { objectives: Array<{ id: string; complete: boolean }> } }
-        ).mission.objectives.some((o) => o.id === id && o.complete),
-      objectiveId,
-      { timeout: 20_000 },
-    );
-  } finally {
-    await page.keyboard.up('g');
-  }
+  await scanWithKeyboard(page);
+  await page.waitForFunction(
+    (id) =>
+      (
+        window.__game as { mission: { objectives: Array<{ id: string; complete: boolean }> } }
+      ).mission.objectives.some((o) => o.id === id && o.complete),
+    objectiveId,
+    { timeout: 20_000 },
+  );
 }
 
 async function subPos(page: Page): Promise<{ x: number; y: number; z: number }> {

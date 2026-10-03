@@ -1,3 +1,4 @@
+import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
@@ -129,14 +130,7 @@ test('sonar follows the sub, zooms by keys and wheel, and marks dive scan state'
   await shot(page, 'expanded');
   await page.keyboard.press('m');
 
-  await page.keyboard.down('g');
-  await page.waitForFunction(
-    () =>
-      (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed === 1,
-    undefined,
-    { timeout: 15_000 },
-  );
-  await page.keyboard.up('g');
+  await scanWithKeyboard(page, 'titanic-bow');
   await expect.poll(() => marker(page, 'titanic-bow')).toMatchObject({ scanned: true, icon: '✓' });
   await page.evaluate(() => {
     (window.__game as { sonar: { setPalette(name: 'highContrast'): void } }).sonar.setPalette(
