@@ -132,6 +132,40 @@ function context(site: string, mode: GameplayMode): GameContext {
 }
 
 describe('fresh-player mission routing and vehicle loadout', () => {
+  it.each(['titanic', 'lost-city', 'great-blue-hole', 'beebe-vent-field', 'monterey-canyon'])(
+    'fresh Arcade %s fits a hull that reaches every placed mission contact',
+    (site) => {
+      const ctx = context(site, 'arcade');
+      const terrain = loadTerrain(ctx);
+      ctx.terrain = terrain;
+      const progress = createProgressSystem();
+      const submarine = createSubmarineSystem();
+      try {
+        progress.init?.(ctx);
+        submarine.init?.(ctx);
+        const pois = placePois(
+          parsePois(JSON.parse(readFileSync(`data/landmarks/${site}/pois.json`, 'utf8'))),
+          ctx.meta,
+          terrain,
+          ctx.config.scan,
+          site,
+        );
+        const contacts = pois.filter((p) => ctx.route!.def.objectives.some((o) => o.poi === p.id));
+        expect(contacts).toHaveLength(ctx.route!.def.objectives.length);
+        for (const contact of contacts)
+          expect(-ctx.sub.getState().ratedDepth, contact.id).toBeGreaterThanOrEqual(
+            -contact.position.y,
+          );
+        expect(ctx.progress.lifetime).toBe(0);
+      } finally {
+        submarine.dispose?.();
+        progress.dispose?.();
+        ctx.subMesh?.dispose();
+        terrain.dispose();
+      }
+    },
+  );
+
   it('a direct Realistic deep tile link is pressure-safe before any props system exists', () => {
     const ctx = context('titanic', 'realistic');
     ctx.route = null;

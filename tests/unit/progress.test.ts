@@ -90,6 +90,49 @@ describe('research rewards and save migration', () => {
 describe('ratings and hull unlocks', () => {
   const primary = { primary: true, complete: true };
   const secondary = { primary: false, complete: false };
+  it.each(['_test', 'Hero_Site', 'constructor', '__proto__'])(
+    'persists best stars for supported content ID %s through purchases and reloads',
+    (site) => {
+      const { progress, store } = researcher();
+      expect(progress.rating(site)).toBe(0);
+      expect(progress.finish(site, [primary])).toMatchObject({ stars: 2, best: 2 });
+      expect(progress.buy('light-range')).toBe(true);
+      const restored = new Progress(new ProgressSave(store));
+      expect(restored.rating(site)).toBe(2);
+      restored.beginDive();
+      expect(restored.finish(site, [primary, secondary])).toEqual({
+        stars: 1,
+        best: 2,
+        points: 0,
+      });
+      expect(new Progress(new ProgressSave(store)).rating(site)).toBe(2);
+    },
+  );
+  it('recovers lost best stars from reward tokens without paying them again', () => {
+    const { progress, store } = researcher();
+    progress.award('species', 'ray');
+    progress.finish('titanic', [primary]);
+    progress.finish('daily-2026-10-03', [primary]);
+    const saved = progress.snapshot();
+    store.setItem(
+      PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        ...saved,
+        ratings: { titanic: null, 'daily-2026-10-03': 1, 'lost-city': 2 },
+        awarded: [...saved.awarded, 'rating:lost-city/4', 'rating:../unsafe/3'],
+      }),
+    );
+    const restored = new Progress(new ProgressSave(store));
+    expect(restored.rating('titanic')).toBe(3);
+    expect(restored.rating('daily-2026-10-03')).toBe(3);
+    expect(restored.rating('lost-city')).toBe(2);
+    expect(restored.rating('../unsafe')).toBe(0);
+    const points = restored.points;
+    restored.finish('titanic', [primary]);
+    restored.finish('daily-2026-10-03', [primary]);
+    expect(restored.points).toBe(points);
+    expect(new Progress(new ProgressSave(store)).rating('titanic')).toBe(3);
+  });
   it('fits every site in Arcade and Custom while keeping Realistic research gates', () => {
     const { progress } = researcher();
     for (const [depth, hull] of [

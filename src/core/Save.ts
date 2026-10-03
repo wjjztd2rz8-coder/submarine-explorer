@@ -394,7 +394,21 @@ export function migrateProgress(raw: unknown): ProgressRecord {
     const map = o[field];
     if (map && typeof map === 'object' && !Array.isArray(map))
       for (const [key, value] of Object.entries(map))
-        if (/^[a-z0-9-]+$/.test(key)) out[field][key] = Math.min(3, integer(value));
+        if ((field === 'ratings' ? /^[A-Za-z0-9_-]{1,64}$/ : /^[a-z0-9-]+$/).test(key))
+          Object.defineProperty(out[field], key, {
+            value: Math.min(3, integer(value)),
+            enumerable: true,
+            writable: true,
+            configurable: true,
+          });
+  }
+  // Star reward tokens also prove best ratings if the summary map was damaged.
+  for (const token of out.awarded) {
+    const rating = /^rating:([A-Za-z0-9_-]{1,64})\/([1-3])$/.exec(token);
+    if (!rating) continue;
+    const site = rating[1];
+    const best = Object.hasOwn(out.ratings, site) ? out.ratings[site] : 0;
+    out.ratings = { ...out.ratings, [site]: Math.max(best, Number(rating[2])) };
   }
   // Stable reward tokens prove earned RP even when either balance is damaged.
   // Purchases explain the gap between spendable RP and lifetime research.

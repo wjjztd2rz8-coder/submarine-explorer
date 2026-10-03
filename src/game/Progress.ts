@@ -75,7 +75,7 @@ export class Progress {
     return this.canDive(depthM, mode) ? requiredHull(depthM).id : this.hull.id;
   }
   rating(site: string): number {
-    return this.data.ratings[site] ?? 0;
+    return Object.hasOwn(this.data.ratings, site) ? this.data.ratings[site] : 0;
   }
   level(id: UpgradeId): number {
     return Math.min(UPGRADES.find((u) => u.id === id)!.costs.length, this.data.upgrades[id] ?? 0);
@@ -124,7 +124,8 @@ export class Progress {
     const stars = diveStars(objectives, this.bonus, aborted);
     if (stars > 0) this.award('primary', site);
     for (let i = 1; i <= stars; i++) this.award('rating', `${site}/${i}`);
-    if (!this.save.readOnly) this.data.ratings[site] = Math.max(this.rating(site), stars);
+    if (!this.save.readOnly)
+      this.data.ratings = { ...this.data.ratings, [site]: Math.max(this.rating(site), stars) };
     this.persist();
     return { stars, points: this.divePoints, best: this.rating(site) };
   }
