@@ -14,6 +14,12 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-LOSTCITY-READABLE: Arcade Lost City opens 38 m from Poseidon with
+  a 50 m chase arm, including near-site missions, so the tower and nearby floor
+  fill the opening view. Preserve the vent passes' +16 ambient fill and all
+  Realistic tuning; add deterministic spawn, framing and ambient-floor checks
+  on Low/Medium/High without screenshot brightness thresholds.
+
 - Phase F, F-CI-MAIN-RED: preset shader checks explicitly select Medium so CI's
   Low preference does not suppress their asserted geometry; the crush-depth
   browser check samples frame-clock progress and waits for the ascent/debrief

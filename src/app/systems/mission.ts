@@ -67,6 +67,14 @@ export const missionSystem: GameSystem = {
       sub.reset(pose.x, pose.y, pose.z, pose.yaw);
       lastStart = sub.position.clone();
       lastChoice = choice;
+      if (route.landmarkId === 'lost-city' && settings.gameplayMode === 'arcade')
+        rig.chaseRadius =
+          opening?.chaseRadius ??
+          Math.hypot(
+            config.camera.chaseOffset.x,
+            config.camera.chaseOffset.y,
+            config.camera.chaseOffset.z,
+          );
       rig.snap(sub.position, sub.yaw, sub.pitch);
       headlights.setEnabled(true);
     };
