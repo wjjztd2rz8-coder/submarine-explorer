@@ -168,7 +168,7 @@ export function migrate(raw: unknown, config: SettingsConfigSource): SettingsDat
   const out = defaultSettings(config);
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
   const value = raw as Record<string, unknown>;
-  if (value.version !== undefined && value.version !== 1 && value.version !== 2) return out;
+  if (value.version !== undefined && ![0, 1, 2].includes(value.version as number)) return out;
   for (const key of DISPLAY_KEYS) {
     if (key in value)
       (out as unknown as Record<string, unknown>)[key] = sanitizeDisplay(
@@ -238,10 +238,14 @@ export class Save {
       console.warn(
         `[save] ${SETTINGS_STORAGE_KEY} is version ${version}; using defaults and not overwriting it`,
       );
-    if (absent) {
+    let recoveredLegacy = false;
+    if (!this.readOnly && (!raw || typeof raw !== 'object' || Array.isArray(raw))) {
       try {
         const legacy = this.storage?.getItem(LEGACY_SETTINGS_KEY);
-        if (legacy) raw = JSON.parse(legacy);
+        if (legacy) {
+          raw = JSON.parse(legacy);
+          recoveredLegacy = !!raw && typeof raw === 'object' && !Array.isArray(raw);
+        }
       } catch {
         raw = null;
       }
@@ -252,7 +256,7 @@ export class Save {
       }
     }
     this.data = migrate(raw, this.config);
-    if (absent && !this.readOnly) this.persist();
+    if ((absent || recoveredLegacy) && !this.readOnly) this.persist();
     return this.get();
   }
   get(): SettingsData {
