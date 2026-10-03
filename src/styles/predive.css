@@ -85,29 +85,6 @@
 .mode-selector.is-home .mode-desc {
   min-height: 2.8em;
 }
-/* Short windows (1280x720): tighten the title and menu so the mode fits
-   between the tagline and the buttons. */
-@media (max-height: 860px) and (min-width: 761px) {
-  .home-copy {
-    top: clamp(24px, 5vh, 60px);
-  }
-  .home-copy h1 {
-    margin: 10px 0;
-    font-size: clamp(36px, 4.2vw, 60px);
-  }
-  .home-tagline {
-    margin: 0;
-  }
-  .home-menu {
-    bottom: clamp(24px, 6vh, 60px);
-    gap: 8px;
-  }
-  .home-menu button {
-    min-height: 46px;
-    padding: 9px 16px;
-  }
-}
-
 /* Settings: Gameplay starts with the mode, full width. */
 .mode-selector.is-settings {
   flex: 1 1 100%;

@@ -1,0 +1,585 @@
+/* F-TITLE-D: Bathyline home layout. Loaded last (after brand-fonts.css) so it owns every
+   home-only rule; pause, briefing and shared mode styles live in their own files.
+   Palette: canvas #06131f, plate #102b3a, primary #e8f3f1, secondary #a8c0c6, mint #65dccb. */
+
+.home-screen {
+  --home-canvas: #06131f;
+  --home-plate: #102b3a;
+  --home-text: #e8f3f1;
+  --home-muted: #a8c0c6;
+  --home-mint: #65dccb;
+  --home-line: rgba(168, 192, 198, 0.38);
+  --home-safe-t: env(safe-area-inset-top, 0px);
+  --home-safe-r: env(safe-area-inset-right, 0px);
+  --home-safe-b: env(safe-area-inset-bottom, 0px);
+  --home-safe-l: env(safe-area-inset-left, 0px);
+  --home-side: 16px;
+  --home-sans: 'DM Sans', system-ui, sans-serif;
+  --home-serif: 'Source Serif 4', Georgia, serif;
+  position: fixed;
+  inset: 0;
+  z-index: 72;
+  box-sizing: border-box;
+  height: 100dvh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  padding: calc(8px + var(--home-safe-t)) calc(var(--home-side) + var(--home-safe-r))
+    calc(16px + var(--home-safe-b)) calc(var(--home-side) + var(--home-safe-l));
+  color: var(--home-text);
+  font-family: var(--home-sans);
+  /* Until the title scene (package E) draws, the existing ocean gradient is the backdrop.
+     E adds .has-title-scene to make the shell transparent over the canvas. */
+  background: radial-gradient(ellipse at 65% 40%, #0a2936 0%, var(--home-canvas) 53%, #020710 100%);
+}
+.home-screen.has-title-scene:not(.has-sites) {
+  background: transparent;
+}
+.home-screen[hidden],
+.home-sites[hidden],
+.home-menu[hidden],
+.home-menu .daily-card[hidden] {
+  display: none;
+}
+@media (max-width: 360px) {
+  .home-screen {
+    --home-side: 12px;
+  }
+}
+
+/* Decorative scene area: hero band plus the (existing) globe, never receiving input itself. */
+.home-hero {
+  position: relative;
+  z-index: 2;
+  grid-column: 1;
+  grid-row: 1;
+  height: clamp(128px, 22dvh, 190px);
+  pointer-events: none;
+}
+.home-scene-plate {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--home-plate);
+  color: var(--home-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.home-scene-caption,
+.home-scene-caveat {
+  display: block;
+}
+.home-scene-caption {
+  color: var(--home-text);
+  font-weight: 600;
+}
+.home-globe-wrap {
+  position: relative;
+  z-index: 0;
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+  min-height: 0;
+  height: clamp(128px, 22dvh, 190px);
+}
+.home-globe-slot {
+  position: absolute;
+  inset: 0;
+}
+.globe.is-embedded {
+  position: absolute;
+  z-index: 0;
+  background: transparent;
+}
+.globe.is-embedded .globe-header,
+.globe.is-embedded .globe-hint {
+  display: none;
+}
+.globe.is-embedded .globe-card {
+  left: auto;
+  right: 12px;
+  bottom: 12px;
+  width: min(390px, calc(100% - 24px));
+  font-size: 14px;
+}
+.globe.is-embedded .globe-pin {
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+}
+.globe.is-embedded .globe-pin-dot {
+  width: 12px;
+  height: 12px;
+}
+
+/* Copy + menu plate. */
+.home-panel {
+  position: relative;
+  z-index: 3;
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--home-plate);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.home-copy {
+  flex: none;
+  min-width: 0;
+}
+.home-kicker {
+  margin: 0 0 8px;
+  color: var(--home-mint);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  overflow-wrap: anywhere;
+}
+.home-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.home-mark {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  fill: none;
+  stroke: var(--home-text);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  --logo-contour: var(--home-mint);
+}
+.home-mark .contour {
+  stroke: var(--home-mint);
+}
+.home-copy h1 {
+  margin: 0;
+  font-family: var(--home-serif);
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+@media (max-width: 360px) {
+  .home-copy h1 {
+    font-size: 32px;
+  }
+}
+.home-tagline {
+  margin: 8px 0 0;
+  color: var(--home-text);
+  font-size: 20px;
+  line-height: 1.25;
+}
+.home-desc {
+  margin: 8px 0 0;
+  color: var(--home-muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.home-body {
+  flex: none;
+  min-width: 0;
+}
+.home-menu {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 6px;
+  margin: -6px;
+}
+@media (max-width: 359px) {
+  .home-menu {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.home-menu > button,
+.home-sites-head button {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 52px;
+  padding: 10px 16px;
+  border: 1px solid var(--home-line);
+  border-radius: 8px;
+  background: #0b2230;
+  color: var(--home-text);
+  font: 600 16px/1.25 var(--home-sans);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.home-menu > button:hover,
+.home-sites-head button:hover {
+  border-color: var(--home-mint);
+  background: #15394b;
+}
+.home-menu button:focus-visible,
+.home-sites button:focus-visible {
+  outline: 3px solid var(--home-mint);
+  outline-offset: 3px;
+}
+.home-menu > .home-primary,
+.home-menu > .home-wide,
+.home-menu > .daily-card,
+.home-menu > .mode-selector {
+  grid-column: 1 / -1;
+}
+.home-menu > .home-primary {
+  font-size: 18px;
+}
+.home-menu > .home-primary:not(:disabled),
+.home-menu > .home-primary:disabled ~ .home-primary {
+  border-color: var(--home-mint);
+}
+.home-menu > .home-primary:not(:disabled):first-child,
+.home-menu > .home-primary:disabled + .home-primary {
+  background: var(--home-mint);
+  color: var(--home-canvas);
+}
+.home-menu > .home-primary:not(:disabled):first-child:hover,
+.home-menu > .home-primary:disabled + .home-primary:hover {
+  background: #8cefe0;
+  border-color: #8cefe0;
+}
+.home-menu > .home-primary:disabled {
+  border-style: dashed;
+  background: transparent;
+  color: var(--home-muted);
+  cursor: not-allowed;
+}
+.home-menu > button.daily-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: center;
+  gap: 4px 12px;
+  min-height: 76px;
+  border-color: var(--home-mint);
+  font-size: 14px;
+}
+.daily-card-title {
+  color: var(--home-mint);
+  font-weight: 600;
+}
+.daily-card-details {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+.daily-card-stars {
+  grid-column: 2;
+  grid-row: 1;
+  color: #ffe09b;
+  font-size: 13px;
+}
+@media (max-width: 359px), (min-width: 960px) and (max-width: 1100px) {
+  .daily-card-stars {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+}
+.home-menu > .mode-selector {
+  margin: 0;
+}
+.home-menu .mode-selector .mode-segments {
+  align-self: stretch;
+}
+.home-menu .mode-selector .mode-seg {
+  min-height: 48px;
+  font-size: 16px;
+}
+.home-menu .mode-selector .mode-advanced-toggle {
+  min-height: 48px;
+}
+.home-menu .mode-selector .mode-advanced {
+  max-height: none;
+  overflow: visible;
+}
+.home-menu .mode-selector .mode-advanced-field select {
+  min-height: 48px;
+}
+@media (max-width: 480px) {
+  .home-menu .mode-selector .mode-advanced {
+    grid-template-columns: 1fr;
+  }
+}
+.home-notes {
+  margin-top: 12px;
+}
+.home-notes p {
+  margin: 0;
+  color: var(--home-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Portrait phones with little height: the whole plate scrolls (already the case);
+   below 600 px the copy is allowed to scroll away so the menu keeps its room. */
+@media (max-height: 600px) {
+  .home-panel {
+    overflow-y: auto;
+  }
+}
+
+/* Dive sites / Free dive subview. */
+.home-sites {
+  position: relative;
+  z-index: 5;
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--home-plate);
+}
+.home-sites-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.home-sites-head h2 {
+  margin: 0;
+  font-family: var(--home-serif);
+  font-size: 28px;
+  font-weight: 600;
+}
+.home-sites-head button {
+  min-height: 48px;
+  min-width: 48px;
+  font-size: 14px;
+}
+.home-sites-scroll {
+  flex: 1;
+  min-height: 0;
+  margin-top: 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #6fb5b9 transparent;
+}
+.home-screen.has-sites .home-hero,
+.home-screen.has-sites .home-body,
+.home-screen.has-sites .home-kicker,
+.home-screen.has-sites .home-tagline,
+.home-screen.has-sites .home-desc {
+  display: none;
+}
+.home-screen.has-sites .home-panel {
+  display: none;
+}
+.home-screen.has-sites {
+  background: radial-gradient(ellipse at 40% 40%, #0a2936 0%, var(--home-canvas) 60%, #020710 100%);
+}
+/* Portrait: a 160 px globe preview above the list; the card would not fit, so it is hidden. */
+.home-screen.has-sites .home-globe-wrap {
+  height: 160px;
+}
+.home-screen.has-sites .home-globe-wrap .globe-card {
+  display: none;
+}
+
+/* Desktop / tablet landscape. */
+@media (min-width: 960px) and (min-height: 501px) {
+  .home-screen {
+    --home-side: clamp(24px, 4vw, 64px);
+    grid-template-columns: clamp(340px, 34vw, 440px) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: 24px;
+    padding: calc(clamp(16px, 4vh, 40px) + var(--home-safe-t))
+      calc(var(--home-side) + var(--home-safe-r)) calc(clamp(16px, 4vh, 40px) + var(--home-safe-b))
+      calc(var(--home-side) + var(--home-safe-l));
+  }
+  .home-panel {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    max-height: 100%;
+    padding: 20px;
+    gap: 20px;
+    overflow: hidden;
+  }
+  .home-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: #6fb5b9 transparent;
+    padding: 6px;
+    margin: -6px;
+  }
+  .home-hero,
+  .home-globe-wrap {
+    grid-column: 2;
+    grid-row: 1;
+    height: auto;
+  }
+  .home-scene-plate {
+    left: auto;
+    right: 16px;
+    bottom: 16px;
+    max-width: min(320px, calc(100% - 32px));
+  }
+  .home-mark {
+    width: 52px;
+    height: 52px;
+  }
+  .home-brand {
+    gap: 12px;
+  }
+  .home-copy h1 {
+    font-size: clamp(40px, 4vw, 48px);
+  }
+  .home-kicker {
+    letter-spacing: 0.12em;
+  }
+  .home-tagline {
+    font-size: 24px;
+  }
+  .home-sites {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    width: min(520px, 100%);
+    max-height: 100%;
+    padding: 20px;
+  }
+  /* Sites: globe on the left 55%, list on the right, compact brand lockup top-left. */
+  .home-screen.has-sites {
+    grid-template-columns: minmax(0, 1fr) min(520px, 45%);
+  }
+  .home-screen.has-sites .home-globe-wrap {
+    grid-column: 1;
+    grid-row: 1;
+    height: auto;
+  }
+  .home-screen.has-sites .home-globe-wrap .globe-card {
+    display: block;
+  }
+  .home-screen.has-sites .home-sites {
+    grid-column: 2;
+    width: auto;
+    justify-self: stretch;
+  }
+  .home-screen.has-sites .home-panel {
+    display: block;
+    position: absolute;
+    z-index: 4;
+    top: calc(clamp(16px, 4vh, 40px) + var(--home-safe-t));
+    left: calc(var(--home-side) + var(--home-safe-l));
+    padding: 0;
+    background: none;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .home-screen.has-sites .home-mark {
+    width: 32px;
+    height: 32px;
+  }
+  .home-screen.has-sites .home-copy h1 {
+    font-size: 28px;
+  }
+}
+
+/* Short landscape (phones sideways) takes precedence: scene+copy left, menu plate right. */
+@media (min-aspect-ratio: 1/1) and (max-height: 500px) {
+  .home-screen {
+    --home-side: 12px;
+    grid-template-columns: 42% minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 12px;
+    padding: calc(12px + var(--home-safe-t)) calc(12px + var(--home-safe-r))
+      calc(12px + var(--home-safe-b)) calc(12px + var(--home-safe-l));
+  }
+  .home-panel {
+    display: contents;
+  }
+  .home-copy {
+    grid-column: 1;
+    grid-row: 1;
+    z-index: 3;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--home-plate);
+    max-height: calc(100dvh - 24px - 96px - 12px - var(--home-safe-t) - var(--home-safe-b));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .home-mark {
+    width: 28px;
+    height: 28px;
+  }
+  .home-copy h1 {
+    font-size: 28px;
+  }
+  .home-tagline {
+    font-size: 18px;
+    margin-top: 6px;
+  }
+  .home-desc {
+    margin-top: 6px;
+  }
+  .home-hero,
+  .home-globe-wrap {
+    grid-column: 1;
+    grid-row: 2;
+    height: auto;
+    min-height: 96px;
+  }
+  .home-body {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    z-index: 3;
+    box-sizing: border-box;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--home-plate);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    min-height: 0;
+  }
+  .home-sites {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    padding: 12px;
+  }
+  .home-screen.has-sites .home-globe-wrap {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    height: auto;
+  }
+  .home-screen.has-sites .home-globe-wrap .globe-card {
+    display: none;
+  }
+}
+/* Exceptionally short or zoomed: the globe preview gives way to a usable list. */
+@media (max-height: 360px) {
+  .home-screen.has-sites .home-globe-wrap {
+    display: none;
+  }
+  .home-screen.has-sites .home-sites {
+    grid-column: 1 / -1;
+  }
+}
