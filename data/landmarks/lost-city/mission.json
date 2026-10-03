@@ -8,6 +8,7 @@
     "preset": "vent",
     "overrides": {
       "fluid": "carbonate",
+      "ambientFill": 8,
       "smokeIntensity": 0,
       "glowLights": 0,
       "shimmerStrength": 0.03

@@ -34,7 +34,6 @@ export class ReefPreset implements EnvPreset {
   private material: THREE.ShaderMaterial | null = null;
   private mesh: THREE.Mesh | null = null;
   private params: PresetParams = {};
-  private visuals = false;
   private readonly warm = new THREE.Color();
 
   constructor(private readonly look: ParticleLook) {}
@@ -42,7 +41,6 @@ export class ReefPreset implements EnvPreset {
   enter(ctx: PresetEnterContext): void {
     const p = (this.params = ctx.params);
     this.scene = ctx.scene;
-    this.visuals = ctx.visuals;
     this.warm.setHex(num(p.warmColor, 0xffe9b8));
     if (!ctx.visuals) return;
     const n = Math.max(0, Math.min(64, Math.round(num(p.shafts, 14))));
@@ -105,7 +103,7 @@ export class ReefPreset implements EnvPreset {
   }
 
   update(_dt: number, ctx: PresetFrameContext): void {
-    if (!this.visuals) return;
+    // Low tier omits shafts, but still needs the site's ambient light adjustments.
     const p = this.params;
     const depth = -ctx.camera.position.y;
     const maxD = num(p.shaftMaxDepthM, 60);
