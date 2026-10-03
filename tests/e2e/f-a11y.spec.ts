@@ -9,6 +9,19 @@ async function boot(page: Page, url: string): Promise<void> {
 
 /** Walk every available control in DOM order, then wrap in both directions. */
 async function cycle(page: Page, root: Locator): Promise<void> {
+  // Panels such as the Journal re-render once their content loads; wait for it.
+  let last = '';
+  await expect
+    .poll(
+      async () => {
+        const html = await root.evaluate((el) => el.innerHTML);
+        const stable = html === last;
+        last = html;
+        return stable;
+      },
+      { intervals: [200] },
+    )
+    .toBe(true);
   const controls = root.locator('button, a[href], input, select, textarea, [tabindex]');
   const indices = await controls.evaluateAll((nodes) =>
     nodes.flatMap((node, index) => {
@@ -135,6 +148,12 @@ test('home menus and nested dialogs cycle visibly, close with Escape, and restor
   }
 });
 
+test('standalone globe is keyboard reachable', async ({ page }) => {
+  await boot(page, '/?mission=titanic&tier=low&skipBriefing=1&globe=1');
+  await expect(page.locator('.globe:not(.is-embedded)')).toBeVisible();
+  await cycle(page, page.locator('.globe:not(.is-embedded)'));
+});
+
 test('briefing, pause details, controls, globe, photo and debrief remain keyboard reachable', async ({
   page,
 }) => {
@@ -186,10 +205,9 @@ test('briefing, pause details, controls, globe, photo and debrief remain keyboar
   await page.keyboard.press('Escape');
   await expect(journal).toBeFocused();
   await page.keyboard.press('Escape');
-  await page.keyboard.press('g');
-  await cycle(page, page.locator('.globe:not(.is-embedded)'));
-  await page.keyboard.press('Escape');
+  await expect(pause).toBeHidden();
   await page.keyboard.press('p');
+  await expect(page.locator('.photo-mode')).toBeVisible();
   await cycle(page, page.locator('.photo-mode'));
   await page.keyboard.press('Escape');
   await expect(page.locator('.photo-mode')).toBeHidden();
