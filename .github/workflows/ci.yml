@@ -1,6 +1,5 @@
-# Continuous integration: Python pipeline tests, typecheck + build, unit tests,
-# Playwright e2e (Chromium on SwiftShader), attribution and formatting checks.
-# See docs/deploy.md. Every step can be reproduced locally with `npm run ci`.
+# Continuous integration: every gate in `npm run ci`, split across parallel jobs.
+# One software-rendering browser per runner; shard individual tests, not files.
 name: CI
 
 on:
@@ -18,18 +17,10 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    name: build and test
+  checks:
+    name: build and static checks
     runs-on: ubuntu-latest
-    # Runners have no GPU, so Chromium renders WebGL on SwiftShader (a few fps).
-    # The e2e suite is single-worker by design (playwright.config.ts); give it room.
-    timeout-minutes: 75
-    strategy:
-      fail-fast: false
-      matrix:
-        # Keep one browser worker per runner; extra shards leave room for the
-        # CI-only timeouts and retry without competing for software-renderer CPU.
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+    timeout-minutes: 15
     env:
       CI: true
     steps:
@@ -43,6 +34,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
+        timeout-minutes: 5
         run: npm ci
 
       - name: Python pipeline tests (stdlib unittest)
@@ -57,6 +49,41 @@ jobs:
       - name: Unit tests (vitest)
         run: npm test
 
+      - name: Attribution check
+        run: python3 tools/check_attribution.py
+
+      - name: Prettier
+        run: npx prettier --check .
+
+  e2e:
+    name: e2e (${{ matrix.shard }}/${{ strategy.job-total }})
+    runs-on: ubuntu-latest
+    # Run alongside checks and project-base, so their budgets do not accumulate.
+    timeout-minutes: 24
+    strategy:
+      fail-fast: true
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: npm ci
+
+      - name: Typecheck and build
+        timeout-minutes: 5
+        run: npm run build
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
@@ -65,25 +92,21 @@ jobs:
 
       - name: Install Playwright Chromium
         # Always ensure OS dependencies, even when the browser cache was restored.
+        timeout-minutes: 5
         run: npx playwright install --with-deps chromium
 
       - name: End-to-end tests (Playwright)
-        # Tiles are committed under data/tiles/, so the e2e suite needs no network.
-        # Derive the denominator from the matrix to keep shard coverage complete.
-        run: npm run test:e2e -- --reporter=list,html --shard=${{ matrix.shard }}/${{ strategy.job-total }}
-
-      - name: Attribution check
-        run: python3 tools/check_attribution.py
-
-      - name: Project-base build and browser check
-        if: matrix.shard == 1
-        run: npm run test:e2e:base
-
-      - name: Prettier
-        run: npx prettier --check .
+        # Test-level sharding balances large specs without software-GPU contention.
+        # Stop on a final failure after the existing retry; never accept a partial pass.
+        # The suite budget permits a graceful failure/report before the job deadline.
+        run: >-
+          npm run test:e2e -- --reporter=list,html --workers=1 --fully-parallel
+          --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+          --global-timeout=1200000 --max-failures=1
 
       - name: Upload e2e screenshots and report
         if: failure()
+        timeout-minutes: 2
         uses: actions/upload-artifact@v4
         with:
           name: e2e-artifacts-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
@@ -92,7 +115,52 @@ jobs:
             .cache/codex/shots
             playwright-report
             test-results
-            test-results-project-base
           if-no-files-found: ignore
           include-hidden-files: true
+          retention-days: 14
+
+  project-base:
+    name: project-base build and browser check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright Chromium
+        timeout-minutes: 5
+        run: npx playwright install --with-deps chromium
+
+      - name: Project-base build and browser check
+        timeout-minutes: 10
+        run: npm run test:e2e:base -- --reporter=list,html --workers=1 --global-timeout=480000 --max-failures=1
+
+      - name: Upload project-base screenshots and report
+        if: failure()
+        timeout-minutes: 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-base-artifacts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report
+            test-results-project-base
+          if-no-files-found: ignore
           retention-days: 14

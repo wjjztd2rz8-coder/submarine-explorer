@@ -66,7 +66,7 @@ async function settle(page: Page): Promise<void> {
 test.describe('Phase F visual QA', () => {
   // One worker, independent contexts and no fail-fast serial group: a broken
   // site must not prevent the other twelve from producing review evidence.
-  test.describe.configure({ mode: 'default', timeout: 300_000 });
+  test.describe.configure({ timeout: 300_000 });
   test.use({
     viewport: { width: 1280, height: 720 },
     deviceScaleFactor: 1,
