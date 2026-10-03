@@ -24,6 +24,7 @@ it('refreshes the cache version when worker logic, shell or mutable content chan
   for (const name of ['sw.js', 'manifest.webmanifest', 'favicon.svg'])
     copyFileSync(`public/${name}`, join(publicDir, name));
   cpSync('public/icons', join(publicDir, 'icons'), { recursive: true });
+  cpSync('public/share', join(publicDir, 'share'), { recursive: true });
   cpSync(publicDir, outDir, { recursive: true });
   const plugin = pwaPlugin();
   if (
@@ -56,6 +57,8 @@ it('refreshes the cache version when worker logic, shell or mutable content chan
     const output = readFileSync(join(outDir, 'sw.js'), 'utf8') as string;
     expect(output).not.toContain('__SW_VERSION__');
     expect(output).not.toContain('__SW_PRECACHE__');
+    const precache = JSON.parse(output.match(/JSON.parse\('([^']+)'\)/)![1]) as string[];
+    expect(precache).toContain('share/bathyline-og-1200x630.png');
     return output.match(/const VERSION = '([^']+)'/)![1];
   };
   const initial = await stamp();
@@ -69,10 +72,13 @@ it('refreshes the cache version when worker logic, shell or mutable content chan
   writeFileSync(join(outDir, 'manifest.webmanifest'), '{"name":"Updated shell"}');
   const shellChanged = await stamp();
   expect(shellChanged).not.toBe(workerChanged);
+  writeFileSync(join(outDir, 'share/bathyline-og-1200x630.png'), 'updated social image');
+  const imageChanged = await stamp();
+  expect(imageChanged).not.toBe(shellChanged);
   mkdirSync(join(outDir, 'data/landmarks/titanic'), { recursive: true });
   writeFileSync(join(outDir, 'data/landmarks/titanic/mission.json'), '{"hint":"New content"}');
   const contentChanged = await stamp();
-  expect(contentChanged).not.toBe(shellChanged);
+  expect(contentChanged).not.toBe(imageChanged);
   mkdirSync(join(outDir, 'data/tiles'), { recursive: true });
   writeFileSync(join(outDir, 'data/tiles/index.json'), '{"tiles":[]}');
   expect(await stamp()).toBe(contentChanged);
