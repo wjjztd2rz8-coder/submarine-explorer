@@ -397,8 +397,10 @@
 .home-screen.has-sites .home-globe-wrap {
   height: 160px;
 }
-.home-screen.has-sites .home-globe-wrap .globe-card {
-  display: none;
+@media (max-width: 959px) {
+  .home-screen.has-sites .home-globe-wrap .globe-card {
+    display: none;
+  }
 }
 
 /* Desktop / tablet landscape. */
@@ -474,9 +476,6 @@
     grid-column: 1;
     grid-row: 1;
     height: auto;
-  }
-  .home-screen.has-sites .home-globe-wrap .globe-card {
-    display: block;
   }
   .home-screen.has-sites .home-sites {
     grid-column: 2;
