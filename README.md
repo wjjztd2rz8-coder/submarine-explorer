@@ -1,12 +1,21 @@
-# Submarine Explorer
+# Bathyline
 
-A browser submarine simulator that flies over **real ocean-floor bathymetry**,
+_Explore the real deep._ Bathyline (working title; the repository and package are
+still named `submarine-explorer`) is a cinematic ocean exploration game for the
+browser: real terrain, simple controls, discoveries worth finding. You pilot a
+research submarine over **real ocean-floor bathymetry**,
 downloaded from the [GMRT](https://www.gmrt.org) Global Multi-Resolution
 Topography synthesis. No invented terrain: what you see is measured seafloor,
 plus a small procedural detail layer (`docs/terrain.md`) and placed props that
 the field guide marks as reconstructions.
 
 ## Playing it
+
+The home screen's backdrop is a fixed title scene: a research submarine beside a
+Monterey Canyon crop built from the checked-in GMRT tile, with the globe kept for
+the Dive sites / Free dive picker (see [`docs/title-scene.md`](docs/title-scene.md)).
+Home type is self-hosted DM Sans and Source Serif 4 (SIL OFL 1.1; notices in
+`public/fonts/` and `ATTRIBUTION.md`).
 
 `npm run dev` and open the printed `localhost` URL. The **home screen** opens
 first with the globe from the dive-site picker behind a menu: **Continue**
