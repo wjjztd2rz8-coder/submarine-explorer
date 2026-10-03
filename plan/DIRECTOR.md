@@ -2,18 +2,18 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-03 evening review; golden set 2026-10-03-190819)
+## Current priorities (refreshed 2026-10-03 late review; golden set 2026-10-03-195811)
 
 Run `tools/golden.sh` at the start of any run that merged visual work. Compare against the previous set. If this list runs dry, refill it from the newest golden set rather than idling.
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
-1. **Monterey canyon (flanking walls and wall life merged 2026-10-03, re-check in next golden set):** remaining: the west wall is barely visible at spawn; a darker depth fall-off gap; wall sponges are large pale cups at close range.
-2. **Lost City surroundings:** the tiered tower now reads (400 may still add texture). The slope around it is bare brown and the light is milky. Add carbonate rubble, flanges on the small towers, a darker ambient.
-3. **Blue Hole wall and floor (merged 2026-10-03, f17: strata banding, alcoves, second grotto):** remaining: east grotto shelf tops still large pale surfaces; no golden pose covers the east alcove.
-4. **Beebe plume variety:** plumes are uniform tall columns. Vary the width and lean per vent, add a lit hot-water haze above the orifice, and a bent plume in the current.
-5. **Titanic far-field lift:** lift the dark far field slightly. Codex 460 handles the snow clutter.
-6. **Toast placement:** the "Animal nearby" toast overlaps the sonar legend at 1600x900. Move it below the legend or to the top centre.
+1. **Monterey canyon polish (walls merged, golden 195811 reads as a canyon):** make the west wall visible at spawn, shrink/darken the wall sponges (pale cups at close range), add a depth fall-off.
+2. **Lost City surroundings (after Codex 400 merges; it touches props.ts/Spawn.ts):** carbonate rubble and flanges on the small towers, darker ambient, textured slope.
+3. **Blue Hole east grotto shelf tops and spawn pose:** shelf tops are large pale slabs; add a golden pose for the east alcove; reduce the empty water-surface view at spawn.
+4. **Beebe plume variety:** per-vent width and lean, lit hot-water haze above orifices, a bent plume in the current.
+5. **Toast placement (after Codex 395 merges):** "Animal nearby" toast to top centre or below the legend at 1600x900.
+6. **Titanic far-field lift (after Codex 460):** lift the dark far field slightly.
 7. **Rebrand logo (Bathyline):** a proper mark for the share image. Codex 440 rebrand does the rollout; Claude reviews.
 
 Codex queue (all unblocked): 410 modes bughunt, 420 verify tests, 430 hero-props bughunt, 440 CI red fix (f2-life scan), 440 rebrand, 450 HUD attribution footer, 450 site triage, 460 marine-snow audit. Stalled worktrees 390/395/400 resume after the 15:45 Codex reset.

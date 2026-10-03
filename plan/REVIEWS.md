@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-03 late comprehensive review (trigger: tag f17; golden set 2026-10-03-195811)
+
+**Changed since the evening review:** Monterey flanking canyon walls and wall life, Blue Hole strata banding / alcoves / second grotto (f17). Beebe plumes (f16) already scored.
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5 each:**
+
+| Site            | Score       | Change | Biggest gap                                                                  |
+| --------------- | ----------- | ------ | ---------------------------------------------------------------------------- |
+| Titanic         | 4/4/4/4/5/4 | same   | Snow clutter and near-black far field (460)                                  |
+| Beebe           | 4/4/4/4/5/4 | same   | Plume variety: lean, width, haze                                             |
+| Great Blue Hole | 4/4/4/3/5/4 | +1     | Spawn pose shows a flat water surface; east grotto shelf tops are pale slabs |
+| Lost City       | 3/3/3/3/5/3 | same   | Tower reads; slope around it is bare brown; 400 camera work still unmerged   |
+| Monterey Canyon | 4/3/4/3/5/3 | +1     | Now reads as a canyon; wall sponges are pale cups; west wall faint           |
+
+**Play flow:** unchanged. Remaining clutter: 5-line GMRT citation (Codex 450) and the "Animal nearby" toast overlapping the sonar legend on 1600x900 (visible in every golden frame; the toast sits under the legend, so it is cramped rather than overlapped, but still the first thing on screen).
+
+**Process:** Claude 5h at 64% with nothing unblocked is the recurring pattern: Lost City and toast work wait on Codex worktrees 400/395 that are stalled at the 5% Codex floor until 15:45. Fix: Claude packages are now picked to avoid files owned by stalled worktrees (Monterey this run). CI on main still red from the `f2-life` scan test (Codex 440 queued, fail-fast off). 8 Codex briefs queued, so Codex will not idle after reset.
+
+**New priorities:** see DIRECTOR.md.
+
+**Needs owner:** nothing blocking.
+
 ## 2026-10-03 evening comprehensive review (trigger: tag f16; golden set 2026-10-03-190819)
 
 **Changed since the last review (same day):** Blue Hole spawn dome fixed (seated alcove, stepped ledge), Beebe billowing plumes merged (f16), CI `fail-fast` turned off.
