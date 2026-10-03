@@ -25,12 +25,14 @@ import {
   smooth,
   type BuiltProp,
 } from './shared.js';
+import { scatterRubble } from './talus.js';
 import { flange, spireRadius, tieredSpire, type SpireOpts } from './spire.js';
 import type { GeoBuildInput } from './types.js';
 
 const OLD = new THREE.Color(0x8e8c82); // weathered, inactive carbonate
 const LIVE = new THREE.Color(0xe9e7de); // fresh white carbonate and brucite, faintly warm
 const STAIN = new THREE.Color(0x6c685a);
+const SEABED = new THREE.Color(0xc2a468); // what the apron fades into: the Lost City sediment
 
 export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltProp {
   const { dims, seed, tier } = input;
@@ -40,14 +42,27 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   const rnd = mulberry32(seed);
   const skirtH = H * (lone ? 0.1 : 0.16);
   const root = H * 0.5; // the foundation sinks into the seabed on the downhill side
-  const skirtShape = (x: number, z: number): number => {
+  // The apron outline: the ellipse's radius pushed in and out by two scales of noise, so the
+  // rim is lobed and ragged rather than a flat oval. `rim` is 1 on the outline, 0 at the centre.
+  const nominal = 0.8; // the outline sits at this fraction of the build plane
+  const rim = (x: number, z: number): number => {
     const r = Math.hypot(x / (W / 2), z / (D / 2));
+    const warp =
+      (fbm3(x * (4.5 / W) + 9, 2, z * (4.5 / D) + 9, seed ^ 0x51, 3) - 0.5) * 0.95 +
+      (fbm3(x * (18 / W), 7, z * (18 / D), seed ^ 0x33, 2) - 0.5) * 0.3;
+    // Never let the outline reach the build plane's edge, where it would be cut off.
+    const edge = smooth(0.82, 1, Math.max(Math.abs(x) / (W * 0.625), Math.abs(z) / (D * 0.625)));
+    return (r * (1 + warp)) / nominal + edge * 2;
+  };
+  const skirtShape = (x: number, z: number): number => {
+    const r = rim(x, z);
     const n = (fbm3(x * 0.12, 5, z * 0.12, seed, 4) - 0.5) * skirtH * 0.7;
     const top = skirtH * Math.pow(Math.max(0, 1 - Math.min(r, 1) ** 2), 1.3);
-    return top + n * clamp01(1 - r) - smooth(0.78, 1.02, r) * root;
+    // Flush with the seabed at the outline (a feathered wedge, not a step), sunk beyond it.
+    return top + n * clamp01(1 - r) - smooth(0.96, 1.4, r) * root;
   };
   /** The talus skirt lifted onto the terrain, so the edifice sits on the slope. */
-  const skirt = (x: number, z: number): number => skirtShape(x, z) + gnd(x, z);
+  const skirt = (x: number, z: number): number => skirtShape(x, z) + gnd(x, z) + 0.05;
 
   interface Spire extends SpireOpts {
     x: number;
@@ -95,9 +110,32 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     mk(Math.cos(a) * r, Math.sin(a) * r, h, false);
   }
 
+  // The build plane is wider than the nominal footprint so the ragged outline fits inside it.
+  const pw = W * 1.25;
+  const pd = D * 1.25;
   const pieces: THREE.BufferGeometry[] = [
-    heightMesh(W, D, Math.round(36 * dens), Math.round(36 * dens), skirt),
+    heightMesh(pw, pd, Math.round(48 * dens), Math.round(48 * dens), skirt),
   ];
+  // Loose carbonate blocks across the apron, thinning toward the outline and clear of the columns.
+  if (d.rubble) {
+    const keep = (x: number, z: number): number => {
+      const r = rim(x, z);
+      if (r > 1.02) return 0;
+      for (const s of spires) if (Math.hypot(x - s.x, z - s.z) < s.r0 * 0.9) return 0;
+      return 0.25 + 0.75 * (1 - smooth(0.5, 1, r));
+    };
+    const area = lone ? W * D : W * D * 1.1;
+    pieces.push(
+      ...scatterRubble(skirt, keep, {
+        halfX: pw / 2,
+        halfZ: pd / 2,
+        count: Math.min(lone ? 14 : 150, Math.round(area * 0.012 * d.growth)),
+        size: lone ? 0.5 : 1.1,
+        detail: Math.min(d.sphereDetail, 1),
+        seed: seed + 313,
+      }),
+    );
+  }
   const tips: { x: number; y: number; z: number }[] = [];
   for (const [i, s] of spires.entries()) {
     pieces.push(
@@ -140,6 +178,9 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     out.copy(OLD).lerp(LIVE, up * 0.92 + 0.1 * n2);
     out.lerp(STAIN, smooth(0.62, 0.88, n2) * 0.3 * (1 - up));
     out.multiplyScalar(0.88 + 0.24 * n2);
+    // Toward the outline the rubble thins into the surrounding seabed colour, patchily.
+    const rn = rim(x, z) + (n1 - 0.5) * 0.35 + (n2 - 0.5) * 0.12;
+    out.lerp(SEABED, smooth(0.5, 1.05, rn) * (1 - up * 0.5));
     if (ny > 0.8) out.multiplyScalar(0.9); // silt dusting on shelves
   });
   projectUVs(geom, 5);

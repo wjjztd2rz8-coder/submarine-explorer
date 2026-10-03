@@ -8,7 +8,7 @@
  */
 
 import * as THREE from 'three';
-import { fbm3, mulberry32, smooth } from './shared.js';
+import { fbm3, lump, mulberry32, place, smooth } from './shared.js';
 
 export interface TalusShape {
   /** Local ground height under (x, z) (0 when the prop is not snapped). */
@@ -229,4 +229,64 @@ export function rockMatrix(
     q,
     new THREE.Vector3(spot.r, spot.r * squash, spot.r),
   );
+}
+
+export interface RubbleOpts {
+  /** Half-extents of the area to scatter over (metres, local x / z). */
+  halfX: number;
+  halfZ: number;
+  /** Number of blocks to try to place. */
+  count: number;
+  /** Median block radius in metres (a long tail of larger blocks sits above it). */
+  size: number;
+  /** Icosphere subdivision per block (0-2). */
+  detail: number;
+  seed: number;
+}
+
+/**
+ * Loose carbonate rubble for an apron whose surface is an arbitrary function: lumpy, flattened
+ * blocks, mostly small with a few large ones, each seated a third of the way into `surface` and
+ * tilted onto its slope. `keep(x, z)` (0..1) thins the scatter, e.g. toward the rim or out of the
+ * footprint of a column. Returns one geometry per block (the caller merges and paints them).
+ */
+export function scatterRubble(
+  surface: (x: number, z: number) => number,
+  keep: (x: number, z: number) => number,
+  o: RubbleOpts,
+): THREE.BufferGeometry[] {
+  const rnd = mulberry32(o.seed ^ 0x5eed);
+  const out: THREE.BufferGeometry[] = [];
+  let guard = o.count * 6;
+  while (out.length < o.count && guard-- > 0) {
+    const x = (rnd() * 2 - 1) * o.halfX;
+    const z = (rnd() * 2 - 1) * o.halfZ;
+    if (rnd() > keep(x, z)) continue;
+    const r = o.size * (0.45 + rnd() * rnd() * 2.4) * (rnd() < 0.06 ? 2.2 : 1);
+    const y = surface(x, z);
+    const e = Math.max(0.4, r * 0.7);
+    const dx = surface(x + e, z) - surface(x - e, z);
+    const dz = surface(x, z + e) - surface(x, z - e);
+    const lean = new THREE.Vector3(-dx / (2 * e), 1, -dz / (2 * e)).normalize();
+    const g = lump(o.detail, o.seed + out.length * 7, 0.32, 1.7);
+    const squash = 0.45 + rnd() * 0.35;
+    const q = new THREE.Quaternion()
+      .setFromUnitVectors(new THREE.Vector3(0, 1, 0), lean.lerp(new THREE.Vector3(0, 1, 0), 0.4))
+      .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rnd() * 6.283));
+    const eu = new THREE.Euler().setFromQuaternion(q);
+    out.push(
+      place(g, {
+        x,
+        y: y + r * squash * 0.35,
+        z,
+        rx: eu.x,
+        ry: eu.y,
+        rz: eu.z,
+        sx: r * (0.8 + rnd() * 0.5),
+        sy: r * squash,
+        sz: r * (0.8 + rnd() * 0.5),
+      }),
+    );
+  }
+  return out;
 }
