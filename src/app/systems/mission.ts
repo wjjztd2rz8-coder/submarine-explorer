@@ -33,7 +33,7 @@ export const missionSystem: GameSystem = {
     const applyMissionStart = (choice: MissionStartPosition): void => {
       if (!route || params.has('poi') || params.has('at') || params.has('depth')) return;
       const opening =
-        choice === 'near-site' && !ctx.daily && save.get().gameplayMode === 'arcade'
+        choice === 'near-site' && !ctx.daily && settings.gameplayMode === 'arcade'
           ? composedMissionSpawn(
               route.landmarkId,
               discovery.pois.filter((p) =>
@@ -48,7 +48,15 @@ export const missionSystem: GameSystem = {
             )
           : null;
       const pose =
-        opening ?? missionStartPose(route.def, choice, discovery.pois, meta, terrain, config);
+        opening ??
+        missionStartPose(
+          { ...route.def, hull_class: sub.getState().hullClass },
+          choice,
+          discovery.pois,
+          meta,
+          terrain,
+          config,
+        );
       if (ctx.daily) {
         pose.x += ctx.daily.start.x;
         pose.z += ctx.daily.start.z;
@@ -65,7 +73,21 @@ export const missionSystem: GameSystem = {
     ctx.applyMissionStart = applyMissionStart;
     const missionRouter = route
       ? new MissionRouter({
-          route,
+          route: {
+            ...route,
+            def: {
+              ...route.def,
+              hull_class: sub.getState().hullClass,
+              briefing: {
+                ...route.def.briefing,
+                hazards: route.def.briefing.hazards.map((hazard) =>
+                  /Class [ABC]/.test(hazard)
+                    ? `Class ${sub.getState().hullClass} hull · rated to ${Math.abs(sub.getState().ratedDepth).toLocaleString('en-US')} m. Stay above the rating.`
+                    : hazard,
+                ),
+              },
+            },
+          },
           rating: () => {
             const rating = ctx.progress.finish(
               ctx.daily ? dailyRatingKey(ctx.daily) : route.missionId,

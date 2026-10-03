@@ -22,6 +22,12 @@ without an entry here is not done.
   hole (reef preset keys `haloclineDepthM`, `haloclineLat`, `haloclineLon`, ...) and
   lighter hole walls; the low tier gets a single-layer haze so the interior is no longer
   a black pit. Nothing is darker than before.
+- Phase F, F-BUGHUNT-3-FIXES: hull and mission access changes now take effect
+  when the next dive loads, keeping mode edits safe during a briefing, deep
+  dive or ROV deployment. Locked Realistic deep-site links start within the
+  fitted hull's rating before optional props load. Daily Low light also keeps
+  ROV lamps dim after settings edits and research purchases.
+
 - Phase F, F-HERO-BLUEHOLE: the Great Blue Hole free dive now opens over the hole
   itself. The sinkhole (about 320 m across, 125 m deep, a ledge near 40 m) is carved
   into the terrain at its reported position because the survey grid cannot resolve it
