@@ -14,6 +14,20 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-COPY-AUDIT: shortened all-site mission objectives, route hints,
+  contextual tips and Journal prompts. Consolidated recreation explanations in
+  the Journal front page and retained Recreation tags, reconstruction flags,
+  source lists and factual measurements. Removed the duplicate scan-target hint
+  because the scan panel already names the target and shows the scan control.
+- Phase F, F-COPY-AUDIT: content validation rejects “illustrative” and
+  “reconstructed” in objective titles and hints, regardless of case; provenance
+  metadata remains allowed. Added regression checks and updated existing browser
+  assertions for the revised copy and hint behavior.
+- Phase F, F-COPY-AUDIT follow-up: the hint persistence browser test now uses
+  Challenger Deep's naturally near-rated Class C dive. Titanic is well below its
+  hull hint threshold. Added explicit hull/rating/safety preconditions and isolated
+  unrelated hints while retaining all visibility, dismissal and persistence checks.
+
 - Phase F, F-SAVE-SOAK: settings and key bindings recover intact legacy copies
   when current localStorage entries are empty, truncated or corrupt. Explicit v0
   settings and bare v0 discovery maps retain their saved choices and discoveries;

@@ -35,24 +35,24 @@
       "type": "scan",
       "poi": "kh-hiolo-north",
       "primary": true,
-      "title": "Survey the Hiolo North vent site",
-      "hint": "The Hiolo North vent site lies southwest of the summit inside Pele's Pit, around 1,300 m."
+      "title": "Survey Hiolo North",
+      "hint": "Head southwest of the summit into Pele's Pit, near 1,300 m."
     },
     {
       "id": "hiolo-south",
       "type": "scan",
       "poi": "kh-hiolo-south",
       "primary": true,
-      "title": "Survey the Hiolo South vent site",
-      "hint": "The Hiolo South vent site lies south of the summit inside Pele's Pit, around 1,275 m."
+      "title": "Survey Hiolo South",
+      "hint": "Look south of the summit inside Pele's Pit, around 1,275 m."
     },
     {
       "id": "south-rift",
       "type": "scan",
       "poi": "kh-south-rift",
       "primary": false,
-      "title": "Trace the south rift zone",
-      "hint": "Trace the south rift zone south from the summit through the deepening volcanic slope, around 1,280 m here."
+      "title": "Trace the south rift",
+      "hint": "Follow the deepening volcanic slope south from the summit, around 1,280 m here."
     }
   ],
   "completion": "all_primary",

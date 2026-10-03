@@ -36,32 +36,32 @@
       "type": "scan",
       "poi": "axial-ashes-mushroom",
       "primary": true,
-      "title": "Locate and scan the Mushroom chimney",
-      "hint": "Mushroom, a chimney in the ASHES field, is at the western caldera wall's base, around 1,540 m."
+      "title": "Scan Mushroom",
+      "hint": "Find Mushroom at the western caldera wall's base, near 1,540 m."
     },
     {
       "id": "inferno",
       "type": "scan",
       "poi": "axial-ashes-inferno",
       "primary": true,
-      "title": "Locate and scan the Inferno chimney",
-      "hint": "Inferno, a black smoker, is beside Mushroom in ASHES, near the western wall, around 1,540 m."
+      "title": "Scan Inferno",
+      "hint": "Inferno stands beside Mushroom near the western wall, around 1,540 m."
     },
     {
       "id": "minor-chimneys",
       "type": "scan",
       "poi": "axial-ashes-minor-chimneys",
       "primary": false,
-      "title": "Survey the Hell, Phoenix and Virgin chimneys",
-      "hint": "The Hell, Phoenix and Virgin chimney group is just east of Mushroom in ASHES, around 1,540 m."
+      "title": "Scan Hell, Phoenix and Virgin",
+      "hint": "Find the smaller chimney group just east of Mushroom, around 1,540 m."
     },
     {
       "id": "caldera-wall",
       "type": "scan",
       "poi": "axial-caldera-wall",
       "primary": false,
-      "title": "Survey the base of the western caldera wall",
-      "hint": "The western caldera wall rises west of ASHES; find its base on the slope near 1,420 m."
+      "title": "Survey the western wall",
+      "hint": "Follow the rising slope west of ASHES to the wall base, near 1,420 m."
     }
   ],
   "completion": "all_primary"

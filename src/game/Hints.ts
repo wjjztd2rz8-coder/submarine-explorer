@@ -24,12 +24,11 @@ export interface HintLabels {
 }
 
 export const HINT_TEXT: Record<HintId, (l: HintLabels) => string> = {
-  'battery-low': (l) =>
-    `Battery is getting low. Rise toward the surface or switch lights off (${l.lights}).`,
-  'near-hull': () => 'You are near your hull rating. Rise a little to ease the pressure.',
-  'scan-target': (l) => `Something to scan is in range. Face it and hold ${l.scan}.`,
-  creature: (l) => `A creature is nearby. Scan it (${l.scan}) or photograph it (${l.photo}).`,
-  rov: (l) => `The ROV is ready: ${l.rov} sends it out on a tether to reach tight spots.`,
+  'battery-low': (l) => `Battery low. Ascend or turn off lights (${l.lights}).`,
+  'near-hull': () => 'Near hull rating. Ascend to ease pressure.',
+  'scan-target': (l) => `Face the target. Hold ${l.scan} to scan.`,
+  creature: (l) => `Animal nearby. Hold ${l.scan} to scan, or press ${l.photo} for a photo.`,
+  rov: (l) => `Press ${l.rov} to deploy the tethered ROV into tight spots.`,
 };
 
 export interface HintContext {

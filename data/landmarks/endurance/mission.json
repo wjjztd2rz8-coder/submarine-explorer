@@ -37,24 +37,24 @@
       "type": "scan",
       "poi": "endurance-hull",
       "primary": true,
-      "title": "Locate and scan the main hull",
-      "hint": "The Endurance hull is at her documented Weddell Sea position, upright on seabed around 3,000 m."
+      "title": "Scan the main hull",
+      "hint": "Find the upright hull on the Weddell Sea floor, around 3,000 m."
     },
     {
       "id": "find-nameplate",
       "type": "scan",
       "poi": "endurance-stern-nameplate",
       "primary": true,
-      "title": "Scan the stern, where her name is still legible",
-      "hint": "The nameplate is at Endurance's stern, just south of the hull centre, around 3,000 m."
+      "title": "Scan the stern nameplate",
+      "hint": "Look just south of the hull centre for the stern nameplate, around 3,000 m."
     },
     {
       "id": "helm",
       "type": "scan",
       "poi": "endurance-helm",
       "primary": false,
-      "title": "Find the ship's wheel and the life growing on the hull",
-      "hint": "The ship's wheel is by the stern, just east of the hull centre, near 3,000 m."
+      "title": "Find the wheel and marine life",
+      "hint": "Look by the stern, just east of the hull centre, near 3,000 m."
     },
     {
       "id": "rigging",
@@ -62,7 +62,7 @@
       "poi": "endurance-rigging-debris",
       "primary": false,
       "title": "Survey the fallen masts and funnel",
-      "hint": "The fallen masts and funnel lie beside the hull, near 3,000 m."
+      "hint": "Find the fallen-rigging marker beside the hull, near 3,000 m."
     }
   ],
   "completion": "all_primary"

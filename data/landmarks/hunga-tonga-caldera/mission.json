@@ -35,8 +35,8 @@
       "type": "scan",
       "poi": "hunga-tonga-caldera-floor",
       "primary": true,
-      "title": "Survey the pre-2022 caldera floor",
-      "hint": "The caldera floor is the broad basin near 130 m, east of the inner wall."
+      "title": "Survey the pre-2022 basin",
+      "hint": "Look east of the inner wall for the broad caldera basin, near 130 m."
     },
     {
       "id": "rim-wall",
@@ -44,7 +44,7 @@
       "poi": "hunga-tonga-rim-wall",
       "primary": true,
       "title": "Follow the volcanic rim slope",
-      "hint": "The volcanic slope lies west of the shallow basin, near 470 m."
+      "hint": "Head west from the shallow basin down the volcanic slope, near 470 m."
     }
   ],
   "completion": "all_primary"

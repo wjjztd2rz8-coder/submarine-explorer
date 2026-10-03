@@ -15,9 +15,7 @@ test('polished dive HUD keeps mission, telemetry, speed and live tips readable',
     () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
   await expect(page.locator('.obj-item')).toHaveCount(4);
-  await expect(page.locator('.obj-item.is-current')).toContainText(
-    'Locate and scan the bow section',
-  );
+  await expect(page.locator('.obj-item.is-current')).toContainText('Scan the bow');
   await expect(page.locator('.obj-item.is-optional')).toHaveCount(2);
   await expect(page.locator('.obj-check')).toHaveText(['○', '○', '○', '○']);
   await expect(page.locator('.obj-hint')).not.toBeEmpty();
@@ -91,14 +89,12 @@ test('a long objective list shows the current target and the next few', async ({
     ]);
   });
   await expect(page.locator('.obj-item')).toHaveCount(4);
-  await expect(page.locator('.obj-item.is-current')).toContainText(
-    'Locate and scan the Poseidon tower',
-  );
+  await expect(page.locator('.obj-item.is-current')).toContainText('Scan Poseidon');
   await expect(page.locator('.obj-item-title')).toHaveText([
-    'Locate and scan the Poseidon tower',
-    'Scan the IMAX Tower',
+    'Scan Poseidon',
+    'Scan IMAX Tower',
     'Extra vent one',
-    'Scan the Beehive chimney',
+    'Scan Beehive',
   ]);
   await expect(page.locator('.obj-more')).toHaveText('+2 more · Esc for all');
   await expect(page.locator('.obj-item', { hasText: 'Extra vent two' })).toHaveCount(0);

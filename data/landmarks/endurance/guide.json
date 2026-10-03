@@ -10,7 +10,7 @@
         "Endurance carried Sir Ernest Shackleton's Imperial Trans-Antarctic Expedition into the Weddell Sea in 1914-15. Built in 1912 at the Framnæs yard in Sandefjord, Norway, and launched under the name Polaris, she was a three-masted barquentine reinforced for polar ice; Shackleton bought and renamed her in January 1914. Pack ice closed around her in January 1915, and after ten months drifting, beset, the ice finally crushed her hull. Captain Frank Worsley recorded her sinking position on 21 November 1915. All 28 men aboard survived; they camped on the drifting ice and eventually reached Elephant Island, from where Shackleton and five others made the 1,300 km open-boat journey to South Georgia for rescue.",
         "The wreck was found on 5 March 2022 by the Endurance22 expedition, organised by the Falklands Maritime Heritage Trust (FMHT) aboard the South African polar vessel S.A. Agulhas II -- exactly 100 years to the day after Shackleton was buried at Grytviken, South Georgia. She lies 3,008 m deep in the Weddell Sea, within the search area the team had defined before departure. Mensun Bound, the expedition's Director of Exploration, called her \"by far the finest wooden shipwreck I have ever seen. It is upright, well proud of the seabed, intact, and in a brilliant state of preservation.\"",
         "The wreck had already been designated a protected Historic Site and Monument (HSM No. 93) under the Antarctic Treaty System in 2019, three years before anyone knew exactly where she lay. The UK Antarctic Heritage Trust (UKAHT), working with Historic England, now leads the Conservation Management Plan for the site.",
-        "What you see here: the seabed is real bathymetry from the GMRT Synthesis, but this part of the Weddell Sea has no dedicated multibeam survey, so the grid falls back to GEBCO's coarser global fill -- far too coarse to show a 44 m wooden hull, and unusually smooth even by the standards of this game's other sites. The ship and everything on her are built from Endurance22's published photographs, survey report and the ship's known dimensions."
+        "No dedicated multibeam survey covers this part of the Weddell Sea; the terrain uses GMRT's coarser GEBCO-derived grid, smoothing small features. Endurance22's published photographs and survey report show the 44 m ship in much finer detail."
       ],
       "facts": [
         {
@@ -132,7 +132,7 @@
       "paragraphs": [
         "The ship's name is still clearly legible on the stern, painted directly below the taffrail. Above it is a five-pointed star -- a survival of her original name, Polaris, the pole star, under which she was launched at the Framnæs yard in 1912 before Shackleton bought and renamed her.",
         "Finding the name intact after 106 years on the seabed was one of the expedition's most striking moments, and it is the clearest piece of evidence that this is, beyond doubt, Shackleton's ship.",
-        "It sits on the stern, about 20 m from the hull's centre. No coordinate or heading is published for the nameplate itself or for the ship's orientation."
+        "The stern scan sits about 20 m from the hull's centre."
       ],
       "facts": [
         {
@@ -166,8 +166,7 @@
       "title": "The wheel, and life in total darkness",
       "paragraphs": [
         "Endurance22's cameras also captured the ship's wheel, still standing at her stern. No sunlight reaches 3,008 m, so nothing here photosynthesises; instead the hull has become a deep-sea oasis of filter feeders that strain edible particles from the passing water.",
-        "Marine biologists reviewing the footage identified sea stars (including brisingid sea stars), glass sponges, sea squirts, a bright yellow stalked sea lily (a crinoid), and a large white anemone near the wheel. They also spotted a ghostly white squat lobster, likely of the genus Munidopsis -- the first record of that kind of animal in this part of the Weddell Sea. \"The ship is cool,\" said British Antarctic Survey marine biogeographer Huw Griffiths, \"but look at those things living on it.\"",
-        "The wheel is placed near the stern; no coordinate is published for it."
+        "Marine biologists reviewing the footage identified sea stars (including brisingid sea stars), glass sponges, sea squirts, a bright yellow stalked sea lily (a crinoid), and a large white anemone near the wheel. They also spotted a ghostly white squat lobster, likely of the genus Munidopsis -- the first record of that kind of animal in this part of the Weddell Sea. \"The ship is cool,\" said British Antarctic Survey marine biogeographer Huw Griffiths, \"but look at those things living on it.\""
       ],
       "facts": [
         {
@@ -202,7 +201,7 @@
       "paragraphs": [
         "Although the hull is remarkably sound, Endurance did not come through entirely undamaged. FMHT's survey found her masts down and her funnel toppled, with the heaviest damage concentrated around the poop deck at the stern and the waist amidships. Photographs of the wreck suggest she struck the seabed bow- or keel-first as she went down.",
         "The damage is consistent with how she sank: crushed by pack ice over months, then going down stern-first as recorded by witnesses in 1915, after a fall of 3 km through freezing water.",
-        "A debris scatter is placed forward of the hull, standing in for the fallen rigging and funnel; no coordinates are published for individual pieces."
+        "Look forward of the hull for the fallen-rigging scan marker."
       ],
       "facts": [
         {
@@ -244,8 +243,8 @@
       "title": "Worsley's position, and the search that found her",
       "paragraphs": [
         "Captain Frank Worsley, Endurance's navigator, logged the ship's sinking position from the ice as 68°39′30″S 52°26′30″W. A 2022 peer-reviewed study of his navigation log (Squire & Bell, Journal of Navigation) found the fix itself was sound work under brutal conditions, but flagged real sources of uncertainty: few navigational sights were possible around the time of the sinking, and chronometer error accumulates the longer it goes unchecked at sea. The authors estimate the combined uncertainty at several nautical miles in both latitude and longitude.",
-        "The Endurance22 team used Worsley's position, adjusted for that uncertainty, to define their search box -- and found the wreck within it. UKAHT and other secondary sources describe the wreck as roughly four miles (6.4 km) south of Worsley's recorded position; this game's own distance between the peer-reviewed log coordinate and the wreck's published coordinate works out closer to 10 km, to the south-south-east. Both figures describe the same real discrepancy; we report ours rather than silently adopting the more common one (see sources.md).",
-        "This point marks real seabed terrain at Worsley's logged coordinate. Nothing was built or lost here -- it is included to show how good historical navigation, and 107 years of searching, finally led back to the ship."
+        "The Endurance22 team used Worsley's position, adjusted for that uncertainty, to define their search box and found the wreck within it. UKAHT describes the wreck as roughly four miles (6.4 km) south of his recorded position. Measuring between the published log and wreck coordinates gives about 10 km to the south-south-east.",
+        "This scan marks seabed at Worsley's logged position. His navigation, and 107 years of searching, finally led back to the ship."
       ],
       "facts": [
         {
@@ -283,7 +282,7 @@
       "title": "A very flat piece of ocean floor",
       "paragraphs": [
         "Away from the wreck, this part of the Weddell Sea floor is remarkably featureless: across the whole ~70 x 33 km tile the terrain ranges only from about 2,915 m to 3,096 m, a relief of under 200 m. Two kilometres west of the wreck the seabed is about 2,988 m deep, a gentle 12 m rise from the 3,000 m reading at the wreck itself.",
-        "That flatness is partly real -- deep Weddell Sea abyssal plain, far from any ridge or canyon -- and partly a limit of the data. This tile has no dedicated multibeam survey at the wreck site, so the grid falls back to GMRT's coarser GEBCO-derived global fill, which smooths out any seabed feature smaller than a few kilometres. That is a second, independent reason (besides scale) that the wreck itself cannot appear in the terrain: even a large seabed feature here would barely register."
+        "The deep Weddell Sea plain lies far from ridges and canyons. The coarser GEBCO-derived grid used here also smooths seabed features smaller than a few kilometres."
       ],
       "facts": [
         {

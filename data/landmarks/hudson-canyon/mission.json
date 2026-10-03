@@ -35,16 +35,16 @@
       "type": "scan",
       "poi": "hc-canyon-wall",
       "primary": true,
-      "title": "Scan the north wall of the upper canyon",
-      "hint": "The upper canyon's north wall is a steep mapped slope near 540 m."
+      "title": "Scan the north canyon wall",
+      "hint": "Find the steep north wall of the upper canyon, near 540 m."
     },
     {
       "id": "coral-ledge",
       "type": "scan",
       "poi": "hc-coral-ledge",
       "primary": true,
-      "title": "Survey the coral-habitat ledge",
-      "hint": "The coral-habitat ledge lies southeast along the canyon wall, around 940 m."
+      "title": "Survey the coral ledge",
+      "hint": "Follow the wall southeast to the coral-habitat ledge, around 940 m."
     }
   ],
   "completion": "all_primary",
