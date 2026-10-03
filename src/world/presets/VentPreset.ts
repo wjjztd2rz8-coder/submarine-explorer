@@ -293,17 +293,23 @@ void main() {
   // Buoyant plume: fast out of the orifice, slowing and spreading as it rises.
   float h = uRiseH * (1.0 - pow(1.0 - t, 1.8));
   // A narrow stem that billows outward: radius grows faster than linearly.
-  float r = uSpread * (0.06 + 0.94 * pow(t, 1.35)) * aSeed.z;
+  // Irregular outline: a per-chimney, height-dependent lobe term and a per-puff bias keep
+  // the edge ragged (no clean cone), with a few stragglers thrown well outside the core.
+  float cph = position.x * 0.13 + position.z * 0.17;
+  float lobe = 0.72 + 0.34 * sin(h * 0.21 + cph * 5.0 + uTime * 0.08)
+                    + 0.18 * sin(h * 0.53 - aSeed.y * 3.0 + cph);
+  float bias = mix(0.55, 1.0, aSeed.w) * (aSeed.w > 0.93 ? 1.35 : 1.0);
+  float r = uSpread * (0.06 + 0.94 * pow(t, 1.35)) * aSeed.z * max(0.35, lobe) * bias;
   float a = aSeed.y + sin(uTime * 0.35 + aSeed.w * 12.0) * 0.6 * t;
   vec3 w = position + vec3(cos(a) * r, h, sin(a) * r);
   // The whole column meanders (phase per chimney) and bends downstream with the current.
   float ph = position.x * 0.13 + position.z * 0.17;
-  w.x += sin(h * 0.09 + uTime * 0.21 + ph) * 0.11 * uSpread * t;
-  w.z += cos(h * 0.07 + uTime * 0.17 + ph * 1.7) * 0.11 * uSpread * t;
+  w.x += sin(h * 0.09 + uTime * 0.21 + ph) * 0.2 * uSpread * t;
+  w.z += cos(h * 0.07 + uTime * 0.17 + ph * 1.7) * 0.2 * uSpread * t;
   w.xz += uDrift * t * t;
   // Turbulent wobble grows with height.
-  w.x += sin(uTime * 0.9 + aSeed.w * 40.0 + h * 0.2) * 0.8 * t;
-  w.z += cos(uTime * 0.7 + aSeed.w * 23.0 + h * 0.15) * 0.8 * t;
+  w.x += sin(uTime * 0.9 + aSeed.w * 40.0 + h * 0.2) * (0.8 + 1.4 * t) * t;
+  w.z += cos(uTime * 0.7 + aSeed.w * 23.0 + h * 0.15) * (0.8 + 1.4 * t) * t;
 
   // Puffs bloom quickly near the source, then keep swelling slowly.
   float size = mix(uSize0, uSize1, sqrt(t)) * (0.7 + 0.6 * aSeed.w);

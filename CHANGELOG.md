@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- F-BEEBE-PLUMES: black-smoker smoke no longer reads as a smooth grey funnel. Prop smoke plumes (`smokePlume`) are now noise puffs with a dark dense core, ragged outline, drift growing with height and an orifice shimmer; the vent preset smoke gets height-dependent lobes, a per-puff radial bias and stronger meander so its edge is irregular (reason: director review, Beebe plumes).
+
 - Phase F, F-CI-MAIN-RED: preset shader checks explicitly select Medium so CI's
   Low preference does not suppress their asserted geometry; the crush-depth
   browser check samples frame-clock progress and waits for the ascent/debrief
