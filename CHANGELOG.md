@@ -14,6 +14,10 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-LOSTCITY-2: Lost City's seabed and slope now read outside the headlight pool
+  (paler grey-carbonate sediment with low contrast, less orange staining, ambient fill 8
+  to 12), and seven unnamed carbonate spires (24-52 m) stand behind Poseidon so the ridge
+  reads as a field. Lost City only; other sites' light and terrain are unchanged.
 - Phase F, F-TITANIC-2: Titanic's free dive now opens broadside to the bow with the
   chase camera pulled in to 70 m (new optional `chaseRadius` on composed openings), so
   the rails, portholes and plating read and the sub no longer hides the mid-hull; the
