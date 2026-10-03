@@ -210,6 +210,8 @@ export interface SpawnPose {
   z: number;
   /** Radians, the sub's convention: 0 faces north (-Z), +PI/2 faces east. */
   yaw: number;
+  /** Chase-camera distance (m) for a composed opening; unset keeps the configured arm. */
+  chaseRadius?: number;
 }
 
 /**

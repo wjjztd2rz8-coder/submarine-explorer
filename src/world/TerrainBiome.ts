@@ -270,7 +270,7 @@ export const BIOMES: Record<string, Biome> = {
     rippleDir: 0.2,
     burrow: 0.6,
     rockBias: 0.15,
-    depthShade: { startM: 14, endM: 95, tint: 0x3a6a90 },
+    depthShade: { startM: 14, endM: 95, tint: 0x5a90b6 },
     scatter: [
       { kind: 'rubble', density: 3, slopeMaxDeg: 30, on: 'any' },
       { kind: 'boulder', density: 0.8, slopeMaxDeg: 45, on: 'rock' },

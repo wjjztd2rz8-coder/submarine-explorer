@@ -10,7 +10,11 @@
       "shaftOpacity": 0.14,
       "shaftMaxDepthM": 110,
       "causticsScale": 0.8,
-      "ambientScale": 1.5
+      "ambientScale": 1.5,
+      "haloclineDepthM": 90,
+      "haloclineLat": 17.3156,
+      "haloclineLon": -87.5356,
+      "haloclineRadiusM": 175
     }
   },
   "species_file": "species.json",

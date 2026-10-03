@@ -128,6 +128,14 @@ export interface ReefPresetConfig {
   ambientWarmth: number;
   warmColor: number;
   causticsScale: number;
+  /** Depth (positive m) of a pale halocline haze layer; 0 = none (Great Blue Hole: ~90 m). */
+  haloclineDepthM: number;
+  /** World position of the layer's centre (a sinkhole); null keeps it off. */
+  haloclineLat: number | null;
+  haloclineLon: number | null;
+  haloclineRadiusM: number;
+  haloclineOpacity: number;
+  haloclineColor: number;
 }
 
 /** Hadal trench: darker than the abyss band, sparser snow, pressure ambience events. */
@@ -294,6 +302,12 @@ export const DEFAULT_PRESETS: PresetsConfig = {
     ambientWarmth: 0.18,
     warmColor: 0xffe9b8,
     causticsScale: 1.5,
+    haloclineDepthM: 0,
+    haloclineLat: null,
+    haloclineLon: null,
+    haloclineRadiusM: 180,
+    haloclineOpacity: 0.34,
+    haloclineColor: 0xb4d8d2,
   },
   trench: {
     fogScale: 1.5,

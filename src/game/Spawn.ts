@@ -86,9 +86,18 @@ const FREE_DIVE_OPENINGS: Record<
     openWater?: boolean;
     /** Score cost per degree of turn away from `bearing` (default 0.12): high keeps a face-on view. */
     turnWeight?: number;
+    /** Pull the chase camera in to this arm length (m): a long wreck then fills the frame. */
+    chaseRadius?: number;
   }
 > = {
-  titanic: { hero: 'bow-hull', bearing: 40, range: 16, altitude: 14, yawOffset: 10 },
+  titanic: {
+    hero: 'bow-hull',
+    bearing: 100,
+    range: 16,
+    altitude: 26,
+    yawOffset: 10,
+    chaseRadius: 70,
+  },
   'challenger-deep': { hero: 'leggo-lander-marker', bearing: 135, range: 65 },
   'lost-city': {
     hero: 'poseidon-tower',
@@ -204,6 +213,7 @@ export function composedFreeDiveSpawn(
     // Reserve a clear chase arm as well as a collision-free submarine pose.
     const yaw =
       Math.atan2(target.x - p.x, -(target.z - p.z)) + ((opening.yawOffset ?? 0) * Math.PI) / 180;
+    if (opening.chaseRadius) rig.chaseRadius = opening.chaseRadius;
     rig.snap(p, yaw, 0);
     let cameraClear = true;
     for (let i = 1; i <= 6; i++) {
@@ -214,7 +224,7 @@ export function composedFreeDiveSpawn(
     const score = Math.abs(p.y - wantedY) * 3 + Math.abs(turn) * (opening.turnWeight ?? 0.12);
     if (score < bestScore) {
       bestScore = score;
-      best = { x: p.x, y: p.y, z: p.z, yaw };
+      best = { x: p.x, y: p.y, z: p.z, yaw, chaseRadius: opening.chaseRadius };
     }
   }
   return best;
