@@ -160,6 +160,7 @@ export class HUD {
     this.currentEl = this.root.querySelector('.hud-current') as HTMLDivElement;
     const attr = this.root.querySelector('.hud-attribution') as HTMLDivElement;
     attr.textContent = meta.attribution;
+    attr.title = meta.attribution;
 
     parent.appendChild(this.root);
     this.set('tile', `${meta.id} (${meta.cols}×${meta.rows})`);

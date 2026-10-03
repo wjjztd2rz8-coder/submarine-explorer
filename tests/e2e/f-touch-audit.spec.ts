@@ -47,6 +47,7 @@ async function reachable(target: Locator): Promise<void> {
 }
 
 for (const viewport of [
+  { width: 360, height: 640 },
   { width: 390, height: 844 },
   { width: 667, height: 375 },
   { width: 844, height: 390 },
@@ -73,7 +74,9 @@ for (const viewport of [
         await expect(page.locator('.scan-panel')).toBeVisible();
         await expect(page.locator('.scan-hint')).toHaveText('HOLD SCAN TO SCAN');
         const controls = ['.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause'];
-        const hud = ['.sonar', '.hud-readouts', '.scan-panel'];
+        const hud = ['.sonar', '.hud-readouts', '.scan-panel', '.hud-attribution'];
+        if (viewport.width < viewport.height)
+          await expect(page.locator('.tc-rotate-hint')).toBeHidden();
         await separate(page, [...hud, '.onboard-card', ...controls]);
         for (const button of await page.locator('.d2-sonar-controls button, .tc-btn').all())
           await reachable(button);
@@ -122,8 +125,7 @@ for (const viewport of [
         await expect(page.locator('.sonar')).toHaveClass(/d-sonar-expanded/);
         for (const button of await page.locator('.d2-sonar-controls button').all())
           await reachable(button);
-        if (viewport.width > viewport.height)
-          await separate(page, ['.sonar', '.tc-buttons', '.tc-btn-pause']);
+        await separate(page, ['.sonar', '.tc-buttons', '.tc-btn-pause']);
         if (scale === 100)
           await page.screenshot({ path: testInfo.outputPath('expanded-sonar.png') });
         await page.locator('.tc-btn-sonar').tap();
@@ -157,11 +159,15 @@ for (const viewport of [
         '.tc-slider',
         '.tc-buttons',
         '.tc-btn-pause',
+        '.hud-attribution',
       ]);
       expect(
         await page.locator('.hud-readouts').evaluate((e) => e.scrollWidth <= e.clientWidth),
       ).toBe(true);
     });
+
+    // 360×640 was added for the HUD audit; retain the existing menu matrix.
+    if (viewport.width === 360) return;
 
     test('Daily, expanded mode picker and menu exits are reachable by touch', async ({ page }) => {
       await ready(page, '/?touch=1&tier=low');
