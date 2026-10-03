@@ -1,5 +1,6 @@
 import type { WebGLRenderer } from 'three';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { waitForFrames } from './helpers/frames.js';
 
 type TitleStats = {
   active: boolean;
@@ -25,10 +26,11 @@ async function presented(page: Page): Promise<void> {
 }
 
 async function stopped(page: Page): Promise<void> {
-  // Allow any pending resize/asset presentation to settle, then observe multiple frames.
-  await page.waitForTimeout(250);
+  // Terrain/resize can mark a static frame dirty before render.prepare consumes it.
+  await waitForFrames(page, 2);
   const before = (await title(page)).drawCount;
-  await page.waitForTimeout(500);
+  // Require actual loop opportunities as well as a span beyond the 30 fps cap.
+  await waitForFrames(page, 8, 500);
   expect((await title(page)).drawCount).toBe(before);
 }
 
@@ -296,8 +298,11 @@ test('quit after a mission lazily presents home, keeps Continue and freezes the 
     });
   const before = await pose();
   await page.keyboard.down('w');
-  await page.waitForTimeout(500);
-  await page.keyboard.up('w');
+  try {
+    await waitForFrames(page, 8, 500);
+  } finally {
+    await page.keyboard.up('w');
+  }
   expect(await pose()).toEqual(before);
   await resume.click();
   await expect(page.locator('.home-screen')).toBeHidden();
@@ -314,6 +319,14 @@ test('optional title terrain and font failures leave an honest, usable fallback'
 }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
+  let fallbackSettled = false;
+  page.on('console', (message) => {
+    if (
+      message.type() === 'warning' &&
+      message.text().includes('[title] Monterey preview unavailable')
+    )
+      fallbackSettled = true;
+  });
   let blocked = 0;
   await page.route('**/data/tiles/monterey-canyon/**', (route) => {
     blocked++;
@@ -328,7 +341,8 @@ test('optional title terrain and font failures leave an honest, usable fallback'
   await presented(page);
   await expect.poll(() => blocked).toBeGreaterThan(0);
   await expect.poll(() => blockedFonts).toBeGreaterThan(0);
-  await page.waitForTimeout(500);
+  // Seeing the request abort is earlier than the title loader's catch handler.
+  await expect.poll(() => fallbackSettled).toBe(true);
   await expect(page.locator('.home-scene-caption')).toHaveText('Expedition preview');
   expect((await title(page)).terrainReady).toBe(false);
   expect(await page.evaluate(() => window.__gameError)).toBeFalsy();

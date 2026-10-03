@@ -589,10 +589,16 @@ to navy in the sites subview, skipping the gameplay/post path. Title draws stop 
 sites, dive/pause, hidden documents and covering Settings/Journal/Controls/Upgrades
 or overlay globe. Return invalidates a fresh frame; scene objects persist across
 home entries and owned resources/listeners are disposed at teardown. The embedded
-globe opens only while home and its sites subview are open.
+globe opens only while home and its sites subview are open, the document is visible,
+no modal covers it and its layout slot has client rects; exceptionally short layouts
+hide that slot and stop the globe renderer too. Title presentation uses the boot
+exposure and the canvas render target, restoring the shared renderer's target,
+exposure, clear colour/alpha, viewport and scissor state afterwards.
 
 OS or saved reduced motion makes the title static; it redraws on dirty events
-such as resize, terrain readiness and re-entry. Animated drawing is capped at
+such as resize, pixel-ratio or quality changes, terrain readiness and re-entry
+(including tab restore and modal close). Between those events static home skips
+renderer state calls as well as draws. Animated drawing is capped at
 30 fps. Title budgets are 35 calls/100k triangles on Low and 60 calls/200k triangles
 on Medium and above. `window.__game.titleScene` exposes snapshots of `active`,
 `terrainReady`, `animated`, `drawCount`, `calls` and `triangles`; the counters let
