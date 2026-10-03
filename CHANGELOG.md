@@ -14,6 +14,9 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-TITLE-A: finalized the original Bathyline mark with a 16 px variant,
+  replaced the sonar favicon/PWA icons for the title identity, and added licensed
+  self-hosted DM Sans/Source Serif 4 weights with an unimported font stylesheet.
 - Phase F, F-TITLE-B/C: added the (not yet wired) Bathyline title scene
   modules: `src/render/title/TitleTerrain.ts` crops a 2,400 m real GMRT
   Monterey Canyon square, and `TitleScene.ts` composes the research sub, lamps,
