@@ -41,6 +41,7 @@ const STATIC_SHELL = [
   'icons/icon-maskable-192.png',
   'icons/icon-maskable-512.png',
   'icons/apple-touch-icon.png',
+  'share/bathyline-og-1200x630.png',
 ];
 
 export function pwaPlugin(): Plugin {

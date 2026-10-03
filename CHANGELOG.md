@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-SHARE-IMAGE: add a reproducible 1200×630 Bathyline social preview,
+  absolute GitHub Pages Open Graph/Twitter image metadata and worker precaching.
 - Phase F, F-BUGHUNT-12: title navigation lights stay steady in animated and
   reduced-motion scenes, including after quality changes.
 - Phase F, F-BUGHUNT-12: downward title vehicle hover respects the title floor

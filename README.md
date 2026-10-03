@@ -17,6 +17,17 @@ the Dive sites / Free dive picker (see [`docs/title-scene.md`](docs/title-scene.
 Home type is self-hosted DM Sans and Source Serif 4 (SIL OFL 1.1; notices in
 `public/fonts/` and `ATTRIBUTION.md`).
 
+The 1200×630 social preview in `public/share/bathyline-og-1200x630.png` uses the
+Bathyline mark, local brand fonts and original bathymetric contours. Regenerate
+its PNG from authored SVG with `node tools/make_share_image.mjs` using the Playwright
+Chromium installation already required for e2e (`npx playwright install chromium`).
+Linux sandboxes that block Chromium can use `node tools/make_share_image.mjs --native`
+with existing Python 3, librsvg, Cairo, HarfBuzz and libwoff2dec system libraries; no extra npm
+or pip packages are required. Renderer versions can change PNG antialiasing.
+The HTML social metadata uses the absolute GitHub Pages image URL under
+`https://wjjztd2rz8-coder.github.io/submarine-explorer/`; update it if the deployment
+host or project base changes.
+
 `npm run dev` and open the printed `localhost` URL. The **home screen** opens
 first with the globe from the dive-site picker behind a menu: **Continue**
 (your last dive, disabled until you've started one), **Dive sites**, **Free
