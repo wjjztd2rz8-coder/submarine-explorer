@@ -93,7 +93,7 @@ const FREE_DIVE_OPENINGS: Record<
   titanic: {
     hero: 'bow-hull',
     bearing: 100,
-    range: 16,
+    range: 28,
     altitude: 26,
     yawOffset: 10,
     chaseRadius: 70,

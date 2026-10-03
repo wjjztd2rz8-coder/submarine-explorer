@@ -4,7 +4,7 @@ Branch `claude/f-titanic-2`. Shots (before = `base-*`, after = `titanic-{high,lo
 
 ## Titanic
 
-- `game/Spawn.ts`: the opening now approaches broadside (bearing 100, 16 m off the footprint, 26 m above the hull base) with a new optional `chaseRadius` (70 m instead of the 123 m default arm). `SpawnPose.chaseRadius` (Pois.ts) carries it; `app/systems/props.ts` applies it before the snap. The hull now spans the frame (portholes, rails, deck, bow); the sub sits over the upper deck edge only. Facing stays within the existing e2e 0.98 assertion.
+- `game/Spawn.ts`: the opening now approaches broadside (bearing 100, 28 m off the footprint, 26 m above the hull base) with a new optional `chaseRadius` (70 m instead of the 123 m default arm). `SpawnPose.chaseRadius` (Pois.ts) carries it; `app/systems/props.ts` applies it before the snap. The hull now spans the frame (portholes, rails, deck, bow); the sub sits over the upper deck edge only. Facing stays within the existing e2e 0.98 assertion.
 - `TerrainBiome.ts`: Titanic bed uses one texture in both slots, `patch 0.12`, `stainAmount 0.05`: no pale blotches on the low tier.
 - `mission.json`: `ambientFill` 19 -> 30 (brighter, never darker), `moteOpacity` 0.3 (less orange snow noise in front of the hull).
 
