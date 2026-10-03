@@ -17,6 +17,7 @@
  * re-exports this class under its old name.
  */
 
+import { APP_NAME } from '../core/Brand.js';
 import type { GameEvents } from '../core/EventBus.js';
 import type { GuideEntry } from '../game/Guide.js';
 import {
@@ -125,7 +126,7 @@ export class Journal {
     const panel = el('div', 'jr-panel');
     const header = el('div', 'jr-header');
     const heading = el('div', 'jr-heading');
-    heading.append(el('span', 'jr-kicker', 'JOURNAL'));
+    heading.append(el('span', 'jr-kicker', APP_NAME));
     this.crumbEl = el('span', 'jr-crumb');
     heading.append(this.crumbEl);
     this.countEl = el('span', 'jr-count');

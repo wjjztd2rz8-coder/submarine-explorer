@@ -1,3 +1,5 @@
+import { APP_NAME, APP_TAGLINE } from '../core/Brand.js';
+import mark from '../../public/bathyline-mark.svg?raw';
 import { FocusTrap } from './FocusTrap.js';
 import { ModeSelector, type GameplaySettingsSource } from './ModeSelector.js';
 
@@ -9,18 +11,15 @@ export interface HomeActions {
 }
 
 const SCENE_FALLBACK = 'Expedition preview';
-const MARK_SVG =
-  '<svg class="home-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-  '<path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Z"/>' +
-  '<path class="contour" d="M7 17h4v-3h3c3 0 4-2 4-4s-2-4-5-4H8"/>' +
-  '<path class="contour inner-contour" d="M6 13h2v-3h3c1 0 2-.5 2-1"/></svg>';
-
-/** Decorative inline Bathyline mark (public/bathyline-mark.svg geometry; currentColor ring). */
+/** Decorative inline Bathyline mark (public/bathyline-mark.svg geometry; currentColor outline). */
 function brandMark(): HTMLElement {
   const box = document.createElement('span');
   box.className = 'home-mark-box';
   box.setAttribute('aria-hidden', 'true');
-  box.innerHTML = MARK_SVG;
+  box.innerHTML = mark.replace(
+    '<svg',
+    '<svg class="home-mark" aria-hidden="true" focusable="false"',
+  );
   return box;
 }
 
@@ -51,7 +50,7 @@ export class Home {
     this.root = document.createElement('div');
     this.root.className = 'home-screen';
     this.root.hidden = true;
-    this.root.setAttribute('aria-label', 'Bathyline home');
+    this.root.setAttribute('aria-label', `${APP_NAME} home`);
 
     // Decorative scene band / plate. Package E draws the title scene behind it.
     const hero = document.createElement('div');
@@ -61,10 +60,7 @@ export class Home {
     this.sceneCaption = document.createElement('span');
     this.sceneCaption.className = 'home-scene-caption';
     this.sceneCaption.textContent = SCENE_FALLBACK;
-    const caveat = document.createElement('span');
-    caveat.className = 'home-scene-caveat';
-    caveat.textContent = 'Vehicle and lighting are illustrative.';
-    plate.append(this.sceneCaption, caveat);
+    plate.append(this.sceneCaption);
     hero.append(plate);
 
     const panel = document.createElement('div');
@@ -77,11 +73,11 @@ export class Home {
     const brand = document.createElement('div');
     brand.className = 'home-brand';
     const title = document.createElement('h1');
-    title.textContent = 'Bathyline';
+    title.textContent = APP_NAME;
     brand.append(brandMark(), title);
     const sub = document.createElement('p');
     sub.className = 'home-tagline';
-    sub.textContent = 'Explore the real deep.';
+    sub.textContent = APP_TAGLINE;
     const desc = document.createElement('p');
     desc.className = 'home-desc';
     desc.textContent = 'Real terrain, simple controls, discoveries worth finding.';

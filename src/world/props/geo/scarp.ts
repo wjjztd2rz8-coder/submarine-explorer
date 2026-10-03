@@ -38,7 +38,14 @@ import {
   smooth,
   type BuiltProp,
 } from './shared.js';
-import { buildTalusMesh, placeRocks, rockMatrix, type RockSpot, type TalusShape } from './talus.js';
+import {
+  buildTalusMesh,
+  placeRocks,
+  rockMatrix,
+  talusSurface,
+  type RockSpot,
+  type TalusShape,
+} from './talus.js';
 import type { GeoBuildInput } from './types.js';
 
 export type ScarpPresetId = 'tuff' | 'canyon' | 'hadal';
@@ -602,7 +609,10 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   }
 
   // Monterey: sponges and cold-water coral fans cling to the lit face of the wall.
-  if (id === 'canyon') addWallLife(full, wall, d.growth, d.branchDepth, joinY, H, seed, rnd);
+  if (id === 'canyon')
+    addWallLife(full, wall, d.growth, d.branchDepth, joinY, H, seed, rnd, (x, z) =>
+      talusSurface(talus, x, z),
+    );
 
   // A faint seep of clear fluid on the caldera wall (Hunga Tonga is volcanically active).
   if (id === 'tuff') {
@@ -883,6 +893,7 @@ function addWallLife(
   H: number,
   seed: number,
   rnd: () => number,
+  surface: (x: number, z: number) => number,
 ): void {
   const pos = wall.getAttribute('position');
   const nor = wall.getAttribute('normal');
@@ -907,6 +918,10 @@ function addWallLife(
     const x = pos.getX(i) + nor.getX(i) * out;
     const yy = y + nor.getY(i) * out;
     const z = pos.getZ(i) + nz * out;
+    // A wall vertex can be below the rising seabed, even in the selected height
+    // band. Colonise only exposed rock above the final terrain/talus surface,
+    // checking the actual seat after its outward normal offset.
+    if (yy <= surface(x, z) + out) continue;
     const tilt = -(0.9 + rnd() * 0.5); // lean out of the face
     if (rnd() < 0.5 && spongeCount() < wantSponge) {
       const kind = Math.min(2, Math.floor(rnd() * 3)) as SpongeKind;

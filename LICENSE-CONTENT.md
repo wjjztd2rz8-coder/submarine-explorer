@@ -1,6 +1,6 @@
 # Content licence
 
-Submarine Explorer has three kinds of material, each under its own terms.
+Bathyline has three kinds of material, each under its own terms.
 
 | What                                                                                                                                                                                               | Licence                                                                                                                     |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -10,12 +10,12 @@ Submarine Explorer has three kinds of material, each under its own terms.
 
 ## CC BY-SA 4.0 for original content
 
-Copyright (c) 2026 Vijay Krishnan and Submarine Explorer contributors.
+Copyright (c) 2026 Vijay Krishnan and Bathyline contributors.
 
 You may share and adapt the original written content for any purpose,
 including commercially, provided that you:
 
-- **give credit**: name "Submarine Explorer contributors", link to the project
+- **give credit**: name "Bathyline contributors", link to the project
   and to this licence, and say whether you made changes; and
 - **share alike**: distribute your adaptations under CC BY-SA 4.0 or a
   compatible licence.

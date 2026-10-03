@@ -34,9 +34,8 @@ test('home copy, semantic order and first focus', async ({ page }) => {
   await expect(page.locator('.home-scene-caption')).toHaveText(
     /^(Expedition preview|Monterey Canyon · Real GMRT bathymetry)$/,
   );
-  await expect(page.locator('.home-scene-caveat')).toHaveText(
-    'Vehicle and lighting are illustrative.',
-  );
+  await expect(page.locator('.home-scene-caveat')).toHaveCount(0);
+  await expect(page.locator('.home-copy')).not.toContainText(/illustrative|reconstructed/i);
   const order = await page
     .locator('.home-menu > button:not(.daily-card), .home-menu > .mode-selector')
     .evaluateAll((els) =>

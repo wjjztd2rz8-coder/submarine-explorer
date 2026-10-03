@@ -1,13 +1,11 @@
 # Bathyline
 
-_Explore the real deep._ Bathyline (working title; the repository and package are
-still named `submarine-explorer`) is a cinematic ocean exploration game for the
-browser: real terrain, simple controls, discoveries worth finding. You pilot a
-research submarine over **real ocean-floor bathymetry**,
-downloaded from the [GMRT](https://www.gmrt.org) Global Multi-Resolution
-Topography synthesis. No invented terrain: what you see is measured seafloor,
-plus a small procedural detail layer (`docs/terrain.md`) and placed props that
-the field guide marks as reconstructions.
+_Explore the real deep._ Bathyline is a cinematic ocean exploration game for the
+browser: real terrain, simple controls, discoveries worth finding. Pilot a
+research submarine over **real ocean-floor bathymetry** from the
+[GMRT](https://www.gmrt.org) Global Multi-Resolution Topography synthesis,
+exploring wrecks, marine life and geological wonders on keyboard, controller or touch.
+The repository, package and deployment URLs retain `submarine-explorer`.
 
 ## Playing it
 
@@ -16,6 +14,14 @@ Monterey Canyon crop built from the checked-in GMRT tile, with the globe kept fo
 the Dive sites / Free dive picker (see [`docs/title-scene.md`](docs/title-scene.md)).
 Home type is self-hosted DM Sans and Source Serif 4 (SIL OFL 1.1; notices in
 `public/fonts/` and `ATTRIBUTION.md`).
+
+The identity lives in `public/brand/`: light/dark SVG marks, simplified 16 px
+marks and portable wordmarks with outlined Source Serif 4 lettering. “Dark”
+variants sit on navy backgrounds; “light” variants sit on pale backgrounds.
+The title imports the same mark geometry as the PWA and social card, and runtime
+copy uses `src/core/Brand.ts`. Rebuild wordmarks with
+`python3 tools/make_brand_wordmarks.py`; rebuild PWA/Apple icons with
+`node tools/make_icons.mjs` (or `--native` for Linux sandboxes).
 
 The 1200×630 social preview in `public/share/bathyline-og-1200x630.png` uses the
 Bathyline mark, local brand fonts and original bathymetric contours. Regenerate
