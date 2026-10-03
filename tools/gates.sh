@@ -1,10 +1,26 @@
 #!/usr/bin/env bash
 # Run every project gate and print a compact summary. Exit 0 only if all pass.
 # Usage: tools/gates.sh [--no-e2e]      Logs: .cache/gates/<gate>.log
+# Builds use temporary outputs unless PW_OUTDIR names a retained output.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.local/node/bin:$PATH"
 mkdir -p .cache/gates
+port="${PW_PORT:-4173}"
+if ! [[ "$port" =~ ^[0-9]+$ ]] || (( 10#$port < 1 || 10#$port > 65435 )); then
+  echo 'PW_PORT must be an integer between 1 and 65435 (reserves port + 100 for e2e-base).' >&2
+  exit 1
+fi
+port=$((10#$port)); bport=$((port + 100))
+# A gate run must build exactly what its preview will serve. Unique outputs
+# also prevent another gate process rebuilding/removing a live suite's files.
+outdir="${PW_OUTDIR:-dist-gates-$port-$$}"
+base_outdir="dist-gates-base-$bport-$$"
+cleanup() {
+  [[ -n "${PW_OUTDIR:-}" ]] || rm -rf -- "$outdir"
+  rm -rf -- "$base_outdir"
+}
+trap cleanup EXIT
 fail=0
 gate() {
   local name="$1"; shift
@@ -16,19 +32,23 @@ gate() {
     fail=1
   fi
 }
-gate build npm run build
+gate build npm run build -- --outDir "$outdir"
 gate unit npm test
 gate python npm run test:py
 gate content npm run check:content
 gate attribution python3 tools/check_attribution.py
 gate prettier npx prettier --check .
 if [[ "${1:-}" != "--no-e2e" ]]; then
-  # PW_PORT (default 4173) lets parallel worktrees run e2e side by side.
-  port="${PW_PORT:-4173}"; bport=$((port + 100))
-  gate e2e env PW_PORT="$port" npm run test:e2e
-  gate e2e-base bash -c "VITE_BASE=/submarine-explorer/ npm run build -- --outDir dist-project-base && \
-    VITE_BASE=/submarine-explorer/ PW_BASE=/submarine-explorer/ PW_PORT=$bport PW_OUTDIR=dist-project-base \
-    npx playwright test tests/e2e/base-url.spec.ts --output=test-results-project-base"
-  rm -rf dist-project-base
+  # Always let Playwright start/own its server; a port conflict fails early
+  # instead of silently depending on another task's preview lifetime/build.
+  gate e2e env PW_PORT="$port" PW_OUTDIR="$outdir" PW_REUSE_SERVER=0 \
+    npm run test:e2e -- --output="test-results-gates-$port-$$"
+  project_base() {
+    VITE_BASE=/submarine-explorer/ npm run build -- --outDir "$base_outdir" && \
+      VITE_BASE=/submarine-explorer/ PW_BASE=/submarine-explorer/ PW_PORT="$bport" \
+      PW_OUTDIR="$base_outdir" PW_REUSE_SERVER=0 \
+      npx playwright test tests/e2e/base-url.spec.ts --output="test-results-project-base-$bport-$$"
+  }
+  gate e2e-base project_base
 fi
 exit $fail
