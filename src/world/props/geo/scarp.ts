@@ -841,6 +841,38 @@ export function interp(profile: [number, number][], y: number): number {
   return profile[profile.length - 1]![1];
 }
 
+export type SpongeKind = 0 | 1 | 2;
+
+/** Size and colour limits for wall sponges (metres, HSL), kept in one place for tests. */
+export const SPONGE_LIMITS = { maxScale: 2.4, maxSat: 0.3, maxLight: 0.46 } as const;
+
+/** One wall sponge: kind 0 vase, 1 tall tube, 2 encrusting dome. Small, dull and varied. */
+export function wallSpongeSpec(
+  kind: SpongeKind,
+  x: number,
+  y: number,
+  z: number,
+  tilt: number,
+  rnd: () => number,
+): InstanceSpec {
+  let sx: number;
+  let sy: number;
+  if (kind === 1) {
+    sx = 0.9 + rnd() * 0.9;
+    sy = 1.1 + rnd() * 1.3;
+  } else if (kind === 2) {
+    sx = 1.2 + rnd() * 1.2;
+    sy = 0.5 + rnd() * 0.5;
+  } else {
+    sx = 0.9 + rnd() * 0.9;
+    sy = sx * (0.8 + rnd() * 0.5);
+  }
+  return {
+    t: { x, y, z, ry: rnd() * 6.28, rx: kind === 2 ? tilt * 0.6 : tilt, sx, sy, sz: sx },
+    color: new THREE.Color().setHSL(0.04 + rnd() * 0.1, 0.14 + rnd() * 0.16, 0.26 + rnd() * 0.2),
+  };
+}
+
 /** Sponges and gorgonian-like fans seated on the wall face, sampled from its own vertices (instanced, cheap). */
 function addWallLife(
   full: THREE.Group,
@@ -855,14 +887,14 @@ function addWallLife(
   const pos = wall.getAttribute('position');
   const nor = wall.getAttribute('normal');
   const n = pos.count;
-  const sponges: InstanceSpec[] = [];
+  const sponges: InstanceSpec[][] = [[], [], []];
+  const spongeCount = (): number => sponges[0]!.length + sponges[1]!.length + sponges[2]!.length;
   const fans: InstanceSpec[][] = [[], []];
   const wantSponge = Math.round(90 * Math.min(growth, 1.2));
   const wantFans = Math.round(70 * Math.min(growth, 1.2));
-  const c = new THREE.Color();
   for (
     let tries = 0;
-    tries < 4000 && (sponges.length < wantSponge || fans[0]!.length + fans[1]!.length < wantFans);
+    tries < 4000 && (spongeCount() < wantSponge || fans[0]!.length + fans[1]!.length < wantFans);
     tries++
   ) {
     const i = Math.floor(rnd() * n);
@@ -876,12 +908,9 @@ function addWallLife(
     const yy = y + nor.getY(i) * out;
     const z = pos.getZ(i) + nz * out;
     const tilt = -(0.9 + rnd() * 0.5); // lean out of the face
-    if (rnd() < 0.5 && sponges.length < wantSponge) {
-      const s = 2 + rnd() * 2.4;
-      sponges.push({
-        t: { x, y: yy, z, ry: rnd() * 6.28, rx: tilt, sx: s, sy: s * (0.8 + rnd() * 0.6), sz: s },
-        color: c.clone().setHSL(0.08 + rnd() * 0.07, 0.4, 0.58 + rnd() * 0.2),
-      });
+    if (rnd() < 0.5 && spongeCount() < wantSponge) {
+      const kind = Math.min(2, Math.floor(rnd() * 3)) as SpongeKind;
+      sponges[kind].push(wallSpongeSpec(kind, x, yy, z, tilt, rnd));
     } else if (fans[0]!.length + fans[1]!.length < wantFans) {
       const s = 1.8 + rnd() * rnd() * 2.6;
       fans[rnd() < 0.5 ? 0 : 1]!.push({
@@ -890,16 +919,23 @@ function addWallLife(
       });
     }
   }
-  if (sponges.length) {
-    const g = new THREE.CylinderGeometry(0.16, 0.09, 0.6, 7, 1, true).translate(0, 0.3, 0);
-    const m = new THREE.MeshStandardMaterial({
-      color: LIFE_TINT,
-      roughness: 0.8,
-      side: THREE.DoubleSide,
-    });
-    vertexGlow(m, 0.2, 0x8fc0c6, 0.35);
-    full.add(instanced(g, m, sponges, 'wall-sponges'));
-  }
+  const spongeGeo: THREE.BufferGeometry[] = [
+    // Vase: a small open cup.
+    new THREE.CylinderGeometry(0.14, 0.08, 0.5, 6, 1, true).translate(0, 0.25, 0),
+    // Tube: a tall, narrow chimney.
+    new THREE.CylinderGeometry(0.07, 0.06, 1, 5, 1, true).translate(0, 0.5, 0),
+    // Encrusting: a low closed dome hugging the rock.
+    new THREE.SphereGeometry(0.3, 6, 4, 0, Math.PI * 2, 0, Math.PI / 2),
+  ];
+  const sm = new THREE.MeshStandardMaterial({
+    color: LIFE_TINT,
+    roughness: 0.85,
+    side: THREE.DoubleSide,
+  });
+  vertexGlow(sm, 0.12, 0x8fc0c6, 0.35);
+  sponges.forEach((items, k) => {
+    if (items.length) full.add(instanced(spongeGeo[k]!, sm, items, `wall-sponges-${k}`));
+  });
   const cm = new THREE.MeshStandardMaterial({
     color: LIFE_TINT,
     vertexColors: true,
