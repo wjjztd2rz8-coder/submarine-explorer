@@ -166,14 +166,17 @@ describe('TitleScene motion and clearance', () => {
     }
   });
 
-  it('starts at the specified shot with a 35 m vehicle height', () => {
+  it('starts at the F-TITLE-LOOK shot with the hull just above the seabed', () => {
     const s = new TitleScene({ tier: 'low', reducedMotion: true });
     s.setCrop(makeCrop());
     const rig = s.scene.children.find((o) => o.type === 'Group') as THREE.Object3D;
-    expect(rig.position.toArray()).toEqual([0, 35, 0]);
-    expect(s.camera.position.x).toBeCloseTo(-85, 6);
-    expect(s.camera.position.y).toBeCloseTo(70, 6);
-    expect(s.camera.position.z).toBeCloseTo(115, 6);
+    expect(rig.position.toArray()).toEqual([0, TITLE_SHOT.vehicleAboveFloorM, 0]);
+    expect(s.camera.position.x).toBeCloseTo(TITLE_SHOT.cameraOffset.x, 6);
+    expect(s.camera.position.y).toBeCloseTo(
+      TITLE_SHOT.vehicleAboveFloorM + TITLE_SHOT.cameraOffset.y,
+      6,
+    );
+    expect(s.camera.position.z).toBeCloseTo(TITLE_SHOT.cameraOffset.z, 6);
     s.dispose();
   });
 
@@ -257,9 +260,9 @@ describe('TitleScene layout framing', () => {
   };
   it('puts the vehicle at the spec screen fractions', () => {
     const cases: [number, number, 'desktop' | 'portrait' | 'short-landscape', number, number][] = [
-      [1280, 720, 'desktop', 0.72, 0.55],
-      [390, 844, 'portrait', 0.64, 0.5],
-      [844, 390, 'short-landscape', 0.5, 0.66],
+      [1280, 720, 'desktop', 0.6, 0.58],
+      [390, 844, 'portrait', 0.5, 0.4],
+      [844, 390, 'short-landscape', 0.4, 0.62],
     ];
     for (const [w, h, layout, fx, fy] of cases) {
       const s = new TitleScene({ tier: 'low', reducedMotion: true });
@@ -391,5 +394,38 @@ describe('TitleScene lifecycle', () => {
     expect(geoSpy).toHaveBeenCalled();
     expect(matSpy).toHaveBeenCalled();
     expect(s.scene.children.length).toBe(0);
+  });
+});
+
+describe('TitleScene look pass (lamp beams, contact shadow)', () => {
+  it('drapes a contact shadow on the seabed and lands the lamp pools on it', () => {
+    const s = new TitleScene({ tier: 'low', reducedMotion: true });
+    expect(s.scene.getObjectByName('titleContactShadow')).toBeUndefined();
+    const crop = makeCrop();
+    s.setCrop(crop);
+    const shadow = s.scene.getObjectByName('titleContactShadow') as THREE.Mesh;
+    expect(shadow).toBeDefined();
+    const pos = shadow.geometry.getAttribute('position');
+    for (let i = 0; i < pos.count; i++) {
+      const y = crop.sampleFloor(pos.getX(i), pos.getZ(i));
+      expect(pos.getY(i) - y).toBeCloseTo(0.3, 5);
+    }
+    for (const side of [-1, 1]) {
+      const lamp = s.scene.getObjectByName(`titleLamp${side}`) as THREE.SpotLight;
+      const target = lamp.target.getWorldPosition(new THREE.Vector3());
+      expect(target.y - crop.sampleFloor(target.x, target.z)).toBeCloseTo(0.2, 3);
+      expect(s.scene.getObjectByName(`titleBeam${side}`)).toBeDefined();
+    }
+    s.dispose();
+    expect(crop.disposed).toBe(1);
+    expect(s.scene.children.length).toBe(0);
+  });
+
+  it('removes the contact shadow when the crop is cleared', () => {
+    const s = new TitleScene({ tier: 'low', reducedMotion: true });
+    s.setCrop(makeCrop());
+    s.setCrop(null);
+    expect(s.scene.getObjectByName('titleContactShadow')).toBeUndefined();
+    s.dispose();
   });
 });

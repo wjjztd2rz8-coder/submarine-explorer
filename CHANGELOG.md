@@ -14,6 +14,12 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-TITLE-LOOK: polished the home backdrop. Low dutch camera looking NW along the
+  Monterey channel so layered real ridges recede behind the hull; hull hovers about 4 m over the
+  real seabed with a draped contact shadow (title clipping guard lowered from 12 m to 7 m, shot
+  only); depth-graded teal-navy terrain colour (heights unchanged, no exaggeration), navy fog and
+  sky gradient, lamps aimed at the sampled floor with volumetric-style beams, round marine snow.
+  Reason: creative-director feedback that the shot read as a prototype.
 - Phase F, F-TITLE-F: public identity is now Bathyline ("Explore the real deep."): HTML title,
   description, Open Graph and theme colour, manifest name/short name/description/colours, README
   prose and new `docs/title-scene.md`. Manifest id, scope, start_url, icons, package name, save keys,

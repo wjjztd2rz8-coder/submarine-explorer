@@ -61,8 +61,8 @@ export const TITLE_SHOT = {
   rollDeg: -3,
   clearanceM: 7,
   swayPeriodS: 40,
-  swayHorizontalM: 0.9, // circle radius: <= 2 m travel
-  swayYawDeg: 0.45, // amplitude: <= 1 degree swing
+  swayHorizontalM: 0.8, // circle radius: <= 2 m travel
+  swayYawDeg: 0.3, // amplitude: <= 1 degree swing
   hoverM: 0.14, // amplitude: <= 0.3 m
   /** Vehicle heading: east, turned 15 degrees toward north (away). */
   headingAwayRad: (15 * Math.PI) / 180,
@@ -80,7 +80,7 @@ export const TITLE_SHOT = {
 /** Where the vehicle should sit in the render region, as screen fractions. */
 const FRAMING: Record<TitleLayout, { x: number; y: number; silhouette: number }> = {
   desktop: { x: 0.6, y: 0.58, silhouette: 0.2 },
-  portrait: { x: 0.5, y: 0.58, silhouette: 0.4 },
+  portrait: { x: 0.5, y: 0.4, silhouette: 0.36 },
   'short-landscape': { x: 0.4, y: 0.62, silhouette: 0.36 },
 };
 
@@ -91,7 +91,11 @@ const SNOW_BOX = new THREE.Vector3(170, 80, 170);
 const POOL_AHEAD_M = 9;
 
 /** Square RGBA texture with a soft round falloff; `rgb` 0..255, alpha peaks at `peak`. */
-function radialTexture(size: number, rgb: [number, number, number], peak: number): THREE.DataTexture {
+function radialTexture(
+  size: number,
+  rgb: [number, number, number],
+  peak: number,
+): THREE.DataTexture {
   const data = new Uint8Array(size * size * 4);
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
@@ -484,7 +488,7 @@ export class TitleScene {
         pos[k * 3] = x;
         pos[k * 3 + 1] = this.crop.sampleFloor(x, z) + 0.3;
         pos[k * 3 + 2] = z;
-        uv[k * 2] = (i / N);
+        uv[k * 2] = i / N;
         uv[k * 2 + 1] = 1 - j / N;
       }
     }
@@ -558,7 +562,9 @@ export class TitleScene {
       const len = dir.length() * 1.08;
       dir.normalize();
       // Beam lives in rig space: convert direction to local.
-      const local = dir.clone().transformDirection(new THREE.Matrix4().copy(this.rig.matrixWorld).invert());
+      const local = dir
+        .clone()
+        .transformDirection(new THREE.Matrix4().copy(this.rig.matrixWorld).invert());
       q.setFromUnitVectors(zAxis, local);
       beam.position.copy(lamp.position);
       beam.quaternion.copy(q);
@@ -776,7 +782,7 @@ export class TitleScene {
       }
     });
     const frac = Math.max(1e-4, (hi - lo) / 2);
-    cam.zoom = Math.min(3, Math.max(1, spec.silhouette / frac));
+    cam.zoom = Math.min(3, Math.max(0.6, spec.silhouette / frac));
     cam.updateProjectionMatrix();
 
     this.tmp.copy(this.basePos).project(cam);

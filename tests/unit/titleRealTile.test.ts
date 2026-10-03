@@ -47,8 +47,8 @@ function hullWidth(title: TitleScene): number {
 describe('TitleScene with checked-in Monterey bathymetry', () => {
   for (const tier of ['low', 'high'] as TitleTier[]) {
     for (const [width, height, layout, silhouette] of [
-      [1280, 720, 'desktop', 0.16],
-      [390, 844, 'portrait', 0.24],
+      [1280, 720, 'desktop', 0.2],
+      [390, 844, 'portrait', 0.36],
     ] as const) {
       it(`${tier} ${width}x${height}: frames the real hull and meets geometry budgets`, () => {
         const crop = buildTitleCrop({ meta, heights });
@@ -59,8 +59,8 @@ describe('TitleScene with checked-in Monterey bathymetry', () => {
           expect(hullWidth(title)).toBeCloseTo(silhouette, 3);
           const rig = title.scene.getObjectByName('vehicle-B')!.parent!;
           const centre = rig.position.clone().project(title.camera);
-          expect((centre.x + 1) / 2).toBeCloseTo(layout === 'desktop' ? 0.72 : 0.64, 3);
-          expect((1 - centre.y) / 2).toBeCloseTo(layout === 'desktop' ? 0.55 : 0.5, 3);
+          expect((centre.x + 1) / 2).toBeCloseTo(layout === 'desktop' ? 0.6 : 0.5, 3);
+          expect((1 - centre.y) / 2).toBeCloseTo(layout === 'desktop' ? 0.58 : 0.4, 3);
           expect(title.stats.calls).toBeLessThanOrEqual(TITLE_SHOT.budgets[tier].calls);
           expect(title.stats.triangles).toBeLessThanOrEqual(TITLE_SHOT.budgets[tier].triangles);
         } finally {
