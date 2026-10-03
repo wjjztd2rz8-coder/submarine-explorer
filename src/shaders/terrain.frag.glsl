@@ -66,6 +66,7 @@ varying vec3 vTerrainWorldNormal;
 varying float vCavity;
 
 const float TERRAIN_ALBEDO_GAIN = 4.6;
+const float TERRAIN_FAR_MIP_BIAS = 3.0;
 
 vec3 terrainBlendWeights(vec3 n) {
   vec3 w = pow(abs(n), vec3(4.0));
@@ -133,22 +134,28 @@ vec3 terrainContrast(vec3 s, float c) {
 
 // Triplanar albedo pattern (linear, mean ~0.214). `brk` multiplies in a second,
 // larger and rotated sample so the repeat never reads.
-vec3 terrainAlbedo(sampler2D t, vec3 p, vec3 w, float s, bool brk) {
+//
+// The gravel-scale albedo aliases into a regular houndstooth/checker on distant
+// and grazing slopes (anisotropic taps and mip selection are too sharp for a
+// high-contrast pattern). A distance-driven mip bias keeps the near field crisp
+// and lets the far field fall back to the smooth mip levels; it costs no fetch.
+vec3 terrainAlbedo(sampler2D t, vec3 p, vec3 w, float s, bool brk, float dist) {
   vec3 c = vec3(0.0);
+  float bias = TERRAIN_FAR_MIP_BIAS * smoothstep(3.0, 40.0, dist);
   if (w.y > 0.02) {
     vec2 uv = p.xz * s;
-    vec3 a = texture2D(t, uv).rgb;
+    vec3 a = texture2D(t, uv, bias).rgb;
 #ifdef TERRAIN_BREAKUP
     if (brk) {
       vec2 uv2 = vec2(uv.x * 0.83 - uv.y * 0.55, uv.x * 0.55 + uv.y * 0.83) * 0.23 + vec2(0.37, 0.71);
-      float b = texture2D(t, uv2).g * TERRAIN_ALBEDO_GAIN;
+      float b = texture2D(t, uv2, bias).g * TERRAIN_ALBEDO_GAIN;
       a *= mix(1.0, b, 0.55);
     }
 #endif
     c += a * w.y;
   }
-  if (w.x > 0.02) c += texture2D(t, p.zy * s).rgb * w.x;
-  if (w.z > 0.02) c += texture2D(t, p.xy * s).rgb * w.z;
+  if (w.x > 0.02) c += texture2D(t, p.zy * s, bias).rgb * w.x;
+  if (w.z > 0.02) c += texture2D(t, p.xy * s, bias).rgb * w.z;
   return c;
 }
 
@@ -207,13 +214,13 @@ float terrRough = 0.92;
   vec3 alb = vec3(0.0);
   float lum = 1.0;
   if (wA > 0.02) {
-    vec3 s = terrainAlbedo(tAlbA, P, bw, texS, true);
+    vec3 s = terrainAlbedo(tAlbA, P, bw, texS, true, dist);
     vec3 g = terrainContrast(s, uContrast.x);
     lum = g.g;
     alb += uColA * g * wA;
   }
-  if (wB > 0.02) alb += uColB * terrainContrast(terrainAlbedo(tAlbB, P, bw, texS * 0.8, false), uContrast.y) * wB;
-  if (wC > 0.02) alb += uColC * terrainContrast(terrainAlbedo(tAlbC, P, bw, texS * 1.15, false), uContrast.z) * wC;
+  if (wB > 0.02) alb += uColB * terrainContrast(terrainAlbedo(tAlbB, P, bw, texS * 0.8, false, dist), uContrast.y) * wB;
+  if (wC > 0.02) alb += uColC * terrainContrast(terrainAlbedo(tAlbC, P, bw, texS * 1.15, false, dist), uContrast.z) * wC;
   alb /= max(wA * step(0.02, wA) + wB * step(0.02, wB) + wC * step(0.02, wC), 0.05);
 
   // --- normals and roughness ---------------------------------------------
