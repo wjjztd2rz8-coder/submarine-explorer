@@ -45,17 +45,22 @@ export function smokePlume(
   count: number,
   seed: number,
 ): THREE.Points | null {
+  // Per-vent variety, deterministic from the seed: width, opacity, and lean strength.
+  const v = mulberry32(seed * 7 + 13);
+  const widthK = 0.7 + v() * 0.75;
+  const opacityK = 0.65 + v() * 0.4;
+  const leanK = 0.7 + v() * 0.9;
   const smoke = makePlume({
     height,
     baseRadius,
-    spread: Math.max(1.6, height * 0.2),
+    spread: Math.max(1.6, height * 0.2) * widthK,
     count,
     color: 0x5a5651,
     core: 0x141211,
-    opacity: 0.8,
-    size: Math.max(1.3, height * 0.12),
+    opacity: 0.8 * opacityK,
+    size: Math.max(1.3, height * 0.12) * Math.sqrt(widthK),
     speed: 0.08 + 1.1 / Math.max(6, height),
-    drift: height * 0.34,
+    drift: height * 0.34 * leanK,
     seed,
     billow: true,
   });

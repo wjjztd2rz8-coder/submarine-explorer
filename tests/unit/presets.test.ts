@@ -186,3 +186,18 @@ describe('current maths', () => {
     expect(trenchInterval(12000, 14, 5, 10900)).toBeCloseTo(5);
   });
 });
+
+describe('vent plume variety', () => {
+  it('is deterministic per vent and differs between vents', async () => {
+    const { ventVariety } = await import('../../src/world/presets/VentPreset.js');
+    const THREE = await import('three');
+    const a = ventVariety(new THREE.Vector3(10, -4900, 20));
+    expect(ventVariety(new THREE.Vector3(10, -4900, 20))).toEqual(a);
+    const b = ventVariety(new THREE.Vector3(31, -4905, -8));
+    expect(b.height).not.toBe(a.height);
+    for (const v of [a, b]) {
+      expect(v.height).toBeGreaterThan(0.65);
+      expect(v.lean).toBeGreaterThan(0.4);
+    }
+  });
+});

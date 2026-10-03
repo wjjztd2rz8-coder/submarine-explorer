@@ -15,6 +15,8 @@ without an entry here is not done.
 ### Changed
 
 - Phase F, F-LOSTCITY-SURROUNDINGS: Lost City gets a cooler, banded grey-green slope with larger talus blocks and rubble, more ledges and flanges on the small carbonate towers, a less milky vent haze (lighter haze lift), and rooted corals (all sites) sit into the sediment with large heads at colony cores and small ones at the fringe.
+- F-BEEBE-PLUME-VARIETY: black-smoker plumes now vary per vent (height, width, opacity, lean, deterministic from the orifice position), bend with height in a consistent ambient-current direction, gain a warm lit haze over each orifice and a small pale white-smoker wisp beside it; no extra per-vent draw calls (one additive haze draw per field).
+
 - Phase F, F-BUGHUNT-17: seat Lost City's small carbonate chimneys on their
   terrain-conforming aprons without a second footprint snap (Beehive was buried
   by about 2.2 m); rebuild their terrain-relative geometry on replacement. Add a
