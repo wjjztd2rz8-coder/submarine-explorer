@@ -86,6 +86,7 @@ export function createLifeSystem(): GameSystem {
     frame: {
       'world.life': (f, ctx) => {
         if (!life) return;
+        life.render.reduceMotion = ctx.rig.reduceMotion;
         const p = f.pilotPosition;
         const v = f.pilotVelocity;
         const fw = f.pilotForward;

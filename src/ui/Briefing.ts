@@ -5,9 +5,8 @@
  * content, not markup.
  *
  * Keyboard (QA-B #12): Tab is trapped inside the card (FocusTrap), so the
- * DIVE SITES / mission buttons behind it are unreachable. Escape deliberately
- * does nothing here: there is nothing behind the briefing to return to, and
- * starting the dive on Escape would be a surprise. Enter begins the dive,
+ * DIVE SITES / mission buttons behind it are unreachable. Escape returns to
+ * home when a cancel action is supplied. Enter begins the dive,
  * except on another focused button or a select, which keep their own action.
  *
  * D2-PREDIVE: the sticky footer holds "Dive settings" (game mode, start
@@ -41,6 +40,7 @@ export interface BriefingContent {
 
 export interface BriefingOptions {
   onBegin: (choice: MissionStartPosition) => void;
+  onCancel?: () => void;
   parent?: HTMLElement;
 }
 
@@ -102,6 +102,13 @@ export class Briefing {
     this.trap = new FocusTrap(this.root);
 
     this.onKey = (e) => {
+      if (this.open_ && e.code === 'Escape' && options.onCancel) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.hide();
+        options.onCancel();
+        return;
+      }
       if (!this.open_ || (e.code !== 'Enter' && e.code !== 'NumpadEnter')) return;
       // Enter on another focused button (Advanced, View controls) or a
       // select does that control's job, not Begin.
@@ -232,6 +239,15 @@ export class Briefing {
     begin.type = 'button';
     begin.addEventListener('click', () => this.begin());
     go.append(el('span', 'briefing-hint', 'OR PRESS ENTER'), begin);
+    if (this.options.onCancel) {
+      const cancel = el('button', 'briefing-cancel', 'Back to home');
+      cancel.type = 'button';
+      cancel.addEventListener('click', () => {
+        this.hide();
+        this.options.onCancel?.();
+      });
+      go.append(cancel);
+    }
     foot.append(this.diveSlot, go);
     p.append(foot);
 

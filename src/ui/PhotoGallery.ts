@@ -135,7 +135,12 @@ export class PhotoGallery {
     container.replaceChildren();
     const back = el('button', 'jr-photo-back', '← All photos');
     back.type = 'button';
-    back.addEventListener('click', () => this.render(container, photos, title));
+    back.addEventListener('click', () => {
+      this.render(container, photos, title);
+      [...container.querySelectorAll<HTMLButtonElement>('[data-photo-id]')]
+        .find((button) => button.dataset.photoId === photo.id)
+        ?.focus();
+    });
     const figure = el('figure', 'jr-photo-viewer');
     const image = el('img');
     image.src = photo.image;

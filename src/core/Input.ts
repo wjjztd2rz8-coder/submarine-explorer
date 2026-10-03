@@ -495,6 +495,12 @@ export class Input {
       // Ignore keystrokes aimed at a text field (including a rebind capture box).
       const t = e.target as HTMLElement | null;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      // Native UI activation/navigation must not also trigger game actions or
+      // lose its default behavior (Space activates a focused button on keyup).
+      if (
+        t?.closest('button, a[href], select') &&
+        ['Enter', 'NumpadEnter', 'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)
+      ) return;
       if (e.repeat) return; // auto-repeat must not re-trigger edge actions
       this.keys.add(e.code);
       for (const action of this.actions) {

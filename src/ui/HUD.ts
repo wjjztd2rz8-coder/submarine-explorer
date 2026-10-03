@@ -131,8 +131,8 @@ export class HUD {
             `<span class="hud-value" data-field="${f}">--</span></div>`,
         ).join('')}
         <div class="hud-power" hidden aria-label="Dive supplies">
-          <div class="hud-power-line" data-supply="battery"><span>BATTERY</span><meter min="0" max="1" value="1"></meter><strong>100%</strong></div>
-          <div class="hud-power-line" data-supply="oxygen"><span>OXYGEN</span><meter min="0" max="1" value="1"></meter><strong>100%</strong></div>
+          <div class="hud-power-line" data-supply="battery"><span>BATTERY</span><meter aria-label="Battery remaining" min="0" max="1" value="1"></meter><strong>100%</strong></div>
+          <div class="hud-power-line" data-supply="oxygen"><span>OXYGEN</span><meter aria-label="Oxygen remaining" min="0" max="1" value="1"></meter><strong>100%</strong></div>
         </div>
         <div class="hud-current" hidden aria-label="Current direction and speed"><span class="hud-current-arrow">↑</span><span class="hud-current-text"></span></div>
         <div class="hud-sim-speed" hidden></div>

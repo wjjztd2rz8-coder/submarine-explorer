@@ -10,6 +10,7 @@ import { UnderwaterPass } from '../../shaders/underwater.js';
 import { uiScaleFactors } from '../../ui/HUD.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
+import { drawWithReducedMotion } from '../../render/reducedMotion.js';
 
 const cleanup = new Disposables();
 
@@ -60,7 +61,7 @@ export const renderSystem: GameSystem = {
         renderer.toneMappingExposure = baseExposure;
         renderer.setRenderTarget(post.target);
         renderer.clear();
-        renderer.render(scene, rig.camera);
+        drawWithReducedMotion(scene, rig.reduceMotion, () => renderer.render(scene, rig.camera));
         // Grade, vignette, fog and light come from the current depth band (A2).
         const a = f.atmo;
         const frame: PostFrame = {
@@ -87,7 +88,7 @@ export const renderSystem: GameSystem = {
         // No post pass: the band's gain still reaches the frame through exposure.
         renderer.toneMappingExposure = baseExposure * f.atmo.gradeGain;
         renderer.setRenderTarget(null);
-        renderer.render(scene, rig.camera);
+        drawWithReducedMotion(scene, rig.reduceMotion, () => renderer.render(scene, rig.camera));
         renderStats.calls = renderer.info.render.calls;
         renderStats.triangles = renderer.info.render.triangles;
       }

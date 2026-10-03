@@ -334,6 +334,23 @@ export class Journal {
   }
 
   private render(): void {
+    const focused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const target = focused?.dataset.target;
+    const inside = !!focused && this.root.contains(focused);
+    this.renderContent();
+    if (inside && !focused?.isConnected) {
+      const replacement = [...this.nav.querySelectorAll<HTMLButtonElement>('[data-target]')].find(
+        (button) => button.dataset.target === target,
+      );
+      (
+        replacement ??
+        this.nav.querySelector<HTMLButtonElement>('.is-selected') ??
+        this.root.querySelector<HTMLButtonElement>('.jr-close')
+      )?.focus();
+    }
+  }
+
+  private renderContent(): void {
     const sites = this.orderedSites();
     let logged = 0;
     let total = 0;

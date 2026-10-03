@@ -160,14 +160,16 @@ test.describe('settings screen', () => {
     await expect(dialog).toBeHidden();
   });
 
-  test('briefing keeps Escape; Settings opens from pause after the dive begins', async ({
+  test('briefing returns home on Escape; Settings opens from pause after the dive begins', async ({
     page,
   }) => {
     await boot(page, '/?mission=titanic');
     await expect(page.locator('.briefing')).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(page.locator('.briefing')).toBeVisible();
+    await expect(page.locator('.briefing')).toBeHidden();
+    await expect(page.locator('.home-screen')).toBeVisible();
     await expect(page.locator('.pause-menu')).toBeHidden();
+    await boot(page, '/?mission=titanic');
     await page.keyboard.press('Enter');
     await expect(page.locator('.briefing')).toBeHidden();
     await openSettings(page);

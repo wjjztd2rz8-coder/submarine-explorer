@@ -1,0 +1,76 @@
+/* F-A11Y: focus and contrast only; keep the existing HUD geometry. */
+:root {
+  --hud-bg: rgba(6, 18, 28, 0.92);
+}
+
+:is(button, a[href], input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid #ffffff !important;
+  outline-offset: 3px;
+}
+
+.hud-label,
+.hud-help,
+.hud-control-tips,
+.hud-attribution,
+html.is-touch .hud-attribution {
+  opacity: 1;
+}
+.hud-attribution {
+  background: var(--hud-bg);
+}
+
+.briefing-label,
+.briefing-hint,
+.briefing-objectives li.is-secondary,
+.jr-nav li.is-locked > .jr-nav-item,
+.jr-site-card.is-locked,
+.jr-card-meta,
+.jr-card-count,
+.jr-hidden-note,
+.jr-figure figcaption,
+.jr-group-tag,
+.jr-footer {
+  opacity: 1;
+}
+.briefing-label,
+.briefing-hint,
+.jr-card-meta,
+.jr-card-count,
+.jr-hidden-note,
+.jr-figure figcaption,
+.jr-group-tag,
+.jr-footer {
+  color: #adc3cc;
+}
+.briefing-cancel {
+  font: inherit;
+  color: var(--b3-text);
+  background: transparent;
+  border: 1px solid var(--b3-hair);
+  border-radius: 2px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+html[data-reduce-motion='true'] *,
+html[data-reduce-motion='true'] *::before,
+html[data-reduce-motion='true'] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+html[data-reduce-motion='true'] .d2-photo-flash {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .d2-photo-flash {
+    display: none;
+  }
+}

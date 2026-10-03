@@ -255,7 +255,11 @@ export class SettingsScreen {
 
     const access = this.section(`${id}-a11y`, 'Accessibility');
     access.append(
-      this.checkbox('reduceMotion', 'Reduce motion (no camera banking)'),
+      this.checkbox(
+        'reduceMotion',
+        'Reduce motion (no banking, particles or flashes)',
+        'Also enabled by your system’s reduced-motion preference.',
+      ),
       this.checkbox('captions', 'Captions for sounds'),
       this.select(
         'sonarPalette',
@@ -516,13 +520,14 @@ export class SettingsScreen {
   private checkbox(
     key: 'postFx' | 'reduceMotion' | 'captions' | 'controlTips' | 'muted',
     label: string,
+    note?: string,
   ): HTMLDivElement {
     const input = el('input');
     input.type = 'checkbox';
     input.dataset.setting = key;
     input.addEventListener('change', () => this.opts.save.save({ [key]: input.checked }));
     this.controls.set(key, input);
-    const row = this.field(label, input);
+    const row = this.field(label, input, note);
     row.classList.add('is-check');
     return row;
   }

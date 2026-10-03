@@ -5,6 +5,8 @@
  * control tips, a capture button and a short-lived status toast.
  */
 
+import { FocusTrap } from './FocusTrap.js';
+
 export const PHOTO_WIDTH_PX = 640;
 export const PHOTO_JPEG_QUALITY = 0.76;
 
@@ -41,6 +43,7 @@ export class PhotoMode {
   private toastTimer = 0;
   private flashTimer = 0;
   private active_ = false;
+  private readonly trap: FocusTrap;
 
   constructor(
     onCapture: () => void,
@@ -98,6 +101,7 @@ export class PhotoMode {
 
     this.root.append(this.flash, top, this.toastEl, bottom);
     parent.append(this.root);
+    this.trap = new FocusTrap(this.root);
   }
 
   get active(): boolean {
@@ -108,6 +112,8 @@ export class PhotoMode {
   setActive(on: boolean, captureKey = 'Enter'): void {
     this.active_ = on;
     this.root.hidden = !on;
+    if (on) this.trap.activate();
+    else this.trap.deactivate();
     document.body.classList.toggle('photo-active', on);
     const keys = captureKey === 'Space' ? 'Space' : `${captureKey} / Space`;
     this.captureButton.textContent = `Capture (${keys})`;
@@ -116,6 +122,11 @@ export class PhotoMode {
   }
 
   shutter(): void {
+    if (
+      document.documentElement.dataset.reduceMotion === 'true' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    )
+      return;
     this.flash.classList.remove('is-active');
     void this.flash.offsetWidth;
     this.flash.classList.add('is-active');

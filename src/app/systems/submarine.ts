@@ -136,6 +136,7 @@ export function createSubmarineSystem(): GameSystem {
         const { sub, subMesh, rov, rig } = ctx;
         // Present the boat.
         subMesh.setHullClass(f.sub.hullClass);
+        subMesh.vehicle.reduceMotion = rig.reduceMotion;
         subMesh.setPose(sub.position, sub.yaw, sub.pitch, sub.roll);
         const live = !rov.deployed;
         subMesh.update(live ? f.state.throttle : 0, f.dt, {

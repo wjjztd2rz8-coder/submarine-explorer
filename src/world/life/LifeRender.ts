@@ -20,6 +20,7 @@ import { bodyLen } from './steer.js';
 import type { LifeTier } from './types.js';
 
 export class LifeRender {
+  reduceMotion = false;
   readonly group = new THREE.Group();
   readonly sparks: Sparks;
   readonly meshes = new Map<string, SpeciesMesh>();
@@ -71,6 +72,7 @@ export class LifeRender {
 
   /** A flash of light on an animal: raises its glow and throws sparks. */
   flash(a: Agent, strength: number): void {
+    if (this.reduceMotion) return;
     const def = a.def;
     if (def.glow === 'none') return;
     a.glow = Math.max(a.glow, strength);
@@ -172,7 +174,12 @@ export class LifeRender {
       m4[14] = a.z;
       m4[15] = 1;
       sm.mesh.instanceMatrix.array.set(m4, i * 16);
-      sm.life.setXYZ(i, a.phase, 0, clamp(a.glow, 0, 1));
+      sm.life.setXYZ(
+        i,
+        a.phase,
+        0,
+        this.reduceMotion && a.def.glow === 'flash' ? 0 : clamp(a.glow, 0, 1),
+      );
     }
     for (const [id, sm] of this.meshes) {
       const n = this.counts.get(id) ?? 0;
@@ -183,8 +190,11 @@ export class LifeRender {
       sm.life.needsUpdate = true;
       sm.glowUniform.value = sm.baseGlow * this.dark;
     }
-    this.wake(sub, dt);
-    this.sparks.update(dt, viewScale, fogDensity);
+    if (this.reduceMotion) this.sparks.clear();
+    else {
+      this.wake(sub, dt);
+      this.sparks.update(dt, viewScale, fogDensity);
+    }
   }
 
   /** Hide and forget every animal (a teleport or restart). */

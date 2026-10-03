@@ -417,7 +417,9 @@ test.describe('fix S: mission failure, framing and modals', () => {
     expect(errors, errors.join(' | ')).toEqual([]);
   });
 
-  test('briefing traps Tab focus and ignores Escape', async ({ page }) => {
+  test('briefing traps Tab focus and Escape returns home without starting the dive', async ({
+    page,
+  }) => {
     const errors = collectErrors(page);
     await boot(page, '/?mission=titanic');
     const briefing = page.locator('.briefing');
@@ -430,8 +432,10 @@ test.describe('fix S: mission failure, framing and modals', () => {
     expect(await page.evaluate(() => !!document.activeElement?.closest('.briefing'))).toBe(true);
     await page.keyboard.press('Escape');
     await page.waitForTimeout(300);
-    await expect(briefing).toBeVisible();
+    await expect(briefing).toBeHidden();
     expect((await missionProbe(page)).state).toBe('briefing');
+    await expect(page.locator('.home-screen')).toBeVisible();
+    await boot(page, '/?mission=titanic');
     await page.keyboard.press('Enter');
     await expect(briefing).toBeHidden();
     expect((await missionProbe(page)).state).toBe('diving');

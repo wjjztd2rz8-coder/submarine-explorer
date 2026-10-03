@@ -88,11 +88,20 @@ export const settingsSystem: GameSystem = {
     );
 
     // Saved display settings, at boot and live.
-    ctx.rig.reduceMotion = settings.reduceMotion;
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncMotion = (): void => {
+      const reduced = save.get().reduceMotion || motionPreference.matches;
+      ctx.rig.reduceMotion = reduced;
+      ctx.waypoints.setReducedMotion(reduced);
+      document.documentElement.dataset.reduceMotion = String(reduced);
+    };
+    syncMotion();
+    motionPreference.addEventListener('change', syncMotion);
+    cleanup.add(() => motionPreference.removeEventListener('change', syncMotion));
     ctx.sonar.setPalette(settings.sonarPalette);
     cleanup.add(
       save.onChange((next, changed) => {
-        if (changed.includes('reduceMotion')) ctx.rig.reduceMotion = next.reduceMotion;
+        if (changed.includes('reduceMotion')) syncMotion();
         if (changed.includes('captions')) ctx.captions.setEnabled(next.captions);
         if (changed.includes('sonarPalette')) ctx.sonar.setPalette(next.sonarPalette);
         if (changed.includes('postFx')) ctx.postFx = next.postFx;

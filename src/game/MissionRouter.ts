@@ -418,6 +418,7 @@ export class MissionRouter {
       this.briefing = new Briefing({
         parent: opts.parent,
         onBegin: (choice) => this.begin(choice),
+        ...(opts.onHome ? { onCancel: opts.onHome } : {}),
       });
       this.briefing.show(this.briefingContent());
       this.panel.setVisible(false);

@@ -29,6 +29,7 @@ function onKeyDown(e: KeyboardEvent): void {
 }
 
 export class FocusTrap {
+  private previous: HTMLElement | null = null;
   constructor(private readonly root: HTMLElement) {}
 
   get active(): boolean {
@@ -37,6 +38,8 @@ export class FocusTrap {
 
   activate(): void {
     if (typeof document === 'undefined') return;
+    if (!this.active)
+      this.previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const i = stack.indexOf(this);
     if (i >= 0) stack.splice(i, 1);
     stack.push(this);
@@ -52,6 +55,8 @@ export class FocusTrap {
   deactivate(): void {
     if (typeof document === 'undefined') return;
     const i = stack.indexOf(this);
+    if (i < 0) return;
+    const wasTop = i === stack.length - 1;
     if (i >= 0) stack.splice(i, 1);
     const a = document.activeElement;
     if (a instanceof HTMLElement && this.root.contains(a)) a.blur();
@@ -59,12 +64,25 @@ export class FocusTrap {
       window.removeEventListener('keydown', onKeyDown, true);
       listening = false;
     }
+    const top = stack[stack.length - 1];
+    if (
+      wasTop &&
+      this.previous?.isConnected &&
+      this.previous.getClientRects().length &&
+      (!top || top.root.contains(this.previous))
+    )
+      this.previous.focus();
+    this.previous = null;
   }
 
   /** Focusable descendants in DOM order, skipping anything inside a `hidden` subtree. */
   focusables(): HTMLElement[] {
     return [...this.root.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
-      (el) => !el.closest('[hidden]'),
+      (el) =>
+        el.tabIndex >= 0 &&
+        !el.closest('[hidden], [inert]') &&
+        el.getClientRects().length > 0 &&
+        getComputedStyle(el).visibility === 'visible',
     );
   }
 

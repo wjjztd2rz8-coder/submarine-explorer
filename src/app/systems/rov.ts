@@ -99,6 +99,7 @@ export function createRovSystem(): GameSystem {
       },
       pose: (f, ctx) => {
         const { rov, rovVisual, rovHud, subMesh, headlights } = ctx;
+        rovVisual.vehicle.reduceMotion = ctx.rig.reduceMotion;
         rovVisual.update(
           rov,
           subMesh.tetherAnchor(tetherAnchor),

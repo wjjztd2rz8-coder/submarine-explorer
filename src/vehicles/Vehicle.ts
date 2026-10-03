@@ -87,6 +87,8 @@ const STROBE_PERIOD_S = 2.0;
 const STROBE_FLASH_S = 0.07;
 
 export class Vehicle {
+  /** Suppress the navigation strobe; lamps remain steady. */
+  reduceMotion = false;
   /** The model, scaled from vehicle metres to world metres. */
   readonly root = new THREE.Group();
   readonly id: string;
@@ -308,7 +310,7 @@ export class Vehicle {
 
     // Strobe.
     const phase = t % STROBE_PERIOD_S;
-    const flash = phase < STROBE_FLASH_S ? 1 - phase / STROBE_FLASH_S : 0;
+    const flash = !this.reduceMotion && phase < STROBE_FLASH_S ? 1 - phase / STROBE_FLASH_S : 0;
     if (this.strobe) {
       (this.strobe.material as THREE.MeshBasicMaterial).color.setRGB(
         0.55 + flash * 7,
