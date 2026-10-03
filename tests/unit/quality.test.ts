@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { afterEach, vi } from 'vitest';
 import { DEFAULT_CONFIG, GRAPHICS_TIERS, resolveGraphicsTier } from '../../src/core/Config.js';
 import {
   DynamicResolution,
@@ -22,6 +23,7 @@ const desktop: DeviceCaps = {
   devicePixelRatio: 2,
 };
 const caps = (over: Partial<DeviceCaps>): DeviceCaps => ({ ...desktop, ...over });
+afterEach(() => vi.unstubAllGlobals());
 
 describe('detectTier', () => {
   it('keeps software renderers on low', () => {
@@ -67,6 +69,17 @@ describe('detectTier', () => {
       expect(detectTier(caps({ renderer })).tier).not.toBe('ultra');
     }
   });
+
+  it('keeps phone detection stable when the screen rotates', () => {
+    for (const [screenW, screenH] of [
+      [390, 844],
+      [844, 390],
+    ]) {
+      expect(
+        detectTier(caps({ renderer: 'Mali-G52', mobileUa: true, screenW, screenH })).tier,
+      ).toBe('low');
+    }
+  });
 });
 
 describe('resolveQuality', () => {
@@ -107,6 +120,35 @@ describe('resolveQuality', () => {
 });
 
 describe('readDeviceCaps', () => {
+  it('recognises desktop-UA iPadOS and falls back when GPU information is locked down', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (Macintosh) AppleWebKit Safari',
+      maxTouchPoints: 5,
+      hardwareConcurrency: 4,
+    });
+    vi.stubGlobal('window', {
+      screen: { width: 1024, height: 1366 },
+      devicePixelRatio: 2,
+      matchMedia: () => ({ matches: true }),
+    });
+    const device = readDeviceCaps({
+      MAX_TEXTURE_SIZE: 1,
+      RENDERER: 2,
+      VENDOR: 3,
+      getExtension: () => {
+        throw new Error('locked down');
+      },
+      getParameter: () => 0,
+    });
+    expect(device).toMatchObject({
+      renderer: '',
+      mobileUa: true,
+      touchPrimary: true,
+      memoryGb: null,
+    });
+    expect(detectTier(device)).toEqual({ tier: 'low', reason: 'small tablet' });
+  });
+
   it('never throws without a context or a DOM', () => {
     const c = readDeviceCaps(null);
     expect(c.renderer).toBe('');
@@ -195,6 +237,19 @@ describe('DynamicResolution', () => {
     const dr = new DynamicResolution(cfg, 1);
     expect(dr.update(5000)).toBeNull();
     expect(dr.frameMs).toBe(0);
+  });
+
+  it.each([
+    [1.874, 0.504],
+    [1.875, 0.505],
+  ])('stays within DPR %f and floor %f after down/up steps', (ceiling, floor) => {
+    const dr = new DynamicResolution({ ...cfg, minPixelRatio: floor }, ceiling);
+    const down = run(dr, 40, 30);
+    expect(down.every((r) => r >= floor && r <= ceiling)).toBe(true);
+    expect(dr.pixelRatio).toBe(floor);
+    const up = run(dr, 8, 120);
+    expect(up.every((r) => r >= floor && r <= ceiling)).toBe(true);
+    expect(dr.pixelRatio).toBe(ceiling);
   });
 
   it('is on only for auto-detected tiers unless ?dynres= says otherwise', () => {

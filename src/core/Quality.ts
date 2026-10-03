@@ -327,7 +327,13 @@ export class DynamicResolution {
   }
 
   private apply(next: number): number {
-    this.ratio = Math.round(next * 100) / 100;
+    // Fractional device DPRs and custom floors need not land on hundredths.
+    this.ratio =
+      next <= this.minRatio
+        ? this.minRatio
+        : next >= this.maxRatio
+          ? this.maxRatio
+          : Math.min(this.maxRatio, Math.max(this.minRatio, Math.round(next * 100) / 100));
     this.overS = 0;
     this.underS = 0;
     this.cooldownS = this.cfg.cooldownS;

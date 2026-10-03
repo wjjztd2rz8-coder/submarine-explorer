@@ -68,7 +68,9 @@
     right: auto;
     left: calc(140px + env(safe-area-inset-left, 0px));
     bottom: calc(4px + env(safe-area-inset-bottom, 0px));
-    width: calc(100vw - 140px - 300px);
+    width: calc(
+      100vw - 140px - 300px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+    );
     max-width: none;
     text-align: left;
     font-size: 8px;
@@ -89,7 +91,9 @@
   :root {
     --hl-sonar-clear: 0px;
     --hl-col-left: calc(168px + env(safe-area-inset-left, 0px));
-    --hl-col-width: calc(100vw - 168px - 270px);
+    --hl-col-width: calc(
+      100vw - 168px - 270px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+    );
   }
   /* Shrink only the map, not its range buttons or their hit areas. */
   html.is-touch .sonar:not(.d-sonar-expanded) {
@@ -231,7 +235,9 @@
   html.is-touch .hud-attribution {
     font-size: 7px;
     left: calc(136px + env(safe-area-inset-left, 0px));
-    width: calc(100vw - 136px - 300px);
+    width: calc(
+      100vw - 136px - 300px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+    );
   }
 }
 
@@ -241,9 +247,9 @@
   html.is-touch .onboard-hint {
     top: auto;
     bottom: calc(230px + env(safe-area-inset-bottom, 0px));
-    left: 50%;
+    left: calc((100% + env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)) / 2);
     transform: translateX(-50%);
-    width: calc(100vw - 24px);
+    width: calc(100vw - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
     min-width: 0;
     animation-name: onboard-in;
   }
