@@ -249,3 +249,8 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged (full gates green on main except one stale e2e, fixed): Codex 300 (FULL_E2E opt-in for codex-task, gate docs), 310 F-COSMETICS (hull paints/lens trims), 320 F-BUGHUNT-12 (title fixes; Sonnet resolved its conflict with F-TITLE-LOOK in TitleScene.ts). Fixed f1-touch manifest-name test (Bathyline). Pushed, tagged f12.
 - Codex 5h was 18% (resets 10:45): queue holds 330, 340, 350 (CI red), 360 (title G QA). No Claude agents (no unblocked visual package; Claude 5h 77%).
 - Needs owner: brand name OK (Bathyline); fresh golden set still needs a browser host.
+
+## 2026-10-03 headless run (started ~08:45)
+
+- Nothing merged or launched: no worktrees, main clean and pushed. Codex 5h is 18% (resets 10:45); queue holds 330, 340, 350 (CI red on main, e2e shard 14), 360, which the dispatcher starts after the reset. No unblocked Claude package (Claude 5h 76%).
+- Needs owner: brand name OK (Bathyline); fresh golden set still needs a browser host.
