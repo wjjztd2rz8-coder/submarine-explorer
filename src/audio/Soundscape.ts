@@ -18,6 +18,7 @@ export function distanceGain(distance: number, range: number): number {
 export class MachineLoop {
   private readonly source: AudioBufferSourceNode;
   private readonly gain: GainNode;
+  private readonly release: () => void;
   constructor(
     private readonly engine: AudioEngine,
     hz: number,
@@ -34,13 +35,14 @@ export class MachineLoop {
     this.gain = ctx.createGain();
     this.gain.gain.value = 0;
     this.source.connect(filter).connect(this.gain).connect(destination);
+    this.release = engine.manageSources([this.source], [filter, this.gain]);
     this.source.start();
   }
   update(level: number): void {
     this.gain.gain.setTargetAtTime(level, this.engine.ctx.currentTime, 0.15);
   }
   stop(): void {
-    this.source.stop();
+    this.release();
   }
 }
 
@@ -61,13 +63,9 @@ export function mechanicalCue(engine: AudioEngine, kind: 'servo' | 'shutter' | '
     .connect(filter)
     .connect(gain)
     .connect(engine.bus(kind === 'shrimp' ? 'ambient' : 'sub'));
+  engine.manageSources([source], [filter, gain]);
   source.start();
   source.stop(now + 0.4);
-  source.onended = () => {
-    source.disconnect();
-    filter.disconnect();
-    gain.disconnect();
-  };
 }
 
 /** Two fixed spatial voices bound to the nearest actual prop of each kind. */
@@ -75,6 +73,7 @@ export class Soundscape {
   private readonly voices: Array<{ kind: 'vent' | 'wreck'; panner: PannerNode; loop: MachineLoop }>;
   private whale: AudioBuffer | null = null;
   private whaleSource: AudioBufferSourceNode | null = null;
+  private releaseWhale: (() => void) | null = null;
   private disposed = false;
   private nextWhale = 12;
   private nextReef = 0;
@@ -173,8 +172,9 @@ export class Soundscape {
     }
     const inWhaleRange = whaleHabitat && position.y > -1000 && position.y < -5;
     if (!inWhaleRange && this.whaleSource) {
-      this.whaleSource.stop();
+      this.releaseWhale?.();
       this.whaleSource = null;
+      this.releaseWhale = null;
     }
     if (inWhaleRange && this.whale && now >= this.nextWhale && !this.whaleSource) {
       const source = ctx.createBufferSource();
@@ -184,14 +184,16 @@ export class Soundscape {
       const gain = ctx.createGain();
       gain.gain.value = 0.18;
       source.connect(gain).connect(this.engine.bus('ambient'));
+      const release = this.engine.manageSources([source], [gain], () => {
+        if (this.whaleSource === source) {
+          this.whaleSource = null;
+          this.releaseWhale = null;
+        }
+      });
+      this.releaseWhale = release;
       source.start();
       this.whaleSource = source;
       this.nextWhale = now + this.config.wildlifeGapS;
-      source.onended = () => {
-        source.disconnect();
-        gain.disconnect();
-        if (this.whaleSource === source) this.whaleSource = null;
-      };
       this.captions.emit({ id: 'whale', text: 'Distant whale call', durationS: 4 });
     }
   }
@@ -200,11 +202,14 @@ export class Soundscape {
   }
 
   stop(): void {
+    if (this.disposed) return;
     this.disposed = true;
     for (const v of this.voices) {
       v.loop.stop();
       v.panner.disconnect();
     }
-    this.whaleSource?.stop();
+    this.releaseWhale?.();
+    this.whaleSource = null;
+    this.releaseWhale = null;
   }
 }

@@ -39,7 +39,7 @@ export class ScoreState {
 /** Open fifths and suspended chords, gently breathing at independent periods. */
 export class AmbientScore {
   readonly state: ScoreState;
-  private readonly layers: Array<{ voices: OscillatorNode[]; gain: GainNode }>;
+  private readonly layers: Array<{ voices: OscillatorNode[]; gain: GainNode; release: () => void }>;
   constructor(
     private readonly engine: AudioEngine,
     private readonly config: AudioConfig,
@@ -62,7 +62,8 @@ export class AmbientScore {
         voice.start();
         return voice;
       });
-      return { voices, gain };
+      const release = engine.manageSources(voices, [gain, tone]);
+      return { voices, gain, release };
     });
   }
   update(depth: number, ratedDepth: number, reduceMotion: boolean): void {
@@ -84,6 +85,6 @@ export class AmbientScore {
     this.state.discover(this.engine.ctx.currentTime, strength);
   }
   stop(): void {
-    for (const layer of this.layers) for (const voice of layer.voices) voice.stop();
+    for (const layer of this.layers) layer.release();
   }
 }

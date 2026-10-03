@@ -14,6 +14,7 @@ export class ThrusterLoop {
   private readonly osc: OscillatorNode;
   private readonly noise: AudioBufferSourceNode;
   private readonly gain: GainNode;
+  private readonly release: () => void;
 
   constructor(
     engine: AudioEngine,
@@ -38,6 +39,7 @@ export class ThrusterLoop {
     this.noise.connect(noiseFilter).connect(this.gain);
     this.gain.connect(engine.bus('sub'));
 
+    this.release = engine.manageSources([this.osc, this.noise], [noiseFilter, this.gain]);
     this.osc.start();
     this.noise.start();
   }
@@ -54,8 +56,7 @@ export class ThrusterLoop {
   }
 
   stop(): void {
-    this.osc.stop();
-    this.noise.stop();
+    this.release();
   }
 }
 
@@ -63,6 +64,7 @@ interface BedLayer {
   osc: OscillatorNode;
   noise: AudioBufferSourceNode;
   gain: GainNode;
+  release: () => void;
 }
 
 /** One drone+noise layer per Config.audio.ambientBands entry, crossfaded by depth. */
@@ -95,9 +97,10 @@ export class AmbientBeds {
       noise.connect(noiseFilter).connect(noiseGain).connect(gain);
       gain.connect(engine.bus('ambient'));
 
+      const release = engine.manageSources([osc, noise], [noiseFilter, noiseGain, gain]);
       osc.start();
       noise.start();
-      return { osc, noise, gain };
+      return { osc, noise, gain, release };
     });
   }
 
@@ -113,8 +116,7 @@ export class AmbientBeds {
 
   stop(): void {
     for (const layer of this.layers) {
-      layer.osc.stop();
-      layer.noise.stop();
+      layer.release();
     }
   }
 }

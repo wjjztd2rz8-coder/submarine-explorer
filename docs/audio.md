@@ -7,20 +7,33 @@ humpback excerpt; its source, licence and processing are in `ATTRIBUTION.md`.
 ## Graph and settings
 
 ```
-ambient / sub / ui / sonar -> SFX volume -> depth low-pass -> master -> destination
+ambient / sub / ui / sonar -> SFX volume -> depth low-pass -> master
 music                     -> Music volume               -> master
+master -> compressor -> sample peak guard -> destination
 ```
 
 The score bypasses the underwater effects filter so its pads remain audible at
 depth. Master, SFX, Music and Mute are separate saved settings. Existing v1/v2
 saves receive audio defaults; invalid volumes fall back or clamp to 0..1.
+The combined output is compressed before a final 0.95 sample ceiling, preventing
+stacked effects from exceeding digital full scale while preserving quiet cues.
+Compression tuning and the ceiling live in `src/core/config/audio.ts`.
 Sliders are keyboard and touch operable, with at least 44 px input height.
 Reduce motion softens discovery and pressure modulation and removes pad breathing.
 
 `AudioSystem.unlock()` builds the graph on a pointer or keyboard gesture and
-resumes it on later gestures if the browser suspends it. The app shell suspends
-the context outside a dive. Disposal stops loops, cancels echoes, unsubscribes
-handlers and closes the context. Optional sample-fetch failures are silent.
+starts a silent one-sample source synchronously to unlock iOS audio, including
+when the first touch occurs on the paused home screen. Later gestures recover
+browser-interrupted audio; gestures during an already unlocked pause keep the
+clock suspended. Capture handlers cover pointer press/release, touch end and
+keyboard input; rejected resumes release their warmup and retry on a later
+gesture. The app shell suspends the context outside a dive, and hidden
+tabs suspend independently of shell pause. The master is silenced immediately
+while suspension completes; returning to a paused tab keeps it silent.
+One-shots disconnect their complete graphs after their last source ends.
+Disposal stops and disconnects every source and processor, cancels echoes,
+unsubscribes handlers and closes the context. Optional sample-fetch failures
+are silent.
 
 ## Score
 
@@ -56,10 +69,17 @@ Tuning lives in `src/core/config/audio.ts`.
 
 Sonar retains terrain ray marching and round-trip echo timing `2 * range / 1500`.
 No echo plays for open water; delayed callbacks are cancelled on disposal and
-suppressed while paused. Existing sonar tests remain unchanged.
+cancelled on pause or tab hide so old echoes cannot arrive after resume. Existing sonar tests remain unchanged.
 
 `tests/unit/f3Audio.test.ts` covers depth palettes, pressure state, accent decay,
 reduce motion, spatial falloff and audio persistence. `tests/e2e/f3-audio.spec.ts`
-starts the real graph, changes independent buses, persists settings, exercises
+starts the real graph, verifies pause/visibility and input-only slider persistence, changes independent buses, persists settings, exercises
 captions and touch targets, and writes review screenshots under
 `.cache/codex/shots/f3-audio/`. `audio.diagnostics` exposes graph state and gains.
+
+`tests/unit/audioLifecycle.test.ts` covers first-gesture warmup, asynchronous
+resume races, independent pause/visibility state, blocked cues, graph reuse,
+complete one-shot/loop teardown and the final output peak guard.
+
+`tests/unit/audioTouchUnlock.test.ts` checks capture-phase touch press/release
+listeners and their removal across two app restarts.

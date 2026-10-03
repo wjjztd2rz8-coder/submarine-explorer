@@ -9,6 +9,7 @@ type AudioProbe = {
     isReady: boolean;
     diagnostics: {
       state: string;
+      contextTime: number;
       sampleReady: boolean;
       musicVolume: number;
       sfxVolume: number;
@@ -31,7 +32,6 @@ async function volume(page: Page, label: string, value: string) {
     const input = node as HTMLInputElement;
     input.value = v;
     input.dispatchEvent(new Event('input', { bubbles: true }));
-    input.dispatchEvent(new Event('change', { bubbles: true }));
   }, value);
 }
 
@@ -109,4 +109,40 @@ test.describe('touch audio', () => {
     expect((await probe(page)).musicVolume).toBeGreaterThan(0.6);
     await page.screenshot({ path: `${shots}/settings-mobile.png` });
   });
+});
+
+test('pause and visibility freeze music and preserve pause when the tab returns', async ({
+  page,
+}) => {
+  await page.goto(url);
+  await page.waitForFunction(() => window.__gameReady);
+  await page.keyboard.press('KeyW');
+  await expect.poll(async () => (await probe(page)).state).toBe('running');
+  await page.keyboard.press('Escape');
+  await expect.poll(async () => (await probe(page)).state).toBe('suspended');
+  expect((await probe(page)).masterGain).toBe(0);
+  const pausedTime = (await probe(page)).contextTime;
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await page.getByRole('button', { name: 'Resume', exact: true }).click();
+  await expect.poll(async () => (await probe(page)).state).toBe('suspended');
+  expect((await probe(page)).contextTime).toBe(pausedTime);
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect.poll(async () => (await probe(page)).state).toBe('running');
+  await expect.poll(async () => (await probe(page)).masterGain).toBeGreaterThan(0.5);
+  await page.keyboard.press('Escape');
+  await expect.poll(async () => (await probe(page)).state).toBe('suspended');
+  await page.evaluate(() => {
+    for (const hidden of [true, false]) {
+      Object.defineProperty(document, 'hidden', { configurable: true, value: hidden });
+      document.dispatchEvent(new Event('visibilitychange'));
+    }
+  });
+  expect((await probe(page)).state).toBe('suspended');
+  expect((await probe(page)).masterGain).toBe(0);
 });

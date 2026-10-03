@@ -24,6 +24,7 @@ export function playPing(
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.4);
 
   osc.connect(g).connect(engine.bus('sonar'));
+  engine.manageSources([osc], [g]);
   osc.start(t0);
   osc.stop(t0 + 0.45);
 }
@@ -57,6 +58,7 @@ export function playCollisionThud(
   noise.connect(noiseFilter).connect(g);
   g.connect(engine.bus('sub'));
 
+  engine.manageSources([osc, noise], [noiseFilter, g]);
   osc.start(t0);
   osc.stop(t0 + 0.4);
   noise.start(t0);
@@ -82,6 +84,7 @@ export function playHullCreak(engine: AudioEngine, _config: AudioConfig, ratio: 
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.5);
 
   noise.connect(filter).connect(g).connect(engine.bus('sub'));
+  engine.manageSources([noise], [filter, g]);
   noise.start(t0);
   noise.stop(t0 + 0.6);
 }
@@ -103,6 +106,7 @@ export function playBallastHiss(engine: AudioEngine, _config: AudioConfig): void
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.7);
 
   noise.connect(filter).connect(g).connect(engine.bus('sub'));
+  engine.manageSources([noise], [filter, g]);
   noise.start(t0);
   noise.stop(t0 + 0.8);
 }
@@ -128,6 +132,7 @@ export function playEmergencyAlarm(engine: AudioEngine, _config: AudioConfig): v
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.7);
 
   osc.connect(g).connect(engine.bus('sub'));
+  engine.manageSources([osc], [g]);
   osc.start(t0);
   osc.stop(t0 + 1.75);
 }
@@ -150,6 +155,7 @@ export function playDiscoveryChime(engine: AudioEngine, _config: AudioConfig): v
     g.gain.exponentialRampToValueAtTime(0.0001, start + 1.0);
 
     osc.connect(g).connect(engine.bus('ui'));
+    engine.manageSources([osc], [g]);
     osc.start(start);
     osc.stop(start + 1.05);
   });
@@ -172,6 +178,7 @@ export function playScanTick(engine: AudioEngine, _config: AudioConfig): void {
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.18);
 
   osc.connect(g).connect(engine.bus('ui'));
+  engine.manageSources([osc], [g]);
   osc.start(t0);
   osc.stop(t0 + 0.2);
 }

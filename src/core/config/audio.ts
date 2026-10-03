@@ -8,6 +8,15 @@ export interface AudioConfig {
   masterVolume: number;
   musicVolume: number;
   sfxVolume: number;
+  /** Final mix sample ceiling after compression, below digital full scale. */
+  outputCeiling: number;
+  mixCompression: {
+    thresholdDb: number;
+    kneeDb: number;
+    ratio: number;
+    attackS: number;
+    releaseS: number;
+  };
   scoreBands: Array<{ name: string; depth: number; notes: number[] }>;
   scoreGain: number;
   scoreFadeS: number;
@@ -56,6 +65,8 @@ export const DEFAULT_AUDIO: AudioConfig = {
   masterVolume: 0.6,
   musicVolume: 0.5,
   sfxVolume: 0.8,
+  outputCeiling: 0.95,
+  mixCompression: { thresholdDb: -6, kneeDb: 6, ratio: 20, attackS: 0.003, releaseS: 0.15 },
   scoreBands: [
     { name: 'sunlit', depth: 0, notes: [130.81, 196, 261.63] },
     { name: 'twilight', depth: -200, notes: [98, 146.83, 220] },
