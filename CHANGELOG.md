@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Submarine Explorer are recorded here. The format follows
+All notable changes to Bathyline are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The project has no
 version numbers yet, so entries are grouped under **Unreleased** by phase and
 package.
@@ -33,6 +33,16 @@ without an entry here is not done.
   and embedded globe visibility in the architecture notes; runtime fill mutation
   confirms Titanic's readability floors fail without fill. No gameplay or visual
   changes; browser verification is blocked by sandbox localhost restrictions.
+- Phase F, F-REBRAND-BATHYLINE: replace the letter-like draft with a survey point
+  and nested bathymetric contours across the title, favicon, PWA icons and share
+  image; provide light/dark SVG marks and wordmarks. Bathyline now shares one
+  code-facing name constant, appears in the Journal and contributor credits,
+  and retains the existing repository URLs and saved dives.
+- Phase F, F-REBRAND-BATHYLINE: remove the repeated vehicle/lighting caveat from
+  the title plate to keep the opening screen plain and focused on exploration.
+- Phase F, F-REBRAND-BATHYLINE gate follow-up: Monterey wall sponges and coral
+  now occupy exposed rock above the surrounding seabed and talus apron; buried
+  candidate positions are resampled while retaining the existing colony counts.
 
 - Great Blue Hole: the wall now shows limestone strata (shader rock banding via a new biome `strata` option, plus concentric shelves in the carve), four scooped wall alcoves, floor blocks and a second stalactite alcove (`karst-grotto-east`) on the south-east ledge; the grotto's apron and shelf tops are mottled tan and grey instead of flat cream, the terrain patch colours are less bright, and boulders scatter on the floor too (f-bluehole-wall).
 
