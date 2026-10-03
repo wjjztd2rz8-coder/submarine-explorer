@@ -275,3 +275,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Nothing merged: the dispatcher had just launched Codex 330 (title-bridge bughunt), 340 (share image) and 350 (CI red on main); all three still running. CI still red on latest main pushes (350 owns it). Claude 5h 73%, no unblocked visual package.
 - Queued: 360 (title G QA), 370 (verify 330/340/350), 380 (hero-site readability audit, code-level).
 - Needs owner: brand name OK (Bathyline); fresh golden set still needs a browser host.
+
+## 2026-10-03 headless run (started ~11:15)
+
+- Merged (full-e2e gates green on main): Codex 350 (CI red fix: crush-depth and preset e2e stabilised, unverified on the runner until the next CI run) and 340 (1200x630 share image + og/twitter meta). Pushed.
+- Running Codex: 330, 360, 370. Queued: 380, 390 (verify CI/share), 395 (touch/HUD bughunt). No Claude agents (no unblocked visual package; Claude 5h ~70%).
+- Needs owner: brand name OK (Bathyline); the share image uses the draft "P"-like mark; fresh golden set still needs a browser host.
