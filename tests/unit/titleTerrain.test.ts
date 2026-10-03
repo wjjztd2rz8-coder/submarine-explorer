@@ -1,3 +1,4 @@
+import poisRaw from '../../public/data/landmarks/monterey-canyon/pois.json?raw';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -39,12 +40,9 @@ function tile(gx: number, gz: number, base = -300): Tile {
 }
 
 describe('TitleTerrain', () => {
-  it('matches the checked-in POI anchor', async () => {
-    const fs = await import('node:fs');
-    const pois = JSON.parse(
-      fs.readFileSync('public/data/landmarks/monterey-canyon/pois.json', 'utf8'),
-    );
-    const poi = (pois.pois ?? pois).find((p: { id: string }) => p.id.endsWith('upper-channel'));
+  it('matches the checked-in POI anchor', () => {
+    const pois = JSON.parse(poisRaw) as { pois: { id: string; lat: number; lon: number }[] };
+    const poi = pois.pois.find((p) => p.id === 'monterey-canyon-upper-channel')!;
     expect(poi.lat).toBe(TITLE_ANCHOR.lat);
     expect(poi.lon).toBe(TITLE_ANCHOR.lon);
   });
