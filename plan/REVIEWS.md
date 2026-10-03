@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-03 night comprehensive review (triggers: 8+ merges, tag f18; golden set 2026-10-03-230949)
+
+**Changed since the late review:** Lost City Arcade opening camera (400), touch HUD fixes (395), e2e stability (390/420), Bathyline rebrand (mark, icons, share image), CI life-scan fix. No visual-site changes except Lost City camera; no new golden run needed (the set was taken at f18).
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5 each:**
+
+| Site            | Score       | Change | Biggest gap                                                                  |
+| --------------- | ----------- | ------ | ---------------------------------------------------------------------------- |
+| Titanic         | 4/4/4/4/5/4 | same   | Dense bright marine snow over the ship; far field near black (460 queued)    |
+| Beebe           | 4/4/4/4/5/4 | same   | Plumes still evenly spaced uniform columns; no lean/width variety            |
+| Great Blue Hole | 4/4/4/3/5/4 | same   | Spawn frame is mostly flat sand wall; grotto reads as a small dark mound     |
+| Lost City       | 4/3/4/3/5/3 | +1     | Tower now large and readable; slope is bare brown, corals look pasted on     |
+| Monterey Canyon | 4/3/4/3/5/3 | same   | Wall reads as a canyon but is a smooth green slab; pose 2 sits inside the hull ring |
+
+**Play flow:** unchanged. Persistent clutter: 5-line GMRT citation (450 hud footer queued) and the "Animal nearby" toast at top-left under the sonar. Audit queued as 510.
+
+**Process:** CI on main has been red on nearly every push (e2e shards failing on `.hud-control-tips` stability, content-missions and software-GL toBeVisible timeouts); the run on the newest main sha was still in progress at review time. Queued 500 to triage real regressions vs flakes. Codex at its 5% floor until 21:15; worktrees 450 hud/450 triage/460 stalled with uncommitted work, 6 briefs queued so it will not idle. Claude 96% 5h but weekly 26%, so at most 2 packages.
+
+**New priorities:** see DIRECTOR.md (Lost City surroundings, Beebe plume variety first).
+
+**Needs owner:** nothing blocking.
+
 ## 2026-10-03 15:30 — targeted review (false positive: "Claude idle ≥ 50% for 2 h")
 
 - Claude was not idle: runs started 13:26, 14:08, 14:28, 14:57 and 15:15 (merges f16, f17, Monterey canyon and polish, Blue Hole). The sampler missed them because it matched only `claude -p Resume Submarine…` and review-run prompts start differently; runs are also short compared with the 30-min sampling.

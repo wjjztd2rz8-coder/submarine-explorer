@@ -2,23 +2,22 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-03 late review; golden set 2026-10-03-195811)
+## Current priorities (refreshed 2026-10-03 night review; golden set 2026-10-03-230949)
 
 Run `tools/golden.sh` at the start of any run that merged visual work. Compare against the previous set. If this list runs dry, refill it from the newest golden set rather than idling.
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
-1. **Monterey golden poses 2/3:** after the polish merge (inward flanks, far wall, subtler sponges) the auto-chosen golden poses 2 and 3 look at wall backs or open water. Pin them to wall-life views in tools/golden-shots.mjs.
-2. **Lost City surroundings (after Codex 400 merges; it touches props.ts/Spawn.ts):** carbonate rubble and flanges on the small towers, darker ambient, textured slope.
-3. **Blue Hole east grotto shelf tops and spawn pose:** shelf tops are large pale slabs; add a golden pose for the east alcove; reduce the empty water-surface view at spawn.
-4. **Beebe plume variety:** per-vent width and lean, lit hot-water haze above orifices, a bent plume in the current.
-5. **Toast placement (after Codex 395 merges):** "Animal nearby" toast to top centre or below the legend at 1600x900.
-6. **Titanic far-field lift (after Codex 460):** lift the dark far field slightly.
-7. **Rebrand logo (Bathyline):** a proper mark for the share image. Codex 440 rebrand does the rollout; Claude reviews.
+1. **Lost City surroundings (unblocked, 400 merged):** carbonate rubble and flanges on the small towers, darker ambient, textured slope; ground the pasted-on corals.
+2. **Beebe plume variety:** per-vent width and lean, lit hot-water haze above orifices, a bent plume in the current.
+3. **Monterey golden poses 2/3 + wall texture:** pin poses to wall-life views in tools/golden-shots.mjs; add sediment banding/texture so the wall is not a smooth slab.
+4. **Blue Hole spawn pose and east grotto:** reduce the flat sand-wall view at spawn, east-alcove golden pose, grotto reads as a dark mound.
+5. **Toast placement (395 merged, unblocked once 450 hud footer merges):** "Animal nearby" toast to top centre or below the legend.
+6. **Titanic far-field lift (after Codex 460 worktree merges):** lift the dark far field slightly.
 
-Codex queue (all unblocked): 410 modes bughunt, 420 verify tests, 430 hero-props bughunt, 440 CI red fix (f2-life scan), 440 rebrand, 450 HUD attribution footer, 450 site triage, 460 marine-snow audit. Stalled worktrees 390/395/400 resume after the 15:45 Codex reset.
+Codex queue (all unblocked): 470 touch-150 overlap, 480 verify rebrand, 490 Lost City camera bughunt, 500 CI red triage, 510 journal/debrief flow audit, 520 verify Lost City/Beebe visuals. Stalled worktrees 450 hud footer, 450 triage, 460 resume after the 21:15 Codex reset.
 
-Demoted: further title polish (the title is good: Bathyline, Arcade/Realistic cards, readable at 844x390).
+Demoted: further title polish; rebrand logo (done, Codex 440).
 
 ## Review rubric (every package, before merge)
 
