@@ -40,6 +40,9 @@ without an entry here is not done.
 - Phase F, F-BUGHUNT-11: `FULL_E2E=1 tools/codex-task.sh` opts into full
   browser feedback and package screenshots; task summaries retain the selected
   e2e mode. Resume instructions require explicit full gates before release pushes.
+- Phase F, F-COSMETICS: add eight hull paints and two lens trims earned from
+  stars, hero-site ratings, secrets and Daily streaks, with saved touch-friendly
+  workshop choices; appearance rewards preserve gameplay and Arcade depth access.
 - Phase F, F-TITLE-B/C: added the (not yet wired) Bathyline title scene
   modules: `src/render/title/TitleTerrain.ts` crops a 2,400 m real GMRT
   Monterey Canyon square, and `TitleScene.ts` composes the research sub, lamps,

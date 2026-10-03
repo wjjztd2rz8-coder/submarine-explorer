@@ -20,6 +20,12 @@ import {
   type VehicleLook,
 } from '../vehicles/index.js';
 import { CockpitView } from '../vehicles/cockpit.js';
+import {
+  HULL_PAINTS,
+  LIGHT_TRIMS,
+  defaultCosmetics,
+  type CosmeticSelection,
+} from '../game/Cosmetics.js';
 
 export interface SubMeshOptions {
   /** Overall length in world metres (scales the model; 26 = the tuned size). */
@@ -51,6 +57,7 @@ export class SubMesh {
   private vehicleRef: Vehicle;
   private readonly options: SubMeshOptions & { length: number; hullClass: string; tier: string };
   private readonly drive: VehicleDrive = {};
+  private cosmetics = defaultCosmetics();
 
   constructor(options: SubMeshOptions = {}) {
     this.options = { length: 24, hullClass: 'B', tier: 'high', ...options };
@@ -67,6 +74,7 @@ export class SubMesh {
     if (o.rimStrength !== undefined) look.rimStrength = o.rimStrength;
     if (o.emissive !== undefined) look.emissive = o.emissive;
     const v = buildVehicle(hullClass, o.tier, { scaleFactor: o.length / 26, look });
+    this.applyCosmetics(v);
     this.group.add(v.root);
     return v;
   }
@@ -74,6 +82,18 @@ export class SubMesh {
   /** The current vehicle (hull class, stats, animation state). */
   get vehicle(): Vehicle {
     return this.vehicleRef;
+  }
+
+  setCosmetics(selection: CosmeticSelection): void {
+    if (selection.paint === this.cosmetics.paint && selection.trim === this.cosmetics.trim) return;
+    this.cosmetics = { ...selection };
+    this.applyCosmetics(this.vehicleRef);
+  }
+
+  private applyCosmetics(vehicle: Vehicle): void {
+    const paint = HULL_PAINTS.find((def) => def.id === this.cosmetics.paint)?.colors ?? null;
+    const trim = LIGHT_TRIMS.find((def) => def.id === this.cosmetics.trim)?.color ?? null;
+    vehicle.materials.setCosmetics(paint, trim);
   }
 
   /** Hull class shown ('A' | 'B' | 'C'). */

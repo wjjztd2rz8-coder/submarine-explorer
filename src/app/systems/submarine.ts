@@ -104,6 +104,8 @@ export function createSubmarineSystem(): GameSystem {
         emissive: config.submarine.hullEmissive,
       });
       ctx.subMesh = subMesh;
+      subMesh.setCosmetics(ctx.progress.cosmetics);
+      cleanup.add(ctx.progress.onChange(() => subMesh.setCosmetics(ctx.progress.cosmetics)));
       scene.add(subMesh.group);
       ctx.expose({ sub, subMesh });
     },
