@@ -6,17 +6,17 @@
       "id": "overview",
       "title": "The Beebe Hydrothermal Vent Field",
       "paragraphs": [
-        "The Beebe Hydrothermal Vent Field sits on the Mid-Cayman Spreading Centre in the Cayman Trough, south of Grand Cayman -- the deepest known active hydrothermal system on Earth, discovered on the world's deepest and slowest-spreading mid-ocean ridge. A 2010 research cruise on the RRS James Cook first detected a hydrothermal plume here (nicknamed 'Piccard' at the time) using the hybrid remotely operated vehicle Nereus, then confirmed the vent field itself with the AUV Autosub6000 and the towed vehicle HyBIS; it was later renamed Beebe, after pioneering deep-sea naturalist William Beebe, who dove in the Bathysphere decades before powered submersibles existed. Connelly et al. published the discovery in Nature Communications in 2012.",
-        "This tile covers only the Beebe field and the axial valley to its northwest; Von Damm, the Mid-Cayman Spreading Centre's other well-studied vent field, sits about 13 km further southwest at roughly 2,300 m depth -- entirely outside this survey's bounding box -- so it is described here for context only and is not a scan target."
+        "The Beebe Hydrothermal Vent Field, also called Piccard, lies nearly 5,000 m down in the Cayman Trough south of Grand Cayman. A 2009 cruise on RV Cape Hatteras detected its hydrothermal plume using Nereus. In 2010 a team on RRS James Cook located and sampled the vents with Autosub6000 and HyBIS. The discovery paper by Connelly and colleagues appeared in 2012. The field honours William Beebe, the naturalist who explored deep water in the Bathysphere.",
+        "This tile covers only the Beebe field and the axial valley to its northwest; Von Damm, the Mid-Cayman Spreading Centre's other well-studied vent field, sits about 21 km south-southwest at roughly 2,300 m depth -- entirely outside this survey's bounding box -- so it is described here for context only and is not a scan target."
       ],
       "facts": [
         {
           "label": "Depth range",
-          "value": "4,957-4,987 m (Connelly et al. 2012)"
+          "value": "about 4,960 m in the discovery paper; local game seabed 4,957–4,988 m"
         },
         {
           "label": "Discovery",
-          "value": "2009-2010, RV Cape Hatteras / RRS James Cook (Nereus, Autosub6000, HyBIS)"
+          "value": "2009 plume: Cape Hatteras / Nereus; 2010 vents: James Cook / Autosub6000 / HyBIS"
         },
         {
           "label": "Publication",
@@ -40,6 +40,10 @@
         {
           "title": "InterRidge Vents Database — Beebe vent field",
           "url": "https://vents-data.interridge.org/ventfield/beebe"
+        },
+        {
+          "title": "German et al. 2010 — 2009 plume detection on the Mid-Cayman Rise",
+          "url": "https://www.pnas.org/doi/full/10.1073/pnas.1009205107"
         }
       ],
       "confidence": "high"
@@ -49,8 +53,8 @@
       "title": "Supercritical black smokers",
       "paragraphs": [
         "Beebe’s black smokers release extremely hot, low-salinity fluid at roughly 500 bar of pressure. Webber and colleagues measured about 401–403 °C and showed that this fluid can be supercritical: its liquid and gas states are no longer distinct. The dark chimneys are built from iron- and copper-bearing sulfide minerals.",
-        "Webber et al. (2015) mapped seven sulfide mounds across the field's western side, built from repeated generations of chimney growth and collapse.",
-        "The shrimp-covered mound around the tallest chimney is a game addition, modelled on the vent mounds mapped at Beebe."
+        "Webber et al. (2015) mapped at least six sulfide mounds, three with active focused venting. The deposits grow and collapse through successive generations of chimneys.",
+        "The chimney layout, shrimp-covered mound and animal encounters here are game additions based on Beebe’s vent habitat."
       ],
       "facts": [
         {
@@ -63,11 +67,15 @@
         },
         {
           "label": "Mapped sulfide mounds",
-          "value": "7 (Webber et al. 2015)"
+          "value": "at least 6; 3 with active focused venting (Webber 2015)"
         },
         {
           "label": "Chimney minerals",
           "value": "pyrite, pyrrhotite, other metal sulfides"
+        },
+        {
+          "label": "Discovery-survey mound",
+          "value": "about 80 m wide and 50 m high (Connelly 2012)"
         }
       ],
       "reconstruction": true,
@@ -87,8 +95,8 @@
       "id": "shrimp",
       "title": "Rimicaris hybisae",
       "paragraphs": [
-        "Thousands of a previously unknown shrimp swarm Beebe's chimneys: Rimicaris hybisae, described by Nye et al. (2012) and named after HyBIS, the towed vehicle used to collect the first specimens. Like its relative Rimicaris exoculata, found some 4,000 km away on Mid-Atlantic Ridge vents, R. hybisae has no image-forming eyes -- adults lose them entirely -- but carries a light-sensing organ on its back, thought to detect the faint thermal glow of the vents themselves in total darkness.",
-        "The shrimp's enlarged cephalothorax hosts episymbiotic bacteria on its gills and mouthparts, which it farms and grazes for organic carbon -- a chemosynthetic partnership that lets it live without ever needing sunlight-derived food. Vent iron tints the swarm a faint brown."
+        "Dense swarms of Rimicaris hybisae crowd Beebe’s chimneys. Nye, Copley and Plouviez described the species in 2012 and named it after HyBIS, the vehicle that collected the first specimens. Its enlarged dorsal eye lacks image-forming optics but detects light. A 2025 study measured visible-light sensitivity in its opsins; detecting faint vent light and bioluminescence is a proposed role.",
+        "The shrimp’s enlarged cephalothorax shelters bacteria associated with its mouthparts and gill chamber. These microbes contribute chemosynthetic carbon to its diet. Fatty-acid studies also found a contribution from photosynthetic carbon, so the shrimp is not wholly independent of food made in sunlit water."
       ],
       "facts": [
         {
@@ -97,15 +105,15 @@
         },
         {
           "label": "Eyes",
-          "value": "lost with age; replaced functionally by a dorsal light-sensing organ"
+          "value": "enlarged dorsal eye; light detection without image-forming optics"
         },
         {
           "label": "Feeding",
-          "value": "chemosynthetic, via episymbiotic bacteria"
+          "value": "chemosynthetic carbon with a photosynthetic contribution"
         },
         {
           "label": "Closest relative",
-          "value": "Rimicaris exoculata (Mid-Atlantic Ridge, ~4,000 km away)"
+          "value": "closely related to Rimicaris chacei; resembles R. exoculata"
         }
       ],
       "reconstruction": true,
@@ -117,6 +125,18 @@
         {
           "title": "Connelly, D.P. et al. 2012, Nature Communications 3:620",
           "url": "https://www.nature.com/articles/ncomms1636"
+        },
+        {
+          "title": "Miyamoto et al. 2025 — visible-light-sensitive opsins in Rimicaris hybisae",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12221356/"
+        },
+        {
+          "title": "Streit et al. 2015 — sources of organic carbon for Rimicaris hybisae",
+          "url": "https://www.sciencedirect.com/science/article/abs/pii/S0967063715000357"
+        },
+        {
+          "title": "Versteegh et al. 2024 — Rimicaris hybisae / chacei species complex",
+          "url": "https://academic.oup.com/evolut/article/78/3/413/7465036"
         }
       ],
       "confidence": "high"
@@ -125,7 +145,7 @@
       "id": "spreading-axis",
       "title": "The Mid-Cayman spreading axis",
       "paragraphs": [
-        "The Cayman Trough is the world's deepest and one of its slowest-spreading mid-ocean ridge systems -- the Mid-Cayman Spreading Centre pulls apart at only about 15 mm per year, less than a tenth the rate of a fast-spreading ridge like the East Pacific Rise. That sluggish spreading means thin, patchy volcanic crust and long-lived faults reaching deep into the mantle, which is part of why Beebe's vent fluids run hot enough for supercritical venting: heat sources here sit closer to a thinned crust than on a typical ridge.",
+        "The Mid-Cayman Spreading Centre is the world’s deepest seafloor spreading centre, with an ultraslow full spreading rate of about 15 mm per year. Its thin crust is cut by faults through which seawater circulates. The pressure at Beebe’s depth, together with its fluid temperature and salinity, allows supercritical fluid to reach the seafloor.",
         "This tile's real terrain shows a deep, elongated trough running northwest-southeast through its western half, reaching -5,395.8 m at its deepest sounded point here -- consistent with the ridge's axial valley, the rift where new seafloor is created. This is a terrain trace of that trough's general depth and direction on this tile's real GMRT grid, not a citation to a precisely surveyed plate-boundary line."
       ],
       "facts": [

@@ -24,16 +24,16 @@
     "summary": "Descend to the Beebe Hydrothermal Vent Field on the Mid-Cayman Spreading Centre and scan its black-smoker chimneys and the Rimicaris shrimp swarms living around them. A western sulfide mound offers another nearby target.",
     "depth_m": 4987.9,
     "facts": [
-      "Beebe is the deepest known active hydrothermal vent field, confirmed at 4,957-4,987 m (Connelly et al. 2012, Nature Communications).",
+      "Beebe lies about 4,960 m deep in the discovery survey (Connelly et al. 2012); its nearby game targets sit on terrain around 4,957–4,988 m.",
       "Its low-salinity vent fluid has been measured around 401–403 °C at roughly 500 bar, hot and pressurized enough to become supercritical.",
-      "Thousands of a shrimp new to science, Rimicaris hybisae, swarm the chimneys; it has no adult eyes but carries a light-sensing organ that may detect the vents' own faint glow.",
+      "Rimicaris hybisae swarm the chimneys; their enlarged dorsal eyes detect light without forming images, and may sense faint vent light and bioluminescence.",
       "The field sits on the Mid-Cayman Spreading Centre, the world's deepest and one of its slowest-spreading mid-ocean ridges (~15 mm/yr)."
     ],
     "hazards": [
       "Rated depth: this Class C hull can operate to 11,000 m, giving wide margin here, but treat the pressure at nearly 5,000 m as real and unforgiving.",
       "Scalding, chemically hostile fluid at the chimney mouths -- some of it supercritical, hotter than 400 degC. Do not linger inside a plume.",
-      "Total darkness; only your lights and the chimneys' own faint thermal signature illuminate anything here.",
-      "Von Damm, this ridge's other major vent field, lies about 13 km southwest at ~2,300 m -- well outside this survey's tile and not reachable in this mission."
+      "No sunlight reaches this depth; use your lights to read the chimneys and surrounding seabed.",
+      "Von Damm, this ridge's other major vent field, lies about 21 km south-southwest at ~2,300 m -- well outside this survey's tile and not reachable in this mission."
     ]
   },
   "objectives": [
