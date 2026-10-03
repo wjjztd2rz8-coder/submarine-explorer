@@ -59,6 +59,7 @@ uniform float uRockLo;          // 1 - cos(slope) where rock starts
 uniform float uRockHi;          // ... and where it is complete
 uniform float uExaggeration;
 uniform vec2 uDepthShade;       // surface depth (m) where the dark tint starts / is complete; 0,0 = off
+uniform vec2 uStrata;           // rock band thickness (m), strength; 0 = off
 uniform vec3 uDepthTint;        // albedo multiplier at full depth shade
 
 varying vec3 vTerrainWorldPos;
@@ -285,6 +286,19 @@ float terrRough = 0.92;
   st *= uStainAmount * (0.55 + 0.9 * rockT + 0.5 * max(cav, 0.0));
   alb = mix(alb, uStain * lum, clamp(st, 0.0, 0.85));
 
+  if (uStrata.y > 0.0) {
+    // Horizontal bands on slopes: warm and cool beds of uneven thickness, a thin dark joint between.
+    float sd = -P.y / max(uExaggeration, 1e-3);
+    float wob = (terrainNoise(P.xz / 17.0).x - 0.5) * 1.6;
+    float bandT = sd / uStrata.x + wob;
+    float bi = floor(bandT);
+    float bh = terrainHash(vec2(bi, 3.0));
+    float joint = smoothstep(0.0, 0.07, fract(bandT));
+    float bandMask = smoothstep(0.12, 0.45, sl);
+    vec3 bedTint = mix(vec3(1.08, 1.03, 0.9), vec3(0.88, 0.93, 1.0), bh);
+    float k = min(1.0, uStrata.y * bandMask * 1.8);
+    alb *= mix(vec3(1.0), bedTint * (0.8 + 0.4 * bh), k) * mix(1.0, 0.72 + 0.28 * joint, k);
+  }
   if (uDepthShade.y > uDepthShade.x) {
     float surfDepth = -P.y / max(uExaggeration, 1e-3);
     alb *= mix(vec3(1.0), uDepthTint, smoothstep(uDepthShade.x, uDepthShade.y, surfDepth));

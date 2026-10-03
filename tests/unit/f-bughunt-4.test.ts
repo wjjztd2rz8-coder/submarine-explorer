@@ -40,8 +40,8 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
       const ray = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0));
       let worst = { error: 0, x: 0, z: 0, mesh: 0, collision: 0, sonar: 0 };
       let maxBurial = { error: 0, x: 0, z: 0, mesh: 0, collision: 0 };
-      for (const oz of [-200, -120, -60, 0, 5, 60, 120, 200]) {
-        for (const ox of [-200, -120, -60, 0, 60, 120, 200]) {
+      for (const oz of [-200, -160, -120, -90, -60, 0, 5, 60, 90, 120, 160, 200]) {
+        for (const ox of [-220, -200, -160, -120, -90, -60, 0, 60, 90, 120, 160, 200, 220]) {
           const x = centre.x + ox;
           const z = centre.z + oz;
           const collision = terrain.sampleHeight(x, z);
@@ -64,7 +64,12 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
       expect(worst.error).toBeGreaterThan(config.submarine.hullRadius * 2);
       expect(maxBurial.error).toBeGreaterThan(config.submarine.hullRadius * 2);
       const sub = new Submarine(config.submarine, terrain);
-      sub.reset(worst.x, Math.min(-80, worst.mesh - config.submarine.hullRadius - 2), worst.z);
+      // Sit between the collision surface and the drawn mesh above it: buried, yet "free".
+      sub.reset(
+        maxBurial.x,
+        maxBurial.collision + config.submarine.hullRadius + config.submarine.seabedClearance + 0.5,
+        maxBurial.z,
+      );
       sub.step(
         {
           throttle: 0,
@@ -78,7 +83,7 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
         1 / 60,
       );
       expect(sub.getState().touchedBottom).toBe(false);
-      expect(sub.position.y + config.submarine.hullRadius).toBeLessThan(worst.mesh);
+      expect(sub.position.y + config.submarine.hullRadius).toBeLessThan(maxBurial.mesh);
       console.log('Buried submarine repro', {
         at: worldToLatLon(terrain.meta, worst.x, worst.z),
         y: sub.position.y,

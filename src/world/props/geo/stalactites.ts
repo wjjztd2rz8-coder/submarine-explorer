@@ -43,17 +43,19 @@ const WALL = new THREE.Color(0x9b9482);
 const WALL_DARK = new THREE.Color(0x5b5648);
 const TIP = new THREE.Color(0xe4d9be);
 const AMBER = new THREE.Color(0xb59a6a);
-const DRAPE = new THREE.Color(0xa59d88);
+const DRAPE = new THREE.Color(0x8c8470);
+const BED_WARM = new THREE.Color(0xb39a68);
+const BED_COOL = new THREE.Color(0x7d8179);
 
 const EDGE_START = 0.55;
 
 /** Sunlit pale limestone: the shared rock albedo (kept dark for vents and tuff) is lifted. */
-const LIMESTONE_LIFT = 4.2;
+const LIMESTONE_LIFT = 3.5;
 const geoMaterial: typeof baseGeoMaterial = (kind, d, o) => {
   const m = baseGeoMaterial(kind, d, o);
   m.color.multiplyScalar(LIMESTONE_LIFT);
   // Scattered light keeps the shelf pale tan like the hole's walls, not a dark silhouette.
-  vertexGlow(m, 0.3, 0xd8d0b0, 0.45);
+  vertexGlow(m, 0.18, 0xd8d0b0, 0.35);
   return m;
 };
 
@@ -157,12 +159,22 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const n = fbm3(x * 0.25, y * 0.22, z * 0.25, seed ^ 0x21, 4);
     out.copy(WALL).lerp(WALL_DARK, smooth(0.5, 0.9, n) * 0.6);
     out.multiplyScalar(0.8 + 0.5 * n);
-    if (ny > 0.6) out.multiplyScalar(0.85);
+    if (ny > 0.6) {
+      // Shelf tops and ledges: silted, mottled grey-tan with darker pockets, never a flat pale slab.
+      const m = fbm3(x * 0.09, z * 0.09, 5, seed ^ 0x3c, 4);
+      out.multiplyScalar(0.66).lerp(BED_COOL, smooth(0.35, 0.7, m) * 0.5);
+      out.multiplyScalar(0.7 + 0.5 * smooth(0.25, 0.75, m));
+    }
     out.lerp(AMBER, smooth(0.6, 0.9, fbm3(x * 0.5, y * 0.5, z * 0.5, seed ^ 0x5, 3)) * 0.35);
     // Horizontal solution notches and a darker, stained shelf underside.
     out.multiplyScalar(1 - 0.18 * smooth(0.7, 1, Math.sin(y * 0.9 + n * 4)));
     if (y > H * 0.48 && y < H * 0.64 && ny < -0.3) out.multiplyScalar(0.78);
-    out.lerp(DRAPE, (1 - smooth(joinY, joinY + 0.12 * H, y)) * 0.7);
+    // Strata: uneven warm and grey beds with a dark joint between, so the face is not one flat tone.
+    const bed = y / (2.6 * scale) + 1.3 * fbm3(x * 0.05, 1, z * 0.05, seed ^ 0x77, 2);
+    const bh = fbm3(Math.floor(bed) * 3.1, 7, 1, seed ^ 0x13, 2);
+    out.lerp(BED_WARM, smooth(0.45, 0.75, bh) * 0.45).lerp(BED_COOL, smooth(0.45, 0.2, bh) * 0.4);
+    out.multiplyScalar(0.72 + 0.28 * smooth(0, 0.12, bed - Math.floor(bed)));
+    out.lerp(DRAPE, (1 - smooth(joinY, joinY + 0.12 * H, y)) * 0.4);
   });
   wall.computeBoundingBox();
   const full = new THREE.Group();
@@ -192,9 +204,12 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       const n = fbm3(x * 0.2, z * 0.2, y * 0.1, seed ^ 0x52, 4);
       out
         .copy(WALL)
-        .lerp(WALL_DARK, 0.25)
-        .lerp(DRAPE, smooth(0.05, 0.9, u) * 0.85);
-      out.multiplyScalar(0.78 + 0.5 * n);
+        .lerp(WALL_DARK, 0.3)
+        .lerp(DRAPE, smooth(0.05, 0.9, u) * 0.45);
+      // Sediment tone drifts between warm sand, grey silt and darker fallen debris; no flat cream.
+      const t = fbm3(x * 0.07, z * 0.07, 3, seed ^ 0x91, 3);
+      out.lerp(BED_WARM, smooth(0.5, 0.8, t) * 0.5).lerp(BED_COOL, smooth(0.5, 0.2, t) * 0.5);
+      out.multiplyScalar(0.7 + 0.55 * n);
       out.multiplyScalar(0.82 + 0.18 * smooth(0, 0.25, u));
     },
   );

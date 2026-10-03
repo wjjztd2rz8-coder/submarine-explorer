@@ -78,6 +78,8 @@ export interface Biome {
   detail?: number;
   /** Darken and blue the albedo of surfaces deeper than `startM` (full at `endM`), whatever the camera depth. */
   depthShade?: { startM: number; endM: number; tint: number };
+  /** Horizontal rock banding on slopes: band thickness (m) and strength 0..1 (limestone strata). */
+  strata?: { periodM: number; amount: number };
   scatter: ScatterSpec[];
 }
 
@@ -263,23 +265,24 @@ export const BIOMES: Record<string, Biome> = {
     a: 'silt',
     b: 'sand',
     c: 'carbonate',
-    colorA: 0xe2dfc9,
-    colorB: 0xebe8d3,
-    colorC: 0xbdb496,
-    contrast: 0.55,
-    detail: 0.45,
-    stain: 0x9c946f,
-    stainAmount: 0.12,
-    patch: 0.45,
+    colorA: 0xdcd6bd,
+    colorB: 0xd2cbb0,
+    colorC: 0xb4a888,
+    contrast: 0.7,
+    detail: 0.55,
+    stain: 0x8f8764,
+    stainAmount: 0.2,
+    patch: 0.3,
     ripple: 0.6,
     rippleLenM: 0.4,
     rippleDir: 0.2,
     burrow: 0.6,
     rockBias: 0.15,
     depthShade: { startM: 12, endM: 100, tint: 0x336a94 },
+    strata: { periodM: 4.5, amount: 0.34 },
     scatter: [
       { kind: 'rubble', density: 3, slopeMaxDeg: 30, on: 'any' },
-      { kind: 'boulder', density: 0.8, slopeMaxDeg: 45, on: 'rock' },
+      { kind: 'boulder', density: 1.6, slopeMaxDeg: 45, on: 'any' },
       { kind: 'mound', density: 2, slopeMaxDeg: 10, on: 'flat' },
     ],
   },

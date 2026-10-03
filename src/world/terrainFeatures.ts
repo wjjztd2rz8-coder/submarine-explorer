@@ -48,6 +48,35 @@ function profileAt(r: number): number {
   return PROFILE[PROFILE.length - 1]![1];
 }
 
+/** Wall alcoves: bearing (rad), angular half-width, absolute height (m), height half-range, depth (m). */
+const NOTCHES: readonly { a: number; w: number; h: number; hw: number; d: number }[] = [
+  { a: 0.4, w: 0.16, h: -60, hw: 9, d: 13 },
+  { a: 2.3, w: 0.13, h: -88, hw: 8, d: 12 },
+  { a: 3.9, w: 0.18, h: -52, hw: 8, d: 14 },
+  { a: 5.4, w: 0.12, h: -75, hw: 7, d: 10 },
+];
+
+/** Fixed floor blocks: (dx, dz, radius, height) in metres from the hole centre. */
+const BLOCKS: readonly (readonly [number, number, number, number])[] = [
+  [-34, 22, 5, 3.5],
+  [18, -41, 6, 4],
+  [41, 30, 4, 3],
+  [-12, -30, 3.5, 2.5],
+  [-52, -18, 5.5, 4],
+  [8, 47, 4.5, 3],
+  [26, 6, 3, 2],
+  [-20, 55, 4, 3],
+];
+
+function boulderField(dx: number, dz: number): number {
+  let h = 0;
+  for (const [bx, bz, br, bh] of BLOCKS) {
+    const d2 = ((dx - bx) * (dx - bx) + (dz - bz) * (dz - bz)) / (br * br);
+    if (d2 < 1) h += bh * (1 - d2) * (1 - d2) * 1.4;
+  }
+  return h;
+}
+
 export interface TerrainCarve {
   /** Height after the carve, given the measured height at (x, z). Never raises the seabed. */
   apply(x: number, z: number, height: number): number;
@@ -68,7 +97,17 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
       const a = Math.atan2(dz, dx);
       // A slightly irregular outline, not a drawn circle.
       const wob = 1 + 0.035 * Math.sin(3 * a + 0.8) + 0.025 * Math.sin(5 * a + 2.1);
-      const r = Math.hypot(dx, dz) / wob;
+      const r0 = Math.hypot(dx, dz) / wob;
+      // Alcoves: a few scooped notches in the wall (the cave mouths and undercuts the hole is
+      // known for), a height field cannot overhang so they are steep, deep re-entrants.
+      let r = r0;
+      for (const n of NOTCHES) {
+        let da = Math.abs(a - n.a);
+        if (da > Math.PI) da = 2 * Math.PI - da;
+        const ang = Math.exp(-((da / n.w) ** 2));
+        const hgt = Math.exp(-(((profileAt(r0) - n.h) / n.hw) ** 2));
+        r -= n.d * ang * hgt;
+      }
       // Ledge undulation, rubble hummocks and sediment ripples (a metre or two) break up the carve.
       const rim = smoothstep(Math.min(1, Math.max(0, (r - 100) / 30)));
       const ledge =
@@ -81,7 +120,16 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
         (0.5 * Math.sin(dx * 0.35 + 0.8 * Math.sin(dz * 0.09)) +
           0.9 * Math.sin(dz * 0.13 + dx * 0.05) +
           1.4 * Math.sin(dx * 0.045) * Math.sin(dz * 0.06));
-      return Math.min(height, profileAt(r) + ledge + ripple);
+      // Limestone strata: concentric shelves and recesses on the wall read as horizontal bands.
+      const wall =
+        smoothstep(Math.min(1, Math.max(0, (r - 104) / 6))) *
+        (1 - smoothstep(Math.min(1, Math.max(0, (r - 152) / 8))));
+      const strata =
+        wall *
+        (1.6 * Math.sin(r * 0.62 + 1.4 * Math.sin(3 * a)) + 0.9 * Math.sin(r * 1.37 + 2 * a));
+      // Fallen blocks and sediment mounds on the floor.
+      const blocks = floor * boulderField(dx, dz);
+      return Math.min(height, profileAt(r) + ledge + ripple + strata + blocks);
     },
   };
 }

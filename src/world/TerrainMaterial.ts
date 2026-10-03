@@ -91,6 +91,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
     uDepthShade: {
       value: new THREE.Vector2(biome.depthShade?.startM ?? 0, biome.depthShade?.endM ?? 0),
     },
+    uStrata: { value: new THREE.Vector2(biome.strata?.periodM ?? 0, biome.strata?.amount ?? 0) },
     uDepthTint: { value: new THREE.Color(biome.depthShade?.tint ?? 0xffffff) },
   };
 
