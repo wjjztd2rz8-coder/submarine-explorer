@@ -14,6 +14,16 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-MOBILE-AUDIT: dynamic resolution respects fractional DPR ceilings
+  and floors. Rotation releases held touch gestures and clears the portrait hint;
+  compact HUD columns and portrait cards account for both safe-area side insets.
+- Phase F, F-MOBILE-AUDIT: offline workers require a complete shell before
+  replacing the previous installation, await cache writes and background index
+  refreshes, tolerate quota failures and isolate versioned caches by deployment
+  base. Mutable mission/landmark files refresh with deployment content; downloaded
+  tiles retain their existing cache. Worker, shell and mutable asset edits change
+  the cache version. Added regression tests for these paths and manifest base URLs.
+
 - Phase F, F-LOSTCITY-3: the Poseidon talus apron is no longer a flat oval. It has a ragged noise-driven outline, feathers flush into the seabed, fades into the sediment colour and carries scattered carbonate blocks (not on the low tier). Lost City also gets a little more ambient fill and a lifted distance haze (new opt-in vent params `hazeScale`, `hazeLift`) so the far ridge softens instead of cutting out black.
 
 - Phase F, F-DAILY-TOUCH: Daily dive, mission selection and home transitions

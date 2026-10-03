@@ -150,6 +150,7 @@ export class TouchControls {
   }
 
   dispose(): void {
+    window.clearTimeout(this.hintTimer);
     for (const d of this.disposers) d();
     this.disposers.length = 0;
     this.releaseAll();
@@ -187,6 +188,17 @@ export class TouchControls {
       if (['ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight'].includes(e.code)) return;
       if (this.touchMode) this.setTouchMode(false);
     });
+    // Rotation moves the controls beneath held fingers. Start the next gesture
+    // from the new geometry rather than retaining thrust or old look positions.
+    const resetLayout = (): void => {
+      this.releaseAll();
+      if (window.innerHeight <= window.innerWidth) {
+        this.rotateHint.hidden = true;
+        window.clearTimeout(this.hintTimer);
+      } else if (this.shouldShow) this.maybeShowRotateHint();
+    };
+    on('resize', resetLayout);
+    on('orientationchange', resetLayout);
   }
 
   // --------------------------------------------------------------- stick
@@ -408,6 +420,7 @@ export class TouchControls {
     this.releaseSlider();
     this.input.touchHeld.clear();
     this.looks.clear();
+    this.pinchDist = 0;
     for (const b of this.root.querySelectorAll('.is-held')) b.classList.remove('is-held');
   }
 

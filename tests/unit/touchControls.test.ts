@@ -9,7 +9,13 @@ import { TouchControls } from '../../src/ui/TouchControls.js';
 class Element extends EventTarget {
   style = { transform: '', top: '', touchAction: '' };
   private classes = new Set<string>();
+  children: Element[] = [];
+  hidden = false;
+  className = '';
+  offsetWidth = 40;
+  offsetHeight = 40;
   classList = {
+    add: (name: string) => this.classes.add(name),
     remove: (name: string) => this.classes.delete(name),
     contains: (name: string) => this.classes.has(name),
     toggle: (name: string, on: boolean) => {
@@ -17,7 +23,13 @@ class Element extends EventTarget {
       else this.classes.delete(name);
     },
   };
-  append() {}
+  append(...children: Element[]) {
+    this.children.push(...children);
+  }
+  setPointerCapture() {}
+  getBoundingClientRect() {
+    return { left: 0, top: 0, width: 120, height: 160 };
+  }
   setAttribute() {}
   querySelectorAll() {
     return [];
@@ -29,6 +41,7 @@ const controls: TouchControls[] = [];
 afterEach(() => {
   for (const touch of controls.splice(0)) touch.dispose();
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 function setup(hardwareTouch = false) {
@@ -41,8 +54,13 @@ function setup(hardwareTouch = false) {
   });
   const win = Object.assign(new EventTarget(), {
     matchMedia: () => ({ matches: hardwareTouch }),
+    innerWidth: 844,
+    innerHeight: 390,
+    clearTimeout: vi.fn((id: number) => globalThis.clearTimeout(id)),
+    setTimeout: (fn: () => void, delay: number) => globalThis.setTimeout(fn, delay),
   });
   vi.stubGlobal('window', win);
+  vi.stubGlobal('screen', { width: 390, height: 844 });
   vi.stubGlobal('navigator', { maxTouchPoints: hardwareTouch ? 5 : 0 });
   vi.stubGlobal('localStorage', {
     getItem: (key: string) => values.get(key) ?? null,
@@ -52,6 +70,7 @@ function setup(hardwareTouch = false) {
     touchActive: false,
     touchAxes: { throttle: 0, yaw: 0, ballast: 0 },
     touchHeld: new Set(),
+    touchLook: vi.fn(),
   } as unknown as Input;
   const opts = {
     input,
@@ -116,4 +135,60 @@ it('still follows mouse and keyboard input after restoring saved touch detection
   win.dispatchEvent(Object.assign(new Event('keydown'), { code: 'KeyW' }));
   expect(touch.active).toBe(false);
   expect(root.classList.contains('is-touch')).toBe(false);
+});
+
+it.each(['resize', 'orientationchange'])(
+  'releases held axes, buttons and camera gestures on %s',
+  (event) => {
+    const { input, create, win, opts } = setup(true);
+    const touch = create();
+    touch.update(true, false);
+    const stick = (touch.root as unknown as Element).children[0]!;
+    const slider = (touch.root as unknown as Element).children[1]!;
+    const scan = (touch.root as unknown as Element).children[2]!.children[0]!;
+    const pointer = (type: string, pointerId: number, clientX = 0, clientY = 0) =>
+      Object.assign(new Event(type), { pointerId, pointerType: 'touch', clientX, clientY });
+    stick.dispatchEvent(pointer('pointerdown', 1, 60, 0));
+    slider.dispatchEvent(pointer('pointerdown', 3, 0, 0));
+    scan.dispatchEvent(pointer('pointerdown', 4));
+    expect(input.touchAxes.throttle).toBeGreaterThan(0);
+    expect(input.touchAxes.ballast).toBe(1);
+    expect(input.touchHeld.has('scan')).toBe(true);
+    // The mock DOM has no bubbling, so feed the canvas event to the window listener.
+    const cameraDown = pointer('pointerdown', 2, 50, 50);
+    Object.defineProperty(cameraDown, 'target', { value: opts.canvas });
+    win.dispatchEvent(cameraDown);
+    win.dispatchEvent(pointer('pointermove', 2, 60, 55));
+    expect(input.touchLook).toHaveBeenCalledWith(10, 5);
+    vi.mocked(input.touchLook).mockClear();
+    win.dispatchEvent(new Event(event));
+    expect(input.touchAxes).toEqual({ throttle: 0, yaw: 0, ballast: 0 });
+    expect(input.touchHeld.size).toBe(0);
+    stick.dispatchEvent(pointer('pointermove', 1, 60, -40));
+    slider.dispatchEvent(pointer('pointermove', 3, 0, 160));
+    win.dispatchEvent(pointer('pointermove', 2, 70, 70));
+    expect(input.touchAxes.throttle).toBe(0);
+    expect(input.touchAxes.ballast).toBe(0);
+    expect(input.touchLook).not.toHaveBeenCalled();
+    expect(touch.active).toBe(true);
+  },
+);
+
+it.each(['rotation', 'disposal'])('cancels the portrait hint timer on %s', (transition) => {
+  vi.useFakeTimers();
+  const { create, win } = setup(true);
+  win.innerWidth = 390;
+  win.innerHeight = 844;
+  const touch = create();
+  touch.update(true, false);
+  const hint = (touch.root as unknown as Element).children[4]!;
+  expect(hint.hidden).toBe(false);
+  expect(vi.getTimerCount()).toBe(1);
+  if (transition === 'rotation') {
+    win.innerWidth = 844;
+    win.innerHeight = 390;
+    win.dispatchEvent(new Event('resize'));
+    expect(hint.hidden).toBe(true);
+  } else touch.dispose();
+  expect(vi.getTimerCount()).toBe(0);
 });
