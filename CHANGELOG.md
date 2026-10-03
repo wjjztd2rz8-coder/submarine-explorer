@@ -14,6 +14,11 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BUGHUNT-7: active objective titles wrap in the HUD, including long
+  species names in the narrow phone stack; OPTIONAL labels retain their space.
+  Added all-site scan-to-Journal checks and browser copy/overflow coverage at
+  390×844 and desktop, including 150% UI scale.
+
 - Phase F, F-LOSTCITY-3: the Poseidon talus apron is no longer a flat oval. It has a ragged noise-driven outline, feathers flush into the seabed, fades into the sediment colour and carries scattered carbonate blocks (not on the low tier). Lost City also gets a little more ambient fill and a lifted distance haze (new opt-in vent params `hazeScale`, `hazeLift`) so the far ridge softens instead of cutting out black.
 
 - Phase F, F-DAILY-TOUCH: Daily dive, mission selection and home transitions
