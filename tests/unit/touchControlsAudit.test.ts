@@ -58,6 +58,8 @@ function fixture() {
   const win = Object.assign(new EventTarget(), {
     innerWidth: 844,
     innerHeight: 390,
+    setTimeout: globalThis.setTimeout.bind(globalThis),
+    clearTimeout: globalThis.clearTimeout.bind(globalThis),
     matchMedia: () => ({ matches: true }),
   });
   vi.stubGlobal('document', doc);
