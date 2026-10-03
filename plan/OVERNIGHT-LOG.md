@@ -149,3 +149,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Running (Codex): 130-f-daily-touch, 140-f-bughunt-5, 150-f-copy-audit. Queued: 90-f-hint-dedupe, 160-f-ci-timeout-check, 170-f-touch-audit, 180-f-bughunt-6-modes.
 - Not done: no fresh golden set (needs the host); I checked the 2026-10-02-2323 set (Titanic good). Claude 5h ended ~65%.
 - Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-03 headless run (started ~01:05)
+
+- Merged (main gates green): F-DAILY-TOUCH (Codex: Daily card reboot keeps touch mode), F-BUGHUNT-5 (Codex: input, discovery store and tile-loader fixes). CHANGELOG conflicts resolved by keeping both sides.
+- Running (Codex): 150-f-copy-audit, 160-f-ci-timeout-check, 170-f-touch-audit. Queued: 90-f-hint-dedupe, 180-f-bughunt-6-modes, 190-f-audio-audit, 200-f-mobile-lowtier-audit.
+- No Claude agents spawned; Claude 5h was ~66%. Lost City terrain checker texture and fresh golden set still open. Not pushed or tagged (no wave complete).
+- Still needs owner: brand name OK (Bathyline).
