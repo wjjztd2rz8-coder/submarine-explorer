@@ -44,6 +44,7 @@ function fakeRenderer() {
   let test = false;
   const r = {
     calls,
+    info: { render: { calls: 9, triangles: 72_000 } },
     render: vi.fn(() => calls.push('render')),
     getViewport: (t: THREE.Vector4) => t.copy(vp),
     getScissor: (t: THREE.Vector4) => t.copy(sc),
@@ -115,6 +116,37 @@ describe('TitleScene budgets', () => {
 });
 
 describe('TitleScene motion and clearance', () => {
+  it('keeps the clearance guard intact at the lowest hover point beside a ridge', () => {
+    const crop = makeCrop();
+    crop.sampleFloor = (x: number) => (x >= 6 ? 40 : 0);
+    const s = new TitleScene({ tier: 'low', reducedMotion: false });
+    s.setCrop(crop);
+    const rig = s.scene.getObjectByName('vehicle-B')!.parent!;
+    run(s, 40, 0.1, () => {
+      expect(rig.position.y - crop.sampleFloor(6, 0)).toBeGreaterThanOrEqual(TITLE_SHOT.clearanceM);
+    });
+    s.dispose();
+  });
+
+  it.each(['low', 'high'] as const)(
+    'never flashes the %s vehicle strobe during title sway',
+    (tier) => {
+      const s = new TitleScene({ tier, reducedMotion: false });
+      const check = (): void => {
+        const strobe = s.scene.getObjectByName('vehicle-strobe') as THREE.Mesh;
+        const color = (strobe.material as THREE.MeshBasicMaterial).color;
+        expect(Math.max(color.r, color.g, color.b)).toBeLessThanOrEqual(1);
+        const halo = s.scene.getObjectByName('vehicle-strobe-halo') as THREE.Sprite | undefined;
+        if (halo) expect((halo.material as THREE.SpriteMaterial).opacity).toBe(0);
+      };
+      check();
+      run(s, 40, 0.1, check);
+      s.setQuality(tier === 'low' ? 'high' : 'low');
+      check();
+      s.dispose();
+    },
+  );
+
   it('keeps 12 m over the sampled floor for camera and vehicle for a full loop', () => {
     for (const ridge of [0, 55, 80]) {
       const crop = makeCrop(ridge);
@@ -134,14 +166,17 @@ describe('TitleScene motion and clearance', () => {
     }
   });
 
-  it('starts at the specified shot with a 35 m vehicle height', () => {
+  it('starts at the F-TITLE-LOOK shot with the hull just above the seabed', () => {
     const s = new TitleScene({ tier: 'low', reducedMotion: true });
     s.setCrop(makeCrop());
     const rig = s.scene.children.find((o) => o.type === 'Group') as THREE.Object3D;
-    expect(rig.position.toArray()).toEqual([0, 35, 0]);
-    expect(s.camera.position.x).toBeCloseTo(-85, 6);
-    expect(s.camera.position.y).toBeCloseTo(70, 6);
-    expect(s.camera.position.z).toBeCloseTo(115, 6);
+    expect(rig.position.toArray()).toEqual([0, TITLE_SHOT.vehicleAboveFloorM, 0]);
+    expect(s.camera.position.x).toBeCloseTo(TITLE_SHOT.cameraOffset.x, 6);
+    expect(s.camera.position.y).toBeCloseTo(
+      TITLE_SHOT.vehicleAboveFloorM + TITLE_SHOT.cameraOffset.y,
+      6,
+    );
+    expect(s.camera.position.z).toBeCloseTo(TITLE_SHOT.cameraOffset.z, 6);
     s.dispose();
   });
 
@@ -225,9 +260,9 @@ describe('TitleScene layout framing', () => {
   };
   it('puts the vehicle at the spec screen fractions', () => {
     const cases: [number, number, 'desktop' | 'portrait' | 'short-landscape', number, number][] = [
-      [1280, 720, 'desktop', 0.72, 0.55],
-      [390, 844, 'portrait', 0.64, 0.5],
-      [844, 390, 'short-landscape', 0.5, 0.66],
+      [1280, 720, 'desktop', 0.6, 0.58],
+      [390, 844, 'portrait', 0.5, 0.4],
+      [844, 390, 'short-landscape', 0.4, 0.62],
     ];
     for (const [w, h, layout, fx, fy] of cases) {
       const s = new TitleScene({ tier: 'low', reducedMotion: true });
@@ -261,6 +296,15 @@ describe('TitleScene layout framing', () => {
 });
 
 describe('TitleScene draw scheduling', () => {
+  it('reports the renderer counters after a presentation', () => {
+    const s = new TitleScene({ tier: 'low', reducedMotion: true });
+    const r = fakeRenderer();
+    s.draw(asRenderer(r));
+    expect(s.stats.calls).toBe(r.info.render.calls);
+    expect(s.stats.triangles).toBe(r.info.render.triangles);
+    s.dispose();
+  });
+
   it('draws static mode only when dirty', () => {
     const s = new TitleScene({ tier: 'low', reducedMotion: true });
     const r = fakeRenderer();
@@ -486,5 +530,38 @@ describe('F-BUGHUNT-12 title regressions', () => {
     } finally {
       s.dispose();
     }
+  });
+});
+
+describe('TitleScene look pass (lamp beams, contact shadow)', () => {
+  it('drapes a contact shadow on the seabed and lands the lamp pools on it', () => {
+    const s = new TitleScene({ tier: 'low', reducedMotion: true });
+    expect(s.scene.getObjectByName('titleContactShadow')).toBeUndefined();
+    const crop = makeCrop();
+    s.setCrop(crop);
+    const shadow = s.scene.getObjectByName('titleContactShadow') as THREE.Mesh;
+    expect(shadow).toBeDefined();
+    const pos = shadow.geometry.getAttribute('position');
+    for (let i = 0; i < pos.count; i++) {
+      const y = crop.sampleFloor(pos.getX(i), pos.getZ(i));
+      expect(pos.getY(i) - y).toBeCloseTo(0.3, 5);
+    }
+    for (const side of [-1, 1]) {
+      const lamp = s.scene.getObjectByName(`titleLamp${side}`) as THREE.SpotLight;
+      const target = lamp.target.getWorldPosition(new THREE.Vector3());
+      expect(target.y - crop.sampleFloor(target.x, target.z)).toBeCloseTo(0.2, 3);
+      expect(s.scene.getObjectByName(`titleBeam${side}`)).toBeDefined();
+    }
+    s.dispose();
+    expect(crop.disposed).toBe(1);
+    expect(s.scene.children.length).toBe(0);
+  });
+
+  it('removes the contact shadow when the crop is cleared', () => {
+    const s = new TitleScene({ tier: 'low', reducedMotion: true });
+    s.setCrop(makeCrop());
+    s.setCrop(null);
+    expect(s.scene.getObjectByName('titleContactShadow')).toBeUndefined();
+    s.dispose();
   });
 });

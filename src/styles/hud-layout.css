@@ -112,10 +112,24 @@
   html.is-touch .sonar:not(.d-sonar-expanded) canvas {
     width: 100% !important;
     height: auto !important;
+    /* Tall tiles can extend into the stick even at 144 px panel width.
+       Reserve 12 px top, 70 px header, 14 px padding/border, the 104 px
+       stick with its 16 px edge, and an 8 px gap. Fit without stretching. */
+    max-height: calc(
+      100vh - 224px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+    );
+    object-fit: contain;
   }
   html.is-touch .sonar.d-sonar-expanded {
+    /* Reserve the right controls and the left Pause slot on narrow phones. */
+    left: auto;
+    right: calc(270px + env(safe-area-inset-right, 0px));
     width: 300px;
-    transform: translate(-50%, -50%);
+    max-width: calc(
+      100vw - 354px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+    );
+    box-sizing: border-box;
+    transform: translateY(-50%);
     z-index: 31;
   }
   html.is-touch .sonar.d-sonar-expanded canvas {
@@ -248,6 +262,26 @@
     width: calc(
       100vw - 136px - 300px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
     );
+  }
+}
+
+/* At 667 px the centre column cannot fit text beside both tutorial buttons.
+   Stack the card and reserve enough height for every touch tutorial step. */
+@media (max-width: 740px) and (max-height: 460px) and (orientation: landscape) {
+  html.is-touch .onboard-card:not([hidden]) {
+    display: block;
+  }
+  html.is-touch .onboard-card-text {
+    margin: 4px 0 8px;
+  }
+  html.is-touch .onboard-card-dots {
+    display: none;
+  }
+  html.is-touch .onboard-card button {
+    padding: 0 6px;
+  }
+  body:has(.onboard-card:not([hidden])) .scan-overlay .scan-panel {
+    top: calc(206px + env(safe-area-inset-top, 0px));
   }
 }
 

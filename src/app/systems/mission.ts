@@ -98,8 +98,10 @@ export const missionSystem: GameSystem = {
               ctx.daily &&
               rating.stars > 0 &&
               ctx.daily.date === new Date().toISOString().slice(0, 10)
-            )
+            ) {
               ctx.dailySave.complete(ctx.daily.date);
+              ctx.progress.recordDailyStreak(ctx.dailySave.get().streak);
+            }
             return rating;
           },
           bus,

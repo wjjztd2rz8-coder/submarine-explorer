@@ -28,6 +28,7 @@ export function createDailySystem(): GameSystem {
   return {
     name: 'daily',
     start(ctx) {
+      ctx.progress.recordDailyStreak(ctx.dailySave.get().streak);
       let display = '';
       const refresh = () => {
         const date = utcDate();

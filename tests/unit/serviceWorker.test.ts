@@ -38,7 +38,7 @@ function worker(scope = defaultScope, active = true) {
     skipWaiting: vi.fn(async () => {}),
     clients: { claim: vi.fn(async () => {}) },
   };
-  const fetch = vi.fn(async (_request: Request) => new Response('fresh'));
+  const fetch = vi.fn(async (_request: Request, _options?: RequestInit) => new Response('fresh'));
   const source = active
     ? template
         .replace('__SW_VERSION__', 'test')
@@ -104,6 +104,57 @@ describe('offline service worker', () => {
     sw.fetch.mockResolvedValue(new Response('unavailable', { status: 503 }));
     const res = await sw.dispatch('fetch', new Request(defaultScope)).response!;
     expect(await res.text()).toBe('offline shell');
+  });
+
+  it.each(['https://example.test/', defaultScope])(
+    'preserves the installed offline shell when a new deploy serves navigation HTML at %s',
+    async (scope) => {
+      const sw = worker(scope);
+      await sw.seed('shell-test', '', '<script src="app.js"></script>');
+      await sw.seed('shell-test', 'app.js', 'installed chunk');
+      sw.fetch.mockResolvedValueOnce(new Response('<script src="new-deploy.js"></script>'));
+      expect(await (await sw.dispatch('fetch', new Request(scope)).response!).text()).toContain(
+        'new-deploy.js',
+      );
+      sw.fetch.mockRejectedValue(new Error('offline before next worker installs'));
+      const offline = await sw.dispatch('fetch', new Request(scope)).response!;
+      expect(await offline.text()).toBe('<script src="app.js"></script>');
+      expect(
+        await (await sw.dispatch('fetch', new Request(`${scope}app.js`)).response!).text(),
+      ).toBe('installed chunk');
+    },
+  );
+
+  it('bypasses the HTTP cache when filling a new deployment mutable-asset cache', async () => {
+    const sw = worker();
+    const request = new Request(`${defaultScope}data/landmarks/titanic/mission.json`);
+    sw.fetch.mockImplementation(
+      async (_request, options) =>
+        new Response(
+          options?.cache === 'reload' ? 'new deployment mission' : 'previous deployment HTTP cache',
+        ),
+    );
+    expect(await (await sw.dispatch('fetch', request).response!).text()).toBe(
+      'new deployment mission',
+    );
+    expect(sw.fetch).toHaveBeenCalledWith(request, { cache: 'reload' });
+    sw.fetch.mockClear();
+    expect(await (await sw.dispatch('fetch', request).response!).text()).toBe(
+      'new deployment mission',
+    );
+    expect(sw.fetch).not.toHaveBeenCalled();
+  });
+
+  it('refreshes a queried tile index instead of treating it as an immutable tile', async () => {
+    const sw = worker();
+    const path = 'data/tiles/index.json?catalog=1';
+    await sw.seed('tiles-v1', path, 'stale');
+    const request = new Request(`${defaultScope}${path}`);
+    const result = sw.dispatch('fetch', request);
+    expect(result.pending).toHaveLength(1);
+    expect(await (await result.response!).text()).toBe('stale');
+    await Promise.all(result.pending);
+    expect(sw.fetch).toHaveBeenCalledWith(request, { cache: 'reload' });
   });
 
   it('keeps tile-index refresh and its cache write alive after returning a stale hit', async () => {

@@ -90,6 +90,39 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
+.upgrades-cosmetics fieldset {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #315362;
+  border-radius: 8px;
+  min-width: 0;
+}
+.cosmetic-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+}
+.upgrades .cosmetic-choice {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 6px 8px;
+  text-align: left;
+  padding: 10px;
+}
+.cosmetic-choice small {
+  grid-column: 1 / -1;
+  font-size: 12px;
+}
+.cosmetic-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #ffffff80;
+}
+.upgrades .cosmetic-choice[aria-pressed='true'] {
+  border-color: #f2ca7b;
+  background: #34575a;
+}
 .upgrade-card {
   padding: 14px 0;
   border-top: 1px solid #294a59;

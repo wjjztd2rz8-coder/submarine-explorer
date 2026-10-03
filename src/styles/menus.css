@@ -10,74 +10,25 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
   visibility: hidden;
 }
 
-.home-screen,
 .pause-menu {
   position: fixed;
   inset: 0;
   color: #e5f4f5;
   font-family: Inter, 'Segoe UI', system-ui, sans-serif;
 }
-.home-screen[hidden],
 .pause-menu[hidden],
-.home-sites[hidden],
-.home-menu[hidden],
 .pause-actions[hidden],
 .pause-detail[hidden],
 .pause-objectives[hidden],
 .pause-sites-scroll[hidden] {
   display: none;
 }
-.home-screen {
-  z-index: 72;
-  overflow: hidden;
-  background: radial-gradient(ellipse at 65% 40%, #0a2936 0%, #06121e 53%, #020710 100%);
-}
-.home-screen::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(90deg, rgba(2, 8, 15, 0.8) 0%, transparent 67%);
-  z-index: 1;
-}
-.home-copy,
-.home-menu {
-  position: absolute;
-  z-index: 3;
-  left: clamp(24px, 5vw, 90px);
-  width: min(490px, 40vw);
-}
-.home-copy {
-  top: clamp(35px, 10vh, 140px);
-}
-.home-kicker,
 .pause-kicker {
   color: #76e5d4;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.2em;
 }
-.home-copy h1 {
-  margin: 14px 0;
-  font-size: clamp(40px, 5vw, 82px);
-  line-height: 1.03;
-  letter-spacing: -0.045em;
-  text-wrap: balance;
-}
-.home-tagline {
-  max-width: 30rem;
-  color: #c3d5da;
-  font-size: clamp(15px, 1.3vw, 19px);
-  line-height: 1.55;
-}
-.home-menu {
-  bottom: clamp(30px, 9vh, 120px);
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-.home-menu button,
-.home-sites-head button,
 .pause-actions button,
 .pause-detail > button {
   min-height: 52px;
@@ -97,35 +48,14 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
     background 0.15s,
     border-color 0.15s;
 }
-.home-menu button:first-of-type,
-.home-menu button:nth-of-type(2) {
-  grid-column: span 2;
-  font-size: 19px;
-}
-.home-menu button:hover,
-.home-sites-head button:hover,
 .pause-actions button:hover,
 .pause-detail > button:hover {
   background: #124056;
   border-color: #79f4e3;
 }
-.home-menu button:focus-visible,
-.home-sites button:focus-visible,
 .pause-menu button:focus-visible {
   outline: 3px solid #8affeb;
   outline-offset: 3px;
-}
-.home-menu button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-.home-globe-wrap {
-  position: absolute;
-  inset: 0 0 0 32%;
-}
-.home-globe-slot {
-  position: absolute;
-  inset: 0;
 }
 .globe.is-embedded {
   position: absolute;
@@ -152,37 +82,10 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
   width: 12px;
   height: 12px;
 }
-.home-sites {
-  position: absolute;
-  z-index: 5;
-  right: clamp(18px, 3vw, 52px);
-  top: 5vh;
-  bottom: 5vh;
-  width: min(520px, 44vw);
-  display: flex;
-  flex-direction: column;
-  padding: 22px;
-  border: 1px solid #456976;
-  border-radius: 8px;
-  background: rgba(4, 17, 28, 0.96);
-  box-shadow: 0 24px 80px #0009;
-}
-.home-sites-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.home-sites-head h2 {
-  margin: 0;
-  font-size: 29px;
-}
-.home-sites-head button,
 .pause-detail > button {
   min-height: 40px;
   font-size: 14px;
 }
-.home-sites-scroll,
 .pause-sites-scroll {
   min-height: 0;
   flex: 1;
@@ -190,21 +93,6 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
   overscroll-behavior: contain;
   margin-top: 18px;
   scrollbar-color: #6fb5b9 transparent;
-}
-.home-screen.has-sites .home-menu {
-  display: none;
-}
-.home-screen.has-sites .home-globe-wrap {
-  inset: 0 39% 0 17%;
-}
-.home-screen.has-sites .home-copy {
-  top: 35px;
-}
-.home-screen.has-sites .home-copy h1 {
-  font-size: clamp(28px, 3vw, 46px);
-}
-.home-screen.has-sites .home-tagline {
-  display: none;
 }
 .mission-select.is-shell {
   position: static;
@@ -366,32 +254,4 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
 body:has(.field-guide:not([hidden])) .home-screen,
 body:has(.field-guide:not([hidden])) .pause-menu {
   pointer-events: none;
-}
-@media (max-width: 760px) {
-  .home-globe-wrap {
-    inset: 17% -26% 20% 15%;
-    opacity: 0.64;
-  }
-  .home-copy,
-  .home-menu {
-    left: 22px;
-    width: calc(100% - 44px);
-  }
-  .home-copy {
-    top: 25px;
-  }
-  .home-copy h1 {
-    font-size: 42px;
-  }
-  .home-menu {
-    bottom: 24px;
-  }
-  .home-screen.has-sites .home-copy,
-  .home-screen.has-sites .home-globe-wrap {
-    display: none;
-  }
-  .home-sites {
-    inset: 12px;
-    width: auto;
-  }
 }

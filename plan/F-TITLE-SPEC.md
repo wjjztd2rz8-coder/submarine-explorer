@@ -333,6 +333,6 @@ because the globe moves. No package renames `subexplorer` storage or project pat
    the brightest title shot. Reduced-motion tests assert stable transforms rather
    than relying on asynchronous pixel identity. Font/icon visual review includes
    fallback fonts and the small mark.
-9. Format owned files, log changes/cuts, and run `tools/gates.sh` with Node in
-   `$HOME/.local/node/bin`. Full gate failures retain logs; report environmental
+9. Format owned files, log changes/cuts, and run `tools/gates.sh --full-e2e`
+   with Node in `$HOME/.local/node/bin`. Full gate failures retain logs; report environmental
    restrictions separately from test failures. No commit in this research task.

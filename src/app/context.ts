@@ -16,6 +16,7 @@ import type { DailySave } from '../game/DailySave.js';
 import type { DailyDive } from '../game/Daily.js';
 import type { Progress } from '../game/Progress.js';
 import type { Upgrades } from '../ui/Upgrades.js';
+import type { TitleBridge } from './systems/title.js';
 import type * as THREE from 'three';
 import type { AudioSystem } from '../audio/AudioSystem.js';
 import type { AtmosphereTier, GameConfig, GraphicsTier } from '../core/Config.js';
@@ -180,6 +181,8 @@ export interface GameContext extends BootContext {
   rov: Rov;
   rovVisual: RovVisual;
   rovHud: RovHUD;
+  /** F-TITLE-E: the home backdrop (diagnostics and draw entry). */
+  titleScene: TitleBridge;
 }
 
 /** Add `expose` bookkeeping to a boot context. */

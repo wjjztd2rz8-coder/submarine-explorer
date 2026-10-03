@@ -9,7 +9,7 @@ import unittest
 
 
 class TestGates(unittest.TestCase):
-    def run_gates(self, *, fail_e2e=False, custom_output=None, args=(), ci=''):
+    def run_gates(self, *, fail_e2e=False, custom_output=None, args=(), ci='', config_mode='default'):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
@@ -25,6 +25,8 @@ with open("calls.jsonl", "a") as f:
     f.write(json.dumps(record) + "\\n")
 if kind == "npm" and args[:2] == ["run", "build"]:
     pathlib.Path(args[args.index("--outDir") + 1]).mkdir()
+if kind == "node":
+    pathlib.Path(args[2]).write_text("// bundled gate config")
 if kind == "npm" and args[:2] == ["run", "test:e2e"]:
     assert os.getenv("PW_REUSE_SERVER") == "0"
     assert pathlib.Path(os.environ["PW_OUTDIR"]).is_dir()
@@ -37,11 +39,12 @@ if kind == "npx" and args[:2] == ["playwright", "test"]:
         source = (Path(__file__).parents[1] / 'gates.sh').read_text()
         # Keep shell control flow and environment propagation intact. The real
         # env executable still dispatches the fake npm command for e2e.
-        for command in ['npm', 'npx', 'python3']:
+        for command in ['npm', 'npx', 'python3', 'node']:
             source = source.replace(command + ' ', shlex.quote(str(shim)) + ' ' + command + ' ')
         script = root / 'tools' / 'gates.sh'
         script.write_text(source)
-        env = dict(os.environ, PW_PORT='4371', PW_REUSE_SERVER='1', CI=ci)
+        env = dict(os.environ, PW_PORT='4371', PW_REUSE_SERVER='1', CI=ci,
+                   GATES_CONFIG_MODE=config_mode)
         env.pop('PW_OUTDIR', None)
         env.pop('VITE_BASE', None)
         env['FAIL_E2E'] = '1' if fail_e2e else '0'
@@ -126,6 +129,26 @@ if kind == "npx" and args[:2] == ["playwright", "test"]:
         preview = next(c for c in calls if c['kind'] == 'npm'
                        and c['args'][:2] == ['run', 'test:e2e'])
         self.assertEqual(preview['outdir'], 'dist-custom')
+
+    def test_writable_config_is_shared_by_builds_and_removed_after_gates(self):
+        root, result, calls = self.run_gates(config_mode='writable')
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        config = next(c for c in calls if c['kind'] == 'node')['args'][2]
+        self.assertTrue(config.startswith('.cache/gates/vite-'))
+        self.assertFalse((root / config).exists())
+        builds = [c for c in calls if c['kind'] == 'npm' and c['args'][:2] == ['run', 'build']]
+        self.assertEqual(len(builds), 2)
+        for build in builds:
+            self.assertEqual(build['args'][build['args'].index('--config') + 1], config)
+            self.assertEqual(build['args'][build['args'].index('--configLoader') + 1], 'native')
+        unit = next(c for c in calls if c['kind'] == 'npm' and c['args'][0] == 'test')
+        self.assertEqual(unit['args'], ['test', '--', '--configLoader', 'runner', '--cache=false'])
+
+    def test_invalid_config_mode_fails_before_gates(self):
+        _, result, calls = self.run_gates(config_mode='unknown')
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('GATES_CONFIG_MODE', result.stderr)
+        self.assertEqual(calls, [])
 
 
 if __name__ == '__main__':

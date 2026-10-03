@@ -33,6 +33,7 @@ import { presetsSystem } from './systems/presets.js';
 import { propsSystem } from './systems/props.js';
 import { createQualitySystem } from './systems/quality.js';
 import { renderSystem } from './systems/render.js';
+import { createTitleSystem } from './systems/title.js';
 import { createRovSystem } from './systems/rov.js';
 import { settingsSystem } from './systems/settings.js';
 import { globeSystem, shellKeysSystem, shellSystem } from './systems/shell.js';
@@ -86,6 +87,8 @@ export function createSystems(): GameSystem[] {
     // emit (shellKeys), then the ROV and photo mode (they miss that emit).
     audioSystem,
     shellKeysSystem,
+    // Before the render system: its draw branch reads `ctx.titleScene`.
+    createTitleSystem(),
     renderSystem,
     createRovSystem(),
     createQualitySystem(),

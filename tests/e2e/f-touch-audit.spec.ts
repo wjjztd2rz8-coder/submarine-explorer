@@ -48,6 +48,7 @@ async function reachable(target: Locator): Promise<void> {
 
 for (const viewport of [
   { width: 390, height: 844 },
+  { width: 667, height: 375 },
   { width: 844, height: 390 },
 ]) {
   test.describe(`touch audit ${viewport.width}x${viewport.height}`, () => {
@@ -62,7 +63,7 @@ for (const viewport of [
     });
 
     for (const scale of [80, 100, 150]) {
-      test(`fresh dive separates HUD and controls at ${scale}% UI`, async ({ page }) => {
+      test(`fresh dive separates HUD and controls at ${scale}% UI`, async ({ page }, testInfo) => {
         await ready(page, dive);
         await page.evaluate((uiScale) => {
           (window.__game as { save: { save(settings: { uiScale: number }): void } }).save.save({
@@ -78,6 +79,18 @@ for (const viewport of [
           await reachable(button);
         for (const label of ['Skip step', 'Skip tutorial'])
           await reachable(page.getByRole('button', { name: label, exact: true }));
+        // Check every instruction: the last step is longer than the first.
+        for (const step of ['move', 'depth', 'lights', 'scan', 'journal']) {
+          await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
+          expect(
+            await page.locator('.onboard-card').evaluate((e) => e.scrollWidth <= e.clientWidth),
+          ).toBe(true);
+          await separate(page, [...hud, '.onboard-card', ...controls]);
+          if (step !== 'journal')
+            await page.getByRole('button', { name: 'Skip step', exact: true }).tap();
+        }
+        if (scale === 100)
+          await page.screenshot({ path: testInfo.outputPath('tutorial-landscape.png') });
         await page.getByRole('button', { name: 'Skip tutorial', exact: true }).tap();
         await expect(page.locator('.onboard-card')).toBeHidden();
         // The scan-range hint chip was retired (the scan panel covers it).
@@ -109,8 +122,10 @@ for (const viewport of [
         await expect(page.locator('.sonar')).toHaveClass(/d-sonar-expanded/);
         for (const button of await page.locator('.d2-sonar-controls button').all())
           await reachable(button);
-        if (viewport.height === 390)
+        if (viewport.width > viewport.height)
           await separate(page, ['.sonar', '.tc-buttons', '.tc-btn-pause']);
+        if (scale === 100)
+          await page.screenshot({ path: testInfo.outputPath('expanded-sonar.png') });
         await page.locator('.tc-btn-sonar').tap();
         await expect(page.locator('.tc-stick')).toBeVisible();
       });
@@ -152,8 +167,9 @@ for (const viewport of [
       await ready(page, '/?touch=1&tier=low');
       const home = page.locator('.home-screen');
       const menu = home.locator('.home-menu');
-      expect((await menu.boundingBox())!.height).toBeGreaterThan(300);
-      await separate(page, ['.home-copy', '.home-menu']);
+      // The menu sits in the scrolling `.home-body` (F-TITLE-D); the scroller stays on screen.
+      expect((await home.locator('.home-body').boundingBox())!.height).toBeGreaterThan(300);
+      await separate(page, ['.home-copy', '.home-body']);
       const mode = home.locator('.mode-selector');
       for (const radio of await mode.getByRole('radio').all()) await reachable(radio);
       await mode.getByRole('radio', { name: 'Realistic' }).tap();

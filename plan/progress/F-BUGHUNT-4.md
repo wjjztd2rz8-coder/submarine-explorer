@@ -39,7 +39,7 @@ Post-fix local validation: **802 unit tests / 82 files passed**, typecheck passe
 production build passed (existing bundle-size warning), Prettier passed, and
 five Playwright tests are still discovered. Chromium execution is delegated to
 the orchestrator as instructed; no post-fix e2e pass is claimed. Rerun
-`tools/gates.sh` outside the sandbox for acceptance.
+`tools/gates.sh --full-e2e` outside the sandbox for acceptance.
 
 Ranks 2 and 3 below record the pre-fix failures, now confirmed by the gate and
 addressed in CSS. Ranks 1 and 4 remain open audit findings. No commits or asset

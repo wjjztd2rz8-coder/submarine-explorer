@@ -27,8 +27,27 @@ const HALF_SIZE = 1200;
 const CELLS = 160; // 161x161 verts, ~51k tris
 const TILE_ID = 'monterey-canyon';
 
-const SAND = new THREE.Color(0xb4a688);
-const SLATE = new THREE.Color(0x4a5560);
+// F-TITLE-LOOK palette: colour only, heights stay real. Deep channel water is
+// teal-navy, higher canyon wall is a lighter slate-teal, and gentle ground near
+// the anchor (where the lamps work) is warm sediment.
+const DEEP = new THREE.Color(0x0b2f40);
+const WALL = new THREE.Color(0x347b92);
+const ROCK = new THREE.Color(0x1f4252);
+const SEDIMENT = new THREE.Color(0x9c8f78);
+/** Metres around the anchor over which warm sediment fades into the cool wall. */
+const SEDIMENT_RADIUS = 70;
+
+function smooth(a: number, b: number, x: number): number {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+}
+
+/** Deterministic 0..1 hash noise for colour mottling only (never heights). */
+function hash2(i: number, j: number): number {
+  let h = (Math.imul(i, 374761393) + Math.imul(j, 668265263)) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
 
 /** Bilinear height (tile metres) at tile-local world x/z; clamps to the tile edge. */
 function tileSampler(tile: Tile): (x: number, z: number) => number {
@@ -85,13 +104,6 @@ export function buildTitleCrop(tile: Tile): TitleCrop {
     }
   }
   const span = Math.max(hi - lo, 1);
-  const tmp = new THREE.Color();
-  for (let v = 0; v < n * n; v++) {
-    tmp.copy(SLATE).lerp(SAND, (pos[v * 3 + 1]! - lo) / span);
-    col[v * 3] = tmp.r;
-    col[v * 3 + 1] = tmp.g;
-    col[v * 3 + 2] = tmp.b;
-  }
   const idx = new Uint32Array(CELLS * CELLS * 6);
   let q = 0;
   for (let j = 0; j < CELLS; j++) {
@@ -107,9 +119,29 @@ export function buildTitleCrop(tile: Tile): TitleCrop {
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  geometry.setAttribute('color', new THREE.BufferAttribute(col, 3));
   geometry.setIndex(new THREE.BufferAttribute(idx, 1));
   geometry.computeVertexNormals();
+  const normal = geometry.getAttribute('normal');
+  const tmp = new THREE.Color();
+  const cool = new THREE.Color();
+  for (let j = 0; j < n; j++) {
+    for (let i = 0; i < n; i++) {
+      const v = j * n + i;
+      const rel = (pos[v * 3 + 1]! - lo) / span;
+      const steep = 1 - smooth(0.93, 0.996, normal.getY(v)); // 0 flat .. 1 steep
+      cool.copy(DEEP).lerp(WALL, smooth(0.05, 0.85, rel));
+      tmp.copy(cool).lerp(ROCK, steep * 0.75);
+      const dist = Math.hypot(pos[v * 3]!, pos[v * 3 + 2]!);
+      const warm = (1 - smooth(40, SEDIMENT_RADIUS, dist)) * (1 - steep) * 0.6;
+      tmp.lerp(SEDIMENT, warm);
+      // Slow patchiness so flat ground never reads as one wash.
+      const m = 0.88 + 0.24 * (0.6 * hash2(i >> 1, j >> 1) + 0.4 * hash2(i, j));
+      col[v * 3] = tmp.r * m;
+      col[v * 3 + 1] = tmp.g * m;
+      col[v * 3 + 2] = tmp.b * m;
+    }
+  }
+  geometry.setAttribute('color', new THREE.BufferAttribute(col, 3));
   geometry.computeBoundingSphere();
   geometry.computeBoundingBox();
   const material = new THREE.MeshStandardMaterial({

@@ -235,3 +235,11 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Running Codex: 250, 280 (title identity), 290 (title modules review). Queued: 300 (CI verify), 310 F-COSMETICS, 320 bughunt-12.
 - No Claude agents (Claude 5h 72%, but F-TITLE-D waits on 280).
 - Needs owner: brand name OK (Bathyline). Still open: fresh golden set (needs a host with a browser).
+
+## 2026-10-03 headless run (started ~07:15)
+
+- Merged (gates green on main): Codex 280 F-TITLE-A (Bathyline mark, icons, self-hosted fonts), 290 title B/C review fixes + capture harness, 250 F-BUGHUNT-9 (audio lifecycle, PWA, mobile); Sonnet F-TITLE-D (home layout), E (scene bridge: Monterey canyon + sub now the home backdrop; globe only after Dive sites/Free dive), F (index/manifest/README/docs), F-TITLE-LOOK (low camera, teal palette, lamp pools, contact shadow). Pushed, tagged f10; Pages deploy OK.
+- **GitHub CI on main is red** (e2e shard 14: mission.spec.ts "crush depth" times out on the runner; red since ~08:20 on earlier runs too). Local gates pass. Queued 350-f-ci-main-red to classify and fix; 300 (gates/CI verify) is also running.
+- Running Codex: 300, 310 (cosmetics), 320 (content regress). Queued: 330 title-bridge audit, 340 share image (og:image), 350 CI red.
+- Decision for owner: the Bathyline mark reads a bit like a "P" with stepped contour lines (draft); the wordmark/serif is good. Say if you want a stronger B. Title scene caption still carries the single "Vehicle and lighting are illustrative." line.
+- Needs owner: brand name OK (Bathyline), still open.

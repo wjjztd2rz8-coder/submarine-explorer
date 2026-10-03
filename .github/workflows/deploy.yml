@@ -5,8 +5,8 @@
 name: Deploy to GitHub Pages
 
 # Deploys every push to main. The orchestrator pushes only after the full local
-# gates (build, unit, e2e, attribution, prettier) pass; CI's e2e shards run in
-# parallel as an extra check rather than a deploy gate. CI bounds each
+# gates (`tools/gates.sh --full-e2e`, including project-base) pass; CI's e2e
+# shards run in parallel as an extra check rather than a deploy gate. CI bounds each
 # SwiftShader e2e shard to 24 minutes (runner queue delays are separate).
 on:
   push:

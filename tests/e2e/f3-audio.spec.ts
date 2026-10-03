@@ -62,6 +62,9 @@ test('adaptive audio starts, captions new cues, independent sliders persist', as
   await page.reload();
   await page.waitForFunction(() => window.__gameReady);
   await page.keyboard.press('KeyW');
+  await expect.poll(async () => (await probe(page)).state).toBe('running');
+  expect((await probe(page)).muted).toBe(true);
+  expect((await probe(page)).masterGain).toBe(0);
   await page.evaluate(() => (window.__game as unknown as AudioProbe).settings.open());
   await expect(music).toHaveValue('0.37');
   await expect(page.getByRole('slider', { name: 'Sound effects volume', exact: true })).toHaveValue(

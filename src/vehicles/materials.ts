@@ -21,6 +21,7 @@
 
 import * as THREE from 'three';
 import { vehicleEnvironment, vehicleSurfaces, type SurfaceSet } from './textures.js';
+import type { HullPaint } from '../game/Cosmetics.js';
 
 /** Material slots. Static geometry is merged per slot. */
 export type Slot =
@@ -127,6 +128,12 @@ export class VehicleMaterials {
   readonly halo: THREE.SpriteMaterial | null;
   decal: THREE.MeshStandardMaterial | null = null;
   private readonly lensBase = new THREE.Color(1, 1, 1);
+  private lensesOn = true;
+  readonly paintUniforms = {
+    uHullPaint: { value: 0 },
+    uHullBase: { value: new THREE.Color(1, 1, 1) },
+    uHullAccent: { value: new THREE.Color(1, 1, 1) },
+  };
   private readonly extra: THREE.Material[] = [];
 
   /**
@@ -220,10 +227,46 @@ export class VehicleMaterials {
           depthWrite: false,
         })
       : null;
+    // Keep the original vertex pattern and dark fittings; recolour fairings only.
+    // Uniforms work on textured and low-tier materials without rebuilding geometry.
+    const compileFoam = foam.onBeforeCompile;
+    foam.onBeforeCompile = (shader, renderer) => {
+      compileFoam.call(foam, shader, renderer);
+      Object.assign(shader.uniforms, this.paintUniforms);
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          '#include <common>',
+          '#include <common>\nuniform float uHullPaint;\nuniform vec3 uHullBase;\nuniform vec3 uHullAccent;',
+        )
+        .replace(
+          '#include <color_fragment>',
+          [
+            '#if defined( USE_COLOR ) || defined( USE_COLOR_ALPHA )',
+            '  vec3 sourcePaint = vColor.rgb;',
+            '  float bright = max(max(sourcePaint.r, sourcePaint.g), sourcePaint.b);',
+            '  float shade = min(min(sourcePaint.r, sourcePaint.g), sourcePaint.b);',
+            '  vec3 rewardPaint = bright < 0.25 ? sourcePaint :',
+            '    (bright - shade > 0.18 ? uHullAccent : uHullBase * clamp(bright / 0.9, 0.65, 1.1));',
+            '  diffuseColor *= vec4(mix(sourcePaint, rewardPaint, uHullPaint), vColor.a);',
+            '#endif',
+          ].join('\n'),
+        );
+    };
+    foam.customProgramCacheKey = () => 'vehicle-key-rim-shoulder-hull-paint-v1';
+  }
+
+  /** Lens tint is visual only: scene lights and their range/intensity stay intact. */
+  setCosmetics(paint: HullPaint | null, trim: number | null): void {
+    this.paintUniforms.uHullPaint.value = paint ? 1 : 0;
+    this.paintUniforms.uHullBase.value.setHex(paint?.base ?? 0xffffff);
+    this.paintUniforms.uHullAccent.value.setHex(paint?.accent ?? 0xffffff);
+    this.lensBase.setHex(trim ?? 0xffffff);
+    this.setLensesOn(this.lensesOn);
   }
 
   /** Lamp lenses dim when the headlights are switched off. */
   setLensesOn(on: boolean): void {
+    this.lensesOn = on;
     (this.bySlot.lens as THREE.MeshBasicMaterial).color
       .copy(this.lensBase)
       .multiplyScalar(on ? 1 : 0.08);

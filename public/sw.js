@@ -4,7 +4,7 @@
  * PRECACHE lists the shell files relative to this file's scope, so the same
  * worker works at `/` and under a GitHub Pages base such as `/submarine-explorer/`.
  *
- * - index.html / navigations: network first, cache as the offline fallback.
+ * - index.html / navigations: network first, installed shell as offline fallback.
  * - Precached shell (hashed JS and CSS, icons, manifest): cache first.
  * - Tiles (`data/tiles/<id>/...`): cache first in a cache that survives deploys
  *   (a tile id is immutable). `data/tiles/index.json` is stale-while-revalidate.
@@ -66,8 +66,9 @@ async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
   try {
     const res = await fetch(request);
-    if (res.ok) await store(cache, request, res);
-    else {
+    // Navigation HTML can belong to the next deploy before its worker installs.
+    // Keep the precached HTML paired with this worker's complete offline chunks.
+    if (!res.ok) {
       const hit = (await cache.match(request)) || (await cache.match(new URL('./', scope).href));
       if (hit) return hit;
     }
@@ -83,7 +84,9 @@ async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
   const hit = await cache.match(request);
   if (hit) return hit;
-  const res = await fetch(request);
+  // A new VERSION must not refill mutable files from the previous deploy's
+  // still-fresh HTTP cache. Immutable tile/shell requests retain their policy.
+  const res = await fetch(request, cacheName === ASSETS ? { cache: 'reload' } : undefined);
   if (res.ok && res.status === 200) await store(cache, request, res);
   return res;
 }
@@ -92,7 +95,7 @@ function staleWhileRevalidate(request, cacheName, event) {
   const opened = caches.open(cacheName);
   const fresh = opened.then(async (cache) => {
     try {
-      const res = await fetch(request);
+      const res = await fetch(request, { cache: 'reload' });
       if (res.ok) await store(cache, request, res);
       return res;
     } catch {
@@ -111,7 +114,8 @@ self.addEventListener('fetch', (event) => {
   if (!ACTIVE || request.method !== 'GET' || request.headers.has('range')) return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin || !url.href.startsWith(scope)) return;
-  const rel = url.href.slice(scope.length);
+  // Query strings are cache keys, not part of the asset's routing path.
+  const rel = url.pathname.slice(new URL(scope).pathname.length);
 
   if (request.mode === 'navigate' || rel === '' || rel === 'index.html') {
     event.respondWith(networkFirst(request, SHELL));

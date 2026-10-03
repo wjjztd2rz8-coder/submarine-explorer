@@ -100,4 +100,5 @@ rerun the touch regression (and its full e2e gate):
 
 ```sh
 npx playwright test tests/e2e/f3-onboard.spec.ts --grep 'PHOTO capture'
+PW_PORT=4197 tools/gates.sh --full-e2e
 ```

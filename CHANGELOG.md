@@ -16,7 +16,7 @@ without an entry here is not done.
 
 - Phase F, F-BUGHUNT-12: title navigation lights stay steady in animated and
   reduced-motion scenes, including after quality changes.
-- Phase F, F-BUGHUNT-12: downward title vehicle hover respects the 12 m floor
+- Phase F, F-BUGHUNT-12: downward title vehicle hover respects the title floor
   clearance when a ridge sets the starting height.
 - Phase F, F-BUGHUNT-12: the title scene accepts resolved Ultra quality with
   the Medium+ snow and geometry budgets.
@@ -34,6 +34,35 @@ without an entry here is not done.
   or layout state belonging to rebuilt controls.
 - Phase F, F-BUGHUNT-12: empty legacy animal/photo subjects no longer grant
   a third survey star or its research reward.
+- Phase F, F-TITLE-LOOK: polished the home backdrop. Low dutch camera looking NW along the
+  Monterey channel so layered real ridges recede behind the hull; hull hovers about 4 m over the
+  real seabed with a draped contact shadow (title clipping guard lowered from 12 m to 7 m, shot
+  only); depth-graded teal-navy terrain colour (heights unchanged, no exaggeration), navy fog and
+  sky gradient, lamps aimed at the sampled floor with volumetric-style beams, round marine snow.
+  Reason: creative-director feedback that the shot read as a prototype.
+- Phase F, F-TITLE-F: public identity is now Bathyline ("Explore the real deep."): HTML title,
+  description, Open Graph and theme colour, manifest name/short name/description/colours, README
+  prose and new `docs/title-scene.md`. Manifest id, scope, start_url, icons, package name, save keys,
+  service worker and deployment base are unchanged. Reason: complete the title-scene rebrand.
+- Phase F, F-TITLE-D: rebuilt the home layout as Bathyline (copy, wordmark with inline
+  mark, Continue / Dive sites primary actions, Free dive, Daily, mode, then Journal /
+  Settings / Controls / Upgrades in DOM order) in a dedicated `src/styles/home.css`
+  with desktop, portrait and short-landscape plates, safe insets and 48 px targets;
+  Back and Escape from Dive sites / Free dive now return focus to the originating
+  button; first focus is Continue when enabled, else Dive sites.
+- Phase F, F-TITLE-A: finalized the original Bathyline mark with a 16 px variant,
+  replaced the sonar favicon/PWA icons for the title identity, and added licensed
+  self-hosted DM Sans/Source Serif 4 weights with an unimported font stylesheet.
+- Phase F, F-TITLE-BC-REVIEW: corrected title hull framing, hover clearance,
+  navigation-strobe suppression and GPU diagnostics; added real-Monterey
+  regressions and an opt-in screenshot harness. Browser visual review remains
+  pending because this sandbox blocks Chromium and local servers.
+- Phase F, F-BUGHUNT-11: `FULL_E2E=1 tools/codex-task.sh` opts into full
+  browser feedback and package screenshots; task summaries retain the selected
+  e2e mode. Resume instructions require explicit full gates before release pushes.
+- Phase F, F-COSMETICS: add eight hull paints and two lens trims earned from
+  stars, hero-site ratings, secrets and Daily streaks, with saved touch-friendly
+  workshop choices; appearance rewards preserve gameplay and Arcade depth access.
 - Phase F, F-TITLE-B/C: added the (not yet wired) Bathyline title scene
   modules: `src/render/title/TitleTerrain.ts` crops a 2,400 m real GMRT
   Monterey Canyon square, and `TitleScene.ts` composes the research sub, lamps,
@@ -64,6 +93,23 @@ without an entry here is not done.
 - Phase F, F-LOSTCITY-MIP-VERIFY: add a reproducible before/after terrain shader
   capture and luminance report for all five hero sites on High, Medium and Low;
   visual sign-off remains pending because this sandbox cannot run a browser.
+- Phase F, F-BUGHUNT-9 follow-up: compact landscape sonar bounds tall tile
+  canvases above the stick with an 8 px gap at 667×375, preserving map aspect
+  and 44 px zoom targets at 80%, 100% and 150% UI scales.
+- Phase F, F-BUGHUNT-9: late audio visibility suspend/resume completions now
+  reconcile with the current pause/hidden state, keeping the clock frozen in
+  hidden tabs and restoring playback on return, including saved mute.
+- Phase F, F-BUGHUNT-9: online navigation preserves the installed offline HTML
+  and its precached chunks while a newer deployment's worker is still installing.
+- Phase F, F-BUGHUNT-9: new deployment caches reload mutable assets from the
+  network instead of copying stale files from the browser's HTTP cache.
+- Phase F, F-BUGHUNT-9: tile-index requests with query parameters retain catalog
+  revalidation, and catalog refreshes bypass stale HTTP-cache responses.
+- Phase F, F-BUGHUNT-9: narrow landscape tutorial cards stack text and buttons
+  with scan-panel clearance at 667×375; redundant progress dots are hidden there
+  so the step count and instructions have room.
+- Phase F, F-BUGHUNT-9: expanded landscape sonar reserves the touch buttons
+  and Pause slot at both 667×375 and 844×390.
 - Phase F, F-LOSTCITY-4: the seabed albedo no longer aliases into a regular
   houndstooth/checker on distant and grazing slopes (most visible at Lost City).
   `terrain.frag.glsl` applies a distance-driven mip bias (0 within 3 m, +3 mips
