@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-LOSTCITY-3: the Poseidon talus apron is no longer a flat oval. It has a ragged noise-driven outline, feathers flush into the seabed, fades into the sediment colour and carries scattered carbonate blocks (not on the low tier). Lost City also gets a little more ambient fill and a lifted distance haze (new opt-in vent params `hazeScale`, `hazeLift`) so the far ridge softens instead of cutting out black.
+
 - Phase F, F-SAVE-SOAK: settings and key bindings recover intact legacy copies
   when current localStorage entries are empty, truncated or corrupt. Explicit v0
   settings and bare v0 discovery maps retain their saved choices and discoveries;

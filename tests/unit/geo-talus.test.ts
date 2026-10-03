@@ -183,3 +183,25 @@ describe('scarps on a sloping seabed', () => {
     });
   }
 });
+
+describe('scatterRubble', () => {
+  it('seats blocks on the surface and honours the keep mask', async () => {
+    const { scatterRubble } = await import('../../src/world/props/geo/talus.js');
+    const surf = (x: number, z: number): number => ground(x, z);
+    const blocks = scatterRubble(surf, (x) => (x > 0 ? 1 : 0), {
+      halfX: 20,
+      halfZ: 20,
+      count: 30,
+      size: 1,
+      detail: 1,
+      seed: 3,
+    });
+    expect(blocks.length).toBeGreaterThan(10);
+    for (const g of blocks) {
+      g.computeBoundingBox();
+      const c = g.boundingBox!.getCenter(new THREE.Vector3());
+      expect(c.x).toBeGreaterThan(-3);
+      expect(Math.abs(c.y - surf(c.x, c.z))).toBeLessThan(6);
+    }
+  });
+});

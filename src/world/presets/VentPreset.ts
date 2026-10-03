@@ -30,6 +30,8 @@ import {
 import type { EnvPreset, PresetEnterContext, PresetFrameContext, PresetParams } from './types.js';
 
 const FILL_TINT = new THREE.Color(0x8a7c6c);
+/** Pale blue-green the distance haze is lifted toward (`hazeLift`). */
+const HAZE_TINT = new THREE.Color(0x2a4a54);
 
 export interface VentSource {
   /** Orifice (top centre) in world space. */
@@ -218,6 +220,12 @@ export class VentPreset implements EnvPreset {
       ctx.atmo.ambientIntensity += fill;
       ctx.atmo.ambientColor.lerp(FILL_TINT, 0.8);
     }
+    // Distance haze (opt-in per site): thicker and a little lighter than the abyssal fog, so a
+    // far ridge fades into the water instead of standing as a hard dark cut-out.
+    const haze = num(this.params.hazeScale, 1);
+    if (haze !== 1) ctx.atmo.fogDensity *= haze;
+    const lift = num(this.params.hazeLift, 0);
+    if (lift > 0) ctx.atmo.fogColor.lerp(HAZE_TINT, lift);
     if (this.smoke) {
       updateCommonUniforms(this.smoke, ctx, this.look);
       // Bend the column downstream: half the drift a particle would make over its life,
