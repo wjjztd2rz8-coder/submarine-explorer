@@ -243,3 +243,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Running Codex: 300, 310 (cosmetics), 320 (content regress). Queued: 330 title-bridge audit, 340 share image (og:image), 350 CI red.
 - Decision for owner: the Bathyline mark reads a bit like a "P" with stepped contour lines (draft); the wordmark/serif is good. Say if you want a stronger B. Title scene caption still carries the single "Vehicle and lighting are illustrative." line.
 - Needs owner: brand name OK (Bathyline), still open.
+
+## 2026-10-03 headless run (started ~08:15)
+
+- Merged (full gates green on main except one stale e2e, fixed): Codex 300 (FULL_E2E opt-in for codex-task, gate docs), 310 F-COSMETICS (hull paints/lens trims), 320 F-BUGHUNT-12 (title fixes; Sonnet resolved its conflict with F-TITLE-LOOK in TitleScene.ts). Fixed f1-touch manifest-name test (Bathyline). Pushed, tagged f12.
+- Codex 5h was 18% (resets 10:45): queue holds 330, 340, 350 (CI red), 360 (title G QA). No Claude agents (no unblocked visual package; Claude 5h 77%).
+- Needs owner: brand name OK (Bathyline); fresh golden set still needs a browser host.
