@@ -69,7 +69,7 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: `npm run preview -- --port ${port} --strictPort --outDir ${outDir}`,
+    command: `npm run preview -- --port ${port} --strictPort --outDir ${outDir}${env.GATES_CONFIG_MODE === 'writable' ? ' --configLoader runner' : ''}`,
     url: `http://localhost:${port}`,
     // Own the preview process for the whole suite. Reusing an orchestrator's
     // preview can lose the server halfway through when its owner cleans up.
