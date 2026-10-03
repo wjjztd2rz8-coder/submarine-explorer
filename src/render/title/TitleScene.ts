@@ -36,7 +36,7 @@ export interface TitleSceneOptions {
 }
 
 export interface TitleStats {
-  /** Renderable objects in the scene (draw calls per frame). */
+  /** GPU counts from the last draw; geometry estimates until first draw. */
   calls: number;
   triangles: number;
   /** Frames actually presented by `draw`. */
@@ -70,8 +70,8 @@ export const TITLE_SHOT = {
 } as const;
 
 /** Where the vehicle should sit in the render region, as screen fractions. */
-const FRAMING: Record<TitleLayout, { x: number; y: number; silhouette: number | null }> = {
-  desktop: { x: 0.72, y: 0.55, silhouette: null },
+const FRAMING: Record<TitleLayout, { x: number; y: number; silhouette: number }> = {
+  desktop: { x: 0.72, y: 0.55, silhouette: 0.16 },
   portrait: { x: 0.64, y: 0.5, silhouette: 0.24 },
   'short-landscape': { x: 0.5, y: 0.66, silhouette: 0.3 },
 };
@@ -269,6 +269,8 @@ export class TitleScene {
     }
     try {
       renderer.render(this.scene, this.camera);
+      this.stats.calls = renderer.info.render.calls;
+      this.stats.triangles = renderer.info.render.triangles;
     } finally {
       if (partial && viewport && scissor) {
         renderer.setViewport(viewport.x, viewport.y, viewport.z, viewport.w);
@@ -300,6 +302,9 @@ export class TitleScene {
 
   private buildVehicle(): Vehicle {
     const v = buildVehicle('B', this.tier);
+    // The gameplay model flashes its navigation strobe by default. This
+    // decorative shot keeps the lenses steady even when camera sway is on.
+    v.reduceMotion = true;
     v.update({ lightsOn: true }, 0);
     this.rig.add(v.root);
     return v;
@@ -418,7 +423,11 @@ export class TitleScene {
       this.floorNear(0, 0) + TITLE_SHOT.clearanceM,
     );
     this.basePos.set(0, vehicleY, 0);
-    this.rig.position.set(0, vehicleY + hover, 0);
+    this.rig.position.set(
+      0,
+      Math.max(vehicleY + hover, this.floorNear(0, 0) + TITLE_SHOT.clearanceM),
+      0,
+    );
     this.rig.rotation.y = -(Math.PI / 2 - TITLE_SHOT.headingAwayRad);
     this.rig.updateMatrixWorld(true);
 
@@ -441,8 +450,8 @@ export class TitleScene {
   }
 
   /**
-   * Compose the shot for the current region: aspect, optional zoom to hold the
-   * silhouette on narrow layouts, and a view offset that puts the vehicle at
+   * Compose the shot for the current region: aspect, zoom to hold the
+   * silhouette at its authored size, and a view offset that puts the vehicle at
    * the layout's screen fraction. Measured from the un-swayed base pose so the
    * framing itself never moves.
    */
@@ -467,25 +476,36 @@ export class TitleScene {
     cam.updateMatrixWorld(true);
 
     const spec = FRAMING[this.layout];
-    if (spec.silhouette !== null) {
-      const box = new THREE.Box3().setFromObject(this.vehicle.root);
-      let lo = Infinity;
-      let hi = -Infinity;
-      for (let i = 0; i < 8; i++) {
-        this.tmp
-          .set(
-            i & 1 ? box.max.x : box.min.x,
-            i & 2 ? box.max.y : box.min.y,
-            i & 4 ? box.max.z : box.min.z,
-          )
-          .project(cam);
-        lo = Math.min(lo, this.tmp.x);
-        hi = Math.max(hi, this.tmp.x);
+    // A world-aligned bounding box overestimates the diagonal hull's width.
+    // Measure the actual geometry so the desktop silhouette meets 14–18%,
+    // and the phone band retains a readable vehicle. This runs only on dirty
+    // framing events, not during animated updates.
+    let lo = Infinity;
+    let hi = -Infinity;
+    const instance = new THREE.Matrix4();
+    const world = new THREE.Matrix4();
+    this.vehicle.root.traverseVisible((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const positions = mesh.geometry.getAttribute('position');
+      const instanced = mesh as THREE.InstancedMesh;
+      const count = instanced.isInstancedMesh ? instanced.count : 1;
+      for (let j = 0; j < count; j++) {
+        world.copy(mesh.matrixWorld);
+        if (instanced.isInstancedMesh) {
+          instanced.getMatrixAt(j, instance);
+          world.multiply(instance);
+        }
+        for (let i = 0; i < positions.count; i++) {
+          this.tmp.fromBufferAttribute(positions, i).applyMatrix4(world).project(cam);
+          lo = Math.min(lo, this.tmp.x);
+          hi = Math.max(hi, this.tmp.x);
+        }
       }
-      const frac = Math.max(1e-4, (hi - lo) / 2);
-      cam.zoom = Math.min(3, Math.max(1, spec.silhouette / frac));
-      cam.updateProjectionMatrix();
-    }
+    });
+    const frac = Math.max(1e-4, (hi - lo) / 2);
+    cam.zoom = Math.min(3, Math.max(1, spec.silhouette / frac));
+    cam.updateProjectionMatrix();
 
     this.tmp.copy(this.basePos).project(cam);
     const px = ((this.tmp.x + 1) / 2) * w;
@@ -505,9 +525,14 @@ export class TitleScene {
     this.scene.traverseVisible((o) => {
       const m = o as THREE.Mesh;
       const isPoints = (o as THREE.Points).isPoints === true;
-      if (!(m.isMesh || isPoints)) return;
+      const isSprite = (o as THREE.Sprite).isSprite === true;
+      if (!(m.isMesh || isPoints || isSprite)) return;
       calls++;
       if (isPoints) return;
+      if (isSprite) {
+        triangles += 2;
+        return;
+      }
       const g = m.geometry;
       const n = g.index ? g.index.count : g.getAttribute('position').count;
       const inst = (o as THREE.InstancedMesh).isInstancedMesh

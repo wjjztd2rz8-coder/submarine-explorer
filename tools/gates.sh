@@ -2,6 +2,8 @@
 # Run static gates and browser smoke checks. CI defaults to the full suite.
 # Usage: tools/gates.sh [--full-e2e | --no-e2e]   Logs: .cache/gates/<gate>.log
 # Builds use temporary outputs unless PW_OUTDIR names a retained output.
+# Read-only dependency trees: GATES_CONFIG_MODE=writable keeps temporary config
+# bundles in .cache, and uses Vitest's runner without a dependency-tree cache.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.local/node/bin:$PATH"
@@ -18,6 +20,15 @@ case "${1:-}" in
   *) echo 'Usage: tools/gates.sh [--full-e2e | --no-e2e]' >&2; exit 1 ;;
 esac
 mkdir -p .cache/gates
+build_config_args=()
+unit_config_args=()
+case "${GATES_CONFIG_MODE:-default}" in
+  default) ;;
+  writable)
+    unit_config_args=(-- --configLoader runner --cache=false)
+    ;;
+  *) echo 'GATES_CONFIG_MODE must be default or writable.' >&2; exit 1 ;;
+esac
 port="${PW_PORT:-4173}"
 if ! [[ "$port" =~ ^[0-9]+$ ]] || (( 10#$port < 1 || 10#$port > 65435 )); then
   echo 'PW_PORT must be an integer between 1 and 65435 (reserves port + 100 for e2e-base).' >&2
@@ -28,9 +39,11 @@ port=$((10#$port)); bport=$((port + 100))
 # also prevent another gate process rebuilding/removing a live suite's files.
 outdir="${PW_OUTDIR:-dist-gates-$port-$$}"
 base_outdir="dist-gates-base-$bport-$$"
+gate_config=".cache/gates/vite-$port-$$.config.mjs"
 cleanup() {
   [[ -n "${PW_OUTDIR:-}" ]] || rm -rf -- "$outdir"
   rm -rf -- "$base_outdir"
+  rm -f -- "$gate_config"
 }
 trap cleanup EXIT
 fail=0
@@ -44,8 +57,20 @@ gate() {
     fail=1
   fi
 }
-gate build npm run build -- --outDir "$outdir"
-gate unit npm test
+if [[ "${GATES_CONFIG_MODE:-default}" == writable ]]; then
+  # Native loading of a local bundle also avoids Vite 8's runner closing before
+  # the existing PWA plugin's late dynamic imports execute in closeBundle.
+  gate config node --input-type=module - "$gate_config" <<'JS'
+import { build } from 'rolldown';
+await build({
+  input: 'vite.config.ts', platform: 'node', external: ['vite'],
+  output: { file: process.argv[2], format: 'esm' },
+});
+JS
+  build_config_args=(--config "$gate_config" --configLoader native)
+fi
+gate build npm run build -- --outDir "$outdir" "${build_config_args[@]}"
+gate unit npm test "${unit_config_args[@]}"
 gate python npm run test:py
 gate content npm run check:content
 gate attribution python3 tools/check_attribution.py
@@ -63,7 +88,7 @@ if [[ "$e2e_mode" != none ]]; then
   gate e2e env PW_PORT="$port" PW_OUTDIR="$outdir" PW_REUSE_SERVER=0 \
     npm run test:e2e -- "${e2e_specs[@]}" --output="test-results-gates-$port-$$"
   project_base() {
-    VITE_BASE=/submarine-explorer/ npm run build -- --outDir "$base_outdir" && \
+    VITE_BASE=/submarine-explorer/ npm run build -- --outDir "$base_outdir" "${build_config_args[@]}" && \
       VITE_BASE=/submarine-explorer/ PW_BASE=/submarine-explorer/ PW_PORT="$bport" \
       PW_OUTDIR="$base_outdir" PW_REUSE_SERVER=0 \
       npx playwright test tests/e2e/base-url.spec.ts --output="test-results-project-base-$bport-$$"
