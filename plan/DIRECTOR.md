@@ -8,7 +8,7 @@ Run `tools/golden.sh` at the start of any run that merged visual work. Compare a
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
-1. **Great Blue Hole spawn:** a dark dome-shaped prop floats mid-frame above the floor (the first thing the player sees). Seat it on the wall/floor or remove it. Then: ledges and stalactites on the hole walls, a darker blue fall-off with depth, and a floor that is not a flat pale slab.
+1. **Great Blue Hole (follow-up):** the floating dome is fixed (merged 2026-10-03: seated alcove, stepped ledge, deeper fall-off). Remaining: the grotto's base apron has rough cream patches, only one stalactite feature exists, and the floor is still plain. Lower priority than 2–4.
 2. **Lost City close-up:** Codex 400 owns the first pass (worktree 400-f-lostcity-readable, stalled by the Codex floor). The 15–30 m view is still a smooth, smeared white tower with soft ring-shaped blobs. Needs carbonate texture (flanges, fluted columns, tan staining), triplanar UVs and a darker, less milky ambient. Review 400 before starting anything new here.
 3. **Beebe plumes:** still smooth grey funnels with a clean cone edge. Make them billowing and turbulent, widening and drifting with the current, black/dark grey and with orifice shimmer. Keep the chimney close-up as is.
 4. **Monterey:** the ridge now has strata and a lit face (improved). Remaining gaps: the canyon reads as a lone mound, not a canyon; add the opposing wall and depth fall-off, and sponges/corals on the lit face.

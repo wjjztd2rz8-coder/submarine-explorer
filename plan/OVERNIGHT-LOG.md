@@ -293,3 +293,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged (full-e2e + project-base green on main): Codex 360 F-TITLE-G QA (title integration/touch/shell e2e, architecture doc) and 380 F-GOLDEN-CHECK (code-level hero readability unit tests; all five heroes pass ambient/fog/clearance floors, no value changes). Both tests/docs only. Pushed, tagged f15.
 - Running Codex: 390 (verify CI/share), 395 (touch bughunt), 400 (Lost City readable). Queued: 410 (modes bughunt), 420 (verify 360/380), 430 (hero props bughunt). No Claude agents (no unblocked visual package; Claude 5h ~65%).
 - Needs owner: brand name OK (Bathyline); fresh golden set still needs a browser host.
+
+## 2026-10-03 comprehensive review run (started ~12:50)
+
+- Review recorded in plan/REVIEWS.md (scores, gaps, priorities). Golden set 2026-10-03-175107.
+- Merged Claude/Sonnet F-BLUEHOLE-SPAWN (grotto seated, stepped ledge, deeper fall-off, no-floating-props test). Full-e2e + project-base green on main. Pushed.
+- CI red cause found: f2-life scan test times out on the runner (queued Codex 440-f-ci-life-scan-red). Also queued 450 HUD attribution footer and 460 marine-snow audit. Codex is at its 5% floor until 15:45; worktrees 390/395/400 are stalled until then.
+- Needs owner: nothing blocking.
