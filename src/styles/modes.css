@@ -193,6 +193,20 @@
 .home-screen:has(.mode-selector) .home-copy {
   top: 28px;
 }
+/* A phone turned sideways has room for two columns, but only 390 px of height.
+   Give its menu the full height so Daily and expanded mode settings can scroll. */
+@media (max-height: 460px) and (orientation: landscape) {
+  .home-screen:has(.mode-selector) .home-menu {
+    top: calc(16px + env(safe-area-inset-top, 0px));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    width: calc(50% - 24px - env(safe-area-inset-right, 0px));
+  }
+  .home-screen:has(.mode-selector) .home-copy {
+    left: calc(24px + env(safe-area-inset-left, 0px));
+    width: calc(50% - 48px - env(safe-area-inset-left, 0px));
+  }
+}
 .home-screen:has(.mode-selector) .home-copy h1 {
   margin: 10px 0;
   font-size: clamp(36px, 4.2vw, 60px);

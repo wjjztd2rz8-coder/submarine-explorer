@@ -63,6 +63,7 @@ export class TouchControls {
   private readonly disposers: Array<() => void> = [];
   private stickPointer: number | null = null;
   private sliderPointer: number | null = null;
+  private readonly heldPointers = new Map<number, 'scan' | 'boost'>();
   private hintShown = false;
   private hintTimer = 0;
 
@@ -120,6 +121,18 @@ export class TouchControls {
     (opts.parent ?? document.body).append(this.root);
     this.bindCamera();
     this.bindModeSwitch();
+    // App switching and rotation can swallow pointerup; a stale centre must
+    // never keep thrust or ballast engaged after the phone layout changes.
+    const release = (): void => this.releaseAll();
+    for (const event of ['blur', 'resize']) {
+      window.addEventListener(event, release);
+      this.disposers.push(() => window.removeEventListener(event, release));
+    }
+    const onVisibility = (): void => {
+      if (document.hidden) release();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    this.disposers.push(() => document.removeEventListener('visibilitychange', onVisibility));
     this.applyMode();
   }
 
@@ -298,10 +311,15 @@ export class TouchControls {
     b.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       b.setPointerCapture(e.pointerId);
+      this.heldPointers.set(e.pointerId, id);
       b.classList.add('is-held');
       this.input.touchHeld.add(id);
     });
-    const end = (): void => {
+    const end = (e: PointerEvent): void => {
+      if (this.heldPointers.get(e.pointerId) !== id) return;
+      this.heldPointers.delete(e.pointerId);
+      // Releasing a second finger must not cancel the first finger's scan.
+      if ([...this.heldPointers.values()].includes(id)) return;
       b.classList.remove('is-held');
       this.input.touchHeld.delete(id);
     };
@@ -417,6 +435,7 @@ export class TouchControls {
     this.releaseStick();
     this.releaseSlider();
     this.input.touchHeld.clear();
+    this.heldPointers.clear();
     this.looks.clear();
     for (const b of this.root.querySelectorAll('.is-held')) b.classList.remove('is-held');
   }

@@ -141,7 +141,9 @@ export class ScanOverlay {
       kind === 'sample'
         ? 'STOWED FOR THIS DIVE'
         : firstTime
-          ? `PRESS ${keys.guide} · JOURNAL`
+          ? document.documentElement.classList.contains('is-touch')
+            ? 'PAUSE → JOURNAL'
+            : `PRESS ${keys.guide} · JOURNAL`
           : `ALREADY LOGGED · SEE JOURNAL`,
     );
     this.setRing(1, 'OK');
@@ -159,6 +161,7 @@ export class ScanOverlay {
    *   off-screen / behind the camera.
    */
   update(view: ScanView, keys: ScanOverlayKeys, screen: ScreenPoint | null, dt: number): void {
+    const scan = document.documentElement.classList.contains('is-touch') ? 'SCAN' : keys.scan;
     if (this.bannerLeft > 0) {
       this.bannerLeft -= dt;
       if (this.bannerLeft <= 0) this.panel.classList.remove('is-complete');
@@ -195,7 +198,7 @@ export class ScanOverlay {
         view.activeId?.startsWith('sample:') ? 'COLLECTING SAMPLE' : 'SCANNING',
       );
       this.setText(this.nameEl, 'name', view.activeName);
-      this.setText(this.hint, 'hint', `HOLD ${keys.scan} · KEEP ON TARGET`);
+      this.setText(this.hint, 'hint', `HOLD ${scan} · KEEP ON TARGET`);
       this.setRing(view.progress, `${Math.floor(view.progress * 100)}%`);
       return;
     }
@@ -217,7 +220,7 @@ export class ScanOverlay {
           ? 'OUT OF RANGE'
           : view.lastAbort === 'facing'
             ? 'BEAM OFF TARGET'
-            : `HOLD ${keys.scan} TO RESUME`;
+            : `HOLD ${scan} TO RESUME`;
       this.setText(this.hint, 'hint', why);
       this.setRing(view.progress, `${Math.floor(view.progress * 100)}%`);
       return;
@@ -232,9 +235,7 @@ export class ScanOverlay {
       this.setText(
         this.hint,
         'hint',
-        view.nearestId?.startsWith('sample:')
-          ? `HOLD ${keys.scan} TO COLLECT`
-          : `HOLD ${keys.scan} TO SCAN`,
+        view.nearestId?.startsWith('sample:') ? `HOLD ${scan} TO COLLECT` : `HOLD ${scan} TO SCAN`,
       );
     } else if (!view.nearestInRange) {
       this.setTone('dim');
