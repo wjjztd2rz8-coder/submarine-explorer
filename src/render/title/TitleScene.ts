@@ -127,8 +127,8 @@ export class TitleScene {
   private readonly lamps: THREE.SpotLight[] = [];
   private snow: THREE.Points | null = null;
   private snowBase: Float32Array | null = null;
-  private readonly hemi = new THREE.HemisphereLight(0x7fb4d4, 0x0b2230, 1.1);
-  private readonly rim = new THREE.DirectionalLight(0x8fd0e6, 0.9);
+  private readonly hemi = new THREE.HemisphereLight(0x6fa6c4, 0x1c3d4e, 0.6);
+  private readonly rim = new THREE.DirectionalLight(0xe0f0f4, 6);
 
   // Scratch.
   private readonly basePos = new THREE.Vector3();
@@ -144,9 +144,9 @@ export class TitleScene {
     this.reduced = opts.reducedMotion;
 
     this.scene.background = new THREE.Color(TITLE_SHOT.fallbackColor);
-    this.scene.fog = new THREE.FogExp2(0x07182a, 0.0035);
+    this.scene.fog = new THREE.FogExp2(0x082338, 0.0022);
 
-    this.rim.position.set(-60, 90, -120);
+    this.rim.position.set(-300, 45, -40);
     this.rim.target.position.set(0, 0, 0);
     this.scene.add(this.hemi, this.rim, this.rim.target);
 

@@ -75,12 +75,8 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.home-menu .mode-advanced-toggle')).toHaveCount(1);
   await expect(page.locator('.home-menu button')).toHaveCount(9);
   await expect(page.getByRole('button', { name: 'Continue' })).toBeDisabled();
-  await page.waitForFunction(
-    () =>
-      (window.__game as { homeGlobe: { textureReady: boolean; pinCount: number } }).homeGlobe
-        .textureReady &&
-      (window.__game as { homeGlobe: { pinCount: number } }).homeGlobe.pinCount > 0,
-  );
+  // F-TITLE-E: the title scene backs the menu; the embedded globe opens only in the sites view.
+  await expect(page.locator('.globe.is-embedded')).toBeHidden();
   const atHome = await pose(page);
   await page.keyboard.down('w');
   await page.waitForTimeout(400);
@@ -88,12 +84,17 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   expect(await pose(page)).toEqual(atHome);
   await page.screenshot({ path: `${shots}/home-1280.png` });
   await page.setViewportSize({ width: 1920, height: 1080 });
-  await expectGlobeClearEdges(page);
   await page.screenshot({ path: `${shots}/home-1920.png` });
 
   await page.locator('.home-menu').getByRole('button', { name: 'Dive sites' }).click();
   const sites = page.locator('.home-sites');
   await expect(sites).toBeVisible();
+  await page.waitForFunction(
+    () =>
+      (window.__game as { homeGlobe: { textureReady: boolean; pinCount: number } }).homeGlobe
+        .textureReady &&
+      (window.__game as { homeGlobe: { pinCount: number } }).homeGlobe.pinCount > 0,
+  );
   await expect
     .poll(() =>
       page.locator('.globe.is-embedded .globe-canvas').evaluate((canvas) => {
@@ -193,6 +194,7 @@ test('URL probes bypass home and home site grid scrolls vertically with trapped 
 
 test('a home globe pin launches the same mission as its grid entry', async ({ page }) => {
   await boot(page, '/');
+  await page.locator('.home-menu').getByRole('button', { name: 'Dive sites' }).click();
   const pin = page.locator('.globe.is-embedded .globe-pin[data-landmark="titanic"]');
   await expect(pin).toHaveAttribute('data-state', 'mission');
   await pin.focus();

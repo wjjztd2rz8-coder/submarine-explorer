@@ -31,7 +31,9 @@ test('home copy, semantic order and first focus', async ({ page }) => {
   );
   await expect(page.locator('.home-notes')).toContainText('Play in your browser');
   await expect(page.locator('.home-notes')).toContainText('Touch, keyboard or controller');
-  await expect(page.locator('.home-scene-caption')).toHaveText('Expedition preview');
+  await expect(page.locator('.home-scene-caption')).toHaveText(
+    /^(Expedition preview|Monterey Canyon · Real GMRT bathymetry)$/,
+  );
   await expect(page.locator('.home-scene-caveat')).toHaveText(
     'Vehicle and lighting are illustrative.',
   );

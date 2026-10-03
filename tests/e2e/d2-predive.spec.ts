@@ -59,13 +59,6 @@ test('home screen shows the game mode and changes it', async ({ page }) => {
   const tagline = await page.locator('.home-tagline').boundingBox();
   const box = await mode.boundingBox();
   expect(box!.y).toBeGreaterThan(tagline!.y + tagline!.height);
-  await page
-    .waitForFunction(
-      () => (window.__game as { homeGlobe: { textureReady: boolean } }).homeGlobe.textureReady,
-      undefined,
-      { timeout: 10_000 },
-    )
-    .catch(() => undefined);
   await page.screenshot({ path: `${shots}/home-mode.png` });
 
   await mode.getByRole('radio', { name: 'Realistic' }).click();
