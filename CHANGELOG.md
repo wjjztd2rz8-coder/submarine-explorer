@@ -21,6 +21,12 @@ without an entry here is not done.
   layout. Hardware detection, touch input and forced touch mode now save and
   restore the existing touch-seen flag; mouse and keyboard still switch the
   current session back to desktop controls.
+- Phase F, F-BUGHUNT-5: gamepad camera, photo, sonar, lights and sim-speed
+  toggles fire once per press. Discovery counters saturate at the safe integer
+  limit so damaged saves cannot overflow into null on reload. Tile loading
+  rejects invalid grid geometry, geographic bounds, depth extrema and nonfinite
+  height samples before meshing; invalid optional quantised data still falls
+  back to the canonical heightmap.
 - Phase F, F-SAVE-SOAK: settings and key bindings recover intact legacy copies
   when current localStorage entries are empty, truncated or corrupt. Explicit v0
   settings and bare v0 discovery maps retain their saved choices and discoveries;

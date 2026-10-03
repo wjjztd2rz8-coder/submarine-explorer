@@ -35,21 +35,69 @@ export type FetchLike = (input: string) => Promise<{
 
 const REQUIRED_META_KEYS = ['id', 'cols', 'rows', 'bbox', 'center', 'cellsize_m_x', 'cellsize_m_y'];
 
-/** Validate an untrusted JSON blob as a TileMeta. Throws on anything missing. */
+/** Reject invalid sampling geometry before an untrusted tile reaches meshing. */
 export function validateMeta(raw: unknown, tileId: string): TileMeta {
-  if (typeof raw !== 'object' || raw === null) {
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
     throw new TileLoadError('meta.json is not an object', tileId);
   }
   const m = raw as Record<string, unknown>;
   for (const key of REQUIRED_META_KEYS) {
     if (m[key] === undefined) throw new TileLoadError(`meta.json is missing "${key}"`, tileId);
   }
-  const cols = Number(m.cols);
-  const rows = Number(m.rows);
-  if (!Number.isInteger(cols) || !Number.isInteger(rows) || cols < 2 || rows < 2) {
+  const { cols, rows } = m;
+  if (
+    typeof cols !== 'number' ||
+    typeof rows !== 'number' ||
+    !Number.isSafeInteger(cols) ||
+    !Number.isSafeInteger(rows) ||
+    cols < 2 ||
+    rows < 2 ||
+    !Number.isSafeInteger(cols * rows * 4)
+  ) {
     throw new TileLoadError(`meta.json has a bad grid size ${cols}x${rows}`, tileId);
   }
+  const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+  for (const key of ['cellsize_m_x', 'cellsize_m_y']) {
+    if (!finite(m[key]) || m[key] <= 0)
+      throw new TileLoadError(`meta.json has invalid "${key}"`, tileId);
+  }
+  const bbox = m.bbox as Partial<TileMeta['bbox']> | null;
+  const center = m.center as Partial<TileMeta['center']> | null;
+  if (
+    !bbox ||
+    !finite(bbox.north) ||
+    !finite(bbox.south) ||
+    !finite(bbox.east) ||
+    !finite(bbox.west) ||
+    bbox.south < -90 ||
+    bbox.north > 90 ||
+    bbox.south >= bbox.north ||
+    bbox.west < -180 ||
+    bbox.east > 180 ||
+    bbox.west >= bbox.east
+  )
+    throw new TileLoadError('meta.json has invalid bbox', tileId);
+  if (
+    !center ||
+    !finite(center.lat) ||
+    !finite(center.lon) ||
+    center.lat < bbox.south ||
+    center.lat > bbox.north ||
+    center.lon < bbox.west ||
+    center.lon > bbox.east
+  )
+    throw new TileLoadError('meta.json has invalid center', tileId);
+  if (!finite(m.min_m) || !finite(m.max_m) || m.min_m > m.max_m)
+    throw new TileLoadError('meta.json has invalid min_m/max_m', tileId);
   return raw as TileMeta;
+}
+
+function validateHeights(heights: Float32Array, tileId: string): Float32Array {
+  for (let i = 0; i < heights.length; i++) {
+    if (!Number.isFinite(heights[i]))
+      throw new TileLoadError(`heightmap has nonfinite sample at index ${i}`, tileId);
+  }
+  return heights;
 }
 
 /**
@@ -70,12 +118,12 @@ export function decodeHeightmap(buffer: ArrayBuffer, meta: TileMeta): Float32Arr
   // The format is defined as LITTLE-endian. Every platform we target is
   // little-endian, so the fast path is a direct view; we verify that
   // assumption once and fall back to a byte-swapping read if it ever fails.
-  if (isLittleEndian()) return new Float32Array(buffer);
+  if (isLittleEndian()) return validateHeights(new Float32Array(buffer), meta.id);
 
   const view = new DataView(buffer);
   const out = new Float32Array(meta.cols * meta.rows);
   for (let i = 0; i < out.length; i++) out[i] = view.getFloat32(i * 4, true);
-  return out;
+  return validateHeights(out, meta.id);
 }
 
 /**
@@ -84,7 +132,13 @@ export function decodeHeightmap(buffer: ArrayBuffer, meta: TileMeta): Float32Arr
  */
 export function decodeHeightmap16(buffer: ArrayBuffer, meta: TileMeta): Float32Array {
   const { quant_min_m: min, quant_scale: scale } = meta;
-  if (typeof min !== 'number' || typeof scale !== 'number' || !(scale > 0)) {
+  if (
+    typeof min !== 'number' ||
+    !Number.isFinite(min) ||
+    typeof scale !== 'number' ||
+    !Number.isFinite(scale) ||
+    !(scale > 0)
+  ) {
     throw new TileLoadError('meta.json has no valid quant_min_m/quant_scale', meta.id);
   }
   const n = meta.cols * meta.rows;
@@ -98,7 +152,7 @@ export function decodeHeightmap16(buffer: ArrayBuffer, meta: TileMeta): Float32A
   const view = new DataView(buffer);
   const out = new Float32Array(n);
   for (let i = 0; i < n; i++) out[i] = min + view.getUint16(i * 2, true) * scale;
-  return out;
+  return validateHeights(out, meta.id);
 }
 
 /** True if meta.json advertises a 16-bit variant. */

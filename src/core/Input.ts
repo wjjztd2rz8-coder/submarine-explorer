@@ -296,6 +296,8 @@ export class Input {
   private readonly storage: BindingStore | null;
   private protectedBindings = false;
   private readonly edgeArmed = new Set<ActionId>();
+  private padIndex: number | null = null;
+  private padPressed = new Set<number>();
   wheelDelta = 0;
 
   // F1-TOUCH ---------------------------------------------------------------
@@ -596,6 +598,8 @@ export class Input {
     this.keys.clear();
     this.edgeArmed.clear();
     this.touchHeld.clear();
+    this.padIndex = null;
+    this.padPressed.clear();
   }
 
   private isBound(code: string): boolean {
@@ -671,6 +675,13 @@ export class Input {
     const pad = pads ? [...pads].find((p) => p?.connected) : null;
     this.gamepadActive = false;
     if (pad) {
+      if (this.padIndex !== pad.index) this.padPressed.clear();
+      this.padIndex = pad.index;
+      const pressed = new Set<number>();
+      pad.buttons.forEach((button, index) => {
+        if (button.pressed) pressed.add(index);
+      });
+      const edge = (index: number): boolean => pressed.has(index) && !this.padPressed.has(index);
       // W3C standard mapping: 0/1 left stick, 2/3 right stick.
       const [lx = 0, ly = 0, , ry = 0] = pad.axes;
       const yaw = applyDeadZone(lx);
@@ -683,14 +694,18 @@ export class Input {
       const down = pad.buttons[1]?.value ?? 0; // B / circle
       const ballast = applyDeadZone(up - down);
       if (ballast) s.ballast = ballast;
-      if (pad.buttons[3]?.pressed) s.toggleCamera = true; // Y
-      if (pad.buttons[2]?.pressed) s.toggleLights = true; // X
+      if (edge(3)) s.toggleCamera = true; // Y
+      if (edge(2)) s.toggleLights = true; // X
       s.scan = s.scan || (pad.buttons[5]?.pressed ?? false); // RB
-      if (pad.buttons[8]?.pressed) s.toggleSonar = true; // Back / view
-      if (pad.buttons[9]?.pressed) s.togglePhotoMode = true; // Start
-      if (pad.buttons[12]?.pressed) s.cycleSimSpeed = true; // D-pad up
+      if (edge(8)) s.toggleSonar = true; // Back / view
+      if (edge(9)) s.togglePhotoMode = true; // Start
+      if (edge(12)) s.cycleSimSpeed = true; // D-pad up
       s.boost = s.boost || (pad.buttons[7]?.value ?? 0) > 0.5; // RT
       this.gamepadActive = Boolean(yaw || throttle || pitch || ballast);
+      this.padPressed = pressed;
+    } else {
+      this.padIndex = null;
+      this.padPressed.clear();
     }
     return s;
   }

@@ -1,7 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { makeConfig } from '../../src/core/Config.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { terrainCarveFor } from '../../src/world/terrainFeatures.js';
@@ -198,24 +198,10 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
     }
   });
 
-  it('records malformed metadata accepted by the loader that poisons height sampling', () => {
+  it('rejects malformed cell spacing before it can poison height sampling', () => {
     const tile = actualTile('monterey-canyon');
-    const meta = validateMeta({ ...tile.meta, cols: 2, rows: 2, cellsize_m_x: 0 }, tile.meta.id);
-    const config = makeConfig();
-    config.terrain.detailStrength = 0;
-    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const terrain = new Terrain(
-      { meta, heights: new Float32Array(4).fill(-100) },
-      config.terrain,
-      'low',
-    );
-    try {
-      expect(Number.isNaN(terrain.sampleDataHeight(0, 0))).toBe(true);
-      expect(Number.isNaN(terrain.sampleDataHeight(Infinity, 0))).toBe(true);
-      expect(error).toHaveBeenCalled();
-    } finally {
-      terrain.dispose();
-      error.mockRestore();
-    }
+    expect(() =>
+      validateMeta({ ...tile.meta, cols: 2, rows: 2, cellsize_m_x: 0 }, tile.meta.id),
+    ).toThrow(/cellsize_m_x/);
   });
 });
