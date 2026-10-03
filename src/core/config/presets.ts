@@ -45,6 +45,9 @@ export interface VentPresetConfig {
   glowCarbonateScale: number;
   /** Extra ambient light intensity added near the field (0 = none): keeps the seabed readable. */
   ambientFill: number;
+  /** Distance fog density multiplier (1 = unchanged) and lift toward a pale haze (0 = none). */
+  hazeScale: number;
+  hazeLift: number;
   /** Shimmer (luminance wobble sprite over each orifice): amplitude and size (m). */
   shimmerStrength: number;
   shimmerSizeM: number;
@@ -244,6 +247,8 @@ export const DEFAULT_PRESETS: PresetsConfig = {
     glowDistanceM: 60,
     glowCarbonateScale: 0.35,
     ambientFill: 0,
+    hazeScale: 1,
+    hazeLift: 0,
     shimmerStrength: 0.08,
     shimmerSizeM: 9,
     upwellMps: 0.35,
