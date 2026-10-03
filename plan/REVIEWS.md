@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-03 evening comprehensive review (trigger: tag f16; golden set 2026-10-03-190819)
+
+**Changed since the last review (same day):** Blue Hole spawn dome fixed (seated alcove, stepped ledge), Beebe billowing plumes merged (f16), CI `fail-fast` turned off.
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1–5 each:**
+
+| Site            | Score       | Change | Biggest gap                                                              |
+| --------------- | ----------- | ------ | ------------------------------------------------------------------------ |
+| Titanic         | 4/4/4/4/5/4 | same   | Foreground marine snow still big and bright; far field near black (460)  |
+| Beebe           | 4/4/4/4/5/4 | +1     | Plumes are tall uniform columns; no flow variation or lit hot-water haze |
+| Great Blue Hole | 4/3/4/3/5/4 | +2     | Wall is flat tan; rim apron smeared; floor plain                         |
+| Lost City       | 3/3/3/3/5/3 | +1     | Tiered tower reads, but surroundings are bare brown slope, milky light   |
+| Monterey Canyon | 3/3/4/3/5/3 | same   | Still a lone striated mound, no opposing wall or depth fall-off          |
+
+**Play flow:** unchanged from the morning review. Clutter remains the 5-line GMRT citation block on every frame (450 queued) and the "Animal nearby" toast overlapping the sonar legend on 1600x900.
+
+**Process:** CI is still red on every main push (shard 12, `f2-life` scan test timing out on the software-GL runner). Because `fail-fast` was true, other shards were hidden; now false, so the next push shows the full picture. Codex 440 owns the real fix. Codex 5h is at the 5% floor until 15:45, so 390/395/400 worktrees are stalled with uncommitted work; they resume from the queue after reset. Claude idled ~17 h and Codex ~19.5 h earlier in the day (already logged and fixed in PROCESS-LOG).
+
+**New priorities:** see DIRECTOR.md (Monterey canyon first, then Lost City surroundings, Blue Hole wall, Beebe plume variety, Titanic lift).
+
+**Needs owner:** nothing blocking.
+
 ## 2026-10-03 comprehensive review (trigger: tag f15)
 
 **Changed since the last review:** first review. Since 2026-10-02: title screen (Bathyline), touch/short-landscape fixes, share image, readability unit tests for all 5 heroes, bughunts 13/14.

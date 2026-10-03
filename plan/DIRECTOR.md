@@ -2,21 +2,21 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-03 comprehensive review; golden set 2026-10-03-175107)
+## Current priorities (refreshed 2026-10-03 evening review; golden set 2026-10-03-190819)
 
 Run `tools/golden.sh` at the start of any run that merged visual work. Compare against the previous set. If this list runs dry, refill it from the newest golden set rather than idling.
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
-1. **Great Blue Hole (follow-up):** the floating dome is fixed (merged 2026-10-03: seated alcove, stepped ledge, deeper fall-off). Remaining: the grotto's base apron has rough cream patches, only one stalactite feature exists, and the floor is still plain. Lower priority than 2–4.
-2. **Lost City close-up:** Codex 400 owns the first pass (worktree 400-f-lostcity-readable, stalled by the Codex floor). The 15–30 m view is still a smooth, smeared white tower with soft ring-shaped blobs. Needs carbonate texture (flanges, fluted columns, tan staining), triplanar UVs and a darker, less milky ambient. Review 400 before starting anything new here.
-3. **Beebe plumes (DONE 2026-10-03, merged billowing plumes + preset smoke; only re-check in next golden set):** was: smooth grey funnels with a clean cone edge. Make them billowing and turbulent, widening and drifting with the current, black/dark grey and with orifice shimmer. Keep the chimney close-up as is.
-4. **Monterey:** the ridge now has strata and a lit face (improved). Remaining gaps: the canyon reads as a lone mound, not a canyon; add the opposing wall and depth fall-off, and sponges/corals on the lit face.
-5. **Titanic:** spawn view is the reference for the other sites. Lift the far field slightly; Codex 460 reduces the foreground snow clutter.
-6. **Rebrand rollout (Bathyline):** Codex 440-f-rebrand-bathyline is queued; Claude reviews the diff. A proper logo for the share image is still open.
-7. **Fewer, better sites:** Codex 450-f-site-triage is queued; decide after reading it.
+1. **Monterey canyon:** the ridge has strata and a lit face, but it still reads as a lone mound. Add the opposing wall, depth fall-off and sponges/corals on the lit face.
+2. **Lost City surroundings:** the tiered tower now reads (400 may still add texture). The slope around it is bare brown and the light is milky. Add carbonate rubble, flanges on the small towers, a darker ambient.
+3. **Blue Hole wall and floor:** the wall is flat tan and the rim apron is smeared. Add banding, overhangs, a second stalactite cluster and a textured floor.
+4. **Beebe plume variety:** plumes are uniform tall columns. Vary the width and lean per vent, add a lit hot-water haze above the orifice, and a bent plume in the current.
+5. **Titanic far-field lift:** lift the dark far field slightly. Codex 460 handles the snow clutter.
+6. **Toast placement:** the "Animal nearby" toast overlaps the sonar legend at 1600x900. Move it below the legend or to the top centre.
+7. **Rebrand logo (Bathyline):** a proper mark for the share image. Codex 440 rebrand does the rollout; Claude reviews.
 
-Codex queue (all unblocked): 410 modes bughunt, 420 verify tests, 430 hero-props bughunt, 440 CI red fix (f2-life scan), 440 rebrand, 450 HUD attribution footer, 450 site triage, 460 marine-snow audit.
+Codex queue (all unblocked): 410 modes bughunt, 420 verify tests, 430 hero-props bughunt, 440 CI red fix (f2-life scan), 440 rebrand, 450 HUD attribution footer, 450 site triage, 460 marine-snow audit. Stalled worktrees 390/395/400 resume after the 15:45 Codex reset.
 
 Demoted: further title polish (the title is good: Bathyline, Arcade/Realistic cards, readable at 844x390).
 
