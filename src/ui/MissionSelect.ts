@@ -46,13 +46,15 @@ export interface MissionSelectOptions {
   onSiteFocus?: (id: string) => void;
 }
 
-/** URL for a mission: only `?mission=` (plus `?tier=`, a machine setting). */
+/** URL for a mission: only `?mission=` plus device preferences (`tier`, `touch`). */
 export function missionUrl(href: string, missionId: string): string {
   const url = new URL(href);
   const tier = url.searchParams.get('tier');
+  const touch = url.searchParams.get('touch');
   url.search = '';
   url.searchParams.set('mission', missionId);
   if (tier) url.searchParams.set('tier', tier);
+  if (touch) url.searchParams.set('touch', touch);
   return url.toString();
 }
 

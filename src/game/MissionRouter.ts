@@ -31,6 +31,7 @@ import { Debrief, formatDuration, type DebriefAction } from '../ui/Debrief.js';
 import { ObjectivesPanel, type NavReadout } from '../ui/ObjectivesPanel.js';
 import { headingFromForward, latLonToWorld, normalizeHeadingDeg } from '../util/geo.js';
 import type { TileMeta } from '../util/types.js';
+import { shellUrl } from '../util/navigation.js';
 import { landmarkIdFor, type FetchJson } from './ContentPath.js';
 import {
   loadMission,
@@ -651,7 +652,7 @@ export class MissionRouter {
   private leave(action: (() => void) | undefined): void {
     this.debrief?.hide();
     if (action) action();
-    else this.navigate(new URL('.', window.location.href).toString());
+    else this.navigate(shellUrl(window.location.href));
   }
 
   private navigate(url: string | null): void {

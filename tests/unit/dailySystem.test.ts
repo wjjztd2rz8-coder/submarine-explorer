@@ -10,6 +10,7 @@ import { EventBus } from '../../src/core/EventBus.js';
 import { createProgressSystem } from '../../src/app/systems/progress.js';
 import { createRovSystem } from '../../src/app/systems/rov.js';
 import { Scene, SpotLight, PointLight, Vector3 } from 'three';
+import { shellUrl } from '../../src/util/navigation.js';
 
 vi.mock('../../src/ui/RovHUD.js', () => ({
   RovHUD: class {
@@ -17,13 +18,13 @@ vi.mock('../../src/ui/RovHUD.js', () => ({
   },
 }));
 
-function setup(lowLight = false) {
+function setup(lowLight = false, href = 'http://localhost/') {
   vi.useFakeTimers();
   vi.setSystemTime(new Date('2026-10-01T23:59:59Z'));
   vi.stubGlobal('window', {
     setInterval,
     clearInterval,
-    location: { href: '' },
+    location: { href },
   });
   const config = makeConfig();
   const save = new Save({ config, storage: null });
@@ -61,7 +62,7 @@ function setup(lowLight = false) {
     scene: new Scene(),
     tier: 'low',
     rig: { chaseRadius: 100 },
-    shellBaseHref: () => 'http://localhost/',
+    shellBaseHref: () => shellUrl(window.location.href),
     expose: vi.fn(),
   } as unknown as GameContext;
   const purchases = createProgressSystem();
@@ -80,6 +81,26 @@ function setup(lowLight = false) {
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
+});
+it('keeps forced touch layout when the Daily card reboots into a mission under a project base', () => {
+  const { ctx, system, offPurchase } = setup(
+    false,
+    'http://localhost/submarine-explorer/?touch=1&tier=low&tile=old&poi=bow',
+  );
+  try {
+    vi.mocked(ctx.home.setDaily).mock.calls[0][4]();
+    const url = new URL(window.location.href);
+    expect(url.pathname).toBe('/submarine-explorer/');
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      mission: 'shallow',
+      tier: 'low',
+      touch: '1',
+      daily: '2026-10-01',
+    });
+  } finally {
+    system.dispose?.();
+    offPurchase();
+  }
 });
 it('rolls the home card over at midnight without mutating the active daily dive and disposes refresh', () => {
   const { ctx, system, offPurchase } = setup(true);

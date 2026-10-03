@@ -8,9 +8,9 @@
  * `touchEdge`, `touchLook`, `touchZoom`), so gameplay code is unchanged.
  *
  * Visibility: the controls show while touch is the primary input. That is
- * decided at start from the media queries and then follows the last input
- * used, so a touch on a laptop shows them and a key press or mouse click
- * hides them again. `html.is-touch` is set with them so CSS (menus, settings)
+ * decided at start from saved touch detection or media queries, then follows
+ * the last input used, so a touch on a laptop shows them and a key press or
+ * mouse click hides them again. `html.is-touch` is set with them so CSS (menus, settings)
  * can adapt; `src/styles/touch.css` holds all the styling.
  */
 
@@ -21,6 +21,7 @@ import {
   DoubleTap,
   isTap,
   pinchWheelDelta,
+  rememberTouch,
   sliderAxis,
   stickAxes,
 } from '../core/Touch.js';
@@ -34,9 +35,6 @@ export interface TouchControlsOptions {
   sonar: { readonly expanded: boolean; zoomWheel(direction: number): unknown };
   parent?: HTMLElement;
 }
-
-/** localStorage key remembering that this device has been used by touch. */
-const SEEN_KEY = 'subexplorer.touch.v1';
 
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -162,6 +160,7 @@ export class TouchControls {
   // ---------------------------------------------------------------- mode
 
   private applyMode(): void {
+    if (this.touchMode) rememberTouch();
     this.input.touchActive = this.touchMode;
     document.documentElement.classList.toggle('is-touch', this.touchMode);
     if (!this.touchMode) this.releaseAll();
@@ -179,7 +178,6 @@ export class TouchControls {
     };
     on('pointerdown', (e) => {
       if (e.pointerType === 'touch') {
-        this.remember();
         this.setTouchMode(true);
       } else if (e.pointerType === 'mouse' && this.touchMode) {
         this.setTouchMode(false);
@@ -189,14 +187,6 @@ export class TouchControls {
       if (['ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight'].includes(e.code)) return;
       if (this.touchMode) this.setTouchMode(false);
     });
-  }
-
-  private remember(): void {
-    try {
-      localStorage.setItem(SEEN_KEY, '1');
-    } catch {
-      /* Optional. */
-    }
   }
 
   // --------------------------------------------------------------- stick

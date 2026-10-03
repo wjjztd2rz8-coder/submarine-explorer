@@ -21,6 +21,7 @@ import { TileLoader } from '../world/TileLoader.js';
 import { makeExposer, type AppState, type BootContext } from './context.js';
 import { applyBootModes } from './systems/modes.js';
 import { readLastSite } from './systems/shell.js';
+import { shellUrl } from '../util/navigation.js';
 
 /** Show the "Dive aborted" card and record the message for tests. */
 export function showFatal(message: string): void {
@@ -64,12 +65,7 @@ export async function boot(): Promise<BootContext | null> {
   const appState: AppState = bypassHome ? 'dive' : 'home';
   document.body.dataset.appState = appState;
   const lastSite = readLastSite();
-  const shellBaseHref = (): string => {
-    const base = new URL('.', window.location.href);
-    const tier = params.get('tier');
-    if (tier) base.searchParams.set('tier', tier);
-    return base.toString();
-  };
+  const shellBaseHref = (): string => shellUrl(window.location.href, params);
   const loader = new TileLoader();
   // B3: `?mission=<id>` (docs/missions.md) names the tile and the content
   // folder; without it (or if its mission.json is missing) this is the free dive.
