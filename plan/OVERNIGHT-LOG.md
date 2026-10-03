@@ -156,3 +156,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Running (Codex): 150-f-copy-audit, 160-f-ci-timeout-check, 170-f-touch-audit. Queued: 90-f-hint-dedupe, 180-f-bughunt-6-modes, 190-f-audio-audit, 200-f-mobile-lowtier-audit.
 - No Claude agents spawned; Claude 5h was ~66%. Lost City terrain checker texture and fresh golden set still open. Not pushed or tagged (no wave complete).
 - Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-03 headless run (started ~01:20)
+
+- Merged (main gates green, not pushed): F-COPY-AUDIT (Codex; Titanic spawn test moved to Challenger Deep). CHANGELOG conflict resolved by keeping both sides.
+- Running (Codex): 160-f-ci-timeout-check, 170-f-touch-audit, 180-f-bughunt-6-modes. Queued: 90-f-hint-dedupe, 190-f-audio-audit, 200-f-mobile-lowtier-audit, 210-f-bughunt-7-copy-regress.
+- No Claude agents spawned (e2e gates took ~40 min with three Codex tasks running; a stale preview server from a timed-out gate run blocked one rerun, so use unique ports and a detached run).
+- Still needs owner: brand name OK (Bathyline).
