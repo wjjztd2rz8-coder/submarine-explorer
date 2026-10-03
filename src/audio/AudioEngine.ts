@@ -1,8 +1,9 @@
 /**
  * The WebAudio graph itself.
  *
- *   bus(ambient|sub|ui|sonar) -> SFX -> depthFilter -> master -> destination
+ *   bus(ambient|sub|ui|sonar) -> SFX -> depthFilter -> master
  *   bus(music) -------------------------------------> master
+ *   master -> compressor -> peak guard -> destination
  *
  * One shared depth low-pass rather than one per bus, because "the effects mix
  * gets muffled with depth" is a property of the water and hull between the
@@ -24,6 +25,10 @@ export class AudioEngine {
   private readonly buses: Record<BusName, GainNode>;
   private unlocked = false;
   readonly effects: GainNode;
+  private readonly compressor: DynamicsCompressorNode;
+  private readonly peakGuard: WaveShaperNode;
+  private readonly sources = new Set<() => void>();
+  private disposed = false;
 
   constructor(private readonly config: AudioConfig) {
     // Safari still exposes webkitAudioContext only in some versions.
@@ -34,7 +39,17 @@ export class AudioEngine {
 
     this.master = this.ctx.createGain();
     this.master.gain.value = config.masterVolume;
-    this.master.connect(this.ctx.destination);
+    // Compress stacked cues, with a final sample ceiling for extreme overlaps.
+    this.compressor = this.ctx.createDynamicsCompressor();
+    const compression = config.mixCompression;
+    this.compressor.threshold.value = compression.thresholdDb;
+    this.compressor.knee.value = compression.kneeDb;
+    this.compressor.ratio.value = compression.ratio;
+    this.compressor.attack.value = compression.attackS;
+    this.compressor.release.value = compression.releaseS;
+    this.peakGuard = this.ctx.createWaveShaper();
+    this.peakGuard.curve = peakCurve(config.outputCeiling);
+    this.master.connect(this.compressor).connect(this.peakGuard).connect(this.ctx.destination);
 
     this.depthFilter = this.ctx.createBiquadFilter();
     this.depthFilter.type = 'lowpass';
@@ -61,9 +76,79 @@ export class AudioEngine {
   }
 
   /** Must be invoked from inside a user-gesture handler (autoplay policy). */
-  unlock(): void {
-    this.unlocked = true;
-    void this.ctx.resume().catch(() => {});
+  unlock(): Promise<void> {
+    if (this.disposed) return Promise.resolve();
+    if (this.unlocked && this.ctx.state === 'running') return Promise.resolve();
+    const resumed = this.ctx.resume();
+    // iOS needs a source started synchronously in the gesture, including when
+    // the first touch opens a dive from a paused home screen.
+    const source = this.ctx.createBufferSource();
+    source.buffer = this.ctx.createBuffer(1, 1, this.ctx.sampleRate);
+    source.connect(this.master);
+    const release = this.manageSources([source], []);
+    source.start();
+    return resumed.then(
+      () => {
+        this.unlocked = true;
+      },
+      () => {
+        this.unlocked = false;
+        release();
+      },
+    );
+  }
+
+  /** Release complete voice graphs on end or teardown, even while suspended. */
+  manageSources(
+    sources: AudioScheduledSourceNode[],
+    nodes: AudioNode[],
+    onEnded?: () => void,
+  ): () => void {
+    const pending = new Set(sources);
+    let released = false;
+    const release = (): void => {
+      if (released) return;
+      released = true;
+      this.sources.delete(release);
+      for (const source of sources) {
+        source.onended = null;
+        if (pending.has(source)) {
+          try {
+            source.stop();
+          } catch {
+            /* A source may already have ended before its event is delivered. */
+          }
+        }
+        source.disconnect();
+      }
+      for (const node of nodes) node.disconnect();
+    };
+    for (const source of sources)
+      source.onended = () => {
+        pending.delete(source);
+        if (!pending.size) {
+          release();
+          onEnded?.();
+        }
+      };
+    this.sources.add(release);
+    return release;
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    for (const release of this.sources) release();
+    for (const node of [
+      ...Object.values(this.buses),
+      this.effects,
+      this.depthFilter,
+      this.master,
+      this.compressor,
+      this.peakGuard,
+    ])
+      node.disconnect();
+    void this.ctx.close().catch(() => {});
   }
 
   get isUnlocked(): boolean {
@@ -86,6 +171,13 @@ export class AudioEngine {
     for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
     return buf;
   }
+}
+
+/** Unity below the ceiling; bounded even when WebAudio sums signals above 1. */
+export function peakCurve(ceiling: number): Float32Array<ArrayBuffer> {
+  return Float32Array.from({ length: 2049 }, (_, i) =>
+    Math.max(-ceiling, Math.min(ceiling, (i / 2048) * 2 - 1)),
+  );
 }
 
 function clamp01(v: number): number {

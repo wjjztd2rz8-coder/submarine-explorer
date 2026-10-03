@@ -32,8 +32,10 @@ export const audioSystem: GameSystem = {
       minDurationS: config.settings.captionMinDurationS,
     });
     const unlockAudio = (): void => audio.unlock();
-    cleanup.listen(window, 'pointerdown', unlockAudio, { passive: true });
-    cleanup.listen(window, 'keydown', unlockAudio, { passive: true });
+    // Touch activation can arrive at release; capture also reaches controls
+    // that stop propagation before the event bubbles to window.
+    for (const event of ['pointerdown', 'pointerup', 'touchend', 'keydown'])
+      cleanup.listen(window, event, unlockAudio, { passive: true, capture: true });
     ctx.expose({ audio, captions: ctx.captions });
   },
   frame: {

@@ -35,6 +35,17 @@ without an entry here is not done.
   Realistic or Custom access policy at boot and refreshes immediately when the
   mode changes. Daily primary rewards share the dated debrief reward key,
   preventing a duplicate payout and leaving ordinary mission rewards available.
+- Phase F, F-AUDIO-AUDIT follow-up: removed a copied absolute nested
+  `node_modules` symlink that split Playwright's CLI and ESM test imports across
+  two dependency trees. Full-suite and project-base test discovery now load one
+  Playwright instance; all browser assertions remain unchanged.
+
+- Phase F, F-AUDIO-AUDIT: audio now unlocks on the first paused touch, stays
+  silent while paused or hidden, cancels stale sonar echoes and suppresses
+  blocked cues. Complete cue and loop graphs disconnect on end or disposal;
+  compression and a final output ceiling protect stacked effects. Regression
+  coverage checks lifecycle races, repeated mode changes and input-only saved
+  volume updates.
 
 - Phase F, F-LOSTCITY-3: the Poseidon talus apron is no longer a flat oval. It has a ragged noise-driven outline, feathers flush into the seabed, fades into the sediment colour and carries scattered carbonate blocks (not on the low tier). Lost City also gets a little more ambient fill and a lifted distance haze (new opt-in vent params `hazeScale`, `hazeLift`) so the far ridge softens instead of cutting out black.
 

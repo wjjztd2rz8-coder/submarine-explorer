@@ -41,6 +41,11 @@ export class AudioSystem {
   private lastCreakAt = -Infinity;
   private readonly unsubs: Array<() => void> = [];
   private paused = false;
+  private hidden = false;
+
+  private get playbackBlocked(): boolean {
+    return this.paused || this.hidden;
+  }
   private score: AmbientScore | null = null;
   private soundscape: Soundscape | null = null;
   private scanHum: MachineLoop | null = null;
@@ -64,7 +69,7 @@ export class AudioSystem {
     if (!this.engine || this.disposed) return;
     const now = this.engine.ctx.currentTime;
     this.engine.master.gain.setTargetAtTime(
-      this.settings.muted ? 0 : this.settings.masterVolume,
+      this.settings.muted || this.playbackBlocked ? 0 : this.settings.masterVolume,
       now,
       0.03,
     );
@@ -101,19 +106,19 @@ export class AudioSystem {
   }
 
   playShutter(): void {
-    if (!this.engine || this.paused || this.disposed) return;
+    if (!this.engine || this.playbackBlocked || this.disposed) return;
     mechanicalCue(this.engine, 'shutter');
     this.captions.emit({ id: 'shutter', text: 'Camera shutter', durationS: 1 });
   }
 
   /** Quiet sensor cue for a nearby natural event, on the existing sonar bus. */
   playExploreCue(): void {
-    if (!this.engine || this.paused || this.disposed) return;
+    if (!this.engine || this.playbackBlocked || this.disposed) return;
     playPing(this.engine, this.config, 0.025, 0.3);
   }
 
   playManipulator(): void {
-    if (!this.engine || this.paused || this.disposed) return;
+    if (!this.engine || this.playbackBlocked || this.disposed) return;
     mechanicalCue(this.engine, 'servo');
     this.captions.emit({ id: 'servo', text: 'Manipulator servo', durationS: 1.5 });
   }
@@ -130,6 +135,15 @@ export class AudioSystem {
       muted: false,
       reduceMotion: false,
     };
+    if (typeof document !== 'undefined') {
+      const onVisibility = (): void => {
+        this.hidden = document.hidden;
+        this.syncPlayback();
+      };
+      this.hidden = document.hidden;
+      document.addEventListener('visibilitychange', onVisibility);
+      this.unsubs.push(() => document.removeEventListener('visibilitychange', onVisibility));
+    }
   }
 
   /**
@@ -140,16 +154,17 @@ export class AudioSystem {
   unlock(): void {
     if (this.disposed) return;
     if (this.engine) {
-      if (!this.paused) this.engine.unlock();
+      if (this.playbackBlocked && this.engine.isUnlocked) return;
+      void this.engine.unlock().then(() => this.syncPlayback());
       return;
     }
     this.engine = new AudioEngine(this.config);
     // Apply saved gains before any source starts, including a muted first touch.
-    this.engine.master.gain.value = this.settings.muted ? 0 : this.settings.masterVolume;
+    this.engine.master.gain.value =
+      this.settings.muted || this.playbackBlocked ? 0 : this.settings.masterVolume;
     this.engine.effects.gain.value = this.settings.sfxVolume;
     this.engine.bus('music').gain.value = this.settings.musicVolume;
-    if (!this.paused) this.engine.unlock();
-    else void this.engine.ctx.suspend().catch(() => {});
+    void this.engine.unlock().then(() => this.syncPlayback());
     this.thruster = new ThrusterLoop(this.engine, this.config);
     this.ambient = new AmbientBeds(this.engine, this.config);
     this.score = new AmbientScore(this.engine, this.config);
@@ -168,8 +183,22 @@ export class AudioSystem {
   setPaused(paused: boolean): void {
     this.paused = paused;
     if (!this.engine || this.disposed) return;
-    if (paused) void this.engine.ctx.suspend().catch(() => {});
-    else void this.engine.ctx.resume().catch(() => {});
+    this.syncPlayback();
+  }
+
+  private syncPlayback(): void {
+    if (!this.engine || this.disposed) return;
+    if (this.playbackBlocked) {
+      // Silence synchronously, including when a resume promise is still pending.
+      this.engine.master.gain.cancelScheduledValues(this.engine.ctx.currentTime);
+      this.engine.master.gain.value = 0;
+      for (const timer of this.echoes) window.clearTimeout(timer);
+      this.echoes.clear();
+      void this.engine.ctx.suspend().catch(() => {});
+    } else {
+      this.setSettings(this.settings);
+      void this.engine.ctx.resume().catch(() => {});
+    }
   }
 
   private wireBusEvents(): void {
@@ -185,12 +214,12 @@ export class AudioSystem {
         this.scanHum?.update(0);
       }),
       this.bus.on('mission:objective', ({ complete }) => {
-        if (complete && !this.paused) this.score?.discover(1.2);
+        if (complete && !this.playbackBlocked) this.score?.discover(1.2);
       }),
     );
     this.unsubs.push(
       this.bus.on('sub:collided', ({ speed }) => {
-        if (!this.engine || this.disposed || this.paused) return;
+        if (!this.engine || this.disposed || this.playbackBlocked) return;
         playCollisionThud(this.engine, this.config, speed);
         this.captions.emit({ id: 'collision', text: 'Hull scrapes bottom', durationS: 1.5 });
       }),
@@ -202,7 +231,7 @@ export class AudioSystem {
     // the collision thud above; creaks are reserved for crush-depth pressure.
     this.unsubs.push(
       this.bus.on('sub:hullStress', ({ stress, cause }) => {
-        if (!this.engine || this.paused || cause !== 'pressure') return;
+        if (!this.engine || this.playbackBlocked || cause !== 'pressure') return;
         const c = this.config;
         const now = this.engine.ctx.currentTime;
         const minGap = c.hullCreakMaxGapS - stress * (c.hullCreakMaxGapS - c.hullCreakMinGapS);
@@ -221,7 +250,7 @@ export class AudioSystem {
     // cooldown with pressure stress so both sources cannot creak at once.
     this.unsubs.push(
       this.bus.on('env:trench', ({ depth }) => {
-        if (!this.engine || this.disposed) return;
+        if (!this.engine || this.disposed || this.playbackBlocked) return;
         const now = this.engine.ctx.currentTime;
         if (now - this.lastCreakAt < this.config.hullCreakMinGapS) return;
         this.lastCreakAt = now;
@@ -242,14 +271,14 @@ export class AudioSystem {
         if (this.scanning) this.playManipulator();
         this.scanning = false;
         this.scanHum?.update(0);
-        if (!this.paused) this.score?.discover(firstTime ? 1 : 0.45);
+        if (!this.playbackBlocked) this.score?.discover(firstTime ? 1 : 0.45);
         if (firstTime) this.playDiscoveryChime();
         else this.playScanTick();
       }),
     );
     this.unsubs.push(
       this.bus.on('sub:emergencyBlow', ({ lockSeconds }) => {
-        if (!this.engine || this.disposed || this.paused) return;
+        if (!this.engine || this.disposed || this.playbackBlocked) return;
         playEmergencyAlarm(this.engine, this.config);
         this.captions.emit({
           id: 'emergency-blow',
@@ -267,7 +296,7 @@ export class AudioSystem {
    * call directly too, e.g. from a debug console.
    */
   ping(): void {
-    if (!this.engine || !this.lastFrame || this.paused) return;
+    if (!this.engine || !this.lastFrame || this.playbackBlocked || this.disposed) return;
     const c = this.config;
     const engine = this.engine;
 
@@ -291,7 +320,7 @@ export class AudioSystem {
 
     const timer = window.setTimeout(() => {
       this.echoes.delete(timer);
-      if (this.disposed || this.paused) return;
+      if (this.disposed || this.playbackBlocked) return;
       const rangeGain = 1 / (1 + hit.rangeM / 200);
       playPing(engine, c, rangeGain * 0.6, 0.9);
       this.captions.emit({
@@ -306,7 +335,8 @@ export class AudioSystem {
   /** Call once per rendered frame (small additive hook in src/main.ts). */
   update(frame: AudioFrameInput): void {
     this.lastFrame = frame;
-    if (!this.engine || !this.thruster || !this.ambient || this.paused) return;
+    if (!this.engine || !this.thruster || !this.ambient || this.playbackBlocked || this.disposed)
+      return;
 
     this.engine.setDepth(frame.depth);
     this.thruster.update(frame.throttle);
@@ -369,7 +399,7 @@ export class AudioSystem {
 
   /** The discovery chime, played on `scan:complete` with `firstTime: true`. */
   playDiscoveryChime(): void {
-    if (!this.engine || this.disposed) return;
+    if (!this.engine || this.disposed || this.playbackBlocked) return;
     this.score?.discover();
     playDiscoveryChime(this.engine, this.config);
     this.captions.emit({ id: 'discovery', text: 'New discovery logged', durationS: 1.5 });
@@ -377,7 +407,7 @@ export class AudioSystem {
 
   /** The quiet confirmation for re-scanning something already catalogued. */
   playScanTick(): void {
-    if (!this.engine || this.disposed) return;
+    if (!this.engine || this.disposed || this.playbackBlocked) return;
     playScanTick(this.engine, this.config);
     this.captions.emit({
       id: 'scan-repeat',
@@ -395,10 +425,11 @@ export class AudioSystem {
     this.soundscape?.stop();
     this.scanHum?.stop();
     this.winch?.stop();
-    if (this.engine) void this.engine.ctx.close().catch(() => {});
+
     for (const u of this.unsubs) u();
     this.unsubs.length = 0;
     this.thruster?.stop();
     this.ambient?.stop();
+    this.engine?.dispose();
   }
 }
