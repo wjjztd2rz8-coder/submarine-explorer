@@ -336,3 +336,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - 2026-10-03 16:15 CDT headless run: skipped: budget gate (claude 5h 36.0% left (resets Sat Oct 03 17:40) | 7d 27.0% left (resets Thu Oct 08 07:00) codex 5h 100.0% left (resets Sat Oct 03 15:45) | 7d 44.0% left (resets Fri Oct 09 16:55) [as of 218 min ago] )
 - 2026-10-03 16:45 CDT headless run: skipped: budget gate (claude 5h 35.0% left (resets Sat Oct 03 17:40) | 7d 27.0% left (resets Thu Oct 08 07:00) codex 5h 82.0% left (resets Sat Oct 03 21:15) | 7d 41.0% left (resets Fri Oct 09 16:55) [as of 22 min ago] )
 - 2026-10-03 17:15 CDT headless run: skipped: budget gate (claude 5h 30.0% left (resets Sat Oct 03 17:40) | 7d 26.0% left (resets Thu Oct 08 07:00) codex 5h 54.0% left (resets Sat Oct 03 21:15) | 7d 36.0% left (resets Fri Oct 09 16:55) )
+
+## 2026-10-03 evening headless run (~22:00)
+
+- Merged Codex packages 430 (hero integrity, Blue Hole stalactite scan POI), 410 (modes), 420 + 390 (e2e stability), 440 CI life-scan fix, 395 (touch HUD), 400 (Lost City Arcade opening camera), 440 rebrand (Bathyline mark/icons/share image). CHANGELOG conflicts resolved by union; rebrand's scarp.ts variant dropped in favour of main's.
+- Golden set 2026-10-03-230949: Lost City shot 1 clearly better (tower large and readable). Full-e2e green on main (one new 395 case, beebe 150% at 360x640, is test.fixme: real HUD overlap, fix queued as 470). Pushed, tagged f18.
+- Codex queue: 470 touch-150 overlap, 480 verify rebrand merge, 490 Lost City camera bughunt; 450 hud footer, 450 triage, 460 marine snow running. No Claude package run (Claude spent on merge review).
+- Needs owner: nothing.
