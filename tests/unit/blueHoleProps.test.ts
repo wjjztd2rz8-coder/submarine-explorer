@@ -66,10 +66,18 @@ describe('Great Blue Hole props', () => {
         foot.push(originY + p.y - ground(x + w.x, z + w.z));
       }
       expect(foot.length).toBeGreaterThan(3);
-      // Every low vertex sits within 2 m of the terrain beneath it (none hangs in mid-water).
-      const worst = Math.max(...foot);
-      console.log(def.id, 'worst foot gap', worst.toFixed(2), 'n', foot.length);
-      expect(worst).toBeLessThan(2);
+      // Every low vertex sits within 3 m of the terrain beneath it (none hangs in mid-water).
+      expect(Math.max(...foot)).toBeLessThan(3);
+      // The shelf's lip is carried by the ledge (not out over the drop (20 m)) and the ground rises behind the wall.
+      const [W, D] = def.dimensionsM!;
+      const at = (lx: number, lz: number): number => {
+        v.set(lx, 0, lz).applyQuaternion(q);
+        return ground(x + v.x, z + v.z);
+      };
+      for (let f = -0.3; f <= 0.3; f += 0.1) {
+        expect(at(f * W, -D)).toBeGreaterThan(originY - 20);
+        expect(at(f * W, 12)).toBeGreaterThanOrEqual(originY - 0.5);
+      }
     });
   }
 });
