@@ -388,7 +388,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   // two extra ones, each with its sideways spread and drift.
   for (const s of byHeight.slice(0, 3)) {
     const ph = THREE.MathUtils.clamp(s.h * 2.6 + 4, 7, 34);
-    const reach = Math.max(1.6, ph * 0.2) * 1.6 + ph * 0.34;
+    const reach = Math.max(1.6, ph * 0.2) * 1.6 * 1.45 + ph * 0.34 * 1.6;
     bounds.expandByPoint(new THREE.Vector3(s.x - reach, s.y + s.h + ph, s.z - reach));
     bounds.expandByPoint(new THREE.Vector3(s.x + reach, s.y + s.h + ph, s.z + reach));
   }

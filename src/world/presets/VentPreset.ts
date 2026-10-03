@@ -40,6 +40,34 @@ export interface VentSource {
   height: number;
 }
 
+export interface VentVariety {
+  height: number;
+  width: number;
+  opacity: number;
+  lean: number;
+  wispX: number;
+  wispZ: number;
+}
+
+/** Deterministic per-vent plume variation from the orifice position (stable across runs). */
+export function ventVariety(top: THREE.Vector3): VentVariety {
+  const r = mulberry(
+    (Math.imul(Math.round(top.x * 7.3), 73856093) ^
+      Math.imul(Math.round(top.z * 7.3), 19349663) ^
+      Math.imul(Math.round(top.y * 3.1), 83492791)) >>> 0,
+  );
+  const a = r() * Math.PI * 2;
+  const d = 0.9 + r() * 1.4;
+  return {
+    height: 0.5 + r() * 0.65,
+    width: 0.55 + r() * 1.0,
+    opacity: 0.55 + r() * 0.5,
+    lean: 0.45 + r() * 1.2,
+    wispX: Math.cos(a) * d,
+    wispZ: Math.sin(a) * d,
+  };
+}
+
 /** Chimney props first (tallest first), else vent POIs; at most `max`. */
 export function ventSources(
   ctx: Pick<PresetEnterContext, 'props' | 'pois'>,
@@ -65,7 +93,10 @@ export class VentPreset implements EnvPreset {
   private smoke: THREE.ShaderMaterial | null = null;
   private smokeLifeS = 60;
   private smokeRiseH = 70;
+  private leanAngle = 0.6;
   private shimmer: THREE.ShaderMaterial | null = null;
+  private haze: THREE.ShaderMaterial | null = null;
+  private readonly hazeLean = new THREE.Vector2(1, 0);
   private glow: GlowLights | null = null;
   private sources: VentSource[] = [];
   private params: PresetParams = {};
@@ -85,6 +116,8 @@ export class VentPreset implements EnvPreset {
     if (!ctx.visuals) return;
 
     const carbonate = str(p.fluid, 'sulfide') === 'carbonate';
+    this.leanAngle = 0.35 + (ventVariety(this.sources[0]!.top).lean % 1) * 0.5;
+    this.hazeLean.set(Math.cos(this.leanAngle), Math.sin(this.leanAngle));
     const intensity = clamp01(num(p.smokeIntensity, 1));
     const total = particleBudget(
       num(p.smokeParticles, 12000) * intensity,
@@ -94,6 +127,7 @@ export class VentPreset implements EnvPreset {
     const per = Math.floor(total / this.sources.length);
     if (per > 0) this.buildSmoke(per, carbonate, intensity);
     this.buildShimmer();
+    if (!carbonate) this.buildHaze();
 
     const glowCount = Math.min(
       3,
@@ -121,17 +155,30 @@ export class VentPreset implements EnvPreset {
     const n = per * this.sources.length;
     const origin = new Float32Array(n * 3);
     const seed = new Float32Array(n * 4);
+    const vari = new Float32Array(n * 4);
     const rnd = mulberry(0x5e17);
+    // Per-vent variety (deterministic from the vent's position): height, width, opacity and
+    // lean scales, a lean-angle offset, and a small white-smoker wisp beside the orifice.
+    const wispN = carbonate ? 0 : Math.floor(per * 0.16);
     let k = 0;
     for (const s of this.sources) {
+      const v = ventVariety(s.top);
       for (let i = 0; i < per; i++, k++) {
-        origin.set([s.top.x, s.top.y, s.top.z], k * 3);
+        const wisp = i < wispN;
+        origin.set(
+          wisp
+            ? [s.top.x + v.wispX, s.top.y - 0.4, s.top.z + v.wispZ]
+            : [s.top.x, s.top.y, s.top.z],
+          k * 3,
+        );
         seed.set([rnd(), rnd() * Math.PI * 2, Math.sqrt(rnd()), rnd()], k * 4);
+        vari.set([v.height, v.width, v.opacity, wisp ? -v.lean : v.lean], k * 4);
       }
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(origin, 3));
     geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 4));
+    geo.setAttribute('aVar', new THREE.BufferAttribute(vari, 4));
 
     const riseH = num(p.riseHeightM, 70);
     const riseMps = Math.max(0.05, num(p.riseMps, 1.2));
@@ -160,6 +207,7 @@ export class VentPreset implements EnvPreset {
         },
         uOpacity: { value: opacity },
         uDrift: { value: new THREE.Vector2() },
+        uWisp: { value: new THREE.Color(carbonate ? 0xe4ebe6 : 0xcfc8bf) },
       },
       vertexShader: SMOKE_VERT,
       fragmentShader: PUFF_FRAG,
@@ -212,6 +260,47 @@ export class VentPreset implements EnvPreset {
     this.stats.particles += pos.length / 3;
   }
 
+  /** Lit hot-water haze: a warm additive glow of soft sprites above each orifice. */
+  private buildHaze(): void {
+    const strength = num(this.params.hazeGlow, 0.5);
+    if (strength <= 0) return;
+    const pos: number[] = [];
+    const seed: number[] = [];
+    this.sources.forEach((s, i) => {
+      const v = ventVariety(s.top);
+      for (let j = 0; j < 3; j++) {
+        const rise = (1.2 + j * 2.6) * (0.7 + 0.5 * v.height);
+        pos.push(
+          s.top.x + this.hazeLean.x * rise * 0.05 * (1 + j),
+          s.top.y + rise,
+          s.top.z + this.hazeLean.y * rise * 0.05 * (1 + j),
+        );
+        seed.push((i * 3 + j) * 1.7 + v.width * 0.0);
+      }
+    });
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setAttribute('aSeed', new THREE.Float32BufferAttribute(seed, 1));
+    this.haze = new THREE.ShaderMaterial({
+      uniforms: {
+        ...commonUniforms(this.look),
+        uSize: { value: num(this.params.hazeGlowSizeM, 7) },
+        uStrength: { value: strength },
+        uTint: { value: new THREE.Color(num(this.params.glowColor, 0xff9a4a)) },
+      },
+      vertexShader: SHIMMER_VERT,
+      fragmentShader: HAZE_FRAG,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+    const pts = makePoints(geo, this.haze, 'ventHaze');
+    pts.renderOrder = 3;
+    this.scene!.add(pts);
+    this.objects.push(pts);
+    this.stats.particles += pos.length / 3;
+  }
+
   update(_dt: number, ctx: PresetFrameContext): void {
     // Soft warm ambient fill ("never black"): lifts the abyssal ambient floor so seabed and
     // chimney bodies read outside the headlight pool. Opt-in per site (sulfide fields).
@@ -232,10 +321,16 @@ export class VentPreset implements EnvPreset {
       // capped so a strong current cannot fling the smoke off the site.
       const drift = this.smoke.uniforms.uDrift!.value as THREE.Vector2;
       drift.set(ctx.current.x, ctx.current.z).multiplyScalar(this.smokeLifeS * 0.5);
-      const cap = this.smokeRiseH * 0.6;
+      // Ambient lean: a steady bottom-current bend in one site-wide direction, so plumes
+      // lean consistently even in slack water (the current adds to it).
+      const lean = this.smokeRiseH * 0.3;
+      drift.x += Math.cos(this.leanAngle) * lean;
+      drift.y += Math.sin(this.leanAngle) * lean;
+      const cap = this.smokeRiseH * 0.7;
       if (drift.length() > cap) drift.setLength(cap);
     }
     if (this.shimmer) updateCommonUniforms(this.shimmer, ctx, this.look);
+    if (this.haze) updateCommonUniforms(this.haze, ctx, this.look);
     this.glow?.update(ctx.elapsed);
 
     // Upwelling: a gentle column above each orifice (strongest at the centre
@@ -265,6 +360,7 @@ export class VentPreset implements EnvPreset {
     this.glow = null;
     this.smoke = null;
     this.shimmer = null;
+    this.haze = null;
     this.stats.draws = this.stats.particles = this.stats.lights = 0;
   }
 }
@@ -281,6 +377,8 @@ uniform vec3  uGlow;
 uniform float uOpacity;
 uniform vec2  uDrift;
 attribute vec4 aSeed; // phase, angle, radial, jitter
+attribute vec4 aVar; // per-vent height, width, opacity scale, lean (negative = wisp)
+uniform vec3 uWisp;
 varying vec3 vColor;
 varying float vAlpha;
 varying float vFog;
@@ -291,7 +389,11 @@ varying float vRot;
 void main() {
   float t = fract(uTime / uLife + aSeed.x);
   // Buoyant plume: fast out of the orifice, slowing and spreading as it rises.
-  float h = uRiseH * (1.0 - pow(1.0 - t, 1.8));
+  bool wisp = aVar.w < 0.0;
+  float lean = abs(aVar.w);
+  float hs = wisp ? aVar.x * 0.3 : aVar.x;
+  float ws = wisp ? 0.22 : aVar.y;
+  float h = uRiseH * hs * (1.0 - pow(1.0 - t, 1.8));
   // A narrow stem that billows outward: radius grows faster than linearly.
   // Irregular outline: a per-chimney, height-dependent lobe term and a per-puff bias keep
   // the edge ragged (no clean cone), with a few stragglers thrown well outside the core.
@@ -299,24 +401,29 @@ void main() {
   float lobe = 0.72 + 0.34 * sin(h * 0.21 + cph * 5.0 + uTime * 0.08)
                     + 0.18 * sin(h * 0.53 - aSeed.y * 3.0 + cph);
   float bias = mix(0.55, 1.0, aSeed.w) * (aSeed.w > 0.93 ? 1.35 : 1.0);
-  float r = uSpread * (0.06 + 0.94 * pow(t, 1.35)) * aSeed.z * max(0.35, lobe) * bias;
+  float r = uSpread * ws * (0.06 + 0.94 * pow(t, 1.35)) * aSeed.z * max(0.35, lobe) * bias;
   float a = aSeed.y + sin(uTime * 0.35 + aSeed.w * 12.0) * 0.6 * t;
   vec3 w = position + vec3(cos(a) * r, h, sin(a) * r);
   // The whole column meanders (phase per chimney) and bends downstream with the current.
   float ph = position.x * 0.13 + position.z * 0.17;
   w.x += sin(h * 0.09 + uTime * 0.21 + ph) * 0.2 * uSpread * t;
   w.z += cos(h * 0.07 + uTime * 0.17 + ph * 1.7) * 0.2 * uSpread * t;
-  w.xz += uDrift * t * t;
+  // Bends with height: the column starts upright and leans further the higher it goes.
+  float bend = wisp ? 0.6 : lean;
+  vec2 dd = uDrift * bend;
+  float la = (aVar.x - 0.8) * 0.9;
+  dd = mat2(cos(la), sin(la), -sin(la), cos(la)) * dd;
+  w.xz += dd * pow(t, 1.7) * (wisp ? 0.35 : 1.0);
   // Turbulent wobble grows with height.
   w.x += sin(uTime * 0.9 + aSeed.w * 40.0 + h * 0.2) * (0.8 + 1.4 * t) * t;
   w.z += cos(uTime * 0.7 + aSeed.w * 23.0 + h * 0.15) * (0.8 + 1.4 * t) * t;
 
   // Puffs bloom quickly near the source, then keep swelling slowly.
-  float size = mix(uSize0, uSize1, sqrt(t)) * (0.7 + 0.6 * aSeed.w);
+  float size = mix(uSize0, uSize1, sqrt(t)) * (0.7 + 0.6 * aSeed.w) * (wisp ? 0.3 : sqrt(aVar.y));
   float dist = placePoint(w, size);
   // Lit by the headlights, plus the warm orifice glow for the first few metres.
-  vColor = uColor * presetLight(w) + uGlow * exp(-h / 5.0);
-  vAlpha = uOpacity * smoothstep(0.0, 0.04, t) * (1.0 - smoothstep(0.5, 1.0, t));
+  vColor = (wisp ? uWisp : uColor) * presetLight(w) + uGlow * exp(-h / 5.0);
+  vAlpha = uOpacity * (wisp ? 0.6 : aVar.z) * smoothstep(0.0, 0.04, t) * (1.0 - smoothstep(0.5, 1.0, t));
   vFog = presetFog(dist);
   vSeed = aSeed.w + aSeed.y;
   vRot = aSeed.y + uTime * 0.12 * (aSeed.z - 0.6);
@@ -398,5 +505,22 @@ void main() {
             sin(uv.x * 29.0 - t * 3.9 + uv.y * 7.0);
   float env = (1.0 - r * r) * vFade;
   gl_FragColor = vec4(vec3(1.0 + uStrength * w * env), 1.0);
+}
+`;
+
+const HAZE_FRAG = /* glsl */ `
+precision highp float;
+uniform float uTime;
+uniform float uStrength;
+uniform vec3 uTint;
+varying float vSeed;
+varying float vFade;
+void main() {
+  vec2 uv = gl_PointCoord - 0.5;
+  float r = length(uv) * 2.0;
+  if (r > 1.0) discard;
+  float flick = 0.85 + 0.15 * sin(uTime * 1.7 + vSeed * 5.0);
+  float a = pow(1.0 - r * r, 2.0) * uStrength * 0.22 * vFade * flick;
+  gl_FragColor = vec4(mix(uTint, vec3(1.0, 0.85, 0.65), 0.35) * a, 1.0);
 }
 `;
