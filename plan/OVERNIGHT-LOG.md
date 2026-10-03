@@ -287,3 +287,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged: Codex 330 (title lifecycle/render-state restore, offline title assets) and 370 (square viewports use short-landscape). Full-e2e on main: 261 pass, 1 fail (f3-onboard touch PHOTO step poll under load with 3 Codex tasks running); passes 2/2 in isolation, treated as load flake. Pushed, tagged f14. CI on main was still red before this push (390 is verifying).
 - Running Codex: 360, 380, 390. Queued: 395, 400 (Lost City readability), 410 (modes bughunt). No Claude agents (no unblocked visual package).
 - Needs owner: brand name OK (Bathyline); fresh golden set still needs a browser host.
+
+## 2026-10-03 headless run (started ~12:45)
+
+- Merged (full-e2e + project-base green on main): Codex 360 F-TITLE-G QA (title integration/touch/shell e2e, architecture doc) and 380 F-GOLDEN-CHECK (code-level hero readability unit tests; all five heroes pass ambient/fog/clearance floors, no value changes). Both tests/docs only. Pushed, tagged f15.
+- Running Codex: 390 (verify CI/share), 395 (touch bughunt), 400 (Lost City readable). Queued: 410 (modes bughunt), 420 (verify 360/380), 430 (hero props bughunt). No Claude agents (no unblocked visual package; Claude 5h ~65%).
+- Needs owner: brand name OK (Bathyline); fresh golden set still needs a browser host.
