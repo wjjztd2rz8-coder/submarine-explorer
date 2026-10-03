@@ -3,7 +3,7 @@ import { makeConfig } from '../../src/core/Config.js';
 import { ProgressSave, Save } from '../../src/core/Save.js';
 import { createDailySystem } from '../../src/app/systems/daily.js';
 import type { GameContext } from '../../src/app/context.js';
-import { dailyDive } from '../../src/game/Daily.js';
+import { dailyDive, dailyRatingKey } from '../../src/game/Daily.js';
 import { DailySave } from '../../src/game/DailySave.js';
 import { Progress } from '../../src/game/Progress.js';
 import { EventBus } from '../../src/core/EventBus.js';
@@ -18,7 +18,7 @@ vi.mock('../../src/ui/RovHUD.js', () => ({
   },
 }));
 
-function setup(lowLight = false, href = 'http://localhost/') {
+function setup(lowLight = false, href = 'http://localhost/', includeDeep = false) {
   vi.useFakeTimers();
   vi.setSystemTime(new Date('2026-10-01T23:59:59Z'));
   vi.stubGlobal('window', {
@@ -45,8 +45,11 @@ function setup(lowLight = false, href = 'http://localhost/') {
     discovery: { pois: [] },
     baseScanRadii: new Map(),
     baseHintRangeFactor: config.scan.hintRangeFactor,
-    missionSummaries: [{ id: 'shallow', tile: 'shallow', title: 'Shallow', depthM: 125 }],
-    index: [{ id: 'shallow' }],
+    missionSummaries: [
+      { id: 'shallow', tile: 'shallow', title: 'Shallow', depthM: 125 },
+      ...(includeDeep ? [{ id: 'deep', tile: 'deep', title: 'Deep', depthM: 3800 }] : []),
+    ],
+    index: [{ id: 'shallow' }, ...(includeDeep ? [{ id: 'deep' }] : [])],
     daily: lowLight ? { ...dailyDive('2026-10-01', ['shallow'])!, modifier: 'low-light' } : null,
     dailySave: new DailySave(null),
     home: { setDaily: vi.fn() },
@@ -123,6 +126,35 @@ it('rolls the home card over at midnight without mutating the active daily dive 
     offPurchase();
   }
 });
+it('refreshes Daily access immediately on both mode changes without altering the loaded dive', () => {
+  const { ctx, system, offPurchase } = setup(true, 'http://localhost/', true);
+  try {
+    const active = structuredClone(ctx.daily);
+    const card = vi.mocked(ctx.home.setDaily);
+    expect(card).toHaveBeenLastCalledWith('Deep', expect.any(String), 0, 0, expect.any(Function));
+    card.mockClear();
+    ctx.save.setGameplayMode('realistic');
+    expect(card).toHaveBeenLastCalledWith(
+      'Shallow',
+      expect.any(String),
+      0,
+      0,
+      expect.any(Function),
+    );
+    ctx.save.setGameplayMode('arcade');
+    expect(card).toHaveBeenLastCalledWith('Deep', expect.any(String), 0, 0, expect.any(Function));
+    card.mock.calls.at(-1)![4]();
+    expect(new URL(window.location.href).searchParams.get('mission')).toBe('deep');
+    expect(ctx.daily).toEqual(active);
+    system.dispose?.();
+    card.mockClear();
+    ctx.save.setGameplayMode('realistic');
+    expect(card).not.toHaveBeenCalled();
+  } finally {
+    system.dispose?.();
+    offPurchase();
+  }
+});
 it('preserves Daily Low light after live settings and purchases and unsubscribes enforcement', () => {
   const { ctx, system, offPurchase, setPreset } = setup(true);
   try {
@@ -171,6 +203,34 @@ it('preserves Daily Low light after live settings and purchases and unsubscribes
     expect(ctx.progress.buy('light-beam')).toBe(true);
     expect(setPreset).toHaveBeenCalledTimes(1);
     expect(setPreset).toHaveBeenLastCalledWith(ctx.config.lightPresets.enhanced);
+  } finally {
+    system.dispose?.();
+    offPurchase();
+  }
+});
+
+it('awards one dated Daily primary reward and preserves ordinary mission rewards through mode edits', () => {
+  const { ctx, system, offPurchase } = setup(true);
+  try {
+    const key = dailyRatingKey(ctx.daily!);
+    const initial = ctx.progress.points;
+    ctx.bus.emit('mission:started', { missionId: 'shallow', tileId: 'shallow' });
+    ctx.save.setGameplayMode('realistic');
+    ctx.bus.emit('mission:primaryComplete', { missionId: 'shallow', completed: 1, total: 1 });
+    expect(ctx.progress.snapshot().awarded).toContain(`primary:${key}`);
+    expect(ctx.progress.snapshot().awarded).not.toContain('primary:shallow');
+    ctx.save.setGameplayMode('arcade');
+    const rating = ctx.progress.finish(key, [{ primary: true, complete: true }]);
+    expect(rating).toEqual({ stars: 2, best: 2, points: 70 });
+    expect(ctx.progress.points - initial).toBe(70);
+    ctx.bus.emit('mission:restart', { missionId: 'shallow' });
+    ctx.bus.emit('mission:primaryComplete', { missionId: 'shallow', completed: 1, total: 1 });
+    ctx.progress.finish(key, [{ primary: true, complete: true }]);
+    expect(ctx.progress.points - initial).toBe(70);
+    ctx.daily = null;
+    ctx.bus.emit('mission:primaryComplete', { missionId: 'shallow', completed: 2, total: 2 });
+    expect(ctx.progress.points - initial).toBe(100);
+    expect(ctx.progress.snapshot().awarded).toContain('primary:shallow');
   } finally {
     system.dispose?.();
     offPurchase();

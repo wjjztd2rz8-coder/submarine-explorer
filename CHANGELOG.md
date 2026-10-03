@@ -31,6 +31,10 @@ without an entry here is not done.
   loss, hidden tabs and resize/rotation. Multiple fingers holding Scan or Boost
   keep the action engaged until the last finger releases. Regression coverage
   checks real control listeners and phone layouts at 390×844 and 844×390.
+- Phase F, F-BUGHUNT-6: Daily dive selection respects the saved Arcade,
+  Realistic or Custom access policy at boot and refreshes immediately when the
+  mode changes. Daily primary rewards share the dated debrief reward key,
+  preventing a duplicate payout and leaving ordinary mission rewards available.
 
 - Phase F, F-LOSTCITY-3: the Poseidon talus apron is no longer a flat oval. It has a ragged noise-driven outline, feathers flush into the seabed, fades into the sediment colour and carries scattered carbonate blocks (not on the low tier). Lost City also gets a little more ambient fill and a lifted distance haze (new opt-in vent params `hazeScale`, `hazeLift`) so the far ridge softens instead of cutting out black.
 

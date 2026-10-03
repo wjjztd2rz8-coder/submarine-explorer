@@ -1,6 +1,7 @@
 import { PROGRESS_CONFIG, UPGRADES } from '../../core/config/progress.js';
 import { DiscoveryStore } from '../../game/DiscoveryStore.js';
 import { PhotoStore } from '../../game/PhotoStore.js';
+import { dailyRatingKey } from '../../game/Daily.js';
 import { creditPreviousDives } from '../../game/ProgressMigration.js';
 import { Progress, applyProgress, requiredHull } from '../../game/Progress.js';
 import { Upgrades } from '../../ui/Upgrades.js';
@@ -75,7 +76,7 @@ export function createProgressSystem(): GameSystem {
       );
       cleanup.add(
         ctx.bus.on('mission:primaryComplete', ({ missionId }) =>
-          progress.award('primary', missionId),
+          progress.award('primary', ctx.daily ? dailyRatingKey(ctx.daily) : missionId),
         ),
       );
       cleanup.add(

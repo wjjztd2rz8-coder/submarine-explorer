@@ -141,37 +141,60 @@ test('Daily completion stores today stars and streak separately from settings', 
   );
 });
 
-test('a fresh pilot gets a Daily dive within the unlocked hull depth', async ({ page }) => {
-  await page.addInitScript(() =>
-    localStorage.setItem(
-      'subexplorer.progress.v1',
-      JSON.stringify({
-        version: 1,
-        lifetime: 0,
-        points: 0,
-        awarded: [],
-        ratings: {},
-        upgrades: {},
-        legacyCredited: true,
-      }),
-    ),
-  );
-  await boot(page);
-  await expect(page.locator('.daily-card')).toBeVisible();
-  await page.locator('.daily-card').click();
-  await page.waitForFunction(
-    () => window.__gameReady === true && Boolean((window.__game as { daily?: unknown }).daily),
-  );
-  expect(
-    await page.evaluate(() => {
+for (const mode of ['arcade', 'realistic'] as const) {
+  test(`a fresh ${mode} pilot gets an accessible Daily dive and a sufficient hull`, async ({
+    page,
+  }) => {
+    await page.addInitScript(() =>
+      localStorage.setItem(
+        'subexplorer.progress.v1',
+        JSON.stringify({
+          version: 1,
+          lifetime: 0,
+          points: 0,
+          awarded: [],
+          ratings: {},
+          upgrades: {},
+          legacyCredited: true,
+        }),
+      ),
+    );
+    await boot(page);
+    await page
+      .locator('.home-screen .mode-selector')
+      .getByRole('radio', {
+        name: mode === 'arcade' ? 'Arcade' : 'Realistic',
+      })
+      .check();
+    await expect(page.locator('.daily-card')).toBeVisible();
+    await page.locator('.daily-card').click();
+    await page.waitForFunction(
+      () => window.__gameReady === true && Boolean((window.__game as { daily?: unknown }).daily),
+    );
+    const access = await page.evaluate(() => {
       const game = window.__game as {
-        progress: { canDive(depth: number): boolean };
+        progress: { canDive(depth: number, mode: string): boolean; lifetime: number };
         mission: { def: { briefing: { depth_m: number } } };
+        save: { get(): { gameplayMode: string } };
+        sub: { getState(): { ratedDepth: number } };
       };
-      return game.progress.canDive(game.mission.def.briefing.depth_m);
-    }),
-  ).toBe(true);
-});
+      const depth = game.mission.def.briefing.depth_m;
+      const savedMode = game.save.get().gameplayMode;
+      return {
+        mode: savedMode,
+        allowed: game.progress.canDive(depth, savedMode),
+        lifetime: game.progress.lifetime,
+        depth,
+        rating: Math.abs(game.sub.getState().ratedDepth),
+      };
+    });
+    expect(access.mode).toBe(mode);
+    expect(access.allowed).toBe(true);
+    expect(access.lifetime).toBe(0);
+    expect(access.depth).toBeLessThanOrEqual(access.rating);
+    if (mode === 'realistic') expect(access.depth).toBeLessThanOrEqual(1000);
+  });
+}
 
 test.describe('phone touch', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
