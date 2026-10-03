@@ -1,3 +1,4 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
@@ -12,12 +13,12 @@ describe('f-monterey-polish', () => {
     for (let i = 0; i < 300; i++) {
       const kind = (i % 3) as SpongeKind;
       const sp = wallSpongeSpec(kind, 0, 0, 0, -1, rnd);
-      expect(sp.t.sx).toBeLessThanOrEqual(SPONGE_LIMITS.maxScale);
-      expect(sp.t.sy).toBeLessThanOrEqual(SPONGE_LIMITS.maxScale);
+      expect(sp.t.sx ?? 0).toBeLessThanOrEqual(SPONGE_LIMITS.maxScale);
+      expect(sp.t.sy ?? 0).toBeLessThanOrEqual(SPONGE_LIMITS.maxScale);
       (sp.color as THREE.Color).getHSL(hsl);
       expect(hsl.s).toBeLessThanOrEqual(SPONGE_LIMITS.maxSat + 1e-6);
       expect(hsl.l).toBeLessThanOrEqual(SPONGE_LIMITS.maxLight + 1e-6);
-      heights.add(Math.round((sp.t.sy / sp.t.sx) * 4));
+      heights.add(Math.round(((sp.t.sy ?? 1) / (sp.t.sx ?? 1)) * 4));
     }
     expect(heights.size).toBeGreaterThan(3);
   });
