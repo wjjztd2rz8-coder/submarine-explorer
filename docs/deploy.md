@@ -40,6 +40,24 @@ after `npm ci`. When other people or agents share the checkout, use the isolated
 form from `CONTRIBUTING-AGENTS.md` (`--outDir dist-<you>`,
 `PW_PORT`/`PW_OUTDIR`) instead.
 
+For routine local work, `PW_PORT=4197 bash tools/gates.sh` runs every static
+gate plus the existing `smoke.spec.ts` (home shell, Titanic and Monterey Canyon
+rendering/error checks) and the separate project-base browser check. With no
+`SMOKE_TILE` override this schedules four browser cases instead of repeating
+the entire suite for every concurrent task. It retains isolated build outputs,
+owned preview servers, browser artifacts and failure propagation. This is a
+smoke pass; the full suite remains required in CI. No test or assertion is
+removed, and the 16-shard CI workflow and `npm run ci` retain full discovery.
+
+Use `PW_PORT=4197 bash tools/gates.sh --full-e2e` for the full local gate set,
+including before a release push (Pages deploy does not wait for CI).
+When `CI` is nonempty, the gate script defaults to the full suite as well.
+`--no-e2e` retains the existing explicit static-only option. Each simultaneous
+gate run needs a different `PW_PORT`; project-base uses that port plus 100.
+Per-test limits, retries and browser worker count are unchanged. Reduced local
+test selection avoids repeated long soak, content and visual sweeps on shared
+CPUs; passing wall time still needs measurement in a browser-capable environment.
+
 `check:content` fails on unreviewed warnings as well as errors. An explicit
 pressure-band review is checked against the mission and hull configuration;
 it is printed as a reviewed note. `test:e2e:base` builds into

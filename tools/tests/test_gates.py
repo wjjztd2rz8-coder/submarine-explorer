@@ -9,7 +9,7 @@ import unittest
 
 
 class TestGates(unittest.TestCase):
-    def run_gates(self, *, fail_e2e=False, custom_output=None):
+    def run_gates(self, *, fail_e2e=False, custom_output=None, args=(), ci=''):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
@@ -41,16 +41,57 @@ if kind == "npx" and args[:2] == ["playwright", "test"]:
             source = source.replace(command + ' ', shlex.quote(str(shim)) + ' ' + command + ' ')
         script = root / 'tools' / 'gates.sh'
         script.write_text(source)
-        env = dict(os.environ, PW_PORT='4371', PW_REUSE_SERVER='1')
+        env = dict(os.environ, PW_PORT='4371', PW_REUSE_SERVER='1', CI=ci)
         env.pop('PW_OUTDIR', None)
         env.pop('VITE_BASE', None)
         env['FAIL_E2E'] = '1' if fail_e2e else '0'
         if custom_output:
             env['PW_OUTDIR'] = custom_output
-        result = subprocess.run(['bash', str(script)], env=env, text=True,
+        result = subprocess.run(['bash', str(script), *args], env=env, text=True,
                                 capture_output=True, timeout=20)
-        calls = [json.loads(line) for line in (root / 'calls.jsonl').read_text().splitlines()]
+        log = root / 'calls.jsonl'
+        calls = [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
         return root, result, calls
+
+    def test_local_smoke_retains_every_static_gate_and_project_base(self):
+        _, result, calls = self.run_gates()
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertIn('E2E mode: smoke + project-base', result.stdout)
+        for gate in ['build', 'unit', 'python', 'content', 'attribution', 'prettier',
+                     'e2e', 'e2e-base']:
+            self.assertIn('PASS ' + gate + '\n', result.stdout)
+        preview = next(c for c in calls if c['kind'] == 'npm'
+                       and c['args'][:2] == ['run', 'test:e2e'])
+        self.assertEqual(preview['args'][2:4], ['--', 'tests/e2e/smoke.spec.ts'])
+        base = next(c for c in calls if c['kind'] == 'npx'
+                    and c['args'][:2] == ['playwright', 'test'])
+        self.assertEqual(base['args'][2], 'tests/e2e/base-url.spec.ts')
+
+    def test_full_local_opt_in_and_ci_default_have_no_test_selection_filter(self):
+        for args, ci in [(('--full-e2e',), ''), ((), 'true')]:
+            with self.subTest(args=args, ci=ci):
+                _, result, calls = self.run_gates(args=args, ci=ci)
+                self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+                self.assertIn('E2E mode: full suite + project-base', result.stdout)
+                preview = next(c for c in calls if c['kind'] == 'npm'
+                               and c['args'][:2] == ['run', 'test:e2e'])
+                self.assertEqual(preview['args'][2], '--')
+                self.assertEqual(len(preview['args']), 4)
+                self.assertTrue(preview['args'][3].startswith('--output='))
+
+    def test_no_e2e_retains_static_gates(self):
+        _, result, calls = self.run_gates(args=('--no-e2e',))
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertEqual(len(calls), 6)
+        self.assertNotIn('PASS e2e', result.stdout)
+
+    def test_unknown_or_conflicting_options_fail_before_running_gates(self):
+        for args in [('--ful-e2e',), ('--full-e2e', '--no-e2e')]:
+            with self.subTest(args=args):
+                _, result, calls = self.run_gates(args=args)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn('Usage:', result.stderr)
+                self.assertEqual(calls, [])
 
     def test_owned_previews_use_their_own_builds_and_clean_only_temporary_outputs(self):
         root, result, calls = self.run_gates()
