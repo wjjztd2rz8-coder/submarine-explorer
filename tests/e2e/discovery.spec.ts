@@ -1,8 +1,9 @@
+import { advanceScan, completeScan } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
 /**
  * B1 discovery loop, end to end, against the `_test` fixture landmark on the
- * real Titanic tile: spawn next to a POI (`?poi=`), hold F until the scan
+ * real Titanic tile: spawn next to a POI (`?poi=`), hold G until the scan
  * completes, check it persisted across a reload, open the Journal (J; it
  * replaced the field guide in D-FLOW), and screenshot the Journal and the
  * debrief (`?debrief=1`).
@@ -94,20 +95,15 @@ test.describe('B1 scan, discovery, Journal', () => {
       }
     });
 
-    // Hold F for longer than scan_seconds (3 s in the fixture).
+    // Advance discovery time while the real scan key is held.
     await page.keyboard.down('g');
-    await page.waitForTimeout(1500);
+    await advanceScan(page, 0.6);
     const mid = await probe(page);
     expect(mid.phase).toBe('scanning');
     expect(mid.progress).toBeGreaterThan(0.1);
     await expect(page.locator('.scan-panel .scan-kicker')).toHaveText('SCANNING');
-    await page.waitForFunction(
-      () =>
-        (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed > 0,
-      undefined,
-      { timeout: 15_000 },
-    );
-    await page.waitForTimeout(300);
+    await completeScan(page, 'test-bow');
+    await advanceScan(page, 0.3);
     await page.keyboard.up('g');
 
     const events = await page.evaluate(

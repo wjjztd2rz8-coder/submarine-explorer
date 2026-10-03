@@ -1,3 +1,4 @@
+import { scanWithKeyboard } from './helpers/scan.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from './helpers/unlocked.js';
@@ -87,14 +88,7 @@ test('deploy, scan through the shared discovery path, and retrieve', async ({ pa
   const deployedExposure = await exposure(page, `${shots}/deployed.png`);
   expect(deployedExposure.nearWhite).toBeLessThan(0.05);
   expect(deployedExposure.centreMean).toBeGreaterThan(35);
-  await page.keyboard.down('g');
-  await page.waitForFunction(
-    () =>
-      (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed === 1,
-    undefined,
-    { timeout: 15000 },
-  );
-  await page.keyboard.up('g');
+  await scanWithKeyboard(page, 'test-bow');
   expect(
     await page.evaluate(
       () =>

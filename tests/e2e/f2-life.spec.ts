@@ -1,3 +1,4 @@
+import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from '@playwright/test';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
@@ -21,7 +22,9 @@ interface Game {
     render: { drawCalls: { species: number; sparks: number } };
     targets: Array<{ id: string }>;
     animalInView(camera: unknown): { id: string } | null;
+    enabled: boolean;
     tier: { maxSpecies: number };
+    update(dt: number, sub: unknown, camera: unknown, height: number, fog: number): void;
   } | null;
   sub: {
     position: { x: number; y: number; z: number };
@@ -134,21 +137,18 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
     };
     // Only the deliberately placed animal should be a scan candidate (ambient wildlife varies with the site's layout).
     g.life!.sim.clear();
-    return g.life!.sim.spawnNear('comb-jelly', sub, 9, 1) !== null;
+    const spawned = g.life!.sim.spawnNear('comb-jelly', sub, 9, 1) !== null;
+    // Publish the placed animal as a live target in this task, before it can drift.
+    g.life!.update(0, sub, g.rig.camera, 800, 0);
+    g.life!.enabled = false; // Hold the specimen/targets during the discovery assertion.
+    return spawned;
   });
   expect(ok).toBe(true);
-  await page.waitForFunction(
-    () => (window.__game as unknown as Game).life!.targets.some((t) => t.id === 'life:comb-jelly'),
-    undefined,
-    { timeout: 10_000 },
-  );
-  await page.keyboard.down('g');
-  await page.waitForFunction(
-    () => (window.__game as unknown as Game).scanner.view.completed >= 1,
-    undefined,
-    { timeout: 20_000 },
-  );
-  await page.keyboard.up('g');
+  try {
+    await scanWithKeyboard(page, 'life:comb-jelly');
+  } finally {
+    await page.evaluate(() => ((window.__game as unknown as Game).life!.enabled = true));
+  }
   const done = await page.evaluate(() => {
     const g = window.__game as unknown as Game;
     return {

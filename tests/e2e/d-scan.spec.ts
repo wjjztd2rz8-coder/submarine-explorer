@@ -1,3 +1,4 @@
+import { scanWithKeyboard, advanceScan } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
@@ -29,14 +30,7 @@ async function screenshot(page: Page, name: string): Promise<void> {
 test('scanned contacts stay marked and cannot be rescanned until a new dive', async ({ page }) => {
   await boot(page, scanUrl);
   await expect(page.locator('.scan-panel .scan-hint')).toHaveText(/HOLD G TO SCAN/);
-  await page.keyboard.down('g');
-  await page.waitForFunction(
-    () =>
-      (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed === 1,
-    undefined,
-    { timeout: 15_000 },
-  );
-  await page.keyboard.up('g');
+  await scanWithKeyboard(page, 'test-bow');
   await expect
     .poll(() =>
       page.evaluate(() =>
@@ -61,7 +55,7 @@ test('scanned contacts stay marked and cannot be rescanned until a new dive', as
   await expect(page.locator('.scan-panel .scan-hint')).toHaveText('Logged · Journal');
   await screenshot(page, 'already-logged-prompt');
   await page.keyboard.down('g');
-  await page.waitForTimeout(3600);
+  await advanceScan(page, 3.6);
   await page.keyboard.up('g');
   expect(
     await page.evaluate(() => {
@@ -85,14 +79,7 @@ test('scanned contacts stay marked and cannot be rescanned until a new dive', as
       'test-bow',
   );
   await expect(page.locator('.scan-panel .scan-hint')).toHaveText(/HOLD G TO SCAN/);
-  await page.keyboard.down('g');
-  await page.waitForFunction(
-    () =>
-      (window.__game as { scanner: { view: { completed: number } } }).scanner.view.completed === 1,
-    undefined,
-    { timeout: 15_000 },
-  );
-  await page.keyboard.up('g');
+  await scanWithKeyboard(page, 'test-bow');
   expect(
     await page.evaluate(() => {
       const g = window.__game as {

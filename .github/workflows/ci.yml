@@ -97,12 +97,12 @@ jobs:
 
       - name: End-to-end tests (Playwright)
         # Test-level sharding balances large specs without software-GPU contention.
-        # Stop on a final failure after the existing retry; never accept a partial pass.
+        # Finish every test in the shard so one failure does not hide later failures.
         # The suite budget permits a graceful failure/report before the job deadline.
         run: >-
           npm run test:e2e -- --reporter=list,html --workers=1 --fully-parallel
           --shard=${{ matrix.shard }}/${{ strategy.job-total }}
-          --global-timeout=1200000 --max-failures=1
+          --global-timeout=1200000
 
       - name: Upload e2e screenshots and report
         if: failure()
