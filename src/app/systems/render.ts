@@ -55,6 +55,13 @@ export const renderSystem: GameSystem = {
   frame: {
     'render.draw': (f, ctx) => {
       const { renderer, scene, rig, post, atmoTier, renderStats, config } = ctx;
+      // F-TITLE-E: the home menu owns the canvas; skip the gameplay draw/post path.
+      if (ctx.titleScene.ownsCanvas) {
+        ctx.titleScene.present(renderer);
+        renderStats.calls = ctx.titleScene.calls;
+        renderStats.triangles = ctx.titleScene.triangles;
+        return;
+      }
       // C5: post-processing can be switched off in Settings.
       if (atmoTier.post && ctx.postFx) {
         // The composite applies the band gain itself: undo any direct-path exposure.

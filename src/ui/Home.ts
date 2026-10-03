@@ -228,6 +228,7 @@ export class Home {
     this.panel.classList.add('is-sites');
     this.menu.hidden = true;
     this.root.classList.add('has-sites');
+    this.root.dispatchEvent(new Event('home:sites'));
     this.sites.querySelector('h2')!.textContent = freeDive ? 'Free dive' : 'Dive sites';
     this.sitesSlot.querySelector('.mission-select')?.classList.toggle('is-free-dive', freeDive);
     this.sites.querySelector<HTMLButtonElement>('.home-sites-head button')?.focus();
@@ -238,6 +239,7 @@ export class Home {
     this.panel.classList.remove('is-sites');
     this.menu.hidden = false;
     this.root.classList.remove('has-sites');
+    this.root.dispatchEvent(new Event('home:sites'));
     (this.sitesOrigin ?? this.diveSitesButton).focus();
     this.sitesOrigin = null;
   }

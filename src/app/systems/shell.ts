@@ -148,20 +148,26 @@ export const shellSystem: GameSystem = {
     ctx.setAppState = (state: AppState): void => {
       app.state = state;
       document.body.dataset.appState = state;
+      // The embedded globe is open only in the home sites subview.
       if (state === 'home') {
         pause.close();
         home.show();
-        ctx.homeGlobe.open('api');
       } else {
         home.hide();
-        ctx.homeGlobe.close();
         if (state === 'pause') {
           document.exitPointerLock?.();
           pause.open();
         } else pause.close();
       }
+      reconcileHomeGlobe();
       bus.emit('app:state', { state });
     };
+    const reconcileHomeGlobe = (): void => {
+      if (!ctx.homeGlobe) return;
+      if (app.state === 'home' && home.isOpen && home.sitesOpen) ctx.homeGlobe.open('api');
+      else ctx.homeGlobe.close();
+    };
+    cleanup.listen(home.root, 'home:sites', reconcileHomeGlobe);
     // D-INPUT-HUD: the in-dive list is reached through the pause menu now.
     missionSelect.root.hidden = true;
     ctx.expose({
