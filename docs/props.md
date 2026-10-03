@@ -45,6 +45,9 @@ Unknown keys are ignored but kept, so the placement tool prints them back.
 **Snapping.** A snapped prop sits on the _lowest_ terrain sample under its footprint corners,
 so a 140 m hull on a slope digs into the uphill side rather than floating off the downhill one.
 With `align_to_slope` it sits on the centre sample and tilts instead.
+Terrain-following debris, feature set pieces and carbonate chimneys with zero base diameter
+already conform their aprons to the seabed; these use the centre sample without a second
+footprint snap, including when replaced in the placement tool.
 
 ## Procedural kinds
 
