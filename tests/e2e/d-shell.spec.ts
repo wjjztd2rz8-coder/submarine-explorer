@@ -59,13 +59,36 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await page.setViewportSize({ width: 1280, height: 720 });
   await boot(page, '/');
   await expect(page.locator('.home-screen')).toBeVisible();
-  // Keep every existing menu action; Daily dive and Advanced add two buttons.
+  // Preserve all actions and the title menu’s DOM/Tab order, including Daily and mode.
   const existingActions = page.locator('.home-menu > button:not(.daily-card)');
   await expect(existingActions).toHaveCount(7);
   await expect(existingActions).toHaveText([
     'Continue',
     'Dive sites',
     'Free dive',
+    'Journal',
+    'Settings',
+    'Controls',
+    'Upgrades',
+  ]);
+  expect(
+    await page
+      .locator('.home-menu > *')
+      .evaluateAll((elements) =>
+        elements.map((element) =>
+          element.classList.contains('daily-card')
+            ? 'Daily dive'
+            : element.classList.contains('mode-selector')
+              ? 'Mode'
+              : element.textContent,
+        ),
+      ),
+  ).toEqual([
+    'Continue',
+    'Dive sites',
+    'Free dive',
+    'Daily dive',
+    'Mode',
     'Journal',
     'Settings',
     'Controls',
@@ -89,6 +112,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await page.locator('.home-menu').getByRole('button', { name: 'Dive sites' }).click();
   const sites = page.locator('.home-sites');
   await expect(sites).toBeVisible();
+  await expect(page.locator('.globe.is-embedded')).toBeVisible();
   await page.waitForFunction(
     () =>
       (window.__game as { homeGlobe: { textureReady: boolean; pinCount: number } }).homeGlobe
@@ -190,6 +214,10 @@ test('URL probes bypass home and home site grid scrolls vertically with trapped 
   ).toBe(true);
   await page.keyboard.press('Escape');
   await expect(page.locator('.home-sites')).toBeHidden();
+  await expect(page.locator('.globe.is-embedded')).toBeHidden();
+  await expect(
+    page.locator('.home-menu').getByRole('button', { name: 'Dive sites' }),
+  ).toBeFocused();
 });
 
 test('a home globe pin launches the same mission as its grid entry', async ({ page }) => {

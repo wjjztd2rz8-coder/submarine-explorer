@@ -33,6 +33,17 @@ without an entry here is not done.
   motion audit matches the full Settings label and verifies both saved values.
 - Phase F, F-BUGHUNT-14: short square viewports use the same title canvas
   composition as the home CSS, keeping the scene aligned with the left plate.
+
+- Phase F, F-TITLE-G: refreshed shell/touch assertions for Bathyline menu order and
+  globe-after-selection; added title canvas/budget, selector/focus, reduced-motion,
+  modal, fallback, quit/Continue and mobile integration regressions, and documented
+  the shared-renderer title architecture. Reason: protect the merged A–F behavior
+  against stale globe-on-home assumptions. No visual tuning or application changes.
+- Phase F, F-TITLE-G QA follow-up: corrected the Controls modal target, exact retained
+  tier parameters on quit/Continue, and mobile region measurements within the whole-panel
+  scroller; retained strict focus, bounds, nonoverlap and touch hit-target checks.
+  Reason: the external full E2E run exposed three incorrect test assumptions.
+
 - Phase F, F-BUGHUNT-12: title navigation lights stay steady in animated and
   reduced-motion scenes, including after quality changes.
 - Phase F, F-BUGHUNT-12: downward title vehicle hover respects the title floor
