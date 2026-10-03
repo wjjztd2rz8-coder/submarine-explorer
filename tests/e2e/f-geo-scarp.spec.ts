@@ -66,7 +66,8 @@ test.describe('F-GEO-SCARP wall heroes', () => {
       const errors: string[] = [];
       page.on('pageerror', (e) => errors.push(e.message));
       await mkdir(shots, { recursive: true });
-      await page.goto(`/?tile=${id}&skipBriefing=1`, {
+      // These geometry checks require rubble, which CI's Low tier omits.
+      await page.goto(`/?tile=${id}&skipBriefing=1&tier=medium`, {
         waitUntil: 'domcontentloaded',
         timeout: 120_000,
       });

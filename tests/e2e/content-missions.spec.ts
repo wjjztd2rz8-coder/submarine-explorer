@@ -77,7 +77,7 @@ async function teleportToPoi(page: Page, poiId: string): Promise<void> {
   }, poiId);
   const observed: string[] = [];
   for (const pose of poses) {
-    await page.evaluate((p) => {
+    const candidate = await page.evaluate(async (p) => {
       const g = window.__game as {
         sub: {
           reset(x: number, y: number, z: number, yaw: number): void;
@@ -87,29 +87,22 @@ async function teleportToPoi(page: Page, poiId: string): Promise<void> {
         };
         rig: { snap(p: unknown, yaw: number, pitch: number): void };
         discovery: { stats: { markTeleport(): void } };
+        scanner: { view: { candidateId: string | null } };
       };
       g.sub.reset(p.x, p.y, p.z, p.yaw);
       g.sub.pitch = p.pitch;
       g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
       g.discovery.stats.markTeleport();
+      // Discovery updates the scanner once per rendered frame. A 600 ms
+      // wait can expire before even one software-rendered frame on CI; observe
+      // two frames so this pose has been processed before choosing another.
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      );
+      return g.scanner.view.candidateId;
     }, pose);
-    try {
-      await page.waitForFunction(
-        (id) =>
-          (window.__game as { scanner: { view: { candidateId: string | null } } }).scanner.view
-            .candidateId === id,
-        poiId,
-        { timeout: 600 },
-      );
-      return;
-    } catch {
-      const candidate = await page.evaluate(
-        () =>
-          (window.__game as { scanner: { view: { candidateId: string | null } } }).scanner.view
-            .candidateId,
-      );
-      observed.push(candidate ?? 'none');
-    }
+    if (candidate === poiId) return;
+    observed.push(candidate ?? 'none');
   }
   throw new Error(`${poiId}: no scannable pose; competing candidates: ${observed.join(', ')}`);
 }
@@ -122,8 +115,9 @@ test('smoke cases match the shipped catalog', async ({ request }) => {
 });
 
 for (const id of missionIds) {
-  test(`${id}: briefing to primary scans to debrief`, async ({ page }) => {
-    test.setTimeout(120_000);
+  test(`${id}: briefing to primary scans to debrief`, async ({ page }, testInfo) => {
+    // Keep the local mission budget while respecting the configured CI budget.
+    test.setTimeout(Math.max(120_000, testInfo.timeout));
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
     page.on('console', (m) => {

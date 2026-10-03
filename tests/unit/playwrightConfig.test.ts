@@ -15,6 +15,7 @@ test.each([
   vi.stubEnv('PW_REUSE_SERVER', reuse);
   vi.stubEnv('PW_PORT', '4371');
   vi.stubEnv('PW_OUTDIR', 'dist-isolated-gate');
+  vi.stubEnv('GATES_CONFIG_MODE', undefined);
   const { default: config } = await import('../../playwright.config.js');
   expect(config.webServer).toMatchObject({
     reuseExistingServer: expected,
