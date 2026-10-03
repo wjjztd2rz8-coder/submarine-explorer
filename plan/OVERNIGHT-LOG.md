@@ -172,3 +172,12 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - No Claude agents spawned (e2e gate waits dominated the run). Claude 5h ~60%.
 - Still open: fresh golden set (needs host), Lost City checker texture.
 - Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-03 headless run (started ~03:00)
+
+- Merged (main gates green, pushed, tagged `f9`; `f8` already existed): F-AUDIO-AUDIT (190), F-MOBILE-AUDIT (200), F-BUGHUNT-7 (210), all Codex. Conflicts: CHANGELOG (kept both) and hud-layout.css (onboard card bottom 230px plus the new safe-area left). Fixed: touchControlsAudit stub lacked window.setTimeout/clearTimeout (1000 unit tests now pass).
+- Queued for Codex: 220-f-bughunt-8-touch-regress, 230-f-ci-split, 240-f-title-scene-brief, 250-f-bughunt-9-audio-mobile-regress. Nothing running.
+- No Claude agents spawned (Claude 5h 100% but gate waits took ~45 min). Codex 5h was 16% at start; it resets 05:22.
+- CI on the previous main push failed in ~2 min (Pages deployed OK); the CI run for f51f7b6 was not checked; 230-f-ci-split covers CI.
+- Still open: fresh golden set (needs host), Lost City checker texture.
+- Still needs owner: brand name OK (Bathyline).
