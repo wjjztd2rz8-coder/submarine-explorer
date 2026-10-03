@@ -1,4 +1,5 @@
 import { expect, test } from './helpers/unlocked.js';
+import { titleAudit } from './helpers/titleAudit.js';
 
 const env =
   (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
@@ -59,3 +60,6 @@ test('project-base build loads data, models, and globe texture', async ({ page }
   expect(errors).toEqual([]);
   await expect(page.locator('.fatal')).toHaveCount(0);
 });
+
+// Title acceptance uses identical assertions at the project deployment base.
+titleAudit(base || '/');

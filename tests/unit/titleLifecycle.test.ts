@@ -4,24 +4,48 @@ import type { GameContext } from '../../src/app/context.js';
 import type { FrameState } from '../../src/app/System.js';
 import { createTitleSystem, titleLayout, titleTier } from '../../src/app/systems/title.js';
 import * as terrain from '../../src/render/title/TitleTerrain.js';
+import { TitleScene } from '../../src/render/title/TitleScene.js';
+import { renderSystem } from '../../src/app/systems/render.js';
 
 type Handler = (e: { state: string }) => void;
 
 function fakeRenderer() {
+  let target: unknown = null;
+  const viewport = new THREE.Vector4(0, 0, 1280, 720);
+  const scissor = viewport.clone();
+  const currentViewport = viewport.clone();
+  let scissorTest = false;
+  const color = new THREE.Color(0x123456);
+  let alpha = 0.5;
   return {
+    toneMappingExposure: 1,
     info: { render: { calls: 12, triangles: 60_000 } },
-    render: vi.fn(),
+    render: vi.fn((_scene: THREE.Scene, _camera: THREE.Camera) => {}),
     clear: vi.fn(),
-    setRenderTarget: vi.fn(),
-    setClearColor: vi.fn(),
-    getClearColor: (c: THREE.Color) => c,
-    getClearAlpha: () => 1,
-    getViewport: (t: THREE.Vector4) => t.set(0, 0, 1280, 720),
-    getScissor: (t: THREE.Vector4) => t.set(0, 0, 1280, 720),
-    getScissorTest: () => false,
-    setViewport: vi.fn(),
-    setScissor: vi.fn(),
-    setScissorTest: vi.fn(),
+    getPixelRatio: vi.fn(() => 1),
+    getRenderTarget: vi.fn(() => target),
+    setRenderTarget: vi.fn((next: unknown) => {
+      target = next;
+      currentViewport.copy(next instanceof THREE.WebGLRenderTarget ? next.viewport : viewport);
+    }),
+    setClearColor: vi.fn((next: THREE.Color, a: number) => {
+      color.copy(next);
+      alpha = a;
+    }),
+    getClearColor: (c: THREE.Color) => c.copy(color),
+    getClearAlpha: () => alpha,
+    getViewport: (v: THREE.Vector4) => v.copy(viewport),
+    getCurrentViewport: (v: THREE.Vector4) => v.copy(currentViewport),
+    getScissor: (v: THREE.Vector4) => v.copy(scissor),
+    getScissorTest: () => scissorTest,
+    setViewport: vi.fn((x: number, y: number, w: number, h: number) => {
+      viewport.set(x, y, w, h);
+      currentViewport.copy(viewport);
+    }),
+    setScissor: vi.fn((x: number, y: number, w: number, h: number) => scissor.set(x, y, w, h)),
+    setScissorTest: vi.fn((value: boolean) => {
+      scissorTest = value;
+    }),
   };
 }
 
@@ -32,9 +56,10 @@ function setup(over: { load?: () => Promise<unknown>; state?: string } = {}) {
   const ctx = {
     app: { state: over.state ?? 'home' },
     tier: 'low',
+    renderer: fakeRenderer(),
     meta: { id: 'other' },
     tile: {},
-    loader: { load: over.load ?? (() => Promise.reject(new Error('blocked'))) },
+    loader: { load: vi.fn(over.load ?? (() => Promise.reject(new Error('blocked')))) },
     rig: { reduceMotion: false },
     bus: {
       on: (name: string, h: Handler) => {
@@ -49,6 +74,7 @@ function setup(over: { load?: () => Promise<unknown>; state?: string } = {}) {
         classList: { add: (c: string) => classes.add(c), remove: (c: string) => classes.delete(c) },
       },
       setSceneCaption: caption,
+      sizeGlobeTargets: vi.fn(),
     },
     settingsScreen: { isOpen: false },
     discovery: { guide: { isOpen: false } },
@@ -65,8 +91,8 @@ function setup(over: { load?: () => Promise<unknown>; state?: string } = {}) {
 
 beforeEach(() => {
   vi.useFakeTimers();
-  vi.stubGlobal('window', { innerWidth: 1280, innerHeight: 720 });
-  vi.stubGlobal('document', { hidden: false });
+  vi.stubGlobal('window', Object.assign(new EventTarget(), { innerWidth: 1280, innerHeight: 720 }));
+  vi.stubGlobal('document', Object.assign(new EventTarget(), { hidden: false }));
   vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 });
 afterEach(() => {
@@ -114,6 +140,7 @@ describe('title lifecycle', () => {
     (ctx.settingsScreen as { isOpen: boolean }).isOpen = false;
     expect(draw()).toBeGreaterThan(modal);
 
+    r.clear.mockClear();
     (ctx.home as { sitesOpen: boolean }).sitesOpen = true;
     const sites = draw();
     for (let i = 0; i < 5; i++) draw();
@@ -185,5 +212,195 @@ describe('title lifecycle', () => {
     ctx.rig.reduceMotion = true;
     frame();
     expect(ctx.titleScene.animated).toBe(false);
+  });
+  it('cancels the deferred tile fetch and removes listeners before teardown', async () => {
+    const windowOff = vi.spyOn(window, 'removeEventListener');
+    const documentOff = vi.spyOn(document, 'removeEventListener');
+    const { ctx, system, handlers } = setup();
+    system.dispose!();
+    system.dispose!();
+    await vi.runAllTimersAsync();
+    expect(ctx.loader.load).not.toHaveBeenCalled();
+    expect(handlers).toHaveLength(0);
+    expect(windowOff).toHaveBeenCalledTimes(1);
+    expect(documentOff).toHaveBeenCalledTimes(1);
+    expect(ctx.titleScene.ownsCanvas).toBe(false);
+  });
+
+  it('resumes after visibility events even when no frames ran while hidden', () => {
+    const { ctx, frame, system } = setup();
+    const r = fakeRenderer();
+    ctx.rig.reduceMotion = true;
+    frame();
+    ctx.titleScene.present(r as never);
+    const before = ctx.titleScene.drawCount;
+    (document as { hidden: boolean }).hidden = true;
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(ctx.titleScene.active).toBe(false);
+    (document as { hidden: boolean }).hidden = false;
+    document.dispatchEvent(new Event('visibilitychange'));
+    frame();
+    ctx.titleScene.present(r as never);
+    expect(ctx.titleScene.drawCount).toBe(before + 1);
+    system.dispose!();
+  });
+
+  it('keeps static home idle and redraws on same-size resize and pixel-ratio changes', () => {
+    const { ctx, frame, system } = setup();
+    const r = fakeRenderer();
+    ctx.rig.reduceMotion = true;
+    const draw = () => {
+      frame();
+      ctx.titleScene.present(r as never);
+    };
+    draw();
+    r.getRenderTarget.mockClear();
+    r.setRenderTarget.mockClear();
+    for (let i = 0; i < 120; i++) draw();
+    expect(r.getRenderTarget).not.toHaveBeenCalled();
+    expect(r.setRenderTarget).not.toHaveBeenCalled();
+    expect(ctx.titleScene.drawCount).toBe(1);
+    window.dispatchEvent(new Event('resize'));
+    draw();
+    expect(ctx.titleScene.drawCount).toBe(2);
+    vi.mocked(ctx.renderer.getPixelRatio).mockReturnValue(0.75);
+    draw();
+    draw();
+    expect(ctx.titleScene.drawCount).toBe(3);
+    ctx.rig.reduceMotion = false;
+    for (let i = 0; i < 10; i++) draw();
+    expect(ctx.titleScene.drawCount).toBeGreaterThan(3);
+    system.dispose!();
+  });
+
+  it('reuses one scene across repeated dive/home entries and modal closures', async () => {
+    const resize = vi.spyOn(TitleScene.prototype, 'resize');
+    const dispose = vi.spyOn(TitleScene.prototype, 'dispose');
+    const { ctx, frame, handlers, system } = setup();
+    const r = fakeRenderer();
+    frame();
+    ctx.titleScene.present(r as never);
+    const initialListeners = handlers.length;
+    for (let i = 0; i < 5; i++) {
+      const before = ctx.titleScene.drawCount;
+      ctx.app.state = 'dive';
+      frame();
+      ctx.titleScene.present(r as never);
+      expect(ctx.titleScene.ownsCanvas).toBe(false);
+      expect(ctx.titleScene.drawCount).toBe(before);
+      ctx.app.state = 'home';
+      handlers[0]!({ state: 'home' });
+      frame();
+      ctx.titleScene.present(r as never);
+      expect(ctx.titleScene.drawCount).toBe(before + 1);
+      for (const modal of [
+        ctx.settingsScreen,
+        ctx.discovery.guide,
+        ctx.upgrades,
+        ctx.controlsCard,
+      ]) {
+        (modal as { isOpen: boolean }).isOpen = true;
+        frame();
+        const paused = ctx.titleScene.drawCount;
+        ctx.titleScene.present(r as never);
+        expect(ctx.titleScene.drawCount).toBe(paused);
+        (modal as { isOpen: boolean }).isOpen = false;
+        frame();
+        ctx.titleScene.present(r as never);
+        expect(ctx.titleScene.drawCount).toBe(paused + 1);
+      }
+    }
+    await vi.runAllTimersAsync();
+    expect(ctx.loader.load).toHaveBeenCalledTimes(1);
+    expect(resize).toHaveBeenCalledTimes(1);
+    expect(handlers).toHaveLength(initialListeners);
+    expect(dispose).not.toHaveBeenCalled();
+    system.dispose!();
+    expect(dispose).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([false, true])(
+    'presents to the canvas and restores gameplay state (throw=%s)',
+    (throws) => {
+      const { ctx, frame, system, handlers } = setup({ state: 'dive' });
+      const r = fakeRenderer();
+      const target = new THREE.WebGLRenderTarget(32, 32);
+      r.setRenderTarget(target);
+      r.toneMappingExposure = 0.25;
+      r.setViewport(3, 4, 500, 400);
+      r.setScissor(5, 6, 300, 200);
+      r.setScissorTest(true);
+      r.clear.mockImplementation(() => {
+        expect(r.getRenderTarget()).toBeNull();
+        expect(r.getScissorTest()).toBe(false);
+      });
+      r.render.mockImplementation(() => {
+        expect(r.getRenderTarget()).toBeNull();
+        expect(r.toneMappingExposure).toBe(1);
+        if (throws) throw new Error('draw failed');
+      });
+      ctx.app.state = 'home';
+      handlers[0]!({ state: 'home' });
+      frame();
+      if (throws) expect(() => ctx.titleScene.present(r as never)).toThrow('draw failed');
+      else ctx.titleScene.present(r as never);
+      expect(r.getRenderTarget()).toBe(target);
+      expect(r.getCurrentViewport(new THREE.Vector4()).toArray()).toEqual(
+        target.viewport.toArray(),
+      );
+      expect(r.toneMappingExposure).toBe(0.25);
+      expect(r.getClearColor(new THREE.Color()).getHex()).toBe(0x123456);
+      expect(r.getClearAlpha()).toBe(0.5);
+      expect(r.getViewport(new THREE.Vector4()).toArray()).toEqual([3, 4, 500, 400]);
+      expect(r.getScissor(new THREE.Vector4()).toArray()).toEqual([5, 6, 300, 200]);
+      expect(r.getScissorTest()).toBe(true);
+      system.dispose!();
+      target.dispose();
+    },
+  );
+  it('closes the CSS-hidden selector globe and reopens it when visible', () => {
+    const { ctx, frame, system } = setup();
+    const rects = vi.fn(() => [] as unknown[]);
+    (ctx.home as unknown as { globeSlot: unknown }).globeSlot = { getClientRects: rects } as never;
+    ctx.homeGlobe = { open: vi.fn(), close: vi.fn() } as never;
+    (ctx.home as { sitesOpen: boolean }).sitesOpen = true;
+    frame();
+    expect(ctx.homeGlobe.close).toHaveBeenCalledOnce();
+    expect(ctx.homeGlobe.open).not.toHaveBeenCalled();
+    rects.mockReturnValue([{}]);
+    frame();
+    expect(ctx.homeGlobe.open).toHaveBeenCalledWith('api');
+    (document as { hidden: boolean }).hidden = true;
+    frame();
+    expect(ctx.homeGlobe.close).toHaveBeenCalledTimes(2);
+    system.dispose!();
+  });
+  it('hands drawing back to gameplay on re-entry after quit-to-home', () => {
+    const { ctx, frame, handlers, system } = setup({ state: 'dive' });
+    const r = fakeRenderer();
+    const gameplayScene = new THREE.Scene();
+    Object.assign(ctx, {
+      renderer: r,
+      scene: gameplayScene,
+      atmoTier: { post: false },
+      renderStats: { calls: 0, triangles: 0 },
+    });
+    const draw = () => {
+      frame();
+      renderSystem.frame!['render.draw']!({ atmo: { gradeGain: 0.25 } } as FrameState, ctx);
+    };
+    draw();
+    expect(r.render.mock.calls[0]![0]).toBe(gameplayScene);
+    ctx.app.state = 'home';
+    handlers[0]!({ state: 'home' });
+    draw();
+    expect(r.render.mock.calls.at(-1)![0]).not.toBe(gameplayScene);
+    expect(ctx.titleScene.drawCount).toBe(1);
+    expect(r.toneMappingExposure).toBe(0.25);
+    ctx.app.state = 'dive';
+    draw();
+    expect(r.render.mock.calls.at(-1)![0]).toBe(gameplayScene);
+    expect(ctx.titleScene.drawCount).toBe(1);
+    system.dispose!();
   });
 });

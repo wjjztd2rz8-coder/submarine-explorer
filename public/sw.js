@@ -6,6 +6,7 @@
  *
  * - index.html / navigations: network first, installed shell as offline fallback.
  * - Precached shell (hashed JS and CSS, icons, manifest): cache first.
+ * - Optional title fonts/marks and Monterey tile: best-effort install caching.
  * - Tiles (`data/tiles/<id>/...`): cache first in a cache that survives deploys
  *   (a tile id is immutable). `data/tiles/index.json` is stale-while-revalidate.
  * - Other same-origin assets (models, textures, decoders): cache first, in a
@@ -26,6 +27,20 @@ const SHELL = `${PREFIX}shell-${VERSION}`;
 const ASSETS = `${PREFIX}assets-${VERSION}`;
 const TILES = 'subexp-tiles-v1';
 
+// These decorative assets must work offline without making a blocked font or
+// optional terrain request prevent installation of the usable app shell.
+const TITLE_ASSETS = [
+  'fonts/dm-sans-latin-400-normal.woff2',
+  'fonts/dm-sans-latin-600-normal.woff2',
+  'fonts/source-serif-4-latin-600-normal.woff2',
+  'bathyline-mark.svg',
+  'bathyline-mark-small.svg',
+];
+const TITLE_TILES = [
+  'data/tiles/monterey-canyon/meta.json',
+  'data/tiles/monterey-canyon/heightmap.bin',
+];
+
 self.addEventListener('install', (event) => {
   if (!ACTIVE) return;
   event.waitUntil(
@@ -36,6 +51,16 @@ self.addEventListener('install', (event) => {
       await Promise.all(
         PRECACHE.map((path) => cache.add(new Request(new URL(path, scope), { cache: 'reload' }))),
       );
+      const tiles = await caches.open(TILES);
+      await Promise.allSettled([
+        ...TITLE_ASSETS.map((path) =>
+          cache.add(new Request(new URL(path, scope), { cache: 'reload' })),
+        ),
+        ...TITLE_TILES.map(async (path) => {
+          const request = new Request(new URL(path, scope), { cache: 'reload' });
+          if (!(await tiles.match(request))) await tiles.add(request);
+        }),
+      ]);
       await self.skipWaiting();
     })(),
   );
@@ -123,7 +148,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(staleWhileRevalidate(request, TILES, event));
   } else if (rel.startsWith('data/tiles/')) {
     event.respondWith(cacheFirst(request, TILES));
-  } else if (PRECACHE.includes(rel)) {
+  } else if (PRECACHE.includes(rel) || TITLE_ASSETS.includes(rel)) {
     event.respondWith(cacheFirst(request, SHELL));
   } else if (!rel.endsWith('.map')) {
     event.respondWith(cacheFirst(request, ASSETS));
