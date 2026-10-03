@@ -222,3 +222,76 @@
     bottom: calc(360px + env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* Portrait phones keep a compact map on the left and one stack on the right.
+   Resize the displayed canvas instead of zooming the panel: sonar's range
+   buttons keep their 44 px touch targets. The objectives observer continues
+   to place readouts below the actual objective panel height. */
+@media (orientation: portrait) and (max-width: 700px) {
+  html.is-touch {
+    --hl-portrait-map-width: clamp(136px, 40vw, 176px);
+    --hl-portrait-stack-left: calc(
+      24px + var(--hl-portrait-map-width) + env(safe-area-inset-left, 0px)
+    );
+    --hl-portrait-stack-top: calc(
+      24px + max(48px, calc(50px * var(--ui-scale))) + env(safe-area-inset-top, 0px)
+    );
+  }
+  html.is-touch .sonar:not(.d-sonar-expanded) {
+    left: calc(12px + env(safe-area-inset-left, 0px));
+    width: var(--hl-portrait-map-width);
+    box-sizing: border-box;
+  }
+  html.is-touch .sonar:not(.d-sonar-expanded) canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+  html.is-touch .sonar .d-sonar-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  html.is-touch .sonar .d2-sonar-controls {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+  }
+  html.is-touch .sonar .d2-sonar-controls button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  html.is-touch .sonar .d-sonar-range {
+    align-self: center;
+    white-space: normal;
+    text-align: center;
+    font-size: 10px;
+  }
+  html.is-touch .sonar .d-sonar-legend {
+    white-space: normal;
+  }
+  html.is-touch .hud-readouts,
+  html.is-touch .objectives-panel {
+    left: var(--hl-portrait-stack-left);
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    top: var(--hl-portrait-stack-top);
+    width: auto;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 7px 8px;
+  }
+  html.is-touch .hud-readouts .hud-row {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  html.is-touch .objectives-panel .obj-item:not(.is-current),
+  html.is-touch .objectives-panel .obj-more,
+  html.is-touch .objectives-panel .obj-hint {
+    display: none;
+  }
+  html.is-touch .objectives-panel .obj-item-title {
+    white-space: normal;
+  }
+  html.is-touch .tc-btn-pause {
+    left: auto;
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    top: calc(12px + env(safe-area-inset-top, 0px));
+  }
+}

@@ -222,6 +222,13 @@
 @media (orientation: portrait) {
   .tc-root {
     --tc-edge: calc(14 * var(--tc-s));
+    /* Two button columns, slider, stick and their gaps use 336 scale units.
+       Leave 8 px between the stick and buttons when an enlarged UI hits the
+       available width; the individual controls still keep their size floors. */
+    --tc-s: min(
+      calc(var(--ui-scale, 1) * 1px),
+      calc((100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 8px) / 336)
+    );
   }
   .tc-stick {
     width: max(104px, calc(118 * var(--tc-s)));
@@ -230,9 +237,21 @@
     height: min(26vh, max(140px, calc(160 * var(--tc-s))));
   }
   .tc-buttons {
-    grid-template-columns: repeat(3, max(48px, calc(52 * var(--tc-s))));
+    grid-template-columns: repeat(2, max(48px, calc(52 * var(--tc-s))));
     grid-auto-rows: max(48px, calc(52 * var(--tc-s)));
     gap: calc(8 * var(--tc-s));
+  }
+  .tc-btn-lights {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .tc-btn-boost {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .tc-btn-scan {
+    grid-column: 1 / span 2;
+    grid-row: 3;
   }
 }
 
