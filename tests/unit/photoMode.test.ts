@@ -25,7 +25,11 @@ afterEach(() => vi.unstubAllGlobals());
 it('offers visible Capture, Done and Pause actions while the viewfinder is active', () => {
   const body = new Element();
   vi.stubGlobal('document', { body, createElement: () => new Element() });
-  vi.stubGlobal('window', { clearTimeout: vi.fn() });
+  vi.stubGlobal('window', {
+    clearTimeout: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  });
   const capture = vi.fn();
   const pause = vi.fn();
   const mode = new PhotoMode(capture, () => mode.setActive(false), pause);
@@ -51,7 +55,11 @@ it('offers visible Capture, Done and Pause actions while the viewfinder is activ
 it('Done uses the photo system exit and Pause leaves photo mode for the pause menu', () => {
   const body = new Element();
   vi.stubGlobal('document', { body, createElement: () => new Element() });
-  vi.stubGlobal('window', { clearTimeout: vi.fn() });
+  vi.stubGlobal('window', {
+    clearTimeout: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  });
   const bus = new EventBus();
   const exit = vi.fn();
   const pause = vi.fn((state: 'home' | 'dive' | 'pause') => bus.emit('app:state', { state }));

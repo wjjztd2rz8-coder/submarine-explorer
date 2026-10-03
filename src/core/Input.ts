@@ -515,8 +515,17 @@ export class Input {
       // lose its default behavior (Space activates a focused button on keyup).
       if (
         t?.closest('button, a[href], select') &&
-        ['Enter', 'NumpadEnter', 'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)
-      ) return;
+        [
+          'Enter',
+          'NumpadEnter',
+          'Space',
+          'ArrowUp',
+          'ArrowDown',
+          'ArrowLeft',
+          'ArrowRight',
+        ].includes(e.code)
+      )
+        return;
       if (e.repeat) return; // auto-repeat must not re-trigger edge actions
       this.keys.add(e.code);
       for (const action of this.actions) {

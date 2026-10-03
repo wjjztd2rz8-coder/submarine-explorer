@@ -28,6 +28,11 @@ function onKeyDown(e: KeyboardEvent): void {
   top.handleTab(e);
 }
 
+function asEl(x: unknown): HTMLElement | null {
+  if (typeof HTMLElement !== 'undefined') return x instanceof HTMLElement ? x : null;
+  return x && typeof (x as HTMLElement).blur === 'function' ? (x as HTMLElement) : null;
+}
+
 export class FocusTrap {
   private previous: HTMLElement | null = null;
   constructor(private readonly root: HTMLElement) {}
@@ -38,8 +43,7 @@ export class FocusTrap {
 
   activate(): void {
     if (typeof document === 'undefined') return;
-    if (!this.active)
-      this.previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (!this.active) this.previous = asEl(document.activeElement);
     const i = stack.indexOf(this);
     if (i >= 0) stack.splice(i, 1);
     stack.push(this);
@@ -49,7 +53,7 @@ export class FocusTrap {
       listening = true;
     }
     const a = document.activeElement;
-    if (a instanceof HTMLElement && a !== document.body && !this.root.contains(a)) a.blur();
+    if (asEl(a) && a !== document.body && !this.root.contains(a)) a.blur();
   }
 
   deactivate(): void {
@@ -59,7 +63,7 @@ export class FocusTrap {
     const wasTop = i === stack.length - 1;
     if (i >= 0) stack.splice(i, 1);
     const a = document.activeElement;
-    if (a instanceof HTMLElement && this.root.contains(a)) a.blur();
+    if (asEl(a) && this.root.contains(a)) a.blur();
     if (!stack.length && listening) {
       window.removeEventListener('keydown', onKeyDown, true);
       listening = false;
@@ -91,7 +95,7 @@ export class FocusTrap {
     const items = this.focusables();
     if (!items.length) return;
     const a = document.activeElement;
-    const i = a instanceof HTMLElement ? items.indexOf(a) : -1;
+    const i = asEl(a) ? items.indexOf(a) : -1;
     let next: number;
     if (i < 0) next = e.shiftKey ? items.length - 1 : 0;
     else next = (i + (e.shiftKey ? -1 : 1) + items.length) % items.length;
