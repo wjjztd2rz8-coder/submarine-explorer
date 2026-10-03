@@ -181,3 +181,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - CI on the previous main push failed in ~2 min (Pages deployed OK); the CI run for f51f7b6 was not checked; 230-f-ci-split covers CI.
 - Still open: fresh golden set (needs host), Lost City checker texture.
 - Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-03 headless run (started ~03:20)
+
+- Merged: F-LOSTCITY-4 (Sonnet: the "checker" on the seabed was gravel albedo aliasing at distance; a distance-based mip bias in terrain.frag.glsl removes it on High and Low; Lost City reviewed in screenshots). Worktree gates passed on the identical tree; main was not re-gated since the merge was fast-forward-equivalent (no other changes). Low tier ~0.7% darker in the lower screen; other sites not compared.
+- Codex 5h was 16% (resets 05:22), so nothing launched. Queued: 220-f-bughunt-8-touch-regress, 230-f-ci-split, 240-f-title-scene-brief, 250-f-bughunt-9-audio-mobile-regress.
+- Open: fresh golden set (needs host), Lost City far terrain may read bland now.
+- Still needs owner: brand name OK (Bathyline).
