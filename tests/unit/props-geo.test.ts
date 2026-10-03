@@ -10,7 +10,7 @@ import {
   isGeoFeature,
   type GeoFeatureId,
 } from '../../src/world/props/geo/index.js';
-import { makePlume } from '../../src/world/props/geo/plume.js';
+import { billowRadius, makePlume, smokePlume } from '../../src/world/props/geo/plume.js';
 import { hashString } from '../../src/world/props/geo/shared.js';
 import { parsePropsDoc, validatePropEntry, type PropDef } from '../../src/world/PropLoader.js';
 
@@ -141,6 +141,47 @@ describe('plumes', () => {
         seed: 1,
       }),
     ).toBeNull();
+  });
+});
+
+describe('smoke plume', () => {
+  it('billows: irregular outline, orifice shimmer, count follows the tier', () => {
+    const p = smokePlume(20, 0.5, 150, 7)!;
+    expect(p.geometry.getAttribute('aSeed').count).toBe(150);
+    const glint = p.getObjectByName('plume-orifice-shimmer') as THREE.Points;
+    expect(glint).toBeDefined();
+    expect(glint.geometry.getAttribute('aSeed').count).toBeGreaterThanOrEqual(4);
+    // Tier scaling: the phone tier gets fewer particles, the shimmer still builds.
+    const low = smokePlume(20, 0.5, Math.round(150 * 0.35), 7)!;
+    expect(low.geometry.getAttribute('aSeed').count).toBeLessThan(60);
+    // Seeds are spread (sprite size / swirl variety), not constant.
+    const seeds = p.geometry.getAttribute('aSeed').array as Float32Array;
+    for (let c = 1; c < 4; c++) {
+      let lo = 1,
+        hi = 0;
+      for (let i = 0; i < 150; i++) {
+        lo = Math.min(lo, seeds[i * 4 + c]!);
+        hi = Math.max(hi, seeds[i * 4 + c]!);
+      }
+      expect(hi - lo).toBeGreaterThan(0.7);
+    }
+    // No clean cone: at a fixed rise phase the radial spread varies a lot between particles.
+    const o = { baseRadius: 0.5, spread: 4 };
+    const r: number[] = [];
+    for (let i = 0; i < 150; i++)
+      r.push(billowRadius(o, [0, ...seeds.slice(i * 4 + 1, i * 4 + 4)], 0.7));
+    const mean = r.reduce((a, b) => a + b, 0) / r.length;
+    const sd = Math.sqrt(r.reduce((a, b) => a + (b - mean) ** 2, 0) / r.length);
+    expect(sd / mean).toBeGreaterThan(0.45);
+    // It widens with height on average.
+    const at = (t: number) =>
+      [...Array(150).keys()].reduce(
+        (a, i) => a + billowRadius(o, [0, ...seeds.slice(i * 4 + 1, i * 4 + 4)], t),
+        0,
+      );
+    expect(at(0.8)).toBeGreaterThan(at(0.2) * 2);
+    // Culling sphere covers the spread and drift.
+    expect(p.geometry.boundingSphere!.radius).toBeGreaterThan(20 + 4);
   });
 });
 
