@@ -877,13 +877,13 @@ function addWallLife(
     const z = pos.getZ(i) + nz * out;
     const tilt = -(0.9 + rnd() * 0.5); // lean out of the face
     if (rnd() < 0.5 && sponges.length < wantSponge) {
-      const s = 1.4 + rnd() * 1.8;
+      const s = 2 + rnd() * 2.4;
       sponges.push({
         t: { x, y: yy, z, ry: rnd() * 6.28, rx: tilt, sx: s, sy: s * (0.8 + rnd() * 0.6), sz: s },
         color: c.clone().setHSL(0.08 + rnd() * 0.07, 0.4, 0.58 + rnd() * 0.2),
       });
     } else if (fans[0]!.length + fans[1]!.length < wantFans) {
-      const s = 1.2 + rnd() * rnd() * 2.2;
+      const s = 1.8 + rnd() * rnd() * 2.6;
       fans[rnd() < 0.5 ? 0 : 1]!.push({
         t: { x, y: yy, z, ry: rnd() * 6.28, rx: tilt, sx: s, sy: s, sz: s },
         color: new THREE.Color(0xf0e8d8).lerp(new THREE.Color(0xf0a678), rnd() < 0.4 ? 0.5 : 0.1),
@@ -897,7 +897,7 @@ function addWallLife(
       roughness: 0.8,
       side: THREE.DoubleSide,
     });
-    vertexGlow(m, 0.1, 0x8fc0c6, 0.35);
+    vertexGlow(m, 0.2, 0x8fc0c6, 0.35);
     full.add(instanced(g, m, sponges, 'wall-sponges'));
   }
   const cm = new THREE.MeshStandardMaterial({
@@ -906,7 +906,7 @@ function addWallLife(
     roughness: 0.75,
     side: THREE.DoubleSide,
   });
-  vertexGlow(cm, 0.1, 0x8fc0c6, 0.35);
+  vertexGlow(cm, 0.2, 0x8fc0c6, 0.35);
   fans.forEach((items, k) => {
     if (items.length) {
       full.add(
