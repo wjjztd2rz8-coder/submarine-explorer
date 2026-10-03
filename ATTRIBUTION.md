@@ -55,9 +55,29 @@ in WebAudio; no third-party samples are used for them.
 
 ## Fonts
 
+- "DM Sans" — The DM Sans Project Authors, [upstream project](https://github.com/googlefonts/dm-fonts), distributed by [Fontsource 5.3.0](https://www.npmjs.com/package/@fontsource/dm-sans/v/5.3.0) — SIL Open Font License 1.1. Unmodified normal Latin-subset WOFF2 files: `public/fonts/dm-sans-latin-400-normal.woff2` and `public/fonts/dm-sans-latin-600-normal.woff2`. Copyright notice and full licence: `public/fonts/DM-Sans-OFL.txt`.
+- "Source Serif 4" — The Source Serif 4 Project Authors / Adobe, [upstream project](https://github.com/adobe-fonts/source-serif), distributed by [Fontsource 5.3.0](https://www.npmjs.com/package/@fontsource/source-serif-4/v/5.3.0) — SIL Open Font License 1.1. Unmodified normal Latin-subset 600 WOFF2: `public/fonts/source-serif-4-latin-600-normal.woff2`. Copyright notice and full licence from [Google Fonts](https://github.com/google/fonts/blob/main/ofl/sourceserif4/OFL.txt): `public/fonts/Source-Serif-4-OFL.txt`.
+
+These three self-hosted weights are declared in `src/styles/brand-fonts.css`
+with `font-display: swap`; the home layout package will import the stylesheet.
+The Latin subsets cover the English title/menu copy; broader localization needs
+additional subsets. Existing font credits below remain for the current UI.
+
 - "Space Mono" — designed by Colophon Foundry (Google Fonts) — SIL Open Font License 1.1
 - "Oxanium" — Google Fonts — SIL Open Font License 1.1
 - "Orbitron" — designed by Matt McInerney (Google Fonts) — SIL Open Font License 1.1
+
+## Bathyline identity
+
+- `public/bathyline-mark.svg` and `public/bathyline-mark-small.svg` — original
+  hand-authored circular viewport and depth-contour geometry, created for this
+  project (F-TITLE-A); project MIT licence. No external artwork or font outlines.
+  The small variant omits the inner contour for 16 px use.
+- `public/favicon.svg` — the original small mark on ocean navy `#06131F`.
+  `public/icons/icon-192.png`, `icon-512.png`, `icon-maskable-192.png`,
+  `icon-maskable-512.png` and `apple-touch-icon.png` are generated from the full
+  mark by `tools/make_icons.mjs` with opaque navy backgrounds; maskable artwork
+  stays inside the central safe circle. No third-party imagery.
 
 ## Vehicles
 
