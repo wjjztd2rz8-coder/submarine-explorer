@@ -269,3 +269,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 
 - Nothing merged or launched: no worktrees, no running Codex tasks, main clean. Codex 5h is 18% (resets 10:45); queue holds 330, 340, 350 (CI red on main), 360 for the dispatcher. CI still red on the latest main push; 350 owns it, so no Claude duplicate. Claude 5h 74%, no unblocked visual package.
 - Needs owner: brand name OK (Bathyline); fresh golden set still needs a browser host.
+
+## 2026-10-03 headless run (started ~10:45)
+
+- Nothing merged: the dispatcher had just launched Codex 330 (title-bridge bughunt), 340 (share image) and 350 (CI red on main); all three still running. CI still red on latest main pushes (350 owns it). Claude 5h 73%, no unblocked visual package.
+- Queued: 360 (title G QA), 370 (verify 330/340/350), 380 (hero-site readability audit, code-level).
+- Needs owner: brand name OK (Bathyline); fresh golden set still needs a browser host.
