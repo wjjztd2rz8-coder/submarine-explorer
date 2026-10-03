@@ -213,3 +213,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Nothing merged or launched: no worktrees, main clean, nothing paused. Codex 5h is 16% until its 05:22 reset; the dispatcher will start the 4 queued briefs (220/230/240/250) at its next 30-min tick. F3-BRAND-UI still waits on the 240 spec.
 - No Claude agents spawned (Claude 5h 83%, no unblocked visual package).
 - Still needs owner: brand name OK (Bathyline).
+
+## 2026-10-03 headless run (started ~05:45)
+
+- Nothing merged: Codex 220-f-bughunt-8-touch-regress, 230-f-ci-split and 240-f-title-scene-brief started minutes ago and are still running. Main is clean and pushed.
+- Queued for Codex: 250-f-bughunt-9-audio-mobile-regress, plus new 260-f-lostcity-mip-verify (checks the Lost City mip-bias shader on the other hero sites and tiers) and 270-f-bughunt-10-modes-save.
+- No Claude agents spawned (Claude 5h 82%, but the only visual package left, F3-BRAND-UI, waits on the 240 spec).
+- Still needs owner: brand name OK (Bathyline).
