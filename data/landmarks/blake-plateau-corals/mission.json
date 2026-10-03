@@ -36,24 +36,24 @@
       "type": "scan",
       "poi": "blake-mound-field-core",
       "primary": true,
-      "title": "Survey the dense coral mound cluster",
-      "hint": "The dense coral mound cluster is on the Blake Plateau seabed, in the mid-700 m depth range."
+      "title": "Survey the coral mound cluster",
+      "hint": "Find the raised mound cluster on the plateau, in the mid-700 m depths."
     },
     {
       "id": "coral-thicket",
       "type": "scan",
       "poi": "blake-coral-thicket",
       "primary": true,
-      "title": "Examine a living Desmophyllum pertusum thicket",
-      "hint": "A Desmophyllum pertusum thicket lies northeast of the mound cluster, near 770 m."
+      "title": "Scan the Desmophyllum pertusum thicket",
+      "hint": "Look northeast of the mound cluster for the coral thicket, near 770 m."
     },
     {
       "id": "second-mound",
       "type": "scan",
       "poi": "blake-second-mound",
       "primary": false,
-      "title": "Chart a neighbouring mound",
-      "hint": "A neighbouring mapped mound lies southwest of the main cluster, near 780 m."
+      "title": "Survey a neighbouring mound",
+      "hint": "Head southwest from the cluster to the next mound, near 780 m."
     },
     {
       "id": "inter-mound-channel",
@@ -61,7 +61,7 @@
       "poi": "blake-inter-mound-channel",
       "primary": false,
       "title": "Survey the channel between mounds",
-      "hint": "The lower channel between mapped mounds is just northwest of the main cluster, near 780 m."
+      "hint": "Look just northwest of the cluster for the lower channel, near 780 m."
     }
   ],
   "completion": "all_primary"

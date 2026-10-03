@@ -15,6 +15,7 @@ Checks:
   * mission.json: tile exists, spawn inside the bbox and above the seabed,
     briefing summary/facts/hazards, >= 2 primary objectives that reference
     existing POIs and have nonblank hints and substantive guide entries,
+    no "illustrative" or "reconstructed" caveats in objective titles or hints,
     `hull_class` A/B/C (read from
     src/core/Config.ts) whose crush depth clears the deepest POI, and
     `environment.preset` from the Phase C list
@@ -52,6 +53,7 @@ DEFAULT_HULLS = {"A": -1000, "B": -4500, "C": -11000}
 DEFAULT_CRUSH_WARN_RATIO = 0.9
 DEFAULT_DEPTH_TOLERANCE_M = 60.0
 REQUIRED_FILES = ("mission.json", "pois.json", "guide.json")
+OBJECTIVE_CAVEATS = re.compile(r"\b(?:illustrative|reconstructed)\b", re.IGNORECASE)
 
 
 def _is_num(v):
@@ -517,6 +519,11 @@ def check_mission(doc, report, landmark, poi_depths, tile, hulls, folder, tiles_
                 report.err(where, 'missing "title"')
             if not _nonempty_str(o.get("hint")):
                 report.err(where, '"hint" must be a nonblank string')
+            for key in ("title", "hint"):
+                text = o.get(key)
+                if isinstance(text, str) and OBJECTIVE_CAVEATS.search(text):
+                    report.err(where, '"%s" must not contain "illustrative" or "reconstructed"; '
+                               'use the Journal statement and Recreation tag' % key)
             if o.get("primary") is True:
                 primary += 1
             else:

@@ -46,16 +46,16 @@
       "type": "scan",
       "poi": "great-blue-hole-outer-dropoff",
       "primary": true,
-      "title": "Survey the eastern atoll drop-off",
-      "hint": "The eastern atoll drop-off lies east of the hole, where the seabed falls to about 200 m."
+      "title": "Survey the eastern atoll edge",
+      "hint": "Head east of the hole to the steep reef edge, around 200 m."
     },
     {
       "id": "western-dropoff",
       "type": "scan",
       "poi": "great-blue-hole-western-dropoff",
       "primary": true,
-      "title": "Survey the western atoll drop-off",
-      "hint": "The western atoll drop-off lies west of the hole, where the reef flat steepens toward 200 m."
+      "title": "Survey the western atoll edge",
+      "hint": "Head west of the hole to where the reef flat steepens toward 200 m."
     }
   ],
   "completion": "all_primary"

@@ -58,7 +58,7 @@ test('scanned contacts stay marked and cannot be rescanned until a new dive', as
       !(window.__game as { discovery: { overlay: { bannerActive: boolean } } }).discovery.overlay
         .bannerActive,
   );
-  await expect(page.locator('.scan-panel .scan-hint')).toHaveText('Already logged — see Journal');
+  await expect(page.locator('.scan-panel .scan-hint')).toHaveText('Logged · Journal');
   await screenshot(page, 'already-logged-prompt');
   await page.keyboard.down('g');
   await page.waitForTimeout(3600);

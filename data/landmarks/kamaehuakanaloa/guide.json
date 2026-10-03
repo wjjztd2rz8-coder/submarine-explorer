@@ -11,10 +11,22 @@
         "This tile covers the volcano's summit and upper south rift; it does not reach the volcano's base or the north rift."
       ],
       "facts": [
-        { "label": "Summit depth", "value": "~975-1,000 m" },
-        { "label": "Height above surrounding seafloor", "value": ">3,000 m (10,000 ft)" },
-        { "label": "North rift / south rift length", "value": "~7 mi / ~12 mi" },
-        { "label": "Projected time to breach the surface", "value": "~10,000-100,000 years" }
+        {
+          "label": "Summit depth",
+          "value": "~975-1,000 m"
+        },
+        {
+          "label": "Height above surrounding seafloor",
+          "value": ">3,000 m (10,000 ft)"
+        },
+        {
+          "label": "North rift / south rift length",
+          "value": "~7 mi / ~12 mi"
+        },
+        {
+          "label": "Projected time to breach the surface",
+          "value": "~10,000-100,000 years"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -41,8 +53,14 @@
         "In July 2021 the Hawai'i Board on Geographic Names voted unanimously to rename it Kama'ehuakanaloa. The new name is not invented for the occasion -- it comes from mele (chants) documented decades before Emery's 1954 survey, describing an undersea volcano by that name. As Ku'ulei Kanahele of the Edith Kanaka'ole Foundation put it, Kama'ehuakanaloa 'is a powerful name that invokes the name of Pelehonuamea and her birth out of Kanaloa [the ocean]' -- restoring Hawaiian cultural knowledge of the volcano that the 1955 descriptive name had left out entirely."
       ],
       "facts": [
-        { "label": "Renamed", "value": "July 2021, Hawai'i Board on Geographic Names (unanimous)" },
-        { "label": "Former name", "value": "Lo'ihi (\"long\"), given 1955" },
+        {
+          "label": "Renamed",
+          "value": "July 2021, Hawai'i Board on Geographic Names (unanimous)"
+        },
+        {
+          "label": "Former name",
+          "value": "Lo'ihi (\"long\"), given 1955"
+        },
         {
           "label": "Namer of the 1955 name",
           "value": "Kenneth O. Emery, with M.K. Pukui, M. Hohu and G.A. Macdonald"
@@ -74,9 +92,18 @@
           "label": "Collapse event",
           "value": "July-August 1996, largest Hawaiian earthquake swarm on record"
         },
-        { "label": "Pele's Pit diameter / depth", "value": "~600 m / ~300 m" },
-        { "label": "Crater wall height / thickness", "value": "~700 ft (210 m) / ~70 ft (21 m)" },
-        { "label": "Peak post-collapse fluid temperature (1997)", "value": ">200 degC" }
+        {
+          "label": "Pele's Pit diameter / depth",
+          "value": "~600 m / ~300 m"
+        },
+        {
+          "label": "Crater wall height / thickness",
+          "value": "~700 ft (210 m) / ~70 ft (21 m)"
+        },
+        {
+          "label": "Peak post-collapse fluid temperature (1997)",
+          "value": ">200 degC"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -96,14 +123,25 @@
       "title": "Pele's and Hiolo vents: iron, not sulfide",
       "paragraphs": [
         "Today's main hydrothermal sites sit inside Pele's Pit: Hiolo North, around 1,300 m deep, and Hiolo South, around 1,274 m deep and roughly 330 m away, both venting warm fluid diffusely rather than the fast, scalding jets of a black smoker. Measured fluid temperatures run about 20-50 degC, with Hiolo South's mean (~47 degC) running about 7 degC hotter than Hiolo North's.",
-        "Kama'ehuakanaloa's vent fluids are unusual: compared to typical mid-ocean-ridge vents they are low in sulfide and rich in CO2 and dissolved ferrous iron (Fe2+). That chemistry starves out the sulfide-oxidizing bacteria that build black-smoker chimneys elsewhere, and instead feeds mats of iron-oxidizing Zetaproteobacteria, which convert Fe2+ to insoluble, rust-colored ferric iron oxyhydroxide. Those mats can grow up to half a metre thick, draping over low mounds and any hard surface near a vent orifice -- at Hiolo North they form over small venting chimneys; at Hiolo South they form a distinctive 'cauliflower' texture around the active orifice.",
-        "The pillow-lava heap beside the chimneys is a game addition, based on the basalt pillows and iron-oxide mats of the summit vents."
+        "Kama'ehuakanaloa's vent fluids are unusual: compared to typical mid-ocean-ridge vents they are low in sulfide and rich in CO2 and dissolved ferrous iron (Fe2+). That chemistry starves out the sulfide-oxidizing bacteria that build black-smoker chimneys elsewhere, and instead feeds mats of iron-oxidizing Zetaproteobacteria, which convert Fe2+ to insoluble, rust-colored ferric iron oxyhydroxide. Those mats can grow up to half a metre thick, draping over low mounds and any hard surface near a vent orifice -- at Hiolo North they form over small venting chimneys; at Hiolo South they form a distinctive 'cauliflower' texture around the active orifice."
       ],
       "facts": [
-        { "label": "Hiolo North depth / temperature", "value": "~1,300 m / ~20-40 degC" },
-        { "label": "Hiolo South depth / temperature", "value": "~1,274 m / ~47 degC mean" },
-        { "label": "Iron mat thickness", "value": "up to ~0.5 m" },
-        { "label": "Dominant microbe", "value": "Zetaproteobacteria (iron-oxidizing)" }
+        {
+          "label": "Hiolo North depth / temperature",
+          "value": "~1,300 m / ~20-40 degC"
+        },
+        {
+          "label": "Hiolo South depth / temperature",
+          "value": "~1,274 m / ~47 degC mean"
+        },
+        {
+          "label": "Iron mat thickness",
+          "value": "up to ~0.5 m"
+        },
+        {
+          "label": "Dominant microbe",
+          "value": "Zetaproteobacteria (iron-oxidizing)"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -126,7 +164,10 @@
         "By contrast, the shorter north rift (~7 miles) is quieter: most of the seismicity, the freshest lava and essentially all of the documented hydrothermal activity concentrate on the south side, which is why this mission's rift objective heads south from the summit rather than north."
       ],
       "facts": [
-        { "label": "South rift length", "value": "~12 mi (published)" },
+        {
+          "label": "South rift length",
+          "value": "~12 mi (published)"
+        },
         {
           "label": "This tile's south-rift depth at 1.4 km / 3.4 km from summit",
           "value": "-1,281 m / -1,897 m"

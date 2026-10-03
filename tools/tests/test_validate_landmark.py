@@ -336,6 +336,23 @@ class ValidateLandmarkTests(unittest.TestCase):
     def test_valid_objective_hints(self):
         self.assertEqual(self.validate().errors, [])
 
+    def test_objective_titles_and_hints_reject_repeated_caveats(self):
+        for field in ("title", "hint"):
+            for word in ("illustrative", "reconstructed", "ILLUSTRATIVE", "Reconstructed"):
+                with self.subTest(field=field, word=word):
+                    rep = self.mutate("mission.json", lambda d: d["objectives"][0].update(
+                        {field: "Scan the (%s) chimney beside the main vent." % word}))
+                    self.assertError(rep, '"%s" must not contain' % field)
+
+    def test_objective_caveat_check_allows_metadata_and_other_words(self):
+        docs = good_content()
+        docs["mission.json"]["objectives"][0]["hint"] = (
+            "Follow the reconstruction-era survey route to the main vent.")
+        docs["pois.json"]["pois"][0]["note"] = "Illustrative position; reconstructed model."
+        docs["guide.json"]["entries"][1]["reconstruction"] = True
+        self.write(docs)
+        self.assertEqual(self.validate().errors, [])
+
     def test_environment_and_briefing(self):
         rep = self.mutate("mission.json", lambda d: d["environment"].update(preset="lava"))
         self.assertError(rep, '"preset" must be one of')

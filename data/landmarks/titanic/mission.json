@@ -42,16 +42,16 @@
       "type": "scan",
       "poi": "titanic-bow",
       "primary": true,
-      "title": "Locate and scan the bow section",
-      "hint": "The bow rests upright at the north end of Titanic's wreck area, around 3,790 m."
+      "title": "Scan the bow",
+      "hint": "Find the upright bow at the north end of the wreck area, around 3,790 m."
     },
     {
       "id": "find-stern",
       "type": "scan",
       "poi": "titanic-stern",
       "primary": true,
-      "title": "Locate and scan the stern section",
-      "hint": "The damaged stern lies roughly 700 m south of the bow, around 3,795 m."
+      "title": "Scan the stern",
+      "hint": "Head roughly 700 m south from the bow to the damaged stern, around 3,795 m."
     },
     {
       "id": "boilers",
@@ -59,15 +59,15 @@
       "poi": "titanic-boilers",
       "primary": false,
       "title": "Survey the boiler field",
-      "hint": "The boiler field is east of the stern in the debris area, around 3,795 m."
+      "hint": "Look east of the stern for the boilers in the debris, around 3,795 m."
     },
     {
       "id": "memorial",
       "type": "scan",
       "poi": "titanic-memorial",
       "primary": false,
-      "title": "Pause at the memorial plaque site on the stern",
-      "hint": "The memorial-plaque site is at the stern, south of the bow, near 3,790 m."
+      "title": "Visit the memorial plaque site",
+      "hint": "Find the former plaque site on the stern, south of the bow, near 3,790 m."
     }
   ],
   "completion": "all_primary"

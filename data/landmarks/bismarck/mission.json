@@ -37,24 +37,24 @@
       "type": "scan",
       "poi": "bismarck-hull",
       "primary": true,
-      "title": "Locate and scan the main hull",
-      "hint": "Bismarck's hull stands on the seamount's southeastern flank, around 4,210 m."
+      "title": "Scan the main hull",
+      "hint": "Find the upright hull on the seamount's southeastern flank, around 4,210 m."
     },
     {
       "id": "turrets",
       "type": "scan",
       "poi": "bismarck-turret-debris",
       "primary": true,
-      "title": "Survey the detached gun turrets up-slope",
-      "hint": "The detached gun turrets lie east of the hull on the seamount slope, around 4,120 m."
+      "title": "Survey the detached turrets",
+      "hint": "Head east and upslope from the hull to the turrets, around 4,120 m."
     },
     {
       "id": "damage",
       "type": "scan",
       "poi": "bismarck-damage",
       "primary": false,
-      "title": "Examine the battle-damage debated by historians",
-      "hint": "The battle-damage site is close to Bismarck's main hull, around 4,210 m."
+      "title": "Inspect the battle damage",
+      "hint": "Inspect the battle-damage marker near the main hull, around 4,210 m."
     }
   ],
   "completion": "all_primary"

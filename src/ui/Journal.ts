@@ -51,9 +51,9 @@ export interface FieldGuideContent {
 
 /** The statement the front page makes once, instead of per-entry caveats. */
 export const JOURNAL_HONESTY =
-  'The seabed in every dive is real survey data. Wrecks, structures and markers are ' +
-  'recreations placed from published sources; their entries carry a Recreation tag. ' +
-  'Species lists are OBIS occurrence records for each survey area.';
+  'Dives start with real survey data. Scenic landforms, wrecks, structures and scan markers ' +
+  'are recreations from published sources; their entries carry a Recreation tag. Animal encounters are staged; ' +
+  'species lists use OBIS survey records. Secrets are game additions.';
 
 type View =
   | { kind: 'front' }
@@ -133,7 +133,7 @@ export class Journal {
     this.spoilerBox = el('input');
     this.spoilerBox.type = 'checkbox';
     this.spoilerBox.addEventListener('change', () => this.setSpoilers(this.spoilerBox.checked));
-    spoiler.append(this.spoilerBox, el('span', undefined, 'Show undiscovered entries (spoilers)'));
+    spoiler.append(this.spoilerBox, el('span', undefined, 'Show spoilers'));
     const close = el('button', 'jr-close', 'ESC  CLOSE');
     close.type = 'button';
     close.addEventListener('click', () => this.close());
@@ -482,7 +482,7 @@ export class Journal {
             label === 'Secrets'
               ? `${hidden} secrets remain. Follow faint nearby sonar contacts.`
               : label === 'Wildlife'
-                ? `${hidden} animals not yet scanned. Hold the scan key on one during a dive.`
+                ? `${hidden} animals unscanned. Face one and hold Scan during a dive.`
                 : `${hidden} species not yet identified. Show spoilers to read the survey list.`,
           ),
         );
@@ -555,9 +555,7 @@ export class Journal {
       ),
     );
     if (!unlocked && !this.spoilers_) {
-      b.append(
-        el('p', 'jr-locked', 'Dive here and scan anything to open this page. Or show spoilers.'),
-      );
+      b.append(el('p', 'jr-locked', 'Scan a target here to open this page, or show spoilers.'));
       return;
     }
     if (site.summary) b.append(el('p', 'jr-para', site.summary));
@@ -591,10 +589,10 @@ export class Journal {
           'p',
           'jr-locked',
           entry.kind === 'life'
-            ? 'Find this animal during a dive and hold the scanner on it to log it. Or show spoilers.'
+            ? 'Face this animal and hold Scan to log it, or show spoilers.'
             : entry.kind === 'species'
-              ? 'Scan the place this species is recorded at to identify it. Or show spoilers.'
-              : 'Find this target during a dive and hold the scanner on it to log it. Or show spoilers.',
+              ? 'Scan its linked habitat to identify this species, or show spoilers.'
+              : 'Face this target and hold Scan to log it, or show spoilers.',
         ),
       );
       this.renderEntryPhotos(site, entry);

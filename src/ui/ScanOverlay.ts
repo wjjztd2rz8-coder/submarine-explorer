@@ -142,7 +142,7 @@ export class ScanOverlay {
         ? 'STOWED FOR THIS DIVE'
         : firstTime
           ? `PRESS ${keys.guide} · JOURNAL`
-          : `ALREADY LOGGED · SEE JOURNAL`,
+          : `LOGGED · JOURNAL`,
     );
     this.setRing(1, 'OK');
     this.panel.classList.add('is-complete');
@@ -204,7 +204,7 @@ export class ScanOverlay {
       this.setTone('dim');
       this.setText(this.kicker, 'kicker', '✓ SCANNED THIS DIVE');
       this.setText(this.nameEl, 'name', view.nearestName);
-      this.setText(this.hint, 'hint', 'Already logged — see Journal');
+      this.setText(this.hint, 'hint', 'Logged · Journal');
       this.setRing(1, '✓');
       return;
     }

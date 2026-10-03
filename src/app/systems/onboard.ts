@@ -252,7 +252,8 @@ export function createOnboardSystem(): GameSystem {
         const id = hints.update(f.elapsed, {
           battery: power.enabled ? power.battery : null,
           ratedRatio: f.sub.ratedRatio,
-          scanTargetInRange: ctx.discovery.scanner.view.candidateId !== null,
+          // The scan panel already gives the target name and hold-to-scan prompt.
+          scanTargetInRange: false,
           creatureInView: (ctx.life?.targets.length ?? 0) > 0,
           rovAvailable:
             device === 'keyboard' &&

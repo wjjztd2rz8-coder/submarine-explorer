@@ -42,16 +42,16 @@
       "type": "scan",
       "poi": "bvf-main-vents",
       "primary": true,
-      "title": "Scan the Beebe 1-5 black smokers",
-      "hint": "The Beebe 1–5 black-smoker complex is on the Mid-Cayman seafloor, close to 4,990 m."
+      "title": "Scan the Beebe 1–5 smokers",
+      "hint": "Find the black-smoker complex on the Mid-Cayman seafloor, near 4,990 m."
     },
     {
       "id": "shrimp",
       "type": "scan",
       "poi": "bvf-shrimp-swarm",
       "primary": true,
-      "title": "Survey the Rimicaris hybisae swarm",
-      "hint": "The Rimicaris hybisae swarm is beside the Beebe chimneys, around 4,980 m."
+      "title": "Scan the Rimicaris hybisae swarm",
+      "hint": "Look beside the Beebe chimneys for shrimp, around 4,980 m."
     },
     {
       "id": "western-mound",
@@ -59,7 +59,7 @@
       "poi": "bvf-sulfide-mound-west",
       "primary": false,
       "title": "Survey the western sulfide mound",
-      "hint": "The western sulfide mound is southwest of the main Beebe chimneys, near 4,960 m."
+      "hint": "Head southwest from the main chimneys to the mound, near 4,960 m."
     }
   ],
   "completion": "all_primary",

@@ -12,8 +12,14 @@
         "It is referenced by no scan target, so it is unlocked from the start."
       ],
       "facts": [
-        { "label": "Tile", "value": "titanic (GMRT, ~46 x 61 m cells)" },
-        { "label": "Seabed", "value": "about 3,800 m" }
+        {
+          "label": "Tile",
+          "value": "titanic (GMRT, ~46 x 61 m cells)"
+        },
+        {
+          "label": "Seabed",
+          "value": "about 3,800 m"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -29,13 +35,21 @@
       "title": "The bow section",
       "paragraphs": [
         "The forward part of the hull came to rest upright on the abyssal plain, about 3,800 m down, after the ship broke apart during the sinking.",
-        "The wreck was located on 1 September 1985 by a joint French-American expedition. The stern section lies roughly 600 m away.",
-        "What you see here is a placed model at the recorded position, not survey data: the bathymetry grid is far too coarse to resolve a 269 m hull."
+        "The wreck was located on 1 September 1985 by a joint French-American expedition. The stern section lies roughly 600 m away."
       ],
       "facts": [
-        { "label": "Depth", "value": "~3,800 m" },
-        { "label": "Found", "value": "1 September 1985" },
-        { "label": "Bow to stern", "value": "~600 m" }
+        {
+          "label": "Depth",
+          "value": "~3,800 m"
+        },
+        {
+          "label": "Found",
+          "value": "1 September 1985"
+        },
+        {
+          "label": "Bow to stern",
+          "value": "~600 m"
+        }
       ],
       "reconstruction": true,
       "sources": [
@@ -52,7 +66,12 @@
       "paragraphs": [
         "Fixture entry for a secondary scan target that snaps to the seabed. Unlocked by scanning the debris POI."
       ],
-      "facts": [{ "label": "Kind", "value": "debris" }],
+      "facts": [
+        {
+          "label": "Kind",
+          "value": "debris"
+        }
+      ],
       "reconstruction": false,
       "sources": [],
       "confidence": "medium"

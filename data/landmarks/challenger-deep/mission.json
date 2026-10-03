@@ -36,32 +36,32 @@
       "type": "scan",
       "poi": "cd-leggo-amphipod-site",
       "primary": true,
-      "title": "Scan the Leggo lander's amphipod bait site",
-      "hint": "The Leggo lander site is on the Eastern Pool floor, near 10,925 m."
+      "title": "Scan Leggo's amphipod bait site",
+      "hint": "Find the Leggo lander site on the Eastern Pool floor, near 10,925 m."
     },
     {
       "id": "north-wall",
       "type": "scan",
       "poi": "cd-north-wall",
       "primary": true,
-      "title": "Survey the steep north inner wall",
-      "hint": "The north inner wall rises northwest of the Leggo site, near 9,980 m."
+      "title": "Survey the north inner wall",
+      "hint": "Climb northwest from the Leggo site to the steep inner wall, near 9,980 m."
     },
     {
       "id": "central-basin",
       "type": "scan",
       "poi": "cd-central-basin",
       "primary": false,
-      "title": "Cross to the Central Pool, the trench's second basin",
-      "hint": "Follow the trench axis far west from the Eastern Pool to the Central Pool, near 10,930 m."
+      "title": "Cross to the Central Pool",
+      "hint": "Follow the trench axis far west to the Central Pool, near 10,930 m."
     },
     {
       "id": "axis-sill",
       "type": "scan",
       "poi": "cd-axis-sill",
       "primary": false,
-      "title": "Find the sill separating the Central and Eastern Pools",
-      "hint": "The higher sill along the trench axis lies west of the Eastern Pool, between it and the Central Pool, near 10,700 m."
+      "title": "Find the sill between pools",
+      "hint": "Look west along the axis for the sill between the pools, near 10,700 m."
     }
   ],
   "completion": "all_primary",

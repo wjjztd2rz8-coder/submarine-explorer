@@ -44,32 +44,32 @@
       "type": "scan",
       "poi": "lost-city-poseidon",
       "primary": true,
-      "title": "Locate and scan the Poseidon tower",
-      "hint": "Poseidon, the tallest carbonate tower, marks the Lost City field on the Atlantis Massif, around 775 m."
+      "title": "Scan Poseidon",
+      "hint": "Find the tallest white carbonate tower on the Atlantis Massif, around 775 m."
     },
     {
       "id": "beehive",
       "type": "scan",
       "poi": "lost-city-beehive",
       "primary": false,
-      "title": "Scan the Beehive chimney",
-      "hint": "The Beehive marker is northeast of Poseidon, near 760 m."
+      "title": "Scan Beehive",
+      "hint": "Look northeast of Poseidon for the Beehive marker, near 760 m."
     },
     {
       "id": "imax-tower",
       "type": "scan",
       "poi": "lost-city-imax-tower",
       "primary": true,
-      "title": "Scan the IMAX Tower",
-      "hint": "The IMAX marker is northwest of Poseidon, near 790 m."
+      "title": "Scan IMAX Tower",
+      "hint": "Look northwest of Poseidon for the IMAX marker, near 790 m."
     },
     {
       "id": "microbial-mat",
       "type": "scan",
       "poi": "lost-city-microbial-mat",
       "primary": false,
-      "title": "Scan a microbial biofilm site",
-      "hint": "A microbial biofilm site is beside Poseidon's carbonate chimneys, near 790 m."
+      "title": "Scan the microbial biofilm site",
+      "hint": "Look beside the carbonate chimneys for the biofilm marker, near 790 m."
     }
   ],
   "completion": "all_primary"

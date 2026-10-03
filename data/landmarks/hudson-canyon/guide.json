@@ -11,10 +11,22 @@
         "This tile covers the canyon's upper and middle reaches, from the shelf break out to about 1,683 m deep -- steep-walled terrain with rock outcrops, mixed sediments and strong local relief that NOAA and the Mid-Atlantic Fishery Management Council describe as an ecological hotspot for fish, corals and marine mammals, and one of the region's most important commercial and recreational fishing grounds."
       ],
       "facts": [
-        { "label": "Length (shelf break to deep sea)", "value": "~350 miles (~560 km)" },
-        { "label": "Width", "value": "up to 7.5 miles (~12 km)" },
-        { "label": "Deepest published extent", "value": "2-2.5 miles (~3,200-4,000 m)" },
-        { "label": "This tile's depth range", "value": "67.9-1,682.6 m" }
+        {
+          "label": "Length (shelf break to deep sea)",
+          "value": "~350 miles (~560 km)"
+        },
+        {
+          "label": "Width",
+          "value": "up to 7.5 miles (~12 km)"
+        },
+        {
+          "label": "Deepest published extent",
+          "value": "2-2.5 miles (~3,200-4,000 m)"
+        },
+        {
+          "label": "This tile's depth range",
+          "value": "67.9-1,682.6 m"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -46,7 +58,10 @@
           "label": "Designation status",
           "value": "proposed, not yet designated (process opened June 2022)"
         },
-        { "label": "Public comments received (2022 scoping)", "value": "17,000+" },
+        {
+          "label": "Public comments received (2022 scoping)",
+          "value": "17,000+"
+        },
         {
           "label": "Existing coral protection",
           "value": "Frank R. Lautenberg Deep Sea Coral Protection Area (~38,000 sq mi, bans bottom gear)"
@@ -81,10 +96,22 @@
         "This survey tile's shallowest sounded point, 67.9 m deep at its northwest corner, sits on the outer shelf approaching that transition; published sources place the canyon's actual head -- where the shelf valley funnels over the shelf break and the seafloor begins dropping steeply -- a little further north and east, just outside this tile, around 39.66-39.67 deg N, 72.47-72.48 deg W."
       ],
       "facts": [
-        { "label": "Shelf valley length", "value": "~150 km" },
-        { "label": "Valley head depth (near harbor mouth)", "value": "~30 m" },
-        { "label": "Valley depth near canyon head", "value": "~85 m" },
-        { "label": "This tile's shallowest sounding", "value": "67.9 m" }
+        {
+          "label": "Shelf valley length",
+          "value": "~150 km"
+        },
+        {
+          "label": "Valley head depth (near harbor mouth)",
+          "value": "~30 m"
+        },
+        {
+          "label": "Valley depth near canyon head",
+          "value": "~85 m"
+        },
+        {
+          "label": "This tile's shallowest sounding",
+          "value": "67.9 m"
+        }
       ],
       "reconstruction": false,
       "sources": [
@@ -104,11 +131,13 @@
       "title": "Steep walls, hard ground, deep-sea corals",
       "paragraphs": [
         "Unlike the soft, muddy plains of the open shelf, canyon walls like this one expose steep rock outcrops and mixed hard sediments, shaped by nutrient-rich currents that sweep along and up the canyon flanks. That combination -- hard substrate plus strong local flow -- is exactly what slow-growing, reef-forming deep-sea corals and sponges need to attach and filter-feed, and it is why NOAA and the Mid-Atlantic Fishery Management Council treat Mid-Atlantic canyon walls as biodiversity hotspots worth protecting from bottom-contact fishing gear.",
-        "No public dataset from recent Hudson Canyon survey cruises gives an exact, publishable coral-colony position for a specific scan point, so this marker stands in for that habitat type on a real, steep stretch of wall.",
-        "The coral mound on the coral ledge is a game addition, because no survey publishes individual colony positions."
+        "This scan marks coral habitat on a steep stretch of the canyon wall."
       ],
       "facts": [
-        { "label": "Wall slope (this survey's wall POI)", "value": "~18-19 deg" },
+        {
+          "label": "Wall slope (this survey's wall POI)",
+          "value": "~18-19 deg"
+        },
         {
           "label": "Habitat protection here",
           "value": "Frank R. Lautenberg Deep Sea Coral Protection Area"
@@ -135,10 +164,22 @@
         "That mismatch is simply a coverage limit, not a claim about the canyon's true depth: this tile was sized to capture the canyon's upper and middle reaches, where the shelf-to-slope transition and the steepest walls are, rather than its full run to the abyssal plain."
       ],
       "facts": [
-        { "label": "Wall depth", "value": "541.9 m" },
-        { "label": "Upper floor depth", "value": "1,220.1 m" },
-        { "label": "Deepest sounding in this tile", "value": "1,682.6 m" },
-        { "label": "Canyon's full published depth", "value": "~3,200-4,000 m (beyond this tile)" }
+        {
+          "label": "Wall depth",
+          "value": "541.9 m"
+        },
+        {
+          "label": "Upper floor depth",
+          "value": "1,220.1 m"
+        },
+        {
+          "label": "Deepest sounding in this tile",
+          "value": "1,682.6 m"
+        },
+        {
+          "label": "Canyon's full published depth",
+          "value": "~3,200-4,000 m (beyond this tile)"
+        }
       ],
       "reconstruction": false,
       "sources": [
