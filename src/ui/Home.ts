@@ -150,6 +150,12 @@ export class Home {
     this.dailyCard.onclick = launch;
   }
 
+  /** No downloaded site is accessible in the selected mode. */
+  clearDaily(): void {
+    this.dailyCard.hidden = true;
+    this.dailyCard.onclick = null;
+  }
+
   showSites(freeDive: boolean): void {
     this.sites.hidden = false;
     this.menu.hidden = true;

@@ -74,21 +74,112 @@ function fixture() {
     touchLook: vi.fn(),
     touchZoom: vi.fn(),
   };
+  const canvas = new TouchElement();
   const controls = new TouchControls({
     input: input as unknown as Input,
-    canvas: new TouchElement() as unknown as HTMLElement,
+    canvas: canvas as unknown as HTMLElement,
     sonar: { expanded: false, zoomWheel: vi.fn() },
     onPause: vi.fn(),
   });
   controls.update(true, false);
   const root = controls.root as unknown as TouchElement;
   const [stick, slider, buttons] = root.children;
-  return { controls, input, doc, win, stick, slider, scan: buttons.children[0] };
+  return { controls, input, doc, win, stick, slider, scan: buttons.children[0], canvas };
 }
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe('touch control interruptions', () => {
+  it.each(['blur', 'visibilitychange', 'resize', 'desktop', 'pause', 'photo'])(
+    'starts a fresh double-tap sequence after %s',
+    (interruption) => {
+      const f = fixture();
+      let now = 1000;
+      vi.spyOn(performance, 'now').mockImplementation(() => now);
+      const tap = () => {
+        for (const type of ['pointerdown', 'pointerup']) {
+          const event = new Event(type);
+          Object.assign(event, { pointerId: 9, pointerType: 'touch', clientX: 60, clientY: 60 });
+          Object.defineProperty(event, 'target', { value: f.canvas });
+          f.win.dispatchEvent(event);
+        }
+      };
+      try {
+        tap();
+        expect(f.input.touchEdge).not.toHaveBeenCalled();
+        if (interruption === 'visibilitychange') {
+          f.doc.hidden = true;
+          f.doc.dispatchEvent(new Event('visibilitychange'));
+          f.doc.hidden = false;
+          f.doc.dispatchEvent(new Event('visibilitychange'));
+        } else if (interruption === 'desktop') {
+          f.controls.setTouchMode(false);
+          f.controls.setTouchMode(true);
+        } else if (interruption === 'pause' || interruption === 'photo') {
+          f.controls.update(interruption !== 'pause', interruption === 'photo');
+          f.controls.update(true, false);
+        } else f.win.dispatchEvent(new Event(interruption));
+        now += 100;
+        tap();
+        expect(f.input.touchEdge).not.toHaveBeenCalled();
+        now += 100;
+        tap();
+        expect(f.input.touchEdge).toHaveBeenCalledExactlyOnceWith('resetCamera');
+      } finally {
+        f.controls.dispose();
+      }
+    },
+  );
+
+  it('removes global listeners and clears touch input on disposal before a reboot', () => {
+    const add = vi.spyOn(EventTarget.prototype, 'addEventListener');
+    const remove = vi.spyOn(EventTarget.prototype, 'removeEventListener');
+    const f = fixture();
+    const globalListeners = add.mock.calls.flatMap((args, i) =>
+      add.mock.contexts[i] === f.win || add.mock.contexts[i] === f.doc
+        ? [{ target: add.mock.contexts[i], args }]
+        : [],
+    );
+    f.controls.dispose();
+    expect(f.input.touchActive).toBe(false);
+    for (const { target, args } of globalListeners) {
+      expect(
+        remove.mock.calls.some(
+          (off, i) =>
+            remove.mock.contexts[i] === target &&
+            off[0] === args[0] &&
+            off[1] === args[1] &&
+            off[2] === args[2],
+        ),
+      ).toBe(true);
+    }
+    const next = new TouchControls({
+      input: f.input as unknown as Input,
+      canvas: f.canvas as unknown as HTMLElement,
+      sonar: { expanded: false, zoomWheel: vi.fn() },
+      onPause: vi.fn(),
+    });
+    try {
+      next.update(true, false);
+      const stick = (next.root as unknown as TouchElement).children[0];
+      pointer(stick, 'pointerdown', 4);
+      f.doc.dispatchEvent(new Event('visibilitychange'));
+      expect(f.input.touchAxes.throttle).toBeGreaterThan(0.8);
+      f.doc.hidden = true;
+      f.doc.dispatchEvent(new Event('visibilitychange'));
+      expect(f.input.touchAxes.throttle).toBe(0);
+      pointer(stick, 'pointermove', 4);
+      expect(f.input.touchAxes.throttle).toBe(0);
+      pointer(stick, 'pointerdown', 5);
+      expect(f.input.touchAxes.throttle).toBeGreaterThan(0.8);
+    } finally {
+      next.dispose();
+    }
+  });
+
   for (const interruption of ['blur', 'resize', 'visibilitychange']) {
     it(`releases axes and holds on ${interruption}, and accepts a new gesture`, () => {
       const f = fixture();

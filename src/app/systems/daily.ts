@@ -40,7 +40,11 @@ export function createDailySystem(): GameSystem {
             ctx.save.get().gameplayMode,
           ),
         );
-        if (!dive) return;
+        if (!dive) {
+          display = '';
+          ctx.home.clearDaily();
+          return;
+        }
         const site = ctx.missionSummaries.find((s) => s.id === dive.site)!;
         const best = ctx.progress.rating(dailyRatingKey(dive));
         const streak = dailyStreak(ctx.dailySave.get(), date);
