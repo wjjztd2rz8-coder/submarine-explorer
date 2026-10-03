@@ -37,6 +37,8 @@ function setup(hardwareTouch = false) {
   vi.stubGlobal('document', {
     body: new Element(),
     documentElement: root,
+    addEventListener: () => {},
+    removeEventListener: () => {},
     createElement: () => new Element(),
   });
   const win = Object.assign(new EventTarget(), {
