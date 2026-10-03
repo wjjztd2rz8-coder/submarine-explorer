@@ -56,7 +56,10 @@ export function createDailySystem(): GameSystem {
           const mode = modifier === 'strong-currents' ? 'exaggerated' : 'off';
           ctx.presets.setCurrentMode(mode);
           ctx.hud.setCurrentMode(mode);
-          if (modifier === 'low-light') ctx.headlights.setPreset(ctx.config.lightPresets.realistic);
+          if (modifier === 'low-light') {
+            ctx.headlights.setPreset(ctx.config.lightPresets.realistic);
+            ctx.rovVisual.setLightPreset(ctx.config.lightPresets.realistic);
+          }
         };
         enforce();
         cleanup.add(ctx.save.onChange(enforce));

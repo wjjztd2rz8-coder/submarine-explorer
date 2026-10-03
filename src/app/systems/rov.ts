@@ -15,9 +15,8 @@ import { RovHUD } from '../../ui/RovHUD.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
-const cleanup = new Disposables();
-
 export function createRovSystem(): GameSystem {
+  const cleanup = new Disposables();
   const rovCurrent = new THREE.Vector3();
   const cameraFromSub = new THREE.Vector3();
   const rovCameraAim = new THREE.Vector3();
@@ -29,16 +28,21 @@ export function createRovSystem(): GameSystem {
     name: 'rov',
     dispose: () => cleanup.dispose(),
     init(ctx) {
-      const { config, terrain, settings, save, hud, scene, rig, sub, headlights, bus } = ctx;
+      const { config, terrain, save, hud, scene, rig, sub, headlights, bus } = ctx;
       const rov = new Rov(config.rov, terrain);
       const rovVisual = new RovVisual(config.rov, ctx.tier);
-      rovVisual.setLightPreset(config.lightPresets[settings.gameplay.lights]);
+      const fitLights = (): void => {
+        const lights =
+          ctx.daily?.modifier === 'low-light' ? 'realistic' : save.get().gameplay.lights;
+        rovVisual.setLightPreset(config.lightPresets[lights]);
+      };
+      fitLights();
       cleanup.add(
-        save.onChange((next, changed) => {
-          if (changed.includes('gameplay'))
-            rovVisual.setLightPreset(config.lightPresets[next.gameplay.lights]);
+        save.onChange((_next, changed) => {
+          if (changed.includes('gameplay')) fitLights();
         }),
       );
+      cleanup.add(ctx.progress.onChange(fitLights));
       const rovHud = new RovHUD(hud.root.querySelector('.hud-readouts') as HTMLElement);
       scene.add(rovVisual.group);
       Object.assign(ctx, { rov, rovVisual, rovHud });

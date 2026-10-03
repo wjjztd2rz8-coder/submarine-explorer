@@ -151,3 +151,8 @@ crashes the game: settings and bindings then last for the session only.
   Realistic/Custom apply live and survive reload; v1 settings migrate to
   Arcade while keeping display choices), `tests/e2e/d-shell.spec.ts` (home
   and pause menu Settings/Controls entry points).
+
+Hull fitting and the loaded mission's access policy are fixed when a dive loads.
+Mode edits and hull research apply when the next dive loads (select a site again),
+including edits made on the briefing. Restarting or resuming the loaded dive keeps
+its fitted hull; speed, lights and other gameplay options still update live.
