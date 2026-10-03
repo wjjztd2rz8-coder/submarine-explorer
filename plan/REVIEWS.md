@@ -8,12 +8,12 @@ Dated director reviews, newest first. Comprehensive reviews run about daily, aft
 
 **Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5 each:**
 
-| Site            | Score       | Change | Biggest gap                                                                  |
-| --------------- | ----------- | ------ | ---------------------------------------------------------------------------- |
-| Titanic         | 4/4/4/4/5/4 | same   | Dense bright marine snow over the ship; far field near black (460 queued)    |
-| Beebe           | 4/4/4/4/5/4 | same   | Plumes still evenly spaced uniform columns; no lean/width variety            |
-| Great Blue Hole | 4/4/4/3/5/4 | same   | Spawn frame is mostly flat sand wall; grotto reads as a small dark mound     |
-| Lost City       | 4/3/4/3/5/3 | +1     | Tower now large and readable; slope is bare brown, corals look pasted on     |
+| Site            | Score       | Change | Biggest gap                                                                         |
+| --------------- | ----------- | ------ | ----------------------------------------------------------------------------------- |
+| Titanic         | 4/4/4/4/5/4 | same   | Dense bright marine snow over the ship; far field near black (460 queued)           |
+| Beebe           | 4/4/4/4/5/4 | same   | Plumes still evenly spaced uniform columns; no lean/width variety                   |
+| Great Blue Hole | 4/4/4/3/5/4 | same   | Spawn frame is mostly flat sand wall; grotto reads as a small dark mound            |
+| Lost City       | 4/3/4/3/5/3 | +1     | Tower now large and readable; slope is bare brown, corals look pasted on            |
 | Monterey Canyon | 4/3/4/3/5/3 | same   | Wall reads as a canyon but is a smooth green slab; pose 2 sits inside the hull ring |
 
 **Play flow:** unchanged. Persistent clutter: 5-line GMRT citation (450 hud footer queued) and the "Animal nearby" toast at top-left under the sonar. Audit queued as 510.

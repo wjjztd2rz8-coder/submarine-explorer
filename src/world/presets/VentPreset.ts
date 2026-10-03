@@ -54,12 +54,13 @@ export function ventVariety(top: THREE.Vector3): VentVariety {
   const r = mulberry(
     (Math.imul(Math.round(top.x * 7.3), 73856093) ^
       Math.imul(Math.round(top.z * 7.3), 19349663) ^
-      Math.imul(Math.round(top.y * 3.1), 83492791)) >>> 0,
+      Math.imul(Math.round(top.y * 3.1), 83492791)) >>>
+      0,
   );
   const a = r() * Math.PI * 2;
   const d = 0.9 + r() * 1.4;
   return {
-    height: 0.5 + r() * 0.65,
+    height: 0.7 + r() * 0.55,
     width: 0.55 + r() * 1.0,
     opacity: 0.55 + r() * 0.5,
     lean: 0.45 + r() * 1.2,
@@ -207,7 +208,7 @@ export class VentPreset implements EnvPreset {
         },
         uOpacity: { value: opacity },
         uDrift: { value: new THREE.Vector2() },
-        uWisp: { value: new THREE.Color(carbonate ? 0xe4ebe6 : 0xcfc8bf) },
+        uWisp: { value: new THREE.Color(carbonate ? 0xe4ebe6 : 0x8a847c) },
       },
       vertexShader: SMOKE_VERT,
       fragmentShader: PUFF_FRAG,
@@ -423,7 +424,7 @@ void main() {
   float dist = placePoint(w, size);
   // Lit by the headlights, plus the warm orifice glow for the first few metres.
   vColor = (wisp ? uWisp : uColor) * presetLight(w) + uGlow * exp(-h / 5.0);
-  vAlpha = uOpacity * (wisp ? 0.6 : aVar.z) * smoothstep(0.0, 0.04, t) * (1.0 - smoothstep(0.5, 1.0, t));
+  vAlpha = uOpacity * (wisp ? 0.4 : aVar.z) * smoothstep(0.0, 0.04, t) * (1.0 - smoothstep(0.5, 1.0, t));
   vFog = presetFog(dist);
   vSeed = aSeed.w + aSeed.y;
   vRot = aSeed.y + uTime * 0.12 * (aSeed.z - 0.6);
