@@ -132,6 +132,29 @@ function context(site: string, mode: GameplayMode): GameContext {
 }
 
 describe('fresh-player mission routing and vehicle loadout', () => {
+  it('loads and applies live cosmetic selections without refitting physics and removes its listener', () => {
+    const ctx = context('titanic', 'arcade');
+    ctx.progress.recordDailyStreak(3);
+    ctx.progress.selectCosmetic('paint', 'silver');
+    const submarine = createSubmarineSystem();
+    try {
+      submarine.init?.(ctx);
+      const vehicle = ctx.subMesh.vehicle;
+      const before = ctx.sub.getState();
+      expect(vehicle.materials.paintUniforms.uHullBase.value.getHex()).toBe(0xabbcc8);
+      ctx.progress.selectCosmetic('paint', 'stock');
+      expect(vehicle.materials.paintUniforms.uHullPaint.value).toBe(0);
+      expect(ctx.subMesh.vehicle).toBe(vehicle);
+      expect(ctx.sub.getState()).toEqual(before);
+      submarine.dispose?.();
+      ctx.progress.selectCosmetic('paint', 'silver');
+      expect(vehicle.materials.paintUniforms.uHullPaint.value).toBe(0);
+    } finally {
+      submarine.dispose?.();
+      ctx.subMesh?.dispose();
+    }
+  });
+
   it.each(['titanic', 'lost-city', 'great-blue-hole', 'beebe-vent-field', 'monterey-canyon'])(
     'fresh Arcade %s fits a hull that reaches every placed mission contact',
     (site) => {

@@ -1,6 +1,15 @@
 import type { GameConfig, GameplayOptions } from '../core/Config.js';
 import { PROGRESS_CONFIG, UPGRADES, type UpgradeId } from '../core/config/progress.js';
 import { ProgressSave, type GameplayMode, type ProgressRecord } from '../core/Save.js';
+import {
+  HULL_PAINTS,
+  LIGHT_TRIMS,
+  cosmeticUnlocked,
+  totalStars,
+  type CosmeticDef,
+  type CosmeticSelection,
+  type CosmeticSlot,
+} from './Cosmetics.js';
 
 export type AwardKind = keyof typeof PROGRESS_CONFIG.rewards;
 export interface DiveRating {
@@ -76,6 +85,29 @@ export class Progress {
   }
   rating(site: string): number {
     return Object.hasOwn(this.data.ratings, site) ? this.data.ratings[site] : 0;
+  }
+  get stars(): number {
+    return totalStars(this.data);
+  }
+  get cosmetics(): CosmeticSelection {
+    return { ...this.data.cosmetics };
+  }
+  ownsCosmetic(def: CosmeticDef): boolean {
+    return cosmeticUnlocked(def, this.data);
+  }
+  selectCosmetic(slot: CosmeticSlot, id: string): boolean {
+    const def = (slot === 'paint' ? HULL_PAINTS : LIGHT_TRIMS).find((item) => item.id === id);
+    if (this.save.readOnly || !def || !this.ownsCosmetic(def)) return false;
+    if (this.data.cosmetics[slot] === id) return true;
+    this.data.cosmetics = { ...this.data.cosmetics, [slot]: id };
+    this.persist();
+    return true;
+  }
+  recordDailyStreak(streak: number): void {
+    if (this.save.readOnly || !Number.isSafeInteger(streak) || streak <= this.data.dailyBestStreak)
+      return;
+    this.data.dailyBestStreak = streak;
+    this.persist();
   }
   level(id: UpgradeId): number {
     return Math.min(UPGRADES.find((u) => u.id === id)!.costs.length, this.data.upgrades[id] ?? 0);

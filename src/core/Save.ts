@@ -7,6 +7,7 @@ import type {
 } from './Config.js';
 import { DEFAULT_AUDIO } from './config/audio.js';
 import { PROGRESS_CONFIG, UPGRADES } from './config/progress.js';
+import { defaultCosmetics, sanitizeCosmetics, type CosmeticSelection } from '../game/Cosmetics.js';
 import type { EventBus } from './EventBus.js';
 
 export const SETTINGS_STORAGE_KEY = 'subexplorer.settings.v2';
@@ -359,6 +360,9 @@ export interface ProgressRecord {
   awarded: string[];
   upgrades: Record<string, number>;
   ratings: Record<string, number>;
+  cosmetics: CosmeticSelection;
+  /** Highest earned streak keeps cosmetic rewards after a missed day. */
+  dailyBestStreak: number;
 }
 export function migrateProgress(raw: unknown): ProgressRecord {
   const out: ProgressRecord = {
@@ -369,6 +373,8 @@ export function migrateProgress(raw: unknown): ProgressRecord {
     awarded: [],
     upgrades: {},
     ratings: {},
+    cosmetics: defaultCosmetics(),
+    dailyBestStreak: 0,
   };
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
   const o = raw as Record<string, unknown>;
@@ -376,6 +382,9 @@ export function migrateProgress(raw: unknown): ProgressRecord {
   const integer = (v: unknown): number =>
     typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0;
   out.legacyCredited = o.legacyCredited === true;
+  out.dailyBestStreak = Number.isSafeInteger(o.dailyBestStreak)
+    ? Math.max(0, Number(o.dailyBestStreak))
+    : 0;
   if (Array.isArray(o.legacyPending))
     out.legacyPending = [
       ...new Set(
@@ -432,6 +441,7 @@ export function migrateProgress(raw: unknown): ProgressRecord {
   const rawPoints = o.points ?? o.rp;
   if (typeof rawPoints !== 'number' || !Number.isFinite(rawPoints) || rawPoints < 0)
     out.points = Math.max(0, out.lifetime - spent);
+  out.cosmetics = sanitizeCosmetics(o.cosmetics, out);
   return out;
 }
 export class ProgressSave {

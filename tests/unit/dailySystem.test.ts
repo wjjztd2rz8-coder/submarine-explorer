@@ -300,3 +300,23 @@ it('awards one dated Daily primary reward and preserves ordinary mission rewards
     offPurchase();
   }
 });
+
+it('imports an existing earned Daily streak on startup without spending RP or losing it after reset', () => {
+  const { ctx, system, offPurchase } = setup();
+  try {
+    system.dispose?.();
+    for (const date of ['2026-09-29', '2026-09-30', '2026-10-01']) ctx.dailySave.complete(date);
+    const points = ctx.progress.points;
+    system.start?.(ctx);
+    expect(ctx.progress.selectCosmetic('paint', 'silver')).toBe(true);
+    expect(ctx.progress.selectCosmetic('trim', 'blue')).toBe(true);
+    expect(ctx.progress.points).toBe(points);
+    expect(ctx.progress.snapshot().dailyBestStreak).toBe(3);
+    ctx.dailySave.complete('2026-10-03');
+    ctx.progress.recordDailyStreak(ctx.dailySave.get().streak);
+    expect(ctx.progress.snapshot().dailyBestStreak).toBe(3);
+  } finally {
+    system.dispose?.();
+    offPurchase();
+  }
+});

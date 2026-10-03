@@ -1,5 +1,11 @@
 import { PROGRESS_CONFIG, UPGRADES } from '../core/config/progress.js';
 import type { Progress } from '../game/Progress.js';
+import {
+  HULL_PAINTS,
+  LIGHT_TRIMS,
+  cosmeticRequirement,
+  type CosmeticSlot,
+} from '../game/Cosmetics.js';
 import { FocusTrap } from './FocusTrap.js';
 import '../styles/upgrades.css';
 
@@ -49,6 +55,7 @@ export class Upgrades {
   };
   private render(): void {
     const focus = (document.activeElement as HTMLElement | null)?.dataset.upgrade;
+    const cosmeticFocus = (document.activeElement as HTMLElement | null)?.dataset.cosmetic;
     const scroll = this.panel.scrollTop;
     this.panel.replaceChildren();
     const head = document.createElement('header');
@@ -109,8 +116,56 @@ export class Upgrades {
       }
       tracks.append(section);
     }
-    this.panel.append(head, balance, hint, hulls, note, tracks);
+    const cosmetics = document.createElement('section');
+    cosmetics.className = 'upgrades-cosmetics';
+    const cosmeticTitle = document.createElement('h2');
+    cosmeticTitle.textContent = `Sub colours · ${this.progress.stars} total stars`;
+    const cosmeticHint = document.createElement('p');
+    cosmeticHint.className = 'upgrades-hint';
+    cosmeticHint.textContent =
+      'Appearance only. Hero sites: Titanic, Lost City, Great Blue Hole, Beebe vents and Monterey Canyon.';
+    cosmetics.append(cosmeticTitle, cosmeticHint);
+    for (const [slot, label] of [
+      ['paint', 'Hull paint'],
+      ['trim', 'Light trim'],
+    ] as const satisfies readonly (readonly [CosmeticSlot, string])[]) {
+      const group = document.createElement('fieldset');
+      const legend = document.createElement('legend');
+      legend.textContent = label;
+      const choices = document.createElement('div');
+      choices.className = 'cosmetic-choices';
+      for (const def of slot === 'paint' ? HULL_PAINTS : LIGHT_TRIMS) {
+        const owned = this.progress.ownsCosmetic(def);
+        const selected = this.progress.cosmetics[slot] === def.id;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.cosmetic = `${slot}:${def.id}`;
+        button.className = 'cosmetic-choice';
+        button.setAttribute('aria-pressed', String(selected));
+        button.disabled = !owned || this.progress.save.readOnly;
+        const swatch = document.createElement('span');
+        swatch.className = 'cosmetic-swatch';
+        swatch.style.backgroundColor = def.swatch;
+        swatch.setAttribute('aria-hidden', 'true');
+        const name = document.createElement('span');
+        name.textContent = def.name;
+        const status = document.createElement('small');
+        status.textContent = selected
+          ? 'Selected'
+          : owned
+            ? 'Available'
+            : `Locked · ${cosmeticRequirement(def)}`;
+        button.append(swatch, name, status);
+        button.onclick = () => this.progress.selectCosmetic(slot, def.id);
+        choices.append(button);
+      }
+      group.append(legend, choices);
+      cosmetics.append(group);
+    }
+    this.panel.append(head, balance, hint, hulls, note, cosmetics, tracks);
     if (focus) this.panel.querySelector<HTMLButtonElement>(`[data-upgrade="${focus}"]`)?.focus();
+    if (cosmeticFocus)
+      this.panel.querySelector<HTMLButtonElement>(`[data-cosmetic="${cosmeticFocus}"]`)?.focus();
     this.panel.scrollTop = scroll;
   }
   dispose(): void {
