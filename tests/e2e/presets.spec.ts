@@ -84,9 +84,18 @@ for (const { name, url, draws, source } of [
       if (m.type() === 'error') errors.push(m.text());
     });
     page.on('pageerror', (e) => errors.push(e.message));
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    // These cases exercise preset geometry/shaders. CI seeds low quality,
+    // which intentionally suppresses that geometry; select its required tier.
+    await page.goto(`${url}&tier=medium`, { waitUntil: 'domcontentloaded' });
     await waitForPreset(page);
-    await page.waitForTimeout(1000);
+    // Let the entered preset render before inspecting errors and taking the
+    // screenshot, regardless of how many wall seconds each frame costs.
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        ),
+    );
     const state = await page.evaluate(() => {
       const p = window.__game!.presets as {
         active: string;

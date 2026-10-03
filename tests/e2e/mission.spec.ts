@@ -320,16 +320,29 @@ test.describe('fix S: mission failure, framing and modals', () => {
     await boot(page, '/?mission=titanic&skipBriefing=1');
     expect((await missionProbe(page)).state).toBe('diving');
 
-    // QA-B #10: the mission clock counts real seconds, not capped physics time.
-    const t0 = await page.evaluate(
-      () => (window.__game as { mission: { elapsedS: number } }).mission.elapsedS,
+    // QA-B #10: the mission clock uses unfrozen frame time, independent of
+    // the eight-step physics cap. Time.tick clamps each frame to 250 ms;
+    // accumulate the same observed frame deltas instead of sleeping for two
+    // wall seconds, which can contain only a few frames on SwiftShader.
+    const clockAdvance = await page.evaluate(
+      () =>
+        new Promise<number>((resolve) => {
+          const mission = (window.__game as { mission: { elapsedS: number } }).mission;
+          let last: number | undefined;
+          let start = 0;
+          let frameTime = 0;
+          const sample = (now: number): void => {
+            if (last === undefined) start = mission.elapsedS;
+            else frameTime += Math.min(0.25, Math.max(0, (now - last) / 1000));
+            last = now;
+            if (frameTime >= 2) resolve(mission.elapsedS - start);
+            else requestAnimationFrame(sample);
+          };
+          requestAnimationFrame(sample);
+        }),
     );
-    await page.waitForTimeout(2000);
-    const t1 = await page.evaluate(
-      () => (window.__game as { mission: { elapsedS: number } }).mission.elapsedS,
-    );
-    expect(t1 - t0).toBeGreaterThan(1.6);
-    expect(t1 - t0).toBeLessThan(2.6);
+    expect(clockAdvance).toBeGreaterThan(1.6);
+    expect(clockAdvance).toBeLessThan(2.6);
 
     // The Titanic seabed (~3,980 m) is inside the Class B rating, so fit the
     // 1,000 m coastal hull and put the boat just below it in open water.
@@ -349,11 +362,17 @@ test.describe('fix S: mission failure, framing and modals', () => {
       g.sub.reset(0, g.sub.getCrushDepth() - 5, 0, 0);
     });
     const alert = page.locator('.objectives-panel .obj-alert');
-    await expect(alert).toBeVisible({ timeout: 5_000 });
+    await expect(alert).toBeVisible();
     await expect(alert).toHaveText('HULL FAILURE — EMERGENCY ASCENT');
 
     const debrief = page.locator('.mission-debrief');
-    await expect(debrief).toBeVisible({ timeout: 20_000 });
+    // The blow lock lasts five simulated seconds, which takes much longer
+    // on a software renderer. Wait for the router to observe its completion;
+    // keep the UI, event, hull-depth and frozen-state assertions below.
+    await expect
+      .poll(async () => (await missionProbe(page)).state, { timeout: 120_000 })
+      .toBe('debrief');
+    await expect(debrief).toBeVisible();
     await expect(alert).toBeHidden();
     await expect(debrief).toHaveClass(/is-aborted/);
     await expect(debrief.locator('.debrief-title')).toHaveText('Dive aborted');

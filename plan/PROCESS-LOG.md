@@ -2,6 +2,15 @@
 
 Changes to how the work is done (tooling, scheduling, agent use), with the reason and the evidence. The owner delegated this on 2026-10-01; the only hard constraint is the usage floors.
 
+- **2026-10-03 — F-CI-MAIN-RED**
+  - Cached hosted logs identify a preset-tier test mismatch and a mission
+    frame/ascent timing failure. Tests now choose the tier they exercise and
+    synchronize with observed frames and mission state. Existing CI scheduling,
+    retries, full discovery and gameplay stay unchanged.
+  - Full local gates were attempted; static checks pass, while both browser
+    gates cannot start a localhost preview in this sandbox. GitHub access and
+    Git metadata writes are denied. The eight-run audit and two consecutive
+    hosted green runs remain pending; see [the evidence report](progress/F-CI-MAIN-RED.md).
 - **2026-10-01 night**
   - **Usage endpoint:** the Claude usage endpoint returned 429 for hours, and two runs were skipped. ai-limits now caches readings, backs off after errors and falls back to rate-limit headers.
   - **Start gate:** the Claude start gate no longer depends on Codex budget (Codex at 4% had blocked runs while Claude was at 98%).
