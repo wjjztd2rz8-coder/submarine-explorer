@@ -30,6 +30,14 @@ def left(k):
     return 100 if w.get("resets_at") and w["resets_at"]<now else 100-w["used"]
 sys.exit(0 if left("five_hour")>=50 and left("seven_day")>=10 else 1)'
 }
+# Work state: main HEAD, worktrees, finished Codex results and the queue. If it
+# hasn't changed since the last run started (and that was < 3 h ago), a new run
+# would only re-read everything and log "nothing to do", so skip it cheaply.
+state=$( { git rev-parse HEAD; git worktree list; ls -l --time-style=+%s .cache/codex/*-result.md .cache/codex/queue/ 2>/dev/null; } | md5sum | cut -c1-12)
+if [[ "${1:-}" == "--headless" && -f .cache/resume-state && "$(cut -d' ' -f1 .cache/resume-state)" == "$state" ]] \
+   && (( $(date +%s) - $(stat -c %Y .cache/resume-state) < 10800 )); then
+  echo "no new work since last run; exiting"; exit 0
+fi
 if [[ "${1:-}" == "--headless" ]] && ! { ai-limits > .cache/resume-gate.txt 2>&1; claude_ok; }; then
   log_skip "budget gate ($(head -2 .cache/resume-gate.txt | tr '\n' ' '))"; exit 0
 fi
@@ -38,6 +46,7 @@ echo "== state =="; git log --oneline -3; git status --short | head -20
 PROMPT="$(cat plan/RESUME-PROMPT.md)"
 if [[ "${1:-}" == "--headless" ]]; then
   # stream-json logs every step as it happens, so tools/status.sh can show live progress.
+  echo "$state $(date +%F_%T)" > .cache/resume-state
   claude -p "$PROMPT" --permission-mode bypassPermissions --output-format stream-json --verbose > ".cache/resume-$(date +%Y%m%d-%H%M).log" 2>&1 &
   cpid=$!
   # Watch usage for the whole run; the watchdog kills the run before a floor.

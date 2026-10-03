@@ -2,28 +2,19 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (2026-10-01 night)
+## Current priorities (refreshed 2026-10-03 12:40; golden set 2026-10-03-172730)
 
-1. **Hero sites over breadth.** Polish five hero sites to postcard quality before adding more breadth: Titanic, Lost City, Great Blue Hole, Beebe vents and Monterey Canyon. The other sites may be trimmed later if they don't earn their place.
-2. **The first 60 seconds at each hero site:**
-   - Spawn close to the set piece at a readable altitude.
-   - Add ambient fill so the seabed within ~40 m is always readable (never black).
-   - Make set pieces bigger and more detailed.
-   - Keep framing and the sub visible.
-3. **Arcade has no depth gating.** In Arcade every site gets the hull it needs. Progression rewards upgrades, stars, cosmetics and secrets. Depth-locked hulls become a Realistic challenge. (A new player at Titanic currently sees black water at 1,000 m: unacceptable.)
-4. **Bottom-centre HUD collisions:** the tutorial card, scan panel and controls bar overlap each other and the sub. Re-lay them out (tutorial to a corner; the controls bar hides once learned).
-5. **Finish F2-MODES** (free dive, daily dive, simplified modes).
-6. **Rebrand** (name, logo, title scene) using docs/research/brand.md.
+Run `tools/golden.sh` at the start of any run that merged visual work (it builds, serves on 127.0.0.1 and captures; the earlier "needs a browser host" blocker was just a missing preview server or `localhost` resolving to ::1). Compare against the previous set.
 
-## Director notes
+The Claude visual backlog below always has unblocked work. If it runs dry, refill it from the newest golden set rather than idling (15 h of Claude capacity went unused on 2026-10-02/03 because this list had run out).
 
-- **2026-10-02 16:55** (golden set 2026-10-02-0704):
-  - **Titanic:** much better. The bow is in frame, the new sub reads well and the HUD no longer collides. Still murky: at 110 m the wreck is a dim rust shape with little detail. Push it toward a documentary still: open closer (~50–60 m) or brighten the far field, and make the rail/deck silhouette readable.
-  - **Lost City:** still fails "readable in 10 s". The tower is a dark silhouette on a black slope, and the seabed outside the headlight pool is invisible. Check that the later vent commits (4ed8c5f+) fixed this in a fresh golden set; if not, it's the top send-back.
-  - **Both:** the "Something to scan is in range" hint duplicates the scan-target panel; show one, not both.
-  - Capture a fresh golden set at the start of the next run and compare.
-
-- **2026-10-02 20:10** (reviewed F-TITANIC-2 shots): Titanic now opens broadside at 70 m chase with rails/portholes readable; sub covers a slice of the upper deck (acceptable). Blue Hole halocline haze and lighter walls work. Still open: golden-run comparison (Codex f-golden-run), Lost City fresh check, Blue Hole grotto prop size verified only by geometry.
+1. **Lost City close-up (cockpit view):** the tower surface is a blurry, stretched white smear at 15–30 m. It needs real carbonate texture: flanges, fluted columns, chalky white with tan staining, and triplanar UVs instead of stretched ones. The wide shot now reads well.
+2. **Great Blue Hole spawn:** a dark dome-shaped prop floats above the floor in the middle of the frame (the grotto/alcove?). Seat it or remove it. The hole walls read as a smooth tan ring and need ledges, stalactites and a darker blue fall-off with depth; the floor is a flat pale slab.
+3. **Beebe plumes:** still smooth grey cones. Make them billowing, turbulent black smoke that widens and drifts, with shimmer at the orifice. The chimney close-up is good (keep it).
+4. **Monterey:** the canyon wall is a dark, muddy ridge and the close view is almost empty. It needs readable strata and a lit wall face, some life (corals or sponges on the wall), and an opening that frames the canyon depth.
+5. **Titanic:** the closest to the vision. The cockpit shot of the bow (rails, portholes, life) is the reference quality for the other sites. The spawn view is still dim; lift the far field a little.
+6. **Rebrand rollout, once the owner OKs the "Bathyline" name:** replace the draft "P"-like mark in the share image with a proper logo.
+7. **Fewer, better sites:** after 1–5, decide which of the other 8 sites earn their place (review a golden-style capture of each) and trim or polish.
 
 ## Review rubric (every package, before merge)
 
@@ -43,3 +34,5 @@ If it fails, send it back to the same agent or Codex session with concrete feedb
 ## Needs owner
 
 (The newest items go first. Codex resets: assume the owner will use them, but list here when Codex is blocked.)
+
+- **2026-10-03:** OK the new name "Bathyline" (from docs/research/brand.md)? The title scene and share image already use it in draft.
