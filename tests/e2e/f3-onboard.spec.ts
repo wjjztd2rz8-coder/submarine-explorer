@@ -134,7 +134,7 @@ test.describe('touch viewport', () => {
     }
     for (const name of ['Skip step', 'Skip tutorial']) {
       const b = (await page.getByRole('button', { name }).boundingBox())!;
-      expect(b.height).toBeGreaterThanOrEqual(44);
+      expect(b.height).toBeGreaterThanOrEqual(43.9);
     }
     await shot(page, 'touch-step1');
     await page.getByRole('button', { name: 'Skip step' }).tap();

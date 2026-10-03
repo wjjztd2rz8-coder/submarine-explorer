@@ -131,3 +131,5 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Running (Codex): f-bughunt-3-fixes, f-bughunt-4, f-golden-run. Queued: 90-f-hint-dedupe, 100-f-a11y-audit, 110-f-journal-factcheck, 120-f-save-soak.
 - Note: the gates e2e takes >10 min with two in parallel; ran sequentially on main.
 - Still needs owner: brand name OK (Bathyline).
+- 2026-10-02 20:45 CDT headless run: skipped: budget gate (claude 5h 43.0% left (resets Fri Oct 02 21:39) | 7d 51.0% left (resets Thu Oct 08 06:59) codex 5h 27.0% left (resets Fri Oct 02 21:55) | 7d 89.0% left (resets Fri Oct 09 16:55) [as of 82 min ago] )
+- 2026-10-02 21:15 CDT headless run: skipped: budget gate (claude 5h 43.0% left (resets Fri Oct 02 21:39) | 7d 51.0% left (resets Thu Oct 08 06:59) codex 5h 2.0% left (resets Fri Oct 02 21:55) | 7d 85.0% left (resets Fri Oct 09 16:55) [as of 21 min ago] )
