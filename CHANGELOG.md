@@ -14,6 +14,14 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-TITANIC-2: Titanic's free dive now opens broadside to the bow with the
+  chase camera pulled in to 70 m (new optional `chaseRadius` on composed openings), so
+  the rails, portholes and plating read and the sub no longer hides the mid-hull; the
+  bed is one uniform pale ooze (no pale blotches on the low tier), ambient fill and rust
+  motes retuned. The Great Blue Hole gains a pale halocline haze at about 90 m inside the
+  hole (reef preset keys `haloclineDepthM`, `haloclineLat`, `haloclineLon`, ...) and
+  lighter hole walls; the low tier gets a single-layer haze so the interior is no longer
+  a black pit. Nothing is darker than before.
 - Phase F, F-HERO-BLUEHOLE: the Great Blue Hole free dive now opens over the hole
   itself. The sinkhole (about 320 m across, 125 m deep, a ledge near 40 m) is carved
   into the terrain at its reported position because the survey grid cannot resolve it
