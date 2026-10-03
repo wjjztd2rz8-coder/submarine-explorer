@@ -1,10 +1,22 @@
 #!/usr/bin/env bash
-# Run every project gate and print a compact summary. Exit 0 only if all pass.
-# Usage: tools/gates.sh [--no-e2e]      Logs: .cache/gates/<gate>.log
+# Run static gates and browser smoke checks. CI defaults to the full suite.
+# Usage: tools/gates.sh [--full-e2e | --no-e2e]   Logs: .cache/gates/<gate>.log
 # Builds use temporary outputs unless PW_OUTDIR names a retained output.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.local/node/bin:$PATH"
+e2e_mode=smoke
+[[ -z "${CI:-}" ]] || e2e_mode=full
+if (( $# > 1 )); then
+  echo 'Usage: tools/gates.sh [--full-e2e | --no-e2e]' >&2
+  exit 1
+fi
+case "${1:-}" in
+  '') ;;
+  --full-e2e) e2e_mode=full ;;
+  --no-e2e) e2e_mode=none ;;
+  *) echo 'Usage: tools/gates.sh [--full-e2e | --no-e2e]' >&2; exit 1 ;;
+esac
 mkdir -p .cache/gates
 port="${PW_PORT:-4173}"
 if ! [[ "$port" =~ ^[0-9]+$ ]] || (( 10#$port < 1 || 10#$port > 65435 )); then
@@ -38,11 +50,18 @@ gate python npm run test:py
 gate content npm run check:content
 gate attribution python3 tools/check_attribution.py
 gate prettier npx prettier --check .
-if [[ "${1:-}" != "--no-e2e" ]]; then
+if [[ "$e2e_mode" != none ]]; then
+  e2e_specs=()
+  if [[ "$e2e_mode" == smoke ]]; then
+    e2e_specs=(tests/e2e/smoke.spec.ts)
+    echo 'E2E mode: smoke + project-base (use --full-e2e for the full suite; CI runs all tests)'
+  else
+    echo 'E2E mode: full suite + project-base'
+  fi
   # Always let Playwright start/own its server; a port conflict fails early
   # instead of silently depending on another task's preview lifetime/build.
   gate e2e env PW_PORT="$port" PW_OUTDIR="$outdir" PW_REUSE_SERVER=0 \
-    npm run test:e2e -- --output="test-results-gates-$port-$$"
+    npm run test:e2e -- "${e2e_specs[@]}" --output="test-results-gates-$port-$$"
   project_base() {
     VITE_BASE=/submarine-explorer/ npm run build -- --outDir "$base_outdir" && \
       VITE_BASE=/submarine-explorer/ PW_BASE=/submarine-explorer/ PW_PORT="$bport" \

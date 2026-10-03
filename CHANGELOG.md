@@ -14,6 +14,11 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-CI-SPLIT: routine local gates schedule the existing browser smoke
+  spec and project-base check alongside every static gate, avoiding repeated
+  full browser sweeps during concurrent tasks. `--full-e2e` restores the full
+  local suite; CI defaults to full discovery and retains all 16 shards. No
+  existing tests, assertions, retries or per-test limits are removed or reduced.
 - Phase F, F-LOSTCITY-4: the seabed albedo no longer aliases into a regular
   houndstooth/checker on distant and grazing slopes (most visible at Lost City).
   `terrain.frag.glsl` applies a distance-driven mip bias (0 within 3 m, +3 mips
