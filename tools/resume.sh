@@ -33,8 +33,9 @@ sys.exit(0 if left("five_hour")>=50 and left("seven_day")>=10 else 1)'
 # Work state: main HEAD, worktrees, finished Codex results and the queue. If it
 # hasn't changed since the last run started (and that was < 3 h ago), a new run
 # would only re-read everything and log "nothing to do", so skip it cheaply.
+tools/review-triggers.sh > /dev/null 2>&1 || true
 state=$( { git rev-parse HEAD; git worktree list; ls -l --time-style=+%s .cache/codex/*-result.md .cache/codex/queue/ 2>/dev/null; } | md5sum | cut -c1-12)
-if [[ "${1:-}" == "--headless" && -f .cache/resume-state && "$(cut -d' ' -f1 .cache/resume-state)" == "$state" ]] \
+if [[ "${1:-}" == "--headless" && ! -f .cache/review-due && -f .cache/resume-state && "$(cut -d' ' -f1 .cache/resume-state)" == "$state" ]] \
    && (( $(date +%s) - $(stat -c %Y .cache/resume-state) < 10800 )); then
   echo "no new work since last run; exiting"; exit 0
 fi
@@ -44,6 +45,13 @@ fi
 echo "== state =="; git log --oneline -3; git status --short | head -20
 # The prompt distinguishes routine smoke feedback from full screenshot/release gates.
 PROMPT="$(cat plan/RESUME-PROMPT.md)"
+if [[ -f .cache/review-due ]]; then
+  PROMPT="THIS RUN IS A $(head -1 .cache/review-due | tr a-z A-Z) REVIEW. Triggers: $(tail -n +2 .cache/review-due | paste -sd';'). Follow plan/REVIEW-PROMPT.md first; do normal work afterwards only if budget remains.
+
+$(cat plan/REVIEW-PROMPT.md)
+
+$PROMPT"
+fi
 if [[ "${1:-}" == "--headless" ]]; then
   # stream-json logs every step as it happens, so tools/status.sh can show live progress.
   echo "$state $(date +%F_%T)" > .cache/resume-state

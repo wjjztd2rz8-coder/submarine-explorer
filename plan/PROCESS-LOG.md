@@ -27,3 +27,7 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
     - (a) DIRECTOR.md priorities had run dry, so runs saw "no unblocked visual package". The list is now refilled, with a rule to refill rather than idle.
     - (b) Golden shots looked blocked ("needs a browser host") but only lacked a preview server. Added `tools/golden.sh` (build + serve on 127.0.0.1 + capture).
   - **resume.sh** now skips a Claude run when the work state (HEAD, worktrees, Codex results, queue) is unchanged since the last run started, while still running at least every 3 h.
+- **2026-10-03 13:00 — review triggers.** Owner observation: their prompted review found far more than routine runs did. `tools/review-triggers.sh` runs every tick (cheap) and flags the next run as a review:
+  - **Comprehensive:** daily, after a release tag or after 8+ merges.
+  - **Targeted:** a dry backlog (3 empty runs), CI red ×3, Claude idle ≥ 2 h, an empty Codex queue ≥ 2 h, or a repeatedly failing gate.
+    The review steps are in `plan/REVIEW-PROMPT.md`; results go to `plan/REVIEWS.md` (pushed).

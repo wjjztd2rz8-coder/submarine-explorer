@@ -13,7 +13,7 @@ The Claude visual backlog below always has unblocked work. If it runs dry, refil
 3. **Beebe plumes:** still smooth grey cones. Make them billowing, turbulent black smoke that widens and drifts, with shimmer at the orifice. The chimney close-up is good (keep it).
 4. **Monterey:** the canyon wall is a dark, muddy ridge and the close view is almost empty. It needs readable strata and a lit wall face, some life (corals or sponges on the wall), and an opening that frames the canyon depth.
 5. **Titanic:** the closest to the vision. The cockpit shot of the bow (rails, portholes, life) is the reference quality for the other sites. The spawn view is still dim; lift the far field a little.
-6. **Rebrand rollout, once the owner OKs the "Bathyline" name:** replace the draft "P"-like mark in the share image with a proper logo.
+6. **Rebrand rollout: the owner approved "Bathyline" as the working name (2026-10-03).** Roll it out everywhere (title, README, manifest, meta) and replace the draft "P"-like mark in the share image with a proper logo.
 7. **Fewer, better sites:** after 1–5, decide which of the other 8 sites earn their place (review a golden-style capture of each) and trim or polish.
 
 ## Review rubric (every package, before merge)
@@ -35,4 +35,4 @@ If it fails, send it back to the same agent or Codex session with concrete feedb
 
 (The newest items go first. Codex resets: assume the owner will use them, but list here when Codex is blocked.)
 
-- **2026-10-03:** OK the new name "Bathyline" (from docs/research/brand.md)? The title scene and share image already use it in draft.
+(none)
