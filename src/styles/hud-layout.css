@@ -321,7 +321,7 @@
   html.is-touch .hud-footer {
     left: calc(12px + env(safe-area-inset-left, 0px));
     right: auto;
-    bottom: calc(188px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(160px + env(safe-area-inset-bottom, 0px));
   }
   html.is-touch .hud-attribution summary {
     min-height: 32px;
