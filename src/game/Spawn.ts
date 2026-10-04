@@ -130,14 +130,15 @@ const FREE_DIVE_OPENINGS: Record<
     altitude: 4,
     yawOffset: 10,
   },
-  // Over the hole's east side, facing the ledge alcove across the dark water.
+  // Inside the hole, facing the ledge alcove across the water: the wall, the light shafts
+  // and the fish above the ledge share the frame instead of a bare rim.
   'great-blue-hole': {
     hero: 'karst-grotto',
     bearing: 90,
-    range: 235,
+    range: 205,
     fromCentre: true,
-    // The ledge the grotto stands on is ~25 m down; open water at 30 m keeps the chase arm clear of the surface.
-    altitude: -6,
+    // ~14 m below the ledge the grotto stands on: the ledge, its shoals and the surface light all stay in view.
+    altitude: -17,
     openWater: true,
   },
   bismarck: { hero: 'main-hull', bearing: 50, range: 110 },
