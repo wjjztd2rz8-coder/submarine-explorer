@@ -91,6 +91,8 @@ const FREE_DIVE_OPENINGS: Record<
     chaseRadius?: number;
     /** Extra lateral chase offset, preserving the sub's authored approach heading. */
     chaseOffsetX?: number;
+    /** Extra vertical chase offset (m): a positive value tilts the opening view down. */
+    chaseOffsetY?: number;
   }
 > = {
   titanic: {
@@ -138,8 +140,9 @@ const FREE_DIVE_OPENINGS: Record<
     range: 205,
     fromCentre: true,
     // ~14 m below the ledge the grotto stands on: the ledge, its shoals and the surface light all stay in view.
-    altitude: -17,
+    altitude: -22,
     openWater: true,
+    chaseOffsetY: 22,
   },
   bismarck: { hero: 'main-hull', bearing: 50, range: 110 },
   'hunga-tonga-caldera': { hero: 'caldera-tuff-wall', bearing: 0, range: 100 },
@@ -230,7 +233,7 @@ export function composedFreeDiveSpawn(
     // Reserve a clear chase arm as well as a collision-free submarine pose.
     const yaw =
       Math.atan2(target.x - p.x, -(target.z - p.z)) + ((opening.yawOffset ?? 0) * Math.PI) / 180;
-    rig.setChaseRadiusDefault(opening.chaseRadius, opening.chaseOffsetX);
+    rig.setChaseRadiusDefault(opening.chaseRadius, opening.chaseOffsetX, opening.chaseOffsetY);
     rig.snap(p, yaw, 0);
     let cameraClear = true;
     for (let i = 1; i <= 6; i++) {
@@ -248,6 +251,7 @@ export function composedFreeDiveSpawn(
         yaw,
         chaseRadius: opening.chaseRadius,
         chaseOffsetX: opening.chaseOffsetX,
+        chaseOffsetY: opening.chaseOffsetY,
       };
     }
   }
