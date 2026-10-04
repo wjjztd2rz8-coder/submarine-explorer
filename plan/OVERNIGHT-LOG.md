@@ -395,6 +395,6 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 
 ## 2026-10-04 morning headless run (~01:45 CDT clock)
 
-- Merged Claude/Sonnet F-BLUEHOLE-PITCH (per-site opening pitch `chaseOffsetY`, Blue Hole spawn 22 m below ledge, west alcove close pose, Monterey fan palette). Shots clearly better (Blue Hole frame 1 now shows sub, shafts, ledge; alcove readable; Monterey pinks). Full-e2e on main in progress at time of writing; see push/tag below if present.
+- Merged Claude/Sonnet F-BLUEHOLE-PITCH (per-site opening pitch `chaseOffsetY`, Blue Hole spawn 22 m below ledge, west alcove close pose, Monterey fan palette). Shots clearly better (Blue Hole frame 1 now shows sub, shafts, ledge; alcove readable; Monterey pinks). Full-e2e + project-base green on main. Pushed, tagged f24.
 - Running: Codex 540, 550, 560. Queue: 570, 580, 590, 600. 530 still waits on 580.
 - Needs owner: nothing.
