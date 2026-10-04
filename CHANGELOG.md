@@ -14,6 +14,14 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BLUEHOLE-SPAWN: the Great Blue Hole Arcade opening now sits about 14 m below the
+  ledge inside the hole (was level with it, over a bare rim), 205 m from the west alcove, so
+  the banded wall, light shafts, the surface shoals and the alcove share the first frame.
+  The wall gets stronger limestone strata and more carbonate showing on slopes; the alcove
+  roofs are lighter and warmer instead of a dark silt-stained lid. Golden shots frame both
+  alcoves from the hole's interior (new `great-blue-hole-east` set). No cuts; real site
+  facts and prop positions are unchanged.
+
 - Phase F, F-MONTEREY-WALL: Monterey Canyon wall now reads as layered rock. The canyon
   preset gets stronger bed-by-bed tone (pale resistant beds against darker weak ones,
   with an ochre tint), thin laminae, a shadow line under each ledge, dark erosion-gully
