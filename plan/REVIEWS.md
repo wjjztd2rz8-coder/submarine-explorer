@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-04 comprehensive review (trigger: tag f23; golden set 2026-10-04-062459)
+
+**Changed since the last review (f22):** Blue Hole spawn now inside the hole with a banded wall and lighter alcoves (f23); Codex 510 (Journal/debrief fixes plus a 15-flow audit spec) and 520 (verification specs) merged. 530 still waits on Codex 580.
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5:**
+
+| Site            | Score       | Change | Biggest gap                                                                                                         |
+| --------------- | ----------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
+| Titanic         | 4/4/5/4/5/4 | same   | Snow flecks still blanket the hull and foreground (570); far field near-black                                       |
+| Beebe           | 4/4/4/4/5/4 | same   | Sub small in frame; flat dark seabed (560 running); plumes good                                                     |
+| Great Blue Hole | 4/4/4/3/5/4 | +0.25  | Sub now in the hole and the banded wall reads. Toast still in the left column (550), spawn pitch fixed by pose only |
+| Lost City       | 4/4/4/3/5/3 | same   | Beehive chimney is a smooth white slab, no life at the base (600)                                                   |
+| Monterey Canyon | 4/4/4/3/5/3 | same   | Wall bands and corals good; coral is flat white, a hex boulder reads fake                                           |
+
+**Play flow:** Not re-captured this run (budget: Claude weekly 20%). The 510 audit spec covers Home, site pick, first minute, Journal and debrief and is green on main. Known open items: the "Animal nearby" toast crowds the left column on the open-water sites, and Lost City/Monterey close shots are tight cockpit views with little context.
+
+**Process:** efficiency's ~23 h Claude idle and ~22 h Codex under-used are mostly stale: they were budget-gate skips (48 of 50 skips), and Codex now has 540/550/560 running with 570-600 queued. Claude weekly is 20%, so Claude packages are rationed to one per run. CI on the f23-era main push is the last failure (21 min); the run on the newest commit was still in progress at review time. No tooling change needed.
+
+**New priorities:** see DIRECTOR.md.
+
+**Needs owner:** nothing.
+
 ## 2026-10-04 comprehensive review (trigger: tag f22; golden set 2026-10-04-031944)
 
 **Changed since the last review (f20):** Monterey banded canyon wall and wall-life golden poses (f22), Codex 480/490/500 merged (rebrand verify, Lost City camera, CI hud-tips stability), vent haze config deduped.

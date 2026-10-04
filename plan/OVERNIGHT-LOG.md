@@ -388,3 +388,7 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Full-e2e + project-base green on final main. Pushed, tagged f23.
 - Codex 530 still unmerged (waits on queued 580). Queue: 540-600 (590 Blue Hole/Journal bughunt, 600 Lost City banding/corals added). DIRECTOR refreshed.
 - Needs owner: nothing.
+
+## 2026-10-04 morning review run (~06:30)
+
+- Comprehensive review for f23 recorded (Blue Hole +0.25); golden 2026-10-04-062459. DIRECTOR refreshed (6 Claude items); Codex queue 570-600 (4 briefs) with 540-560 running. No merges, no Claude package (weekly 20%, review only). Needs owner: nothing.

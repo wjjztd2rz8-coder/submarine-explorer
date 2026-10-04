@@ -2,21 +2,20 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-04 review for tag f22; golden set 2026-10-04-031944)
+## Current priorities (refreshed 2026-10-04 review for tag f23; golden set 2026-10-04-062459)
 
-Run `tools/golden.sh` at the start of any run that merged visual work. Compare against the previous set. If this list runs dry, refill it from the newest golden set rather than idling.
+Run `tools/golden.sh` at the start of any run that merged visual work. Compare against the previous set. If this list runs dry, refill it from the newest golden set rather than idling. Claude weekly budget is tight (~20%), so one Sonnet package per run.
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
-2. ~~510 and 520 merged (f23).~~ **530 (HUD footer/touch) is still unmerged and waits on Codex 580 (license link hit-test fix).**
-3. ~~Blue Hole spawn pose and east grotto~~ merged (f23: sub inside the hole, banded wall, lighter alcoves). Left: spawn pitch can't be set so frame 1 is still mostly wall; west alcove close shot is murky.
-4. **Lost City banding stronger and tower-base corals** (queued as Codex 600).
-5. **Titanic far-field lift:** lift the near-black far field and add a faint haze horizon (snow density is Codex 570).
-6. **Beebe sub scale:** sub reads small in shot 1; nearer default camera or vent framing (floor and chimney texture is Codex 560).
-7. **Blue Hole spawn pitch + west alcove** follow-up, then debrief/Journal polish from the 510 audit design questions (F-FLOW-AUDIT-510.md).
-8. **Debrief/Journal polish from audit 510** once it lands (dead ends, clutter).
-   Codex queue (all unblocked): 540, 550, 560, 570, 580, 590 (bughunt Blue Hole/Journal), 600 (Lost City). Merged through f23: 480-520. 450-triage holds only a spec.
-   Codex queue (all unblocked): 540 merge residue bughunt, 550 toast placement, 560 Beebe seabed lift, 570 Titanic snow density. Merged through f22: 480, 490, 500. Finished but unmerged: 510, 520, 530; 450-triage holds only a spec.
+1. **Titanic far-field lift and haze horizon:** far field is near-black; add a faint haze horizon (snow density is Codex 570, avoid its files).
+2. **Beebe sub scale:** sub reads small in shot 1; nearer default camera or vent framing (seabed texture is Codex 560).
+3. **Blue Hole spawn pitch and west alcove:** frame 1 is still mostly wall; west alcove close shot is murky.
+4. **Lost City and Monterey close shots:** the golden poses are tight cockpit views with little context; pull back poses so the sub or a landmark is in frame, and make the Monterey coral less flat white (Lost City banding is Codex 600).
+5. **Debrief/Journal polish** from the 510 audit design questions (F-FLOW-AUDIT-510.md): dead ends and clutter.
+6. **Merge 530 (HUD footer/touch)** once Codex 580 lands, and review its screenshots.
+
+Codex queue (all unblocked): 540, 550, 560 running; 570 (Titanic snow), 580 (530 fix), 590 (Blue Hole/Journal bughunt), 600 (Lost City). Merged through f23: 480-520. 450-triage holds only a spec.
 
 Demoted: further title polish; rebrand logo (done, Codex 440).
 
