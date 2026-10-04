@@ -14,11 +14,29 @@ const KEY = 'subexplorer.onboard.v1';
 
 const { defaultBrowserType: _p, ...phoneLandscape } = devices['iPhone 13 landscape'];
 
-type Probe = { onboard: { tutorial: { index: number; active: boolean } } };
+type Probe = {
+  onboard: { tutorial: { index: number; active: boolean } };
+  discovery: { loaded: boolean; spawnedAt: string | null };
+  scanner: { view: { candidateId: string | null } };
+};
 
 async function boot(page: Page, extra = ''): Promise<void> {
   await page.goto(url + extra, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
+  // The first rendered frame precedes async fixture loading and the ?poi=
+  // teleport. Save/restore only the actual scan approach, not the tile spawn.
+  await page.waitForFunction(
+    () => {
+      const g = window.__game as unknown as Probe;
+      return (
+        g.discovery.loaded &&
+        g.discovery.spawnedAt === 'test-bow' &&
+        g.scanner.view.candidateId === 'test-bow'
+      );
+    },
+    undefined,
+    { timeout: 45_000 },
+  );
 }
 async function shot(page: Page, name: string): Promise<void> {
   await mkdir(shots, { recursive: true });
@@ -240,6 +258,9 @@ test.describe('touch viewport', () => {
         ).sub.reset(p.x, p.y, p.z, p.yaw),
       start,
     );
+    await expect
+      .poll(() => page.evaluate(() => (window.__game as unknown as Probe).scanner.view.candidateId))
+      .toBe('test-bow');
     await hold('.tc-btn-scan', 0.5, 0.5);
     await expect.poll(() => stepIndex(page)).toBe(4);
     await release();

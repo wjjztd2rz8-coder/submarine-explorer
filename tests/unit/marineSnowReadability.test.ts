@@ -1,7 +1,17 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { afterAll, describe, expect, it } from 'vitest';
-import { AmbientLight, Color, FogExp2, MathUtils, Scene, ShaderMaterial, Vector3 } from 'three';
+import {
+  AmbientLight,
+  BufferAttribute,
+  Color,
+  FogExp2,
+  MathUtils,
+  PerspectiveCamera,
+  Scene,
+  ShaderMaterial,
+  Vector3,
+} from 'three';
 import { GRAPHICS_TIERS, makeConfig } from '../../src/core/Config.js';
 import type { WaterConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
@@ -34,14 +44,47 @@ afterAll(() => {
     writeFileSync('.cache/snow-audit-measurements.json', JSON.stringify(rows, null, 2) + '\n');
 });
 
-/** The old shader's ceilings, for before/after comparisons with identical seeds. */
-function legacy(config: WaterConfig): WaterConfig {
-  return {
+/** Exact pre-570 centre bounds, retaining 460's foreground guard. The old
+ * alpha has no distance fade; reconstruct it rather than inheriting the new one.
+ */
+function before570Appearance(
+  config: WaterConfig,
+  atmosphere: AtmosphereSample,
+  scale: number,
+  seed: number,
+  viewDepthM: number,
+  cameraDistanceM: number,
+  lit: number,
+  edge = 1,
+) {
+  const old = {
     ...config,
-    snowMaxSizePx: 18,
-    snowForegroundSizePx: 18,
-    snowForegroundAlpha: 1,
-    snowForegroundBrightness: 3.6,
+    snowSizeM: 0.14,
+    snowMaxSizePx: 6,
+    snowOpacity: 1,
+    snowLampGain: 2.6,
+  };
+  const appearance = snowParticleAppearance(
+    old,
+    atmosphere,
+    scale,
+    seed,
+    viewDepthM,
+    cameraDistanceM,
+    lit,
+    edge,
+  );
+  const fog = Math.exp(-(atmosphere.fogDensity ** 2) * viewDepthM ** 2);
+  const alpha =
+    edge * (seed <= atmosphere.snowDensity ? 1 : 0) * (0.55 + 0.45 * fog) * (0.5 + 0.5 * lit);
+  const foreground = MathUtils.smoothstep(
+    cameraDistanceM,
+    config.snowForegroundM,
+    config.snowForegroundFadeEndM,
+  );
+  return {
+    ...appearance,
+    alpha: Math.min(alpha, MathUtils.lerp(config.snowForegroundAlpha, 1, foreground)),
   };
 }
 
@@ -65,7 +108,6 @@ function projectedField(
   const scale = 720 / (2 * Math.tan((camera.fov * Math.PI) / 360));
   const light = makeConfig().lightPresets.enhanced;
   const lampCos = Math.cos((light.angleDeg * Math.PI) / 180);
-  const old = legacy(config);
   const world = new Vector3(),
     view = new Vector3(),
     ndc = new Vector3(),
@@ -111,7 +153,7 @@ function projectedField(
     const lit =
       MathUtils.smoothstep(aim, lampCos - 0.06, MathUtils.lerp(lampCos, 1, 0.45)) *
       (1 - MathUtils.smoothstep(lampDist, 0, Math.min(light.distance, 600)));
-    const prev = snowParticleAppearance(old, atmo, scale, seed, depth, radial, lit, edge);
+    const prev = before570Appearance(config, atmo, scale, seed, depth, radial, lit, edge);
     const next = snowParticleAppearance(config, atmo, scale, seed, depth, radial, lit, edge);
     visible++;
     maxBeforePx = Math.max(maxBeforePx, prev.sizePx);
@@ -133,14 +175,69 @@ function projectedField(
   };
 }
 
-describe('460 marine snow readability at all shipped sites and tiers', () => {
+describe('570 permanent marine snow distance and brightness', () => {
+  it('fades lens flecks and distant points radially while preserving smaller middle-distance cues', () => {
+    const config = makeConfig().water;
+    const atmo = sampleAtmosphere(config, -3800);
+    // Titanic's ambient fill saturates the permanent snow's brightness floor.
+    atmo.ambientIntensity = 30;
+    atmo.snowDensity = 1;
+    const appearance = (distance: number, depth = distance, lit = 1) =>
+      snowParticleAppearance(config, atmo, 900, 1, depth, distance, lit);
+    expect(appearance(0).alpha).toBe(0);
+    expect(appearance(1).alpha).toBeLessThan(0.005);
+    expect(appearance(6).alpha).toBeLessThanOrEqual(0.12);
+    const middle = appearance(20);
+    expect(middle.alpha).toBeGreaterThan(0.1);
+    expect(middle.alpha).toBeLessThanOrEqual(0.24);
+    expect(middle.brightness).toBeCloseTo(1.8);
+    // Fine dust attenuates with depth; the largest flakes hit the pixel cap.
+    const fine = (distance: number) =>
+      snowParticleAppearance(config, atmo, 900, 0.3, distance, distance, 1);
+    expect(fine(40).sizePx).toBeLessThan(fine(20).sizePx);
+    expect(appearance(60).alpha).toBeLessThan(middle.alpha);
+    expect(appearance(80).alpha).toBe(0);
+    expect(appearance(80, 40).alpha).toBe(0);
+    expect(appearance(120).alpha).toBe(0);
+    expect(appearance(20, 20, 0).alpha).toBeGreaterThan(0.05);
+    expect(appearance(20, 20, 0).brightness).toBeLessThan(middle.brightness);
+  });
+
+  it('retains GPU drift/current motion without rewriting or replacing the Low particle pool', () => {
+    const config = makeConfig().water;
+    const snow = new MarineSnow(config, config.tiers.low);
+    try {
+      const geometry = snow.points!.geometry;
+      const positions = geometry.getAttribute('position') as BufferAttribute;
+      const original = Array.from(positions.array);
+      const version = positions.version;
+      const atmo = sampleAtmosphere(config, -3800);
+      snow.update(new PerspectiveCamera(), atmo, 10, 900, { x: 0.2, z: -0.1 });
+      const mat = snow.points!.material as ShaderMaterial;
+      expect(mat.uniforms.uTime!.value).toBe(10);
+      expect(mat.uniforms.uDrift!.value).toBeGreaterThan(0);
+      expect(mat.uniforms.uFlow!.value.toArray()).toEqual([2, -1]);
+      expect(snow.points!.geometry).toBe(geometry);
+      expect(positions.version).toBe(version);
+      expect(Array.from(positions.array)).toEqual(original);
+    } finally {
+      snow.dispose();
+    }
+  });
+});
+
+describe('460/570 marine snow readability at all shipped sites and tiers', () => {
   it('keeps the tested bounds connected to both GPU shaders and config uniforms', () => {
     const config = makeConfig();
     const snow = new MarineSnow(config.water, config.water.tiers.medium);
     try {
       const mat = snow.points!.material as ShaderMaterial;
       for (const [uniform, value] of Object.entries({
-        uMaxSizePx: 6,
+        uMaxSizePx: 3,
+        uOpacity: 0.24,
+        uLampGain: 0.8,
+        uFadeStartM: 40,
+        uFadeEndM: 80,
         uForegroundM: 6,
         uForegroundFadeEndM: 12,
         uForegroundSizePx: 2,
@@ -151,7 +248,12 @@ describe('460 marine snow readability at all shipped sites and tiers', () => {
       expect(mat.vertexShader).toContain('length(world - uCam)');
       expect(mat.vertexShader).toContain('mix(uForegroundSizePx, uMaxSizePx, vForegroundFade)');
       expect(mat.vertexShader).toContain('1.0, sizeCap)');
-      expect(mat.fragmentShader).toContain('min(uBrightness + vLit * 2.6, brightnessCap)');
+      expect(mat.vertexShader).toContain('uOpacity * distanceFade * edge * step(aSeed, uDensity)');
+      expect(mat.vertexShader).toContain('smoothstep(0.0, uForegroundFadeEndM, cameraDistance)');
+      expect(mat.vertexShader).toContain(
+        '1.0 - smoothstep(uFadeStartM, uFadeEndM, cameraDistance)',
+      );
+      expect(mat.fragmentShader).toContain('min(uBrightness + vLit * uLampGain, brightnessCap)');
       expect(mat.fragmentShader).toContain('min(vAlpha * (0.5 + 0.5 * vLit), alphaCap) * soft');
     } finally {
       snow.dispose();
@@ -288,7 +390,7 @@ describe('460 marine snow readability at all shipped sites and tiers', () => {
                         distance,
                         lit,
                       );
-                      expect(a.sizePx).toBeLessThanOrEqual(6);
+                      expect(a.sizePx).toBeLessThanOrEqual(3);
                       expect(a.alpha).toBeGreaterThanOrEqual(0);
                       if (seed > atmo.snowDensity) expect(a.alpha).toBe(0);
                       if (distance <= 6) {
@@ -296,8 +398,8 @@ describe('460 marine snow readability at all shipped sites and tiers', () => {
                         expect(a.alpha).toBeLessThanOrEqual(0.12);
                         expect(a.brightness).toBeLessThanOrEqual(0.65);
                       }
-                      const old = snowParticleAppearance(
-                        legacy(config.water),
+                      const old = before570Appearance(
+                        config.water,
                         atmo,
                         scale,
                         seed,
@@ -308,8 +410,8 @@ describe('460 marine snow readability at all shipped sites and tiers', () => {
                       expect(a.sizePx).toBeLessThanOrEqual(old.sizePx);
                       expect(a.alpha).toBeLessThanOrEqual(old.alpha);
                       if (distance >= 12) {
-                        expect(a.alpha).toBe(old.alpha);
-                        expect(a.brightness).toBe(old.brightness);
+                        expect(a.alpha).toBeLessThanOrEqual(old.alpha);
+                        expect(a.brightness).toBeLessThanOrEqual(old.brightness);
                       }
                     }
                   }
@@ -317,19 +419,11 @@ describe('460 marine snow readability at all shipped sites and tiers', () => {
             }
             const scale = mat.uniforms.uScale!.value as number;
             const seed = Math.min(1, atmo.snowDensity);
-            const old20 = snowParticleAppearance(
-              legacy(config.water),
-              atmo,
-              scale,
-              seed,
-              20,
-              20,
-              1,
-            );
+            const old20 = before570Appearance(config.water, atmo, scale, seed, 20, 20, 1);
             const new20 = snowParticleAppearance(config.water, atmo, scale, seed, 20, 20, 1);
             const forward = new Vector3(Math.sin(pose.yaw), 0, -Math.cos(pose.yaw));
             const field = projectedField(snow, config.water, atmo, rig, position, forward, opening);
-            expect(field.maxAfterPx).toBeLessThanOrEqual(6);
+            expect(field.maxAfterPx).toBeLessThanOrEqual(3);
             expect(field.lowerThirdGlareAfter).toBeLessThanOrEqual(field.lowerThirdGlareBefore);
             const wreckLayers = [];
             for (const name of ['wreckHaze', 'wreckMotes']) {
@@ -337,6 +431,15 @@ describe('460 marine snow readability at all shipped sites and tiers', () => {
               if (!points) continue;
               const material = points.material as ShaderMaterial;
               const u = material.uniforms;
+              if (site === 'titanic') {
+                const haze = name === 'wreckHaze';
+                expect(u.uSize!.value).toBe(haze ? 0.25 : 0.15);
+                expect(u.uOpacity!.value).toBe(haze ? 0.05 : 0.16);
+                const scale = config.presets.tierParticleScale[tier];
+                const count = points.geometry.getAttribute('aSeed').count;
+                if (haze) expect(count).toBe(Math.floor(1800 * scale));
+                else expect(count).toBeLessThanOrEqual(Math.floor(180 * 6 * scale));
+              }
               expect(u.uForegroundM!.value).toBe(6);
               expect(u.uForegroundSizePx!.value).toBe(2);
               expect(u.uForegroundAlpha!.value).toBe(0.12);

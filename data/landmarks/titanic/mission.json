@@ -8,8 +8,12 @@
     "preset": "wreck",
     "overrides": {
       "ambientFill": 30,
-      "moteOpacity": 0.3,
-      "hazeOpacity": 0.12
+      "hazeParticles": 1800,
+      "hazeSizeM": 0.25,
+      "hazeOpacity": 0.05,
+      "motesPerHull": 180,
+      "moteSizeM": 0.15,
+      "moteOpacity": 0.16
     }
   },
   "spawn": {
