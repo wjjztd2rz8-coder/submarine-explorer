@@ -22,53 +22,68 @@ test.use({
   storageState: { cookies: [], origins: [] },
 });
 
-test('Titanic opening stays within the Low-tier frame geometry budget', async ({ page }) => {
-  test.setTimeout(180_000);
-  const errors: string[] = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/?tile=titanic&tier=low&dynres=0&tutorial=0&lifeSeed=42', {
-    waitUntil: 'domcontentloaded',
+const sites = [
+  { id: 'titanic', props: 6 },
+  { id: 'lost-city', props: 12 },
+  { id: 'great-blue-hole', props: 2 },
+  { id: 'beebe-vent-field', props: 3 },
+  { id: 'monterey-canyon', props: 5 },
+];
+
+for (const site of sites) {
+  test(`${site.id} opening stays within the Low-tier frame geometry budget`, async ({ page }) => {
+    test.setTimeout(180_000);
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'error') errors.push(message.text());
+    });
+    await page.goto(`/?tile=${site.id}&tier=low&dynres=0&tutorial=0&lifeSeed=42`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForFunction(() => {
+      const g = window.__game as unknown as Game | undefined;
+      return (
+        window.__gameReady && g?.props.loaded && g.discovery.loaded && g.explore.ready && g.life
+      );
+    });
+    const sample = await page.evaluate(async () => {
+      const g = window.__game as unknown as Game;
+      g.sub.step = () => {};
+      const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()));
+      for (let i = 0; i < 30; i++) await frame();
+      let calls = 0;
+      let triangles = 0;
+      let countersMatch = true;
+      for (let i = 0; i < 60; i++) {
+        await frame();
+        calls = Math.max(calls, g.perf.drawCalls);
+        triangles = Math.max(triangles, g.perf.triangles);
+        // Low has no post pass: the exported totals must match renderer.info.
+        countersMatch &&= g.perf.drawCalls === g.renderer.info.render.calls;
+        countersMatch &&= g.perf.triangles === g.renderer.info.render.triangles;
+      }
+      return {
+        calls,
+        triangles,
+        countersMatch,
+        tier: g.perf.tier,
+        dynamicResolution: g.perf.dynamicResolution,
+        props: { ...g.props.stats },
+      };
+    });
+    expect(errors).toEqual([]);
+    expect(sample.tier).toBe('low');
+    expect(sample.dynamicResolution).toBe(false);
+    expect(sample.props.count).toBe(site.props);
+    expect(sample.props.failed).toBe(0);
+    expect(sample.props.skipped).toBe(0);
+    expect(sample.props.full).toBeGreaterThan(0);
+    expect(sample.countersMatch).toBe(true);
+    // Prevent a blank/missing scene from passing the upper-bound checks.
+    expect(sample.calls).toBeGreaterThan(0);
+    expect(sample.triangles).toBeGreaterThan(10_000);
+    expect(sample.calls).toBeLessThanOrEqual(1500);
+    expect(sample.triangles).toBeLessThanOrEqual(1_500_000);
   });
-  await page.waitForFunction(() => {
-    const g = window.__game as unknown as Game | undefined;
-    return window.__gameReady && g?.props.loaded && g.discovery.loaded && g.explore.ready && g.life;
-  });
-  const sample = await page.evaluate(async () => {
-    const g = window.__game as unknown as Game;
-    g.sub.step = () => {};
-    const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()));
-    for (let i = 0; i < 30; i++) await frame();
-    let calls = 0;
-    let triangles = 0;
-    let countersMatch = true;
-    for (let i = 0; i < 60; i++) {
-      await frame();
-      calls = Math.max(calls, g.perf.drawCalls);
-      triangles = Math.max(triangles, g.perf.triangles);
-      // Low has no post pass: the exported totals must match renderer.info.
-      countersMatch &&= g.perf.drawCalls === g.renderer.info.render.calls;
-      countersMatch &&= g.perf.triangles === g.renderer.info.render.triangles;
-    }
-    return {
-      calls,
-      triangles,
-      countersMatch,
-      tier: g.perf.tier,
-      dynamicResolution: g.perf.dynamicResolution,
-      props: { ...g.props.stats },
-    };
-  });
-  expect(errors).toEqual([]);
-  expect(sample.tier).toBe('low');
-  expect(sample.dynamicResolution).toBe(false);
-  expect(sample.props.count).toBe(6);
-  expect(sample.props.failed).toBe(0);
-  expect(sample.props.skipped).toBe(0);
-  expect(sample.props.full).toBeGreaterThan(0);
-  expect(sample.countersMatch).toBe(true);
-  // Prevent a blank/missing scene from passing the upper-bound checks.
-  expect(sample.calls).toBeGreaterThan(0);
-  expect(sample.triangles).toBeGreaterThan(10_000);
-  expect(sample.calls).toBeLessThanOrEqual(1500);
-  expect(sample.triangles).toBeLessThanOrEqual(1_500_000);
-});
+}

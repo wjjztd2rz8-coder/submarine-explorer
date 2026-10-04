@@ -30,6 +30,18 @@ without an entry here is not done.
   Add fresh-player Home-to-debrief capture/regression coverage for all five
   heroes at desktop, touch landscape and touch portrait sizes; rendered audit
   remains pending browser-capable execution. No new HUD controls or caveats.
+- Phase F, F-VERIFY-520 gate follow-up: wait for the asynchronously populated
+  Daily card before checking title-menu scroll targets; cover delayed catalogue
+  loading at 667×375 while retaining all size, overlap and hit-test assertions.
+  Persist the 844×390 hero PNGs and diagnostics as files so the list reporter's
+  run can be visually reviewed. Reason: late Daily insertion shifted controls
+  during the title test, and inline attachments did not survive the gate run.
+- Phase F, F-VERIFY-520: extend the Low-tier rendered budget guard to all five
+  heroes, add Lost City/Beebe touch capture checks at 844×390 with lighting floors,
+  and catch console errors in the performance benchmark and browser guards.
+  Readability/integrity and static budgets pass; fresh screenshots and runtime
+  performance/console verification remain blocked by sandbox browser/localhost
+  restrictions. Results: `plan/progress/F-VERIFY-520.md`.
 - Phase F, F-TOUCH-150 gate follow-up: make warm vent haze opt-in through
   registered Config defaults and enable it explicitly at Beebe. Reason: its
   implicit global default added a third draw to generic vent presets, breaking

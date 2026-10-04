@@ -362,8 +362,33 @@ for (const viewport of [
     test('scene plate, copy, menu and selector remain separate and tappable', async ({
       page,
     }, testInfo) => {
-      await boot(page);
-      await presented(page);
+      // Reproduce the late catalogue load on the viewport that exposed the race.
+      // __gameReady/title presentation intentionally do not wait for this data.
+      let releaseCatalogue: (() => void) | undefined;
+      let catalogueRequests = 0;
+      if (viewport.width === 667) {
+        const catalogue = new Promise<void>((done) => {
+          releaseCatalogue = done;
+        });
+        await page.route('**/data/landmarks/index.json', async (route) => {
+          catalogueRequests++;
+          await catalogue;
+          await route.continue();
+        });
+      }
+      try {
+        await boot(page);
+        await presented(page);
+        if (releaseCatalogue) {
+          await expect.poll(() => catalogueRequests).toBeGreaterThan(0);
+          await expect(page.locator('.home-menu > .daily-card')).toBeHidden();
+        }
+      } finally {
+        releaseCatalogue?.();
+      }
+      // Daily is inserted after catalogue loading and a timer refresh. Wait for
+      // the complete menu before taking a locator snapshot or scrolling actions.
+      await expect(page.locator('.home-menu > .daily-card')).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,
       );
@@ -381,6 +406,7 @@ for (const viewport of [
             const r = el.getBoundingClientRect();
             return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
           }),
+          (await button.textContent()) ?? 'menu button',
         ).toBe(true);
       }
       await page.locator('.home-menu').getByRole('button', { name: 'Dive sites' }).tap();
