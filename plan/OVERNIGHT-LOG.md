@@ -411,3 +411,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 
 - Comprehensive review for f25 recorded (golden 2026-10-04-094934, scores unchanged). Merged Codex 560 (Beebe seabed) and 540 (merge-residue bughunt) into local main (conflicts in CHANGELOG and scarp.ts resolved, both kept). Smoke gates green in each worktree. Full-e2e on main was still running when the run ended: NOT pushed, NOT tagged. Next run: confirm `tools/gates.sh --full-e2e` result on main, push, tag f26.
 - Still unmerged: 580 (finished), 530 (after 580). Running: 570, 590, 600. Needs owner: nothing.
+
+## 2026-10-04 headless run (~06:00-08:30 CDT)
+
+- Full-e2e green on main (f25 merges 560/540), pushed, tagged f26. Merged Codex 580 (credits panel placement and license hit fix; kept main's scan-stack CSS in the conflict) and 570 (thinner Titanic snow; golden shot: hull readable, sparse snow). Removed worktrees 530/540/560/570/580 (530 was superseded by 580).
+- Merged Claude/Sonnet F-BEEBE-MONTEREY (nearer Beebe opening pose, fractured Monterey boulders, rougher wall sponges). Beebe sub now fills the frame but hides the nearest chimney; seabed still dark (follow-up in DIRECTOR). First full-e2e had 8 failures, all stale spec expectations (Titanic snow counts/size, Beebe chase radius, a credits re-layout race); fixed in tests only. Full-e2e + project-base green on the final commit; pushed, tagged f27.
+- Running/unmerged: Codex 600 (Lost City) running; 610 and 620 finished, need gates/review next run. Queue: 630, 640 (CI red diagnosis), 650 (verify f27). Codex 5h was ~6% so nothing new launches until its reset.
+- Needs owner: nothing.
