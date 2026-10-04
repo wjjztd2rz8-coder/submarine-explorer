@@ -1,27 +1,22 @@
 # F-BLUEHOLE-SPAWN
 
-Branch `claude/f-bluehole-spawn`. The floating dark dome at the Great Blue Hole spawn was the `karst-grotto` (stalactite-cluster) prop: its wall plane sat at the lip of the 40 m ledge with a 32 m shelf projecting out over the 125 m drop, 20+ m in front of the real hole wall.
+## What changed
 
-## Changes
+- `src/game/Spawn.ts`: Blue Hole free-dive opening altitude -6 -> -17 (about 14 m under the ledge, 50 m depth), range 235 -> 205. Frame now has banded wall, light shafts, shoals above the ledge, alcove and sub.
+- `src/world/TerrainBiome.ts` (great-blue-hole): rockBias 0.15 -> 0.3, strata 0.34 -> 0.5, contrast 0.7 -> 0.85, detail 0.55 -> 0.6, stain 0.2 -> 0.3. No new draw calls.
+- `src/world/props/geo/stalactites.ts`: alcove shelf tops/roofs less darkened (0.66 -> 0.86, warm instead of cool grey), apron floor darkening reduced. Applies to both alcoves.
+- `tools/golden-shots.mjs`: heroes accept an authored fixed pose; both alcoves are framed from inside the hole on the ledge (40 m and 30 m). New `great-blue-hole-east-2/3.png`; `GOLDEN_SITES` accepts `great-blue-hole-east`. Sites without a fixed pose behave as before.
+- No extra fish were added: the existing life systems already place shoals around the new pose.
 
-- `data/landmarks/great-blue-hole/props.json`: grotto moved outward onto the ledge against the wall (lon -87.53705), dims 84x32x28 -> 70x22x18, so its shelf is carried by the ledge.
-- `src/world/terrainFeatures.ts`: steeper upper wall into a wider flat ledge (~40 m), second step near 75 m, plus gentle ledge undulation and floor ripples/hummocks (1-3 m).
-- `src/world/TerrainBiome.ts`: Blue Hole depth shade starts at 12 m, ends at 100 m, deeper blue tint.
-- `src/world/props/geo/stalactites.ts`: faint vertex glow so the limestone reads pale tan, not a dark silhouette.
-- `src/game/Spawn.ts`: Blue Hole opening altitude 12 -> -6 so the spawn stays ~30-40 m deep (clear of the surface camera ceiling).
-- `tests/unit/blueHoleProps.test.ts` (new): every geo prop at the site has its foot within 3 m of the sampled carved terrain, its shelf lip is within 20 m of the ledge height and ground rises behind the wall. Fails on the old placement.
-- `tests/unit/f-bughunt-4.test.ts`: retargeted characterization numbers that the smoother carve changed (depth shade 12/100, buried-sub depth, mismatch threshold).
+## Screenshots (worktree `.cache/golden/`)
 
-## Screenshots (spawn pose, 1600x900)
+- Before: `/home/vijay/submarine-explorer/.cache/golden/2026-10-04-031944/great-blue-hole-1.png`
+- After spawn: `.cache/golden/2026-10-04-052810/great-blue-hole-1.png`
+- West alcove: `.cache/golden/2026-10-04-053030/great-blue-hole-2.png`, `-3.png`
+- East alcove: `.cache/golden/2026-10-04-052937/great-blue-hole-east-2.png`, `-3.png`
 
-- Before: `.cache/golden/2026-10-03-175645/great-blue-hole-1.png`
-- After: `.cache/golden/2026-10-03-180500/great-blue-hole-1.png` (ledge close-up: `...180206/great-blue-hole-2.png`)
+## Left over
 
-## Notes / open
-
-- Extra N/S shelf props were tried and removed (read as floating dark slivers at frame edges).
-- Cream flat patches (talus apron) still show on the ledge in the 40 m approach shot; candidate follow-up.
-
-## Gates
-
-`PW_PORT=4411 tools/gates.sh`: all PASS (build, unit, python, content, attribution, prettier, e2e smoke, e2e-base).
+- West alcove close shot (-3) sits behind the stalactites and is murky; a per-hero range would help.
+- Alcove floor sediment is still one tone near the foot; no new formations were added.
+- Spawn view is still mostly wall; pitch cannot be set by the spawn pose.

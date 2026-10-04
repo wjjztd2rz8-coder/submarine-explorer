@@ -47,11 +47,22 @@ async function main() {
   const heroes = [
     ['titanic', 'bow-hull'],
     ['lost-city', 'poseidon-tower'],
-    ['great-blue-hole', 'karst-grotto'],
+    // The west alcove, framed from the hole's interior on its ledge (the hole centre lies due east).
+    ['great-blue-hole', 'karst-grotto', 'great-blue-hole', { direction: [1, 0, 0], above: 5 }],
+    // The south-eastern alcove, framed from inside the hole on its ledge (open side faces the hole centre).
+    [
+      'great-blue-hole',
+      'karst-grotto-east',
+      'great-blue-hole-east',
+      { direction: [-0.54, 0, -0.84], above: 5 },
+    ],
     ['beebe-vent-field', 'beebe-chimney-1'],
     ['monterey-canyon', 'canyon-wall-ledge'],
-  ].filter(([site]) => !only || only.includes(site));
-  if (!heroes.length || only?.some((site) => !heroes.some(([id]) => id === site)))
+  ].filter(([site, , slug]) => !only || only.includes(site) || only.includes(slug));
+  if (
+    !heroes.length ||
+    only?.some((site) => !heroes.some(([id, , slug]) => id === site || slug === site))
+  )
     throw new Error(`Unknown or empty GOLDEN_SITES: ${process.env.GOLDEN_SITES}`);
   await mkdir(output, { recursive: true });
   const captures = [];
@@ -92,7 +103,8 @@ async function main() {
     browser = await chromium.launch({
       args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
     });
-    for (const [site, heroId] of heroes) {
+    for (const [siteId, heroId, slug, fixed] of heroes) {
+      const site = slug ?? siteId;
       stage = `${site}: create context`;
       const context = await browser.newContext({
         viewport: { width: 1600, height: 900 },
@@ -167,7 +179,7 @@ async function main() {
           console.log(`Preview base: ${base.href}`);
         }
         const url = new URL(base);
-        url.search = new URLSearchParams({ tile: site, tutorial: '0', tier: 'high' }).toString();
+        url.search = new URLSearchParams({ tile: siteId, tutorial: '0', tier: 'high' }).toString();
         const loaded = await page.goto(url.href, {
           waitUntil: 'domcontentloaded',
           timeout: 120_000,
@@ -263,54 +275,68 @@ async function main() {
           captures.push({ site, heroId, filename, range, captureMethod, ...pose });
           console.log(`${filename} (${pose.hull}, ${pose.tier})`);
         };
-        await capture(1, null);
+        if (site === siteId) await capture(1, null);
         stage = `${site}: choose approach`;
-        const approach = await evaluate((propId) => {
-          const g = window.__game;
-          const hero = g.props.placed.find((p) => p.def.id === propId);
-          if (!hero || hero.localBounds.isEmpty())
-            throw new Error(`Missing hero bounds: ${propId}`);
-          hero.root.updateMatrixWorld(true);
-          // Vent set pieces are framed from their axis; wall scarps from their footprint edge.
-          const axis = /^(?!.*(ledge|cliff|scarp)).+/.test(hero.def.feature ?? '');
-          const centre = hero.localBounds.getCenter(g.sub.position.clone());
-          const half = hero.localBounds.getSize(g.sub.position.clone()).multiplyScalar(0.5);
-          if (hero.def.model === 'procedural:chimney' && hero.def.dimensionsM?.[2])
-            centre.y = Math.max(hero.localBounds.min.y, 0) + hero.def.dimensionsM[2] * 0.45;
-          for (let i = 0; i < 16; i++) {
-            const angle = Math.PI / 4 + (i * Math.PI) / 8;
-            const dx = Math.sin(angle),
-              dz = -Math.cos(angle);
-            // Sprawling vent set pieces (a feature) are framed from their axis, not their footprint edge.
-            const edge = axis
-              ? 0
-              : Math.min(
-                  half.x / Math.max(Math.abs(dx), 1e-6),
-                  half.z / Math.max(Math.abs(dz), 1e-6),
-                );
-            const target = hero.root.localToWorld(
-              centre.clone().add(g.sub.position.clone().set(dx * edge, 0, dz * edge)),
-            );
-            const direction = axis
-              ? hero.root
-                  .localToWorld(g.sub.position.clone().set(dx, 0, dz))
-                  .sub(hero.root.localToWorld(g.sub.position.clone().set(0, 0, 0)))
-                  .setY(0)
-                  .normalize()
-              : target.clone().sub(hero.root.localToWorld(centre.clone())).setY(0).normalize();
-            if (direction.lengthSq() < 0.5) continue;
-            const clear = (axis ? [40, 30] : [40, 15]).every((range) => {
-              const p = target.clone().addScaledVector(direction, range);
-              p.y = g.terrain.sampleHeight(p.x, p.z) + 15;
-              return (
-                p.y < -g.config.submarine.hullRadius &&
-                !g.props.collide(p.clone(), g.config.submarine.hullRadius, p.clone())
+        const approach = await evaluate(
+          ({ propId, fixed }) => {
+            const g = window.__game;
+            const hero = g.props.placed.find((p) => p.def.id === propId);
+            if (!hero || hero.localBounds.isEmpty())
+              throw new Error(`Missing hero bounds: ${propId}`);
+            hero.root.updateMatrixWorld(true);
+            if (fixed) {
+              // Authored pose: stand over the hero's ledge on a fixed bearing, aim at its middle.
+              const mid = hero.root.localToWorld(
+                hero.localBounds.getCenter(g.sub.position.clone()),
               );
-            });
-            if (clear) return { target: target.toArray(), direction: direction.toArray() };
-          }
-          throw new Error(`No clear fixed approach for ${propId}`);
-        }, heroId);
+              return {
+                target: mid.toArray(),
+                direction: fixed.direction,
+                above: fixed.above + hero.root.position.y - mid.y,
+              };
+            }
+            // Vent set pieces are framed from their axis; wall scarps from their footprint edge.
+            const axis = /^(?!.*(ledge|cliff|scarp)).+/.test(hero.def.feature ?? '');
+            const centre = hero.localBounds.getCenter(g.sub.position.clone());
+            const half = hero.localBounds.getSize(g.sub.position.clone()).multiplyScalar(0.5);
+            if (hero.def.model === 'procedural:chimney' && hero.def.dimensionsM?.[2])
+              centre.y = Math.max(hero.localBounds.min.y, 0) + hero.def.dimensionsM[2] * 0.45;
+            for (let i = 0; i < 16; i++) {
+              const angle = Math.PI / 4 + (i * Math.PI) / 8;
+              const dx = Math.sin(angle),
+                dz = -Math.cos(angle);
+              // Sprawling vent set pieces (a feature) are framed from their axis, not their footprint edge.
+              const edge = axis
+                ? 0
+                : Math.min(
+                    half.x / Math.max(Math.abs(dx), 1e-6),
+                    half.z / Math.max(Math.abs(dz), 1e-6),
+                  );
+              const target = hero.root.localToWorld(
+                centre.clone().add(g.sub.position.clone().set(dx * edge, 0, dz * edge)),
+              );
+              const direction = axis
+                ? hero.root
+                    .localToWorld(g.sub.position.clone().set(dx, 0, dz))
+                    .sub(hero.root.localToWorld(g.sub.position.clone().set(0, 0, 0)))
+                    .setY(0)
+                    .normalize()
+                : target.clone().sub(hero.root.localToWorld(centre.clone())).setY(0).normalize();
+              if (direction.lengthSq() < 0.5) continue;
+              const clear = (axis ? [40, 30] : [40, 15]).every((range) => {
+                const p = target.clone().addScaledVector(direction, range);
+                p.y = g.terrain.sampleHeight(p.x, p.z) + 15;
+                return (
+                  p.y < -g.config.submarine.hullRadius &&
+                  !g.props.collide(p.clone(), g.config.submarine.hullRadius, p.clone())
+                );
+              });
+              if (clear) return { target: target.toArray(), direction: direction.toArray() };
+            }
+            throw new Error(`No clear fixed approach for ${propId}`);
+          },
+          { propId: heroId, fixed: fixed ?? null },
+        );
         // Wall scarps with wall-life (Monterey): aim at the densest sponge/coral patch, from the face side.
         const lifeApproach = await evaluate((propId) => {
           const g = window.__game;
@@ -361,28 +387,31 @@ async function main() {
           approach.direction = lifeApproach.direction;
         }
         // A feature set piece is framed from its axis, so its close shot stays outside the spires.
-        const closeRange = lifeApproach
-          ? 26
-          : await evaluate(
-              (propId) =>
-                (
-                  window.__game.props.placed.find((p) => p.def.id === propId)?.def.feature ?? ''
-                ).match(/^(?!.*(ledge|cliff|scarp)).+/)
-                  ? 30
-                  : 15,
-              heroId,
-            );
+        const closeRange = fixed
+          ? 30
+          : lifeApproach
+            ? 26
+            : await evaluate(
+                (propId) =>
+                  (
+                    window.__game.props.placed.find((p) => p.def.id === propId)?.def.feature ?? ''
+                  ).match(/^(?!.*(ledge|cliff|scarp)).+/)
+                    ? 30
+                    : 15,
+                heroId,
+              );
         for (const [n, range] of [
           [2, 40],
           [3, closeRange],
         ]) {
           stage = `${site}: position ${n}`;
           await evaluate(
-            ({ target, direction, range }) => {
+            ({ target, direction, range, above }) => {
               const g = window.__game;
+              const fixedY = above === undefined ? null : target[1] + above;
               const x = target[0] + direction[0] * range;
               const z = target[2] + direction[2] * range;
-              const y = g.terrain.sampleHeight(x, z) + 15;
+              const y = fixedY ?? g.terrain.sampleHeight(x, z) + 15;
               const yaw = Math.atan2(target[0] - x, -(target[2] - z));
               g.sub.reset(x, y, z, yaw);
               g.sub.pitch = Math.max(
