@@ -134,7 +134,7 @@ export function createOnboardSystem(): GameSystem {
           finishTutorial();
         },
       });
-      chip = new HintChip();
+      chip = new HintChip(ctx.discovery.overlay.messages);
 
       // Last input used decides which layout is shown.
       cleanup.listen(window, 'keydown', () => controlsCard.setDevice('keyboard'), {

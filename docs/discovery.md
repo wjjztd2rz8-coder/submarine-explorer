@@ -101,6 +101,12 @@ facing it, and `HOLD G TO SCAN` when it can be scanned. While the beam is on,
 a cyan progress ring fills. A completed scan shows `NEW ENTRY`, and pressing
 J then opens the guide at that entry.
 
+`ScanOverlay.messages` is the shared DOM column for the target panel and the
+onboarding `HintChip`. Desktop hints flow immediately below the target at top
+centre; wrapped target names increase the column's height. On portrait touch
+screens, hints use the tutorial's row after it closes, above the controls and
+source credit. Hiding the target panel leaves contextual hints visible.
+
 The panel's distance is the 3D range to the POI; the mission objectives
 panel's `RNG` is the same slant range (QA-B #11).
 

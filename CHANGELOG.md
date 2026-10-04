@@ -22,6 +22,15 @@ without an entry here is not done.
   the lens, and the alcove floor is a little lighter. Monterey wall fans now use a bubblegum,
   coral-red, orange and pale palette instead of near-white (instance colours only, no new draw
   calls). No cuts.
+- Phase F, F-TOAST-550: move contextual hints from beneath the sonar into the
+  top-centre scan-target stack on desktop. Wrapped target names push the toast
+  down naturally; portrait touch hints reuse the completed tutorial row above
+  the sticks and source credit. Keep the dismiss button and add overlap checks
+  for both hero sites at five viewport sizes, including 150% touch UI. Reason:
+  the animal hint crowded the left HUD column in the golden screenshots.
+  Scope the target's width to its shared column so the separately imported
+  ExploreNotice touch styles cannot leave the target and toast misaligned.
+
 - Phase F, F-BLUEHOLE-SPAWN: the Great Blue Hole Arcade opening now sits about 14 m below the
   ledge inside the hole (was level with it, over a bare rim), 205 m from the west alcove, so
   the banded wall, light shafts, the surface shoals and the alcove share the first frame.

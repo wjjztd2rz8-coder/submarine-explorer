@@ -312,8 +312,8 @@ it('scan instructions use on-screen controls on touch and key bindings on keyboa
     nearestDistance: 5,
     candidateId: 'bow',
   } as ScanView;
-  const root = overlay.root as unknown as TouchElement;
-  const hint = root.children[1].children[1].children[2];
+  const messages = overlay.messages as unknown as TouchElement;
+  const hint = messages.children[0].children[1].children[2];
   try {
     f.controls.setTouchMode(false);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
