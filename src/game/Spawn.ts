@@ -131,6 +131,9 @@ const FREE_DIVE_OPENINGS: Record<
     fromCentre: true,
     altitude: 4,
     yawOffset: 10,
+    // A shorter, lower chase arm: the sub fills more of the frame and the smokers stand beside it.
+    chaseRadius: 54,
+    chaseOffsetY: -16,
   },
   // Inside the hole, facing the ledge alcove across the water: the wall, the light shafts
   // and the fish above the ledge share the frame instead of a bare rim.

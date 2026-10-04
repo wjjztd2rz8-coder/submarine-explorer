@@ -591,6 +591,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       }),
     );
     const tmpl = [0, 1, 2].map((k) => {
+      if (id === 'canyon') return fracturedBoulder(d.sphereDetail, seed + k * 5, k);
       // Angular blocks: strong noise, faceted shading, dark undersides (contact occlusion).
       const g = lump(d.sphereDetail, seed + k * 5, 0.36, 2.2);
       paint(g, (_x, y, _z, _n, out) => out.setScalar(0.5 + 0.5 * smooth(-1, 0.5, y)));
@@ -608,10 +609,16 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       return m;
     });
     const mat = new THREE.Matrix4();
+    const stretchM = new THREE.Matrix4();
     const c = new THREE.Color();
     rocks.forEach((spot, i) => {
       const m = meshes[i % 3]!;
       rockMatrix(spot, rnd() * 6.28, 0.55 + rnd() * 0.3, mat);
+      // Break the uniform footprint: stretch each block along its own (spun) x axis.
+      if (id === 'canyon') {
+        const stretch = 0.7 + rnd() * 0.75;
+        mat.multiply(stretchM.makeScale(stretch, 0.8 + rnd() * 0.5, 1 / Math.sqrt(stretch)));
+      }
       // Rubble matches the apron it sits in; only a little darker and more varied.
       c.copy(P.boulder)
         .lerp(P.base, 0.3)
@@ -968,6 +975,55 @@ function wallFaceSampler(
   };
 }
 
+/**
+ * One angular boulder template: a noisy lump cut by a few random planes (fractured faces of
+ * different sizes, so the outline is irregular rather than a regular polygon), roughened with
+ * fine noise and painted with pale-to-dark bedding bands plus a dark underside.
+ */
+function fracturedBoulder(detail: number, seed: number, variant: number): THREE.BufferGeometry {
+  const g = lump(Math.max(2, detail), seed, 0.3, 1.5);
+  const rnd = mulberry32(seed ^ 0xb01d);
+  const planes: { n: THREE.Vector3; d: number }[] = [];
+  const cuts = 3 + variant;
+  for (let i = 0; i < cuts; i++) {
+    const n = new THREE.Vector3(rnd() * 2 - 1, (rnd() * 2 - 1) * 0.6, rnd() * 2 - 1).normalize();
+    planes.push({ n, d: 0.62 + rnd() * 0.28 });
+  }
+  const p = g.getAttribute('position');
+  const v = new THREE.Vector3();
+  for (let i = 0; i < p.count; i++) {
+    v.fromBufferAttribute(p, i);
+    for (const pl of planes) {
+      const over = v.dot(pl.n) - pl.d;
+      if (over > 0) v.addScaledVector(pl.n, -over);
+    }
+    const r = 1 + (fbm3(v.x * 5 + 3, v.y * 5, v.z * 5, seed + 77, 2) - 0.5) * 0.14;
+    p.setXYZ(i, v.x * r, v.y * r, v.z * r);
+  }
+  g.computeVertexNormals();
+  paint(g, (x, y, z, _n, out) => {
+    const band = Math.sin(y * 9 + fbm3(x * 1.5, y, z * 1.5, seed + 9, 2) * 5);
+    const patch = fbm3(x * 2.5 + 1, y * 2.5, z * 2.5, seed + 31, 3);
+    out.setScalar((0.5 + 0.5 * smooth(-1, 0.5, y)) * (0.84 + 0.1 * band + 0.3 * (patch - 0.5)));
+  });
+  projectUVs(g, 1.2);
+  return g;
+}
+
+/** Displace a geometry's vertices by position-keyed noise (seam-safe) so low-poly shapes lose their regular outline. */
+function roughen(g: THREE.BufferGeometry, amp: number, seed: number): THREE.BufferGeometry {
+  const p = g.getAttribute('position');
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i);
+    const y = p.getY(i);
+    const z = p.getZ(i);
+    const f = 1 + (fbm3(x * 9 + 5, y * 9 + 5, z * 9 + 5, seed, 2) - 0.5) * 2 * amp;
+    p.setXYZ(i, x * f, y * (0.9 + 0.1 * f), z * f);
+  }
+  g.computeVertexNormals();
+  return g;
+}
+
 /** Sponges and fans seated on exposed rendered triangles of the lit wall face. */
 function addWallLife(
   full: THREE.Group,
@@ -1036,11 +1092,15 @@ function addWallLife(
   }
   const spongeGeo: THREE.BufferGeometry[] = [
     // Vase: a small open cup.
-    new THREE.CylinderGeometry(0.14, 0.08, 0.5, 6, 1, true).translate(0, 0.25, 0),
+    roughen(
+      new THREE.CylinderGeometry(0.14, 0.08, 0.5, 11, 2, true).translate(0, 0.25, 0),
+      0.22,
+      3,
+    ),
     // Tube: a tall, narrow chimney.
-    new THREE.CylinderGeometry(0.07, 0.06, 1, 5, 1, true).translate(0, 0.5, 0),
+    roughen(new THREE.CylinderGeometry(0.07, 0.06, 1, 9, 3, true).translate(0, 0.5, 0), 0.25, 4),
     // Encrusting: a low closed dome hugging the rock.
-    new THREE.SphereGeometry(0.3, 6, 4, 0, Math.PI * 2, 0, Math.PI / 2),
+    roughen(new THREE.SphereGeometry(0.3, 14, 6, 0, Math.PI * 2, 0, Math.PI / 2), 0.3, 5),
   ];
   const sm = new THREE.MeshStandardMaterial({
     color: LIFE_TINT,
