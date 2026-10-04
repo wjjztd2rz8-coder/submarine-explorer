@@ -366,3 +366,11 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 ## 2026-10-04 early review run (~02:30)
 
 - Comprehensive review for tag f20 recorded (Titanic +0.5). Golden 2026-10-04-020114. DIRECTOR refreshed (6 Claude items), Codex briefs 550/560/570 queued with 540. No merges, no Claude package (weekly 23%); Codex 480-530 worktrees still running. Needs owner: nothing.
+
+## 2026-10-03 night headless run (~21:15-22:20 CDT)
+
+- Merged Codex 500 (CI triage: hud tips stability), 490 (Lost City camera bughunt) and 480 (rebrand merge verify, Monterey wall-life above talus). 490 and 480 both duplicated the vent haze config already on main; deduped hazeGlow/hazeGlowSizeM in presets.ts, kept main's VentPreset and docs. Full-e2e + project-base green on main, pushed, tagged f21.
+- Merged Claude/Sonnet F-MONTEREY-WALL (banded canyon wall via vertex colours, golden poses 2/3 aimed at wall life). Shots clearly better (pose 3 strong, pose 2 subtler). Full-e2e on final main: see tag f22 below.
+- Still running: Codex 510, 520, 530; 450-triage holds only a spec. Queue: 540-570. Codex 5h was 16%, so nothing new launched.
+- Next Claude candidates: Blue Hole spawn pose and east grotto, Lost City banding and tower-base corals.
+- Needs owner: nothing.
