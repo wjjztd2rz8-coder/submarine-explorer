@@ -37,3 +37,8 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 
 - Owner applied a Codex reset; ai-limits still read 6% from the last Codex session log (Codex reports usage only inside its own runs), so the dispatcher would have waited until a natural reset with 6 briefs queued.
 - Fix: tools/codex-dispatch.sh refreshes the reading (`ai-limits --refresh`, one tiny Codex prompt) when it says low, no Codex task is running and the reading is >30 min old. Launched 470/480/490 immediately.
+
+## 2026-10-04 08:30 — CI e2e shards timing out
+
+- CI on main failed for ~6 consecutive pushes. Cause: 7 of 16 e2e shards hit `--global-timeout=1200000` (20 min); no assertion failures. The 510/520 specs lengthened the suite on the software-GPU runners.
+- Fix: 20 shards, `--global-timeout=1560000`, job `timeout-minutes: 30`. Watch the next run; if still timing out, split the heaviest specs rather than adding more shards (public-repo concurrency is 20 jobs).

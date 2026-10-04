@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-04 comprehensive review (trigger: tag f24; golden set 2026-10-04-082207)
+
+**Changed since the last review (f23):** per-site opening pitch (`chaseOffsetY`), Blue Hole spawn 22 m below the ledge, west alcove close pose, Monterey fan palette (f24).
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5:**
+
+| Site            | Score       | Change | Biggest gap                                                                                           |
+| --------------- | ----------- | ------ | ----------------------------------------------------------------------------------------------------- |
+| Titanic         | 4/4/5/4/5/4 | same   | Snow flecks still blanket the hull and foreground (570 running); sky above the haze near-black        |
+| Beebe           | 4/4/4/4/5/4 | same   | Sub small in frame; seabed flat and dark (560 finished, unmerged); plumes good                        |
+| Great Blue Hole | 4/4/4/4/5/4 | +0.25  | Shot 1 now shows sub, wall bands and ledge with the stalactite gallery target; toast still left (550) |
+| Lost City       | 4/4/4/3/5/3 | same   | Beehive chimney is a smooth white slab, no base life (600 queued)                                     |
+| Monterey Canyon | 4/4/4/3/5/3 | +0.1   | Pinks in the fans read well; a hex boulder still reads fake                                           |
+
+**Play flow:** not re-captured (Claude weekly 18%). The 510 audit spec covers Home, site pick, first minute, Journal and debrief and is green on main. Codex 610 (portrait/low tier) and 620 (first-minute audit) now cover the gap.
+
+**Process:** CI has been red on main for ~6 pushes in a row because 7 of 16 e2e shards hit the 20-min global timeout (the suite grew with the 510/520 verification specs); the failures are timeouts, not test failures. Fixed in ci.yml: 20 shards, 26-min global timeout, 30-min job timeout (logged in PROCESS-LOG). Efficiency idle numbers are mostly budget-gate skips (48 of 50). Three Codex worktrees (540-560) finished but sat unmerged since the last review; merging them is now item 1.
+
+**New priorities:** see DIRECTOR.md.
+
+**Needs owner:** nothing.
+
 ## 2026-10-04 comprehensive review (trigger: tag f23; golden set 2026-10-04-062459)
 
 **Changed since the last review (f22):** Blue Hole spawn now inside the hole with a banded wall and lighter alcoves (f23); Codex 510 (Journal/debrief fixes plus a 15-flow audit spec) and 520 (verification specs) merged. 530 still waits on Codex 580.
