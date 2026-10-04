@@ -1,8 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG, GRAPHICS_TIERS } from '../../src/core/Config.js';
 import { godRayStrength } from '../../src/app/systems/render.js';
+import { MarineSnow } from '../../src/render/MarineSnow.js';
 
 describe('F1-OCEAN', () => {
+  it('570: allocates the deliberately reduced snow budgets, with Low at one tenth of High', () => {
+    const counts = { low: 300, medium: 1200, high: 3000, ultra: 3000 };
+    for (const tier of GRAPHICS_TIERS) {
+      expect(DEFAULT_CONFIG.water.tiers[tier].snowCount).toBe(counts[tier]);
+      const snow = new MarineSnow(DEFAULT_CONFIG.water, DEFAULT_CONFIG.water.tiers[tier]);
+      try {
+        expect(snow.points!.geometry.getAttribute('position').count).toBe(counts[tier]);
+      } finally {
+        snow.dispose();
+      }
+    }
+  });
+
   it('god rays are off above the surface and in the deep, strongest in the shallows', () => {
     const base = 0.35;
     expect(godRayStrength(base, 5)).toBe(0);

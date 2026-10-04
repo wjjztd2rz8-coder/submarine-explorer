@@ -14,6 +14,10 @@ describe('Monterey wall life on surveyed terrain', () => {
     it(`${tier}: wall colonies sit above the seabed and apron without removing the planted life`, async () => {
       const site = 'monterey-canyon';
       const config = makeConfig();
+      // These checks use Terrain.sampleHeight and the actual prop apron, not
+      // the seafloor mesh. Avoid building unused subdivided tile geometry;
+      // retain this tier's detail octaves and every prop's full tier geometry.
+      config.terrain.tiers[tier].detailSubdiv = 1;
       const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
       const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
       const heights = new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows);

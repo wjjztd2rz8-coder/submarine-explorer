@@ -37,17 +37,29 @@ Spawn at a depth with `?depth=<metres>`; it is clamped 40 m above the seabed.
 
 ## Marine snow
 
-GPU point field of `snowCount` particles in a `snowBoxM` cube that wraps around the camera; density and drift per band; brightness follows ambient with a floor so particles still catch the headlights in the abyss.
+GPU point field of `snowCount` particles in a `snowBoxM` cube that wraps around
+the camera; density and drift per band. Permanent flakes use `snowSizeM` (0.08 m),
+`snowOpacity` (0.24), and `snowLampGain` (0.8 extra linear brightness in the lamp
+cone). The budgets are 300/1,200/3,000/3,000 for Low/Medium/High/Ultra; one draw
+with GPU drift and no per-frame particle uploads on every tier.
 
 Readability guard: within `snowForegroundM` (6 m radial distance from the camera),
 sprites are at most 2 drawing-buffer pixels across, with centre alpha at most
 0.12 and a linear colour multiplier at most 0.65, including lamp flare. These
-bounds ease back to normal lighting/alpha by 12 m; the diameter never exceeds
-`snowMaxSizePx` (6 buffer pixels). The Gaussian edge, density, drift and wrapping
+bounds ease back to the configured lighting/alpha by 12 m; the diameter never
+exceeds `snowMaxSizePx` (3 buffer pixels). Permanent snow also fades in from zero
+at the lens to full strength at 12 m and fades out radially between
+`snowFadeStartM` (40 m) and `snowFadeEndM` (80 m), keeping the middle-distance
+particles as depth cues. The Gaussian edge, band density, drift and wrapping
 are unchanged. At higher DPR the cap occupies fewer CSS pixels. Fog and scene
 ambient floors are independent of these particle controls. Wreck sediment haze
 and rust motes share the 6 m guard, easing back to their original broad sprites,
 alpha and lighting by 12 m. Other preset plumes/mist retain their own appearance.
+Titanic also overrides its wreck haze to 1,800 particles, 0.25 m sprites and
+0.05 opacity, and rust motes to 180 per hull, 0.15 m sprites and 0.16 opacity.
+These settings reduce large seabed flecks outside the foreground guard while
+preserving the 30-intensity ambient fill that lights the hull. Low skips both
+wreck particle layers.
 Regression coverage:
 `tests/unit/marineSnowReadability.test.ts` (13 sites, four tiers, free/mission openings).
 
@@ -81,10 +93,10 @@ Regression coverage:
 
 | tier   | post | bloom levels | god-ray octaves | MSAA | snow | caustics px | beam detail |
 | ------ | ---- | ------------ | --------------- | ---- | ---- | ----------- | ----------- |
-| low    | no   | 0            | 0               | 0    | 600  | 0           | 0 (plain)   |
-| medium | yes  | 1            | 1               | 0    | 3000 | 128         | 1           |
-| high   | yes  | 2            | 2               | 4    | 9000 | 256         | 2           |
-| ultra  | yes  | 2            | 2               | 4    | 9000 | 256         | 2           |
+| low    | no   | 0            | 0               | 0    | 300  | 0           | 0 (plain)   |
+| medium | yes  | 1            | 1               | 0    | 1200 | 128         | 1           |
+| high   | yes  | 2            | 2               | 4    | 3000 | 256         | 2           |
+| ultra  | yes  | 2            | 2               | 4    | 3000 | 256         | 2           |
 
 ## Follow-ups
 

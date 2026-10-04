@@ -75,9 +75,18 @@ export function snowParticleAppearance(
     sizeCap,
   );
   const fog = Math.exp(-(atmosphere.fogDensity ** 2) * viewDepthM ** 2);
+  const distanceFade =
+    THREE.MathUtils.smoothstep(cameraDistanceM, 0, config.snowForegroundFadeEndM) *
+    (1 - THREE.MathUtils.smoothstep(cameraDistanceM, config.snowFadeStartM, config.snowFadeEndM));
   const alpha =
-    edge * (seed <= atmosphere.snowDensity ? 1 : 0) * (0.55 + 0.45 * fog) * (0.5 + 0.5 * lit);
-  const brightness = 0.22 + 0.78 * Math.min(1, atmosphere.ambientIntensity / 1.5) + lit * 2.6;
+    config.snowOpacity *
+    distanceFade *
+    edge *
+    (seed <= atmosphere.snowDensity ? 1 : 0) *
+    (0.55 + 0.45 * fog) *
+    (0.5 + 0.5 * lit);
+  const brightness =
+    0.22 + 0.78 * Math.min(1, atmosphere.ambientIntensity / 1.5) + lit * config.snowLampGain;
   return {
     sizePx,
     alpha: Math.min(alpha, THREE.MathUtils.lerp(config.snowForegroundAlpha, 1, t)),
@@ -134,6 +143,10 @@ export class MarineSnow {
         uDrift: { value: 0.2 },
         uFlow: { value: new THREE.Vector2() },
         uSizeM: { value: config.snowSizeM },
+        uOpacity: { value: config.snowOpacity },
+        uLampGain: { value: config.snowLampGain },
+        uFadeStartM: { value: config.snowFadeStartM },
+        uFadeEndM: { value: config.snowFadeEndM },
         uScale: { value: 500 },
         ...snowReadabilityUniforms(config),
         uLampPos: { value: new THREE.Vector3() },
@@ -215,6 +228,9 @@ uniform float uMaxSizePx;
 uniform float uForegroundM;
 uniform float uForegroundFadeEndM;
 uniform float uForegroundSizePx;
+uniform float uOpacity;
+uniform float uFadeStartM;
+uniform float uFadeEndM;
 uniform float fogDensity;
 uniform vec3  uLampPos;
 uniform vec3  uLampDir;
@@ -240,7 +256,8 @@ void main() {
   vec4 mv = viewMatrix * vec4(world, 1.0);
   float dist = -mv.z;
   // Use radial distance: the guard must hold at the sides of the frame too.
-  vForegroundFade = smoothstep(uForegroundM, uForegroundFadeEndM, length(world - uCam));
+  float cameraDistance = length(world - uCam);
+  vForegroundFade = smoothstep(uForegroundM, uForegroundFadeEndM, cameraDistance);
   gl_Position = projectionMatrix * mv;
 
   // Lit by the boat's lamps: inside the beam cone, fading with range.
@@ -260,7 +277,11 @@ void main() {
   vec3 d = abs(world - uCam) / (0.5 * uBox);
   float edge = 1.0 - smoothstep(0.7, 1.0, max(d.x, max(d.y, d.z)));
   float fog = exp(-fogDensity * fogDensity * dist * dist);
-  vAlpha = edge * step(aSeed, uDensity) * mix(0.55, 1.0, fog);
+  // Leave drifting cues in the middle distance, without lens flecks or a
+  // bright point field silhouetted against the dark far water.
+  float distanceFade = smoothstep(0.0, uForegroundFadeEndM, cameraDistance)
+    * (1.0 - smoothstep(uFadeStartM, uFadeEndM, cameraDistance));
+  vAlpha = uOpacity * distanceFade * edge * step(aSeed, uDensity) * mix(0.55, 1.0, fog);
   if (vAlpha <= 0.0) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
 }
 `;
@@ -269,6 +290,7 @@ const SNOW_FRAG = /* glsl */ `
 precision highp float;
 uniform vec3  uColor;
 uniform float uBrightness;
+uniform float uLampGain;
 uniform float uForegroundAlpha;
 uniform float uForegroundBrightness;
 varying float vAlpha;
@@ -282,7 +304,7 @@ void main() {
   // Gaussian-ish sprite: soft edge, no hard disc.
   float soft = exp(-r * 14.0);
   float brightnessCap = mix(uForegroundBrightness, 3.6, vForegroundFade);
-  vec3 col = uColor * min(uBrightness + vLit * 2.6, brightnessCap);
+  vec3 col = uColor * min(uBrightness + vLit * uLampGain, brightnessCap);
   // Clamp the centre before applying the Gaussian, preserving a soft edge.
   float alphaCap = mix(uForegroundAlpha, 1.0, vForegroundFade);
   float a = min(vAlpha * (0.5 + 0.5 * vLit), alphaCap) * soft;

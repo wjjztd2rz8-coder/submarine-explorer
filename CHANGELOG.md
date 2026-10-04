@@ -14,6 +14,30 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-TITANIC-SNOW-570 unit gate follow-up: build source-resolution
+  seafloor mesh geometry in the Monterey wall-life test while retaining each
+  tier's surveyed height sampler, detail octaves and full prop/apron geometry.
+  Reason: unused seafloor subdivisions made the Ultra case exceed its existing
+  5-second limit under full-suite load. Keep every colony count, clearance,
+  apron intersection and planted-life assertion, and the original timeout.
+
+- Phase F, F-TITANIC-SNOW-570 gate follow-up: wait for the asynchronously loaded
+  fixture POI teleport and a valid scan candidate before the onboarding test
+  saves its return pose. Check the candidate again after practising touch
+  movement and restoring that pose. Reason: capturing the initial tile position
+  left the held Scan out of range and stalled the touch-only photo flow.
+  Preserve all existing action, layout, movement and completion assertions.
+
+- Phase F, F-TITANIC-SNOW-570: reduce permanent marine snow to
+  300/1,200/3,000/3,000 particles across Low/Medium/High/Ultra, with smaller
+  sprites (0.08 m, 3 px cap), 0.24 alpha, gentler lamp flare, and radial lens/far
+  fades. Reason: bright lower-frame flakes obscured Titanic hull detail against
+  dark water. Thin and soften Titanic's seabed haze and hull rust motes through
+  its existing site overrides. Keep GPU drift and the wreck lighting/sediment
+  guard; Low remains one snow draw with no particle uploads. Deliberately update count/readability
+  coverage. Golden Titanic 1–3 comparison is pending sandbox browser/localhost
+  access; validation details: `plan/progress/F-TITANIC-SNOW-570.md`.
+
 - Phase F, F-BLUEHOLE-PITCH: Openings can now tilt the chase camera (`chaseOffsetY`, a per-site
   vertical arm offset); the Great Blue Hole opening uses it and sits 22 m below the ledge, so
   the first frame looks down across the open water with the whole sub, the ledge, the surface

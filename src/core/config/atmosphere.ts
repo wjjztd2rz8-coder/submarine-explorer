@@ -110,6 +110,12 @@ export interface WaterConfig {
   snowBoxM: number;
   /** Marine-snow point size in metres (size-attenuated). */
   snowSizeM: number;
+  /** Permanent snow opacity and extra linear brightness inside the lamp cone. */
+  snowOpacity: number;
+  snowLampGain: number;
+  /** Radial far fade; permanent snow vanishes at snowFadeEndM. */
+  snowFadeStartM: number;
+  snowFadeEndM: number;
   /** Point diameter in drawing-buffer pixels; independent of tier and DPR. */
   snowMaxSizePx: number;
   /** Camera-relative foreground guard, easing back to normal by fadeEndM. */
@@ -220,8 +226,12 @@ export const DEFAULT_WATER: WaterConfig = {
   causticsFootprintM: 320,
   causticsFps: 12,
   snowBoxM: 160,
-  snowSizeM: 0.14,
-  snowMaxSizePx: 6,
+  snowSizeM: 0.08,
+  snowOpacity: 0.24,
+  snowLampGain: 0.8,
+  snowFadeStartM: 40,
+  snowFadeEndM: 80,
+  snowMaxSizePx: 3,
   snowForegroundM: 6,
   snowForegroundFadeEndM: 12,
   snowForegroundSizePx: 2,
@@ -237,7 +247,7 @@ export const DEFAULT_WATER: WaterConfig = {
     low: {
       post: false,
       godRays: false,
-      snowCount: 600,
+      snowCount: 300,
       causticsSize: 0,
       headlightCones: true,
       aberration: 0,
@@ -249,7 +259,7 @@ export const DEFAULT_WATER: WaterConfig = {
     medium: {
       post: true,
       godRays: true,
-      snowCount: 3000,
+      snowCount: 1200,
       causticsSize: 128,
       headlightCones: true,
       aberration: 1,
@@ -261,7 +271,7 @@ export const DEFAULT_WATER: WaterConfig = {
     high: {
       post: true,
       godRays: true,
-      snowCount: 9000,
+      snowCount: 3000,
       causticsSize: 256,
       headlightCones: true,
       aberration: 1.4,
@@ -274,7 +284,7 @@ export const DEFAULT_WATER: WaterConfig = {
     ultra: {
       post: true,
       godRays: true,
-      snowCount: 9000,
+      snowCount: 3000,
       causticsSize: 256,
       headlightCones: true,
       aberration: 1.4,
