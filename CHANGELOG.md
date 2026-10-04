@@ -14,6 +14,12 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BEEBE-MONTEREY: Beebe Vent Field opens with a shorter, lower chase
+  arm (54 m, -16 m offset) so the sub fills the frame beside a lit smoker.
+  Monterey wall boulders are now fractured, stretched, banded blocks and the
+  wall sponges are roughened with more segments. Reason: the golden set showed
+  a small sub on a dark seabed and a hexagonal boulder that read as fake. Other
+  sites unchanged; instance counts unchanged.
 - Phase F, F-VERIFY-530 follow-up: give credit links a single clickable box
   when the credits panel wraps or scrolls. Reason: the split inline `CC BY 4.0`
   label left its bounding-box centre over the paragraph, failing the link
