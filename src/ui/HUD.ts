@@ -143,7 +143,7 @@ export class HUD {
       <div class="hud-prompt" hidden></div>
       <div class="hud-control-tips" hidden></div>
       <button class="hud-reset-camera" type="button" aria-label="Reset camera">Reset camera</button>
-      <div class="hud-attribution"></div>
+      <div class="hud-attribution"><span class="hud-attribution-credit"></span><span class="hud-attribution-pill" aria-hidden="true"></span></div>
     `;
     for (const el of this.root.querySelectorAll<HTMLSpanElement>('[data-field]')) {
       this.values.set(el.dataset.field as Field, el);
@@ -159,7 +159,8 @@ export class HUD {
     this.powerEl = this.root.querySelector('.hud-power') as HTMLDivElement;
     this.currentEl = this.root.querySelector('.hud-current') as HTMLDivElement;
     const attr = this.root.querySelector('.hud-attribution') as HTMLDivElement;
-    attr.textContent = meta.attribution;
+    attr.querySelector('.hud-attribution-credit')!.textContent = meta.attribution;
+    attr.querySelector('.hud-attribution-pill')!.textContent = `${meta.source} bathymetry`;
     attr.title = meta.attribution;
 
     parent.appendChild(this.root);

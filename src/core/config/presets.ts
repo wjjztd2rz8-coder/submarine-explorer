@@ -48,6 +48,9 @@ export interface VentPresetConfig {
   /** Distance fog density multiplier (1 = unchanged) and lift toward a pale haze (0 = none). */
   hazeScale: number;
   hazeLift: number;
+  /** Optional warm orifice haze (0 = disabled); adds one draw for the field. */
+  hazeGlow: number;
+  hazeGlowSizeM: number;
   /** Shimmer (luminance wobble sprite over each orifice): amplitude and size (m). */
   shimmerStrength: number;
   shimmerSizeM: number;
@@ -249,6 +252,8 @@ export const DEFAULT_PRESETS: PresetsConfig = {
     ambientFill: 0,
     hazeScale: 1,
     hazeLift: 0,
+    hazeGlow: 0,
+    hazeGlowSizeM: 7,
     shimmerStrength: 0.08,
     shimmerSizeM: 9,
     upwellMps: 0.35,

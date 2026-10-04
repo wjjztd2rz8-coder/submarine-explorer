@@ -72,6 +72,31 @@
   box-sizing: border-box;
 }
 
+/* Keep the full credit available to assistive technology and in the title, but
+   reserve only a small source pill while the on-screen controls are visible. */
+.hud-attribution-pill {
+  display: none;
+}
+html.is-touch body:has(.tc-root:not([hidden])) .hud-attribution-credit {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+html.is-touch body:has(.tc-root:not([hidden])) .hud-attribution-pill {
+  display: inline;
+}
+html.is-touch body:has(.tc-root:not([hidden])) .hud-attribution {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 999px;
+}
+
 /* Touch landscape: the map credit sits in the strip between stick and buttons. */
 @media (orientation: landscape) {
   html.is-touch .hud-attribution {
@@ -450,6 +475,25 @@
    bottom:400px. Use the same compact readouts as landscape, followed by the
    scan and tutorial rows; keep the 44px tutorial buttons and touch controls. */
 @media (orientation: portrait) and (max-width: 700px) and (max-height: 700px) {
+  /* The enlarged Pause row and wrapped telemetry otherwise enter the scan
+     row. Cap only the playing HUD to the normal phone scale; menus and the
+     saved preference retain their requested size. Touch targets keep their
+     existing 44/48 px floors, and lower scale preferences still apply. */
+  html.is-touch {
+    --hl-compact-scale: min(calc(var(--ui-auto-scale) * var(--ui-user-scale)), 0.8);
+    --hl-portrait-stack-top: calc(
+      24px + max(48px, calc(50px * var(--hl-compact-scale))) + env(safe-area-inset-top, 0px)
+    );
+  }
+  html.is-touch .hud,
+  html.is-touch .objectives-panel,
+  html.is-touch .sonar,
+  html.is-touch .scan-overlay,
+  html.is-touch .onboard-card,
+  html.is-touch .onboard-hint,
+  html.is-touch .tc-root {
+    --ui-scale: var(--hl-compact-scale);
+  }
   html.is-touch .sonar:not(.d-sonar-expanded) canvas {
     max-height: 120px;
     object-fit: contain;
