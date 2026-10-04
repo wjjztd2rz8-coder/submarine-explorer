@@ -26,6 +26,11 @@ allocates no preset draw geometry or glow lights; current force and trench
 events still run. `medium` uses half the high-tier particle count. The global
 `maxParticles` cap applies to each preset.
 
+Sulfide sites may explicitly enable `hazeGlow` (default 0) for one additional
+additive hot-water haze draw shared by all orifices. Beebe enables it at 0.5;
+`hazeGlowSizeM` controls the sprites' size (default 7 m). Generic vent presets
+retain the two-draw budget above, and carbonate fluid never adds this hot haze.
+
 The base current is the attributed [offline HYCOM site grid](currents.md).
 The canyon bends and scales that base flow; it does not add a separate fixed
 current. The current's bearing is the direction water flows **toward**: 0° north

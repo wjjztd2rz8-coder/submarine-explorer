@@ -1,4 +1,4 @@
-# Bathymetry Data Sources for Submarine Explorer
+# Bathymetry Data Sources for Bathyline
 
 Research date: 2026-09-16. All URLs and API behaviors below were verified live (via `curl` and/or `WebFetch`/`WebSearch`) on this date. Formats and limits on these services can change without notice — re-verify before relying on this in production, especially the GMRT size limits and the GEBCO/EMODnet version numbers (currently GEBCO_2025 and EMODnet DTM 2024).
 

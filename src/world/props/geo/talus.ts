@@ -25,6 +25,9 @@ export interface TalusShape {
 /** Concavity of the apron profile: 1 = straight ramp, higher = more concave. */
 const CONCAVE = 1.8;
 
+/** Apron vertex lift above the analytic surface, hiding terrain triangulation gaps. */
+export const TALUS_LIP_RISE = 0.3;
+
 /** Apron thickness above the ground at (x, z); 0 outside the apron. */
 export function talusDepth(t: TalusShape, x: number, z: number): number {
   const reach = t.reach(x);
@@ -92,8 +95,11 @@ export function buildTalusMesh(
       const z = foot - s;
       const u = Math.max(0, s / reach);
       // Rest slightly proud of the seabed (hides triangulation mismatch) and sink the rim.
-      const lip = 0.3 * (1 - smooth(0.78, 1, u)) - 0.7 * smooth(0.9, 1, u);
-      const y = t.gnd(x, z) + (talusDepth(t, x, z) + (s > 0 ? lip : 0.3)) * fade - 0.8 * (1 - fade);
+      const lip = TALUS_LIP_RISE * (1 - smooth(0.78, 1, u)) - 0.7 * smooth(0.9, 1, u);
+      const y =
+        t.gnd(x, z) +
+        (talusDepth(t, x, z) + (s > 0 ? lip : TALUS_LIP_RISE)) * fade -
+        0.8 * (1 - fade);
       const k = i * (rows + 1) + j;
       pos[k * 3] = x;
       pos[k * 3 + 1] = y;

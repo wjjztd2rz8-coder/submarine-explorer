@@ -49,8 +49,16 @@ class TestBathylineBrand(unittest.TestCase):
         self.assertEqual(manifest['name'], name)
         self.assertEqual(manifest['short_name'], name)
         self.assertEqual((ROOT / 'README.md').read_text().splitlines()[0], '# ' + name)
-        for filename in ['LICENSE', 'LICENSE-CONTENT.md', 'preview/vehicles.html']:
-            self.assertNotIn('Submarine Explorer', (ROOT / filename).read_text())
+        public_files = [ROOT / filename for filename in [
+            'index.html', 'public/manifest.webmanifest', 'README.md',
+            'LICENSE', 'LICENSE-CONTENT.md', 'preview/vehicles.html',
+            'docs/data-sources.md', 'docs/art-direction.md', 'docs/assets.md',
+            'docs/deploy.md', 'docs/landmarks.md', 'docs/architecture.md',
+        ]]
+        public_files.extend((ROOT / 'src').rglob('*.ts'))
+        for path in public_files:
+            with self.subTest(path=str(path.relative_to(ROOT))):
+                self.assertNotIn('submarine explorer', path.read_text().lower())
 
     def test_svg_themes_and_legacy_urls_share_contours(self):
         def paths(filename):

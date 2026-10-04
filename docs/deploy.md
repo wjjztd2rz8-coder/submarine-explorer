@@ -1,4 +1,4 @@
-# Deploying Submarine Explorer
+# Deploying Bathyline
 
 The game is a static site: `npm run build` writes HTML, JS, CSS, models and the
 bathymetry tiles to `dist/`, and any static host can serve it. The repository

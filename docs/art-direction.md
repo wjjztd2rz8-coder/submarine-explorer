@@ -1,4 +1,4 @@
-# Art direction and mood board — Submarine Explorer
+# Art direction and mood board — Bathyline
 
 Owner: docs/art-direction.md and docs/img/moodboard/* (package A5). Do not edit source under `src/`.
 

@@ -7,7 +7,8 @@
  * with none, POIs of kind `vent`. `fluid: carbonate` (Lost City) swaps the
  * dark sulfide smoke for a pale, faint, cooler plume.
  *
- * Draw calls: 2 (smoke points + shimmer points). The shimmer is a cheap
+ * Draw calls: 2 (smoke points + shimmer points), plus one optional hot-water
+ * haze draw when a sulfide site's `hazeGlow` override enables it. The shimmer is a cheap
  * stand-in for refraction: point sprites blended as `dst * src` with src
  * wobbling around 1.0, so the background luminance ripples over the vent top
  * without sampling the frame (see docs/presets.md).
@@ -263,7 +264,7 @@ export class VentPreset implements EnvPreset {
 
   /** Lit hot-water haze: a warm additive glow of soft sprites above each orifice. */
   private buildHaze(): void {
-    const strength = num(this.params.hazeGlow, 0.5);
+    const strength = num(this.params.hazeGlow, 0);
     if (strength <= 0) return;
     const pos: number[] = [];
     const seed: number[] = [];
