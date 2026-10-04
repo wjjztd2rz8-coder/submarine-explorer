@@ -8,15 +8,15 @@ Run `tools/golden.sh` at the start of any run that merged visual work. Compare a
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
-1. **Batch-merge the finished Codex worktrees 540 (merge-residue bughunt), 560 (Beebe seabed lift) and 580 (530 fix), then 530**, with one full-e2e on the final main (550 merged in f25). Cheapest player-visible wins on the list.
-2. **Titanic snow and far field:** snow flecks still blanket the hull (570 running, review its shots); far field now has a faint haze but the sky above is near-black; add a lighter horizon gradient.
+1. ~~Batch-merge 540/560/580/530~~ merged (f26/f27). Codex 610 (portrait/low-tier pitch verification) and 620 (first-minute audit) finished and need gates + review next.
+2. ~~Titanic snow~~ merged (570, shots good: sparse snow, hull readable). Remaining: sky above the far field is near-black; add a lighter horizon gradient.
 3. **Lost City beehive chimney:** smooth white slab with no life at its base (600 queued for Codex; if it stalls, do it in Claude with banded vertex colours and base corals).
-4. **Beebe sub scale:** sub is small in shot 1 and the flat seabed is dark; nearer default camera or vent framing (560 covers seabed only).
+4. **Beebe sub scale (partly done in f27: nearer pose, sub now fills frame but hides the nearest chimney; seabed still dark):** sub is small in shot 1 and the flat seabed is dark; nearer default camera or vent framing (560 covers seabed only).
 5. **Blue Hole east grotto and stalactite gallery:** shot 1 is good now; east grotto poses still need a close shot with context.
-6. **Monterey coral hex boulder:** the boulder reads fake; replace or break up with rock variants.
+6. ~~Monterey hex boulder~~ done in f27 (fractured boulders, rough sponges). Old text:  the boulder reads fake; replace or break up with rock variants.
 7. **Debrief/Journal polish** from the 510 audit design questions (F-FLOW-AUDIT-510.md).
 
-Codex queue: 570, 580, 590 running; 540, 550, 560 finished and awaiting merge; queued 600 (Lost City), 610 (portrait/low-tier verification of f24 poses), 620 (first-minute audit and fixes), 630 (Lost City/Monterey fact check). 450-triage holds only a spec.
+Codex queue (f27 update: 600, 610, 620 finished/running; queued 630, 640, 650); older: 570, 580, 590 running; 540, 550, 560 finished and awaiting merge; queued 600 (Lost City), 610 (portrait/low-tier verification of f24 poses), 620 (first-minute audit and fixes), 630 (Lost City/Monterey fact check). 450-triage holds only a spec.
 
 Demoted: further title polish; rebrand logo (done, Codex 440).
 
