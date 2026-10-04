@@ -35,6 +35,8 @@ export class CameraRig {
   lookElevation = 0;
   orbitRadius: number;
   chaseRadius: number;
+  private chaseRadiusDefault: number;
+  private chaseOffsetX = 0;
 
   private readonly desiredPosition = new THREE.Vector3();
   private readonly desiredTarget = new THREE.Vector3();
@@ -62,6 +64,7 @@ export class CameraRig {
     this.camera.name = 'mainCamera';
     this.orbitRadius = config.orbitRadius;
     this.chaseRadius = Math.hypot(config.chaseOffset.x, config.chaseOffset.y, config.chaseOffset.z);
+    this.chaseRadiusDefault = this.chaseRadius;
     this.orbitElevation = config.orbitElevation;
   }
 
@@ -119,7 +122,21 @@ export class CameraRig {
     return this.mode;
   }
 
-  /** Return to the configured chase view and zoom. */
+  /** Set a dive's reset distance separately from the pilot's wheel zoom. */
+  setChaseRadiusDefault(
+    radius = Math.hypot(
+      this.config.chaseOffset.x,
+      this.config.chaseOffset.y,
+      this.config.chaseOffset.z,
+    ),
+    offsetX = 0,
+  ): void {
+    this.chaseRadiusDefault = radius;
+    this.chaseRadius = radius;
+    this.chaseOffsetX = offsetX;
+  }
+
+  /** Return to this dive's chase view and zoom. */
   resetView(): void {
     this.freeLook = false;
     this.lookAzimuth = 0;
@@ -128,11 +145,7 @@ export class CameraRig {
     this.pendingLookElevation = 0;
     this.freeLookTargetOffset.set(0, 0, 0);
     this.freeLookAimElapsed = 0;
-    this.chaseRadius = Math.hypot(
-      this.config.chaseOffset.x,
-      this.config.chaseOffset.y,
-      this.config.chaseOffset.z,
-    );
+    this.chaseRadius = this.chaseRadiusDefault;
     this.bank = 0;
     this.setMode('chase');
   }
@@ -226,9 +239,8 @@ export class CameraRig {
             )
             .multiplyScalar(this.chaseRadius);
         } else {
-          this.offset.multiplyScalar(
-            this.chaseRadius / Math.hypot(c.chaseOffset.x, c.chaseOffset.y, c.chaseOffset.z),
-          );
+          this.offset.x += this.chaseOffsetX;
+          this.offset.multiplyScalar(this.chaseRadius / this.offset.length());
           this.offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), -yaw);
         }
       } else {

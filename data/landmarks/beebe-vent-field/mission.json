@@ -10,7 +10,8 @@
       "smokeOpacitySulfide": 0.85,
       "ambientFill": 8,
       "glowIntensity": 520,
-      "glowDistanceM": 80
+      "glowDistanceM": 80,
+      "hazeGlow": 0.5
     }
   },
   "species_file": "species.json",

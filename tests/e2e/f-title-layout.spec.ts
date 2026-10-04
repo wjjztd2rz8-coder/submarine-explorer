@@ -18,6 +18,9 @@ async function boot(page: Page): Promise<void> {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
   await expect(page.locator('.home-screen')).toBeVisible();
+  // Catalogue loading makes the Daily card appear after the first game frame.
+  // Wait for it before counting/indexing buttons and scrolling their centres.
+  await expect(page.locator('.home-menu .daily-card')).toBeVisible();
 }
 
 test('home copy, semantic order and first focus', async ({ page }) => {

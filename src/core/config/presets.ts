@@ -51,6 +51,9 @@ export interface VentPresetConfig {
   /** Shimmer (luminance wobble sprite over each orifice): amplitude and size (m). */
   shimmerStrength: number;
   shimmerSizeM: number;
+  /** Optional sulfide hot-water haze; 0 keeps the generic vent's two-draw budget. */
+  hazeGlow: number;
+  hazeGlowSizeM: number;
   /** Upwelling above chimneys: speed at the orifice (m/s), radius and height of the column (m). */
   upwellMps: number;
   upwellRadiusM: number;
@@ -251,6 +254,8 @@ export const DEFAULT_PRESETS: PresetsConfig = {
     hazeLift: 0,
     shimmerStrength: 0.08,
     shimmerSizeM: 9,
+    hazeGlow: 0,
+    hazeGlowSizeM: 7,
     upwellMps: 0.35,
     upwellRadiusM: 18,
     upwellHeightM: 120,

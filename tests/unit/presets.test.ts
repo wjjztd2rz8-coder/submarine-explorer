@@ -1,4 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
+import { Scene, Vector3 } from 'three';
+import { EventBus } from '../../src/core/EventBus.js';
+import { VentPreset } from '../../src/world/presets/VentPreset.js';
+import type { PresetParams } from '../../src/world/presets/types.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import {
   landmarkTypeFor,
@@ -188,6 +194,52 @@ describe('current maths', () => {
 });
 
 describe('vent plume variety', () => {
+  it('retains the generic two-draw budget while Beebe explicitly opts into warm haze', () => {
+    const defaults = presetDefaults(DEFAULT_CONFIG.presets, 'vent');
+    const mission = JSON.parse(
+      readFileSync('data/landmarks/beebe-vent-field/mission.json', 'utf8'),
+    );
+    const warn = vi.fn();
+    const beebe = mergePresetParams('vent', defaults, mission.environment.overrides, warn);
+    expect(warn).not.toHaveBeenCalled();
+    expect(beebe.hazeGlow).toBe(0.5);
+    for (const { params, visuals, draws, haze } of [
+      { params: defaults, visuals: true, draws: 2, haze: false },
+      { params: beebe, visuals: true, draws: 3, haze: true },
+      { params: { ...beebe, fluid: 'carbonate' }, visuals: true, draws: 2, haze: false },
+      { params: beebe, visuals: false, draws: 0, haze: false },
+    ]) {
+      const scene = new Scene();
+      const preset = new VentPreset({ ambient: 0.1, headlightGain: 1, headlightFalloffM: 60 });
+      try {
+        preset.enter({
+          scene,
+          terrain: {
+            sampleHeight: () => -5000,
+            getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+            widthM: 1000,
+            depthM: 1000,
+          },
+          props: [],
+          pois: [{ id: 'vent', kind: 'vent', position: new Vector3(0, -4900, 0) }],
+          params: params as PresetParams,
+          visuals,
+          particleScale: 0.5,
+          maxParticles: 1000,
+          spawn: new Vector3(0, -4900, 0),
+          toWorld: () => ({ x: 0, z: 0 }),
+          bus: new EventBus(),
+        });
+        expect(preset.stats.draws).toBe(draws);
+        expect(scene.getObjectByName('ventHaze') !== undefined).toBe(haze);
+      } finally {
+        preset.exit();
+      }
+      expect(scene.getObjectByName('ventSmoke')).toBeUndefined();
+      expect(scene.getObjectByName('ventShimmer')).toBeUndefined();
+      expect(scene.getObjectByName('ventHaze')).toBeUndefined();
+    }
+  });
   it('is deterministic per vent and differs between vents', async () => {
     const { ventVariety } = await import('../../src/world/presets/VentPreset.js');
     const THREE = await import('three');

@@ -26,6 +26,12 @@ allocates no preset draw geometry or glow lights; current force and trench
 events still run. `medium` uses half the high-tier particle count. The global
 `maxParticles` cap applies to each preset.
 
+The generic vent retains two draws (smoke and shimmer). Sulfide fields may
+opt into a third warm hot-water haze draw with `hazeGlow` (default 0) and
+`hazeGlowSizeM` (default 7 m); Beebe sets `hazeGlow: 0.5` in its mission
+environment. Carbonate fields never allocate that sulfide haze. These keys
+are registered in `Config.presets.vent`, so mission overrides are validated.
+
 The base current is the attributed [offline HYCOM site grid](currents.md).
 The canyon bends and scales that base flow; it does not add a separate fixed
 current. The current's bearing is the direction water flows **toward**: 0° north

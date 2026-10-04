@@ -42,6 +42,8 @@ export interface CameraConfig {
   /** Photo-mode free orbit: radius and starting elevation (radians). */
   orbitRadius: number;
   orbitElevation: number;
+  /** Arcade Lost City composition; Realistic/Custom retain the authored approach. */
+  lostCityArcadeOpening: { rangeM: number; chaseRadiusM: number; chaseOffsetXM: number };
 }
 
 export const DEFAULT_CAMERA: CameraConfig = {
@@ -62,4 +64,5 @@ export const DEFAULT_CAMERA: CameraConfig = {
   bankFollow: 0.55,
   orbitRadius: 90,
   orbitElevation: 0.35,
+  lostCityArcadeOpening: { rangeM: 38, chaseRadiusM: 50, chaseOffsetXM: -20 },
 };

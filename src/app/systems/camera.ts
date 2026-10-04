@@ -76,10 +76,7 @@ export const cameraControlsSystem: GameSystem = {
     };
     cleanup.add(
       bus.on('mission:started', () => {
-        const openingRadius = rig.chaseRadius;
         rig.resetView();
-        if (ctx.route?.landmarkId === 'lost-city' && ctx.settings.gameplayMode === 'arcade')
-          rig.chaseRadius = openingRadius;
         startTips();
       }),
     );
@@ -101,7 +98,7 @@ export const cameraControlsSystem: GameSystem = {
     });
     cleanup.add(
       hud.onResetCamera(() => {
-        if (ctx.app.state === 'dive') {
+        if (ctx.app.state === 'dive' && !ctx.photoMode.active) {
           rig.resetView();
           tips.until = 0;
         }
@@ -110,6 +107,7 @@ export const cameraControlsSystem: GameSystem = {
     cleanup.listen(canvas, 'dblclick', () => {
       if (
         ctx.app.state === 'dive' &&
+        !ctx.photoMode.active &&
         !ctx.settingsScreen.isOpen &&
         !ctx.globe.isOpen &&
         !(ctx.missionRouter?.frozen ?? false)

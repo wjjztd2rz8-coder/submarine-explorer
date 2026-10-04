@@ -89,6 +89,8 @@ const FREE_DIVE_OPENINGS: Record<
     turnWeight?: number;
     /** Pull the chase camera in to this arm length (m): a long wreck then fills the frame. */
     chaseRadius?: number;
+    /** Extra lateral chase offset, preserving the sub's authored approach heading. */
+    chaseOffsetX?: number;
   }
 > = {
   titanic: {
@@ -164,7 +166,12 @@ export function composedFreeDiveSpawn(
   // shorter chase arm so the full tower and nearby floor share the frame.
   const opening =
     siteId === 'lost-city' && gameplayMode === 'arcade'
-      ? { ...authored!, range: 38, chaseRadius: 50 }
+      ? {
+          ...authored!,
+          range: cameraConfig.lostCityArcadeOpening.rangeM,
+          chaseRadius: cameraConfig.lostCityArcadeOpening.chaseRadiusM,
+          chaseOffsetX: cameraConfig.lostCityArcadeOpening.chaseOffsetXM,
+        }
       : authored;
   const hero = props.placed.find((p) => p.def.id === opening?.hero);
   if (!opening || !hero || hero.localBounds.isEmpty()) return null;
@@ -222,7 +229,7 @@ export function composedFreeDiveSpawn(
     // Reserve a clear chase arm as well as a collision-free submarine pose.
     const yaw =
       Math.atan2(target.x - p.x, -(target.z - p.z)) + ((opening.yawOffset ?? 0) * Math.PI) / 180;
-    if (opening.chaseRadius) rig.chaseRadius = opening.chaseRadius;
+    rig.setChaseRadiusDefault(opening.chaseRadius, opening.chaseOffsetX);
     rig.snap(p, yaw, 0);
     let cameraClear = true;
     for (let i = 1; i <= 6; i++) {
@@ -233,7 +240,14 @@ export function composedFreeDiveSpawn(
     const score = Math.abs(p.y - wantedY) * 3 + Math.abs(turn) * (opening.turnWeight ?? 0.12);
     if (score < bestScore) {
       bestScore = score;
-      best = { x: p.x, y: p.y, z: p.z, yaw, chaseRadius: opening.chaseRadius };
+      best = {
+        x: p.x,
+        y: p.y,
+        z: p.z,
+        yaw,
+        chaseRadius: opening.chaseRadius,
+        chaseOffsetX: opening.chaseOffsetX,
+      };
     }
   }
   return best;
