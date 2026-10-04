@@ -35,6 +35,56 @@ export interface SnowLamp {
   on: boolean;
 }
 
+/** Shared by permanent snow and the snow-like wreck sediment layers. */
+export function snowReadabilityUniforms(config: WaterConfig): Record<string, THREE.IUniform> {
+  return {
+    uMaxSizePx: { value: config.snowMaxSizePx },
+    uForegroundM: { value: config.snowForegroundM },
+    uForegroundFadeEndM: { value: config.snowForegroundFadeEndM },
+    uForegroundSizePx: { value: config.snowForegroundSizePx },
+    uForegroundAlpha: { value: config.snowForegroundAlpha },
+    uForegroundBrightness: { value: config.snowForegroundBrightness },
+  };
+}
+
+/** CPU mirror of the sprite-centre shader bounds for code-level readability audits.
+ * viewDepthM drives perspective/fog; cameraDistanceM drives the spherical guard.
+ * edge and lit are the vertex shader's wrapping fade and lamp-cone weight.
+ * Brightness is the linear colour multiplier before tone mapping, not pixel luminance.
+ */
+export function snowParticleAppearance(
+  config: WaterConfig,
+  atmosphere: AtmosphereSample,
+  scale: number,
+  seed: number,
+  viewDepthM: number,
+  cameraDistanceM: number,
+  lit: number,
+  edge = 1,
+): { sizePx: number; alpha: number; brightness: number } {
+  const t = THREE.MathUtils.smoothstep(
+    cameraDistanceM,
+    config.snowForegroundM,
+    config.snowForegroundFadeEndM,
+  );
+  const sizeCap = THREE.MathUtils.lerp(config.snowForegroundSizePx, config.snowMaxSizePx, t);
+  const sizePx = THREE.MathUtils.clamp(
+    (config.snowSizeM * (0.35 + 1.6 * seed * seed) * (1 + 0.7 * lit) * scale) /
+      Math.max(1, viewDepthM),
+    1,
+    sizeCap,
+  );
+  const fog = Math.exp(-(atmosphere.fogDensity ** 2) * viewDepthM ** 2);
+  const alpha =
+    edge * (seed <= atmosphere.snowDensity ? 1 : 0) * (0.55 + 0.45 * fog) * (0.5 + 0.5 * lit);
+  const brightness = 0.22 + 0.78 * Math.min(1, atmosphere.ambientIntensity / 1.5) + lit * 2.6;
+  return {
+    sizePx,
+    alpha: Math.min(alpha, THREE.MathUtils.lerp(config.snowForegroundAlpha, 1, t)),
+    brightness: Math.min(brightness, THREE.MathUtils.lerp(config.snowForegroundBrightness, 3.6, t)),
+  };
+}
+
 export class MarineSnow {
   readonly points: THREE.Points | null;
 
@@ -85,6 +135,7 @@ export class MarineSnow {
         uFlow: { value: new THREE.Vector2() },
         uSizeM: { value: config.snowSizeM },
         uScale: { value: 500 },
+        ...snowReadabilityUniforms(config),
         uLampPos: { value: new THREE.Vector3() },
         uLampDir: { value: new THREE.Vector3(0, 0, -1) },
         uLampCos: { value: 0.8 },
@@ -160,6 +211,10 @@ uniform float uDrift;
 uniform vec2 uFlow;
 uniform float uSizeM;
 uniform float uScale;
+uniform float uMaxSizePx;
+uniform float uForegroundM;
+uniform float uForegroundFadeEndM;
+uniform float uForegroundSizePx;
 uniform float fogDensity;
 uniform vec3  uLampPos;
 uniform vec3  uLampDir;
@@ -169,6 +224,7 @@ uniform float uLampOn;
 attribute float aSeed;
 varying float vAlpha;
 varying float vLit;
+varying float vForegroundFade;
 
 void main() {
   // Drift: mostly sinking, with a slow per-particle lateral sway.
@@ -183,6 +239,8 @@ void main() {
 
   vec4 mv = viewMatrix * vec4(world, 1.0);
   float dist = -mv.z;
+  // Use radial distance: the guard must hold at the sides of the frame too.
+  vForegroundFade = smoothstep(uForegroundM, uForegroundFadeEndM, length(world - uCam));
   gl_Position = projectionMatrix * mv;
 
   // Lit by the boat's lamps: inside the beam cone, fading with range.
@@ -194,7 +252,8 @@ void main() {
 
   // A wide spread of sizes: most are fine dust, a few are proper flakes.
   float sizeMul = 0.35 + 1.6 * aSeed * aSeed;
-  gl_PointSize = clamp(uSizeM * sizeMul * (1.0 + 0.7 * vLit) * uScale / max(1.0, dist), 1.0, 18.0);
+  float sizeCap = mix(uForegroundSizePx, uMaxSizePx, vForegroundFade);
+  gl_PointSize = clamp(uSizeM * sizeMul * (1.0 + 0.7 * vLit) * uScale / max(1.0, dist), 1.0, sizeCap);
 
   // Fade out at the edge of the cube so wrapping never pops, and drop the
   // points the current density does not pay for. Distant motes sink into the fog.
@@ -210,8 +269,11 @@ const SNOW_FRAG = /* glsl */ `
 precision highp float;
 uniform vec3  uColor;
 uniform float uBrightness;
+uniform float uForegroundAlpha;
+uniform float uForegroundBrightness;
 varying float vAlpha;
 varying float vLit;
+varying float vForegroundFade;
 
 void main() {
   vec2 d = gl_PointCoord - 0.5;
@@ -219,8 +281,11 @@ void main() {
   if (r > 0.25) discard;
   // Gaussian-ish sprite: soft edge, no hard disc.
   float soft = exp(-r * 14.0);
-  vec3 col = uColor * (uBrightness + vLit * 2.6);
-  float a = vAlpha * soft * (0.5 + 0.5 * vLit);
+  float brightnessCap = mix(uForegroundBrightness, 3.6, vForegroundFade);
+  vec3 col = uColor * min(uBrightness + vLit * 2.6, brightnessCap);
+  // Clamp the centre before applying the Gaussian, preserving a soft edge.
+  float alphaCap = mix(uForegroundAlpha, 1.0, vForegroundFade);
+  float a = min(vAlpha * (0.5 + 0.5 * vLit), alphaCap) * soft;
   gl_FragColor = vec4(col, a);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
