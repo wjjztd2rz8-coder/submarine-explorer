@@ -107,7 +107,8 @@ fog and the headlights light them like the terrain. None of them glow (art-direc
   - `tuff-cliff` / `canyon-ledge` / `hadal-scarp`: extruded scarps (banded tuff, terraced mudstone
     with a shelf, fractured silty trench wall) with a boulder apron.
     Canyon wall sponges and corals attach only to exposed face vertices: their final offset
-    anchors are checked against the local seabed, since a slope can bury part of the wall face.
+    anchors must clear the local seabed plus talus and its raised mesh lip, since either a slope
+    or the rubble apron can bury part of the wall face. Buried candidates are resampled.
     Terrain in these tiles has 50–60 m cells, so big pieces sink a skirt below their base; use
     `y_offset_m` to lift a piece that would otherwise be buried on a slope.
 

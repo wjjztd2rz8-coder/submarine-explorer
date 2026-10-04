@@ -1,4 +1,4 @@
-# Asset Research: Submarine Explorer
+# Asset Research: Bathyline
 
 Research date: **September 2026**. Every URL below was checked (WebSearch/WebFetch) as of this date; licenses can change, so re-verify before shipping. One proof sample was downloaded to `/Users/vijay/submarine-explorer/assets-samples/noaa_bloop.wav` (165 KB, valid PCM WAV — confirms the NOAA PMEL link works).
 

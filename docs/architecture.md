@@ -1,6 +1,6 @@
 # Architecture
 
-Bathyline (repository/package: Submarine Explorer) renders **real ocean-floor bathymetry** from the GMRT
+Bathyline (repository/package: `submarine-explorer`) renders **real ocean-floor bathymetry** from the GMRT
 synthesis as a navigable 3D world, with scan-and-discover missions on top.
 There are three parts that meet at documented interfaces:
 

@@ -46,6 +46,18 @@ without an entry here is not done.
   Register warm vent haze as an explicit Beebe override so generic vents retain
   their two-draw budget and Beebe retains its haze. Reason: full-e2e regressions.
   No cuts.
+- Phase F, F-VERIFY-480 browser follow-up: make the extra hot-water haze an
+  explicit sulfide-site override, enabled at Beebe. Reason: an undeclared,
+  nonzero fallback added a third draw to every vent, violating the generic
+  preset's two-draw budget. Declare and validate both haze controls, preserve
+  Beebe's additive haze and keep the exact browser budget assertion.
+- Phase F, F-VERIFY-480: restore Monterey wall-life rejection above the final
+  talus surface and raised apron lip after merge resolution retained only the
+  seabed check. Reason:
+  exposed seabed anchors can still be buried in the rubble apron. Cover all four
+  walls and quality tiers against the rendered apron while preserving colony
+  counts; consolidate the repeated Changed heading and finish documentation's
+  Bathyline naming, retaining repository URLs and save keys.
 - Phase F, F-LOSTCITY-SURROUNDINGS: Lost City gets a cooler, banded grey-green slope with larger talus blocks and rubble, more ledges and flanges on the small carbonate towers, a less milky vent haze (lighter haze lift), and rooted corals (all sites) sit into the sediment with large heads at colony cores and small ones at the fringe.
 - F-BEEBE-PLUME-VARIETY: black-smoker plumes now vary per vent (height, width, opacity, lean, deterministic from the orifice position), bend with height in a consistent ambient-current direction, gain a warm lit haze over each orifice and a small pale white-smoker wisp beside it; no extra per-vent draw calls (one additive haze draw per field).
 
@@ -357,6 +369,138 @@ without an entry here is not done.
   to Realistic, keeping depth progression as an optional challenge. Custom mode
   also leaves site access open; upgrades, research rewards and stars are preserved.
 
+- Phase F, F2-MODES follow-up: fixed a CSS cascade conflict that kept Advanced
+  options visible when collapsed on home, briefing and Settings screens.
+
+- Phase F, F2-MODES: Custom moves out of the three-way mode control into a
+  collapsed Advanced disclosure. Arcade remains the default; Realistic is the
+  other segment. Editing an advanced option shows a small Custom tag, and
+  selecting either preset restores every option. Existing Custom saves keep
+  their settings. New controls use 44 px touch targets and native keyboard input.
+- Phase F, F-HUD-LAYOUT: the dive HUD no longer stacks on the submarine. The
+  tutorial card (and hint chip) moved to the left column under the sonar; the
+  scan-target panel moved from the bottom centre, where the chase camera keeps
+  the sub, to the top centre; the controls hint bar stays bottom-left. On
+  phone landscape the sonar is smaller, the card and scan panel share a
+  top-centre column, objectives show only the current step, readouts drop the
+  heading row, and the map credit moves into the strip between stick and
+  buttons. The controls hint bar now hides once move, turn and rise/sink have
+  each been used, and only shows for the first three dives; Help (Pause >
+  Controls) still has everything. Portrait phones are unchanged (the game
+  already asks players to rotate). Reason: owner playtest and director's brief
+  priority 4. New `src/styles/hud-layout.css`; e2e `f-hud-layout.spec.ts`
+  asserts no overlaps at 1600x900, 1280x720, 844x390 touch and 1024x768 touch.
+- Phase F, F-GEO-SCARP: the wall hero pieces at Challenger Deep, Monterey Canyon,
+  Hunga Tonga and the Great Blue Hole are rebuilt so they no longer read as
+  extruded slabs. Each wall now curves in plan and tapers out under the seabed at
+  its ends. Hunga is an arcuate, jointed wall of dipping tuff beds; Monterey has
+  an S-bend with an undercut base and receding terraces, rubble on the outer bend
+  and a clear sandy passage on the inner one; Challenger is a crescentic slump
+  scarp with benches and large displaced blocks; the Blue Hole alcove has a
+  curved wall, a scalloped shelf and clustered fluted stalactites. A graded
+  rubble apron with a lobed rim, sunk into the seabed, replaces the hard toe, and
+  every boulder is seated on that apron's final surface. Rock texture is now
+  world-scale along the face, with bed-by-bed tones, instead of stretched
+  vertical projection; boulders are angular, darker underneath and tinted to
+  match the wall. The Blue Hole alcove keeps only a few sponges on the upper face
+  and none on its floor. Prop ids, sizes and placements are unchanged.
+
+- Phase F, F-CONTENT-FIX: Lost City now releases clear-flow shimmer, with smoke
+  and warm glow disabled. Poseidon's composite footprint follows the published
+  roughly 100 m width; field area and carbonate-age text now follow the research.
+- Lighthouse Reef leads the Great Blue Hole dive's atoll route; Hunga consistently
+  presents the historical landscape before January 2022. Its volcanic slope hero
+  now shares the scan marker, and Inferno sits about 10 m from Mushroom at ASHES.
+- Bismarck's briefing reports the current terrain route depth, while the Journal
+  preserves the real wreck depth and explains the unresolved mapping gap. Its bow
+  remains attached and its stern is described as missing. Beebe field naming and
+  fluid pressure, Endurance tonnage, Challenger depth and monument boundary,
+  white coral colour and wreck memorial text are corrected; deeper-route hints no longer call the twilight zone fully dark.
+
+- F2-EXPLORE follow-up: Journal navigation keeps the page the player selects
+  while content finishes loading. Sample confirmations now say “Stowed for this
+  dive”; compact touch scan panels clear the movement and Scan controls.
+  No features or objectives were cut.
+- Phase F, F-VISUAL-FIXES: narrower, softer headlights and a weaker nearby fill
+  preserve material colour and seabed gradients. Exposure and bloom are lower;
+  marine snow is smaller. Realistic lights keep a faint local fill for the hull.
+  Beam haze follows the length of lit water through the view, replacing the
+  bright faceted shells so they no longer dominate a dive's opening.
+- F-VISUAL-FIXES follow-up: restored the ROV's broad working-light pool after
+  the close submarine lighting changes dimmed it. Submarine lamps now retain
+  more light at navigation distance, helping opening heroes stand out while
+  preserving the softer beams and close-range colour tuning.
+- The underwater camera reserves 2 m below the surface and retracts its chase
+  arm near shallow water or a reef, while retaining terrain clearance. Photo
+  orbit from chase starts at the current camera position, including a retracted arm.
+  No site models, terrain, controls or HUD features were cut.
+
+- Phase F, F2-PROGRESS: hull selection now follows site depth and unlocked research,
+  rather than giving every deep free dive an unrestricted hull. Shared links to a
+  locked mission open a rated free dive with a dismissible requirement notice.
+  The fitted class chooses the matching existing vehicle and briefing rating.
+- Boost now uses an eight-second reserve that recharges while released; upgrades
+  extend it by 20% per level. This replaces unlimited held boost so boost research
+  has a useful effect in Arcade as well as improving battery endurance in Realistic.
+
+- Phase F, F1-FIXES: **wave-1 audit fixes.** Wall colliders (scarps, canyon ledge,
+  stalactite alcove) now follow the deformed mesh: overlapping x segments (no
+  gaps), end heights capped to the pinched crest, real front and back extents;
+  the far-LOD alcove impostor keeps the whole wall. Post-FX toggling no longer
+  changes exposure; custom shaders (water, marine snow, beams, wash, plumes,
+  smoke) finish with Three's tone-mapping and colour-space chunks so direct
+  rendering matches the post path. The additive headlight beam no longer
+  multiplies alpha twice (`headlightConeOpacity` 0.05 to 0.012 to keep the
+  brightness). Lost City's main edifice is 60 m total relief (was about 70 m).
+  Bismarck shows four overturned turrets (was two inverted, one on its side, one
+  upright). ASHES hero stacks are about 4 m (was 9 m), matching the field.
+  Beebe's hero is recorded as a flank fragment of the roughly 80 m by 50 m
+  mound; the full mound is deferred (it would bury the neighbouring chimneys).
+  Smoker culling bounds now include the smoke; Journal entries without a linked
+  POI show the Recreation tag when the guide entry is flagged.
+
+- Phase F, F1-TERRAIN: the old depth-ramp vertex-colour seabed and its
+  height/slope colour ramp are replaced by the biome material (config
+  `colorForDepth`/ramp inputs removed from the material); reason: PBR realism.
+- F1-OCEAN: the **caustic projector** now uses a two-layer animated Voronoi web.
+  The old interference formula was missing its domain offset and rendered an
+  almost flat texture, so shallow caustics were effectively invisible. The
+  footprint shrank from 900 m to 320 m (finer web) and the intensity rose from
+  1.1 to 3.6. The headlight cone shader was also drawing nothing (its along-beam
+  coordinate had the wrong sign); it is rebuilt.
+- F1-OCEAN: tiers gained `bloomLevels`, `rayOctaves`, `msaa` and `beamDetail`;
+  `low` now runs a plain beam cone and 600 marine-snow points (was none), and
+  medium turns god rays on. The sea surface is drawn to 160 m (was 100 m) so the
+  window fades out rather than popping, and it is a flat quad shaded per
+  fragment (the 96-segment vertex swell aliased against a 22 m wavelength).
+- Phase F, F1-GEO: `poseidon-tower` (Lost City) and `beebe-chimney-1` are now
+  hand-built vent set pieces instead of plain chimney columns; they stay
+  `procedural:chimney` with a `feature`, so the vent preset still smokes them. Blake
+  Plateau keeps its two boulder stand-ins beside the new coral mound. The Hudson
+  Canyon `props.json` note that no coral model exists was removed (one now does).
+
+- F1-VEHICLES: the ROV fill light moved from 3.6 m to about 9 m from the float (intensity x3) and vehicle materials gained a highlight shoulder, because pale livery inside the boat's own headlight beams clipped to flat white. The old single-mesh hull and ROV models are replaced, not kept as an option.
+- Phase F, F0-CORE: **`main.ts` split into systems** (`src/app/`). There is one
+  file per system under `src/app/systems/`, each with init, per-frame stage
+  hooks and dispose. The ordered registration list lives in
+  `src/app/systems.ts`, the frame loop in `src/app/loop.ts` and boot in
+  `src/app/boot.ts`. Behaviour, frame order, listener order and the
+  `window.__game` contract are unchanged (new keys only).
+- Phase F, F0-CORE: **`styles.css` split** into per-module files under
+  `src/styles/`, imported by `src/styles.css` in the original cascade order. No
+  selector changed.
+- Phase F, F0-CORE: **`Config.ts` split**. Per-domain types and defaults now
+  live in `src/core/config/*.ts`, and the `GameConfig` contract lives in
+  `src/core/config/types.ts`. `src/core/Config.ts` stays the import path and
+  still exports `makeConfig`. Default values are unchanged.
+- Phase F, F0-CORE: **procedural prop builders split** into
+  `src/world/props/builders/` (`wrecks`, `debris`, `vents`, `reefs`, `geology`,
+  `generic`, `shared`), with a kind → builder registry.
+  `src/world/props/Procedural.ts` re-exports them for compatibility.
+- Phase F, F0-CORE: saved settings accept `auto` and `ultra` for the graphics
+  tier. Existing `low`, `medium` and `high` saves are kept as they are. The
+  default stays `medium`, so a fresh install looks the same as before.
+
 ### Removed
 
 - Phase F, F2-MODES: retired Gentle from new current choices to keep Off,
@@ -532,137 +676,3 @@ without an entry here is not done.
   build strips three's default decoder URLs so no second copy of the Draco or
   Basis files ships.
 - Phase F, F0-CORE: **Auto** and **Ultra** entries in Settings → Graphics tier.
-
-### Changed
-
-- Phase F, F2-MODES follow-up: fixed a CSS cascade conflict that kept Advanced
-  options visible when collapsed on home, briefing and Settings screens.
-
-- Phase F, F2-MODES: Custom moves out of the three-way mode control into a
-  collapsed Advanced disclosure. Arcade remains the default; Realistic is the
-  other segment. Editing an advanced option shows a small Custom tag, and
-  selecting either preset restores every option. Existing Custom saves keep
-  their settings. New controls use 44 px touch targets and native keyboard input.
-- Phase F, F-HUD-LAYOUT: the dive HUD no longer stacks on the submarine. The
-  tutorial card (and hint chip) moved to the left column under the sonar; the
-  scan-target panel moved from the bottom centre, where the chase camera keeps
-  the sub, to the top centre; the controls hint bar stays bottom-left. On
-  phone landscape the sonar is smaller, the card and scan panel share a
-  top-centre column, objectives show only the current step, readouts drop the
-  heading row, and the map credit moves into the strip between stick and
-  buttons. The controls hint bar now hides once move, turn and rise/sink have
-  each been used, and only shows for the first three dives; Help (Pause >
-  Controls) still has everything. Portrait phones are unchanged (the game
-  already asks players to rotate). Reason: owner playtest and director's brief
-  priority 4. New `src/styles/hud-layout.css`; e2e `f-hud-layout.spec.ts`
-  asserts no overlaps at 1600x900, 1280x720, 844x390 touch and 1024x768 touch.
-- Phase F, F-GEO-SCARP: the wall hero pieces at Challenger Deep, Monterey Canyon,
-  Hunga Tonga and the Great Blue Hole are rebuilt so they no longer read as
-  extruded slabs. Each wall now curves in plan and tapers out under the seabed at
-  its ends. Hunga is an arcuate, jointed wall of dipping tuff beds; Monterey has
-  an S-bend with an undercut base and receding terraces, rubble on the outer bend
-  and a clear sandy passage on the inner one; Challenger is a crescentic slump
-  scarp with benches and large displaced blocks; the Blue Hole alcove has a
-  curved wall, a scalloped shelf and clustered fluted stalactites. A graded
-  rubble apron with a lobed rim, sunk into the seabed, replaces the hard toe, and
-  every boulder is seated on that apron's final surface. Rock texture is now
-  world-scale along the face, with bed-by-bed tones, instead of stretched
-  vertical projection; boulders are angular, darker underneath and tinted to
-  match the wall. The Blue Hole alcove keeps only a few sponges on the upper face
-  and none on its floor. Prop ids, sizes and placements are unchanged.
-
-- Phase F, F-CONTENT-FIX: Lost City now releases clear-flow shimmer, with smoke
-  and warm glow disabled. Poseidon's composite footprint follows the published
-  roughly 100 m width; field area and carbonate-age text now follow the research.
-- Lighthouse Reef leads the Great Blue Hole dive's atoll route; Hunga consistently
-  presents the historical landscape before January 2022. Its volcanic slope hero
-  now shares the scan marker, and Inferno sits about 10 m from Mushroom at ASHES.
-- Bismarck's briefing reports the current terrain route depth, while the Journal
-  preserves the real wreck depth and explains the unresolved mapping gap. Its bow
-  remains attached and its stern is described as missing. Beebe field naming and
-  fluid pressure, Endurance tonnage, Challenger depth and monument boundary,
-  white coral colour and wreck memorial text are corrected; deeper-route hints no longer call the twilight zone fully dark.
-
-- F2-EXPLORE follow-up: Journal navigation keeps the page the player selects
-  while content finishes loading. Sample confirmations now say “Stowed for this
-  dive”; compact touch scan panels clear the movement and Scan controls.
-  No features or objectives were cut.
-- Phase F, F-VISUAL-FIXES: narrower, softer headlights and a weaker nearby fill
-  preserve material colour and seabed gradients. Exposure and bloom are lower;
-  marine snow is smaller. Realistic lights keep a faint local fill for the hull.
-  Beam haze follows the length of lit water through the view, replacing the
-  bright faceted shells so they no longer dominate a dive's opening.
-- F-VISUAL-FIXES follow-up: restored the ROV's broad working-light pool after
-  the close submarine lighting changes dimmed it. Submarine lamps now retain
-  more light at navigation distance, helping opening heroes stand out while
-  preserving the softer beams and close-range colour tuning.
-- The underwater camera reserves 2 m below the surface and retracts its chase
-  arm near shallow water or a reef, while retaining terrain clearance. Photo
-  orbit from chase starts at the current camera position, including a retracted arm.
-  No site models, terrain, controls or HUD features were cut.
-
-- Phase F, F2-PROGRESS: hull selection now follows site depth and unlocked research,
-  rather than giving every deep free dive an unrestricted hull. Shared links to a
-  locked mission open a rated free dive with a dismissible requirement notice.
-  The fitted class chooses the matching existing vehicle and briefing rating.
-- Boost now uses an eight-second reserve that recharges while released; upgrades
-  extend it by 20% per level. This replaces unlimited held boost so boost research
-  has a useful effect in Arcade as well as improving battery endurance in Realistic.
-
-- Phase F, F1-FIXES: **wave-1 audit fixes.** Wall colliders (scarps, canyon ledge,
-  stalactite alcove) now follow the deformed mesh: overlapping x segments (no
-  gaps), end heights capped to the pinched crest, real front and back extents;
-  the far-LOD alcove impostor keeps the whole wall. Post-FX toggling no longer
-  changes exposure; custom shaders (water, marine snow, beams, wash, plumes,
-  smoke) finish with Three's tone-mapping and colour-space chunks so direct
-  rendering matches the post path. The additive headlight beam no longer
-  multiplies alpha twice (`headlightConeOpacity` 0.05 to 0.012 to keep the
-  brightness). Lost City's main edifice is 60 m total relief (was about 70 m).
-  Bismarck shows four overturned turrets (was two inverted, one on its side, one
-  upright). ASHES hero stacks are about 4 m (was 9 m), matching the field.
-  Beebe's hero is recorded as a flank fragment of the roughly 80 m by 50 m
-  mound; the full mound is deferred (it would bury the neighbouring chimneys).
-  Smoker culling bounds now include the smoke; Journal entries without a linked
-  POI show the Recreation tag when the guide entry is flagged.
-
-- Phase F, F1-TERRAIN: the old depth-ramp vertex-colour seabed and its
-  height/slope colour ramp are replaced by the biome material (config
-  `colorForDepth`/ramp inputs removed from the material); reason: PBR realism.
-- F1-OCEAN: the **caustic projector** now uses a two-layer animated Voronoi web.
-  The old interference formula was missing its domain offset and rendered an
-  almost flat texture, so shallow caustics were effectively invisible. The
-  footprint shrank from 900 m to 320 m (finer web) and the intensity rose from
-  1.1 to 3.6. The headlight cone shader was also drawing nothing (its along-beam
-  coordinate had the wrong sign); it is rebuilt.
-- F1-OCEAN: tiers gained `bloomLevels`, `rayOctaves`, `msaa` and `beamDetail`;
-  `low` now runs a plain beam cone and 600 marine-snow points (was none), and
-  medium turns god rays on. The sea surface is drawn to 160 m (was 100 m) so the
-  window fades out rather than popping, and it is a flat quad shaded per
-  fragment (the 96-segment vertex swell aliased against a 22 m wavelength).
-- Phase F, F1-GEO: `poseidon-tower` (Lost City) and `beebe-chimney-1` are now
-  hand-built vent set pieces instead of plain chimney columns; they stay
-  `procedural:chimney` with a `feature`, so the vent preset still smokes them. Blake
-  Plateau keeps its two boulder stand-ins beside the new coral mound. The Hudson
-  Canyon `props.json` note that no coral model exists was removed (one now does).
-
-- F1-VEHICLES: the ROV fill light moved from 3.6 m to about 9 m from the float (intensity x3) and vehicle materials gained a highlight shoulder, because pale livery inside the boat's own headlight beams clipped to flat white. The old single-mesh hull and ROV models are replaced, not kept as an option.
-- Phase F, F0-CORE: **`main.ts` split into systems** (`src/app/`). There is one
-  file per system under `src/app/systems/`, each with init, per-frame stage
-  hooks and dispose. The ordered registration list lives in
-  `src/app/systems.ts`, the frame loop in `src/app/loop.ts` and boot in
-  `src/app/boot.ts`. Behaviour, frame order, listener order and the
-  `window.__game` contract are unchanged (new keys only).
-- Phase F, F0-CORE: **`styles.css` split** into per-module files under
-  `src/styles/`, imported by `src/styles.css` in the original cascade order. No
-  selector changed.
-- Phase F, F0-CORE: **`Config.ts` split**. Per-domain types and defaults now
-  live in `src/core/config/*.ts`, and the `GameConfig` contract lives in
-  `src/core/config/types.ts`. `src/core/Config.ts` stays the import path and
-  still exports `makeConfig`. Default values are unchanged.
-- Phase F, F0-CORE: **procedural prop builders split** into
-  `src/world/props/builders/` (`wrecks`, `debris`, `vents`, `reefs`, `geology`,
-  `generic`, `shared`), with a kind → builder registry.
-  `src/world/props/Procedural.ts` re-exports them for compatibility.
-- Phase F, F0-CORE: saved settings accept `auto` and `ultra` for the graphics
-  tier. Existing `low`, `medium` and `high` saves are kept as they are. The
-  default stays `medium`, so a fresh install looks the same as before.

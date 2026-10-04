@@ -1,4 +1,4 @@
-# Submarine Explorer — Landmark Catalog Notes
+# Bathyline — Landmark Catalog Notes
 
 This document accompanies `data/landmarks.json` (68 entries, schema version 1, generated 2026-09-16). It records sourcing methodology, per-category notes, gameplay ideas, and how to pull in bulk feature databases for future expansion.
 
