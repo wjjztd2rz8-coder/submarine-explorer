@@ -213,6 +213,8 @@ export class Debrief {
 
     this.open_ = true;
     this.root.hidden = false;
+    // Returning from Keep exploring creates a new summary in the same panel.
+    p.scrollTop = 0;
     this.trap.activate();
   }
 

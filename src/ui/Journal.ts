@@ -272,6 +272,8 @@ export class Journal {
     this.open_ = true;
     this.root.hidden = false;
     this.render();
+    // A newly focused scan must start at its heading, not the previous entry's scroll.
+    this.body.scrollTop = 0;
     this.trap.activate();
     const openingView = this.view;
     void this.load().then(() => {
@@ -496,13 +498,13 @@ export class Journal {
     const b = this.body;
     b.append(el('h2', 'jr-title', 'Dive journal'));
     b.append(el('p', 'jr-honesty', JOURNAL_HONESTY));
-    const visited = sites.filter((s) => isSiteUnlocked(s, this.store)).length;
+    const loggedSites = sites.filter((s) => isSiteUnlocked(s, this.store)).length;
     b.append(
       el(
         'p',
         'jr-lead',
         `Scan wrecks, vents and landforms during a dive to log them here. ` +
-          `${visited} of ${sites.length} sites visited.`,
+          `${loggedSites} of ${sites.length} sites with scans.`,
       ),
     );
     const grid = el('div', 'jr-site-grid');
@@ -533,7 +535,7 @@ export class Journal {
     const unlocked = isSiteUnlocked(site, this.store);
     const titleRow = el('div', 'jr-title-row');
     titleRow.append(el('h2', 'jr-title', site.name));
-    if (!unlocked) titleRow.append(el('span', 'jr-tag is-undiscovered', 'Not visited'));
+    if (!unlocked) titleRow.append(el('span', 'jr-tag is-undiscovered', 'No scans logged'));
     b.append(titleRow);
     const meta = [
       site.region,
