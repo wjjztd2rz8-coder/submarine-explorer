@@ -34,5 +34,6 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - **2026-10-03 15:30 — false "Claude idle" trigger.** The targeted review fired for "Claude idle ≥ 50% for 2 h" although runs happened at 13:26, 14:08, 14:28, 14:57 and 15:15. Cause: `usage-sample.sh` detected a run with `pgrep 'claude -p Resume Submarine'`, which never matches review runs ("THIS RUN IS A…"), and runs are short, so samples at :15/:45 missed them. It now checks `--permission-mode bypassPermissions` or a fresh `orchestrator.active`, and `review-triggers.sh` also requires that no `resume-*.log` was written in the last 2 h. `efficiency.sh` idle hours before this fix are overstated.
 
 ## 2026-10-03 19:00 — stale Codex reading after a manual reset
+
 - Owner applied a Codex reset; ai-limits still read 6% from the last Codex session log (Codex reports usage only inside its own runs), so the dispatcher would have waited until a natural reset with 6 briefs queued.
 - Fix: tools/codex-dispatch.sh refreshes the reading (`ai-limits --refresh`, one tiny Codex prompt) when it says low, no Codex task is running and the reading is >30 min old. Launched 470/480/490 immediately.
