@@ -23,6 +23,13 @@ without an entry here is not done.
   face side (pose 3 at 26 m, not 15 m, to keep the camera clear of the fans); review
   screenshots only, no gameplay change.
 
+- Phase F, F-FLOW-AUDIT-510: let Journal columns and site/count rows shrink
+  and wrap without horizontal overflow; open Journal articles and repeated
+  debriefs at their headings. Describe Journal unlocks as scans instead of
+  visits so an unscanned current site does not claim it was never visited.
+  Add fresh-player Home-to-debrief capture/regression coverage for all five
+  heroes at desktop, touch landscape and touch portrait sizes; rendered audit
+  remains pending browser-capable execution. No new HUD controls or caveats.
 - Phase F, F-TOUCH-150 gate follow-up: make warm vent haze opt-in through
   registered Config defaults and enable it explicitly at Beebe. Reason: its
   implicit global default added a third draw to generic vent presets, breaking
