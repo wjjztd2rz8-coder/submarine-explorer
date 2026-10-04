@@ -5,12 +5,12 @@
    The chase camera keeps the sub low and central, so the bottom centre is the
    sub's. Everything else is arranged around it:
 
-     desktop / tablet   top-left: sonar, then the tutorial card or hint chip
-                        top-centre (below warnings): scan-target panel
+     desktop / tablet   top-left: sonar, then the tutorial card
+                        top-centre (below warnings): scan-target panel, then hint
                         top-right: objectives, then readouts
                         bottom-left: controls hint bar
      phone landscape    top-left: sonar (small); top-centre column: tutorial
-                        card or hint chip, then the scan-target panel;
+                        card, then the scan-target panel and hint;
                         top-right: short objectives and readouts
                         bottom strip between stick and buttons: map credit
 
@@ -22,9 +22,8 @@
   --hl-scan-width: 300px;
 }
 
-/* Tutorial card and hint chip: left column under the sonar. */
-.onboard-card,
-.onboard-hint {
+/* Tutorial card: left column under the sonar. */
+.onboard-card {
   left: calc(12px + env(safe-area-inset-left, 0px));
   top: calc(var(--hl-sonar-clear) + env(safe-area-inset-top, 0px));
   bottom: auto;
@@ -33,9 +32,6 @@
   min-width: 270px;
   max-width: none;
   animation-name: hl-card-in;
-}
-.onboard-hint {
-  font-size: 14px;
 }
 /* Keep the active instruction readable, including long species names in the
    narrow portrait stack. Other objective rows retain their compact ellipsis. */
@@ -57,19 +53,37 @@
     transform: none;
   }
 }
-/* Never both at once: the hint chip waits below the card. */
-.onboard-card:not([hidden]) ~ .onboard-hint:not([hidden]),
-.onboard-hint:not([hidden]) ~ .onboard-card:not([hidden]) {
-  top: calc(var(--hl-sonar-clear) + 190px + env(safe-area-inset-top, 0px));
-}
-
-/* Scan-target panel: top centre, below the hull warning and clear of the sub. */
-.scan-panel {
+/* F-TOAST-550: the hint follows the target in normal flow, so a wrapped name
+   never needs a guessed offset. With no target it uses the same centre slot. */
+.scan-stack {
   top: calc(max(84px, 15%) + env(safe-area-inset-top, 0px));
   bottom: auto;
   width: var(--hl-scan-width);
   min-width: 0;
   box-sizing: border-box;
+}
+/* ExploreNotice also imports touch card styles. Keep column sizing more
+   specific than those per-feature widths, regardless of stylesheet order. */
+.scan-overlay .scan-stack > .scan-panel {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.scan-stack .onboard-hint {
+  position: static;
+  transform: none;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  font-size: 14px;
+  animation-name: hl-card-in;
+}
+.onboard-hint-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.onboard-hint-close {
+  flex: none;
 }
 
 /* Touch landscape: the map credit sits in the strip between stick and buttons. */
@@ -89,7 +103,7 @@
       calc(100vw - 136px - 300px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
     );
   }
-  html.is-touch .scan-overlay .scan-panel {
+  html.is-touch .scan-overlay .scan-stack {
     left: calc(50% - 40px);
     width: var(--hl-scan-width);
     top: calc(max(84px, 15%) + env(safe-area-inset-top, 0px));
@@ -206,8 +220,7 @@
     display: none;
   }
   /* Card: text on the left, buttons on the right, so it stays short. */
-  html.is-touch .onboard-card,
-  html.is-touch .onboard-hint {
+  html.is-touch .onboard-card {
     top: calc(58px + env(safe-area-inset-top, 0px));
     left: var(--hl-col-left);
     width: var(--hl-col-width);
@@ -238,20 +251,17 @@
     padding: 0 10px;
     font-size: 13px;
   }
-  html.is-touch .onboard-card:not([hidden]) ~ .onboard-hint:not([hidden]),
-  html.is-touch .onboard-hint:not([hidden]) ~ .onboard-card:not([hidden]) {
-    top: calc(146px + env(safe-area-inset-top, 0px));
-  }
-  html.is-touch .scan-overlay .scan-panel {
+  html.is-touch .scan-overlay .scan-stack {
     left: var(--hl-col-left);
     transform: none;
     width: var(--hl-col-width);
     top: calc(58px + env(safe-area-inset-top, 0px));
+  }
+  html.is-touch .scan-overlay .scan-panel {
     padding: 6px 10px 6px 6px;
     gap: 10px;
   }
-  body:has(.onboard-card:not([hidden])) .scan-overlay .scan-panel,
-  body:has(.onboard-hint:not([hidden])) .scan-overlay .scan-panel {
+  body:has(.onboard-card:not([hidden])) .scan-overlay .scan-stack {
     top: calc(146px + env(safe-area-inset-top, 0px));
   }
   html.is-touch .scan-overlay .scan-ring {
@@ -275,12 +285,12 @@
   html.is-touch .onboard-card button {
     padding: 0 6px;
   }
-  body:has(.onboard-card:not([hidden])) .scan-overlay .scan-panel {
+  body:has(.onboard-card:not([hidden])) .scan-overlay .scan-stack {
     top: calc(206px + env(safe-area-inset-top, 0px));
   }
 }
 
-/* Portrait phones: card above the controls, scan panel under the readouts. */
+/* Portrait phones: tutorial above the controls, scan stack under the readouts. */
 @media (orientation: portrait) {
   /* A rotate suggestion must not cover an active instruction or contact. */
   html.is-touch body:has(.onboard-card:not([hidden])) .tc-rotate-hint,
@@ -288,8 +298,7 @@
   html.is-touch body:has(.scan-panel:not([hidden])) .tc-rotate-hint {
     display: none;
   }
-  html.is-touch .onboard-card,
-  html.is-touch .onboard-hint {
+  html.is-touch .onboard-card {
     top: auto;
     bottom: calc(230px + env(safe-area-inset-bottom, 0px));
     left: calc((100% + env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)) / 2);
@@ -298,15 +307,17 @@
     min-width: 0;
     animation-name: onboard-in;
   }
-  html.is-touch .onboard-hint {
-    bottom: calc(300px + env(safe-area-inset-bottom, 0px));
-  }
-  html.is-touch .scan-overlay .scan-panel {
+  html.is-touch .scan-overlay .scan-stack {
     left: 50%;
     top: auto;
-    /* The two-line tutorial and hint need more than the old 150 px gap. */
+    /* Leave room for every tutorial step below the target. */
     bottom: calc(400px + env(safe-area-inset-bottom, 0px));
     max-width: calc(100vw - 24px);
+  }
+  /* Hints appear after the tutorial. Reuse its row and grow the target/hint
+     stack upward, leaving the credit chip and the touch controls below. */
+  html.is-touch body:has(.onboard-card[hidden]):has(.onboard-hint:not([hidden])) .scan-stack {
+    bottom: calc(230px + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -368,7 +379,7 @@
   }
   html.is-touch body:has(.sonar.d-sonar-expanded) .onboard-card,
   html.is-touch body:has(.sonar.d-sonar-expanded) .onboard-hint,
-  html.is-touch body:has(.sonar.d-sonar-expanded) .scan-panel {
+  html.is-touch body:has(.sonar.d-sonar-expanded) .scan-stack {
     visibility: hidden;
   }
   html.is-touch .sonar .d-sonar-header {
@@ -517,12 +528,11 @@
     font-size: 12px;
     line-height: 1.25;
   }
-  html.is-touch .onboard-hint {
-    bottom: calc(230px + env(safe-area-inset-bottom, 0px));
-  }
-  html.is-touch .scan-overlay .scan-panel {
+  html.is-touch .scan-overlay .scan-stack {
     width: calc(100vw - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
     bottom: calc(338px + env(safe-area-inset-bottom, 0px));
+  }
+  html.is-touch .scan-overlay .scan-panel {
     padding: 6px 10px 6px 6px;
     gap: 10px;
     font-size: 14px;

@@ -1,7 +1,7 @@
 /**
- * The tutorial coach card and hint chip (F3-ONBOARD). Both sit near the bottom
- * centre, never take focus, never block the view or the controls, and only
- * their own buttons catch pointer events.
+ * The tutorial coach card and hint chip (F3-ONBOARD). Placement lives in the
+ * HUD layout; hints share the scan-target column. Neither takes focus, and
+ * only their own buttons catch pointer events.
  */
 
 import type { TutorialStepId } from '../game/Tutorial.js';

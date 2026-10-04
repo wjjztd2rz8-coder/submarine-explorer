@@ -30,6 +30,8 @@ type Tone = 'cyan' | 'amber' | 'dim';
 
 export class ScanOverlay {
   readonly root: HTMLDivElement;
+  /** Shared flow for the target card and contextual hint, including wrapped text. */
+  readonly messages: HTMLDivElement;
   private readonly reticle: HTMLDivElement;
   private readonly panel: HTMLDivElement;
   private readonly kicker: HTMLDivElement;
@@ -111,7 +113,10 @@ export class ScanOverlay {
     text.append(this.kicker, this.nameEl, this.hint);
 
     this.panel.append(svg, text);
-    this.root.append(this.reticle, this.panel);
+    this.messages = document.createElement('div');
+    this.messages.className = 'scan-stack';
+    this.messages.append(this.panel);
+    this.root.append(this.reticle, this.messages);
     parent.appendChild(this.root);
   }
 
