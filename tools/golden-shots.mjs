@@ -49,7 +49,16 @@ async function main() {
     ['titanic', 'bow-hull'],
     ['lost-city', 'poseidon-tower'],
     // The west alcove, framed from the hole's interior on its ledge (the hole centre lies due east).
-    ['great-blue-hole', 'karst-grotto', 'great-blue-hole', { direction: [1, 0, 0], above: 5, close: closeOverride ?? { range: 36, above: 9, lateral: 10 } }],
+    [
+      'great-blue-hole',
+      'karst-grotto',
+      'great-blue-hole',
+      {
+        direction: [1, 0, 0],
+        above: 5,
+        close: closeOverride ?? { range: 36, above: 9, lateral: 10 },
+      },
+    ],
     // The south-eastern alcove, framed from inside the hole on its ledge (open side faces the hole centre).
     [
       'great-blue-hole',

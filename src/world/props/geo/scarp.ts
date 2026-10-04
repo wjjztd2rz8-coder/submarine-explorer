@@ -912,6 +912,16 @@ export function wallSpongeSpec(
   };
 }
 
+/** Bubblegum, red and orange gorgonians with the odd pale one, so a wall of fans is not one flat white. */
+const FAN_PALETTE = [0xe98a86, 0xe8863c, 0xd0524a, 0xf0c8a8, 0xd96f9a, 0xf0e8d8].map(
+  (c) => new THREE.Color(c),
+);
+function fanColour(pick: number, shade: number): THREE.Color {
+  const base =
+    FAN_PALETTE[Math.min(FAN_PALETTE.length - 1, Math.floor(pick * FAN_PALETTE.length))]!;
+  return base.clone().multiplyScalar(0.75 + 0.35 * shade);
+}
+
 /** Sponges and gorgonian-like fans seated on the wall face, sampled from its own vertices (instanced, cheap). */
 function addWallLife(
   full: THREE.Group,
@@ -959,7 +969,7 @@ function addWallLife(
       const s = 1.8 + rnd() * rnd() * 2.6;
       fans[rnd() < 0.5 ? 0 : 1]!.push({
         t: { x, y: yy, z, ry: rnd() * 6.28, rx: tilt, sx: s, sy: s, sz: s },
-        color: new THREE.Color(0xf0e8d8).lerp(new THREE.Color(0xf0a678), rnd() < 0.4 ? 0.5 : 0.1),
+        color: fanColour(rnd(), rnd()),
       });
     }
   }
