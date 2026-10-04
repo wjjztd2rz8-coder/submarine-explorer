@@ -4,6 +4,11 @@ This project uses third-party assets under the following licenses.
 CC0 / Public Domain assets are listed for transparency but do not
 legally require attribution.
 
+## Bathymetry data
+
+- Global Multi-Resolution Topography (GMRT) Synthesis — [GMRT terms](https://www.gmrt.org/about/terms_of_use.php), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Ryan, W.B.F., et al. (2009), Global Multi-Resolution Topography synthesis, Geochem. Geophys. Geosyst., 10, Q03014, [doi:10.1029/2008GC002332](https://doi.org/10.1029/2008GC002332); [data doi:10.1594/IEDA.100001](https://doi.org/10.1594/IEDA.100001). Used in all 13 real `data/tiles/` bathymetry grids; per-tile source URL, fetch date and citation are retained in each `meta.json`. Subsetted and converted to game terrain with visual detail added; not for navigation, no endorsement implied. The in-dive **Data: GMRT** chip opens the full tile citation, source and licence links in one click/tap. Terms checked 2026-10-03; no persistent full-citation placement is specified.
+- `data/tiles/demo-synthetic/` is original procedural bathymetry and is labelled separately in the data chip.
+
 ## Ocean-current data
 
 - NRL HYCOM GOFS 3.1 GLBy0.08 experiment 93.0, eastward and northward water velocity at 2024-01-15 12:00 UTC, https://www.hycom.org/dataserver/gofs-3pt1/analysis (subset service: https://ncss.hycom.org/thredds/ncss/GLBy0.08/expt_93.0). DoD Distribution A: approved for public release; distribution unlimited. Sampled into the 13 `data/currents/*.json` files on 2026-09-24 UTC. See [docs/currents.md](docs/currents.md) for depths, transformation and limitations.

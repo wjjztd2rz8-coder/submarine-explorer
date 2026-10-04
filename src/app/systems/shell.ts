@@ -281,6 +281,11 @@ export const shellKeysSystem: GameSystem = {
         ctx.exitPhotoMode();
         return;
       }
+      if (app.state === 'dive' && ctx.hud.closeDataCredits()) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
       if (document.pointerLockElement) {
         document.exitPointerLock?.();
       }

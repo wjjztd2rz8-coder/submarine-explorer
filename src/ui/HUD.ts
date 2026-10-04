@@ -142,8 +142,15 @@ export class HUD {
       <div class="hud-objective" hidden></div>
       <div class="hud-prompt" hidden></div>
       <div class="hud-control-tips" hidden></div>
-      <button class="hud-reset-camera" type="button" aria-label="Reset camera">Reset camera</button>
-      <div class="hud-attribution"></div>
+      <div class="hud-footer">
+        <button class="hud-reset-camera" type="button" aria-label="Reset camera">Reset camera</button>
+        <details class="hud-attribution">
+          <summary role="button" aria-expanded="false"></summary>
+          <div class="hud-attribution-panel" role="region" aria-label="Data attribution">
+            <p class="hud-attribution-citation"></p>
+          </div>
+        </details>
+      </div>
     `;
     for (const el of this.root.querySelectorAll<HTMLSpanElement>('[data-field]')) {
       this.values.set(el.dataset.field as Field, el);
@@ -158,10 +165,25 @@ export class HUD {
     this.resetCameraEl = this.root.querySelector('.hud-reset-camera') as HTMLButtonElement;
     this.powerEl = this.root.querySelector('.hud-power') as HTMLDivElement;
     this.currentEl = this.root.querySelector('.hud-current') as HTMLDivElement;
-    const attr = this.root.querySelector('.hud-attribution') as HTMLDivElement;
-    attr.textContent = meta.attribution;
-    attr.title = meta.attribution;
-
+    const attr = this.root.querySelector<HTMLDetailsElement>('.hud-attribution')!;
+    const summary = attr.querySelector('summary')!;
+    summary.textContent = `Data: ${meta.source}`;
+    summary.setAttribute('aria-label', `Data: ${meta.source} credits`);
+    attr.addEventListener('toggle', () => {
+      summary.setAttribute('aria-expanded', String(attr.open));
+    });
+    attr.querySelector('.hud-attribution-citation')!.textContent = meta.attribution;
+    if (meta.source === 'GMRT') {
+      attr.querySelector('.hud-attribution-panel')!.insertAdjacentHTML(
+        'beforeend',
+        `<p><a href="https://www.gmrt.org/">GMRT Synthesis</a> ·
+          <a href="https://doi.org/10.1029/2008GC002332">Ryan et al. (2009)</a> ·
+          <a href="https://doi.org/10.1594/IEDA.100001">Data DOI</a> ·
+          <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></p>
+         <p>Subsetted and converted to game terrain with visual detail added.
+          Not for navigation. No endorsement implied.</p>`,
+      );
+    }
     parent.appendChild(this.root);
     this.set('tile', `${meta.id} (${meta.cols}×${meta.rows})`);
   }
@@ -169,6 +191,15 @@ export class HUD {
   onResetCamera(handler: () => void): () => void {
     this.resetCameraEl.addEventListener('click', handler);
     return () => this.resetCameraEl.removeEventListener('click', handler);
+  }
+
+  /** The shell's capture-phase Escape handler dismisses credits before pausing. */
+  closeDataCredits(): boolean {
+    const attr = this.root.querySelector<HTMLDetailsElement>('.hud-attribution')!;
+    if (!attr.open) return false;
+    attr.open = false;
+    attr.querySelector('summary')!.focus();
+    return true;
   }
 
   private showContext(el: HTMLDivElement, text: string | null | undefined): void {

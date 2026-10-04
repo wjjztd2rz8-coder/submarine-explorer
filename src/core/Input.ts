@@ -516,7 +516,7 @@ export class Input {
       // Native UI activation/navigation must not also trigger game actions or
       // lose its default behavior (Space activates a focused button on keyup).
       if (
-        t?.closest('button, a[href], select') &&
+        t?.closest('button, a[href], select, summary') &&
         [
           'Enter',
           'NumpadEnter',
