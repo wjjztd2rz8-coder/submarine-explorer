@@ -88,6 +88,11 @@ fog and the headlights light them like the terrain. None of them glow (art-direc
   (`Config.props.chimneyMaterials`): `carbonate` is cream-grey with white tips (Lost City),
   `sulfide` near-black with rusty staining (black smokers). The shape is the same for every hint.
   The impostor is a 6-sided cone in the rock colour.
+  `Config.props.chimneyCrust` selects individual chimney IDs for a patchy warm-grey mineral
+  finish. Its colour, blend amount, patch scale in metres and bump strength are configurable.
+  Beebe's three chimneys use it, including the merged `smoker-cluster` body. The finish changes
+  existing vertex colours on every tier and strengthens the existing bump map on Medium and
+  above; it adds no geometry, textures or draw calls and leaves plume materials unchanged.
 
 - **`procedural:geo`** (F1-GEO, `src/world/props/geo/`): hand-built geology and biology set pieces
   chosen by `feature`, with `dimensions_m` as [length, width, height] of the piece. Vertex colours

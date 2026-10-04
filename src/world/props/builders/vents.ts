@@ -9,7 +9,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { ChimneyMaterial, PropsConfig } from '../../../core/Config.js';
 import { geoDetail } from '../geo/detail.js';
-import { geoMaterial } from '../geo/materials.js';
+import { geoMaterial, mineralCrust } from '../geo/materials.js';
 import { buildGeo } from '../geo/index.js';
 import { buildCarbonateChimney } from '../geo/towers.js';
 import {
@@ -168,8 +168,8 @@ export function buildPlacedChimney(
 export const VENT_BUILDERS = {
   // A chimney with a `feature` is a vent set piece (Poseidon, a smoker mound): it stays
   // `procedural:chimney` so the vent preset still puts smoke and glow on its tallest stack.
-  chimney: (input) =>
-    input.def.feature
+  chimney: (input) => {
+    const built = input.def.feature
       ? buildGeo(input)
       : input.def.materialHint === 'carbonate' && !(input.dims[0] > 0)
         ? buildCarbonateChimney(input)
@@ -179,5 +179,13 @@ export const VENT_BUILDERS = {
             input.cfg,
             input.def.materialHint ?? 'basalt',
             input.tier,
-          ),
+          );
+    // Feature builders handle their merged body; plain Beebe chimneys use the same mineral finish.
+    if (!input.def.feature && input.cfg.chimneyCrust.propIds.includes(input.def.id)) {
+      const body = built.full as THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
+      mineralCrust(body.geometry, input.seed, input.cfg.chimneyCrust);
+      body.material.bumpScale = input.cfg.chimneyCrust.bumpScale;
+    }
+    return built;
+  },
 } satisfies Record<'chimney', ProceduralBuilder>;

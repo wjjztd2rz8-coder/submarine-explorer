@@ -95,6 +95,14 @@ export interface PropsConfig {
    * `colors.basalt` / `colors.mineral`.
    */
   chimneyMaterials: Record<Exclude<ChimneyMaterial, 'basalt'>, { rock: number; stain: number }>;
+  /** Patchy mineral precipitate on selected chimney bodies, without extra geometry or draws. */
+  chimneyCrust: {
+    propIds: string[];
+    color: number;
+    amount: number;
+    scaleM: number;
+    bumpScale: number;
+  };
   /** `?debugProps=1` placement tool steps. */
   debugNudgeM: number;
   debugNudgeFastM: number;
@@ -162,6 +170,13 @@ export const DEFAULT_PROPS: PropsConfig = {
   chimneyMaterials: {
     carbonate: { rock: 0xa9a393, stain: 0xd6d1c4 }, // Lost City: cream-grey calcite, fresh white brucite tips
     sulfide: { rock: 0x24201e, stain: 0x7a4e2c }, // black smoker sulphide, rusty Fe-oxide staining
+  },
+  chimneyCrust: {
+    propIds: ['beebe-chimney-1', 'beebe-chimney-2', 'beebe-chimney-3'],
+    color: 0x9a8e7b,
+    amount: 0.32,
+    scaleM: 1.4,
+    bumpScale: 1.3,
   },
   debugNudgeM: 1,
   debugNudgeFastM: 10,
