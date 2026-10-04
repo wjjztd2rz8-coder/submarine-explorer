@@ -15,6 +15,7 @@
  */
 
 import { currentScale } from '../../core/config/modes.js';
+import { DEFAULT_WATER } from '../../core/Config.js';
 import * as THREE from 'three';
 import type {
   EnvPresetName,
@@ -217,7 +218,11 @@ export function presetDefaults(
   return { ...(config[name] as unknown as Record<string, PresetParamValue>) };
 }
 
-export function createPreset(name: EnvPresetName, look: ParticleLook): EnvPreset {
+export function createPreset(
+  name: EnvPresetName,
+  look: ParticleLook,
+  water = DEFAULT_WATER,
+): EnvPreset {
   switch (name) {
     case 'vent':
       return new VentPreset(look);
@@ -230,7 +235,7 @@ export function createPreset(name: EnvPresetName, look: ParticleLook): EnvPreset
     case 'trench':
       return new TrenchPreset();
     case 'wreck':
-      return new WreckPreset(look);
+      return new WreckPreset(look, water);
     case 'seamount':
       return new SeamountPreset();
     default:
@@ -386,7 +391,7 @@ export class PresetSystem {
       presetDefaults(o.config.presets, sel.preset),
       sel.overrides,
     );
-    this.preset = createPreset(sel.preset, this.look);
+    this.preset = createPreset(sel.preset, this.look, this.o.config.water);
     this.emit('env:preset', { preset: sel.preset, landmarkId: o.landmarkId });
     console.info(`[presets] ${sel.preset} (${sel.source}) for ${o.landmarkId}`);
   }

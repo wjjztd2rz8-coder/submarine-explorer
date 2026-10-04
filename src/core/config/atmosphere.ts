@@ -110,6 +110,15 @@ export interface WaterConfig {
   snowBoxM: number;
   /** Marine-snow point size in metres (size-attenuated). */
   snowSizeM: number;
+  /** Point diameter in drawing-buffer pixels; independent of tier and DPR. */
+  snowMaxSizePx: number;
+  /** Camera-relative foreground guard, easing back to normal by fadeEndM. */
+  snowForegroundM: number;
+  snowForegroundFadeEndM: number;
+  snowForegroundSizePx: number;
+  /** Sprite-centre alpha and linear colour multiplier, including lamp flare. */
+  snowForegroundAlpha: number;
+  snowForegroundBrightness: number;
   /** The sea surface is only drawn when the camera is shallower than this. */
   surfaceVisibleAboveM: number;
   /** Sea-surface wave amplitude (m) and wavelength (m) for the Fresnel lid. */
@@ -212,6 +221,12 @@ export const DEFAULT_WATER: WaterConfig = {
   causticsFps: 12,
   snowBoxM: 160,
   snowSizeM: 0.14,
+  snowMaxSizePx: 6,
+  snowForegroundM: 6,
+  snowForegroundFadeEndM: 12,
+  snowForegroundSizePx: 2,
+  snowForegroundAlpha: 0.12,
+  snowForegroundBrightness: 0.65,
   surfaceVisibleAboveM: -160,
   surfaceWaveAmpM: 0.9,
   surfaceWaveLengthM: 22,

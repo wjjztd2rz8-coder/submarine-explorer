@@ -11,6 +11,8 @@
 
 import * as THREE from 'three';
 import type { EnvPresetName } from '../../core/Config.js';
+import { DEFAULT_WATER, type WaterConfig } from '../../core/Config.js';
+import { snowReadabilityUniforms } from '../../render/MarineSnow.js';
 import { fitSeabedPlane, mulberry, particleBudget } from './maths.js';
 import {
   COMMON_VERT,
@@ -40,6 +42,29 @@ export function hullProps(props: readonly PresetProp[], max: number): PresetProp
 
 const FILL_TINT = new THREE.Color(0x7d8284);
 
+/** CPU mirror of the foreground-only wreck guard; distant haze keeps its broad sprites. */
+export function wreckParticleAppearance(
+  config: WaterConfig,
+  cameraDistanceM: number,
+  sizePx: number,
+  alpha: number,
+  brightness: number,
+): { sizePx: number; alpha: number; brightness: number } {
+  const t = THREE.MathUtils.smoothstep(
+    cameraDistanceM,
+    config.snowForegroundM,
+    config.snowForegroundFadeEndM,
+  );
+  return {
+    sizePx: Math.min(sizePx, THREE.MathUtils.lerp(config.snowForegroundSizePx, 256, t)),
+    alpha: Math.min(alpha, THREE.MathUtils.lerp(config.snowForegroundAlpha, 1, t)),
+    brightness: Math.min(
+      brightness,
+      THREE.MathUtils.lerp(config.snowForegroundBrightness, brightness, t),
+    ),
+  };
+}
+
 export class WreckPreset implements EnvPreset {
   readonly name: EnvPresetName = 'wreck';
   readonly stats = { draws: 0, particles: 0, lights: 0 };
@@ -51,7 +76,10 @@ export class WreckPreset implements EnvPreset {
   private params: PresetParams = {};
   private visuals = false;
 
-  constructor(private readonly look: ParticleLook) {}
+  constructor(
+    private readonly look: ParticleLook,
+    private readonly water: WaterConfig = DEFAULT_WATER,
+  ) {}
 
   enter(ctx: PresetEnterContext): void {
     this.params = ctx.params;
@@ -82,6 +110,7 @@ export class WreckPreset implements EnvPreset {
     this.haze = new THREE.ShaderMaterial({
       uniforms: {
         ...commonUniforms(this.look),
+        ...snowReadabilityUniforms(this.water),
         uBox: { value: box },
         uBand: { value: num(p.hazeBandM, 30) },
         uPlane: { value: new THREE.Vector3() }, // seabed height, d/dx, d/dz at the camera
@@ -139,6 +168,7 @@ export class WreckPreset implements EnvPreset {
     this.motes = new THREE.ShaderMaterial({
       uniforms: {
         ...commonUniforms(this.look),
+        ...snowReadabilityUniforms(this.water),
         uSize: { value: num(p.moteSizeM, 0.35) },
         uColor: { value: new THREE.Color(num(p.moteColor, 0x8a4a2c)) },
         uOpacity: { value: num(p.moteOpacity, 0.5) },
@@ -178,8 +208,28 @@ export class WreckPreset implements EnvPreset {
   }
 }
 
+// Apply only to snow-like wreck haze/motes; broad plumes and brine mist have
+// different visual roles. The ambient scene/sample is never changed here.
+const FOREGROUND_VERT = /* glsl */ `
+uniform float uForegroundM;
+uniform float uForegroundFadeEndM;
+uniform float uForegroundSizePx;
+uniform float uForegroundAlpha;
+uniform float uForegroundBrightness;
+float wreckForeground(vec3 world) {
+  float fade = smoothstep(uForegroundM, uForegroundFadeEndM, length(world - uCam));
+  gl_PointSize = min(gl_PointSize, mix(uForegroundSizePx, 256.0, fade));
+  return fade;
+}
+float wreckBrightness(vec3 world, float fade) {
+  float light = presetLight(world);
+  return min(light, mix(uForegroundBrightness, light, fade));
+}
+`;
+
 const HAZE_VERT = /* glsl */ `
 ${COMMON_VERT}
+${FOREGROUND_VERT}
 uniform float uBox;
 uniform float uBand;
 uniform vec3  uPlane;
@@ -200,15 +250,17 @@ void main() {
   float floorY = uPlane.x + uPlane.y * d.x + uPlane.z * d.y;
   w.y = floorY + 0.5 + p.y * uBand + sin(uTime * 0.2 + aSeed * 9.0) * 0.5;
   float dist = placePoint(w, uSize * (0.6 + 0.8 * aSeed));
+  float foreground = wreckForeground(w);
   float edge = 1.0 - smoothstep(0.35, 0.5, max(abs(d.x), abs(d.y)) / uBox);
-  vColor = uColor * presetLight(w);
-  vAlpha = uOpacity * edge * (1.0 - 0.6 * p.y);
+  vColor = uColor * wreckBrightness(w, foreground);
+  vAlpha = min(uOpacity * edge * (1.0 - 0.6 * p.y), mix(uForegroundAlpha, 1.0, foreground));
   vFog = presetFog(dist);
 }
 `;
 
 const MOTE_VERT = /* glsl */ `
 ${COMMON_VERT}
+${FOREGROUND_VERT}
 uniform float uSize;
 uniform vec3  uColor;
 uniform float uOpacity;
@@ -222,8 +274,9 @@ void main() {
   w.y += sin(uTime * 0.05 + aSeed * 13.0) * 1.0 - 0.3;
   w.z += cos(uTime * 0.06 + aSeed * 41.0) * 1.5;
   float dist = placePoint(w, uSize * (0.5 + aSeed));
-  vColor = uColor * presetLight(w);
-  vAlpha = uOpacity * (1.0 - smoothstep(90.0, 160.0, dist));
+  float foreground = wreckForeground(w);
+  vColor = uColor * wreckBrightness(w, foreground);
+  vAlpha = min(uOpacity * (1.0 - smoothstep(90.0, 160.0, dist)), mix(uForegroundAlpha, 1.0, foreground));
   vFog = presetFog(dist);
 }
 `;

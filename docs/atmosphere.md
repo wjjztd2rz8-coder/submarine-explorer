@@ -39,6 +39,18 @@ Spawn at a depth with `?depth=<metres>`; it is clamped 40 m above the seabed.
 
 GPU point field of `snowCount` particles in a `snowBoxM` cube that wraps around the camera; density and drift per band; brightness follows ambient with a floor so particles still catch the headlights in the abyss.
 
+Readability guard: within `snowForegroundM` (6 m radial distance from the camera),
+sprites are at most 2 drawing-buffer pixels across, with centre alpha at most
+0.12 and a linear colour multiplier at most 0.65, including lamp flare. These
+bounds ease back to normal lighting/alpha by 12 m; the diameter never exceeds
+`snowMaxSizePx` (6 buffer pixels). The Gaussian edge, density, drift and wrapping
+are unchanged. At higher DPR the cap occupies fewer CSS pixels. Fog and scene
+ambient floors are independent of these particle controls. Wreck sediment haze
+and rust motes share the 6 m guard, easing back to their original broad sprites,
+alpha and lighting by 12 m. Other preset plumes/mist retain their own appearance.
+Regression coverage:
+`tests/unit/marineSnowReadability.test.ts` (13 sites, four tiers, free/mission openings).
+
 ## Surface lid
 
 `Water.ts` draws a camera-following flat quad at y = 0, only while the camera is shallower than `surfaceVisibleAboveM` (−160 m). F1-OCEAN shades it per fragment from the optics. The swell is an analytic slope (two crossed sine trains plus four fine ripples on medium and up) that flattens with distance.
