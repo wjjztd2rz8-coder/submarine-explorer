@@ -50,42 +50,76 @@ for (const layout of [
           const g = window.__game as { save: { save(value: { uiScale: number }): void } };
           g.save.save({ uiScale });
         }, scale);
-        for (const objective of copy) {
-          await page.evaluate(
-            ({ text, activeId }) => {
-              const g = window.__game as {
-                mission: { objectives: ObjectiveStatus[] };
-                missionRouter: { panel: ObjectivesPanel };
-              };
+        // The copy fixture and its measurements are one browser task, so the
+        // live router cannot overwrite the fixture between setting and reading
+        // it. Every authored title/hint and all original bounds are still checked.
+        const samples = await page.evaluate(
+          ({ copy, activeId }) => {
+            const g = window.__game as {
+              mission: { objectives: ObjectiveStatus[] };
+              missionRouter: { panel: ObjectivesPanel };
+            };
+            // Select the fixture's current row explicitly. Live navigation may
+            // have changed between scales; copy measurement must not depend on
+            // the submarine continuing to favour the same target.
+            g.missionRouter.panel.setNav(
+              {
+                id: activeId,
+                name: 'Copy fixture',
+                primary: true,
+                bearingDeg: 0,
+                rangeM: 0,
+                depthM: 0,
+                relativeDeg: 0,
+              },
+              false,
+            );
+            return copy.map((objective) => {
               g.missionRouter.panel.setObjectives(
                 g.mission.objectives.map((o) =>
                   o.id === activeId
-                    ? { ...o, title: text.title, hint: text.hint, primary: text.primary }
+                    ? {
+                        ...o,
+                        title: objective.title,
+                        hint: objective.hint,
+                        primary: objective.primary,
+                      }
                     : o,
                 ),
               );
-            },
-            { text: objective, activeId },
-          );
-          const title = page.locator('.obj-item.is-current .obj-item-title');
-          await expect(title).toHaveText(objective.title);
-          await expect(page.locator('.obj-hint')).toHaveText(objective.hint);
-          const bounds = await title.evaluate((element) => {
-            const box = element.getBoundingClientRect();
-            const row = element.parentElement!.getBoundingClientRect();
-            const optional = element
-              .parentElement!.querySelector('.obj-optional')
-              ?.getBoundingClientRect();
-            return {
-              clipped:
-                element.scrollWidth > element.clientWidth + 1 ||
-                element.scrollHeight > element.clientHeight + 1,
-              left: box.left,
-              right: box.right,
-              rowRight: row.right,
-              optionalLeft: optional?.left ?? row.right,
-            };
-          });
+              const element = document.querySelector<HTMLElement>(
+                '.obj-item.is-current .obj-item-title',
+              )!;
+              const box = element.getBoundingClientRect();
+              const row = element.parentElement!.getBoundingClientRect();
+              const optional = element
+                .parentElement!.querySelector('.obj-optional')
+                ?.getBoundingClientRect();
+              return {
+                objective,
+                title: element.textContent,
+                hint: document.querySelector('.obj-hint')!.textContent,
+                visible:
+                  box.width > 0 &&
+                  box.height > 0 &&
+                  getComputedStyle(element).visibility === 'visible',
+                clipped:
+                  element.scrollWidth > element.clientWidth + 1 ||
+                  element.scrollHeight > element.clientHeight + 1,
+                left: box.left,
+                right: box.right,
+                rowRight: row.right,
+                optionalLeft: optional?.left ?? row.right,
+              };
+            });
+          },
+          { copy, activeId },
+        );
+        for (const bounds of samples) {
+          const objective = bounds.objective;
+          expect(bounds.title).toBe(objective.title);
+          expect(bounds.hint).toBe(objective.hint);
+          expect(bounds.visible, `${scale}%: ${objective.title}`).toBe(true);
           expect(bounds.clipped, `${scale}%: ${objective.title}`).toBe(false);
           expect(bounds.left).toBeGreaterThanOrEqual(0);
           expect(bounds.right).toBeLessThanOrEqual(layout.width);

@@ -23,8 +23,10 @@ function setup(route: boolean) {
     input: { wheelDelta: 0 },
     photoMode: { active: false },
     keyboard: { unlock: vi.fn() },
+    expose: vi.fn(),
   } as unknown as GameContext;
   cameraControlsSystem.init?.(ctx);
+  expect(ctx.expose).toHaveBeenCalledWith({ cameraTips: ctx.cameraTips });
   return { ctx, offReset };
 }
 function count() {

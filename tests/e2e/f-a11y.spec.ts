@@ -39,8 +39,16 @@ async function cycle(page: Page, root: Locator): Promise<void> {
   await controls.nth(indices[0]!).focus();
   for (const index of indices) {
     const control = controls.nth(index);
-    await expect(control).toBeFocused();
-    expect(await control.evaluate((el) => getComputedStyle(el).outlineStyle)).toBe('solid');
+    // Read focus and its visible outline together rather than spending two
+    // renderer-blocked round trips on each control in the catalogue.
+    await expect
+      .poll(() =>
+        control.evaluate((el) => ({
+          focused: document.activeElement === el,
+          outline: getComputedStyle(el).outlineStyle,
+        })),
+      )
+      .toEqual({ focused: true, outline: 'solid' });
     await page.keyboard.press('Tab');
   }
   await expect(controls.nth(indices[0]!)).toBeFocused();

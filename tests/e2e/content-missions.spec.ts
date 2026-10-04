@@ -1,5 +1,7 @@
 import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import type { Discovery } from '../../src/game/Discovery.js';
+import type { Vector3 } from 'three';
 
 /**
  * Retained Phase C smoke: each shipped pack completes through real scans.
@@ -78,28 +80,27 @@ async function teleportToPoi(page: Page, poiId: string): Promise<void> {
   }, poiId);
   const observed: string[] = [];
   for (const pose of poses) {
-    const candidate = await page.evaluate(async (p) => {
+    const candidate = await page.evaluate((p) => {
       const g = window.__game as {
         sub: {
           reset(x: number, y: number, z: number, yaw: number): void;
-          position: unknown;
+          position: Vector3;
+          getForward(): Vector3;
           yaw: number;
           pitch: number;
         };
         rig: { snap(p: unknown, yaw: number, pitch: number): void };
-        discovery: { stats: { markTeleport(): void } };
+        discovery: Discovery;
         scanner: { view: { candidateId: string | null } };
       };
       g.sub.reset(p.x, p.y, p.z, p.yaw);
       g.sub.pitch = p.pitch;
       g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
       g.discovery.stats.markTeleport();
-      // Discovery updates the scanner once per rendered frame. A 600 ms
-      // wait can expire before even one software-rendered frame on CI; observe
-      // two frames so this pose has been processed before choosing another.
-      await new Promise<void>((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-      );
+      // Process the actual pose through Discovery before inspecting the state.
+      // No scan time or vehicle time advances; rendering speed cannot decide
+      // whether this pose is scannable (the held-input scan is checked below).
+      g.discovery.update(0, 0, g.sub.position, g.sub.getForward(), { scan: false }, undefined, 0);
       return g.scanner.view.candidateId;
     }, pose);
     if (candidate === poiId) return;

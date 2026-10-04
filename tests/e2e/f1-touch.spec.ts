@@ -74,7 +74,12 @@ test.describe('phone landscape', () => {
     const s = await centre(page, '.tc-stick');
     await touch(cdp, 'touchStart', [{ x: s.x, y: s.y, id: 1 }]);
     await touch(cdp, 'touchMove', [{ x: s.x, y: s.y - 60, id: 1 }]);
-    await page.waitForTimeout(1500);
+    await expect
+      .poll(async () => {
+        const p = await subPos(page);
+        return Math.hypot(p[0] - before[0], p[2] - before[2]);
+      })
+      .toBeGreaterThan(0.2);
     const axis = await page.evaluate(
       () =>
         (window.__game as { input: { touchAxes: { throttle: number } } }).input.touchAxes.throttle,
@@ -100,7 +105,7 @@ test.describe('phone landscape', () => {
     const sx = sl.x + sl.width / 2;
     await touch(cdp, 'touchStart', [{ x: sx, y: sl.y + sl.height * 0.5, id: 2 }]);
     await touch(cdp, 'touchMove', [{ x: sx, y: sl.y + sl.height * 0.95, id: 2 }]);
-    await page.waitForTimeout(1500);
+    await expect.poll(async () => Math.abs((await subPos(page))[1] - y0)).toBeGreaterThan(0.05);
     await touch(cdp, 'touchEnd', []);
     expect(Math.abs((await subPos(page))[1] - y0)).toBeGreaterThan(0.05);
 

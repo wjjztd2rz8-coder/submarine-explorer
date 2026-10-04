@@ -162,6 +162,7 @@ it('Begin dive keeps the Lost City Arcade arm while resetting camera controls', 
       settings: { gameplayMode: mode },
       hud: { onResetCamera: () => () => {} },
       canvas: new EventTarget(),
+      expose: () => {},
     } as unknown as GameContext;
     try {
       cameraControlsSystem.init!(ctx);
