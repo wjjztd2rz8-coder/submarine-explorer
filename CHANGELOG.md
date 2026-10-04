@@ -30,6 +30,11 @@ without an entry here is not done.
   the animal hint crowded the left HUD column in the golden screenshots.
   Scope the target's width to its shared column so the separately imported
   ExploreNotice touch styles cannot leave the target and toast misaligned.
+- Phase F, F-BEEBE-SEABED-560: gently lift Beebe's warm-grey sediment and exposed basalt,
+  retain patch variation, and strengthen its existing warm vent light pools. Add patchy mineral
+  crust to the three Beebe chimney bodies through existing vertex colours and bump textures,
+  with no extra geometry or draws. Preserve depth lighting, fog, camera and plume code.
+  Readability guards and golden-capture status: `plan/progress/F-BEEBE-SEABED-560.md`.
 
 - Phase F, F-BLUEHOLE-SPAWN: the Great Blue Hole Arcade opening now sits about 14 m below the
   ledge inside the hole (was level with it, over a bare rim), 205 m from the west alcove, so

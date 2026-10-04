@@ -1,3 +1,5 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
@@ -111,6 +113,72 @@ describe('procedural:geo features', () => {
     const b = buildPlacedChimney([3, 3, 6], 7, cfg, 'sulfide', 'medium');
     expect((b.full as THREE.Mesh).geometry.getAttribute('color')).toBeDefined();
   });
+});
+
+describe('Beebe mineral finish', () => {
+  const beebe = parsePropsDoc(
+    JSON.parse(readFileSync('data/landmarks/beebe-vent-field/props.json', 'utf8')),
+    cfg,
+  ).props;
+  const bareCfg = { ...cfg, chimneyCrust: { ...cfg.chimneyCrust, propIds: [] } };
+
+  for (const tier of ['low', 'high']) {
+    for (const def of beebe) {
+      it(`${def.id} ${tier}: patchy crust lifts rock without changing geometry, bounds or draws`, () => {
+        const input = {
+          def,
+          dims: def.dimensionsM!,
+          seed: hashString(def.id),
+          tier,
+          groundHeight: () => undefined,
+        };
+        const finished = PROCEDURAL_BUILDERS.chimney({ ...input, cfg });
+        const bare = PROCEDURAL_BUILDERS.chimney({ ...input, cfg: bareCfg });
+        const body = (built: typeof finished): THREE.Mesh =>
+          (built.full.getObjectByName('smoker-body') ?? built.full) as THREE.Mesh;
+        const a = body(finished).geometry;
+        const b = body(bare).geometry;
+        expect(a.getAttribute('position').array).toEqual(b.getAttribute('position').array);
+        expect(a.getAttribute('normal').array).toEqual(b.getAttribute('normal').array);
+        expect(finished.bounds.equals(bare.bounds)).toBe(true);
+        expect(countGeo(finished.full)).toEqual(countGeo(bare.full));
+        const ca = a.getAttribute('color');
+        const cb = b.getAttribute('color');
+        const luminance = (c: typeof ca, i: number): number =>
+          0.2126 * c.getX(i) + 0.7152 * c.getY(i) + 0.0722 * c.getZ(i);
+        const lift = Array.from(
+          { length: ca.count },
+          (_, i) => luminance(ca, i) - luminance(cb, i),
+        );
+        const mean = lift.reduce((sum, n) => sum + n, 0) / lift.length;
+        expect(mean).toBeGreaterThan(0);
+        // Variation must survive on Low too, where no bump map is available.
+        expect(new Set(lift.map((n) => Math.round(n * 1000))).size).toBeGreaterThan(10);
+        expect(Math.max(...lift)).toBeGreaterThan(mean * 2);
+      });
+    }
+
+    it(`${tier}: other smoker clusters keep their original colours and material`, () => {
+      const def = { ...beebe[0]!, id: 'axial-unselected-smoker' };
+      const input = {
+        def,
+        dims: def.dimensionsM!,
+        seed: hashString(def.id),
+        tier,
+        groundHeight: () => undefined,
+      };
+      const finished = PROCEDURAL_BUILDERS.chimney({ ...input, cfg });
+      const bare = PROCEDURAL_BUILDERS.chimney({ ...input, cfg: bareCfg });
+      const a = finished.full.getObjectByName('smoker-body') as THREE.Mesh;
+      const b = bare.full.getObjectByName('smoker-body') as THREE.Mesh;
+      expect(a.geometry.getAttribute('color').array).toEqual(
+        b.geometry.getAttribute('color').array,
+      );
+      expect((a.material as THREE.MeshStandardMaterial).bumpScale).toBe(
+        (b.material as THREE.MeshStandardMaterial).bumpScale,
+      );
+    });
+  }
 });
 
 describe('plumes', () => {

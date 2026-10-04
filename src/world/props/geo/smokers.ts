@@ -10,7 +10,7 @@
 
 import * as THREE from 'three';
 import { geoDetail } from './detail.js';
-import { geoMaterial, LIFE_TINT, vertexGlow } from './materials.js';
+import { geoMaterial, LIFE_TINT, mineralCrust, vertexGlow } from './materials.js';
 import { shimmerPlume, smokePlume } from './plume.js';
 import { tieredSpire } from './spire.js';
 import {
@@ -40,7 +40,7 @@ const MOUND = new THREE.Color(0x4c4038);
 const MAT = new THREE.Color(0xb9ad98);
 
 export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
-  const { dims, seed, tier, def } = input;
+  const { dims, seed, tier, def, cfg } = input;
   const gnd = input.groundHeight() ?? ((): number => 0);
   const d = geoDetail(tier);
   const [L, W, H0] = dims;
@@ -164,12 +164,17 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     );
     if (ny > 0.85 && best === 0) out.multiplyScalar(1.08);
   });
+  const crusted = cfg.chimneyCrust.propIds.includes(def.id);
+  if (crusted) mineralCrust(geom, seed, cfg.chimneyCrust);
   projectUVs(geom, 3);
   geom.computeBoundingBox();
   geom.computeBoundingSphere();
   const full = new THREE.Group();
   full.name = 'smoker-cluster';
-  const bodyMat = geoMaterial('rock', d, { roughness: 0.9 });
+  const bodyMat = geoMaterial('rock', d, {
+    roughness: 0.9,
+    ...(crusted ? { bumpScale: cfg.chimneyCrust.bumpScale } : {}),
+  });
   // Black smokers are dark but not black: lift the albedo, and give the warm fluid a faint
   // self-lit tint that follows the pale and rusty parts of the crust.
   bodyMat.color.multiplyScalar(1.25);

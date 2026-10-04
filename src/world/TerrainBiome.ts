@@ -218,19 +218,21 @@ export const BIOMES: Record<string, Biome> = {
     ],
   },
   'axial-seamount-ashes': { ...VOLCANIC, colorB: 0x6a655c },
-  // Soft basalt-and-sulphide sediment: a low, even texture so the chimneys are the subject.
+  // Warm grey sulphide sediment: enough albedo for the vent pools to read against the abyss.
   'beebe-vent-field': {
     ...VOLCANIC,
     a: 'sand',
     b: 'silt',
-    colorA: 0x5a544d,
-    colorB: 0x645d55,
+    colorA: 0x635d55,
+    colorB: 0x70685d,
+    // The basalt slot dominates slopes; leaving it near black swallows the light around vents.
+    colorC: 0x45413d,
     stainAmount: 0.3,
-    patch: 0.3,
+    patch: 0.36,
     ripple: 0.05,
     burrow: 0.1,
-    contrast: 0.55,
-    detail: 0.5,
+    contrast: 0.6,
+    detail: 0.55,
   },
   'hunga-tonga-caldera': {
     ...VOLCANIC,

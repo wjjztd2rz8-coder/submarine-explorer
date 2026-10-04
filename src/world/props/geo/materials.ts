@@ -1,7 +1,9 @@
 /** Materials for the geo set pieces: vertex colours times a neutral detail map. */
 
 import * as THREE from 'three';
+import type { PropsConfig } from '../../../core/Config.js';
 import type { GeoDetail } from './detail.js';
+import { fbm3, smooth } from './shared.js';
 import { detailTexture, type GeoTexKind } from './textures.js';
 
 /** Overall albedo multiplier for geo rock (vertex colours are authored in natural colours). */
@@ -9,6 +11,32 @@ export const ALBEDO = 0.07;
 
 /** Tint for instanced life (colonies, worms, sponges, mats): brighter than rock, but not clipping. */
 export const LIFE_TINT = 0x666666;
+
+/** Mineral islands at two scales: broad encrustation and finer broken edges on existing vertices. */
+export function mineralCrust(
+  geometry: THREE.BufferGeometry,
+  seed: number,
+  crust: PropsConfig['chimneyCrust'],
+): void {
+  const pos = geometry.getAttribute('position');
+  const normal = geometry.getAttribute('normal');
+  const colors = geometry.getAttribute('color');
+  const tint = new THREE.Color(crust.color);
+  const c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i) / crust.scaleM;
+    const y = pos.getY(i) / crust.scaleM;
+    const z = pos.getZ(i) / crust.scaleM;
+    const broad = fbm3(x, y, z, seed ^ 0x6c41, 3);
+    const grain = fbm3(x * 3, y * 3, z * 3, seed ^ 0x8f13, 2);
+    // Shelves catch more precipitate; recessed sulfide and the rusty underlying palette still show.
+    const patch = smooth(0.42, 0.68, broad * 0.7 + grain * 0.3);
+    const shelf = 0.7 + 0.3 * Math.max(0, normal.getY(i));
+    c.fromBufferAttribute(colors, i).lerp(tint, crust.amount * patch * shelf);
+    colors.setXYZ(i, c.r, c.g, c.b);
+  }
+  colors.needsUpdate = true;
+}
 
 export interface GeoMaterialOpts {
   roughness?: number;
