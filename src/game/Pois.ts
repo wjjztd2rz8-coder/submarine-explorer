@@ -212,6 +212,8 @@ export interface SpawnPose {
   yaw: number;
   /** Chase-camera distance (m) for a composed opening; unset keeps the configured arm. */
   chaseRadius?: number;
+  /** Extra lateral chase offset before normalizing the arm to chaseRadius (m). */
+  chaseOffsetX?: number;
 }
 
 /**

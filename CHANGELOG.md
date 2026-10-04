@@ -32,6 +32,20 @@ without an entry here is not done.
   stay unchanged. Cached CI failures and validation limits are recorded in
   `plan/progress/F-CI-TRIAGE-500.md`.
 
+- Phase F, F-BUGHUNT-18: Lost City's Arcade camera resets to its 50 m opening
+  distance after wheel zoom, free look and view toggles; add a lateral chase
+  offset so all three hull classes clear Poseidon's tower axis while preserving
+  the original 10° approach heading and 50 m arm.
+  Mission previews and Begin use the current saved mode, restoring the global
+  arm for Realistic/Custom, surface, Daily and missing-content starts. Ignore
+  chase resets during photo orbit to keep the camera and overlay in sync.
+  Add camera-control, actual-slope/geometry and mode regressions, plus browser
+  checks and screenshot capture at 1600×900 and 844×390. Browser comparisons
+  await rendered camera frames and the loaded Daily card before measuring;
+  existing facing, position and hit-target thresholds remain unchanged.
+  Register warm vent haze as an explicit Beebe override so generic vents retain
+  their two-draw budget and Beebe retains its haze. Reason: full-e2e regressions.
+  No cuts.
 - Phase F, F-LOSTCITY-SURROUNDINGS: Lost City gets a cooler, banded grey-green slope with larger talus blocks and rubble, more ledges and flanges on the small carbonate towers, a less milky vent haze (lighter haze lift), and rooted corals (all sites) sit into the sediment with large heads at colony cores and small ones at the fringe.
 - F-BEEBE-PLUME-VARIETY: black-smoker plumes now vary per vent (height, width, opacity, lean, deterministic from the orifice position), bend with height in a consistent ambient-current direction, gain a warm lit haze over each orifice and a small pale white-smoker wisp beside it; no extra per-vent draw calls (one additive haze draw per field).
 

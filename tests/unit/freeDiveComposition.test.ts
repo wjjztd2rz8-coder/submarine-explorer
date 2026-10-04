@@ -69,6 +69,7 @@ describe('free-dive openings on actual survey terrain and procedural hero geomet
               (['lost-city', 'beebe-vent-field'].includes(site) ? 0.42 : 0.55);
         const target = hero.root.localToWorld(centre);
         const rig = new CameraRig(config.camera, 16 / 9, terrain);
+        rig.setChaseRadiusDefault(spawn!.chaseRadius, spawn!.chaseOffsetX);
         rig.snap(pos, spawn!.yaw, 0);
         const eye = rig.camera.position;
         expect(eye.y).toBeLessThanOrEqual(-2 + 1e-8);

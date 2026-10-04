@@ -32,8 +32,9 @@ export const missionSystem: GameSystem = {
     // resolves the same pose and the dive starts without a teleport.
     const applyMissionStart = (choice: MissionStartPosition): void => {
       if (!route || params.has('poi') || params.has('at') || params.has('depth')) return;
+      const mode = save.get().gameplayMode;
       const opening =
-        choice === 'near-site' && !ctx.daily && settings.gameplayMode === 'arcade'
+        choice === 'near-site' && !ctx.daily && mode === 'arcade'
           ? composedMissionSpawn(
               route.landmarkId,
               discovery.pois.filter((p) =>
@@ -67,14 +68,8 @@ export const missionSystem: GameSystem = {
       sub.reset(pose.x, pose.y, pose.z, pose.yaw);
       lastStart = sub.position.clone();
       lastChoice = choice;
-      if (route.landmarkId === 'lost-city' && settings.gameplayMode === 'arcade')
-        rig.chaseRadius =
-          opening?.chaseRadius ??
-          Math.hypot(
-            config.camera.chaseOffset.x,
-            config.camera.chaseOffset.y,
-            config.camera.chaseOffset.z,
-          );
+      if (route.landmarkId === 'lost-city')
+        rig.setChaseRadiusDefault(opening?.chaseRadius, opening?.chaseOffsetX);
       rig.snap(sub.position, sub.yaw, sub.pitch);
       headlights.setEnabled(true);
     };
@@ -168,6 +163,11 @@ export const missionSystem: GameSystem = {
         choices: config.settings.gameplayOptions,
         onStartChange: previewStart,
       });
+      cleanup.add(
+        save.onChange((_next, changed) => {
+          if (changed.includes('gameplayMode')) previewStart(briefing.startChoice);
+        }),
+      );
       previewStart(briefing.startChoice);
     }
     if (briefing && route) {

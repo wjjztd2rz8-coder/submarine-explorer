@@ -68,7 +68,7 @@ describe('Lost City first-ten-second Arcade opening', () => {
         );
         expect(props.collide(position.clone(), settings.hullRadius + 4, new Vector3())).toBe(false);
         const rig = new CameraRig(config.camera, 16 / 9, terrain);
-        rig.chaseRadius = pose.chaseRadius!;
+        rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX);
         rig.snap(position, pose.yaw, 0);
         expect(rig.camera.position.distanceTo(hero.root.position)).toBeLessThan(95);
         // The full solid tower's axis fits vertically, on desktop and portrait.
@@ -151,7 +151,8 @@ it('Begin dive keeps the Lost City Arcade arm while resetting camera controls', 
     ['titanic', 'arcade', Math.hypot(38, 90)],
   ] as const) {
     const rig = new CameraRig(config.camera, 16 / 9);
-    rig.chaseRadius = 50;
+    if (site === 'lost-city' && mode === 'arcade') rig.setChaseRadiusDefault(50);
+    rig.chaseRadius = 180; // Begin restores the opening, not a pilot's previous zoom.
     rig.freeLook = true;
     rig.setMode('first-person');
     const bus = new EventBus();

@@ -20,6 +20,8 @@ import { propsSystem } from '../../src/app/systems/props.js';
 import { createRovSystem } from '../../src/app/systems/rov.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
 import type { FrameState } from '../../src/app/System.js';
+import { CameraRig } from '../../src/sub/CameraRig.js';
+import { missionStartPose } from '../../src/game/MissionRouter.js';
 
 // Keep real mission routing, vehicle physics and lamp meshes. Only DOM views
 // are replaced: these node tests inspect the content passed to the briefing.
@@ -488,6 +490,124 @@ describe('fresh-player mission routing and vehicle loadout', () => {
       terrain.dispose();
     }
   });
+
+  for (const skipBriefing of [false, true]) {
+    it(`Lost City ${skipBriefing ? 'skip' : 'briefing'} starts clear the Arcade camera default for Realistic, surface, Daily and missing props`, async () => {
+      const ctx = context('lost-city', 'arcade');
+      ctx.route!.skipBriefing = skipBriefing;
+      stubShell(ctx);
+      const terrain = loadTerrain(ctx);
+      ctx.terrain = terrain;
+      const submarine = createSubmarineSystem();
+      try {
+        submarine.init?.(ctx);
+        ctx.rig = new CameraRig(ctx.config.camera, 16 / 9, terrain);
+        ctx.props = new Props(ctx.meta, terrain, ctx.config.props, 'low');
+        const pois = placePois(
+          parsePois(JSON.parse(readFileSync('data/landmarks/lost-city/pois.json', 'utf8'))),
+          ctx.meta,
+          terrain,
+          ctx.config.scan,
+          'lost-city',
+        );
+        ctx.discovery = { ready: Promise.resolve(), pois } as unknown as GameContext['discovery'];
+        await ctx.props.placeAll(
+          JSON.parse(readFileSync('data/landmarks/lost-city/props.json', 'utf8')),
+          'lost-city',
+        );
+        missionSystem.init?.(ctx);
+        await Promise.resolve();
+        expect(ctx.rig.chaseRadius).toBe(50);
+        const arcadePos = ctx.sub.position.clone();
+        // Both boot directions must use current saved settings, even when the
+        // near-site choice is unchanged. The preview must match Begin.
+        ctx.save.setGameplayMode('realistic');
+        await Promise.resolve();
+        if (!skipBriefing) expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
+        ctx.applyMissionStart('near-site');
+        const legacy = missionStartPose(
+          { ...ctx.route!.def, hull_class: ctx.sub.getState().hullClass },
+          'near-site',
+          pois,
+          ctx.meta,
+          terrain,
+          ctx.config,
+        );
+        expect(ctx.sub.position.toArray()).toEqual([legacy.x, legacy.y, legacy.z]);
+        expect(ctx.sub.position.distanceTo(arcadePos)).toBeGreaterThan(1);
+        ctx.rig.chaseRadius = 35;
+        ctx.rig.resetView();
+        expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
+        ctx.save.setGameplayMode('arcade');
+        await Promise.resolve();
+        ctx.applyMissionStart('near-site');
+        expect(ctx.sub.position.distanceTo(arcadePos)).toBeLessThan(1e-6);
+        expect(ctx.rig.chaseRadius).toBe(50);
+        ctx.applyMissionStart('surface');
+        ctx.rig.resetView();
+        expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
+        ctx.applyMissionStart('near-site');
+        expect(ctx.rig.chaseRadius).toBe(50);
+        ctx.daily = { start: { x: 0, z: 0, headingDeg: 0 } } as GameContext['daily'];
+        ctx.applyMissionStart('near-site');
+        ctx.rig.resetView();
+        expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
+        ctx.daily = null;
+        ctx.applyMissionStart('near-site');
+        // Losing optional content must also clear a previously shortened arm.
+        ctx.props = new Props(ctx.meta, terrain, ctx.config.props, 'low');
+        ctx.applyMissionStart('near-site');
+        ctx.rig.resetView();
+        expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
+      } finally {
+        missionSystem.dispose?.();
+        ctx.missionRouter?.dispose();
+        submarine.dispose?.();
+        ctx.subMesh?.dispose();
+        terrain.dispose();
+      }
+    });
+  }
+
+  for (const mode of ['arcade', 'realistic', 'custom'] as const) {
+    it(`Lost City ${mode} free dive installs its reset distance after optional props load`, async () => {
+      const ctx = context('lost-city', mode);
+      ctx.route = null;
+      ctx.params = new URLSearchParams('tile=lost-city');
+      stubShell(ctx);
+      vi.stubGlobal('fetch', async () => ({
+        ok: true,
+        text: async () => readFileSync('data/landmarks/lost-city/props.json', 'utf8'),
+      }));
+      const terrain = loadTerrain(ctx);
+      ctx.terrain = terrain;
+      const submarine = createSubmarineSystem();
+      try {
+        submarine.init?.(ctx);
+        ctx.rig = new CameraRig(ctx.config.camera, 16 / 9, terrain);
+        propsSystem.init?.(ctx);
+        const radius = mode === 'arcade' ? 50 : Math.hypot(38, 90);
+        await vi.waitFor(() => {
+          expect(ctx.props.loaded).toBe(true);
+          const hero = ctx.props.placed.find((p) => p.def.id === 'poseidon-tower')!;
+          expect(
+            Math.hypot(
+              ctx.sub.position.x - hero.root.position.x,
+              ctx.sub.position.z - hero.root.position.z,
+            ),
+          ).toBeCloseTo(mode === 'arcade' ? 38 : 44, 6);
+          expect(ctx.rig.chaseRadius).toBeCloseTo(radius, 6);
+        });
+        ctx.rig.chaseRadius = 180;
+        ctx.rig.resetView();
+        expect(ctx.rig.chaseRadius).toBeCloseTo(radius, 6);
+      } finally {
+        submarine.dispose?.();
+        ctx.subMesh?.dispose();
+        terrain.dispose();
+      }
+    });
+  }
   for (const [site, hull] of [
     ['titanic', 'B'],
     ['bismarck', 'B'],

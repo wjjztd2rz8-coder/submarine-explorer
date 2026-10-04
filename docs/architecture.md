@@ -80,6 +80,18 @@ downloads individual JPEGs or one ZIP. `MissionState` gained a `primaries-comple
 finishing the primaries no longer force-opens the debrief. The D2 chase camera starts farther behind and higher above the
 sub, follows yaw but not pitch, and keeps a world-fixed direction after manual
 free look. `X`, the HUD button or a double-click restores the chase view.
+Arcade Lost City's composed 38 m opening sets a 50 m reset distance, independent
+of wheel zoom (35–180 m). Its original 10° heading offset is preserved; a
+local X offset of −20 m in the chase vector moves the hull off Poseidon's axis
+before that vector is normalized to the 50 m arm. The spawn pose carries
+`chaseOffsetX` alongside `chaseRadius`. `CameraRig.setChaseRadiusDefault(radius?, offsetX?)`
+sets the current/reset distance and lateral framing; omitting both restores
+the configured arm and zero extra lateral offset. Surface,
+Daily, missing-content and Realistic/Custom mission starts clear the Lost City
+override; other sites retain their existing camera defaults. Briefing mode
+changes preview the current saved mode, including when the start choice stays
+the same. Chase resets are ignored while photo orbit is active; its 6–220 m
+zoom is separate and exiting restores the prior camera mode and chase distance.
 Pointer look is started from Settings → Controls and released by menus. The
 briefing now previews the chosen start pose before Begin and does not move the
 sub after the dive starts. The hull gauge compares depth with the fitted
