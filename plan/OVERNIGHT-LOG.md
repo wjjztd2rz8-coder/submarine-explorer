@@ -362,3 +362,7 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Still running or unmerged: Codex 480, 490, 500 (running), 450-triage (spec only, awaiting its owner). Queue: 510, 520, 530 (verify footer/touch/snow), 540 (merge residue bughunt). No Claude agent run (weekly 23%, and merge fixes took the time).
 - Not reviewed visually this run: Titanic far-field lift and snow (460) after merge; 530 verifies them. The portrait chip may be hidden under the in-range contact label at times (transient).
 - Needs owner: nothing.
+
+## 2026-10-04 early review run (~02:30)
+
+- Comprehensive review for tag f20 recorded (Titanic +0.5). Golden 2026-10-04-020114. DIRECTOR refreshed (6 Claude items), Codex briefs 550/560/570 queued with 540. No merges, no Claude package (weekly 23%); Codex 480-530 worktrees still running. Needs owner: nothing.

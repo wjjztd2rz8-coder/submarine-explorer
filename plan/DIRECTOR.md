@@ -2,20 +2,20 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-03 evening review; golden set 2026-10-04-002012)
+## Current priorities (refreshed 2026-10-04 review for tag f20; golden set 2026-10-04-020114)
 
 Run `tools/golden.sh` at the start of any run that merged visual work. Compare against the previous set. If this list runs dry, refill it from the newest golden set rather than idling.
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
 1. **Monterey golden poses 2/3 + wall texture:** pin poses to wall-life views in tools/golden-shots.mjs; sediment banding/texture so the wall is not a smooth slab.
-2. **Blue Hole spawn pose and east grotto:** reduce the flat sand-wall view at spawn, east-alcove golden pose, grotto reads as a dark mound.
-3. **Toast placement (395 merged; after 450 hud footer merges):** "Animal nearby" toast to top centre or below the legend; it sits under the sonar and crowds the left column.
-4. **Titanic far-field lift (after Codex 460 worktree merges):** lift the near-black far field; thin the marine snow over the ship.
-5. **Beebe sub/seabed readability:** seabed around the vents is near black-brown and the sub reads small; add subtle floor lift and chimney texture (plumes are now good).
-6. **Lost City banding stronger and tower-base corals:** the slope is better but banding is faint.
+2. **Blue Hole spawn pose and east grotto:** spawn frame is a flat sand wall with a lone stalactite dome; reframe to look into the hole with fish, east-alcove golden pose, grotto reads as a dark mound.
+3. **Lost City banding stronger and tower-base corals:** slope is textured but banding faint; corals at the tower base.
+4. **Titanic far-field lift:** lift the near-black far field and add a faint haze horizon (snow density is Codex 570).
+5. **Beebe sub scale:** sub reads small in shot 1; nearer default camera or vent framing (floor and chimney texture is Codex 560).
+6. **Debrief/Journal polish from audit 510** once it lands (dead ends, clutter).
 
-Codex queue (all unblocked): 470 touch-150 overlap, 480 verify rebrand, 490 Lost City camera bughunt, 500 CI red triage, 510 journal/debrief flow audit, 520 verify Lost City/Beebe visuals. Worktrees 450 hud footer, 450 triage, 460 hold work.
+Codex queue (all unblocked): 540 merge residue bughunt, 550 toast placement, 560 Beebe seabed lift, 570 Titanic snow density. Running/unmerged worktrees: 480, 490, 500, 510, 520, 530, 450-triage.
 
 Demoted: further title polish; rebrand logo (done, Codex 440).
 

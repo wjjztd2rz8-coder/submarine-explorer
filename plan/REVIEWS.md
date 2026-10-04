@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-04 comprehensive review (trigger: tag f20; golden set 2026-10-04-020114)
+
+**Changed since the last review:** HUD attribution footer chip (the 5-line GMRT citation is gone, Titanic shot 1 is much cleaner), touch 150% overlap fix, Titanic far-field lift and thinner snow (460), vent haze gating.
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5:**
+
+| Site            | Score       | Change | Biggest gap                                                         |
+| --------------- | ----------- | ------ | ------------------------------------------------------------------- |
+| Titanic         | 4/4/5/4/5/4 | +0.5   | Snow flecks still dense over the lower hull; far field near black   |
+| Beebe           | 4/4/4/4/5/4 | same   | Seabed dark brown, sub small in frame                               |
+| Great Blue Hole | 4/4/4/3/5/4 | same   | Spawn frame flat sand wall with lone dome; toast crowds left column |
+| Lost City       | 4/4/4/3/5/3 | same   | Tower strong; banding faint                                         |
+| Monterey Canyon | 4/3/4/3/5/3 | same   | Wall still a ribbed slab; toast crowds left column                  |
+
+**Play flow:** HUD footer is clean now. Remaining clutter: "Animal nearby" toast (Codex 550). Audit 510 (journal/debrief) still running; not re-reviewed by me this run.
+
+**Process:** efficiency idle figures are dominated by the earlier Claude weekly squeeze (budget-gate skips); Codex had 4 tasks running. CI on main still red on some pushes (Codex 500 triage pending merge). No Claude package this run (weekly 23%).
+
+**New priorities:** see DIRECTOR.md. Queued Codex 550 toast, 560 Beebe seabed, 570 Titanic snow alongside 540.
+
+**Needs owner:** nothing.
+
 ## 2026-10-03 evening comprehensive review (trigger: tag f19; golden set 2026-10-04-002012)
 
 **Changed since the night review:** Lost City surroundings (textured slope, talus, flanges) and Beebe plume variety (per-vent width/lean, current bend, haze), both in f19.
