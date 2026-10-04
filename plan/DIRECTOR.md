@@ -9,12 +9,12 @@ Run `tools/golden.sh` at the start of any run that merged visual work. Compare a
 Claude visual backlog (Sonnet agents, in order of player impact):
 
 1. ~~Monterey golden poses 2/3 + wall texture~~ done (f22, banded canyon wall, poses pinned). Pose 2 banding still subtle at range.
-0. **Merge finished Codex worktrees 530 (HUD footer/touch), 520 (verify), 510 (Journal/debrief fixes + audit specs)** and review their screenshots.
-2. **Blue Hole spawn pose and east grotto:** spawn frame is a flat sand wall with a lone stalactite dome; reframe to look into the hole with fish, east-alcove golden pose, grotto reads as a dark mound.
-3. **Lost City banding stronger and tower-base corals:** slope is textured but banding faint; corals at the tower base.
-4. **Titanic far-field lift:** lift the near-black far field and add a faint haze horizon (snow density is Codex 570).
-5. **Beebe sub scale:** sub reads small in shot 1; nearer default camera or vent framing (floor and chimney texture is Codex 560).
-6. **Debrief/Journal polish from audit 510** once it lands (dead ends, clutter).
+2. **Merge finished Codex worktrees 530 (HUD footer/touch), 520 (verify), 510 (Journal/debrief fixes + audit specs)** and review their screenshots.
+3. **Blue Hole spawn pose and east grotto:** spawn frame is a flat sand wall with a lone stalactite dome; reframe to look into the hole with fish, east-alcove golden pose, grotto reads as a dark mound.
+4. **Lost City banding stronger and tower-base corals:** slope is textured but banding faint; corals at the tower base.
+5. **Titanic far-field lift:** lift the near-black far field and add a faint haze horizon (snow density is Codex 570).
+6. **Beebe sub scale:** sub reads small in shot 1; nearer default camera or vent framing (floor and chimney texture is Codex 560).
+7. **Debrief/Journal polish from audit 510** once it lands (dead ends, clutter).
 
 Codex queue (all unblocked): 540 merge residue bughunt, 550 toast placement, 560 Beebe seabed lift, 570 Titanic snow density. Merged through f22: 480, 490, 500. Finished but unmerged: 510, 520, 530; 450-triage holds only a spec.
 

@@ -8,13 +8,13 @@ Dated director reviews, newest first. Comprehensive reviews run about daily, aft
 
 **Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5:**
 
-| Site            | Score       | Change | Biggest gap                                                              |
-| --------------- | ----------- | ------ | ------------------------------------------------------------------------ |
-| Titanic         | 4/4/5/4/5/4 | same   | Snow flecks still dense over the lower hull (570)                        |
-| Beebe           | 4/4/4/4/5/4 | same   | Seabed dark brown, sub small in frame; plumes good                       |
-| Great Blue Hole | 4/4/4/3/5/4 | same   | Spawn frame is a flat sand wall with one dome; toast in left column      |
-| Lost City       | 4/4/4/3/5/3 | same   | Tower and flanges strong; slope banding still faint; no tower-base life  |
-| Monterey Canyon | 4/4/4/3/5/3 | +0.25  | Pose 3 now a strong banded wall with corals; walls still flat-shaded     |
+| Site            | Score       | Change | Biggest gap                                                             |
+| --------------- | ----------- | ------ | ----------------------------------------------------------------------- |
+| Titanic         | 4/4/5/4/5/4 | same   | Snow flecks still dense over the lower hull (570)                       |
+| Beebe           | 4/4/4/4/5/4 | same   | Seabed dark brown, sub small in frame; plumes good                      |
+| Great Blue Hole | 4/4/4/3/5/4 | same   | Spawn frame is a flat sand wall with one dome; toast in left column     |
+| Lost City       | 4/4/4/3/5/3 | same   | Tower and flanges strong; slope banding still faint; no tower-base life |
+| Monterey Canyon | 4/4/4/3/5/3 | +0.25  | Pose 3 now a strong banded wall with corals; walls still flat-shaded    |
 
 **Play flow:** The "Animal nearby" toast still crowds the left column on Blue Hole and Lost City (Codex 550 queued). Codex 510 (Journal/debrief audit) and 520/530 (verification) are finished but unmerged; 510 could not render in the Codex sandbox, so its visual claims are unreviewed until the merge gates capture the PNGs.
 

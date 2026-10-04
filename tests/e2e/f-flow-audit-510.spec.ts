@@ -37,7 +37,19 @@ async function contained(target: Locator): Promise<void> {
         c.getBoundingClientRect().right > e.getBoundingClientRect().left + e.clientWidth + 1 ||
         c.scrollWidth > c.clientWidth + 1,
     );
-    return `${[...e.querySelectorAll("*")].map((c) => c.tagName + "." + c.className + ":" + Math.round(c.getBoundingClientRect().right - e.getBoundingClientRect().left)).slice(-14).join(" | ")} ${e.scrollWidth}>${e.clientWidth} via ${wide?.tagName}.${wide?.className} ${wide?.textContent?.slice(0, 40)}`;
+    return `${[...e.querySelectorAll('*')]
+      .map(
+        (c) =>
+          c.tagName +
+          '.' +
+          c.className +
+          ':' +
+          Math.round(c.getBoundingClientRect().right - e.getBoundingClientRect().left),
+      )
+      .slice(-14)
+      .join(
+        ' | ',
+      )} ${e.scrollWidth}>${e.clientWidth} via ${wide?.tagName}.${wide?.className} ${wide?.textContent?.slice(0, 40)}`;
   });
   expect(offender, `${target} must not clip text horizontally`).toBe('');
 }
