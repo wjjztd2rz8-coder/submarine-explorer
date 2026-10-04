@@ -33,6 +33,9 @@ try {
         const page = await context.newPage();
         const errors = [];
         page.on('pageerror', (error) => errors.push(error.message));
+        page.on('console', (message) => {
+          if (message.type() === 'error') errors.push(message.text());
+        });
         const url = new URL(base);
         url.search = new URLSearchParams({
           tile: site,
@@ -113,6 +116,7 @@ try {
         if (result.tier !== tier || result.dynamicResolution || result.pixelRatio !== 1)
           throw new Error(`${site}/${tier}: unexpected quality settings`);
         await page.screenshot({ path: resolve(output, `${site}-${tier}.png`), timeout: 90_000 });
+        if (errors.length) throw new Error(`${site}/${tier}: ${errors.join('; ')}`);
         results.push({ site, ...result });
         console.log(
           `${site} ${tier}: ${result.drawCalls} calls, ${result.triangles} triangles; mean ${result.meanMs.toFixed(1)} ms, p50 ${result.medianMs.toFixed(1)}, p95 ${result.p95Ms.toFixed(1)}`,

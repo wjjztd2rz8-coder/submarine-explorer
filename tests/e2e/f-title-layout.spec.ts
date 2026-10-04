@@ -78,6 +78,9 @@ for (const viewport of VIEWPORTS) {
     await mkdir(shots, { recursive: true });
     await page.setViewportSize(viewport);
     await boot(page);
+    // The async Daily row changes the menu height; include it in every layout
+    // and hit-target assertion rather than racing its first timer refresh.
+    await expect(page.locator('.home-menu > .daily-card')).toBeVisible();
     const size = `${viewport.width}x${viewport.height}`;
     await page.screenshot({ path: `${shots}/home-${size}.png` });
 
