@@ -26,6 +26,11 @@ allocates no preset draw geometry or glow lights; current force and trench
 events still run. `medium` uses half the high-tier particle count. The global
 `maxParticles` cap applies to each preset.
 
+Warm orifice haze is opt-in: `hazeGlow` defaults to 0 and `hazeGlowSizeM` to
+7 m. Beebe enables `hazeGlow: 0.5` in its mission overrides, adding one batched
+draw for the field (three total with smoke and shimmer). Generic vent presets
+retain their two-draw budget; carbonate flow does not build this warm haze.
+
 The base current is the attributed [offline HYCOM site grid](currents.md).
 The canyon bends and scales that base flow; it does not add a separate fixed
 current. The current's bearing is the direction water flows **toward**: 0° north

@@ -1,5 +1,11 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
+import { Points, Scene, Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import { VentPreset } from '../../src/world/presets/VentPreset.js';
+import type { PresetEnterContext, PresetParams } from '../../src/world/presets/types.js';
 import {
   landmarkTypeFor,
   mergePresetParams,
@@ -199,5 +205,80 @@ describe('vent plume variety', () => {
       expect(v.height).toBeGreaterThan(0.65);
       expect(v.lean).toBeGreaterThan(0.4);
     }
+  });
+});
+
+describe('vent haze draw budget', () => {
+  function enter(params: PresetParams): { scene: Scene; preset: VentPreset } {
+    const scene = new Scene();
+    const preset = new VentPreset({ ambient: 0.12, headlightGain: 1.6, headlightFalloffM: 90 });
+    const context: PresetEnterContext = {
+      scene,
+      terrain: {
+        sampleHeight: () => -5000,
+        getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+        widthM: 1000,
+        depthM: 1000,
+      },
+      props: [],
+      pois: [{ id: 'vent', kind: 'vent', position: new Vector3(0, -4990, 0) }],
+      params,
+      visuals: true,
+      particleScale: 0.5,
+      maxParticles: 20000,
+      spawn: new Vector3(0, -4980, 0),
+      toWorld: () => ({ x: 0, z: 0 }),
+      bus: new EventBus(),
+    };
+    preset.enter(context);
+    return { scene, preset };
+  }
+
+  it('keeps generic vent geometry at two draws with Config defaults or omitted params', () => {
+    for (const params of [presetDefaults(DEFAULT_CONFIG.presets, 'vent'), {}]) {
+      const { scene, preset } = enter(params);
+      expect(preset.stats.draws).toBe(2);
+      expect(scene.children.filter((object) => object instanceof Points)).toHaveLength(2);
+      expect(scene.getObjectByName('ventHaze')).toBeUndefined();
+      preset.exit();
+      expect(scene.children).toHaveLength(0);
+    }
+  });
+
+  it('accepts Beebe mission haze overrides and preserves its single batched haze draw', () => {
+    resetOverrideWarnings();
+    const mission = JSON.parse(
+      readFileSync('data/landmarks/beebe-vent-field/mission.json', 'utf8'),
+    ) as { environment: { overrides: Record<string, unknown> } };
+    const warn = vi.fn();
+    const params = mergePresetParams(
+      'vent',
+      presetDefaults(DEFAULT_CONFIG.presets, 'vent'),
+      mission.environment.overrides,
+      warn,
+    );
+    expect(warn).not.toHaveBeenCalled();
+    const { scene, preset } = enter(params);
+    expect(preset.stats.draws).toBe(3);
+    expect(scene.children.filter((object) => object instanceof Points)).toHaveLength(3);
+    const haze = scene.getObjectByName('ventHaze') as Points;
+    expect(haze.geometry.getAttribute('position').count).toBe(3);
+    expect(haze.material).toMatchObject({ uniforms: { uStrength: { value: 0.5 } } });
+    preset.exit();
+    expect(scene.children).toHaveLength(0);
+  });
+
+  it('keeps carbonate flow free of warm haze even if explicitly enabled', () => {
+    const { scene, preset } = enter({
+      ...presetDefaults(DEFAULT_CONFIG.presets, 'vent'),
+      fluid: 'carbonate',
+      smokeIntensity: 0,
+      glowLights: 0,
+      hazeGlow: 0.5,
+    });
+    expect(preset.stats.draws).toBe(1);
+    expect(scene.children.filter((object) => object instanceof Points)).toHaveLength(1);
+    expect(scene.getObjectByName('ventHaze')).toBeUndefined();
+    preset.exit();
   });
 });

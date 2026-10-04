@@ -14,6 +14,15 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-TOUCH-150 gate follow-up: make warm vent haze opt-in through
+  registered Config defaults and enable it explicitly at Beebe. Reason: its
+  implicit global default added a third draw to generic vent presets, breaking
+  their two-draw contract. Preserve Beebe's haze and the exact E2E assertion.
+- Phase F, F-TOUCH-150: cap the playing HUD scale on short portrait touch
+  viewports so enlarged UI keeps the tutorial and scanner clear of telemetry
+  and sonar; show a small source-credit pill above touch controls while retaining
+  the full attribution. Preserve menu scaling and saved preferences. Remove the
+  Beebe 150% overlap fixme and check compact credits in the hero regression.
 - Phase F, F-LOSTCITY-SURROUNDINGS: Lost City gets a cooler, banded grey-green slope with larger talus blocks and rubble, more ledges and flanges on the small carbonate towers, a less milky vent haze (lighter haze lift), and rooted corals (all sites) sit into the sediment with large heads at colony cores and small ones at the fringe.
 - F-BEEBE-PLUME-VARIETY: black-smoker plumes now vary per vent (height, width, opacity, lean, deterministic from the orifice position), bend with height in a consistent ambient-current direction, gain a warm lit haze over each orifice and a small pale white-smoker wisp beside it; no extra per-vent draw calls (one additive haze draw per field).
 
