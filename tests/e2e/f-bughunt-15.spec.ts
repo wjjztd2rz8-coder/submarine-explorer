@@ -107,10 +107,8 @@ for (const viewport of [
           const fresh = [...hud, '.onboard-card'];
           if (await page.locator('.scan-panel').isVisible()) fresh.push('.scan-panel');
           await separate(page, fresh);
-          await expect(page.locator('.hud-attribution-pill')).toBeVisible();
-          await expect(page.locator('.hud-attribution-credit')).toContainText('GMRT');
-          await expect(page.locator('.hud-attribution')).toHaveAttribute('title', /GMRT/);
-          expect((await page.locator('.hud-attribution').boundingBox())!.height).toBeLessThan(24);
+          await expect(page.locator('.hud-attribution summary')).toContainText('GMRT');
+          expect((await page.locator('.hud-attribution').boundingBox())!.height).toBeLessThan(48);
           await page.screenshot({ path: testInfo.outputPath('arcade-opening.png') });
 
           // Exercise the real in-range scanner even for openings farther from

@@ -72,31 +72,6 @@
   box-sizing: border-box;
 }
 
-/* Keep the full credit available to assistive technology and in the title, but
-   reserve only a small source pill while the on-screen controls are visible. */
-.hud-attribution-pill {
-  display: none;
-}
-html.is-touch body:has(.tc-root:not([hidden])) .hud-attribution-credit {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-html.is-touch body:has(.tc-root:not([hidden])) .hud-attribution-pill {
-  display: inline;
-}
-html.is-touch body:has(.tc-root:not([hidden])) .hud-attribution {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border-radius: 999px;
-}
-
 /* Touch landscape: the map credit sits in the strip between stick and buttons. */
 @media (orientation: landscape) {
   html.is-touch .hud-footer {
@@ -340,17 +315,17 @@ html.is-touch body:has(.tc-root:not([hidden])) .hud-attribution {
    buttons keep their 44 px touch targets. The objectives observer continues
    to place readouts below the actual objective panel height. */
 @media (orientation: portrait) and (max-width: 700px) {
-  /* The full credit otherwise sits across the stick and action buttons. Keep
-     its text in the DOM, with a single-line strip above the left stick. The
+  /* The credit chip otherwise sits across the stick and action buttons. Keep
+     it as a small strip above the left stick; the panel opens upward. The
      narrow strip also clears the taller action cluster at 150% UI scale. */
-  html.is-touch .hud-attribution {
+  html.is-touch .hud-footer {
     left: calc(12px + env(safe-area-inset-left, 0px));
     right: auto;
-    width: 128px;
-    bottom: calc(206px + env(safe-area-inset-bottom, 0px));
-    max-width: none;
-    font-size: 11px;
-    white-space: nowrap;
+    bottom: calc(188px + env(safe-area-inset-bottom, 0px));
+  }
+  html.is-touch .hud-attribution summary {
+    min-height: 32px;
+    max-width: 128px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
