@@ -106,7 +106,12 @@ for (const { name, url, draws, source } of [
     });
     expect(state.active).toBe(name);
     expect(state.source).toBe(source);
-    expect(state.stats.draws).toBe(draws);
+    // The vent's additive orifice haze is a third draw that appears once its
+    // first particles are live, so the vent may report one extra.
+    if (name === 'vent') {
+      expect(state.stats.draws).toBeGreaterThanOrEqual(draws);
+      expect(state.stats.draws).toBeLessThanOrEqual(draws + 1);
+    } else expect(state.stats.draws).toBe(draws);
     expect(errors).toEqual([]);
     await page.screenshot({ path: testInfo.outputPath(`${name}.png`) });
   });
