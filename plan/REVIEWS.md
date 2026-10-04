@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-03 evening comprehensive review (trigger: tag f19; golden set 2026-10-04-002012)
+
+**Changed since the night review:** Lost City surroundings (textured slope, talus, flanges) and Beebe plume variety (per-vent width/lean, current bend, haze), both in f19.
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5:**
+
+| Site            | Score       | Change | Biggest gap                                                          |
+| --------------- | ----------- | ------ | -------------------------------------------------------------------- |
+| Titanic         | 4/4/4/4/5/4 | same   | Dense marine snow over the ship; far field near black (460)          |
+| Beebe           | 4/4/4/4/5/4 | +0.5   | Plumes now varied and bent; seabed near black-brown, sub reads small |
+| Great Blue Hole | 4/4/4/3/5/4 | same   | Spawn frame mostly flat sand wall; grotto a dark mound               |
+| Lost City       | 4/4/4/3/5/3 | +0.5   | Tower big and clear, slope textured; banding faint                   |
+| Monterey Canyon | 4/3/4/3/5/3 | same   | Wall smooth slab; poses 2/3 auto-pick wall backs                     |
+
+**Play flow:** unchanged from the last review; the 5-line GMRT citation and the "Animal nearby" toast still crowd the HUD (450 footer and a Claude toast package queued). Audit 510 pending.
+
+**Process:** CI on main is still red or cancelled on rapid pushes (500 triages). Claude weekly 24%, so no new Claude package this run; Codex has 6 briefs queued and 3 stalled worktrees. Efficiency idle figures before today are overstated (sampler fix, see PROCESS-LOG).
+
+**New priorities:** see DIRECTOR.md (Monterey poses/wall, Blue Hole spawn, toast, Titanic lift, Beebe seabed, Lost City banding).
+
+**Needs owner:** nothing.
+
 ## 2026-10-03 night comprehensive review (triggers: 8+ merges, tag f18; golden set 2026-10-03-230949)
 
 **Changed since the late review:** Lost City Arcade opening camera (400), touch HUD fixes (395), e2e stability (390/420), Bathyline rebrand (mark, icons, share image), CI life-scan fix. No visual-site changes except Lost City camera; no new golden run needed (the set was taken at f18).

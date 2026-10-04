@@ -351,3 +351,7 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - CI on main has been red for most pushes (shards fail on `.hud-control-tips` stability, content-missions and GL timeouts); Codex 500 triages. Codex resumed after reset; worktrees 450 hud/450 triage/460 still hold work.
 - Next Claude candidates: Monterey poses and wall texture, Blue Hole spawn pose, Lost City banding stronger and tower-base corals.
 - Needs owner: nothing.
+
+## 2026-10-03 evening review run (~19:30 CDT)
+
+- Comprehensive review for tag f19 recorded (Beebe +0.5, Lost City +0.5). DIRECTOR refreshed; 6 Codex briefs already queued. No merges, no Claude package (weekly 24%). Needs owner: nothing.
