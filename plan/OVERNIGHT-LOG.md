@@ -355,3 +355,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 ## 2026-10-03 evening review run (~19:30 CDT)
 
 - Comprehensive review for tag f19 recorded (Beebe +0.5, Lost City +0.5). DIRECTOR refreshed; 6 Codex briefs already queued. No merges, no Claude package (weekly 24%). Needs owner: nothing.
+
+## 2026-10-03 evening headless run (~19:45–21:30 CDT)
+
+- Merged Codex 450 (HUD attribution footer chip), 460 (Titanic far-field lift, thinner snow) and 470 (touch 150% overlap, vent haze gating). The 450 footer replaced 470's pill markup, so I resolved HUD.ts/scarp.ts (kept main's scarp) and removed the pill CSS/e2e checks. First full-e2e on the merge had 26 touch-overlap failures (chip over the tutorial card/150% stick); moved the portrait chip to 160px above the bottom edge and loosened the landscape height check to <48. Full-e2e + project-base green on main. Pushed, tagged f20.
+- Still running or unmerged: Codex 480, 490, 500 (running), 450-triage (spec only, awaiting its owner). Queue: 510, 520, 530 (verify footer/touch/snow), 540 (merge residue bughunt). No Claude agent run (weekly 23%, and merge fixes took the time).
+- Not reviewed visually this run: Titanic far-field lift and snow (460) after merge; 530 verifies them. The portrait chip may be hidden under the in-range contact label at times (transient).
+- Needs owner: nothing.
