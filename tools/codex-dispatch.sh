@@ -23,6 +23,16 @@ def left(k):
     if "used" not in w: return -1
     return 100 if w.get("resets_at") and w["resets_at"]<now else 100-w["used"]
 sys.exit(0 if left("five_hour")>=20 and left("seven_day")>=8 else 1)'; }
+# Codex readings come from its last session log, so a manual reset (or a reset
+# while idle) stays invisible until a Codex run happens. When the reading says
+# low, nothing is running and the reading is >30 min old, refresh it once.
+codex_stale() { ai-limits --json 2>/dev/null | python3 -c '
+import json,sys,time; c=json.load(sys.stdin).get("codex",{})
+sys.exit(0 if time.time()-c.get("as_of",0)>1800 else 1)'; }
+if ! codex_ok && (( $(running) == 0 )) && codex_stale; then
+  ai-limits --refresh >/dev/null 2>&1
+  echo "$(date '+%F %T') refreshed stale Codex reading" >> .cache/codex/queue/waiting.log
+fi
 port=4370
 mapfile -t active_units < <(systemctl --user list-units --type=service --state=running --no-legend 'subexp-*' | awk '{print $1}')
 reserved_ports=''
