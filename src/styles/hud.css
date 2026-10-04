@@ -1,4 +1,4 @@
-/* Core HUD: readouts, help, warning banner, attribution and the sonar frame.
+/* Core HUD: readouts, warning banner, attribution and the sonar frame.
    Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
 
 .hud,
@@ -48,18 +48,6 @@
 
 .hud-value {
   font-variant-numeric: tabular-nums;
-}
-
-.hud-help {
-  left: 12px;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  font-size: 11px;
-  opacity: 0.8;
-  line-height: 1.7;
-}
-
-.hud-help b {
-  color: var(--hud-accent);
 }
 
 .hud-warning {

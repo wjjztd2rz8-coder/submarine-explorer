@@ -32,6 +32,11 @@ describe('Monterey wall life on surveyed terrain', () => {
           // independently of the builder's analytic talus-height callback.
           const apron = hero.full.children[1] as THREE.Mesh;
           expect(apron.isMesh).toBe(true);
+          const wall = hero.full.children[0] as THREE.Mesh;
+          const localWall = new THREE.Mesh(wall.geometry, wall.material);
+          const faceRay = new THREE.Raycaster();
+          const intoRock = new THREE.Vector3(0, 0, 1);
+          const seat = new THREE.Vector3();
           const ray = new THREE.Raycaster();
           const down = new THREE.Vector3(0, -1, 0);
           const origin = new THREE.Vector3();
@@ -51,6 +56,19 @@ describe('Monterey wall life on surveyed terrain', () => {
               range.min = Math.min(range.min, clearance);
               range.max = Math.max(range.max, clearance);
               if (mesh.name.startsWith('wall-')) {
+                seat.setFromMatrixPosition(instance);
+                faceRay.set(
+                  new THREE.Vector3(seat.x, seat.y, wall.geometry.boundingBox!.min.z - 1),
+                  intoRock,
+                );
+                const face = faceRay.intersectObject(localWall, false)[0];
+                const label = `${hero.def.id} ${mesh.name}[${i}]: attached to exposed lit face`;
+                expect(face, label).toBeDefined();
+                if (face) {
+                  expect(face.point.z - seat.z, label).toBeGreaterThanOrEqual(-1e-4);
+                  expect(face.point.z - seat.z, label).toBeLessThan(0.5);
+                  expect(face.face!.normal.z, label).toBeLessThan(-0.25);
+                }
                 origin.copy(position);
                 origin.y = hero.root.position.y + hero.localBounds.max.y + 1;
                 ray.set(origin, down);
@@ -104,6 +122,6 @@ describe('Monterey wall life on surveyed terrain', () => {
       } finally {
         terrain.dispose();
       }
-    });
+    }, 15_000); // Independent triangle raycasts across four walls at every quality tier.
   }
 });

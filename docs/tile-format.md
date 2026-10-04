@@ -95,7 +95,7 @@ consumer can tell how much of a tile is interpolated rather than measured.
 | `min_m`, `max_m`             | elevation extremes **after** NODATA filling                                                                                                                        |
 | `nodata_count`               | number of cells that were holes in the source data                                                                                                                 |
 | `center`                     | bbox centre; the world-space origin (see below)                                                                                                                    |
-| `attribution`                | human-readable credit; the HUD renders this verbatim                                                                                                               |
+| `attribution`                | human-readable credit; rendered verbatim inside the HUD's expandable `Data: <source>` credits panel                                                                |
 | `requested_bbox`             | optional; what the CLI was asked for                                                                                                                               |
 | `resolution`, `layer`        | optional; the GMRT parameters actually used                                                                                                                        |
 | `synthetic`, `seed`          | optional; present only on `make_synthetic_tile.py` output                                                                                                          |

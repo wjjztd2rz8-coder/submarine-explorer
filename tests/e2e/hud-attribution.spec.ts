@@ -40,6 +40,7 @@ for (const layout of [
       await page.waitForFunction(() => window.__gameReady === true);
       const chip = page.getByRole('button', { name: 'Data: GMRT credits' });
       const panel = page.getByRole('region', { name: 'Data attribution' });
+      await expect(page.locator('.hud-attribution')).toHaveCount(1);
       await expect(chip).toHaveText('Data: GMRT');
       await expect(chip).toHaveAttribute('aria-expanded', 'false');
       await expect(panel).toBeHidden();
@@ -76,6 +77,9 @@ for (const layout of [
         await expect(panel).toBeHidden();
         await expect(page.locator('.pause-menu')).toBeHidden();
         await expect(chip).toBeFocused();
+        await expect(chip).toHaveCSS('outline-style', 'solid');
+        await expect(chip).toHaveCSS('outline-width', '2px');
+        await expect(chip).toHaveCSS('outline-color', 'rgb(255, 255, 255)');
         await page.keyboard.press('Space');
         await expect(panel).toBeVisible();
         await page.keyboard.press('Enter');

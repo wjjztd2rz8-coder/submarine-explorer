@@ -2,39 +2,14 @@
    Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
 
 /* Compact objectives panel: title, current target + nav line, "n of m". */
-.objectives-panel {
-  width: min(calc(520px * var(--ui-scale)), 62vw);
-  padding: 7px 14px 8px;
-  text-align: center;
-  font-size: clamp(14px, calc(15px * var(--ui-scale)), 22px);
-}
-.obj-head {
-  justify-content: center;
-  padding-bottom: 0;
-  margin-bottom: 3px;
-  border-bottom: 0;
-  font-size: clamp(12px, calc(12px * var(--ui-scale)), 18px);
-}
 .obj-title {
   flex: 0 1 auto;
-}
-.obj-nav {
-  justify-content: center;
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
-  font-size: clamp(14px, calc(14px * var(--ui-scale)), 21px);
 }
 .obj-nav-target {
   font-weight: 600;
 }
 .obj-nav-turn {
   margin-left: 0;
-}
-.obj-progress {
-  margin-top: 3px;
-  font-size: clamp(13px, calc(13px * var(--ui-scale)), 19px);
-  opacity: 0.75;
 }
 .obj-alert {
   margin: 6px 0 0;
@@ -158,7 +133,10 @@ body:has(.mission-debrief:not([hidden])) .objectives-panel {
 }
 .obj-head {
   justify-content: flex-start;
+  padding-bottom: 0;
   margin-bottom: 5px;
+  border-bottom: 0;
+  font-size: clamp(12px, calc(12px * var(--ui-scale)), 18px);
 }
 .obj-list {
   display: grid;
@@ -218,7 +196,9 @@ body:has(.mission-debrief:not([hidden])) .objectives-panel {
   display: none;
 }
 .obj-progress {
+  margin-top: 3px;
   font-size: clamp(11px, calc(11px * var(--ui-scale)), 16px);
+  opacity: 0.75;
 }
 body:has(.objectives-panel:not([hidden])) .hud-readouts {
   top: calc(var(--obj-panel-bottom, 240px) + 8px);

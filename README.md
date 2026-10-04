@@ -480,6 +480,11 @@ Try it with `/?mission=<id>`, or `/?tile=<id>&poi=<poiId>` to jump to a POI.
 
 ## Attribution
 
+During a dive, click or tap **Data: GMRT** (or **Data: synthetic**) to open the
+full tile credit. Keyboard users can focus the chip and press Enter or Space;
+Escape closes the panel before pausing. GMRT credits include source, DOI and
+licence links. Photo mode hides the footer.
+
 Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis.
 Ryan, W.B.F., et al. (2009), _Global Multi-Resolution Topography synthesis_,
 Geochem. Geophys. Geosyst., 10, Q03014,

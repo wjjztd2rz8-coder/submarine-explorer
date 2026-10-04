@@ -1,19 +1,7 @@
-/* C5: settings dialog, clickable HUD hint, captions.
+/* C5: settings dialog and captions.
    Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
 
-/* Settings dialog (docs/settings.md), clickable HUD hint, captions. */
-.hud-help-link {
-  pointer-events: auto;
-  font: inherit;
-  color: inherit;
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  text-decoration: underline dotted;
-}
-
-.hud-help-link:focus-visible,
+/* Settings dialog (docs/settings.md) and captions. */
 .settings button:focus-visible,
 .settings select:focus-visible,
 .settings input:focus-visible {

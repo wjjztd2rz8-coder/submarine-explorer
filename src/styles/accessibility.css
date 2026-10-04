@@ -3,20 +3,14 @@
   --hud-bg: rgba(6, 18, 28, 0.92);
 }
 
-:is(button, a[href], input, select, textarea, [tabindex]):focus-visible {
+:is(button, summary, a[href], input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid #ffffff !important;
   outline-offset: 3px;
 }
 
 .hud-label,
-.hud-help,
-.hud-control-tips,
-.hud-attribution,
-html.is-touch .hud-attribution {
+.hud-control-tips {
   opacity: 1;
-}
-.hud-attribution {
-  background: var(--hud-bg);
 }
 
 .briefing-label,

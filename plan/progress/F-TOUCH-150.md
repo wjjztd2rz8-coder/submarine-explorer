@@ -1,5 +1,10 @@
 # F-TOUCH-150 — short portrait HUD at enlarged UI
 
+Current attribution behaviour supersedes the original source pill described
+below: [450](450-hud-attribution.md) replaced it with a native expandable
+`Data: <source>` chip on desktop and touch. The full credit is in that panel,
+with GMRT source/licence links; it is no longer supplied as a title tooltip.
+
 ## Plan
 
 1. Remove the 360×640 Beebe 150% fixme and reproduce the opening overlap.
