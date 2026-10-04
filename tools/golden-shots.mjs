@@ -43,12 +43,22 @@ async function main() {
   base.hash = '';
   const stamp = new Date().toISOString().slice(0, 19).replace('T', '-').replaceAll(':', '');
   const output = resolve('.cache/golden', stamp);
+  const closeOverride = process.env.GOLDEN_CLOSE ? JSON.parse(process.env.GOLDEN_CLOSE) : null; // dev: retune the west alcove close pose
   const only = process.env.GOLDEN_SITES?.split(',').map((site) => site.trim());
   const heroes = [
     ['titanic', 'bow-hull'],
     ['lost-city', 'poseidon-tower'],
     // The west alcove, framed from the hole's interior on its ledge (the hole centre lies due east).
-    ['great-blue-hole', 'karst-grotto', 'great-blue-hole', { direction: [1, 0, 0], above: 5 }],
+    [
+      'great-blue-hole',
+      'karst-grotto',
+      'great-blue-hole',
+      {
+        direction: [1, 0, 0],
+        above: 5,
+        close: closeOverride ?? { range: 36, above: 9, lateral: 10 },
+      },
+    ],
     // The south-eastern alcove, framed from inside the hole on its ledge (open side faces the hole centre).
     [
       'great-blue-hole',
@@ -293,6 +303,9 @@ async function main() {
                 target: mid.toArray(),
                 direction: fixed.direction,
                 above: fixed.above + hero.root.position.y - mid.y,
+                close: fixed.close
+                  ? { ...fixed.close, above: fixed.close.above + hero.root.position.y - mid.y }
+                  : null,
               };
             }
             // Vent set pieces are framed from their axis; wall scarps from their footprint edge.
@@ -388,7 +401,7 @@ async function main() {
         }
         // A feature set piece is framed from its axis, so its close shot stays outside the spires.
         const closeRange = fixed
-          ? 30
+          ? (fixed.close?.range ?? 30)
           : lifeApproach
             ? 26
             : await evaluate(
@@ -406,11 +419,14 @@ async function main() {
         ]) {
           stage = `${site}: position ${n}`;
           await evaluate(
-            ({ target, direction, range, above }) => {
+            ({ target, direction, range, above, close, n }) => {
               const g = window.__game;
-              const fixedY = above === undefined ? null : target[1] + above;
-              const x = target[0] + direction[0] * range;
-              const z = target[2] + direction[2] * range;
+              // An authored close shot may stand off to one side and higher, looking across the alcove.
+              const c = n === 3 ? close : null;
+              const fixedY = above === undefined ? null : target[1] + (c?.above ?? above);
+              const side = c?.lateral ?? 0;
+              const x = target[0] + direction[0] * range - direction[2] * side;
+              const z = target[2] + direction[2] * range + direction[0] * side;
               const y = fixedY ?? g.terrain.sampleHeight(x, z) + 15;
               const yaw = Math.atan2(target[0] - x, -(target[2] - z));
               g.sub.reset(x, y, z, yaw);
@@ -429,7 +445,7 @@ async function main() {
               g.rig.lookElevation = (pitch - g.sub.pitch) / 0.55;
               g.rig.snap(g.sub.position, yaw, g.sub.pitch);
             },
-            { ...approach, range },
+            { ...approach, range, n },
           );
           await capture(n, range);
         }

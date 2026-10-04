@@ -37,6 +37,7 @@ export class CameraRig {
   chaseRadius: number;
   private chaseRadiusDefault: number;
   private chaseOffsetX = 0;
+  private chaseOffsetY = 0;
 
   private readonly desiredPosition = new THREE.Vector3();
   private readonly desiredTarget = new THREE.Vector3();
@@ -130,10 +131,12 @@ export class CameraRig {
       this.config.chaseOffset.z,
     ),
     offsetX = 0,
+    offsetY = 0,
   ): void {
     this.chaseRadiusDefault = radius;
     this.chaseRadius = radius;
     this.chaseOffsetX = offsetX;
+    this.chaseOffsetY = offsetY;
   }
 
   /** Return to this dive's chase view and zoom. */
@@ -240,6 +243,7 @@ export class CameraRig {
             .multiplyScalar(this.chaseRadius);
         } else {
           this.offset.x += this.chaseOffsetX;
+          this.offset.y += this.chaseOffsetY;
           this.offset.multiplyScalar(this.chaseRadius / this.offset.length());
           this.offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), -yaw);
         }

@@ -14,6 +14,14 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BLUEHOLE-PITCH: Openings can now tilt the chase camera (`chaseOffsetY`, a per-site
+  vertical arm offset); the Great Blue Hole opening uses it and sits 22 m below the ledge, so
+  the first frame looks down across the open water with the whole sub, the ledge, the surface
+  light and the wall instead of mostly wall. Other sites are unchanged. The west-alcove close
+  golden shot is an authored pose off to the side and higher, so the stalactites no longer block
+  the lens, and the alcove floor is a little lighter. Monterey wall fans now use a bubblegum,
+  coral-red, orange and pale palette instead of near-white (instance colours only, no new draw
+  calls). No cuts.
 - Phase F, F-BLUEHOLE-SPAWN: the Great Blue Hole Arcade opening now sits about 14 m below the
   ledge inside the hole (was level with it, over a bare rim), 205 m from the west alcove, so
   the banded wall, light shafts, the surface shoals and the alcove share the first frame.

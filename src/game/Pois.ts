@@ -214,6 +214,8 @@ export interface SpawnPose {
   chaseRadius?: number;
   /** Extra lateral chase offset before normalizing the arm to chaseRadius (m). */
   chaseOffsetX?: number;
+  /** Extra vertical chase offset (m) before normalizing: raises the camera to look further down. */
+  chaseOffsetY?: number;
 }
 
 /**

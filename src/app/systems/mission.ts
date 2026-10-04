@@ -68,8 +68,12 @@ export const missionSystem: GameSystem = {
       sub.reset(pose.x, pose.y, pose.z, pose.yaw);
       lastStart = sub.position.clone();
       lastChoice = choice;
-      if (route.landmarkId === 'lost-city')
-        rig.setChaseRadiusDefault(opening?.chaseRadius, opening?.chaseOffsetX);
+      if (route.landmarkId === 'lost-city' || opening?.chaseOffsetY !== undefined)
+        rig.setChaseRadiusDefault(
+          opening?.chaseRadius,
+          opening?.chaseOffsetX,
+          opening?.chaseOffsetY,
+        );
       rig.snap(sub.position, sub.yaw, sub.pitch);
       headlights.setEnabled(true);
     };
