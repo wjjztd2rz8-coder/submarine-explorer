@@ -2,6 +2,20 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-04 comprehensive review (trigger: tag f25; golden set 2026-10-04-094934)
+
+**Changed since the last review (f24):** only Codex 550 (toast stacks under the scan target) and the CI shard/timeout fix. Golden set is otherwise unchanged, so scores are the same as the f24 entry below (Titanic 4/4/5/4/5/4, Beebe 4/4/4/4/5/4, Blue Hole 4/4/4/4/5/4, Lost City 4/4/4/3/5/3, Monterey 4/4/4/3/5/3).
+
+**Biggest gaps (unchanged):** Titanic snow flecks still blanket the hull and foreground with a near-black sky (570 in round 3); Beebe sub small and seabed flat (560 finished, unmerged); Lost City beehive slab (600 running).
+
+**Play flow:** not re-captured; 510 audit spec is green, 610/620 queued.
+
+**Process:** the real bottleneck is merge throughput, not budget. Four Codex worktrees (530, 540, 560, 580) are finished but unmerged because each merge costs a full-e2e gate run. Plan: batch-merge 540+560+580 in one run with one full-e2e. Latest CI run on main was still in progress at review time; the previous one failed at 27 min (shard timeout fix of f24 not yet confirmed; Codex 640 diagnoses). Claude weekly is 18%, so one package per run.
+
+**New priorities:** DIRECTOR.md (item 1 now: batch-merge 540/560/580, then 530).
+
+**Needs owner:** nothing.
+
 ## 2026-10-04 comprehensive review (trigger: tag f24; golden set 2026-10-04-082207)
 
 **Changed since the last review (f23):** per-site opening pitch (`chaseOffsetY`), Blue Hole spawn 22 m below the ledge, west alcove close pose, Monterey fan palette (f24).

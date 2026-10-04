@@ -8,7 +8,7 @@ Run `tools/golden.sh` at the start of any run that merged visual work. Compare a
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
-1. **Merge the finished Codex worktrees 540 (merge-residue bughunt), 550 (toast placement), 560 (Beebe seabed lift)** after gates and screenshot review; 530 waits on 580. Cheapest player-visible wins on the list.
+1. **Batch-merge the finished Codex worktrees 540 (merge-residue bughunt), 560 (Beebe seabed lift) and 580 (530 fix), then 530**, with one full-e2e on the final main (550 merged in f25). Cheapest player-visible wins on the list.
 2. **Titanic snow and far field:** snow flecks still blanket the hull (570 running, review its shots); far field now has a faint haze but the sky above is near-black; add a lighter horizon gradient.
 3. **Lost City beehive chimney:** smooth white slab with no life at its base (600 queued for Codex; if it stalls, do it in Claude with banded vertex colours and base corals).
 4. **Beebe sub scale:** sub is small in shot 1 and the flat seabed is dark; nearer default camera or vent framing (560 covers seabed only).
