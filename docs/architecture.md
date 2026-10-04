@@ -567,7 +567,10 @@ streaming (Tier 4), and a hard draw-call cap.
 `sonar`, `waypoints`, `journal`, `globe`, `home`, `homeGlobe`, `pause`,
 `titleScene` (read-only title diagnostics, described below),
 `appState` (a live getter for `'home' | 'dive' | 'pause'`), `save`,
-`settings`, `captions`, `input`.
+`settings`, `captions`, `input`, `cameraTips` (the live `{ until }` hint deadline
+in `performance.now()` milliseconds; zero means dismissed). Layout fixtures can
+hold this deadline at Infinity without changing the clock, visibility rules,
+learning, bindings, or saved Control tips preference.
 `window.__gameReady` flips to `true` after the first presented frame;
 `window.__gameError` holds a fatal startup message.
 

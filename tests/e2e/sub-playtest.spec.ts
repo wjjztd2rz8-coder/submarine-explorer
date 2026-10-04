@@ -1,4 +1,5 @@
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { processedFrames } from './helpers/hudTips.js';
 
 /**
  * A3 playtest harness: drives the *real* game with scripted key presses and
@@ -6,9 +7,9 @@ import { expect, test, type Page } from './helpers/unlocked.js';
  *
  * It reads state through `window.__game`, which main.ts already exposes for
  * debugging, so nothing test-only leaks into the shipped engine. Physics is
- * fixed-step, but wall-clock here is not, so the thresholds are deliberately
- * loose: they catch "the boat no longer accelerates / turns / stops", not a
- * five-percent tuning drift (that is what the vitest suite is for).
+ * fixed-step; observe the resulting state instead of assuming wall seconds
+ * equal simulation seconds. The thresholds catch lost acceleration, turning
+ * or braking; tuning drift is covered by the vitest suite.
  */
 
 interface Probe {
@@ -71,6 +72,19 @@ async function hold(page: Page, key: string, ms: number): Promise<void> {
   await page.keyboard.up(key);
 }
 
+async function holdUntil(
+  page: Page,
+  keys: string[],
+  reached: (state: Probe) => boolean,
+): Promise<void> {
+  for (const key of keys) await page.keyboard.down(key);
+  try {
+    await expect.poll(async () => reached(await probe(page))).toBe(true);
+  } finally {
+    for (const key of [...keys].reverse()) await page.keyboard.up(key);
+  }
+}
+
 test.describe('A3 submarine feel', () => {
   test('scripted flight: thrust, coast, turn, ballast, camera, sim speed', async ({
     page,
@@ -85,28 +99,34 @@ test.describe('A3 submarine feel', () => {
     // handling script needs its original north-facing, open-water manoeuvre area.
     await page.goto('/?tile=titanic&depth=3700', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
-    await page.waitForTimeout(500);
+    await processedFrames(page);
 
     const start = await probe(page);
     expect(start.speed).toBeLessThan(1);
     expect(start.headingDeg).toBeCloseTo(0, 1);
 
     // --- check 1: full ahead accelerates, and heads north (-Z at yaw 0) ------
-    await hold(page, 'w', 6000);
+    await holdUntil(page, ['w'], (s) => s.speed > 3 && s.z < start.z - 10);
     const cruising = await probe(page);
     expect(cruising.speed).toBeGreaterThan(3);
     expect(cruising.z).toBeLessThan(start.z - 10);
 
     // --- check 3: cutting the throttle sheds most of that speed -------------
-    await page.waitForTimeout(6000);
+    await expect.poll(async () => (await probe(page)).speed).toBeLessThan(cruising.speed * 0.5);
     const coasted = await probe(page);
     expect(coasted.speed).toBeLessThan(cruising.speed * 0.5);
 
     // --- checks 5 + 6: yaw turns the boat, and banks it while moving --------
+    await holdUntil(page, ['w'], (s) => s.speed > 3);
     await page.keyboard.down('w');
-    await page.waitForTimeout(4000);
     await page.keyboard.down('d');
-    await page.waitForTimeout(2500);
+    await expect
+      .poll(async () => {
+        const s = await probe(page);
+        const turned = ((s.headingDeg - cruising.headingDeg + 540) % 360) - 180;
+        return turned > 10 && s.roll < -0.05;
+      })
+      .toBe(true);
     const turning = await probe(page);
     await page.keyboard.up('d');
     await page.keyboard.up('w');
@@ -115,37 +135,37 @@ test.describe('A3 submarine feel', () => {
     expect(turning.roll).toBeLessThan(-0.05); // and leaning into it
 
     // Rotational inertia: the boat is still swinging a moment after release.
-    await page.waitForTimeout(150);
+    await expect.poll(async () => (await probe(page)).headingDeg).not.toBe(turning.headingDeg);
     const coastingTurn = await probe(page);
     expect(coastingTurn.headingDeg).not.toBe(turning.headingDeg);
 
     // --- ballast: flood to dive, blow to rise -------------------------------
     const beforeDive = await probe(page);
-    await hold(page, 'c', 4000);
+    await holdUntil(page, ['c'], (s) => s.depth < beforeDive.depth - 3);
     const dived = await probe(page);
     expect(dived.depth).toBeLessThan(beforeDive.depth - 3);
-    await hold(page, ' ', 5000);
+    await holdUntil(page, [' '], (s) => s.depth > dived.depth);
     expect((await probe(page)).depth).toBeGreaterThan(dived.depth);
 
     // --- camera: Q cycles chase <-> first person ----------------------------
     expect((await probe(page)).cameraMode).toBe('chase');
     await page.keyboard.press('q');
-    await page.waitForTimeout(300);
+    await expect.poll(async () => (await probe(page)).cameraMode).toBe('first-person');
     expect((await probe(page)).cameraMode).toBe('first-person');
     await page.keyboard.press('q');
-    await page.waitForTimeout(300);
+    await expect.poll(async () => (await probe(page)).cameraMode).toBe('chase');
     expect((await probe(page)).cameraMode).toBe('chase');
 
     // --- sim speed: T cycles 1x -> 2x ---------------------------------------
     expect((await probe(page)).simSpeed).toBe(1);
     await page.keyboard.press('t');
-    await page.waitForTimeout(300);
+    await expect.poll(async () => (await probe(page)).simSpeed).toBe(2);
     expect((await probe(page)).simSpeed).toBe(2);
     // Two separate frames: presses inside one frame collapse into one edge.
     await page.keyboard.press('t');
-    await page.waitForTimeout(150);
+    await expect.poll(async () => (await probe(page)).simSpeed).toBe(3);
     await page.keyboard.press('t');
-    await page.waitForTimeout(300);
+    await expect.poll(async () => (await probe(page)).simSpeed).toBe(1);
     expect((await probe(page)).simSpeed).toBe(1);
 
     await page.screenshot({ path: 'tests/e2e/screenshots/a3-playtest.png' });

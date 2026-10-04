@@ -1,6 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { holdFreshTips } from './helpers/hudTips.js';
 
 const shots = '.cache/codex/shots/d2-camera';
 const feelShots = '.cache/codex/shots/d3-feel';
@@ -25,6 +26,7 @@ async function camera(page: Page): Promise<{ free: boolean; radius: number; mode
 test('chase framing, dive-start tips, free look and reset controls', async ({ page }) => {
   await mkdir(shots, { recursive: true });
   await dive(page, 'titanic');
+  await holdFreshTips(page);
   await expect(page.locator('.hud-control-tips')).toContainText(
     'Drag: look · Wheel: zoom · X: reset camera',
   );

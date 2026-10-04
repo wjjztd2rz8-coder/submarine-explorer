@@ -23,6 +23,15 @@ without an entry here is not done.
   and sonar; show a small source-credit pill above touch controls while retaining
   the full attribution. Preserve menu scaling and saved preferences. Remove the
   Beebe 150% overlap fixme and check compact credits in the hero regression.
+- Phase F, F-CI-TRIAGE-500: synchronize mission pose checks with Discovery state
+  and motion checks with their original movement thresholds; keep fresh HUD tips
+  active during layout audits and cover expiry and learned dismissal separately.
+  Batch copy, touch-layout and focus measurements to reduce software-WebGL browser
+  round trips, preserving every title, hit-target, focus and bounds assertion.
+  Add a documented live hint-deadline debug handle; gameplay and touch visibility
+  stay unchanged. Cached CI failures and validation limits are recorded in
+  `plan/progress/F-CI-TRIAGE-500.md`.
+
 - Phase F, F-LOSTCITY-SURROUNDINGS: Lost City gets a cooler, banded grey-green slope with larger talus blocks and rubble, more ledges and flanges on the small carbonate towers, a less milky vent haze (lighter haze lift), and rooted corals (all sites) sit into the sediment with large heads at colony cores and small ones at the fringe.
 - F-BEEBE-PLUME-VARIETY: black-smoker plumes now vary per vent (height, width, opacity, lean, deterministic from the orifice position), bend with height in a consistent ambient-current direction, gain a warm lit haze over each orifice and a small pale white-smoker wisp beside it; no extra per-vent draw calls (one additive haze draw per field).
 

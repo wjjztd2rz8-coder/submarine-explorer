@@ -62,6 +62,7 @@ export const cameraControlsSystem: GameSystem = {
     const { bus, rig, hud, canvas } = ctx;
     const tips = { until: 0 };
     ctx.cameraTips = tips;
+    ctx.expose({ cameraTips: tips });
     let learn = readLearn();
     let started = false;
     // Steering used once each: move, turn and rise/sink.

@@ -1,6 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test } from './helpers/unlocked.js';
+import { holdFreshTips } from './helpers/hudTips.js';
 
 const shots = '.cache/codex/shots/d-polish';
 
@@ -14,6 +15,7 @@ test('polished dive HUD keeps mission, telemetry, speed and live tips readable',
   await page.waitForFunction(
     () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
+  await holdFreshTips(page);
   await expect(page.locator('.obj-item')).toHaveCount(4);
   await expect(page.locator('.obj-item.is-current')).toContainText('Scan the bow');
   await expect(page.locator('.obj-item.is-optional')).toHaveCount(2);

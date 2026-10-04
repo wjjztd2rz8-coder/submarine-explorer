@@ -9,16 +9,39 @@ async function ready(page: Page, url: string): Promise<void> {
 
 async function separate(page: Page, selectors: string[]): Promise<void> {
   const viewport = page.viewportSize()!;
-  const boxes = [];
-  for (const selector of selectors) {
-    const element = page.locator(selector);
-    await expect(element).toBeVisible();
-    const box = (await element.boundingBox())!;
-    expect(box.x, selector).toBeGreaterThanOrEqual(0);
-    expect(box.y, selector).toBeGreaterThanOrEqual(0);
-    expect(box.x + box.width, selector).toBeLessThanOrEqual(viewport.width);
-    expect(box.y + box.height, selector).toBeLessThanOrEqual(viewport.height);
-    boxes.push({ selector, ...box });
+  // Observe one layout snapshot. Hundreds of separate browser round trips can
+  // exhaust a shard while WebGL is rendering, even when every box is correct.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (selectors) =>
+          selectors.every((selector) => {
+            const el = document.querySelector<HTMLElement>(selector);
+            return (
+              !!el &&
+              el.getBoundingClientRect().width > 0 &&
+              el.getBoundingClientRect().height > 0 &&
+              getComputedStyle(el).visibility === 'visible'
+            );
+          }),
+        selectors,
+      ),
+    )
+    .toBe(true);
+  const boxes = await page.evaluate(
+    (selectors) =>
+      selectors.map((selector) => {
+        const el = document.querySelector<HTMLElement>(selector)!;
+        const box = el.getBoundingClientRect();
+        return { selector, x: box.x, y: box.y, width: box.width, height: box.height };
+      }),
+    selectors,
+  );
+  for (const box of boxes) {
+    expect(box.x, box.selector).toBeGreaterThanOrEqual(0);
+    expect(box.y, box.selector).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width, box.selector).toBeLessThanOrEqual(viewport.width);
+    expect(box.y + box.height, box.selector).toBeLessThanOrEqual(viewport.height);
   }
   for (let i = 0; i < boxes.length; i++) {
     const a = boxes[i];
@@ -32,18 +55,16 @@ async function separate(page: Page, selectors: string[]): Promise<void> {
 }
 
 async function reachable(target: Locator): Promise<void> {
+  await expect(target).toBeVisible();
   await target.scrollIntoViewIfNeeded();
-  const box = (await target.boundingBox())!;
+  const box = await target.evaluate((element) => {
+    const r = element.getBoundingClientRect();
+    const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+    return { width: r.width, height: r.height, receivesTap: hit !== null && element.contains(hit) };
+  });
   expect(box.width).toBeGreaterThanOrEqual(44);
   expect(box.height).toBeGreaterThanOrEqual(44);
-  expect(
-    await target.evaluate((element) => {
-      const r = element.getBoundingClientRect();
-      const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-      return hit !== null && element.contains(hit);
-    }),
-    'the centre of the touch target must receive the tap',
-  ).toBe(true);
+  expect(box.receivesTap, 'the centre of the touch target must receive the tap').toBe(true);
 }
 
 for (const viewport of [

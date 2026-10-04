@@ -160,8 +160,11 @@ test.describe('B3 mission flow', () => {
     // Now it simulates: flooding the tanks takes the boat down.
     const y0 = (await subPos(page)).y;
     await page.keyboard.down('c');
-    await page.waitForTimeout(1500);
-    await page.keyboard.up('c');
+    try {
+      await expect.poll(async () => (await subPos(page)).y).toBeLessThan(y0 - 1);
+    } finally {
+      await page.keyboard.up('c');
+    }
     expect((await subPos(page)).y).toBeLessThan(y0 - 1);
     // T cycles the sim speed; the HUD badge shows it.
     await page.keyboard.press('t');
