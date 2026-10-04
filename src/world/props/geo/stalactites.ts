@@ -162,8 +162,8 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     if (ny > 0.6) {
       // Shelf tops and ledges: silted, mottled grey-tan with darker pockets, never a flat pale slab.
       const m = fbm3(x * 0.09, z * 0.09, 5, seed ^ 0x3c, 4);
-      out.multiplyScalar(0.66).lerp(BED_COOL, smooth(0.35, 0.7, m) * 0.5);
-      out.multiplyScalar(0.7 + 0.5 * smooth(0.25, 0.75, m));
+      out.multiplyScalar(0.86).lerp(BED_WARM, smooth(0.35, 0.7, m) * 0.4);
+      out.multiplyScalar(0.8 + 0.45 * smooth(0.25, 0.75, m));
     }
     out.lerp(AMBER, smooth(0.6, 0.9, fbm3(x * 0.5, y * 0.5, z * 0.5, seed ^ 0x5, 3)) * 0.35);
     // Horizontal solution notches and a darker, stained shelf underside.
@@ -210,7 +210,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       const t = fbm3(x * 0.07, z * 0.07, 3, seed ^ 0x91, 3);
       out.lerp(BED_WARM, smooth(0.5, 0.8, t) * 0.5).lerp(BED_COOL, smooth(0.5, 0.2, t) * 0.5);
       out.multiplyScalar(0.7 + 0.55 * n);
-      out.multiplyScalar(0.82 + 0.18 * smooth(0, 0.25, u));
+      out.multiplyScalar(0.92 + 0.18 * smooth(0, 0.25, u));
     },
   );
   apron.computeBoundingBox();
