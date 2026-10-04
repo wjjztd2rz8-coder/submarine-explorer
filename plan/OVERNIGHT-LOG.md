@@ -398,3 +398,11 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged Claude/Sonnet F-BLUEHOLE-PITCH (per-site opening pitch `chaseOffsetY`, Blue Hole spawn 22 m below ledge, west alcove close pose, Monterey fan palette). Shots clearly better (Blue Hole frame 1 now shows sub, shafts, ledge; alcove readable; Monterey pinks). Full-e2e + project-base green on main. Pushed, tagged f24.
 - Running: Codex 540, 550, 560. Queue: 570, 580, 590, 600. 530 still waits on 580.
 - Needs owner: nothing.
+
+## 2026-10-04 review run after f24 (~08:20-10:30)
+
+- Comprehensive review for f24 recorded (Blue Hole +0.25); golden 2026-10-04-082207; DIRECTOR refreshed; Codex briefs 610/620/630 queued (with 600).
+- Process: CI had been red on ~6 pushes because 7 of 16 e2e shards hit the 20-min global timeout. ci.yml now 20 shards, 26-min timeout (PROCESS-LOG). Check the next CI run.
+- Merged Codex 550 (toast stacks under the scan target; desktop shot clean, portrait overlaps the sub slightly but readable). Full-e2e + project-base green on main. Pushed, tagged f25.
+- Unmerged: Codex 540, 560 (finished, need gates); 530 waits on 580; 570/580/590 running. No Claude agent run (review plus gates took the time).
+- Needs owner: nothing.
