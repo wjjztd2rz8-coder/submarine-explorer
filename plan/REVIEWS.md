@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-04 comprehensive review (trigger: tag f22; golden set 2026-10-04-031944)
+
+**Changed since the last review (f20):** Monterey banded canyon wall and wall-life golden poses (f22), Codex 480/490/500 merged (rebrand verify, Lost City camera, CI hud-tips stability), vent haze config deduped.
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5:**
+
+| Site            | Score       | Change | Biggest gap                                                              |
+| --------------- | ----------- | ------ | ------------------------------------------------------------------------ |
+| Titanic         | 4/4/5/4/5/4 | same   | Snow flecks still dense over the lower hull (570)                        |
+| Beebe           | 4/4/4/4/5/4 | same   | Seabed dark brown, sub small in frame; plumes good                       |
+| Great Blue Hole | 4/4/4/3/5/4 | same   | Spawn frame is a flat sand wall with one dome; toast in left column      |
+| Lost City       | 4/4/4/3/5/3 | same   | Tower and flanges strong; slope banding still faint; no tower-base life  |
+| Monterey Canyon | 4/4/4/3/5/3 | +0.25  | Pose 3 now a strong banded wall with corals; walls still flat-shaded     |
+
+**Play flow:** The "Animal nearby" toast still crowds the left column on Blue Hole and Lost City (Codex 550 queued). Codex 510 (Journal/debrief audit) and 520/530 (verification) are finished but unmerged; 510 could not render in the Codex sandbox, so its visual claims are unreviewed until the merge gates capture the PNGs.
+
+**Process:** efficiency shows ~22 h Claude idle and ~21 h Codex under-used, almost all budget-gate skips (Claude weekly 22%, Codex 5h floors); not a scheduling bug. CI on f21 failed (20 min shard run); the in-progress run on the latest main is the check for Codex 500's stability fix. Codex 5h is 4% until the 00:00 reset, so no Codex launches this run.
+
+**New priorities:** see DIRECTOR.md (Blue Hole spawn, Lost City banding, Beebe sub scale, Titanic, debrief polish, merge 510/520/530).
+
+**Needs owner:** nothing.
+
 ## 2026-10-04 comprehensive review (trigger: tag f20; golden set 2026-10-04-020114)
 
 **Changed since the last review:** HUD attribution footer chip (the 5-line GMRT citation is gone, Titanic shot 1 is much cleaner), touch 150% overlap fix, Titanic far-field lift and thinner snow (460), vent haze gating.
