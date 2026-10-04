@@ -8,15 +8,15 @@ Run `tools/golden.sh` at the start of any run that merged visual work. Compare a
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
-1. ~~Monterey golden poses 2/3 + wall texture~~ done (f22, banded canyon wall, poses pinned). Pose 2 banding still subtle at range.
-2. **Merge finished Codex worktrees 530 (HUD footer/touch), 520 (verify), 510 (Journal/debrief fixes + audit specs)** and review their screenshots.
-3. **Blue Hole spawn pose and east grotto:** spawn frame is a flat sand wall with a lone stalactite dome; reframe to look into the hole with fish, east-alcove golden pose, grotto reads as a dark mound.
-4. **Lost City banding stronger and tower-base corals:** slope is textured but banding faint; corals at the tower base.
+2. ~~510 and 520 merged (f23).~~ **530 (HUD footer/touch) is still unmerged and waits on Codex 580 (license link hit-test fix).**
+3. ~~Blue Hole spawn pose and east grotto~~ merged (f23: sub inside the hole, banded wall, lighter alcoves). Left: spawn pitch can't be set so frame 1 is still mostly wall; west alcove close shot is murky.
+4. **Lost City banding stronger and tower-base corals** (queued as Codex 600).
 5. **Titanic far-field lift:** lift the near-black far field and add a faint haze horizon (snow density is Codex 570).
 6. **Beebe sub scale:** sub reads small in shot 1; nearer default camera or vent framing (floor and chimney texture is Codex 560).
-7. **Debrief/Journal polish from audit 510** once it lands (dead ends, clutter).
-
-Codex queue (all unblocked): 540 merge residue bughunt, 550 toast placement, 560 Beebe seabed lift, 570 Titanic snow density. Merged through f22: 480, 490, 500. Finished but unmerged: 510, 520, 530; 450-triage holds only a spec.
+7. **Blue Hole spawn pitch + west alcove** follow-up, then debrief/Journal polish from the 510 audit design questions (F-FLOW-AUDIT-510.md).
+8. **Debrief/Journal polish from audit 510** once it lands (dead ends, clutter).
+   Codex queue (all unblocked): 540, 550, 560, 570, 580, 590 (bughunt Blue Hole/Journal), 600 (Lost City). Merged through f23: 480-520. 450-triage holds only a spec.
+   Codex queue (all unblocked): 540 merge residue bughunt, 550 toast placement, 560 Beebe seabed lift, 570 Titanic snow density. Merged through f22: 480, 490, 500. Finished but unmerged: 510, 520, 530; 450-triage holds only a spec.
 
 Demoted: further title polish; rebrand logo (done, Codex 440).
 

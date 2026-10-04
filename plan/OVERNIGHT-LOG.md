@@ -381,3 +381,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Tried merging Codex 530 (credits panel placement): smoke green, but full-e2e on main failed 4 of its own new cases (CC BY 4.0 link hit-test, f-verify-530.spec.ts:146). Reverted the local merge (never pushed); main unchanged. Codex brief 580 queued to fix it in the 530 worktree. 510 and 520 remain finished-but-unmerged (510 could not render in Codex sandbox, needs gate screenshots). No push, no tag, no Claude agent (spent on gates).
 - Queue: 540, 550, 560, 570, 580. Codex 5h was 4% until the 00:00 reset.
 - Needs owner: nothing.
+
+## 2026-10-04 headless run (~23:00-04:00)
+
+- Merged Codex 510 (Journal/debrief fixes, 15-flow audit spec; I fixed the spec's touch release/scan-visibility bugs and the portrait Journal header overlap and fact-table overflow it exposed) and Codex 520 (verification specs), plus Claude/Sonnet F-BLUEHOLE-SPAWN (sub inside the hole, banded wall, lighter alcoves; shot clearly better). CHANGELOG conflicts resolved by union.
+- Full-e2e + project-base green on final main. Pushed, tagged f23.
+- Codex 530 still unmerged (waits on queued 580). Queue: 540-600 (590 Blue Hole/Journal bughunt, 600 Lost City banding/corals added). DIRECTOR refreshed.
+- Needs owner: nothing.
