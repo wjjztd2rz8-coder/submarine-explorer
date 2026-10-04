@@ -14,6 +14,14 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-VERIFY-530 follow-up: give credit links a single clickable box
+  when the credits panel wraps or scrolls. Reason: the split inline `CC BY 4.0`
+  label left its bounding-box centre over the paragraph, failing the link
+  hit-test. Keep long link text within narrow panels and preserve the assertion.
+- Phase F, F-VERIFY-530 expanded-sonar follow-up: fit the whole landscape
+  sonar panel above the footer chip, shrinking its map while keeping range
+  buttons at 44 px. Reason: its canvas-only height cap let the header push the
+  expanded map over the credit control at both 100% and 150% UI scale.
 - Phase F, F-BLUEHOLE-PITCH: Openings can now tilt the chase camera (`chaseOffsetY`, a per-site
   vertical arm offset); the Great Blue Hole opening uses it and sits 22 m below the ledge, so
   the first frame looks down across the open water with the whole sub, the ledge, the surface
@@ -58,6 +66,15 @@ without an entry here is not done.
   Readability/integrity and static budgets pass; fresh screenshots and runtime
   performance/console verification remain blocked by sandbox browser/localhost
   restrictions. Results: `plan/progress/F-VERIFY-520.md`.
+- Phase F, F-VERIFY-530: place expanded data credits in a free viewport slot
+  around visible HUD panels and controls, with scrolling on crowded phones;
+  recalculate on tutorial, scanner, toast and viewport changes. Reason: the
+  merged right-anchored panel ran off the left edge in portrait and covered
+  sonar/scan labels in landscape. Restore the portrait chip's 44 px tap target.
+  Add geometry and desktop/touch 100%/150% credits regressions plus Titanic
+  lighting/snow browser checks. Beebe's 150% regression is already active.
+  Static gates pass; browser and fresh visual verification are blocked by
+  sandbox localhost/Chromium restrictions (see `plan/progress/F-VERIFY-530.md`).
 - Phase F, F-TOUCH-150 gate follow-up: make warm vent haze opt-in through
   registered Config defaults and enable it explicitly at Beebe. Reason: its
   implicit global default added a third draw to generic vent presets, breaking

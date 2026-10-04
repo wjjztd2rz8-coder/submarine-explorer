@@ -133,9 +133,9 @@
 }
 
 .hud-attribution-panel {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 8px);
+  /* HUD.layoutDataCredits chooses a free viewport slot, including when a
+     portrait chip is anchored at the left edge or the scanner is visible. */
+  position: fixed;
   box-sizing: border-box;
   width: min(400px, calc(100vw - 24px));
   max-height: calc(100dvh - 100px);
@@ -146,6 +146,7 @@
   border-radius: 6px;
   background: #06121c;
   color: var(--hud-text);
+  overflow-wrap: anywhere;
 }
 
 .hud-attribution-panel p {
@@ -157,6 +158,10 @@
 }
 
 .hud-attribution-panel a {
+  /* Keep each link in one hit box. Split inline fragments leave the centre
+     of a wrapped link over the paragraph instead of the clickable anchor. */
+  display: inline-block;
+  max-width: 100%;
   color: var(--hud-accent);
 }
 

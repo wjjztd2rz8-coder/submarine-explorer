@@ -61,6 +61,7 @@ export const hudSystem: GameSystem = {
             ? ctx.controlsCard.compactTips(rov.deployed)
             : null,
       });
+      hud.layoutDataCredits();
     },
   },
 };
