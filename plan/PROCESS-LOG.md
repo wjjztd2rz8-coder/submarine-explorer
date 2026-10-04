@@ -42,3 +42,9 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 
 - CI on main failed for ~6 consecutive pushes. Cause: 7 of 16 e2e shards hit `--global-timeout=1200000` (20 min); no assertion failures. The 510/520 specs lengthened the suite on the software-GPU runners.
 - Fix: 20 shards, `--global-timeout=1560000`, job `timeout-minutes: 30`. Watch the next run; if still timing out, split the heaviest specs rather than adding more shards (public-repo concurrency is 20 jobs).
+
+## 2026-10-04 06:10 — Claude weekly pacing
+- Claude weekly was 18% left with 4 days to the Oct 8 reset. Every release tag (f22–f25, ~one per run) triggered a full comprehensive review, so Claude spent most of the night on reviews and gates.
+- resume.sh gate now requires weekly left ≥ max(10, 7 + 2.5 × days to reset): roughly one Claude run a day until Oct 8, Codex carries the build work.
+- review-triggers.sh: a new tag only triggers a comprehensive review ≥12 h after the last one.
+- OVERNIGHT-LOG entries had guessed times (e.g. "~10:00-11:00" written before 06:00); RESUME-PROMPT now says to take the time from `date`.

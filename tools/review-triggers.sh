@@ -3,7 +3,8 @@
 # Writes .cache/review-due ("comprehensive" or "targeted" + reasons) or leaves
 # it absent. Called every timer tick from tools/resume.sh. The review run
 # deletes the flag and touches .cache/last-review-<type> when done.
-#   Comprehensive: >= 24 h since the last one, a new release tag, or >= 8 merges.
+#   Comprehensive: >= 24 h since the last one, a new release tag (>= 12 h after
+#   the last review; f22-f25 each got one), or >= 8 merges.
 #   Targeted: the Claude backlog ran dry (3 runs in a row merged nothing),
 #   CI red on main for 3+ runs, Claude idle at >= 50% for 2+ h, the Codex queue
 #   empty with < 2 tasks for 2+ h, or the same gate failing repeatedly.
@@ -18,7 +19,7 @@ sh=lambda c: subprocess.run(c,shell=True,capture_output=True,text=True).stdout
 since=f'--since=@{int(now-last)}' if last<1e8 else ''
 if last<1e8:
     if sh(f'git log {since} --merges --oneline | wc -l').strip().isdigit() and int(sh(f'git log {since} --merges --oneline | wc -l'))>=8: why['comprehensive'].append('8+ merges since the last review')
-    if sh(f'git log {since} --simplify-by-decoration --decorate --oneline | grep -c "tag: f"').strip() not in ('','0'): why['comprehensive'].append('new release tag')
+    if sh(f'git log {since} --simplify-by-decoration --decorate --oneline | grep -c "tag: f"').strip() not in ('','0') and last>12*3600: why['comprehensive'].append('new release tag')
 log=open('plan/OVERNIGHT-LOG.md').read()
 runs=re.split(r'\n## ',log)[-3:]
 if len(runs)==3 and all(re.search(r'Nothing merged|nothing to do|no unblocked',r,re.I) for r in runs):

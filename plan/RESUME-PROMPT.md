@@ -54,6 +54,6 @@ Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-expl
   - Keep the HUD uncluttered.
   - Log every cut in CHANGELOG.md.
 - Before exiting:
-  - append a short entry to `plan/OVERNIGHT-LOG.md`: the time, what merged, what is running or where, problems, and decisions for the owner to review;
+  - append a short entry to `plan/OVERNIGHT-LOG.md`: the time (from `date`, never guessed), what merged, what is running or where, problems, and decisions for the owner to review;
   - commit it;
   - delete `.cache/orchestrator.active`.
