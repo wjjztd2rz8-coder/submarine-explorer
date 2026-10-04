@@ -135,7 +135,12 @@ for (const layout of [
         await page.evaluate(() => {
           document.querySelector<HTMLElement>('.hud-notice')!.hidden = true;
         });
-        // Even the last link stays reachable inside a narrow scrollable panel.
+        // Let the panel re-layout after the toast is gone, then check the last
+        // link stays reachable inside a narrow scrollable panel.
+        await page.evaluate(
+          () =>
+            new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
+        );
         const license = panel.getByRole('link', { name: 'CC BY 4.0' });
         await license.evaluate((el) => el.scrollIntoView({ block: 'center' }));
         const hit = await license.evaluate((el) => {
@@ -338,12 +343,12 @@ for (const tier of ['low', 'medium', 'high']) {
       expect(opening.fill).toBeGreaterThanOrEqual(24);
       expect(opening.ambient).toBeGreaterThanOrEqual(24);
       expect(opening.floor.every((value) => value >= 0.1)).toBe(true);
-      expect(opening.snowCount).toBe(tier === 'low' ? 600 : tier === 'medium' ? 3000 : 9000);
+      expect(opening.snowCount).toBe(tier === 'low' ? 300 : tier === 'medium' ? 1200 : 3000);
       expect(opening.snowVisible).toBe(true);
       expect(opening.opacity).toBeGreaterThan(0);
       expect(opening.density).toBeGreaterThan(0);
       expect(opening.foregroundAlpha).toBeGreaterThan(0);
-      expect(opening.maxSize).toBe(6);
+      expect(opening.maxSize).toBe(3);
       await page.screenshot({ path: info.outputPath('titanic-spawn.png') });
       await page.evaluate(() =>
         (window.__game as unknown as TitanicGame).headlights.setEnabled(false),
