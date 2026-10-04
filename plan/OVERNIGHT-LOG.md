@@ -406,3 +406,8 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged Codex 550 (toast stacks under the scan target; desktop shot clean, portrait overlaps the sub slightly but readable). Full-e2e + project-base green on main. Pushed, tagged f25.
 - Unmerged: Codex 540, 560 (finished, need gates); 530 waits on 580; 570/580/590 running. No Claude agent run (review plus gates took the time).
 - Needs owner: nothing.
+
+## 2026-10-04 review run after f25 (~10:00-11:00)
+
+- Comprehensive review for f25 recorded (golden 2026-10-04-094934, scores unchanged). Merged Codex 560 (Beebe seabed) and 540 (merge-residue bughunt) into local main (conflicts in CHANGELOG and scarp.ts resolved, both kept). Smoke gates green in each worktree. Full-e2e on main was still running when the run ended: NOT pushed, NOT tagged. Next run: confirm `tools/gates.sh --full-e2e` result on main, push, tag f26.
+- Still unmerged: 580 (finished), 530 (after 580). Running: 570, 590, 600. Needs owner: nothing.
