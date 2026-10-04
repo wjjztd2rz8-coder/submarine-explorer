@@ -63,7 +63,7 @@ test('chase framing, dive-start tips, free look and reset controls', async ({ pa
   await expect.poll(async () => (await camera(page)).free).toBe(false);
   const resetBox = (await page.locator('.hud-reset-camera').boundingBox())!;
   const attributionBox = (await page.locator('.hud-attribution').boundingBox())!;
-  expect(resetBox.y + resetBox.height).toBeLessThan(attributionBox.y);
+  expect(resetBox.x + resetBox.width).toBeLessThan(attributionBox.x);
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width / 2 + 100, box.y + box.height / 2);

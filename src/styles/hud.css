@@ -13,6 +13,11 @@
   inset: 0;
 }
 
+/* Open credits must read above scan labels and tutorial hints, below dialogs. */
+.hud:has(.hud-attribution[open]) {
+  z-index: 31;
+}
+
 .hud-panel {
   position: absolute;
   background: var(--hud-bg);
@@ -82,15 +87,82 @@
   }
 }
 
-.hud-attribution {
+.hud-footer {
   position: absolute;
-  right: 12px;
+  right: calc(12px + env(safe-area-inset-right, 0px));
   bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-  max-width: 44ch;
-  text-align: right;
-  font-size: 10px;
-  opacity: 0.45;
-  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-attribution {
+  position: relative;
+  pointer-events: auto;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.hud-attribution summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  min-height: 32px;
+  padding: 5px 9px;
+  border: 1px solid var(--hud-border);
+  border-radius: 4px;
+  background: var(--hud-bg);
+  color: var(--hud-text);
+  white-space: nowrap;
+  cursor: pointer;
+  list-style: none;
+}
+
+.hud-attribution summary::-webkit-details-marker {
+  display: none;
+}
+
+.hud-attribution summary::after {
+  content: '+';
+  color: var(--hud-accent);
+}
+
+.hud-attribution[open] summary::after {
+  content: '−';
+}
+
+.hud-attribution-panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  box-sizing: border-box;
+  width: min(400px, calc(100vw - 24px));
+  max-height: calc(100dvh - 100px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 10px 12px;
+  border: 1px solid var(--hud-border);
+  border-radius: 6px;
+  background: #06121c;
+  color: var(--hud-text);
+}
+
+.hud-attribution-panel p {
+  margin: 0 0 8px;
+}
+
+.hud-attribution-panel p:last-child {
+  margin-bottom: 0;
+}
+
+.hud-attribution-panel a {
+  color: var(--hud-accent);
+}
+
+body:not([data-app-state='dive']) .hud-footer,
+body.photo-active .hud-footer {
+  display: none;
 }
 
 .sonar {

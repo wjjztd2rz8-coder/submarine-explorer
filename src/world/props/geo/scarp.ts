@@ -602,7 +602,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   }
 
   // Monterey: sponges and cold-water coral fans cling to the lit face of the wall.
-  if (id === 'canyon') addWallLife(full, wall, d.growth, d.branchDepth, joinY, H, seed, rnd);
+  if (id === 'canyon') addWallLife(full, wall, d.growth, d.branchDepth, joinY, H, seed, rnd, gnd);
 
   // A faint seep of clear fluid on the caldera wall (Hunga Tonga is volcanically active).
   if (id === 'tuff') {
@@ -883,6 +883,7 @@ function addWallLife(
   H: number,
   seed: number,
   rnd: () => number,
+  gnd: (x: number, z: number) => number,
 ): void {
   const pos = wall.getAttribute('position');
   const nor = wall.getAttribute('normal');
@@ -898,15 +899,16 @@ function addWallLife(
     tries++
   ) {
     const i = Math.floor(rnd() * n);
-    const y = pos.getY(i);
     const nz = nor.getZ(i);
-    // Lit face only: facing the viewer, between the apron and the upper terraces.
-    if (nz > -0.25 || y < joinY + 0.04 * H || y > 0.72 * H) continue;
-    if (fbm3(pos.getX(i) * 0.12, y * 0.1, seed + 55, seed + 2, 3) < 0.42) continue; // patchy
     const out = 0.12;
     const x = pos.getX(i) + nor.getX(i) * out;
-    const yy = y + nor.getY(i) * out;
+    const yy = pos.getY(i) + nor.getY(i) * out;
     const z = pos.getZ(i) + nz * out;
+    // Measure the exposed face from the seabed at the final attachment point.
+    // Origin-relative heights can place life underground on a rising canyon slope.
+    const height = yy - gnd(x, z);
+    if (nz > -0.25 || height < joinY + 0.04 * H || height > 0.72 * H) continue;
+    if (fbm3(x * 0.12, height * 0.1, seed + 55, seed + 2, 3) < 0.42) continue; // patchy
     const tilt = -(0.9 + rnd() * 0.5); // lean out of the face
     if (rnd() < 0.5 && spongeCount() < wantSponge) {
       const kind = Math.min(2, Math.floor(rnd() * 3)) as SpongeKind;

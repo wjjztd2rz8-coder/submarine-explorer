@@ -80,9 +80,6 @@ body {
 .scan-hint {
   font-size: inherit;
 }
-.hud-attribution {
-  font-size: clamp(11px, calc(12px * var(--ui-scale)), 18px);
-}
 .settings {
   font-size: clamp(14px, calc(15px * var(--ui-scale)), 22px);
 }

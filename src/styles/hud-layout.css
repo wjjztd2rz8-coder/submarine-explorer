@@ -74,18 +74,20 @@
 
 /* Touch landscape: the map credit sits in the strip between stick and buttons. */
 @media (orientation: landscape) {
-  html.is-touch .hud-attribution {
-    right: auto;
-    left: calc(140px + env(safe-area-inset-left, 0px));
-    bottom: calc(4px + env(safe-area-inset-bottom, 0px));
-    width: calc(
-      100vw - 140px - 300px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+  html.is-touch .hud-footer {
+    left: calc(136px + env(safe-area-inset-left, 0px));
+    right: calc(300px + env(safe-area-inset-right, 0px));
+    justify-content: flex-end;
+  }
+  html.is-touch .hud-attribution summary {
+    min-height: 44px;
+  }
+  html.is-touch .hud-attribution-panel {
+    max-height: calc(100dvh - 120px);
+    width: min(
+      400px,
+      calc(100vw - 136px - 300px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
     );
-    max-width: none;
-    text-align: left;
-    font-size: 8px;
-    line-height: 1.15;
-    opacity: 0.5;
   }
   html.is-touch .scan-overlay .scan-panel {
     left: calc(50% - 40px);
@@ -255,13 +257,6 @@
   html.is-touch .scan-overlay .scan-ring {
     width: 40px;
     height: 40px;
-  }
-  html.is-touch .hud-attribution {
-    font-size: 7px;
-    left: calc(136px + env(safe-area-inset-left, 0px));
-    width: calc(
-      100vw - 136px - 300px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
-    );
   }
 }
 
