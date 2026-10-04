@@ -343,3 +343,11 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Golden set 2026-10-03-230949: Lost City shot 1 clearly better (tower large and readable). Full-e2e green on main (one new 395 case, beebe 150% at 360x640, is test.fixme: real HUD overlap, fix queued as 470). Pushed, tagged f18.
 - Codex queue: 470 touch-150 overlap, 480 verify rebrand merge, 490 Lost City camera bughunt; 450 hud footer, 450 triage, 460 marine snow running. No Claude package run (Claude spent on merge review).
 - Needs owner: nothing.
+
+## 2026-10-03 night comprehensive review + headless run (~00:00)
+
+- Review recorded in plan/REVIEWS.md (Lost City +1; others unchanged), DIRECTOR priorities refreshed, briefs 500 (CI triage), 510 (flow audit), 520 (verify Lost City/Beebe) queued with 470-490.
+- Merged Claude/Sonnet F-LOSTCITY-SURROUNDINGS (cool textured slope, talus scatter, more flanges, corals grounded; ambient fill not darkened because the readability guard blocks it, banding faint) and F-BEEBE-PLUME-VARIETY (per-vent width/height/opacity/lean, current bend, orifice haze and wisps). Shots clearly better. Full-e2e on main: 311 pass, 1 fail (vent preset draw count, +1 haze draw), fixed by allowing +1 and rerun green; smoke gates green. Pushed, tagged f19.
+- CI on main has been red for most pushes (shards fail on `.hud-control-tips` stability, content-missions and GL timeouts); Codex 500 triages. Codex resumed after reset; worktrees 450 hud/450 triage/460 still hold work.
+- Next Claude candidates: Monterey poses and wall texture, Blue Hole spawn pose, Lost City banding stronger and tower-base corals.
+- Needs owner: nothing.
