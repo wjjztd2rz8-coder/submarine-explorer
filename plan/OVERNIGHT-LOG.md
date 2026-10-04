@@ -374,3 +374,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Still running: Codex 510, 520, 530; 450-triage holds only a spec. Queue: 540-570. Codex 5h was 16%, so nothing new launched.
 - Next Claude candidates: Blue Hole spawn pose and east grotto, Lost City banding and tower-base corals.
 - Needs owner: nothing.
+
+## 2026-10-04 early headless run after f22 review (~03:00-04:20)
+
+- Comprehensive review for f22 recorded (Monterey +0.25), DIRECTOR refreshed. Golden 2026-10-04-031944.
+- Tried merging Codex 530 (credits panel placement): smoke green, but full-e2e on main failed 4 of its own new cases (CC BY 4.0 link hit-test, f-verify-530.spec.ts:146). Reverted the local merge (never pushed); main unchanged. Codex brief 580 queued to fix it in the 530 worktree. 510 and 520 remain finished-but-unmerged (510 could not render in Codex sandbox, needs gate screenshots). No push, no tag, no Claude agent (spent on gates).
+- Queue: 540, 550, 560, 570, 580. Codex 5h was 4% until the 00:00 reset.
+- Needs owner: nothing.
