@@ -13,7 +13,7 @@ Claude visual backlog (Sonnet agents, in order of player impact):
 3. **Lost City beehive chimney:** smooth white slab with no life at its base (600 queued for Codex; if it stalls, do it in Claude with banded vertex colours and base corals).
 4. **Beebe sub scale (partly done in f27: nearer pose, sub now fills frame but hides the nearest chimney; seabed still dark):** sub is small in shot 1 and the flat seabed is dark; nearer default camera or vent framing (560 covers seabed only).
 5. **Blue Hole east grotto and stalactite gallery:** shot 1 is good now; east grotto poses still need a close shot with context.
-6. ~~Monterey hex boulder~~ done in f27 (fractured boulders, rough sponges). Old text:  the boulder reads fake; replace or break up with rock variants.
+6. ~~Monterey hex boulder~~ done in f27 (fractured boulders, rough sponges). Old text: the boulder reads fake; replace or break up with rock variants.
 7. **Debrief/Journal polish** from the 510 audit design questions (F-FLOW-AUDIT-510.md).
 
 Codex queue (f27 update: 600, 610, 620 finished/running; queued 630, 640, 650); older: 570, 580, 590 running; 540, 550, 560 finished and awaiting merge; queued 600 (Lost City), 610 (portrait/low-tier verification of f24 poses), 620 (first-minute audit and fixes), 630 (Lost City/Monterey fact check). 450-triage holds only a spec.
