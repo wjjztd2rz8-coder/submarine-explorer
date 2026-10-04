@@ -95,6 +95,8 @@ interface Preset {
   edgeStart: number;
   /** Metres per texture tile along the wall and up the face (anisotropic: bedding runs along x). */
   tile: [number, number];
+  /** Bed-by-bed tone contrast, thin lamination and grain strength (1 = the original look). */
+  bedContrast: number;
 }
 
 const REAR: [number, number][] = [
@@ -145,6 +147,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     rough: 0.95,
     edgeStart: 0.3,
     tile: [11, 6],
+    bedContrast: 1,
   },
   canyon: {
     tex: 'strata',
@@ -188,6 +191,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     rough: 0.97,
     edgeStart: 0.3,
     tile: [12, 5],
+    bedContrast: 2.8,
   },
   hadal: {
     tex: 'rock',
@@ -227,6 +231,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     rough: 0.98,
     edgeStart: 0.3,
     tile: [7, 7],
+    bedContrast: 1,
   },
 };
 
@@ -502,10 +507,24 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     // Each bed has its own tone (resistant beds pale, weak beds dark); the lip of a bed catches
     // light and the undercut beneath it is in shadow.
     const bed = fbm3(Math.floor(s) * 3.1 + 0.5, 2.5, seed + 77, seed + 3, 1);
-    out.copy(P.band).lerp(P.base, 0.25 + 0.85 * bed);
+    const bc = P.bedContrast;
+    out.copy(P.band).lerp(P.base, Math.min(1.1, 0.25 + 0.85 * ((bed - 0.5) * bc + 0.5)));
     out.multiplyScalar(
       (0.82 + 0.4 * tone) * (1 + 0.14 * smooth(0.8, 1, saw) - 0.28 * (1 - smooth(0, 0.14, saw))),
     );
+    if (bc > 1) {
+      // Thin laminae inside each bed, a sharp shadow line under every ledge, and fine grain.
+      const s4 = s * 4.3 + fbm3(x * 0.08, 3, seed + 12, seed, 2) * 0.8;
+      const lam = fbm3(Math.floor(s4) * 2.3 + 0.5, 1.5, seed + 31, seed + 8, 1);
+      const lipDark = 1 - 0.34 * (1 - smooth(0, 0.07, saw));
+      const lipLit = 1 + 0.2 * smooth(0.86, 0.98, saw) * (1 - smooth(0.98, 1, saw));
+      const rill = 1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, 4) - 1);
+      const gullyShade = 1 - 0.3 * smooth(0.55, 0.9, rill); // erosion gullies read as dark runnels
+      const grain = 0.88 + 0.24 * fbm3(x * 1.7, y * 2.2, z * 1.7, seed + 66, 2);
+      out.multiplyScalar((0.84 + 0.32 * lam) * lipDark * lipLit * gullyShade * grain);
+      // Alternate pale resistant beds with ochre-brown weak ones so bedding survives the teal haze.
+      out.lerp(P.drape, 0.22 * smooth(0.5, 0.75, bed));
+    }
     out.lerp(P.crest, smooth(0.75, 1, y / H) * 0.6);
     if (P.joints > 0) {
       const { crack } = jointOffset(x, P.joints, P.jointStep, seed);

@@ -311,16 +311,67 @@ async function main() {
           }
           throw new Error(`No clear fixed approach for ${propId}`);
         }, heroId);
+        // Wall scarps with wall-life (Monterey): aim at the densest sponge/coral patch, from the face side.
+        const lifeApproach = await evaluate((propId) => {
+          const g = window.__game;
+          const hero = g.props.placed.find((p) => p.def.id === propId);
+          if (!hero) return null;
+          hero.root.updateMatrixWorld(true);
+          const Matrix4 = hero.root.matrixWorld.constructor;
+          const m = new Matrix4();
+          const pts = [];
+          hero.root.traverse((o) => {
+            if (!o.isInstancedMesh || !/^wall-(sponges|corals)/.test(o.name)) return;
+            for (let i = 0; i < o.count; i++) {
+              o.getMatrixAt(i, m);
+              m.premultiply(o.matrixWorld);
+              pts.push([m.elements[12], m.elements[13], m.elements[14]]);
+            }
+          });
+          if (pts.length < 10) return null;
+          let best = null;
+          for (const p of pts) {
+            const near = pts.filter((q) => Math.hypot(q[0] - p[0], q[1] - p[1], q[2] - p[2]) < 9);
+            if (!best || near.length > best.near.length) best = { near };
+          }
+          const c = [0, 1, 2].map(
+            (k) => best.near.reduce((a, q) => a + q[k], 0) / best.near.length,
+          );
+          const o0 = hero.root.localToWorld(g.sub.position.clone().set(0, 0, 0));
+          const o1 = hero.root.localToWorld(g.sub.position.clone().set(0, 0, -1));
+          const face = o1.sub(o0).setY(0).normalize();
+          for (const turn of [0, 0.3, -0.3, 0.6, -0.6, 0.9, -0.9]) {
+            const dx = face.x * Math.cos(turn) - face.z * Math.sin(turn);
+            const dz = face.x * Math.sin(turn) + face.z * Math.cos(turn);
+            const ok = [40, 26].every((range) => {
+              const p = g.sub.position.clone().set(c[0] + dx * range, 0, c[2] + dz * range);
+              p.y = g.terrain.sampleHeight(p.x, p.z) + 15;
+              return (
+                p.y < -g.config.submarine.hullRadius &&
+                !g.props.collide(p.clone(), g.config.submarine.hullRadius, p.clone())
+              );
+            });
+            if (ok) return { target: c, direction: [dx, 0, dz], count: best.near.length };
+          }
+          return null;
+        }, heroId);
+        if (lifeApproach) {
+          console.log(`${site}: wall-life patch of ${lifeApproach.count} aimed`);
+          approach.target = lifeApproach.target;
+          approach.direction = lifeApproach.direction;
+        }
         // A feature set piece is framed from its axis, so its close shot stays outside the spires.
-        const closeRange = await evaluate(
-          (propId) =>
-            (window.__game.props.placed.find((p) => p.def.id === propId)?.def.feature ?? '').match(
-              /^(?!.*(ledge|cliff|scarp)).+/,
-            )
-              ? 30
-              : 15,
-          heroId,
-        );
+        const closeRange = lifeApproach
+          ? 26
+          : await evaluate(
+              (propId) =>
+                (
+                  window.__game.props.placed.find((p) => p.def.id === propId)?.def.feature ?? ''
+                ).match(/^(?!.*(ledge|cliff|scarp)).+/)
+                  ? 30
+                  : 15,
+              heroId,
+            );
         for (const [n, range] of [
           [2, 40],
           [3, closeRange],

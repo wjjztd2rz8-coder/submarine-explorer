@@ -14,6 +14,15 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-MONTEREY-WALL: Monterey Canyon wall now reads as layered rock. The canyon
+  preset gets stronger bed-by-bed tone (pale resistant beds against darker weak ones,
+  with an ochre tint), thin laminae, a shadow line under each ledge, dark erosion-gully
+  runnels and fine grain, all in vertex colours, with no extra geometry or draw calls.
+  Hunga Tonga and Challenger Deep walls are unchanged (`bedContrast` 1). Golden shots 2
+  and 3 for sites with wall-life now aim at the densest sponge/coral patch from the
+  face side (pose 3 at 26 m, not 15 m, to keep the camera clear of the fans); review
+  screenshots only, no gameplay change.
+
 - Phase F, F-TOUCH-150 gate follow-up: make warm vent haze opt-in through
   registered Config defaults and enable it explicitly at Beebe. Reason: its
   implicit global default added a third draw to generic vent presets, breaking
