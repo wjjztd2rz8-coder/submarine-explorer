@@ -633,6 +633,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     addWallLife(
       full,
       wall,
+      [Math.min(nx, 220), Math.min(ny, 150)],
       d.growth,
       d.branchDepth,
       joinY,
@@ -922,10 +923,56 @@ function fanColour(pick: number, shade: number): THREE.Color {
   return base.clone().multiplyScalar(0.75 + 0.35 * shade);
 }
 
-/** Sponges and gorgonian-like fans seated on the wall face, sampled from its own vertices (instanced, cheap). */
+/** Find the frontmost rendered triangle at (x, y), using the extrusion's x columns. */
+function wallFaceSampler(
+  wall: THREE.BufferGeometry,
+  columns: number,
+  rows: number,
+): (x: number, y: number) => number | undefined {
+  const pos = wall.getAttribute('position');
+  const bounds = wall.boundingBox!;
+  const ray = new THREE.Ray(new THREE.Vector3(), new THREE.Vector3(0, 0, 1));
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  const c = new THREE.Vector3();
+  const hit = new THREE.Vector3();
+  const normal = new THREE.Vector3();
+  const edge = new THREE.Vector3();
+  const index = wall.getIndex()!;
+  return (x, y) => {
+    const column = Math.floor(((x - bounds.min.x) / (bounds.max.x - bounds.min.x)) * columns);
+    if (column < 0 || column >= columns) return undefined;
+    ray.origin.set(x, y, bounds.min.z - 1);
+    let front = Infinity;
+    let nz = 0;
+    // Only this column can cross a +Z ray. Avoid scanning the whole wall per colony.
+    for (let t = column * rows * 6; t < (column + 1) * rows * 6; t += 3) {
+      const ia = index.getX(t);
+      const ib = index.getX(t + 1);
+      const ic = index.getX(t + 2);
+      if (
+        y < Math.min(pos.getY(ia), pos.getY(ib), pos.getY(ic)) ||
+        y > Math.max(pos.getY(ia), pos.getY(ib), pos.getY(ic))
+      )
+        continue;
+      a.fromBufferAttribute(pos, ia);
+      b.fromBufferAttribute(pos, ib);
+      c.fromBufferAttribute(pos, ic);
+      if (ray.intersectTriangle(a, b, c, true, hit) && hit.z < front) {
+        front = hit.z;
+        normal.subVectors(b, a).cross(edge.subVectors(c, a)).normalize();
+        nz = normal.z;
+      }
+    }
+    return nz < -0.25 ? front : undefined;
+  };
+}
+
+/** Sponges and fans seated on exposed rendered triangles of the lit wall face. */
 function addWallLife(
   full: THREE.Group,
   wall: THREE.BufferGeometry,
+  segments: [number, number],
   growth: number,
   branchDepth: number,
   joinY: number,
@@ -937,17 +984,14 @@ function addWallLife(
   const pos = wall.getAttribute('position');
   const nor = wall.getAttribute('normal');
   const n = pos.count;
+  const faceAt = wallFaceSampler(wall, ...segments);
   const sponges: InstanceSpec[][] = [[], [], []];
   const spongeCount = (): number => sponges[0]!.length + sponges[1]!.length + sponges[2]!.length;
   const fans: InstanceSpec[][] = [[], []];
   const wantSponge = Math.round(90 * Math.min(growth, 1.2));
   const wantFans = Math.round(70 * Math.min(growth, 1.2));
-  for (
-    let tries = 0;
-    tries < 4000 && (spongeCount() < wantSponge || fans[0]!.length + fans[1]!.length < wantFans);
-    tries++
-  ) {
-    const i = Math.floor(rnd() * n);
+  const seats: THREE.Vector3[] = [];
+  for (let i = 0; i < n; i++) {
     const y = pos.getY(i);
     const nz = nor.getZ(i);
     // Lit face only: facing the viewer, between the apron and the upper terraces.
@@ -956,13 +1000,30 @@ function addWallLife(
     const out = 0.12;
     const x = pos.getX(i) + nor.getX(i) * out;
     const yy = y + nor.getY(i) * out;
-    const z = pos.getZ(i) + nz * out;
+    // Smoothed vertex normals can point across a terrace edge, putting the
+    // offset seat inside rock or over empty water. Seat on the actual first
+    // triangle facing the light, rather than trusting that normal's z offset.
+    const face = faceAt(x, yy);
+    if (face === undefined) continue;
+    const z = face - out;
     // A wall vertex can be below the rising seabed or rubble apron. Check the
     // final outward-offset seat and resample buried candidates without lifting
     // colonies off the wall or reducing their requested counts.
     if (yy <= surface(x, z) + out) continue;
+    seats.push(new THREE.Vector3(x, yy, z));
+  }
+  // Sample exposed seats directly: a finite retry budget could silently drop
+  // colonies on steep terrain where most of the wall is buried.
+  while (
+    seats.length &&
+    (spongeCount() < wantSponge || fans[0]!.length + fans[1]!.length < wantFans)
+  ) {
+    const { x, y: yy, z } = seats[Math.floor(rnd() * seats.length)]!;
     const tilt = -(0.9 + rnd() * 0.5); // lean out of the face
-    if (rnd() < 0.5 && spongeCount() < wantSponge) {
+    if (
+      spongeCount() < wantSponge &&
+      (fans[0]!.length + fans[1]!.length >= wantFans || rnd() < 0.5)
+    ) {
       const kind = Math.min(2, Math.floor(rnd() * 3)) as SpongeKind;
       sponges[kind].push(wallSpongeSpec(kind, x, yy, z, tilt, rnd));
     } else if (fans[0]!.length + fans[1]!.length < wantFans) {

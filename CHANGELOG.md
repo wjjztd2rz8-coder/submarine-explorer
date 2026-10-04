@@ -35,6 +35,18 @@ without an entry here is not done.
   crust to the three Beebe chimney bodies through existing vertex colours and bump textures,
   with no extra geometry or draws. Preserve depth lighting, fog, camera and plume code.
   Readability guards and golden-capture status: `plan/progress/F-BEEBE-SEABED-560.md`.
+- Phase F, F-BUGHUNT-540: seat Monterey sponges and corals against the frontmost
+  rendered rock triangles instead of smoothed vertex-normal offsets, which could
+  bury or float colonies at terrace edges. Sample exposed seats directly to
+  preserve tier counts on steep slopes; retain seabed and raised-apron clearance.
+  Add independent raycast checks for attachment and lit-face placement on all
+  four authored walls and quality tiers. Give the data-credit summary the shared
+  keyboard focus ring, clarify current attribution docs and consolidate repeated
+  vent-haze changelog notes. Findings: `plan/progress/F-BUGHUNT-540.md`.
+- Phase F, F-HUD-ATTRIBUTION-450 (previously omitted): replace the always-visible
+  multiline citation and touch source pill with a native expandable
+  `Data: <source>` chip. Retain the exact tile citation in its panel, add GMRT
+  source/DOI/licence links, and close credits with Escape before pausing.
 
 - Phase F, F-BLUEHOLE-SPAWN: the Great Blue Hole Arcade opening now sits about 14 m below the
   ledge inside the hole (was level with it, over a bare rim), 205 m from the west alcove, so
@@ -72,10 +84,6 @@ without an entry here is not done.
   Readability/integrity and static budgets pass; fresh screenshots and runtime
   performance/console verification remain blocked by sandbox browser/localhost
   restrictions. Results: `plan/progress/F-VERIFY-520.md`.
-- Phase F, F-TOUCH-150 gate follow-up: make warm vent haze opt-in through
-  registered Config defaults and enable it explicitly at Beebe. Reason: its
-  implicit global default added a third draw to generic vent presets, breaking
-  their two-draw contract. Preserve Beebe's haze and the exact E2E assertion.
 - Phase F, F-TOUCH-150: cap the playing HUD scale on short portrait touch
   viewports so enlarged UI keeps the tutorial and scanner clear of telemetry
   and sonar; show a small source-credit pill above touch controls while retaining
@@ -101,8 +109,6 @@ without an entry here is not done.
   checks and screenshot capture at 1600×900 and 844×390. Browser comparisons
   await rendered camera frames and the loaded Daily card before measuring;
   existing facing, position and hit-target thresholds remain unchanged.
-  Register warm vent haze as an explicit Beebe override so generic vents retain
-  their two-draw budget and Beebe retains its haze. Reason: full-e2e regressions.
   No cuts.
 - Phase F, F-VERIFY-480 browser follow-up: make the extra hot-water haze an
   explicit sulfide-site override, enabled at Beebe. Reason: an undeclared,
@@ -560,6 +566,11 @@ without an entry here is not done.
   default stays `medium`, so a fresh install looks the same as before.
 
 ### Removed
+
+- Phase F, F-BUGHUNT-540: delete dead HUD help/link selectors, stale attribution
+  wrapper opacity/background rules from the former pill, and superseded centred
+  objectives declarations. Reason: the retired UI left unused styles and duplicate
+  declarations that obscured the active cascade.
 
 - Phase F, F2-MODES: retired Gentle from new current choices to keep Off,
   Realistic and Exaggerated clear. Existing Gentle saves still load and run.

@@ -111,9 +111,12 @@ fog and the headlights light them like the terrain. None of them glow (art-direc
   - `pillow-field`: heap of basalt pillows with iron-oxide staining and orange iron mats.
   - `tuff-cliff` / `canyon-ledge` / `hadal-scarp`: extruded scarps (banded tuff, terraced mudstone
     with a shelf, fractured silty trench wall) with a boulder apron.
-    Canyon wall sponges and corals attach only to exposed face vertices: their final offset
-    anchors must clear the local seabed plus talus and its raised mesh lip, since either a slope
-    or the rubble apron can bury part of the wall face. Buried candidates are resampled.
+    Canyon wall sponges and corals attach to the frontmost rendered face triangles, offset
+    0.12 m toward local −Z. Smoothed vertex normals alone can cross terrace edges and leave
+    anchors buried in rock or floating off the wall. Only lit faces (normal Z < −0.25) qualify.
+    Final offset anchors must clear the local seabed plus talus and its raised mesh lip, since either a slope
+    or the rubble apron can bury part of the wall face. Colonies sample the exposed seats
+    directly to retain quality-tier counts even when much of the wall is buried.
     Terrain in these tiles has 50–60 m cells, so big pieces sink a skirt below their base; use
     `y_offset_m` to lift a piece that would otherwise be buried on a slope.
 
