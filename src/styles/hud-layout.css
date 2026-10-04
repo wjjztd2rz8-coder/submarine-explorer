@@ -137,21 +137,32 @@
     object-fit: contain;
   }
   html.is-touch .sonar.d-sonar-expanded {
-    /* Reserve the right controls and the left Pause slot on narrow phones. */
+    /* Reserve the right controls and the left Pause slot on narrow phones.
+       The whole panel must also clear the footer: 12 px top, 10 px bottom,
+       the 44 px credit chip and an 8 px gap. Let only the map shrink. */
     left: auto;
     right: calc(270px + env(safe-area-inset-right, 0px));
+    top: calc(12px + env(safe-area-inset-top, 0px));
     width: 300px;
     max-width: calc(
       100vw - 354px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
     );
+    max-height: calc(
+      100dvh - 74px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+    );
     box-sizing: border-box;
-    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    transform: none;
     z-index: 31;
+  }
+  html.is-touch .sonar.d-sonar-expanded .d-sonar-header {
+    flex-shrink: 0;
   }
   html.is-touch .sonar.d-sonar-expanded canvas {
     width: 100% !important;
     height: auto !important;
-    max-height: calc(100vh - 104px);
+    min-height: 0;
     object-fit: contain;
   }
   html.is-touch .sonar .d-sonar-header {
@@ -327,15 +338,15 @@
    to place readouts below the actual objective panel height. */
 @media (orientation: portrait) and (max-width: 700px) {
   /* The credit chip otherwise sits across the stick and action buttons. Keep
-     it as a small strip above the left stick; the panel opens upward. The
-     narrow strip also clears the taller action cluster at 150% UI scale. */
+     it as a small strip above the left stick, clearing the taller action
+     cluster at 150% UI scale. */
   html.is-touch .hud-footer {
     left: calc(12px + env(safe-area-inset-left, 0px));
     right: auto;
     bottom: calc(160px + env(safe-area-inset-bottom, 0px));
   }
   html.is-touch .hud-attribution summary {
-    min-height: 32px;
+    min-height: 44px;
     max-width: 128px;
     overflow: hidden;
     text-overflow: ellipsis;

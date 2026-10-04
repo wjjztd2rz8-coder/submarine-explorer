@@ -11,6 +11,7 @@ import type { GameplayOptions } from '../core/Config.js';
 import type { CurrentStatus } from '../world/Currents.js';
 import type { HullWarningStyle } from '../core/Save.js';
 import { HullGauge } from './HullGauge.js';
+import { placeDataCredits } from './DataCreditsLayout.js';
 
 const FIELDS = ['depth', 'heading', 'speed', 'status', 'tile'] as const;
 type Field = (typeof FIELDS)[number];
@@ -114,6 +115,7 @@ export class HUD {
   private current = { dirDeg: 0, speedMps: 0 };
   private powerState: PowerState | undefined;
   private hullNote = '';
+  private creditsLayoutKey = '';
 
   constructor(
     private readonly meta: TileMeta,
@@ -171,6 +173,8 @@ export class HUD {
     summary.setAttribute('aria-label', `Data: ${meta.source} credits`);
     attr.addEventListener('toggle', () => {
       summary.setAttribute('aria-expanded', String(attr.open));
+      this.creditsLayoutKey = '';
+      this.layoutDataCredits();
     });
     attr.querySelector('.hud-attribution-citation')!.textContent = meta.attribution;
     if (meta.source === 'GMRT') {
@@ -200,6 +204,48 @@ export class HUD {
     attr.open = false;
     attr.querySelector('summary')!.focus();
     return true;
+  }
+
+  /** Called while drawing the HUD: scanner, tutorial and toast visibility can
+   * change while credits are open. Cache geometry so steady frames only read
+   * the obstacles and never resize the panel or search for another slot. */
+  layoutDataCredits(): void {
+    const attr = this.root.querySelector<HTMLDetailsElement>('.hud-attribution')!;
+    if (!attr.open) return;
+    const panel = attr.querySelector<HTMLElement>('.hud-attribution-panel')!;
+    const anchor = attr.querySelector('summary')!.getBoundingClientRect();
+    const obstacles = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.sonar, .hud-readouts, .objectives-panel, .scan-panel, .hud-notice, ' +
+          '.hud-warning, .onboard-card, .onboard-hint, .hud-control-tips, ' +
+          '.hud-reset-camera, .tc-stick, .tc-slider, .tc-buttons, .tc-btn-pause',
+      ),
+    )
+      .filter((el) => el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden')
+      .map((el) => el.getBoundingClientRect());
+    obstacles.push(anchor);
+    const font = getComputedStyle(panel).font;
+    const key = JSON.stringify([innerWidth, innerHeight, font, obstacles]);
+    if (key === this.creditsLayoutKey) return;
+    this.creditsLayoutKey = key;
+    // Measure the unwrapped preferred panel once per geometry change. Width
+    // and scrollHeight from the previous narrow slot would feed back into the
+    // next placement and cause it to jump between slots.
+    const width = Math.min(400, innerWidth - 24);
+    panel.style.width = `${width}px`;
+    const height = panel.scrollHeight + 2;
+    const slot = placeDataCredits(
+      { left: 12, top: 12, right: innerWidth - 12, bottom: innerHeight - 12 },
+      anchor,
+      obstacles,
+      width,
+      height,
+    );
+    if (!slot) return;
+    panel.style.left = `${slot.left}px`;
+    panel.style.top = `${slot.top}px`;
+    panel.style.width = `${slot.right - slot.left}px`;
+    panel.style.maxHeight = `${slot.bottom - slot.top}px`;
   }
 
   private showContext(el: HTMLDivElement, text: string | null | undefined): void {
