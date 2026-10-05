@@ -1,5 +1,9 @@
 # Lost City content: sources and notes (package C4a)
 
+## F-FACTCHECK-630 correction (2026-10-04)
+
+The authoritative claim-by-claim review is [F-FACTCHECK-630](../../../plan/progress/F-FACTCHECK-630.md). The earlier research notes below are historical; their Wikipedia-based claims and terrain interpretations are superseded wherever the review identifies a discrepancy or an unresolved claim.
+
 ## Phase F factual corrections — 2026-10-01
 
 - Discharge is clear, warm alkaline fluid, not an opaque white smoker. The [NOAA fluid comparison, page 2](https://oceanexplorer.noaa.gov/okeanos/explorations/ex1104/background/edu/media/ex1104_tracking.pdf) supports clear flow. Mission overrides disable smoke and warm glow and retain shimmer strength 0.03; existing generic carbonate builders do not emit a second plume.
@@ -13,7 +17,7 @@ The initial research pass relied heavily on Wikipedia. A later check against the
 
 - [Denny et al. (2016), _Geologic evolution of the Lost City Hydrothermal Field_](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869) describes Poseidon as a 60 m composite edifice, Beehive as a roughly 1 m vent on its flank, and IMAX as a roughly 30 m multipronged chimney on its north face. The paper also supplies a geologic survey basis for the field's long history.
 - [Aquino et al. (2024), _Fluid Mixing and Spatial Geochemical Variability in the Lost City Hydrothermal Field Chimneys_](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023GC011011) reports that the Beehive chimney was absent during the 2018 sampling visit, though fluid still emerged at its former opening. The in-game marker therefore depicts the historical vent, with a deliberately offset position for scanning.
-- [Kelley et al. (2005), _The Lost City Hydrothermal Field_](https://tos.org/oceanography/assets/docs/18-3_kelley.pdf) describes the IMAX chimney as about 8 m tall. Denny et al. (2016) later describe a roughly 30 m structure; the sources may measure different parts or stages of this growing complex. The prop retains an 8 m illustrative marker, and the guide states both measurements.
+- [Kelley et al. (2005), _The Lost City Hydrothermal Field_](https://tos.org/oceanography/assets/docs/18-3_kelley.pdf) describes the IMAX chimney as about 8 m tall. Denny et al. (2016) later describe a roughly 30 m structure; the reason for the difference remains unresolved. The prop retains an 8 m illustrative marker, and the guide states both measurements.
 - [Ludwig et al. (2011), _U-Th systematics and 230Th ages of carbonate chimneys_](https://www.sciencedirect.com/science/article/abs/pii/S0016703711000135) supports the old carbonate age. Individual prop coordinates remain illustrative because this terrain grid does not resolve chimney footprints.
 
 The original source table below records the first pass; use the corrections above for Beehive and IMAX dimensions and placement.
@@ -33,9 +37,7 @@ folder. Tile: `data/tiles/lost-city` (GMRT, bbox N 30.2005 / S 30.0302 / E -42.0
 | 5   | data/landmarks.json (this repo)                                                                  | —                                                          | Catalog entry: nominal position 30.1167, -42.1167; depth_range_m [750, 900]; facts/hooks used as a starting checklist                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 The InterRidge vents-data site (`https://vents-data.interridge.org/`) was attempted but its TLS certificate is
-currently expired (fetch failed with "certificate has expired" on 2026-09-23); it was not used. Everything above
-is corroborated by the landmarks.json catalog entry, which independently cites the same Wikipedia article plus
-InterRidge.
+currently expired (fetch failed with "certificate has expired" on 2026-09-23); it was not used. The catalogue repeats the same Wikipedia source and is not independent corroboration. Use the primary papers in the fact-check report.
 
 ## Terrain survey (this session, via `tools/inspect_tile.py` and a bilinear sampler built on
 

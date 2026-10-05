@@ -14,7 +14,7 @@
   "taxa_in_bbox": 200,
   "taxa_matching_rank": 200,
   "records_in_bbox": 1192,
-  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Placement of animals in the game is invented.",
+  "note": "OBIS occurrence snapshot fetched on 23 September 2026 within the tile bbox. Record counts reflect sampling effort, not abundance; depth ranges summarize at most 2,000 sampled records per taxon and are not complete habitat limits. Live totals may differ from this snapshot. Retained taxa span kingdom to genus; collection depths and attribution to one 2003 ICoMM survey remain unverified.",
   "species": [
     {
       "scientificName": "Rhodobacteraceae",

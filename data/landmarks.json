@@ -21,11 +21,11 @@
       "country_eez": "international waters",
       "confidence": "high",
       "coordinate_source": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field",
-      "summary": "A field of towering carbonate chimneys on the Atlantis Massif, venting warm alkaline fluid driven by serpentinization rather than magma, hosting unique microbial life relevant to origin-of-life research.",
+      "summary": "A field of towering carbonate chimneys on the Atlantis Massif, venting warm alkaline fluid shaped by seawater reacting with mantle rock and hosting microbial life relevant to origin-of-life research.",
       "facts": [
         "Chimneys are carbonate, not sulfide, and among the tallest known vent structures (~60 m, 'Poseidon')",
-        "Powered by serpentinization of mantle rock, not magmatic heat",
-        "Discovered in December 2000 using DSV Alvin",
+        "Serpentinization of mantle rock supplies chemical energy and heat; cooling of the lithosphere also contributes heat",
+        "Discovered on 4 December 2000 during an Argo II camera survey from RV Atlantis; first Alvin visit on 5 December",
         "Considered a model for possible life on icy moons like Enceladus"
       ],
       "gameplay_hooks": [
@@ -39,7 +39,9 @@
         "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field",
         "https://vents-data.interridge.org/",
         "https://oceanexplorer.noaa.gov/okeanos/explorations/ex1104/background/edu/media/ex1104_tracking.pdf",
-        "https://oceanexplorer.noaa.gov/explorations/05lostcity/logs/july29/july29.html"
+        "https://oceanexplorer.noaa.gov/explorations/05lostcity/logs/july29/july29.html",
+        "https://www.washington.edu/news/2000/12/12/hydrothermal-vent-system-unlike-any-seen-before-found-in-atlantic/",
+        "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"
       ],
       "wreck_meta": null
     },
@@ -1013,10 +1015,10 @@
       "country_eez": "United States",
       "confidence": "high",
       "coordinate_source": "https://en.wikipedia.org/wiki/Monterey_Canyon",
-      "summary": "The largest submarine canyon on the US West Coast, comparable in scale to the Grand Canyon, extending from Moss Landing beach out to abyssal depths in Monterey Bay.",
+      "summary": "One of the deepest submarine canyons on the US West Coast, comparable in scale to the Grand Canyon, beginning at Moss Landing and continuing offshore through the Monterey Deep Sea Fan to the abyssal plain.",
       "facts": [
         "Comparable in size and depth to the Grand Canyon",
-        "Reaches depths of over 3,600 m within roughly 100 km of the shoreline",
+        "The 3,600 m reference depth describes the offshore channel; its continuation ends below 4,000 m, beyond this dive's terrain, which reaches about 2,333 m",
         "Intensively studied by MBARI using ROVs and cabled observatories",
         "Hosts frequent turbidity-current sediment flows that reshape the canyon floor"
       ],
@@ -1026,7 +1028,11 @@
       ],
       "hazards": ["turbidity currents", "strong upwelling currents", "fishing gear"],
       "notable_species": ["Humboldt squid", "giant larvacean 'ghost' filters", "deep-sea corals"],
-      "external_links": ["https://en.wikipedia.org/wiki/Monterey_Canyon", "https://www.mbari.org/"],
+      "external_links": [
+        "https://www.mbari.org/know-your-ocean/monterey-canyon/",
+        "https://www.mbari.org/news/deciphering-the-visual-language-of-humboldt-squid/",
+        "https://www.mbari.org/news/sinkers-provide-missing-piece-in-deep-sea-puzzle-2/"
+      ],
       "wreck_meta": null
     },
     {

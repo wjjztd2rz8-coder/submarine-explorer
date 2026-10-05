@@ -23,18 +23,18 @@
     "heading_deg": 258
   },
   "briefing": {
-    "summary": "Follow Monterey Canyon from its head just offshore of Moss Landing onto the steep shelf break nearby. Continue along the north wall or visit the MARS seafloor observatory node farther down-canyon.",
+    "summary": "Follow Monterey Canyon from its upper reaches just offshore of Moss Landing down the steep channel nearby. Continue along the north wall or visit the MARS seafloor observatory node farther offshore.",
     "depth_m": 2000,
     "facts": [
       "Monterey Canyon begins right off the beach at Moss Landing -- so close to shore that MBARI, headquartered there, calls it their 'backyard'.",
       "MBARI traces the main channel more than 470 km offshore, through the Monterey Deep Sea Fan to depths beyond 4,000 m; the walls reach about 1,700 m high. This tile covers only the upper part, to about 2,333 m.",
-      "Just past the head, the seafloor drops from under 50 m to more than 250 m in under 3 km, where the canyon cuts across the continental shelf break.",
+      "Between the head marker and the next scan point, this terrain grid drops from about 44 m to 265 m over about 2.85 km in a straight line.",
       "Turbidity currents -- fast underwater avalanches of sediment -- have been measured moving down this canyon at up to about 7 m/s, some travelling more than 50 km. They happen several times a year in the upper canyon.",
       "The MBARI-operated MARS observatory node, on the continental slope at 891 m, is a real cabled power-and-data outlet for deep-sea science instruments, connected to shore by a 52 km cable."
     ],
     "hazards": [
       "Turbidity currents: sudden, fast-moving sediment flows can occur without warning, especially in the upper canyon.",
-      "Strong currents generally, including upwelling-driven flow near the canyon rim.",
+      "Strong currents, including internal tidal flows along the canyon.",
       "Fishing gear may be present, especially in shallower water near the head.",
       "Sunlight fades with depth; use your lights to read the deeper terrain."
     ]
@@ -53,7 +53,7 @@
       "type": "scan",
       "poi": "monterey-canyon-upper-channel",
       "primary": true,
-      "title": "Follow the channel to the shelf break",
+      "title": "Follow the upper channel",
       "hint": "Follow the channel west from the head, descending to around 265 m."
     },
     {
