@@ -6,7 +6,7 @@ import type { Journal } from '../../src/ui/Journal.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
 import type { CameraRig } from '../../src/sub/CameraRig.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
-import { waitForFrames } from './helpers/frames.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
 /** Fresh player: no hull unlocks, discoveries, skipped briefing or completed tutorial. */
 const shots = '.cache/codex/shots/510-f-journal-debrief-flow-audit';
@@ -20,8 +20,11 @@ type Game = {
 };
 
 async function ready(page: Page): Promise<void> {
-  await page.waitForFunction(() => window.__gameReady === true);
-  await page.waitForFunction(() => (window.__game as unknown as Game).discovery.loaded);
+  await clockFramesUntil(
+    page,
+    () => window.__gameReady === true && (window.__game as unknown as Game).discovery.loaded,
+  );
+  await page.evaluate(() => (window.__game as unknown as Game).journal.load());
 }
 
 async function act(target: Locator, touch: boolean): Promise<void> {
@@ -57,6 +60,7 @@ async function contained(target: Locator): Promise<void> {
 async function pause(page: Page, touch: boolean): Promise<void> {
   if (touch) await page.locator('.tc-btn-pause').tap();
   else await page.keyboard.press('Escape');
+  await page.clock.runFor(17);
   await expect(page.locator('.pause-menu')).toBeVisible();
 }
 
@@ -85,10 +89,12 @@ async function holdTouchUntilStep(
       type: 'touchMove',
       touchPoints: [{ x: box.x + box.width * xFraction, y: box.y + box.height * yFraction }],
     });
-    await page.waitForFunction(
-      (step) => (window.__game as unknown as Game).onboard.tutorial.index === step,
-      step,
-    );
+    await expect
+      .poll(async () => {
+        await page.clock.fastForward(250);
+        return page.evaluate(() => (window.__game as unknown as Game).onboard.tutorial.index);
+      })
+      .toBe(step);
   } finally {
     await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     await session.detach();
@@ -104,7 +110,8 @@ async function firstActions(page: Page, touch: boolean): Promise<void> {
     await page.keyboard.down('w');
     await page.keyboard.down('d');
     try {
-      await page.waitForFunction(
+      await clockFramesUntil(
+        page,
         () => (window.__game as unknown as Game).onboard.tutorial.index === 1,
       );
     } finally {
@@ -113,7 +120,8 @@ async function firstActions(page: Page, touch: boolean): Promise<void> {
     }
     await page.keyboard.down('Space');
     try {
-      await page.waitForFunction(
+      await clockFramesUntil(
+        page,
         () => (window.__game as unknown as Game).onboard.tutorial.index === 2,
       );
     } finally {
@@ -121,6 +129,7 @@ async function firstActions(page: Page, touch: boolean): Promise<void> {
     }
     await page.keyboard.press('l');
   }
+  await page.clock.runFor(17);
   await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'scan');
   // The tutorial asks for a toggle; restore light for the scene observations.
   if (touch) await page.locator('.tc-btn-lights').tap();
@@ -147,6 +156,7 @@ for (const viewport of [
     for (const site of sites.filter((site) => viewport.sites.includes(site))) {
       test(`${site}: Home -> opening -> Journal -> debrief -> Home`, async ({ page }) => {
         test.setTimeout(240_000);
+        await pauseClockBeforeNavigation(page);
         await page.addInitScript(() => {
           if (!localStorage.getItem('subexplorer.settings.v2'))
             localStorage.setItem(
@@ -160,7 +170,7 @@ for (const viewport of [
         page.on('pageerror', (e) => errors.push(e.message));
         const records: unknown[] = [];
         const shot = async (name: string): Promise<void> => {
-          await waitForFrames(page, 2);
+          await page.clock.runFor(34);
           const path = `${directory}/${name}.png`;
           await page.screenshot({ path });
           records.push({
@@ -236,11 +246,18 @@ for (const viewport of [
         // Observe ten real simulation seconds after learning the controls.
         // Repeating an idle minute in 15 site/viewport combinations dominated CI;
         // scan reachability is independently checked against every hero's terrain.
-        await page.waitForFunction(
-          () => (window.__game as unknown as Game).discovery.stats.elapsedS >= 10,
-          undefined,
-          { timeout: 90_000 },
-        );
+        await expect
+          .poll(
+            async () => {
+              // One real frame per bounded clock advance; Time caps its delta at 250 ms.
+              await page.clock.fastForward(250);
+              return page.evaluate(
+                () => (window.__game as unknown as Game).discovery.stats.elapsedS,
+              );
+            },
+            { timeout: 90_000, intervals: [20] },
+          )
+          .toBeGreaterThanOrEqual(10);
         await shot('06-dive-10s');
         await pause(page, touch);
         await act(
