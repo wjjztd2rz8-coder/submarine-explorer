@@ -248,6 +248,8 @@ for (const viewport of [
         await begin.scrollIntoViewIfNeeded();
         await shot('04-briefing-actions');
         await act(begin, touch);
+        // The clock is paused: render frames so the first tutorial step is shown.
+        await page.clock.runFor(34);
         await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'move');
         await shot('05-dive-start');
         await firstActions(page, touch);
