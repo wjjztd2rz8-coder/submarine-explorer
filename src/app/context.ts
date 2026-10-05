@@ -158,7 +158,7 @@ export interface GameContext extends BootContext {
   homeGlobe: Globe;
   input: Input;
   /** Control tips show until this `performance.now()` time. */
-  cameraTips: { until: number };
+  cameraTips: { until: number; moved: boolean };
   keyboard: { lock(): Promise<void>; unlock(): void };
   pointerLook: { updateHint(): void };
   settingsScreen: SettingsScreen;

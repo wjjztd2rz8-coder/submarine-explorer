@@ -36,6 +36,7 @@ export function createOnboardSystem(): GameSystem {
   let photoCount = 0;
   let wasGamepad = false;
   let wasTouch = false;
+  let creatureHint = false;
 
   const padLabel = (id: ActionId, fallback: string): string =>
     ctxRef?.input.actions.find((a) => a.id === id)?.pad ?? fallback;
@@ -249,12 +250,13 @@ export function createOnboardSystem(): GameSystem {
           return;
         }
         const power = ctx.power.state;
+        if (creatureHint && ctx.cameraTips.moved && chip.visible) chip.fade();
         const id = hints.update(f.elapsed, {
           battery: power.enabled ? power.battery : null,
           ratedRatio: f.sub.ratedRatio,
           // The scan panel already gives the target name and hold-to-scan prompt.
           scanTargetInRange: false,
-          creatureInView: (ctx.life?.targets.length ?? 0) > 0,
+          creatureInView: !ctx.cameraTips.moved && (ctx.life?.targets.length ?? 0) > 0,
           rovAvailable:
             device === 'keyboard' &&
             !ctx.rov.deployed &&
@@ -263,6 +265,7 @@ export function createOnboardSystem(): GameSystem {
           canShow: !tutorial.active,
         });
         if (id) {
+          creatureHint = id === 'creature';
           store.save({ seenHints: hints.seen });
           chip.show(HINT_TEXT[id](hintLabels(device)));
         }
@@ -273,6 +276,7 @@ export function createOnboardSystem(): GameSystem {
   function onAdvance(): void {
     if (tutorial.active) return;
     finishTutorial();
+    creatureHint = false;
     chip?.show('Nice work. The Controls guide is always in the Pause menu.');
   }
 }

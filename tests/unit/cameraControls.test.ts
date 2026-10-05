@@ -5,6 +5,8 @@ import type { GameContext } from '../../src/app/context.js';
 import type { FrameState } from '../../src/app/System.js';
 import { makeConfig } from '../../src/core/Config.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
+import { Vector3 } from 'three';
+import { FIRST_MINUTE_GUIDANCE } from '../../src/core/Config.js';
 
 const key = 'subexplorer.controlsLearned.v1';
 const records = new Map<string, string>();
@@ -14,10 +16,15 @@ function setup(route: boolean, rig?: CameraRig) {
     setItem: (k: string, value: string) => records.set(k, value),
   });
   const offReset = vi.fn();
+  const tipStrip = {
+    style: { setProperty: vi.fn() },
+    classList: { remove: vi.fn(), toggle: vi.fn() },
+  };
   const ctx = {
     bus: new EventBus(),
     rig: rig ?? { resetView: vi.fn() },
-    hud: { onResetCamera: vi.fn(() => offReset) },
+    hud: { root: { querySelector: () => tipStrip }, onResetCamera: vi.fn(() => offReset) },
+    sub: { position: new Vector3(0, -100, 0), yaw: 0 },
     canvas: new EventTarget(),
     app: { state: 'home' },
     route: route ? {} : null,
@@ -29,7 +36,7 @@ function setup(route: boolean, rig?: CameraRig) {
   } as unknown as GameContext;
   cameraControlsSystem.init?.(ctx);
   expect(ctx.expose).toHaveBeenCalledWith({ cameraTips: ctx.cameraTips });
-  return { ctx, offReset };
+  return { ctx, offReset, tipStrip };
 }
 function count() {
   return JSON.parse(records.get(key) ?? '{"dives":0}').dives;
@@ -44,6 +51,7 @@ afterEach(() => {
   cameraControlsSystem.dispose?.();
   records.clear();
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 it('counts mission starts once and does not consume hints on Home or briefing', () => {
   const { ctx } = setup(true);
@@ -79,11 +87,51 @@ it('counts a free dive on first active frame, preserves three hint dives and dis
 it('hides learned controls across subsequent dives', () => {
   const { ctx } = setup(false);
   tick(ctx, false, { throttle: 1, yaw: 1, ballast: 1 });
-  expect(ctx.cameraTips.until).toBe(0);
+  expect(ctx.cameraTips.until).toBeGreaterThan(0);
+  expect(JSON.parse(records.get(key)!).learned).toBe(true);
   cameraControlsSystem.dispose?.();
   cameraControlsSystem.init?.(ctx);
   tick(ctx, false);
   expect(ctx.cameraTips.until).toBe(0);
+});
+
+it('starts a twelve-second deadline, fades after actual movement, and keeps learning', () => {
+  let now = 1000;
+  vi.spyOn(performance, 'now').mockImplementation(() => now);
+  const { ctx, tipStrip } = setup(false);
+  tick(ctx, false);
+  expect(ctx.cameraTips.until).toBe(now + 12_000);
+  tick(ctx, true, { throttle: 1, yaw: 1, ballast: 1 });
+  expect(ctx.cameraTips.moved).toBe(false);
+  tick(ctx, false, { throttle: 1, yaw: 0, ballast: 0 });
+  expect(ctx.cameraTips.moved).toBe(false);
+  ctx.sub.position.z = -0.6;
+  now += 100;
+  tick(ctx, false);
+  expect(ctx.cameraTips.moved).toBe(true);
+  expect(ctx.cameraTips.until).toBe(now + FIRST_MINUTE_GUIDANCE.fadeMs);
+  expect(tipStrip.classList.toggle).toHaveBeenLastCalledWith('is-guidance-fading', true);
+  expect(JSON.parse(records.get(key)!).learned).toBe(false);
+  now += 1000;
+  tick(ctx, false, { throttle: 0, yaw: 1, ballast: 1 });
+  expect(JSON.parse(records.get(key)!).learned).toBe(true);
+  ctx.bus.emit('mission:started', { missionId: 'titanic', tileId: 'titanic' });
+  expect(ctx.cameraTips.moved).toBe(false);
+  expect(ctx.cameraTips.until).toBe(0);
+});
+
+it('does not extend a deadline that elapsed before movement', () => {
+  let now = 1000;
+  vi.spyOn(performance, 'now').mockImplementation(() => now);
+  const { ctx } = setup(false);
+  tick(ctx, false);
+  const deadline = ctx.cameraTips.until;
+  now += 13_000;
+  tick(ctx, false, { throttle: 1, yaw: 0, ballast: 0 });
+  ctx.sub.position.z -= 1;
+  tick(ctx, false);
+  expect(ctx.cameraTips.until).toBe(deadline);
+  expect(ctx.cameraTips.moved).toBe(true);
 });
 
 it('reset controls restore the Lost City opening and leave an active photo orbit alone', () => {
