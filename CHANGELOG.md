@@ -61,6 +61,16 @@ without an entry here is not done.
   chimney and left its surroundings dark and flat. Ambient fill and HUD are
   unchanged; fresh browser captures remain blocked by this sandbox.
   Validation and capture paths: `plan/progress/F-BEEBE-FRAMING-680.md`.
+- Phase F, F-BLUEHOLE-GROTTO-690: define the east grotto's limestone overhang
+  lip, spread varied-length stalactite clusters across its mouth and recessed
+  gallery, and fade faint cool opening light toward the banded back wall.
+  Share an authored east close pose between golden captures and visual QA so
+  the lip, pendants and apron fit beyond the cockpit offset. Clarify the
+  Journal's glacial dry-cave origin and roughly 40–50 m stalactite depth.
+  Reason: close views lacked a readable grotto mouth and surrounding context.
+  Browser gates passed in the orchestrator; golden comparison remains pending.
+  Format the two planning logs flagged by the full-repo gate. Details in
+  `plan/progress/F-BLUEHOLE-GROTTO-690.md`.
 - Phase F, F-BEEBE-MONTEREY: Beebe Vent Field opens with a shorter, lower chase
   arm (54 m, -16 m offset) so the sub fills the frame beside a lit smoker.
   Monterey wall boulders are now fractured, stretched, banded blocks and the

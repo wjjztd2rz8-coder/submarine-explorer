@@ -22,6 +22,7 @@
 import { chromium } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import blueHolePoses from './blue-hole-poses.json' with { type: 'json' };
 
 async function main() {
   const args = process.argv.slice(2);
@@ -44,7 +45,9 @@ async function main() {
   const stamp = new Date().toISOString().slice(0, 19).replace('T', '-').replaceAll(':', '');
   const output = resolve('.cache/golden', stamp);
   const closeOverride = process.env.GOLDEN_CLOSE ? JSON.parse(process.env.GOLDEN_CLOSE) : null; // dev: retune the west alcove close pose
-  const only = process.env.GOLDEN_SITES?.split(',').map((site) => site.trim());
+  const only = process.env.GOLDEN_SITES?.split(',').map((site) =>
+    site.trim() === 'blue-hole' ? 'great-blue-hole' : site.trim(),
+  );
   const heroes = [
     ['titanic', 'bow-hull'],
     ['lost-city', 'poseidon-tower'],
@@ -60,12 +63,7 @@ async function main() {
       },
     ],
     // The south-eastern alcove, framed from inside the hole on its ledge (open side faces the hole centre).
-    [
-      'great-blue-hole',
-      'karst-grotto-east',
-      'great-blue-hole-east',
-      { direction: [-0.54, 0, -0.84], above: 5 },
-    ],
+    ['great-blue-hole', 'karst-grotto-east', 'great-blue-hole-east', blueHolePoses.east],
     ['beebe-vent-field', 'beebe-chimney-1'],
     ['monterey-canyon', 'canyon-wall-ledge'],
   ].filter(([site, , slug]) => !only || only.includes(site) || only.includes(slug));
@@ -297,7 +295,9 @@ async function main() {
             if (fixed) {
               // Authored pose: stand over the hero's ledge on a fixed bearing, aim at its middle.
               const mid = hero.root.localToWorld(
-                hero.localBounds.getCenter(g.sub.position.clone()),
+                fixed.target
+                  ? g.sub.position.clone().fromArray(fixed.target)
+                  : hero.localBounds.getCenter(g.sub.position.clone()),
               );
               return {
                 target: mid.toArray(),
@@ -414,7 +414,7 @@ async function main() {
                 heroId,
               );
         for (const [n, range] of [
-          [2, 40],
+          [2, fixed?.approachRange ?? 40],
           [3, closeRange],
         ]) {
           stage = `${site}: position ${n}`;
