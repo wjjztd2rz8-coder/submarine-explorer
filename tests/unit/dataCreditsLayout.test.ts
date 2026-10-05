@@ -149,6 +149,53 @@ function hudFixture() {
 }
 
 describe('live HUD credit placement', () => {
+  it('fits the crowded 667×375 mission without relaxing reading size or HUD clearance', () => {
+    const f = hudFixture();
+    vi.stubGlobal('innerWidth', 667);
+    vi.stubGlobal('innerHeight', 375);
+    Object.assign(f.chip, rect(261.515625, 321, 105.484375, 44));
+    f.readHeight.mockReturnValue(216);
+    // Conservative envelopes from the short-landscape layout: sonar/stick
+    // on the left, tutorial/contact in the centre, mission/telemetry and
+    // actions on the right. Pause splits the space above the tutorial.
+    const obstacles = [
+      rect(12, 12, 144, 239),
+      rect(16, 255, 108, 104),
+      rect(168, 58, 229, 142),
+      rect(168, 206, 229, 103),
+      rect(405, 12, 250, 100),
+      rect(417, 120, 238, 60),
+      rect(411.8, 187, 172, 172),
+      rect(591, 219, 60, 140),
+      rect(667 * 0.34, 6.4, 48, 48),
+    ];
+    vi.stubGlobal('document', {
+      querySelectorAll: () =>
+        obstacles.map((box) => ({
+          getClientRects: () => [box],
+          getBoundingClientRect: () => box,
+        })),
+    });
+    // The old padded search cannot place a panel, leaving its CSS auto
+    // position below the credit chip (y=365 in the external failure).
+    expect(
+      placeDataCredits(rect(12, 12, 643, 351), f.chip, [...obstacles, f.chip], 400, 218),
+    ).toBeNull();
+    f.hud.layoutDataCredits();
+    assertClear(f.slot(), rect(4, 4, 659, 367), [...obstacles, f.chip]);
+    const first = f.slot();
+    f.hud.layoutDataCredits();
+    expect(f.slot()).toEqual(first);
+    expect(f.readHeight).toHaveBeenCalledOnce();
+    // Once the mission panels clear, prefer the normal spacing and full
+    // reading width again instead of retaining the cramped fallback.
+    obstacles.splice(0);
+    f.hud.layoutDataCredits();
+    assertClear(f.slot(), rect(12, 12, 643, 351), [f.chip]);
+    expect(f.slot().right - f.slot().left).toBe(400);
+    expect(f.readHeight).toHaveBeenCalledTimes(2);
+  });
+
   it('caches steady geometry and responds to a toast appearing and disappearing', () => {
     const f = hudFixture();
     f.hud.layoutDataCredits();

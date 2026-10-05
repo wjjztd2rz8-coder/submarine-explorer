@@ -234,13 +234,25 @@ export class HUD {
     const width = Math.min(400, innerWidth - 24);
     panel.style.width = `${width}px`;
     const height = panel.scrollHeight + 2;
-    const slot = placeDataCredits(
-      { left: 12, top: 12, right: innerWidth - 12, bottom: innerHeight - 12 },
-      anchor,
-      obstacles,
-      width,
-      height,
-    );
+    const slot =
+      placeDataCredits(
+        { left: 12, top: 12, right: innerWidth - 12, bottom: innerHeight - 12 },
+        anchor,
+        obstacles,
+        width,
+        height,
+      ) ??
+      placeDataCredits(
+        // A short mission at enlarged UI scale can exhaust the padded slots.
+        // Use tighter margins before leaving the panel at its offscreen auto
+        // position; keep the same reading size and avoid every HUD obstacle.
+        { left: 4, top: 4, right: innerWidth - 4, bottom: innerHeight - 4 },
+        anchor,
+        obstacles,
+        width,
+        height,
+        4,
+      );
     if (!slot) return;
     panel.style.left = `${slot.left}px`;
     panel.style.top = `${slot.top}px`;

@@ -16,8 +16,9 @@ export function placeDataCredits(
   obstacles: readonly CreditsRect[],
   preferredWidth: number,
   preferredHeight: number,
+  /** Minimum obstacle clearance in CSS pixels; crowded HUDs can use a tighter gap. */
+  gap = 8,
 ): CreditsRect | null {
-  const gap = 8;
   const minWidth = 120;
   const minHeight = 48;
   const lefts = new Set([

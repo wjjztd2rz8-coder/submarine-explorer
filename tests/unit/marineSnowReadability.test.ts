@@ -354,7 +354,9 @@ describe('460/570 marine snow readability at all shipped sites and tiers', () =>
           ] as const) {
             position.set(pose.x, pose.y, pose.z);
             const rig = new CameraRig(config.camera, 16 / 9, terrain);
-            if (opening === 'free' && pose.chaseRadius) rig.chaseRadius = pose.chaseRadius;
+            if (opening === 'free' && pose.chaseOffsetY !== undefined)
+              rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
+            else if (opening === 'free' && pose.chaseRadius) rig.chaseRadius = pose.chaseRadius;
             rig.snap(position, pose.yaw, 0);
             const atmo = sampleAtmosphere(config.water, rig.camera.position.y);
             presets.update(0, 0, atmo, rig.camera, 720, 0);

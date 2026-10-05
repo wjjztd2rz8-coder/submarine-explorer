@@ -14,6 +14,18 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-VERIFY-650 credits gate follow-up: if the normal padded credits
+  slot is exhausted, retry with 4 px viewport margins and HUD gaps while
+  retaining the 120×48 minimum reading area and all obstacle checks. Reason:
+  the 667×375 Beebe mission at 150% UI scale had no slot with 12 px margins
+  and 8 px gaps, leaving the panel below its chip and offscreen. Preserve the
+  existing browser containment, overlap and Escape assertions.
+- Phase F, F-VERIFY-650: level only Beebe's 54 m opening chase arm by changing
+  its vertical offset from -16 m to -38 m. Reason: the lone nearby scan
+  contact projected inside the submarine silhouette at desktop, landscape
+  and portrait aspects, with detailed hull geometry blocking its sightline.
+  Surveyed-terrain regressions now check the complete reticle, hull framing
+  and Reset camera at all four tiers. Retain all other Beebe pose settings.
 - Phase F, F-BEEBE-MONTEREY: Beebe Vent Field opens with a shorter, lower chase
   arm (54 m, -16 m offset) so the sub fills the frame beside a lit smoker.
   Monterey wall boulders are now fractured, stretched, banded blocks and the
