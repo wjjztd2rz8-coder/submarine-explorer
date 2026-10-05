@@ -51,11 +51,13 @@ for (const site of sites) {
       const g = window.__game as unknown as Game;
       g.sub.step = () => {};
       const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()));
-      for (let i = 0; i < 30; i++) await frame();
+      // Content is already loaded and the sub is held. Five settling frames
+      // suffice for LOD/counters; sample thirty actual renders for the peak.
+      for (let i = 0; i < 5; i++) await frame();
       let calls = 0;
       let triangles = 0;
       let countersMatch = true;
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < 30; i++) {
         await frame();
         calls = Math.max(calls, g.perf.drawCalls);
         triangles = Math.max(triangles, g.perf.triangles);

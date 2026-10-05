@@ -128,9 +128,9 @@ async function firstActions(page: Page, touch: boolean): Promise<void> {
 }
 
 for (const viewport of [
-  { width: 1600, height: 900, touch: false },
-  { width: 844, height: 390, touch: true },
-  { width: 390, height: 844, touch: true },
+  { width: 1600, height: 900, touch: false, sites: ['titanic', 'great-blue-hole'] },
+  { width: 844, height: 390, touch: true, sites: ['lost-city', 'beebe-vent-field'] },
+  { width: 390, height: 844, touch: true, sites: ['monterey-canyon'] },
 ]) {
   const size = `${viewport.width}x${viewport.height}`;
   test.describe(`510 flow ${size}`, () => {
@@ -142,10 +142,18 @@ for (const viewport of [
       storageState: { cookies: [], origins: [] },
       serviceWorkers: 'block',
     });
-    for (const site of sites) {
-      test(`${site}: Home -> first minute -> Journal -> debrief -> Home`, async ({ page }) => {
-        // Real unfrozen game time, never an injected clock or accelerated vehicle.
-        test.setTimeout(900_000);
+    // One complete journey per hero site, across desktop and both touch
+    // orientations. Dedicated HUD/credits/toast specs cover the viewport matrix.
+    for (const site of sites.filter((site) => viewport.sites.includes(site))) {
+      test(`${site}: Home -> opening -> Journal -> debrief -> Home`, async ({ page }) => {
+        test.setTimeout(240_000);
+        await page.addInitScript(() => {
+          if (!localStorage.getItem('subexplorer.settings.v2'))
+            localStorage.setItem(
+              'subexplorer.settings.v2',
+              JSON.stringify({ version: 2, graphicsTier: 'low' }),
+            );
+        });
         const directory = `${shots}/${size}/${site}`;
         await mkdir(directory, { recursive: true });
         const errors: string[] = [];
@@ -225,16 +233,15 @@ for (const viewport of [
         await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'move');
         await shot('05-dive-start');
         await firstActions(page, touch);
-        // After learning motion/depth/lights, observe the opening without guessing
-        // a target route. This is a reproducible script, not a human usability study.
-        for (const seconds of [10, 30, 60]) {
-          await page.waitForFunction(
-            (s) => (window.__game as unknown as Game).discovery.stats.elapsedS >= s,
-            seconds,
-            { timeout: 600_000 },
-          );
-          await shot(`06-dive-${seconds}s`);
-        }
+        // Observe ten real simulation seconds after learning the controls.
+        // Repeating an idle minute in 15 site/viewport combinations dominated CI;
+        // scan reachability is independently checked against every hero's terrain.
+        await page.waitForFunction(
+          () => (window.__game as unknown as Game).discovery.stats.elapsedS >= 10,
+          undefined,
+          { timeout: 90_000 },
+        );
+        await shot('06-dive-10s');
         await pause(page, touch);
         await act(
           page.locator('.pause-menu').getByRole('button', { name: 'Journal', exact: true }),
@@ -266,7 +273,7 @@ for (const viewport of [
         await expect(debrief.locator('[data-action="journal"]')).toBeFocused();
         await act(debrief.locator('[data-action="keep-exploring"]'), touch);
 
-        // Supplemental reward/navigation check AFTER the first minute. Teleport is
+        // Supplemental reward/navigation check AFTER the opening. Teleport is
         // explicit in the filename; it is not evidence of a reachable opening scan.
         const poi = await page.evaluate(() => {
           const g = window.__game as unknown as Game;

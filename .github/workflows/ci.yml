@@ -1,5 +1,5 @@
 # Continuous integration: every gate in `npm run ci`, split across parallel jobs.
-# One software-rendering browser per runner; shard individual tests, not files.
+# One software-rendering browser per runner; balance individual tests by duration.
 name: CI
 
 on:
@@ -66,6 +66,7 @@ jobs:
         shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     env:
       CI: true
+      PLAYWRIGHT_JSON_OUTPUT_FILE: test-results/e2e-timings.json
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -96,13 +97,21 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: End-to-end tests (Playwright)
-        # Test-level sharding balances large specs without software-GPU contention.
+        # Duration balancing spreads expensive cases across the existing 20 jobs.
         # Finish every test in the shard so one failure does not hide later failures.
         # The suite budget permits a graceful failure/report before the job deadline.
         run: >-
-          npm run test:e2e -- --reporter=list,html --workers=1 --fully-parallel
-          --shard=${{ matrix.shard }}/${{ strategy.job-total }}
-          --global-timeout=1560000
+          node tools/e2e-shards.mjs ${{ matrix.shard }}/${{ strategy.job-total }}
+          --reporter=list,json,html --global-timeout=900000
+
+      - name: Upload e2e timings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-timings-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
+          path: test-results/e2e-timings.json
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Upload e2e screenshots and report
         if: failure()

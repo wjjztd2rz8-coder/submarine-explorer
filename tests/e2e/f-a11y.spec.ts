@@ -162,9 +162,7 @@ test('standalone globe is keyboard reachable', async ({ page }) => {
   await cycle(page, page.locator('.globe:not(.is-embedded)'));
 });
 
-test('briefing, pause details, controls, globe, photo and debrief remain keyboard reachable', async ({
-  page,
-}) => {
+test('briefing controls and cancellation remain keyboard reachable', async ({ page }) => {
   await boot(page, '/?mission=titanic&tier=low');
   const briefing = page.locator('.briefing');
   await cycle(page, briefing);
@@ -176,6 +174,11 @@ test('briefing, pause details, controls, globe, photo and debrief remain keyboar
   await page.keyboard.press('Escape');
   await expect(briefing).toBeHidden();
   await expect(page.locator('.home-screen')).toBeVisible();
+});
+
+// Keep the complete Tab walks, but give each panel family an independent
+// browser context/budget so one long catalogue cannot exhaust a monolithic test.
+test('pause details and mission selection remain keyboard reachable', async ({ page }) => {
   await boot(page, '/?mission=titanic&tier=low&skipBriefing=1');
   await page.keyboard.press('Escape');
   const pause = page.locator('.pause-menu');
@@ -195,6 +198,12 @@ test('briefing, pause details, controls, globe, photo and debrief remain keyboar
     await page.keyboard.press('Escape');
     await expect(page.locator('.pause-actions')).toBeVisible();
   }
+});
+
+test('controls and Journal cycle focus and restore their pause opener', async ({ page }) => {
+  await boot(page, '/?mission=titanic&tier=low&skipBriefing=1');
+  await page.keyboard.press('Escape');
+  const pause = page.locator('.pause-menu');
   const controls = pause.getByRole('button', { name: 'Controls', exact: true });
   await controls.focus();
   await page.keyboard.press('Enter');
@@ -214,6 +223,13 @@ test('briefing, pause details, controls, globe, photo and debrief remain keyboar
   await expect(journal).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(pause).toBeHidden();
+});
+
+test('photo, HUD and debrief remain keyboard reachable with accessible contrast', async ({
+  page,
+}) => {
+  await boot(page, '/?mission=titanic&tier=low&skipBriefing=1');
+  const pause = page.locator('.pause-menu');
   await page.keyboard.press('p');
   await expect(page.locator('.photo-mode')).toBeVisible();
   await cycle(page, page.locator('.photo-mode'));

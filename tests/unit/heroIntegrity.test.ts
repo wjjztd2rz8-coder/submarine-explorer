@@ -247,7 +247,7 @@ describe('hero-site spawn, placement and scan integrity', () => {
         } finally {
           terrain.dispose();
         }
-      });
+      }, 15_000); // Real terrain and every rendered vertex can exceed the hosted CPU's 5s default.
     }
   }
 });

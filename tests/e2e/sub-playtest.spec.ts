@@ -179,21 +179,36 @@ test.describe('A3 submarine feel', () => {
   }) => {
     await page.goto('/?tile=titanic&depth=3700', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
-    await page.waitForTimeout(500);
+    await processedFrames(page);
 
     // Turn to starboard from north until the HUD heading reads ~90 deg.
     await page.keyboard.down('d');
+    try {
+      await page.waitForFunction(
+        () => {
+          const g = window.__game as { sub: { getState(): { headingDeg: number } } };
+          const h = g.sub.getState().headingDeg;
+          return h > 75 && h < 180;
+        },
+        undefined,
+        { timeout: 60_000 },
+      );
+    } finally {
+      await page.keyboard.up('d');
+    }
+    // Wait for actual rotational settling rather than 1.5 wall seconds on a
+    // software renderer. Preserve the heading and camera-side assertions below.
     await page.waitForFunction(
       () => {
-        const g = window.__game as { sub: { getState(): { headingDeg: number } } };
-        const h = g.sub.getState().headingDeg;
-        return h > 75 && h < 180;
+        const g = window.__game as {
+          sub: { yawRate: number; position: { x: number } };
+          rig: { camera: { position: { x: number } } };
+        };
+        return Math.abs(g.sub.yawRate) < 0.01 && g.rig.camera.position.x < g.sub.position.x;
       },
       undefined,
-      { timeout: 15_000 },
+      { timeout: 60_000 },
     );
-    await page.keyboard.up('d');
-    await page.waitForTimeout(1500); // rotation coasts a little, then the camera settles
 
     const r = await page.evaluate(() => {
       type V = { x: number; y: number; z: number };
