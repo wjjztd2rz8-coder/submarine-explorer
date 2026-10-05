@@ -28,7 +28,7 @@ for (const viewport of [
       .toBe(true);
     await expect(page.locator('.home-screen')).toHaveClass(/has-title-scene/);
     await expect(page).toHaveTitle('Bathyline');
-    await expect(page.locator('.home-screen h1')).toHaveText('Journal');
+    await expect(page.locator('.home-screen h1')).toHaveText('Bathyline');
     await expect(page.locator('.home-mark')).toHaveAttribute('aria-hidden', 'true');
     await expect(page.locator('.home-screen')).not.toContainText(
       /Submarine Explorer|illustrative|reconstructed/i,
@@ -184,7 +184,7 @@ test('favicon at tab size and social card', async ({ page, request }) => {
   await preview.locator('#tab-title').evaluate((el, title) => {
     el.textContent = title;
   }, title);
-  await expect(preview.locator('#tab-title')).toHaveText('Journal');
+  await expect(preview.locator('#tab-title')).toHaveText('Bathyline');
   await preview.locator('img').evaluate((img) => (img as HTMLImageElement).decode());
   await preview.screenshot({ path: `${shots}/favicon-tab-preview.png` });
 
