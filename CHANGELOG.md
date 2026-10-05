@@ -14,6 +14,19 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BEEBE-FRAMING-680 gate follow-up: keep Beebe's hull facing the
+  vents within the existing 0.98 facing guard by using an 11° heading offset,
+  a -10 m lateral chase offset and a 76 m approach. Reason: the 24° turn cleared
+  the chimney but pointed the hull away from its target. Preserve the original
+  browser assertions and add facing coverage to the framing regression test.
+- Phase F, F-BEEBE-FRAMING-680: turn Beebe's opening hull farther off the main
+  smoker and tilt the short chase arm toward its seabed so the chimney clears
+  the hull at desktop and portrait aspect ratios. Add a Beebe-only, vertex-coloured
+  sediment apron with muted warm mineral patches and scattered sulfide rubble
+  using the existing terrain and talus helpers. Reason: f27 hid the nearest
+  chimney and left its surroundings dark and flat. Ambient fill and HUD are
+  unchanged; fresh browser captures remain blocked by this sandbox.
+  Validation and capture paths: `plan/progress/F-BEEBE-FRAMING-680.md`.
 - Phase F, F-BEEBE-MONTEREY: Beebe Vent Field opens with a shorter, lower chase
   arm (54 m, -16 m offset) so the sub fills the frame beside a lit smoker.
   Monterey wall boulders are now fractured, stretched, banded blocks and the
