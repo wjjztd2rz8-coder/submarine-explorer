@@ -2,6 +2,12 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-05 targeted review (trigger: CI red x3)
+
+- **Diagnosis:** two stacked causes. Prettier failed on `plan/OVERNIGHT-LOG.md` and `plan/PROCESS-LOG.md` (fixed). Codex 640's shard rebalance and race fixes were never merged; I merged them (conflict only in PROCESS-LOG). Its first hosted run still failed in 12/20 shards: `--global-timeout=900000` cut each shard at 15 min ("10 did not run"), and one 240 s test timeout per shard (f-save-soak, f-flow-audit-510, f-bughunt-18, f-a11y globe, atmosphere). The hosted runner is ~2x slower than the timing file assumed.
+- **Fix pushed:** global timeout 25 min. Brief 730 queued for Codex to read the next hosted run, fix leftover test races and recalibrate `tools/e2e-timings.json`. If the run after 5c8a400 is still red, shard count or the heavy soak/flow tests need trimming.
+- **Needs owner:** none.
+
 ## 2026-10-05 comprehensive review (trigger: tag f27 / Claude idle; golden set 2026-10-05-054554)
 
 **Changed since the last review (f25):** f26/f27 merged Codex 570 (thinner Titanic snow), 580 (credits and licence hit fix), 560 and Claude's Beebe/Monterey package (nearer Beebe pose, fractured Monterey boulders). Seven finished Codex packages (590-650) sit pre-merged in integration worktree 660, which is still going green; 670/680 are running.
