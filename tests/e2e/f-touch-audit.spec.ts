@@ -274,8 +274,11 @@ for (const viewport of [
         await reachable(journal.locator('.jr-spoilers'));
         await journal.locator('.jr-spoilers').tap();
         await expect(journal.getByRole('checkbox')).toBeChecked();
+        const contents = journal.locator('.jr-contents-toggle');
+        if (await contents.isVisible()) await contents.tap();
         await reachable(journal.locator('.jr-nav-item').first());
         await reachable(journal.locator('.jr-nav-item').last());
+        if (await contents.isVisible()) await contents.tap();
         const site = journal.locator('.jr-site-card[data-target="titanic"]');
         await reachable(site);
         await site.tap();

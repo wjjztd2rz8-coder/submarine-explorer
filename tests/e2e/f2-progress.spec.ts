@@ -155,7 +155,7 @@ test('new researcher earns RP, buys a live upgrade and earns a three-star dive',
   const debrief = page.locator('.mission-debrief');
   await expect(debrief).toBeVisible();
   await expect(debrief.locator('.debrief-stars')).toHaveAttribute('aria-label', '3 of 3 stars');
-  await expect(debrief.locator('.debrief-rating')).toContainText('160 RP earned this dive');
+  await expect(debrief.locator('.debrief-rating')).toContainText('160 research points earned');
   await shot(page, 'debrief');
   await page.evaluate(() =>
     (window.__game as { save: { setGameplayMode(mode: 'realistic'): void } }).save.setGameplayMode(

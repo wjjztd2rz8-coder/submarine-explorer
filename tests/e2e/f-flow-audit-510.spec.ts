@@ -66,6 +66,14 @@ async function closeJournal(page: Page, touch: boolean): Promise<void> {
   await expect(page.locator('.journal')).toBeHidden();
 }
 
+async function checkJournalNavigation(journal: Locator, site: string): Promise<void> {
+  const contents = journal.locator('.jr-contents-toggle');
+  if (await contents.isVisible()) await contents.click();
+  await contained(journal.locator('.jr-nav'));
+  await contained(journal.locator(`.jr-nav-item[data-target="${site}"]`));
+  if (await contents.isVisible()) await contents.click();
+}
+
 /** Native touch gestures through Chromium, including pointer capture and release. */
 async function holdTouchUntilStep(
   page: Page,
@@ -251,10 +259,9 @@ for (const viewport of [
         await expect(journal.locator('.jr-body .jr-locked')).toBeVisible();
         await expect(journal.locator('.jr-body .is-undiscovered')).toHaveText('No scans logged');
         await contained(journal.locator('.jr-header'));
-        await contained(journal.locator('.jr-nav'));
         await contained(journal.locator('.jr-body'));
         // Check the long current-site label plus THIS DIVE count in its actual column.
-        await contained(journal.locator(`.jr-nav-item[data-target="${site}"]`));
+        await checkJournalNavigation(journal, site);
         await shot('07-journal-unscanned');
         await closeJournal(page, touch);
         await expect(page.locator('.pause-menu')).toBeVisible();
@@ -311,8 +318,8 @@ for (const viewport of [
         await expect
           .poll(() => page.evaluate(() => (window.__game as unknown as Game).journal.selectedId))
           .toBe(poi.entry);
-        await contained(journal.locator('.jr-nav'));
         await contained(journal.locator('.jr-body'));
+        await checkJournalNavigation(journal, site);
         await shot('11-journal-assisted-scan');
         await journal.locator('.jr-body').evaluate((e) => (e.scrollTop = e.scrollHeight));
         if (size === '844x390')

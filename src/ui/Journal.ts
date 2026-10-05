@@ -17,7 +17,6 @@
  * re-exports this class under its old name.
  */
 
-import { APP_NAME } from '../core/Brand.js';
 import type { GameEvents } from '../core/EventBus.js';
 import type { GuideEntry } from '../game/Guide.js';
 import {
@@ -52,9 +51,9 @@ export interface FieldGuideContent {
 
 /** The statement the front page makes once, instead of per-entry caveats. */
 export const JOURNAL_HONESTY =
-  'Dives start with real survey data. Scenic landforms, wrecks, structures and scan markers ' +
-  'are recreations from published sources; their entries carry a Recreation tag. Animal encounters are staged; ' +
-  'species lists use OBIS survey records. Secrets are game additions.';
+  'Dives use real survey data. Recreation tags mark plausible landforms, wrecks, structures and ' +
+  'scan markers based on published sources. Animal encounters are staged; species lists use OBIS ' +
+  'survey records. Secrets carry a Game addition tag.';
 
 type View =
   | { kind: 'front' }
@@ -93,6 +92,7 @@ export class Journal {
   private readonly countEl: HTMLSpanElement;
   private readonly spoilerBox: HTMLInputElement;
   private readonly nav: HTMLElement;
+  private readonly contentsToggle: HTMLButtonElement;
   private readonly body: HTMLDivElement;
   private readonly footer: HTMLDivElement;
   private readonly trap: FocusTrap;
@@ -103,6 +103,7 @@ export class Journal {
   private currentSiteId: string | null = null;
   private homeMode = false;
   private spoilers_ = false;
+  private contentsOpen = false;
   private view: View = { kind: 'front' };
   private pendingFocus: string | null = null;
   private open_ = false;
@@ -126,7 +127,7 @@ export class Journal {
     const panel = el('div', 'jr-panel');
     const header = el('div', 'jr-header');
     const heading = el('div', 'jr-heading');
-    heading.append(el('span', 'jr-kicker', APP_NAME));
+    heading.append(el('span', 'jr-kicker', 'Journal'));
     this.crumbEl = el('span', 'jr-crumb');
     heading.append(this.crumbEl);
     this.countEl = el('span', 'jr-count');
@@ -135,15 +136,27 @@ export class Journal {
     this.spoilerBox.type = 'checkbox';
     this.spoilerBox.addEventListener('change', () => this.setSpoilers(this.spoilerBox.checked));
     spoiler.append(this.spoilerBox, el('span', undefined, 'Show spoilers'));
-    const close = el('button', 'jr-close', 'ESC  CLOSE');
+    const close = el('button', 'jr-close', 'Close');
     close.type = 'button';
+    close.title = 'Close Journal (Esc)';
     close.addEventListener('click', () => this.close());
-    header.append(heading, this.countEl, spoiler, close);
+    this.contentsToggle = el('button', 'jr-contents-toggle', 'Contents');
+    this.contentsToggle.type = 'button';
+    this.contentsToggle.setAttribute('aria-controls', 'journal-contents');
+    this.contentsToggle.setAttribute('aria-expanded', 'false');
+    this.contentsToggle.addEventListener('click', () => {
+      this.setContentsOpen(!this.contentsOpen);
+    });
+    header.append(heading, close, this.countEl, spoiler, this.contentsToggle);
 
     const main = el('div', 'jr-main');
     this.nav = el('nav', 'jr-nav');
+    this.nav.id = 'journal-contents';
     this.nav.setAttribute('aria-label', 'Journal contents');
     this.body = el('div', 'jr-body');
+    this.body.tabIndex = -1;
+    this.body.setAttribute('role', 'region');
+    this.body.setAttribute('aria-label', 'Journal article');
     main.append(this.nav, this.body);
     this.footer = el('div', 'jr-footer');
     panel.append(header, main, this.footer);
@@ -257,6 +270,7 @@ export class Journal {
    * just logged, else the front page from home, else the current site's page.
    */
   open(entryId?: string): void {
+    this.contentsOpen = false;
     const focus = entryId ?? this.pendingFocus;
     this.pendingFocus = null;
     const site = this.currentSiteId;
@@ -296,6 +310,7 @@ export class Journal {
 
   /** Show the front page, a site page (site id) or an entry (entry key). */
   show(target: 'front' | string): void {
+    this.contentsOpen = false;
     if (target === 'front') this.view = { kind: 'front' };
     else if (target === 'photos') this.view = { kind: 'photos' };
     else if (this.sites.some((s) => s.id === target)) this.view = { kind: 'site', siteId: target };
@@ -303,6 +318,11 @@ export class Journal {
     this.render();
     this.announce();
     this.body.scrollTop = 0;
+  }
+
+  private setContentsOpen(open: boolean): void {
+    this.contentsOpen = open;
+    this.render();
   }
 
   /** The focus id may be a site-level entry rather than a POI one. */
@@ -342,6 +362,10 @@ export class Journal {
     const inside = !!focused && this.root.contains(focused);
     this.renderContent();
     if (inside && !focused?.isConnected) {
+      if (!this.contentsOpen && window.matchMedia('(max-width: 760px)').matches) {
+        this.body.focus({ preventScroll: true });
+        return;
+      }
       const replacement = [...this.nav.querySelectorAll<HTMLButtonElement>('[data-target]')].find(
         (button) => button.dataset.target === target,
       );
@@ -354,6 +378,8 @@ export class Journal {
   }
 
   private renderContent(): void {
+    this.root.classList.toggle('contents-open', this.contentsOpen);
+    this.contentsToggle.setAttribute('aria-expanded', String(this.contentsOpen));
     const sites = this.orderedSites();
     let logged = 0;
     let total = 0;
@@ -401,6 +427,7 @@ export class Journal {
     b.type = 'button';
     b.dataset.target = target;
     b.classList.toggle('is-selected', on);
+    if (on) b.setAttribute('aria-current', 'page');
     b.append(el('span', 'jr-nav-title', label));
     if (meta) b.append(el('span', 'jr-nav-meta', meta));
     b.addEventListener('click', () => this.show(target));
@@ -471,7 +498,13 @@ export class Journal {
           hidden++;
           continue;
         }
-        const title = open || this.spoilers_ ? e.title : 'Undiscovered';
+        // Distinguish locked targets without revealing their authored names.
+        const title =
+          open || this.spoilers_
+            ? e.title
+            : e.kind === 'poi'
+              ? `Unscanned target ${list.indexOf(e) + 1}`
+              : 'Undiscovered';
         const li = this.navButton(title, '', `is-entry is-${e.kind}`, e.key, e === current);
         li.classList.toggle('is-locked', !open);
         ul.append(li);
@@ -606,7 +639,7 @@ export class Journal {
     if (entry.kind === 'species' && !entry.species?.commonName) title.classList.add('is-latin');
     titleRow.append(title);
     if (entry.kind === 'secret') titleRow.append(el('span', 'jr-tag', 'Game addition'));
-    if (entry.recreation) titleRow.append(el('span', 'jr-tag is-recreation', 'Recreation'));
+    else if (entry.recreation) titleRow.append(el('span', 'jr-tag is-recreation', 'Recreation'));
     if (!open) titleRow.append(el('span', 'jr-tag is-undiscovered', 'Undiscovered'));
     b.append(titleRow);
     if (entry.kind === 'life' && entry.life) {
