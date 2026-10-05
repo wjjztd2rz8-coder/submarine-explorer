@@ -70,8 +70,10 @@ async function clearCredits(page: Page, open: boolean): Promise<void> {
 
 for (const layout of [
   { name: 'desktop', width: 1280, height: 720, touch: false },
+  { name: 'desktop-650', width: 1600, height: 900, touch: false },
   { name: 'portrait', width: 360, height: 640, touch: true },
   { name: 'landscape', width: 844, height: 390, touch: true },
+  { name: 'short-landscape', width: 667, height: 375, touch: true },
 ]) {
   test.describe(`530 credits ${layout.name}`, () => {
     test.use({
