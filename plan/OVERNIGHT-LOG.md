@@ -459,3 +459,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 ## 2026-10-05 02:06 targeted review (CI red x3)
 
 - Merged Codex 640 (CI shard rebalance), fixed Prettier, raised e2e global timeout to 25 min; see REVIEWS.md. Queued brief 730 (verify CI shards); queue now 3 briefs. Hosted CI result after 5c8a400 pending. No owner decisions.
+
+## 2026-10-05 02:47 headless run
+
+- Merged and pushed Codex 660 integration batch (590 dropped, 600/610/620/630/650 in) as f28; full e2e and project-base passed in the worktree after merging main; shots reviewed (Lost City banding, Blue Hole readable). Worktrees 590-660 removed.
+- Running: Codex 690, 700, 710. Finished but unmerged: 670 (Titanic horizon), 680 (Beebe framing) worktrees. Queue: 720, 730, 740.
+- No Claude agents launched (weekly ~13%). Problem: my first foreground full-e2e timed out and left a preview server on its port; use background runs. No owner decisions.
