@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-05 comprehensive review (trigger: tag f27 / Claude idle; golden set 2026-10-05-054554)
+
+**Changed since the last review (f25):** f26/f27 merged Codex 570 (thinner Titanic snow), 580 (credits and licence hit fix), 560 and Claude's Beebe/Monterey package (nearer Beebe pose, fractured Monterey boulders). Seven finished Codex packages (590-650) sit pre-merged in integration worktree 660, which is still going green; 670/680 are running.
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5:**
+
+| Site            | Score       | Change | Biggest gap                                                                    |
+| --------------- | ----------- | ------ | ------------------------------------------------------------------------------ |
+| Titanic         | 4/4/5/4/5/4 | same   | Hull and snow now good; sky above a hard horizon band is near-black (670)      |
+| Beebe           | 4/4/4/4/5/4 | +      | Seabed warmer and lit; sub now hides the nearest chimney (680)                 |
+| Great Blue Hole | 3/3/4/3/5/4 | -0.5   | Flat orange wall, scan target 203 m away, toast and scan card stack at the top |
+| Lost City       | 4/4/4/3/5/3 | same   | Tower carbonate reads smooth; base life sparse (600/710)                       |
+| Monterey        | 4/4/4/3/5/3 | +      | Fractured boulders and wall life read well; fish sparse, wall still dark       |
+
+**Play flow:** not observed. 620's audit has no screenshots because Codex sandboxes cannot start a browser (listen EPERM). Source findings: key strip lingers too long, "Survey" wording, nav and waypoint can pick different targets, tutorial may ask for lights while a scan is ready (all but the last two fixed in 620). A real Claude-side capture pass is backlog item 2.
+
+**Process:** efficiency.sh shows Claude idle 43 h and Codex under-used 39 h, caused by the weekly pacing gate skipping 83 runs and an empty Codex queue (already addressed in PROCESS-LOG 2026-10-05 00:20: Codex integrates, pacing relaxed). Watchdog tripped 29 times, all recovering. Codex pass rate 85/91. New process lesson: Codex cannot verify visuals, so every Codex UI package still needs a Claude screenshot review. Queue holds 690, 700, 710; three more candidates are listed in DIRECTOR.
+
+**New priorities:** see DIRECTOR.md (land 660 batch, real first-minute capture, Blue Hole opening, Beebe, Lost City, Journal polish).
+
+**Needs owner:** nothing.
+
 ## 2026-10-04 comprehensive review (trigger: tag f25; golden set 2026-10-04-094934)
 
 **Changed since the last review (f24):** only Codex 550 (toast stacks under the scan target) and the CI shard/timeout fix. Golden set is otherwise unchanged, so scores are the same as the f24 entry below (Titanic 4/4/5/4/5/4, Beebe 4/4/4/4/5/4, Blue Hole 4/4/4/4/5/4, Lost City 4/4/4/3/5/3, Monterey 4/4/4/3/5/3).
