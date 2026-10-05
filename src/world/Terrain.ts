@@ -171,6 +171,27 @@ export class Terrain {
     this.stats = this.build(config, tier, subdiv, built.textureSize);
     this.stats.requestedSubdiv = requested;
 
+    if (this.biome.vertexTint) {
+      // Only Lost City opts in. Reuse every LOD's existing vertices and draw calls.
+      built.material.vertexColors = true;
+      (built.material.userData.uniforms.uStrata.value as THREE.Vector2).y = 0;
+      for (const chunk of this.chunks) {
+        const position = chunk.geometry.getAttribute('position');
+        const normal = chunk.geometry.getAttribute('normal');
+        const colors = new Float32Array(position.count * 3);
+        for (let i = 0; i < position.count; i++) {
+          const tint = this.biome.vertexTint(
+            position.getX(i),
+            position.getY(i) / this.exaggeration,
+            position.getZ(i),
+            normal.getY(i),
+          );
+          colors.set(tint, i * 3);
+        }
+        chunk.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      }
+    }
+
     const normal = new THREE.Vector3();
     this.scatter = new Scatter({
       ground: {

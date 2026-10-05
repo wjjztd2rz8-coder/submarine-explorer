@@ -14,6 +14,14 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-LOSTCITY-600: Lost City slopes and carbonate chimneys get broader,
+  irregular beds in vertex colours, with gentle-slope coverage and restrained
+  pale/cool contrast. Three small coral/anemone clusters reuse existing models
+  at Poseidon's inactive base, rooted in the rendered apron and batched into
+  two instanced draws. Ambient fill stays at 16; terrain geometry is unchanged.
+  No cuts. Golden capture and rendered budget verification remain blocked by
+  the local sandbox's preview/browser restrictions; see the progress report.
+
 - Phase F, F-BLUEHOLE-PITCH: Openings can now tilt the chase camera (`chaseOffsetY`, a per-site
   vertical arm offset); the Great Blue Hole opening uses it and sits 22 m below the ledge, so
   the first frame looks down across the open water with the whole sub, the ledge, the surface
