@@ -80,6 +80,20 @@ without an entry here is not done.
   this environment's preview/Chromium permissions; findings and remaining checks
   are in `plan/progress/F-FIRSTMIN-620.md`. Reason: clear competing opening
   guidance while keeping the mission instruction visible.
+- Phase F, F-BUGHUNT-590 gate follow-up: compact supplies/current spacing
+  in the short landscape HUD so Realistic Surface telemetry clears the
+  ballast slider. Fix the five portrait scan tests to hold the native touch
+  Scan control; keyboard scanning had switched the UI to desktop input and
+  hidden Pause. Preserve every overlap, containment, scan, layout and frame
+  budget assertion; also require Realistic supplies/current to remain visible.
+- Phase F, F-BUGHUNT-590: correct the opening geometry regression to apply
+  the merged Blue Hole vertical chase offset; add actual-tile hull/near-plane
+  clearance checks at Low and High for Arcade/Realistic and both touch aspects.
+  Add focused browser checks for Blue Hole openings, Surface start, HUD/frame
+  budgets and scanned portrait Journal/debrief layouts at all five heroes.
+  Initial sandbox audit found no product bug. Browser and golden
+  verification remain pending browser-capable execution; evidence and rerun
+  commands: `plan/progress/F-BUGHUNT-590.md`.
 - Phase F, F-BLUEHOLE-PITCH: Openings can now tilt the chase camera (`chaseOffsetY`, a per-site
   vertical arm offset); the Great Blue Hole opening uses it and sits 22 m below the ledge, so
   the first frame looks down across the open water with the whole sub, the ledge, the surface
