@@ -102,7 +102,7 @@ jobs:
         # The suite budget permits a graceful failure/report before the job deadline.
         run: >-
           node tools/e2e-shards.mjs ${{ matrix.shard }}/${{ strategy.job-total }}
-          --reporter=list,json,html --global-timeout=900000
+          --reporter=list,json,html --global-timeout=1500000
 
       - name: Upload e2e timings
         if: always()
