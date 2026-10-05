@@ -1,10 +1,12 @@
 import { expect, test, type Page } from './unlocked.js';
 import type { GameContext } from '../../../src/app/context.js';
+import { waitForFrames } from './frames.js';
 
 type AuditGame = Pick<
   GameContext,
-  'home' | 'sub' | 'power' | 'progress' | 'save' | 'titleScene'
+  'home' | 'sub' | 'power' | 'progress' | 'save' | 'titleScene' | 'props' | 'discovery' | 'life'
 > & {
+  explore: { ready: boolean };
   mission: { elapsedS: number; emitted: unknown[] } | null;
   perf: { geometries: number; textures: number; sceneObjects: number };
 };
@@ -232,6 +234,12 @@ export function titleAudit(base = '/') {
     page,
   }) => {
     await boot(page, `${base}?tier=low`);
+    const contentReady = () => {
+      const g = window.__game as unknown as AuditGame;
+      return g.props.loaded && g.discovery.loaded && g.explore.ready && !!g.life;
+    };
+    await page.waitForFunction(contentReady);
+    await waitForFrames(page, 2);
     await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
     const initial = await gameplay(page);
     for (const key of ['w', 'Space', 'g', 'Shift']) {
@@ -241,6 +249,8 @@ export function titleAudit(base = '/') {
     }
     expect(await gameplay(page)).toEqual(initial);
     await boot(page, `${base}?mission=titanic&tier=low&skipBriefing=1`);
+    await page.waitForFunction(contentReady);
+    await waitForFrames(page, 2);
     await expect(page.locator('.home-screen')).toBeHidden();
     expect(await draws(page)).toBe(0);
     await page.keyboard.press('Escape');
@@ -256,6 +266,10 @@ export function titleAudit(base = '/') {
         page.evaluate(() => (window.__game as unknown as AuditGame).titleScene.terrainReady),
       )
       .toBe(true);
+    // terrainReady means the crop was installed, before the renderer uploads
+    // its buffers. Sample only after it has actually been presented; otherwise
+    // the next Journal close can look like a two-geometry leak.
+    await waitForFrames(page, 2);
     const perf = await page.evaluate(() => ({ ...(window.__game as unknown as AuditGame).perf }));
     for (let i = 0; i < 3; i++) {
       const before = await draws(page);
@@ -267,7 +281,7 @@ export function titleAudit(base = '/') {
       await page.keyboard.press('Escape');
       await expect.poll(() => draws(page)).toBeGreaterThan(before);
     }
-    await page.waitForTimeout(300);
+    await waitForFrames(page, 2);
     expect(await gameplay(page)).toEqual(paused);
     const after = await page.evaluate(() => ({ ...(window.__game as unknown as AuditGame).perf }));
     expect(after.geometries).toBe(perf.geometries);

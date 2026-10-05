@@ -5,6 +5,7 @@ import type { Life } from '../../src/world/life/Life.js';
 import type { ScanOverlay } from '../../src/ui/ScanOverlay.js';
 import type { PerspectiveCamera, Vector3 } from 'three';
 import { finishAnimations, holdFreshTips } from './helpers/hudTips.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
 const shots = '.cache/codex/shots/550-f-toast-placement';
 
@@ -79,9 +80,17 @@ for (const layout of [
       isMobile: layout.touch,
     });
 
-    for (const site of ['great-blue-hole', 'monterey-canyon']) {
+    // Both animal habitats remain covered. Geometry depends on viewport/scale;
+    // alternate habitats instead of repeating that matrix twice.
+    for (const site of [
+      layout.width === 1600 ||
+      layout.width === 390 ||
+      (layout.width === 844 && layout.scale === 150)
+        ? 'great-blue-hole'
+        : 'monterey-canyon',
+    ]) {
       test(`${site}: animal toast stays clear of HUD and can be dismissed`, async ({ page }) => {
-        await page.clock.install();
+        await pauseClockBeforeNavigation(page);
         await page.addInitScript((scale) => {
           localStorage.setItem(
             'subexplorer.settings.v2',
@@ -100,8 +109,10 @@ for (const layout of [
           `/?tile=${site}&skipBriefing=1&tier=low&lifeSeed=3${layout.touch ? '&touch=1' : ''}`,
           { waitUntil: 'domcontentloaded' },
         );
-        await page.waitForFunction(() => window.__gameReady === true);
-        await page.waitForFunction(() => (window.__game as unknown as Probe).life !== null);
+        await clockFramesUntil(
+          page,
+          () => window.__gameReady === true && !!(window.__game as unknown as Probe).life,
+        );
         await holdFreshTips(page);
         await finishAnimations(page, '.onboard-card');
         await expect(page.locator('.scan-panel')).toBeVisible();
@@ -139,6 +150,7 @@ for (const layout of [
         const skip = page.getByRole('button', { name: 'Skip tutorial', exact: true });
         if (layout.touch) await skip.tap();
         else await skip.click();
+        await page.clock.runFor(50);
         const hint = page.locator('.onboard-hint');
         await expect(page.locator('.onboard-card')).toBeHidden();
         await expect(hint).toContainText(
@@ -147,9 +159,8 @@ for (const layout of [
             : 'Animal nearby. Hold G to scan, or press P for a photo.',
         );
         await finishAnimations(page, '.onboard-hint');
-        // Freeze only after the real HUD has shown the message, so its nine
-        // second timeout cannot expire during screenshot/geometry round trips.
-        await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1000));
+        // The clock was paused before navigation; screenshots and geometry
+        // round trips cannot consume the real hint's nine-second lifetime.
         await screenshot(page, `${site}-${name}`);
         await separate(page, [...hud, '.scan-panel', '.onboard-hint', ...controls]);
         const target = (await page.locator('.scan-panel').boundingBox())!;

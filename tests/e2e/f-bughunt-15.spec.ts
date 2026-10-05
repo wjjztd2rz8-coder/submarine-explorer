@@ -67,8 +67,14 @@ for (const viewport of [
   test.describe(`hero touch HUD ${viewport.width}x${viewport.height}`, () => {
     test.use({ viewport, hasTouch: true, isMobile: true });
 
-    // Default UI at every hero; also exercise the larger preference at Beebe.
-    for (const hero of heroes) {
+    // Rotate the default UI across heroes; Beebe's long objectives exercise
+    // every touch breakpoint at both scales. Other HUD specs cover the full
+    // viewport matrix without repeating the complete tutorial at every site.
+    for (const hero of heroes.filter(
+      (hero, index) =>
+        hero.site === 'beebe-vent-field' ||
+        index % 3 === (viewport.width === 360 ? 0 : viewport.width === 390 ? 1 : 2),
+    )) {
       for (const uiScale of hero.site === 'beebe-vent-field' ? [100, 150] : [100]) {
         test(`${hero.site} ${uiScale}%: tutorial, contact and controls stay separate`, async ({
           page,

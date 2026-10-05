@@ -84,7 +84,9 @@ for (const viewport of [
       });
     });
 
-    for (const scale of [80, 100, 150]) {
+    // Stress every viewport at large UI; the smallest portrait/landscape also
+    // cover normal/minimum scale. Other HUD specs cover normal UI at larger sizes.
+    for (const scale of viewport.width === 360 || viewport.width === 667 ? [80, 100, 150] : [150]) {
       test(`fresh dive separates HUD and controls at ${scale}% UI`, async ({ page }, testInfo) => {
         await ready(page, dive);
         await page.evaluate((uiScale) => {
@@ -190,95 +192,104 @@ for (const viewport of [
     // 360×640 was added for the HUD audit; retain the existing menu matrix.
     if (viewport.width === 360) return;
 
-    test('Daily, expanded mode picker and menu exits are reachable by touch', async ({ page }) => {
-      await ready(page, '/?touch=1&tier=low');
-      const home = page.locator('.home-screen');
-      const menu = home.locator('.home-menu');
-      // The menu sits in the scrolling `.home-body` (F-TITLE-D); the scroller stays on screen.
-      expect((await home.locator('.home-body').boundingBox())!.height).toBeGreaterThan(300);
-      await separate(page, ['.home-copy', '.home-body']);
-      await expect(page.locator('.globe.is-embedded')).toBeHidden();
-      expect(
-        await menu
-          .locator(':scope > *')
-          .evaluateAll((elements) =>
-            elements.map((element) =>
-              element.classList.contains('daily-card')
-                ? 'Daily dive'
-                : element.classList.contains('mode-selector')
-                  ? 'Mode'
-                  : element.textContent,
-            ),
-          ),
-      ).toEqual([
-        'Continue',
-        'Dive sites',
-        'Free dive',
-        'Daily dive',
-        'Mode',
-        'Journal',
-        'Settings',
-        'Controls',
-        'Upgrades',
-      ]);
-      for (const name of ['Dive sites', 'Free dive']) {
-        const origin = menu.getByRole('button', { name, exact: true });
-        await reachable(origin);
-        await origin.tap();
-        await expect(home.locator('.home-sites h2')).toHaveText(name);
-        await expect(page.locator('.globe.is-embedded')).toBeVisible();
-        await separate(page, ['.home-globe-wrap', '.home-sites']);
-        const back = home.getByRole('button', { name: 'Back to menu' });
-        await reachable(back);
-        await back.tap();
+    // Full menu/Journal journeys run at 390x844 portrait and 667x375 landscape.
+    // The HUD and mission layout checks above still run at all four sizes.
+    if (viewport.width === 390 || viewport.width === 667) {
+      test('Daily, expanded mode picker and menu exits are reachable by touch', async ({
+        page,
+      }) => {
+        await ready(page, '/?touch=1&tier=low');
+        const home = page.locator('.home-screen');
+        const menu = home.locator('.home-menu');
+        // The menu sits in the scrolling `.home-body` (F-TITLE-D); the scroller stays on screen.
+        expect((await home.locator('.home-body').boundingBox())!.height).toBeGreaterThan(300);
+        await separate(page, ['.home-copy', '.home-body']);
         await expect(page.locator('.globe.is-embedded')).toBeHidden();
-        await expect(origin).toBeFocused();
-      }
-      const mode = home.locator('.mode-selector');
-      for (const radio of await mode.getByRole('radio').all()) await reachable(radio);
-      await mode.getByRole('radio', { name: 'Realistic' }).tap();
-      await expect(mode.getByRole('radio', { name: 'Realistic' })).toBeChecked();
-      const advanced = mode.getByRole('button', { name: 'Advanced' });
-      await advanced.tap();
-      for (const select of await mode.locator('select').all()) await reachable(select);
-      await mode.getByLabel('Currents', { exact: true }).selectOption('exaggerated');
-      await expect(mode.locator('.mode-custom-tag')).toBeVisible();
-      for (const name of ['Daily dive', 'Controls', 'Journal'])
-        await reachable(menu.getByRole('button', { name: new RegExp(name) }));
-      // Daily must launch even while the expanded picker is scrolled out of view.
-      await menu.getByRole('button', { name: /Daily dive/ }).tap();
-      await expect(page.locator('.briefing')).toBeVisible();
-      const briefing = page.locator('.briefing');
-      await briefing.getByRole('button', { name: 'Advanced' }).tap();
-      for (const select of await briefing.locator('.mode-advanced select').all())
-        await reachable(select);
-      await reachable(briefing.locator('.briefing-begin'));
-      await reachable(briefing.getByRole('button', { name: 'Free dive', exact: true }));
-    });
+        expect(
+          await menu
+            .locator(':scope > *')
+            .evaluateAll((elements) =>
+              elements.map((element) =>
+                element.classList.contains('daily-card')
+                  ? 'Daily dive'
+                  : element.classList.contains('mode-selector')
+                    ? 'Mode'
+                    : element.textContent,
+              ),
+            ),
+        ).toEqual([
+          'Continue',
+          'Dive sites',
+          'Free dive',
+          'Daily dive',
+          'Mode',
+          'Journal',
+          'Settings',
+          'Controls',
+          'Upgrades',
+        ]);
+        for (const name of ['Dive sites', 'Free dive']) {
+          const origin = menu.getByRole('button', { name, exact: true });
+          await reachable(origin);
+          await origin.tap();
+          await expect(home.locator('.home-sites h2')).toHaveText(name);
+          await expect(page.locator('.globe.is-embedded')).toBeVisible();
+          await separate(page, ['.home-globe-wrap', '.home-sites']);
+          const back = home.getByRole('button', { name: 'Back to menu' });
+          await reachable(back);
+          await back.tap();
+          await expect(page.locator('.globe.is-embedded')).toBeHidden();
+          await expect(origin).toBeFocused();
+        }
+        const mode = home.locator('.mode-selector');
+        for (const radio of await mode.getByRole('radio').all()) await reachable(radio);
+        await mode.getByRole('radio', { name: 'Realistic' }).tap();
+        await expect(mode.getByRole('radio', { name: 'Realistic' })).toBeChecked();
+        const advanced = mode.getByRole('button', { name: 'Advanced' });
+        await advanced.tap();
+        for (const select of await mode.locator('select').all()) await reachable(select);
+        await mode.getByLabel('Currents', { exact: true }).selectOption('exaggerated');
+        await expect(mode.locator('.mode-custom-tag')).toBeVisible();
+        for (const name of ['Daily dive', 'Controls', 'Journal'])
+          await reachable(menu.getByRole('button', { name: new RegExp(name) }));
+        // Daily must launch even while the expanded picker is scrolled out of view.
+        await menu.getByRole('button', { name: /Daily dive/ }).tap();
+        await expect(page.locator('.briefing')).toBeVisible();
+        const briefing = page.locator('.briefing');
+        await briefing.getByRole('button', { name: 'Advanced' }).tap();
+        for (const select of await briefing.locator('.mode-advanced select').all())
+          await reachable(select);
+        await reachable(briefing.locator('.briefing-begin'));
+        await reachable(briefing.getByRole('button', { name: 'Free dive', exact: true }));
+      });
 
-    test('journal spoilers, navigation, entries and Close remain reachable', async ({ page }) => {
-      await ready(page, '/?touch=1&tier=low');
-      await page.locator('.home-menu').getByRole('button', { name: 'Journal', exact: true }).tap();
-      const journal = page.getByRole('dialog', { name: 'Journal', exact: true });
-      await expect(journal).toBeVisible();
-      await reachable(journal.locator('.jr-spoilers'));
-      await journal.locator('.jr-spoilers').tap();
-      await expect(journal.getByRole('checkbox')).toBeChecked();
-      await reachable(journal.locator('.jr-nav-item').first());
-      await reachable(journal.locator('.jr-nav-item').last());
-      const site = journal.locator('.jr-site-card[data-target="titanic"]');
-      await reachable(site);
-      await site.tap();
-      await reachable(journal.locator('.jr-next'));
-      await journal.locator('.jr-next').tap();
-      await expect(journal.locator('.jr-body .jr-title')).not.toHaveText('Undiscovered');
-      expect(
-        await journal.locator('.jr-header').evaluate((e) => e.scrollWidth <= e.clientWidth),
-      ).toBe(true);
-      await reachable(journal.locator('.jr-close'));
-      await journal.locator('.jr-close').tap();
-      await expect(journal).toBeHidden();
-      await expect(page.locator('.home-screen')).toBeVisible();
-    });
+      test('journal spoilers, navigation, entries and Close remain reachable', async ({ page }) => {
+        await ready(page, '/?touch=1&tier=low');
+        await page
+          .locator('.home-menu')
+          .getByRole('button', { name: 'Journal', exact: true })
+          .tap();
+        const journal = page.getByRole('dialog', { name: 'Journal', exact: true });
+        await expect(journal).toBeVisible();
+        await reachable(journal.locator('.jr-spoilers'));
+        await journal.locator('.jr-spoilers').tap();
+        await expect(journal.getByRole('checkbox')).toBeChecked();
+        await reachable(journal.locator('.jr-nav-item').first());
+        await reachable(journal.locator('.jr-nav-item').last());
+        const site = journal.locator('.jr-site-card[data-target="titanic"]');
+        await reachable(site);
+        await site.tap();
+        await reachable(journal.locator('.jr-next'));
+        await journal.locator('.jr-next').tap();
+        await expect(journal.locator('.jr-body .jr-title')).not.toHaveText('Undiscovered');
+        expect(
+          await journal.locator('.jr-header').evaluate((e) => e.scrollWidth <= e.clientWidth),
+        ).toBe(true);
+        await reachable(journal.locator('.jr-close'));
+        await journal.locator('.jr-close').tap();
+        await expect(journal).toBeHidden();
+        await expect(page.locator('.home-screen')).toBeVisible();
+      });
+    }
   });
 }

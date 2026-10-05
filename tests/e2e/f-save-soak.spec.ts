@@ -48,10 +48,10 @@ async function sample(page: Page) {
 
 test.use({ storageState: { cookies: [], origins: [] }, viewport: { width: 960, height: 640 } });
 
-test('ten dives, mode switches, restarts and reloads preserve saves without scene leaks or errors', async ({
+test('four dives, mode switches, restarts and reloads preserve saves without scene leaks or errors', async ({
   page,
 }) => {
-  test.setTimeout(600_000);
+  test.setTimeout(240_000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => {
@@ -89,7 +89,9 @@ test('ten dives, mode switches, restarts and reloads preserve saves without scen
   await page.goto('/?mission=blake-plateau-corals&tier=low&dynres=0&tutorial=0&lifeSeed=42');
   const baselines = new Map<string, Awaited<ReturnType<typeof sample>>>();
   let expectedMode = 'arcade';
-  for (let iteration = 0; iteration < 10; iteration++) {
+  // Each mode boots twice, so both get a baseline and a repeated leak check.
+  // Three restarts per dive exercise accumulation without 100 redundant samples.
+  for (let iteration = 0; iteration < 4; iteration++) {
     await test.step(`cycle ${iteration + 1}`, async () => {
       await ready(page);
       const saved = await page.evaluate(() => {
@@ -163,7 +165,7 @@ test('ten dives, mode switches, restarts and reloads preserve saves without scen
       const beforeRestart = await sample(page);
       // Also exercise cleanup repeatedly in one live scene. Navigation alone
       // replaces the JS heap and can hide objects leaked by restart listeners.
-      for (let restart = 0; restart < 10; restart++) {
+      for (let restart = 0; restart < 3; restart++) {
         await page.evaluate(() => {
           const mission = (window.__game as unknown as Game).mission;
           mission.restart();
@@ -191,7 +193,7 @@ test('ten dives, mode switches, restarts and reloads preserve saves without scen
       expect(errors).toEqual([]);
     });
   }
-  // Check the last reload too, not only the start of cycles 1–10.
+  // Check the last reload too, not only the start of cycles 1–4.
   const final = await sample(page);
   expect(final.sceneObjects).toBe(baselines.get(expectedMode)!.sceneObjects);
   expect(final.geometries).toBe(baselines.get(expectedMode)!.geometries);

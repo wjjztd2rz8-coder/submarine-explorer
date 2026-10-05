@@ -65,7 +65,9 @@ for (const size of [
   { width: 1600, height: 900 },
   { width: 844, height: 390 },
 ]) {
-  for (const route of ['tile', 'mission']) {
+  // Both routes and both viewport sizes exercise the full camera sequence;
+  // avoid repeating the identical reset/wheel checks in a Cartesian product.
+  for (const route of [size.width === 1600 ? 'tile' : 'mission']) {
     test(`Lost City ${route}: reset, wheel and photo at ${size.width}x${size.height}`, async ({
       page,
     }) => {

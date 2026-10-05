@@ -7,6 +7,8 @@
 import { mkdir } from 'node:fs/promises';
 import { devices, expect, test, type Page } from '@playwright/test';
 import { HINT_THRESHOLDS } from '../../src/game/Hints.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { completeScan } from './helpers/scan.js';
 
 const shots = '.cache/codex/shots/f3-onboard';
 const url = '/?tile=titanic&landmark=_test&poi=test-bow&skipBriefing=1&tier=low';
@@ -107,66 +109,70 @@ test('desktop: Pause opens the controls card for the active device', async ({ pa
   await expect(dialog).toContainText('Left stick');
 });
 
-test('hints appear once, can be dismissed and are remembered', async ({ page }) => {
-  await page.addInitScript((k) => {
-    if (!localStorage.getItem(k))
-      localStorage.setItem(
-        k,
-        JSON.stringify({
-          version: 1,
-          tutorialDone: true,
-          seenHints: ['battery-low', 'creature', 'rov'],
-        }),
+for (const dismissal of ['button', 'expiry'] as const) {
+  test(
+    dismissal === 'button'
+      ? 'hints appear once, can be dismissed and are remembered'
+      : 'hints expire after nine seconds and stay remembered after reload',
+    async ({ page }) => {
+      await pauseClockBeforeNavigation(page);
+      await page.addInitScript((k) => {
+        if (!localStorage.getItem(k))
+          localStorage.setItem(
+            k,
+            JSON.stringify({
+              version: 1,
+              tutorialDone: true,
+              seenHints: ['battery-low', 'creature', 'rov'],
+            }),
+          );
+      }, KEY);
+      // Titanic is only ~58% of its fitted hull rating, so no pressure hint is due.
+      // Leggo's site naturally reaches the hint band without exceeding Class C's rating.
+      await page.goto('/?tile=challenger-deep&poi=cd-leggo-amphipod-site&skipBriefing=1&tier=low', {
+        waitUntil: 'domcontentloaded',
+      });
+      const ready = () =>
+        window.__gameReady === true &&
+        (window.__game as { discovery: { spawnedAt: string | null } }).discovery.spawnedAt ===
+          'cd-leggo-amphipod-site';
+      await clockFramesUntil(page, ready);
+      const hull = await page.evaluate(() =>
+        (
+          window.__game as {
+            sub: {
+              getState(): { hullClass: string; ratedRatio: number; hullBreached: boolean };
+            };
+          }
+        ).sub.getState(),
       );
-  }, KEY);
-  // Titanic is only ~58% of its fitted hull rating, so no pressure hint is due.
-  // Leggo's site naturally reaches the hint band without exceeding Class C's rating.
-  await page.goto('/?tile=challenger-deep&poi=cd-leggo-amphipod-site&skipBriefing=1&tier=low', {
-    waitUntil: 'domcontentloaded',
-  });
-  await page.waitForFunction(
-    () =>
-      window.__gameReady === true &&
-      (window.__game as { discovery: { spawnedAt: string | null } }).discovery.spawnedAt ===
-        'cd-leggo-amphipod-site',
-    undefined,
-    { timeout: 45_000 },
-  );
-  const hull = await page.evaluate(() =>
-    (
-      window.__game as {
-        sub: {
-          getState(): { hullClass: string; ratedRatio: number; hullBreached: boolean };
-        };
+      expect(hull.hullClass).toBe('C');
+      expect(hull.ratedRatio).toBeGreaterThanOrEqual(HINT_THRESHOLDS.hull);
+      expect(hull.ratedRatio).toBeLessThan(1);
+      expect(hull.hullBreached).toBe(false);
+      const hint = page.locator('.onboard-hint');
+      await expect(hint).toBeVisible({ timeout: 30_000 });
+      await expect(hint).toContainText('Near hull rating');
+      await expect(page.locator('.scan-panel')).toBeVisible();
+      await shot(page, 'desktop-hint');
+      if (dismissal === 'button') {
+        await hint.getByRole('button', { name: 'Dismiss hint' }).click();
+      } else {
+        await page.clock.fastForward(8000);
+        await expect(hint).toBeVisible();
+        await page.clock.fastForward(1001);
       }
-    ).sub.getState(),
+      await expect(hint).toBeHidden();
+      expect((await saved(page))?.seenHints).toContain('near-hull');
+      expect((await saved(page))?.seenHints).not.toContain('scan-target');
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await clockFramesUntil(page, ready);
+      await page.clock.fastForward(2500);
+      await expect(page.locator('.scan-panel')).toBeVisible();
+      await expect(page.locator('.onboard-hint')).toBeHidden();
+    },
   );
-  expect(hull.hullClass).toBe('C');
-  expect(hull.ratedRatio).toBeGreaterThanOrEqual(HINT_THRESHOLDS.hull);
-  expect(hull.ratedRatio).toBeLessThan(1);
-  expect(hull.hullBreached).toBe(false);
-  const hint = page.locator('.onboard-hint');
-  await expect(hint).toBeVisible({ timeout: 30_000 });
-  await expect(hint).toContainText('Near hull rating');
-  await expect(page.locator('.scan-panel')).toBeVisible();
-  await shot(page, 'desktop-hint');
-  await hint.getByRole('button', { name: 'Dismiss hint' }).click();
-  await expect(hint).toBeHidden();
-  expect((await saved(page))?.seenHints).toContain('near-hull');
-  expect((await saved(page))?.seenHints).not.toContain('scan-target');
-  await page.reload({ waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(
-    () =>
-      window.__gameReady === true &&
-      (window.__game as { discovery: { spawnedAt: string | null } }).discovery.spawnedAt ===
-        'cd-leggo-amphipod-site',
-    undefined,
-    { timeout: 45_000 },
-  );
-  await page.waitForTimeout(2500);
-  await expect(page.locator('.scan-panel')).toBeVisible();
-  await expect(page.locator('.onboard-hint')).toBeHidden();
-});
+}
 
 test.describe('touch viewport', () => {
   test.use({ ...phoneLandscape });
@@ -262,6 +268,7 @@ test.describe('touch viewport', () => {
       .poll(() => page.evaluate(() => (window.__game as unknown as Probe).scanner.view.candidateId))
       .toBe('test-bow');
     await hold('.tc-btn-scan', 0.5, 0.5);
+    await completeScan(page, 'test-bow');
     await expect.poll(() => stepIndex(page)).toBe(4);
     await release();
     await expect(card).toContainText('Step 5 of 5');

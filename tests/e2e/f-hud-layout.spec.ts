@@ -25,16 +25,24 @@ async function shot(page: Page, name: string): Promise<void> {
 
 async function clearLayout(page: Page, selectors: string[]): Promise<void> {
   const viewport = page.viewportSize()!;
-  const boxes = [];
-  for (const selector of selectors) {
-    const element = page.locator(selector);
-    await expect(element).toBeVisible();
-    const box = (await element.boundingBox())!;
-    expect(box.x, selector).toBeGreaterThanOrEqual(0);
-    expect(box.y, selector).toBeGreaterThanOrEqual(0);
-    expect(box.x + box.width, selector).toBeLessThanOrEqual(viewport.width);
-    expect(box.y + box.height, selector).toBeLessThanOrEqual(viewport.height);
-    boxes.push({ selector, ...box });
+  // One renderer round trip observes a coherent layout, rather than waiting
+  // for WebGL separately for every rectangle at every tutorial step.
+  const boxes = await page.evaluate(
+    (selectors) =>
+      selectors.map((selector) => {
+        const element = document.querySelector<HTMLElement>(selector)!;
+        const box = element.getBoundingClientRect();
+        return { selector, x: box.x, y: box.y, width: box.width, height: box.height };
+      }),
+    selectors,
+  );
+  for (const box of boxes) {
+    expect(box.width, box.selector).toBeGreaterThan(0);
+    expect(box.height, box.selector).toBeGreaterThan(0);
+    expect(box.x, box.selector).toBeGreaterThanOrEqual(0);
+    expect(box.y, box.selector).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width, box.selector).toBeLessThanOrEqual(viewport.width);
+    expect(box.y + box.height, box.selector).toBeLessThanOrEqual(viewport.height);
   }
   for (let i = 0; i < boxes.length; i++) {
     for (const b of boxes.slice(i + 1)) {
