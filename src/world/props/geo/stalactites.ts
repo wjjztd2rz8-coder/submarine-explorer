@@ -3,8 +3,8 @@
  * curved limestone wall with a scalloped overhanging ceiling whose underside
  * carries clusters of fluted stalactites, fallen blocks blending the foot of
  * the wall into the seabed, and a few Caribbean sponges high on the face. The
- * real Blue Hole formed as a flooded cave system and holds stalactites in its
- * ledges at about 40 m. dims = [width, ledge projection, height].
+ * stalactites formed in air-filled caves during glacial sea-level lows and now
+ * sit at roughly 40–50 m depth. dims = [width, ledge projection, height].
  */
 
 import * as THREE from 'three';
@@ -102,11 +102,18 @@ function undersideY(f: number): number {
 
 export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   const { dims, seed, tier } = input;
+  const east = input.def.id === 'karst-grotto-east';
   const gnd = input.groundHeight() ?? ((): number => 0);
   const d = geoDetail(tier);
   const [W, D, H] = dims;
   const rnd = mulberry32(seed);
-  const rawProfile = PROFILE.map(([y, z]): [number, number] => [y * H, z * D]);
+  // A continuous, thicker lip frames the east mouth; retain the west alcove's scallops.
+  const mouthProfile = east
+    ? PROFILE.map(([y, z]): [number, number] =>
+        y === 0.63 ? [0.65, -1.02] : y === 0.66 ? [0.69, -0.5] : [y, z],
+      )
+    : PROFILE;
+  const rawProfile = mouthProfile.map(([y, z]): [number, number] => [y * H, z * D]);
   const joinY = PROFILE[0]![0] * H;
   const footZ = rawProfile[0]![1];
   const profile: [number, number][] = [[joinY - 0.09 * H, footZ + 0.025 * D], ...rawProfile];
@@ -129,8 +136,33 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   const liftAt = (x: number): number => gnd(x, footAt(x));
 
   /** How far the shelf projects at x (1 = the profile's lip): scalloped, in places hardly at all. */
-  const shelf = (x: number): number =>
-    0.42 + 0.95 * smooth(0.32, 0.62, fbm3(x * 0.075 + 4, 1, seed + 61, seed + 8, 3));
+  const shelf = (x: number): number => {
+    const scallop = smooth(0.32, 0.62, fbm3(x * 0.075 + 4, 1, seed + 61, seed + 8, 3));
+    return east ? 0.88 + 0.3 * scallop : 0.42 + 0.95 * scallop;
+  };
+
+  // Opening light multiplies the banded vertex glow, preserving the strata and
+  // underside shading without a new light or transparent fog plane.
+  const surfaceMaterial: typeof geoMaterial = (kind, detail, opts) => {
+    const m = geoMaterial(kind, detail, opts);
+    if (!east) return m;
+    m.emissive.set(0xa4ced8).multiplyScalar(0.16);
+    const inherited = m.onBeforeCompile;
+    m.onBeforeCompile = (shader, renderer) => {
+      inherited.call(m, shader, renderer);
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying float vGrottoDepth;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvGrottoDepth = position.z;');
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>', '#include <common>\nvarying float vGrottoDepth;')
+        .replace(
+          '#include <emissivemap_fragment>',
+          `#include <emissivemap_fragment>\nfloat openingLight = 1.0 - smoothstep(${(-D * 0.95).toFixed(3)}, ${(-D * 0.12).toFixed(3)}, vGrottoDepth);\ntotalEmissiveRadiance *= 0.28 + 0.72 * openingLight;`,
+        );
+    };
+    m.customProgramCacheKey = () => `blue-hole-east-opening-${D}`;
+    return m;
+  };
 
   const disp = (x: number, y: number, z: number): number => {
     const env = smooth(joinY, joinY + 0.15 * H, y);
@@ -179,9 +211,12 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   wall.computeBoundingBox();
   const full = new THREE.Group();
   full.name = 'stalactite-cluster';
-  full.add(
-    new THREE.Mesh(wall, geoMaterial('rock', d, { roughness: 0.9, side: THREE.DoubleSide })),
+  const wallMesh = new THREE.Mesh(
+    wall,
+    surfaceMaterial('rock', d, { roughness: 0.9, side: THREE.DoubleSide }),
   );
+  wallMesh.name = 'grotto-overhang';
+  full.add(wallMesh);
 
   // --- fallen blocks and sediment blending the foot into the seabed
   const talus: TalusShape = {
@@ -214,7 +249,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     },
   );
   apron.computeBoundingBox();
-  full.add(new THREE.Mesh(apron, geoMaterial('rock', d, { roughness: 0.92 })));
+  full.add(new THREE.Mesh(apron, surfaceMaterial('rock', d, { roughness: 0.92 })));
   if (d.rubble) {
     const spots = placeRocks(talus, W, Math.round(120 * d.growth), seed, {
       size: 0.7 * scale,
@@ -254,10 +289,13 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   colliders.push(...talusColliders(talus, W));
   const parts: THREE.BufferGeometry[] = [];
   const longest: { x: number; z: number; y: number; len: number; r: number }[] = [];
-  const clusters = Math.max(4, Math.round(8 * Math.sqrt(d.growth)));
+  const clusters = Math.max(4, Math.round((east ? 10 : 8) * Math.sqrt(d.growth)));
   for (let k = 0; k < clusters; k++) {
-    const cx = (rnd() - 0.5) * W * 0.5;
-    const cf = 0.25 + rnd() * 0.65; // projection fraction of the cluster centre
+    const cx = east
+      ? ((k + 0.25 + rnd() * 0.5) / clusters - 0.5) * W * 0.62
+      : (rnd() - 0.5) * W * 0.5;
+    // Alternate lip silhouettes and recessed clusters, leaving water between them.
+    const cf = east ? (k % 3 === 0 ? 0.84 : k % 3 === 1 ? 0.57 : 0.32) : 0.25 + rnd() * 0.65;
     const members = 2 + Math.floor(rnd() * 4);
     for (let i = 0; i < members; i++) {
       const x = cx + (rnd() - 0.5) * 3.2;
@@ -267,13 +305,20 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       const sc = shelf(x);
       if (sc * f < 0.12) continue; // no shelf here: nothing to hang from
       const yBase = undersideY(f) * H;
-      const z = z0 + disp(x, yBase, z0) + plan(x);
-      const yTop = yBase * scaleAt(x) + liftAt(x) + 0.5;
+      const { edge } = wallEnvelope(x, W, EDGE_START);
+      const z = east
+        ? (z0 + disp(x, yBase, z0) * (1 - edge * 0.6)) * (1 - edge * 0.55) + plan(x)
+        : z0 + disp(x, yBase, z0) + plan(x);
+      const yTop = yBase * scaleAt(x) + liftAt(x) + 0.5 - (east ? sinkAt(x) : 0);
       const main = i === 0;
-      const len =
+      const generatedLength =
         (1.4 + rnd() * rnd() * 0.36 * H) *
         (main ? 1.35 : 0.55 + rnd() * 0.5) *
         (0.6 + 0.4 * scaleAt(x));
+      const len = east
+        ? Math.min(H * (main ? 0.27 + rnd() * 0.17 : 0.065 + rnd() * 0.13), yTop - gnd(x, z) - 0.7)
+        : generatedLength;
+      if (east && len < 0.5) continue;
       const r = len * 0.12 + 0.22;
       parts.push(
         place(
@@ -309,7 +354,12 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       void ny;
     });
     projectUVs(stal, 2);
-    full.add(new THREE.Mesh(stal, geoMaterial('flow', d, { roughness: 0.75, bumpScale: 1.2 })));
+    const gallery = new THREE.Mesh(
+      stal,
+      surfaceMaterial('flow', d, { roughness: 0.75, bumpScale: 1.2 }),
+    );
+    gallery.name = 'stalactite-gallery';
+    full.add(gallery);
   }
   longest.sort((a, b) => b.len - a.len);
   for (const s of longest.slice(0, 7)) {

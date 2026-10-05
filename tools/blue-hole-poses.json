@@ -1,0 +1,9 @@
+{
+  "east": {
+    "direction": [-0.544639035, 0, -0.838670568],
+    "above": 5,
+    "approachRange": 55,
+    "target": [0, 6.2, -9],
+    "close": { "range": 42, "above": 6.5, "lateral": 8 }
+  }
+}

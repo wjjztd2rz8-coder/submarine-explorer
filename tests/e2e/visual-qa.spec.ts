@@ -5,6 +5,7 @@ import landmarkIndex from '../../data/landmarks/index.json' with { type: 'json' 
 import type { CameraRig } from '../../src/sub/CameraRig.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
 import type { Props } from '../../src/world/Props.js';
+import blueHolePoses from '../../tools/blue-hole-poses.json' with { type: 'json' };
 
 /**
  * Opt-in Phase F review: VISUAL_QA=1 npx playwright test visual-qa.spec.ts
@@ -208,4 +209,67 @@ test.describe('Phase F visual QA', () => {
       expect(errors).toEqual([]);
     });
   }
+
+  test('great-blue-hole: authored east grotto close', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await mkdir(shots, { recursive: true });
+    await page.goto('/?tile=great-blue-hole&skipBriefing=1&tutorial=0');
+    await page.waitForFunction(
+      () => {
+        const g = window.__game as unknown as Game | undefined;
+        return window.__gameReady && g?.props.loaded && g.discovery.loaded;
+      },
+      undefined,
+      { timeout: 120_000 },
+    );
+    const clearance = await page.evaluate((pose) => {
+      const g = window.__game as unknown as Game;
+      const hero = g.props.placed.find((p) => p.def.id === 'karst-grotto-east');
+      if (!hero) throw new Error('Missing east grotto');
+      hero.root.updateMatrixWorld(true);
+      const target = hero.root.localToWorld(g.sub.position.clone().fromArray(pose.target));
+      const { range, above, lateral } = pose.close;
+      const [dx, , dz] = pose.direction;
+      const x = target.x + dx * range - dz * lateral;
+      const z = target.z + dz * range + dx * lateral;
+      const y = hero.root.position.y + above;
+      const yaw = Math.atan2(target.x - x, -(target.z - z));
+      g.sub.step = () => {};
+      g.sub.reset(x, y, z, yaw);
+      g.sub.pitch = Math.max(
+        -g.config.submarine.maxPitch,
+        Math.min(
+          g.config.submarine.maxPitch,
+          Math.atan2(target.y - y, Math.hypot(target.x - x, target.z - z)),
+        ),
+      );
+      g.rig.resetView();
+      g.rig.setMode('first-person');
+      g.rig.snap(g.sub.position, yaw, g.sub.pitch);
+      const eye = g.rig.camera.position;
+      const pitch = Math.atan2(target.y - eye.y, Math.hypot(target.x - eye.x, target.z - eye.z));
+      g.rig.lookElevation = (pitch - g.sub.pitch) / 0.55;
+      g.rig.snap(g.sub.position, yaw, g.sub.pitch);
+      return {
+        blocked: g.props.collide(
+          g.sub.position.clone(),
+          g.config.submarine.hullRadius,
+          g.sub.position.clone(),
+        ),
+        floor: y - g.terrain.sampleHeight(x, z),
+        eyeBlocked: g.props.collide(eye.clone(), 0.3, eye.clone()),
+        underwater: eye.y < -2,
+        failedProps: g.props.stats.failed,
+      };
+    }, blueHolePoses.east);
+    expect(clearance.blocked).toBe(false);
+    expect(clearance.eyeBlocked).toBe(false);
+    expect(clearance.floor).toBeGreaterThan(1);
+    expect(clearance.underwater).toBe(true);
+    expect(clearance.failedProps).toBe(0);
+    await settle(page);
+    await page.screenshot({ path: `${shots}/great-blue-hole-east-3.png`, timeout: 60_000 });
+    expect(errors).toEqual([]);
+  });
 });
