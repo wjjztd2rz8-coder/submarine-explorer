@@ -127,13 +127,14 @@ const FREE_DIVE_OPENINGS: Record<
   'beebe-vent-field': {
     hero: 'beebe-chimney-1',
     bearing: 60,
-    range: 46,
+    range: 76,
     fromCentre: true,
-    altitude: 4,
-    yawOffset: 10,
-    // Keep the short arm level with the sub so the seabed contact clears its silhouette, even in portrait.
+    altitude: 8,
+    yawOffset: 11,
+    // Shift the eye sideways to clear the stack while keeping the hull pointed toward the vents.
     chaseRadius: 54,
-    chaseOffsetY: -38,
+    chaseOffsetX: -10,
+    chaseOffsetY: -12,
   },
   // Inside the hole, facing the ledge alcove across the water: the wall, the light shafts
   // and the fish above the ledge share the frame instead of a bare rim.

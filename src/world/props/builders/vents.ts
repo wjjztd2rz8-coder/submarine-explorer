@@ -12,6 +12,7 @@ import { geoDetail } from '../geo/detail.js';
 import { geoMaterial, mineralCrust } from '../geo/materials.js';
 import { buildGeo } from '../geo/index.js';
 import { buildCarbonateChimney } from '../geo/towers.js';
+import { addBeebeSeabed } from '../geo/beebe.js';
 import {
   mulberry32,
   normalise,
@@ -186,6 +187,6 @@ export const VENT_BUILDERS = {
       mineralCrust(body.geometry, input.seed, input.cfg.chimneyCrust);
       body.material.bumpScale = input.cfg.chimneyCrust.bumpScale;
     }
-    return built;
+    return addBeebeSeabed(built, input);
   },
 } satisfies Record<'chimney', ProceduralBuilder>;
