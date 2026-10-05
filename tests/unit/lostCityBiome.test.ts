@@ -35,7 +35,14 @@ describe('lost-city biome', () => {
 
   it('only opts Lost City into baked colour, leaving geometry and LOD budgets unchanged', () => {
     const makeTile = (id: string): Tile => ({
-      meta: { id, cols: 9, rows: 9, cellsize_m_x: 20, cellsize_m_y: 20 } as Tile['meta'],
+      meta: {
+        id,
+        cols: 9,
+        rows: 9,
+        cellsize_m_x: 20,
+        cellsize_m_y: 20,
+        center: { lat: 36.7872, lon: -122.0133 },
+      } as Tile['meta'],
       heights: Float32Array.from({ length: 81 }, (_, i) => -800 + (i % 9) * 5),
     });
     const lost = new Terrain(makeTile('lost-city'), DEFAULT_CONFIG.terrain, 'low');

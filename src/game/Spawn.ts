@@ -134,10 +134,10 @@ const FREE_DIVE_OPENINGS: Record<
     fromCentre: true,
     altitude: 8,
     yawOffset: 11,
-    // Shift the eye sideways to clear the stack while keeping the hull pointed toward the vents.
+    // Shift the eye sideways to clear the stack and the scan reticle, level with the sub (650 + 680).
     chaseRadius: 54,
-    chaseOffsetX: -10,
-    chaseOffsetY: -12,
+    chaseOffsetX: -24,
+    chaseOffsetY: -38,
   },
   // Inside the hole, facing the ledge alcove across the water: the wall, the light shafts
   // and the fish above the ledge share the frame instead of a bare rim.
