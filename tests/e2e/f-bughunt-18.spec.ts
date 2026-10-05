@@ -6,6 +6,7 @@ import type { Submarine } from '../../src/sub/Submarine.js';
 import type { Terrain } from '../../src/world/Terrain.js';
 import type { Props } from '../../src/world/Props.js';
 import type { Save } from '../../src/core/Save.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
 interface Game {
   rig: CameraRig;
@@ -17,15 +18,19 @@ interface Game {
 const shots = '.cache/bughunt18/screenshots';
 const defaultRadius = Math.hypot(38, 90);
 
+test.beforeEach(async ({ page }) => pauseClockBeforeNavigation(page));
+
 async function ready(page: Page, query: string): Promise<void> {
   await page.goto(`/?${query}&tutorial=0&tier=low`, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => {
+  await clockFramesUntil(page, () => {
     const g = window.__game as unknown as Game | undefined;
-    return window.__gameReady === true && g?.props.loaded;
+    return window.__gameReady === true && g?.props.loaded === true;
   });
 }
 
-function camera(page: Page) {
+async function camera(page: Page) {
+  // Input edges and camera resets apply in the real game frame.
+  await page.clock.runFor(17);
   return page.evaluate(() => {
     const { rig, sub, terrain } = window.__game as unknown as Game;
     return {
@@ -53,12 +58,7 @@ async function drag(page: Page): Promise<void> {
 async function presentedFrame(page: Page): Promise<void> {
   // UI handlers change mode immediately; the rig applies the pose on the next
   // game frame. Compare rendered views on both sides of photo mode.
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-      ),
-  );
+  await page.clock.runFor(34);
 }
 
 for (const size of [
@@ -107,6 +107,7 @@ for (const size of [
       await presentedFrame(page);
       const before = await camera(page);
       await page.keyboard.press('p');
+      await page.clock.runFor(17);
       await expect(page.locator('.photo-mode')).toBeVisible();
       await expect.poll(async () => (await camera(page)).mode).toBe('orbit');
       const frozen = (await camera(page)).position;
@@ -128,6 +129,7 @@ for (const size of [
       await page.keyboard.press('q');
       await expect.poll(async () => (await camera(page)).mode).toBe('first-person');
       await page.keyboard.press('p');
+      await page.clock.runFor(17);
       await expect.poll(async () => (await camera(page)).mode).toBe('orbit');
       await page.locator('.photo-mode-exit').click();
       await expect.poll(async () => (await camera(page)).mode).toBe('first-person');

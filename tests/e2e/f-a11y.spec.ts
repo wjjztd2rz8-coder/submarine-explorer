@@ -1,27 +1,20 @@
 import AxeBuilder from '@axe-core/playwright';
 import type * as THREE from 'three';
+import { clockFramesUntil, pauseClockBeforeNavigation, withClockFrames } from './helpers/clock.js';
+import type { Journal } from '../../src/ui/Journal.js';
 import { expect, test, type Page, type Locator } from './helpers/unlocked.js';
+
+test.beforeEach(async ({ page }) => pauseClockBeforeNavigation(page));
 
 async function boot(page: Page, url: string): Promise<void> {
   await page.goto(url, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => window.__gameReady === true);
+  await clockFramesUntil(page, () => window.__gameReady === true);
 }
 
 /** Walk every available control in DOM order, then wrap in both directions. */
 async function cycle(page: Page, root: Locator): Promise<void> {
-  // Panels such as the Journal re-render once their content loads; wait for it.
-  let last = '';
-  await expect
-    .poll(
-      async () => {
-        const html = await root.evaluate((el) => el.innerHTML);
-        const stable = html === last;
-        last = html;
-        return stable;
-      },
-      { intervals: [200] },
-    )
-    .toBe(true);
+  // Await the actual catalogue; equal HTML samples can precede a late refresh.
+  await page.evaluate(() => (window.__game as { journal: Journal }).journal.load());
   const controls = root.locator('button, a[href], input, select, textarea, [tabindex]');
   const indices = await controls.evaluateAll((nodes) =>
     nodes.flatMap((node, index) => {
@@ -84,13 +77,15 @@ test('system and saved reduced motion apply live to camera, particles, warnings 
         render.call(this, scene, camera);
       };
     });
-    await page.waitForFunction(
+    await clockFramesUntil(
+      page,
       () => typeof (window as unknown as { drawnParticles?: number }).drawnParticles === 'number',
     );
     return page.evaluate(() => (window as unknown as { drawnParticles: number }).drawnParticles);
   }
   expect(await drawnParticles()).toBe(0);
   await page.keyboard.press('p');
+  await page.clock.runFor(17);
   await expect(page.locator('.photo-mode')).toBeVisible();
   await page.evaluate(() =>
     (window.__game as { photoMode: { shutter(): void } }).photoMode.shutter(),
@@ -118,7 +113,7 @@ test('system and saved reduced motion apply live to camera, particles, warnings 
   });
   await expect(page.locator('.hud-warning')).toHaveCSS('animation-name', 'none');
   await page.reload();
-  await page.waitForFunction(() => window.__gameReady === true);
+  await clockFramesUntil(page, () => window.__gameReady === true);
   await expect.poll(reduced).toBe(true);
 });
 
@@ -166,10 +161,12 @@ test('briefing controls and cancellation remain keyboard reachable', async ({ pa
   await boot(page, '/?mission=titanic&tier=low');
   const briefing = page.locator('.briefing');
   await cycle(page, briefing);
-  const contrast = await new AxeBuilder({ page })
-    .include('.briefing')
-    .withRules(['color-contrast', 'button-name'])
-    .analyze();
+  const contrast = await withClockFrames(page, () =>
+    new AxeBuilder({ page })
+      .include('.briefing')
+      .withRules(['color-contrast', 'button-name'])
+      .analyze(),
+  );
   expect(contrast.violations).toEqual([]);
   await page.keyboard.press('Escape');
   await expect(briefing).toBeHidden();
@@ -214,10 +211,12 @@ test('controls and Journal cycle focus and restore their pause opener', async ({
   await journal.focus();
   await page.keyboard.press('Enter');
   await cycle(page, page.locator('.journal'));
-  const journalContrast = await new AxeBuilder({ page })
-    .include('.journal')
-    .withRules(['color-contrast', 'button-name'])
-    .analyze();
+  const journalContrast = await withClockFrames(page, () =>
+    new AxeBuilder({ page })
+      .include('.journal')
+      .withRules(['color-contrast', 'button-name'])
+      .analyze(),
+  );
   expect(journalContrast.violations).toEqual([]);
   await page.keyboard.press('Escape');
   await expect(journal).toBeFocused();
@@ -231,14 +230,14 @@ test('photo, HUD and debrief remain keyboard reachable with accessible contrast'
   await boot(page, '/?mission=titanic&tier=low&skipBriefing=1');
   const pause = page.locator('.pause-menu');
   await page.keyboard.press('p');
+  await page.clock.runFor(17);
   await expect(page.locator('.photo-mode')).toBeVisible();
   await cycle(page, page.locator('.photo-mode'));
   await page.keyboard.press('Escape');
   await expect(page.locator('.photo-mode')).toBeHidden();
-  const hud = await new AxeBuilder({ page })
-    .include('.hud')
-    .withRules(['color-contrast', 'button-name'])
-    .analyze();
+  const hud = await withClockFrames(page, () =>
+    new AxeBuilder({ page }).include('.hud').withRules(['color-contrast', 'button-name']).analyze(),
+  );
   expect(hud.violations).toEqual([]);
   await page.keyboard.press('Escape');
   await pause.getByRole('button', { name: 'Surface and debrief' }).focus();

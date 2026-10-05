@@ -85,9 +85,9 @@ test.describe('phone landscape', () => {
         (window.__game as { input: { touchAxes: { throttle: number } } }).input.touchAxes.throttle,
     );
     expect(axis).toBeGreaterThan(0.8);
-    await touch(cdp, 'touchEnd', []);
     const after = await subPos(page);
     expect(Math.hypot(after[0] - before[0], after[2] - before[2])).toBeGreaterThan(0.2);
+    await touch(cdp, 'touchEnd', []);
     await expect
       .poll(() =>
         page.evaluate(
@@ -107,7 +107,17 @@ test.describe('phone landscape', () => {
     await touch(cdp, 'touchMove', [{ x: sx, y: sl.y + sl.height * 0.95, id: 2 }]);
     await expect.poll(async () => Math.abs((await subPos(page))[1] - y0)).toBeGreaterThan(0.05);
     await touch(cdp, 'touchEnd', []);
-    expect(Math.abs((await subPos(page))[1] - y0)).toBeGreaterThan(0.05);
+    // Movement was observed while held; seabed collision/settling after release
+    // can reverse it. Release must clear the input, not preserve a later pose.
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            (window.__game as { input: { touchAxes: { ballast: number } } }).input.touchAxes
+              .ballast,
+        ),
+      )
+      .toBe(0);
 
     // Hold Scan on the contact.
     const b = await centre(page, '.tc-btn-scan');

@@ -1,4 +1,5 @@
 import { expect, test } from './helpers/unlocked.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
 /**
  * A2 acceptance: three depth bands must look clearly different. Each case
@@ -38,11 +39,12 @@ interface Mean {
   b: number;
 }
 
-test.describe('A2 atmosphere depth bands', () => {
+test('A2 atmosphere depth bands render distinct non-black frames', async ({ page }) => {
+  await pauseClockBeforeNavigation(page);
   const means: Record<number, Mean> = {};
 
   for (const c of CASES) {
-    test(`renders ${c.tile} at ${c.depth} m`, async ({ page }) => {
+    await test.step(`renders ${c.tile} at ${c.depth} m`, async () => {
       const errors: string[] = [];
       page.on('pageerror', (err) => errors.push(err.message));
       page.on('console', (msg) => {
@@ -50,10 +52,12 @@ test.describe('A2 atmosphere depth bands', () => {
       });
 
       await page.goto(`/?tile=${c.tile}&depth=${c.depth}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForFunction(() => window.__gameReady === true, undefined, {
-        timeout: 45_000,
+      await clockFramesUntil(page, () => {
+        const g = window.__game as { props: { loaded: boolean }; discovery: { loaded: boolean } };
+        return window.__gameReady === true && g?.props.loaded && g.discovery.loaded;
       });
-      await page.waitForTimeout(1500);
+      // Present the loaded scene before measuring its colour.
+      await page.clock.runFor(34);
 
       const shot = `tests/e2e/screenshots/atmosphere-${c.depth}.png`;
       const png = await page.screenshot({ path: shot });
@@ -90,7 +94,7 @@ test.describe('A2 atmosphere depth bands', () => {
     });
   }
 
-  test('the three depth frames differ from each other', () => {
+  await test.step('the three depth frames differ from each other', () => {
     const d = (a: Mean, b: Mean): number =>
       Math.abs(a.r - b.r) + Math.abs(a.g - b.g) + Math.abs(a.b - b.b);
     expect(d(means[10]!, means[300]!)).toBeGreaterThan(20);

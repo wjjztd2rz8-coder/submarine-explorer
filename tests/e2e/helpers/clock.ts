@@ -22,3 +22,27 @@ export async function clockFramesUntil(page: Page, ready: () => boolean): Promis
     )
     .toBe(true);
 }
+
+/** Let timer-driven browser work (such as axe) finish while the clock is paused. */
+export async function withClockFrames<T>(page: Page, work: () => Promise<T>): Promise<T> {
+  let done = false;
+  const result = work();
+  void result.then(
+    () => {
+      done = true;
+    },
+    () => {
+      done = true;
+    },
+  );
+  await expect
+    .poll(
+      async () => {
+        await page.clock.runFor(50);
+        return done;
+      },
+      { timeout: 45_000, intervals: [20] },
+    )
+    .toBe(true);
+  return result;
+}

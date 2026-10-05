@@ -3,6 +3,7 @@ import type { PerfStats } from '../../src/app/systems/quality.js';
 import type { Save } from '../../src/core/Save.js';
 import type { Mission } from '../../src/game/Mission.js';
 import type { Progress } from '../../src/game/Progress.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
 interface Game {
   perf: PerfStats;
@@ -17,24 +18,23 @@ interface Game {
 }
 
 async function ready(page: Page): Promise<void> {
-  await page.waitForFunction(() => {
+  await clockFramesUntil(page, () => {
     const game = window.__game as unknown as Game | undefined;
-    return (
+    return Boolean(
       window.__gameReady &&
       game?.props.loaded &&
       game.discovery.loaded &&
       game.explore.ready &&
-      game.life
+      game.life,
     );
   });
   await expect(page.locator('.briefing')).toBeVisible();
 }
 
 async function sample(page: Page) {
-  return page.evaluate(async () => {
-    // Let disposal notifications and at least one subsequent render finish.
-    for (let i = 0; i < 5; i++)
-      await new Promise<void>((done) => requestAnimationFrame(() => done()));
+  // Let disposal notifications and subsequent real renders finish.
+  await page.clock.runFor(85);
+  return page.evaluate(() => {
     const { perf } = window.__game as unknown as Game;
     return {
       sceneObjects: perf.sceneObjects,
@@ -52,6 +52,7 @@ test('four dives, mode switches, restarts and reloads preserve saves without sce
   page,
 }) => {
   test.setTimeout(240_000);
+  await pauseClockBeforeNavigation(page);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => {
@@ -138,13 +139,23 @@ test('four dives, mode switches, restarts and reloads preserve saves without sce
         ...(window.__game as unknown as Game).sub.position,
       }));
       await page.keyboard.down('i');
-      await page.waitForFunction((position) => {
-        const current = (window.__game as unknown as Game).sub.position;
-        return (
-          Math.hypot(current.x - position.x, current.y - position.y, current.z - position.z) > 0.05
-        );
-      }, before);
-      await page.keyboard.up('i');
+      try {
+        await expect
+          .poll(async () => {
+            await page.clock.runFor(50);
+            return page.evaluate((position) => {
+              const current = (window.__game as unknown as Game).sub.position;
+              return Math.hypot(
+                current.x - position.x,
+                current.y - position.y,
+                current.z - position.z,
+              );
+            }, before);
+          })
+          .toBeGreaterThan(0.05);
+      } finally {
+        await page.keyboard.up('i');
+      }
       await page.keyboard.press('Escape');
       await expect(page.locator('.pause-menu')).toBeVisible();
       await page
