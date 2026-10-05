@@ -6,7 +6,8 @@
  *
  * The haze box follows the camera; its floor is a plane fitted to the seabed
  * under the camera (maths.ts `fitSeabedPlane`), so particles hug the floor
- * without a per-particle terrain lookup. Draw calls: 2 (haze + motes).
+ * without a per-particle terrain lookup. Draw calls: 2 (haze + motes), plus
+ * one opt-in water backdrop at Titanic (also retained without particles on Low).
  */
 
 import * as THREE from 'three';
@@ -14,6 +15,7 @@ import type { EnvPresetName } from '../../core/Config.js';
 import { DEFAULT_WATER, type WaterConfig } from '../../core/Config.js';
 import { snowReadabilityUniforms } from '../../render/MarineSnow.js';
 import { fitSeabedPlane, mulberry, particleBudget } from './maths.js';
+import { TitanicHorizon } from './TitanicHorizon.js';
 import {
   COMMON_VERT,
   SOFT_FRAG,
@@ -75,6 +77,7 @@ export class WreckPreset implements EnvPreset {
   private motes: THREE.ShaderMaterial | null = null;
   private params: PresetParams = {};
   private visuals = false;
+  private horizon: TitanicHorizon | null = null;
 
   constructor(
     private readonly look: ParticleLook,
@@ -85,10 +88,14 @@ export class WreckPreset implements EnvPreset {
     this.params = ctx.params;
     this.scene = ctx.scene;
     this.visuals = ctx.visuals;
+    if (ctx.params.titanicHorizon === true) {
+      this.horizon = new TitanicHorizon(ctx.scene);
+      this.stats.draws = 1;
+    }
     if (!ctx.visuals) return;
     this.buildHaze(ctx);
     this.buildMotes(ctx);
-    this.stats.draws = this.objects.length;
+    this.stats.draws += this.objects.length;
   }
 
   private buildHaze(ctx: PresetEnterContext): void {
@@ -185,6 +192,7 @@ export class WreckPreset implements EnvPreset {
   }
 
   update(_dt: number, ctx: PresetFrameContext): void {
+    this.horizon?.update(ctx.camera, ctx.atmo);
     const fill = num(this.params.ambientFill, 0);
     if (fill > 0) {
       ctx.atmo.ambientIntensity += fill;
@@ -202,6 +210,8 @@ export class WreckPreset implements EnvPreset {
   }
 
   exit(): void {
+    this.horizon?.dispose();
+    this.horizon = null;
     if (this.scene) disposeObjects(this.scene, this.objects);
     this.haze = this.motes = null;
     this.stats.draws = this.stats.particles = 0;

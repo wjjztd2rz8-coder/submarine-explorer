@@ -42,6 +42,12 @@ without an entry here is not done.
   and portrait aspects, with detailed hull geometry blocking its sightline.
   Surveyed-terrain regressions now check the complete reticle, hull framing
   and Reset camera at all four tiers. Retain all other Beebe pose settings.
+- Phase F, F-TITANIC-HORIZON-670: give only Titanic a dim blue-grey water
+  backdrop that brightens upward and slightly lift its far-field fog. Reason:
+  near-black water above the sediment haze made the frame fall into a void.
+  Preserve fog hue/density, hull lighting, ambient fill, lamps and grade; keep
+  other sites on the existing path. Golden/pixel QA remains pending sandbox
+  browser access; evidence: `plan/progress/F-TITANIC-HORIZON-670.md`.
 - Phase F, F-BEEBE-MONTEREY: Beebe Vent Field opens with a shorter, lower chase
   arm (54 m, -16 m offset) so the sub fills the frame beside a lit smoker.
   Monterey wall boulders are now fractured, stretched, banded blocks and the
