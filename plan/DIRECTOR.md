@@ -8,6 +8,7 @@ Run `tools/golden.sh` at the start of any run that merged visual work. Compare a
 
 Claude visual backlog (Sonnet agents, in order of player impact):
 
+0. **(2026-10-05) Codex 660 integrates 590/600/610/620/630/640/650** in worktree `../subexp-wt/660-f-integrate-batch` (already merged there; Codex makes it full-e2e green). When it passes: review its shots against the rubric, fast-forward main to that branch (`git merge --ff-only codex/660-f-integrate-batch`), rerun smoke gates, push, tag. Do not re-run full-e2e on main if main has not moved since 660 started; that is what saves Claude budget. Then remove worktrees 590-660. Codex 670 (Titanic horizon), 680 (Beebe framing), 690 (Blue Hole grotto) cover items 2, 4, 5: review their shots and send back if weak.
 1. ~~Batch-merge 540/560/580/530~~ merged (f26/f27). Codex 610 (portrait/low-tier pitch verification) and 620 (first-minute audit) finished and need gates + review next.
 2. ~~Titanic snow~~ merged (570, shots good: sparse snow, hull readable). Remaining: sky above the far field is near-black; add a lighter horizon gradient.
 3. **Lost City beehive chimney:** smooth white slab with no life at its base (600 queued for Codex; if it stalls, do it in Claude with banded vertex colours and base corals).

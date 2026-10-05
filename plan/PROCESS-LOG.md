@@ -49,3 +49,9 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - resume.sh gate now requires weekly left ≥ max(10, 7 + 2.5 × days to reset): roughly one Claude run a day until Oct 8, Codex carries the build work.
 - review-triggers.sh: a new tag only triggers a comprehensive review ≥12 h after the last one.
 - OVERNIGHT-LOG entries had guessed times (e.g. "~10:00-11:00" written before 06:00); RESUME-PROMPT now says to take the time from `date`.
+
+## 2026-10-05 00:20 — Codex starved by Claude pacing; merges moved to Codex
+- With the weekly pacing gate (7 + 2.5%/day) Claude skipped every run from 08:40 Oct 4, so nobody refilled the Codex queue or merged: Codex sat idle ~15 h at 100% and seven finished packages waited unmerged.
+- Merges no longer need a Claude full-e2e: Claude (cheap, git only) commits finished Codex worktrees and pre-merges them into an integration worktree; a Codex task (660) makes it full-e2e green; Claude then only reviews screenshots and fast-forwards main. Codex sandboxes can't commit (the worktree .git dir is outside the sandbox), so the git step stays with Claude.
+- Pacing relaxed to 7 + 1.5%/day so about one short Claude run a day can review/merge and refill the queue.
+- Follow-up: the queue should hold enough briefs for a day of Codex when Claude is rationed.
