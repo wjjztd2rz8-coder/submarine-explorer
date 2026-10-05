@@ -465,3 +465,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Merged and pushed Codex 660 integration batch (590 dropped, 600/610/620/630/650 in) as f28; full e2e and project-base passed in the worktree after merging main; shots reviewed (Lost City banding, Blue Hole readable). Worktrees 590-660 removed.
 - Running: Codex 690, 700, 710. Finished but unmerged: 670 (Titanic horizon), 680 (Beebe framing) worktrees. Queue: 720, 730, 740.
 - No Claude agents launched (weekly ~13%). Problem: my first foreground full-e2e timed out and left a preview server on its port; use background runs. No owner decisions.
+
+## 2026-10-05 04:49 CDT headless run
+
+- Merged 670, 680, 690, 700, 720, 730 (Codex) plus a vitest 30 s timeout (main CI was red on a 5 s unit timeout). First full gate run failed: 680 won a Spawn.ts conflict over 660's Beebe pose, 720 changed the Journal kicker, 730 paused the clock in the 510 flow spec. A Sonnet agent fixed them (F-F29-FIX.md): Beebe pose now range 76/offset -24,-38; stale tests updated. Full e2e + project-base all PASS on main; pushed, tagged f29. Pages/CI results pending at exit.
+- NOT reviewed visually: Codex sandboxes produced no screenshots for 670-720. Next run: run tools/golden.sh and compare to 2026-10-05-054554 (Titanic horizon, Beebe side-by-side, Blue Hole grotto, Monterey, Journal/debrief portrait); send back anything weak.
+- Worktree 710 (Lost City close-up texture) finished with no changes; 450 is stale. Codex 5h at 6%, so nothing launched; queue holds 740, 750 (verify f29 merge), 760 (phone pitch non-hero sites).
+- No owner decisions.
