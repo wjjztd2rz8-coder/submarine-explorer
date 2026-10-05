@@ -7,6 +7,7 @@
   "environment": {
     "preset": "wreck",
     "overrides": {
+      "titanicHorizon": true,
       "ambientFill": 30,
       "hazeParticles": 1800,
       "hazeSizeM": 0.25,

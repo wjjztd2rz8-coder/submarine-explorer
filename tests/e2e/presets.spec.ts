@@ -56,7 +56,7 @@ for (const { name, url, draws, source } of [
   {
     name: 'wreck',
     url: '/?tile=titanic&preset=wreck&depth=3790',
-    draws: 2,
+    draws: 3, // Titanic's backdrop plus wreck haze and rust motes.
     source: 'param',
   },
   {

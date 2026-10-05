@@ -161,6 +161,8 @@ export interface TrenchPresetConfig {
 
 /** Wreck site: seabed sediment haze, rust motes near hulls, a touch more vignette. */
 export interface WreckPresetConfig {
+  /** Titanic-only dim upper-water backdrop and far-field fog lift; opt-in. */
+  titanicHorizon: boolean;
   hazeParticles: number;
   /** Haze box edge around the camera (m) and band height above the seabed (m). */
   hazeBoxM: number;
@@ -330,6 +332,7 @@ export const DEFAULT_PRESETS: PresetsConfig = {
     creakFullDepthM: 10900,
   },
   wreck: {
+    titanicHorizon: false,
     hazeParticles: 9000,
     hazeBoxM: 220,
     hazeBandM: 30,
