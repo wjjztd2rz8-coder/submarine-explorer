@@ -132,13 +132,29 @@ for (const layout of [
 
 test.describe('controls hint bar', () => {
   test.use({ viewport: { width: 1280, height: 720 } });
-  test('hides once move, turn and rise/sink are used, and stays in Help', async ({ page }) => {
+  test('hides after the first move, still records all controls, and stays in Help', async ({
+    page,
+  }) => {
     await page.goto('/?mission=titanic&skipBriefing=1&tier=low');
     await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
     await holdFreshTips(page);
     const tips = page.locator('.hud-control-tips');
     await expect(tips).toBeVisible();
-    for (const key of ['KeyW', 'KeyA', 'Space']) {
+    await page.keyboard.down('KeyW');
+    try {
+      await page.waitForFunction(
+        () => (window.__game as { cameraTips: { moved: boolean } }).cameraTips.moved,
+      );
+    } finally {
+      await page.keyboard.up('KeyW');
+    }
+    await expect(tips).toBeHidden();
+    expect(
+      await page.evaluate(
+        () => JSON.parse(localStorage.getItem('subexplorer.controlsLearned.v1')!).learned,
+      ),
+    ).toBe(false);
+    for (const key of ['KeyA', 'Space']) {
       await page.keyboard.down(key);
       await processedFrames(page);
       await page.keyboard.up(key);

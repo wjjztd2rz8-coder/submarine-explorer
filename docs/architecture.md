@@ -579,8 +579,11 @@ streaming (Tier 4), and a hard draw-call cap.
 `sonar`, `waypoints`, `journal`, `globe`, `home`, `homeGlobe`, `pause`,
 `titleScene` (read-only title diagnostics, described below),
 `appState` (a live getter for `'home' | 'dive' | 'pause'`), `save`,
-`settings`, `captions`, `input`, `cameraTips` (the live `{ until }` hint deadline
-in `performance.now()` milliseconds; zero means dismissed). Layout fixtures can
+`settings`, `captions`, `input`, `cameraTips` (the live `{ until, moved }` opening
+guidance state: `until` is a deadline in `performance.now()` milliseconds, zero
+means dismissed, and `moved` records the first commanded move or turn). The strip
+fades after that move or 12 seconds; completing all three steering controls still
+records learning independently. Layout fixtures can
 hold this deadline at Infinity without changing the clock, visibility rules,
 learning, bindings, or saved Control tips preference.
 `window.__gameReady` flips to `true` after the first presented frame;

@@ -7,6 +7,7 @@
 import type { TutorialStepId } from '../game/Tutorial.js';
 import { TUTORIAL_STEPS } from '../game/Tutorial.js';
 import type { InputDevice } from './ControlsCard.js';
+import { FIRST_MINUTE_GUIDANCE } from '../core/Config.js';
 
 export interface TutorialKeys {
   move: string;
@@ -147,6 +148,7 @@ export class HintChip {
     this.root = el('div', 'onboard-hint');
     this.root.hidden = true;
     this.root.setAttribute('role', 'status');
+    this.root.style.setProperty('--guidance-fade-ms', `${FIRST_MINUTE_GUIDANCE.fadeMs}ms`);
     this.text = el('span', 'onboard-hint-text');
     const close = plainButton('Dismiss', 'onboard-hint-close', () => this.hide());
     close.setAttribute('aria-label', 'Dismiss hint');
@@ -159,11 +161,23 @@ export class HintChip {
     return !this.root.hidden;
   }
 
-  show(message: string, seconds = 9): void {
+  show(message: string, seconds = FIRST_MINUTE_GUIDANCE.lifetimeMs / 1000): void {
     this.text.textContent = message;
+    this.root.classList.remove('is-guidance-fading');
     this.root.hidden = false;
     window.clearTimeout(this.timer);
-    this.timer = window.setTimeout(() => this.hide(), seconds * 1000);
+    this.timer = window.setTimeout(
+      () => this.fade(),
+      Math.max(0, seconds * 1000 - FIRST_MINUTE_GUIDANCE.fadeMs),
+    );
+  }
+
+  /** Keep the shared scan column in flow until the fade has finished. */
+  fade(): void {
+    if (!this.visible || this.root.classList.contains('is-guidance-fading')) return;
+    window.clearTimeout(this.timer);
+    this.root.classList.add('is-guidance-fading');
+    this.timer = window.setTimeout(() => this.hide(), FIRST_MINUTE_GUIDANCE.fadeMs);
   }
 
   hide(): void {

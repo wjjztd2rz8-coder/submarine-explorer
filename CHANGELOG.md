@@ -71,6 +71,15 @@ without an entry here is not done.
   No cuts. Golden capture and rendered budget verification remain blocked by
   the local sandbox's preview/browser restrictions; see the progress report.
 
+- Phase F, F-FIRSTMIN-620: fade the opening controls strip and animal hint after
+  the first successful move/turn or 12 seconds, keeping Controls in Pause and
+  recording control learning independently. Select a current objective before
+  the first navigation update so touch HUDs immediately show what to do. Retain
+  the existing scan/toast flow and Arcade defaults; add two-round, all-site
+  desktop/touch capture coverage and fade checks. Browser capture is blocked by
+  this environment's preview/Chromium permissions; findings and remaining checks
+  are in `plan/progress/F-FIRSTMIN-620.md`. Reason: clear competing opening
+  guidance while keeping the mission instruction visible.
 - Phase F, F-BLUEHOLE-PITCH: Openings can now tilt the chase camera (`chaseOffsetY`, a per-site
   vertical arm offset); the Great Blue Hole opening uses it and sits 22 m below the ledge, so
   the first frame looks down across the open water with the whole sub, the ledge, the surface

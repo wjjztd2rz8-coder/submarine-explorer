@@ -6,6 +6,15 @@
 import { publicUrl } from '../../util/publicUrl.js';
 import type { GameplayOptions } from './gameplay.js';
 
+/** Opening guidance leaves the view after movement or a short reading window. */
+export const FIRST_MINUTE_GUIDANCE = {
+  lifetimeMs: 12_000,
+  fadeMs: 250,
+  axisMin: 0.2,
+  moveDistanceM: 0.5,
+  turnRadians: Math.PI / 90,
+} as const;
+
 /** C1: globe mission select overlay (docs/globe.md). Distances in globe radii. */
 export interface GlobeConfig {
   /** Equirectangular Earth texture (public/assets/globe, ATTRIBUTION.md). */

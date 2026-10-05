@@ -252,3 +252,29 @@ html[data-reduce-motion='true'] .onboard-hint {
 .controls-card-control {
   flex-basis: 40%;
 }
+
+/* --- F-FIRSTMIN-620: clear opening guidance without moving the scan card. --- */
+.hud-control-tips,
+.onboard-hint {
+  transition: opacity var(--guidance-fade-ms, 250ms) ease-out;
+}
+.hud-control-tips.is-guidance-fading,
+.onboard-hint.is-guidance-fading,
+.scan-stack .onboard-hint.is-guidance-fading {
+  opacity: 0;
+  animation: none;
+  pointer-events: none;
+}
+.onboard-hint.is-guidance-fading button {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hud-control-tips,
+  .onboard-hint {
+    transition: none;
+  }
+}
+html[data-reduce-motion='true'] .hud-control-tips,
+html[data-reduce-motion='true'] .onboard-hint {
+  transition: none;
+}

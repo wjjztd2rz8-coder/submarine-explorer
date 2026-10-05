@@ -57,6 +57,25 @@ export function formatProgress(objectives: readonly ObjectiveStatus[]): string {
   return `${all} · ${primaryDone} of ${primary.length} primary`;
 }
 
+/** Keep an instruction visible while navigation waits for its first position. */
+export function currentObjectiveId(
+  objectives: readonly ObjectiveStatus[],
+  preferred: string | null,
+): string | null {
+  const current = objectives.find((o) => o.id === preferred && !o.complete);
+  return (
+    (
+      current ??
+      objectives.find((o) => !o.complete && o.primary && o.resolved) ??
+      objectives.find((o) => !o.complete && o.resolved) ??
+      objectives.find((o) => !o.complete && o.primary) ??
+      objectives.find((o) => !o.complete) ??
+      objectives.find((o) => o.primary) ??
+      objectives[0]
+    )?.id ?? null
+  );
+}
+
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   className?: string,
@@ -174,6 +193,7 @@ export class ObjectivesPanel {
   /** Refresh the "n of m" progress line. Cheap; called when an objective changes. */
   setObjectives(objectives: readonly ObjectiveStatus[]): void {
     this.objectives = objectives;
+    this.currentId = currentObjectiveId(objectives, this.currentId);
     this.write(this.progressEl, 'progress', formatProgress(objectives));
     this.renderList();
   }
@@ -197,8 +217,9 @@ export class ObjectivesPanel {
 
   /** The nav line; `allPrimaryDone` marks the target as optional, or shows a notice when none is left. */
   setNav(nav: NavReadout | null, allPrimaryDone: boolean): void {
-    if (this.currentId !== (nav?.id ?? null)) {
-      this.currentId = nav?.id ?? null;
+    const currentId = currentObjectiveId(this.objectives, nav?.id ?? this.currentId);
+    if (this.currentId !== currentId) {
+      this.currentId = currentId;
       this.renderList();
     }
     const t = (f: string, text: string): void => {
@@ -230,6 +251,8 @@ export class ObjectivesPanel {
     this.listEl.replaceChildren(
       ...shown.map((objective) => {
         const row = el('div', 'obj-item');
+        row.dataset.objective = objective.id;
+        if (objective.id === this.currentId) row.setAttribute('aria-current', 'step');
         row.classList.toggle('is-current', objective.id === this.currentId);
         row.classList.toggle('is-optional', !objective.primary);
         row.classList.toggle('is-complete', objective.complete);
