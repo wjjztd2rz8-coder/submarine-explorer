@@ -14,6 +14,13 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-MONTEREY-CANYON-700: extend Monterey's inward-facing mudstone
+  banks into steep canyon walls, add a descending local channel bend, and lower
+  and offset the opening chase arm while retaining the global reset distance. Keep the ledge's wall bands and colonies,
+  re-seat flank colonies on the larger faces, and give the distant bank
+  collision. Reason: the opening read as a lone mound instead of a submarine
+  canyon. The local bend is a reconstruction; survey data and science POIs
+  retain their original locations.
 - Phase F, F-BEEBE-MONTEREY: Beebe Vent Field opens with a shorter, lower chase
   arm (54 m, -16 m offset) so the sub fills the frame beside a lit smoker.
   Monterey wall boulders are now fractured, stretched, banded blocks and the
