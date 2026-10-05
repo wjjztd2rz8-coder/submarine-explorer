@@ -55,11 +55,11 @@
       "text": "A slender silver hake that schools over the continental shelf and slope of the northeast Pacific. It rises toward the surface at night to feed on krill and small fish, and spawns off California.",
       "facts": {
         "Length": "30 to 60 cm common",
-        "Depth": "Roughly 50 to 900 m",
+        "Depth": "Most common around 50 to 500 m; adults also occur below 900 m",
         "Diet": "Krill and small fish"
       },
-      "sourceTitle": "FishBase: Merluccius productus",
-      "sourceUrl": "https://www.fishbase.se/summary/Merluccius-productus.html"
+      "sourceTitle": "NOAA Fisheries — Pacific whiting (Pacific hake)",
+      "sourceUrl": "https://www.fisheries.noaa.gov/species/pacific-whiting"
     },
     "silver-hake": {
       "text": "A schooling hake of the northwest Atlantic shelf and canyon edges. By day it holds near the bottom; at night it rises into midwater to chase shrimp and small fish.",
@@ -85,11 +85,11 @@
       "text": "A big, dark, slow-moving fish that lingers near wrecks, ledges and rocky outcrops on the continental slope, which is how it got its name. A deepwater fishery works the Blake Plateau for it.",
       "facts": {
         "Length": "Up to about 2 m, around 1 m in the game",
-        "Depth": "Roughly 100 to 1,000 m",
+        "Depth": "Roughly 40 to 1,000 m",
         "Diet": "Fish and squid"
       },
-      "sourceTitle": "FishBase: Polyprion americanus",
-      "sourceUrl": "https://www.fishbase.se/summary/Polyprion-americanus.html"
+      "sourceTitle": "NOAA Fisheries — Wreckfish",
+      "sourceUrl": "https://www.fisheries.noaa.gov/species/wreckfish"
     },
     "rattail": {
       "text": "Grenadiers, or rattails, are deep-sea fish with a big head and a long tail that tapers to a point, which they hold above the bottom while they swim head-down hunting for food. The genus Coryphaenoides is found from the upper slope to the abyssal plains.",
@@ -152,14 +152,14 @@
       "sourceUrl": "https://www.fishbase.se/summary/Prionace-glauca.html"
     },
     "sixgill-shark": {
-      "text": "A large, ancient-looking shark with six gill slits and a green-glowing eye. It lives in deep water by day and rises toward the shallows at night to feed.",
+      "text": "A large, ancient-looking shark with six gill slits and large green eyes that reflect light. It lives in deep water by day and rises toward the shallows at night to feed.",
       "facts": {
         "Length": "Up to about 5 m, 3.6 m in the game",
         "Depth": "Surface to about 2,000 m",
         "Diet": "Fish, squid, carrion"
       },
-      "sourceTitle": "FishBase: Hexanchus griseus",
-      "sourceUrl": "https://www.fishbase.se/summary/Hexanchus-griseus.html"
+      "sourceTitle": "Florida Museum — Bluntnose sixgill shark",
+      "sourceUrl": "https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/bluntnose-sixgill-shark/"
     },
     "sperm-whale": {
       "text": "The largest toothed predator on Earth. It dives for over an hour to depths beyond 1,000 m, finding squid in the dark by echolocation clicks that are among the loudest sounds made by any animal.",
@@ -172,14 +172,14 @@
       "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Physeter%20macrocephalus"
     },
     "humpback-whale": {
-      "text": "A baleen whale famous for the long songs sung by males on their winter breeding grounds. Tonga is one of the places where humpbacks gather from about July to October to mate and calve.",
+      "text": "A baleen whale famous for the long songs sung by males. Humpbacks migrate between productive feeding grounds, where they eat krill and small fish, and warmer breeding grounds where they mate and calve.",
       "facts": {
-        "Length": "Up to about 16 m",
+        "Length": "Up to about 18 m",
         "Habitat": "Open water, often near islands and reefs",
         "Diet": "Krill and small fish"
       },
-      "sourceTitle": "WoRMS: Megaptera novaeangliae",
-      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Megaptera%20novaeangliae"
+      "sourceTitle": "NOAA Fisheries — Humpback whale",
+      "sourceUrl": "https://www.fisheries.noaa.gov/species/humpback-whale"
     },
     "sea-lion": {
       "text": "A playful, agile eared seal of the California coast. It hunts fish and squid on dives of a few minutes and often investigates divers and boats.",
@@ -188,8 +188,8 @@
         "Dive depth": "Usually under 100 m, can exceed 250 m",
         "Diet": "Fish and squid"
       },
-      "sourceTitle": "WoRMS: Zalophus californianus",
-      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Zalophus%20californianus"
+      "sourceTitle": "NOAA Fisheries — California sea lion",
+      "sourceUrl": "https://www.fisheries.noaa.gov/species/california-sea-lion"
     },
     "whale-shark": {
       "text": "The largest fish in the sea. It filters plankton, fish eggs and small fish from the water as it cruises with its huge mouth open, and each animal's spot pattern is unique, like a fingerprint.",
@@ -225,21 +225,21 @@
       "text": "A deep-sea crown jelly with a dark red bell. When attacked it throws out a spinning ring of bright blue light, a burglar alarm that may call a larger predator to the attacker.",
       "facts": {
         "Bell diameter": "Up to about 15 cm",
-        "Depth": "Roughly 400 to 4,000 m",
+        "Depth": "About 500 to 5,000 m for Atolla species (MBARI)",
         "Light": "Blue bioluminescent alarm display"
       },
-      "sourceTitle": "WoRMS: Atolla wyvillei",
-      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Atolla%20wyvillei"
+      "sourceTitle": "MBARI — Deep-sea crown jelly (Atolla)",
+      "sourceUrl": "https://www.mbari.org/animal/deep-sea-crown-jelly/"
     },
     "comb-jelly": {
-      "text": "A lobate comb jelly. Eight rows of beating plates move it through the water and split the light into a rainbow shimmer. In the dark, many comb jellies also flash blue-green light when bumped.",
+      "text": "A lobate comb jelly. Eight rows of beating plates move it through the water and split the light into a rainbow shimmer. In the dark, many comb jellies also flash blue-green light when bumped. Northeastern Pacific Bolinopsis are B. microptera; the Atlantic B. infundibulum is a distinct species.",
       "facts": {
         "Length": "Up to about 15 cm",
         "Habitat": "Open water, surface to over 1,000 m",
         "Diet": "Plankton"
       },
-      "sourceTitle": "WoRMS: Bolinopsis infundibulum",
-      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Bolinopsis%20infundibulum"
+      "sourceTitle": "Johnson et al. 2022 — Bolinopsis species and biogeography",
+      "sourceUrl": "https://www.frontiersin.org/journals/genetics/articles/10.3389/fgene.2022.970314/full"
     },
     "beebe-shrimp": {
       "text": "Shrimp swarm in dense masses on the walls of the Beebe black smokers, 4,960 m down on the Mid-Cayman Rise. Bacteria growing on their mouthparts and shell feed them, and a light-sensing organ on the back may detect the faint glow of the hot vents.",
@@ -274,12 +274,12 @@
     "sun-star": {
       "text": "A many-armed sea star of the California slope, with thirteen or more broad arms radiating from a wide central disc. It crawls over mud and rock on rows of tiny tube feet.",
       "facts": {
-        "Span": "20 to 50 cm",
-        "Depth": "About 200 to 1,000 m",
+        "Span": "Up to about 45 cm",
+        "Depth": "About 60 to 1,000 m",
         "Habitat": "Soft slope and canyon floor"
       },
-      "sourceTitle": "WoRMS: Rathbunaster californicus",
-      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Rathbunaster%20californicus"
+      "sourceTitle": "MBARI — California sun star",
+      "sourceUrl": "https://www.mbari.org/animal/california-sun-star/"
     },
     "brittle-star": {
       "text": "A large abyssal brittle star. Brittle stars move by whipping their slender arms in a rowing motion, unlike sea stars that glide on tube feet, and they drop an arm to escape a predator.",
@@ -375,11 +375,11 @@
       "text": "A sea pen is a colony of polyps shaped like a quill pen. Its stalk is anchored in soft sediment, and the feeding polyps cluster at the top and catch plankton drifting by.",
       "facts": {
         "Height": "0.5 to 1.5 m",
-        "Depth": "About 375 to 1,200 m",
+        "Depth": "375 to 1,192 m in the retained OBIS sample",
         "Habitat": "Muddy canyon floors"
       },
-      "sourceTitle": "WoRMS: Umbellula lindahli",
-      "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Umbellula%20lindahli"
+      "sourceTitle": "OBIS — Umbellula lindahli occurrence records",
+      "sourceUrl": "https://obis.org/taxon/128531"
     },
     "anemone": {
       "text": "A sea anemone of the deep: a soft muscular column with a crown of stinging tentacles that catch drifting animals. It attaches to rock, wreckage or bones and can slowly change position.",
@@ -435,8 +435,8 @@
       "text": "Neither a squid nor a vampire. It lives in the oxygen-poor midwater, drifts on its fins and sheds glowing mucus from its arm tips instead of ink. It feeds on marine snow it collects with long, sticky filaments.",
       "facts": {
         "Length": "About 15 to 30 cm",
-        "Depth": "About 500 to 1,500 m",
-        "Light": "Bioluminescent arm tips and fin photophores"
+        "Depth": "Typically 600 to 900 m (MBARI); local OBIS sample 402 to 1,000 m",
+        "Light": "Bioluminescent displays and glowing mucus"
       },
       "sourceTitle": "MBARI: Vampire squid",
       "sourceUrl": "https://www.mbari.org/animal/vampire-squid/"

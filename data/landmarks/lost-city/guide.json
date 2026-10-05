@@ -6,10 +6,11 @@
       "id": "overview",
       "title": "Lost City Hydrothermal Field",
       "paragraphs": [
-        "The Lost City Hydrothermal Field sits on the southern summit of the Atlantis Massif, a dome-shaped mountain of mantle rock exposed on the Mid-Atlantic Ridge near 30°N. Unlike the famous 'black smoker' vents that run on volcanic heat, Lost City is powered by serpentinization: seawater reacting with olivine-rich mantle rock, producing heat, hydrogen and methane rather than relying on a shallow magma chamber.",
-        "The field was found on 4 December 2000 during an Argo II camera survey from the research vessel Atlantis. The expedition’s scientific leaders were Deborah Kelley, Donna Blackman and Jeffrey Karson. Kelley and Karson visited in DSV Alvin the next day. The white carbonate towers rise as much as 60 m above the seabed.",
+        "The Lost City Hydrothermal Field sits near the southern summit of the Atlantis Massif, an oceanic core complex of exposed mantle and lower-crust rocks near 30°N on the Mid-Atlantic Ridge. Seawater reacting with olivine-rich mantle rock through serpentinization releases heat and hydrogen and creates alkaline, methane-rich fluids. Cooling of the lithosphere also supplies heat; the system does not require a shallow magma chamber.",
+        "The field was found on 4 December 2000 during an Argo II camera survey from the research vessel Atlantis. Gretchen Früh-Green and Barbara John were leading the camera watch when the white deposits appeared. Donna Blackman was the expedition's chief scientist, with Deborah Kelley and Jeffrey Karson as co-principal investigators. Kelley and Karson visited in DSV Alvin with pilot Patrick Hickey on 5 December. The carbonate towers rise as much as 60 m above the seabed.",
         "The fluid emerges clear and alkaline, depositing calcium carbonate and brucite when it meets seawater. Kelley’s 2005 account reported about 40–91 °C; later measurements at the Beehive outlet reached 96–116 °C.",
-        "NOAA's 2005 expedition described a field covering about 60,000 square metres."
+        "NOAA's 2005 expedition described a field covering about 60,000 square metres.",
+        "Chimney shapes and scan-marker positions in this dive are authored interpretations of the field. Secret finds and wildlife encounters are plausible game additions, rather than documented sightings at those positions. The species tables preserve an OBIS snapshot from 23 September 2026: counts measure sampling effort, and listed depths are sampled occurrence ranges rather than complete habitat limits. Local records for some wildlife remain unverified."
       ],
       "facts": [
         {
@@ -22,7 +23,7 @@
         },
         {
           "label": "Power source",
-          "value": "serpentinization, not magma"
+          "value": "serpentinization and cooling of the lithosphere; no shallow magma chamber required"
         },
         {
           "label": "Fluid temperature",
@@ -39,14 +40,6 @@
       ],
       "reconstruction": true,
       "sources": [
-        {
-          "title": "Lost City Hydrothermal Field — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
-        },
-        {
-          "title": "Atlantis Massif — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Atlantis_Massif"
-        },
         {
           "title": "GMRT Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
           "url": "https://www.gmrt.org/"
@@ -70,6 +63,14 @@
         {
           "title": "Aquino et al. 2024 — fluid mixing and spatial geochemical variability",
           "url": "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023GC011011"
+        },
+        {
+          "title": "Kelley et al. 2001 — discovery paper, Nature 412, 145–149",
+          "url": "https://doi.org/10.1038/35084000"
+        },
+        {
+          "title": "Kelley et al. 2005 — A Serpentinite-Hosted Ecosystem: The Lost City Hydrothermal Field",
+          "url": "https://doi.org/10.1126/science.1102556"
         }
       ],
       "confidence": "high"
@@ -80,7 +81,7 @@
       "paragraphs": [
         "Poseidon is a composite carbonate edifice about 60 m tall and 100 m long, with a width of many tens of metres. Its adjoining towers, spires and flanges grow as warm vent fluid mixes with cold seawater and deposits minerals.",
         "Uranium-thorium dating of carbonate samples from across Lost City gives ages up to about 120,000 years. These samples record the field’s long history; they do not date the entire active Poseidon tower.",
-        "Because it needs only olivine rock and liquid water, serpentinization like this could in principle happen anywhere those two things meet -- including on icy moons such as Europa or Enceladus, which is one reason Lost City is studied as a possible model for life beyond Earth."
+        "Serpentinization requires water and suitable iron-bearing rocks and could occur beneath the oceans of icy moons such as Europa or Enceladus. Lost City is therefore studied as an analogue for potentially habitable environments beyond Earth; this is a hypothesis about conditions, not evidence that life exists on those moons."
       ],
       "facts": [
         {
@@ -103,10 +104,6 @@
       "reconstruction": true,
       "sources": [
         {
-          "title": "Lost City Hydrothermal Field — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
-        },
-        {
           "title": "Denny et al. 2016, Geologic evolution of the Lost City Hydrothermal Field",
           "url": "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869"
         },
@@ -121,6 +118,14 @@
         {
           "title": "Kelley 2005 — measured Poseidon dimensions",
           "url": "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"
+        },
+        {
+          "title": "NASA Astrobiology — serpentinization and the Enceladus ocean",
+          "url": "https://astrobiology.nasa.gov/news/endly-is-enceladus-ocean-to-life/"
+        },
+        {
+          "title": "Ludwig et al. 2011 — authors' institutional abstract and U–Th ages",
+          "url": "https://experts.umn.edu/en/publications/u-th-systematics-and-sup230sup-th-ages-of-carbonate-chimneys-at-t/"
         }
       ],
       "confidence": "medium"
@@ -145,10 +150,6 @@
       "reconstruction": true,
       "sources": [
         {
-          "title": "Lost City Hydrothermal Field — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
-        },
-        {
           "title": "Denny et al. 2016, Geologic evolution of the Lost City Hydrothermal Field",
           "url": "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869"
         },
@@ -163,7 +164,7 @@
       "id": "imax-tower",
       "title": "IMAX Tower",
       "paragraphs": [
-        "IMAX is a parasitic chimney and flange on Poseidon's north face, built as warm, alkaline vent fluid mixed with seawater and deposited carbonate minerals. A 2005 expedition account described the chimney as about 8 m tall; a later detailed geologic survey described a roughly 30 m multipronged structure. The accounts describe different survey views of the complex.",
+        "IMAX is a parasitic chimney and flange on Poseidon's north face, built as warm, alkaline vent fluid mixed with seawater and deposited carbonate minerals. A 2005 expedition account described the chimney as about 8 m tall; a later detailed geologic survey described a roughly 30 m multipronged structure. The reason for the difference between these published heights remains unresolved.",
         "Look northwest of Poseidon for the IMAX scan marker."
       ],
       "facts": [
@@ -174,10 +175,6 @@
       ],
       "reconstruction": true,
       "sources": [
-        {
-          "title": "Lost City Hydrothermal Field — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
-        },
         {
           "title": "Kelley et al. 2005, The Lost City Hydrothermal Field",
           "url": "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"
@@ -193,9 +190,9 @@
       "id": "microbial-mat",
       "title": "Microbial life on the chimneys",
       "paragraphs": [
-        "Lost City's chimneys are coated inside and out with thick biofilms of archaea and bacteria that live on the vent's own chemistry: hydrogen and methane, produced abiotically by the serpentinization reaction, with almost no help from sunlight or photosynthesis at all. A group of archaea related to the order Methanosarcinales dominates the warmest, most active surfaces.",
+        "Lost City's chimney biofilms contain archaea and bacteria that draw energy from vent chemistry, including hydrogen and methane, rather than directly from sunlight. Methanosarcinales-related archaea dominate the hot, oxygen-poor interiors of active chimneys. Exterior biofilms grow where vent fluid mixes with seawater, which supplies oxygen and sulfate.",
         "Most of the invertebrates associated with the chimneys are small, often less than a centimetre long. Snails, bivalves, worms and small crustaceans inhabit the structures, alongside microbial biofilms. The dense beds of large tubeworms, mussels and clams familiar from many black-smoker fields are absent.",
-        "This POI sits near a real cluster of OBIS occurrence records from a 2003 International Census of Marine Microbes survey of the field -- almost entirely archaea and bacteria identified from DNA, with no reported collection depth."
+        "The OBIS export for this area is dominated by bacteria and archaea, including Rhodobacteraceae and Methanosarcinaceae. Its retained records identify taxa at ranks ranging from kingdom to genus, rather than individual microbial species, and report no collection depths. Attribution of this entire export to a single 2003 survey remains unverified."
       ],
       "facts": [
         {
@@ -204,15 +201,11 @@
         },
         {
           "label": "Large fauna",
-          "value": "low biomass; mostly small invertebrates, with occasional larger animals such as wreckfish"
+          "value": "low chimney-fauna biomass; mostly small invertebrates, while wreckfish are common in the field"
         }
       ],
       "reconstruction": true,
       "sources": [
-        {
-          "title": "Lost City Hydrothermal Field — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
-        },
         {
           "title": "Ocean Biodiversity Information System (OBIS)",
           "url": "https://obis.org/"
@@ -220,6 +213,14 @@
         {
           "title": "Kelley 2005 — Lost City microbial and animal communities",
           "url": "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"
+        },
+        {
+          "title": "Kelley et al. 2005 — microbial communities and macrofaunal diversity",
+          "url": "https://doi.org/10.1126/science.1102556"
+        },
+        {
+          "title": "Lartaud et al. 2011 — rare Lost City mussels",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3093485/"
         }
       ],
       "confidence": "medium"
@@ -244,12 +245,12 @@
       "reconstruction": false,
       "sources": [
         {
-          "title": "Atlantis Massif — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Atlantis_Massif"
-        },
-        {
           "title": "GMRT Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
           "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Denny et al. 2016 — Atlantis Massif core complex and field setting",
+          "url": "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869"
         }
       ],
       "confidence": "high"
@@ -267,23 +268,23 @@
           "value": "1,332 m"
         },
         {
-          "label": "Distance to real field",
-          "value": "about 665 m north"
+          "label": "Distance to terrain-matched vent-depth band",
+          "value": "about 665 m north; exact chimney footprints unverified"
         },
         {
           "label": "Cause",
-          "value": "arc-minute-rounded published coordinate on steep terrain"
+          "value": "rounded catalogue coordinate combined with coarse bathymetry on steep terrain"
         }
       ],
       "reconstruction": false,
       "sources": [
         {
-          "title": "Lost City Hydrothermal Field — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
-        },
-        {
           "title": "GMRT Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
           "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "Kelley et al. 2005 — published field-depth range",
+          "url": "https://doi.org/10.1126/science.1102556"
         }
       ],
       "confidence": "high"

@@ -15,7 +15,7 @@
   "taxa_in_bbox": 885,
   "taxa_matching_rank": 449,
   "records_in_bbox": 129124,
-  "note": "Occurrence records within the tile bbox from OBIS; record counts reflect sampling effort, not abundance. Placement of animals in the game is invented.",
+  "note": "OBIS occurrence snapshot fetched on 23 September 2026 within the tile bbox. Record counts reflect sampling effort, not abundance; depth ranges summarize at most 2,000 sampled records per taxon and are not complete habitat limits. Live totals may differ from this snapshot. The species rank filter also includes infraspecific ranks, such as Paragorgia arborea var. pacifica. Broad occurrence depth intervals may extend outside the 200–3,600 m query window.",
   "species": [
     {
       "scientificName": "Heteropolypus ritteri",

@@ -27,13 +27,13 @@
     "summary": "Descend about 800 m to the Lost City Hydrothermal Field, a cluster of towering white carbonate chimneys on the Atlantis Massif. Find and scan the Poseidon tower, then survey the smaller chimneys and the real terrain around the field.",
     "depth_m": 780,
     "facts": [
-      "Lost City runs on serpentinization: seawater reacting with mantle rock. Its warm, alkaline fluid emerges clear, leaving pale carbonate towers.",
+      "Serpentinization supplies heat and chemical energy as seawater reacts with mantle rock; cooling of the lithosphere also supplies heat. Lost City's alkaline fluid emerges clear, leaving pale carbonate towers.",
       "Poseidon stands about 60 m tall. Carbonate samples elsewhere in the field record activity reaching back about 120,000 years.",
       "The towers stand on a sloping terrace of the Atlantis Massif, around 750–900 m deep.",
       "Microbial communities use hydrogen and methane from the vent fluid as sources of energy."
     ],
     "hazards": [
-      "Fragile mineral formations: the carbonate spires are delicate and slow-growing. Keep a respectful distance.",
+      "Fragile mineral formations: delicate new carbonate growth can break easily. Keep a respectful distance.",
       "Moderate currents around the summit.",
       "Sunlight fades with depth; use your lights to read the deeper terrain."
     ]
