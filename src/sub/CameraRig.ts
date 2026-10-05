@@ -67,10 +67,17 @@ export class CameraRig {
     this.chaseRadius = Math.hypot(config.chaseOffset.x, config.chaseOffset.y, config.chaseOffset.z);
     this.chaseRadiusDefault = this.chaseRadius;
     this.orbitElevation = config.orbitElevation;
+    this.setAspect(aspect);
   }
 
   setAspect(aspect: number): void {
     this.camera.aspect = aspect;
+    // Preserve at least the configured horizontal field of view on portrait
+    // screens. A fixed vertical FOV crops the close chase hull on narrow phones.
+    this.camera.fov = THREE.MathUtils.radToDeg(
+      2 *
+        Math.atan(Math.tan(THREE.MathUtils.degToRad(this.config.fovDeg / 2)) / Math.min(1, aspect)),
+    );
     this.camera.updateProjectionMatrix();
   }
 

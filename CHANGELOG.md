@@ -14,6 +14,22 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-INTEGRATE-660: preserve horizontal camera framing on portrait
+  screens and place tall-phone scan targets/hints below measured telemetry in
+  its right column.
+  Restore nine-second pressure/supply hints; retain twelve-second animal
+  guidance and expire hints independently of delayed fade callbacks. Reason:
+  the merged browser gate exposed clipped/covered portrait hulls and a changed
+  hint lifetime. Preserve the retained browser assertions,
+  authored opening poses and the duration-balanced CI shards.
+- Phase F, F-CI-640: balance individual browser tests by recorded duration across
+  20 single-worker CI jobs, finish every case in each shard, and upload timing
+  artifacts. Synchronize browser checks with rendered frames and native touch
+  input while retaining their existing assertions. Reason: red CI and uneven
+  software-WebGL shard runtimes delayed integration.
+- Phase F, F-FACTCHECK-630: correct Lost City and Monterey Journal, mission and
+  wildlife copy against primary sources; clarify survey snapshots and authored
+  interpretations. Retain placement, numeric settings and provenance tags.
 - Phase F, F-VERIFY-650 credits gate follow-up: if the normal padded credits
   slot is exhausted, retry with 4 px viewport margins and HUD gaps while
   retaining the 120×48 minimum reading area and all obstacle checks. Reason:
@@ -80,20 +96,6 @@ without an entry here is not done.
   this environment's preview/Chromium permissions; findings and remaining checks
   are in `plan/progress/F-FIRSTMIN-620.md`. Reason: clear competing opening
   guidance while keeping the mission instruction visible.
-- Phase F, F-BUGHUNT-590 gate follow-up: compact supplies/current spacing
-  in the short landscape HUD so Realistic Surface telemetry clears the
-  ballast slider. Fix the five portrait scan tests to hold the native touch
-  Scan control; keyboard scanning had switched the UI to desktop input and
-  hidden Pause. Preserve every overlap, containment, scan, layout and frame
-  budget assertion; also require Realistic supplies/current to remain visible.
-- Phase F, F-BUGHUNT-590: correct the opening geometry regression to apply
-  the merged Blue Hole vertical chase offset; add actual-tile hull/near-plane
-  clearance checks at Low and High for Arcade/Realistic and both touch aspects.
-  Add focused browser checks for Blue Hole openings, Surface start, HUD/frame
-  budgets and scanned portrait Journal/debrief layouts at all five heroes.
-  Initial sandbox audit found no product bug. Browser and golden
-  verification remain pending browser-capable execution; evidence and rerun
-  commands: `plan/progress/F-BUGHUNT-590.md`.
 - Phase F, F-BLUEHOLE-PITCH: Openings can now tilt the chase camera (`chaseOffsetY`, a per-site
   vertical arm offset); the Great Blue Hole opening uses it and sits 22 m below the ledge, so
   the first frame looks down across the open water with the whole sub, the ledge, the surface
@@ -173,10 +175,6 @@ without an entry here is not done.
   lighting/snow browser checks. Beebe's 150% regression is already active.
   Static gates pass; browser and fresh visual verification are blocked by
   sandbox localhost/Chromium restrictions (see `plan/progress/F-VERIFY-530.md`).
-- Phase F, F-TOUCH-150 gate follow-up: make warm vent haze opt-in through
-  registered Config defaults and enable it explicitly at Beebe. Reason: its
-  implicit global default added a third draw to generic vent presets, breaking
-  their two-draw contract. Preserve Beebe's haze and the exact E2E assertion.
 - Phase F, F-TOUCH-150: cap the playing HUD scale on short portrait touch
   viewports so enlarged UI keeps the tutorial and scanner clear of telemetry
   and sonar; show a small source-credit pill above touch controls while retaining
@@ -203,7 +201,7 @@ without an entry here is not done.
   await rendered camera frames and the loaded Daily card before measuring;
   existing facing, position and hit-target thresholds remain unchanged.
   No cuts.
-- Phase F, F-VERIFY-480 browser follow-up: make the extra hot-water haze an
+- Phase F, F-VERIFY-480 / F-TOUCH-150 gate follow-up: make the extra hot-water haze an
   explicit sulfide-site override, enabled at Beebe. Reason: an undeclared,
   nonzero fallback added a third draw to every vent, violating the generic
   preset's two-draw budget. Declare and validate both haze controls, preserve
@@ -660,6 +658,14 @@ without an entry here is not done.
 
 ### Removed
 
+- Phase F, F-INTEGRATE-660: drop F-BUGHUNT-590 after its Realistic Blue Hole
+  Surface telemetry still overlapped the ballast slider after a real fix
+  attempt. Restore its changed paths from merge `78ab30e`'s first parent,
+  remove its added specs/report and roll back the unsuccessful landscape
+  integration attempt. Retain the unrelated portrait and hint fixes and all
+  six other packages. Reason: the integration task explicitly requires dropping
+  590 if its changes still fail after a fix attempt; the collision remains
+  unresolved. Details: `plan/progress/F-INTEGRATE-660.md`.
 - Phase F, F-BUGHUNT-540: delete dead HUD help/link selectors, stale attribution
   wrapper opacity/background rules from the former pill, and superseded centred
   objectives declarations. Reason: the retired UI left unused styles and duplicate

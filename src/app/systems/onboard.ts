@@ -14,6 +14,7 @@ import type { HintLabels } from '../../game/Hints.js';
 import { Tutorial } from '../../game/Tutorial.js';
 import { TutorialSave } from '../../game/TutorialSave.js';
 import type { ActionId } from '../../core/Input.js';
+import { FIRST_MINUTE_GUIDANCE } from '../../core/Config.js';
 import type { GameContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
@@ -267,7 +268,10 @@ export function createOnboardSystem(): GameSystem {
         if (id) {
           creatureHint = id === 'creature';
           store.save({ seenHints: hints.seen });
-          chip.show(HINT_TEXT[id](hintLabels(device)));
+          chip.show(
+            HINT_TEXT[id](hintLabels(device)),
+            id === 'creature' ? FIRST_MINUTE_GUIDANCE.lifetimeMs / 1000 : 9,
+          );
         }
       },
     },

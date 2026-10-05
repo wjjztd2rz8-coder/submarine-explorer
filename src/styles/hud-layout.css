@@ -201,21 +201,6 @@
   html.is-touch .hud-readouts .hud-value {
     font-size: 13px;
   }
-  /* Supplies and currents add three rows in Realistic. Keep their spacing
-     compact so the mission/readout stack clears the ballast slider below. */
-  html.is-touch .hud-power,
-  html.is-touch .hud-current {
-    margin-top: 2px;
-    padding-top: 2px;
-  }
-  html.is-touch .hud-power {
-    gap: 2px;
-  }
-  html.is-touch .hud-power-line,
-  html.is-touch .hud-current {
-    font-size: 12px;
-    line-height: 1.25;
-  }
   /* Heading and tile name wait in the pause menu and sonar on a phone. */
   html.is-touch .hud-readouts .hud-row:has([data-field='heading']),
   html.is-touch .hud-readouts .hud-row:has([data-field='tile']) {
@@ -225,7 +210,6 @@
     margin-top: 3px;
     padding-top: 3px;
     font-size: 11px;
-    line-height: 1.25;
   }
   html.is-touch .hull-gauge-label {
     margin-bottom: 2px;
@@ -476,6 +460,23 @@
     left: auto;
     right: calc(12px + env(safe-area-inset-right, 0px));
     top: calc(12px + env(safe-area-inset-top, 0px));
+  }
+}
+
+/* Tall portrait: keep contacts and hints in the telemetry column, leaving
+   the centre chase hull clear. The measured height includes supplies, hull
+   rating and wrapped values; mission telemetry follows the objective bottom. */
+@media (orientation: portrait) and (max-width: 700px) and (min-height: 701px) {
+  html.is-touch .scan-overlay .scan-stack,
+  html.is-touch body:has(.onboard-hint:not([hidden])) .scan-overlay .scan-stack {
+    left: var(--hl-portrait-stack-left);
+    top: calc(var(--hl-portrait-stack-top) + var(--hud-readouts-height, 120px) + 12px);
+    bottom: auto;
+    width: calc(100vw - var(--hl-portrait-stack-left) - 12px - env(safe-area-inset-right, 0px));
+    transform: none;
+  }
+  html.is-touch body:has(.objectives-panel:not([hidden])) .scan-overlay .scan-stack {
+    top: calc(var(--obj-panel-bottom, 240px) + 8px + var(--hud-readouts-height, 120px) + 12px);
   }
 }
 

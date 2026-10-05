@@ -116,6 +116,7 @@ export class HUD {
   private powerState: PowerState | undefined;
   private hullNote = '';
   private creditsLayoutKey = '';
+  private readoutsObserver: ResizeObserver | null = null;
 
   constructor(
     private readonly meta: TileMeta,
@@ -189,6 +190,16 @@ export class HUD {
       );
     }
     parent.appendChild(this.root);
+    if (typeof ResizeObserver !== 'undefined') {
+      const readouts = this.root.querySelector<HTMLElement>('.hud-readouts')!;
+      this.readoutsObserver = new ResizeObserver(() => {
+        document.documentElement.style.setProperty(
+          '--hud-readouts-height',
+          `${readouts.getBoundingClientRect().height}px`,
+        );
+      });
+      this.readoutsObserver.observe(readouts);
+    }
     this.set('tile', `${meta.id} (${meta.cols}×${meta.rows})`);
   }
 
@@ -406,6 +417,7 @@ export class HUD {
   }
 
   dispose(): void {
+    this.readoutsObserver?.disconnect();
     this.root.remove();
   }
 }

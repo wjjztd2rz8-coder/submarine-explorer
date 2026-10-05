@@ -143,6 +143,7 @@ export class HintChip {
   readonly root: HTMLDivElement;
   private readonly text: HTMLElement;
   private timer = 0;
+  private fadeTimer = 0;
 
   constructor(parent: HTMLElement = document.body) {
     this.root = el('div', 'onboard-hint');
@@ -161,27 +162,33 @@ export class HintChip {
     return !this.root.hidden;
   }
 
-  show(message: string, seconds = FIRST_MINUTE_GUIDANCE.lifetimeMs / 1000): void {
+  show(message: string, seconds = 9): void {
     this.text.textContent = message;
     this.root.classList.remove('is-guidance-fading');
     this.root.hidden = false;
     window.clearTimeout(this.timer);
-    this.timer = window.setTimeout(
-      () => this.fade(),
+    window.clearTimeout(this.fadeTimer);
+    // Keep expiry independent of the fade callback: delayed/coalesced timers
+    // must not start another quarter second of lifetime after the deadline.
+    this.fadeTimer = window.setTimeout(
+      () => this.root.classList.add('is-guidance-fading'),
       Math.max(0, seconds * 1000 - FIRST_MINUTE_GUIDANCE.fadeMs),
     );
+    this.timer = window.setTimeout(() => this.hide(), Math.max(0, seconds * 1000));
   }
 
   /** Keep the shared scan column in flow until the fade has finished. */
   fade(): void {
     if (!this.visible || this.root.classList.contains('is-guidance-fading')) return;
     window.clearTimeout(this.timer);
+    window.clearTimeout(this.fadeTimer);
     this.root.classList.add('is-guidance-fading');
     this.timer = window.setTimeout(() => this.hide(), FIRST_MINUTE_GUIDANCE.fadeMs);
   }
 
   hide(): void {
     window.clearTimeout(this.timer);
+    window.clearTimeout(this.fadeTimer);
     this.root.hidden = true;
   }
 
