@@ -119,6 +119,9 @@ const FREE_DIVE_OPENINGS: Record<
     altitude: 10,
     yawOffset: 10,
     turnWeight: 3,
+    // Frame the bend beside the hull while keeping X reset at the global chase distance.
+    chaseOffsetY: -14,
+    chaseOffsetX: 20,
   },
   endurance: { hero: 'main-hull', bearing: 60, range: 70 },
   'axial-seamount-ashes': { hero: 'mushroom-chimney', bearing: 45, range: 60 },

@@ -29,52 +29,52 @@
       "lod_distance_m": 900,
       "collision": "box",
       "reconstruction": true,
-      "note": "Game addition: a bedded mudstone canyon wall in an S-bend, undercut at its base, with receding terraces, rubble on the outer bend and a sandy passage on the inner one, in the manner of the steep walls of Monterey Canyon (MBARI). Size and position along the wall are invented."
+      "note": "Game reconstruction: a bedded mudstone ledge on the inner bend, beside the descending opening channel. The neighbouring banks extend beyond this ledge so it sits inside a canyon rather than standing alone. Dimensions and placement are invented; the original wall bands, sea fans and sponges remain."
     },
     {
       "id": "canyon-wall-east",
       "model": "procedural:geo",
       "feature": "canyon-ledge",
-      "lat": 36.7868,
-      "lon": -122.0123,
+      "lat": 36.787,
+      "lon": -122.011,
       "snap_to_seabed": true,
       "heading_deg": 270,
       "scale": 1,
-      "dimensions_m": [90, 34, 38],
+      "dimensions_m": [700, 110, 170],
       "lod_distance_m": 900,
       "collision": "box",
       "reconstruction": true,
-      "note": "Game addition: the east flank of the canyon, a smaller bedded mudstone face standing across the dive path so the passage between the walls reads as a canyon. Size and position are invented."
+      "note": "Game reconstruction: the opposing east bank across the descending opening channel, facing inward and seen through water haze. Terraces and colonies follow its terrain-supported surface. Dimensions and placement are invented."
     },
     {
       "id": "canyon-wall-west",
       "model": "procedural:geo",
       "feature": "canyon-ledge",
       "lat": 36.78715,
-      "lon": -122.0143,
+      "lon": -122.0145,
       "snap_to_seabed": true,
       "heading_deg": 90,
       "scale": 1,
-      "dimensions_m": [120, 48, 50],
+      "dimensions_m": [800, 100, 150],
       "lod_distance_m": 900,
       "collision": "box",
       "reconstruction": true,
-      "note": "Game addition: the west flank of the canyon, a smaller bedded mudstone face standing across the dive path so the passage between the walls reads as a canyon. Size and position are invented."
+      "note": "Game reconstruction: a long, steep west-bank mudstone face, facing inward along the opening bend. Terraces, sea fans and sponges follow its terrain-supported surface. Dimensions and placement are invented."
     },
     {
       "id": "canyon-wall-far",
       "model": "procedural:geo",
       "feature": "canyon-ledge",
-      "lat": 36.7902,
-      "lon": -122.0108,
+      "lat": 36.7929,
+      "lon": -122.011,
       "snap_to_seabed": true,
-      "heading_deg": 180,
+      "heading_deg": 270,
       "scale": 1,
-      "dimensions_m": [220, 90, 80],
+      "dimensions_m": [500, 110, 190],
       "lod_distance_m": 1400,
-      "collision": "none",
+      "collision": "box",
       "reconstruction": true,
-      "note": "Game addition: a distant bedded mudstone face further up the north side of the canyon, so the water beyond the near walls reads as depth rather than empty space. Size and position are invented."
+      "note": "Game reconstruction: the continuation of the opposing bank beyond the opening bend, with a collidable stratified face receding into haze. Dimensions and placement are invented."
     }
   ]
 }

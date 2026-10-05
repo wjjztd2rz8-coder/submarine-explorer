@@ -6,6 +6,8 @@
  * the sinkhole (near-circular, steep walls, a ledge at ~40 m where the real
  * stalactites hang, a floor near 125 m) applied on top of the measured surface.
  * It is a reconstruction (tagged in the Journal and the prop note), not survey data.
+ * Monterey also gets a local reconstructed opening bend between its mudstone
+ * banks; the surveyed tile and science contacts remain unchanged.
  */
 
 import { latLonToWorld } from '../util/geo.js';
@@ -86,6 +88,27 @@ export interface TerrainCarve {
 
 /** The carve for a tile, or null when it has none. */
 export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
+  if (meta.id === 'monterey-canyon') {
+    // A reconstructed S-bend beside the opening ledge. Its 180 m-wide floor
+    // has shoulders smoothed out by the survey grid; retain the original wall seats.
+    const wall = latLonToWorld(meta, 36.7872, -122.0133);
+    const centre = { x: wall.x + 170, z: wall.z };
+    return {
+      centre,
+      apply(x, z, height) {
+        const along = z - centre.z;
+        const axis = centre.x + 20 * Math.sin(along / 220);
+        const across = Math.abs(x - axis);
+        if (Math.abs(along) >= 620 || across >= 90) return height;
+        const end = 1 - smoothstep(Math.max(0, (Math.abs(along) - 450) / 170));
+        const bank = 1 - smoothstep(Math.max(0, (across - 30) / 60));
+        // This local bend turns north before continuing west: its sandy floor
+        // drops 20 m per 100 m forward, with steep shoulders into the banks.
+        const floor = -860 + along * 0.2 + across * across * 0.002;
+        return height + (Math.min(height, floor) - height) * end * bank;
+      },
+    };
+  }
   if (meta.id !== 'great-blue-hole') return null;
   const centre = latLonToWorld(meta, BLUE_HOLE_LAT, BLUE_HOLE_LON);
   return {
