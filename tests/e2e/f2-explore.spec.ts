@@ -175,7 +175,10 @@ test('samples collect per dive, appear in mission debrief, and reset on restart'
   ).toBe(1);
   await page.evaluate(() => (window.__game as unknown as Game).missionRouter.endDive());
   await expect(page.locator('.mission-debrief .is-samples')).toContainText('Sediment core');
-  await expect(page.locator('.mission-debrief .is-secrets')).toContainText('SECRETS FOUND 0/3');
+  await expect(page.locator('.mission-debrief .is-secrets')).toHaveCount(0);
+  expect(
+    await page.evaluate(() => (window.__game as unknown as Game).explore.summary().found),
+  ).toBe(0);
   await shot(page, 'sample-debrief');
   await page.getByRole('button', { name: 'Dive again', exact: true }).click();
   await page.waitForFunction(

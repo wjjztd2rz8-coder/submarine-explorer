@@ -230,15 +230,15 @@ test.describe('D-FLOW dive flow', () => {
       total: 4,
     });
     await expect(debrief.locator('.debrief-title')).toHaveText('Mission complete');
-    await expect(debrief.locator('.debrief-subtitle')).toContainText('3 of 4 objectives');
+    await expect(debrief.locator('.debrief-subtitle')).toHaveText('All primary objectives');
     await expect(
       debrief.locator('.debrief-stat[data-field="objectives"] .debrief-value'),
     ).toHaveText('3 of 4');
     await expect(debrief.locator('.debrief-btn')).toHaveText([
-      'Keep exploring',
-      'Dive again',
       'Dive sites',
       'Home',
+      'Keep exploring',
+      'Dive again',
       'Journal',
     ]);
     await shot(page, 'debrief');
@@ -300,7 +300,8 @@ test.describe('D-FLOW dive flow', () => {
     await surfaceFromPause(page);
     const debrief = page.locator('.mission-debrief');
     await expect(debrief.locator('.debrief-title')).toHaveText('Dive ended');
-    await expect(debrief.locator('.debrief-subtitle')).toContainText('1 of 4 objectives');
+    await expect(debrief.locator('.debrief-subtitle')).toHaveText('Primary objectives unfinished');
+    await expect(debrief.locator('[data-field="objectives"] .debrief-value')).toHaveText('1 of 4');
     expect((await probe(page)).emitted).not.toContain('mission:complete');
 
     await debrief.locator('[data-action="home"]').click();
@@ -373,7 +374,7 @@ test.describe('D-FLOW Journal', () => {
     await expect(journal.locator('.jr-body .jr-title')).toHaveText('RMS Titanic');
     const bow = journal.locator('.jr-nav-item[data-target="titanic/poi/bow"]');
     const stern = journal.locator('.jr-nav-item[data-target="titanic/poi/stern"]');
-    await expect(stern).toHaveText('Undiscovered');
+    await expect(stern).toHaveText('Unscanned target 2');
     await bow.click();
     await expect(journal.locator('.jr-tag.is-recreation')).toHaveText('Recreation');
     await expect(journal.locator('.jr-sources a').first()).toHaveAttribute('href', /^https?:/);
@@ -383,7 +384,7 @@ test.describe('D-FLOW Journal', () => {
     await stern.click();
     await expect(journal.locator('.jr-body .jr-title')).toHaveText('Undiscovered');
     await journal.locator('.jr-spoilers input').check();
-    await expect(stern).not.toHaveText('Undiscovered');
+    await expect(stern).not.toHaveText('Unscanned target 2');
     await expect(journal.locator('.jr-tag.is-undiscovered')).toBeVisible();
     await expect(journal.locator('.jr-body .jr-para').first()).toBeVisible();
     // Species unlock only through a documented linkage; with spoilers they are readable.

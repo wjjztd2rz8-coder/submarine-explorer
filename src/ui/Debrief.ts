@@ -101,7 +101,13 @@ export class Debrief {
       ),
     );
     head.append(el('h1', 'debrief-title', stats.title ?? 'Dive debrief'));
-    if (stats.subtitle) head.append(el('p', 'debrief-subtitle', stats.subtitle));
+    if (stats.subtitle) {
+      // Objectives and time already have their own cells; keep the outcome once.
+      const subtitle = stats.objectives
+        ? stats.subtitle.replace(/ · \d+ of \d+ objectives · [\d:]+$/, '')
+        : stats.subtitle;
+      head.append(el('p', 'debrief-subtitle', subtitle));
+    }
     p.append(head);
     if (rating) {
       const row = el('div', 'debrief-rating');
@@ -111,13 +117,13 @@ export class Debrief {
         '★'.repeat(rating.stars) + '☆'.repeat(3 - rating.stars),
       );
       stars.setAttribute('aria-label', `${rating.stars} of 3 stars`);
-      row.append(stars, el('span', undefined, `${rating.points} RP earned this dive`));
+      row.append(stars, el('span', undefined, `${rating.points} research points earned`));
       row.append(
         el(
           'small',
           undefined,
           rating.stars === 3
-            ? 'Every objective + photo or species goal'
+            ? 'All objectives + photo or species goal'
             : rating.stars === 2
               ? 'Every objective · add a photo or species scan for 3 stars'
               : rating.stars === 1
@@ -138,54 +144,52 @@ export class Debrief {
     if (stats.objectives) {
       const { completed, total } = stats.objectives;
       stat('OBJECTIVES', `${completed} of ${total}`, 'objectives');
+      grid.className += ' has-objectives';
     }
+    stat('SCANS', String(stats.discoveries.length), 'discoveries');
     stat('DISTANCE', formatDistance(stats.distanceM), 'distance');
     stat('MAX DEPTH', `${Math.round(stats.maxDepthM).toLocaleString('en-US')} m`, 'maxDepth');
     stat('DIVE TIME', formatDuration(stats.elapsedS), 'elapsed');
-    stat('SCANS', String(stats.discoveries.length), 'discoveries');
     p.append(grid);
 
     const lists = el('div', 'debrief-lists');
-    const section = (title: string, items: string[], empty: string, cls: string): void => {
+    const section = (title: string, items: string[], cls: string): void => {
+      if (!items.length) return;
       const s = el('div', `debrief-section ${cls}`);
       s.append(el('h2', 'debrief-section-title', title));
       if (items.length) {
         const ul = el('ul');
         for (const i of items) ul.append(el('li', undefined, i));
         s.append(ul);
-      } else {
-        s.append(el('p', 'debrief-empty', empty));
       }
       lists.append(s);
     };
     section(
-      'DISCOVERIES THIS DIVE',
+      'SCANNED THIS DIVE',
       stats.discoveries.map((d) => d.name),
-      'Nothing scanned this dive.',
       'is-discoveries',
     );
-    section(
-      'NEW JOURNAL ENTRIES',
-      stats.newEntries.map((e) => e.title),
-      'No new entries.',
-      'is-new',
-    );
+    if (stats.newEntries.length) {
+      const count = stats.newEntries.length;
+      lists.append(
+        el(
+          'p',
+          'debrief-journal-summary',
+          `${count} new Journal ${count === 1 ? 'entry' : 'entries'}`,
+        ),
+      );
+    } else if (!stats.discoveries.length) {
+      lists.append(el('p', 'debrief-empty', 'Hold Scan near a target to add a Journal entry.'));
+    }
     const exploration = this.exploration?.();
     if (exploration && exploration.total) {
       section(
         `SECRETS FOUND ${exploration.found}/${exploration.total}`,
         exploration.secrets,
-        'Follow faint nearby sonar contacts to find secrets.',
         'is-secrets',
       );
-      section(
-        'SAMPLES COLLECTED',
-        exploration.samples,
-        'No samples collected this dive.',
-        'is-samples',
-      );
-      if (exploration.events.length)
-        section('EVENTS WITNESSED', exploration.events, '', 'is-events');
+      section('SAMPLES COLLECTED', exploration.samples, 'is-samples');
+      if (exploration.events.length) section('EVENTS WITNESSED', exploration.events, 'is-events');
     }
     p.append(lists);
 
@@ -202,13 +206,22 @@ export class Debrief {
       },
       { id: 'journal', label: 'Journal', run: () => this.options.onFieldGuide?.() },
     ];
-    for (const a of list) {
-      const b = el('button', a.primary ? 'debrief-btn is-primary' : 'debrief-btn', a.label);
+    // Navigation is the main next step. Resume/replay remain available below it.
+    const primary =
+      list.find((a) => a.id === 'dive-sites') ?? list.find((a) => a.primary) ?? list[0];
+    const navigation = el('div', 'debrief-navigation');
+    const secondary = el('div', 'debrief-secondary');
+    const ordered = [primary, ...list.filter((a) => a !== primary)].filter(
+      (a): a is DebriefAction => !!a,
+    );
+    for (const a of ordered) {
+      const b = el('button', a === primary ? 'debrief-btn is-primary' : 'debrief-btn', a.label);
       b.type = 'button';
       b.dataset.action = a.id;
       b.addEventListener('click', () => a.run());
-      row.append(b);
+      (a === primary || a.id === 'home' ? navigation : secondary).append(b);
     }
+    row.append(navigation, secondary);
     p.append(row);
 
     this.open_ = true;

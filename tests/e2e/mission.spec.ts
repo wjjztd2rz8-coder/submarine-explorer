@@ -261,10 +261,10 @@ test.describe('B3 mission flow', () => {
     await expect(debrief.locator('.debrief-title')).toHaveText('Mission complete');
     await expect(debrief.locator('.debrief-kicker')).toHaveText('TITANIC DIVE');
     await expect(debrief.locator('.debrief-btn')).toHaveText([
-      'Keep exploring',
-      'Dive again',
       'Dive sites',
       'Home',
+      'Keep exploring',
+      'Dive again',
       'Journal',
     ]);
     await expect(debrief.locator('.debrief-section.is-discoveries li')).toHaveText([
@@ -380,9 +380,9 @@ test.describe('fix S: mission failure, framing and modals', () => {
     await expect(debrief.locator('.debrief-subtitle')).toContainText('Hull failure at');
     // No Keep exploring after an abort: the dive is over.
     await expect(debrief.locator('.debrief-btn')).toHaveText([
-      'Dive again',
       'Dive sites',
       'Home',
+      'Dive again',
       'Journal',
     ]);
     const m = await missionProbe(page);

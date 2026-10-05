@@ -80,7 +80,7 @@
   display: none !important;
 }
 
-/* Debrief: five stats (objectives first), readable sizes, wrapping actions. */
+/* Debrief: outcome and scans first, then telemetry and the next destination. */
 .debrief-panel {
   width: min(calc(820px * var(--ui-scale)), 94vw);
   max-height: 92vh;
@@ -99,20 +99,101 @@
   font-size: clamp(17px, calc(20px * var(--ui-scale)), 30px);
 }
 .debrief-stats {
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+.debrief-stat {
+  grid-column: span 2;
+  min-width: 0;
+  padding: 10px 12px;
+  overflow-wrap: anywhere;
+}
+.debrief-stat + .debrief-stat {
+  padding-left: 12px;
+  border-left: 0;
+}
+.debrief-stat[data-field='discoveries'] {
+  grid-column: 1 / -1;
+}
+.debrief-stats.has-objectives .debrief-stat[data-field='objectives'],
+.debrief-stats.has-objectives .debrief-stat[data-field='discoveries'] {
+  grid-column: span 3;
+}
+.debrief-stat:is([data-field='objectives'], [data-field='discoveries']) {
+  background: rgba(46, 217, 217, 0.06);
+}
+.debrief-stat:is([data-field='objectives'], [data-field='discoveries']) .debrief-value {
+  font-size: 1.7em;
 }
 .debrief-stat[data-field='objectives'] .debrief-value {
   color: var(--b1-text);
   font-weight: 600;
 }
 .debrief-actions {
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--b1-hair-dim);
+}
+.debrief-navigation,
+.debrief-secondary {
+  display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 .debrief-btn {
+  min-height: 44px;
   padding: 8px 12px;
   letter-spacing: 0.04em;
   font-size: clamp(14px, calc(14px * var(--ui-scale)), 20px);
+}
+.debrief-btn.is-primary {
+  background: var(--b1-cyan);
+  color: var(--b1-panel-solid);
+  font-weight: 600;
+}
+.debrief-secondary .debrief-btn {
+  border-color: transparent;
+  padding-inline: 8px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.debrief-lists {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.debrief-journal-summary {
+  margin: 0;
+  color: var(--b1-cyan);
+}
+.debrief .debrief-rating {
+  margin: 12px 0;
+  padding: 0;
+  gap: 4px 14px;
+  background: none;
+}
+.debrief-rating small {
+  flex-basis: 100%;
+  opacity: 0.8;
+}
+@media (max-width: 480px) {
+  .debrief-panel {
+    padding: 18px 14px;
+  }
+  .debrief-navigation .debrief-btn.is-primary {
+    flex: 1;
+  }
+  .debrief-secondary {
+    justify-content: space-between;
+  }
+  .debrief-stat {
+    padding-inline: 6px;
+  }
+  .debrief-stat + .debrief-stat {
+    padding-left: 6px;
+  }
+  .debrief-label {
+    letter-spacing: 0.04em;
+  }
 }
 /* Nothing of the dive HUD competes with the end-of-dive choices. */
 body:has(.mission-debrief:not([hidden])) .d-scan-waypoints,
