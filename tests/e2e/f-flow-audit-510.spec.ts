@@ -58,6 +58,8 @@ async function contained(target: Locator): Promise<void> {
 }
 
 async function pause(page: Page, touch: boolean): Promise<void> {
+  // Paused clock: Playwright's actionability check needs rendered frames.
+  await page.clock.runFor(34);
   if (touch) await page.locator('.tc-btn-pause').tap();
   else await page.keyboard.press('Escape');
   await page.clock.runFor(17);
@@ -310,6 +312,8 @@ for (const viewport of [
           g.discovery.stats.markTeleport();
           return { id: poi.id, entry: poi.guideEntry };
         });
+        // Paused clock: render frames so the touch HUD shows after resuming.
+        await page.clock.runFor(34);
         if (touch) {
           const session = await page.context().newCDPSession(page);
           await expect(page.locator('.tc-btn-scan')).toBeVisible();

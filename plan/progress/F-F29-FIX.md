@@ -10,3 +10,4 @@
 - f-flow-audit-510: 730 moved the spec to a paused clock, but the post-Begin check had no frame advance, so
   the tutorial card never rendered. Added page.clock.runFor(34). UI not regressed.
 - f-save-soak and f-verify-650 pass with the corrected Beebe pose (no change needed).
+- f-flow-audit-510 also needed clock.runFor before the touch SCAN button check and inside pause() (paused clock stalls actionability). All 5 cases pass.
