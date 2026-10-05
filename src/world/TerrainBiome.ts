@@ -13,6 +13,8 @@
  * on this floor and how thickly. Sites follow docs/research/sites.md.
  */
 
+import { LOST_CITY_STRATA, lostCitySlopeTint } from './LostCityBands.js';
+
 /** The five packed texture sets in `public/assets/terrain/<set>_{a,n}.jpg`. */
 export type TerrainSet = 'silt' | 'sand' | 'basalt' | 'rubble' | 'carbonate';
 
@@ -82,6 +84,13 @@ export interface Biome {
   depthShade?: { startM: number; endM: number; tint: number };
   /** Horizontal rock banding on slopes: band thickness (m) and strength 0..1 (limestone strata). */
   strata?: { periodM: number; amount: number };
+  /** Optional baked linear colour multipliers, replacing fragment strata for this biome. */
+  vertexTint?: (
+    x: number,
+    y: number,
+    z: number,
+    normalY: number,
+  ) => readonly [number, number, number];
   scatter: ScatterSpec[];
 }
 
@@ -208,8 +217,9 @@ export const BIOMES: Record<string, Biome> = {
     rockBias: 0.45,
     contrast: 0.7,
     detail: 0.7,
-    // Massif slopes are layered serpentinite and carbonate-cemented talus: low, cool bands.
-    strata: { periodM: 3.2, amount: 0.5 },
+    // Broad carbonate-cemented beds also read on the gentle massif slopes, at every tier.
+    strata: LOST_CITY_STRATA,
+    vertexTint: lostCitySlopeTint,
     scatter: [
       { kind: 'boulder', density: 4.5, slopeMaxDeg: 55, on: 'any', sizeMul: 2.4 },
       { kind: 'rubble', density: 14, slopeMaxDeg: 45, on: 'any', sizeMul: 2.6 },

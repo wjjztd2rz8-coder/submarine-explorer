@@ -8,8 +8,11 @@
  */
 
 import * as THREE from 'three';
+import { lostCityBedTint } from '../../LostCityBands.js';
+import { buildAnemone } from '../../life/models/sessile.js';
+import { branchingColony } from './coral.js';
 import { geoDetail } from './detail.js';
-import { geoMaterial, vertexGlow } from './materials.js';
+import { geoMaterial, LIFE_TINT, vertexGlow } from './materials.js';
 import { shimmerPlume } from './plume.js';
 import {
   boxCH,
@@ -17,6 +20,7 @@ import {
   fbm3,
   heightMesh,
   impostorFromBoxes,
+  instanced,
   mergeAll,
   mulberry32,
   paint,
@@ -24,6 +28,7 @@ import {
   projectUVs,
   smooth,
   type BuiltProp,
+  type InstanceSpec,
 } from './shared.js';
 import { scatterRubble } from './talus.js';
 import { flange, spireRadius, tieredSpire, type SpireOpts } from './spire.js';
@@ -179,6 +184,11 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     out.copy(OLD).lerp(LIVE, up * 0.92 + 0.1 * n2);
     out.lerp(STAIN, smooth(0.62, 0.88, n2) * 0.3 * (1 - up));
     out.multiplyScalar(0.88 + 0.24 * n2);
+    // Weathered and fresh carbonate beds follow the flanges; no extra rock geometry.
+    const tint = lostCityBedTint(x, y - gnd(0, 0), z, Math.max(1.2, H / 11), 0.9);
+    out.r *= tint[0];
+    out.g *= tint[1];
+    out.b *= tint[2];
     // Toward the outline the rubble thins into the surrounding seabed colour, patchily.
     const rn = rim(x, z) + (n1 - 0.5) * 0.35 + (n2 - 0.5) * 0.12;
     out.lerp(SEABED, smooth(0.5, 1.05, rn) * (1 - up * 0.5));
@@ -194,6 +204,77 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   full.name = 'carbonate-tower';
   full.add(new THREE.Mesh(geom, material));
   full.userData.ventTop = tips[0]!.y;
+
+  // Poseidon's inactive apron: three small thickets, clear of the active columns.
+  // Reuse the prop coral and life anemone templates; two instanced draws at every tier.
+  // A separate RNG keeps the chimney layout and shimmer unchanged.
+  if (!lone && input.def.id === 'poseidon-tower') {
+    const lifeRnd = mulberry32(seed ^ 0x600);
+    const colonies: InstanceSpec[] = [];
+    const anemones: InstanceSpec[] = [];
+    const rock = full.children[0] as THREE.Mesh;
+    const rootRay = new THREE.Raycaster();
+    const down = new THREE.Vector3(0, -1, 0);
+    geom.computeBoundingBox();
+    const perPatch = Math.max(4, Math.round(18 * Math.min(d.growth, 1.2)));
+    for (const [cx, cz] of [
+      [-0.24 * W, 0.2 * D],
+      [0.24 * W, 0.22 * D],
+      [0.04 * W, -0.3 * D],
+    ]) {
+      for (let i = 0; i < perPatch; i++) {
+        const a = lifeRnd() * Math.PI * 2;
+        const r = Math.sqrt(lifeRnd()) * 4;
+        const x = cx! + Math.cos(a) * r;
+        const z = cz! + Math.sin(a) * r;
+        if (rim(x, z) > 0.92 || spires.some((s) => Math.hypot(x - s.x, z - s.z) < s.r0 + 1.5))
+          continue;
+        const scale = 0.65 + (1 - r / 4) * 0.65 + lifeRnd() * 0.25;
+        const isCoral = i % 3 !== 0;
+        // Seat roots on the rendered triangles, including rubble, rather than on
+        // the analytic skirt (which can sit above a coarse Low-tier triangle).
+        rootRay.set(new THREE.Vector3(x, geom.boundingBox!.max.y + 1, z), down);
+        const surface = rootRay.intersectObject(rock, false)[0];
+        if (!surface) continue;
+        (isCoral ? colonies : anemones).push({
+          t: {
+            x,
+            y: surface.point.y - (isCoral ? 0.08 : 0.025) * scale,
+            z,
+            ry: lifeRnd() * Math.PI * 2,
+            sx: scale,
+            sy: scale,
+            sz: scale,
+          },
+          color: new THREE.Color(isCoral ? 0xe5c4af : 0xf0e4d3),
+        });
+      }
+    }
+    const lifeMaterial = new THREE.MeshStandardMaterial({
+      color: LIFE_TINT,
+      vertexColors: true,
+      roughness: 0.85,
+      side: THREE.DoubleSide,
+    });
+    if (colonies.length)
+      full.add(
+        instanced(
+          branchingColony(d.branchDepth, seed ^ 0x601),
+          lifeMaterial,
+          colonies,
+          'poseidon-base-corals',
+        ),
+      );
+    if (anemones.length)
+      full.add(
+        instanced(
+          buildAnemone({}, 0.25, tier === 'low' ? 0 : 1),
+          lifeMaterial,
+          anemones,
+          'poseidon-base-anemones',
+        ),
+      );
+  }
 
   // Faint clear-fluid haze at the tips of the tallest spires.
   const hazeFor = [...spires.keys()]
