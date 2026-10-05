@@ -50,6 +50,13 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - review-triggers.sh: a new tag only triggers a comprehensive review ≥12 h after the last one.
 - OVERNIGHT-LOG entries had guessed times (e.g. "~10:00-11:00" written before 06:00); RESUME-PROMPT now says to take the time from `date`.
 
+## 2026-10-05 00:20 — Codex starved by Claude pacing; merges moved to Codex
+
+- With the weekly pacing gate (7 + 2.5%/day) Claude skipped every run from 08:40 Oct 4, so nobody refilled the Codex queue or merged: Codex sat idle ~15 h at 100% and seven finished packages waited unmerged.
+- Merges no longer need a Claude full-e2e: Claude (cheap, git only) commits finished Codex worktrees and pre-merges them into an integration worktree; a Codex task (660) makes it full-e2e green; Claude then only reviews screenshots and fast-forwards main. Codex sandboxes can't commit (the worktree .git dir is outside the sandbox), so the git step stays with Claude.
+- Pacing relaxed to 7 + 1.5%/day so about one short Claude run a day can review/merge and refill the queue.
+- Follow-up: the queue should hold enough briefs for a day of Codex when Claude is rationed.
+
 ## 2026-10-04 — 640: diagnose red main CI and shorten browser shards
 
 - Audited all 22 job logs from [run 37189080100](https://github.com/wjjztd2rz8-coder/submarine-explorer/actions/runs/37189080100) and the latest completed [run 37197436369](https://github.com/wjjztd2rz8-coder/submarine-explorer/actions/runs/37197436369), using `gh run list --workflow CI --branch main` and `gh api repos/wjjztd2rz8-coder/submarine-explorer/actions/jobs/<id>/logs`. The newer run 37203012584 was still running during the audit.
@@ -69,3 +76,8 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - CI now has a 15 min browser-suite budget and uploads JSON timing reports on success or failure. Refresh the historical timings from those reports after the first hosted run. No additional shards, removed sites, art or gameplay changes.
 - Final project-base validation exposed another timing race in `helpers/titleAudit.ts`: the renderer allocation baseline could be read before async content and the title crop had rendered (90 geometries became 92). Wait for loaded content and actual frames before sampling, retaining exact geometry/texture/object equality and gameplay preservation assertions.
 - Validation: all 371 discovered cases were checked against Playwright's actual `--list --grep` selection across all 20 assignments, with no overlaps or omissions, including shared-helper and opt-in cases. Local gates pass: 144 Python tests, all 13 strict mission-pack validations, build/typecheck, 1,330 Vitest tests, attribution (14 assets), and full Prettier. All 81 current cases in the changed feature specs have passing browser results across targeted runs. The exact shard runner passed 17 cases with 2 existing opt-in skips in 2.6 min and wrote its JSON timing artifact. The complete project-base gate passed all 8 cases; the allocation regression additionally passed three consecutive root runs and three consecutive project-base runs with retries disabled. The full suite was not executed as one local run, and the patch has not run through all 20 hosted shards; hosted runtime confirmation remains pending.
+
+## 2026-10-05 — CI red x3 (targeted review)
+
+- Causes: (1) Prettier failed on the plan logs; fixed. (2) Merged Codex 640 (balanced shards, race fixes). Its first hosted run still failed in 12 of 20 shards: shards hit the `--global-timeout=900000` cut and reported "N did not run" plus one 240 s test timeout each (soak, flow-audit, bughunt-18, a11y globe, atmosphere). The hosted runner is ~2x slower than the e2e-timings estimates.
+- Fix: global timeout raised to 25 min (job limit is 30). Brief 730 queued for Codex to read the next hosted run, fix the remaining test-level races and recalibrate `tools/e2e-timings.json` from real durations.

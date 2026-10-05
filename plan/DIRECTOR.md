@@ -2,23 +2,23 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-04 review for tag f24; golden set 2026-10-04-082207)
+## Current priorities (refreshed 2026-10-05 comprehensive review; golden set 2026-10-05-054554)
 
-Run `tools/golden.sh` at the start of any run that merged visual work. Compare against the previous set. If this list runs dry, refill it from the newest golden set rather than idling. Claude weekly budget is tight (~18%), so one Sonnet package per run.
+Run `tools/golden.sh` at the start of any run that merged visual work. If this list runs dry, refill it from the newest golden set. Claude weekly budget is tight (~13%), so one Sonnet package per run; Codex integrates and verifies.
 
-Claude visual backlog (Sonnet agents, in order of player impact):
+Claude backlog (ordered by player impact; items 2-6 are unblocked and self-contained):
 
-1. ~~Batch-merge 540/560/580/530~~ merged (f26/f27). Codex 610 (portrait/low-tier pitch verification) and 620 (first-minute audit) finished and need gates + review next.
-2. ~~Titanic snow~~ merged (570, shots good: sparse snow, hull readable). Remaining: sky above the far field is near-black; add a lighter horizon gradient.
-3. **Lost City beehive chimney:** smooth white slab with no life at its base (600 queued for Codex; if it stalls, do it in Claude with banded vertex colours and base corals).
-4. **Beebe sub scale (partly done in f27: nearer pose, sub now fills frame but hides the nearest chimney; seabed still dark):** sub is small in shot 1 and the flat seabed is dark; nearer default camera or vent framing (560 covers seabed only).
-5. **Blue Hole east grotto and stalactite gallery:** shot 1 is good now; east grotto poses still need a close shot with context.
-6. ~~Monterey hex boulder~~ done in f27 (fractured boulders, rough sponges). Old text: the boulder reads fake; replace or break up with rock variants.
-7. **Debrief/Journal polish** from the 510 audit design questions (F-FLOW-AUDIT-510.md).
+1. **Land the 660 integration batch** (590/600/610/620/630/640/650 plus 670/680 when done): review 660's shots, `git merge --ff-only codex/660-f-integrate-batch`, smoke gates, push, tag f28, remove worktrees 590-660. No full-e2e on main if main has not moved.
+2. **Real first-60 s playthrough captures (Claude/Playwright, not Codex):** Codex sandboxes cannot start a browser, so 620 has zero screenshots and its checklist is "pending" for all 13 sites. Capture Home -> site -> 60 s on desktop and portrait for the 5 hero sites, plus the Journal and debrief, and fix confusion found (Survey wording, nav target vs waypoint target, tutorial asking for lights while a scan is ready).
+3. **Blue Hole opening:** the wall is flat orange-yellow, the scan target is 203 m away and the toast and scan card stack at the top. Add depth to the wall (darker banding toward the water, a visible ledge) and make the first target closer or the first pose face it (690 covers the east grotto only).
+4. **Beebe:** the sub hides the nearest chimney; shift the pose so sub and smoker sit side by side (680 does the framing; review it).
+5. **Lost City beehive and Poseidon tower:** banded vertex colours and base life (600 and 710 cover this; review shots, redo in Claude if weak).
+6. **Debrief/Journal polish** from the 510 audit design questions (F-FLOW-AUDIT-510.md).
+7. Titanic far-field sky: 670 adds a dim blue-grey backdrop; review whether the hard horizon band is gone.
 
-Codex queue (f27 update: 600, 610, 620 finished/running; queued 630, 640, 650); older: 570, 580, 590 running; 540, 550, 560 finished and awaiting merge; queued 600 (Lost City), 610 (portrait/low-tier verification of f24 poses), 620 (first-minute audit and fixes), 630 (Lost City/Monterey fact check). 450-triage holds only a spec.
+Codex queue: 660 (integration), 670 (Titanic horizon), 680 (Beebe framing) running; queued 690 (Blue Hole grotto), 700 (Monterey canyon read), 710 (Lost City close-up texture). Refill from this list when fewer than 3 are queued: next candidates are a Challenger Deep/Endurance golden pass, a phone-tier pitch pass for the non-hero sites and a Journal copy audit.
 
-Demoted: further title polish; rebrand logo (done, Codex 440).
+Demoted: further title polish; rebrand logo (done).
 
 ## Review rubric (every package, before merge)
 
