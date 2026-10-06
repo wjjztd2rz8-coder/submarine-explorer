@@ -20,6 +20,10 @@ Codex queue: 770 (Blue Hole target), 780 (Titanic horizon), 790 (CI) queued. Nex
 
 Demoted: further title polish; rebrand logo (done).
 
+## Director note 2026-10-06 (calibration)
+
+Looking at golden set 2026-10-06-121603 directly: recent review scores were too generous. Against the owner's ask ("realistic, detailed, similar to real life") the sites are readable and coherent but still read as a stylised prototype: faceted low-poly terrain (Monterey, Blue Hole walls), the Lost City close-up still blurry and stretched (710 finished with NO changes and was silently dropped; reopen it), and the Blue Hole gallery overhang still reads as a dark dome. Honest "beautiful" scores: Titanic 4, Beebe 3, Blue Hole 3, Lost City 3, Monterey 2-3. The step change is not more per-site tweaks: it is (1) denser terrain meshes with smooth normals, (2) CC0 PBR rock/sediment textures with triplanar mapping (F1-TERRAIN planned this; check what actually shipped), (3) higher-detail hero props. Plan this as one "fidelity pass" package set after the Claude weekly reset (2026-10-08): Claude designs and reviews, Codex builds per site.
+
 ## Review rubric (every package, before merge)
 
 - **Readable in the first 10 s:** you can see the sub, the seabed and something interesting.
