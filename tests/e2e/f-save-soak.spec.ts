@@ -3,7 +3,7 @@ import type { PerfStats } from '../../src/app/systems/quality.js';
 import type { Save } from '../../src/core/Save.js';
 import type { Mission } from '../../src/game/Mission.js';
 import type { Progress } from '../../src/game/Progress.js';
-import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { clockFramesUntil, pauseClockBeforeNavigation, withClockFrames } from './helpers/clock.js';
 
 interface Game {
   perf: PerfStats;
@@ -14,6 +14,7 @@ interface Game {
   discovery: { loaded: boolean };
   explore: { ready: boolean };
   life: object | null;
+  terrain: { texturesReady: Promise<void> };
   sub: { position: { x: number; y: number; z: number } };
 }
 
@@ -28,6 +29,11 @@ async function ready(page: Page): Promise<void> {
       game.life,
     );
   });
+  // __gameReady deliberately permits neutral terrain placeholders. Exact GPU
+  // baselines require the maps bound and those temporary textures disposed.
+  await withClockFrames(page, () =>
+    page.evaluate(() => (window.__game as unknown as Game).terrain.texturesReady),
+  );
   await expect(page.locator('.briefing')).toBeVisible();
 }
 

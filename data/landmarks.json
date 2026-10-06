@@ -412,7 +412,7 @@
       "country_eez": "Federated States of Micronesia / international (Mariana Trench)",
       "confidence": "high",
       "coordinate_source": "https://en.wikipedia.org/wiki/Challenger_Deep",
-      "summary": "The deepest known point in Earth's oceans, located in the southern Mariana Trench; consists of three en echelon basins with the eastern pool deepest.",
+      "summary": "The deepest known region of Earth's oceans, in the southern Mariana Trench, with three elongated sub-basins known as the Western, Central and Eastern Pools.",
       "facts": [
         "Deepest confirmed point on Earth's seafloor",
         "First crewed descent 1960 (Trieste, Piccard & Walsh)",
@@ -879,7 +879,7 @@
       "facts": [
         "The January 2022 eruption sent a plume about 58 km high and generated a destructive tsunami",
         "Caldera floor deepened from roughly 150 m to about 850 m after the eruption",
-        "Caldera widened to about 4 km across",
+        "Repeat mapping found the caldera widened from roughly 4.5 km to 4.8 km in the January 2022 eruption (Ribó et al. 2026)",
         "Generated a Pacific-wide tsunami and unprecedented atmospheric shockwaves"
       ],
       "gameplay_hooks": [
@@ -1359,7 +1359,7 @@
       "country_eez": "United States",
       "confidence": "high",
       "coordinate_source": "https://oceanexplorer.noaa.gov/",
-      "summary": "The largest known deep-sea coral reef province on Earth, an expanse of thousands of Lophelia coral mounds spanning roughly the area of Florida beneath the Gulf Stream off the southeastern US.",
+      "summary": "A vast deep-sea coral reef province beneath the Gulf Stream off the southeastern US, with about 6.4 million acres of cold-water coral mound habitat mapped in the 2024 study.",
       "facts": [
         "Announced by NOAA in 2024 as the largest deep-sea coral reef habitat yet mapped, roughly 500 km long",
         "Comprises thousands of individual coral mounds up to tens of meters tall",
@@ -1372,7 +1372,10 @@
       ],
       "hazards": ["strong Gulf Stream currents", "fragile coral habitat (no-touch)"],
       "notable_species": ["Lophelia pertusa coral", "deep-sea sharks", "squat lobsters"],
-      "external_links": ["https://oceanexplorer.noaa.gov/"],
+      "external_links": [
+        "https://oceanexplorer.noaa.gov/",
+        "https://oceanexplorer.noaa.gov/news/million-mounds-news/"
+      ],
       "wreck_meta": null
     },
     {

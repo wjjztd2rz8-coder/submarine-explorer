@@ -14,6 +14,33 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-VERIFY-740 second follow-up: route tutorial Skip actions through
+  the existing completion handler so ending the tutorial displays its
+  completion toast as well as saving progress. Retain contextual hint
+  priority, toast lifetime and every Surface assertion; cover both Skip
+  actions, normal completion and subsequent animal guidance in system tests.
+- Phase F, F-VERIFY-740 follow-up: reflow short-landscape Realistic telemetry
+  into three rows above the action controls, and place the portrait rotate
+  prompt below measured telemetry. Preserve all live readouts and touch sizes;
+  omit the next-dive mode notice for start-position-only edits because the
+  fitted hull is unchanged. Release replaced terrain placeholder textures and
+  wait for map readiness before exact save-soak GPU comparisons. Give the
+  separate completion-toast fixture explicit animal-hint history; all text,
+  containment, overlap and resource-count assertions remain strict.
+- Phase F, F-VERIFY-740: audit Journal copy across all 13 sites; give staged
+  wildlife one Game addition tag alongside secrets, and explain OBIS counts
+  and sampled depths once on the front page. Correct Blake Plateau's habitat
+  area versus survey area, Challenger's categorical pool ranking, Hunga's
+  post-eruption diameter, and Kama'ehuakanaloa's grid-size comparison.
+- Phase F, F-VERIFY-740: remove repeated Lost City/Monterey provenance caveats
+  because entry tags now identify additions; retain scientific uncertainties
+  and snapshot dates. Cut Monterey's unsupported 2.5 km offshore estimate,
+  270 m / 700 m cross-section estimate and shelf-break identification from
+  paragraphs and fact tables; their evidence limits remain in F-FACTCHECK-630.
+  Replace Blake's editorial mound-identification caveat with a direct terrain
+  description and remove the erroneous "subducting" label from Challenger's
+  landward wall. No HUD elements or existing assertions were cut.
+
 - Phase F, F-INTEGRATE-660: preserve horizontal camera framing on portrait
   screens and place tall-phone scan targets/hints below measured telemetry in
   its right column.

@@ -85,7 +85,7 @@
       "paragraphs": [
         "In July and early August 1996, Kama'ehuakanaloa produced the largest earthquake swarm ever recorded at any Hawaiian volcano -- thousands of quakes over about two weeks. The seismic crisis accompanied a collapse of the volcano's summit: 'Pele's Vents,' until then the volcano's main hydrothermal site at about 980 m depth, dropped away entirely, leaving a new pit crater roughly 600 m across and about 300 m deep, since named Pele's Pit. Its walls stand about 700 feet (210 m) high and are unusually thick -- about 70 feet (21 m) -- suggesting the crater rim has been built up by repeated lava flows over a long history, not created in a single event.",
         "Hydrothermal venting did not stop after the collapse; it moved and changed. Diffuse ~30 degC vents that had existed on the pre-collapse summit gave way, within Pele's Pit itself, to much hotter fluids -- around 80 degC soon after the collapse, and exceeding 200 degC by late 1997 during submersible dives -- before settling into the cooler, iron-rich venting the pit hosts today.",
-        "This tile's grid (about 58 x 61 m per cell) is coarser than Pele's Pit's roughly 600 m diameter, so this mission does not attempt to trace the crater's rim; the summit and Hiolo vent POIs sit on real terrain inside the collapsed summit area without claiming to outline the pit itself."
+        "This tile's grid has cells about 58 × 61 m across. The scan points sample summit terrain at the published Hiolo vent depths; the grid does not establish a detailed outline of Pele's Pit's roughly 600 m rim."
       ],
       "facts": [
         {

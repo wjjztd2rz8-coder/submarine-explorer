@@ -59,6 +59,12 @@ export interface JournalEntry {
   life?: { def: SpeciesDef; info: LifeJournalEntry; rare: boolean };
 }
 
+/** One provenance tag; staged encounters do not establish a local survey record. */
+export function journalEntryTag(entry: JournalEntry): 'Game addition' | 'Recreation' | null {
+  if (entry.kind === 'secret' || entry.kind === 'life') return 'Game addition';
+  return entry.recreation ? 'Recreation' : null;
+}
+
 /** What `landmarks.json` says about a site. */
 export interface CatalogueInfo {
   name: string;

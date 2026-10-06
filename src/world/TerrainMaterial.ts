@@ -41,6 +41,8 @@ export interface TerrainMaterialResult {
   textureSize: number;
   /** The site's slot C (hard substrate) albedo, resolved once loaded; null under Node. */
   rockTexture: Promise<THREE.Texture | null>;
+  /** All maps bound and their temporary placeholders released; immediate under Node. */
+  texturesReady: Promise<void>;
 }
 
 export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMaterialResult {
@@ -49,6 +51,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
   const textures: THREE.Texture[] = [];
   const loadable = typeof document !== 'undefined';
   let rockTexture: Promise<THREE.Texture | null> = Promise.resolve(null);
+  let texturesReady = Promise.resolve();
 
   const albPlaceholder = solidTexture(128, 128, 128);
   const nrPlaceholder = solidTexture(128, 128, 210);
@@ -121,6 +124,13 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
       if (ua === 'tAlbC') rockTexture = p;
       if (tierCfg.pbrNormals) void fetch(`${set}_n.jpg`, false, un);
     }
+    texturesReady = Promise.all(cache.values()).then(() => {
+      // Uniform bindings above run first. Once replaced, neutral maps must
+      // leave GPU memory, whether they were rendered before loading or not.
+      // The low tier does not sample the normal uniforms.
+      albPlaceholder.dispose();
+      nrPlaceholder.dispose();
+    });
   }
 
   const vert = splitSections(vertGlsl, ['@body']);
@@ -152,7 +162,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
     shader.fragmentShader = defines.join('\n') + '\n' + frag.head + '\n' + frg;
   };
 
-  return { material, textures, textureSize: tierCfg.textureSize, rockTexture };
+  return { material, textures, textureSize: tierCfg.textureSize, rockTexture, texturesReady };
 }
 
 /** A 1x1 stand-in shown until the real map arrives. */

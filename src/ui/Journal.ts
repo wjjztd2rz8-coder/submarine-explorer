@@ -22,6 +22,7 @@ import type { GuideEntry } from '../game/Guide.js';
 import {
   isEntryUnlocked,
   isSiteUnlocked,
+  journalEntryTag,
   lifeDiscoveryId,
   loadJournalSites,
   siteProgress,
@@ -52,8 +53,9 @@ export interface FieldGuideContent {
 /** The statement the front page makes once, instead of per-entry caveats. */
 export const JOURNAL_HONESTY =
   'Dives use real survey data. Recreation tags mark plausible landforms, wrecks, structures and ' +
-  'scan markers based on published sources. Animal encounters are staged; species lists use OBIS ' +
-  'survey records. Secrets carry a Game addition tag.';
+  'scan markers based on published sources. Game addition tags mark secrets and staged animal ' +
+  'encounters. Species lists use OBIS survey records: counts reflect sampling effort and recorded ' +
+  'depths reflect sampled occurrences, rather than complete habitat limits.';
 
 type View =
   | { kind: 'front' }
@@ -638,8 +640,11 @@ export class Journal {
     const title = el('h2', 'jr-title', entry.title);
     if (entry.kind === 'species' && !entry.species?.commonName) title.classList.add('is-latin');
     titleRow.append(title);
-    if (entry.kind === 'secret') titleRow.append(el('span', 'jr-tag', 'Game addition'));
-    else if (entry.recreation) titleRow.append(el('span', 'jr-tag is-recreation', 'Recreation'));
+    const provenance = journalEntryTag(entry);
+    if (provenance)
+      titleRow.append(
+        el('span', provenance === 'Recreation' ? 'jr-tag is-recreation' : 'jr-tag', provenance),
+      );
     if (!open) titleRow.append(el('span', 'jr-tag is-undiscovered', 'Undiscovered'));
     b.append(titleRow);
     if (entry.kind === 'life' && entry.life) {

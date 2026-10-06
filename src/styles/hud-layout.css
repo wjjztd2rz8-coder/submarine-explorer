@@ -218,10 +218,84 @@
   html.is-touch .objectives-panel {
     box-sizing: border-box;
     width: 250px;
-    padding: 4px 8px;
+    padding: 2px 8px;
     left: auto;
     right: calc(12px + env(safe-area-inset-right, 0px));
     transform: none;
+  }
+  html.is-touch .objectives-panel .obj-head {
+    margin-bottom: 2px;
+    line-height: 1.15;
+  }
+  html.is-touch .objectives-panel .obj-item {
+    font-size: 12px;
+    line-height: 1.15;
+  }
+  /* Supplies add almost 100 px to the old single-column Surface stack.
+     Use the full objective width and three rows above the action buttons:
+     depth/speed/status; supplies/hull; current. Keep every live readout. */
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    width: 250px;
+    padding: 3px 8px;
+  }
+  html.is-touch
+    .hud-readouts:has(.hud-power:not([hidden]))
+    .hud-row:is(
+      :has([data-field='depth']),
+      :has([data-field='speed']),
+      :has([data-field='status'])
+    ) {
+    grid-row: 1;
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0;
+    line-height: 1.2;
+  }
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-power {
+    grid-row: 2;
+    grid-column: 1 / span 3;
+    margin-top: 3px;
+    padding-top: 3px;
+    padding-right: 4px;
+    gap: 2px;
+  }
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-power-line {
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+    gap: 4px;
+    font-size: 12px;
+    line-height: 1.15;
+  }
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hull-gauge {
+    grid-row: 2;
+    grid-column: 4 / span 3;
+    margin-top: 2px;
+    padding-top: 2px;
+    padding-left: 4px;
+    line-height: 1.15;
+  }
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hull-gauge-label {
+    margin-bottom: 1px;
+  }
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-current {
+    grid-row: 3;
+    grid-column: 1 / -1;
+    margin-top: 3px;
+    padding-top: 3px;
+    gap: 4px;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-current-arrow {
+    font-size: 1em;
+  }
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-sim-speed {
+    grid-row: 4;
+    grid-column: 1 / -1;
   }
   html.is-touch .objectives-panel .obj-item:not(.is-current),
   html.is-touch .objectives-panel .obj-nav,
@@ -337,6 +411,12 @@
    buttons keep their 44 px touch targets. The objectives observer continues
    to place readouts below the actual objective panel height. */
 @media (orientation: portrait) and (max-width: 700px) {
+  html.is-touch body:has(.objectives-panel:not([hidden])) .tc-rotate-hint {
+    top: max(
+      42%,
+      calc(var(--obj-panel-bottom, 0px) + 8px + var(--hud-readouts-height, 0px) + 12px)
+    );
+  }
   /* The credit chip otherwise sits across the stick and action buttons. Keep
      it as a small strip above the left stick, clearing the taller action
      cluster at 150% UI scale. */
