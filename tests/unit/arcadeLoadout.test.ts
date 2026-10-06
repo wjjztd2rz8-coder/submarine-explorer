@@ -138,6 +138,34 @@ const catalogueSites: string[] = JSON.parse(
 ).landmarks;
 
 describe('fresh-player mission routing and vehicle loadout', () => {
+  for (const mode of ['arcade', 'realistic'] as const) {
+    it(`${mode}: selecting Surface does not queue a next-dive notice; explicit modes still do`, () => {
+      const ctx = context('great-blue-hole', mode);
+      const notice = vi.fn();
+      ctx.hud = { notice } as unknown as GameContext['hud'];
+      const system = createSubmarineSystem();
+      try {
+        system.init?.(ctx);
+        const hull = ctx.sub.getState().hullClass;
+        ctx.save.setGameplayOption('startPosition', 'surface');
+        expect(ctx.save.get().gameplayMode).toBe('custom');
+        expect(notice).not.toHaveBeenCalled();
+        expect(ctx.sub.getState().hullClass).toBe(hull);
+        ctx.save.setGameplayMode('realistic');
+        expect(notice).toHaveBeenCalledTimes(1);
+        ctx.save.setGameplayMode('arcade');
+        expect(notice).toHaveBeenCalledTimes(2);
+        ctx.save.setGameplayMode('custom');
+        expect(notice).toHaveBeenCalledTimes(3);
+        system.dispose?.();
+        ctx.save.setGameplayMode('realistic');
+        expect(notice).toHaveBeenCalledTimes(3);
+      } finally {
+        system.dispose?.();
+        ctx.subMesh?.dispose();
+      }
+    });
+  }
   it('loads and applies live cosmetic selections without refitting physics and removes its listener', () => {
     const ctx = context('titanic', 'arcade');
     ctx.progress.recordDailyStreak(3);

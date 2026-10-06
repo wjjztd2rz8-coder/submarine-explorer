@@ -72,9 +72,21 @@ export function createSubmarineSystem(): GameSystem {
           Math.abs(state.ratedDepth) >= Math.abs(meta.min_m) + config.submarine.freeDiveHullMarginM;
         ctx.hud?.setHullNote(ctx.freeDiveHull.cleared ? '' : 'at rating limit');
       }
+      let previousSettings = ctx.save.get();
       cleanup.add(
-        ctx.save.onChange((_next, changed) => {
-          if (changed.includes('gameplayMode'))
+        ctx.save.onChange((next, changed) => {
+          // Choosing the briefing's start enters Custom without changing the
+          // fitted hull. Keep next-load notices for actual mode selections.
+          const startOnly =
+            next.gameplayMode === 'custom' &&
+            next.gameplay.startPosition !== previousSettings.gameplay.startPosition &&
+            Object.entries(next.gameplay).every(
+              ([key, value]) =>
+                key === 'startPosition' ||
+                value === previousSettings.gameplay[key as keyof typeof next.gameplay],
+            );
+          previousSettings = next;
+          if (changed.includes('gameplayMode') && !startOnly)
             ctx.hud?.notice('Hull and site access changes apply when you load your next dive.');
         }),
       );

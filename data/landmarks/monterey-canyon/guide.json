@@ -9,7 +9,7 @@
         "Monterey Canyon begins just offshore of Moss Landing, beside the Monterey Bay Aquarium Research Institute (MBARI). Its walls reach about 1,700 m from floor to rim. MBARI describes a main channel extending more than 470 km offshore, continuing through the Monterey Deep Sea Fan and ending below 4,000 m on the abyssal plain.",
         "Sediment supplied from nearby beaches accumulates at the canyon head. Storm waves and slope failures can turn it into turbidity currents: fast underwater flows of sediment and seawater. Earthquakes can trigger sediment flows, but none of the flows in the 2015–2017 Coordinated Canyon Experiment coincided with earthquakes above magnitude 2, and some powerful flows occurred without major external triggers. These flows continue to carve and reshape the canyon.",
         "This tile covers the upper canyon to about 2,333 m depth. The deeper channel and its continuation across the deep-sea fan lie beyond the western edge of the survey.",
-        "Secret finds and wildlife encounters in this dive are plausible game additions rather than documented sightings at their displayed positions. The species tables preserve an OBIS snapshot from 23 September 2026: counts measure sampling effort, and depths are sampled occurrence ranges rather than full habitat limits. The shared comb-jelly label is uncertain here: northeastern Pacific Bolinopsis are B. microptera, distinct from the Atlantic B. infundibulum."
+        "The species tables preserve an OBIS snapshot from 23 September 2026. The shared comb-jelly label is uncertain here: northeastern Pacific Bolinopsis are B. microptera, distinct from the Atlantic B. infundibulum."
       ],
       "facts": [
         {
@@ -56,16 +56,12 @@
       "paragraphs": [
         "Monterey Canyon's head lies right off the beach at Moss Landing. The seafloor here drops away steeply, and MBARI's research vessels can reach areas more than a mile deep in a little over two and a half hours.",
         "This closeness to shore helps explain why the canyon is so well studied: deep-sea habitats and processes are within easy reach of MBARI's shore-based marine laboratory.",
-        "The scan point samples the upper canyon's GMRT terrain at about 44 m depth. Its previously reported distance of about 2.5 km offshore is an unverified estimate, rather than a measured position of the canyon's shoreline head."
+        "The scan point samples the upper canyon's GMRT terrain at about 44 m depth."
       ],
       "facts": [
         {
           "label": "Depth here",
           "value": "about 44 m"
-        },
-        {
-          "label": "Distance offshore",
-          "value": "about 2.5 km previously estimated; unverified shoreline reference"
         }
       ],
       "reconstruction": false,
@@ -86,16 +82,12 @@
       "title": "A canyon wall",
       "paragraphs": [
         "From the axis out to the rim, Monterey Canyon's walls climb as much as about 1,700 m, comparable to the depth of the Grand Canyon. Along the way they are cut by smaller side gullies, and repeated small slope failures feed sediment into the turbidity currents that scour the canyon floor below.",
-        "This point samples the canyon's north wall at about 748 m depth. An earlier terrain trace estimated a nearby axis roughly 700 m away and 270 m lower; those cross-section estimates remain unverified because the comparison axis point is no longer retained in this pack."
+        "This point samples the canyon's north wall at about 748 m depth."
       ],
       "facts": [
         {
           "label": "Depth here",
           "value": "about 748 m"
-        },
-        {
-          "label": "Relief to nearby axis",
-          "value": "previously estimated at about 270 m over 700 m; comparison point unverified"
         }
       ],
       "reconstruction": true,
@@ -155,7 +147,7 @@
       "title": "The upper canyon descent",
       "paragraphs": [
         "A few kilometres down-canyon from the head marker, this tile shows the bottom dropping from about 44 m to 265 m over about 2.85 km in a straight line. The descent exposes the steep channel within the continental shelf; depth alone does not establish the regional shelf-break position.",
-        "An earlier description identified this scan point as the shelf break. That identification remains unverified. The upper channel carries sediment toward deeper water and is close enough to the head marker for a short dive before continuing toward the deeper wall and the MARS observatory farther offshore.",
+        "The upper channel carries sediment toward deeper water and is close enough to the head marker for a short dive before continuing toward the deeper wall and the MARS observatory farther offshore.",
         "This point is real GMRT terrain, traced by sampling depth along the line from the canyon head toward the axis."
       ],
       "facts": [
@@ -166,10 +158,6 @@
         {
           "label": "Distance from canyon head",
           "value": "about 2.8 km"
-        },
-        {
-          "label": "Shelf-break identification",
-          "value": "unverified; scan point selected from the terrain grid"
         }
       ],
       "reconstruction": false,

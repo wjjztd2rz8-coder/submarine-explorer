@@ -92,6 +92,8 @@ export class Terrain {
   readonly stats: TerrainStats;
   /** The site's seabed palette and scatter table (TerrainBiome.ts). */
   readonly biome: Biome;
+  /** Seabed maps are bound and temporary textures released; boot stays nonblocking. */
+  readonly texturesReady: Promise<void>;
 
   /** Tile extent in metres. */
   readonly widthM: number;
@@ -164,6 +166,7 @@ export class Terrain {
     });
     this.material = built.material;
     this.textures = built.textures;
+    this.texturesReady = built.texturesReady;
 
     this.group.name = `terrain:${tile.meta.id}`;
     const requested = Math.max(1, Math.round(tierCfg.detailSubdiv));

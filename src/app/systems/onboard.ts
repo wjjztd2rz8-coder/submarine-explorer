@@ -128,12 +128,12 @@ export function createOnboardSystem(): GameSystem {
 
       card = new TutorialCard({
         skipStep: () => {
-          tutorial.skipStep();
-          if (!tutorial.active) finishTutorial();
+          if (tutorial.skipStep()) onAdvance();
         },
         skipAll: () => {
+          if (!tutorial.active) return;
           tutorial.skipAll();
-          finishTutorial();
+          onAdvance();
         },
       });
       chip = new HintChip(ctx.discovery.overlay.messages);
