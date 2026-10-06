@@ -2,21 +2,21 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-05 comprehensive review; golden set 2026-10-05-054554)
+## Current priorities (refreshed 2026-10-06 comprehensive review; golden set 2026-10-06-121603)
 
-Run `tools/golden.sh` at the start of any run that merged visual work. If this list runs dry, refill it from the newest golden set. Claude weekly budget is tight (~13%), so one Sonnet package per run; Codex integrates and verifies.
+Run `tools/golden.sh` at the start of any run that merged visual work. If this list runs dry, refill it from the newest golden set. Claude weekly budget is ~10% until 2026-10-08 07:00, so Claude does review/merge/push only until then; Codex builds.
 
-Claude backlog (ordered by player impact; items 2-6 are unblocked and self-contained):
+Claude backlog (ordered by player impact; all unblocked):
 
-1. **Land the 660 integration batch** (590/600/610/620/630/640/650 plus 670/680 when done): review 660's shots, `git merge --ff-only codex/660-f-integrate-batch`, smoke gates, push, tag f28, remove worktrees 590-660. No full-e2e on main if main has not moved.
-2. **Real first-60 s playthrough captures (Claude/Playwright, not Codex):** Codex sandboxes cannot start a browser, so 620 has zero screenshots and its checklist is "pending" for all 13 sites. Capture Home -> site -> 60 s on desktop and portrait for the 5 hero sites, plus the Journal and debrief, and fix confusion found (Survey wording, nav target vs waypoint target, tutorial asking for lights while a scan is ready).
-3. **Blue Hole opening:** the wall is flat orange-yellow, the scan target is 203 m away and the toast and scan card stack at the top. Add depth to the wall (darker banding toward the water, a visible ledge) and make the first target closer or the first pose face it (690 covers the east grotto only).
-4. **Beebe:** the sub hides the nearest chimney; shift the pose so sub and smoker sit side by side (680 does the framing; review it).
-5. **Lost City beehive and Poseidon tower:** banded vertex colours and base life (600 and 710 cover this; review shots, redo in Claude if weak).
-6. **Debrief/Journal polish** from the 510 audit design questions (F-FLOW-AUDIT-510.md).
-7. Titanic far-field sky: 670 adds a dim blue-grey backdrop; review whether the hard horizon band is gone.
+1. **Real first-60 s playthrough captures (Claude/Playwright):** Home -> site -> 60 s on desktop and portrait for the 5 hero sites, plus Journal and debrief. Fix confusion found (Survey wording, nav target vs waypoint target, tutorial asking for lights while a scan is ready).
+2. **Review and merge 770 (Blue Hole first target within ~110 m, opening toast delay) from its screenshots.** Redo in Claude if the wall still reads flat.
+3. **Review and merge 780 (Titanic horizon band).** Hull must remain the brightest thing.
+4. **Hosted CI green (790):** push Codex's fixes, check `gh run list`; if still red after one more round, cut shard-heavy specs rather than loosen assertions.
+5. **Monterey first frame:** raise ambient/sub light so the canyon is readable in 10 s without being flat, and add fish density near the start pose.
+6. **Lost City beehive/slab at distance:** banded vertex colours on the beehive like the Poseidon tower.
+7. **Beebe seabed:** sparse and dark beyond the lit pool; add sediment variation and a few tube-worm clumps.
 
-Codex queue: 660 (integration), 670 (Titanic horizon), 680 (Beebe framing) running; queued 690 (Blue Hole grotto), 700 (Monterey canyon read), 710 (Lost City close-up texture). Refill from this list when fewer than 3 are queued: next candidates are a Challenger Deep/Endurance golden pass, a phone-tier pitch pass for the non-hero sites and a Journal copy audit.
+Codex queue: 770 (Blue Hole target), 780 (Titanic horizon), 790 (CI) queued. Next candidates: Challenger Deep/Endurance golden pass, a Journal copy audit of the 720 changes, a regression bug hunt over 740/760.
 
 Demoted: further title polish; rebrand logo (done).
 

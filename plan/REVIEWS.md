@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-06 comprehensive review (triggers: 24 h, 8+ merges, tag f29, Claude idle; golden set 2026-10-06-121603)
+
+**Changed since the last review (f27):** f28/f29 merged the 660 integration batch (590-650), 670 Titanic horizon, 680 Beebe framing, 690 Blue Hole grotto, 700 Monterey canyon read, 710 Lost City close-up texture and 720 debrief/Journal polish. Today I merged 760 (Bismarck and Hunga Tonga first targets now ~105-110 m) and 740 (tutorial Skip now fires the completion toast, plus Journal regression tests).
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5:**
+
+| Site            | Score       | Change | Biggest gap                                                                            |
+| --------------- | ----------- | ------ | -------------------------------------------------------------------------------------- |
+| Titanic         | 4/4/5/4/5/4 | same   | Seabed haze still ends in a visible horizon line above near-black sky (780)            |
+| Beebe           | 4/4/4/4/5/4 | same+  | Smoker and sub now sit side by side and read well; seabed still sparse and dark        |
+| Great Blue Hole | 3/4/4/3/5/4 | +0.5   | Wall banding and ledge now give depth; scan target still 203 m away, toast stack (770) |
+| Lost City       | 4/4/4/4/5/3 | +      | Banded Poseidon tower and base life now read; beehive/slab still plain at distance     |
+| Monterey        | 4/4/4/3/5/3 | same   | Fractured wall reads; very dark and sparse fish in the first frame                     |
+
+**Play flow:** still not captured by a real browser (Codex cannot launch one). The 720 polish and 740 fixes address the audit findings from source. A Claude-side Home -> site -> 60 s capture is still the top Claude item, deferred because the Claude weekly window is at ~10% until 2026-10-08 07:00.
+
+**Process:** Claude weekly budget is the constraint (10% left), so Claude idle time is expected and not waste; Codex was starved for ~24 h because the queue was empty after 760 (fixed: three briefs queued, 770/780/790). Hosted CI on main is still red (7+ of 20 shards, run 37292557785), so brief 790 hands this to Codex with `gh` access. Watchdog trips all recovered.
+
+**New priorities:** see DIRECTOR.md.
+
+**Needs owner:** nothing. (Claude weekly resets Thu 2026-10-08 07:00; Codex weekly 39% left.)
+
 ## 2026-10-05 targeted review (trigger: CI red x3)
 
 - **Diagnosis:** two stacked causes. Prettier failed on `plan/OVERNIGHT-LOG.md` and `plan/PROCESS-LOG.md` (fixed). Codex 640's shard rebalance and race fixes were never merged; I merged them (conflict only in PROCESS-LOG). Its first hosted run still failed in 12/20 shards: `--global-timeout=900000` cut each shard at 15 min ("10 did not run"), and one 240 s test timeout per shard (f-save-soak, f-flow-audit-510, f-bughunt-18, f-a11y globe, atmosphere). The hosted runner is ~2x slower than the timing file assumed.
