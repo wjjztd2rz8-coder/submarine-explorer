@@ -151,8 +151,9 @@ const FREE_DIVE_OPENINGS: Record<
     openWater: true,
     chaseOffsetY: 22,
   },
-  bismarck: { hero: 'main-hull', bearing: 50, range: 110 },
-  'hunga-tonga-caldera': { hero: 'caldera-tuff-wall', bearing: 0, range: 100 },
+  // Keep the first scan within 120 m, including the hull's footprint and the depth difference.
+  bismarck: { hero: 'main-hull', bearing: 50, range: 85 },
+  'hunga-tonga-caldera': { hero: 'caldera-tuff-wall', bearing: 0, range: 75 },
   'blake-plateau-corals': { hero: 'lophelia-mound', bearing: 45, range: 75 },
 };
 
