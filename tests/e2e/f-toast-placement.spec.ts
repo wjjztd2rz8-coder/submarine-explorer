@@ -153,6 +153,11 @@ for (const layout of [
         await page.clock.runFor(50);
         const hint = page.locator('.onboard-hint');
         await expect(page.locator('.onboard-card')).toBeHidden();
+        // Animal guidance waits for eight seconds of play when a scan card is
+        // visible. Locator polling cannot advance this deliberately paused
+        // clock: run the full opening interval, including each animation frame
+        // (fastForward would skip frames and hit the game's frame-delta clamp).
+        await page.clock.runFor(8_000);
         await expect(hint).toContainText(
           layout.touch
             ? 'Animal nearby. Hold SCAN to scan, or press PHOTO for a photo.'
@@ -160,7 +165,7 @@ for (const layout of [
         );
         await finishAnimations(page, '.onboard-hint');
         // The clock was paused before navigation; screenshots and geometry
-        // round trips cannot consume the real hint's nine-second lifetime.
+        // round trips cannot consume the real hint's twelve-second lifetime.
         await screenshot(page, `${site}-${name}`);
         await separate(page, [...hud, '.scan-panel', '.onboard-hint', ...controls]);
         const target = (await page.locator('.scan-panel').boundingBox())!;

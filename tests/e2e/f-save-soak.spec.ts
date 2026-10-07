@@ -3,6 +3,8 @@ import type { PerfStats } from '../../src/app/systems/quality.js';
 import type { Save } from '../../src/core/Save.js';
 import type { Mission } from '../../src/game/Mission.js';
 import type { Progress } from '../../src/game/Progress.js';
+import type { SubMesh } from '../../src/sub/SubMesh.js';
+import type { Scene, WebGLRenderer, PerspectiveCamera } from 'three';
 import { clockFramesUntil, pauseClockBeforeNavigation, withClockFrames } from './helpers/clock.js';
 
 interface Game {
@@ -16,6 +18,10 @@ interface Game {
   life: object | null;
   terrain: { texturesReady: Promise<void> };
   sub: { position: { x: number; y: number; z: number } };
+  scene: Scene;
+  renderer: WebGLRenderer;
+  rig: { camera: PerspectiveCamera };
+  subMesh: SubMesh;
 }
 
 async function ready(page: Page): Promise<void> {
@@ -35,6 +41,40 @@ async function ready(page: Page): Promise<void> {
     page.evaluate(() => (window.__game as unknown as Game).terrain.texturesReady),
   );
   await expect(page.locator('.briefing')).toBeVisible();
+  await warmSceneAllocations(page);
+}
+
+/** Register every resident geometry/texture before exact GPU comparisons.
+ * Three allocates on the first draw, so the views rendered during asynchronous
+ * spawn composition otherwise leave different allocation histories per reload.
+ * This preserves resident GPU resources and does not overwrite counters;
+ * attached or GPU-only leaks remain visible to the original assertions.
+ */
+async function warmSceneAllocations(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const { scene, renderer, rig, subMesh } = window.__game as unknown as Game;
+    // Cockpit callbacks refit three Low-tier geometries on their first draw.
+    // Prepare those before Three captures geometry references for the render
+    // list, so first and repeated warm-ups register the same resident set.
+    subMesh.cockpit.fit(rig.camera.fov, rig.camera.aspect);
+    const states: { object: Scene['children'][number]; visible: boolean; culled: boolean }[] = [];
+    const target = renderer.getRenderTarget();
+    scene.traverse((object) => {
+      states.push({ object, visible: object.visible, culled: object.frustumCulled });
+      object.visible = true;
+      object.frustumCulled = false;
+    });
+    try {
+      renderer.setRenderTarget(null);
+      renderer.render(scene, rig.camera);
+    } finally {
+      for (const { object, visible, culled } of states) {
+        object.visible = visible;
+        object.frustumCulled = culled;
+      }
+      renderer.setRenderTarget(target);
+    }
+  });
 }
 
 async function sample(page: Page) {
