@@ -70,7 +70,9 @@ for (const layout of [
     for (const tier of ['low', 'medium']) {
       for (const site of ['titanic', 'beebe-vent-field', 'monterey-canyon']) {
         test(`${site} ${tier}: opening intent and rendered work`, async ({ page }, info) => {
-          test.setTimeout(180_000);
+          // Preserve all 30 warm-up + 60 measured frames. Hosted Monterey
+          // Medium can exceed 180 s at <1 fps, before any assertion fails.
+          test.setTimeout(env.CI ? 300_000 : 180_000);
           const errors: string[] = [];
           page.on('pageerror', (error) => errors.push(error.message));
           let baseline: Awaited<ReturnType<typeof perf>> | undefined;

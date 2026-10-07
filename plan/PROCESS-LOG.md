@@ -81,3 +81,29 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 
 - Causes: (1) Prettier failed on the plan logs; fixed. (2) Merged Codex 640 (balanced shards, race fixes). Its first hosted run still failed in 12 of 20 shards: shards hit the `--global-timeout=900000` cut and reported "N did not run" plus one 240 s test timeout each (soak, flow-audit, bughunt-18, a11y globe, atmosphere). The hosted runner is ~2x slower than the e2e-timings estimates.
 - Fix: global timeout raised to 25 min (job limit is 30). Brief 730 queued for Codex to read the next hosted run, fix the remaining test-level races and recalibrate `tools/e2e-timings.json` from real durations.
+
+## 2026-10-06 — F-CI-790 hosted timing and frame synchronization
+
+- Retrieved all 20 timing artifacts and raw logs for main run 37292557785 after
+  `gh run view --log-failed` returned empty output. Classified seven red shards:
+  three suite timeouts, simulation-starved movement waits, and desktop WebGL/DOM
+  audits exhausting individual budgets. One separate a11y flake passed on retry.
+- Preserve exact assertions and full coverage; explicitly advance rendered frames
+  for movement, content allocation baselines and desktop debrief/current audits.
+  Preserve the verification's 90 frames with a scoped 300s hosted test budget.
+- Import 380 completed hosted test costs, including observed retries; never record
+  omitted/skipped work as zero. Add a reusable JSON importer and its unit check.
+  Increase CI to 30 duration-balanced shards with the existing 25-minute global
+  budget. Measurements show 1.10× median slowdown, not a universal 2× factor.
+- Validation and exact next-run expectations are in [F-CI-790](progress/F-CI-790.md).
+  Claude must push and verify hosted acceptance; no remote mutation here.
+- Broader regression found a POI/wildlife readiness ordering race in the toast
+  spec and reproduced the accessibility clock flake. Wait for discovery content;
+  recover only an auxiliary page closing during context-wide clock advancement.
+  Keep all audit assertions and propagate main-page/work errors, verified by
+  negative unit checks and 15 repeated real accessibility audits.
+- The onboarding hint test also now observes the post-teleport live scan
+  candidate, rather than its earlier spawn marker. Final gates pass (1,426 unit
+  tests, 144 Python tests, smoke/project-base); repeat flow/soak and accessibility
+  audits pass with retries disabled. Full local e2e and hosted green remain
+  separate acceptance checks; see the progress note for precise coverage.

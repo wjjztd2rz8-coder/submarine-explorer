@@ -6,7 +6,7 @@ import type { Journal } from '../../src/ui/Journal.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
 import type { CameraRig } from '../../src/sub/CameraRig.js';
 import { scanWithKeyboard } from './helpers/scan.js';
-import { waitForFrames } from './helpers/frames.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
 const env =
   (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
@@ -55,12 +55,15 @@ for (const viewport of [
     for (const site of sites) {
       test(`${site}: short summary, Journal, resume and exit`, async ({ page }) => {
         test.setTimeout(240_000);
+        // Present frames explicitly: repeated DOM checks must not continuously
+        // render a 1600px WebGL scene on a hosted software GPU.
+        await pauseClockBeforeNavigation(page);
         const errors: string[] = [];
         page.on('pageerror', (error) => errors.push(error.message));
         const directory = `.cache/codex/shots/720-f-debrief-journal/${before ? 'before' : 'after'}/${viewport.width}x${viewport.height}/${site}`;
         await mkdir(directory, { recursive: true });
         const shot = async (name: string): Promise<void> => {
-          await waitForFrames(page, 2);
+          await page.clock.runFor(34);
           await page.screenshot({ path: `${directory}/${name}.png` });
         };
         // Rendering tier only: mode retains the Arcade default, discoveries start empty.
@@ -71,7 +74,8 @@ for (const viewport of [
           );
         });
         await page.goto(`/?mission=${site}&skipBriefing=1`, { waitUntil: 'domcontentloaded' });
-        await page.waitForFunction(
+        await clockFramesUntil(
+          page,
           () => window.__gameReady === true && (window.__game as unknown as Game).discovery.loaded,
         );
         expect(

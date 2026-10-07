@@ -13,7 +13,7 @@ interface Probe {
   life: Life | null;
   sub: { position: Vector3; step(): void };
   rig: { camera: PerspectiveCamera };
-  discovery: { overlay: ScanOverlay };
+  discovery: { loaded: boolean; overlay: ScanOverlay };
 }
 
 async function separate(page: Page, selectors: string[]): Promise<void> {
@@ -109,10 +109,13 @@ for (const layout of [
           `/?tile=${site}&skipBriefing=1&tier=low&lifeSeed=3${layout.touch ? '&touch=1' : ''}`,
           { waitUntil: 'domcontentloaded' },
         );
-        await clockFramesUntil(
-          page,
-          () => window.__gameReady === true && !!(window.__game as unknown as Probe).life,
-        );
+        await clockFramesUntil(page, () => {
+          const game = window.__game as unknown as Probe;
+          // Wildlife can finish loading before POIs; a paused clock cannot
+          // make the scan panel appear while a DOM-only assertion waits.
+          return window.__gameReady === true && !!game.life && game.discovery.loaded;
+        });
+        await page.clock.runFor(34);
         await holdFreshTips(page);
         await finishAnimations(page, '.onboard-card');
         await expect(page.locator('.scan-panel')).toBeVisible();
