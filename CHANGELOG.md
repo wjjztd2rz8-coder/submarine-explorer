@@ -14,6 +14,22 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BLUEHOLE-770 second gate follow-up: fit the hidden cockpit before
+  the save-soak resource warm-up. Reason: its first render callback replaced
+  three Low-tier placeholder geometries after Three captured the render list,
+  making one warm-up differ from two. Reproduce the allocation sequence using
+  Three's geometry registry; retain every exact browser count assertion.
+- Phase F, F-BLUEHOLE-770 gate follow-up: advance real frames in the paused-clock
+  animal-toast fixture until the eight-second opening delay releases guidance.
+  Warm resident scene resources before save-soak GPU comparisons because Three
+  allocates geometries on first draw and asynchronous opening views vary by reload.
+  Preserve all text, geometry, dismissal, save and exact resource-count assertions.
+- Phase F, F-BLUEHOLE-770: shorten the Blue Hole's scenic opening approach
+  from 205 m to 100 m so the existing stalactite gallery is immediately
+  scannable. Defer animal guidance during the first eight dive seconds while
+  a scan card is visible. Reason: the distant gallery and stacked opening
+  prompts weakened the first frame. Site facts and the Journal's existing
+  Recreation tag are retained; browser screenshot review remains pending.
 - Phase F, F-VERIFY-740 second follow-up: route tutorial Skip actions through
   the existing completion handler so ending the tutorial displays its
   completion toast as well as saving progress. Retain contextual hint

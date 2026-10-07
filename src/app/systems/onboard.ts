@@ -9,7 +9,7 @@ import type { InputDevice } from '../../ui/ControlsCard.js';
 import { ControlsCard } from '../../ui/ControlsCard.js';
 import { HintChip, TutorialCard, tutorialText } from '../../ui/TutorialCard.js';
 import type { TutorialKeys } from '../../ui/TutorialCard.js';
-import { HINT_TEXT, HintEngine } from '../../game/Hints.js';
+import { HINT_TEXT, HintEngine, creatureHintAllowed } from '../../game/Hints.js';
 import type { HintLabels } from '../../game/Hints.js';
 import { Tutorial } from '../../game/Tutorial.js';
 import { TutorialSave } from '../../game/TutorialSave.js';
@@ -257,7 +257,10 @@ export function createOnboardSystem(): GameSystem {
           ratedRatio: f.sub.ratedRatio,
           // The scan panel already gives the target name and hold-to-scan prompt.
           scanTargetInRange: false,
-          creatureInView: !ctx.cameraTips.moved && (ctx.life?.targets.length ?? 0) > 0,
+          creatureInView:
+            creatureHintAllowed(diveS, ctx.discovery.overlay.cardVisible) &&
+            !ctx.cameraTips.moved &&
+            (ctx.life?.targets.length ?? 0) > 0,
           rovAvailable:
             device === 'keyboard' &&
             !ctx.rov.deployed &&

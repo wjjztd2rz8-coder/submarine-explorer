@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { HINT_TEXT, HintEngine, type HintContext } from '../../src/game/Hints.js';
+import {
+  HINT_TEXT,
+  HintEngine,
+  creatureHintAllowed,
+  type HintContext,
+} from '../../src/game/Hints.js';
 import { TUTORIAL_STEPS, Tutorial } from '../../src/game/Tutorial.js';
 import { ONBOARD_STORAGE_KEY, TutorialSave, migrateOnboard } from '../../src/game/TutorialSave.js';
 import { compactTips, controlGroups } from '../../src/ui/ControlsCard.js';
@@ -17,6 +22,35 @@ const calm: HintContext = {
 const labels = { scan: 'F', rov: 'E', photo: 'P', lights: 'L' };
 
 describe('hint engine', () => {
+  it('defers animals while a scan card owns the first eight seconds, without consuming the hint', () => {
+    const e = new HintEngine();
+    const context = (diveS: number, visible: boolean) => ({
+      ...calm,
+      creatureInView: creatureHintAllowed(diveS, visible),
+    });
+    for (const diveS of [0, 1, 7.999]) {
+      expect(e.update(100 + diveS, context(diveS, true))).toBeNull();
+      expect(e.hasSeen('creature')).toBe(false);
+    }
+    expect(e.update(108, context(8, true))).toBe('creature');
+    expect(e.update(200, context(100, true))).toBeNull();
+  });
+
+  it('allows early animal guidance when the scan card disappears and preserves safety hint priority', () => {
+    expect(
+      new HintEngine().update(0, {
+        ...calm,
+        creatureInView: creatureHintAllowed(0, false),
+      }),
+    ).toBe('creature');
+    expect(
+      new HintEngine().update(0, {
+        ...calm,
+        battery: 0.1,
+        creatureInView: creatureHintAllowed(0, true),
+      }),
+    ).toBe('battery-low');
+  });
   it('shows nothing when nothing is due', () => {
     expect(new HintEngine().update(100, calm)).toBeNull();
   });

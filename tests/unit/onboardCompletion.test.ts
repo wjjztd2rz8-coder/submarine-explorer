@@ -75,7 +75,7 @@ function setup(seenHints: HintId[] = ['creature']) {
     params: new URLSearchParams('tutorial=1'),
     settings: { reduceMotion: true },
     save: { onChange: () => () => {} },
-    discovery: { overlay: { messages: {} }, guide: { isOpen: false } },
+    discovery: { overlay: { messages: {}, cardVisible: false }, guide: { isOpen: false } },
     app: { state: 'dive' },
     photoMode: { active: false },
     photos,
@@ -98,6 +98,38 @@ function setup(seenHints: HintId[] = ['creature']) {
 }
 
 describe('onboarding completion through the system', () => {
+  it('delays animal guidance until eight dive seconds even when the app clock is already large', () => {
+    const { ctx, system, onboard } = setup([]);
+    const draw = (dt: number, frozen = false) =>
+      system.frame!['hud.draw']!(
+        {
+          state: { throttle: 0, yaw: 0, ballast: 0 },
+          dt,
+          elapsed: 1000,
+          frozen,
+          sub: { ratedRatio: 0.01 },
+        } as FrameState,
+        ctx,
+      );
+    try {
+      Object.assign(ctx.discovery.overlay, { cardVisible: true });
+      views.actions!.skipAll();
+      views.chip.show.mockClear();
+      draw(7.999);
+      draw(20, true);
+      expect(views.chip.show).not.toHaveBeenCalled();
+      expect(onboard.store.get().seenHints).toEqual([]);
+      draw(0.001);
+      expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
+        'Animal nearby. Hold G to scan, or press G for a photo.',
+        12,
+      );
+      expect(onboard.store.get().seenHints).toEqual(['creature']);
+    } finally {
+      system.dispose?.();
+    }
+  });
+
   it('Skip tutorial persists completion and shows its toast through the following frame', () => {
     const { system, tick, onboard, data } = setup();
     try {
