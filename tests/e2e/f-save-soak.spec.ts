@@ -4,6 +4,7 @@ import type { Save } from '../../src/core/Save.js';
 import type { Mission } from '../../src/game/Mission.js';
 import type { Progress } from '../../src/game/Progress.js';
 import { clockFramesUntil, pauseClockBeforeNavigation, withClockFrames } from './helpers/clock.js';
+import { waitForFrames } from './helpers/frames.js';
 
 interface Game {
   perf: PerfStats;
@@ -34,12 +35,15 @@ async function ready(page: Page): Promise<void> {
   await withClockFrames(page, () =>
     page.evaluate(() => (window.__game as unknown as Game).terrain.texturesReady),
   );
+  // Loaded content and bound textures precede the renderer's GPU uploads.
+  // Observe two presented frames before comparing exact boot allocations.
+  await withClockFrames(page, () => waitForFrames(page, 2));
   await expect(page.locator('.briefing')).toBeVisible();
 }
 
 async function sample(page: Page) {
   // Let disposal notifications and subsequent real renders finish.
-  await page.clock.runFor(85);
+  await withClockFrames(page, () => waitForFrames(page, 2));
   return page.evaluate(() => {
     const { perf } = window.__game as unknown as Game;
     return {
@@ -147,17 +151,22 @@ test('four dives, mode switches, restarts and reloads preserve saves without sce
       await page.keyboard.down('i');
       try {
         await expect
-          .poll(async () => {
-            await page.clock.runFor(50);
-            return page.evaluate((position) => {
-              const current = (window.__game as unknown as Game).sub.position;
-              return Math.hypot(
-                current.x - position.x,
-                current.y - position.y,
-                current.z - position.z,
-              );
-            }, before);
-          })
+          .poll(
+            async () => {
+              // Use the engine's 250 ms frame clamp instead of spending several
+              // slow GPU renders to advance only 50 ms of held input.
+              await page.clock.fastForward(250);
+              return page.evaluate((position) => {
+                const current = (window.__game as unknown as Game).sub.position;
+                return Math.hypot(
+                  current.x - position.x,
+                  current.y - position.y,
+                  current.z - position.z,
+                );
+              }, before);
+            },
+            { intervals: [20] },
+          )
           .toBeGreaterThan(0.05);
       } finally {
         await page.keyboard.up('i');
