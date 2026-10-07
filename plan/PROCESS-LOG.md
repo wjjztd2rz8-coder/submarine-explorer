@@ -81,3 +81,8 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 
 - Causes: (1) Prettier failed on the plan logs; fixed. (2) Merged Codex 640 (balanced shards, race fixes). Its first hosted run still failed in 12 of 20 shards: shards hit the `--global-timeout=900000` cut and reported "N did not run" plus one 240 s test timeout each (soak, flow-audit, bughunt-18, a11y globe, atmosphere). The hosted runner is ~2x slower than the e2e-timings estimates.
 - Fix: global timeout raised to 25 min (job limit is 30). Brief 730 queued for Codex to read the next hosted run, fix the remaining test-level races and recalibrate `tools/e2e-timings.json` from real durations.
+
+## 2026-10-06 21:45 — Codex self-refills its queue
+- Codex idled again (~12 h, 09:20-21:40 Oct 6) with 100% 5h and 32% weekly: the "leave >=3 briefs" rule depends on Claude runs, which are paced out until the weekly reset.
+- New tools/codex-refill.sh: when the queue is empty, slots are free and Codex has budget, the dispatcher (every 30 min, no Claude needed) asks Codex to write 3 briefs from DIRECTOR.md/REVIEWS.md, at most every 2 h. Briefs may not merge, push or touch tools/DIRECTOR. Claude still reviews everything before it reaches main.
+- Same session: pre-merged 770/780/790 into integration worktree 800 (clean) and queued the first fidelity-pass prototypes 810 (Monterey terrain), 820 (Lost City close-up redo), 830 (Blue Hole dome/walls), 840 (bug hunt f28-f30).

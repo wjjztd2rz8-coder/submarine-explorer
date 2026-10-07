@@ -33,6 +33,11 @@ if ! codex_ok && (( $(running) == 0 )) && codex_stale; then
   ai-limits --refresh >/dev/null 2>&1
   echo "$(date '+%F %T') refreshed stale Codex reading" >> .cache/codex/queue/waiting.log
 fi
+# Empty queue, spare slots and budget: let Codex draft the next briefs (<= every 2 h).
+if ! ls .cache/codex/queue/*.md >/dev/null 2>&1 && (( $(running) < MAX )) && codex_ok && \
+   [[ -z "$(find .cache/codex/refill.log -mmin -120 2>/dev/null)" ]]; then
+  tools/codex-refill.sh
+fi
 port=4370
 mapfile -t active_units < <(systemctl --user list-units --type=service --state=running --no-legend 'subexp-*' | awk '{print $1}')
 reserved_ports=''
