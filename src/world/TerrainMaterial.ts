@@ -138,6 +138,9 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
   const defines: string[] = [];
   if (tierCfg.pbrNormals) defines.push('#define TERRAIN_PBR_NORMALS');
   if (tierCfg.textureBreakup) defines.push('#define TERRAIN_BREAKUP');
+  if (biome.abyssFadeM) {
+    uniforms.uAbyssFadeM = { value: new THREE.Vector2(...biome.abyssFadeM) };
+  }
 
   const material = new THREE.MeshStandardMaterial({
     color: 0xffffff,
@@ -147,7 +150,8 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
   });
   material.name = 'seabed';
   material.userData.uniforms = uniforms;
-  material.customProgramCacheKey = () => `seabed-${defines.join('')}`;
+  material.customProgramCacheKey = () =>
+    `seabed-${defines.join('')}${biome.abyssFadeM ? '-abyss-fade' : ''}`;
 
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
@@ -159,6 +163,24 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
     let frg = after(shader.fragmentShader, 'map_fragment', frag.sections[0] as string);
     frg = after(frg, 'roughnessmap_fragment', frag.sections[1] as string);
     frg = after(frg, 'normal_fragment_begin', frag.sections[2] as string);
+    if (biome.abyssFadeM) {
+      // The lit plain can still contrast with open water long before Exp2
+      // reaches its asymptote. Ease ONLY the distant seabed to the same fog
+      // colour, after Three's fog/output conversion (also correct on Low).
+      frg =
+        'uniform vec2 uAbyssFadeM;\n' +
+        after(
+          frg,
+          'fog_fragment',
+          /* glsl */ `
+#ifdef USE_FOG
+  float abyssFade = smoothstep(uAbyssFadeM.x, uAbyssFadeM.y, vFogDepth)
+    * smoothstep(700.0, 1200.0, -cameraPosition.y);
+  gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, abyssFade);
+#endif
+`,
+        );
+    }
     shader.fragmentShader = defines.join('\n') + '\n' + frag.head + '\n' + frg;
   };
 

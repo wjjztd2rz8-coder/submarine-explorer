@@ -19,7 +19,10 @@ export class TitanicHorizon {
     this.weights = new Float32Array(position.count);
     for (let i = 0; i < position.count; i++) {
       // World up, rather than screen up, so cockpit pitch keeps a level horizon.
-      this.weights[i] = THREE.MathUtils.smoothstep(position.getY(i), 0, 0.65);
+      // Carry the exact fog colour through the first ring above level. Far
+      // seabed silhouettes sit slightly above/below level; starting the lift
+      // right at zero makes vertex interpolation outline that boundary.
+      this.weights[i] = THREE.MathUtils.smoothstep(position.getY(i), 0.2, 0.85);
     }
     geometry.setAttribute(
       'color',
@@ -31,6 +34,9 @@ export class TitanicHorizon {
         vertexColors: true,
         side: THREE.BackSide,
         fog: false,
+        // Three applies terrain fog after tone mapping on the direct/Low
+        // path. Keep this unlit fog-colour backdrop on that same path.
+        toneMapped: false,
         depthTest: false,
         depthWrite: false,
       }),
