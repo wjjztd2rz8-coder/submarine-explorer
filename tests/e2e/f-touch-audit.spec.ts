@@ -1,3 +1,4 @@
+import { expectCompactPhoneHud } from './helpers/phoneHud.js';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const dive = '/?tile=titanic&landmark=_test&poi=test-bow&skipBriefing=1&touch=1&tier=low';
@@ -101,10 +102,12 @@ for (const viewport of [
         if (viewport.width < viewport.height)
           await expect(page.locator('.tc-rotate-hint')).toBeHidden();
         await separate(page, [...hud, '.onboard-card', ...controls]);
-        for (const button of await page.locator('.d2-sonar-controls button, .tc-btn').all())
+        for (const button of await page.locator('.d2-sonar-controls button:visible, .tc-btn').all())
           await reachable(button);
-        for (const label of ['Skip step', 'Skip tutorial'])
-          await reachable(page.getByRole('button', { name: label, exact: true }));
+        await reachable(page.getByRole('button', { name: 'Skip', exact: true }));
+        await expect(page.locator('.onboard-card button:visible')).toHaveCount(1);
+        await expect(page.locator('.d-sonar-legend')).toBeHidden();
+        expect((await page.locator('.sonar').boundingBox())!.width).toBe(96);
         // Check every instruction: the last step is longer than the first.
         for (const step of ['move', 'depth', 'lights', 'scan', 'journal']) {
           await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
@@ -112,12 +115,12 @@ for (const viewport of [
             await page.locator('.onboard-card').evaluate((e) => e.scrollWidth <= e.clientWidth),
           ).toBe(true);
           await separate(page, [...hud, '.onboard-card', ...controls]);
-          if (step !== 'journal')
-            await page.getByRole('button', { name: 'Skip step', exact: true }).tap();
+          await expectCompactPhoneHud(page);
+          if (step !== 'journal') await page.locator('.onboard-skip-step').tap();
         }
         if (scale === 100)
           await page.screenshot({ path: testInfo.outputPath('tutorial-landscape.png') });
-        await page.getByRole('button', { name: 'Skip tutorial', exact: true }).tap();
+        await page.getByRole('button', { name: 'Skip', exact: true }).tap();
         await expect(page.locator('.onboard-card')).toBeHidden();
         // The scan-range hint chip was retired (the scan panel covers it).
         await expect(page.locator('.onboard-hint')).toBeHidden();
@@ -144,7 +147,7 @@ for (const viewport of [
           await page.locator('.scan-panel').evaluate((e) => e.scrollWidth <= e.clientWidth),
         ).toBe(true);
         await separate(page, ['.scan-panel', ...controls]);
-        await page.locator('.tc-btn-sonar').tap();
+        await page.locator('.sonar canvas').tap();
         await expect(page.locator('.sonar')).toHaveClass(/d-sonar-expanded/);
         for (const button of await page.locator('.d2-sonar-controls button').all())
           await reachable(button);
@@ -260,7 +263,7 @@ for (const viewport of [
         for (const select of await briefing.locator('.mode-advanced select').all())
           await reachable(select);
         await reachable(briefing.locator('.briefing-begin'));
-        await reachable(briefing.getByRole('button', { name: 'Free dive', exact: true }));
+        await reachable(briefing.getByRole('link', { name: 'Free dive', exact: true }));
       });
 
       test('journal spoilers, navigation, entries and Close remain reachable', async ({ page }) => {

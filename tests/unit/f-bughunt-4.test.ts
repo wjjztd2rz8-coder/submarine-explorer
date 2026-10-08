@@ -28,8 +28,8 @@ function actualTile(id: string): Tile {
 }
 
 describe('F-BUGHUNT-4 audit reproductions', () => {
-  // These tests retain measurements of the unfixed findings; they do not certify acceptance.
-  it('quantifies the low-tier Blue Hole mesh versus collision/sonar surface', () => {
+  // Retain the original audit grid; 920 turns the repaired collision findings into regressions.
+  it('keeps low-tier Blue Hole collision on the mesh while measuring sonar relief', () => {
     const config = makeConfig();
     const terrain = new Terrain(actualTile('great-blue-hole'), config.terrain, 'low');
     try {
@@ -60,11 +60,10 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
         }
       }
       console.log('Blue Hole low-tier surface errors (metres)', { worst, maxBurial });
-      // Characterization of the confirmed issue, not an acceptance threshold.
-      expect(worst.error).toBeGreaterThan(config.submarine.hullRadius * 2);
-      expect(maxBurial.error).toBeGreaterThan(config.submarine.hullRadius * 2);
+      expect(worst.error).toBeLessThan(0.002);
+      expect(maxBurial.error).toBeLessThan(0.002);
       const sub = new Submarine(config.submarine, terrain);
-      // Sit between the collision surface and the drawn mesh above it: buried, yet "free".
+      // The original burial reproduction now hovers clear of the rendered floor.
       sub.reset(
         maxBurial.x,
         maxBurial.collision + config.submarine.hullRadius + config.submarine.seabedClearance + 0.5,
@@ -83,8 +82,10 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
         1 / 60,
       );
       expect(sub.getState().touchedBottom).toBe(false);
-      expect(sub.position.y + config.submarine.hullRadius).toBeLessThan(maxBurial.mesh);
-      console.log('Buried submarine repro', {
+      expect(sub.position.y - config.submarine.hullRadius).toBeGreaterThanOrEqual(
+        maxBurial.mesh + config.submarine.seabedClearance - 0.002,
+      );
+      console.log('Rendered floor clearance', {
         at: worldToLatLon(terrain.meta, worst.x, worst.z),
         y: sub.position.y,
         altitude: sub.getState().altitude,
@@ -105,7 +106,7 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
     }
   });
 
-  it('reproduces the carved-wall mismatch with procedural detail disabled', () => {
+  it('keeps detail-off collision on the carved mesh while retaining survey relief', () => {
     const config = makeConfig();
     config.terrain.detailStrength = 0;
     const terrain = new Terrain(actualTile('great-blue-hole'), config.terrain, 'low');
@@ -119,7 +120,8 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
       const mesh = ray.intersectObjects(meshes, false)[0]!.point.y;
       const sampler = terrain.sampleDataHeight(x, z);
       console.log('Blue Hole without procedural detail', { mesh, sampler, error: mesh - sampler });
-      expect(terrain.sampleHeight(x, z)).toBe(sampler);
+      expect(Math.abs(terrain.sampleHeight(x, z) - mesh)).toBeLessThan(0.002);
+      // The original analytic survey/mesh resolution difference still exists.
       expect(mesh - sampler).toBeGreaterThan(config.submarine.hullRadius);
     } finally {
       terrain.dispose();

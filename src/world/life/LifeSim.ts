@@ -43,6 +43,8 @@ export interface SimOptions {
   rand?: Rand;
   /** Seed for the cell hash (a site always lays out the same corals). */
   seed?: number;
+  /** Optional authored habitat, populated before random groups consume the pool. */
+  populate?: (sim: LifeSim, sub: SubInfo) => void;
 }
 
 export interface SimStats {
@@ -88,12 +90,14 @@ export class LifeSim {
   private lastX = Infinity;
   private lastZ = Infinity;
   private started = false;
+  private readonly populate: SimOptions['populate'];
 
   constructor(opts: SimOptions) {
     this.tier = opts.tier;
     this.env = opts.env;
     this.rand = opts.rand ?? mulberry32(0x5eed);
     this.seed = opts.seed ?? 1;
+    this.populate = opts.populate;
     this.rows = buildEntries(opts.table);
     this.rare = opts.table?.rare ?? null;
     this.pool = Array.from({ length: opts.tier.maxAgents }, (_, i) => {
@@ -203,6 +207,7 @@ export class LifeSim {
     this.started = true;
     this.steer.sub = sub;
     this.refreshActive(sub);
+    this.populate?.(this, sub);
     for (let i = 0; i < 40; i++) this.spawnPass(sub, true);
     this.cellPass(sub, true);
     for (const a of this.pool) if (a.alive) a.fade = 1;

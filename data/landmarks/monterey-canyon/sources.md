@@ -93,3 +93,29 @@ reaches 2,332.8 m, within this hull's rating.
   points at 1,000/2,000 m; all four are located by tracing this tile's real GMRT terrain rather than by citation,
   and each POI's `note` field says so.
 - The upper-channel POI added for the pacing fix is likewise a terrain-traced point, not a cited coordinate.
+
+## F-MONTEREY-860 opening wildlife
+
+The two staged midwater schools use Pacific hake (`Merluccius productus`),
+and the floor field uses `Umbellula lindahli`: both are already in the
+retained Monterey OBIS list. Counts and placement are game staging, not a
+survey abundance estimate. The OBIS snapshot is unchanged.
+
+The new demersal fish is sablefish (`Anoplopoma fimbria`).
+[NOAA Fisheries](https://www.fisheries.noaa.gov/species/sablefish) documents
+its California range, adult muddy-bottom habitat deeper than 650 ft
+(about 200 m), and metre-scale maximum size.
+[Monterey Bay Aquarium](https://www.montereybayaquarium.org/animals-the-ocean/animals-a-to-z/sablefish)
+documents a maximum length of 100 cm and a North Pacific depth range to
+2,800 m. [MBARI's Deep-Sea Guide](https://dsg.mbari.org/dsg/plots/concept/Anoplopoma%20fimbria)
+provides ROV observations. These sources support a staged adult encounter at
+the roughly 720–750 m opening; they do not establish an observed population
+at the game's authored wall. The Journal uses factual species copy and the
+existing Game addition tag. Sablefish are only added to Monterey's spawn table.
+
+`LifeOptions.populate` / `SimOptions.populate` is an optional synchronous
+habitat callback `(sim, sub) => void`. It runs after depth/species selection,
+before random first-fill groups, and runs again after `clear()` or a teleport
+refill. Monterey uses it to reserve opening habitat within the existing tier
+pool. Elsewhere it is omitted. Normal steering, scanning, fades and despawning
+continue after placement; `?life=0` bypasses the life system as before.

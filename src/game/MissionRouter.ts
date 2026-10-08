@@ -672,6 +672,7 @@ export class MissionRouter {
     const k = (a: string, fallback: string): string => this.opts.keyLabel?.(a) || fallback;
     const hull = def.hull_class ? config.submarine.hullClasses[def.hull_class] : undefined;
     const content: BriefingContent = {
+      siteId: def.landmark,
       kicker: `MISSION BRIEFING · ${def.landmark.toUpperCase()}`,
       title: def.title,
       summary: def.briefing.summary,

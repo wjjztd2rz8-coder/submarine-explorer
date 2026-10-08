@@ -60,6 +60,8 @@ overrides): `vent→vent`, `seep→brine`, `canyon→canyon`, `reef|hole→reef`
 - `environment.preset`: one of `vent | brine | canyon | reef | trench | wreck | seamount | default`.
 - `environment.overrides`: keys are defined by C3 in `docs/presets.md` and
   `Config.presets`; unknown keys are ignored with a warning.
+  Canyon accepts optional numeric `ambientFillColor` (RGB hex, default
+  `0x4f7480`) alongside `ambientFill`; omitted values retain the shared look.
 - `species_file`: defaults to `species.json` in the same folder; C1's field-guide
   species tab reads it (see §3).
 - `pressure_band_review` is an optional content review record for a real POI

@@ -15,7 +15,7 @@
       "lod_distance_m": 800,
       "collision": "box",
       "reconstruction": true,
-      "note": "Game addition: a [26,20,12] m build flank fragment of Beebe’s documented ~80 m-wide, ~50 m-high sulfide mound, with a tallest chimney, subsidiary spires, black particulate plumes and localized shrimp clusters. Stack heights and exact arrangement are scenic, not the full mound dimensions. Low-salinity fluids were measured around 401–403 °C and ~500 bar (Webber et al. 2015). See sources.md.",
+      "note": "Game addition: a [26,20,12] m build flank fragment of Beebe’s documented ~80 m-wide, ~50 m-high sulfide mound, with a tallest chimney, subsidiary spires, black particulate plumes and localized shrimp clusters. Stack heights and exact arrangement are scenic, not the full mound dimensions. Low-salinity fluids were measured around 401–403 °C and ~500 bar (Webber et al. 2015). See sources.md. Scenic addition: sparse tube-worm and mussel clumps on cooler flow margins, with broken chimney rubble; placement is illustrative, not a surveyed Beebe fauna census.",
       "variant": "shrimp",
       "beebe_seabed": {
         "width_m": 90,
@@ -32,6 +32,17 @@
         "rubble_color": 6643543,
         "rubble_count": 42,
         "rubble_size_m": 0.65
+      },
+      "beebe_habitat": {
+        "clumps": 12,
+        "worms_per_clump": 10,
+        "mussels_per_clump": 20,
+        "rubble_count": 36,
+        "flow_deg": 50,
+        "flow_length_m": 20,
+        "clump_radius_m": 1.15,
+        "worm_height_m": 1.0,
+        "rubble_size_m": 0.55
       }
     },
     {
@@ -47,7 +58,18 @@
       "lod_distance_m": 700,
       "collision": "box",
       "reconstruction": true,
-      "note": "Second, shorter black-smoker chimney in the Beebe 1-5 mound cluster, same rationale as beebe-chimney-1."
+      "note": "Second, shorter black-smoker chimney in the Beebe 1-5 mound cluster, same rationale as beebe-chimney-1. Scenic addition: sparse tube-worm and mussel clumps on cooler flow margins, with broken chimney rubble; placement is illustrative, not a surveyed Beebe fauna census.",
+      "beebe_habitat": {
+        "clumps": 12,
+        "worms_per_clump": 10,
+        "mussels_per_clump": 20,
+        "rubble_count": 36,
+        "flow_deg": 50,
+        "flow_length_m": 24,
+        "clump_radius_m": 1.15,
+        "worm_height_m": 1.0,
+        "rubble_size_m": 0.55
+      }
     },
     {
       "id": "beebe-chimney-3",
@@ -62,7 +84,18 @@
       "lod_distance_m": 700,
       "collision": "box",
       "reconstruction": true,
-      "note": "Chimney on the western sulfide mound (bvf-sulfide-mound-west POI), representing one of at least six mounds mapped by Webber et al. (2015). Reconstruction: general mound location and count are sourced, this specific chimney's shape is not."
+      "note": "Chimney on the western sulfide mound (bvf-sulfide-mound-west POI), representing one of at least six mounds mapped by Webber et al. (2015). Reconstruction: general mound location and count are sourced, this specific chimney's shape is not. Scenic addition: sparse tube-worm and mussel clumps on cooler flow margins, with broken chimney rubble; placement is illustrative, not a surveyed Beebe fauna census.",
+      "beebe_habitat": {
+        "clumps": 12,
+        "worms_per_clump": 10,
+        "mussels_per_clump": 20,
+        "rubble_count": 36,
+        "flow_deg": 50,
+        "flow_length_m": 24,
+        "clump_radius_m": 1.15,
+        "worm_height_m": 1.0,
+        "rubble_size_m": 0.55
+      }
     }
   ]
 }

@@ -26,7 +26,12 @@ import {
   type GuidePoi,
   type GuideSource,
 } from './Guide.js';
-import { MISSION_INDEX_URL, parseMissionIndex } from './Mission.js';
+import {
+  MISSION_INDEX_URL,
+  parseMissionIndex,
+  parseMission,
+  type MissionBriefing,
+} from './Mission.js';
 import { loadPois, type PoiDef } from './Pois.js';
 import { loadSpecies, type SpeciesDoc, type SpeciesRecord } from './Species.js';
 import { publicUrl } from '../util/publicUrl.js';
@@ -86,6 +91,8 @@ export interface JournalSite {
   links: GuideSource[];
   memorialNote?: string;
   missionTitle?: string;
+  /** The verified mission overview, retained even before the first scan. */
+  briefing?: MissionBriefing;
   /** Site-level entries, then POI entries (file order), then species (most records first). */
   entries: JournalEntry[];
   /** Every POI id at the site: any of them scanned unlocks the site page. */
@@ -147,6 +154,7 @@ export interface JournalSiteInput {
   id: string;
   catalogue?: CatalogueInfo;
   missionTitle?: string;
+  briefing?: MissionBriefing;
   guide: GuideDoc | null;
   pois: PoiDef[];
   species: SpeciesDoc | null;
@@ -261,6 +269,7 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
   };
   if (guide?.memorial_note) site.memorialNote = guide.memorial_note;
   if (input.missionTitle) site.missionTitle = input.missionTitle;
+  if (input.briefing) site.briefing = input.briefing;
   return site;
 }
 
@@ -350,6 +359,8 @@ export async function loadJournalSite(
   if (info) input.catalogue = info;
   const title = isObj(mission) ? str(mission.title) : '';
   if (title) input.missionTitle = title;
+  const missionDef = parseMission(mission, id, quiet);
+  if (missionDef) input.briefing = missionDef.briefing;
   return buildJournalSite(input);
 }
 

@@ -450,6 +450,16 @@
       },
       "sourceTitle": "WoRMS: Architeuthis dux",
       "sourceUrl": "https://www.marinespecies.org/aphia.php?p=taxlist&tName=Architeuthis%20dux"
+    },
+    "sablefish": {
+      "text": "Sablefish, also called black cod, are dark fish of the North Pacific continental slope. Adults live close to muddy bottoms deeper than about 200 metres and feed on fishes and invertebrates.",
+      "facts": {
+        "Length": "Up to 1 m",
+        "Habitat": "Continental slope; adults near muddy bottoms",
+        "Depth": "Adults deeper than about 200 m; species recorded to 2,800 m"
+      },
+      "sourceTitle": "NOAA Fisheries — Sablefish; Monterey Bay Aquarium",
+      "sourceUrl": "https://www.fisheries.noaa.gov/species/sablefish"
     }
   },
   "sites": {
@@ -747,16 +757,23 @@
       "spawns": [
         {
           "species": "pacific-hake",
-          "weight": 2,
+          "weight": 2.5,
           "depth": [150, 900],
-          "group": [12, 26]
+          "group": [10, 18],
+          "star": true
+        },
+        {
+          "species": "sablefish",
+          "weight": 1.5,
+          "depth": [200, 2800],
+          "group": [2, 4],
+          "star": true
         },
         {
           "species": "nanomia",
           "weight": 4,
           "depth": [100, 800],
-          "group": [3, 8],
-          "star": true
+          "group": [3, 8]
         },
         {
           "species": "sea-pen",
@@ -780,8 +797,7 @@
           "species": "vampire-squid",
           "weight": 1,
           "depth": [500, 1500],
-          "group": [1, 1],
-          "star": true
+          "group": [1, 1]
         },
         {
           "species": "comb-jelly",

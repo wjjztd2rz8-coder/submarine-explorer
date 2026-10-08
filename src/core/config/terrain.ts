@@ -116,19 +116,6 @@ export const MONTEREY_FIDELITY: TerrainFidelity = {
   wallSegments: { low: [220, 150], medium: [230, 150], high: [520, 280], ultra: [640, 320] },
 };
 
-// Terrain-only profiles: reconstructed prop meshes keep their existing art and limits.
-export const BLUE_HOLE_FIDELITY: TerrainFidelity = {
-  ...MONTEREY_FIDELITY,
-  // Cover both ledge scans, the shaft and the interior opening pose. The analytic
-  // carve has shelves only a few metres wide, so its near grid needs ~3.7 m cells.
-  focus: { lat: 17.3156, lon: -87.5356, radiusM: 310, fadeM: 90 },
-  chunkCells: 8,
-  nearSubdiv: { low: 1, medium: 16, high: 32, ultra: 32 },
-  reliefM: 0.18,
-  reliefWavelengthM: 24,
-  normalStrength: 0.16,
-};
-
 export const LOST_CITY_FIDELITY: TerrainFidelity = {
   ...MONTEREY_FIDELITY,
   // Poseidon is the first scan. Keep its start pose and the neighbouring spires
@@ -144,8 +131,18 @@ export const LOST_CITY_FIDELITY: TerrainFidelity = {
 export const DEFAULT_TERRAIN: TerrainConfig = {
   fidelity: {
     'monterey-canyon': MONTEREY_FIDELITY,
-    'great-blue-hole': BLUE_HOLE_FIDELITY,
     'lost-city': LOST_CITY_FIDELITY,
+    // The 320 m sinkhole fits inside six survey cells. Resolve its reconstructed
+    // ledges on the sand/rock surface itself, avoiding intersecting prop skins.
+    'great-blue-hole': {
+      focus: { lat: 17.3156, lon: -87.5356, radiusM: 240, fadeM: 60 },
+      chunkCells: 8,
+      nearSubdiv: { low: 1, medium: 16, high: 32, ultra: 32 },
+      reliefM: 0,
+      reliefWavelengthM: 24,
+      normalStrength: 0.18,
+      wallSegments: { low: [200, 140], medium: [200, 140], high: [200, 140], ultra: [200, 140] },
+    },
   },
   // 64 source cells x subdiv 2 = a 129x129 vertex chunk, which still fits in
   // 16-bit indices and gives the LOD selector something to actually choose

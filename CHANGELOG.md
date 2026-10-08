@@ -23,6 +23,57 @@ without an entry here is not done.
   survives cubic reconstruction. Static geometry checks pass; rendered budgets
   and paired visual QA await an unrestricted browser run. Evidence:
   `plan/progress/F-FIDELITY-870.md`.
+- Phase F, F-BRIEFING-900: lead mission briefings with objectives, show at most
+  three prioritised facts and hazards each, and move the summary, remaining
+  bullets and controls into “More about this site”. Retain the complete mission
+  overview in the same Journal disclosure before the first scan. Keep Begin
+  dive as the only filled button, make Free dive a text link, and compact Start
+  into “near the first target / at the surface”. Tighten the phone layout while
+  retaining 44 px targets and the Titanic memorial note. Reason: the first dive
+  was preceded by a wall of copy and competing actions. Verified facts are
+  unchanged; rendered phone fit and after screenshots remain blocked by the
+  sandbox. Evidence: `plan/progress/F-BRIEFING-900.md`.
+
+- Phase F, F-VERIFY-920: sample near mesh triangles for collision, POIs, prop
+  seats and scatter on carved sites at every tier, including detail-off mode.
+  Move Monterey's opening approach back 4 m to retain the seated wall's first
+  scan on Low. Reason: continuous collision differed from the rendered carves
+  by up to 30 m. Add shipped-tile Low/Medium/High and cubic-carve regression
+  coverage; record remaining mesh fidelity and camera arm issues in
+  `plan/progress/F-VERIFY-920.md`.
+- Phase F, F-MONTEREY-860: lift Monterey's ambient fill with a more neutral
+  tint and a modest hemisphere light; extend and strengthen its submarine
+  lamps. Stage two Pacific hake schools, a few factual sablefish and a sea-pen
+  field near the opening through the existing life pool, retaining Low's caps.
+  Aim the opening four degrees closer to the North canyon wall so its first
+  scan remains immediately available across tiers. Reason: the opening was
+  dark, teal and sparsely populated. Add sourced sablefish Journal copy;
+  paired screenshot review is pending sandbox browser access. Evidence:
+  `plan/progress/F-MONTEREY-860.md`.
+- Phase F, F-BEEBE-850: vary Beebe's outer seabed through existing sand/rubble/basalt
+  slots, cooler sediment/cobble patches and stronger ripples; reuse 780's distant
+  seabed fade to fog. Add tier-scaled tube-worm/mussel clumps and chimney rubble on
+  the three smokers' cooler flow margins, and widen/elevate only Beebe's opening
+  chase view so hull length reads beside the main stack. Reason: the outer floor
+  was sparse and flat orange, with a hard skyline and foreshortened sub. Frozen
+  non-Beebe rendering fingerprints guard isolation; rendered after QA remains
+  blocked by sandbox browser/localhost restrictions. Evidence: `plan/progress/F-BEEBE-850.md`.
+
+- Phase F, F-PHONE-HUD-890 gate follow-up: dock the short-portrait tutorial below
+  the submarine, preserve the compact flex scan card against ExploreNotice's
+  small-landscape grid rules, and restore inline powered readouts with tighter
+  supplies/current rows. Reason: external full e2e found six small-phone overlaps
+  and Realistic Surface telemetry crossing the action buttons. Retain every
+  assertion and live readout; external browser revalidation remains pending.
+- Phase F, F-PHONE-HUD-890: compact the phone HUD around the scene. Keep the
+  scan card's target, range and turn hint; suppress the duplicate waypoint
+  chip and mission instruction while that card is visible. Collapse sonar to
+  96 px with tap expansion, combine depth/speed/status/hull into two core rows,
+  dock a two-line tutorial above the controls with one Skip action, and move
+  Data credits below the small sonar. Reason: the first-minute phone HUD hid
+  the submarine. Desktop layout, scanning and tutorial progression are unchanged.
+  Static gates pass; fresh browser captures are blocked by sandbox port/browser
+  restrictions. Evidence and rerun commands: `plan/progress/F-PHONE-HUD-890.md`.
 - Debrief and Journal first-session polish (debrief-journal). Partial dives now
   read "Back at the surface" with "You found N of M — the rest are still down
   there." instead of "Dive ended / Primary objectives unfinished". The debrief
@@ -768,6 +819,9 @@ without an entry here is not done.
 
 ### Removed
 
+- Phase F, F-PHONE-HUD-890: remove the phone sonar legend, tutorial heading/dots
+  and second Skip action; hide collapsed sonar zoom controls until expansion.
+  Reason: these rows consumed the first-minute scene and repeated guidance.
 - Phase F, F-INTEGRATE-660: drop F-BUGHUNT-590 after its Realistic Blue Hole
   Surface telemetry still overlapped the ballast slider after a real fix
   attempt. Restore its changed paths from merge `78ab30e`'s first parent,

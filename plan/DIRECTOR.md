@@ -8,11 +8,13 @@ Run `tools/golden.sh` at the start of any run that merged visual work (`GOLDEN_S
 
 Claude backlog (ordered by player impact; all unblocked):
 
+0. **Joint review 2026-10-08 (REVIEWS.md):** ~65%, ~3 weeks to 1.0. Agreed blocker order: first five minutes (890/900 + a real capture), default missions reach the hero scenery (940), Blue Hole fidelity first (910/875), green CI (920/880), all-13-site + real-phone Low-tier coverage. Honest beautiful: Titanic 3.5, Beebe 3, Blue Hole 2, Lost City 3, Monterey 3. Small, well-scoped Claude tasks go to Haiku 5.5 (RESUME-PROMPT §2).
+
 1. **Phone first-minute clutter (review + rework if Codex 890 falls short):** at 60 s on 390x844 the scene is ~25% of the screen; the same scan target is shown three times; tutorial card covers the sub. Review 890's before/after at 390x844 and 844x390 and send back until the sub, the seabed and one target indicator dominate.
 2. **Briefing wall of text (review 900):** 4 facts + 5 hazards + 3 buttons before the first dive; the default view must fit a phone without scrolling and have one filled button.
 3. **Blue Hole wall relief redo (review 910):** 830 was reverted: patchwork sand blobs and a shrunken gallery. Accept only if the gallery stays as large as in golden 132858 and no hard-edged patches remain.
 4. **Fidelity rollout (review 870, then Lost City beehive/slab and Titanic hull detail):** Monterey's 810 terrain read much smoother and more natural in golden 132228 (+1). Roll the same profile to Blue Hole and Lost City, then decide on Beebe/Titanic from the result.
-5. **Beebe (review 850) and Monterey first frame (review 860):** Beebe seabed beyond the lit pool and an odd near-vertical sub pose; Monterey still dark and teal-monochrome with few animals. Redo in Claude if Codex output is flat.
+5. (850/860 MERGED 2026-10-08; Beebe first frame good, close-up sand-disc edge queued as 930; re-check Monterey in next golden after the carve fix) **Beebe and Monterey first frame:** Beebe seabed beyond the lit pool and an odd near-vertical sub pose; Monterey still dark and teal-monochrome with few animals. Redo in Claude if Codex output is flat.
 6. (DONE 2026-10-08) **Debrief wording and actions:** "Dive ended / Primary objectives unfinished" after a successful scan reads like failure, and the end card offers five actions (two buttons, three links). One primary action, a warmer line for partial dives.
 7. (DONE 2026-10-08) **Journal list:** "Unscanned target 2..7" rows are dead space; collapse them to a single "7 more to find" row.
 8. **Hosted CI:** run on f30 push; if still red after 880's verification, cut shard-heavy specs rather than loosen assertions.
