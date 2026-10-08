@@ -14,6 +14,15 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-MONTEREY-860: lift Monterey's ambient fill with a more neutral
+  tint and a modest hemisphere light; extend and strengthen its submarine
+  lamps. Stage two Pacific hake schools, a few factual sablefish and a sea-pen
+  field near the opening through the existing life pool, retaining Low's caps.
+  Aim the opening four degrees closer to the North canyon wall so its first
+  scan remains immediately available across tiers. Reason: the opening was
+  dark, teal and sparsely populated. Add sourced sablefish Journal copy;
+  paired screenshot review is pending sandbox browser access. Evidence:
+  `plan/progress/F-MONTEREY-860.md`.
 - Phase F, F-BLUEHOLE-770 second gate follow-up: fit the hidden cockpit before
   the save-soak resource warm-up. Reason: its first render callback replaced
   three Low-tier placeholder geometries after Three captured the render list,

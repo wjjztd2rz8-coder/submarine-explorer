@@ -117,7 +117,7 @@ const FREE_DIVE_OPENINGS: Record<
     bearing: 0,
     range: 12,
     altitude: 10,
-    yawOffset: 10,
+    yawOffset: 6,
     turnWeight: 3,
     // Frame the bend beside the hull while keeping X reset at the global chase distance.
     chaseOffsetY: -14,

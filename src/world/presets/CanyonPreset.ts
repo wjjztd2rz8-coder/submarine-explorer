@@ -34,7 +34,6 @@ import type { EnvPreset, PresetEnterContext, PresetFrameContext, PresetParams } 
 
 const MAX_PLUMES = 8;
 const SAMPLE_PERIOD_S = 0.25;
-const FILL_TINT = new THREE.Color(0x4f7480);
 
 export class CanyonPreset implements EnvPreset {
   readonly name: EnvPresetName = 'canyon';
@@ -49,6 +48,7 @@ export class CanyonPreset implements EnvPreset {
   private readonly rnd = mulberry(0xca9e);
   private readonly normal = new THREE.Vector3();
   private readonly tmpN = new THREE.Vector3();
+  private readonly fillTint = new THREE.Color();
   /** Horizontal current at the sub from the last terrain sample (m/s). */
   readonly flow = new THREE.Vector3();
 
@@ -56,6 +56,7 @@ export class CanyonPreset implements EnvPreset {
 
   enter(ctx: PresetEnterContext): void {
     const p = (this.params = ctx.params);
+    this.fillTint.setHex(num(p.ambientFillColor, 0x4f7480));
     this.scene = ctx.scene;
     if (!ctx.visuals) return;
     this.plumes = Math.min(MAX_PLUMES, Math.max(0, Math.round(num(p.plumes, 6))));
@@ -157,7 +158,7 @@ export class CanyonPreset implements EnvPreset {
     const fill = num(this.params.ambientFill, 0);
     if (fill > 0) {
       ctx.atmo.ambientIntensity += fill;
-      ctx.atmo.ambientColor.lerp(FILL_TINT, 0.75);
+      ctx.atmo.ambientColor.lerp(this.fillTint, 0.75);
     }
     ctx.atmo.snowDensity *= num(this.params.snowScale, 1);
     this.sampleClock += dt;

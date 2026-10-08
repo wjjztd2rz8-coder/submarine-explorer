@@ -37,6 +37,7 @@ export interface LifeOptions {
   landmarkId: string;
   rand?: Rand;
   seed?: number;
+  populate?: ConstructorParameters<typeof LifeSim>[0]['populate'];
 }
 
 export class Life {
@@ -62,6 +63,7 @@ export class Life {
     };
     if (opts.rand) simOpts.rand = opts.rand;
     if (opts.seed !== undefined) simOpts.seed = opts.seed;
+    if (opts.populate) simOpts.populate = opts.populate;
     this.sim = new LifeSim(simOpts);
     this.render = new LifeRender(this.tier, this.sim.rand);
     this.sim.setFlashHandler((a, s) => this.render.flash(a, s));

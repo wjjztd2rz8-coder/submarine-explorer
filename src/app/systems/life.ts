@@ -15,6 +15,7 @@ import { Life, LIFE_ID_PREFIX } from '../../world/life/Life.js';
 import { loadLifeDoc } from '../../world/life/tables.js';
 import type { SubInfo } from '../../world/life/agent.js';
 import type { GameSystem } from '../System.js';
+import { populateMontereyOpening } from '../../world/life/MontereyOpening.js';
 
 export function createLifeSystem(): GameSystem {
   const sub: SubInfo = {
@@ -68,6 +69,9 @@ export function createLifeSystem(): GameSystem {
           },
         };
         if (seed !== undefined) opts.seed = seed;
+        if (contentLandmark === 'monterey-canyon') {
+          opts.populate = (sim, pilot) => populateMontereyOpening(sim, pilot, ctx.props);
+        }
         life = new Life(opts);
         ctx.life = life;
         discovery.scanner.setExtraTargets(life.targets);

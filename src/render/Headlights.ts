@@ -30,6 +30,7 @@ export class Headlights {
   constructor(
     private readonly config: WaterConfig,
     private readonly tier: AtmosphereTier,
+    private readonly tuning = { intensity: 1, distance: 1, fillIntensity: 1, fillDistance: 1 },
   ) {
     const angle = (config.headlightAngleDeg * Math.PI) / 180;
     for (let i = 0; i < 2; i++) {
@@ -137,15 +138,19 @@ export class Headlights {
     const preset = this.preset;
     if (!preset) return;
     const work = this.workLighting ? preset.workLight : undefined;
+    const tuning = this.workLighting
+      ? { intensity: 1, distance: 1, fillIntensity: 1, fillDistance: 1 }
+      : this.tuning;
     for (const light of this.lights) {
-      light.intensity = preset.intensity * (work?.intensityFactor ?? 1);
-      light.distance = preset.distance;
+      light.intensity = preset.intensity * (work?.intensityFactor ?? 1) * tuning.intensity;
+      light.distance = preset.distance * tuning.distance;
       light.angle = ((work?.angleDeg ?? preset.angleDeg) * Math.PI) / 180;
       light.penumbra = work ? 0.6 : 0.7;
       light.decay = work ? 1 : 1.35;
     }
-    this.fill.intensity = preset.fillIntensity * (work?.fillIntensityFactor ?? 1);
-    this.fill.distance = work?.fillDistance ?? preset.fillDistance;
+    this.fill.intensity =
+      preset.fillIntensity * (work?.fillIntensityFactor ?? 1) * tuning.fillIntensity;
+    this.fill.distance = (work?.fillDistance ?? preset.fillDistance) * tuning.fillDistance;
     this.fill.decay = work ? 1 : 2;
     this.fill.visible = this.enabled && this.fill.intensity > 0;
   }

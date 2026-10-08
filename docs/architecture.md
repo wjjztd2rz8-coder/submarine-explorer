@@ -702,3 +702,11 @@ uses the specified position without group scatter. Forced encounter groups have
 an optional `preview` marker: photo naming prefers that explicit subject only
 when it passes the normal size, fade and frame checks. Natural spawning and
 natural subject scoring remain unchanged.
+
+`LifeOptions.populate` forwards an optional synchronous `(sim, sub) => void`
+habitat callback to `SimOptions.populate`. It runs on first fill, after active
+species selection and before random groups consume the tier pool, and again
+after `clear()` or teleport refills. Monterey alone supplies this callback near
+its opening ledge. Its two hake schools, sablefish and rooted sea pens retain
+normal steering, scan targets and despawning. The Low pool stays at 44 agents
+and four species; the shallow whale appearance keeps its reserved slot.
