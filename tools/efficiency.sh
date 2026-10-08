@@ -17,7 +17,8 @@ print(f"samples (30 min each): {n}")
 print(f"Claude idle with >=50% 5h and no run: {idle_claude} samples (~{idle_claude/2:.1f} h)")
 print(f"Codex under-used (>=30% 5h, <2 tasks): {idle_codex} samples (~{idle_codex/2:.1f} h)")
 print(f"Usage unreadable: {blind} samples")
-log=open('plan/OVERNIGHT-LOG.md').read()
+import os
+log=open('plan/OVERNIGHT-LOG.md').read()+(open('.cache/skips.log').read() if os.path.exists('.cache/skips.log') else '')
 skips=collections.Counter(re.findall(r'skipped: (\w[\w ]*?) \(',log))
 print("run skips by reason:",dict(skips))
 try:

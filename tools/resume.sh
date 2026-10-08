@@ -12,7 +12,7 @@ flock -n 9 || { echo "another resume run is active; exiting"; exit 0; }
 # Cheap every tick (no Claude): record metrics and dispatch queued Codex briefs.
 tools/usage-sample.sh 2>/dev/null || true
 tools/codex-dispatch.sh > /dev/null 2>&1 || true
-log_skip() { echo "- $(date '+%Y-%m-%d %H:%M %Z') headless run: skipped: $1" >> plan/OVERNIGHT-LOG.md; }
+log_skip() { echo "- $(date '+%Y-%m-%d %H:%M %Z') headless run: skipped: $1" >> .cache/skips.log; }
 # Skip cheaply (without starting Claude) when another orchestrator is active or
 # the budget floors (owner: Claude 5h >=20%, Codex 5h >=5%, weekly >=5%) are hit.
 if [[ -f .cache/orchestrator.active ]] && (( $(date +%s) - $(stat -c %Y .cache/orchestrator.active) < 5400 )); then
