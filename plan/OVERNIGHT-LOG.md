@@ -572,3 +572,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - **Weak spots (DIRECTOR):** briefing at 844x390 still scrolls internally (~271 px); Blue Hole phone first frame is still very dark (910 redo pending). 890/900 "after" screenshot tables in their progress notes are unfilled.
 - **Still in worktrees (uncommitted Codex work, need browser gates):** 875, 880, 910, 930 (830 kept as reference). Queue: 940, 950 (Challenger/Endurance golden), 960 (regression hunt after 890/900). Codex resets 15:50.
 - Needs owner: nothing.
+
+## 2026-10-08 15:26 CDT headless run (Claude)
+
+- **Merged:** 910 Blue Hole wall redo (golden-reviewed: gallery as large as before, no sand patches, wall slightly smoother), 875 fidelity rollout (Lost City profile; its Blue Hole profile dropped in favour of 910's; Lost City close-up unchanged at the golden pose), 880 f30 bug-hunt tests. Full e2e passed on final main; pushed, tagged f34.
+- **Held:** 930 Beebe pool edge (worktree kept): golden shows no visible change to the cream disc; send back for a real fix when Codex has budget.
+- **Queue:** 940, 950, 960. Codex 5h was 0% (resets 15:50). Needs owner: nothing.
