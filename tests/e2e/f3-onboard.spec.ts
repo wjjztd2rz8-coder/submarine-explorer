@@ -1,3 +1,4 @@
+import { dismissTutorial } from './helpers/tutorial.js';
 /**
  * F3-ONBOARD: the first-dive tutorial, one-shot hints and the controls card.
  * These specs use the plain Playwright test (fresh player), not the
@@ -203,16 +204,16 @@ test.describe('touch viewport', () => {
         other.y < box.y + box.height;
       expect(overlap, `${sel} overlaps the card`).toBe(false);
     }
-    for (const name of ['Skip step', 'Skip tutorial']) {
+    for (const name of ['Skip']) {
       const b = (await page.getByRole('button', { name }).boundingBox())!;
       expect(b.height).toBeGreaterThanOrEqual(43.9);
     }
     await shot(page, 'touch-step1');
-    await page.getByRole('button', { name: 'Skip step' }).tap();
-    await expect(card).toContainText('Step 2 of 5');
+    await page.getByRole('button', { name: 'Skip', exact: true }).tap();
+    await expect(card).toHaveAttribute('data-step', 'depth');
     await expect(card).toContainText('slider');
     await shot(page, 'touch-step2');
-    await page.getByRole('button', { name: 'Skip tutorial' }).tap();
+    await dismissTutorial(page, true);
     await expect(card).toBeHidden();
     await page.locator('.tc-btn-pause').tap();
     await page.locator('.pause-menu').getByRole('button', { name: 'Controls' }).tap();

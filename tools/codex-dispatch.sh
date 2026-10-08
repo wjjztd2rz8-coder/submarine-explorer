@@ -7,7 +7,7 @@
 # Called every 30 min from tools/resume.sh; safe to run by hand.
 set -uo pipefail
 cd "$(dirname "$0")/.."
-export PATH="$HOME/.local/node/bin:$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/node/bin:$HOME/.local/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
 # Serialize dispatchers; socket probes alone miss running tasks which have not
 # started their gate server yet (or are between e2e and e2e-base).
 mkdir -p .cache/codex/queue/launched

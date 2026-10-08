@@ -347,11 +347,20 @@ export class HUD {
   /** Update from a physics snapshot. Safe to call every rendered frame. */
   update(s: SubmarineState, ctx: HudContext = {}): void {
     this.set('depth', formatDepth(s.depth, this.warn.hullRadius));
+    const compactDepth =
+      s.depth >= -(this.warn.hullRadius + 0.5)
+        ? 'SURFACED'
+        : `${Math.max(0, -s.depth).toFixed(0)} m`;
+    const depthEl = this.values.get('depth')!;
+    if (depthEl.dataset.meters !== compactDepth) depthEl.dataset.meters = compactDepth;
     this.hullGauge.update(s);
     this.set('tile', formatTileLine(this.meta, s.hullClass, s.ratedDepth, this.hullNote));
     this.set('heading', `${s.headingDeg.toFixed(0)}° ${compass(s.headingDeg)}`);
     // Knots are the natural unit for a boat; 1 m/s = 1.94384 kn.
     this.set('speed', `${(s.speed * 1.94384).toFixed(1)} kn  (${s.speed.toFixed(1)} m/s)`);
+    const compactSpeed = `${(s.speed * 1.94384).toFixed(1)} kn`;
+    const speedEl = this.values.get('speed')!;
+    if (speedEl.dataset.knots !== compactSpeed) speedEl.dataset.knots = compactSpeed;
     this.showContext(this.objectiveEl, ctx.objective ? `OBJECTIVE · ${ctx.objective}` : null);
     this.showContext(this.promptEl, ctx.scanPrompt);
     this.showContext(

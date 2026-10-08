@@ -100,7 +100,7 @@ describe('Monterey fidelity profile', () => {
     }
   });
 
-  it('preserves Low and other sites byte-for-byte, and retains pure-survey sampling', () => {
+  it('preserves Low and other sites byte-for-byte, and retains survey vertices without detail', () => {
     for (const [id, tier] of [
       ['monterey-canyon', 'low'],
       ['titanic', 'high'],
@@ -124,7 +124,14 @@ describe('Monterey fidelity profile', () => {
     }
     const pure = new Terrain(tile(), { ...config(), detailStrength: 0 }, 'high');
     try {
-      expect(pure.sampleHeight(17, 29)).toBe(pure.sampleDataHeight(17, 29));
+      const x = pure.worldXOfCol(32);
+      const z = pure.worldZOfRow(32);
+      expect(pure.sampleHeight(x, z)).toBe(pure.sampleDataHeight(x, z));
+      const ray = new THREE.Raycaster(new THREE.Vector3(17, 100, 29), new THREE.Vector3(0, -1, 0));
+      expect(pure.sampleHeight(17, 29)).toBeCloseTo(
+        ray.intersectObjects(meshes(pure))[0].point.y,
+        4,
+      );
     } finally {
       pure.dispose();
     }

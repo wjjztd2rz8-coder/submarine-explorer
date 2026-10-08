@@ -345,7 +345,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
       },
     },
   },
-  "spawn": "683fa92195702b9d3a5b66ee19ca3417d34339c61c6f528c974e66d1b7781ad7",
+  "spawn": "fbbc663f915ac301f511344133924f65d7ff062172cf2f220d91be6c3caa6c4d",
   "titanic": {
     "biome": "f6ff8c51a55e0599fa55b281f87d739723d441f874f5f3944945e085f7377a5f",
     "tiers": {

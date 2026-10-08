@@ -1,3 +1,4 @@
+import { expectObjectiveGuidance } from './helpers/phoneHud.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir, writeFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
@@ -175,7 +176,7 @@ for (let pass = 1; pass <= rounds; pass++) {
           expect(errors).toEqual([]);
           if (round !== 'before') {
             await expect(page.locator('.hud-control-tips')).toBeHidden();
-            await expect(page.locator('.objectives-panel .obj-item.is-current')).toBeVisible();
+            await expectObjectiveGuidance(page, layout.touch);
           }
         });
       }
@@ -206,7 +207,7 @@ for (const layout of [
       await ready(page);
       const tips = page.locator('.hud-control-tips');
       if (!layout.touch) await expect(tips).toBeVisible();
-      await expect(page.locator('.obj-item[aria-current="step"]')).toBeVisible();
+      await expectObjectiveGuidance(page, layout.touch);
       const remaining = await page.evaluate(() => {
         const g = window.__game as { cameraTips: { until: number; moved: boolean } };
         return { ms: g.cameraTips.until - performance.now(), moved: g.cameraTips.moved };
@@ -296,7 +297,7 @@ for (const layout of [
       await expect(hint).toBeHidden();
       await expect(page.locator('.hud-control-tips')).toBeHidden();
       await expect(page.locator('.scan-panel')).toBeVisible();
-      await expect(page.locator('.obj-item[aria-current="step"]')).toBeVisible();
+      await expectObjectiveGuidance(page, layout.touch);
       await page.screenshot({ path: `${shots}/checks/${layout.name}-after-move.png` });
     });
   });
