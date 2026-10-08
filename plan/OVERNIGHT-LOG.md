@@ -539,3 +539,7 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - **Queued for Codex:** 850 Beebe, 860 Monterey first frame, 870 fidelity rollout (Blue Hole, Lost City), 880 f30 bug hunt, 890 phone HUD, 900 briefing, 910 Blue Hole redo.
 - **Process:** skip lines moved out of the tracked log (they broke prettier); see plan/PROCESS-LOG.md.
 - **Needs owner:** nothing.
+
+## 2026-10-08 08:39 CDT targeted review run (Claude)
+
+- Trigger "e2e failing repeatedly" was a false positive (stale all-time FAIL count); trigger now uses a 2-day window. No merges; queue 850-910 unchanged. Needs owner: nothing.

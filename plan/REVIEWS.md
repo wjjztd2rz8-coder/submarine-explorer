@@ -2,6 +2,10 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-08 targeted review (trigger: gate "e2e" failing repeatedly)
+
+Diagnosis: false positive. The trigger counted all-time FAIL lines in Codex result files (Oct 1-5); the latest results pass. Fixed the trigger to a 2-day window (plan/PROCESS-LOG.md). No other action needed; the 850-910 queue is still the active plan.
+
 ## 2026-10-08 comprehensive review (triggers: 24 h, CI red x3, Claude idle, Codex starved, e2e gate; golden sets 2026-10-08-122501 and -132228)
 
 **Changed since the last review:** the Claude weekly window reset, so this run collected seven finished Codex packages. Merged: 800 (integration of 770 Blue Hole first target ~100 m, 780 Titanic horizon soften, 790 hosted-CI fixes), 840 (terrain-texture fallback and dispatch bug fixes), 820 (Lost City carbonate triplanar texture and rounded flange), 810 (Monterey terrain fidelity: denser chunks near the canyon, cubic survey reconstruction, filtered detail normals). Merged then **reverted** 830 (Blue Hole wall relief) after looking at its golden. Full e2e passed on the merged main (before the 830 revert; smoke and project-base after).

@@ -120,3 +120,7 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - **Gates one at a time.** Three parallel `tools/gates.sh` runs made `tests/unit/montereyWallLife.test.ts` time out at 15 s; run gates sequentially.
 - **Revert instead of fix-later.** 830 passed gates but its golden showed a visual regression; the merge was reverted and a redo (910) queued with acceptance criteria tied to the golden file names.
 - **Queue refilled:** 850-910 (seven briefs) so Codex has work while Claude's window is spent.
+
+## 2026-10-08 targeted review: "e2e failing repeatedly"
+
+- **Root cause: stale trigger, not a live failure.** `tools/review-triggers.sh` counted every `FAIL` line in all historical `.cache/codex/*-result.md` (4 old e2e failures from Oct 1-5), so the trigger could never clear. The last seven Codex results (Oct 6) all pass the full suite. The count now only reads results from the last 2 days.
