@@ -86,6 +86,8 @@ export interface Biome {
   strata?: { periodM: number; amount: number };
   /** Extra abyssal distance fade to fog; leaves the near seabed unchanged. */
   abyssFadeM?: readonly [number, number];
+  /** Ease the distant seabed to the fog colour at any camera depth (soft horizon, no hard terrain edge). */
+  horizonFadeM?: readonly [number, number];
   /** Optional baked linear colour multipliers, replacing fragment strata for this biome. */
   vertexTint?: (
     x: number,
@@ -310,9 +312,13 @@ export const BIOMES: Record<string, Biome> = {
     rippleDir: 0.2,
     burrow: 0.6,
     rockBias: 0.3,
-    depthShade: { startM: 12, endM: 100, tint: 0x336a94 },
-    strata: { periodM: 4.5, amount: 0.5 },
+    // Lower walls fall away to deep blue-grey (the real hole is dark below the ledge) but stay readable.
+    depthShade: { startM: 30, endM: 105, tint: 0x28556f },
+    strata: { periodM: 3.4, amount: 0.8 },
+    horizonFadeM: [110, 460],
     scatter: [
+      { kind: 'sponge', density: 0.8, slopeMaxDeg: 40, on: 'rock' },
+      { kind: 'sponge', density: 0.5, slopeMaxDeg: 20, on: 'flat' },
       { kind: 'rubble', density: 3, slopeMaxDeg: 30, on: 'any' },
       { kind: 'boulder', density: 1.6, slopeMaxDeg: 45, on: 'any' },
       { kind: 'mound', density: 2, slopeMaxDeg: 10, on: 'flat' },

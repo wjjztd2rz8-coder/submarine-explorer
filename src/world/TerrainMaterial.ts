@@ -147,6 +147,9 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
   if (biome.abyssFadeM) {
     uniforms.uAbyssFadeM = { value: new THREE.Vector2(...biome.abyssFadeM) };
   }
+  if (biome.horizonFadeM) {
+    uniforms.uHorizonFadeM = { value: new THREE.Vector2(...biome.horizonFadeM) };
+  }
   if (opts.rockDetailStrength) defines.push('#define TERRAIN_ROCK_DETAIL');
 
   const material = new THREE.MeshStandardMaterial({
@@ -158,7 +161,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
   material.name = 'seabed';
   material.userData.uniforms = uniforms;
   material.customProgramCacheKey = () =>
-    `seabed-${defines.join('')}${biome.abyssFadeM ? '-abyss-fade' : ''}`;
+    `seabed-${defines.join('')}${biome.abyssFadeM ? '-abyss-fade' : ''}${biome.horizonFadeM ? '-horizon-fade' : ''}`;
 
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
@@ -184,6 +187,19 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
   float abyssFade = smoothstep(uAbyssFadeM.x, uAbyssFadeM.y, vFogDepth)
     * smoothstep(700.0, 1200.0, -cameraPosition.y);
   gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, abyssFade);
+#endif
+`,
+        );
+    }
+    if (biome.horizonFadeM) {
+      frg =
+        'uniform vec2 uHorizonFadeM;\n' +
+        after(
+          frg,
+          'fog_fragment',
+          /* glsl */ `
+#ifdef USE_FOG
+  gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, smoothstep(uHorizonFadeM.x, uHorizonFadeM.y, vFogDepth) * 0.92);
 #endif
 `,
         );
