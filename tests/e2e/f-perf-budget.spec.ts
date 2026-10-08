@@ -25,7 +25,7 @@ test.use({
 const sites = [
   { id: 'titanic', props: 6 },
   { id: 'lost-city', props: 12 },
-  { id: 'great-blue-hole', props: 3 },
+  { id: 'great-blue-hole', props: 2 },
   { id: 'beebe-vent-field', props: 3 },
   { id: 'monterey-canyon', props: 5 },
 ];
