@@ -39,6 +39,11 @@ without an entry here is not done.
   full browser gates pass; fix the missing process-log heading separation
   flagged by repository formatting. Fresh paired golden images remain pending
   sandbox browser/port access. Evidence: `plan/progress/F-BLUEHOLE-830.md`.
+- Phase F, F-LOSTCITY-820: replace stretched Lost City chimney/flange UV flow
+  detail with world-space triplanar carbonate albedo and packed normals, plus
+  filtered close-range pore normals. Smooth and thin the irregular rounded
+  flange lips and add knobbly column relief; preserve F-600 vertex beds and
+  base life. Low omits detail normals and uses fewer flange samples.
 - Phase F, F-VERIFY-740 second follow-up: route tutorial Skip actions through
   the existing completion handler so ending the tutorial displays its
   completion toast as well as saving progress. Retain contextual hint
