@@ -14,6 +14,15 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-FIDELITY-875 (870 retry): enable terrain fidelity around the Blue
+  Hole shaft/galleries and Lost City's Poseidon opening, with site-tuned local
+  density, cubic survey reconstruction and filtered relief normals. Preserve
+  Low terrain buffers and existing prop art. Add real-tile carve regression
+  tests and strict Medium frame-budget guards for all golden poses. Reason:
+  coarse terrain steps weakened the openings; the repaired Monterey carve now
+  survives cubic reconstruction. Static geometry checks pass; rendered budgets
+  and paired visual QA await an unrestricted browser run. Evidence:
+  `plan/progress/F-FIDELITY-870.md`.
 - Debrief and Journal first-session polish (debrief-journal). Partial dives now
   read "Back at the surface" with "You found N of M — the rest are still down
   there." instead of "Dive ended / Primary objectives unfinished". The debrief

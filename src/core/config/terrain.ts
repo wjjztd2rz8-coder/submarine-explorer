@@ -92,7 +92,7 @@ export interface TerrainConfig {
 }
 
 export interface TerrainFidelity {
-  /** Focus of the playable canyon, in geographic coordinates. */
+  /** Focus of the opening landform, in geographic coordinates. */
   focus: { lat: number; lon: number; radiusM: number; fadeM: number };
   chunkCells: number;
   nearSubdiv: Record<GraphicsTier, number>;
@@ -116,8 +116,37 @@ export const MONTEREY_FIDELITY: TerrainFidelity = {
   wallSegments: { low: [220, 150], medium: [230, 150], high: [520, 280], ultra: [640, 320] },
 };
 
+// Terrain-only profiles: reconstructed prop meshes keep their existing art and limits.
+export const BLUE_HOLE_FIDELITY: TerrainFidelity = {
+  ...MONTEREY_FIDELITY,
+  // Cover both ledge scans, the shaft and the interior opening pose. The analytic
+  // carve has shelves only a few metres wide, so its near grid needs ~3.7 m cells.
+  focus: { lat: 17.3156, lon: -87.5356, radiusM: 310, fadeM: 90 },
+  chunkCells: 8,
+  nearSubdiv: { low: 1, medium: 16, high: 32, ultra: 32 },
+  reliefM: 0.18,
+  reliefWavelengthM: 24,
+  normalStrength: 0.16,
+};
+
+export const LOST_CITY_FIDELITY: TerrainFidelity = {
+  ...MONTEREY_FIDELITY,
+  // Poseidon is the first scan. Keep its start pose and the neighbouring spires
+  // inside the dense envelope, with rounded relief on the carbonate massif.
+  focus: { lat: 30.124, lon: -42.1195, radiusM: 650, fadeM: 250 },
+  chunkCells: 16,
+  nearSubdiv: { low: 1, medium: 4, high: 8, ultra: 8 },
+  reliefM: 1.8,
+  reliefWavelengthM: 36,
+  normalStrength: 0.2,
+};
+
 export const DEFAULT_TERRAIN: TerrainConfig = {
-  fidelity: { 'monterey-canyon': MONTEREY_FIDELITY },
+  fidelity: {
+    'monterey-canyon': MONTEREY_FIDELITY,
+    'great-blue-hole': BLUE_HOLE_FIDELITY,
+    'lost-city': LOST_CITY_FIDELITY,
+  },
   // 64 source cells x subdiv 2 = a 129x129 vertex chunk, which still fits in
   // 16-bit indices and gives the LOD selector something to actually choose
   // between on a 25 km tile.
