@@ -315,7 +315,7 @@ export const BIOMES: Record<string, Biome> = {
     // Lower walls fall away to deep blue-grey (the real hole is dark below the ledge) but stay readable.
     depthShade: { startM: 30, endM: 105, tint: 0x28556f },
     strata: { periodM: 3.4, amount: 0.8 },
-    horizonFadeM: [110, 460],
+    horizonFadeM: [90, 380],
     scatter: [
       { kind: 'sponge', density: 0.8, slopeMaxDeg: 40, on: 'rock' },
       { kind: 'sponge', density: 0.5, slopeMaxDeg: 20, on: 'flat' },

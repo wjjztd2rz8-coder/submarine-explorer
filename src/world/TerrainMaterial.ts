@@ -199,7 +199,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
           'fog_fragment',
           /* glsl */ `
 #ifdef USE_FOG
-  gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, smoothstep(uHorizonFadeM.x, uHorizonFadeM.y, vFogDepth) * 0.92);
+  gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, smoothstep(uHorizonFadeM.x, uHorizonFadeM.y, vFogDepth));
 #endif
 `,
         );
