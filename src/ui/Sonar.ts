@@ -289,6 +289,15 @@ export class Sonar {
       event.preventDefault();
       event.stopPropagation();
     });
+    this.root.addEventListener('click', (event) => {
+      if (
+        !document.documentElement.classList.contains('is-touch') ||
+        !(event.target instanceof Element) ||
+        event.target.closest('button')
+      )
+        return;
+      this.toggle();
+    });
     (options.parent ?? document.body).append(this.backdrop, this.root);
 
     const ctx = this.canvas.getContext('2d');

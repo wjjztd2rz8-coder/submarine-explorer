@@ -119,7 +119,7 @@ for (const layout of [
           await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
           await clearCredits(page, true);
           if (step !== 'journal') {
-            const skip = page.getByRole('button', { name: 'Skip step', exact: true });
+            const skip = page.locator('.onboard-skip-step');
             if (layout.touch) await skip.tap();
             else await skip.click();
           }

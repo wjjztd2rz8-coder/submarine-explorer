@@ -651,3 +651,336 @@
     height: 40px;
   }
 }
+
+/* --- F-PHONE-HUD-890: reserve the scene between the top instruments and controls. --- */
+.onboard-card-phone-text,
+.onboard-skip-phone {
+  display: none;
+}
+
+@media (orientation: portrait) and (max-width: 480px),
+  (orientation: landscape) and (max-width: 900px) and (max-height: 460px) {
+  html.is-touch .d-sonar-legend {
+    display: none;
+  }
+  html.is-touch .sonar:not(.d-sonar-expanded) {
+    width: 96px;
+    padding: 4px;
+    box-sizing: border-box;
+  }
+  html.is-touch .sonar:not(.d-sonar-expanded) canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 96px;
+    object-fit: contain;
+  }
+  html.is-touch .sonar:not(.d-sonar-expanded) .d-sonar-header {
+    margin-bottom: 2px;
+    font-size: 10px;
+  }
+  /* Range adjustment stays in the expanded map with its full touch targets. */
+  html.is-touch .sonar:not(.d-sonar-expanded) .d2-sonar-controls {
+    display: none;
+  }
+  html.is-touch .hud-readouts,
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 10px;
+    row-gap: 3px;
+    width: auto;
+    padding: 6px 8px;
+  }
+  /* Match the powered landscape selector so its old column layout cannot
+     stack the labels above values and add a third core telemetry line. */
+  html.is-touch
+    :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
+    .hud-row:is(
+      :has([data-field='depth']),
+      :has([data-field='speed']),
+      :has([data-field='status'])
+    ) {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 5px;
+    line-height: 16px;
+  }
+  html.is-touch .hud-readouts .hud-label {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+  html.is-touch .hud-readouts .hud-value {
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  html.is-touch
+    :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
+    .hud-row:has([data-field='depth']) {
+    grid-area: 1 / 1;
+  }
+  html.is-touch
+    :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
+    .hud-row:has([data-field='speed']) {
+    grid-area: 1 / 2;
+  }
+  html.is-touch
+    :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
+    .hud-row:has([data-field='status']) {
+    grid-area: 2 / 1;
+  }
+  html.is-touch
+    :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
+    .hud-row:has([data-field='status'])
+    .hud-label,
+  html.is-touch
+    :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
+    .hud-row:has([data-field='heading']),
+  html.is-touch
+    :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
+    .hud-row:has([data-field='tile']) {
+    display: none;
+  }
+  html.is-touch .hud-readouts [data-field='speed'] {
+    font-size: 0;
+  }
+  html.is-touch .hud-readouts [data-field='speed']::after {
+    content: attr(data-knots);
+    font-size: 13px;
+  }
+  html.is-touch .hud-readouts [data-field='status'] {
+    font-size: 11px;
+  }
+  html.is-touch .hud-readouts [data-field='depth'] {
+    font-size: 0;
+  }
+  html.is-touch .hud-readouts [data-field='depth']::after {
+    content: attr(data-meters);
+    font-size: 13px;
+  }
+  html.is-touch :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden]))) .hull-gauge {
+    grid-area: 2 / 2;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    align-self: center;
+    line-height: 16px;
+  }
+  html.is-touch .hull-gauge-label {
+    margin: 0;
+    font-size: 0;
+  }
+  html.is-touch .hull-gauge-label::after {
+    content: attr(data-rating);
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  html.is-touch .hull-gauge-track {
+    height: 2px;
+  }
+  /* Optional supplies/current still get their own rows when enabled. */
+  html.is-touch :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden]))) .hud-power,
+  html.is-touch :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden]))) .hud-current,
+  html.is-touch :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden]))) .hud-sim-speed {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  html.is-touch .hud-readouts .hud-power-line {
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+  }
+  html.is-touch .objectives-panel {
+    padding: 5px 8px;
+  }
+  html.is-touch .objectives-panel .obj-head {
+    margin: 0;
+  }
+  html.is-touch body:has(.scan-panel:not([hidden])) .objectives-panel .obj-list,
+  html.is-touch body:has(.scan-panel:not([hidden])) .d-scan-edge,
+  html.is-touch body:has(.scan-panel:not([hidden])) .d-scan-objective-hint {
+    display: none;
+  }
+  /* The navigation chip remains available for targets outside scan range. */
+  html.is-touch .onboard-card {
+    top: auto;
+    bottom: calc(230px + env(safe-area-inset-bottom, 0px));
+    left: calc(12px + env(safe-area-inset-left, 0px));
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    width: auto;
+    min-width: 0;
+    padding: 5px 8px;
+    transform: none;
+    animation-name: hl-card-in;
+  }
+  html.is-touch .onboard-card:not([hidden]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+  }
+  html.is-touch .onboard-card-head,
+  html.is-touch .onboard-card-title,
+  html.is-touch .onboard-card-text,
+  html.is-touch .onboard-skip-desktop,
+  html.is-touch .onboard-skip-all {
+    display: none;
+  }
+  html.is-touch .onboard-card-phone-text {
+    display: block;
+    margin: 0;
+    font-size: 13px;
+    line-height: 17px;
+  }
+  html.is-touch .onboard-skip-phone {
+    display: inline;
+  }
+  html.is-touch .onboard-card-buttons {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  html.is-touch .onboard-card button {
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  html.is-touch .scan-overlay .scan-panel {
+    padding: 6px 8px;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+  /* ExploreNotice imports a narrow landscape grid with display:contents on
+     the text wrapper. Keep the ring beside the text at every phone width,
+     regardless of that stylesheet's load order. Hidden cards stay hidden. */
+  html.is-touch .scan-overlay .scan-panel:not([hidden]),
+  html.is-touch .scan-overlay .scan-text {
+    display: flex;
+  }
+  html.is-touch .scan-overlay .scan-ring {
+    width: 40px;
+    height: 40px;
+  }
+  html.is-touch .hud-attribution summary {
+    min-height: 44px;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 480px) {
+  html.is-touch {
+    --hl-portrait-map-width: 96px;
+    --hl-portrait-stack-left: calc(120px + env(safe-area-inset-left, 0px));
+  }
+  html.is-touch .hud-readouts,
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) {
+    left: var(--hl-portrait-stack-left);
+    right: calc(12px + env(safe-area-inset-right, 0px));
+  }
+  html.is-touch .hud-footer {
+    left: calc(12px + env(safe-area-inset-left, 0px));
+    right: auto;
+    top: calc(140px + env(safe-area-inset-top, 0px));
+    bottom: auto;
+  }
+  html.is-touch .hud-attribution summary {
+    max-width: 96px;
+    padding: 4px;
+    font-size: 10px;
+  }
+  html.is-touch .sonar.d-sonar-expanded {
+    max-height: calc(100dvh - var(--hl-portrait-stack-top) - 294px);
+    display: flex;
+    flex-direction: column;
+  }
+  html.is-touch .sonar.d-sonar-expanded .d-sonar-header {
+    flex-shrink: 0;
+  }
+  html.is-touch .sonar.d-sonar-expanded canvas {
+    min-height: 0;
+  }
+  html.is-touch body:has(.sonar.d-sonar-expanded) .hud-footer {
+    top: auto;
+    bottom: calc(230px + env(safe-area-inset-bottom, 0px));
+  }
+  html.is-touch .scan-overlay .scan-stack,
+  html.is-touch body:has(.onboard-hint:not([hidden])) .scan-overlay .scan-stack,
+  html.is-touch body:has(.onboard-card:not([hidden])) .scan-overlay .scan-stack {
+    left: var(--hl-portrait-stack-left);
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    top: calc(var(--hl-portrait-stack-top) + var(--hud-readouts-height, 48px) + 8px);
+    bottom: auto;
+    width: auto;
+    max-width: none;
+    transform: none;
+  }
+  html.is-touch body:has(.objectives-panel:not([hidden])) .scan-overlay .scan-stack {
+    top: calc(var(--obj-panel-bottom, 120px) + 8px + var(--hud-readouts-height, 48px) + 8px);
+  }
+}
+
+@media (orientation: portrait) and (max-width: 480px) and (max-height: 700px) {
+  /* The short-phone controls are capped at 0.8 scale and occupy 168 px.
+     Dock four pixels above them, below the hull rather than across it. */
+  html.is-touch .onboard-card {
+    bottom: calc(172px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (orientation: landscape) and (max-width: 900px) and (max-height: 460px) {
+  html.is-touch .hud-readouts,
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) {
+    left: auto;
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    width: 250px;
+  }
+  /* Supplies and the complete current readout must also clear the buttons
+     when the out-of-range mission instruction adds height above telemetry. */
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-power,
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-current {
+    margin-top: 2px;
+    padding-top: 2px;
+  }
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-power-line,
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-current {
+    font-size: 11px;
+    line-height: 13px;
+    letter-spacing: 0;
+  }
+  /* Keep the current readout on one line so the panel clears the touch buttons. */
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-current {
+    gap: 3px;
+    white-space: nowrap;
+    font-size: 10px;
+  }
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-current-arrow {
+    width: 1em;
+  }
+  html.is-touch .onboard-card {
+    left: calc(132px + env(safe-area-inset-left, 0px));
+    right: calc(12px + env(safe-area-inset-right, 0px));
+    bottom: calc(196px + env(safe-area-inset-bottom, 0px));
+  }
+  html.is-touch .scan-overlay .scan-stack,
+  html.is-touch body:has(.onboard-card:not([hidden])) .scan-overlay .scan-stack {
+    left: calc(120px + env(safe-area-inset-left, 0px));
+    top: calc(58px + env(safe-area-inset-top, 0px));
+    bottom: auto;
+    width: calc(100vw - 402px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    transform: none;
+  }
+  html.is-touch .hud-footer {
+    left: calc(12px + env(safe-area-inset-left, 0px));
+    right: auto;
+    top: calc(140px + env(safe-area-inset-top, 0px));
+    bottom: auto;
+  }
+  html.is-touch body:has(.sonar.d-sonar-expanded) .onboard-card,
+  html.is-touch body:has(.sonar.d-sonar-expanded) .scan-stack {
+    visibility: hidden;
+  }
+  html.is-touch body:has(.sonar.d-sonar-expanded) .hud-footer {
+    left: calc(136px + env(safe-area-inset-left, 0px));
+    right: calc(300px + env(safe-area-inset-right, 0px));
+    top: auto;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+}

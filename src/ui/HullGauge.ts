@@ -32,6 +32,9 @@ export class HullGauge {
     const ratio = depth / rated;
     this.gauge.querySelector('.hull-gauge-label')!.textContent =
       `HULL · ${Math.round(depth).toLocaleString('en-US')} / ${Math.round(rated).toLocaleString('en-US')} m rated`;
+    const label = this.gauge.querySelector<HTMLElement>('.hull-gauge-label')!;
+    const compactRating = `HULL ${Math.round(rated).toLocaleString('en-US')} m`;
+    if (label.dataset.rating !== compactRating) label.dataset.rating = compactRating;
     (this.gauge.querySelector('.hull-gauge-track i') as HTMLElement).style.width =
       `${Math.min(100, ratio * 100).toFixed(1)}%`;
     this.gauge.classList.toggle('is-danger', ratio > 1);

@@ -72,16 +72,21 @@ for (const layout of [
         selectors.push('.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause');
       } else selectors.push('.hud-control-tips', '.hud-reset-camera');
       await clearLayout(page, selectors);
-      for (const name of ['Skip step', 'Skip tutorial']) {
+      for (const name of layout.name === 'phone-landscape'
+        ? ['Skip']
+        : ['Skip step', 'Skip tutorial']) {
         const box = (await page.getByRole('button', { name, exact: true }).boundingBox())!;
         expect(box.width).toBeGreaterThanOrEqual(44);
         expect(box.height).toBeGreaterThanOrEqual(44);
       }
       for (let step = 1; step < 5; step++) {
-        const button = page.getByRole('button', { name: 'Skip step', exact: true });
+        const button = page.locator('.onboard-skip-step');
         if (layout.touch) await button.tap();
         else await button.click();
-        await expect(page.locator('.onboard-card')).toContainText(`Step ${step + 1} of 5`);
+        await expect(page.locator('.onboard-card')).toHaveAttribute(
+          'data-step',
+          ['move', 'depth', 'lights', 'scan', 'journal'][step],
+        );
         await clearLayout(page, selectors);
       }
     });
