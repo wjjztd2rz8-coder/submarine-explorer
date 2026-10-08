@@ -8,6 +8,7 @@ import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { geoDetail } from '../../src/world/props/geo/detail.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
+import { projectedRaycast } from './projectedRaycast.js';
 
 /** Real sloping bathymetry and authored transforms expose buried wall-life seats. */
 describe('Monterey wall life on surveyed terrain', () => {
@@ -63,6 +64,8 @@ describe('Monterey wall life on surveyed terrain', () => {
           expect(apron.isMesh).toBe(true);
           const wall = hero.full.children[0] as THREE.Mesh;
           const localWall = new THREE.Mesh(wall.geometry, wall.material);
+          const intersectFace = projectedRaycast(localWall, 'z');
+          const intersectApron = projectedRaycast(apron, 'y');
           const faceRay = new THREE.Raycaster();
           const intoRock = new THREE.Vector3(0, 0, 1);
           const seat = new THREE.Vector3();
@@ -90,7 +93,7 @@ describe('Monterey wall life on surveyed terrain', () => {
                   new THREE.Vector3(seat.x, seat.y, wall.geometry.boundingBox!.min.z - 1),
                   intoRock,
                 );
-                const face = faceRay.intersectObject(localWall, false)[0];
+                const face = intersectFace(faceRay)[0];
                 const label = `${hero.def.id} ${mesh.name}[${i}]: attached to exposed lit face`;
                 expect(face, label).toBeDefined();
                 if (face) {
@@ -101,7 +104,7 @@ describe('Monterey wall life on surveyed terrain', () => {
                 origin.copy(position);
                 origin.y = hero.root.position.y + hero.localBounds.max.y + 1;
                 ray.set(origin, down);
-                const hit = ray.intersectObject(apron, false)[0];
+                const hit = intersectApron(ray)[0];
                 if (hit) {
                   apronChecks++;
                   expect(
@@ -151,6 +154,6 @@ describe('Monterey wall life on surveyed terrain', () => {
       } finally {
         terrain.dispose();
       }
-    }, 120_000); // Ultra took ~50 s on hosted runners (timed out at 45 s). Independent raycasts through the denser four-wall meshes at every tier.
+    });
   }
 });

@@ -305,7 +305,15 @@ test.describe('A3 submarine feel', () => {
 test.describe('fix S: free-dive loadout and spawn', () => {
   async function bootTile(page: Page, url: string): Promise<void> {
     await page.goto(url, { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
+    // Props compose the authored opening after the first frame. Checking only
+    // __gameReady can sample the temporary generic spawn on a slow runner.
+    await page.waitForFunction(
+      () =>
+        window.__gameReady === true &&
+        (window.__game as { props: { loaded: boolean } }).props.loaded,
+      undefined,
+      { timeout: 45_000 },
+    );
   }
   async function subInfo(page: Page): Promise<{
     y: number;
