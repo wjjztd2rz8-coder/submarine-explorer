@@ -531,3 +531,11 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - Review logged in plan/REVIEWS.md; DIRECTOR priorities rewritten. Merged 760 and 740; removed finished/stale worktrees 450, 710, 750. Queued Codex 770/780/790.
 - Gates on main: --full-e2e 407 passed, 1 failed (f-save-soak geometry baseline race, passes alone), prettier fixed afterwards. Pushed as f30. Hosted CI still red (790 queued).
 - Claude weekly ~10% until Thu 07:00: no Claude agents launched. Needs owner: nothing.
+
+## 2026-10-08 08:32 CDT comprehensive review run (Claude)
+
+- **Merged:** 800 (770 Blue Hole first target ~100 m, 780 Titanic horizon, 790 CI fixes), 840 (bug-hunt fixes), 820 (Lost City carbonate), 810 (Monterey terrain fidelity). Full e2e passed on the merged main; 830 (Blue Hole wall) merged and then reverted after golden review (patchwork sand blobs, gallery shrank). Branch codex/830-f-bluehole-dome-wall and its worktree are kept for the redo (brief 910).
+- **Review:** see plan/REVIEWS.md (2026-10-08). New golden sets 2026-10-08-122501 and -132228. Monterey +1; Blue Hole unchanged; first-minute problems found on phone and in the briefing.
+- **Queued for Codex:** 850 Beebe, 860 Monterey first frame, 870 fidelity rollout (Blue Hole, Lost City), 880 f30 bug hunt, 890 phone HUD, 900 briefing, 910 Blue Hole redo.
+- **Process:** skip lines moved out of the tracked log (they broke prettier); see plan/PROCESS-LOG.md.
+- **Needs owner:** nothing.
