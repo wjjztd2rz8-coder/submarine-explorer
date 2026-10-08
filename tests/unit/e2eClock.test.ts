@@ -4,7 +4,7 @@ import { withClockFrames } from '../e2e/helpers/clock.js';
 
 const closedError = new Error('Target page, context or browser has been closed');
 
-function probe(runFor: () => Promise<void>, isClosed = false) {
+function probe(fastForward: () => Promise<void>, isClosed = false) {
   let added: ((page: Page) => void) | undefined;
   const page = {
     context: () => ({
@@ -15,7 +15,7 @@ function probe(runFor: () => Promise<void>, isClosed = false) {
         added = undefined;
       },
     }),
-    clock: { runFor },
+    clock: { fastForward },
     isClosed: () => isClosed,
     evaluate: async () => 'complete',
   } as unknown as Page;

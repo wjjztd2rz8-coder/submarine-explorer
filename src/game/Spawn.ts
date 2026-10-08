@@ -81,6 +81,8 @@ const FREE_DIVE_OPENINGS: Record<
     fromCentre?: boolean;
     /** Hold this height above the hero's base (its local origin) instead of rising to the target. */
     altitude?: number;
+    /** Minimum opening altitude over the local seabed, even beside a shallow ledge. */
+    minSeabedAltitudeM?: number;
     /** Turn the sub this many degrees off the hero so the hull does not hide it (chase view). */
     yawOffset?: number;
     /** The approach crosses open water (a sinkhole): skip the clear-seabed-line-of-sight raise. */
@@ -151,6 +153,7 @@ const FREE_DIVE_OPENINGS: Record<
     fromCentre: true,
     // ~14 m below the ledge the grotto stands on: the ledge, its shoals and the surface light all stay in view.
     altitude: -22,
+    minSeabedAltitudeM: 26,
     openWater: true,
     chaseOffsetY: 22,
   },
@@ -229,7 +232,8 @@ export function composedFreeDiveSpawn(
       .normalize();
     const p = boundary.addScaledVector(direction, opening.range);
     if (p.x < nw.x || p.x > se.x || p.z < nw.z || p.z > se.z) continue;
-    let floor = seabed.sampleHeight(p.x, p.z);
+    const localFloor = seabed.sampleHeight(p.x, p.z);
+    let floor = localFloor;
     // A clear line into the landscape matters as much as a safe initial hull.
     for (let i = 1; i <= (opening.openWater ? 0 : 8); i++) {
       const t = i / 10;
@@ -238,7 +242,12 @@ export function composedFreeDiveSpawn(
         seabed.sampleHeight(p.x + (target.x - p.x) * t, p.z + (target.z - p.z) * t),
       );
     }
-    p.y = Math.max(floor + clearance, wantedY, safeDepth + settings.hullRadius);
+    p.y = Math.max(
+      floor + clearance,
+      localFloor + (opening.minSeabedAltitudeM ?? clearance),
+      wantedY,
+      safeDepth + settings.hullRadius,
+    );
     if (p.y > -settings.hullRadius) continue;
     if (props.collide(p.clone(), settings.hullRadius + 4, new Vector3())) continue;
     // Reserve a clear chase arm as well as a collision-free submarine pose.

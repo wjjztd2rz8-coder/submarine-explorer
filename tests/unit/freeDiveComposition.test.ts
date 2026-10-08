@@ -52,6 +52,8 @@ describe('free-dive openings on actual survey terrain and procedural hero geomet
         );
         expect(spawn).not.toBeNull();
         const pos = new Vector3(spawn!.x, spawn!.y, spawn!.z);
+        if (site === 'great-blue-hole')
+          expect(pos.y - terrain.sampleHeight(pos.x, pos.z)).toBeGreaterThan(25);
         expect(pos.y).toBeLessThanOrEqual(-config.submarine.hullRadius);
         expect(pos.y).toBeGreaterThanOrEqual(
           terrain.sampleHeight(pos.x, pos.z) +

@@ -15,6 +15,7 @@ interface Probe {
   sub: { position: Vector3; step(): void };
   rig: { camera: PerspectiveCamera };
   discovery: { loaded: boolean; overlay: ScanOverlay };
+  props: { loaded: boolean };
 }
 
 async function separate(page: Page, selectors: string[]): Promise<void> {
@@ -114,7 +115,9 @@ for (const layout of [
           const game = window.__game as unknown as Probe;
           // Wildlife can finish loading before POIs; a paused clock cannot
           // make the scan panel appear while a DOM-only assertion waits.
-          return window.__gameReady === true && !!game.life && game.discovery.loaded;
+          return (
+            window.__gameReady === true && !!game.life && game.discovery.loaded && game.props.loaded
+          );
         });
         await page.clock.runFor(34);
         await holdFreshTips(page);
@@ -148,18 +151,26 @@ for (const layout of [
           const animal = game.life!.sim.spawnNear('comb-jelly', sub, 9, 1);
           game.life!.update(0, sub, game.rig.camera, window.innerHeight, 0);
           game.life!.enabled = false;
-          return animal !== null;
+          return { spawned: animal !== null, targets: game.life!.targets.length };
         });
-        expect(spawned).toBe(true);
+        expect(spawned.spawned).toBe(true);
+        expect(spawned.targets).toBeGreaterThan(0);
         await dismissTutorial(page, layout.touch, true);
         await page.clock.runFor(50);
         const hint = page.locator('.onboard-hint');
         await expect(page.locator('.onboard-card')).toBeHidden();
         // Animal guidance waits for eight seconds of play when a scan card is
         // visible. Locator polling cannot advance this deliberately paused
-        // clock: run the full opening interval, including each animation frame
-        // (fastForward would skip frames and hit the game's frame-delta clamp).
-        await page.clock.runFor(8_000);
+        // clock. Advance one frame at a time at the engine's 250 ms clamp:
+        // eight seconds of actual game time takes 32 renders, not 500. Stop
+        // when the real hint appears so its lifetime remains paused for layout QA.
+        await clockFramesUntil(
+          page,
+          () =>
+            document.querySelector('.onboard-hint')?.textContent?.includes('Animal nearby.') ===
+            true,
+          250,
+        );
         await expect(hint).toContainText(
           layout.touch
             ? 'Animal nearby. Hold SCAN to scan, or press PHOTO for a photo.'

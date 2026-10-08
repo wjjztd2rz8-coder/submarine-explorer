@@ -60,7 +60,10 @@ export async function withClockFrames<T>(page: Page, work: () => Promise<T>): Pr
           if (done) return true;
           const before = auxiliaryClosures;
           try {
-            await page.clock.runFor(50);
+            // This helper waits for work, not a duration of simulation. One
+            // frame per poll lets RAF/timer callbacks finish without spending
+            // three software-GPU renders on every 50 ms polling interval.
+            await page.clock.fastForward(50);
           } catch (error) {
             // Clock advancement targets every page in the context. Axe closes
             // its temporary finishRun page while this call can still be using

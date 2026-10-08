@@ -38,7 +38,14 @@ async function opening(page: Page, site: string, tier: string, touch: boolean, o
   await page.evaluate(() => {
     (window.__game as unknown as Game).sub.step = () => {};
   });
-  await waitForFrames(page, 30);
+  // Renderer counters describe the latest frame, not a time average. Wait
+  // for texture binding and two presented frames before sampling static work.
+  await page.evaluate(
+    () =>
+      (window.__game as unknown as { terrain: { texturesReady: Promise<void> } }).terrain
+        .texturesReady,
+  );
+  await waitForFrames(page, 2);
 }
 
 async function perf(page: Page) {
@@ -46,7 +53,7 @@ async function perf(page: Page) {
     const g = window.__game as unknown as Game;
     let drawCalls = 0,
       triangles = 0;
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 3; i++) {
       await new Promise<void>((done) => requestAnimationFrame(() => done()));
       drawCalls = Math.max(drawCalls, g.perf.drawCalls);
       triangles = Math.max(triangles, g.perf.triangles);
@@ -70,9 +77,6 @@ for (const layout of [
     for (const tier of ['low', 'medium']) {
       for (const site of ['titanic', 'beebe-vent-field', 'monterey-canyon']) {
         test(`${site} ${tier}: opening intent and rendered work`, async ({ page }, info) => {
-          // Preserve all 30 warm-up + 60 measured frames. Hosted Monterey
-          // Medium can exceed 180 s at <1 fps, before any assertion fails.
-          test.setTimeout(env.CI ? 300_000 : 180_000);
           const errors: string[] = [];
           page.on('pageerror', (error) => errors.push(error.message));
           let baseline: Awaited<ReturnType<typeof perf>> | undefined;
