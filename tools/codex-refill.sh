@@ -5,7 +5,7 @@
 # .cache/codex/queue/. Called by codex-dispatch.sh at most every 2 h.
 set -uo pipefail
 cd "$(dirname "$0")/.."
-export PATH="$HOME/.local/node/bin:$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/node/bin:$HOME/.local/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
 model=$(tools/codex-model.sh 2>/dev/null || echo gpt-6-sol)
 last=$(ls .cache/codex/queue/launched/ | sed -n 's/^\([0-9][0-9]*\)-.*/\1/p' | sort -n | tail -1)
 next=$(( (10#${last:-900} / 10 + 1) * 10 ))

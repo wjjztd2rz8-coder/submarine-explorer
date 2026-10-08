@@ -129,3 +129,8 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 
 - **Owner (2026-10-08):** Haiku 5.5 (`model: "haiku"`, verified to resolve to claude-haiku-5-5) now takes smaller, well-scoped Claude tasks instead of Sonnet. Sonnet stays the main contributor for visual-heavy, multi-file and judgment work; Opus only after Sonnet fails twice. Claude-only change: Codex model choice is unchanged. RESUME-PROMPT §2 updated.
 - **Run trigger:** two Sonnet headless runs this morning only logged "nothing to collect". They were started by the dispatcher launching briefs (new worktree, queue file moved) and by each run's own log commit changing HEAD. The resume.sh state hash now covers only non-log commits, finished Codex results and paused Claude packages.
+
+## 2026-10-08 11:41 CDT: Codex self-refill never ran from the timer
+
+- `.cache/codex/refill.log` showed "codex: command not found" for every refill since 2026-10-07: the timer's PATH lacks /home/linuxbrew/.linuxbrew/bin. Added it to codex-dispatch.sh and codex-refill.sh. The queue only stayed fed because Claude's reviews wrote briefs.
+- 890 and 900 ended after their Codex round with no result file and no unit exit in the journal (cause unknown; a chrome-headless core dump at each start). Their worktrees are complete; the next Claude run gates them (RESUME-PROMPT §1).
