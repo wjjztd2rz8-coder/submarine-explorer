@@ -14,6 +14,13 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-VERIFY-920: sample near mesh triangles for collision, POIs, prop
+  seats and scatter on carved sites at every tier, including detail-off mode.
+  Move Monterey's opening approach back 4 m to retain the seated wall's first
+  scan on Low. Reason: continuous collision differed from the rendered carves
+  by up to 30 m. Add shipped-tile Low/Medium/High and cubic-carve regression
+  coverage; record remaining mesh fidelity and camera arm issues in
+  `plan/progress/F-VERIFY-920.md`.
 - Phase F, F-MONTEREY-860: lift Monterey's ambient fill with a more neutral
   tint and a modest hemisphere light; extend and strengthen its submarine
   lamps. Stage two Pacific hake schools, a few factual sablefish and a sea-pen

@@ -115,7 +115,9 @@ const FREE_DIVE_OPENINGS: Record<
   'monterey-canyon': {
     hero: 'canyon-wall-ledge',
     bearing: 0,
-    range: 12,
+    // Leave room for the scan cone's vertical angle above the seated wall contact,
+    // including Low's coarser terrain triangles.
+    range: 16,
     altitude: 10,
     yawOffset: 6,
     turnWeight: 3,
