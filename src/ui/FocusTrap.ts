@@ -33,6 +33,11 @@ function asEl(x: unknown): HTMLElement | null {
   return x && typeof (x as HTMLElement).blur === 'function' ? (x as HTMLElement) : null;
 }
 
+function hiddenByDetails(el: HTMLElement): boolean {
+  const d = el.parentElement?.closest('details:not([open])');
+  return !!d && !(el.tagName === 'SUMMARY' && el.parentElement === d);
+}
+
 export class FocusTrap {
   private previous: HTMLElement | null = null;
   constructor(private readonly root: HTMLElement) {}
@@ -85,6 +90,8 @@ export class FocusTrap {
       (el) =>
         el.tabIndex >= 0 &&
         !el.closest('[hidden], [inert]') &&
+        // Content of a collapsed <details> keeps layout boxes but cannot take focus.
+        !hiddenByDetails(el) &&
         el.getClientRects().length > 0 &&
         getComputedStyle(el).visibility === 'visible',
     );

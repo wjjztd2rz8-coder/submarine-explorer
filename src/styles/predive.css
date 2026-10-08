@@ -397,8 +397,8 @@
   grid-column: 3;
   grid-row: 1;
 }
-.briefing .briefing-free-dive,
-.briefing .briefing-cancel,
+.briefing .briefing-go .briefing-free-dive,
+.briefing .briefing-go .briefing-cancel,
 .briefing .briefing-controls button {
   display: inline-flex;
   align-items: center;
@@ -412,12 +412,16 @@
   font-size: 12px;
   text-decoration: underline;
   text-underline-offset: 3px;
+  cursor: pointer;
+}
+.briefing .briefing-go .briefing-free-dive:focus-visible {
+  outline: 3px solid #8affeb;
 }
 @media (max-width: 760px) {
   .briefing .briefing-panel {
     width: calc(100vw - 16px);
     max-height: calc(100dvh - 16px);
-    padding: 12px;
+    padding: 10px 12px;
   }
   .briefing .briefing-cols {
     grid-template-columns: 1fr;
@@ -490,5 +494,12 @@
   }
   .briefing .briefing-hint {
     display: none;
+  }
+  .briefing .mode-selector.is-briefing .mode-desc {
+    font-size: 12px;
+    line-height: 1.25;
+  }
+  .briefing .briefing-site-more > summary {
+    margin-block: -4px;
   }
 }

@@ -116,6 +116,8 @@ test.describe('B3 mission flow', () => {
       0.01,
     );
 
+    // Enter on the focused disclosure toggles it; release focus so Enter is global.
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
     await page.keyboard.press('Enter');
     await expect(briefing).toBeHidden();
     const started = await missionProbe(page);

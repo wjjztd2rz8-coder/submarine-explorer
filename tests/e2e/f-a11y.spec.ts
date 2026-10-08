@@ -15,12 +15,19 @@ async function boot(page: Page, url: string): Promise<void> {
 async function cycle(page: Page, root: Locator): Promise<void> {
   // Await the actual catalogue; equal HTML samples can precede a late refresh.
   await page.evaluate(() => (window.__game as { journal: Journal }).journal.load());
-  const controls = root.locator('button, a[href], input, select, textarea, [tabindex]');
+  const controls = root.locator('button, summary, a[href], input, select, textarea, [tabindex]');
   const indices = await controls.evaluateAll((nodes) =>
     nodes.flatMap((node, index) => {
       const el = node as HTMLElement;
       return el.tabIndex >= 0 &&
         !el.closest('[hidden], [inert]') &&
+        !(
+          el.parentElement?.closest('details:not([open])') &&
+          !(
+            el.tagName === 'SUMMARY' &&
+            el.parentElement.closest('details:not([open])') === el.parentElement
+          )
+        ) &&
         el.getClientRects().length &&
         getComputedStyle(el).visibility === 'visible' &&
         !(el as HTMLButtonElement).disabled
