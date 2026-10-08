@@ -593,3 +593,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** Blue Hole stepped terraces with lips/undercuts (Sonnet; gallery untouched, ~3/10 -> ~6/10; left wall slightly jagged; Low tier not captured). Gates on main: smoke e2e + project-base passed; not pushed.
 - **Running (Codex):** 940, 950, 960. **Queued:** 970, 980, 990 (Low/phone sweep). Held: 930 Beebe worktree (clean, no change yet).
 - Needs owner: nothing.
+
+## 2026-10-08 16:52 CDT headless run (Claude)
+
+- **Merged:** 930 Beebe seabed apron now uses the terrain world-space material (golden pose 3: no cream plate; bluish ring is the cockpit bezel, left alone). Smoke e2e + project-base passed on main; not pushed. Codex 940, 950, 960 still running (round 1); queue 970, 980, 990. Needs owner: nothing.
