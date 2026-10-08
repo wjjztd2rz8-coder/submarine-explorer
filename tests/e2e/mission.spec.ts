@@ -262,10 +262,10 @@ test.describe('B3 mission flow', () => {
     await expect(debrief.locator('.debrief-kicker')).toHaveText('TITANIC DIVE');
     await expect(debrief.locator('.debrief-btn')).toHaveText([
       'Dive sites',
-      'Home',
       'Keep exploring',
-      'Dive again',
       'Journal',
+      'Dive again',
+      'Home',
     ]);
     await expect(debrief.locator('.debrief-section.is-discoveries li')).toHaveText([
       'Bow section',
@@ -286,6 +286,7 @@ test.describe('B3 mission flow', () => {
         sessionStorage.setItem('b3-restart', JSON.stringify(w.__restart));
       });
     });
+    await debrief.locator('.debrief-more-toggle').click();
     await Promise.all([
       page.waitForEvent('load'),
       debrief.locator('.debrief-btn', { hasText: 'Dive again' }).click(),
@@ -381,9 +382,9 @@ test.describe('fix S: mission failure, framing and modals', () => {
     // No Keep exploring after an abort: the dive is over.
     await expect(debrief.locator('.debrief-btn')).toHaveText([
       'Dive sites',
-      'Home',
       'Dive again',
       'Journal',
+      'Home',
     ]);
     const m = await missionProbe(page);
     expect(m.state).toBe('debrief');
@@ -426,6 +427,7 @@ test.describe('fix S: mission failure, framing and modals', () => {
         sessionStorage.setItem('fixs-restart', JSON.stringify(w.__restart));
       });
     });
+    await debrief.locator('.debrief-more-toggle').click();
     await Promise.all([
       page.waitForEvent('load'),
       debrief.locator('.debrief-btn', { hasText: 'Dive again' }).click(),

@@ -36,7 +36,7 @@ it('a second surfaced dive opens at the new summary heading after scrolling and 
   vi.stubGlobal('document', { body, activeElement: body, createElement: () => new Element() });
   const debrief = new Debrief();
   const first: DebriefStats = {
-    title: 'Dive ended',
+    title: 'Back at the surface',
     elapsedS: 60,
     distanceM: 20,
     maxDepthM: 100,
