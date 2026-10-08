@@ -1,0 +1,330 @@
+{
+  "source_ref": "f27",
+  "source_commit": "beb67345d9653f299b24321a4eb72977e582b1e5",
+  "sites": {
+    "titanic": {
+      "pois": [
+        {
+          "id": "titanic-bow",
+          "guide_entry": "bow"
+        },
+        {
+          "id": "titanic-stern",
+          "guide_entry": "stern"
+        },
+        {
+          "id": "titanic-boilers",
+          "guide_entry": "boilers"
+        },
+        {
+          "id": "titanic-debris-field",
+          "guide_entry": "debris-field"
+        },
+        {
+          "id": "titanic-big-piece",
+          "guide_entry": "big-piece"
+        },
+        {
+          "id": "titanic-memorial",
+          "guide_entry": "memorial"
+        },
+        {
+          "id": "titanic-channel",
+          "guide_entry": "channel"
+        }
+      ],
+      "guide_ids": [
+        "overview",
+        "bow",
+        "stern",
+        "boilers",
+        "debris-field",
+        "big-piece",
+        "memorial",
+        "channel"
+      ]
+    },
+    "challenger-deep": {
+      "pois": [
+        {
+          "id": "cd-leggo-amphipod-site",
+          "guide_entry": "hadal-life"
+        },
+        {
+          "id": "cd-north-wall",
+          "guide_entry": "trench-walls"
+        },
+        {
+          "id": "cd-central-basin",
+          "guide_entry": "three-pools"
+        },
+        {
+          "id": "cd-axis-sill",
+          "guide_entry": "three-pools"
+        }
+      ],
+      "guide_ids": [
+        "overview",
+        "eastern-pool",
+        "descents",
+        "hadal-life",
+        "published-coordinate",
+        "trench-walls",
+        "three-pools"
+      ]
+    },
+    "lost-city": {
+      "pois": [
+        {
+          "id": "lost-city-poseidon",
+          "guide_entry": "poseidon"
+        },
+        {
+          "id": "lost-city-beehive",
+          "guide_entry": "beehive"
+        },
+        {
+          "id": "lost-city-imax-tower",
+          "guide_entry": "imax-tower"
+        },
+        {
+          "id": "lost-city-microbial-mat",
+          "guide_entry": "microbial-mat"
+        }
+      ],
+      "guide_ids": [
+        "overview",
+        "poseidon",
+        "beehive",
+        "imax-tower",
+        "microbial-mat",
+        "summit",
+        "south-wall"
+      ]
+    },
+    "monterey-canyon": {
+      "pois": [
+        {
+          "id": "monterey-canyon-head",
+          "guide_entry": "canyon-head"
+        },
+        {
+          "id": "monterey-canyon-upper-channel",
+          "guide_entry": "upper-canyon"
+        },
+        {
+          "id": "monterey-canyon-wall",
+          "guide_entry": "canyon-wall"
+        },
+        {
+          "id": "mbari-mars-node",
+          "guide_entry": "mars-node"
+        }
+      ],
+      "guide_ids": [
+        "overview",
+        "canyon-head",
+        "canyon-wall",
+        "canyon-axis",
+        "upper-canyon",
+        "mars-node"
+      ]
+    },
+    "endurance": {
+      "pois": [
+        {
+          "id": "endurance-hull",
+          "guide_entry": "wreck-hull"
+        },
+        {
+          "id": "endurance-stern-nameplate",
+          "guide_entry": "stern-nameplate"
+        },
+        {
+          "id": "endurance-helm",
+          "guide_entry": "helm-and-life"
+        },
+        {
+          "id": "endurance-rigging-debris",
+          "guide_entry": "structural-damage"
+        }
+      ],
+      "guide_ids": [
+        "overview",
+        "wreck-hull",
+        "stern-nameplate",
+        "helm-and-life",
+        "structural-damage",
+        "worsley-position",
+        "abyssal-plain",
+        "protection"
+      ]
+    },
+    "axial-seamount-ashes": {
+      "pois": [
+        {
+          "id": "axial-ashes-mushroom",
+          "guide_entry": "mushroom-inferno"
+        },
+        {
+          "id": "axial-ashes-inferno",
+          "guide_entry": "mushroom-inferno"
+        },
+        {
+          "id": "axial-ashes-minor-chimneys",
+          "guide_entry": "minor-chimneys"
+        },
+        {
+          "id": "axial-caldera-wall",
+          "guide_entry": "caldera-wall"
+        }
+      ],
+      "guide_ids": [
+        "overview",
+        "mushroom-inferno",
+        "minor-chimneys",
+        "vent-life",
+        "caldera-wall",
+        "caldera-floor",
+        "eruption-forecast",
+        "caldera-summit"
+      ]
+    },
+    "hudson-canyon": {
+      "pois": [
+        {
+          "id": "hc-canyon-wall",
+          "guide_entry": "canyon-wall"
+        },
+        {
+          "id": "hc-coral-ledge",
+          "guide_entry": "canyon-wall"
+        }
+      ],
+      "guide_ids": ["overview", "sanctuary", "shelf-valley", "canyon-wall", "axis-floor"]
+    },
+    "kamaehuakanaloa": {
+      "pois": [
+        {
+          "id": "kh-hiolo-north",
+          "guide_entry": "vents"
+        },
+        {
+          "id": "kh-hiolo-south",
+          "guide_entry": "vents"
+        },
+        {
+          "id": "kh-south-rift",
+          "guide_entry": "south-rift"
+        }
+      ],
+      "guide_ids": ["overview", "renaming", "peles-pit", "vents", "south-rift"]
+    },
+    "beebe-vent-field": {
+      "pois": [
+        {
+          "id": "bvf-main-vents",
+          "guide_entry": "vents"
+        },
+        {
+          "id": "bvf-shrimp-swarm",
+          "guide_entry": "shrimp"
+        },
+        {
+          "id": "bvf-sulfide-mound-west",
+          "guide_entry": "vents"
+        }
+      ],
+      "guide_ids": ["overview", "vents", "shrimp", "spreading-axis"]
+    },
+    "great-blue-hole": {
+      "pois": [
+        {
+          "id": "great-blue-hole-stalactites",
+          "guide_entry": "the-hole"
+        },
+        {
+          "id": "great-blue-hole-outer-dropoff",
+          "guide_entry": "outer-dropoff"
+        },
+        {
+          "id": "great-blue-hole-western-dropoff",
+          "guide_entry": "western-dropoff"
+        }
+      ],
+      "guide_ids": [
+        "overview",
+        "the-hole",
+        "reef-rim",
+        "outer-dropoff",
+        "reef-biology",
+        "western-dropoff"
+      ]
+    },
+    "bismarck": {
+      "pois": [
+        {
+          "id": "bismarck-hull",
+          "guide_entry": "wreck-hull"
+        },
+        {
+          "id": "bismarck-turret-debris",
+          "guide_entry": "turret-debris"
+        },
+        {
+          "id": "bismarck-damage",
+          "guide_entry": "sinking-and-debate"
+        }
+      ],
+      "guide_ids": [
+        "overview",
+        "wreck-hull",
+        "turret-debris",
+        "sinking-and-debate",
+        "seamount-flank",
+        "memorial"
+      ]
+    },
+    "hunga-tonga-caldera": {
+      "pois": [
+        {
+          "id": "hunga-tonga-caldera-floor",
+          "guide_entry": "caldera-floor"
+        },
+        {
+          "id": "hunga-tonga-rim-wall",
+          "guide_entry": "rim-wall"
+        }
+      ],
+      "guide_ids": ["overview", "caldera-floor", "island-saddle", "rim-wall", "outer-flank"]
+    },
+    "blake-plateau-corals": {
+      "pois": [
+        {
+          "id": "blake-mound-field-core",
+          "guide_entry": "mound-field"
+        },
+        {
+          "id": "blake-coral-thicket",
+          "guide_entry": "coral-thicket"
+        },
+        {
+          "id": "blake-second-mound",
+          "guide_entry": "second-mound"
+        },
+        {
+          "id": "blake-inter-mound-channel",
+          "guide_entry": "inter-mound-channel"
+        }
+      ],
+      "guide_ids": [
+        "overview",
+        "mound-field",
+        "coral-thicket",
+        "second-mound",
+        "gulf-stream",
+        "inter-mound-channel"
+      ]
+    }
+  }
+}

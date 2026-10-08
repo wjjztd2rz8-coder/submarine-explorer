@@ -98,6 +98,78 @@ function setup(seenHints: HintId[] = ['creature']) {
 }
 
 describe('onboarding completion through the system', () => {
+  it('880: a mission restart resets deferred animal guidance without consuming its saved hint', () => {
+    const { ctx, system, onboard, data } = setup([]);
+    const draw = (dt: number, frozen = false) =>
+      system.frame!['hud.draw']!(
+        {
+          state: { throttle: 0, yaw: 0, ballast: 0 },
+          dt,
+          elapsed: 1000,
+          frozen,
+          sub: { ratedRatio: 0.01 },
+        } as FrameState,
+        ctx,
+      );
+    try {
+      Object.assign(ctx.discovery.overlay, { cardVisible: true });
+      views.actions!.skipAll();
+      views.chip.show.mockClear();
+      draw(7);
+      ctx.bus.emit('mission:started', { missionId: 'great-blue-hole', tileId: 'great-blue-hole' });
+      draw(7.999);
+      draw(60, true);
+      expect(views.chip.show).not.toHaveBeenCalled();
+      expect(JSON.parse(data.get('subexplorer.onboard.v1')!).seenHints).toEqual([]);
+      draw(0.001);
+      expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
+        'Animal nearby. Hold G to scan, or press G for a photo.',
+        12,
+      );
+      expect(onboard.store.get().seenHints).toEqual(['creature']);
+    } finally {
+      system.dispose?.();
+    }
+  });
+
+  it('880: hiding the scan card releases the deferred animal hint before eight seconds', () => {
+    const { ctx, system, tick, onboard } = setup([]);
+    try {
+      Object.assign(ctx.discovery.overlay, { cardVisible: true });
+      views.actions!.skipAll();
+      views.chip.show.mockClear();
+      tick();
+      expect(onboard.store.get().seenHints).toEqual([]);
+      Object.assign(ctx.discovery.overlay, { cardVisible: false });
+      tick();
+      expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
+        'Animal nearby. Hold G to scan, or press G for a photo.',
+        12,
+      );
+      expect(onboard.store.get().seenHints).toEqual(['creature']);
+    } finally {
+      system.dispose?.();
+    }
+  });
+
+  it('880: delaying animal guidance never delays the low-battery safety hint', () => {
+    const { ctx, system, tick, onboard } = setup([]);
+    try {
+      Object.assign(ctx.discovery.overlay, { cardVisible: true });
+      Object.assign(ctx.power.state, { enabled: true, battery: 0.2 });
+      views.actions!.skipAll();
+      views.chip.show.mockClear();
+      tick();
+      expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
+        'Battery low. Ascend or turn off lights (G).',
+        9,
+      );
+      expect(onboard.store.get().seenHints).toEqual(['battery-low']);
+    } finally {
+      system.dispose?.();
+    }
+  });
+
   it('delays animal guidance until eight dive seconds even when the app clock is already large', () => {
     const { ctx, system, onboard } = setup([]);
     const draw = (dt: number, frozen = false) =>
