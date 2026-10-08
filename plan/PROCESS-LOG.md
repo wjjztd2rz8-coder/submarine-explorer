@@ -113,3 +113,10 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
   tests, 144 Python tests, smoke/project-base); repeat flow/soak and accessibility
   audits pass with retries disabled. Full local e2e and hosted green remain
   separate acceptance checks; see the progress note for precise coverage.
+
+## 2026-10-08 comprehensive review
+
+- **Skip lines broke the prettier gate.** `tools/resume.sh` appended a line per skipped 30-min tick to the tracked `plan/OVERNIGHT-LOG.md`; the unformatted lines failed `prettier --check` in every full gate and kept the working tree dirty. Skips now go to `.cache/skips.log`; `tools/efficiency.sh` reads both files.
+- **Gates one at a time.** Three parallel `tools/gates.sh` runs made `tests/unit/montereyWallLife.test.ts` time out at 15 s; run gates sequentially.
+- **Revert instead of fix-later.** 830 passed gates but its golden showed a visual regression; the merge was reverted and a redo (910) queued with acceptance criteria tied to the golden file names.
+- **Queue refilled:** 850-910 (seven briefs) so Codex has work while Claude's window is spent.

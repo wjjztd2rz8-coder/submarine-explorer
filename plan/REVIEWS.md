@@ -2,6 +2,30 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-08 comprehensive review (triggers: 24 h, CI red x3, Claude idle, Codex starved, e2e gate; golden sets 2026-10-08-122501 and -132228)
+
+**Changed since the last review:** the Claude weekly window reset, so this run collected seven finished Codex packages. Merged: 800 (integration of 770 Blue Hole first target ~100 m, 780 Titanic horizon soften, 790 hosted-CI fixes), 840 (terrain-texture fallback and dispatch bug fixes), 820 (Lost City carbonate triplanar texture and rounded flange), 810 (Monterey terrain fidelity: denser chunks near the canyon, cubic survey reconstruction, filtered detail normals). Merged then **reverted** 830 (Blue Hole wall relief) after looking at its golden. Full e2e passed on the merged main (before the 830 revert; smoke and project-base after).
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), 1-5:**
+
+| Site            | Score           | Change            | Biggest gap                                                                                         |
+| --------------- | --------------- | ----------------- | --------------------------------------------------------------------------------------------------- |
+| Titanic         | 4/4.5/5/4/5/4   | +0.5              | Horizon now melts into haze and the hull is the brightest thing; sub is plain, seabed flat          |
+| Beebe           | 4/3.5/4/4/5/4   | -0.5 (calibrated) | Seabed beyond the lit pool is a flat dark-orange plane with a hard skyline; sub pose odd (850)      |
+| Great Blue Hole | 4/3/4/3.5/5/4   | same              | Target now 100 m away; walls still flat banded slabs, gallery reads as a dome (910)                 |
+| Lost City       | 4/4/4/4/5/3     | same              | Tower bands soft and natural now; beehive/slab and phone framing remain                             |
+| Monterey        | 4/3.5/4/3.5/5/3 | +1                | 810 terrain is smooth and natural instead of faceted; still dark teal-monochrome, few animals (860) |
+
+**Regression caught:** 830 turned the Blue Hole slope into a camouflage patchwork of hard-edged sand blobs over brown rock and shrank the stalactite gallery. Reverted before pushing; 910 redoes it with explicit acceptance criteria.
+
+**Play flow (first real look, from the 510 audit captures):** Home is clean and inviting (Arcade default, one filled button). Problems found: (1) the briefing is a wall of text before the first dive (4 facts, 5 hazards, objectives, mode, start choice, 3 buttons); (2) at 60 s on a 390x844 phone the scene is ~25% of the screen: sonar with legend, mission card, status card and the tutorial card cover the sub, and the same scan target appears three times; the Data chip overlaps the tutorial card; (3) the debrief says "Dive ended / Primary objectives unfinished" after a good scan and offers five actions; (4) the Journal lists seven "Unscanned target N" rows. Briefs 890 and 900 queued for (1) and (2); items 6-7 are in the Claude backlog.
+
+**Process:** efficiency.sh: Claude idle ~120 h and Codex under-used ~112 h over the last two weeks, almost all due to the 5% weekly Claude gate on Oct 6-8 (231 skipped runs) and an empty Codex queue; the queue now holds seven briefs. New finding: `resume.sh` wrote one skip line per 30-min tick into the tracked `plan/OVERNIGHT-LOG.md`; prettier failed on those lines, which broke the prettier gate in every full run and left the tree dirty for the next run. Skips now go to `.cache/skips.log` (efficiency.sh reads both). Merge conflicts were trivial (log files, one add/add test name); unit test `montereyWallLife` times out at 15 s when three gates run in parallel, so gates run one at a time. CI on main is still red as of the last hosted run (26 min, f29+); 880 verifies after the f30 push.
+
+**New priorities:** see DIRECTOR.md.
+
+**Needs owner:** nothing.
+
 ## 2026-10-06 comprehensive review (triggers: 24 h, 8+ merges, tag f29, Claude idle; golden set 2026-10-06-121603)
 
 **Changed since the last review (f27):** f28/f29 merged the 660 integration batch (590-650), 670 Titanic horizon, 680 Beebe framing, 690 Blue Hole grotto, 700 Monterey canyon read, 710 Lost City close-up texture and 720 debrief/Journal polish. Today I merged 760 (Bismarck and Hunga Tonga first targets now ~105-110 m) and 740 (tutorial Skip now fires the completion toast, plus Journal regression tests).

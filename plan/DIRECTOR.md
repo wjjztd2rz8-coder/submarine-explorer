@@ -2,21 +2,22 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-06 comprehensive review; golden set 2026-10-06-121603)
+## Current priorities (refreshed 2026-10-08 comprehensive review; golden sets 2026-10-08-122501 and -132228)
 
-Run `tools/golden.sh` at the start of any run that merged visual work. If this list runs dry, refill it from the newest golden set. Claude weekly budget is ~10% until 2026-10-08 07:00, so Claude does review/merge/push only until then; Codex builds.
+Run `tools/golden.sh` at the start of any run that merged visual work (`GOLDEN_SITES=great-blue-hole GOLDEN_LAYOUTS=desktop` for a single site). Claude weekly budget reset on 2026-10-08 (100%), so Claude can build again, but Sonnet agents still own only visual-heavy packages; Codex builds the rest.
 
 Claude backlog (ordered by player impact; all unblocked):
 
-1. **Real first-60 s playthrough captures (Claude/Playwright):** Home -> site -> 60 s on desktop and portrait for the 5 hero sites, plus Journal and debrief. Fix confusion found (Survey wording, nav target vs waypoint target, tutorial asking for lights while a scan is ready).
-2. **Review and merge 770 (Blue Hole first target within ~110 m, opening toast delay) from its screenshots.** Redo in Claude if the wall still reads flat.
-3. **Review and merge 780 (Titanic horizon band).** Hull must remain the brightest thing.
-4. **Hosted CI green (790):** push Codex's fixes, check `gh run list`; if still red after one more round, cut shard-heavy specs rather than loosen assertions.
-5. **Monterey first frame:** raise ambient/sub light so the canyon is readable in 10 s without being flat, and add fish density near the start pose.
-6. **Lost City beehive/slab at distance:** banded vertex colours on the beehive like the Poseidon tower.
-7. **Beebe seabed:** sparse and dark beyond the lit pool; add sediment variation and a few tube-worm clumps.
+1. **Phone first-minute clutter (review + rework if Codex 890 falls short):** at 60 s on 390x844 the scene is ~25% of the screen; the same scan target is shown three times; tutorial card covers the sub. Review 890's before/after at 390x844 and 844x390 and send back until the sub, the seabed and one target indicator dominate.
+2. **Briefing wall of text (review 900):** 4 facts + 5 hazards + 3 buttons before the first dive; the default view must fit a phone without scrolling and have one filled button.
+3. **Blue Hole wall relief redo (review 910):** 830 was reverted: patchwork sand blobs and a shrunken gallery. Accept only if the gallery stays as large as in golden 132858 and no hard-edged patches remain.
+4. **Fidelity rollout (review 870, then Lost City beehive/slab and Titanic hull detail):** Monterey's 810 terrain read much smoother and more natural in golden 132228 (+1). Roll the same profile to Blue Hole and Lost City, then decide on Beebe/Titanic from the result.
+5. **Beebe (review 850) and Monterey first frame (review 860):** Beebe seabed beyond the lit pool and an odd near-vertical sub pose; Monterey still dark and teal-monochrome with few animals. Redo in Claude if Codex output is flat.
+6. **Debrief wording and actions:** "Dive ended / Primary objectives unfinished" after a successful scan reads like failure, and the end card offers five actions (two buttons, three links). One primary action, a warmer line for partial dives.
+7. **Journal list:** "Unscanned target 2..7" rows are dead space; collapse them to a single "7 more to find" row.
+8. **Hosted CI:** run on f30 push; if still red after 880's verification, cut shard-heavy specs rather than loosen assertions.
 
-Codex queue: 770 (Blue Hole target), 780 (Titanic horizon), 790 (CI) queued. Next candidates: Challenger Deep/Endurance golden pass, a Journal copy audit of the 720 changes, a regression bug hunt over 740/760.
+Codex queue: 850 Beebe, 860 Monterey first frame, 870 fidelity rollout, 880 f30 bug hunt, 890 phone HUD, 900 briefing, 910 Blue Hole redo. Next candidates: Challenger Deep/Endurance golden pass, Journal list collapse and debrief wording (items 6-7), a regression bug hunt after 890/900.
 
 Demoted: further title polish; rebrand logo (done).
 
