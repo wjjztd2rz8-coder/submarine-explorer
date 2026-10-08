@@ -161,9 +161,19 @@
   align-items: center;
 }
 .debrief-more {
-  display: inline-block;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.debrief-more-items[hidden] {
+  display: none;
 }
 .debrief-more-toggle {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-family: inherit;
   min-height: 44px;
   display: inline-flex;
   align-items: center;

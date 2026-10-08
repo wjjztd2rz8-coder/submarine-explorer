@@ -211,10 +211,17 @@ export class Debrief {
       list.find((a) => a.id === 'dive-sites') ?? list.find((a) => a.primary) ?? list[0];
     const navigation = el('div', 'debrief-navigation');
     const secondary = el('div', 'debrief-secondary');
-    const more = el('details', 'debrief-more');
-    more.append(el('summary', 'debrief-more-toggle', 'More'));
+    const more = el('div', 'debrief-more');
+    const toggle = el('button', 'debrief-more-toggle', 'More');
+    toggle.type = 'button';
+    toggle.setAttribute('aria-expanded', 'false');
     const moreBox = el('div', 'debrief-more-items');
-    more.append(moreBox);
+    moreBox.hidden = true;
+    toggle.addEventListener('click', () => {
+      moreBox.hidden = !moreBox.hidden;
+      toggle.setAttribute('aria-expanded', String(!moreBox.hidden));
+    });
+    more.append(toggle, moreBox);
     // One filled primary; at most two quiet links (first choice + Journal); the rest tuck under More.
     const rest = list.filter((a) => a !== primary);
     const quiet = [

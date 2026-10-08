@@ -236,10 +236,10 @@ test.describe('D-FLOW dive flow', () => {
     ).toHaveText('3 of 4');
     await expect(debrief.locator('.debrief-btn')).toHaveText([
       'Dive sites',
-      'Home',
       'Keep exploring',
-      'Dive again',
       'Journal',
+      'Dive again',
+      'Home',
     ]);
     await shot(page, 'debrief');
 
@@ -308,6 +308,7 @@ test.describe('D-FLOW dive flow', () => {
     await expect(debrief.locator('.debrief-secondary > .debrief-btn')).toHaveCount(2);
     await expect(debrief.locator('[data-field="objectives"] .debrief-value')).toHaveText('1 of 4');
     expect((await probe(page)).emitted).not.toContain('mission:complete');
+    await shot(page, 'debrief-partial');
 
     await debrief.locator('.debrief-more-toggle').click();
     await debrief.locator('[data-action="home"]').click();

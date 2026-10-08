@@ -513,7 +513,7 @@ export class Journal {
       }
       box.append(ul);
       if (unscanned) {
-        box.append(el('p', 'jr-hidden-note jr-more-to-find', `${unscanned} more to find`));
+        box.append(el('p', 'jr-more-to-find', `${unscanned} more to find`));
       }
       if (hidden) {
         box.append(

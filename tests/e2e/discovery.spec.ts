@@ -154,7 +154,9 @@ test.describe('B1 scan, discovery, Journal', () => {
     );
     await expect(journal.locator('.jr-body .jr-title')).toHaveText('Test site · Titanic tile');
     // The debris entry is still locked; the bow is unlocked.
-    await expect(journal.locator('.jr-site-entries li.is-locked')).toHaveCount(1);
+    // It collapses into one quiet count row rather than a locked list item.
+    await expect(journal.locator('.jr-site-entries li.is-locked')).toHaveCount(0);
+    await expect(journal.locator('.jr-site-entries .jr-more-to-find')).toHaveText('1 more to find');
     await journal.locator('.jr-nav-item[data-target="_test/poi/bow"]').click();
     await expect(journal.locator('.jr-body .jr-title')).toHaveText('The bow section');
     await expect(journal.locator('.jr-tag.is-recreation')).toHaveText('Recreation');
