@@ -299,11 +299,17 @@ test.describe('D-FLOW dive flow', () => {
     // Surfacing before the primaries is an honest "Dive ended".
     await surfaceFromPause(page);
     const debrief = page.locator('.mission-debrief');
-    await expect(debrief.locator('.debrief-title')).toHaveText('Dive ended');
-    await expect(debrief.locator('.debrief-subtitle')).toHaveText('Primary objectives unfinished');
+    await expect(debrief.locator('.debrief-title')).toHaveText('Back at the surface');
+    await expect(debrief.locator('.debrief-subtitle')).toHaveText(
+      'You found 1 of 4 — the rest are still down there.',
+    );
+    // One filled primary; at most two quiet links visible, the rest under More.
+    await expect(debrief.locator('.debrief-btn.is-primary')).toHaveCount(1);
+    await expect(debrief.locator('.debrief-secondary > .debrief-btn')).toHaveCount(2);
     await expect(debrief.locator('[data-field="objectives"] .debrief-value')).toHaveText('1 of 4');
     expect((await probe(page)).emitted).not.toContain('mission:complete');
 
+    await debrief.locator('.debrief-more-toggle').click();
     await debrief.locator('[data-action="home"]').click();
     await expect(page.locator('.home-screen')).toBeVisible();
     await expect(page.locator('.home-sites')).toBeHidden();
@@ -318,6 +324,7 @@ test.describe('D-FLOW dive flow', () => {
       STORAGE_KEY,
     );
 
+    await openMoreIfPresent(debrief);
     await Promise.all([
       page.waitForEvent('load'),
       debrief.locator('[data-action="dive-again"]').click(),
@@ -374,17 +381,20 @@ test.describe('D-FLOW Journal', () => {
     await expect(journal.locator('.jr-body .jr-title')).toHaveText('RMS Titanic');
     const bow = journal.locator('.jr-nav-item[data-target="titanic/poi/bow"]');
     const stern = journal.locator('.jr-nav-item[data-target="titanic/poi/stern"]');
-    await expect(stern).toHaveText('Unscanned target 2');
+    // Unscanned targets collapse into one quiet count row: no per-target rows, no names.
+    await expect(stern).toHaveCount(0);
+    await expect(journal.locator('.jr-nav-item', { hasText: /Unscanned target/ })).toHaveCount(0);
+    await expect(journal.locator('.jr-more-to-find')).toHaveText(/^\d+ more to find$/);
     await bow.click();
     await expect(journal.locator('.jr-tag.is-recreation')).toHaveText('Recreation');
     await expect(journal.locator('.jr-sources a').first()).toHaveAttribute('href', /^https?:/);
     await expect(journal.locator('.jr-body')).not.toContainText(/illustrative|not surveyed/i);
     await shot(page, 'journal-site');
 
-    await stern.click();
-    await expect(journal.locator('.jr-body .jr-title')).toHaveText('Undiscovered');
     await journal.locator('.jr-spoilers input').check();
-    await expect(stern).not.toHaveText('Unscanned target 2');
+    await expect(journal.locator('.jr-more-to-find')).toHaveCount(0);
+    await expect(stern).toBeVisible();
+    await stern.click();
     await expect(journal.locator('.jr-tag.is-undiscovered')).toBeVisible();
     await expect(journal.locator('.jr-body .jr-para').first()).toBeVisible();
     // Species unlock only through a documented linkage; with spoilers they are readable.
@@ -408,3 +418,9 @@ test.describe('D-FLOW Journal', () => {
     expect(errors, errors.join(' | ')).toEqual([]);
   });
 });
+
+/** Dive again sits under "More" while Keep exploring is offered. */
+async function openMoreIfPresent(root: import('@playwright/test').Locator): Promise<void> {
+  const toggle = root.locator('.debrief-more-toggle');
+  if (await toggle.count()) await toggle.click();
+}

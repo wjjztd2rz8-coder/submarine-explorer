@@ -211,16 +211,27 @@ export class Debrief {
       list.find((a) => a.id === 'dive-sites') ?? list.find((a) => a.primary) ?? list[0];
     const navigation = el('div', 'debrief-navigation');
     const secondary = el('div', 'debrief-secondary');
-    const ordered = [primary, ...list.filter((a) => a !== primary)].filter(
-      (a): a is DebriefAction => !!a,
-    );
-    for (const a of ordered) {
-      const b = el('button', a === primary ? 'debrief-btn is-primary' : 'debrief-btn', a.label);
+    const more = el('details', 'debrief-more');
+    more.append(el('summary', 'debrief-more-toggle', 'More'));
+    const moreBox = el('div', 'debrief-more-items');
+    more.append(moreBox);
+    // One filled primary; at most two quiet links (first choice + Journal); the rest tuck under More.
+    const rest = list.filter((a) => a !== primary);
+    const quiet = [
+      rest.find((a) => a.id !== 'journal' && a.id !== 'home'),
+      rest.find((a) => a.id === 'journal'),
+    ];
+    const mk = (a: DebriefAction, cls: string): HTMLButtonElement => {
+      const b = el('button', cls, a.label);
       b.type = 'button';
       b.dataset.action = a.id;
       b.addEventListener('click', () => a.run());
-      (a === primary || a.id === 'home' ? navigation : secondary).append(b);
-    }
+      return b;
+    };
+    if (primary) navigation.append(mk(primary, 'debrief-btn is-primary'));
+    for (const a of quiet) if (a) secondary.append(mk(a, 'debrief-btn'));
+    for (const a of rest) if (!quiet.includes(a)) moreBox.append(mk(a, 'debrief-btn'));
+    if (moreBox.childElementCount) secondary.append(more);
     row.append(navigation, secondary);
     p.append(row);
 

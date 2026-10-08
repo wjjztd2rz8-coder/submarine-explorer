@@ -224,7 +224,14 @@ describe('debrief wording', () => {
     expect(debriefText('all', true, { completed: 4, total: 4 }, 75).subtitle).toBe(
       'Every objective · 4 of 4 objectives · 1:15',
     );
-    expect(debriefText('surface', false, { completed: 1, total: 4 }, 5).title).toBe('Dive ended');
+    expect(debriefText('surface', false, { completed: 1, total: 4 }, 5)).toEqual({
+      title: 'Back at the surface',
+      subtitle: 'You found 1 of 4 — the rest are still down there. · 1 of 4 objectives · 0:05',
+    });
+    const none = debriefText('surface', false, { completed: 0, total: 4 }, 5);
+    expect(none.title).toBe('Back at the surface');
+    expect(none.subtitle).toMatch(/^Nothing logged this time/);
+    expect(none.subtitle).not.toMatch(/fail|unfinished|ended/i);
     expect(debriefText('abort', false, { completed: 1, total: 4 }, 5, -1180)).toEqual({
       title: 'Dive aborted',
       subtitle: 'Hull failure at 1,180 m · emergency ascent completed · 1 of 4 objectives · 0:05',

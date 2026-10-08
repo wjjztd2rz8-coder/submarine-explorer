@@ -353,7 +353,12 @@ export function debriefText(
   if (primaryComplete) {
     return { title: 'Mission complete', subtitle: `All primary objectives · ${tally}` };
   }
-  return { title: 'Dive ended', subtitle: `Primary objectives unfinished · ${tally}` };
+  // Partial dive: warm, not a failure. The tally cell carries the numbers.
+  const line =
+    counts.completed > 0
+      ? `You found ${counts.completed} of ${counts.total} — the rest are still down there.`
+      : 'Nothing logged this time — the site is still waiting.';
+  return { title: 'Back at the surface', subtitle: `${line} · ${tally}` };
 }
 
 export class MissionRouter {

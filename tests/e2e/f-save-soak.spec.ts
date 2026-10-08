@@ -249,6 +249,7 @@ test('four dives, mode switches, restarts and reloads preserve saves without sce
       await page.keyboard.press('Escape');
       await page.locator('.pause-surface').click();
       await expect(page.locator('.mission-debrief')).toBeVisible();
+      await openMoreIfPresent(page.locator('.mission-debrief'));
       await Promise.all([
         page.waitForEvent('load'),
         page.locator('.mission-debrief [data-action="dive-again"]').click(),
@@ -266,3 +267,9 @@ test('four dives, mode switches, restarts and reloads preserve saves without sce
   expect(final.textures).toBe(baselines.get(expectedMode)!.textures);
   expect(errors).toEqual([]);
 });
+
+/** Dive again sits under "More" while Keep exploring is offered. */
+async function openMoreIfPresent(root: import('@playwright/test').Locator): Promise<void> {
+  const toggle = root.locator('.debrief-more-toggle');
+  if (await toggle.count()) await toggle.click();
+}

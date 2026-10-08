@@ -490,6 +490,7 @@ export class Journal {
       box.append(el('h3', 'jr-group', label));
       const ul = el('ul');
       let hidden = 0;
+      let unscanned = 0;
       for (const e of list) {
         const open = isEntryUnlocked(site, e, this.store);
         if (
@@ -500,18 +501,20 @@ export class Journal {
           hidden++;
           continue;
         }
-        // Distinguish locked targets without revealing their authored names.
-        const title =
-          open || this.spoilers_
-            ? e.title
-            : e.kind === 'poi'
-              ? `Unscanned target ${list.indexOf(e) + 1}`
-              : 'Undiscovered';
+        // Locked targets collapse into one quiet count row (no names, no per-target rows).
+        if (!open && !this.spoilers_ && e.kind === 'poi') {
+          unscanned++;
+          continue;
+        }
+        const title = open || this.spoilers_ ? e.title : 'Undiscovered';
         const li = this.navButton(title, '', `is-entry is-${e.kind}`, e.key, e === current);
         li.classList.toggle('is-locked', !open);
         ul.append(li);
       }
       box.append(ul);
+      if (unscanned) {
+        box.append(el('p', 'jr-hidden-note jr-more-to-find', `${unscanned} more to find`));
+      }
       if (hidden) {
         box.append(
           el(
