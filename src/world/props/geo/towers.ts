@@ -96,10 +96,11 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       wobble: 0.1,
       rough: 0.035,
       ridges: main ? 9 : 6,
-      ridgeAmp: 0.06,
+      ridgeAmp: 0.075,
       flare: main ? 0.7 : 0.5,
       lip: 0.1,
       crater: 0.5,
+      irregular: 1,
       lean: main ? 0 : (rnd() - 0.5) * 0.12,
       leanA: rnd() * 6.283,
     });
@@ -156,24 +157,66 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     );
     tips.push({ x: s.x, y: s.y + s.h, z: s.z });
     // Drooping flanges on the column: wide shelves on the main tower, one or two elsewhere.
-    const nf = lone ? 2 + Math.floor(rnd() * 2) : i === 0 ? 7 : 2 + Math.floor(rnd() * 3);
+    const nf = lone ? 1 + Math.floor(rnd() * 2) : i === 0 ? 4 : 1 + Math.floor(rnd() * 2);
     for (let f = 0; f < nf; f++) {
       const t =
         i === 0 ? 0.12 + (f / nf) * 0.6 + rnd() * 0.06 : 0.1 + (f / nf) * 0.6 + rnd() * 0.08;
       const rAt = spireRadius(s, t);
-      const w = rAt * (0.4 + rnd() * 0.5) + 0.6;
+      const w = rAt * (0.22 + rnd() * 0.3) + 0.4;
       pieces.push(
         place(
           lostCityFlange({
             r0: rAt * 0.92,
             w,
-            arc: 1.7 + rnd() * 2.4,
+            arc: 1.1 + rnd() * 1.7,
             start: rnd() * 6.28,
             seed: seed + f + i * 5,
             tier,
           }),
           { x: s.x, y: s.y + t * s.h, z: s.z },
         ),
+      );
+    }
+  }
+  // Branching fingers: slim spires leaning out of the column flank, like buttresses
+  // and side chimneys; they break the single-cone silhouette.
+  const fingerRnd = mulberry32(seed ^ 0xf1f1);
+  for (const [i, s] of spires.entries()) {
+    const nFing = lone ? 2 : i === 0 ? 6 : 2;
+    for (let k = 0; k < nFing; k++) {
+      const t = 0.1 + (k / nFing) * 0.55 + fingerRnd() * 0.1;
+      const a = fingerRnd() * 6.283;
+      const rAt = spireRadius(s, t);
+      const fh = s.h * (0.16 + fingerRnd() * 0.2);
+      const fr = rAt * (0.16 + fingerRnd() * 0.14) + 0.25;
+      const lean = 0.35 + fingerRnd() * 0.5;
+      const finger = tieredSpire({
+        h: fh,
+        r0: fr,
+        topFrac: 0.25,
+        seed: seed + 900 + k + i * 13,
+        segs: 10 * dens + 4,
+        rings: (fh / 1.2) * dens + 5,
+        tiers: Math.max(1, Math.round(fh / 4)),
+        ledge: 0.18,
+        wobble: 0.12,
+        rough: 0.04,
+        ridges: 4,
+        ridgeAmp: 0.08,
+        flare: 0.3,
+        lip: 0.12,
+        crater: 0.4,
+        irregular: 1,
+      });
+      // Root sunk inside the column, tilting outward along azimuth `a`.
+      pieces.push(
+        place(finger, {
+          x: s.x + Math.cos(a) * rAt * 0.75,
+          y: s.y + t * s.h,
+          z: s.z + Math.sin(a) * rAt * 0.75,
+          rx: Math.sin(a) * lean,
+          rz: -Math.cos(a) * lean,
+        }),
       );
     }
   }
@@ -194,6 +237,11 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     // Toward the outline the rubble thins into the surrounding seabed colour, patchily.
     const rn = rim(x, z) + (n1 - 0.5) * 0.35 + (n2 - 0.5) * 0.12;
     out.lerp(SEABED, smooth(0.5, 1.05, rn) * (1 - up * 0.5));
+    // Dark seams between flow sheets: thin, vertically drawn streaks, strongest on walls.
+    const seam = fbm3(x * 1.1, y * 0.07, z * 1.1, seed ^ 0x5ea, 3);
+    out.multiplyScalar(
+      1 - 0.38 * smooth(0.5, 0.56, seam) * (1 - smooth(0.56, 0.62, seam)) * (1 - Math.abs(ny)),
+    );
     if (ny > 0.8) out.multiplyScalar(0.9); // silt dusting on shelves
   });
   const material = createLostCityCarbonateMaterial(tier);
