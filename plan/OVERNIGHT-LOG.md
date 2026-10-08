@@ -556,3 +556,7 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - **Merged:** 860 Monterey first frame and 850 Beebe seabed (golden-reviewed: Beebe first frame improved, close-up sand-disc edge unchanged, queued as 930). Refreshed spawn snapshot in beebeIsolation (expected Monterey preset change). Gates on main: smoke e2e passed; 850/860 each passed full e2e in their own worktrees. Not pushed (no release tag this run).
 - **Running (Codex):** 875, 880, 890. **Queued:** 900, 910, 920, 930.
 - No Claude agents launched. Needs owner: nothing.
+
+## 2026-10-08 10:15 CDT headless run (Claude)
+
+- Nothing finished to collect: Codex 875, 880 and 890 are still running (round 1, tests in progress); 830 worktree is kept for the 910 redo. Queue holds 900, 910, 920 and 930, so Codex has work. Main clean, no merges, no push, no Claude agents launched (nothing unblocked that Codex is not already covering). Needs owner: nothing.
