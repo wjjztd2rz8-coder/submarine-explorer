@@ -89,7 +89,16 @@ const clamp01 = (t: number): number => Math.max(0, Math.min(1, t));
  * Zone: heights -34..-100 m; the mouth mask in blueHoleWallRelief keeps both
  * gallery seats untouched.
  */
-function terraces(a: number, r: number): number {
+export function blueHoleTerraces(a: number, r: number): number {
+  let mouth = 1;
+  for (const [bearing, width] of [
+    [Math.PI, 0.3],
+    [1.0, 0.25],
+  ]) {
+    const da = Math.abs(Math.atan2(Math.sin(a - bearing!), Math.cos(a - bearing!)));
+    mouth *= smoothstep(clamp01((da - width!) / 0.15));
+  }
+  if (mouth <= 0) return 0;
   const h = profileAt(r);
   const zone = smoothstep(clamp01((h + 106) / 8)) * (1 - smoothstep(clamp01((h + 34) / 6)));
   if (zone <= 0) return 0;
@@ -100,7 +109,7 @@ function terraces(a: number, r: number): number {
   const step = Math.floor(u) + smoothstep(clamp01((f - 0.58) / 0.27));
   const lip = Math.exp(-(((f - 0.9) / 0.07) ** 2));
   const under = Math.exp(-(((f - 0.66) / 0.07) ** 2));
-  return zone * (step * q - off - h + 1.1 * lip - 1.3 * under);
+  return mouth * zone * (step * q - off - h + 1.1 * lip - 1.3 * under);
 }
 
 /** Relief is part of the single heightfield, so sand and exposed rock share
@@ -126,7 +135,7 @@ export function blueHoleWallRelief(a: number, r: number): number {
   // Fine rubble hummocks at the foot of each broken bench, without a second
   // surface or rock AABBs closing the navigable shaft.
   const rubble = Math.max(0, Math.sin(61 * a + r * 0.9)) ** 4 * (bench + lower);
-  return ends * mouth * (terraces(a, r) + 1.4 * flute + 1.1 * (bench + lower) * broken + 0.7 * rubble);
+  return ends * mouth * (1.4 * flute + 1.1 * (bench + lower) * broken + 0.7 * rubble);
 }
 
 export interface TerrainCarve {
@@ -204,7 +213,13 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
       const blocks = floor * boulderField(dx, dz);
       return Math.min(
         height,
-        profileAt(r) + ledge + ripple + strata + blocks + blueHoleWallRelief(a, r),
+        profileAt(r) +
+          ledge +
+          ripple +
+          strata +
+          blocks +
+          blueHoleWallRelief(a, r) +
+          blueHoleTerraces(a, r),
       );
     },
   };

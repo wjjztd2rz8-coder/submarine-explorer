@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Great Blue Hole wall: irregular stepped terraces (treads, steep risers, crest lips and undercut dips) between about -34 and -100 m, via `blueHoleTerraces` in the carve; both gallery mouths are masked out so the stalactite gallery is unchanged. Heightfield-only, so mesh, physics and collision agree.
+
 - Lost City towers: irregular carbonate columns (twisting elliptical sections, partial one-sided ledges, meandering flowstone ridges, dark flow seams) with leaning side fingers; the saucer flanges are fewer and narrower (main tower 7 to 4) so the silhouette is no longer stacked cones.
 
 - Blue Hole bowl: darker lower walls (depth shade 30-105 m), stronger limestone strata, a horizon fade (new biome `horizonFadeM`) that eases the distant seabed into the water colour, sponges on walls and floor, and a larger blue tang. No cuts; the stalactite gallery is unchanged.
