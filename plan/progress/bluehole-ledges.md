@@ -13,7 +13,7 @@
 
 ## Gates
 
-`PW_PORT=4881 tools/gates.sh`: unit, python, content, attribution, e2e, e2e-base passed; first run failed unit (signed terrace broke the non-negative relief test, fixed by splitting it out) and prettier (fixed). Re-run recorded in the final report.
+`PW_PORT=4881 tools/gates.sh`: all pass except one unit timeout (heroIntegrity lost-city medium, 15 s, load flake; passes alone). Earlier failures (relief test, prettier) were fixed.
 
 ## Known weaknesses
 
