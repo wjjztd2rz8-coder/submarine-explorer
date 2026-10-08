@@ -20,6 +20,21 @@ without an entry here is not done.
   edge, all chimney/clump geometry and opening composition. Reason: the plain
   cream patch read as a plate in close-ups. The blue oval is the cockpit bezel;
   shared cockpit rendering is retained. Evidence: `plan/progress/F-BEEBE-930.md`.
+- Great Blue Hole wall: irregular stepped terraces (treads, steep risers, crest lips and undercut dips) between about -34 and -100 m, via `blueHoleTerraces` in the carve; both gallery mouths are masked out so the stalactite gallery is unchanged. Heightfield-only, so mesh, physics and collision agree.
+
+- Lost City towers: irregular carbonate columns (twisting elliptical sections, partial one-sided ledges, meandering flowstone ridges, dark flow seams) with leaning side fingers; the saucer flanges are fewer and narrower (main tower 7 to 4) so the silhouette is no longer stacked cones.
+
+- Blue Hole bowl: darker lower walls (depth shade 30-105 m), stronger limestone strata, a horizon fade (new biome `horizonFadeM`) that eases the distant seabed into the water colour, sponges on walls and floor, and a larger blue tang. No cuts; the stalactite gallery is unchanged.
+
+- Phase F, F-FIDELITY-875 (870 retry): enable terrain fidelity around the Blue
+  Hole shaft/galleries and Lost City's Poseidon opening, with site-tuned local
+  density, cubic survey reconstruction and filtered relief normals. Preserve
+  Low terrain buffers and existing prop art. Add real-tile carve regression
+  tests and strict Medium frame-budget guards for all golden poses. Reason:
+  coarse terrain steps weakened the openings; the repaired Monterey carve now
+  survives cubic reconstruction. Static geometry checks pass; rendered budgets
+  and paired visual QA await an unrestricted browser run. Evidence:
+  `plan/progress/F-FIDELITY-870.md`.
 - Phase F, F-BRIEFING-900: lead mission briefings with objectives, show at most
   three prioritised facts and hazards each, and move the summary, remaining
   bullets and controls into “More about this site”. Retain the complete mission

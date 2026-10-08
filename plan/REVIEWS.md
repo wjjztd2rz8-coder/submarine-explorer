@@ -2,6 +2,36 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-08 evening comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-08-202656 vs -155020)
+
+Codex 5h budget was 0% (`codex-review.sh` exited 75), so there was no Sol second opinion; this is Claude's view only. The morning joint review still stands as the agreed baseline.
+
+**Changed since the morning review:** merged 890 (phone HUD declutter), 900 (compact briefing), 920 (carve physics fix, Monterey free-dive range), 910 (Blue Hole wall relief redo), 875 (fidelity rollout) and 880 (f30 bug hunt), tagged f33/f34. Not yet verified by a human-style playthrough: 890/900 (960 queued).
+
+**Per-site scores (readable / beautiful), High tier, vs the morning set:**
+
+| Site            | Score   | Change | Biggest gap                                                                                                                                                                         |
+| --------------- | ------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Titanic         | 4 / 3.5 | same   | Sub parks dead centre over the bow and hides the scan target; flat haze band above the seabed (980)                                                                                 |
+| Beebe           | 4 / 3.5 | same   | Lit sand disc still has a clean edge; chimneys blunt; plumes remain the best effect (930)                                                                                           |
+| Great Blue Hole | 3 / 2.5 | +0.5   | 910 kept the gallery full-size and added boulders at the rim, with no sand blobs; but the bowl is still a smooth beige dune with a hard horizon ring and flat cones for stalactites |
+| Lost City       | 4 / 3   | same   | Beehive chimney identical to the morning set; stacked-cone silhouette and saucer flanges unchanged (875 did not reach it)                                                           |
+| Monterey        | 4 / 3   | same   | Regular corrugated "stacked plate" strata; the wall is now busy with life (good) but reads as a pattern (980)                                                                       |
+
+No regressions in this set. Blue Hole 910 is accepted (it meets the acceptance criteria) but it is not yet beautiful.
+
+**CI:** red since f29. Root causes found this run: (a) `montereyWallLife` ultra tier takes ~50 s on hosted runners and hit its 45 s timeout, now 120 s (fixed here); (b) 6/30 e2e shards fail after 12-22 min but `--log-failed` returns no e2e lines, so the cause needs the Playwright artifacts (970 queued).
+
+**Process:** efficiency.sh: Claude idle ~124 h and Codex under-used ~112 h over two weeks, nearly all the Oct 6-8 weekly-gate lockout; since the reset the queue has stayed full. Codex's 5h window hit 0% at 10:50 CDT after the 875/880/910 burst, so today's third review could not use Sol; nothing to fix (floors worked). The watchdog tripped on the CODEX floor at 15:26 as designed.
+
+**Play flow:** not re-captured this run; 960 verifies 890/900 on phone and desktop with fresh captures.
+
+**New priorities:** see DIRECTOR.md. Order: (1) CI green (970); (2) hero route (940); (3) first-minute verification (960); (4) Blue Hole relief/horizon and Lost City towers (Claude/Sonnet, visual); (5) Titanic/Monterey (980); (6) Challenger/Endurance goldens (950).
+
+**Stage:** ~67% to 1.0, about three weeks (unchanged from the morning agreement; Claude only).
+
+**Needs owner:** nothing.
+
 ## 2026-10-08 joint review, Claude + Codex 6.1 Sol (owner request; golden set 2026-10-08-155020)
 
 Both reviewed independently (Codex read-only, viewing all current goldens, the Oct 6 set and the flow captures), then reconciled in one round. Agreed position below; Claude's and Sol's raw reviews are in `.cache/review/`.

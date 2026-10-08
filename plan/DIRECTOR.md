@@ -2,7 +2,22 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-08 comprehensive review; golden sets 2026-10-08-122501 and -132228)
+## Current priorities (refreshed 2026-10-08 evening review; golden 2026-10-08-202656)
+
+Claude backlog (ordered by player impact; all unblocked; Sonnet for visual, Haiku for small):
+
+1. (PARTLY DONE 2026-10-08 16:xx: horizon fade, darker strata, sponges merged; bowl wall geometry still smooth/albedo-only, needs real ledge geometry) **Blue Hole bowl and horizon (Sonnet):** gallery is right after 910, but the bowl is a smooth beige dune with a hard horizon ring; add strata/ledges, darker lower walls, softened horizon, real sponge/fish silhouettes. Compare GOLDEN_SITES=great-blue-hole.
+2. (PARTLY DONE: irregular fingers merged; fingers still tubular with flat tops, wide shot still tiered spire; not checked on Low/phone) **Lost City beehive/slab (Sonnet):** towers still stacked cones with saucer flanges; give irregular carbonate fingers and flow texture, close-up view first (lost-city-2.png).
+3. **Review 940/960/970 when they land:** 940 must put Blue Hole's hole/gallery and Monterey's wall on the default mission path; 960 must show phone 60 s with sub, seabed and one target; 970 must turn CI green (cut shard-heavy specs, never loosen assertions).
+4. **Beebe sand-disc edge and chimneys (Sonnet):** feather the lit disc into the seabed and add chimney detail (930 if Codex has not done it).
+5. **Low-tier and real-phone pass (Haiku to run, Sonnet to judge):** capture all 13 sites on Low tier at 390x844 and 844x390; log defects.
+6. Queue state: Codex has 940, 950, 960, 970, 980 queued. Refill with Challenger Deep/Endurance fixes and the next fidelity rollout after the next golden set.
+
+Demoted: further title polish; rebrand logo (done); per-site tweaks that don't change the silhouette or material read.
+
+## Previous priorities (morning review 2026-10-08)
+
+(older list follows)
 
 Run `tools/golden.sh` at the start of any run that merged visual work (`GOLDEN_SITES=great-blue-hole GOLDEN_LAYOUTS=desktop` for a single site). Claude weekly budget reset on 2026-10-08 (100%), so Claude can build again, but Sonnet agents still own only visual-heavy packages; Codex builds the rest.
 

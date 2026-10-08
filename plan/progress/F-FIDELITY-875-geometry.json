@@ -1,0 +1,1787 @@
+{
+  "baseline": "5ed338762226aa81dffa278c741cc6f0629fdcd9",
+  "measurement": "CPU geometry/frustum census; excludes sub, swimming life, scatter and post passes; no WebGL or frame-time measurements",
+  "sites": [
+    {
+      "site": "great-blue-hole",
+      "tier": "low",
+      "profile": {
+        "focus": {
+          "lat": 17.3156,
+          "lon": -87.5356,
+          "radiusM": 310,
+          "fadeM": 90
+        },
+        "chunkCells": 8,
+        "nearSubdiv": {
+          "low": 1,
+          "medium": 16,
+          "high": 32,
+          "ultra": 32
+        },
+        "reliefM": 0.18,
+        "reliefWavelengthM": 24,
+        "normalStrength": 0.16,
+        "wallSegments": {
+          "low": [220, 150],
+          "medium": [230, 150],
+          "high": [520, 280],
+          "ultra": [640, 320]
+        }
+      },
+      "residentBefore": {
+        "chunks": 81,
+        "vertices": 343476,
+        "triangles": 666000
+      },
+      "residentAfter": {
+        "chunks": 81,
+        "vertices": 343476,
+        "triangles": 666000
+      },
+      "spawnBefore": {
+        "x": -243.95596189103077,
+        "y": -56.73446228596164,
+        "z": 25.908738271603568,
+        "yaw": -0.7853981633974533,
+        "chaseOffsetY": 22
+      },
+      "spawnAfter": {
+        "x": -243.95596189103077,
+        "y": -56.73446228596164,
+        "z": 25.908738271603568,
+        "yaw": -0.7853981633974533,
+        "chaseOffsetY": 22
+      },
+      "goldenPosesAfter": [
+        {
+          "name": "opening",
+          "position": {
+            "x": -243.95596189103077,
+            "y": -56.73446228596164,
+            "z": 25.908738271603568
+          },
+          "yaw": -0.7853981633974533,
+          "pitch": 0
+        },
+        {
+          "name": "karst-grotto-2",
+          "position": {
+            "x": -274.66664000968586,
+            "y": -29.73446228596164,
+            "z": -44.80193984705082
+          },
+          "target": {
+            "x": -314.66664000968586,
+            "y": -33.81279804798557,
+            "z": -44.80193984705082
+          },
+          "yaw": -1.5707963267948966,
+          "pitch": -0.10160727817225769
+        },
+        {
+          "name": "karst-grotto-3",
+          "position": {
+            "x": -278.66664000968586,
+            "y": -25.73446228596164,
+            "z": -34.80193984705082
+          },
+          "target": {
+            "x": -314.66664000968586,
+            "y": -33.81279804798557,
+            "z": -44.80193984705082
+          },
+          "yaw": -1.299849476456476,
+          "pitch": -0.22074158153770118
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "position": {
+            "x": -109.39275210870463,
+            "y": -35.57330912964779,
+            "z": 31.767543801255464
+          },
+          "target": {
+            "x": -79.43760518370463,
+            "y": -34.37330912964779,
+            "z": 77.89442504125546
+          },
+          "yaw": 2.5656340004739917,
+          "pitch": 0.02181472074807582
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "position": {
+            "x": -95.60308010970463,
+            "y": -34.07330912964779,
+            "z": 38.31314890525546
+          },
+          "target": {
+            "x": -79.43760518370463,
+            "y": -34.37330912964779,
+            "z": 77.89442504125546
+          },
+          "yaw": 2.753855505778762,
+          "pitch": -0.0071427356694133345
+        }
+      ],
+      "views": [
+        {
+          "name": "opening",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 46134,
+          "maxTrianglesAfter": 46134,
+          "terrainTrianglesAfter": 35456,
+          "propTrianglesAfter": 10678,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 48442,
+          "maxTrianglesAfter": 48442,
+          "terrainTrianglesAfter": 37764,
+          "propTrianglesAfter": 10678,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 47414,
+          "maxTrianglesAfter": 47414,
+          "terrainTrianglesAfter": 36736,
+          "propTrianglesAfter": 10678,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 37202,
+          "maxTrianglesAfter": 37202,
+          "terrainTrianglesAfter": 28440,
+          "propTrianglesAfter": 8762,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 36950,
+          "maxTrianglesAfter": 36950,
+          "terrainTrianglesAfter": 28188,
+          "propTrianglesAfter": 8762,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "opening",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 43574,
+          "maxTrianglesAfter": 43574,
+          "terrainTrianglesAfter": 32896,
+          "propTrianglesAfter": 10678,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 34230,
+          "maxTrianglesAfter": 34230,
+          "terrainTrianglesAfter": 23552,
+          "propTrianglesAfter": 10678,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 43574,
+          "maxTrianglesAfter": 43574,
+          "terrainTrianglesAfter": 32896,
+          "propTrianglesAfter": 10678,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 33614,
+          "maxTrianglesAfter": 33614,
+          "terrainTrianglesAfter": 24852,
+          "propTrianglesAfter": 8762,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 42066,
+          "maxTrianglesAfter": 42066,
+          "terrainTrianglesAfter": 33304,
+          "propTrianglesAfter": 8762,
+          "sampledDriftM": [-2, 0, 2]
+        }
+      ]
+    },
+    {
+      "site": "great-blue-hole",
+      "tier": "medium",
+      "profile": {
+        "focus": {
+          "lat": 17.3156,
+          "lon": -87.5356,
+          "radiusM": 310,
+          "fadeM": 90
+        },
+        "chunkCells": 8,
+        "nearSubdiv": {
+          "low": 1,
+          "medium": 16,
+          "high": 32,
+          "ultra": 32
+        },
+        "reliefM": 0.18,
+        "reliefWavelengthM": 24,
+        "normalStrength": 0.16,
+        "wallSegments": {
+          "low": [220, 150],
+          "medium": [230, 150],
+          "high": [520, 280],
+          "ultra": [640, 320]
+        }
+      },
+      "residentBefore": {
+        "chunks": 81,
+        "vertices": 1312263,
+        "triangles": 2583432
+      },
+      "residentAfter": {
+        "chunks": 144,
+        "vertices": 1418754,
+        "triangles": 2789512,
+        "subdivisionCounts": {
+          "2": 138,
+          "16": 6
+        }
+      },
+      "spawnBefore": {
+        "x": -244.00002927384327,
+        "y": -55.394611710148126,
+        "z": 25.908738271603568,
+        "yaw": -0.7853981633974533,
+        "chaseOffsetY": 22
+      },
+      "spawnAfter": {
+        "x": -244.00002927384327,
+        "y": -54.80341344673556,
+        "z": 25.908738271603568,
+        "yaw": -0.7853981633974533,
+        "chaseOffsetY": 22
+      },
+      "goldenPosesAfter": [
+        {
+          "name": "opening",
+          "position": {
+            "x": -244.00002927384327,
+            "y": -54.80341344673556,
+            "z": 25.908738271603568
+          },
+          "yaw": -0.7853981633974533,
+          "pitch": 0
+        },
+        {
+          "name": "karst-grotto-2",
+          "position": {
+            "x": -274.71070739249836,
+            "y": -27.80341344673556,
+            "z": -44.80193984705082
+          },
+          "target": {
+            "x": -314.71070739249836,
+            "y": -31.64175802071017,
+            "z": -44.80193984705082
+          },
+          "yaw": -1.5707963267948966,
+          "pitch": -0.09566570020193386
+        },
+        {
+          "name": "karst-grotto-3",
+          "position": {
+            "x": -278.71070739249836,
+            "y": -23.80341344673556,
+            "z": -34.80193984705082
+          },
+          "target": {
+            "x": -314.71070739249836,
+            "y": -31.64175802071017,
+            "z": -44.80193984705082
+          },
+          "yaw": -1.299849476456476,
+          "pitch": -0.21438578490421567
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "position": {
+            "x": -109.39275210870463,
+            "y": -34.64575232233789,
+            "z": 31.767543801255464
+          },
+          "target": {
+            "x": -79.43760518370463,
+            "y": -33.44575232233789,
+            "z": 77.89442504125546
+          },
+          "yaw": 2.5656340004739917,
+          "pitch": 0.02181472074807582
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "position": {
+            "x": -95.60308010970463,
+            "y": -33.14575232233789,
+            "z": 38.31314890525546
+          },
+          "target": {
+            "x": -79.43760518370463,
+            "y": -33.44575232233789,
+            "z": 77.89442504125546
+          },
+          "yaw": 2.753855505778762,
+          "pitch": -0.0071427356694133345
+        }
+      ],
+      "views": [
+        {
+          "name": "opening",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 192188,
+          "maxTrianglesAfter": 273596,
+          "terrainTrianglesAfter": 239872,
+          "propTrianglesAfter": 33724,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 206784,
+          "maxTrianglesAfter": 290496,
+          "terrainTrianglesAfter": 256772,
+          "propTrianglesAfter": 33724,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 203196,
+          "maxTrianglesAfter": 285244,
+          "terrainTrianglesAfter": 251520,
+          "propTrianglesAfter": 33724,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 172650,
+          "maxTrianglesAfter": 227306,
+          "terrainTrianglesAfter": 197218,
+          "propTrianglesAfter": 30088,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 171698,
+          "maxTrianglesAfter": 226738,
+          "terrainTrianglesAfter": 196650,
+          "propTrianglesAfter": 30088,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "opening",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 182972,
+          "maxTrianglesAfter": 263740,
+          "terrainTrianglesAfter": 230016,
+          "propTrianglesAfter": 33724,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 153276,
+          "maxTrianglesAfter": 234684,
+          "terrainTrianglesAfter": 200960,
+          "propTrianglesAfter": 33724,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 182972,
+          "maxTrianglesAfter": 263740,
+          "terrainTrianglesAfter": 230016,
+          "propTrianglesAfter": 33724,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 153514,
+          "maxTrianglesAfter": 205482,
+          "terrainTrianglesAfter": 175394,
+          "propTrianglesAfter": 30088,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 186354,
+          "maxTrianglesAfter": 238514,
+          "terrainTrianglesAfter": 208426,
+          "propTrianglesAfter": 30088,
+          "sampledDriftM": [-2, 0, 2]
+        }
+      ]
+    },
+    {
+      "site": "great-blue-hole",
+      "tier": "high",
+      "profile": {
+        "focus": {
+          "lat": 17.3156,
+          "lon": -87.5356,
+          "radiusM": 310,
+          "fadeM": 90
+        },
+        "chunkCells": 8,
+        "nearSubdiv": {
+          "low": 1,
+          "medium": 16,
+          "high": 32,
+          "ultra": 32
+        },
+        "reliefM": 0.18,
+        "reliefWavelengthM": 24,
+        "normalStrength": 0.16,
+        "wallSegments": {
+          "low": [220, 150],
+          "medium": [230, 150],
+          "high": [520, 280],
+          "ultra": [640, 320]
+        }
+      },
+      "residentBefore": {
+        "chunks": 81,
+        "vertices": 2906766,
+        "triangles": 5752296
+      },
+      "residentAfter": {
+        "chunks": 144,
+        "vertices": 1718274,
+        "triangles": 3385480,
+        "subdivisionCounts": {
+          "2": 138,
+          "32": 6
+        }
+      },
+      "spawnBefore": {
+        "x": -244.20325345597217,
+        "y": -54.808052394408314,
+        "z": 25.908738271603568,
+        "yaw": -0.7853981633974533,
+        "chaseOffsetY": 22
+      },
+      "spawnAfter": {
+        "x": -244.20325345597217,
+        "y": -54.80690787477057,
+        "z": 25.908738271603568,
+        "yaw": -0.7853981633974533,
+        "chaseOffsetY": 22
+      },
+      "goldenPosesAfter": [
+        {
+          "name": "opening",
+          "position": {
+            "x": -244.20325345597217,
+            "y": -54.80690787477057,
+            "z": 25.908738271603568
+          },
+          "yaw": -0.7853981633974533,
+          "pitch": 0
+        },
+        {
+          "name": "karst-grotto-2",
+          "position": {
+            "x": -274.91393157462727,
+            "y": -27.806907874770573,
+            "z": -44.80193984705082
+          },
+          "target": {
+            "x": -314.91393157462727,
+            "y": -31.735427123732975,
+            "z": -44.80193984705082
+          },
+          "yaw": -1.5707963267948966,
+          "pitch": -0.09789901571102642
+        },
+        {
+          "name": "karst-grotto-3",
+          "position": {
+            "x": -278.91393157462727,
+            "y": -23.806907874770573,
+            "z": -34.80193984705082
+          },
+          "target": {
+            "x": -314.91393157462727,
+            "y": -31.735427123732975,
+            "z": -44.80193984705082
+          },
+          "yaw": -1.299849476456476,
+          "pitch": -0.21677601467618157
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "position": {
+            "x": -109.39275210870463,
+            "y": -34.361493434275,
+            "z": 31.767543801255464
+          },
+          "target": {
+            "x": -79.43760518370463,
+            "y": -33.161493434274995,
+            "z": 77.89442504125546
+          },
+          "yaw": 2.5656340004739917,
+          "pitch": 0.02181472074807582
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "position": {
+            "x": -95.60308010970463,
+            "y": -32.861493434275,
+            "z": 38.31314890525546
+          },
+          "target": {
+            "x": -79.43760518370463,
+            "y": -33.161493434274995,
+            "z": 77.89442504125546
+          },
+          "yaw": 2.753855505778762,
+          "pitch": -0.0071427356694133345
+        }
+      ],
+      "views": [
+        {
+          "name": "opening",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 531044,
+          "maxTrianglesAfter": 773476,
+          "terrainTrianglesAfter": 719360,
+          "propTrianglesAfter": 54116,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 563020,
+          "maxTrianglesAfter": 791272,
+          "terrainTrianglesAfter": 737156,
+          "propTrianglesAfter": 54116,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 555236,
+          "maxTrianglesAfter": 785124,
+          "terrainTrianglesAfter": 731008,
+          "propTrianglesAfter": 54116,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 490594,
+          "maxTrianglesAfter": 610020,
+          "terrainTrianglesAfter": 560354,
+          "propTrianglesAfter": 49666,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 488594,
+          "maxTrianglesAfter": 609900,
+          "terrainTrianglesAfter": 560234,
+          "propTrianglesAfter": 49666,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "opening",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 511076,
+          "maxTrianglesAfter": 763620,
+          "terrainTrianglesAfter": 709504,
+          "propTrianglesAfter": 54116,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 430820,
+          "maxTrianglesAfter": 728164,
+          "terrainTrianglesAfter": 674048,
+          "propTrianglesAfter": 54116,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 496868,
+          "maxTrianglesAfter": 757220,
+          "terrainTrianglesAfter": 703104,
+          "propTrianglesAfter": 54116,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 434626,
+          "maxTrianglesAfter": 580004,
+          "terrainTrianglesAfter": 530338,
+          "propTrianglesAfter": 49666,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 507890,
+          "maxTrianglesAfter": 613484,
+          "terrainTrianglesAfter": 563818,
+          "propTrianglesAfter": 49666,
+          "sampledDriftM": [-2, 0, 2]
+        }
+      ]
+    },
+    {
+      "site": "great-blue-hole",
+      "tier": "ultra",
+      "profile": {
+        "focus": {
+          "lat": 17.3156,
+          "lon": -87.5356,
+          "radiusM": 310,
+          "fadeM": 90
+        },
+        "chunkCells": 8,
+        "nearSubdiv": {
+          "low": 1,
+          "medium": 16,
+          "high": 32,
+          "ultra": 32
+        },
+        "reliefM": 0.18,
+        "reliefWavelengthM": 24,
+        "normalStrength": 0.16,
+        "wallSegments": {
+          "low": [220, 150],
+          "medium": [230, 150],
+          "high": [520, 280],
+          "ultra": [640, 320]
+        }
+      },
+      "residentBefore": {
+        "chunks": 81,
+        "vertices": 2906766,
+        "triangles": 5752296
+      },
+      "residentAfter": {
+        "chunks": 144,
+        "vertices": 1718274,
+        "triangles": 3385480,
+        "subdivisionCounts": {
+          "2": 138,
+          "32": 6
+        }
+      },
+      "spawnBefore": {
+        "x": -244.01941938004444,
+        "y": -54.808052394408314,
+        "z": 25.908738271603568,
+        "yaw": -0.7853981633974533,
+        "chaseOffsetY": 22
+      },
+      "spawnAfter": {
+        "x": -244.01941938004444,
+        "y": -54.80690787477057,
+        "z": 25.908738271603568,
+        "yaw": -0.7853981633974533,
+        "chaseOffsetY": 22
+      },
+      "goldenPosesAfter": [
+        {
+          "name": "opening",
+          "position": {
+            "x": -244.01941938004444,
+            "y": -54.80690787477057,
+            "z": 25.908738271603568
+          },
+          "yaw": -0.7853981633974533,
+          "pitch": 0
+        },
+        {
+          "name": "karst-grotto-2",
+          "position": {
+            "x": -274.73009749869954,
+            "y": -27.806907874770573,
+            "z": -44.80193984705082
+          },
+          "target": {
+            "x": -314.73009749869954,
+            "y": -31.74410365266364,
+            "z": -44.80193984705082
+          },
+          "yaw": -1.5707963267948966,
+          "pitch": -0.0981138520876427
+        },
+        {
+          "name": "karst-grotto-3",
+          "position": {
+            "x": -278.73009749869954,
+            "y": -23.806907874770573,
+            "z": -34.80193984705082
+          },
+          "target": {
+            "x": -314.73009749869954,
+            "y": -31.74410365266364,
+            "z": -44.80193984705082
+          },
+          "yaw": -1.299849476456476,
+          "pitch": -0.21700586830208352
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "position": {
+            "x": -109.39275210870463,
+            "y": -34.361493434275,
+            "z": 31.767543801255464
+          },
+          "target": {
+            "x": -79.43760518370463,
+            "y": -33.161493434274995,
+            "z": 77.89442504125546
+          },
+          "yaw": 2.5656340004739917,
+          "pitch": 0.02181472074807582
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "position": {
+            "x": -95.60308010970463,
+            "y": -32.861493434275,
+            "z": 38.31314890525546
+          },
+          "target": {
+            "x": -79.43760518370463,
+            "y": -33.161493434274995,
+            "z": 77.89442504125546
+          },
+          "yaw": 2.753855505778762,
+          "pitch": -0.0071427356694133345
+        }
+      ],
+      "views": [
+        {
+          "name": "opening",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 588832,
+          "maxTrianglesAfter": 831264,
+          "terrainTrianglesAfter": 719360,
+          "propTrianglesAfter": 111904,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 620808,
+          "maxTrianglesAfter": 849060,
+          "terrainTrianglesAfter": 737156,
+          "propTrianglesAfter": 111904,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 613024,
+          "maxTrianglesAfter": 842912,
+          "terrainTrianglesAfter": 731008,
+          "propTrianglesAfter": 111904,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 549526,
+          "maxTrianglesAfter": 668952,
+          "terrainTrianglesAfter": 560354,
+          "propTrianglesAfter": 108598,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 547526,
+          "maxTrianglesAfter": 668832,
+          "terrainTrianglesAfter": 560234,
+          "propTrianglesAfter": 108598,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "opening",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 568864,
+          "maxTrianglesAfter": 821408,
+          "terrainTrianglesAfter": 709504,
+          "propTrianglesAfter": 111904,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 488608,
+          "maxTrianglesAfter": 785952,
+          "terrainTrianglesAfter": 674048,
+          "propTrianglesAfter": 111904,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 554656,
+          "maxTrianglesAfter": 815008,
+          "terrainTrianglesAfter": 703104,
+          "propTrianglesAfter": 111904,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 493558,
+          "maxTrianglesAfter": 638936,
+          "terrainTrianglesAfter": 530338,
+          "propTrianglesAfter": 108598,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "karst-grotto-east-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 566822,
+          "maxTrianglesAfter": 672416,
+          "terrainTrianglesAfter": 563818,
+          "propTrianglesAfter": 108598,
+          "sampledDriftM": [-2, 0, 2]
+        }
+      ]
+    },
+    {
+      "site": "lost-city",
+      "tier": "low",
+      "profile": {
+        "focus": {
+          "lat": 30.124,
+          "lon": -42.1195,
+          "radiusM": 650,
+          "fadeM": 250
+        },
+        "chunkCells": 16,
+        "nearSubdiv": {
+          "low": 1,
+          "medium": 4,
+          "high": 8,
+          "ultra": 8
+        },
+        "reliefM": 1.8,
+        "reliefWavelengthM": 36,
+        "normalStrength": 0.2,
+        "wallSegments": {
+          "low": [220, 150],
+          "medium": [230, 150],
+          "high": [520, 280],
+          "ultra": [640, 320]
+        }
+      },
+      "residentBefore": {
+        "chunks": 30,
+        "vertices": 124296,
+        "triangles": 240924
+      },
+      "residentAfter": {
+        "chunks": 30,
+        "vertices": 124296,
+        "triangles": 240924
+      },
+      "spawnBefore": {
+        "x": 68.2472358820348,
+        "y": -781.5715762665793,
+        "z": -928.0286616148973,
+        "yaw": 0.17453292519943295,
+        "chaseRadius": 50,
+        "chaseOffsetX": -20
+      },
+      "spawnAfter": {
+        "x": 68.2472358820348,
+        "y": -781.5715762665793,
+        "z": -928.0286616148973,
+        "yaw": 0.17453292519943295,
+        "chaseRadius": 50,
+        "chaseOffsetX": -20
+      },
+      "goldenPosesAfter": [
+        {
+          "name": "opening",
+          "position": {
+            "x": 68.2472358820348,
+            "y": -781.5715762665793,
+            "z": -928.0286616148973
+          },
+          "yaw": 0.17453292519943295,
+          "pitch": 0
+        },
+        {
+          "name": "poseidon-tower-2",
+          "position": {
+            "x": 96.5315071294967,
+            "y": -762.5911725877647,
+            "z": -994.3129328623592
+          },
+          "target": {
+            "x": 68.2472358820348,
+            "y": -773.9889536288682,
+            "z": -966.0286616148973
+          },
+          "yaw": -2.356194490192345,
+          "pitch": -0.27758784977517426
+        },
+        {
+          "name": "poseidon-tower-3",
+          "position": {
+            "x": 89.46043931763123,
+            "y": -768.4717461755106,
+            "z": -987.2418650504937
+          },
+          "target": {
+            "x": 68.2472358820348,
+            "y": -773.9889536288682,
+            "z": -966.0286616148973
+          },
+          "yaw": -2.356194490192346,
+          "pitch": -0.18187464785913543
+        }
+      ],
+      "views": [
+        {
+          "name": "opening",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 108388,
+          "maxTrianglesAfter": 108388,
+          "terrainTrianglesAfter": 33248,
+          "propTrianglesAfter": 75140,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 75636,
+          "maxTrianglesAfter": 75636,
+          "terrainTrianglesAfter": 33504,
+          "propTrianglesAfter": 42132,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 75636,
+          "maxTrianglesAfter": 75636,
+          "terrainTrianglesAfter": 33504,
+          "propTrianglesAfter": 42132,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "opening",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 102876,
+          "maxTrianglesAfter": 102876,
+          "terrainTrianglesAfter": 32112,
+          "propTrianglesAfter": 70764,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 64444,
+          "maxTrianglesAfter": 64444,
+          "terrainTrianglesAfter": 22312,
+          "propTrianglesAfter": 42132,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 64444,
+          "maxTrianglesAfter": 64444,
+          "terrainTrianglesAfter": 22312,
+          "propTrianglesAfter": 42132,
+          "sampledDriftM": [-2, 0, 2]
+        }
+      ]
+    },
+    {
+      "site": "lost-city",
+      "tier": "medium",
+      "profile": {
+        "focus": {
+          "lat": 30.124,
+          "lon": -42.1195,
+          "radiusM": 650,
+          "fadeM": 250
+        },
+        "chunkCells": 16,
+        "nearSubdiv": {
+          "low": 1,
+          "medium": 4,
+          "high": 8,
+          "ultra": 8
+        },
+        "reliefM": 1.8,
+        "reliefWavelengthM": 36,
+        "normalStrength": 0.2,
+        "wallSegments": {
+          "low": [220, 150],
+          "medium": [230, 150],
+          "high": [520, 280],
+          "ultra": [640, 320]
+        }
+      },
+      "residentBefore": {
+        "chunks": 30,
+        "vertices": 474630,
+        "triangles": 934224
+      },
+      "residentAfter": {
+        "chunks": 90,
+        "vertices": 513522,
+        "triangles": 1004112,
+        "subdivisionCounts": {
+          "2": 81,
+          "4": 9
+        }
+      },
+      "spawnBefore": {
+        "x": 68.2472358820348,
+        "y": -781.7351544197223,
+        "z": -928.0286616148973,
+        "yaw": 0.17453292519943295,
+        "chaseRadius": 50,
+        "chaseOffsetX": -20
+      },
+      "spawnAfter": {
+        "x": 41.37717819694599,
+        "y": -783.236813400059,
+        "z": -939.1586039298085,
+        "yaw": 0.9599310885968815,
+        "chaseRadius": 50,
+        "chaseOffsetX": -20
+      },
+      "goldenPosesAfter": [
+        {
+          "name": "opening",
+          "position": {
+            "x": 41.37717819694599,
+            "y": -783.236813400059,
+            "z": -939.1586039298085
+          },
+          "yaw": 0.9599310885968815,
+          "pitch": 0
+        },
+        {
+          "name": "poseidon-tower-2",
+          "position": {
+            "x": 96.5315071294967,
+            "y": -763.1180602207052,
+            "z": -994.3129328623592
+          },
+          "target": {
+            "x": 68.2472358820348,
+            "y": -774.236813400059,
+            "z": -966.0286616148973
+          },
+          "yaw": -2.356194490192345,
+          "pitch": -0.2711242076522291
+        },
+        {
+          "name": "poseidon-tower-3",
+          "position": {
+            "x": 89.46043931763123,
+            "y": -768.8386580227872,
+            "z": -987.2418650504937
+          },
+          "target": {
+            "x": 68.2472358820348,
+            "y": -774.236813400059,
+            "z": -966.0286616148973
+          },
+          "yaw": -2.356194490192346,
+          "pitch": -0.17803337983970444
+        }
+      ],
+      "views": [
+        {
+          "name": "opening",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 458288,
+          "maxTrianglesAfter": 330646,
+          "terrainTrianglesAfter": 96468,
+          "propTrianglesAfter": 234178,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 322560,
+          "maxTrianglesAfter": 275328,
+          "terrainTrianglesAfter": 106032,
+          "propTrianglesAfter": 169296,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 322560,
+          "maxTrianglesAfter": 275328,
+          "terrainTrianglesAfter": 106032,
+          "propTrianglesAfter": 169296,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "opening",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 431474,
+          "maxTrianglesAfter": 277488,
+          "terrainTrianglesAfter": 72916,
+          "propTrianglesAfter": 204572,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 267092,
+          "maxTrianglesAfter": 243028,
+          "terrainTrianglesAfter": 73732,
+          "propTrianglesAfter": 169296,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 267092,
+          "maxTrianglesAfter": 243028,
+          "terrainTrianglesAfter": 73732,
+          "propTrianglesAfter": 169296,
+          "sampledDriftM": [-2, 0, 2]
+        }
+      ]
+    },
+    {
+      "site": "lost-city",
+      "tier": "high",
+      "profile": {
+        "focus": {
+          "lat": 30.124,
+          "lon": -42.1195,
+          "radiusM": 650,
+          "fadeM": 250
+        },
+        "chunkCells": 16,
+        "nearSubdiv": {
+          "low": 1,
+          "medium": 4,
+          "high": 8,
+          "ultra": 8
+        },
+        "reliefM": 1.8,
+        "reliefWavelengthM": 36,
+        "normalStrength": 0.2,
+        "wallSegments": {
+          "low": [220, 150],
+          "medium": [230, 150],
+          "high": [520, 280],
+          "ultra": [640, 320]
+        }
+      },
+      "residentBefore": {
+        "chunks": 30,
+        "vertices": 1051152,
+        "triangles": 2079900
+      },
+      "residentAfter": {
+        "chunks": 90,
+        "vertices": 627570,
+        "triangles": 1229904,
+        "subdivisionCounts": {
+          "2": 81,
+          "8": 9
+        }
+      },
+      "spawnBefore": {
+        "x": 68.2472358820348,
+        "y": -781.577099841267,
+        "z": -928.0286616148973,
+        "yaw": 0.17453292519943295,
+        "chaseRadius": 50,
+        "chaseOffsetX": -20
+      },
+      "spawnAfter": {
+        "x": 41.37717819694599,
+        "y": -783.3534560092373,
+        "z": -939.1586039298085,
+        "yaw": 0.9599310885968815,
+        "chaseRadius": 50,
+        "chaseOffsetX": -20
+      },
+      "goldenPosesAfter": [
+        {
+          "name": "opening",
+          "position": {
+            "x": 41.37717819694599,
+            "y": -783.3534560092373,
+            "z": -939.1586039298085
+          },
+          "yaw": 0.9599310885968815,
+          "pitch": 0
+        },
+        {
+          "name": "poseidon-tower-2",
+          "position": {
+            "x": 96.5315071294967,
+            "y": -762.8027529645364,
+            "z": -994.3129328623592
+          },
+          "target": {
+            "x": 68.2472358820348,
+            "y": -774.3534560092373,
+            "z": -966.0286616148973
+          },
+          "yaw": -2.356194490192345,
+          "pitch": -0.28112023003707215
+        },
+        {
+          "name": "poseidon-tower-3",
+          "position": {
+            "x": 89.46043931763123,
+            "y": -768.5615731788582,
+            "z": -987.2418650504937
+          },
+          "target": {
+            "x": 68.2472358820348,
+            "y": -774.3534560092373,
+            "z": -966.0286616148973
+          },
+          "yaw": -2.356194490192346,
+          "pitch": -0.19071632627947574
+        }
+      ],
+      "views": [
+        {
+          "name": "opening",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 822112,
+          "maxTrianglesAfter": 592764,
+          "terrainTrianglesAfter": 281612,
+          "propTrianglesAfter": 311152,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 701548,
+          "maxTrianglesAfter": 494300,
+          "terrainTrianglesAfter": 268720,
+          "propTrianglesAfter": 225580,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 701548,
+          "maxTrianglesAfter": 494300,
+          "terrainTrianglesAfter": 268720,
+          "propTrianglesAfter": 225580,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "opening",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 767516,
+          "maxTrianglesAfter": 476192,
+          "terrainTrianglesAfter": 204556,
+          "propTrianglesAfter": 271636,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 552620,
+          "maxTrianglesAfter": 427184,
+          "terrainTrianglesAfter": 201604,
+          "propTrianglesAfter": 225580,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 552620,
+          "maxTrianglesAfter": 427184,
+          "terrainTrianglesAfter": 201604,
+          "propTrianglesAfter": 225580,
+          "sampledDriftM": [-2, 0, 2]
+        }
+      ]
+    },
+    {
+      "site": "lost-city",
+      "tier": "ultra",
+      "profile": {
+        "focus": {
+          "lat": 30.124,
+          "lon": -42.1195,
+          "radiusM": 650,
+          "fadeM": 250
+        },
+        "chunkCells": 16,
+        "nearSubdiv": {
+          "low": 1,
+          "medium": 4,
+          "high": 8,
+          "ultra": 8
+        },
+        "reliefM": 1.8,
+        "reliefWavelengthM": 36,
+        "normalStrength": 0.2,
+        "wallSegments": {
+          "low": [220, 150],
+          "medium": [230, 150],
+          "high": [520, 280],
+          "ultra": [640, 320]
+        }
+      },
+      "residentBefore": {
+        "chunks": 30,
+        "vertices": 1051152,
+        "triangles": 2079900
+      },
+      "residentAfter": {
+        "chunks": 90,
+        "vertices": 627570,
+        "triangles": 1229904,
+        "subdivisionCounts": {
+          "2": 81,
+          "8": 9
+        }
+      },
+      "spawnBefore": {
+        "x": 68.2472358820348,
+        "y": -781.577099841267,
+        "z": -928.0286616148973,
+        "yaw": 0.17453292519943295,
+        "chaseRadius": 50,
+        "chaseOffsetX": -20
+      },
+      "spawnAfter": {
+        "x": 41.37717819694599,
+        "y": -783.3534560092373,
+        "z": -939.1586039298085,
+        "yaw": 0.9599310885968815,
+        "chaseRadius": 50,
+        "chaseOffsetX": -20
+      },
+      "goldenPosesAfter": [
+        {
+          "name": "opening",
+          "position": {
+            "x": 41.37717819694599,
+            "y": -783.3534560092373,
+            "z": -939.1586039298085
+          },
+          "yaw": 0.9599310885968815,
+          "pitch": 0
+        },
+        {
+          "name": "poseidon-tower-2",
+          "position": {
+            "x": 96.5315071294967,
+            "y": -762.8027529645364,
+            "z": -994.3129328623592
+          },
+          "target": {
+            "x": 68.2472358820348,
+            "y": -774.3534560092373,
+            "z": -966.0286616148973
+          },
+          "yaw": -2.356194490192345,
+          "pitch": -0.28112023003707215
+        },
+        {
+          "name": "poseidon-tower-3",
+          "position": {
+            "x": 89.46043931763123,
+            "y": -768.5615731788582,
+            "z": -987.2418650504937
+          },
+          "target": {
+            "x": 68.2472358820348,
+            "y": -774.3534560092373,
+            "z": -966.0286616148973
+          },
+          "yaw": -2.356194490192346,
+          "pitch": -0.19071632627947574
+        }
+      ],
+      "views": [
+        {
+          "name": "opening",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 988900,
+          "maxTrianglesAfter": 724122,
+          "terrainTrianglesAfter": 281612,
+          "propTrianglesAfter": 442510,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-2",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 792486,
+          "maxTrianglesAfter": 585238,
+          "terrainTrianglesAfter": 268720,
+          "propTrianglesAfter": 316518,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-3",
+          "aspect": 1.7777777777777777,
+          "maxTrianglesBefore": 792486,
+          "maxTrianglesAfter": 585238,
+          "terrainTrianglesAfter": 268720,
+          "propTrianglesAfter": 316518,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "opening",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 924174,
+          "maxTrianglesAfter": 587910,
+          "terrainTrianglesAfter": 204556,
+          "propTrianglesAfter": 383354,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-2",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 643558,
+          "maxTrianglesAfter": 518122,
+          "terrainTrianglesAfter": 201604,
+          "propTrianglesAfter": 316518,
+          "sampledDriftM": [-2, 0, 2]
+        },
+        {
+          "name": "poseidon-tower-3",
+          "aspect": 0.46208530805687204,
+          "maxTrianglesBefore": 643558,
+          "maxTrianglesAfter": 518122,
+          "terrainTrianglesAfter": 201604,
+          "propTrianglesAfter": 316518,
+          "sampledDriftM": [-2, 0, 2]
+        }
+      ]
+    }
+  ],
+  "carves": [
+    {
+      "site": "monterey-canyon",
+      "tier": "medium",
+      "x": -3230.927430367679,
+      "z": -1358.837559250192,
+      "carvedSurvey": -860,
+      "continuous": -858.6671855474478,
+      "detail": 1.332814452552141,
+      "collision": -858.295162923946,
+      "mesh": -858.2951753813143
+    },
+    {
+      "site": "monterey-canyon",
+      "tier": "high",
+      "x": -3230.927430367679,
+      "z": -1358.837559250192,
+      "carvedSurvey": -860,
+      "continuous": -858.8197740745906,
+      "detail": 1.1802259254094989,
+      "collision": -858.4331359837661,
+      "mesh": -858.4331439865116
+    },
+    {
+      "site": "monterey-canyon",
+      "tier": "ultra",
+      "x": -3230.927430367679,
+      "z": -1358.837559250192,
+      "carvedSurvey": -860,
+      "continuous": -858.8197740745906,
+      "detail": 1.1802259254094989,
+      "collision": -858.4331359837661,
+      "mesh": -858.4331439865116
+    },
+    {
+      "site": "great-blue-hole",
+      "tier": "medium",
+      "x": -157.43050033975456,
+      "z": -44.80193984705082,
+      "carvedSurvey": -125,
+      "continuous": -125.6745371817383,
+      "detail": -0.6745371817383027,
+      "collision": -125.6658688322714,
+      "mesh": -125.66586751948313
+    },
+    {
+      "site": "great-blue-hole",
+      "tier": "high",
+      "x": -157.43050033975456,
+      "z": -44.80193984705082,
+      "carvedSurvey": -125,
+      "continuous": -125.60628601135342,
+      "detail": -0.6062860113534251,
+      "collision": -125.60315145522247,
+      "mesh": -125.60315258167716
+    },
+    {
+      "site": "great-blue-hole",
+      "tier": "ultra",
+      "x": -157.43050033975456,
+      "z": -44.80193984705082,
+      "carvedSurvey": -125,
+      "continuous": -125.60628601135342,
+      "detail": -0.6062860113534251,
+      "collision": -125.60315145522247,
+      "mesh": -125.60315258167716
+    }
+  ],
+  "montereyRestored": {
+    "mediumInspection": [
+      {
+        "name": "wide",
+        "camera": [-3428.847959758872, -730.558588480653, -1259.9546917945656],
+        "terrainTriangles": 185424,
+        "terrainDraws": 51,
+        "lodCounts": [7, 10, 34],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 110270,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 130458,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 126786,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 129948,
+            "draws": 10
+          }
+        ],
+        "triangles": 682886
+      },
+      {
+        "name": "toe",
+        "camera": [-3418.0543494773365, -745.9611600454584, -1310.4952863076871],
+        "terrainTriangles": 185216,
+        "terrainDraws": 52,
+        "lodCounts": [7, 12, 33],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 110270,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 130458,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 126786,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 129948,
+            "draws": 10
+          }
+        ],
+        "triangles": 682678
+      },
+      {
+        "name": "oblique",
+        "camera": [-3414.69487763298, -746.1347211017327, -1283.496066832099],
+        "terrainTriangles": 174976,
+        "terrainDraws": 49,
+        "lodCounts": [7, 14, 28],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 110270,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 130458,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 126786,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 129948,
+            "draws": 10
+          }
+        ],
+        "triangles": 672438
+      },
+      {
+        "name": "high",
+        "camera": [-3365.5157553152826, -689.224543609524, -1270.1355032679542],
+        "terrainTriangles": 162688,
+        "terrainDraws": 45,
+        "lodCounts": [7, 11, 27],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 110270,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 130458,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 126786,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 129948,
+            "draws": 10
+          }
+        ],
+        "triangles": 660150
+      },
+      {
+        "name": "cockpit",
+        "camera": [-3400.927430367679, -737.4856699325663, -1332.6740132126156],
+        "terrainTriangles": 185216,
+        "terrainDraws": 52,
+        "lodCounts": [7, 12, 33],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 110270,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 130458,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 126786,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 129948,
+            "draws": 10
+          }
+        ],
+        "triangles": 682678
+      }
+    ],
+    "highGoldenPoses": [
+      {
+        "viewport": [1600, 900],
+        "shot": 2,
+        "position": [-3400.927430367679, -719.41579069787, -1271.837559250192],
+        "yaw": 0,
+        "pitch": 0,
+        "camera": [-3400.927430367679, -715.41579069787, -1283.837559250192],
+        "lookElevation": -0.11528536721242177
+      },
+      {
+        "viewport": [1600, 900],
+        "shot": 3,
+        "position": [-3412.927430367679, -719.41579069787, -1298.837559250192],
+        "yaw": 0.24497866312686414,
+        "pitch": 0,
+        "camera": [-3410.017002867243, -715.41579069787, -1310.479269251936],
+        "lookElevation": -0.19332515476613546
+      },
+      {
+        "viewport": [390, 844],
+        "shot": 2,
+        "position": [-3400.927430367679, -719.41579069787, -1271.837559250192],
+        "yaw": 0,
+        "pitch": 0,
+        "camera": [-3400.927430367679, -715.41579069787, -1283.837559250192],
+        "lookElevation": -0.11528536721242177
+      },
+      {
+        "viewport": [390, 844],
+        "shot": 3,
+        "position": [-3412.927430367679, -719.41579069787, -1298.837559250192],
+        "yaw": 0.24497866312686414,
+        "pitch": 0,
+        "camera": [-3410.017002867243, -715.41579069787, -1310.479269251936],
+        "lookElevation": -0.19332515476613546
+      }
+    ]
+  }
+}

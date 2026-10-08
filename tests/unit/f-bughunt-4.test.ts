@@ -189,13 +189,13 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
     );
     try {
       const u = materials.map((m) => m.material.userData.uniforms);
-      expect(u[0].uDepthShade.value.toArray()).toEqual([12, 100]);
+      expect(u[0].uDepthShade.value.toArray()).toEqual([30, 105]);
       expect(u[1].uDepthShade.value.toArray()).toEqual([0, 0]);
       u[0].uDepthShade.value.set(99, 100);
       u[0].uDepthTint.value.set(0x000000);
       expect(u[1].uDepthShade.value.toArray()).toEqual([0, 0]);
       expect(u[1].uDepthTint.value.getHex()).toBe(0xffffff);
-      expect(u[2].uDepthShade.value.toArray()).toEqual([12, 100]);
+      expect(u[2].uDepthShade.value.toArray()).toEqual([30, 105]);
       expect(u[2].uDepthTint.value.getHex()).not.toBe(0);
     } finally {
       for (const m of materials) {

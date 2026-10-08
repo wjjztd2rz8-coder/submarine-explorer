@@ -79,7 +79,7 @@ const VERTEBRATES: SpeciesDef[] = [
     group: 'Fish',
     archetype: 'school',
     model: 'fish',
-    size: 0.25,
+    size: 0.34,
     depth: [1, 40],
     speed: [0.3, 1.8],
     skittish: 0.35,
