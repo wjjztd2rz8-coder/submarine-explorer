@@ -361,7 +361,7 @@ export class Terrain {
       const fz = THREE.MathUtils.clamp((z + this.halfD) / this.dz, 0, this.rows - 1);
       const c = Math.floor(fx);
       const r = Math.floor(fz);
-      base =
+      const measured =
         monotoneCubic(
           this.cubicRow(c, r - 1, fx - c),
           this.cubicRow(c, r, fx - c),
@@ -369,6 +369,8 @@ export class Terrain {
           this.cubicRow(c, r + 2, fx - c),
           fz - r,
         ) * this.exaggeration;
+      // The cubic replaces the bilinear survey surface, so the site carve must be reapplied.
+      base = this.carve ? this.carve.apply(x, z, measured) : measured;
     }
     return base + this.detailHeight(x, z);
   }
