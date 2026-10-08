@@ -587,3 +587,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged (smoke e2e on main, not pushed, no tag):** Blue Hole horizon fade + darker strata + sponges (wall geometry unchanged, modest gain); Lost City irregular carbonate towers with leaning fingers (clear improvement at lost-city-2; fingers still tubular, Low/phone unchecked). Both Sonnet.
 - **Queue:** 940, 950, 960, 970, 980 (Codex 5h reset 15:50). Held: 930 Beebe worktree. Needs owner: nothing.
+
+## 2026-10-08 16:44 CDT headless run (Claude)
+
+- **Merged:** Blue Hole stepped terraces with lips/undercuts (Sonnet; gallery untouched, ~3/10 -> ~6/10; left wall slightly jagged; Low tier not captured). Gates on main: smoke e2e + project-base passed; not pushed.
+- **Running (Codex):** 940, 950, 960. **Queued:** 970, 980, 990 (Low/phone sweep). Held: 930 Beebe worktree (clean, no change yet).
+- Needs owner: nothing.
