@@ -297,7 +297,7 @@ for (const viewport of [
         await act(page.locator('.pause-surface'), touch);
         const debrief = page.locator('.mission-debrief');
         await expect(debrief).toBeVisible();
-        await expect(debrief.locator('.debrief-title')).toHaveText('Dive ended');
+        await expect(debrief.locator('.debrief-title')).toHaveText('Back at the surface');
         await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText('0');
         await shot('09-debrief-unscanned');
         await act(debrief.locator('[data-action="journal"]'), touch);
@@ -378,6 +378,7 @@ for (const viewport of [
         await expect
           .poll(() => debrief.locator('.debrief-panel').evaluate((e) => e.scrollTop))
           .toBe(0);
+        await act(debrief.locator('.debrief-more-toggle'), touch);
         await act(debrief.locator('[data-action="home"]'), touch);
         await expect(home).toBeVisible();
         await expect(home.locator('.home-menu')).toBeVisible();

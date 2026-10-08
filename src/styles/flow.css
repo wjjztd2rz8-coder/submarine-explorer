@@ -157,6 +157,39 @@
   text-decoration: underline;
   text-underline-offset: 4px;
 }
+.debrief-secondary {
+  align-items: center;
+}
+.debrief-more {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.debrief-more-items[hidden] {
+  display: none;
+}
+.debrief-more-toggle {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-family: inherit;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 8px;
+  cursor: pointer;
+  opacity: 0.75;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-size: clamp(14px, calc(14px * var(--ui-scale)), 20px);
+  letter-spacing: 0.04em;
+}
+.debrief-more-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 .debrief-lists {
   grid-template-columns: minmax(0, 1fr);
   gap: 12px;
@@ -183,7 +216,7 @@
     flex: 1;
   }
   .debrief-secondary {
-    justify-content: space-between;
+    justify-content: flex-start;
   }
   .debrief-stat {
     padding-inline: 6px;

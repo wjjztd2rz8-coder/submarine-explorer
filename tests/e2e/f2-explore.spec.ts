@@ -180,6 +180,8 @@ test('samples collect per dive, appear in mission debrief, and reset on restart'
     await page.evaluate(() => (window.__game as unknown as Game).explore.summary().found),
   ).toBe(0);
   await shot(page, 'sample-debrief');
+  const more = page.locator('.mission-debrief .debrief-more-toggle');
+  if (await more.count()) await more.click();
   await page.getByRole('button', { name: 'Dive again', exact: true }).click();
   await page.waitForFunction(
     () => window.__gameReady && (window.__game as unknown as Game).explore?.ready,

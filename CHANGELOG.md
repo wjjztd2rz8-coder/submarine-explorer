@@ -23,6 +23,14 @@ without an entry here is not done.
   dark, teal and sparsely populated. Add sourced sablefish Journal copy;
   paired screenshot review is pending sandbox browser access. Evidence:
   `plan/progress/F-MONTEREY-860.md`.
+- Debrief and Journal first-session polish (debrief-journal). Partial dives now
+  read "Back at the surface" with "You found N of M — the rest are still down
+  there." instead of "Dive ended / Primary objectives unfinished". The debrief
+  shows one filled primary button plus at most two quiet text links; remaining
+  actions sit under a "More" disclosure. The Journal collapses every unscanned
+  target of a site into one "N more to find" row instead of "Unscanned target
+  2..7" rows. Reason: the old wording read as failure and the dead rows and
+  five actions were noise.
 - Phase F, F-BLUEHOLE-770 second gate follow-up: fit the hidden cockpit before
   the save-soak resource warm-up. Reason: its first render callback replaced
   three Low-tier placeholder geometries after Three captured the render list,
