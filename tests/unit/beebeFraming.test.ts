@@ -83,10 +83,25 @@ describe('Beebe opening keeps its active main stack beside the hull', () => {
           terrain.sampleHeight(rig.camera.position.x, rig.camera.position.z) +
             config.camera.terrainClearance,
         );
+        const offset = rig.camera.position.clone().sub(pos);
+        const aft = new Vector3(-Math.sin(pose.yaw), 0, Math.cos(pose.yaw));
+        const horizontal = offset.clone().setY(0).normalize();
+        const angle = (Math.acos(horizontal.dot(aft)) * 180) / Math.PI;
+        expect(angle).toBeGreaterThan(25);
+        expect(angle).toBeLessThan(45);
+        const elevation = (Math.atan2(offset.y, Math.hypot(offset.x, offset.z)) * 180) / Math.PI;
+        expect(elevation).toBeGreaterThan(8);
+        expect(elevation).toBeLessThan(22);
         for (const aspect of [1600 / 900, 390 / 844]) {
           rig.setAspect(aspect);
           rig.camera.updateMatrixWorld(true);
           const hull = hullScreen(sub, rig);
+          const bow = sub.group.localToWorld(new Vector3(0, 0, -10)).project(rig.camera);
+          const stern = sub.group.localToWorld(new Vector3(0, 0, 10)).project(rig.camera);
+          // Judge the longitudinal axis in pixels: portrait NDC stretches X and Y differently.
+          const dx = (bow.x - stern.x) * aspect;
+          const dy = bow.y - stern.y;
+          expect(Math.abs(dy / dx)).toBeLessThan(0.55);
           const orifice = hero.root.localToWorld(new Vector3(0, top, 0)).project(rig.camera);
           expect(orifice.x).toBeLessThan(-0.1);
           for (const edge of [hull.min, hull.max]) {

@@ -1,0 +1,412 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms, shaders and opening presets 1`] = `
+{
+  "axial-seamount-ashes": {
+    "biome": "a43c11d2a8c38441d88be9ffc1797c8de88d83efd73069832cb8f44f62c9b157",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
+        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
+        "uniforms": "fe9ac8c130dcce1ffedda207c264551c5fe1781224be3e6d22125fed3f593681",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "fe9ac8c130dcce1ffedda207c264551c5fe1781224be3e6d22125fed3f593681",
+      },
+    },
+  },
+  "bismarck": {
+    "biome": "98e0534e18bd2243fe7484a1941be86f3c47c0d3aa37acb3fe5b9b911e6be896",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
+        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
+        "uniforms": "f60b9de3d0e3f1de8f199008a0835aeb31cd5ed7055b0bf3e6ddd077a75db4d2",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "f60b9de3d0e3f1de8f199008a0835aeb31cd5ed7055b0bf3e6ddd077a75db4d2",
+      },
+    },
+  },
+  "blake-plateau-corals": {
+    "biome": "743029cd79c23cbd6a21da0bbf1e8345df7c0c697b67486d77188a99dc60420e",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
+        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
+        "uniforms": "506a2317e6c77ee20d902f0564d17fc1426283433aa878cb045af3c092bbea6b",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "506a2317e6c77ee20d902f0564d17fc1426283433aa878cb045af3c092bbea6b",
+      },
+    },
+  },
+  "challenger-deep": {
+    "biome": "32cae57dcd6998d683cc8d72c7f20720211fd0a75415abc51aac39edc3437e2e",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
+        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
+        "uniforms": "f1253ad03457a236778a50c63008254780200174747438077e44c379dce8745e",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "f1253ad03457a236778a50c63008254780200174747438077e44c379dce8745e",
+      },
+    },
+  },
+  "endurance": {
+    "biome": "32c40c9c35827722ebe20554eec3d03607fdd32bab6a152a7e39d0681bbbbbfb",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
+        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
+        "uniforms": "95888cf243af4f99b702c0a98641f006d285ede5e154c6bdfacda9b0d95fc42c",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "95888cf243af4f99b702c0a98641f006d285ede5e154c6bdfacda9b0d95fc42c",
+      },
+    },
+  },
+  "great-blue-hole": {
+    "biome": "c16537e38f91ffdc55b5fb450960788a5d5b1a96d76877a7c92388ccb0c7a064",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
+        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
+        "uniforms": "3d961fa25f3cbccfcac63b92c4ffa5d8cc6a36f66ca93ea34d3f3322e6c11288",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "3d961fa25f3cbccfcac63b92c4ffa5d8cc6a36f66ca93ea34d3f3322e6c11288",
+      },
+    },
+  },
+  "hudson-canyon": {
+    "biome": "f58f3f6a32d64010179d7095ce684215d1f1fefd2465b5a12813f284c7b5261f",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
+        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
+        "uniforms": "e2f359812fce59ce8cf1fe8a1acc542d35cbac943fd0174a6906010ff13dacd8",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "e2f359812fce59ce8cf1fe8a1acc542d35cbac943fd0174a6906010ff13dacd8",
+      },
+    },
+  },
+  "hunga-tonga-caldera": {
+    "biome": "65b5b4c4cad2774c927bc9dee2d658ecc5870de78a1ddeb69067e50994881859",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
+        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
+        "uniforms": "b7b4b3191e7babae109bd908163b6d193cdc36f4c3cf17d3bcbb797cd9947918",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "b7b4b3191e7babae109bd908163b6d193cdc36f4c3cf17d3bcbb797cd9947918",
+      },
+    },
+  },
+  "kamaehuakanaloa": {
+    "biome": "214c5c2275f0dd26606460b2fb2eaa32ce3af0f10efacf18bb746c0f3d19423a",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
+        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
+        "uniforms": "e060c0e2e56387bfe78d1c7d406ab0d00e669e00229282c65c0bb5dd6d575e9c",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "e060c0e2e56387bfe78d1c7d406ab0d00e669e00229282c65c0bb5dd6d575e9c",
+      },
+    },
+  },
+  "lost-city": {
+    "biome": "1776cf8fa6b2b0c0cc891bb7a70d3abf51f6a23f5a56ca07fea8c8f34ac5aadf",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "color": "eff305eb332697dc3c0374f237989c5b985712e32ab3a57ae8b5621bd90efaa7",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
+        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
+        "uniforms": "25958b0fa7e7eea04b94f4601ef5195bd10bfa127c56a469ff7f8bd20664c50b",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "color": "13f678f3bf2f7dbb9196a62f814a3643f02f7509d6f5f1e62e54bb4696bd8329",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "25958b0fa7e7eea04b94f4601ef5195bd10bfa127c56a469ff7f8bd20664c50b",
+      },
+    },
+  },
+  "monterey-canyon": {
+    "biome": "4d142b977dfe2df97074a1dd936f5a51ab22b78efcc8bc64a76b90200c3eb639",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "60e85f7800eda938157cdf4c02e91bc1dadb549c1caf7b4cba9d50623ac98b02",
+            "index": "33f3f65b8909899dbddb9d23ac7ae208a4bd641501e600f2f2b5079f128619d4",
+            "normal": "19b7d7a31b5da2ed4184bae7010cfb2bf120ceeb88df2d9e9264676a6ce8697d",
+            "position": "518d12ac0aca601a31f7c0c71501f43cf822943f6bc2ab970da9bab5721066e0",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP#define TERRAIN_ROCK_DETAIL",
+        "shader": "9d2b9011abe0e42d66f3369e5fca389b86c1f319aa621795ae2bd8aa4e455788",
+        "uniforms": "61d68fadc05ab4ca7ffbb06dc829ab51bb8e3bd055a105f95a3c13630c307168",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "317283bc15d3be878c6f39343195645e2dba82a14cef11b9f756ed861beea573",
+      },
+    },
+  },
+  "spawn": "d218f2afdf7bea5d4e5e560f53100630d09fdd7a7797e2c5412fb453e92004ae",
+  "titanic": {
+    "biome": "f6ff8c51a55e0599fa55b281f87d739723d441f874f5f3944945e085f7377a5f",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP-abyss-fade",
+        "shader": "3a00fdf2ca37761a5a04a680dd65fa5e22373cc8ff6b8e27c95558b53d024775",
+        "uniforms": "eb24a602be7e4cc2ad5f8d0d75f685082a337de9fda4ea267a19bb69d0dc5bdb",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed--abyss-fade",
+        "shader": "594e4e41d62dc43c8f02e26cd262736737dc192b405425337f8a07113dc760da",
+        "uniforms": "eb24a602be7e4cc2ad5f8d0d75f685082a337de9fda4ea267a19bb69d0dc5bdb",
+      },
+    },
+  },
+  "unknown": {
+    "biome": "a85c3136e06d3ba3e0520f3725755313a13b4ede801192c527f38f390896f001",
+    "tiers": {
+      "high": {
+        "buffers": [
+          {
+            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
+            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
+            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+          },
+        ],
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
+        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
+        "uniforms": "1be4a5adc8539823172633f4f45988895541c923b85ca9f99ba4deb2891b848a",
+      },
+      "low": {
+        "buffers": [
+          {
+            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
+            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
+            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+          },
+        ],
+        "cache": "seabed-",
+        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
+        "uniforms": "1be4a5adc8539823172633f4f45988895541c923b85ca9f99ba4deb2891b848a",
+      },
+    },
+  },
+}
+`;

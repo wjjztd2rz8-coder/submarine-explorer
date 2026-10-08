@@ -23,6 +23,15 @@ without an entry here is not done.
   dark, teal and sparsely populated. Add sourced sablefish Journal copy;
   paired screenshot review is pending sandbox browser access. Evidence:
   `plan/progress/F-MONTEREY-860.md`.
+- Phase F, F-BEEBE-850: vary Beebe's outer seabed through existing sand/rubble/basalt
+  slots, cooler sediment/cobble patches and stronger ripples; reuse 780's distant
+  seabed fade to fog. Add tier-scaled tube-worm/mussel clumps and chimney rubble on
+  the three smokers' cooler flow margins, and widen/elevate only Beebe's opening
+  chase view so hull length reads beside the main stack. Reason: the outer floor
+  was sparse and flat orange, with a hard skyline and foreshortened sub. Frozen
+  non-Beebe rendering fingerprints guard isolation; rendered after QA remains
+  blocked by sandbox browser/localhost restrictions. Evidence: `plan/progress/F-BEEBE-850.md`.
+
 - Debrief and Journal first-session polish (debrief-journal). Partial dives now
   read "Back at the surface" with "You found N of M — the rest are still down
   there." instead of "Dive ended / Primary objectives unfinished". The debrief

@@ -134,10 +134,10 @@ const FREE_DIVE_OPENINGS: Record<
     fromCentre: true,
     altitude: 8,
     yawOffset: 11,
-    // Shift the eye sideways to clear the stack and the scan reticle, level with the sub (650 + 680).
+    // Three-quarter stern view: show hull length and deck, with the smoker to port.
     chaseRadius: 54,
-    chaseOffsetX: -24,
-    chaseOffsetY: -38,
+    chaseOffsetX: -48,
+    chaseOffsetY: -12,
   },
   // Inside the hole, facing the ledge alcove across the water: the wall, the light shafts
   // and the fish above the ledge share the frame instead of a bare rim.
