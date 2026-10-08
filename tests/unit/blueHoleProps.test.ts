@@ -23,7 +23,10 @@ const ground = (x: number, z: number): number => carve.apply(x, z, -4);
 describe('Great Blue Hole props', () => {
   const cfg = DEFAULT_CONFIG.props;
   const { props } = parsePropsDoc(doc, cfg);
-  const geo = props.filter((p) => p.procedural === 'geo' && isGeoFeature(p.feature ?? ''));
+  const geo = props.filter(
+    (p) =>
+      p.id !== 'blue-hole-wall-relief' && p.procedural === 'geo' && isGeoFeature(p.feature ?? ''),
+  );
 
   it('has a seated grotto at the hole', () => {
     expect(geo.length).toBeGreaterThan(0);
@@ -83,7 +86,7 @@ describe('Great Blue Hole props', () => {
     });
   }
 
-  for (const tier of ['low', 'high']) {
+  for (const tier of ['low', 'medium', 'high', 'ultra']) {
     it(`east ${tier}: has a roof over the mouth, pendant clearance and a clear close camera`, () => {
       const def = geo.find((p) => p.id === 'karst-grotto-east')!;
       const { x, z } = latLonToWorld(meta, def.lat, def.lon);
@@ -189,5 +192,61 @@ describe('Great Blue Hole props', () => {
         expect(projected.z).toBeLessThan(1);
       }
     });
+  }
+
+  for (const tier of ['low', 'high']) {
+    for (const def of geo) {
+      it(`${def.id} ${tier}: is a wall ledge with a buried rear and a supported underside`, () => {
+        const { x, z } = latLonToWorld(meta, def.lat, def.lon);
+        const originY = ground(x, z);
+        const q = headingQuaternion(def.headingDeg);
+        const localGround = (lx: number, lz: number): number => {
+          const p = new THREE.Vector3(lx, 0, lz).applyQuaternion(q);
+          return ground(x + p.x, z + p.z) - originY;
+        };
+        const built = buildGeo({
+          def,
+          dims: def.dimensionsM!,
+          seed: hashString(def.id),
+          cfg,
+          tier,
+          groundHeight: () => localGround,
+        });
+        const roof = built.full.getObjectByName('grotto-overhang') as THREE.Mesh;
+        built.full.updateMatrixWorld(true);
+        const [W, D, H] = def.dimensionsM!;
+        const pos = roof.geometry.getAttribute('position');
+        let rear = 0,
+          buried = 0;
+        for (let i = 0; i < pos.count; i++) {
+          const lx = pos.getX(i),
+            ly = pos.getY(i),
+            lz = pos.getZ(i);
+          // The roof no longer rises into a separate rounded crest.
+          expect(ly - localGround(lx, 0)).toBeLessThan(H * 0.8 + 1);
+          if (lz > D * 0.75 && Math.abs(lx) < W * 0.3) {
+            rear++;
+            if (ly < localGround(lx, lz)) buried++;
+          }
+        }
+        expect(rear).toBeGreaterThan(10);
+        expect(buried / rear).toBeGreaterThan(0.95);
+        // Upward rays from the cavity hit the lip well above the ledge.
+        let supported = 0;
+        for (const lx of [-W * 0.1, 0, W * 0.1]) {
+          for (const lz of [-D * 0.3, -D * 0.5]) {
+            const hit = new THREE.Raycaster(
+              new THREE.Vector3(lx, localGround(lx, lz) + 0.5, lz),
+              new THREE.Vector3(0, 1, 0),
+            ).intersectObject(roof)[0];
+            if (hit && hit.point.y > localGround(lx, lz) + 3) supported++;
+          }
+        }
+        expect(supported).toBeGreaterThanOrEqual(4);
+        expect(
+          (built.full.getObjectByName('fallen-blocks') as THREE.InstancedMesh).count,
+        ).toBeGreaterThan(20);
+      });
+    }
   }
 });
