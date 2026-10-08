@@ -945,6 +945,15 @@
     line-height: 13px;
     letter-spacing: 0;
   }
+  /* Keep the current readout on one line so the panel clears the touch buttons. */
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-current {
+    gap: 3px;
+    white-space: nowrap;
+    font-size: 10px;
+  }
+  html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-current-arrow {
+    width: 1em;
+  }
   html.is-touch .onboard-card {
     left: calc(132px + env(safe-area-inset-left, 0px));
     right: calc(12px + env(safe-area-inset-right, 0px));
