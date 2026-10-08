@@ -23,6 +23,13 @@ without an entry here is not done.
   without changing spawn heuristics or art. Preserve legacy route credit and
   add Low/Medium/High spawn regressions plus optional `GOLDEN_MODE=mission`
   captures with a `-mission` suffix. Evidence: `plan/progress/F-MISSION-940.md`.
+- Phase F, F-BEEBE-930: blend Beebe's main smoker sediment apron with the
+  surrounding 850 seabed using its existing world-space material and shared
+  texture uniforms. Remove the pale radial tint while retaining the noisy buried
+  edge, all chimney/clump geometry and opening composition. Reason: the plain
+  cream patch read as a plate in close-ups. The blue oval is the cockpit bezel;
+  shared cockpit rendering is retained. Evidence: `plan/progress/F-BEEBE-930.md`.
+- Great Blue Hole wall: irregular stepped terraces (treads, steep risers, crest lips and undercut dips) between about -34 and -100 m, via `blueHoleTerraces` in the carve; both gallery mouths are masked out so the stalactite gallery is unchanged. Heightfield-only, so mesh, physics and collision agree.
 
 - Lost City towers: irregular carbonate columns (twisting elliptical sections, partial one-sided ledges, meandering flowstone ridges, dark flow seams) with leaning side fingers; the saucer flanges are fewer and narrower (main tower 7 to 4) so the silhouette is no longer stacked cones.
 

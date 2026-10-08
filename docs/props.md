@@ -54,6 +54,13 @@ footprint snap, including when replaced in the placement tool.
 All four builders are deterministic from `hashString(id)` and use `MeshStandardMaterial`, so
 fog and the headlights light them like the terrain. None of them glow (art-direction §4).
 
+Procedural builders may receive an optional `seabedMaterial` in
+`ProceduralBuildInput`. Beebe's main smoker apron uses it to share the supporting
+terrain's world-space shader and live texture uniforms. The apron owns a separate
+material wrapper; the terrain retains ownership of the shared textures. Other
+props do not receive this option. Without a supporting material, standalone Beebe
+builders use the same biome through the terrain material factory.
+
 - **`procedural:hull-block`**: `dimensions_m` = [length along heading, beam, height]. Every hull has a
   bilge taper toward the keel (`hullKeelFraction`), a rubbing strake down each side, and 2–4 deck
   houses and some vents amidships. Each end is shaped by `ends` (forward = local −Z, aft = +Z):

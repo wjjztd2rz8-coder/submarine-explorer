@@ -1,5 +1,8 @@
 /** Local sediment and broken sulfide around Beebe's opening smoker cluster. */
 import * as THREE from 'three';
+import { DEFAULT_CONFIG, isGraphicsTier } from '../../../core/Config.js';
+import { biomeFor } from '../../TerrainBiome.js';
+import { createTerrainMaterial } from '../../TerrainMaterial.js';
 import type { ProceduralBuildInput } from '../builders/shared.js';
 import { geoDetail } from './detail.js';
 import {
@@ -66,7 +69,23 @@ function settings(input: ProceduralBuildInput): BeebeSeabed | undefined {
   return value as unknown as BeebeSeabed;
 }
 
-/** Append an opaque, terrain-following apron; its buried rim avoids a visible decal edge. */
+/** Supporting terrain material, without loading another set of seabed textures. */
+export function beebeSeabedMaterial(ground: {
+  sampleHeight(x: number, z: number): number;
+  group?: THREE.Group;
+}): THREE.MeshStandardMaterial | undefined {
+  for (const child of ground.group?.children ?? []) {
+    if (
+      child instanceof THREE.Mesh &&
+      child.material instanceof THREE.MeshStandardMaterial &&
+      child.material.name === 'seabed'
+    )
+      return child.material;
+  }
+  return;
+}
+
+/** Append a terrain-following apron; world-space seabed shading hides its buried, noisy outline. */
 function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp {
   const cfg = settings(input);
   if (!cfg) return built;
@@ -114,8 +133,36 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
     out.lerp(stain, smooth(0.4, 0.75, n) * cfg.stain_amount * (1 - smooth(0.65, 1, r)));
     out.multiplyScalar(0.88 + grain * 0.24);
   };
-  paint(apron, (x, _y, z, _ny, out) => color(x, z, out, false));
+  // Keep every supporting height (and therefore the 850 clumps) unchanged. The plate
+  // came from a plain pale material with radial edge tint, not the height mesh.
+  // A neutral cavity lets this mesh use exactly the surrounding floor's shader.
+  apron.setAttribute(
+    'aCavity',
+    new THREE.BufferAttribute(new Float32Array(apron.getAttribute('position').count).fill(0.5), 1),
+  );
+  const supporting =
+    input.seabedMaterial ??
+    createTerrainMaterial({
+      config: DEFAULT_CONFIG.terrain,
+      tier: isGraphicsTier(input.tier) ? input.tier : 'high',
+      biome: biomeFor('beebe-vent-field'),
+      exaggeration: 1,
+    }).material;
   const material = new THREE.MeshStandardMaterial({
+    color: supporting.color,
+    roughness: supporting.roughness,
+    metalness: supporting.metalness,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
+  });
+  // A separate material owns its lifetime, while maps/uniforms remain terrain-owned.
+  // The world-space projection continues across the join despite the prop's heading.
+  material.name = 'beebe-seabed-blend';
+  material.onBeforeCompile = supporting.onBeforeCompile;
+  material.customProgramCacheKey = supporting.customProgramCacheKey;
+  material.userData.uniforms = supporting.userData.uniforms;
+  const rubbleMaterial = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     vertexColors: true,
     roughness: 1,
@@ -154,7 +201,7 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
     built.bounds.union(geometry.boundingBox!);
-    const talus = new THREE.Mesh(geometry, material);
+    const talus = new THREE.Mesh(geometry, rubbleMaterial);
     talus.name = 'beebe-seabed-talus';
     built.full.add(talus);
   }

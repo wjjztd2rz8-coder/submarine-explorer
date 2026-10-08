@@ -79,6 +79,39 @@ function boulderField(dx: number, dz: number): number {
   return h;
 }
 
+const clamp01 = (t: number): number => Math.max(0, Math.min(1, t));
+
+/**
+ * Irregular benches on the sinkhole wall: the profile height is quantised into
+ * treads and steep risers (period and phase wander with bearing, so no ring is
+ * constant), with a small raised lip at each riser crest and a dip under it
+ * that the slope shading reads as an undercut shadow. Returns a height delta.
+ * Zone: heights -34..-100 m; the mouth mask in blueHoleWallRelief keeps both
+ * gallery seats untouched.
+ */
+export function blueHoleTerraces(a: number, r: number): number {
+  let mouth = 1;
+  for (const [bearing, width] of [
+    [Math.PI, 0.3],
+    [1.0, 0.25],
+  ]) {
+    const da = Math.abs(Math.atan2(Math.sin(a - bearing!), Math.cos(a - bearing!)));
+    mouth *= smoothstep(clamp01((da - width!) / 0.15));
+  }
+  if (mouth <= 0) return 0;
+  const h = profileAt(r);
+  const zone = smoothstep(clamp01((h + 106) / 8)) * (1 - smoothstep(clamp01((h + 34) / 6)));
+  if (zone <= 0) return 0;
+  const q = 9 + 2.5 * Math.sin(5 * a + 0.7) + 1.5 * Math.sin(11 * a + 2.0);
+  const off = 4 * Math.sin(3 * a + 1.1) + 2 * Math.sin(8 * a);
+  const u = (h + off) / q;
+  const f = u - Math.floor(u);
+  const step = Math.floor(u) + smoothstep(clamp01((f - 0.58) / 0.27));
+  const lip = Math.exp(-(((f - 0.9) / 0.07) ** 2));
+  const under = Math.exp(-(((f - 0.66) / 0.07) ** 2));
+  return mouth * zone * (step * q - off - h + 1.1 * lip - 1.3 * under);
+}
+
 /** Relief is part of the single heightfield, so sand and exposed rock share
  * vertices, derivative normals, material and collision. Suppress displacement
  * around both gallery seats to retain their original mouth and pendant space.
@@ -180,7 +213,13 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
       const blocks = floor * boulderField(dx, dz);
       return Math.min(
         height,
-        profileAt(r) + ledge + ripple + strata + blocks + blueHoleWallRelief(a, r),
+        profileAt(r) +
+          ledge +
+          ripple +
+          strata +
+          blocks +
+          blueHoleWallRelief(a, r) +
+          blueHoleTerraces(a, r),
       );
     },
   };

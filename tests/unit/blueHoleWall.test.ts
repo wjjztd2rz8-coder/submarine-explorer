@@ -8,6 +8,7 @@ import { Terrain } from '../../src/world/Terrain.js';
 import {
   BLUE_HOLE_LAT,
   BLUE_HOLE_LON,
+  blueHoleTerraces,
   blueHoleWallRelief,
 } from '../../src/world/terrainFeatures.js';
 import { latLonToWorld } from '../../src/util/geo.js';
@@ -178,4 +179,22 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
       }
     });
   }
+
+  it('terraces are bounded, seamless and leave both gallery mouths and the floor untouched', () => {
+    let largest = 0;
+    for (let i = 0; i <= 180; i++) {
+      const a = (i / 180) * Math.PI * 2;
+      for (let r = 90; r <= 195; r += 1.5) {
+        const t = blueHoleTerraces(a, r);
+        expect(Number.isFinite(t)).toBe(true);
+        expect(Math.abs(t)).toBeLessThan(10);
+        largest = Math.max(largest, Math.abs(t));
+        if (r <= 100 || r >= 180) expect(t).toBe(0);
+      }
+    }
+    expect(largest).toBeGreaterThan(2);
+    for (const bearing of [Math.PI, 1])
+      for (const r of [120, 139, 150]) expect(blueHoleTerraces(bearing, r)).toBe(0);
+    expect(blueHoleTerraces(1e-4, 139)).toBeCloseTo(blueHoleTerraces(2 * Math.PI + 1e-4, 139), 10);
+  });
 });
