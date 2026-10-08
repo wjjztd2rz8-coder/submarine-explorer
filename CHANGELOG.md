@@ -14,6 +14,26 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-GOLDEN-950 follow-up: reduce Endurance's opening heading offset
+  from 16° to 8° and move its lateral chase camera offset from −26 to −38 m.
+  Reason: the old heading produced a 0.96126 facing dot product, failing the
+  unchanged E2E requirement of > 0.98. Camera separation retains the strict
+  phone-reticle clearance without turning the sub away from the wreck. Add
+  the exact facing regression across every tier and the 1280×720 E2E viewport.
+  No assertions weakened or content cut. Evidence: `plan/progress/F-GOLDEN-950.md`.
+
+- Phase F, F-GOLDEN-950: bring Challenger Deep and Endurance's openings
+  closer to their sampling marker / wooden hull, shorten and offset their
+  chase cameras, and add site-local neutral abyss fill, thinner fog and
+  stronger existing lamps. Stage one budgeted amphipod group at Challenger
+  and one anemone group attached to Endurance's timber, using the existing
+  Journal Game addition tags. Replace distant, nearly empty first-frame
+  defaults because the seabed and targets disappeared into fog. Add both
+  sites to the golden tool and real-tile opening checks across every tier.
+  Fresh before/after captures and rendered acceptance remain blocked by
+  sandbox preview/Chromium restrictions. No content cuts. Evidence:
+  `plan/progress/F-GOLDEN-950.md`.
+
 - Lost City towers: irregular carbonate columns (twisting elliptical sections, partial one-sided ledges, meandering flowstone ridges, dark flow seams) with leaning side fingers; the saucer flanges are fewer and narrower (main tower 7 to 4) so the silhouette is no longer stacked cones.
 
 - Blue Hole bowl: darker lower walls (depth shade 30-105 m), stronger limestone strata, a horizon fade (new biome `horizonFadeM`) that eases the distant seabed into the water colour, sponges on walls and floor, and a larger blue tang. No cuts; the stalactite gallery is unchanged.

@@ -10,7 +10,7 @@ import { Headlights } from '../../render/Headlights.js';
 import { MarineSnow } from '../../render/MarineSnow.js';
 import { Water } from '../../world/Water.js';
 import type { GameSystem } from '../System.js';
-import { MONTEREY_OPENING } from '../../core/Config.js';
+import { MONTEREY_OPENING, deepOpeningFor, deepSiteWater } from '../../core/Config.js';
 import { HemisphereLight } from 'three';
 
 /** The ROV's lamp bar is this share of the sub's headlight separation. */
@@ -21,8 +21,20 @@ export const atmosphereSystem: GameSystem = {
   init(ctx) {
     const { config, tier, scene, bus, settings, terrain } = ctx;
     const atmoTier = atmosphereTier(config.water, tier);
-    const atmosphere = new Atmosphere(scene, config.water, atmoTier, bus);
+    const atmosphere = new Atmosphere(
+      scene,
+      deepSiteWater(ctx.meta.id, config.water),
+      atmoTier,
+      bus,
+    );
     const monterey = ctx.meta.id === 'monterey-canyon';
+    const deep = deepOpeningFor(ctx.meta.id);
+    if (deep) {
+      const fill = deep.hemisphere;
+      const hemisphere = new HemisphereLight(fill.sky, fill.ground, fill.intensity);
+      hemisphere.name = `${ctx.meta.id}Fill`;
+      atmosphere.group.add(hemisphere);
+    }
     if (monterey) {
       const fill = MONTEREY_OPENING.hemisphere;
       const hemisphere = new HemisphereLight(fill.sky, fill.ground, fill.intensity);
@@ -32,7 +44,7 @@ export const atmosphereSystem: GameSystem = {
     const headlights = new Headlights(
       config.water,
       atmoTier,
-      monterey ? MONTEREY_OPENING.lamps : undefined,
+      deep?.lamps ?? (monterey ? MONTEREY_OPENING.lamps : undefined),
     );
     // D-MODES: the lights preset from the gameplay options.
     headlights.setPreset(config.lightPresets[settings.gameplay.lights]);

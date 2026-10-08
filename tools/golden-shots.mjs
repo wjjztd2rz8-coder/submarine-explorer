@@ -1,5 +1,5 @@
 /**
- * Capture the five hero sites for nightly visual review; never builds or starts a server.
+ * Capture the hero sites for nightly visual review; never builds or starts a server.
  *
  * Usage (from the repo root, with Node on PATH):
  *   npm run build
@@ -76,6 +76,8 @@ async function main() {
     ['great-blue-hole', 'karst-grotto-east', 'great-blue-hole-east', blueHolePoses.east],
     ['beebe-vent-field', 'beebe-chimney-1'],
     ['monterey-canyon', 'canyon-wall-ledge', 'monterey-canyon', montereyPoses.wall],
+    ['challenger-deep', 'leggo-lander-marker'],
+    ['endurance', 'main-hull'],
   ].filter(([site, , slug]) => !only || only.includes(site) || only.includes(slug));
   if (
     !heroes.length ||

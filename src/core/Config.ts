@@ -43,6 +43,7 @@ export * from './config/atmosphere.js';
 export * from './config/audio.js';
 export * from './config/camera.js';
 export * from './config/discovery.js';
+export * from './config/deepOpenings.js';
 export * from './config/gameplay.js';
 export * from './config/mission.js';
 export * from './config/monterey.js';

@@ -5,7 +5,8 @@
  */
 
 import { contentUrl, landmarkIdFor } from '../../game/ContentPath.js';
-import { composedFreeDiveSpawn, spawnSettings } from '../../game/Spawn.js';
+import { spawnSettings } from '../../game/Spawn.js';
+import { composedFreeDiveSpawn } from '../../game/DeepOpeningSpawn.js';
 import { Props } from '../../world/Props.js';
 import { PlacementDebug } from '../../world/props/PlacementDebug.js';
 import { PropContact, atSpawnPose, parseAtParam } from '../../world/props/Wiring.js';

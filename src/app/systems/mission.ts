@@ -15,7 +15,8 @@ import {
 } from '../../game/MissionRouter.js';
 import { tileUrl } from '../../ui/MissionSelect.js';
 import type { GameSystem } from '../System.js';
-import { composedMissionSpawn, spawnHeight, spawnSettings } from '../../game/Spawn.js';
+import { spawnHeight, spawnSettings } from '../../game/Spawn.js';
+import { composedMissionSpawn } from '../../game/DeepOpeningSpawn.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
