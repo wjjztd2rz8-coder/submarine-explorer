@@ -117,7 +117,20 @@ export const MONTEREY_FIDELITY: TerrainFidelity = {
 };
 
 export const DEFAULT_TERRAIN: TerrainConfig = {
-  fidelity: { 'monterey-canyon': MONTEREY_FIDELITY },
+  fidelity: {
+    'monterey-canyon': MONTEREY_FIDELITY,
+    // The 320 m sinkhole fits inside six survey cells. Resolve its reconstructed
+    // ledges on the sand/rock surface itself, avoiding intersecting prop skins.
+    'great-blue-hole': {
+      focus: { lat: 17.3156, lon: -87.5356, radiusM: 240, fadeM: 60 },
+      chunkCells: 8,
+      nearSubdiv: { low: 1, medium: 16, high: 32, ultra: 32 },
+      reliefM: 0,
+      reliefWavelengthM: 24,
+      normalStrength: 0.18,
+      wallSegments: { low: [200, 140], medium: [200, 140], high: [200, 140], ultra: [200, 140] },
+    },
+  },
   // 64 source cells x subdiv 2 = a 129x129 vertex chunk, which still fits in
   // 16-bit indices and gives the LOD selector something to actually choose
   // between on a 25 km tile.
