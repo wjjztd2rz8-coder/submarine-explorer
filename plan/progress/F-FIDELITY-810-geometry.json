@@ -1,0 +1,1144 @@
+{
+  "baselineCommit": "355d8e85de801eaf3f079efb1ac220a9a7b1e90c",
+  "measurement": "CPU frustum census of terrain and props only. Not renderer.info; excludes sub, life, particles, post and GPU timings.",
+  "before": [
+    {
+      "tier": "low",
+      "resident": {
+        "chunks": 130,
+        "vertices": 571766,
+        "triangles": 1109290,
+        "visibleChunks": 25,
+        "drawnTriangles": 33792,
+        "lodCounts": [2, 1, 22],
+        "subdiv": 1,
+        "requestedSubdiv": 1,
+        "tier": "low",
+        "textureSize": 1024
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -721.6724860383587,
+        "z": -1324.7993874820036,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 40,
+          "terrainTriangles": 44948,
+          "lodCounts": [2, 2, 36],
+          "propDraws": 28,
+          "propTriangles": 283502
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 25,
+          "terrainTriangles": 33792,
+          "lodCounts": [2, 1, 22],
+          "propDraws": 28,
+          "propTriangles": 283502
+        }
+      ]
+    },
+    {
+      "tier": "medium",
+      "resident": {
+        "chunks": 130,
+        "vertices": 2186288,
+        "triangles": 4305392,
+        "visibleChunks": 25,
+        "drawnTriangles": 139776,
+        "lodCounts": [2, 3, 20],
+        "subdiv": 2,
+        "requestedSubdiv": 2,
+        "tier": "medium",
+        "textureSize": 1024
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -722.3183865127653,
+        "z": -1324.1867299350065,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 40,
+          "terrainTriangles": 205416,
+          "lodCounts": [3, 3, 34],
+          "propDraws": 40,
+          "propTriangles": 449666
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 25,
+          "terrainTriangles": 139776,
+          "lodCounts": [2, 3, 20],
+          "propDraws": 40,
+          "propTriangles": 449666
+        }
+      ]
+    },
+    {
+      "tier": "high",
+      "resident": {
+        "chunks": 130,
+        "vertices": 2186288,
+        "triangles": 4305392,
+        "visibleChunks": 25,
+        "drawnTriangles": 184064,
+        "lodCounts": [3, 5, 17],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -722.3349829107212,
+        "z": -1324.1445527346891,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 40,
+          "terrainTriangles": 262504,
+          "lodCounts": [4, 7, 29],
+          "propDraws": 40,
+          "propTriangles": 578878
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 25,
+          "terrainTriangles": 184064,
+          "lodCounts": [3, 5, 17],
+          "propDraws": 40,
+          "propTriangles": 578878
+        }
+      ]
+    },
+    {
+      "tier": "ultra",
+      "resident": {
+        "chunks": 130,
+        "vertices": 2186288,
+        "triangles": 4305392,
+        "visibleChunks": 25,
+        "drawnTriangles": 184064,
+        "lodCounts": [3, 5, 17],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "ultra",
+        "textureSize": 1024
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -722.3346662331415,
+        "z": -1324.1534180911344,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 40,
+          "terrainTriangles": 262504,
+          "lodCounts": [4, 7, 29],
+          "propDraws": 40,
+          "propTriangles": 879390
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 25,
+          "terrainTriangles": 184064,
+          "lodCounts": [3, 5, 17],
+          "propDraws": 40,
+          "propTriangles": 879390
+        }
+      ]
+    }
+  ],
+  "after": [
+    {
+      "tier": "low",
+      "resident": {
+        "chunks": 130,
+        "vertices": 571766,
+        "triangles": 1109290,
+        "visibleChunks": 25,
+        "drawnTriangles": 33792,
+        "lodCounts": [2, 1, 22],
+        "subdiv": 1,
+        "requestedSubdiv": 1,
+        "tier": "low",
+        "textureSize": 1024
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -721.6724860383587,
+        "z": -1324.7993874820036,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 40,
+          "terrainTriangles": 44948,
+          "lodCounts": [2, 2, 36],
+          "propDraws": 28,
+          "propTriangles": 283502
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 25,
+          "terrainTriangles": 33792,
+          "lodCounts": [2, 1, 22],
+          "propDraws": 28,
+          "propTriangles": 283502
+        }
+      ]
+    },
+    {
+      "tier": "medium",
+      "resident": {
+        "chunks": 190,
+        "vertices": 2280668,
+        "triangles": 4484080,
+        "visibleChunks": 52,
+        "drawnTriangles": 185216,
+        "lodCounts": [7, 12, 33],
+        "subdiv": 2,
+        "requestedSubdiv": 2,
+        "tier": "medium",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 164,
+          "4": 26
+        }
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -722.5320823779148,
+        "z": -1324.334629562692,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 52,
+          "terrainTriangles": 186472,
+          "lodCounts": [7, 11, 34],
+          "propDraws": 40,
+          "propTriangles": 497462
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 33,
+          "terrainTriangles": 125568,
+          "lodCounts": [5, 8, 20],
+          "propDraws": 40,
+          "propTriangles": 497462
+        }
+      ],
+      "scarpViews": [
+        {
+          "name": "wide",
+          "camera": [-3428.847959758872, -730.558588480653, -1259.9546917945656],
+          "terrainTriangles": 185424,
+          "terrainDraws": 51,
+          "lodCounts": [7, 10, 34],
+          "parts": [
+            {
+              "id": "mars-node-marker",
+              "triangles": 0,
+              "draws": 0
+            },
+            {
+              "id": "canyon-wall-ledge",
+              "triangles": 110270,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-east",
+              "triangles": 130458,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-west",
+              "triangles": 126786,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-far",
+              "triangles": 129948,
+              "draws": 10
+            }
+          ],
+          "triangles": 682886
+        },
+        {
+          "name": "toe",
+          "camera": [-3418.0543494773365, -745.9611600454584, -1310.4952863076871],
+          "terrainTriangles": 185216,
+          "terrainDraws": 52,
+          "lodCounts": [7, 12, 33],
+          "parts": [
+            {
+              "id": "mars-node-marker",
+              "triangles": 0,
+              "draws": 0
+            },
+            {
+              "id": "canyon-wall-ledge",
+              "triangles": 110270,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-east",
+              "triangles": 130458,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-west",
+              "triangles": 126786,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-far",
+              "triangles": 129948,
+              "draws": 10
+            }
+          ],
+          "triangles": 682678
+        },
+        {
+          "name": "oblique",
+          "camera": [-3414.69487763298, -746.1347211017327, -1283.496066832099],
+          "terrainTriangles": 174976,
+          "terrainDraws": 49,
+          "lodCounts": [7, 14, 28],
+          "parts": [
+            {
+              "id": "mars-node-marker",
+              "triangles": 0,
+              "draws": 0
+            },
+            {
+              "id": "canyon-wall-ledge",
+              "triangles": 110270,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-east",
+              "triangles": 130458,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-west",
+              "triangles": 126786,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-far",
+              "triangles": 129948,
+              "draws": 10
+            }
+          ],
+          "triangles": 672438
+        },
+        {
+          "name": "high",
+          "camera": [-3365.5157553152826, -689.224543609524, -1270.1355032679542],
+          "terrainTriangles": 162688,
+          "terrainDraws": 45,
+          "lodCounts": [7, 11, 27],
+          "parts": [
+            {
+              "id": "mars-node-marker",
+              "triangles": 0,
+              "draws": 0
+            },
+            {
+              "id": "canyon-wall-ledge",
+              "triangles": 110270,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-east",
+              "triangles": 130458,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-west",
+              "triangles": 126786,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-far",
+              "triangles": 129948,
+              "draws": 10
+            }
+          ],
+          "triangles": 660150
+        },
+        {
+          "name": "cockpit",
+          "camera": [-3400.927430367679, -737.4856699325663, -1332.6740132126156],
+          "terrainTriangles": 185216,
+          "terrainDraws": 52,
+          "lodCounts": [7, 12, 33],
+          "parts": [
+            {
+              "id": "mars-node-marker",
+              "triangles": 0,
+              "draws": 0
+            },
+            {
+              "id": "canyon-wall-ledge",
+              "triangles": 110270,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-east",
+              "triangles": 130458,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-west",
+              "triangles": 126786,
+              "draws": 10
+            },
+            {
+              "id": "canyon-wall-far",
+              "triangles": 129948,
+              "draws": 10
+            }
+          ],
+          "triangles": 682678
+        }
+      ]
+    },
+    {
+      "tier": "high",
+      "resident": {
+        "chunks": 190,
+        "vertices": 2610140,
+        "triangles": 5136368,
+        "visibleChunks": 33,
+        "drawnTriangles": 397824,
+        "lodCounts": [10, 6, 17],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 164,
+          "8": 26
+        }
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -722.5013231999111,
+        "z": -1324.8593182833952,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 52,
+          "terrainTriangles": 579944,
+          "lodCounts": [15, 8, 29],
+          "propDraws": 40,
+          "propTriangles": 1381798
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 33,
+          "terrainTriangles": 397824,
+          "lodCounts": [10, 6, 17],
+          "propDraws": 40,
+          "propTriangles": 1381798
+        }
+      ],
+      "plannedShots": [
+        {
+          "viewport": [1600, 900],
+          "shot": 2,
+          "position": [-3400.927430367679, -719.41579069787, -1271.837559250192],
+          "yaw": 0,
+          "pitch": 0,
+          "camera": [-3400.927430367679, -715.41579069787, -1283.837559250192],
+          "lookElevation": -0.11528536721242177
+        },
+        {
+          "viewport": [1600, 900],
+          "shot": 3,
+          "position": [-3412.927430367679, -719.41579069787, -1298.837559250192],
+          "yaw": 0.24497866312686414,
+          "pitch": 0,
+          "camera": [-3410.017002867243, -715.41579069787, -1310.479269251936],
+          "lookElevation": -0.19332515476613546
+        },
+        {
+          "viewport": [390, 844],
+          "shot": 2,
+          "position": [-3400.927430367679, -719.41579069787, -1271.837559250192],
+          "yaw": 0,
+          "pitch": 0,
+          "camera": [-3400.927430367679, -715.41579069787, -1283.837559250192],
+          "lookElevation": -0.11528536721242177
+        },
+        {
+          "viewport": [390, 844],
+          "shot": 3,
+          "position": [-3412.927430367679, -719.41579069787, -1298.837559250192],
+          "yaw": 0.24497866312686414,
+          "pitch": 0,
+          "camera": [-3410.017002867243, -715.41579069787, -1310.479269251936],
+          "lookElevation": -0.19332515476613546
+        }
+      ]
+    },
+    {
+      "tier": "ultra",
+      "resident": {
+        "chunks": 190,
+        "vertices": 2610140,
+        "triangles": 5136368,
+        "visibleChunks": 33,
+        "drawnTriangles": 397824,
+        "lodCounts": [10, 6, 17],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "ultra",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 164,
+          "8": 26
+        }
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -722.4946312295575,
+        "z": -1324.3993706973356,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 52,
+          "terrainTriangles": 579944,
+          "lodCounts": [15, 8, 29],
+          "propDraws": 40,
+          "propTriangles": 2122590
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 33,
+          "terrainTriangles": 397824,
+          "lodCounts": [10, 6, 17],
+          "propDraws": 40,
+          "propTriangles": 2122590
+        }
+      ]
+    }
+  ],
+  "preGateFix": [
+    {
+      "tier": "low",
+      "resident": {
+        "chunks": 130,
+        "vertices": 571766,
+        "triangles": 1109290,
+        "visibleChunks": 25,
+        "drawnTriangles": 33792,
+        "lodCounts": [2, 1, 22],
+        "subdiv": 1,
+        "requestedSubdiv": 1,
+        "tier": "low",
+        "textureSize": 1024
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -721.6724860383587,
+        "z": -1324.7993874820036,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 40,
+          "terrainTriangles": 44948,
+          "lodCounts": [2, 2, 36],
+          "propDraws": 28,
+          "propTriangles": 283502
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 25,
+          "terrainTriangles": 33792,
+          "lodCounts": [2, 1, 22],
+          "propDraws": 28,
+          "propTriangles": 283502
+        }
+      ]
+    },
+    {
+      "tier": "medium",
+      "resident": {
+        "chunks": 190,
+        "vertices": 2280668,
+        "triangles": 4484080,
+        "visibleChunks": 33,
+        "drawnTriangles": 125568,
+        "lodCounts": [5, 8, 20],
+        "subdiv": 2,
+        "requestedSubdiv": 2,
+        "tier": "medium",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 164,
+          "4": 26
+        }
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -722.5440614748265,
+        "z": -1324.9362454684538,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 52,
+          "terrainTriangles": 211560,
+          "lodCounts": [8, 10, 34],
+          "propDraws": 40,
+          "propTriangles": 611262
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 33,
+          "terrainTriangles": 125568,
+          "lodCounts": [5, 8, 20],
+          "propDraws": 40,
+          "propTriangles": 611262
+        }
+      ]
+    },
+    {
+      "tier": "high",
+      "resident": {
+        "chunks": 190,
+        "vertices": 2610140,
+        "triangles": 5136368,
+        "visibleChunks": 33,
+        "drawnTriangles": 422912,
+        "lodCounts": [11, 5, 17],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 164,
+          "8": 26
+        }
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -722.5013231999111,
+        "z": -1324.8593182833952,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 52,
+          "terrainTriangles": 605032,
+          "lodCounts": [16, 7, 29],
+          "propDraws": 40,
+          "propTriangles": 1381798
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 33,
+          "terrainTriangles": 422912,
+          "lodCounts": [11, 5, 17],
+          "propDraws": 40,
+          "propTriangles": 1381798
+        }
+      ],
+      "plannedShots": [
+        {
+          "viewport": [1600, 900],
+          "shot": 2,
+          "position": [-3400.927430367679, -719.41579069787, -1271.837559250192],
+          "yaw": 0,
+          "pitch": 0,
+          "camera": [-3400.927430367679, -715.41579069787, -1283.837559250192],
+          "lookElevation": -0.11528536721242177
+        },
+        {
+          "viewport": [1600, 900],
+          "shot": 3,
+          "position": [-3412.927430367679, -719.41579069787, -1298.837559250192],
+          "yaw": 0.24497866312686414,
+          "pitch": 0,
+          "camera": [-3410.017002867243, -715.41579069787, -1310.479269251936],
+          "lookElevation": -0.19332515476613546
+        },
+        {
+          "viewport": [390, 844],
+          "shot": 2,
+          "position": [-3400.927430367679, -719.41579069787, -1271.837559250192],
+          "yaw": 0,
+          "pitch": 0,
+          "camera": [-3400.927430367679, -715.41579069787, -1283.837559250192],
+          "lookElevation": -0.11528536721242177
+        },
+        {
+          "viewport": [390, 844],
+          "shot": 3,
+          "position": [-3412.927430367679, -719.41579069787, -1298.837559250192],
+          "yaw": 0.24497866312686414,
+          "pitch": 0,
+          "camera": [-3410.017002867243, -715.41579069787, -1310.479269251936],
+          "lookElevation": -0.19332515476613546
+        }
+      ]
+    },
+    {
+      "tier": "ultra",
+      "resident": {
+        "chunks": 190,
+        "vertices": 2610140,
+        "triangles": 5136368,
+        "visibleChunks": 33,
+        "drawnTriangles": 422912,
+        "lodCounts": [11, 5, 17],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "ultra",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 164,
+          "8": 26
+        }
+      },
+      "pose": {
+        "x": -3400.927430367679,
+        "y": -722.4946312295575,
+        "z": -1324.3993706973356,
+        "yaw": 0.17453292519943295,
+        "chaseOffsetX": 20,
+        "chaseOffsetY": -14
+      },
+      "views": [
+        {
+          "viewport": [1600, 900],
+          "terrainDraws": 52,
+          "terrainTriangles": 605032,
+          "lodCounts": [16, 7, 29],
+          "propDraws": 40,
+          "propTriangles": 2122590
+        },
+        {
+          "viewport": [390, 844],
+          "terrainDraws": 33,
+          "terrainTriangles": 422912,
+          "lodCounts": [11, 5, 17],
+          "propDraws": 40,
+          "propTriangles": 2122590
+        }
+      ]
+    }
+  ],
+  "gateFix": {
+    "externalFailure": {
+      "spec": "tests/e2e/f-geo-scarp.spec.ts",
+      "tier": "medium",
+      "draws": 117,
+      "triangles": 1027690,
+      "strictTriangleLimit": 900000
+    },
+    "scarpViewsBeforeFix": [
+      {
+        "name": "wide",
+        "camera": [-3429.3011075517725, -730.4489313462319, -1260.6529543549395],
+        "terrainTriangles": 210512,
+        "terrainDraws": 51,
+        "lodCounts": [8, 9, 34],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 124950,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 163498,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 159826,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 162988,
+            "draws": 10
+          }
+        ],
+        "triangles": 821774
+      },
+      {
+        "name": "toe",
+        "camera": [-3418.282184770338, -745.9109528796075, -1311.1015016534482],
+        "terrainTriangles": 209664,
+        "terrainDraws": 51,
+        "lodCounts": [8, 10, 33],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 124950,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 163498,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 159826,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 162988,
+            "draws": 10
+          }
+        ],
+        "triangles": 820926
+      },
+      {
+        "name": "oblique",
+        "camera": [-3415.1408889529125, -746.047748064997, -1283.958544983544],
+        "terrainTriangles": 174976,
+        "terrainDraws": 49,
+        "lodCounts": [7, 14, 28],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 124950,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 163498,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 159826,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 162988,
+            "draws": 10
+          }
+        ],
+        "triangles": 786238
+      },
+      {
+        "name": "high",
+        "camera": [-3364.9013407480165, -689.1124495344552, -1270.8875334488982],
+        "terrainTriangles": 171392,
+        "terrainDraws": 46,
+        "lodCounts": [7, 12, 27],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 124950,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 163498,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 159826,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 162988,
+            "draws": 10
+          }
+        ],
+        "triangles": 782654
+      },
+      {
+        "name": "cockpit",
+        "camera": [-3400.927430367679, -737.3405110109157, -1333.2756291183773],
+        "terrainTriangles": 223104,
+        "terrainDraws": 52,
+        "lodCounts": [10, 9, 33],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 124950,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 163498,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 159826,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 162988,
+            "draws": 10
+          }
+        ],
+        "triangles": 834366
+      }
+    ],
+    "scarpViewsAfterFix": [
+      {
+        "name": "wide",
+        "camera": [-3428.847959758872, -730.558588480653, -1259.9546917945656],
+        "terrainTriangles": 185424,
+        "terrainDraws": 51,
+        "lodCounts": [7, 10, 34],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 110270,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 130458,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 126786,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 129948,
+            "draws": 10
+          }
+        ],
+        "triangles": 682886
+      },
+      {
+        "name": "toe",
+        "camera": [-3418.0543494773365, -745.9611600454584, -1310.4952863076871],
+        "terrainTriangles": 185216,
+        "terrainDraws": 52,
+        "lodCounts": [7, 12, 33],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 110270,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 130458,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 126786,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 129948,
+            "draws": 10
+          }
+        ],
+        "triangles": 682678
+      },
+      {
+        "name": "oblique",
+        "camera": [-3414.69487763298, -746.1347211017327, -1283.496066832099],
+        "terrainTriangles": 174976,
+        "terrainDraws": 49,
+        "lodCounts": [7, 14, 28],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 110270,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 130458,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 126786,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 129948,
+            "draws": 10
+          }
+        ],
+        "triangles": 672438
+      },
+      {
+        "name": "high",
+        "camera": [-3365.5157553152826, -689.224543609524, -1270.1355032679542],
+        "terrainTriangles": 162688,
+        "terrainDraws": 45,
+        "lodCounts": [7, 11, 27],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 110270,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 130458,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 126786,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 129948,
+            "draws": 10
+          }
+        ],
+        "triangles": 660150
+      },
+      {
+        "name": "cockpit",
+        "camera": [-3400.927430367679, -737.4856699325663, -1332.6740132126156],
+        "terrainTriangles": 185216,
+        "terrainDraws": 52,
+        "lodCounts": [7, 12, 33],
+        "parts": [
+          {
+            "id": "mars-node-marker",
+            "triangles": 0,
+            "draws": 0
+          },
+          {
+            "id": "canyon-wall-ledge",
+            "triangles": 110270,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-east",
+            "triangles": 130458,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-west",
+            "triangles": 126786,
+            "draws": 10
+          },
+          {
+            "id": "canyon-wall-far",
+            "triangles": 129948,
+            "draws": 10
+          }
+        ],
+        "triangles": 682678
+      }
+    ],
+    "reservedSceneTriangles": 200000,
+    "renderedRerun": "Pending outside sandbox"
+  }
+}

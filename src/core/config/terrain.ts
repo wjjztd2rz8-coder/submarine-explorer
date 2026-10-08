@@ -26,6 +26,8 @@ export interface TerrainTier {
 }
 
 export interface TerrainConfig {
+  /** Opt-in local fidelity profiles; unspecified sites retain their existing mesh and shader. */
+  fidelity?: Record<string, TerrainFidelity>;
   /** Source cells per chunk edge. 64 keeps a subdivided chunk inside 16-bit indices. */
   chunkCells: number;
   /**
@@ -89,7 +91,33 @@ export interface TerrainConfig {
   tiers: Record<GraphicsTier, TerrainTier>;
 }
 
+export interface TerrainFidelity {
+  /** Focus of the playable canyon, in geographic coordinates. */
+  focus: { lat: number; lon: number; radiusM: number; fadeM: number };
+  chunkCells: number;
+  nearSubdiv: Record<GraphicsTier, number>;
+  /** Fine relief is sampled by both geometry and physics, in metres. */
+  reliefM: number;
+  reliefWavelengthM: number;
+  normalStrength: number;
+  /** Reconstructed wall mesh limits; Low retains the original limits. */
+  wallSegments: Record<GraphicsTier, [number, number]>;
+}
+
+export const MONTEREY_FIDELITY: TerrainFidelity = {
+  focus: { lat: 36.7872, lon: -122.0133, radiusM: 1400, fadeM: 450 },
+  chunkCells: 16,
+  nearSubdiv: { low: 1, medium: 4, high: 8, ultra: 8 },
+  reliefM: 1.2,
+  reliefWavelengthM: 48,
+  normalStrength: 0.24,
+  // Medium reserves frame geometry for the sub, swimming life and scatter even when all
+  // four canyon banks are in view. Keep the old vertical resolution and refine the hero face.
+  wallSegments: { low: [220, 150], medium: [230, 150], high: [520, 280], ultra: [640, 320] },
+};
+
 export const DEFAULT_TERRAIN: TerrainConfig = {
+  fidelity: { 'monterey-canyon': MONTEREY_FIDELITY },
   // 64 source cells x subdiv 2 = a 129x129 vertex chunk, which still fits in
   // 16-bit indices and gives the LOD selector something to actually choose
   // between on a 25 km tile.

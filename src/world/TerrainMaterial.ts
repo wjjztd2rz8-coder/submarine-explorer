@@ -32,6 +32,8 @@ export interface TerrainMaterialOptions {
   biome: Biome;
   /** Vertical exaggeration, so the shader can recover true depth from world Y. */
   exaggeration: number;
+  /** Optional site-specific erosion normals; shader path is absent for other sites and Low. */
+  rockDetailStrength?: number;
 }
 
 export interface TerrainMaterialResult {
@@ -96,6 +98,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
     },
     uStrata: { value: new THREE.Vector2(biome.strata?.periodM ?? 0, biome.strata?.amount ?? 0) },
     uDepthTint: { value: new THREE.Color(biome.depthShade?.tint ?? 0xffffff) },
+    uRockDetail: { value: opts.rockDetailStrength ?? 0 },
   };
 
   if (loadable) {
@@ -138,6 +141,7 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
   const defines: string[] = [];
   if (tierCfg.pbrNormals) defines.push('#define TERRAIN_PBR_NORMALS');
   if (tierCfg.textureBreakup) defines.push('#define TERRAIN_BREAKUP');
+  if (opts.rockDetailStrength) defines.push('#define TERRAIN_ROCK_DETAIL');
 
   const material = new THREE.MeshStandardMaterial({
     color: 0xffffff,

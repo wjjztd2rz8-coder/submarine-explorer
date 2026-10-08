@@ -90,3 +90,34 @@ export function vertexGlow(
   };
   m.customProgramCacheKey = () => `vertexGlow2-${floor}`;
 }
+
+/** Monterey only: layer filtered erosion normals over the smooth reconstructed wall. */
+export function canyonRockDetail(m: THREE.MeshStandardMaterial, strength: number): void {
+  const compile = m.onBeforeCompile;
+  const cacheKey = m.customProgramCacheKey();
+  m.onBeforeCompile = (shader, renderer) => {
+    compile.call(m, shader, renderer);
+    shader.vertexShader =
+      'varying vec3 vCanyonPosition;\n' +
+      shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        '#include <begin_vertex>\nvCanyonPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;',
+      );
+    shader.fragmentShader =
+      'varying vec3 vCanyonPosition;\n' +
+      shader.fragmentShader.replace(
+        '#include <normal_fragment_maps>',
+        `#include <normal_fragment_maps>
+      vec3 cp = vCanyonPosition;
+      vec3 phase = cp * vec3(7.0, 11.0, 6.0);
+      vec3 filtered = vec3(1.0) - smoothstep(vec3(0.8), vec3(2.5), fwidth(phase));
+      vec3 grad = cos(phase) * filtered * vec3(0.35, 0.5, 0.35);
+      float bed = (cp.y + cp.x * 0.07 + cp.z * 0.03) * 4.2;
+      grad += vec3(0.07, 1.0, 0.03) * cos(bed) * (1.0 - smoothstep(0.8, 2.5, fwidth(bed)));
+      grad = mat3(viewMatrix) * grad;
+      grad -= normal * dot(normal, grad);
+      normal = normalize(normal - grad * ${strength.toFixed(3)} * (1.0 - smoothstep(45.0, 160.0, length(vViewPosition))));`,
+      );
+  };
+  m.customProgramCacheKey = () => `${cacheKey}-canyon-detail-${strength}`;
+}

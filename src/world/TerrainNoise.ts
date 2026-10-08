@@ -34,6 +34,19 @@ function fade(t: number): number {
   return t * t * (3 - 2 * t);
 }
 
+/** Shape-preserving cubic: C1 at survey knots, no new extrema between the middle samples. */
+export function monotoneCubic(a: number, b: number, c: number, d: number, t: number): number {
+  const tangent = (left: number, right: number): number =>
+    left * right <= 0 ? 0 : (2 * left * right) / (left + right);
+  const m0 = tangent(b - a, c - b);
+  const m1 = tangent(c - b, d - c);
+  const t2 = t * t;
+  const t3 = t2 * t;
+  return (
+    (2 * t3 - 3 * t2 + 1) * b + (t3 - 2 * t2 + t) * m0 + (-2 * t3 + 3 * t2) * c + (t3 - t2) * m1
+  );
+}
+
 /** Value noise on a unit lattice, in [0, 1). */
 export function valueNoise2(x: number, y: number, seed: number): number {
   const ix = Math.floor(x);

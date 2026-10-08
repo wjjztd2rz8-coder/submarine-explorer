@@ -17,12 +17,16 @@
  * A pose manifest accompanies the contact sheet for reproducible comparisons.
  * Output: .cache/golden/<UTC YYYY-MM-DD-HHMMSS>/<site>-<1|2|3>.png + index.html.
  * GOLDEN_SITES=lost-city,beebe-vent-field limits the run to those sites.
+ * GOLDEN_SITES=monterey is an alias for monterey-canyon.
+ * GOLDEN_LAYOUTS=desktop,portrait captures 1600×900 and 390×844 at the same authored poses.
+ * Monterey uses tools/monterey-poses.json, rather than geometry-dependent wall-life patch selection.
  * Chromium uses SwiftShader so the tool also works without a physical GPU.
  */
 import { chromium } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import blueHolePoses from './blue-hole-poses.json' with { type: 'json' };
+import montereyPoses from './monterey-poses.json' with { type: 'json' };
 
 async function main() {
   const args = process.argv.slice(2);
@@ -44,9 +48,15 @@ async function main() {
   base.hash = '';
   const stamp = new Date().toISOString().slice(0, 19).replace('T', '-').replaceAll(':', '');
   const output = resolve('.cache/golden', stamp);
+  const layouts = (process.env.GOLDEN_LAYOUTS ?? 'desktop').split(',').map((name) => {
+    if (name === 'desktop') return { name, width: 1600, height: 900 };
+    if (name === 'portrait') return { name, width: 390, height: 844 };
+    throw new Error(`Unknown GOLDEN_LAYOUTS: ${name}`);
+  });
   const closeOverride = process.env.GOLDEN_CLOSE ? JSON.parse(process.env.GOLDEN_CLOSE) : null; // dev: retune the west alcove close pose
-  const only = process.env.GOLDEN_SITES?.split(',').map((site) =>
-    site.trim() === 'blue-hole' ? 'great-blue-hole' : site.trim(),
+  const only = process.env.GOLDEN_SITES?.split(',').map(
+    (site) =>
+      ({ 'blue-hole': 'great-blue-hole', monterey: 'monterey-canyon' })[site.trim()] ?? site.trim(),
   );
   const heroes = [
     ['titanic', 'bow-hull'],
@@ -65,7 +75,7 @@ async function main() {
     // The south-eastern alcove, framed from inside the hole on its ledge (open side faces the hole centre).
     ['great-blue-hole', 'karst-grotto-east', 'great-blue-hole-east', blueHolePoses.east],
     ['beebe-vent-field', 'beebe-chimney-1'],
-    ['monterey-canyon', 'canyon-wall-ledge'],
+    ['monterey-canyon', 'canyon-wall-ledge', 'monterey-canyon', montereyPoses.wall],
   ].filter(([site, , slug]) => !only || only.includes(site) || only.includes(slug));
   if (
     !heroes.length ||
@@ -111,11 +121,14 @@ async function main() {
     browser = await chromium.launch({
       args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
     });
-    for (const [siteId, heroId, slug, fixed] of heroes) {
+    for (const {
+      layout: { name: layout, width, height },
+      hero: [siteId, heroId, slug, fixed],
+    } of layouts.flatMap((layout) => heroes.map((hero) => ({ layout, hero })))) {
       const site = slug ?? siteId;
       stage = `${site}: create context`;
       const context = await browser.newContext({
-        viewport: { width: 1600, height: 900 },
+        viewport: { width, height },
         deviceScaleFactor: 1,
         serviceWorkers: 'block',
       });
@@ -187,7 +200,14 @@ async function main() {
           console.log(`Preview base: ${base.href}`);
         }
         const url = new URL(base);
-        url.search = new URLSearchParams({ tile: siteId, tutorial: '0', tier: 'high' }).toString();
+        url.search = new URLSearchParams({
+          tile: siteId,
+          tutorial: '0',
+          tier: 'high',
+          lifeSeed: '42',
+          dynres: '0',
+          ...(layout === 'portrait' ? { touch: '1' } : {}),
+        }).toString();
         const loaded = await page.goto(url.href, {
           waitUntil: 'domcontentloaded',
           timeout: 120_000,
@@ -203,6 +223,7 @@ async function main() {
           { timeout: 120_000 },
         );
         await settle(page);
+        await evaluate(() => window.__game.terrain.texturesReady);
         await evaluate(() => {
           // Freeze translation, pitch and ballast; keep normal lighting/render updates.
           window.__game.sub.step = () => {};
@@ -212,7 +233,7 @@ async function main() {
           console.log(stage);
           await settle(page);
           if (errors.length) throw new Error(`${site}: ${errors.join('; ')}`);
-          const filename = `${site}-${n}.png`;
+          const filename = `${site}${layout === 'desktop' ? '' : '-portrait'}-${n}.png`;
           const pose = await evaluate(() => {
             const g = window.__game;
             return {
@@ -224,6 +245,10 @@ async function main() {
               tier: g.perf.tier,
               hull: g.sub.getState().hullClass,
               failedProps: g.props.stats.failed,
+              lookElevation: g.rig.lookElevation,
+              drawCalls: g.perf.drawCalls,
+              triangles: g.perf.triangles,
+              terrain: { ...g.terrain.stats },
             };
           });
           if (pose.tier !== 'high')
@@ -275,12 +300,21 @@ async function main() {
           if (
             png.length < 24 ||
             png.toString('hex', 0, 8) !== '89504e470d0a1a0a' ||
-            png.readUInt32BE(16) !== 1600 ||
-            png.readUInt32BE(20) !== 900
+            png.readUInt32BE(16) !== width ||
+            png.readUInt32BE(20) !== height
           )
-            throw new Error(`${filename}: capture is not a 1600 × 900 PNG`);
+            throw new Error(`${filename}: capture is not a ${width} × ${height} PNG`);
           await writeFile(resolve(output, filename), png);
-          captures.push({ site, heroId, filename, range, captureMethod, ...pose });
+          captures.push({
+            site,
+            heroId,
+            filename,
+            range,
+            captureMethod,
+            layout,
+            viewport: [width, height],
+            ...pose,
+          });
           console.log(`${filename} (${pose.hull}, ${pose.tier})`);
         };
         if (site === siteId) await capture(1, null);
@@ -394,7 +428,7 @@ async function main() {
           }
           return null;
         }, heroId);
-        if (lifeApproach) {
+        if (lifeApproach && !fixed) {
           console.log(`${site}: wall-life patch of ${lifeApproach.count} aimed`);
           approach.target = lifeApproach.target;
           approach.direction = lifeApproach.direction;
@@ -470,7 +504,15 @@ async function main() {
     await writeFile(
       resolve(output, 'poses.json'),
       JSON.stringify(
-        { base: base.href, stamp, complete: failures.length === 0, failures, captures },
+        {
+          base: base.href,
+          stamp,
+          layouts,
+          plannedHeroes: heroes,
+          complete: failures.length === 0,
+          failures,
+          captures,
+        },
         null,
         2,
       ),
@@ -481,7 +523,7 @@ async function main() {
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Golden shots ${stamp}</title><style>
 body{margin:24px;background:#081522;color:#e6f0f7;font:16px system-ui}main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}figure{margin:0}img{width:100%;height:auto}a{color:inherit}figcaption{padding:8px 0}@media(max-width:800px){main{grid-template-columns:1fr}}
-</style><h1>Golden shots · ${stamp} UTC</h1><p>${failures.length ? `INCOMPLETE: ${failures.length} failure(s). ` : ''}High tier · 1600 × 900 · fresh Arcade profile. 1: spawn; 2: 40 m; 3: 15 m (30 m for axis-framed set pieces). <a href="poses.json">Pose manifest and failures</a></p>
+</style><h1>Golden shots · ${stamp} UTC</h1><p>${failures.length ? `INCOMPLETE: ${failures.length} failure(s). ` : ''}High tier · ${layouts.map((l) => `${l.name} ${l.width} × ${l.height}`).join(', ')} · fresh Arcade profile, life seed 42, dynamic resolution off. 1: spawn; 2–3: approach and detail (ranges below). <a href="poses.json">Pose manifest and failures</a></p>
 <main>${captures.map(({ filename, site, range }) => `<figure><a href="${filename}"><img loading="lazy" src="${filename}" alt="${site}, ${range === null ? 'default spawn' : `${range} m approach`}"></a><figcaption>${filename}</figcaption></figure>`).join('\n')}</main></html>`,
     );
     console.log(`Contact sheet: ${resolve(output, 'index.html')}`);

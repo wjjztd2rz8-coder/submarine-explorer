@@ -60,6 +60,13 @@ export interface ChunkOptions {
   /** Vertex spacing in metres. */
   stepX: number;
   stepZ: number;
+  /** Common derivative spacing across chunks of different density (seam-consistent shading). */
+  normalStepX?: number;
+  normalStepZ?: number;
+  /** World-space derivative scale; identical at shared positions, independent of patch density. */
+  normalStepScaleAt?: (x: number, z: number) => number;
+  /** Local dense chunks can shed subdivisions more quickly beyond the playable area. */
+  lodStrides?: readonly [number, number, number];
   /** How far the perimeter skirt hangs below the surface, in metres. */
   skirtDepthM: number;
   name: string;
@@ -79,6 +86,8 @@ export class TerrainChunk {
   /** Centre and radius of the bounding sphere, in world space. */
   readonly center = new THREE.Vector3();
   readonly radius: number;
+  /** World-space extent, including the skirt, for conservative distance selection. */
+  readonly bounds: THREE.Box3;
 
   private readonly lodIndex: THREE.BufferAttribute[] = [];
   private lod = 0;
@@ -97,7 +106,8 @@ export class TerrainChunk {
     const normals = new Float32Array(total * 3);
     const ys = new Float64Array(surfaceCount);
     const cavity = new Uint8Array(total).fill(128);
-    const cavityScale = 1 / (0.06 * Math.min(stepX, stepZ));
+    const baseNormalX = opts.normalStepX ?? stepX;
+    const baseNormalZ = opts.normalStepZ ?? stepZ;
 
     // --- sample the surface ------------------------------------------------
     for (let j = 0; j < nz; j++) {
@@ -114,19 +124,27 @@ export class TerrainChunk {
     }
 
     // --- normals from central differences on the height grid ---------------
-    const invX = 1 / (2 * stepX);
-    const invZ = 1 / (2 * stepZ);
     for (let j = 0; j < nz; j++) {
       const z = z0 + j * stepZ;
       for (let i = 0; i < nx; i++) {
         const k = j * nx + i;
         const x = x0 + i * stepX;
+        const scale = opts.normalStepScaleAt?.(x, z) ?? 1;
+        const normalX = baseNormalX * scale;
+        const normalZ = baseNormalZ * scale;
+        const invX = 1 / (2 * normalX);
+        const invZ = 1 / (2 * normalZ);
+        const cavityScale = 1 / (0.06 * Math.min(normalX, normalZ));
         // Outside the chunk we evaluate the field again rather than clamping, so
         // two chunks sharing an edge produce bit-identical normals there.
-        const hL = i > 0 ? (ys[k - 1] as number) : field.surfaceY(x - stepX, z);
-        const hR = i < nx - 1 ? (ys[k + 1] as number) : field.surfaceY(x + stepX, z);
-        const hN = j > 0 ? (ys[k - nx] as number) : field.surfaceY(x, z - stepZ);
-        const hS = j < nz - 1 ? (ys[k + nx] as number) : field.surfaceY(x, z + stepZ);
+        const hL =
+          normalX === stepX && i > 0 ? (ys[k - 1] as number) : field.surfaceY(x - normalX, z);
+        const hR =
+          normalX === stepX && i < nx - 1 ? (ys[k + 1] as number) : field.surfaceY(x + normalX, z);
+        const hN =
+          normalZ === stepZ && j > 0 ? (ys[k - nx] as number) : field.surfaceY(x, z - normalZ);
+        const hS =
+          normalZ === stepZ && j < nz - 1 ? (ys[k + nx] as number) : field.surfaceY(x, z + normalZ);
         const lap = (hL + hR + hN + hS) * 0.25 - (ys[k] as number);
         const cv = lap * cavityScale;
         cavity[k] = Math.round((cv < -1 ? -1 : cv > 1 ? 1 : cv) * 127.5 + 127.5);
@@ -165,7 +183,7 @@ export class TerrainChunk {
 
     // --- index buffers, one per LOD ----------------------------------------
     const IndexArray = total > 65535 ? Uint32Array : Uint16Array;
-    for (const stride of LOD_STRIDES) {
+    for (const stride of opts.lodStrides ?? LOD_STRIDES) {
       const cols = strideList(nx, stride);
       const rows = strideList(nz, stride);
       const quads = (cols.length - 1) * (rows.length - 1);
@@ -235,12 +253,14 @@ export class TerrainChunk {
     geom.setIndex(this.lodIndex[0] as THREE.BufferAttribute);
     // Includes the skirt, so the sphere is conservative for frustum culling.
     geom.computeBoundingSphere();
+    geom.computeBoundingBox();
 
     this.geometry = geom;
     this.vertexCount = total;
     const sphere = geom.boundingSphere as THREE.Sphere;
     this.center.copy(sphere.center);
     this.radius = sphere.radius;
+    this.bounds = geom.boundingBox as THREE.Box3;
 
     this.mesh = new THREE.Mesh(geom, opts.material);
     this.mesh.name = opts.name;

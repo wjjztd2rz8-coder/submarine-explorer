@@ -7,6 +7,7 @@ import type { TileMeta } from '../../src/util/types.js';
 import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { geoDetail } from '../../src/world/props/geo/detail.js';
+import { parsePois, placePois } from '../../src/game/Pois.js';
 
 /** Real sloping bathymetry and authored transforms expose buried wall-life seats. */
 describe('Monterey wall life on surveyed terrain', () => {
@@ -27,6 +28,30 @@ describe('Monterey wall life on surveyed terrain', () => {
         const doc = JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8'));
         await props.load('props.json', site, async () => doc);
         expect(props.stats.failed).toBe(0);
+        const pois = placePois(
+          parsePois(JSON.parse(readFileSync(`data/landmarks/${site}/pois.json`, 'utf8'))),
+          meta,
+          terrain,
+          config.scan,
+          site,
+        );
+        expect(pois).toHaveLength(4);
+        for (const poi of pois) {
+          const { x, y, z } = poi.position;
+          const seabed = terrain.sampleHeight(x, z);
+          if (poi.def.snap_to_seabed) {
+            expect(y).toBe(seabed);
+            if (tier !== 'low') {
+              const ray = new THREE.Raycaster(
+                new THREE.Vector3(x, 100, z),
+                new THREE.Vector3(0, -1, 0),
+              );
+              const hit = ray.intersectObject(terrain.group, true)[0];
+              expect(hit, `${tier} ${poi.id} rendered surface`).toBeDefined();
+              expect(Math.abs(hit.point.y - y)).toBeLessThan(0.002);
+            }
+          } else expect(y).toBeGreaterThanOrEqual(seabed);
+        }
         const walls = props.placed.filter((prop) => prop.def.feature === 'canyon-ledge');
         expect(walls).toHaveLength(4);
         let apronChecks = 0;
@@ -126,6 +151,6 @@ describe('Monterey wall life on surveyed terrain', () => {
       } finally {
         terrain.dispose();
       }
-    }, 15_000); // Independent triangle raycasts across four walls at every quality tier.
+    }, 45_000); // Independent raycasts through the denser four-wall meshes at every tier.
   }
 });

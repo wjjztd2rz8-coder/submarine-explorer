@@ -47,3 +47,44 @@ Survey cells are 45–61 m on our GMRT tiles (450 m where GEBCO fills). At a few
 
 - Formal fps measurement on this Mac was not recorded before the agent was stopped; do it during the Phase A QA pass with `?debugTerrain=1`.
 - A faint cell-aligned pattern is still visible from high altitude in the surface band (docs/img/atmosphere-10.png). Likely the albedo texture repeat coinciding with cell size; try a non-integer `materialTextureScaleM`.
+
+## Monterey fidelity profile (810)
+
+`terrain.fidelity['monterey-canyon']` opts Medium/High/Ultra into a local mesh
+profile around the opening canyon ledge. Low and all other sites retain their
+existing buffers and shading. Within a 1,400 m focus radius plus a 450 m fade,
+four survey chunks are split into 16-cell patches. Near patches use 4 subdivisions
+on Medium and 8 on High/Ultra; distant chunks keep the budget-fitted 2 subdivisions
+and 64-cell footprint. Local upgrades account for skirts and duplicate edges in
+the resident vertex budget. `stats.subdivisionCounts` reports the actual allocation;
+`subdiv` and `requestedSubdiv` continue to report the distant base mesh.
+
+The opt-in surface uses shape-preserving cubic interpolation of the survey,
+preserving survey knots and introducing no extrema between samples. It adds up
+to 1.2 m of slope-masked, smoothly faded bed/rill relief. `sampleDataHeight` stays
+bilinear survey-only. With detail enabled, `sampleHeight` on this profile returns
+the LOD-0 triangle height, so physics, terrain-following props and snapped POIs
+sit on the rendered near surface. `getNormal` differentiates the continuous
+reconstruction at a world-position-dependent spacing shared by both sides of
+every seam; that spacing fades from the near mesh resolution to the distant base
+resolution. It is a smooth shading normal, rather than an individual triangle
+normal. Other sites keep their original sampling behavior. `detailStrength = 0`
+retains the original survey-only API and vertex elevations.
+
+Dense patches drop to the base density at LOD 1 and half the base at LOD 2
+(8/2/1 for High, 4/2/1 for Medium); existing skirts cover density and LOD cracks.
+For this profile, LOD distance uses the chunk's axis-aligned bounds, including
+the skirt. The original spherical distance kept oversized distant survey chunks
+at full detail during close wall inspection. Other sites retain their original
+LOD selection. Medium canyon wall caps are 230 × 150 to reserve complete-frame
+geometry for the submarine, swimming life and normal effects; the Medium hero
+face remains denser than its original 123 × 123 grid.
+The Monterey material adds filtered grain and dipping lamination normals, projected
+onto the surface tangent plane, fading at 45–160 m. The existing CC0 triplanar maps
+and their loading remain unchanged. Reconstructed canyon walls have a separate
+mesh: their density caps and erosion-normal hook are also raised for this profile,
+and colonies check the actual frontmost wall and apron triangles.
+
+Measurements, validation limits and the recipe for another site are in
+[`F-FIDELITY-810.md`](../plan/progress/F-FIDELITY-810.md). Browser screenshots and
+full rendered-frame budgets still require an unrestricted browser run.

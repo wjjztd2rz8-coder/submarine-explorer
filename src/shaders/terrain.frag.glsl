@@ -61,6 +61,7 @@ uniform float uExaggeration;
 uniform vec2 uDepthShade;       // surface depth (m) where the dark tint starts / is complete; 0,0 = off
 uniform vec2 uStrata;           // rock band thickness (m), strength; 0 = off
 uniform vec3 uDepthTint;        // albedo multiplier at full depth shade
+uniform float uRockDetail;
 
 varying vec3 vTerrainWorldPos;
 varying vec3 vTerrainWorldNormal;
@@ -275,6 +276,19 @@ float terrRough = 0.92;
     burrowShade = t1 * 0.12 * bm;
   }
   nAcc.xz += slope;
+#ifdef TERRAIN_ROCK_DETAIL
+  // Fine dipping lamination and grain; analytical gradients cost no extra texture fetches.
+  // Filter each frequency before it becomes smaller than a pixel, then project onto the surface.
+  vec3 phase = P * vec3(7.0, 11.0, 6.0);
+  vec3 filterWidth = fwidth(phase);
+  vec3 filtered = vec3(1.0) - smoothstep(vec3(0.8), vec3(2.5), filterWidth);
+  vec3 grainGrad = cos(phase) * filtered * vec3(0.35, 0.5, 0.35);
+  float bedPhase = (P.y + P.x * 0.07 + P.z * 0.03) * 4.2;
+  float bedFilter = 1.0 - smoothstep(0.8, 2.5, fwidth(bedPhase));
+  vec3 reliefGrad = grainGrad + vec3(0.07, 1.0, 0.03) * cos(bedPhase) * bedFilter;
+  reliefGrad -= wn * dot(wn, reliefGrad);
+  nAcc -= reliefGrad * uRockDetail * rockT * (1.0 - smoothstep(45.0, 160.0, dist));
+#endif
   terrWorldN = normalize(nAcc);
 
   // --- shading modulations ----------------------------------------------
