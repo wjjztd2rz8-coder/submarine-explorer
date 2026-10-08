@@ -115,3 +115,14 @@ remain pending.
   breakup. Texture storage and uniform state are shared with the floor.
 - These are CPU geometry/material counts, not measured GPU timings. Rendered
   performance and documentary-still appearance require browser-capable QA.
+
+## Verification update (2026-10-08, browser-capable host)
+
+`GOLDEN_SITES=beebe-vent-field GOLDEN_LAYOUTS=desktop tools/golden.sh` now runs.
+Before (main, plain pale apron): `.cache/beebe930/before/beebe-vent-field-3-main.png`
+(flat cream disc with sharp edge, clearly plate-like). After (this branch):
+`.cache/beebe930/after/beebe-vent-field-{1,2,3}.png`. The apron now reads as the
+same rippled grey-tan sediment as the surrounding floor; the edge is gone and
+the pale radial tint is absent. The remaining blue oval is the cockpit bezel
+(camera-locked), not seabed. `PW_PORT=4930 tools/gates.sh` passes (build, unit,
+python, content, attribution, prettier, e2e, e2e-base).
