@@ -38,6 +38,7 @@ import {
 } from './shared.js';
 import { buildTalusMesh, placeRocks, rockMatrix, type TalusShape } from './talus.js';
 import type { GeoBuildInput } from './types.js';
+import { buildBlueHoleWall } from './blueHoleWall.js';
 
 const WALL = new THREE.Color(0x9b9482);
 const WALL_DARK = new THREE.Color(0x5b5648);
@@ -60,9 +61,9 @@ const geoMaterial: typeof baseGeoMaterial = (kind, d, o) => {
 };
 
 /**
- * (y, z) profile fractions from the apron join: a wall, a thick shelf whose
- * underside rises a little toward the lip (0.5-0.64 H), then the top. The
- * shelf's projection is scalloped along the wall (see `shelf`).
+ * A solution notch in the wall: a recessed face, an overhanging lip and a
+ * low roof extending back into the rising terrain. There is no exposed
+ * crest above the roof; the rear closes below the limestone slope.
  */
 const PROFILE: [number, number][] = [
   [0.1, -0.05],
@@ -74,10 +75,8 @@ const PROFILE: [number, number][] = [
   [0.57, -1.0],
   [0.63, -0.98],
   [0.66, -0.5],
-  [0.68, -0.04],
-  [0.9, 0],
-  [1, 0.1],
-  [1.02, 0.45],
+  [0.7, -0.04],
+  [0.7, 0.45],
   [0.7, 0.9],
   [0.3, 1.3],
   [-0.12, 1.75],
@@ -101,6 +100,7 @@ function undersideY(f: number): number {
 }
 
 export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
+  if (input.def.id === 'blue-hole-wall-relief') return buildBlueHoleWall(input);
   const { dims, seed, tier } = input;
   const east = input.def.id === 'karst-grotto-east';
   const gnd = input.groundHeight() ?? ((): number => 0);
@@ -138,7 +138,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   /** How far the shelf projects at x (1 = the profile's lip): scalloped, in places hardly at all. */
   const shelf = (x: number): number => {
     const scallop = smooth(0.32, 0.62, fbm3(x * 0.075 + 4, 1, seed + 61, seed + 8, 3));
-    return east ? 0.88 + 0.3 * scallop : 0.42 + 0.95 * scallop;
+    return east ? 0.88 + 0.3 * scallop : 0.42 + 0.35 * scallop;
   };
 
   // Opening light multiplies the banded vertex glow, preserving the strata and
@@ -250,7 +250,9 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   );
   apron.computeBoundingBox();
   full.add(new THREE.Mesh(apron, surfaceMaterial('rock', d, { roughness: 0.92 })));
-  if (d.rubble) {
+  // Large fallen blocks carry the ledge's shape even at Low; only their count
+  // and mesh density change with tier.
+  {
     const spots = placeRocks(talus, W, Math.round(120 * d.growth), seed, {
       size: 0.7 * scale,
       blocks: 0.04,
@@ -279,7 +281,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   }
 
   // --- stalactites: clusters of fluted pendants hung from the underside of the shelf
-  const colliders: THREE.Box3[] = wallColliders(profile, W, D, H, 8, gnd, {
+  const colliders: THREE.Box3[] = wallColliders(profile, W, D, H, 12, gnd, {
     disp,
     edgeStart: EDGE_START,
     plan,
@@ -306,19 +308,18 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       if (sc * f < 0.12) continue; // no shelf here: nothing to hang from
       const yBase = undersideY(f) * H;
       const { edge } = wallEnvelope(x, W, EDGE_START);
-      const z = east
-        ? (z0 + disp(x, yBase, z0) * (1 - edge * 0.6)) * (1 - edge * 0.55) + plan(x)
-        : z0 + disp(x, yBase, z0) + plan(x);
-      const yTop = yBase * scaleAt(x) + liftAt(x) + 0.5 - (east ? sinkAt(x) : 0);
+      const z = (z0 + disp(x, yBase, z0) * (1 - edge * 0.6)) * (1 - edge * 0.55) + plan(x);
+      const yTop = yBase * scaleAt(x) + liftAt(x) + 0.5 - sinkAt(x);
       const main = i === 0;
       const generatedLength =
         (1.4 + rnd() * rnd() * 0.36 * H) *
         (main ? 1.35 : 0.55 + rnd() * 0.5) *
         (0.6 + 0.4 * scaleAt(x));
-      const len = east
-        ? Math.min(H * (main ? 0.27 + rnd() * 0.17 : 0.065 + rnd() * 0.13), yTop - gnd(x, z) - 0.7)
+      const wantedLength = east
+        ? H * (main ? 0.27 + rnd() * 0.17 : 0.065 + rnd() * 0.13)
         : generatedLength;
-      if (east && len < 0.5) continue;
+      const len = Math.min(wantedLength, yTop - gnd(x, z) - 0.7);
+      if (len < 0.5) continue;
       const r = len * 0.12 + 0.22;
       parts.push(
         place(

@@ -14,6 +14,15 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BLUEHOLE-830: replace the Blue Hole galleries' raised dome crests
+  with low limestone ledges embedded in the rising wall, with pendants hung
+  from the supported underside. Add shaft ledges, vertical solution fluting
+  and fallen rubble through a Blue Hole-only prop; retain opening/contact
+  placement and large rubble at Low. Reason: the opening showed a detached
+  dark dome above smooth banded walls. Geometry/collision checks and orchestrator
+  full browser gates pass; fix the missing process-log heading separation
+  flagged by repository formatting. Fresh paired golden images remain pending
+  sandbox browser/port access. Evidence: `plan/progress/F-BLUEHOLE-830.md`.
 - Phase F, F-VERIFY-740 second follow-up: route tutorial Skip actions through
   the existing completion handler so ending the tutorial displays its
   completion toast as well as saving progress. Retain contextual hint
