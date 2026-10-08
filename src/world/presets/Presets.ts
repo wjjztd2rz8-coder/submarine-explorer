@@ -10,8 +10,8 @@
  * have loaded, runs it after `Atmosphere.update` each frame, writes any
  * adjusted fog/ambient back to the scene, and couples the summed water
  * current to the sub's velocity (capped at `Config.presets.maxCurrentMps`).
- * On the low graphics tier nothing is drawn; currents and events remain
- * (`lowTierCurrents`).
+ * Low disables particles and glow lights; currents, events and ambient fill
+ * remain, as does Titanic's opt-in water backdrop (`lowTierCurrents`).
  */
 
 import { currentScale } from '../../core/config/modes.js';

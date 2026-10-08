@@ -47,7 +47,7 @@ if (( ${#active_units[@]} )); then
   reserved_ports=$(systemctl --user show "${active_units[@]}" --property=ExecStart --value |
     grep -oE 'PW_PORT=[0-9]+' | cut -d= -f2 | awk '{print $1; print $1 + 100}')
 fi
-for brief in $(ls .cache/codex/queue/*.md 2>/dev/null | sort); do
+for brief in $(ls .cache/codex/queue/*.md 2>/dev/null | sort -V); do
   (( $(running) < MAX )) || { echo "dispatch: $MAX tasks running"; break; }
   codex_ok || { echo "dispatch: Codex budget low; queue waits"; echo "$(date '+%F %T') codex low; $(ls .cache/codex/queue/*.md | wc -l) queued" >> .cache/codex/queue/waiting.log; break; }
   name=$(basename "$brief" .md); name=${name#[0-9][0-9]-}

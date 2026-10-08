@@ -22,8 +22,12 @@ different preset does not inherit another preset's mission overrides.
 Draw calls are the preset objects' `stats.draws`, checked by Playwright at
 1280×800 in Chromium; visible calls can be lower when a material is culled or
 the effect is outside view. Particle counts depend on graphics tier. `low`
-allocates no preset draw geometry or glow lights; current force and trench
-events still run. `medium` uses half the high-tier particle count. The global
+allocates no preset particles or glow lights; current force and trench
+events still run. Titanic's `titanicHorizon: true` wreck override adds one
+unlit water backdrop on every tier (three preset draws with particles, one on
+Low). It fades in from 700 to 1,200 m depth and slightly lifts distant fog;
+other wrecks keep the default `false`.
+`medium` uses half the high-tier particle count. The global
 `maxParticles` cap applies to each preset.
 
 Warm orifice haze is opt-in: `hazeGlow` defaults to 0 and `hazeGlowSizeM` to
@@ -52,7 +56,8 @@ changes back to the scene. Atmosphere samples fresh depth-band values each
 frame, so modifiers do not accumulate. The reef preset cannot extend the
 base caustic projector below its configured 60 m range; it only strengthens
 it where present. Trench grade and snow values are read later in the same
-frame. Low-tier preset visuals, including ambient modifiers, are disabled.
+frame. Low-tier particle layers are disabled; ambient fill and Titanic's
+opt-in fog/backdrop still apply.
 
 Lost City uses the `fluid: "carbonate"` override in its mission file. Its
 reconstructed chimneys emit pale carbonate plumes with faint glow, reflecting

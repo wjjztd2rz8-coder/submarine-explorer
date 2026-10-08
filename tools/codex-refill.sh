@@ -7,7 +7,7 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.local/node/bin:$HOME/.local/bin:$PATH"
 model=$(tools/codex-model.sh 2>/dev/null || echo gpt-6-sol)
-last=$(ls .cache/codex/queue/launched/ | sed -n 's/^\([0-9]\{3\}\)-.*/\1/p' | sort -n | tail -1)
+last=$(ls .cache/codex/queue/launched/ | sed -n 's/^\([0-9][0-9]*\)-.*/\1/p' | sort -n | tail -1)
 next=$(( (10#${last:-900} / 10 + 1) * 10 ))
 codex exec -m "$model" -c model_reasoning_effort=high -c 'sandbox_mode="workspace-write"' "You are refilling the Codex work queue for the Bathyline game repo while the Claude director is out of budget.
 Read plan/DIRECTOR.md (priorities and the 2026-10-06 director note), the newest entry of plan/REVIEWS.md, the tail of plan/OVERNIGHT-LOG.md, and the brief files in .cache/codex/queue/launched/ (to avoid duplicates; read the last 10 for the format and the -result.md files in .cache/codex/ for what finished).
