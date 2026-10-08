@@ -12,9 +12,9 @@ const index = JSON.parse(readFileSync('data/landmarks/index.json', 'utf8')) as {
   landmarks: string[];
 };
 
-describe('all mission near-site starts', () => {
+describe('classic mission near-site starts (without composed scenery)', () => {
   for (const id of index.landmarks) {
-    it(`${id}: first primary is safely reachable within 60 s at Arcade cruise`, () => {
+    it(`${id}: ${id === 'great-blue-hole' ? 'gallery start safely falls back to the surface' : 'first primary is safely reachable within 60 s at Arcade cruise'}`, () => {
       const def = parseMission(
         JSON.parse(readFileSync(`data/landmarks/${id}/mission.json`, 'utf8')),
         id,
@@ -53,10 +53,18 @@ describe('all mission near-site starts', () => {
       const target = pois.find((p) => p.id === primary.poi)!.position;
       const pose = missionStartPose(def, 'near-site', pois, meta, seabed, DEFAULT_CONFIG);
       if (id === 'great-blue-hole') {
-        // The first primary now sits on the mapped eastern atoll slope, deep
-        // enough for a safe near-site pose instead of the old reef-flat fallback.
+        // The classic 350–600 m search lands outside the small hole on shallow
+        // reef. Its safe surface fallback is intentional. Default Arcade uses
+        // the composed gallery opening, covered on all tiers in heroMissionSpawn.
         const surface = missionStartPose(def, 'surface', pois, meta, seabed, DEFAULT_CONFIG);
-        expect(pose).not.toEqual(surface);
+        expect(pose).toEqual(surface);
+        expect(pose.y).toBeGreaterThanOrEqual(
+          seabed.sampleHeight(pose.x, pose.z) +
+            DEFAULT_CONFIG.submarine.hullRadius +
+            DEFAULT_CONFIG.submarine.seabedClearance +
+            DEFAULT_CONFIG.mission.spawnClearanceM,
+        );
+        return;
       }
       const nw = latLonToWorld(meta, meta.bbox.north, meta.bbox.west);
       const se = latLonToWorld(meta, meta.bbox.south, meta.bbox.east);

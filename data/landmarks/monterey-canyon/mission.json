@@ -24,7 +24,7 @@
     "heading_deg": 258
   },
   "briefing": {
-    "summary": "Follow Monterey Canyon from its upper reaches just offshore of Moss Landing down the steep channel nearby. Continue along the north wall or visit the MARS seafloor observatory node farther offshore.",
+    "summary": "Survey Monterey Canyon's north wall, then follow the upper channel toward Moss Landing. Visit the shallow canyon head or the MARS seafloor observatory node for optional scans.",
     "depth_m": 2000,
     "facts": [
       "Monterey Canyon begins right off the beach at Moss Landing -- so close to shore that MBARI, headquartered there, calls it their 'backyard'.",
@@ -42,12 +42,12 @@
   },
   "objectives": [
     {
-      "id": "canyon-head",
+      "id": "canyon-wall",
       "type": "scan",
-      "poi": "monterey-canyon-head",
+      "poi": "monterey-canyon-wall",
       "primary": true,
-      "title": "Scan the canyon head",
-      "hint": "Find the canyon head just offshore from Moss Landing, around 45 m."
+      "title": "Survey the north canyon wall",
+      "hint": "Face the nearby north wall, around 750 m."
     },
     {
       "id": "upper-channel",
@@ -55,15 +55,15 @@
       "poi": "monterey-canyon-upper-channel",
       "primary": true,
       "title": "Follow the upper channel",
-      "hint": "Follow the channel west from the head, descending to around 265 m."
+      "hint": "Follow the channel east toward Moss Landing, rising to around 265 m."
     },
     {
-      "id": "canyon-wall",
+      "id": "canyon-head",
       "type": "scan",
-      "poi": "monterey-canyon-wall",
+      "poi": "monterey-canyon-head",
       "primary": false,
-      "title": "Survey the north canyon wall",
-      "hint": "Continue far west and down-canyon to the north wall, around 750 m."
+      "title": "Scan the canyon head",
+      "hint": "Continue east to the shallow canyon head off Moss Landing, around 45 m."
     },
     {
       "id": "mars-node",

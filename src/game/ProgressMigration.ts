@@ -4,6 +4,19 @@ import type { Photo } from './PhotoStore.js';
 import type { FetchJson } from './ContentPath.js';
 import type { Progress } from './Progress.js';
 
+// 940 changed these routes. A discoveries-only save can already have earned
+// completion on the old primaries; retain that credit without marking a new
+// mission run complete or requiring the newly promoted scenic scan.
+const PRE_940_OBJECTIVES: Record<string, Record<string, boolean>> = {
+  'great-blue-hole': { 'outer-dropoff': true, 'western-dropoff': true },
+  'monterey-canyon': {
+    'canyon-head': true,
+    'upper-channel': true,
+    'canyon-wall': false,
+    'mars-node': false,
+  },
+};
+
 /** Finish legacy credit before hull gating; a returning pilot never loses access during migration. */
 export async function creditPreviousDives(
   progress: Progress,
@@ -33,14 +46,23 @@ export async function creditPreviousDives(
       def.objectives.forEach((o, i) => {
         if (statuses[i].complete) progress.credit('objective', `${site}/${o.id}`);
       });
-      const primary = statuses.filter((o) => o.primary);
-      if (primary.length && primary.every((o) => o.complete)) {
+      const oldRoles = PRE_940_OBJECTIVES[site];
+      const oldStatuses = oldRoles
+        ? def.objectives.flatMap((o, i) =>
+            Object.hasOwn(oldRoles, o.id)
+              ? [{ primary: oldRoles[o.id], complete: statuses[i].complete }]
+              : [],
+          )
+        : [];
+      for (const route of oldRoles ? [oldStatuses, statuses] : [statuses]) {
+        const primary = route.filter((o) => o.primary);
+        if (!primary.length || !primary.every((o) => o.complete)) continue;
         progress.bonus =
           photos.some((p) => p.siteId === site && !!p.poiId) ||
           keys.some(
             (key) => key.startsWith(`${def.landmark}/life:`) && key !== `${def.landmark}/life:`,
           );
-        progress.finish(site, statuses);
+        progress.finish(site, route);
       }
       return null;
     }),

@@ -9,7 +9,7 @@ Claude backlog (ordered by player impact; all unblocked; Sonnet for visual, Haik
 1. (PARTLY DONE 2026-10-08 16:xx: horizon fade, darker strata, sponges merged; bowl wall geometry still smooth/albedo-only, needs real ledge geometry) **Blue Hole bowl and horizon (Sonnet):** gallery is right after 910, but the bowl is a smooth beige dune with a hard horizon ring; add strata/ledges, darker lower walls, softened horizon, real sponge/fish silhouettes. Compare GOLDEN_SITES=great-blue-hole.
 2. (PARTLY DONE: irregular fingers merged; fingers still tubular with flat tops, wide shot still tiered spire; not checked on Low/phone) **Lost City beehive/slab (Sonnet):** towers still stacked cones with saucer flanges; give irregular carbonate fingers and flow texture, close-up view first (lost-city-2.png).
 3. **Review 940/960/970 when they land:** 940 must put Blue Hole's hole/gallery and Monterey's wall on the default mission path; 960 must show phone 60 s with sub, seabed and one target; 970 must turn CI green (cut shard-heavy specs, never loosen assertions).
-4. **Beebe sand-disc edge and chimneys (Sonnet):** feather the lit disc into the seabed and add chimney detail (930 if Codex has not done it).
+4. (DONE 2026-10-08 evening, merged) **Beebe sand-disc edge and chimneys (Sonnet):** feather the lit disc into the seabed and add chimney detail (930 if Codex has not done it).
 5. **Low-tier and real-phone pass (Haiku to run, Sonnet to judge):** capture all 13 sites on Low tier at 390x844 and 844x390; log defects.
 6. Queue state: Codex has 940, 950, 960, 970, 980 queued. Refill with Challenger Deep/Endurance fixes and the next fidelity rollout after the next golden set.
 

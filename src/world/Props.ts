@@ -14,7 +14,7 @@
  */
 
 import * as THREE from 'three';
-import { beebeRenderedGround } from './props/geo/beebe.js';
+import { beebeRenderedGround, beebeSeabedMaterial } from './props/geo/beebe.js';
 import type { PropsConfig } from '../core/Config.js';
 import { fetchContentJson } from '../game/ContentPath.js';
 import { bboxContains, latLonToWorld } from '../util/geo.js';
@@ -269,6 +269,11 @@ export class Props {
         cfg: this.cfg,
         tier: this.tier,
         groundHeight: () => this.debrisHeightFn(def),
+        // 930 Beebe material begin
+        ...(def.id === 'beebe-chimney-1' && def.feature === 'smoker-cluster'
+          ? { seabedMaterial: beebeSeabedMaterial(this.hf) }
+          : {}),
+        // 930 Beebe material end
       });
     }
     // A GLB model.

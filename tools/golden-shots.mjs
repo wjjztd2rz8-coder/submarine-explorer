@@ -18,6 +18,8 @@
  * Output: .cache/golden/<UTC YYYY-MM-DD-HHMMSS>/<site>-<1|2|3>.png + index.html.
  * GOLDEN_SITES=lost-city,beebe-vent-field limits the run to those sites.
  * GOLDEN_SITES=monterey is an alias for monterey-canyon.
+ * GOLDEN_MODE=mission loads each default mission; capture filenames end in -mission.png.
+ * Without GOLDEN_MODE, captures still use free dive.
  * GOLDEN_LAYOUTS=desktop,portrait captures 1600×900 and 390×844 at the same authored poses.
  * Monterey uses tools/monterey-poses.json, rather than geometry-dependent wall-life patch selection.
  * Chromium uses SwiftShader so the tool also works without a physical GPU.
@@ -46,6 +48,8 @@ async function main() {
   if (!base.pathname.endsWith('/')) base.pathname += '/';
   base.search = '';
   base.hash = '';
+  const mode = process.env.GOLDEN_MODE ?? 'free-dive';
+  if (!['free-dive', 'mission'].includes(mode)) throw new Error(`Unknown GOLDEN_MODE: ${mode}`);
   const stamp = new Date().toISOString().slice(0, 19).replace('T', '-').replaceAll(':', '');
   const output = resolve('.cache/golden', stamp);
   const layouts = (process.env.GOLDEN_LAYOUTS ?? 'desktop').split(',').map((name) => {
@@ -204,6 +208,7 @@ async function main() {
         const url = new URL(base);
         url.search = new URLSearchParams({
           tile: siteId,
+          ...(mode === 'mission' ? { mission: siteId } : {}),
           tutorial: '0',
           tier: 'high',
           lifeSeed: '42',
@@ -230,12 +235,18 @@ async function main() {
           // Freeze translation, pitch and ballast; keep normal lighting/render updates.
           window.__game.sub.step = () => {};
         });
+        if (mode === 'mission') {
+          stage = `${site}: begin default mission`;
+          await page.locator('.briefing-begin').click();
+          await page.waitForFunction(() => window.__game.mission?.state === 'diving');
+          await settle(page);
+        }
         const capture = async (n, range) => {
           stage = `${site}: capture ${n}`;
           console.log(stage);
           await settle(page);
           if (errors.length) throw new Error(`${site}: ${errors.join('; ')}`);
-          const filename = `${site}${layout === 'desktop' ? '' : '-portrait'}-${n}.png`;
+          const filename = `${site}${layout === 'desktop' ? '' : '-portrait'}-${n}${mode === 'mission' ? '-mission' : ''}.png`;
           const pose = await evaluate(() => {
             const g = window.__game;
             return {
@@ -509,6 +520,7 @@ async function main() {
         {
           base: base.href,
           stamp,
+          mode,
           layouts,
           plannedHeroes: heroes,
           complete: failures.length === 0,
@@ -525,7 +537,7 @@ async function main() {
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Golden shots ${stamp}</title><style>
 body{margin:24px;background:#081522;color:#e6f0f7;font:16px system-ui}main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}figure{margin:0}img{width:100%;height:auto}a{color:inherit}figcaption{padding:8px 0}@media(max-width:800px){main{grid-template-columns:1fr}}
-</style><h1>Golden shots · ${stamp} UTC</h1><p>${failures.length ? `INCOMPLETE: ${failures.length} failure(s). ` : ''}High tier · ${layouts.map((l) => `${l.name} ${l.width} × ${l.height}`).join(', ')} · fresh Arcade profile, life seed 42, dynamic resolution off. 1: spawn; 2–3: approach and detail (ranges below). <a href="poses.json">Pose manifest and failures</a></p>
+</style><h1>Golden shots · ${stamp} UTC</h1><p>${failures.length ? `INCOMPLETE: ${failures.length} failure(s). ` : ''}High tier · ${layouts.map((l) => `${l.name} ${l.width} × ${l.height}`).join(', ')} · ${mode} · fresh Arcade profile, life seed 42, dynamic resolution off. 1: spawn; 2–3: approach and detail (ranges below). <a href="poses.json">Pose manifest and failures</a></p>
 <main>${captures.map(({ filename, site, range }) => `<figure><a href="${filename}"><img loading="lazy" src="${filename}" alt="${site}, ${range === null ? 'default spawn' : `${range} m approach`}"></a><figcaption>${filename}</figcaption></figure>`).join('\n')}</main></html>`,
     );
     console.log(`Contact sheet: ${resolve(output, 'index.html')}`);
