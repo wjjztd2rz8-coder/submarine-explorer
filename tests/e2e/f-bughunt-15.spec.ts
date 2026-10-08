@@ -141,11 +141,10 @@ for (const viewport of [
           for (const step of ['move', 'depth', 'lights', 'scan', 'journal']) {
             await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
             await separate(page, [...hud, '.onboard-card', '.scan-panel']);
-            if (step !== 'journal')
-              await page.getByRole('button', { name: 'Skip step', exact: true }).tap();
+            if (step !== 'journal') await page.locator('.onboard-skip-step').tap();
           }
           await page.screenshot({ path: testInfo.outputPath('contact-and-tutorial.png') });
-          await page.getByRole('button', { name: 'Skip tutorial', exact: true }).tap();
+          await page.getByRole('button', { name: 'Skip', exact: true }).tap();
           await expect(page.locator('.onboard-card')).toBeHidden();
           await expect(page.locator('.scan-panel')).toBeVisible();
           await expect(page.locator('.scan-hint')).toHaveCount(1);

@@ -60,9 +60,9 @@ const geoMaterial: typeof baseGeoMaterial = (kind, d, o) => {
 };
 
 /**
- * (y, z) profile fractions from the apron join: a wall, a thick shelf whose
- * underside rises a little toward the lip (0.5-0.64 H), then the top. The
- * shelf's projection is scalloped along the wall (see `shelf`).
+ * A solution notch beneath a low limestone roof. The rear returns into the
+ * rising terrain instead of forming a tall exposed crest. Shelf projection
+ * and pendant lengths retain the original gallery footprint.
  */
 const PROFILE: [number, number][] = [
   [0.1, -0.05],
@@ -74,10 +74,8 @@ const PROFILE: [number, number][] = [
   [0.57, -1.0],
   [0.63, -0.98],
   [0.66, -0.5],
-  [0.68, -0.04],
-  [0.9, 0],
-  [1, 0.1],
-  [1.02, 0.45],
+  [0.7, -0.04],
+  [0.7, 0.45],
   [0.7, 0.9],
   [0.3, 1.3],
   [-0.12, 1.75],
@@ -279,7 +277,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   }
 
   // --- stalactites: clusters of fluted pendants hung from the underside of the shelf
-  const colliders: THREE.Box3[] = wallColliders(profile, W, D, H, 8, gnd, {
+  const colliders: THREE.Box3[] = wallColliders(profile, W, D, H, 12, gnd, {
     disp,
     edgeStart: EDGE_START,
     plan,

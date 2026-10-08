@@ -15,7 +15,7 @@
  */
 
 const FOCUSABLE =
-  'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), ' +
+  'button:not([disabled]), summary, a[href], input:not([disabled]), select:not([disabled]), ' +
   'textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 const stack: FocusTrap[] = [];
@@ -31,6 +31,11 @@ function onKeyDown(e: KeyboardEvent): void {
 function asEl(x: unknown): HTMLElement | null {
   if (typeof HTMLElement !== 'undefined') return x instanceof HTMLElement ? x : null;
   return x && typeof (x as HTMLElement).blur === 'function' ? (x as HTMLElement) : null;
+}
+
+function hiddenByDetails(el: HTMLElement): boolean {
+  const d = el.parentElement?.closest('details:not([open])');
+  return !!d && !(el.tagName === 'SUMMARY' && el.parentElement === d);
 }
 
 export class FocusTrap {
@@ -85,6 +90,8 @@ export class FocusTrap {
       (el) =>
         el.tabIndex >= 0 &&
         !el.closest('[hidden], [inert]') &&
+        // Content of a collapsed <details> keeps layout boxes but cannot take focus.
+        !hiddenByDetails(el) &&
         el.getClientRects().length > 0 &&
         getComputedStyle(el).visibility === 'visible',
     );

@@ -582,6 +582,22 @@ export class Journal {
     ].filter(Boolean);
     if (meta.length) b.append(el('p', 'jr-meta', meta.join(' · ')));
     if (site.memorialNote) b.append(el('p', 'jr-memorial', site.memorialNote));
+    if (site.briefing) {
+      const more = el('details', 'jr-site-more');
+      more.append(el('summary', undefined, 'More about this site'));
+      if (site.briefing.summary) more.append(el('p', 'jr-para', site.briefing.summary));
+      for (const [title, items] of [
+        ['FACTS', site.briefing.facts],
+        ['HAZARDS', site.briefing.hazards],
+      ] as const) {
+        if (!items.length) continue;
+        more.append(el('h3', 'jr-sources-title', title));
+        const list = el('ul', 'jr-facts-list');
+        for (const item of items) list.append(el('li', undefined, item));
+        more.append(list);
+      }
+      b.append(more);
+    }
     const p = siteProgress(site, this.store);
     const wl = wildlifeProgress(site, this.store);
     const secrets = site.entries.filter((e) => e.kind === 'secret');

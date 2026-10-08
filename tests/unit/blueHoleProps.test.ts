@@ -29,6 +29,69 @@ describe('Great Blue Hole props', () => {
     expect(geo.length).toBeGreaterThan(0);
   });
 
+  // Measured on main before 910 with level seating. Preserve the pendant
+  // envelope independently of terrain refinements and the roof's reduced crest.
+  const originalGallery = [
+    {
+      id: 'karst-grotto',
+      tier: 'low',
+      min: [-1.06218, 1.67745, -25.74851],
+      max: [7.28213, 11.17616, -3.06162],
+    },
+    {
+      id: 'karst-grotto',
+      tier: 'high',
+      min: [-17.81372, 1.06023, -31.67323],
+      max: [6.26942, 10.70134, -2.80004],
+    },
+    {
+      id: 'karst-grotto-east',
+      tier: 'low',
+      min: [-17.16424, 0.8634, -21.30654],
+      max: [16.30138, 8.09706, -4.00215],
+    },
+    {
+      id: 'karst-grotto-east',
+      tier: 'high',
+      min: [-18.58081, 1.16659, -23.38138],
+      max: [17.10649, 8.3307, -2.17395],
+    },
+  ];
+  for (const baseline of originalGallery) {
+    it(`${baseline.id} ${baseline.tier}: retains the pendant envelope beneath a low roof`, () => {
+      const def = geo.find((p) => p.id === baseline.id)!;
+      const built = buildGeo({
+        def,
+        dims: def.dimensionsM!,
+        seed: hashString(def.id),
+        cfg,
+        tier: baseline.tier,
+        groundHeight: () => () => 0,
+      });
+      const gallery = built.full.getObjectByName('stalactite-gallery') as THREE.Mesh;
+      gallery.geometry.computeBoundingBox();
+      const expected = new THREE.Box3(
+        new THREE.Vector3().fromArray(baseline.min),
+        new THREE.Vector3().fromArray(baseline.max),
+      );
+      const size = gallery.geometry.boundingBox!.getSize(new THREE.Vector3());
+      const original = expected.getSize(new THREE.Vector3());
+      for (const axis of ['x', 'y', 'z'] as const)
+        expect(size[axis]).toBeGreaterThan(original[axis] * 0.99);
+      expect(
+        gallery.geometry
+          .boundingBox!.getCenter(new THREE.Vector3())
+          .distanceTo(expected.getCenter(new THREE.Vector3())),
+      ).toBeLessThan(0.1);
+      built.full.updateMatrixWorld(true);
+      const roof = built.full.getObjectByName('grotto-overhang') as THREE.Mesh;
+      const down = new THREE.Raycaster(new THREE.Vector3(0, 100, 0), new THREE.Vector3(0, -1, 0));
+      const hit = down.intersectObject(roof)[0];
+      expect(hit).toBeDefined();
+      expect(hit.point.y).toBeLessThan(def.dimensionsM![2] * 0.75);
+    });
+  }
+
   for (const def of geo) {
     it(`${def.id}: stands on the ledge and its foot never floats above the sampled terrain`, () => {
       const { x, z } = latLonToWorld(meta, def.lat, def.lon);

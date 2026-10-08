@@ -92,7 +92,10 @@ test.describe('B3 mission flow', () => {
     await expect(page.locator('.briefing-objectives li.is-secondary')).toHaveCount(2);
     await expect(page.locator('.briefing-section.is-hazards li')).not.toHaveCount(0);
     await expect(page.locator('.briefing-memorial')).toBeVisible();
+    await expect(page.locator('.briefing-controls button')).toBeHidden();
+    await briefing.getByText('More about this site', { exact: true }).click();
     await expect(page.locator('.briefing-controls button')).toHaveText('View controls');
+    await briefing.getByText('More about this site', { exact: true }).click();
     await expect(page.locator('.briefing-begin')).toHaveText('Begin dive');
     await expect(page.locator('.objectives-panel')).toBeHidden();
     // The mission picker is collapsed out of the way during a mission.
@@ -113,6 +116,8 @@ test.describe('B3 mission flow', () => {
       0.01,
     );
 
+    // Enter on the focused disclosure toggles it; release focus so Enter is global.
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
     await page.keyboard.press('Enter');
     await expect(briefing).toBeHidden();
     const started = await missionProbe(page);

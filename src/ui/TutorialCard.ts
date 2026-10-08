@@ -82,6 +82,7 @@ export class TutorialCard {
   private readonly count: HTMLElement;
   private readonly title: HTMLElement;
   private readonly text: HTMLElement;
+  private readonly phoneText: HTMLElement;
   private readonly dots: HTMLElement;
   private shownKey = '';
 
@@ -94,17 +95,21 @@ export class TutorialCard {
     this.title = el('h2', 'onboard-card-title');
     this.text = el('p', 'onboard-card-text');
     this.text.setAttribute('aria-live', 'polite');
+    this.phoneText = el('p', 'onboard-card-phone-text');
+    this.phoneText.setAttribute('aria-live', 'polite');
     this.dots = el('div', 'onboard-card-dots');
     this.dots.setAttribute('aria-hidden', 'true');
     for (let i = 0; i < TUTORIAL_STEPS.length; i += 1) this.dots.append(el('span', 'onboard-dot'));
     const buttons = el('div', 'onboard-card-buttons');
-    buttons.append(
-      plainButton('Skip step', 'onboard-skip-step', actions.skipStep),
-      plainButton('Skip tutorial', 'onboard-skip-all', actions.skipAll),
+    const skipStep = plainButton('', 'onboard-skip-step', actions.skipStep);
+    skipStep.append(
+      el('span', 'onboard-skip-desktop', 'Skip step'),
+      el('span', 'onboard-skip-phone', 'Skip'),
     );
+    buttons.append(skipStep, plainButton('Skip tutorial', 'onboard-skip-all', actions.skipAll));
     const head = el('div', 'onboard-card-head');
     head.append(this.count, this.dots);
-    this.root.append(head, this.title, this.text, buttons);
+    this.root.append(head, this.title, this.text, this.phoneText, buttons);
     parent.append(this.root);
   }
 
@@ -127,6 +132,16 @@ export class TutorialCard {
     this.count.textContent = `Step ${index + 1} of ${TUTORIAL_STEPS.length}`;
     this.title.textContent = TUTORIAL_STEPS[index]?.title ?? '';
     this.text.textContent = text;
+    // Presentation only: the same five steps and skipStep action still run.
+    const phoneInstructions: Record<TutorialStepId, string> = {
+      move: 'Push left stick forward; sideways to turn.',
+      depth: 'Right slider: up to rise, down to sink.',
+      lights: 'Tap LIGHTS to switch the headlights.',
+      scan: 'Face a glowing target; hold SCAN to finish.',
+      journal: 'Tap PHOTO, or Pause → Journal for your finds.',
+    };
+    const step = TUTORIAL_STEPS[index];
+    this.phoneText.textContent = step ? phoneInstructions[step.id] : text;
     this.dots.querySelectorAll('.onboard-dot').forEach((dot, i) => {
       dot.classList.toggle('is-done', i < index);
       dot.classList.toggle('is-current', i === index);

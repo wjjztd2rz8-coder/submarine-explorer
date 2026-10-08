@@ -1,3 +1,4 @@
+import { dismissTutorial } from './helpers/tutorial.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
@@ -150,9 +151,7 @@ for (const layout of [
           return animal !== null;
         });
         expect(spawned).toBe(true);
-        const skip = page.getByRole('button', { name: 'Skip tutorial', exact: true });
-        if (layout.touch) await skip.tap();
-        else await skip.click();
+        await dismissTutorial(page, layout.touch, true);
         await page.clock.runFor(50);
         const hint = page.locator('.onboard-hint');
         await expect(page.locator('.onboard-card')).toBeHidden();

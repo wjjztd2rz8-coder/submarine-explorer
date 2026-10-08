@@ -73,13 +73,13 @@ for (const viewport of [
     const diveMode = briefing.locator('.mode-selector');
     await expect(diveMode.getByRole('radio')).toHaveCount(2);
     await expect(diveMode.locator('.mode-advanced')).toBeHidden();
-    await expect(briefing.getByRole('button', { name: 'Free dive', exact: true })).toBeVisible();
+    await expect(briefing.getByRole('link', { name: 'Free dive', exact: true })).toBeVisible();
     await briefing.locator('.briefing-begin').scrollIntoViewIfNeeded();
     await page.screenshot({ path: `${shots}/daily-briefing-${viewport.width}.png` });
     await diveMode.getByRole('button', { name: 'Advanced' }).click();
     await expect(diveMode.locator('.mode-advanced')).toBeVisible();
     await page.screenshot({ path: `${shots}/daily-briefing-${viewport.width}-advanced.png` });
-    await briefing.getByRole('button', { name: 'Free dive', exact: true }).click();
+    await briefing.getByRole('link', { name: 'Free dive', exact: true }).click();
     await page.waitForFunction(
       () => window.__gameReady === true && (window.__game as { mission: unknown }).mission === null,
     );

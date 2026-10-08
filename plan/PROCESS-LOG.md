@@ -134,3 +134,7 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 
 - `.cache/codex/refill.log` showed "codex: command not found" for every refill since 2026-10-07: the timer's PATH lacks /home/linuxbrew/.linuxbrew/bin. Added it to codex-dispatch.sh and codex-refill.sh. The queue only stayed fed because Claude's reviews wrote briefs.
 - 890 and 900 ended after their Codex round with no result file and no unit exit in the journal (cause unknown; a chrome-headless core dump at each start). Their worktrees are complete; the next Claude run gates them (RESUME-PROMPT §1).
+
+## 2026-10-08 11:44 CDT: comprehensive reviews are joint with Codex Sol
+
+- **Owner (2026-10-08):** the joint review helped, so every comprehensive review now runs it. Sol found a blocker Claude missed (default missions skip the hero scenery) and corrected two Claude errors. `tools/codex-review.sh start` runs Sol's independent, read-only review in the background while Claude reviews; `reconcile` sends Claude's draft back for one round and returns an agreed summary. REVIEW-PROMPT step 0. Skips (exit 75) when Codex 5h < 20% or weekly < 10%.
