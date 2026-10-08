@@ -7,9 +7,13 @@ import type { Submarine } from '../../src/sub/Submarine.js';
 import type { CameraRig } from '../../src/sub/CameraRig.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { expectCompactPhoneHud } from './helpers/phoneHud.js';
 
 /** Fresh player: no hull unlocks, discoveries, skipped briefing or completed tutorial. */
-const shots = '.cache/codex/shots/510-f-journal-debrief-flow-audit';
+const env =
+  (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
+const shots = env.FLOW_AUDIT_SHOTS ?? '.cache/codex/shots/510-f-journal-debrief-flow-audit';
+const captureSeconds = Number(env.FLOW_AUDIT_SECONDS ?? 10);
 const sites = ['titanic', 'lost-city', 'great-blue-hole', 'beebe-vent-field', 'monterey-canyon'];
 type Game = {
   discovery: Discovery;
@@ -150,8 +154,18 @@ async function firstActions(page: Page, touch: boolean): Promise<void> {
 
 for (const viewport of [
   { width: 1600, height: 900, touch: false, sites: ['titanic', 'great-blue-hole'] },
-  { width: 844, height: 390, touch: true, sites: ['lost-city', 'beebe-vent-field'] },
-  { width: 390, height: 844, touch: true, sites: ['monterey-canyon'] },
+  {
+    width: 844,
+    height: 390,
+    touch: true,
+    sites: ['lost-city', 'beebe-vent-field', 'titanic', 'great-blue-hole'],
+  },
+  {
+    width: 390,
+    height: 844,
+    touch: true,
+    sites: ['monterey-canyon', 'titanic', 'great-blue-hole'],
+  },
 ]) {
   const size = `${viewport.width}x${viewport.height}`;
   test.describe(`510 flow ${size}`, () => {
@@ -167,7 +181,7 @@ for (const viewport of [
     // orientations. Dedicated HUD/credits/toast specs cover the viewport matrix.
     for (const site of sites.filter((site) => viewport.sites.includes(site))) {
       test(`${site}: Home -> opening -> Journal -> debrief -> Home`, async ({ page }) => {
-        test.setTimeout(240_000);
+        test.setTimeout(captureSeconds > 10 ? 480_000 : 240_000);
         await pauseClockBeforeNavigation(page);
         await page.addInitScript(() => {
           if (!localStorage.getItem('subexplorer.settings.v2'))
@@ -260,24 +274,27 @@ for (const viewport of [
         // The clock is paused: render frames so the first tutorial step is shown.
         await page.clock.runFor(34);
         await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'move');
+        if (touch) await expectCompactPhoneHud(page);
         await shot('05-dive-start');
         await firstActions(page, touch);
-        // Observe ten real simulation seconds after learning the controls.
-        // Repeating an idle minute in 15 site/viewport combinations dominated CI;
-        // scan reachability is independently checked against every hero's terrain.
-        await expect
-          .poll(
-            async () => {
-              // One real frame per bounded clock advance; Time caps its delta at 250 ms.
-              await page.clock.fastForward(250);
-              return page.evaluate(
-                () => (window.__game as unknown as Game).discovery.stats.elapsedS,
-              );
-            },
-            { timeout: 90_000, intervals: [20] },
-          )
-          .toBeGreaterThanOrEqual(10);
-        await shot('06-dive-10s');
+        // Normal CI observes ten seconds. The director's phone audit captures
+        // 10/30/60 simulation seconds using FLOW_AUDIT_SECONDS=60.
+        for (const seconds of [10, 30, 60].filter((s) => s <= captureSeconds)) {
+          await expect
+            .poll(
+              async () => {
+                // One real frame per bounded clock advance; Time caps its delta at 250 ms.
+                await page.clock.fastForward(250);
+                return page.evaluate(
+                  () => (window.__game as unknown as Game).discovery.stats.elapsedS,
+                );
+              },
+              { timeout: 180_000, intervals: [20] },
+            )
+            .toBeGreaterThanOrEqual(seconds);
+          if (touch) await expectCompactPhoneHud(page);
+          await shot(`06-dive-${seconds}s`);
+        }
         await pause(page, touch);
         await act(
           page.locator('.pause-menu').getByRole('button', { name: 'Journal', exact: true }),
