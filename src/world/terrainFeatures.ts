@@ -79,6 +79,30 @@ function boulderField(dx: number, dz: number): number {
   return h;
 }
 
+const clamp01 = (t: number): number => Math.max(0, Math.min(1, t));
+
+/**
+ * Irregular benches on the sinkhole wall: the profile height is quantised into
+ * treads and steep risers (period and phase wander with bearing, so no ring is
+ * constant), with a small raised lip at each riser crest and a dip under it
+ * that the slope shading reads as an undercut shadow. Returns a height delta.
+ * Zone: heights -34..-100 m; the mouth mask in blueHoleWallRelief keeps both
+ * gallery seats untouched.
+ */
+function terraces(a: number, r: number): number {
+  const h = profileAt(r);
+  const zone = smoothstep(clamp01((h + 106) / 8)) * (1 - smoothstep(clamp01((h + 34) / 6)));
+  if (zone <= 0) return 0;
+  const q = 9 + 2.5 * Math.sin(5 * a + 0.7) + 1.5 * Math.sin(11 * a + 2.0);
+  const off = 4 * Math.sin(3 * a + 1.1) + 2 * Math.sin(8 * a);
+  const u = (h + off) / q;
+  const f = u - Math.floor(u);
+  const step = Math.floor(u) + smoothstep(clamp01((f - 0.58) / 0.27));
+  const lip = Math.exp(-(((f - 0.9) / 0.07) ** 2));
+  const under = Math.exp(-(((f - 0.66) / 0.07) ** 2));
+  return zone * (step * q - off - h + 1.1 * lip - 1.3 * under);
+}
+
 /** Relief is part of the single heightfield, so sand and exposed rock share
  * vertices, derivative normals, material and collision. Suppress displacement
  * around both gallery seats to retain their original mouth and pendant space.
@@ -102,7 +126,7 @@ export function blueHoleWallRelief(a: number, r: number): number {
   // Fine rubble hummocks at the foot of each broken bench, without a second
   // surface or rock AABBs closing the navigable shaft.
   const rubble = Math.max(0, Math.sin(61 * a + r * 0.9)) ** 4 * (bench + lower);
-  return ends * mouth * (1.4 * flute + 1.1 * (bench + lower) * broken + 0.7 * rubble);
+  return ends * mouth * (terraces(a, r) + 1.4 * flute + 1.1 * (bench + lower) * broken + 0.7 * rubble);
 }
 
 export interface TerrainCarve {
