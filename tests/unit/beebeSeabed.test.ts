@@ -11,6 +11,8 @@ import { headingQuaternion } from '../../src/world/Props.js';
 import { parsePropsDoc } from '../../src/world/PropLoader.js';
 import { VENT_BUILDERS } from '../../src/world/props/builders/vents.js';
 import { hashString } from '../../src/world/props/geo/shared.js';
+import { biomeFor } from '../../src/world/TerrainBiome.js';
+import { createTerrainMaterial } from '../../src/world/TerrainMaterial.js';
 
 const def = parsePropsDoc(doc, DEFAULT_CONFIG.props).props[0]!;
 const ground = (x: number, z: number): number =>
@@ -107,12 +109,13 @@ describe('Beebe opening mineral seabed', () => {
       }
       expect(raised).toBeGreaterThan(30);
       expect(buried).toBeGreaterThan(30);
-      expect(apron.material.vertexColors).toBe(true);
+      expect(apron.material.vertexColors).toBe(false);
       expect(apron.material.emissive.getHex()).toBe(0);
-      const colors = apron.geometry.getAttribute('color');
-      const warm = Array.from({ length: colors.count }, (_, i) => colors.getX(i) - colors.getZ(i));
-      expect(Math.max(...warm)).toBeGreaterThan(0.03);
-      expect(new Set(warm.map((v) => Math.round(v * 1000))).size).toBeGreaterThan(20);
+      // No radius-based colour band: the terrain shader supplies world-space sediment patches.
+      expect(apron.geometry.getAttribute('color')).toBeUndefined();
+      const cavity = apron.geometry.getAttribute('aCavity');
+      expect(cavity.count).toBe(positions.count);
+      expect(Array.from(cavity.array).every((value) => value === 0.5)).toBe(true);
       const talus = built.full.getObjectByName('beebe-seabed-talus') as THREE.Mesh;
       expect(talus.geometry.getAttribute('color')).toBeDefined();
       expect(built.bounds.containsBox(new THREE.Box3().setFromObject(apron))).toBe(true);
@@ -159,6 +162,54 @@ describe('Beebe opening mineral seabed', () => {
       ).count;
     expect(talusVertices(low)).toBeLessThan(talusVertices(high) / 2);
   });
+
+  for (const tier of ['low', 'high'] as const) {
+    it(`${tier}: shares the live seabed uniforms and exact shader without allocating maps`, () => {
+      const terrain = createTerrainMaterial({
+        config: DEFAULT_CONFIG.terrain,
+        tier,
+        biome: biomeFor('beebe-vent-field'),
+        exaggeration: 1,
+      });
+      const built = VENT_BUILDERS.chimney({
+        def,
+        dims: def.dimensionsM!,
+        seed: hashString(def.id),
+        cfg: DEFAULT_CONFIG.props,
+        tier,
+        groundHeight: () => ground,
+        seabedMaterial: terrain.material,
+      });
+      const apron = apronOf(built);
+      expect(apron.material).not.toBe(terrain.material);
+      expect(apron.material.userData.uniforms).toBe(terrain.material.userData.uniforms);
+      expect(apron.material.transparent).toBe(false);
+      expect(apron.material.map).toBeNull();
+      expect(apron.material.customProgramCacheKey()).toBe(terrain.material.customProgramCacheKey());
+      const compile = (material: THREE.MeshStandardMaterial) => {
+        const shader = {
+          ...THREE.ShaderLib.standard,
+          uniforms: { ...THREE.ShaderLib.standard.uniforms },
+        };
+        material.onBeforeCompile(
+          shader as Parameters<typeof material.onBeforeCompile>[0],
+          {} as THREE.WebGLRenderer,
+        );
+        return shader;
+      };
+      expect(compile(apron.material)).toEqual(compile(terrain.material));
+      // An asynchronously loaded texture must also reach the apron, without rebinding/copying.
+      const loadedMap = new THREE.Texture();
+      terrain.material.userData.uniforms.tAlbA.value = loadedMap;
+      expect(compile(apron.material).uniforms.tAlbA.value).toBe(loadedMap);
+      if (tier === 'low')
+        expect(compile(apron.material).fragmentShader).not.toContain('#define TERRAIN_PBR_NORMALS');
+      loadedMap.dispose();
+      terrain.textures.forEach((texture) => texture.dispose());
+      terrain.material.dispose();
+      apron.material.dispose();
+    });
+  }
 
   it('does not decorate other vent sites, missing terrain or malformed content', () => {
     const elsewhere = build('high', { ...def, id: 'axial-smoker' });

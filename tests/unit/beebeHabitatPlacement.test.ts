@@ -28,6 +28,12 @@ for (const tier of ['low', 'high'] as const) {
         expect(origin.y).toBeCloseTo(terrain.sampleHeight(origin.x, origin.z), 5);
         const mesh = prop.full.getObjectByName('beebe-flow-habitat')!;
         const apron = prop.full.getObjectByName('beebe-mineral-seabed');
+        if (apron instanceof THREE.Mesh) {
+          const floor = terrain.group.children.find(
+            (object) => object instanceof THREE.Mesh,
+          ) as THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
+          expect(apron.material.userData.uniforms).toBe(floor.material.userData.uniforms);
+        }
         for (const anchor of mesh.userData.anchors as number[][]) {
           const point = prop.root.localToWorld(new THREE.Vector3().fromArray(anchor));
           const ray = new THREE.Raycaster(

@@ -138,6 +138,8 @@ export interface ProceduralBuildInput {
    * undefined when the prop does not snap. Computed on demand.
    */
   groundHeight(): LocalHeightFn | undefined;
+  /** Optional supporting seabed finish; Beebe's apron shares its world-space shading. */
+  seabedMaterial?: THREE.MeshStandardMaterial;
 }
 
 /** One `procedural:<kind>` builder. Must be deterministic from `seed`. */

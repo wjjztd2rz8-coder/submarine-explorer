@@ -14,6 +14,12 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BEEBE-930: blend Beebe's main smoker sediment apron with the
+  surrounding 850 seabed using its existing world-space material and shared
+  texture uniforms. Remove the pale radial tint while retaining the noisy buried
+  edge, all chimney/clump geometry and opening composition. Reason: the plain
+  cream patch read as a plate in close-ups. The blue oval is the cockpit bezel;
+  shared cockpit rendering is retained. Evidence: `plan/progress/F-BEEBE-930.md`.
 - Phase F, F-MONTEREY-860: lift Monterey's ambient fill with a more neutral
   tint and a modest hemisphere light; extend and strengthen its submarine
   lamps. Stage two Pacific hake schools, a few factual sablefish and a sea-pen
