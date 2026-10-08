@@ -543,3 +543,10 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 ## 2026-10-08 08:39 CDT targeted review run (Claude)
 
 - Trigger "e2e failing repeatedly" was a false positive (stale all-time FAIL count); trigger now uses a 2-day window. No merges; queue 850-910 unchanged. Needs owner: nothing.
+
+## 2026-10-08 10:05 CDT headless run (Claude)
+
+- **Found:** 870 stopped because 810's cubic terrain reconstruction dropped the site carve (Monterey lost ~164 m of canyon depth on Medium+; Blue Hole would too). Fixed on main in Terrain.surfaceHeight; 870 requeued as 875, verification queued as 920.
+- **Merged:** debrief wording/one primary action and Journal "N more to find" collapse (DIRECTOR items 6-7); full e2e passed on the identical commit, smoke on main.
+- **Running (Codex):** 850 Beebe, 860 Monterey first frame; queued 875, 880-910, 920.
+- Monterey will look deeper after the carve fix: next golden run should compare. Needs owner: nothing.

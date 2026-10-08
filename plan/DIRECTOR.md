@@ -13,8 +13,8 @@ Claude backlog (ordered by player impact; all unblocked):
 3. **Blue Hole wall relief redo (review 910):** 830 was reverted: patchwork sand blobs and a shrunken gallery. Accept only if the gallery stays as large as in golden 132858 and no hard-edged patches remain.
 4. **Fidelity rollout (review 870, then Lost City beehive/slab and Titanic hull detail):** Monterey's 810 terrain read much smoother and more natural in golden 132228 (+1). Roll the same profile to Blue Hole and Lost City, then decide on Beebe/Titanic from the result.
 5. **Beebe (review 850) and Monterey first frame (review 860):** Beebe seabed beyond the lit pool and an odd near-vertical sub pose; Monterey still dark and teal-monochrome with few animals. Redo in Claude if Codex output is flat.
-6. **Debrief wording and actions:** "Dive ended / Primary objectives unfinished" after a successful scan reads like failure, and the end card offers five actions (two buttons, three links). One primary action, a warmer line for partial dives.
-7. **Journal list:** "Unscanned target 2..7" rows are dead space; collapse them to a single "7 more to find" row.
+6. (DONE 2026-10-08) **Debrief wording and actions:** "Dive ended / Primary objectives unfinished" after a successful scan reads like failure, and the end card offers five actions (two buttons, three links). One primary action, a warmer line for partial dives.
+7. (DONE 2026-10-08) **Journal list:** "Unscanned target 2..7" rows are dead space; collapse them to a single "7 more to find" row.
 8. **Hosted CI:** run on f30 push; if still red after 880's verification, cut shard-heavy specs rather than loosen assertions.
 
 Codex queue: 850 Beebe, 860 Monterey first frame, 870 fidelity rollout, 880 f30 bug hunt, 890 phone HUD, 900 briefing, 910 Blue Hole redo. Next candidates: Challenger Deep/Endurance golden pass, Journal list collapse and debrief wording (items 6-7), a regression bug hunt after 890/900.
