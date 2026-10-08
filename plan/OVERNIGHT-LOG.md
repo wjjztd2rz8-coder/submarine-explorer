@@ -597,3 +597,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 ## 2026-10-08 16:52 CDT headless run (Claude)
 
 - **Merged:** 930 Beebe seabed apron now uses the terrain world-space material (golden pose 3: no cream plate; bluish ring is the cockpit bezel, left alone). Smoke e2e + project-base passed on main; not pushed. Codex 940, 950, 960 still running (round 1); queue 970, 980, 990. Needs owner: nothing.
+
+## 2026-10-08 18:56 CDT headless run (Claude)
+
+- **Merged:** 940 (default Blue Hole mission starts with the stalactite gallery, Monterey with the north wall; spawn offsets 0 m; removed a "scenic reconstruction" caveat from the hint) and 950 (Challenger/Endurance closer openings, depth lighting, one staged life group; reviewed desktop goldens: sub, floor and target readable, Endurance still snowy with the sub covering part of the wreck). Full e2e passed on both branches before merge; main smoke + project-base green; pushed, tagged f35.
+- **Hosted CI** on main was red at 20:35Z; 970 (e2e shards) and new 1010 cover it.
+- **Running (Codex):** 960 (regression hunt), 970. Codex 5h at 8% until 21:15. **Queue:** 980, 990, 1000, 1010. Held: 830 reference worktree. No Claude agents launched. Needs owner: nothing.
