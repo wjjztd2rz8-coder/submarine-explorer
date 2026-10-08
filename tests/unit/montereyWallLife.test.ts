@@ -151,6 +151,6 @@ describe('Monterey wall life on surveyed terrain', () => {
       } finally {
         terrain.dispose();
       }
-    }, 45_000); // Independent raycasts through the denser four-wall meshes at every tier.
+    }, 120_000); // Ultra took ~50 s on hosted runners (timed out at 45 s). Independent raycasts through the denser four-wall meshes at every tier.
   }
 });
