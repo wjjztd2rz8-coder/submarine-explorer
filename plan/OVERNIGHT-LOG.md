@@ -582,3 +582,8 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 ## 2026-10-08 15:35 headless review run (Claude only)
 
 Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothing; fixed montereyWallLife ultra timeout (CI), queued 970 (e2e shards) and 980 (Titanic/Monterey), DIRECTOR refreshed. Needs owner: nothing.
+
+## 2026-10-08 16:10 CDT headless run (Claude)
+
+- **Merged (smoke e2e on main, not pushed, no tag):** Blue Hole horizon fade + darker strata + sponges (wall geometry unchanged, modest gain); Lost City irregular carbonate towers with leaning fingers (clear improvement at lost-city-2; fingers still tubular, Low/phone unchecked). Both Sonnet.
+- **Queue:** 940, 950, 960, 970, 980 (Codex 5h reset 15:50). Held: 930 Beebe worktree. Needs owner: nothing.
