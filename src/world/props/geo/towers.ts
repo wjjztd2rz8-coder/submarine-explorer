@@ -9,10 +9,12 @@
 
 import * as THREE from 'three';
 import { lostCityBedTint } from '../../LostCityBands.js';
+import { createLostCityCarbonateMaterial } from '../../LostCityCarbonate.js';
+import { lostCityFlange } from '../../LostCityFlange.js';
 import { buildAnemone } from '../../life/models/sessile.js';
 import { branchingColony } from './coral.js';
 import { geoDetail } from './detail.js';
-import { geoMaterial, LIFE_TINT, vertexGlow } from './materials.js';
+import { LIFE_TINT } from './materials.js';
 import { shimmerPlume } from './plume.js';
 import {
   boxCH,
@@ -25,13 +27,12 @@ import {
   mulberry32,
   paint,
   place,
-  projectUVs,
   smooth,
   type BuiltProp,
   type InstanceSpec,
 } from './shared.js';
 import { scatterRubble } from './talus.js';
-import { flange, spireRadius, tieredSpire, type SpireOpts } from './spire.js';
+import { spireRadius, tieredSpire, type SpireOpts } from './spire.js';
 import type { GeoBuildInput } from './types.js';
 
 const OLD = new THREE.Color(0x8e8c82); // weathered, inactive carbonate
@@ -93,6 +94,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       tiers: Math.max(2, Math.round(h / (main ? 6.5 : 5))),
       ledge: main ? 0.2 : 0.16,
       wobble: 0.1,
+      rough: 0.035,
       ridges: main ? 9 : 6,
       ridgeAmp: 0.06,
       flare: main ? 0.7 : 0.5,
@@ -162,13 +164,13 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const w = rAt * (0.4 + rnd() * 0.5) + 0.6;
       pieces.push(
         place(
-          flange({
+          lostCityFlange({
             r0: rAt * 0.92,
             w,
             arc: 1.7 + rnd() * 2.4,
             start: rnd() * 6.28,
             seed: seed + f + i * 5,
-            segs: Math.round(18 + 14 * dens),
+            tier,
           }),
           { x: s.x, y: s.y + t * s.h, z: s.z },
         ),
@@ -194,12 +196,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     out.lerp(SEABED, smooth(0.5, 1.05, rn) * (1 - up * 0.5));
     if (ny > 0.8) out.multiplyScalar(0.9); // silt dusting on shelves
   });
-  projectUVs(geom, 5);
-  const material = geoMaterial('flow', d, { roughness: 0.82, side: THREE.DoubleSide });
-  // Pale carbonate answers the warm headlights harder than dark rock, and a faint cool
-  // emissive lift keeps the silhouette readable in the dark water beyond the beams.
-  material.color.multiplyScalar(1.5);
-  vertexGlow(material, 0.22, 0xb4c8cc, 0.25);
+  const material = createLostCityCarbonateMaterial(tier);
   const full = new THREE.Group();
   full.name = 'carbonate-tower';
   full.add(new THREE.Mesh(geom, material));
