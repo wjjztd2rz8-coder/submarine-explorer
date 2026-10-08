@@ -92,7 +92,7 @@ export class Terrain {
   readonly stats: TerrainStats;
   /** The site's seabed palette and scatter table (TerrainBiome.ts). */
   readonly biome: Biome;
-  /** Seabed maps are bound and temporary textures released; boot stays nonblocking. */
+  /** Seabed map loads settled, retaining fallbacks after errors; boot stays nonblocking. */
   readonly texturesReady: Promise<void>;
 
   /** Tile extent in metres. */

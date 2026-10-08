@@ -41,7 +41,7 @@ export interface TerrainMaterialResult {
   textureSize: number;
   /** The site's slot C (hard substrate) albedo, resolved once loaded; null under Node. */
   rockTexture: Promise<THREE.Texture | null>;
-  /** All maps bound and their temporary placeholders released; immediate under Node. */
+  /** All map loads settled; required fallbacks stay alive after errors. Immediate under Node. */
   texturesReady: Promise<void>;
 }
 
@@ -104,18 +104,18 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
       ['tAlbB', 'tNrmB', biome.b],
       ['tAlbC', 'tNrmC', biome.c],
     ];
-    const cache = new Map<string, Promise<THREE.Texture>>();
-    const fetch = (file: string, srgb: boolean, uniform: string): Promise<THREE.Texture> => {
+    const cache = new Map<string, Promise<THREE.Texture | null>>();
+    const fetch = (file: string, srgb: boolean, uniform: string): Promise<THREE.Texture | null> => {
       let p = cache.get(file);
       if (!p) {
         const tex = loadSeabedTexture(file, srgb);
         textures.push(tex);
-        p = tex.userData.ready as Promise<THREE.Texture>;
+        p = tex.userData.ready as Promise<THREE.Texture | null>;
         cache.set(file, p);
       }
       // Bind only once the image is there: an unloaded texture samples as black.
       void p.then((tex) => {
-        (uniforms[uniform] as THREE.IUniform).value = tex;
+        if (tex) (uniforms[uniform] as THREE.IUniform).value = tex;
       });
       return p;
     };
@@ -125,11 +125,14 @@ export function createTerrainMaterial(opts: TerrainMaterialOptions): TerrainMate
       if (tierCfg.pbrNormals) void fetch(`${set}_n.jpg`, false, un);
     }
     texturesReady = Promise.all(cache.values()).then(() => {
-      // Uniform bindings above run first. Once replaced, neutral maps must
-      // leave GPU memory, whether they were rendered before loading or not.
-      // The low tier does not sample the normal uniforms.
-      albPlaceholder.dispose();
-      nrPlaceholder.dispose();
+      // Uniform bindings above run first. A failed map still samples the neutral
+      // fallback; release only placeholders that no active slot needs anymore.
+      const uses = (prefix: string, texture: THREE.Texture): boolean =>
+        Object.entries(uniforms).some(
+          ([key, uniform]) => key.startsWith(prefix) && uniform.value === texture,
+        );
+      if (!uses('tAlb', albPlaceholder)) albPlaceholder.dispose();
+      if (!tierCfg.pbrNormals || !uses('tNrm', nrPlaceholder)) nrPlaceholder.dispose();
     });
   }
 
@@ -205,7 +208,7 @@ function loadSeabedTexture(file: string, srgb: boolean): THREE.Texture {
   tex.generateMipmaps = true;
   tex.anisotropy = 4;
   tex.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
-  tex.userData.ready = new Promise<THREE.Texture>((resolve) => {
+  tex.userData.ready = new Promise<THREE.Texture | null>((resolve) => {
     const img = new Image();
     img.onload = () => {
       tex.image = img;
@@ -213,7 +216,10 @@ function loadSeabedTexture(file: string, srgb: boolean): THREE.Texture {
       resolve(tex);
     };
     // A missing map leaves the neutral placeholder in place.
-    img.onerror = () => console.warn(`[terrain] could not load seabed map ${file}`);
+    img.onerror = () => {
+      console.warn(`[terrain] could not load seabed map ${file}`);
+      resolve(null);
+    };
     img.src = publicUrl(`assets/terrain/${file}`);
   });
   return tex;

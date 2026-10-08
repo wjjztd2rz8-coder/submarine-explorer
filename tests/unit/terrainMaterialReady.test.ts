@@ -65,6 +65,83 @@ describe('terrain map readiness and temporary texture lifetime', () => {
     });
   }
 
+  for (const tier of ['low', 'high'] as const) {
+    for (const failed of [
+      'sand_a.jpg',
+      'basalt_a.jpg',
+      'all',
+      ...(tier === 'high' ? ['sand_n.jpg'] : []),
+    ]) {
+      it(`${tier}: settles failed ${failed} maps while keeping required fallback textures alive`, async () => {
+        const images: Array<{ src: string; onload: () => void; onerror: () => void }> = [];
+        vi.stubGlobal('document', {});
+        vi.stubGlobal(
+          'Image',
+          class {
+            src = '';
+            onload = () => {};
+            onerror = () => {};
+            constructor() {
+              images.push(this);
+            }
+          },
+        );
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const result = createTerrainMaterial({
+          config: DEFAULT_CONFIG.terrain,
+          tier,
+          biome: { ...biomeFor('test'), a: 'sand', b: 'sand', c: 'basalt' },
+          exaggeration: 1,
+        });
+        const uniforms = result.material.userData.uniforms as Record<string, IUniform<Texture>>;
+        const albedo = result.textures[0];
+        const normal = result.textures[1];
+        const albedoDisposed = vi.fn();
+        const normalDisposed = vi.fn();
+        albedo.addEventListener('dispose', albedoDisposed);
+        normal.addEventListener('dispose', normalDisposed);
+        let ready = false;
+        void result.texturesReady.then(() => (ready = true));
+        try {
+          const fails = (src: string) => failed === 'all' || src.endsWith(failed);
+          for (const image of images) {
+            if (fails(image.src)) image.onerror();
+            else image.onload();
+          }
+          // Failure must settle just like a successful load, without a timeout.
+          for (let i = 0; i < 8; i++) await Promise.resolve();
+          expect(ready).toBe(true);
+          const needsAlbedo = Object.entries(uniforms).some(
+            ([key, u]) => key.startsWith('tAlb') && u.value === albedo,
+          );
+          const needsNormal =
+            tier === 'high' &&
+            Object.entries(uniforms).some(
+              ([key, u]) => key.startsWith('tNrm') && u.value === normal,
+            );
+          expect(albedoDisposed).toHaveBeenCalledTimes(needsAlbedo ? 0 : 1);
+          expect(normalDisposed).toHaveBeenCalledTimes(needsNormal ? 0 : 1);
+          for (const [key, set] of [
+            ['A', 'sand'],
+            ['B', 'sand'],
+            ['C', 'basalt'],
+          ]) {
+            expect(uniforms[`tAlb${key}`].value === albedo).toBe(fails(`${set}_a.jpg`));
+            if (tier === 'high')
+              expect(uniforms[`tNrm${key}`].value === normal).toBe(fails(`${set}_n.jpg`));
+          }
+          expect(await result.rockTexture).toBe(
+            fails('basalt_a.jpg') ? null : uniforms.tAlbC.value,
+          );
+        } finally {
+          warn.mockRestore();
+          result.material.dispose();
+          for (const texture of result.textures) texture.dispose();
+        }
+      });
+    }
+  }
+
   it('is immediately ready without browser image loading under Node', async () => {
     const result = createTerrainMaterial({
       config: DEFAULT_CONFIG.terrain,

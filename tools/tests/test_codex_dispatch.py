@@ -69,6 +69,25 @@ elif kind == "ss":
         self.assertFalse((root / 'calls.jsonl').exists())
         self.assertEqual(len(list((root / '.cache/codex/queue').glob('*.md'))), 2)
 
+    def test_numbered_briefs_launch_in_numeric_order_across_1000(self):
+        root, script = self.fixture()
+        queue = root / '.cache/codex/queue'
+        for brief in queue.glob('*.md'):
+            brief.unlink()
+        for name in ['990-last-three-digit.md', '1000-first-four-digit.md']:
+            (queue / name).write_text('<!-- env: ROUNDS=2 -->\nfixture task\n')
+        result = subprocess.run(['bash', str(script)], env=dict(os.environ, MAX='6'),
+                                capture_output=True, text=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = [json.loads(line) for line in (root / 'calls.jsonl').read_text().splitlines()]
+        launches = [call for call in calls if call['kind'] == 'systemd-run']
+        briefs = [next(arg for arg in call['args'] if arg.startswith('.cache/codex/queue/launched/'))
+                  for call in launches]
+        self.assertEqual(briefs, [
+            '.cache/codex/queue/launched/990-last-three-digit.md',
+            '.cache/codex/queue/launched/1000-first-four-digit.md',
+        ])
+
 
 if __name__ == '__main__':
     unittest.main()
