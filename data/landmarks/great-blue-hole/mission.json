@@ -25,7 +25,7 @@
     "heading_deg": 270
   },
   "briefing": {
-    "summary": "Cross the shallow Lighthouse Reef platform and survey its steep eastern and western edges around the Great Blue Hole.",
+    "summary": "Scan the scenic stalactite gallery inside the Great Blue Hole, then cross the shallow Lighthouse Reef platform to survey its eastern edge. The western edge offers an optional survey.",
     "depth_m": 226,
     "facts": [
       "The Great Blue Hole is about 320 m across and 125 m deep, inside the shallow Lighthouse Reef lagoon.",
@@ -42,6 +42,14 @@
   },
   "objectives": [
     {
+      "id": "stalactites",
+      "type": "scan",
+      "poi": "great-blue-hole-stalactites",
+      "primary": true,
+      "title": "Scan the stalactite gallery",
+      "hint": "Face the nearby limestone alcove inside the hole."
+    },
+    {
       "id": "outer-dropoff",
       "type": "scan",
       "poi": "great-blue-hole-outer-dropoff",
@@ -53,7 +61,7 @@
       "id": "western-dropoff",
       "type": "scan",
       "poi": "great-blue-hole-western-dropoff",
-      "primary": true,
+      "primary": false,
       "title": "Survey the western atoll edge",
       "hint": "Head west of the hole to where the reef flat steepens toward 200 m."
     }

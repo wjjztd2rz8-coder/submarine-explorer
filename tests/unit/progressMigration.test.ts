@@ -4,6 +4,51 @@ import { Progress } from '../../src/game/Progress.js';
 import { creditPreviousDives } from '../../src/game/ProgressMigration.js';
 import { ProgressSave } from '../../src/core/Save.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
+
+it.each([
+  ['great-blue-hole', ['great-blue-hole-outer-dropoff', 'great-blue-hole-western-dropoff'], 2],
+  ['monterey-canyon', ['monterey-canyon-head', 'monterey-canyon-upper-channel'], 1],
+  ['great-blue-hole', ['great-blue-hole-stalactites', 'great-blue-hole-outer-dropoff'], 1],
+  ['monterey-canyon', ['monterey-canyon-wall', 'monterey-canyon-upper-channel'], 1],
+] as const)(
+  '940 preserves legacy discoveries and earned route credit for %s: %j',
+  async (site, pois, stars) => {
+    const values = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        values.set(key, value);
+      },
+      removeItem: (key: string) => {
+        values.delete(key);
+      },
+    };
+    const original = new DiscoveryStore(storage);
+    for (const poi of pois) original.record(site, poi);
+    const saved = original.snapshot();
+    const discoveries = new DiscoveryStore(storage);
+    const progress = new Progress(new ProgressSave(storage));
+    const fetchJson: FetchJson = async () => ({
+      ok: true,
+      text: async () => readFileSync(`data/landmarks/${site}/mission.json`, 'utf8'),
+    });
+    await creditPreviousDives(progress, discoveries, [], fetchJson);
+    expect(progress.rating(site)).toBe(stars);
+    for (const poi of pois) {
+      expect(discoveries.isDiscovered(site, poi)).toBe(true);
+      expect(progress.snapshot().awarded).toContain(`poi:${site}/${poi}`);
+    }
+    if (!new Set<string>(pois).has('great-blue-hole-stalactites'))
+      expect(progress.snapshot().awarded).not.toContain('objective:great-blue-hole/stalactites');
+    const earned = progress.snapshot();
+    const reloaded = new Progress(new ProgressSave(storage));
+    await creditPreviousDives(reloaded, new DiscoveryStore(storage), [], fetchJson);
+    expect(reloaded.snapshot()).toEqual(earned);
+    expect(new DiscoveryStore(storage).snapshot()).toEqual(saved);
+  },
+);
 
 it.each(['animal', 'photo'])(
   'does not grant a legacy bonus for an empty %s subject',

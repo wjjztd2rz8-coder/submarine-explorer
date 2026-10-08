@@ -8,9 +8,9 @@ import type { Save } from '../../src/core/Save.js';
 const heroes = [
   { site: 'titanic', poi: 'titanic-bow' },
   { site: 'lost-city', poi: 'lost-city-poseidon' },
-  { site: 'great-blue-hole', poi: 'great-blue-hole-outer-dropoff' },
+  { site: 'great-blue-hole', poi: 'great-blue-hole-stalactites' },
   { site: 'beebe-vent-field', poi: 'bvf-main-vents' },
-  { site: 'monterey-canyon', poi: 'monterey-canyon-head' },
+  { site: 'monterey-canyon', poi: 'monterey-canyon-wall' },
 ];
 const hud = [
   '.sonar',
