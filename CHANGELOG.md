@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Blue Hole bowl: darker lower walls (depth shade 30-105 m), stronger limestone strata, a horizon fade (new biome `horizonFadeM`) that eases the distant seabed into the water colour, sponges on walls and floor, and a larger blue tang. No cuts; the stalactite gallery is unchanged.
+
 - Phase F, F-FIDELITY-875 (870 retry): enable terrain fidelity around the Blue
   Hole shaft/galleries and Lost City's Poseidon opening, with site-tuned local
   density, cubic survey reconstruction and filtered relief normals. Preserve
