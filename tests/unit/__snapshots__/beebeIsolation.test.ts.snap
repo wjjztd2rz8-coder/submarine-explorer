@@ -163,15 +163,15 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
       "high": {
         "buffers": [
           {
-            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
-            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
-            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
-            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+            "aCavity": "60e85f7800eda938157cdf4c02e91bc1dadb549c1caf7b4cba9d50623ac98b02",
+            "index": "33f3f65b8909899dbddb9d23ac7ae208a4bd641501e600f2f2b5079f128619d4",
+            "normal": "19b7d7a31b5da2ed4184bae7010cfb2bf120ceeb88df2d9e9264676a6ce8697d",
+            "position": "518d12ac0aca601a31f7c0c71501f43cf822943f6bc2ab970da9bab5721066e0",
           },
         ],
-        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
-        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
-        "uniforms": "3d961fa25f3cbccfcac63b92c4ffa5d8cc6a36f66ca93ea34d3f3322e6c11288",
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP#define TERRAIN_ROCK_DETAIL",
+        "shader": "9d2b9011abe0e42d66f3369e5fca389b86c1f319aa621795ae2bd8aa4e455788",
+        "uniforms": "05db32a9fb3c02e52eb661f3e421bd24d691c4952cac6945cec65643c5eab5b9",
       },
       "low": {
         "buffers": [
