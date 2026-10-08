@@ -550,3 +550,9 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - **Merged:** debrief wording/one primary action and Journal "N more to find" collapse (DIRECTOR items 6-7); full e2e passed on the identical commit, smoke on main.
 - **Running (Codex):** 850 Beebe, 860 Monterey first frame; queued 875, 880-910, 920.
 - Monterey will look deeper after the carve fix: next golden run should compare. Needs owner: nothing.
+
+## 2026-10-08 10:15 CDT headless run (Claude)
+
+- **Merged:** 860 Monterey first frame and 850 Beebe seabed (golden-reviewed: Beebe first frame improved, close-up sand-disc edge unchanged, queued as 930). Refreshed spawn snapshot in beebeIsolation (expected Monterey preset change). Gates on main: smoke e2e passed; 850/860 each passed full e2e in their own worktrees. Not pushed (no release tag this run).
+- **Running (Codex):** 875, 880, 890. **Queued:** 900, 910, 920, 930.
+- No Claude agents launched. Needs owner: nothing.
