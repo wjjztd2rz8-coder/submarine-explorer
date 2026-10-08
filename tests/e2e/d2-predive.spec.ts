@@ -83,7 +83,7 @@ test('briefing Dive settings: mode, start and Advanced persist to settings', asy
   const briefing = page.locator('.briefing');
   await expect(briefing).toBeVisible();
   const dive = briefing.locator('.briefing-dive');
-  await expect(dive).toContainText('DIVE SETTINGS');
+  await expect(dive).toHaveAttribute('aria-label', 'Dive settings');
   await expect(dive.getByRole('radio', { name: 'Arcade' })).toBeChecked();
   await expect(dive.locator('.briefing-start input[value="near-site"]')).toBeChecked();
   // One start choice only: the old footer radiogroup merged into Dive settings.

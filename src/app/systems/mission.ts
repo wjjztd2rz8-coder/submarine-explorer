@@ -175,13 +175,10 @@ export const missionSystem: GameSystem = {
       previewStart(briefing.startChoice);
     }
     if (briefing && route) {
-      const free = document.createElement('button');
-      free.type = 'button';
+      const free = document.createElement('a');
+      free.href = tileUrl(ctx.shellBaseHref(), route.tileId);
       free.className = 'briefing-free-dive';
       free.textContent = 'Free dive';
-      free.addEventListener('click', () => {
-        window.location.href = tileUrl(ctx.shellBaseHref(), route.tileId);
-      });
       briefing.root.querySelector('.briefing-go')?.prepend(free);
     }
     ctx.expose({ mission: missionRouter?.mission ?? null, missionRouter });

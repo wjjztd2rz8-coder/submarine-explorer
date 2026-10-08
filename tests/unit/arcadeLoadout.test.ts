@@ -74,6 +74,7 @@ function safeTicks(ctx: GameContext): void {
 }
 
 function stubShell(ctx: GameContext): void {
+  ctx.shellBaseHref = () => 'http://localhost/';
   vi.stubGlobal('window', {
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),

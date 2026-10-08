@@ -14,6 +14,17 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BRIEFING-900: lead mission briefings with objectives, show at most
+  three prioritised facts and hazards each, and move the summary, remaining
+  bullets and controls into “More about this site”. Retain the complete mission
+  overview in the same Journal disclosure before the first scan. Keep Begin
+  dive as the only filled button, make Free dive a text link, and compact Start
+  into “near the first target / at the surface”. Tighten the phone layout while
+  retaining 44 px targets and the Titanic memorial note. Reason: the first dive
+  was preceded by a wall of copy and competing actions. Verified facts are
+  unchanged; rendered phone fit and after screenshots remain blocked by the
+  sandbox. Evidence: `plan/progress/F-BRIEFING-900.md`.
+
 - Phase F, F-MONTEREY-860: lift Monterey's ambient fill with a more neutral
   tint and a modest hemisphere light; extend and strengthen its submarine
   lamps. Stage two Pacific hake schools, a few factual sablefish and a sea-pen

@@ -269,3 +269,226 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+
+/* --- F-BRIEFING-900: objectives first, one launch action --- */
+.briefing .briefing-cols {
+  grid-template-columns: 1fr 1.4fr;
+  gap: 24px;
+  margin-top: 14px;
+}
+.briefing .briefing-section ul,
+.briefing .briefing-memorial,
+.briefing .briefing-summary {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.briefing .briefing-site-more > summary,
+.jr-site-more > summary {
+  display: list-item;
+  width: fit-content;
+  min-height: 44px;
+  padding: 12px 0;
+  color: var(--b3-cyan);
+  cursor: pointer;
+}
+.briefing .briefing-site-extra {
+  padding: 0 0 8px;
+}
+.briefing .briefing-dive-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 24px;
+  align-items: start;
+}
+.briefing .mode-selector.is-briefing {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 4px 10px;
+}
+.briefing .mode-selector.is-briefing .mode-desc,
+.briefing .mode-selector.is-briefing .mode-advanced {
+  grid-column: 1 / -1;
+}
+.briefing .mode-selector.is-briefing .mode-desc {
+  font-family: 'DM Sans', sans-serif;
+}
+.briefing .mode-selector.is-briefing .mode-seg {
+  min-width: 0;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+.briefing .mode-selector.is-briefing .mode-advanced-toggle {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 6px;
+  font-size: 12px;
+  color: var(--b3-text);
+}
+.briefing .briefing-start {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.briefing .briefing-start-segments {
+  display: flex;
+  border: 1px solid var(--b3-hair);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.briefing .briefing-start-option {
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 6px 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.briefing .briefing-start-option + .briefing-start-option {
+  border-left: 1px solid var(--b3-hair);
+}
+.briefing .briefing-start-option input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.briefing .briefing-start-option:has(input:checked) {
+  color: #ffffff;
+  box-shadow: inset 0 -3px 0 var(--b3-cyan);
+}
+.briefing .briefing-start-option:has(input:focus-visible) {
+  outline: 2px solid #ffffff;
+  outline-offset: -3px;
+}
+.briefing .briefing-go {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 12px;
+}
+.briefing .briefing-go .briefing-begin {
+  grid-column: 4;
+  grid-row: 1;
+  min-height: 44px;
+}
+.briefing .briefing-go .briefing-cancel {
+  grid-column: 1;
+  grid-row: 1;
+}
+.briefing .briefing-free-dive {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: start;
+}
+.briefing .briefing-go .briefing-hint {
+  grid-column: 3;
+  grid-row: 1;
+}
+.briefing .briefing-free-dive,
+.briefing .briefing-cancel,
+.briefing .briefing-controls button {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--b3-text);
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 760px) {
+  .briefing .briefing-panel {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    padding: 12px;
+  }
+  .briefing .briefing-cols {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .briefing .briefing-title {
+    font-size: 20px;
+    line-height: 1.2;
+  }
+  .briefing .briefing-meta-cell {
+    padding: 4px 8px 4px 0;
+  }
+  .briefing .briefing-meta-cell + .briefing-meta-cell {
+    padding-left: 8px;
+  }
+  .briefing .briefing-value {
+    font-size: 11px;
+  }
+  .briefing .briefing-section {
+    margin-bottom: 6px;
+  }
+  .briefing .briefing-section-title {
+    margin-bottom: 3px;
+  }
+  .briefing .briefing-section ul,
+  .briefing .briefing-memorial {
+    font-size: 13px;
+    line-height: 1.3;
+  }
+  .briefing .briefing-objectives li {
+    gap: 6px;
+  }
+  .briefing .briefing-memorial {
+    margin-top: 6px;
+    padding-top: 6px;
+  }
+  .briefing .briefing-dive-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .briefing .mode-selector.is-briefing {
+    grid-template-columns: auto 1fr auto;
+    gap: 4px 8px;
+  }
+  .briefing .mode-selector.is-briefing .mode-segments {
+    justify-self: start;
+  }
+  .briefing .mode-selector.is-briefing .mode-custom-tag:not([hidden]) {
+    display: block;
+    margin: 2px 0 0;
+    padding: 0;
+    border: 0;
+    font-size: 10px;
+  }
+  .briefing .briefing-actions {
+    position: static;
+    gap: 6px;
+    margin-top: 0;
+    padding-top: 6px;
+  }
+  .briefing .briefing-go {
+    grid-template-columns: auto 1fr auto;
+    gap: 14px;
+  }
+  .briefing .briefing-go .briefing-begin {
+    grid-column: 3;
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  .briefing .briefing-hint {
+    display: none;
+  }
+}

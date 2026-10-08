@@ -260,7 +260,7 @@ for (const viewport of [
         for (const select of await briefing.locator('.mode-advanced select').all())
           await reachable(select);
         await reachable(briefing.locator('.briefing-begin'));
-        await reachable(briefing.getByRole('button', { name: 'Free dive', exact: true }));
+        await reachable(briefing.getByRole('link', { name: 'Free dive', exact: true }));
       });
 
       test('journal spoilers, navigation, entries and Close remain reachable', async ({ page }) => {
