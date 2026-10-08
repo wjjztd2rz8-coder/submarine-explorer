@@ -14,6 +14,15 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BEEBE-850: vary Beebe's outer seabed through existing sand/rubble/basalt
+  slots, cooler sediment/cobble patches and stronger ripples; reuse 780's distant
+  seabed fade to fog. Add tier-scaled tube-worm/mussel clumps and chimney rubble on
+  the three smokers' cooler flow margins, and widen/elevate only Beebe's opening
+  chase view so hull length reads beside the main stack. Reason: the outer floor
+  was sparse and flat orange, with a hard skyline and foreshortened sub. Frozen
+  non-Beebe rendering fingerprints guard isolation; rendered after QA remains
+  blocked by sandbox browser/localhost restrictions. Evidence: `plan/progress/F-BEEBE-850.md`.
+
 - Phase F, F-BLUEHOLE-770 second gate follow-up: fit the hidden cockpit before
   the save-soak resource warm-up. Reason: its first render callback replaced
   three Low-tier placeholder geometries after Three captured the render list,

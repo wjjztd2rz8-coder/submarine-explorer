@@ -2,7 +2,16 @@
 import * as THREE from 'three';
 import type { ProceduralBuildInput } from '../builders/shared.js';
 import { geoDetail } from './detail.js';
-import { fbm3, heightMesh, mergeAll, paint, smooth, type BuiltProp } from './shared.js';
+import {
+  fbm3,
+  heightMesh,
+  mergeAll,
+  mulberry32,
+  paint,
+  place,
+  smooth,
+  type BuiltProp,
+} from './shared.js';
 import { scatterRubble } from './talus.js';
 
 interface BeebeSeabed {
@@ -58,7 +67,7 @@ function settings(input: ProceduralBuildInput): BeebeSeabed | undefined {
 }
 
 /** Append an opaque, terrain-following apron; its buried rim avoids a visible decal edge. */
-export function addBeebeSeabed(built: BuiltProp, input: ProceduralBuildInput): BuiltProp {
+function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp {
   const cfg = settings(input);
   if (!cfg) return built;
   const ground = input.groundHeight();
@@ -150,4 +159,194 @@ export function addBeebeSeabed(built: BuiltProp, input: ProceduralBuildInput): B
     built.full.add(talus);
   }
   return built;
+}
+
+/** Beebe's authored cool-flow margins; kept separate from the existing shrimp-covered stacks. */
+function addBeebeHabitat(built: BuiltProp, input: ProceduralBuildInput): void {
+  if (!['beebe-chimney-1', 'beebe-chimney-2', 'beebe-chimney-3'].includes(input.def.id)) return;
+  const raw = input.def.raw.beebe_habitat;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return;
+  const cfg = raw as Record<string, number>;
+  const keys = [
+    'clumps',
+    'worms_per_clump',
+    'mussels_per_clump',
+    'rubble_count',
+    'flow_length_m',
+    'clump_radius_m',
+    'worm_height_m',
+    'rubble_size_m',
+  ];
+  if (
+    !keys.every((key) => Number.isFinite(cfg[key]) && cfg[key]! > 0) ||
+    !Number.isFinite(cfg.flow_deg)
+  )
+    return;
+  // Bound untrusted authoring extensions before allocating geometry.
+  if (keys.some((key) => cfg[key]! > 64)) return;
+  const ground = input.groundHeight();
+  if (!ground) return;
+  const d = geoDetail(input.tier);
+  const rnd = mulberry32(input.seed ^ 0x850);
+  const pieces: THREE.BufferGeometry[] = [];
+  const apron = built.full.getObjectByName('beebe-mineral-seabed') as THREE.Mesh | undefined;
+  const ray = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0));
+  const surface = (x: number, z: number): number => {
+    const y = ground(x, z);
+    if (!apron) return y;
+    // Seat against the rendered apron triangles, including its uneven/buried rim.
+    ray.ray.origin.set(x, y + 10, z);
+    const hit = ray.intersectObject(apron)[0];
+    return Math.max(y, hit?.point.y ?? y);
+  };
+  const clumps = Math.max(3, Math.round(cfg.clumps! * d.growth));
+  const perWorm = Math.max(3, Math.round(cfg.worms_per_clump! * d.growth));
+  const perMussel = Math.max(5, Math.round(cfg.mussels_per_clump! * d.growth));
+  const flow = THREE.MathUtils.degToRad(cfg.flow_deg!);
+  const radius = Math.hypot(input.dims[0], input.dims[1]) / 2 + 2;
+  const anchors: number[][] = [];
+  for (let k = 0; k < clumps; k++) {
+    // First clumps circle the base; the rest follow two broken downstream margins.
+    const downstream = k >= Math.ceil(clumps / 3);
+    const a = downstream
+      ? flow + (k % 2 ? 0.35 : -0.35)
+      : flow + (k / Math.ceil(clumps / 3)) * Math.PI * 2;
+    const r = radius + (downstream ? ((k + 1) / clumps) * cfg.flow_length_m! : rnd() * 2);
+    const cx = Math.cos(a) * r;
+    const cz = Math.sin(a) * r;
+    anchors.push([cx, surface(cx, cz), cz]);
+    for (let i = 0; i < perWorm + perMussel; i++) {
+      const angle = rnd() * Math.PI * 2;
+      const spread = Math.sqrt(rnd()) * cfg.clump_radius_m!;
+      const x = cx + Math.cos(angle) * spread;
+      const z = cz + Math.sin(angle) * spread;
+      let geometry: THREE.BufferGeometry;
+      if (i < perWorm) {
+        const h = cfg.worm_height_m! * (0.55 + rnd() * 0.6);
+        const stem = new THREE.CylinderGeometry(0.035, 0.055, h * 0.8, 5, 1).translate(
+          0,
+          h * 0.4,
+          0,
+        );
+        paint(stem, (_x, _y, _z, _ny, color) => color.set(0xb0aa96));
+        const crown = new THREE.ConeGeometry(0.095, h * 0.2, 5).translate(0, h * 0.9, 0);
+        paint(crown, (_x, _y, _z, _ny, color) => color.set(0x873c38));
+        geometry = mergeAll([stem, crown]);
+        place(geometry, {
+          x,
+          y: surface(x, z) - 0.025,
+          z,
+          rx: Math.sin(angle) * 0.12,
+          rz: Math.cos(angle) * 0.12,
+        });
+      } else {
+        geometry = new THREE.IcosahedronGeometry(1, 0);
+        paint(geometry, (_x, _y, _z, ny, color) => color.set(ny > 0.5 ? 0x77796e : 0x414940));
+        place(geometry, {
+          x,
+          y: surface(x, z) + 0.045,
+          z,
+          ry: rnd() * Math.PI * 2,
+          sx: 0.18 + rnd() * 0.12,
+          sy: 0.08,
+          sz: 0.12,
+        });
+      }
+      pieces.push(geometry);
+    }
+  }
+  const rubble = Math.max(6, Math.round(cfg.rubble_count! * d.growth));
+  for (let k = 0; k < rubble; k++) {
+    const a = flow + (rnd() - 0.5) * Math.PI * 1.7;
+    const r = radius + rnd() * cfg.flow_length_m!;
+    const x = Math.cos(a) * r;
+    const z = Math.sin(a) * r;
+    const size = cfg.rubble_size_m! * (0.5 + rnd());
+    // Short fractured columns supplement the existing rounded talus.
+    const chunk = new THREE.CylinderGeometry(size * 0.45, size * 0.6, size * 1.5, 5, 1);
+    paint(chunk, (_x, _y, _z, ny, color) => color.set(ny > 0.5 ? 0x756b58 : 0x494840));
+    place(chunk, {
+      x,
+      y: surface(x, z) + size * 0.25,
+      z,
+      rx: 0.9 + rnd() * 0.7,
+      ry: rnd() * Math.PI * 2,
+    });
+    pieces.push(chunk);
+  }
+  const geometry = mergeAll(pieces);
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  const habitat = new THREE.Mesh(
+    geometry,
+    new THREE.MeshStandardMaterial({ color: 0x999999, vertexColors: true, roughness: 0.92 }),
+  );
+  habitat.name = 'beebe-flow-habitat';
+  habitat.userData = {
+    clumps,
+    worms: clumps * perWorm,
+    mussels: clumps * perMussel,
+    rubble,
+    anchors,
+  };
+  // Decorative clumps must not enlarge collision volumes or alter the vent source.
+  built.colliders ??= [built.bounds.clone()];
+  built.bounds.union(geometry.boundingBox!);
+  built.full.add(habitat);
+}
+
+/** The existing vent-builder hook keeps all additions confined to authored Beebe props. */
+export function addBeebeSeabed(built: BuiltProp, input: ProceduralBuildInput): BuiltProp {
+  addBeebeApron(built, input);
+  addBeebeHabitat(built, input);
+  return built;
+}
+
+/** Near-grid triangle sampling for Beebe's tiny plain-chimney colonies, without raycasting entire chunks per shell. */
+export function beebeRenderedGround(
+  ground: { sampleHeight(x: number, z: number): number },
+  centreX: number,
+  centreZ: number,
+): (x: number, z: number) => number {
+  // Terrain's existing render group is optional: narrow headless height fields keep their sampler.
+  const group = (ground as typeof ground & { group?: THREE.Group }).group;
+  const grids: Array<{ p: THREE.BufferAttribute; nx: number; nz: number }> = [];
+  for (const object of group?.children ?? []) {
+    if (!(object instanceof THREE.Mesh) || !object.name.startsWith('chunk_')) continue;
+    const box = object.geometry.boundingBox as THREE.Box3;
+    if (
+      box.max.x < centreX - 64 ||
+      box.min.x > centreX + 64 ||
+      box.max.z < centreZ - 64 ||
+      box.min.z > centreZ + 64
+    )
+      continue;
+    const p = object.geometry.getAttribute('position') as THREE.BufferAttribute;
+    let nx = 1;
+    while (nx < p.count && p.getZ(nx) === p.getZ(0)) nx++;
+    // TerrainChunk's regular near grid is followed by two rows and two columns of skirt vertices.
+    const nz = (p.count - 2 * nx) / (nx + 2);
+    if (nx >= 2 && Number.isInteger(nz) && nz >= 2) grids.push({ p, nx, nz });
+  }
+  return (x, z) => {
+    for (const { p, nx, nz } of grids) {
+      const x0 = p.getX(0),
+        z0 = p.getZ(0);
+      const x1 = p.getX(nx - 1),
+        z1 = p.getZ((nz - 1) * nx);
+      if (x < x0 || x > x1 || z < z0 || z > z1) continue;
+      const i = Math.min(nx - 2, Math.floor((x - x0) / ((x1 - x0) / (nx - 1))));
+      const j = Math.min(nz - 2, Math.floor((z - z0) / ((z1 - z0) / (nz - 1))));
+      const a = j * nx + i,
+        b = a + 1,
+        d = a + nx,
+        e = d + 1;
+      const tx = (x - p.getX(a)) / (p.getX(b) - p.getX(a));
+      const tz = (z - p.getZ(a)) / (p.getZ(d) - p.getZ(a));
+      return tx + tz <= 1
+        ? p.getY(a) + (p.getY(b) - p.getY(a)) * tx + (p.getY(d) - p.getY(a)) * tz
+        : p.getY(e) + (p.getY(d) - p.getY(e)) * (1 - tx) + (p.getY(b) - p.getY(e)) * (1 - tz);
+    }
+    return ground.sampleHeight(x, z);
+  };
 }

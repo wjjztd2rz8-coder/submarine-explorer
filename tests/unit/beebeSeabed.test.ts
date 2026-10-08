@@ -17,10 +17,11 @@ const ground = (x: number, z: number): number =>
   x * 0.12 - z * 0.07 + 0.4 * Math.sin(x / 7) * Math.cos(z / 9);
 const build = (tier: string, entry = def) =>
   VENT_BUILDERS.chimney({
-    def: entry,
     dims: entry.dimensionsM!,
     seed: hashString(entry.id),
     cfg: DEFAULT_CONFIG.props,
+    // This suite isolates the apron from the independent 850 flow-margin layer.
+    def: { ...entry, raw: { ...entry.raw, beebe_habitat: undefined } },
     tier,
     groundHeight: () => ground,
   });

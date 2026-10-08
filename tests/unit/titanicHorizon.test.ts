@@ -186,7 +186,6 @@ describe('Titanic far-field horizon', () => {
         'bismarck',
         'lost-city',
         'great-blue-hole',
-        'beebe-vent-field',
         'monterey-canyon',
       ]) {
         const built = createTerrainMaterial({
