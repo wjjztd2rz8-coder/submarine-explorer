@@ -115,9 +115,11 @@ const FREE_DIVE_OPENINGS: Record<
   'monterey-canyon': {
     hero: 'canyon-wall-ledge',
     bearing: 0,
-    range: 12,
+    // Leave room for the scan cone's vertical angle above the seated wall contact,
+    // including Low's coarser terrain triangles.
+    range: 16,
     altitude: 10,
-    yawOffset: 10,
+    yawOffset: 6,
     turnWeight: 3,
     // Frame the bend beside the hull while keeping X reset at the global chase distance.
     chaseOffsetY: -14,
@@ -134,10 +136,10 @@ const FREE_DIVE_OPENINGS: Record<
     fromCentre: true,
     altitude: 8,
     yawOffset: 11,
-    // Shift the eye sideways to clear the stack and the scan reticle, level with the sub (650 + 680).
+    // Three-quarter stern view: show hull length and deck, with the smoker to port.
     chaseRadius: 54,
-    chaseOffsetX: -24,
-    chaseOffsetY: -38,
+    chaseOffsetX: -48,
+    chaseOffsetY: -12,
   },
   // Inside the hole, facing the ledge alcove across the water: the wall, the light shafts
   // and the fish above the ledge share the frame instead of a bare rim.

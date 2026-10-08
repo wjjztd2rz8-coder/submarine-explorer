@@ -16,8 +16,24 @@ import { debriefText } from '../../src/game/MissionRouter.js';
 import { parsePois } from '../../src/game/Pois.js';
 import { parseSpecies } from '../../src/game/Species.js';
 import type { FetchJson } from '../../src/game/ContentPath.js';
+import titanic from '../../data/landmarks/titanic/mission.json';
+import blueHole from '../../data/landmarks/great-blue-hole/mission.json';
 
 const quiet = (): void => {};
+
+it.each([titanic, blueHole])(
+  'retains every verified briefing bullet in the Journal ($landmark)',
+  async (mission) => {
+    const fetchFn: FetchJson = async (url) => ({
+      ok: url.endsWith('/mission.json') || url.endsWith('/index.json'),
+      text: async () =>
+        JSON.stringify(url.endsWith('/mission.json') ? mission : { landmarks: [mission.landmark] }),
+    });
+    const [site] = await loadJournalSites([], fetchFn);
+    expect(site.briefing).toEqual(mission.briefing);
+    expect(isSiteUnlocked(site, { isDiscovered: () => false })).toBe(false);
+  },
+);
 
 const GUIDE = parseGuide(
   {

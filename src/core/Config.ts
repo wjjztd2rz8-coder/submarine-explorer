@@ -45,6 +45,7 @@ export * from './config/camera.js';
 export * from './config/discovery.js';
 export * from './config/gameplay.js';
 export * from './config/mission.js';
+export * from './config/monterey.js';
 export * from './config/presets.js';
 export * from './config/props.js';
 export * from './config/quality.js';

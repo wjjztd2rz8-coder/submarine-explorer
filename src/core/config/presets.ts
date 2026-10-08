@@ -114,6 +114,8 @@ export interface CanyonPresetConfig {
   plumeColor: number;
   /** Extra ambient light intensity (0 = none) so the wall and floor near the sub never read black. */
   ambientFill: number;
+  /** Tint for the optional canyon ambient fill. */
+  ambientFillColor: number;
   /** Marine-snow density multiplier (1 = unchanged). */
   snowScale: number;
 }
@@ -301,6 +303,7 @@ export const DEFAULT_PRESETS: PresetsConfig = {
     plumeColor: 0x8a7d68,
     ambientFill: 0,
     snowScale: 1,
+    ambientFillColor: 0x4f7480,
   },
   reef: {
     shafts: 14,

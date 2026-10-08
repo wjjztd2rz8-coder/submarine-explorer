@@ -161,7 +161,7 @@ test('Lost City briefing mode changes and surface starts restore the appropriate
   await expect.poll(async () => (await camera(page)).radius).toBe(50);
   await page
     .locator('.briefing')
-    .getByRole('radio', { name: /^Surface/ })
+    .getByRole('radio', { name: /^at the surface/ })
     .check();
   await expect.poll(async () => (await camera(page)).radius).toBeCloseTo(defaultRadius, 6);
   await page.locator('.briefing').getByRole('button', { name: 'Begin dive', exact: true }).click();

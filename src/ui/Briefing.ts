@@ -24,6 +24,7 @@ import type { MissionStartPosition } from '../game/MissionRouter.js';
 import { ModeSelector, type GameplaySettingsSource } from './ModeSelector.js';
 
 export interface BriefingContent {
+  siteId?: string;
   kicker: string;
   title: string;
   summary: string;
@@ -57,9 +58,16 @@ export interface DiveSettingsOptions {
 }
 
 const START_CHOICES = [
-  ['near-site', 'Near site', 'next to the first objective'],
-  ['surface', 'Surface', 'full descent'],
+  ['near-site', 'near the first target'],
+  ['surface', 'at the surface'],
 ] as const;
+
+// Prioritise orientation and conditions over launch instructions/history.
+// The complete, unchanged lists remain in the site disclosure.
+const SITE_PRIORITIES: Record<string, { facts: number[]; hazards: number[] }> = {
+  titanic: { facts: [1, 0, 3], hazards: [3, 4, 1] },
+  'great-blue-hole': { facts: [0, 1, 3], hazards: [0, 1, 2] },
+};
 
 let uid = 0;
 
@@ -117,6 +125,8 @@ export class Briefing {
         t instanceof HTMLElement &&
         this.root.contains(t) &&
         (t.tagName === 'SELECT' ||
+          t.tagName === 'SUMMARY' ||
+          t.tagName === 'A' ||
           (t.tagName === 'BUTTON' && !t.classList.contains('briefing-begin')))
       )
         return;
@@ -131,7 +141,8 @@ export class Briefing {
     this.onPanelKey = (e) => {
       if (['Enter', 'NumpadEnter', 'Escape', 'Tab'].includes(e.code)) return;
       const t = e.target;
-      if (t instanceof HTMLElement && t.closest('button, select, input')) e.stopPropagation();
+      if (t instanceof HTMLElement && t.closest('button, select, input, summary, a'))
+        e.stopPropagation();
     };
     this.root.addEventListener('keydown', this.onPanelKey);
   }
@@ -183,8 +194,6 @@ export class Briefing {
       head.append(meta);
     }
     p.append(head);
-    if (c.summary) p.append(el('p', 'briefing-summary', c.summary));
-
     const cols = el('div', 'briefing-cols');
     const left = el('div', 'briefing-col');
     const right = el('div', 'briefing-col');
@@ -197,8 +206,16 @@ export class Briefing {
       s.append(ul);
       into.append(s);
     };
-    list('FACTS', c.facts, 'is-facts', left);
-    list('HAZARDS', c.hazards, 'is-hazards', left);
+    const priority = SITE_PRIORITIES[c.siteId ?? ''];
+    const preview = (items: string[], order?: number[]): string[] =>
+      (order ? order.map((i) => items[i]).filter((item): item is string => !!item) : items).slice(
+        0,
+        3,
+      );
+    const facts = preview(c.facts, priority?.facts);
+    const hazards = preview(c.hazards, priority?.hazards);
+    list('FACTS', facts, 'is-facts', right);
+    list('HAZARDS', hazards, 'is-hazards', right);
 
     const obj = el('section', 'briefing-section is-objectives');
     obj.append(el('h2', 'briefing-section-title', 'OBJECTIVES'));
@@ -213,7 +230,25 @@ export class Briefing {
       ol.append(li);
     }
     obj.append(ol);
-    right.append(obj);
+    left.append(obj);
+
+    // One disclosure owns the longer overview and the remaining bullets.
+    const more = el('details', 'briefing-site-more');
+    more.append(el('summary', undefined, 'More about this site'));
+    const extra = el('div', 'briefing-site-extra');
+    if (c.summary) extra.append(el('p', 'briefing-summary', c.summary));
+    list(
+      'FACTS',
+      c.facts.filter((fact) => !facts.includes(fact)),
+      'is-facts',
+      extra,
+    );
+    list(
+      'HAZARDS',
+      c.hazards.filter((hazard) => !hazards.includes(hazard)),
+      'is-hazards',
+      extra,
+    );
 
     const ctl = el('section', 'briefing-section is-controls');
     ctl.append(el('h2', 'briefing-section-title', 'CONTROLS'));
@@ -222,12 +257,12 @@ export class Briefing {
       grid.append(el('span', 'briefing-key', key), el('span', 'briefing-key-desc', what));
     }
     ctl.append(grid);
-    right.append(ctl);
-    // The memorial note sits under the controls, where the right column has
-    // room, so the whole card fits a 1280x800 window without scrolling.
-    if (c.memorialNote) right.append(el('p', 'briefing-memorial', c.memorialNote));
+    extra.append(ctl);
+    more.append(extra);
+    // Keep the memorial visible beside the objectives, even with site details closed.
+    if (c.memorialNote) left.append(el('p', 'briefing-memorial', c.memorialNote));
     cols.append(left, right);
-    p.append(cols);
+    p.append(cols, more);
 
     // D2-PREDIVE: Dive settings (mode, start, more options) and Begin share
     // the sticky footer, so they stay visible even when the card scrolls.
@@ -265,7 +300,6 @@ export class Briefing {
     this.modeSelector = null;
     const section = el('section', 'briefing-dive');
     section.setAttribute('aria-label', 'Dive settings');
-    section.append(el('h2', 'briefing-section-title', 'DIVE SETTINGS'));
     const row = el('div', 'briefing-dive-row');
     if (this.dive) {
       this.modeSelector = new ModeSelector(
@@ -280,9 +314,10 @@ export class Briefing {
     const start = el('div', 'briefing-start');
     start.setAttribute('role', 'radiogroup');
     start.setAttribute('aria-label', 'Start position');
-    start.append(el('span', 'briefing-start-label', 'Start'));
+    start.append(el('span', 'briefing-start-label', 'Start:'));
+    const segments = el('div', 'briefing-start-segments');
     this.startInputs = [];
-    for (const [value, label, detail] of START_CHOICES) {
+    for (const [value, label] of START_CHOICES) {
       const option = el('label', 'briefing-start-option');
       const input = el('input');
       input.type = 'radio';
@@ -295,10 +330,11 @@ export class Briefing {
         if (this.dive) this.dive.settings.setGameplayOption('startPosition', value);
         else this.choice = value;
       });
-      option.append(input, el('span', undefined, label), el('small', undefined, detail));
-      start.append(option);
+      option.append(input, el('span', undefined, label));
+      segments.append(option);
       this.startInputs.push(input);
     }
+    start.append(segments);
     row.append(start);
     section.append(row);
 

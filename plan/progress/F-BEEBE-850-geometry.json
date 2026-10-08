@@ -1,0 +1,221 @@
+{
+  "method": "CPU construction and independent downward raycasts of rendered near terrain, all props resident; excludes scatter, submarine, particles, post and culling. Full anchors: .cache/beebe850/geometry.json",
+  "tiers": [
+    {
+      "tier": "low",
+      "failed": 0,
+      "pose": {
+        "x": 10.007403608846598,
+        "y": -4967.671606868395,
+        "z": -87.70518834554093,
+        "yaw": 3.0717794835100207,
+        "chaseRadius": 54,
+        "chaseOffsetX": -48,
+        "chaseOffsetY": -12
+      },
+      "records": [
+        {
+          "id": "beebe-chimney-1",
+          "draws": 1,
+          "triangles": 750,
+          "clumps": 3,
+          "worms": 9,
+          "mussels": 15,
+          "rubble": 9,
+          "root": [29.677651036638125, -4987.709126857239, -14.294825547571719],
+          "ground": -4987.709126857239,
+          "groundRaySamples": 3,
+          "groundRayClearanceM": [0.1653893080965645, 0.5400127628581686]
+        },
+        {
+          "id": "beebe-chimney-2",
+          "draws": 1,
+          "triangles": 750,
+          "clumps": 3,
+          "worms": 9,
+          "mussels": 15,
+          "rubble": 9,
+          "root": [-7.260949871585021, -4995.926731054399, -30.992825547730547],
+          "ground": -4995.926731054399,
+          "groundRaySamples": 3,
+          "groundRayClearanceM": [0, 9.094947017729282e-13]
+        },
+        {
+          "id": "beebe-chimney-3",
+          "draws": 1,
+          "triangles": 750,
+          "clumps": 3,
+          "worms": 9,
+          "mussels": 15,
+          "rubble": 9,
+          "root": [-255.27727025794007, -4955.8750419096705, 219.47717445227894],
+          "ground": -4955.8750419096705,
+          "groundRaySamples": 3,
+          "groundRayClearanceM": [0, 0]
+        }
+      ]
+    },
+    {
+      "tier": "medium",
+      "failed": 0,
+      "pose": {
+        "x": 10.007403608846598,
+        "y": -4967.533446480234,
+        "z": -87.70518834554093,
+        "yaw": 3.0717794835100207,
+        "chaseRadius": 54,
+        "chaseOffsetX": -48,
+        "chaseOffsetY": -12
+      },
+      "records": [
+        {
+          "id": "beebe-chimney-1",
+          "draws": 1,
+          "triangles": 3380,
+          "clumps": 7,
+          "worms": 42,
+          "mussels": 84,
+          "rubble": 22,
+          "root": [29.677651036638125, -4987.643489861366, -14.294825547571719],
+          "ground": -4987.643489861366,
+          "groundRaySamples": 7,
+          "groundRayClearanceM": [0.05193086624967691, 1.1397111110291007]
+        },
+        {
+          "id": "beebe-chimney-2",
+          "draws": 1,
+          "triangles": 3380,
+          "clumps": 7,
+          "worms": 42,
+          "mussels": 84,
+          "rubble": 22,
+          "root": [-7.260949871585021, -4995.233131584469, -30.992825547730547],
+          "ground": -4995.233131584469,
+          "groundRaySamples": 7,
+          "groundRayClearanceM": [-9.094947017729282e-13, 0]
+        },
+        {
+          "id": "beebe-chimney-3",
+          "draws": 1,
+          "triangles": 3380,
+          "clumps": 7,
+          "worms": 42,
+          "mussels": 84,
+          "rubble": 22,
+          "root": [-255.27727025794007, -4955.719006257532, 219.47717445227894],
+          "ground": -4955.719006257532,
+          "groundRaySamples": 7,
+          "groundRayClearanceM": [-9.094947017729282e-13, 9.094947017729282e-13]
+        }
+      ]
+    },
+    {
+      "tier": "high",
+      "failed": 0,
+      "pose": {
+        "x": 10.007403608846598,
+        "y": -4967.40018307721,
+        "z": -87.70518834554093,
+        "yaw": 3.0717794835100207,
+        "chaseRadius": 54,
+        "chaseOffsetX": -48,
+        "chaseOffsetY": -12
+      },
+      "records": [
+        {
+          "id": "beebe-chimney-1",
+          "draws": 1,
+          "triangles": 9120,
+          "clumps": 12,
+          "worms": 120,
+          "mussels": 240,
+          "rubble": 36,
+          "root": [29.677651036638125, -4987.7168291411235, -14.294825547571719],
+          "ground": -4987.7168291411235,
+          "groundRaySamples": 12,
+          "groundRayClearanceM": [0.049142345667860354, 1.1789576912442499]
+        },
+        {
+          "id": "beebe-chimney-2",
+          "draws": 1,
+          "triangles": 9120,
+          "clumps": 12,
+          "worms": 120,
+          "mussels": 240,
+          "rubble": 36,
+          "root": [-7.260949871585021, -4995.11237156557, -30.992825547730547],
+          "ground": -4995.11237156557,
+          "groundRaySamples": 12,
+          "groundRayClearanceM": [-9.094947017729282e-13, 9.094947017729282e-13]
+        },
+        {
+          "id": "beebe-chimney-3",
+          "draws": 1,
+          "triangles": 9120,
+          "clumps": 12,
+          "worms": 120,
+          "mussels": 240,
+          "rubble": 36,
+          "root": [-255.27727025794007, -4955.614275968085, 219.47717445227894],
+          "ground": -4955.614275968085,
+          "groundRaySamples": 12,
+          "groundRayClearanceM": [-9.094947017729282e-13, 9.094947017729282e-13]
+        }
+      ]
+    },
+    {
+      "tier": "ultra",
+      "failed": 0,
+      "pose": {
+        "x": 10.007403608846598,
+        "y": -4967.40018307721,
+        "z": -87.70518834554093,
+        "yaw": 3.0717794835100207,
+        "chaseRadius": 54,
+        "chaseOffsetX": -48,
+        "chaseOffsetY": -12
+      },
+      "records": [
+        {
+          "id": "beebe-chimney-1",
+          "draws": 1,
+          "triangles": 22440,
+          "clumps": 19,
+          "worms": 304,
+          "mussels": 608,
+          "rubble": 58,
+          "root": [29.677651036638125, -4987.7168291411235, -14.294825547571719],
+          "ground": -4987.7168291411235,
+          "groundRaySamples": 19,
+          "groundRayClearanceM": [0.04671555487311707, 1.1953067056738291]
+        },
+        {
+          "id": "beebe-chimney-2",
+          "draws": 1,
+          "triangles": 22440,
+          "clumps": 19,
+          "worms": 304,
+          "mussels": 608,
+          "rubble": 58,
+          "root": [-7.260949871585021, -4995.11237156557, -30.992825547730547],
+          "ground": -4995.11237156557,
+          "groundRaySamples": 19,
+          "groundRayClearanceM": [-9.094947017729282e-13, 9.094947017729282e-13]
+        },
+        {
+          "id": "beebe-chimney-3",
+          "draws": 1,
+          "triangles": 22440,
+          "clumps": 19,
+          "worms": 304,
+          "mussels": 608,
+          "rubble": 58,
+          "root": [-255.27727025794007, -4955.614275968085, 219.47717445227894],
+          "ground": -4955.614275968085,
+          "groundRaySamples": 19,
+          "groundRayClearanceM": [-9.094947017729282e-13, 9.094947017729282e-13]
+        }
+      ]
+    }
+  ]
+}

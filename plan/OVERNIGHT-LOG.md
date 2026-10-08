@@ -550,3 +550,25 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - **Merged:** debrief wording/one primary action and Journal "N more to find" collapse (DIRECTOR items 6-7); full e2e passed on the identical commit, smoke on main.
 - **Running (Codex):** 850 Beebe, 860 Monterey first frame; queued 875, 880-910, 920.
 - Monterey will look deeper after the carve fix: next golden run should compare. Needs owner: nothing.
+
+## 2026-10-08 10:15 CDT headless run (Claude)
+
+- **Merged:** 860 Monterey first frame and 850 Beebe seabed (golden-reviewed: Beebe first frame improved, close-up sand-disc edge unchanged, queued as 930). Refreshed spawn snapshot in beebeIsolation (expected Monterey preset change). Gates on main: smoke e2e passed; 850/860 each passed full e2e in their own worktrees. Not pushed (no release tag this run).
+- **Running (Codex):** 875, 880, 890. **Queued:** 900, 910, 920, 930.
+- No Claude agents launched. Needs owner: nothing.
+
+## 2026-10-08 10:15 CDT headless run (Claude)
+
+- Nothing finished to collect: Codex 875, 880 and 890 are still running (round 1, tests in progress); 830 worktree is kept for the 910 redo. Queue holds 900, 910, 920 and 930, so Codex has work. Main clean, no merges, no push, no Claude agents launched (nothing unblocked that Codex is not already covering). Needs owner: nothing.
+
+## 2026-10-08 10:45 CDT headless run (Claude)
+
+- Nothing finished: Codex 875, 880, 890 still running (uncommitted edits in their worktrees); 830 kept for the 910 redo. Queue holds 900, 910, 920, 930. No merges, no push, no Claude agents. Needs owner: nothing.
+
+## 2026-10-08 14:33 CDT headless run (Claude)
+
+- **Found:** Codex hit 0% (5h) and its sandbox could not start a browser, so 875/880/890/900/910/920/930 all stopped with uncommitted work and no browser acceptance. I ran the browser gates myself.
+- **Merged:** 920 (carved-site physics sample the near mesh; Monterey free-dive range 16; full e2e 414 passed), 890 phone HUD (one landscape overlap fixed by a Sonnet agent: CURRENT readout one line at 844x390), 900 compact briefing (Sonnet fixed 5 e2e failures: FocusTrap ignored closed details, portrait overflow, selector rename). Full e2e passed on final main; pushed, tagged f33.
+- **Weak spots (DIRECTOR):** briefing at 844x390 still scrolls internally (~271 px); Blue Hole phone first frame is still very dark (910 redo pending). 890/900 "after" screenshot tables in their progress notes are unfilled.
+- **Still in worktrees (uncommitted Codex work, need browser gates):** 875, 880, 910, 930 (830 kept as reference). Queue: 940, 950 (Challenger/Endurance golden), 960 (regression hunt after 890/900). Codex resets 15:50.
+- Needs owner: nothing.

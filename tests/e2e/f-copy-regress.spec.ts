@@ -1,3 +1,4 @@
+import { expectObjectiveGuidance } from './helpers/phoneHud.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test } from './helpers/unlocked.js';
@@ -34,7 +35,7 @@ for (const layout of [
         .sort((a, b) => a.title.length - b.title.length);
       await page.goto(`/?mission=titanic&skipBriefing=1&tier=low${layout.touch ? '&touch=1' : ''}`);
       await page.waitForFunction(() => window.__gameReady === true);
-      await expect(page.locator('.obj-item.is-current')).toBeVisible();
+      await expectObjectiveGuidance(page, layout.touch);
       const activeId = await page.evaluate(() => {
         const g = window.__game as { mission: { objectives: ObjectiveStatus[] } };
         const title = document.querySelector('.obj-item.is-current .obj-item-title')!.textContent;
@@ -74,7 +75,12 @@ for (const layout of [
               },
               false,
             );
-            return copy.map((objective) => {
+            // Objective copy is shown when no scan card owns the instruction.
+            // Measure that real presentation state in the same synchronous task.
+            const scan = document.querySelector<HTMLElement>('.scan-panel')!;
+            const hidden = scan.hidden;
+            scan.hidden = true;
+            const samples = copy.map((objective) => {
               g.missionRouter.panel.setObjectives(
                 g.mission.objectives.map((o) =>
                   o.id === activeId
@@ -112,6 +118,8 @@ for (const layout of [
                 optionalLeft: optional?.left ?? row.right,
               };
             });
+            scan.hidden = hidden;
+            return samples;
           },
           { copy, activeId },
         );

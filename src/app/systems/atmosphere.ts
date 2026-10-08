@@ -10,6 +10,8 @@ import { Headlights } from '../../render/Headlights.js';
 import { MarineSnow } from '../../render/MarineSnow.js';
 import { Water } from '../../world/Water.js';
 import type { GameSystem } from '../System.js';
+import { MONTEREY_OPENING } from '../../core/Config.js';
+import { HemisphereLight } from 'three';
 
 /** The ROV's lamp bar is this share of the sub's headlight separation. */
 const ROV_LAMP_SCALE = 0.3;
@@ -20,7 +22,18 @@ export const atmosphereSystem: GameSystem = {
     const { config, tier, scene, bus, settings, terrain } = ctx;
     const atmoTier = atmosphereTier(config.water, tier);
     const atmosphere = new Atmosphere(scene, config.water, atmoTier, bus);
-    const headlights = new Headlights(config.water, atmoTier);
+    const monterey = ctx.meta.id === 'monterey-canyon';
+    if (monterey) {
+      const fill = MONTEREY_OPENING.hemisphere;
+      const hemisphere = new HemisphereLight(fill.sky, fill.ground, fill.intensity);
+      hemisphere.name = 'montereyFill';
+      atmosphere.group.add(hemisphere);
+    }
+    const headlights = new Headlights(
+      config.water,
+      atmoTier,
+      monterey ? MONTEREY_OPENING.lamps : undefined,
+    );
     // D-MODES: the lights preset from the gameplay options.
     headlights.setPreset(config.lightPresets[settings.gameplay.lights]);
     scene.add(headlights.group);

@@ -59,6 +59,14 @@ it where present. Trench grade and snow values are read later in the same
 frame. Low-tier particle layers are disabled; ambient fill and Titanic's
 opt-in fog/backdrop still apply.
 
+Canyon `ambientFillColor` is an optional numeric RGB colour, defaulting to
+`0x4f7480`; it tints the extra ambient fill when `ambientFill` is positive.
+Monterey overrides it with `0x71858b` and raises fill to 28. Monterey also adds
+a modest hemisphere light and increases the submarine lamp intensity and
+range through `Config.MONTEREY_OPENING`. These are visibility aids at depth;
+the hemisphere is not sunlight. They apply at Low without shadows, particles,
+or extra geometry. Other canyon sites retain their existing defaults.
+
 Lost City uses the `fluid: "carbonate"` override in its mission file. Its
 reconstructed chimneys emit pale carbonate plumes with faint glow, reflecting
 the site's geology rather than generic dark sulfide smoke. The Blake Plateau

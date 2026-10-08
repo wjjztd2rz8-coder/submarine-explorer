@@ -14,6 +14,7 @@
  */
 
 import * as THREE from 'three';
+import { beebeRenderedGround } from './props/geo/beebe.js';
 import type { PropsConfig } from '../core/Config.js';
 import { fetchContentJson } from '../game/ContentPath.js';
 import { bboxContains, latLonToWorld } from '../util/geo.js';
@@ -94,6 +95,11 @@ export function followsTerrain(def: PropDef): boolean {
   return (
     def.procedural === 'debris' ||
     def.feature !== null ||
+    // 850: Beebe's optional cooler-flow habitat uses a centre-relative ground sampler.
+    // Footprint snapping would sink these plain chimneys as their decoration bounds grow.
+    (['beebe-chimney-1', 'beebe-chimney-2', 'beebe-chimney-3'].includes(def.id) &&
+      typeof def.raw.beebe_habitat === 'object' &&
+      def.raw.beebe_habitat !== null) ||
     // The carbonate builder makes a terrain-following apron even without a feature id.
     (def.procedural === 'chimney' &&
       def.materialHint === 'carbonate' &&
@@ -294,6 +300,19 @@ export class Props {
     const q = headingQuaternion(def.headingDeg);
     const [sx, sy, sz] = def.scale;
     const v = new THREE.Vector3();
+    // 850 Beebe ground begin
+    if (
+      ['beebe-chimney-1', 'beebe-chimney-2', 'beebe-chimney-3'].includes(def.id) &&
+      def.feature === null &&
+      def.raw.beebe_habitat
+    ) {
+      const sample = beebeRenderedGround(this.hf, x, z);
+      return (lx, lz) => {
+        v.set(lx * sx, 0, lz * sz).applyQuaternion(q);
+        return (sample(x + v.x, z + v.z) + def.yOffsetM - originY) / sy;
+      };
+    }
+    // 850 Beebe ground end
     return (lx, lz) => {
       v.set(lx * sx, 0, lz * sz).applyQuaternion(q);
       return (this.hf.sampleHeight(x + v.x, z + v.z) + def.yOffsetM - originY) / sy;

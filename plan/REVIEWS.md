@@ -2,6 +2,32 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-08 joint review, Claude + Codex 6.1 Sol (owner request; golden set 2026-10-08-155020)
+
+Both reviewed independently (Codex read-only, viewing all current goldens, the Oct 6 set and the flow captures), then reconciled in one round. Agreed position below; Claude's and Sol's raw reviews are in `.cache/review/`.
+
+**Stage:** ~65% to 1.0, about **three calendar weeks** away. 1.0 = five hero sites beautiful >=4 across opening/approach/detail views; the other eight sites coherent with no major visual defect; an understandable first five minutes on desktop and phone; acceptable Low-tier performance on a real phone; hosted CI green; no known blockers. (Claude first said 2 weeks, Sol 3-5 weeks for a broader scope; both settled on 3.)
+
+**Per-site scores (readable / beautiful / simple / rewarding / honest / phone), current main, High tier:**
+
+| Site            | Score         | Biggest gap                                                                                                         |
+| --------------- | ------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Titanic         | 4/3.5/4/4/5/3 | Hull reads; sub parks over the bow; flat seabed with a haze band; debris like flat cards                            |
+| Beebe           | 4/3/4/4/5/3   | Plumes are the best effect in the game; hard-edged lit sand disc; blunt small chimneys                              |
+| Great Blue Hole | 3/2/3/3/5/3   | Reads as sand desert under a cyan sky; gallery a freestanding shell with teeth; crude sponges                       |
+| Lost City       | 4/3/4/4/5/3   | Towers read as stacked cones with saucer flanges; ridge has large flat facets                                       |
+| Monterey        | 4/3/3/3.5/4/3 | Corrugated "stacked plate" strata; comb jelly species mismatch (Bolinopsis infundibulum vs B. microptera, 840 note) |
+
+Phone 3 is provisional: goldens are High tier with the tutorial off, so Low tier, onboarding and real-phone performance are untested.
+
+**New finding (Sol):** the default mission does not go where the goldens look. Goldens load free dive; mission spawns keep the scenic opening only when a required objective is within 300 m. Blue Hole's primaries are the two atoll edges (the hole is not an objective), Monterey's are the shallow head and channel (the wall is optional). Queued 940.
+
+**Agreed blockers, in order:** (1) a clear, uncluttered first five minutes through an unaided scan on desktop and phone (890, 900, then a real capture); (2) default missions lead to the hero scenery (940); (3) hero fidelity, Blue Hole first (910, 875), then terrain/material seams and sub occluding targets; (4) green hosted CI (6/30 shards red on run 37797816285) and an integrated full run on the release commit, including the carve fix (920); (5) all-13-site coverage and real-phone Low-tier checks.
+
+**Corrections to Claude's draft:** the Blue Hole capsules are wall sponges (`stalactites.ts:369`), not fish (still crude); golden did report the Monterey capture failure (my `| tail` hid the exit code); some flow captures are from Oct 8, but no complete current-build audit exists.
+
+**Needs owner:** nothing.
+
 ## 2026-10-08 targeted review (trigger: gate "e2e" failing repeatedly)
 
 Diagnosis: false positive. The trigger counted all-time FAIL lines in Codex result files (Oct 1-5); the latest results pass. Fixed the trigger to a 2-day window (plan/PROCESS-LOG.md). No other action needed; the 850-910 queue is still the active plan.

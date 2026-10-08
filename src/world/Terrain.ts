@@ -13,9 +13,9 @@
  * identically. See `TerrainChunk.ts` for the per-chunk detail.
  *
  * The rendered surface is *measured data plus a procedural detail term*
- * (`TerrainNoise.ts`). `sampleHeight` returns exactly the same sum, so physics
- * collides with what the player sees. Set `terrain.detailStrength` to 0 for the
- * pure-survey mesh.
+ * (`TerrainNoise.ts`). Carved sites and fidelity profiles sample the near mesh
+ * triangles for physics. Set `terrain.detailStrength` to 0 to remove detail;
+ * site reconstructions remain applied to the survey.
  *
  * Coordinates: +X east, +Z south, +Y up, origin at the tile centre
  * (see src/util/geo.ts). Heightmap row 0 is the NORTH edge, so grid row index
@@ -258,8 +258,8 @@ export class Terrain {
   }
 
   /**
-   * Bilinearly interpolated *measured* elevation, exaggeration applied, with no
-   * procedural detail. This is the honest survey surface.
+   * Bilinearly interpolated survey elevation, exaggeration and any site carve
+   * applied, with no procedural detail. Carves are authored reconstructions.
    */
   sampleDataHeight(x: number, z: number): number {
     const fx = (x + this.halfW) / this.dx;
@@ -326,10 +326,11 @@ export class Terrain {
    * to the edge.
    */
   sampleHeight(x: number, z: number): number {
-    if (this.detail.strength <= 0) return this.sampleDataHeight(x, z);
-    if (!this.fidelity || !this.contains(x, z) || this.patchSubdivs.size === 0)
+    if (this.detail.strength <= 0 && !this.carve) return this.sampleDataHeight(x, z);
+    if ((!this.fidelity && !this.carve) || !this.contains(x, z) || this.patchSubdivs.size === 0)
       return this.surfaceHeight(x, z);
-    // Seats, POIs and physics use the triangles actually drawn at near LOD, including fine relief.
+    // Sharp carves can deviate from their triangles by tens of metres, even without
+    // noise. Seats, POIs and physics must use the near mesh at every carved tier.
     const c = Math.min(this.cols - 2, Math.floor((x + this.halfW) / this.dx));
     const r = Math.min(this.rows - 2, Math.floor((z + this.halfD) / this.dz));
     const c0 = Math.floor(c / this.meshChunkCells) * this.meshChunkCells;
