@@ -1,0 +1,9 @@
+{
+  "wall": {
+    "direction": [0, 0, 1],
+    "above": 26,
+    "approachRange": 75,
+    "target": [0, 26, -12],
+    "close": { "range": 48, "above": 26, "lateral": 12 }
+  }
+}

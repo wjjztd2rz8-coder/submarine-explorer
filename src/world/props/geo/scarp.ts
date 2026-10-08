@@ -20,6 +20,9 @@
  */
 
 import * as THREE from 'three';
+import { MONTEREY_FIDELITY } from '../../../core/config/terrain.js';
+import type { GraphicsTier } from '../../../core/Config.js';
+import { canyonRockDetail } from './materials.js';
 import { geoDetail } from './detail.js';
 import { branchingColony } from './coral.js';
 import { geoMaterial, LIFE_TINT, vertexGlow } from './materials.js';
@@ -46,6 +49,7 @@ import {
   type TalusShape,
   TALUS_LIP_RISE,
   talusSurface,
+  talusMeshSampler,
 } from './talus.js';
 import type { GeoBuildInput } from './types.js';
 
@@ -436,8 +440,22 @@ function jointOffset(
 export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const { dims, seed, tier } = input;
   const d = geoDetail(tier);
+  const fidelity = id === 'canyon' && tier !== 'low' ? MONTEREY_FIDELITY : null;
   const P = PRESETS[id];
   const [W, D, H] = dims;
+  const limits = fidelity?.wallSegments[tier as GraphicsTier] ?? [220, 150];
+  const nx = Math.min(
+    limits[0]!,
+    Math.round(Math.max(30, W * (fidelity ? 2.2 : 1.1)) * d.meshDensity),
+  );
+  const ny = Math.min(
+    limits[1]!,
+    Math.round(Math.max(40, H * (fidelity ? 4.8 : 2.4)) * d.meshDensity),
+  );
+  // Do not put sub-vertex gullies into large banks: those octaves become random facets.
+  const gullyOctaves = fidelity
+    ? Math.max(1, Math.min(4, 1 + Math.floor(Math.log2(1 / (((3 * W) / nx) * P.gullyFreq)))))
+    : 4;
   const rnd = mulberry32(seed);
   const rawProfile = P.profile.map(([y, z]): [number, number] => [y * H, z * D]);
   const joinY = P.join * H;
@@ -462,12 +480,16 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const disp = (x: number, y: number, z: number): number => {
     const env = smooth(joinY, joinY + 0.15 * H, y);
     // Ridged noise: sharp-edged vertical rills cut into the face rather than soft swells.
-    const rill = 1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, 4) - 1);
+    const rill =
+      1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, gullyOctaves) - 1);
     const gully = (Math.pow(rill, 3) - 0.3) * -2.4 * P.gully * scale * 1.6;
     const s = ((y + P.dip * x) / H) * P.bands + (fbm3(x * 0.03, 5, seed, seed + 7, 2) - 0.5) * 1.2;
     const saw = s - Math.floor(s);
-    const ledge = -Math.pow(saw, 2.2) * P.ledge * scale * 2.4; // strata protrude, then step back
-    const fine = (fbm3(x * 0.3, y * 0.3, z * 0.3, seed + 4, 2) - 0.5) * 0.9 * scale;
+    // Round the sub-metre return of each resistant bed rather than sampling a discontinuity.
+    const lip = fidelity ? 1 - smooth(0.88, 1, saw) : 1;
+    const ledge = -Math.pow(saw, 2.2) * lip * P.ledge * scale * 2.4;
+    const fine =
+      (fbm3(x * 0.3, y * 0.3, z * 0.3, seed + 4, 2) - 0.5) * (fidelity ? 0.3 : 0.9 * scale);
     const bulge = (fbm3(x * 0.045, y * 0.05, seed + 8, seed + 6, 3) - 0.5) * 0.5 * H * 0.35;
     const joint = P.joints > 0 ? jointOffset(x, P.joints, P.jointStep * scale, seed).off : 0;
     return (gully + ledge + bulge + joint) * env + fine * smooth(joinY - 0.05 * H, joinY, y);
@@ -481,23 +503,11 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   };
 
   // --- the wall
-  const nx = Math.round(Math.max(30, W * 1.1) * d.meshDensity);
-  const ny = Math.round(Math.max(40, H * 2.4) * d.meshDensity);
-  const wall = extrudeProfile(
-    profile,
-    W,
-    Math.min(nx, 220),
-    Math.min(ny, 150),
-    disp,
-    H,
-    lift,
-    P.edgeStart,
-    {
-      plan,
-      sink: sinkAt,
-      uvTile: P.tile,
-    },
-  );
+  const wall = extrudeProfile(profile, W, nx, ny, disp, H, lift, P.edgeStart, {
+    plan,
+    sink: sinkAt,
+    uvTile: P.tile,
+  });
   paint(wall, (x, yAbs, z, ny_, out) => {
     const y = yAbs - liftAt(x);
     // Dipping, wandering beds across the face; resistant beds are lighter and protrude.
@@ -507,7 +517,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     // Each bed has its own tone (resistant beds pale, weak beds dark); the lip of a bed catches
     // light and the undercut beneath it is in shadow.
     const bed = fbm3(Math.floor(s) * 3.1 + 0.5, 2.5, seed + 77, seed + 3, 1);
-    const bc = P.bedContrast;
+    const bc = fidelity ? 1.5 : P.bedContrast;
     out.copy(P.band).lerp(P.base, Math.min(1.1, 0.25 + 0.85 * ((bed - 0.5) * bc + 0.5)));
     out.multiplyScalar(
       (0.82 + 0.4 * tone) * (1 + 0.14 * smooth(0.8, 1, saw) - 0.28 * (1 - smooth(0, 0.14, saw))),
@@ -518,7 +528,8 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       const lam = fbm3(Math.floor(s4) * 2.3 + 0.5, 1.5, seed + 31, seed + 8, 1);
       const lipDark = 1 - 0.34 * (1 - smooth(0, 0.07, saw));
       const lipLit = 1 + 0.2 * smooth(0.86, 0.98, saw) * (1 - smooth(0.98, 1, saw));
-      const rill = 1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, 4) - 1);
+      const rill =
+        1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, gullyOctaves) - 1);
       const gullyShade = 1 - 0.3 * smooth(0.55, 0.9, rill); // erosion gullies read as dark runnels
       const grain = 0.88 + 0.24 * fbm3(x * 1.7, y * 2.2, z * 1.7, seed + 66, 2);
       out.multiplyScalar((0.84 + 0.32 * lam) * lipDark * lipLit * gullyShade * grain);
@@ -557,23 +568,19 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const wallMat = geoMaterial(P.tex, d, { roughness: P.rough, side: THREE.DoubleSide });
   // Monterey: a faint self-lit teal lift stands in for scattered light, so the wall reads in the dark.
   if (id === 'canyon') vertexGlow(wallMat, 0.27, 0x8fc0c6, 0.4);
+  if (fidelity) canyonRockDetail(wallMat, fidelity.normalStrength);
   full.add(new THREE.Mesh(wall, wallMat));
   const tone = new THREE.Color();
-  const apron = buildTalusMesh(
-    talus,
-    W,
-    Math.min(220, Math.round(Math.max(24, W * 1.1) * d.meshDensity)),
-    Math.round(Math.max(14, (P.reach * D * 1.55) / 0.9) * d.meshDensity),
-    TILE_M,
-    (x, y, z, u, out) => {
-      const n = fbm3(x * 0.2, z * 0.2, y * 0.1, seed ^ 0x51, 4);
-      tone.copy(P.boulder).lerp(P.base, 0.4);
-      out.copy(tone).lerp(P.drape, smooth(0.05, 0.95, u) * 0.85 * (0.7 + 0.5 * n));
-      out.multiplyScalar(0.78 + 0.5 * n);
-      // Contact shading hugging the foot of the wall.
-      out.multiplyScalar(0.82 + 0.18 * smooth(0, 0.25, u));
-    },
-  );
+  const apronCols = Math.min(220, Math.round(Math.max(24, W * 1.1) * d.meshDensity));
+  const apronRows = Math.round(Math.max(14, (P.reach * D * 1.55) / 0.9) * d.meshDensity);
+  const apron = buildTalusMesh(talus, W, apronCols, apronRows, TILE_M, (x, y, z, u, out) => {
+    const n = fbm3(x * 0.2, z * 0.2, y * 0.1, seed ^ 0x51, 4);
+    tone.copy(P.boulder).lerp(P.base, 0.4);
+    out.copy(tone).lerp(P.drape, smooth(0.05, 0.95, u) * 0.85 * (0.7 + 0.5 * n));
+    out.multiplyScalar(0.78 + 0.5 * n);
+    // Contact shading hugging the foot of the wall.
+    out.multiplyScalar(0.82 + 0.18 * smooth(0, 0.25, u));
+  });
   apron.computeBoundingBox();
   const apronMat = geoMaterial('rock', d, { roughness: P.rough });
   if (id === 'canyon') vertexGlow(apronMat, 0.16, 0x8fc0c6, 0.35);
@@ -637,17 +644,20 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
 
   // Monterey: sponges and cold-water coral fans cling to the lit face of the wall.
   if (id === 'canyon') {
+    const apronHeight = fidelity ? talusMeshSampler(apron, apronCols, apronRows) : null;
     addWallLife(
       full,
       wall,
-      [Math.min(nx, 220), Math.min(ny, 150)],
+      [nx, ny],
       d.growth,
       d.branchDepth,
       joinY,
       H,
       seed,
       rnd,
-      (x, z) => talusSurface(talus, x, z) + TALUS_LIP_RISE,
+      (x, z) =>
+        Math.max(talusSurface(talus, x, z) + TALUS_LIP_RISE, apronHeight?.(x, z) ?? -Infinity),
+      fidelity ? Math.max(1, Math.ceil(wall.getAttribute('position').count / 24000)) : 1,
     );
   }
 
@@ -965,7 +975,8 @@ function wallFaceSampler(
       a.fromBufferAttribute(pos, ia);
       b.fromBufferAttribute(pos, ib);
       c.fromBufferAttribute(pos, ic);
-      if (ray.intersectTriangle(a, b, c, true, hit) && hit.z < front) {
+      // Test both sides first: a folded terrace may hide an otherwise front-facing triangle.
+      if (ray.intersectTriangle(a, b, c, false, hit) && hit.z < front) {
         front = hit.z;
         normal.subVectors(b, a).cross(edge.subVectors(c, a)).normalize();
         nz = normal.z;
@@ -1036,6 +1047,7 @@ function addWallLife(
   seed: number,
   rnd: () => number,
   surface: (x: number, z: number) => number,
+  candidateStride = 1,
 ): void {
   const pos = wall.getAttribute('position');
   const nor = wall.getAttribute('normal');
@@ -1047,7 +1059,7 @@ function addWallLife(
   const wantSponge = Math.round(90 * Math.min(growth, 1.2));
   const wantFans = Math.round(70 * Math.min(growth, 1.2));
   const seats: THREE.Vector3[] = [];
-  for (let i = 0; i < n; i++) {
+  for (let i = 0; i < n; i += candidateStride) {
     const y = pos.getY(i);
     const nz = nor.getZ(i);
     // Lit face only: facing the viewer, between the apron and the upper terraces.

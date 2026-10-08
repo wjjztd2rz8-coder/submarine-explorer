@@ -31,6 +31,9 @@ import { biomeFor, type Biome } from './TerrainBiome.js';
 import { createTerrainMaterial } from './TerrainMaterial.js';
 import { Scatter } from './scatter/Scatter.js';
 import { detailAt, type DetailParams } from './TerrainNoise.js';
+import { monotoneCubic, valueNoise2 } from './TerrainNoise.js';
+import { latLonToWorld } from '../util/geo.js';
+import type { TerrainFidelity } from '../core/config/terrain.js';
 
 export interface TerrainStats {
   chunks: number;
@@ -50,6 +53,8 @@ export interface TerrainStats {
   requestedSubdiv: number;
   tier: GraphicsTier;
   textureSize: number;
+  /** Number of chunks built at each subdivision (local fidelity profiles only). */
+  subdivisionCounts?: Record<number, number>;
 }
 
 /**
@@ -111,6 +116,12 @@ export class Terrain {
   private readonly ramp: RampStop[];
   private readonly chunks: TerrainChunk[] = [];
   private readonly detail: DetailParams;
+  private readonly fidelity: TerrainFidelity | null;
+  private readonly focus: { x: number; z: number } | null;
+  private readonly normalSubdiv: number;
+  private baseSubdiv = 1;
+  private readonly patchSubdivs = new Map<string, number>();
+  private meshChunkCells = 64;
   private readonly lodNear: number;
   private readonly lodFar: number;
   private readonly textures: THREE.Texture[];
@@ -143,6 +154,11 @@ export class Terrain {
       .sort((a, b) => a.depth - b.depth);
 
     const tierCfg = config.tiers[tier];
+    this.fidelity = tier === 'low' ? null : (config.fidelity?.[tile.meta.id] ?? null);
+    this.focus = this.fidelity
+      ? latLonToWorld(tile.meta, this.fidelity.focus.lat, this.fidelity.focus.lon)
+      : null;
+    this.normalSubdiv = this.fidelity?.nearSubdiv[tier] ?? tierCfg.detailSubdiv;
     const cellM = Math.min(this.dx, this.dz);
     this.detail = {
       strength: config.detailStrength,
@@ -163,6 +179,7 @@ export class Terrain {
       tier,
       biome: this.biome,
       exaggeration: this.exaggeration,
+      rockDetailStrength: this.fidelity?.normalStrength,
     });
     this.material = built.material;
     this.textures = built.textures;
@@ -170,7 +187,10 @@ export class Terrain {
 
     this.group.name = `terrain:${tile.meta.id}`;
     const requested = Math.max(1, Math.round(tierCfg.detailSubdiv));
-    const subdiv = fitSubdivToBudget(this.cols, this.rows, requested, config.maxVertices);
+    const fitted = fitSubdivToBudget(this.cols, this.rows, requested, config.maxVertices);
+    // Local indices must land on integer nodes and align with the coarse lattice.
+    const subdiv = this.fidelity ? 2 ** Math.floor(Math.log2(fitted)) : fitted;
+    this.baseSubdiv = subdiv;
     this.stats = this.build(config, tier, subdiv, built.textureSize);
     this.stats.requestedSubdiv = requested;
 
@@ -278,7 +298,24 @@ export class Terrain {
   /** The procedural detail displacement alone, in metres. 0 in pure-data mode. */
   detailHeight(x: number, z: number): number {
     if (this.detail.strength <= 0) return 0;
-    return detailAt(x, z, this.dataSlopeDeg(x, z), this.detail);
+    const slope = this.dataSlopeDeg(x, z);
+    const broad = detailAt(x, z, slope, this.detail);
+    if (!this.fidelity || !this.focus) return broad;
+    const f = this.fidelity;
+    const distance = Math.hypot(x - this.focus.x, z - this.focus.z);
+    const fade =
+      1 - THREE.MathUtils.smoothstep(distance, f.focus.radiusM, f.focus.radiusM + f.focus.fadeM);
+    const rock = THREE.MathUtils.smoothstep(slope, 8, 28);
+    // Rounded erosion rills and resistant beds: resolved relief, not independent shader displacement.
+    const u = x / f.reliefWavelengthM;
+    const v = z / f.reliefWavelengthM;
+    const rill = 1 - Math.abs(2 * valueNoise2(u, v * 0.35, this.detail.seed ^ 0x51) - 1);
+    const bed = Math.sin(
+      (u * 0.35 + v + valueNoise2(u * 0.3, v * 0.3, this.detail.seed)) * Math.PI * 2,
+    );
+    return (
+      broad + (bed * 0.35 - rill * rill * 0.65) * f.reliefM * rock * fade * this.detail.strength
+    );
   }
 
   /**
@@ -289,7 +326,72 @@ export class Terrain {
    * to the edge.
    */
   sampleHeight(x: number, z: number): number {
-    return this.sampleDataHeight(x, z) + this.detailHeight(x, z);
+    if (this.detail.strength <= 0) return this.sampleDataHeight(x, z);
+    if (!this.fidelity || !this.contains(x, z) || this.patchSubdivs.size === 0)
+      return this.surfaceHeight(x, z);
+    // Seats, POIs and physics use the triangles actually drawn at near LOD, including fine relief.
+    const c = Math.min(this.cols - 2, Math.floor((x + this.halfW) / this.dx));
+    const r = Math.min(this.rows - 2, Math.floor((z + this.halfD) / this.dz));
+    const c0 = Math.floor(c / this.meshChunkCells) * this.meshChunkCells;
+    const r0 = Math.floor(r / this.meshChunkCells) * this.meshChunkCells;
+    const s = this.patchSubdivs.get(`${c0}|${r0}`) ?? 1;
+    const fx = (x - this.worldXOfCol(c0)) / (this.dx / s);
+    const fz = (z - this.worldZOfRow(r0)) / (this.dz / s);
+    const i = Math.floor(fx);
+    const j = Math.floor(fz);
+    const tx = fx - i;
+    const tz = fz - j;
+    const x0 = this.worldXOfCol(c0) + (i * this.dx) / s;
+    const z0 = this.worldZOfRow(r0) + (j * this.dz) / s;
+    const b = this.surfaceHeight(x0 + this.dx / s, z0);
+    const d = this.surfaceHeight(x0, z0 + this.dz / s);
+    if (tx + tz <= 1) {
+      const a = this.surfaceHeight(x0, z0);
+      return a + (b - a) * tx + (d - a) * tz;
+    }
+    const e = this.surfaceHeight(x0 + this.dx / s, z0 + this.dz / s);
+    return e + (d - e) * (1 - tx) + (b - e) * (1 - tz);
+  }
+
+  /** Continuous reconstruction used by the vertex sampler and derivative normals. */
+  private surfaceHeight(x: number, z: number): number {
+    let base = this.sampleDataHeight(x, z);
+    if (this.fidelity && this.detail.strength > 0) {
+      const fx = THREE.MathUtils.clamp((x + this.halfW) / this.dx, 0, this.cols - 1);
+      const fz = THREE.MathUtils.clamp((z + this.halfD) / this.dz, 0, this.rows - 1);
+      const c = Math.floor(fx);
+      const r = Math.floor(fz);
+      base =
+        monotoneCubic(
+          this.cubicRow(c, r - 1, fx - c),
+          this.cubicRow(c, r, fx - c),
+          this.cubicRow(c, r + 1, fx - c),
+          this.cubicRow(c, r + 2, fx - c),
+          fz - r,
+        ) * this.exaggeration;
+    }
+    return base + this.detailHeight(x, z);
+  }
+
+  private cubicRow(c: number, r: number, t: number): number {
+    return monotoneCubic(
+      this.heightAtCell(c - 1, r),
+      this.heightAtCell(c, r),
+      this.heightAtCell(c + 1, r),
+      this.heightAtCell(c + 2, r),
+      t,
+    );
+  }
+
+  private normalStepScale(x: number, z: number): number {
+    if (!this.fidelity || !this.focus) return 1;
+    const f = this.fidelity.focus;
+    const fade = THREE.MathUtils.smoothstep(
+      Math.hypot(x - this.focus.x, z - this.focus.z),
+      f.radiusM,
+      f.radiusM + f.fadeM,
+    );
+    return this.baseSubdiv / THREE.MathUtils.lerp(this.normalSubdiv, this.baseSubdiv, fade);
   }
 
   /**
@@ -297,12 +399,13 @@ export class Terrain {
    * sampled height field (detail included). Always a unit vector with positive Y.
    */
   getNormal(x: number, z: number, out = new THREE.Vector3()): THREE.Vector3 {
-    const ex = this.dx;
-    const ez = this.dz;
-    const hL = this.sampleHeight(x - ex, z);
-    const hR = this.sampleHeight(x + ex, z);
-    const hN = this.sampleHeight(x, z - ez);
-    const hS = this.sampleHeight(x, z + ez);
+    const scale = this.normalStepScale(x, z);
+    const ex = this.fidelity ? (this.dx / this.baseSubdiv) * scale : this.dx;
+    const ez = this.fidelity ? (this.dz / this.baseSubdiv) * scale : this.dz;
+    const hL = this.surfaceHeight(x - ex, z);
+    const hR = this.surfaceHeight(x + ex, z);
+    const hN = this.surfaceHeight(x, z - ez);
+    const hS = this.surfaceHeight(x, z + ez);
     // Tangents: (2ex, hR-hL, 0) along +X and (0, hS-hN, 2ez) along +Z.
     // Their cross product, normalised and oriented upward.
     return out.set(-(hR - hL) * 2 * ez, 4 * ex * ez, -(hS - hN) * 2 * ex).normalize();
@@ -352,7 +455,11 @@ export class Terrain {
     let drawn = 0;
     const counts = [0, 0, 0];
     for (const chunk of this.chunks) {
-      const d = eye.distanceTo(chunk.center) - chunk.radius;
+      // Large spherical bounds overstate proximity to distant survey patches. The fidelity
+      // profile spends near detail by distance to the actual footprint/height extent instead.
+      const d = this.fidelity
+        ? chunk.bounds.distanceToPoint(eye)
+        : eye.distanceTo(chunk.center) - chunk.radius;
       const level = d < this.lodNear ? 0 : d < this.lodFar ? 1 : 2;
       chunk.setLod(level);
       this.sphere.center.copy(chunk.center);
@@ -378,7 +485,12 @@ export class Terrain {
       (s.requestedSubdiv > s.subdiv ? `, capped from ${s.requestedSubdiv} by vertex budget` : '') +
       `) | ` +
       `drawn ${s.visibleChunks} chunks, ${(s.drawnTriangles / 1e3).toFixed(0)}k tris | ` +
-      `lod ${s.lodCounts.join('/')} | tex ${s.textureSize}px`
+      `lod ${s.lodCounts.join('/')} | tex ${s.textureSize}px` +
+      (s.subdivisionCounts
+        ? ` | subdivisions ${Object.entries(s.subdivisionCounts)
+            .map(([sub, count]) => `${sub}:${count}`)
+            .join('/')}`
+        : '')
     );
   }
 
@@ -400,35 +512,102 @@ export class Terrain {
     textureSize: number,
   ): TerrainStats {
     const sub = Math.max(1, Math.round(subdiv));
-    const chunkCells = Math.max(4, config.chunkCells);
-    const stepX = this.dx / sub;
-    const stepZ = this.dz / sub;
-    const field = { surfaceY: (x: number, z: number): number => this.sampleHeight(x, z) };
+    const chunkCells = Math.max(4, this.fidelity?.chunkCells ?? config.chunkCells);
+    this.meshChunkCells = chunkCells;
+    const field = { surfaceY: (x: number, z: number): number => this.surfaceHeight(x, z) };
+
+    const patches: Array<{
+      c0: number;
+      c1: number;
+      r0: number;
+      r1: number;
+      sub: number;
+      distance: number;
+    }> = [];
+    const cost = (p: (typeof patches)[number], s: number): number => {
+      const nx = (p.c1 - p.c0) * s + 1;
+      const nz = (p.r1 - p.r0) * s + 1;
+      return nx * nz + 2 * nx + 2 * nz;
+    };
+    const addPatch = (c0: number, r0: number, cells: number): void => {
+      const c1 = Math.min(c0 + cells, this.cols - 1);
+      const r1 = Math.min(r0 + cells, this.rows - 1);
+      const x = this.focus?.x ?? 0;
+      const z = this.focus?.z ?? 0;
+      // Distance to the footprint, not its centre: every chunk touching the detail envelope qualifies.
+      const distance = Math.hypot(
+        Math.max(this.worldXOfCol(c0) - x, 0, x - this.worldXOfCol(c1)),
+        Math.max(this.worldZOfRow(r0) - z, 0, z - this.worldZOfRow(r1)),
+      );
+      patches.push({ c0, c1, r0, r1, sub, distance });
+    };
+    // Keep distant survey chunks large. Only split chunks touching the playable envelope;
+    // refining the entire 40 km tile would spend hundreds of extra draws on invisible detail.
+    const outerCells = this.fidelity ? Math.max(chunkCells, config.chunkCells) : chunkCells;
+    for (let r0 = 0; r0 < this.rows - 1; r0 += outerCells) {
+      for (let c0 = 0; c0 < this.cols - 1; c0 += outerCells) {
+        addPatch(c0, r0, outerCells);
+        const parent = patches[patches.length - 1]!;
+        if (
+          this.fidelity &&
+          outerCells > chunkCells &&
+          parent.distance <= this.fidelity.focus.radiusM + this.fidelity.focus.fadeM
+        ) {
+          patches.pop();
+          for (let r = r0; r < parent.r1; r += chunkCells) {
+            for (let c = c0; c < parent.c1; c += chunkCells) addPatch(c, r, chunkCells);
+          }
+        }
+      }
+    }
+    if (this.fidelity) {
+      // Include skirts and duplicate boundaries in the local budget. Preserve the old allocation
+      // for other sites. Closest patches get first claim on the remaining resident vertices.
+      let resident = patches.reduce((sum, p) => sum + cost(p, sub), 0);
+      for (const p of [...patches].sort((a, b) => a.distance - b.distance)) {
+        if (p.distance > this.fidelity.focus.radiusM + this.fidelity.focus.fadeM) continue;
+        let wanted = Math.max(sub, this.fidelity.nearSubdiv[tier]);
+        while (
+          wanted > sub &&
+          config.maxVertices > 0 &&
+          resident + cost(p, wanted) - cost(p, sub) > config.maxVertices
+        )
+          wanted = Math.max(sub, wanted / 2);
+        resident += cost(p, wanted) - cost(p, sub);
+        p.sub = wanted;
+      }
+    }
 
     let vertices = 0;
     let triangles = 0;
 
-    for (let r0 = 0; r0 < this.rows - 1; r0 += chunkCells) {
-      const r1 = Math.min(r0 + chunkCells, this.rows - 1);
-      for (let c0 = 0; c0 < this.cols - 1; c0 += chunkCells) {
-        const c1 = Math.min(c0 + chunkCells, this.cols - 1);
-        const chunk = new TerrainChunk({
-          field,
-          material: this.material,
-          x0: this.worldXOfCol(c0),
-          z0: this.worldZOfRow(r0),
-          nx: (c1 - c0) * sub + 1,
-          nz: (r1 - r0) * sub + 1,
-          stepX,
-          stepZ,
-          skirtDepthM: config.skirtDepthM,
-          name: `chunk_${c0}_${r0}`,
-        });
-        this.group.add(chunk.mesh);
-        this.chunks.push(chunk);
-        vertices += chunk.vertexCount;
-        triangles += chunk.lodTriangles[0] as number;
+    const subdivisionCounts: Record<number, number> = {};
+    for (const { c0, c1, r0, r1, sub: localSub } of patches) {
+      for (let r = r0; r < r1; r += chunkCells) {
+        for (let c = c0; c < c1; c += chunkCells) this.patchSubdivs.set(`${c}|${r}`, localSub);
       }
+      subdivisionCounts[localSub] = (subdivisionCounts[localSub] ?? 0) + 1;
+      const chunk = new TerrainChunk({
+        field,
+        material: this.material,
+        x0: this.worldXOfCol(c0),
+        z0: this.worldZOfRow(r0),
+        nx: (c1 - c0) * localSub + 1,
+        nz: (r1 - r0) * localSub + 1,
+        stepX: this.dx / localSub,
+        stepZ: this.dz / localSub,
+        normalStepX: this.fidelity ? this.dx / sub : undefined,
+        normalStepZ: this.fidelity ? this.dz / sub : undefined,
+        normalStepScaleAt: this.fidelity ? (x, z) => this.normalStepScale(x, z) : undefined,
+        lodStrides:
+          this.fidelity && localSub > sub ? [1, localSub / sub, (localSub * 2) / sub] : undefined,
+        skirtDepthM: config.skirtDepthM,
+        name: `chunk_${c0}_${r0}`,
+      });
+      this.group.add(chunk.mesh);
+      this.chunks.push(chunk);
+      vertices += chunk.vertexCount;
+      triangles += chunk.lodTriangles[0] as number;
     }
 
     return {
@@ -442,6 +621,7 @@ export class Terrain {
       requestedSubdiv: sub,
       tier,
       textureSize,
+      ...(this.fidelity ? { subdivisionCounts } : {}),
     };
   }
 }

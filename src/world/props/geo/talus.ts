@@ -132,6 +132,45 @@ export function buildTalusMesh(
   return g;
 }
 
+/** Exact apron triangle height in O(1): the strip has regular x columns and linear z rows. */
+export function talusMeshSampler(
+  geometry: THREE.BufferGeometry,
+  columns: number,
+  rows: number,
+): (x: number, z: number) => number | undefined {
+  geometry.computeBoundingBox();
+  const bounds = geometry.boundingBox!;
+  const pos = geometry.getAttribute('position');
+  const index = geometry.getIndex()!;
+  const ray = new THREE.Ray(new THREE.Vector3(), new THREE.Vector3(0, -1, 0));
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  const c = new THREE.Vector3();
+  const hit = new THREE.Vector3();
+  return (x, z) => {
+    const fx = ((x - bounds.min.x) / (bounds.max.x - bounds.min.x)) * columns;
+    if (fx < 0 || fx > columns) return undefined;
+    const column = Math.min(columns - 1, Math.floor(fx));
+    const t = fx - column;
+    const left = column * (rows + 1);
+    const right = (column + 1) * (rows + 1);
+    const start = THREE.MathUtils.lerp(pos.getZ(left), pos.getZ(right), t);
+    const end = THREE.MathUtils.lerp(pos.getZ(left + rows), pos.getZ(right + rows), t);
+    const fz = ((z - start) / (end - start)) * rows;
+    if (fz < 0 || fz > rows) return undefined;
+    const row = Math.min(rows - 1, Math.floor(fz));
+    ray.origin.set(x, bounds.max.y + 1, z);
+    let top = -Infinity;
+    for (let k = (column * rows + row) * 6; k < (column * rows + row + 1) * 6; k += 3) {
+      a.fromBufferAttribute(pos, index.getX(k));
+      b.fromBufferAttribute(pos, index.getX(k + 1));
+      c.fromBufferAttribute(pos, index.getX(k + 2));
+      if (ray.intersectTriangle(a, b, c, false, hit)) top = Math.max(top, hit.y);
+    }
+    return Number.isFinite(top) ? top : undefined;
+  };
+}
+
 export interface RockSpot {
   /** A point on the final surface. */
   x: number;
