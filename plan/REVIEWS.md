@@ -10,13 +10,13 @@ Codex 5h budget was 0% (`codex-review.sh` exited 75), so there was no Sol second
 
 **Per-site scores (readable / beautiful), High tier, vs the morning set:**
 
-| Site | Score | Change | Biggest gap |
-| --- | --- | --- | --- |
-| Titanic | 4 / 3.5 | same | Sub parks dead centre over the bow and hides the scan target; flat haze band above the seabed (980) |
-| Beebe | 4 / 3.5 | same | Lit sand disc still has a clean edge; chimneys blunt; plumes remain the best effect (930) |
-| Great Blue Hole | 3 / 2.5 | +0.5 | 910 kept the gallery full-size and added boulders at the rim, with no sand blobs; but the bowl is still a smooth beige dune with a hard horizon ring and flat cones for stalactites |
-| Lost City | 4 / 3 | same | Beehive chimney identical to the morning set; stacked-cone silhouette and saucer flanges unchanged (875 did not reach it) |
-| Monterey | 4 / 3 | same | Regular corrugated "stacked plate" strata; the wall is now busy with life (good) but reads as a pattern (980) |
+| Site            | Score   | Change | Biggest gap                                                                                                                                                                         |
+| --------------- | ------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Titanic         | 4 / 3.5 | same   | Sub parks dead centre over the bow and hides the scan target; flat haze band above the seabed (980)                                                                                 |
+| Beebe           | 4 / 3.5 | same   | Lit sand disc still has a clean edge; chimneys blunt; plumes remain the best effect (930)                                                                                           |
+| Great Blue Hole | 3 / 2.5 | +0.5   | 910 kept the gallery full-size and added boulders at the rim, with no sand blobs; but the bowl is still a smooth beige dune with a hard horizon ring and flat cones for stalactites |
+| Lost City       | 4 / 3   | same   | Beehive chimney identical to the morning set; stacked-cone silhouette and saucer flanges unchanged (875 did not reach it)                                                           |
+| Monterey        | 4 / 3   | same   | Regular corrugated "stacked plate" strata; the wall is now busy with life (good) but reads as a pattern (980)                                                                       |
 
 No regressions in this set. Blue Hole 910 is accepted (it meets the acceptance criteria) but it is not yet beautiful.
 

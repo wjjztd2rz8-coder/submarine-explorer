@@ -138,3 +138,5 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 ## 2026-10-08 11:44 CDT: comprehensive reviews are joint with Codex Sol
 
 - **Owner (2026-10-08):** the joint review helped, so every comprehensive review now runs it. Sol found a blocker Claude missed (default missions skip the hero scenery) and corrected two Claude errors. `tools/codex-review.sh start` runs Sol's independent, read-only review in the background while Claude reviews; `reconcile` sends Claude's draft back for one round and returns an agreed summary. REVIEW-PROMPT step 0. Skips (exit 75) when Codex 5h < 20% or weekly < 10%.
+
+- **2026-10-08 evening:** Codex 5h hit 0% right after the 875/880/910 burst, so the joint review ran Claude-only (script exits 75 as designed). CI root cause (montereyWallLife ultra 45 s timeout) fixed; e2e shard failures need artifacts (970). `gh run view --log-failed` returns no e2e lines; fetch Playwright artifacts instead.

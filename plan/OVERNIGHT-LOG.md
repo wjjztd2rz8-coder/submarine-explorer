@@ -578,3 +578,7 @@ Append-only notes from timed headless orchestrator runs, for the owner to read i
 - **Merged:** 910 Blue Hole wall redo (golden-reviewed: gallery as large as before, no sand patches, wall slightly smoother), 875 fidelity rollout (Lost City profile; its Blue Hole profile dropped in favour of 910's; Lost City close-up unchanged at the golden pose), 880 f30 bug-hunt tests. Full e2e passed on final main; pushed, tagged f34.
 - **Held:** 930 Beebe pool edge (worktree kept): golden shows no visible change to the cream disc; send back for a real fix when Codex has budget.
 - **Queue:** 940, 950, 960. Codex 5h was 0% (resets 15:50). Needs owner: nothing.
+
+## 2026-10-08 15:35 headless review run (Claude only)
+
+Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothing; fixed montereyWallLife ultra timeout (CI), queued 970 (e2e shards) and 980 (Titanic/Monterey), DIRECTOR refreshed. Needs owner: nothing.
