@@ -34,6 +34,12 @@ export interface SpireOpts {
   lip?: number;
   /** Orifice depth below the rim, as a fraction of the top radius (0 = flat cap). */
   crater?: number;
+  /**
+   * Irregular carbonate mode (0 = off): the cross-section turns elliptical and rotates
+   * with height, ledges become partial shelves that hug one side, and the flutes meander
+   * into sharp flowstone ridges. Colliders still follow the smooth `spireRadius`.
+   */
+  irregular?: number;
 }
 
 /** Smooth, noise-free radius at height fraction t: the profile colliders and flanges follow. */
@@ -74,6 +80,27 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
     const ang = Math.atan2(z, x);
     const n = fbm3(Math.cos(ang) * 1.3 + 3, y * 0.09, Math.sin(ang) * 1.3 + 3, o.seed, 3);
     let f = spireRadius(o, t) / o.r0;
+    const irr = o.irregular ?? 0;
+    if (irr) {
+      const plain = spireRadius({ ...o, tiers: 0 }, t) / o.r0;
+      const u = t * (o.tiers ?? 0);
+      const m = fbm3(
+        Math.cos(ang) * 1.6 + 7,
+        Math.floor(u) * 3.1,
+        Math.sin(ang) * 1.6 + 7,
+        o.seed + 31,
+        2,
+      );
+      // Shelves are strong on one side and vanish on the other.
+      f = plain * (1 + (f / plain - 1) * smooth(0.25, 0.7, m) * 1.7);
+      // Elliptical, twisting cross-section plus broad lumps: no lathe-like symmetry.
+      f *= 1 + irr * 0.22 * Math.cos(2 * (ang - t * 2.4 - o.seed * 0.37));
+      f *=
+        1 +
+        irr *
+          0.5 *
+          (fbm3(Math.cos(ang) * 2.4 + 1, y * 0.05, Math.sin(ang) * 2.4 + 1, o.seed + 77, 2) - 0.5);
+    }
     f *= 1 + (n - 0.5) * 2 * wob;
     if (o.rough)
       f *=
@@ -81,7 +108,16 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
         (fbm3(Math.cos(ang) * 4 + 5, y * 0.6, Math.sin(ang) * 4 + 5, o.seed + 9, 2) - 0.5) *
           2 *
           o.rough;
-    f *= 1 + amp * Math.sin(ang * flutes + n * 5 + t * 2.5);
+    if (irr) {
+      // Meandering flow ridges: sharp crests, broad troughs, phase drifting with height.
+      const ph =
+        ang * flutes +
+        n * 6 +
+        y * 0.11 +
+        (fbm3(y * 0.08, 4, o.seed * 0.1, o.seed + 5, 2) - 0.5) * 7;
+      const crest = 1 - Math.abs(Math.sin(ph * 0.5));
+      f *= 1 + amp * 2.2 * (crest * crest - 0.35);
+    } else f *= 1 + amp * Math.sin(ang * flutes + n * 5 + t * 2.5);
     // The top cap's centre vertex sinks to make a crater: the vent orifice.
     const sink = o.crater && t > 0.999 && Math.hypot(x, z) < 1e-6 ? o.crater * o.r0 * o.topFrac : 0;
     p.setXYZ(i, x * f, y - sink, z * f);
