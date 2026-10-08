@@ -161,6 +161,11 @@ export class ScanOverlay {
     return this.bannerLeft > 0;
   }
 
+  /** Includes target, interrupted scan and completion cards. */
+  get cardVisible(): boolean {
+    return !this.panel.hidden;
+  }
+
   /**
    * @param screen CSS-pixel position of the nearest POI, or null if it is
    *   off-screen / behind the camera.

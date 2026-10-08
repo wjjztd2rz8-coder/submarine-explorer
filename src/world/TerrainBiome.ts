@@ -84,6 +84,8 @@ export interface Biome {
   depthShade?: { startM: number; endM: number; tint: number };
   /** Horizontal rock banding on slopes: band thickness (m) and strength 0..1 (limestone strata). */
   strata?: { periodM: number; amount: number };
+  /** Extra abyssal distance fade to fog; leaves the near seabed unchanged. */
+  abyssFadeM?: readonly [number, number];
   /** Optional baked linear colour multipliers, replacing fragment strata for this biome. */
   vertexTint?: (
     x: number,
@@ -145,6 +147,7 @@ const VOLCANIC: Biome = {
 export const BIOMES: Record<string, Biome> = {
   // Soft pale ooze: low-contrast so the wreck is the subject and the bed never reads black.
   titanic: {
+    abyssFadeM: [300, 1100],
     ...ABYSSAL,
     // Same texture in both slots and a faint patch/stain: no pale blotches on the low tier.
     b: 'silt',

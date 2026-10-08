@@ -144,7 +144,8 @@ const FREE_DIVE_OPENINGS: Record<
   'great-blue-hole': {
     hero: 'karst-grotto',
     bearing: 90,
-    range: 205,
+    // Reach the existing gallery scan in the opening frame, rather than crossing the hole first.
+    range: 100,
     fromCentre: true,
     // ~14 m below the ledge the grotto stands on: the ledge, its shoals and the surface light all stay in view.
     altitude: -22,

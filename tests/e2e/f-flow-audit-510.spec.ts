@@ -123,6 +123,7 @@ async function firstActions(page: Page, touch: boolean): Promise<void> {
       await clockFramesUntil(
         page,
         () => (window.__game as unknown as Game).onboard.tutorial.index === 1,
+        250,
       );
     } finally {
       await page.keyboard.up('w');
@@ -133,6 +134,7 @@ async function firstActions(page: Page, touch: boolean): Promise<void> {
       await clockFramesUntil(
         page,
         () => (window.__game as unknown as Game).onboard.tutorial.index === 2,
+        250,
       );
     } finally {
       await page.keyboard.up('Space');
@@ -235,7 +237,9 @@ for (const viewport of [
         await choice.scrollIntoViewIfNeeded();
         await contained(choice);
         await shot('02-pick-site');
-        await act(choice, touch);
+        // Site selection navigates; tap/click can resolve before the new
+        // document commits. Do not pump/evaluate the outgoing game.
+        await Promise.all([page.waitForEvent('load'), act(choice, touch)]);
         await ready(page);
         await expect(page.locator('.briefing')).toBeVisible();
         await shot('03-briefing');
@@ -244,7 +248,10 @@ for (const viewport of [
         await act(cancel, touch);
         await expect(home).toBeVisible();
         await act(home.getByRole('button', { name: 'Dive sites', exact: true }), touch);
-        await act(home.locator(`.mission-item[data-mission="${site}"]`), touch);
+        await Promise.all([
+          page.waitForEvent('load'),
+          act(home.locator(`.mission-item[data-mission="${site}"]`), touch),
+        ]);
         await ready(page);
         const begin = page.locator('.briefing-begin');
         await begin.scrollIntoViewIfNeeded();

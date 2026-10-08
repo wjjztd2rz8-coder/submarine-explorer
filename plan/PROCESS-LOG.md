@@ -83,6 +83,33 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - Fix: global timeout raised to 25 min (job limit is 30). Brief 730 queued for Codex to read the next hosted run, fix the remaining test-level races and recalibrate `tools/e2e-timings.json` from real durations.
 
 ## 2026-10-06 21:45 — Codex self-refills its queue
+
 - Codex idled again (~12 h, 09:20-21:40 Oct 6) with 100% 5h and 32% weekly: the "leave >=3 briefs" rule depends on Claude runs, which are paced out until the weekly reset.
 - New tools/codex-refill.sh: when the queue is empty, slots are free and Codex has budget, the dispatcher (every 30 min, no Claude needed) asks Codex to write 3 briefs from DIRECTOR.md/REVIEWS.md, at most every 2 h. Briefs may not merge, push or touch tools/DIRECTOR. Claude still reviews everything before it reaches main.
 - Same session: pre-merged 770/780/790 into integration worktree 800 (clean) and queued the first fidelity-pass prototypes 810 (Monterey terrain), 820 (Lost City close-up redo), 830 (Blue Hole dome/walls), 840 (bug hunt f28-f30).
+
+## 2026-10-06 — F-CI-790 hosted timing and frame synchronization
+
+- Retrieved all 20 timing artifacts and raw logs for main run 37292557785 after
+  `gh run view --log-failed` returned empty output. Classified seven red shards:
+  three suite timeouts, simulation-starved movement waits, and desktop WebGL/DOM
+  audits exhausting individual budgets. One separate a11y flake passed on retry.
+- Preserve exact assertions and full coverage; explicitly advance rendered frames
+  for movement, content allocation baselines and desktop debrief/current audits.
+  Preserve the verification's 90 frames with a scoped 300s hosted test budget.
+- Import 380 completed hosted test costs, including observed retries; never record
+  omitted/skipped work as zero. Add a reusable JSON importer and its unit check.
+  Increase CI to 30 duration-balanced shards with the existing 25-minute global
+  budget. Measurements show 1.10× median slowdown, not a universal 2× factor.
+- Validation and exact next-run expectations are in [F-CI-790](progress/F-CI-790.md).
+  Claude must push and verify hosted acceptance; no remote mutation here.
+- Broader regression found a POI/wildlife readiness ordering race in the toast
+  spec and reproduced the accessibility clock flake. Wait for discovery content;
+  recover only an auxiliary page closing during context-wide clock advancement.
+  Keep all audit assertions and propagate main-page/work errors, verified by
+  negative unit checks and 15 repeated real accessibility audits.
+- The onboarding hint test also now observes the post-teleport live scan
+  candidate, rather than its earlier spawn marker. Final gates pass (1,426 unit
+  tests, 144 Python tests, smoke/project-base); repeat flow/soak and accessibility
+  audits pass with retries disabled. Full local e2e and hosted green remain
+  separate acceptance checks; see the progress note for precise coverage.

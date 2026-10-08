@@ -132,10 +132,17 @@ for (const dismissal of ['button', 'expiry'] as const) {
       await page.goto('/?tile=challenger-deep&poi=cd-leggo-amphipod-site&skipBriefing=1&tier=low', {
         waitUntil: 'domcontentloaded',
       });
-      const ready = () =>
-        window.__gameReady === true &&
-        (window.__game as { discovery: { spawnedAt: string | null } }).discovery.spawnedAt ===
-          'cd-leggo-amphipod-site';
+      const ready = () => {
+        const game = window.__game as unknown as Probe;
+        // spawnedAt is set just after teleport/cancel, before the next scan/HUD
+        // update. Pump until the intended POI is actually the live candidate.
+        return (
+          window.__gameReady === true &&
+          game.discovery.loaded &&
+          game.discovery.spawnedAt === 'cd-leggo-amphipod-site' &&
+          game.scanner.view.candidateId === 'cd-leggo-amphipod-site'
+        );
+      };
       await clockFramesUntil(page, ready);
       const hull = await page.evaluate(() =>
         (

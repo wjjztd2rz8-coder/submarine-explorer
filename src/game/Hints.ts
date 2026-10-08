@@ -45,6 +45,11 @@ export interface HintContext {
 
 export const HINT_THRESHOLDS = { battery: 0.3, hull: 0.85 } as const;
 
+/** Give the opening scan card eight seconds of attention before animal guidance. */
+export function creatureHintAllowed(diveS: number, scanCardVisible: boolean): boolean {
+  return !scanCardVisible || diveS >= 8;
+}
+
 export function hintDue(id: HintId, c: HintContext): boolean {
   switch (id) {
     case 'battery-low':

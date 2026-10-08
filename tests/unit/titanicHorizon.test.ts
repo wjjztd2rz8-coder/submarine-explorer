@@ -8,6 +8,8 @@ import { sampleAtmosphere } from '../../src/render/Atmosphere.js';
 import { mergePresetParams, presetDefaults } from '../../src/world/presets/Presets.js';
 import { TitanicHorizon } from '../../src/world/presets/TitanicHorizon.js';
 import { WreckPreset } from '../../src/world/presets/WreckPreset.js';
+import { biomeFor } from '../../src/world/TerrainBiome.js';
+import { createTerrainMaterial } from '../../src/world/TerrainMaterial.js';
 import type { PresetEnterContext, PresetFrameContext } from '../../src/world/presets/types.js';
 
 const config = makeConfig();
@@ -74,6 +76,77 @@ describe('Titanic far-field horizon', () => {
   });
 
   for (const visuals of [false, true]) {
+    for (const aspect of [16 / 9, 9 / 16]) {
+      it(`matches fully fogged seabed across the horizon (${visuals ? 'post' : 'Low'}, aspect ${aspect})`, () => {
+        const { scene, camera, preset, frame } = setup(true, visuals);
+        const dome = scene.getObjectByName('titanicHorizon') as TitanicHorizon['dome'];
+        camera.aspect = aspect;
+        camera.rotation.set(0.25, 1.2, 0.1);
+        camera.updateProjectionMatrix();
+        frame.atmo = sampleAtmosphere(config.water, camera.position.y);
+        preset.update(1 / 60, frame);
+        // Fog is applied AFTER tone mapping in Three's direct (Low) path.
+        // The backdrop must use that same unlit colour path.
+        expect(dome.material.toneMapped).toBe(false);
+        const positions = dome.geometry.getAttribute('position');
+        const colors = dome.geometry.getAttribute('color');
+        let horizonVertices = 0;
+        for (let i = 0; i < positions.count; i++) {
+          // Include the first ring above level: matching just the equator
+          // lets interpolation introduce an edge in pitched/portrait views.
+          if (positions.getY(i) > 0.2) continue;
+          horizonVertices++;
+          const color = new THREE.Color().fromBufferAttribute(colors, i);
+          for (const channel of ['r', 'g', 'b'] as const) {
+            expect(color[channel]).toBeCloseTo(scene.fog!.color[channel], 7);
+          }
+        }
+        expect(horizonVertices).toBeGreaterThan(0);
+        // Sample interpolated backdrop colours along world-level rays using
+        // the actual pitched/rolled landscape or portrait projection.
+        camera.updateMatrixWorld();
+        dome.updateMatrixWorld();
+        const raycaster = new THREE.Raycaster();
+        for (const y of [-0.1, 0, 0.1]) {
+          const direction = camera.getWorldDirection(new THREE.Vector3());
+          direction.y = y;
+          const point = direction
+            .normalize()
+            .multiplyScalar(camera.far * 0.5)
+            .add(camera.position)
+            .project(camera);
+          expect(Math.abs(point.x)).toBeLessThan(1);
+          expect(Math.abs(point.y)).toBeLessThan(1);
+          raycaster.setFromCamera(new THREE.Vector2(point.x, point.y), camera);
+          const hit = raycaster.intersectObject(dome)[0]!;
+          expect(hit).toBeDefined();
+          const face = hit.face!;
+          const weights = THREE.Triangle.getBarycoord(
+            dome.worldToLocal(hit.point.clone()),
+            new THREE.Vector3().fromBufferAttribute(positions, face.a),
+            new THREE.Vector3().fromBufferAttribute(positions, face.b),
+            new THREE.Vector3().fromBufferAttribute(positions, face.c),
+            new THREE.Vector3(),
+          )!;
+          const color = new THREE.Color(0, 0, 0);
+          for (const [index, weight] of [
+            [face.a, weights.x],
+            [face.b, weights.y],
+            [face.c, weights.z],
+          ]) {
+            const vertexColor = new THREE.Color().fromBufferAttribute(colors, index!);
+            color.r += vertexColor.r * weight!;
+            color.g += vertexColor.g * weight!;
+            color.b += vertexColor.b * weight!;
+          }
+          for (const channel of ['r', 'g', 'b'] as const) {
+            expect(color[channel]).toBeCloseTo(scene.fog!.color[channel], 7);
+          }
+        }
+        preset.exit();
+      });
+    }
+
     it(`keeps exposure and fog density unchanged (${visuals ? 'particle tiers' : 'Low'})`, () => {
       const before = setup(false, visuals);
       const after = setup(true, visuals);
@@ -105,6 +178,49 @@ describe('Titanic far-field horizon', () => {
       after.preset.exit();
     });
   }
+
+  it('fades only the Titanic seabed to the same fog colour, on Low and High', () => {
+    for (const tier of ['low', 'high'] as const) {
+      for (const site of [
+        'titanic',
+        'bismarck',
+        'lost-city',
+        'great-blue-hole',
+        'beebe-vent-field',
+        'monterey-canyon',
+      ]) {
+        const built = createTerrainMaterial({
+          config: config.terrain,
+          tier,
+          biome: biomeFor(site),
+          exaggeration: 1,
+        });
+        const shader = {
+          ...THREE.ShaderLib.standard,
+          uniforms: { ...THREE.ShaderLib.standard.uniforms },
+        } as Parameters<THREE.MeshStandardMaterial['onBeforeCompile']>[0];
+        built.material.onBeforeCompile(shader, {} as THREE.WebGLRenderer);
+        if (site === 'titanic') {
+          expect(shader.uniforms.uAbyssFadeM.value.toArray()).toEqual([300, 1100]);
+          // Reuse Three's output-space fog colour, so the fully faded seabed
+          // converges to the backdrop on both direct and post render paths.
+          expect(shader.fragmentShader).toContain('mix(gl_FragColor.rgb, fogColor, abyssFade)');
+          expect(shader.fragmentShader).toContain(
+            'smoothstep(uAbyssFadeM.x, uAbyssFadeM.y, vFogDepth)',
+          );
+          expect(shader.fragmentShader).toContain('smoothstep(700.0, 1200.0, -cameraPosition.y)');
+          expect(shader.fragmentShader.indexOf('float abyssFade')).toBeGreaterThan(
+            shader.fragmentShader.indexOf('#include <fog_fragment>'),
+          );
+        } else {
+          expect(shader.uniforms.uAbyssFadeM).toBeUndefined();
+          expect(shader.fragmentShader).not.toContain('abyssFade');
+        }
+        built.material.dispose();
+        for (const texture of built.textures) texture.dispose();
+      }
+    }
+  });
 
   it('renders a dim upward gradient behind geometry, follows translation and preserves world up', () => {
     const { scene, camera, preset, frame, atmo } = setup(true, true);
