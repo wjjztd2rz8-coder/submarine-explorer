@@ -23,6 +23,11 @@ without an entry here is not done.
 - **f-ci-triage:** retain all 600 first-minute simulation/render frames and safety assertions at every site/tier/viewport, but cut intermediate drawing-buffer resolution to 25% during the soak because hosted software GL exhausts the 300 s budget. Opening, end-of-minute and Journal screenshots still use full tier resolution. Apply the same temporary resolution reduction during real held-input scan journeys; every original per-frame clearance, two-minute completion, <30 m transit, Journal and debrief assertion remains. Split Lost City Medium desktop Poseidon tower 2/3 by vertical drift; all three drifts and eight warm-up/eight measured frames remain. Wait for the requested mission document before advancing the clock in the 960 navigation matrix, and for the credits toggle handler before measuring Monterey portrait HUD overlap. Retry Chromium installation once within its existing five-minute step budget.
 
 - **f-firstminute:** the mission briefing eyebrow no longer shows the raw site slug (`BEEBE-VENT-FIELD`, `LOST-CITY`, `MONTEREY-CANYON`); hyphens render as spaces. Added `tools/firstminute-shots.mjs`, a Home to debrief first-minute screenshot walkthrough (desktop 1280x720 and phone 390x844). No gameplay or layout change.
+- **F-1110:** fact-check Lost City, Beebe, Great Blue Hole, Monterey and Titanic
+  Journal/scan copy against primary sources; correct Beebe’s survey year and
+  Beebe-125 name, marker distances and shrimp text, credit Titanic’s joint
+  discovery leadership, and tag authored Beebe markers once through the existing
+  Journal provenance path. Sources and verification: `plan/progress/F-1110.md`.
 
 - **F-MONTEREY-STRATA:** the Monterey canyon wall no longer reads as even corrugated stripes. Bed thickness is skewed (many thin beds, a few massive ones), ledge depth and overhang follow per-bed hardness and vary along the wall, slump scars are deeper, and each bed has its own muted albedo (olive, tan, grey, dark olive, buff). Vertex-colour and displacement only: no draw-call, triangle or tier change.
 
@@ -897,6 +902,15 @@ without an entry here is not done.
   default stays `medium`, so a fresh install looks the same as before.
 
 ### Removed
+
+- **F-1110:** cut unsupported Monterey shelf-break identification, Blue Hole
+  stalactite depth restriction, Lost City sampling-coordinate attribution, and
+  Titanic’s precise debris footprints, remnant lengths/burial, boiler-cluster
+  assignment, plaque disappearance/footprint, channel-origin attribution and
+  secondary-only exhibit details. Replace Big Piece short-ton assumptions with
+  the recovering operator’s 17-ton description and broad UNESCO-protection
+  wording with NOAA’s US–UK agreement/in situ policy. Retain all scan targets.
+  Reason: primary evidence does not establish those precise claims.
 
 - Phase F, F-PHONE-HUD-890: remove the phone sonar legend, tutorial heading/dots
   and second Skip action; hide collapsed sonar zoom controls until expansion.

@@ -16,8 +16,8 @@
       "confidence": "medium",
       "reconstruction": true,
       "sources": [
-        "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field",
-        "https://www.gmrt.org/"
+        "https://www.gmrt.org/",
+        "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"
       ],
       "note": "The published field position is a rounded 30°07'0\"N 42°07'0\"W (= 30.1167, -42.1167), which is also the data/landmarks.json pin; on this tile that point reads 1,332 m, on the massif's south wall, far outside the field's real 750-900 m depth range. The nearest terrain in the correct depth band is about 665 m north of that pin. This POI is placed there instead; seabed here is 801 m, and depth_m (775 m) sits partway up the ~60 m tower. See sources.md."
     },
@@ -38,7 +38,7 @@
         "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869",
         "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023GC011011"
       ],
-      "note": "Beehive was a roughly 1 m vent on Poseidon; Aquino et al. 2024 report the chimney was absent by the 2018 visit. This separately scannable marker is placed illustratively about 140 m from Poseidon, not at a surveyed Beehive footprint."
+      "note": "Beehive was a roughly 1 m vent on Poseidon; Aquino et al. 2024 report the chimney was absent by the 2018 visit. This separately scannable marker is placed about 74 m from Poseidon, not at a surveyed Beehive footprint."
     },
     {
       "id": "lost-city-imax-tower",
@@ -57,7 +57,7 @@
         "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf",
         "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005869"
       ],
-      "note": "IMAX is a parasitic chimney and flange on Poseidon's north face; a 2005 account gives about 8 m and a 2016 survey describes a roughly 30 m multipronged structure. This separate marker is placed illustratively near Poseidon."
+      "note": "IMAX is a parasitic chimney and flange on Poseidon's north face; a 2005 account gives about 8 m and a 2016 survey describes a roughly 30 m multipronged structure. This separate marker is placed near Poseidon."
     },
     {
       "id": "lost-city-microbial-mat",
@@ -72,11 +72,8 @@
       "guide_entry": "microbial-mat",
       "confidence": "medium",
       "reconstruction": true,
-      "sources": [
-        "https://obis.org/",
-        "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field"
-      ],
-      "note": "Coordinate near an OBIS occurrence cluster (2003 International Census of Marine Microbes samples) inside this bbox; nearly all records are archaea/bacteria with no reported depth. The visible mat/biofilm is an invented reconstruction; the sampling location is real."
+      "sources": ["https://obis.org/", "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"],
+      "note": "Local biofilm scan marker near Poseidon; GMRT seabed about 793 m. Lost City chimney microbial communities are documented by Kelley (2005). The retained OBIS export has no collection depths and does not verify this marker as an exact sampling location or identify it with a single 2003 cruise."
     }
   ]
 }

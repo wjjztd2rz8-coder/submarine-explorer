@@ -14,12 +14,12 @@
       "scan_seconds": 6,
       "guide_entry": "vents",
       "confidence": "high",
-      "reconstruction": false,
+      "reconstruction": true,
       "sources": [
         "https://www.nature.com/articles/ncomms1636",
-        "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field"
+        "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879"
       ],
-      "note": "Real GMRT terrain (Ryan et al. 2009; value read directly from this tile's grid): -4,987.9 m, within a few tens of metres of Wikipedia's published coordinate for the Beebe Hydrothermal Vent Field (18 32'48\"N 81 43'6\"W = 18.5467, -81.7183) and inside Connelly et al. (2012)'s published depth range for the field, 4,957-4,987 m. Webber et al. (2015) call the high-temperature cluster Beebe-125 (also called Beebe Vents); its placement here follows local game terrain and are the source of low-salinity fluids measured around 401–403 °C at roughly 500 bar (Webber et al. 2015)."
+      "note": "Local scan marker on GMRT seabed at about 4,988 m. Webber et al. (2015), reporting the February 2013 survey, identify Beebe-125 on the southern margin of the westernmost sulfide mound and report 401–403 °C fluid at about 500 bar. This marker uses the field vicinity and local terrain; it does not establish an exact surveyed Beebe-125 footprint."
     },
     {
       "id": "bvf-shrimp-swarm",
@@ -38,7 +38,7 @@
         "http://www.joncopley.com/docs/Rimicaris_hybisae.pdf",
         "https://www.nature.com/articles/ncomms1636"
       ],
-      "note": "Real GMRT terrain, -4,979.2 m, ~35 m from the main vent POI, inside the same real vent complex where Nye et al. (2012) described Rimicaris hybisae swarming by the thousand around Beebe's chimneys. `reconstruction: true` because no published survey gives exact individual-shrimp or swarm-density coordinates to place -- the swarm's real presence at this vent field is sourced, its precise mapped position here is not."
+      "note": "Real GMRT terrain, -4,979.2 m, ~57 m from the main vent POI, inside the same real vent complex where Nye et al. (2012) described Rimicaris hybisae swarming by the thousand around Beebe's chimneys. `reconstruction: true` because no published survey gives exact individual-shrimp or swarm-density coordinates to place -- the swarm's real presence at this vent field is sourced, its precise mapped position here is not."
     },
     {
       "id": "bvf-sulfide-mound-west",
@@ -51,8 +51,8 @@
       "primary": false,
       "scan_seconds": 4,
       "guide_entry": "vents",
-      "confidence": "medium",
-      "reconstruction": false,
+      "confidence": "low",
+      "reconstruction": true,
       "sources": [
         "https://www.gmrt.org/",
         "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879"

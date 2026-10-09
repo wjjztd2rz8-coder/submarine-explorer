@@ -242,14 +242,14 @@
       "sourceUrl": "https://www.frontiersin.org/journals/genetics/articles/10.3389/fgene.2022.970314/full"
     },
     "beebe-shrimp": {
-      "text": "Shrimp swarm in dense masses on the walls of the Beebe black smokers, 4,960 m down on the Mid-Cayman Rise. Bacteria growing on their mouthparts and shell feed them, and a light-sensing organ on the back may detect the faint glow of the hot vents.",
+      "text": "Rimicaris hybisae swarm the Beebe black smokers at roughly 4,960 m on the Mid-Cayman Rise. Microbes associated with their mouthparts and gill chamber contribute chemosynthetic food; their diet also includes carbon from photosynthesis. Their dorsal eye detects light without forming images and may sense faint vent light or bioluminescence.",
       "facts": {
         "Length": "3 to 6 cm",
-        "Depth": "About 4,950 m",
+        "Depth": "About 4,960 m at Beebe",
         "Habitat": "Black smoker chimneys"
       },
-      "sourceTitle": "PMC: Vent fauna of the Mid-Cayman Rise",
-      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3612092/"
+      "sourceTitle": "Streit et al. 2015 — Rimicaris hybisae carbon sources",
+      "sourceUrl": "https://www.sciencedirect.com/science/article/abs/pii/S0967063715000357"
     },
     "hawaii-shrimp": {
       "text": "A small vent shrimp described from Kamaʻehuakanaloa (formerly Lōʻihi) seamount, where it swarms around warm, mineral-rich vents near the summit.",

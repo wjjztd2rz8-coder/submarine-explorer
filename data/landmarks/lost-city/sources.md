@@ -1,5 +1,11 @@
 # Lost City content: sources and notes (package C4a)
 
+## F-1110 audit (2026-10-09)
+
+[The five-site primary-source audit](../../../plan/progress/F-1110.md) records
+the current copy, corrections, cuts and source-access limits. Earlier notes below
+are historical and are superseded where that audit corrects or removes a claim.
+
 ## F-FACTCHECK-630 correction (2026-10-04)
 
 The authoritative claim-by-claim review is [F-FACTCHECK-630](../../../plan/progress/F-FACTCHECK-630.md). The earlier research notes below are historical; their Wikipedia-based claims and terrain interpretations are superseded wherever the review identifies a discrepancy or an unresolved claim.

@@ -30,10 +30,6 @@
       "reconstruction": true,
       "sources": [
         {
-          "title": "Great Blue Hole — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole"
-        },
-        {
           "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
           "url": "https://www.gmrt.org/"
         },
@@ -56,7 +52,7 @@
       "id": "the-hole",
       "title": "Inside the real Blue Hole",
       "paragraphs": [
-        "The Great Blue Hole is a flooded limestone sinkhole. Its stalactites formed in air-filled caves during glacial sea-level lows. Now roughly 40–50 m below the surface, they and the submerged ledges preserve traces of those caves, flooded as the sea rose.",
+        "The Great Blue Hole is a flooded limestone sinkhole. Its submerged stalactites formed in air-filled caves during glacial sea-level lows. They and the submerged ledges preserve traces of those caves, flooded as the sea rose.",
         "Jacques Cousteau’s Calypso expedition explored it in 1971. A crewed-submarine and sonar expedition in 2018 mapped the interior in much greater detail, including submerged stalactite galleries.",
         "Below roughly 90 m, the lower water is oxygen-depleted and rich in hydrogen sulfide. Reef fish stay in the upper water; the lower sediment still supports microbial life."
       ],
@@ -84,18 +80,6 @@
       ],
       "reconstruction": true,
       "sources": [
-        {
-          "title": "Great Blue Hole — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole"
-        },
-        {
-          "title": "Jacques Cousteau's Grandson to Map Depths of Massive Blue Hole Off Belize's Coast — Live Science",
-          "url": "https://www.livescience.com/63950-belize-blue-hole-expedition.html"
-        },
-        {
-          "title": "Belize's Great Blue Hole revealed in expedition survey — GPS World",
-          "url": "https://www.gpsworld.com/belizes-great-blue-hole-revealed-in-expedition-survey/"
-        },
         {
           "title": "Gischler et al. 2013 — Blue Hole setting and stratification",
           "url": "https://limnogeology.ethz.ch/GischlerMarine.pdf"
@@ -139,8 +123,8 @@
           "url": "https://www.gmrt.org/"
         },
         {
-          "title": "Lighthouse Reef — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef"
+          "title": "Gischler et al. 2025 — Great Blue Hole core, dimensions and stratification",
+          "url": "https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"
         }
       ],
       "confidence": "high"
@@ -169,8 +153,8 @@
           "url": "https://www.gmrt.org/"
         },
         {
-          "title": "Lighthouse Reef — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef"
+          "title": "Gischler et al. 2025 — Great Blue Hole core, dimensions and stratification",
+          "url": "https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"
         }
       ],
       "confidence": "high"
@@ -194,14 +178,6 @@
       ],
       "reconstruction": true,
       "sources": [
-        {
-          "title": "Great Blue Hole — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Great_Blue_Hole"
-        },
-        {
-          "title": "Lighthouse Reef — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef"
-        },
         {
           "title": "Baremore et al. 2021 — Caribbean reef sharks at Lighthouse Reef",
           "url": "https://2025.maralliance.org/wp-content/uploads/2022/06/Baremore-et-al-2021_Movements-residency-of-Caribbean-reef-sharks-Lighthouse-Reef-Atoll-Belize.pdf"
@@ -241,8 +217,8 @@
           "url": "https://www.gmrt.org/"
         },
         {
-          "title": "Lighthouse Reef atoll overview",
-          "url": "https://en.wikipedia.org/wiki/Lighthouse_Reef"
+          "title": "Gischler et al. 2025 — Great Blue Hole core, dimensions and stratification",
+          "url": "https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"
         }
       ],
       "confidence": "high"

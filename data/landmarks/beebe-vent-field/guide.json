@@ -34,10 +34,6 @@
           "url": "https://www.nature.com/articles/ncomms1636"
         },
         {
-          "title": "Beebe Hydrothermal Vent Field — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field"
-        },
-        {
           "title": "InterRidge Vents Database — Beebe vent field",
           "url": "https://vents-data.interridge.org/ventfield/beebe"
         },
@@ -52,12 +48,12 @@
       "id": "vents",
       "title": "Supercritical black smokers",
       "paragraphs": [
-        "Beebe’s black smokers release extremely hot, low-salinity fluid at roughly 500 bar of pressure. Webber and colleagues measured about 401–403 °C and showed that this fluid can be supercritical: its liquid and gas states are no longer distinct. The dark chimneys are built from iron- and copper-bearing sulfide minerals.",
+        "Beebe’s black smokers release extremely hot, low-salinity fluid at roughly 500 bar of pressure. During the February 2013 survey, Webber and colleagues measured about 401–403 °C and showed that this fluid can be supercritical: its liquid and gas states are no longer distinct. The dark chimneys are built from iron- and copper-bearing sulfide minerals.",
         "Webber et al. (2015) mapped at least six sulfide mounds, three with active focused venting. The deposits grow and collapse through successive generations of chimneys."
       ],
       "facts": [
         {
-          "label": "Measured fluid temperature (2015)",
+          "label": "Measured fluid temperature (2013 survey)",
           "value": "about 401–403 °C (Webber et al. 2015)"
         },
         {
@@ -126,7 +122,7 @@
           "url": "https://www.nature.com/articles/ncomms1636"
         },
         {
-          "title": "Miyamoto et al. 2025 — visible-light-sensitive opsins in Rimicaris hybisae",
+          "title": "Nagata et al. 2025 — visible-light-sensitive opsins in Rimicaris hybisae",
           "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12221356/"
         },
         {
