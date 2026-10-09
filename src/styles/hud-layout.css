@@ -802,9 +802,10 @@
     display: none;
   }
   /* The navigation chip remains available for targets outside scan range. */
+  /* Sit in the gap just above the touch controls, clear of the sub and target. */
   html.is-touch .onboard-card {
     top: auto;
-    bottom: calc(230px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(176px + env(safe-area-inset-bottom, 0px));
     left: calc(12px + env(safe-area-inset-left, 0px));
     right: calc(12px + env(safe-area-inset-right, 0px));
     width: auto;

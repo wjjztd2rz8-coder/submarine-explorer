@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-hud-overlap:** on tall portrait phones the tutorial coach card now docks just above the touch controls (was over the lower sub and the base of the scan target). On desktop the on-screen target label sits below the target diamond so the centre scan bracket no longer crosses its text. UI placement only. `tools/firstminute-shots.mjs` gained a `phoneland` (844x390) layout.
+
 - **f-firstminute:** the mission briefing eyebrow no longer shows the raw site slug (`BEEBE-VENT-FIELD`, `LOST-CITY`, `MONTEREY-CANYON`); hyphens render as spaces. Added `tools/firstminute-shots.mjs`, a Home to debrief first-minute screenshot walkthrough (desktop 1280x720 and phone 390x844). No gameplay or layout change.
 
 - **F-MONTEREY-STRATA:** the Monterey canyon wall no longer reads as even corrugated stripes. Bed thickness is skewed (many thin beds, a few massive ones), ledge depth and overhang follow per-bed hardness and vary along the wall, slump scars are deeper, and each bed has its own muted albedo (olive, tan, grey, dark olive, buff). Vertex-colour and displacement only: no draw-call, triangle or tier change.
