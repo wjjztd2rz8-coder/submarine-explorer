@@ -1,3 +1,4 @@
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from '@playwright/test';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -41,6 +42,7 @@ interface Game {
     snap(p: unknown, yaw: number, pitch: number): void;
   };
   perf: { drawCalls: number };
+  props: { loaded: boolean };
 }
 
 async function boot(page: Page, url = DIVE): Promise<void> {
@@ -253,7 +255,14 @@ for (const site of SITES) {
     test.setTimeout(120_000);
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
-    await boot(page, `/?tile=${site}&skipBriefing=1&tier=high&lifeSeed=5`);
+    await pauseClockBeforeNavigation(page);
+    await page.goto(`/?tile=${site}&skipBriefing=1&tier=high&lifeSeed=5`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await clockFramesUntil(page, () => {
+      const game = window.__game as unknown as Game;
+      return window.__gameReady === true && game.life !== null && game.props.loaded;
+    });
     const band = await page.evaluate(() => {
       const r = (
         window.__game as unknown as Game & { life: { sim: { rare: { depth: number[] } } } }
@@ -270,7 +279,7 @@ for (const site of SITES) {
       const y = onBand ? gnd + 10 : Math.min(-8, Math.max(-(b[0] + b[1]) / 2, gnd + 10));
       g.sub.reset(p.x, y, p.z, 0);
     }, band);
-    await page.waitForTimeout(500);
+    await page.clock.runFor(34);
     const res = await page.evaluate(() => {
       const g = window.__game as unknown as Game;
       const p = g.sub.position;
@@ -292,7 +301,7 @@ for (const site of SITES) {
       return s.spawnRare(sub) !== null;
     });
     expect(res).toBe(true);
-    await page.waitForTimeout(1500);
+    await page.clock.fastForward(250);
     // For the screenshot, hold one of the species in the lights, centred.
     await page.evaluate(() => {
       const g = window.__game as unknown as Game;
@@ -306,12 +315,13 @@ for (const site of SITES) {
       const sub = { x: p.x, y: p.y, z: p.z, vx: 0, vy: 0, vz: 0, fx: 0, fy: 0, fz: -1 };
       l.sim.spawnNear(l.sim.rare.species, { ...sub, speed: 0, lightsOn: true, hullR: 7 }, 20, 1);
     });
-    await page.waitForTimeout(1200);
+    await page.clock.runFor(34);
     await page.keyboard.press('p');
+    await page.clock.runFor(34);
     await page.evaluate(() => {
       (window.__game as unknown as Game).rig.orbitRadius = 50;
     });
-    await page.waitForTimeout(500);
+    await page.clock.runFor(34);
     const info = await page.evaluate(() => {
       const g = window.__game as unknown as Game;
       return { draw: g.life!.render.drawCalls, stats: g.life!.sim.stats() };

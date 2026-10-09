@@ -159,18 +159,13 @@ for (const layout of [
         await page.clock.runFor(50);
         const hint = page.locator('.onboard-hint');
         await expect(page.locator('.onboard-card')).toBeHidden();
-        // Animal guidance waits for eight seconds of play when a scan card is
-        // visible. Locator polling cannot advance this deliberately paused
-        // clock. Advance one frame at a time at the engine's 250 ms clamp:
-        // eight seconds of actual game time takes 32 renders, not 500. Stop
-        // when the real hint appears so its lifetime remains paused for layout QA.
-        await clockFramesUntil(
-          page,
-          () =>
-            document.querySelector('.onboard-hint')?.textContent?.includes('Animal nearby.') ===
-            true,
-          250,
-        );
+        // Give the real eight-second trigger enough clamped game frames.
+        // Bound by simulated time (up to ten seconds), not a 45 s wall-clock
+        // poll that can expire before 32 software-GPU renders have completed.
+        for (let frame = 0; frame < 40; frame++) {
+          if (await hint.textContent().then((text) => text?.includes('Animal nearby.'))) break;
+          await page.clock.fastForward(250);
+        }
         await expect(hint).toContainText(
           layout.touch
             ? 'Animal nearby. Hold SCAN to scan, or press PHOTO for a photo.'
