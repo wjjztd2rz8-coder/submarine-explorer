@@ -31,8 +31,18 @@ for (const site of ['great-blue-hole', 'lost-city']) {
             'karst-grotto-east-3',
           ]
         : ['opening', 'poseidon-tower-2', 'poseidon-tower-3'];
-    for (const poseName of poseNames) {
-      test(`${site} Medium ${layout.name}: ${poseName} stays below 900k rendered triangles`, async ({
+    // These two desktop poses exceed the CI budget when all three drifts
+    // share one context. Retain each drift and all 16 frames independently.
+    const cases = poseNames.flatMap((poseName) => {
+      const driftGroups =
+        site === 'lost-city' && layout.name === 'desktop' && poseName !== 'opening'
+          ? [[-2], [0], [2]]
+          : [[-2, 0, 2]];
+      return driftGroups.map((drifts) => ({ poseName, drifts }));
+    });
+    for (const { poseName, drifts } of cases) {
+      const suffix = drifts.length === 1 ? `, vertical drift ${drifts[0]} m` : '';
+      test(`${site} Medium ${layout.name}: ${poseName}${suffix} stays below 900k rendered triangles`, async ({
         page,
       }) => {
         test.setTimeout(240_000);
@@ -141,7 +151,7 @@ for (const site of ['great-blue-hole', 'lost-city']) {
         const pose = poses.find((candidate) => candidate.name === poseName);
         expect(pose, `Missing golden pose ${poseName}`).toBeDefined();
         if (!pose) throw new Error(`Missing golden pose ${poseName}`);
-        for (const drift of [-2, 0, 2]) {
+        for (const drift of drifts) {
           await page.evaluate(
             ({ pose, drift }) => {
               const g = window.__game as unknown as Game;

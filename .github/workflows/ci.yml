@@ -126,7 +126,7 @@ jobs:
       - name: Install Playwright Chromium
         # Always ensure OS dependencies, even when the browser cache was restored.
         timeout-minutes: 5
-        run: npx playwright install --with-deps chromium
+        run: bash tools/install-playwright-chromium.sh
 
       - name: End-to-end tests (Playwright)
         # Hosted durations include retry costs; 30 shards leave room for runner variance.
@@ -188,7 +188,7 @@ jobs:
 
       - name: Install Playwright Chromium
         timeout-minutes: 5
-        run: npx playwright install --with-deps chromium
+        run: bash tools/install-playwright-chromium.sh
 
       - name: Project-base build and browser check
         timeout-minutes: 10

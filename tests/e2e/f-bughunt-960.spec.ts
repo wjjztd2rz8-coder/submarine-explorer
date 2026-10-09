@@ -92,7 +92,12 @@ for (const layout of [
             await act(
               home.locator('.home-menu').getByRole('button', { name: 'Dive sites', exact: true }),
             );
-            await act(home.locator(`[data-mission="${site}"]`));
+            // Touch action completion can precede the new document's commit.
+            // Advance the clock only after the requested mission has loaded.
+            await Promise.all([
+              page.waitForURL((url) => url.searchParams.get('mission') === site),
+              act(home.locator(`[data-mission="${site}"]`)),
+            ]);
             await ready(page);
             const briefing = page.locator('.briefing');
             await expect(briefing).toBeVisible();
