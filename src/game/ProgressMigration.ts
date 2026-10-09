@@ -7,14 +7,17 @@ import type { Progress } from './Progress.js';
 // 940 changed these routes. A discoveries-only save can already have earned
 // completion on the old primaries; retain that credit without marking a new
 // mission run complete or requiring the newly promoted scenic scan.
-const PRE_940_OBJECTIVES: Record<string, Record<string, boolean>> = {
-  'great-blue-hole': { 'outer-dropoff': true, 'western-dropoff': true },
-  'monterey-canyon': {
-    'canyon-head': true,
-    'upper-channel': true,
-    'canyon-wall': false,
-    'mars-node': false,
-  },
+// f-mission-pacing moved the second required target close to the first; the
+// 940-era route stays credited too.
+const PRE_940_OBJECTIVES: Record<string, Record<string, boolean>[]> = {
+  'great-blue-hole': [
+    { 'outer-dropoff': true, 'western-dropoff': true },
+    { stalactites: true, 'outer-dropoff': true, 'stalactites-east': false },
+  ],
+  'monterey-canyon': [
+    { 'canyon-head': true, 'upper-channel': true, 'canyon-wall': false, 'mars-node': false },
+    { 'canyon-wall': true, 'upper-channel': true, 'canyon-axis': false },
+  ],
 };
 
 /** Finish legacy credit before hull gating; a returning pilot never loses access during migration. */
@@ -46,15 +49,14 @@ export async function creditPreviousDives(
       def.objectives.forEach((o, i) => {
         if (statuses[i].complete) progress.credit('objective', `${site}/${o.id}`);
       });
-      const oldRoles = PRE_940_OBJECTIVES[site];
-      const oldStatuses = oldRoles
-        ? def.objectives.flatMap((o, i) =>
-            Object.hasOwn(oldRoles, o.id)
-              ? [{ primary: oldRoles[o.id], complete: statuses[i].complete }]
-              : [],
-          )
-        : [];
-      for (const route of oldRoles ? [oldStatuses, statuses] : [statuses]) {
+      const oldRoutes = (PRE_940_OBJECTIVES[site] ?? []).map((roles) =>
+        def.objectives.flatMap((o, i) =>
+          Object.hasOwn(roles, o.id)
+            ? [{ primary: roles[o.id], complete: statuses[i].complete }]
+            : [],
+        ),
+      );
+      for (const route of [...oldRoutes, statuses]) {
         const primary = route.filter((o) => o.primary);
         if (!primary.length || !primary.every((o) => o.complete)) continue;
         progress.bonus =

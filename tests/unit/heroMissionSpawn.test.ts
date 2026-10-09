@@ -30,13 +30,13 @@ const heroes = [
   },
   {
     site: 'great-blue-hole',
-    primary: ['stalactites', 'outer-dropoff'],
+    primary: ['stalactites', 'stalactites-east'],
     before: ['outer-dropoff', 'western-dropoff'],
   },
   { site: 'beebe-vent-field', primary: ['main-vents', 'shrimp'], before: ['main-vents', 'shrimp'] },
   {
     site: 'monterey-canyon',
-    primary: ['canyon-wall', 'upper-channel'],
+    primary: ['canyon-wall', 'canyon-axis'],
     before: ['canyon-head', 'upper-channel'],
   },
 ];

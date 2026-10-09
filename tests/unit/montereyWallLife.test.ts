@@ -36,7 +36,7 @@ describe('Monterey wall life on surveyed terrain', () => {
           config.scan,
           site,
         );
-        expect(pois).toHaveLength(4);
+        expect(pois).toHaveLength(5);
         for (const poi of pois) {
           const { x, y, z } = poi.position;
           const seabed = terrain.sampleHeight(x, z);

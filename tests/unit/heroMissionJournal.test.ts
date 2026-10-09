@@ -6,7 +6,7 @@ import { isEntryUnlocked, loadJournalSite } from '../../src/game/JournalData.js'
 import { parseMission } from '../../src/game/Mission.js';
 
 it.each([
-  ['great-blue-hole', 'stalactites', 'the-hole', 'stalactite gallery'],
+  ['great-blue-hole', 'stalactites', 'the-hole', 'stalactite galleries'],
   ['monterey-canyon', 'canyon-wall', 'canyon-wall', 'north wall'],
 ])(
   '%s Journal resolves the new first primary and names it in its mission summary',

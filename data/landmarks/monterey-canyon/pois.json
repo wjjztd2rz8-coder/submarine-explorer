@@ -41,6 +41,25 @@
       "note": "GMRT terrain, about 265 m deep and 2.85 km in a straight line from the canyon-head marker. Located by sampling the grid toward the canyon axis; this scan point does not establish the regional shelf-break position."
     },
     {
+      "id": "monterey-canyon-axis",
+      "name": "Canyon floor, 1,000 m",
+      "lat": 36.7814,
+      "lon": -122.0133,
+      "snap_to_seabed": true,
+      "radius_m": 200,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 3,
+      "guide_entry": "canyon-axis",
+      "confidence": "medium",
+      "reconstruction": false,
+      "sources": [
+        "https://www.mbari.org/know-your-ocean/monterey-canyon/",
+        "https://www.gmrt.org/"
+      ],
+      "note": "GMRT terrain: about 1,018 m deep, the deepest cell of the traced canyon axis, about 640 m south of the north-wall marker at the same longitude. No source publishes a coordinate for a specific axis point; it was located by sampling the grid along that meridian."
+    },
+    {
       "id": "monterey-canyon-wall",
       "name": "North canyon wall",
       "lat": 36.7872,

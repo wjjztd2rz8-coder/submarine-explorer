@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-mission-pacing:** Blue Hole's second required target is now the Eastern stalactite gallery (270 m from the first, was the outer drop-off 4.5 km away, now optional). Monterey's second required target is a new real-terrain "Canyon floor, 1,000 m" scan 645 m south of the north wall (was the upper channel 14.6 km away, now optional). New `tests/unit/missionPacing.test.ts` caps consecutive required gaps at 1.5 km per site; Challenger Deep, Hudson Canyon and Hunga Tonga remain listed as known long gaps. Details in `plan/progress/f-mission-pacing.md`.
+
 - **1160 debrief verification:** added unit coverage for zero/one-scan action order, callbacks, More reset and non-resumable/free-dive fallbacks, plus a two-pass browser regression spec for Titanic, Beebe and Blue Hole at 390×844 and 1280×720. Browser execution is blocked by localhost binding permissions; acceptance remains pending in `plan/progress/1160.md`. No product behavior change.
 - **1140 post-merge bug hunt:** repair Lost City's reversed grey-blue mineral blend, remove per-rock Beebe geometry warnings, and keep zero-radius irregular spire tips finite. Hoist spire profile setup and restrict Monterey bed-colour allocations to canyon scarps. Add four Low-tier buffer snapshots, finite-buffer/draw-budget checks, mineral continuity and shared-scarp isolation regressions. Existing assertions and snapshots retained; performance follow-ups and blocked browser validation are recorded in `plan/progress/1140.md`.
 
