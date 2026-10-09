@@ -407,7 +407,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       const lean = main ? 0 : 0.05 + vr() * 0.14;
       const leanDir = vr() * 6.28;
       const r = len * 0.12 + 0.22;
-      const girth = 1 + vr() * 0.9;
+      const girth = 1 + vr() * 1.4;
       parts.push(
         place(
           pendant({
