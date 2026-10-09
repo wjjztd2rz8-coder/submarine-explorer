@@ -139,4 +139,5 @@ touch-audit screenshots. Separately drive each requested size/mode/tier through
 a natural first scan using keyboard or touch, then debrief and reload. Record
 any observed overlaps, unreachable controls or cosmetics here. Acceptance stays
 open until those journeys and `tools/gates.sh --full-e2e` pass.
+
 - Blue Hole 390x844 portrait: tutorial card covered the hull (chase arm shortened by the surface, hull sat low). Fix in src/sub/CameraRig.ts: on portrait chase (aspect < 0.7) aim drops up to 30 m in proportion to lost arm length, lifting the hull above the card (sub y 597 -> 497, card top 558). Gates and camera/HUD/onboard/touch specs pass.
