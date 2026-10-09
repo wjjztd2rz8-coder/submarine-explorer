@@ -620,3 +620,6 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** 1010 (CI e2e splits/waits, refreshed timings) and 980 (Titanic opening beside the bow, whole hull visible and sub no longer covering it; Monterey strata varied, clearly less uniform in golden 2026-10-09-041919). Full e2e (527 passed) + project-base green on main; pushed, tagged f38.
 - **Running (Codex):** 1000, 1020, 1030. **Queue:** 1040, 1050 (Lost City fingers + Low check, 980 verify), 1060 (Journal collapse/debrief). No Claude agents launched. Needs owner: nothing.
+
+## 2026-10-09 00:xx review run (Claude)
+- Comprehensive review (Claude alone, Codex 6%): REVIEWS.md/DIRECTOR.md updated; queued Codex 1070 (CI shards), 1080 (Endurance/Beebe). No merges, no agents. Needs owner: nothing.

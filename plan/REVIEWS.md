@@ -2,6 +2,26 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-09 comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-09-045527 vs -202656)
+
+Codex 5h was 6% so `codex-review.sh` skipped; no Sol second opinion. The morning joint review stays the agreed baseline.
+
+**Changed:** merged 940, 950, 970, 960, 990, 1010, 980; tagged f35-f38. Titanic opening now shows the whole hull beside the sub; Monterey strata varied; Blue Hole and Challenger/Endurance openings improved.
+
+| Site | Score (readable / beautiful) | Biggest gap |
+| --- | --- | --- |
+| Titanic | 4 / 4 | haze band above seabed |
+| Beebe | 4 / 3.5 | smooth fluted chimney, flat boulders |
+| Blue Hole | 3 / 2.5 | smooth bowl, hard horizon ring, cone stalactites |
+| Lost City | 4 / 3 | stacked-plate beehive, blotchy texture |
+| Monterey | 4 / 3.5 | sub overlaps wall at spawn |
+
+**Process:** efficiency.sh: Claude idle ~128 h and Codex under-used ~114 h, almost all the Oct 6-8 weekly lockout; 41 watchdog trips, all floors working. Hosted CI on f37 still red (e2e shards 3, 6, 24); 1070 queued. f38 run pending. Play-flow not re-captured; 1060 and a Haiku capture are queued in the backlog.
+
+**Priorities:** see DIRECTOR.md (Blue Hole bowl, Lost City, Beebe chimney, CI, first-minute check, Titanic haze/Monterey spawn). Codex queued: 1040, 1050, 1060, 1070, 1080.
+
+**Stage:** ~69% to 1.0, about 2.5-3 weeks (Claude only). **Needs owner:** nothing.
+
 ## 2026-10-08 evening comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-08-202656 vs -155020)
 
 Codex 5h budget was 0% (`codex-review.sh` exited 75), so there was no Sol second opinion; this is Claude's view only. The morning joint review still stands as the agreed baseline.

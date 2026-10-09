@@ -2,7 +2,20 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-08 evening review; golden 2026-10-08-202656)
+## Current priorities (refreshed 2026-10-09 comprehensive review; golden 2026-10-09-045527)
+
+Claude backlog (ordered by player impact; all unblocked; Sonnet for visual, Haiku for small):
+
+1. **Blue Hole bowl (Sonnet):** gallery fine; bowl is still a smooth beige dune with a hard horizon ring and flat-cone stalactites. Real ledge geometry, darker lower walls, softened ring, tapered irregular stalactites (1030 may cover part; review it first).
+2. **Lost City tower read (Sonnet):** close-up is ledged but still stacked plates with blotchy albedo; irregular carbonate fingers with flow texture (1050 verifies; fix what it finds).
+3. **Beebe chimney detail (Sonnet; Codex 1080 has a first pass, review it):** smooth fluted trunk needs crust/flange variation and a visible orifice; boulders are flat pale blobs.
+4. **Hosted CI green (Haiku to triage 1070 output):** f37 run had e2e shards 3/6/24 red; f38 run pending. Never loosen assertions.
+5. **First-minute playthrough check (Haiku capture, Sonnet judge):** Home -> site -> 60 s -> Journal -> debrief on desktop and phone after 1060 merges.
+6. **Titanic haze band and Monterey spawn overlap (Sonnet):** flat haze above seabed; sub overlaps the wall at Monterey spawn.
+
+Codex queue: 1040, 1050, 1060, 1070, 1080 (1020/1030/1000 running or merging). Refill from next golden.
+
+## Previous priorities (2026-10-08 evening review; golden 2026-10-08-202656)
 
 Claude backlog (ordered by player impact; all unblocked; Sonnet for visual, Haiku for small):
 
