@@ -636,3 +636,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Hosted CI** for f39 (docs commit) completed **failure** after 44 min; Pages deploy OK. 1070 (CI shard failures) queued; not yet triaged.
 - **Running:** no Codex tasks (5h at 5% until 02:45). **Queue:** 1040, 1050, 1060, 1070, 1080. Held: 830 reference worktree.
 - Needs owner: nothing.
+
+## 2026-10-09 04:00 CDT headless run (Claude)
+
+- **Merged:** f-titanic-monterey (Sonnet): Titanic distant seabed fades over 110–650 m (softer horizon band; faint lighter strip remains); Monterey spawn 34 m from the wall, chase arm 64, opening fauna moved ahead of the sub. Reviewed desktop shots: sub clear of the wall, readable. Monterey portrait final framing unchecked; HUD panels overlap in portrait capture (open).
+- **Gates:** full e2e on main: 556 passed, 1 failed (f-bughunt-18 chase-radius spec expected the global radius for Monterey); fixed the spec (accept 64 like Beebe's 54), targeted rerun passed, smoke + project-base green. Full suite not re-run after the fix. Pushed, tagged f41.
+- **Running/queue:** no Codex tasks running; queue 1040, 1050, 1060, 1070, 1080 (Codex 5h reset to 100%, dispatcher will launch). Next Claude: Beebe chimney review after 1080, Monterey portrait HUD overlap. Needs owner: nothing.

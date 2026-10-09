@@ -211,8 +211,12 @@ test('new sites and explicit Lost City probes restore the global chase radius', 
     'mission=lost-city&poi=lost-city-poseidon&skipBriefing=1',
   ]) {
     await ready(page, query);
-    // Beebe's authored nearer chase radius (Spawn.ts) may land after the keypress.
-    const accepted = query.includes('beebe') ? [54, defaultRadius] : [defaultRadius];
+    // Beebe's and Monterey's authored chase radii (Spawn.ts) may land after the keypress.
+    const accepted = query.includes('beebe')
+      ? [54, defaultRadius]
+      : query.includes('monterey')
+        ? [64, defaultRadius]
+        : [defaultRadius];
     await expect
       .poll(async () => {
         await page.keyboard.press('x');
