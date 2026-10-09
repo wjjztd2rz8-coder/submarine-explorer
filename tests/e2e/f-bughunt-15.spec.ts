@@ -24,18 +24,30 @@ const hud = [
   '.tc-btn-pause',
 ];
 
-// Sample all rectangles in one frame, then poll for the ResizeObserver and
-// entrance animation to settle. Fail with the actual rectangles for diagnosis.
+// Sample visibility and all rectangles together, then poll for the ResizeObserver
+// and entrance animation to settle. Serial visibility calls cost a software-GPU
+// render apiece, repeated for every tutorial step, on hosted runners.
 async function separate(page: Page, selectors: string[]): Promise<void> {
-  for (const selector of selectors) await expect(page.locator(selector)).toBeVisible();
   await expect
     .poll(async () =>
       page.evaluate((selectors) => {
-        const boxes = selectors.map((selector) => ({
-          selector,
-          box: document.querySelector(selector)!.getBoundingClientRect().toJSON() as DOMRect,
-        }));
         const issues: string[] = [];
+        const boxes = selectors.flatMap((selector) => {
+          const elements = document.querySelectorAll(selector);
+          // Retain the locator's strict single-element requirement as well.
+          if (elements.length !== 1) {
+            issues.push(`${selector} expected one element, found ${elements.length}`);
+            return [];
+          }
+          const element = elements[0];
+          const box = element.getBoundingClientRect().toJSON() as DOMRect;
+          const visibility = getComputedStyle(element).visibility;
+          // Match Playwright's visible check: a nonempty box and visibility
+          // other than hidden/collapse. Opacity does not determine visibility.
+          if (box.width <= 0 || box.height <= 0 || visibility !== 'visible')
+            issues.push(`${selector} hidden: ${JSON.stringify(box)}, visibility=${visibility}`);
+          return [{ selector, box }];
+        });
         for (const { selector, box } of boxes) {
           if (box.x < 0 || box.y < 0 || box.right > innerWidth || box.bottom > innerHeight)
             issues.push(`${selector} offscreen: ${JSON.stringify(box)}`);
