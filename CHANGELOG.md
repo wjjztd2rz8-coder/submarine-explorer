@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Added a Monterey Canyon portrait (390x844) HUD regression test: sonar, readouts, scan card, objectives, tutorial card, touch controls and the open Data credits panel keep separate space, and none covers the submarine. No layout change was needed; the overlap seen in an earlier golden capture no longer reproduces.
+
 - **f-titanic-monterey:** Titanic distant seabed now fades into the water over 110-650 m (was 180-780 m), softening the flat haze band above the seabed. Monterey Canyon opening starts 34 m from the north wall (was 16 m) with a 64 m chase arm, so the sub sits clear on the sand with the wall beyond; opening sablefish and sea pens moved ahead of the sub to stay in the opening frame.
 
 - Phase F, F-BLUEHOLE-BOWL2: Blue Hole bowl colour and relief shading. Baked
