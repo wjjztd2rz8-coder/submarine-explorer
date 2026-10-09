@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Lost City carbonate towers (f-lostcity-trunk): trunks get jittered, uneven terraces plus slow swells instead of evenly stacked plates; fewer and narrower flanges; vertex-colour flow streaks, white/cream/grey-blue mineral variation and a dark vent mouth with a deeper funnel; shader albedo contrast eased (0.32 to 0.2) to cut grey blotching. Colliders, scan targets, materials and draw calls unchanged.
+
 - **f-bluehole-atmos:** Blue Hole bowl grades from warm tan at the rim to teal-blue with depth (vertex tint plus a bluer, earlier depth shade), each tread gets its own tone and width gradient, the first riser's lip and shadow are softened, the gallery apron and lower wall cool toward teal, and pendants are thicker, more tapered and irregular with varied length and lean. Colour and geometry only; no new meshes or draw calls.
 
 - **f-bluehole-apron:** Blue Hole shelf and apron vertex tint now carries sediment patches (tan sand, grey-brown silt, olive algae film, darker rubble beds, scour streaks and ripples) instead of one beige value, with a pale lip and dark foot-shadow at the first riser. Baked in vertex colour only; no new draw calls.

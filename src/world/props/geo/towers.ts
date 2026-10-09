@@ -106,6 +106,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       lip: 0.1,
       crater: 0.5,
       irregular: 1,
+      trunk: true,
       lean: main ? 0 : (rnd() - 0.5) * 0.12,
       leanA: rnd() * 6.283,
     });
@@ -208,6 +209,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
         lip: 0,
         crater: 0.4,
         irregular: 1,
+        trunk: true,
         rootHeight: t * s.h,
         azimuth: a,
         lean,
