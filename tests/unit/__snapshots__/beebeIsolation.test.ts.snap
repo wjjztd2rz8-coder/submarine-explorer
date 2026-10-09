@@ -158,12 +158,13 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
     },
   },
   "great-blue-hole": {
-    "biome": "908d3adf26351550d435cfaf9443fe786dbfcfe23fe246918d32113a9721a043",
+    "biome": "7cfc61b35685481328b55eb34101d8cda5a61ba0018917f4c7a3c5a1a6e242c7",
     "tiers": {
       "high": {
         "buffers": [
           {
             "aCavity": "60e85f7800eda938157cdf4c02e91bc1dadb549c1caf7b4cba9d50623ac98b02",
+            "color": "26121958d4fc09c75e1f44a8a697c6470fd9f9a78da745ebaf8c818bb0263816",
             "index": "33f3f65b8909899dbddb9d23ac7ae208a4bd641501e600f2f2b5079f128619d4",
             "normal": "19b7d7a31b5da2ed4184bae7010cfb2bf120ceeb88df2d9e9264676a6ce8697d",
             "position": "518d12ac0aca601a31f7c0c71501f43cf822943f6bc2ab970da9bab5721066e0",
@@ -171,12 +172,13 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP#define TERRAIN_ROCK_DETAIL-horizon-fade",
         "shader": "439da990cb25fdc09b55af6103b87a0dab592011c028b4e494367d6c386e523f",
-        "uniforms": "19e0480590826dfc05e8956e5029c4fdc344ce4003d7a4d92292fc64241977ae",
+        "uniforms": "1e7a26e3bb650ddf65cf0a0e96e980116749c13e9fecd5414765d36be3675e05",
       },
       "low": {
         "buffers": [
           {
             "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "color": "677717450e39ca09baefa1e70c3ee8ede94d29241bb4e986457695016228ac09",
             "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
             "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
             "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
@@ -184,7 +186,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
         ],
         "cache": "seabed--horizon-fade",
         "shader": "cecaaa3b0a4bcf9e1b7b74dc89cfcc410eff4dce560dba94f8d485a4a7c974a0",
-        "uniforms": "289ec01e286defccd6ee12657d1620500882c4913703749ffee33fc7c01ec909",
+        "uniforms": "932051e742d97e9a082eb170777fe6aa9ea615c84270542313647cc426bbb9fc",
       },
     },
   },

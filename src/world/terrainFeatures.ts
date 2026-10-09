@@ -193,7 +193,7 @@ export function blueHoleTint(
   const bandT = depth / 3.4 + wob;
   const bi = Math.floor(bandT);
   const bh = 0.5 + 0.5 * Math.sin(bi * 12.9898 + 4.1) * Math.cos(bi * 7.233);
-  const joint = smoothstep(clamp01(((bandT - bi) / 0.12)));
+  const joint = smoothstep(clamp01((bandT - bi) / 0.12));
   const bed = (0.8 + 0.4 * bh) * (0.7 + 0.3 * joint);
   const k = rock * 0.85;
   tr *= lerp(1, bed * lerp(1.06, 0.92, bh), k);
@@ -218,6 +218,12 @@ export function blueHoleTint(
     0.25 * Math.sin(z * 0.085 + 0.9 * Math.sin(x * 0.13 + 2));
   const fine = 0.5 + 0.5 * Math.sin(x * 0.53 + z * 0.37 + 2 * Math.sin(x * 0.21 - z * 0.29));
   const flat = 1 - rock;
+  // Level silt and sand keep only part of the wall's chroma: pale sand, not saturated ochre.
+  const mean = (tr + tg + tb) / 3;
+  const keep = 0.4 + 0.6 * rock;
+  tr = mean + (tr - mean) * keep;
+  tg = mean + (tg - mean) * keep;
+  tb = mean + (tb - mean) * keep;
   const tone = 1 + flat * (0.34 * (mott - 0.5) + 0.12 * (fine - 0.5));
   const warm = flat * 0.18 * (mott - 0.5);
   const m = ao * tone * (0.8 + 0.2 * smoothstep(clamp01(normalY)));
