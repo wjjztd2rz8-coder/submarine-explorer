@@ -69,6 +69,35 @@ function settings(input: ProceduralBuildInput): BeebeSeabed | undefined {
   return value as unknown as BeebeSeabed;
 }
 
+/** Angular, noise-displaced rock: a coarse polyhedron clipped by random planes, flat-shaded. */
+function angularRock(detail: number, seed: number): THREE.BufferGeometry {
+  const rnd = mulberry32(seed);
+  let g: THREE.BufferGeometry = new THREE.IcosahedronGeometry(1, Math.max(1, detail));
+  const p = g.getAttribute('position');
+  const planes: Array<[THREE.Vector3, number]> = [];
+  for (let i = 0; i < 6; i++) {
+    const n = new THREE.Vector3(rnd() * 2 - 1, (rnd() * 2 - 1) * 0.8, rnd() * 2 - 1).normalize();
+    planes.push([n, 0.55 + rnd() * 0.3]);
+  }
+  const v = new THREE.Vector3();
+  for (let i = 0; i < p.count; i++) {
+    v.fromBufferAttribute(p, i);
+    const n = fbm3(v.x * 1.5 + 7, v.y * 1.5 + 7, v.z * 1.5 + 7, seed, 3);
+    v.multiplyScalar(1 + (n - 0.5) * 0.9);
+    for (const [pn, d] of planes) {
+      const over = v.dot(pn) - d;
+      if (over > 0) v.addScaledVector(pn, -over);
+    }
+    p.setXYZ(i, v.x, v.y, v.z);
+  }
+  // Duplicated corners keep the faceting hard after the normals are rebuilt.
+  g.deleteAttribute('normal');
+  g.deleteAttribute('uv');
+  g = g.toNonIndexed();
+  g.computeVertexNormals();
+  return g;
+}
+
 /** Supporting terrain material, without loading another set of seabed textures. */
 export function beebeSeabedMaterial(ground: {
   sampleHeight(x: number, z: number): number;
@@ -97,12 +126,27 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
   const halfZ = cfg.depth_m / 2;
   const rim = (x: number, z: number): number => {
     const radius = Math.hypot(x / halfX, z / halfZ);
+    // Multi-scale noise plus angular lobes break the ellipse into bays and tongues; the
+    // distortion tapers to nothing at the mesh edge, so that edge always stays buried.
     const lobes = fbm3(x / cfg.patch_size_m, 2, z / cfg.patch_size_m, seed ^ 0xbee, 3);
-    return radius * (1 + (lobes - 0.5) * 0.2);
+    const broad = fbm3(
+      x / (cfg.patch_size_m * 2.6),
+      5,
+      z / (cfg.patch_size_m * 2.6),
+      seed ^ 0x5e1,
+      2,
+    );
+    const a = Math.atan2(z, x);
+    const bays = Math.sin(a * 3 + (seed % 17)) * 0.05 + Math.sin(a * 5 + (seed % 7)) * 0.035;
+    const wobble =
+      ((lobes - 0.5) * 1.4 + (broad - 0.5) * 1.1 + bays) *
+      smooth(0.58, 0.8, radius) *
+      (1 - smooth(0.82, 1, radius));
+    return radius * (1 + wobble);
   };
   const surface = (x: number, z: number): number => {
     const r = rim(x, z);
-    const fade = 1 - smooth(0.65, 0.96, r);
+    const fade = 1 - smooth(0.6, 0.96, r);
     const grain = fbm3(x / cfg.patch_size_m, 4, z / cfg.patch_size_m, seed ^ 0x680, 3);
     // sampleHeight already contains measured bathymetry and procedural terrain detail.
     // A small positive lift hides triangulation gaps; the outer ring sinks into the floor.
@@ -115,24 +159,8 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
   const segments = Math.max(8, Math.round(cfg.grid_segments * detail.meshDensity));
   const apron = heightMesh(cfg.width_m, cfg.depth_m, segments, segments, surface);
   const sediment = new THREE.Color(cfg.sediment_color);
-  const edge = new THREE.Color(cfg.edge_color);
   const stain = new THREE.Color(cfg.stain_color);
-  const rock = new THREE.Color(cfg.rubble_color);
-  const color = (x: number, z: number, out: THREE.Color, rubble: boolean): void => {
-    const r = rim(x, z);
-    const n = fbm3(x / cfg.patch_size_m, 7, z / cfg.patch_size_m, seed ^ 0x71, 3);
-    const grain = fbm3(
-      x / (cfg.patch_size_m * 0.3),
-      3,
-      z / (cfg.patch_size_m * 0.3),
-      seed ^ 0x92,
-      2,
-    );
-    out.copy(rubble ? rock : sediment).lerp(edge, smooth(0.5, 1, r));
-    // Patchy rusty mineral precipitates stay muted against the lighter, grey-tan sediment.
-    out.lerp(stain, smooth(0.4, 0.75, n) * cfg.stain_amount * (1 - smooth(0.65, 1, r)));
-    out.multiplyScalar(0.88 + grain * 0.24);
-  };
+  const basalt = new THREE.Color(0x2e2d2b);
   // Keep every supporting height (and therefore the 850 clumps) unchanged. The plate
   // came from a plain pale material with radial edge tint, not the height mesh.
   // A neutral cavity lets this mesh use exactly the surrounding floor's shader.
@@ -191,13 +219,23 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
       halfZ,
       count: Math.max(3, Math.round(cfg.rubble_count * detail.growth)),
       size: cfg.rubble_size_m,
-      detail: tier === 'low' ? 0 : Math.min(1, detail.sphereDetail),
+      detail: tier === 'low' ? 1 : 2,
       seed: seed ^ 0x7a105,
+      make: angularRock,
+      lift: 0.1,
     },
   );
   if (rubble.length) {
     const geometry = mergeAll(rubble);
-    paint(geometry, (x, _y, z, _ny, out) => color(x, z, out, true));
+    paint(geometry, (x, y, z, ny, out) => {
+      // Basalt-dark blocks, patchy sulfide staining and a dusting of sediment on upper faces.
+      const m = fbm3(x * 0.9, y * 1.4, z * 0.9, seed ^ 0x3a1, 2);
+      const s = fbm3(x * 0.35, y * 0.6, z * 0.35, seed ^ 0x9d, 2);
+      const f = fbm3(x * 3.1, y * 3.1, z * 3.1, seed ^ 0x2c, 2);
+      out.copy(basalt).multiplyScalar(0.7 + m * 0.9 + (f - 0.5) * 0.5);
+      out.lerp(stain, smooth(0.45, 0.7, s) * 0.45);
+      out.lerp(sediment, smooth(0.5, 0.95, ny) * 0.1);
+    });
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
     built.bounds.union(geometry.boundingBox!);

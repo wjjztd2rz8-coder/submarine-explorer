@@ -287,6 +287,10 @@ export interface RubbleOpts {
   /** Icosphere subdivision per block (0-2). */
   detail: number;
   seed: number;
+  /** Optional block builder (unit radius, scaled by the caller); default is a smooth lump. */
+  make?: (detail: number, seed: number) => THREE.BufferGeometry;
+  /** With `make`: how far the block centre sits above the surface, in half-heights (default 0.2). */
+  lift?: number;
 }
 
 /**
@@ -313,7 +317,9 @@ export function scatterRubble(
     const dx = surface(x + e, z) - surface(x - e, z);
     const dz = surface(x, z + e) - surface(x, z - e);
     const lean = new THREE.Vector3(-dx / (2 * e), 1, -dz / (2 * e)).normalize();
-    const g = lump(o.detail, o.seed + out.length * 7, 0.32, 1.7);
+    const g = o.make
+      ? o.make(o.detail, o.seed + out.length * 7)
+      : lump(o.detail, o.seed + out.length * 7, 0.32, 1.7);
     const squash = 0.45 + rnd() * 0.35;
     const q = new THREE.Quaternion()
       .setFromUnitVectors(new THREE.Vector3(0, 1, 0), lean.lerp(new THREE.Vector3(0, 1, 0), 0.4))
@@ -322,7 +328,7 @@ export function scatterRubble(
     out.push(
       place(g, {
         x,
-        y: y + r * squash * 0.35,
+        y: y + r * squash * (o.make ? (o.lift ?? 0.2) : 0.35),
         z,
         rx: eu.x,
         ry: eu.y,
