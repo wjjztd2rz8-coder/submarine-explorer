@@ -84,9 +84,13 @@ Arcade Lost City's composed 38 m opening sets a 50 m reset distance, independent
 of wheel zoom (35–180 m). Its original 10° heading offset is preserved; a
 local X offset of −20 m in the chase vector moves the hull off Poseidon's axis
 before that vector is normalized to the 50 m arm. The spawn pose carries
-`chaseOffsetX` alongside `chaseRadius`. `CameraRig.setChaseRadiusDefault(radius?, offsetX?)`
-sets the current/reset distance and lateral framing; omitting both restores
-the configured arm and zero extra lateral offset. Surface,
+`chaseOffsetX` alongside `chaseRadius`. `CameraRig.setChaseRadiusDefault(radius?, offsetX?, offsetY?, portraitOffset?)`
+sets the current/reset distance and framing; omitting the arguments restores
+the configured arm and zero extra lateral offset. The optional `{ x, y }` portrait
+offset is carried by `SpawnPose.portraitChaseOffset` and applied only below aspect 1.
+Challenger and Endurance use a centred, lower portrait chase arm to keep the
+level hull, seabed and scan reticle clear; rotating the screen and resetting
+the camera retain the dive's framing defaults. Surface,
 Daily, missing-content and Realistic/Custom mission starts clear the Lost City
 override; other sites retain their existing camera defaults. Briefing mode
 changes preview the current saved mode, including when the start choice stays

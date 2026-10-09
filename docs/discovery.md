@@ -107,6 +107,11 @@ centre; wrapped target names increase the column's height. On portrait touch
 screens, hints use the tutorial's row after it closes, above the controls and
 source credit. Hiding the target panel leaves contextual hints visible.
 
+The hull-rating hint waits until 20 active dive seconds. Its depth baseline is
+captured after opening props and POIs load, and resets when a mission starts.
+A dive starting in the warning band stays quiet at that depth; descending at
+least 10 m farther enables the hint. Low-battery hints retain their priority.
+
 The panel's distance is the 3D range to the POI; the mission objectives
 panel's `RNG` is the same slant range (QA-B #11).
 

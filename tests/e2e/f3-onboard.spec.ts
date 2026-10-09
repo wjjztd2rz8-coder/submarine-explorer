@@ -159,6 +159,24 @@ for (const dismissal of ['button', 'expiry'] as const) {
       expect(hull.ratedRatio).toBeLessThan(1);
       expect(hull.hullBreached).toBe(false);
       const hint = page.locator('.onboard-hint');
+      await expect(hint).toBeHidden();
+      // The authored deep approach must stay quiet after the opening grace
+      // period as well. Keep physics fixed while advancing real dive frames.
+      await page.evaluate(() => {
+        const g = window.__game as unknown as {
+          sub: { step(): void; position: { y: number } };
+        };
+        g.sub.step = () => {};
+      });
+      for (let i = 0; i < 81; i++) await page.clock.fastForward(250);
+      await expect(hint).toBeHidden();
+      expect((await saved(page))?.seenHints).not.toContain('near-hull');
+      // A new descent beyond the opening depth still earns the one-shot hint.
+      await page.evaluate(() => {
+        const g = window.__game as unknown as { sub: { position: { y: number } } };
+        g.sub.position.y -= 11;
+      });
+      await page.clock.fastForward(250);
       await expect(hint).toBeVisible({ timeout: 30_000 });
       await expect(hint).toContainText('Near hull rating');
       await expect(page.locator('.scan-panel')).toBeVisible();

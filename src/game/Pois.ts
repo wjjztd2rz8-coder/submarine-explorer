@@ -216,6 +216,8 @@ export interface SpawnPose {
   chaseOffsetX?: number;
   /** Extra vertical chase offset (m) before normalizing: raises the camera to look further down. */
   chaseOffsetY?: number;
+  /** Optional chase offsets for portrait, where a side view can crop the hull. */
+  portraitChaseOffset?: { x: number; y: number };
 }
 
 /**

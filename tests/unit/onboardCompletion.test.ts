@@ -75,7 +75,12 @@ function setup(seenHints: HintId[] = ['creature']) {
     params: new URLSearchParams('tutorial=1'),
     settings: { reduceMotion: true },
     save: { onChange: () => () => {} },
-    discovery: { overlay: { messages: {}, cardVisible: false }, guide: { isOpen: false } },
+    discovery: {
+      loaded: true,
+      overlay: { messages: {}, cardVisible: false },
+      guide: { isOpen: false },
+    },
+    props: { loaded: true },
     app: { state: 'dive' },
     photoMode: { active: false },
     photos,
@@ -91,13 +96,88 @@ function setup(seenHints: HintId[] = ['creature']) {
   system.init?.(ctx);
   const tick = (state = { throttle: 0, yaw: 0, ballast: 0 }, dt = 0.1) =>
     system.frame!['hud.draw']!(
-      { state, dt, elapsed: 1, frozen: false, sub: { ratedRatio: 0.01 } } as FrameState,
+      {
+        state,
+        dt,
+        elapsed: 1,
+        frozen: false,
+        sub: { ratedRatio: 0.01, depth: -110, ratedDepth: -11000 },
+      } as FrameState,
       ctx,
     );
   return { ctx, system, tick, onboard: exposed.onboard!, data, headlights, photos };
 }
 
 describe('onboarding completion through the system', () => {
+  it('1020: waits for the authored opening before judging a new descent', () => {
+    const { ctx, system, onboard } = setup(['creature', 'rov']);
+    const draw = (dt: number, depth: number, frozen = false) =>
+      system.frame!['hud.draw']!(
+        {
+          state: { throttle: 0, yaw: 0, ballast: 0 },
+          dt,
+          elapsed: 1000,
+          frozen,
+          sub: { depth, ratedDepth: -11000, ratedRatio: depth / -11000 },
+        } as FrameState,
+        ctx,
+      );
+    try {
+      views.actions!.skipAll();
+      views.chip.show.mockClear();
+      ctx.props.loaded = false;
+      draw(1, -100);
+      ctx.props.loaded = true;
+      ctx.discovery.loaded = false;
+      draw(1, -500);
+      ctx.discovery.loaded = true;
+      draw(1, -10903);
+      draw(100, -10903);
+      expect(views.chip.show).not.toHaveBeenCalled();
+      expect(onboard.store.get().seenHints).toEqual(['creature', 'rov']);
+      draw(1, -10913);
+      expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
+        'Near hull rating. Ascend to ease pressure.',
+        9,
+      );
+    } finally {
+      system.dispose?.();
+    }
+  });
+
+  it('1020: counts dive time rather than loading, pause or app-clock time', () => {
+    const { ctx, system, onboard } = setup(['creature', 'rov']);
+    const draw = (dt: number, depth: number, frozen = false) =>
+      system.frame!['hud.draw']!(
+        {
+          state: { throttle: 0, yaw: 0, ballast: 0 },
+          dt,
+          elapsed: 1000,
+          frozen,
+          sub: { depth, ratedDepth: -11000, ratedRatio: depth / -11000 },
+        } as FrameState,
+        ctx,
+      );
+    try {
+      views.actions!.skipAll();
+      views.chip.show.mockClear();
+      draw(1, -100);
+      draw(18.999, -9900);
+      draw(100, -9900, true);
+      expect(views.chip.show).not.toHaveBeenCalled();
+      expect(onboard.store.get().seenHints).toEqual(['creature', 'rov']);
+      ctx.bus.emit('mission:started', { missionId: 'challenger-deep', tileId: 'challenger-deep' });
+      draw(20, -9900);
+      expect(views.chip.show).not.toHaveBeenCalled();
+      draw(1, -9910);
+      expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
+        'Near hull rating. Ascend to ease pressure.',
+        9,
+      );
+    } finally {
+      system.dispose?.();
+    }
+  });
   it('960: passes the active device to the phone card after switching inputs', () => {
     const { ctx, system, tick } = setup();
     try {
@@ -142,7 +222,7 @@ describe('onboarding completion through the system', () => {
           dt,
           elapsed: 1000,
           frozen,
-          sub: { ratedRatio: 0.01 },
+          sub: { ratedRatio: 0.01, depth: -110, ratedDepth: -11000 },
         } as FrameState,
         ctx,
       );
@@ -214,7 +294,7 @@ describe('onboarding completion through the system', () => {
           dt,
           elapsed: 1000,
           frozen,
-          sub: { ratedRatio: 0.01 },
+          sub: { ratedRatio: 0.01, depth: -110, ratedDepth: -11000 },
         } as FrameState,
         ctx,
       );

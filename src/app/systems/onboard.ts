@@ -9,7 +9,7 @@ import type { InputDevice } from '../../ui/ControlsCard.js';
 import { ControlsCard } from '../../ui/ControlsCard.js';
 import { HintChip, TutorialCard, tutorialText } from '../../ui/TutorialCard.js';
 import type { TutorialKeys } from '../../ui/TutorialCard.js';
-import { HINT_TEXT, HintEngine, creatureHintAllowed } from '../../game/Hints.js';
+import { HINT_TEXT, HintEngine, creatureHintAllowed, hullHintAllowed } from '../../game/Hints.js';
 import type { HintLabels } from '../../game/Hints.js';
 import { Tutorial } from '../../game/Tutorial.js';
 import { TutorialSave } from '../../game/TutorialSave.js';
@@ -31,6 +31,7 @@ export function createOnboardSystem(): GameSystem {
   let card: TutorialCard | null = null;
   let chip: HintChip | null = null;
   let diveS = 0;
+  let startDepth: number | null = null;
   let wasLights = false;
   let wasJournal = false;
   let wasPhotoMode = false;
@@ -170,6 +171,7 @@ export function createOnboardSystem(): GameSystem {
       cleanup.add(
         bus.on('mission:started', () => {
           diveS = 0;
+          startDepth = null;
         }),
       );
 
@@ -211,6 +213,10 @@ export function createOnboardSystem(): GameSystem {
         const playing = dive && !f.frozen && !ctx.photoMode.active;
 
         if (dive && !f.frozen) diveS += f.dt;
+        // Props and POIs can move the initial pose asynchronously. Capture the
+        // actual approach, rather than interpreting that teleport as descent.
+        if (playing && startDepth === null && ctx.props.loaded && ctx.discovery.loaded)
+          startDepth = f.sub.depth;
         const lights = ctx.headlights.on;
         const journal = ctx.discovery.guide.isOpen || ctx.journal.isOpen;
         const photoMode = ctx.photoMode.active;
@@ -255,6 +261,9 @@ export function createOnboardSystem(): GameSystem {
         const id = hints.update(f.elapsed, {
           battery: power.enabled ? power.battery : null,
           ratedRatio: f.sub.ratedRatio,
+          hullHintEligible:
+            startDepth !== null &&
+            hullHintAllowed(diveS, f.sub.depth, startDepth, f.sub.ratedDepth),
           // The scan panel already gives the target name and hold-to-scan prompt.
           scanTargetInRange: false,
           creatureInView:
