@@ -5,7 +5,7 @@ import { ALBEDO, vertexGlow } from './props/geo/materials.js';
 
 export const LOST_CITY_SURFACE = {
   repeatM: 2.4,
-  contrast: 0.32,
+  contrast: 0.2,
   normalStrength: 0.65,
   normalFadeM: [5, 65],
   poreM: 0.065,

@@ -10,6 +10,11 @@ import { fbm3, smooth } from './shared.js';
 
 const TAU = Math.PI * 2;
 
+function hash1(k: number): number {
+  const v = Math.sin(k * 12.9898 + 78.233) * 43758.5453;
+  return v - Math.floor(v);
+}
+
 export interface SpireOpts {
   h: number;
   r0: number;
@@ -83,16 +88,31 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
     const irr = o.irregular ?? 0;
     if (irr) {
       const plain = spireRadius({ ...o, tiers: 0 }, t) / o.r0;
-      const u = t * (o.tiers ?? 0);
+      // Jittered terrace phase and per-terrace strength: shelves drift in height and
+      // some nearly vanish, so the column never reads as evenly stacked plates.
+      const uj =
+        t * (o.tiers ?? 0) +
+        (fbm3(y * 0.07, 9, o.seed * 0.1, o.seed + 13, 2) - 0.5) * 3.2 +
+        (fbm3(Math.cos(ang) * 1.1 + 2, y * 0.04, Math.sin(ang) * 1.1 + 2, o.seed + 19, 2) - 0.5) *
+          1.6;
+      const fj = uj - Math.floor(uj);
+      const strength = 0.15 + 1.1 * hash1(Math.floor(uj) + o.seed);
+      const shelf = (o.ledge ?? 0.14) * smooth(0, 0.08, fj) * Math.pow(1 - fj, 2.2) * strength;
       const m = fbm3(
         Math.cos(ang) * 1.6 + 7,
-        Math.floor(u) * 3.1,
+        Math.floor(uj) * 3.1,
         Math.sin(ang) * 1.6 + 7,
         o.seed + 31,
         2,
       );
       // Shelves are strong on one side and vanish on the other.
-      f = plain * (1 + (f / plain - 1) * smooth(0.25, 0.7, m) * 1.7);
+      f = plain * (1 + shelf * smooth(0.3, 0.7, m) * 1.5);
+      // Slow swells and waists along the whole trunk.
+      f *=
+        1 +
+        irr *
+          (0.1 * Math.sin(t * TAU * 1.35 + o.seed * 0.7 + Math.cos(ang - o.seed) * 0.6) +
+            0.07 * Math.sin(t * TAU * 3.3 + o.seed * 1.9 - Math.sin(ang) * 0.9));
       // Elliptical, twisting cross-section plus broad lumps: no lathe-like symmetry.
       f *= 1 + irr * 0.22 * Math.cos(2 * (ang - t * 2.4 - o.seed * 0.37));
       f *=
@@ -119,7 +139,11 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
       f *= 1 + amp * 2.2 * (crest * crest - 0.35);
     } else f *= 1 + amp * Math.sin(ang * flutes + n * 5 + t * 2.5);
     // The top cap's centre vertex sinks to make a crater: the vent orifice.
-    const sink = o.crater && t > 0.999 && Math.hypot(x, z) < 1e-6 ? o.crater * o.r0 * o.topFrac : 0;
+    // Irregular carbonate sinks deeper so the dark vent opening reads as a funnel.
+    const sink =
+      o.crater && t > 0.999 && Math.hypot(x, z) < 1e-6
+        ? o.crater * o.r0 * o.topFrac * (irr ? 2.4 : 1)
+        : 0;
     p.setXYZ(i, x * f, y - sink, z * f);
   }
   g.deleteAttribute('uv');

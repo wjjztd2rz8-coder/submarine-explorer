@@ -29,6 +29,7 @@ import {
   paint,
   place,
   smooth,
+  xformMatrix,
   type BuiltProp,
   type InstanceSpec,
 } from './shared.js';
@@ -39,6 +40,9 @@ import type { GeoBuildInput } from './types.js';
 const OLD = new THREE.Color(0x8e8c82); // weathered, inactive carbonate
 const LIVE = new THREE.Color(0xe9e7de); // fresh white carbonate and brucite, faintly warm
 const STAIN = new THREE.Color(0x6c685a);
+const CREAM = new THREE.Color(0xf0e2c4); // warm cream carbonate crust
+const GREYBLUE = new THREE.Color(0x7d8a92); // cooler, older grey-blue carbonate
+const VENT = new THREE.Color(0x14120f); // the dark vent mouth
 const SEABED = new THREE.Color(0xc2a468); // what the apron fades into: the Lost City sediment
 
 export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltProp {
@@ -154,18 +158,18 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     pieces.push(column);
     tips.push({ x: s.x, y: s.y + s.h, z: s.z });
     // Drooping flanges on the column: wide shelves on the main tower, one or two elsewhere.
-    const nf = lone ? 1 + Math.floor(rnd() * 2) : i === 0 ? 4 : 1 + Math.floor(rnd() * 2);
+    const nf = lone ? 1 : i === 0 ? 2 : Math.floor(rnd() * 2);
     for (let f = 0; f < nf; f++) {
       const t =
         i === 0 ? 0.12 + (f / nf) * 0.6 + rnd() * 0.06 : 0.1 + (f / nf) * 0.6 + rnd() * 0.08;
       const rAt = spireRadius(s, t);
-      const w = rAt * (0.22 + rnd() * 0.3) + 0.4;
+      const w = rAt * (0.12 + rnd() * 0.2) + 0.3;
       pieces.push(
         place(
           lostCityFlange({
             r0: rAt * 0.92,
             w,
-            arc: 1.1 + rnd() * 1.7,
+            arc: 0.9 + rnd() * 1.1,
             start: rnd() * 6.28,
             seed: seed + f + i * 5,
             tier,
@@ -227,6 +231,17 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       rz: Math.cos(s.leanA) * s.lean,
     });
   }
+  // Vent orifice positions in the prop frame (after each column's lean).
+  const vents = spires.map((s) => ({
+    p: new THREE.Vector3(0, s.h, 0).applyMatrix4(
+      xformMatrix(
+        { x: s.x, y: s.y, z: s.z, rx: Math.sin(s.leanA) * s.lean, rz: Math.cos(s.leanA) * s.lean },
+        new THREE.Matrix4(),
+      ),
+    ),
+    r: s.r0 * s.topFrac * (1 + (s.lip ?? 0)),
+    depth: s.crater ? s.crater * s.r0 * s.topFrac * 2.4 : 0,
+  }));
   const geom = mergeAll(pieces);
   paint(geom, (x, y, z, ny, out) => {
     const n1 = fbm3(x * 0.16, y * 0.1, z * 0.16, seed ^ 0x77, 4);
@@ -248,11 +263,27 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     // Toward the outline the rubble thins into the surrounding seabed colour, patchily.
     const rn = rim(x, z) + (n1 - 0.5) * 0.35 + (n2 - 0.5) * 0.12;
     out.lerp(SEABED, smooth(0.5, 1.05, rn) * (1 - up * 0.5));
+    // Mineral variation: white brucite/aragonite crust, cream, and grey-blue carbonate,
+    // drifting in broad patches that stretch vertically with the flow.
+    const mineral = fbm3(x * 0.32, y * 0.045, z * 0.32, seed ^ 0x3b1, 3);
+    out.lerp(CREAM, smooth(0.46, 0.64, mineral) * 0.6 * (0.4 + up));
+    out.lerp(GREYBLUE, smooth(0.5, 0.3, mineral) * 0.5);
+    // Flow streaks: narrow vertical bands (high horizontal, very low vertical frequency)
+    // alternating pale and shaded, as fluid ran down the walls.
+    const wall = 1 - Math.abs(ny);
+    const streak = fbm3(x * 1.3, y * 0.03, z * 1.3, seed ^ 0xf10, 3);
+    out.multiplyScalar(1 + (streak - 0.5) * 1.3 * wall);
     // Dark seams between flow sheets: thin, vertically drawn streaks, strongest on walls.
     const seam = fbm3(x * 1.1, y * 0.07, z * 1.1, seed ^ 0x5ea, 3);
-    out.multiplyScalar(
-      1 - 0.38 * smooth(0.5, 0.56, seam) * (1 - smooth(0.56, 0.62, seam)) * (1 - Math.abs(ny)),
-    );
+    out.multiplyScalar(1 - 0.4 * smooth(0.5, 0.56, seam) * (1 - smooth(0.56, 0.62, seam)) * wall);
+    // Vent orifices: a dark, sulphide-stained mouth at each column tip.
+    for (const v of vents) {
+      const dy = y - v.p.y;
+      if (dy < -v.depth - 1.2 || dy > 0.6) continue;
+      const dd = Math.hypot(x - v.p.x, z - v.p.z) / v.r;
+      const mouth = 1 - smooth(0.2, 1.05, dd);
+      out.lerp(VENT, mouth * smooth(-v.depth - 1.2, -0.3, dy) * 0.92);
+    }
     if (ny > 0.8) out.multiplyScalar(0.9); // silt dusting on shelves
   });
   const material = createLostCityCarbonateMaterial(tier);
