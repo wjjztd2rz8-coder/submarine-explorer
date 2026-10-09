@@ -603,3 +603,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** 940 (default Blue Hole mission starts with the stalactite gallery, Monterey with the north wall; spawn offsets 0 m; removed a "scenic reconstruction" caveat from the hint) and 950 (Challenger/Endurance closer openings, depth lighting, one staged life group; reviewed desktop goldens: sub, floor and target readable, Endurance still snowy with the sub covering part of the wreck). Full e2e passed on both branches before merge; main smoke + project-base green; pushed, tagged f35.
 - **Hosted CI** on main was red at 20:35Z; 970 (e2e shards) and new 1010 cover it.
 - **Running (Codex):** 960 (regression hunt), 970. Codex 5h at 8% until 21:15. **Queue:** 980, 990, 1000, 1010. Held: 830 reference worktree. No Claude agents launched. Needs owner: nothing.
+
+## 2026-10-08 20:58 CDT headless run (Claude)
+
+- **Merged:** 970 (CI e2e shard fixes, Blue Hole opening ≥26 m altitude, wall-life raycast buckets, refreshed shard weights) and 960 regression hunt (tutorial card now follows the active input device; Sonnet fixed a real bug it found: on Blue Hole portrait phone the surface-start chase camera left the sub under the tutorial card, CameraRig aims lower on portrait with a shortened arm). Full e2e passed on main; pushed, tagged f36/f37.
+- **Queue:** 980, 990, 1000, 1010 (Codex 5h 6% until 21:15). Held: 830 reference worktree. Hosted CI result for f36/f37 not yet checked.
+- Needs owner: nothing.
