@@ -8,8 +8,8 @@ Why this refresh: Claude sat at >=50% for 140 h of samples because the backlog r
 
 Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
 
-1. **Lost City tower trunk (Sonnet, IN FLIGHT 2026-10-09 14:30):** lost-city-2 is a smooth pale blob with flat saucer flanges; needs carbonate flow texture, irregular profile, mineral colour variation, orifice.
-2. **Blue Hole bowl + sonar (Sonnet, IN FLIGHT):** bowl is smooth beige with a hard shelf line and flat-cone stalactites; the minimap is a flat lime-green square (no bathymetry read). Add ledge relief, darker blue lower walls, stalactite taper, readable sonar palette.
+1. (MERGED 2026-10-09 15:xx, modest gain: jagged ledged silhouette, orifice not yet verified in frame) **Lost City tower trunk:** lost-city-2 is a smooth pale blob with flat saucer flanges; needs carbonate flow texture, irregular profile, mineral colour variation, orifice.
+2. (PARTLY MERGED: stouter pendants, Blue Hole-only sonar ramp, but sonar background is STILL a flat green square and the shelf line/bowl read unchanged; redo with a new angle: darken sonar fill by depth and rework the wall profile near the gallery seat) **Blue Hole bowl + sonar (Sonnet):** bowl is smooth beige with a hard shelf line and flat-cone stalactites; the minimap is a flat lime-green square (no bathymetry read). Add ledge relief, darker blue lower walls, stalactite taper, readable sonar palette.
 3. **Challenger Deep seabed life (Sonnet):** challenger-deep-1 is an empty brown plane; add amphipods near the lander, sediment ripples, a visible slope/horizon.
 4. **Titanic haze band / horizon (Sonnet):** big flat dark void above a hard seabed horizon.
 5. **Merge Codex 1090/1100/1110/1120 when budget returns (Haiku gates, Claude review):** worktrees stalled by the Codex floor; hosted CI for f43 still red (1120 triage).

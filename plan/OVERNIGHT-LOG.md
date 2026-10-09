@@ -724,3 +724,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** nothing. Codex 5h is 0% (resets 14:16), so 1090/1100/1110/1120 are stalled with uncommitted work and nothing is running; no finished worktrees to collect. Main clean.
 - **CI:** latest hosted CI run (docs: merge 1060/1070/1080) failed after 41 min; Pages deploy succeeded. 1120 holds the triage and resumes after the Codex reset.
 - **Queue:** 1130, 1140, 1160. No Claude agent launched (Claude 69%): remaining visual backlog (Titanic haze band, Blue Hole bowl) needs the post-Codex golden set to judge. Needs owner: nothing.
+
+## 2026-10-09 14:52 CDT headless targeted review (Claude)
+
+- **Review:** idle trigger traced to an empty backlog; new golden 2026-10-09-191533, backlog refilled, 1170 queued (REVIEWS.md).
+- **Merged:** f-lostcity-tower (modest gain, jagged trunk), f-bluehole-bowl (partial: sonar still flat green, bowl barely changed; redo queued as Claude item 2). Smoke + project-base green on main; no push.
+- **Codex:** 1090-1120 stalled at 0% until 14:16 reset; queue 1130, 1140, 1160, 1170. Needs owner: nothing.
