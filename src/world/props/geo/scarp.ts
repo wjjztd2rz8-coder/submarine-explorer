@@ -21,6 +21,7 @@
 
 import * as THREE from 'three';
 import { MONTEREY_FIDELITY } from '../../../core/config/terrain.js';
+import { MONTEREY_STRATA } from '../../../core/config/monterey.js';
 import type { GraphicsTier } from '../../../core/Config.js';
 import { canyonRockDetail } from './materials.js';
 import { geoDetail } from './detail.js';
@@ -476,6 +477,33 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const sinkAt = (x: number): number => endSink(x, W, H);
   const liftAt = (x: number): number => gnd(x, footAt(x));
 
+  // Unequal bed intervals preserve bedding without a repeated corrugated profile.
+  // Use a separate seed stream so rubble and wall-life counts/choices stay stable.
+  const bedRnd = mulberry32(seed ^ 0xbed);
+  const beds = [0];
+  for (let i = 0; i < P.bands; i++) {
+    const [min, max] = MONTEREY_STRATA.thickness;
+    beds.push(beds[i]! + min + (max - min) * bedRnd());
+  }
+  const totalBeds = beds[P.bands]!;
+  const bedPhase = (x: number, y: number): number => {
+    if (id !== 'canyon')
+      return ((y + P.dip * x) / H) * P.bands + (fbm3(x * 0.03, 5, seed, seed + 7, 2) - 0.5) * 1.2;
+    const [fx, fy] = MONTEREY_STRATA.wanderFrequency;
+    const height = ((y + P.dip * x) / H) * totalBeds;
+    let k = 0;
+    while (k < P.bands - 1 && height > beds[k + 1]!) k++;
+    return (
+      k +
+      (height - beds[k]!) / (beds[k + 1]! - beds[k]!) +
+      (fbm3(x * fx, y * fy, seed + 7, seed + 17, 2) - 0.5) * MONTEREY_STRATA.wanderBeds
+    );
+  };
+  const slumpAt = (x: number, y: number): number => {
+    const [fx, fy] = MONTEREY_STRATA.slumpFrequency;
+    return smooth(0.53, 0.73, fbm3(x * fx, y * fy, seed + 28, seed + 51, 2));
+  };
+
   // --- displacement: gullies, dipping strata ledges, joints; zero at the apron join.
   const disp = (x: number, y: number, z: number): number => {
     const env = smooth(joinY, joinY + 0.15 * H, y);
@@ -483,16 +511,26 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     const rill =
       1 - Math.abs(2 * fbm3(x * P.gullyFreq, y * 0.03, seed + 1, seed, gullyOctaves) - 1);
     const gully = (Math.pow(rill, 3) - 0.3) * -2.4 * P.gully * scale * 1.6;
-    const s = ((y + P.dip * x) / H) * P.bands + (fbm3(x * 0.03, 5, seed, seed + 7, 2) - 0.5) * 1.2;
+    const s = bedPhase(x, y);
     const saw = s - Math.floor(s);
     // Round the sub-metre return of each resistant bed rather than sampling a discontinuity.
     const lip = fidelity ? 1 - smooth(0.88, 1, saw) : 1;
-    const ledge = -Math.pow(saw, 2.2) * lip * P.ledge * scale * 2.4;
+    const [minLedge, maxLedge] = MONTEREY_STRATA.ledgeStrength;
+    const strength =
+      id === 'canyon'
+        ? minLedge +
+          (maxLedge - minLedge) * fbm3(Math.floor(s) * 3.1, x * 0.04, seed + 81, seed + 9, 2)
+        : 1;
+    const slump = id === 'canyon' ? slumpAt(x, y) : 0;
+    const ledge = -Math.pow(saw, 2.2) * lip * P.ledge * scale * 2.4 * strength * (1 - slump);
     const fine =
       (fbm3(x * 0.3, y * 0.3, z * 0.3, seed + 4, 2) - 0.5) * (fidelity ? 0.3 : 0.9 * scale);
     const bulge = (fbm3(x * 0.045, y * 0.05, seed + 8, seed + 6, 3) - 0.5) * 0.5 * H * 0.35;
     const joint = P.joints > 0 ? jointOffset(x, P.joints, P.jointStep * scale, seed).off : 0;
-    return (gully + ledge + bulge + joint) * env + fine * smooth(joinY - 0.05 * H, joinY, y);
+    return (
+      (gully + ledge + bulge + joint + slump * H * MONTEREY_STRATA.slumpDepthH) * env +
+      fine * smooth(joinY - 0.05 * H, joinY, y)
+    );
   };
   // Slump benches rise and fall along the wall; no change at the join or the crest.
   const lift = (x: number, y: number): number => {
@@ -511,7 +549,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   paint(wall, (x, yAbs, z, ny_, out) => {
     const y = yAbs - liftAt(x);
     // Dipping, wandering beds across the face; resistant beds are lighter and protrude.
-    const s = ((y + P.dip * x) / H) * P.bands + (fbm3(x * 0.03, 5, seed, seed + 7, 2) - 0.5) * 1.2;
+    const s = bedPhase(x, y);
     const saw = s - Math.floor(s);
     const tone = fbm3(x * 0.25, y * 0.2, z * 0.25, seed ^ 0x3c, 4);
     // Each bed has its own tone (resistant beds pale, weak beds dark); the lip of a bed catches
@@ -543,6 +581,11 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     }
     // Sediment drape on gentle slopes; exposed rock on steep faces.
     out.lerp(P.drape, smooth(0.45, 0.85, ny_) * 0.7 * (0.6 + 0.4 * tone));
+    if (id === 'canyon') {
+      // Dust catches on interrupted shelves and drapes the occasional slump scar.
+      const dust = Math.max(slumpAt(x, y), smooth(0.05, 0.6, ny_) * tone);
+      out.lerp(P.drape, dust * MONTEREY_STRATA.dustAmount);
+    }
     // The foot is buried in rubble and silt.
     out.lerp(P.drape, (1 - smooth(joinY, joinY + 0.12 * H, y)) * 0.7);
   });

@@ -345,9 +345,9 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
       },
     },
   },
-  "spawn": "efa45f603367734bf68f57843f567efec99e37308afd5c27bd84a17298b1ee97",
+  "spawn": "6c21e8f480c36bd2c779ee10df1b59ce49e1ad66722ae54f9317eb2a41e5efa9",
   "titanic": {
-    "biome": "f6ff8c51a55e0599fa55b281f87d739723d441f874f5f3944945e085f7377a5f",
+    "biome": "2ed92244e8d52fe117711353de063859007cf9ea3ab37caff3e0ebbc289f4fd1",
     "tiers": {
       "high": {
         "buffers": [
@@ -360,7 +360,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP-abyss-fade",
         "shader": "3a00fdf2ca37761a5a04a680dd65fa5e22373cc8ff6b8e27c95558b53d024775",
-        "uniforms": "eb24a602be7e4cc2ad5f8d0d75f685082a337de9fda4ea267a19bb69d0dc5bdb",
+        "uniforms": "222222888554fe8913d00616339b6c11e8829f6cb4c852061a0743ff61753a77",
       },
       "low": {
         "buffers": [
@@ -373,7 +373,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
         ],
         "cache": "seabed--abyss-fade",
         "shader": "594e4e41d62dc43c8f02e26cd262736737dc192b405425337f8a07113dc760da",
-        "uniforms": "eb24a602be7e4cc2ad5f8d0d75f685082a337de9fda4ea267a19bb69d0dc5bdb",
+        "uniforms": "222222888554fe8913d00616339b6c11e8829f6cb4c852061a0743ff61753a77",
       },
     },
   },

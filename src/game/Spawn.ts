@@ -102,8 +102,10 @@ const FREE_DIVE_OPENINGS: Record<
     bearing: 100,
     range: 28,
     altitude: 26,
-    yawOffset: 10,
-    chaseRadius: 70,
+    yawOffset: 0,
+    // Keep the global opening/reset radius; offsets put the sub beside the bow contact.
+    chaseOffsetX: -70,
+    chaseOffsetY: -10,
   },
   'challenger-deep': { hero: 'leggo-lander-marker', bearing: 135, range: 65 },
   'lost-city': {
