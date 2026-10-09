@@ -874,6 +874,18 @@
     --hl-portrait-map-width: 96px;
     --hl-portrait-stack-left: calc(120px + env(safe-area-inset-left, 0px));
   }
+  /* The three control rows (3 × 52), gaps (2 × 8), and bottom edge (14)
+     occupy 186 scale units. Share their width cap and leave an 8 px gap;
+     the 176 px floor also clears rows held at the 48 px touch-target floor. */
+  html.is-touch .onboard-card {
+    bottom: calc(
+      max(
+          176px,
+          calc(186 * min(calc(var(--ui-scale, 1) * 1px), var(--tc-portrait-width-scale)) + 8px)
+        ) +
+        env(safe-area-inset-bottom, 0px)
+    );
+  }
   html.is-touch .hud-readouts,
   html.is-touch .hud-readouts:has(.hud-power:not([hidden])) {
     left: var(--hl-portrait-stack-left);

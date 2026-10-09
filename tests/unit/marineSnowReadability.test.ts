@@ -448,7 +448,13 @@ describe('460/570 marine snow readability at all shipped sites and tiers', () =>
               expect(u.uForegroundBrightness!.value).toBe(0.65);
               expect(material.vertexShader).toContain('length(world - uCam)');
               expect(material.vertexShader).toContain('float foreground = wreckForeground(w)');
-              expect(material.vertexShader).toContain('mix(uForegroundSizePx, 256.0, fade)');
+              expect(material.vertexShader).toContain(
+                'mix(uForegroundSizePx, uParticleMaxSizePx, fade)',
+              );
+              const maxSizePx = site === 'endurance' ? 2 : 256;
+              const maxBrightness = site === 'endurance' ? 0.75 : 1_000_000;
+              expect(u.uParticleMaxSizePx!.value).toBe(maxSizePx);
+              expect(u.uParticleMaxBrightness!.value).toBe(maxBrightness);
               expect(material.vertexShader).toContain('wreckBrightness(w, foreground)');
               expect(material.vertexShader).toContain('mix(uForegroundAlpha, 1.0, foreground)');
               const brightness = u.uAmbient!.value + u.uHeadGain!.value;
@@ -467,6 +473,8 @@ describe('460/570 marine snow readability at all shipped sites and tiers', () =>
                     rawSize,
                     opacity,
                     brightness,
+                    maxSizePx,
+                    maxBrightness,
                   );
                   if (distance <= 6) {
                     expect(bounded.sizePx).toBeLessThanOrEqual(2);
@@ -474,17 +482,17 @@ describe('460/570 marine snow readability at all shipped sites and tiers', () =>
                     expect(bounded.brightness).toBeLessThanOrEqual(0.65);
                   }
                   if (distance >= 12) {
-                    expect(bounded.sizePx).toBe(rawSize);
+                    expect(bounded.sizePx).toBe(Math.min(rawSize, maxSizePx));
                     expect(bounded.alpha).toBe(opacity);
-                    expect(bounded.brightness).toBeCloseTo(brightness, 12);
+                    expect(bounded.brightness).toBeCloseTo(Math.min(brightness, maxBrightness), 12);
                   }
                 }
               wreckLayers.push({
                 name,
                 count: points.geometry.getAttribute('aSeed').count,
-                maxSize20Px: Math.min(256, (sizeM * scale) / 20),
+                maxSize20Px: Math.min(maxSizePx, (sizeM * scale) / 20),
                 centreAlphaBound: opacity,
-                brightnessBound: brightness,
+                brightnessBound: Math.min(brightness, maxBrightness),
               });
             }
             if (['titanic', 'endurance', 'bismarck'].includes(site)) {

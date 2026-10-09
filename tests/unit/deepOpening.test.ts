@@ -370,7 +370,7 @@ it('keeps the upper water column and other sites intact; abyss exposure survives
     expect(sampleAtmosphere(water, -5)).toEqual(sampleAtmosphere(config.water, -5));
     const abyss = sampleAtmosphere(water, -3000);
     expect(abyss.sunIntensity).toBe(0);
-    if (site === 'endurance') expect(abyss.snowDensity).toBe(0.25);
+    if (site === 'endurance') expect(abyss.snowDensity).toBe(0.12);
     else expect(abyss.snowDensity).toBe(sampleAtmosphere(config.water, -3000).snowDensity);
     const fog =
       abyss.fogDensity * (site === 'challenger-deep' ? config.presets.trench.fogScale : 1);

@@ -109,7 +109,10 @@ function addKeyAndRim(mat: THREE.MeshStandardMaterial, u: LitUniforms, rimScale 
           '{',
           '  float hi = max( max( outgoingLight.r, outgoingLight.g ), outgoingLight.b );',
           '  if ( hi > 0.5 ) {',
-          '    float sh = 0.5 + 0.4 * tanh( ( hi - 0.5 ) / 0.4 );',
+          // tanh can overflow its positive exponential on software GPUs
+          // under hull-close lamps. This equivalent uses only exp(x <= 0).
+          '    float shoulderDecay = exp( -2.0 * ( hi - 0.5 ) / 0.4 );',
+          '    float sh = 0.5 + 0.4 * ( 1.0 - shoulderDecay ) / ( 1.0 + shoulderDecay );',
           '    outgoingLight *= sh / hi;',
           '  }',
           '}',
@@ -117,7 +120,7 @@ function addKeyAndRim(mat: THREE.MeshStandardMaterial, u: LitUniforms, rimScale 
         ].join('\n'),
       );
   };
-  mat.customProgramCacheKey = () => `vehicle-key-rim-shoulder-${rimScale}`;
+  mat.customProgramCacheKey = () => `vehicle-key-rim-stable-shoulder-${rimScale}`;
 }
 
 /** Owns one vehicle's materials. */
@@ -252,7 +255,7 @@ export class VehicleMaterials {
           ].join('\n'),
         );
     };
-    foam.customProgramCacheKey = () => 'vehicle-key-rim-shoulder-hull-paint-v1';
+    foam.customProgramCacheKey = () => 'vehicle-key-rim-stable-shoulder-hull-paint-v1';
   }
 
   /** Lens tint is visual only: scene lights and their range/intensity stay intact. */

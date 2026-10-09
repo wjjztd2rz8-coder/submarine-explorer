@@ -155,3 +155,45 @@ describe('SubMesh + RovVisual integration', () => {
     visual.dispose();
   });
 });
+
+// Exercise the injected shader expressions in floating-point arithmetic:
+// the old positive-exponential tanh form could turn bright hull pixels into NaN.
+describe('hull-close highlight compression', () => {
+  for (const tier of ['low', 'medium', 'high', 'ultra']) {
+    it(`${tier}: remains finite under extreme lamps and preserves the highlight shoulder`, async () => {
+      const THREE = await import('three');
+      const vehicle = buildVehicle('B', tier);
+      try {
+        for (const slot of ['foam', 'frame', 'metal'] as const) {
+          const mat = vehicle.materials.bySlot[slot] as InstanceType<
+            typeof THREE.MeshStandardMaterial
+          >;
+          const shader = {
+            ...THREE.ShaderLib.standard,
+            uniforms: { ...THREE.ShaderLib.standard.uniforms },
+          } as Parameters<typeof mat.onBeforeCompile>[0];
+          mat.onBeforeCompile(shader, {} as InstanceType<typeof THREE.WebGLRenderer>);
+          const decay = shader.fragmentShader.match(/float shoulderDecay = (.*);/)![1]!;
+          const shoulder = shader.fragmentShader.match(/float sh = (.*);/)![1]!;
+          const scale = new Function(
+            'hi',
+            `const shoulderDecay = ${decay.replace('exp(', 'Math.exp(')}; const sh = ${shoulder}; return sh / hi;`,
+          ) as (hi: number) => number;
+          for (const hi of [0.50001, 0.6, 1, 5, 20, 100, 1000, 1e6, 1e20]) {
+            const factor = Math.fround(scale(Math.fround(hi)));
+            for (const color of [hi, hi * 0.7, hi * 0.1]) {
+              const compressed = Math.fround(color * factor);
+              expect(Number.isFinite(compressed)).toBe(true);
+              expect(compressed).toBeGreaterThan(0);
+              expect(compressed).toBeLessThanOrEqual(0.900001);
+            }
+            expect(hi * factor).toBeCloseTo(0.5 + 0.4 * Math.tanh((hi - 0.5) / 0.4), 6);
+          }
+          expect(shader.fragmentShader).not.toContain('tanh(');
+        }
+      } finally {
+        vehicle.dispose();
+      }
+    });
+  }
+});
