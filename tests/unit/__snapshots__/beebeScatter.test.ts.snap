@@ -1,0 +1,219 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`1130: Beebe rocks darken and fracture in the same three draws with identical placement at every tier 1`] = `
+{
+  "high": [
+    {
+      "color": "887f81ac75c820662bd0570d0974be5e7eae01914ec39c642fc553653a2c24e8",
+      "instances": 363,
+      "name": "scatter:pillow",
+      "normal": "9cbe9a8cb7c066373cf323d612f65fe001fc2a755951a82714ed8376fe26b235",
+      "position": "d9bb52631e9d95ee617ecd5d11eb2b688908ea1beb1d1a260bed619a0211202e",
+      "triangles": 80,
+    },
+    {
+      "color": "467f378e83079cb46c012d1ed584b128c92180a5618d56b9a526521bb52295e2",
+      "instances": 195,
+      "name": "scatter:rubble",
+      "normal": "d88d88bd99f912677e30cbab04b02182f4ee1d687d8ae906b8436ff6341663dc",
+      "position": "8643d4b2ae87c4e6024b141fca654b480c06a2e37f386c42554e37b7e66b3079",
+      "triangles": 20,
+    },
+    {
+      "color": "b1e369925eb4da6dcad568a0bd9a1a52a57461c3ad715b4839a0622112efe895",
+      "instances": 45,
+      "name": "scatter:boulder",
+      "normal": "ef78f942cb8c51e7bf842eb05d5a710de755809e4ddd0397232de6f5b3e1ad2e",
+      "position": "50a1114643ee83ca8124096df9d2488c165b40204be90f0268ae326cfcb0129c",
+      "triangles": 80,
+    },
+  ],
+  "low": [
+    {
+      "color": "887f81ac75c820662bd0570d0974be5e7eae01914ec39c642fc553653a2c24e8",
+      "instances": 30,
+      "name": "scatter:pillow",
+      "normal": "9cbe9a8cb7c066373cf323d612f65fe001fc2a755951a82714ed8376fe26b235",
+      "position": "d9bb52631e9d95ee617ecd5d11eb2b688908ea1beb1d1a260bed619a0211202e",
+      "triangles": 80,
+    },
+    {
+      "color": "467f378e83079cb46c012d1ed584b128c92180a5618d56b9a526521bb52295e2",
+      "instances": 54,
+      "name": "scatter:rubble",
+      "normal": "d88d88bd99f912677e30cbab04b02182f4ee1d687d8ae906b8436ff6341663dc",
+      "position": "8643d4b2ae87c4e6024b141fca654b480c06a2e37f386c42554e37b7e66b3079",
+      "triangles": 20,
+    },
+    {
+      "color": "b1e369925eb4da6dcad568a0bd9a1a52a57461c3ad715b4839a0622112efe895",
+      "instances": 2,
+      "name": "scatter:boulder",
+      "normal": "ef78f942cb8c51e7bf842eb05d5a710de755809e4ddd0397232de6f5b3e1ad2e",
+      "position": "50a1114643ee83ca8124096df9d2488c165b40204be90f0268ae326cfcb0129c",
+      "triangles": 80,
+    },
+  ],
+  "medium": [
+    {
+      "color": "887f81ac75c820662bd0570d0974be5e7eae01914ec39c642fc553653a2c24e8",
+      "instances": 122,
+      "name": "scatter:pillow",
+      "normal": "9cbe9a8cb7c066373cf323d612f65fe001fc2a755951a82714ed8376fe26b235",
+      "position": "d9bb52631e9d95ee617ecd5d11eb2b688908ea1beb1d1a260bed619a0211202e",
+      "triangles": 80,
+    },
+    {
+      "color": "467f378e83079cb46c012d1ed584b128c92180a5618d56b9a526521bb52295e2",
+      "instances": 129,
+      "name": "scatter:rubble",
+      "normal": "d88d88bd99f912677e30cbab04b02182f4ee1d687d8ae906b8436ff6341663dc",
+      "position": "8643d4b2ae87c4e6024b141fca654b480c06a2e37f386c42554e37b7e66b3079",
+      "triangles": 20,
+    },
+    {
+      "color": "b1e369925eb4da6dcad568a0bd9a1a52a57461c3ad715b4839a0622112efe895",
+      "instances": 11,
+      "name": "scatter:boulder",
+      "normal": "ef78f942cb8c51e7bf842eb05d5a710de755809e4ddd0397232de6f5b3e1ad2e",
+      "position": "50a1114643ee83ca8124096df9d2488c165b40204be90f0268ae326cfcb0129c",
+      "triangles": 80,
+    },
+  ],
+  "ultra": [
+    {
+      "color": "887f81ac75c820662bd0570d0974be5e7eae01914ec39c642fc553653a2c24e8",
+      "instances": 1590,
+      "name": "scatter:pillow",
+      "normal": "9cbe9a8cb7c066373cf323d612f65fe001fc2a755951a82714ed8376fe26b235",
+      "position": "d9bb52631e9d95ee617ecd5d11eb2b688908ea1beb1d1a260bed619a0211202e",
+      "triangles": 80,
+    },
+    {
+      "color": "467f378e83079cb46c012d1ed584b128c92180a5618d56b9a526521bb52295e2",
+      "instances": 360,
+      "name": "scatter:rubble",
+      "normal": "d88d88bd99f912677e30cbab04b02182f4ee1d687d8ae906b8436ff6341663dc",
+      "position": "8643d4b2ae87c4e6024b141fca654b480c06a2e37f386c42554e37b7e66b3079",
+      "triangles": 20,
+    },
+    {
+      "color": "b1e369925eb4da6dcad568a0bd9a1a52a57461c3ad715b4839a0622112efe895",
+      "instances": 246,
+      "name": "scatter:boulder",
+      "normal": "ef78f942cb8c51e7bf842eb05d5a710de755809e4ddd0397232de6f5b3e1ad2e",
+      "position": "50a1114643ee83ca8124096df9d2488c165b40204be90f0268ae326cfcb0129c",
+      "triangles": 80,
+    },
+  ],
+}
+`;
+
+exports[`1130: other sites retain byte-identical scatter geometry, placement, colors and draw counts 1`] = `
+{
+  "axial-seamount-ashes": {
+    "meshes": "a93a09f0c35869d402d10c257d21b8aedfec7e1f98b2ddec68332f8677d44b02",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 3,
+      "instances": 149,
+    },
+  },
+  "bismarck": {
+    "meshes": "b69ff60f0839555fbfb6fa0821d8225be6fd9a722475fdf811f169a942176f6a",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 3,
+      "instances": 95,
+    },
+  },
+  "blake-plateau-corals": {
+    "meshes": "666bc789ecf420792f6e52e0897f960910aad8022cb981939a7b03662cbbda51",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 4,
+      "instances": 276,
+    },
+  },
+  "challenger-deep": {
+    "meshes": "71902770c3054f4065ae7dad5c3f9536f34afcb66205988157691640d73534e2",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 2,
+      "instances": 82,
+    },
+  },
+  "endurance": {
+    "meshes": "f1a8d384323a3230f379f0d2c0b34af134567313cf8b837957c8348c724b4460",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 3,
+      "instances": 116,
+    },
+  },
+  "great-blue-hole": {
+    "meshes": "497a2ec7736690c05b1f426456472f9b256dbfb13d2e2c7452d0fe0e137ab9fb",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 4,
+      "instances": 219,
+    },
+  },
+  "hudson-canyon": {
+    "meshes": "fc4f95d9679c22747e6695e33a3222cd017b367bb3bbe6f3bb8f1e816f407aad",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 3,
+      "instances": 65,
+    },
+  },
+  "hunga-tonga-caldera": {
+    "meshes": "de4f42eaad511cf0facaafa5337190718fc99ad30303135a2d12c28547d688b6",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 3,
+      "instances": 149,
+    },
+  },
+  "kamaehuakanaloa": {
+    "meshes": "a93a09f0c35869d402d10c257d21b8aedfec7e1f98b2ddec68332f8677d44b02",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 3,
+      "instances": 149,
+    },
+  },
+  "lost-city": {
+    "meshes": "d10be21c3ce778761488bf9cb4dfd59822e8db249223bf4082a5216b67d7ebd5",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 4,
+      "instances": 816,
+    },
+  },
+  "monterey-canyon": {
+    "meshes": "e173180038b748a99b550f5e72705fa5647142ae769eefee6cfe72abcf40be2c",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 6,
+      "instances": 164,
+    },
+  },
+  "titanic": {
+    "meshes": "be17cfce3710a02afce6cf748b9938cbc83ce4cbb74b3d3163fe169f3f855004",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 2,
+      "instances": 148,
+    },
+  },
+  "unknown": {
+    "meshes": "08e91b08bdbbe9d8bda17f52dfac5e49de7c2d879117aa63b7ea127a49c03038",
+    "stats": {
+      "cells": 21,
+      "drawCalls": 2,
+      "instances": 148,
+    },
+  },
+}
+`;

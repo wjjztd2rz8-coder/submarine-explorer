@@ -225,7 +225,8 @@
 
 /* Portrait: the play area is high up, so controls can sit lower and tighter. */
 @media (orientation: portrait) {
-  .tc-root {
+  .tc-root,
+  .onboard-card {
     --tc-edge: calc(14 * var(--tc-s));
     /* Two button columns, slider, stick and their gaps use 336 scale units.
        Leave 8 px between the stick and buttons when an enlarged UI hits the
@@ -234,17 +235,32 @@
       calc(var(--ui-scale, 1) * 1px),
       calc((100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 8px) / 336)
     );
+    /* Share the control envelope with the tutorial's docking offset. Both
+       resolve the effective UI scale, including the short-phone cap. */
+    --tc-portrait-stick-size: max(104px, calc(118 * var(--tc-s)));
+    --tc-portrait-slider-height: min(26vh, max(140px, calc(160 * var(--tc-s))));
+    --tc-portrait-button-size: max(48px, calc(52 * var(--tc-s)));
+    --tc-portrait-button-gap: calc(8 * var(--tc-s));
+    --tc-portrait-clearance: calc(
+      var(--tc-edge) +
+        max(
+          var(--tc-portrait-stick-size),
+          var(--tc-portrait-slider-height),
+          calc(3 * var(--tc-portrait-button-size) + 2 * var(--tc-portrait-button-gap))
+        ) +
+        8px
+    );
   }
   .tc-stick {
-    width: max(104px, calc(118 * var(--tc-s)));
+    width: var(--tc-portrait-stick-size);
   }
   .tc-slider {
-    height: min(26vh, max(140px, calc(160 * var(--tc-s))));
+    height: var(--tc-portrait-slider-height);
   }
   .tc-buttons {
-    grid-template-columns: repeat(2, max(48px, calc(52 * var(--tc-s))));
-    grid-auto-rows: max(48px, calc(52 * var(--tc-s)));
-    gap: calc(8 * var(--tc-s));
+    grid-template-columns: repeat(2, var(--tc-portrait-button-size));
+    grid-auto-rows: var(--tc-portrait-button-size);
+    gap: var(--tc-portrait-button-gap);
   }
   .tc-btn-lights {
     grid-column: 1;

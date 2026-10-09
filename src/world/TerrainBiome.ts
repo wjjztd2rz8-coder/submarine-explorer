@@ -56,6 +56,8 @@ export interface ScatterSpec {
 }
 
 export interface Biome {
+  /** Baked finish for existing rock instances; absent preserves the shared shapes. */
+  scatterRock?: 'fractured-basalt';
   /** Slot A / B / C texture sets. */
   a: TerrainSet;
   b: TerrainSet;
@@ -243,6 +245,7 @@ export const BIOMES: Record<string, Biome> = {
   // Warm grey sulphide sediment: enough albedo for the vent pools to read against the abyss.
   'beebe-vent-field': {
     ...VOLCANIC,
+    scatterRock: 'fractured-basalt',
     a: 'sand',
     b: 'rubble',
     c: 'basalt',
