@@ -13,6 +13,7 @@ import { createLostCityCarbonateMaterial } from '../../LostCityCarbonate.js';
 import { lostCityFlange } from '../../LostCityFlange.js';
 import { buildAnemone } from '../../life/models/sessile.js';
 import { branchingColony } from './coral.js';
+import { carbonateFinger } from './carbonateFinger.js';
 import { geoDetail } from './detail.js';
 import { LIFE_TINT } from './materials.js';
 import { shimmerPlume } from './plume.js';
@@ -145,16 +146,12 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     );
   }
   const tips: { x: number; y: number; z: number }[] = [];
+  const columns: THREE.BufferGeometry[] = [];
   for (const [i, s] of spires.entries()) {
-    pieces.push(
-      place(tieredSpire(s), {
-        x: s.x,
-        y: s.y,
-        z: s.z,
-        rx: Math.sin(s.leanA) * s.lean,
-        rz: Math.cos(s.leanA) * s.lean,
-      }),
-    );
+    // Keep each column local until its side growths have been seated.
+    const column = tieredSpire(s);
+    columns.push(column);
+    pieces.push(column);
     tips.push({ x: s.x, y: s.y + s.h, z: s.z });
     // Drooping flanges on the column: wide shelves on the main tower, one or two elsewhere.
     const nf = lone ? 1 + Math.floor(rnd() * 2) : i === 0 ? 4 : 1 + Math.floor(rnd() * 2);
@@ -188,12 +185,12 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const a = fingerRnd() * 6.283;
       const rAt = spireRadius(s, t);
       const fh = s.h * (0.16 + fingerRnd() * 0.2);
-      const fr = rAt * (0.16 + fingerRnd() * 0.14) + 0.25;
-      const lean = 0.35 + fingerRnd() * 0.5;
-      const finger = tieredSpire({
+      const fr = rAt * (0.22 + fingerRnd() * 0.14) + 0.25;
+      const lean = 0.2 + fingerRnd() * 0.25;
+      const finger = carbonateFinger(columns[i]!, {
         h: fh,
         r0: fr,
-        topFrac: 0.25,
+        topFrac: 0.08,
         seed: seed + 900 + k + i * 13,
         segs: 10 * dens + 4,
         rings: (fh / 1.2) * dens + 5,
@@ -203,22 +200,32 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
         rough: 0.04,
         ridges: 4,
         ridgeAmp: 0.08,
-        flare: 0.3,
-        lip: 0.12,
+        flare: 0.7,
+        lip: 0,
         crater: 0.4,
         irregular: 1,
+        rootHeight: t * s.h,
+        azimuth: a,
+        lean,
       });
-      // Root sunk inside the column, tilting outward along azimuth `a`.
+      // Share the parent's transform after seating against its local surface.
       pieces.push(
         place(finger, {
-          x: s.x + Math.cos(a) * rAt * 0.75,
-          y: s.y + t * s.h,
-          z: s.z + Math.sin(a) * rAt * 0.75,
-          rx: Math.sin(a) * lean,
-          rz: -Math.cos(a) * lean,
+          x: s.x,
+          y: s.y,
+          z: s.z,
+          rx: Math.sin(s.leanA) * s.lean,
+          rz: Math.cos(s.leanA) * s.lean,
         }),
       );
     }
+    place(columns[i]!, {
+      x: s.x,
+      y: s.y,
+      z: s.z,
+      rx: Math.sin(s.leanA) * s.lean,
+      rz: Math.cos(s.leanA) * s.lean,
+    });
   }
   const geom = mergeAll(pieces);
   paint(geom, (x, y, z, ny, out) => {
@@ -229,6 +236,10 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     out.copy(OLD).lerp(LIVE, up * 0.92 + 0.1 * n2);
     out.lerp(STAIN, smooth(0.62, 0.88, n2) * 0.3 * (1 - up));
     out.multiplyScalar(0.88 + 0.24 * n2);
+    // Pale crust on exposed growths, warm weathering in recesses. Vertex paint
+    // remains visible on Low without a normal-map or another material draw.
+    const crust = fbm3(x * 0.45, y * 0.24, z * 0.45, seed ^ 0xc4, 2);
+    out.lerp(LIVE, smooth(0.48, 0.72, crust) * 0.35 * up);
     // Weathered and fresh carbonate beds follow the flanges; no extra rock geometry.
     const tint = lostCityBedTint(x, y - gnd(0, 0), z, Math.max(1.2, H / 11), 0.9);
     out.r *= tint[0];
