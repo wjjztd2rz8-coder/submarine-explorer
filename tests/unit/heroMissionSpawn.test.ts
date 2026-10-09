@@ -1,8 +1,15 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import { readFileSync } from 'node:fs';
-import { expect, it } from 'vitest';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { afterAll, expect, it } from 'vitest';
 import { makeConfig } from '../../src/core/Config.js';
-import { parseMission } from '../../src/game/Mission.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import type { InputState } from '../../src/core/Input.js';
+import { Mission, parseMission } from '../../src/game/Mission.js';
+import { Scanner } from '../../src/game/Scanner.js';
+import { Submarine } from '../../src/sub/Submarine.js';
+import { CameraRig } from '../../src/sub/CameraRig.js';
+import { SubMesh } from '../../src/sub/SubMesh.js';
+import { hullClearance } from './helpers/hullClearance.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
 import {
   composedFreeDiveSpawn,
@@ -33,6 +40,12 @@ const heroes = [
   },
 ];
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
+const audit: unknown[] = [];
+afterAll(() => {
+  const env = (globalThis as { process?: { env?: Record<string, string> } }).process?.env;
+  if (env?.F_VERIFY_1000_AUDIT === '1')
+    writeFileSync('.cache/verify-1000-missions.json', JSON.stringify(audit, null, 2) + '\n');
+});
 
 for (const { site, primary, before } of heroes) {
   for (const tier of ['low', 'medium', 'high'] as const) {
@@ -96,6 +109,96 @@ for (const { site, primary, before } of heroes) {
           first.position.z - pose.z,
         );
         expect(range).toBeLessThanOrEqual(120);
+
+        if (site === 'great-blue-hole' || site === 'monterey-canyon') {
+          // Exercise actual Arcade physics and scanner time, rather than infer
+          // accessibility from distance or teleport the pilot to the contact.
+          const mode = config.settings.gameplayPresets.arcade;
+          const sub = new Submarine(config.submarine, terrain);
+          sub.setHullClass(mission.hull_class!);
+          sub.applyProfiles(
+            config.speedProfiles[mode.speedProfile],
+            config.descentProfiles[mode.descentProfile],
+          );
+          sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+          const mesh = new SubMesh({ length: 26, hullClass: mission.hull_class!, tier });
+          mesh.setView('chase');
+          mesh.setPose(sub.position, sub.yaw, sub.pitch, sub.roll);
+          const visualClearance = hullClearance(mesh.group, terrain);
+          mesh.dispose();
+          expect(visualClearance, 'visible hull clears the terrain at the opening').toBeGreaterThan(
+            0,
+          );
+          const bus = new EventBus();
+          const run = new Mission({ def: mission, bus });
+          run.resolve(pois.map((p) => p.id));
+          run.start(site);
+          const scanner = new Scanner(config.scan, bus);
+          const multiplier = config.sensorPresets[mode.sensors].scanRadiusMultiplier;
+          scanner.setTargets(pois.map((p) => ({ ...p, radius: p.radius * multiplier })));
+          const input = {
+            throttle: 0,
+            yaw: 0,
+            pitch: 0,
+            ballast: 0,
+            lookDx: 0,
+            lookDy: 0,
+            toggleCamera: false,
+            toggleSonar: false,
+            boost: false,
+            toggleLights: false,
+            ping: false,
+            scan: true,
+            cycleSimSpeed: false,
+            togglePhotoMode: false,
+          } satisfies InputState;
+          let completedAt: number | null = null;
+          let minimumClearance = Infinity;
+          const rigs = [1600 / 900, 390 / 844].map((aspect) => {
+            const rig = new CameraRig(config.camera, aspect, terrain);
+            rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
+            return rig;
+          });
+          for (let tick = 0; tick < 3600; tick++) {
+            sub.step(input, 1 / 60);
+            scanner.update(1 / 60, sub.position, sub.getForward(), input.scan);
+            run.update(1 / 60);
+            if (completedAt === null && scanner.isScanned(site, first.id))
+              completedAt = (tick + 1) / 60;
+            minimumClearance = Math.min(
+              minimumClearance,
+              sub.position.y - terrain.sampleHeight(sub.position.x, sub.position.z),
+            );
+            if (tick % 60 === 0)
+              for (const rig of rigs) {
+                rig.snap(sub.position, sub.yaw, sub.pitch);
+                expect(
+                  rig.camera.position.y -
+                    terrain.sampleHeight(rig.camera.position.x, rig.camera.position.z),
+                ).toBeGreaterThanOrEqual(config.camera.terrainClearance - 1e-6);
+              }
+          }
+          expect(completedAt, 'first primary can be scanned without any transit').not.toBeNull();
+          expect(completedAt!).toBeLessThanOrEqual(120);
+          expect(run.objectives[0].complete).toBe(true);
+          expect(sub.hullBreached).toBe(false);
+          expect(minimumClearance).toBeGreaterThanOrEqual(
+            config.submarine.hullRadius + config.submarine.seabedClearance - 1e-6,
+          );
+          audit.push({
+            site,
+            tier,
+            range,
+            completedAt,
+            transit: 0,
+            minimumClearance,
+            visualClearance,
+          });
+          console.log(
+            `VERIFY-1000 ${site} ${tier}: scan=${completedAt}s transit=0m minClearance=${minimumClearance.toFixed(2)}m`,
+          );
+          run.dispose();
+        }
 
         // Keep the old primary selection measurable for the progress note.
         const oldObjectives = before.map((id) => mission.objectives.find((o) => o.id === id)!);
