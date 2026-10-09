@@ -629,3 +629,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** 1000 (verify 940/950 tests; resolved a heroMissionSpawn test conflict), 1020 (Challenger/Endurance portrait framing, near-hull hint grace), 1030 (Blue Hole ledges, Low-tier refinement, horizon haze). Golden 2026-10-09-052720: ledges now read in the bowl and the stalactites are better, but the bowl is still a beige, low-contrast surface; a further pass is still open (DIRECTOR #1). Full e2e + project-base green on main; pushed, tagged f39. Hosted CI/Pages for f39 were queued at exit; check next run.
 - **Running:** no Codex tasks (Codex 5h at 5% until 02:45). **Queue:** 1040, 1050, 1060, 1070, 1080. No Claude agents launched. Needs owner: nothing.
+
+## 2026-10-09 02:41 CDT headless run (Claude)
+
+- **Merged:** Blue Hole bowl pass 2 (Sonnet): baked strata tint (tan→ochre→grey-brown), riser shadowing, darker gallery wall/apron, tapered ribbed bent stalactites. Reviewed desktop shots: clear gain in pose 1 and east gallery; apron in poses 2/3 still beige (shared rock texture). Grey ring/bottom strip are the cockpit bezel, not a bug. Full e2e + project-base green on main; pushed, tagged f40.
+- **Hosted CI** for f39 (docs commit) completed **failure** after 44 min; Pages deploy OK. 1070 (CI shard failures) queued; not yet triaged.
+- **Running:** no Codex tasks (5h at 5% until 02:45). **Queue:** 1040, 1050, 1060, 1070, 1080. Held: 830 reference worktree.
+- Needs owner: nothing.
