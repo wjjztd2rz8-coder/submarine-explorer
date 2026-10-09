@@ -52,3 +52,15 @@
   border: 1px solid var(--hud-border);
   border-radius: 4px;
 }
+
+/* Phone portrait: a centred top-notice collides with the sonar/readout stack, so ride above the tutorial card. */
+@media (orientation: portrait) {
+  html.is-touch .hud-notice {
+    top: auto;
+    bottom: calc(232px + env(safe-area-inset-bottom, 0px));
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    white-space: nowrap;
+    font-size: 14px;
+  }
+}
