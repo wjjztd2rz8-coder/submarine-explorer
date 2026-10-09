@@ -88,3 +88,19 @@ and colonies check the actual frontmost wall and apron triangles.
 Measurements, validation limits and the recipe for another site are in
 [`F-FIDELITY-810.md`](../plan/progress/F-FIDELITY-810.md). Browser screenshots and
 full rendered-frame budgets still require an unrestricted browser run.
+
+## Blue Hole bowl on Low (1030)
+
+The Blue Hole's fidelity profile opts into `resolveLow`. Only its 240 m focus
+radius plus 60 m fade receives 16 subdivisions per survey cell on Low (about
+3.7 m spacing); the rest of the tile retains Low's single subdivision. Normal
+maps, texture breakup and scatter still use the Low settings. This resolves the
+reconstructed limestone terraces and floor without a second surface or material.
+Other fidelity profiles keep their previous Low meshes.
+
+Broad treads and steep risers wander with bearing and smoothly fade out around
+both gallery mouths, the floor and reef. Collision uses the same rendered near
+triangles. The site palette keeps fine albedo joints faint and blends the reef
+into fog over 55–210 m, including on Low. Gallery geometry and camera framing
+are preserved. Verification is recorded in
+[`F-1030.md`](../plan/progress/F-1030.md).

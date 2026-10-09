@@ -154,7 +154,8 @@ export class Terrain {
       .sort((a, b) => a.depth - b.depth);
 
     const tierCfg = config.tiers[tier];
-    this.fidelity = tier === 'low' ? null : (config.fidelity?.[tile.meta.id] ?? null);
+    const fidelity = config.fidelity?.[tile.meta.id];
+    this.fidelity = tier !== 'low' || fidelity?.resolveLow ? (fidelity ?? null) : null;
     this.focus = this.fidelity
       ? latLonToWorld(tile.meta, this.fidelity.focus.lat, this.fidelity.focus.lon)
       : null;
@@ -179,7 +180,7 @@ export class Terrain {
       tier,
       biome: this.biome,
       exaggeration: this.exaggeration,
-      rockDetailStrength: this.fidelity?.normalStrength,
+      rockDetailStrength: tier === 'low' ? undefined : this.fidelity?.normalStrength,
     });
     this.material = built.material;
     this.textures = built.textures;

@@ -114,10 +114,37 @@ for (const site of ['great-blue-hole', 'lost-city']) {
     }, 60_000);
   }
 
-  it(`${site} Low: profile leaves the actual mesh buffers and all pose budgets byte-identical`, async () => {
+  it(`${site} Low: reconstructed bowl resolves locally; other profiles retain identical buffers`, async () => {
     const a = await fidelityScene(site, 'low');
     const b = await fidelityScene(site, 'low', false);
     try {
+      if (site === 'great-blue-hole') {
+        expect(a.terrain.stats.vertices).toBeLessThan(500_000);
+        expect(a.terrain.stats.subdiv).toBe(b.terrain.stats.subdiv);
+        expect(a.terrain.stats.subdivisionCounts![16]).toBeGreaterThan(0);
+        for (const count of a.counts) {
+          // Reserve the same 200k for swimming life, scatter and the submarine
+          // as the Medium census. Low's complete frame has a tighter ceiling.
+          expect(count.triangles + 200_000, count.name).toBeLessThan(500_000);
+        }
+        const ray = new THREE.Raycaster();
+        for (const view of a.views) {
+          expect(
+            view.position.y - a.terrain.sampleHeight(view.position.x, view.position.z),
+            view.name,
+          ).toBeGreaterThan(a.config.submarine.hullRadius);
+          ray.set(
+            new THREE.Vector3(view.position.x, 100, view.position.z),
+            new THREE.Vector3(0, -1, 0),
+          );
+          const hit = ray.intersectObject(a.terrain.group, true)[0]!;
+          expect(hit).toBeDefined();
+          expect(
+            Math.abs(hit.point.y - a.terrain.sampleHeight(view.position.x, view.position.z)),
+          ).toBeLessThan(0.001);
+        }
+        return;
+      }
       expect(a.terrain.stats).toEqual(b.terrain.stats);
       expect(a.counts).toEqual(b.counts);
       expect(a.pose).toEqual(b.pose);

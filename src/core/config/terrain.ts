@@ -92,6 +92,8 @@ export interface TerrainConfig {
 }
 
 export interface TerrainFidelity {
+  /** Resolve a small reconstructed landform on Low too; surveyed sites remain coarse. */
+  resolveLow?: boolean;
   /** Focus of the opening landform, in geographic coordinates. */
   focus: { lat: number; lon: number; radiusM: number; fadeM: number };
   chunkCells: number;
@@ -135,9 +137,10 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
     // The 320 m sinkhole fits inside six survey cells. Resolve its reconstructed
     // ledges on the sand/rock surface itself, avoiding intersecting prop skins.
     'great-blue-hole': {
+      resolveLow: true,
       focus: { lat: 17.3156, lon: -87.5356, radiusM: 240, fadeM: 60 },
       chunkCells: 8,
-      nearSubdiv: { low: 1, medium: 16, high: 32, ultra: 32 },
+      nearSubdiv: { low: 16, medium: 16, high: 32, ultra: 32 },
       reliefM: 0,
       reliefWavelengthM: 24,
       normalStrength: 0.18,
