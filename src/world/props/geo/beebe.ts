@@ -157,25 +157,8 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
   const segments = Math.max(8, Math.round(cfg.grid_segments * detail.meshDensity));
   const apron = heightMesh(cfg.width_m, cfg.depth_m, segments, segments, surface);
   const sediment = new THREE.Color(cfg.sediment_color);
-  const edge = new THREE.Color(cfg.edge_color);
   const stain = new THREE.Color(cfg.stain_color);
-  const rock = new THREE.Color(cfg.rubble_color);
-  const basalt = new THREE.Color(0x3b3a38);
-  const color = (x: number, z: number, out: THREE.Color, rubble: boolean): void => {
-    const r = rim(x, z);
-    const n = fbm3(x / cfg.patch_size_m, 7, z / cfg.patch_size_m, seed ^ 0x71, 3);
-    const grain = fbm3(
-      x / (cfg.patch_size_m * 0.3),
-      3,
-      z / (cfg.patch_size_m * 0.3),
-      seed ^ 0x92,
-      2,
-    );
-    out.copy(rubble ? rock : sediment).lerp(edge, smooth(0.5, 1, r));
-    // Patchy rusty mineral precipitates stay muted against the lighter, grey-tan sediment.
-    out.lerp(stain, smooth(0.4, 0.75, n) * cfg.stain_amount * (1 - smooth(0.65, 1, r)));
-    out.multiplyScalar(0.88 + grain * 0.24);
-  };
+  const basalt = new THREE.Color(0x2e2d2b);
   // Keep every supporting height (and therefore the 850 clumps) unchanged. The plate
   // came from a plain pale material with radial edge tint, not the height mesh.
   // A neutral cavity lets this mesh use exactly the surrounding floor's shader.
@@ -243,14 +226,13 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
   if (rubble.length) {
     const geometry = mergeAll(rubble);
     paint(geometry, (x, y, z, ny, out) => {
-      color(x, z, out, true);
       // Basalt-dark blocks, patchy sulfide staining and a dusting of sediment on upper faces.
       const m = fbm3(x * 0.9, y * 1.4, z * 0.9, seed ^ 0x3a1, 2);
       const s = fbm3(x * 0.35, y * 0.6, z * 0.35, seed ^ 0x9d, 2);
-      out.multiplyScalar(0.5 + m * 0.55);
-      out.lerp(basalt, 0.55 + (1 - m) * 0.3);
-      out.lerp(stain, smooth(0.45, 0.7, s) * 0.55);
-      out.lerp(sediment, smooth(0.5, 0.95, ny) * 0.16);
+      const f = fbm3(x * 3.1, y * 3.1, z * 3.1, seed ^ 0x2c, 2);
+      out.copy(basalt).multiplyScalar(0.7 + m * 0.9 + (f - 0.5) * 0.5);
+      out.lerp(stain, smooth(0.45, 0.7, s) * 0.45);
+      out.lerp(sediment, smooth(0.5, 0.95, ny) * 0.1);
     });
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
