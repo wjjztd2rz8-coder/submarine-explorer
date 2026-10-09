@@ -483,7 +483,18 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const beds = [0];
   for (let i = 0; i < P.bands; i++) {
     const [min, max] = MONTEREY_STRATA.thickness;
-    beds.push(beds[i]! + min + (max - min) * bedRnd());
+    beds.push(beds[i]! + min + (max - min) * Math.pow(bedRnd(), MONTEREY_STRATA.thicknessSkew));
+  }
+  // Per-bed hardness (thick, resistant beds protrude and overhang) and albedo.
+  const bedHard: number[] = [];
+  const bedColour: THREE.Color[] = [];
+  for (let i = 0; i < P.bands; i++) {
+    const thick = (beds[i + 1]! - beds[i]!) / MONTEREY_STRATA.thickness[1];
+    bedHard.push(Math.min(1, 0.55 * thick + 0.6 * Math.pow(bedRnd(), 1.6)));
+    const pal = MONTEREY_STRATA.bedPalette;
+    const c = new THREE.Color(pal[Math.floor(bedRnd() * pal.length) % pal.length]);
+    c.multiplyScalar(0.78 + 0.4 * bedRnd());
+    bedColour.push(c);
   }
   const totalBeds = beds[P.bands]!;
   const bedPhase = (x: number, y: number): number => {
@@ -519,7 +530,9 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     const strength =
       id === 'canyon'
         ? minLedge +
-          (maxLedge - minLedge) * fbm3(Math.floor(s) * 3.1, x * 0.04, seed + 81, seed + 9, 2)
+          (maxLedge - minLedge) *
+            bedHard[Math.min(P.bands - 1, Math.max(0, Math.floor(s)))]! *
+            (0.35 + 1.1 * fbm3(Math.floor(s) * 3.1, x * 0.03, seed + 81, seed + 9, 2))
         : 1;
     const slump = id === 'canyon' ? slumpAt(x, y) : 0;
     const ledge = -Math.pow(saw, 2.2) * lip * P.ledge * scale * 2.4 * strength * (1 - slump);
@@ -557,6 +570,11 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     const bed = fbm3(Math.floor(s) * 3.1 + 0.5, 2.5, seed + 77, seed + 3, 1);
     const bc = fidelity ? 1.5 : P.bedContrast;
     out.copy(P.band).lerp(P.base, Math.min(1.1, 0.25 + 0.85 * ((bed - 0.5) * bc + 0.5)));
+    if (id === 'canyon') {
+      // Each bed keeps its own muted albedo; resistant beds are paler than weak ones.
+      const k = Math.min(P.bands - 1, Math.max(0, Math.floor(s)));
+      out.copy(bedColour[k]!).multiplyScalar(0.8 + 0.4 * bedHard[k]!);
+    }
     out.multiplyScalar(
       (0.82 + 0.4 * tone) * (1 + 0.14 * smooth(0.8, 1, saw) - 0.28 * (1 - smooth(0, 0.14, saw))),
     );
@@ -572,7 +590,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       const grain = 0.88 + 0.24 * fbm3(x * 1.7, y * 2.2, z * 1.7, seed + 66, 2);
       out.multiplyScalar((0.84 + 0.32 * lam) * lipDark * lipLit * gullyShade * grain);
       // Alternate pale resistant beds with ochre-brown weak ones so bedding survives the teal haze.
-      out.lerp(P.drape, 0.22 * smooth(0.5, 0.75, bed));
+      if (id !== 'canyon') out.lerp(P.drape, 0.22 * smooth(0.5, 0.75, bed));
     }
     out.lerp(P.crest, smooth(0.75, 1, y / H) * 0.6);
     if (P.joints > 0) {
