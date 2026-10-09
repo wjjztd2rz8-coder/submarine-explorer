@@ -736,3 +736,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Review:** joint review with Sol written to REVIEWS.md (stage ~70%, 3-4 weeks; Sol's reconcile round produced no output, disputes settled on evidence). Backlog rewritten; Codex briefs 1170, 1180 (Endurance snow), 1190 (Titanic haze), 1200 (sonar palette) queued.
 - **Merged:** f-firstdiscovery (Sonnet): scan-to-reward capture script, phone notice and next-target chip fixes. Smoke + project-base green on main; no push of a release wave.
 - **Running:** Codex 1130, 1140, 1160; stalled 1090-1120 need collection. Hosted CI still red. Needs owner: nothing.
+
+## 2026-10-09 15:51 CDT headless run (Claude)
+
+- **Merged:** Codex 1090, 1100, 1110, 1120, 1140, 1160 (finished, stalled by the earlier floor; committed and merged, one spec conflict in f-bughunt-960 resolved with 1090's version). Smoke + project-base green on main; no full e2e, no push.
+- **Running:** Codex 1130, 1170, 1180. **Queue:** 1190, 1200, 1210 (verify merged work). No Claude agent launched this run; Claude backlog (pacing, Blue Hole bowl, Challenger) waits for 1170/1180 audits. Hosted CI still unconfirmed; push wave f45 after full e2e. Needs owner: nothing.
