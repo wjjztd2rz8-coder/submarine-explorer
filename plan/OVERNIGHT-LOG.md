@@ -609,3 +609,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** 970 (CI e2e shard fixes, Blue Hole opening ≥26 m altitude, wall-life raycast buckets, refreshed shard weights) and 960 regression hunt (tutorial card now follows the active input device; Sonnet fixed a real bug it found: on Blue Hole portrait phone the surface-start chase camera left the sub under the tutorial card, CameraRig aims lower on portrait with a shortened arm). Full e2e passed on main; pushed, tagged f36/f37.
 - **Queue:** 980, 990, 1000, 1010 (Codex 5h 6% until 21:15). Held: 830 reference worktree. Hosted CI result for f36/f37 not yet checked.
 - Needs owner: nothing.
+
+## 2026-10-08 22:57 headless run (short)
+- Merged 990 (low-tier/phone golden tooling; Codex sandbox could not capture, so I ran the Low portrait sweep: .cache/golden/2026-10-09-034952, 13 sites, complete). Gates smoke+project-base passed.
+- Findings: Challenger Deep opening tilted sub + hull toast at t=0; Blue Hole horizon/bowl still smooth. Queued Codex 1020/1030/1040.
+- Running: Codex 980, 1000, 1010. No Claude agent launched (no Claude-suited package fit; no push this run, no new wave).
