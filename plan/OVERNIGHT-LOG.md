@@ -685,3 +685,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** f-lostcity-trunk (Sonnet): irregular carbonate trunk profile (gated to Lost City, Beebe untouched), fewer flanges, cream/grey-blue flow colour, vent mouth painted at tips, lower shader blotch contrast. Close-up clearly better (plates gone); orifice unverified in any pose, one flat flange remains. Smoke + project-base green on main (prettier fixed on progress note); no push.
 - **Queue:** 1090, 1100, 1110 (Codex 5h was 5% at start; dispatcher will launch after 09:00 reset). Next Claude: Beebe boulders/disc ring, Monterey strata, first-minute playthrough, hosted CI check for f43. Needs owner: nothing.
+
+## 2026-10-09 08:58 CDT headless run (Claude)
+
+- **Merged:** f-beebe-rocks (Sonnet): angular dark basalt rubble replaces pale egg boulders, noise-distorted sand apron edge (Beebe-only, draw calls unchanged, Beebe snapshot regenerated). Reviewed before/after cockpit shot: clear gain; a few pale biome-scatter rocks remain. Smoke + project-base green in worktree and on main; no push. Removed stale merged worktree 830.
+- **CI:** hosted CI for f43 still red (~10 of 30 shards, shard 7 died at Chromium install); `gh` logs unavailable. Queued 1120-f-ci-triage for Codex.
+- **Queue:** 1090, 1100, 1110, 1120. Next Claude: Monterey strata, first-minute playthrough, Beebe pale scatter rocks. Needs owner: nothing.
