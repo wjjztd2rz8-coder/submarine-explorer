@@ -1,0 +1,15 @@
+{
+  "kamaehuakanaloa": {
+    "direction": [0.7071067811865476, 0, -0.7071067811865476],
+    "above": 22,
+    "approachRange": 75,
+    "close": { "range": 60, "above": 22 }
+  },
+  "hunga-tonga-caldera": {
+    "target": [0, 36, -8],
+    "direction": [1, 0, 0],
+    "above": 38,
+    "approachRange": 75,
+    "close": { "range": 50, "above": 38 }
+  }
+}

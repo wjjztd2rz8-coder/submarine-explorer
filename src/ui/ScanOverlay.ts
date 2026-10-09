@@ -13,6 +13,7 @@
 
 import type { ScanConfig } from '../core/Config.js';
 import type { ScanView } from '../game/Scanner.js';
+import { reticleClearOfControls } from './ScanReticleLayout.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -180,7 +181,22 @@ export class ScanOverlay {
 
     const hasTarget = view.nearestId !== null || view.activeId !== null;
     // Reticle over the nearest contact.
-    if (screen && view.nearestId !== null && view.nearestInRange) {
+    const controls =
+      screen && document.documentElement.classList.contains('is-touch')
+        ? Array.from(
+            document.querySelectorAll<HTMLElement>(
+              '.tc-stick, .tc-slider, .tc-buttons, .tc-btn-pause',
+            ),
+          )
+            .filter((el) => el.checkVisibility())
+            .map((el) => el.getBoundingClientRect())
+        : [];
+    if (
+      screen &&
+      view.nearestId !== null &&
+      view.nearestInRange &&
+      reticleClearOfControls(screen, this.config.reticleSizePx, controls)
+    ) {
       this.reticle.hidden = false;
       this.reticle.style.transform = `translate(${screen.x.toFixed(1)}px, ${screen.y.toFixed(1)}px)`;
       this.reticle.classList.toggle('is-locked', view.phase === 'scanning');

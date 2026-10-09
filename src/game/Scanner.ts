@@ -59,7 +59,7 @@ export interface ScanView {
   progress: number;
   /** Best scannable POI right now (in range AND facing), if any. */
   candidateId: string | null;
-  /** Nearest POI within hint range (radius * hintRangeFactor), if any. */
+  /** Unscanned contacts in scan range, then logged POIs in range, then remote hints. */
   nearestId: string | null;
   nearestName: string;
   nearestDistance: number;
@@ -228,14 +228,16 @@ export class Scanner {
     let candidateDist = Infinity;
     let nearest: ScanTarget | null = null;
     let nearestGeo: Geometry | null = null;
+    let scannedNearest: ScanTarget | null = null;
+    let scannedNearestGeo: Geometry | null = null;
     let activeGeo: Geometry | null = null;
     for (const t of this.targets) {
       const g = this.geometry(t, position, forward);
       if (t === this.active) activeGeo = g;
       if (this.isScanned(t.landmarkId, t.id)) {
-        if (g.inRange && (!nearestGeo || g.distance < nearestGeo.distance)) {
-          nearest = t;
-          nearestGeo = g;
+        if (g.inRange && (!scannedNearestGeo || g.distance < scannedNearestGeo.distance)) {
+          scannedNearest = t;
+          scannedNearestGeo = g;
         }
         continue;
       }
@@ -244,7 +246,12 @@ export class Scanner {
         candidateDist = g.distance;
       }
       const hintRange = t.radius * this.config.hintRangeFactor;
-      if (g.distance <= hintRange && (!nearestGeo || g.distance < nearestGeo.distance)) {
+      if (
+        g.distance <= hintRange &&
+        (!nearestGeo ||
+          (g.inRange && !nearestGeo.inRange) ||
+          (g.inRange === nearestGeo.inRange && g.distance < nearestGeo.distance))
+      ) {
         nearest = t;
         nearestGeo = g;
       }
@@ -254,7 +261,7 @@ export class Scanner {
       const g = this.geometry(t, position, forward);
       if (t === this.active) activeGeo = g;
       if (this.isScanned(t.landmarkId, t.id) || !g.inRange) continue;
-      if (!nearestGeo || g.distance < nearestGeo.distance) {
+      if (!nearestGeo || !nearestGeo.inRange || g.distance < nearestGeo.distance) {
         nearest = t;
         nearestGeo = g;
       }
@@ -262,6 +269,12 @@ export class Scanner {
         candidate = t;
         candidateDist = g.distance;
       }
+    }
+    // A remote hint must not hide a logged contact where the pilot is still
+    // hovering. Nearby unscanned fixed contacts retain priority over both.
+    if (scannedNearest && !nearestGeo?.inRange) {
+      nearest = scannedNearest;
+      nearestGeo = scannedNearestGeo;
     }
     // Moving targets (animals): considered only where no POI already claims the
     // hint or the candidate, and only hinted once they are in range.

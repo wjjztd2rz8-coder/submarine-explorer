@@ -1,5 +1,10 @@
 import { Vector3 } from 'three';
-import { deepOpeningFor, DEFAULT_CAMERA, type CameraConfig } from '../core/Config.js';
+import {
+  deepOpeningFor,
+  DEFAULT_CAMERA,
+  KAMAEHUAKANALOA_OPENING,
+  type CameraConfig,
+} from '../core/Config.js';
 import { CameraRig } from '../sub/CameraRig.js';
 import type { Props } from '../world/Props.js';
 import type { SeabedSampler, SpawnPose } from './Pois.js';
@@ -9,7 +14,7 @@ import {
   type SpawnSettings,
 } from './Spawn.js';
 
-/** Keep the shared bearing search; shorten only these sites' already-safe approach. */
+/** Keep the shared safe bearing search, then apply the site's authored subject framing. */
 function reframe(
   site: string,
   pose: SpawnPose | null,
@@ -19,7 +24,7 @@ function reframe(
   safeDepth: number,
   camera: CameraConfig,
 ): SpawnPose | null {
-  const tuning = deepOpeningFor(site);
+  const tuning = site === 'kamaehuakanaloa' ? KAMAEHUAKANALOA_OPENING : deepOpeningFor(site);
   const hero = props.placed.find((p) => p.def.id === tuning?.hero);
   if (!pose || !tuning || !hero || hero.localBounds.isEmpty()) return pose;
   hero.root.updateMatrixWorld(true);
@@ -51,8 +56,17 @@ function reframe(
     props.collide(p.clone(), settings.hullRadius + 4, new Vector3())
   )
     return pose;
+  // The pillow field sets the viewing distance; the small vent remains the
+  // opening's heading reference and first scan subject.
+  const aimHero =
+    'aimHero' in tuning ? props.placed.find((prop) => prop.def.id === tuning.aimHero) : null;
+  if (aimHero) aimHero.root.updateMatrixWorld(true);
+  const aimTarget = aimHero
+    ? aimHero.root.localToWorld(aimHero.localBounds.getCenter(new Vector3()))
+    : target;
   const yaw =
-    Math.atan2(target.x - p.x, -(target.z - p.z)) + (tuning.opening.yawOffset * Math.PI) / 180;
+    Math.atan2(aimTarget.x - p.x, -(aimTarget.z - p.z)) +
+    (tuning.opening.yawOffset * Math.PI) / 180;
   const rig = new CameraRig(camera, 16 / 9, {
     sampleHeight: (x, z) => seabed.sampleHeight(x, z),
     getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),

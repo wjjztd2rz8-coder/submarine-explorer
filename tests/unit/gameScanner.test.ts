@@ -45,6 +45,74 @@ function run(s: Scanner, seconds: number, pos: Vector3, fwd: Vector3, held: bool
 
 const names = (log: Log) => log.map(([n]) => n);
 
+it('prefers the nearest unscanned contact over a closer logged contact, independent of target order', () => {
+  const logged = target({ id: 'west', position: new Vector3(0, -100, -20) });
+  const fresh = target({ id: 'east', position: new Vector3(0, -100, -40) });
+  for (const targets of [
+    [logged, fresh],
+    [fresh, logged],
+  ]) {
+    const { scanner } = setup(targets);
+    scanner.scannedThisDive.add('lm/west');
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.nearestId).toBe('east');
+    expect(scanner.view.candidateId).toBe('east');
+    expect(scanner.view.nearestScanned).toBe(false);
+    scanner.scannedThisDive.add('lm/east');
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.nearestId).toBe('west');
+    expect(scanner.view.nearestScanned).toBe(true);
+    expect(scanner.view.candidateId).toBeNull();
+  }
+});
+
+it('retains the logged POI hint over passing wildlife when no unscanned fixed contact is nearby', () => {
+  const { scanner } = setup();
+  scanner.scannedThisDive.add('lm/bow');
+  scanner.setExtraTargets([target({ id: 'life:fish', position: new Vector3(0, -100, -20) })]);
+  scanner.update(0, AT, NORTH, false);
+  expect(scanner.view.nearestId).toBe('bow');
+  expect(scanner.view.nearestScanned).toBe(true);
+  expect(scanner.view.candidateId).toBe('life:fish');
+});
+
+it('keeps a logged contact in scan range ahead of a distant unscanned hint, then resumes remote guidance after leaving', () => {
+  const logged = target({ id: 'logged', position: new Vector3(0, -100, -80) });
+  const remote = target({ id: 'remote', position: new Vector3(0, -100, -300) });
+  for (const targets of [
+    [logged, remote],
+    [remote, logged],
+  ]) {
+    const { scanner } = setup(targets);
+    scanner.update(logged.scanSeconds, AT, NORTH, true);
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.nearestId).toBe('logged');
+    expect(scanner.view.nearestInRange).toBe(true);
+    expect(scanner.view.nearestScanned).toBe(true);
+    expect(scanner.view.candidateId).toBeNull();
+    scanner.update(0, new Vector3(0, -100, 100), NORTH, false);
+    expect(scanner.view.nearestId).toBe('remote');
+    expect(scanner.view.nearestInRange).toBe(false);
+    expect(scanner.view.nearestScanned).toBe(false);
+  }
+});
+
+it('prefers an unscanned contact in range over a closer remote hint with a smaller radius', () => {
+  const logged = target({ id: 'logged', position: new Vector3(0, -100, -20) });
+  const remote = target({ id: 'remote', position: new Vector3(0, -100, -30), radius: 20 });
+  const local = target({ id: 'local', position: new Vector3(0, -100, -60) });
+  for (const supplemental of [false, true]) {
+    const { scanner } = setup(supplemental ? [logged, remote] : [logged, remote, local]);
+    if (supplemental) scanner.setSupplementalTargets([local]);
+    scanner.scannedThisDive.add('lm/logged');
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.nearestId).toBe('local');
+    expect(scanner.view.nearestInRange).toBe(true);
+    expect(scanner.view.nearestScanned).toBe(false);
+    expect(scanner.view.candidateId).toBe('local');
+  }
+});
+
 describe('Scanner', () => {
   it('completes after scan_seconds of holding while in range and facing', () => {
     const { scanner, log, store } = setup();

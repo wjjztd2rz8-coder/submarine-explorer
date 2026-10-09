@@ -1,5 +1,6 @@
 /** Opt-in capture settings; nightly defaults stay High / desktop / hero sites. */
 import bismarckPose from './bismarck-poses.json' with { type: 'json' };
+import lowTierPoses from './lowtier-poses.json' with { type: 'json' };
 
 export function goldenOptions(env = process.env) {
   const tier = env.GOLDEN_TIER ?? 'high';
@@ -23,7 +24,7 @@ export function goldenOptions(env = process.env) {
 const extraHeroes = {
   'axial-seamount-ashes': 'mushroom-chimney',
   'hudson-canyon': 'coral-ledge-mound',
-  kamaehuakanaloa: 'hiolo-north-chimney-1',
+  kamaehuakanaloa: 'hiolo-north-pillows',
   bismarck: 'main-hull',
   'hunga-tonga-caldera': 'caldera-tuff-wall',
   'blake-plateau-corals': 'lophelia-mound',
@@ -40,7 +41,9 @@ export function selectGoldenHeroes(defaultHeroes, catalog, { only, allSites }) {
       heroes.push(
         site === 'bismarck'
           ? [site, extraHeroes[site], site, bismarckPose]
-          : [site, extraHeroes[site]],
+          : Object.hasOwn(lowTierPoses, site)
+            ? [site, extraHeroes[site], site, lowTierPoses[site]]
+            : [site, extraHeroes[site]],
       );
     }
   }

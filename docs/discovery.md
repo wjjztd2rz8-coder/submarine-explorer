@@ -101,6 +101,15 @@ facing it, and `HOLD G TO SCAN` when it can be scanned. While the beam is on,
 a cyan progress ring fills. A completed scan shows `NEW ENTRY`, and pressing
 J then opens the guide at that entry.
 
+Guidance selects the nearest unscanned fixed contact within scan range, then a
+previously scanned POI still in range, then a remote unscanned POI within hint
+range. A distant hint cannot hide the logged-contact card where the pilot is
+hovering. POIs retain hint priority over passing wildlife. The Blue Hole's two authored galleries have separate scan contacts, both
+linked to the same cave-history Journal entry. On touch screens a reticle that
+intersects a visible stick, slider, action-button group or pause button is hidden;
+the target card stays available and the reticle returns at the contact's actual
+screen position when the controls are clear.
+
 `ScanOverlay.messages` is the shared DOM column for the target panel and the
 onboarding `HintChip`. Desktop hints flow immediately below the target at top
 centre; wrapped target names increase the column's height. On portrait touch
