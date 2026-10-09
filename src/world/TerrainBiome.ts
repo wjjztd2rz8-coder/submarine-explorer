@@ -151,7 +151,7 @@ export const BIOMES: Record<string, Biome> = {
   // Soft pale ooze: low-contrast so the wreck is the subject and the bed never reads black.
   titanic: {
     // Finish blending before the distant plain forms a flat edge against open water.
-    abyssFadeM: [180, 780],
+    abyssFadeM: [110, 650],
     ...ABYSSAL,
     // Same texture in both slots and a faint patch/stain: no pale blotches on the low tier.
     b: 'silt',
