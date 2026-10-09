@@ -111,6 +111,8 @@ function pendant(o: {
   h: number;
   r0: number;
   seed: number;
+  /** Body thickness multiplier; the foot keeps the original footprint. */
+  girth?: number;
   segs: number;
   rings: number;
 }): THREE.BufferGeometry {
@@ -153,6 +155,7 @@ function pendant(o: {
       3,
     );
     const foot = (1 + (n0 - 0.5) * 0.6) * (1 + 0.16 * Math.sin(ang * 11 + n0 * 6)) * 1.7;
+    f = Math.min(f * (o.girth ?? 1), foot * 0.94);
     f = foot + (f - foot) * smooth(0, 0.12, t);
     const bx = Math.cos(bendDir) * bend * t * t;
     const bz = Math.sin(bendDir) * bend * t * t;
@@ -171,6 +174,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   const d = geoDetail(tier);
   const [W, D, H] = dims;
   const rnd = mulberry32(seed);
+  const vr = mulberry32(seed ^ 0x7e11);
   // A continuous, thicker lip frames the east mouth; retain the west alcove's scallops.
   const mouthProfile = east
     ? PROFILE.map(([y, z]): [number, number] =>
@@ -391,7 +395,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       const yTop = yBase * scaleAt(x) + liftAt(x) + 0.5 - (east ? sinkAt(x) : 0);
       const main = i === 0;
       const generatedLength =
-        (1.2 + Math.pow(rnd(), 1.6) * 0.42 * H) *
+        (1.4 + rnd() * rnd() * 0.36 * H) *
         (main ? 1.35 : 0.55 + rnd() * 0.5) *
         (0.6 + 0.4 * scaleAt(x));
       const len = east
@@ -399,12 +403,17 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
         : generatedLength;
       if (east && len < 0.5) continue;
       // Thick, uneven columns: some stout, some slender, so no two read alike.
-      const r = (len * 0.14 + 0.28) * (0.75 + rnd() * rnd() * 1.1);
+      // Variation draws use their own stream, so the placement of the original gallery is unchanged.
+      const lean = main ? 0 : 0.05 + vr() * 0.14;
+      const leanDir = vr() * 6.28;
+      const r = len * 0.12 + 0.22;
+      const girth = 1 + vr() * 0.9;
       parts.push(
         place(
           pendant({
             h: len,
             r0: r,
+            girth,
             seed: seed + (k * 7 + i) * 3,
             segs: 10 * d.meshDensity + 4,
             rings: 8 + 6 * d.meshDensity,
@@ -413,9 +422,9 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
             x,
             y: yTop,
             z,
-            rx: Math.PI + (rnd() - 0.5) * 0.16,
+            rx: Math.PI + lean * Math.cos(leanDir),
             ry: rnd() * 6.28,
-            rz: (rnd() - 0.5) * 0.3,
+            rz: (rnd() - 0.5) * 0.1 + lean * Math.sin(leanDir),
           },
         ),
       );
