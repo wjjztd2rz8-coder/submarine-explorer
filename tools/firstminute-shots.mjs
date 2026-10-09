@@ -17,6 +17,7 @@ const sites = (process.env.FM_SITES ?? 'titanic,beebe-vent-field').split(',');
 const all = {
   desktop: { viewport: { width: 1280, height: 720 }, touch: false },
   phone: { viewport: { width: 390, height: 844 }, touch: true },
+  phoneland: { viewport: { width: 844, height: 390 }, touch: true },
 };
 const layouts = (process.env.FM_LAYOUTS ?? 'desktop,phone').split(',');
 const out = resolve(process.env.FM_OUT ?? '.cache/codex/shots/firstmin-f44');

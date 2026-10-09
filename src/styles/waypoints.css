@@ -68,6 +68,8 @@
 }
 .d-scan-edge.is-onscreen {
   border-color: rgba(46, 217, 217, 0.45);
+  /* Sit below the target so the centre scan bracket never crosses the text. */
+  transform: translate(-50%, calc(var(--scan-reticle-size, 44px) / 2 + 14px));
 }
 .d-scan-edge.is-onscreen::before {
   content: '◇';
