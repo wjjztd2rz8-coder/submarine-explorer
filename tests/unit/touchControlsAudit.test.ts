@@ -3,6 +3,10 @@ import type { Input } from '../../src/core/Input.js';
 import { TouchControls } from '../../src/ui/TouchControls.js';
 import { ScanOverlay } from '../../src/ui/ScanOverlay.js';
 import type { ScanView } from '../../src/game/Scanner.js';
+import { Scanner } from '../../src/game/Scanner.js';
+import { makeConfig } from '../../src/core/Config.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import { Vector3 } from 'three';
 
 // A small DOM fixture dispatches events through the real control listeners.
 class TouchElement extends EventTarget {
@@ -326,6 +330,104 @@ it('scan instructions use on-screen controls on touch and key bindings on keyboa
     f.controls.setTouchMode(false);
     overlay.showComplete('Bow', true, { scan: 'G', guide: 'J' });
     expect(hint.textContent).toBe('PRESS J · JOURNAL');
+  } finally {
+    overlay.dispose();
+    f.controls.dispose();
+  }
+});
+
+it('hides an anchored reticle behind visible touch controls and restores it after they move or hide', () => {
+  const f = fixture();
+  const overlay = new ScanOverlay({
+    ringSizePx: 64,
+    ringStrokePx: 2,
+    reticleSizePx: 44,
+    completeBannerSeconds: 3,
+  });
+  let visible = true;
+  let left = 210;
+  Object.assign(f.doc, {
+    querySelectorAll: (selector: string) => {
+      expect(selector).toContain('.tc-buttons');
+      return [
+        {
+          checkVisibility: () => visible,
+          getBoundingClientRect: () => ({ left, right: left + 101, top: 786, bottom: 832 }),
+        },
+      ];
+    },
+  });
+  const reticle = (overlay.root as unknown as TouchElement).children[0];
+  const view = {
+    phase: 'idle',
+    nearestId: 'channel',
+    nearestName: 'Channel',
+    nearestInRange: true,
+    candidateId: 'channel',
+    nearestDistance: 57,
+  } as ScanView;
+  try {
+    f.controls.setTouchMode(true);
+    overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
+    expect(reticle.hidden).toBe(true);
+    expect(overlay.cardVisible).toBe(true);
+    left = 300;
+    overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
+    expect(reticle.hidden).toBe(false);
+    expect(reticle.style.transform).toBe('translate(217.0px, 794.0px)');
+    left = 210;
+    visible = false;
+    overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
+    expect(reticle.hidden).toBe(false);
+    visible = true;
+    f.controls.setTouchMode(false);
+    overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
+    expect(reticle.hidden).toBe(false);
+  } finally {
+    overlay.dispose();
+    f.controls.dispose();
+  }
+});
+
+it('replaces the completion banner with the logged contact card even when a remote unscanned hint exists', () => {
+  const f = fixture();
+  const config = makeConfig();
+  const bus = new EventBus();
+  const scanner = new Scanner(config.scan, bus);
+  const overlay = new ScanOverlay(config.scan);
+  scanner.setTargets([
+    {
+      id: 'bow',
+      name: 'Bow',
+      landmarkId: 'fixture',
+      position: new Vector3(0, -100, -80),
+      radius: 150,
+      scanSeconds: 1,
+    },
+    {
+      id: 'remote',
+      name: 'Remote contact',
+      landmarkId: 'fixture',
+      position: new Vector3(0, -100, -300),
+      radius: 150,
+      scanSeconds: 1,
+    },
+  ]);
+  const keys = { scan: 'G', guide: 'J' };
+  const messages = overlay.messages as unknown as TouchElement;
+  const hint = messages.children[0].children[1].children[2];
+  bus.on('scan:complete', () => overlay.showComplete('Bow', true, keys));
+  try {
+    f.controls.setTouchMode(false);
+    scanner.update(1, new Vector3(0, -100, 0), new Vector3(0, 0, -1), true);
+    expect(hint.textContent).toBe('PRESS J · JOURNAL');
+    expect(overlay.bannerActive).toBe(true);
+    scanner.update(0, new Vector3(0, -100, 0), new Vector3(0, 0, -1), false);
+    overlay.update(scanner.view, keys, null, config.scan.completeBannerSeconds);
+    expect(overlay.bannerActive).toBe(false);
+    expect(overlay.cardVisible).toBe(true);
+    expect(hint.textContent).toBe('Logged · Journal');
+    expect(scanner.view.completed).toBe(1);
   } finally {
     overlay.dispose();
     f.controls.dispose();

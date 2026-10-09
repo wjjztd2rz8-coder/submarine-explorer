@@ -86,3 +86,13 @@ is a game placement on the locally carved ledge, not a surveyed gallery coordina
 confidence is low and the Recreation tag is retained. It gives the scenic free-dive
 opening a nearby scan while the mission primaries remain the mapped atoll drop-offs.
 The gallery history and source links already present in `the-hole` are unchanged.
+
+## Eastern gallery scan (F-1100)
+
+`great-blue-hole-stalactites-east` adds a separate optional contact at the
+existing `karst-grotto-east` prop on the south-eastern ledge. It links to
+`the-hole`, retains low confidence and the Recreation tag, and uses a 100 m
+scan radius. This allows a pilot visiting that gallery to scan the local
+reconstruction. Its coordinate and gallery shape remain invented game
+placements; it adds no claim about a surveyed cave location. The mission route
+continues to use its existing west-gallery and atoll contacts.

@@ -22,6 +22,25 @@
       "note": "Game scan contact at the authored karst-grotto prop, on the locally carved ledge. Submerged stalactite galleries are documented at the real Blue Hole, but this marker's coordinate and geometry are not a surveyed gallery location."
     },
     {
+      "id": "great-blue-hole-stalactites-east",
+      "name": "Eastern stalactite gallery",
+      "lat": 17.31443,
+      "lon": -87.53482,
+      "snap_to_seabed": true,
+      "radius_m": 100,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "the-hole",
+      "confidence": "low",
+      "reconstruction": true,
+      "sources": [
+        "https://en.wikipedia.org/wiki/Great_Blue_Hole",
+        "https://www.gpsworld.com/belizes-great-blue-hole-revealed-in-expedition-survey/"
+      ],
+      "note": "Game scan contact at the authored karst-grotto-east prop on the south-eastern ledge. Position and gallery geometry are a reconstruction, not a surveyed gallery location; the documented cave history shares the existing the-hole Journal entry."
+    },
+    {
       "id": "great-blue-hole-outer-dropoff",
       "name": "Eastern atoll drop-off",
       "lat": 17.3153,

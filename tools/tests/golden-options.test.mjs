@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { goldenOptions } from '../golden-options.mjs';
 import bismarckPose from '../bismarck-poses.json' with { type: 'json' };
+import lowTierPoses from '../lowtier-poses.json' with { type: 'json' };
 
 test('nightly defaults remain High desktop and the original hero selection', () => {
   assert.deepEqual(goldenOptions({}), {
@@ -88,5 +89,25 @@ test('all-site hero selection covers the live catalog with valid prop IDs and fa
         goldenOptions({ GOLDEN_SITES: 'all' }),
       ),
     /No golden hero/,
+  );
+});
+
+test('Low follow-up captures frame the pillow field and exposed tuff wall using their authored poses', async () => {
+  const { selectGoldenHeroes } = await import('../golden-options.mjs');
+  assert.deepEqual(
+    selectGoldenHeroes(
+      [],
+      ['kamaehuakanaloa', 'hunga-tonga-caldera'],
+      goldenOptions({ GOLDEN_TIER: 'low', GOLDEN_SITES: 'kamaehuakanaloa,hunga-tonga-caldera' }),
+    ),
+    [
+      ['kamaehuakanaloa', 'hiolo-north-pillows', 'kamaehuakanaloa', lowTierPoses.kamaehuakanaloa],
+      [
+        'hunga-tonga-caldera',
+        'caldera-tuff-wall',
+        'hunga-tonga-caldera',
+        lowTierPoses['hunga-tonga-caldera'],
+      ],
+    ],
   );
 });
