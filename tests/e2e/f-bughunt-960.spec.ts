@@ -92,7 +92,15 @@ for (const layout of [
             await act(
               home.locator('.home-menu').getByRole('button', { name: 'Dive sites', exact: true }),
             );
-            await act(home.locator(`[data-mission="${site}"]`));
+            // The mission button replaces the document. A tap can finish
+            // before navigation commits, while the home game's ready flag is
+            // still true. Wait for the destination before pumping its clock.
+            await Promise.all([
+              page.waitForURL((url) => url.searchParams.get('mission') === site, {
+                waitUntil: 'domcontentloaded',
+              }),
+              act(home.locator(`[data-mission="${site}"]`)),
+            ]);
             await ready(page);
             const briefing = page.locator('.briefing');
             await expect(briefing).toBeVisible();
