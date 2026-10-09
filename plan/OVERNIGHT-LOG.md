@@ -741,3 +741,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** Codex 1090, 1100, 1110, 1120, 1140, 1160 (finished, stalled by the earlier floor; committed and merged, one spec conflict in f-bughunt-960 resolved with 1090's version). Smoke + project-base green on main; no full e2e, no push.
 - **Running:** Codex 1130, 1170, 1180. **Queue:** 1190, 1200, 1210 (verify merged work). No Claude agent launched this run; Claude backlog (pacing, Blue Hole bowl, Challenger) waits for 1170/1180 audits. Hosted CI still unconfirmed; push wave f45 after full e2e. Needs owner: nothing.
+
+## 2026-10-09 17:11 CDT headless run (Claude)
+
+- **Merged:** Codex 1170 (Challenger amphipod/ripple tuning, Endurance fact fixes; fresh visuals unverified), f-mission-pacing (Sonnet; Blue Hole 4.5 km to 270 m, Monterey 14.6 km to 645 m, old-save migration, pacing test), f-bluehole-bowl2 (Sonnet; modest +0.25, shot reviewed, readable). Smoke + project-base green on main after each; no full e2e, no push.
+- **Running:** Codex 1130, 1180. **Queue:** 1190, 1200, 1210, 1220 (remaining pacing gaps). Claude ~75% left, Codex 5h ~15%. Hosted CI for f43 still unconfirmed; push f45 after full e2e. Needs owner: nothing.

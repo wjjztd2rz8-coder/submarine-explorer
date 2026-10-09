@@ -9,8 +9,8 @@ Agreed scores (beautiful): Titanic 3.5-4, Beebe 3-3.5, Blue Hole 2.5-3, Lost Cit
 Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
 
 1. (MERGED 2026-10-09 evening: tools/firstdiscovery-shots.mjs, phone notice and next-target chip fixes; Beebe 173 degree turn not reproduced in guided flow; open: reward card title differs from objective name, desktop tutorial stuck on 'Move and turn') **Unaided first-discovery capture (Sonnet):** extend tools/firstminute-shots.mjs to press Scan, show the reward and the next-step prompt on desktop and phone for Titanic and Beebe; fix whatever confuses (Beebe asks for a 173 degree turn while onboarding teaches vertical movement; Titanic phone 60 s frame loses the wreck).
-2. **Mission pacing (Sonnet):** second required targets at Blue Hole (~4.5 km) and Monterey (~14.6 km) are transit, not exploration; move or add intermediate required POIs so the next target is within ~1 km, keeping facts honest.
-3. **Blue Hole bowl and sonar scale (Sonnet):** shelf line, faceted terraces, capsule sponges; sonar minimap scaled so the hole is legible (palette itself is Codex 1200).
+2. (MERGED 2026-10-09 eve: Blue Hole 270 m, Monterey 645 m; Challenger 4.1 km, Hunga Tonga 3.3 km, Hudson 2.8 km gaps remain, allowlisted in tests/unit/missionPacing.test.ts) **Mission pacing (Sonnet):** second required targets at Blue Hole (~4.5 km) and Monterey (~14.6 km) are transit, not exploration; move or add intermediate required POIs so the next target is within ~1 km, keeping facts honest.
+3. (BOWL PASS 4 MERGED: ragged lip, bluer walls, capsule sponges, ~+0.25; overhangs/sponge density open) **Blue Hole bowl and sonar scale (Sonnet):** shelf line, faceted terraces, capsule sponges; sonar minimap scaled so the hole is legible (palette itself is Codex 1200).
 4. **Challenger seabed legibility (Sonnet):** lander marker is tiny; make the amphipod swarm and slope readable (1170 audits).
 5. **Lost City tower redo (Sonnet):** still blobby clay with plate flanges; flow-stone ridges, orifice, material variation.
 6. **Beebe chimney trunk and sediment (Sonnet):** fluted-cone look; sediment still procedural.
