@@ -98,6 +98,41 @@ function setup(seenHints: HintId[] = ['creature']) {
 }
 
 describe('onboarding completion through the system', () => {
+  it('960: passes the active device to the phone card after switching inputs', () => {
+    const { ctx, system, tick } = setup();
+    try {
+      tick();
+      expect(views.card.show).toHaveBeenLastCalledWith(
+        0,
+        'Hold G to move, then G or G to turn.',
+        'keyboard',
+      );
+      ctx.input.touchActive = true;
+      tick();
+      expect(views.card.show).toHaveBeenLastCalledWith(
+        0,
+        'Push the left stick forward to move, then sideways to turn.',
+        'touch',
+      );
+      window.dispatchEvent(new Event('keydown'));
+      tick();
+      expect(views.card.show).toHaveBeenLastCalledWith(
+        0,
+        'Hold G to move, then G or G to turn.',
+        'keyboard',
+      );
+      ctx.input.gamepadActive = true;
+      tick();
+      expect(views.card.show).toHaveBeenLastCalledWith(
+        0,
+        'Use the left stick: up to move, sideways to turn.',
+        'gamepad',
+      );
+    } finally {
+      system.dispose?.();
+    }
+  });
+
   it('880: a mission restart resets deferred animal guidance without consuming its saved hint', () => {
     const { ctx, system, onboard, data } = setup([]);
     const draw = (dt: number, frozen = false) =>
