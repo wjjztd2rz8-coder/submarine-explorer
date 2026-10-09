@@ -61,8 +61,13 @@ export function lostCityFlange(o: {
     const scallop = fbm3(Math.cos(a) * 2.2 + 9, 5, Math.sin(a) * 2.2 + 9, o.seed, 2) - 0.5;
     const grain = fbm3(Math.cos(a) * 9 + 3, 2, Math.sin(a) * 9 + 3, o.seed ^ 820, 2) - 0.5;
     const k = (1 + (scallop * 0.28 + grain * 0.045) * out) * (1 - (1 - end) * out * 0.9);
-    const yy = y - out * out * w * 0.1 - (scallop * 0.3 + grain * th * 0.25) * out;
-    p.setXYZ(i, x * k, yy * (0.25 + 0.75 * end), z * k);
+    // Wedge the shelf toward its edge: the slab thins to a feathered, drooping, notched margin
+    // rather than a flat saucer rim.
+    const wedge = 1 - 0.78 * out * out;
+    const notch = fbm3(Math.cos(a) * 7 + 5, 9, Math.sin(a) * 7 + 5, o.seed ^ 77, 2) - 0.5;
+    const kk = k * (1 - smooth(0.2, 0.5, notch) * out * out * 0.22);
+    const yy = y * wedge - out * out * w * 0.16 - (scallop * 0.3 + grain * th * 0.25) * out;
+    p.setXYZ(i, x * kk, yy * (0.25 + 0.75 * end), z * kk);
   }
   geometry.deleteAttribute('uv');
   geometry.computeVertexNormals();

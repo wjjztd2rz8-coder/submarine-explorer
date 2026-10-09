@@ -42,8 +42,53 @@ const LIVE = new THREE.Color(0xe9e7de); // fresh white carbonate and brucite, fa
 const STAIN = new THREE.Color(0x6c685a);
 const CREAM = new THREE.Color(0xf0e2c4); // warm cream carbonate crust
 const GREYBLUE = new THREE.Color(0x7d8a92); // cooler, older grey-blue carbonate
+const BIOFILM = new THREE.Color(0x6f9a90); // faint blue-green microbial film in damp recesses
 const VENT = new THREE.Color(0x14120f); // the dark vent mouth
 const SEABED = new THREE.Color(0xc2a468); // what the apron fades into: the Lost City sediment
+
+/**
+ * Breaks the lathe-smooth trunk in place (local column frame, y up from the base):
+ * noise-varied radius, vertical ridges, notched and broken ledges, and a pocket
+ * where the side orifice sits. Vertex count is unchanged.
+ */
+function roughenTrunk(g: THREE.BufferGeometry, s: SpireOpts, seed: number, pocket: boolean): void {
+  const p = g.getAttribute('position');
+  const orA = 0.9;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i),
+      y = p.getY(i),
+      z = p.getZ(i);
+    const t = y / s.h;
+    const rad = Math.hypot(x, z);
+    if (rad < 1e-4) continue;
+    const a = Math.atan2(z, x);
+    const ca = Math.cos(a),
+      sa = Math.sin(a);
+    // Fade out at the base (buried) and at the crater rim so the mouth keeps its shape.
+    const w = smooth(0.0, 0.08, t) * (1 - smooth(0.9, 0.99, t));
+    const big = fbm3(ca * 1.6 + 4, y * 0.07, sa * 1.6 + 4, seed ^ 0x2a1, 3) - 0.5;
+    const mid = fbm3(ca * 4.5 + 1, y * 0.25, sa * 4.5 + 1, seed ^ 0x2a2, 2) - 0.5;
+    // Ridges that wander and pinch out along the height.
+    const ridgePhase = a * 7 + big * 5 + y * 0.05;
+    const ridge = Math.pow(0.5 + 0.5 * Math.sin(ridgePhase), 2) * smooth(0.3, 0.6, mid + 0.5 + big);
+    // Ledges: stepped horizontal bands, broken by noise so they stop and start.
+    const band = y / Math.max(2.5, s.h / 9) + big * 1.5;
+    const frac = band - Math.floor(band);
+    const broken = smooth(0.35, 0.6, mid + 0.5 + Math.sin(a * 3 + Math.floor(band)) * 0.2);
+    const ledge = smooth(0.7, 0.96, frac) * (1 - smooth(0.96, 1, frac)) * broken;
+    const undercut = smooth(0.0, 0.25, frac) * (1 - smooth(0.25, 0.5, frac)) * broken;
+    let k = 1 + big * 0.6 + mid * 0.3 + ridge * 0.1 + ledge * 0.11 - undercut * 0.09;
+    // Orifice pocket.
+    const da = Math.atan2(Math.sin(a - orA), Math.cos(a - orA)) * rad;
+    const dy = y - 0.8 * s.h;
+    const orr = Math.max(0.6, rad * 0.3);
+    const od = Math.hypot(da, dy) / orr;
+    if (pocket) k -= (1 - smooth(0.3, 1.1, od)) * 0.25;
+    k = 1 + (k - 1) * w;
+    p.setXYZ(i, x * k, y, z * k);
+  }
+  g.computeVertexNormals();
+}
 
 export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltProp {
   const { dims, seed, tier } = input;
@@ -155,6 +200,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   for (const [i, s] of spires.entries()) {
     // Keep each column local until its side growths have been seated.
     const column = tieredSpire(s);
+    roughenTrunk(column, s, seed + i * 31, i === 0 && !lone);
     columns.push(column);
     pieces.push(column);
     tips.push({ x: s.x, y: s.y + s.h, z: s.z });
@@ -244,6 +290,28 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     r: s.r0 * s.topFrac * (1 + (s.lip ?? 0)),
     depth: s.crater ? s.crater * s.r0 * s.topFrac * 2.4 : 0,
   }));
+  // A dark side orifice high on the main trunk, in the prop frame.
+  const sm = spires[0]!;
+  const orT = 0.8;
+  const orA = 0.9;
+  const orR = spireRadius(sm, orT);
+  const orifice = new THREE.Vector3(
+    Math.cos(orA) * orR,
+    orT * sm.h,
+    Math.sin(orA) * orR,
+  ).applyMatrix4(
+    xformMatrix(
+      {
+        x: sm.x,
+        y: sm.y,
+        z: sm.z,
+        rx: Math.sin(sm.leanA) * sm.lean,
+        rz: Math.cos(sm.leanA) * sm.lean,
+      },
+      new THREE.Matrix4(),
+    ),
+  );
+  const orifaceR = Math.max(0.6, orR * 0.3);
   const geom = mergeAll(pieces);
   paint(geom, (x, y, z, ny, out) => {
     const n1 = fbm3(x * 0.16, y * 0.1, z * 0.16, seed ^ 0x77, 4);
@@ -285,6 +353,21 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const dd = Math.hypot(x - v.p.x, z - v.p.z) / v.r;
       const mouth = 1 - smooth(0.2, 1.05, dd);
       out.lerp(VENT, mouth * smooth(-v.depth - 1.2, -0.3, dy) * 0.92);
+    }
+    // Faint blue-green biofilm: damp, sheltered lower walls and under ledges.
+    const film = fbm3(x * 0.22, y * 0.12, z * 0.22, seed ^ 0xb10, 3);
+    out.lerp(BIOFILM, smooth(0.48, 0.6, film) * 0.4 * wall * (1 - up * 0.6));
+    // Side orifice: a dark, ragged-edged mouth with a stained rim and drip streak below.
+    {
+      const od = Math.hypot(x - orifice.x, y - orifice.y, z - orifice.z) / orifaceR;
+      const ragged = od + (n2 - 0.5) * 0.35;
+      if (ragged < 1.8) {
+        out.lerp(STAIN, (1 - smooth(1, 1.8, ragged)) * 0.5);
+        out.lerp(VENT, (1 - smooth(0.45, 1, ragged)) * 0.95);
+      }
+      const below = (orifice.y - y) / (orifaceR * 4);
+      if (below > 0 && below < 1 && Math.hypot(x - orifice.x, z - orifice.z) < orifaceR * 0.8)
+        out.multiplyScalar(1 - 0.3 * (1 - below));
     }
     if (ny > 0.8) out.multiplyScalar(0.9); // silt dusting on shelves
   });
