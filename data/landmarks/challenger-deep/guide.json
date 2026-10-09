@@ -167,8 +167,8 @@
           "value": "11 22.11' N, 142 25.86' E, 10,897 m, 185 amphipods in 2.5 h"
         },
         {
-          "label": "Deepest fish filmed anywhere",
-          "value": "~8,075 m (Mariana snailfish) — well above the trench floor"
+          "label": "Deepest fish filmed (2023 publication)",
+          "value": "8,336 m (snailfish, Izu-Ogasawara Trench) — well above Challenger Deep's floor"
         },
         {
           "label": "Xenophyophore depth record",
@@ -199,7 +199,7 @@
         },
         {
           "title": "Jamieson et al. 2023 — fish filmed at 8,336 m",
-          "url": "https://www.sciencedirect.com/science/article/pii/S0967063723001711"
+          "url": "https://research-repository.uwa.edu.au/en/publications/new-maximum-depth-record-for-bony-fish-teleostei-scorpaeniformes-/"
         }
       ],
       "confidence": "high"

@@ -183,6 +183,9 @@ export const BIOMES: Record<string, Biome> = {
     colorB: 0x3f3d38,
     colorC: 0x33322f,
     stainAmount: 0.05,
+    // Quiet, metre-scale surface cues on soft mud; no change to bathymetry.
+    ripple: 0.2,
+    rippleLenM: 0.8,
     burrow: 0.6,
     scatter: [
       { kind: 'dropstone', density: 1.4, slopeMaxDeg: 20, on: 'flat' },
@@ -199,6 +202,8 @@ export const BIOMES: Record<string, Biome> = {
     stainAmount: 0.03,
     burrow: 0.9,
     ripple: 0.15,
+    // Separate the sparse crests from the fine silt texture in the approach view.
+    rippleLenM: 1.2,
     rockBias: -0.1,
     scatter: [
       { kind: 'dropstone', density: 0.3, slopeMaxDeg: 20, on: 'any' },

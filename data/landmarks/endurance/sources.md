@@ -1,5 +1,11 @@
 # Endurance site content: sources and notes (package C4)
 
+## 1170 factual audit — 2026-10-09
+
+The protection paragraph and fact labels were stale. [Antarctic Treaty Measure 18 (2022)](https://www.ats.aq/devAS/Meetings/Measure/768) established the 500 m extent; [Measure 18 (2024)](https://www.ats.aq/devAS/Meetings/Measure/830?lang=e), effective 28 October 2024, expanded the associated-artefact extent to 1,500 m. The guide now dates both radii and no longer calls the latter merely proposed. UKAHT's page still contains proposal wording, so the effective Treaty measure takes precedence.
+
+[Endurance22's 9 March 2022 expedition account](https://endurance22.org/expedition-blog/9-march-2022) places the Polaris star below the ship's name, correcting the guide's reversed relationship. Removed the implication of continuous searching for 107 years. The [April 2024 Conservation Management Plan](https://www.enduranceshipwreck.org/s/CMP_Endurance_amends_April24-4.pdf), §2.2, supports a flat soft-mud seabed, pockmarks, small mounds and occasional dropstones, and describes approximate N–S wreck orientation and an E–W debris field. Replaced the categorical claim that no dedicated multibeam survey exists with a statement about the coarse grid actually used by this tile. No prop heading, coordinates, hull, rigging or seabed geometry were changed.
+
 ## Phase F tone review — 2026-10-01
 
 Retain the upright, intact 44 m timber hull and documented 3,008 m discovery depth. Remove the catalog’s low-oxygen preservation claim: [Endurance22’s discovery account](https://endurance22.org/endurance-is-found) supports excellent preservation and absence of destructive shipworms, not oxygen depletion. The abundant filter-feeding fauna also makes a low-oxygen explanation inappropriate. Replace generic-block prose with the current preserved-ship description and shorten memorial text to observation and non-disturbance at this wreck, without a stale game-wide ban on sampling.
