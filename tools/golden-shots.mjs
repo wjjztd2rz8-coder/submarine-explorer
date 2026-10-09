@@ -21,12 +21,15 @@
  * GOLDEN_MODE=mission loads each default mission; capture filenames end in -mission.png.
  * Without GOLDEN_MODE, captures still use free dive.
  * GOLDEN_LAYOUTS=desktop,portrait captures 1600×900 and 390×844 at the same authored poses.
+ * GOLDEN_TIER=low selects Low (default high); GOLDEN_LAYOUTS=portrait,landscape adds 844×390.
+ * GOLDEN_SITES=all includes all 13 catalog sites plus the east Blue Hole gallery.
  * Monterey uses tools/monterey-poses.json, rather than geometry-dependent wall-life patch selection.
  * Chromium uses SwiftShader so the tool also works without a physical GPU.
  */
 import { chromium } from '@playwright/test';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { goldenOptions, selectGoldenHeroes } from './golden-options.mjs';
 import blueHolePoses from './blue-hole-poses.json' with { type: 'json' };
 import montereyPoses from './monterey-poses.json' with { type: 'json' };
 
@@ -34,7 +37,7 @@ async function main() {
   const args = process.argv.slice(2);
   if (args.includes('--help') || args.includes('-h')) {
     console.log(
-      'Usage: node tools/golden-shots.mjs [base-url | --base-url URL] (default http://localhost:4173/)',
+      'Usage: node tools/golden-shots.mjs [base-url | --base-url URL] (default http://localhost:4173/)\nEnv: GOLDEN_TIER=low|medium|high|ultra, GOLDEN_LAYOUTS=desktop,portrait,landscape, GOLDEN_SITES=all|site,..., GOLDEN_MODE=free-dive|mission',
     );
     return;
   }
@@ -52,17 +55,10 @@ async function main() {
   if (!['free-dive', 'mission'].includes(mode)) throw new Error(`Unknown GOLDEN_MODE: ${mode}`);
   const stamp = new Date().toISOString().slice(0, 19).replace('T', '-').replaceAll(':', '');
   const output = resolve('.cache/golden', stamp);
-  const layouts = (process.env.GOLDEN_LAYOUTS ?? 'desktop').split(',').map((name) => {
-    if (name === 'desktop') return { name, width: 1600, height: 900 };
-    if (name === 'portrait') return { name, width: 390, height: 844 };
-    throw new Error(`Unknown GOLDEN_LAYOUTS: ${name}`);
-  });
+  const options = goldenOptions();
+  const { tier, layouts } = options;
   const closeOverride = process.env.GOLDEN_CLOSE ? JSON.parse(process.env.GOLDEN_CLOSE) : null; // dev: retune the west alcove close pose
-  const only = process.env.GOLDEN_SITES?.split(',').map(
-    (site) =>
-      ({ 'blue-hole': 'great-blue-hole', monterey: 'monterey-canyon' })[site.trim()] ?? site.trim(),
-  );
-  const heroes = [
+  const defaultHeroes = [
     ['titanic', 'bow-hull'],
     ['lost-city', 'poseidon-tower'],
     // The west alcove, framed from the hole's interior on its ledge (the hole centre lies due east).
@@ -82,12 +78,11 @@ async function main() {
     ['monterey-canyon', 'canyon-wall-ledge', 'monterey-canyon', montereyPoses.wall],
     ['challenger-deep', 'leggo-lander-marker'],
     ['endurance', 'main-hull'],
-  ].filter(([site, , slug]) => !only || only.includes(site) || only.includes(slug));
-  if (
-    !heroes.length ||
-    only?.some((site) => !heroes.some(([id, , slug]) => id === site || slug === site))
-  )
-    throw new Error(`Unknown or empty GOLDEN_SITES: ${process.env.GOLDEN_SITES}`);
+  ];
+  const catalog = JSON.parse(
+    await readFile(new URL('../data/landmarks/index.json', import.meta.url), 'utf8'),
+  );
+  const heroes = selectGoldenHeroes(defaultHeroes, catalog.landmarks, options);
   await mkdir(output, { recursive: true });
   const captures = [];
   const failures = [];
@@ -111,13 +106,20 @@ async function main() {
     }
   }
   async function settle(page) {
-    await bounded(
+    return await bounded(
       'settle rendered frames',
       page.evaluate(
         () =>
           new Promise((done) => {
-            let frames = 0;
-            const next = () => (++frames >= 8 ? done() : requestAnimationFrame(next));
+            const times = [];
+            let last;
+            const next = (now) => {
+              if (last !== undefined) times.push(now - last);
+              last = now;
+              if (times.length < 7) return requestAnimationFrame(next);
+              const sorted = [...times].sort((a, b) => a - b);
+              done({ medianMs: sorted[3], maxMs: sorted[6], samples: times });
+            };
             requestAnimationFrame(next);
           }),
       ),
@@ -135,6 +137,7 @@ async function main() {
       stage = `${site}: create context`;
       const context = await browser.newContext({
         viewport: { width, height },
+        hasTouch: layout !== 'desktop',
         deviceScaleFactor: 1,
         serviceWorkers: 'block',
       });
@@ -210,11 +213,12 @@ async function main() {
           tile: siteId,
           ...(mode === 'mission' ? { mission: siteId } : {}),
           tutorial: '0',
-          tier: 'high',
+          tier,
           lifeSeed: '42',
           dynres: '0',
-          ...(layout === 'portrait' ? { touch: '1' } : {}),
+          ...(layout !== 'desktop' ? { touch: '1' } : {}),
         }).toString();
+        const loadStarted = Date.now();
         const loaded = await page.goto(url.href, {
           waitUntil: 'domcontentloaded',
           timeout: 120_000,
@@ -231,6 +235,7 @@ async function main() {
         );
         await settle(page);
         await evaluate(() => window.__game.terrain.texturesReady);
+        const loadMs = Date.now() - loadStarted;
         await evaluate(() => {
           // Freeze translation, pitch and ballast; keep normal lighting/render updates.
           window.__game.sub.step = () => {};
@@ -244,9 +249,9 @@ async function main() {
         const capture = async (n, range) => {
           stage = `${site}: capture ${n}`;
           console.log(stage);
-          await settle(page);
+          const frameTimes = await settle(page);
           if (errors.length) throw new Error(`${site}: ${errors.join('; ')}`);
-          const filename = `${site}${layout === 'desktop' ? '' : '-portrait'}-${n}${mode === 'mission' ? '-mission' : ''}.png`;
+          const filename = `${site}${layout === 'desktop' ? '' : `-${layout}`}-${n}${mode === 'mission' ? '-mission' : ''}.png`;
           const pose = await evaluate(() => {
             const g = window.__game;
             return {
@@ -262,10 +267,40 @@ async function main() {
               drawCalls: g.perf.drawCalls,
               triangles: g.perf.triangles,
               terrain: { ...g.terrain.stats },
+              heroGeometry: g.props.placed
+                .filter((p) => p.def.feature)
+                .map((p) => {
+                  const meshes = [];
+                  p.root.traverse((o) => {
+                    if (o.isMesh)
+                      meshes.push({
+                        name: o.name,
+                        vertices: o.geometry?.attributes.position?.count ?? 0,
+                        instances: o.count ?? 1,
+                      });
+                  });
+                  return { id: p.def.id, meshes };
+                }),
+              hud: [
+                '.hud-readouts',
+                '.hud-attribution',
+                '.scan-panel',
+                '.sonar',
+                '.tc-stick',
+                '.tc-slider',
+                '.tc-buttons',
+                '.tc-btn-pause',
+                '.objectives-panel',
+              ].flatMap((selector) => {
+                const el = document.querySelector(selector);
+                if (!el || !el.checkVisibility()) return [];
+                const { x, y, width, height } = el.getBoundingClientRect();
+                return [{ selector, x, y, width, height }];
+              }),
             };
           });
-          if (pose.tier !== 'high')
-            throw new Error(`${site}: expected high tier, got ${pose.tier}`);
+          if (pose.tier !== tier)
+            throw new Error(`${site}: expected ${tier} tier, got ${pose.tier}`);
           if (pose.failedProps)
             throw new Error(`${site}: ${pose.failedProps} props failed to load`);
           await bounded(
@@ -326,6 +361,8 @@ async function main() {
             captureMethod,
             layout,
             viewport: [width, height],
+            loadMs,
+            frameTimes,
             ...pose,
           });
           console.log(`${filename} (${pose.hull}, ${pose.tier})`);
@@ -497,7 +534,7 @@ async function main() {
           await capture(n, range);
         }
       } catch (error) {
-        failures.push({ site, stage, message: error.message });
+        failures.push({ site, layout, stage, message: error.message });
         console.error(`${stage}: ${error.message.split('\n')[0]}`);
       } finally {
         await bounded('close site context', context.close(), 10_000).catch((error) => {
@@ -521,6 +558,7 @@ async function main() {
           base: base.href,
           stamp,
           mode,
+          tier,
           layouts,
           plannedHeroes: heroes,
           complete: failures.length === 0,
@@ -537,7 +575,7 @@ async function main() {
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Golden shots ${stamp}</title><style>
 body{margin:24px;background:#081522;color:#e6f0f7;font:16px system-ui}main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}figure{margin:0}img{width:100%;height:auto}a{color:inherit}figcaption{padding:8px 0}@media(max-width:800px){main{grid-template-columns:1fr}}
-</style><h1>Golden shots · ${stamp} UTC</h1><p>${failures.length ? `INCOMPLETE: ${failures.length} failure(s). ` : ''}High tier · ${layouts.map((l) => `${l.name} ${l.width} × ${l.height}`).join(', ')} · ${mode} · fresh Arcade profile, life seed 42, dynamic resolution off. 1: spawn; 2–3: approach and detail (ranges below). <a href="poses.json">Pose manifest and failures</a></p>
+</style><h1>Golden shots · ${stamp} UTC</h1><p>${failures.length ? `INCOMPLETE: ${failures.length} failure(s). ` : ''}${tier[0].toUpperCase() + tier.slice(1)} tier · ${layouts.map((l) => `${l.name} ${l.width} × ${l.height}`).join(', ')} · ${mode} · fresh Arcade profile, life seed 42, dynamic resolution off. 1: spawn; 2–3: approach and detail (ranges below). <a href="poses.json">Pose manifest and failures</a></p>
 <main>${captures.map(({ filename, site, range }) => `<figure><a href="${filename}"><img loading="lazy" src="${filename}" alt="${site}, ${range === null ? 'default spawn' : `${range} m approach`}"></a><figcaption>${filename}</figcaption></figure>`).join('\n')}</main></html>`,
     );
     console.log(`Contact sheet: ${resolve(output, 'index.html')}`);
