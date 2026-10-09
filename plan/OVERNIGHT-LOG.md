@@ -696,3 +696,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** f-monterey-strata (Sonnet): varied bed thickness, hardness-driven ledges/overhangs, per-bed muted albedo on the Monterey wall (displacement and vertex colour only, no extra draw calls). Reviewed after-shot: clear gain, fine laminae still somewhat regular. Smoke + project-base green in worktree and on main; no push (not a release wave).
 - **Queue:** 1090, 1100, 1110, 1120 (Codex 5h was 4% at start; dispatcher launches after reset). Next Claude: first-minute playthrough check, Beebe pale scatter rocks, hosted CI after 1120. Needs owner: nothing.
+
+## 2026-10-09 09:42 CDT headless run (Claude)
+
+- **Merged:** f-firstminute (Sonnet): Home -> site -> 60 s -> Journal -> debrief checked on desktop and phone for Titanic and Beebe; flow works, HUD uncluttered. Fixed raw slug in briefing eyebrow; added tools/firstminute-shots.mjs. Smoke + project-base green on main; no push.
+- **Open findings:** 0-scan debrief primary is "Dive sites" (queued 1150), phone tutorial bar overlaps sub base, target bracket crosses its label.
+- **Codex:** 1090, 1100, 1110 just launched. **Queue:** 1120 (CI triage), 1130 (Beebe pale rocks), 1140 (bug hunt f44), 1150. Hosted CI for f43 still red. Needs owner: nothing.
