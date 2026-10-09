@@ -1,3 +1,4 @@
+import type { WebGLRenderer } from 'three';
 import { openJournalCategory } from './helpers/journal.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
@@ -14,6 +15,7 @@ const journalSites = '.jr-nav-list > li > .jr-nav-item.is-site';
 
 interface Game {
   config: GameConfig;
+  renderer: WebGLRenderer;
   sub: Submarine;
   terrain: Terrain;
   discovery: Discovery;
@@ -118,6 +120,15 @@ for (const viewport of [
             };
           });
           expect(start.first).toBe(objective);
+          // Preserve the real scan/vehicle frame path and every safety check;
+          // reduce only raster fill work during the held-input interval.
+          const pixelRatio = await page.evaluate(() => {
+            const g = window.__game as unknown as Game;
+            const ratio = g.renderer.getPixelRatio();
+            g.renderer.setPixelRatio(ratio * 0.25);
+            window.dispatchEvent(new Event('resize'));
+            return ratio;
+          });
           await page.keyboard.down('g');
           let seconds = 0;
           let complete = false;
@@ -142,6 +153,10 @@ for (const viewport of [
             }
           } finally {
             await page.keyboard.up('g');
+            await page.evaluate((ratio) => {
+              (window.__game as unknown as Game).renderer.setPixelRatio(ratio);
+              window.dispatchEvent(new Event('resize'));
+            }, pixelRatio);
           }
           expect(complete, 'scan completes in at most two minutes of game frames').toBe(true);
           const end = await page.evaluate(() =>
@@ -153,6 +168,7 @@ for (const viewport of [
             body: JSON.stringify({ site, tier, viewport, seconds, transit, minimumClearance, poi }),
             contentType: 'application/json',
           });
+          await page.clock.fastForward(34);
           await page.screenshot({ path: info.outputPath('first-scan.png') });
 
           await page.keyboard.press('j');
@@ -196,18 +212,72 @@ for (const viewport of [
           );
           expect(count).toBeGreaterThanOrEqual(expectedCount);
           await page.screenshot({ path: info.outputPath('opening.png') });
-          let minimumClearance = Infinity;
-          for (let frame = 0; frame < 600; frame++) {
-            await page.clock.fastForward(100);
-            const state = await page.evaluate(() => {
-              const g = window.__game as unknown as Game;
-              return {
+          // Keep all 600 real 100 ms frames and their safety samples. Only
+          // intermediate raster resolution is reduced; full resolution is
+          // restored before the final frame/screenshot. The camera, viewport,
+          // tier, simulation, geometry and post-processing remain active.
+          interface Sample {
+            elapsedMs: number;
+            clearance: number;
+            floor: number;
+            breached: boolean;
+          }
+          interface Probe {
+            samples: Sample[];
+            request: number;
+            pixelRatio: number;
+          }
+          await page.evaluate(() => {
+            const g = window.__game as unknown as Game;
+            const startMs = performance.now();
+            const probe: Probe = {
+              samples: [],
+              request: 0,
+              pixelRatio: g.renderer.getPixelRatio(),
+            };
+            (window as unknown as { minuteProbe: Probe }).minuteProbe = probe;
+            g.renderer.setPixelRatio(probe.pixelRatio * 0.25);
+            window.dispatchEvent(new Event('resize'));
+            const sample = (): void => {
+              probe.samples.push({
+                elapsedMs: performance.now() - startMs,
                 clearance:
                   g.sub.position.y - g.terrain.sampleHeight(g.sub.position.x, g.sub.position.z),
                 floor: g.config.submarine.hullRadius + g.config.submarine.seabedClearance,
                 breached: g.sub.hullBreached,
-              };
+              });
+              probe.request = requestAnimationFrame(sample);
+            };
+            // The game registered its next frame first, so each sample reads
+            // the completed simulation/render, without an extra browser call.
+            probe.request = requestAnimationFrame(sample);
+          });
+          let samples: Sample[];
+          try {
+            for (let frame = 0; frame < 600; frame++) {
+              if (frame === 599)
+                await page.evaluate(() => {
+                  const g = window.__game as unknown as Game;
+                  const probe = (window as unknown as { minuteProbe: Probe }).minuteProbe;
+                  g.renderer.setPixelRatio(probe.pixelRatio);
+                  window.dispatchEvent(new Event('resize'));
+                });
+              await page.clock.fastForward(100);
+            }
+          } finally {
+            samples = await page.evaluate(() => {
+              const g = window.__game as unknown as Game;
+              const probe = (window as unknown as { minuteProbe: Probe }).minuteProbe;
+              cancelAnimationFrame(probe.request);
+              g.renderer.setPixelRatio(probe.pixelRatio);
+              window.dispatchEvent(new Event('resize'));
+              return probe.samples;
             });
+          }
+          expect(samples).toHaveLength(600);
+          let minimumClearance = Infinity;
+          for (const [index, state] of samples.entries()) {
+            expect(state.elapsedMs).toBe((index + 1) * 100);
             minimumClearance = Math.min(minimumClearance, state.clearance);
             expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 1e-6);
             expect(state.breached).toBe(false);

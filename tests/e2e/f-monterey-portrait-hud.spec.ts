@@ -93,6 +93,8 @@ test('free dive: portrait HUD panels do not overlap, credits open or closed', as
   await expectClearLayout(page, false);
   await page.locator('.hud-attribution summary').tap();
   await expect(page.locator('.hud-attribution-panel')).toBeVisible();
+  // Visibility changes before the queued details toggle places the panel.
+  await expect(page.locator('.hud-attribution summary')).toHaveAttribute('aria-expanded', 'true');
   await expectClearLayout(page, true);
 });
 
@@ -105,5 +107,6 @@ test('mission with tutorial: card, objectives, scan and readouts stay separate',
   await expectClearLayout(page, false);
   await page.locator('.hud-attribution summary').tap();
   await expect(page.locator('.hud-attribution-panel')).toBeVisible();
+  await expect(page.locator('.hud-attribution summary')).toHaveAttribute('aria-expanded', 'true');
   await expectClearLayout(page, true);
 });

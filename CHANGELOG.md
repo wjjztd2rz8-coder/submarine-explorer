@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-ci-triage:** retain all 600 first-minute simulation/render frames and safety assertions at every site/tier/viewport, but cut intermediate drawing-buffer resolution to 25% during the soak because hosted software GL exhausts the 300 s budget. Opening, end-of-minute and Journal screenshots still use full tier resolution. Apply the same temporary resolution reduction during real held-input scan journeys; every original per-frame clearance, two-minute completion, <30 m transit, Journal and debrief assertion remains. Split Lost City Medium desktop Poseidon tower 2/3 by vertical drift; all three drifts and eight warm-up/eight measured frames remain. Wait for the requested mission document before advancing the clock in the 960 navigation matrix, and for the credits toggle handler before measuring Monterey portrait HUD overlap. Retry Chromium installation once within its existing five-minute step budget.
+
 - **f-firstminute:** the mission briefing eyebrow no longer shows the raw site slug (`BEEBE-VENT-FIELD`, `LOST-CITY`, `MONTEREY-CANYON`); hyphens render as spaces. Added `tools/firstminute-shots.mjs`, a Home to debrief first-minute screenshot walkthrough (desktop 1280x720 and phone 390x844). No gameplay or layout change.
 
 - **F-MONTEREY-STRATA:** the Monterey canyon wall no longer reads as even corrugated stripes. Bed thickness is skewed (many thin beds, a few massive ones), ledge depth and overhang follow per-bed hardness and vary along the wall, slump scars are deeper, and each bed has its own muted albedo (olive, tan, grey, dark olive, buff). Vertex-colour and displacement only: no draw-call, triangle or tier change.
