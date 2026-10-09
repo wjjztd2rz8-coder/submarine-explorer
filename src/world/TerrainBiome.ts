@@ -199,18 +199,22 @@ export const BIOMES: Record<string, Biome> = {
   // Pale diatom ooze; almost nothing else. Sparse tracks and pits.
   'challenger-deep': {
     ...ABYSSAL,
-    colorA: 0x4d4b44,
-    colorB: 0x424038,
-    colorC: 0x3a3934,
-    stainAmount: 0.03,
+    // Lighter olive-grey ooze with warm and cool patches, so the floor reads under the lamps and in the approach.
+    colorA: 0x6a6758,
+    colorB: 0x58594f,
+    colorC: 0x4c4a41,
+    stain: 0x7a6548,
+    stainAmount: 0.14,
+    patch: 0.45,
     burrow: 0.9,
-    ripple: 0.15,
-    // Separate the sparse crests from the fine silt texture in the approach view.
-    rippleLenM: 1.2,
+    ripple: 0.3,
+    // Separate the crests from the fine silt texture in the approach view.
+    rippleLenM: 1.6,
+    rippleDir: 0.5,
     rockBias: -0.1,
     scatter: [
-      { kind: 'dropstone', density: 0.3, slopeMaxDeg: 20, on: 'any' },
-      { kind: 'mound', density: 4, slopeMaxDeg: 12, on: 'flat' },
+      { kind: 'dropstone', density: 0.4, slopeMaxDeg: 20, on: 'any' },
+      { kind: 'mound', density: 7, slopeMaxDeg: 12, on: 'flat' },
     ],
   },
   // Serpentinite and white carbonate, thin sediment.

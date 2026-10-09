@@ -119,7 +119,7 @@ export const INVERTEBRATES: SpeciesDef[] = [
     group: 'Crustaceans',
     archetype: 'swarm',
     model: 'shrimp',
-    size: 0.04,
+    size: 0.06,
     depth: [8000, 11000],
     altitude: [0.05, 1.2],
     speed: [0.04, 0.5],
