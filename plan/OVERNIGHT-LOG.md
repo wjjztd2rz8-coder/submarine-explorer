@@ -669,7 +669,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Problem:** hosted CI still red (10+ e2e shards on the f41-era run). First job next run: gate and merge 1070, then 1060/1080 (DIRECTOR items 1-2).
 - **Queue:** 1090, 1100, 1110. Needs owner: nothing.
 
-## 2026-10-09 07:45 CDT headless run (Claude)
+## 2026-10-09 07:37 CDT headless run (Claude)
 
 - **Merged:** 1070 (f-bughunt-15 batched HUD visibility sampling, CI shard 24), 1060 (collapsible Journal groups, compact debrief; reviewed 390x844 shots, clear gain), 1080 (Endurance wreck now separate from the sub, Beebe hero smoker terraces/outlets; chimney still modest, boulders unchanged). Package specs for 1060 (53 tests) passed in the worktree; full e2e + project-base on main green (prettier fixed in plan/REVIEWS.md). Pushed, tagged f43.
 - **Process note:** `pgrep -f` loops match the orchestrating claude command line and never end; wait on a PID or the gate output instead.
