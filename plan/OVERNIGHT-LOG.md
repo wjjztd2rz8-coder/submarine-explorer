@@ -674,3 +674,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** 1070 (f-bughunt-15 batched HUD visibility sampling, CI shard 24), 1060 (collapsible Journal groups, compact debrief; reviewed 390x844 shots, clear gain), 1080 (Endurance wreck now separate from the sub, Beebe hero smoker terraces/outlets; chimney still modest, boulders unchanged). Package specs for 1060 (53 tests) passed in the worktree; full e2e + project-base on main green (prettier fixed in plan/REVIEWS.md). Pushed, tagged f43.
 - **Process note:** `pgrep -f` loops match the orchestrating claude command line and never end; wait on a PID or the gate output instead.
 - **Running (Codex):** none (5h at 5% until 09:00); queue 1090, 1100, 1110. Next Claude: Blue Hole bowl atmosphere, Lost City tower trunk, Beebe boulders, first-minute playthrough, check hosted CI for f43. No agents launched this run (Claude 82%). Needs owner: nothing.
+
+## 2026-10-09 08:08 CDT headless run (Claude)
+
+- **Merged:** f-bluehole-atmos (Sonnet): Blue Hole bowl depth-graded warm rim to teal bottom, softened first riser, thicker/leaning pendants (vertex colour only, no new draw calls). Reviewed poses 2/3: less beige, modest gain; apron leans grey-green, pendants slightly flat cream. Gates (smoke e2e + project-base) green on main; snapshot regenerated for Blue Hole colour hashes. No push (no new wave).
+- **CI:** f43 Pages deploy succeeded; hosted CI run was still in progress at 08:00.
+- **Queue (Codex 5h resets 09:00):** 1090, 1100, 1110. Next Claude: Lost City tower trunk, Beebe boulders, first-minute playthrough, check hosted CI for f43. Needs owner: nothing.
