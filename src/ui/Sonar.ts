@@ -484,7 +484,10 @@ export class Sonar {
       for (let px = 0; px < w; px++) {
         const index = py * w + px;
         const height = heights[index] as number;
-        const [r, g, b] = paletteColor(this.palette.stops, rampT((height - low) / span, shallowSite));
+        const [r, g, b] = paletteColor(
+          this.palette.stops,
+          rampT((height - low) / span, shallowSite),
+        );
         // Measured X/Z slopes in m/m, lit from the north-west. A gain makes
         // gentle local walls legible without fabricating depth variation.
         const left = heights[py * w + Math.max(0, px - 1)] as number;
