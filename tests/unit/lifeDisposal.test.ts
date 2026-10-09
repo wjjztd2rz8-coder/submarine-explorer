@@ -31,16 +31,16 @@ const sub: SubInfo = {
   lightsOn: true,
   hullR: 6,
 };
-function setup() {
+function setup(site = 'site', params = new URLSearchParams()) {
   const config = makeConfig();
   const bus = new EventBus();
   const on = vi.spyOn(bus, 'on');
   const scanner = new Scanner(config.scan, bus, new DiscoveryStore(null));
   const ctx = {
-    params: new URLSearchParams(),
+    params,
     scene: new Scene(),
     tier: 'low',
-    contentLandmark: 'site',
+    contentLandmark: site,
     terrain: { sampleHeight: () => -200 },
     currents: { sample: (_x: number, _z: number, out: Vector3) => out.set(0, 0, 0) },
     bus,
@@ -51,6 +51,25 @@ function setup() {
   const system = createLifeSystem();
   return { ctx, system, on, scanner };
 }
+it.each(['challenger-deep', 'endurance'])(
+  '%s life=0 disables staged life before loading content',
+  (site) => {
+    vi.mocked(loadLifeDoc).mockClear();
+    const { ctx, system, on, scanner } = setup(site, new URLSearchParams('life=0'));
+    try {
+      system.init?.(ctx);
+      expect(ctx.life).toBeNull();
+      expect(loadLifeDoc).not.toHaveBeenCalled();
+      expect(on).not.toHaveBeenCalled();
+      expect(scanner.getExtraTargets()).toHaveLength(0);
+      expect(ctx.scene.children).toHaveLength(0);
+      const descriptor = vi.mocked(ctx.expose).mock.calls[0][0];
+      expect((descriptor as { life: Life | null }).life).toBeNull();
+    } finally {
+      system.dispose?.();
+    }
+  },
+);
 it('cannot recreate life or listeners after disposal while content is pending', async () => {
   let resolve!: (doc: LifeDoc) => void;
   vi.mocked(loadLifeDoc).mockReturnValue(

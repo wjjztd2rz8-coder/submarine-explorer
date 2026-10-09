@@ -1,6 +1,6 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { afterAll, describe, expect, it } from 'vitest';
 import { Box2, InstancedMesh, Matrix4, Mesh, Raycaster, Vector2, Vector3 } from 'three';
 import { DEEP_OPENINGS, deepSiteWater, makeConfig } from '../../src/core/Config.js';
 import { spawnSettings } from '../../src/game/Spawn.js';
@@ -10,6 +10,8 @@ import { Scanner } from '../../src/game/Scanner.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { buildJournalSite, journalEntryTag } from '../../src/game/JournalData.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
+import { Submarine } from '../../src/sub/Submarine.js';
+import type { InputState } from '../../src/core/Input.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 import { sampleAtmosphere } from '../../src/render/Atmosphere.js';
 import { Props } from '../../src/world/Props.js';
@@ -20,14 +22,21 @@ import { parseLifeDoc } from '../../src/world/life/tables.js';
 import { LIFE_TIERS } from '../../src/world/life/types.js';
 import type { SubInfo } from '../../src/world/life/agent.js';
 import type { TileMeta } from '../../src/util/types.js';
+import { hullClearance } from './helpers/hullClearance.js';
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 const life = parseLifeDoc(json('data/life/life.json'));
+const audit: unknown[] = [];
+afterAll(() => {
+  const env = (globalThis as { process?: { env?: Record<string, string> } }).process?.env;
+  if (env?.F_VERIFY_1000_AUDIT === '1')
+    writeFileSync('.cache/verify-1000-deep.json', JSON.stringify(audit, null, 2) + '\n');
+});
 
 describe('Challenger / Endurance opening', () => {
   for (const site of ['challenger-deep', 'endurance'] as const) {
     for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
-      it(`${site} ${tier}: safe hull, visible target and staged wildlife through 10 s`, async () => {
+      it(`${site} ${tier}: safe hull, visible target and staged wildlife through 60 s`, async () => {
         const config = makeConfig();
         const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;
         const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
@@ -132,6 +141,10 @@ describe('Challenger / Endurance opening', () => {
           expect(scanner.view.candidateId).toBe(target.id);
           sub.setView('chase');
           sub.setPose(position, pose.yaw, 0, 0);
+          const visualClearance = hullClearance(sub.group, terrain);
+          expect(visualClearance, 'visible hull clears the terrain at the opening').toBeGreaterThan(
+            0,
+          );
           for (const [width, height] of [
             [1600, 900],
             [1280, 720],
@@ -208,12 +221,56 @@ describe('Challenger / Endurance opening', () => {
               }),
             );
           }
-          for (let i = 0; i < 600; i++) {
+          const vehicle = new Submarine(config.submarine, terrain);
+          vehicle.setHullClass(site === 'challenger-deep' ? 'C' : 'B');
+          vehicle.reset(pose.x, pose.y, pose.z, pose.yaw);
+          const idle = {
+            throttle: 0,
+            yaw: 0,
+            pitch: 0,
+            ballast: 0,
+            lookDx: 0,
+            lookDy: 0,
+            toggleCamera: false,
+            toggleSonar: false,
+            boost: false,
+            toggleLights: false,
+            ping: false,
+            scan: false,
+            cycleSimSpeed: false,
+            togglePhotoMode: false,
+          } satisfies InputState;
+          let minimumClearance = Infinity;
+          for (let i = 0; i < 3600; i++) {
+            vehicle.step(idle, 1 / 60);
+            Object.assign(pilot, {
+              x: vehicle.position.x,
+              y: vehicle.position.y,
+              z: vehicle.position.z,
+            });
             sim.update(1 / 60, pilot);
-            scanner.update(1 / 60, position, forward, true);
+            scanner.update(1 / 60, vehicle.position, vehicle.getForward(), true);
+            minimumClearance = Math.min(
+              minimumClearance,
+              vehicle.position.y - terrain.sampleHeight(vehicle.position.x, vehicle.position.z),
+            );
           }
           expect(scanner.view.lastCompleteId).toBe(target.id);
-          expect(group.members.length).toBeGreaterThan(0);
+          expect(minimumClearance).toBeGreaterThanOrEqual(
+            config.submarine.hullRadius + config.submarine.seabedClearance - 1e-6,
+          );
+          expect(vehicle.hullBreached).toBe(false);
+          expect(group.members.length, 'staged group survives the first minute').toBeGreaterThan(0);
+          audit.push({
+            site,
+            tier,
+            staged: group.members.length,
+            minimumClearance,
+            visualClearance,
+          });
+          console.log(
+            `VERIFY-1000 ${site} ${tier}: staged=${group.members.length} minClearance=${minimumClearance.toFixed(2)}m`,
+          );
           expect(sim.liveCount).toBeLessThanOrEqual(LIFE_TIERS[tier].maxAgents);
           expect(sim.stats().species).toBeLessThanOrEqual(LIFE_TIERS[tier].maxSpecies);
           for (const a of group.members) {
