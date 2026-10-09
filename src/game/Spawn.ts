@@ -121,13 +121,14 @@ const FREE_DIVE_OPENINGS: Record<
     bearing: 0,
     // Leave room for the scan cone's vertical angle above the seated wall contact,
     // including Low's coarser terrain triangles.
-    range: 16,
+    range: 34,
     altitude: 10,
     yawOffset: 6,
     turnWeight: 3,
     // Frame the bend beside the hull while keeping X reset at the global chase distance.
-    chaseOffsetY: -14,
-    chaseOffsetX: 20,
+    chaseRadius: 64,
+    chaseOffsetY: -2,
+    chaseOffsetX: 14,
   },
   endurance: { hero: 'main-hull', bearing: 60, range: 70 },
   'axial-seamount-ashes': { hero: 'mushroom-chimney', bearing: 45, range: 60 },
