@@ -661,3 +661,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** 1050 (Lost City carbonate fingers follow the parent wall, tapered lobed profile) and 1040 (Low-tier ambient floor on six dark sites, Bismarck capture pose, Low sweep findings). Reviewed fresh Low portrait captures (golden 2026-10-09-102028): Hudson and Bismarck now readable, Lost City still stacked plates (DIRECTOR #2 stays open). Full e2e + project-base green on main; pushed, tagged f42.
 - **Running (Codex):** 1060, 1070, 1080. **Queue:** 1090, 1100 (Low follow-ups), 1110 (fact check). No Claude agents launched. Needs owner: nothing.
+
+## 2026-10-09 06:40 CDT headless run (Claude, comprehensive review)
+
+- **Review:** midday comprehensive review done (Claude alone; Codex 5h 6%, Sol skipped). Entry at top of plan/REVIEWS.md; DIRECTOR.md re-planned; ~70% to 1.0. Scores: Titanic 4/4, Beebe 4/3.5, Blue Hole 3.5/3, Lost City 4/3, Monterey 4/3.5.
+- **Merged:** nothing. 1070 (CI spec fix, uncommitted in its worktree) static gates pass (config, build, unit, python, content, prettier) but the e2e leg timed out in this headless shell (`CI=1` forces the full suite; a single-spec run hit the 60 s webServer timeout without GATES_CONFIG_MODE=writable setup). 1060 and 1080 worktrees are also uncommitted and un-gated.
+- **Problem:** hosted CI still red (10+ e2e shards on the f41-era run). First job next run: gate and merge 1070, then 1060/1080 (DIRECTOR items 1-2).
+- **Queue:** 1090, 1100, 1110. Needs owner: nothing.
