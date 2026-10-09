@@ -680,3 +680,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** f-bluehole-atmos (Sonnet): Blue Hole bowl depth-graded warm rim to teal bottom, softened first riser, thicker/leaning pendants (vertex colour only, no new draw calls). Reviewed poses 2/3: less beige, modest gain; apron leans grey-green, pendants slightly flat cream. Gates (smoke e2e + project-base) green on main; snapshot regenerated for Blue Hole colour hashes. No push (no new wave).
 - **CI:** f43 Pages deploy succeeded; hosted CI run was still in progress at 08:00.
 - **Queue (Codex 5h resets 09:00):** 1090, 1100, 1110. Next Claude: Lost City tower trunk, Beebe boulders, first-minute playthrough, check hosted CI for f43. Needs owner: nothing.
+
+## 2026-10-09 08:29 CDT headless run (Claude)
+
+- **Merged:** f-lostcity-trunk (Sonnet): irregular carbonate trunk profile (gated to Lost City, Beebe untouched), fewer flanges, cream/grey-blue flow colour, vent mouth painted at tips, lower shader blotch contrast. Close-up clearly better (plates gone); orifice unverified in any pose, one flat flange remains. Smoke + project-base green on main (prettier fixed on progress note); no push.
+- **Queue:** 1090, 1100, 1110 (Codex 5h was 5% at start; dispatcher will launch after 09:00 reset). Next Claude: Beebe boulders/disc ring, Monterey strata, first-minute playthrough, hosted CI check for f43. Needs owner: nothing.
