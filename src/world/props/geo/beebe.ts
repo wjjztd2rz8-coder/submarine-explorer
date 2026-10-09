@@ -139,12 +139,14 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
     const a = Math.atan2(z, x);
     const bays = Math.sin(a * 3 + (seed % 17)) * 0.05 + Math.sin(a * 5 + (seed % 7)) * 0.035;
     const wobble =
-      ((lobes - 0.5) * 1.4 + (broad - 0.5) * 1.1 + bays) * (1 - smooth(0.78, 1, radius));
+      ((lobes - 0.5) * 1.4 + (broad - 0.5) * 1.1 + bays) *
+      smooth(0.58, 0.8, radius) *
+      (1 - smooth(0.82, 1, radius));
     return radius * (1 + wobble);
   };
   const surface = (x: number, z: number): number => {
     const r = rim(x, z);
-    const fade = 1 - smooth(0.35, 0.95, r);
+    const fade = 1 - smooth(0.6, 0.96, r);
     const grain = fbm3(x / cfg.patch_size_m, 4, z / cfg.patch_size_m, seed ^ 0x680, 3);
     // sampleHeight already contains measured bathymetry and procedural terrain detail.
     // A small positive lift hides triangulation gaps; the outer ring sinks into the floor.
