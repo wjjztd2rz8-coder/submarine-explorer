@@ -611,6 +611,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Needs owner: nothing.
 
 ## 2026-10-08 22:57 headless run (short)
+
 - Merged 990 (low-tier/phone golden tooling; Codex sandbox could not capture, so I ran the Low portrait sweep: .cache/golden/2026-10-09-034952, 13 sites, complete). Gates smoke+project-base passed.
 - Findings: Challenger Deep opening tilted sub + hull toast at t=0; Blue Hole horizon/bowl still smooth. Queued Codex 1020/1030/1040.
 - Running: Codex 980, 1000, 1010. No Claude agent launched (no Claude-suited package fit; no push this run, no new wave).
