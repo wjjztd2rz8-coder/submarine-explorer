@@ -230,10 +230,10 @@ test.describe('D-FLOW dive flow', () => {
       total: 4,
     });
     await expect(debrief.locator('.debrief-title')).toHaveText('Mission complete');
-    await expect(debrief.locator('.debrief-subtitle')).toHaveText('All primary objectives');
-    await expect(
-      debrief.locator('.debrief-stat[data-field="objectives"] .debrief-value'),
-    ).toHaveText('3 of 4');
+    await expect(debrief.locator('.debrief-next')).toHaveText(
+      'Next: Finish the remaining objectives for 2 stars.',
+    );
+    await expect(debrief.locator('[data-field="objectives"] .debrief-value')).toHaveText('3 of 4');
     await expect(debrief.locator('.debrief-btn')).toHaveText([
       'Dive sites',
       'Keep exploring',
@@ -300,8 +300,9 @@ test.describe('D-FLOW dive flow', () => {
     await surfaceFromPause(page);
     const debrief = page.locator('.mission-debrief');
     await expect(debrief.locator('.debrief-title')).toHaveText('Back at the surface');
-    await expect(debrief.locator('.debrief-subtitle')).toHaveText(
-      'You found 1 of 4 — the rest are still down there.',
+    await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Bow section.');
+    await expect(debrief.locator('.debrief-next')).toHaveText(
+      'Next: Keep exploring to finish the primary objectives.',
     );
     // One filled primary; at most two quiet links visible, the rest under More.
     await expect(debrief.locator('.debrief-btn.is-primary')).toHaveCount(1);

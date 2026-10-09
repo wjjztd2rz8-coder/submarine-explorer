@@ -146,6 +146,15 @@
 .jr-nav-item.is-site .jr-nav-title {
   font-weight: 600;
 }
+.jr-nav-item.is-site:not(.is-entry)::before {
+  content: '▸';
+}
+.jr-nav-item.is-site:not(.is-entry)[aria-expanded='true']::before {
+  content: '▾';
+}
+.jr-nav-item.is-site .jr-nav-title {
+  flex: 1;
+}
 .jr-nav-meta {
   flex-shrink: 0;
   font-size: 0.8em;
@@ -161,13 +170,33 @@
   border-left: 1px solid var(--b1-hair-dim);
 }
 .jr-group {
-  margin: 8px 0 3px;
-  font-size: 0.75em;
+  margin: 0;
+  min-height: 44px;
+  padding: 8px 4px;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: 0.9em;
   font-weight: 400;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--b1-cyan);
   opacity: 0.85;
+}
+.jr-group .jr-nav-meta {
+  font-size: 0.9em;
+  float: right;
+  margin-left: 8px;
+  letter-spacing: 0;
+}
+.jr-category {
+  border-bottom: 1px solid var(--b1-hair-dim);
+}
+.jr-group:focus-visible {
+  outline: 2px solid var(--b1-cyan);
+  outline-offset: -2px;
+}
+.jr-nav-item {
+  min-height: 44px;
 }
 .jr-nav-item.is-entry {
   font-size: 0.92em;

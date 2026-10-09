@@ -1,3 +1,4 @@
+import { openJournalCategory } from './helpers/journal.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from '@playwright/test';
@@ -166,10 +167,7 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
 
   // The Journal's wildlife list now has it, with text and a source link.
   await page.keyboard.press('j');
-  await page
-    .getByRole('button', { name: /Monterey Canyon/ })
-    .first()
-    .click();
+  await openJournalCategory(page, 'monterey-canyon', 'life');
   await page.getByRole('button', { name: 'Lobate comb jelly' }).click();
   await expect(page.locator('.jr-title')).toHaveText('Lobate comb jelly');
   await expect(page.locator('.jr-latin i')).toHaveText('Bolinopsis infundibulum');

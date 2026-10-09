@@ -64,3 +64,37 @@ it('a second surfaced dive opens at the new summary heading after scrolling and 
     debrief.dispose();
   }
 });
+
+it('renders a collected sample as the single classified highlight and clears it on the next dive', () => {
+  const body = new Element();
+  vi.stubGlobal('HTMLElement', Element);
+  vi.stubGlobal('window', new EventTarget());
+  vi.stubGlobal('document', { body, activeElement: body, createElement: () => new Element() });
+  const debrief = new Debrief();
+  const stats: DebriefStats = {
+    elapsedS: 60,
+    distanceM: 20,
+    maxDepthM: 100,
+    discoveries: [],
+    newEntries: [],
+  };
+  const exploration = { found: 0, total: 0, secrets: [], samples: ['Sediment core'], events: [] };
+  debrief.exploration = () => exploration;
+  const panel = (debrief.root as unknown as Element).children[0];
+  const highlights = () =>
+    panel.children.filter((el) => el.className.split(' ').includes('debrief-highlight'));
+  try {
+    debrief.show(stats);
+    expect(highlights()).toHaveLength(1);
+    expect(highlights()[0].className).toBe('debrief-highlight is-samples');
+    expect(highlights()[0].textContent).toBe('Collected Sediment core.');
+    debrief.hide();
+    exploration.samples = [];
+    debrief.show(stats);
+    expect(highlights()).toHaveLength(1);
+    expect(highlights()[0].className).toBe('debrief-highlight');
+    expect(highlights()[0].textContent).toBe('The site is waiting for your first scan.');
+  } finally {
+    debrief.dispose();
+  }
+});

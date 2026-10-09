@@ -1,3 +1,4 @@
+import { openJournalCategory } from './helpers/journal.js';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
@@ -178,6 +179,7 @@ test('Journal lists the survey species with their OBIS sources', async ({ page }
   await page.keyboard.press('KeyJ');
   const journal = page.locator('.journal');
   await expect(journal).toBeVisible();
+  await openJournalCategory(page, '_test', 'species');
   // D-FLOW: no species is linked to a scanned POI yet, so they are spoilers.
   await expect(journal.locator('.jr-hidden-note')).toContainText('2 species not yet identified');
   await journal.locator('.jr-spoilers input').check();

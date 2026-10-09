@@ -29,6 +29,8 @@ function journalWithLoad(loading = Promise.resolve()): Journal {
   Object.assign(journal, {
     sites: [site],
     currentSiteId: site.id,
+    expandedSites: new Map<string, boolean>(),
+    expandedCategories: new Map<string, boolean>(),
     view: { kind: 'front' },
     root: { hidden: true },
     body: { scrollTop: 0 },

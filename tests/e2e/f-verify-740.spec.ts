@@ -1,3 +1,4 @@
+import { openJournalCategory } from './helpers/journal.js';
 import { dismissTutorial } from './helpers/tutorial.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { writeFile } from 'node:fs/promises';
@@ -267,6 +268,7 @@ for (const layout of [
         await click(`.jr-nav-item.is-site[data-target="${site}"]`);
         for (const kind of ['life', 'secret']) {
           await contents();
+          await openJournalCategory(page, site, kind);
           const entry = page.locator(`.jr-nav-item[data-target^="${site}/${kind}/"]`).first();
           await expect(entry).toBeVisible();
           await entry.scrollIntoViewIfNeeded();

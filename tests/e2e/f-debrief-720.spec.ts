@@ -96,7 +96,8 @@ for (const viewport of [
               'data-action',
               'dive-sites',
             );
-            await expect(debrief.locator('.debrief-empty')).toHaveCount(round === 1 ? 1 : 0);
+            await expect(debrief.locator('.debrief-highlight')).toHaveCount(1);
+            await expect(debrief.locator('.debrief-next')).toHaveCount(1);
             await expect(debrief.locator('.debrief-rating')).toContainText('research points');
             await expect(debrief.locator('.debrief-section.is-samples')).toHaveCount(0);
           }

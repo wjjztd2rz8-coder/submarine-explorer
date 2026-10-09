@@ -183,9 +183,8 @@ test.describe('B1 scan, discovery, Journal', () => {
     const debrief = page.locator('.debrief');
     await expect(debrief).toBeVisible({ timeout: 15_000 });
     await expect(page.locator('.debrief-title')).toHaveText('Dive debrief');
-    await expect(page.locator('.debrief-stat[data-field="maxDepth"] .debrief-value')).toHaveText(
-      /\d[\d,]* m/,
-    );
+    await expect(debrief.locator('.debrief-score')).toContainText('0 scans');
+    await expect(debrief.locator('.debrief-next')).toHaveText('Next: Face a target and hold Scan.');
     await expect(page.locator('.debrief-btn')).toHaveText(['Dive again', 'Journal']);
     await page.screenshot({ path: 'tests/e2e/screenshots/discovery-debrief.png' });
 

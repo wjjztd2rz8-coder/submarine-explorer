@@ -1,6 +1,5 @@
 /**
- * End-of-dive debrief (DOM): objectives, distance, max depth, elapsed time,
- * what was scanned this dive and which Journal entries are new. The mission
+ * End-of-dive debrief (DOM): score, one highlight and a next suggestion. The mission
  * router (D-FLOW) opens it when the player surfaces and passes its own
  * actions (Keep exploring, Dive again, Dive sites, Home, Journal);
  * `?debrief=1` opens the free-dive variant for screenshots.
@@ -46,6 +45,70 @@ export function formatDuration(s: number): string {
   const mm = String(m).padStart(h ? 2 : 1, '0');
   const ss = String(sec).padStart(2, '0');
   return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+
+/** Keep a surfaced dive rewarding, with a single concrete thing to do next. */
+export function summarizeDive(
+  stats: DebriefStats,
+  rating?: DiveRating,
+  exploration?: ExplorationSummary,
+): {
+  highlight: string;
+  next: string;
+  kind: 'discoveries' | 'secrets' | 'events' | 'samples' | null;
+} {
+  const cause = stats.subtitle?.split(' · ')[0];
+  if (cause?.startsWith('Hull failure'))
+    return {
+      highlight: `${cause}.`,
+      next: 'Try a shallower route or a stronger hull.',
+      kind: null,
+    };
+  if (cause === 'Supplies exhausted')
+    return {
+      highlight: 'Supplies exhausted · safe ascent completed.',
+      next: 'Refill supplies before diving again.',
+      kind: null,
+    };
+
+  const scan = stats.discoveries[0];
+  const secret = exploration?.secrets[0];
+  const event = exploration?.events[0];
+  const sample = exploration?.samples[0];
+  const entry = stats.newEntries[0];
+  const kind = scan
+    ? 'discoveries'
+    : secret
+      ? 'secrets'
+      : event
+        ? 'events'
+        : sample
+          ? 'samples'
+          : null;
+  const highlight = scan
+    ? `Scanned ${scan.name}.`
+    : secret
+      ? `Found ${secret}.`
+      : event
+        ? `Witnessed ${event}.`
+        : sample
+          ? `Collected ${sample}.`
+          : entry
+            ? `Logged ${entry.title}.`
+            : 'The site is waiting for your first scan.';
+  const next =
+    rating?.stars === 3
+      ? 'Try another dive site.'
+      : rating?.stars === 2
+        ? 'Take a photo or scan a species for 3 stars.'
+        : rating?.stars === 1
+          ? 'Finish the remaining objectives for 2 stars.'
+          : !scan && !entry
+            ? 'Face a target and hold Scan.'
+            : stats.objectives && stats.objectives.completed < stats.objectives.total
+              ? 'Keep exploring to finish the primary objectives.'
+              : 'Open the Journal to read your finds.';
+  return { highlight, next, kind };
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(
@@ -101,97 +164,42 @@ export class Debrief {
       ),
     );
     head.append(el('h1', 'debrief-title', stats.title ?? 'Dive debrief'));
-    if (stats.subtitle) {
-      // Objectives and time already have their own cells; keep the outcome once.
-      const subtitle = stats.objectives
-        ? stats.subtitle.replace(/ · \d+ of \d+ objectives · [\d:]+$/, '')
-        : stats.subtitle;
-      head.append(el('p', 'debrief-subtitle', subtitle));
-    }
     p.append(head);
+
+    const score = el('div', 'debrief-rating debrief-score');
     if (rating) {
-      const row = el('div', 'debrief-rating');
       const stars = el(
         'span',
         'debrief-stars',
         '★'.repeat(rating.stars) + '☆'.repeat(3 - rating.stars),
       );
       stars.setAttribute('aria-label', `${rating.stars} of 3 stars`);
-      row.append(stars, el('span', undefined, `${rating.points} research points earned`));
-      row.append(
-        el(
-          'small',
-          undefined,
-          rating.stars === 3
-            ? 'All objectives + photo or species goal'
-            : rating.stars === 2
-              ? 'Every objective · add a photo or species scan for 3 stars'
-              : rating.stars === 1
-                ? 'Primaries complete · finish secondaries for 2 stars'
-                : 'Finish the primary objectives to earn a star',
-        ),
-      );
-      p.append(row);
+      score.append(stars, el('span', undefined, `${rating.points} research points`));
     }
-
-    const grid = el('div', 'debrief-stats');
-    const stat = (label: string, value: string, field: string): void => {
-      const cell = el('div', 'debrief-stat');
-      cell.dataset.field = field;
-      cell.append(el('span', 'debrief-label', label), el('span', 'debrief-value', value));
-      grid.append(cell);
+    const metric = (field: string, value: string, label: string): void => {
+      const item = el('span', 'debrief-score-item');
+      item.dataset.field = field;
+      item.append(el('span', 'debrief-value', value), el('span', undefined, ` ${label}`));
+      score.append(item);
     };
-    if (stats.objectives) {
-      const { completed, total } = stats.objectives;
-      stat('OBJECTIVES', `${completed} of ${total}`, 'objectives');
-      grid.className += ' has-objectives';
-    }
-    stat('SCANS', String(stats.discoveries.length), 'discoveries');
-    stat('DISTANCE', formatDistance(stats.distanceM), 'distance');
-    stat('MAX DEPTH', `${Math.round(stats.maxDepthM).toLocaleString('en-US')} m`, 'maxDepth');
-    stat('DIVE TIME', formatDuration(stats.elapsedS), 'elapsed');
-    p.append(grid);
-
-    const lists = el('div', 'debrief-lists');
-    const section = (title: string, items: string[], cls: string): void => {
-      if (!items.length) return;
-      const s = el('div', `debrief-section ${cls}`);
-      s.append(el('h2', 'debrief-section-title', title));
-      if (items.length) {
-        const ul = el('ul');
-        for (const i of items) ul.append(el('li', undefined, i));
-        s.append(ul);
-      }
-      lists.append(s);
-    };
-    section(
-      'SCANNED THIS DIVE',
-      stats.discoveries.map((d) => d.name),
-      'is-discoveries',
+    metric(
+      'discoveries',
+      String(stats.discoveries.length),
+      stats.discoveries.length === 1 ? 'scan' : 'scans',
     );
-    if (stats.newEntries.length) {
-      const count = stats.newEntries.length;
-      lists.append(
-        el(
-          'p',
-          'debrief-journal-summary',
-          `${count} new Journal ${count === 1 ? 'entry' : 'entries'}`,
-        ),
+    if (stats.objectives) {
+      metric(
+        'objectives',
+        `${stats.objectives.completed} of ${stats.objectives.total}`,
+        'objectives',
       );
-    } else if (!stats.discoveries.length) {
-      lists.append(el('p', 'debrief-empty', 'Hold Scan near a target to add a Journal entry.'));
     }
-    const exploration = this.exploration?.();
-    if (exploration && exploration.total) {
-      section(
-        `SECRETS FOUND ${exploration.found}/${exploration.total}`,
-        exploration.secrets,
-        'is-secrets',
-      );
-      section('SAMPLES COLLECTED', exploration.samples, 'is-samples');
-      if (exploration.events.length) section('EVENTS WITNESSED', exploration.events, 'is-events');
-    }
-    p.append(lists);
+    p.append(score);
+    const summary = summarizeDive(stats, rating, this.exploration?.());
+    p.append(
+      el('p', `debrief-highlight${summary.kind ? ` is-${summary.kind}` : ''}`, summary.highlight),
+      el('p', 'debrief-next', `Next: ${summary.next}`),
+    );
 
     const row = el('div', 'debrief-actions');
     const list = actions ?? [
