@@ -652,3 +652,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** f-bluehole-apron (Sonnet): baked sediment/algae/rubble/scour vertex colour on the Blue Hole apron and bowl treads, pale rim lip + dark shadow on the first riser. Moderate gain in poses 2/3 (haze and shared rock texture still flatten it; next step would be atmosphere or a dedicated texture). Regenerated the Beebe-isolation snapshot (it covers Blue Hole colour buffers, legitimately changed). Smoke + project-base green on main; no push (no new wave).
 - **Running (Codex):** 1040, 1050, 1060 (uncommitted work in their worktrees; 1050 already touches Lost City towers). **Queue:** 1070, 1080, 1090 (bug hunt over f38-f41). Next Claude: review 1050/1060/1080 when they land, Beebe chimney review, first-minute playthrough check. Needs owner: nothing.
+
+## 2026-10-09 04:45 CDT headless run (Claude)
+
+- **Merged:** nothing. Codex 1040, 1050, 1060 are still running (uncommitted work in their worktrees; 1050 touches Lost City towers, 1060 the Journal/Debrief, so no Claude package could avoid overlap). **Queue:** 1070, 1080, 1090. No Claude agent launched, no push. Next Claude: review 1050/1060/1040 when they land, Beebe chimney review after 1080, first-minute playthrough check. Needs owner: nothing.
