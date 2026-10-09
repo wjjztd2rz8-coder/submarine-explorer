@@ -337,7 +337,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     // drifting in broad patches that stretch vertically with the flow.
     const mineral = fbm3(x * 0.32, y * 0.045, z * 0.32, seed ^ 0x3b1, 3);
     out.lerp(CREAM, smooth(0.46, 0.64, mineral) * 0.6 * (0.4 + up));
-    out.lerp(GREYBLUE, smooth(0.5, 0.3, mineral) * 0.5);
+    out.lerp(GREYBLUE, (1 - smooth(0.3, 0.5, mineral)) * 0.5);
     // Flow streaks: narrow vertical bands (high horizontal, very low vertical frequency)
     // alternating pale and shaded, as fluid ran down the walls.
     const wall = 1 - Math.abs(ny);

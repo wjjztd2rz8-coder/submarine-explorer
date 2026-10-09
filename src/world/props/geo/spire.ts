@@ -79,6 +79,7 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
   const wob = o.wobble ?? 0.12;
   const flutes = o.ridges ?? 7;
   const amp = o.ridgeAmp ?? 0.06;
+  const plainProfile = { ...o, tiers: 0 };
   for (let i = 0; i < p.count; i++) {
     const x = p.getX(i);
     const y = p.getY(i);
@@ -89,7 +90,7 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
     let f = spireRadius(o, t) / o.r0;
     const irr = o.irregular ?? 0;
     if (irr) {
-      const plain = spireRadius({ ...o, tiers: 0 }, t) / o.r0;
+      const plain = spireRadius(plainProfile, t) / o.r0;
       if (o.trunk) {
         // Jittered terrace phase and per-terrace strength: shelves drift in height and
         // some nearly vanish, so the column never reads as evenly stacked plates.
@@ -126,7 +127,8 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
           2,
         );
         // Shelves are strong on one side and vanish on the other.
-        f = plain * (1 + (f / plain - 1) * smooth(0.25, 0.7, m) * 1.7);
+        // A fully tapered tip has no shelf radius; avoid dividing zero by zero.
+        f = plain === 0 ? 0 : plain * (1 + (f / plain - 1) * smooth(0.25, 0.7, m) * 1.7);
       }
       // Elliptical, twisting cross-section plus broad lumps: no lathe-like symmetry.
       f *= 1 + irr * 0.22 * Math.cos(2 * (ang - t * 2.4 - o.seed * 0.37));

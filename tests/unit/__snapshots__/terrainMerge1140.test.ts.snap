@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`1140: beebe-vent-field Low buffers are finite and draw counts stay within f43 1`] = `
+{
+  "buffers": "8647a4a7ddb0223c743a106ebeb70e9e9b3bb4bea15181197b3d3c76d374867b",
+  "draws": 13,
+  "triangles": 19938,
+}
+`;
+
+exports[`1140: great-blue-hole Low buffers are finite and draw counts stay within f43 1`] = `
+{
+  "buffers": "318bc0f98a9173129e2400d88077145596ae19c7b9fd6129e831da22f781d00a",
+  "draws": 8,
+  "triangles": 21300,
+}
+`;
+
+exports[`1140: lost-city Low buffers are finite and draw counts stay within f43 1`] = `
+{
+  "buffers": "7b892f9ba1b82f335dfbed087afe47f964281910979b81f925b3c2f020e1a3c8",
+  "draws": 14,
+  "triangles": 56384,
+}
+`;
+
+exports[`1140: monterey-canyon Low buffers are finite and draw counts stay within f43 1`] = `
+{
+  "buffers": "c8baa64cac27e161a13af24e8c578982ad6e4721ac6f037715971bf1b4285c23",
+  "draws": 30,
+  "triangles": 284010,
+}
+`;

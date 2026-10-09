@@ -488,13 +488,15 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   // Per-bed hardness (thick, resistant beds protrude and overhang) and albedo.
   const bedHard: number[] = [];
   const bedColour: THREE.Color[] = [];
-  for (let i = 0; i < P.bands; i++) {
-    const thick = (beds[i + 1]! - beds[i]!) / MONTEREY_STRATA.thickness[1];
-    bedHard.push(Math.min(1, 0.55 * thick + 0.6 * Math.pow(bedRnd(), 1.6)));
-    const pal = MONTEREY_STRATA.bedPalette;
-    const c = new THREE.Color(pal[Math.floor(bedRnd() * pal.length) % pal.length]);
-    c.multiplyScalar(0.78 + 0.4 * bedRnd());
-    bedColour.push(c);
+  if (id === 'canyon') {
+    for (let i = 0; i < P.bands; i++) {
+      const thick = (beds[i + 1]! - beds[i]!) / MONTEREY_STRATA.thickness[1];
+      bedHard.push(Math.min(1, 0.55 * thick + 0.6 * Math.pow(bedRnd(), 1.6)));
+      const pal = MONTEREY_STRATA.bedPalette;
+      const c = new THREE.Color(pal[Math.floor(bedRnd() * pal.length) % pal.length]);
+      c.multiplyScalar(0.78 + 0.4 * bedRnd());
+      bedColour.push(c);
+    }
   }
   const totalBeds = beds[P.bands]!;
   const bedPhase = (x: number, y: number): number => {
