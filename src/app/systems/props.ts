@@ -48,7 +48,12 @@ export const propsSystem: GameSystem = {
         if (pose) {
           sub.reset(pose.x, pose.y, pose.z, pose.yaw);
           if (propsLandmark === 'lost-city' || pose.chaseOffsetY !== undefined)
-            rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
+            rig.setChaseRadiusDefault(
+              pose.chaseRadius,
+              pose.chaseOffsetX,
+              pose.chaseOffsetY,
+              pose.portraitChaseOffset,
+            );
           else if (pose.chaseRadius) rig.chaseRadius = pose.chaseRadius;
           rig.snap(sub.position, sub.yaw, sub.pitch);
         }

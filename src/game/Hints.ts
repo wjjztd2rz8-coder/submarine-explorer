@@ -4,6 +4,8 @@
  * {@link HintContext} every frame and shows whatever `update` returns.
  */
 
+import { FIRST_MINUTE_GUIDANCE } from '../core/config/guidance.js';
+
 export type HintId = 'battery-low' | 'near-hull' | 'scan-target' | 'creature' | 'rov';
 
 /** Highest priority first: when several are due, the earliest one wins. */
@@ -36,6 +38,8 @@ export interface HintContext {
   battery: number | null;
   /** Operating depth divided by the hull rating. */
   ratedRatio: number;
+  /** Opening grace period and authored-depth suppression have cleared. */
+  hullHintEligible: boolean;
   scanTargetInRange: boolean;
   creatureInView: boolean;
   rovAvailable: boolean;
@@ -44,6 +48,20 @@ export interface HintContext {
 }
 
 export const HINT_THRESHOLDS = { battery: 0.3, hull: 0.85 } as const;
+
+/** Depths are negative: a dive already in the warning band needs a new descent. */
+export function hullHintAllowed(
+  diveS: number,
+  depth: number,
+  startDepth: number,
+  ratedDepth: number,
+): boolean {
+  return (
+    diveS >= FIRST_MINUTE_GUIDANCE.hullHintAfterS &&
+    (startDepth / ratedDepth < HINT_THRESHOLDS.hull ||
+      startDepth - depth >= FIRST_MINUTE_GUIDANCE.hullHintDescentM)
+  );
+}
 
 /** Give the opening scan card eight seconds of attention before animal guidance. */
 export function creatureHintAllowed(diveS: number, scanCardVisible: boolean): boolean {
@@ -55,7 +73,7 @@ export function hintDue(id: HintId, c: HintContext): boolean {
     case 'battery-low':
       return c.battery !== null && c.battery < HINT_THRESHOLDS.battery;
     case 'near-hull':
-      return c.ratedRatio >= HINT_THRESHOLDS.hull;
+      return c.hullHintEligible && c.ratedRatio >= HINT_THRESHOLDS.hull;
     case 'scan-target':
       return c.scanTargetInRange;
     case 'creature':

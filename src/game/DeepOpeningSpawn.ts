@@ -70,6 +70,7 @@ function reframe(
     chaseRadius: opening.chaseRadius,
     chaseOffsetX: opening.chaseOffsetX,
     chaseOffsetY: opening.chaseOffsetY,
+    portraitChaseOffset: opening.portraitChaseOffset,
   };
 }
 

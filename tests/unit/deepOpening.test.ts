@@ -151,7 +151,12 @@ describe('Challenger / Endurance opening', () => {
             [390, 844],
           ]) {
             const rig = new CameraRig(config.camera, width / height, terrain);
-            rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
+            rig.setChaseRadiusDefault(
+              pose.chaseRadius,
+              pose.chaseOffsetX,
+              pose.chaseOffsetY,
+              pose.portraitChaseOffset,
+            );
             rig.snap(position, pose.yaw, 0);
             rig.camera.updateMatrixWorld(true);
             props.group.updateMatrixWorld(true);

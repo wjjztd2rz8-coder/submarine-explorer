@@ -40,6 +40,7 @@ export class CameraRig {
   chaseRadius: number;
   private chaseRadiusDefault: number;
   private chaseOffsetX = 0;
+  private portraitChaseOffset: { x: number; y: number } | null = null;
   private chaseOffsetY = 0;
 
   private readonly desiredPosition = new THREE.Vector3();
@@ -133,7 +134,7 @@ export class CameraRig {
     return this.mode;
   }
 
-  /** Set a dive's reset distance separately from the pilot's wheel zoom. */
+  /** Set the reset distance and framing; portrait offsets also survive rotation/reset. */
   setChaseRadiusDefault(
     radius = Math.hypot(
       this.config.chaseOffset.x,
@@ -142,10 +143,12 @@ export class CameraRig {
     ),
     offsetX = 0,
     offsetY = 0,
+    portraitOffset?: { x: number; y: number },
   ): void {
     this.chaseRadiusDefault = radius;
     this.chaseRadius = radius;
     this.chaseOffsetX = offsetX;
+    this.portraitChaseOffset = portraitOffset ?? null;
     this.chaseOffsetY = offsetY;
   }
 
@@ -252,8 +255,9 @@ export class CameraRig {
             )
             .multiplyScalar(this.chaseRadius);
         } else {
-          this.offset.x += this.chaseOffsetX;
-          this.offset.y += this.chaseOffsetY;
+          const portrait = this.camera.aspect < 1 ? this.portraitChaseOffset : null;
+          this.offset.x += portrait?.x ?? this.chaseOffsetX;
+          this.offset.y += portrait?.y ?? this.chaseOffsetY;
           this.offset.multiplyScalar(this.chaseRadius / this.offset.length());
           this.offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), -yaw);
         }

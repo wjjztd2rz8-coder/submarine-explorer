@@ -3,6 +3,7 @@ import {
   HINT_TEXT,
   HintEngine,
   creatureHintAllowed,
+  hullHintAllowed,
   type HintContext,
 } from '../../src/game/Hints.js';
 import { TUTORIAL_STEPS, Tutorial } from '../../src/game/Tutorial.js';
@@ -14,6 +15,7 @@ import type { SettingsStorage } from '../../src/core/Save.js';
 const calm: HintContext = {
   battery: 1,
   ratedRatio: 0.1,
+  hullHintEligible: true,
   scanTargetInRange: false,
   creatureInView: false,
   rovAvailable: false,
@@ -22,6 +24,46 @@ const calm: HintContext = {
 const labels = { scan: 'F', rov: 'E', photo: 'P', lights: 'L' };
 
 describe('hint engine', () => {
+  it('defers hull guidance for 20 dive seconds without consuming it', () => {
+    const e = new HintEngine();
+    const context = (diveS: number) => ({
+      ...calm,
+      ratedRatio: 0.9,
+      hullHintEligible: hullHintAllowed(diveS, -9900, -100, -11000),
+    });
+    for (const diveS of [0, 1, 19.999]) {
+      expect(e.update(diveS, context(diveS))).toBeNull();
+      expect(e.hasSeen('near-hull')).toBe(false);
+    }
+    expect(e.update(20, context(20))).toBe('near-hull');
+    expect(e.update(100, context(100))).toBeNull();
+  });
+
+  it('suppresses an authored near-rating opening until a new descent of 10 m', () => {
+    const e = new HintEngine();
+    const start = -10903;
+    const context = (depth: number) => ({
+      ...calm,
+      ratedRatio: depth / -11000,
+      hullHintEligible: hullHintAllowed(100, depth, start, -11000),
+    });
+    for (const depth of [start, start + 20, start - 0.001, start - 9.999]) {
+      expect(e.update(100, context(depth))).toBeNull();
+      expect(e.hasSeen('near-hull')).toBe(false);
+    }
+    expect(e.update(100, context(start - 10))).toBe('near-hull');
+  });
+
+  it('retains low-battery priority during the hull grace period', () => {
+    expect(
+      new HintEngine().update(0, {
+        ...calm,
+        ratedRatio: 0.99,
+        hullHintEligible: false,
+        battery: 0.1,
+      }),
+    ).toBe('battery-low');
+  });
   it('defers animals while a scan card owns the first eight seconds, without consuming the hint', () => {
     const e = new HintEngine();
     const context = (diveS: number, visible: boolean) => ({
