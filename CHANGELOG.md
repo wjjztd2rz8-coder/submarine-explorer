@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **1160 debrief verification:** added unit coverage for zero/one-scan action order, callbacks, More reset and non-resumable/free-dive fallbacks, plus a two-pass browser regression spec for Titanic, Beebe and Blue Hole at 390×844 and 1280×720. Browser execution is blocked by localhost binding permissions; acceptance remains pending in `plan/progress/1160.md`. No product behavior change.
+
 - **f-debrief-zero:** a debrief with 0 scans now makes "Keep exploring" the single filled primary button and shows "Dive sites" as a quiet link (it was the other way round, contradicting "Next: Face a target and hold Scan"). With 1+ scans, or when the dive cannot resume, nothing changes. `f-debrief-720` spec asserts the new round-1 primary. The target-bracket/label overlap (firstminute finding 3) was already fixed by f-hud-overlap.
 
 - **f-hud-overlap:** on tall portrait phones the tutorial coach card now docks just above the touch controls (was over the lower sub and the base of the scan target). On desktop the on-screen target label sits below the target diamond so the centre scan bracket no longer crosses its text. UI placement only. `tools/firstminute-shots.mjs` gained a `phoneland` (844x390) layout.
