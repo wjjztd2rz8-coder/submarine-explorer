@@ -153,3 +153,7 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - Finding: `pgrep -f golden.sh` matches the headless `claude -p` process (its prompt text contains the script name), so waits built on it never end. Wait on the specific PID instead.
 - Finding: Endurance golden was byte-identical across two sets; nothing in the backlog covered it until now (queued 1180). Backlog audits should list every site in the contact sheet, not only the five hero sites.
 - Hosted CI still red (e2e shards); 1120 owns triage.
+
+## 2026-10-09 late comprehensive review
+
+- Finding: three comprehensive reviews in one day merely re-score the same set; the 8+ merges trigger counts `--merges` including Codex collection merges. Action: none yet; consider requiring a new golden diff or 24 h. Sol skipped at Codex 11% (exit 75, as designed).

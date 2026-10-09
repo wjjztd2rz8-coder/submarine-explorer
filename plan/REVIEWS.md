@@ -2,6 +2,30 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-09 late comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-09-221156 vs -195308)
+
+Codex 5h was 11% (`codex-review.sh` exit 75), so no Sol second opinion.
+
+**Changed since the last review:** merged Codex 1090-1120, 1140, 1160, 1170 (Challenger amphipod/ripple, Endurance facts), f-firstdiscovery, f-mission-pacing (Blue Hole 270 m, Monterey 645 m to next target) and f-bluehole-bowl2 (feathered shelf, ragged lip, bluer walls).
+
+| Site       | Readable | Beautiful | Change | Biggest gap                                            |
+| ---------- | -------- | --------- | ------ | ------------------------------------------------------ |
+| Titanic    | 4        | 4         | same   | slight flat void above horizon (1190)                  |
+| Beebe      | 4        | 3.5       | +0.25  | chimney now layered; sediment still procedural         |
+| Blue Hole  | 4        | 3         | +0.25  | smooth bowl floor; sonar minimap a flat green square   |
+| Lost City  | 4        | 3         | same   | tower trunk still pale blobby plates, no orifice       |
+| Monterey   | 4        | 3.5       | same   | more flora/fish, strata still regular                  |
+| Challenger | 3.5      | 3         | +0.25  | lander visible now; seabed dim, flat, slope unreadable |
+| Endurance  | 3        | 2.5       | same   | snow discs fill lower frame, black blob on sub (1180)  |
+
+No regressions seen. Play-flow was not re-captured; firstdiscovery-shots from the last review stand (open: reward card title vs objective name, desktop tutorial stuck on 'Move and turn').
+
+**Process:** efficiency.sh: Claude idle ~142 h and Codex under-used ~116 h, almost all the Oct 6-8 lockout and the Codex 0% window; 54 watchdog trips, floors working; 233 budget-gate skips. Hosted CI still red (14/30 e2e shards) on the pre-1120 SHA; the next push will show whether 1120 fixed it (1230 queued as follow-up). Codex is at 10% weekly so reviews are Claude-only until it recovers.
+
+**Priorities:** see DIRECTOR.md (push f45 + CI, Endurance snow, sonar legibility, Lost City redo, Challenger seabed, Blue Hole floor). Codex queue: 1190, 1200, 1210, 1220, 1230.
+
+**Stage:** ~71% to 1.0, about 3 weeks (Claude alone). **Needs owner:** nothing.
+
 ## 2026-10-09 evening comprehensive review, joint with Sol (trigger: 8+ merges; golden 2026-10-09-195308 vs -191533)
 
 Sol ran an independent review (read-only). The one-round `reconcile` call produced no output and was killed at its time limit, so disagreements were settled by me against the evidence instead (below). Monterey was not recaptured (viewport screenshot timeouts under CPU load); -191533 was used for it.

@@ -2,7 +2,23 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (joint review with Sol, 2026-10-09 evening; golden 2026-10-09-195308)
+## Current priorities (comprehensive review, Claude alone, 2026-10-09 17:30; golden 2026-10-09-221156)
+
+Codex 5h was 11% so Sol was skipped (exit 75). Scores (beautiful): Titanic 4, Beebe 3.5 (chimney now layered/ridged, +0.25), Monterey 3.5 (livelier, more flora), Blue Hole 3 (bowl readable, sonar still a flat green square), Lost City 3 (tower still blobby plates), Challenger 3 (lander visible, seabed dim and flat), Endurance 2.5 (snow discs and black blob on sub unchanged; 1180 running).
+
+Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
+
+1. **Push wave f45 and fix hosted CI:** run full e2e on main, push, tag, check `gh run list`; 14/30 e2e shards still failed on the pre-1120 SHA. If still red, queue Codex triage with shard logs.
+2. **Endurance snow + black blob (Sonnet, after 1180 lands):** snow discs cover the lower half of frame; black blob on the sub hull; flat horizon.
+3. **Sonar minimap legibility (Sonnet or take Codex 1200):** Blue Hole, Endurance and Titanic maps are flat teal squares; scale and depth shading so features read.
+4. **Lost City tower redo (Sonnet):** flow-stone ridges, orifice, colour variation; trunk is still pale plated blob.
+5. **Challenger seabed (Sonnet):** brighten and add relief to the seabed around the lander, amphipod swarm legible, slope visible.
+6. **Blue Hole overhangs and sponge density (Sonnet):** bowl floor still smooth; remaining pacing gaps at Challenger/Hunga Tonga/Hudson are Codex 1220.
+7. **Unaided first-discovery open items (Haiku):** reward card title vs objective name; desktop tutorial stuck on 'Move and turn'.
+
+Codex queue: 1190 (Titanic haze), 1200 (sonar palette), 1210 (verify merged), 1220 (pacing gaps), 1230 (CI shard triage after push). Running: 1130, 1180.
+
+## Previous priorities (joint review with Sol, 2026-10-09 evening; golden 2026-10-09-195308)
 
 Agreed scores (beautiful): Titanic 3.5-4, Beebe 3-3.5, Blue Hole 2.5-3, Lost City 3-3.3, Monterey 3-3.5, Challenger 2.5-3, Endurance 2.5. Stage ~70%, 3-4 weeks. Sol's calibration: opening frames hide weak close-ups; "complete a scan and read the reward" has never been captured; second required targets are 4.5 km (Blue Hole) and 14.6 km (Monterey) away.
 
