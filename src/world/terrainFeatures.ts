@@ -179,11 +179,33 @@ export function blueHoleTint(
   const depth = -y;
   const a = Math.atan2(dz, dx);
   // Colour by depth: warm tan, ochre, grey-brown, never below a readable floor.
-  const ochre = smoothstep(clamp01((depth - 6) / 30));
-  const grey = smoothstep(clamp01((depth - 40) / 70));
-  let tr = lerp(lerp(1.14, 1.04, ochre), 0.72, grey);
-  let tg = lerp(lerp(1.05, 0.82, ochre), 0.68, grey);
-  let tb = lerp(lerp(0.84, 0.56, ochre), 0.64, grey);
+  // Warm sunlit reef top, thin ochre, then a cool teal-blue ramp: the bottom reads cold, the rim warm.
+  const ochre = smoothstep(clamp01((depth - 4) / 22));
+  const cool = smoothstep(clamp01((depth - 14) / 70));
+  let tr = lerp(lerp(1.16, 1.0, ochre), 0.5, cool);
+  let tg = lerp(lerp(1.06, 0.86, ochre), 0.78, cool);
+  let tb = lerp(lerp(0.82, 0.62, ochre), 0.88, cool);
+  // Per-tread character: each level bed gets its own tone, warmth and silt cover, graded
+  // across its width (pale outer lip, damp darker inner foot) so no tread is one flat value.
+  let tread = 0;
+  let treadU = 0.5;
+  if (r > 90 && r < 215) {
+    for (let i = 1; i < TERRACE_PROFILE.length; i++) {
+      const [r1, h1] = TERRACE_PROFILE[i]!;
+      const [r0, h0] = TERRACE_PROFILE[i - 1]!;
+      if (r >= r1 && r < r0 && r0 - r1 > 3 && (h0 - h1) / (r0 - r1) < 0.8) {
+        const th = 0.5 + 0.5 * Math.sin(i * 12.9898 + 1.7) * Math.cos(i * 4.131);
+        tread = 1;
+        treadU = (r - r1) / (r0 - r1);
+        const warmth = th - 0.5;
+        const tone = 0.9 + 0.24 * th + 0.1 * (treadU - 0.5);
+        tr *= tone * (1 + 0.16 * warmth);
+        tg *= tone;
+        tb *= tone * (1 - 0.2 * warmth);
+        break;
+      }
+    }
+  }
   // Wall mask: the silt floor and the open reef stay soft, the rock gets the beds.
   const slope = smoothstep(clamp01((1 - normalY - 0.01) / 0.18));
   const wallR = smoothstep(clamp01((r - 92) / 8)) * (1 - smoothstep(clamp01((r - 205) / 10)));
@@ -206,8 +228,8 @@ export function blueHoleTint(
       const [r1, h1] = TERRACE_PROFILE[i]!;
       const [r0, h0] = TERRACE_PROFILE[i - 1]!;
       if (r0 - r1 < 1 || (h0 - h1) / (r0 - r1) < 1.2) continue;
-      if (r < r1) ao *= 1 - 0.5 * Math.exp(-(r1 - r) / 4.5);
-      else if (r < r0) ao *= 1 - 0.28 * (1 - (r - r1) / (r0 - r1));
+      if (r < r1) ao *= 1 - 0.34 * Math.exp(-(r1 - r) / 6.5);
+      else if (r < r0) ao *= 1 - 0.2 * (1 - (r - r1) / (r0 - r1));
     }
   }
   // Broad mottling of the treads: warm sand patches against grey silt and darker rubble
@@ -219,7 +241,7 @@ export function blueHoleTint(
   const fine = 0.5 + 0.5 * Math.sin(x * 0.53 + z * 0.37 + 2 * Math.sin(x * 0.21 - z * 0.29));
   // Level silt and sand keep only part of the wall's chroma: pale sand, not saturated ochre.
   const mean = (tr + tg + tb) / 3;
-  const keep = 0.3 + 0.7 * rock;
+  const keep = (0.3 + 0.7 * rock) * (1 - 0.15 * tread);
   tr = mean + (tr - mean) * keep;
   tg = mean + (tg - mean) * keep;
   tb = mean + (tb - mean) * keep;
@@ -252,10 +274,11 @@ export function blueHoleTint(
   const bright = 1 + pf * (0.14 * (fine - 0.5) + 0.2 * (scour - 0.5) + 0.12 * (ripple - 0.3));
   const m = ao * dark * bright * (0.8 + 0.2 * smoothstep(clamp01(normalY)));
   // Crisp rim: a thin pale lip at the first riser, with a dark cut at its foot.
+  // Kept soft and wide: the riser is a gradient, not a drawn line.
   const rim =
     1 +
-    0.28 * Math.exp(-(((r - 179) / 2.2) ** 2)) * (1 - rock) -
-    0.38 * Math.exp(-(((r - 172) / 2.4) ** 2));
+    0.1 * Math.exp(-(((r - 179) / 4.5) ** 2)) * (1 - rock) -
+    0.2 * Math.exp(-(((r - 171) / 5.5) ** 2));
   return [tr * m * sr * rim, tg * m * sg * rim, tb * m * sb * rim];
 }
 

@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-bluehole-atmos:** Blue Hole bowl grades from warm tan at the rim to teal-blue with depth (vertex tint plus a bluer, earlier depth shade), each tread gets its own tone and width gradient, the first riser's lip and shadow are softened, the gallery apron and lower wall cool toward teal, and pendants are thicker, more tapered and irregular with varied length and lean. Colour and geometry only; no new meshes or draw calls.
+
 - **f-bluehole-apron:** Blue Hole shelf and apron vertex tint now carries sediment patches (tan sand, grey-brown silt, olive algae film, darker rubble beds, scour streaks and ripples) instead of one beige value, with a pale lip and dark foot-shadow at the first riser. Baked in vertex colour only; no new draw calls.
 
 - Added a Monterey Canyon portrait (390x844) HUD regression test: sonar, readouts, scan card, objectives, tutorial card, touch controls and the open Data credits panel keep separate space, and none covers the submarine. No layout change was needed; the overlap seen in an earlier golden capture no longer reproduces.

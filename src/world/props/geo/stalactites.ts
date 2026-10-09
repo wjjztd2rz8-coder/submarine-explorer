@@ -40,13 +40,15 @@ import type { GeoBuildInput } from './types.js';
 
 const WALL = new THREE.Color(0x9b9482);
 const WALL_DARK = new THREE.Color(0x5b5648);
-const TIP = new THREE.Color(0xe4d9be);
+const TIP = new THREE.Color(0xd2c6a6);
 const AMBER = new THREE.Color(0xb59a6a);
 const OCHRE = new THREE.Color(0xc79a52);
 const GREY_BROWN = new THREE.Color(0x6a604f);
 const DRAPE = new THREE.Color(0x8c8470);
 const BED_WARM = new THREE.Color(0xb39a68);
 const BED_COOL = new THREE.Color(0x7d8179);
+/** Cool teal-grey of the water-filled depths: the apron and lower wall grade toward it. */
+const DEEP_TEAL = new THREE.Color(0x5f817f);
 
 const EDGE_START = 0.55;
 
@@ -56,7 +58,7 @@ const geoMaterial: typeof baseGeoMaterial = (kind, d, o) => {
   const m = baseGeoMaterial(kind, d, o);
   m.color.multiplyScalar(LIMESTONE_LIFT);
   // Scattered light keeps the shelf pale tan like the hole's walls, not a dark silhouette.
-  vertexGlow(m, 0.1, 0xd8d0b0, 0.35);
+  vertexGlow(m, 0.1, 0xc4d2c6, 0.35);
   return m;
 };
 
@@ -109,12 +111,14 @@ function pendant(o: {
   h: number;
   r0: number;
   seed: number;
+  /** Body thickness multiplier; the foot keeps the original footprint. */
+  girth?: number;
   segs: number;
   rings: number;
 }): THREE.BufferGeometry {
   const rnd = mulberry32(o.seed ^ 0x5a17);
   const g = new THREE.CylinderGeometry(
-    o.r0 * 0.04,
+    o.r0 * 0.07,
     o.r0,
     o.h,
     Math.max(6, Math.round(o.segs)),
@@ -122,9 +126,9 @@ function pendant(o: {
   );
   g.translate(0, o.h / 2, 0);
   const p = g.getAttribute('position');
-  const concave = 1.5 + rnd() * 0.9;
+  const concave = 1.05 + rnd() * 0.9;
   const bendDir = rnd() * 6.28;
-  const bend = Math.min(o.r0 * 0.9, o.h * 0.07) * (0.4 + rnd() * 0.6);
+  const bend = Math.min(o.r0 * 1.3, o.h * 0.1) * (0.4 + rnd() * 0.8);
   const ringFreq = 5 + rnd() * 6;
   const ringPhase = rnd() * 6.28;
   const flutes = 7 + Math.floor(rnd() * 6);
@@ -136,12 +140,12 @@ function pendant(o: {
     const ang = Math.atan2(z, x);
     const n = fbm3(Math.cos(ang) * 1.6 + 3, t * 5, Math.sin(ang) * 1.6 + 3, o.seed, 3);
     // Concave taper (thick throat, needle tip) with a flared foot into the shelf.
-    let f = Math.pow(1 - t * 0.96, concave);
+    let f = Math.pow(1 - t * 0.94, concave);
     f *= 1 + 0.7 * (1 - smooth(0, 0.18, t));
     // Drip rings: radius swells and pinches along the length, more toward the tip.
     f *= 1 + 0.13 * Math.sin(t * ringFreq * 6.28 + ringPhase + n * 3) * (0.4 + 0.6 * t);
-    f *= 1 + (n - 0.5) * 0.6;
-    f *= 1 + 0.12 * Math.sin(ang * flutes + n * 7 + t * 3);
+    f *= 1 + (n - 0.5) * 0.85;
+    f *= 1 + 0.16 * Math.sin(ang * flutes + n * 7 + t * 3);
     // The foot keeps the original gallery's footprint: it grows out of the shelf.
     const n0 = fbm3(
       Math.cos(ang) * 1.4 + 3,
@@ -151,11 +155,12 @@ function pendant(o: {
       3,
     );
     const foot = (1 + (n0 - 0.5) * 0.6) * (1 + 0.16 * Math.sin(ang * 11 + n0 * 6)) * 1.7;
+    f = Math.min(f * (o.girth ?? 1), foot * 0.94);
     f = foot + (f - foot) * smooth(0, 0.12, t);
     const bx = Math.cos(bendDir) * bend * t * t;
     const bz = Math.sin(bendDir) * bend * t * t;
     // The cylinder's own taper is part of its radius; divide it out, then apply ours.
-    const base = 1 - (1 - 0.04) * t;
+    const base = 1 - (1 - 0.07) * t;
     p.setXYZ(i, (x / base) * f + bx, y, (z / base) * f + bz);
   }
   g.computeVertexNormals();
@@ -169,6 +174,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   const d = geoDetail(tier);
   const [W, D, H] = dims;
   const rnd = mulberry32(seed);
+  const vr = mulberry32(seed ^ 0x7e11);
   // A continuous, thicker lip frames the east mouth; retain the west alcove's scallops.
   const mouthProfile = east
     ? PROFILE.map(([y, z]): [number, number] =>
@@ -274,6 +280,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const hf = clamp(y / (0.62 * H));
     out.lerp(OCHRE, 0.34 * smooth(0.25, 0.9, hf) * (0.5 + bh));
     out.lerp(GREY_BROWN, 0.5 * (1 - smooth(0.05, 0.75, hf)));
+    out.lerp(DEEP_TEAL, 0.22 * (1 - smooth(0.1, 0.8, hf)));
     out.multiplyScalar(0.62 + 0.5 * smooth(0, 0.14, bed - Math.floor(bed)));
     out.multiplyScalar(0.62 + 0.38 * smooth(0, 0.22, hf));
     if (ny < -0.35) out.multiplyScalar(0.7);
@@ -318,7 +325,9 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       // Streaks of fallen debris running down the slope, and a shadowed contact with the wall.
       const streak = fbm3(x * 0.45, z * 0.09, 6, seed ^ 0x63, 3);
       out.multiplyScalar(0.78 + 0.45 * smooth(0.3, 0.7, streak));
-      out.lerp(OCHRE, 0.28 * smooth(0.45, 0.8, t));
+      out.lerp(OCHRE, 0.1 * smooth(0.45, 0.8, t));
+      // Away from the wall the apron sinks toward the cool blue-green of the deep water.
+      out.lerp(DEEP_TEAL, (0.3 + 0.35 * smooth(0.2, 0.9, u)) * (0.7 + 0.5 * (1 - t)));
       out.multiplyScalar(0.5 + 0.5 * smooth(0, 0.4, u));
     },
   );
@@ -393,17 +402,30 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
         ? Math.min(H * (main ? 0.27 + rnd() * 0.17 : 0.065 + rnd() * 0.13), yTop - gnd(x, z) - 0.7)
         : generatedLength;
       if (east && len < 0.5) continue;
+      // Thick, uneven columns: some stout, some slender, so no two read alike.
+      // Variation draws use their own stream, so the placement of the original gallery is unchanged.
+      const lean = main ? 0 : 0.05 + vr() * 0.14;
+      const leanDir = vr() * 6.28;
       const r = len * 0.12 + 0.22;
+      const girth = 1 + vr() * 0.9;
       parts.push(
         place(
           pendant({
             h: len,
             r0: r,
+            girth,
             seed: seed + (k * 7 + i) * 3,
             segs: 10 * d.meshDensity + 4,
             rings: 8 + 6 * d.meshDensity,
           }),
-          { x, y: yTop, z, rx: Math.PI, ry: rnd() * 6.28, rz: (rnd() - 0.5) * 0.1 },
+          {
+            x,
+            y: yTop,
+            z,
+            rx: Math.PI + lean * Math.cos(leanDir),
+            ry: rnd() * 6.28,
+            rz: (rnd() - 0.5) * 0.1 + lean * Math.sin(leanDir),
+          },
         ),
       );
       longest.push({ x, z, y: yTop, len, r });
