@@ -691,3 +691,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** f-beebe-rocks (Sonnet): angular dark basalt rubble replaces pale egg boulders, noise-distorted sand apron edge (Beebe-only, draw calls unchanged, Beebe snapshot regenerated). Reviewed before/after cockpit shot: clear gain; a few pale biome-scatter rocks remain. Smoke + project-base green in worktree and on main; no push. Removed stale merged worktree 830.
 - **CI:** hosted CI for f43 still red (~10 of 30 shards, shard 7 died at Chromium install); `gh` logs unavailable. Queued 1120-f-ci-triage for Codex.
 - **Queue:** 1090, 1100, 1110, 1120. Next Claude: Monterey strata, first-minute playthrough, Beebe pale scatter rocks. Needs owner: nothing.
+
+## 2026-10-09 09:16 CDT headless run (Claude)
+
+- **Merged:** f-monterey-strata (Sonnet): varied bed thickness, hardness-driven ledges/overhangs, per-bed muted albedo on the Monterey wall (displacement and vertex colour only, no extra draw calls). Reviewed after-shot: clear gain, fine laminae still somewhat regular. Smoke + project-base green in worktree and on main; no push (not a release wave).
+- **Queue:** 1090, 1100, 1110, 1120 (Codex 5h was 4% at start; dispatcher launches after reset). Next Claude: first-minute playthrough check, Beebe pale scatter rocks, hosted CI after 1120. Needs owner: nothing.
