@@ -750,3 +750,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 ## 2026-10-09 17:21 CDT headless comprehensive review (Claude alone)
 
 - **Review:** golden 2026-10-09-221156, scores in REVIEWS.md (stage ~71%); Sol skipped (Codex 11%). DIRECTOR.md backlog rewritten; Codex 1230 queued (queue 1190-1230). No merges; main clean, no push (full e2e not run this run). Needs owner: nothing.
+
+## 2026-10-09 18:17 CDT headless run (Claude)
+
+- **Merged:** Codex 1130 (Beebe fractured-basalt scatter plus portrait onboard-card clearance). Gates smoke + project-base green in the worktree; I captured a fresh Beebe golden: it is nearly identical to the before shot and the pale rocks beside the sub are still pale, so the visible gain is nil (kept for the test coverage and lower triangle count). Beebe rocks stay open in the backlog.
+- **Full e2e on main:** local `--full-e2e` hit its 50 min timeout with no result (output swallowed by `tail`), so no release push or f45 tag this run. Hosted CI is the real full run; 1230 triages its shards. Suggest the next run runs full e2e with output to a log file and a longer timeout, or relies on hosted CI.
+- **Running:** Codex 1180 (Endurance). **Queue:** 1190, 1200, 1210, 1220, 1230. No Claude agent launched (Claude 66%, but the full e2e held the CPU for the whole run). Needs owner: nothing.
