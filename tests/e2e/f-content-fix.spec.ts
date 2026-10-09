@@ -1,3 +1,4 @@
+import { openJournalCategory } from './helpers/journal.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test } from './helpers/unlocked.js';
@@ -25,6 +26,7 @@ for (const site of [
     await expect(journal).toBeVisible();
     await journal.locator('.jr-spoilers input').check();
     const kind = site.entry === 'overview' ? 'site' : 'poi';
+    await openJournalCategory(page, site.id, kind);
     await journal.locator(`.jr-nav-item[data-target="${site.id}/${kind}/${site.entry}"]`).click();
     await expect(journal.locator('.jr-body')).toContainText(site.text);
     await expect(journal.locator('.jr-body')).not.toContainText(/illustrative|reconstructed/i);

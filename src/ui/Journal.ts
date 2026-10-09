@@ -106,6 +106,8 @@ export class Journal {
   private homeMode = false;
   private spoilers_ = false;
   private contentsOpen = false;
+  private readonly expandedSites = new Map<string, boolean>();
+  private readonly expandedCategories = new Map<string, boolean>();
   private view: View = { kind: 'front' };
   private pendingFocus: string | null = null;
   private open_ = false;
@@ -285,6 +287,7 @@ export class Journal {
       this.view = { kind: 'site', siteId: site };
     }
     this.opened = true;
+    this.revealView();
     this.open_ = true;
     this.root.hidden = false;
     this.render();
@@ -317,6 +320,7 @@ export class Journal {
     else if (target === 'photos') this.view = { kind: 'photos' };
     else if (this.sites.some((s) => s.id === target)) this.view = { kind: 'site', siteId: target };
     else this.view = { kind: 'entry', key: target };
+    this.revealView();
     this.render();
     this.announce();
     this.body.scrollTop = 0;
@@ -331,7 +335,18 @@ export class Journal {
   private fixEntryKey(siteId: string, id: string): void {
     const site = this.sites.find((s) => s.id === siteId);
     const e = site?.entries.find((x) => isGuideEntry(x) && x.id === id);
-    if (e) this.view = { kind: 'entry', key: e.key };
+    if (e) {
+      this.view = { kind: 'entry', key: e.key };
+      this.revealView();
+    }
+  }
+
+  /** Direct navigation (including a newly scanned entry) reveals its contents. */
+  private revealView(): void {
+    const entry = this.view.kind === 'entry' ? this.entryByKey(this.view.key) : null;
+    const siteId = this.view.kind === 'site' ? this.view.siteId : entry?.siteId;
+    if (siteId) this.expandedSites.set(siteId, true);
+    if (entry) this.expandedCategories.set(`${entry.siteId}/${entry.kind}`, true);
   }
 
   private entryByKey(key: string): JournalEntry | null {
@@ -361,6 +376,7 @@ export class Journal {
   private render(): void {
     const focused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const target = focused?.dataset.target;
+    const category = focused?.dataset.category;
     const inside = !!focused && this.root.contains(focused);
     this.renderContent();
     if (inside && !focused?.isConnected) {
@@ -368,12 +384,16 @@ export class Journal {
         this.body.focus({ preventScroll: true });
         return;
       }
-      const replacement = [...this.nav.querySelectorAll<HTMLButtonElement>('[data-target]')].find(
-        (button) => button.dataset.target === target,
+      // Use the trap's visibility rules, including collapsed native details.
+      const controls = this.trap.focusables();
+      const replacement = controls.find((control) =>
+        target
+          ? control.dataset.target === target
+          : !!category && control.dataset.category === category,
       );
       (
         replacement ??
-        this.nav.querySelector<HTMLButtonElement>('.is-selected') ??
+        controls.find((control) => control.classList.contains('is-selected')) ??
         this.root.querySelector<HTMLButtonElement>('.jr-close')
       )?.focus();
     }
@@ -423,6 +443,7 @@ export class Journal {
     cls: string,
     target: string,
     on: boolean,
+    run: () => void = () => this.show(target),
   ): HTMLLIElement {
     const li = el('li');
     const b = el('button', `jr-nav-item ${cls}`);
@@ -432,7 +453,7 @@ export class Journal {
     if (on) b.setAttribute('aria-current', 'page');
     b.append(el('span', 'jr-nav-title', label));
     if (meta) b.append(el('span', 'jr-nav-meta', meta));
-    b.addEventListener('click', () => this.show(target));
+    b.addEventListener('click', run);
     li.append(b);
     return li;
   }
@@ -460,16 +481,35 @@ export class Journal {
     for (const s of sites) {
       const p = siteProgress(s, this.store);
       const cur = s.id === this.currentSiteId && !this.homeMode;
+      const expanded = this.expandedSites.get(s.id) ?? s.id === this.currentSiteId;
       const li = this.navButton(
         s.name,
         `${cur ? 'THIS DIVE · ' : ''}${p.logged}/${p.total}`,
         'is-site',
         s.id,
         this.view.kind === 'site' && s.id === open?.id,
+        () => {
+          // A site row remains a route back from an entry/front/photos page.
+          // Only a second activation on its overview collapses the group.
+          if (expanded && (this.view.kind !== 'site' || this.view.siteId !== s.id)) {
+            this.show(s.id);
+            return;
+          }
+          this.expandedSites.set(s.id, !expanded);
+          if (!expanded) this.show(s.id);
+          else this.render();
+        },
       );
       li.classList.toggle('is-locked', !isSiteUnlocked(s, this.store));
+      const button = li.querySelector<HTMLButtonElement>('button')!;
+      const entriesId = `journal-entries-${s.id}`;
+      button.setAttribute('aria-expanded', String(expanded));
+      button.setAttribute('aria-controls', entriesId);
+      const entries = expanded ? this.siteEntryList(s, entry) : el('div', 'jr-site-entries');
+      entries.id = entriesId;
+      entries.hidden = !expanded;
       ul.append(li);
-      if (s === open) li.append(this.siteEntryList(s, entry));
+      li.append(entries);
     }
     this.nav.replaceChildren(ul);
     this.nav.scrollTop = scrollTop;
@@ -478,16 +518,32 @@ export class Journal {
   /** The open site's entries, grouped, under its nav item. */
   private siteEntryList(site: JournalSite, current: JournalEntry | null): HTMLElement {
     const box = el('div', 'jr-site-entries');
-    const groups: Array<[string, JournalEntry[]]> = [
-      ['About the site', site.entries.filter((e) => e.kind === 'site')],
-      ['Points of interest', site.entries.filter((e) => e.kind === 'poi')],
-      ['Species', site.entries.filter((e) => e.kind === 'species')],
-      ['Wildlife', site.entries.filter((e) => e.kind === 'life')],
-      ['Secrets', site.entries.filter((e) => e.kind === 'secret')],
+    const groups: Array<[string, JournalEntry['kind']]> = [
+      ['About the site', 'site'],
+      ['Points of interest', 'poi'],
+      ['Species', 'species'],
+      ['Wildlife', 'life'],
+      ['Secrets', 'secret'],
     ];
-    for (const [label, list] of groups) {
+    for (const [label, kind] of groups) {
+      const list = site.entries.filter((e) => e.kind === kind);
       if (!list.length) continue;
-      box.append(el('h3', 'jr-group', label));
+      const key = `${site.id}/${kind}`;
+      const group = el('details', 'jr-category');
+      group.dataset.category = key;
+      group.open = this.expandedCategories.get(key) ?? kind === 'poi';
+      const logged = list.filter((e) => isEntryUnlocked(site, e, this.store)).length;
+      const summary = el('summary', 'jr-group');
+      summary.dataset.category = key;
+      summary.append(
+        el('span', undefined, label),
+        el('span', 'jr-nav-meta', `${logged}/${list.length}`),
+      );
+      group.append(summary);
+      group.addEventListener('toggle', () => {
+        if (group.isConnected) this.expandedCategories.set(key, group.open);
+      });
+      box.append(group);
       const ul = el('ul');
       let hidden = 0;
       let unscanned = 0;
@@ -511,12 +567,12 @@ export class Journal {
         li.classList.toggle('is-locked', !open);
         ul.append(li);
       }
-      box.append(ul);
+      group.append(ul);
       if (unscanned) {
-        box.append(el('p', 'jr-more-to-find', `${unscanned} more to find`));
+        group.append(el('p', 'jr-more-to-find', `${unscanned} more to find`));
       }
       if (hidden) {
-        box.append(
+        group.append(
           el(
             'p',
             'jr-hidden-note',

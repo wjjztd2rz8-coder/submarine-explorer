@@ -1,3 +1,4 @@
+import { openJournalCategory } from './helpers/journal.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import type { GameConfig } from '../../src/core/Config.js';
@@ -165,7 +166,7 @@ for (const viewport of [
           await page.keyboard.press('Escape');
           await page.clock.fastForward(34);
           await page.locator('.pause-surface').click();
-          await expect(page.locator('.mission-debrief .is-discoveries')).toContainText(name);
+          await expect(page.locator('.mission-debrief .debrief-highlight')).toContainText(name);
           await page.screenshot({ path: info.outputPath('debrief.png') });
           expect(errors).toEqual([]);
         });
@@ -221,8 +222,7 @@ for (const viewport of [
           await expect(page.locator(journalSites)).toHaveCount(13);
           await page.locator('.jr-spoilers input').check();
           await contents(page);
-          await page.locator(`${journalSites}[data-target="${site}"]`).click();
-          await contents(page);
+          await openJournalCategory(page, site, 'life');
           await page.locator(`.jr-nav-item[data-target="${site}/life/${species}"]`).click();
           const tags = page.locator('.jr-title-row .jr-tag:not(.is-undiscovered)');
           await expect(tags).toHaveCount(1);

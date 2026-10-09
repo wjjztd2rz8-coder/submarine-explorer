@@ -272,10 +272,8 @@ test.describe('B3 mission flow', () => {
       'Dive again',
       'Home',
     ]);
-    await expect(debrief.locator('.debrief-section.is-discoveries li')).toHaveText([
-      'Bow section',
-      'Stern section',
-    ]);
+    await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Bow section.');
+    await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText('2');
     await page.waitForTimeout(300);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-debrief.png' });
 
@@ -383,7 +381,7 @@ test.describe('fix S: mission failure, framing and modals', () => {
     await expect(alert).toBeHidden();
     await expect(debrief).toHaveClass(/is-aborted/);
     await expect(debrief.locator('.debrief-title')).toHaveText('Dive aborted');
-    await expect(debrief.locator('.debrief-subtitle')).toContainText('Hull failure at');
+    await expect(debrief.locator('.debrief-highlight')).toContainText('Hull failure at');
     // No Keep exploring after an abort: the dive is over.
     await expect(debrief.locator('.debrief-btn')).toHaveText([
       'Dive sites',
