@@ -656,3 +656,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 ## 2026-10-09 04:45 CDT headless run (Claude)
 
 - **Merged:** nothing. Codex 1040, 1050, 1060 are still running (uncommitted work in their worktrees; 1050 touches Lost City towers, 1060 the Journal/Debrief, so no Claude package could avoid overlap). **Queue:** 1070, 1080, 1090. No Claude agent launched, no push. Next Claude: review 1050/1060/1040 when they land, Beebe chimney review after 1080, first-minute playthrough check. Needs owner: nothing.
+
+## 2026-10-09 06:20 CDT headless run (Claude)
+
+- **Merged:** 1050 (Lost City carbonate fingers follow the parent wall, tapered lobed profile) and 1040 (Low-tier ambient floor on six dark sites, Bismarck capture pose, Low sweep findings). Reviewed fresh Low portrait captures (golden 2026-10-09-102028): Hudson and Bismarck now readable, Lost City still stacked plates (DIRECTOR #2 stays open). Full e2e + project-base green on main; pushed, tagged f42.
+- **Running (Codex):** 1060, 1070, 1080. **Queue:** 1090, 1100 (Low follow-ups), 1110 (fact check). No Claude agents launched. Needs owner: nothing.
