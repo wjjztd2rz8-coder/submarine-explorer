@@ -730,3 +730,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Review:** idle trigger traced to an empty backlog; new golden 2026-10-09-191533, backlog refilled, 1170 queued (REVIEWS.md).
 - **Merged:** f-lostcity-tower (modest gain, jagged trunk), f-bluehole-bowl (partial: sonar still flat green, bowl barely changed; redo queued as Claude item 2). Smoke + project-base green on main; no push.
 - **Codex:** 1090-1120 stalled at 0% until 14:16 reset; queue 1130, 1140, 1160, 1170. Needs owner: nothing.
+
+## 2026-10-09 15:45 CDT headless comprehensive review (Claude + Sol)
+
+- **Review:** joint review with Sol written to REVIEWS.md (stage ~70%, 3-4 weeks; Sol's reconcile round produced no output, disputes settled on evidence). Backlog rewritten; Codex briefs 1170, 1180 (Endurance snow), 1190 (Titanic haze), 1200 (sonar palette) queued.
+- **Merged:** f-firstdiscovery (Sonnet): scan-to-reward capture script, phone notice and next-target chip fixes. Smoke + project-base green on main; no push of a release wave.
+- **Running:** Codex 1130, 1140, 1160; stalled 1090-1120 need collection. Hosted CI still red. Needs owner: nothing.

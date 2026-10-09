@@ -8,7 +8,7 @@ Agreed scores (beautiful): Titanic 3.5-4, Beebe 3-3.5, Blue Hole 2.5-3, Lost Cit
 
 Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
 
-1. **Unaided first-discovery capture (Sonnet):** extend tools/firstminute-shots.mjs to press Scan, show the reward and the next-step prompt on desktop and phone for Titanic and Beebe; fix whatever confuses (Beebe asks for a 173 degree turn while onboarding teaches vertical movement; Titanic phone 60 s frame loses the wreck).
+1. (MERGED 2026-10-09 evening: tools/firstdiscovery-shots.mjs, phone notice and next-target chip fixes; Beebe 173 degree turn not reproduced in guided flow; open: reward card title differs from objective name, desktop tutorial stuck on 'Move and turn') **Unaided first-discovery capture (Sonnet):** extend tools/firstminute-shots.mjs to press Scan, show the reward and the next-step prompt on desktop and phone for Titanic and Beebe; fix whatever confuses (Beebe asks for a 173 degree turn while onboarding teaches vertical movement; Titanic phone 60 s frame loses the wreck).
 2. **Mission pacing (Sonnet):** second required targets at Blue Hole (~4.5 km) and Monterey (~14.6 km) are transit, not exploration; move or add intermediate required POIs so the next target is within ~1 km, keeping facts honest.
 3. **Blue Hole bowl and sonar scale (Sonnet):** shelf line, faceted terraces, capsule sponges; sonar minimap scaled so the hole is legible (palette itself is Codex 1200).
 4. **Challenger seabed legibility (Sonnet):** lander marker is tiny; make the amphipod swarm and slope readable (1170 audits).
