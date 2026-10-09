@@ -295,3 +295,32 @@ export const DEFAULT_WATER: WaterConfig = {
     },
   },
 };
+
+/** The six 990 openings whose floor disappears outside the lamps on Low. */
+export const LOW_READABILITY_SITES: readonly string[] = [
+  'axial-seamount-ashes',
+  'bismarck',
+  'blake-plateau-corals',
+  'hudson-canyon',
+  'hunga-tonga-caldera',
+  'kamaehuakanaloa',
+];
+
+const LOW_SEABED_LIGHT = { depthM: -200, color: 0x879399, intensity: 3 };
+
+/** Reuse the existing ambient light; no extra lights, geometry or post passes. */
+export function lowSiteWater(site: string, tier: GraphicsTier, water: WaterConfig): WaterConfig {
+  if (tier !== 'low' || !LOW_READABILITY_SITES.includes(site)) return water;
+  return {
+    ...water,
+    bands: water.bands.map((band) =>
+      band.depth <= LOW_SEABED_LIGHT.depthM
+        ? {
+            ...band,
+            ambientColor: LOW_SEABED_LIGHT.color,
+            ambientIntensity: Math.max(band.ambientIntensity, LOW_SEABED_LIGHT.intensity),
+          }
+        : band,
+    ),
+  };
+}
