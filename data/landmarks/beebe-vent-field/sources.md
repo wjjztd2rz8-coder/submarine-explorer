@@ -1,5 +1,11 @@
 # Beebe Vent Field content: sources and notes (package C4, beebe-vent-field)
 
+## F-1110 audit (2026-10-09)
+
+[The five-site primary-source audit](../../../plan/progress/F-1110.md) records
+the current copy, corrections, cuts and source-access limits. Earlier notes below
+are historical and are superseded where that audit corrects or removes a claim.
+
 ## Phase F fluid and scale correction — 2026-10-01
 
 [Webber et al. 2015](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005879) documents low-salinity fluids at ~401–403 °C and ~500 bar in the supercritical domain. The earlier ~298 bar description confused a seawater critical-point value with hydrostatic pressure at ~5 km. Use the measured low-salinity chemistry when explaining the state, rather than treating 403 °C as automatically supercritical for full-salinity seawater at this depth.

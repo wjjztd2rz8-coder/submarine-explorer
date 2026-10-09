@@ -72,7 +72,7 @@
       "poi": "titanic-memorial",
       "primary": false,
       "title": "Visit the memorial plaque site",
-      "hint": "Find the former plaque site on the stern, south of the bow, near 3,790 m."
+      "hint": "Find the memorial site on the stern, south of the bow, near 3,790 m."
     }
   ],
   "completion": "all_primary"

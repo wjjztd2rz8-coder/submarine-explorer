@@ -14,6 +14,12 @@ without an entry here is not done.
 
 ### Changed
 
+- **F-1110:** fact-check Lost City, Beebe, Great Blue Hole, Monterey and Titanic
+  Journal/scan copy against primary sources; correct Beebe’s survey year and
+  Beebe-125 name, marker distances and shrimp text, credit Titanic’s joint
+  discovery leadership, and tag authored Beebe markers once through the existing
+  Journal provenance path. Sources and verification: `plan/progress/F-1110.md`.
+
 - **F-MONTEREY-STRATA:** the Monterey canyon wall no longer reads as even corrugated stripes. Bed thickness is skewed (many thin beds, a few massive ones), ledge depth and overhang follow per-bed hardness and vary along the wall, slump scars are deeper, and each bed has its own muted albedo (olive, tan, grey, dark olive, buff). Vertex-colour and displacement only: no draw-call, triangle or tier change.
 
 - **f-beebe-rocks:** Beebe's seabed boulders are now angular, plane-clipped, noise-displaced rocks with flat shading, dark basalt vertex colour, rusty sulfide staining and partial burial, replacing the pale smooth lumps; the sand apron edge is feathered with multi-scale noise and angular bays and a wider height/lift fade so it is no longer a clean ellipse. Beebe only (other talus users keep their lumps via an opt-in rock builder). Same single merged rubble mesh, no new draw calls, colliders or scan targets; the previous radial edge-colour tint on the rubble was dropped. Low tier uses 80-face rocks.
@@ -887,6 +893,15 @@ without an entry here is not done.
   default stays `medium`, so a fresh install looks the same as before.
 
 ### Removed
+
+- **F-1110:** cut unsupported Monterey shelf-break identification, Blue Hole
+  stalactite depth restriction, Lost City sampling-coordinate attribution, and
+  Titanic’s precise debris footprints, remnant lengths/burial, boiler-cluster
+  assignment, plaque disappearance/footprint, channel-origin attribution and
+  secondary-only exhibit details. Replace Big Piece short-ton assumptions with
+  the recovering operator’s 17-ton description and broad UNESCO-protection
+  wording with NOAA’s US–UK agreement/in situ policy. Retain all scan targets.
+  Reason: primary evidence does not establish those precise claims.
 
 - Phase F, F-PHONE-HUD-890: remove the phone sonar legend, tutorial heading/dots
   and second Skip action; hide collapsed sonar zoom controls until expansion.

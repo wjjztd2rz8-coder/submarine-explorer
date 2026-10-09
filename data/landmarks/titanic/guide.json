@@ -7,14 +7,14 @@
       "id": "overview",
       "title": "RMS Titanic wreck site",
       "paragraphs": [
-        "RMS Titanic sank in the early hours of 15 April 1912 on her maiden voyage from Southampton to New York, about two hours and forty minutes after striking an iceberg. About 1,500 of the roughly 2,200 people on board died; published figures range from about 1,496 to 1,523.",
-        "The wreck lies about 3,800 m down, some 325 nautical miles south-south-east of Newfoundland. It was found just after 1 a.m. on 1 September 1985 by a French–American expedition led by Jean-Louis Michel (IFREMER) and Robert Ballard (Woods Hole Oceanographic Institution). The towed camera sled Argo, working from the research vessel Knorr, followed a trail of debris until it picked out one of the ship's boilers.",
-        "The ship broke apart as it sank. The bow and stern sections rest about 600–700 m apart, and they face opposite ways. Two dense debris fields, each 600–800 m long, trail south-west from the sections, and a thinner scatter spreads over many square kilometres. Most of the debris lies near the stern: boilers, hull plates, fittings, and the personal belongings of passengers and crew.",
+        "RMS Titanic sank on 15 April 1912 on her maiden voyage after striking an iceberg. About 1,500 people died.",
+        "The wreck lies about 3,800 m down in the North Atlantic. A French–American expedition led by Jean-Louis Michel (IFREMER) and Robert Ballard (WHOI) found it on 1 September 1985. Cameras towed from RV Knorr first revealed a boiler; the team followed the debris north to the ship.",
+        "The bow and stern rest about 600 m apart and face opposite ways. Hull fragments, machinery and personal belongings are scattered across the surrounding seabed.",
         "GMRT survey cells here span about 45 × 61 m. Magellan's proprietary 2022 photogrammetric scan is not used in this dive."
       ],
       "facts": [
         {
-          "label": "Position (bow)",
+          "label": "Bow scan marker",
           "value": "41°43′57″N 49°56′49″W"
         },
         {
@@ -31,7 +31,7 @@
         },
         {
           "label": "Length (intact)",
-          "value": "269.1 m (882 ft 9 in)"
+          "value": "about 269 m (overall length)"
         },
         {
           "label": "Beam",
@@ -43,19 +43,11 @@
         },
         {
           "label": "Protection",
-          "value": "US–UK Agreement (in force 18 Nov 2019); UNESCO 2001 Convention (since April 2012)"
+          "value": "US–UK Agreement in force 18 November 2019; in situ preservation preferred"
         }
       ],
       "reconstruction": true,
       "sources": [
-        {
-          "title": "Wreck of the Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
-        },
-        {
-          "title": "RMS Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/RMS_Titanic"
-        },
         {
           "title": "1985 Discovery of RMS Titanic — Woods Hole Oceanographic Institution",
           "url": "https://www.whoi.edu/ocean-learning-hub/ocean-topics/ocean-human-lives/underwater-archaeology/rms-titanic/1985-discovery-of-rms-titanic/"
@@ -69,16 +61,32 @@
           "url": "https://assets.publishing.service.gov.uk/media/5dfa072de5274a08dd355be0/TS_8.2019_Agreement_concerning_Shipwrecked_Vessel_RMS_Titanic.pdf"
         },
         {
-          "title": "First full-sized 3D scan of the Titanic shipwreck captured (2023) — Al Jazeera",
-          "url": "https://www.aljazeera.com/news/2023/5/17/first-full-sized-3d-scan-of-the-titanic-shipwreck-captured"
-        },
-        {
           "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332",
           "url": "https://www.gmrt.org/"
         },
         {
           "title": "WHOI — fortieth anniversary of the Titanic discovery",
           "url": "https://www.whoi.edu/press-room/news-release/titanic-40th/"
+        },
+        {
+          "title": "WHOI — The Quest to Map Titanic (2012)",
+          "url": "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+        },
+        {
+          "title": "NOAA — 2010 Titanic expedition results",
+          "url": "https://sanctuaries.noaa.gov/maritime/titanic/expedition_results.html"
+        },
+        {
+          "title": "NOAA — Titanic agreement and preservation policy",
+          "url": "https://www.noaa.gov/office-of-general-counsel/gc-international-section/rms-titanic-frequently-asked-questions"
+        },
+        {
+          "title": "1912 British Wreck Commissioner inquiry — ship dimensions (transcript)",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTReport/botRepTitanic.php"
+        },
+        {
+          "title": "NIST — Titanic overall length and wireless history",
+          "url": "https://www.nist.gov/blogs/taking-measure/nist-and-titanic-how-sinking-ship-improved-wireless-communications-navigating"
         }
       ],
       "confidence": "high"
@@ -87,13 +95,12 @@
       "id": "bow",
       "title": "The bow section",
       "paragraphs": [
-        "The forward part of the ship, about 143 m (470 ft) long, stands upright and faces roughly north. It struck the seabed at speed and ploughed about 18 m (60 ft) into the sediment, which buckled the hull. It remains the most recognisable part of the wreck: the forecastle railing, the anchor cranes, the well deck, and the hollow where the bridge once stood.",
-        "Iron-eating microbes have been slowly consuming the steel since 1912. They leave rusticles, icicle-like growths of rust that hang from every surface. In 2019 divers in the submersible Limiting Factor found that the starboard officers' quarters, including the captain's cabin and his bathtub, had collapsed. In 2024 an RMS Titanic Inc. survey found that a section of railing about 4.5 m (15 ft) long on the port side of the bow had fallen to the seabed.",
-        "In 1986 Robert Ballard left an Explorers Club plaque on one of the bronze-topped capstans on the forecastle deck."
+        "The bow stands upright and remains more intact than the stern. Its impact disturbed and ploughed the sediment, leaving marks visible in the 2010 sonar survey.",
+        "Iron-eating microbes have been slowly consuming the steel since 1912. They leave rusticles, icicle-like growths of rust that hang from every surface. In 2019 divers in the submersible Limiting Factor found that the starboard officers' quarters, including the captain's cabin and his bathtub, had collapsed. In 2024, RMS Titanic Inc. documented a fallen 4.5 m (15 ft) section of port-side bow railing, confirmed by multibeam imagery."
       ],
       "facts": [
         {
-          "label": "Position",
+          "label": "Scan marker",
           "value": "41°43′57″N 49°56′49″W"
         },
         {
@@ -101,16 +108,8 @@
           "value": "about 3,800 m (seabed in this tile: 3,802 m)"
         },
         {
-          "label": "Length",
-          "value": "about 143 m (470 ft) of the 269 m hull"
-        },
-        {
           "label": "Heading",
           "value": "roughly north"
-        },
-        {
-          "label": "Buried",
-          "value": "about 18 m (60 ft) into the sediment"
         },
         {
           "label": "Site discovered",
@@ -120,14 +119,6 @@
       "reconstruction": true,
       "sources": [
         {
-          "title": "Wreck of the Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
-        },
-        {
-          "title": "Discovering Titanic: bow, stern and boiler coordinates — titanicstory.com",
-          "url": "https://www.titanicstory.com/discover.htm"
-        },
-        {
           "title": "The Quest to Map Titanic — WHOI Oceanus Vol. 49 No. 2 (2012)",
           "url": "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
         },
@@ -136,16 +127,12 @@
           "url": "https://www.ncl.ac.uk/press/articles/archive/2019/08/titanicdive/"
         },
         {
-          "title": "Iconic Titanic bow railing falls to sea floor in sign of ongoing decay (2024) — Encyclopedia Titanica",
-          "url": "https://www.encyclopedia-titanica.org/titanic-news/iconic-titanic-bow-railing-falls-to-sea-floor-decay.html"
+          "title": "NOAA — 2010 Titanic expedition results",
+          "url": "https://sanctuaries.noaa.gov/maritime/titanic/expedition_results.html"
         },
         {
-          "title": "New images of Titanic reveal part of bow railing collapsed (2024) — CBS News",
-          "url": "https://www.cbsnews.com/news/titanic-images-bow-railing-collapsed-diana-versailles-statue/"
-        },
-        {
-          "title": "What Happened to Ballard's Plaque? — Paul Lee",
-          "url": "https://www.paullee.com/titanic/THSplaque.php"
+          "title": "RMS Titanic Inc. — 2024 bow-railing survey",
+          "url": "https://rmstitanicinc.com/titanic-expeditions/"
         }
       ],
       "confidence": "high"
@@ -154,13 +141,13 @@
       "id": "stern",
       "title": "The stern section",
       "paragraphs": [
-        "The stern section, about 107 m (350 ft) long, lies about 600–700 m south of the bow. It sank more slowly than the bow and was far more badly damaged. Pressure crushed its trapped air spaces as it went down, and the impact with the seabed collapsed its decks onto one another. Its hull plating is peeled outwards along both sides.",
+        "The stern lies about 600 m from the bow and is much more badly damaged. WHOI's 2010 images show its collapsed decks and distorted hull. It sank more slowly than the bow.",
         "The stern turned around as it sank, so its rear end now points back towards the bow. The two halves of the ship face in opposite directions.",
-        "Hundreds of people were on or near the stern when it went under, because it was the last part of the ship above water. For that reason the 1986 expedition chose it for the memorial plaque."
+        "In 1986, Ballard returned and placed a bronze Titanic Historical Society memorial plaque on the stern to honour those who died."
       ],
       "facts": [
         {
-          "label": "Position",
+          "label": "Scan marker",
           "value": "41°43′35″N 49°56′54″W"
         },
         {
@@ -168,16 +155,12 @@
           "value": "about 3,800 m (seabed in this tile: 3,801 m)"
         },
         {
-          "label": "Length",
-          "value": "about 107 m (350 ft)"
-        },
-        {
           "label": "Orientation",
           "value": "rear end points north-north-east, towards the bow"
         },
         {
           "label": "Distance from bow",
-          "value": "about 600 m (published); 690 m from the published coordinates"
+          "value": "about 600 m (WHOI); 690 m between the game markers"
         },
         {
           "label": "Condition",
@@ -187,24 +170,12 @@
       "reconstruction": true,
       "sources": [
         {
-          "title": "Wreck of the Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
-        },
-        {
-          "title": "Discovering Titanic: bow, stern and boiler coordinates — titanicstory.com",
-          "url": "https://www.titanicstory.com/discover.htm"
-        },
-        {
           "title": "The Quest to Map Titanic — WHOI Oceanus Vol. 49 No. 2 (2012)",
           "url": "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
         },
         {
-          "title": "First complete map of Titanic wreck site — The History Blog",
-          "url": "http://www.thehistoryblog.com/archives/15523"
-        },
-        {
-          "title": "Scientists placed a memorial plaque on the stern (21 July 1986) — UPI Archives",
-          "url": "https://www.upi.com/Archives/1986/07/21/Scientists-placed-a-memorial-plaque-on-the-stern-of/6073522302400/"
+          "title": "Titanic Historical Society — its 1986 stern memorial",
+          "url": "https://titanichistoricalsociety.org/titanic-past-present/"
         }
       ],
       "confidence": "high"
@@ -213,8 +184,8 @@
       "id": "boilers",
       "title": "The boiler field",
       "paragraphs": [
-        "Titanic had 29 coal-fired boilers, each about 4.8 m (15 ft 9 in) across. When the hull broke apart near the third funnel, five boilers from Boiler Room No. 1 fell out. They landed as a tight cluster in the debris field around the stern, about 180 m (600 ft) east of it. Because heavy boilers fall almost straight down, the cluster is thought to mark the point where the ship broke up, far above.",
-        "One of these boilers was the first object the 1985 expedition recognised. Early on 1 September, Argo's cameras showed its round face and firebox openings on the seabed, and the team knew they had found Titanic."
+        "Titanic had 29 coal-fired boilers: 24 double-ended and five single-ended. Each was about 4.8 m (15 ft 9 in) in diameter, according to the 1912 British inquiry. Boilers are among the machinery documented in the wreck's debris field.",
+        "One boiler was the first object the 1985 expedition recognised. Early on 1 September, the cameras showed its distinctive rivets; the team followed the debris north to the wreck."
       ],
       "facts": [
         {
@@ -226,15 +197,11 @@
           "value": "about 4.8 m (15 ft 9 in)"
         },
         {
-          "label": "On the seabed",
-          "value": "five, from Boiler Room No. 1"
-        },
-        {
           "label": "First seen",
-          "value": "just after 1 a.m., 1 September 1985"
+          "value": "1 September 1985"
         },
         {
-          "label": "Position",
+          "label": "Scan marker",
           "value": "41°43′32″N 49°56′49″W (field centre)"
         },
         {
@@ -244,18 +211,6 @@
       ],
       "reconstruction": true,
       "sources": [
-        {
-          "title": "RMS Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/RMS_Titanic"
-        },
-        {
-          "title": "Wreck of the Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
-        },
-        {
-          "title": "Discovering Titanic: bow, stern and boiler coordinates — titanicstory.com",
-          "url": "https://www.titanicstory.com/discover.htm"
-        },
         {
           "title": "1985 Discovery of RMS Titanic — Woods Hole Oceanographic Institution",
           "url": "https://www.whoi.edu/ocean-learning-hub/ocean-topics/ocean-human-lives/underwater-archaeology/rms-titanic/1985-discovery-of-rms-titanic/"
@@ -267,6 +222,18 @@
         {
           "title": "RMS Titanic Inc. — wreck site, boilers and discovery",
           "url": "https://rmstitanicinc.com/titanic-wreck/"
+        },
+        {
+          "title": "1912 British Wreck Commissioner inquiry — machinery (transcript)",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTReport/botRepMach.php"
+        },
+        {
+          "title": "WHOI — 1985 Titanic discovery, fortieth anniversary",
+          "url": "https://www.whoi.edu/press-room/news-release/titanic-40th/"
+        },
+        {
+          "title": "NOAA — 2010 Titanic expedition results",
+          "url": "https://sanctuaries.noaa.gov/maritime/titanic/expedition_results.html"
         }
       ],
       "confidence": "low"
@@ -276,21 +243,17 @@
       "title": "The debris field",
       "paragraphs": [
         "As the ship broke apart, thousands of objects fell 3.8 km through the dark water: coal, hull plates, furniture, crockery, bottles, and the belongings of passengers and crew. Heavy pieces fell almost straight down. Lighter pieces drifted with the currents and settled in long trails.",
-        "Close to the wreck, two dense debris fields trail south-west from the bow and the stern. Each is 600–800 m long, together they cover about 5 km² (2 square miles), and most of the debris lies near the stern. The 2010 survey by RMS Titanic Inc., WHOI and the Waitt Institute used two REMUS 6000 autonomous vehicles to map the whole site with sonar and cameras for the first time, covering 15–20 square miles (about 39–52 km²) of seafloor. It showed several overlapping debris fields and a much wider scatter, not the single simple trail that had been assumed.",
+        "The 2010 expedition used two REMUS 6000 autonomous vehicles and an ROV to survey the wreck site. WHOI describes mapping 15–20 square miles (about 39–52 km²) of seafloor. NOAA's account distinguishes the broad scatter from close-up surveys of particular clusters of wreckage.",
         "Pairs of shoes still lie where bodies once came to rest. They are among the most moving sights at the site, and a reminder that this is a grave.",
-        "This point marks the gap you cross between the bow and stern. The densest debris lies near the stern; the real field is far larger and more varied."
+        "This scan marks the gap between the bow and stern. The survey area extends well beyond the two hull sections."
       ],
       "facts": [
-        {
-          "label": "Dense fields",
-          "value": "two, each 600–800 m long; about 5 km² (2 sq mi)"
-        },
         {
           "label": "Area mapped (2010)",
           "value": "15–20 sq mi (about 39–52 km²)"
         },
         {
-          "label": "Fully mapped",
+          "label": "Survey expedition",
           "value": "2010 (RMS Titanic Inc., WHOI, Waitt Institute)"
         },
         {
@@ -309,14 +272,6 @@
           "url": "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
         },
         {
-          "title": "First complete map of Titanic wreck site — The History Blog",
-          "url": "http://www.thehistoryblog.com/archives/15523"
-        },
-        {
-          "title": "Wreck of the Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
-        },
-        {
           "title": "2010 Expedition Results — NOAA Maritime Heritage Program",
           "url": "https://sanctuaries.noaa.gov/maritime/titanic/expedition_results.html"
         }
@@ -327,22 +282,18 @@
       "id": "big-piece",
       "title": "Where the \"Big Piece\" lay",
       "paragraphs": [
-        "The \"Big Piece\" is a section of starboard hull plating about 7.9 m wide and 6.1 m high, weighing 15–20 tons. It was part of the wall of first-class cabins on C Deck, extending down to D Deck, and several portholes are still in place. It broke away from the hull and came to rest among the stern-side debris.",
-        "First seen in 1994, it was raised by RMS Titanic Inc. in August 1998 after an earlier attempt failed in 1996. After recovery it was divided: the larger piece is displayed in Las Vegas, and the smaller piece in Orlando. Recoveries like this were controversial, and the international agreement that came into force in 2019 favours leaving the wreck and its artifacts in place.",
-        "This point marks the general stern-side debris area where hull plating like this lies. The Big Piece itself is no longer on the seabed."
+        "The \"Big Piece\", also called \"The Chunk\", is a recovered section of hull with portholes spanning C-Deck cabins and D-Deck kitchens. RMS Titanic Inc. describes it as a 17-ton section.",
+        "Recovery work began in 1994. Weather and equipment problems stopped an attempt in 1996; the section was finally raised in 1998. The expedition operator reports that it was subsequently divided into two sections.",
+        "The hull section is no longer on the seabed. This marker lies in the stern-side debris area."
       ],
       "facts": [
         {
-          "label": "Size",
-          "value": "about 7.9 x 6.1 m"
-        },
-        {
-          "label": "Weight",
-          "value": "15–20 short tons"
+          "label": "Reported weight",
+          "value": "17 tons (RMS Titanic Inc.; unit system unspecified)"
         },
         {
           "label": "Raised",
-          "value": "August 1998"
+          "value": "1998"
         },
         {
           "label": "Position confidence",
@@ -352,16 +303,8 @@
       "reconstruction": true,
       "sources": [
         {
-          "title": "The Big Piece — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/The_Big_Piece"
-        },
-        {
           "title": "Titanic artifacts (\"The Chunk\") — RMS Titanic, Inc.",
           "url": "https://rmstitanicinc.com/titanic-artifacts/"
-        },
-        {
-          "title": "Wreck of the Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
         },
         {
           "title": "The Quest to Map Titanic — WHOI Oceanus Vol. 49 No. 2 (2012)",
@@ -378,15 +321,14 @@
       "id": "memorial",
       "title": "The memorial plaque",
       "paragraphs": [
-        "In July 1986 Robert Ballard's team returned to the wreck in the crewed submersible Alvin. They fixed a bronze plaque from the Titanic Historical Society to the stern, on the aft starboard side between two fairleads (guides for mooring ropes). It reads: \"In memory of those souls who perished with the Titanic April 14-15, 1912.\" Ballard chose the stern because it was the last part of the ship to go under, with people still on or near it.",
-        "The plaque was gone by 1996, and it is not known what happened to it. Later expeditions left other memorials at the site.",
-        "The wreck is protected by the RMS Titanic Maritime Memorial Act (US, 1986), by the Agreement concerning the Shipwrecked Vessel RMS Titanic (concluded in 2003, in force since 18 November 2019), and, since April 2012, by the UNESCO 2001 Convention on the Protection of the Underwater Cultural Heritage. The agreement describes the wreck as a final resting place and favours preserving it where it lies.",
-        "This scan marks the plaque's former position on the stern."
+        "In 1986, Robert Ballard returned to the wreck and placed a bronze Titanic Historical Society memorial plaque on the stern in honour of those who died.",
+        "NOAA treats Titanic as a grave site and maritime memorial. The US–UK agreement entered into force on 18 November 2019 and favours preserving the wreck in place.",
+        "This scan marks a memorial site on the stern."
       ],
       "facts": [
         {
           "label": "Placed",
-          "value": "July 1986, from DSV Alvin"
+          "value": "1986"
         },
         {
           "label": "Donor",
@@ -394,60 +336,32 @@
         },
         {
           "label": "Location",
-          "value": "aft starboard stern"
-        },
-        {
-          "label": "Status",
-          "value": "missing since about 1996"
+          "value": "stern"
         },
         {
           "label": "Protection",
-          "value": "US Memorial Act 1986; US–UK Agreement (in force 2019); UNESCO 2001 Convention (2012)"
+          "value": "US–UK Agreement in force 18 November 2019"
         }
       ],
       "reconstruction": true,
       "sources": [
         {
-          "title": "Scientists placed a memorial plaque on the stern (21 July 1986) — UPI Archives",
-          "url": "https://www.upi.com/Archives/1986/07/21/Scientists-placed-a-memorial-plaque-on-the-stern-of/6073522302400/"
+          "title": "Titanic Historical Society — its 1986 stern memorial",
+          "url": "https://titanichistoricalsociety.org/titanic-past-present/"
         },
         {
-          "title": "Explorers Memorialize the Titanic's Dead (22 July 1986) — The Harvard Crimson",
-          "url": "https://www.thecrimson.com/article/1986/7/22/explorers-memorialize-the-titanics-dead-pwoods/"
-        },
-        {
-          "title": "What Happened to Ballard's Plaque? — Paul Lee",
-          "url": "https://www.paullee.com/titanic/THSplaque.php"
-        },
-        {
-          "title": "Agreement concerning the Shipwrecked Vessel RMS Titanic, UK Treaty Series No. 8 (2019)",
-          "url": "https://assets.publishing.service.gov.uk/media/5dfa072de5274a08dd355be0/TS_8.2019_Agreement_concerning_Shipwrecked_Vessel_RMS_Titanic.pdf"
-        },
-        {
-          "title": "Agreement Concerning the Shipwrecked Vessel RMS Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Agreement_Concerning_the_Shipwrecked_Vessel_RMS_Titanic"
-        },
-        {
-          "title": "RMS Titanic Maritime Memorial Act — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/RMS_Titanic_Maritime_Memorial_Act"
-        },
-        {
-          "title": "Wreck of the Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
-        },
-        {
-          "title": "UNESCO — underwater cultural heritage convention, 100-year threshold",
-          "url": "https://www.unesco.org/en/legal-affairs/convention-protection-underwater-cultural-heritage"
+          "title": "NOAA — Titanic agreement and preservation policy",
+          "url": "https://www.noaa.gov/office-of-general-counsel/gc-international-section/rms-titanic-frequently-asked-questions"
         }
       ],
-      "confidence": "medium"
+      "confidence": "low"
     },
     {
       "id": "channel",
       "title": "An abyssal channel",
       "paragraphs": [
         "The wreck rests on a nearly flat stretch of seabed south-east of the Grand Banks of Newfoundland. The ground varies by only a few metres over hundreds of metres. About 5 km to the north-west, the open survey data shows a shallow channel running roughly north-north-east to south-south-west. It is about a kilometre wide and 50–60 m deep.",
-        "Channels like this are cut and kept open by currents and by flows of sediment moving down the continental margin. Deep currents along this margin (the western boundary current and its eddies) also sweep the wreck site itself, sorting the sediment and slowly scouring the debris.",
+        "The survey grid records the channel shape and depth. It does not establish when the channel formed or which currents and sediment flows shaped it.",
         "Unlike the wreck, this feature is real survey data from the GMRT grid (about 45 x 61 m per cell). It has no published name that we could find."
       ],
       "facts": [
@@ -475,8 +389,8 @@
           "url": "https://www.gmrt.org/"
         },
         {
-          "title": "Wreck of the Titanic — Wikipedia",
-          "url": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
+          "title": "GMRT GridServer — source dataset request for this Titanic tile",
+          "url": "https://www.gmrt.org/services/GridServer?north=41.88&south=41.58&east=-49.8&west=-50.1&layer=topo&format=esriascii&resolution=high"
         }
       ],
       "confidence": "medium"

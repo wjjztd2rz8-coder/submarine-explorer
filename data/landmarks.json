@@ -36,7 +36,6 @@
       "hazards": ["fragile/protected formations", "moderate currents"],
       "notable_species": ["novel archaea and bacteria", "limited macrofauna vs black smokers"],
       "external_links": [
-        "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field",
         "https://vents-data.interridge.org/",
         "https://oceanexplorer.noaa.gov/okeanos/explorations/ex1104/background/edu/media/ex1104_tracking.pdf",
         "https://oceanexplorer.noaa.gov/explorations/05lostcity/logs/july29/july29.html",
@@ -320,9 +319,8 @@
       "hazards": ["extreme pressure", "scalding supercritical fluids", "crush depth"],
       "notable_species": ["Rimicaris hybisae shrimp", "anemones"],
       "external_links": [
-        "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field",
         "https://vents-data.interridge.org/ventfield/beebe",
-        "https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2015GC005879"
+        "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879"
       ],
       "wreck_meta": null
     },
@@ -1448,8 +1446,8 @@
       "hazards": ["low oxygen layer at depth", "dark cavern interior", "narrow submerged ledges"],
       "notable_species": ["Caribbean reef sharks", "groupers"],
       "external_links": [
-        "https://en.wikipedia.org/wiki/Great_Blue_Hole",
-        "https://limnogeology.ethz.ch/GischlerMarine.pdf"
+        "https://limnogeology.ethz.ch/GischlerMarine.pdf",
+        "https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"
       ],
       "wreck_meta": null
     },
@@ -1888,7 +1886,7 @@
       "country_eez": "international waters (high seas)",
       "confidence": "high",
       "coordinate_source": "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
-      "summary": "The famous ocean liner that sank on 15 April 1912 after striking an iceberg; the wreck was found by Robert Ballard's expedition in 1985 and lies in two main pieces about 600 m apart.",
+      "summary": "An ocean liner that sank on 15 April 1912 after striking an iceberg. A French–American expedition led by Jean-Louis Michel and Robert Ballard found the wreck in 1985; its two main sections lie about 600 m apart.",
       "facts": [
         "Discovered September 1, 1985 by Robert Ballard/Jean-Louis Michel",
         "Bow and stern sections lie ~600 m apart with a debris field between",
@@ -1914,8 +1912,10 @@
         "orientation_notes": "broken into separate bow and stern sections roughly 600 m apart, both upright-ish; stern heavily collapsed"
       },
       "external_links": [
-        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
-        "https://www.gov.uk/government/publications/agreement-concerning-the-shipwrecked-vessel-rms-titanic-ts-no82019"
+        "https://www.gov.uk/government/publications/agreement-concerning-the-shipwrecked-vessel-rms-titanic-ts-no82019",
+        "https://www.whoi.edu/press-room/news-release/titanic-40th/",
+        "https://www.noaa.gov/office-of-general-counsel/gc-international-section/rms-titanic-frequently-asked-questions",
+        "https://www.mycg.uscg.mil/News/Article/3439601/coast-guard-convenes-a-marine-board-of-investigation-for-titan-submersible/"
       ]
     },
     {

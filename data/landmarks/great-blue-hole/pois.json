@@ -15,10 +15,7 @@
       "guide_entry": "the-hole",
       "confidence": "low",
       "reconstruction": true,
-      "sources": [
-        "https://en.wikipedia.org/wiki/Great_Blue_Hole",
-        "https://www.gpsworld.com/belizes-great-blue-hole-revealed-in-expedition-survey/"
-      ],
+      "sources": ["https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021"],
       "note": "Game scan contact at the authored karst-grotto prop, on the locally carved ledge. Submerged stalactite galleries are documented at the real Blue Hole, but this marker's coordinate and geometry are not a surveyed gallery location."
     },
     {
@@ -50,7 +47,7 @@
       "guide_entry": "western-dropoff",
       "confidence": "high",
       "reconstruction": false,
-      "sources": ["https://www.gmrt.org/", "https://en.wikipedia.org/wiki/Lighthouse_Reef"],
+      "sources": ["https://www.gmrt.org/"],
       "note": "Real GMRT terrain on the western edge of Lighthouse Reef: along 17.3153 N, the floor remains 2-4 m deep from the hole coordinate to about 87.58 W, then drops to about 30 m at 87.59 W and about 304 m at 87.60 W. This target is 157 m deep on the visible western slope, about 6.5 km west of the hole coordinate."
     }
   ]

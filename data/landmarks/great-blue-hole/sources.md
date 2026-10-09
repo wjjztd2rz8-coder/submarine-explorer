@@ -1,5 +1,11 @@
 # Great Blue Hole site content: sources and notes (package C4)
 
+## F-1110 audit (2026-10-09)
+
+[The five-site primary-source audit](../../../plan/progress/F-1110.md) records
+the current copy, corrections, cuts and source-access limits. Earlier notes below
+are historical and are superseded where that audit corrects or removes a claim.
+
 ## Phase F scope decision — 2026-10-01
 
 Retain the existing Lighthouse Reef atoll route and surveyed outer slopes. The mission and catalog now lead with that experience. The western-slope grotto remains a game addition and is not the actual hole interior. An enclosed sinkhole terrain overlay, lower-shaft chemistry and interior route require a separate geometry/bathymetry package; those promises are cut from the current research brief.

@@ -15,12 +15,8 @@
       "guide_entry": "bow",
       "confidence": "high",
       "reconstruction": true,
-      "sources": [
-        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
-        "https://www.titanicstory.com/discover.htm",
-        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
-      ],
-      "note": "Published position 41°43′57″N 49°56′49″W. depth_m is the scan target at roughly mid-hull height; GMRT seabed here is 3,802 m."
+      "sources": ["https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"],
+      "note": "Game scan marker at a commonly reported wreck-section position. The source grid gives the local seabed depth, while WHOI describes about 600 m between the sections. Marker geometry and placement do not constitute a georeferenced wreck survey."
     },
     {
       "id": "titanic-stern",
@@ -35,12 +31,8 @@
       "guide_entry": "stern",
       "confidence": "high",
       "reconstruction": true,
-      "sources": [
-        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
-        "https://www.titanicstory.com/discover.htm",
-        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
-      ],
-      "note": "Published position 41°43′35″N 49°56′54″W. GMRT seabed here is 3,801 m."
+      "sources": ["https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"],
+      "note": "Game scan marker at a commonly reported wreck-section position. The source grid gives the local seabed depth, while WHOI describes about 600 m between the sections. Marker geometry and placement do not constitute a georeferenced wreck survey."
     },
     {
       "id": "titanic-boilers",
@@ -53,15 +45,15 @@
       "primary": false,
       "scan_seconds": 4,
       "guide_entry": "boilers",
-      "confidence": "medium",
+      "confidence": "low",
       "reconstruction": true,
       "sources": [
-        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
-        "https://www.titanicstory.com/discover.htm",
         "https://www.whoi.edu/ocean-learning-hub/ocean-topics/ocean-human-lives/underwater-archaeology/rms-titanic/1985-discovery-of-rms-titanic/",
-        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
+        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf",
+        "https://www.whoi.edu/press-room/news-release/titanic-40th/",
+        "https://sanctuaries.noaa.gov/maritime/titanic/expedition_results.html"
       ],
-      "note": "Centre of the boiler field, 41°43′32″N 49°56′49″W: the Wikipedia \"Wreck of the Titanic\" infobox coordinate, footnoted \"the centre of the boiler field\" (Ballard 1987, p. 199); titanicstory.com gives the same coordinate for the boilers. That puts it ~150 m south-east of the published stern position; Wikipedia says the boilers are about 600 ft (180 m) east of the stern."
+      "note": "Local boiler-field scan marker near the stern. WHOI documents a boiler as the first recognised object in 1985; NOAA maps boilers in the 2010 debris survey. These accounts do not establish this exact marker coordinate or a surveyed boiler count here."
     },
     {
       "id": "titanic-debris-field",
@@ -76,12 +68,8 @@
       "guide_entry": "debris-field",
       "confidence": "low",
       "reconstruction": true,
-      "sources": [
-        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf",
-        "http://www.thehistoryblog.com/archives/15523",
-        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic"
-      ],
-      "note": "Representative point in the gap between the sections. The two dense debris fields are each 600–800 m long (about 5 km² together), and the 2010 survey mapped 15–20 sq mi (39–52 km²) of seafloor; neither extent is published as coordinates."
+      "sources": ["https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"],
+      "note": "Representative scan point between the hull sections. WHOI reports a 15–20 square mile survey area in 2010, distinct from individual debris clusters. No exact footprint for this marker is inferred."
     },
     {
       "id": "titanic-big-piece",
@@ -96,12 +84,8 @@
       "guide_entry": "big-piece",
       "confidence": "low",
       "reconstruction": true,
-      "sources": [
-        "https://en.wikipedia.org/wiki/The_Big_Piece",
-        "https://en.wikipedia.org/wiki/Wreck_of_the_Titanic",
-        "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
-      ],
-      "note": "Approximate: hull plating that broke from the stern lies in the stern-side debris, which trails south-west from the stern (Wikipedia, 'Wreck of the Titanic', section 'Debris fields', citing Ballard 1987, p. 207). Placed ~175 m south-west of the stern. The Big Piece itself was raised in 1998 and is not on the seabed."
+      "sources": ["https://rmstitanicinc.com/titanic-artifacts/"],
+      "note": "Approximate marker in the stern-side debris area. RMS Titanic Inc. reports recovery of the hull section in 1998; it is no longer on the seabed. This coordinate does not establish its historical resting place."
     },
     {
       "id": "titanic-memorial",
@@ -114,14 +98,10 @@
       "primary": false,
       "scan_seconds": 5,
       "guide_entry": "memorial",
-      "confidence": "medium",
+      "confidence": "low",
       "reconstruction": true,
-      "sources": [
-        "https://www.upi.com/Archives/1986/07/21/Scientists-placed-a-memorial-plaque-on-the-stern-of/6073522302400/",
-        "https://www.thecrimson.com/article/1986/7/22/explorers-memorialize-the-titanics-dead-pwoods/",
-        "https://www.paullee.com/titanic/THSplaque.php"
-      ],
-      "note": "Aft starboard corner of the stern section, where Ballard fixed the Titanic Historical Society plaque in July 1986. Exact placement is approximate; the plaque itself was gone by 1996 and is not modelled."
+      "sources": ["https://titanichistoricalsociety.org/titanic-past-present/"],
+      "note": "Approximate stern memorial marker. The Titanic Historical Society confirms the 1986 placement on the stern; the exact aft-starboard footprint and a 1996 disappearance date were not verified against a primary source. No plaque is modelled."
     },
     {
       "id": "titanic-channel",
@@ -137,7 +117,7 @@
       "confidence": "medium",
       "reconstruction": false,
       "sources": ["https://www.gmrt.org/"],
-      "note": "Eastern flank of a shallow NNE–SSW channel visible in the GMRT tile, ~4.8 km north-west of the bow (seabed 3,871 m here, axis ~3,890 m). This is survey data, not a reconstruction."
+      "note": "Eastern flank of a shallow NNE–SSW channel visible in the GMRT tile, ~4.8 km north-west of the bow (seabed 3,873 m here, axis ~3,890 m). This is survey data, not a reconstruction."
     }
   ]
 }
