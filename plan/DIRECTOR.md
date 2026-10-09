@@ -4,6 +4,8 @@ The owner treats this as a curiosity project about how far current models and wo
 
 ## Current priorities (refreshed 2026-10-09 midday comprehensive review; golden 2026-10-09-112035)
 
+Status 2026-10-09 07:xx: items 1 and 2 MERGED (1070 spec fix, 1060 Journal/Debrief, 1080 Endurance framing + Beebe smoker). Hosted CI needs re-check after push. Remaining Claude backlog: 3-7.
+
 Claude backlog (ordered by player impact; all unblocked; Sonnet for visual, Haiku for small):
 
 1. **Hosted CI green (Haiku, then Sonnet if needed):** latest completed CI (f41 docs commit) failed 10+ of 30 e2e shards after 36 min. 1070 worktree holds an uncommitted spec fix (f-bughunt-15 batched visibility) and its gate run was killed by the Codex floor. Finish: run it, merge, push, then check the hosted run. If many shards still fail, cut shard-heavy specs rather than loosen assertions.

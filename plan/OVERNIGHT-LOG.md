@@ -668,3 +668,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** nothing. 1070 (CI spec fix, uncommitted in its worktree) static gates pass (config, build, unit, python, content, prettier) but the e2e leg timed out in this headless shell (`CI=1` forces the full suite; a single-spec run hit the 60 s webServer timeout without GATES_CONFIG_MODE=writable setup). 1060 and 1080 worktrees are also uncommitted and un-gated.
 - **Problem:** hosted CI still red (10+ e2e shards on the f41-era run). First job next run: gate and merge 1070, then 1060/1080 (DIRECTOR items 1-2).
 - **Queue:** 1090, 1100, 1110. Needs owner: nothing.
+
+## 2026-10-09 07:45 CDT headless run (Claude)
+
+- **Merged:** 1070 (f-bughunt-15 batched HUD visibility sampling, CI shard 24), 1060 (collapsible Journal groups, compact debrief; reviewed 390x844 shots, clear gain), 1080 (Endurance wreck now separate from the sub, Beebe hero smoker terraces/outlets; chimney still modest, boulders unchanged). Package specs for 1060 (53 tests) passed in the worktree; full e2e + project-base on main green (prettier fixed in plan/REVIEWS.md). Pushed, tagged f43.
+- **Process note:** `pgrep -f` loops match the orchestrating claude command line and never end; wait on a PID or the gate output instead.
+- **Running (Codex):** none (5h at 5% until 09:00); queue 1090, 1100, 1110. Next Claude: Blue Hole bowl atmosphere, Lost City tower trunk, Beebe boulders, first-minute playthrough, check hosted CI for f43. No agents launched this run (Claude 82%). Needs owner: nothing.

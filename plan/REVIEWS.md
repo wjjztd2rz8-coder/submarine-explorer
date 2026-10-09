@@ -8,9 +8,9 @@ Codex 5h was 6% (`codex-review.sh` exited 75), so there is no Sol second opinion
 
 **Changed since the last review:** merged f-titanic-monterey (f41), f-monterey-portrait-hud, f-bluehole-apron, 1050 (Lost City fingers) and 1040 (Low ambient floor), tagged f41 and f42. Titanic hull now sits beside the sub with a softer distant seabed; Monterey spawn is clear of the wall; Blue Hole bowl and apron have strata and rubble.
 
-| Site      | Score (readable / beautiful) | Change | Biggest gap                                                          |
-| --------- | ---------------------------- | ------ | -------------------------------------------------------------------- |
-| Titanic   | 4 / 4                        | same   | seabed haze band; hull still slightly flat-lit                       |
+| Site      | Score (readable / beautiful) | Change | Biggest gap                                                           |
+| --------- | ---------------------------- | ------ | --------------------------------------------------------------------- |
+| Titanic   | 4 / 4                        | same   | seabed haze band; hull still slightly flat-lit                        |
 | Beebe     | 4 / 3.5                      | same   | pale egg boulders, clean-edged sand disc                              |
 | Blue Hole | 3.5 / 3                      | +0.5   | bowl still a beige smooth dune with hard shelf line, thin stalactites |
 | Lost City | 4 / 3                        | same   | tower trunk is stacked plates with grey blotches, saucer flanges      |
