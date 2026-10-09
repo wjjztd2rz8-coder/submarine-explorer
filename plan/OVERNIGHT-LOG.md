@@ -624,3 +624,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 ## 2026-10-09 00:xx review run (Claude)
 
 - Comprehensive review (Claude alone, Codex 6%): REVIEWS.md/DIRECTOR.md updated; queued Codex 1070 (CI shards), 1080 (Endurance/Beebe). No merges, no agents. Needs owner: nothing.
+
+## 2026-10-09 01:04 CDT headless run (Claude)
+
+- **Merged:** 1000 (verify 940/950 tests; resolved a heroMissionSpawn test conflict), 1020 (Challenger/Endurance portrait framing, near-hull hint grace), 1030 (Blue Hole ledges, Low-tier refinement, horizon haze). Golden 2026-10-09-052720: ledges now read in the bowl and the stalactites are better, but the bowl is still a beige, low-contrast surface; a further pass is still open (DIRECTOR #1). Full e2e + project-base green on main; pushed, tagged f39. Hosted CI/Pages for f39 were queued at exit; check next run.
+- **Running:** no Codex tasks (Codex 5h at 5% until 02:45). **Queue:** 1040, 1050, 1060, 1070, 1080. No Claude agents launched. Needs owner: nothing.
