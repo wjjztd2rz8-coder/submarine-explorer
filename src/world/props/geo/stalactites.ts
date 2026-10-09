@@ -458,9 +458,18 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   }
 
   // --- a few sponges high on the face, above the sediment line (none on the floor)
-  const sponge = new THREE.CylinderGeometry(0.16, 0.1, 0.7, 7, 1, true).translate(0, 0.35, 0);
+  // Capsule-bodied tube sponge: closed rounded crown, slight belly, soft base; no hard cylinder rim.
+  const sponge = new THREE.LatheGeometry(
+    [
+      [0.0, 0.0],
+      [0.17, 0.25],
+      [0.14, 0.62],
+      [0.0, 0.8],
+    ].map(([r, y]) => new THREE.Vector2(r as number, y as number)),
+    5,
+  );
   const sp: InstanceSpec[] = [];
-  const ns = Math.round(34 * d.growth);
+  const ns = Math.round(12 * d.growth);
   for (let i = 0; i < ns; i++) {
     const x = (rnd() - 0.5) * W * 0.7;
     const y = H * (0.28 + rnd() * 0.2);
@@ -482,7 +491,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
         sy: s * (0.7 + rnd()),
         sz: s,
       },
-      color: new THREE.Color().setHSL(hue, 0.5, 0.45 + rnd() * 0.15),
+      color: new THREE.Color().setHSL(hue, 0.34, 0.4 + rnd() * 0.15),
     });
   }
   if (sp.length) {

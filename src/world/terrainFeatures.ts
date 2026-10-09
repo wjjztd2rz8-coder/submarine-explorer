@@ -63,8 +63,10 @@ const TERRACE_PROFILE: readonly (readonly [number, number])[] = [
   [153, -38],
   [134, -41],
   [129, -43],
-  [125, -62],
-  [121, -63],
+  [127, -50],
+  [125, -55],
+  [124, -62],
+  [120, -63],
   [117, -74],
   [112, -78],
   [108, -98],
@@ -182,9 +184,9 @@ export function blueHoleTint(
   // Warm sunlit reef top, thin ochre, then a cool teal-blue ramp: the bottom reads cold, the rim warm.
   const ochre = smoothstep(clamp01((depth - 4) / 22));
   const cool = smoothstep(clamp01((depth - 14) / 85));
-  const abyss = smoothstep(clamp01((depth - 55) / 60));
-  let tr = lerp(lerp(lerp(1.16, 1.0, ochre), 0.5, cool), 0.36, abyss);
-  let tg = lerp(lerp(lerp(1.06, 0.86, ochre), 0.78, cool), 0.64, abyss);
+  const abyss = smoothstep(clamp01((depth - 45) / 55));
+  let tr = lerp(lerp(lerp(1.16, 1.0, ochre), 0.46, cool), 0.3, abyss);
+  let tg = lerp(lerp(lerp(1.06, 0.86, ochre), 0.76, cool), 0.6, abyss);
   let tb = lerp(lerp(lerp(0.82, 0.62, ochre), 0.88, cool), 1.0, abyss);
   // Per-tread character: each level bed gets its own tone, warmth and silt cover, graded
   // across its width (pale outer lip, damp darker inner foot) so no tread is one flat value.
@@ -199,10 +201,10 @@ export function blueHoleTint(
         tread = 1;
         treadU = (r - r1) / (r0 - r1);
         const warmth = th - 0.5;
-        const tone = 0.9 + 0.24 * th + 0.1 * (treadU - 0.5);
-        tr *= tone * (1 + 0.16 * warmth);
+        const tone = 0.84 + 0.36 * th + 0.14 * (treadU - 0.5);
+        tr *= tone * (1 + 0.24 * warmth);
         tg *= tone;
-        tb *= tone * (1 - 0.2 * warmth);
+        tb *= tone * (1 - 0.3 * warmth);
         break;
       }
     }
@@ -276,11 +278,16 @@ export function blueHoleTint(
   const m = ao * dark * bright * (0.8 + 0.2 * smoothstep(clamp01(normalY)));
   // Crisp rim: a thin pale lip at the first riser, with a dark cut at its foot.
   // Kept soft and wide: the riser is a gradient, not a drawn line.
+  // Feather: the shelf's warm tone hands over to the cool lower wall across ~30 m, not at one ring.
+  const feather = smoothstep(clamp01((139 - r) / 30));
+  const fm = 1 - 0.2 * feather;
+  tr *= 1 - 0.1 * feather;
+  tb *= 1 + 0.06 * feather;
   const rim =
     1 +
     0.1 * Math.exp(-(((r - 179) / 4.5) ** 2)) * (1 - rock) -
     0.2 * Math.exp(-(((r - 171) / 5.5) ** 2));
-  return [tr * m * sr * rim, tg * m * sg * rim, tb * m * sb * rim];
+  return [tr * m * fm * sr * rim, tg * m * fm * sg * rim, tb * m * fm * sb * rim];
 }
 
 export interface TerrainCarve {
@@ -328,7 +335,10 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
       const r0 = Math.hypot(dx, dz) / wob;
       // Alcoves: a few scooped notches in the wall (the cave mouths and undercuts the hole is
       // known for), a height field cannot overhang so they are steep, deep re-entrants.
-      let r = r0;
+      // Ragged lip: the shelf edge wanders a few metres, so the shelf line is never one ring.
+      const lipBand = Math.exp(-(((r0 - 131) / 14) ** 2));
+      let r =
+        r0 + lipBand * (3.2 * Math.sin(11 * a + 0.6) + 2.2 * Math.sin(19 * a + 2.4 + r0 * 0.05));
       for (const n of NOTCHES) {
         let da = Math.abs(a - n.a);
         if (da > Math.PI) da = 2 * Math.PI - da;
@@ -364,6 +374,7 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
           ripple +
           strata +
           blocks +
+          lipBand * 1.1 * Math.max(0, Math.sin(37 * a + r * 0.7)) ** 3 +
           blueHoleWallRelief(a, r) +
           blueHoleTerraces(a, r),
       );
