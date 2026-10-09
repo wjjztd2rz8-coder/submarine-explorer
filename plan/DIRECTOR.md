@@ -2,7 +2,23 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-09 midday comprehensive review; golden 2026-10-09-112035)
+## Current priorities (targeted review 2026-10-09 14:30; golden 2026-10-09-191533)
+
+Why this refresh: Claude sat at >=50% for 140 h of samples because the backlog read "waits for the next golden set"; the set now exists. Scores (honest): Titanic 4, Beebe 3.5, Monterey 3.5 (strata better), Challenger 3 (empty seabed), Lost City 3, Blue Hole 2.5-3.
+
+Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
+
+1. **Lost City tower trunk (Sonnet, IN FLIGHT 2026-10-09 14:30):** lost-city-2 is a smooth pale blob with flat saucer flanges; needs carbonate flow texture, irregular profile, mineral colour variation, orifice.
+2. **Blue Hole bowl + sonar (Sonnet, IN FLIGHT):** bowl is smooth beige with a hard shelf line and flat-cone stalactites; the minimap is a flat lime-green square (no bathymetry read). Add ledge relief, darker blue lower walls, stalactite taper, readable sonar palette.
+3. **Challenger Deep seabed life (Sonnet):** challenger-deep-1 is an empty brown plane; add amphipods near the lander, sediment ripples, a visible slope/horizon.
+4. **Titanic haze band / horizon (Sonnet):** big flat dark void above a hard seabed horizon.
+5. **Merge Codex 1090/1100/1110/1120 when budget returns (Haiku gates, Claude review):** worktrees stalled by the Codex floor; hosted CI for f43 still red (1120 triage).
+6. **Phone pass at 844x390 landscape for the three new fixes (Haiku capture, Sonnet judge).**
+7. **Push wave f45 after full e2e on main once 1-2 merge.**
+
+Codex queue: 1130 Beebe scatter rocks, 1140 bug hunt f44, 1160 verify debrief-zero, 1170 Challenger seabed bug/fidelity audit.
+
+## Previous priorities (refreshed 2026-10-09 midday comprehensive review; golden 2026-10-09-112035)
 
 Status 2026-10-09 07:xx: items 1 and 2 MERGED (1070 spec fix, 1060 Journal/Debrief, 1080 Endurance framing + Beebe smoker). Hosted CI needs re-check after push. Remaining Claude backlog: 3-7.
 
