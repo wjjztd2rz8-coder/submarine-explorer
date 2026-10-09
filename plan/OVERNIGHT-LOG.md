@@ -702,3 +702,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** f-firstminute (Sonnet): Home -> site -> 60 s -> Journal -> debrief checked on desktop and phone for Titanic and Beebe; flow works, HUD uncluttered. Fixed raw slug in briefing eyebrow; added tools/firstminute-shots.mjs. Smoke + project-base green on main; no push.
 - **Open findings:** 0-scan debrief primary is "Dive sites" (queued 1150), phone tutorial bar overlaps sub base, target bracket crosses its label.
 - **Codex:** 1090, 1100, 1110 just launched. **Queue:** 1120 (CI triage), 1130 (Beebe pale rocks), 1140 (bug hunt f44), 1150. Hosted CI for f43 still red. Needs owner: nothing.
+
+## 2026-10-09 10:19 CDT headless run (Claude)
+
+- **Merged:** f-hud-overlap (Sonnet): phone tutorial card moved clear of sub/target, desktop waypoint label offset below the bracket (CSS only). Reviewed phone shot: clean. Smoke + project-base green on main; no push.
+- **Codex running:** 1090, 1100, 1120. **Queue:** 1130, 1140, 1150. Hosted CI for f43 still red (1120 triaging). Next Claude: review Codex 1090/1100/1120 when they finish; push a wave once CI triage lands. Needs owner: nothing.
