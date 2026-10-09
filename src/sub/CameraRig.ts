@@ -329,18 +329,23 @@ export class CameraRig {
   private clampToTerrain(subPos: THREE.Vector3): void {
     const p = this.camera.position;
     const ceiling = subPos.y < 0 ? -this.config.surfaceClearance : Infinity;
-    // A reef may leave no room between the terrain clearance and surface.
-    // Find the first obstruction along the arm and retract to its boundary;
-    // raising Y alone would put the camera above water. Refinement keeps the
-    // boundary continuous while turning and ascending, even on steep banks.
+    // A clear eye alone can still leave the chase arm crossing a submerged
+    // ridge. Retract at the first obstruction along the actual arm, including
+    // reefs that leave no room below the surface. Refine the boundary so the
+    // view stays continuous while turning and ascending on steep banks.
     if (this.terrain && Number.isFinite(ceiling)) {
       const dx = p.x - subPos.x;
       const dz = p.z - subPos.z;
       const dy = p.y - subPos.y;
+      // An invalid anchor (e.g. a debug teleport below the floor) has no clear
+      // arm to retract. Let the existing eye-height clamp recover that pose.
+      const checkArm =
+        this.mode === 'chase' &&
+        this.terrain.sampleHeight(subPos.x, subPos.z) + this.config.terrainClearance <= subPos.y;
       const fits = (t: number): boolean =>
         this.terrain!.sampleHeight(subPos.x + dx * t, subPos.z + dz * t) +
           this.config.terrainClearance <=
-        ceiling;
+        (checkArm ? Math.min(ceiling, subPos.y + dy * t) : ceiling);
       for (let i = 1; i <= 24; i++) {
         if (fits(i / 24)) continue;
         let lo = (i - 1) / 24;

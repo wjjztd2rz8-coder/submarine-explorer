@@ -80,6 +80,11 @@ downloads individual JPEGs or one ZIP. `MissionState` gained a `primaries-comple
 finishing the primaries no longer force-opens the debrief. The D2 chase camera starts farther behind and higher above the
 sub, follows yaw but not pitch, and keeps a world-fixed direction after manual
 free look. `X`, the HUD button or a double-click restores the chase view.
+The chase arm retracts at the first sampled seabed obstruction, even when
+the eye beyond a submerged ridge is clear. Boundary refinement preserves
+continuous motion and the underwater ceiling. An invalid anchor below the
+floor retains the eye-height recovery; first-person and photo orbit retain
+their existing terrain clamps.
 Arcade Lost City's composed 38 m opening sets a 50 m reset distance, independent
 of wheel zoom (35–180 m). Its original 10° heading offset is preserved; a
 local X offset of −20 m in the chase vector moves the hull off Poseidon's axis

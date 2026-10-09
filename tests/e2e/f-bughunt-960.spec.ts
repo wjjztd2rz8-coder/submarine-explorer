@@ -92,10 +92,13 @@ for (const layout of [
             await act(
               home.locator('.home-menu').getByRole('button', { name: 'Dive sites', exact: true }),
             );
-            // Touch action completion can precede the new document's commit.
-            // Advance the clock only after the requested mission has loaded.
+            // The mission button replaces the document. A tap can finish
+            // before navigation commits, while the home game's ready flag is
+            // still true. Wait for the destination before pumping its clock.
             await Promise.all([
-              page.waitForURL((url) => url.searchParams.get('mission') === site),
+              page.waitForURL((url) => url.searchParams.get('mission') === site, {
+                waitUntil: 'domcontentloaded',
+              }),
               act(home.locator(`[data-mission="${site}"]`)),
             ]);
             await ready(page);
