@@ -72,7 +72,7 @@ function settings(input: ProceduralBuildInput): BeebeSeabed | undefined {
 /** Angular, noise-displaced rock: a coarse polyhedron clipped by random planes, flat-shaded. */
 function angularRock(detail: number, seed: number): THREE.BufferGeometry {
   const rnd = mulberry32(seed);
-  let g: THREE.BufferGeometry = new THREE.IcosahedronGeometry(1, Math.max(1, detail));
+  const g: THREE.BufferGeometry = new THREE.IcosahedronGeometry(1, Math.max(1, detail));
   const p = g.getAttribute('position');
   const planes: Array<[THREE.Vector3, number]> = [];
   for (let i = 0; i < 6; i++) {
@@ -90,10 +90,9 @@ function angularRock(detail: number, seed: number): THREE.BufferGeometry {
     }
     p.setXYZ(i, v.x, v.y, v.z);
   }
-  // Duplicated corners keep the faceting hard after the normals are rebuilt.
+  // IcosahedronGeometry already duplicates corners, retaining hard faceting.
   g.deleteAttribute('normal');
   g.deleteAttribute('uv');
-  g = g.toNonIndexed();
   g.computeVertexNormals();
   return g;
 }

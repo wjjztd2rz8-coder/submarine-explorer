@@ -15,6 +15,7 @@ without an entry here is not done.
 ### Changed
 
 - **1160 debrief verification:** added unit coverage for zero/one-scan action order, callbacks, More reset and non-resumable/free-dive fallbacks, plus a two-pass browser regression spec for Titanic, Beebe and Blue Hole at 390×844 and 1280×720. Browser execution is blocked by localhost binding permissions; acceptance remains pending in `plan/progress/1160.md`. No product behavior change.
+- **1140 post-merge bug hunt:** repair Lost City's reversed grey-blue mineral blend, remove per-rock Beebe geometry warnings, and keep zero-radius irregular spire tips finite. Hoist spire profile setup and restrict Monterey bed-colour allocations to canyon scarps. Add four Low-tier buffer snapshots, finite-buffer/draw-budget checks, mineral continuity and shared-scarp isolation regressions. Existing assertions and snapshots retained; performance follow-ups and blocked browser validation are recorded in `plan/progress/1140.md`.
 
 - **f-debrief-zero:** a debrief with 0 scans now makes "Keep exploring" the single filled primary button and shows "Dive sites" as a quiet link (it was the other way round, contradicting "Next: Face a target and hold Scan"). With 1+ scans, or when the dive cannot resume, nothing changes. `f-debrief-720` spec asserts the new round-1 primary. The target-bracket/label overlap (firstminute finding 3) was already fixed by f-hud-overlap.
 
