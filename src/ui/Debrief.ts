@@ -215,8 +215,13 @@ export class Debrief {
       { id: 'journal', label: 'Journal', run: () => this.options.onFieldGuide?.() },
     ];
     // Navigation is the main next step. Resume/replay remain available below it.
+    // With no scans the dive has barely started: resuming is the obvious next step.
+    const unstarted = stats.discoveries.length === 0 && list.some((a) => a.id === 'keep-exploring');
     const primary =
-      list.find((a) => a.id === 'dive-sites') ?? list.find((a) => a.primary) ?? list[0];
+      (unstarted ? list.find((a) => a.id === 'keep-exploring') : undefined) ??
+      list.find((a) => a.id === 'dive-sites') ??
+      list.find((a) => a.primary) ??
+      list[0];
     const navigation = el('div', 'debrief-navigation');
     const secondary = el('div', 'debrief-secondary');
     const more = el('div', 'debrief-more');
@@ -232,6 +237,9 @@ export class Debrief {
     more.append(toggle, moreBox);
     // One filled primary; at most two quiet links (first choice + Journal); the rest tuck under More.
     const rest = list.filter((a) => a !== primary);
+    // When resuming is primary, Dive sites is the quiet link beside Journal.
+    if (unstarted)
+      rest.sort((a, b) => Number(b.id === 'dive-sites') - Number(a.id === 'dive-sites'));
     const quiet = [
       rest.find((a) => a.id !== 'journal' && a.id !== 'home'),
       rest.find((a) => a.id === 'journal'),

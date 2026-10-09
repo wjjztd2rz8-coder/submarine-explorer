@@ -94,8 +94,12 @@ for (const viewport of [
             await expect(debrief.locator('.debrief-btn.is-primary')).toHaveCount(1);
             await expect(debrief.locator('.debrief-btn.is-primary')).toHaveAttribute(
               'data-action',
-              'dive-sites',
+              round === 1 ? 'keep-exploring' : 'dive-sites',
             );
+            // Zero scans: Dive sites is demoted to a quiet link; otherwise it is the primary.
+            await expect(
+              debrief.locator('.debrief-secondary > [data-action="dive-sites"]'),
+            ).toHaveCount(round === 1 ? 1 : 0);
             await expect(debrief.locator('.debrief-highlight')).toHaveCount(1);
             await expect(debrief.locator('.debrief-next')).toHaveCount(1);
             await expect(debrief.locator('.debrief-rating')).toContainText('research points');
