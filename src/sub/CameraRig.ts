@@ -21,6 +21,9 @@ export interface CameraUpdateOptions {
   velocity?: THREE.Vector3;
 }
 
+/** Aim drop (m) at full chase-arm retraction on portrait phones. */
+const PORTRAIT_RETRACTED_AIM_DROP_M = 30;
+
 export class CameraRig {
   readonly camera: THREE.PerspectiveCamera;
   mode: CameraMode = 'chase';
@@ -297,6 +300,15 @@ export class CameraRig {
     this.currentTarget.copy(this.desiredTarget);
 
     this.clampToTerrain(subPos);
+    // Tall portrait frames: when the surface or terrain shortens the chase arm, the hull sits
+    // low in a close view and ends up under the phone tutorial card.
+    // Aim lower in proportion to the lost arm so the hull rides up the frame.
+    if (this.mode === 'chase' && !this.freeLook && this.camera.aspect < 0.7) {
+      const wanted = this.chaseRadius;
+      const lost =
+        wanted > 0 ? 1 - Math.min(1, this.camera.position.distanceTo(subPos) / wanted) : 0;
+      this.currentTarget.y -= lost * PORTRAIT_RETRACTED_AIM_DROP_M;
+    }
     this.camera.lookAt(this.currentTarget);
     this.applyBank(opts.roll ?? 0, dt);
   }
