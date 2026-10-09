@@ -77,7 +77,7 @@ function roughenTrunk(g: THREE.BufferGeometry, s: SpireOpts, seed: number, pocke
     const broken = smooth(0.35, 0.6, mid + 0.5 + Math.sin(a * 3 + Math.floor(band)) * 0.2);
     const ledge = smooth(0.7, 0.96, frac) * (1 - smooth(0.96, 1, frac)) * broken;
     const undercut = smooth(0.0, 0.25, frac) * (1 - smooth(0.25, 0.5, frac)) * broken;
-    let k = 1 + big * 0.34 + mid * 0.1 + ridge * 0.07 + ledge * 0.07 - undercut * 0.06;
+    let k = 1 + big * 0.6 + mid * 0.3 + ridge * 0.1 + ledge * 0.11 - undercut * 0.09;
     // Orifice pocket.
     const da = Math.atan2(Math.sin(a - orA), Math.cos(a - orA)) * rad;
     const dy = y - 0.8 * s.h;
@@ -356,7 +356,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     }
     // Faint blue-green biofilm: damp, sheltered lower walls and under ledges.
     const film = fbm3(x * 0.22, y * 0.12, z * 0.22, seed ^ 0xb10, 3);
-    out.lerp(BIOFILM, smooth(0.55, 0.75, film) * 0.3 * wall * (1 - up * 0.6));
+    out.lerp(BIOFILM, smooth(0.48, 0.6, film) * 0.4 * wall * (1 - up * 0.6));
     // Side orifice: a dark, ragged-edged mouth with a stained rim and drip streak below.
     {
       const od = Math.hypot(x - orifice.x, y - orifice.y, z - orifice.z) / orifaceR;
