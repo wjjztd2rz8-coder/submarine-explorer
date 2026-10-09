@@ -16,7 +16,7 @@
 
 ## Gates
 
-PW_PORT=4890 tools/gates.sh: see final run result in the commit message / report.
+PW_PORT=4890 tools/gates.sh: all PASS (build, unit, python, content, attribution, prettier, e2e, e2e-base).
 
 ## Weaknesses
 
