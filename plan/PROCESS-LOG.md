@@ -142,3 +142,7 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - **2026-10-08 evening:** Codex 5h hit 0% right after the 875/880/910 burst, so the joint review ran Claude-only (script exits 75 as designed). CI root cause (montereyWallLife ultra 45 s timeout) fixed; e2e shard failures need artifacts (970). `gh run view --log-failed` returns no e2e lines; fetch Playwright artifacts instead.
 
 ## 2026-10-09 review: no change needed; idle capacity was the weekly-gate lockout (already resolved). Sol review skipped at Codex 6%; reviews should start Sol only when Codex 5h >= ~15%.
+
+## 2026-10-09 midday review
+
+- Finding: Codex tasks 1060/1070/1080 were killed by the Codex 5h floor mid-round and left uncommitted worktrees, with no auto-resume path until the next Claude collection run. Hosted CI failures grew (10+ shards) while the fix sat stranded. Action: prioritised in DIRECTOR.md items 1-2; no tooling change (floors are by design). Idea if it recurs: have codex-dispatch relaunch unfinished worktrees first when budget returns.

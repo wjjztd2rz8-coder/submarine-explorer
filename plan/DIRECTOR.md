@@ -2,7 +2,21 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (refreshed 2026-10-09 comprehensive review; golden 2026-10-09-045527)
+## Current priorities (refreshed 2026-10-09 midday comprehensive review; golden 2026-10-09-112035)
+
+Claude backlog (ordered by player impact; all unblocked; Sonnet for visual, Haiku for small):
+
+1. **Hosted CI green (Haiku, then Sonnet if needed):** latest completed CI (f41 docs commit) failed 10+ of 30 e2e shards after 36 min. 1070 worktree holds an uncommitted spec fix (f-bughunt-15 batched visibility) and its gate run was killed by the Codex floor. Finish: run it, merge, push, then check the hosted run. If many shards still fail, cut shard-heavy specs rather than loosen assertions.
+2. **Land stranded Codex worktrees (Haiku gates, Claude review):** 1060 (Journal/Debrief polish), 1070, 1080 (Challenger/Endurance opening plus Beebe framing/smokers) have uncommitted work after the Codex floor stopped them. Run gates, review shots, merge or send back.
+3. **Blue Hole bowl atmosphere (Sonnet):** gallery is good; bowl and apron still read as one beige smooth-shaded dune with a hard shelf line (great-blue-hole-2). Needs depth haze/colour grading toward blue at the bottom, per-ledge texture or normal variation, and stalactite thickness/irregularity. Biggest "beautiful" gap in the set (2.5-3).
+4. **Lost City tower (Sonnet):** close-up (lost-city-2) is stacked plates with grey blotchy albedo and pale saucer flanges; needs carbonate flow texture, irregular profile, mineral colour variation, a visible orifice. Review 1050 landed fingers; the tower trunk itself is unchanged.
+5. **Beebe chimney and boulders (Sonnet):** chimney trunk now has some ridge variation but boulders are pale smooth eggs and the sand disc ring is still a clean ellipse. Replace boulders with rock mesh, feather the disc edge.
+6. **Monterey strata regularity (Sonnet):** corrugated stripes repeat; vary thickness, add slumps and overhangs. Sub is clear of the wall now (merged f41).
+7. **First-minute playthrough check (Haiku capture, Sonnet judge):** after 1060 merges: Home -> site -> 60 s -> Journal -> debrief on desktop and phone.
+
+Codex queue: 1090 (bug hunt f38-f41), 1100 (Low-tier recheck), 1110 (audio fact check). Refill after the 1060/1070/1080 stalls are resolved.
+
+## Previous priorities (2026-10-09 early comprehensive review; golden 2026-10-09-045527)
 
 Claude backlog (ordered by player impact; all unblocked; Sonnet for visual, Haiku for small):
 

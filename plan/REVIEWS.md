@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-09 midday comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-09-112035 vs -045527)
+
+Codex 5h was 6% (`codex-review.sh` exited 75), so there is no Sol second opinion; this is Claude's view only. The early-morning review is the last joint-ish baseline.
+
+**Changed since the last review:** merged f-titanic-monterey (f41), f-monterey-portrait-hud, f-bluehole-apron, 1050 (Lost City fingers) and 1040 (Low ambient floor), tagged f41 and f42. Titanic hull now sits beside the sub with a softer distant seabed; Monterey spawn is clear of the wall; Blue Hole bowl and apron have strata and rubble.
+
+| Site      | Score (readable / beautiful) | Change | Biggest gap                                                          |
+| --------- | ---------------------------- | ------ | -------------------------------------------------------------------- |
+| Titanic   | 4 / 4                        | same   | seabed haze band; hull still slightly flat-lit                       |
+| Beebe     | 4 / 3.5                      | same   | pale egg boulders, clean-edged sand disc                              |
+| Blue Hole | 3.5 / 3                      | +0.5   | bowl still a beige smooth dune with hard shelf line, thin stalactites |
+| Lost City | 4 / 3                        | same   | tower trunk is stacked plates with grey blotches, saucer flanges      |
+| Monterey  | 4 / 3.5                      | same   | regular corrugated strata (sub/wall overlap fixed)                    |
+
+No regressions seen. Only a subset of poses was viewed closely (Titanic 1, Beebe 2, Blue Hole 1-2, Lost City 2, Monterey 1).
+
+**Process:** efficiency.sh: Claude idle ~132 h, Codex under-used ~115 h, almost entirely the Oct 6-8 weekly lockout; 46 watchdog trips, floors working. **Hosted CI is still red**: the f41-era run failed 10+ of 30 e2e shards (up from 6 at f37) after 36 min, so 1070's fix has not shipped. Codex 1060, 1070 and 1080 were stopped by the 5% floor at 06:20 and left uncommitted worktrees; they need collection (gates, review, merge). Play-flow not re-captured (1060 owns it).
+
+**Priorities:** see DIRECTOR.md (CI, stranded worktrees, Blue Hole bowl atmosphere, Lost City tower, Beebe boulders, Monterey strata, first-minute check). Codex queued: 1090, 1100, 1110.
+
+**Stage:** ~70% to 1.0, about 2.5 weeks (Claude only). **Needs owner:** nothing.
+
 ## 2026-10-09 comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-09-045527 vs -202656)
 
 Codex 5h was 6% so `codex-review.sh` skipped; no Sol second opinion. The morning joint review stays the agreed baseline.
