@@ -200,7 +200,7 @@ describe('Titanic far-field horizon', () => {
         } as Parameters<THREE.MeshStandardMaterial['onBeforeCompile']>[0];
         built.material.onBeforeCompile(shader, {} as THREE.WebGLRenderer);
         if (site === 'titanic') {
-          expect(shader.uniforms.uAbyssFadeM.value.toArray()).toEqual([300, 1100]);
+          expect(shader.uniforms.uAbyssFadeM.value.toArray()).toEqual([180, 780]);
           // Reuse Three's output-space fog colour, so the fully faded seabed
           // converges to the backdrop on both direct and post render paths.
           expect(shader.fragmentShader).toContain('mix(gl_FragColor.rgb, fogColor, abyssFade)');

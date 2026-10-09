@@ -13,3 +13,14 @@ export const MONTEREY_OPENING = {
     { species: 'sea-pen', offset: [34, 0, 6], low: 5, count: 9 },
   ],
 } as const;
+
+/** Irregular mudstone beds, local slump scars and pale sediment on exposed shelves. */
+export const MONTEREY_STRATA = {
+  thickness: [0.55, 1.65],
+  wanderFrequency: [0.03, 0.035],
+  wanderBeds: 1.8,
+  ledgeStrength: [0.18, 0.95],
+  slumpFrequency: [0.055, 0.075],
+  slumpDepthH: 0.045,
+  dustAmount: 0.3,
+} as const;
