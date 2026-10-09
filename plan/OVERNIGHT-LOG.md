@@ -622,4 +622,5 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Running (Codex):** 1000, 1020, 1030. **Queue:** 1040, 1050 (Lost City fingers + Low check, 980 verify), 1060 (Journal collapse/debrief). No Claude agents launched. Needs owner: nothing.
 
 ## 2026-10-09 00:xx review run (Claude)
+
 - Comprehensive review (Claude alone, Codex 6%): REVIEWS.md/DIRECTOR.md updated; queued Codex 1070 (CI shards), 1080 (Endurance/Beebe). No merges, no agents. Needs owner: nothing.

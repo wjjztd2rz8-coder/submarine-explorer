@@ -8,13 +8,13 @@ Codex 5h was 6% so `codex-review.sh` skipped; no Sol second opinion. The morning
 
 **Changed:** merged 940, 950, 970, 960, 990, 1010, 980; tagged f35-f38. Titanic opening now shows the whole hull beside the sub; Monterey strata varied; Blue Hole and Challenger/Endurance openings improved.
 
-| Site | Score (readable / beautiful) | Biggest gap |
-| --- | --- | --- |
-| Titanic | 4 / 4 | haze band above seabed |
-| Beebe | 4 / 3.5 | smooth fluted chimney, flat boulders |
-| Blue Hole | 3 / 2.5 | smooth bowl, hard horizon ring, cone stalactites |
-| Lost City | 4 / 3 | stacked-plate beehive, blotchy texture |
-| Monterey | 4 / 3.5 | sub overlaps wall at spawn |
+| Site      | Score (readable / beautiful) | Biggest gap                                      |
+| --------- | ---------------------------- | ------------------------------------------------ |
+| Titanic   | 4 / 4                        | haze band above seabed                           |
+| Beebe     | 4 / 3.5                      | smooth fluted chimney, flat boulders             |
+| Blue Hole | 3 / 2.5                      | smooth bowl, hard horizon ring, cone stalactites |
+| Lost City | 4 / 3                        | stacked-plate beehive, blotchy texture           |
+| Monterey  | 4 / 3.5                      | sub overlaps wall at spawn                       |
 
 **Process:** efficiency.sh: Claude idle ~128 h and Codex under-used ~114 h, almost all the Oct 6-8 weekly lockout; 41 watchdog trips, all floors working. Hosted CI on f37 still red (e2e shards 3, 6, 24); 1070 queued. f38 run pending. Play-flow not re-captured; 1060 and a Haiku capture are queued in the backlog.
 
