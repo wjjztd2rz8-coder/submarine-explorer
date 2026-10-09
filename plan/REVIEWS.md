@@ -8,15 +8,15 @@ Sol ran an independent review (read-only). The one-round `reconcile` call produc
 
 **Changed since the last review:** merged f-firstminute, f-hud-overlap, f-debrief-zero, f-monterey-strata, f-lostcity-tower (jagged ledged trunk, modest gain), f-bluehole-bowl (stouter pendants, sonar ramp; bowl barely changed). Endurance is byte-identical across both golden sets.
 
-| Site | Readable | Beautiful (agreed) | Biggest gap |
-| --- | --- | --- | --- |
-| Titanic | 4 | 3.5-4 | flat dark void above hard horizon; repetitive hull panels up close |
-| Beebe | 4 | 3-3.5 | fluted-cone chimney, procedural sediment |
-| Blue Hole | 3.5 | 2.5-3 | smooth bowl with shelf line, faceted terraces, sonar scale |
-| Lost City | 4 | 3-3.3 | tower still blobby clay with plate flanges, no orifice |
-| Monterey | 4 | 3-3.5 | corrugated rock, angular banks |
-| Challenger | 3-3.5 | 2.5-3 | tiny lander marker; amphipods and slope present but barely legible |
-| Endurance | 3 | 2.5 | marine-snow discs cover the lower half of the frame, black blob on sub, flat horizon |
+| Site       | Readable | Beautiful (agreed) | Biggest gap                                                                          |
+| ---------- | -------- | ------------------ | ------------------------------------------------------------------------------------ |
+| Titanic    | 4        | 3.5-4              | flat dark void above hard horizon; repetitive hull panels up close                   |
+| Beebe      | 4        | 3-3.5              | fluted-cone chimney, procedural sediment                                             |
+| Blue Hole  | 3.5      | 2.5-3              | smooth bowl with shelf line, faceted terraces, sonar scale                           |
+| Lost City  | 4        | 3-3.3              | tower still blobby clay with plate flanges, no orifice                               |
+| Monterey   | 4        | 3-3.5              | corrugated rock, angular banks                                                       |
+| Challenger | 3-3.5    | 2.5-3              | tiny lander marker; amphipods and slope present but barely legible                   |
+| Endurance  | 3        | 2.5                | marine-snow discs cover the lower half of the frame, black blob on sub, flat horizon |
 
 **Disputes settled on evidence:** Sol said Claude was too generous on Titanic (4) and the finish estimate; accepted (3.5-4, 3-4 weeks). Sol said "Challenger empty" was too harsh; accepted (flecks and a slope are visible). Sol's new findings, all verified: second required POIs are ~4.5 km away at Blue Hole (pois.json: lon delta 0.042 deg) and ~14.6 km at Monterey; firstminute-shots never presses Scan so reward/comprehension is unproven (Sol); golden manifest was `complete:false` (Sol). Claude's own finding: Endurance snow and the black hull blob.
 
