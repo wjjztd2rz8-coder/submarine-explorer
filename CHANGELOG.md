@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-firstminute:** the mission briefing eyebrow no longer shows the raw site slug (`BEEBE-VENT-FIELD`, `LOST-CITY`, `MONTEREY-CANYON`); hyphens render as spaces. Added `tools/firstminute-shots.mjs`, a Home to debrief first-minute screenshot walkthrough (desktop 1280x720 and phone 390x844). No gameplay or layout change.
+
 - **F-MONTEREY-STRATA:** the Monterey canyon wall no longer reads as even corrugated stripes. Bed thickness is skewed (many thin beds, a few massive ones), ledge depth and overhang follow per-bed hardness and vary along the wall, slump scars are deeper, and each bed has its own muted albedo (olive, tan, grey, dark olive, buff). Vertex-colour and displacement only: no draw-call, triangle or tier change.
 
 - **f-beebe-rocks:** Beebe's seabed boulders are now angular, plane-clipped, noise-displaced rocks with flat shading, dark basalt vertex colour, rusty sulfide staining and partial burial, replacing the pale smooth lumps; the sand apron edge is feathered with multi-scale noise and angular bays and a wider height/lift fade so it is no longer a clean ellipse. Beebe only (other talus users keep their lumps via an opt-in rock builder). Same single merged rubble mesh, no new draw calls, colliders or scan targets; the previous radial edge-colour tint on the rubble was dropped. Low tier uses 80-face rocks.

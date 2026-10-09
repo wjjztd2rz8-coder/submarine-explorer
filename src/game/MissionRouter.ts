@@ -673,7 +673,7 @@ export class MissionRouter {
     const hull = def.hull_class ? config.submarine.hullClasses[def.hull_class] : undefined;
     const content: BriefingContent = {
       siteId: def.landmark,
-      kicker: `MISSION BRIEFING · ${def.landmark.toUpperCase()}`,
+      kicker: `MISSION BRIEFING · ${def.landmark.replaceAll('-', ' ').toUpperCase()}`,
       title: def.title,
       summary: def.briefing.summary,
       meta: [],
