@@ -871,6 +871,10 @@
     --hl-portrait-map-width: 96px;
     --hl-portrait-stack-left: calc(120px + env(safe-area-inset-left, 0px));
   }
+  html.is-touch .onboard-card {
+    /* The enlarged three-row controls grow above the old fixed 176px slot. */
+    bottom: calc(max(176px, var(--tc-portrait-clearance)) + env(safe-area-inset-bottom, 0px));
+  }
   html.is-touch .hud-readouts,
   html.is-touch .hud-readouts:has(.hud-power:not([hidden])) {
     left: var(--hl-portrait-stack-left);

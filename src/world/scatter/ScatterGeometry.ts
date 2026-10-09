@@ -8,6 +8,8 @@
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { BEEBE_SCATTER_ROCK } from '../../core/config/beebeChimney.js';
+import type { Biome, ScatterKind } from '../TerrainBiome.js';
 
 /** Integer hash of a position triple -> [0, 1); equal input gives equal output. */
 function hash3(x: number, y: number, z: number, seed: number): number {
@@ -127,6 +129,63 @@ export function pillowGeometry(): THREE.BufferGeometry {
 /** Small angular fragment (coral rubble, shell hash). */
 export function rubbleGeometry(): THREE.BufferGeometry {
   return lump(0, 41, 0.35, [1.0, 0.55, 0.7], true, 0.25);
+}
+
+/** Beebe-only clipped blocks: retain each kind's placement, material and instanced draw. */
+export function fracturedBasaltGeometry(kind: ScatterKind, biome: Biome): THREE.BufferGeometry {
+  const cfg = BEEBE_SCATTER_ROCK;
+  const seed = kind === 'rubble' ? 41 : kind === 'pillow' ? 31 : 11;
+  const scale =
+    kind === 'pillow' ? [1.45, 0.62, 1] : kind === 'rubble' ? [1, 0.55, 0.7] : [1, 0.72, 0.85];
+  const g = new THREE.IcosahedronGeometry(1, kind === 'rubble' ? 0 : 1);
+  const pos = g.getAttribute('position');
+  const planes = Array.from({ length: cfg.clipPlanes }, (_, i) => ({
+    normal: new THREE.Vector3(
+      hash3(i, 1, 0, seed) * 2 - 1,
+      hash3(i, 2, 0, seed) * 2 - 1,
+      hash3(i, 3, 0, seed) * 2 - 1,
+    ).normalize(),
+    distance: cfg.clipMin + cfg.clipVariation * hash3(i, 4, 0, seed),
+  }));
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    v.multiplyScalar(1 + cfg.jitter * (hash3(v.x, v.y, v.z, seed) * 2 - 1));
+    for (const { normal, distance } of planes) {
+      const over = v.dot(normal) - distance;
+      if (over > 0) v.addScaledVector(normal, -over);
+    }
+    pos.setXYZ(i, v.x * scale[0]! * 0.5, v.y * scale[1]! * 0.5, v.z * scale[2]! * 0.5);
+  }
+  g.computeBoundingBox();
+  g.translate(0, -g.boundingBox!.min.y, 0);
+  finish(g, seed, cfg.faceVariation);
+  const normal = g.getAttribute('normal');
+  const colors = g.getAttribute('color');
+  const basalt = new THREE.Color(cfg.color);
+  const stain = new THREE.Color(biome.stain);
+  const sediment = new THREE.Color(biome.colorA);
+  // Instance tint still supplies deterministic brightness variation. Cancel its
+  // old base hue in vertex colours, especially rubble's pale carbonate colorA.
+  const reference = new THREE.Color(kind === 'rubble' ? biome.colorA : biome.colorC);
+  const color = new THREE.Color();
+  for (let f = 0; f < pos.count; f += 3) {
+    const patch = hash3(pos.getX(f), pos.getY(f), pos.getZ(f), seed + 1130);
+    color.copy(basalt).lerp(stain, patch * cfg.stainAmount);
+    color.lerp(sediment, Math.max(0, normal.getY(f)) * cfg.sedimentAmount);
+    const variation = colors.getX(f);
+    for (let k = 0; k < 3; k++) {
+      colors.setXYZ(
+        f + k,
+        (color.r / reference.r) * variation,
+        (color.g / reference.g) * variation,
+        (color.b / reference.b) * variation,
+      );
+    }
+  }
+  g.computeBoundingBox();
+  g.computeBoundingSphere();
+  return g;
 }
 
 /** Vase / barrel sponge with a hollow mouth. */

@@ -23,6 +23,7 @@ import {
   type ScatterGround,
 } from './ScatterPlacement.js';
 import { SCATTER_TYPES, type ScatterMaterialKind } from './ScatterTypes.js';
+import { fracturedBasaltGeometry } from './ScatterGeometry.js';
 
 export interface ScatterOptions {
   ground: ScatterGround;
@@ -226,7 +227,10 @@ export class Scatter {
     let mesh = this.meshes.get(kind);
     if (mesh) return mesh;
     const def = SCATTER_TYPES[kind];
-    const geo = def.geometry();
+    const geo =
+      this.opts.biome.scatterRock === 'fractured-basalt' && def.material === 'rock'
+        ? fracturedBasaltGeometry(kind, this.opts.biome)
+        : def.geometry();
     this.geometries.set(kind, geo);
     mesh = new THREE.InstancedMesh(geo, this.materials.get(def.material), CAP_PER_KIND);
     mesh.name = `scatter:${kind}`;
