@@ -38,17 +38,42 @@ const PROFILE: readonly (readonly [number, number])[] = [
 
 const smoothstep = (t: number): number => t * t * (3 - 2 * t);
 
-function profileAt(r: number): number {
-  if (r >= PROFILE[0]![0]) return 0;
-  for (let i = 1; i < PROFILE.length; i++) {
-    const [r1, h1] = PROFILE[i]!;
+function profileAt(r: number, profile = PROFILE): number {
+  if (r >= profile[0]![0]) return 0;
+  for (let i = 1; i < profile.length; i++) {
+    const [r1, h1] = profile[i]!;
     if (r >= r1) {
-      const [r0, h0] = PROFILE[i - 1]!;
+      const [r0, h0] = profile[i - 1]!;
       return h1 + (h0 - h1) * smoothstep((r - r1) / (r0 - r1));
     }
   }
-  return PROFILE[PROFILE.length - 1]![1];
+  return profile[profile.length - 1]![1];
 }
+
+// Broad limestone beds separated by short, steep risers. Radial treads are
+// 4–7 m wide, so even the locally refined Low mesh resolves their silhouettes.
+// The original 40 m gallery seat is retained; angular masks also protect its roof.
+const TERRACE_PROFILE: readonly (readonly [number, number])[] = [
+  [215, 0],
+  [184, -9],
+  [177, -10],
+  [173, -18],
+  [166, -19],
+  [160, -30],
+  [153, -38],
+  [134, -41],
+  [129, -43],
+  [125, -62],
+  [121, -63],
+  [117, -74],
+  [112, -78],
+  [108, -98],
+  [102, -100],
+  [97, -113],
+  [92, -118],
+  [60, -123],
+  [0, -125],
+];
 
 /** Wall alcoves: bearing (rad), angular half-width, absolute height (m), height half-range, depth (m). */
 const NOTCHES: readonly { a: number; w: number; h: number; hw: number; d: number }[] = [
@@ -82,12 +107,10 @@ function boulderField(dx: number, dz: number): number {
 const clamp01 = (t: number): number => Math.max(0, Math.min(1, t));
 
 /**
- * Irregular benches on the sinkhole wall: the profile height is quantised into
- * treads and steep risers (period and phase wander with bearing, so no ring is
- * constant), with a small raised lip at each riser crest and a dip under it
- * that the slope shading reads as an undercut shadow. Returns a height delta.
- * Zone: heights -34..-100 m; the mouth mask in blueHoleWallRelief keeps both
- * gallery seats untouched.
+ * Replace the smooth bowl with broad beds, from the upper reef to the lower
+ * wall. The beds wander slowly with bearing, without quantisation seams or
+ * isolated rock skins. Returns a height delta; both gallery mouths and the
+ * floor retain their original surface.
  */
 export function blueHoleTerraces(a: number, r: number): number {
   let mouth = 1;
@@ -99,17 +122,11 @@ export function blueHoleTerraces(a: number, r: number): number {
     mouth *= smoothstep(clamp01((da - width!) / 0.15));
   }
   if (mouth <= 0) return 0;
-  const h = profileAt(r);
-  const zone = smoothstep(clamp01((h + 106) / 8)) * (1 - smoothstep(clamp01((h + 34) / 6)));
+  const zone = smoothstep(clamp01((r - 100) / 10)) * (1 - smoothstep(clamp01((r - 184) / 11)));
   if (zone <= 0) return 0;
-  const q = 9 + 2.5 * Math.sin(5 * a + 0.7) + 1.5 * Math.sin(11 * a + 2.0);
-  const off = 4 * Math.sin(3 * a + 1.1) + 2 * Math.sin(8 * a);
-  const u = (h + off) / q;
-  const f = u - Math.floor(u);
-  const step = Math.floor(u) + smoothstep(clamp01((f - 0.58) / 0.27));
-  const lip = Math.exp(-(((f - 0.9) / 0.07) ** 2));
-  const under = Math.exp(-(((f - 0.66) / 0.07) ** 2));
-  return mouth * zone * (step * q - off - h + 1.1 * lip - 1.3 * under);
+  const drift = 0.8 * Math.sin(3 * a + 0.7) + 0.35 * Math.sin(7 * a + 2);
+  const rr = r + drift;
+  return mouth * zone * (profileAt(rr, TERRACE_PROFILE) - profileAt(r));
 }
 
 /** Relief is part of the single heightfield, so sand and exposed rock share

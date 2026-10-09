@@ -297,16 +297,16 @@ export const BIOMES: Record<string, Biome> = {
   // Limestone walls, pale silt floor.
   'great-blue-hole': {
     a: 'silt',
-    b: 'sand',
+    b: 'silt',
     c: 'carbonate',
-    colorA: 0xdcd6bd,
-    colorB: 0xd2cbb0,
-    colorC: 0xb4a888,
-    contrast: 0.85,
+    colorA: 0xc9c8b4,
+    colorB: 0xc3c0aa,
+    colorC: 0x969382,
+    contrast: 0.65,
     detail: 0.6,
     stain: 0x8f8764,
-    stainAmount: 0.3,
-    patch: 0.3,
+    stainAmount: 0.16,
+    patch: 0.18,
     ripple: 0.6,
     rippleLenM: 0.4,
     rippleDir: 0.2,
@@ -314,8 +314,10 @@ export const BIOMES: Record<string, Biome> = {
     rockBias: 0.3,
     // Lower walls fall away to deep blue-grey (the real hole is dark below the ledge) but stay readable.
     depthShade: { startM: 30, endM: 105, tint: 0x28556f },
-    strata: { periodM: 3.4, amount: 0.8 },
-    horizonFadeM: [90, 380],
+    // Geometry supplies the bed edges; fine joints stay subordinate to the ledges.
+    strata: { periodM: 3.4, amount: 0.32 },
+    // Across the 320 m bowl the reef should already dissolve into water haze.
+    horizonFadeM: [55, 210],
     scatter: [
       { kind: 'sponge', density: 0.8, slopeMaxDeg: 40, on: 'rock' },
       { kind: 'sponge', density: 0.5, slopeMaxDeg: 20, on: 'flat' },

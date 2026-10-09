@@ -121,8 +121,9 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
       const sampler = terrain.sampleDataHeight(x, z);
       console.log('Blue Hole without procedural detail', { mesh, sampler, error: mesh - sampler });
       expect(Math.abs(terrain.sampleHeight(x, z) - mesh)).toBeLessThan(0.002);
-      // The original analytic survey/mesh resolution difference still exists.
-      expect(mesh - sampler).toBeGreaterThan(config.submarine.hullRadius);
+      // 1030 resolves the reconstructed bowl on Low, including with noise off:
+      // the old difference exceeded hull clearance; now it stays within 2 m.
+      expect(Math.abs(mesh - sampler)).toBeLessThan(2);
     } finally {
       terrain.dispose();
     }
