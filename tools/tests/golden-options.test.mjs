@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { goldenOptions } from '../golden-options.mjs';
+import bismarckPose from '../bismarck-poses.json' with { type: 'json' };
 
 test('nightly defaults remain High desktop and the original hero selection', () => {
   assert.deepEqual(goldenOptions({}), {
@@ -73,7 +74,7 @@ test('all-site hero selection covers the live catalog with valid prop IDs and fa
   }
   assert.deepEqual(
     selectGoldenHeroes(defaults, catalog, goldenOptions({ GOLDEN_SITES: 'bismarck' })),
-    [['bismarck', 'main-hull']],
+    [['bismarck', 'main-hull', 'bismarck', bismarckPose]],
   );
   assert.throws(
     () => selectGoldenHeroes(defaults, catalog, goldenOptions({ GOLDEN_SITES: 'typo' })),

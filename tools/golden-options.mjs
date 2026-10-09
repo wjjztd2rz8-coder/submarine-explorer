@@ -1,4 +1,6 @@
 /** Opt-in capture settings; nightly defaults stay High / desktop / hero sites. */
+import bismarckPose from './bismarck-poses.json' with { type: 'json' };
+
 export function goldenOptions(env = process.env) {
   const tier = env.GOLDEN_TIER ?? 'high';
   if (!['low', 'medium', 'high', 'ultra'].includes(tier))
@@ -34,7 +36,12 @@ export function selectGoldenHeroes(defaultHeroes, catalog, { only, allSites }) {
       if (heroes.some(([id]) => id === site) || (!allSites && !only.includes(site))) continue;
       if (!Object.hasOwn(extraHeroes, site))
         throw new Error(`No golden hero configured for catalog site: ${site}`);
-      heroes.push([site, extraHeroes[site]]);
+      // Bismarck's box centre is buried in the slope; aim at its exposed upper side.
+      heroes.push(
+        site === 'bismarck'
+          ? [site, extraHeroes[site], site, bismarckPose]
+          : [site, extraHeroes[site]],
+      );
     }
   }
   const selected =

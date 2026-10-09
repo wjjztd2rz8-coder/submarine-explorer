@@ -12,6 +12,7 @@ import { Water } from '../../world/Water.js';
 import type { GameSystem } from '../System.js';
 import { MONTEREY_OPENING, deepOpeningFor, deepSiteWater } from '../../core/Config.js';
 import { HemisphereLight } from 'three';
+import { lowSiteWater } from '../../core/config/atmosphere.js';
 
 /** The ROV's lamp bar is this share of the sub's headlight separation. */
 const ROV_LAMP_SCALE = 0.3;
@@ -23,7 +24,7 @@ export const atmosphereSystem: GameSystem = {
     const atmoTier = atmosphereTier(config.water, tier);
     const atmosphere = new Atmosphere(
       scene,
-      deepSiteWater(ctx.meta.id, config.water),
+      lowSiteWater(ctx.meta.id, tier, deepSiteWater(ctx.meta.id, config.water)),
       atmoTier,
       bus,
     );
