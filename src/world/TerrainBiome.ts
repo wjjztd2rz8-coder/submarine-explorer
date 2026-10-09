@@ -181,6 +181,7 @@ export const BIOMES: Record<string, Biome> = {
   },
   endurance: {
     ...ABYSSAL,
+    abyssFadeM: [110, 650],
     colorA: 0x48463f,
     colorB: 0x3f3d38,
     colorC: 0x33322f,

@@ -127,7 +127,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
     },
   },
   "endurance": {
-    "biome": "4a8f54ac43291e65e4dd9f64b949a79d45b9f8a58736dfabba4a8fd9dd258f4c",
+    "biome": "b7b14092d0e8bb48dd41a0ccffe45cc0f610fd15bec42b9edf9a8f52fed67007",
     "tiers": {
       "high": {
         "buffers": [
@@ -138,9 +138,9 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
             "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
           },
         ],
-        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
-        "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
-        "uniforms": "fe6f4ae5be8f111cb6fbbbaf7200e1f0b509955c5da74c2a41c1175a7f4526d1",
+        "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP-abyss-fade",
+        "shader": "3a00fdf2ca37761a5a04a680dd65fa5e22373cc8ff6b8e27c95558b53d024775",
+        "uniforms": "2189aa81094aefb482dcf39658aacf6c3614849f7fb194baf80d2c4eefe28e74",
       },
       "low": {
         "buffers": [
@@ -151,9 +151,9 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
             "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
           },
         ],
-        "cache": "seabed-",
-        "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
-        "uniforms": "fe6f4ae5be8f111cb6fbbbaf7200e1f0b509955c5da74c2a41c1175a7f4526d1",
+        "cache": "seabed--abyss-fade",
+        "shader": "594e4e41d62dc43c8f02e26cd262736737dc192b405425337f8a07113dc760da",
+        "uniforms": "2189aa81094aefb482dcf39658aacf6c3614849f7fb194baf80d2c4eefe28e74",
       },
     },
   },

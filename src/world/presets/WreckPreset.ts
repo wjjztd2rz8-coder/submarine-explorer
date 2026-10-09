@@ -7,12 +7,12 @@
  * The haze box follows the camera; its floor is a plane fitted to the seabed
  * under the camera (maths.ts `fitSeabedPlane`), so particles hug the floor
  * without a per-particle terrain lookup. Draw calls: 2 (haze + motes), plus
- * one opt-in water backdrop at Titanic (also retained without particles on Low).
+ * one water backdrop at Titanic and Endurance (retained without particles on Low).
  */
 
 import * as THREE from 'three';
 import type { EnvPresetName } from '../../core/Config.js';
-import { DEFAULT_WATER, type WaterConfig } from '../../core/Config.js';
+import { DEFAULT_WATER, DEEP_OPENINGS, type WaterConfig } from '../../core/Config.js';
 import { snowReadabilityUniforms } from '../../render/MarineSnow.js';
 import { fitSeabedPlane, mulberry, particleBudget } from './maths.js';
 import { TitanicHorizon } from './TitanicHorizon.js';
@@ -44,13 +44,15 @@ export function hullProps(props: readonly PresetProp[], max: number): PresetProp
 
 const FILL_TINT = new THREE.Color(0x7d8284);
 
-/** CPU mirror of the foreground-only wreck guard; distant haze keeps its broad sprites. */
+/** CPU mirror of the wreck guard, with optional site-specific far-field ceilings. */
 export function wreckParticleAppearance(
   config: WaterConfig,
   cameraDistanceM: number,
   sizePx: number,
   alpha: number,
   brightness: number,
+  maxSizePx = 256,
+  maxBrightness = Infinity,
 ): { sizePx: number; alpha: number; brightness: number } {
   const t = THREE.MathUtils.smoothstep(
     cameraDistanceM,
@@ -58,11 +60,11 @@ export function wreckParticleAppearance(
     config.snowForegroundFadeEndM,
   );
   return {
-    sizePx: Math.min(sizePx, THREE.MathUtils.lerp(config.snowForegroundSizePx, 256, t)),
+    sizePx: Math.min(sizePx, THREE.MathUtils.lerp(config.snowForegroundSizePx, maxSizePx, t)),
     alpha: Math.min(alpha, THREE.MathUtils.lerp(config.snowForegroundAlpha, 1, t)),
     brightness: Math.min(
       brightness,
-      THREE.MathUtils.lerp(config.snowForegroundBrightness, brightness, t),
+      THREE.MathUtils.lerp(config.snowForegroundBrightness, Math.min(brightness, maxBrightness), t),
     ),
   };
 }
@@ -78,6 +80,8 @@ export class WreckPreset implements EnvPreset {
   private params: PresetParams = {};
   private visuals = false;
   private horizon: TitanicHorizon | null = null;
+  private maxSizePx = 256;
+  private maxBrightness = 1_000_000;
 
   constructor(
     private readonly look: ParticleLook,
@@ -85,11 +89,16 @@ export class WreckPreset implements EnvPreset {
   ) {}
 
   enter(ctx: PresetEnterContext): void {
-    this.params = ctx.params;
+    const endurance = ctx.pois.some((poi) => poi.id === 'endurance-hull');
+    const tuning = endurance ? DEEP_OPENINGS.endurance.wreckAtmosphere : null;
+    this.params = tuning ? { ...ctx.params, ...tuning } : ctx.params;
+    this.maxSizePx = tuning?.maxSizePx ?? 256;
+    this.maxBrightness = tuning?.maxBrightness ?? 1_000_000;
     this.scene = ctx.scene;
     this.visuals = ctx.visuals;
-    if (ctx.params.titanicHorizon === true) {
+    if (ctx.params.titanicHorizon === true || endurance) {
       this.horizon = new TitanicHorizon(ctx.scene);
+      if (endurance) this.horizon.dome.name = 'enduranceHorizon';
       this.stats.draws = 1;
     }
     if (!ctx.visuals) return;
@@ -118,6 +127,8 @@ export class WreckPreset implements EnvPreset {
       uniforms: {
         ...commonUniforms(this.look),
         ...snowReadabilityUniforms(this.water),
+        uParticleMaxSizePx: { value: this.maxSizePx },
+        uParticleMaxBrightness: { value: this.maxBrightness },
         uBox: { value: box },
         uBand: { value: num(p.hazeBandM, 30) },
         uPlane: { value: new THREE.Vector3() }, // seabed height, d/dx, d/dz at the camera
@@ -176,6 +187,8 @@ export class WreckPreset implements EnvPreset {
       uniforms: {
         ...commonUniforms(this.look),
         ...snowReadabilityUniforms(this.water),
+        uParticleMaxSizePx: { value: this.maxSizePx },
+        uParticleMaxBrightness: { value: this.maxBrightness },
         uSize: { value: num(p.moteSizeM, 0.35) },
         uColor: { value: new THREE.Color(num(p.moteColor, 0x8a4a2c)) },
         uOpacity: { value: num(p.moteOpacity, 0.5) },
@@ -226,14 +239,16 @@ uniform float uForegroundFadeEndM;
 uniform float uForegroundSizePx;
 uniform float uForegroundAlpha;
 uniform float uForegroundBrightness;
+uniform float uParticleMaxSizePx;
+uniform float uParticleMaxBrightness;
 float wreckForeground(vec3 world) {
   float fade = smoothstep(uForegroundM, uForegroundFadeEndM, length(world - uCam));
-  gl_PointSize = min(gl_PointSize, mix(uForegroundSizePx, 256.0, fade));
+  gl_PointSize = min(gl_PointSize, mix(uForegroundSizePx, uParticleMaxSizePx, fade));
   return fade;
 }
 float wreckBrightness(vec3 world, float fade) {
   float light = presetLight(world);
-  return min(light, mix(uForegroundBrightness, light, fade));
+  return min(light, mix(uForegroundBrightness, min(light, uParticleMaxBrightness), fade));
 }
 `;
 
