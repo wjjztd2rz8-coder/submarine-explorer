@@ -146,3 +146,10 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 ## 2026-10-09 midday review
 
 - Finding: Codex tasks 1060/1070/1080 were killed by the Codex 5h floor mid-round and left uncommitted worktrees, with no auto-resume path until the next Claude collection run. Hosted CI failures grew (10+ shards) while the fix sat stranded. Action: prioritised in DIRECTOR.md items 1-2; no tooling change (floors are by design). Idea if it recurs: have codex-dispatch relaunch unfinished worktrees first when budget returns.
+
+## 2026-10-09 evening comprehensive review
+
+- Finding: `golden.sh` for Monterey hit repeated 30 s screenshot timeouts while three Codex tasks and the Sol review shared the CPU; the desktop set shipped 20 of 23 images. Action: reviews should capture Monterey first or alone (`GOLDEN_SITES=monterey-canyon`) before launching Sol; this review used the previous Monterey shot.
+- Finding: `pgrep -f golden.sh` matches the headless `claude -p` process (its prompt text contains the script name), so waits built on it never end. Wait on the specific PID instead.
+- Finding: Endurance golden was byte-identical across two sets; nothing in the backlog covered it until now (queued 1180). Backlog audits should list every site in the contact sheet, not only the five hero sites.
+- Hosted CI still red (e2e shards); 1120 owns triage.
