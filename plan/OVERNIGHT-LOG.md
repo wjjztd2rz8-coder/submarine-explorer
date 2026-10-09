@@ -642,3 +642,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** f-titanic-monterey (Sonnet): Titanic distant seabed fades over 110–650 m (softer horizon band; faint lighter strip remains); Monterey spawn 34 m from the wall, chase arm 64, opening fauna moved ahead of the sub. Reviewed desktop shots: sub clear of the wall, readable. Monterey portrait final framing unchecked; HUD panels overlap in portrait capture (open).
 - **Gates:** full e2e on main: 556 passed, 1 failed (f-bughunt-18 chase-radius spec expected the global radius for Monterey); fixed the spec (accept 64 like Beebe's 54), targeted rerun passed, smoke + project-base green. Full suite not re-run after the fix. Pushed, tagged f41.
 - **Running/queue:** no Codex tasks running; queue 1040, 1050, 1060, 1070, 1080 (Codex 5h reset to 100%, dispatcher will launch). Next Claude: Beebe chimney review after 1080, Monterey portrait HUD overlap. Needs owner: nothing.
+
+## 2026-10-09 04:18 CDT headless run (Claude)
+
+- **Merged:** f-monterey-portrait-hud (Sonnet): could not reproduce the Monterey portrait HUD overlap at 390x844 (earlier HUD work likely fixed it); no source change, added a regression e2e spec + CHANGELOG note. Smoke + project-base green on main; no push (no new wave).
+- **Running (Codex):** 1040, 1050, 1060. **Queue:** 1070, 1080. Next Claude: Beebe chimney review after 1080, Lost City tower read after 1050. Needs owner: nothing.
