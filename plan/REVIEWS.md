@@ -2,6 +2,14 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-09 afternoon targeted review (trigger: Claude idle at >=50% for 2 h)
+
+**Root cause:** the Claude backlog was empty of unblocked items ("wait for next golden set") while Codex sat at 0% until 14:16, so 140 h of samples show Claude idle. Fix: new golden set (2026-10-09-191533) captured, backlog refilled in DIRECTOR.md, two Sonnet packages launched (Lost City tower, Blue Hole bowl + sonar ramp), Codex 1170 queued. Rule for next time: never end a run with "waits for golden"; capture golden in the same run.
+
+**Scores (Claude alone, no Sol):** Titanic 4, Beebe 3.5, Monterey 3.5 (strata improved), Challenger 3 (empty seabed), Lost City 3 (tower still smooth blob), Blue Hole 2.5-3 (bowl smooth, sonar minimap flat lime green).
+
+**Needs owner:** nothing.
+
 ## 2026-10-09 midday comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-09-112035 vs -045527)
 
 Codex 5h was 6% (`codex-review.sh` exited 75), so there is no Sol second opinion; this is Claude's view only. The early-morning review is the last joint-ish baseline.
