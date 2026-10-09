@@ -206,12 +206,22 @@ export function blueHoleTint(
       const [r1, h1] = TERRACE_PROFILE[i]!;
       const [r0, h0] = TERRACE_PROFILE[i - 1]!;
       if (r0 - r1 < 1 || (h0 - h1) / (r0 - r1) < 1.2) continue;
-      if (r < r1) ao *= 1 - 0.38 * Math.exp(-(r1 - r) / 3.2);
+      if (r < r1) ao *= 1 - 0.5 * Math.exp(-(r1 - r) / 4.5);
       else if (r < r0) ao *= 1 - 0.28 * (1 - (r - r1) / (r0 - r1));
     }
   }
-  const m = ao * (0.82 + 0.18 * smoothstep(clamp01(normalY)));
-  return [tr * m, tg * m, tb * m];
+  // Broad mottling of the treads: warm sand patches against grey silt and darker rubble
+  // beds, so a level shelf is never one flat cream tone.
+  const mott =
+    0.5 +
+    0.25 * Math.sin(x * 0.11 + 1.3 * Math.sin(z * 0.07)) +
+    0.25 * Math.sin(z * 0.085 + 0.9 * Math.sin(x * 0.13 + 2));
+  const fine = 0.5 + 0.5 * Math.sin(x * 0.53 + z * 0.37 + 2 * Math.sin(x * 0.21 - z * 0.29));
+  const flat = 1 - rock;
+  const tone = 1 + flat * (0.34 * (mott - 0.5) + 0.12 * (fine - 0.5));
+  const warm = flat * 0.18 * (mott - 0.5);
+  const m = ao * tone * (0.8 + 0.2 * smoothstep(clamp01(normalY)));
+  return [tr * m * (1 + warm), tg * m, tb * m * (1 - warm)];
 }
 
 export interface TerrainCarve {

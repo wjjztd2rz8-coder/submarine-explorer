@@ -42,6 +42,8 @@ const WALL = new THREE.Color(0x9b9482);
 const WALL_DARK = new THREE.Color(0x5b5648);
 const TIP = new THREE.Color(0xe4d9be);
 const AMBER = new THREE.Color(0xb59a6a);
+const OCHRE = new THREE.Color(0xc79a52);
+const GREY_BROWN = new THREE.Color(0x6a604f);
 const DRAPE = new THREE.Color(0x8c8470);
 const BED_WARM = new THREE.Color(0xb39a68);
 const BED_COOL = new THREE.Color(0x7d8179);
@@ -49,12 +51,12 @@ const BED_COOL = new THREE.Color(0x7d8179);
 const EDGE_START = 0.55;
 
 /** Sunlit pale limestone: the shared rock albedo (kept dark for vents and tuff) is lifted. */
-const LIMESTONE_LIFT = 3.5;
+const LIMESTONE_LIFT = 2.7;
 const geoMaterial: typeof baseGeoMaterial = (kind, d, o) => {
   const m = baseGeoMaterial(kind, d, o);
   m.color.multiplyScalar(LIMESTONE_LIFT);
   // Scattered light keeps the shelf pale tan like the hole's walls, not a dark silhouette.
-  vertexGlow(m, 0.18, 0xd8d0b0, 0.35);
+  vertexGlow(m, 0.1, 0xd8d0b0, 0.35);
   return m;
 };
 
@@ -267,6 +269,14 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     out.lerp(BED_WARM, smooth(0.45, 0.75, bh) * 0.45).lerp(BED_COOL, smooth(0.45, 0.2, bh) * 0.4);
     out.multiplyScalar(0.72 + 0.28 * smooth(0, 0.12, bed - Math.floor(bed)));
     out.lerp(DRAPE, (1 - smooth(joinY, joinY + 0.12 * H, y)) * 0.4);
+    // Documentary-still contrast: ochre beds high on the face, grey-brown lower down, dark
+    // joints and a shadowed foot and underside, so the wall reads as stacked limestone.
+    const hf = clamp(y / (0.62 * H));
+    out.lerp(OCHRE, 0.34 * smooth(0.25, 0.9, hf) * (0.5 + bh));
+    out.lerp(GREY_BROWN, 0.5 * (1 - smooth(0.05, 0.75, hf)));
+    out.multiplyScalar(0.62 + 0.5 * smooth(0, 0.14, bed - Math.floor(bed)));
+    out.multiplyScalar(0.62 + 0.38 * smooth(0, 0.22, hf));
+    if (ny < -0.35) out.multiplyScalar(0.7);
   });
   wall.computeBoundingBox();
   const full = new THREE.Group();
@@ -304,8 +314,12 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       // Sediment tone drifts between warm sand, grey silt and darker fallen debris; no flat cream.
       const t = fbm3(x * 0.07, z * 0.07, 3, seed ^ 0x91, 3);
       out.lerp(BED_WARM, smooth(0.5, 0.8, t) * 0.55).lerp(BED_COOL, smooth(0.5, 0.2, t) * 0.3);
-      out.multiplyScalar(0.8 + 0.55 * n);
-      out.multiplyScalar(0.92 + 0.18 * smooth(0, 0.25, u));
+      out.multiplyScalar(0.6 + 0.95 * n);
+      // Streaks of fallen debris running down the slope, and a shadowed contact with the wall.
+      const streak = fbm3(x * 0.45, z * 0.09, 6, seed ^ 0x63, 3);
+      out.multiplyScalar(0.78 + 0.45 * smooth(0.3, 0.7, streak));
+      out.lerp(OCHRE, 0.28 * smooth(0.45, 0.8, t));
+      out.multiplyScalar(0.5 + 0.5 * smooth(0, 0.4, u));
     },
   );
   apron.computeBoundingBox();
