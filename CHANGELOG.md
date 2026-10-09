@@ -17,6 +17,14 @@ without an entry here is not done.
 - **f-bluehole-apron:** Blue Hole shelf and apron vertex tint now carries sediment patches (tan sand, grey-brown silt, olive algae film, darker rubble beds, scour streaks and ripples) instead of one beige value, with a pale lip and dark foot-shadow at the first riser. Baked in vertex colour only; no new draw calls.
 
 - Added a Monterey Canyon portrait (390x844) HUD regression test: sonar, readouts, scan card, objectives, tutorial card, touch controls and the open Data credits panel keep separate space, and none covers the submarine. No layout change was needed; the overlap seen in an earlier golden capture no longer reproduces.
+- Phase F, F-1050: replace Lost City's straight, narrow side fingers and cut
+  rims with broad buried feet, stronger taper, lobed crust and uneven crowns.
+  Seat roots against the parent's rendered triangles and share its lean, so
+  irregular columns cannot leave fingers floating. Pale crust uses existing
+  vertex paint; draw calls, triangle counts, scan targets and site facts are
+  unchanged. Reason: director review found tubular fingers and unverified Low
+  views. Capture attempts and the outstanding Low desktop/phone acceptance
+  are recorded in `plan/progress/F-1050.md`.
 
 - **f-titanic-monterey:** Titanic distant seabed now fades into the water over 110-650 m (was 180-780 m), softening the flat haze band above the seabed. Monterey Canyon opening starts 34 m from the north wall (was 16 m) with a 64 m chase arm, so the sub sits clear on the sand with the wall beyond; opening sablefish and sea pens moved ahead of the sub to stay in the opening frame.
 
