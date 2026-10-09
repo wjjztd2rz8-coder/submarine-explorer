@@ -3,6 +3,7 @@ import type { Discovery } from '../../src/game/Discovery.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
 import type { CameraRig } from '../../src/sub/CameraRig.js';
 import type { HintEngine } from '../../src/game/Hints.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import type { Save } from '../../src/core/Save.js';
 
 const heroes = [
@@ -76,97 +77,118 @@ for (const viewport of [
         index % 3 === (viewport.width === 360 ? 0 : viewport.width === 390 ? 1 : 2),
     )) {
       for (const uiScale of hero.site === 'beebe-vent-field' ? [100, 150] : [100]) {
-        test(`${hero.site} ${uiScale}%: tutorial, contact and controls stay separate`, async ({
-          page,
-        }, testInfo) => {
-          await page.addInitScript((uiScale) => {
-            // Unlock sites, but leave tutorial and hint history fresh.
-            localStorage.setItem(
-              'subexplorer.progress.v1',
-              JSON.stringify({
-                version: 1,
-                points: 0,
-                lifetime: 900,
-                awarded: [],
-                upgrades: {},
-                ratings: {},
-              }),
-            );
-            localStorage.setItem(
-              'subexplorer.settings.v2',
-              JSON.stringify({ version: 2, uiScale, reduceMotion: true, graphicsTier: 'low' }),
-            );
-          }, uiScale);
-          await page.goto(`/?mission=${hero.site}&skipBriefing=1&touch=1&tier=low`);
-          await page.waitForFunction(() => window.__gameReady === true, undefined, {
-            timeout: 45_000,
-          });
-          await page.waitForFunction(
-            () => (window.__game as { discovery: Discovery }).discovery.loaded,
-          );
-          expect(
-            await page.evaluate(() => (window.__game as { save: Save }).save.get().gameplayMode),
-          ).toBe('arcade');
-          expect(
-            await page.evaluate(() => (window.__game as { save: Save }).save.get().uiScale),
-          ).toBe(uiScale);
-          const fresh = [...hud, '.onboard-card'];
-          if (await page.locator('.scan-panel').isVisible()) fresh.push('.scan-panel');
-          await separate(page, fresh);
-          await expect(page.locator('.hud-attribution summary')).toContainText('GMRT');
-          expect((await page.locator('.hud-attribution').boundingBox())!.height).toBeLessThan(48);
-          await page.screenshot({ path: testInfo.outputPath('arcade-opening.png') });
+        for (const phase of ['opening', 'tutorial steps', 'contextual hint']) {
+          test(`${hero.site} ${uiScale}%: ${phase}, contact and controls stay separate`, async ({
+            page,
+          }, testInfo) => {
+            await pauseClockBeforeNavigation(page);
+            await page.addInitScript((uiScale) => {
+              // Unlock sites, but leave tutorial and hint history fresh.
+              localStorage.setItem(
+                'subexplorer.progress.v1',
+                JSON.stringify({
+                  version: 1,
+                  points: 0,
+                  lifetime: 900,
+                  awarded: [],
+                  upgrades: {},
+                  ratings: {},
+                }),
+              );
+              localStorage.setItem(
+                'subexplorer.settings.v2',
+                JSON.stringify({ version: 2, uiScale, reduceMotion: true, graphicsTier: 'low' }),
+              );
+            }, uiScale);
+            await page.goto(`/?mission=${hero.site}&skipBriefing=1&touch=1&tier=low`);
+            await clockFramesUntil(page, () => {
+              const game = window.__game as { discovery: Discovery; props: { loaded: boolean } };
+              return window.__gameReady === true && game.discovery.loaded && game.props.loaded;
+            });
+            // Freeze the composed opening, and pause hint lifetime during layout reads.
+            await page.evaluate(() => {
+              (window.__game as { sub: Submarine }).sub.step = () => {};
+            });
+            await page.clock.runFor(34);
+            expect(
+              await page.evaluate(() => (window.__game as { save: Save }).save.get().gameplayMode),
+            ).toBe('arcade');
+            expect(
+              await page.evaluate(() => (window.__game as { save: Save }).save.get().uiScale),
+            ).toBe(uiScale);
+            if (phase === 'opening') {
+              const fresh = [...hud, '.onboard-card'];
+              if (await page.locator('.scan-panel').isVisible()) fresh.push('.scan-panel');
+              await separate(page, fresh);
+              await expect(page.locator('.hud-attribution summary')).toContainText('GMRT');
+              expect((await page.locator('.hud-attribution').boundingBox())!.height).toBeLessThan(
+                48,
+              );
+              await page.screenshot({ path: testInfo.outputPath('arcade-opening.png') });
+              return;
+            }
 
-          // Exercise the real in-range scanner even for openings farther from
-          // their target. Use the same safe pose as ?poi= without reloading.
-          await page.evaluate((poi) => {
-            const game = window.__game as {
-              discovery: Discovery;
-              sub: Submarine;
-              rig: CameraRig;
-            };
-            const pose = game.discovery.spawnPose(poi);
-            if (!pose) throw new Error(`Missing hero POI ${poi}`);
-            game.sub.reset(pose.x, pose.y, pose.z, pose.yaw);
-            game.rig.snap(game.sub.position, game.sub.yaw, game.sub.pitch);
-          }, hero.poi);
-          await expect(page.locator('.scan-panel')).toBeVisible();
-          await page.waitForFunction(
-            () => (window.__game as { discovery: Discovery }).discovery.scanner.view.nearestInRange,
-          );
-          await expect(page.locator('.hud-control-tips')).toBeHidden();
-          await expect(page.locator('.hud-prompt')).toBeHidden();
-          if (viewport.width < viewport.height)
-            await expect(page.locator('.tc-rotate-hint')).toBeHidden();
-          for (const step of ['move', 'depth', 'lights', 'scan', 'journal']) {
-            await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
-            await separate(page, [...hud, '.onboard-card', '.scan-panel']);
-            if (step !== 'journal') await page.locator('.onboard-skip-step').tap();
-          }
-          await page.screenshot({ path: testInfo.outputPath('contact-and-tutorial.png') });
-          await page.getByRole('button', { name: 'Skip', exact: true }).tap();
-          await expect(page.locator('.onboard-card')).toBeHidden();
-          await expect(page.locator('.scan-panel')).toBeVisible();
-          await expect(page.locator('.scan-hint')).toHaveCount(1);
-          await expect(page.locator('.hud-prompt')).toBeHidden();
-          await expect(
-            page.getByText('Something to scan is in range', { exact: false }),
-          ).toBeHidden();
-          await expect(page.locator('.onboard-hint')).not.toContainText(
-            /Something to scan is in range|Face the target\. Hold .* to scan\./,
-          );
-          expect(
-            await page.evaluate(() =>
-              (window.__game as { onboard: { hints: HintEngine } }).onboard.hints.hasSeen(
-                'scan-target',
+            // Exercise the real in-range scanner even for openings farther from
+            // their target. Use the same safe pose as ?poi= without reloading.
+            await page.evaluate((poi) => {
+              const game = window.__game as {
+                discovery: Discovery;
+                sub: Submarine;
+                rig: CameraRig;
+              };
+              const pose = game.discovery.spawnPose(poi);
+              if (!pose) throw new Error(`Missing hero POI ${poi}`);
+              game.sub.reset(pose.x, pose.y, pose.z, pose.yaw);
+              game.rig.snap(game.sub.position, game.sub.yaw, game.sub.pitch);
+            }, hero.poi);
+            await clockFramesUntil(
+              page,
+              () =>
+                !!(window.__game as { discovery: Discovery }).discovery.scanner.view.nearestInRange,
+            );
+            await expect(page.locator('.scan-panel')).toBeVisible();
+            await expect(page.locator('.hud-control-tips')).toBeHidden();
+            await expect(page.locator('.hud-prompt')).toBeHidden();
+            if (viewport.width < viewport.height)
+              await expect(page.locator('.tc-rotate-hint')).toBeHidden();
+            for (const step of ['move', 'depth', 'lights', 'scan', 'journal']) {
+              await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
+              if (phase === 'tutorial steps')
+                await separate(page, [...hud, '.onboard-card', '.scan-panel']);
+              if (step !== 'journal') {
+                await page.locator('.onboard-skip-step').tap();
+                await page.clock.runFor(34);
+              }
+            }
+            if (phase === 'tutorial steps') {
+              await page.screenshot({ path: testInfo.outputPath('contact-and-tutorial.png') });
+              return;
+            }
+            await page.getByRole('button', { name: 'Skip', exact: true }).tap();
+            await page.clock.runFor(34);
+            await expect(page.locator('.onboard-card')).toBeHidden();
+            await expect(page.locator('.scan-panel')).toBeVisible();
+            await expect(page.locator('.scan-hint')).toHaveCount(1);
+            await expect(page.locator('.hud-prompt')).toBeHidden();
+            await expect(
+              page.getByText('Something to scan is in range', { exact: false }),
+            ).toBeHidden();
+            await expect(page.locator('.onboard-hint')).not.toContainText(
+              /Something to scan is in range|Face the target\. Hold .* to scan\./,
+            );
+            expect(
+              await page.evaluate(() =>
+                (window.__game as { onboard: { hints: HintEngine } }).onboard.hints.hasSeen(
+                  'scan-target',
+                ),
               ),
-            ),
-          ).toBe(false);
-          const after = [...hud, '.scan-panel'];
-          // Other contextual hints are legitimate; check their layout too.
-          if (await page.locator('.onboard-hint').isVisible()) after.push('.onboard-hint');
-          await separate(page, after);
-        });
+            ).toBe(false);
+            const after = [...hud, '.scan-panel'];
+            // Other contextual hints are legitimate; check their layout too.
+            if (await page.locator('.onboard-hint').isVisible()) after.push('.onboard-hint');
+            await separate(page, after);
+          });
+        }
       }
     }
   });
