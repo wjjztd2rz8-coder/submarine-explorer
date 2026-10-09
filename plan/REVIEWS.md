@@ -2,6 +2,30 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-09 evening comprehensive review, joint with Sol (trigger: 8+ merges; golden 2026-10-09-195308 vs -191533)
+
+Sol ran an independent review (read-only). The one-round `reconcile` call produced no output and was killed at its time limit, so disagreements were settled by me against the evidence instead (below). Monterey was not recaptured (viewport screenshot timeouts under CPU load); -191533 was used for it.
+
+**Changed since the last review:** merged f-firstminute, f-hud-overlap, f-debrief-zero, f-monterey-strata, f-lostcity-tower (jagged ledged trunk, modest gain), f-bluehole-bowl (stouter pendants, sonar ramp; bowl barely changed). Endurance is byte-identical across both golden sets.
+
+| Site | Readable | Beautiful (agreed) | Biggest gap |
+| --- | --- | --- | --- |
+| Titanic | 4 | 3.5-4 | flat dark void above hard horizon; repetitive hull panels up close |
+| Beebe | 4 | 3-3.5 | fluted-cone chimney, procedural sediment |
+| Blue Hole | 3.5 | 2.5-3 | smooth bowl with shelf line, faceted terraces, sonar scale |
+| Lost City | 4 | 3-3.3 | tower still blobby clay with plate flanges, no orifice |
+| Monterey | 4 | 3-3.5 | corrugated rock, angular banks |
+| Challenger | 3-3.5 | 2.5-3 | tiny lander marker; amphipods and slope present but barely legible |
+| Endurance | 3 | 2.5 | marine-snow discs cover the lower half of the frame, black blob on sub, flat horizon |
+
+**Disputes settled on evidence:** Sol said Claude was too generous on Titanic (4) and the finish estimate; accepted (3.5-4, 3-4 weeks). Sol said "Challenger empty" was too harsh; accepted (flecks and a slope are visible). Sol's new findings, all verified: second required POIs are ~4.5 km away at Blue Hole (pois.json: lon delta 0.042 deg) and ~14.6 km at Monterey; firstminute-shots never presses Scan so reward/comprehension is unproven (Sol); golden manifest was `complete:false` (Sol). Claude's own finding: Endurance snow and the black hull blob.
+
+**Process:** efficiency.sh: Claude idle ~140 h and Codex under-used ~116 h (mostly the Oct 6-8 lockout and the 0% Codex window until 14:16); 54 watchdog trips, floors working. Hosted CI still red (e2e shards); 1120 owns triage. Details in PROCESS-LOG.md.
+
+**New priorities:** see DIRECTOR.md (unaided first discovery, mission pacing, Blue Hole bowl/sonar, Challenger legibility, Lost City redo, Beebe chimney, merge stalled Codex worktrees). Codex queue: 1170, 1180, 1190, 1200.
+
+**Stage:** ~70% to 1.0, about 3-4 weeks (agreed with Sol, who said 68%). **Needs owner:** nothing.
+
 ## 2026-10-09 afternoon targeted review (trigger: Claude idle at >=50% for 2 h)
 
 **Root cause:** the Claude backlog was empty of unblocked items ("wait for next golden set") while Codex sat at 0% until 14:16, so 140 h of samples show Claude idle. Fix: new golden set (2026-10-09-191533) captured, backlog refilled in DIRECTOR.md, two Sonnet packages launched (Lost City tower, Blue Hole bowl + sonar ramp), Codex 1170 queued. Rule for next time: never end a run with "waits for golden"; capture golden in the same run.
