@@ -241,7 +241,7 @@ export function createOnboardSystem(): GameSystem {
         const step = tutorial.step;
         if (card) {
           if (step && playing)
-            card.show(tutorial.index, tutorialText(step.id, device, tutorialKeys(device)));
+            card.show(tutorial.index, tutorialText(step.id, device, tutorialKeys(device)), device);
           else card.show(null);
         }
 

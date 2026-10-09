@@ -118,13 +118,13 @@ export class TutorialCard {
   }
 
   /** Show step `index` with `text`, or hide when `index` is null. */
-  show(index: number | null, text = ''): void {
+  show(index: number | null, text = '', device: InputDevice = 'keyboard'): void {
     if (index === null) {
       this.root.hidden = true;
       this.shownKey = '';
       return;
     }
-    const key = `${index}|${text}`;
+    const key = `${index}|${text}|${device}`;
     this.root.hidden = false;
     if (key === this.shownKey) return;
     this.shownKey = key;
@@ -141,7 +141,7 @@ export class TutorialCard {
       journal: 'Tap PHOTO, or Pause → Journal for your finds.',
     };
     const step = TUTORIAL_STEPS[index];
-    this.phoneText.textContent = step ? phoneInstructions[step.id] : text;
+    this.phoneText.textContent = step && device === 'touch' ? phoneInstructions[step.id] : text;
     this.dots.querySelectorAll('.onboard-dot').forEach((dot, i) => {
       dot.classList.toggle('is-done', i < index);
       dot.classList.toggle('is-current', i === index);
