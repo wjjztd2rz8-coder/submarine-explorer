@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **F-MONTEREY-STRATA:** the Monterey canyon wall no longer reads as even corrugated stripes. Bed thickness is skewed (many thin beds, a few massive ones), ledge depth and overhang follow per-bed hardness and vary along the wall, slump scars are deeper, and each bed has its own muted albedo (olive, tan, grey, dark olive, buff). Vertex-colour and displacement only: no draw-call, triangle or tier change.
+
 - **f-beebe-rocks:** Beebe's seabed boulders are now angular, plane-clipped, noise-displaced rocks with flat shading, dark basalt vertex colour, rusty sulfide staining and partial burial, replacing the pale smooth lumps; the sand apron edge is feathered with multi-scale noise and angular bays and a wider height/lift fade so it is no longer a clean ellipse. Beebe only (other talus users keep their lumps via an opt-in rock builder). Same single merged rubble mesh, no new draw calls, colliders or scan targets; the previous radial edge-colour tint on the rubble was dropped. Low tier uses 80-face rocks.
 
 - Lost City carbonate towers (f-lostcity-trunk): trunks get jittered, uneven terraces plus slow swells instead of evenly stacked plates; fewer and narrower flanges; vertex-colour flow streaks, white/cream/grey-blue mineral variation and a dark vent mouth with a deeper funnel; shader albedo contrast eased (0.32 to 0.2) to cut grey blotching. Colliders, scan targets, materials and draw calls unchanged.
