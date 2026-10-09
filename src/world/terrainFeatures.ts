@@ -217,17 +217,46 @@ export function blueHoleTint(
     0.25 * Math.sin(x * 0.11 + 1.3 * Math.sin(z * 0.07)) +
     0.25 * Math.sin(z * 0.085 + 0.9 * Math.sin(x * 0.13 + 2));
   const fine = 0.5 + 0.5 * Math.sin(x * 0.53 + z * 0.37 + 2 * Math.sin(x * 0.21 - z * 0.29));
-  const flat = 1 - rock;
   // Level silt and sand keep only part of the wall's chroma: pale sand, not saturated ochre.
   const mean = (tr + tg + tb) / 3;
-  const keep = 0.4 + 0.6 * rock;
+  const keep = 0.3 + 0.7 * rock;
   tr = mean + (tr - mean) * keep;
   tg = mean + (tg - mean) * keep;
   tb = mean + (tb - mean) * keep;
-  const tone = 1 + flat * (0.34 * (mott - 0.5) + 0.12 * (fine - 0.5));
-  const warm = flat * 0.18 * (mott - 0.5);
-  const m = ao * tone * (0.8 + 0.2 * smoothstep(clamp01(normalY)));
-  return [tr * m * (1 + warm), tg * m, tb * m * (1 - warm)];
+  // Sediment patches on the shelf: three overlapping low-frequency fields pick between tan sand,
+  // grey-brown silt and an olive algae film; a fourth marks darker rubble beds; scour streaks
+  // (long ripples elongated across the current) modulate brightness. All baked, no new draw calls.
+  // Patches also reach the bowl's treads (less on the steep risers, which keep their beds).
+  const pf = 1 - 0.45 * rock;
+  const f1 = 0.5 + 0.5 * Math.sin(x * 0.09 + 2 * Math.sin(z * 0.061 + 1) + z * 0.04);
+  const f2 = 0.5 + 0.5 * Math.sin(z * 0.1 - 1.7 * Math.sin(x * 0.07 + 0.4) + 2.1);
+  const f3 = 0.5 + 0.5 * Math.sin((x + z) * 0.12 + 2.4 * Math.sin((x - z) * 0.08));
+  const olive = smoothstep(clamp01((f1 - 0.45) / 0.25)) * pf;
+  const grey2 = smoothstep(clamp01((f2 - 0.45) / 0.25)) * pf;
+  const rubble = smoothstep(clamp01((f3 - 0.5) / 0.25)) * pf * (0.6 + 0.4 * fine);
+  const scour = 0.5 + 0.5 * Math.sin(x * 0.22 + 0.9 * Math.sin(z * 0.045) + z * 0.05);
+  const ripple = pf * (0.5 + 0.5 * Math.sin(x * 1.3 + 5 * Math.sin(z * 0.09 + x * 0.04))) ** 2;
+  let sr = 1 + pf * 0.3 * (mott - 0.5);
+  let sg = 1 + pf * 0.1 * (mott - 0.5);
+  let sb = 1 - pf * 0.4 * (mott - 0.5);
+  // Olive film: pull red and blue down, keep green.
+  sr = lerp(sr, sr * 0.68, olive);
+  sg = lerp(sg, sg * 0.97, olive);
+  sb = lerp(sb, sb * 0.52, olive);
+  // Grey-brown silt: neutral and slightly cool.
+  sr = lerp(sr, sr * 0.8, grey2 * 0.8);
+  sg = lerp(sg, sg * 0.82, grey2 * 0.8);
+  sb = lerp(sb, sb * 0.92, grey2 * 0.8);
+  // Dark rubble beds, never below a readable floor.
+  const dark = 1 - 0.55 * rubble;
+  const bright = 1 + pf * (0.14 * (fine - 0.5) + 0.2 * (scour - 0.5) + 0.12 * (ripple - 0.3));
+  const m = ao * dark * bright * (0.8 + 0.2 * smoothstep(clamp01(normalY)));
+  // Crisp rim: a thin pale lip at the first riser, with a dark cut at its foot.
+  const rim =
+    1 +
+    0.28 * Math.exp(-(((r - 179) / 2.2) ** 2)) * (1 - rock) -
+    0.38 * Math.exp(-(((r - 172) / 2.4) ** 2));
+  return [tr * m * sr * rim, tg * m * sg * rim, tb * m * sb * rim];
 }
 
 export interface TerrainCarve {
