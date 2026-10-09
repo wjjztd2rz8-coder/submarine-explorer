@@ -2,7 +2,25 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (targeted review 2026-10-09 14:30; golden 2026-10-09-191533)
+## Current priorities (joint review with Sol, 2026-10-09 evening; golden 2026-10-09-195308)
+
+Agreed scores (beautiful): Titanic 3.5-4, Beebe 3-3.5, Blue Hole 2.5-3, Lost City 3-3.3, Monterey 3-3.5, Challenger 2.5-3, Endurance 2.5. Stage ~70%, 3-4 weeks. Sol's calibration: opening frames hide weak close-ups; "complete a scan and read the reward" has never been captured; second required targets are 4.5 km (Blue Hole) and 14.6 km (Monterey) away.
+
+Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
+
+1. **Unaided first-discovery capture (Sonnet):** extend tools/firstminute-shots.mjs to press Scan, show the reward and the next-step prompt on desktop and phone for Titanic and Beebe; fix whatever confuses (Beebe asks for a 173 degree turn while onboarding teaches vertical movement; Titanic phone 60 s frame loses the wreck).
+2. **Mission pacing (Sonnet):** second required targets at Blue Hole (~4.5 km) and Monterey (~14.6 km) are transit, not exploration; move or add intermediate required POIs so the next target is within ~1 km, keeping facts honest.
+3. **Blue Hole bowl and sonar scale (Sonnet):** shelf line, faceted terraces, capsule sponges; sonar minimap scaled so the hole is legible (palette itself is Codex 1200).
+4. **Challenger seabed legibility (Sonnet):** lander marker is tiny; make the amphipod swarm and slope readable (1170 audits).
+5. **Lost City tower redo (Sonnet):** still blobby clay with plate flanges; flow-stone ridges, orifice, material variation.
+6. **Beebe chimney trunk and sediment (Sonnet):** fluted-cone look; sediment still procedural.
+7. **Review and merge Codex 1090-1120, 1130, 1140, 1160 (Haiku gates, Claude review); hosted CI green on the release SHA; then push wave f45 after full e2e.**
+
+Codex queue: 1170 (Challenger audit), 1180 (Endurance snow/black blob), 1190 (Titanic haze), 1200 (sonar palette). Also running: 1130, 1140, 1160 plus stalled 1090-1120.
+
+Process: capture Monterey alone before starting Sol (CPU contention caused timeouts); audit all contact-sheet sites, not just the hero five.
+
+## Previous priorities (targeted review 2026-10-09 14:30; golden 2026-10-09-191533)
 
 Why this refresh: Claude sat at >=50% for 140 h of samples because the backlog read "waits for the next golden set"; the set now exists. Scores (honest): Titanic 4, Beebe 3.5, Monterey 3.5 (strata better), Challenger 3 (empty seabed), Lost City 3, Blue Hole 2.5-3.
 
