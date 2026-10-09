@@ -13,6 +13,7 @@
  * on this floor and how thickly. Sites follow docs/research/sites.md.
  */
 
+import { blueHoleTint } from './terrainFeatures.js';
 import { LOST_CITY_STRATA, lostCitySlopeTint } from './LostCityBands.js';
 
 /** The five packed texture sets in `public/assets/terrain/<set>_{a,n}.jpg`. */
@@ -314,9 +315,11 @@ export const BIOMES: Record<string, Biome> = {
     burrow: 0.6,
     rockBias: 0.3,
     // Lower walls fall away to deep blue-grey (the real hole is dark below the ledge) but stay readable.
-    depthShade: { startM: 30, endM: 105, tint: 0x28556f },
+    depthShade: { startM: 30, endM: 105, tint: 0x3f6a82 },
     // Geometry supplies the bed edges; fine joints stay subordinate to the ledges.
+    // Beds are baked into vertex colour instead (blueHoleTint), with riser ambient occlusion.
     strata: { periodM: 3.4, amount: 0.32 },
+    vertexTint: blueHoleTint,
     // Across the 320 m bowl the reef should already dissolve into water haze.
     horizonFadeM: [55, 210],
     scatter: [

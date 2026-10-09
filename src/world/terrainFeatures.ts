@@ -155,6 +155,81 @@ export function blueHoleWallRelief(a: number, r: number): number {
   return ends * mouth * (1.4 * flute + 1.1 * (bench + lower) * broken + 0.7 * rubble);
 }
 
+/** Centre of the carve, recorded when the carve is built; the vertex tint reads it. */
+let blueHoleCentre: { x: number; z: number } | null = null;
+
+const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
+
+/**
+ * Baked linear albedo multipliers for the bowl: warm tan reef-top limestone
+ * giving way to ochre and then grey-brown lower beds, per-bed tone changes with
+ * a dark joint, and ambient occlusion at the foot of every riser and under each
+ * lip. Replaces the fragment strata (one vertex attribute, no extra draw calls).
+ */
+export function blueHoleTint(
+  x: number,
+  y: number,
+  z: number,
+  normalY: number,
+): readonly [number, number, number] {
+  if (!blueHoleCentre) return [1, 1, 1];
+  const dx = x - blueHoleCentre.x;
+  const dz = z - blueHoleCentre.z;
+  const r = Math.hypot(dx, dz);
+  const depth = -y;
+  const a = Math.atan2(dz, dx);
+  // Colour by depth: warm tan, ochre, grey-brown, never below a readable floor.
+  const ochre = smoothstep(clamp01((depth - 6) / 30));
+  const grey = smoothstep(clamp01((depth - 40) / 70));
+  let tr = lerp(lerp(1.14, 1.04, ochre), 0.72, grey);
+  let tg = lerp(lerp(1.05, 0.82, ochre), 0.68, grey);
+  let tb = lerp(lerp(0.84, 0.56, ochre), 0.64, grey);
+  // Wall mask: the silt floor and the open reef stay soft, the rock gets the beds.
+  const slope = smoothstep(clamp01((1 - normalY - 0.01) / 0.18));
+  const wallR = smoothstep(clamp01((r - 92) / 8)) * (1 - smoothstep(clamp01((r - 205) / 10)));
+  const rock = Math.max(slope, 0.55 * wallR);
+  // Beds: uneven tone per bed, a thin dark joint between them.
+  const wob = 1.6 * Math.sin(3 * a + depth * 0.02) + 0.7 * Math.sin(8 * a + 1.3);
+  const bandT = depth / 3.4 + wob;
+  const bi = Math.floor(bandT);
+  const bh = 0.5 + 0.5 * Math.sin(bi * 12.9898 + 4.1) * Math.cos(bi * 7.233);
+  const joint = smoothstep(clamp01((bandT - bi) / 0.12));
+  const bed = (0.8 + 0.4 * bh) * (0.7 + 0.3 * joint);
+  const k = rock * 0.85;
+  tr *= lerp(1, bed * lerp(1.06, 0.92, bh), k);
+  tg *= lerp(1, bed, k);
+  tb *= lerp(1, bed * lerp(0.9, 1.06, bh), k);
+  // Ambient occlusion: the tread just inside each riser foot, and the riser's lower face.
+  let ao = 1;
+  if (r < 186 && r > 90) {
+    for (let i = 1; i < TERRACE_PROFILE.length; i++) {
+      const [r1, h1] = TERRACE_PROFILE[i]!;
+      const [r0, h0] = TERRACE_PROFILE[i - 1]!;
+      if (r0 - r1 < 1 || (h0 - h1) / (r0 - r1) < 1.2) continue;
+      if (r < r1) ao *= 1 - 0.5 * Math.exp(-(r1 - r) / 4.5);
+      else if (r < r0) ao *= 1 - 0.28 * (1 - (r - r1) / (r0 - r1));
+    }
+  }
+  // Broad mottling of the treads: warm sand patches against grey silt and darker rubble
+  // beds, so a level shelf is never one flat cream tone.
+  const mott =
+    0.5 +
+    0.25 * Math.sin(x * 0.11 + 1.3 * Math.sin(z * 0.07)) +
+    0.25 * Math.sin(z * 0.085 + 0.9 * Math.sin(x * 0.13 + 2));
+  const fine = 0.5 + 0.5 * Math.sin(x * 0.53 + z * 0.37 + 2 * Math.sin(x * 0.21 - z * 0.29));
+  const flat = 1 - rock;
+  // Level silt and sand keep only part of the wall's chroma: pale sand, not saturated ochre.
+  const mean = (tr + tg + tb) / 3;
+  const keep = 0.4 + 0.6 * rock;
+  tr = mean + (tr - mean) * keep;
+  tg = mean + (tg - mean) * keep;
+  tb = mean + (tb - mean) * keep;
+  const tone = 1 + flat * (0.34 * (mott - 0.5) + 0.12 * (fine - 0.5));
+  const warm = flat * 0.18 * (mott - 0.5);
+  const m = ao * tone * (0.8 + 0.2 * smoothstep(clamp01(normalY)));
+  return [tr * m * (1 + warm), tg * m, tb * m * (1 - warm)];
+}
+
 export interface TerrainCarve {
   /** Height after the carve, given the measured height at (x, z). Never raises the seabed. */
   apply(x: number, z: number, height: number): number;
@@ -187,6 +262,7 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
   }
   if (meta.id !== 'great-blue-hole') return null;
   const centre = latLonToWorld(meta, BLUE_HOLE_LAT, BLUE_HOLE_LON);
+  blueHoleCentre = centre;
   return {
     centre,
     apply(x, z, height) {

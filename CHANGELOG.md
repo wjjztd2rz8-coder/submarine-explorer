@@ -14,6 +14,13 @@ without an entry here is not done.
 
 ### Changed
 
+- Phase F, F-BLUEHOLE-BOWL2: Blue Hole bowl colour and relief shading. Baked
+  vertex tint (warm tan to ochre to grey-brown by depth, per-bed tone with dark
+  joints, ambient occlusion at riser feet) replaces the fragment strata for this
+  site only; gallery wall and apron repainted with stronger bedding contrast and
+  a shadowed foot; pendants are now tapered, ribbed and bent rather than smooth
+  cones (footprint, foot rule and envelope tests unchanged). Reason: golden
+  2026-10-09 read as a smooth low-contrast beige surface.
 - Phase F, F-GOLDEN-950 follow-up: reduce Endurance's opening heading offset
   from 16° to 8° and move its lateral chase camera offset from −26 to −38 m.
   Reason: the old heading produced a 0.96126 facing dot product, failing the

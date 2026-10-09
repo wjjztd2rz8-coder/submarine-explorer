@@ -22,7 +22,6 @@ import {
 } from './scarp.js';
 import {
   boxCH,
-  column,
   fbm3,
   impostorFromBoxes,
   instanced,
@@ -43,6 +42,8 @@ const WALL = new THREE.Color(0x9b9482);
 const WALL_DARK = new THREE.Color(0x5b5648);
 const TIP = new THREE.Color(0xe4d9be);
 const AMBER = new THREE.Color(0xb59a6a);
+const OCHRE = new THREE.Color(0xc79a52);
+const GREY_BROWN = new THREE.Color(0x6a604f);
 const DRAPE = new THREE.Color(0x8c8470);
 const BED_WARM = new THREE.Color(0xb39a68);
 const BED_COOL = new THREE.Color(0x7d8179);
@@ -50,12 +51,12 @@ const BED_COOL = new THREE.Color(0x7d8179);
 const EDGE_START = 0.55;
 
 /** Sunlit pale limestone: the shared rock albedo (kept dark for vents and tuff) is lifted. */
-const LIMESTONE_LIFT = 3.5;
+const LIMESTONE_LIFT = 2.7;
 const geoMaterial: typeof baseGeoMaterial = (kind, d, o) => {
   const m = baseGeoMaterial(kind, d, o);
   m.color.multiplyScalar(LIMESTONE_LIFT);
   // Scattered light keeps the shelf pale tan like the hole's walls, not a dark silhouette.
-  vertexGlow(m, 0.18, 0xd8d0b0, 0.35);
+  vertexGlow(m, 0.1, 0xd8d0b0, 0.35);
   return m;
 };
 
@@ -96,6 +97,69 @@ function undersideY(f: number): number {
     if (f <= f1) return y0 + (y1 - y0) * Math.max(0, (f - f0) / (f1 - f0));
   }
   return UNDERSIDE[UNDERSIDE.length - 1]![1];
+}
+
+/**
+ * One pendant standing on y = 0 (the shelf end, wide) up to a thin tip at y = h.
+ * Unlike a smooth cone: a concave taper with a needle tip, drip rings that
+ * swell and pinch the radius, uneven flutes, and a slight lateral bend that
+ * stays inside the foot's footprint. Indexed and smooth-shaded.
+ */
+function pendant(o: {
+  h: number;
+  r0: number;
+  seed: number;
+  segs: number;
+  rings: number;
+}): THREE.BufferGeometry {
+  const rnd = mulberry32(o.seed ^ 0x5a17);
+  const g = new THREE.CylinderGeometry(
+    o.r0 * 0.04,
+    o.r0,
+    o.h,
+    Math.max(6, Math.round(o.segs)),
+    Math.max(6, Math.round(o.rings)),
+  );
+  g.translate(0, o.h / 2, 0);
+  const p = g.getAttribute('position');
+  const concave = 1.5 + rnd() * 0.9;
+  const bendDir = rnd() * 6.28;
+  const bend = Math.min(o.r0 * 0.9, o.h * 0.07) * (0.4 + rnd() * 0.6);
+  const ringFreq = 5 + rnd() * 6;
+  const ringPhase = rnd() * 6.28;
+  const flutes = 7 + Math.floor(rnd() * 6);
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i);
+    const y = p.getY(i);
+    const z = p.getZ(i);
+    const t = y / o.h;
+    const ang = Math.atan2(z, x);
+    const n = fbm3(Math.cos(ang) * 1.6 + 3, t * 5, Math.sin(ang) * 1.6 + 3, o.seed, 3);
+    // Concave taper (thick throat, needle tip) with a flared foot into the shelf.
+    let f = Math.pow(1 - t * 0.96, concave);
+    f *= 1 + 0.7 * (1 - smooth(0, 0.18, t));
+    // Drip rings: radius swells and pinches along the length, more toward the tip.
+    f *= 1 + 0.13 * Math.sin(t * ringFreq * 6.28 + ringPhase + n * 3) * (0.4 + 0.6 * t);
+    f *= 1 + (n - 0.5) * 0.6;
+    f *= 1 + 0.12 * Math.sin(ang * flutes + n * 7 + t * 3);
+    // The foot keeps the original gallery's footprint: it grows out of the shelf.
+    const n0 = fbm3(
+      Math.cos(ang) * 1.4 + 3,
+      y * (0.5 / Math.max(1, o.h / 12)) * 4,
+      Math.sin(ang) * 1.4 + 3,
+      o.seed,
+      3,
+    );
+    const foot = (1 + (n0 - 0.5) * 0.6) * (1 + 0.16 * Math.sin(ang * 11 + n0 * 6)) * 1.7;
+    f = foot + (f - foot) * smooth(0, 0.12, t);
+    const bx = Math.cos(bendDir) * bend * t * t;
+    const bz = Math.sin(bendDir) * bend * t * t;
+    // The cylinder's own taper is part of its radius; divide it out, then apply ours.
+    const base = 1 - (1 - 0.04) * t;
+    p.setXYZ(i, (x / base) * f + bx, y, (z / base) * f + bz);
+  }
+  g.computeVertexNormals();
+  return g;
 }
 
 export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
@@ -205,6 +269,14 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     out.lerp(BED_WARM, smooth(0.45, 0.75, bh) * 0.45).lerp(BED_COOL, smooth(0.45, 0.2, bh) * 0.4);
     out.multiplyScalar(0.72 + 0.28 * smooth(0, 0.12, bed - Math.floor(bed)));
     out.lerp(DRAPE, (1 - smooth(joinY, joinY + 0.12 * H, y)) * 0.4);
+    // Documentary-still contrast: ochre beds high on the face, grey-brown lower down, dark
+    // joints and a shadowed foot and underside, so the wall reads as stacked limestone.
+    const hf = clamp(y / (0.62 * H));
+    out.lerp(OCHRE, 0.34 * smooth(0.25, 0.9, hf) * (0.5 + bh));
+    out.lerp(GREY_BROWN, 0.5 * (1 - smooth(0.05, 0.75, hf)));
+    out.multiplyScalar(0.62 + 0.5 * smooth(0, 0.14, bed - Math.floor(bed)));
+    out.multiplyScalar(0.62 + 0.38 * smooth(0, 0.22, hf));
+    if (ny < -0.35) out.multiplyScalar(0.7);
   });
   wall.computeBoundingBox();
   const full = new THREE.Group();
@@ -242,8 +314,12 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       // Sediment tone drifts between warm sand, grey silt and darker fallen debris; no flat cream.
       const t = fbm3(x * 0.07, z * 0.07, 3, seed ^ 0x91, 3);
       out.lerp(BED_WARM, smooth(0.5, 0.8, t) * 0.55).lerp(BED_COOL, smooth(0.5, 0.2, t) * 0.3);
-      out.multiplyScalar(0.8 + 0.55 * n);
-      out.multiplyScalar(0.92 + 0.18 * smooth(0, 0.25, u));
+      out.multiplyScalar(0.6 + 0.95 * n);
+      // Streaks of fallen debris running down the slope, and a shadowed contact with the wall.
+      const streak = fbm3(x * 0.45, z * 0.09, 6, seed ^ 0x63, 3);
+      out.multiplyScalar(0.78 + 0.45 * smooth(0.3, 0.7, streak));
+      out.lerp(OCHRE, 0.28 * smooth(0.45, 0.8, t));
+      out.multiplyScalar(0.5 + 0.5 * smooth(0, 0.4, u));
     },
   );
   apron.computeBoundingBox();
@@ -320,17 +396,12 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       const r = len * 0.12 + 0.22;
       parts.push(
         place(
-          column({
+          pendant({
             h: len,
             r0: r,
-            topFrac: 0.05,
             seed: seed + (k * 7 + i) * 3,
             segs: 10 * d.meshDensity + 4,
-            rings: 8,
-            wobble: 0.3,
-            ridges: 11,
-            ridgeAmp: 0.16,
-            flare: 0.7,
+            rings: 8 + 6 * d.meshDensity,
           }),
           { x, y: yTop, z, rx: Math.PI, ry: rnd() * 6.28, rz: (rnd() - 0.5) * 0.1 },
         ),
