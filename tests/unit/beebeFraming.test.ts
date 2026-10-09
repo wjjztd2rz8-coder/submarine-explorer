@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { Box2, InstancedMesh, Matrix4, Mesh, Raycaster, Vector2, Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
+import { BEEBE_CHIMNEY } from '../../src/core/config/beebeChimney.js';
 import { composedFreeDiveSpawn, spawnSettings } from '../../src/game/Spawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
@@ -79,6 +80,60 @@ describe('Beebe opening keeps its active main stack beside the hull', () => {
         const rig = new CameraRig(config.camera, 16 / 9, terrain);
         rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
         rig.snap(pos, pose.yaw, 0);
+        // Verify the composed chase opening and the exact 40 m first-person golden pose.
+        const body = hero.full.getObjectByName('smoker-body') as Mesh;
+        const collars = hero.full.getObjectByName('beebe-side-collars') as Mesh;
+        const orifices = hero.full.getObjectByName('beebe-orifices') as Mesh;
+        const sideMouths = orifices.userData.sideMouths as Array<{
+          centre: [number, number, number];
+          normal: [number, number, number];
+        }>;
+        expect(sideMouths).toHaveLength(3);
+        hero.root.updateMatrixWorld(true);
+        rig.camera.updateMatrixWorld(true);
+        const visibleMouths = (camera: CameraRig['camera']): number =>
+          sideMouths.filter(({ centre, normal }) => {
+            const point = hero.root.localToWorld(new Vector3(...centre));
+            const facing = new Vector3(...normal).transformDirection(hero.root.matrixWorld);
+            const toEye = camera.position.clone().sub(point);
+            if (facing.dot(toEye.clone().normalize()) <= 0.1) return false;
+            const screen = point.clone().project(camera);
+            if (Math.abs(screen.x) > 0.9 || Math.abs(screen.y) > 0.9 || screen.z > 1) return false;
+            const tangent = new Vector3().crossVectors(facing, new Vector3(0, 1, 0)).normalize();
+            const a = point
+              .clone()
+              .addScaledVector(tangent, BEEBE_CHIMNEY.outletMouthRadiusM)
+              .project(camera);
+            const b = point
+              .clone()
+              .addScaledVector(tangent, -BEEBE_CHIMNEY.outletMouthRadiusM)
+              .project(camera);
+            if (Math.abs(a.x - b.x) * 800 <= 3) return false;
+            const ray = new Raycaster(
+              camera.position,
+              point.clone().sub(camera.position).normalize(),
+            );
+            const hit = ray.intersectObjects([body, collars])[0];
+            return !hit || hit.distance > toEye.length() - 0.08;
+          }).length;
+        expect(visibleMouths(rig.camera)).toBeGreaterThan(0);
+        const goldenRig = new CameraRig(config.camera, 1600 / 900, terrain);
+        goldenRig.setMode('first-person');
+        goldenRig.lookElevation = -0.2368383507472154;
+        goldenRig.snap(
+          new Vector3(64.31866718801567, -4967.856059080448, -34.29482554757174),
+          -2.094395102393196,
+          -0.3468998753461086,
+        );
+        goldenRig.camera.updateMatrixWorld(true);
+        if (tier === 'high') {
+          expect(
+            goldenRig.camera.position.distanceTo(
+              new Vector3(53.367680136657945, -4968.174142090568, -27.972270225578242),
+            ),
+          ).toBeLessThan(0.1);
+        }
+        expect(visibleMouths(goldenRig.camera)).toBeGreaterThan(0);
         expect(rig.camera.position.y).toBeGreaterThanOrEqual(
           terrain.sampleHeight(rig.camera.position.x, rig.camera.position.z) +
             config.camera.terrainClearance,

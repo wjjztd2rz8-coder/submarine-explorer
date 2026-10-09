@@ -41,6 +41,7 @@ import type { GameConfig } from './config/types.js';
 
 export * from './config/atmosphere.js';
 export * from './config/audio.js';
+export * from './config/beebeChimney.js';
 export * from './config/camera.js';
 export * from './config/discovery.js';
 export * from './config/deepOpenings.js';

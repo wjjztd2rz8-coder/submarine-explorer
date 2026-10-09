@@ -199,6 +199,54 @@ describe('Challenger / Endurance opening', () => {
               ),
               'target reticle clear of the whole hull',
             ).toBe(false);
+            if (site === 'endurance') {
+              // The scan reticle alone misses overlap with the stern and deck.
+              // Check every visible wreck vertex against the complete projected sub.
+              const wreck = new Box2();
+              hero.full.traverseVisible((object) => {
+                if (!(object instanceof Mesh)) return;
+                const vertices = object.geometry.getAttribute('position');
+                const count = object instanceof InstancedMesh ? object.count : 1;
+                for (let i = 0; i < count; i++) {
+                  if (object instanceof InstancedMesh) object.getMatrixAt(i, matrix);
+                  else matrix.identity();
+                  world.multiplyMatrices(object.matrixWorld, matrix);
+                  for (let j = 0; j < vertices.count; j++) {
+                    point.fromBufferAttribute(vertices, j).applyMatrix4(world).project(rig.camera);
+                    expect(point.z, 'wreck in front of the opening camera').toBeGreaterThan(-1);
+                    expect(point.z).toBeLessThan(1);
+                    wreck.expandByPoint(
+                      new Vector2(((point.x + 1) * width) / 2, ((1 - point.y) * height) / 2),
+                    );
+                  }
+                }
+              });
+              expect(wreck.min.x, 'whole wreck fits horizontally').toBeGreaterThan(0);
+              expect(wreck.max.x).toBeLessThan(width);
+              expect(wreck.min.y, 'whole wreck fits vertically').toBeGreaterThan(0);
+              expect(wreck.max.y).toBeLessThan(height);
+              expect(wreck.intersectsBox(bounds), 'whole wreck silhouette clears the sub').toBe(
+                false,
+              );
+              if (width > height)
+                expect(
+                  bounds.min.x - wreck.max.x,
+                  'wreck beside sub with a visible gap',
+                ).toBeGreaterThan(8);
+              const eye = rig.camera.position.clone();
+              const radius = Math.hypot(
+                config.camera.chaseOffset.x,
+                config.camera.chaseOffset.y,
+                config.camera.chaseOffset.z,
+              );
+              expect(pose.chaseRadius).toBeUndefined();
+              expect(rig.chaseRadius).toBe(radius);
+              rig.orbit(0.2, 0.1, 0.5);
+              rig.resetView();
+              rig.snap(position, pose.yaw, 0);
+              expect(rig.chaseRadius).toBe(radius);
+              expect(rig.camera.position).toEqual(eye);
+            }
             const visible = group.members.filter((a) => {
               const p = new Vector3(a.x, a.y + (a.def.size * a.def.visScale) / 2, a.z);
               const ndc = p.clone().project(rig.camera);
@@ -322,6 +370,8 @@ it('keeps the upper water column and other sites intact; abyss exposure survives
     expect(sampleAtmosphere(water, -5)).toEqual(sampleAtmosphere(config.water, -5));
     const abyss = sampleAtmosphere(water, -3000);
     expect(abyss.sunIntensity).toBe(0);
+    if (site === 'endurance') expect(abyss.snowDensity).toBe(0.25);
+    else expect(abyss.snowDensity).toBe(sampleAtmosphere(config.water, -3000).snowDensity);
     const fog =
       abyss.fogDensity * (site === 'challenger-deep' ? config.presets.trench.fogScale : 1);
     expect(Math.exp(-fog * fog * 80 * 80)).toBeGreaterThan(0.12);

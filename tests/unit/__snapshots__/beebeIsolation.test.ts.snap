@@ -413,15 +413,15 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
 }
 `;
 
-exports[`930: preserves the 850 Beebe geometry, clumps, collision and vent sources on every tier 1`] = `
+exports[`F-1080: confines chimney detail to Beebe while retaining collision and vent sources 1`] = `
 {
   "high": [
     {
       "budget": {
-        "draws": 7,
-        "triangles": 69700,
+        "draws": 9,
+        "triangles": 74074,
       },
-      "geometry": "193bec70e4a0e5ef2a5a5abf1c12019d3c64891f676132d6be585f8802f128f3",
+      "geometry": "1432ebf17d20ef35af2a5ace002a8e56c2b89360d91e5579cdda47e8babae8f6",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
@@ -462,10 +462,10 @@ exports[`930: preserves the 850 Beebe geometry, clumps, collision and vent sourc
   "low": [
     {
       "budget": {
-        "draws": 7,
-        "triangles": 14356,
+        "draws": 9,
+        "triangles": 16938,
       },
-      "geometry": "08e6ce09b6ce306d35af9713f33f58a558ab31fef077aac8f6718fcc7ace0707",
+      "geometry": "c81a33fa6dfca6254f156c538a4593b9831c377a615eb7c05af15a79c94fb6d0",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
@@ -506,10 +506,10 @@ exports[`930: preserves the 850 Beebe geometry, clumps, collision and vent sourc
   "medium": [
     {
       "budget": {
-        "draws": 7,
-        "triangles": 36430,
+        "draws": 9,
+        "triangles": 39908,
       },
-      "geometry": "c98791ee3e300d554a057de9029ebd9243208448588d2325dcd9b1f1d837e413",
+      "geometry": "ec490efd5a4b578ef889b2c92da71afeb2a85e0f803ed8b43ce565e0c677b011",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
@@ -550,10 +550,10 @@ exports[`930: preserves the 850 Beebe geometry, clumps, collision and vent sourc
   "ultra": [
     {
       "budget": {
-        "draws": 7,
-        "triangles": 154240,
+        "draws": 9,
+        "triangles": 160182,
       },
-      "geometry": "99c28c102f74096f4e3710b6c5225e40131f9d72421423562f286ccc96f019de",
+      "geometry": "78ddd4f5ceb9f6e1c2a64e86ce78167c9c45505445de8ac58160523015329333",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,

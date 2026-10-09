@@ -9,10 +9,11 @@
  */
 
 import * as THREE from 'three';
+import { BEEBE_CHIMNEY as beebe } from '../../../core/config/beebeChimney.js';
 import { geoDetail } from './detail.js';
 import { geoMaterial, LIFE_TINT, mineralCrust, vertexGlow } from './materials.js';
 import { shimmerPlume, smokePlume } from './plume.js';
-import { tieredSpire } from './spire.js';
+import { flange, tieredSpire } from './spire.js';
 import {
   boxCH,
   clamp01,
@@ -46,7 +47,9 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   const [L, W, H0] = dims;
   const H = H0 * 1.5; // the hero stack stands taller than its nominal height
   const rnd = mulberry32(seed);
+  const shapeRnd = mulberry32(seed ^ 0x1080be);
   const shrimp = def.raw.variant === 'shrimp';
+  const beebeHero = def.id === 'beebe-chimney-1';
   const moundH = THREE.MathUtils.clamp(H0 * 0.32, 0.8, 5);
 
   const shape = (x: number, z: number): number => {
@@ -93,16 +96,37 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
       segs: 22 * d.meshDensity + 4,
       rings: (s.h / 0.7) * d.meshDensity + 6,
       tiers: Math.max(2, Math.round(s.h / 3.2)),
-      ledge: 0.1,
-      wobble: 0.2,
-      rough: 0.07,
-      ridges: 4,
-      ridgeAmp: 0.08,
+      ledge: beebeHero ? beebe.ledge : 0.1,
+      wobble: beebeHero ? beebe.wobble : 0.2,
+      rough: beebeHero ? beebe.rough : 0.07,
+      ridges: beebeHero ? beebe.ridges : 4,
+      ridgeAmp: beebeHero ? beebe.ridgeAmp : 0.08,
       flare: 0.75,
-      lip: 0.3,
-      crater: 0.7,
+      lip: beebeHero ? beebe.lip : 0.3,
+      crater: beebeHero ? beebe.crater : 0.7,
+      irregular: beebeHero ? beebe.irregular : 0,
     });
     pieces.push(place(c, { x: s.x, y: s.y, z: s.z }));
+    if (beebeHero) {
+      // Partial sulfide shelves interrupt the long trunk without changing the vent axis.
+      const shelves = i === 0 ? beebe.mainShelves : beebe.sideShelves;
+      for (let k = 0; k < shelves; k++) {
+        const t =
+          beebe.shelfStart +
+          (k + beebe.shelfJitter * shapeRnd()) *
+            (i === 0 ? beebe.mainShelfStep : beebe.sideShelfStep);
+        const localR = s.r0 * (1 - 0.55 * t);
+        const shelf = flange({
+          r0: localR * beebe.shelfRadiusFraction,
+          w: localR * (beebe.shelfWidthMin + shapeRnd() * beebe.shelfWidthVariation),
+          arc: beebe.shelfArcMin + shapeRnd() * beebe.shelfArcVariation,
+          start: shapeRnd() * Math.PI * 2,
+          seed: seed + i * 37 + k * 11,
+          segs: 18 * d.meshDensity,
+        });
+        pieces.push(place(shelf, { x: s.x, y: s.y + s.h * t, z: s.z }));
+      }
+    }
     // Side spire and a small parasitic vent on the taller stacks.
     if (s.h > 3) {
       const a = rnd() * 6.28;
@@ -182,6 +206,102 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   const body = new THREE.Mesh(geom, bodyMat);
   body.name = 'smoker-body';
   full.add(body);
+  if (beebeHero) {
+    // Dark fluid surfaces sit below the top rims, within the modeled crater bowls.
+    // They are visual only: smoke origins, colliders and impostor retain their existing anchors.
+    const mouthMaterial = new THREE.MeshStandardMaterial({
+      color: beebe.mouthColor,
+      roughness: 1,
+      side: THREE.DoubleSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+    });
+    const mouths: THREE.BufferGeometry[] = [];
+    const collars: THREE.BufferGeometry[] = [];
+    const sideMouths: Array<{ centre: number[]; normal: number[] }> = [];
+    for (const s of stacks) {
+      const topRadius = s.r0 * 0.45;
+      const radius = topRadius * beebe.topMouthRadiusFraction;
+      mouths.push(
+        place(new THREE.CircleGeometry(radius, 16), {
+          x: s.x,
+          y: s.y + s.h - beebe.crater * topRadius * beebe.topMouthRecessFraction,
+          z: s.z,
+          rx: -Math.PI / 2,
+        }),
+      );
+    }
+    // The opening view sees the main stack from below its summit. Broken side vents
+    // give that view a readable aperture even when the top rim is outside the frame.
+    const crustMaterial = new THREE.MeshStandardMaterial({
+      color: beebe.collarColor,
+      roughness: 1,
+      emissive: beebe.collarEmissive,
+    });
+    const outward = new THREE.Vector3();
+    const axisY = new THREE.Vector3(0, 1, 0);
+    const axisZ = new THREE.Vector3(0, 0, 1);
+    const stack = stacks[0]!;
+    const ray = new THREE.Raycaster();
+    for (let k = 0; k < beebe.outletCount; k++) {
+      const t = beebe.outletStartHeightFraction + k * beebe.outletHeightStepFraction;
+      const angle = beebe.outletStartAngleRad + k * beebe.outletAngleStepRad;
+      outward.set(Math.cos(angle), 0, Math.sin(angle));
+      ray.set(
+        new THREE.Vector3(
+          stack.x + outward.x * beebe.outletRayStartM,
+          stack.y + stack.h * t,
+          stack.z + outward.z * beebe.outletRayStartM,
+        ),
+        outward.clone().negate(),
+      );
+      const hit = ray
+        .intersectObject(body)
+        .find(
+          (intersection) =>
+            Math.hypot(intersection.point.x - stack.x, intersection.point.z - stack.z) <
+            stack.r0 * beebe.outletMaxAxisRadiusFactor,
+        );
+      if (!hit) continue;
+      const halfLength = beebe.outletLengthM / 2;
+      const centre = hit.point.clone().addScaledVector(outward, halfLength - beebe.outletEmbedM);
+      const collar = new THREE.CylinderGeometry(
+        beebe.outletTipRadiusM,
+        beebe.outletBaseRadiusM,
+        beebe.outletLengthM,
+        11,
+        2,
+      );
+      collar.applyMatrix4(
+        new THREE.Matrix4().compose(
+          centre,
+          new THREE.Quaternion().setFromUnitVectors(axisY, outward),
+          new THREE.Vector3(1, 1, 1),
+        ),
+      );
+      collars.push(collar);
+      const mouth = new THREE.CircleGeometry(beebe.outletMouthRadiusM, 16);
+      const mouthCentre = centre
+        .clone()
+        .addScaledVector(outward, halfLength + beebe.mouthClearanceM);
+      mouth.applyMatrix4(
+        new THREE.Matrix4().compose(
+          mouthCentre,
+          new THREE.Quaternion().setFromUnitVectors(axisZ, outward),
+          new THREE.Vector3(1, 1, 1),
+        ),
+      );
+      mouths.push(mouth);
+      sideMouths.push({ centre: mouthCentre.toArray(), normal: outward.toArray() });
+    }
+    const orifices = new THREE.Mesh(mergeAll(mouths), mouthMaterial);
+    orifices.name = 'beebe-orifices';
+    orifices.userData.sideMouths = sideMouths;
+    full.add(orifices);
+    const mineralCollars = new THREE.Mesh(mergeAll(collars), crustMaterial);
+    mineralCollars.name = 'beebe-side-collars';
+    full.add(mineralCollars);
+  }
   const top = stacks[0]!;
   full.userData.ventTop = top.y + top.h;
 

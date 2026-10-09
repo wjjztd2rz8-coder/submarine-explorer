@@ -87,7 +87,7 @@ it('keeps shared prop placement byte-identical outside the Beebe dispatch', () =
   expect(digest(source)).toBe('c73869437510f21786195dde1bde0497b08de26dbaab636d04b8ff93a43a5277');
 });
 
-it('930: preserves the 850 Beebe geometry, clumps, collision and vent sources on every tier', () => {
+it('F-1080: confines chimney detail to Beebe while retaining collision and vent sources', () => {
   const cfg = makeConfig();
   const defs = parsePropsDoc(beebeDoc, cfg.props).props;
   const evidence: Record<string, unknown> = {};
@@ -121,8 +121,25 @@ it('930: preserves the 850 Beebe geometry, clumps, collision and vent sources on
           userData: digest(JSON.stringify(object.userData)),
         });
       });
-      if (tier === 'low' && def.id === 'beebe-chimney-1') {
-        console.log(`BEEBE-930-LOW ${JSON.stringify(countGeo(built.full))}`);
+      if (def.id === 'beebe-chimney-1') {
+        const orifices = built.full.getObjectByName('beebe-orifices') as THREE.Mesh;
+        const collars = built.full.getObjectByName('beebe-side-collars') as THREE.Mesh;
+        expect(orifices).toBeInstanceOf(THREE.Mesh);
+        expect(collars).toBeInstanceOf(THREE.Mesh);
+        expect(orifices.geometry.getAttribute('position').count).toBeGreaterThan(100);
+        expect(collars.geometry.getAttribute('position').count).toBeGreaterThan(60);
+        const mouth = new THREE.Vector3().fromBufferAttribute(
+          orifices.geometry.getAttribute('position'),
+          0,
+        );
+        const rim = Number(built.full.userData.ventTop);
+        expect(mouth.y).toBeLessThan(rim);
+        const eye = mouth.clone().add(new THREE.Vector3(0, 8, 0));
+        const body = built.full.getObjectByName('smoker-body') as THREE.Mesh;
+        const rock = new THREE.Raycaster(eye, new THREE.Vector3(0, -1, 0)).intersectObject(body)[0];
+        expect(!rock || rock.distance > eye.distanceTo(mouth)).toBe(true);
+      } else {
+        expect(built.full.getObjectByName('beebe-orifices')).toBeUndefined();
       }
       return {
         id: def.id,
@@ -134,6 +151,6 @@ it('930: preserves the 850 Beebe geometry, clumps, collision and vent sources on
       };
     });
   }
-  // Captured from the unmodified 850 builder, before replacing the apron material.
+  // Pin the authored Beebe shape and verify every tier keeps its original vent and collision anchors.
   expect(evidence).toMatchSnapshot();
 });
