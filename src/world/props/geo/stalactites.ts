@@ -406,8 +406,8 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       // Variation draws use their own stream, so the placement of the original gallery is unchanged.
       const lean = main ? 0 : 0.05 + vr() * 0.14;
       const leanDir = vr() * 6.28;
-      const r = len * 0.12 + 0.22;
-      const girth = 1 + vr() * 0.9;
+      const r = len * (0.1 + vr() * 0.07) + 0.3;
+      const girth = 1.25 + vr() * 1.1;
       parts.push(
         place(
           pendant({

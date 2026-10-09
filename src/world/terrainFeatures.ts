@@ -181,10 +181,11 @@ export function blueHoleTint(
   // Colour by depth: warm tan, ochre, grey-brown, never below a readable floor.
   // Warm sunlit reef top, thin ochre, then a cool teal-blue ramp: the bottom reads cold, the rim warm.
   const ochre = smoothstep(clamp01((depth - 4) / 22));
-  const cool = smoothstep(clamp01((depth - 14) / 70));
-  let tr = lerp(lerp(1.16, 1.0, ochre), 0.5, cool);
-  let tg = lerp(lerp(1.06, 0.86, ochre), 0.78, cool);
-  let tb = lerp(lerp(0.82, 0.62, ochre), 0.88, cool);
+  const cool = smoothstep(clamp01((depth - 14) / 85));
+  const abyss = smoothstep(clamp01((depth - 55) / 60));
+  let tr = lerp(lerp(lerp(1.16, 1.0, ochre), 0.5, cool), 0.36, abyss);
+  let tg = lerp(lerp(lerp(1.06, 0.86, ochre), 0.78, cool), 0.64, abyss);
+  let tb = lerp(lerp(lerp(0.82, 0.62, ochre), 0.88, cool), 1.0, abyss);
   // Per-tread character: each level bed gets its own tone, warmth and silt cover, graded
   // across its width (pale outer lip, damp darker inner foot) so no tread is one flat value.
   let tread = 0;
@@ -228,8 +229,8 @@ export function blueHoleTint(
       const [r1, h1] = TERRACE_PROFILE[i]!;
       const [r0, h0] = TERRACE_PROFILE[i - 1]!;
       if (r0 - r1 < 1 || (h0 - h1) / (r0 - r1) < 1.2) continue;
-      if (r < r1) ao *= 1 - 0.34 * Math.exp(-(r1 - r) / 6.5);
-      else if (r < r0) ao *= 1 - 0.2 * (1 - (r - r1) / (r0 - r1));
+      if (r < r1) ao *= 1 - 0.22 * Math.exp(-(r1 - r) / 9);
+      else if (r < r0) ao *= 1 - 0.12 * (1 - (r - r1) / (r0 - r1));
     }
   }
   // Broad mottling of the treads: warm sand patches against grey silt and darker rubble

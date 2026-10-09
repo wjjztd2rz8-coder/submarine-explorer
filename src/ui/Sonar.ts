@@ -146,6 +146,13 @@ export function sonarReliefRange(
   return { low: (lo + hi - span) / 2, span };
 }
 
+/** Ramp position for shallow sites: a power curve keeps the reef off the pale end so ledges separate. */
+export function rampT(t: number, shallowSite: boolean): number {
+  if (!shallowSite) return t;
+  const x = Math.min(1, Math.max(0, t));
+  return 0.12 + 0.62 * Math.pow(x, 1.7);
+}
+
 export interface SonarMarker {
   poiId: string;
   name: string;
@@ -458,7 +465,9 @@ export class Sonar {
           ) as SonarZoom);
     const { low, span } = sonarReliefRange(lo, hi, this.zoomConfig.minReliefSpanM[reference]);
     const contourInterval = sonarContourInterval(
-      this.zoomConfig.contourIntervalM[reference],
+      this.terrain.meta.id === 'great-blue-hole'
+        ? Math.min(10, this.zoomConfig.contourIntervalM[reference])
+        : this.zoomConfig.contourIntervalM[reference],
       actualSpan,
       this.zoomConfig.maxContours,
     );
@@ -468,12 +477,14 @@ export class Sonar {
       spanM: span,
       contourIntervalM: contourInterval,
     };
+    // Blue Hole: a 0-120 m range under a flat reef saturates the pale end of the ramp; spread the shelves.
+    const shallowSite = this.terrain.meta.id === 'great-blue-hole';
     const img = ctx.createImageData(w, h);
     for (let py = 0; py < h; py++) {
       for (let px = 0; px < w; px++) {
         const index = py * w + px;
         const height = heights[index] as number;
-        const [r, g, b] = paletteColor(this.palette.stops, (height - low) / span);
+        const [r, g, b] = paletteColor(this.palette.stops, rampT((height - low) / span, shallowSite));
         // Measured X/Z slopes in m/m, lit from the north-west. A gain makes
         // gentle local walls legible without fabricating depth variation.
         const left = heights[py * w + Math.max(0, px - 1)] as number;
