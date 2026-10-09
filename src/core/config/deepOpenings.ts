@@ -23,10 +23,11 @@ export const DEEP_OPENINGS = {
     lamps: { intensity: 2, distance: 1, fillIntensity: 3, fillDistance: 1.5 },
     habitat: {
       species: 'hadal-amphipod',
-      aheadM: 19,
-      sideM: 9,
-      low: 12,
-      count: 18,
+      // Bring the bait-station group into the lander's approach, away from the hull.
+      aheadM: 24,
+      sideM: 5,
+      low: 18,
+      count: 30,
       spacingM: 1.2,
       onWreck: false,
     },

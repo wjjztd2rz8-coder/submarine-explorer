@@ -1,5 +1,13 @@
 # Challenger Deep content: sources and notes (package C4)
 
+## 1170 factual audit — 2026-10-09
+
+The `hadal-life` fact card still gave 8,075 m as the global fish record even though its paragraph had already been updated. Corrected it to the 8,336 m snailfish observation in the Izu–Ogasawara Trench, with the [authors' UWA publication record](https://research-repository.uwa.edu.au/en/publications/new-maximum-depth-record-for-bony-fish-teleostei-scorpaeniformes-/) as an accessible primary source. This is a different trench and provides no evidence of fish at Challenger Deep's floor.
+
+The [Five Deeps 2019 dive schedule](https://fivedeeps.com/wp-content/uploads/2019/05/FDE-Challenger-Release-FINAL-5132019.pdf) describes three Eastern Pool dives and one Central Pool dive. The catalogue now names those pools rather than claiming the 2019 expedition surveyed all three sub-basins. The general three-pool description remains.
+
+The amphipod wildlife card now gives the 2–5 cm specimen range reported by [Kobayashi et al. 2012](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0042727), which also supports wood-digesting cellulase and increased enzyme activity at 100 MPa / 2°C. The paper's Results and Methods differ on ASHURA's date and deployment duration; the existing guide explicitly follows Methods (10 September 2009, 2.5 h, 185 individuals). Do not treat the staged animal count or enlarged rendered animals as survey measurements.
+
 ## Phase F text review — 2026-10-01
 
 Keep the sampled Eastern Pool and Leggo bait-station targets distinct from the invented northern wall scarp. Remove the claim that this particular pool is conclusively the ocean’s absolute deepest point. [Jamieson et al. 2023](https://www.sciencedirect.com/science/article/pii/S0967063723001711) records fish imagery at 8,336 m in the Izu–Ogasawara Trench, replacing the stale global 8,075 m record. Fish remain unsupported at Challenger Deep floor depth. Remove the obsolete “no amphipod model” statement now that the life layer exists. No changes to species occurrence provenance or prop scale/heading were made.

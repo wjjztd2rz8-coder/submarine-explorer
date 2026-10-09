@@ -264,12 +264,12 @@
     "hadal-amphipod": {
       "text": "A scavenging amphipod of the deepest trenches. It swarms to food that falls from above, and its gut makes enzymes that can break down wood and plant material that has sunk into the trench.",
       "facts": {
-        "Length": "3 to 5 cm",
+        "Length": "2 to 5 cm",
         "Depth": "About 7,000 to 10,900 m",
         "Diet": "Sunken plant and animal remains"
       },
-      "sourceTitle": "PMC: Hirondellea gigas wood digestion",
-      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3419748/"
+      "sourceTitle": "Kobayashi et al. 2012 — Hirondellea gigas wood digestion",
+      "sourceUrl": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0042727"
     },
     "sun-star": {
       "text": "A many-armed sea star of the California slope, with thirteen or more broad arms radiating from a wide central disc. It crawls over mud and rock on rows of tiny tube feet.",

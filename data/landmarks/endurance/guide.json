@@ -10,7 +10,7 @@
         "Endurance carried Sir Ernest Shackleton's Imperial Trans-Antarctic Expedition into the Weddell Sea in 1914-15. Built in 1912 at the Framnæs yard in Sandefjord, Norway, and launched under the name Polaris, she was a three-masted barquentine reinforced for polar ice; Shackleton bought and renamed her in January 1914. Pack ice closed around her in January 1915, and after ten months drifting, beset, the ice finally crushed her hull. Captain Frank Worsley recorded her sinking position on 21 November 1915. All 28 men aboard survived; they camped on the drifting ice and eventually reached Elephant Island, from where Shackleton and five others made the 1,300 km open-boat journey to South Georgia for rescue.",
         "The wreck was found on 5 March 2022 by the Endurance22 expedition, organised by the Falklands Maritime Heritage Trust (FMHT) aboard the South African polar vessel S.A. Agulhas II -- exactly 100 years to the day after Shackleton was buried at Grytviken, South Georgia. She lies 3,008 m deep in the Weddell Sea, within the search area the team had defined before departure. Mensun Bound, the expedition's Director of Exploration, called her \"by far the finest wooden shipwreck I have ever seen. It is upright, well proud of the seabed, intact, and in a brilliant state of preservation.\"",
         "The wreck had already been designated a protected Historic Site and Monument (HSM No. 93) under the Antarctic Treaty System in 2019, three years before anyone knew exactly where she lay. The UK Antarctic Heritage Trust (UKAHT), working with Historic England, now leads the Conservation Management Plan for the site.",
-        "No dedicated multibeam survey covers this part of the Weddell Sea; the terrain uses GMRT's coarser GEBCO-derived grid, smoothing small features. Endurance22's published photographs and survey report show the 44 m ship in much finer detail."
+        "This tile uses GMRT's coarser GEBCO-derived grid, smoothing small features. Endurance22's published imagery shows the 44 m ship in much finer detail; the Conservation Management Plan describes soft mud with pockmarks, small mounds and occasional dropstones around the site."
       ],
       "facts": [
         {
@@ -67,6 +67,10 @@
         {
           "title": "UK Antarctic Heritage Trust — Endurance shipwreck and registered tonnage",
           "url": "https://ukaht.org/places/endurance-shipwreck/"
+        },
+        {
+          "title": "Endurance Conservation Management Plan — UKAHT / Historic England, April 2024",
+          "url": "https://www.enduranceshipwreck.org/s/CMP_Endurance_amends_April24-4.pdf"
         }
       ],
       "confidence": "high"
@@ -130,7 +134,7 @@
       "id": "stern-nameplate",
       "title": "\"ENDURANCE\", and the star of her old name",
       "paragraphs": [
-        "The ship's name is still clearly legible on the stern, painted directly below the taffrail. Above it is a five-pointed star -- a survival of her original name, Polaris, the pole star, under which she was launched at the Framnæs yard in 1912 before Shackleton bought and renamed her.",
+        "The ship's name is still clearly legible on the stern, painted directly below the taffrail. Below the name is a five-pointed star -- a survival of her original name, Polaris, the pole star, under which she was launched at the Framnæs yard in 1912 before Shackleton bought and renamed her.",
         "Finding the name intact after 106 years on the seabed was one of the expedition's most striking moments, and it is the clearest piece of evidence that this is, beyond doubt, Shackleton's ship.",
         "The stern scan sits about 20 m from the hull's centre."
       ],
@@ -151,12 +155,20 @@
       "reconstruction": true,
       "sources": [
         {
+          "title": "Endurance22 expedition blog — 9 March 2022, stern name and Polaris star",
+          "url": "https://endurance22.org/expedition-blog/9-march-2022"
+        },
+        {
           "title": "Endurance at the bottom of the sea — Falklands Maritime Heritage Trust",
           "url": "https://fmht.co.uk/shackletons-endurance-revealed/endurance-at-the-bottom-of-the-sea/"
         },
         {
           "title": "Photos of the Wreck of Shackleton's Endurance — HISTORY",
           "url": "https://www.history.com/articles/endurance-shackleton-shipwreck-discovery-photos"
+        },
+        {
+          "title": "Endurance Conservation Management Plan — UKAHT / Historic England, April 2024",
+          "url": "https://www.enduranceshipwreck.org/s/CMP_Endurance_amends_April24-4.pdf"
         }
       ],
       "confidence": "medium"
@@ -244,7 +256,7 @@
       "paragraphs": [
         "Captain Frank Worsley, Endurance's navigator, logged the ship's sinking position from the ice as 68°39′30″S 52°26′30″W. A 2022 peer-reviewed study of his navigation log (Squire & Bell, Journal of Navigation) found the fix itself was sound work under brutal conditions, but flagged real sources of uncertainty: few navigational sights were possible around the time of the sinking, and chronometer error accumulates the longer it goes unchecked at sea. The authors estimate the combined uncertainty at several nautical miles in both latitude and longitude.",
         "The Endurance22 team used Worsley's position, adjusted for that uncertainty, to define their search box and found the wreck within it. UKAHT describes the wreck as roughly four miles (6.4 km) south of his recorded position. Measuring between the published log and wreck coordinates gives about 10 km to the south-south-east.",
-        "This scan marks seabed at Worsley's logged position. His navigation, and 107 years of searching, finally led back to the ship."
+        "This scan marks seabed at Worsley's logged position. More than a century after the sinking, his navigation helped the expedition find the ship."
       ],
       "facts": [
         {
@@ -307,6 +319,10 @@
         {
           "title": "Endurance (1912 ship) — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/Endurance_(1912_ship)"
+        },
+        {
+          "title": "Endurance Conservation Management Plan — UKAHT / Historic England, April 2024",
+          "url": "https://www.enduranceshipwreck.org/s/CMP_Endurance_amends_April24-4.pdf"
         }
       ],
       "confidence": "medium"
@@ -317,7 +333,7 @@
       "paragraphs": [
         "Every man aboard Endurance survived her sinking; Shackleton had already led the crew off onto the ice before she went down. So unlike Titanic or Bismarck, this wreck is not a war grave or a gravesite -- but she is still one of the best-preserved and most significant wrecks in the world, and international law protects her accordingly.",
         "The Antarctic Treaty System designated the (then still unfound) wreck a Historic Site and Monument, HSM No. 93, in 2019 -- three years before anyone located her. That status makes it an offence to touch, disturb, or remove anything from the site; Endurance22's own survey and filming work had to be carried out without any contact with the wreck.",
-        "Since the discovery, the UK Antarctic Heritage Trust and Historic England have led a Conservation Management Plan for the site, and have proposed expanding the protection zone from its original 500 m radius to 1,500 m to cover the full debris field, with a longer-term goal of a formal Antarctic Specially Protected Area designation. Warming Antarctic waters and increasing ship traffic in the region are cited as growing risks.",
+        "Since the discovery, the UK Antarctic Heritage Trust and Historic England have led a Conservation Management Plan for the site. Antarctic Treaty Measure 18 (2024), effective on 28 October 2024, expanded HSM No. 93 to include associated artefacts within a 1,500 m radius of the wreck. The Conservation Management Plan also discusses possible Antarctic Specially Protected Area status and risks from warming waters and ship traffic.",
         "Survey the wreck through photographs and scans, leaving its timber, fittings and surrounding debris undisturbed."
       ],
       "facts": [
@@ -326,11 +342,11 @@
           "value": "Antarctic Treaty Historic Site and Monument No. 93 (2019)"
         },
         {
-          "label": "Protection radius (original)",
+          "label": "Protection radius (Measure 18, 2022)",
           "value": "500 m"
         },
         {
-          "label": "Protection radius (proposed)",
+          "label": "Protection radius (Measure 18, 2024)",
           "value": "1,500 m"
         },
         {
@@ -355,6 +371,14 @@
         {
           "title": "Wreck of Shackleton's 'Endurance' Gets New Protections — Smithsonian Magazine",
           "url": "https://www.smithsonianmag.com/smart-news/the-endurance-shipwreck-gets-new-protections-amid-warming-antarctic-waters-180984683/"
+        },
+        {
+          "title": "Antarctic Treaty Secretariat — Measure 18 (2022), 500 m radius",
+          "url": "https://www.ats.aq/devAS/Meetings/Measure/768"
+        },
+        {
+          "title": "Antarctic Treaty Secretariat — Measure 18 (2024), effective 28 October 2024",
+          "url": "https://www.ats.aq/devAS/Meetings/Measure/830?lang=e"
         }
       ],
       "confidence": "high"
