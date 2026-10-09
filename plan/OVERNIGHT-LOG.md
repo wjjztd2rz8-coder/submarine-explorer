@@ -647,3 +647,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** f-monterey-portrait-hud (Sonnet): could not reproduce the Monterey portrait HUD overlap at 390x844 (earlier HUD work likely fixed it); no source change, added a regression e2e spec + CHANGELOG note. Smoke + project-base green on main; no push (no new wave).
 - **Running (Codex):** 1040, 1050, 1060. **Queue:** 1070, 1080. Next Claude: Beebe chimney review after 1080, Lost City tower read after 1050. Needs owner: nothing.
+
+## 2026-10-09 04:44 CDT headless run (Claude)
+
+- **Merged:** f-bluehole-apron (Sonnet): baked sediment/algae/rubble/scour vertex colour on the Blue Hole apron and bowl treads, pale rim lip + dark shadow on the first riser. Moderate gain in poses 2/3 (haze and shared rock texture still flatten it; next step would be atmosphere or a dedicated texture). Regenerated the Beebe-isolation snapshot (it covers Blue Hole colour buffers, legitimately changed). Smoke + project-base green on main; no push (no new wave).
+- **Running (Codex):** 1040, 1050, 1060 (uncommitted work in their worktrees; 1050 already touches Lost City towers). **Queue:** 1070, 1080, 1090 (bug hunt over f38-f41). Next Claude: review 1050/1060/1080 when they land, Beebe chimney review, first-minute playthrough check. Needs owner: nothing.

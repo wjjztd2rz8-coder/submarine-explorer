@@ -6,7 +6,7 @@ The owner treats this as a curiosity project about how far current models and wo
 
 Claude backlog (ordered by player impact; all unblocked; Sonnet for visual, Haiku for small):
 
-1. **Blue Hole bowl (Sonnet):** gallery fine; bowl is still a smooth beige dune with a hard horizon ring and flat-cone stalactites. Real ledge geometry, darker lower walls, softened ring, tapered irregular stalactites (1030 may cover part; review it first).
+1. (PASS 3 MERGED 2026-10-09: apron vertex-colour variance, moderate gain; further gain needs atmosphere/haze or a dedicated texture) **Blue Hole bowl (Sonnet):** gallery fine; bowl is still a smooth beige dune with a hard horizon ring and flat-cone stalactites. Real ledge geometry, darker lower walls, softened ring, tapered irregular stalactites (1030 may cover part; review it first).
 2. **Lost City tower read (Sonnet):** close-up is ledged but still stacked plates with blotchy albedo; irregular carbonate fingers with flow texture (1050 verifies; fix what it finds).
 3. **Beebe chimney detail (Sonnet; Codex 1080 has a first pass, review it):** smooth fluted trunk needs crust/flange variation and a visible orifice; boulders are flat pale blobs.
 4. **Hosted CI green (Haiku to triage 1070 output):** f37 run had e2e shards 3/6/24 red; f38 run pending. Never loosen assertions.
