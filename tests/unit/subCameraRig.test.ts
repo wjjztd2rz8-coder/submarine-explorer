@@ -301,3 +301,33 @@ describe('CameraRig + SubMesh follow the physics heading (F1)', () => {
     expect(camRight.y).toBeLessThan(-0.05);
   });
 });
+
+it('retains a close portrait arm through zoom, free look, rotation and reset', () => {
+  const position = new Vector3(0, -3000, 0);
+  const rig = new CameraRig(cam, 390 / 844);
+  const defaultRadius = Math.hypot(cam.chaseOffset.x, cam.chaseOffset.y, cam.chaseOffset.z);
+  rig.setChaseRadiusDefault(undefined, -220, -10, { x: 0, y: -48, radius: 52 });
+  rig.snap(position, 0.7, 0);
+  const portraitEye = rig.camera.position.clone();
+  expect(portraitEye.distanceTo(position)).toBeCloseTo(52, 8);
+  rig.orbit(0.1, 0.05);
+  rig.snap(position, 0.7, 0);
+  expect(rig.freeLook).toBe(true);
+  expect(rig.camera.position.distanceTo(position)).toBeCloseTo(52, 8);
+  rig.orbit(0, 0, 0.2);
+  rig.snap(position, 0.7, 0);
+  expect(rig.camera.position.distanceTo(position)).toBeCloseTo(52 * 1.2, 8);
+  rig.setAspect(16 / 9);
+  rig.snap(position, 0.7, 0);
+  expect(rig.camera.position.distanceTo(position)).toBeCloseTo(defaultRadius * 1.2, 8);
+  rig.resetView();
+  rig.snap(position, 0.7, 0);
+  expect(rig.camera.position.distanceTo(position)).toBeCloseTo(defaultRadius, 8);
+  rig.setAspect(390 / 844);
+  rig.snap(position, 0.7, 0);
+  expect(rig.camera.position).toEqual(portraitEye);
+  // Loading a new dive without the override restores the usual portrait distance.
+  rig.setChaseRadiusDefault();
+  rig.snap(position, 0.7, 0);
+  expect(rig.camera.position.distanceTo(position)).toBeCloseTo(defaultRadius, 8);
+});

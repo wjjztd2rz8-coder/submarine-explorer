@@ -86,8 +86,11 @@ local X offset of −20 m in the chase vector moves the hull off Poseidon's axis
 before that vector is normalized to the 50 m arm. The spawn pose carries
 `chaseOffsetX` alongside `chaseRadius`. `CameraRig.setChaseRadiusDefault(radius?, offsetX?, offsetY?, portraitOffset?)`
 sets the current/reset distance and framing; omitting the arguments restores
-the configured arm and zero extra lateral offset. The optional `{ x, y }` portrait
-offset is carried by `SpawnPose.portraitChaseOffset` and applied only below aspect 1.
+the configured arm and zero extra lateral offset. The optional `{ x, y, radius? }` portrait
+override is carried by `SpawnPose.portraitChaseOffset` and applied only below aspect 1.
+Its optional radius sets the portrait arm length at default zoom; wheel zoom and
+free look scale that arm relative to the shared desktop reset distance. Endurance
+uses a 52 m portrait arm while its desktop camera inherits the global radius.
 Challenger and Endurance use a centred, lower portrait chase arm to keep the
 level hull, seabed and scan reticle clear; rotating the screen and resetting
 the camera retain the dive's framing defaults. Surface,

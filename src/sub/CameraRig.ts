@@ -40,7 +40,7 @@ export class CameraRig {
   chaseRadius: number;
   private chaseRadiusDefault: number;
   private chaseOffsetX = 0;
-  private portraitChaseOffset: { x: number; y: number } | null = null;
+  private portraitChaseOffset: { x: number; y: number; radius?: number } | null = null;
   private chaseOffsetY = 0;
 
   private readonly desiredPosition = new THREE.Vector3();
@@ -143,7 +143,7 @@ export class CameraRig {
     ),
     offsetX = 0,
     offsetY = 0,
-    portraitOffset?: { x: number; y: number },
+    portraitOffset?: { x: number; y: number; radius?: number },
   ): void {
     this.chaseRadiusDefault = radius;
     this.chaseRadius = radius;
@@ -253,12 +253,12 @@ export class CameraRig {
               Math.sin(this.lookElevation),
               Math.cos(this.lookAzimuth) * ce,
             )
-            .multiplyScalar(this.chaseRadius);
+            .multiplyScalar(this.chaseViewRadius());
         } else {
           const portrait = this.camera.aspect < 1 ? this.portraitChaseOffset : null;
           this.offset.x += portrait?.x ?? this.chaseOffsetX;
           this.offset.y += portrait?.y ?? this.chaseOffsetY;
-          this.offset.multiplyScalar(this.chaseRadius / this.offset.length());
+          this.offset.multiplyScalar(this.chaseViewRadius() / this.offset.length());
           this.offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), -yaw);
         }
       } else {
@@ -308,13 +308,21 @@ export class CameraRig {
     // low in a close view and ends up under the phone tutorial card.
     // Aim lower in proportion to the lost arm so the hull rides up the frame.
     if (this.mode === 'chase' && !this.freeLook && this.camera.aspect < 0.7) {
-      const wanted = this.chaseRadius;
+      const wanted = this.chaseViewRadius();
       const lost =
         wanted > 0 ? 1 - Math.min(1, this.camera.position.distanceTo(subPos) / wanted) : 0;
       this.currentTarget.y -= lost * PORTRAIT_RETRACTED_AIM_DROP_M;
     }
     this.camera.lookAt(this.currentTarget);
     this.applyBank(opts.roll ?? 0, dt);
+  }
+
+  /** Portrait can keep a close authored view while sharing desktop's zoom/reset state. */
+  private chaseViewRadius(): number {
+    const portraitRadius = this.camera.aspect < 1 ? this.portraitChaseOffset?.radius : undefined;
+    return (
+      this.chaseRadius * ((portraitRadius ?? this.chaseRadiusDefault) / this.chaseRadiusDefault)
+    );
   }
 
   /** Never let the camera sit inside (or below) the seabed. */
