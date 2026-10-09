@@ -797,8 +797,11 @@
     margin: 0;
   }
   html.is-touch body:has(.scan-panel:not([hidden])) .objectives-panel .obj-list,
-  html.is-touch body:has(.scan-panel:not([hidden])) .d-scan-edge,
   html.is-touch body:has(.scan-panel:not([hidden])) .d-scan-objective-hint {
+    display: none;
+  }
+  /* A logged (dim) scan panel is not a prompt: keep the next-target chip showing. */
+  html.is-touch body:has(.scan-panel:not([hidden], [data-tone='dim'])) .d-scan-edge {
     display: none;
   }
   /* The navigation chip remains available for targets outside scan range. */
