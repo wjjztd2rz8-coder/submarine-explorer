@@ -142,7 +142,7 @@ const FREE_DIVE_OPENINGS: Record<
     altitude: 8,
     yawOffset: 11,
     // Three-quarter stern view: show hull length and deck, with the smoker to port.
-    chaseRadius: 64,
+    chaseRadius: 54,
     chaseOffsetX: -48,
     chaseOffsetY: -12,
   },
