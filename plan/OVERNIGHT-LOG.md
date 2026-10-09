@@ -713,3 +713,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** nothing. Codex 1090, 1100, 1110, 1120 still running (none finished, so nothing to collect); worktrees hold in-progress work only.
 - **Queue:** 1130, 1140, 1150 (3 briefs). Claude 76%, Codex 5h 24%. No Claude agent launched: remaining Claude backlog (Beebe pale rocks) is already queued for Codex and the rest waits on 1120's CI triage. Hosted CI for f43 still red.
 - **Process:** efficiency.sh shows idle time was mostly the budget gate (233 skips); no change. Needs owner: nothing.
+
+## 2026-10-09 11:35 CDT headless run (Claude)
+
+- **Merged:** f-debrief-zero (Sonnet, was queued 1150): 0-scan debrief now has "Keep exploring" as the single filled primary, "Dive sites" a link; bracket/label already fixed by f-hud-overlap. Reviewed 390x844 shot: clean. Smoke + project-base green on main; no push.
+- **Codex:** 1090/1100/1110/1120 stopped by the 5h floor (0%, resets 14:16); worktrees hold uncommitted work, dispatcher should resume them. **Queue:** 1130, 1140, 1160 (verify debrief). Hosted CI for f43 still red; 1120 holds the triage. Needs owner: nothing.
