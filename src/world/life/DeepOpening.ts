@@ -37,7 +37,8 @@ export function populateDeepOpening(
     const jz = (Math.sin(i * 78.233) * 12543.531) % 1;
     const jitter = spec.onWreck ? 0 : spec.spacingM * 0.45;
     const px = x + ((i % 3) - 1) * spec.spacingM + jx * jitter;
-    const pz = z + (Math.floor(i / 3) - (Math.ceil(count / 3) - 1) / 2) * spec.spacingM + jz * jitter;
+    const pz =
+      z + (Math.floor(i / 3) - (Math.ceil(count / 3) - 1) / 2) * spec.spacingM + jz * jitter;
     return new Vector3(px, sim.env.groundAt(px, pz) + (row.def.altitude?.[0] ?? 0), pz);
   });
   if (spec.onWreck) {

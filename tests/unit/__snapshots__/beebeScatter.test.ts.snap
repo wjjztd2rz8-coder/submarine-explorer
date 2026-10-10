@@ -136,11 +136,11 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "challenger-deep": {
-    "meshes": "71902770c3054f4065ae7dad5c3f9536f34afcb66205988157691640d73534e2",
+    "meshes": "52e759f29564f4f32c9433612f1ee4082025d173699121df45f591c8f423acb0",
     "stats": {
       "cells": 21,
       "drawCalls": 2,
-      "instances": 82,
+      "instances": 123,
     },
   },
   "endurance": {
