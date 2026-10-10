@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Challenger Deep (f-challenger-lander): the lander marker is now a purpose-built `benthic-lander` geo feature (three legs, yellow flotation, bait cage, mast, orange flag, strobe; 3 draw calls) at 9 m footprint instead of a small orange debris pile, and the trench wall gets baked vertex-colour relief (lighter upslope gradient, faint terraces); opening range 34 -> 30 m. Reason: the lander was unreadable in the opening frame.
+
 - Lost City carbonate towers: flow-stone look with 22 meandering vertical ridges on the main trunk, much weaker terrace shelves, ridge-aligned crest/trough colouring (grey-brown troughs, faint blue-green film near the base), deeper and wider dark vent mouth. Cut: saucer flanges removed from the main trunk and the lone chimney, and reduced to a rare small one on lesser spires (Lost City tower triangles drop; terrainMerge1140 snapshot updated).
 
 - Great Blue Hole bowl (f-bluehole-bowl2): ragged shelf lip with rubble ridges and a stepped main riser (extra ledge knots), a 30 m colour feather from warm shelf to cool wall, stronger per-terrace tone and darker blue lower walls; wall sponges are now closed capsules (muted colour, 12 instead of 34 to stay in the Low triangle budget). Blue Hole snapshots updated.

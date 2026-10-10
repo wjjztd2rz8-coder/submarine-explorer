@@ -14,6 +14,7 @@
  */
 
 import { blueHoleTint } from './terrainFeatures.js';
+import { challengerSlopeTint } from './ChallengerRelief.js';
 import { LOST_CITY_STRATA, lostCitySlopeTint } from './LostCityBands.js';
 
 /** The five packed texture sets in `public/assets/terrain/<set>_{a,n}.jpg`. */
@@ -212,6 +213,8 @@ export const BIOMES: Record<string, Biome> = {
     rippleLenM: 1.6,
     rippleDir: 0.5,
     rockBias: -0.1,
+    // Slope relief baked into vertex colour: lighter upslope, faint terraces, no extra geometry.
+    vertexTint: challengerSlopeTint,
     scatter: [
       { kind: 'dropstone', density: 0.4, slopeMaxDeg: 20, on: 'any' },
       { kind: 'mound', density: 7, slopeMaxDeg: 12, on: 'flat' },

@@ -7,7 +7,7 @@ export const DEEP_OPENINGS = {
     opening: {
       hero: 'leggo-lander-marker',
       bearing: 135,
-      range: 34,
+      range: 30,
       altitude: 8,
       yawOffset: 8,
       chaseRadius: 48,
