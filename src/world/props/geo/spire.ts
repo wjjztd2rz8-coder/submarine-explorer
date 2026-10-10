@@ -68,7 +68,8 @@ export function crustBand(
   const saw = phase - idx;
   const side = fbm3(Math.cos(ang) * 1.5 + 9, idx * 2.3, Math.sin(ang) * 1.5 + 9, seed + 53, 2);
   const strength = smooth(0.25, 0.65, side) * (0.35 + 0.65 * hash1(idx * 3.7 + seed));
-  return { lip: smooth(0, 0.12, saw) * Math.pow(1 - saw, 2.4) * strength, saw, idx };
+  // A broad rounded crest (slow rise, gentle fall) rather than a sawtooth spike.
+  return { lip: smooth(0, 0.3, saw) * Math.pow(1 - saw, 1.7) * strength, saw, idx };
 }
 
 /** Flow-ridge crest value in [0, 1] (1 on a crest) at an angle and local height. */
@@ -179,7 +180,7 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
       const b = crustBand(ang, y, o.seed);
       const nod = fbm3(Math.cos(ang) * 7 + 2, y * 1.7, Math.sin(ang) * 7 + 2, o.seed + 67, 2);
       // Overhanging crust flanges, pitted by knobbly sulfide nodules; fades near the rim.
-      f *= 1 + o.crust * (0.34 * (b.lip - 0.1) + (nod - 0.5) * 0.3) * (1 - smooth(0.9, 1, t));
+      f *= 1 + o.crust * (0.38 * (b.lip - 0.1) + (nod - 0.5) * 0.2) * (1 - smooth(0.9, 1, t));
     }
     if (o.rough)
       f *=
@@ -219,15 +220,16 @@ export function flange(o: {
   segs: number;
 }): THREE.BufferGeometry {
   const { r0, w } = o;
-  const th = 0.35 + w * 0.12;
+  const th = 0.42 + w * 0.14;
+  // A thick, rounded lip: the outer edge is a blunt bullnose, not a knife edge.
   const profile = [
     new THREE.Vector2(r0 * 0.8, th * 0.5),
-    new THREE.Vector2(r0 + w * 0.35, th * 0.55),
-    new THREE.Vector2(r0 + w * 0.8, th * 0.15),
-    new THREE.Vector2(r0 + w, -th * 0.45),
-    new THREE.Vector2(r0 + w * 0.9, -th * 1.3),
-    new THREE.Vector2(r0 + w * 0.55, -th * 1.2),
-    new THREE.Vector2(r0 + w * 0.15, -th * 0.9),
+    new THREE.Vector2(r0 + w * 0.35, th * 0.6),
+    new THREE.Vector2(r0 + w * 0.78, th * 0.4),
+    new THREE.Vector2(r0 + w * 0.97, -th * 0.1),
+    new THREE.Vector2(r0 + w * 0.97, -th * 0.7),
+    new THREE.Vector2(r0 + w * 0.7, -th * 1.25),
+    new THREE.Vector2(r0 + w * 0.3, -th * 1.1),
     new THREE.Vector2(r0 * 0.8, -th * 0.6),
   ];
   const g = new THREE.LatheGeometry(profile, Math.max(6, Math.round(o.segs)), o.start, o.arc);
@@ -244,8 +246,8 @@ export function flange(o: {
     // Both ends of the arc pinch out to nothing so the sector has no cut face.
     const u = ((((Math.atan2(x, z) - o.start) % TAU) + TAU) % TAU) / o.arc;
     const end = smooth(0, 0.22, u) * smooth(0, 0.22, 1 - u);
-    const k = (1 + sc * 0.5 * out) * (1 - (1 - end) * out * 0.9);
-    const yy = y - out * out * w * 0.12 - sc * out * 0.5;
+    const k = (1 + sc * 0.32 * out) * (1 - (1 - end) * out * 0.9);
+    const yy = y - out * out * w * 0.12 - sc * out * 0.3;
     p.setXYZ(i, x * k, yy * (0.25 + 0.75 * end), z * k);
   }
   g.deleteAttribute('uv');

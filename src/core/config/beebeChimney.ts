@@ -50,3 +50,40 @@ export const BEEBE_SCATTER_ROCK = {
   stainAmount: 0.22,
   sedimentAmount: 0.06,
 } as const;
+
+/**
+ * Per-chimney variation for the plain Beebe chimneys 2-3, which share the hero's crusted
+ * flange profile but differ in height, lean, flange count and flute count so no two match.
+ */
+export const BEEBE_SIDE_CHIMNEYS: Record<
+  string,
+  {
+    heightScale: number;
+    widthScale: number;
+    /** Lean from vertical (rad) and its compass direction (rad). */
+    lean: number;
+    leanDir: number;
+    flanges: number;
+    ridges: number;
+    crust: number;
+  }
+> = {
+  'beebe-chimney-2': {
+    heightScale: 1.18,
+    widthScale: 1.05,
+    lean: 0.06,
+    leanDir: 0.8,
+    flanges: 4,
+    ridges: 4,
+    crust: 0.9,
+  },
+  'beebe-chimney-3': {
+    heightScale: 0.9,
+    widthScale: 1.25,
+    lean: 0.09,
+    leanDir: 3.6,
+    flanges: 2,
+    ridges: 6,
+    crust: 1.1,
+  },
+};

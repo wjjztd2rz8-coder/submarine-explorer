@@ -13,7 +13,8 @@ import { BEEBE_CHIMNEY as beebe } from '../../../core/config/beebeChimney.js';
 import { geoDetail } from './detail.js';
 import { geoMaterial, LIFE_TINT, mineralCrust, vertexGlow } from './materials.js';
 import { shimmerPlume, smokePlume } from './plume.js';
-import { crustBand, flange, tieredSpire } from './spire.js';
+import { paintCrust } from './crust.js';
+import { flange, tieredSpire } from './spire.js';
 import {
   boxCH,
   clamp01,
@@ -39,16 +40,6 @@ const ANHYDRITE = new THREE.Color(0xcfc4b2);
 const SULFIDE = new THREE.Color(0x2c231e);
 const MOUND = new THREE.Color(0x4c4038);
 const MAT = new THREE.Color(0xb9ad98);
-// Beebe crust palette: ochre and orange Fe-oxide, sulfur-yellow bloom, near-black sulfide.
-const OCHRE = new THREE.Color(0xc0903f);
-const ORANGE = new THREE.Color(0xb4572c);
-const SULFUR = new THREE.Color(0xd8bb62);
-const COAL = new THREE.Color(0x15110f);
-
-const hash01 = (k: number): number => {
-  const v = Math.sin(k * 12.9898 + 78.233) * 43758.5453;
-  return v - Math.floor(v);
-};
 
 export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   const { dims, seed, tier, def, cfg } = input;
@@ -190,24 +181,18 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     if (best > 0 && beebeHero) {
       // Crusted sulfide: coal-black recesses, ochre/orange oxide on band crests, sulfur bloom
       // and pale anhydrite on the upper flanges. Relief and colour share crustBand().
-      const b = crustBand(
+      paintCrust(
+        out,
+        x,
+        y,
+        z,
         Math.atan2(z - near.z, x - near.x),
         y - near.y,
+        hh,
+        nz,
+        seed,
         seed + stacks.indexOf(near) * 7,
       );
-      const bandTint = hash01(b.idx * 1.7 + seed);
-      const patch = fbm3(x * 0.8, y * 0.45, z * 0.8, seed ^ 0x77, 3);
-      const fine = fbm3(x * 4.2, y * 5, z * 4.2, seed ^ 0x19, 2);
-      out.copy(COAL).lerp(SULFIDE, 0.3 + 0.7 * nz);
-      const oxide = smooth(0.2, 0.75, b.lip * 2.2 + (patch - 0.5) * 1.2) * (0.55 + 0.45 * fine);
-      out.lerp(bandTint > 0.5 ? OCHRE : ORANGE, oxide * 0.9);
-      out.lerp(RUST, smooth(0.5, 0.8, patch) * 0.6 * (1 - oxide));
-      out.lerp(SULFUR, smooth(0.78, 0.95, fine) * smooth(0.3, 0.8, b.lip) * 0.6);
-      out.lerp(
-        ANHYDRITE,
-        smooth(0.85, 1, hh + (nz - 0.5) * 0.25) * 0.32 + smooth(0.84, 0.97, patch) * 0.22,
-      );
-      out.multiplyScalar(0.8 + 0.5 * fine);
     } else if (best > 0) {
       out.copy(SULFIDE).lerp(ROCK, nz);
       out.lerp(RUST, smooth(0.45, 0.85, nz + hh * 0.15) * 0.55);
