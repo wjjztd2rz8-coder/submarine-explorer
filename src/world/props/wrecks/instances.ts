@@ -114,8 +114,8 @@ export function rusticleGeometry(): THREE.BufferGeometry {
       pos.setXYZ(i, x * k + sway, y, z * k);
     }
     g.computeVertexNormals();
-    const root = new THREE.Color(0x6b3d1c);
-    const tip = new THREE.Color(0x2e180d);
+    const root = new THREE.Color(0x8a5424);
+    const tip = new THREE.Color(0x4a2a14);
     const c = new THREE.Color();
     return colourise(normalise(g), (_x, y) => c.copy(root).lerp(tip, Math.pow(-y, 0.7)));
   });
@@ -132,8 +132,8 @@ export function hangRusticle(
   len: number,
   rnd: () => number,
 ): void {
-  const L = len * (0.4 + rnd() * 0.25);
-  const r = Math.max(0.012, L * (0.03 + rnd() * rnd() * 0.07));
+  const L = len * (0.75 + rnd() * 0.3);
+  const r = Math.max(0.02, L * (0.065 + rnd() * rnd() * 0.1));
   const m = new THREE.Matrix4().compose(
     p,
     new THREE.Quaternion().setFromEuler(

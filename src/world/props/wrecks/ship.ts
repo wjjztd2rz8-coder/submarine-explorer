@@ -99,12 +99,12 @@ export function rusticlesAlong(
     const a = path[i]!;
     const b = path[i + 1]!;
     const dist = a.distanceTo(b);
-    const clumps = Math.floor((dist * density) / 3 + rnd());
+    const clumps = Math.floor((dist * density) / 2 + rnd());
     for (let k = 0; k < clumps; k++) {
       const c = new THREE.Vector3().lerpVectors(a, b, rnd());
       const o = typeof outward === 'function' ? outward(c) : outward;
       const reach = lenMin + (lenMax - lenMin) * Math.pow(rnd(), 1.6);
-      const strands = 2 + Math.floor(rnd() * 5);
+      const strands = 3 + Math.floor(rnd() * 6);
       for (let j = 0; j < strands; j++) {
         const p = c.clone();
         p.lerp(b, (rnd() - 0.5) * Math.min(0.6, 0.5 / Math.max(dist, 0.5)) * 2);
