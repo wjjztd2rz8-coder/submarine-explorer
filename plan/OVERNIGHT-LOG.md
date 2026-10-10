@@ -820,3 +820,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** f-phone-pass (Sonnet, ~24 min): golden capture now uses real touch mode on phone layouts (it had been showing the desktop HUD), phone-landscape sonar 120 px without tiny contour labels, short mission title. Smoke + project-base green on main; no full e2e, no push (f46 last tag). Hosted CI of the last push failed again (shard timeouts), still untriaged.
 - **Open:** Endurance/Titanic opening frames put the sub under the PHOTO/SONAR buttons (needs a phone camera offset); Blue Hole minimap still a flat teal tile; Lost City and Lighthouse Reef titles ellipsize.
 - **Queue:** Codex 1220-1280 (weekly 6%, dry until 15 Oct). Next Claude: phone camera offset, hosted CI triage, Monterey wall. Needs owner: nothing.
+
+## 2026-10-10 05:10 CDT headless run (Claude)
+
+- **Merged:** f-phone-camera (Sonnet, ~26 min): phone-landscape-only 14% view shift so the sub/wreck clears PHOTO/SONAR/thumb zones (Titanic, Endurance, Lost City shots reviewed, clear gain); phone mission titles "Lost City dive" and "Lighthouse Reef" no longer ellipsize. Smoke + project-base green on main; no full e2e, no push (f46 last tag).
+- **Dropped:** Blue Hole-only sonar depth curve (conflicts with the shared-ramp test sonarPalette1200); minimap is still a flat teal tile, left to Codex 1250 / a shared-ramp change.
+- **Queue:** Codex 1220-1280 (weekly 6%, dry until 15 Oct). Claude 5h ~50% at exit, no new agent started. Next: hosted CI triage, Monterey wall, shared sonar ramp for flat sites. Needs owner: nothing.
