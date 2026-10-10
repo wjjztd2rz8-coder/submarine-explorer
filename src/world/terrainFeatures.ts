@@ -297,7 +297,7 @@ export function blueHoleTint(
   const bi = Math.floor(bandT);
   const bh = 0.5 + 0.5 * Math.sin(bi * 12.9898 + 4.1) * Math.cos(bi * 7.233);
   const joint = smoothstep(clamp01((bandT - bi) / 0.12));
-  const bed = (0.8 + 0.4 * bh) * (0.7 + 0.3 * joint);
+  const bed = (0.72 + 0.56 * bh) * (0.62 + 0.38 * joint);
   const k = rock * 0.85;
   tr *= lerp(1, bed * lerp(1.06, 0.92, bh), k);
   tg *= lerp(1, bed, k);

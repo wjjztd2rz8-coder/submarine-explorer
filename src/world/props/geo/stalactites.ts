@@ -48,6 +48,8 @@ const DRAPE = new THREE.Color(0x8c8470);
 const BED_WARM = new THREE.Color(0xb39a68);
 const BED_COOL = new THREE.Color(0x7d8179);
 /** Cool teal-grey of the water-filled depths: the apron and lower wall grade toward it. */
+const BLUE_GREY = new THREE.Color(0x4e6c80);
+const CREAM_OCHRE = new THREE.Color(0xd4b57e);
 const DEEP_TEAL = new THREE.Color(0x5f817f);
 
 const EDGE_START = 0.55;
@@ -232,6 +234,12 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     return m;
   };
 
+  const ledgeBed = (x: number, y: number): { bedI: number; bedF: number } => {
+    const bedY = y / (2.1 * scale) + 0.9 * fbm3(x * 0.04, 3, seed + 9, seed + 4, 2);
+    const bedI = Math.floor(bedY);
+    return { bedI, bedF: bedY - bedI };
+  };
+
   const disp = (x: number, y: number, z: number): number => {
     const env = smooth(joinY, joinY + 0.15 * H, y);
     const rill = 1 - Math.abs(2 * fbm3(x * 0.4, y * 0.09, seed + 2, seed, 3) - 1);
@@ -239,7 +247,24 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const flute = (Math.pow(rill, 2.5) - 0.25) * -0.9;
     // The shelf window: scale the projection of everything between the underside and the top.
     const win = smooth(0.46 * H, 0.5 * H, y) * (1 - smooth(0.66 * H, 0.7 * H, y));
-    return (bulge + flute) * env + z * (shelf(x) - 1) * win;
+    // Stratified ledges: each bed projects a lip that returns into a recess, with uneven bed
+    // thickness, so the face reads as stacked limestone in silhouette. Off across the shelf window.
+    const { bedI, bedF } = ledgeBed(x, y);
+    const bedAmp = (0.35 + 0.65 * fbm3(bedI * 2.7, 5, seed + 17, seed + 6, 2)) * 1.15 * scale;
+    const lipOut = 1 - smooth(0, 0.32, bedF);
+    const ledges = -bedAmp * lipOut * (1 - win) * env;
+    // Shallow solution notches: a few recessed bands at fixed fractions of the face, partial in x.
+    let notch = 0;
+    for (const [fy, hw, depth, fx] of [
+      [0.82, 0.035, 1.1, 0.05],
+      [0.97, 0.03, 0.9, 0.11],
+      [1.2, 0.04, 1.2, 0.17],
+      [0.3, 0.04, 0.8, 0.23],
+    ] as const) {
+      const m = smooth(0.38, 0.62, fbm3(x * 0.07 + fx * 40, 2, seed + 71, seed + 3, 3));
+      notch += depth * scale * m * Math.exp(-(((y - fy * H) / (hw * H)) ** 2));
+    }
+    return (bulge + flute) * env + z * (shelf(x) - 1) * win + ledges + notch * (1 - win) * env;
   };
 
   // --- the wall
@@ -284,6 +309,18 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     out.multiplyScalar(0.62 + 0.5 * smooth(0, 0.14, bed - Math.floor(bed)));
     out.multiplyScalar(0.62 + 0.38 * smooth(0, 0.22, hf));
     if (ny < -0.35) out.multiplyScalar(0.7);
+    // Wall read: cream-ochre near the lip grading to cool blue-grey below the halocline, with
+    // each ledge lip catching light and the recess under it falling into shadow. Floors keep
+    // the tone readable (never below ~0.55 of the base).
+    const { bedI, bedF } = ledgeBed(x, y);
+    const face = 1 - smooth(0.2, 0.55, ny < 0 ? -ny : ny); // steep faces only
+    const depthF = 1 - smooth(0.12, 0.62, hf);
+    out.lerp(BLUE_GREY, 0.75 * depthF * (0.4 + 0.6 * face));
+    out.lerp(CREAM_OCHRE, 0.3 * smooth(0.45, 0.95, hf) * face);
+    const bedTone = 0.72 + 0.5 * fbm3(bedI * 3.3, 9, seed + 29, seed + 7, 2);
+    const lipLight = 1 + 0.3 * (1 - smooth(0, 0.22, bedF));
+    const recess = 1 - 0.45 * smooth(0.3, 0.55, bedF) * (1 - smooth(0.7, 1, bedF));
+    out.multiplyScalar(bedTone * lipLight * recess * (1 - 0.3 * depthF * face));
   });
   wall.computeBoundingBox();
   const full = new THREE.Group();
