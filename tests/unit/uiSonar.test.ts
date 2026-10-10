@@ -10,6 +10,8 @@ import {
   easeSonarRange,
   sonarCanvasSize,
   sonarContourInterval,
+  sonarFlatProfile,
+  sonarLocalContourInterval,
   sonarPoiIcon,
   sonarPoiVisible,
   sonarProject,
@@ -100,5 +102,31 @@ describe('D-SONAR sub-centred map', () => {
     expect(sonarContourInterval(25, 100, 20)).toBe(20);
     expect(sonarContourInterval(100, 2000, 20)).toBe(100);
     expect(sonarContourInterval(5, 1, 20)).toBe(Infinity);
+  });
+});
+
+describe('flat-site sonar relief', () => {
+  it('leaves relief-rich views (Blue Hole, ~0.12 m/m) untouched', () => {
+    const p = sonarFlatProfile(122, 1000);
+    expect(p).toEqual({ flatness: 0, gainBoost: 1, tint: 0 });
+    expect(sonarLocalContourInterval(10, 122, 20, p.flatness)).toBe(
+      sonarContourInterval(10, 122, 20),
+    );
+  });
+
+  it('boosts shading and tint on near-flat plains', () => {
+    const titanic = sonarFlatProfile(9, 1000);
+    expect(titanic.flatness).toBe(1);
+    expect(titanic.gainBoost).toBeGreaterThan(5);
+    expect(titanic.gainBoost).toBeLessThanOrEqual(8);
+    expect(titanic.tint).toBeGreaterThan(0);
+    expect(sonarFlatProfile(0, 1000).gainBoost).toBe(8);
+  });
+
+  it('chooses about six contours across the local relief, never below 1 m', () => {
+    expect(sonarLocalContourInterval(25, 9, 20, 1)).toBe(2);
+    expect(sonarLocalContourInterval(25, 6, 20, 1)).toBe(1);
+    expect(sonarLocalContourInterval(100, 596, 20, 1)).toBe(100);
+    expect(sonarLocalContourInterval(5, 1, 20, 1)).toBe(Infinity);
   });
 });

@@ -137,6 +137,44 @@ export function sonarContourInterval(
   return ([1, 2, 5, 10].find((n) => n * magnitude >= target) ?? 10) * magnitude;
 }
 
+export interface SonarFlatProfile {
+  /** 0 on sites whose relief already reads, 1 on near-flat seabed. */
+  flatness: number;
+  /** Multiplier on `hillshadeGain`, so gentle slopes still shade. */
+  gainBoost: number;
+  /** Strength (0..~0.3) of the local-depth luminance tint. */
+  tint: number;
+}
+
+/**
+ * How flat the view is, from its measured relief over its span (m per m).
+ * Slopes of about 0.1 or more (Blue Hole) get no change; Titanic, Endurance
+ * and the other abyssal plains (about 0.01) get the full boost.
+ */
+export function sonarFlatProfile(actualSpanM: number, viewSpanM: number): SonarFlatProfile {
+  const slope = viewSpanM > 0 ? Math.max(0, actualSpanM) / viewSpanM : 0;
+  const flatness = Math.min(1, Math.max(0, (0.06 - slope) / 0.04));
+  const gainBoost =
+    flatness > 0 ? 1 + flatness * (Math.min(8, Math.max(1, 0.08 / Math.max(slope, 1e-4))) - 1) : 1;
+  return { flatness, gainBoost, tint: 0.3 * flatness };
+}
+
+/**
+ * Contour step from local relief. Near-flat views aim for about six lines
+ * across the actual span (1 m floor, no sub-metre survey noise); steeper views
+ * keep `sonarContourInterval`.
+ */
+export function sonarLocalContourInterval(
+  baseM: number,
+  actualSpanM: number,
+  maxContours: number,
+  flatness: number,
+): number {
+  if (flatness <= 0 || actualSpanM < 2)
+    return sonarContourInterval(baseM, actualSpanM, maxContours);
+  return sonarContourInterval(actualSpanM / 6, actualSpanM, Math.max(1, maxContours));
+}
+
 export function sonarReliefRange(
   lo: number,
   hi: number,
@@ -163,6 +201,7 @@ export interface SonarRelief {
   maxDepthM: number;
   spanM: number;
   contourIntervalM: number;
+  flatness?: number;
 }
 
 /** Logarithmic range easing keeps equal zoom ratios moving at equal visual speed. */
@@ -187,6 +226,7 @@ export class Sonar {
   private readonly ctx: CanvasRenderingContext2D;
   private base: HTMLCanvasElement;
   private reliefDirty = true;
+  private flatness = 0;
   private reliefCenter = { x: 0, z: 0 };
   private scanState: (poi: PlacedPoi) => boolean = () => false;
   private readonly palettes: Record<SonarPaletteName, SonarPalette>;
@@ -467,18 +507,25 @@ export class Sonar {
             this.numericRange(this.zoomConfig.initial),
           ) as SonarZoom);
     const { low, span } = sonarReliefRange(lo, hi, this.zoomConfig.minReliefSpanM[reference]);
-    const contourInterval = sonarContourInterval(
+    const flat = sonarFlatProfile(
+      actualSpan,
+      zoom === 'tile' ? Math.max(this.terrain.widthM, this.terrain.depthM) : zoom,
+    );
+    this.flatness = flat.flatness;
+    const contourInterval = sonarLocalContourInterval(
       this.terrain.meta.id === 'great-blue-hole'
         ? Math.min(10, this.zoomConfig.contourIntervalM[reference])
         : this.zoomConfig.contourIntervalM[reference],
       actualSpan,
       this.zoomConfig.maxContours,
+      flat.flatness,
     );
     this.relief = {
       minDepthM: -hi,
       maxDepthM: -lo,
       spanM: span,
       contourIntervalM: contourInterval,
+      flatness: flat.flatness,
     };
     const img = ctx.createImageData(w, h);
     for (let py = 0; py < h; py++) {
@@ -486,6 +533,11 @@ export class Sonar {
         const index = py * w + px;
         const height = heights[index] as number;
         const [r, g, b] = paletteColor(this.palette.stops, (height - low) / span);
+        // Flat sites: tint by position within the view's own depth range.
+        const tintMul =
+          flat.tint > 0 && actualSpan > 0.5
+            ? 1 + flat.tint * ((height - lo) / actualSpan - 0.5)
+            : 1;
         // Measured X/Z slopes in m/m, lit from the north-west. A gain makes
         // gentle local walls legible without fabricating depth variation.
         const leftX = Math.max(0, px - slopeRadiusX);
@@ -499,7 +551,11 @@ export class Sonar {
         const gx = (right - left) / ((rightX - leftX) * metresPerPixel);
         const gz = (south - north) / ((southY - northY) * metresPerPixel);
         // A smooth shoulder keeps steep survey slopes from clipping into bands.
-        const shade = 1 - 0.28 * Math.tanh(this.zoomConfig.hillshadeGain * (0.7 * gx + 0.5 * gz));
+        const shade =
+          tintMul *
+          (1 -
+            0.28 *
+              Math.tanh(this.zoomConfig.hillshadeGain * flat.gainBoost * (0.7 * gx + 0.5 * gz)));
         const out = index * 4;
         img.data[out] = Math.round(Math.max(0, Math.min(255, r * shade)));
         img.data[out + 1] = Math.round(Math.max(0, Math.min(255, g * shade)));
@@ -587,6 +643,50 @@ export class Sonar {
     }
   }
 
+  /**
+   * Flat sites only: faint range rings about the sub and a soft footprint
+   * halo under each contact (the scan radius), so the wreck and objectives
+   * show against featureless seabed. Faded out as relief takes over.
+   */
+  private drawFlatGuides(ctx: CanvasRenderingContext2D, s: SubmarineState): void {
+    const flat = this.flatness;
+    if (flat <= 0 || !this.showMarkers) return;
+    const { w, h } = this;
+    ctx.save();
+    const hc = this.paletteName_ === 'highContrast';
+    if (this.zoom !== 'tile') {
+      const origin = this.project(s.position.x, s.position.z);
+      const pxPerM = Math.max(w, h) / this.zoom;
+      const ringM = this.zoom / 4;
+      ctx.strokeStyle = hc ? `rgba(255,255,255,${0.3 * flat})` : `rgba(200,240,235,${0.22 * flat})`;
+      ctx.lineWidth = 0.7;
+      ctx.setLineDash([2, 3]);
+      for (let r = ringM; r * pxPerM < Math.hypot(w, h); r += ringM) {
+        ctx.beginPath();
+        ctx.arc(origin.px, origin.py, r * pxPerM, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+    const pxPerM =
+      this.zoom === 'tile' ? this.w / this.terrain.widthM : Math.max(w, h) / (this.zoom as number);
+    ctx.setLineDash([]);
+    for (const poi of this.pois) {
+      const { px, py } = this.project(poi.position.x, poi.position.z);
+      const rad = Math.max(7, poi.radius * pxPerM);
+      const g = ctx.createRadialGradient(px, py, 0, px, py, rad);
+      g.addColorStop(
+        0,
+        hc ? `rgba(255,255,255,${0.34 * flat})` : `rgba(255,214,120,${0.3 * flat})`,
+      );
+      g.addColorStop(1, 'rgba(255,214,120,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(px, py, rad, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
   /** World XZ -> canvas pixel. */
   private project(x: number, z: number): { px: number; py: number } {
     return this.zoom === 'tile'
@@ -631,6 +731,8 @@ export class Sonar {
     const margin = this.zoom === 'tile' ? 0 : this.zoomConfig.rasterMarginPx;
     ctx.imageSmoothingEnabled = true;
     ctx.drawImage(this.base, -margin + shiftX, -margin + shiftY, w + margin * 2, h + margin * 2);
+
+    this.drawFlatGuides(ctx, s);
 
     // Breadcrumb trail.
     const last = this.trail[this.trail.length - 1];
