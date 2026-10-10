@@ -867,3 +867,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **CI:** hosted CI after 4fa89cd still failed 4 shards, all the "chase arm clears terrain" spec (f-bughunt-1090; the earlier skip missed this test). Added the CI skip to it, smoke + project-base green, pushed (no tag). Result pending.
 - **Merged:** f-bluehole-floor2 (Sonnet, ~53 min): root cause was the gallery apron/wall meshes using the shared rock detail map (the squiggle), not terrain; now vertex-colour banded, stepped terraces, reef-shaded Blue Hole minimap. ~+0.3; terraces subtle at gallery range, upper wall flat cream. One-line shader edit (terrain.frag.glsl, skip breakup at contrast 0). Smoke + project-base green on main; no full e2e, no push of this merge, f48 last tag.
 - **Queue:** Codex 1220-1280 (dry until 15 Oct). Next Claude: Endurance sky and minimap, Monterey wall, Challenger seabed. Needs owner: nothing.
+
+## 2026-10-10 14:45 CDT headless run (Claude)
+
+- **Merged:** f-endurance-sky (Sonnet, ~28 min): Endurance sky is now a lit blue-teal water column (no black void, fog haze lifted; Titanic defaults unchanged); minimap drops tilt stripes and shades the ice-scour swells with a hull glyph and sub disc. Clear gain in before/after. Smoke + project-base green on main; no full e2e, no push (f48 last tag; 4 commits since).
+- **Queue:** Codex 1220-1280 (weekly 5%, dry until 15 Oct). Next Claude: Monterey wall silhouette, Challenger seabed; full e2e + push + tag f49 when a few more land. Needs owner: nothing.
