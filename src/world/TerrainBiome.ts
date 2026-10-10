@@ -228,8 +228,11 @@ export const BIOMES: Record<string, Biome> = {
     // Slope relief baked into vertex colour: lighter upslope, faint terraces, no extra geometry.
     vertexTint: challengerSlopeTint,
     scatter: [
-      { kind: 'dropstone', density: 0.4, slopeMaxDeg: 20, on: 'any' },
-      { kind: 'mound', density: 7, slopeMaxDeg: 12, on: 'flat' },
+      // Scattered dropstones and cobbles, a few larger half-buried rocks, and burrow mounds: relief near the lander.
+      { kind: 'dropstone', density: 14, slopeMaxDeg: 24, on: 'any', sizeMul: 2.4 },
+      { kind: 'boulder', density: 1.6, slopeMaxDeg: 25, on: 'any', sizeMul: 1.1 },
+      { kind: 'rubble', density: 24, slopeMaxDeg: 30, on: 'any', sizeMul: 2 },
+      { kind: 'mound', density: 14, slopeMaxDeg: 12, on: 'flat' },
     ],
   },
   // Serpentinite and white carbonate, thin sediment.
