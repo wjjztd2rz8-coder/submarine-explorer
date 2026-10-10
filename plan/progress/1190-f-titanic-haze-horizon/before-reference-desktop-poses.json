@@ -1,0 +1,3202 @@
+{
+  "base": "http://127.0.0.1:4298/",
+  "stamp": "2026-10-09-221156",
+  "mode": "free-dive",
+  "tier": "high",
+  "layouts": [
+    {
+      "name": "desktop",
+      "width": 1600,
+      "height": 900
+    }
+  ],
+  "plannedHeroes": [
+    ["titanic", "bow-hull"],
+    ["lost-city", "poseidon-tower"],
+    [
+      "great-blue-hole",
+      "karst-grotto",
+      "great-blue-hole",
+      {
+        "direction": [1, 0, 0],
+        "above": 5,
+        "close": {
+          "range": 36,
+          "above": 9,
+          "lateral": 10
+        }
+      }
+    ],
+    [
+      "great-blue-hole",
+      "karst-grotto-east",
+      "great-blue-hole-east",
+      {
+        "direction": [-0.544639035, 0, -0.838670568],
+        "above": 5,
+        "approachRange": 55,
+        "target": [0, 6.2, -9],
+        "close": {
+          "range": 42,
+          "above": 6.5,
+          "lateral": 8
+        }
+      }
+    ],
+    ["beebe-vent-field", "beebe-chimney-1"],
+    [
+      "monterey-canyon",
+      "canyon-wall-ledge",
+      "monterey-canyon",
+      {
+        "direction": [0, 0, 1],
+        "above": 26,
+        "approachRange": 75,
+        "target": [0, 26, -12],
+        "close": {
+          "range": 48,
+          "above": 26,
+          "lateral": 12
+        }
+      }
+    ],
+    ["challenger-deep", "leggo-lander-marker"],
+    ["endurance", "main-hull"]
+  ],
+  "complete": true,
+  "failures": [],
+  "captures": [
+    {
+      "site": "titanic",
+      "heroId": "bow-hull",
+      "filename": "titanic-1.png",
+      "range": null,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 2272,
+      "frameTimes": {
+        "medianMs": 16.699999999999818,
+        "maxMs": 16.700000000000273,
+        "samples": [
+          16.700000000000273, 16.59999999999991, 16.699999999999818, 16.700000000000273,
+          16.699999999999818, 16.59999999999991, 16.700000000000273
+        ]
+      },
+      "position": [336.1257046335893, -3777.4736582986575, -292.8164161227348],
+      "yaw": -1.3962634015954667,
+      "pitch": 0,
+      "camera": [399.76278905637935, -3754.174747725535, -222.4496466056373],
+      "view": "chase",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": 0,
+      "drawCalls": 82,
+      "triangles": 941429,
+      "terrain": {
+        "chunks": 81,
+        "vertices": 2771892,
+        "triangles": 5484006,
+        "visibleChunks": 24,
+        "drawnTriangles": 500352,
+        "lodCounts": [4, 7, 13],
+        "subdiv": 3,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 179,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "titanic",
+      "heroId": "bow-hull",
+      "filename": "titanic-2.png",
+      "range": 40,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 2272,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 16.799999999999272,
+        "samples": [
+          16.799999999999272, 16.599999999998545, 16.600000000002183, 16.700000000000728,
+          16.69999999999709, 16.700000000000728, 16.600000000002183
+        ]
+      },
+      "position": [336.83535879670933, -3787.264713024235, -345.8730906206479],
+      "yaw": -2.356194490192345,
+      "pitch": -0.2055022867438315,
+      "camera": [327.9514537828495, -3785.7975854192077, -336.98918560678806],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -0.250407135995292,
+      "drawCalls": 65,
+      "triangles": 766667,
+      "terrain": {
+        "chunks": 81,
+        "vertices": 2771892,
+        "triangles": 5484006,
+        "visibleChunks": 25,
+        "drawnTriangles": 367508,
+        "lodCounts": [2, 8, 15],
+        "subdiv": 3,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 179,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "titanic",
+      "heroId": "bow-hull",
+      "filename": "titanic-3.png",
+      "range": 15,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 2272,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 16.700000000004366,
+        "samples": [
+          16.599999999998545, 16.700000000004366, 16.69999999999709, 16.69999999999709,
+          16.60000000000582, 16.69999999999709, 16.69999999999709
+        ]
+      },
+      "position": [319.1576892670456, -3787.344546294849, -328.19542109098415],
+      "yaw": -2.356194490192345,
+      "pitch": -0.5032506256850777,
+      "camera": [310.3603357095158, -3789.6277766309377, -319.39806753345437],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -1.2053230475058947,
+      "drawCalls": 40,
+      "triangles": 634745,
+      "terrain": {
+        "chunks": 81,
+        "vertices": 2771892,
+        "triangles": 5484006,
+        "visibleChunks": 4,
+        "drawnTriangles": 244992,
+        "lodCounts": [3, 1, 0],
+        "subdiv": 3,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 179,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "lost-city",
+      "heroId": "poseidon-tower",
+      "filename": "lost-city-1.png",
+      "range": null,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 7561,
+      "frameTimes": {
+        "medianMs": 16.699999999999818,
+        "maxMs": 16.699999999999818,
+        "samples": [
+          16.699999999999818, 16.699999999999818, 16.600000000000364, 16.699999999999818,
+          16.699999999999818, 16.600000000000364, 16.699999999999818
+        ]
+      },
+      "position": [41.37717819694599, -783.3449510228534, -939.1586039298085],
+      "yaw": 0.9599310885968819,
+      "pitch": 0,
+      "camera": [-1.340204754487786, -764.2915265349982, -921.4896421870757],
+      "view": "chase",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": 0,
+      "drawCalls": 89,
+      "triangles": 974166,
+      "terrain": {
+        "chunks": 90,
+        "vertices": 627570,
+        "triangles": 1229904,
+        "visibleChunks": 36,
+        "drawnTriangles": 281612,
+        "lodCounts": [15, 20, 1],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 81,
+          "8": 9
+        }
+      },
+      "heroGeometry": [
+        {
+          "id": "poseidon-tower",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 196596,
+              "instances": 1
+            },
+            {
+              "name": "poseidon-base-corals",
+              "vertices": 1080,
+              "instances": 24
+            },
+            {
+              "name": "poseidon-base-anemones",
+              "vertices": 452,
+              "instances": 9
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 576,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 101.390625
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 298.1875
+        }
+      ]
+    },
+    {
+      "site": "lost-city",
+      "heroId": "poseidon-tower",
+      "filename": "lost-city-2.png",
+      "range": 40,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 7561,
+      "frameTimes": {
+        "medianMs": 16.700000000000728,
+        "maxMs": 99.89999999999782,
+        "samples": [
+          99.89999999999782, 16.700000000000728, 16.700000000000728, 16.700000000000728,
+          16.599999999998545, 16.599999999998545, 16.700000000000728
+        ]
+      },
+      "position": [96.5315071294967, -762.8027529645364, -994.3129328623592],
+      "yaw": -2.356194490192345,
+      "pitch": -0.2811202300370722,
+      "camera": [87.59461690997036, -762.2889568879955, -985.3760426428328],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -0.2439411423872942,
+      "drawCalls": 61,
+      "triangles": 867354,
+      "terrain": {
+        "chunks": 90,
+        "vertices": 627570,
+        "triangles": 1229904,
+        "visibleChunks": 31,
+        "drawnTriangles": 268720,
+        "lodCounts": [13, 14, 4],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 81,
+          "8": 9
+        }
+      },
+      "heroGeometry": [
+        {
+          "id": "poseidon-tower",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 196596,
+              "instances": 1
+            },
+            {
+              "name": "poseidon-base-corals",
+              "vertices": 1080,
+              "instances": 24
+            },
+            {
+              "name": "poseidon-base-anemones",
+              "vertices": 452,
+              "instances": 9
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 576,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 298.1875
+        }
+      ]
+    },
+    {
+      "site": "lost-city",
+      "heroId": "poseidon-tower",
+      "filename": "lost-city-3.png",
+      "range": 30,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 7561,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 16.700000000004366,
+        "samples": [
+          16.69999999999709, 16.700000000004366, 16.69999999999709, 16.599999999998545,
+          16.599999999998545, 16.700000000004366, 16.69999999999709
+        ]
+      },
+      "position": [89.46043931763123, -768.5615731788582, -987.2418650504937],
+      "yaw": -2.356194490192346,
+      "pitch": -0.19071632627947574,
+      "camera": [80.59284403753645, -766.9088457673105, -978.374269770399],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -0.3860677795557067,
+      "drawCalls": 60,
+      "triangles": 867354,
+      "terrain": {
+        "chunks": 90,
+        "vertices": 627570,
+        "triangles": 1229904,
+        "visibleChunks": 31,
+        "drawnTriangles": 268720,
+        "lodCounts": [13, 14, 4],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 81,
+          "8": 9
+        }
+      },
+      "heroGeometry": [
+        {
+          "id": "poseidon-tower",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 196596,
+              "instances": 1
+            },
+            {
+              "name": "poseidon-base-corals",
+              "vertices": 1080,
+              "instances": 24
+            },
+            {
+              "name": "poseidon-base-anemones",
+              "vertices": 452,
+              "instances": 9
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 576,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 101.390625
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 298.1875
+        }
+      ]
+    },
+    {
+      "site": "great-blue-hole",
+      "heroId": "karst-grotto",
+      "filename": "great-blue-hole-1.png",
+      "range": null,
+      "captureMethod": "cdp-viewport",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 7751,
+      "frameTimes": {
+        "medianMs": 16.699999999999818,
+        "maxMs": 549.8999999999996,
+        "samples": [
+          16.599999999999454, 16.700000000000728, 33.399999999999636, 16.600000000000364,
+          16.699999999999818, 16.699999999999818, 549.8999999999996
+        ]
+      },
+      "position": [-244.06162328324268, -54.62596131269206, 25.908738271603568],
+      "yaw": -0.7853981633974536,
+      "pitch": 0,
+      "camera": [-188.2433621172442, -2, 81.72699943760148],
+      "view": "chase",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": 0,
+      "drawCalls": 80,
+      "triangles": 1058518,
+      "terrain": {
+        "chunks": 144,
+        "vertices": 1718274,
+        "triangles": 3385480,
+        "visibleChunks": 36,
+        "drawnTriangles": 719360,
+        "lodCounts": [15, 5, 16],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 138,
+          "32": 6
+        }
+      },
+      "heroGeometry": [
+        {
+          "id": "karst-grotto",
+          "meshes": [
+            {
+              "name": "grotto-overhang",
+              "vertices": 11167,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 1870,
+              "instances": 1
+            },
+            {
+              "name": "fallen-blocks",
+              "vertices": 92,
+              "instances": 120
+            },
+            {
+              "name": "stalactite-gallery",
+              "vertices": 34020,
+              "instances": 1
+            },
+            {
+              "name": "sponges",
+              "vertices": 24,
+              "instances": 12
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 5364,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "karst-grotto-east",
+          "meshes": [
+            {
+              "name": "grotto-overhang",
+              "vertices": 8381,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 1360,
+              "instances": 1
+            },
+            {
+              "name": "fallen-blocks",
+              "vertices": 92,
+              "instances": 120
+            },
+            {
+              "name": "stalactite-gallery",
+              "vertices": 44100,
+              "instances": 1
+            },
+            {
+              "name": "sponges",
+              "vertices": 24,
+              "instances": 12
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 4320,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "great-blue-hole",
+      "heroId": "karst-grotto",
+      "filename": "great-blue-hole-2.png",
+      "range": 40,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 7751,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 33.299999999995634,
+        "samples": [
+          33.299999999995634, 16.700000000004366, 16.69999999999709, 16.700000000004366,
+          16.599999999998545, 16.69999999999709, 16.599999999998545
+        ]
+      },
+      "position": [-274.7723014018978, -27.634917741236812, -44.80193984705082],
+      "yaw": -1.5707963267948966,
+      "pitch": -0.17008237792405861,
+      "camera": [-287.27620547767424, -25.7237969015772, -44.80193984705082],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -0.25277779693590685,
+      "drawCalls": 74,
+      "triangles": 1052736,
+      "terrain": {
+        "chunks": 144,
+        "vertices": 1718274,
+        "triangles": 3385480,
+        "visibleChunks": 45,
+        "drawnTriangles": 737156,
+        "lodCounts": [20, 6, 19],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 138,
+          "32": 6
+        }
+      },
+      "heroGeometry": [
+        {
+          "id": "karst-grotto",
+          "meshes": [
+            {
+              "name": "grotto-overhang",
+              "vertices": 11167,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 1870,
+              "instances": 1
+            },
+            {
+              "name": "fallen-blocks",
+              "vertices": 92,
+              "instances": 120
+            },
+            {
+              "name": "stalactite-gallery",
+              "vertices": 34020,
+              "instances": 1
+            },
+            {
+              "name": "sponges",
+              "vertices": 24,
+              "instances": 12
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 5364,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "karst-grotto-east",
+          "meshes": [
+            {
+              "name": "grotto-overhang",
+              "vertices": 8381,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 1360,
+              "instances": 1
+            },
+            {
+              "name": "fallen-blocks",
+              "vertices": 92,
+              "instances": 120
+            },
+            {
+              "name": "stalactite-gallery",
+              "vertices": 44100,
+              "instances": 1
+            },
+            {
+              "name": "sponges",
+              "vertices": 24,
+              "instances": 12
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 4320,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "great-blue-hole",
+      "heroId": "karst-grotto",
+      "filename": "great-blue-hole-3.png",
+      "range": 36,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 7751,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 16.700000000004366,
+        "samples": [
+          16.69999999999709, 16.700000000004366, 16.599999999998545, 16.69999999999709,
+          16.599999999998545, 16.700000000004366, 16.69999999999709
+        ]
+      },
+      "position": [-275.503504745928, -23.89319758218449, -35.30935764448137],
+      "yaw": -1.299849476456476,
+      "pitch": -0.29323120804375535,
+      "camera": [-287.6861932956664, -23.53250211487102, -38.69343779718648],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -0.24219721426626054,
+      "drawCalls": 68,
+      "triangles": 1047068,
+      "terrain": {
+        "chunks": 144,
+        "vertices": 1718274,
+        "triangles": 3385480,
+        "visibleChunks": 39,
+        "drawnTriangles": 731008,
+        "lodCounts": [16, 6, 17],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 138,
+          "32": 6
+        }
+      },
+      "heroGeometry": [
+        {
+          "id": "karst-grotto",
+          "meshes": [
+            {
+              "name": "grotto-overhang",
+              "vertices": 11167,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 1870,
+              "instances": 1
+            },
+            {
+              "name": "fallen-blocks",
+              "vertices": 92,
+              "instances": 120
+            },
+            {
+              "name": "stalactite-gallery",
+              "vertices": 34020,
+              "instances": 1
+            },
+            {
+              "name": "sponges",
+              "vertices": 24,
+              "instances": 12
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 5364,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "karst-grotto-east",
+          "meshes": [
+            {
+              "name": "grotto-overhang",
+              "vertices": 8381,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 1360,
+              "instances": 1
+            },
+            {
+              "name": "fallen-blocks",
+              "vertices": 92,
+              "instances": 120
+            },
+            {
+              "name": "stalactite-gallery",
+              "vertices": 44100,
+              "instances": 1
+            },
+            {
+              "name": "sponges",
+              "vertices": 24,
+              "instances": 12
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 4320,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "great-blue-hole-east",
+      "heroId": "karst-grotto-east",
+      "filename": "great-blue-hole-east-2.png",
+      "range": 55,
+      "captureMethod": "cdp-viewport",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 7732,
+      "frameTimes": {
+        "medianMs": 16.700000000000728,
+        "maxMs": 499.89999999999964,
+        "samples": [
+          50.100000000000364, 33.30000000000018, 16.599999999999454, 16.700000000000728,
+          16.699999999999818, 16.699999999999818, 499.89999999999964
+        ]
+      },
+      "position": [-109.39275210870463, -34.558028028162646, 31.767543801255464],
+      "yaw": 2.5656340004739917,
+      "pitch": 0.02181472074807582,
+      "camera": [-102.90615955546114, -30.297223867498676, 41.75602040946128],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -0.16859682723345581,
+      "drawCalls": 93,
+      "triangles": 845446,
+      "terrain": {
+        "chunks": 144,
+        "vertices": 1718274,
+        "triangles": 3385480,
+        "visibleChunks": 64,
+        "drawnTriangles": 560354,
+        "lodCounts": [35, 10, 19],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 138,
+          "32": 6
+        }
+      },
+      "heroGeometry": [
+        {
+          "id": "karst-grotto",
+          "meshes": [
+            {
+              "name": "grotto-overhang",
+              "vertices": 11167,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 1870,
+              "instances": 1
+            },
+            {
+              "name": "fallen-blocks",
+              "vertices": 92,
+              "instances": 120
+            },
+            {
+              "name": "stalactite-gallery",
+              "vertices": 34020,
+              "instances": 1
+            },
+            {
+              "name": "sponges",
+              "vertices": 24,
+              "instances": 12
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 5364,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "karst-grotto-east",
+          "meshes": [
+            {
+              "name": "grotto-overhang",
+              "vertices": 8381,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 1360,
+              "instances": 1
+            },
+            {
+              "name": "fallen-blocks",
+              "vertices": 92,
+              "instances": 120
+            },
+            {
+              "name": "stalactite-gallery",
+              "vertices": 44100,
+              "instances": 1
+            },
+            {
+              "name": "sponges",
+              "vertices": 24,
+              "instances": 12
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 4320,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 101.390625
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "great-blue-hole-east",
+      "heroId": "karst-grotto-east",
+      "filename": "great-blue-hole-east-3.png",
+      "range": 42,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 7732,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 33.299999999995634,
+        "samples": [
+          16.599999999998545, 16.69999999999709, 16.599999999998545, 16.700000000004366,
+          16.599999999998545, 16.80000000000291, 33.299999999995634
+        ]
+      },
+      "position": [-95.60308010970463, -33.058028028162646, 38.31314890525546],
+      "yaw": 2.753855505778762,
+      "pitch": -0.0071427356694133345,
+      "camera": [-91.05525929124705, -29.143842164283548, 49.44851934481484],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -0.23483062621484274,
+      "drawCalls": 95,
+      "triangles": 856212,
+      "terrain": {
+        "chunks": 144,
+        "vertices": 1718274,
+        "triangles": 3385480,
+        "visibleChunks": 66,
+        "drawnTriangles": 560234,
+        "lodCounts": [36, 11, 19],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 138,
+          "32": 6
+        }
+      },
+      "heroGeometry": [
+        {
+          "id": "karst-grotto",
+          "meshes": [
+            {
+              "name": "grotto-overhang",
+              "vertices": 11167,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 1870,
+              "instances": 1
+            },
+            {
+              "name": "fallen-blocks",
+              "vertices": 92,
+              "instances": 120
+            },
+            {
+              "name": "stalactite-gallery",
+              "vertices": 34020,
+              "instances": 1
+            },
+            {
+              "name": "sponges",
+              "vertices": 24,
+              "instances": 12
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 5364,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "karst-grotto-east",
+          "meshes": [
+            {
+              "name": "grotto-overhang",
+              "vertices": 8381,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 1360,
+              "instances": 1
+            },
+            {
+              "name": "fallen-blocks",
+              "vertices": 92,
+              "instances": 120
+            },
+            {
+              "name": "stalactite-gallery",
+              "vertices": 44100,
+              "instances": 1
+            },
+            {
+              "name": "sponges",
+              "vertices": 24,
+              "instances": 12
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 4320,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 101.390625
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "beebe-vent-field",
+      "heroId": "beebe-chimney-1",
+      "filename": "beebe-vent-field-1.png",
+      "range": null,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 4890,
+      "frameTimes": {
+        "medianMs": 16.699999999999818,
+        "maxMs": 16.799999999999272,
+        "samples": [
+          16.700000000000728, 16.599999999999454, 16.699999999999818, 16.600000000000364,
+          16.600000000000364, 16.799999999999272, 16.700000000000728
+        ]
+      },
+      "position": [10.007403608846598, -4967.392968197, -87.70518834554093],
+      "yaw": 3.0717794835100207,
+      "pitch": 0,
+      "camera": [31.35108454729356, -4954.054768122499, -135.48112059987105],
+      "view": "chase",
+      "tier": "high",
+      "hull": "C",
+      "failedProps": 0,
+      "lookElevation": 0,
+      "drawCalls": 84,
+      "triangles": 970515,
+      "terrain": {
+        "chunks": 90,
+        "vertices": 2931408,
+        "triangles": 5798004,
+        "visibleChunks": 33,
+        "drawnTriangles": 524580,
+        "lodCounts": [4, 7, 22],
+        "subdiv": 3,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [
+        {
+          "id": "beebe-chimney-1",
+          "meshes": [
+            {
+              "name": "smoker-body",
+              "vertices": 46476,
+              "instances": 1
+            },
+            {
+              "name": "beebe-orifices",
+              "vertices": 432,
+              "instances": 1
+            },
+            {
+              "name": "beebe-side-collars",
+              "vertices": 594,
+              "instances": 1
+            },
+            {
+              "name": "shrimp",
+              "vertices": 60,
+              "instances": 1440
+            },
+            {
+              "name": "sulfide-talus",
+              "vertices": 42,
+              "instances": 80
+            },
+            {
+              "name": "bacterial-mats",
+              "vertices": 14,
+              "instances": 16
+            },
+            {
+              "name": "beebe-mineral-seabed",
+              "vertices": 5329,
+              "instances": 1
+            },
+            {
+              "name": "beebe-seabed-talus",
+              "vertices": 22680,
+              "instances": 1
+            },
+            {
+              "name": "beebe-flow-habitat",
+              "vertices": 27360,
+              "instances": 1
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 468,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 101.390625
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 302.1875
+        }
+      ]
+    },
+    {
+      "site": "beebe-vent-field",
+      "heroId": "beebe-chimney-1",
+      "filename": "beebe-vent-field-2.png",
+      "range": 40,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 4890,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 16.700000000000728,
+        "samples": [
+          16.600000000002183, 16.69999999999709, 16.600000000002183, 16.700000000000728,
+          16.69999999999709, 16.600000000002183, 16.700000000000728
+        ]
+      },
+      "position": [64.31866718801567, -4967.856059080448, -34.29482554757174],
+      "yaw": -2.094395102393196,
+      "pitch": -0.3468998753461086,
+      "camera": [53.367680136657945, -4968.174142090568, -27.972270225578242],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "C",
+      "failedProps": 0,
+      "lookElevation": -0.2368383507472154,
+      "drawCalls": 66,
+      "triangles": 990086,
+      "terrain": {
+        "chunks": 90,
+        "vertices": 2931408,
+        "triangles": 5798004,
+        "visibleChunks": 28,
+        "drawnTriangles": 567184,
+        "lodCounts": [5, 6, 17],
+        "subdiv": 3,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [
+        {
+          "id": "beebe-chimney-1",
+          "meshes": [
+            {
+              "name": "smoker-body",
+              "vertices": 46476,
+              "instances": 1
+            },
+            {
+              "name": "beebe-orifices",
+              "vertices": 432,
+              "instances": 1
+            },
+            {
+              "name": "beebe-side-collars",
+              "vertices": 594,
+              "instances": 1
+            },
+            {
+              "name": "shrimp",
+              "vertices": 60,
+              "instances": 1440
+            },
+            {
+              "name": "sulfide-talus",
+              "vertices": 42,
+              "instances": 80
+            },
+            {
+              "name": "bacterial-mats",
+              "vertices": 14,
+              "instances": 16
+            },
+            {
+              "name": "beebe-mineral-seabed",
+              "vertices": 5329,
+              "instances": 1
+            },
+            {
+              "name": "beebe-seabed-talus",
+              "vertices": 22680,
+              "instances": 1
+            },
+            {
+              "name": "beebe-flow-habitat",
+              "vertices": 27360,
+              "instances": 1
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 468,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 101.390625
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 302.1875
+        }
+      ]
+    },
+    {
+      "site": "beebe-vent-field",
+      "heroId": "beebe-chimney-1",
+      "filename": "beebe-vent-field-3.png",
+      "range": 30,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 4890,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 33.400000000001455,
+        "samples": [
+          33.400000000001455, 16.599999999998545, 16.69999999999709, 16.700000000004366,
+          16.599999999998545, 16.69999999999709, 16.700000000004366
+        ]
+      },
+      "position": [55.65841315017128, -4969.006869705447, -29.294825547571733],
+      "yaw": -2.094395102393196,
+      "pitch": -0.41757352783809953,
+      "camera": [44.75421564639946, -4970.217091061913, -22.99928418347222],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "C",
+      "failedProps": 0,
+      "lookElevation": -0.3451086930608124,
+      "drawCalls": 58,
+      "triangles": 959594,
+      "terrain": {
+        "chunks": 90,
+        "vertices": 2931408,
+        "triangles": 5798004,
+        "visibleChunks": 22,
+        "drawnTriangles": 546432,
+        "lodCounts": [5, 6, 11],
+        "subdiv": 3,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [
+        {
+          "id": "beebe-chimney-1",
+          "meshes": [
+            {
+              "name": "smoker-body",
+              "vertices": 46476,
+              "instances": 1
+            },
+            {
+              "name": "beebe-orifices",
+              "vertices": 432,
+              "instances": 1
+            },
+            {
+              "name": "beebe-side-collars",
+              "vertices": 594,
+              "instances": 1
+            },
+            {
+              "name": "shrimp",
+              "vertices": 60,
+              "instances": 1440
+            },
+            {
+              "name": "sulfide-talus",
+              "vertices": 42,
+              "instances": 80
+            },
+            {
+              "name": "bacterial-mats",
+              "vertices": 14,
+              "instances": 16
+            },
+            {
+              "name": "beebe-mineral-seabed",
+              "vertices": 5329,
+              "instances": 1
+            },
+            {
+              "name": "beebe-seabed-talus",
+              "vertices": 22680,
+              "instances": 1
+            },
+            {
+              "name": "beebe-flow-habitat",
+              "vertices": 27360,
+              "instances": 1
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 468,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 101.390625
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 302.1875
+        }
+      ]
+    },
+    {
+      "site": "monterey-canyon",
+      "heroId": "canyon-wall-ledge",
+      "filename": "monterey-canyon-1.png",
+      "range": null,
+      "captureMethod": "cdp-viewport",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 7921,
+      "frameTimes": {
+        "medianMs": 16.699999999999818,
+        "maxMs": 16.699999999999818,
+        "samples": [
+          16.699999999999818, 16.699999999999818, 16.600000000000364, 16.699999999999818,
+          16.699999999999818, 16.600000000000364, 16.699999999999818
+        ]
+      },
+      "position": [-3400.927430367679, -722.5763761897639, -1303.937319305734],
+      "yaw": 0.10471975511965992,
+      "pitch": 0,
+      "camera": [-3397.9765283904685, -699.0514705720942, -1244.4909485737824],
+      "view": "chase",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": 0,
+      "drawCalls": 133,
+      "triangles": 2462624,
+      "terrain": {
+        "chunks": 190,
+        "vertices": 2610140,
+        "triangles": 5136368,
+        "visibleChunks": 52,
+        "drawnTriangles": 579944,
+        "lodCounts": [15, 8, 29],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 164,
+          "8": 26
+        }
+      },
+      "heroGeometry": [
+        {
+          "id": "canyon-wall-ledge",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 87393,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 5270,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 37
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 26
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 27
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 912,
+              "instances": 39
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 864,
+              "instances": 31
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7488,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "canyon-wall-east",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 146965,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 16133,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 21
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 28
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 41
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 936,
+              "instances": 34
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 960,
+              "instances": 36
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7416,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "canyon-wall-west",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 146965,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 14586,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 40
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 25
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 25
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 744,
+              "instances": 30
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 960,
+              "instances": 40
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7704,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "canyon-wall-far",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 146965,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 16133,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 21
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 34
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 35
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 960,
+              "instances": 42
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 912,
+              "instances": 28
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7452,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 297.1875
+        }
+      ]
+    },
+    {
+      "site": "monterey-canyon",
+      "heroId": "canyon-wall-ledge",
+      "filename": "monterey-canyon-2.png",
+      "range": 75,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 7921,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 16.80000000000291,
+        "samples": [
+          16.599999999998545, 16.80000000000291, 16.5, 16.69999999999709, 16.700000000004366,
+          16.69999999999709, 16.599999999998545
+        ]
+      },
+      "position": [-3400.927430367679, -719.41579069787, -1271.837559250192],
+      "yaw": 0,
+      "pitch": 0,
+      "camera": [-3400.927430367679, -715.41579069787, -1283.837559250192],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -0.11528536721242177,
+      "drawCalls": 118,
+      "triangles": 2450334,
+      "terrain": {
+        "chunks": 190,
+        "vertices": 2610140,
+        "triangles": 5136368,
+        "visibleChunks": 52,
+        "drawnTriangles": 578688,
+        "lodCounts": [15, 9, 28],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 164,
+          "8": 26
+        }
+      },
+      "heroGeometry": [
+        {
+          "id": "canyon-wall-ledge",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 87393,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 5270,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 37
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 26
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 27
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 912,
+              "instances": 39
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 864,
+              "instances": 31
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7488,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "canyon-wall-east",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 146965,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 16133,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 21
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 28
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 41
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 936,
+              "instances": 34
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 960,
+              "instances": 36
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7416,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "canyon-wall-west",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 146965,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 14586,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 40
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 25
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 25
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 744,
+              "instances": 30
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 960,
+              "instances": 40
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7704,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "canyon-wall-far",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 146965,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 16133,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 21
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 34
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 35
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 960,
+              "instances": 42
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 912,
+              "instances": 28
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7452,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 297.1875
+        }
+      ]
+    },
+    {
+      "site": "monterey-canyon",
+      "heroId": "canyon-wall-ledge",
+      "filename": "monterey-canyon-3.png",
+      "range": 48,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 7921,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 16.69999999999709,
+        "samples": [
+          16.69999999999709, 16.60000000000582, 16.69999999999709, 16.69999999999709,
+          16.60000000000582, 16.69999999999709, 16.59999999999127
+        ]
+      },
+      "position": [-3412.927430367679, -719.41579069787, -1298.837559250192],
+      "yaw": 0.24497866312686414,
+      "pitch": 0,
+      "camera": [-3410.017002867243, -715.41579069787, -1310.479269251936],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -0.19332515476613546,
+      "drawCalls": 118,
+      "triangles": 2476254,
+      "terrain": {
+        "chunks": 190,
+        "vertices": 2610140,
+        "triangles": 5136368,
+        "visibleChunks": 52,
+        "drawnTriangles": 604624,
+        "lodCounts": [15, 7, 30],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024,
+        "subdivisionCounts": {
+          "2": 164,
+          "8": 26
+        }
+      },
+      "heroGeometry": [
+        {
+          "id": "canyon-wall-ledge",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 87393,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 5270,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 37
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 26
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 27
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 912,
+              "instances": 39
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 864,
+              "instances": 31
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7488,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "canyon-wall-east",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 146965,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 16133,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 21
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 28
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 41
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 936,
+              "instances": 34
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 960,
+              "instances": 36
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7416,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "canyon-wall-west",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 146965,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 14586,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 40
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 25
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 25
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 744,
+              "instances": 30
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 960,
+              "instances": 40
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7704,
+              "instances": 1
+            }
+          ]
+        },
+        {
+          "id": "canyon-wall-far",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 146965,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 16133,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 54
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 53
+            },
+            {
+              "name": "wall-sponges-0",
+              "vertices": 36,
+              "instances": 21
+            },
+            {
+              "name": "wall-sponges-1",
+              "vertices": 40,
+              "instances": 34
+            },
+            {
+              "name": "wall-sponges-2",
+              "vertices": 105,
+              "instances": 35
+            },
+            {
+              "name": "wall-corals-0",
+              "vertices": 960,
+              "instances": 42
+            },
+            {
+              "name": "wall-corals-1",
+              "vertices": 912,
+              "instances": 28
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7452,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 234,
+          "height": 297.1875
+        }
+      ]
+    },
+    {
+      "site": "challenger-deep",
+      "heroId": "leggo-lander-marker",
+      "filename": "challenger-deep-1.png",
+      "range": null,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 3779,
+      "frameTimes": {
+        "medianMs": 16.699999999999818,
+        "maxMs": 16.700000000000273,
+        "samples": [
+          16.699999999999818, 16.700000000000273, 16.699999999999818, 16.59999999999991,
+          16.59999999999991, 16.700000000000273, 16.699999999999818
+        ]
+      },
+      "position": [-441.02797646174275, -10903.0613319467, 538.3155180732513],
+      "yaw": -0.6457718232379017,
+      "pitch": 0,
+      "camera": [-425.5033445821644, -10889.392514358275, 581.6300564032157],
+      "view": "chase",
+      "tier": "high",
+      "hull": "C",
+      "failedProps": 0,
+      "lookElevation": 0,
+      "drawCalls": 91,
+      "triangles": 510978,
+      "terrain": {
+        "chunks": 225,
+        "vertices": 3477325,
+        "triangles": 6843200,
+        "visibleChunks": 65,
+        "drawnTriangles": 314112,
+        "lodCounts": [4, 6, 55],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [
+        {
+          "id": "north-wall-scarp",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 13675,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 4107,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 64
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 63
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 63
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7560,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 101.390625
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 230,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "challenger-deep",
+      "heroId": "leggo-lander-marker",
+      "filename": "challenger-deep-2.png",
+      "range": 40,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 3779,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 50,
+        "samples": [
+          50, 16.600000000002183, 16.700000000000728, 16.69999999999709, 16.600000000002183,
+          16.700000000000728, 16.69999999999709
+        ]
+      },
+      "position": [-436.78533577462343, -10908.973272422145, 475.4669340495607],
+      "yaw": -2.356194490192345,
+      "pitch": -0.36609641820717587,
+      "camera": [-445.72081442162886, -10909.534024326127, 484.4024126965661],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "C",
+      "failedProps": 0,
+      "lookElevation": -0.23452069890148544,
+      "drawCalls": 69,
+      "triangles": 401102,
+      "terrain": {
+        "chunks": 225,
+        "vertices": 3477325,
+        "triangles": 6843200,
+        "visibleChunks": 54,
+        "drawnTriangles": 228792,
+        "lodCounts": [2, 7, 45],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [
+        {
+          "id": "north-wall-scarp",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 13675,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 4107,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 64
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 63
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 63
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7560,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 101.390625
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 230,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "challenger-deep",
+      "heroId": "leggo-lander-marker",
+      "filename": "challenger-deep-3.png",
+      "range": 15,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 3779,
+      "frameTimes": {
+        "medianMs": 16.700000000000728,
+        "maxMs": 16.700000000000728,
+        "samples": [
+          16.700000000000728, 16.599999999998545, 16.700000000000728, 16.700000000000728,
+          16.599999999998545, 16.700000000000728, 16.700000000000728
+        ]
+      },
+      "position": [-454.46300530428715, -10909.559906696137, 493.1446035792244],
+      "yaw": -2.356194490192345,
+      "pitch": -0.7769451644103359,
+      "camera": [-462.49653108650887, -10915.120925219102, 501.1781293614461],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "C",
+      "failedProps": 0,
+      "lookElevation": -0.757707377654423,
+      "drawCalls": 17,
+      "triangles": 231834,
+      "terrain": {
+        "chunks": 225,
+        "vertices": 3477325,
+        "triangles": 6843200,
+        "visibleChunks": 2,
+        "drawnTriangles": 67584,
+        "lodCounts": [2, 0, 0],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [
+        {
+          "id": "north-wall-scarp",
+          "meshes": [
+            {
+              "name": "",
+              "vertices": 13675,
+              "instances": 1
+            },
+            {
+              "name": "",
+              "vertices": 4107,
+              "instances": 1
+            },
+            {
+              "name": "boulders-0",
+              "vertices": 92,
+              "instances": 64
+            },
+            {
+              "name": "boulders-1",
+              "vertices": 92,
+              "instances": 63
+            },
+            {
+              "name": "boulders-2",
+              "vertices": 92,
+              "instances": 63
+            },
+            {
+              "name": "geo-impostor",
+              "vertices": 7560,
+              "instances": 1
+            }
+          ]
+        }
+      ],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 101.390625
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 230,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "endurance",
+      "heroId": "main-hull",
+      "filename": "endurance-1.png",
+      "range": null,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 5931,
+      "frameTimes": {
+        "medianMs": 16.699999999999818,
+        "maxMs": 16.700000000000728,
+        "samples": [
+          16.600000000000364, 16.699999999999818, 16.699999999999818, 16.699999999999818,
+          16.600000000000364, 16.599999999999454, 16.700000000000728
+        ]
+      },
+      "position": [-396.79612374913046, -2978.6289523832165, 1054.0090541469992],
+      "yaw": -1.9547687622336636,
+      "pitch": 0,
+      "camera": [-329.0958847747871, -2967.199995912202, 1123.5076627431463],
+      "view": "chase",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": 0,
+      "drawCalls": 103,
+      "triangles": 745139,
+      "terrain": {
+        "chunks": 171,
+        "vertices": 2741101,
+        "triangles": 5395912,
+        "visibleChunks": 50,
+        "drawnTriangles": 438016,
+        "lodCounts": [7, 16, 27],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 190,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "endurance",
+      "heroId": "main-hull",
+      "filename": "endurance-2.png",
+      "range": 40,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 5931,
+      "frameTimes": {
+        "medianMs": 16.69999999999709,
+        "maxMs": 16.700000000000728,
+        "samples": [
+          16.600000000002183, 16.69999999999709, 16.600000000002183, 16.700000000000728,
+          16.69999999999709, 16.700000000000728, 16.600000000002183
+        ]
+      },
+      "position": [-396.22466542277044, -2985.586354372095, 1039.6840345818882],
+      "yaw": -2.356194490192345,
+      "pitch": -0.26921746359433923,
+      "camera": [-405.15659830264354, -2984.922163090246, 1048.6159674617613],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -0.2450824807976533,
+      "drawCalls": 92,
+      "triangles": 771543,
+      "terrain": {
+        "chunks": 171,
+        "vertices": 2741101,
+        "triangles": 5395912,
+        "visibleChunks": 54,
+        "drawnTriangles": 486528,
+        "lodCounts": [9, 14, 31],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 101.390625
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 190,
+          "height": 303.1875
+        }
+      ]
+    },
+    {
+      "site": "endurance",
+      "heroId": "main-hull",
+      "filename": "endurance-3.png",
+      "range": 15,
+      "captureMethod": "playwright",
+      "layout": "desktop",
+      "viewport": [1600, 900],
+      "loadMs": 5931,
+      "frameTimes": {
+        "medianMs": 16.60000000000582,
+        "maxMs": 16.80000000000291,
+        "samples": [
+          16.69999999999709, 16.60000000000582, 16.69999999999709, 16.599999999998545,
+          16.80000000000291, 16.599999999998545, 16.599999999998545
+        ]
+      },
+      "position": [-413.90233495243416, -2985.636221458002, 1057.361704111552],
+      "yaw": -2.356194490192345,
+      "pitch": -0.6321748932655165,
+      "camera": [-422.41910676343525, -2989.500053214002, 1065.878475922553],
+      "view": "first-person",
+      "tier": "high",
+      "hull": "B",
+      "failedProps": 0,
+      "lookElevation": -0.9914861925921353,
+      "drawCalls": 43,
+      "triangles": 520609,
+      "terrain": {
+        "chunks": 171,
+        "vertices": 2741101,
+        "triangles": 5395912,
+        "visibleChunks": 7,
+        "drawnTriangles": 236544,
+        "lodCounts": [7, 0, 0],
+        "subdiv": 2,
+        "requestedSubdiv": 3,
+        "tier": "high",
+        "textureSize": 1024
+      },
+      "heroGeometry": [],
+      "hud": [
+        {
+          "selector": ".hud-readouts",
+          "x": 1228,
+          "y": 12,
+          "width": 360,
+          "height": 142
+        },
+        {
+          "selector": ".hud-attribution",
+          "x": 1482.515625,
+          "y": 858,
+          "width": 105.484375,
+          "height": 32
+        },
+        {
+          "selector": ".scan-panel",
+          "x": 650,
+          "y": 135,
+          "width": 300,
+          "height": 98
+        },
+        {
+          "selector": ".sonar",
+          "x": 12,
+          "y": 12,
+          "width": 190,
+          "height": 303.1875
+        }
+      ]
+    }
+  ]
+}

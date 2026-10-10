@@ -1,0 +1,34 @@
+[
+  {
+    "source": "/home/vijay/submarine-explorer/.cache/golden/2026-10-09-221156/titanic-1.png",
+    "copy": "plan/progress/1190-f-titanic-haze-horizon/before-reference-titanic-desktop-high.png",
+    "sha256": "607ed0bc3f41541fcfd61f9358cd29e28e21791d79f647e31bcfccb1c6d5720c",
+    "identical": true,
+    "tier": "high",
+    "layout": "desktop"
+  },
+  {
+    "source": "/home/vijay/submarine-explorer/.cache/golden/2026-10-09-221156/endurance-1.png",
+    "copy": "plan/progress/1190-f-titanic-haze-horizon/before-reference-endurance-desktop-high.png",
+    "sha256": "dfd2730b4ffdc10cdf079a79ee9c285188e8be25303399cbe91831374b8ece48",
+    "identical": true,
+    "tier": "high",
+    "layout": "desktop"
+  },
+  {
+    "source": "/home/vijay/submarine-explorer/.cache/golden/2026-10-09-034952/titanic-portrait-1.png",
+    "copy": "plan/progress/1190-f-titanic-haze-horizon/before-reference-titanic-portrait-low.png",
+    "sha256": "97d1500e444395b07f3226b14bff2aaec4100b79d6efc2bff6cee41bfe04328f",
+    "identical": true,
+    "tier": "low",
+    "layout": "portrait"
+  },
+  {
+    "source": "/home/vijay/submarine-explorer/.cache/golden/2026-10-09-034952/endurance-portrait-1.png",
+    "copy": "plan/progress/1190-f-titanic-haze-horizon/before-reference-endurance-portrait-low.png",
+    "sha256": "beb9454c0c0c7752819660a74def83b45ed2d000687104de59c245a834c843a5",
+    "identical": true,
+    "tier": "low",
+    "layout": "portrait"
+  }
+]

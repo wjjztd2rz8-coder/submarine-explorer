@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
-import { makeConfig } from '../../src/core/Config.js';
+import { ABYSS_HORIZON, makeConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { sampleAtmosphere } from '../../src/render/Atmosphere.js';
 import { mergePresetParams, presetDefaults } from '../../src/world/presets/Presets.js';
@@ -76,6 +76,44 @@ describe('Titanic far-field horizon', () => {
   });
 
   for (const visuals of [false, true]) {
+    it(`adds a dim sediment glow without darkening the previous backdrop (${visuals ? 'post' : 'Low'})`, () => {
+      const { scene, camera, preset, atmo } = setup(true, visuals);
+      const dome = scene.getObjectByName('titanicHorizon') as TitanicHorizon['dome'];
+      const positions = dome.geometry.getAttribute('position');
+      const colors = dome.geometry.getAttribute('color');
+      // Retain the existing geometry/draw budget, including on Low.
+      expect(positions.count).toBe(561);
+      expect(dome.geometry.index!.count).toBe(2880);
+      const previousUpper = new THREE.Color(0x182630);
+      const luminance = (c: THREE.Color) => 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+      const hazeLimit = luminance(new THREE.Color(ABYSS_HORIZON.hazeColor));
+      const ring: number[] = [];
+      for (let i = 0; i < positions.count; i++) {
+        const elevation = positions.getY(i);
+        const color = new THREE.Color().fromBufferAttribute(colors, i);
+        const previous = atmo.fogColor
+          .clone()
+          .lerp(previousUpper, THREE.MathUtils.smoothstep(elevation, 0.2, 0.85));
+        expect(luminance(color)).toBeGreaterThanOrEqual(luminance(previous) - 1e-8);
+        expect(luminance(color)).toBeLessThanOrEqual(hazeLimit + 1e-8);
+        if (elevation > 0.5 && elevation < 0.6) ring.push(luminance(color));
+      }
+      // The gentle, azimuth-varying band peaks below the crown, rather than
+      // filling the upper water with a uniformly bright colour.
+      expect(Math.min(...ring)).toBeGreaterThan(
+        luminance(new THREE.Color(ABYSS_HORIZON.upperColor)),
+      );
+      expect(Math.max(...ring) - Math.min(...ring)).toBeGreaterThan(0.0005);
+      camera.position.y = -950;
+      const partial = sampleAtmosphere(config.water, -950);
+      preset.update(0, { camera, atmo: partial } as PresetFrameContext);
+      expect(partial.fogColor.r).toBeCloseTo(
+        sampleAtmosphere(config.water, -950).fogColor.r * 1.2,
+        7,
+      );
+      preset.exit();
+    });
+
     for (const aspect of [16 / 9, 9 / 16]) {
       it(`matches fully fogged seabed across the horizon (${visuals ? 'post' : 'Low'}, aspect ${aspect})`, () => {
         const { scene, camera, preset, frame } = setup(true, visuals);
