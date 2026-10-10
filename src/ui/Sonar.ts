@@ -156,7 +156,7 @@ export function sonarFlatProfile(actualSpanM: number, viewSpanM: number): SonarF
   const flatness = Math.min(1, Math.max(0, (0.06 - slope) / 0.04));
   const gainBoost =
     flatness > 0 ? 1 + flatness * (Math.min(8, Math.max(1, 0.08 / Math.max(slope, 1e-4))) - 1) : 1;
-  return { flatness, gainBoost, tint: 0.3 * flatness };
+  return { flatness, gainBoost, tint: 0.4 * flatness };
 }
 
 /**
@@ -672,17 +672,22 @@ export class Sonar {
     ctx.setLineDash([]);
     for (const poi of this.pois) {
       const { px, py } = this.project(poi.position.x, poi.position.z);
-      const rad = Math.max(7, poi.radius * pxPerM);
+      const rad = Math.max(11, poi.radius * pxPerM);
       const g = ctx.createRadialGradient(px, py, 0, px, py, rad);
       g.addColorStop(
         0,
-        hc ? `rgba(255,255,255,${0.34 * flat})` : `rgba(255,214,120,${0.3 * flat})`,
+        hc ? `rgba(255,255,255,${0.2 * flat})` : `rgba(255,214,120,${0.16 * flat})`,
       );
       g.addColorStop(1, 'rgba(255,214,120,0)');
       ctx.fillStyle = g;
       ctx.beginPath();
       ctx.arc(px, py, rad, 0, Math.PI * 2);
       ctx.fill();
+      ctx.strokeStyle = hc ? `rgba(255,255,255,${0.55 * flat})` : `rgba(255,214,120,${0.5 * flat})`;
+      ctx.lineWidth = 0.8;
+      ctx.setLineDash([3, 2]);
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
     ctx.restore();
   }
