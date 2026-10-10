@@ -535,7 +535,8 @@ export class Sonar {
         ? latLonToWorld(this.terrain.meta, BLUE_HOLE_LAT, BLUE_HOLE_LON)
         : null;
     // Only where the hole is on this tile (the shared-ramp test uses a synthetic tile elsewhere).
-    const shadeReef = blueHoleCentre !== null && this.terrain.contains(blueHoleCentre.x, blueHoleCentre.z);
+    const shadeReef =
+      blueHoleCentre !== null && this.terrain.contains(blueHoleCentre.x, blueHoleCentre.z);
     for (let py = 0; py < h; py++) {
       for (let px = 0; px < w; px++) {
         const index = py * w + px;
