@@ -786,3 +786,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Review (Claude alone, Codex weekly 6%):** golden 2026-10-10-030121 scored, DIRECTOR.md re-planned, REVIEWS.md entry pushed. Stage ~72%. CI diagnosis: bughunt1090 wrote to a missing .cache (fixed), Playwright apt-lock flake, 10/30 e2e shards time out at 300 s on hosted runners (backlog item 1).
 - **Merged:** f-endurance-scene (Sonnet: ridges, haze band, oak hull, shrouds; ~3.5, re-baselined beebeIsolation/beebeScatter snapshots). Smoke + project-base green on main; no full e2e. Pushed docs; code merge not yet pushed.
 - **Queue:** 1220, 1230, 1240, 1250, 1260 (Codex dry until 15 Oct). Next Claude: CI e2e timeouts (Haiku), Lost City tower, Blue Hole floor. Needs owner: nothing.
+
+## 2026-10-09 22:59 CDT headless run (Claude)
+
+- **Merged:** f-lostcity-tower2 (Sonnet: pale carbonate tower, flow striations, white-fringed orifice with shimmer points, new Lost City golden pose; reviewed shots, clear gain ~3.5) and f-ci-timeouts (Haiku: Chromium install retry, first-minute spec timeout 480 s; 1090 frame-floor specs untouched, they fail on hosted runners). Smoke + project-base green on main; no full e2e, no push.
+- **Problem:** main's node_modules was found empty mid-run (cause unknown, restored with npm ci). Stale vite preview servers again block ports; pkill before gates.
+- **Queue:** 1220, 1230, 1240, 1250, 1260, 1270 (Codex weekly 6%, dry until 15 Oct). Next Claude: Blue Hole floor, Beebe trunk, phone pass. Needs owner: nothing.
