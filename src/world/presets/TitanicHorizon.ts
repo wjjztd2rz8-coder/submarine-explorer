@@ -11,6 +11,10 @@ export interface HorizonLook {
   upperColor?: number;
   hazeColor?: number;
   hazePeakElevation?: number;
+  /** Extra fog brightness at full abyss depth (default ABYSS_HORIZON.fogLift); hue is preserved. */
+  fogLift?: number;
+  /** Share (0..1) of the haze colour mixed into the fog at full abyss depth; default 0 keeps the fog hue. */
+  fogHaze?: number;
 }
 
 export class TitanicHorizon {
@@ -21,6 +25,8 @@ export class TitanicHorizon {
   private readonly weights: Float32Array;
   private readonly upperWeights: Float32Array;
 
+  private readonly fogLift: number;
+  private readonly fogHaze: number;
   private readonly upperWater: THREE.Color;
   private readonly hazeWater: THREE.Color;
 
@@ -28,6 +34,8 @@ export class TitanicHorizon {
     private readonly scene: THREE.Scene,
     look: HorizonLook = {},
   ) {
+    this.fogLift = look.fogLift ?? ABYSS_HORIZON.fogLift;
+    this.fogHaze = look.fogHaze ?? 0;
     this.upperWater =
       look.upperColor === undefined ? UPPER_WATER : new THREE.Color(look.upperColor);
     this.hazeWater = look.hazeColor === undefined ? HAZE_WATER : new THREE.Color(look.hazeColor);
@@ -92,7 +100,8 @@ export class TitanicHorizon {
     // Preserve the fog hue: the shared post pass derives its foreground
     // readability floor from normalized fog RGB. A tint lerp would recolour
     // hull shadows even where distance fog is negligible.
-    atmo.fogColor.multiplyScalar(1 + ABYSS_HORIZON.fogLift * abyss);
+    atmo.fogColor.multiplyScalar(1 + this.fogLift * abyss);
+    if (this.fogHaze > 0) atmo.fogColor.lerp(this.hazeWater, this.fogHaze * abyss);
     // Low skips PresetSystem's visual atmosphere sync; its backdrop/fog still
     // need the same colour, independently of the disabled particle layers.
     if (this.scene.fog instanceof THREE.FogExp2) this.scene.fog.color.copy(atmo.fogColor);
