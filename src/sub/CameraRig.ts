@@ -21,6 +21,12 @@ export interface CameraUpdateOptions {
   velocity?: THREE.Vector3;
 }
 
+/**
+ * Phone landscape: fraction of the frame width the picture slides left so the
+ * hull sits clear of the right-hand PHOTO/SONAR/SCAN thumb zone (F-PHONE-CAMERA).
+ */
+export const PHONE_LANDSCAPE_SHIFT = 0.1;
+
 /** Aim drop (m) at full chase-arm retraction on portrait phones. */
 const PORTRAIT_RETRACTED_AIM_DROP_M = 30;
 
@@ -55,6 +61,7 @@ export class CameraRig {
   private pendingLookAzimuth = 0;
   private pendingLookElevation = 0;
 
+  private phoneLandscape = false;
   private bank = 0;
   /** Mode the camera returns to when photo mode is switched off. */
   private modeBeforeOrbit: CameraMode = 'chase';
@@ -74,6 +81,26 @@ export class CameraRig {
     this.setAspect(aspect);
   }
 
+  /** Phone landscape framing: slide the image left (see {@link PHONE_LANDSCAPE_SHIFT}). */
+  setPhoneLandscape(on: boolean): void {
+    if (on === this.phoneLandscape) return;
+    this.phoneLandscape = on;
+    this.applyViewOffset();
+  }
+
+  private applyViewOffset(): void {
+    const cam = this.camera;
+    if (!this.phoneLandscape) {
+      cam.clearViewOffset();
+      return;
+    }
+    // A window shifted right by `shift` px shows the scene shifted left; a pure
+    // projection offset, so the chase arm, collision and aim are untouched.
+    const w = 1000;
+    const h = w / cam.aspect;
+    cam.setViewOffset(w, h, w * PHONE_LANDSCAPE_SHIFT, 0, w, h);
+  }
+
   setAspect(aspect: number): void {
     this.camera.aspect = aspect;
     // Preserve at least the configured horizontal field of view on portrait
@@ -83,6 +110,7 @@ export class CameraRig {
         Math.atan(Math.tan(THREE.MathUtils.degToRad(this.config.fovDeg / 2)) / Math.min(1, aspect)),
     );
     this.camera.updateProjectionMatrix();
+    if (this.phoneLandscape) this.applyViewOffset();
   }
 
   /** The camera-view key: swap between chase and the first-person viewport. */

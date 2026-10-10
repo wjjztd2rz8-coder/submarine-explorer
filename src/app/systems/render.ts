@@ -26,6 +26,11 @@ export function godRayStrength(base: number, depthM: number): number {
 
 let baseExposure = 1.0;
 
+/** Same test as the phone-landscape HUD CSS: touch mode, short side <= 460 px. */
+function isPhoneLandscape(w: number, h: number): boolean {
+  return document.documentElement.classList.contains('is-touch') && w > h && w <= 900 && h <= 460;
+}
+
 export const renderSystem: GameSystem = {
   name: 'render',
   dispose: () => cleanup.dispose(),
@@ -42,6 +47,7 @@ export const renderSystem: GameSystem = {
       const h = window.innerHeight;
       renderer.setSize(w, h, false);
       rig.setAspect(w / h);
+      rig.setPhoneLandscape(isPhoneLandscape(w, h));
       post.setSize(w * renderer.getPixelRatio(), h * renderer.getPixelRatio());
       // D-INPUT-HUD
       const scale = uiScaleFactors(w, save.get().uiScale);
@@ -49,6 +55,12 @@ export const renderSystem: GameSystem = {
       document.documentElement.style.setProperty('--ui-user-scale', String(scale.user));
     };
     ctx.resize = resize;
+    // Touch mode can switch after the first resize; the HUD class is the source of truth.
+    const touchWatch = new MutationObserver(() =>
+      rig.setPhoneLandscape(isPhoneLandscape(window.innerWidth, window.innerHeight)),
+    );
+    touchWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    cleanup.add(() => touchWatch.disconnect());
     cleanup.listen(window, 'resize', resize);
     resize();
   },

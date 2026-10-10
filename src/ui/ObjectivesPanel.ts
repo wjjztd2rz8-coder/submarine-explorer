@@ -87,6 +87,19 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return e;
 }
 
+/**
+ * Short mission name for phone landscape: drop the subtitle after ':' or ',' and
+ * the "hydrothermal field" qualifier, e.g. "Lost City hydrothermal field dive"
+ * -> "Lost City dive", "Lighthouse Reef: around the Great Blue Hole" -> "Lighthouse Reef".
+ */
+export function phoneMissionTitle(title: string): string {
+  const head = title
+    .split(/[:,]/)[0]!
+    .replace(/ hydrothermal field/i, '')
+    .trim();
+  return head || title;
+}
+
 export class ObjectivesPanel {
   readonly root: HTMLDivElement;
   private readonly titleEl: HTMLSpanElement;
@@ -186,7 +199,12 @@ export class ObjectivesPanel {
   setTitle(title: string): void {
     const text = `MISSION · ${title.toUpperCase()}`;
     // The prefix has its own span so phone landscape can drop it and fit the name.
-    this.titleEl.replaceChildren(el('span', 'obj-title-prefix', 'MISSION · '), title.toUpperCase());
+    // F-PHONE-CAMERA: a shorter phone label (not smaller text) so long names do not ellipsize.
+    this.titleEl.replaceChildren(
+      el('span', 'obj-title-prefix', 'MISSION · '),
+      el('span', 'obj-title-full', title.toUpperCase()),
+      el('span', 'obj-title-short', phoneMissionTitle(title).toUpperCase()),
+    );
     // QA-C #2: long titles are truncated by CSS; the full text stays on hover.
     this.titleEl.title = text;
   }
