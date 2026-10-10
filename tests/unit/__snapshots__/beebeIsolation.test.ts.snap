@@ -102,6 +102,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
         "buffers": [
           {
             "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
+            "color": "3bf37cb4c7543d0a4dd57a698429ff4f4f60a85681cf8b49a39e845e3315e946",
             "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
             "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
             "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
@@ -115,6 +116,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
         "buffers": [
           {
             "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
+            "color": "3d90c81f740920b49b5b99f7067ebb43ba5d8cc9b4c8577da6a68688c3a4f992",
             "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
             "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
             "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
