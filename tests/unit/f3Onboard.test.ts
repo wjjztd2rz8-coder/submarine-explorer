@@ -141,11 +141,26 @@ describe('tutorial progression', () => {
   it('has five steps in the documented order', () => {
     expect(TUTORIAL_STEPS.map((s) => s.id)).toEqual(['move', 'depth', 'lights', 'scan', 'journal']);
   });
-  it('move needs both thrust and turning', () => {
+  it('move completes on sustained thrust alone, without turning', () => {
     const t = new Tutorial();
-    hold(t, { throttle: 1 });
+    hold(t, { throttle: 1 }, 20); // 0.67 s, under MOVE_HOLD_S
     expect(t.step?.id).toBe('move');
-    hold(t, { yaw: -1 });
+    hold(t, { throttle: 1 }, 10); // past 0.8 s
+    expect(t.step?.id).toBe('depth');
+  });
+  it('move completes on a sustained turn alone, without thrust', () => {
+    const t = new Tutorial();
+    hold(t, { yaw: -1 }, 10); // 0.33 s, under TURN_HOLD_S
+    expect(t.step?.id).toBe('move');
+    hold(t, { yaw: -1 }, 10); // past 0.5 s
+    expect(t.step?.id).toBe('depth');
+  });
+  it('short thrust and turn presses do not add up across axes', () => {
+    const t = new Tutorial();
+    hold(t, { yaw: 1 }, 6);
+    hold(t, { throttle: -1 }, 6);
+    expect(t.step?.id).toBe('move'); // alternating short presses do not add up to a hold
+    hold(t, { throttle: -1 }, 30);
     expect(t.step?.id).toBe('depth');
   });
   it('ignores tiny stick drift and zero-length frames', () => {

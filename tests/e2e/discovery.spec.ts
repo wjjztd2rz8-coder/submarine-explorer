@@ -123,7 +123,7 @@ test.describe('B1 scan, discovery, Journal', () => {
     expect(names.filter((n) => n === 'scan:started')).toHaveLength(1);
 
     await expect(page.locator('.scan-panel .scan-kicker')).toHaveText('NEW ENTRY');
-    await expect(page.locator('.scan-panel .scan-name')).toHaveText('The bow section');
+    await expect(page.locator('.scan-panel .scan-name')).toHaveText('Bow section (fixture)');
     await page.screenshot({ path: 'tests/e2e/screenshots/discovery-scan.png' });
 
     const saved = await page.evaluate((k) => localStorage.getItem(k), STORAGE_KEY);
