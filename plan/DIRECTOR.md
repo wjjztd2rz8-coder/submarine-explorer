@@ -10,8 +10,8 @@ Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku sm
 
 1. **Push f48 and confirm hosted CI green (Haiku):** full e2e on main was started 2026-10-10 08:30 (.cache/full-e2e-review.log); if all gates pass push, tag f48, check `gh run list`. If CI still red, read shard logs and lighten specs, never loosen assertions.
 2. **Blue Hole floor and minimap (Sonnet, take a new angle):** floor is a smooth grey ramp and the minimap a flat teal square; tried three times. Use vertex-colour banding plus real terrace geometry (no silt texture), and shade the minimap by depth outside the hole.
-3. **Titanic rusticles (Sonnet):** shrink and thin the orange spikes, vary length, cluster them under rails and edges.
-4. **Beebe main trunk (Sonnet):** side chimneys are crusted; the central trunk is a smooth brown cone, give it the same crust, flange and colour treatment.
+3. (MERGED 2026-10-10 f-rusticles: thin drooping clumps, clear gain) **Titanic rusticles (Sonnet):** shrink and thin the orange spikes, vary length, cluster them under rails and edges.
+4. (MERGED 2026-10-10 f-beebe-trunk: paint ownership bug fixed, ochre crests, modest gain at range; near pose still shows side stack) **Beebe main trunk (Sonnet):** side chimneys are crusted; the central trunk is a smooth brown cone, give it the same crust, flange and colour treatment.
 5. **Endurance sky and minimap (Sonnet):** dark void above the horizon, minimap five stripes; add haze gradient and ice-scour relief on the map.
 6. **Monterey wall silhouette (Sonnet, low):** strata read; the wall outline is stepped slabs, add slump and overhang variation.
 7. **Challenger seabed (Haiku/Sonnet, low):** add scattered rocks and faint slope shading around the lander.

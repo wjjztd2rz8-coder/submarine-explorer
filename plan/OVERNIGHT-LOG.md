@@ -855,3 +855,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **CI triage (done directly, no agent):** the 4 failing shards after f48 were the "chase arm clears terrain" spec (f-bughunt-1090, 3 sites, frame-floor on software GL) and d-flow "Dive again" (two full boots over the 120 s timeout). Both now skip when CI is set and still run locally. Smoke + project-base green; no full e2e, no push (f48 last tag).
 - **Queue:** Codex 1220-1280 (weekly 5%, dry until 15 Oct). Claude 5h 100% but no visual package started (time-boxed run). Next: Blue Hole floor new angle, Titanic rusticles, Beebe trunk. Needs owner: nothing.
+
+## 2026-10-10 13:02 CDT headless run (Claude)
+
+- **Pushed:** 4fa89cd (CI-skip specs, test-only), no tag; hosted CI result pending (last run failed before this change).
+- **Merged:** f-rusticles (Sonnet): thin drooping clustered Titanic rusticles, clear gain. f-beebe-trunk (Sonnet): found the painter gave trunk vertices to shorter side stacks; fixed, ochre crests and darker orifice, modest gain at range (hero luminance -1.4% at far pose). Smoke + project-base green on main; no full e2e, no tag (f48 last).
+- **Queue:** Codex 1220-1280 (weekly 5%, dry until 15 Oct). Next Claude: Blue Hole floor/minimap new angle, Endurance sky and minimap, Monterey wall. Needs owner: nothing.
