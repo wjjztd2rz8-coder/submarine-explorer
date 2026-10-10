@@ -159,5 +159,6 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - Finding: three comprehensive reviews in one day merely re-score the same set; the 8+ merges trigger counts `--merges` including Codex collection merges. Action: none yet; consider requiring a new golden diff or 24 h. Sol skipped at Codex 11% (exit 75, as designed).
 
 ## 2026-10-09 22:30 review
+
 - Hosted CI red had three causes, not one: a unit test writing to a missing `.cache/` (fixed), a Playwright apt-lock flake in project-base, and e2e shard 300 s timeouts. Lesson: read the failing static job first; it was a one-line fix hidden behind "e2e red".
 - Codex weekly at 6% blocks Sol reviews and dispatch until 15 Oct; Claude carries packages.
