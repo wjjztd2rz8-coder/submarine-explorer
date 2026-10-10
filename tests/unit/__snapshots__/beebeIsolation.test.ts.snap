@@ -423,7 +423,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 9,
         "triangles": 95374,
       },
-      "geometry": "9248a63dce927880cbda0644e61b688ac1edb4ed0bc68b35fddbabd43e971ed0",
+      "geometry": "d20b7a1fdc2faecd309597636fcaec22f4107980f1bc1af1b637736f77795902",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
@@ -435,29 +435,29 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
     {
       "budget": {
         "draws": 2,
-        "triangles": 9540,
+        "triangles": 13056,
       },
-      "geometry": "105a8870009302d2e5461c377567a6a946785aeb17578b8a2b4cf876fb03ab11",
+      "geometry": "3e85a0d16ef0a3a9dc7fca219a825c71ac6e01a0a52fdef6545b930af2dd0d2b",
       "id": "beebe-chimney-2",
       "impostor": {
         "draws": 1,
         "triangles": 24,
       },
-      "placement": "86e65a5a1e207c10dd3cd2742094ed8352688974cfa697451dc398a4a02785aa",
+      "placement": "4485c75a519db02dc11a1b0665d855e9bffa3805d67b9d55a51ece66ca22faa5",
       "ventTop": undefined,
     },
     {
       "budget": {
         "draws": 2,
-        "triangles": 9540,
+        "triangles": 12632,
       },
-      "geometry": "1c10937b539f69943f15f83490e49455ac31cf12aa9b4fc663dc776c3311cd0a",
+      "geometry": "518a76fefc2246d5269dce136bb949d7a106a53d8f3afc4d82af0628b61a28d4",
       "id": "beebe-chimney-3",
       "impostor": {
         "draws": 1,
         "triangles": 24,
       },
-      "placement": "e890b63916c01e94082c6cee549f2ba105867b0dca4985d08128aad63f1247ad",
+      "placement": "c7e9b0bd62aa0534a4f2ac65de5d374d0c6f5fb18a2e14d44239ba84d5a2f15e",
       "ventTop": undefined,
     },
   ],
@@ -467,7 +467,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 9,
         "triangles": 17598,
       },
-      "geometry": "36c9899da799b72c09ef20d56654a149f7f22387f0d8c94248d52a4ef66dda8d",
+      "geometry": "340644fd18f0b007f85a645f6f7c318ce79b3db9c52a158a4ae08771b0c85b1c",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
@@ -479,29 +479,29 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
     {
       "budget": {
         "draws": 2,
-        "triangles": 1170,
+        "triangles": 1214,
       },
-      "geometry": "b9b8f1c0544e6f8f9c1597e86b5f9f4d17aa20dfa79473fee7585b45c45fa51b",
+      "geometry": "4dc29c137662f2fcfb7565c896562d0ee3c1ade40636f58786d73dfefe1d2368",
       "id": "beebe-chimney-2",
       "impostor": {
         "draws": 1,
         "triangles": 24,
       },
-      "placement": "9438a17abf573a0c9e1efb8ddc9df76cd04cde88ddcb2d745a7dc1c298c20dd5",
+      "placement": "941d73d4439af2dae20cefd1afba00b9e349c68496912db03bcefa43dce791b4",
       "ventTop": undefined,
     },
     {
       "budget": {
         "draws": 2,
-        "triangles": 1170,
+        "triangles": 1114,
       },
-      "geometry": "f69cc1c74f4faa3b4b750c18ca00f7a2d7601753882f21ecd4b560cae02f3be2",
+      "geometry": "4587bafd5e6eab75a32b3621c6f92245903e20286b0c31b4af515dd223df5a18",
       "id": "beebe-chimney-3",
       "impostor": {
         "draws": 1,
         "triangles": 24,
       },
-      "placement": "b1c789a88c7a28bf54d09e7c79d16cc0d4f021af5b10f2c6097a7dd7ae15eeb9",
+      "placement": "7c59685bc2b63e5bb21e6da48816415f68e078a1d7921071457deb38f7a547cf",
       "ventTop": undefined,
     },
   ],
@@ -511,7 +511,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 9,
         "triangles": 53728,
       },
-      "geometry": "8a08695357b612e26b2894fa9b358ad40a400c7a3d41162532bd70132621c4e1",
+      "geometry": "c58d8f332ed66c0b9cf2b6f0878e63cada4ccab0a11918538582af1809bf0711",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
@@ -523,29 +523,29 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
     {
       "budget": {
         "draws": 2,
-        "triangles": 3800,
+        "triangles": 6252,
       },
-      "geometry": "0e5ea9dc60249f2cfe02c6780d32a590d2a16894e76136cb3a1ca38ec1edb6ee",
+      "geometry": "6e847654b5a3d193ae1f06c394e5cf245d1d6c1b1e91fe0e0dfbabb8fc1554e5",
       "id": "beebe-chimney-2",
       "impostor": {
         "draws": 1,
         "triangles": 24,
       },
-      "placement": "c1d0d7cc44521324bfcc936829f49699d3ce30d2284f2d893ee74d2270c2162d",
+      "placement": "d36a8054d1e5930cb305ce91e660592bb1f34f74d448aa59b7f72be5d9a8861a",
       "ventTop": undefined,
     },
     {
       "budget": {
         "draws": 2,
-        "triangles": 3800,
+        "triangles": 5992,
       },
-      "geometry": "e2cf60661e65cf3770be06812bd678e1a26809ccb65d1e85bd82d9a334f0765f",
+      "geometry": "6eb0c933b5473fbe747d5b11456da09de3805e17ddfb7b11df1a523a255fe340",
       "id": "beebe-chimney-3",
       "impostor": {
         "draws": 1,
         "triangles": 24,
       },
-      "placement": "9b8dc61d8548f48b72c0462baed2fa1fcc8e54eda2878eed628251db8541d0c5",
+      "placement": "620535e93ac6914f32a953fa193d6a41243324b16b75b52fc1b8ba5743b1c6a9",
       "ventTop": undefined,
     },
   ],
@@ -555,7 +555,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 9,
         "triangles": 199172,
       },
-      "geometry": "da962bff66a849c9c2a7f20ecaab43782a12caabde2403dd4850c85bdb7b266a",
+      "geometry": "9130d83e18ebb876dbcab77a51b1eb0df976c286dacdf4b793804b6d56792ce7",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
@@ -567,29 +567,29 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
     {
       "budget": {
         "draws": 2,
-        "triangles": 22860,
+        "triangles": 28696,
       },
-      "geometry": "0641382467c70ece8bea7908ad9df513c6b2c251148812e5cd94848126779144",
+      "geometry": "bacf055874c36d31c5724d60d8c1cd760bc681e2169540e8e9e4879df742f232",
       "id": "beebe-chimney-2",
       "impostor": {
         "draws": 1,
         "triangles": 24,
       },
-      "placement": "ab39e4ab72c53cf3c205a451b0f2b9b8beaa36972b681fc6131cd7947db380e0",
+      "placement": "13375cdea55716c4c7135bf57403f02dbad35d902850f03dc87ef0077d7685c6",
       "ventTop": undefined,
     },
     {
       "budget": {
         "draws": 2,
-        "triangles": 22860,
+        "triangles": 28000,
       },
-      "geometry": "6c6b1764614700ddc766221c21e6cb69c46e04fd6477fb7d30b9e227e689d2e2",
+      "geometry": "bad9a28e75841053848f1de4ada3f72d0fa8a92f3d08327402d425d786711d6d",
       "id": "beebe-chimney-3",
       "impostor": {
         "draws": 1,
         "triangles": 24,
       },
-      "placement": "83bdc2a8fa4798fbda93ebed746446d51783fcf29c149de6d0dbc3a36ab66f0f",
+      "placement": "9e6cfec46e04ea4456d71994c3da052b564bd32933afa49fa288160bd32ab881",
       "ventTop": undefined,
     },
   ],

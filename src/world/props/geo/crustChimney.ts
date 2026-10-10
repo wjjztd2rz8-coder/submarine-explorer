@@ -51,8 +51,8 @@ export function buildCrustedChimney(input: GeoBuildInput): BuiltProp {
     r0,
     topFrac: 0.45,
     seed,
-    segs: dense ? 28 * d.meshDensity + 4 : 12,
-    rings: dense ? (H / 0.32) * d.meshDensity + 6 : H / 0.9 + 3,
+    segs: dense ? 28 * d.meshDensity + 4 : 10,
+    rings: dense ? (H / 0.32) * d.meshDensity + 6 : H / 1.4 + 3,
     crust: v.crust,
     tiers: Math.max(2, Math.round(H / 3.2)),
     ledge: beebe.ledge,
@@ -72,8 +72,10 @@ export function buildCrustedChimney(input: GeoBuildInput): BuiltProp {
   pieces.push(place(paintColumn(trunk, H, seed, seed + 7), lean));
 
   // Partial sulfide shelves, like the hero's, spread up the trunk with jitter.
-  for (let k = 0; k < v.flanges; k++) {
-    const t = 0.2 + ((k + 0.25 * rnd()) / v.flanges) * 0.6;
+  // Low keeps a single coarse shelf: flanges dominate the triangle budget.
+  const flanges = dense ? v.flanges : 1;
+  for (let k = 0; k < flanges; k++) {
+    const t = 0.2 + ((k + 0.25 * rnd()) / flanges) * 0.6;
     const localR = r0 * (1 - 0.55 * t);
     const shelf = flange({
       r0: localR * beebe.shelfRadiusFraction,
@@ -81,7 +83,7 @@ export function buildCrustedChimney(input: GeoBuildInput): BuiltProp {
       arc: beebe.shelfArcMin + rnd() * beebe.shelfArcVariation,
       start: rnd() * Math.PI * 2,
       seed: seed + k * 11,
-      segs: 18 * d.meshDensity,
+      segs: dense ? 18 * d.meshDensity : 6,
     });
     // Seat the shelf on the leaned trunk axis.
     const on = new THREE.Vector3(0, H * t, 0).applyEuler(new THREE.Euler(lean.rx, 0, lean.rz));
@@ -101,8 +103,8 @@ export function buildCrustedChimney(input: GeoBuildInput): BuiltProp {
       r0: r0 * 0.4,
       topFrac: 0.45,
       seed: seed + i * 13 + 5,
-      segs: dense ? 16 * d.meshDensity + 4 : 8,
-      rings: dense ? h / 0.4 + 4 : h / 1.2 + 3,
+      segs: dense ? 16 * d.meshDensity + 4 : 6,
+      rings: dense ? h / 0.4 + 4 : h / 1.6 + 2,
       crust: dense ? 0.8 : 0,
       wobble: 0.2,
       lip: 0.25,
