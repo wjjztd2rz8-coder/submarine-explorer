@@ -6,6 +6,13 @@ import { ABYSS_HORIZON } from '../../core/config/atmosphere.js';
 const UPPER_WATER = new THREE.Color(ABYSS_HORIZON.upperColor);
 const HAZE_WATER = new THREE.Color(ABYSS_HORIZON.hazeColor);
 
+/** Optional per-site grade of the backdrop (Endurance: a paler water band above the seabed). */
+export interface HorizonLook {
+  upperColor?: number;
+  hazeColor?: number;
+  hazePeakElevation?: number;
+}
+
 export class TitanicHorizon {
   readonly dome: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
   private readonly upper = new THREE.Color();
@@ -14,7 +21,17 @@ export class TitanicHorizon {
   private readonly weights: Float32Array;
   private readonly upperWeights: Float32Array;
 
-  constructor(private readonly scene: THREE.Scene) {
+  private readonly upperWater: THREE.Color;
+  private readonly hazeWater: THREE.Color;
+
+  constructor(
+    private readonly scene: THREE.Scene,
+    look: HorizonLook = {},
+  ) {
+    this.upperWater =
+      look.upperColor === undefined ? UPPER_WATER : new THREE.Color(look.upperColor);
+    this.hazeWater = look.hazeColor === undefined ? HAZE_WATER : new THREE.Color(look.hazeColor);
+    const peak = look.hazePeakElevation ?? ABYSS_HORIZON.hazePeakElevation;
     const geometry = new THREE.SphereGeometry(1, 32, 16);
     const position = geometry.getAttribute('position');
     this.weights = new Float32Array(position.count);
@@ -29,15 +46,10 @@ export class TitanicHorizon {
       const glow =
         1 - ABYSS_HORIZON.glowVariation * (0.5 + 0.5 * Math.cos(azimuth * ABYSS_HORIZON.glowLobes));
       this.weights[i] =
-        glow *
-        THREE.MathUtils.smoothstep(
-          elevation,
-          ABYSS_HORIZON.fogMatchElevation,
-          ABYSS_HORIZON.hazePeakElevation,
-        );
+        glow * THREE.MathUtils.smoothstep(elevation, ABYSS_HORIZON.fogMatchElevation, peak);
       this.upperWeights[i] = THREE.MathUtils.smoothstep(
         elevation,
-        ABYSS_HORIZON.hazePeakElevation,
+        peak,
         ABYSS_HORIZON.upperElevation,
       );
     }
@@ -87,8 +99,8 @@ export class TitanicHorizon {
     if (this.scene.background instanceof THREE.Color) this.scene.background.copy(atmo.fogColor);
     this.dome.position.copy(camera.position);
     this.dome.scale.setScalar(camera.far * 0.9);
-    this.upper.copy(atmo.fogColor).lerp(UPPER_WATER, abyss);
-    this.haze.copy(atmo.fogColor).lerp(HAZE_WATER, abyss);
+    this.upper.copy(atmo.fogColor).lerp(this.upperWater, abyss);
+    this.haze.copy(atmo.fogColor).lerp(this.hazeWater, abyss);
     const colors = this.dome.geometry.getAttribute('color');
     for (let i = 0; i < this.weights.length; i++) {
       this.color.copy(atmo.fogColor).lerp(this.haze, this.weights[i]!);

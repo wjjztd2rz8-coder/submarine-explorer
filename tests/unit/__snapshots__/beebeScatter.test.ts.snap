@@ -144,11 +144,11 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "endurance": {
-    "meshes": "f1a8d384323a3230f379f0d2c0b34af134567313cf8b837957c8348c724b4460",
+    "meshes": "d7f6fa0e449237a31156dcc8bbb345941880244453208a8eeb9f6446dfa5a8c6",
     "stats": {
       "cells": 21,
-      "drawCalls": 3,
-      "instances": 116,
+      "drawCalls": 4,
+      "instances": 78,
     },
   },
   "great-blue-hole": {

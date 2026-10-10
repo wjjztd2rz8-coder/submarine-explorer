@@ -131,8 +131,8 @@ export function buildEndurance(
   const wood = new PartBin();
   const fit = new PartBin();
   const dark = new PartBin();
-  const hullC = 0x2c2621; // black paint worn back to dark timber
-  const oak = C.oak;
+  const hullC = 0x453a30; // black paint long gone: weathered grey-brown oak planking
+  const oak = 0x6d5a40; // bleached oak rails, spars and deckhouses
 
   // ---- hull: outer planking, bulwarks' inner faces, deck
   wood.add(loftSides(spec), hullC);
@@ -291,6 +291,42 @@ export function buildEndurance(
     const to = loftPoint(spec, s * k + 2, top(s * k + 2), side, new THREE.Vector3());
     to.x -= side * 0.2;
     catenary(fit, from, to, 0.8, 0.04, 0x2a241c);
+  }
+
+  // Shrouds: each surviving mast stump keeps a pair of stays down to the rail,
+  // and the foremast and mainmast keep a short yard-stub across the top.
+  for (const [s, hh, side] of [
+    [E.foremast, 2.6, 1],
+    [E.foremast, 2.6, -1],
+    [E.mainmast, 3.8, 1],
+    [E.mainmast, 3.8, -1],
+    [E.mizzen, 1.8, 1],
+    [E.mizzen, 1.8, -1],
+  ] as const) {
+    for (const ds of [-1.4, 1.4]) {
+      const from = v3(0, deck(s * k) + (hh - 0.3) * hk, zOf(s * k));
+      const to = loftPoint(spec, s * k + ds, top(s * k + ds), side, new THREE.Vector3());
+      to.x -= side * 0.15;
+      catenary(fit, from, to, 0.25, 0.035, 0x4a3c2c);
+    }
+  }
+  for (const [s, hh] of [
+    [E.foremast, 2.6],
+    [E.mainmast, 3.8],
+  ] as const) {
+    const y = deck(s * k) + (hh - 0.5) * hk;
+    wood.add(beam(v3(-2.6, y, zOf(s * k)), v3(2.6, y - 0.15, zOf(s * k)), 0.1, 0.07, 6), oak);
+  }
+  // Sediment skirt: mud banked against both flanks, thickest at the bow and stern.
+  for (let i = 0; i < 30; i++) {
+    const s = 3 + (i / 29) * (L - 6);
+    for (const side of [-1, 1] as const) {
+      const hw = half(Math.min(L - 0.5, Math.max(0.5, s)), 0.8);
+      const g = normalise(new THREE.SphereGeometry(1, 10, 5, 0, Math.PI * 2, 0, Math.PI / 2));
+      g.scale(0.55 + rnd() * 0.25, 0.16 + rnd() * 0.1, 2.0 + rnd() * 0.6);
+      g.translate(side * (hw + 0.15 + rnd() * 0.2), -0.08, zOf(s));
+      wood.add(g, C.silt);
+    }
   }
 
   // ---- the wheel on the poop: spoked wheel on its box

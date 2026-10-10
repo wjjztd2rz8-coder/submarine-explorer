@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-endurance-scene:** Endurance gets ten low ice-plough ridges 55-170 m out (one unlit vertex-coloured mesh, ~3k triangles, fogged into the water), a paler water band above the horizon (per-site `HorizonLook` on the shared dome; Titanic unchanged), larger dropstones and a few erratic boulders, and a lighter weathered-oak hull with shrouds, yard stubs and a low sediment skirt. Reason: the wreck was small and dark on a flat plain under a featureless void. Two byte-identity snapshots (beebeIsolation, beebeScatter) were re-baselined because the Endurance biome and scatter changed.
+
 - **f-bluehole-overhangs:** Great Blue Hole bowl gains rock-awning "ledge" scatter slabs (dark undersides, a real overhang read a heightfield cannot give), clustered capsule "tube" sponges, denser sponges, and four extra wall notches. Adds two instanced scatter draws at this site only.
 
 - Challenger Deep (f-challenger-lander): the lander marker is now a purpose-built `benthic-lander` geo feature (three legs, yellow flotation, bait cage, mast, orange flag, strobe; 3 draw calls) at 9 m footprint instead of a small orange debris pile, and the trench wall gets baked vertex-colour relief (lighter upslope gradient, faint terraces); opening range 34 -> 30 m. Reason: the lander was unreadable in the opening frame.

@@ -129,7 +129,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
     },
   },
   "endurance": {
-    "biome": "b7b14092d0e8bb48dd41a0ccffe45cc0f610fd15bec42b9edf9a8f52fed67007",
+    "biome": "215d1e68bc867674861f72a8e467a5da9939599d7763cd18dd2fac8656471754",
     "tiers": {
       "high": {
         "buffers": [
