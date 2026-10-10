@@ -21,7 +21,7 @@ The pale tan blobs were not the terrain shader's cobble/stain layer (setting pat
 
 ## Gates
 
-See bottom (filled after tools/gates.sh).
+PW_PORT=4871 tools/gates.sh (smoke + project-base): build, unit, python, content, attribution, prettier, e2e, e2e-base all PASS.
 
 ## Remaining gaps
 
