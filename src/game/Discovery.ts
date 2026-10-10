@@ -201,7 +201,6 @@ export class Discovery {
     if (!poi) return;
     this.stats.noteScan(poi.id, poi.name);
     const entryId = entryIdForPoi(poi, this.entries);
-    const entry = this.entries.find((e) => e.id === entryId);
     const before = this.unlocked;
     this.unlocked = this.unlockedSet();
     for (const id of this.unlocked) {
@@ -212,7 +211,9 @@ export class Discovery {
     }
     this.guide.focus(entryId);
     this.guide.refresh();
-    this.overlay.showComplete(entry?.title ?? poi.name, firstTime, this.keys());
+    // The card names the target the objective panel showed; the Journal
+    // entry (guide title) can differ in wording.
+    this.overlay.showComplete(poi.name, firstTime, this.keys());
   }
 
   /**

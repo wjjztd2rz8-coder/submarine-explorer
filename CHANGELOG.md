@@ -15,6 +15,7 @@ without an entry here is not done.
 ### Changed
 
 - Challenger Deep (f-challenger-lander): the lander marker is now a purpose-built `benthic-lander` geo feature (three legs, yellow flotation, bait cage, mast, orange flag, strobe; 3 draw calls) at 9 m footprint instead of a small orange debris pile, and the trench wall gets baked vertex-colour relief (lighter upslope gradient, faint terraces); opening range 34 -> 30 m. Reason: the lander was unreadable in the opening frame.
+- First-discovery fixes (f-firstdiscovery-fixes): the scan completion card now titles the target with the objective name the player saw (e.g. "Beebe-125 black smokers") instead of the guide entry title, which could differ in wording; the Journal still uses the guide title. The tutorial "Move and turn" step completes on either a sustained thrust (0.8 s) or a sustained turn (0.5 s), instead of needing both, so a player who only drives or only turns is no longer stuck on it. Reason: owner's unaided first-discovery capture. Phone input uses the same axes, so phone behaviour is unchanged.
 
 - Lost City carbonate towers: flow-stone look with 22 meandering vertical ridges on the main trunk, much weaker terrace shelves, ridge-aligned crest/trough colouring (grey-brown troughs, faint blue-green film near the base), deeper and wider dark vent mouth. Cut: saucer flanges removed from the main trunk and the lone chimney, and reduced to a rare small one on lesser spires (Lost City tower triangles drop; terrainMerge1140 snapshot updated).
 
