@@ -748,8 +748,10 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
         span: 0.46,
       }),
     );
-    // Monterey: blocks that dropped out of each scar, resting on the apron below it.
+    // Monterey: blocks that dropped out of each scar, resting on the apron below it. They replace
+    // the same number of ordinary rocks, so instance counts stay unchanged.
     if (scars.length) {
+      const fallen: RockSpot[] = [];
       const fr = mulberry32(seed ^ 0xfa11);
       for (const c of scars) {
         for (let k = 0; k < 3; k++) {
@@ -767,12 +769,14 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
               u: 0.1,
             };
             if (isSupported(talus, spot)) {
-              rocks.push(spot);
+              fallen.push(spot);
               break;
             }
           }
         }
       }
+      rocks.length = Math.max(0, rocks.length - fallen.length);
+      rocks.push(...fallen);
     }
     const tmpl = [0, 1, 2].map((k) => {
       if (id === 'canyon') return fracturedBoulder(d.sphereDetail, seed + k * 5, k);
