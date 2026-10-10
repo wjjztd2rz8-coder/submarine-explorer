@@ -1,6 +1,6 @@
 # F-BEEBE-TRUNK
 
-Branch claude/f-beebe-trunk. Gates: see final run (PW_PORT=4481). Re-baselined: beebeIsolation (High/Medium triangles up, geometry hashes) and terrainMerge1140 beebe Low snapshot (buffer hash only; draws and triangles unchanged). Files: src/world/props/geo/spire.ts, smokers.ts, src/core/config/props.ts, data/landmarks/beebe-vent-field/mission.json, CHANGELOG.
+Branch claude/f-beebe-trunk. Gates: all PASS (PW_PORT=4481). Re-baselined: beebeIsolation (High/Medium triangles up, geometry hashes) and terrainMerge1140 beebe Low snapshot (buffer hash only; draws and triangles unchanged). Files: src/world/props/geo/spire.ts, smokers.ts, src/core/config/props.ts, data/landmarks/beebe-vent-field/mission.json, CHANGELOG.
 
 ## Built
 
