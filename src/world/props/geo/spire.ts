@@ -49,6 +49,19 @@ export interface SpireOpts {
   trunk?: boolean;
 }
 
+/** Flow-ridge crest value in [0, 1] (1 on a crest) at an angle and local height. */
+export function trunkCrest(
+  ang: number,
+  y: number,
+  n: number,
+  flutes: number,
+  seed: number,
+): number {
+  const ph =
+    ang * flutes + n * 6 + y * 0.11 + (fbm3(y * 0.08, 4, seed * 0.1, seed + 5, 2) - 0.5) * 7;
+  return 1 - Math.abs(Math.sin(ph * 0.5));
+}
+
 /** Smooth, noise-free radius at height fraction t: the profile colliders and flanges follow. */
 export function spireRadius(o: SpireOpts, t0: number): number {
   const t = Math.min(1, Math.max(0, t0));
@@ -101,7 +114,8 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
             1.6;
         const fj = uj - Math.floor(uj);
         const strength = 0.15 + 1.1 * hash1(Math.floor(uj) + o.seed);
-        const shelf = (o.ledge ?? 0.14) * smooth(0, 0.08, fj) * Math.pow(1 - fj, 2.2) * strength;
+        const shelf =
+          (o.ledge ?? 0.14) * smooth(0, 0.08, fj) * Math.pow(1 - fj, 2.2) * strength * 0.3;
         const m = fbm3(
           Math.cos(ang) * 1.6 + 7,
           Math.floor(uj) * 3.1,
@@ -147,12 +161,7 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
           o.rough;
     if (irr) {
       // Meandering flow ridges: sharp crests, broad troughs, phase drifting with height.
-      const ph =
-        ang * flutes +
-        n * 6 +
-        y * 0.11 +
-        (fbm3(y * 0.08, 4, o.seed * 0.1, o.seed + 5, 2) - 0.5) * 7;
-      const crest = 1 - Math.abs(Math.sin(ph * 0.5));
+      const crest = trunkCrest(ang, y, n, flutes, o.seed);
       f *= 1 + amp * 2.2 * (crest * crest - 0.35);
     } else f *= 1 + amp * Math.sin(ang * flutes + n * 5 + t * 2.5);
     // The top cap's centre vertex sinks to make a crater: the vent orifice.
