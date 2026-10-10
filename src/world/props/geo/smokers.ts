@@ -192,6 +192,8 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
         nz,
         seed,
         seed + stacks.indexOf(near) * 7,
+        ny,
+        near === stacks[0],
       );
     } else if (best > 0) {
       out.copy(SULFIDE).lerp(ROCK, nz);

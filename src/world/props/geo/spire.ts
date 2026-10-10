@@ -245,8 +245,8 @@ export function flange(o: {
     const sc = fbm3(Math.cos(ang) * 2.2 + 9, 5, Math.sin(ang) * 2.2 + 9, o.seed, 2) - 0.5;
     // Both ends of the arc pinch out to nothing so the sector has no cut face.
     const u = ((((Math.atan2(x, z) - o.start) % TAU) + TAU) % TAU) / o.arc;
-    const end = smooth(0, 0.22, u) * smooth(0, 0.22, 1 - u);
-    const k = (1 + sc * 0.32 * out) * (1 - (1 - end) * out * 0.9);
+    const end = smooth(0, 0.34, u) * smooth(0, 0.34, 1 - u);
+    const k = (1 + sc * 0.24 * out) * (1 - (1 - end) * out * 0.9);
     const yy = y - out * out * w * 0.12 - sc * out * 0.3;
     p.setXYZ(i, x * k, yy * (0.25 + 0.75 * end), z * k);
   }
