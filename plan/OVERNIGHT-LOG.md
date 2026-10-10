@@ -883,3 +883,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Release:** full e2e on main: 631 passed, 4 failed. Endurance sonar spec expected a finite contour interval (stale after f-endurance-sky, Infinity by design); spec fixed, passes. Blue Hole 1090 60 s idle spec got exactly 30 frames (needs >30) under full-suite load; passes alone (software-GL flake, not loosened). Pushed and tagged f49; hosted CI result pending.
 - **Queue:** Codex 1220-1280 (dry until 15 Oct). DIRECTOR backlog empty: next run needs a new review/golden set. Needs owner: nothing.
+
+## 2026-10-10 17:31 CDT headless run (Claude)
+
+- **Merged:** f-bluehole-wall (Sonnet, ~18 min): stratified limestone ledges/notches and depth colour grade on the Blue Hole wall; modest visible gain (~+0.3), bowl terraces still fogged, overhangs shallow. Smoke + project-base green on main; no full e2e, no push (f49 last tag; hosted CI for f49 pending).
+- **Queue:** Codex 1220-1280 (dry until 15 Oct). DIRECTOR backlog empty: next run needs a new golden set + review. Needs owner: nothing.

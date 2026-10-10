@@ -16,6 +16,8 @@ Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku sm
 6. (MERGED 2026-10-10 f-monterey-wall: slump scars, uneven ledges, fallen blocks; modest gain, no overhang geometry) **Monterey wall silhouette (Sonnet, low):** strata read; the wall outline is stepped slabs, add slump and overhang variation.
 7. (MERGED 2026-10-10 f-challenger-seabed: cobbles, dropstones, tone patches; clear gain) **Challenger seabed (Haiku/Sonnet, low):** add scattered rocks and faint slope shading around the lander.
 
+(MERGED 2026-10-10 f-bluehole-wall: stratified ledges, depth colour grade; modest gain at gallery range, bowl terraces still fogged) Blue Hole wall pass done. Backlog otherwise empty; next run needs a new golden set + review.
+
 Codex queue (dry until 15 Oct weekly reset): 1220 pacing gaps, 1230 CI shard triage, 1240 verify lander/first-discovery, 1250 sonar flat sites (largely done by f-sonar-flat; check before running), 1260 new-player flow audit, 1270 verify Lost City/CI, 1280 Blue Hole squiggle.
 
 ## Previous priorities (comprehensive review, Claude alone, 2026-10-09 17:30; golden 2026-10-09-221156)
