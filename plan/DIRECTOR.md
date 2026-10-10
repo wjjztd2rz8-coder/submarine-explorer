@@ -2,7 +2,23 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (comprehensive review, Claude alone, 2026-10-09 17:30; golden 2026-10-09-221156)
+## Current priorities (comprehensive review, Claude alone, 2026-10-10 08:30; golden 2026-10-10-123858)
+
+Sol skipped (Codex weekly 5%). Scores (beautiful): Titanic 4, Lost City 3.5 (+0.5), Endurance 3.5 (+0.5), Beebe 3.5, Monterey 3.5, Challenger 3.5, Blue Hole 3.
+
+Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
+
+1. **Push f48 and confirm hosted CI green (Haiku):** full e2e on main was started 2026-10-10 08:30 (.cache/full-e2e-review.log); if all gates pass push, tag f48, check `gh run list`. If CI still red, read shard logs and lighten specs, never loosen assertions.
+2. **Blue Hole floor and minimap (Sonnet, take a new angle):** floor is a smooth grey ramp and the minimap a flat teal square; tried three times. Use vertex-colour banding plus real terrace geometry (no silt texture), and shade the minimap by depth outside the hole.
+3. **Titanic rusticles (Sonnet):** shrink and thin the orange spikes, vary length, cluster them under rails and edges.
+4. **Beebe main trunk (Sonnet):** side chimneys are crusted; the central trunk is a smooth brown cone, give it the same crust, flange and colour treatment.
+5. **Endurance sky and minimap (Sonnet):** dark void above the horizon, minimap five stripes; add haze gradient and ice-scour relief on the map.
+6. **Monterey wall silhouette (Sonnet, low):** strata read; the wall outline is stepped slabs, add slump and overhang variation.
+7. **Challenger seabed (Haiku/Sonnet, low):** add scattered rocks and faint slope shading around the lander.
+
+Codex queue (dry until 15 Oct weekly reset): 1220 pacing gaps, 1230 CI shard triage, 1240 verify lander/first-discovery, 1250 sonar flat sites (largely done by f-sonar-flat; check before running), 1260 new-player flow audit, 1270 verify Lost City/CI, 1280 Blue Hole squiggle.
+
+## Previous priorities (comprehensive review, Claude alone, 2026-10-09 17:30; golden 2026-10-09-221156)
 
 Codex 5h was 11% so Sol was skipped (exit 75). Scores (beautiful): Titanic 4, Beebe 3.5 (chimney now layered/ridged, +0.25), Monterey 3.5 (livelier, more flora), Blue Hole 3 (bowl readable, sonar still a flat green square), Lost City 3 (tower still blobby plates), Challenger 3 (lander visible, seabed dim and flat), Endurance 2.5 (snow discs and black blob on sub unchanged; 1180 running).
 

@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-10 08:30 comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-10-123858 vs -030121)
+
+Codex weekly 5% (`codex-review.sh` skipped for budget), so no Sol second opinion. Play-flow not recaptured (Codex 1260 queued; firstdiscovery shots from 10-09 stand).
+
+**Changed since the last review:** merged f-beebe-trunk/-chimneys/-blobs (crusted flanges, dark basalt seabed), f-phone-pass and f-phone-camera (real touch layout in golden, 14% landscape view shift, short titles), f-ci-heavy-specs, f-sonar-flat (rings, tint, footprints), plus the Endurance and Lost City passes from the previous night. f47 pushed.
+
+| Site       | Readable | Beautiful | Change | Biggest gap                                                      |
+| ---------- | -------- | --------- | ------ | ---------------------------------------------------------------- |
+| Titanic    | 4        | 4         | same   | rusticles are oversized orange spikes, a little cartoonish       |
+| Beebe      | 4        | 3.5       | same   | lit chimney fine; main trunk still smooth brown cone             |
+| Blue Hole  | 4        | 3         | same   | smooth grey bowl floor; minimap still a flat teal square         |
+| Lost City  | 4        | 3.5       | +0.5   | pale carbonate towers with orifice smoke read well; seabed bland |
+| Monterey   | 4        | 3.5       | same   | strata good, wall silhouette still stepped                       |
+| Challenger | 4        | 3.5       | same   | lander and amphipods read; seabed flat                           |
+| Endurance  | 3.5      | 3.5       | +0.5   | hull large with ripples and wood now; sky void, minimap stripes  |
+
+No regressions seen. Blue Hole floor and minimap are the longest-standing gap (three tries).
+
+**Process:** efficiency.sh: Claude idle ~150 h and Codex under-used ~123 h of samples, mostly the Oct 6-8 lockout and Codex weekly 5%; 68 watchdog trips (floors working). Hosted CI last failed on the 06:43 CDT push, before f-ci-heavy-specs; a full e2e run on main was started in this review so the next push shows whether CI is green. Seven Codex briefs queued (1220-1280) and dry until 15 Oct.
+
+**Priorities:** see DIRECTOR.md. **Stage:** ~75% to 1.0, about 2.5 weeks (Claude alone, Sol not consulted). **Needs owner:** nothing.
+
 ## 2026-10-09 22:30 comprehensive review, Claude alone (trigger: 8+ merges, CI red 3 runs; golden 2026-10-10-030121 vs -223546)
 
 Codex weekly 6% (`codex-review.sh` exit 75), so no Sol second opinion; Play-flow not recaptured (queued as Codex 1260).
