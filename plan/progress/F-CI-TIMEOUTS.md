@@ -23,12 +23,12 @@ Latest main head 712e538 has no completed CI run yet; its CI is queued.
 
 ## Changes
 
-| File | Change | Why |
-| --- | --- | --- |
-| tools/install-playwright-chromium.sh | Three attempts (120 s bound each) with 15 s and 30 s back-off; previously two attempts with a 10 s sleep | apt-lock flake (exit 100) on hosted runners |
-| tools/tests/test_install_playwright.py | Expectations follow the three-attempt policy; added failure-failure-success and last-failure cases | Keeps the installer policy test honest |
-| .github/workflows/ci.yml | Install steps (e2e and project-base) `timeout-minutes` 5 -> 8 | Worst case of three bounded attempts plus back-off is about 7 min |
-| tests/e2e/f-verify-1000.spec.ts | First-minute test timeout 300 s -> 480 s; same 600 samples and assertions | Hosted high-tier runs exceeded 300 s; no assertion weakened |
+| File                                   | Change                                                                                                   | Why                                                               |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| tools/install-playwright-chromium.sh   | Three attempts (120 s bound each) with 15 s and 30 s back-off; previously two attempts with a 10 s sleep | apt-lock flake (exit 100) on hosted runners                       |
+| tools/tests/test_install_playwright.py | Expectations follow the three-attempt policy; added failure-failure-success and last-failure cases       | Keeps the installer policy test honest                            |
+| .github/workflows/ci.yml               | Install steps (e2e and project-base) `timeout-minutes` 5 -> 8                                            | Worst case of three bounded attempts plus back-off is about 7 min |
+| tests/e2e/f-verify-1000.spec.ts        | First-minute test timeout 300 s -> 480 s; same 600 samples and assertions                                | Hosted high-tier runs exceeded 300 s; no assertion weakened       |
 
 Not changed (needs a decision): the 1090 real-time frame-floor specs and the shard
 balance in tools/e2e-timings.json, which still records the timed-out costs (about 600 s
