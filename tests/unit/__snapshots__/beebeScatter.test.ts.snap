@@ -4,7 +4,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
 {
   "high": [
     {
-      "color": "887f81ac75c820662bd0570d0974be5e7eae01914ec39c642fc553653a2c24e8",
+      "color": "18df73ddf40ea777c6810ffdd7cb9fd44022bc9b43e3f6cc6be3e16f5ddad802",
       "instances": 363,
       "name": "scatter:pillow",
       "normal": "9cbe9a8cb7c066373cf323d612f65fe001fc2a755951a82714ed8376fe26b235",
@@ -12,7 +12,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
       "triangles": 80,
     },
     {
-      "color": "4e601dff937b48212078b3fd7e900f443fd13ab0bd29021ab3311519f1fa6be6",
+      "color": "3cd56d6484970707bb6a4b61b848bbed0aafb09592db27d0fdbf3c0bbd673235",
       "instances": 195,
       "name": "scatter:rubble",
       "normal": "d88d88bd99f912677e30cbab04b02182f4ee1d687d8ae906b8436ff6341663dc",
@@ -20,7 +20,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
       "triangles": 20,
     },
     {
-      "color": "b1e369925eb4da6dcad568a0bd9a1a52a57461c3ad715b4839a0622112efe895",
+      "color": "906b0c320f0f39035914cd9d429017d54c2ad7ccb27ba99356c79de4346bebe5",
       "instances": 45,
       "name": "scatter:boulder",
       "normal": "ef78f942cb8c51e7bf842eb05d5a710de755809e4ddd0397232de6f5b3e1ad2e",
@@ -30,7 +30,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
   ],
   "low": [
     {
-      "color": "887f81ac75c820662bd0570d0974be5e7eae01914ec39c642fc553653a2c24e8",
+      "color": "18df73ddf40ea777c6810ffdd7cb9fd44022bc9b43e3f6cc6be3e16f5ddad802",
       "instances": 30,
       "name": "scatter:pillow",
       "normal": "9cbe9a8cb7c066373cf323d612f65fe001fc2a755951a82714ed8376fe26b235",
@@ -38,7 +38,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
       "triangles": 80,
     },
     {
-      "color": "4e601dff937b48212078b3fd7e900f443fd13ab0bd29021ab3311519f1fa6be6",
+      "color": "3cd56d6484970707bb6a4b61b848bbed0aafb09592db27d0fdbf3c0bbd673235",
       "instances": 54,
       "name": "scatter:rubble",
       "normal": "d88d88bd99f912677e30cbab04b02182f4ee1d687d8ae906b8436ff6341663dc",
@@ -46,7 +46,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
       "triangles": 20,
     },
     {
-      "color": "b1e369925eb4da6dcad568a0bd9a1a52a57461c3ad715b4839a0622112efe895",
+      "color": "906b0c320f0f39035914cd9d429017d54c2ad7ccb27ba99356c79de4346bebe5",
       "instances": 2,
       "name": "scatter:boulder",
       "normal": "ef78f942cb8c51e7bf842eb05d5a710de755809e4ddd0397232de6f5b3e1ad2e",
@@ -56,7 +56,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
   ],
   "medium": [
     {
-      "color": "887f81ac75c820662bd0570d0974be5e7eae01914ec39c642fc553653a2c24e8",
+      "color": "18df73ddf40ea777c6810ffdd7cb9fd44022bc9b43e3f6cc6be3e16f5ddad802",
       "instances": 122,
       "name": "scatter:pillow",
       "normal": "9cbe9a8cb7c066373cf323d612f65fe001fc2a755951a82714ed8376fe26b235",
@@ -64,7 +64,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
       "triangles": 80,
     },
     {
-      "color": "4e601dff937b48212078b3fd7e900f443fd13ab0bd29021ab3311519f1fa6be6",
+      "color": "3cd56d6484970707bb6a4b61b848bbed0aafb09592db27d0fdbf3c0bbd673235",
       "instances": 129,
       "name": "scatter:rubble",
       "normal": "d88d88bd99f912677e30cbab04b02182f4ee1d687d8ae906b8436ff6341663dc",
@@ -72,7 +72,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
       "triangles": 20,
     },
     {
-      "color": "b1e369925eb4da6dcad568a0bd9a1a52a57461c3ad715b4839a0622112efe895",
+      "color": "906b0c320f0f39035914cd9d429017d54c2ad7ccb27ba99356c79de4346bebe5",
       "instances": 11,
       "name": "scatter:boulder",
       "normal": "ef78f942cb8c51e7bf842eb05d5a710de755809e4ddd0397232de6f5b3e1ad2e",
@@ -82,7 +82,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
   ],
   "ultra": [
     {
-      "color": "887f81ac75c820662bd0570d0974be5e7eae01914ec39c642fc553653a2c24e8",
+      "color": "18df73ddf40ea777c6810ffdd7cb9fd44022bc9b43e3f6cc6be3e16f5ddad802",
       "instances": 1590,
       "name": "scatter:pillow",
       "normal": "9cbe9a8cb7c066373cf323d612f65fe001fc2a755951a82714ed8376fe26b235",
@@ -90,7 +90,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
       "triangles": 80,
     },
     {
-      "color": "4e601dff937b48212078b3fd7e900f443fd13ab0bd29021ab3311519f1fa6be6",
+      "color": "3cd56d6484970707bb6a4b61b848bbed0aafb09592db27d0fdbf3c0bbd673235",
       "instances": 360,
       "name": "scatter:rubble",
       "normal": "d88d88bd99f912677e30cbab04b02182f4ee1d687d8ae906b8436ff6341663dc",
@@ -98,7 +98,7 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
       "triangles": 20,
     },
     {
-      "color": "b1e369925eb4da6dcad568a0bd9a1a52a57461c3ad715b4839a0622112efe895",
+      "color": "906b0c320f0f39035914cd9d429017d54c2ad7ccb27ba99356c79de4346bebe5",
       "instances": 246,
       "name": "scatter:boulder",
       "normal": "ef78f942cb8c51e7bf842eb05d5a710de755809e4ddd0397232de6f5b3e1ad2e",
