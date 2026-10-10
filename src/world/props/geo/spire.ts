@@ -50,8 +50,15 @@ export interface SpireOpts {
 }
 
 /** Flow-ridge crest value in [0, 1] (1 on a crest) at an angle and local height. */
-export function trunkCrest(ang: number, y: number, n: number, flutes: number, seed: number): number {
-  const ph = ang * flutes + n * 6 + y * 0.11 + (fbm3(y * 0.08, 4, seed * 0.1, seed + 5, 2) - 0.5) * 7;
+export function trunkCrest(
+  ang: number,
+  y: number,
+  n: number,
+  flutes: number,
+  seed: number,
+): number {
+  const ph =
+    ang * flutes + n * 6 + y * 0.11 + (fbm3(y * 0.08, 4, seed * 0.1, seed + 5, 2) - 0.5) * 7;
   return 1 - Math.abs(Math.sin(ph * 0.5));
 }
 
