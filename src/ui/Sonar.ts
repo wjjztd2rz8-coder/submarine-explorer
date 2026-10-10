@@ -576,7 +576,9 @@ export class Sonar {
     }
     ctx.font = 'bold 9px ui-monospace, monospace';
     ctx.textBaseline = 'middle';
-    for (const label of labels) {
+    // A phone's compact map shows the 220 px canvas at ~110 px: labels would be ~4 px, so skip them.
+    const compact = this.canvas.clientWidth > 0 && this.canvas.clientWidth < 140;
+    for (const label of compact ? [] : labels) {
       const width = ctx.measureText(label.text).width + 6;
       ctx.fillStyle = 'rgba(2, 12, 17, .88)';
       ctx.fillRect(label.x - 2, label.y - 6, width, 12);
@@ -602,6 +604,7 @@ export class Sonar {
 
   toggle(): boolean {
     this.root.classList.toggle('d-sonar-expanded');
+    this.reliefDirty = true; // contour labels depend on the displayed size
     this.backdrop.hidden = !this.expanded;
     return this.expanded;
   }

@@ -934,6 +934,18 @@
 }
 
 @media (orientation: landscape) and (max-width: 900px) and (max-height: 460px) {
+  /* F-PHONE-PASS: the 96 px map was too small to read features; 120 px still
+     clears the stick (top 270 px) with the credit chip under it. */
+  html.is-touch .sonar:not(.d-sonar-expanded) {
+    width: 120px;
+  }
+  html.is-touch .sonar:not(.d-sonar-expanded) canvas {
+    max-height: 120px;
+  }
+  /* Mission title: the name matters more than the "MISSION" prefix. */
+  html.is-touch .obj-title-prefix {
+    display: none;
+  }
   html.is-touch .hud-readouts,
   html.is-touch .hud-readouts:has(.hud-power:not([hidden])) {
     left: auto;
@@ -969,16 +981,16 @@
   }
   html.is-touch .scan-overlay .scan-stack,
   html.is-touch body:has(.onboard-card:not([hidden])) .scan-overlay .scan-stack {
-    left: calc(120px + env(safe-area-inset-left, 0px));
+    left: calc(144px + env(safe-area-inset-left, 0px));
     top: calc(58px + env(safe-area-inset-top, 0px));
     bottom: auto;
-    width: calc(100vw - 402px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    width: calc(100vw - 426px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
     transform: none;
   }
   html.is-touch .hud-footer {
     left: calc(12px + env(safe-area-inset-left, 0px));
     right: auto;
-    top: calc(140px + env(safe-area-inset-top, 0px));
+    top: calc(166px + env(safe-area-inset-top, 0px));
     bottom: auto;
   }
   html.is-touch body:has(.sonar.d-sonar-expanded) .onboard-card,

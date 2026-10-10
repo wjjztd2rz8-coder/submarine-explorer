@@ -185,7 +185,8 @@ export class ObjectivesPanel {
 
   setTitle(title: string): void {
     const text = `MISSION · ${title.toUpperCase()}`;
-    this.titleEl.textContent = text;
+    // The prefix has its own span so phone landscape can drop it and fit the name.
+    this.titleEl.replaceChildren(el('span', 'obj-title-prefix', 'MISSION · '), title.toUpperCase());
     // QA-C #2: long titles are truncated by CSS; the full text stays on hover.
     this.titleEl.title = text;
   }
