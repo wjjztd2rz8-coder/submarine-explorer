@@ -146,13 +146,6 @@ export function sonarReliefRange(
   return { low: (lo + hi - span) / 2, span };
 }
 
-/** Ramp position for shallow sites: a power curve keeps the reef off the pale end so ledges separate. */
-export function rampT(t: number, shallowSite: boolean): number {
-  if (!shallowSite) return t;
-  const x = Math.min(1, Math.max(0, t));
-  return 0.12 + 0.62 * Math.pow(x, 1.7);
-}
-
 export interface SonarMarker {
   poiId: string;
   name: string;
@@ -430,22 +423,32 @@ export class Sonar {
   /** Rebuild the measured-depth relief around the visible map, with cached margins for smooth tracking. */
   private renderBathymetry(centerX: number, centerZ: number): void {
     const zoom = this.zoom;
-    const margin = zoom === 'tile' ? 0 : this.zoomConfig.rasterMarginPx;
-    const w = this.w + margin * 2;
-    const h = this.h + margin * 2;
+    // Sample the bilinear terrain field at backing-pixel resolution. A CSS-sized
+    // relief raster becomes visibly blocky on Retina screens and expanded maps.
+    const resolution = this.canvas.width / this.w;
+    const margin = zoom === 'tile' ? 0 : this.zoomConfig.rasterMarginPx * resolution;
+    const w = Math.round(this.canvas.width + margin * 2);
+    const h = Math.round(this.canvas.height + margin * 2);
     this.base.width = w;
     this.base.height = h;
     const ctx = this.base.getContext('2d');
     if (!ctx) return;
-    const scale = zoom === 'tile' ? this.w / this.terrain.widthM : Math.max(this.w, this.h) / zoom;
+    const scale =
+      resolution *
+      (zoom === 'tile' ? this.w / this.terrain.widthM : Math.max(this.w, this.h) / zoom);
     const metresPerPixel = 1 / scale;
+    // Bilinear heights are continuous, but their per-pixel slopes jump at
+    // survey-cell edges. Measure relief across a source cell to soften those
+    // boundaries without altering depths or the contour field.
+    const slopeRadiusX = Math.max(1, Math.ceil(this.terrain.meta.cellsize_m_x / metresPerPixel));
+    const slopeRadiusZ = Math.max(1, Math.ceil(this.terrain.meta.cellsize_m_y / metresPerPixel));
     const heights = new Float32Array(w * h);
     let lo = Infinity;
     let hi = -Infinity;
     for (let py = 0; py < h; py++) {
-      const z = centerZ + (py - margin - this.h / 2) * metresPerPixel;
+      const z = centerZ + (py - margin - this.canvas.height / 2) * metresPerPixel;
       for (let px = 0; px < w; px++) {
-        const x = centerX + (px - margin - this.w / 2) * metresPerPixel;
+        const x = centerX + (px - margin - this.canvas.width / 2) * metresPerPixel;
         const depth = this.terrain.sampleDataHeight(x, z);
         heights[py * w + px] = depth;
         if (px >= margin && px < w - margin && py >= margin && py < h - margin) {
@@ -477,29 +480,26 @@ export class Sonar {
       spanM: span,
       contourIntervalM: contourInterval,
     };
-    // Blue Hole: a 0-120 m range under a flat reef saturates the pale end of the ramp; spread the shelves.
-    const shallowSite = this.terrain.meta.id === 'great-blue-hole';
     const img = ctx.createImageData(w, h);
     for (let py = 0; py < h; py++) {
       for (let px = 0; px < w; px++) {
         const index = py * w + px;
         const height = heights[index] as number;
-        const [r, g, b] = paletteColor(
-          this.palette.stops,
-          rampT((height - low) / span, shallowSite),
-        );
+        const [r, g, b] = paletteColor(this.palette.stops, (height - low) / span);
         // Measured X/Z slopes in m/m, lit from the north-west. A gain makes
         // gentle local walls legible without fabricating depth variation.
-        const left = heights[py * w + Math.max(0, px - 1)] as number;
-        const right = heights[py * w + Math.min(w - 1, px + 1)] as number;
-        const north = heights[Math.max(0, py - 1) * w + px] as number;
-        const south = heights[Math.min(h - 1, py + 1) * w + px] as number;
-        const gx = (right - left) / (2 * metresPerPixel);
-        const gz = (south - north) / (2 * metresPerPixel);
-        const shade = Math.max(
-          0.72,
-          Math.min(1.28, 1 - this.zoomConfig.hillshadeGain * (0.7 * gx + 0.5 * gz)),
-        );
+        const leftX = Math.max(0, px - slopeRadiusX);
+        const rightX = Math.min(w - 1, px + slopeRadiusX);
+        const northY = Math.max(0, py - slopeRadiusZ);
+        const southY = Math.min(h - 1, py + slopeRadiusZ);
+        const left = heights[py * w + leftX] as number;
+        const right = heights[py * w + rightX] as number;
+        const north = heights[northY * w + px] as number;
+        const south = heights[southY * w + px] as number;
+        const gx = (right - left) / ((rightX - leftX) * metresPerPixel);
+        const gz = (south - north) / ((southY - northY) * metresPerPixel);
+        // A smooth shoulder keeps steep survey slopes from clipping into bands.
+        const shade = 1 - 0.28 * Math.tanh(this.zoomConfig.hillshadeGain * (0.7 * gx + 0.5 * gz));
         const out = index * 4;
         img.data[out] = Math.round(Math.max(0, Math.min(255, r * shade)));
         img.data[out + 1] = Math.round(Math.max(0, Math.min(255, g * shade)));
@@ -508,8 +508,9 @@ export class Sonar {
       }
     }
     ctx.putImageData(img, 0, 0);
+    ctx.scale(resolution, resolution);
     if (Number.isFinite(contourInterval))
-      this.drawContours(ctx, heights, w, h, lo, hi, contourInterval, margin);
+      this.drawContours(ctx, heights, w, h, lo, hi, contourInterval, margin, resolution);
     this.reliefCenter = { x: centerX, z: centerZ };
     this.reliefDirty = false;
   }
@@ -523,6 +524,7 @@ export class Sonar {
     hi: number,
     interval: number,
     margin: number,
+    resolution: number,
   ): void {
     const levels: number[] = [];
     for (let level = Math.ceil(lo / interval) * interval; level <= hi; level += interval)
@@ -549,14 +551,18 @@ export class Sonar {
           for (let i = 0; i + 1 < hits.length; i += 2) {
             const p = hits[i] as { x: number; y: number };
             const q = hits[i + 1] as { x: number; y: number };
+            p.x /= resolution;
+            p.y /= resolution;
+            q.x /= resolution;
+            q.y /= resolution;
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(q.x, q.y);
             if (
               !anchor &&
-              p.x > margin + 18 &&
-              p.x < w - margin - 45 &&
-              p.y > margin + 12 &&
-              p.y < h - margin - 12 &&
+              p.x > margin / resolution + 18 &&
+              p.x < (w - margin) / resolution - 45 &&
+              p.y > margin / resolution + 12 &&
+              p.y < (h - margin) / resolution - 12 &&
               labels.every((label) => Math.hypot(label.x - p.x, label.y - p.y) > 32)
             )
               anchor = p;
@@ -620,7 +626,8 @@ export class Sonar {
     )
       this.renderBathymetry(centerX, centerZ);
     const margin = this.zoom === 'tile' ? 0 : this.zoomConfig.rasterMarginPx;
-    ctx.drawImage(this.base, -margin + shiftX, -margin + shiftY);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(this.base, -margin + shiftX, -margin + shiftY, w + margin * 2, h + margin * 2);
 
     // Breadcrumb trail.
     const last = this.trail[this.trail.length - 1];
