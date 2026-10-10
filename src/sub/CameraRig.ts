@@ -25,7 +25,7 @@ export interface CameraUpdateOptions {
  * Phone landscape: fraction of the frame width the picture slides left so the
  * hull sits clear of the right-hand PHOTO/SONAR/SCAN thumb zone (F-PHONE-CAMERA).
  */
-export const PHONE_LANDSCAPE_SHIFT = 0.1;
+export const PHONE_LANDSCAPE_SHIFT = 0.14;
 
 /** Aim drop (m) at full chase-arm retraction on portrait phones. */
 const PORTRAIT_RETRACTED_AIM_DROP_M = 30;

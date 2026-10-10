@@ -485,7 +485,11 @@ export class Sonar {
       for (let px = 0; px < w; px++) {
         const index = py * w + px;
         const height = heights[index] as number;
-        const [r, g, b] = paletteColor(this.palette.stops, (height - low) / span);
+        let t = (height - low) / span;
+        // F-PHONE-CAMERA: the Blue Hole's shallow flat holds most of the span at the top of the
+        // ramp; a gentle curve spreads the walls and bowl across it so the map is not one tile.
+        if (this.terrain.meta.id === 'great-blue-hole') t = Math.max(0, Math.min(1, t)) ** 2.2;
+        const [r, g, b] = paletteColor(this.palette.stops, t);
         // Measured X/Z slopes in m/m, lit from the north-west. A gain makes
         // gentle local walls legible without fabricating depth variation.
         const leftX = Math.max(0, px - slopeRadiusX);
