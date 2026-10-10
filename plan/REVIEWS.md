@@ -8,15 +8,15 @@ Codex weekly 6% (`codex-review.sh` exit 75), so no Sol second opinion; Play-flow
 
 **Changed since the last review:** merged f-challenger-seabed and -lander, f-lostcity-tower pass 2, f-bluehole-overhangs, Codex 1130, 1180, 1190, 1200, 1210 (Endurance snow gone, Blue Hole sonar reads), f-firstdiscovery-fixes. f45 pushed and tagged.
 
-| Site | Readable | Beautiful | Change | Biggest gap |
-| --- | --- | --- | --- | --- |
-| Titanic | 4 | 4 | same | flat dark void above horizon |
-| Beebe | 4 | 3.5 | same | plaster-like trunk, no visible smoke at the orifice |
-| Blue Hole | 4 | 3 | same | smooth grey floor ramp, tile-like noise |
-| Lost City | 3.5 | 3 | same | brown clay cone, no bright carbonate |
-| Monterey | 4 | 3.5 | same | corrugated rock |
-| Challenger | 4 | 3.5 | +0.5 | seabed still simple, sonar fine |
-| Endurance | 3 | 3 | +0.5 | tiny hull in flat plain, void sky, minimap five stripes |
+| Site       | Readable | Beautiful | Change | Biggest gap                                             |
+| ---------- | -------- | --------- | ------ | ------------------------------------------------------- |
+| Titanic    | 4        | 4         | same   | flat dark void above horizon                            |
+| Beebe      | 4        | 3.5       | same   | plaster-like trunk, no visible smoke at the orifice     |
+| Blue Hole  | 4        | 3         | same   | smooth grey floor ramp, tile-like noise                 |
+| Lost City  | 3.5      | 3         | same   | brown clay cone, no bright carbonate                    |
+| Monterey   | 4        | 3.5       | same   | corrugated rock                                         |
+| Challenger | 4        | 3.5       | +0.5   | seabed still simple, sonar fine                         |
+| Endurance  | 3        | 3         | +0.5   | tiny hull in flat plain, void sky, minimap five stripes |
 
 **CI diagnosis (new):** the hosted run fails on (a) `tests/unit/bughunt1090.test.ts` writing to a non-existent `.cache/` (fixed this run), (b) project-base Playwright install tripping an apt lock (flake), (c) 10 of 30 e2e shards hitting 300 s test timeouts on hosted runners. So red CI was not only shards. Remaining work is Claude backlog item 1.
 
