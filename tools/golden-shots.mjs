@@ -140,6 +140,7 @@ async function main() {
       const context = await browser.newContext({
         viewport: { width, height },
         hasTouch: layout !== 'desktop',
+        isMobile: layout !== 'desktop',
         deviceScaleFactor: 1,
         serviceWorkers: 'block',
       });
@@ -244,7 +245,9 @@ async function main() {
         });
         if (mode === 'mission') {
           stage = `${site}: begin default mission`;
-          await page.locator('.briefing-begin').click();
+          await (layout === 'desktop'
+            ? page.locator('.briefing-begin').click()
+            : page.locator('.briefing-begin').tap()); // a mouse click would leave touch mode
           await page.waitForFunction(() => window.__game.mission?.state === 'diving');
           await settle(page);
         }
