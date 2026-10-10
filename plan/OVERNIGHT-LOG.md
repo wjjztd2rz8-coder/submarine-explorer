@@ -767,3 +767,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** f-lostcity-tower (Sonnet: 22 flow ridges, flanges removed, ridge-following colour, deeper vent; modest gain, ~3.3, orifice not framed in golden shots, reframe a shot next). Fixed a stale Blue Hole journal string in f-verify-1000 (mission-pacing side effect).
 - **Full e2e on main (log to file, 1.1 h):** 611 passed; only that one spec failed, fixed and rerun green. **Pushed main and tagged f45.** Pages deploy and hosted CI for this push were in progress; check next run (`gh run list`).
 - **Queue:** 1190, 1200, 1210, 1220, 1230 (Codex 5h ~10%, dispatches at reset). Next Claude: sonar minimap (if 1200 hasn't landed), reframe Lost City vent shot, Beebe rocks. Needs owner: nothing.
+
+## 2026-10-09 21:02 CDT headless run (Claude)
+
+- **Merged:** f-challenger-lander (Sonnet: purpose-built benthic lander with legs, flag, strobe, bait cage; trench-wall vertex relief; shots reviewed, clear gain ~3.5) and f-firstdiscovery-fixes (Haiku: reward card uses objective POI name; 'Move and turn' completes on thrust or turn). Smoke + project-base green on main; no full e2e, no new push.
+- **Hosted CI:** f45 Pages deploy succeeded; CI run still in progress at exit, check next run.
+- **Running:** Codex 1190, 1200, 1210. **Queue:** 1220, 1230, 1240. Next Claude: Endurance horizon, Blue Hole overhangs, Beebe rocks. Needs owner: nothing.
