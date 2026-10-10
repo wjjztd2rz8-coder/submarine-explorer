@@ -17,7 +17,7 @@ describe('Endurance ice-scour ridges (shared by the 3D swells and the sonar)', (
 
   it('peaks on a ridge crest, never exceeds the tallest ridge sum, and is zero far away', () => {
     const r = ridges[0]!;
-    const crest = enduranceScourHeight(ridges, r.cx, r.cz);
+    const crest = enduranceScourHeight(ridges, r.cx - r.dz * r.bend, r.cz + r.dx * r.bend);
     expect(crest).toBeGreaterThan(1);
     expect(crest).toBeLessThan(ridges.reduce((a, k) => a + k.height, 0) + 1e-6);
     expect(enduranceScourHeight(ridges, 5000, 5000)).toBe(0);
