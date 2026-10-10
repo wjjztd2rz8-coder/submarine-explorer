@@ -25,7 +25,7 @@ Codex weekly 6% so Sol was skipped (exit 75). Scores (beautiful): Titanic 4, Cha
 Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
 
 1. **Hosted CI green (Haiku):** the fixable part (bughunt1090 wrote to a missing .cache) is fixed. Next: 10/30 e2e shards hit 300 s test timeouts on hosted runners (page closed); find the slow specs from shard logs (gh api .../jobs/<id>/logs), cut or lighten them, never loosen assertions. Playwright apt-lock flake in project-base: add a retry wrapper. Codex 1230 covers it only after the 15 Oct reset.
-2. **Endurance scene (Sonnet):** hull is small and dark in a flat tan plain with a void above the horizon; add scale (ice-scoured seabed, boulders, distant relief), haze gradient, bigger approach framing.
+2. (MERGED 2026-10-09 22:50: ridges, haze band, oak hull; ~3.5, opening framing still small) **Endurance scene (Sonnet):** hull is small and dark in a flat tan plain with a void above the horizon; add scale (ice-scoured seabed, boulders, distant relief), haze gradient, bigger approach framing.
 3. **Lost City tower (Sonnet):** trunk reads as brown clay cone with lumpy plates; needs pale carbonate with vertical flow striations, white-fringed orifice with shimmer, brighter material contrast against the dark seabed.
 4. **Blue Hole floor and gallery (Sonnet):** the bowl floor is a smooth grey ramp with scattered boulders; add terraced ledges and sediment banding; drop the beige tile-like noise.
 5. **Beebe chimney trunk (Sonnet):** smooth grey fluted trunk, still reads as plaster; add crust, chimneys with mineral colours, visible black smoke at the orifice.

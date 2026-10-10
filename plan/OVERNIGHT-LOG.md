@@ -780,3 +780,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Hosted CI:** f45 run (and the previous one) still FAILED after ~39 min; Pages deploy OK. Codex 1230 (shard triage) queued but Codex weekly is 6%, so it may not dispatch until the 15 Oct reset.
 - **Process note:** killed full-e2e left stale vite preview servers that blocked ports (cleared by hand).
 - **Queue:** 1220, 1230, 1240. Next Claude: Endurance horizon, Beebe rocks, Titanic/Endurance sonar shading, CI shard triage if Codex stays dry. Needs owner: nothing.
+
+## 2026-10-09 22:31 CDT headless run (Claude): comprehensive review
+
+- **Review (Claude alone, Codex weekly 6%):** golden 2026-10-10-030121 scored, DIRECTOR.md re-planned, REVIEWS.md entry pushed. Stage ~72%. CI diagnosis: bughunt1090 wrote to a missing .cache (fixed), Playwright apt-lock flake, 10/30 e2e shards time out at 300 s on hosted runners (backlog item 1).
+- **Merged:** f-endurance-scene (Sonnet: ridges, haze band, oak hull, shrouds; ~3.5, re-baselined beebeIsolation/beebeScatter snapshots). Smoke + project-base green on main; no full e2e. Pushed docs; code merge not yet pushed.
+- **Queue:** 1220, 1230, 1240, 1250, 1260 (Codex dry until 15 Oct). Next Claude: CI e2e timeouts (Haiku), Lost City tower, Blue Hole floor. Needs owner: nothing.
