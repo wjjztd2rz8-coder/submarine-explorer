@@ -4,17 +4,18 @@
   "props": [
     {
       "id": "leggo-lander-marker",
-      "model": "procedural:debris",
+      "model": "procedural:geo",
+      "feature": "benthic-lander",
       "lat": 11.36854,
       "lon": 142.587517,
       "snap_to_seabed": true,
       "heading_deg": 0,
       "scale": 1,
-      "dimensions_m": [3, 3, 1.5],
+      "dimensions_m": [3.4, 3.4, 4.6],
       "lod_distance_m": 400,
       "collision": "none",
       "reconstruction": true,
-      "note": "Stands in for the benthic lander 'Leggo', which touched down at this real position (11.368536 N, 142.5875166 E) on 19 Dec 2014 during Schmidt Ocean Institute's RV Falkor cruise FK141215 ('Expanding Mariana Trench Perspectives', schmidtocean.org) and recorded amphipods (Hirondellea gigas) feeding on baited mackerel at a depth of 10,929 m. The engine's procedural kinds do not include a lander-frame shape, so a small debris cluster marks the site instead; it does not depict Leggo's real shape or size (no published dimensions were found). Leggo was recovered after the cruise, so nothing physical remains here today -- this marker represents a historic sampling event, not a permanent structure."
+      "note": "Stands in for the benthic lander 'Leggo', which touched down at this real position (11.368536 N, 142.5875166 E) on 19 Dec 2014 during Schmidt Ocean Institute's RV Falkor cruise FK141215 ('Expanding Mariana Trench Perspectives', schmidtocean.org) and recorded amphipods (Hirondellea gigas) feeding on baited mackerel at a depth of 10,929 m. A generic three-legged lander (frame, flotation, bait cage, flag and strobe) marks the site; it does not depict Leggo's real shape or size (no published dimensions were found). Leggo was recovered after the cruise, so nothing physical remains here today -- this marker represents a historic sampling event, not a permanent structure."
     },
     {
       "id": "north-wall-scarp",

@@ -27,6 +27,7 @@ const DIMS: Record<GeoFeatureId, [number, number, number]> = {
   'tuff-cliff': [90, 30, 45],
   'canyon-ledge': [70, 26, 36],
   'hadal-scarp': [100, 40, 50],
+  'benthic-lander': [3.4, 3.4, 4.6],
 };
 
 function build(feature: GeoFeatureId, tier = 'high', variant?: string) {

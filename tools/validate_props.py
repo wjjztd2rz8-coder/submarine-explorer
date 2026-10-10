@@ -37,7 +37,8 @@ WRECK_SCATTERS = ("titanic-boilers", "titanic-field", "titanic-stern-field", "bi
                   "bismarck-field", "bismarck-landslide", "endurance-rigging", "endurance-stern")
 # "feature": procedural:geo set pieces (src/world/props/geo/features.ts); keep in step.
 GEO_FEATURES = ("smoker-cluster", "carbonate-tower", "coral-mound", "stalactite-cluster",
-                "pillow-field", "tuff-cliff", "canyon-ledge", "hadal-scarp")
+                "pillow-field", "tuff-cliff", "canyon-ledge", "hadal-scarp",
+                "benthic-lander")
 DEFAULT_MAX_PROPS = 400  # Config.props.maxProps
 DEFAULT_MAX_MODEL_MB = 2.0
 
