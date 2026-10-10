@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **1210 merged-work verification:** restore Titanic's documented voyage route, sinking interval, approximate people aboard, Argo discovery timing and 1986 Memorial Act after the fact-check rewrite cut them. Distinguish the recovered 17-ton Chunk from its conserved 15-ton Big Piece and 2-ton Little Piece, restore the operator's exhibit locations, and remove one duplicate WHOI source link. Add factual-retention regressions and extend the existing camera clearance audit to 844×390 without changing any assertion or tolerance. Evidence and browser limitations: `plan/progress/1210.md`.
+
 - Lost City carbonate towers: flow-stone look with 22 meandering vertical ridges on the main trunk, much weaker terrace shelves, ridge-aligned crest/trough colouring (grey-brown troughs, faint blue-green film near the base), deeper and wider dark vent mouth. Cut: saucer flanges removed from the main trunk and the lone chimney, and reduced to a rare small one on lesser spires (Lost City tower triangles drop; terrainMerge1140 snapshot updated).
 
 - Great Blue Hole bowl (f-bluehole-bowl2): ragged shelf lip with rubble ridges and a stepped main riser (extra ledge knots), a 30 m colour feather from warm shelf to cool wall, stronger per-terrace tone and darker blue lower walls; wall sponges are now closed capsules (muted colour, 12 instead of 34 to stay in the Low triangle budget). Blue Hole snapshots updated.

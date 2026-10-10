@@ -1,5 +1,14 @@
 # Titanic site content: sources and notes (package B2)
 
+## 1210 verification (2026-10-09)
+
+[The merged-work review](../../../plan/progress/1210.md) restores supported
+history cut by F-1110: the voyage route, sinking interval, approximate people
+aboard, Argo and the discovery time, and the 1986 Memorial Act. It also separates
+the recovered Chunk from the two conserved pieces using the operator's artifact
+account. F-1110's removal of unsupported dimensions and precise marker-footprint
+claims remains in force; the older notes below are historical.
+
 ## F-1110 audit (2026-10-09)
 
 [The five-site primary-source audit](../../../plan/progress/F-1110.md) records

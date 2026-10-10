@@ -45,7 +45,7 @@ const idle: InputState = {
 
 for (const site of sites) {
   for (const tier of ['low', 'medium'] as const) {
-    it(`${site} ${tier}: free/mission hulls and desktop/portrait cameras clear the opening and 60 s idle`, async () => {
+    it(`${site} ${tier}: free/mission hulls and desktop/portrait/landscape cameras clear the opening and 60 s idle`, async () => {
       const config = makeConfig();
       const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;
       const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
@@ -123,7 +123,7 @@ for (const site of sites) {
           sub.step(idle, 0);
           const openingYaw = sub.yaw;
           const mesh = new SubMesh({ length: 26, hullClass: hull, tier });
-          const rigs = [1280 / 800, 390 / 844].map((aspect) => {
+          const rigs = [1280 / 800, 390 / 844, 844 / 390].map((aspect) => {
             const rig = new CameraRig(config.camera, aspect, terrain);
             rig.setChaseRadiusDefault(
               pose.chaseRadius,
@@ -244,7 +244,7 @@ it('retracts a deep chase arm before a submerged ridge even when the desired eye
     sampleHeight: (_x: number, z: number) => -200 + 115 * Math.max(0, 1 - Math.abs(z - 45) / 15),
     getNormal: (_x: number, _z: number, out = new Vector3()) => out.set(0, 1, 0),
   };
-  for (const aspect of [1280 / 800, 390 / 844]) {
+  for (const aspect of [1280 / 800, 390 / 844, 844 / 390]) {
     const rig = new CameraRig(config.camera, aspect, terrain);
     const position = new Vector3(0, -120, 0);
     rig.snap(position, 0, 0);

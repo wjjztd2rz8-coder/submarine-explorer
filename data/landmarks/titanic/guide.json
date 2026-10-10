@@ -7,8 +7,8 @@
       "id": "overview",
       "title": "RMS Titanic wreck site",
       "paragraphs": [
-        "RMS Titanic sank on 15 April 1912 on her maiden voyage after striking an iceberg. About 1,500 people died.",
-        "The wreck lies about 3,800 m down in the North Atlantic. A French–American expedition led by Jean-Louis Michel (IFREMER) and Robert Ballard (WHOI) found it on 1 September 1985. Cameras towed from RV Knorr first revealed a boiler; the team followed the debris north to the ship.",
+        "RMS Titanic sank in the early hours of 15 April 1912 on her maiden voyage from Southampton to New York, about two hours and forty minutes after striking an iceberg. About 1,500 of the roughly 2,200 people aboard died.",
+        "The wreck lies about 3,800 m down in the North Atlantic. A French–American expedition led by Jean-Louis Michel (IFREMER) and Robert Ballard (WHOI) found it on 1 September 1985. The Argo camera sled, towed from RV Knorr, first revealed a boiler; the team followed the debris north to the ship.",
         "The bow and stern rest about 600 m apart and face opposite ways. Hull fragments, machinery and personal belongings are scattered across the surrounding seabed.",
         "GMRT survey cells here span about 45 × 61 m. Magellan's proprietary 2022 photogrammetric scan is not used in this dive."
       ],
@@ -69,10 +69,6 @@
           "url": "https://www.whoi.edu/press-room/news-release/titanic-40th/"
         },
         {
-          "title": "WHOI — The Quest to Map Titanic (2012)",
-          "url": "https://www.whoi.edu/cms/files/Oceanus_49_2_Titanic_123424.pdf"
-        },
-        {
           "title": "NOAA — 2010 Titanic expedition results",
           "url": "https://sanctuaries.noaa.gov/maritime/titanic/expedition_results.html"
         },
@@ -87,6 +83,18 @@
         {
           "title": "NIST — Titanic overall length and wireless history",
           "url": "https://www.nist.gov/blogs/taking-measure/nist-and-titanic-how-sinking-ship-improved-wireless-communications-navigating"
+        },
+        {
+          "title": "WHOI — Titanic's maiden voyage",
+          "url": "https://www.whoi.edu/ocean-learning-hub/ocean-topics/ocean-human-lives/underwater-archaeology/rms-titanic/history-of-rms-titanic/"
+        },
+        {
+          "title": "1912 British Wreck Commissioner inquiry — collision and sinking times (transcript)",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTReport/botRepMessages.php"
+        },
+        {
+          "title": "1912 British Wreck Commissioner inquiry — people aboard and rescued (transcript)",
+          "url": "https://www.titanicinquiry.org/BOTInq/BOTReport/botRepSaved.php"
         }
       ],
       "confidence": "high"
@@ -185,7 +193,7 @@
       "title": "The boiler field",
       "paragraphs": [
         "Titanic had 29 coal-fired boilers: 24 double-ended and five single-ended. Each was about 4.8 m (15 ft 9 in) in diameter, according to the 1912 British inquiry. Boilers are among the machinery documented in the wreck's debris field.",
-        "One boiler was the first object the 1985 expedition recognised. Early on 1 September, the cameras showed its distinctive rivets; the team followed the debris north to the wreck."
+        "One boiler was the first object the 1985 expedition recognised. Just after 1 a.m. on 1 September, Argo's cameras showed its distinctive rivets; the team followed the debris north to the wreck."
       ],
       "facts": [
         {
@@ -198,7 +206,7 @@
         },
         {
           "label": "First seen",
-          "value": "1 September 1985"
+          "value": "just after 1 a.m., 1 September 1985"
         },
         {
           "label": "Scan marker",
@@ -282,8 +290,8 @@
       "id": "big-piece",
       "title": "Where the \"Big Piece\" lay",
       "paragraphs": [
-        "The \"Big Piece\", also called \"The Chunk\", is a recovered section of hull with portholes spanning C-Deck cabins and D-Deck kitchens. RMS Titanic Inc. describes it as a 17-ton section.",
-        "Recovery work began in 1994. Weather and equipment problems stopped an attempt in 1996; the section was finally raised in 1998. The expedition operator reports that it was subsequently divided into two sections.",
+        "The \"Chunk\" is a recovered section of hull with portholes spanning C-Deck cabins and D-Deck kitchens. RMS Titanic Inc. describes the recovered section as weighing 17 tons.",
+        "Recovery work began in 1994. Weather and equipment problems stopped an attempt in 1996; the section was finally raised in 1998. Conservators divided the 17-ton Chunk into the 15-ton Big Piece and the 2-ton Little Piece. The operator lists the Big Piece on display in Las Vegas and the Little Piece in Orlando.",
         "The hull section is no longer on the seabed. This marker lies in the stern-side debris area."
       ],
       "facts": [
@@ -322,7 +330,7 @@
       "title": "The memorial plaque",
       "paragraphs": [
         "In 1986, Robert Ballard returned to the wreck and placed a bronze Titanic Historical Society memorial plaque on the stern in honour of those who died.",
-        "NOAA treats Titanic as a grave site and maritime memorial. The US–UK agreement entered into force on 18 November 2019 and favours preserving the wreck in place.",
+        "NOAA treats Titanic as a grave site and maritime memorial. The RMS Titanic Maritime Memorial Act of 1986 directed the United States to negotiate an international agreement and develop guidelines for the site. The US–UK agreement entered into force on 18 November 2019 and favours preserving the wreck in place.",
         "This scan marks a memorial site on the stern."
       ],
       "facts": [
