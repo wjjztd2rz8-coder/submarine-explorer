@@ -1,12 +1,12 @@
 # F-LOSTCITY-TOWER2
 
-Branch claude/f-lostcity-tower2. Files: src/world/props/geo/towers.ts, tools/golden-shots.mjs, tools/lostcity-poses.json (new), CHANGELOG.
+Branch claude/f-lostcity-tower2. Gates: all PASS (PW_PORT=4471); terrainMerge1140 lost-city Low snapshot re-baselined (buffer hash only; draws 14 and triangles 40256 unchanged). Files: src/world/props/geo/towers.ts, tools/golden-shots.mjs, tools/lostcity-poses.json (new), CHANGELOG.
 
 ## Built
 
 - Palette: OLD/LIVE/CREAM/GREYBLUE/STAIN/TROUGH all lifted (LIVE 0xfaf6ec); ridge crest/trough multiplier 0.56..1.26 narrowed to 0.8..1.1; seams and streak noise cut. No brown clay tone remains on the trunk.
 - Striations: two sine bands per spire in angle (4.5x and 11x the ridge count), perturbed by the ridge noise and height, pale/shaded, strongest on the upper trunk. Vertex colour only, no new draw.
-- Orifice: white brucite fringe painted on the lip, narrower dark throat, plus one flat additive ring mesh per tall spire (top 3; shared RingGeometry and MeshBasicMaterial, opacity 0.14). The existing tier-scaled shimmerPlume stays the rising haze. All tiers get the ring (3 tiny draws).
+- Orifice: white brucite fringe painted on the lip, narrower dark throat, plus ring of 28 soft additive points on the lip of each of the top 3 spires (one Points object, no extra mesh draw; a flat ring mesh broke the per-prop mesh-count tests). The existing tier-scaled shimmerPlume stays the rising haze. All tiers get the ring (one small Points draw).
 - Golden pose: lost-city shots 2/3 now use tools/lostcity-poses.json (target 56 m up the trunk, 66 m above the seabed, 32 m standoff, from the SE) so the Poseidon mouth is framed beneath the HUD label. Filenames unchanged.
 
 ## Shots
