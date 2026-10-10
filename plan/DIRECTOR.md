@@ -13,8 +13,8 @@ Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku sm
 3. (MERGED 2026-10-10 f-rusticles: thin drooping clumps, clear gain) **Titanic rusticles (Sonnet):** shrink and thin the orange spikes, vary length, cluster them under rails and edges.
 4. (MERGED 2026-10-10 f-beebe-trunk: paint ownership bug fixed, ochre crests, modest gain at range; near pose still shows side stack) **Beebe main trunk (Sonnet):** side chimneys are crusted; the central trunk is a smooth brown cone, give it the same crust, flange and colour treatment.
 5. (MERGED 2026-10-10 f-endurance-sky: lit water column, scour-shaded minimap, hull glyph; clear gain) **Endurance sky and minimap (Sonnet):** dark void above the horizon, minimap five stripes; add haze gradient and ice-scour relief on the map.
-6. **Monterey wall silhouette (Sonnet, low):** strata read; the wall outline is stepped slabs, add slump and overhang variation.
-7. **Challenger seabed (Haiku/Sonnet, low):** add scattered rocks and faint slope shading around the lander.
+6. (MERGED 2026-10-10 f-monterey-wall: slump scars, uneven ledges, fallen blocks; modest gain, no overhang geometry) **Monterey wall silhouette (Sonnet, low):** strata read; the wall outline is stepped slabs, add slump and overhang variation.
+7. (MERGED 2026-10-10 f-challenger-seabed: cobbles, dropstones, tone patches; clear gain) **Challenger seabed (Haiku/Sonnet, low):** add scattered rocks and faint slope shading around the lander.
 
 Codex queue (dry until 15 Oct weekly reset): 1220 pacing gaps, 1230 CI shard triage, 1240 verify lander/first-discovery, 1250 sonar flat sites (largely done by f-sonar-flat; check before running), 1260 new-player flow audit, 1270 verify Lost City/CI, 1280 Blue Hole squiggle.
 
