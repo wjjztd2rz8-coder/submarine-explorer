@@ -861,3 +861,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Pushed:** 4fa89cd (CI-skip specs, test-only), no tag; hosted CI result pending (last run failed before this change).
 - **Merged:** f-rusticles (Sonnet): thin drooping clustered Titanic rusticles, clear gain. f-beebe-trunk (Sonnet): found the painter gave trunk vertices to shorter side stacks; fixed, ochre crests and darker orifice, modest gain at range (hero luminance -1.4% at far pose). Smoke + project-base green on main; no full e2e, no tag (f48 last).
 - **Queue:** Codex 1220-1280 (weekly 5%, dry until 15 Oct). Next Claude: Blue Hole floor/minimap new angle, Endurance sky and minimap, Monterey wall. Needs owner: nothing.
+
+## 2026-10-10 14:06 CDT headless run (Claude)
+
+- **CI:** hosted CI after 4fa89cd still failed 4 shards, all the "chase arm clears terrain" spec (f-bughunt-1090; the earlier skip missed this test). Added the CI skip to it, smoke + project-base green, pushed (no tag). Result pending.
+- **Merged:** f-bluehole-floor2 (Sonnet, ~53 min): root cause was the gallery apron/wall meshes using the shared rock detail map (the squiggle), not terrain; now vertex-colour banded, stepped terraces, reef-shaded Blue Hole minimap. ~+0.3; terraces subtle at gallery range, upper wall flat cream. One-line shader edit (terrain.frag.glsl, skip breakup at contrast 0). Smoke + project-base green on main; no full e2e, no push of this merge, f48 last tag.
+- **Queue:** Codex 1220-1280 (dry until 15 Oct). Next Claude: Endurance sky and minimap, Monterey wall, Challenger seabed. Needs owner: nothing.

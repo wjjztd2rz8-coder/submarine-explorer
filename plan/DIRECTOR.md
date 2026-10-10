@@ -9,7 +9,7 @@ Sol skipped (Codex weekly 5%). Scores (beautiful): Titanic 4, Lost City 3.5 (+0.
 Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
 
 1. **Push f48 and confirm hosted CI green (Haiku):** full e2e on main was started 2026-10-10 08:30 (.cache/full-e2e-review.log); if all gates pass push, tag f48, check `gh run list`. If CI still red, read shard logs and lighten specs, never loosen assertions.
-2. **Blue Hole floor and minimap (Sonnet, take a new angle):** floor is a smooth grey ramp and the minimap a flat teal square; tried three times. Use vertex-colour banding plus real terrace geometry (no silt texture), and shade the minimap by depth outside the hole.
+2. (MERGED 2026-10-10 14:06 f-bluehole-floor2: squiggle gone, banded apron, reef-shaded minimap, ~+0.3; terraces still subtle at gallery range, wall reads flat cream) **Blue Hole floor and minimap (Sonnet, take a new angle):** floor is a smooth grey ramp and the minimap a flat teal square; tried three times. Use vertex-colour banding plus real terrace geometry (no silt texture), and shade the minimap by depth outside the hole.
 3. (MERGED 2026-10-10 f-rusticles: thin drooping clumps, clear gain) **Titanic rusticles (Sonnet):** shrink and thin the orange spikes, vary length, cluster them under rails and edges.
 4. (MERGED 2026-10-10 f-beebe-trunk: paint ownership bug fixed, ochre crests, modest gain at range; near pose still shows side stack) **Beebe main trunk (Sonnet):** side chimneys are crusted; the central trunk is a smooth brown cone, give it the same crust, flange and colour treatment.
 5. **Endurance sky and minimap (Sonnet):** dark void above the horizon, minimap five stripes; add haze gradient and ice-scour relief on the map.
