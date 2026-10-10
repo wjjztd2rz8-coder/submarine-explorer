@@ -792,3 +792,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** f-lostcity-tower2 (Sonnet: pale carbonate tower, flow striations, white-fringed orifice with shimmer points, new Lost City golden pose; reviewed shots, clear gain ~3.5) and f-ci-timeouts (Haiku: Chromium install retry, first-minute spec timeout 480 s; 1090 frame-floor specs untouched, they fail on hosted runners). Smoke + project-base green on main; no full e2e, no push.
 - **Problem:** main's node_modules was found empty mid-run (cause unknown, restored with npm ci). Stale vite preview servers again block ports; pkill before gates.
 - **Queue:** 1220, 1230, 1240, 1250, 1260, 1270 (Codex weekly 6%, dry until 15 Oct). Next Claude: Blue Hole floor, Beebe trunk, phone pass. Needs owner: nothing.
+
+## 2026-10-10 01:46 CDT headless run (Claude)
+
+- **Merged:** nothing new. f-bluehole-floor (Sonnet, ~1.5 h) was NOT merged: terraces and softer tint are invisible in golden poses (~3, +0.1); the grey squiggle texture (silt_a.jpg outlines) is unsolved. Branch claude/f-bluehole-floor kept; Codex 1280 queued to bisect the squiggle.
+- **Pushed:** full e2e + project-base PASSED on main (only prettier on an older progress note failed, fixed); pushed and tagged f46. Pages deploy in progress at exit; hosted CI of the previous push failed again (shard timeouts), check next run.
+- **Queue:** 1220-1280 (Codex weekly 6%, dry until 15 Oct). Next Claude: Beebe trunk, phone pass, hosted CI triage. Needs owner: nothing.
