@@ -152,11 +152,11 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "great-blue-hole": {
-    "meshes": "497a2ec7736690c05b1f426456472f9b256dbfb13d2e2c7452d0fe0e137ab9fb",
+    "meshes": "e14c7a68a790a95220b92d6baa7c371c42231c247fea3704194948e1db451d11",
     "stats": {
       "cells": 21,
-      "drawCalls": 4,
-      "instances": 219,
+      "drawCalls": 6,
+      "instances": 461,
     },
   },
   "hudson-canyon": {

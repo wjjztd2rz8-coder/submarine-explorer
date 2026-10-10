@@ -83,6 +83,9 @@ const NOTCHES: readonly { a: number; w: number; h: number; hw: number; d: number
   { a: 2.3, w: 0.13, h: -88, hw: 8, d: 12 },
   { a: 3.9, w: 0.18, h: -52, hw: 8, d: 14 },
   { a: 5.4, w: 0.12, h: -75, hw: 7, d: 10 },
+  { a: 1.5, w: 0.1, h: -66, hw: 6, d: 12 },
+  { a: 4.6, w: 0.11, h: -92, hw: 6, d: 11 },
+  { a: 0.1, w: 0.09, h: -45, hw: 5, d: 9 },
 ];
 
 /** Fixed floor blocks: (dx, dz, radius, height) in metres from the hole centre. */

@@ -42,7 +42,16 @@ export const SET_CONTRAST: Record<TerrainSet, number> = {
 
 /** Scatter kinds a biome may request (see `scatter/ScatterTypes.ts`). */
 export type ScatterKind =
-  'boulder' | 'dropstone' | 'pillow' | 'rubble' | 'sponge' | 'seapen' | 'whip' | 'mound';
+  | 'boulder'
+  | 'dropstone'
+  | 'pillow'
+  | 'rubble'
+  | 'sponge'
+  | 'seapen'
+  | 'whip'
+  | 'mound'
+  | 'ledge'
+  | 'tube';
 
 export interface ScatterSpec {
   kind: ScatterKind;
@@ -339,8 +348,11 @@ export const BIOMES: Record<string, Biome> = {
     // Across the 320 m bowl the reef should already dissolve into water haze.
     horizonFadeM: [55, 210],
     scatter: [
-      { kind: 'sponge', density: 0.8, slopeMaxDeg: 40, on: 'rock' },
-      { kind: 'sponge', density: 0.5, slopeMaxDeg: 20, on: 'flat' },
+      { kind: 'sponge', density: 1.2, slopeMaxDeg: 40, on: 'rock' },
+      { kind: 'sponge', density: 0.9, slopeMaxDeg: 20, on: 'flat' },
+      // Real overhangs: a heightfield cannot undercut, so rock awnings (dark undersides) jut from the beds.
+      { kind: 'ledge', density: 1.8, slopeMaxDeg: 62, on: 'rock' },
+      { kind: 'tube', density: 3.2, slopeMaxDeg: 50, on: 'any' },
       { kind: 'rubble', density: 3, slopeMaxDeg: 30, on: 'any' },
       { kind: 'boulder', density: 1.6, slopeMaxDeg: 45, on: 'any' },
       { kind: 'mound', density: 2, slopeMaxDeg: 10, on: 'flat' },

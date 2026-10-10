@@ -9,6 +9,8 @@ import type * as THREE from 'three';
 import type { Biome, ScatterKind } from '../TerrainBiome.js';
 import {
   boulderGeometry,
+  ledgeGeometry,
+  tubeSpongeGeometry,
   dropstoneGeometry,
   moundGeometry,
   pillowGeometry,
@@ -74,6 +76,8 @@ function tinted(
 
 // Muted sponge palette (sRGB): ochre, pale cream, dusky orange, grey-lilac.
 const SPONGE_HUES = [0xb59a55, 0xc9bfa0, 0xa8663b, 0x8f8290];
+
+const TUBE_HUES = [0x7d6f9a, 0xb86f55, 0xc7b36a, 0x6a8f93, 0x9c7a8e];
 
 export const SCATTER_TYPES: Record<ScatterKind, ScatterTypeDef> = {
   boulder: {
@@ -189,6 +193,45 @@ export const SCATTER_TYPES: Record<ScatterKind, ScatterTypeDef> = {
     patchScaleM: 26,
     drawRangeM: 100,
     color: (_b, r, o) => tinted(0xd2c7ae, 0.7, 1.15, r, o),
+  },
+  // Awning slab that juts from a steep wall: a half-buried flat plate with a dark underside.
+  ledge: {
+    material: 'rock',
+    geometry: ledgeGeometry,
+    size: [2.5, 6.5],
+    height: [0.7, 1.3],
+    embed: 0.35,
+    align: 0.0,
+    wobble: 0.08,
+    clump: [1, 2],
+    clumpRadiusM: 5,
+    patchiness: 0.55,
+    patchScaleM: 38,
+    drawRangeM: 220,
+    color: (b, r, o) => tinted(b.colorC, 0.38, 0.75, r, o),
+  },
+  // Slender capsule tube sponges in leaning clusters, several muted hues.
+  tube: {
+    material: 'soft',
+    geometry: tubeSpongeGeometry,
+    size: [0.4, 1.5],
+    height: [0.9, 2.2],
+    embed: 0.05,
+    align: 0.25,
+    wobble: 0.22,
+    clump: [3, 7],
+    clumpRadiusM: 1.6,
+    patchiness: 0.75,
+    patchScaleM: 24,
+    drawRangeM: 140,
+    color: (_b, r, o) =>
+      tinted(
+        TUBE_HUES[Math.floor(r() * TUBE_HUES.length) % TUBE_HUES.length] as number,
+        0.75,
+        1.2,
+        r,
+        o,
+      ),
   },
   mound: {
     material: 'soft',

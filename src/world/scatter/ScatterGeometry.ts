@@ -99,6 +99,37 @@ export function boulderGeometry(): THREE.BufferGeometry {
   return lump(1, 11, 0.32, [1.0, 0.72, 0.85], true, 0.22);
 }
 
+/** Wide flat awning slab; faces looking down are darkened so it reads as an undercut. */
+export function ledgeGeometry(): THREE.BufferGeometry {
+  const g = lump(1, 61, 0.3, [2.2, 0.34, 1.3], false, 0.18);
+  const nor = g.getAttribute('normal');
+  const col = g.getAttribute('color');
+  for (let i = 0; i < col.count; i++) {
+    const k = nor.getY(i) < -0.15 ? 0.55 : 1;
+    col.setXYZ(i, col.getX(i) * k, col.getY(i) * k, col.getZ(i) * k);
+  }
+  return g;
+}
+
+/** Slender capsule tube sponge (closed rounded crown, soft base), ~1 unit tall. */
+export function tubeSpongeGeometry(): THREE.BufferGeometry {
+  const pts = [
+    [0.0, 0.0],
+    [0.14, 0.04],
+    [0.2, 0.3],
+    [0.17, 0.75],
+    [0.12, 0.95],
+    [0.0, 1.0],
+  ].map(([r, y]) => new THREE.Vector2(r as number, y as number));
+  const g = new THREE.LatheGeometry(pts, 6);
+  const pos = g.getAttribute('position');
+  for (let i = 0; i < pos.count; i++) {
+    const k = 1 + 0.14 * (hash3(pos.getX(i), pos.getY(i), pos.getZ(i), 77) - 0.5);
+    pos.setXYZ(i, pos.getX(i) * k, pos.getY(i), pos.getZ(i) * k);
+  }
+  return finish(g, 79, 0.12);
+}
+
 /** Smooth rounded stone (glacial dropstone), ~1 unit across. */
 export function dropstoneGeometry(): THREE.BufferGeometry {
   return lump(2, 23, 0.1, [1.0, 0.7, 0.85], true, 0.1);
