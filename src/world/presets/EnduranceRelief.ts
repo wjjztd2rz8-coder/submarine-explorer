@@ -13,13 +13,21 @@ const COUNT = 10;
 const LONG = 28;
 const ACROSS = 6;
 
-/** Build the ridge mesh around `centre`; deterministic. */
-export function buildEnduranceRelief(terrain: PresetTerrain, centre: THREE.Vector3): THREE.Mesh {
+export interface ScourRidge {
+  cx: number;
+  cz: number;
+  dx: number;
+  dz: number;
+  len: number;
+  width: number;
+  height: number;
+  bend: number;
+}
+
+/** The ridge layout around `centre` (x, z); deterministic. Shared by the mesh and the sonar. */
+export function enduranceRidges(centre: { x: number; z: number }): ScourRidge[] {
   const rnd = mulberry(0xe4d0);
-  const pos: number[] = [];
-  const col: number[] = [];
-  const idx: number[] = [];
-  const tint = new THREE.Color();
+  const out: ScourRidge[] = [];
   for (let r = 0; r < COUNT; r++) {
     const bearing = ((r + rnd() * 0.7) / COUNT) * Math.PI * 2;
     const dist = 55 + rnd() * 115;
@@ -30,14 +38,45 @@ export function buildEnduranceRelief(terrain: PresetTerrain, centre: THREE.Vecto
     const len = 55 + rnd() * 90;
     const width = 9 + rnd() * 12;
     const height = 3.5 + rnd() * 5;
-    const dx = Math.cos(dir);
-    const dz = Math.sin(dir);
     const bend = (rnd() - 0.5) * 30;
+    out.push({ cx, cz, dx: Math.cos(dir), dz: Math.sin(dir), len, width, height, bend });
+  }
+  return out;
+}
+
+const envelope = (t: number, r: number): number =>
+  Math.sin(Math.PI * t) ** 0.8 * (0.75 + 0.25 * Math.sin(t * 17 + r));
+
+/** Summed ridge height (m) above the plain at world (x, z); 0 away from every ridge. */
+export function enduranceScourHeight(ridges: readonly ScourRidge[], x: number, z: number): number {
+  let h = 0;
+  for (let r = 0; r < ridges.length; r++) {
+    const k = ridges[r] as ScourRidge;
+    const px = x - k.cx;
+    const pz = z - k.cz;
+    const t = (px * k.dx + pz * k.dz) / k.len + 0.5;
+    if (t <= 0 || t >= 1) continue;
+    const u = (-px * k.dz + pz * k.dx - Math.sin(Math.PI * t) * k.bend) / k.width;
+    if (Math.abs(u) >= 1) continue;
+    h += k.height * envelope(t, r) * Math.cos(u * Math.PI * 0.5) ** 2;
+  }
+  return h;
+}
+
+/** Build the ridge mesh around `centre`; deterministic. */
+export function buildEnduranceRelief(terrain: PresetTerrain, centre: THREE.Vector3): THREE.Mesh {
+  const pos: number[] = [];
+  const col: number[] = [];
+  const idx: number[] = [];
+  const tint = new THREE.Color();
+  const ridges = enduranceRidges(centre);
+  for (let r = 0; r < COUNT; r++) {
+    const { cx, cz, dx, dz, len, width, height, bend } = ridges[r] as ScourRidge;
     const base = pos.length / 3;
     for (let i = 0; i <= LONG; i++) {
       const t = i / LONG;
       const along = (t - 0.5) * len;
-      const env = Math.sin(Math.PI * t) ** 0.8 * (0.75 + 0.25 * Math.sin(t * 17 + r));
+      const env = envelope(t, r);
       const sway = Math.sin(t * Math.PI) * bend;
       for (let j = 0; j <= ACROSS; j++) {
         const u = (j / ACROSS - 0.5) * 2;

@@ -101,7 +101,7 @@ export class WreckPreset implements EnvPreset {
       this.horizon = new TitanicHorizon(
         ctx.scene,
         endurance
-          ? { upperColor: 0x1f3a48, hazeColor: 0x335563, hazePeakElevation: 0.32 }
+          ? { upperColor: 0x2c5266, hazeColor: 0x3f6d80, hazePeakElevation: 0.4 }
           : undefined,
       );
       if (endurance) this.horizon.dome.name = 'enduranceHorizon';

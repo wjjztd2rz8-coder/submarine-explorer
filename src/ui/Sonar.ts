@@ -20,6 +20,7 @@ import {
 } from '../core/Config.js';
 import { latLonToWorld } from '../util/geo.js';
 import { BLUE_HOLE_LAT, BLUE_HOLE_LON, blueHoleSonarShade } from '../world/terrainFeatures.js';
+import { enduranceRidges, enduranceScourHeight } from '../world/presets/EnduranceRelief.js';
 import type { Terrain } from '../world/Terrain.js';
 import type { PlacedLandmark } from '../world/Landmarks.js';
 import type { PlacedPoi } from '../game/Pois.js';
@@ -421,6 +422,7 @@ export class Sonar {
 
   setPois(pois: readonly PlacedPoi[]): void {
     this.pois = pois;
+    this.reliefDirty = true;
   }
   setScanState(isScanned: (poi: PlacedPoi) => boolean): void {
     this.scanState = isScanned;
@@ -514,14 +516,21 @@ export class Sonar {
       zoom === 'tile' ? Math.max(this.terrain.widthM, this.terrain.depthM) : zoom,
     );
     this.flatness = flat.flatness;
-    const contourInterval = sonarLocalContourInterval(
-      this.terrain.meta.id === 'great-blue-hole'
-        ? Math.min(10, this.zoomConfig.contourIntervalM[reference])
-        : this.zoomConfig.contourIntervalM[reference],
-      actualSpan,
-      this.zoomConfig.maxContours,
-      flat.flatness,
-    );
+    // Endurance: the survey is a plane tilted ~6 m over 1 km, so contours would
+    // only be parallel stripes. Show the ice-scour swells around the hull
+    // (same layout as the 3D ridges) as soft shading instead.
+    const hull = this.terrain.meta.id === 'endurance' && flat.flatness > 0 ? this.hullPoi() : null;
+    const ridges = hull ? enduranceRidges(hull.position) : null;
+    const contourInterval = ridges
+      ? Infinity
+      : sonarLocalContourInterval(
+          this.terrain.meta.id === 'great-blue-hole'
+            ? Math.min(10, this.zoomConfig.contourIntervalM[reference])
+            : this.zoomConfig.contourIntervalM[reference],
+          actualSpan,
+          this.zoomConfig.maxContours,
+          flat.flatness,
+        );
     this.relief = {
       minDepthM: -hi,
       maxDepthM: -lo,
@@ -560,7 +569,21 @@ export class Sonar {
         const gx = (right - left) / ((rightX - leftX) * metresPerPixel);
         const gz = (south - north) / ((southY - northY) * metresPerPixel);
         // A smooth shoulder keeps steep survey slopes from clipping into bands.
+        let scour = 1;
+        if (ridges) {
+          const wx = centerX + (px - margin - this.canvas.width / 2) * metresPerPixel;
+          const wz = centerZ + (py - margin - this.canvas.height / 2) * metresPerPixel;
+          const e = metresPerPixel * 1.5;
+          const h0 = enduranceScourHeight(ridges, wx, wz);
+          // Lit from the north-west, like the hillshade; swell crests also read lighter.
+          const dX =
+            enduranceScourHeight(ridges, wx + e, wz) - enduranceScourHeight(ridges, wx - e, wz);
+          const dZ =
+            enduranceScourHeight(ridges, wx, wz + e) - enduranceScourHeight(ridges, wx, wz - e);
+          scour = 1 - 0.5 * Math.tanh(((0.7 * dX + 0.5 * dZ) / (2 * e)) * 3) + 0.04 * h0;
+        }
         const shade =
+          scour *
           tintMul *
           (1 -
             0.28 *
@@ -664,6 +687,10 @@ export class Sonar {
    * halo under each contact (the scan radius), so the wreck and objectives
    * show against featureless seabed. Faded out as relief takes over.
    */
+  private hullPoi(): PlacedPoi | undefined {
+    return this.pois.find((poi) => poi.id === 'endurance-hull');
+  }
+
   private drawFlatGuides(ctx: CanvasRenderingContext2D, s: SubmarineState): void {
     const flat = this.flatness;
     if (flat <= 0 || !this.showMarkers) return;
@@ -704,6 +731,14 @@ export class Sonar {
       ctx.setLineDash([3, 2]);
       ctx.stroke();
       ctx.setLineDash([]);
+      if (poi.id === 'endurance-hull') {
+        // Hull footprint (about 44 m by 9 m) drawn at least 16 px long.
+        const half = Math.max(8, 22 * pxPerM);
+        ctx.fillStyle = hc ? 'rgba(255,255,255,.55)' : 'rgba(255,214,120,.5)';
+        ctx.beginPath();
+        ctx.ellipse(px, py, half, Math.max(2.5, half * 0.22), 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
     ctx.restore();
   }
@@ -852,6 +887,13 @@ export class Sonar {
     // and so does +Z (south), so a heading of 0 (north) must point up: -y.
     const { px, py } = this.project(s.position.x, s.position.z);
     const a = (s.headingDeg * Math.PI) / 180;
+    if (this.flatness > 0 && this.showMarkers) {
+      // Near-featureless seabed: a dark disc under the sub keeps it findable.
+      ctx.fillStyle = 'rgba(2, 12, 17, .6)';
+      ctx.beginPath();
+      ctx.arc(px, py, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.save();
     ctx.translate(px, py);
     ctx.rotate(a);
