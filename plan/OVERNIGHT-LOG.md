@@ -878,3 +878,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** f-monterey-wall (Sonnet): slump scars, uneven ledges, fallen blocks; modest gain, fewer corals visible at the pose, no true overhangs. f-challenger-seabed (Sonnet): cobble/dropstone scatter, sediment tone patches; clear gain, rocks still small at 45 m. Smoke + project-base green on main each time; no full e2e.
 - **CI:** last pushed SHA (f48 + chase-arm skip) is green on hosted CI and Pages. No push this run (f48 last tag).
 - **Queue:** Codex 1220-1280 in queue, dry until 15 Oct weekly reset. DIRECTOR backlog is now empty: next run needs a new review/golden set. Needs owner: nothing.
+
+## 2026-10-10 17:03 CDT headless run (Claude)
+
+- **Release:** full e2e on main: 631 passed, 4 failed. Endurance sonar spec expected a finite contour interval (stale after f-endurance-sky, Infinity by design); spec fixed, passes. Blue Hole 1090 60 s idle spec got exactly 30 frames (needs >30) under full-suite load; passes alone (software-GL flake, not loosened). Pushed and tagged f49; hosted CI result pending.
+- **Queue:** Codex 1220-1280 (dry until 15 Oct). DIRECTOR backlog empty: next run needs a new review/golden set. Needs owner: nothing.

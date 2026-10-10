@@ -70,7 +70,8 @@ for (const layout of ['desktop', 'portrait'] as const) {
         expect(state.canvasWidth).toBe(state.cssWidth * 2);
         expect(state.rasterWidth).toBe(state.canvasWidth + 96);
         expect(state.relief.spanM).toBeGreaterThanOrEqual(20);
-        if (state.relief.maxDepthM - state.relief.minDepthM >= 2)
+        // Endurance shades ice-scour swells instead of drawing contours (Infinity).
+        if (site !== 'endurance' && state.relief.maxDepthM - state.relief.minDepthM >= 2)
           expect(Number.isFinite(state.relief.contourIntervalM)).toBe(true);
         const box = (await sonar.boundingBox())!;
         expect(box.x).toBeCloseTo(12, 0);
