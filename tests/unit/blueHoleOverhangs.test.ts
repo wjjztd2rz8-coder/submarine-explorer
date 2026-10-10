@@ -16,8 +16,8 @@ describe('Blue Hole overhangs and benthos', () => {
     let nd = 0;
     let nu = 0;
     for (let i = 0; i < n.count; i++) {
-      if (n.getY(i) < -0.3) (down += c.getX(i)), nd++;
-      else if (n.getY(i) > 0.3) (up += c.getX(i)), nu++;
+      if (n.getY(i) < -0.3) ((down += c.getX(i)), nd++);
+      else if (n.getY(i) > 0.3) ((up += c.getX(i)), nu++);
     }
     expect(nd).toBeGreaterThan(0);
     expect(down / nd).toBeLessThan(0.75 * (up / nu));

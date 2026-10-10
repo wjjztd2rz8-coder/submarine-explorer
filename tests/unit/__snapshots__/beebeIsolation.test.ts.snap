@@ -160,7 +160,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
     },
   },
   "great-blue-hole": {
-    "biome": "7cfc61b35685481328b55eb34101d8cda5a61ba0018917f4c7a3c5a1a6e242c7",
+    "biome": "8303cad2f0ca935135973f27162fe4834c575aff62ae5541c0a4705eadfb166f",
     "tiers": {
       "high": {
         "buffers": [
