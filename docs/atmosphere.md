@@ -1,5 +1,17 @@
 # Underwater atmosphere (package A2)
 
+Titanic and Endurance reuse their existing unlit 32×16 backdrop dome for a
+gradual abyssal haze band. `ABYSS_HORIZON` in `src/core/config/atmosphere.ts`
+controls the blue-grey crown, slightly brighter suspended-sediment glow, and
+700–1,200 m activation. Fog matching continues through the first ring above
+world level; broad 8% azimuth variation adds faint depth to the glow. The same
+single draw runs on Low without a post pass or additional particles. Fog hue,
+density, hull lighting and hull geometry remain unchanged; the near seabed
+retains its existing terrain treatment. Regression coverage:
+`tests/unit/titanicHorizon.test.ts`, `tests/unit/enduranceAtmosphere.test.ts`,
+and `tests/e2e/f-horizon-1190.spec.ts` (fresh desktop and 390×844 portrait starts
+on Low and High).
+
 Source of truth: `src/render/Atmosphere.ts` (fog, ambient, filtered sun, caustics, depth-band events), `Headlights.ts`, `MarineSnow.ts`, `caustics.ts`, `src/world/Water.ts` (surface lid), `src/shaders/underwater.ts` (post pass). Tunables: `water` section of `src/core/Config.ts`. Wiring: `src/main.ts`. Test: `tests/e2e/atmosphere.spec.ts`.
 
 ## Depth bands
