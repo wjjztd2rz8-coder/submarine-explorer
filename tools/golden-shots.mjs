@@ -31,6 +31,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { goldenOptions, selectGoldenHeroes } from './golden-options.mjs';
 import blueHolePoses from './blue-hole-poses.json' with { type: 'json' };
+import lostCityPoses from './lostcity-poses.json' with { type: 'json' };
 import montereyPoses from './monterey-poses.json' with { type: 'json' };
 
 async function main() {
@@ -60,7 +61,8 @@ async function main() {
   const closeOverride = process.env.GOLDEN_CLOSE ? JSON.parse(process.env.GOLDEN_CLOSE) : null; // dev: retune the west alcove close pose
   const defaultHeroes = [
     ['titanic', 'bow-hull'],
-    ['lost-city', 'poseidon-tower'],
+    // Poseidon: shot 3 looks up the trunk so the vent orifice is in frame.
+    ['lost-city', 'poseidon-tower', 'lost-city', lostCityPoses['poseidon-tower']],
     // The west alcove, framed from the hole's interior on its ledge (the hole centre lies due east).
     [
       'great-blue-hole',
