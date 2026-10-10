@@ -1,8 +1,9 @@
 /**
  * Baked vertex-colour relief for the Challenger Deep trench slopes. The real GMRT surface is
  * smooth, so the wall is shaped only by colour: a lighter, warmer upslope gradient, faint
- * horizontal sediment terraces and darker slope shoulders. Multipliers sit around 1 on the flat
- * floor (so the lander's seabed is unchanged) and brighten gently up the wall; never below 0.8.
+ * horizontal sediment terraces and darker slope shoulders. On the flat floor the multiplier varies about 1 by
+ * under 15% (warm/cool sediment patches and faint current drift lines) and brightens gently up the
+ * wall; never below 0.8.
  */
 
 /** Depth (m, negative) of the lander floor; the gradient starts a few metres above it. */
@@ -27,6 +28,12 @@ export function challengerSlopeTint(
   const terrace = Math.sin(((y + wobble) / 7.5) * Math.PI * 2);
   const band = 1 + 0.1 * terrace * Math.max(slope, up * 0.6);
   // Lighter and slightly warmer with height; steep faces a touch darker in their recesses.
-  const g = (1 + 0.5 * up) * band * (1 - 0.1 * slope * (1 - up));
-  return [g * (1 + 0.06 * up), g, g * (1 - 0.1 * up)];
+  // Floor sediment tone: broad warm/cool patches plus thin bottom-current drift lines (a lighter crest, darker lee).
+  const patch = Math.sin(x * 0.021 + Math.sin(z * 0.017) * 1.6) * Math.sin(z * 0.026 - x * 0.011);
+  const drift = Math.sin((x * 0.62 + z * 0.78) * 0.9 + Math.sin(x * 0.05 - z * 0.04) * 2.4);
+  const floorW = 1 - up;
+  const tone = 1 + floorW * (0.09 * patch + 0.035 * drift * (0.5 + 0.5 * patch));
+  const g = (1 + 0.5 * up) * band * (1 - 0.1 * slope * (1 - up)) * tone;
+  const warm = 1 + 0.06 * up + floorW * 0.04 * patch;
+  return [g * warm, g, g * (1 - 0.1 * up - floorW * 0.04 * patch)];
 }
