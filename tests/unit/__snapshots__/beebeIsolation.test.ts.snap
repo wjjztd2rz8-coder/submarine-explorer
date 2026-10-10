@@ -423,7 +423,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 9,
         "triangles": 95374,
       },
-      "geometry": "d20b7a1fdc2faecd309597636fcaec22f4107980f1bc1af1b637736f77795902",
+      "geometry": "ba5d39464709848b02ec96a116db180bb1af08da785f87c11b0ccb6e83137cfb",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
@@ -437,7 +437,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 2,
         "triangles": 13056,
       },
-      "geometry": "3e85a0d16ef0a3a9dc7fca219a825c71ac6e01a0a52fdef6545b930af2dd0d2b",
+      "geometry": "b2132b270fb3ee117ce006ecd987b5e2a5e284d9915533ae3504b79b579fd881",
       "id": "beebe-chimney-2",
       "impostor": {
         "draws": 1,
@@ -451,7 +451,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 2,
         "triangles": 12632,
       },
-      "geometry": "518a76fefc2246d5269dce136bb949d7a106a53d8f3afc4d82af0628b61a28d4",
+      "geometry": "f076d6a0cd83334c65ec01b3a3ca91758822e828429f524b1307388c2e1c2e35",
       "id": "beebe-chimney-3",
       "impostor": {
         "draws": 1,
@@ -467,7 +467,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 9,
         "triangles": 17598,
       },
-      "geometry": "340644fd18f0b007f85a645f6f7c318ce79b3db9c52a158a4ae08771b0c85b1c",
+      "geometry": "8a7d100ade96d2e89886075a4c0a96a35682c8cae42be8f0e489d8db5597f63a",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
@@ -481,7 +481,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 2,
         "triangles": 1214,
       },
-      "geometry": "4dc29c137662f2fcfb7565c896562d0ee3c1ade40636f58786d73dfefe1d2368",
+      "geometry": "9770e20ad518bc7dc5b6849d1fc02b7c5224b6f63a2189f26ef9aa05f90c0610",
       "id": "beebe-chimney-2",
       "impostor": {
         "draws": 1,
@@ -495,7 +495,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 2,
         "triangles": 1114,
       },
-      "geometry": "4587bafd5e6eab75a32b3621c6f92245903e20286b0c31b4af515dd223df5a18",
+      "geometry": "cf8cb1921e27fd8b9e5ad3ed0cf42ad32603519514f3edad6ecd7666e2a3d47c",
       "id": "beebe-chimney-3",
       "impostor": {
         "draws": 1,
@@ -511,7 +511,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 9,
         "triangles": 53728,
       },
-      "geometry": "c58d8f332ed66c0b9cf2b6f0878e63cada4ccab0a11918538582af1809bf0711",
+      "geometry": "a35711d59f891cd6cbafd16143078ba54157b341c0dfcfaca1f5bc2c47bbfa30",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
@@ -525,7 +525,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 2,
         "triangles": 6252,
       },
-      "geometry": "6e847654b5a3d193ae1f06c394e5cf245d1d6c1b1e91fe0e0dfbabb8fc1554e5",
+      "geometry": "4ec889465105e1d4724b1b25b2736714773364a5bf4c31d7ea822ec4a988fe87",
       "id": "beebe-chimney-2",
       "impostor": {
         "draws": 1,
@@ -539,7 +539,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 2,
         "triangles": 5992,
       },
-      "geometry": "6eb0c933b5473fbe747d5b11456da09de3805e17ddfb7b11df1a523a255fe340",
+      "geometry": "689733810f704f3bcca4ffbdafa71ad560d15783520a0922a101622d81d4d7a0",
       "id": "beebe-chimney-3",
       "impostor": {
         "draws": 1,
@@ -555,7 +555,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 9,
         "triangles": 199172,
       },
-      "geometry": "9130d83e18ebb876dbcab77a51b1eb0df976c286dacdf4b793804b6d56792ce7",
+      "geometry": "aa2c3b63ea25fcf6c6413df954f599d96e1c812355eb9cebbe120be682ef5b74",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
@@ -569,7 +569,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 2,
         "triangles": 28696,
       },
-      "geometry": "bacf055874c36d31c5724d60d8c1cd760bc681e2169540e8e9e4879df742f232",
+      "geometry": "8d1c8cb922302c88158643ec37522c65c023e7493c3ed83b4e46d76526531a6a",
       "id": "beebe-chimney-2",
       "impostor": {
         "draws": 1,
@@ -583,7 +583,7 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
         "draws": 2,
         "triangles": 28000,
       },
-      "geometry": "bad9a28e75841053848f1de4ada3f72d0fa8a92f3d08327402d425d786711d6d",
+      "geometry": "166ee2709635286a8de7a76f873140d64aef377aa03c2c24f4304b3db9e86fac",
       "id": "beebe-chimney-3",
       "impostor": {
         "draws": 1,

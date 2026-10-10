@@ -50,7 +50,7 @@ const settle = () =>
   );
 const snap = async (name) => {
   await settle();
-  await page.screenshot({ path: resolve(outDir, `${prefix}-${name}.png`) });
+  await page.screenshot({ path: resolve(outDir, `${prefix}-${name}.png`), timeout: 180000 });
   const perf = await page.evaluate(() => ({
     d: window.__game.perf.drawCalls,
     t: window.__game.perf.triangles,

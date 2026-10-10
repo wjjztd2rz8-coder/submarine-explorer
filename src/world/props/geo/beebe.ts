@@ -207,6 +207,8 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
   built.colliders ??= [built.bounds.clone()];
   built.bounds.union(apron.boundingBox!);
   built.full.add(mesh);
+  // Dark rust, not the bright ochre apron stain: lit talus must stay basalt, never plaster-tan.
+  const rubbleStain = stain.clone().multiplyScalar(0.3);
   const rubble = scatterRubble(
     surface,
     (x, z) => {
@@ -232,8 +234,8 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
       const s = fbm3(x * 0.35, y * 0.6, z * 0.35, seed ^ 0x9d, 2);
       const f = fbm3(x * 3.1, y * 3.1, z * 3.1, seed ^ 0x2c, 2);
       out.copy(basalt).multiplyScalar(0.7 + m * 0.9 + (f - 0.5) * 0.5);
-      out.lerp(stain, smooth(0.45, 0.7, s) * 0.45);
-      out.lerp(sediment, smooth(0.5, 0.95, ny) * 0.1);
+      out.lerp(rubbleStain, smooth(0.45, 0.7, s) * 0.3);
+      out.lerp(sediment, smooth(0.5, 0.95, ny) * 0.04);
     });
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
@@ -339,6 +341,7 @@ function addBeebeHabitat(built: BuiltProp, input: ProceduralBuildInput): void {
       pieces.push(geometry);
     }
   }
+  const chunkDust = new THREE.Color(0x4a443b);
   const rubble = Math.max(6, Math.round(cfg.rubble_count! * d.growth));
   for (let k = 0; k < rubble; k++) {
     const a = flow + (rnd() - 0.5) * Math.PI * 1.7;
@@ -356,7 +359,10 @@ function addBeebeHabitat(built: BuiltProp, input: ProceduralBuildInput): void {
       cp.setXYZ(i, cp.getX(i) * j, cp.getY(i) * (0.9 + 0.2 * j), cp.getZ(i) * j);
     }
     chunk.computeVertexNormals();
-    paint(chunk, (_x, _y, _z, ny, color) => color.set(ny > 0.6 ? 0x5a5347 : 0x33322e));
+    paint(chunk, (_x, _y, _z, ny, color) => {
+      // Soft dusting on upward faces only; a hard-edged pale top reads as a plaster lump.
+      color.set(0x2c2b28).lerp(chunkDust, smooth(0.55, 0.95, ny) * 0.5);
+    });
     place(chunk, {
       x,
       y: surface(x, z) + size * 0.25,
