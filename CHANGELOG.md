@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- First-discovery fixes (f-firstdiscovery-fixes): the scan completion card now titles the target with the objective name the player saw (e.g. "Beebe-125 black smokers") instead of the guide entry title, which could differ in wording; the Journal still uses the guide title. The tutorial "Move and turn" step completes on either a sustained thrust (0.8 s) or a sustained turn (0.5 s), instead of needing both, so a player who only drives or only turns is no longer stuck on it. Reason: owner's unaided first-discovery capture. Phone input uses the same axes, so phone behaviour is unchanged.
+
 - Lost City carbonate towers: flow-stone look with 22 meandering vertical ridges on the main trunk, much weaker terrace shelves, ridge-aligned crest/trough colouring (grey-brown troughs, faint blue-green film near the base), deeper and wider dark vent mouth. Cut: saucer flanges removed from the main trunk and the lone chimney, and reduced to a rare small one on lesser spires (Lost City tower triangles drop; terrainMerge1140 snapshot updated).
 
 - Great Blue Hole bowl (f-bluehole-bowl2): ragged shelf lip with rubble ridges and a stepped main riser (extra ledge knots), a 30 m colour feather from warm shelf to cool wall, stronger per-terrace tone and darker blue lower walls; wall sponges are now closed capsules (muted colour, 12 instead of 34 to stay in the Low triangle budget). Blue Hole snapshots updated.
