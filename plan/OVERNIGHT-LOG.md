@@ -843,3 +843,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** f-sonar-flat (Sonnet, ~40 min): flat-view detection (relief <0.06 m/m) adds local contour interval, hillshade boost, depth tint, range rings and contact footprint halos; Blue Hole/Hunga Tonga unchanged. Titanic clearly better; Endurance improved but the seabed really is a ~6 m tilt, so still banded. Smoke + project-base green on main; no full e2e, no push (f47 last tag).
 - **Queue:** Codex 1220-1280 (weekly 6%, dry until 15 Oct); 1250 is now partly redundant (check before running). Next Claude: Monterey wall, Blue Hole floor (1280). Needs owner: nothing.
+
+## 2026-10-10 09:03 CDT headless run, comprehensive review (Claude)
+
+- **Review:** Claude alone (Codex weekly 5%, Sol skipped); entry at top of plan/REVIEWS.md, new priorities in DIRECTOR.md. Stage ~75%. Scores: Titanic 4, Lost City/Endurance/Beebe/Monterey/Challenger 3.5, Blue Hole 3.
+- **Release:** full e2e + project-base passed on main; pushed and tagged f48. Hosted CI result pending (first push after f-ci-heavy-specs).
+- **Queue:** Codex 1220-1280 (dry until 15 Oct). Next Claude: Blue Hole floor/minimap new angle, Titanic rusticles, Beebe trunk. Needs owner: nothing.
