@@ -151,7 +151,7 @@ vec3 terrainAlbedo(sampler2D t, vec3 p, vec3 w, float s, bool brk, float dist) {
     if (brk) {
       vec2 uv2 = vec2(uv.x * 0.83 - uv.y * 0.55, uv.x * 0.55 + uv.y * 0.83) * 0.23 + vec2(0.37, 0.71);
       float b = texture2D(t, uv2, bias).g * TERRAIN_ALBEDO_GAIN;
-      a *= mix(1.0, b, 0.55);
+      a *= mix(1.0, b, 0.55 * step(0.001, uContrast.x)); // contrast 0 = no pattern at all
     }
 #endif
     c += a * w.y;

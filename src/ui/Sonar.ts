@@ -534,6 +534,8 @@ export class Sonar {
       this.terrain.meta.id === 'great-blue-hole'
         ? latLonToWorld(this.terrain.meta, BLUE_HOLE_LAT, BLUE_HOLE_LON)
         : null;
+    // Only where the hole is on this tile (the shared-ramp test uses a synthetic tile elsewhere).
+    const shadeReef = blueHoleCentre !== null && this.terrain.contains(blueHoleCentre.x, blueHoleCentre.z);
     for (let py = 0; py < h; py++) {
       for (let px = 0; px < w; px++) {
         const index = py * w + px;
@@ -565,7 +567,7 @@ export class Sonar {
         const out = index * 4;
         // Blue Hole: the surrounding reef platform is one flat survey depth; shade it as patch reef and sand.
         let bh: readonly [number, number, number] = [1, 1, 1];
-        if (blueHoleCentre) {
+        if (blueHoleCentre && shadeReef) {
           const wx = centerX + (px - margin - this.canvas.width / 2) * metresPerPixel;
           const wz = centerZ + (py - margin - this.canvas.height / 2) * metresPerPixel;
           bh = blueHoleSonarShade(wx, wz, blueHoleCentre.x, blueHoleCentre.z);

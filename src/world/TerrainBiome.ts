@@ -333,8 +333,8 @@ export const BIOMES: Record<string, Biome> = {
     colorB: 0xc3c0aa,
     colorC: 0x969382,
     // Texture pattern, stain and patch blotches off: their noise thresholds drew grey squiggle contours; banding is baked instead.
-    contrast: 0.2,
-    detail: 0.25,
+    contrast: 0,
+    detail: 0,
     stain: 0x8f8764,
     stainAmount: 0,
     patch: 0,
