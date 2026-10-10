@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-lostcity-tower2:** Poseidon tower and its lesser spires repainted as pale, near-white carbonate (lighter palette, grey-brown troughs and heavy seams cut back) with fine vertical flow striations; each tall spire's vent mouth gets a white brucite fringe plus a ring of soft additive points (one Points draw, all tiers). Golden pose for Lost City shots 2 and 3 now looks at the Poseidon summit so the orifice is in frame (`tools/lostcity-poses.json`). Reason: the trunk read as a brown clay cone.
+
 - **f-endurance-scene:** Endurance gets ten low ice-plough ridges 55-170 m out (one unlit vertex-coloured mesh, ~3k triangles, fogged into the water), a paler water band above the horizon (per-site `HorizonLook` on the shared dome; Titanic unchanged), larger dropstones and a few erratic boulders, and a lighter weathered-oak hull with shrouds, yard stubs and a low sediment skirt. Reason: the wreck was small and dark on a flat plain under a featureless void. Two byte-identity snapshots (beebeIsolation, beebeScatter) were re-baselined because the Endurance biome and scatter changed.
 
 - **f-bluehole-overhangs:** Great Blue Hole bowl gains rock-awning "ledge" scatter slabs (dark undersides, a real overhang read a heightfield cannot give), clustered capsule "tube" sponges, denser sponges, and four extra wall notches. Adds two instanced scatter draws at this site only.

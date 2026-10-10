@@ -17,6 +17,7 @@ import { carbonateFinger } from './carbonateFinger.js';
 import { geoDetail } from './detail.js';
 import { LIFE_TINT } from './materials.js';
 import { shimmerPlume } from './plume.js';
+import { softDot } from './textures.js';
 import {
   boxCH,
   clamp01,
@@ -37,13 +38,14 @@ import { scatterRubble } from './talus.js';
 import { spireRadius, tieredSpire, trunkCrest, type SpireOpts } from './spire.js';
 import type { GeoBuildInput } from './types.js';
 
-const OLD = new THREE.Color(0x8e8c82); // weathered, inactive carbonate
-const LIVE = new THREE.Color(0xe9e7de); // fresh white carbonate and brucite, faintly warm
-const STAIN = new THREE.Color(0x6c685a);
-const CREAM = new THREE.Color(0xf0e2c4); // warm cream carbonate crust
-const GREYBLUE = new THREE.Color(0x7d8a92); // cooler, older grey-blue carbonate
+const OLD = new THREE.Color(0xc2bfb3); // weathered, inactive carbonate
+const LIVE = new THREE.Color(0xfaf6ec); // fresh white carbonate and brucite, faintly warm
+const STAIN = new THREE.Color(0x938d7c);
+const CREAM = new THREE.Color(0xf8ecd2); // warm cream carbonate crust
+const GREYBLUE = new THREE.Color(0xaab6bb); // cooler, older grey-blue carbonate
 const BIOFILM = new THREE.Color(0x6f9a90); // faint blue-green microbial film in damp recesses
-const TROUGH = new THREE.Color(0x7a6e58); // grey-brown stain in the flow troughs
+const TROUGH = new THREE.Color(0xb3ab98); // warm grey stain in the flow troughs
+const FRINGE = new THREE.Color(0xffffff); // brucite fringe round the vent mouth
 const VENT = new THREE.Color(0x14120f); // the dark vent mouth
 const SEABED = new THREE.Color(0xc2a468); // what the apron fades into: the Lost City sediment
 
@@ -344,10 +346,10 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     // alternating pale and shaded, as fluid ran down the walls.
     const wall = 1 - Math.abs(ny);
     const streak = fbm3(x * 1.3, y * 0.03, z * 1.3, seed ^ 0xf10, 3);
-    out.multiplyScalar(1 + (streak - 0.5) * 1.3 * wall);
+    out.multiplyScalar(1 + (streak - 0.5) * 0.9 * wall);
     // Dark seams between flow sheets: thin, vertically drawn streaks, strongest on walls.
     const seam = fbm3(x * 1.1, y * 0.07, z * 1.1, seed ^ 0x5ea, 3);
-    out.multiplyScalar(1 - 0.4 * smooth(0.5, 0.56, seam) * (1 - smooth(0.56, 0.62, seam)) * wall);
+    out.multiplyScalar(1 - 0.22 * smooth(0.5, 0.56, seam) * (1 - smooth(0.56, 0.62, seam)) * wall);
     // Flow ridges: pale crests catch the light, troughs run grey-brown with a cool film.
     for (const sp of spires) {
       const dx = x - sp.x,
@@ -358,8 +360,15 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const nn = fbm3(Math.cos(ang) * 1.3 + 3, ly * 0.09, Math.sin(ang) * 1.3 + 3, sp.seed, 3);
       const cr = trunkCrest(ang, ly, nn, sp.ridges ?? 7, sp.seed);
       const cc = cr * cr;
-      out.multiplyScalar(0.56 + 0.7 * cc);
-      out.lerp(TROUGH, (1 - cc) * 0.5 * smooth(0.02, 0.2, ly / sp.h));
+      out.multiplyScalar(0.8 + 0.3 * cc);
+      out.lerp(TROUGH, (1 - cc) * 0.4 * smooth(0.02, 0.2, ly / sp.h));
+      // Fine flow striations: thin pale and shaded lines running down the wall, drifting
+      // and pinching out with height, strongest on the upper (fresh, white) trunk.
+      const fine = Math.sin(ang * (sp.ridges ?? 7) * 4.5 + nn * 9 + ly * 0.06 + sp.seed);
+      const fine2 = Math.sin(ang * (sp.ridges ?? 7) * 11 - nn * 5 + ly * 0.03);
+      const line = 0.65 * fine + 0.35 * fine2;
+      out.multiplyScalar(1 + line * 0.2 * wall);
+      out.lerp(FRINGE, smooth(0.55, 0.95, line) * 0.22 * wall * smooth(0.1, 0.5, ly / sp.h));
       out.lerp(BIOFILM, (1 - cc) * 0.3 * (1 - smooth(0, 0.35, ly / sp.h)) * smooth(0.4, 0.6, n1));
       break;
     }
@@ -368,8 +377,11 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const dy = y - v.p.y;
       if (dy < -v.depth - 1.2 || dy > 0.6) continue;
       const dd = Math.hypot(x - v.p.x, z - v.p.z) / v.r;
-      const mouth = 1 - smooth(0.35, 1.3, dd);
-      out.lerp(VENT, mouth * smooth(-v.depth - 1.2, -0.3, dy) * 0.92);
+      const mouth = 1 - smooth(0.3, 0.95, dd);
+      // A white brucite fringe round the lip, then the dark throat inside it.
+      const lip = smooth(0.6, 1.0, dd) * (1 - smooth(1.5, 2.3, dd)) * smooth(-2.5, -0.2, dy);
+      out.lerp(FRINGE, lip * 0.85);
+      out.lerp(VENT, mouth * smooth(-v.depth - 1.2, -0.3, dy) * 0.85);
     }
     // Faint blue-green biofilm: damp, sheltered lower walls and under ledges.
     const film = fbm3(x * 0.22, y * 0.12, z * 0.22, seed ^ 0xb10, 3);
@@ -386,7 +398,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       if (below > 0 && below < 1 && Math.hypot(x - orifice.x, z - orifice.z) < orifaceR * 0.8)
         out.multiplyScalar(1 - 0.3 * (1 - below));
     }
-    if (ny > 0.8) out.multiplyScalar(0.9); // silt dusting on shelves
+    if (ny > 0.8) out.multiplyScalar(0.95); // silt dusting on shelves
   });
   const material = createLostCityCarbonateMaterial(tier);
   const full = new THREE.Group();
@@ -476,6 +488,36 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     if (!haze) continue;
     haze.position.set(tip.x, tip.y, tip.z);
     full.add(haze);
+  }
+  // A faint bright fringe at each mouth: a ring of soft additive points on the lip (one Points
+  // object, 28 points per vent, so it is no extra mesh draw and stays cheap on Low).
+  const fringe: number[] = [];
+  for (const k of hazeFor) {
+    const v = vents[k]!;
+    for (let j = 0; j < 28; j++) {
+      const a = (j / 28) * Math.PI * 2 + k;
+      fringe.push(v.p.x + Math.cos(a) * v.r * 0.95, v.p.y + 0.15, v.p.z + Math.sin(a) * v.r * 0.95);
+    }
+  }
+  if (fringe.length) {
+    const fg = new THREE.BufferGeometry();
+    fg.setAttribute('position', new THREE.Float32BufferAttribute(fringe, 3));
+    const ring = new THREE.Points(
+      fg,
+      new THREE.PointsMaterial({
+        color: 0xe8f4f2,
+        size: 0.8,
+        sizeAttenuation: true,
+        map: softDot(),
+        transparent: true,
+        opacity: 0.35,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        fog: true,
+      }),
+    );
+    ring.name = 'vent-fringe';
+    full.add(ring);
   }
   geom.computeBoundingBox();
   geom.computeBoundingSphere();
