@@ -28,7 +28,8 @@ export class TitanicHorizon {
     private readonly scene: THREE.Scene,
     look: HorizonLook = {},
   ) {
-    this.upperWater = look.upperColor === undefined ? UPPER_WATER : new THREE.Color(look.upperColor);
+    this.upperWater =
+      look.upperColor === undefined ? UPPER_WATER : new THREE.Color(look.upperColor);
     this.hazeWater = look.hazeColor === undefined ? HAZE_WATER : new THREE.Color(look.hazeColor);
     const peak = look.hazePeakElevation ?? ABYSS_HORIZON.hazePeakElevation;
     const geometry = new THREE.SphereGeometry(1, 32, 16);
@@ -45,12 +46,7 @@ export class TitanicHorizon {
       const glow =
         1 - ABYSS_HORIZON.glowVariation * (0.5 + 0.5 * Math.cos(azimuth * ABYSS_HORIZON.glowLobes));
       this.weights[i] =
-        glow *
-        THREE.MathUtils.smoothstep(
-          elevation,
-          ABYSS_HORIZON.fogMatchElevation,
-          peak,
-        );
+        glow * THREE.MathUtils.smoothstep(elevation, ABYSS_HORIZON.fogMatchElevation, peak);
       this.upperWeights[i] = THREE.MathUtils.smoothstep(
         elevation,
         peak,

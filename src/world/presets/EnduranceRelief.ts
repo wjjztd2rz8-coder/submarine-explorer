@@ -29,7 +29,7 @@ export function buildEnduranceRelief(terrain: PresetTerrain, centre: THREE.Vecto
     const dir = bearing + Math.PI / 2 + (rnd() - 0.5) * 0.7;
     const len = 55 + rnd() * 90;
     const width = 9 + rnd() * 12;
-    const height = 1.8 + rnd() * 3.2;
+    const height = 3.5 + rnd() * 5;
     const dx = Math.cos(dir);
     const dz = Math.sin(dir);
     const bend = (rnd() - 0.5) * 30;
@@ -48,7 +48,7 @@ export function buildEnduranceRelief(terrain: PresetTerrain, centre: THREE.Vecto
         const y = terrain.sampleHeight(x, z) + height * env * prof - 0.25;
         pos.push(x, y, z);
         const lift = 0.85 + 0.3 * prof * env;
-        tint.setRGB(0.3 * lift, 0.28 * lift, 0.24 * lift);
+        tint.setRGB(0.135 * lift, 0.122 * lift, 0.09 * lift);
         col.push(tint.r, tint.g, tint.b);
       }
     }
@@ -65,7 +65,15 @@ export function buildEnduranceRelief(terrain: PresetTerrain, centre: THREE.Vecto
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   g.setIndex(idx);
   g.computeVertexNormals();
-  const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0 });
+  // Unlit (the site's ambient is very strong): bake a soft key light so the
+  // swells model, then let scene fog carry them into the water colour.
+  const n = g.getAttribute('normal');
+  const c = g.getAttribute('color');
+  for (let i = 0; i < n.count; i++) {
+    const shade = 0.8 + 0.35 * Math.max(0, n.getX(i) * 0.5 + n.getY(i) * 0.8 - n.getZ(i) * 0.3);
+    c.setXYZ(i, c.getX(i) * shade, c.getY(i) * shade, c.getZ(i) * shade);
+  }
+  const mat = new THREE.MeshBasicMaterial({ vertexColors: true });
   mat.name = 'enduranceRelief';
   const mesh = new THREE.Mesh(g, mat);
   mesh.name = 'enduranceRelief';
