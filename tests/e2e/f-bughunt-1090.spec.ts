@@ -174,6 +174,7 @@ for (const layout of [
         page,
       }, info) => {
         test.setTimeout(180_000);
+        test.skip(!!process.env.CI, 'frame-rate dependent; software GL on hosted runners');
         const errors: string[] = [];
         page.on('pageerror', (e) => errors.push(e.message));
         page.on('console', (m) => {
