@@ -202,6 +202,9 @@ export const BIOMES: Record<string, Biome> = {
     burrow: 0.6,
     scatter: [
       { kind: 'dropstone', density: 1.4, slopeMaxDeg: 20, on: 'flat' },
+      // Ice-rafted dropstones and a few big erratics give the plain scale.
+      { kind: 'dropstone', density: 0.5, slopeMaxDeg: 20, on: 'flat', sizeMul: 3.2 },
+      { kind: 'boulder', density: 0.12, slopeMaxDeg: 25, on: 'flat', sizeMul: 1.8 },
       { kind: 'sponge', density: 0.35, slopeMaxDeg: 12, on: 'flat' },
       { kind: 'mound', density: 2.5, slopeMaxDeg: 10, on: 'flat' },
     ],

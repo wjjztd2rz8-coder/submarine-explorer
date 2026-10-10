@@ -16,6 +16,7 @@ import { DEFAULT_WATER, DEEP_OPENINGS, type WaterConfig } from '../../core/Confi
 import { snowReadabilityUniforms } from '../../render/MarineSnow.js';
 import { fitSeabedPlane, mulberry, particleBudget } from './maths.js';
 import { TitanicHorizon } from './TitanicHorizon.js';
+import { buildEnduranceRelief } from './EnduranceRelief.js';
 import {
   COMMON_VERT,
   SOFT_FRAG,
@@ -74,7 +75,7 @@ export class WreckPreset implements EnvPreset {
   readonly stats = { draws: 0, particles: 0, lights: 0 };
 
   private scene: THREE.Scene | null = null;
-  private readonly objects: THREE.Points[] = [];
+  private readonly objects: Array<THREE.Mesh | THREE.Points> = [];
   private haze: THREE.ShaderMaterial | null = null;
   private motes: THREE.ShaderMaterial | null = null;
   private params: PresetParams = {};
@@ -97,11 +98,23 @@ export class WreckPreset implements EnvPreset {
     this.scene = ctx.scene;
     this.visuals = ctx.visuals;
     if (ctx.params.titanicHorizon === true || endurance) {
-      this.horizon = new TitanicHorizon(ctx.scene);
+      this.horizon = new TitanicHorizon(
+        ctx.scene,
+        endurance
+          ? { upperColor: 0x1f3a48, hazeColor: 0x335563, hazePeakElevation: 0.32 }
+          : undefined,
+      );
       if (endurance) this.horizon.dome.name = 'enduranceHorizon';
       this.stats.draws = 1;
     }
     if (!ctx.visuals) return;
+    const hull = ctx.pois.find((poi) => poi.id === 'endurance-hull');
+    if (endurance && hull) {
+      const relief = buildEnduranceRelief(ctx.terrain, hull.position);
+      ctx.scene.add(relief);
+      this.objects.push(relief);
+      this.stats.draws += 1;
+    }
     this.buildHaze(ctx);
     this.buildMotes(ctx);
     this.stats.draws += this.objects.length;
