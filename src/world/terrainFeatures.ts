@@ -61,8 +61,12 @@ const TERRACE_PROFILE: readonly (readonly [number, number])[] = [
   [166, -19],
   [160, -30],
   [153, -38],
-  [134, -41],
-  [129, -43],
+  [148, -38.6],
+  [145.5, -41.4],
+  [140, -42],
+  [137.5, -44.8],
+  [132, -45.4],
+  [129.5, -48.4],
   [127, -50],
   [125, -55],
   [124, -62],
@@ -129,9 +133,80 @@ export function blueHoleTerraces(a: number, r: number): number {
   if (mouth <= 0) return 0;
   const zone = smoothstep(clamp01((r - 100) / 10)) * (1 - smoothstep(clamp01((r - 184) / 11)));
   if (zone <= 0) return 0;
-  const drift = 0.8 * Math.sin(3 * a + 0.7) + 0.35 * Math.sin(7 * a + 2);
+  // Ragged edges: each step wanders a few metres with bearing, and a little with its own depth.
+  const drift =
+    0.8 * Math.sin(3 * a + 0.7) +
+    0.4 * Math.sin(7 * a + 2) +
+    0.25 * Math.sin(17 * a + 1 + r * 0.05);
   const rr = r + drift;
   return mouth * zone * (profileAt(rr, TERRACE_PROFILE) - profileAt(r));
+}
+
+/**
+ * Gallery-mouth shelves: the terraces above leave both gallery bearings untouched, so the
+ * shelf the sub sits on would be one smooth ramp. This cuts four ragged 1.7 m steps into
+ * it (lowering only, inside the same angular window the terraces skip, fading in over its
+ * edges), well below the pendants and clear of the original seat radius.
+ */
+export function blueHoleApron(a: number, r: number): number {
+  if (r < 112 || r > 152) return 0;
+  let mouth = 1;
+  for (const [bearing, width] of [
+    [Math.PI, 0.3],
+    [1.0, 0.25],
+  ]) {
+    const da = Math.abs(Math.atan2(Math.sin(a - bearing!), Math.cos(a - bearing!)));
+    mouth *= smoothstep(clamp01((da - width!) / 0.15));
+  }
+  const window = 1 - mouth;
+  if (window <= 0) return 0;
+  const rr = r + 1.6 * Math.sin(9 * a + 0.3 + r * 0.04) + 1.0 * Math.sin(23 * a + 1.1);
+  let drop = 0;
+  for (const edge of [146, 139.5, 133, 126.5]) drop += 1.7 * smoothstep(clamp01((edge - rr) / 2.2));
+  const ends = smoothstep(clamp01((r - 112) / 8)) * (1 - smoothstep(clamp01((r - 146) / 6)));
+  return -drop * window * ends;
+}
+
+/** Riser feet (radius) that shed talus; each gets a ring of fallen blocks. */
+const TALUS_FEET: readonly number[] = [145, 137, 129, 123, 116, 106];
+const TALUS_CELLS = 22;
+
+/**
+ * Fallen blocks at the foot of the bigger risers: rounded mounds 1.2-2.6 m high
+ * and 5-8 m across at hashed bearings. Part of the heightfield (no draw calls), so
+ * they also read as boulders in the baked colour and shadow the riser foot.
+ */
+export function blueHoleTalus(a: number, r: number): number {
+  if (r < 100 || r > 152) return 0;
+  const cell = (Math.PI * 2) / TALUS_CELLS;
+  const base = Math.floor((a + Math.PI) / cell);
+  let sum = 0;
+  for (let f = 0; f < TALUS_FEET.length; f++) {
+    const dr = r - (TALUS_FEET[f]! - 2.5);
+    if (Math.abs(dr) > 6) continue;
+    for (let k = -1; k <= 1; k++) {
+      const ci = base + k;
+      const h1 = Math.abs(Math.sin(ci * 12.9898 + f * 78.233) * 43758.5453) % 1;
+      const h2 = Math.abs(Math.sin(ci * 39.346 + f * 11.135) * 24634.6345) % 1;
+      if (h1 < 0.45) continue;
+      const ca = -Math.PI + (ci + 0.2 + 0.6 * h2) * cell;
+      let da = Math.abs(a - ca);
+      if (da > Math.PI) da = Math.PI * 2 - da;
+      const rad = 5 + 3 * h2;
+      const dx = da * r;
+      const d2 = (dx * dx + dr * dr) / (rad * rad);
+      if (d2 < 1) sum += (1.0 + 1.0 * h1) * (1 - d2) * (1 - d2) * 1.5;
+    }
+  }
+  let mouth = 1;
+  for (const [bearing, width] of [
+    [Math.PI, 0.3],
+    [1.0, 0.25],
+  ]) {
+    const da = Math.abs(Math.atan2(Math.sin(a - bearing!), Math.cos(a - bearing!)));
+    mouth *= smoothstep(clamp01((da - width!) / 0.15));
+  }
+  return sum * mouth;
 }
 
 /** Relief is part of the single heightfield, so sand and exposed rock share
@@ -278,7 +353,13 @@ export function blueHoleTint(
   // Dark rubble beds, never below a readable floor.
   const dark = 1 - 0.55 * rubble;
   const bright = 1 + pf * (0.14 * (fine - 0.5) + 0.2 * (scour - 0.5) + 0.12 * (ripple - 0.3));
-  const m = ao * dark * bright * (0.8 + 0.2 * smoothstep(clamp01(normalY)));
+  // Risers fall into shadow, treads keep their light; a pale lip crowns each tread edge and wide
+  // hollows (low-frequency, darker and cooler) pool between the patches of pale sand.
+  const riserShade = 0.6 + 0.4 * smoothstep(clamp01((normalY - 0.35) / 0.5));
+  const lip = tread * Math.exp(-(((1 - treadU) * 5) ** 2)) * 0.22;
+  const hollow = 1 - 0.28 * smoothstep(clamp01((0.42 - f1 * f2) / 0.25)) * (1 - 0.5 * rock);
+  const sand = 1 + 0.2 * smoothstep(clamp01((f3 - 0.62) / 0.2)) * (1 - rock);
+  const m = ao * dark * bright * riserShade * hollow * sand * (1 + lip);
   // Crisp rim: a thin pale lip at the first riser, with a dark cut at its foot.
   // Kept soft and wide: the riser is a gradient, not a drawn line.
   // Feather: the shelf's warm tone hands over to the cool lower wall across ~30 m, not at one ring.
@@ -291,6 +372,38 @@ export function blueHoleTint(
     0.1 * Math.exp(-(((r - 179) / 4.5) ** 2)) * (1 - rock) -
     0.2 * Math.exp(-(((r - 171) / 5.5) ** 2));
   return [tr * m * fm * sr * rim, tg * m * fm * sg * rim, tb * m * fm * sb * rim];
+}
+
+/**
+ * Minimap shading for the reef platform around the hole. The survey grid is flat
+ * there (a single 4 m depth), so the sonar relief is a uniform teal square; this returns
+ * linear RGB multipliers for sand channels, darker coral patches and a soft blue
+ * deepening toward the lagoon, fading out over the hole's rim so the measured carve keeps
+ * its own depth palette. Pure and deterministic in world metres; Blue Hole sonar path only.
+ */
+export function blueHoleSonarShade(
+  x: number,
+  z: number,
+  centreX: number,
+  centreZ: number,
+): readonly [number, number, number] {
+  const d = Math.hypot(x - centreX, z - centreZ);
+  const out = smoothstep(clamp01((d - 215) / 70));
+  if (out <= 0) return [1, 1, 1];
+  const n1 = 0.5 + 0.5 * Math.sin(x * 0.0085 + 1.9 * Math.sin(z * 0.006 + 0.4) + 0.3);
+  const n2 = 0.5 + 0.5 * Math.sin(x * 0.031 + 2.2 * Math.sin(z * 0.027 + x * 0.008) + 1.1);
+  const n3 = 0.5 + 0.5 * Math.sin(z * 0.047 - 1.8 * Math.sin(x * 0.039 - 0.6) + 2.4);
+  const n4 = 0.5 + 0.5 * Math.sin((x - z) * 0.085 + 1.5 * Math.sin((x + z) * 0.06));
+  // Coral heads and patch reef: dark blue-green blotches with a ragged rim.
+  const coral = smoothstep(clamp01((n2 * n3 + 0.25 * n4 - 0.5) / 0.3));
+  // Sand channels between them: broad pale ribbons.
+  const sand = smoothstep(clamp01((n1 - 0.55) / 0.2)) * (1 - coral);
+  // The lagoon deepens gently toward its blue middle (slow, wide gradient).
+  const deep = smoothstep(clamp01((0.45 - n1) / 0.45)) * (1 - 0.5 * coral);
+  const r = 1 - 0.4 * coral * out - 0.32 * deep * out + 0.06 * sand * out;
+  const g = 1 - 0.27 * coral * out - 0.2 * deep * out + 0.05 * sand * out;
+  const b = 1 - 0.18 * coral * out - 0.06 * deep * out - 0.02 * sand * out;
+  return [r, g, b];
 }
 
 export interface TerrainCarve {
@@ -379,7 +492,9 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
           blocks +
           lipBand * 1.1 * Math.max(0, Math.sin(37 * a + r * 0.7)) ** 3 +
           blueHoleWallRelief(a, r) +
-          blueHoleTerraces(a, r),
+          blueHoleTerraces(a, r) +
+          blueHoleApron(a, r) +
+          blueHoleTalus(a, r),
       );
     },
   };
