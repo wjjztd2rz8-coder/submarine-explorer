@@ -90,12 +90,13 @@ function cachedGeo(key: string, make: () => THREE.BufferGeometry): THREE.BufferG
 // ------------------------------------------------------------- rusticles
 
 /**
- * A rusticle: a lumpy, drooping cone 1 m long hanging from y = 0 to y = -1,
- * dark at the root and bright orange toward the dripping tip.
+ * A rusticle: a thin, lumpy strand 1 m long hanging from y = 0 to y = -1. It
+ * flares at the root where it grips the steel, narrows to a thread, and the tip
+ * sags sideways like a drip that ran. Ochre at the root to deep brown at the tip.
  */
 export function rusticleGeometry(): THREE.BufferGeometry {
   return cachedGeo('rusticle', () => {
-    const g = new THREE.CylinderGeometry(0.5, 0.02, 1, 7, 5, false);
+    const g = new THREE.CylinderGeometry(0.5, 0.05, 1, 6, 8, false);
     g.translate(0, -0.5, 0);
     const pos = g.getAttribute('position');
     for (let i = 0; i < pos.count; i++) {
@@ -103,37 +104,47 @@ export function rusticleGeometry(): THREE.BufferGeometry {
       const y = pos.getY(i);
       const z = pos.getZ(i);
       const a = Math.atan2(z, x);
-      const bulge = 0.75 + 0.5 * valueNoise3(Math.cos(a) * 1.3, y * 3.1, Math.sin(a) * 1.3, 0x7a3);
-      // Droop: the tip swings a little sideways, like a drip that ran.
       const t = -y;
-      pos.setXYZ(i, x * bulge + 0.12 * t * t, y, z * bulge);
+      const bulge = 0.7 + 0.6 * valueNoise3(Math.cos(a) * 1.3, y * 5.3, Math.sin(a) * 1.3, 0x7a3);
+      // Flared root, then a thin, slightly beaded stalk.
+      const flare = 1 + 1.4 * Math.pow(1 - Math.min(1, t * 6), 2);
+      const k = bulge * flare;
+      // Droop: the tip swings sideways and the stalk wanders.
+      const sway = 0.5 * t * t + 0.06 * Math.sin(t * 9);
+      pos.setXYZ(i, x * k + sway, y, z * k);
     }
     g.computeVertexNormals();
-    const root = new THREE.Color(0x4a2213);
-    const tip = new THREE.Color(0xb4602e);
+    const root = new THREE.Color(0x6b3d1c);
+    const tip = new THREE.Color(0x2e180d);
     const c = new THREE.Color();
-    return colourise(normalise(g), (_x, y) => c.copy(root).lerp(tip, Math.pow(-y, 0.8)));
+    return colourise(normalise(g), (_x, y) => c.copy(root).lerp(tip, Math.pow(-y, 0.7)));
   });
 }
 
 const _up = new THREE.Vector3();
-/** Hang one rusticle at `p`, `len` m long, radius ~len/5, a random twist and lean. */
+/**
+ * Hang one rusticle at `p`. `len` is the nominal length; strands are thin
+ * (radius 3-8% of length), vary in thickness, and hang almost straight down.
+ */
 export function hangRusticle(
   list: InstanceList,
   p: THREE.Vector3,
   len: number,
   rnd: () => number,
 ): void {
-  const r = len * (0.12 + rnd() * 0.12);
+  const L = len * (0.4 + rnd() * 0.25);
+  const r = Math.max(0.012, L * (0.03 + rnd() * rnd() * 0.07));
   const m = new THREE.Matrix4().compose(
     p,
     new THREE.Quaternion().setFromEuler(
-      new THREE.Euler((rnd() - 0.5) * 0.25, rnd() * Math.PI * 2, (rnd() - 0.5) * 0.25),
+      new THREE.Euler((rnd() - 0.5) * 0.12, rnd() * Math.PI * 2, (rnd() - 0.5) * 0.12),
     ),
-    _up.set(r * 2, len, r * 2),
+    _up.set(r * 2, L, r * 2),
   );
-  const shade = 0.75 + rnd() * 0.45;
-  list.push(m, new THREE.Color(shade, shade * (0.9 + rnd() * 0.15), shade * 0.95));
+  // Ochre to brown, subtle; never neon.
+  const shade = 0.8 + rnd() * 0.35;
+  const warm = rnd();
+  list.push(m, new THREE.Color(shade, shade * (0.8 + warm * 0.15), shade * (0.7 + warm * 0.15)));
 }
 
 // ------------------------------------------------------------- openings
