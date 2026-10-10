@@ -18,6 +18,22 @@ Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku sm
 
 Codex queue: 1190 (Titanic haze), 1200 (sonar palette), 1210 (verify merged), 1220 (pacing gaps), 1230 (CI shard triage after push). Running: 1130, 1180.
 
+## Current priorities (comprehensive review, Claude alone, 2026-10-09 22:30; golden 2026-10-10-030121)
+
+Codex weekly 6% so Sol was skipped (exit 75). Scores (beautiful): Titanic 4, Challenger 3.5 (lander + amphipods + ripples now clearly read, +0.5), Monterey 3.5, Beebe 3.5, Blue Hole 3 (overhangs help; floor still smooth), Lost City 3 (tower still lumpy brown cone, orifice dark but chimney reads as clay), Endurance 3 (snow discs and black blob gone, +0.5; hull small, flat void above horizon, minimap five stripes).
+
+Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
+
+1. **Hosted CI green (Haiku):** the fixable part (bughunt1090 wrote to a missing .cache) is fixed. Next: 10/30 e2e shards hit 300 s test timeouts on hosted runners (page closed); find the slow specs from shard logs (gh api .../jobs/<id>/logs), cut or lighten them, never loosen assertions. Playwright apt-lock flake in project-base: add a retry wrapper. Codex 1230 covers it only after the 15 Oct reset.
+2. **Endurance scene (Sonnet):** hull is small and dark in a flat tan plain with a void above the horizon; add scale (ice-scoured seabed, boulders, distant relief), haze gradient, bigger approach framing.
+3. **Lost City tower (Sonnet):** trunk reads as brown clay cone with lumpy plates; needs pale carbonate with vertical flow striations, white-fringed orifice with shimmer, brighter material contrast against the dark seabed.
+4. **Blue Hole floor and gallery (Sonnet):** the bowl floor is a smooth grey ramp with scattered boulders; add terraced ledges and sediment banding; drop the beige tile-like noise.
+5. **Beebe chimney trunk (Sonnet):** smooth grey fluted trunk, still reads as plaster; add crust, chimneys with mineral colours, visible black smoke at the orifice.
+6. **Phone pass at 844x390 (Haiku capture, Sonnet judge)** of Challenger lander, Endurance and the new sonar.
+7. **Monterey spare wall regularity (Sonnet, low):** strata better, still corrugated.
+
+Codex queue: 1220 (pacing gaps), 1230 (CI shard triage), 1240 (verify lander/first-discovery), 1250 (sonar flat sites), 1260 (new-player flow audit). Codex is dry until the 15 Oct weekly reset.
+
 ## Previous priorities (joint review with Sol, 2026-10-09 evening; golden 2026-10-09-195308)
 
 Agreed scores (beautiful): Titanic 3.5-4, Beebe 3-3.5, Blue Hole 2.5-3, Lost City 3-3.3, Monterey 3-3.5, Challenger 2.5-3, Endurance 2.5. Stage ~70%, 3-4 weeks. Sol's calibration: opening frames hide weak close-ups; "complete a scan and read the reward" has never been captured; second required targets are 4.5 km (Blue Hole) and 14.6 km (Monterey) away.

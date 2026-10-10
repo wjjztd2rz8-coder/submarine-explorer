@@ -1,5 +1,5 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { afterAll, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
@@ -22,8 +22,10 @@ const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 const sites = json('data/landmarks/index.json').landmarks as string[];
 const measurements: unknown[] = [];
 afterAll(() => {
-  if (measurements.length)
+  if (measurements.length) {
+    mkdirSync('.cache', { recursive: true });
     writeFileSync('.cache/1090-geometry.json', JSON.stringify(measurements, null, 2) + '\n');
+  }
 });
 
 const idle: InputState = {

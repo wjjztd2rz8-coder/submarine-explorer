@@ -2,6 +2,30 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-09 22:30 comprehensive review, Claude alone (trigger: 8+ merges, CI red 3 runs; golden 2026-10-10-030121 vs -223546)
+
+Codex weekly 6% (`codex-review.sh` exit 75), so no Sol second opinion; Play-flow not recaptured (queued as Codex 1260).
+
+**Changed since the last review:** merged f-challenger-seabed and -lander, f-lostcity-tower pass 2, f-bluehole-overhangs, Codex 1130, 1180, 1190, 1200, 1210 (Endurance snow gone, Blue Hole sonar reads), f-firstdiscovery-fixes. f45 pushed and tagged.
+
+| Site | Readable | Beautiful | Change | Biggest gap |
+| --- | --- | --- | --- | --- |
+| Titanic | 4 | 4 | same | flat dark void above horizon |
+| Beebe | 4 | 3.5 | same | plaster-like trunk, no visible smoke at the orifice |
+| Blue Hole | 4 | 3 | same | smooth grey floor ramp, tile-like noise |
+| Lost City | 3.5 | 3 | same | brown clay cone, no bright carbonate |
+| Monterey | 4 | 3.5 | same | corrugated rock |
+| Challenger | 4 | 3.5 | +0.5 | seabed still simple, sonar fine |
+| Endurance | 3 | 3 | +0.5 | tiny hull in flat plain, void sky, minimap five stripes |
+
+**CI diagnosis (new):** the hosted run fails on (a) `tests/unit/bughunt1090.test.ts` writing to a non-existent `.cache/` (fixed this run), (b) project-base Playwright install tripping an apt lock (flake), (c) 10 of 30 e2e shards hitting 300 s test timeouts on hosted runners. So red CI was not only shards. Remaining work is Claude backlog item 1.
+
+**Process:** efficiency.sh: Claude idle ~145 h and Codex under-used ~118 h, mostly the Oct 6-8 lockout and Codex 0%; 57 watchdog trips (floors working). Codex weekly is the binding limit until 15 Oct, so Claude carries all packages.
+
+**Priorities:** see DIRECTOR.md. Codex queue: 1220, 1230, 1240, 1250, 1260.
+
+**Stage:** ~72% to 1.0, about 3 weeks (Claude alone). **Needs owner:** nothing.
+
 ## 2026-10-09 late comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-09-221156 vs -195308)
 
 Codex 5h was 11% (`codex-review.sh` exit 75), so no Sol second opinion.
