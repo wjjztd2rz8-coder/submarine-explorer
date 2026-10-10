@@ -366,7 +366,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const fine = Math.sin(ang * (sp.ridges ?? 7) * 4.5 + nn * 9 + ly * 0.06 + sp.seed);
       const fine2 = Math.sin(ang * (sp.ridges ?? 7) * 11 - nn * 5 + ly * 0.03);
       const line = 0.65 * fine + 0.35 * fine2;
-      out.multiplyScalar(1 + line * 0.13 * wall);
+      out.multiplyScalar(1 + line * 0.2 * wall);
       out.lerp(FRINGE, smooth(0.55, 0.95, line) * 0.22 * wall * smooth(0.1, 0.5, ly / sp.h));
       out.lerp(BIOFILM, (1 - cc) * 0.3 * (1 - smooth(0, 0.35, ly / sp.h)) * smooth(0.4, 0.6, n1));
       break;
@@ -490,12 +490,12 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   }
   // A faint bright fringe at each mouth: one flat additive ring, shared geometry and material,
   // so it costs a draw call per vent even on Low. The haze above supplies the shimmer.
-  const ringGeo = new THREE.RingGeometry(0.8, 1.5, 24);
+  const ringGeo = new THREE.RingGeometry(1.0, 1.3, 24);
   ringGeo.rotateX(-Math.PI / 2);
   const ringMat = new THREE.MeshBasicMaterial({
     color: 0xe8f4f2,
     transparent: true,
-    opacity: 0.3,
+    opacity: 0.14,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
     side: THREE.DoubleSide,
@@ -504,7 +504,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     const ring = new THREE.Mesh(ringGeo, ringMat);
     ring.name = 'vent-fringe';
     ring.position.copy(vents[k]!.p).add(new THREE.Vector3(0, 0.12, 0));
-    ring.scale.setScalar(vents[k]!.r);
+    ring.scale.setScalar(vents[k]!.r * 0.82);
     full.add(ring);
   }
   geom.computeBoundingBox();

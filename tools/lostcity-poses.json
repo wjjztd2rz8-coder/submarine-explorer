@@ -1,9 +1,9 @@
 {
   "poseidon-tower": {
-    "target": [0, 52, 0],
+    "target": [0, 56, 0],
     "direction": [0.7071067811865476, 0, 0.7071067811865476],
     "above": 38,
     "approachRange": 70,
-    "close": { "range": 30, "above": 36 }
+    "close": { "range": 32, "above": 66 }
   }
 }
