@@ -798,3 +798,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** nothing new. f-bluehole-floor (Sonnet, ~1.5 h) was NOT merged: terraces and softer tint are invisible in golden poses (~3, +0.1); the grey squiggle texture (silt_a.jpg outlines) is unsolved. Branch claude/f-bluehole-floor kept; Codex 1280 queued to bisect the squiggle.
 - **Pushed:** full e2e + project-base PASSED on main (only prettier on an older progress note failed, fixed); pushed and tagged f46. Pages deploy in progress at exit; hosted CI of the previous push failed again (shard timeouts), check next run.
 - **Queue:** 1220-1280 (Codex weekly 6%, dry until 15 Oct). Next Claude: Beebe trunk, phone pass, hosted CI triage. Needs owner: nothing.
+
+## 2026-10-10 02:06 CDT headless run (Claude)
+
+- **Merged:** f-beebe-trunk (Sonnet: crusted sulfide flanges with ochre/rust/black colour bands, dark charcoal smoke override, hero stacks denser on Medium+; shots reviewed, clear gain ~+0.4, flanges a little spiky; chimneys 2-3 unchanged). Smoke + project-base green on main; no full e2e, no push.
+- **Queue:** Codex 1220-1280 (weekly 6%, dry until 15 Oct). Next Claude: phone pass at 844x390, Beebe chimneys 2-3 profile, hosted CI triage. Needs owner: nothing.

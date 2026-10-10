@@ -28,7 +28,7 @@ Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku sm
 2. (MERGED 2026-10-09 22:50: ridges, haze band, oak hull; ~3.5, opening framing still small) **Endurance scene (Sonnet):** hull is small and dark in a flat tan plain with a void above the horizon; add scale (ice-scoured seabed, boulders, distant relief), haze gradient, bigger approach framing.
 3. (MERGED 2026-10-09 23:xx: pale carbonate, white-fringed orifice with shimmer; ~3.5; striations subtle at range) **Lost City tower (Sonnet):** trunk reads as brown clay cone with lumpy plates; needs pale carbonate with vertical flow striations, white-fringed orifice with shimmer, brighter material contrast against the dark seabed.
 4. (TRIED 2026-10-10, not merged: branch claude/f-bluehole-floor, terraces invisible; squiggle texture from silt_a.jpg unsolved, Codex 1280 queued) **Blue Hole floor and gallery (Sonnet):** the bowl floor is a smooth grey ramp with scattered boulders; add terraced ledges and sediment banding; drop the beige tile-like noise.
-5. **Beebe chimney trunk (Sonnet):** smooth grey fluted trunk, still reads as plaster; add crust, chimneys with mineral colours, visible black smoke at the orifice.
+5. (MERGED 2026-10-10 03:xx: crusted ochre/sulfide flanges, dark smoke, ~+0.4; flanges slightly spiky, chimneys 2-3 keep old profile) **Beebe chimney trunk (Sonnet):** smooth grey fluted trunk, still reads as plaster; add crust, chimneys with mineral colours, visible black smoke at the orifice.
 6. **Phone pass at 844x390 (Haiku capture, Sonnet judge)** of Challenger lander, Endurance and the new sonar.
 7. **Monterey spare wall regularity (Sonnet, low):** strata better, still corrugated.
 
