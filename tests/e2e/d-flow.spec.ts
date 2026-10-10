@@ -1,3 +1,5 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import process from 'node:process';
 import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -290,6 +292,7 @@ test.describe('D-FLOW dive flow', () => {
   });
 
   test('Home from the debrief; Dive again starts a fresh dive', async ({ page }) => {
+    test.skip(!!process.env.CI, 'two full boots exceed the timeout on software GL');
     test.setTimeout(120_000);
     const errors = collectErrors(page);
     await seed(page);

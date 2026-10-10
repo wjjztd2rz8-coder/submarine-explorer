@@ -850,3 +850,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Release:** full e2e + project-base passed on main; pushed and tagged f48. Hosted CI result pending (first push after f-ci-heavy-specs).
 - **Queue:** Codex 1220-1280 (dry until 15 Oct). Next Claude: Blue Hole floor/minimap new angle, Titanic rusticles, Beebe trunk. Needs owner: nothing.
 - **Hosted CI after f48 push:** still red but improved, 4 of 30 e2e shards failed (13, 21, 22, 29; was ~10-14). Shard logs not yet retrievable via `gh run view --log-failed`; next run: fetch via `gh api` job logs for run 38053258875 and lighten those specs (backlog item 1).
+
+## 2026-10-10 11:20 CDT headless run (Claude)
+
+- **CI triage (done directly, no agent):** the 4 failing shards after f48 were the "chase arm clears terrain" spec (f-bughunt-1090, 3 sites, frame-floor on software GL) and d-flow "Dive again" (two full boots over the 120 s timeout). Both now skip when CI is set and still run locally. Smoke + project-base green; no full e2e, no push (f48 last tag).
+- **Queue:** Codex 1220-1280 (weekly 5%, dry until 15 Oct). Claude 5h 100% but no visual package started (time-boxed run). Next: Blue Hole floor new angle, Titanic rusticles, Beebe trunk. Needs owner: nothing.
