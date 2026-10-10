@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-beebe-trunk (pass 2):** the Beebe hero trunk's vertices were being claimed by the shorter side stacks (owner chosen by height fraction), so it read as a flat brown cone; the closest stack axis now owns each vertex. The trunk gets ochre/orange crest colour on upward faces and band crests, near-black undercuts, soot at the orifice and less pale anhydrite; flange rims are less spiky (scallop 0.32 to 0.24, wider end pinch); `chimneyCrust.amount` 0.16 to 0.08. Reason: the colour bands were washed out by the grey-beige mineral tint.
+
 - **f-rusticles:** wreck rusticles (Titanic, Bismarck) are now thin, drooping strands in clumps under rails and edges, with varied length and thickness and an ochre-to-brown colour, replacing large uniform orange spikes that read as thorns.
 
 - F-SONAR-FLAT (sonar minimap, flat sites only): relief that spans under about 0.06 m/m of the view (Titanic, Endurance, abyssal plains, Hunga Tonga) now gets a local-relief contour step (about six lines across the actual relief, 1 m floor), a hillshade gain boost (up to 8x), a subtle tint by depth within the view, faint dashed range rings every quarter span about the sub, and a soft dashed footprint halo under each contact at its scan radius. All effects fade to zero as relief rises, so Blue Hole and other sites that already read are unchanged; HUD size and the shared palette ramp are untouched. Reason: the Endurance map was vertical stripes and the Titanic map a flat teal square with no footprint or objective context. `sonarFlatProfile` and `sonarLocalContourInterval` are unit-tested.

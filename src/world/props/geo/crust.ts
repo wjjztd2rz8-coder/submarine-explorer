@@ -39,6 +39,8 @@ export function paintCrust(
   nz: number,
   seed: number,
   bandSeed: number,
+  ny = 0,
+  trunk = false,
 ): void {
   const b = crustBand(ang, ly, bandSeed);
   const bandTint = hash01(b.idx * 1.7 + bandSeed);
@@ -51,7 +53,19 @@ export function paintCrust(
   out.lerp(SULFUR, smooth(0.78, 0.95, fine) * smooth(0.3, 0.8, b.lip) * 0.6);
   out.lerp(
     ANHYDRITE,
-    smooth(0.85, 1, hh + (nz - 0.5) * 0.25) * 0.32 + smooth(0.84, 0.97, patch) * 0.22,
+    (smooth(0.85, 1, hh + (nz - 0.5) * 0.25) * 0.32 + smooth(0.84, 0.97, patch) * 0.22) *
+      (trunk ? 0.4 : 1),
   );
   out.multiplyScalar(0.8 + 0.5 * fine);
+  if (trunk) {
+    // Hero trunk: more colour separation. Upward faces of flanges and band crests catch warm
+    // ochre/sulfur precipitate; undercuts stay near-black; the orifice is soot-stained.
+    const up = smooth(0.25, 0.85, ny);
+    const crest = Math.max(up * 0.55, b.lip) * (0.6 + 0.4 * fine);
+    out.lerp(bandTint > 0.5 ? OCHRE : ORANGE, crest * 0.8);
+    out.lerp(SULFUR, smooth(0.7, 0.95, patch) * up * 0.3);
+    out.lerp(COAL, smooth(0.35, 0, b.saw) * (1 - b.lip) * 0.65 * (1 - up));
+    out.lerp(COAL, smooth(0.9, 0.995, hh) * 0.7);
+    out.multiplyScalar(1.3); // keeps the trunk's overall brightness despite the darker recesses
+  }
 }

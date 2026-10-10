@@ -174,7 +174,7 @@ export const DEFAULT_PROPS: PropsConfig = {
   chimneyCrust: {
     propIds: ['beebe-chimney-1', 'beebe-chimney-2', 'beebe-chimney-3'],
     color: 0x9a8e7b,
-    amount: 0.16,
+    amount: 0.08,
     scaleM: 1.4,
     bumpScale: 1.3,
   },

@@ -167,11 +167,16 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     let best = 0;
     let hh = 0;
     let near = stacks[0]!;
+    let nearest = Infinity;
     for (const s of stacks) {
       const d2 = Math.hypot(x - s.x, z - s.z);
       if (d2 < s.r0 * 2.4 && y > s.y) {
         const t = clamp01((y - s.y) / s.h);
-        if (t > best) {
+        // The stack whose axis is closest (in its own radii) owns the vertex. Choosing by
+        // height fraction let the shorter side stacks claim the main trunk's upper flanks.
+        const rel = d2 / s.r0;
+        if (beebeHero ? rel < nearest : t > best) {
+          nearest = rel;
           best = t;
           hh = t;
           near = s;
@@ -192,6 +197,8 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
         nz,
         seed,
         seed + stacks.indexOf(near) * 7,
+        ny,
+        near === stacks[0],
       );
     } else if (best > 0) {
       out.copy(SULFIDE).lerp(ROCK, nz);
