@@ -15,7 +15,8 @@ export async function expectObjectiveGuidance(page: Page, touch: boolean): Promi
 /** Measure actual text and camera projection; do not guess the sub's screen centre. */
 export async function expectCompactPhoneHud(page: Page): Promise<void> {
   await expect(page.locator('.d-sonar-legend')).toBeHidden();
-  expect((await page.locator('.sonar').boundingBox())!.width).toBe(96);
+  const landscape = (page.viewportSize()?.width ?? 0) > (page.viewportSize()?.height ?? 0);
+  expect((await page.locator('.sonar').boundingBox())!.width).toBe(landscape ? 120 : 96);
   await expect(page.locator('.d2-sonar-controls')).toBeHidden();
   await expect(page.locator('.onboard-card button:visible')).toHaveCount(1);
   await expect(page.getByRole('button', { name: 'Skip', exact: true })).toBeVisible();

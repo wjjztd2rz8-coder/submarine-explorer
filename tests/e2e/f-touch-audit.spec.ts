@@ -107,7 +107,9 @@ for (const viewport of [
         await reachable(page.getByRole('button', { name: 'Skip', exact: true }));
         await expect(page.locator('.onboard-card button:visible')).toHaveCount(1);
         await expect(page.locator('.d-sonar-legend')).toBeHidden();
-        expect((await page.locator('.sonar').boundingBox())!.width).toBe(96);
+        expect((await page.locator('.sonar').boundingBox())!.width).toBe(
+          viewport.width > viewport.height ? 120 : 96,
+        );
         // Check every instruction: the last step is longer than the first.
         for (const step of ['move', 'depth', 'lights', 'scan', 'journal']) {
           await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
