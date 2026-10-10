@@ -47,6 +47,8 @@ import {
   placeRocks,
   rockMatrix,
   type RockSpot,
+  isSupported,
+  talusNormal,
   type TalusShape,
   TALUS_LIP_RISE,
   talusSurface,
@@ -438,6 +440,45 @@ function jointOffset(
   return { off: (h(i) * (1 - m) + h(i + 1) * m) * step, crack: smooth(0.88, 0.97, f) * (1 - m) };
 }
 
+/** One slump scar: centre (x, y), half-extents and scoop depth (all metres). */
+interface Scar {
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
+  depth: number;
+}
+
+/** Scar footprint 0..1: a bowl with a short, steep headwall above and a long floor below. */
+function scarBowl(c: Scar, x: number, y: number): number {
+  const dy = y - c.cy;
+  const r = Math.hypot((x - c.cx) / c.rx, dy / (dy > 0 ? c.ry * 0.5 : c.ry * 1.3));
+  return smooth(1, 0.55, r);
+}
+
+/** Extra z (into the rock, +) from all scars; the headwall is sharper than the floor. */
+function scarDisp(scars: Scar[], x: number, y: number): number {
+  let d = 0;
+  for (const c of scars) {
+    const b = scarBowl(c, x, y);
+    if (b > 0) d = Math.max(d, c.depth * Math.pow(b, y > c.cy ? 0.6 : 1.4));
+  }
+  return d;
+}
+
+/** Headwall emphasis 0..1: just inside the scar rim on its upper half. */
+function scarHead(scars: Scar[], x: number, y: number): number {
+  let h = 0;
+  for (const c of scars) {
+    if (y > c.cy)
+      h = Math.max(
+        h,
+        smooth(0.2, 0.6, scarBowl(c, x, y)) * (1 - smooth(0.9, 1, scarBowl(c, x, y))),
+      );
+  }
+  return h;
+}
+
 export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const { dims, seed, tier } = input;
   const d = geoDetail(tier);
@@ -516,6 +557,27 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     const [fx, fy] = MONTEREY_STRATA.slumpFrequency;
     return smooth(0.53, 0.73, fbm3(x * fx, y * fy, seed + 28, seed + 51, 2));
   };
+  // Monterey slump scars: a few scooped amphitheatres with a steep headwall above a gentler,
+  // silt-floored bowl, so the wall outline is eroded rather than stacked. Own seed stream.
+  const scars: Scar[] = [];
+  if (fidelity) {
+    const sr = mulberry32(seed ^ 0x5ca2);
+    const count = 5;
+    for (let i = 0; i < count; i++) {
+      scars.push({
+        cx: ((i + 0.2 + 0.6 * sr()) / count - 0.5) * W * 0.78,
+        cy: (0.4 + 0.45 * sr()) * H,
+        rx: W * (0.05 + 0.05 * sr()),
+        ry: H * (0.16 + 0.1 * sr()),
+        depth: H * (0.14 + 0.1 * sr()),
+      });
+    }
+  }
+  const scarAt = (x: number, y: number): number => {
+    let v = 0;
+    for (const c of scars) v = Math.max(v, scarBowl(c, x, y));
+    return v;
+  };
 
   // --- displacement: gullies, dipping strata ledges, joints; zero at the apron join.
   const disp = (x: number, y: number, z: number): number => {
@@ -537,13 +599,33 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
             (0.35 + 1.1 * fbm3(Math.floor(s) * 3.1, x * 0.03, seed + 81, seed + 9, 2))
         : 1;
     const slump = id === 'canyon' ? slumpAt(x, y) : 0;
-    const ledge = -Math.pow(saw, 2.2) * lip * P.ledge * scale * 2.4 * strength * (1 - slump);
+    // Ledge depth varies along each bed (pinching out, then jutting) and vanishes in scars.
+    const reach = fidelity
+      ? 0.35 + 1.5 * fbm3(x * 0.055, Math.floor(s) * 1.9, seed + 91, seed + 13, 2)
+      : 1;
+    const scar = scars.length ? scarAt(x, y) : 0;
+    const ledge =
+      -Math.pow(saw, 2.2) *
+      lip *
+      P.ledge *
+      scale *
+      2.4 *
+      strength *
+      reach *
+      (1 - slump) *
+      (1 - scar);
     const fine =
       (fbm3(x * 0.3, y * 0.3, z * 0.3, seed + 4, 2) - 0.5) * (fidelity ? 0.3 : 0.9 * scale);
     const bulge = (fbm3(x * 0.045, y * 0.05, seed + 8, seed + 6, 3) - 0.5) * 0.5 * H * 0.35;
     const joint = P.joints > 0 ? jointOffset(x, P.joints, P.jointStep * scale, seed).off : 0;
     return (
-      (gully + ledge + bulge + joint + slump * H * MONTEREY_STRATA.slumpDepthH) * env +
+      (gully +
+        ledge +
+        bulge +
+        joint +
+        slump * H * MONTEREY_STRATA.slumpDepthH +
+        scarDisp(scars, x, y)) *
+        env +
       fine * smooth(joinY - 0.05 * H, joinY, y)
     );
   };
@@ -605,6 +687,12 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       // Dust catches on interrupted shelves and drapes the occasional slump scar.
       const dust = Math.max(slumpAt(x, y), smooth(0.05, 0.6, ny_) * tone);
       out.lerp(P.drape, dust * MONTEREY_STRATA.dustAmount);
+      if (scars.length) {
+        // Pale silt on the scar floor, a darker raw headwall above it.
+        const sc = scarAt(x, y);
+        out.lerp(P.drape, sc * 0.35);
+        out.multiplyScalar(1 - 0.3 * scarHead(scars, x, y));
+      }
     }
     // The foot is buried in rubble and silt.
     out.lerp(P.drape, (1 - smooth(joinY, joinY + 0.12 * H, y)) * 0.7);
@@ -660,6 +748,32 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
         span: 0.46,
       }),
     );
+    // Monterey: blocks that dropped out of each scar, resting on the apron below it.
+    if (scars.length) {
+      const fr = mulberry32(seed ^ 0xfa11);
+      for (const c of scars) {
+        for (let k = 0; k < 3; k++) {
+          for (let tries = 0; tries < 8; tries++) {
+            const x = c.cx + (fr() - 0.5) * c.rx * 1.8;
+            const reach = talus.reach(x);
+            if (reach < 2) continue;
+            const z = talus.foot(x) - (0.04 + fr() * 0.4) * reach;
+            const spot: RockSpot = {
+              x,
+              y: talusSurface(talus, x, z),
+              z,
+              n: talusNormal(talus, x, z),
+              r: scale * (1.1 + fr() * 1.6) * (k === 0 ? 1.5 : 1),
+              u: 0.1,
+            };
+            if (isSupported(talus, spot)) {
+              rocks.push(spot);
+              break;
+            }
+          }
+        }
+      }
+    }
     const tmpl = [0, 1, 2].map((k) => {
       if (id === 'canyon') return fracturedBoulder(d.sphereDetail, seed + k * 5, k);
       // Angular blocks: strong noise, faceted shading, dark undersides (contact occlusion).
