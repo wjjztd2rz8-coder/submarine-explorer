@@ -20,6 +20,8 @@ export function isCrustedSideChimney(id: string): boolean {
   return Object.hasOwn(BEEBE_SIDE_CHIMNEYS, id);
 }
 
+const HERO_MUTE = new THREE.Color(0x4c4038);
+
 /** Paint a column in its own frame (axis at the origin, y up from the foot) and keep it indexed-free. */
 function paintColumn(
   g: THREE.BufferGeometry,
@@ -32,6 +34,8 @@ function paintColumn(
   paint(flat, (x, y, z, _ny, out) => {
     const nz = fbm3(x * 0.6, y * 0.5, z * 0.6, seed ^ 0x51, 4);
     paintCrust(out, x, y, z, Math.atan2(z, x), y, Math.min(1, y / height), nz, seed, bandSeed);
+    // The hero's colour is muted by its mound blend; match it so chimneys 2-3 are not pinker.
+    out.lerp(HERO_MUTE, 0.22).multiplyScalar(0.92);
   });
   return flat;
 }
