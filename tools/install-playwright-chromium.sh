@@ -4,10 +4,9 @@
 # usually clears within a few tens of seconds, so back off between attempts.
 # Preserve the final attempt's exit code.
 set -uo pipefail
-attempts=3
-delays=(0 15 30)
+delays=(15 30)
+attempts=$(( ${#delays[@]} + 1 ))
 for attempt in $(seq 1 "$attempts"); do
-  sleep "${delays[$((attempt - 1))]}"
   if timeout --kill-after=5s 120s npx playwright install --with-deps chromium; then
     exit 0
   else
@@ -16,5 +15,6 @@ for attempt in $(seq 1 "$attempts"); do
   if (( attempt == attempts )); then
     exit "$status"
   fi
-  echo "Chromium installation failed or stalled (attempt $attempt of $attempts); retrying." >&2
+  echo "Chromium installation failed or stalled (attempt $attempt of $attempts); retrying in ${delays[attempt - 1]} seconds." >&2
+  sleep "${delays[attempt - 1]}"
 done

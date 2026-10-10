@@ -29,7 +29,7 @@ class ChromiumInstallTests(unittest.TestCase):
             stub.chmod(0o755)
             sleep = root / "sleep"
             sleep.write_text(
-                '#!/usr/bin/env bash\n[[ "$1" == 10 ]] || exit 99\n'
+                '#!/usr/bin/env bash\n[[ "$1" == 15 || "$1" == 30 ]] || exit 99\n'
                 'echo sleep >> "$INSTALL_TEST_SLEEPS"\n'
             )
             sleep.chmod(0o755)
@@ -61,8 +61,11 @@ class ChromiumInstallTests(unittest.TestCase):
     def test_stalled_install_can_retry(self):
         self.assertEqual(self.run_installer([124, 0]), (0, 2, 1))
 
-    def test_second_failure_is_not_hidden(self):
-        self.assertEqual(self.run_installer([1, 7]), (7, 2, 1))
+    def test_failure_failure_then_success_uses_backoff(self):
+        self.assertEqual(self.run_installer([1, 1, 0]), (0, 3, 2))
+
+    def test_last_failure_is_not_hidden(self):
+        self.assertEqual(self.run_installer([1, 1, 7]), (7, 3, 2))
 
 
 if __name__ == "__main__":
