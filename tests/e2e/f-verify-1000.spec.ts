@@ -91,7 +91,7 @@ for (const viewport of [
           'stalactites',
           'great-blue-hole-stalactites',
           'Stalactite gallery',
-          'stalactite gallery',
+          'stalactite galleries',
         ],
         [
           'monterey-canyon',
