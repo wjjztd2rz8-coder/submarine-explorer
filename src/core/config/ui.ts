@@ -192,11 +192,11 @@ export const DEFAULT_SONAR_PALETTES: Record<SonarPaletteName, SonarPalette> = {
   default: {
     label: 'Sonar relief',
     stops: [
-      [0, 3, 26, 28],
-      [0.25, 9, 57, 55],
-      [0.5, 30, 94, 83],
-      [0.75, 78, 142, 113],
-      [1, 155, 198, 144],
+      [0, 5, 15, 35],
+      [0.25, 9, 47, 67],
+      [0.5, 15, 85, 100],
+      [0.75, 25, 132, 140],
+      [1, 51, 182, 173],
     ],
     blip: '#ffd24a',
     blipOutline: null,

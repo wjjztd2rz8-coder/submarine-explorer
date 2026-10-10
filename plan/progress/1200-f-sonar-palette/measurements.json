@@ -1,0 +1,166 @@
+{
+  "method": "Actual Sonar.renderBathymetry with recording canvas; PNGs are depth raster only; SVGs include actual contour paths and labels; no browser HUD/layout capture",
+  "poseSource": "2026-10-09-195308",
+  "sites": [
+    {
+      "site": "great-blue-hole",
+      "stage": "before",
+      "position": [-244.06162328324268, 25.908738271603568],
+      "dpr": 2,
+      "raster": [268, 268],
+      "cssCanvas": [220, 220],
+      "relief": {
+        "minDepthM": 2.9159464955901524,
+        "maxDepthM": 126.26240447048201,
+        "spanM": 123.34645797489186,
+        "contourIntervalM": 10
+      },
+      "contourSegments": 3142,
+      "labels": ["120 m", "80 m", "40 m"]
+    },
+    {
+      "site": "great-blue-hole",
+      "stage": "after",
+      "position": [-244.06162328324268, 25.908738271603568],
+      "dpr": 2,
+      "raster": [536, 536],
+      "cssCanvas": [220, 220],
+      "relief": {
+        "minDepthM": 2.908663181428288,
+        "maxDepthM": 126.43568289308799,
+        "spanM": 123.5270197116597,
+        "contourIntervalM": 10
+      },
+      "contourSegments": 6776,
+      "labels": ["120 m", "80 m", "40 m"]
+    },
+    {
+      "site": "endurance",
+      "stage": "before",
+      "position": [-396.79612374913046, 1054.0090541469992],
+      "dpr": 2,
+      "raster": [224, 268],
+      "cssCanvas": [176, 220],
+      "relief": {
+        "minDepthM": 2998.115561444487,
+        "maxDepthM": 3002.9569869055695,
+        "spanM": 20,
+        "contourIntervalM": 1
+      },
+      "contourSegments": 1085,
+      "labels": ["3000 m"]
+    },
+    {
+      "site": "endurance",
+      "stage": "after",
+      "position": [-396.79612374913046, 1054.0090541469992],
+      "dpr": 2,
+      "raster": [448, 536],
+      "cssCanvas": [176, 220],
+      "relief": {
+        "minDepthM": 2998.115561444487,
+        "maxDepthM": 3002.969352984851,
+        "spanM": 20,
+        "contourIntervalM": 1
+      },
+      "contourSegments": 2172,
+      "labels": ["3000 m"]
+    },
+    {
+      "site": "lost-city",
+      "stage": "before",
+      "position": [41.37717819694599, -939.1586039298085],
+      "dpr": 2,
+      "raster": [268, 263],
+      "cssCanvas": [220, 215],
+      "relief": {
+        "minDepthM": 724.2063661381399,
+        "maxDepthM": 1293.44366014838,
+        "spanM": 569.2372940102402,
+        "contourIntervalM": 50
+      },
+      "contourSegments": 4356,
+      "labels": ["1050 m", "850 m"]
+    },
+    {
+      "site": "lost-city",
+      "stage": "after",
+      "position": [41.37717819694599, -939.1586039298085],
+      "dpr": 2,
+      "raster": [536, 526],
+      "cssCanvas": [220, 215],
+      "relief": {
+        "minDepthM": 724.2063661381399,
+        "maxDepthM": 1294.9386119641565,
+        "spanM": 570.7322458260167,
+        "contourIntervalM": 50
+      },
+      "contourSegments": 8724,
+      "labels": ["1050 m", "850 m"]
+    },
+    {
+      "site": "beebe-vent-field",
+      "stage": "before",
+      "position": [10.007403608846598, -87.70518834554093],
+      "dpr": 2,
+      "raster": [268, 267],
+      "cssCanvas": [220, 219],
+      "relief": {
+        "minDepthM": 4872.79852943283,
+        "maxDepthM": 5138.875110335196,
+        "spanM": 266.076580902366,
+        "contourIntervalM": 50
+      },
+      "contourSegments": 2208,
+      "labels": ["5100 m", "5000 m"]
+    },
+    {
+      "site": "beebe-vent-field",
+      "stage": "after",
+      "position": [10.007403608846598, -87.70518834554093],
+      "dpr": 2,
+      "raster": [536, 534],
+      "cssCanvas": [220, 219],
+      "relief": {
+        "minDepthM": 4872.787031868674,
+        "maxDepthM": 5138.943246766271,
+        "spanM": 266.15621489759724,
+        "contourIntervalM": 50
+      },
+      "contourSegments": 4429,
+      "labels": ["5100 m", "5000 m"]
+    },
+    {
+      "site": "titanic",
+      "stage": "before",
+      "position": [336.1257046335893, -292.8164161227348],
+      "dpr": 2,
+      "raster": [213, 268],
+      "cssCanvas": [165, 220],
+      "relief": {
+        "minDepthM": 3795.354343046102,
+        "maxDepthM": 3804.9555657677947,
+        "spanM": 20,
+        "contourIntervalM": 2
+      },
+      "contourSegments": 1604,
+      "labels": ["3804 m", "3800 m"]
+    },
+    {
+      "site": "titanic",
+      "stage": "after",
+      "position": [336.1257046335893, -292.8164161227348],
+      "dpr": 2,
+      "raster": [426, 536],
+      "cssCanvas": [165, 220],
+      "relief": {
+        "minDepthM": 3795.3245293861332,
+        "maxDepthM": 3804.9565509571453,
+        "spanM": 20,
+        "contourIntervalM": 2
+      },
+      "contourSegments": 3222,
+      "labels": ["3804 m", "3800 m"]
+    }
+  ]
+}
