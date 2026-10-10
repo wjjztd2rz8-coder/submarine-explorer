@@ -34,7 +34,7 @@ import {
   type InstanceSpec,
 } from './shared.js';
 import { scatterRubble } from './talus.js';
-import { spireRadius, tieredSpire, type SpireOpts } from './spire.js';
+import { spireRadius, tieredSpire, trunkCrest, type SpireOpts } from './spire.js';
 import type { GeoBuildInput } from './types.js';
 
 const OLD = new THREE.Color(0x8e8c82); // weathered, inactive carbonate
@@ -43,6 +43,7 @@ const STAIN = new THREE.Color(0x6c685a);
 const CREAM = new THREE.Color(0xf0e2c4); // warm cream carbonate crust
 const GREYBLUE = new THREE.Color(0x7d8a92); // cooler, older grey-blue carbonate
 const BIOFILM = new THREE.Color(0x6f9a90); // faint blue-green microbial film in damp recesses
+const TROUGH = new THREE.Color(0x7a6e58); // grey-brown stain in the flow troughs
 const VENT = new THREE.Color(0x14120f); // the dark vent mouth
 const SEABED = new THREE.Color(0xc2a468); // what the apron fades into: the Lost City sediment
 
@@ -77,7 +78,7 @@ function roughenTrunk(g: THREE.BufferGeometry, s: SpireOpts, seed: number, pocke
     const broken = smooth(0.35, 0.6, mid + 0.5 + Math.sin(a * 3 + Math.floor(band)) * 0.2);
     const ledge = smooth(0.7, 0.96, frac) * (1 - smooth(0.96, 1, frac)) * broken;
     const undercut = smooth(0.0, 0.25, frac) * (1 - smooth(0.25, 0.5, frac)) * broken;
-    let k = 1 + big * 0.6 + mid * 0.3 + ridge * 0.1 + ledge * 0.11 - undercut * 0.09;
+    let k = 1 + big * 0.6 + mid * 0.3 + ridge * 0.1 + ledge * 0.04 - undercut * 0.03;
     // Orifice pocket.
     const da = Math.atan2(Math.sin(a - orA), Math.cos(a - orA)) * rad;
     const dy = y - 0.8 * s.h;
@@ -142,14 +143,14 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       segs: 26 * dens + 4,
       rings: (h / 0.9) * dens + 8,
       tiers: Math.max(2, Math.round(h / (main ? 6.5 : 5))),
-      ledge: main ? 0.2 : 0.16,
+      ledge: main ? 0.12 : 0.1,
       wobble: 0.1,
       rough: 0.035,
-      ridges: main ? 9 : 6,
-      ridgeAmp: 0.075,
+      ridges: main ? 22 : 14,
+      ridgeAmp: main ? 0.13 : 0.1,
       flare: main ? 0.7 : 0.5,
       lip: 0.1,
-      crater: 0.5,
+      crater: main ? 0.9 : 0.7,
       irregular: 1,
       trunk: true,
       lean: main ? 0 : (rnd() - 0.5) * 0.12,
@@ -205,12 +206,13 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     pieces.push(column);
     tips.push({ x: s.x, y: s.y + s.h, z: s.z });
     // Drooping flanges on the column: wide shelves on the main tower, one or two elsewhere.
-    const nf = lone ? 1 : i === 0 ? 2 : Math.floor(rnd() * 2);
+    // Saucer flanges read as plates, so only an occasional small one remains on lesser spires.
+    const nf = lone || i === 0 ? 0 : rnd() < 0.3 ? 1 : 0;
     for (let f = 0; f < nf; f++) {
       const t =
         i === 0 ? 0.12 + (f / nf) * 0.6 + rnd() * 0.06 : 0.1 + (f / nf) * 0.6 + rnd() * 0.08;
       const rAt = spireRadius(s, t);
-      const w = rAt * (0.12 + rnd() * 0.2) + 0.3;
+      const w = rAt * (0.08 + rnd() * 0.1) + 0.2;
       pieces.push(
         place(
           lostCityFlange({
@@ -346,12 +348,27 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     // Dark seams between flow sheets: thin, vertically drawn streaks, strongest on walls.
     const seam = fbm3(x * 1.1, y * 0.07, z * 1.1, seed ^ 0x5ea, 3);
     out.multiplyScalar(1 - 0.4 * smooth(0.5, 0.56, seam) * (1 - smooth(0.56, 0.62, seam)) * wall);
+    // Flow ridges: pale crests catch the light, troughs run grey-brown with a cool film.
+    for (const sp of spires) {
+      const dx = x - sp.x,
+        dz = z - sp.z;
+      if (dx * dx + dz * dz > sp.r0 * sp.r0 * 3 || y < sp.y || y > sp.y + sp.h) continue;
+      const ang = Math.atan2(dz, dx);
+      const ly = y - sp.y;
+      const nn = fbm3(Math.cos(ang) * 1.3 + 3, ly * 0.09, Math.sin(ang) * 1.3 + 3, sp.seed, 3);
+      const cr = trunkCrest(ang, ly, nn, sp.ridges ?? 7, sp.seed);
+      const cc = cr * cr;
+      out.multiplyScalar(0.56 + 0.7 * cc);
+      out.lerp(TROUGH, (1 - cc) * 0.5 * smooth(0.02, 0.2, ly / sp.h));
+      out.lerp(BIOFILM, (1 - cc) * 0.3 * (1 - smooth(0, 0.35, ly / sp.h)) * smooth(0.4, 0.6, n1));
+      break;
+    }
     // Vent orifices: a dark, sulphide-stained mouth at each column tip.
     for (const v of vents) {
       const dy = y - v.p.y;
       if (dy < -v.depth - 1.2 || dy > 0.6) continue;
       const dd = Math.hypot(x - v.p.x, z - v.p.z) / v.r;
-      const mouth = 1 - smooth(0.2, 1.05, dd);
+      const mouth = 1 - smooth(0.35, 1.3, dd);
       out.lerp(VENT, mouth * smooth(-v.depth - 1.2, -0.3, dy) * 0.92);
     }
     // Faint blue-green biofilm: damp, sheltered lower walls and under ledges.

@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- Lost City carbonate towers: flow-stone look with 22 meandering vertical ridges on the main trunk, much weaker terrace shelves, ridge-aligned crest/trough colouring (grey-brown troughs, faint blue-green film near the base), deeper and wider dark vent mouth. Cut: saucer flanges removed from the main trunk and the lone chimney, and reduced to a rare small one on lesser spires (Lost City tower triangles drop; terrainMerge1140 snapshot updated).
+
 - Great Blue Hole bowl (f-bluehole-bowl2): ragged shelf lip with rubble ridges and a stepped main riser (extra ledge knots), a 30 m colour feather from warm shelf to cool wall, stronger per-terrace tone and darker blue lower walls; wall sponges are now closed capsules (muted colour, 12 instead of 34 to stay in the Low triangle budget). Blue Hole snapshots updated.
 
 - **f-mission-pacing:** Blue Hole's second required target is now the Eastern stalactite gallery (270 m from the first, was the outer drop-off 4.5 km away, now optional). Monterey's second required target is a new real-terrain "Canyon floor, 1,000 m" scan 645 m south of the north wall (was the upper channel 14.6 km away, now optional). New `tests/unit/missionPacing.test.ts` caps consecutive required gaps at 1.5 km per site; Challenger Deep, Hudson Canyon and Hunga Tonga remain listed as known long gaps. Details in `plan/progress/f-mission-pacing.md`.
