@@ -348,7 +348,15 @@ function addBeebeHabitat(built: BuiltProp, input: ProceduralBuildInput): void {
     const size = cfg.rubble_size_m! * (0.5 + rnd());
     // Short fractured columns supplement the existing rounded talus.
     const chunk = new THREE.CylinderGeometry(size * 0.45, size * 0.6, size * 1.5, 5, 1);
-    paint(chunk, (_x, _y, _z, ny, color) => color.set(ny > 0.5 ? 0x756b58 : 0x494840));
+    // Roughen toward fractured basalt: knobbly, dark, with only a dusting of sediment on top.
+    const cp = chunk.getAttribute('position');
+    for (let i = 0; i < cp.count; i++) {
+      const j =
+        0.78 + 0.5 * fbm3(cp.getX(i) * 3 + k, cp.getY(i) * 3, cp.getZ(i) * 3 + k * 0.7, k + 5, 2);
+      cp.setXYZ(i, cp.getX(i) * j, cp.getY(i) * (0.9 + 0.2 * j), cp.getZ(i) * j);
+    }
+    chunk.computeVertexNormals();
+    paint(chunk, (_x, _y, _z, ny, color) => color.set(ny > 0.6 ? 0x5a5347 : 0x33322e));
     place(chunk, {
       x,
       y: surface(x, z) + size * 0.25,

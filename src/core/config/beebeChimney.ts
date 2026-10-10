@@ -49,6 +49,8 @@ export const BEEBE_SCATTER_ROCK = {
   faceVariation: 0.22,
   stainAmount: 0.22,
   sedimentAmount: 0.06,
+  /** Divides rubble's vertex colour: its instance tint is brighter than boulders and pillows. */
+  rubbleDarken: 1.3,
 } as const;
 
 /**

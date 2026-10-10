@@ -199,6 +199,8 @@ export function fracturedBasaltGeometry(kind: ScatterKind, biome: Biome): THREE.
   // Instance tint still supplies deterministic brightness variation. Cancel its
   // old base hue in vertex colours, especially rubble's pale carbonate colorA.
   const reference = new THREE.Color(kind === 'rubble' ? biome.colorA : biome.colorC);
+  // Rubble's instance tint is the brightest of the three; pull it toward the basalt of the rest.
+  if (kind === 'rubble') reference.multiplyScalar(cfg.rubbleDarken);
   const color = new THREE.Color();
   for (let f = 0; f < pos.count; f += 3) {
     const patch = hash3(pos.getX(f), pos.getY(f), pos.getZ(f), seed + 1130);
