@@ -319,12 +319,12 @@ export function buildEndurance(
   }
   // Sediment skirt: mud banked against both flanks, thickest at the bow and stern.
   for (let i = 0; i < 30; i++) {
-    const s = (i / 29) * L;
+    const s = 3 + (i / 29) * (L - 6);
     for (const side of [-1, 1] as const) {
       const hw = half(Math.min(L - 0.5, Math.max(0.5, s)), 0.8);
       const g = normalise(new THREE.SphereGeometry(1, 10, 5, 0, Math.PI * 2, 0, Math.PI / 2));
-      g.scale(1.3 + rnd() * 0.6, 0.16 + rnd() * 0.1, 2.6 + rnd() * 0.8);
-      g.translate(side * (hw + 0.5 + rnd() * 0.4), -0.08, zOf(s));
+      g.scale(0.55 + rnd() * 0.25, 0.16 + rnd() * 0.1, 2.0 + rnd() * 0.6);
+      g.translate(side * (hw + 0.15 + rnd() * 0.2), -0.08, zOf(s));
       wood.add(g, C.silt);
     }
   }
