@@ -94,17 +94,25 @@ export function rusticlesAlong(
   rnd: () => number,
   outward?: THREE.Vector3 | ((p: THREE.Vector3) => THREE.Vector3),
 ): void {
+  // Rusticles gather in clumps under seams, rails and edges, with bare steel between.
   for (let i = 0; i < path.length - 1; i++) {
     const a = path[i]!;
     const b = path[i + 1]!;
-    const n = Math.floor(a.distanceTo(b) * density + rnd());
-    for (let k = 0; k < n; k++) {
-      const p = new THREE.Vector3().lerpVectors(a, b, rnd());
-      const o = typeof outward === 'function' ? outward(p) : outward;
-      if (o) p.addScaledVector(o, 0.08);
-      // Mostly short, a few long ones.
-      const len = lenMin + (lenMax - lenMin) * Math.pow(rnd(), 2.2);
-      hangRusticle(list, p, len, rnd);
+    const dist = a.distanceTo(b);
+    const clumps = Math.floor((dist * density) / 2 + rnd());
+    for (let k = 0; k < clumps; k++) {
+      const c = new THREE.Vector3().lerpVectors(a, b, rnd());
+      const o = typeof outward === 'function' ? outward(c) : outward;
+      const reach = lenMin + (lenMax - lenMin) * Math.pow(rnd(), 1.6);
+      const strands = 3 + Math.floor(rnd() * 6);
+      for (let j = 0; j < strands; j++) {
+        const p = c.clone();
+        p.lerp(b, (rnd() - 0.5) * Math.min(0.6, 0.5 / Math.max(dist, 0.5)) * 2);
+        if (o) p.addScaledVector(o, 0.06 + rnd() * 0.06);
+        // Strands in a clump share a rough length; the odd one runs long.
+        const len = reach * (0.35 + rnd() * 0.65) * (rnd() < 0.08 ? 1.6 : 1);
+        hangRusticle(list, p, len, rnd);
+      }
     }
   }
 }
