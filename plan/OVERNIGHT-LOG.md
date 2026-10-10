@@ -838,3 +838,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Triage:** hosted CI failures on the last push are all heavy specs timing out on software GL (f-verify-1000 high-tier first-minute, f-bughunt-1090 real 60 s idle) plus one apt install flake (code 100).
 - **Merged:** f-ci-heavy-specs (Haiku): those specs skip when CI is set, still run locally; no assertions loosened. Smoke + project-base green on worktree; no full e2e, no push (f47 last tag). Next push should show whether hosted CI goes green.
 - **Queue:** Codex 1220-1280 (weekly 6%, dry until 15 Oct). Next Claude: shared sonar ramp for flat sites, Monterey wall. Needs owner: nothing.
+
+## 2026-10-10 07:38 CDT headless run (Claude)
+
+- **Merged:** f-sonar-flat (Sonnet, ~40 min): flat-view detection (relief <0.06 m/m) adds local contour interval, hillshade boost, depth tint, range rings and contact footprint halos; Blue Hole/Hunga Tonga unchanged. Titanic clearly better; Endurance improved but the seabed really is a ~6 m tilt, so still banded. Smoke + project-base green on main; no full e2e, no push (f47 last tag).
+- **Queue:** Codex 1220-1280 (weekly 6%, dry until 15 Oct); 1250 is now partly redundant (check before running). Next Claude: Monterey wall, Blue Hole floor (1280). Needs owner: nothing.
