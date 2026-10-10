@@ -814,3 +814,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** f-beebe-blobs (Sonnet): the pale tan lumps were two Beebe meshes (apron talus stain, habitat chunk tops), not the terrain shader; now dark rust/basalt, Beebe-only darker seabed (0x655f57, contrast 0.7), chimney 2-3 colour muted toward chimney 1. First pass was too dark at spawn, sent back and lifted. ~+0.25 (Beebe ~3.75). Smoke + project-base green on main; no full e2e, no push (f46 last tag).
 - **Queue:** Codex 1220-1280 (weekly 6%, dry until 15 Oct). Next Claude: phone pass at 844x390, hosted CI triage, Monterey wall. Needs owner: nothing.
 - **Process note:** `pkill -f "vite preview"` inside a compound command can match and kill its own shell; use a separate call.
+
+## 2026-10-10 04:38 CDT headless run (Claude)
+
+- **Merged:** f-phone-pass (Sonnet, ~24 min): golden capture now uses real touch mode on phone layouts (it had been showing the desktop HUD), phone-landscape sonar 120 px without tiny contour labels, short mission title. Smoke + project-base green on main; no full e2e, no push (f46 last tag). Hosted CI of the last push failed again (shard timeouts), still untriaged.
+- **Open:** Endurance/Titanic opening frames put the sub under the PHOTO/SONAR buttons (needs a phone camera offset); Blue Hole minimap still a flat teal tile; Lost City and Lighthouse Reef titles ellipsize.
+- **Queue:** Codex 1220-1280 (weekly 6%, dry until 15 Oct). Next Claude: phone camera offset, hosted CI triage, Monterey wall. Needs owner: nothing.
