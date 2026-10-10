@@ -96,7 +96,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
     },
   },
   "challenger-deep": {
-    "biome": "06ce1f582f12d901649dda83e87125101bf490c080025d53de84ff60439d91f7",
+    "biome": "e4bc382e5598d8ca058a73f5b8a691469449a6157f58436daab153ffa1663ea8",
     "tiers": {
       "high": {
         "buffers": [
@@ -109,7 +109,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP",
         "shader": "5c1ff0dd5011d8760bed2f99dbe67e9e00553c01c52e5e2af8eefc452c441012",
-        "uniforms": "f881fa11d41a3b9fa5fcace354d597dc737d70ef423a52368952beda77ac0175",
+        "uniforms": "e93917837f1da7181e5ca377df757de140799db692fe1e5f7c5ad98b570cdf79",
       },
       "low": {
         "buffers": [
@@ -122,7 +122,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
         ],
         "cache": "seabed-",
         "shader": "c6b332dc417814b0f0b600afc643ccfc75881b081a0b8efde290343c04d15fb1",
-        "uniforms": "f881fa11d41a3b9fa5fcace354d597dc737d70ef423a52368952beda77ac0175",
+        "uniforms": "e93917837f1da7181e5ca377df757de140799db692fe1e5f7c5ad98b570cdf79",
       },
     },
   },

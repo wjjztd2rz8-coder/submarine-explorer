@@ -26,9 +26,9 @@ export const DEEP_OPENINGS = {
       // Bring the bait-station group into the lander's approach, away from the hull.
       aheadM: 24,
       sideM: 5,
-      low: 18,
-      count: 30,
-      spacingM: 1.2,
+      low: 24,
+      count: 45,
+      spacingM: 1.0,
       onWreck: false,
     },
   },

@@ -32,8 +32,13 @@ export function populateDeepOpening(
   const count = sim.tier.detail === 0 ? spec.low : spec.count;
   // Reject the whole patch if any individual would overlap the wreck or leave its depth band.
   let positions = Array.from({ length: count }, (_, i) => {
-    const px = x + ((i % 3) - 1) * spec.spacingM;
-    const pz = z + (Math.floor(i / 3) - (Math.ceil(count / 3) - 1) / 2) * spec.spacingM;
+    // Grid of three columns, loosened by a deterministic scatter so a bait swarm does not read as rows.
+    const jx = (Math.sin(i * 12.9898) * 43758.5453) % 1;
+    const jz = (Math.sin(i * 78.233) * 12543.531) % 1;
+    const jitter = spec.onWreck ? 0 : spec.spacingM * 0.45;
+    const px = x + ((i % 3) - 1) * spec.spacingM + jx * jitter;
+    const pz =
+      z + (Math.floor(i / 3) - (Math.ceil(count / 3) - 1) / 2) * spec.spacingM + jz * jitter;
     return new Vector3(px, sim.env.groundAt(px, pz) + (row.def.altitude?.[0] ?? 0), pz);
   });
   if (spec.onWreck) {
