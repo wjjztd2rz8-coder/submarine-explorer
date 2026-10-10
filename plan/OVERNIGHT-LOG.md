@@ -756,3 +756,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** Codex 1130 (Beebe fractured-basalt scatter plus portrait onboard-card clearance). Gates smoke + project-base green in the worktree; I captured a fresh Beebe golden: it is nearly identical to the before shot and the pale rocks beside the sub are still pale, so the visible gain is nil (kept for the test coverage and lower triangle count). Beebe rocks stay open in the backlog.
 - **Full e2e on main:** local `--full-e2e` hit its 50 min timeout with no result (output swallowed by `tail`), so no release push or f45 tag this run. Hosted CI is the real full run; 1230 triages its shards. Suggest the next run runs full e2e with output to a log file and a longer timeout, or relies on hosted CI.
 - **Running:** Codex 1180 (Endurance). **Queue:** 1190, 1200, 1210, 1220, 1230. No Claude agent launched (Claude 66%, but the full e2e held the CPU for the whole run). Needs owner: nothing.
+
+## 2026-10-09 19:05 CDT headless run (Claude)
+
+- **Merged:** Codex 1180 (Endurance snow discs and hull blob gone in a fresh golden, shot reviewed; conflicts with 1130 in touch/hud CSS resolved to main's version) and f-challenger-seabed (Sonnet: brighter rippled seabed, bigger amphipod swarm; lander marker still tiny, slope only slightly clearer). Smoke + project-base green on main after each; no full e2e, no push.
+- **Queue:** 1190, 1200, 1210, 1220, 1230 (Codex 5h 11%, resumes at reset). Next Claude: sonar minimap (or 1200), Lost City tower, push f45 with full e2e logged to a file. Needs owner: nothing.
