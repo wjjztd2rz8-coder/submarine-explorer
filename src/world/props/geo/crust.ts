@@ -66,5 +66,6 @@ export function paintCrust(
     out.lerp(SULFUR, smooth(0.7, 0.95, patch) * up * 0.3);
     out.lerp(COAL, smooth(0.35, 0, b.saw) * (1 - b.lip) * 0.65 * (1 - up));
     out.lerp(COAL, smooth(0.9, 0.995, hh) * 0.7);
+    out.multiplyScalar(1.3); // keeps the trunk's overall brightness despite the darker recesses
   }
 }
