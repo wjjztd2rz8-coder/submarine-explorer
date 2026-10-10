@@ -47,6 +47,28 @@ export interface SpireOpts {
   irregular?: number;
   /** Lost City trunk profile (needs `irregular`): jittered terraces, swells, deeper vent funnel. */
   trunk?: boolean;
+  /** Sulfide crust strength (0 = off): irregular flanged crust bands and nodules (Beebe). */
+  crust?: number;
+}
+
+/**
+ * Crust band at an angle and local height (m): `lip` is 1 on a band's overhanging crest
+ * and 0 in the undercut recess beneath it; `idx` identifies the band for colour variety.
+ * Shared by the geometry (spire radius) and the vertex painter so colour follows relief.
+ */
+export function crustBand(
+  ang: number,
+  y: number,
+  seed: number,
+): { lip: number; saw: number; idx: number } {
+  const phase =
+    y / 0.85 +
+    (fbm3(Math.cos(ang) * 1.1 + 4, y * 0.12, Math.sin(ang) * 1.1 + 4, seed + 41, 2) - 0.5) * 6;
+  const idx = Math.floor(phase);
+  const saw = phase - idx;
+  const side = fbm3(Math.cos(ang) * 1.5 + 9, idx * 2.3, Math.sin(ang) * 1.5 + 9, seed + 53, 2);
+  const strength = smooth(0.25, 0.65, side) * (0.35 + 0.65 * hash1(idx * 3.7 + seed));
+  return { lip: smooth(0, 0.12, saw) * Math.pow(1 - saw, 2.4) * strength, saw, idx };
 }
 
 /** Flow-ridge crest value in [0, 1] (1 on a crest) at an angle and local height. */
@@ -153,6 +175,12 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
           (fbm3(Math.cos(ang) * 2.4 + 1, y * 0.05, Math.sin(ang) * 2.4 + 1, o.seed + 77, 2) - 0.5);
     }
     f *= 1 + (n - 0.5) * 2 * wob;
+    if (o.crust) {
+      const b = crustBand(ang, y, o.seed);
+      const nod = fbm3(Math.cos(ang) * 7 + 2, y * 1.7, Math.sin(ang) * 7 + 2, o.seed + 67, 2);
+      // Overhanging crust flanges, pitted by knobbly sulfide nodules; fades near the rim.
+      f *= 1 + o.crust * (0.34 * (b.lip - 0.1) + (nod - 0.5) * 0.3) * (1 - smooth(0.9, 1, t));
+    }
     if (o.rough)
       f *=
         1 +
