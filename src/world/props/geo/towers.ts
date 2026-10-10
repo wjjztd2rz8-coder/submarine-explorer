@@ -17,6 +17,7 @@ import { carbonateFinger } from './carbonateFinger.js';
 import { geoDetail } from './detail.js';
 import { LIFE_TINT } from './materials.js';
 import { shimmerPlume } from './plume.js';
+import { softDot } from './textures.js';
 import {
   boxCH,
   clamp01,
@@ -488,23 +489,34 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     haze.position.set(tip.x, tip.y, tip.z);
     full.add(haze);
   }
-  // A faint bright fringe at each mouth: one flat additive ring, shared geometry and material,
-  // so it costs a draw call per vent even on Low. The haze above supplies the shimmer.
-  const ringGeo = new THREE.RingGeometry(1.0, 1.3, 24);
-  ringGeo.rotateX(-Math.PI / 2);
-  const ringMat = new THREE.MeshBasicMaterial({
-    color: 0xe8f4f2,
-    transparent: true,
-    opacity: 0.14,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-  });
+  // A faint bright fringe at each mouth: a ring of soft additive points on the lip (one Points
+  // object, 28 points per vent, so it is no extra mesh draw and stays cheap on Low).
+  const fringe: number[] = [];
   for (const k of hazeFor) {
-    const ring = new THREE.Mesh(ringGeo, ringMat);
+    const v = vents[k]!;
+    for (let j = 0; j < 28; j++) {
+      const a = (j / 28) * Math.PI * 2 + k;
+      fringe.push(v.p.x + Math.cos(a) * v.r * 0.95, v.p.y + 0.15, v.p.z + Math.sin(a) * v.r * 0.95);
+    }
+  }
+  if (fringe.length) {
+    const fg = new THREE.BufferGeometry();
+    fg.setAttribute('position', new THREE.Float32BufferAttribute(fringe, 3));
+    const ring = new THREE.Points(
+      fg,
+      new THREE.PointsMaterial({
+        color: 0xe8f4f2,
+        size: 0.8,
+        sizeAttenuation: true,
+        map: softDot(),
+        transparent: true,
+        opacity: 0.35,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        fog: true,
+      }),
+    );
     ring.name = 'vent-fringe';
-    ring.position.copy(vents[k]!.p).add(new THREE.Vector3(0, 0.12, 0));
-    ring.scale.setScalar(vents[k]!.r * 0.82);
     full.add(ring);
   }
   geom.computeBoundingBox();
