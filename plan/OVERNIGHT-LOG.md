@@ -849,3 +849,4 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Review:** Claude alone (Codex weekly 5%, Sol skipped); entry at top of plan/REVIEWS.md, new priorities in DIRECTOR.md. Stage ~75%. Scores: Titanic 4, Lost City/Endurance/Beebe/Monterey/Challenger 3.5, Blue Hole 3.
 - **Release:** full e2e + project-base passed on main; pushed and tagged f48. Hosted CI result pending (first push after f-ci-heavy-specs).
 - **Queue:** Codex 1220-1280 (dry until 15 Oct). Next Claude: Blue Hole floor/minimap new angle, Titanic rusticles, Beebe trunk. Needs owner: nothing.
+- **Hosted CI after f48 push:** still red but improved, 4 of 30 e2e shards failed (13, 21, 22, 29; was ~10-14). Shard logs not yet retrievable via `gh run view --log-failed`; next run: fetch via `gh api` job logs for run 38053258875 and lighten those specs (backlog item 1).
