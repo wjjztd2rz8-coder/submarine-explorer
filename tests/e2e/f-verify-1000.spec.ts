@@ -195,7 +195,9 @@ for (const viewport of [
         test(`${site} ${tier}: first minute, one Journal tag and life=0`, async ({
           page,
         }, info) => {
-          test.setTimeout(300_000);
+          // Hosted software rendering took >300 s for 600 high-tier frames (shards 2, 3, 6 of
+          // the f45 run); the 600 samples and their assertions are unchanged.
+          test.setTimeout(480_000);
           const errors: string[] = [];
           page.on('pageerror', (e) => errors.push(e.message));
           await pauseClockBeforeNavigation(page);
