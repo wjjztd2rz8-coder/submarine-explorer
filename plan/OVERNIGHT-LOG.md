@@ -803,3 +803,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** f-beebe-trunk (Sonnet: crusted sulfide flanges with ochre/rust/black colour bands, dark charcoal smoke override, hero stacks denser on Medium+; shots reviewed, clear gain ~+0.4, flanges a little spiky; chimneys 2-3 unchanged). Smoke + project-base green on main; no full e2e, no push.
 - **Queue:** Codex 1220-1280 (weekly 6%, dry until 15 Oct). Next Claude: phone pass at 844x390, Beebe chimneys 2-3 profile, hosted CI triage. Needs owner: nothing.
+
+## 2026-10-10 03:13 CDT headless run (Claude)
+
+- **Merged:** f-beebe-chimneys (Sonnet: chimneys 2-3 get the crusted-flange profile and colour bands, hero flanges rounder, rubble darker; shots reviewed, consistent vent family). Gaps: pale tan blobs beside the sub come from the terrain shader cobble/stain layer, not meshes; chimneys 2-3 slightly paler/pinker. Smoke + project-base green on main; no full e2e, no push (f46 is the last tag).
+- **Hosted CI** for the f46 push was still in progress at start. Queue: Codex 1220-1280 (weekly 6%, dry until 15 Oct). Next Claude: Beebe terrain-shader blobs, phone pass at 844x390, CI triage. Needs owner: nothing.
