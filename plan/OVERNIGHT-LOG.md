@@ -773,3 +773,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** f-challenger-lander (Sonnet: purpose-built benthic lander with legs, flag, strobe, bait cage; trench-wall vertex relief; shots reviewed, clear gain ~3.5) and f-firstdiscovery-fixes (Haiku: reward card uses objective POI name; 'Move and turn' completes on thrust or turn). Smoke + project-base green on main; no full e2e, no new push.
 - **Hosted CI:** f45 Pages deploy succeeded; CI run still in progress at exit, check next run.
 - **Running:** Codex 1190, 1200, 1210. **Queue:** 1220, 1230, 1240. Next Claude: Endurance horizon, Blue Hole overhangs, Beebe rocks. Needs owner: nothing.
+
+## 2026-10-09 22:00 CDT headless run (Claude)
+
+- **Merged:** Codex 1210 (Titanic copy verification), 1200 (sonar palette: Blue Hole now reads as a dark hole, smoothed hillshade; Titanic/Endurance maps still flat teal), 1190 (Titanic haze fog continuity; no after-shots, visually unverified) and f-bluehole-overhangs (Sonnet: overhang slabs, tube sponges, ~+0.25, gallery-seat floor still smooth). Smoke + project-base green on main; no full e2e (it takes ~1 h), no new push.
+- **Hosted CI:** f45 run (and the previous one) still FAILED after ~39 min; Pages deploy OK. Codex 1230 (shard triage) queued but Codex weekly is 6%, so it may not dispatch until the 15 Oct reset.
+- **Process note:** killed full-e2e left stale vite preview servers that blocked ports (cleared by hand).
+- **Queue:** 1220, 1230, 1240. Next Claude: Endurance horizon, Beebe rocks, Titanic/Endurance sonar shading, CI shard triage if Codex stays dry. Needs owner: nothing.
