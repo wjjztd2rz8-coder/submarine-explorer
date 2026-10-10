@@ -270,7 +270,7 @@ export const BIOMES: Record<string, Biome> = {
     b: 'rubble',
     c: 'basalt',
     // Cool grey-tan sediment and darker cobble patches: lamps supply the warmth.
-    colorA: 0x58534b,
+    colorA: 0x655f57,
     colorB: 0x454742,
     colorC: 0x484743,
     stain: 0x3e3229,
@@ -280,7 +280,7 @@ export const BIOMES: Record<string, Biome> = {
     rippleLenM: 0.55,
     rippleDir: 1.1,
     burrow: 0.22,
-    contrast: 0.62,
+    contrast: 0.7,
     detail: 0.75,
     // Reuse 780's fog-after-output seabed fade; no extra draw or texture fetch.
     abyssFadeM: [300, 1100],

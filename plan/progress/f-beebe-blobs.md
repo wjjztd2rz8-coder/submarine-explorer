@@ -10,13 +10,13 @@ The pale tan blobs were not the terrain shader's cobble/stain layer (setting pat
 
 - Apron talus: dark rust stain (stain x0.3, 30% max), sediment dusting 0.1 -> 0.04.
 - Habitat chunks: dark basalt with a smooth dust gradient on upward faces (no hard edge).
-- Beebe biome (shader, per-site): colorA 0x736e63 -> 0x58534b, contrast 0.85 -> 0.62, ripple 0.38 -> 0.22, ripple length 0.8 -> 0.55 m, stain 0x3e3229 at 0.12.
+- Beebe biome (shader, per-site): colorA 0x736e63 -> 0x655f57, contrast 0.85 -> 0.7, ripple 0.38 -> 0.22, ripple length 0.8 -> 0.55 m, stain 0x3e3229 at 0.12.
 - Chimneys 2-3: painted colour lerped 22% toward the hero's mound tone and x0.92.
 
 ## Shots
 
 - Before: `.cache/golden/2026-10-10-081418/beebe-vent-field-{1,2,3}.png`
-- After: `.cache/golden/2026-10-10-082509/beebe-vent-field-{1,2,3}.png` (colorA slightly lifted afterwards)
+- After (final, colorA 0x655f57, contrast 0.7, director spawn-brightness fix): `.cache/golden/2026-10-10-085445/beebe-vent-field-{1,2,3}.png` (high); Low tier spawn: `.cache/golden/2026-10-10-085547/beebe-vent-field-1.png`. Earlier darker pass: `...-082509`.
 - Chimneys: `.cache/codex/shots/f-beebe-blobs/b0-*` (before), `b1-*` (after)
 
 ## Gates
