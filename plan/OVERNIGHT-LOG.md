@@ -808,3 +808,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** f-beebe-chimneys (Sonnet: chimneys 2-3 get the crusted-flange profile and colour bands, hero flanges rounder, rubble darker; shots reviewed, consistent vent family). Gaps: pale tan blobs beside the sub come from the terrain shader cobble/stain layer, not meshes; chimneys 2-3 slightly paler/pinker. Smoke + project-base green on main; no full e2e, no push (f46 is the last tag).
 - **Hosted CI** for the f46 push was still in progress at start. Queue: Codex 1220-1280 (weekly 6%, dry until 15 Oct). Next Claude: Beebe terrain-shader blobs, phone pass at 844x390, CI triage. Needs owner: nothing.
+
+## 2026-10-10 04:09 CDT headless run (Claude)
+
+- **Merged:** f-beebe-blobs (Sonnet): the pale tan lumps were two Beebe meshes (apron talus stain, habitat chunk tops), not the terrain shader; now dark rust/basalt, Beebe-only darker seabed (0x655f57, contrast 0.7), chimney 2-3 colour muted toward chimney 1. First pass was too dark at spawn, sent back and lifted. ~+0.25 (Beebe ~3.75). Smoke + project-base green on main; no full e2e, no push (f46 last tag).
+- **Queue:** Codex 1220-1280 (weekly 6%, dry until 15 Oct). Next Claude: phone pass at 844x390, hosted CI triage, Monterey wall. Needs owner: nothing.
+- **Process note:** `pkill -f "vite preview"` inside a compound command can match and kill its own shell; use a separate call.
