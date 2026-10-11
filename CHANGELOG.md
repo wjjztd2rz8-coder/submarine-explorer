@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **Scan card and Scan share one target:** the scanner now promotes its scan candidate (in-cone and in range, mission objective first, then nearest) to the card/reticle/prompt contact, so with two contacts in range the card names exactly what pressing Scan scans instead of a nearer off-axis contact. Reason: bug-hunt 1330 showed one name on the card and another scanned. No visual change.
 - **1320 Monterey wall-foot / Endurance sonar:** Monterey rockfall now has irregular patches, separated blocks, varied sizes and runout across the apron onto the seabed; scar blocks scatter farther from their source. Wall geometry, support checks, instance counts and Low-tier behavior stay intact. Endurance contours now trace its shared authored ice-scour relief above the local plain, replacing the straight survey-plane stripes; absolute depths still drive the palette and depth readout. Authored contours omit surveyed-depth labels. Reason: the boulders read as a neat row and the minimap stripes obscured the hull plan. Two review rounds and validation limits are recorded in `plan/progress/1320-f-monterey-endurance-small.md`.
 
 - **f-titanic-sky:** Titanic sky haze lifted (`ABYSS_HORIZON.hazeColor` 0x1d2e38 to 0x223743, peak elevation 0.4 to 0.3). The old 0.025 dome luminance ceiling capped the sky at a ~1.4x gradient, a flat void; the test ceiling in `titanicHorizon.test.ts` is deliberately raised to 0.035 (director-approved). Floor, contrast and fog-match checks unchanged; Titanic only.

@@ -275,7 +275,14 @@ export class Scanner {
         }
         continue;
       }
-      if (g.inRange && g.facing && g.distance < candidateDist) {
+      if (
+        g.inRange &&
+        g.facing &&
+        (candidate === null ||
+        (t.id === this.objectivePoiId) !== (candidate.id === this.objectivePoiId)
+          ? t.id === this.objectivePoiId || candidate === null
+          : g.distance < candidateDist)
+      ) {
         candidate = t;
         candidateDist = g.distance;
       }
@@ -337,6 +344,12 @@ export class Scanner {
       !this.isScanned(this.active.landmarkId, this.active.id)
     ) {
       candidate = this.active;
+    }
+    // One shared selection: whatever Scan will scan is also what the card,
+    // reticle and prompt name, even if a nearer off-axis contact exists.
+    if (candidate && nearest !== candidate) {
+      nearest = candidate;
+      nearestGeo = this.geometry(candidate, position, forward);
     }
 
     v.candidateId = candidate?.id ?? null;

@@ -46,7 +46,8 @@ describe('progress e2e scan positioning on actual Blake Plateau terrain', () => 
       sub.reset(p.x, p.y, p.z, p.yaw);
       scanner.update(0, sub.position, sub.getForward(), false);
       expect(scanner.view.candidateId).not.toBe(target.id);
-      expect(scanner.view.nearestFacing).toBe(false);
+      // nearest* now follows the scan candidate, which may be a different contact.
+      if (scanner.view.nearestId === target.id) expect(scanner.view.nearestFacing).toBe(false);
       const aim = scanAim(p, target.position, config.submarine.maxPitch);
       sub.yaw = aim.yaw;
       sub.pitch = aim.pitch;
