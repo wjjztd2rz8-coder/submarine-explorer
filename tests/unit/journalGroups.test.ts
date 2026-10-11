@@ -234,3 +234,15 @@ it('opens a focused scan even when its category was manually collapsed', () => {
   expect(category('reef/poi').open).toBe(true);
   expect(journal.selectedId).toBe('entry');
 });
+
+it('keeps one front-page caveat through refreshes and only a provenance tag on entries', () => {
+  for (let round = 0; round < 2; round++) {
+    journal.show('front');
+    journal.refresh();
+    expect(descendants(root).filter((el) => el.className === 'jr-honesty')).toHaveLength(1);
+    journal.setSpoilers(true);
+    journal.show('wreck/secret/entry');
+    expect(descendants(root).filter((el) => el.className === 'jr-honesty')).toHaveLength(0);
+    expect(descendants(root).filter((el) => el.textContent === 'Game addition')).toHaveLength(1);
+  }
+});

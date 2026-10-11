@@ -69,6 +69,7 @@ describe('740 Journal content-tone audit across all thirteen sites', () => {
       const guide = parseGuide(read(`${root}/guide.json`), id)!;
       const pois = parsePois(read(`${root}/pois.json`));
       const secrets = parseSecrets(read(`data/secrets/${id}.json`));
+      const mission = parseMission(read(`${root}/mission.json`), id)!;
       const species = parseSpecies(read(`${root}/species.json`), id);
       const site = buildJournalSite({
         id,
@@ -83,6 +84,18 @@ describe('740 Journal content-tone audit across all thirteen sites', () => {
       expect(site.entries.some((e) => e.kind === 'life')).toBe(true);
       expect(site.entries.filter((e) => e.kind === 'species').length).toBeGreaterThan(0);
       expect([site.summary, ...site.facts].join('\n')).not.toMatch(caveats);
+      expect(
+        [
+          mission.title,
+          mission.briefing.summary,
+          ...mission.briefing.facts,
+          ...mission.briefing.hazards,
+          mission.briefing.memorial_note ?? '',
+          ...mission.objectives.flatMap((o) => [o.title, o.hint]),
+          guide.memorial_note ?? '',
+        ].join('\n'),
+        `${id} briefing and scan instructions`,
+      ).not.toMatch(caveats);
       for (const entry of site.entries) {
         const tag = journalEntryTag(entry);
         if (entry.kind === 'life' || entry.kind === 'secret') expect(tag).toBe('Game addition');
@@ -96,6 +109,10 @@ describe('740 Journal content-tone audit across all thirteen sites', () => {
               ...entry.guide.facts.flatMap((f) => [f.label, f.value]),
             ].join('\n'),
             entry.key,
+          ).not.toMatch(caveats);
+          expect(
+            [entry.guide.image?.alt ?? '', entry.guide.image?.credit ?? ''].join('\n'),
+            `${entry.key} image caption`,
           ).not.toMatch(caveats);
           expect(entry.guide.paragraphs.length, entry.key).toBeGreaterThan(0);
           // Fictional finds have no claimed survey citation; authored site/POI science does.
