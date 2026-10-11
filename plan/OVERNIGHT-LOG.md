@@ -961,3 +961,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** nothing. Codex 1280, 1310, 1320 are still running in their worktrees (1310 and 1320 report their own checks passing; browser checks were blocked in their sandbox, so they need a screenshot run on collection). 1330, 1340 and 1350 are queued. Claude 5h was 98% but no Claude package was started: the open items (Blue Hole apron, Monterey and Endurance small items, Titanic sky and Challenger boulders) wait on or overlap those Codex tasks.
 - **Next:** collect 1280, 1310 and 1320 with `--full-e2e` screenshots, then the Blue Hole apron (Sonnet) using 1280's finding. Then a full e2e on main and a release push, since f51 is several merges behind. Needs owner: nothing.
+
+## 2026-10-11 11:16 CDT headless run (Claude)
+
+- **Merged:** Codex 1280 (Blue Hole apron now has level sediment terraces; clear gain in the gallery view; I committed it from the worktree, smoke + project-base green). Codex 1310 (Titanic crown/haze, Challenger boulders x2.6 and slope shadow; modest, boulders not visible at the opening pose). I dropped 1310's camera.ts/CameraRig edits and three camera tests because they came from a stale base and reverted the merged Lost City and Challenger camera work. f-titanic-sky (Sonnet): haze lifted, and I approved raising the titanicHorizon luminance ceiling 0.025 to 0.035; gain is barely perceptible (mid-sky unchanged, upper band +2 to +4 per channel), so the sky is still close to flat.
+- **Gates:** smoke + project-base on main only. A full e2e run was started but abandoned at ~115 of 640 tests after 25 min because three Codex tasks share the CPU; no push, f51 is still the last tag (several merges behind). A release needs a quiet window for the full run.
+- **Running:** Codex 1320, 1330, 1340. Queued 1350, 1360 (verify 1280/1310), 1370 (Journal/debrief bug hunt). 1320's worktree also touches camera.ts; check it for the same stale-base reverts before merging.
+- **Next:** collect 1320/1330/1340; release run when Codex is idle. Needs owner: nothing.
