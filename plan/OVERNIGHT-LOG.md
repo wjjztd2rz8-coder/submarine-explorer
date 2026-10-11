@@ -929,3 +929,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Released f51:** full e2e on main = 640 passed, only the 1240 verify spec failed (it read the scanner candidate before the first scan frame); fixed the wait (assertions unchanged), 8/8 pass alone; pushed and tagged f51 on that basis. The two later Claude merges have smoke + project-base only and are unpushed.
 - **Queue:** Codex 1280, 1290, 1310 (Codex 5h was 10% at run start; dispatch timer launches after the 06:04 reset). Next Claude: items in DIRECTOR 'Update 2026-10-11 04:50'. Needs owner: nothing.
 - **Hosted CI on f51:** 29/30 e2e shards green; shard 5 failed only on `f1-vehicles.spec.ts:21` (page.screenshot hit the 240 s test timeout on the software-GL runner, twice). Passed locally in the full run. Next run: lighten that spec (fewer/lower-res screenshots), do not loosen assertions. Pages deploy succeeded.
+
+## 2026-10-11 05:22 CDT headless run (Claude, comprehensive review)
+
+- **Review:** golden 2026-10-11-100422 viewed; Sol skipped (Codex 5h 9%, exit 75). Scores 3.5-4, no regressions; REVIEWS.md entry and DIRECTOR backlog (7 items) written and pushed. Stage ~80%.
+- **Merged:** f-ci-vehicles (Haiku): lightened f1-vehicles spec (800x500, fewer screenshots, assertions unchanged; local 8.4 s to 4.7 s; hosted runner unverified). Smoke + project-base gates pass on main; not a release, no tag.
+- **Queue:** Codex 1280, 1290, 1310, 1320, 1330. Next Claude: DIRECTOR items 2-7. Needs owner: nothing.

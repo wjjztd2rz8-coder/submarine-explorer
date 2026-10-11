@@ -8,7 +8,7 @@ Sol skipped (Codex 5h 9%). Scores (beautiful): Titanic 4, Endurance 4 (+0.25), B
 
 Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
 
-1. **Hosted CI f1-vehicles (Haiku):** `e2e/f1-vehicles.spec.ts:21` screenshot times out on the software-GL runner; fewer/lower-res screenshots, never loosen assertions.
+1. (MERGED 2026-10-11, spec lightened: 800x500, fewer shots; hosted CI to confirm) **Hosted CI f1-vehicles (Haiku):** `e2e/f1-vehicles.spec.ts:21` screenshot times out on the software-GL runner; fewer/lower-res screenshots, never loosen assertions.
 2. **Touch landscape stack (Sonnet):** scan card + tutorial strip cover ~195 of 390 px; collapse the strip after the first scan and add a compact objective chip when no contact is in range.
 3. **Tutorial step text after first scan (Sonnet):** still says 'Step 1: Move and turn' (1240 tests pin it; update tests deliberately).
 4. **Blue Hole gallery apron/talus (Sonnet):** ramp apron smooth and fogged at gallery range.
