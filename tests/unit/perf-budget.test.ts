@@ -64,6 +64,8 @@ const sites = [
   'monterey-canyon',
   'challenger-deep',
   'endurance',
+  'hunga-tonga-caldera',
+  'hudson-canyon',
 ];
 const diagnostics =
   (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
