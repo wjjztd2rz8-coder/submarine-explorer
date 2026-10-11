@@ -213,11 +213,11 @@ export const BIOMES: Record<string, Biome> = {
   'challenger-deep': {
     ...ABYSSAL,
     // Lighter olive-grey ooze with warm and cool patches, so the floor reads under the lamps and in the approach.
-    colorA: 0x6a6758,
-    colorB: 0x58594f,
-    colorC: 0x4c4a41,
-    stain: 0x7a6548,
-    stainAmount: 0.14,
+    colorA: 0x525a54,
+    colorB: 0x454d49,
+    colorC: 0x3b413e,
+    stain: 0x5c5c4e,
+    stainAmount: 0.07,
     patch: 0.45,
     burrow: 0.9,
     ripple: 0.3,

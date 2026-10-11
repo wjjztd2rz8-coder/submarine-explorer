@@ -15,7 +15,7 @@ export const DEEP_OPENINGS = {
       chaseOffsetY: -10,
       portraitChaseOffset: { x: 0, y: -38 },
     },
-    fogDensity: 0.012,
+    fogDensity: 0.015,
     ambientColor: 0x879399,
     ambientIntensity: 18,
     vignette: 0.32,

@@ -34,6 +34,6 @@ export function challengerSlopeTint(
   const floorW = 1 - up;
   const tone = 1 + floorW * (0.09 * patch + 0.035 * drift * (0.5 + 0.5 * patch));
   const g = (1 + 0.5 * up) * band * (1 - 0.1 * slope * (1 - up)) * tone;
-  const warm = 1 + 0.06 * up + floorW * 0.04 * patch;
-  return [g * warm, g, g * (1 - 0.1 * up - floorW * 0.04 * patch)];
+  const warm = 1 + 0.02 * up + floorW * 0.015 * patch;
+  return [g * warm * 0.9, g * 0.98, g * (1.02 - 0.04 * up - floorW * 0.015 * patch)];
 }
