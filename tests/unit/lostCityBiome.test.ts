@@ -24,7 +24,11 @@ describe('lost-city biome', () => {
   });
 
   it('reveals broad beds on gentle slopes while preserving level silt and a light floor', () => {
-    expect(lostCitySlopeTint(0, -800, 0, 1)).toEqual([1, 1, 1]);
+    // Level silt is unbanded (same tone at any depth) but carries sediment variation.
+    const level = lostCitySlopeTint(0, -800, 0, 1);
+    expect(lostCitySlopeTint(0, -790, 0, 1)).toEqual(level);
+    for (const c of level) expect(c).toBeGreaterThan(0.7);
+    for (const c of level) expect(c).toBeLessThan(1.3);
     const tones = Array.from({ length: 120 }, (_, i) =>
       lostCitySlopeTint(20, -800 + i * 0.25, 30, Math.cos((15 * Math.PI) / 180)),
     ).flat();
