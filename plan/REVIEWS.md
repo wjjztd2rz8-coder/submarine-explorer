@@ -8,15 +8,15 @@ Sol's independent review ran; the round-2 reconcile died because Codex hit its u
 
 **Changed since the last review:** merged f-ci-vehicles, f-touch-stack, f-tutorial-order, f-challenger-cam, f-lostcity-tower, Codex 1280/1310/1320/1340, f-scan-candidate, and now Codex 1350 (mobile resize/perf), 1360 (Blue Hole rock seating, Challenger lander-boulder overlap), 1370 (photo mode), 1390 (scan overlay on touch). Gates PASS on main; full e2e running before the push.
 
-| Site       | Readable | Beautiful | Change | Biggest gap                                          |
-| ---------- | -------- | --------- | ------ | ---------------------------------------------------- |
-| Titanic    | 4        | 3.75      | same   | regular panels, thin rusticles (Sol); sky now subtle |
-| Beebe      | 4        | 3.5       | same   | smooth cone trunk; scan card covers the vent top     |
-| Blue Hole  | 4        | 3.25      | same   | faceted flat polygon steps on the bowl               |
-| Lost City  | 4        | 3.5       | +0.25  | towers read as chimneys; striations stretched (Sol)  |
-| Monterey   | 4        | 3.5       | +0.1   | wall-foot rubble scattered now; broad corrugation    |
-| Challenger | 4        | 3.5       | same   | toy-like lander materials (Sol); emptiness is fine   |
-| Endurance  | 3.5-4    | 3.5       | same   | opening hull ~380 px of 1600, sub huge (Sol, correct)|
+| Site       | Readable | Beautiful | Change | Biggest gap                                           |
+| ---------- | -------- | --------- | ------ | ----------------------------------------------------- |
+| Titanic    | 4        | 3.75      | same   | regular panels, thin rusticles (Sol); sky now subtle  |
+| Beebe      | 4        | 3.5       | same   | smooth cone trunk; scan card covers the vent top      |
+| Blue Hole  | 4        | 3.25      | same   | faceted flat polygon steps on the bowl                |
+| Lost City  | 4        | 3.5       | +0.25  | towers read as chimneys; striations stretched (Sol)   |
+| Monterey   | 4        | 3.5       | +0.1   | wall-foot rubble scattered now; broad corrugation     |
+| Challenger | 4        | 3.5       | same   | toy-like lander materials (Sol); emptiness is fine    |
+| Endurance  | 3.5-4    | 3.5       | same   | opening hull ~380 px of 1600, sub huge (Sol, correct) |
 
 Credits: Sol found the Endurance opening and Blue Hole collision-clearance gaps, the mixed-age capture evidence and the missing portrait set; I found the shard-7 cause and the Lost City/Monterey gains.
 
