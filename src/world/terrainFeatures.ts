@@ -279,10 +279,10 @@ export function blueHoleTint(
         tread = 1;
         treadU = (r - r1) / (r0 - r1);
         const warmth = th - 0.5;
-        const tone = 0.84 + 0.36 * th + 0.14 * (treadU - 0.5);
-        tr *= tone * (1 + 0.24 * warmth);
+        const tone = 0.74 + 0.58 * th + 0.14 * (treadU - 0.5);
+        tr *= tone * (1 + 0.3 * warmth);
         tg *= tone;
-        tb *= tone * (1 - 0.3 * warmth);
+        tb *= tone * (1 - 0.36 * warmth);
         break;
       }
     }
@@ -309,7 +309,7 @@ export function blueHoleTint(
       const [r1, h1] = TERRACE_PROFILE[i]!;
       const [r0, h0] = TERRACE_PROFILE[i - 1]!;
       if (r0 - r1 < 1 || (h0 - h1) / (r0 - r1) < 1.2) continue;
-      if (r < r1) ao *= 1 - 0.22 * Math.exp(-(r1 - r) / 9);
+      if (r < r1) ao *= 1 - 0.3 * Math.exp(-(r1 - r) / 7);
       else if (r < r0) ao *= 1 - 0.12 * (1 - (r - r1) / (r0 - r1));
     }
   }
@@ -330,7 +330,7 @@ export function blueHoleTint(
   // grey-brown silt and an olive algae film; a fourth marks darker rubble beds; scour streaks
   // (long ripples elongated across the current) modulate brightness. All baked, no new draw calls.
   // Patches also reach the bowl's treads (less on the steep risers, which keep their beds).
-  const pf = 1 - 0.45 * rock;
+  const pf = 1 - 0.8 * Math.max(rock, 0.8 * wallR);
   const f1 = 0.5 + 0.5 * Math.sin(x * 0.09 + 2 * Math.sin(z * 0.061 + 1) + z * 0.04);
   const f2 = 0.5 + 0.5 * Math.sin(z * 0.1 - 1.7 * Math.sin(x * 0.07 + 0.4) + 2.1);
   const f3 = 0.5 + 0.5 * Math.sin((x + z) * 0.12 + 2.4 * Math.sin((x - z) * 0.08));
@@ -355,8 +355,8 @@ export function blueHoleTint(
   const bright = 1 + pf * (0.14 * (fine - 0.5) + 0.2 * (scour - 0.5) + 0.12 * (ripple - 0.3));
   // Risers fall into shadow, treads keep their light; a pale lip crowns each tread edge and wide
   // hollows (low-frequency, darker and cooler) pool between the patches of pale sand.
-  const riserShade = 0.6 + 0.4 * smoothstep(clamp01((normalY - 0.35) / 0.5));
-  const lip = tread * Math.exp(-(((1 - treadU) * 5) ** 2)) * 0.22;
+  const riserShade = 0.46 + 0.54 * smoothstep(clamp01((normalY - 0.35) / 0.5));
+  const lip = tread * Math.exp(-(((1 - treadU) * 8) ** 2)) * 0.42;
   const hollow = 1 - 0.28 * smoothstep(clamp01((0.42 - f1 * f2) / 0.25)) * (1 - 0.5 * rock);
   const sand = 1 + 0.2 * smoothstep(clamp01((f3 - 0.62) / 0.2)) * (1 - rock);
   const m = ao * dark * bright * riserShade * hollow * sand * (1 + lip);
