@@ -96,7 +96,7 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
     },
   },
   "challenger-deep": {
-    "biome": "d4082e32df7ff242107f3153207ccf4084523aa35d988fb09283f0c9be3c851d",
+    "biome": "b3c00a1635b60abec3d66fc1c182bbbf5e49626fa6a3685b41bdff1f04c83fb3",
     "tiers": {
       "high": {
         "buffers": [

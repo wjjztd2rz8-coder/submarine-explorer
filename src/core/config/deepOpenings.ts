@@ -16,6 +16,14 @@ export const DEEP_OPENINGS = {
       portraitChaseOffset: { x: -28, y: -10 },
     },
     fogDensity: 0.015,
+    // Baked lower-rise shade; preserve the near lander floor and upper wall.
+    slopeShadow: {
+      startY: -10926,
+      fullY: -10920,
+      fadeY: -10885,
+      endY: -10815,
+      strength: 0.12,
+    },
     ambientColor: 0x879399,
     ambientIntensity: 18,
     vignette: 0.32,

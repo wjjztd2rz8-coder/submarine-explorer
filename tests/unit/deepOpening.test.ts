@@ -1,6 +1,6 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync, writeFileSync } from 'node:fs';
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it, vi } from 'vitest';
 import { Box2, InstancedMesh, Matrix4, Mesh, Raycaster, Vector2, Vector3 } from 'three';
 import { DEEP_OPENINGS, deepSiteWater, makeConfig } from '../../src/core/Config.js';
 import { spawnSettings } from '../../src/game/Spawn.js';
@@ -16,6 +16,9 @@ import { SubMesh } from '../../src/sub/SubMesh.js';
 import { sampleAtmosphere } from '../../src/render/Atmosphere.js';
 import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
+import { biomeFor } from '../../src/world/TerrainBiome.js';
+import { Scatter } from '../../src/world/scatter/Scatter.js';
+import { hashString } from '../../src/world/props/geo/shared.js';
 import { populateDeepOpening } from '../../src/world/life/DeepOpening.js';
 import { LifeSim } from '../../src/world/life/LifeSim.js';
 import { parseLifeDoc } from '../../src/world/life/tables.js';
@@ -54,6 +57,7 @@ describe('Challenger / Endurance opening', () => {
           hullClass: site === 'challenger-deep' ? 'C' : 'B',
           tier,
         });
+        let scatter: Scatter | null = null;
         try {
           await props.placeAll(json(`data/landmarks/${site}/props.json`), site);
           expect(props.stats.failed).toBe(0);
@@ -67,6 +71,32 @@ describe('Challenger / Endurance opening', () => {
           )!;
           expect(pose).not.toBeNull();
           const position = new Vector3(pose.x, pose.y, pose.z);
+          if (site === 'challenger-deep') {
+            // 1310: include the enlarged rocks in actual GMRT opening sightlines.
+            // Only Scatter needs a document sentinel to build headless instance buffers.
+            vi.stubGlobal('document', {});
+            const normal = new Vector3();
+            const tierCfg = config.terrain.tiers[tier];
+            scatter = new Scatter({
+              biome: biomeFor(site),
+              ground: {
+                sampleHeight: (x, z) => terrain.sampleHeight(x, z),
+                contains: (x, z) => terrain.contains(x, z),
+                normalAt: (x, z, out) => {
+                  terrain.getNormal(x, z, normal);
+                  out[0] = normal.x;
+                  out[1] = normal.y;
+                  out[2] = normal.z;
+                },
+              },
+              density: tierCfg.scatterDensity,
+              rangeM: tierCfg.scatterRangeM,
+              seed: config.terrain.detailSeed ^ hashString(site),
+              rockLo: 1 - Math.cos((config.terrain.rockSlopeLoDeg * Math.PI) / 180),
+              rockHi: 1 - Math.cos((config.terrain.rockSlopeHiDeg * Math.PI) / 180),
+            });
+            vi.unstubAllGlobals();
+          }
           const forward = new Vector3(Math.sin(pose.yaw), 0, -Math.cos(pose.yaw));
           const hero = props.placed.find((p) => p.def.id === DEEP_OPENINGS[site].hero)!;
           hero.root.updateMatrixWorld(true);
@@ -160,6 +190,22 @@ describe('Challenger / Endurance opening', () => {
             rig.snap(position, pose.yaw, 0);
             rig.camera.updateMatrixWorld(true);
             props.group.updateMatrixWorld(true);
+            if (scatter) {
+              for (let i = 0; i < 128; i++) scatter.update(rig.camera);
+              scatter.group.updateMatrixWorld(true);
+              const centre = hero.root.localToWorld(hero.localBounds.getCenter(new Vector3()));
+              const delta = centre.sub(rig.camera.position);
+              const ray = new Raycaster(
+                rig.camera.position,
+                delta.clone().normalize(),
+                0,
+                delta.length(),
+              );
+              expect(
+                ray.intersectObject(scatter.group, true),
+                'lander clear of rocks',
+              ).toHaveLength(0);
+            }
             const projected = target.position.clone().project(rig.camera);
             expect(Math.abs(projected.x), 'target horizontal fit').toBeLessThan(0.95);
             expect(Math.abs(projected.y), 'target vertical fit').toBeLessThan(0.95);
@@ -255,7 +301,10 @@ describe('Challenger / Endurance opening', () => {
                 0,
                 delta.length() - 0.5,
               );
-              return ray.intersectObject(props.group, true).length === 0;
+              return (
+                ray.intersectObject(props.group, true).length === 0 &&
+                (!scatter || ray.intersectObject(scatter.group, true).length === 0)
+              );
             });
             expect(visible.length, `${width}x${height} wildlife sightline`).toBeGreaterThan(0);
             console.log(
@@ -351,6 +400,8 @@ describe('Challenger / Endurance opening', () => {
           expect(entries).toHaveLength(1);
           expect(journalEntryTag(entries[0]!)).toBe('Game addition');
         } finally {
+          vi.unstubAllGlobals();
+          scatter?.dispose();
           sub.dispose();
           terrain.dispose();
         }

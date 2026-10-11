@@ -230,7 +230,8 @@ export const BIOMES: Record<string, Biome> = {
     scatter: [
       // Scattered dropstones and cobbles, a few larger half-buried rocks, and burrow mounds: relief near the lander.
       { kind: 'dropstone', density: 14, slopeMaxDeg: 24, on: 'any', sizeMul: 2.4 },
-      { kind: 'boulder', density: 1.6, slopeMaxDeg: 25, on: 'any', sizeMul: 1.1 },
+      // Larger sparse blocks read at the 45 m approach; retain the same instance budget.
+      { kind: 'boulder', density: 1.6, slopeMaxDeg: 25, on: 'any', sizeMul: 2.6 },
       { kind: 'rubble', density: 24, slopeMaxDeg: 30, on: 'any', sizeMul: 2 },
       { kind: 'mound', density: 14, slopeMaxDeg: 12, on: 'flat' },
     ],

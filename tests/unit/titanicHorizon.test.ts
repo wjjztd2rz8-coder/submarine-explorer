@@ -103,6 +103,11 @@ describe('Titanic far-field horizon', () => {
       expect(Math.min(...ring)).toBeGreaterThan(
         luminance(new THREE.Color(ABYSS_HORIZON.upperColor)),
       );
+      // 1310: depth remains perceptible while the fixed 0.025 ceiling below
+      // keeps the abyss mood. Check contrast independently of the tuned palette.
+      expect(Math.min(...ring)).toBeGreaterThan(
+        1.25 * luminance(new THREE.Color(ABYSS_HORIZON.upperColor)),
+      );
       expect(Math.max(...ring) - Math.min(...ring)).toBeGreaterThan(0.0005);
       camera.position.y = -950;
       const partial = sampleAtmosphere(config.water, -950);

@@ -135,3 +135,58 @@ it('1130: Beebe rocks darken and fracture in the same three draws with identical
   }
   expect(evidence).toMatchSnapshot();
 });
+
+it('1310: larger Challenger boulders retain every tier instance and triangle budget', () => {
+  const biome = BIOMES['challenger-deep']!;
+  const previous = {
+    ...biome,
+    scatter: biome.scatter.map((spec) =>
+      spec.kind === 'boulder' ? { ...spec, sizeMul: 1.1 } : spec,
+    ),
+  };
+  const cfg = makeConfig();
+  const matrix = new THREE.Matrix4();
+  const oldMatrix = new THREE.Matrix4();
+  const scale = new THREE.Vector3();
+  const oldScale = new THREE.Vector3();
+  for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+    const { scatterDensity, scatterRangeM } = cfg.terrain.tiers[tier];
+    const before = populated(previous, scatterDensity, scatterRangeM);
+    const after = populated(biome, scatterDensity, scatterRangeM);
+    try {
+      expect(after.stats).toEqual(before.stats);
+      expect(after.stats.drawCalls).toBe(4);
+      for (const [index, child] of after.group.children.entries()) {
+        const mesh = child as THREE.InstancedMesh;
+        const oldMesh = before.group.children[index] as THREE.InstancedMesh;
+        expect(mesh.count).toBe(oldMesh.count);
+        expect(mesh.geometry.index?.count ?? mesh.geometry.getAttribute('position').count).toBe(
+          oldMesh.geometry.index?.count ?? oldMesh.geometry.getAttribute('position').count,
+        );
+        expect(digest(mesh.instanceColor!.array)).toBe(digest(oldMesh.instanceColor!.array));
+        if (mesh.name !== 'scatter:boulder') {
+          expect(digest(mesh.instanceMatrix.array)).toBe(digest(oldMesh.instanceMatrix.array));
+          continue;
+        }
+        expect(mesh.count).toBeGreaterThan(0);
+        let large = 0;
+        for (let i = 0; i < mesh.count; i++) {
+          mesh.getMatrixAt(i, matrix);
+          oldMesh.getMatrixAt(i, oldMatrix);
+          expect(matrix.elements[12]).toBe(oldMatrix.elements[12]);
+          expect(matrix.elements[14]).toBe(oldMatrix.elements[14]);
+          scale.setFromMatrixScale(matrix);
+          oldScale.setFromMatrixScale(oldMatrix);
+          expect(scale.x / oldScale.x).toBeCloseTo(2.6 / 1.1, 5);
+          expect(scale.y / oldScale.y).toBeCloseTo(2.6 / 1.1, 5);
+          expect(scale.z / oldScale.z).toBeCloseTo(2.6 / 1.1, 5);
+          if (scale.x >= 3) large++;
+        }
+        expect(large, `${tier}: some blocks read at approach range`).toBeGreaterThan(0);
+      }
+    } finally {
+      before.dispose();
+      after.dispose();
+    }
+  }
+});

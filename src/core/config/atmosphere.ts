@@ -7,7 +7,8 @@ import type { GraphicsTier } from './quality.js';
 
 /** Titanic / Endurance's existing unlit dome; no extra particle or mesh budget. */
 export const ABYSS_HORIZON = {
-  upperColor: 0x1b2b35,
+  // Darker crown separates the faint depth band without raising its brightness ceiling.
+  upperColor: 0x182630,
   hazeColor: 0x1d2e38,
   // Keep the fog hue and nearby exposure stable; terrain fades into this colour.
   fogLift: 0.4,
@@ -16,7 +17,7 @@ export const ABYSS_HORIZON = {
   // Elevations are unit-sphere Y. Match fog through the first ring above level
   // to avoid outlining far seabed in pitched and portrait views.
   fogMatchElevation: 0.2,
-  hazePeakElevation: 0.5,
+  hazePeakElevation: 0.4,
   upperElevation: 1,
   // Broad, faint suspended-sediment variation, baked into existing vertices.
   glowVariation: 0.08,

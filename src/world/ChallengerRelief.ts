@@ -3,12 +3,15 @@
  * smooth, so the wall is shaped only by colour: a lighter, warmer upslope gradient, faint
  * horizontal sediment terraces and darker slope shoulders. On the flat floor the multiplier varies about 1 by
  * under 15% (warm/cool sediment patches and faint current drift lines) and brightens gently up the
- * wall; never below 0.8.
+ * wall. A soft shadow across the lower rise separates the far slope from the lander's floor.
  */
+
+import { DEEP_OPENINGS } from '../core/config/deepOpenings.js';
 
 /** Depth (m, negative) of the lander floor; the gradient starts a few metres above it. */
 const FLOOR_Y = -10935;
 const WALL_RISE_M = 260;
+const SHOULDER_SHADOW = DEEP_OPENINGS['challenger-deep'].slopeShadow;
 
 const smooth = (a: number, b: number, v: number): number => {
   const t = Math.min(1, Math.max(0, (v - a) / (b - a)));
@@ -33,7 +36,17 @@ export function challengerSlopeTint(
   const drift = Math.sin((x * 0.62 + z * 0.78) * 0.9 + Math.sin(x * 0.05 - z * 0.04) * 2.4);
   const floorW = 1 - up;
   const tone = 1 + floorW * (0.09 * patch + 0.035 * drift * (0.5 + 0.5 * patch));
-  const g = (1 + 0.5 * up) * band * (1 - 0.1 * slope * (1 - up)) * tone;
+  // The measured floor rises gently north of the lander. Shade that lower shoulder,
+  // easing back to the existing lit wall above it; no new contour or geometry.
+  const shoulder =
+    smooth(SHOULDER_SHADOW.startY, SHOULDER_SHADOW.fullY, y) *
+    (1 - smooth(SHOULDER_SHADOW.fadeY, SHOULDER_SHADOW.endY, y));
+  const g =
+    (1 + 0.5 * up) *
+    band *
+    (1 - 0.1 * slope * (1 - up)) *
+    tone *
+    (1 - SHOULDER_SHADOW.strength * shoulder);
   const warm = 1 + 0.02 * up + floorW * 0.015 * patch;
   return [g * warm * 0.9, g * 0.98, g * (1.02 - 0.04 * up - floorW * 0.015 * patch)];
 }
