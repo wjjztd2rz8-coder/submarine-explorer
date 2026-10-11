@@ -8,15 +8,15 @@ Codex 5h 9% (`codex-review.sh` exit 75), so no Sol second opinion. Play-flow jud
 
 **Changed since the last review:** merged f-lostcity-5, f-endurance-hull, f-bluehole-bowl, f-bluehole-perf, Codex 1220/1230/1240/1250/1260/1270, f-newplayer-recapture, f-scan-card-objective. f50 and f51 pushed.
 
-| Site       | Readable | Beautiful | Change | Biggest gap                                              |
-| ---------- | -------- | --------- | ------ | -------------------------------------------------------- |
-| Titanic    | 4        | 4         | same   | flat near-black void above horizon (Codex 1310)          |
-| Beebe      | 4        | 3.75      | same   | trunk and seabed plain                                   |
-| Blue Hole  | 4        | 3.5       | +0.25  | gallery-range apron still smooth and fogged              |
-| Lost City  | 4        | 3.5       | same   | striations too subtle to read; pale pillars              |
-| Monterey   | 4        | 3.75      | same   | wall foot boulders still in a line                       |
-| Challenger | 4        | 3.75      | same   | cobbles tiny; boulders queued (1310)                     |
-| Endurance  | 4        | 4         | +0.25  | hull now fills the frame; minimap stripes remain         |
+| Site       | Readable | Beautiful | Change | Biggest gap                                      |
+| ---------- | -------- | --------- | ------ | ------------------------------------------------ |
+| Titanic    | 4        | 4         | same   | flat near-black void above horizon (Codex 1310)  |
+| Beebe      | 4        | 3.75      | same   | trunk and seabed plain                           |
+| Blue Hole  | 4        | 3.5       | +0.25  | gallery-range apron still smooth and fogged      |
+| Lost City  | 4        | 3.5       | same   | striations too subtle to read; pale pillars      |
+| Monterey   | 4        | 3.75      | same   | wall foot boulders still in a line               |
+| Challenger | 4        | 3.75      | same   | cobbles tiny; boulders queued (1310)             |
+| Endurance  | 4        | 4         | +0.25  | hull now fills the frame; minimap stripes remain |
 
 No regressions. **Process:** efficiency.sh: Claude idle ~160 h and Codex under-used ~134 h of samples, nearly all the Oct 6-10 budget lockout (233 gate skips, 79 watchdog trips: floors working). Codex PASS 123 / other 11. Hosted CI on f51: 29/30 shards green; shard 5 failed only on `f1-vehicles.spec.ts:21` (screenshot hit 240 s on the software-GL runner): lightening it is DIRECTOR item 1. Codex queue holds 1280, 1290, 1310.
 
