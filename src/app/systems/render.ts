@@ -62,6 +62,9 @@ export const renderSystem: GameSystem = {
     touchWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     cleanup.add(() => touchWatch.disconnect());
     cleanup.listen(window, 'resize', resize);
+    // Some touch hosts notify rotation before emitting a separate resize.
+    // Refresh from the current viewport on either notification.
+    cleanup.listen(window, 'orientationchange', resize);
     resize();
   },
   frame: {

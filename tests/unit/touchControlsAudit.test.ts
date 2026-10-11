@@ -166,7 +166,7 @@ describe('touch control interruptions', () => {
     }
   });
 
-  it.each(['blur', 'visibilitychange', 'resize', 'desktop', 'pause', 'photo'])(
+  it.each(['blur', 'visibilitychange', 'resize', 'orientationchange', 'desktop', 'pause', 'photo'])(
     'starts a fresh double-tap sequence after %s',
     (interruption) => {
       const f = fixture();
@@ -253,7 +253,7 @@ describe('touch control interruptions', () => {
     }
   });
 
-  for (const interruption of ['blur', 'resize', 'visibilitychange']) {
+  for (const interruption of ['blur', 'resize', 'orientationchange', 'visibilitychange']) {
     it(`releases axes and holds on ${interruption}, and accepts a new gesture`, () => {
       const f = fixture();
       try {
