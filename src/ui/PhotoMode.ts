@@ -113,8 +113,9 @@ export class PhotoMode {
     this.active_ = on;
     this.root.hidden = !on;
     if (on) this.trap.activate();
-    else this.trap.deactivate();
     document.body.classList.toggle('photo-active', on);
+    // Hidden dive controls retain layout boxes but cannot receive restored focus.
+    if (!on) this.trap.deactivate();
     const keys = captureKey === 'Space' ? 'Space' : `${captureKey} / Space`;
     this.captureButton.textContent = `Capture (${keys})`;
     this.tips.textContent = 'Done / Esc: exit photo mode · drag orbit · pinch or wheel zoom';

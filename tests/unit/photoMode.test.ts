@@ -17,6 +17,9 @@ class Element extends EventTarget {
     this.children.push(...children);
   }
   setAttribute() {}
+  contains(child: Element): boolean {
+    return child === this || this.children.some((el) => el.contains(child));
+  }
   click() {
     this.dispatchEvent(new Event('click'));
   }
@@ -50,6 +53,53 @@ it('offers visible Capture, Done and Pause actions while the viewfinder is activ
   expect(mode.active).toBe(false);
   expect(root.hidden).toBe(true);
   expect(body.classList.toggle).toHaveBeenLastCalledWith('photo-active', false);
+});
+
+it('restores the opener only after the dive controls become visible again, over two rounds', () => {
+  const body = new Element();
+  let photoActive = false;
+  let activeElement: Element | object = body;
+  body.classList.toggle.mockImplementation((_name: string, on: boolean) => {
+    photoActive = on;
+  });
+  const opener = {
+    isConnected: true,
+    // visibility:hidden retains layout boxes, but the browser refuses focus.
+    getClientRects: () => [{}],
+    blur: () => {
+      activeElement = body;
+    },
+    focus: vi.fn(() => {
+      if (!photoActive) activeElement = opener;
+    }),
+  };
+  vi.stubGlobal('document', {
+    body,
+    get activeElement() {
+      return activeElement;
+    },
+    createElement: () => new Element(),
+  });
+  vi.stubGlobal('window', {
+    clearTimeout: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  });
+  const mode = new PhotoMode(vi.fn(), () => mode.setActive(false), vi.fn());
+  try {
+    for (let round = 0; round < 2; round++) {
+      opener.focus();
+      mode.setActive(true);
+      expect(photoActive).toBe(true);
+      expect(activeElement).toBe(body);
+      const actions = (mode.root as unknown as Element).children.at(-1)!.children.at(-1)!;
+      actions.children[1].click();
+      expect(photoActive).toBe(false);
+      expect(activeElement).toBe(opener);
+    }
+  } finally {
+    mode.setActive(false);
+  }
 });
 
 it('Done uses the photo system exit and Pause leaves photo mode for the pause menu', () => {
