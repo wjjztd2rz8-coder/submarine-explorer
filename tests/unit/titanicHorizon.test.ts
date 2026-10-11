@@ -284,7 +284,10 @@ describe('Titanic far-field horizon', () => {
       brightest = Math.max(brightest, luminance(color));
     }
     expect(brightest).toBeGreaterThan(luminance(atmo.fogColor));
-    expect(brightest).toBeLessThan(0.025);
+    // f-titanic-sky (director-approved): the old 0.025 ceiling capped the sky at a
+    // ~1.4x gradient, i.e. a flat void. Raised to 0.035 for a readable horizon haze;
+    // floor, contrast and fog-match checks are unchanged.
+    expect(brightest).toBeLessThan(0.035);
     camera.position.x += 100;
     camera.rotation.set(0.6, 1.2, 0.2);
     frame.atmo = sampleAtmosphere(config.water, camera.position.y);
