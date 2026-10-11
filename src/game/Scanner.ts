@@ -75,6 +75,11 @@ export interface ScanView {
    * turn to starboard (clockwise seen from above).
    */
   nearestTurnDeg: number;
+  /**
+   * Signed vertical correction to face the nearest POI, degrees: positive means
+   * the target is above the current heading line (rise or pitch up).
+   */
+  nearestVertDeg: number;
   /** Reason for the most recent interruption, while phase === 'interrupted'. */
   lastAbort: AbortReason | null;
   /** Completed scans since construction (handy for tests and e2e). */
@@ -87,6 +92,7 @@ interface Geometry {
   distance: number;
   angleDeg: number;
   turnDeg: number;
+  vertDeg: number;
   inRange: boolean;
   facing: boolean;
 }
@@ -107,6 +113,7 @@ export class Scanner {
     nearestScanned: false,
     nearestAngleDeg: 180,
     nearestTurnDeg: 0,
+    nearestVertDeg: 0,
     lastAbort: null,
     completed: 0,
     lastCompleteId: null,
@@ -175,6 +182,7 @@ export class Scanner {
         nearestScanned: false,
         nearestAngleDeg: 180,
         nearestTurnDeg: 0,
+        nearestVertDeg: 0,
       });
     }
     this.extra = targets;
@@ -315,6 +323,7 @@ export class Scanner {
     v.nearestScanned = nearest ? this.isScanned(nearest.landmarkId, nearest.id) : false;
     v.nearestAngleDeg = nearestGeo?.angleDeg ?? 180;
     v.nearestTurnDeg = nearestGeo?.turnDeg ?? 0;
+    v.nearestVertDeg = nearestGeo?.vertDeg ?? 0;
 
     if (held && candidate) {
       if (this.active !== candidate) {
@@ -409,6 +418,14 @@ export class Scanner {
     const ht = Math.atan2(dx, -dz);
     let turn = ((ht - hf) * 180) / Math.PI;
     turn = ((turn + 540) % 360) - 180;
-    return { distance, angleDeg, turnDeg: turn, inRange, facing };
+    const fl = Math.hypot(f.x, f.y, f.z) || 1;
+    const vertDeg =
+      distance > 1e-6
+        ? ((Math.asin(Math.max(-1, Math.min(1, dy / distance))) -
+            Math.asin(Math.max(-1, Math.min(1, f.y / fl)))) *
+            180) /
+          Math.PI
+        : 0;
+    return { distance, angleDeg, turnDeg: turn, vertDeg, inRange, facing };
   }
 }

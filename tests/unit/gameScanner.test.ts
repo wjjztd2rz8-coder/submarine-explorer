@@ -156,6 +156,15 @@ describe('Scanner', () => {
     expect(scanner.view.nearestTurnDeg).toBeCloseTo(-90, 0);
   });
 
+  it('reports the vertical correction so touch can say rise or sink', () => {
+    const { scanner } = setup([target({ position: new Vector3(0, -50, -100) })]);
+    scanner.update(0, AT, NORTH, false); // target 50 m above, level heading
+    expect(scanner.view.nearestVertDeg).toBeCloseTo(26.57, 1);
+    const below = setup([target({ position: new Vector3(0, -150, -100) })]).scanner;
+    below.update(0, AT, NORTH, false);
+    expect(below.view.nearestVertDeg).toBeCloseTo(-26.57, 1);
+  });
+
   it('waives the facing test inside closeRangeM', () => {
     const { scanner } = setup([target({ position: new Vector3(5, -100, 0) })]);
     scanner.update(DT, AT, NORTH.clone().negate(), true);

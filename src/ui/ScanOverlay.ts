@@ -273,8 +273,14 @@ export class ScanOverlay {
       const turn = view.nearestTurnDeg;
       const side = turn >= 0 ? 'STARBOARD' : 'PORT';
       // Mostly vertical misalignment when the horizontal turn is small.
-      const msg =
-        Math.abs(turn) < 10 ? 'PITCH TOWARD TARGET' : `TURN ${Math.abs(turn).toFixed(0)}° ${side}`;
+      // Touch has no pitch control: the ballast slider is the vertical aid.
+      const up = view.nearestVertDeg >= 0;
+      const vertical = document.documentElement.classList.contains('is-touch')
+        ? up
+          ? 'RISE TOWARD TARGET'
+          : 'SINK TOWARD TARGET'
+        : 'PITCH TOWARD TARGET';
+      const msg = Math.abs(turn) < 10 ? vertical : `TURN ${Math.abs(turn).toFixed(0)}° ${side}`;
       this.setText(this.hint, 'hint', msg);
     }
   }

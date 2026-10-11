@@ -64,3 +64,17 @@
     font-size: 14px;
   }
 }
+
+/* Phone landscape: the scan card and tutorial strip fill the top-centre, which
+   hid the "New discovery" notice behind them. Ride the free bottom-centre gap
+   between the stick and the action buttons instead. */
+@media (orientation: landscape) and (max-height: 460px) {
+  html.is-touch .hud-notice {
+    top: auto;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    max-width: 36vw;
+    font-size: 13px;
+    text-align: center;
+    z-index: 2;
+  }
+}
