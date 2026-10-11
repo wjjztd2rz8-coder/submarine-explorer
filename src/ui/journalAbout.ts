@@ -7,6 +7,8 @@
 import type { JournalSite } from '../game/JournalData.js';
 
 export interface AboutLists {
+  /** The mission overview, when the page's summary is something else. */
+  overview: string;
   facts: string[];
   hazards: string[];
 }
@@ -86,14 +88,21 @@ export function uniqueLines(lines: readonly string[]): string[] {
 
 /**
  * The site's facts (briefing first, as it is the verified overview) and hazards.
- * `catalogue` includes the catalogue facts, which stay hidden until the site opens.
+ * `catalogue` includes the catalogue facts, which stay hidden until the site opens;
+ * `shown` is the summary the page already shows, so the overview is not said twice.
  */
-export function aboutLists(site: JournalSite, catalogue: boolean): AboutLists {
+export function aboutLists(site: JournalSite, catalogue: boolean, shown = ''): AboutLists {
   const strip = (items: readonly string[]): string[] =>
     items.map(withoutHullRating).filter(Boolean);
   const facts = strip([...(site.briefing?.facts ?? []), ...(catalogue ? site.facts : [])]);
   const hazards = strip(site.briefing?.hazards ?? []);
-  return { facts: uniqueLines(facts), hazards: uniqueLines(hazards) };
+  const overview = site.briefing?.summary ?? '';
+  const repeat = uniqueLines([shown, overview]).length < (shown.trim() ? 2 : 1);
+  return {
+    overview: repeat ? '' : overview,
+    facts: uniqueLines(facts),
+    hazards: uniqueLines(hazards),
+  };
 }
 
 /** The terrain data credit for a tile source, or null when none is owed. */

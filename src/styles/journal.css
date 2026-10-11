@@ -485,6 +485,9 @@
   text-align: left;
   background: rgba(205, 224, 229, 0.04);
 }
+.jr-row.is-photos {
+  margin-top: 8px;
+}
 .jr-row-title {
   min-width: 0;
 }

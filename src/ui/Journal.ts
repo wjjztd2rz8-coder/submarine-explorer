@@ -747,21 +747,19 @@ export class Journal {
       card.addEventListener('click', () => this.show(s.id));
       grid.append(card);
     }
+    b.append(grid);
     // The sheet has no tree, so the photos get a row here.
     if (this.phone && this.photoGallery) {
-      const photos = el('button', 'jr-site-card is-photos');
+      const photos = el('button', 'jr-row is-photos');
       photos.type = 'button';
       photos.dataset.target = 'photos';
-      const top = el('span', 'jr-card-top');
-      top.append(
-        el('span', 'jr-card-name', 'Photos'),
-        el('span', 'jr-card-count jr-badge', String(this.photos?.photos.length ?? 0)),
+      photos.append(
+        el('span', 'jr-row-title', 'Photos'),
+        el('span', 'jr-badge', String(this.photos?.photos.length ?? 0)),
       );
-      photos.append(top);
       photos.addEventListener('click', () => this.show('photos'));
-      grid.append(photos);
+      b.append(photos);
     }
-    b.append(grid);
     b.append(el('p', 'jr-honesty', JOURNAL_HONESTY));
   }
 
@@ -803,7 +801,7 @@ export class Journal {
       this.body.append(this.entryRows(site));
     }
     this.body.append(foot);
-    this.renderAbout(site, open, foot);
+    this.renderAbout(site, open, summary ?? '', foot);
     const credit = dataCreditFor(this.tileSources.get(site.id));
     if (credit) {
       const line = el('p', 'jr-credit', `${credit.label}: `);
@@ -865,15 +863,21 @@ export class Journal {
   }
 
   /** Facts, hazards and references: one collapsed disclosure, nothing said twice. */
-  private renderAbout(site: JournalSite, catalogue: boolean, into: HTMLElement): void {
-    const { facts, hazards } = aboutLists(site, catalogue);
+  private renderAbout(
+    site: JournalSite,
+    catalogue: boolean,
+    shown: string,
+    into: HTMLElement,
+  ): void {
+    const { overview, facts, hazards } = aboutLists(site, catalogue, shown);
     const links = catalogue ? site.links : [];
-    if (!facts.length && !hazards.length && !links.length) return;
+    if (!overview && !facts.length && !hazards.length && !links.length) return;
     const more = el('details', 'jr-site-more');
     const summary = el('summary', undefined, 'About this site');
     summary.setAttribute('aria-expanded', 'false');
     more.addEventListener('toggle', () => summary.setAttribute('aria-expanded', String(more.open)));
     more.append(summary);
+    if (overview) more.append(el('p', 'jr-para', overview));
     for (const [title, items] of [
       ['FACTS', facts],
       ['HAZARDS', hazards],

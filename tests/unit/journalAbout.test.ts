@@ -85,6 +85,20 @@ describe('about lists', () => {
     expect(lists.hazards).toEqual(['Near-freezing water, about 1-2 degC.']);
   });
 
+  it('adds the mission overview only when the page shows another summary', () => {
+    const withSummary = site([], { ...briefing });
+    withSummary.briefing!.summary = 'Find the stalactite galleries on the north wall.';
+    expect(aboutLists(withSummary, true, 'A flooded sinkhole in the reef.').overview).toBe(
+      'Find the stalactite galleries on the north wall.',
+    );
+    expect(
+      aboutLists(withSummary, true, 'Find the stalactite galleries on the north wall.').overview,
+    ).toBe('');
+    expect(aboutLists(withSummary, false).overview).toBe(
+      'Find the stalactite galleries on the north wall.',
+    );
+  });
+
   it('holds back catalogue facts until the site is open', () => {
     expect(
       aboutLists(site(['Protected by an international agreement'], briefing), false).facts,
