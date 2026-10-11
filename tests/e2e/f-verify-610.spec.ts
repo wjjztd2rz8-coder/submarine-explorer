@@ -14,7 +14,6 @@ const sites = ['titanic', 'lost-city', 'great-blue-hole', 'beebe-vent-field', 'm
 const hudSelectors = [
   '.sonar',
   '.hud-readouts',
-  '.hud-attribution',
   '.hud-warning',
   '.hud-notice',
   '.hud-objective',
@@ -34,7 +33,6 @@ const hudSelectors = [
 const requiredHud = [
   '.sonar',
   '.hud-readouts',
-  '.hud-attribution',
   '.tc-stick',
   '.tc-slider',
   '.tc-buttons',

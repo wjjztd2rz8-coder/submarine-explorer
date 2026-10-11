@@ -63,9 +63,8 @@ test('chase framing, dive-start tips, free look and reset controls', async ({ pa
   await expect.poll(async () => (await camera(page)).free).toBe(true);
   await page.locator('.hud-reset-camera').click();
   await expect.poll(async () => (await camera(page)).free).toBe(false);
-  const resetBox = (await page.locator('.hud-reset-camera').boundingBox())!;
-  const attributionBox = (await page.locator('.hud-attribution').boundingBox())!;
-  expect(resetBox.x + resetBox.width).toBeLessThan(attributionBox.x);
+  // The data credit moved to the pause menu; the dive HUD has no chip beside Reset camera.
+  await expect(page.locator('.hud-attribution')).toHaveCount(0);
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width / 2 + 100, box.y + box.height / 2);

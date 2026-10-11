@@ -17,7 +17,6 @@ const hud = [
   '.sonar',
   '.objectives-panel',
   '.hud-readouts',
-  '.hud-attribution',
   '.tc-stick',
   '.tc-slider',
   '.tc-buttons',
@@ -132,10 +131,7 @@ for (const viewport of [
               const fresh = [...hud, '.onboard-card'];
               if (await page.locator('.scan-panel').isVisible()) fresh.push('.scan-panel');
               await separate(page, fresh);
-              await expect(page.locator('.hud-attribution summary')).toContainText('GMRT');
-              expect((await page.locator('.hud-attribution').boundingBox())!.height).toBeLessThan(
-                48,
-              );
+              await expect(page.locator('.hud-attribution')).toHaveCount(0);
               await page.screenshot({ path: testInfo.outputPath('arcade-opening.png') });
               return;
             }

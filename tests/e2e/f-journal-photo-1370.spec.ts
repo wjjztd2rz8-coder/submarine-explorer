@@ -36,7 +36,8 @@ for (const profile of [
             'titanic-bow',
       );
       const mode = page.locator('.photo-mode');
-      const credit = page.locator('.hud-attribution summary');
+      // A persistent, focusable HUD control the photo mode must hand focus back to.
+      const credit = page.locator(profile.touch ? '.tc-btn-pause' : '.hud-reset-camera');
       const touchPhoto = page.locator('.tc-btn-photo');
       const capture = mode.locator('.photo-mode-capture');
       const done = mode.locator('.photo-mode-exit');

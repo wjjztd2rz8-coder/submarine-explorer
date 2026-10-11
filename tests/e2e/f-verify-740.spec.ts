@@ -23,7 +23,6 @@ const panels = [
   '.sonar',
   '.objectives-panel',
   '.hud-readouts',
-  '.hud-attribution',
   '.hud-warning',
   '.hud-notice',
   '.hud-objective',
@@ -121,7 +120,6 @@ for (const layout of [
           '.sonar',
           '.objectives-panel',
           '.hud-readouts',
-          '.hud-attribution',
           ...(layout.touch ? ['.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause'] : []),
         ])
           await expect(page.locator(selector)).toBeVisible();

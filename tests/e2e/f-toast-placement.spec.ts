@@ -123,7 +123,7 @@ for (const layout of [
         await holdFreshTips(page);
         await finishAnimations(page, '.onboard-card');
         await expect(page.locator('.scan-panel')).toBeVisible();
-        const hud = ['.sonar', '.hud-readouts', '.hud-attribution'];
+        const hud = ['.sonar', '.hud-readouts'];
         const controls = layout.touch
           ? ['.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause']
           : ['.hud-control-tips', '.hud-reset-camera'];

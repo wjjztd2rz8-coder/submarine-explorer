@@ -9,7 +9,7 @@ it('renders fresh hints, expires at the deadline, and still respects settings an
   const now = vi.spyOn(performance, 'now').mockReturnValue(0);
   const update = vi.fn();
   const ctx = {
-    hud: { update, layoutDataCredits: vi.fn() },
+    hud: { update },
     discovery: { scanner: { view: {} }, focusPoint: () => null },
     input: { primaryKeyLabel: () => 'G' },
     sub: { simSpeed: 1 },

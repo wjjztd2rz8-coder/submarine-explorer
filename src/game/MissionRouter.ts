@@ -306,8 +306,6 @@ export interface MissionRouterOptions {
   applyStart?: (choice: MissionStartPosition) => void;
   /** Unused since D-FLOW (the HUD shows a non-1× sim speed); kept for callers. */
   simSpeed?: number;
-  /** Primary key label for an input action, e.g. `input.primaryKeyLabel`. */
-  keyLabel?: (action: string) => string;
   /** Navigate: a URL, or null to reload the current one. */
   navigate?: (url: string | null) => void;
   /** Debrief "Dive sites": open the site chooser (home). Default: navigate to the home page. */
@@ -669,10 +667,8 @@ export class MissionRouter {
   private briefingContent(): BriefingContent {
     const { route, config } = this.opts;
     const def = route.def;
-    const k = (a: string, fallback: string): string => this.opts.keyLabel?.(a) || fallback;
     const hull = def.hull_class ? config.submarine.hullClasses[def.hull_class] : undefined;
     const content: BriefingContent = {
-      siteId: def.landmark,
       kicker: `MISSION BRIEFING · ${def.landmark.replaceAll('-', ' ').toUpperCase()}`,
       title: def.title,
       summary: def.briefing.summary,
@@ -682,17 +678,6 @@ export class MissionRouter {
       objectives: [...this.mission.objectives]
         .sort((a, b) => Number(b.primary) - Number(a.primary))
         .map((o) => ({ title: o.title, primary: o.primary })),
-      controls: [
-        [`${k('thrustForward', 'W')}/${k('thrustReverse', 'S')}`, 'thrust'],
-        [`${k('yawPort', 'A')}/${k('yawStarboard', 'D')}`, 'yaw'],
-        [k('ballastBlow', 'Space'), 'rise'],
-        [k('ballastFlood', 'Ctrl'), 'dive'],
-        [k('toggleLights', 'L'), 'headlights'],
-        [k('scan', 'F'), 'scan (hold)'],
-        [k('toggleJournal', 'J'), 'Journal'],
-        [k('cycleSimSpeed', 'T'), 'sim speed'],
-        [k('toggleSonar', 'M'), 'sonar map'],
-      ],
     };
     if (def.briefing.depth_m !== undefined) {
       content.meta.push([

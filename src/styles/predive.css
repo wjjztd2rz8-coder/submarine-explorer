@@ -271,9 +271,7 @@
 }
 
 /* --- F-BRIEFING-900: objectives first, one launch action --- */
-.briefing .briefing-cols {
-  grid-template-columns: 1fr 1.4fr;
-  gap: 24px;
+.briefing .briefing-head + .briefing-section {
   margin-top: 14px;
 }
 .briefing .briefing-section ul,
@@ -397,9 +395,12 @@
   grid-column: 3;
   grid-row: 1;
 }
+/* No Enter key on a touch screen. */
+html.is-touch .briefing .briefing-hint {
+  display: none;
+}
 .briefing .briefing-go .briefing-free-dive,
-.briefing .briefing-go .briefing-cancel,
-.briefing .briefing-controls button {
+.briefing .briefing-go .briefing-cancel {
   display: inline-flex;
   align-items: center;
   min-width: 0;
@@ -423,9 +424,7 @@
     max-height: calc(100dvh - 16px);
     padding: 10px 12px;
   }
-  .briefing .briefing-cols {
-    grid-template-columns: 1fr;
-    gap: 4px;
+  .briefing .briefing-head + .briefing-section {
     margin-top: 8px;
   }
   .briefing .briefing-title {

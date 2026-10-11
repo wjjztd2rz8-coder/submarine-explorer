@@ -28,11 +28,16 @@ for (const mission of [titanic, blueHole]) {
       await expect(briefing).toBeVisible();
       const more = briefing.locator('.briefing-site-more');
       const summary = more.locator('summary');
-      await expect(summary).toHaveText('More about this site');
+      await expect(summary).toHaveText('About this site');
       await expect(more).not.toHaveAttribute('open', '');
+      // Facts and hazards live only in the collapsed disclosure; no controls list.
       for (const kind of ['facts', 'hazards']) {
-        await expect(briefing.locator(`.briefing-cols .is-${kind} li`)).toHaveCount(3);
+        await expect(briefing.locator(`.briefing-section.is-${kind} li:visible`)).toHaveCount(0);
       }
+      await expect(briefing.locator('.briefing-controls')).toHaveCount(0);
+      await expect(briefing.getByRole('button', { name: 'View controls' })).toHaveCount(0);
+      for (const objective of await briefing.locator('.briefing-objectives li').all())
+        await expect(objective).toBeInViewport({ ratio: 1 });
       await expect(briefing.locator('.briefing-objectives li')).toHaveCount(
         mission.objectives.length,
       );
@@ -70,14 +75,11 @@ for (const mission of [titanic, blueHole]) {
       await expect(more).toHaveAttribute('open', '');
       await expect(briefing).toBeVisible();
       await expect(more.locator('.briefing-summary')).toHaveText(mission.briefing.summary);
-      await expect(briefing.locator('.is-facts li')).toHaveText([
-        ...(mission.landmark === 'titanic'
-          ? [mission.briefing.facts[1], mission.briefing.facts[0], mission.briefing.facts[3]]
-          : [mission.briefing.facts[0], mission.briefing.facts[1], mission.briefing.facts[3]]),
-        mission.briefing.facts[2],
-      ]);
-      await expect(briefing.locator('.is-hazards li')).toHaveCount(mission.briefing.hazards.length);
-      await expect(briefing.getByRole('button', { name: 'View controls' })).toBeVisible();
+      await expect(briefing.locator('.is-facts li')).toHaveText(mission.briefing.facts);
+      // The hull rating hazard repeats the HULL meta line, so it is not listed.
+      await expect(briefing.locator('.is-hazards li')).toHaveText(
+        mission.briefing.hazards.filter((hazard) => !/Class [ABC]/.test(hazard)),
+      );
       await page.keyboard.press('Space');
       await expect(more).not.toHaveAttribute('open', '');
       await expect(briefing).toBeVisible();
