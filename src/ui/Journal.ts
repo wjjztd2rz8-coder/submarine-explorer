@@ -9,6 +9,12 @@
  * structures and markers are recreations; recreated entries carry a small
  * "Recreation" tag and every entry lists its sources.
  *
+ * Desktop is a two-pane reader (contents tree, article). On a phone (narrow, or
+ * a short touch landscape) it is a full-screen sheet with a back arrow: sites,
+ * then a site page with its entry rows, then an entry. A site's facts and
+ * hazards sit once in a collapsed "About this site"; its data credit is the
+ * page's last line.
+ *
  * All content is untrusted JSON, so it is only ever assigned via textContent;
  * URLs were already filtered to http(s)/site-relative by Guide.ts.
  *
@@ -31,8 +37,11 @@ import {
   type JournalEntry,
   type JournalSite,
 } from '../game/JournalData.js';
+import { fetchContentJson } from '../game/ContentPath.js';
 import { formatDepthRange, OBIS_HOME_URL, obisTaxonUrl, type SpeciesDoc } from '../game/Species.js';
+import { publicUrl } from '../util/publicUrl.js';
 import { FocusTrap } from './FocusTrap.js';
+import { aboutLists, dataCreditFor } from './journalAbout.js';
 // --- D-PHOTO begin ---
 import { PhotoGallery } from './PhotoGallery.js';
 import { PHOTO_LIMIT, type PhotoStore } from '../game/PhotoStore.js';
@@ -69,6 +78,37 @@ const isGuideEntry = (e: JournalEntry): boolean =>
 
 const NO_STORE: DiscoveryReader = { isDiscovered: () => false };
 
+/** The sheet layout: a narrow screen, or a touch device in landscape (short). */
+const PHONE_QUERY = '(max-width: 760px), (max-height: 520px) and (pointer: coarse)';
+
+/** Entry groups on a site page and in the contents tree, in reading order. */
+const GROUPS: ReadonlyArray<readonly [label: string, kind: JournalEntry['kind']]> = [
+  ['Overview', 'site'],
+  ['Points of interest', 'poi'],
+  ['Species', 'species'],
+  ['Wildlife', 'life'],
+  ['Secrets', 'secret'],
+];
+
+/** One short line on finding the first of a hidden group's entries. */
+const HOW_TO_FIND: Partial<Record<JournalEntry['kind'], string>> = {
+  species: 'Scan their habitat to identify them.',
+  life: 'Face an animal and hold Scan.',
+  secret: 'Follow faint sonar contacts.',
+};
+
+/** `data/tiles/index.json` -> tile id to data source (for the site's data credit). */
+async function loadTileSources(): Promise<Map<string, string>> {
+  const doc = await fetchContentJson(publicUrl('/data/tiles/index.json'));
+  const out = new Map<string, string>();
+  const tiles = (doc as { tiles?: unknown } | null)?.tiles;
+  if (!Array.isArray(tiles)) return out;
+  for (const t of tiles as Array<{ id?: unknown; source?: unknown }>) {
+    if (typeof t?.id === 'string' && typeof t.source === 'string') out.set(t.id, t.source);
+  }
+  return out;
+}
+
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   className?: string,
@@ -88,24 +128,39 @@ function link(url: string, text: string): HTMLAnchorElement {
   return a;
 }
 
+/** A reference link's text: its site, not the whole URL. */
+function linkLabel(l: { title: string; url?: string }): string {
+  if (l.title !== l.url || !l.url) return l.title;
+  try {
+    return new URL(l.url).hostname.replace(/^www\./, '');
+  } catch {
+    return l.title;
+  }
+}
+
 export class Journal {
   readonly root: HTMLDivElement;
   private readonly crumbEl: HTMLSpanElement;
   private readonly countEl: HTMLSpanElement;
   private readonly spoilerBox: HTMLInputElement;
+  private readonly spoilerEl: HTMLLabelElement;
+  private readonly backBtn: HTMLButtonElement;
   private readonly nav: HTMLElement;
-  private readonly contentsToggle: HTMLButtonElement;
+  private readonly navList: HTMLDivElement;
+  private readonly navFoot: HTMLDivElement;
   private readonly body: HTMLDivElement;
   private readonly footer: HTMLDivElement;
   private readonly trap: FocusTrap;
+  private readonly phoneMq: MediaQueryList | null;
 
   private store: DiscoveryReader = NO_STORE;
   private sites: JournalSite[] = [];
+  private tileSources = new Map<string, string>();
   private loading: Promise<void> | null = null;
   private currentSiteId: string | null = null;
   private homeMode = false;
   private spoilers_ = false;
-  private contentsOpen = false;
+  private phone = false;
   private readonly expandedSites = new Map<string, boolean>();
   private readonly expandedCategories = new Map<string, boolean>();
   private view: View = { kind: 'front' };
@@ -130,33 +185,40 @@ export class Journal {
 
     const panel = el('div', 'jr-panel');
     const header = el('div', 'jr-header');
+    this.backBtn = el('button', 'jr-back');
+    this.backBtn.type = 'button';
+    this.backBtn.setAttribute('aria-label', 'Back');
+    this.backBtn.append(this.glyph('\u2190'));
+    this.backBtn.addEventListener('click', () => this.back());
     const heading = el('div', 'jr-heading');
     heading.append(el('span', 'jr-kicker', 'Journal'));
     this.crumbEl = el('span', 'jr-crumb');
     heading.append(this.crumbEl);
-    this.countEl = el('span', 'jr-count');
-    const spoiler = el('label', 'jr-spoilers');
-    this.spoilerBox = el('input');
-    this.spoilerBox.type = 'checkbox';
-    this.spoilerBox.addEventListener('change', () => this.setSpoilers(this.spoilerBox.checked));
-    spoiler.append(this.spoilerBox, el('span', undefined, 'Show spoilers'));
-    const close = el('button', 'jr-close', 'Close');
+    const close = el('button', 'jr-close');
     close.type = 'button';
     close.title = 'Close Journal (Esc)';
+    close.setAttribute('aria-label', 'Close Journal');
+    close.append(this.glyph('\u00d7'));
     close.addEventListener('click', () => this.close());
-    this.contentsToggle = el('button', 'jr-contents-toggle', 'Contents');
-    this.contentsToggle.type = 'button';
-    this.contentsToggle.setAttribute('aria-controls', 'journal-contents');
-    this.contentsToggle.setAttribute('aria-expanded', 'false');
-    this.contentsToggle.addEventListener('click', () => {
-      this.setContentsOpen(!this.contentsOpen);
-    });
-    header.append(heading, close, this.countEl, spoiler, this.contentsToggle);
+    header.append(this.backBtn, heading, close);
+
+    this.spoilerEl = el('label', 'jr-spoilers');
+    this.spoilerBox = el('input');
+    this.spoilerBox.type = 'checkbox';
+    this.spoilerBox.setAttribute('role', 'switch');
+    this.spoilerBox.addEventListener('change', () => this.setSpoilers(this.spoilerBox.checked));
+    this.spoilerEl.append(this.spoilerBox, el('span', undefined, 'Show spoilers'));
+    this.countEl = el('span', 'jr-count');
 
     const main = el('div', 'jr-main');
     this.nav = el('nav', 'jr-nav');
     this.nav.id = 'journal-contents';
     this.nav.setAttribute('aria-label', 'Journal contents');
+    this.navList = el('div', 'jr-nav-scroll');
+    // The count and the spoilers switch live under the tree, off the header.
+    this.navFoot = el('div', 'jr-nav-foot');
+    this.navFoot.append(this.countEl, this.spoilerEl);
+    this.nav.append(this.navList, this.navFoot);
     this.body = el('div', 'jr-body');
     this.body.tabIndex = -1;
     this.body.setAttribute('role', 'region');
@@ -167,6 +229,16 @@ export class Journal {
     this.root.append(panel);
     parent.appendChild(this.root);
     this.trap = new FocusTrap(this.root);
+    this.phoneMq = typeof window.matchMedia === 'function' ? window.matchMedia(PHONE_QUERY) : null;
+    // Rotating a phone swaps the layout under an open Journal.
+    this.phoneMq?.addEventListener?.('change', () => this.refresh());
+  }
+
+  /** An icon character the screen reader skips (the button carries the label). */
+  private glyph(char: string): HTMLSpanElement {
+    const g = el('span', 'jr-glyph', char);
+    g.setAttribute('aria-hidden', 'true');
+    return g;
   }
 
   get isOpen(): boolean {
@@ -260,12 +332,14 @@ export class Journal {
 
   /** Load every site's content once. Resolves when the Journal can render it. */
   load(): Promise<void> {
-    this.loading ??= loadJournalSites(this.currentSiteId ? [this.currentSiteId] : []).then(
-      (sites) => {
-        this.sites = sites;
-        this.refresh();
-      },
-    );
+    this.loading ??= Promise.all([
+      loadJournalSites(this.currentSiteId ? [this.currentSiteId] : []),
+      loadTileSources(),
+    ]).then(([sites, sources]) => {
+      this.sites = sites;
+      this.tileSources = sources;
+      this.refresh();
+    });
     return this.loading;
   }
 
@@ -274,7 +348,6 @@ export class Journal {
    * just logged, else the front page from home, else the current site's page.
    */
   open(entryId?: string): void {
-    this.contentsOpen = false;
     const focus = entryId ?? this.pendingFocus;
     this.pendingFocus = null;
     const site = this.currentSiteId;
@@ -315,7 +388,6 @@ export class Journal {
 
   /** Show the front page, a site page (site id) or an entry (entry key). */
   show(target: 'front' | string): void {
-    this.contentsOpen = false;
     if (target === 'front') this.view = { kind: 'front' };
     else if (target === 'photos') this.view = { kind: 'photos' };
     else if (this.sites.some((s) => s.id === target)) this.view = { kind: 'site', siteId: target };
@@ -326,9 +398,12 @@ export class Journal {
     this.body.scrollTop = 0;
   }
 
-  private setContentsOpen(open: boolean): void {
-    this.contentsOpen = open;
-    this.render();
+  /** One level up: an entry to its site, a site or the photos to the front page. */
+  private back(): void {
+    const v = this.view;
+    const entry = v.kind === 'entry' ? this.entryByKey(v.key) : null;
+    this.show(entry ? entry.siteId : 'front');
+    this.body.focus({ preventScroll: true });
   }
 
   /** The focus id may be a site-level entry rather than a POI one. */
@@ -377,10 +452,16 @@ export class Journal {
     const focused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const target = focused?.dataset.target;
     const category = focused?.dataset.category;
+    const row = focused?.dataset.row;
     const inside = !!focused && this.root.contains(focused);
     this.renderContent();
+    // Moving the switch between the tree and the page drops its focus.
+    if (focused === this.spoilerBox && document.activeElement !== focused) {
+      this.spoilerBox.focus({ preventScroll: true });
+      return;
+    }
     if (inside && !focused?.isConnected) {
-      if (!this.contentsOpen && window.matchMedia('(max-width: 760px)').matches) {
+      if (this.phone) {
         this.body.focus({ preventScroll: true });
         return;
       }
@@ -389,7 +470,9 @@ export class Journal {
       const replacement = controls.find((control) =>
         target
           ? control.dataset.target === target
-          : !!category && control.dataset.category === category,
+          : row
+            ? control.dataset.row === row
+            : !!category && control.dataset.category === category,
       );
       (
         replacement ??
@@ -400,8 +483,9 @@ export class Journal {
   }
 
   private renderContent(): void {
-    this.root.classList.toggle('contents-open', this.contentsOpen);
-    this.contentsToggle.setAttribute('aria-expanded', String(this.contentsOpen));
+    this.phone = !!this.phoneMq?.matches;
+    this.root.classList.toggle('is-phone', this.phone);
+    this.root.classList.toggle('at-front', this.view.kind === 'front');
     const sites = this.orderedSites();
     let logged = 0;
     let total = 0;
@@ -418,9 +502,21 @@ export class Journal {
     const siteId = v.kind === 'site' ? v.siteId : (entry?.siteId ?? null);
     const site = sites.find((s) => s.id === siteId) ?? null;
     this.crumbEl.textContent = site ? site.name : v.kind === 'photos' ? 'Photos' : 'All dive sites';
-    this.renderNav(sites, site, entry);
+    // The sheet has no tree: its contents are the front page, its rows the site page.
+    if (this.phone) this.navList.replaceChildren();
+    else this.renderNav(sites, site, entry);
 
     this.body.replaceChildren();
+    this.renderBody(sites, site, entry);
+    // On a phone the switch sits at the end of the pages that can be locked.
+    const locked = !!entry && !!site && !isEntryUnlocked(site, entry, this.store);
+    const home =
+      this.phone && (v.kind === 'front' || v.kind === 'site' || locked) ? this.body : this.navFoot;
+    if (this.spoilerEl.parentElement !== home || home === this.body) home.append(this.spoilerEl);
+  }
+
+  private renderBody(sites: JournalSite[], site: JournalSite | null, entry: JournalEntry | null) {
+    const v = this.view;
     // --- D-PHOTO begin ---
     if (v.kind === 'photos' && this.photoGallery) {
       const list = this.photos?.photos ?? [];
@@ -463,7 +559,7 @@ export class Journal {
     open: JournalSite | null,
     entry: JournalEntry | null,
   ): void {
-    const scrollTop = this.nav.scrollTop;
+    const scrollTop = this.navList.scrollTop;
     const ul = el('ul', 'jr-nav-list');
     ul.append(this.navButton('Front page', '', 'is-front', 'front', this.view.kind === 'front'));
     // --- D-PHOTO begin ---
@@ -511,21 +607,58 @@ export class Journal {
       ul.append(li);
       li.append(entries);
     }
-    this.nav.replaceChildren(ul);
-    this.nav.scrollTop = scrollTop;
+    this.navList.replaceChildren(ul);
+    this.navList.scrollTop = scrollTop;
+  }
+
+  /**
+   * One group's rows. Locked species, animals and secrets are only counted
+   * (their names would spoil them); locked targets collapse into one quiet
+   * "more to find" count; spoilers show everything.
+   */
+  private groupRows(
+    site: JournalSite,
+    label: string,
+    list: JournalEntry[],
+  ): {
+    rows: Array<{ entry: JournalEntry; open: boolean; title: string }>;
+    unscanned: number;
+    hidden: number;
+    note: string;
+  } {
+    const rows: Array<{ entry: JournalEntry; open: boolean; title: string }> = [];
+    let hidden = 0;
+    let unscanned = 0;
+    for (const e of list) {
+      const open = isEntryUnlocked(site, e, this.store);
+      if (
+        !open &&
+        !this.spoilers_ &&
+        (e.kind === 'species' || e.kind === 'life' || e.kind === 'secret')
+      ) {
+        hidden++;
+        continue;
+      }
+      if (!open && !this.spoilers_ && e.kind === 'poi') {
+        unscanned++;
+        continue;
+      }
+      rows.push({ entry: e, open, title: open || this.spoilers_ ? e.title : 'Undiscovered' });
+    }
+    const note = !hidden
+      ? ''
+      : label === 'Secrets'
+        ? `${hidden} secrets remain. Follow faint nearby sonar contacts.`
+        : label === 'Wildlife'
+          ? `${hidden} animals unscanned. Face one and hold Scan during a dive.`
+          : `${hidden} species not yet identified. Show spoilers to read the survey list.`;
+    return { rows, unscanned, hidden, note };
   }
 
   /** The open site's entries, grouped, under its nav item. */
   private siteEntryList(site: JournalSite, current: JournalEntry | null): HTMLElement {
     const box = el('div', 'jr-site-entries');
-    const groups: Array<[string, JournalEntry['kind']]> = [
-      ['About the site', 'site'],
-      ['Points of interest', 'poi'],
-      ['Species', 'species'],
-      ['Wildlife', 'life'],
-      ['Secrets', 'secret'],
-    ];
-    for (const [label, kind] of groups) {
+    for (const [label, kind] of GROUPS) {
       const list = site.entries.filter((e) => e.kind === kind);
       if (!list.length) continue;
       const key = `${site.id}/${kind}`;
@@ -545,60 +678,47 @@ export class Journal {
       });
       box.append(group);
       const ul = el('ul');
-      let hidden = 0;
-      let unscanned = 0;
-      for (const e of list) {
-        const open = isEntryUnlocked(site, e, this.store);
-        if (
-          !open &&
-          !this.spoilers_ &&
-          (e.kind === 'species' || e.kind === 'life' || e.kind === 'secret')
-        ) {
-          hidden++;
-          continue;
-        }
-        // Locked targets collapse into one quiet count row (no names, no per-target rows).
-        if (!open && !this.spoilers_ && e.kind === 'poi') {
-          unscanned++;
-          continue;
-        }
-        const title = open || this.spoilers_ ? e.title : 'Undiscovered';
-        const li = this.navButton(title, '', `is-entry is-${e.kind}`, e.key, e === current);
+      const { rows, unscanned, note } = this.groupRows(site, label, list);
+      for (const { entry, open, title } of rows) {
+        const li = this.navButton(
+          title,
+          '',
+          `is-entry is-${entry.kind}`,
+          entry.key,
+          entry === current,
+        );
         li.classList.toggle('is-locked', !open);
         ul.append(li);
       }
       group.append(ul);
-      if (unscanned) {
-        group.append(el('p', 'jr-more-to-find', `${unscanned} more to find`));
-      }
-      if (hidden) {
-        group.append(
-          el(
-            'p',
-            'jr-hidden-note',
-            label === 'Secrets'
-              ? `${hidden} secrets remain. Follow faint nearby sonar contacts.`
-              : label === 'Wildlife'
-                ? `${hidden} animals unscanned. Face one and hold Scan during a dive.`
-                : `${hidden} species not yet identified. Show spoilers to read the survey list.`,
-          ),
-        );
-      }
+      if (unscanned) group.append(el('p', 'jr-more-to-find', `${unscanned} more to find`));
+      if (note) group.append(el('p', 'jr-hidden-note', note));
     }
     return box;
+  }
+
+  /** A row of small progress chips ("3/8 entries"). */
+  private chips(items: ReadonlyArray<string>, cls = ''): HTMLUListElement {
+    const ul = el('ul', `jr-chips ${cls}`.trim());
+    for (const text of items) ul.append(el('li', 'jr-chip', text));
+    return ul;
   }
 
   private renderFront(sites: JournalSite[]): void {
     const b = this.body;
     b.append(el('h2', 'jr-title', 'Dive journal'));
-    b.append(el('p', 'jr-honesty', JOURNAL_HONESTY));
-    const loggedSites = sites.filter((s) => isSiteUnlocked(s, this.store)).length;
+    let logged = 0;
+    let total = 0;
+    for (const s of sites) {
+      const p = siteProgress(s, this.store);
+      logged += p.logged;
+      total += p.total;
+    }
+    const scanned = sites.filter((s) => isSiteUnlocked(s, this.store)).length;
     b.append(
-      el(
-        'p',
+      this.chips(
+        [`${logged}/${total} entries`, `${scanned}/${sites.length} sites scanned`],
         'jr-lead',
-        `Scan wrecks, vents and landforms during a dive to log them here. ` +
-          `${loggedSites} of ${sites.length} sites with scans.`,
       ),
     );
     const grid = el('div', 'jr-site-grid');
@@ -607,8 +727,14 @@ export class Journal {
       const card = el('button', 'jr-site-card');
       card.type = 'button';
       card.dataset.target = s.id;
+      card.setAttribute('aria-label', `${s.name}, ${p.logged} of ${p.total} entries logged`);
       card.classList.toggle('is-locked', !isSiteUnlocked(s, this.store));
-      card.append(el('span', 'jr-card-name', s.name));
+      const top = el('span', 'jr-card-top');
+      top.append(el('span', 'jr-card-name', s.name));
+      if (s.id === this.currentSiteId && !this.homeMode)
+        top.append(el('span', 'jr-card-tag', 'This dive'));
+      top.append(el('span', 'jr-card-count jr-badge', `${p.logged}/${p.total}`));
+      card.append(top);
       const meta = [s.region, s.depthM === null ? '' : `${s.depthM.toLocaleString('en-US')} m`]
         .filter(Boolean)
         .join(' · ');
@@ -617,16 +743,33 @@ export class Journal {
       const fill = el('span', 'jr-card-fill');
       fill.style.width = `${p.total ? Math.round((100 * p.logged) / p.total) : 0}%`;
       bar.append(fill);
-      card.append(bar, el('span', 'jr-card-count', `${p.logged} of ${p.total} entries logged`));
+      card.append(bar);
       card.addEventListener('click', () => this.show(s.id));
       grid.append(card);
     }
     b.append(grid);
+    // The sheet has no tree, so the photos get a row here.
+    if (this.phone && this.photoGallery) {
+      const photos = el('button', 'jr-row is-photos');
+      photos.type = 'button';
+      photos.dataset.target = 'photos';
+      photos.append(
+        el('span', 'jr-row-title', 'Photos'),
+        el('span', 'jr-badge', String(this.photos?.photos.length ?? 0)),
+      );
+      photos.addEventListener('click', () => this.show('photos'));
+      b.append(photos);
+    }
+    b.append(el('p', 'jr-honesty', JOURNAL_HONESTY));
   }
 
   private renderSite(site: JournalSite): void {
-    const b = this.body;
+    // Three blocks, so a short landscape screen can put the entries beside the text.
+    const b = el('div', 'jr-site-top');
+    const foot = el('div', 'jr-site-foot');
+    this.body.append(b);
     const unlocked = isSiteUnlocked(site, this.store);
+    const open = unlocked || this.spoilers_;
     const titleRow = el('div', 'jr-title-row');
     titleRow.append(el('h2', 'jr-title', site.name));
     if (!unlocked) titleRow.append(el('span', 'jr-tag is-undiscovered', 'No scans logged'));
@@ -638,58 +781,118 @@ export class Journal {
     ].filter(Boolean);
     if (meta.length) b.append(el('p', 'jr-meta', meta.join(' · ')));
     if (site.memorialNote) b.append(el('p', 'jr-memorial', site.memorialNote));
-    if (site.briefing) {
-      const more = el('details', 'jr-site-more');
-      more.append(el('summary', undefined, 'More about this site'));
-      if (site.briefing.summary) more.append(el('p', 'jr-para', site.briefing.summary));
-      for (const [title, items] of [
-        ['FACTS', site.briefing.facts],
-        ['HAZARDS', site.briefing.hazards],
-      ] as const) {
-        if (!items.length) continue;
-        more.append(el('h3', 'jr-sources-title', title));
-        const list = el('ul', 'jr-facts-list');
-        for (const item of items) list.append(el('li', undefined, item));
-        more.append(list);
-      }
-      b.append(more);
-    }
+    // The mission overview reads before the first scan; the catalogue text after.
+    const summary = open ? site.summary || site.briefing?.summary : site.briefing?.summary;
+    if (summary) b.append(el('p', 'jr-para', summary));
+
     const p = siteProgress(site, this.store);
     const wl = wildlifeProgress(site, this.store);
     const secrets = site.entries.filter((e) => e.kind === 'secret');
     const found = secrets.filter((e) => isEntryUnlocked(site, e, this.store)).length;
-    b.append(
-      el(
-        'p',
-        'jr-progress',
-        `${p.logged} of ${p.total} entries logged · ${p.species} of ${p.speciesTotal} species identified` +
-          (wl.total ? ` · ${wl.scanned} of ${wl.total} animals scanned` : '') +
-          (secrets.length ? ` · Secrets found ${found}/${secrets.length}` : ''),
-      ),
-    );
-    if (!unlocked && !this.spoilers_) {
+    const chips = [`${p.logged}/${p.total} entries`];
+    if (p.speciesTotal) chips.push(`${p.species}/${p.speciesTotal} species`);
+    if (wl.total) chips.push(`${wl.scanned}/${wl.total} animals`);
+    if (secrets.length) chips.push(`${found}/${secrets.length} secrets`);
+    b.append(this.chips(chips, 'jr-progress'));
+
+    if (!open) {
       b.append(el('p', 'jr-locked', 'Scan a target here to open this page, or show spoilers.'));
-      return;
+    } else {
+      this.body.append(this.entryRows(site));
     }
-    if (site.summary) b.append(el('p', 'jr-para', site.summary));
-    if (site.facts.length) {
-      const ul = el('ul', 'jr-facts-list');
-      for (const f of site.facts) ul.append(el('li', undefined, f));
-      b.append(ul);
-    }
-    const firstPoi = site.entries.find((e) => e.kind === 'poi');
-    if (firstPoi) {
-      const go = el('button', 'jr-next', 'Read the entries →');
-      go.type = 'button';
-      go.addEventListener('click', () => {
-        const first =
-          site.entries.find((e) => isGuideEntry(e) && isEntryUnlocked(site, e, this.store)) ??
-          firstPoi;
-        this.show(first.key);
+    this.body.append(foot);
+    this.renderAbout(site, open, summary ?? '', foot);
+    const credit = dataCreditFor(this.tileSources.get(site.id));
+    if (credit) {
+      const line = el('p', 'jr-credit', `${credit.label}: `);
+      credit.links.forEach(([text, href], i) => {
+        if (i) line.append(' · ');
+        line.append(link(href, text));
       });
-      b.append(go);
+      foot.append(line);
     }
-    this.renderSources(site.links);
+  }
+
+  /** The site page's entries as large rows, grouped under quiet headings. */
+  private entryRows(site: JournalSite): HTMLElement {
+    const box = el('div', 'jr-entries');
+    for (const [label, kind] of GROUPS) {
+      const list = site.entries.filter((e) => e.kind === kind);
+      if (!list.length) continue;
+      const { rows, unscanned, hidden } = this.groupRows(site, label, list);
+      const logged = list.filter((e) => isEntryUnlocked(site, e, this.store)).length;
+      const section = el('section', 'jr-entry-group');
+      const head = el('h3', 'jr-group-title');
+      head.setAttribute('aria-label', `${label}, ${logged} of ${list.length} logged`);
+      const text = el('span', undefined, label);
+      text.setAttribute('aria-hidden', 'true');
+      const badge = el('span', 'jr-badge', `${logged}/${list.length}`);
+      badge.setAttribute('aria-hidden', 'true');
+      head.append(text, badge);
+      section.append(head);
+      if (rows.length) {
+        const ul = el('ul', 'jr-rows');
+        for (const { entry, open, title } of rows) {
+          const li = el('li');
+          const b = el('button', `jr-row is-${entry.kind}`);
+          b.type = 'button';
+          b.dataset.row = entry.key;
+          b.classList.toggle('is-locked', !open);
+          b.append(el('span', 'jr-row-title', title), this.glyph('›'));
+          b.addEventListener('click', () => this.show(entry.key));
+          li.append(b);
+          ul.append(li);
+        }
+        section.append(ul);
+      }
+      // Locked names stay hidden: a count, plus how to find the first one.
+      const more = unscanned + hidden;
+      if (more) {
+        const how = HOW_TO_FIND[kind];
+        section.append(
+          el(
+            'p',
+            'jr-row-note',
+            rows.length || !how ? `${more} more to find` : `${more} more to find. ${how}`,
+          ),
+        );
+      }
+      box.append(section);
+    }
+    return box;
+  }
+
+  /** Facts, hazards and references: one collapsed disclosure, nothing said twice. */
+  private renderAbout(
+    site: JournalSite,
+    catalogue: boolean,
+    shown: string,
+    into: HTMLElement,
+  ): void {
+    const { overview, facts, hazards } = aboutLists(site, catalogue, shown);
+    const links = catalogue ? site.links : [];
+    if (!overview && !facts.length && !hazards.length && !links.length) return;
+    const more = el('details', 'jr-site-more');
+    const summary = el('summary', undefined, 'About this site');
+    summary.setAttribute('aria-expanded', 'false');
+    more.addEventListener('toggle', () => summary.setAttribute('aria-expanded', String(more.open)));
+    more.append(summary);
+    if (overview) more.append(el('p', 'jr-para', overview));
+    for (const [title, items] of [
+      ['FACTS', facts],
+      ['HAZARDS', hazards],
+    ] as const) {
+      if (!items.length) continue;
+      more.append(el('h3', 'jr-sources-title', title));
+      const list = el('ul', 'jr-facts-list');
+      for (const item of items) list.append(el('li', undefined, item));
+      more.append(list);
+    }
+    this.renderSources(
+      links.map((l) => ({ ...l, title: linkLabel(l) })),
+      more,
+    );
+    into.append(more);
   }
 
   private renderEntry(site: JournalSite, entry: JournalEntry): void {
@@ -847,9 +1050,12 @@ export class Journal {
     this.renderSources(sources);
   }
 
-  private renderSources(list: ReadonlyArray<{ title: string; url?: string }>): void {
+  private renderSources(
+    list: ReadonlyArray<{ title: string; url?: string }>,
+    into: HTMLElement = this.body,
+  ): void {
     if (!list.length) return;
-    this.body.append(el('h3', 'jr-sources-title', 'SOURCES'));
+    into.append(el('h3', 'jr-sources-title', 'SOURCES'));
     const ol = el('ol', 'jr-sources');
     for (const s of list) {
       const li = el('li');
@@ -857,7 +1063,7 @@ export class Journal {
       else li.textContent = s.title;
       ol.append(li);
     }
-    this.body.append(ol);
+    into.append(ol);
   }
 
   dispose(): void {

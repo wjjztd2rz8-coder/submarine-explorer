@@ -102,12 +102,17 @@ for (const mission of [titanic, blueHole]) {
     const journal = page.locator('.journal');
     await expect(journal.locator(`.jr-site-card[data-target="${mission.landmark}"]`)).toBeVisible();
     await journal.locator(`.jr-site-card[data-target="${mission.landmark}"]`).click();
+    // Before the first scan the page shows the mission overview as its summary.
+    await expect(journal.locator('.jr-site-top .jr-para')).toHaveText(mission.briefing.summary);
     const more = journal.locator('.jr-site-more');
+    await expect(more.locator('summary')).toHaveText('About this site');
     await more.locator('summary').click();
-    await expect(more.locator('.jr-para')).toHaveText(mission.briefing.summary);
-    await expect(more.locator('.jr-facts-list li')).toHaveText([
-      ...mission.briefing.facts,
-      ...mission.briefing.hazards,
-    ]);
+    // Facts and hazards sit once in the disclosure: nothing twice, no hull-rating line.
+    const items = await more.locator('.jr-facts-list li').allTextContents();
+    const source = [...mission.briefing.facts, ...mission.briefing.hazards];
+    expect(items.length).toBeGreaterThan(0);
+    for (const item of items) expect(source.some((line) => line.includes(item))).toBe(true);
+    expect(new Set(items).size).toBe(items.length);
+    expect(items.join(' ')).not.toMatch(/hull (is|can)\b|rated depth|hull warning/i);
   });
 }
