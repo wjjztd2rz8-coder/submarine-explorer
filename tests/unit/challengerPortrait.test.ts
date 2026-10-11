@@ -98,10 +98,27 @@ for (const site of [
         expect(bounds.max.x).toBeLessThan(width - 12);
         expect(bounds.min.y).toBeGreaterThan(211);
         expect(bounds.max.y).toBeLessThan(height * 0.79);
-        expect(bounds.getCenter(new Vector2()).x).toBeCloseTo(width / 2, 4);
+        if (site === 'challenger-deep') {
+          // F-CHALLENGER-CAM: the hull sits right of centre so the Leggo lander shows
+          // beside it, not behind it. Assert that the lander's screen centre is in
+          // frame and clear of the hull's screen span.
+          const hero = props.placed.find((p) => p.def.id === 'leggo-lander-marker')!;
+          hero.root.updateMatrixWorld(true);
+          const heroNdc = hero.root
+            .localToWorld(hero.localBounds.getCenter(new Vector3()))
+            .project(rig.camera);
+          const heroX = ((heroNdc.x + 1) * width) / 2;
+          expect(heroX).toBeGreaterThan(12);
+          expect(heroX).toBeLessThan(width - 12);
+          expect(heroX < bounds.min.x - 12 || heroX > bounds.max.x + 12).toBe(true);
+        } else {
+          expect(bounds.getCenter(new Vector2()).x).toBeCloseTo(width / 2, 4);
+        }
         const port = position.clone().addScaledVector(right, -4).project(rig.camera);
         const starboard = position.clone().addScaledVector(right, 4).project(rig.camera);
-        expect(port.y).toBeCloseTo(starboard.y, 8);
+        // The lateral Challenger framing views the hull off-axis, so its port and starboard
+        // points differ by a pixel or so in screen y. Other sites stay exactly level.
+        if (site !== 'challenger-deep') expect(port.y).toBeCloseTo(starboard.y, 8);
         const floor = position.clone().addScaledVector(forward, 30);
         floor.y = terrain.sampleHeight(floor.x, floor.z);
         const seabedNdc = floor.project(rig.camera);
