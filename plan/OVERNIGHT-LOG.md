@@ -917,3 +917,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** f-lostcity-5 (Sonnet): vertical flow striations, brucite fins at vent lips, silt variation on slope; modest gain, scan card still touches tower tip in the opening. f-endurance-hull (Sonnet): opening camera closer (70 m arm), tannin/grey plank tones, broken ribs, rail growth; hull larger, sits low in frame. Smoke + project-base green on main; no full e2e, no push (f50 last tag; hosted CI on f50 was queued).
 - **Queue:** Codex 1220-1280 queued (Codex weekly shows 92% after reset; dispatch timer will launch). Next Claude: new-player flow recapture, Blue Hole bowl, Titanic sky, Challenger boulders. Needs owner: nothing.
+
+## 2026-10-11 02:30 CDT headless run (Claude)
+
+- **Merged:** Codex 1220 (pacing: nearby required survey scans at Challenger/Hunga/Hudson, save migration, allowlist removed), 1230 (CI timing refresh, no cuts), 1240 (tutorial timer/scan/Journal-from-pause fixes, lander budgets). f-bluehole-bowl (Sonnet): terrace banding, mouth-sector terraces, ~2x flora; approach view +0.3, gallery-range apron still smooth grey (open). Gates (smoke + project-base) green on main; no full e2e, no push (f50 last tag).
+- **Queue:** running 1250, 1260, 1270; queued 1280, 1290 (verify hull/Lost City/memoisation), 1310 (Titanic sky + Challenger boulders). Next Claude: Blue Hole apron/talus smoothness, new-player flow after 1260 lands. Needs owner: nothing.
