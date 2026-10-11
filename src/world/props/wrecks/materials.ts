@@ -164,6 +164,11 @@ export interface PaintOptions {
   mudBand: number;
   /** Wood keeps its grain colour; no rust streaking. */
   wood?: boolean;
+  /**
+   * Strake-by-strake plank colour on top of `wood`: tannin-stained brown to
+   * bleached grey, with long patches along the hull (mean brightness kept).
+   */
+  plankTone?: boolean;
   /** Extra per-vertex brightness multiplier (the dark torn interior, say). */
   shadeAt?: (x: number, y: number, z: number) => number;
 }
@@ -177,6 +182,9 @@ const RUST_ORANGE = new THREE.Color(WRECK_COLORS.rustOrange);
 const GROWTH = new THREE.Color(WRECK_COLORS.growth);
 const SILT = new THREE.Color(WRECK_COLORS.silt);
 const MUD = new THREE.Color(WRECK_COLORS.mud);
+/** Plank tone multipliers: tannin-stained oak, and silvery weathered grey. */
+const TANNIN = new THREE.Color(0.7, 0.54, 0.4);
+const GREY = new THREE.Color(1.08, 1.12, 1.15);
 
 /**
  * Weather the base colours of a merged wreck geometry in place (its `color`
@@ -198,6 +206,13 @@ export function paintWreck(geom: THREE.BufferGeometry, o: PaintOptions): void {
     const streak = valueNoise3(x * 1.3 + 3.1, y * 0.06, z * 1.3, o.seed ^ 0x77);
     if (o.wood) {
       _c.copy(_base).multiplyScalar(0.75 + 0.45 * mid);
+      if (o.plankTone) {
+        // Each strake (0.45 m of height) has its own tone; slow patches run along the hull.
+        const strake = valueNoise3(Math.floor(y / 0.45) * 7.13 + 0.5, 1.5, 2.5, o.seed ^ 0x3c);
+        const patch = valueNoise3(x * 0.1, y * 0.05, z * 0.16, o.seed ^ 0x6d);
+        _r.copy(TANNIN).lerp(GREY, S(0.55 * strake + 0.45 * patch, 0.3, 0.7));
+        _c.multiply(_r);
+      }
     } else {
       const rustMix = THREE.MathUtils.clamp(
         o.rustiness + (big - 0.5) * 0.9 + (streak - 0.5) * 0.5,

@@ -317,6 +317,32 @@ export function buildEndurance(
     const y = deck(s * k) + (hh - 0.5) * hk;
     wood.add(beam(v3(-2.6, y, zOf(s * k)), v3(2.6, y - 0.15, zOf(s * k)), 0.1, 0.07, 6), oak);
   }
+  // Broken ribs: the bulwark planking is gone along the starboard waist and the poop,
+  // leaving bare frames of uneven height standing above the rail, leaning in.
+  const ribRnd = mulberry32(seed ^ 0x51b5);
+  for (const [side, from, to, n] of [
+    [1, 26.5, 33.5, 9],
+    [-1, 31.5, 34.5, 4],
+  ] as const) {
+    for (let i = 0; i < n; i++) {
+      const s = (from + ((to - from) * i) / (n - 1) + (ribRnd() - 0.5) * 0.3) * k;
+      const p = loftPoint(spec, s, top(s), side, new THREE.Vector3());
+      const h = 0.5 + ribRnd() * ribRnd() * 2.4 + (i % 3 === 0 ? 0.5 : 0);
+      const lean = -side * h * (0.12 + ribRnd() * 0.18);
+      const base = v3(p.x - side * 0.1, top(s) - 1.1, p.z);
+      const mid = base.clone().add(v3(lean * 0.3, h * 0.55 + 1.1, 0));
+      const tip = base.clone().add(v3(lean, h + 1.1, (ribRnd() - 0.5) * 0.15));
+      const rib = new PartBin();
+      rib.add(beam(base, mid, 0.09, 0.075, 5), 0x2e241a);
+      rib.add(
+        jitter(beam(mid, tip, 0.075, 0.045, 5), 0.03, 4, seed ^ i, (_x, y) =>
+          y > tip.y - 0.25 ? 1 : 0,
+        ),
+        0x2e241a,
+      );
+      wood.add(rib.merge()!, 0x2e241a);
+    }
+  }
   // Sediment skirt: mud banked against both flanks, thickest at the bow and stern.
   for (let i = 0; i < 30; i++) {
     const s = 3 + (i / 29) * (L - 6);
@@ -359,7 +385,15 @@ export function buildEndurance(
 
   // ---- merge + paint
   const woodGeom = wood.merge()!;
-  paintWreck(woodGeom, { seed, rustiness: 0, growth: 0.15, silt: 0.8, mudBand: 1.2, wood: true });
+  paintWreck(woodGeom, {
+    seed,
+    rustiness: 0,
+    growth: 0.15,
+    silt: 0.8,
+    mudBand: 1.2,
+    wood: true,
+    plankTone: true,
+  });
   projectUVs(woodGeom, 5, true);
   const fitGeom = fit.merge()!;
   paintWreck(fitGeom, { seed: seed ^ 3, rustiness: 0.6, growth: 0.15, silt: 0.6, mudBand: 0 });
@@ -410,6 +444,23 @@ export function buildEndurance(
         v3(0, 1, 0),
         0.08 + rnd() * 0.1,
       );
+    }
+  }
+  // Rail growth: sparse clusters of anemones and pale sponges along the rail caps.
+  const clusters = Math.round(14 * detail.growth);
+  for (let c = 0; c < clusters; c++) {
+    const side = (rnd() < 0.5 ? -1 : 1) as -1 | 1;
+    const s0 = 1 + rnd() * (L - 2);
+    for (let j = 0; j < 7; j++) {
+      const s = THREE.MathUtils.clamp(s0 + (rnd() - 0.5) * 1.6, 0.5, L - 0.5);
+      const p = loftPoint(spec, s, top(s), side, new THREE.Vector3());
+      p.x -= side * (0.09 + (rnd() - 0.5) * 0.08);
+      p.y += 0.15;
+      if (j % 3 === 2) {
+        const q = new THREE.Quaternion().setFromAxisAngle(v3(0, 1, 0), rnd() * 6.28);
+        const sz = 0.16 + rnd() * 0.12;
+        squirt.push(new THREE.Matrix4().compose(p, q, v3(sz * 1.3, sz, sz * 1.3)), 0xd9cfa6);
+      } else place(anem, p, v3(0, 1, 0), 0.12 + rnd() * 0.14);
     }
   }
   const am = makeInstanced(anemoneGeometry(), growthMaterial(), anem, 'endurance-anemones');
