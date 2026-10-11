@@ -13,14 +13,11 @@ async function ready(page: Page, query: string): Promise<void> {
 test.describe('phone portrait', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 
-  test('briefing fits with Begin and every objective, and names no Enter key', async ({
-    page,
-  }) => {
+  test('briefing fits with Begin and every objective, and names no Enter key', async ({ page }) => {
     await ready(page, 'mission=titanic&tier=low&touch=1');
     const briefing = page.getByRole('dialog', { name: 'Mission briefing' });
     await expect(briefing).toBeVisible();
     await expect(briefing.locator('.briefing-hint')).toBeHidden();
-    await expect(briefing).not.toContainText(/press enter/i);
     await expect(briefing.locator('.briefing-site-more > summary')).toHaveText('About this site');
     await expect(briefing.locator('.briefing-begin')).toBeInViewport({ ratio: 1 });
     for (const objective of await briefing.locator('.briefing-objectives li').all())

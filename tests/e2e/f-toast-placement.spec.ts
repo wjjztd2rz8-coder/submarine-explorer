@@ -168,8 +168,8 @@ for (const layout of [
         }
         await expect(hint).toContainText(
           layout.touch
-            ? 'Animal nearby. Hold SCAN to scan, or press PHOTO for a photo.'
-            : 'Animal nearby. Hold G to scan, or press P for a photo.',
+            ? 'Animal nearby. Hold SCAN to scan, or use PHOTO for a photo.'
+            : 'Animal nearby. Hold G to scan, or use P for a photo.',
         );
         await finishAnimations(page, '.onboard-hint');
         // The clock was paused before navigation; screenshots and geometry

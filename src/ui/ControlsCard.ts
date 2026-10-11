@@ -243,7 +243,9 @@ export class ControlsCard {
     this.root.hidden = false;
     document.exitPointerLock?.();
     this.trap.activate();
-    this.root.querySelector<HTMLButtonElement>('.controls-card-close')?.focus();
+    this.root
+      .querySelector<HTMLButtonElement>('.controls-card-close')
+      ?.focus({ preventScroll: true });
   }
 
   close(): void {

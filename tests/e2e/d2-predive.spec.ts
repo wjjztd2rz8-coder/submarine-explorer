@@ -63,7 +63,7 @@ test('home screen shows the game mode and changes it', async ({ page }) => {
 
   await mode.getByRole('radio', { name: 'Realistic' }).click();
   await expect(mode.getByRole('radio', { name: 'Realistic' })).toBeChecked();
-  await expect(mode.locator('.mode-desc')).toContainText('battery and oxygen');
+  await expect(mode.locator('.mode-desc')).toContainText('Battery, oxygen');
   expect((await saved(page)).gameplayMode).toBe('realistic');
   expect((await saved(page)).gameplay.speedProfile).toBe('research');
 
