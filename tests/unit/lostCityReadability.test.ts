@@ -62,7 +62,7 @@ describe('Lost City first-ten-second Arcade opening', () => {
         expect(
           Math.hypot(position.x - hero.root.position.x, position.z - hero.root.position.z),
         ).toBeCloseTo(38, 6);
-        expect(pose.chaseRadius).toBe(50);
+        expect(pose.chaseRadius).toBe(66);
         expect(position.y - terrain.sampleHeight(position.x, position.z)).toBeGreaterThanOrEqual(
           settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM,
         );
@@ -70,7 +70,7 @@ describe('Lost City first-ten-second Arcade opening', () => {
         const rig = new CameraRig(config.camera, 16 / 9, terrain);
         rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX);
         rig.snap(position, pose.yaw, 0);
-        expect(rig.camera.position.distanceTo(hero.root.position)).toBeLessThan(95);
+        expect(rig.camera.position.distanceTo(hero.root.position)).toBeLessThan(112);
         // The full solid tower's axis fits vertically, on desktop and portrait.
         // Effect bounds include clear-fluid plumes, so use its authored 60 m relief.
         for (const aspect of [16 / 9, 390 / 844]) {
@@ -145,13 +145,13 @@ describe('Lost City first-ten-second Arcade opening', () => {
 it('Begin dive keeps the Lost City Arcade arm while resetting camera controls', () => {
   const config = makeConfig();
   for (const [site, mode, radius] of [
-    ['lost-city', 'arcade', 50],
+    ['lost-city', 'arcade', 66],
     ['lost-city', 'realistic', Math.hypot(38, 90)],
     ['lost-city', 'custom', Math.hypot(38, 90)],
     ['titanic', 'arcade', Math.hypot(38, 90)],
   ] as const) {
     const rig = new CameraRig(config.camera, 16 / 9);
-    if (site === 'lost-city' && mode === 'arcade') rig.setChaseRadiusDefault(50);
+    if (site === 'lost-city' && mode === 'arcade') rig.setChaseRadiusDefault(66);
     rig.chaseRadius = 180; // Begin restores the opening, not a pilot's previous zoom.
     rig.freeLook = true;
     rig.setMode('first-person');

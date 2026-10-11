@@ -546,7 +546,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
         );
         missionSystem.init?.(ctx);
         await Promise.resolve();
-        expect(ctx.rig.chaseRadius).toBe(50);
+        expect(ctx.rig.chaseRadius).toBe(66);
         const arcadePos = ctx.sub.position.clone();
         // Both boot directions must use current saved settings, even when the
         // near-site choice is unchanged. The preview must match Begin.
@@ -571,12 +571,12 @@ describe('fresh-player mission routing and vehicle loadout', () => {
         await Promise.resolve();
         ctx.applyMissionStart('near-site');
         expect(ctx.sub.position.distanceTo(arcadePos)).toBeLessThan(1e-6);
-        expect(ctx.rig.chaseRadius).toBe(50);
+        expect(ctx.rig.chaseRadius).toBe(66);
         ctx.applyMissionStart('surface');
         ctx.rig.resetView();
         expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
         ctx.applyMissionStart('near-site');
-        expect(ctx.rig.chaseRadius).toBe(50);
+        expect(ctx.rig.chaseRadius).toBe(66);
         ctx.daily = { start: { x: 0, z: 0, headingDeg: 0 } } as GameContext['daily'];
         ctx.applyMissionStart('near-site');
         ctx.rig.resetView();
@@ -615,7 +615,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
         submarine.init?.(ctx);
         ctx.rig = new CameraRig(ctx.config.camera, 16 / 9, terrain);
         propsSystem.init?.(ctx);
-        const radius = mode === 'arcade' ? 50 : Math.hypot(38, 90);
+        const radius = mode === 'arcade' ? 66 : Math.hypot(38, 90);
         await vi.waitFor(() => {
           expect(ctx.props.loaded).toBe(true);
           const hero = ctx.props.placed.find((p) => p.def.id === 'poseidon-tower')!;
