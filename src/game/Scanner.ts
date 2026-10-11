@@ -278,8 +278,10 @@ export class Scanner {
       if (
         g.inRange &&
         g.facing &&
-        (g.distance < candidateDist ||
-          (t.id === this.objectivePoiId && candidate?.id !== this.objectivePoiId))
+        (candidate === null ||
+        (t.id === this.objectivePoiId) !== (candidate.id === this.objectivePoiId)
+          ? t.id === this.objectivePoiId || candidate === null
+          : g.distance < candidateDist)
       ) {
         candidate = t;
         candidateDist = g.distance;
