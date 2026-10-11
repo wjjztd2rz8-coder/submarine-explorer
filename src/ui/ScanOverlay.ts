@@ -131,6 +131,7 @@ export class ScanOverlay {
     if (suppressed) {
       this.panel.hidden = true;
       this.reticle.hidden = true;
+      this.chip.hidden = true;
     }
   }
 
@@ -141,6 +142,9 @@ export class ScanOverlay {
     keys: ScanOverlayKeys,
     kind: 'scan' | 'sample' = 'scan',
   ): void {
+    // Completion events can arrive between overlay updates. Replace the
+    // navigation cue immediately instead of leaving both messages visible.
+    this.chip.hidden = true;
     this.bannerLeft = this.config.completeBannerSeconds;
     this.setTone(firstTime || kind === 'sample' ? 'cyan' : 'dim');
     this.setText(this.kicker, 'kicker', firstTime ? 'NEW ENTRY' : 'SCAN COMPLETE');
