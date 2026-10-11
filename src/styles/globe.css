@@ -26,7 +26,6 @@
 }
 
 .globe-canvas,
-.globe-leaders,
 .globe-pins {
   position: absolute;
   inset: 0;
@@ -38,46 +37,51 @@
   display: block;
 }
 
-.globe-leaders {
-  pointer-events: none;
-}
-
-.globe-leaders line {
-  stroke: var(--b1-cyan);
-  stroke-width: 1;
-  opacity: 0;
+/* --globe-hit is the pin hit-area side; Globe.ts sets it from Config.globe
+   (pinHitPx / pinHitTouchPx) and uses the same number for clustering. */
+.globe {
+  --globe-hit: 32px;
 }
 
 .globe-pins {
   pointer-events: none;
 }
 
-.globe-pin {
+/* A pin is a transparent padded button (the hit area) around a small dot. The
+   transform that places it on its projected location is set in Globe.ts. */
+.globe-pin,
+.globe-cluster {
   position: absolute;
   left: 0;
   top: 0;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
+  width: var(--globe-hit);
+  height: var(--globe-hit);
+  min-width: var(--globe-hit);
+  min-height: var(--globe-hit);
   padding: 0;
   border: 0;
   background: transparent;
+  color: inherit;
+  font: inherit;
   cursor: pointer;
   pointer-events: auto;
   display: grid;
   place-items: center;
+  z-index: 2;
   will-change: transform;
 }
 
-.globe-pin.is-back {
+.globe-pin.is-back,
+.globe-pin.is-clustered {
   pointer-events: none;
 }
 
 .globe-pin-dot {
   display: block;
-  width: 9px;
-  height: 9px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
+  box-sizing: border-box;
   transition:
     transform 0.12s,
     box-shadow 0.12s;
@@ -86,43 +90,246 @@
 .globe-pin.is-mission .globe-pin-dot,
 .globe-legend-item.is-mission .globe-legend-dot {
   background: var(--b1-cyan);
-  box-shadow: 0 0 0 1px rgba(1, 5, 9, 0.9);
+  box-shadow: 0 0 0 1.5px rgba(1, 5, 9, 0.9);
 }
 
 .globe-pin.is-tile .globe-pin-dot,
 .globe-legend-item.is-tile .globe-legend-dot {
-  background: rgba(1, 5, 9, 0.6);
-  border: 1.5px solid var(--b1-cyan);
+  background: rgba(1, 5, 9, 0.7);
+  border: 2px solid var(--b1-cyan);
+}
+
+/* Card-only sites: faint specks under the playable pins. Not pointer targets;
+   keyboard focus still reaches them and shows their card. */
+.globe-pin.is-catalogue {
+  width: 14px;
+  height: 14px;
+  min-width: 0;
+  min-height: 0;
+  pointer-events: none;
+  cursor: default;
+  z-index: 1;
 }
 
 .globe-pin.is-catalogue .globe-pin-dot,
 .globe-legend-item.is-catalogue .globe-legend-dot {
+  width: 4px;
+  height: 4px;
+  background: rgba(205, 224, 229, 0.38);
+}
+
+.globe-pin.is-catalogue.is-active .globe-pin-dot {
+  width: 8px;
+  height: 8px;
+  background: rgba(205, 224, 229, 0.9);
+}
+
+.globe-legend-item.is-catalogue .globe-legend-dot {
   width: 5px;
   height: 5px;
-  background: rgba(205, 224, 229, 0.45);
 }
 
 .globe-pin.is-current .globe-pin-dot {
   box-shadow:
-    0 0 0 1px rgba(1, 5, 9, 0.9),
-    0 0 0 4px rgba(46, 217, 217, 0.35);
+    0 0 0 1.5px rgba(1, 5, 9, 0.9),
+    0 0 0 5px rgba(46, 217, 217, 0.35);
 }
 
-.globe-pin:hover .globe-pin-dot,
+.globe-pin.is-mission:hover .globe-pin-dot,
+.globe-pin.is-tile:hover .globe-pin-dot,
 .globe-pin.is-active .globe-pin-dot {
-  transform: scale(1.5);
+  transform: scale(1.4);
 }
 
-.globe-pin:focus {
+.globe-pin.is-active {
+  z-index: 4;
+}
+
+.globe-pin:focus,
+.globe-cluster:focus {
   outline: none;
 }
 
-.globe-pin:focus-visible::after {
-  content: '';
+.globe-pin:focus-visible .globe-pin-dot {
+  outline: 2px solid var(--b1-cyan);
+  outline-offset: 3px;
+}
+
+/* Name beside the focused or selected pin; flips inward near the right edge. */
+.globe-pin-label {
+  display: none;
   position: absolute;
-  inset: 0;
-  border: 1px solid var(--b1-cyan);
+  left: calc(50% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 170px;
+  padding: 2px 7px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: var(--b1-text);
+  background: rgba(1, 5, 9, 0.85);
+  border: 1px solid var(--b1-hair);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.globe-pin.is-active .globe-pin-label {
+  display: block;
+}
+
+.globe-pin.is-flip .globe-pin-label {
+  left: auto;
+  right: calc(50% + 12px);
+}
+
+/* Several playable sites under one finger: a counted pin at their centre. */
+.globe-cluster {
+  z-index: 3;
+}
+
+.globe-cluster[hidden] {
+  display: none;
+}
+
+.globe-cluster-count {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  padding: 0 5px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #02121a;
+  background: var(--b1-cyan);
+  box-shadow:
+    0 0 0 2px rgba(1, 5, 9, 0.9),
+    0 0 0 3.5px rgba(46, 217, 217, 0.45);
+  transition: transform 0.12s;
+}
+
+.globe-cluster:hover .globe-cluster-count,
+.globe-cluster:focus-visible .globe-cluster-count {
+  transform: scale(1.12);
+}
+
+/* Members still overlapping at full zoom: pick one. */
+.globe-chooser {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 190px;
+  max-width: min(280px, 86vw);
+  margin: 22px 0 0 -16px;
+  padding: 4px;
+  background: var(--b1-panel-solid);
+  border: 1px solid var(--b1-hair);
+  border-radius: 4px;
+  cursor: default;
+}
+
+.globe-chooser[hidden] {
+  display: none;
+}
+
+.globe-chooser-item {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr);
+  grid-template-areas:
+    'dot name'
+    'dot badge';
+  align-items: center;
+  column-gap: 10px;
+  min-height: var(--globe-hit);
+  padding: 4px 10px;
+  text-align: left;
+  font: inherit;
+  color: var(--b1-text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.globe-chooser-item:hover,
+.globe-chooser-item:focus-visible {
+  border-color: var(--b1-cyan);
+  outline: none;
+}
+
+.globe-chooser-dot {
+  grid-area: dot;
+  width: 12px;
+  height: 12px;
+  box-sizing: border-box;
   border-radius: 50%;
+}
+
+.globe-chooser-item.is-mission .globe-chooser-dot {
+  background: var(--b1-cyan);
+}
+
+.globe-chooser-item.is-tile .globe-chooser-dot {
+  border: 2px solid var(--b1-cyan);
+}
+
+.globe-chooser-name {
+  grid-area: name;
+  font-size: 13px;
+}
+
+.globe-chooser-badge {
+  grid-area: badge;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+}
+
+/* + / - zoom, for touch and mouse alike. */
+.globe-zoom {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.globe:not(.is-embedded) .globe-zoom {
+  top: auto;
+  bottom: 44px;
+  right: 16px;
+}
+
+.globe-zoom-btn {
+  width: var(--globe-hit);
+  height: var(--globe-hit);
+  padding: 0;
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--b1-text);
+  cursor: pointer;
+  background: var(--b1-panel);
+  border: 1px solid var(--b1-hair-dim);
+  border-radius: 50%;
+}
+
+.globe-zoom-btn:hover,
+.globe-zoom-btn:focus-visible {
+  border-color: var(--b1-cyan);
+  outline: none;
 }
 
 .globe-header {
