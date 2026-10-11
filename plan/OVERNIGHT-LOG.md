@@ -940,3 +940,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** f-touch-stack (Sonnet): one-line objective chip on touch when no scan card, tutorial collapses to one row after first scan at landscape >900 px (phones unchanged). f-challenger-cam (Haiku): portrait opening offset shows the lander beside the hull (unit test for Challenger now checks lander clear of hull instead of hull centred; other sites unchanged); touch landscape briefing footer no longer covers objectives. Smoke + project-base green on main; no full e2e, no push (f51 last tag).
 - **Queue:** Codex 1280-1330 queued (Codex 5h 9% until 06:04 reset). Next Claude: DIRECTOR items 3, 4, 5, 7 (tutorial step text, Blue Hole apron, Lost City tower, Monterey boulders). Needs owner: nothing.
+
+## 2026-10-11 06:31 CDT headless run (Claude)
+
+- **Merged:** f-tutorial-order (Sonnet): the tutorial remembers a scan/lights/photo/Journal done early and skips that step on arrival; the current step still does not advance (1240 pins kept, one unit test added). f-lostcity-tower (Sonnet): ochre/blue-grey tower colour, stronger flutes, subtler brucite fins, opening framing keeps the tip clear of the scan card; modest gain, opening camera ~16 m farther back (pins updated deliberately). Smoke + project-base green on main; no full e2e, no push (f51 last tag).
+- **Queue:** Codex 1280-1330 queued (dispatch timer launches after the 06:04 reset). Next Claude: Blue Hole apron (DIRECTOR 4; check 1280 first), Monterey/Endurance small items (queued as 1320). Needs owner: nothing.
