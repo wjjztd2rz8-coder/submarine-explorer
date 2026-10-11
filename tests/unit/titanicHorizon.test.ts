@@ -1,5 +1,5 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
 import { ABYSS_HORIZON, makeConfig } from '../../src/core/Config.js';
@@ -11,6 +11,7 @@ import { WreckPreset } from '../../src/world/presets/WreckPreset.js';
 import { biomeFor } from '../../src/world/TerrainBiome.js';
 import { createTerrainMaterial } from '../../src/world/TerrainMaterial.js';
 import type { PresetEnterContext, PresetFrameContext } from '../../src/world/presets/types.js';
+import { CameraRig } from '../../src/sub/CameraRig.js';
 
 const config = makeConfig();
 const look = { ambient: 0.1, headlightGain: 1, headlightFalloffM: 60 };
@@ -319,4 +320,91 @@ describe('Titanic far-field horizon', () => {
     expect(frame.atmo.fogColor.equals(sampleAtmosphere(config.water, -600).fogColor)).toBe(true);
     preset.exit();
   });
+});
+
+it('1360: pitched desktop/phone sky preserves its fog ring and dim upper gradient', () => {
+  const samples: unknown[] = [];
+  for (const [width, height] of [
+    [1600, 900],
+    [844, 390],
+    [390, 844],
+  ]) {
+    for (const pitch of [-15, 0, 15, 45]) {
+      const { scene, camera, preset, frame } = setup(true, false);
+      try {
+        camera.aspect = width / height;
+        camera.fov = new CameraRig(config.camera, width / height).camera.fov;
+        camera.lookAt(
+          camera.position
+            .clone()
+            .add(
+              new THREE.Vector3(
+                0,
+                Math.sin((pitch * Math.PI) / 180),
+                -Math.cos((pitch * Math.PI) / 180),
+              ),
+            ),
+        );
+        camera.updateProjectionMatrix();
+        camera.updateMatrixWorld(true);
+        frame.atmo = sampleAtmosphere(config.water, camera.position.y);
+        preset.update(0, frame);
+        const dome = scene.getObjectByName('titanicHorizon') as TitanicHorizon['dome'];
+        dome.updateMatrixWorld(true);
+        const positions = dome.geometry.getAttribute('position');
+        const colors = dome.geometry.getAttribute('color');
+        const ray = new THREE.Raycaster();
+        const luminances: number[] = [];
+        for (const x of [-0.8, 0, 0.8])
+          for (const y of [0, 0.4, 0.8]) {
+            ray.setFromCamera(new THREE.Vector2(x, y), camera);
+            const hit = ray.intersectObject(dome)[0]!;
+            expect(hit).toBeDefined();
+            const face = hit.face!;
+            const local = dome.worldToLocal(hit.point.clone());
+            const weights = THREE.Triangle.getBarycoord(
+              local,
+              new THREE.Vector3().fromBufferAttribute(positions, face.a),
+              new THREE.Vector3().fromBufferAttribute(positions, face.b),
+              new THREE.Vector3().fromBufferAttribute(positions, face.c),
+              new THREE.Vector3(),
+            )!;
+            const color = new THREE.Color(0, 0, 0);
+            for (const [vertex, weight] of [
+              [face.a, weights.x],
+              [face.b, weights.y],
+              [face.c, weights.z],
+            ]) {
+              const c = new THREE.Color().fromBufferAttribute(colors, vertex);
+              color.r += c.r * weight;
+              color.g += c.g * weight;
+              color.b += c.b * weight;
+            }
+            luminances.push(0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b);
+          }
+        const minimum = Math.min(...luminances),
+          maximum = Math.max(...luminances);
+        expect(maximum).toBeLessThan(0.035);
+        if (pitch === -15 && width > height) {
+          // These upper-screen samples remain below the fog-matched ring.
+          // Record the flat pose; changing its art direction requires visual review.
+          expect(maximum - minimum).toBeLessThan(1e-8);
+        } else {
+          expect(maximum - minimum, `${width}x${height}, pitch ${pitch}`).toBeGreaterThan(0.0001);
+        }
+        samples.push({
+          viewport: [width, height],
+          pitch,
+          minimum,
+          maximum,
+          contrast: maximum - minimum,
+        });
+      } finally {
+        preset.exit();
+      }
+    }
+  }
+  const env = (globalThis as { process?: { env?: Record<string, string> } }).process?.env;
+  if (env?.VERIFY_1360 === '1')
+    writeFileSync('.cache/1360/sky.json', JSON.stringify(samples, null, 2) + '\n');
 });
