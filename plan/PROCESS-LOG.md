@@ -2,6 +2,9 @@
 
 Changes to how the work is done (tooling, scheduling, agent use), with the reason and the evidence. The owner delegated this on 2026-10-01; the only hard constraint is the usage floors.
 
+- **2026-10-11 — one plan (owner)**
+  - **Problem:** forward work came from several places that disagreed. DIRECTOR.md had 15 stacked "current/previous priorities" sections, RESUME-PROMPT picked packages from PHASE-F-PLAN §3 (waves already finished), there was a separate phone-feedback package table and a new simplification plan, and codex-refill read a 2026-10-06 note. The owner asked that the plan and all runs come from one source, to avoid disjointed development.
+  - **Change:** DIRECTOR.md now holds one ordered Backlog with stable item IDs and lanes, plus the simplicity rules every package must meet. History moved to `plan/archive/DIRECTOR-HISTORY-2026-10.md`, and the simplification review was archived as evidence. RESUME-PROMPT §2, REVIEW-PROMPT step 4, `tools/codex-refill.sh` and `tools/codex-review.sh` read only DIRECTOR.md. Briefs, branches, progress notes and commits name the item ID. PHASE-F-PLAN and PHONE-FEEDBACK carry "reference only" banners.
 - **2026-10-03 — F-CI-MAIN-RED**
   - Cached hosted logs identify a preset-tier test mismatch and a mission
     frame/ascent timing failure. Tests now choose the tier they exercise and

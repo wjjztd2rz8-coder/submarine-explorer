@@ -1,5 +1,7 @@
 # Phase F — "Make it wonderful" (2026-09-29)
 
+> **Reference only (2026-10-11).** The owner decisions (§1), pillars (§2) and package rules (§3 intro) still apply. The waves below are history. All forward work, including the 2026-10-11 simplification items, comes from the single Backlog in [DIRECTOR.md](DIRECTOR.md). §4's operating rules are superseded where they differ from `plan/RESUME-PROMPT.md` and the memory notes on budget.
+
 The owner approved the D3 checkpoint and asked for an ambitious phase:
 
 - a large increase in quality, interest and playability;

@@ -2,6 +2,26 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-11 18:45 simplification review (owner-requested; Claude + Sol round 1)
+
+- **What ran:**
+  - Claude: Sonnet for UI and gameplay from screenshots; Haiku for code structure, tests and tooling, world and render, systems and settings, audio, content and pipeline, plus a pass verifying 13 claims.
+  - Sol: an independent review. Round 2 hit the Codex limit and resumes after the reset.
+- **Evidence:** `plan/archive/SIMPLIFY-REVIEW-2026-10-11.md`; raw reports in `.cache/review/simplify-20261011/`.
+- **Finding:** most complexity came from the workflow, not the design. Package-local fixes piled up as HUD offsets (`hud-layout.css` is 1,077 lines), site branches (26), config mutation and package-named specs (92 e2e specs, 8.8 h serial).
+- **Bugs found:**
+  - the sonar ping can never fire;
+  - the N (globe) key is dead;
+  - gamepad gaps;
+  - the default graphics tier doesn't match its comment.
+- **Credits:**
+  - Claude: guidance-slot redundancy, the modal/key ordering, shared helpers and dead code, and the bugs.
+  - Sol: the effective-settings resolver (config mutation, ROV POI radii), unused Draco/KTX2, Home booting a dive tile, CI build-once, and dormant Journal/FieldGuide paths.
+  - Both: HUD regions, one site picker, Custom trim, test consolidation, Ultra merge.
+  - Disputed: upgrades (trim vs fixed equipment) and Daily Dive scope. Both are now owner decisions.
+- **Process change (owner):** `plan/DIRECTOR.md` is now the single source of forward work. It has one Backlog with item IDs and lanes, with the `S-*` simplification items woven into the 1.0 items (`R-`, `V-`, `P-`). It also gains a definition of done made of simplicity rules. Earlier priority lists moved to `plan/archive/DIRECTOR-HISTORY-2026-10.md`. RESUME-PROMPT, REVIEW-PROMPT, codex-refill and codex-review now read only DIRECTOR.md; PHASE-F-PLAN is reference only.
+- **Needs owner:** five decisions (upgrades, Daily Dive, ROV, Ultra tier, globe on phones). See DIRECTOR.md.
+
 ## 2026-10-11 13:15 comprehensive review, joint with Sol (round 1 only; golden 2026-10-11-171945 vs -100422)
 
 Sol's independent review ran; the round-2 reconcile died because Codex hit its usage limit (resets 16:45). Scores are my reconciliation on evidence: I viewed Titanic, Challenger, Blue Hole, Lost City, Monterey, Endurance and Beebe images and accepted Sol's calibration where an image backs it. Disputed: none firm; Sol never saw my draft.

@@ -1,5 +1,7 @@
 # Conventions for agents working in this repo
 
+**Where work comes from:** [`plan/DIRECTOR.md`](plan/DIRECTOR.md) is the single source of forward work: one Backlog with item IDs, plus the simplicity rules every package must meet (definition of done). Name the item ID you're working on in your branch, progress note and commits.
+
 This scaffold is meant to be built on by many agents, often concurrently. These
 rules exist so that parallel work merges cleanly.
 
