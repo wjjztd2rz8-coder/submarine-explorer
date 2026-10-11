@@ -968,3 +968,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Gates:** smoke + project-base on main only. A full e2e run was started but abandoned at ~115 of 640 tests after 25 min because three Codex tasks share the CPU; no push, f51 is still the last tag (several merges behind). A release needs a quiet window for the full run.
 - **Running:** Codex 1320, 1330, 1340. Queued 1350, 1360 (verify 1280/1310), 1370 (Journal/debrief bug hunt). 1320's worktree also touches camera.ts; check it for the same stale-base reverts before merging.
 - **Next:** collect 1320/1330/1340; release run when Codex is idle. Needs owner: nothing.
+
+## 2026-10-11 11:25 CDT headless run (Claude)
+
+- **Merged:** Codex 1340 (Save no longer overwrites settings after a failed storage read; captions disposed on teardown; migration uses own-property lookup; tests added). Smoke + project-base green on main; no full e2e, no push (f51 still last tag).
+- **Dropped:** 1330 (verify flow on touch) was blocked in the Codex sandbox (no browser), so no screenshots. One source finding worth a Sonnet fix: with two contacts in range the idle scan card can name the nearest off-axis contact while Scan targets the objective ahead (Scanner candidate vs nearest). Worktree removed.
+- **Not merged:** 1320 (Monterey/Endurance small) worktree still holds uncommitted edits to camera.ts/CameraRig.ts from a stale base (would revert Lost City camera work); needs a rebase or selective salvage. Codex 5h was 6% so nothing was launched; 1350-1370 queued. No Claude package started. Needs owner: nothing.
