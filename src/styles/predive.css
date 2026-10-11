@@ -503,3 +503,11 @@
     margin-block: -4px;
   }
 }
+
+/* F-CHALLENGER-CAM: short landscape phones. The sticky Dive settings/Begin footer
+   covered the objectives list; let the card scroll as one so the list reads in full. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .briefing .briefing-actions {
+    position: static;
+  }
+}
