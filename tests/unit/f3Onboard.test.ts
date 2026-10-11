@@ -169,6 +169,29 @@ describe('tutorial progression', () => {
     expect(t.index).toBe(0);
     expect(t.update({ dt: 0, throttle: 1, yaw: 1, ballast: 1 })).toBe(false);
   });
+  it('released input breaks a sustained thrust or turn hold', () => {
+    for (const axis of ['throttle', 'yaw'] as const) {
+      const t = new Tutorial();
+      for (let i = 0; i < 10; i++) {
+        hold(t, { [axis]: 1 }, 6); // 0.2 s is below either threshold.
+        hold(t, {}, 1);
+      }
+      expect(t.step?.id).toBe('move');
+      hold(t, { [axis]: 1 }, 30);
+      expect(t.step?.id).toBe('depth');
+    }
+  });
+  it('stick drift breaks the depth hold rather than banking short presses', () => {
+    const t = new Tutorial();
+    t.skipStep();
+    for (let i = 0; i < 10; i++) {
+      hold(t, { ballast: -1 }, 6);
+      hold(t, { ballast: -0.1 }, 1);
+    }
+    expect(t.step?.id).toBe('depth');
+    hold(t, { ballast: -1 }, 30);
+    expect(t.step?.id).toBe('lights');
+  });
   it('events only count for the step waiting for them', () => {
     const t = new Tutorial();
     expect(t.notify('scan')).toBe(false);

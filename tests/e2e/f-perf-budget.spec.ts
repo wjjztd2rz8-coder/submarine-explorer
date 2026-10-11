@@ -28,6 +28,8 @@ const sites = [
   { id: 'great-blue-hole', props: 2 },
   { id: 'beebe-vent-field', props: 3 },
   { id: 'monterey-canyon', props: 5 },
+  { id: 'challenger-deep', props: 2 },
+  { id: 'endurance', props: 3 },
 ];
 
 for (const site of sites) {

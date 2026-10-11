@@ -39,6 +39,7 @@ export function createOnboardSystem(): GameSystem {
   let wasGamepad = false;
   let wasTouch = false;
   let creatureHint = false;
+  let scanCompleted = false;
 
   const padLabel = (id: ActionId, fallback: string): string =>
     ctxRef?.input.actions.find((a) => a.id === id)?.pad ?? fallback;
@@ -101,6 +102,7 @@ export function createOnboardSystem(): GameSystem {
     },
     init(ctx) {
       ctxRef = ctx;
+      scanCompleted = false;
       const { input, bus, params } = ctx;
       store = new TutorialSave();
       const record = store.get();
@@ -167,11 +169,19 @@ export function createOnboardSystem(): GameSystem {
       );
 
       cleanup.add(bus.on('scan:started', () => tutorial.notify('scan') && onAdvance()));
-      cleanup.add(bus.on('scan:complete', () => tutorial.notify('scan') && onAdvance()));
+      cleanup.add(
+        bus.on('scan:complete', () => {
+          // A completed opening target cannot be scanned again this dive.
+          // Retain success while earlier steps are still on screen.
+          scanCompleted = true;
+          if (tutorial.notify('scan')) onAdvance();
+        }),
+      );
       cleanup.add(
         bus.on('mission:started', () => {
           diveS = 0;
           startDepth = null;
+          scanCompleted = false;
         }),
       );
 
@@ -223,10 +233,18 @@ export function createOnboardSystem(): GameSystem {
         const photos = ctx.photos.photos.length;
         if (tutorial.active && dive) {
           if (lights !== wasLights && tutorial.notify('lights')) onAdvance();
-          if (journal && !wasJournal && tutorial.notify('journal')) onAdvance();
           if ((photoMode && !wasPhotoMode) || photos > photoCount)
             if (tutorial.notify('photo')) onAdvance();
         }
+        // Touch opens the Journal through Pause, which retains the paused dive.
+        if (
+          tutorial.active &&
+          (dive || ctx.app.state === 'pause') &&
+          journal &&
+          !wasJournal &&
+          tutorial.notify('journal')
+        )
+          onAdvance();
         wasLights = lights;
         wasJournal = journal;
         wasPhotoMode = photoMode;
@@ -242,6 +260,7 @@ export function createOnboardSystem(): GameSystem {
             })
           )
             onAdvance();
+          if (scanCompleted && tutorial.notify('scan')) onAdvance();
         }
 
         const step = tutorial.step;

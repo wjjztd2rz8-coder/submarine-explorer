@@ -30,15 +30,15 @@ case "${GATES_CONFIG_MODE:-default}" in
   *) echo 'GATES_CONFIG_MODE must be default or writable.' >&2; exit 1 ;;
 esac
 port="${PW_PORT:-4173}"
-if ! [[ "$port" =~ ^[0-9]+$ ]] || (( 10#$port < 1 || 10#$port > 65435 )); then
-  echo 'PW_PORT must be an integer between 1 and 65435 (reserves port + 100 for e2e-base).' >&2
+if ! [[ "$port" =~ ^[0-9]+$ ]] || (( 10#$port < 1 || 10#$port > 65535 )); then
+  echo 'PW_PORT must be an integer between 1 and 65535.' >&2
   exit 1
 fi
-port=$((10#$port)); bport=$((port + 100))
+port=$((10#$port))
 # A gate run must build exactly what its preview will serve. Unique outputs
 # also prevent another gate process rebuilding/removing a live suite's files.
 outdir="${PW_OUTDIR:-dist-gates-$port-$$}"
-base_outdir="dist-gates-base-$bport-$$"
+base_outdir="dist-gates-base-$port-$$"
 gate_config=".cache/gates/vite-$port-$$.config.mjs"
 cleanup() {
   [[ -n "${PW_OUTDIR:-}" ]] || rm -rf -- "$outdir"
@@ -88,10 +88,13 @@ if [[ "$e2e_mode" != none ]]; then
   gate e2e env PW_PORT="$port" PW_OUTDIR="$outdir" PW_REUSE_SERVER=0 \
     npm run test:e2e -- "${e2e_specs[@]}" --output="test-results-gates-$port-$$"
   project_base() {
+    # The suites run sequentially and Playwright has stopped the first preview.
+    # Use the requested port again: port + 100 may belong to an unrelated task.
+    # This is a fresh owned preview of a separate build, with reuse still off.
     VITE_BASE=/submarine-explorer/ npm run build -- --outDir "$base_outdir" "${build_config_args[@]}" && \
-      VITE_BASE=/submarine-explorer/ PW_BASE=/submarine-explorer/ PW_PORT="$bport" \
+      VITE_BASE=/submarine-explorer/ PW_BASE=/submarine-explorer/ PW_PORT="$port" \
       PW_OUTDIR="$base_outdir" PW_REUSE_SERVER=0 \
-      npx playwright test tests/e2e/base-url.spec.ts --output="test-results-project-base-$bport-$$"
+      npx playwright test tests/e2e/base-url.spec.ts --output="test-results-project-base-$port-$$"
   }
   gate e2e-base project_base
 fi

@@ -67,13 +67,13 @@ export class Tutorial {
     const step = this.step;
     if (!step || !(s.dt > 0)) return false;
     if (step.id === 'move') {
-      if (Math.abs(s.throttle) >= AXIS_MIN) this.moveS += s.dt;
-      if (Math.abs(s.yaw) >= AXIS_MIN) this.turnS += s.dt;
+      this.moveS = Math.abs(s.throttle) >= AXIS_MIN ? this.moveS + s.dt : 0;
+      this.turnS = Math.abs(s.yaw) >= AXIS_MIN ? this.turnS + s.dt : 0;
       // Either a sustained push ahead/astern or a sustained turn counts, so a
       // player who only drives (or only turns) is not stuck on this step.
       if (this.moveS >= MOVE_HOLD_S || this.turnS >= TURN_HOLD_S) return this.advance();
     } else if (step.id === 'depth') {
-      if (Math.abs(s.ballast) >= AXIS_MIN) this.depthS += s.dt;
+      this.depthS = Math.abs(s.ballast) >= AXIS_MIN ? this.depthS + s.dt : 0;
       if (this.depthS >= DEPTH_HOLD_S) return this.advance();
     }
     return false;

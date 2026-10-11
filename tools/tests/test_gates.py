@@ -9,7 +9,8 @@ import unittest
 
 
 class TestGates(unittest.TestCase):
-    def run_gates(self, *, fail_e2e=False, custom_output=None, args=(), ci='', config_mode='default'):
+    def run_gates(self, *, fail_e2e=False, custom_output=None, args=(), ci='', config_mode='default',
+                  occupied_ports=(), port='4371'):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
@@ -34,6 +35,11 @@ if kind == "npm" and args[:2] == ["run", "test:e2e"]:
 if kind == "npx" and args[:2] == ["playwright", "test"]:
     assert os.getenv("PW_REUSE_SERVER") == "0"
     assert pathlib.Path(os.environ["PW_OUTDIR"]).is_dir()
+if (kind == "npm" and args[:2] == ["run", "test:e2e"] or
+        kind == "npx" and args[:2] == ["playwright", "test"]):
+    if os.getenv("PW_PORT") in json.loads(os.environ["OCCUPIED_PORTS"]):
+        print("Preview port is already used", file=sys.stderr)
+        sys.exit(1)
 ''')
         shim.chmod(0o755)
         source = (Path(__file__).parents[1] / 'gates.sh').read_text()
@@ -43,8 +49,9 @@ if kind == "npx" and args[:2] == ["playwright", "test"]:
             source = source.replace(command + ' ', shlex.quote(str(shim)) + ' ' + command + ' ')
         script = root / 'tools' / 'gates.sh'
         script.write_text(source)
-        env = dict(os.environ, PW_PORT='4371', PW_REUSE_SERVER='1', CI=ci,
+        env = dict(os.environ, PW_PORT=port, PW_REUSE_SERVER='1', CI=ci,
                    GATES_CONFIG_MODE=config_mode)
+        env['OCCUPIED_PORTS'] = json.dumps(list(occupied_ports))
         env.pop('PW_OUTDIR', None)
         env.pop('VITE_BASE', None)
         env['FAIL_E2E'] = '1' if fail_e2e else '0'
@@ -110,7 +117,7 @@ if kind == "npx" and args[:2] == ["playwright", "test"]:
             self.assertEqual(output, preview['outdir'])
             self.assertEqual(preview['reuse'], '0')
             self.assertFalse((root / output).exists())
-        self.assertEqual([p['port'] for p in previews], ['4371', '4471'])
+        self.assertEqual([p['port'] for p in previews], ['4371', '4371'])
         self.assertEqual(previews[1]['base'], '/submarine-explorer/')
 
     def test_e2e_failure_stays_failed_and_does_not_skip_the_base_gate(self):
@@ -121,6 +128,30 @@ if kind == "npx" and args[:2] == ["playwright", "test"]:
         self.assertEqual(len([c for c in calls if c['kind'] == 'npx'
                               and c['args'][:2] == ['playwright', 'test']]), 1)
         self.assertFalse(list(root.glob('dist-gates-*')))
+
+    def test_unrelated_preview_on_port_plus_100_cannot_block_project_base(self):
+        root, result, calls = self.run_gates(occupied_ports=('4471',))
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertIn('PASS e2e\n', result.stdout)
+        self.assertIn('PASS e2e-base\n', result.stdout)
+        previews = [c for c in calls if c['kind'] == 'npm'
+                    and c['args'][:2] == ['run', 'test:e2e']
+                    or c['kind'] == 'npx' and c['args'][:2] == ['playwright', 'test']]
+        self.assertEqual([p['port'] for p in previews], ['4371', '4371'])
+        self.assertEqual([p['reuse'] for p in previews], ['0', '0'])
+        self.assertNotEqual(previews[0]['outdir'], previews[1]['outdir'])
+        self.assertFalse(list(root.glob('dist-gates-*')))
+
+    def test_occupied_requested_port_stays_a_failure_for_both_owned_previews(self):
+        _, result, calls = self.run_gates(occupied_ports=('4371',))
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('FAIL e2e ', result.stdout)
+        self.assertIn('FAIL e2e-base ', result.stdout)
+        previews = [c for c in calls if c['kind'] == 'npm'
+                    and c['args'][:2] == ['run', 'test:e2e']
+                    or c['kind'] == 'npx' and c['args'][:2] == ['playwright', 'test']]
+        self.assertEqual([p['port'] for p in previews], ['4371', '4371'])
+        self.assertEqual([p['reuse'] for p in previews], ['0', '0'])
 
     def test_explicit_build_output_is_built_served_and_retained(self):
         root, result, calls = self.run_gates(custom_output='dist-custom')
@@ -149,6 +180,20 @@ if kind == "npx" and args[:2] == ["playwright", "test"]:
         self.assertEqual(result.returncode, 1)
         self.assertIn('GATES_CONFIG_MODE', result.stderr)
         self.assertEqual(calls, [])
+
+    def test_requested_port_validation_uses_the_full_tcp_range(self):
+        _, result, calls = self.run_gates(port='65535')
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        previews = [c for c in calls if c['kind'] == 'npm'
+                    and c['args'][:2] == ['run', 'test:e2e']
+                    or c['kind'] == 'npx' and c['args'][:2] == ['playwright', 'test']]
+        self.assertEqual([p['port'] for p in previews], ['65535', '65535'])
+        for port in ['0', '65536', '-1', 'abc']:
+            with self.subTest(port=port):
+                _, result, calls = self.run_gates(port=port)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn('PW_PORT must be an integer between 1 and 65535', result.stderr)
+                self.assertEqual(calls, [])
 
 
 if __name__ == '__main__':
