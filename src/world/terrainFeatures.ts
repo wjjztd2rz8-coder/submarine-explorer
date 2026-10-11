@@ -359,7 +359,10 @@ export function blueHoleTint(
   // Risers fall into shadow, treads keep their light; a pale lip crowns each tread edge and wide
   // hollows (low-frequency, darker and cooler) pool between the patches of pale sand.
   const riserShade = 0.46 + 0.54 * smoothstep(clamp01((normalY - 0.35) / 0.5));
-  const lip = tread * Math.exp(-(((1 - treadU) * 8) ** 2)) * 0.42;
+  const lip =
+    tread *
+    Math.exp(-(((1 - treadU) * 8) ** 2)) *
+    (0.42 + 0.4 * smoothstep(clamp01((depth - 20) / 60)));
   const hollow = 1 - 0.28 * smoothstep(clamp01((0.42 - f1 * f2) / 0.25)) * (1 - 0.5 * rock);
   const sand = 1 + 0.2 * smoothstep(clamp01((f3 - 0.62) / 0.2)) * (1 - rock);
   const m = ao * dark * bright * riserShade * hollow * sand * (1 + lip);
@@ -367,7 +370,7 @@ export function blueHoleTint(
   // Kept soft and wide: the riser is a gradient, not a drawn line.
   // Feather: the shelf's warm tone hands over to the cool lower wall across ~30 m, not at one ring.
   const feather = smoothstep(clamp01((139 - r) / 30));
-  const fm = 1 - 0.2 * feather;
+  const fm = 1 - 0.1 * feather;
   tr *= 1 - 0.1 * feather;
   tb *= 1 + 0.06 * feather;
   const rim =

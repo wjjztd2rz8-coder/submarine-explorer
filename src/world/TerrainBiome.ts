@@ -353,7 +353,7 @@ export const BIOMES: Record<string, Biome> = {
     strata: { periodM: 3.4, amount: 0.32 },
     vertexTint: blueHoleTint,
     // Across the 320 m bowl the reef should already dissolve into water haze.
-    horizonFadeM: [55, 210],
+    horizonFadeM: [80, 260],
     scatter: [
       // Dense, enlarged clumps on the ledges and treads so they read at gallery range.
       { kind: 'sponge', density: 2.6, slopeMaxDeg: 40, on: 'rock', sizeMul: 2.2 },
