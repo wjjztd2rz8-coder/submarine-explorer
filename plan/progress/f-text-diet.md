@@ -30,3 +30,7 @@ Owner phone playtest 2026-10-11: too much text at every menu, key names on touch
 - On a short landscape phone (844x390) the briefing still scrolls to reach Begin (the sticky footer is off there since F-CHALLENGER-CAM). Portrait is the target and fits.
 - The touch `.hud-footer` rules in `hud-layout.css` are removed. The footer now holds only the Reset camera button, which `touch.css` hides on touch.
 - `PhotoGallery.ts` ("then press Enter to save it here") is outside this package.
+
+## Gates
+
+`PW_PORT=4622 tools/gates.sh`: build, unit, python, content, attribution, prettier, e2e (smoke) and e2e-base all PASS. Targeted e2e (about 230 cases across the touched specs and the new `f-text-diet.spec.ts`) pass.
