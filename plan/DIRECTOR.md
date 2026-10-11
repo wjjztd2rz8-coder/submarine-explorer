@@ -81,8 +81,8 @@ The newest items go first.
   - **P-globe-pins, P-text-diet, P-journal-mobile:** DONE 2026-10-11 (merged to main).
   - **P-first-dive-flow** (Codex 1391), **P-events-reform** (Codex 1393): stopped at the Codex limit in round 1 (17:38); resume after the 21:48 reset.
   - **P-touch-controls** (Codex 1392): round 1 finished; needs e2e and screenshot review before merge.
-- **Codex already launched:** 1410 Blue Hole facets (V-bluehole), 1420 Beebe trunk + card (V-beebe), 1430 CI shard 7 (folded into S-tests), 1440 scan-candidate bug hunt, 1460 Blue Hole collision, 1470 test-suite sweep (no report yet, superseded by S-tests step 1), 1480 Endurance opening (V-endurance). Collect what finished; don't re-brief.
-- **Sol round 2 on the simplification review** resumes after the Codex reset. When it lands, fold its corrections into the `S-*` items here, not into a separate document.
+- **Codex dispatcher paused for the phone work** (interactive thread; see PROCESS-LOG at 3fb8349): `.cache/codex/dispatch-max` is 0 and the uncap timer is stopped. Seven written briefs are parked in `.cache/codex/queue/hold/`: 1410 Blue Hole facets (V-bluehole), 1420 Beebe trunk + card (V-beebe), 1430 CI shard 7 (folded into S-tests), 1440 scan-candidate bug hunt, 1460 Blue Hole collision, 1470 test-suite sweep (replace it with an S-tests step 1 brief before requeueing), 1480 Endurance opening (V-endurance). Until the P-items merge, put new briefs in `hold/`, not `queue/`. The phone thread restores the dispatcher afterwards.
+- **Sol round 2 on the simplification review** runs as the `subexp-simplify-sol2` timer after 22:00, once the 1391r, 1392 and 1393r Codex units have finished. Its reply lands in `.cache/review/simplify-20261011/sol-round2.md`. The next run folds its corrections into the `S-*` items here, not into a separate document.
 
 ## Backlog
 
