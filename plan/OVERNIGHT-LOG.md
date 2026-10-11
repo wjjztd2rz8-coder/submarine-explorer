@@ -912,3 +912,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Released f50:** full e2e on main passed (all gates, rc=0) after a fix; pushed and tagged f50. Pages deploy started; hosted CI for the new SHA queued (check `gh run list`).
 - **Merged:** f-bluehole-perf (Sonnet): the Blue Hole 60 s idle spec failure (30 frames) was not a flake or render cost. `Terrain.sampleHeight` took ~43 µs per call on Blue Hole (carve + relief noise), so the spec's ~47k calls/s blocked ~2 s per check; now memoised at lattice corners (~1.3 µs), no visual change. Also speeds physics/camera/prop sampling in game. The earlier "software-GL flake" call at 17:03 was wrong; I recorded it here.
 - **Queue:** Codex 1220-1280 (dry until 15 Oct). Next Claude: DIRECTOR backlog items 2-7 (new-player flow recapture, Lost City columns, Endurance hull, Blue Hole bowl, Titanic sky, Challenger boulders). Needs owner: nothing.
+
+## 2026-10-11 01:51 CDT headless run (Claude)
+
+- **Merged:** f-lostcity-5 (Sonnet): vertical flow striations, brucite fins at vent lips, silt variation on slope; modest gain, scan card still touches tower tip in the opening. f-endurance-hull (Sonnet): opening camera closer (70 m arm), tannin/grey plank tones, broken ribs, rail growth; hull larger, sits low in frame. Smoke + project-base green on main; no full e2e, no push (f50 last tag; hosted CI on f50 was queued).
+- **Queue:** Codex 1220-1280 queued (Codex weekly shows 92% after reset; dispatch timer will launch). Next Claude: new-player flow recapture, Blue Hole bowl, Titanic sky, Challenger boulders. Needs owner: nothing.

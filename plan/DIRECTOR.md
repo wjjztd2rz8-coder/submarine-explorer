@@ -8,10 +8,10 @@ Sol skipped (Codex weekly 5%). Scores (beautiful): Titanic 4, Beebe 3.75, Monter
 
 Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
 
-1. **Release f50 (Haiku):** full e2e on main (9+ commits ahead of origin), push, tag f50, check `gh run list`. Never loosen assertions; software-GL frame-count flakes get rerun alone. Free PW_PORT first (`fuser -k`).
+1. (DONE f50 pushed) **Release f50 (Haiku):** full e2e on main (9+ commits ahead of origin), push, tag f50, check `gh run list`. Never loosen assertions; software-GL frame-count flakes get rerun alone. Free PW_PORT first (`fuser -k`).
 2. **New-player flow recapture (Haiku capture, Sonnet judge):** Home to site to first 60 s to Journal to debrief on desktop and phone; not recaptured since 10-09. Fix any dead end or clutter found.
-3. **Lost City columns (Sonnet):** towers are smooth pale pillars with a bland seabed slope; add vertical flow striations, colour variation, brucite fringe near orifice; keep the scan card clear of the tower.
-4. **Endurance hull scale and weathering (Sonnet):** hull reads small against the plain at the default pose; bring the camera closer or enlarge the framing, vary plank colour, add rail growth and a broken-rib silhouette.
+3. (MERGED 2026-10-11 f-lostcity-5: striations, brucite fins, silt variation; modest gain, fins a bit spiky, scan card still overlaps tower tip in opening) **Lost City columns (Sonnet):** towers are smooth pale pillars with a bland seabed slope; add vertical flow striations, colour variation, brucite fringe near orifice; keep the scan card clear of the tower.
+4. (MERGED 2026-10-11 f-endurance-hull: opening chase arm 98.5->70 m, plank tones, ribs, rail growth; hull ~380 px, sits low in frame) **Endurance hull scale and weathering (Sonnet):** hull reads small against the plain at the default pose; bring the camera closer or enlarge the framing, vary plank colour, add rail growth and a broken-rib silhouette.
 5. **Blue Hole floor/bowl (Sonnet):** wall and floor still smooth green ramps with sparse debris-like flora; add bowl terraces visible at gallery range and denser sponge/coral clumps.
 6. **Titanic dark-void sky (Haiku/Sonnet):** flat near-black above the horizon; a faint depth gradient like Endurance's, without brightening the abyss mood.
 7. **Challenger rock scale (Haiku, low):** cobbles are tiny at 45 m; add a few larger boulders and a slope shadow beyond the lander.
