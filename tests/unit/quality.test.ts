@@ -80,6 +80,47 @@ describe('detectTier', () => {
       ).toBe('low');
     }
   });
+
+  it.each([
+    {
+      name: 'masked phone GPU',
+      renderer: 'WebKit WebGL',
+      cores: null,
+      memoryGb: null,
+      tier: 'low',
+    },
+    {
+      name: 'flagship without optional hints',
+      renderer: 'Apple GPU',
+      cores: null,
+      memoryGb: null,
+      tier: 'medium',
+    },
+    {
+      name: 'flagship with little memory',
+      renderer: 'Adreno (TM) 740',
+      cores: 8,
+      memoryGb: 4,
+      tier: 'low',
+    },
+    { name: 'flagship with few cores', renderer: 'Mali-G715', cores: 4, memoryGb: 8, tier: 'low' },
+    {
+      name: 'desktop GPU on a handheld',
+      renderer: 'NVIDIA GeForce RTX 3070',
+      cores: 8,
+      memoryGb: 8,
+      tier: 'low',
+    },
+  ])('keeps $name on $tier in both phone orientations', ({ renderer, cores, memoryGb, tier }) => {
+    for (const [screenW, screenH] of [
+      [390, 844],
+      [844, 390],
+    ]) {
+      expect(
+        detectTier(caps({ renderer, cores, memoryGb, screenW, screenH, mobileUa: true })).tier,
+      ).toBe(tier);
+    }
+  });
 });
 
 describe('resolveQuality', () => {
@@ -120,6 +161,44 @@ describe('resolveQuality', () => {
 });
 
 describe('readDeviceCaps', () => {
+  it.each(['ua', 'coarse-pointer', 'client-hints'])(
+    'reads a low-end phone through %s hints without changing its tier on rotation',
+    (source) => {
+      vi.stubGlobal('navigator', {
+        userAgent: source === 'ua' ? 'Mozilla/5.0 (Linux; Android 12) Mobile' : 'desktop',
+        userAgentData: { mobile: source === 'client-hints' },
+        maxTouchPoints: source === 'coarse-pointer' ? 5 : 0,
+        hardwareConcurrency: 4,
+        deviceMemory: 4,
+      });
+      const gl = {
+        MAX_TEXTURE_SIZE: 1,
+        RENDERER: 2,
+        VENDOR: 3,
+        getExtension: () => null,
+        getParameter: (p: number) => ({ 1: 8192, 2: 'Mali-G52', 3: 'ARM' })[p],
+      };
+      for (const [width, height] of [
+        [390, 844],
+        [844, 390],
+      ]) {
+        vi.stubGlobal('window', {
+          screen: { width, height },
+          devicePixelRatio: 3,
+          matchMedia: () => ({ matches: source === 'coarse-pointer' }),
+        });
+        const snapshot = readDeviceCaps(gl);
+        expect(snapshot.renderer).toBe('Mali-G52');
+        expect(snapshot.screenW).toBe(width);
+        expect(snapshot.screenH).toBe(height);
+        expect(resolveQuality(null, 'auto', snapshot)).toMatchObject({
+          tier: 'low',
+          source: 'auto',
+        });
+      }
+    },
+  );
+
   it('recognises desktop-UA iPadOS and falls back when GPU information is locked down', () => {
     vi.stubGlobal('navigator', {
       userAgent: 'Mozilla/5.0 (Macintosh) AppleWebKit Safari',

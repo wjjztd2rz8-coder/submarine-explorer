@@ -1,8 +1,10 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { afterAll, describe, expect, it } from 'vitest';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { afterAll, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import { ModelCache } from '../../src/world/PropLoader.js';
 import { Props } from '../../src/world/Props.js';
 import { validateMeta } from '../../src/world/TileLoader.js';
 
@@ -56,17 +58,21 @@ function staticCost(root: THREE.Object3D): { calls: number; triangles: number } 
   return { calls, triangles };
 }
 
-const sites = [
-  'titanic',
-  'lost-city',
-  'great-blue-hole',
-  'beebe-vent-field',
-  'monterey-canyon',
-  'challenger-deep',
-  'endurance',
-  'hunga-tonga-caldera',
-  'hudson-canyon',
-];
+const sites = (
+  JSON.parse(readFileSync('data/landmarks/index.json', 'utf8')) as { landmarks: string[] }
+).landmarks;
+
+/** Read actual GLB geometry/materials; image decoding is irrelevant to this census. */
+async function localModel(url: string): Promise<THREE.Object3D> {
+  const loader = new GLTFLoader();
+  loader.register(() => ({
+    name: 'static-census-textures',
+    loadTexture: async () => new THREE.Texture(),
+  }));
+  const bytes = readFileSync(`public${url}`);
+  const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+  return (await loader.parseAsync(buffer, '')).scene;
+}
 const diagnostics =
   (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
     ?.PERF_BUDGET_STATIC === '1';
@@ -78,7 +84,7 @@ afterAll(() => {
   writeFileSync('.cache/perf-budget/static.json', JSON.stringify(rows, null, 2));
 });
 
-describe('hero site static prop budgets', () => {
+describe('catalog site static prop budgets', () => {
   for (const site of sites) {
     for (const tier of diagnostics ? (['low', 'high'] as const) : (['low'] as const)) {
       it(`${site} ${tier}: bounds prop draw calls and triangles before culling`, async () => {
@@ -96,25 +102,33 @@ describe('hero site static prop budgets', () => {
           DEFAULT_CONFIG.props,
           tier,
         );
-        const stats = await props.placeAll(doc, site);
-        expect(stats.failed).toBe(0);
-        expect(stats.skipped).toBe(0);
-        expect(stats.count).toBeGreaterThan(0);
-        expect(stats.models).toBe(0); // These hero documents currently use procedural content.
-        const totals = { calls: 0, triangles: 0 };
-        for (const placed of props.placed) {
-          const cost = staticCost(placed.full);
-          totals.calls += cost.calls;
-          totals.triangles += cost.triangles;
-        }
-        if (diagnostics) rows.push({ site, tier, ...totals });
-        expect(totals.calls).toBeGreaterThan(0);
-        expect(totals.triangles).toBeGreaterThan(0);
-        if (tier === 'low') {
-          // Reserve 300 calls / 300k triangles of the frame budget for the rest
-          // of the scene; the e2e guard checks the actual full-frame budget.
-          expect(totals.calls).toBeLessThanOrEqual(1200);
-          expect(totals.triangles).toBeLessThanOrEqual(1_200_000);
+        // Blake includes two real GLB rocks. Avoid network/DOM image loaders,
+        // while preserving the shipped mesh, material sides and placement path.
+        const models = vi.spyOn(ModelCache.prototype, 'get').mockImplementation(localModel);
+        try {
+          const stats = await props.placeAll(doc, site);
+          expect(stats.failed).toBe(0);
+          expect(stats.skipped).toBe(0);
+          expect(stats.count).toBeGreaterThan(0);
+          if (site === 'blake-plateau-corals') expect(stats.models).toBe(2);
+          else expect(stats.models).toBe(0); // The other documents use procedural content.
+          const totals = { calls: 0, triangles: 0 };
+          for (const placed of props.placed) {
+            const cost = staticCost(placed.full);
+            totals.calls += cost.calls;
+            totals.triangles += cost.triangles;
+          }
+          if (diagnostics) rows.push({ site, tier, ...totals });
+          expect(totals.calls).toBeGreaterThan(0);
+          expect(totals.triangles).toBeGreaterThan(0);
+          if (tier === 'low') {
+            // Reserve 300 calls / 300k triangles of the frame budget for the rest
+            // of the scene; the e2e guard checks the actual full-frame budget.
+            expect(totals.calls).toBeLessThanOrEqual(1200);
+            expect(totals.triangles).toBeLessThanOrEqual(1_200_000);
+          }
+        } finally {
+          models.mockRestore();
         }
       });
     }
