@@ -308,3 +308,21 @@ it('detaches an active moving target immediately when its owner disposes', () =>
   run(scanner, 0.1, AT, NORTH, true);
   expect(scanner.view.candidateId).toBeNull();
 });
+
+it('names exactly the contact Scan will scan when a nearer off-axis contact exists', () => {
+  const offAxis = target({ id: 'side', position: new Vector3(30, -100, 0) }); // 30 m east, nearer
+  const ahead = target({ id: 'ahead', position: new Vector3(0, -100, -60) }); // 60 m north
+  for (const targets of [
+    [offAxis, ahead],
+    [ahead, offAxis],
+  ]) {
+    const { scanner, log } = setup(targets);
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe('ahead');
+    expect(scanner.view.nearestId).toBe('ahead');
+    expect(scanner.view.nearestName).toBe('Bow');
+    scanner.update(DT, AT, NORTH, true);
+    expect(scanner.view.activeId).toBe(scanner.view.nearestId);
+    expect(log.find(([n]) => n === 'scan:started')?.[1]).toEqual({ poiId: 'ahead' });
+  }
+});
