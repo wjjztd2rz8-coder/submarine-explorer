@@ -120,10 +120,13 @@ for (const layout of layouts) {
       await page.locator('.journal').waitFor({ timeout: 10000 });
       await page.waitForTimeout(600);
       await shot('journal');
-      await page.keyboard.press('Escape');
+      if (touch)
+        await click(page.locator('.journal').getByRole('button', { name: 'Close', exact: true }));
+      else await page.keyboard.press('Escape');
       await page.waitForTimeout(400);
       if (!(await page.locator('.pause-surface').isVisible())) {
-        await page.keyboard.press('Escape');
+        if (touch) await click(page.locator('.tc-btn-pause'));
+        else await page.keyboard.press('Escape');
         await page.waitForTimeout(400);
       }
       if (!(await page.locator('.pause-surface').isVisible())) await shot('after-journal');

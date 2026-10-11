@@ -7,7 +7,7 @@
  * Usage (repo root, Node on PATH):
  *   npm run build -- --outDir dist-fd && npx vite preview --port 4391 --strictPort --outDir dist-fd &
  *   node tools/firstdiscovery-shots.mjs [http://localhost:4391/]
- * Env: FD_SITES=titanic,beebe-vent-field  FD_LAYOUTS=desktop,phone  FD_OUT=<dir>
+ * Env: FD_SITES=titanic,beebe-vent-field  FD_LAYOUTS=desktop,phone,phoneland  FD_OUT=<dir>
  * Output: .cache/codex/shots/firstdiscovery/<layout>-<site>/NN-label.png
  */
 import { chromium } from '@playwright/test';
@@ -19,6 +19,7 @@ const sites = (process.env.FD_SITES ?? 'titanic,beebe-vent-field').split(',');
 const all = {
   desktop: { viewport: { width: 1600, height: 900 }, touch: false },
   phone: { viewport: { width: 390, height: 844 }, touch: true },
+  phoneland: { viewport: { width: 844, height: 390 }, touch: true },
 };
 const layouts = (process.env.FD_LAYOUTS ?? 'desktop,phone').split(',');
 const out = resolve(process.env.FD_OUT ?? '.cache/codex/shots/firstdiscovery');

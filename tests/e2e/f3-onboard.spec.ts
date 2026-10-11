@@ -203,6 +203,25 @@ for (const dismissal of ['button', 'expiry'] as const) {
 test.describe('touch viewport', () => {
   test.use({ ...phoneLandscape });
 
+  test('Journal returns to Pause without switching out of touch mode', async ({ page }) => {
+    await boot(page, '&touch=1');
+    for (let i = 0; i < 4; i++) await page.locator('.onboard-skip-step').tap();
+    await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'journal');
+    await page.locator('.tc-btn-pause').tap();
+    const pause = page.locator('.pause-menu');
+    await pause.getByRole('button', { name: 'Journal', exact: true }).tap();
+    const journal = page.locator('.journal');
+    await expect(journal).toBeVisible();
+    await expect.poll(async () => (await saved(page))?.tutorialDone).toBe(true);
+    await journal.getByRole('button', { name: 'Close', exact: true }).tap();
+    await expect(journal).toBeHidden();
+    await expect(pause).toBeVisible();
+    await expect(page.locator('html')).toHaveClass(/is-touch/);
+    await pause.getByRole('button', { name: 'Resume', exact: true }).tap();
+    await expect(page.locator('.tc-btn-pause')).toBeVisible();
+    await expect(page.locator('.onboard-card')).toBeHidden();
+  });
+
   test('tutorial card clears the on-screen controls and targets are 44px', async ({ page }) => {
     await boot(page, '&touch=1');
     const card = page.locator('.onboard-card');

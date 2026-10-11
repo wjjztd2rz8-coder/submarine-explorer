@@ -103,6 +103,7 @@ export function createOnboardSystem(): GameSystem {
     init(ctx) {
       ctxRef = ctx;
       scanCompleted = false;
+      wasLights = ctx.headlights.on;
       const { input, bus, params } = ctx;
       store = new TutorialSave();
       const record = store.get();
@@ -197,6 +198,8 @@ export function createOnboardSystem(): GameSystem {
       });
     },
     start(ctx) {
+      // Mission setup can enable the lamps; only player changes count as practice.
+      wasLights = ctx.headlights.on;
       // A second way into the card, from the Settings header.
       const open =
         ctx.settingsScreen.root.querySelector<HTMLButtonElement>('.settings-controls-open');
