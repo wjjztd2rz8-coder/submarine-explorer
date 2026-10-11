@@ -375,35 +375,23 @@ export function blueHoleTint(
 }
 
 /**
- * Minimap shading for the reef platform around the hole. The survey grid is flat
- * there (a single 4 m depth), so the sonar relief is a uniform teal square; this returns
- * linear RGB multipliers for sand channels, darker coral patches and a soft blue
- * deepening toward the lagoon, fading out over the hole's rim so the measured carve keeps
- * its own depth palette. Pure and deterministic in world metres; Blue Hole sonar path only.
+ * Minimap treatment of the reef platform around the hole. The measured relief out
+ * there is a few metres of reef-top noise that reads as camouflage on the map, so the
+ * sonar replaces it with one calm gradient: `blend` is 0 over the hole (measured depth
+ * palette and hillshade untouched) and 1 on the reef flat; `shallowT` is the palette
+ * position to show (0 deep, 1 shallow), pale turquoise at the rim easing to soft blue
+ * toward the survey edge. Pure and deterministic; Blue Hole sonar path only.
  */
-export function blueHoleSonarShade(
+export function blueHoleSonarReef(
   x: number,
   z: number,
   centreX: number,
   centreZ: number,
-): readonly [number, number, number] {
+): { blend: number; shallowT: number } {
   const d = Math.hypot(x - centreX, z - centreZ);
-  const out = smoothstep(clamp01((d - 215) / 70));
-  if (out <= 0) return [1, 1, 1];
-  const n1 = 0.5 + 0.5 * Math.sin(x * 0.0085 + 1.9 * Math.sin(z * 0.006 + 0.4) + 0.3);
-  const n2 = 0.5 + 0.5 * Math.sin(x * 0.031 + 2.2 * Math.sin(z * 0.027 + x * 0.008) + 1.1);
-  const n3 = 0.5 + 0.5 * Math.sin(z * 0.047 - 1.8 * Math.sin(x * 0.039 - 0.6) + 2.4);
-  const n4 = 0.5 + 0.5 * Math.sin((x - z) * 0.085 + 1.5 * Math.sin((x + z) * 0.06));
-  // Coral heads and patch reef: dark blue-green blotches with a ragged rim.
-  const coral = smoothstep(clamp01((n2 * n3 + 0.25 * n4 - 0.5) / 0.3));
-  // Sand channels between them: broad pale ribbons.
-  const sand = smoothstep(clamp01((n1 - 0.55) / 0.2)) * (1 - coral);
-  // The lagoon deepens gently toward its blue middle (slow, wide gradient).
-  const deep = smoothstep(clamp01((0.45 - n1) / 0.45)) * (1 - 0.5 * coral);
-  const r = 1 - 0.4 * coral * out - 0.32 * deep * out + 0.06 * sand * out;
-  const g = 1 - 0.27 * coral * out - 0.2 * deep * out + 0.05 * sand * out;
-  const b = 1 - 0.18 * coral * out - 0.06 * deep * out - 0.02 * sand * out;
-  return [r, g, b];
+  const blend = smoothstep(clamp01((d - 215) / 70));
+  const far = smoothstep(clamp01((d - 260) / 420));
+  return { blend, shallowT: 0.97 - 0.45 * far };
 }
 
 export interface TerrainCarve {

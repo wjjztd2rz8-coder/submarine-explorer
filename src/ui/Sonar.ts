@@ -19,7 +19,7 @@ import {
   type SonarZoomConfig,
 } from '../core/Config.js';
 import { latLonToWorld } from '../util/geo.js';
-import { BLUE_HOLE_LAT, BLUE_HOLE_LON, blueHoleSonarShade } from '../world/terrainFeatures.js';
+import { BLUE_HOLE_LAT, BLUE_HOLE_LON, blueHoleSonarReef } from '../world/terrainFeatures.js';
 import { enduranceRidges, enduranceScourHeight } from '../world/presets/EnduranceRelief.js';
 import type { Terrain } from '../world/Terrain.js';
 import type { PlacedLandmark } from '../world/Landmarks.js';
@@ -589,16 +589,24 @@ export class Sonar {
             0.28 *
               Math.tanh(this.zoomConfig.hillshadeGain * flat.gainBoost * (0.7 * gx + 0.5 * gz)));
         const out = index * 4;
-        // Blue Hole: the surrounding reef platform is one flat survey depth; shade it as patch reef and sand.
-        let bh: readonly [number, number, number] = [1, 1, 1];
+        let rgb: readonly [number, number, number] = [r * shade, g * shade, b * shade];
+        // Blue Hole: the reef flat around the hole is a calm depth gradient, not measured noise.
         if (blueHoleCentre && shadeReef) {
           const wx = centerX + (px - margin - this.canvas.width / 2) * metresPerPixel;
           const wz = centerZ + (py - margin - this.canvas.height / 2) * metresPerPixel;
-          bh = blueHoleSonarShade(wx, wz, blueHoleCentre.x, blueHoleCentre.z);
+          const reef = blueHoleSonarReef(wx, wz, blueHoleCentre.x, blueHoleCentre.z);
+          if (reef.blend > 0) {
+            const calm = paletteColor(this.palette.stops, reef.shallowT);
+            rgb = [
+              rgb[0] + (calm[0] - rgb[0]) * reef.blend,
+              rgb[1] + (calm[1] - rgb[1]) * reef.blend,
+              rgb[2] + (calm[2] - rgb[2]) * reef.blend,
+            ];
+          }
         }
-        img.data[out] = Math.round(Math.max(0, Math.min(255, r * shade * bh[0])));
-        img.data[out + 1] = Math.round(Math.max(0, Math.min(255, g * shade * bh[1])));
-        img.data[out + 2] = Math.round(Math.max(0, Math.min(255, b * shade * bh[2])));
+        img.data[out] = Math.round(Math.max(0, Math.min(255, rgb[0])));
+        img.data[out + 1] = Math.round(Math.max(0, Math.min(255, rgb[1])));
+        img.data[out + 2] = Math.round(Math.max(0, Math.min(255, rgb[2])));
         img.data[out + 3] = 255;
       }
     }

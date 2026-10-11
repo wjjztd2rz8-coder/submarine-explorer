@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-bluehole-map:** the Great Blue Hole minimap shows the reef flat outside the hole as one calm radial depth gradient (pale turquoise at the rim easing to soft blue, `blueHoleSonarReef`) instead of the measured reef-top noise shaded as camouflage-like coral and sand blotches; the hole interior, contour rings and depth labels are unchanged, and other sites are untouched.
+
 - **f-monterey-wall:** the Monterey canyon wall silhouette is eroded instead of stacked: five seeded slump scars per wall (scooped amphitheatre with a steep headwall, pale silt floor, darker headwall shading; they notch the crest), per-bed ledge reach varies along each bed (pinches out, then juts), and up to 15 larger fallen blocks rest on the apron below the scars. The fallen blocks replace ordinary rubble, so instance counts are unchanged; no new draw calls. Low tier skips scars (no fidelity wall) and rubble as before. Reason: wall outline read as stepped slabs.
 - **f-challenger-seabed:** the Challenger Deep floor around the lander gets relief: far denser scatter (dropstones 14, cobble rubble 24, boulders 1.6, burrow mounds 14 per 1000 m2, larger size multipliers; tier density still scales it, so Low builds a quarter) and baked vertex-colour sediment tone (warm/cool patches and faint current drift lines, under 15% on the floor; slope shading unchanged). No new draw calls (existing instanced scatter kinds). Reason: the seabed read as flat and bare.
 
