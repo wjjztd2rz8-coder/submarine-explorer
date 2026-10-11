@@ -35,6 +35,7 @@ export class ScanOverlay {
   readonly messages: HTMLDivElement;
   private readonly reticle: HTMLDivElement;
   private readonly panel: HTMLDivElement;
+  private readonly chip: HTMLDivElement;
   private readonly kicker: HTMLDivElement;
   private readonly nameEl: HTMLDivElement;
   private readonly hint: HTMLDivElement;
@@ -116,7 +117,10 @@ export class ScanOverlay {
     this.panel.append(svg, text);
     this.messages = document.createElement('div');
     this.messages.className = 'scan-stack';
-    this.messages.append(this.panel);
+    this.chip = document.createElement('div');
+    this.chip.className = 'scan-objective-chip';
+    this.chip.hidden = true;
+    this.messages.append(this.panel, this.chip);
     this.root.append(this.reticle, this.messages);
     parent.appendChild(this.root);
   }
@@ -172,6 +176,32 @@ export class ScanOverlay {
    *   off-screen / behind the camera.
    */
   update(view: ScanView, keys: ScanOverlayKeys, screen: ScreenPoint | null, dt: number): void {
+    this.updateCard(view, keys, screen, dt);
+    this.updateChip(view);
+  }
+
+  /** Touch only: a one-line "where next" cue while no scan card is showing. */
+  private updateChip(view: ScanView): void {
+    const show =
+      document.documentElement.classList.contains('is-touch') &&
+      !this.suppressed &&
+      this.panel.hidden &&
+      view.objectiveId !== null &&
+      view.objectiveName !== '';
+    this.chip.hidden = !show;
+    if (!show) return;
+    const d = Number.isFinite(view.objectiveDistance)
+      ? ` · ${view.objectiveDistance.toFixed(0)} m`
+      : '';
+    this.setText(this.chip, 'chip', `▸ ${view.objectiveName}${d}`);
+  }
+
+  private updateCard(
+    view: ScanView,
+    keys: ScanOverlayKeys,
+    screen: ScreenPoint | null,
+    dt: number,
+  ): void {
     const scan = document.documentElement.classList.contains('is-touch') ? 'SCAN' : keys.scan;
     if (this.bannerLeft > 0) {
       this.bannerLeft -= dt;
