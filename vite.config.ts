@@ -139,6 +139,9 @@ function stripLoaderDefaultDecoderUrls(): Plugin {
 export default defineConfig({
   base: resolveBase(env.VITE_BASE),
   publicDir: 'public',
+  // tools/codex-browser.sh gives each dev server its own optimizer cache
+  // (worktrees share node_modules by symlink).
+  cacheDir: env.VITE_CACHE_DIR ?? 'node_modules/.vite',
   plugins: [stripLoaderDefaultDecoderUrls(), copyPublicFiltered(), pwaPlugin()],
   server: { port: 5173 },
   preview: { port: 4173 },

@@ -23,6 +23,7 @@
 # Logs and results still land in this checkout's .cache/codex/.
 set -uo pipefail
 cd "$(dirname "$0")/.."
+root="$PWD"
 model="${CODEX_MODEL:-$(tools/codex-model.sh)}"
 export PATH="$HOME/.local/node/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
 gate_cmd=(tools/gates.sh)
@@ -48,6 +49,22 @@ log="$dir/$name.log"; result="$dir/$name-result.md"; last="$dir/$name-last.md"
 common=(-m "$model" -c model_reasoning_effort=high -c 'sandbox_mode="workspace-write"')
 # NET=1 lets the task reach the network (e.g. to fetch open datasets).
 [[ "${NET:-0}" == 1 ]] && common+=(-c sandbox_workspace_write.network_access=true)
+# Browser (2026-10-11): a live Vite dev server of this checkout plus a headless
+# Playwright MCP server, both outside the sandbox (tools/codex-browser.sh).
+# BROWSER=0 turns it off; without the MCP install the task runs as before.
+browser_note=''
+if [[ "${BROWSER:-1}" == 1 ]]; then
+  bport=$(( ${PW_PORT:-4173} + 300 ))
+  bpid=$("$root/tools/codex-browser.sh" start "$bport")
+  if [[ -n "$bpid" ]]; then
+    trap '"$root/tools/codex-browser.sh" stop "$bpid"' EXIT
+    mapfile -t bargs < <("$root/tools/codex-browser.sh" args "$dir/shots/$name/browser")
+    common+=("${bargs[@]}")
+    browser_note="Browser access: a live Vite dev server of your checkout runs at http://127.0.0.1:$bport/ (it reloads your edits; window.__game exposes game state). Use the browser_pw MCP tools (browser_navigate, browser_resize, browser_evaluate, browser_take_screenshot with a filename) to see and check your work in a real WebGL browser; screenshots are saved under .cache/codex/shots/$name/browser/. You still cannot start Vite, Chromium or the e2e suite from your shell; the orchestrator runs the gates.
+
+"
+  fi
+fi
 
 wait_for_limit() {  # returns 0 if we slept for a usage-limit reset
   local t
@@ -88,7 +105,7 @@ run_codex() {  # run_codex <round-log> <prompt> [images...]
 }
 
 session="${SESSION:-}"   # SESSION=<id> resumes an earlier Codex session (follow-up fixes)
-run_codex "$dir/$name-r1.log" "$(cat "$brief")"
+run_codex "$dir/$name-r1.log" "$browser_note$(cat "$brief")"
 round=1; status=FAIL
 while :; do
   gates=$("${gate_cmd[@]}" 2>&1); gstat=$?

@@ -14,6 +14,9 @@ mkdir -p .cache/codex/queue/launched
 exec {dispatch_lock_fd}>.cache/codex/dispatch.lock
 flock -n "$dispatch_lock_fd" || exit 0
 MAX="${MAX:-3}"
+# A review can lower the cap (e.g. to 1 while Sol reviews, since Sol plus three
+# tasks exhausted the Codex 5h window on 2026-10-11) by writing this file.
+[[ -s .cache/codex/dispatch-max ]] && MAX=$(cat .cache/codex/dispatch-max)
 running() { systemctl --user list-units --type=service --state=running --no-legend 'subexp-*' | awk '{print $1}' | grep -vc '^subexp-resume'; }
 codex_ok() { ai-limits --json 2>/dev/null | python3 -c '
 import json,sys,time

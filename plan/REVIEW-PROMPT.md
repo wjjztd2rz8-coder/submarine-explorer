@@ -17,7 +17,8 @@ You are the creative director doing a deliberate review, not routine collection.
    - the new priorities;
    - "Needs owner" items;
    - the stage (% toward 1.0) and time remaining, as agreed with Sol.
-     Commit and push it, so the owner can read it on GitHub.
+     Also rewrite `plan/STATUS.md` (one page: stage, the 1.0 table, done, left, needs owner) so the owner has a current summary.
+     Commit and push both, so the owner can read them on GitHub.
 6. `touch .cache/last-review-comprehensive && rm -f .cache/review-due`
 
 ## Targeted review
