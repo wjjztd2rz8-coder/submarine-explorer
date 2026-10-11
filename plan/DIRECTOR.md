@@ -2,6 +2,14 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
+## Top priority: owner phone test (2026-10-11 15:20)
+
+The owner's first real-phone test produced 12 notes; decisions and file ownership are in [PHONE-FEEDBACK-2026-10-11.md](PHONE-FEEDBACK-2026-10-11.md). These packages outrank the backlog below:
+
+- Claude (interactive thread): f-globe-pins and f-text-diet (Sonnet, running in `../subexp-wt/`), then f-journal-mobile (Sonnet, after the Claude 5h reset).
+- Codex: 1391 first-dive flow, 1392 touch controls, 1393 events reform (queued first). 1405 and 1450 were renumbered 1470 and 1480 so they don't collide with them.
+- Headless runs must not start Claude packages that touch the owned files in that doc, and must leave these worktrees for the interactive thread to collect.
+
 ## Current priorities (joint review, Claude + Sol first round, 2026-10-11 13:15; golden 2026-10-11-171945)
 
 Sol's round-2 reconcile failed (Codex hit its usage limit until 16:45), so scores below fold in Sol's round-1 calibration, checked against the images. Agreed scores (beautiful): Titanic 3.75, Beebe 3.5, Monterey 3.5, Challenger 3.5, Lost City 3.5 (+0.25), Endurance 3.5 (opening hull small: Sol correct, my 4 was generous), Blue Hole 3.25. Stage ~75%, ~3 weeks.
