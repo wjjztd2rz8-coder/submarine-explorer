@@ -193,7 +193,7 @@ export interface RockSpot {
   n: THREE.Vector3;
   /** Mean radius in metres. */
   r: number;
-  /** 0 at the foot of the wall, 1 at the apron rim. */
+  /** 0 at the foot of the wall, 1 at the apron rim; >1 for rolled blocks on the seabed. */
   u: number;
 }
 
@@ -204,13 +204,25 @@ export interface RockOpts {
   blocks?: number;
   /** Half-width of the usable span as a fraction of the wall width. */
   span?: number;
+  /** Optional patchy rockfall; other scarps retain their original distribution. */
+  scatter?: {
+    patchWavelengthM: number;
+    patchFloor: number;
+    blockRunout: readonly [number, number];
+    fragmentRunout: readonly [number, number];
+    blockRadius: readonly [number, number];
+    fragmentRadius: readonly [number, number];
+    radiusSkew: number;
+    separationRadii: number;
+    placementAttempts: number;
+  };
 }
 
 /**
  * Rock positions seated on the apron surface: smaller rubble near the foot,
  * larger blocks that have rolled out toward the rim, and a few slump blocks.
- * Every spot lies on `talusSurface`, never on the face above the foot and
- * never beyond the rim.
+ * Every spot lies on `talusSurface`, never on the face above the foot.
+ * The optional patchy distribution also lets blocks roll beyond the apron onto the seabed.
  */
 export function placeRocks(
   t: TalusShape,
@@ -222,17 +234,48 @@ export function placeRocks(
   const rnd = mulberry32(seed ^ 0x7a1);
   const out: RockSpot[] = [];
   const span = o.span ?? 0.45;
-  let guard = count * 8;
+  let guard = count * (o.scatter?.placementAttempts ?? 8);
   while (out.length < count && guard-- > 0) {
     const x = (rnd() * 2 - 1) * width * span;
     const reach = t.reach(x);
     if (reach < 2) continue;
     const block = rnd() < (o.blocks ?? 0.04);
-    const u = block ? rnd() * 0.45 : Math.pow(rnd(), 0.8) * 0.97;
+    const scatter = o.scatter;
+    const u = scatter
+      ? THREE.MathUtils.lerp(...(block ? scatter.blockRunout : scatter.fragmentRunout), rnd())
+      : block
+        ? rnd() * 0.45
+        : Math.pow(rnd(), 0.8) * 0.97;
     const z = t.foot(x) - u * reach;
+    if (scatter) {
+      const patch = fbm3(
+        x / scatter.patchWavelengthM,
+        z / scatter.patchWavelengthM,
+        0,
+        seed ^ 0x1320,
+        2,
+      );
+      if (rnd() > scatter.patchFloor + (1 - scatter.patchFloor) * smooth(0.3, 0.7, patch)) continue;
+    }
     const y = talusSurface(t, x, z);
-    const r = o.size * (block ? 2.6 + rnd() * 1.8 : (0.3 + rnd() * rnd() * 1.9) * (0.7 + 0.8 * u));
+    const r =
+      o.size *
+      (scatter
+        ? THREE.MathUtils.lerp(
+            ...(block ? scatter.blockRadius : scatter.fragmentRadius),
+            Math.pow(rnd(), scatter.radiusSkew),
+          )
+        : block
+          ? 2.6 + rnd() * 1.8
+          : (0.3 + rnd() * rnd() * 1.9) * (0.7 + 0.8 * u));
     const spot: RockSpot = { x, y, z, n: talusNormal(t, x, z), r, u };
+    if (
+      scatter &&
+      out.some(
+        (other) => Math.hypot(x - other.x, z - other.z) < (r + other.r) * scatter.separationRadii,
+      )
+    )
+      continue;
     if (isSupported(t, spot)) out.push(spot);
   }
   return out;
