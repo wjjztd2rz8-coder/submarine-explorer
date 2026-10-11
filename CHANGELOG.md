@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-endurance-hull:** Endurance opening camera pulled in (chase arm 98 m to 70 m, side offsets retuned; the unit test now expects the authored radius rather than the global one), so the 44 m hull spans about 380 px of the 1600 px first frame instead of 280 px, with the sub, scan card and minimap still clear. Hull planks now vary strake by strake from tannin-stained brown to bleached grey, the poop and waist gain broken bulwark ribs, and the rails carry sparse anemone and sponge clusters (same instanced draw calls; Low keeps its smaller budget). Hull length and beam unchanged.
+
 - **f-challenger-tone:** Challenger Deep seabed tone: cooler, darker grey-olive silt with less warm stain and slightly denser fog, so the 10.9 km floor no longer reads as a sunlit beach; other sites unchanged.
 - **f-bluehole-map:** the Great Blue Hole minimap shows the reef flat outside the hole as one calm radial depth gradient (pale turquoise at the rim easing to soft blue, `blueHoleSonarReef`) instead of the measured reef-top noise shaded as camouflage-like coral and sand blotches; the hole interior, contour rings and depth labels are unchanged, and other sites are untouched.
 
