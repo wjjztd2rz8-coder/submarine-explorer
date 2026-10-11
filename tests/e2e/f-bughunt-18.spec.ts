@@ -16,6 +16,8 @@ interface Game {
   save: Save;
 }
 const shots = '.cache/bughunt18/screenshots';
+// F-LOSTCITY-TOWER pins the opening/reset arm at 66 m to clear the tower tip.
+const lostCityRadius = 66;
 const defaultRadius = Math.hypot(38, 90);
 
 test.beforeEach(async ({ page }) => pauseClockBeforeNavigation(page));
@@ -81,7 +83,7 @@ for (const size of [
           .click();
         await expect(page.locator('.briefing')).toBeHidden();
       }
-      await expect.poll(async () => (await camera(page)).radius).toBe(50);
+      await expect.poll(async () => (await camera(page)).radius).toBe(lostCityRadius);
       const prefix = `${shots}/${route}-${size.width}x${size.height}`;
       await page.screenshot({ path: `${prefix}-opening.png` });
       await page.mouse.move(size.width / 2, size.height * 0.42);
@@ -91,18 +93,18 @@ for (const size of [
       await expect.poll(async () => (await camera(page)).radius).toBe(180);
       await drag(page);
       await page.keyboard.press('x');
-      await expect.poll(async () => (await camera(page)).radius).toBe(50);
+      await expect.poll(async () => (await camera(page)).radius).toBe(lostCityRadius);
       await expect.poll(async () => (await camera(page)).freeLook).toBe(false);
       await page.screenshot({ path: `${prefix}-reset.png` });
       expect((await camera(page)).clearance).toBeGreaterThanOrEqual(6 - 1e-6);
       await drag(page);
       await page.locator('.hud-reset-camera').click();
       await expect.poll(async () => (await camera(page)).freeLook).toBe(false);
-      expect((await camera(page)).radius).toBe(50);
+      expect((await camera(page)).radius).toBe(lostCityRadius);
       await drag(page);
       await page.mouse.dblclick(size.width / 2, size.height * 0.42);
       await expect.poll(async () => (await camera(page)).freeLook).toBe(false);
-      expect((await camera(page)).radius).toBe(50);
+      expect((await camera(page)).radius).toBe(lostCityRadius);
 
       await presentedFrame(page);
       const before = await camera(page);
@@ -119,13 +121,13 @@ for (const size of [
       await page.mouse.wheel(0, 100000);
       await expect.poll(async () => (await camera(page)).orbitRadius).toBe(220);
       expect((await camera(page)).position).toEqual(frozen);
-      expect((await camera(page)).radius).toBe(50);
+      expect((await camera(page)).radius).toBe(lostCityRadius);
       await page.locator('.photo-mode-exit').click();
       await expect.poll(async () => (await camera(page)).mode).toBe('chase');
       await presentedFrame(page);
       const returned = await camera(page);
       for (let i = 0; i < 3; i++) expect(returned.offset[i]).toBeCloseTo(before.offset[i]!, 2);
-      expect(returned.radius).toBe(50);
+      expect(returned.radius).toBe(lostCityRadius);
       await page.keyboard.press('q');
       await expect.poll(async () => (await camera(page)).mode).toBe('first-person');
       await page.keyboard.press('p');
@@ -135,7 +137,7 @@ for (const size of [
       await expect.poll(async () => (await camera(page)).mode).toBe('first-person');
       await page.keyboard.press('q');
       await expect.poll(async () => (await camera(page)).mode).toBe('chase');
-      expect((await camera(page)).radius).toBe(50);
+      expect((await camera(page)).radius).toBe(lostCityRadius);
     });
   }
 }
@@ -144,7 +146,7 @@ test('Lost City briefing mode changes and surface starts restore the appropriate
   page,
 }) => {
   await ready(page, 'mission=lost-city');
-  await expect.poll(async () => (await camera(page)).radius).toBe(50);
+  await expect.poll(async () => (await camera(page)).radius).toBe(lostCityRadius);
   const briefing = page.locator('.briefing');
   await briefing.getByRole('radio', { name: 'Realistic', exact: true }).check();
   await expect.poll(async () => (await camera(page)).radius).toBeCloseTo(defaultRadius, 6);
@@ -158,7 +160,7 @@ test('Lost City briefing mode changes and surface starts restore the appropriate
 
   await page.evaluate(() => (window.__game as unknown as Game).save.setGameplayMode('arcade'));
   await ready(page, 'mission=lost-city');
-  await expect.poll(async () => (await camera(page)).radius).toBe(50);
+  await expect.poll(async () => (await camera(page)).radius).toBe(lostCityRadius);
   await page
     .locator('.briefing')
     .getByRole('radio', { name: /^at the surface/ })
@@ -201,7 +203,7 @@ test('new sites and explicit Lost City probes restore the global chase radius', 
   page,
 }) => {
   await ready(page, 'tile=lost-city');
-  await expect.poll(async () => (await camera(page)).radius).toBe(50);
+  await expect.poll(async () => (await camera(page)).radius).toBe(lostCityRadius);
   for (const query of [
     'tile=titanic',
     'mission=titanic&skipBriefing=1',

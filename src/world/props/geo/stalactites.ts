@@ -347,6 +347,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     },
     top: (x) => Math.max(0.3, joinY * scaleAt(x) - sinkAt(x)),
     seed,
+    terraces: input.cfg.blueHoleApron,
   };
   const apron = buildTalusMesh(
     talus,
@@ -371,14 +372,12 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       // Away from the wall the apron sinks toward the cool blue-green of the deep water.
       out.lerp(DEEP_TEAL, (0.3 + 0.35 * smooth(0.2, 0.9, u)) * (0.7 + 0.5 * (1 - t)));
       out.multiplyScalar(0.5 + 0.5 * smooth(0, 0.4, u));
-      // Sediment bands by height (one per ~1.7 m step of the carved shelf): a pale lip, a dark
-      // shadowed joint, and a tone that changes bed to bed, plus darker hollows and pale sand pools.
-      const bandT = y / 1.7 + 0.8 * Math.sin(x * 0.11 + z * 0.05);
-      const bi = Math.floor(bandT);
-      const fr = bandT - bi;
+      // Broad, light sediment beds follow actual apron terraces. Thin painted
+      // joints drew contour lines even when the shared rock map was disabled.
+      const bedHeight = input.cfg.blueHoleApron.bedHeightM;
+      const bi = bedHeight > 0 ? Math.floor(y / bedHeight) : 0;
       const bt = 0.5 + 0.5 * Math.sin(bi * 12.9898 + 2.3) * Math.cos(bi * 5.17);
-      out.multiplyScalar(0.7 + 0.6 * bt);
-      out.multiplyScalar(0.4 + 0.6 * smooth(0, 0.2, fr) + 0.3 * smooth(0.8, 1, fr));
+      out.multiplyScalar(1.1 + 0.2 * bt);
       const hollow = fbm3(x * 0.05, z * 0.05, 9, seed ^ 0x2b, 3);
       out.multiplyScalar(1 - 0.3 * smooth(0.55, 0.3, hollow));
       out.lerp(TIP, 0.22 * smooth(0.6, 0.78, hollow));
@@ -391,7 +390,9 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   apronMaterial.map = null;
   apronMaterial.bumpMap = null;
   apronMaterial.color.multiplyScalar(0.58);
-  full.add(new THREE.Mesh(apron, apronMaterial));
+  const apronMesh = new THREE.Mesh(apron, apronMaterial);
+  apronMesh.name = 'grotto-sediment-apron';
+  full.add(apronMesh);
   if (d.rubble) {
     const spots = placeRocks(talus, W, Math.round(120 * d.growth), seed, {
       size: 0.7 * scale,

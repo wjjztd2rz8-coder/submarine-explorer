@@ -68,7 +68,7 @@ describe('Lost City first-ten-second Arcade opening', () => {
         );
         expect(props.collide(position.clone(), settings.hullRadius + 4, new Vector3())).toBe(false);
         const rig = new CameraRig(config.camera, 16 / 9, terrain);
-        rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX);
+        rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
         rig.snap(position, pose.yaw, 0);
         expect(rig.camera.position.distanceTo(hero.root.position)).toBeLessThan(112);
         // The full solid tower's axis fits vertically, on desktop and portrait.

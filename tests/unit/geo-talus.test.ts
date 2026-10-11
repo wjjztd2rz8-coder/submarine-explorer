@@ -60,6 +60,62 @@ describe('talus surface', () => {
   });
 });
 
+describe('sediment terraces', () => {
+  const terraced: TalusShape = {
+    ...shape,
+    terraces: DEFAULT_CONFIG.props.blueHoleApron,
+  };
+
+  it('adds bounded beds to the final sloping surface and preserves both contacts', () => {
+    const bed = terraced.terraces!.bedHeightM;
+    let flat = 0;
+    let riser = 0;
+    for (let s = 3.5; s < 13; s += 0.02) {
+      const z = shape.foot(0) - s;
+      const original = talusSurface(shape, 0, z);
+      const finished = talusSurface(terraced, 0, z);
+      expect(finished).toBeGreaterThanOrEqual(original - 1e-9);
+      expect(finished - original).toBeLessThan(bed);
+      const slope = Math.abs((talusSurface(terraced, 0, z - 0.005) - finished) / 0.005);
+      if (slope < 0.02) flat++;
+      if (slope > 0.4) riser++;
+    }
+    // Real level treads and short risers, rather than painted lines on a ramp.
+    expect(flat).toBeGreaterThan(150);
+    expect(riser).toBeGreaterThan(20);
+    for (const u of [-0.1, 0, 1, 1.1]) {
+      const z = shape.foot(0) - u * shape.reach(0);
+      expect(talusSurface(terraced, 0, z)).toBe(talusSurface(shape, 0, z));
+    }
+  });
+
+  it('renders and seats rocks on the same stepped surface without extra triangles', () => {
+    const colour = (_x: number, _y: number, _z: number, _u: number, c: THREE.Color) =>
+      c.setScalar(0.5);
+    const original = buildTalusMesh(shape, 90, 60, 40, 5, colour);
+    const finished = buildTalusMesh(terraced, 90, 60, 40, 5, colour);
+    expect(finished.index!.count).toBe(original.index!.count);
+    const p = finished.getAttribute('position');
+    const before = original.getAttribute('position');
+    let raised = 0;
+    for (let i = 0; i < p.count; i++) {
+      const lift = p.getY(i) - before.getY(i);
+      expect(lift).toBeGreaterThanOrEqual(-1e-5);
+      expect(lift).toBeLessThan(terraced.terraces!.bedHeightM);
+      if (lift > 0.1) raised++;
+    }
+    expect(raised).toBeGreaterThan(100);
+    const rocks = placeRocks(terraced, 90, 100, 11, { size: 0.9 });
+    expect(rocks.length).toBeGreaterThan(40);
+    for (const rock of rocks) {
+      expect(rock.y).toBe(talusSurface(terraced, rock.x, rock.z));
+      expect(isSupported(terraced, rock)).toBe(true);
+    }
+    original.dispose();
+    finished.dispose();
+  });
+});
+
 describe('rocks sit on the final apron surface', () => {
   const spots = placeRocks(shape, 90, 200, 11, { size: 0.9, blocks: 0.06, span: 0.45 });
 
