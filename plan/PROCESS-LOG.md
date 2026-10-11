@@ -169,3 +169,10 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - Sol review plus 3 running Codex tasks exhausted Codex 5h (63% to 0 in ~25 min), so the reconcile round failed. Rule: start Sol only when fewer than 2 Codex tasks run or Codex 5h >= 70%.
 - `.cache/review/current` is a symlink written by `codex-review.sh start`; creating it with mkdir breaks `reconcile` (it waited forever). Write the draft only after `start` has made the link.
 - Shard-7 CI failure traced via `gh api repos/:owner/:repo/actions/jobs/<id>/logs` (`gh run view --log-failed` printed nothing).
+
+## 2026-10-11 15:30 owner-requested review follow-ups (interactive)
+
+- **Codex browser access.** The owner asked whether Codex could get a browser. The Codex chrome plugin (ChatGPT extension) is not installed and finds no supported browser (the default is Brave Origin), and it would drive the owner's own window, which doesn't suit headless runs. Instead, `tools/codex-browser.sh` starts a Vite dev server of the task's checkout and passes a headless Playwright MCP server (`~/.local/share/pw-mcp`, @playwright/mcp 0.0.83, Playwright's Chromium) to `codex exec`. Outside Codex, the MCP server rendered the game with WebGL. Whether codex-spawned MCP servers escape the sandbox is checked by `.cache/owner-review-kickoff.sh` at 16:48 (result in `.cache/codex/browser-smoke.md`; failure writes `.cache/codex/browser-off`, which disables it).
+- **Dispatch cap.** `.cache/codex/dispatch-max` overrides MAX (set to 1 until Sol's reconcile; a timer removes it at 20:30 regardless), which applies the 13:15 rule above automatically.
+- **STATUS.md** was a Phase D2 page from Sept 24. It is archived, and each comprehensive review now rewrites a one-page plan/STATUS.md.
+- **Test suite:** Codex 1405 sweeps for redundant, slow and obsolete tests (report only); Claude then prunes from its report.
