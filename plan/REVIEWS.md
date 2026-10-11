@@ -2,6 +2,26 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-11 05:30 comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-11-100422 vs -015340)
+
+Codex 5h 9% (`codex-review.sh` exit 75), so no Sol second opinion. Play-flow judged from the f-newplayer-recapture and Codex 1260 captures (day old), not recaptured.
+
+**Changed since the last review:** merged f-lostcity-5, f-endurance-hull, f-bluehole-bowl, f-bluehole-perf, Codex 1220/1230/1240/1250/1260/1270, f-newplayer-recapture, f-scan-card-objective. f50 and f51 pushed.
+
+| Site       | Readable | Beautiful | Change | Biggest gap                                              |
+| ---------- | -------- | --------- | ------ | -------------------------------------------------------- |
+| Titanic    | 4        | 4         | same   | flat near-black void above horizon (Codex 1310)          |
+| Beebe      | 4        | 3.75      | same   | trunk and seabed plain                                   |
+| Blue Hole  | 4        | 3.5       | +0.25  | gallery-range apron still smooth and fogged              |
+| Lost City  | 4        | 3.5       | same   | striations too subtle to read; pale pillars              |
+| Monterey   | 4        | 3.75      | same   | wall foot boulders still in a line                       |
+| Challenger | 4        | 3.75      | same   | cobbles tiny; boulders queued (1310)                     |
+| Endurance  | 4        | 4         | +0.25  | hull now fills the frame; minimap stripes remain         |
+
+No regressions. **Process:** efficiency.sh: Claude idle ~160 h and Codex under-used ~134 h of samples, nearly all the Oct 6-10 budget lockout (233 gate skips, 79 watchdog trips: floors working). Codex PASS 123 / other 11. Hosted CI on f51: 29/30 shards green; shard 5 failed only on `f1-vehicles.spec.ts:21` (screenshot hit 240 s on the software-GL runner): lightening it is DIRECTOR item 1. Codex queue holds 1280, 1290, 1310.
+
+**Priorities:** see DIRECTOR.md. **Stage:** ~80% to 1.0, about 2 weeks (Claude alone). **Needs owner:** nothing.
+
 ## 2026-10-10 22:00 comprehensive review, Claude alone (trigger: new release tag f49; golden 2026-10-11-015340 vs -004532)
 
 Codex weekly 5% (`codex-review.sh` exit 75), so no Sol second opinion. Play-flow not recaptured (Codex 1260 queued; now DIRECTOR item 2).

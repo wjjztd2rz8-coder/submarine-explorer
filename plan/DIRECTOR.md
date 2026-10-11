@@ -2,6 +2,22 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
+## Current priorities (comprehensive review, Claude alone, 2026-10-11 05:30; golden 2026-10-11-100422)
+
+Sol skipped (Codex 5h 9%). Scores (beautiful): Titanic 4, Endurance 4 (+0.25), Beebe 3.75, Monterey 3.75, Challenger 3.75, Blue Hole 3.5 (+0.25), Lost City 3.5. No regressions.
+
+Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
+
+1. **Hosted CI f1-vehicles (Haiku):** `e2e/f1-vehicles.spec.ts:21` screenshot times out on the software-GL runner; fewer/lower-res screenshots, never loosen assertions.
+2. **Touch landscape stack (Sonnet):** scan card + tutorial strip cover ~195 of 390 px; collapse the strip after the first scan and add a compact objective chip when no contact is in range.
+3. **Tutorial step text after first scan (Sonnet):** still says 'Step 1: Move and turn' (1240 tests pin it; update tests deliberately).
+4. **Blue Hole gallery apron/talus (Sonnet):** ramp apron smooth and fogged at gallery range.
+5. **Lost City tower read (Sonnet):** raise striation contrast and colour variation; keep scan card off the tip.
+6. **Challenger camera/briefing (Haiku):** camera hides lander behind sub; touch briefing clips objectives.
+7. **Monterey wall-foot boulders and Endurance minimap stripes (Haiku, low).**
+
+Codex queue: 1280 Blue Hole squiggle, 1290 verify hull/Lost City, 1310 Titanic sky + Challenger boulders; plus new briefs below.
+
 ## Update 2026-10-11 04:50 (post f51)
 
 - DONE: new-player flow recapture (f-newplayer-recapture: touch reward notice moved clear of scan card, RISE/SINK hint on touch) and f-scan-card-objective (scan card points at the mission objective). Codex 1250 (sonar flat sites) and 1260/1270 merged; f51 pushed.
