@@ -956,3 +956,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** Codex 1290 (Terrain.dispose now clears the height memo; memo-equivalence and opening-clearance tests; browser checks were blocked in its sandbox, so no screenshots). Smoke + project-base green on main; no full e2e, no push (f51 last tag).
 - **Running:** Codex 1280, 1310, 1320. Queued 1330, 1340, 1350. No Claude package: Blue Hole apron waits on 1280. Needs owner: nothing.
+
+## 2026-10-11 07:45 CDT headless run (Claude)
+
+- **Merged:** nothing. Codex 1280, 1310, 1320 are still running in their worktrees (1310 and 1320 report their own checks passing; browser checks were blocked in their sandbox, so they need a screenshot run on collection). 1330, 1340 and 1350 are queued. Claude 5h was 98% but no Claude package was started: the open items (Blue Hole apron, Monterey and Endurance small items, Titanic sky and Challenger boulders) wait on or overlap those Codex tasks.
+- **Next:** collect 1280, 1310 and 1320 with `--full-e2e` screenshots, then the Blue Hole apron (Sonnet) using 1280's finding. Then a full e2e on main and a release push, since f51 is several merges behind. Needs owner: nothing.
