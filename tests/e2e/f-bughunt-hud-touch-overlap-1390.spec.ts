@@ -75,14 +75,40 @@ async function ready(page: Page): Promise<void> {
 }
 
 async function away(page: Page): Promise<void> {
-  await page.evaluate(() => {
-    const g = window.__game as unknown as Game;
-    g.sub.position.x += 10000;
-    g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
-    // Advance the completion banner without spending wall time or reward lifetime.
-    g.discovery.update(0, 10, g.sub.position, g.sub.getForward(), { scan: false });
+  // Procedural wildlife and sample targets spawn around the sub wherever it is
+  // (deep coral at Hudson Canyon and Kamaʻehuakanaloa) a frame after it moves, so
+  // a fixed offset can land in range of one. Try several until none is in range.
+  const offsets = [
+    [10000, 0],
+    [0, 10000],
+    [-10000, 0],
+    [0, -10000],
+    [20000, 7000],
+    [-20000, 7000],
+    [7000, -20000],
+    [-7000, 20000],
+  ];
+  const base = await page.evaluate(() => {
+    const p = (window.__game as unknown as Game).sub.position;
+    return { x: p.x, y: p.y, z: p.z };
   });
-  await page.clock.runFor(34);
+  for (const [dx, dz] of offsets) {
+    await page.evaluate(
+      ([base, dx, dz]) => {
+        const g = window.__game as unknown as Game;
+        g.sub.position.set(base.x + dx, base.y, base.z + dz);
+        g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
+        // Advance the completion banner without spending wall time or reward lifetime.
+        g.discovery.update(0, 10, g.sub.position, g.sub.getForward(), { scan: false });
+      },
+      [base, dx, dz] as const,
+    );
+    await page.clock.runFor(34);
+    const inRange = await page.evaluate(
+      () => (window.__game as unknown as Game).discovery.scanner.view.nearestInRange,
+    );
+    if (!inRange) break;
+  }
 }
 
 for (const viewport of [

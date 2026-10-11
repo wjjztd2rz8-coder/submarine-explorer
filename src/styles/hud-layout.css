@@ -56,7 +56,7 @@
 /* F-TOAST-550: the hint follows the target in normal flow, so a wrapped name
    never needs a guessed offset. With no target it uses the same centre slot. */
 .scan-stack {
-  top: calc(max(84px, 15%) + env(safe-area-inset-top, 0px));
+  top: calc(max(112px, 15%) + env(safe-area-inset-top, 0px));
   bottom: auto;
   width: var(--hl-scan-width);
   min-width: 0;
@@ -106,7 +106,7 @@
   html.is-touch .scan-overlay .scan-stack {
     left: calc(50% - 40px);
     width: var(--hl-scan-width);
-    top: calc(max(84px, 15%) + env(safe-area-inset-top, 0px));
+    top: calc(max(112px, 15%) + env(safe-area-inset-top, 0px));
     bottom: auto;
   }
 }
