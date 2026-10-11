@@ -906,3 +906,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Review:** trigger new tag f49. Golden 2026-10-11-015340 viewed; Sol skipped (Codex weekly 5%). Scores 3.25-4, no regressions; DIRECTOR backlog refilled (7 items), REVIEWS.md entry added. CI on f49 green.
 - **Release f50 pending:** full e2e on main (11 commits ahead of origin) running as detached unit `subexp-fulle2e` (log .cache/full-e2e-review.log, ends with `rc=N`). Next run: if rc=0, push, tag f50, check gh run list; else triage. Process note: background Bash tasks and Monitors are killed after ~10 min, so long gates must use systemd-run.
 - **Queue:** Codex 1220-1280 (dry until 15 Oct). Needs owner: nothing.
+
+## 2026-10-11 01:04 CDT headless run (Claude, release f50)
+
+- **Released f50:** full e2e on main passed (all gates, rc=0) after a fix; pushed and tagged f50. Pages deploy started; hosted CI for the new SHA queued (check `gh run list`).
+- **Merged:** f-bluehole-perf (Sonnet): the Blue Hole 60 s idle spec failure (30 frames) was not a flake or render cost. `Terrain.sampleHeight` took ~43 µs per call on Blue Hole (carve + relief noise), so the spec's ~47k calls/s blocked ~2 s per check; now memoised at lattice corners (~1.3 µs), no visual change. Also speeds physics/camera/prop sampling in game. The earlier "software-GL flake" call at 17:03 was wrong; I recorded it here.
+- **Queue:** Codex 1220-1280 (dry until 15 Oct). Next Claude: DIRECTOR backlog items 2-7 (new-player flow recapture, Lost City columns, Endurance hull, Blue Hole bowl, Titanic sky, Challenger boulders). Needs owner: nothing.
