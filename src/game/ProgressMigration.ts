@@ -4,12 +4,12 @@ import type { Photo } from './PhotoStore.js';
 import type { FetchJson } from './ContentPath.js';
 import type { Progress } from './Progress.js';
 
-// 940 changed these routes. A discoveries-only save can already have earned
+// Earlier content changed these routes. A discoveries-only save can already have earned
 // completion on the old primaries; retain that credit without marking a new
-// mission run complete or requiring the newly promoted scenic scan.
+// mission run complete or requiring a newly added or promoted terrain scan.
 // f-mission-pacing moved the second required target close to the first; the
 // 940-era route stays credited too.
-const PRE_940_OBJECTIVES: Record<string, Record<string, boolean>[]> = {
+const PREVIOUS_OBJECTIVES: Record<string, Record<string, boolean>[]> = {
   'great-blue-hole': [
     { 'outer-dropoff': true, 'western-dropoff': true },
     { stalactites: true, 'outer-dropoff': true, 'stalactites-east': false },
@@ -18,6 +18,11 @@ const PRE_940_OBJECTIVES: Record<string, Record<string, boolean>[]> = {
     { 'canyon-head': true, 'upper-channel': true, 'canyon-wall': false, 'mars-node': false },
     { 'canyon-wall': true, 'upper-channel': true, 'canyon-axis': false },
   ],
+  'challenger-deep': [
+    { 'leggo-site': true, 'north-wall': true, 'central-basin': false, 'axis-sill': false },
+  ],
+  'hunga-tonga-caldera': [{ 'caldera-floor': true, 'rim-wall': true }],
+  'hudson-canyon': [{ wall: true, 'coral-ledge': true }],
 };
 
 /** Finish legacy credit before hull gating; a returning pilot never loses access during migration. */
@@ -49,7 +54,7 @@ export async function creditPreviousDives(
       def.objectives.forEach((o, i) => {
         if (statuses[i].complete) progress.credit('objective', `${site}/${o.id}`);
       });
-      const oldRoutes = (PRE_940_OBJECTIVES[site] ?? []).map((roles) =>
+      const oldRoutes = (PREVIOUS_OBJECTIVES[site] ?? []).map((roles) =>
         def.objectives.flatMap((o, i) =>
           Object.hasOwn(roles, o.id)
             ? [{ primary: roles[o.id], complete: statuses[i].complete }]

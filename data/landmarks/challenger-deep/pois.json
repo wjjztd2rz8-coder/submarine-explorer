@@ -22,6 +22,22 @@
       "note": "Real event and real position, corrected this session against Schmidt Ocean Institute's own cruise page (previously mis-sourced to Wikipedia and mis-dated 2018): the benthic lander 'Leggo', deployed from RV Falkor during the December 2014 'Expanding Mariana Trench Perspectives' cruise (FK141215), recorded amphipods (Hirondellea gigas) feeding on bait at 11.368536 N, 142.5875166 E, 10,929 m, on 19 December 2014. This tile's terrain reads 10,925.1 m at that point, 4 m away. `reconstruction: true` because Leggo was recovered after the cruise and nothing physical remains on the seabed here; the marker/prop at this position stands in for the historic sampling event, not a permanent structure."
     },
     {
+      "id": "cd-eastern-floor",
+      "name": "Eastern Pool floor transect",
+      "lat": 11.3758609130288,
+      "lon": 142.58688354492188,
+      "snap_to_seabed": true,
+      "radius_m": 120,
+      "kind": "geology",
+      "primary": true,
+      "scan_seconds": 3,
+      "guide_entry": "eastern-floor",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/"],
+      "note": "Real GMRT terrain: 10919.8 m deep at the centre of row 450, column 446 (zero-based) in data/tiles/challenger-deep/heightmap.bin. This second floor scan lies about 817 m north of the Leggo bait-station site. The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment. No prop or staged encounter is added."
+    },
+    {
       "id": "cd-north-wall",
       "name": "North inner wall",
       "lat": 11.4055,
@@ -29,7 +45,7 @@
       "snap_to_seabed": true,
       "radius_m": 200,
       "kind": "geology",
-      "primary": true,
+      "primary": false,
       "scan_seconds": 4,
       "guide_entry": "trench-walls",
       "confidence": "high",

@@ -15,7 +15,7 @@
     "heading_deg": 140
   },
   "briefing": {
-    "summary": "Descend to the Leggo lander’s 2014 bait-station site on the Eastern Pool floor, then climb the steep north inner wall of the trench.",
+    "summary": "Scan the Leggo lander’s 2014 bait-station site and a nearby stretch of the Eastern Pool floor. The north inner wall is an optional longer survey.",
     "depth_m": 10931,
     "facts": [
       "Challenger Deep contains several deep basins. This tile’s deepest sampled cell in the Eastern Pool is about 10,931 m.",
@@ -40,12 +40,20 @@
       "hint": "Find the Leggo lander site on the Eastern Pool floor, near 10,925 m."
     },
     {
+      "id": "eastern-floor",
+      "type": "scan",
+      "poi": "cd-eastern-floor",
+      "primary": true,
+      "title": "Survey the Eastern Pool floor",
+      "hint": "Follow the Eastern Pool floor north from the Leggo site, near 10,920 m."
+    },
+    {
       "id": "north-wall",
       "type": "scan",
       "poi": "cd-north-wall",
-      "primary": true,
+      "primary": false,
       "title": "Survey the north inner wall",
-      "hint": "Climb northwest from the Leggo site to the steep inner wall, near 9,980 m."
+      "hint": "Optional longer survey: climb northwest from the Leggo site to the steep inner wall, near 9,980 m."
     },
     {
       "id": "central-basin",

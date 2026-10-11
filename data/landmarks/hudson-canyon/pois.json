@@ -3,22 +3,6 @@
   "landmark": "hudson-canyon",
   "pois": [
     {
-      "id": "hc-canyon-wall",
-      "name": "North wall of the upper canyon",
-      "lat": 39.42,
-      "lon": -72.21,
-      "snap_to_seabed": true,
-      "radius_m": 200,
-      "kind": "geology",
-      "primary": true,
-      "scan_seconds": 5,
-      "guide_entry": "canyon-wall",
-      "confidence": "high",
-      "reconstruction": false,
-      "sources": ["https://www.gmrt.org/", "https://www.mafmc.org/actions/hudson-canyon"],
-      "note": "Real GMRT terrain (Ryan et al. 2009; value and slope read directly from this tile's grid this session): 541.9 m deep, on a locally steep flank of the upper canyon's north wall. Central-difference slope sampling over one grid cell (~50-60 m) gives roughly 18-19 deg here -- steep for this ~50 m grid, and the true wall relief (rock outcrops and ledges per MAFMC's habitat description) is almost certainly sharper than this coarse sampling can resolve."
-    },
-    {
       "id": "hc-coral-ledge",
       "name": "Coral-habitat ledge",
       "lat": 39.41,
@@ -36,6 +20,38 @@
         "https://en.wikipedia.org/wiki/Frank_R._Lautenberg_Deep-Sea_Coral_Protection_Area"
       ],
       "note": "Real GMRT terrain (941.9 m deep, steep mid-canyon flank a little over 2.5 km from the wall POI) inside the Frank R. Lautenberg Deep Sea Coral Protection Area, which closes bottom-tending fishing gear across roughly 38,000 sq mi of Mid-Atlantic canyon and slope habitat including Hudson Canyon. In September 2025 a NOAA/Ocean Exploration Trust expedition used ROV Global Explorer to survey Hudson Canyon's coral and sponge communities for the first time in years, live-streamed as part of the sanctuary-designation science effort. No public dataset from that cruise gives an exact coral colony position usable here, so this POI's precise coordinate is an invented stand-in for that habitat type on a real steep ledge; `reconstruction: true` because no coral model is rendered -- the field guide entry, not a placed prop, carries the biology."
+    },
+    {
+      "id": "hc-wall-transect",
+      "name": "Canyon flank transect",
+      "lat": 39.41195730570121,
+      "lon": -72.18594360351562,
+      "snap_to_seabed": true,
+      "radius_m": 120,
+      "kind": "geology",
+      "primary": true,
+      "scan_seconds": 3,
+      "guide_entry": "wall-transect",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/"],
+      "note": "Real GMRT terrain: 976.7 m deep at the centre of row 433, column 936 (zero-based) in data/tiles/hudson-canyon/heightmap.bin. This terrain survey is about 555 m northwest of the coral-habitat ledge marker. The GMRT grid reads about 977 m here, compared with about 942 m at the ledge marker. The nearby pair samples the surveyed canyon flank. This point was chosen from the terrain grid for the dive; it does not mark a documented coral colony. Continue northwest to the optional north-wall scan, where the grid reads about 542 m. No prop or staged encounter is added."
+    },
+    {
+      "id": "hc-canyon-wall",
+      "name": "North wall of the upper canyon",
+      "lat": 39.42,
+      "lon": -72.21,
+      "snap_to_seabed": true,
+      "radius_m": 200,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 5,
+      "guide_entry": "canyon-wall",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/", "https://www.mafmc.org/actions/hudson-canyon"],
+      "note": "Real GMRT terrain (Ryan et al. 2009; value and slope read directly from this tile's grid this session): 541.9 m deep, on a locally steep flank of the upper canyon's north wall. Central-difference slope sampling over one grid cell (~50-60 m) gives roughly 18-19 deg here -- steep for this ~50 m grid, and the true wall relief (rock outcrops and ledges per MAFMC's habitat description) is almost certainly sharper than this coarse sampling can resolve."
     }
   ]
 }

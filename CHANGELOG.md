@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **1220-f-pacing-gaps:** Challenger Deep, Hunga Tonga and Hudson Canyon now pair their opening scan with a nearby required survey on real GMRT bathymetry (817 m, 660 m and 555 m away). The north inner wall, shallow caldera floor and shallower north canyon wall remain optional longer surveys. Briefings, hints and Journal entries describe the new routes; old saves retain earned route credit. Removed all remaining long-gap exceptions from the 1.5 km pacing test. No rendering changes. Details in `plan/progress/1220-f-pacing-gaps.md`.
 - **f-challenger-tone:** Challenger Deep seabed tone: cooler, darker grey-olive silt with less warm stain and slightly denser fog, so the 10.9 km floor no longer reads as a sunlit beach; other sites unchanged.
 - **f-bluehole-map:** the Great Blue Hole minimap shows the reef flat outside the hole as one calm radial depth gradient (pale turquoise at the rim easing to soft blue, `blueHoleSonarReef`) instead of the measured reef-top noise shaded as camouflage-like coral and sand blotches; the hole interior, contour rings and depth labels are unchanged, and other sites are untouched.
 

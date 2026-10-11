@@ -188,6 +188,32 @@
         }
       ],
       "confidence": "high"
+    },
+    {
+      "id": "flank-transect",
+      "title": "Volcanic flank transect (pre-2022 survey)",
+      "paragraphs": [
+        "This terrain survey is about 660 m east-northeast of the volcanic rim-slope scan. The pre-2022 GMRT grid reads about 293 m here, compared with about 469 m at the rim-slope point.",
+        "The nearby pair samples the volcanic flank beyond the shallow central basin. This point was chosen from the survey grid for the dive; it is not a separately named volcanic feature. Continue east to the optional shallow basin-floor scan to compare that earlier landscape."
+      ],
+      "facts": [
+        {
+          "label": "Depth here (this tile)",
+          "value": "292.9 m"
+        }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 (value read from this tile’s grid)",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "GMRT GridServer request for this shipped bathymetry tile",
+          "url": "https://www.gmrt.org/services/GridServer?north=-20.4&south=-20.7&east=-175.2398&west=-175.5602&layer=topo&format=esriascii&resolution=max"
+        }
+      ],
+      "confidence": "high"
     }
   ]
 }
