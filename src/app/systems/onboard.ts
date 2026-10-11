@@ -101,6 +101,7 @@ export function createOnboardSystem(): GameSystem {
     },
     init(ctx) {
       ctxRef = ctx;
+      wasLights = ctx.headlights.on;
       const { input, bus, params } = ctx;
       store = new TutorialSave();
       const record = store.get();
@@ -187,6 +188,8 @@ export function createOnboardSystem(): GameSystem {
       });
     },
     start(ctx) {
+      // Mission setup can enable the lamps; only player changes count as practice.
+      wasLights = ctx.headlights.on;
       // A second way into the card, from the Settings header.
       const open =
         ctx.settingsScreen.root.querySelector<HTMLButtonElement>('.settings-controls-open');
@@ -223,10 +226,12 @@ export function createOnboardSystem(): GameSystem {
         const photos = ctx.photos.photos.length;
         if (tutorial.active && dive) {
           if (lights !== wasLights && tutorial.notify('lights')) onAdvance();
-          if (journal && !wasJournal && tutorial.notify('journal')) onAdvance();
           if ((photoMode && !wasPhotoMode) || photos > photoCount)
             if (tutorial.notify('photo')) onAdvance();
         }
+        // Touch players reach Journal through Pause, where the sim stays frozen.
+        if (tutorial.active && ctx.app.state !== 'home' && journal && !wasJournal)
+          if (tutorial.notify('journal')) onAdvance();
         wasLights = lights;
         wasJournal = journal;
         wasPhotoMode = photoMode;

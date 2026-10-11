@@ -48,7 +48,7 @@ vi.mock('../../src/ui/ControlsCard.js', () => ({
 
 afterEach(() => vi.unstubAllGlobals());
 
-function setup(seenHints: HintId[] = ['creature']) {
+function setup(seenHints: HintId[] = ['creature'], initialLights = false) {
   vi.clearAllMocks();
   views.chip.visible = false;
   views.chip.show.mockImplementation(() => {
@@ -67,7 +67,7 @@ function setup(seenHints: HintId[] = ['creature']) {
   vi.stubGlobal('window', new EventTarget());
   vi.stubGlobal('document', { documentElement: { dataset: {} } });
   const exposed: { onboard?: { tutorial: Tutorial; store: TutorialSave } } = {};
-  const headlights = { on: false };
+  const headlights = { on: initialLights };
   const photos = { photos: [] as object[] };
   const ctx = {
     input: { actions: [], primaryKeyLabel: () => 'G', touchActive: false, gamepadActive: false },
@@ -385,6 +385,72 @@ describe('onboarding completion through the system', () => {
       );
       tick();
       expect(views.chip.show).toHaveBeenCalledTimes(1);
+    } finally {
+      system.dispose?.();
+    }
+  });
+
+  it('early scan and Journal events finish once after movement and depth practice', () => {
+    const { ctx, system, tick, onboard, headlights } = setup();
+    const journal = ctx.journal as unknown as { isOpen: boolean };
+    try {
+      ctx.bus.emit('scan:complete', { poiId: 'test', landmarkId: '_test', firstTime: true });
+      ctx.app.state = 'pause';
+      journal.isOpen = true;
+      tick();
+      journal.isOpen = false;
+      ctx.app.state = 'dive';
+      headlights.on = true;
+      tick();
+      expect(onboard.tutorial.step?.id).toBe('move');
+      expect(views.chip.show).not.toHaveBeenCalled();
+      tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
+      tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
+      expect(onboard.tutorial.finished).toBe(true);
+      expect(onboard.store.get().tutorialDone).toBe(true);
+      expect(views.card.show).toHaveBeenLastCalledWith(null);
+      expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
+        'Nice work. The Controls guide is always in the Pause menu.',
+      );
+      ctx.bus.emit('scan:started', { poiId: 'test' });
+      tick();
+      expect(views.chip.show).toHaveBeenCalledTimes(1);
+    } finally {
+      system.dispose?.();
+    }
+  });
+
+  it('initially enabled lamps do not count as a player switching headlights', () => {
+    const { system, tick, onboard, headlights } = setup(['creature'], true);
+    try {
+      tick();
+      tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
+      tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
+      expect(onboard.tutorial.step?.id).toBe('lights');
+      headlights.on = false;
+      tick();
+      expect(onboard.tutorial.step?.id).toBe('scan');
+    } finally {
+      system.dispose?.();
+    }
+  });
+
+  it('Journal opened from Pause completes the last step; Home Journal does not', () => {
+    const { ctx, system, tick, onboard } = setup();
+    const journal = ctx.journal as unknown as { isOpen: boolean };
+    try {
+      for (let i = 0; i < 4; i++) views.actions!.skipStep();
+      ctx.app.state = 'home';
+      journal.isOpen = true;
+      tick();
+      expect(onboard.tutorial.step?.id).toBe('journal');
+      journal.isOpen = false;
+      tick();
+      ctx.app.state = 'pause';
+      journal.isOpen = true;
+      tick();
+      expect(onboard.tutorial.finished).toBe(true);
+      expect(onboard.store.get().tutorialDone).toBe(true);
     } finally {
       system.dispose?.();
     }

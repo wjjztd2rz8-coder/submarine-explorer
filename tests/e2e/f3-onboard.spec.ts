@@ -110,6 +110,22 @@ test('desktop: Pause opens the controls card for the active device', async ({ pa
   await expect(dialog).toContainText('Left stick');
 });
 
+test('an opening scan is remembered when the player reaches the scan tutorial step', async ({
+  page,
+}) => {
+  await boot(page);
+  await page.keyboard.down('g');
+  await completeScan(page, 'test-bow');
+  await page.keyboard.up('g');
+  expect(await stepIndex(page)).toBe(0);
+  const skip = page.locator('.onboard-skip-step');
+  await skip.click();
+  await skip.click();
+  await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'lights');
+  await page.keyboard.press('l');
+  await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'journal');
+});
+
 for (const dismissal of ['button', 'expiry'] as const) {
   test(
     dismissal === 'button'
@@ -202,6 +218,25 @@ for (const dismissal of ['button', 'expiry'] as const) {
 
 test.describe('touch viewport', () => {
   test.use({ ...phoneLandscape });
+
+  test('Journal returns to Pause without switching out of touch mode', async ({ page }) => {
+    await boot(page, '&touch=1');
+    for (let i = 0; i < 4; i++) await page.locator('.onboard-skip-step').tap();
+    await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'journal');
+    await page.locator('.tc-btn-pause').tap();
+    const pause = page.locator('.pause-menu');
+    await pause.getByRole('button', { name: 'Journal', exact: true }).tap();
+    const journal = page.locator('.journal');
+    await expect(journal).toBeVisible();
+    await expect.poll(async () => (await saved(page))?.tutorialDone).toBe(true);
+    await journal.getByRole('button', { name: 'Close', exact: true }).tap();
+    await expect(journal).toBeHidden();
+    await expect(pause).toBeVisible();
+    await expect(page.locator('html')).toHaveClass(/is-touch/);
+    await pause.getByRole('button', { name: 'Resume', exact: true }).tap();
+    await expect(page.locator('.tc-btn-pause')).toBeVisible();
+    await expect(page.locator('.onboard-card')).toBeHidden();
+  });
 
   test('tutorial card clears the on-screen controls and targets are 44px', async ({ page }) => {
     await boot(page, '&touch=1');

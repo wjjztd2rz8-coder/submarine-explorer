@@ -40,6 +40,7 @@ export class Tutorial {
   private moveS = 0;
   private turnS = 0;
   private depthS = 0;
+  private readonly seenEvents = new Set<TutorialEvent>();
 
   constructor(active = true) {
     this.active_ = active;
@@ -79,14 +80,12 @@ export class Tutorial {
     return false;
   }
 
-  /** An event only counts for the step that is waiting for it. */
+  /** Remember actions done early so later prompts do not ask for them again. */
   notify(event: TutorialEvent): boolean {
     const step = this.step;
     if (!step) return false;
-    if (step.id === 'lights' && event === 'lights') return this.advance();
-    if (step.id === 'scan' && event === 'scan') return this.advance();
-    if (step.id === 'journal' && (event === 'journal' || event === 'photo')) return this.advance();
-    return false;
+    this.seenEvents.add(event);
+    return this.eventDone(step.id) ? this.advance() : false;
   }
 
   /** Skip the step on screen. */
@@ -101,7 +100,13 @@ export class Tutorial {
 
   private advance(): boolean {
     this.index_ += 1;
+    while (this.eventDone(TUTORIAL_STEPS[this.index_]?.id)) this.index_ += 1;
     if (this.finished) this.active_ = false;
     return true;
+  }
+
+  private eventDone(id?: TutorialStepId): boolean {
+    if (id === 'lights' || id === 'scan') return this.seenEvents.has(id);
+    return id === 'journal' && (this.seenEvents.has('journal') || this.seenEvents.has('photo'));
   }
 }

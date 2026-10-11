@@ -169,13 +169,11 @@ describe('tutorial progression', () => {
     expect(t.index).toBe(0);
     expect(t.update({ dt: 0, throttle: 1, yaw: 1, ballast: 1 })).toBe(false);
   });
-  it('events only count for the step waiting for them', () => {
+  it('events advance the current step', () => {
     const t = new Tutorial();
-    expect(t.notify('scan')).toBe(false);
     hold(t, { throttle: 1, yaw: 1 });
     hold(t, { ballast: -1 });
     expect(t.step?.id).toBe('lights');
-    expect(t.notify('journal')).toBe(false);
     expect(t.notify('lights')).toBe(true);
     expect(t.notify('scan')).toBe(true);
     expect(t.step?.id).toBe('journal');
@@ -183,6 +181,49 @@ describe('tutorial progression', () => {
     expect(t.finished).toBe(true);
     expect(t.active).toBe(false);
     expect(t.step).toBeNull();
+  });
+  it('remembers an opening scan without skipping movement or depth practice', () => {
+    const t = new Tutorial();
+    expect(t.notify('scan')).toBe(false);
+    expect(t.step?.id).toBe('move');
+    hold(t, { throttle: 1 });
+    expect(t.step?.id).toBe('depth');
+    hold(t, { ballast: -1 });
+    expect(t.step?.id).toBe('lights');
+    expect(t.notify('lights')).toBe(true);
+    expect(t.step?.id).toBe('journal');
+    expect(t.finished).toBe(false);
+  });
+  it.each(['journal', 'photo'] as const)(
+    'remembers early %s and completes after practice',
+    (event) => {
+      const t = new Tutorial();
+      t.notify(event);
+      t.notify('lights');
+      t.notify('scan');
+      t.notify('scan'); // A repeated event does not advance unrelated steps.
+      expect(t.index).toBe(0);
+      hold(t, { throttle: 1 });
+      expect(t.step?.id).toBe('depth');
+      hold(t, { ballast: 1 });
+      expect(t.finished).toBe(true);
+      expect(t.active).toBe(false);
+      expect(t.notify('scan')).toBe(false);
+    },
+  );
+  it('skip step also bypasses actions already done, and new tutorials start fresh', () => {
+    const t = new Tutorial();
+    t.notify('scan');
+    t.skipStep();
+    t.skipStep();
+    expect(t.step?.id).toBe('lights');
+    t.skipStep();
+    expect(t.step?.id).toBe('journal');
+    const fresh = new Tutorial();
+    fresh.skipStep();
+    fresh.skipStep();
+    fresh.skipStep();
+    expect(fresh.step?.id).toBe('scan');
   });
   it('skip step moves on; skip all ends it', () => {
     const t = new Tutorial();
