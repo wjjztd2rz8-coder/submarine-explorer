@@ -234,12 +234,9 @@ describe('Challenger / Endurance opening', () => {
                   'wreck beside sub with a visible gap',
                 ).toBeGreaterThan(8);
               const eye = rig.camera.position.clone();
-              const radius = Math.hypot(
-                config.camera.chaseOffset.x,
-                config.camera.chaseOffset.y,
-                config.camera.chaseOffset.z,
-              );
-              expect(pose.chaseRadius).toBeUndefined();
+              // The opening pulls the chase arm in so the 44 m hull dominates the first frame.
+              const radius = DEEP_OPENINGS.endurance.opening.chaseRadius;
+              expect(pose.chaseRadius).toBe(radius);
               expect(rig.chaseRadius).toBe(radius);
               rig.orbit(0.2, 0.1, 0.5);
               rig.resetView();
