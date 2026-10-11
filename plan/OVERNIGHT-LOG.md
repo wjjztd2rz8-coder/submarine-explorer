@@ -945,3 +945,19 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** f-tutorial-order (Sonnet): the tutorial remembers a scan/lights/photo/Journal done early and skips that step on arrival; the current step still does not advance (1240 pins kept, one unit test added). f-lostcity-tower (Sonnet): ochre/blue-grey tower colour, stronger flutes, subtler brucite fins, opening framing keeps the tip clear of the scan card; modest gain, opening camera ~16 m farther back (pins updated deliberately). Smoke + project-base green on main; no full e2e, no push (f51 last tag).
 - **Queue:** Codex 1280-1330 queued (dispatch timer launches after the 06:04 reset). Next Claude: Blue Hole apron (DIRECTOR 4; check 1280 first), Monterey/Endurance small items (queued as 1320). Needs owner: nothing.
+
+## 2026-10-11 06:36 CDT headless run (Claude)
+
+- **Merged:** nothing. Codex 1280 (Blue Hole squiggle bisect), 1290 and 1310 were running at start (launched after the 06:04 reset); 1320 and 1330 queued. No Claude package launched: the remaining Claude item (Blue Hole apron) depends on 1280's finding about the silt-texture squiggles, and the other open items are in 1320. Claude 5h was 63%.
+- **Process:** efficiency.sh shows idle time is dominated by budget-gate skips (233); no tooling change this run.
+- **Next:** collect 1280/1290/1310, then Blue Hole apron (Sonnet) using 1280's result. Needs owner: nothing.
+
+## 2026-10-11 07:25 CDT headless run (Claude)
+
+- **Merged:** Codex 1290 (Terrain.dispose now clears the height memo; memo-equivalence and opening-clearance tests; browser checks were blocked in its sandbox, so no screenshots). Smoke + project-base green on main; no full e2e, no push (f51 last tag).
+- **Running:** Codex 1280, 1310, 1320. Queued 1330, 1340, 1350. No Claude package: Blue Hole apron waits on 1280. Needs owner: nothing.
+
+## 2026-10-11 07:45 CDT headless run (Claude)
+
+- **Merged:** nothing. Codex 1280, 1310, 1320 are still running in their worktrees (1310 and 1320 report their own checks passing; browser checks were blocked in their sandbox, so they need a screenshot run on collection). 1330, 1340 and 1350 are queued. Claude 5h was 98% but no Claude package was started: the open items (Blue Hole apron, Monterey and Endurance small items, Titanic sky and Challenger boulders) wait on or overlap those Codex tasks.
+- **Next:** collect 1280, 1310 and 1320 with `--full-e2e` screenshots, then the Blue Hole apron (Sonnet) using 1280's finding. Then a full e2e on main and a release push, since f51 is several merges behind. Needs owner: nothing.

@@ -20,6 +20,8 @@ export interface TalusShape {
   /** Apron height above the ground at the foot, metres. */
   top: (x: number) => number;
   seed: number;
+  /** Optional sediment beds; absent preserves the shared concave rubble profile. */
+  terraces?: { bedHeightM: number; riserFraction: number };
 }
 
 /** Concavity of the apron profile: 1 = straight ramp, higher = more concave. */
@@ -43,7 +45,18 @@ export function talusDepth(t: TalusShape, x: number, z: number): number {
   const d =
     top * Math.pow(1 - u, CONCAVE) +
     (hum * Math.min(top, 4) * 0.3 + clast * 0.28) * Math.sqrt(1 - u) * smooth(0, 0.08, u);
-  return Math.max(0, d);
+  if (!t.terraces || t.terraces.bedHeightM <= 0) return Math.max(0, d);
+  // Terrace the final elevation, not thickness: a sloping ground field would
+  // otherwise tilt every tread back into a ramp. Only lift sediment, by at most
+  // one bed, and feather to the original wall contact and buried outer rim.
+  const bed = t.terraces.bedHeightM;
+  const ground = t.gnd(x, z);
+  const level = (ground + Math.max(0, d)) / bed;
+  const phase = level - Math.floor(level);
+  const stepped = bed * (Math.floor(level) + smooth(0, t.terraces.riserFraction, phase));
+  const lift = Math.max(0, stepped - ground - Math.max(0, d));
+  const mask = smooth(0.04, 0.18, u) * (1 - smooth(0.78, 1, u));
+  return Math.max(0, d) + lift * mask;
 }
 
 /** Final surface height (ground plus apron). */
