@@ -99,6 +99,21 @@ if (carbonateWeights.z > 0.02) {
 #endif
 }
 diffuseColor.rgb *= max(vec3(0.3), 1.0 + (carbonatePattern * 4.6 - 1.0) * carbonateContrast);
+// Vertical flow striations: the same albedo sampled with the vertical axis stretched
+// about 12x on the walls, so fluid-run streaks hang down the carbonate. Two scales,
+// brightness only; fades out on flat tops and with distance (when it would shimmer).
+{
+  float wall = 1.0 - carbonateWeights.y;
+  float far = 1.0 - smoothstep(25.0, 110.0, carbonateDistance);
+  vec3 sp = vCarbonatePosition * vec3(1.9, 0.16, 1.9);
+  float sx = texture2D(carbonateAlbedo, sp.zy, carbonateMip).g * carbonateWeights.x +
+    texture2D(carbonateAlbedo, sp.xy + 0.37, carbonateMip).g * carbonateWeights.z;
+  vec3 sq = vCarbonatePosition * vec3(0.55, 0.05, 0.55);
+  float sw = texture2D(carbonateAlbedo, sq.zy + 0.61, carbonateMip).g * carbonateWeights.x +
+    texture2D(carbonateAlbedo, sq.xy + 0.11, carbonateMip).g * carbonateWeights.z;
+  float stripe = (sx * 0.6 + sw * 0.4) * 4.6 - 1.0;
+  diffuseColor.rgb *= max(0.4, 1.0 + stripe * 0.55 * wall * far);
+}
 roughnessFactor = clamp(carbonateRoughness, 0.72, 0.98);
 #ifdef LOST_CITY_NORMALS
 vec3 porePosition = vCarbonatePosition / carbonatePoreSize;

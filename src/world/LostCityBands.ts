@@ -34,5 +34,12 @@ export function lostCitySlopeTint(
   // The previous fragment strata began at ~28 degrees, hiding gentle massif slopes.
   // Fade in from 4 to 17 degrees; leave level silt unbanded. Broad beds survive LOD.
   const slope = smooth(0.002, 0.045, 1 - normalY);
-  return lostCityBedTint(x, y, z, LOST_CITY_STRATA.periodM, LOST_CITY_STRATA.amount * slope);
+  const bed = lostCityBedTint(x, y, z, LOST_CITY_STRATA.periodM, LOST_CITY_STRATA.amount * slope);
+  // Sediment variation: dark organic-rich silt pockets and pale carbonate-flour drifts,
+  // balanced about 1.0 so the slope keeps its overall brightness.
+  const broad = fbm3(x * 0.045, 11, z * 0.045, 611, 3);
+  const fine = fbm3(x * 0.3, 13, z * 0.3, 613, 2);
+  const silt = 0.62 + 0.9 * smooth(0.3, 0.7, broad) + 0.18 * (fine - 0.5);
+  const warm = 1 + 0.08 * (fbm3(x * 0.09, 17, z * 0.09, 617, 2) - 0.5);
+  return [bed[0] * silt * warm, bed[1] * silt, bed[2] * silt / warm];
 }

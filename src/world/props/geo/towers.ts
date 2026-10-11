@@ -316,6 +316,47 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     ),
   );
   const orifaceR = Math.max(0.6, orR * 0.3);
+  // Brucite fringe: delicate pale fins fanning up and out of each vent lip.
+  const finRnd = mulberry32(seed ^ 0xb7c);
+  for (const [vi, v] of vents.entries()) {
+    const nFins = Math.max(8, Math.round((vi === 0 && !lone ? 64 : 24) * d.growth ** 0.5));
+    for (let k = 0; k < nFins; k++) {
+      const a = (k / nFins) * Math.PI * 2 + finRnd() * 0.4;
+      const len = 0.3 + finRnd() * 0.5 + Math.min(v.r, 4) * 0.12 * finRnd();
+      const wid = 0.04 + finRnd() * 0.06;
+      const out = 0.15 + finRnd() * 0.4; // outward splay per metre of height
+      const tw = finRnd() * 0.6 - 0.3; // sideways curl
+      const ca = Math.cos(a),
+        sa = Math.sin(a);
+      const base = new THREE.Vector3(v.p.x + ca * v.r * 0.95, v.p.y - 0.3, v.p.z + sa * v.r * 0.95);
+      const segs = 3;
+      const pos: number[] = [];
+      for (let j = 0; j <= segs; j++) {
+        const u = j / segs;
+        const h = u * len;
+        const rr = h * out * (0.6 + 0.4 * u);
+        const ang = a + tw * u * u;
+        const cx = base.x + Math.cos(ang) * rr;
+        const cz = base.z + Math.sin(ang) * rr;
+        const cy = base.y + h + 0.3 * u;
+        // Blade width runs tangentially, tapering to a point.
+        const w = wid * (1 - u * 0.92);
+        const tx = -Math.sin(ang) * w,
+          tz = Math.cos(ang) * w;
+        pos.push(cx - tx, cy, cz - tz, cx + tx, cy, cz + tz);
+      }
+      const idx: number[] = [];
+      for (let j = 0; j < segs; j++) {
+        const o = j * 2;
+        idx.push(o, o + 1, o + 2, o + 1, o + 3, o + 2);
+      }
+      const fin = new THREE.BufferGeometry();
+      fin.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      fin.setIndex(idx);
+      fin.computeVertexNormals();
+      pieces.push(fin);
+    }
+  }
   const geom = mergeAll(pieces);
   paint(geom, (x, y, z, ny, out) => {
     const n1 = fbm3(x * 0.16, y * 0.1, z * 0.16, seed ^ 0x77, 4);
@@ -375,7 +416,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     // Vent orifices: a dark, sulphide-stained mouth at each column tip.
     for (const v of vents) {
       const dy = y - v.p.y;
-      if (dy < -v.depth - 1.2 || dy > 0.6) continue;
+      if (dy < -v.depth - 1.2 || dy > 3) continue;
       const dd = Math.hypot(x - v.p.x, z - v.p.z) / v.r;
       const mouth = 1 - smooth(0.3, 0.95, dd);
       // A white brucite fringe round the lip, then the dark throat inside it.
