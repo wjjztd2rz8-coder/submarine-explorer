@@ -2,6 +2,26 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-10 22:00 comprehensive review, Claude alone (trigger: new release tag f49; golden 2026-10-11-015340 vs -004532)
+
+Codex weekly 5% (`codex-review.sh` exit 75), so no Sol second opinion. Play-flow not recaptured (Codex 1260 queued; now DIRECTOR item 2).
+
+**Changed since the last review:** merged f-monterey-wall, f-challenger-seabed, f-bluehole-wall, f-bluehole-map, f-challenger-tone. f49 pushed; hosted CI and Pages green.
+
+| Site       | Readable | Beautiful | Change | Biggest gap                                              |
+| ---------- | -------- | --------- | ------ | -------------------------------------------------------- |
+| Titanic    | 4        | 4         | same   | flat near-black void above the horizon                   |
+| Beebe      | 4        | 3.75      | same   | trunk fine; seabed and smoke plume plain                 |
+| Blue Hole  | 4        | 3.25      | +0.25  | smooth green ramps, bowl terraces fogged                 |
+| Lost City  | 4        | 3.5       | same   | smooth pale pillars, bland slope                         |
+| Monterey   | 4        | 3.75      | same   | strata good; wall base boulders in a line                |
+| Challenger | 4        | 3.75      | +0.25  | grey-olive floor works; cobbles tiny                     |
+| Endurance  | 3.5      | 3.75      | same   | lit water good; hull small and pale in a wide plain      |
+
+No regressions. **Process:** efficiency.sh: Claude idle ~157 h and Codex under-used ~132 h of samples (lockout, Codex weekly 5% until 15 Oct; 233 budget-gate skips, 78 watchdog trips: floors working). Codex PASS 117 / other 11. CI green on f49. Seven Codex briefs queued and dry until 15 Oct.
+
+**Priorities:** see DIRECTOR.md. **Stage:** ~77% to 1.0, about 2 weeks (Claude alone). **Needs owner:** nothing.
+
 ## 2026-10-10 20:00 targeted review (trigger: Claude idle at >=50% for 2 h; golden 2026-10-11-004532)
 
 **Cause:** the DIRECTOR backlog was empty after f-bluehole-wall merged and Codex is dry until 15 Oct (weekly 5%), so runs exited without a package. **Fix:** new golden set captured and viewed; backlog refilled with 7 items (DIRECTOR.md). Scores (beautiful): Titanic 4, Beebe 3.75, Monterey 3.75, Endurance 3.75, Challenger 3.5, Lost City 3.5, Blue Hole 3; no regressions. Biggest gaps: Blue Hole floor and minimap, smooth Lost City pillars, over-bright Challenger floor. Sol not consulted (targeted review). Needs owner: nothing.

@@ -2,7 +2,23 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (targeted review, 2026-10-10 20:00; golden 2026-10-11-004532)
+## Current priorities (comprehensive review, Claude alone, 2026-10-10 22:00; golden 2026-10-11-015340)
+
+Sol skipped (Codex weekly 5%). Scores (beautiful): Titanic 4, Beebe 3.75, Monterey 3.75, Challenger 3.75 (+0.25, grey-olive floor, lander and amphipods read), Endurance 3.75 (lit water column good; hull still small and pale), Lost City 3.5, Blue Hole 3.25 (+0.25, minimap now calm and hole legible). No regressions. CI on f49 green.
+
+Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
+
+1. **Release f50 (Haiku):** full e2e on main (9+ commits ahead of origin), push, tag f50, check `gh run list`. Never loosen assertions; software-GL frame-count flakes get rerun alone. Free PW_PORT first (`fuser -k`).
+2. **New-player flow recapture (Haiku capture, Sonnet judge):** Home to site to first 60 s to Journal to debrief on desktop and phone; not recaptured since 10-09. Fix any dead end or clutter found.
+3. **Lost City columns (Sonnet):** towers are smooth pale pillars with a bland seabed slope; add vertical flow striations, colour variation, brucite fringe near orifice; keep the scan card clear of the tower.
+4. **Endurance hull scale and weathering (Sonnet):** hull reads small against the plain at the default pose; bring the camera closer or enlarge the framing, vary plank colour, add rail growth and a broken-rib silhouette.
+5. **Blue Hole floor/bowl (Sonnet):** wall and floor still smooth green ramps with sparse debris-like flora; add bowl terraces visible at gallery range and denser sponge/coral clumps.
+6. **Titanic dark-void sky (Haiku/Sonnet):** flat near-black above the horizon; a faint depth gradient like Endurance's, without brightening the abyss mood.
+7. **Challenger rock scale (Haiku, low):** cobbles are tiny at 45 m; add a few larger boulders and a slope shadow beyond the lander.
+
+Codex queue unchanged (1220-1280, dry until 15 Oct): see below.
+
+## Previous priorities (targeted review, 2026-10-10 20:00; golden 2026-10-11-004532)
 
 Why: Claude idled at >=50% because the backlog was empty after the last merges and Codex is dry until 15 Oct. New golden set viewed (Claude alone, no Sol). Scores (beautiful): Titanic 4, Beebe 3.75 (two chimneys with smoke, lit), Monterey 3.75 (wall silhouette and strata good), Endurance 3.75 (hull large, lit sky), Challenger 3.5, Lost City 3.5, Blue Hole 3 (floor still a smooth grey ramp; minimap now teal camouflage blotches that don't read as bathymetry).
 
