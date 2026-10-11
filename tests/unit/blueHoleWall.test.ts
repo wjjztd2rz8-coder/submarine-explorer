@@ -208,7 +208,7 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
     });
   }
 
-  it('terraces are bounded, seamless and leave both gallery mouths and the floor untouched', () => {
+  it('terraces are bounded, seamless and leave both gallery seats and the floor untouched', () => {
     let largest = 0;
     for (let i = 0; i <= 180; i++) {
       const a = (i / 180) * Math.PI * 2;
@@ -221,8 +221,14 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
       }
     }
     expect(largest).toBeGreaterThan(2);
-    for (const bearing of [Math.PI, 1])
-      for (const r of [120, 139, 150]) expect(blueHoleTerraces(bearing, r)).toBe(0);
+    for (const bearing of [Math.PI, 1]) {
+      for (const r of [139, 150]) expect(blueHoleTerraces(bearing, r)).toBe(0);
+      // Below the seat the mouth sector terraces too, so the view down it is not a blank ramp.
+      let deep = 0;
+      for (let r = 104; r <= 124; r += 1)
+        deep = Math.max(deep, Math.abs(blueHoleTerraces(bearing, r)));
+      expect(deep).toBeGreaterThan(1);
+    }
     expect(blueHoleTerraces(1e-4, 139)).toBeCloseTo(blueHoleTerraces(2 * Math.PI + 1e-4, 139), 10);
   });
 });

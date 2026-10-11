@@ -130,6 +130,9 @@ export function blueHoleTerraces(a: number, r: number): number {
     const da = Math.abs(Math.atan2(Math.sin(a - bearing!), Math.cos(a - bearing!)));
     mouth *= smoothstep(clamp01((da - width!) / 0.15));
   }
+  // Below the gallery seat (r < ~135, deeper than ~45 m) the mouth windows terrace too: the sub
+  // looks straight down this sector, and an untouched smooth ramp there read as a blank slope.
+  mouth += (1 - mouth) * (1 - smoothstep(clamp01((r - 126) / 10)));
   if (mouth <= 0) return 0;
   const zone = smoothstep(clamp01((r - 100) / 10)) * (1 - smoothstep(clamp01((r - 184) / 11)));
   if (zone <= 0) return 0;
