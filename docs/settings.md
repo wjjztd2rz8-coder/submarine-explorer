@@ -32,8 +32,8 @@ options), `Config.sonarPalettes`.
 | Hull warning      | immediately        | Vignette, gauge or both (default). The gauge shows depth against the fitted hull rating; the vignette begins beyond that rating. Simulated crush is 10% deeper and triggers emergency ascent.                                                                      |
 
 **Reset settings** restores the defaults (Arcade gameplay mode, `uiScale`
-100, `controlTips` on, and the display settings above) and removes the stored
-copy. When graphics tier, terrain detail, or default sim speed differs from
+100, `controlTips` on, and the display settings above) and writes those defaults
+to v2 so an older v1 copy cannot be re-imported. When graphics tier, terrain detail, or default sim speed differs from
 its boot value, **Apply and reload** appears. It reloads the current URL,
 preserving the mission and query parameters. A `?tier=` URL override remains
 in force; changing the saved tier alone cannot replace it. If settings
@@ -127,6 +127,10 @@ field by field against `Config.settings.gameplayOptions`. A newer stored
 version (of either key) is read as defaults and left on disk, never
 overwritten. Storage that is missing or throws (privacy mode, quota) never
 crashes the game: settings and bindings then last for the session only.
+If a settings read throws, settings writes and resets stay in memory until a
+successful `Save.load()` or a new session can read the keys. This preserves an
+unread existing save even when storage still accepts writes; Apply and reload
+stays unavailable during that failure.
 
 ## Accessibility
 

@@ -3,7 +3,12 @@ import type { GameContext } from '../../src/app/context.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 
-const calls = vi.hoisted(() => ({ unlock: vi.fn(), dispose: vi.fn(), unlistenSave: vi.fn() }));
+const calls = vi.hoisted(() => ({
+  unlock: vi.fn(),
+  dispose: vi.fn(),
+  disposeCaptions: vi.fn(),
+  unlistenSave: vi.fn(),
+}));
 vi.mock('../../src/audio/AudioSystem.js', () => ({
   AudioSystem: class {
     captions = {};
@@ -13,7 +18,11 @@ vi.mock('../../src/audio/AudioSystem.js', () => ({
     setPaused = vi.fn();
   },
 }));
-vi.mock('../../src/ui/Captions.js', () => ({ Captions: class {} }));
+vi.mock('../../src/ui/Captions.js', () => ({
+  Captions: class {
+    dispose = calls.disposeCaptions;
+  },
+}));
 import { audioSystem } from '../../src/app/systems/audio.js';
 
 afterEach(() => {
@@ -51,6 +60,7 @@ describe('touch unlock integration', () => {
       expect(calls.unlock).toHaveBeenCalledTimes((round + 1) * 4);
     }
     expect(calls.dispose).toHaveBeenCalledTimes(2);
+    expect(calls.disposeCaptions).toHaveBeenCalledTimes(2);
     expect(calls.unlistenSave).toHaveBeenCalledTimes(2);
   });
 });

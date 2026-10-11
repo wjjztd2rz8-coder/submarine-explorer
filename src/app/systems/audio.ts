@@ -26,11 +26,13 @@ export const audioSystem: GameSystem = {
     cleanup.add(() => audio.dispose());
     audio.setPaused(app.state !== 'dive');
     cleanup.add(bus.on('app:state', ({ state }) => audio.setPaused(state !== 'dive')));
-    ctx.captions = new Captions(audio.captions, {
+    const captions = new Captions(audio.captions, {
       enabled: settings.captions,
       maxLines: config.settings.captionMaxLines,
       minDurationS: config.settings.captionMinDurationS,
     });
+    ctx.captions = captions;
+    cleanup.add(() => captions.dispose());
     const unlockAudio = (): void => audio.unlock();
     // Touch activation can arrive at release; capture also reaches controls
     // that stop propagation before the event bubbles to window.

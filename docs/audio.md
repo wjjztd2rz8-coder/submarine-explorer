@@ -34,6 +34,8 @@ One-shots disconnect their complete graphs after their last source ends.
 Disposal stops and disconnects every source and processor, cancels echoes,
 unsubscribes handlers and closes the context. Optional sample-fetch failures
 are silent.
+The app audio system also disposes its caption overlay, subscription and expiry
+timer on teardown, including repeated in-page system restarts.
 
 ## Score
 

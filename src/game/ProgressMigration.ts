@@ -54,7 +54,8 @@ export async function creditPreviousDives(
       def.objectives.forEach((o, i) => {
         if (statuses[i].complete) progress.credit('objective', `${site}/${o.id}`);
       });
-      const oldRoutes = (PREVIOUS_OBJECTIVES[site] ?? []).map((roles) =>
+      const previous = Object.hasOwn(PREVIOUS_OBJECTIVES, site) ? PREVIOUS_OBJECTIVES[site] : [];
+      const oldRoutes = previous.map((roles) =>
         def.objectives.flatMap((o, i) =>
           Object.hasOwn(roles, o.id)
             ? [{ primary: roles[o.id], complete: statuses[i].complete }]
