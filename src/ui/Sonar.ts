@@ -145,21 +145,21 @@ export interface SonarFlatProfile {
   flatness: number;
   /** Multiplier on `hillshadeGain`, so gentle slopes still shade. */
   gainBoost: number;
-  /** Strength (0..~0.3) of the local-depth luminance tint. */
+  /** Strength (0..0.24) of the local-depth luminance tint. */
   tint: number;
 }
 
 /**
  * How flat the view is, from its measured relief over its span (m per m).
- * Slopes of about 0.1 or more (Blue Hole) get no change; Titanic, Endurance
+ * Slopes of 0.06 or more (Blue Hole) get no change; Titanic, Endurance
  * and the other abyssal plains (about 0.01) get the full boost.
  */
 export function sonarFlatProfile(actualSpanM: number, viewSpanM: number): SonarFlatProfile {
   const slope = viewSpanM > 0 ? Math.max(0, actualSpanM) / viewSpanM : 0;
   const flatness = Math.min(1, Math.max(0, (0.06 - slope) / 0.04));
   const gainBoost =
-    flatness > 0 ? 1 + flatness * (Math.min(8, Math.max(1, 0.08 / Math.max(slope, 1e-4))) - 1) : 1;
-  return { flatness, gainBoost, tint: 0.4 * flatness };
+    flatness > 0 ? 1 + flatness * (Math.min(16, Math.max(1, 0.08 / Math.max(slope, 1e-4))) - 1) : 1;
+  return { flatness, gainBoost, tint: 0.24 * flatness };
 }
 
 /**
@@ -175,7 +175,18 @@ export function sonarLocalContourInterval(
 ): number {
   if (flatness <= 0 || actualSpanM < 2)
     return sonarContourInterval(baseM, actualSpanM, maxContours);
-  return sonarContourInterval(actualSpanM / 6, actualSpanM, Math.max(1, maxContours));
+  const blend = Math.min(1, flatness);
+  const localBase = baseM + (Math.min(baseM, actualSpanM / 6) - baseM) * blend;
+  return sonarContourInterval(localBase, actualSpanM, Math.max(1, maxContours));
+}
+
+/** Authored hull plan, in the same world frame and orientation as the 3D prop. */
+export interface SonarFootprint {
+  x: number;
+  z: number;
+  lengthM: number;
+  widthM: number;
+  headingDeg: number;
 }
 
 export function sonarReliefRange(
@@ -244,6 +255,7 @@ export class Sonar {
   private sensorRangeM = 2000;
   private showMarkers = true;
   private pois: readonly PlacedPoi[] = [];
+  private footprints: readonly SonarFootprint[] = [];
   private objectivePoiId: string | null = null;
   private lastPosition = { x: 0, z: 0 };
   private readonly rangeLabel: HTMLSpanElement;
@@ -424,6 +436,9 @@ export class Sonar {
     this.pois = pois;
     this.reliefDirty = true;
   }
+  setFootprints(footprints: readonly SonarFootprint[]): void {
+    this.footprints = footprints;
+  }
   setScanState(isScanned: (poi: PlacedPoi) => boolean): void {
     this.scanState = isScanned;
   }
@@ -517,20 +532,18 @@ export class Sonar {
     );
     this.flatness = flat.flatness;
     // Endurance: the survey is a plane tilted ~6 m over 1 km, so contours would
-    // only be parallel stripes. Show the ice-scour swells around the hull
-    // (same layout as the 3D ridges) as soft shading instead.
+    // only be parallel stripes. Keep them faint beneath ice-scour swells
+    // (same layout as the 3D ridges), rather than dropping measured contours.
     const hull = this.terrain.meta.id === 'endurance' && flat.flatness > 0 ? this.hullPoi() : null;
     const ridges = hull ? enduranceRidges(hull.position) : null;
-    const contourInterval = ridges
-      ? Infinity
-      : sonarLocalContourInterval(
-          this.terrain.meta.id === 'great-blue-hole'
-            ? Math.min(10, this.zoomConfig.contourIntervalM[reference])
-            : this.zoomConfig.contourIntervalM[reference],
-          actualSpan,
-          this.zoomConfig.maxContours,
-          flat.flatness,
-        );
+    const contourInterval = sonarLocalContourInterval(
+      this.terrain.meta.id === 'great-blue-hole'
+        ? Math.min(10, this.zoomConfig.contourIntervalM[reference])
+        : this.zoomConfig.contourIntervalM[reference],
+      actualSpan,
+      this.zoomConfig.maxContours,
+      flat.flatness,
+    );
     this.relief = {
       minDepthM: -hi,
       maxDepthM: -lo,
@@ -633,8 +646,10 @@ export class Sonar {
     for (let level = Math.ceil(lo / interval) * interval; level <= hi; level += interval)
       levels.push(level);
     const labels: Array<{ x: number; y: number; text: string }> = [];
-    ctx.strokeStyle =
-      this.paletteName_ === 'highContrast' ? 'rgba(255,255,255,.72)' : 'rgba(225,244,220,.58)';
+    const contourAlpha =
+      (this.paletteName_ === 'highContrast' ? 0.72 : 0.58) * (1 - 0.65 * this.flatness);
+    ctx.strokeStyle = `rgba(225,244,220,${contourAlpha})`;
+    if (this.paletteName_ === 'highContrast') ctx.strokeStyle = `rgba(255,255,255,${contourAlpha})`;
     ctx.lineWidth = 0.8;
     for (const [index, level] of levels.entries()) {
       ctx.beginPath();
@@ -691,8 +706,8 @@ export class Sonar {
   }
 
   /**
-   * Flat sites only: faint range rings about the sub and a soft footprint
-   * halo under each contact (the scan radius), so the wreck and objectives
+   * Flat sites only: faint range rings, authored hull footprints and small
+   * contact halos, so the wreck and objectives
    * show against featureless seabed. Faded out as relief takes over.
    */
   private hullPoi(): PlacedPoi | undefined {
@@ -723,7 +738,19 @@ export class Sonar {
     ctx.setLineDash([]);
     for (const poi of this.pois) {
       const { px, py } = this.project(poi.position.x, poi.position.z);
-      const rad = Math.max(11, poi.radius * pxPerM);
+      if (
+        !sonarPoiVisible(
+          Math.hypot(poi.position.x - s.position.x, poi.position.z - s.position.z),
+          this.sensorRangeM,
+          px,
+          py,
+          w,
+          h,
+        )
+      )
+        continue;
+      // A scan radius can be 200 m; don't let overlapping circles bury the hull.
+      const rad = Math.min(18, Math.max(11, poi.radius * pxPerM));
       const g = ctx.createRadialGradient(px, py, 0, px, py, rad);
       g.addColorStop(
         0,
@@ -734,19 +761,40 @@ export class Sonar {
       ctx.beginPath();
       ctx.arc(px, py, rad, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = hc ? `rgba(255,255,255,${0.55 * flat})` : `rgba(255,214,120,${0.5 * flat})`;
-      ctx.lineWidth = 0.8;
-      ctx.setLineDash([3, 2]);
+    }
+    for (const footprint of this.footprints) {
+      const { px, py } = this.project(footprint.x, footprint.z);
+      const measuredLength = footprint.lengthM * pxPerM;
+      // A minimum symbol size keeps a small hull readable on the compact phone map.
+      const length = Math.max(24, measuredLength);
+      const beam = Math.max(4, footprint.widthM * pxPerM);
+      if (
+        measuredLength < 4 ||
+        Math.hypot(footprint.x - s.position.x, footprint.z - s.position.z) > this.sensorRangeM ||
+        px + length < 0 ||
+        px - length > w ||
+        py + length < 0 ||
+        py - length > h
+      )
+        continue;
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate((footprint.headingDeg * Math.PI) / 180);
+      ctx.fillStyle = hc ? `rgba(255,255,255,${0.22 * flat})` : `rgba(132,206,208,${0.22 * flat})`;
+      ctx.strokeStyle = hc ? `rgba(255,255,255,${0.8 * flat})` : `rgba(178,235,231,${0.8 * flat})`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(0, -length / 2);
+      ctx.lineTo(beam / 2, -length * 0.3);
+      ctx.lineTo(beam / 2, length * 0.4);
+      ctx.lineTo(beam * 0.3, length / 2);
+      ctx.lineTo(-beam * 0.3, length / 2);
+      ctx.lineTo(-beam / 2, length * 0.4);
+      ctx.lineTo(-beam / 2, -length * 0.3);
+      ctx.closePath();
+      ctx.fill();
       ctx.stroke();
-      ctx.setLineDash([]);
-      if (poi.id === 'endurance-hull') {
-        // Hull footprint (about 44 m by 9 m) drawn at least 16 px long.
-        const half = Math.max(8, 22 * pxPerM);
-        ctx.fillStyle = hc ? 'rgba(255,255,255,.55)' : 'rgba(255,214,120,.5)';
-        ctx.beginPath();
-        ctx.ellipse(px, py, half, Math.max(2.5, half * 0.22), 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      ctx.restore();
     }
     ctx.restore();
   }
@@ -944,13 +992,15 @@ export class Sonar {
               : '#53e2d8';
     ctx.save();
     ctx.beginPath();
-    ctx.arc(marker.px, marker.py, marker.current ? 10 : 8, 0, Math.PI * 2);
+    const radius = (marker.current ? 10 : 8) - 3 * this.flatness;
+    ctx.arc(marker.px, marker.py, radius, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(2, 12, 17, .88)';
     ctx.fill();
     ctx.strokeStyle = color;
     ctx.lineWidth = marker.current ? 1.5 : 0.8;
     ctx.stroke();
-    ctx.font = `bold ${marker.current ? 20 : marker.scanned ? 15 : 24}px ui-monospace, monospace`;
+    const fontSize = marker.current ? 20 - 4 * this.flatness : marker.scanned ? 15 : 24;
+    ctx.font = `bold ${fontSize}px ui-monospace, monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = color;

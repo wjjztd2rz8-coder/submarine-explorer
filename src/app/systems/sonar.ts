@@ -20,6 +20,25 @@ export const sonarSystem: GameSystem = {
       zoom: config.sonarZoom,
     });
     ctx.sonar = sonar;
+    cleanup.add(
+      ctx.bus.on('props:loaded', () => {
+        sonar.setFootprints(
+          ctx.props.placed.flatMap(({ def, root }) =>
+            def.procedural === 'hull-block' && def.dimensionsM
+              ? [
+                  {
+                    x: root.position.x,
+                    z: root.position.z,
+                    lengthM: def.dimensionsM[0] * def.scale[2],
+                    widthM: def.dimensionsM[1] * def.scale[0],
+                    headingDeg: def.headingDeg,
+                  },
+                ]
+              : [],
+          ),
+        );
+      }),
+    );
     sonar.setSensorRange(config.sensorPresets[settings.gameplay.sensors].sonarPoiRange);
     sonar.setMarkersVisible(settings.gameplay.sonarMarkers);
     cleanup.add(

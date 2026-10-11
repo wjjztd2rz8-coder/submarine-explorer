@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **1250 F-SONAR-FLAT-SITES:** flat minimaps choose contours and hillshade from local relief, fade contours beneath the wreck, and retain faint range rings with a gentler depth tint. Hull plans now follow authored prop dimensions and headings; small contact halos respect sensor visibility and keep objectives clear. Endurance keeps measured contours beneath its existing scour shading. Relief-rich views, including Blue Hole, keep their rendering and HUD dimensions are unchanged. Reason: flat seabed and overlapping scan-radius halos obscured the wreck footprint.
+
 - **F-LOSTCITY-5 (Lost City columns):** carbonate towers gain vertical flow striations (shader, all tiers), brucite fins round each vent lip, and the slope gains dark silt pockets and pale drifts at unchanged mean brightness.
 - **f-endurance-hull:** Endurance opening camera pulled in (chase arm 98 m to 70 m, side offsets retuned; the unit test now expects the authored radius rather than the global one), so the 44 m hull spans about 380 px of the 1600 px first frame instead of 280 px, with the sub, scan card and minimap still clear. Hull planks now vary strake by strake from tannin-stained brown to bleached grey, the poop and waist gain broken bulwark ribs, and the rails carry sparse anemone and sponge clusters (same instanced draw calls; Low keeps its smaller budget). Hull length and beam unchanged.
 

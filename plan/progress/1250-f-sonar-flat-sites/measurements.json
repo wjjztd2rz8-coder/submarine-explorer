@@ -1,0 +1,375 @@
+{
+  "method": "Offline recording of actual Sonar.update, actual Terrain sampling, authored POIs and hull plans at reported golden opening poses; PNG vector compositing uses Pillow. Compact omits tiny contour labels. These are renderer previews, not browser golden/HUD captures.",
+  "poseSource": "2026-10-10-030121",
+  "sites": [
+    {
+      "site": "titanic",
+      "layout": "desktop",
+      "stage": "before",
+      "position": {
+        "x": 336.1257046335893,
+        "z": -292.8164161227348
+      },
+      "cssCanvas": [165, 220],
+      "relief": {
+        "minDepthM": 3795.3245293861332,
+        "maxDepthM": 3804.9565509571453,
+        "spanM": 20,
+        "contourIntervalM": 2,
+        "flatness": 1
+      },
+      "profile": {
+        "flatness": 1,
+        "gainBoost": 8,
+        "tint": 0.4
+      },
+      "footprints": 2
+    },
+    {
+      "site": "titanic",
+      "layout": "desktop",
+      "stage": "after",
+      "position": {
+        "x": 336.1257046335893,
+        "z": -292.8164161227348
+      },
+      "cssCanvas": [165, 220],
+      "relief": {
+        "minDepthM": 3795.3245293861332,
+        "maxDepthM": 3804.9565509571453,
+        "spanM": 20,
+        "contourIntervalM": 2,
+        "flatness": 1
+      },
+      "profile": {
+        "flatness": 1,
+        "gainBoost": 8.30562923994722,
+        "tint": 0.24
+      },
+      "footprints": 2
+    },
+    {
+      "site": "titanic",
+      "layout": "compact",
+      "stage": "before",
+      "position": {
+        "x": 336.1257046335893,
+        "z": -292.8164161227348
+      },
+      "cssCanvas": [165, 220],
+      "relief": {
+        "minDepthM": 3795.3245293861332,
+        "maxDepthM": 3804.9565509571453,
+        "spanM": 20,
+        "contourIntervalM": 2,
+        "flatness": 1
+      },
+      "profile": {
+        "flatness": 1,
+        "gainBoost": 8,
+        "tint": 0.4
+      },
+      "footprints": 2
+    },
+    {
+      "site": "titanic",
+      "layout": "compact",
+      "stage": "after",
+      "position": {
+        "x": 336.1257046335893,
+        "z": -292.8164161227348
+      },
+      "cssCanvas": [165, 220],
+      "relief": {
+        "minDepthM": 3795.3245293861332,
+        "maxDepthM": 3804.9565509571453,
+        "spanM": 20,
+        "contourIntervalM": 2,
+        "flatness": 1
+      },
+      "profile": {
+        "flatness": 1,
+        "gainBoost": 8.30562923994722,
+        "tint": 0.24
+      },
+      "footprints": 2
+    },
+    {
+      "site": "endurance",
+      "layout": "desktop",
+      "stage": "before",
+      "position": {
+        "x": -396.79612374913046,
+        "z": 1054.0090541469992
+      },
+      "cssCanvas": [176, 220],
+      "relief": {
+        "minDepthM": 2998.115561444487,
+        "maxDepthM": 3002.969352984851,
+        "spanM": 20,
+        "contourIntervalM": null,
+        "flatness": 1
+      },
+      "profile": {
+        "flatness": 1,
+        "gainBoost": 8,
+        "tint": 0.4
+      },
+      "footprints": 1
+    },
+    {
+      "site": "endurance",
+      "layout": "desktop",
+      "stage": "after",
+      "position": {
+        "x": -396.79612374913046,
+        "z": 1054.0090541469992
+      },
+      "cssCanvas": [176, 220],
+      "relief": {
+        "minDepthM": 2998.115561444487,
+        "maxDepthM": 3002.969352984851,
+        "spanM": 20,
+        "contourIntervalM": 1,
+        "flatness": 1
+      },
+      "profile": {
+        "flatness": 1,
+        "gainBoost": 16,
+        "tint": 0.24
+      },
+      "footprints": 1
+    },
+    {
+      "site": "endurance",
+      "layout": "compact",
+      "stage": "before",
+      "position": {
+        "x": -396.79612374913046,
+        "z": 1054.0090541469992
+      },
+      "cssCanvas": [176, 220],
+      "relief": {
+        "minDepthM": 2998.115561444487,
+        "maxDepthM": 3002.969352984851,
+        "spanM": 20,
+        "contourIntervalM": null,
+        "flatness": 1
+      },
+      "profile": {
+        "flatness": 1,
+        "gainBoost": 8,
+        "tint": 0.4
+      },
+      "footprints": 1
+    },
+    {
+      "site": "endurance",
+      "layout": "compact",
+      "stage": "after",
+      "position": {
+        "x": -396.79612374913046,
+        "z": 1054.0090541469992
+      },
+      "cssCanvas": [176, 220],
+      "relief": {
+        "minDepthM": 2998.115561444487,
+        "maxDepthM": 3002.969352984851,
+        "spanM": 20,
+        "contourIntervalM": 1,
+        "flatness": 1
+      },
+      "profile": {
+        "flatness": 1,
+        "gainBoost": 16,
+        "tint": 0.24
+      },
+      "footprints": 1
+    },
+    {
+      "site": "great-blue-hole",
+      "layout": "desktop",
+      "stage": "before",
+      "position": {
+        "x": -244.06162328324268,
+        "z": 25.908738271603568
+      },
+      "cssCanvas": [220, 220],
+      "relief": {
+        "minDepthM": 2.908663181428288,
+        "maxDepthM": 126.43568289308799,
+        "spanM": 123.5270197116597,
+        "contourIntervalM": 10,
+        "flatness": 0
+      },
+      "profile": {
+        "flatness": 0,
+        "gainBoost": 1,
+        "tint": 0.0
+      },
+      "footprints": 0
+    },
+    {
+      "site": "great-blue-hole",
+      "layout": "desktop",
+      "stage": "after",
+      "position": {
+        "x": -244.06162328324268,
+        "z": 25.908738271603568
+      },
+      "cssCanvas": [220, 220],
+      "relief": {
+        "minDepthM": 2.908663181428288,
+        "maxDepthM": 126.43568289308799,
+        "spanM": 123.5270197116597,
+        "contourIntervalM": 10,
+        "flatness": 0
+      },
+      "profile": {
+        "flatness": 0,
+        "gainBoost": 1,
+        "tint": 0
+      },
+      "footprints": 0
+    },
+    {
+      "site": "great-blue-hole",
+      "layout": "compact",
+      "stage": "before",
+      "position": {
+        "x": -244.06162328324268,
+        "z": 25.908738271603568
+      },
+      "cssCanvas": [220, 220],
+      "relief": {
+        "minDepthM": 2.908663181428288,
+        "maxDepthM": 126.43568289308799,
+        "spanM": 123.5270197116597,
+        "contourIntervalM": 10,
+        "flatness": 0
+      },
+      "profile": {
+        "flatness": 0,
+        "gainBoost": 1,
+        "tint": 0.0
+      },
+      "footprints": 0
+    },
+    {
+      "site": "great-blue-hole",
+      "layout": "compact",
+      "stage": "after",
+      "position": {
+        "x": -244.06162328324268,
+        "z": 25.908738271603568
+      },
+      "cssCanvas": [220, 220],
+      "relief": {
+        "minDepthM": 2.908663181428288,
+        "maxDepthM": 126.43568289308799,
+        "spanM": 123.5270197116597,
+        "contourIntervalM": 10,
+        "flatness": 0
+      },
+      "profile": {
+        "flatness": 0,
+        "gainBoost": 1,
+        "tint": 0
+      },
+      "footprints": 0
+    },
+    {
+      "site": "hunga-tonga-caldera",
+      "layout": "desktop",
+      "stage": "before",
+      "position": {
+        "x": -2082.1863490043716,
+        "z": 2270.7714868499484
+      },
+      "cssCanvas": [220, 219],
+      "relief": {
+        "minDepthM": 235.1335416393292,
+        "maxDepthM": 635.1959868767109,
+        "spanM": 400.06244523738167,
+        "contourIntervalM": 50,
+        "flatness": 0
+      },
+      "profile": {
+        "flatness": 0,
+        "gainBoost": 1,
+        "tint": 0.0
+      },
+      "footprints": 0
+    },
+    {
+      "site": "hunga-tonga-caldera",
+      "layout": "desktop",
+      "stage": "after",
+      "position": {
+        "x": -2082.1863490043716,
+        "z": 2270.7714868499484
+      },
+      "cssCanvas": [220, 219],
+      "relief": {
+        "minDepthM": 235.1335416393292,
+        "maxDepthM": 635.1959868767109,
+        "spanM": 400.06244523738167,
+        "contourIntervalM": 50,
+        "flatness": 0
+      },
+      "profile": {
+        "flatness": 0,
+        "gainBoost": 1,
+        "tint": 0
+      },
+      "footprints": 0
+    },
+    {
+      "site": "hunga-tonga-caldera",
+      "layout": "compact",
+      "stage": "before",
+      "position": {
+        "x": -2082.1863490043716,
+        "z": 2270.7714868499484
+      },
+      "cssCanvas": [220, 219],
+      "relief": {
+        "minDepthM": 235.1335416393292,
+        "maxDepthM": 635.1959868767109,
+        "spanM": 400.06244523738167,
+        "contourIntervalM": 50,
+        "flatness": 0
+      },
+      "profile": {
+        "flatness": 0,
+        "gainBoost": 1,
+        "tint": 0.0
+      },
+      "footprints": 0
+    },
+    {
+      "site": "hunga-tonga-caldera",
+      "layout": "compact",
+      "stage": "after",
+      "position": {
+        "x": -2082.1863490043716,
+        "z": 2270.7714868499484
+      },
+      "cssCanvas": [220, 219],
+      "relief": {
+        "minDepthM": 235.1335416393292,
+        "maxDepthM": 635.1959868767109,
+        "spanM": 400.06244523738167,
+        "contourIntervalM": 50,
+        "flatness": 0
+      },
+      "profile": {
+        "flatness": 0,
+        "gainBoost": 1,
+        "tint": 0
+      },
+      "footprints": 0
+    }
+  ],
+  "currentObjective": "First authored POI, assigned explicitly for the offline objective preview; reference goldens remain their original free-dive state."
+}
