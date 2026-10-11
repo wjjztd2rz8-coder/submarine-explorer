@@ -30,6 +30,8 @@ const sites = [
   { id: 'monterey-canyon', props: 5 },
   { id: 'challenger-deep', props: 2 },
   { id: 'endurance', props: 3 },
+  { id: 'hunga-tonga-caldera', props: 1 },
+  { id: 'hudson-canyon', props: 1 },
 ];
 
 for (const site of sites) {

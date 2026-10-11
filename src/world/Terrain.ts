@@ -519,6 +519,7 @@ export class Terrain {
   }
 
   dispose(): void {
+    this.latticeHeights.clear();
     this.scatter.dispose();
     for (const chunk of this.chunks) chunk.dispose();
     this.chunks.length = 0;
