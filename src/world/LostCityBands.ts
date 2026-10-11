@@ -41,5 +41,5 @@ export function lostCitySlopeTint(
   const fine = fbm3(x * 0.3, 13, z * 0.3, 613, 2);
   const silt = 0.62 + 0.9 * smooth(0.3, 0.7, broad) + 0.18 * (fine - 0.5);
   const warm = 1 + 0.08 * (fbm3(x * 0.09, 17, z * 0.09, 617, 2) - 0.5);
-  return [bed[0] * silt * warm, bed[1] * silt, bed[2] * silt / warm];
+  return [bed[0] * silt * warm, bed[1] * silt, (bed[2] * silt) / warm];
 }

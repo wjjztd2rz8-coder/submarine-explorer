@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **F-LOSTCITY-5 (Lost City columns):** carbonate towers gain vertical flow striations (shader, all tiers), brucite fins round each vent lip, and the slope gains dark silt pockets and pale drifts at unchanged mean brightness.
+
 - **f-challenger-tone:** Challenger Deep seabed tone: cooler, darker grey-olive silt with less warm stain and slightly denser fog, so the 10.9 km floor no longer reads as a sunlit beach; other sites unchanged.
 - **f-bluehole-map:** the Great Blue Hole minimap shows the reef flat outside the hole as one calm radial depth gradient (pale turquoise at the rim easing to soft blue, `blueHoleSonarReef`) instead of the measured reef-top noise shaded as camouflage-like coral and sand blotches; the hole interior, contour rings and depth labels are unchanged, and other sites are untouched.
 
