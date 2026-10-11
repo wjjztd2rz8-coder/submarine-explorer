@@ -192,6 +192,7 @@ export function composedFreeDiveSpawn(
           range: cameraConfig.lostCityArcadeOpening.rangeM,
           chaseRadius: cameraConfig.lostCityArcadeOpening.chaseRadiusM,
           chaseOffsetX: cameraConfig.lostCityArcadeOpening.chaseOffsetXM,
+          chaseOffsetY: cameraConfig.lostCityArcadeOpening.chaseOffsetYM,
         }
       : authored;
   const hero = props.placed.find((p) => p.def.id === opening?.hero);

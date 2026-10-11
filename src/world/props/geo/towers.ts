@@ -38,13 +38,15 @@ import { scatterRubble } from './talus.js';
 import { spireRadius, tieredSpire, trunkCrest, type SpireOpts } from './spire.js';
 import type { GeoBuildInput } from './types.js';
 
-const OLD = new THREE.Color(0xc2bfb3); // weathered, inactive carbonate
+const OLD = new THREE.Color(0xc8c0ac); // weathered, inactive carbonate
 const LIVE = new THREE.Color(0xfaf6ec); // fresh white carbonate and brucite, faintly warm
 const STAIN = new THREE.Color(0x938d7c);
 const CREAM = new THREE.Color(0xf8ecd2); // warm cream carbonate crust
 const GREYBLUE = new THREE.Color(0xaab6bb); // cooler, older grey-blue carbonate
 const BIOFILM = new THREE.Color(0x6f9a90); // faint blue-green microbial film in damp recesses
-const TROUGH = new THREE.Color(0xb3ab98); // warm grey stain in the flow troughs
+const TROUGH = new THREE.Color(0x8a8270); // warm grey stain in the flow troughs
+const OCHRE = new THREE.Color(0xc9a46a); // warm iron-stained carbonate
+const SHADE = new THREE.Color(0x5d6468); // shadowed flute, cool blue-grey
 const FRINGE = new THREE.Color(0xffffff); // brucite fringe round the vent mouth
 const VENT = new THREE.Color(0x14120f); // the dark vent mouth
 const SEABED = new THREE.Color(0xc2a468); // what the apron fades into: the Lost City sediment
@@ -319,12 +321,12 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   // Brucite fringe: delicate pale fins fanning up and out of each vent lip.
   const finRnd = mulberry32(seed ^ 0xb7c);
   for (const [vi, v] of vents.entries()) {
-    const nFins = Math.max(8, Math.round((vi === 0 && !lone ? 64 : 24) * d.growth ** 0.5));
+    const nFins = Math.max(8, Math.round((vi === 0 && !lone ? 40 : 16) * d.growth ** 0.5));
     for (let k = 0; k < nFins; k++) {
       const a = (k / nFins) * Math.PI * 2 + finRnd() * 0.4;
-      const len = 0.3 + finRnd() * 0.5 + Math.min(v.r, 4) * 0.12 * finRnd();
-      const wid = 0.04 + finRnd() * 0.06;
-      const out = 0.15 + finRnd() * 0.4; // outward splay per metre of height
+      const len = 0.2 + finRnd() * 0.3 + Math.min(v.r, 4) * 0.06 * finRnd();
+      const wid = 0.07 + finRnd() * 0.07;
+      const out = 0.1 + finRnd() * 0.25; // outward splay per metre of height
       const tw = finRnd() * 0.6 - 0.3; // sideways curl
       const ca = Math.cos(a),
         sa = Math.sin(a);
@@ -340,7 +342,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
         const cz = base.z + Math.sin(ang) * rr;
         const cy = base.y + h + 0.3 * u;
         // Blade width runs tangentially, tapering to a point.
-        const w = wid * (1 - u * 0.92);
+        const w = wid * (1 - u * 0.7);
         const tx = -Math.sin(ang) * w,
           tz = Math.cos(ang) * w;
         pos.push(cx - tx, cy, cz - tz, cx + tx, cy, cz + tz);
@@ -382,12 +384,16 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     // drifting in broad patches that stretch vertically with the flow.
     const mineral = fbm3(x * 0.32, y * 0.045, z * 0.32, seed ^ 0x3b1, 3);
     out.lerp(CREAM, smooth(0.46, 0.64, mineral) * 0.6 * (0.4 + up));
-    out.lerp(GREYBLUE, (1 - smooth(0.3, 0.5, mineral)) * 0.5);
+    out.lerp(GREYBLUE, (1 - smooth(0.34, 0.54, mineral)) * 0.7);
+    out.lerp(
+      OCHRE,
+      smooth(0.44, 0.62, fbm3(x * 0.2 + 9, y * 0.06, z * 0.2, seed ^ 0x0c4, 3)) * 0.8,
+    );
     // Flow streaks: narrow vertical bands (high horizontal, very low vertical frequency)
     // alternating pale and shaded, as fluid ran down the walls.
     const wall = 1 - Math.abs(ny);
     const streak = fbm3(x * 1.3, y * 0.03, z * 1.3, seed ^ 0xf10, 3);
-    out.multiplyScalar(1 + (streak - 0.5) * 0.9 * wall);
+    out.multiplyScalar(1 + (streak - 0.5) * 1.5 * wall);
     // Dark seams between flow sheets: thin, vertically drawn streaks, strongest on walls.
     const seam = fbm3(x * 1.1, y * 0.07, z * 1.1, seed ^ 0x5ea, 3);
     out.multiplyScalar(1 - 0.22 * smooth(0.5, 0.56, seam) * (1 - smooth(0.56, 0.62, seam)) * wall);
@@ -401,14 +407,15 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const nn = fbm3(Math.cos(ang) * 1.3 + 3, ly * 0.09, Math.sin(ang) * 1.3 + 3, sp.seed, 3);
       const cr = trunkCrest(ang, ly, nn, sp.ridges ?? 7, sp.seed);
       const cc = cr * cr;
-      out.multiplyScalar(0.8 + 0.3 * cc);
-      out.lerp(TROUGH, (1 - cc) * 0.4 * smooth(0.02, 0.2, ly / sp.h));
+      out.multiplyScalar(0.72 + 0.4 * cc);
+      out.lerp(SHADE, (1 - cc) * (1 - cc) * 0.3 * smooth(0.05, 0.4, ly / sp.h));
+      out.lerp(TROUGH, (1 - cc) * 0.55 * smooth(0.02, 0.2, ly / sp.h));
       // Fine flow striations: thin pale and shaded lines running down the wall, drifting
       // and pinching out with height, strongest on the upper (fresh, white) trunk.
       const fine = Math.sin(ang * (sp.ridges ?? 7) * 4.5 + nn * 9 + ly * 0.06 + sp.seed);
       const fine2 = Math.sin(ang * (sp.ridges ?? 7) * 11 - nn * 5 + ly * 0.03);
       const line = 0.65 * fine + 0.35 * fine2;
-      out.multiplyScalar(1 + line * 0.2 * wall);
+      out.multiplyScalar(1 + line * 0.32 * wall);
       out.lerp(FRINGE, smooth(0.55, 0.95, line) * 0.22 * wall * smooth(0.1, 0.5, ly / sp.h));
       out.lerp(BIOFILM, (1 - cc) * 0.3 * (1 - smooth(0, 0.35, ly / sp.h)) * smooth(0.4, 0.6, n1));
       break;

@@ -22,3 +22,17 @@ Gain is modest. The trunk now reads as vertical flow-stone with fewer plates and
 ## Gates
 
 All gates PASS (build, unit, python, content, attribution, prettier after formatting fix, e2e, e2e-base) with PW_PORT=4411.
+
+---
+
+# f-lostcity-tower (second pass, 2026-10-11)
+
+Files: src/world/LostCityCarbonate.ts, src/world/props/geo/towers.ts, src/core/config/camera.ts, src/game/Spawn.ts.
+
+- Colour: vertex paint adds ochre iron-stained patches, more grey-blue area, a cool blue-grey shade in the deep flow troughs, darker troughs and stronger crest/trough and streak amplitude. Shader striations raised (0.55 to 1.05) and tinted: warm ivory/ochre on pale runs, cool blue-grey in flutes (walls only, fades with distance).
+- Brucite fins: 40/16 fins (was 64/24), about 40% shorter, wider base and less splay, so the vent rim is a subtle fringe not spikes.
+- Opening camera (Arcade Lost City only): chase arm 50 to 66 m, new `chaseOffsetYM: 8`. Tower tip now sits about 30 px under the scan card on desktop (was behind it) and clear on 844x390.
+
+Shots: .cache/codex/shots/f-lostcity-tower/ base-*, a3-* (final). Golden: GOLDEN_SITES=lost-city GOLDEN_LAYOUTS=desktop,landscape.
+
+Assessment: clear but moderate gain. Warm/cool variation and darker flutes read at opening and close range; towers are still smooth-sectioned and the wide scene is moody grey-green. Whole tower field now fits the opening frame, sub slightly smaller. Portrait and Low tier not re-checked.
