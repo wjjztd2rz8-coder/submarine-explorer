@@ -900,3 +900,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** f-bluehole-map (Sonnet): Blue Hole minimap now a calm reef gradient, hole legible. f-challenger-tone (Sonnet): trench floor cool grey-olive, ~+0.5. Gates (static, smoke, project-base) green on main; no full e2e, no push (f49 last tag, 8 commits ahead).
 - **Process:** gates.sh can leave vite preview servers on its PW_PORT; a rerun on the same port then fails with "port in use" (false e2e FAIL). Agents' golden runs need a free GOLDEN_PORT. Killed leftovers with fuser.
 - **Queue:** Codex 1220-1280 (dry until 15 Oct). Next Claude: release f50 (full e2e + push), Lost City columns, Endurance hull weathering. Needs owner: nothing.
+
+## 2026-10-10 22:32 CDT headless run (Claude, comprehensive review)
+
+- **Review:** trigger new tag f49. Golden 2026-10-11-015340 viewed; Sol skipped (Codex weekly 5%). Scores 3.25-4, no regressions; DIRECTOR backlog refilled (7 items), REVIEWS.md entry added. CI on f49 green.
+- **Release f50 pending:** full e2e on main (11 commits ahead of origin) running as detached unit `subexp-fulle2e` (log .cache/full-e2e-review.log, ends with `rc=N`). Next run: if rc=0, push, tag f50, check gh run list; else triage. Process note: background Bash tasks and Monitors are killed after ~10 min, so long gates must use systemd-run.
+- **Queue:** Codex 1220-1280 (dry until 15 Oct). Needs owner: nothing.
