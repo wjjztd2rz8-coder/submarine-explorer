@@ -8,15 +8,15 @@ Codex weekly 5% (`codex-review.sh` exit 75), so no Sol second opinion. Play-flow
 
 **Changed since the last review:** merged f-monterey-wall, f-challenger-seabed, f-bluehole-wall, f-bluehole-map, f-challenger-tone. f49 pushed; hosted CI and Pages green.
 
-| Site       | Readable | Beautiful | Change | Biggest gap                                              |
-| ---------- | -------- | --------- | ------ | -------------------------------------------------------- |
-| Titanic    | 4        | 4         | same   | flat near-black void above the horizon                   |
-| Beebe      | 4        | 3.75      | same   | trunk fine; seabed and smoke plume plain                 |
-| Blue Hole  | 4        | 3.25      | +0.25  | smooth green ramps, bowl terraces fogged                 |
-| Lost City  | 4        | 3.5       | same   | smooth pale pillars, bland slope                         |
-| Monterey   | 4        | 3.75      | same   | strata good; wall base boulders in a line                |
-| Challenger | 4        | 3.75      | +0.25  | grey-olive floor works; cobbles tiny                     |
-| Endurance  | 3.5      | 3.75      | same   | lit water good; hull small and pale in a wide plain      |
+| Site       | Readable | Beautiful | Change | Biggest gap                                         |
+| ---------- | -------- | --------- | ------ | --------------------------------------------------- |
+| Titanic    | 4        | 4         | same   | flat near-black void above the horizon              |
+| Beebe      | 4        | 3.75      | same   | trunk fine; seabed and smoke plume plain            |
+| Blue Hole  | 4        | 3.25      | +0.25  | smooth green ramps, bowl terraces fogged            |
+| Lost City  | 4        | 3.5       | same   | smooth pale pillars, bland slope                    |
+| Monterey   | 4        | 3.75      | same   | strata good; wall base boulders in a line           |
+| Challenger | 4        | 3.75      | +0.25  | grey-olive floor works; cobbles tiny                |
+| Endurance  | 3.5      | 3.75      | same   | lit water good; hull small and pale in a wide plain |
 
 No regressions. **Process:** efficiency.sh: Claude idle ~157 h and Codex under-used ~132 h of samples (lockout, Codex weekly 5% until 15 Oct; 233 budget-gate skips, 78 watchdog trips: floors working). Codex PASS 117 / other 11. CI green on f49. Seven Codex briefs queued and dry until 15 Oct.
 
