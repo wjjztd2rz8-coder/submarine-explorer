@@ -176,3 +176,9 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - **Dispatch cap.** `.cache/codex/dispatch-max` overrides MAX (set to 1 until Sol's reconcile; a timer removes it at 20:30 regardless), which applies the 13:15 rule above automatically.
 - **STATUS.md** was a Phase D2 page from Sept 24. It is archived, and each comprehensive review now rewrites a one-page plan/STATUS.md.
 - **Test suite:** Codex 1405 sweeps for redundant, slow and obsolete tests (report only); Claude then prunes from its report.
+
+## 2026-10-11 18:30: phone-feedback session (interactive)
+
+- **Merge check for emptied files.** f-journal-mobile's wip commit accidentally emptied `tests/e2e/f-touch-audit.spec.ts` (303 deletions). Its own gates then passed because the spec was gone. I caught it as a merge conflict, restored main's version, and it passes against the new Journal. Rule: before merging any agent branch, run `git diff --numstat main..<branch>` and look for test files with only deletions.
+- **Dispatcher paused for phone work.** `dispatch-max` is 0, the uncap timer is stopped, and the seven queued briefs moved to `.cache/codex/queue/hold/`. This gives the Codex reset at 21:48 to the scheduled phone resumes (1391r 21:55, 1393r 21:57). Restore it after those merge: move the briefs back and `rm .cache/codex/dispatch-max`.
+- **Budget.** Two parallel Sonnet agents used about 42% of the Claude 5h window in about 20 minutes, three times in a row. The Claude weekly is at 20% on Oct 11, with the reset on Oct 15. Until then, run at most one Claude agent at a time.
