@@ -100,7 +100,7 @@ function setup(seenHints: HintId[] = ['creature']) {
         state,
         dt,
         elapsed: 1,
-        frozen: false,
+        frozen: ctx.app.state !== 'dive',
         sub: { ratedRatio: 0.01, depth: -110, ratedDepth: -11000 },
       } as FrameState,
       ctx,
@@ -109,6 +109,90 @@ function setup(seenHints: HintId[] = ['creature']) {
 }
 
 describe('onboarding completion through the system', () => {
+  for (const touch of [false, true]) {
+    it(`remembers a completed scan before movement (${touch ? 'touch' : 'keyboard'})`, () => {
+      const { ctx, system, tick, onboard, headlights } = setup();
+      ctx.input.touchActive = touch;
+      try {
+        ctx.bus.emit('scan:started', { poiId: 'opening-target' });
+        ctx.bus.emit('scan:complete', {
+          poiId: 'opening-target',
+          landmarkId: 'challenger-deep',
+          firstTime: true,
+        });
+        tick();
+        expect(onboard.tutorial.step?.id).toBe('move');
+        tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
+        expect(onboard.tutorial.step?.id).toBe('depth');
+        tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
+        expect(onboard.tutorial.step?.id).toBe('lights');
+        headlights.on = true;
+        tick();
+        expect(onboard.tutorial.step?.id).toBe('journal');
+        expect(onboard.store.get().tutorialDone).toBe(false);
+        if (touch) Object.assign(ctx.app, { state: 'pause' });
+        Object.assign(ctx.journal, { isOpen: true });
+        tick();
+        expect(onboard.tutorial.finished).toBe(true);
+        expect(onboard.store.get().tutorialDone).toBe(true);
+        expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
+          'Nice work. The Controls guide is always in the Pause menu.',
+        );
+      } finally {
+        system.dispose?.();
+      }
+    });
+  }
+
+  it('opening the Journal from home does not complete the dive tutorial', () => {
+    const { ctx, system, tick, onboard } = setup();
+    try {
+      for (let i = 0; i < 4; i++) views.actions!.skipStep();
+      expect(onboard.tutorial.step?.id).toBe('journal');
+      Object.assign(ctx.app, { state: 'home' });
+      Object.assign(ctx.journal, { isOpen: true });
+      tick();
+      expect(onboard.tutorial.step?.id).toBe('journal');
+      expect(onboard.store.get().tutorialDone).toBe(false);
+    } finally {
+      system.dispose?.();
+    }
+  });
+
+  it('an unfinished early scan does not satisfy the later scan step', () => {
+    const { ctx, system, tick, onboard, headlights } = setup();
+    try {
+      ctx.bus.emit('scan:started', { poiId: 'opening-target' });
+      tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
+      tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
+      headlights.on = true;
+      tick();
+      expect(onboard.tutorial.step?.id).toBe('scan');
+      expect(onboard.store.get().tutorialDone).toBe(false);
+    } finally {
+      system.dispose?.();
+    }
+  });
+
+  it('a new dive clears deferred scan completion', () => {
+    const { ctx, system, tick, onboard, headlights } = setup();
+    try {
+      ctx.bus.emit('scan:complete', {
+        poiId: 'opening-target',
+        landmarkId: 'challenger-deep',
+        firstTime: false,
+      });
+      ctx.bus.emit('mission:started', { missionId: 'endurance', tileId: 'endurance' });
+      tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
+      tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
+      headlights.on = true;
+      tick();
+      expect(onboard.tutorial.step?.id).toBe('scan');
+    } finally {
+      system.dispose?.();
+    }
+  });
+
   it('1020: waits for the authored opening before judging a new descent', () => {
     const { ctx, system, onboard } = setup(['creature', 'rov']);
     const draw = (dt: number, depth: number, frozen = false) =>

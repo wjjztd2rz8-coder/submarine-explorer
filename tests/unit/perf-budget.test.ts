@@ -56,7 +56,15 @@ function staticCost(root: THREE.Object3D): { calls: number; triangles: number } 
   return { calls, triangles };
 }
 
-const sites = ['titanic', 'lost-city', 'great-blue-hole', 'beebe-vent-field', 'monterey-canyon'];
+const sites = [
+  'titanic',
+  'lost-city',
+  'great-blue-hole',
+  'beebe-vent-field',
+  'monterey-canyon',
+  'challenger-deep',
+  'endurance',
+];
 const diagnostics =
   (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
     ?.PERF_BUDGET_STATIC === '1';
