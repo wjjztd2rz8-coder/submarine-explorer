@@ -25,10 +25,20 @@ test('Blake portrait keeps the contact reticle off SCAN and restores it when con
   });
   await expect(page.locator('.tc-btn-scan')).toBeVisible();
   await expect(page.locator('.scan-panel')).toBeVisible();
+  // The card, reticle and Scan share one target, so the Blake contact now opens
+  // on-axis and clear of the controls. Slide the SCAN button over the contact
+  // without moving it: the reticle must hide behind the control.
+  await expect(page.locator('.scan-reticle')).toBeVisible();
+  await page.locator('.tc-buttons').evaluate((el) => {
+    const r = document.querySelector('.scan-reticle')!.getBoundingClientRect();
+    const b = document.querySelector('.tc-btn-scan')!.getBoundingClientRect();
+    (el as HTMLElement).style.transform =
+      `translate(${r.left + r.width / 2 - (b.left + b.width / 2)}px, ${r.top + r.height / 2 - (b.top + b.height / 2)}px)`;
+  });
   await expect(page.locator('.scan-reticle')).toBeHidden();
   // Clear the projected contact without moving it; the reticle must reappear at its true aim.
   await page.locator('.tc-buttons').evaluate((el) => {
-    (el as HTMLElement).style.transform = 'translateY(-400px)';
+    (el as HTMLElement).style.transform = 'translateY(400px)';
   });
   await expect(page.locator('.scan-reticle')).toBeVisible();
   const overlap = await page.evaluate(() => {
@@ -40,7 +50,8 @@ test('Blake portrait keeps the contact reticle off SCAN and restores it when con
   await page.locator('.tc-buttons').evaluate((el) => {
     (el as HTMLElement).style.transform = '';
   });
-  await expect(page.locator('.scan-reticle')).toBeHidden();
+  // At rest the contact is clear of every control, so the reticle stays.
+  await expect(page.locator('.scan-reticle')).toBeVisible();
   await mkdir(shots, { recursive: true });
   await page.screenshot({ path: `${shots}/blake-opening.png` });
 });

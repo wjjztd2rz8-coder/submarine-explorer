@@ -69,5 +69,5 @@ export const DEFAULT_CAMERA: CameraConfig = {
   bankFollow: 0.55,
   orbitRadius: 90,
   orbitElevation: 0.35,
-  lostCityArcadeOpening: { rangeM: 38, chaseRadiusM: 66, chaseOffsetXM: -20, chaseOffsetYM: 8 },
+  lostCityArcadeOpening: { rangeM: 38, chaseRadiusM: 66, chaseOffsetXM: -8, chaseOffsetYM: 30 },
 };

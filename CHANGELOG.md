@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-e2e-regress:** Arcade Lost City opening chase offset now `chaseOffsetXM: -8, chaseOffsetYM: 30` (was -20, 8): the taller scan card on 844x390 phone landscape (card bottom 115 px) had caught the carbonate tower tip (y 117-118 px); the tip now sits at about 124-129 px. Chase radius stays 66. The Blake reticle spec now slides SCAN over the contact itself, since the card, reticle and Scan share one target and the contact opens on-axis.
+
 - **f-hud-overlap-fix:** desktop and tablet scan stack top is now `max(112px, 15%)` (was 84px) so the top-centre `New discovery` notice (72-109px) no longer overlaps the scan card, tutorial hint or objective chip at 1280x720; the 1390 sweep now settles the ResizeObserver-driven layout before measuring and picks a genuinely out-of-range spot (procedural deep-coral targets at Hudson Canyon and Kamaʻehuakanaloa were landing in range of the fixed +10000 m offset).
 
 - **Scan card and Scan share one target:** the scanner now promotes its scan candidate (in-cone and in range, mission objective first, then nearest) to the card/reticle/prompt contact, so with two contacts in range the card names exactly what pressing Scan scans instead of a nearer off-axis contact. Reason: bug-hunt 1330 showed one name on the card and another scanned. No visual change.
