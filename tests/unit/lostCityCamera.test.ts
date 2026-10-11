@@ -56,7 +56,7 @@ describe('Lost City camera geometry', () => {
       expect(new Vector3(Math.sin(pose.yaw), 0, -Math.cos(pose.yaw)).dot(toHero)).toBeGreaterThan(
         0.98,
       );
-      expect(rig.camera.position.distanceTo(pos)).toBeCloseTo(50, 6);
+      expect(rig.camera.position.distanceTo(pos)).toBeCloseTo(66, 6);
       const sub = new SubMesh({ length: 26, hullClass, tier: 'low' });
       sub.setPose(pos, pose.yaw, 0, 0);
       sub.group.updateMatrixWorld(true);
@@ -135,7 +135,7 @@ describe('Lost City camera geometry', () => {
 describe('Lost City chase reset and photo return', () => {
   it('restores the opening distance after wheel zoom, free look and view toggles', () => {
     const rig = new CameraRig(config.camera, 16 / 9);
-    rig.setChaseRadiusDefault(50, config.camera.lostCityArcadeOpening.chaseOffsetXM);
+    rig.setChaseRadiusDefault(66, config.camera.lostCityArcadeOpening.chaseOffsetXM);
     const pos = new Vector3(0, -750, 0);
     rig.snap(pos, 0.5, 0);
     const openingEye = rig.camera.position.clone();
@@ -149,13 +149,13 @@ describe('Lost City chase reset and photo return', () => {
     rig.resetView();
     rig.update(pos, 0.5, 0, 1 / 60);
     expect(rig.camera.position.distanceTo(openingEye)).toBeLessThan(1e-6);
-    expect(rig.chaseRadius).toBe(50);
+    expect(rig.chaseRadius).toBe(66);
     expect(rig.freeLook).toBe(false);
     rig.toggleMode();
     expect(rig.mode).toBe('first-person');
     rig.toggleMode();
     expect(rig.mode).toBe('chase');
-    expect(rig.chaseRadius).toBe(50);
+    expect(rig.chaseRadius).toBe(66);
     rig.setChaseRadiusDefault(); // Surface / Realistic / missing opening clears the override.
     rig.chaseRadius = 35;
     rig.resetView();
@@ -183,13 +183,13 @@ describe('Lost City chase reset and photo return', () => {
       expect(rig.orbitRadius).toBe(PHOTO_ORBIT_MAX_M);
       rig.orbit(0, 0, -100);
       expect(rig.orbitRadius).toBe(PHOTO_ORBIT_MIN_M);
-      expect(rig.chaseRadius).toBe(50);
+      expect(rig.chaseRadius).toBe(66);
       expect(rig.exitPhotoMode()).toBe(mode);
       rig.update(pos, pose.yaw, 0, 1 / 60);
       expect(rig.camera.position.distanceTo(eye)).toBeLessThan(1e-6);
       expect(rig.camera.quaternion.angleTo(aim)).toBeLessThan(1e-6);
       rig.resetView();
-      expect(rig.chaseRadius).toBe(50);
+      expect(rig.chaseRadius).toBe(66);
     }
   });
 });

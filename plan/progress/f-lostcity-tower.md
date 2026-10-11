@@ -33,6 +33,8 @@ Files: src/world/LostCityCarbonate.ts, src/world/props/geo/towers.ts, src/core/c
 - Brucite fins: 40/16 fins (was 64/24), about 40% shorter, wider base and less splay, so the vent rim is a subtle fringe not spikes.
 - Opening camera (Arcade Lost City only): chase arm 50 to 66 m, new `chaseOffsetYM: 8`. Tower tip now sits about 30 px under the scan card on desktop (was behind it) and clear on 844x390.
 
-Shots: .cache/codex/shots/f-lostcity-tower/ base-*, a3-* (final). Golden: GOLDEN_SITES=lost-city GOLDEN_LAYOUTS=desktop,landscape.
+Shots: .cache/codex/shots/f-lostcity-tower/ base-_, a3-_ (final). Golden: GOLDEN_SITES=lost-city GOLDEN_LAYOUTS=desktop,landscape.
 
 Assessment: clear but moderate gain. Warm/cool variation and darker flutes read at opening and close range; towers are still smooth-sectioned and the wide scene is moody grey-green. Whole tower field now fits the opening frame, sub slightly smaller. Portrait and Low tier not re-checked.
+
+Test changes (deliberate): Lost City Arcade chase-arm pins 50 to 66 in lostCityCamera, lostCityReadability and arcadeLoadout unit tests; the "camera within 95 m of the tower" bound in lostCityReadability is now 112 m (radius 50 at offsetY 0, 8, 24 or -14 could not clear the card; a higher altitude changed the chosen side of the tower). Snapshots terrainMerge1140 and beebeIsolation regenerated (tower geometry changed). Tradeoff: opening is slightly farther back (whole tower group fits, sub smaller).
