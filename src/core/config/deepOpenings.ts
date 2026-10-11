@@ -38,12 +38,12 @@ export const DEEP_OPENINGS = {
       hero: 'main-hull',
       bearing: 60,
       range: 32,
-      altitude: 14,
-      yawOffset: 8,
-      // Inherit the global reset radius; the wider side view clears the entire wreck.
-      chaseRadius: undefined,
+      altitude: 10,
+      yawOffset: 10,
+      // Pulled-in side view (global arm is 98 m): the 44 m hull spans over a quarter of the frame.
+      chaseRadius: 70,
       chaseOffsetX: -220,
-      chaseOffsetY: -10,
+      chaseOffsetY: -20,
       portraitChaseOffset: { x: 0, y: -48, radius: 52 },
     },
     fogDensity: 0.01,
