@@ -63,7 +63,12 @@ for (const touch of [false, true]) {
         );
         await clockFramesUntil(page, () => {
           const g = window.__game as unknown as Game;
-          return window.__gameReady === true && g.props.loaded && g.discovery.loaded;
+          return (
+            window.__gameReady === true &&
+            g.props.loaded &&
+            g.discovery.loaded &&
+            g.discovery.scanner.view.candidateId !== null
+          );
         });
         const target = await page.evaluate((id) => {
           const g = window.__game as unknown as Game;
