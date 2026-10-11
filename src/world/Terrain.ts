@@ -121,6 +121,12 @@ export class Terrain {
   private readonly normalSubdiv: number;
   private baseSubdiv = 1;
   private readonly patchSubdivs = new Map<string, number>();
+  /**
+   * Memo of `surfaceHeight` at the near-mesh lattice corners `sampleHeight` reads. The surface
+   * is a pure function of position and corners are shared by every query in the same mesh
+   * cell, so physics/camera/prop sampling (thousands of nearby queries per frame) mostly hit.
+   */
+  private readonly latticeHeights = new Map<number, number>();
   private meshChunkCells = 64;
   private readonly lodNear: number;
   private readonly lodFar: number;
@@ -345,14 +351,28 @@ export class Terrain {
     const tz = fz - j;
     const x0 = this.worldXOfCol(c0) + (i * this.dx) / s;
     const z0 = this.worldZOfRow(r0) + (j * this.dz) / s;
-    const b = this.surfaceHeight(x0 + this.dx / s, z0);
-    const d = this.surfaceHeight(x0, z0 + this.dz / s);
+    const gx = c0 * s + i;
+    const gz = r0 * s + j;
+    const b = this.latticeHeight(gx + 1, gz, s, x0 + this.dx / s, z0);
+    const d = this.latticeHeight(gx, gz + 1, s, x0, z0 + this.dz / s);
     if (tx + tz <= 1) {
-      const a = this.surfaceHeight(x0, z0);
+      const a = this.latticeHeight(gx, gz, s, x0, z0);
       return a + (b - a) * tx + (d - a) * tz;
     }
-    const e = this.surfaceHeight(x0 + this.dx / s, z0 + this.dz / s);
+    const e = this.latticeHeight(gx + 1, gz + 1, s, x0 + this.dx / s, z0 + this.dz / s);
     return e + (d - e) * (1 - tx) + (b - e) * (1 - tz);
+  }
+
+  /** Cached `surfaceHeight` at lattice corner (gx, gz) of a patch with `s` subdivisions per cell. */
+  private latticeHeight(gx: number, gz: number, s: number, x: number, z: number): number {
+    const key = (gz + 1024) * 1048576 + (gx + 1024) + s * 1099511627776;
+    let h = this.latticeHeights.get(key);
+    if (h === undefined) {
+      if (this.latticeHeights.size >= 400_000) this.latticeHeights.clear();
+      h = this.surfaceHeight(x, z);
+      this.latticeHeights.set(key, h);
+    }
+    return h;
   }
 
   /** Continuous reconstruction used by the vertex sampler and derivative normals. */
