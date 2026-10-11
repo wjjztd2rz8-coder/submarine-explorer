@@ -28,6 +28,15 @@ export const propsSystem: GameSystem = {
     const propsLandmark = route ? contentLandmark : landmarkIdFor(params, meta.id);
     const initialPosition = sub.position.clone();
     void props.load(contentUrl(propsLandmark, 'props.json'), propsLandmark).then((st) => {
+      if (propsLandmark === 'challenger-deep') {
+        const lander = props.placed.find((p) => p.def.id === 'leggo-lander-marker');
+        if (lander) {
+          lander.root.updateMatrixWorld(true);
+          terrain.scatter.setBoulderKeepout(
+            lander.localBounds.clone().applyMatrix4(lander.root.matrixWorld),
+          );
+        }
+      }
       // Explicit probes and missions keep their poses; don't teleport a pilot
       // who has already moved while optional models were downloading.
       if (

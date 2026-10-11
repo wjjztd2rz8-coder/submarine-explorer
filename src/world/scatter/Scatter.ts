@@ -76,6 +76,14 @@ export class Scatter {
   private readonly scl = new THREE.Vector3();
   private readonly up = new THREE.Vector3(0, 1, 0);
   private readonly color = new THREE.Color();
+  private boulderKeepout: THREE.Box3 | null = null;
+  private readonly instanceBounds = new THREE.Box3();
+
+  /** Reserve a loaded prop's world bounds without regenerating any scatter cells. */
+  setBoulderKeepout(bounds: THREE.Box3): void {
+    this.boulderKeepout = bounds.clone();
+    this.dirty = true;
+  }
 
   constructor(opts: ScatterOptions) {
     this.opts = opts;
@@ -204,6 +212,11 @@ export class Scatter {
           this.pos.set(inst.x, inst.y, inst.z);
           this.scl.set(inst.sx, inst.sy, inst.sz);
           this.m4.compose(this.pos, this.q, this.scl);
+          if (kind === 'boulder' && this.boulderKeepout) {
+            if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+            this.instanceBounds.copy(mesh.geometry.boundingBox!).applyMatrix4(this.m4);
+            if (this.instanceBounds.intersectsBox(this.boulderKeepout)) continue;
+          }
           mesh.setMatrixAt(n, this.m4);
           this.color.setRGB(inst.r, inst.g, inst.b);
           mesh.setColorAt(n, this.color);

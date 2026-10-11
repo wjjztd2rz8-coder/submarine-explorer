@@ -35,7 +35,13 @@ import {
   type BuiltProp,
   type InstanceSpec,
 } from './shared.js';
-import { buildTalusMesh, placeRocks, rockMatrix, type TalusShape } from './talus.js';
+import {
+  buildTalusMesh,
+  placeRocks,
+  rockMatrix,
+  talusMeshSampler,
+  type TalusShape,
+} from './talus.js';
 import type { GeoBuildInput } from './types.js';
 
 const WALL = new THREE.Color(0x9b9482);
@@ -349,40 +355,35 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     seed,
     terraces: input.cfg.blueHoleApron,
   };
-  const apron = buildTalusMesh(
-    talus,
-    W,
-    Math.min(160, Math.round(W * 1.2 * d.meshDensity)),
-    Math.round(Math.max(12, (0.5 * D * 1.5) / 0.8) * d.meshDensity),
-    5,
-    (x, y, z, u, out) => {
-      const n = fbm3(x * 0.2, z * 0.2, y * 0.1, seed ^ 0x52, 4);
-      out
-        .copy(WALL)
-        .lerp(WALL_DARK, 0.3)
-        .lerp(DRAPE, smooth(0.05, 0.9, u) * 0.45);
-      // Sediment tone drifts between warm sand, grey silt and darker fallen debris; no flat cream.
-      const t = fbm3(x * 0.07, z * 0.07, 3, seed ^ 0x91, 3);
-      out.lerp(BED_WARM, smooth(0.5, 0.8, t) * 0.55).lerp(BED_COOL, smooth(0.5, 0.2, t) * 0.3);
-      out.multiplyScalar(0.6 + 0.95 * n);
-      // Streaks of fallen debris running down the slope, and a shadowed contact with the wall.
-      const streak = fbm3(x * 0.45, z * 0.09, 6, seed ^ 0x63, 3);
-      out.multiplyScalar(0.78 + 0.45 * smooth(0.3, 0.7, streak));
-      out.lerp(OCHRE, 0.1 * smooth(0.45, 0.8, t));
-      // Away from the wall the apron sinks toward the cool blue-green of the deep water.
-      out.lerp(DEEP_TEAL, (0.3 + 0.35 * smooth(0.2, 0.9, u)) * (0.7 + 0.5 * (1 - t)));
-      out.multiplyScalar(0.5 + 0.5 * smooth(0, 0.4, u));
-      // Broad, light sediment beds follow actual apron terraces. Thin painted
-      // joints drew contour lines even when the shared rock map was disabled.
-      const bedHeight = input.cfg.blueHoleApron.bedHeightM;
-      const bi = bedHeight > 0 ? Math.floor(y / bedHeight) : 0;
-      const bt = 0.5 + 0.5 * Math.sin(bi * 12.9898 + 2.3) * Math.cos(bi * 5.17);
-      out.multiplyScalar(1.1 + 0.2 * bt);
-      const hollow = fbm3(x * 0.05, z * 0.05, 9, seed ^ 0x2b, 3);
-      out.multiplyScalar(1 - 0.3 * smooth(0.55, 0.3, hollow));
-      out.lerp(TIP, 0.22 * smooth(0.6, 0.78, hollow));
-    },
-  );
+  const apronColumns = Math.min(160, Math.round(W * 1.2 * d.meshDensity));
+  const apronRows = Math.round(Math.max(12, (0.5 * D * 1.5) / 0.8) * d.meshDensity);
+  const apron = buildTalusMesh(talus, W, apronColumns, apronRows, 5, (x, y, z, u, out) => {
+    const n = fbm3(x * 0.2, z * 0.2, y * 0.1, seed ^ 0x52, 4);
+    out
+      .copy(WALL)
+      .lerp(WALL_DARK, 0.3)
+      .lerp(DRAPE, smooth(0.05, 0.9, u) * 0.45);
+    // Sediment tone drifts between warm sand, grey silt and darker fallen debris; no flat cream.
+    const t = fbm3(x * 0.07, z * 0.07, 3, seed ^ 0x91, 3);
+    out.lerp(BED_WARM, smooth(0.5, 0.8, t) * 0.55).lerp(BED_COOL, smooth(0.5, 0.2, t) * 0.3);
+    out.multiplyScalar(0.6 + 0.95 * n);
+    // Streaks of fallen debris running down the slope, and a shadowed contact with the wall.
+    const streak = fbm3(x * 0.45, z * 0.09, 6, seed ^ 0x63, 3);
+    out.multiplyScalar(0.78 + 0.45 * smooth(0.3, 0.7, streak));
+    out.lerp(OCHRE, 0.1 * smooth(0.45, 0.8, t));
+    // Away from the wall the apron sinks toward the cool blue-green of the deep water.
+    out.lerp(DEEP_TEAL, (0.3 + 0.35 * smooth(0.2, 0.9, u)) * (0.7 + 0.5 * (1 - t)));
+    out.multiplyScalar(0.5 + 0.5 * smooth(0, 0.4, u));
+    // Broad, light sediment beds follow actual apron terraces. Thin painted
+    // joints drew contour lines even when the shared rock map was disabled.
+    const bedHeight = input.cfg.blueHoleApron.bedHeightM;
+    const bi = bedHeight > 0 ? Math.floor(y / bedHeight) : 0;
+    const bt = 0.5 + 0.5 * Math.sin(bi * 12.9898 + 2.3) * Math.cos(bi * 5.17);
+    out.multiplyScalar(1.1 + 0.2 * bt);
+    const hollow = fbm3(x * 0.05, z * 0.05, 9, seed ^ 0x2b, 3);
+    out.multiplyScalar(1 - 0.3 * smooth(0.55, 0.3, hollow));
+    out.lerp(TIP, 0.22 * smooth(0.6, 0.78, hollow));
+  });
   apron.computeBoundingBox();
   // The shared rock detail map draws grey squiggle contours across the whole shelf; the apron's
   // banding is baked in vertex colour instead, so drop the map (albedo scale is kept).
@@ -407,8 +408,20 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const rocks = new THREE.InstancedMesh(g, bm, Math.max(1, spots.length));
     const m = new THREE.Matrix4();
     const c = new THREE.Color();
+    const apronHeight = talusMeshSampler(apron, apronColumns, apronRows);
+    const vertices = g.getAttribute('position');
+    const point = new THREE.Vector3();
     spots.forEach((spot, i) => {
       rockMatrix(spot, rnd() * 6.28, 0.55 + rnd() * 0.3, m);
+      // The analytic tread can stand above its interpolated triangles. Lower
+      // only detached blocks until their actual geometry touches the apron.
+      let gap = Infinity;
+      for (let j = 0; j < vertices.count; j++) {
+        point.fromBufferAttribute(vertices, j).applyMatrix4(m);
+        const height = apronHeight(point.x, point.z);
+        if (height !== undefined) gap = Math.min(gap, point.y - height);
+      }
+      if (Number.isFinite(gap) && gap > 0) m.elements[13] -= gap;
       c.copy(WALL)
         .lerp(DRAPE, rnd() * 0.3 + 0.3 * spot.u)
         .multiplyScalar(0.8 + rnd() * 0.3);
