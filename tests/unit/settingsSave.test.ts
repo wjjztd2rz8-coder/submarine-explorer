@@ -156,6 +156,75 @@ describe('Save', () => {
     expect(s.reloadSafe).toBe(false);
   });
 
+  it.each([2, 3])('preserves an unread v%s save when reads fail but writes work', (version) => {
+    const store = new MemoryStore();
+    const original = JSON.stringify({ version, captions: true, graphicsTier: 'low' });
+    store.setItem(SETTINGS_STORAGE_KEY, original);
+    const read = vi.spyOn(store, 'getItem').mockImplementationOnce(() => {
+      throw new Error('temporarily unreadable');
+    });
+    const save = new Save({ config, storage: store });
+    expect(save.get()).toEqual(defaultSettings(config));
+    expect(store.getItem(SETTINGS_STORAGE_KEY)).toBe(original);
+    expect(save.reloadSafe).toBe(false);
+    save.save({ musicVolume: 0.25 });
+    expect(save.get().musicVolume).toBe(0.25);
+    save.reset();
+    expect(store.getItem(SETTINGS_STORAGE_KEY)).toBe(original);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    save.load();
+    if (version === 2) {
+      expect(save.get().captions).toBe(true);
+      save.save({ musicVolume: 0.25 });
+      expect(save.reloadSafe).toBe(true);
+      expect(new Save({ config, storage: store }).get().musicVolume).toBe(0.25);
+    } else {
+      expect(save.protectedVersion).toBe(true);
+      expect(save.reloadSafe).toBe(false);
+      save.save({ musicVolume: 0.25 });
+      expect(store.getItem(SETTINGS_STORAGE_KEY)).toBe(original);
+    }
+    read.mockRestore();
+    warn.mockRestore();
+  });
+
+  it('does not mask unread legacy preferences with a fresh current save', () => {
+    const store = new MemoryStore();
+    const original = JSON.stringify({ version: 1, captions: true });
+    store.setItem('subexplorer.settings.v1', original);
+    const read = vi.spyOn(store, 'getItem');
+    read
+      .mockImplementationOnce(() => null)
+      .mockImplementationOnce(() => {
+        throw new Error('legacy temporarily unreadable');
+      });
+    const save = new Save({ config, storage: store });
+    expect(save.reloadSafe).toBe(false);
+    save.save({ musicVolume: 0.25 });
+    expect(store.getItem(SETTINGS_STORAGE_KEY)).toBeNull();
+    expect(store.getItem('subexplorer.settings.v1')).toBe(original);
+    save.load();
+    expect(save.get().captions).toBe(true);
+    expect(save.reloadSafe).toBe(true);
+    expect(new Save({ config, storage: store }).get().captions).toBe(true);
+    read.mockRestore();
+  });
+
+  it('detects silently dropped writes and retries unchanged session settings', () => {
+    const store = new MemoryStore();
+    const save = new Save({ config, storage: store });
+    const original = store.getItem(SETTINGS_STORAGE_KEY);
+    const write = vi.spyOn(store, 'setItem').mockImplementation(() => {});
+    save.save({ masterVolume: 0.23, muted: true });
+    expect(save.get()).toMatchObject({ masterVolume: 0.23, muted: true });
+    expect(save.reloadSafe).toBe(false);
+    expect(store.getItem(SETTINGS_STORAGE_KEY)).toBe(original);
+    write.mockRestore();
+    save.save({ masterVolume: 0.23, muted: true });
+    expect(save.reloadSafe).toBe(true);
+    expect(new Save({ config, storage: store }).get()).toEqual(save.get());
+  });
+
   it('keeps the original detail default after live config changes', () => {
     const live = structuredClone(config);
     const s = new Save({ config: live, storage: null });

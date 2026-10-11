@@ -297,3 +297,37 @@ it('finishes migration for genuinely absent optional missions', async () => {
   expect(progress.points).toBe(10);
   expect(progress.legacyCredited).toBe(true);
 });
+
+it.each(['constructor', '__proto__', 'toString'])(
+  'migrates a valid site id %s without treating inherited properties as old routes',
+  async (site) => {
+    const discoveries = new DiscoveryStore(null);
+    discoveries.record(site, 'a');
+    const original = discoveries.snapshot();
+    const progress = new Progress(new ProgressSave(null));
+    const fetchJson: FetchJson = async () => ({
+      ok: true,
+      text: async () =>
+        JSON.stringify({
+          version: 1,
+          landmark: site,
+          tile: site,
+          title: site,
+          spawn: { lat: 0, lon: 0 },
+          objectives: [{ id: 'a', poi: 'a', primary: true }],
+          completion: 'all_primary',
+        }),
+    });
+    await expect(
+      creditPreviousDives(progress, discoveries, [], fetchJson),
+    ).resolves.toBeUndefined();
+    expect(progress.rating(site)).toBe(2);
+    expect(progress.legacyCredited).toBe(true);
+    expect(progress.points).toBe(85);
+    expect(progress.divePoints).toBe(0);
+    expect(discoveries.snapshot()).toEqual(original);
+    const earned = progress.snapshot();
+    await creditPreviousDives(progress, discoveries, [], fetchJson);
+    expect(progress.snapshot()).toEqual(earned);
+  },
+);

@@ -215,6 +215,7 @@ export class Save {
   private readonly config: SettingsConfigSource;
   private readonly listeners = new Set<SettingsListener>();
   private readOnly = false;
+  private storageReadFailed = false;
   private reloadSafe_ = true;
   constructor(private readonly options: SaveOptions) {
     this.config = { ...options.config, terrain: { ...options.config.terrain } };
@@ -223,10 +224,19 @@ export class Save {
     this.load();
   }
   load(): SettingsData {
+    this.storageReadFailed = false;
+    const read = (key: string): string | null => {
+      try {
+        return this.storage?.getItem(key) ?? null;
+      } catch {
+        this.storageReadFailed = true;
+        return null;
+      }
+    };
     let raw: unknown = null;
     let absent = true;
     try {
-      const text = this.storage?.getItem(SETTINGS_STORAGE_KEY) ?? null;
+      const text = read(SETTINGS_STORAGE_KEY);
       absent = text === null;
       if (text) raw = JSON.parse(text);
     } catch {
@@ -234,7 +244,7 @@ export class Save {
     }
     const version = (raw as { version?: unknown } | null)?.version;
     this.readOnly = typeof version === 'number' && version > SETTINGS_VERSION;
-    this.reloadSafe_ = !this.readOnly;
+    this.reloadSafe_ = !this.readOnly && !this.storageReadFailed;
     if (this.readOnly)
       console.warn(
         `[save] ${SETTINGS_STORAGE_KEY} is version ${version}; using defaults and not overwriting it`,
@@ -242,7 +252,7 @@ export class Save {
     let recoveredLegacy = false;
     if (!this.readOnly && (!raw || typeof raw !== 'object' || Array.isArray(raw))) {
       try {
-        const legacy = this.storage?.getItem(LEGACY_SETTINGS_KEY);
+        const legacy = read(LEGACY_SETTINGS_KEY);
         if (legacy) {
           raw = JSON.parse(legacy);
           recoveredLegacy = !!raw && typeof raw === 'object' && !Array.isArray(raw);
@@ -257,6 +267,7 @@ export class Save {
       }
     }
     this.data = migrate(raw, this.config);
+    if (this.storageReadFailed) this.reloadSafe_ = false;
     if ((absent || recoveredLegacy) && !this.readOnly) this.persist();
     return this.get();
   }
@@ -337,7 +348,9 @@ export class Save {
   }
   private persist(): void {
     this.reloadSafe_ = false;
-    if (!this.storage || this.readOnly) return;
+    // A failed read cannot prove the key absent; writes might still succeed
+    // and erase intact preferences, including a protected future version.
+    if (!this.storage || this.readOnly || this.storageReadFailed) return;
     try {
       const text = JSON.stringify(this.data);
       this.storage.setItem(SETTINGS_STORAGE_KEY, text);
