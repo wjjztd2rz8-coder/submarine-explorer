@@ -1,10 +1,17 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
-import { expect, test, type Locator, type Page } from './helpers/unlocked.js';
+import { expect, test, type Locator } from './helpers/unlocked.js';
 import type { Discovery } from '../../src/game/Discovery.js';
 import type { Journal } from '../../src/ui/Journal.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
 import type { CameraRig } from '../../src/sub/CameraRig.js';
+import {
+  journalEntries,
+  journalFirstOfKind,
+  journalFront,
+  journalIsSheet,
+  setJournalSpoilers,
+} from './helpers/journal.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
@@ -30,12 +37,6 @@ async function contained(target: Locator): Promise<void> {
   expect(box.y).toBeGreaterThanOrEqual(0);
   expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
   expect(box.y + box.height).toBeLessThanOrEqual(viewport.height + 1);
-}
-
-async function contents(page: Page): Promise<void> {
-  const toggle = page.locator('.jr-contents-toggle');
-  if ((await toggle.isVisible()) && (await toggle.getAttribute('aria-expanded')) === 'false')
-    await toggle.click();
 }
 
 for (const viewport of [
@@ -115,38 +116,34 @@ for (const viewport of [
           await shot(`round-${round}-journal`);
           if (round === 1) {
             await expect(journal.locator('.jr-locked')).toBeVisible();
-            await contents(page);
-            await journal.locator('[data-target="front"]').click();
+            await journalFront(page);
             await expect(journal.locator('.jr-honesty')).toHaveCount(1);
             await shot('journal-front');
             await journal.locator(`.jr-site-card[data-target="${site}"]`).click();
             await journal.locator('.jr-spoilers input').check();
-            await contents(page);
-            await journal
-              .locator(
-                site === 'monterey-canyon'
-                  ? '[data-target="monterey-canyon/poi/canyon-wall"]'
-                  : '.jr-nav-item.is-poi',
-              )
-              .first()
-              .click();
+            await (
+              site === 'monterey-canyon'
+                ? (await journalEntries(page, 'monterey-canyon/poi/canyon-wall')).first()
+                : await journalFirstOfKind(page, 'poi')
+            ).click();
             if (!before) {
               await expect(journal.locator('.jr-tag.is-recreation')).toHaveCount(1);
               await expect(journal.locator('.jr-tag.is-recreation')).toHaveText('Recreation');
               await expect(journal.locator('.jr-honesty')).toHaveCount(0);
-              if (viewport.width === 390) {
+              if (await journalIsSheet(page)) {
                 await expect(journal.locator('.jr-nav')).toBeHidden();
                 expect((await journal.locator('.jr-body').boundingBox())!.height).toBeGreaterThan(
                   viewport.height * 0.5,
                 );
-                await contents(page);
-                await contained(journal.locator('.jr-nav'));
-                await journal.locator('.jr-contents-toggle').click();
-                await expect(journal.locator('.jr-contents-toggle')).toBeFocused();
+                // Back goes up one level, to the site page, and leaves the article focused.
+                await journal.locator('.jr-back').click();
+                await expect(journal.locator('.jr-body .jr-entries')).toBeVisible();
+                await expect(journal.locator('.jr-body')).toBeFocused();
+                await (await journalFirstOfKind(page, 'poi')).click();
               }
             }
             await shot('journal-spoiler-entry');
-            await journal.locator('.jr-spoilers input').uncheck();
+            await setJournalSpoilers(page, false);
           }
           await journal.locator('.jr-close').click();
           await expect(debrief.locator('[data-action="journal"]')).toBeFocused();

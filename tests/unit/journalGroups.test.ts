@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Journal } from '../../src/ui/Journal.js';
 import type { JournalEntry, JournalSite } from '../../src/game/JournalData.js';
 
@@ -114,6 +114,8 @@ function site(id: string): JournalSite {
 }
 let journal: Journal;
 let root: Element;
+/** The phone-sheet media query, flipped per test. */
+const phoneQuery = { matches: false };
 const find = (predicate: (el: Element) => boolean): Element => {
   const el = descendants(root).find(predicate);
   expect(el).toBeDefined();
@@ -123,13 +125,11 @@ const header = (id: string) => find((el) => el.dataset.target === id && el.tagNa
 const category = (key: string) =>
   find((el) => el.dataset.category === key && el.tagName === 'DETAILS');
 beforeEach(() => {
+  phoneQuery.matches = false;
   const body = new Element('body');
   vi.stubGlobal('HTMLElement', Element);
   vi.stubGlobal('getComputedStyle', () => ({ visibility: 'visible' }));
-  vi.stubGlobal(
-    'window',
-    Object.assign(new EventTarget(), { matchMedia: () => ({ matches: false }) }),
-  );
+  vi.stubGlobal('window', Object.assign(new EventTarget(), { matchMedia: () => phoneQuery }));
   vi.stubGlobal('document', {
     body,
     activeElement: body,
@@ -245,4 +245,55 @@ it('keeps one front-page caveat through refreshes and only a provenance tag on e
     expect(descendants(root).filter((el) => el.className === 'jr-honesty')).toHaveLength(0);
     expect(descendants(root).filter((el) => el.textContent === 'Game addition')).toHaveLength(1);
   }
+});
+
+describe('phone sheet', () => {
+  const byClass = (cls: string): Element[] =>
+    descendants(root).filter((el) => el.className.split(' ').includes(cls));
+  const body = () => byClass('jr-body')[0]!;
+  beforeEach(() => {
+    phoneQuery.matches = true;
+    journal.refresh();
+  });
+
+  it('lists the sites as rows on the front page and renders no contents tree', () => {
+    journal.show('front');
+    expect(root.classList.contains('is-phone')).toBe(true);
+    expect(root.classList.contains('at-front')).toBe(true);
+    expect(byClass('jr-site-card').map((el) => el.dataset.target)).toEqual(['reef', 'wreck']);
+    expect(byClass('jr-nav-list')).toHaveLength(0);
+  });
+
+  it('puts the spoilers switch at the end of the contents and site pages, off the header', () => {
+    journal.show('front');
+    const label = byClass('jr-spoilers')[0]!;
+    expect(label.parentElement).toBe(body());
+    expect(byClass('jr-header')[0]!.contains(label)).toBe(false);
+    journal.show('reef');
+    expect(label.parentElement).toBe(body());
+    // A logged entry's page is not cluttered by it.
+    journal.setStore({ isDiscovered: () => true });
+    journal.show('reef/poi/entry');
+    expect(label.parentElement).not.toBe(body());
+  });
+
+  it('lists a site page as entry rows and goes back one level at a time', () => {
+    journal.setSpoilers(true);
+    journal.show('reef');
+    expect(root.classList.contains('at-front')).toBe(false);
+    const rows = byClass('jr-row');
+    expect(rows.map((el) => el.dataset.row)).toContain('reef/site/entry');
+    // Until a first scan, the page is a short locked note with no rows.
+    journal.setSpoilers(false);
+    expect(byClass('jr-locked')).toHaveLength(1);
+    expect(byClass('jr-row')).toHaveLength(0);
+    journal.setSpoilers(true);
+    const open = byClass('jr-row').find((el) => el.dataset.row === 'reef/poi/entry')!;
+    open.dispatchEvent(new Event('click'));
+    expect(journal.viewKey).toBe('reef/poi/entry');
+    byClass('jr-back')[0]!.dispatchEvent(new Event('click'));
+    expect(journal.viewKey).toBe('reef');
+    byClass('jr-back')[0]!.dispatchEvent(new Event('click'));
+    expect(journal.viewKey).toBe('front');
+  });
 });

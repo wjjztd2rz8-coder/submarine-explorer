@@ -1,4 +1,4 @@
-import { openJournalCategory } from './helpers/journal.js';
+import { journalEntries, openJournalCategory, openJournalSite } from './helpers/journal.js';
 import { dismissTutorial } from './helpers/tutorial.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { writeFile } from 'node:fs/promises';
@@ -244,17 +244,6 @@ for (const layout of [
       page.on('pageerror', (e) => errors.push(e.message));
       await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
       await page.waitForFunction(() => window.__gameReady === true);
-      const click = async (selector: string) => {
-        const button = page.locator(selector);
-        await button.scrollIntoViewIfNeeded();
-        if (layout.touch) await button.tap();
-        else await button.click();
-      };
-      const contents = async () => {
-        const toggle = page.locator('.jr-contents-toggle');
-        if ((await toggle.isVisible()) && (await toggle.getAttribute('aria-expanded')) === 'false')
-          await click('.jr-contents-toggle');
-      };
       const homeJournal = page
         .locator('.home-menu')
         .getByRole('button', { name: 'Journal', exact: true });
@@ -264,12 +253,10 @@ for (const layout of [
       await expect(page.locator('.jr-honesty')).toContainText('real survey data');
       await page.locator('.jr-spoilers input').check();
       for (const site of catalog.landmarks) {
-        await contents();
-        await click(`.jr-nav-item.is-site[data-target="${site}"]`);
+        await openJournalSite(page, site);
         for (const kind of ['life', 'secret']) {
-          await contents();
           await openJournalCategory(page, site, kind);
-          const entry = page.locator(`.jr-nav-item[data-target^="${site}/${kind}/"]`).first();
+          const entry = (await journalEntries(page, `${site}/${kind}/`)).first();
           await expect(entry).toBeVisible();
           await entry.scrollIntoViewIfNeeded();
           if (layout.touch) await entry.tap();

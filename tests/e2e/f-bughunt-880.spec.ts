@@ -7,6 +7,7 @@ import type { Submarine } from '../../src/sub/Submarine.js';
 import type { Props } from '../../src/world/Props.js';
 import type { Terrain } from '../../src/world/Terrain.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { journalEntries } from './helpers/journal.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
 
 interface Game {
@@ -199,12 +200,8 @@ for (const tier of ['low', 'medium']) {
       // J queues an input edge; the paused game must sample it in a real frame.
       await page.clock.runFor(34);
       await expect(page.locator('.journal')).toBeVisible();
-      const toggle = page.locator('.jr-contents-toggle');
-      if (await toggle.isVisible()) {
-        if ((await toggle.getAttribute('aria-expanded')) === 'false') await toggle.click();
-      }
       // Guide-linked contacts have one stable content row after reload.
-      const entry = page.locator(`.jr-nav-item[data-target="${site}/poi/${opening.target.guide}"]`);
+      const entry = (await journalEntries(page, `${site}/poi/${opening.target.guide}`)).first();
       await entry.scrollIntoViewIfNeeded();
       if (hasTouch) await entry.tap();
       else await entry.click();
