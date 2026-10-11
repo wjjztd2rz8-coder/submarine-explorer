@@ -974,3 +974,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** Codex 1340 (Save no longer overwrites settings after a failed storage read; captions disposed on teardown; migration uses own-property lookup; tests added). Smoke + project-base green on main; no full e2e, no push (f51 still last tag).
 - **Dropped:** 1330 (verify flow on touch) was blocked in the Codex sandbox (no browser), so no screenshots. One source finding worth a Sonnet fix: with two contacts in range the idle scan card can name the nearest off-axis contact while Scan targets the objective ahead (Scanner candidate vs nearest). Worktree removed.
 - **Not merged:** 1320 (Monterey/Endurance small) worktree still holds uncommitted edits to camera.ts/CameraRig.ts from a stale base (would revert Lost City camera work); needs a rebase or selective salvage. Codex 5h was 6% so nothing was launched; 1350-1370 queued. No Claude package started. Needs owner: nothing.
+
+## 2026-10-11 12:19 CDT headless run (Claude)
+
+- **Merged:** Codex 1320 (Monterey wall-foot rubble, Endurance sonar scour; salvaged by Sonnet onto current main, dropping its stale camera edits; offline renders show clear gain, no browser shots). f-scan-candidate (Sonnet): scan card, reticle and prompt now name exactly the contact Scan will scan; I fixed the objective-priority ordering in review. Two tests that pinned the old split behaviour were updated deliberately. Smoke + project-base green on main; no full e2e.
+- **Running:** Codex 1350, 1360, 1370. Queued 1380 (verify 1320), 1390 (HUD/touch overlap hunt), 1400 (fact check).
+- **Not done:** no release; main is ~28 commits ahead of f51 and a full e2e needs a quiet CPU (three Codex tasks running). Next quiet window: full e2e, push, tag f52. Needs owner: nothing.
