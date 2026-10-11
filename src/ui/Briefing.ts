@@ -24,7 +24,6 @@ import type { MissionStartPosition } from '../game/MissionRouter.js';
 import { ModeSelector, type GameplaySettingsSource } from './ModeSelector.js';
 
 export interface BriefingContent {
-  siteId?: string;
   kicker: string;
   title: string;
   summary: string;
@@ -34,8 +33,6 @@ export interface BriefingContent {
   hazards: string[];
   memorialNote?: string;
   objectives: Array<{ title: string; primary: boolean }>;
-  /** Key label / what it does. */
-  controls: Array<[string, string]>;
   startPosition?: MissionStartPosition;
 }
 
@@ -62,14 +59,18 @@ const START_CHOICES = [
   ['surface', 'at the surface'],
 ] as const;
 
-// Prioritise orientation and conditions over launch instructions/history.
-// The complete, unchanged lists remain in the site disclosure.
-const SITE_PRIORITIES: Record<string, { facts: number[]; hazards: number[] }> = {
-  titanic: { facts: [1, 0, 3], hazards: [3, 4, 1] },
-  'great-blue-hole': { facts: [0, 1, 3], hazards: [0, 1, 2] },
-};
-
 let uid = 0;
+
+/** The lines in order, without blanks or repeats (case and spacing ignored). */
+function unique(items: readonly string[]): string[] {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const key = item.trim().replace(/\s+/g, ' ').toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
 
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -118,7 +119,7 @@ export class Briefing {
         return;
       }
       if (!this.open_ || (e.code !== 'Enter' && e.code !== 'NumpadEnter')) return;
-      // Enter on another focused button (Advanced, View controls) or a
+      // Enter on another focused button (Advanced, About this site) or a
       // select does that control's job, not Begin.
       const t = e.target;
       if (
@@ -194,29 +195,6 @@ export class Briefing {
       head.append(meta);
     }
     p.append(head);
-    const cols = el('div', 'briefing-cols');
-    const left = el('div', 'briefing-col');
-    const right = el('div', 'briefing-col');
-    const list = (title: string, items: string[], cls: string, into: HTMLElement): void => {
-      if (!items.length) return;
-      const s = el('section', `briefing-section ${cls}`);
-      s.append(el('h2', 'briefing-section-title', title));
-      const ul = el('ul');
-      for (const i of items) ul.append(el('li', undefined, i));
-      s.append(ul);
-      into.append(s);
-    };
-    const priority = SITE_PRIORITIES[c.siteId ?? ''];
-    const preview = (items: string[], order?: number[]): string[] =>
-      (order ? order.map((i) => items[i]).filter((item): item is string => !!item) : items).slice(
-        0,
-        3,
-      );
-    const facts = preview(c.facts, priority?.facts);
-    const hazards = preview(c.hazards, priority?.hazards);
-    list('FACTS', facts, 'is-facts', right);
-    list('HAZARDS', hazards, 'is-hazards', right);
-
     const obj = el('section', 'briefing-section is-objectives');
     obj.append(el('h2', 'briefing-section-title', 'OBJECTIVES'));
     const ol = el('ul', 'briefing-objectives');
@@ -230,39 +208,32 @@ export class Briefing {
       ol.append(li);
     }
     obj.append(ol);
-    left.append(obj);
-
-    // One disclosure owns the longer overview and the remaining bullets.
-    const more = el('details', 'briefing-site-more');
-    more.append(el('summary', undefined, 'More about this site'));
-    const extra = el('div', 'briefing-site-extra');
-    if (c.summary) extra.append(el('p', 'briefing-summary', c.summary));
-    list(
-      'FACTS',
-      c.facts.filter((fact) => !facts.includes(fact)),
-      'is-facts',
-      extra,
-    );
-    list(
-      'HAZARDS',
-      c.hazards.filter((hazard) => !hazards.includes(hazard)),
-      'is-hazards',
-      extra,
-    );
-
-    const ctl = el('section', 'briefing-section is-controls');
-    ctl.append(el('h2', 'briefing-section-title', 'CONTROLS'));
-    const grid = el('div', 'briefing-controls');
-    for (const [key, what] of c.controls) {
-      grid.append(el('span', 'briefing-key', key), el('span', 'briefing-key-desc', what));
+    p.append(obj);
+    // The memorial note stays on the card; everything else about the site is
+    // one collapsed disclosure, each fact and hazard listed once.
+    if (c.memorialNote) p.append(el('p', 'briefing-memorial', c.memorialNote));
+    const facts = unique(c.facts);
+    const hazards = unique(c.hazards).filter((h) => !facts.includes(h));
+    if (c.summary || facts.length || hazards.length) {
+      const more = el('details', 'briefing-site-more');
+      more.append(el('summary', undefined, 'About this site'));
+      const extra = el('div', 'briefing-site-extra');
+      if (c.summary && c.summary !== c.memorialNote)
+        extra.append(el('p', 'briefing-summary', c.summary));
+      const list = (title: string, items: string[], cls: string): void => {
+        if (!items.length) return;
+        const s = el('section', `briefing-section ${cls}`);
+        s.append(el('h2', 'briefing-section-title', title));
+        const ul = el('ul');
+        for (const i of items) ul.append(el('li', undefined, i));
+        s.append(ul);
+        extra.append(s);
+      };
+      list('FACTS', facts, 'is-facts');
+      list('HAZARDS', hazards, 'is-hazards');
+      more.append(extra);
+      p.append(more);
     }
-    ctl.append(grid);
-    extra.append(ctl);
-    more.append(extra);
-    // Keep the memorial visible beside the objectives, even with site details closed.
-    if (c.memorialNote) left.append(el('p', 'briefing-memorial', c.memorialNote));
-    cols.append(left, right);
-    p.append(cols, more);
 
     // D2-PREDIVE: Dive settings (mode, start, more options) and Begin share
     // the sticky footer, so they stay visible even when the card scrolls.

@@ -19,7 +19,6 @@ const selectors = [
   '.sonar',
   '.objectives-panel',
   '.hud-readouts',
-  '.hud-attribution',
   '.scan-panel',
   '.scan-objective-chip',
   '.onboard-card',

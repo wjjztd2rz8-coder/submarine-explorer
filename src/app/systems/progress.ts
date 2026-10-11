@@ -50,14 +50,6 @@ export function createProgressSystem(): GameSystem {
           ctx.settings.gameplayMode,
         );
         ctx.route.def.hull_class = fitted;
-        const rating = Math.abs(ctx.config.submarine.hullClasses[fitted].ratedDepth).toLocaleString(
-          'en-US',
-        );
-        ctx.route.def.briefing.hazards = ctx.route.def.briefing.hazards.map((hazard) =>
-          /Class [ABC]/.test(hazard)
-            ? `Class ${fitted} hull · rated to ${rating} m. Stay above the rating.`
-            : hazard,
-        );
       }
       cleanup.add(
         ctx.bus.on('scan:complete', ({ landmarkId, poiId }) => {

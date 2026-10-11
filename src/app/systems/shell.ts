@@ -7,6 +7,7 @@
 import { contentUrl, fetchContentJson } from '../../game/ContentPath.js';
 import { loadMissionSummaries } from '../../game/Mission.js';
 import { loadSpecies } from '../../game/Species.js';
+import { buildDataCredits } from '../../ui/DataCredits.js';
 import { Globe } from '../../ui/Globe.js';
 import { Home } from '../../ui/Home.js';
 import { MissionSelect, missionUrl, tileUrl } from '../../ui/MissionSelect.js';
@@ -96,6 +97,8 @@ export const shellSystem: GameSystem = {
       journal: () => discovery.guide.open(),
       settings: () => ctx.settingsScreen.open(),
       controls: () => ctx.controlsCard.open(),
+      controlsLabel: () => (ctx.controlsCard.device === 'touch' ? 'How to play' : 'Controls'),
+      credits: () => buildDataCredits(meta),
       quit: () => {
         history.pushState({}, '', ctx.shellBaseHref());
         ctx.setAppState('home');
@@ -279,11 +282,6 @@ export const shellKeysSystem: GameSystem = {
         e.preventDefault();
         e.stopImmediatePropagation();
         ctx.exitPhotoMode();
-        return;
-      }
-      if (app.state === 'dive' && ctx.hud.closeDataCredits()) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
         return;
       }
       if (document.pointerLockElement) {

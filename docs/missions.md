@@ -51,8 +51,11 @@ seabed + hullRadius + seabedClearance + mission.spawnClearanceM]`. The
    Yaw = `heading_deg · π/180` (physics convention: `+yaw` turns toward +X =
    east). `?poi=` / `?at=` still override the pose afterwards. Missions keep
    `mission.hull_class`; the free-dive hull chooser does not run.
-3. **Briefing.** Title, summary, target depth, hull, start, facts, hazards
-   (amber), objectives, controls, memorial note (italic). While it is up the game
+3. **Briefing.** Title, target depth, hull, objectives, memorial note (italic)
+   and the dive settings. Summary, facts and hazards (amber) sit once each in
+   one collapsed "About this site" disclosure; a hazard that only repeats the
+   hull rating is dropped, and there is no controls list (the pause menu has
+   Controls, or "How to play" on touch). While it is up the game
    is frozen: no physics steps, input replaced by `FROZEN_INPUT`, no dive time
    counted. "Begin dive" or Enter starts it; `?skipBriefing=1` skips it (e2e).
    Tab is trapped inside the card (`src/ui/FocusTrap.ts`; the debrief and field

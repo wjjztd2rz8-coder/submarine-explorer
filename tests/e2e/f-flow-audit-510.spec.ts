@@ -209,7 +209,6 @@ for (const viewport of [
                 '.hud-readouts',
                 '.scan-panel',
                 '.sonar',
-                '.hud-attribution',
                 '.tc-stick',
                 '.tc-slider',
                 '.tc-buttons',

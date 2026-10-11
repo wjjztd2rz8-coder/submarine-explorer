@@ -12,7 +12,6 @@
      phone landscape    top-left: sonar (small); top-centre column: tutorial
                         card, then the scan-target panel and hint;
                         top-right: short objectives and readouts
-                        bottom strip between stick and buttons: map credit
 
    Loaded last so it wins over the earlier per-feature files. */
 
@@ -86,23 +85,7 @@
   flex: none;
 }
 
-/* Touch landscape: the map credit sits in the strip between stick and buttons. */
 @media (orientation: landscape) {
-  html.is-touch .hud-footer {
-    left: calc(136px + env(safe-area-inset-left, 0px));
-    right: calc(300px + env(safe-area-inset-right, 0px));
-    justify-content: flex-end;
-  }
-  html.is-touch .hud-attribution summary {
-    min-height: 44px;
-  }
-  html.is-touch .hud-attribution-panel {
-    max-height: calc(100dvh - 120px);
-    width: min(
-      400px,
-      calc(100vw - 136px - 300px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
-    );
-  }
   html.is-touch .scan-overlay .scan-stack {
     left: calc(50% - 40px);
     width: var(--hl-scan-width);
@@ -138,8 +121,7 @@
   }
   html.is-touch .sonar.d-sonar-expanded {
     /* Reserve the right controls and the left Pause slot on narrow phones.
-       The whole panel must also clear the footer: 12 px top, 10 px bottom,
-       the 44 px credit chip and an 8 px gap. Let only the map shrink. */
+       Let only the map shrink. */
     left: auto;
     right: calc(270px + env(safe-area-inset-right, 0px));
     top: calc(12px + env(safe-area-inset-top, 0px));
@@ -400,7 +382,7 @@
     max-width: calc(100vw - 24px);
   }
   /* Hints appear after the tutorial. Reuse its row and grow the target/hint
-     stack upward, leaving the credit chip and the touch controls below. */
+     stack upward, leaving the touch controls below. */
   html.is-touch body:has(.onboard-card[hidden]):has(.onboard-hint:not([hidden])) .scan-stack {
     bottom: calc(230px + env(safe-area-inset-bottom, 0px));
   }
@@ -416,20 +398,6 @@
       42%,
       calc(var(--obj-panel-bottom, 0px) + 8px + var(--hud-readouts-height, 0px) + 12px)
     );
-  }
-  /* The credit chip otherwise sits across the stick and action buttons. Keep
-     it as a small strip above the left stick, clearing the taller action
-     cluster at 150% UI scale. */
-  html.is-touch .hud-footer {
-    left: calc(12px + env(safe-area-inset-left, 0px));
-    right: auto;
-    bottom: calc(160px + env(safe-area-inset-bottom, 0px));
-  }
-  html.is-touch .hud-attribution summary {
-    min-height: 44px;
-    max-width: 128px;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
   html.is-touch {
     --hl-portrait-map-width: clamp(136px, 40vw, 176px);
@@ -864,9 +832,6 @@
     width: 40px;
     height: 40px;
   }
-  html.is-touch .hud-attribution summary {
-    min-height: 44px;
-  }
 }
 
 @media (orientation: portrait) and (max-width: 480px) {
@@ -883,17 +848,6 @@
     left: var(--hl-portrait-stack-left);
     right: calc(12px + env(safe-area-inset-right, 0px));
   }
-  html.is-touch .hud-footer {
-    left: calc(12px + env(safe-area-inset-left, 0px));
-    right: auto;
-    top: calc(140px + env(safe-area-inset-top, 0px));
-    bottom: auto;
-  }
-  html.is-touch .hud-attribution summary {
-    max-width: 96px;
-    padding: 4px;
-    font-size: 10px;
-  }
   html.is-touch .sonar.d-sonar-expanded {
     max-height: calc(100dvh - var(--hl-portrait-stack-top) - 294px);
     display: flex;
@@ -904,10 +858,6 @@
   }
   html.is-touch .sonar.d-sonar-expanded canvas {
     min-height: 0;
-  }
-  html.is-touch body:has(.sonar.d-sonar-expanded) .hud-footer {
-    top: auto;
-    bottom: calc(230px + env(safe-area-inset-bottom, 0px));
   }
   html.is-touch .scan-overlay .scan-stack,
   html.is-touch body:has(.onboard-hint:not([hidden])) .scan-overlay .scan-stack,
@@ -940,7 +890,7 @@
 
 @media (orientation: landscape) and (max-width: 900px) and (max-height: 460px) {
   /* F-PHONE-PASS: the 96 px map was too small to read features; 120 px still
-     clears the stick (top 270 px) with the credit chip under it. */
+     clears the stick (top 270 px). */
   html.is-touch .sonar:not(.d-sonar-expanded) {
     width: 120px;
   }
@@ -996,21 +946,9 @@
     width: calc(100vw - 426px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
     transform: none;
   }
-  html.is-touch .hud-footer {
-    left: calc(12px + env(safe-area-inset-left, 0px));
-    right: auto;
-    top: calc(166px + env(safe-area-inset-top, 0px));
-    bottom: auto;
-  }
   html.is-touch body:has(.sonar.d-sonar-expanded) .onboard-card,
   html.is-touch body:has(.sonar.d-sonar-expanded) .scan-stack {
     visibility: hidden;
-  }
-  html.is-touch body:has(.sonar.d-sonar-expanded) .hud-footer {
-    left: calc(136px + env(safe-area-inset-left, 0px));
-    right: calc(300px + env(safe-area-inset-right, 0px));
-    top: auto;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   }
 }
 

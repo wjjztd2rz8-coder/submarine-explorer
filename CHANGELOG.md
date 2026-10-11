@@ -14,6 +14,11 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-text-diet (owner phone playtest: too much text):**
+  - Briefing: FACTS and HAZARDS left the main card and now sit once each inside one collapsed "About this site" disclosure (with the summary). The CONTROLS section and the "View controls" button are removed, the hull-rating hazard ("Class B hull ... Stay above the rating") is dropped because the HULL meta row says it, "OR PRESS ENTER" is hidden on touch, and the mode descriptions are shortened to one line. Reason: the card was a wall of text on a phone; Begin and every objective now fit without scrolling at 390x844. `SITE_PRIORITIES` is gone.
+  - Dive HUD: the "Data: GMRT +" chip and its placement code (`DataCreditsLayout.ts`) are removed. The full CC BY 4.0 credit (citation, GMRT and DOI links, "not for navigation") is in the pause menu's new "Data credits" view. Reason: the chip did not matter during play. The Journal site page is a later package.
+  - Touch: the pause menu's "Controls" becomes "How to play", a picture-first page with no key names. Photo mode shows "Capture" and "Drag to orbit · pinch to zoom" on touch, and a shorter key hint on desktop. Contextual hints no longer say "press".
+
 - **f-e2e-regress:** Arcade Lost City opening chase offset now `chaseOffsetXM: -8, chaseOffsetYM: 30` (was -20, 8): the taller scan card on 844x390 phone landscape (card bottom 115 px) had caught the carbonate tower tip (y 117-118 px); the tip now sits at about 124-129 px. Chase radius stays 66. The Blake reticle spec now slides SCAN over the contact itself, since the card, reticle and Scan share one target and the contact opens on-axis.
 
 - **f-hud-overlap-fix:** desktop and tablet scan stack top is now `max(112px, 15%)` (was 84px) so the top-centre `New discovery` notice (72-109px) no longer overlaps the scan card, tutorial hint or objective chip at 1280x720; the 1390 sweep now settles the ResizeObserver-driven layout before measuring and picks a genuinely out-of-range spot (procedural deep-coral targets at Hudson Canyon and Kamaʻehuakanaloa were landing in range of the fixed +10000 m offset).

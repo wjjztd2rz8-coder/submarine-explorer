@@ -98,7 +98,7 @@ for (const viewport of [
         await expect(page.locator('.scan-panel')).toBeVisible();
         await expect(page.locator('.scan-hint')).toHaveText('HOLD SCAN TO SCAN');
         const controls = ['.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause'];
-        const hud = ['.sonar', '.hud-readouts', '.scan-panel', '.hud-attribution'];
+        const hud = ['.sonar', '.hud-readouts', '.scan-panel'];
         if (viewport.width < viewport.height)
           await expect(page.locator('.tc-rotate-hint')).toBeHidden();
         await separate(page, [...hud, '.onboard-card', ...controls]);
@@ -187,7 +187,6 @@ for (const viewport of [
         '.tc-slider',
         '.tc-buttons',
         '.tc-btn-pause',
-        '.hud-attribution',
       ]);
       expect(
         await page.locator('.hud-readouts').evaluate((e) => e.scrollWidth <= e.clientWidth),
