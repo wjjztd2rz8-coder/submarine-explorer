@@ -9,11 +9,11 @@ Sol skipped (Codex 5h 9%). Scores (beautiful): Titanic 4, Endurance 4 (+0.25), B
 Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
 
 1. (MERGED 2026-10-11, spec lightened: 800x500, fewer shots; hosted CI to confirm) **Hosted CI f1-vehicles (Haiku):** `e2e/f1-vehicles.spec.ts:21` screenshot times out on the software-GL runner; fewer/lower-res screenshots, never loosen assertions.
-2. **Touch landscape stack (Sonnet):** scan card + tutorial strip cover ~195 of 390 px; collapse the strip after the first scan and add a compact objective chip when no contact is in range.
+2. (MERGED 2026-10-11 f-touch-stack: objective chip, tutorial collapse >900 px) **Touch landscape stack (Sonnet):** scan card + tutorial strip cover ~195 of 390 px; collapse the strip after the first scan and add a compact objective chip when no contact is in range.
 3. **Tutorial step text after first scan (Sonnet):** still says 'Step 1: Move and turn' (1240 tests pin it; update tests deliberately).
 4. **Blue Hole gallery apron/talus (Sonnet):** ramp apron smooth and fogged at gallery range.
 5. **Lost City tower read (Sonnet):** raise striation contrast and colour variation; keep scan card off the tip.
-6. **Challenger camera/briefing (Haiku):** camera hides lander behind sub; touch briefing clips objectives.
+6. (MERGED 2026-10-11 f-challenger-cam: portrait lander clear, touch briefing scrolls) **Challenger camera/briefing (Haiku):** camera hides lander behind sub; touch briefing clips objectives.
 7. **Monterey wall-foot boulders and Endurance minimap stripes (Haiku, low).**
 
 Codex queue: 1280 Blue Hole squiggle, 1290 verify hull/Lost City, 1310 Titanic sky + Challenger boulders; plus new briefs below.

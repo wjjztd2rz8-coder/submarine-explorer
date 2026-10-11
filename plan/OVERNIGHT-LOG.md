@@ -935,3 +935,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Review:** golden 2026-10-11-100422 viewed; Sol skipped (Codex 5h 9%, exit 75). Scores 3.5-4, no regressions; REVIEWS.md entry and DIRECTOR backlog (7 items) written and pushed. Stage ~80%.
 - **Merged:** f-ci-vehicles (Haiku): lightened f1-vehicles spec (800x500, fewer screenshots, assertions unchanged; local 8.4 s to 4.7 s; hosted runner unverified). Smoke + project-base gates pass on main; not a release, no tag.
 - **Queue:** Codex 1280, 1290, 1310, 1320, 1330. Next Claude: DIRECTOR items 2-7. Needs owner: nothing.
+
+## 2026-10-11 05:55 CDT headless run (Claude)
+
+- **Merged:** f-touch-stack (Sonnet): one-line objective chip on touch when no scan card, tutorial collapses to one row after first scan at landscape >900 px (phones unchanged). f-challenger-cam (Haiku): portrait opening offset shows the lander beside the hull (unit test for Challenger now checks lander clear of hull instead of hull centred; other sites unchanged); touch landscape briefing footer no longer covers objectives. Smoke + project-base green on main; no full e2e, no push (f51 last tag).
+- **Queue:** Codex 1280-1330 queued (Codex 5h 9% until 06:04 reset). Next Claude: DIRECTOR items 3, 4, 5, 7 (tutorial step text, Blue Hole apron, Lost City tower, Monterey boulders). Needs owner: nothing.
