@@ -45,7 +45,7 @@ describe('Lost City camera geometry', () => {
       const pose = opening();
       const pos = new Vector3(pose.x, pose.y, pose.z);
       const rig = new CameraRig(config.camera, 16 / 9, terrain);
-      rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX);
+      rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
       rig.snap(pos, pose.yaw, 0);
       const hero = props.placed.find((p) => p.def.id === 'poseidon-tower')!;
       const toHero = hero.root
@@ -90,7 +90,7 @@ describe('Lost City camera geometry', () => {
     const pose = opening();
     const pos = new Vector3(pose.x, pose.y, pose.z);
     const rig = new CameraRig(config.camera, 844 / 390, terrain);
-    rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX);
+    rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
     const check = () => {
       const eye = rig.camera.position;
       expect(eye.y).toBeGreaterThanOrEqual(
@@ -171,7 +171,7 @@ describe('Lost City chase reset and photo return', () => {
       const pose = opening();
       const pos = new Vector3(pose.x, pose.y, pose.z);
       const rig = new CameraRig(config.camera, 16 / 9, terrain);
-      rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX);
+      rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
       rig.setMode(mode);
       rig.snap(pos, pose.yaw, 0);
       const eye = rig.camera.position.clone();

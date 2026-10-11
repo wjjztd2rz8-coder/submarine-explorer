@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { latLonToWorld } from '../../src/util/geo.js';
 import type { TileMeta } from '../../src/util/types.js';
@@ -11,6 +11,7 @@ import { hashString } from '../../src/world/props/geo/shared.js';
 import doc from '../../data/landmarks/great-blue-hole/props.json';
 import blueHolePoses from '../../tools/blue-hole-poses.json';
 import { CameraRig } from '../../src/sub/CameraRig.js';
+import * as textures from '../../src/world/props/geo/textures.js';
 
 // The measured grid shows only a flat 4 m platform; the carve digs the hole into it.
 const meta = {
@@ -93,6 +94,37 @@ describe('Great Blue Hole props', () => {
   }
 
   for (const def of geo) {
+    for (const tier of ['low', 'high']) {
+      it(`${def.id} ${tier}: sediment apron and wall cannot sample the contour detail map`, () => {
+        // Node normally returns null for every canvas map. Supply a real texture
+        // so this test catches accidentally restoring the contour map in a browser.
+        const map = new THREE.Texture();
+        map.userData.meanLinear = 0.58;
+        const factory = vi.spyOn(textures, 'detailTexture').mockReturnValue(map);
+        try {
+          const built = buildGeo({
+            def,
+            dims: def.dimensionsM!,
+            seed: hashString(def.id),
+            cfg,
+            tier,
+            groundHeight: () => () => 0,
+          });
+          for (const name of ['grotto-sediment-apron', 'grotto-overhang']) {
+            const mesh = built.full.getObjectByName(name) as THREE.Mesh;
+            const material = mesh.material as THREE.MeshStandardMaterial;
+            expect(material.map).toBeNull();
+            expect(material.bumpMap).toBeNull();
+            expect(material.vertexColors).toBe(true);
+          }
+          const pendants = built.full.getObjectByName('stalactite-gallery') as THREE.Mesh;
+          expect((pendants.material as THREE.MeshStandardMaterial).map).toBe(map);
+        } finally {
+          factory.mockRestore();
+          map.dispose();
+        }
+      });
+    }
     it(`${def.id}: stands on the ledge and its foot never floats above the sampled terrain`, () => {
       const { x, z } = latLonToWorld(meta, def.lat, def.lon);
       const originY = ground(x, z);

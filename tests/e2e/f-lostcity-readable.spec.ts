@@ -62,10 +62,29 @@ for (const tier of ['low', 'medium', 'high']) {
             light.intensity * luminance * Math.exp(-Math.pow(density * distance, 2)),
           );
         }
+        // F-LOSTCITY-TOWER authored a 66 m arm with -20 m lateral and +8 m
+        // vertical offsets. Pin the actual eye and tower framing rather than
+        // the obsolete <95 m distance to the tower's foot.
+        const localEye = g.rig.camera.position
+          .clone()
+          .sub(pos)
+          .applyAxisAngle(pos.clone().set(0, 1, 0), g.sub.yaw);
+        g.rig.camera.updateMatrixWorld(true);
+        hero.root.updateMatrixWorld(true);
+        const towerAxis = [];
+        for (let height = 0; height <= 60; height += 5) {
+          towerAxis.push(
+            hero.root
+              .localToWorld(pos.clone().set(0, height, 0))
+              .project(g.rig.camera)
+              .toArray(),
+          );
+        }
         return {
           mode: g.save.get().gameplayMode,
           heroRange: Math.hypot(pos.x - hero.root.position.x, pos.z - hero.root.position.z),
-          cameraRange: g.rig.camera.position.distanceTo(hero.root.position),
+          localEye: localEye.toArray(),
+          towerAxis,
           chaseRadius: g.rig.chaseRadius,
           altitude: pos.y - g.terrain.sampleHeight(pos.x, pos.z),
           ambient: light.intensity,
@@ -77,8 +96,17 @@ for (const tier of ['low', 'medium', 'high']) {
       expect(opening.mode).toBe('arcade');
       expect(opening.heroRange).toBeGreaterThan(30);
       expect(opening.heroRange).toBeLessThanOrEqual(40);
-      expect(opening.cameraRange).toBeLessThan(95);
-      expect(opening.chaseRadius).toBe(50);
+      expect(opening.chaseRadius).toBe(66);
+      const expectedEye = [-20, 46, 90];
+      const armScale = 66 / Math.hypot(...expectedEye);
+      for (let axis = 0; axis < 3; axis++)
+        expect(opening.localEye[axis]).toBeCloseTo(expectedEye[axis] * armScale, 1);
+      for (const [x, y, z] of opening.towerAxis) {
+        expect(Math.abs(x)).toBeLessThan(0.9);
+        expect(Math.abs(y)).toBeLessThan(0.9);
+        expect(z).toBeGreaterThan(-1);
+        expect(z).toBeLessThan(1);
+      }
       expect(opening.altitude).toBeGreaterThanOrEqual(22);
       expect(opening.fill).toBe(16);
       expect(opening.ambient).toBeGreaterThanOrEqual(16);
