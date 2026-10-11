@@ -893,3 +893,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **No package launched:** DIRECTOR backlog is empty and main is clean (4 commits ahead of origin, incl. f-bluehole-wall; smoke + project-base only, no full e2e, so not pushed). Hosted CI for f49 is still in progress (Pages deploy succeeded).
 - **Queue:** Codex 1220-1280 queued (dry until 15 Oct weekly reset). Next run: new golden set + review to refill the backlog, then full e2e + push + tag f50. Needs owner: nothing.
+
+## 2026-10-10 20:53 CDT headless run (Claude, targeted review)
+
+- **Review:** trigger was idle Claude >=50% (empty backlog, Codex dry until 15 Oct). New golden set 2026-10-11-004532 captured, DIRECTOR backlog refilled with 7 items, REVIEWS.md entry added.
+- **Merged:** f-bluehole-map (Sonnet): Blue Hole minimap now a calm reef gradient, hole legible. f-challenger-tone (Sonnet): trench floor cool grey-olive, ~+0.5. Gates (static, smoke, project-base) green on main; no full e2e, no push (f49 last tag, 8 commits ahead).
+- **Process:** gates.sh can leave vite preview servers on its PW_PORT; a rerun on the same port then fails with "port in use" (false e2e FAIL). Agents' golden runs need a free GOLDEN_PORT. Killed leftovers with fuser.
+- **Queue:** Codex 1220-1280 (dry until 15 Oct). Next Claude: release f50 (full e2e + push), Lost City columns, Endurance hull weathering. Needs owner: nothing.

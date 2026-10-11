@@ -162,3 +162,4 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 
 - Hosted CI red had three causes, not one: a unit test writing to a missing `.cache/` (fixed), a Playwright apt-lock flake in project-base, and e2e shard 300 s timeouts. Lesson: read the failing static job first; it was a one-line fix hidden behind "e2e red".
 - Codex weekly at 6% blocks Sol reviews and dispatch until 15 Oct; Claude carries packages.
+- 2026-10-10: gates.sh leaves preview servers on PW_PORT, so reruns on that port false-fail ('port in use'); golden runs by agents need a free GOLDEN_PORT. Workaround: fuser -k <port>/tcp; fix in tools/gates.sh worth a Haiku item.
