@@ -250,7 +250,7 @@
     'dot badge';
   align-items: center;
   column-gap: 10px;
-  min-height: var(--globe-hit);
+  min-height: clamp(36px, var(--globe-hit), 44px);
   padding: 4px 10px;
   text-align: left;
   font: inherit;
@@ -313,8 +313,8 @@
 }
 
 .globe-zoom-btn {
-  width: var(--globe-hit);
-  height: var(--globe-hit);
+  width: clamp(36px, var(--globe-hit), 44px);
+  height: clamp(36px, var(--globe-hit), 44px);
   padding: 0;
   font: inherit;
   font-size: 20px;

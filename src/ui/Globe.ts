@@ -681,7 +681,7 @@ export class Globe {
         c.opacity = opacity;
         c.el.style.opacity = String(opacity);
       }
-      if (i === this.chooserLeader) {
+      if (this.chooserLeader >= 0 && owner[this.chooserLeader] === i) {
         chooserSeen = true;
         this.chooser.style.transform = `translate(${x}px, ${y}px)`;
       }
@@ -712,6 +712,7 @@ export class Globe {
     b.append(count);
     c = { el: b, count, leader: -1, size: 0, hash: 0, x: NaN, y: NaN, opacity: NaN };
     const entry = c;
+    b.addEventListener('pointerenter', () => this.orbit.poke());
     b.addEventListener('click', () => this.openCluster(entry.leader));
     this.pinLayer.append(b);
     this.clusterEls[k] = c;
