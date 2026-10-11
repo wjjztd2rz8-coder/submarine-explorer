@@ -66,13 +66,13 @@ it('prefers the nearest unscanned contact over a closer logged contact, independ
   }
 });
 
-it('retains the logged POI hint over passing wildlife when no unscanned fixed contact is nearby', () => {
+it('names the wildlife that Scan will scan, not the logged POI, when both are in range', () => {
   const { scanner } = setup();
   scanner.scannedThisDive.add('lm/bow');
   scanner.setExtraTargets([target({ id: 'life:fish', position: new Vector3(0, -100, -20) })]);
   scanner.update(0, AT, NORTH, false);
-  expect(scanner.view.nearestId).toBe('bow');
-  expect(scanner.view.nearestScanned).toBe(true);
+  expect(scanner.view.nearestId).toBe('life:fish');
+  expect(scanner.view.nearestScanned).toBe(false);
   expect(scanner.view.candidateId).toBe('life:fish');
 });
 
