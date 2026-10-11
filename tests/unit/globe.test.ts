@@ -3,6 +3,8 @@ import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import type { FetchJson } from '../../src/game/ContentPath.js';
 import {
   buildSites,
+  clusterPins,
+  distanceToSeparate,
   facesCamera,
   latLonToUnit,
   loadGlobeCatalog,
@@ -10,7 +12,7 @@ import {
   parseCatalogue,
   pinBadge,
   resolvePinState,
-  spreadOverlaps,
+  shortName,
   unitToLatLon,
   wrapDeg,
   type CatalogueLandmark,
@@ -168,56 +170,114 @@ describe('pin state resolution', () => {
   });
 });
 
-describe('overlap spreading', () => {
-  it('leaves separated pins and hidden pins alone', () => {
-    const out = spreadOverlaps(
-      [
-        { x: 0, y: 0, visible: true },
-        { x: 100, y: 0, visible: true },
-        { x: 1, y: 1, visible: false },
-      ],
-      16,
+describe('pin clustering', () => {
+  const run = (pts: Array<[number, number]>, eligible: number[], hit = 44): number[] => {
+    const out = new Int32Array(pts.length);
+    clusterPins(
+      pts.map((p) => p[0]),
+      pts.map((p) => p[1]),
+      eligible,
+      pts.length,
+      hit,
+      out,
     );
-    expect(out).toEqual([
-      { x: 0, y: 0, group: 1 },
-      { x: 100, y: 0, group: 1 },
-      { x: 1, y: 1, group: 1 },
-    ]);
+    return [...out];
+  };
+
+  it('leaves separated pins alone and marks ineligible pins -1', () => {
+    expect(
+      run(
+        [
+          [0, 0],
+          [100, 0],
+          [1, 1],
+        ],
+        [1, 1, 0],
+      ),
+    ).toEqual([0, 1, -1]);
   });
 
-  it('fans a cluster out so every pair is at least minPx apart, around the centroid', () => {
-    const pins = [
-      { x: 200, y: 200, visible: true },
-      { x: 203, y: 201, visible: true },
-      { x: 205, y: 198, visible: true },
-      { x: 212, y: 200, visible: true }, // chained via the third
-      { x: 400, y: 400, visible: true },
-    ];
-    const out = spreadOverlaps(pins, 16);
-    const cluster = out.slice(0, 4);
-    for (const p of cluster) expect(p.group).toBe(4);
-    for (let i = 0; i < 4; i++) {
-      for (let j = i + 1; j < 4; j++) {
-        const d = Math.hypot(cluster[i].x - cluster[j].x, cluster[i].y - cluster[j].y);
-        expect(d).toBeGreaterThanOrEqual(16 - 1e-9);
-      }
-    }
-    const cx = cluster.reduce((s, p) => s + p.x, 0) / 4;
-    const cy = cluster.reduce((s, p) => s + p.y, 0) / 4;
-    close(cx, (200 + 203 + 205 + 212) / 4, 1e-9);
-    close(cy, (200 + 201 + 198 + 200) / 4, 1e-9);
-    expect(out[4]).toEqual({ x: 400, y: 400, group: 1 });
+  it('groups pins whose hit areas overlap under the first one in order', () => {
+    const owner = run(
+      [
+        [200, 200],
+        [230, 210],
+        [210, 190],
+        [400, 400],
+        [215, 215],
+      ],
+      [1, 1, 1, 1, 1],
+    );
+    expect(owner).toEqual([0, 0, 0, 3, 0]);
   });
 
-  it('two identical points split to exactly minPx', () => {
-    const out = spreadOverlaps(
-      [
-        { x: 10, y: 10, visible: true },
-        { x: 10, y: 10, visible: true },
-      ],
-      16,
+  it('seeds rather than chains: a long row does not become one blob', () => {
+    const row: Array<[number, number]> = [0, 1, 2, 3, 4, 5].map((i) => [i * 30, 0]);
+    const owner = run(row, [1, 1, 1, 1, 1, 1], 44);
+    expect(owner).toEqual([0, 0, 2, 2, 4, 4]);
+  });
+
+  it('a forced single (not eligible) never joins a group', () => {
+    expect(
+      run(
+        [
+          [10, 10],
+          [12, 10],
+          [14, 10],
+        ],
+        [1, 0, 1],
+      ),
+    ).toEqual([0, -1, 0]);
+  });
+
+  it('identical points merge and the threshold is the hit side', () => {
+    expect(
+      run(
+        [
+          [5, 5],
+          [5, 5],
+        ],
+        [1, 1],
+      ),
+    ).toEqual([0, 0]);
+    expect(
+      run(
+        [
+          [0, 0],
+          [44, 0],
+        ],
+        [1, 1],
+        44,
+      ),
+    ).toEqual([0, 1]);
+  });
+});
+
+describe('cluster zoom target', () => {
+  it('puts a pair `hit` pixels apart on screen at the returned distance', () => {
+    const theta = 0.05; // ~2.9 degrees
+    const hit = 44;
+    const h = 600;
+    const fov = 35;
+    const d = distanceToSeparate(theta, hit, h, fov, 1);
+    // Project both points (one at the view centre, one theta away) back.
+    const focal = h / 2 / Math.tan((fov * Math.PI) / 360);
+    const px = (focal * Math.sin(theta)) / (d - Math.cos(theta));
+    close(px, hit, 1e-6);
+    expect(distanceToSeparate(theta / 2, hit, h, fov, 1)).toBeLessThan(d);
+  });
+});
+
+describe('short names', () => {
+  it('keeps the recognisable head of a site name', () => {
+    expect(shortName('Lost City Hydrothermal Field')).toBe('Lost City');
+    expect(shortName('Axial Seamount / ASHES Vent Field')).toBe('Axial Seamount');
+    expect(shortName('Beebe Hydrothermal Vent Field (Piccard)')).toBe('Beebe');
+    expect(shortName('Endeavour Hydrothermal Vents')).toBe('Endeavour');
+    expect(shortName('Monterey Canyon')).toBe('Monterey Canyon');
+    expect(shortName('Hunga Tonga–Hunga Ha’apai (pre-2022 survey)')).toBe(
+      'Hunga Tonga–Hunga Ha’apai',
     );
-    close(Math.hypot(out[0].x - out[1].x, out[0].y - out[1].y), 16, 1e-9);
   });
 });
 
@@ -292,6 +352,34 @@ describe('orbit', () => {
     for (let i = 0; i < 180; i++) o.update(1 / 60);
     close(o.lat, 10, 0.05);
     close(wrapDeg(o.lon + 170), 0, 0.05);
+  });
+
+  it('faceLatLon with a distance eases the zoom too, and a wheel zoom cancels it', () => {
+    const o = new OrbitState(t);
+    o.faceLatLon(0, 0, 2);
+    for (let i = 0; i < 240; i++) o.update(1 / 60);
+    close(o.distance, 2, 0.01);
+    o.faceLatLon(0, 0, 1e-3); // clamped to minDistance
+    for (let i = 0; i < 240; i++) o.update(1 / 60);
+    close(o.distance, t.minDistance, 0.01);
+    o.faceLatLon(50, 50, 3);
+    o.zoomBy(1);
+    const d = o.distance;
+    for (let i = 0; i < 60; i++) o.update(1 / 60);
+    expect(o.distance).toBe(d);
+  });
+
+  it('an embedded fit distance is the zoomed-out start; it follows resizes until zoomed in', () => {
+    const o = new OrbitState(t);
+    o.setFitDistance(3.8);
+    expect(o.distance).toBe(3.8);
+    expect(o.maxDistance).toBe(t.maxDistance);
+    o.setFitDistance(5);
+    expect(o.distance).toBe(5);
+    expect(o.maxDistance).toBe(5);
+    o.zoomBy(0.5);
+    o.setFitDistance(4);
+    expect(o.distance).toBeLessThan(4);
   });
 
   it('camera sits over its lat/lon at `distance` radii', () => {
