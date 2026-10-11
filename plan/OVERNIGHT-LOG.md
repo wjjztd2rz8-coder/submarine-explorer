@@ -922,3 +922,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - **Merged:** Codex 1220 (pacing: nearby required survey scans at Challenger/Hunga/Hudson, save migration, allowlist removed), 1230 (CI timing refresh, no cuts), 1240 (tutorial timer/scan/Journal-from-pause fixes, lander budgets). f-bluehole-bowl (Sonnet): terrace banding, mouth-sector terraces, ~2x flora; approach view +0.3, gallery-range apron still smooth grey (open). Gates (smoke + project-base) green on main; no full e2e, no push (f50 last tag).
 - **Queue:** running 1250, 1260, 1270; queued 1280, 1290 (verify hull/Lost City/memoisation), 1310 (Titanic sky + Challenger boulders). Next Claude: Blue Hole apron/talus smoothness, new-player flow after 1260 lands. Needs owner: nothing.
+
+## 2026-10-11 05:03 CDT headless run (Claude)
+
+- **Merged:** Codex 1250 (sonar relief/contours/hull plans on flat sites), 1260 (lights baseline, touch Journal e2e, tool fixes; its Tutorial.ts changes dropped because they contradict 1240's pinned scan semantics), 1270 (Lost City/CI verification report). f-newplayer-recapture (Sonnet): touch reward notice no longer hidden by scan card, RISE/SINK hints on touch. f-scan-card-objective (Sonnet): scan card guides to the mission objective (Titanic: stern, not debris field).
+- **Released f51:** full e2e on main = 640 passed, only the 1240 verify spec failed (it read the scanner candidate before the first scan frame); fixed the wait (assertions unchanged), 8/8 pass alone; pushed and tagged f51 on that basis. The two later Claude merges have smoke + project-base only and are unpushed.
+- **Queue:** Codex 1280, 1290, 1310 (Codex 5h was 10% at run start; dispatch timer launches after the 06:04 reset). Next Claude: items in DIRECTOR 'Update 2026-10-11 04:50'. Needs owner: nothing.

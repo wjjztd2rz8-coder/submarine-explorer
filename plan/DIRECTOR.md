@@ -2,6 +2,12 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
+## Update 2026-10-11 04:50 (post f51)
+
+- DONE: new-player flow recapture (f-newplayer-recapture: touch reward notice moved clear of scan card, RISE/SINK hint on touch) and f-scan-card-objective (scan card points at the mission objective). Codex 1250 (sonar flat sites) and 1260/1270 merged; f51 pushed.
+- Open, Claude backlog: (a) touch landscape stack (scan card + tutorial strip ~195 of 390 px) covers the subject, e.g. Blue Hole gallery reticle: layout decision, collapse the strip once the first scan is done; (b) card only shows within scan range of a contact, so far from any contact touch has no 'where next' signal (consider a compact objective chip); (c) tutorial still says 'Step 1: Move and turn' after the first scan (pinned by 1240 tests; revisit deliberately); (d) Challenger camera hides the lander behind the sub; touch briefing clips objectives; (e) Blue Hole gallery-range apron/talus; Titanic sky + Challenger boulders (Codex 1310 queued).
+- Needs owner: nothing.
+
 ## Current priorities (comprehensive review, Claude alone, 2026-10-10 22:00; golden 2026-10-11-015340)
 
 Sol skipped (Codex weekly 5%). Scores (beautiful): Titanic 4, Beebe 3.75, Monterey 3.75, Challenger 3.75 (+0.25, grey-olive floor, lander and amphipods read), Endurance 3.75 (lit water column good; hull still small and pale), Lost City 3.5, Blue Hole 3.25 (+0.25, minimap now calm and hole legible). No regressions. CI on f49 green.
