@@ -12,8 +12,16 @@ it.each([
   ['monterey-canyon', ['monterey-canyon-head', 'monterey-canyon-upper-channel'], 1],
   ['great-blue-hole', ['great-blue-hole-stalactites', 'great-blue-hole-outer-dropoff'], 1],
   ['monterey-canyon', ['monterey-canyon-wall', 'monterey-canyon-upper-channel'], 1],
+  ['challenger-deep', ['cd-leggo-amphipod-site', 'cd-north-wall'], 1],
+  [
+    'challenger-deep',
+    ['cd-leggo-amphipod-site', 'cd-north-wall', 'cd-central-basin', 'cd-axis-sill'],
+    2,
+  ],
+  ['hunga-tonga-caldera', ['hunga-tonga-caldera-floor', 'hunga-tonga-rim-wall'], 2],
+  ['hudson-canyon', ['hc-canyon-wall', 'hc-coral-ledge'], 2],
 ] as const)(
-  '940 preserves legacy discoveries and earned route credit for %s: %j',
+  'preserves legacy discoveries and earned route credit for %s: %j',
   async (site, pois, stars) => {
     const values = new Map<string, string>();
     const storage = {
@@ -42,6 +50,8 @@ it.each([
     }
     if (!new Set<string>(pois).has('great-blue-hole-stalactites'))
       expect(progress.snapshot().awarded).not.toContain('objective:great-blue-hole/stalactites');
+    for (const objective of ['eastern-floor', 'flank-transect', 'wall-transect'])
+      expect(progress.snapshot().awarded).not.toContain(`objective:${site}/${objective}`);
     const earned = progress.snapshot();
     const reloaded = new Progress(new ProgressSave(storage));
     await creditPreviousDives(reloaded, new DiscoveryStore(storage), [], fetchJson);
@@ -49,6 +59,23 @@ it.each([
     expect(new DiscoveryStore(storage).snapshot()).toEqual(saved);
   },
 );
+
+it.each([
+  ['challenger-deep', 'cd-leggo-amphipod-site'],
+  ['hunga-tonga-caldera', 'hunga-tonga-caldera-floor'],
+  ['hudson-canyon', 'hc-canyon-wall'],
+])('does not credit an unfinished old route at %s', async (site, poi) => {
+  const discoveries = new DiscoveryStore(null);
+  discoveries.record(site, poi);
+  const progress = new Progress(new ProgressSave(null));
+  await creditPreviousDives(progress, discoveries, [], async () => ({
+    ok: true,
+    text: async () => readFileSync(`data/landmarks/${site}/mission.json`, 'utf8'),
+  }));
+  expect(progress.rating(site)).toBe(0);
+  expect(progress.snapshot().awarded).not.toContain(`primary:${site}`);
+  expect(progress.divePoints).toBe(0);
+});
 
 it.each(['animal', 'photo'])(
   'does not grant a legacy bonus for an empty %s subject',

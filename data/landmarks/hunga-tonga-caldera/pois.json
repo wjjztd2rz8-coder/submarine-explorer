@@ -3,22 +3,6 @@
   "landmark": "hunga-tonga-caldera",
   "pois": [
     {
-      "id": "hunga-tonga-caldera-floor",
-      "name": "Caldera floor (pre-2022 survey)",
-      "lat": -20.56,
-      "lon": -175.39,
-      "depth_m": 130,
-      "radius_m": 250,
-      "kind": "geology",
-      "primary": true,
-      "scan_seconds": 4,
-      "guide_entry": "caldera-floor",
-      "confidence": "high",
-      "reconstruction": false,
-      "sources": ["https://niwa.co.nz/hazards/mapping-tongan-eruption", "https://www.gmrt.org/"],
-      "note": "Real survey terrain, this tile's own reading: 131.6 m deep here, closely matching the widely cited pre-eruption caldera-floor depth of ~150 m (NIWA). This tile predates the 15 January 2022 eruption (see mission.json/guide.json); nothing about the post-eruption caldera is shown at this point."
-    },
-    {
       "id": "hunga-tonga-rim-wall",
       "name": "Volcanic rim slope (pre-2022 survey)",
       "lat": -20.57,
@@ -33,6 +17,38 @@
       "reconstruction": false,
       "sources": ["https://www.gmrt.org/", "https://www.nature.com/articles/s41561-026-02099-7"],
       "note": "The terrain grid reads about 468.6 m here, deeper than Hunga’s pre-eruption central basin (150–200 m). This is a volcanic slope beyond the basin, not a surveyed inner caldera wall. The authored tuff scarp shares this marker location and is explicitly a game addition."
+    },
+    {
+      "id": "hunga-tonga-flank-transect",
+      "name": "Volcanic flank transect (pre-2022 survey)",
+      "lat": -20.568003505584493,
+      "lon": -175.41403198242188,
+      "snap_to_seabed": true,
+      "radius_m": 120,
+      "kind": "geology",
+      "primary": true,
+      "scan_seconds": 3,
+      "guide_entry": "flank-transect",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": ["https://www.gmrt.org/"],
+      "note": "Real GMRT terrain: 292.9 m deep at the centre of row 306, column 267 (zero-based) in data/tiles/hunga-tonga-caldera/heightmap.bin. This terrain survey is about 660 m east-northeast of the volcanic rim-slope scan. The pre-2022 GMRT grid reads about 293 m here, compared with about 469 m at the rim-slope point. The nearby pair samples the volcanic flank beyond the shallow central basin. This point was chosen from the survey grid for the dive; it is not a separately named volcanic feature. Continue east to the optional shallow basin-floor scan to compare that earlier landscape. No prop or staged encounter is added."
+    },
+    {
+      "id": "hunga-tonga-caldera-floor",
+      "name": "Caldera floor (pre-2022 survey)",
+      "lat": -20.56,
+      "lon": -175.39,
+      "depth_m": 130,
+      "radius_m": 250,
+      "kind": "geology",
+      "primary": false,
+      "scan_seconds": 4,
+      "guide_entry": "caldera-floor",
+      "confidence": "high",
+      "reconstruction": false,
+      "sources": ["https://niwa.co.nz/hazards/mapping-tongan-eruption", "https://www.gmrt.org/"],
+      "note": "Real survey terrain, this tile's own reading: 131.6 m deep here, closely matching the widely cited pre-eruption caldera-floor depth of ~150 m (NIWA). This tile predates the 15 January 2022 eruption (see mission.json/guide.json); nothing about the post-eruption caldera is shown at this point."
     }
   ]
 }

@@ -193,6 +193,32 @@
         }
       ],
       "confidence": "high"
+    },
+    {
+      "id": "wall-transect",
+      "title": "Canyon flank transect",
+      "paragraphs": [
+        "This terrain survey is about 555 m northwest of the coral-habitat ledge marker. The GMRT grid reads about 977 m here, compared with about 942 m at the ledge marker.",
+        "The nearby pair samples the surveyed canyon flank. This point was chosen from the terrain grid for the dive; it does not mark a documented coral colony. Continue northwest to the optional north-wall scan, where the grid reads about 542 m."
+      ],
+      "facts": [
+        {
+          "label": "Depth here (this tile)",
+          "value": "976.7 m"
+        }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 (value read from this tile’s grid)",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "GMRT GridServer request for this shipped bathymetry tile",
+          "url": "https://www.gmrt.org/services/GridServer?north=39.65&south=39.15&east=-72.1&west=-72.7&layer=topo&format=esriascii&resolution=max"
+        }
+      ],
+      "confidence": "high"
     }
   ]
 }

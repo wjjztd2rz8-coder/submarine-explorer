@@ -15,13 +15,13 @@
     "heading_deg": 250
   },
   "briefing": {
-    "summary": "Explore Hunga Tonga–Hunga Ha’apai before the January 2022 eruption. Scan the shallow caldera basin, then follow the volcanic slope beyond the rim.",
-    "depth_m": 155,
+    "summary": "Explore Hunga Tonga–Hunga Ha’apai before the January 2022 eruption. Scan the volcanic rim slope and a nearby stretch of the flank; the shallow basin floor is an optional longer survey.",
+    "depth_m": 469,
     "facts": [
       "Before the 15 January 2022 eruption, Hunga’s central basin was about 150–200 m deep and roughly 4.5 km across.",
       "The 2014–2015 eruption built a cone that joined the two older islands, Hunga Tonga and Hunga Ha’apai.",
       "The January 2022 eruption deepened the basin to about 850 m and separated the islands. This dive follows the earlier landscape.",
-      "With a surface start, head west-southwest and descend toward the caldera floor."
+      "With a surface start, head west-southwest and descend toward the volcanic rim slope."
     ],
     "hazards": [
       "Steep volcanic slopes: watch your altitude as you cross the rim.",
@@ -31,20 +31,28 @@
   },
   "objectives": [
     {
-      "id": "caldera-floor",
-      "type": "scan",
-      "poi": "hunga-tonga-caldera-floor",
-      "primary": true,
-      "title": "Survey the pre-2022 basin",
-      "hint": "Look east of the inner wall for the broad caldera basin, near 130 m."
-    },
-    {
       "id": "rim-wall",
       "type": "scan",
       "poi": "hunga-tonga-rim-wall",
       "primary": true,
       "title": "Follow the volcanic rim slope",
-      "hint": "Head west from the shallow basin down the volcanic slope, near 470 m."
+      "hint": "Find the volcanic slope beyond the shallow basin, near 470 m."
+    },
+    {
+      "id": "flank-transect",
+      "type": "scan",
+      "poi": "hunga-tonga-flank-transect",
+      "primary": true,
+      "title": "Survey the nearby volcanic flank",
+      "hint": "Follow the volcanic flank east-northeast from the rim-slope scan, near 293 m."
+    },
+    {
+      "id": "caldera-floor",
+      "type": "scan",
+      "poi": "hunga-tonga-caldera-floor",
+      "primary": false,
+      "title": "Survey the pre-2022 basin",
+      "hint": "Optional longer survey: look east of the inner wall for the broad caldera basin, near 130 m."
     }
   ],
   "completion": "all_primary"

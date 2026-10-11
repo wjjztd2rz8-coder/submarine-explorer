@@ -15,7 +15,7 @@
     "heading_deg": 135
   },
   "briefing": {
-    "summary": "Descend into Hudson Canyon and scan its steep north wall and a deeper coral-habitat ledge. The two scans reveal how the canyon slopes create different seafloor habitats.",
+    "summary": "Descend to Hudson Canyon’s coral-habitat ledge and scan a nearby stretch of the canyon flank. Continue northwest to the shallower north wall for an optional longer survey.",
     "depth_m": 1682.6,
     "facts": [
       "Hudson Canyon begins about 100 miles southeast of New York City and runs roughly 350 miles seaward; its lower reaches (beyond this survey tile) reach 2-2.5 miles (3,200-4,000 m) deep.",
@@ -31,20 +31,28 @@
   },
   "objectives": [
     {
-      "id": "wall",
-      "type": "scan",
-      "poi": "hc-canyon-wall",
-      "primary": true,
-      "title": "Scan the north canyon wall",
-      "hint": "Find the steep north wall of the upper canyon, near 540 m."
-    },
-    {
       "id": "coral-ledge",
       "type": "scan",
       "poi": "hc-coral-ledge",
       "primary": true,
       "title": "Survey the coral ledge",
-      "hint": "Follow the wall southeast to the coral-habitat ledge, around 940 m."
+      "hint": "Find the coral-habitat ledge on the canyon flank, around 940 m."
+    },
+    {
+      "id": "wall-transect",
+      "type": "scan",
+      "poi": "hc-wall-transect",
+      "primary": true,
+      "title": "Survey the nearby canyon flank",
+      "hint": "Follow the canyon flank northwest from the coral-habitat ledge, near 977 m."
+    },
+    {
+      "id": "wall",
+      "type": "scan",
+      "poi": "hc-canyon-wall",
+      "primary": false,
+      "title": "Scan the north canyon wall",
+      "hint": "Optional longer survey: find the steep north wall of the upper canyon, near 540 m."
     }
   ],
   "completion": "all_primary",

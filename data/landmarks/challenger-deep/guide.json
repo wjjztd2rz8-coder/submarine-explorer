@@ -322,6 +322,32 @@
         }
       ],
       "confidence": "medium"
+    },
+    {
+      "id": "eastern-floor",
+      "title": "Eastern Pool floor transect",
+      "paragraphs": [
+        "This second floor scan lies about 817 m north of the Leggo bait-station site. The shipped GMRT grid reads about 10,920 m here. It is a terrain survey point chosen for this dive, not the position of another lander deployment.",
+        "The two required scans sample the same Eastern Pool floor: the terrain is about 10,925 m deep at the historic bait-station site and about 10,920 m here. These values come from the shipped survey grid; they do not establish a new deepest sounding."
+      ],
+      "facts": [
+        {
+          "label": "Depth here (this tile)",
+          "value": "10,919.8 m"
+        }
+      ],
+      "reconstruction": false,
+      "sources": [
+        {
+          "title": "Global Multi-Resolution Topography (GMRT) Synthesis — Ryan et al. 2009, doi:10.1029/2008GC002332 (value read from this tile’s grid)",
+          "url": "https://www.gmrt.org/"
+        },
+        {
+          "title": "GMRT GridServer request for this shipped bathymetry tile",
+          "url": "https://www.gmrt.org/services/GridServer?north=11.6233&south=11.1233&east=142.8417&west=142.3417&layer=topo&format=esriascii&resolution=max"
+        }
+      ],
+      "confidence": "high"
     }
   ]
 }
