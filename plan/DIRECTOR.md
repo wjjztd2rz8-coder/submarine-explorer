@@ -2,7 +2,23 @@
 
 The owner treats this as a curiosity project about how far current models and workflows can go. Claude acts as creative director: it holds the vision, reviews every package and sends work back until it is good. Most plan "rules" are Claude's own recommendations, so revise them freely and record why here.
 
-## Current priorities (comprehensive review, Claude alone, 2026-10-10 08:30; golden 2026-10-10-123858)
+## Current priorities (targeted review, 2026-10-10 20:00; golden 2026-10-11-004532)
+
+Why: Claude idled at >=50% because the backlog was empty after the last merges and Codex is dry until 15 Oct. New golden set viewed (Claude alone, no Sol). Scores (beautiful): Titanic 4, Beebe 3.75 (two chimneys with smoke, lit), Monterey 3.75 (wall silhouette and strata good), Endurance 3.75 (hull large, lit sky), Challenger 3.5, Lost City 3.5, Blue Hole 3 (floor still a smooth grey ramp; minimap now teal camouflage blotches that don't read as bathymetry).
+
+Claude backlog (ordered by player impact; all unblocked; Sonnet visual, Haiku small):
+
+1. **Release f50 (Haiku):** full e2e on main, push, tag f50, check `gh run list`. Never loosen assertions; software-GL frame-count flakes get rerun alone.
+2. **Blue Hole minimap (Sonnet):** outside the hole the sonar is camouflage-like teal blobs; replace with a calm depth gradient plus the hole ring so the feature reads in 2 s.
+3. **Lost City columns (Sonnet):** towers are smooth pale pillars; add vertical flow striations, colour variation and brucite fringe near orifice; keep the scan card clear of the tower.
+4. **Challenger seabed tone (Sonnet):** the floor is bright warm tan at 10.9 km; cool and darken toward grey-brown with soft fog so the trench feels deep, keeping the lander readable.
+5. **Endurance hull weathering (Sonnet):** pale planks with repeating dark blotches; vary plank colour, add marine growth near waterline-equivalent rail and a broken-rib silhouette.
+6. **Monterey wall base (Haiku/Sonnet, low):** the row of dark boulders at the wall foot is a neat line; scatter and vary size.
+7. **New-player flow recapture (Haiku capture, Sonnet judge):** Home to site to 60 s to Journal to debrief on desktop and phone (Codex 1260 covers it after 15 Oct; do first if budget allows).
+
+Codex queue unchanged (1220-1280, dry until 15 Oct): 1220 pacing gaps, 1230 CI shard triage, 1240 verify lander/first-discovery, 1250 sonar flat sites, 1260 new-player flow audit, 1270 verify Lost City/CI, 1280 Blue Hole squiggle.
+
+## Previous priorities (comprehensive review, Claude alone, 2026-10-10 08:30; golden 2026-10-10-123858)
 
 Sol skipped (Codex weekly 5%). Scores (beautiful): Titanic 4, Lost City 3.5 (+0.5), Endurance 3.5 (+0.5), Beebe 3.5, Monterey 3.5, Challenger 3.5, Blue Hole 3.
 

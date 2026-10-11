@@ -2,6 +2,10 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-10 20:00 targeted review (trigger: Claude idle at >=50% for 2 h; golden 2026-10-11-004532)
+
+**Cause:** the DIRECTOR backlog was empty after f-bluehole-wall merged and Codex is dry until 15 Oct (weekly 5%), so runs exited without a package. **Fix:** new golden set captured and viewed; backlog refilled with 7 items (DIRECTOR.md). Scores (beautiful): Titanic 4, Beebe 3.75, Monterey 3.75, Endurance 3.75, Challenger 3.5, Lost City 3.5, Blue Hole 3; no regressions. Biggest gaps: Blue Hole floor and minimap, smooth Lost City pillars, over-bright Challenger floor. Sol not consulted (targeted review). Needs owner: nothing.
+
 ## 2026-10-10 08:30 comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-10-123858 vs -030121)
 
 Codex weekly 5% (`codex-review.sh` skipped for budget), so no Sol second opinion. Play-flow not recaptured (Codex 1260 queued; firstdiscovery shots from 10-09 stand).
