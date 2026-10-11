@@ -40,6 +40,8 @@ export class Tutorial {
   private moveS = 0;
   private turnS = 0;
   private depthS = 0;
+  /** Events seen before their step came up; that step completes on arrival. */
+  private early = new Set<TutorialEvent>();
 
   constructor(active = true) {
     this.active_ = active;
@@ -89,6 +91,20 @@ export class Tutorial {
     return false;
   }
 
+  /**
+   * Record a finished action done before its step: that step completes on
+   * arrival. Never advances the current step. Ignored if it is the current one.
+   */
+  remember(event: TutorialEvent): void {
+    const step = this.step;
+    if (step && !this.waitsFor(step.id, event)) this.early.add(event);
+  }
+
+  /** Forget remembered actions (a new dive starts). */
+  forgetEarly(): void {
+    this.early.clear();
+  }
+
   /** Skip the step on screen. */
   skipStep(): boolean {
     return this.step ? this.advance() : false;
@@ -99,8 +115,24 @@ export class Tutorial {
     this.active_ = false;
   }
 
+  private waitsFor(id: TutorialStepId, event: TutorialEvent): boolean {
+    return (
+      (id === 'lights' && event === 'lights') ||
+      (id === 'scan' && event === 'scan') ||
+      (id === 'journal' && (event === 'journal' || event === 'photo'))
+    );
+  }
+
   private advance(): boolean {
     this.index_ += 1;
+    // Skip any following step whose event already happened.
+    for (;;) {
+      const next = TUTORIAL_STEPS[this.index_];
+      if (!next) break;
+      const done = [...this.early].some((e) => this.waitsFor(next.id, e));
+      if (!done) break;
+      this.index_ += 1;
+    }
     if (this.finished) this.active_ = false;
     return true;
   }

@@ -207,6 +207,18 @@ describe('tutorial progression', () => {
     expect(t.active).toBe(false);
     expect(t.step).toBeNull();
   });
+  it('events done out of order skip their step on arrival', () => {
+    const t = new Tutorial();
+    t.remember('scan');
+    t.remember('lights');
+    expect(t.step?.id).toBe('move'); // a scan during move does not advance it
+    hold(t, { throttle: 1 });
+    expect(t.step?.id).toBe('depth');
+    hold(t, { ballast: -1 });
+    expect(t.step?.id).toBe('journal'); // lights and scan already done
+    expect(t.notify('photo')).toBe(true);
+    expect(t.finished).toBe(true);
+  });
   it('skip step moves on; skip all ends it', () => {
     const t = new Tutorial();
     t.skipStep();

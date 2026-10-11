@@ -176,6 +176,7 @@ export function createOnboardSystem(): GameSystem {
           // Retain success while earlier steps are still on screen.
           scanCompleted = true;
           if (tutorial.notify('scan')) onAdvance();
+          else tutorial.remember('scan');
         }),
       );
       cleanup.add(
@@ -183,6 +184,7 @@ export function createOnboardSystem(): GameSystem {
           diveS = 0;
           startDepth = null;
           scanCompleted = false;
+          tutorial.forgetEarly();
         }),
       );
 
@@ -235,19 +237,20 @@ export function createOnboardSystem(): GameSystem {
         const photoMode = ctx.photoMode.active;
         const photos = ctx.photos.photos.length;
         if (tutorial.active && dive) {
-          if (lights !== wasLights && tutorial.notify('lights')) onAdvance();
-          if ((photoMode && !wasPhotoMode) || photos > photoCount)
+          if (lights !== wasLights) {
+            if (tutorial.notify('lights')) onAdvance();
+            else tutorial.remember('lights');
+          }
+          if ((photoMode && !wasPhotoMode) || photos > photoCount) {
             if (tutorial.notify('photo')) onAdvance();
+            else tutorial.remember('photo');
+          }
         }
         // Touch opens the Journal through Pause, which retains the paused dive.
-        if (
-          tutorial.active &&
-          (dive || ctx.app.state === 'pause') &&
-          journal &&
-          !wasJournal &&
-          tutorial.notify('journal')
-        )
-          onAdvance();
+        if (tutorial.active && (dive || ctx.app.state === 'pause') && journal && !wasJournal) {
+          if (tutorial.notify('journal')) onAdvance();
+          else tutorial.remember('journal');
+        }
         wasLights = lights;
         wasJournal = journal;
         wasPhotoMode = photoMode;
