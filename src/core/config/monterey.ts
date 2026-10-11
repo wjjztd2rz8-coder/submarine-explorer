@@ -28,3 +28,19 @@ export const MONTEREY_STRATA = {
   slumpDepthH: 0.06,
   dustAmount: 0.3,
 } as const;
+
+/** Patchy rockfall and rolled blocks across the apron, rather than a row at its foot. */
+export const MONTEREY_RUBBLE = {
+  patchWavelengthM: 18,
+  patchFloor: 0.18,
+  blockRunout: [0.22, 1.55],
+  fragmentRunout: [0.08, 1.75],
+  blockRadius: [1.2, 3.2],
+  fragmentRadius: [0.3, 2.2],
+  separationRadii: 0.6,
+  placementAttempts: 32,
+  radiusSkew: 1.8,
+  scarRunout: [0.12, 1.5],
+  scarSpread: 3.2,
+  scarRadius: [0.6, 2.8],
+} as const;

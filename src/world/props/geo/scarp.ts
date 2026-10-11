@@ -21,7 +21,7 @@
 
 import * as THREE from 'three';
 import { MONTEREY_FIDELITY } from '../../../core/config/terrain.js';
-import { MONTEREY_STRATA } from '../../../core/config/monterey.js';
+import { MONTEREY_RUBBLE, MONTEREY_STRATA } from '../../../core/config/monterey.js';
 import type { GraphicsTier } from '../../../core/Config.js';
 import { canyonRockDetail } from './materials.js';
 import { geoDetail } from './detail.js';
@@ -746,6 +746,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
         size: P.rockSize * scale,
         blocks: P.blocks,
         span: 0.46,
+        scatter: id === 'canyon' ? MONTEREY_RUBBLE : undefined,
       }),
     );
     // Monterey: blocks that dropped out of each scar, resting on the apron below it. They replace
@@ -756,17 +757,23 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       for (const c of scars) {
         for (let k = 0; k < 3; k++) {
           for (let tries = 0; tries < 8; tries++) {
-            const x = c.cx + (fr() - 0.5) * c.rx * 1.8;
+            const x = c.cx + (fr() - 0.5) * c.rx * MONTEREY_RUBBLE.scarSpread;
             const reach = talus.reach(x);
             if (reach < 2) continue;
-            const z = talus.foot(x) - (0.04 + fr() * 0.4) * reach;
+            const u = THREE.MathUtils.lerp(...MONTEREY_RUBBLE.scarRunout, fr());
+            const z = talus.foot(x) - u * reach;
             const spot: RockSpot = {
               x,
               y: talusSurface(talus, x, z),
               z,
               n: talusNormal(talus, x, z),
-              r: scale * (1.1 + fr() * 1.6) * (k === 0 ? 1.5 : 1),
-              u: 0.1,
+              r:
+                scale *
+                THREE.MathUtils.lerp(
+                  ...MONTEREY_RUBBLE.scarRadius,
+                  fr() ** MONTEREY_RUBBLE.radiusSkew,
+                ),
+              u,
             };
             if (isSupported(talus, spot)) {
               fallen.push(spot);

@@ -531,12 +531,11 @@ export class Sonar {
       zoom === 'tile' ? Math.max(this.terrain.widthM, this.terrain.depthM) : zoom,
     );
     this.flatness = flat.flatness;
-    // Endurance: the survey is a plane tilted ~6 m over 1 km, so contours would
-    // only be parallel stripes. Keep them faint beneath ice-scour swells
-    // (same layout as the 3D ridges), rather than dropping measured contours.
+    // Endurance contours show scour height above the local plain, matching the
+    // authored 3D swells. Absolute survey depths still drive the palette/readouts.
     const hull = this.terrain.meta.id === 'endurance' && flat.flatness > 0 ? this.hullPoi() : null;
     const ridges = hull ? enduranceRidges(hull.position) : null;
-    const contourInterval = sonarLocalContourInterval(
+    let contourInterval = sonarLocalContourInterval(
       this.terrain.meta.id === 'great-blue-hole'
         ? Math.min(10, this.zoomConfig.contourIntervalM[reference])
         : this.zoomConfig.contourIntervalM[reference],
@@ -552,6 +551,9 @@ export class Sonar {
       flatness: flat.flatness,
     };
     const img = ctx.createImageData(w, h);
+    const contourHeights = ridges ? new Float32Array(heights.length) : heights;
+    const contourLo = ridges ? 0 : lo;
+    let contourHi = ridges ? 0 : hi;
     const blueHoleCentre =
       this.terrain.meta.id === 'great-blue-hole'
         ? latLonToWorld(this.terrain.meta, BLUE_HOLE_LAT, BLUE_HOLE_LON)
@@ -588,6 +590,10 @@ export class Sonar {
           const wz = centerZ + (py - margin - this.canvas.height / 2) * metresPerPixel;
           const e = metresPerPixel * 1.5;
           const h0 = enduranceScourHeight(ridges, wx, wz);
+          contourHeights[index] = h0;
+          if (px >= margin && px < w - margin && py >= margin && py < h - margin) {
+            contourHi = Math.max(contourHi, h0);
+          }
           // Lit from the north-west, like the hillshade; swell crests also read lighter.
           const dX =
             enduranceScourHeight(ridges, wx + e, wz) - enduranceScourHeight(ridges, wx - e, wz);
@@ -625,8 +631,28 @@ export class Sonar {
     }
     ctx.putImageData(img, 0, 0);
     ctx.scale(resolution, resolution);
+    if (ridges) {
+      contourInterval = sonarLocalContourInterval(
+        this.zoomConfig.contourIntervalM[reference],
+        contourHi - contourLo,
+        this.zoomConfig.maxContours,
+        flat.flatness,
+      );
+      this.relief.contourIntervalM = contourInterval;
+    }
     if (Number.isFinite(contourInterval))
-      this.drawContours(ctx, heights, w, h, lo, hi, contourInterval, margin, resolution);
+      this.drawContours(
+        ctx,
+        contourHeights,
+        w,
+        h,
+        contourLo,
+        contourHi,
+        contourInterval,
+        margin,
+        resolution,
+        Boolean(ridges),
+      );
     this.reliefCenter = { x: centerX, z: centerZ };
     this.reliefDirty = false;
   }
@@ -641,6 +667,7 @@ export class Sonar {
     interval: number,
     margin: number,
     resolution: number,
+    authoredRelief = false,
   ): void {
     const levels: number[] = [];
     for (let level = Math.ceil(lo / interval) * interval; level <= hi; level += interval)
@@ -696,7 +723,8 @@ export class Sonar {
     ctx.textBaseline = 'middle';
     // A phone's compact map shows the 220 px canvas at ~110 px: labels would be ~4 px, so skip them.
     const compact = this.canvas.clientWidth > 0 && this.canvas.clientWidth < 140;
-    for (const label of compact ? [] : labels) {
+    // Authored swells are a visual reconstruction, so their contours carry no surveyed-depth labels.
+    for (const label of compact || authoredRelief ? [] : labels) {
       const width = ctx.measureText(label.text).width + 6;
       ctx.fillStyle = 'rgba(2, 12, 17, .88)';
       ctx.fillRect(label.x - 2, label.y - 6, width, 12);
