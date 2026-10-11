@@ -395,6 +395,88 @@ it('scan card guidance points at the mission objective, not the nearest contact'
   }
 });
 
+it('keeps the objective chip exclusive with in-range contacts and completion cards', () => {
+  const f = fixture();
+  const overlay = new ScanOverlay(makeConfig().scan);
+  const scanner = new Scanner(makeConfig().scan, new EventBus(), {
+    record: () => ({ firstTime: true }),
+  });
+  const view = scanner.view;
+  const messages = overlay.messages as unknown as TouchElement;
+  const [panel, chip] = messages.children;
+  const keys = { scan: 'G', guide: 'J' };
+  Object.assign(view, {
+    objectiveId: 'stern',
+    objectiveName: 'Stern section',
+    objectiveDistance: 692,
+  });
+  try {
+    f.controls.setTouchMode(true);
+    overlay.update(view, keys, null, 0);
+    expect(panel.hidden).toBe(true);
+    expect(chip.hidden).toBe(false);
+    expect(chip.textContent).toBe('▸ Stern section · 692 m');
+    Object.assign(view, {
+      nearestId: 'bow',
+      nearestName: 'Bow',
+      nearestInRange: true,
+      nearestDistance: 5,
+      candidateId: 'bow',
+    });
+    overlay.update(view, keys, null, 0);
+    expect(panel.hidden).toBe(false);
+    expect(chip.hidden).toBe(true);
+    view.nearestInRange = false;
+    view.candidateId = null;
+    overlay.update(view, keys, null, 0);
+    expect(panel.hidden).toBe(true);
+    expect(chip.hidden).toBe(false);
+    overlay.showComplete('Bow', true, keys);
+    expect(panel.hidden).toBe(false);
+    expect(chip.hidden).toBe(true);
+    overlay.update(view, keys, null, makeConfig().scan.completeBannerSeconds + 1);
+    expect(panel.hidden).toBe(true);
+    expect(chip.hidden).toBe(false);
+    view.objectiveId = null;
+    overlay.update(view, keys, null, 0);
+    expect(chip.hidden).toBe(true);
+    view.objectiveId = 'stern';
+    f.controls.setTouchMode(false);
+    overlay.update(view, keys, null, 0);
+    expect(chip.hidden).toBe(true);
+  } finally {
+    overlay.dispose();
+    f.controls.dispose();
+  }
+});
+
+it('suppresses a visible objective chip immediately and restores it on the next unblocked update', () => {
+  const f = fixture();
+  const overlay = new ScanOverlay(makeConfig().scan);
+  const scanner = new Scanner(makeConfig().scan, new EventBus(), {
+    record: () => ({ firstTime: true }),
+  });
+  const view = scanner.view;
+  const chip = (overlay.messages as unknown as TouchElement).children[1];
+  const keys = { scan: 'G', guide: 'J' };
+  Object.assign(view, { objectiveId: 'stern', objectiveName: 'Stern section' });
+  try {
+    f.controls.setTouchMode(true);
+    overlay.update(view, keys, null, 0);
+    expect(chip.hidden).toBe(false);
+    overlay.setSuppressed(true);
+    expect(chip.hidden).toBe(true);
+    overlay.update(view, keys, null, 0);
+    expect(chip.hidden).toBe(true);
+    overlay.setSuppressed(false);
+    overlay.update(view, keys, null, 0);
+    expect(chip.hidden).toBe(false);
+  } finally {
+    overlay.dispose();
+    f.controls.dispose();
+  }
+});
+
 it('hides an anchored reticle behind visible touch controls and restores it after they move or hide', () => {
   const f = fixture();
   const overlay = new ScanOverlay({
