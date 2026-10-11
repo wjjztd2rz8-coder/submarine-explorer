@@ -1,0 +1,34 @@
+[
+  {
+    "capture": "hunga-tonga-caldera-compact",
+    "identical": true
+  },
+  {
+    "capture": "great-blue-hole-desktop",
+    "identical": true
+  },
+  {
+    "capture": "great-blue-hole-compact",
+    "identical": true
+  },
+  {
+    "capture": "endurance-desktop",
+    "identical": false
+  },
+  {
+    "capture": "titanic-desktop",
+    "identical": false
+  },
+  {
+    "capture": "endurance-compact",
+    "identical": false
+  },
+  {
+    "capture": "titanic-compact",
+    "identical": false
+  },
+  {
+    "capture": "hunga-tonga-caldera-desktop",
+    "identical": true
+  }
+]

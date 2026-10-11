@@ -118,9 +118,10 @@ describe('flat-site sonar relief', () => {
     const titanic = sonarFlatProfile(9, 1000);
     expect(titanic.flatness).toBe(1);
     expect(titanic.gainBoost).toBeGreaterThan(5);
-    expect(titanic.gainBoost).toBeLessThanOrEqual(8);
+    expect(titanic.gainBoost).toBeLessThanOrEqual(16);
     expect(titanic.tint).toBeGreaterThan(0);
-    expect(sonarFlatProfile(0, 1000).gainBoost).toBe(8);
+    expect(sonarFlatProfile(0, 1000).gainBoost).toBe(16);
+    expect(sonarFlatProfile(6, 1000).gainBoost).toBeCloseTo(0.08 / 0.006);
   });
 
   it('chooses about six contours across the local relief, never below 1 m', () => {
@@ -128,5 +129,43 @@ describe('flat-site sonar relief', () => {
     expect(sonarLocalContourInterval(25, 6, 20, 1)).toBe(1);
     expect(sonarLocalContourInterval(100, 596, 20, 1)).toBe(100);
     expect(sonarLocalContourInterval(5, 1, 20, 1)).toBe(Infinity);
+  });
+
+  it('preserves the existing interval as the relief reaches the flatness boundary', () => {
+    for (const relief of [60, 122, 300, 596]) {
+      const { flatness } = sonarFlatProfile(relief, 1000);
+      expect(flatness).toBe(0);
+      expect(sonarLocalContourInterval(25, relief, 20, flatness)).toBe(
+        sonarContourInterval(25, relief, 20),
+      );
+    }
+    const almostSteep = sonarFlatProfile(59.99, 1000);
+    expect(sonarLocalContourInterval(25, 59.99, 20, almostSteep.flatness)).toBe(
+      sonarContourInterval(25, 59.99, 20),
+    );
+  });
+
+  it('honours the line budget and noise floor on flat views at every range', () => {
+    for (const view of [250, 500, 1000, 2000, 33000]) {
+      const relief = view * 0.01;
+      const { flatness } = sonarFlatProfile(relief, view);
+      for (const budget of [1, 3, 6, 20]) {
+        const interval = sonarLocalContourInterval(25, relief, budget, flatness);
+        expect(interval).toBeGreaterThanOrEqual(1);
+        expect(Math.ceil(relief / interval)).toBeLessThanOrEqual(budget);
+      }
+    }
+    for (const relief of [0, 0.5, 1.99])
+      expect(sonarLocalContourInterval(25, relief, 20, 1)).toBe(Infinity);
+    expect(sonarLocalContourInterval(25, 2, 20, 1)).toBe(1);
+  });
+
+  it('fades gain and tint with local slope independently of zoom or absolute depth', () => {
+    const mid = sonarFlatProfile(40, 1000);
+    expect(mid.flatness).toBeCloseTo(0.5);
+    expect(mid.tint).toBeCloseTo(0.12);
+    expect(mid.gainBoost).toBeCloseTo(1.5);
+    expect(sonarFlatProfile(20, 500)).toEqual(mid);
+    expect(sonarFlatProfile(60, 1000)).toEqual({ flatness: 0, gainBoost: 1, tint: 0 });
   });
 });
