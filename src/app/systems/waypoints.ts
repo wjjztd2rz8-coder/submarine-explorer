@@ -58,6 +58,7 @@ export const waypointsSystem: GameSystem = {
         missionRouter?.mission.objectives.find((o) => o.resolved && !o.complete && o.primary) ??
         missionRouter?.mission.objectives.find((o) => o.resolved && !o.complete);
       f.nextScanObjective = nextScanObjective;
+      ctx.discovery.scanner.setObjective(nextScanObjective?.poiId ?? null);
       const scanContent = route?.def.objectives.find((o) => o.id === nextScanObjective?.id) as
         { hint?: string } | undefined;
       ctx.waypoints.update(

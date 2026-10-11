@@ -336,6 +336,65 @@ it('scan instructions use on-screen controls on touch and key bindings on keyboa
   }
 });
 
+it('scan card guidance points at the mission objective, not the nearest contact', () => {
+  const f = fixture();
+  const overlay = new ScanOverlay({
+    ringSizePx: 64,
+    ringStrokePx: 2,
+    reticleSizePx: 44,
+    completeBannerSeconds: 3,
+  });
+  const view = {
+    phase: 'idle',
+    nearestId: 'debris',
+    nearestName: 'Debris field',
+    nearestInRange: true,
+    nearestRadius: 300,
+    nearestScanned: false,
+    nearestDistance: 275,
+    nearestTurnDeg: -108,
+    candidateId: null,
+    objectiveId: 'stern',
+    objectiveName: 'Stern section',
+    objectiveDistance: 692,
+    objectiveRadius: 120,
+    objectiveInRange: false,
+    objectiveTurnDeg: 40,
+    objectiveVertDeg: -20,
+  } as ScanView;
+  const messages = overlay.messages as unknown as TouchElement;
+  const card = messages.children[0].children[1];
+  const [kicker, name, hint] = [card.children[0], card.children[1], card.children[2]];
+  try {
+    f.controls.setTouchMode(false);
+    overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
+    expect(kicker.textContent).toBe('OBJECTIVE');
+    expect(name.textContent).toBe('Stern section');
+    expect(hint.textContent).toBe('TURN 40° STARBOARD');
+    view.objectiveTurnDeg = 3;
+    overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
+    expect(hint.textContent).toBe('CLOSE TO 120 M');
+    view.objectiveInRange = true;
+    f.controls.setTouchMode(true);
+    overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
+    expect(hint.textContent).toBe('SINK TOWARD TARGET');
+    // A scannable contact keeps the scan prompt.
+    view.candidateId = 'debris';
+    overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
+    expect(name.textContent).toBe('Debris field');
+    expect(hint.textContent).toBe('HOLD SCAN TO SCAN');
+    // No objective: nearest-contact guidance as before.
+    view.candidateId = null;
+    view.objectiveId = null;
+    overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
+    expect(name.textContent).toBe('Debris field');
+    expect(hint.textContent).toBe('TURN 108° PORT');
+  } finally {
+    overlay.dispose();
+    f.controls.dispose();
+  }
+});
+
 it('hides an anchored reticle behind visible touch controls and restores it after they move or hide', () => {
   const f = fixture();
   const overlay = new ScanOverlay({

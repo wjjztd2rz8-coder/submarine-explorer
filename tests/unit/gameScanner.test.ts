@@ -165,6 +165,42 @@ describe('Scanner', () => {
     expect(below.view.nearestVertDeg).toBeCloseTo(-26.57, 1);
   });
 
+  it('guides to the mission objective without changing the scan candidate', () => {
+    const near = target({
+      id: 'debris',
+      name: 'Debris',
+      position: new Vector3(0, -100, -50),
+      radius: 100,
+    });
+    const stern = target({
+      id: 'stern',
+      name: 'Stern',
+      position: new Vector3(300, -100, 0),
+      radius: 80,
+    });
+    const { scanner } = setup([near, stern]);
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.objectiveId).toBeNull();
+    scanner.setObjective('stern');
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.candidateId).toBe('debris');
+    expect(scanner.view.nearestId).toBe('debris');
+    expect(scanner.view.objectiveId).toBe('stern');
+    expect(scanner.view.objectiveName).toBe('Stern');
+    expect(scanner.view.objectiveDistance).toBeCloseTo(300, 3);
+    expect(scanner.view.objectiveInRange).toBe(false);
+    expect(scanner.view.objectiveTurnDeg).toBeCloseTo(90, 0);
+    expect(scanner.view.objectiveVertDeg).toBeCloseTo(0, 3);
+    // Unknown POI id or a scanned objective drops back to no objective.
+    scanner.setObjective('missing');
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.objectiveId).toBeNull();
+    scanner.setObjective('debris');
+    scanner.scannedThisDive.add('lm/debris');
+    scanner.update(0, AT, NORTH, false);
+    expect(scanner.view.objectiveId).toBeNull();
+  });
+
   it('waives the facing test inside closeRangeM', () => {
     const { scanner } = setup([target({ position: new Vector3(5, -100, 0) })]);
     scanner.update(DT, AT, NORTH.clone().negate(), true);

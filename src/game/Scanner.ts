@@ -80,6 +80,19 @@ export interface ScanView {
    * the target is above the current heading line (rise or pitch up).
    */
   nearestVertDeg: number;
+  /**
+   * Active mission objective (set via setObjective), when it is an unscanned
+   * fixed target. Guidance only; it never changes `candidateId`.
+   */
+  objectiveId: string | null;
+  objectiveName: string;
+  objectiveDistance: number;
+  objectiveRadius: number;
+  objectiveInRange: boolean;
+  /** Signed turn to face the objective, degrees (positive = starboard). */
+  objectiveTurnDeg: number;
+  /** Signed vertical correction toward the objective, degrees (positive = above). */
+  objectiveVertDeg: number;
   /** Reason for the most recent interruption, while phase === 'interrupted'. */
   lastAbort: AbortReason | null;
   /** Completed scans since construction (handy for tests and e2e). */
@@ -114,6 +127,13 @@ export class Scanner {
     nearestAngleDeg: 180,
     nearestTurnDeg: 0,
     nearestVertDeg: 0,
+    objectiveId: null,
+    objectiveName: '',
+    objectiveDistance: Infinity,
+    objectiveRadius: 0,
+    objectiveInRange: false,
+    objectiveTurnDeg: 0,
+    objectiveVertDeg: 0,
     lastAbort: null,
     completed: 0,
     lastCompleteId: null,
@@ -142,6 +162,12 @@ export class Scanner {
   /** Public per-dive state for sonar, objectives and other presentation layers. */
   readonly scannedThisDive = new Set<string>();
   private active: ScanTarget | null = null;
+  private objectivePoiId: string | null = null;
+
+  /** Point the card's guidance at the active mission objective (POI id), or null. */
+  setObjective(poiId: string | null): void {
+    this.objectivePoiId = poiId;
+  }
   private sinceProgressEmit = Infinity;
   private readonly cosCone: number;
 
@@ -325,6 +351,8 @@ export class Scanner {
     v.nearestTurnDeg = nearestGeo?.turnDeg ?? 0;
     v.nearestVertDeg = nearestGeo?.vertDeg ?? 0;
 
+    this.updateObjective(position, forward);
+
     if (held && candidate) {
       if (this.active !== candidate) {
         // Switching to a different target abandons the old one outright.
@@ -368,6 +396,31 @@ export class Scanner {
       v.progress = Math.max(0, v.progress - this.config.decayPerSecond * dt);
       if (v.progress <= 0) this.clearActive();
     }
+  }
+
+  private updateObjective(position: Vector3, forward: Vector3): void {
+    const v = this.view;
+    const t = this.objectivePoiId
+      ? (this.targets.find((x) => x.id === this.objectivePoiId) ?? null)
+      : null;
+    if (!t || this.isScanned(t.landmarkId, t.id)) {
+      v.objectiveId = null;
+      v.objectiveName = '';
+      v.objectiveDistance = Infinity;
+      v.objectiveRadius = 0;
+      v.objectiveInRange = false;
+      v.objectiveTurnDeg = 0;
+      v.objectiveVertDeg = 0;
+      return;
+    }
+    const g = this.geometry(t, position, forward);
+    v.objectiveId = t.id;
+    v.objectiveName = t.name;
+    v.objectiveDistance = g.distance;
+    v.objectiveRadius = t.radius;
+    v.objectiveInRange = g.inRange;
+    v.objectiveTurnDeg = g.turnDeg;
+    v.objectiveVertDeg = g.vertDeg;
   }
 
   /** Drop any scan in progress without emitting (e.g. after a teleport). */

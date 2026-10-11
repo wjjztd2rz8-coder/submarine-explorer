@@ -252,10 +252,21 @@ export class ScanOverlay {
       return;
     }
 
-    // Idle: guide the pilot towards a scannable pose.
-    this.setText(this.nameEl, 'name', view.nearestName);
-    this.setRing(0, dist);
+    // Idle: guide the pilot towards a scannable pose. The scan prompt follows
+    // the candidate; where-to-go guidance follows the mission objective.
+    const touch = document.documentElement.classList.contains('is-touch');
+    const guide = (turn: number, vert: number, fallback: string): string => {
+      if (Math.abs(turn) >= 10) {
+        return `TURN ${Math.abs(turn).toFixed(0)}° ${turn >= 0 ? 'STARBOARD' : 'PORT'}`;
+      }
+      // Touch has no pitch control: the ballast slider is the vertical aid.
+      if (touch) return vert >= 0 ? 'RISE TOWARD TARGET' : 'SINK TOWARD TARGET';
+      return fallback;
+    };
+    const objective = view.objectiveId != null && view.objectiveId !== view.nearestId;
     if (view.candidateId !== null) {
+      this.setText(this.nameEl, 'name', view.nearestName);
+      this.setRing(0, dist);
       this.setTone('cyan');
       this.setText(this.kicker, 'kicker', 'SCAN TARGET');
       this.setText(
@@ -263,25 +274,36 @@ export class ScanOverlay {
         'hint',
         view.nearestId?.startsWith('sample:') ? `HOLD ${scan} TO COLLECT` : `HOLD ${scan} TO SCAN`,
       );
+    } else if (objective) {
+      // Objective guidance replaces the nearest-contact guidance.
+      this.setText(this.nameEl, 'name', view.objectiveName);
+      this.setRing(0, `${view.objectiveDistance.toFixed(0)} m`);
+      this.setTone(view.objectiveInRange ? 'amber' : 'dim');
+      this.setText(this.kicker, 'kicker', 'OBJECTIVE');
+      const turn = view.objectiveTurnDeg;
+      const near = `CLOSE TO ${view.objectiveRadius.toFixed(0)} M`;
+      const msg = view.objectiveInRange
+        ? guide(turn, view.objectiveVertDeg, 'PITCH TOWARD TARGET')
+        : Math.abs(turn) >= 10
+          ? guide(turn, 0, near)
+          : near;
+      this.setText(this.hint, 'hint', msg);
     } else if (!view.nearestInRange) {
+      this.setText(this.nameEl, 'name', view.nearestName);
+      this.setRing(0, dist);
       this.setTone('dim');
       this.setText(this.kicker, 'kicker', 'CONTACT');
       this.setText(this.hint, 'hint', `CLOSE TO ${view.nearestRadius.toFixed(0)} M`);
     } else {
+      this.setText(this.nameEl, 'name', view.nearestName);
+      this.setRing(0, dist);
       this.setTone('amber');
       this.setText(this.kicker, 'kicker', 'SCAN TARGET');
-      const turn = view.nearestTurnDeg;
-      const side = turn >= 0 ? 'STARBOARD' : 'PORT';
-      // Mostly vertical misalignment when the horizontal turn is small.
-      // Touch has no pitch control: the ballast slider is the vertical aid.
-      const up = view.nearestVertDeg >= 0;
-      const vertical = document.documentElement.classList.contains('is-touch')
-        ? up
-          ? 'RISE TOWARD TARGET'
-          : 'SINK TOWARD TARGET'
-        : 'PITCH TOWARD TARGET';
-      const msg = Math.abs(turn) < 10 ? vertical : `TURN ${Math.abs(turn).toFixed(0)}° ${side}`;
-      this.setText(this.hint, 'hint', msg);
+      this.setText(
+        this.hint,
+        'hint',
+        guide(view.nearestTurnDeg, view.nearestVertDeg, 'PITCH TOWARD TARGET'),
+      );
     }
   }
 
