@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-11 13:15 comprehensive review, joint with Sol (round 1 only; golden 2026-10-11-171945 vs -100422)
+
+Sol's independent review ran; the round-2 reconcile died because Codex hit its usage limit (resets 16:45). Scores are my reconciliation on evidence: I viewed Titanic, Challenger, Blue Hole, Lost City, Monterey, Endurance and Beebe images and accepted Sol's calibration where an image backs it. Disputed: none firm; Sol never saw my draft.
+
+**Changed since the last review:** merged f-ci-vehicles, f-touch-stack, f-tutorial-order, f-challenger-cam, f-lostcity-tower, Codex 1280/1310/1320/1340, f-scan-candidate, and now Codex 1350 (mobile resize/perf), 1360 (Blue Hole rock seating, Challenger lander-boulder overlap), 1370 (photo mode), 1390 (scan overlay on touch). Gates PASS on main; full e2e running before the push.
+
+| Site       | Readable | Beautiful | Change | Biggest gap                                          |
+| ---------- | -------- | --------- | ------ | ---------------------------------------------------- |
+| Titanic    | 4        | 3.75      | same   | regular panels, thin rusticles (Sol); sky now subtle |
+| Beebe      | 4        | 3.5       | same   | smooth cone trunk; scan card covers the vent top     |
+| Blue Hole  | 4        | 3.25      | same   | faceted flat polygon steps on the bowl               |
+| Lost City  | 4        | 3.5       | +0.25  | towers read as chimneys; striations stretched (Sol)  |
+| Monterey   | 4        | 3.5       | +0.1   | wall-foot rubble scattered now; broad corrugation    |
+| Challenger | 4        | 3.5       | same   | toy-like lander materials (Sol); emptiness is fine   |
+| Endurance  | 3.5-4    | 3.5       | same   | opening hull ~380 px of 1600, sub huge (Sol, correct)|
+
+Credits: Sol found the Endurance opening and Blue Hole collision-clearance gaps, the mixed-age capture evidence and the missing portrait set; I found the shard-7 cause and the Lost City/Monterey gains.
+
+**Process:** efficiency.sh: Claude idle ~166 h and Codex under-used ~135 h of samples (Oct 6-10 lockout; 233 gate skips, 81 watchdog trips: floors working). Codex PASS 130 / other 11. Hosted CI on 38131716507: only e2e shard 7 red, `f-sonar-palette-1200.spec.ts:12` screenshot timeout (240 s) on the software-GL runner: Codex 1430. Gotcha: `.cache/review/current` is a symlink created by `codex-review.sh start`; do not `mkdir` it (it broke the first reconcile). Codex 5h limit was exhausted by running Sol alongside three Codex tasks: avoid starting Sol while 3 tasks run.
+
+**Priorities:** see DIRECTOR.md (7 Claude items, 6 Codex briefs queued). **Stage:** ~75% to 1.0, about 3 weeks (Sol 70-75% / 3-5 weeks, me 80% / 2 weeks: took the middle). **Needs owner:** nothing.
+
 ## 2026-10-11 05:30 comprehensive review, Claude alone (trigger: 8+ merges; golden 2026-10-11-100422 vs -015340)
 
 Codex 5h 9% (`codex-review.sh` exit 75), so no Sol second opinion. Play-flow judged from the f-newplayer-recapture and Codex 1260 captures (day old), not recaptured.

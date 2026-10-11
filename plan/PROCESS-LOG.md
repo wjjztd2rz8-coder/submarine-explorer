@@ -163,3 +163,9 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - Hosted CI red had three causes, not one: a unit test writing to a missing `.cache/` (fixed), a Playwright apt-lock flake in project-base, and e2e shard 300 s timeouts. Lesson: read the failing static job first; it was a one-line fix hidden behind "e2e red".
 - Codex weekly at 6% blocks Sol reviews and dispatch until 15 Oct; Claude carries packages.
 - 2026-10-10: gates.sh leaves preview servers on PW_PORT, so reruns on that port false-fail ('port in use'); golden runs by agents need a free GOLDEN_PORT. Workaround: fuser -k <port>/tcp; fix in tools/gates.sh worth a Haiku item.
+
+## 2026-10-11 13:15 review run
+
+- Sol review plus 3 running Codex tasks exhausted Codex 5h (63% to 0 in ~25 min), so the reconcile round failed. Rule: start Sol only when fewer than 2 Codex tasks run or Codex 5h >= 70%.
+- `.cache/review/current` is a symlink written by `codex-review.sh start`; creating it with mkdir breaks `reconcile` (it waited forever). Write the draft only after `start` has made the link.
+- Shard-7 CI failure traced via `gh api repos/:owner/:repo/actions/jobs/<id>/logs` (`gh run view --log-failed` printed nothing).
