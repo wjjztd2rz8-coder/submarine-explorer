@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **f-hud-overlap-fix:** desktop and tablet scan stack top is now `max(112px, 15%)` (was 84px) so the top-centre `New discovery` notice (72-109px) no longer overlaps the scan card, tutorial hint or objective chip at 1280x720; the 1390 sweep now settles the ResizeObserver-driven layout before measuring and picks a genuinely out-of-range spot (procedural deep-coral targets at Hudson Canyon and Kamaʻehuakanaloa were landing in range of the fixed +10000 m offset).
+
 - **Scan card and Scan share one target:** the scanner now promotes its scan candidate (in-cone and in range, mission objective first, then nearest) to the card/reticle/prompt contact, so with two contacts in range the card names exactly what pressing Scan scans instead of a nearer off-axis contact. Reason: bug-hunt 1330 showed one name on the card and another scanned. No visual change.
 - **1320 Monterey wall-foot / Endurance sonar:** Monterey rockfall now has irregular patches, separated blocks, varied sizes and runout across the apron onto the seabed; scar blocks scatter farther from their source. Wall geometry, support checks, instance counts and Low-tier behavior stay intact. Endurance contours now trace its shared authored ice-scour relief above the local plain, replacing the straight survey-plane stripes; absolute depths still drive the palette and depth readout. Authored contours omit surveyed-depth labels. Reason: the boulders read as a neat row and the minimap stripes obscured the hull plan. Two review rounds and validation limits are recorded in `plan/progress/1320-f-monterey-endurance-small.md`.
 

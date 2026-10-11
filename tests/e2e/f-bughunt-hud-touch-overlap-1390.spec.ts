@@ -34,6 +34,19 @@ const selectors = [
 ];
 
 async function layout(page: Page, phase: string): Promise<void> {
+  // The objectives panel republishes --obj-panel-bottom from a ResizeObserver, which
+  // runs in the next real rendering step (not on the fake clock). Wait for one
+  // so a measurement taken right after a content change sees the settled layout.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        const observer = new ResizeObserver(() => {
+          observer.disconnect();
+          resolve();
+        });
+        observer.observe(document.body);
+      }),
+  );
   // Read the entire composed HUD together, including transient reward notices.
   const issues = await page.evaluate((selectors) => {
     const boxes = selectors.flatMap((selector) => {
