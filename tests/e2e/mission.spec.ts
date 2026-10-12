@@ -91,11 +91,13 @@ test.describe('B3 mission flow', () => {
     await expect(page.locator('.briefing-objectives li.is-primary')).toHaveCount(2);
     await expect(page.locator('.briefing-objectives li.is-secondary')).toHaveCount(2);
     await expect(page.locator('.briefing-section.is-hazards li')).not.toHaveCount(0);
+    await expect(page.locator('.briefing-section.is-hazards li:visible')).toHaveCount(0);
     await expect(page.locator('.briefing-memorial')).toBeVisible();
-    await expect(page.locator('.briefing-controls button')).toBeHidden();
-    await briefing.getByText('More about this site', { exact: true }).click();
-    await expect(page.locator('.briefing-controls button')).toHaveText('View controls');
-    await briefing.getByText('More about this site', { exact: true }).click();
+    await expect(page.locator('.briefing-controls')).toHaveCount(0);
+    await briefing.getByText('About this site', { exact: true }).click();
+    await expect(page.locator('.briefing-section.is-hazards li').first()).toBeVisible();
+    await expect(briefing.getByRole('button', { name: 'View controls' })).toHaveCount(0);
+    await briefing.getByText('About this site', { exact: true }).click();
     await expect(page.locator('.briefing-begin')).toHaveText('Begin dive');
     await expect(page.locator('.objectives-panel')).toBeHidden();
     // The mission picker is collapsed out of the way during a mission.

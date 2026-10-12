@@ -24,10 +24,15 @@ class Element extends EventTarget {
     this.dispatchEvent(new Event('click'));
   }
 }
-afterEach(() => vi.unstubAllGlobals());
+let touch = false;
+afterEach(() => {
+  touch = false;
+  vi.unstubAllGlobals();
+});
+const documentElement = { classList: { contains: (name: string) => touch && name === 'is-touch' } };
 it('offers visible Capture, Done and Pause actions while the viewfinder is active', () => {
   const body = new Element();
-  vi.stubGlobal('document', { body, createElement: () => new Element() });
+  vi.stubGlobal('document', { body, documentElement, createElement: () => new Element() });
   vi.stubGlobal('window', {
     clearTimeout: vi.fn(),
     addEventListener: vi.fn(),
@@ -75,6 +80,7 @@ it('restores the opener only after the dive controls become visible again, over 
   };
   vi.stubGlobal('document', {
     body,
+    documentElement,
     get activeElement() {
       return activeElement;
     },
@@ -104,7 +110,7 @@ it('restores the opener only after the dive controls become visible again, over 
 
 it('Done uses the photo system exit and Pause leaves photo mode for the pause menu', () => {
   const body = new Element();
-  vi.stubGlobal('document', { body, createElement: () => new Element() });
+  vi.stubGlobal('document', { body, documentElement, createElement: () => new Element() });
   vi.stubGlobal('window', {
     clearTimeout: vi.fn(),
     addEventListener: vi.fn(),
@@ -144,4 +150,28 @@ it('Done uses the photo system exit and Pause leaves photo mode for the pause me
   } finally {
     system.dispose?.();
   }
+});
+
+it('on touch the capture button and tips name no keys', () => {
+  touch = true;
+  const body = new Element();
+  vi.stubGlobal('document', { body, documentElement, createElement: () => new Element() });
+  vi.stubGlobal('window', {
+    clearTimeout: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  });
+  const mode = new PhotoMode(
+    () => {},
+    () => {},
+    () => {},
+  );
+  mode.setActive(true, 'Enter');
+  const bottom = (mode.root as unknown as Element).children.at(-1)!;
+  const tips = bottom.children[0]!;
+  const capture = bottom.children.at(-1)!.children[0]!;
+  expect(capture.textContent).toBe('Capture');
+  expect(tips.textContent).toBe('Drag to orbit · pinch to zoom');
+  expect(`${capture.textContent} ${tips.textContent}`).not.toMatch(/Enter|Space|Esc|wheel/);
+  mode.setActive(false);
 });

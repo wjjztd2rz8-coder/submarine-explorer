@@ -30,6 +30,8 @@ Play: <https://wjjztd2rz8-coder.github.io/submarine-explorer/> (deployed on ever
 
 ## Left for 1.0
 
+The ordered list with owners is the Backlog in [DIRECTOR.md](DIRECTOR.md), the single source of forward work since 2026-10-11. It now includes the simplification items (`S-*`) from the 2026-10-11 review: fix 4 small bugs, remove dead and unused code, one guidance slot and a three-region HUD, a shorter first flow, test consolidation and settings resolved once. Summary:
+
 1. Release f52 and get hosted CI fully green.
 2. Phone first five minutes: an unaided capture on the current build; rework the portrait HUD stack.
 3. Hero art to 4: Blue Hole gallery and bowl, Endurance opening, Titanic close-up, Beebe trunk, Lost City opening.
@@ -38,5 +40,7 @@ Play: <https://wjjztd2rz8-coder.github.io/submarine-explorer/> (deployed on ever
 6. Owner real-phone check; README and a playtest checklist; tag v1.0.
 
 ## Needs owner
+
+- Five simplification decisions (upgrades, Daily Dive, ROV, Ultra tier, globe on phones); see DIRECTOR.md "Needs owner".
 
 - A five-minute play on a real phone once f52 is pushed.

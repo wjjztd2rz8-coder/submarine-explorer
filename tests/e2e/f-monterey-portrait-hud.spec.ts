@@ -42,8 +42,8 @@ async function boot(page: Page, query: string): Promise<void> {
   );
 }
 
-async function expectClearLayout(page: Page, credits: boolean): Promise<void> {
-  const selectors = credits ? [...HUD, '.hud-attribution-panel'] : HUD;
+async function expectClearLayout(page: Page): Promise<void> {
+  const selectors = HUD;
   const m = await page.evaluate((selectors) => {
     const boxes = selectors.flatMap((selector) => {
       const el = document.querySelector<HTMLElement>(selector);
@@ -87,15 +87,10 @@ async function expectClearLayout(page: Page, credits: boolean): Promise<void> {
   expect(m.sy).toBeLessThan(m.h - 40);
 }
 
-test('free dive: portrait HUD panels do not overlap, credits open or closed', async ({ page }) => {
+test('free dive: portrait HUD panels do not overlap', async ({ page }) => {
   await boot(page, 'tutorial=0');
   await expect(page.locator('.scan-stack')).toBeVisible();
-  await expectClearLayout(page, false);
-  await page.locator('.hud-attribution summary').tap();
-  await expect(page.locator('.hud-attribution-panel')).toBeVisible();
-  // Visibility changes before the queued details toggle places the panel.
-  await expect(page.locator('.hud-attribution summary')).toHaveAttribute('aria-expanded', 'true');
-  await expectClearLayout(page, true);
+  await expectClearLayout(page);
 });
 
 test('mission with tutorial: card, objectives, scan and readouts stay separate', async ({
@@ -104,9 +99,5 @@ test('mission with tutorial: card, objectives, scan and readouts stay separate',
   await boot(page, 'mission=monterey-canyon');
   await expect(page.locator('.onboard-card')).toBeVisible();
   await expect(page.locator('.objectives-panel')).toBeVisible();
-  await expectClearLayout(page, false);
-  await page.locator('.hud-attribution summary').tap();
-  await expect(page.locator('.hud-attribution-panel')).toBeVisible();
-  await expect(page.locator('.hud-attribution summary')).toHaveAttribute('aria-expanded', 'true');
-  await expectClearLayout(page, true);
+  await expectClearLayout(page);
 });

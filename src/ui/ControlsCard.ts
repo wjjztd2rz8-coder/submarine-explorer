@@ -7,6 +7,7 @@
 
 import type { ActionId, Input } from '../core/Input.js';
 import { FocusTrap } from './FocusTrap.js';
+import { buildHowToPlay } from './HowToPlay.js';
 
 export type InputDevice = 'keyboard' | 'gamepad' | 'touch';
 export const INPUT_DEVICES: readonly InputDevice[] = ['keyboard', 'gamepad', 'touch'];
@@ -163,6 +164,7 @@ export class ControlsCard {
   readonly root: HTMLDivElement;
   private readonly body: HTMLElement;
   private readonly heading: HTMLElement;
+  private readonly tabsRow: HTMLElement;
   private readonly tabs = new Map<InputDevice, HTMLButtonElement>();
   private readonly rebind: HTMLButtonElement;
   private readonly trap: FocusTrap;
@@ -205,6 +207,7 @@ export class ControlsCard {
     done.type = 'button';
     done.addEventListener('click', () => this.close());
     actions.append(this.rebind, done);
+    this.tabsRow = tabs;
     panel.append(this.heading, tabs, this.body, actions);
     this.root.append(panel);
     (opts.parent ?? document.body).append(this.root);
@@ -240,7 +243,9 @@ export class ControlsCard {
     this.root.hidden = false;
     document.exitPointerLock?.();
     this.trap.activate();
-    this.root.querySelector<HTMLButtonElement>('.controls-card-close')?.focus();
+    this.root
+      .querySelector<HTMLButtonElement>('.controls-card-close')
+      ?.focus({ preventScroll: true });
   }
 
   close(): void {
@@ -262,6 +267,17 @@ export class ControlsCard {
     }
     this.rebind.hidden = this.viewing !== 'keyboard' || !this.opts.onRebind;
     this.body.replaceChildren();
+    // Touch: a picture-first "How to play" with no key names, and no device tabs.
+    this.tabsRow.hidden = this.device_ === 'touch';
+    this.heading.textContent = this.viewing === 'touch' ? 'How to play' : 'Controls';
+    this.root.setAttribute(
+      'aria-label',
+      this.viewing === 'touch' ? 'How to play' : 'Controls guide',
+    );
+    if (this.viewing === 'touch') {
+      this.body.append(buildHowToPlay());
+      return;
+    }
     const note = el(
       'p',
       'controls-card-note',

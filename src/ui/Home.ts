@@ -219,16 +219,6 @@ export class Home {
       : SCENE_FALLBACK;
   }
 
-  /** Expand invisible pin hit areas while keeping their authored dots centred. */
-  sizeGlobeTargets(): void {
-    for (const pin of this.globeSlot.querySelectorAll<HTMLButtonElement>('.globe-pin')) {
-      if (pin.style.width === '48px') continue;
-      pin.style.width = '48px';
-      pin.style.height = '48px';
-      pin.style.margin = '-24px 0 0 -24px';
-    }
-  }
-
   showSites(freeDive: boolean, origin?: HTMLButtonElement): void {
     this.sitesOrigin = origin ?? (freeDive ? this.freeDiveButton : this.diveSitesButton);
     this.sites.hidden = false;

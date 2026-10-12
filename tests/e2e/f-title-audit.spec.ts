@@ -21,16 +21,19 @@ test.describe('title touch navigation', () => {
     await expect
       .poll(() => page.locator('.globe.is-embedded .globe-pin').count())
       .toBeGreaterThan(0);
+    // Playable pins are at least 44 x 44 CSS px on touch; catalogue specks are not targets.
     await expect
       .poll(() =>
         page
-          .locator('.globe.is-embedded .globe-pin')
-          .evaluateAll((pins) =>
-            pins.every(
-              (pin) =>
-                parseFloat(getComputedStyle(pin).width) >= 48 &&
-                parseFloat(getComputedStyle(pin).height) >= 48,
-            ),
+          .locator('.globe.is-embedded .globe-pin:not(.is-catalogue)')
+          .evaluateAll(
+            (pins) =>
+              pins.length > 0 &&
+              pins.every(
+                (pin) =>
+                  parseFloat(getComputedStyle(pin).width) >= 44 &&
+                  parseFloat(getComputedStyle(pin).height) >= 44,
+              ),
           ),
       )
       .toBe(true);

@@ -23,14 +23,12 @@ export const GAME_MODES: ReadonlyArray<{ id: GameplayMode; label: string; descri
   {
     id: 'arcade',
     label: 'Arcade',
-    description:
-      'Fast travel, strong lights, long-range sensors and waypoints. No battery limit or currents.',
+    description: 'Fast travel and waypoints. No battery limit or currents.',
   },
   {
     id: 'realistic',
     label: 'Realistic',
-    description:
-      'Research-sub speed, true light and sensor range, no waypoints, battery and oxygen, currents.',
+    description: 'True speed and light. Battery, oxygen and currents; no waypoints.',
   },
 ];
 

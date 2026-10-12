@@ -3,11 +3,11 @@ Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-expl
 ## 0. Guard (do this first)
 
 - `tools/resume.sh` has already checked the budget gate and the lock. Write `headless <PID> <time>` to `.cache/orchestrator.active`, `touch` it after each major step, and delete it when you finish.
-- Read your memory notes: phase-f-direction, usage-budget, codex-subagents, content-tone and playtest-direction. Then read plan/PHASE-F-PLAN.md (the waves, packages, ownership and operating rules) and the tail of plan/OVERNIGHT-LOG.md.
+- Read your memory notes: phase-f-direction, usage-budget, codex-subagents, content-tone and playtest-direction. Then read the tail of plan/OVERNIGHT-LOG.md. plan/PHASE-F-PLAN.md is reference only (owner decisions, pillars, package rules); its waves are finished.
 
 ## 0b. Direction
 
-- Read `plan/DIRECTOR.md` FIRST. It holds the current priorities and the review rubric, and it outranks PHASE-F-PLAN.md ordering. You are the creative director: judge every package against the rubric and send work back with concrete feedback rather than merging and fixing later. Items you need from the owner go under "Needs owner" there and at the top of your OVERNIGHT-LOG entry.
+- Read `plan/DIRECTOR.md` FIRST. It is the **single source of forward work** (owner, 2026-10-11): one ordered Backlog with stable item IDs and lanes, the simplicity rules (definition of done) and the review rubric. Take work only from its Backlog. If something new comes up, add or reorder an item there; never start a separate plan document. You are the creative director: judge every package against the rubric and send work back with concrete feedback rather than merging and fixing later. Items you need from the owner go under "Needs owner" there and at the top of your OVERNIGHT-LOG entry.
 
 ## 0c. Process health (once per day, or when something looks off)
 
@@ -28,7 +28,7 @@ Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-expl
 
 ## 2. Next package
 
-- Pick the next package from PHASE-F-PLAN.md §3 whose owned files don't overlap work in flight. Write its brief in the style of the earlier ones (see `.cache/codex/brief-f-*.md` and the F0-CORE prompt style: why, tasks, constraints, gates, screenshots, progress note, final report).
+- Pick the highest unblocked Backlog item in `plan/DIRECTOR.md` for the lane you're filling (Sonnet/Haiku for Claude, Codex for the queue) whose files don't overlap work in flight. Mark it `IN FLIGHT` in DIRECTOR.md, and name its item ID in the worktree branch, the progress note and the commits. Write its brief, including the item ID and the DIRECTOR.md simplicity rules (definition of done), in the style of the earlier ones (see `.cache/codex/brief-f-*.md` and the F0-CORE prompt style: why, tasks, constraints, gates, screenshots, progress note, final report).
 - Implementation goes to Claude subagents (Agent tool). Pick the cheapest model that fits (Claude only; Codex is unchanged):
   - **Owner (2026-10-08): Haiku 5.5 takes smaller, well-scoped tasks** over Sonnet: `model: "haiku"`. Use it for one-file or few-file fixes with a clear spec, test or snapshot updates, lint/prettier and log fixes, merge-conflict cleanup in logs and docs, running gates or golden captures and summarising them, and searches.
   - **Sonnet stays the main contributor** (owner, 2026-09-29) for visual-heavy work, multi-file features and anything that needs design judgment or screenshot review: `model: "sonnet"`. If Haiku fails a task once, give it to Sonnet.
@@ -36,7 +36,7 @@ Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-expl
   - Create the worktree first: `git worktree add -b claude/<pkg> ../subexp-wt/<pkg> HEAD`, symlink node_modules, and symlink `.cache/codex/shots`.
   - In a headless run, run the agent synchronously (not in the background) so it finishes before you exit, and run at most 2 packages per run.
 - **Owner (2026-10-01): Codex 6.1 Sol also builds** well-specified, self-contained packages (progression, modes, audio, fix lists from audits), because a Claude window only covers ~40 min of one agent. Claude keeps visual-heavy work (marine life, set pieces, brand/UI) and reviews Codex diffs and screenshots before merging. Codex also does the detail work (audits, verification of merged work, bug hunts, research, fact checks): `systemd-run --user --unit=subexp-<name> --working-directory=$PWD env WT=1 ON_LIMIT=exit [NET=1] PW_PORT=<unique> tools/codex-task.sh <brief> <name> 2`.
-- **Codex queue:** don't launch Codex tasks directly. Write briefs to `.cache/codex/queue/NN-<name>.md` (an optional first line `<!-- env: NET=1 ROUNDS=3 -->`; add `FULL_E2E=1` inside that line for package screenshots or full regression feedback). `tools/codex-dispatch.sh` runs every 30 min from the timer, without needing Claude, and launches them whenever Codex has budget and fewer than 3 tasks are running. Before exiting, make sure at least 3 briefs are queued (verification of what you merged, bug hunts, the next self-contained packages from DIRECTOR.md), so Codex never idles while Claude is out of budget (it idled ~12 h on 2026-10-01/02).
+- **Codex queue:** don't launch Codex tasks directly. Write briefs to `.cache/codex/queue/NN-<name>.md` (an optional first line `<!-- env: NET=1 ROUNDS=3 -->`; add `FULL_E2E=1` inside that line for package screenshots or full regression feedback). `tools/codex-dispatch.sh` runs every 30 min from the timer, without needing Claude, and launches them whenever Codex has budget and fewer than 3 tasks are running. Before exiting, make sure at least 3 briefs are queued (verification of what you merged, bug hunts, the next Codex-lane Backlog items from DIRECTOR.md; each brief names its item ID), so Codex never idles while Claude is out of budget (it idled ~12 h on 2026-10-01/02).
 - **Keep Codex busy (owner, 2026-10-01):** every run checks `tools/codex-status.sh`. If fewer than 3 Codex tasks are running and Codex has budget (5h ≥ 30%, weekly ≥ 15%), launch the next self-contained Codex package(s) or a verification/bug-hunt task over newly merged work. Idle Codex capacity is wasted.
 - After each merged wave, or a large package, that is green and screenshot-reviewed:
   - run `PW_PORT=<unique> tools/gates.sh --full-e2e` on the final main commit and require every gate to pass before pushing; Pages deploy does not wait for CI;
@@ -46,6 +46,7 @@ Resume Submarine Explorer Phase F orchestration (repo /home/vijay/submarine-expl
 
 ## 3. Rules
 
+- Review every package against the DIRECTOR.md rubric AND its simplicity rules (net simpler, one guidance surface, no layout patches, no site branches, settings resolve once, tests by capability, no package numbers in code). Send work back that breaks them. After merging, mark the item `DONE <date> (<commit>)` in DIRECTOR.md.
 - Commit only green work (`tools/gates.sh` for routine feedback; `--full-e2e` for full regression acceptance). Record which e2e mode passed. Review fresh package screenshots for UI work and require full gates before a release push.
 - `tools/resume.sh` runs `tools/budget-watchdog.sh` for this whole run. It polls usage every 2 minutes, stops Codex units below 7% (5h) or 7% (weekly), and kills this run if Claude falls below 23% (5h) or 7% (weekly). Uncommitted worktree files survive; commit `wip(<pkg>)` checkpoints often.
 - Check `~/.local/bin/ai-limits` before EACH new Claude agent and after each one finishes. Start a new agent only if Claude's 5-hour window is at least 45% left. Once it falls below 30%, start nothing new; finish collecting and exit. Never let the window fall under the 20% floor: an agent that hits the session limit dies mid-work. If any weekly window is at or below 5%, stop; the timer will retry, and runs skip until the reset.

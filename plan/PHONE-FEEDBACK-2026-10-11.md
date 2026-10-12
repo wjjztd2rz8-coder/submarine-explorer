@@ -1,5 +1,7 @@
 # Owner phone test, 2026-10-11 (f51, about 5 minutes)
 
+> Decision record. Status and order of these packages live in [DIRECTOR.md](DIRECTOR.md) as the `P-*` items.
+
 The owner's notes, condensed, with Claude's decision for each one. Where a phone fix also helps on desktop, it ships on both. Fresh captures of the current build: `.cache/phonefb/phone-titanic/` and `.cache/phonefb/phoneland-titanic/`.
 
 | #   | Owner note                                                                                                                             | Decision                                                                                                                                                                                                                                                                                                                                                                           | Package                                                |

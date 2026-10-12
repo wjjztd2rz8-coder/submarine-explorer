@@ -20,7 +20,8 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
 .pause-actions[hidden],
 .pause-detail[hidden],
 .pause-objectives[hidden],
-.pause-sites-scroll[hidden] {
+.pause-sites-scroll[hidden],
+.pause-credits[hidden] {
   display: none;
 }
 .pause-kicker {
@@ -72,15 +73,6 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
   bottom: 30px;
   width: min(390px, 43vw);
   font-size: 14px;
-}
-.globe.is-embedded .globe-pin {
-  width: 28px;
-  height: 28px;
-  margin: -14px 0 0 -14px;
-}
-.globe.is-embedded .globe-pin-dot {
-  width: 12px;
-  height: 12px;
 }
 .pause-detail > button {
   min-height: 40px;
@@ -254,4 +246,22 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
 body:has(.field-guide:not([hidden])) .home-screen,
 body:has(.field-guide:not([hidden])) .pause-menu {
   pointer-events: none;
+}
+
+.pause-credits {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: #c2dce0;
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.pause-credits p {
+  margin: 0 0 10px;
+}
+.pause-credits a {
+  display: inline-block;
+  max-width: 100%;
+  color: #78ebd8;
 }

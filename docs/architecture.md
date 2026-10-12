@@ -45,7 +45,7 @@ and [audio.md](./audio.md).
 `'home' | 'dive' | 'pause'` states (`GameEvents['app:state']`), driven by two
 new full-screen overlays: `ui/Home.ts` (Bathyline title screen: Continue/Dive
 sites/Free dive/Daily dive/mode/Journal/Settings/Controls/Upgrades) and `ui/PauseMenu.ts` (`Esc`:
-Resume/Objectives/Mission select/Journal/Settings/Controls/Quit to home).
+Resume/Objectives/Mission select/Journal/Settings/Controls/Data credits/Quit to home).
 Both retire the old `O` (settings) and `N` (globe) hotkeys — `Input`'s
 `defaultActions()` no longer binds `toggleSettings` or `toggleGlobe` at all;
 those screens open only from a menu button now. `Save`'s settings record is
