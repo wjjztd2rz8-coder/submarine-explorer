@@ -72,7 +72,8 @@ export function createOnboardSystem(): GameSystem {
 
   const hintLabels = (device: InputDevice): HintLabels => {
     const input = ctxRef!.input;
-    if (device === 'touch') return { scan: 'SCAN', rov: 'E', photo: 'PHOTO', lights: 'LIGHTS' };
+    // ROV has no touch control; its contextual hint is suppressed below.
+    if (device === 'touch') return { scan: 'SCAN', rov: '', photo: 'PHOTO', lights: 'LIGHTS' };
     if (device === 'gamepad')
       return {
         scan: padLabel('scan', 'Right bumper'),
@@ -169,14 +170,20 @@ export function createOnboardSystem(): GameSystem {
         true,
       );
 
-      cleanup.add(bus.on('scan:started', () => tutorial.notify('scan') && onAdvance()));
+      cleanup.add(bus.on('scan:started', () => tutorial.notify('scan:started')));
+      cleanup.add(
+        bus.on('scan:progress', ({ progress }) => {
+          tutorial.scanProgress = progress;
+        }),
+      );
+      cleanup.add(bus.on('scan:aborted', () => tutorial.notify('scan:aborted')));
       cleanup.add(
         bus.on('scan:complete', () => {
           // A completed opening target cannot be scanned again this dive.
           // Retain success while earlier steps are still on screen.
           scanCompleted = true;
-          if (tutorial.notify('scan')) onAdvance();
-          else tutorial.remember('scan');
+          if (tutorial.notify('scan:complete')) onAdvance();
+          else tutorial.remember('scan:complete');
         }),
       );
       cleanup.add(
@@ -266,13 +273,26 @@ export function createOnboardSystem(): GameSystem {
             })
           )
             onAdvance();
-          if (scanCompleted && tutorial.notify('scan')) onAdvance();
+          if (scanCompleted && tutorial.notify('scan:complete')) onAdvance();
         }
 
         const step = tutorial.step;
+        const objectiveTitle = ctx.missionRouter?.mission.objectives.find(
+          (o) => o.primary && !o.complete,
+        )?.title;
         if (card) {
           if (step && playing)
-            card.show(tutorial.index, tutorialText(step.id, device, tutorialKeys(device)), device);
+            card.show(
+              tutorial.index,
+              tutorialText(
+                step.id,
+                device,
+                tutorialKeys(device),
+                tutorial.scanning ? tutorial.scanProgress : null,
+                objectiveTitle?.startsWith('Head to ') ? objectiveTitle.slice(8) : undefined,
+              ),
+              device,
+            );
           else card.show(null);
         }
 

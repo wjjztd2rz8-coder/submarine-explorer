@@ -96,20 +96,5 @@ export function composedFreeDiveSpawn(...args: Parameters<typeof baseFreeSpawn>)
 export function composedMissionSpawn(
   ...args: Parameters<typeof baseMissionSpawn>
 ): SpawnPose | null {
-  const pose = baseMissionSpawn(...args);
-  const framed = reframe(
-    args[0],
-    pose,
-    args[3],
-    args[4],
-    args[5],
-    args[6],
-    args[7] ?? DEFAULT_CAMERA,
-  );
-  return framed &&
-    args[1].some(
-      ({ position: p }) => Math.hypot(p.x - framed.x, p.y - framed.y, p.z - framed.z) <= 300,
-    )
-    ? framed
-    : pose;
+  return baseMissionSpawn(...args);
 }

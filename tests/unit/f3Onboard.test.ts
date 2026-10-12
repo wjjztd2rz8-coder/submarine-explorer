@@ -194,13 +194,13 @@ describe('tutorial progression', () => {
   });
   it('events only count for the step waiting for them', () => {
     const t = new Tutorial();
-    expect(t.notify('scan')).toBe(false);
+    expect(t.notify('scan:complete')).toBe(false);
     hold(t, { throttle: 1, yaw: 1 });
     hold(t, { ballast: -1 });
     expect(t.step?.id).toBe('lights');
     expect(t.notify('journal')).toBe(false);
     expect(t.notify('lights')).toBe(true);
-    expect(t.notify('scan')).toBe(true);
+    expect(t.notify('scan:complete')).toBe(true);
     expect(t.step?.id).toBe('journal');
     expect(t.notify('photo')).toBe(true);
     expect(t.finished).toBe(true);
@@ -209,7 +209,7 @@ describe('tutorial progression', () => {
   });
   it('events done out of order skip their step on arrival', () => {
     const t = new Tutorial();
-    t.remember('scan');
+    t.remember('scan:complete');
     t.remember('lights');
     expect(t.step?.id).toBe('move'); // a scan during move does not advance it
     hold(t, { throttle: 1 });

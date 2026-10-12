@@ -9,6 +9,7 @@ import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
+let visualHints = false;
 
 export const waypointsSystem: GameSystem = {
   name: 'waypoints',
@@ -17,7 +18,8 @@ export const waypointsSystem: GameSystem = {
     const { discovery, settings, sonar, route, save } = ctx;
     const waypoints = new Waypoints(discovery.scanner);
     ctx.waypoints = waypoints;
-    waypoints.setVisualHints(settings.gameplay.visualHints);
+    visualHints = settings.gameplay.visualHints;
+    waypoints.setVisualHints(visualHints);
     waypoints.setReducedMotion(settings.reduceMotion);
     waypoints.setPalette(settings.sonarPalette);
     void discovery.ready.then(() => waypoints.setPois(discovery.pois));
@@ -44,7 +46,10 @@ export const waypointsSystem: GameSystem = {
     }
     cleanup.add(
       save.onChange((next, changed) => {
-        if (changed.includes('gameplay')) waypoints.setVisualHints(next.gameplay.visualHints);
+        if (changed.includes('gameplay')) {
+          visualHints = next.gameplay.visualHints;
+          waypoints.setVisualHints(visualHints);
+        }
         if (changed.includes('reduceMotion')) waypoints.setReducedMotion(next.reduceMotion);
         if (changed.includes('sonarPalette')) waypoints.setPalette(next.sonarPalette);
       }),
@@ -57,6 +62,14 @@ export const waypointsSystem: GameSystem = {
       const nextScanObjective =
         missionRouter?.mission.objectives.find((o) => o.resolved && !o.complete && o.primary) ??
         missionRouter?.mission.objectives.find((o) => o.resolved && !o.complete);
+      // Near-site approaches retain their navigation marker in Realistic too.
+      // Once in scan range, resume the pilot's normal visual-waypoint preference.
+      const approach = nextScanObjective?.title.startsWith('Head to ') ?? false;
+      const showHints = ctx.save.get().gameplay.visualHints || approach;
+      if (showHints !== visualHints) {
+        visualHints = showHints;
+        ctx.waypoints.setVisualHints(visualHints);
+      }
       f.nextScanObjective = nextScanObjective;
       ctx.discovery.scanner.setObjective(nextScanObjective?.poiId ?? null);
       const scanContent = route?.def.objectives.find((o) => o.id === nextScanObjective?.id) as
@@ -68,7 +81,10 @@ export const waypointsSystem: GameSystem = {
           ? {
               poiId: nextScanObjective.poiId,
               title: nextScanObjective.title,
-              hint: scanContent?.hint ?? ctx.scanObjectiveHints.get(nextScanObjective.id),
+              hint:
+                nextScanObjective.hint ||
+                scanContent?.hint ||
+                ctx.scanObjectiveHints.get(nextScanObjective.id),
             }
           : null,
       );

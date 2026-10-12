@@ -174,9 +174,11 @@ describe('F-GOLDEN-CHECK hero spawn and ambient readability', () => {
             expect(altitude).toBeGreaterThanOrEqual(
               settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM - 1e-6,
             );
-            expect(altitude, opening).toBeLessThanOrEqual(limits.maxAltitude);
-            // Monterey and Blue Hole missions open at survey contacts, away from the scenic free-dive props.
-            if (opening === 'free' || !['monterey-canyon', 'great-blue-hole'].includes(site)) {
+            if (opening === 'free')
+              expect(altitude, opening).toBeLessThanOrEqual(limits.maxAltitude);
+            else expect(altitude, opening).toBeLessThanOrEqual(300);
+            // Only free dives pin the hero's beauty-frame distance; missions pin the transit instead.
+            if (opening === 'free') {
               const centreRange = Math.hypot(
                 position.x - hero.root.position.x,
                 position.z - hero.root.position.z,

@@ -146,7 +146,7 @@ test('Lost City briefing mode changes and surface starts restore the appropriate
   page,
 }) => {
   await ready(page, 'mission=lost-city');
-  await expect.poll(async () => (await camera(page)).radius).toBe(lostCityRadius);
+  await expect.poll(async () => (await camera(page)).radius).toBeCloseTo(defaultRadius, 6);
   const briefing = page.locator('.briefing');
   await briefing.getByRole('radio', { name: 'Realistic', exact: true }).check();
   await expect.poll(async () => (await camera(page)).radius).toBeCloseTo(defaultRadius, 6);
@@ -160,7 +160,7 @@ test('Lost City briefing mode changes and surface starts restore the appropriate
 
   await page.evaluate(() => (window.__game as unknown as Game).save.setGameplayMode('arcade'));
   await ready(page, 'mission=lost-city');
-  await expect.poll(async () => (await camera(page)).radius).toBe(lostCityRadius);
+  await expect.poll(async () => (await camera(page)).radius).toBeCloseTo(defaultRadius, 6);
   await page
     .locator('.briefing')
     .getByRole('radio', { name: /^at the surface/ })

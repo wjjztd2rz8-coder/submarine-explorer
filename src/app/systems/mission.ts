@@ -15,32 +15,73 @@ import {
 } from '../../game/MissionRouter.js';
 import { tileUrl } from '../../ui/MissionSelect.js';
 import type { GameSystem } from '../System.js';
-import { spawnHeight, spawnSettings } from '../../game/Spawn.js';
+import {
+  MISSION_APPROACH_M,
+  missionApproachScanRadius,
+  spawnHeight,
+  spawnSettings,
+} from '../../game/Spawn.js';
 import { composedMissionSpawn } from '../../game/DeepOpeningSpawn.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
+let approachOpening = false;
+const APPROACH_DESTINATIONS: Readonly<Record<string, string>> = {
+  titanic: 'the bow',
+  'challenger-deep': "Leggo's lander site",
+  'lost-city': 'Poseidon',
+  'monterey-canyon': 'the north canyon wall',
+  endurance: 'the main hull',
+  'axial-seamount-ashes': 'Mushroom vent',
+  'hudson-canyon': 'the coral ledge',
+  kamaehuakanaloa: 'Hiolo North',
+  'beebe-vent-field': 'the Beebe smokers',
+  'great-blue-hole': 'the stalactite gallery',
+  bismarck: 'the main hull',
+  'hunga-tonga-caldera': 'the volcanic rim slope',
+  'blake-plateau-corals': 'the coral mound cluster',
+};
 
 export const missionSystem: GameSystem = {
   name: 'mission',
   dispose: () => cleanup.dispose(),
   init(ctx) {
+    approachOpening = false;
     const { route, params, discovery, meta, terrain, config, sub, rig, headlights, bus } = ctx;
     const { settings, input, save, settingsScreen } = ctx;
     let lastStart: typeof sub.position | null = null;
     let lastChoice: MissionStartPosition = settings.gameplay.startPosition;
+    const originalScanRadii = new Map<string, number>();
     // D2-PREDIVE: also used to preview the start behind the briefing, so Begin
     // resolves the same pose and the dive starts without a teleport.
     const applyMissionStart = (choice: MissionStartPosition): void => {
       if (!route || params.has('poi') || params.has('at') || params.has('depth')) return;
-      const mode = save.get().gameplayMode;
+      // Cap only mission primaries: Extended sensors must still leave a transit.
+      approachOpening = choice === 'near-site';
+      const sensor = config.sensorPresets[save.get().gameplay.sensors];
+      for (const objective of route.def.objectives.filter((o) => o.primary)) {
+        const poi = discovery.pois.find((p) => p.id === objective.poi);
+        if (!poi) continue;
+        const original =
+          originalScanRadii.get(poi.id) ??
+          ctx.baseScanRadii.get(poi.id) ??
+          poi.radius / sensor.scanRadiusMultiplier;
+        originalScanRadii.set(poi.id, original);
+        const radius =
+          choice === 'near-site' ? missionApproachScanRadius(route.landmarkId, original) : original;
+        ctx.baseScanRadii.set(poi.id, radius);
+        poi.radius = radius * sensor.scanRadiusMultiplier;
+      }
       const opening =
-        choice === 'near-site' && !ctx.daily && mode === 'arcade'
+        choice === 'near-site'
           ? composedMissionSpawn(
               route.landmarkId,
-              discovery.pois.filter((p) =>
-                route.def.objectives.some((o) => o.primary && o.poi === p.id),
-              ),
+              route.def.objectives
+                .filter((o) => o.primary)
+                .flatMap((o) => {
+                  const poi = discovery.pois.find((p) => p.id === o.poi);
+                  return poi ? [poi] : [];
+                }),
               meta,
               terrain,
               ctx.props,
@@ -59,7 +100,7 @@ export const missionSystem: GameSystem = {
           terrain,
           config,
         );
-      if (ctx.daily) {
+      if (ctx.daily && !opening) {
         pose.x += ctx.daily.start.x;
         pose.z += ctx.daily.start.z;
         // Keep the small approach variation above the local seabed.
@@ -69,13 +110,12 @@ export const missionSystem: GameSystem = {
       sub.reset(pose.x, pose.y, pose.z, pose.yaw);
       lastStart = sub.position.clone();
       lastChoice = choice;
-      if (route.landmarkId === 'lost-city' || opening?.chaseOffsetY !== undefined)
-        rig.setChaseRadiusDefault(
-          opening?.chaseRadius,
-          opening?.chaseOffsetX,
-          opening?.chaseOffsetY,
-          opening?.portraitChaseOffset,
-        );
+      rig.setChaseRadiusDefault(
+        opening?.chaseRadius,
+        opening?.chaseOffsetX,
+        opening?.chaseOffsetY,
+        opening?.portraitChaseOffset,
+      );
       rig.snap(sub.position, sub.yaw, sub.pitch);
       headlights.setEnabled(true);
     };
@@ -189,6 +229,25 @@ export const missionSystem: GameSystem = {
     // fix S: `sub` lets the router turn the end of an emergency blow into the
     // "Dive aborted" debrief (plan/DECISIONS.md failure model).
     'play.mission': (f, ctx) => {
+      const mission = ctx.missionRouter?.mission;
+      const first = mission?.objectives.find((o) => o.primary);
+      const original = ctx.route?.def.objectives.find((o) => o.id === first?.id);
+      const target = ctx.discovery.pois.find((p) => p.id === first?.poiId);
+      if (first && original && target) {
+        const distance = ctx.sub.position.distanceTo(target.position);
+        const navigating = approachOpening && !first.complete && distance > target.radius;
+        const site = ctx.route!.landmarkId;
+        const destination = APPROACH_DESTINATIONS[site] ?? target.name;
+        const title = navigating ? `Head to ${destination}` : original.title;
+        const hint = navigating
+          ? `Head to ${destination}, ${MISSION_APPROACH_M[site] ?? 220} m ahead.`
+          : original.hint;
+        if (first.title !== title || first.hint !== hint) {
+          first.title = title;
+          first.hint = hint;
+          ctx.missionRouter!.panel.setObjectives(mission!.objectives);
+        }
+      }
       ctx.missionRouter?.update(f.clockDt, f.dt, ctx.sub.position, f.sub.headingDeg, f.sub);
     },
   },

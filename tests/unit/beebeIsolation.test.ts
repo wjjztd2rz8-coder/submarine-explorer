@@ -61,7 +61,7 @@ it('850: other sites retain byte-identical biome, terrain buffers, uniforms, sha
     }
     evidence[id] = { biome: digest(JSON.stringify(biome)), tiers };
   }
-  // Only the Beebe authored opening may change; shared spawn logic stays identical.
+  // Pin shared spawning too; 1391 deliberately changes mission approaches while retaining free-dive frames.
   evidence.spawn = digest(
     readFileSync('src/game/Spawn.ts', 'utf8').replace(
       /  'beebe-vent-field': \{[\s\S]*?\n  \},/,

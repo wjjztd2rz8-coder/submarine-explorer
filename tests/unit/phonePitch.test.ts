@@ -11,6 +11,7 @@ import {
   chooseFreeDiveHull,
   composedFreeDiveSpawn,
   composedMissionSpawn,
+  missionApproachScanRadius,
   spawnSettings,
 } from '../../src/game/Spawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
@@ -54,7 +55,7 @@ describe('760 non-hero phone opening poses', () => {
 
   for (const [site, heroId] of sites) {
     for (const tier of ['low', 'medium'] as const) {
-      it(`${site} ${tier}: free and mission poses keep the hero close, camera clear and first scan within 120 m`, async () => {
+      it(`${site} ${tier}: free beauty frame and mission approach keep the camera clear and navigation in view`, async () => {
         const config = makeConfig();
         const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;
         const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
@@ -122,7 +123,12 @@ describe('760 non-hero phone opening poses', () => {
             const heroDistance = bounds.distanceToPoint(position);
             const scanDistance = nearest.position.distanceTo(position);
             const scanner = new Scanner(config.scan, new EventBus());
-            scanner.setTargets(pois);
+            scanner.setTargets(
+              opening === 'mission'
+                ? pois.map((p) => ({ ...p, radius: missionApproachScanRadius(site, p.radius) }))
+                : pois,
+            );
+            if (opening === 'mission') scanner.setObjective(nearest.id);
             scanner.update(
               0,
               position,
@@ -131,12 +137,17 @@ describe('760 non-hero phone opening poses', () => {
             );
             const candidate = pois.find((p) => p.id === scanner.view.candidateId);
             const candidateDistance = candidate?.position.distanceTo(position) ?? Infinity;
-            expect.soft(scanner.view.nearestId, `${opening}: first-frame scan hint`).not.toBeNull();
-            expect
-              .soft(scanner.view.nearestDistance, `${opening}: first scan hint distance`)
-              .toBeLessThanOrEqual(120);
-            // Check the nearest mission primary as well as the actual Scanner hint.
-            // A target within 120 m can still need an approach into its authored scan radius.
+            if (opening === 'free') {
+              expect.soft(scanner.view.nearestId, 'free: first-frame scan hint').not.toBeNull();
+              expect
+                .soft(scanner.view.nearestDistance, 'free: first scan hint distance')
+                .toBeLessThanOrEqual(120);
+            } else {
+              expect(scanner.view.objectiveId).toBe(nearest.id);
+              expect(scanner.view.objectiveDistance).toBeLessThanOrEqual(300 + 1e-6);
+              expect(scanner.view.objectiveInRange).toBe(false);
+            }
+            // Mission navigation stays available independently of the remote-contact hint radius.
             for (const aspect of [390 / 844, 844 / 390, 16 / 9]) {
               const rig = new CameraRig(config.camera, aspect, terrain);
               // Match propsSystem and missionSystem's opening camera overrides.
@@ -164,10 +175,13 @@ describe('760 non-hero phone opening poses', () => {
                   subAltitude: pose.y - terrain.sampleHeight(pose.x, pose.z),
                   pose,
                 });
+              if (opening === 'free')
+                expect
+                  .soft(heroDistance, `${opening}: hero distance`)
+                  .toBeLessThanOrEqual(rig.chaseRadius);
               expect
-                .soft(heroDistance, `${opening}: hero distance`)
-                .toBeLessThanOrEqual(rig.chaseRadius);
-              expect.soft(scanDistance, `${opening}: first scan distance`).toBeLessThanOrEqual(120);
+                .soft(scanDistance, `${opening}: first scan distance`)
+                .toBeLessThanOrEqual(opening === 'free' ? 120 : 300 + 1e-6);
               expect
                 .soft(cameraClearance, `${opening}: camera terrain clearance`)
                 .toBeGreaterThanOrEqual(config.camera.terrainClearance - 1e-6);

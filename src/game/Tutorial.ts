@@ -5,7 +5,8 @@
  */
 
 export type TutorialStepId = 'move' | 'depth' | 'lights' | 'scan' | 'journal';
-export type TutorialEvent = 'lights' | 'scan' | 'journal' | 'photo';
+export type TutorialEvent =
+  'lights' | 'scan:complete' | 'journal' | 'photo' | 'scan:started' | 'scan:aborted';
 
 export interface TutorialStep {
   id: TutorialStepId;
@@ -37,6 +38,8 @@ export interface TutorialSample {
 export class Tutorial {
   private index_ = 0;
   private active_: boolean;
+  scanning = false;
+  scanProgress = 0;
   private moveS = 0;
   private turnS = 0;
   private depthS = 0;
@@ -83,10 +86,16 @@ export class Tutorial {
 
   /** An event only counts for the step that is waiting for it. */
   notify(event: TutorialEvent): boolean {
+    if (event === 'scan:started') {
+      this.scanning = true;
+      this.scanProgress = 0;
+      return false;
+    }
+    if (event === 'scan:aborted' || event === 'scan:complete') this.scanning = false;
     const step = this.step;
     if (!step) return false;
     if (step.id === 'lights' && event === 'lights') return this.advance();
-    if (step.id === 'scan' && event === 'scan') return this.advance();
+    if (step.id === 'scan' && event === 'scan:complete') return this.advance();
     if (step.id === 'journal' && (event === 'journal' || event === 'photo')) return this.advance();
     return false;
   }
@@ -96,6 +105,7 @@ export class Tutorial {
    * arrival. Never advances the current step. Ignored if it is the current one.
    */
   remember(event: TutorialEvent): void {
+    if (event === 'scan:started' || event === 'scan:aborted') return;
     const step = this.step;
     if (step && !this.waitsFor(step.id, event)) this.early.add(event);
   }
@@ -103,6 +113,8 @@ export class Tutorial {
   /** Forget remembered actions (a new dive starts). */
   forgetEarly(): void {
     this.early.clear();
+    this.scanning = false;
+    this.scanProgress = 0;
   }
 
   /** Skip the step on screen. */
@@ -118,7 +130,7 @@ export class Tutorial {
   private waitsFor(id: TutorialStepId, event: TutorialEvent): boolean {
     return (
       (id === 'lights' && event === 'lights') ||
-      (id === 'scan' && event === 'scan') ||
+      (id === 'scan' && event === 'scan:complete') ||
       (id === 'journal' && (event === 'journal' || event === 'photo'))
     );
   }

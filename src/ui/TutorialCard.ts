@@ -21,14 +21,25 @@ export interface TutorialKeys {
 }
 
 /** Instruction text for a step on the given device. */
-export function tutorialText(id: TutorialStepId, device: InputDevice, k: TutorialKeys): string {
+export function tutorialText(
+  id: TutorialStepId,
+  device: InputDevice,
+  k: TutorialKeys,
+  scanProgress: number | null = null,
+  destination?: string,
+): string {
   switch (id) {
-    case 'move':
-      return device === 'touch'
-        ? 'Push the left stick forward to move, then sideways to turn.'
-        : device === 'gamepad'
-          ? 'Use the left stick: up to move, sideways to turn.'
-          : `Hold ${k.move} to move, then ${k.turn} to turn.`;
+    case 'move': {
+      const guidance = destination ? `Follow the marker toward ${destination}. ` : '';
+      return (
+        guidance +
+        (device === 'touch'
+          ? 'Push the left stick forward to move, then sideways to turn.'
+          : device === 'gamepad'
+            ? 'Use the left stick: up to move, sideways to turn.'
+            : `Hold ${k.move} to move, then ${k.turn} to turn.`)
+      );
+    }
     case 'depth':
       return device === 'touch'
         ? 'Slide the right slider up to rise or down to sink.'
@@ -40,6 +51,8 @@ export function tutorialText(id: TutorialStepId, device: InputDevice, k: Tutoria
         ? 'Tap LIGHTS to switch the headlights.'
         : `Press ${k.lights} to switch the headlights.`;
     case 'scan':
+      if (scanProgress !== null)
+        return `Scanning… ${Math.round(Math.max(0, Math.min(1, scanProgress)) * 100)}% · keep holding ${device === 'touch' ? 'SCAN' : k.scan}.`;
       return device === 'touch'
         ? 'Face a glowing target and hold SCAN until it finishes.'
         : `Face a glowing target and hold ${k.scan} until it finishes.`;
@@ -141,7 +154,10 @@ export class TutorialCard {
       journal: 'Tap PHOTO, or Pause → Journal for your finds.',
     };
     const step = TUTORIAL_STEPS[index];
-    this.phoneText.textContent = step && device === 'touch' ? phoneInstructions[step.id] : text;
+    this.phoneText.textContent =
+      step && device === 'touch' && step.id !== 'scan' && !text.startsWith('Follow the marker')
+        ? phoneInstructions[step.id]
+        : text;
     this.dots.querySelectorAll('.onboard-dot').forEach((dot, i) => {
       dot.classList.toggle('is-done', i < index);
       dot.classList.toggle('is-current', i === index);
