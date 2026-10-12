@@ -97,7 +97,17 @@ for (const viewport of [
         }, scale);
         await expect(page.locator('.scan-panel')).toBeVisible();
         await expect(page.locator('.scan-hint')).toHaveText('HOLD SCAN TO SCAN');
-        const controls = ['.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause'];
+        const controls = [
+          '.tc-stick',
+          '.tc-slider',
+          '.tc-btn-scan',
+          '.tc-btn-lights',
+          '.tc-btn-sonar',
+          '.tc-btn-photo',
+          '.tc-btn-pause',
+          '.tc-btn-boost',
+          '.hud-journal',
+        ];
         const hud = ['.sonar', '.hud-readouts', '.scan-panel', '.hud-attribution'];
         if (viewport.width < viewport.height)
           await expect(page.locator('.tc-rotate-hint')).toBeHidden();
@@ -153,7 +163,16 @@ for (const viewport of [
         await expect(page.locator('.sonar')).toHaveClass(/d-sonar-expanded/);
         for (const button of await page.locator('.d2-sonar-controls button').all())
           await reachable(button);
-        await separate(page, ['.sonar', '.tc-buttons', '.tc-btn-pause']);
+        await separate(page, [
+          '.sonar',
+          '.tc-btn-scan',
+          '.tc-btn-lights',
+          '.tc-btn-sonar',
+          '.tc-btn-photo',
+          '.tc-btn-pause',
+          '.tc-btn-boost',
+          '.hud-journal',
+        ]);
         if (scale === 100)
           await page.screenshot({ path: testInfo.outputPath('expanded-sonar.png') });
         await page.locator('.tc-btn-sonar').tap();
@@ -185,7 +204,10 @@ for (const viewport of [
         '.sonar',
         '.tc-stick',
         '.tc-slider',
-        '.tc-buttons',
+        '.tc-btn-scan',
+        '.tc-btn-lights',
+        '.tc-btn-sonar',
+        '.tc-btn-photo',
         '.tc-btn-pause',
         '.hud-attribution',
       ]);

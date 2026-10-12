@@ -27,8 +27,13 @@ const selectors = [
   '.hud-notice',
   '.tc-stick',
   '.tc-slider',
-  '.tc-buttons',
+  '.tc-btn-scan',
+  '.tc-btn-lights',
+  '.tc-btn-sonar',
+  '.tc-btn-photo',
   '.tc-btn-pause',
+  '.tc-btn-boost',
+  '.hud-journal',
   '.hud-control-tips',
   '.hud-reset-camera',
 ];
@@ -126,7 +131,9 @@ async function away(page: Page): Promise<void> {
 
 for (const viewport of [
   { width: 844, height: 390, touch: true },
+  { width: 667, height: 375, touch: true },
   { width: 390, height: 844, touch: true },
+  { width: 1024, height: 768, touch: true },
   { width: 1280, height: 720, touch: true },
   { width: 1280, height: 720, touch: false },
 ]) {

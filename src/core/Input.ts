@@ -306,8 +306,10 @@ export class Input {
    * non-zero axis overrides the keyboard value, like a deflected gamepad stick.
    */
   readonly touchAxes = { throttle: 0, yaw: 0, pitch: 0, ballast: 0 };
-  /** Level-triggered actions held by an on-screen button (`boost`, `scan`). */
+  /** Level-triggered actions held by an on-screen button (`scan`). */
   readonly touchHeld = new Set<ActionId>();
+  /** Touch Boost stays on between taps; desktop and gamepad still hold. */
+  touchBoost = false;
   /** True while the touch controls are the player's primary input. */
   touchActive = false;
 
@@ -598,6 +600,7 @@ export class Input {
     this.keys.clear();
     this.edgeArmed.clear();
     this.touchHeld.clear();
+    this.touchBoost = false;
     this.padIndex = null;
     this.padPressed.clear();
   }
@@ -653,7 +656,7 @@ export class Input {
     if (ta.yaw) s.yaw = ta.yaw;
     if (ta.pitch) s.pitch = ta.pitch;
     if (ta.ballast) s.ballast = ta.ballast;
-    if (this.touchHeld.has('boost')) s.boost = true;
+    if (this.touchBoost) s.boost = true;
     if (this.touchHeld.has('scan')) s.scan = true;
 
     if (this.edgeArmed.size) {
