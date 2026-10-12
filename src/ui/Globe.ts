@@ -8,8 +8,10 @@
  * - Pins: one real `<button>` per landmark in data/landmarks.json, projected
  *   over the canvas every frame, so Tab / Enter / screen readers work without
  *   a custom focus model. Three states (GlobeModel.resolvePinState): mission,
- *   tile (free dive), catalogue (card only). Pins that overlap on screen are
- *   fanned out on a small ring with a hairline leader to the true position.
+ *   tile (free dive), catalogue (card only). Every pin is drawn exactly at its
+ *   projected location; playable pins whose hit areas would overlap merge into
+ *   one counted cluster pin (click: zoom in until they separate, or a chooser
+ *   at full zoom). Catalogue pins are faint, non-pointer specks.
  * - Controls: drag to orbit (with inertia), wheel to zoom, idle auto-rotate;
  *   arrows orbit, +/- zoom, Tab cycles pins (the camera turns to face the
  *   focused one), Enter selects, Escape (or the toggle key) closes.
@@ -25,6 +27,8 @@ import type { GlobeConfig } from '../core/Config.js';
 import type { GameEvents } from '../core/EventBus.js';
 import { FocusTrap } from './FocusTrap.js';
 import {
+  clusterPins,
+  distanceToSeparate,
   facesCamera,
   formatDepth,
   latLonToUnit,
@@ -32,10 +36,10 @@ import {
   OrbitState,
   pinAction,
   pinBadge,
-  spreadOverlaps,
+  shortName,
   type GlobeCatalog,
   type GlobeSite,
-  type ScreenPin,
+  unitToLatLon,
   type Vec3,
 } from './GlobeModel.js';
 import { missionUrl, tileUrl } from './MissionSelect.js';
@@ -69,11 +73,31 @@ export interface GlobeOptions {
 interface Pin {
   site: GlobeSite;
   el: HTMLButtonElement;
-  line: SVGLineElement;
   unit: Vec3;
+  /** Missions and free dives take part in clustering; catalogue specks do not. */
+  playable: boolean;
+  /** Last values written to the DOM, so a still globe writes nothing. */
+  x: number;
+  y: number;
+  opacity: number;
+  clustered: boolean;
+  back: boolean;
+  flip: boolean;
 }
 
-const SVG_NS = 'http://www.w3.org/2000/svg';
+/** One counted cluster button; pooled, grown on demand. */
+interface ClusterEl {
+  el: HTMLButtonElement;
+  count: HTMLSpanElement;
+  /** Seed pin index of the group it shows (-1 while hidden). */
+  leader: number;
+  size: number;
+  hash: number;
+  x: number;
+  y: number;
+  opacity: number;
+}
+
 /** Pins sit a hair above the surface so the horizon test is not ambiguous. */
 const PIN_ALTITUDE = 1.002;
 
@@ -174,11 +198,27 @@ export class Globe {
 
   private readonly canvas: HTMLCanvasElement;
   private readonly pinLayer: HTMLDivElement;
-  private readonly lines: SVGSVGElement;
+  private readonly chooser: HTMLDivElement;
   private readonly card: HTMLDivElement;
   private readonly legend: HTMLDivElement;
   private readonly trap: FocusTrap;
   private pins: Pin[] = [];
+  private clusterEls: ClusterEl[] = [];
+  /** Per-frame scratch, sized to the pin count in setSites (no per-frame allocation). */
+  private sx = new Float32Array(0);
+  private sy = new Float32Array(0);
+  private alpha = new Float32Array(0);
+  private eligible = new Uint8Array(0);
+  private owner = new Int32Array(0);
+  private groupX = new Float32Array(0);
+  private groupY = new Float32Array(0);
+  private groupN = new Int32Array(0);
+  private groupAlpha = new Float32Array(0);
+  private groupHash = new Int32Array(0);
+  private hitPx = 0;
+  private readonly coarse: MediaQueryList | null;
+  private chooserLeader = -1;
+  private lastPointerType = '';
   private open_ = false;
   private hovered: GlobeSite | null = null;
   private focused: GlobeSite | null = null;
@@ -213,9 +253,6 @@ export class Globe {
 
     this.canvas = el('canvas', 'globe-canvas');
     this.canvas.setAttribute('aria-hidden', 'true');
-    this.lines = document.createElementNS(SVG_NS, 'svg');
-    this.lines.classList.add('globe-leaders');
-    this.lines.setAttribute('aria-hidden', 'true');
     this.pinLayer = el('div', 'globe-pins');
     this.pinLayer.setAttribute('role', 'group');
     this.pinLayer.setAttribute('aria-label', 'Dive sites');
@@ -239,10 +276,34 @@ export class Globe {
     const hint = el(
       'div',
       'globe-hint',
-      'DRAG ROTATE · WHEEL / + − ZOOM · ARROWS ORBIT · TAB PINS · ENTER SELECT · ESC CLOSE',
+      'DRAG ROTATE · WHEEL / + − ZOOM · NUMBERED PINS ZOOM IN · TAB PINS · ENTER SELECT · ESC CLOSE',
     );
 
-    this.root.append(this.canvas, this.lines, this.pinLayer, header, this.card, hint);
+    this.chooser = el('div', 'globe-chooser');
+    this.chooser.setAttribute('role', 'group');
+    this.chooser.setAttribute('aria-label', 'Sites here');
+    this.chooser.hidden = true;
+    const zoom = el('div', 'globe-zoom');
+    zoom.setAttribute('role', 'group');
+    zoom.setAttribute('aria-label', 'Zoom');
+    const zoomButton = (text: string, label: string, factor: number): HTMLButtonElement => {
+      const b = el('button', 'globe-zoom-btn', text);
+      b.type = 'button';
+      b.setAttribute('aria-label', label);
+      b.addEventListener('click', () => {
+        this.closeChooser();
+        this.orbit.zoomBy(factor);
+      });
+      return b;
+    };
+    zoom.append(
+      zoomButton('+', 'Zoom in', 1 / cfg.keyZoomFactor),
+      zoomButton('\u2212', 'Zoom out', cfg.keyZoomFactor),
+    );
+
+    this.root.append(this.canvas, this.pinLayer, header, zoom, this.card, this.chooser, hint);
+    this.coarse =
+      typeof window.matchMedia === 'function' ? window.matchMedia('(pointer: coarse)') : null;
     (opts.parent ?? document.body).appendChild(this.root);
     this.trap = new FocusTrap(this.root);
 
@@ -306,6 +367,7 @@ export class Globe {
     this.drag = null;
     this.orbit.endDrag();
     this.hovered = null;
+    this.closeChooser();
     if (!this.opts.embedded) this.trap.deactivate();
   }
 
@@ -321,24 +383,21 @@ export class Globe {
     // covers browsers without ResizeObserver before the next presented frame.
     if (this.root.clientWidth !== this.size.width || this.root.clientHeight !== this.size.height)
       this.resize();
-    this.orbit.update(Math.min(dt, 0.1));
-    const orbitCam = this.orbit.cameraPosition();
     const w = this.root.clientWidth || window.innerWidth;
     const h = this.root.clientHeight || window.innerHeight;
-    // The home globe may live in a narrow panel. Fit the outer atmosphere
-    // shell to the smaller field of view so neither limb is cropped.
-    const halfVertical = (this.opts.config.fovDeg * Math.PI) / 360;
-    const halfHorizontal = Math.atan(Math.tan(halfVertical) * (w / h));
-    const fitDistance = this.opts.embedded
-      ? this.opts.config.atmosphereScale / Math.sin(Math.min(halfVertical, halfHorizontal) * 0.9)
-      : 0;
-    const cameraDistance = Math.max(this.orbit.distance, fitDistance);
-    const scale = cameraDistance / this.orbit.distance;
-    const cam = {
-      x: orbitCam.x * scale,
-      y: orbitCam.y * scale,
-      z: orbitCam.z * scale,
-    };
+    // The home globe may live in a narrow panel. Its zoomed-out view fits the
+    // outer atmosphere shell to the smaller field of view so neither limb is
+    // cropped; the player zooms in from there.
+    if (this.opts.embedded) {
+      const halfVertical = (this.opts.config.fovDeg * Math.PI) / 360;
+      const halfHorizontal = Math.atan(Math.tan(halfVertical) * (w / h));
+      this.orbit.setFitDistance(
+        this.opts.config.atmosphereScale / Math.sin(Math.min(halfVertical, halfHorizontal) * 0.9),
+      );
+    }
+    this.orbit.update(Math.min(dt, 0.1));
+    const cam = this.orbit.cameraPosition();
+    const cameraDistance = this.orbit.distance;
     if (this.camera) {
       if (cameraDistance + this.opts.config.atmosphereScale >= this.camera.far) {
         this.camera.far = cameraDistance + this.opts.config.atmosphereScale + 1;
@@ -401,7 +460,8 @@ export class Globe {
   private setSites(sites: GlobeSite[]): void {
     this.sites = sites;
     this.pinLayer.replaceChildren();
-    this.lines.replaceChildren();
+    this.clusterEls = [];
+    this.closeChooser();
     this.pins = sites.map((site) => {
       const b = el('button', `globe-pin is-${site.state}`);
       b.type = 'button';
@@ -414,7 +474,11 @@ export class Globe {
         'aria-label',
         `${site.name}, ${site.type}, ${formatDepth(site.depthM)}. ${site.state === 'mission' ? (this.missionAccess?.(site) ?? pinBadge(site)) : pinBadge(site)}`,
       );
-      b.append(el('span', 'globe-pin-dot'));
+      // The small visible dot sits in a larger transparent button (the hit area).
+      b.append(el('span', 'globe-pin-dot'), el('span', 'globe-pin-label', shortName(site.name)));
+      b.addEventListener('pointerdown', (e) => {
+        this.lastPointerType = e.pointerType;
+      });
       b.addEventListener('pointerenter', () => {
         this.hovered = site;
         this.opts.onSiteFocus?.(site.id);
@@ -428,25 +492,53 @@ export class Globe {
       b.addEventListener('focus', () => {
         this.focused = site;
         this.opts.onSiteFocus?.(site.id);
-        this.orbit.faceLatLon(site.lat, site.lon);
+        // Only keyboard focus turns the globe: a mouse press must not move the
+        // pin out from under the pointer before the click lands.
+        if (b.matches(':focus-visible')) this.orbit.faceLatLon(site.lat, site.lon);
         this.renderCard();
       });
       b.addEventListener('blur', () => {
         if (this.focused === site) this.focused = null;
         this.renderCard();
       });
-      b.addEventListener('click', () => this.select(site));
-      const line = document.createElementNS(SVG_NS, 'line');
-      this.lines.append(line);
+      b.addEventListener('click', (e) => {
+        // First touch tap names the pin (label, card, list highlight); the
+        // second tap on it goes. Mouse and keyboard act at once.
+        const touchTap = this.lastPointerType === 'touch' && e.detail > 0;
+        this.lastPointerType = '';
+        if (touchTap && site.state !== 'catalogue' && this.pinned !== site) {
+          this.pinned = site;
+          this.renderCard();
+          return;
+        }
+        this.select(site);
+      });
       this.pinLayer.append(b);
       const u = latLonToUnit(site.lat, site.lon);
       return {
         site,
         el: b,
-        line,
         unit: { x: u.x * PIN_ALTITUDE, y: u.y * PIN_ALTITUDE, z: u.z * PIN_ALTITUDE },
+        playable: site.state !== 'catalogue',
+        x: NaN,
+        y: NaN,
+        opacity: NaN,
+        clustered: false,
+        back: false,
+        flip: false,
       };
     });
+    const n = this.pins.length;
+    this.sx = new Float32Array(n);
+    this.sy = new Float32Array(n);
+    this.alpha = new Float32Array(n);
+    this.eligible = new Uint8Array(n);
+    this.owner = new Int32Array(n);
+    this.groupX = new Float32Array(n);
+    this.groupY = new Float32Array(n);
+    this.groupN = new Int32Array(n);
+    this.groupAlpha = new Float32Array(n);
+    this.groupHash = new Int32Array(n);
     const count = (s: GlobeSite['state']): number => sites.filter((x) => x.state === s).length;
     this.legend.replaceChildren(
       this.legendItem('is-mission', `${count('mission')} MISSIONS`),
@@ -470,14 +562,30 @@ export class Globe {
     return s;
   }
 
+  /** Hit-area side for the current input: set on the root so CSS sizes the buttons to match. */
+  private syncHitSize(): number {
+    const cfg = this.opts.config;
+    const touch =
+      document.documentElement.classList.contains('is-touch') || this.coarse?.matches === true;
+    const hit = touch ? cfg.pinHitTouchPx : cfg.pinHitPx;
+    if (hit !== this.hitPx) {
+      this.hitPx = hit;
+      this.root.style.setProperty('--globe-hit', `${hit}px`);
+    }
+    return hit;
+  }
+
   private placePins(cam: Vec3, w: number, h: number): void {
     const camera = this.camera;
-    if (!camera || !this.pins.length) return;
+    const pins = this.pins;
+    const n = pins.length;
+    if (!camera || !n) return;
+    const hit = this.syncHitSize();
+    const { sx, sy, alpha, eligible, owner, groupX, groupY, groupN, groupAlpha, groupHash } = this;
     const fade = this.opts.config.pinHorizonFade;
     const camLen = Math.hypot(cam.x, cam.y, cam.z);
-    const screen: ScreenPin[] = [];
-    const alpha: number[] = [];
-    for (const p of this.pins) {
+    for (let i = 0; i < n; i++) {
+      const p = pins[i];
       const v = this.tmp.set(p.unit.x, p.unit.y, p.unit.z).project(camera);
       const front = facesCamera(p.unit, cam, PIN_ALTITUDE);
       // cos of the angle between the surface normal and the view ray.
@@ -487,29 +595,218 @@ export class Globe {
       const ndv =
         (p.unit.x * dx + p.unit.y * dy + p.unit.z * dz) /
         (Math.hypot(dx, dy, dz) * PIN_ALTITUDE || 1);
-      const a = front ? Math.min(1, Math.max(0, ndv / fade)) : 0;
-      alpha.push(camLen > 0 ? a : 0);
-      screen.push({ x: ((v.x + 1) / 2) * w, y: ((1 - v.y) / 2) * h, visible: a > 0.05 });
+      const a = front && camLen > 0 ? Math.min(1, Math.max(0, ndv / fade)) : 0;
+      alpha[i] = a;
+      sx[i] = ((v.x + 1) / 2) * w;
+      sy[i] = ((1 - v.y) / 2) * h;
+      // A focused or pinned pin always stands alone, so Tab can reach a pin
+      // that sits inside a cluster and see which one it is.
+      eligible[i] =
+        p.playable && a > 0.05 && p.site !== this.focused && p.site !== this.pinned ? 1 : 0;
     }
-    const spread = spreadOverlaps(screen, this.opts.config.pinOverlapPx);
-    for (let i = 0; i < this.pins.length; i++) {
-      const p = this.pins[i];
-      const s = spread[i];
-      const a = alpha[i];
-      const visible = screen[i].visible;
-      p.el.style.transform = `translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)`;
-      p.el.style.opacity = visible ? a.toFixed(2) : '0';
-      p.el.classList.toggle('is-back', !visible);
-      if (visible && s.group > 1) {
-        p.line.setAttribute('x1', screen[i].x.toFixed(1));
-        p.line.setAttribute('y1', screen[i].y.toFixed(1));
-        p.line.setAttribute('x2', s.x.toFixed(1));
-        p.line.setAttribute('y2', s.y.toFixed(1));
-        p.line.style.opacity = (a * 0.8).toFixed(2);
-      } else {
-        p.line.style.opacity = '0';
+    clusterPins(sx, sy, eligible, n, hit, owner);
+    groupX.fill(0, 0, n);
+    groupY.fill(0, 0, n);
+    groupN.fill(0, 0, n);
+    groupAlpha.fill(0, 0, n);
+    groupHash.fill(0, 0, n);
+    for (let i = 0; i < n; i++) {
+      const o = owner[i];
+      if (o < 0) continue;
+      groupX[o] += sx[i];
+      groupY[o] += sy[i];
+      groupN[o]++;
+      groupAlpha[o] = Math.max(groupAlpha[o], alpha[i]);
+      groupHash[o] = (groupHash[o] * 31 + i + 1) | 0;
+    }
+    const card = this.cardSite;
+    for (let i = 0; i < n; i++) {
+      const p = pins[i];
+      const o = owner[i];
+      const clustered = o >= 0 && groupN[o] > 1;
+      const back = alpha[i] <= 0.05;
+      const opacity = back || clustered ? 0 : Math.round(alpha[i] * 100) / 100;
+      const x = Math.round(sx[i] * 10) / 10;
+      const y = Math.round(sy[i] * 10) / 10;
+      if (x !== p.x || y !== p.y) {
+        p.x = x;
+        p.y = y;
+        p.el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+      }
+      if (opacity !== p.opacity) {
+        p.opacity = opacity;
+        p.el.style.opacity = String(opacity);
+      }
+      if (back !== p.back) {
+        p.back = back;
+        p.el.classList.toggle('is-back', back);
+      }
+      if (clustered !== p.clustered) {
+        p.clustered = clustered;
+        p.el.classList.toggle('is-clustered', clustered);
+      }
+      if (p.site === card) {
+        // The name label opens toward the middle of the globe, away from the edge.
+        const flip = x > w * 0.6;
+        if (flip !== p.flip) {
+          p.flip = flip;
+          p.el.classList.toggle('is-flip', flip);
+        }
       }
     }
+    let k = 0;
+    let chooserSeen = false;
+    for (let i = 0; i < n; i++) {
+      if (owner[i] !== i || groupN[i] < 2) continue;
+      const c = this.clusterEl(k++);
+      const size = groupN[i];
+      const x = Math.round((groupX[i] / size) * 10) / 10;
+      const y = Math.round((groupY[i] / size) * 10) / 10;
+      if (c.leader !== i || c.size !== size || c.hash !== groupHash[i]) {
+        c.leader = i;
+        c.size = size;
+        c.hash = groupHash[i];
+        c.count.textContent = String(size);
+        c.el.setAttribute('aria-label', this.clusterLabel(i));
+        c.el.hidden = false;
+        c.el.dataset.sites = this.clusterIds(i);
+      }
+      if (x !== c.x || y !== c.y) {
+        c.x = x;
+        c.y = y;
+        c.el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+      }
+      const opacity = Math.round(groupAlpha[i] * 100) / 100;
+      if (opacity !== c.opacity) {
+        c.opacity = opacity;
+        c.el.style.opacity = String(opacity);
+      }
+      if (this.chooserLeader >= 0 && owner[this.chooserLeader] === i) {
+        chooserSeen = true;
+        this.chooser.style.transform = `translate(${x}px, ${y}px)`;
+      }
+    }
+    for (; k < this.clusterEls.length; k++) {
+      const c = this.clusterEls[k];
+      if (c.leader >= 0) {
+        c.leader = -1;
+        c.size = 0;
+        c.hash = 0;
+        c.el.hidden = true;
+      }
+    }
+    if (this.chooserLeader >= 0) {
+      if (chooserSeen) this.orbit.poke();
+      else this.closeChooser();
+    }
+  }
+
+  private clusterEl(k: number): ClusterEl {
+    let c = this.clusterEls[k];
+    if (c) return c;
+    const b = el('button', 'globe-cluster');
+    b.type = 'button';
+    // Members are the keyboard path; the cluster is for pointer and touch.
+    b.tabIndex = -1;
+    const count = el('span', 'globe-cluster-count');
+    b.append(count);
+    c = { el: b, count, leader: -1, size: 0, hash: 0, x: NaN, y: NaN, opacity: NaN };
+    const entry = c;
+    b.addEventListener('pointerenter', () => this.orbit.poke());
+    b.addEventListener('click', () => this.openCluster(entry.leader));
+    this.pinLayer.append(b);
+    this.clusterEls[k] = c;
+    return c;
+  }
+
+  /** Pin indices of the group seeded at `leader` (last placed frame). */
+  private clusterMembers(leader: number): number[] {
+    const out: number[] = [];
+    for (let i = 0; i < this.owner.length; i++) if (this.owner[i] === leader) out.push(i);
+    return out;
+  }
+
+  private clusterIds(leader: number): string {
+    return this.clusterMembers(leader)
+      .map((i) => this.pins[i].site.id)
+      .join(' ');
+  }
+
+  private clusterLabel(leader: number): string {
+    const names = this.clusterMembers(leader).map((i) => this.pins[i].site.name);
+    return `${names.length} sites: ${names.join(', ')}. Zoom in`;
+  }
+
+  /**
+   * Click on a cluster: turn to its centre and zoom until the members separate.
+   * Already at full zoom with the members still overlapping: offer a chooser.
+   */
+  private openCluster(leader: number): void {
+    if (leader < 0) return;
+    const members = this.clusterMembers(leader).map((i) => this.pins[i]);
+    if (members.length < 2) return;
+    this.closeChooser();
+    let x = 0;
+    let y = 0;
+    let z = 0;
+    for (const m of members) {
+      x += m.unit.x;
+      y += m.unit.y;
+      z += m.unit.z;
+    }
+    const centre = unitToLatLon({ x, y, z });
+    // Closest pair decides how far in is needed.
+    let theta = Math.PI;
+    for (let i = 0; i < members.length; i++) {
+      for (let j = i + 1; j < members.length; j++) {
+        const a = members[i].unit;
+        const b = members[j].unit;
+        const cos = (a.x * b.x + a.y * b.y + a.z * b.z) / (PIN_ALTITUDE * PIN_ALTITUDE);
+        theta = Math.min(theta, Math.acos(Math.max(-1, Math.min(1, cos))));
+      }
+    }
+    const orbit = this.orbit;
+    const target = distanceToSeparate(
+      theta,
+      this.hitPx || this.opts.config.pinHitPx,
+      this.size.height || this.root.clientHeight || window.innerHeight,
+      this.opts.config.fovDeg,
+    );
+    if (orbit.distance <= orbit.minDistance * 1.02) {
+      this.showChooser(leader, members);
+      orbit.faceLatLon(centre.lat, centre.lon);
+      return;
+    }
+    orbit.faceLatLon(centre.lat, centre.lon, Math.min(target, orbit.distance * 0.7));
+  }
+
+  private showChooser(leader: number, members: readonly Pin[]): void {
+    this.chooserLeader = leader;
+    this.chooser.replaceChildren(
+      ...members.map((m) => {
+        const b = el('button', `globe-chooser-item is-${m.site.state}`);
+        b.type = 'button';
+        b.dataset.landmark = m.site.id;
+        b.append(
+          el('span', 'globe-chooser-dot'),
+          el('span', 'globe-chooser-name', m.site.name),
+          el('span', 'globe-chooser-badge', pinBadge(m.site)),
+        );
+        b.addEventListener('pointerenter', () => this.opts.onSiteFocus?.(m.site.id));
+        b.addEventListener('click', () => {
+          this.closeChooser();
+          this.select(m.site);
+        });
+        return b;
+      }),
+    );
+    this.chooser.hidden = false;
+    this.chooser.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
+  }
+
+  private closeChooser(): void {
+    this.chooserLeader = -1;
+    this.chooser.hidden = true;
   }
 
   private renderCard(): void {
@@ -548,6 +845,7 @@ export class Globe {
       this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now() };
       this.orbit.beginDrag();
       this.pinned = null;
+      this.closeChooser();
       this.renderCard();
       this.root.setPointerCapture?.(e.pointerId);
       this.root.classList.add('is-dragging');
@@ -572,6 +870,7 @@ export class Globe {
       if (!this.open_) return;
       e.preventDefault();
       const px = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * 400 : e.deltaY;
+      this.closeChooser();
       this.orbit.zoomBy(Math.exp(px * this.opts.config.wheelZoomPerPx));
     };
     this.root.addEventListener('pointerdown', onDown);
@@ -597,6 +896,13 @@ export class Globe {
     };
     const onKeyDown = (e: KeyboardEvent): void => {
       if (!this.open_) return;
+      if (e.code === 'Escape' && !this.chooser.hidden) {
+        // Escape dismisses the chooser first, before it closes anything else.
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.closeChooser();
+        return;
+      }
       if (this.opts.embedded) {
         if (!this.root.contains(document.activeElement)) return;
         if (e.code === 'Tab' || e.code === 'Escape') return;
@@ -740,6 +1046,5 @@ export class Globe {
       this.camera.aspect = w / Math.max(1, h);
       this.camera.updateProjectionMatrix();
     }
-    this.lines.setAttribute('viewBox', `0 0 ${w} ${h}`);
   }
 }

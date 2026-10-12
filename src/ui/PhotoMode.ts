@@ -116,9 +116,15 @@ export class PhotoMode {
     document.body.classList.toggle('photo-active', on);
     // Hidden dive controls retain layout boxes but cannot receive restored focus.
     if (!on) this.trap.deactivate();
-    const keys = captureKey === 'Space' ? 'Space' : `${captureKey} / Space`;
-    this.captureButton.textContent = `Capture (${keys})`;
-    this.tips.textContent = 'Done / Esc: exit photo mode · drag orbit · pinch or wheel zoom';
+    // No keys on a touch screen: the button says what it does, the tip is gestures.
+    if (document.documentElement.classList.contains('is-touch')) {
+      this.captureButton.textContent = 'Capture';
+      this.tips.textContent = 'Drag to orbit · pinch to zoom';
+    } else {
+      const keys = captureKey === 'Space' ? 'Space' : `${captureKey} / Space`;
+      this.captureButton.textContent = `Capture (${keys})`;
+      this.tips.textContent = 'Esc: exit · drag: orbit · wheel: zoom';
+    }
     if (!on) this.hideToast();
   }
 

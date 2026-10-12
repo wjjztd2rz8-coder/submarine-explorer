@@ -66,7 +66,7 @@ for (const layout of [
       await boot(page, layout.touch);
       await shot(page, `${before ? 'before' : 'after'}-${layout.name}`);
       if (before) return; // Capture the unmodified game before applying the fix.
-      const selectors = ['.onboard-card', '.scan-panel', '.hud-readouts', '.hud-attribution'];
+      const selectors = ['.onboard-card', '.scan-panel', '.hud-readouts'];
       if (layout.touch) {
         await expect(page.locator('.hud-control-tips')).toBeHidden();
         selectors.push('.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause');

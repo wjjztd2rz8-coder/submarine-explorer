@@ -60,8 +60,11 @@ seabed + hullRadius + seabedClearance + mission.spawnClearanceM]`. The
    range, then restore the authored scan instructions. This opening marker is
    also shown for Realistic near-site starts; other waypoint preferences resume
    on arrival. Free dives retain their independent composed beauty frames.
-3. **Briefing.** Title, summary, target depth, hull, start, facts, hazards
-   (amber), objectives, controls, memorial note (italic). While it is up the game
+3. **Briefing.** Title, target depth, hull, objectives, memorial note (italic)
+   and the dive settings. Summary, facts and hazards (amber) sit once each in
+   one collapsed "About this site" disclosure; a hazard that only repeats the
+   hull rating is dropped, and there is no controls list (the pause menu has
+   Controls, or "How to play" on touch). While it is up the game
    is frozen: no physics steps, input replaced by `FROZEN_INPUT`, no dive time
    counted. "Begin dive" or Enter starts it; `?skipBriefing=1` skips it (e2e).
    Tab is trapped inside the card (`src/ui/FocusTrap.ts`; the debrief and field
@@ -156,11 +159,25 @@ not listed, with entries per site (guide entries no POI points at), per POI
 `species.json`. Unlocks read `subexplorer.discoveries.v1`, which the Journal
 never writes: a site opens on any scan there, a POI entry on its POI's scan,
 and a species only when a scanned POI's entry names it; other species stay
-spoiler-only until a future encounter system. "Show undiscovered entries
-(spoilers)" is an in-memory toggle. The front page says once that the seabed
-is real survey data and that wrecks, structures and markers are recreations;
-entries for POIs with `reconstruction: true` carry a small **Recreation** tag,
-and every entry lists its sources.
+spoiler-only until a future encounter system. "Show spoilers" is an in-memory
+switch (under the contents tree on desktop, at the end of the contents and site
+pages on a phone). The front page says once that the seabed is real survey data
+and that wrecks, structures and markers are recreations; entries for POIs with
+`reconstruction: true` carry a small **Recreation** tag, and every entry lists
+its sources.
+
+Layout: desktop is a two-pane reader (a contents tree beside the article). On a
+phone (width up to 760 px, or touch in landscape under 520 px tall; `.is-phone`
+on the root) it is a full-screen sheet with a sticky header (back arrow, title,
+Close icon). Navigation is list-first and the back arrow goes up one level:
+the front page lists the sites as large rows with `3/8` badges, a site page
+lists its entries as rows, an entry is the article. A site page is the summary,
+progress chips (entries, species, animals, secrets), the entry rows, one
+collapsed **About this site** (facts from the mission briefing and catalogue
+with repeats merged, hazards without the hull-rating line, references) and, on
+the last line, the terrain data credit (GMRT, with its CC BY 4.0 link, read from
+`data/tiles/index.json`). In short landscape the entries sit beside the text.
+The merging rules live in `src/ui/journalAbout.ts`.
 
 ## Titanic time budget
 

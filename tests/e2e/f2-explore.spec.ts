@@ -147,8 +147,11 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
     g.journal.open();
     g.journal.show('monterey-canyon');
   });
-  await expect(page.locator('.jr-progress')).toContainText('Secrets found 3/3');
-  await page.getByRole('button', { name: 'Lost instrument frame', exact: true }).click();
+  await expect(page.locator('.jr-progress')).toContainText('3/3 secrets');
+  await page
+    .locator('.jr-nav')
+    .getByRole('button', { name: 'Lost instrument frame', exact: true })
+    .click();
   await expect(page.locator('.jr-title')).toHaveText('Lost instrument frame');
   await expect(page.locator('.jr-title-row .jr-tag')).toHaveText('Game addition');
   await shot(page, 'journal-secret');

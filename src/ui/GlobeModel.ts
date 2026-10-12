@@ -7,9 +7,8 @@
  *   (u = 0 at lon -180, v = 0 at the north pole):
  *       lon 0 -> +X, lon 90 E -> -Z, north pole -> +Y.
  * - {@link resolvePinState}: mission / tile / catalogue (docs/globe.md).
- * - {@link spreadOverlaps}: pins closer than N screen pixels are grouped and
- *   fanned out on a small ring, so the Mid-Atlantic and Pacific vent clusters
- *   stay individually clickable at any zoom.
+ * - {@link clusterPins}: pins whose hit areas would overlap merge into one
+ *   counted cluster pin; every other pin sits exactly on its location.
  * - {@link OrbitState}: drag / wheel / keyboard orbit with inertia, idle
  *   auto-rotate and an eased "turn to face this pin".
  * - {@link loadGlobeCatalog}: landmarks.json + index.json + mission summaries
@@ -222,81 +221,64 @@ export async function loadGlobeCatalog(
 /** Where a landmark's content lives (for docs and the card). */
 export const contentFolder = (id: string): string => `${CONTENT_ROOT}/${id}/`;
 
-// ------------------------------------------------------------ overlap spread
+// ------------------------------------------------------------ pin clusters
 
-export interface ScreenPin {
-  x: number;
-  y: number;
-  /** Only visible pins take part; hidden ones pass through unchanged. */
-  visible: boolean;
-}
-
-export interface SpreadPin {
-  x: number;
-  y: number;
-  /** Size of the overlap group this pin was fanned out in (1 = alone). */
-  group: number;
+/**
+ * Greedy proximity clustering of screen pins, for pins drawn at their true
+ * position with a `hitPx` square hit area. Walks the pins in order (so
+ * missions seed before free dives); an unassigned eligible pin becomes a seed
+ * and absorbs every later unassigned eligible pin closer than `hitPx` to it.
+ * `out[i]` is the seed index of pin i's group (its own index when alone) or -1
+ * when the pin is not eligible (hidden, catalogue, forced single). Seeding
+ * rather than chaining keeps a long row of pins from merging into one blob.
+ * Allocation-free: `out` is the caller's `Int32Array`.
+ */
+export function clusterPins(
+  x: ArrayLike<number>,
+  y: ArrayLike<number>,
+  eligible: ArrayLike<number>,
+  n: number,
+  hitPx: number,
+  out: Int32Array,
+): void {
+  out.fill(-1, 0, n);
+  const h2 = hitPx * hitPx;
+  for (let i = 0; i < n; i++) {
+    if (!eligible[i] || out[i] >= 0) continue;
+    out[i] = i;
+    for (let j = i + 1; j < n; j++) {
+      if (!eligible[j] || out[j] >= 0) continue;
+      const dx = x[i] - x[j];
+      const dy = y[i] - y[j];
+      if (dx * dx + dy * dy < h2) out[j] = i;
+    }
+  }
 }
 
 /**
- * Group visible pins whose screen distance is below `minPx` (transitively),
- * then place each group of n > 1 on a ring around its centroid whose chord
- * between neighbours is `minPx`: R = minPx / (2 sin(pi / n)). Deterministic:
- * ring order follows input order, starting at 12 o'clock.
+ * Camera distance (globe radii) at which two surface points `thetaRad` apart,
+ * viewed head-on, sit `hitPx * margin` apart on screen. Used to zoom a cluster
+ * in until its members separate. Not clamped.
  */
-export function spreadOverlaps(pins: readonly ScreenPin[], minPx: number): SpreadPin[] {
-  const n = pins.length;
-  const parent = pins.map((_, i) => i);
-  const find = (i: number): number => {
-    while (parent[i] !== i) {
-      parent[i] = parent[parent[i]];
-      i = parent[i];
-    }
-    return i;
-  };
-  const min2 = minPx * minPx;
-  for (let i = 0; i < n; i++) {
-    const a = pins[i];
-    if (!a.visible) continue;
-    for (let j = i + 1; j < n; j++) {
-      const b = pins[j];
-      if (!b.visible) continue;
-      const dx = a.x - b.x;
-      const dy = a.y - b.y;
-      if (dx * dx + dy * dy < min2) {
-        const ra = find(i);
-        const rb = find(j);
-        if (ra !== rb) parent[Math.max(ra, rb)] = Math.min(ra, rb);
-      }
-    }
-  }
-  const groups = new Map<number, number[]>();
-  for (let i = 0; i < n; i++) {
-    if (!pins[i].visible) continue;
-    const r = find(i);
-    const g = groups.get(r);
-    if (g) g.push(i);
-    else groups.set(r, [i]);
-  }
-  const out: SpreadPin[] = pins.map((p) => ({ x: p.x, y: p.y, group: 1 }));
-  for (const members of groups.values()) {
-    const k = members.length;
-    if (k < 2) continue;
-    let cx = 0;
-    let cy = 0;
-    for (const i of members) {
-      cx += pins[i].x;
-      cy += pins[i].y;
-    }
-    cx /= k;
-    cy /= k;
-    const radius = minPx / (2 * Math.sin(Math.PI / k));
-    members.forEach((i, m) => {
-      const a = -Math.PI / 2 + (2 * Math.PI * m) / k;
-      out[i] = { x: cx + radius * Math.cos(a), y: cy + radius * Math.sin(a), group: k };
-    });
-  }
-  return out;
+export function distanceToSeparate(
+  thetaRad: number,
+  hitPx: number,
+  viewportHeightPx: number,
+  fovDeg: number,
+  margin = 1.15,
+): number {
+  const focalPx = viewportHeightPx / 2 / Math.tan((fovDeg * D2R) / 2);
+  return Math.cos(thetaRad) + (focalPx * Math.sin(thetaRad)) / (hitPx * margin);
+}
+
+/**
+ * Short on-globe label: first of "A / B" or "A – B", parentheticals dropped,
+ * trailing "Hydrothermal Vent Field" style words dropped.
+ */
+export function shortName(name: string): string {
+  const first = name.split(/\s+[/–]\s+/)[0].replace(/\s*\([^)]*\)/g, '');
+  const trimmed = first.replace(/\s+(?:Hydrothermal\s+)?(?:Vent\s+)?(?:Field|Vents)$/i, '').trim();
+  return trimmed || name;
 }
 
 // -------------------------------------------------------------------- orbit
@@ -331,7 +313,9 @@ export class OrbitState {
   private vLon = 0;
   private idle = 0;
   private dragging = false;
-  private focus: { lat: number; lon: number } | null = null;
+  private focus: { lat: number; lon: number; distance: number | null } | null = null;
+  /** Embedded globes: the distance that fits the whole globe in its box (0 = n/a). */
+  private fit = 0;
   private held = { lat: 0, lon: 0 };
 
   constructor(private readonly t: OrbitTunables) {
@@ -388,11 +372,32 @@ export class OrbitState {
     }
   }
 
+  /**
+   * Embedded globes show the whole disc at `fit` and zoom in from there. While
+   * the view is at the previous fit it follows the new one (a resize).
+   */
+  setFitDistance(fit: number): void {
+    if (fit === this.fit) return;
+    if (this.distance >= this.fit - 1e-6) this.distance = fit;
+    this.fit = fit;
+  }
+
+  /** Farthest the camera may sit. */
+  get maxDistance(): number {
+    return Math.max(this.t.maxDistance, this.fit);
+  }
+
   /** Multiply the altitude above the surface by `factor` (> 1 zooms out). */
   zoomBy(factor: number): void {
     const alt = (this.distance - 1) * factor;
-    this.distance = Math.min(this.t.maxDistance, Math.max(this.t.minDistance, 1 + alt));
+    this.distance = Math.min(this.maxDistance, Math.max(this.t.minDistance, 1 + alt));
+    if (this.focus) this.focus.distance = null;
     this.idle = 0;
+  }
+
+  /** Closest the camera may sit. */
+  get minDistance(): number {
+    return this.t.minDistance;
   }
 
   /** Held arrow keys: -1..1 per axis (x: east/west, y: north/south). */
@@ -404,9 +409,16 @@ export class OrbitState {
     }
   }
 
-  /** Ease the camera over a lat/lon (Tab focus). */
-  faceLatLon(lat: number, lon: number): void {
-    this.focus = { lat: this.clampLat(lat), lon };
+  /** Ease the camera over a lat/lon, and to `distance` when given (clamped). */
+  faceLatLon(lat: number, lon: number, distance?: number): void {
+    this.focus = {
+      lat: this.clampLat(lat),
+      lon,
+      distance:
+        distance === undefined
+          ? null
+          : Math.min(this.maxDistance, Math.max(this.t.minDistance, distance)),
+    };
     this.vLat = 0;
     this.vLon = 0;
     this.idle = 0;
@@ -437,7 +449,14 @@ export class OrbitState {
       const dLat = this.focus.lat - this.lat;
       this.lon = wrapDeg(this.lon + dLon * a);
       this.lat = this.clampLat(this.lat + dLat * a);
-      if (Math.abs(dLon) < 0.01 && Math.abs(dLat) < 0.01) this.focus = null;
+      let settled = Math.abs(dLon) < 0.01 && Math.abs(dLat) < 0.01;
+      if (this.focus.distance !== null) {
+        // Ease the altitude geometrically, so a zoom-in feels even.
+        const dAlt = Math.log((this.focus.distance - 1) / (this.distance - 1));
+        this.distance = 1 + (this.distance - 1) * Math.exp(dAlt * a);
+        settled &&= Math.abs(dAlt) < 0.002;
+      }
+      if (settled) this.focus = null;
       this.idle = 0;
       return;
     }

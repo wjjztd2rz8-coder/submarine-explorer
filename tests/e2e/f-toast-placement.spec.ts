@@ -123,7 +123,7 @@ for (const layout of [
         await holdFreshTips(page);
         await finishAnimations(page, '.onboard-card');
         await expect(page.locator('.scan-panel')).toBeVisible();
-        const hud = ['.sonar', '.hud-readouts', '.hud-attribution'];
+        const hud = ['.sonar', '.hud-readouts'];
         const controls = layout.touch
           ? ['.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause']
           : ['.hud-control-tips', '.hud-reset-camera'];
@@ -168,8 +168,8 @@ for (const layout of [
         }
         await expect(hint).toContainText(
           layout.touch
-            ? 'Animal nearby. Hold SCAN to scan, or press PHOTO for a photo.'
-            : 'Animal nearby. Hold G to scan, or press P for a photo.',
+            ? 'Animal nearby. Hold SCAN to scan, or use PHOTO for a photo.'
+            : 'Animal nearby. Hold G to scan, or use P for a photo.',
         );
         await finishAnimations(page, '.onboard-hint');
         // The clock was paused before navigation; screenshots and geometry

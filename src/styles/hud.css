@@ -1,4 +1,4 @@
-/* Core HUD: readouts, warning banner, attribution and the sonar frame.
+/* Core HUD: readouts, warning banner and the sonar frame.
    Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
 
 .hud,
@@ -11,11 +11,6 @@
 
 .hud {
   inset: 0;
-}
-
-/* Open credits must read above scan labels and tutorial hints, below dialogs. */
-.hud:has(.hud-attribution[open]) {
-  z-index: 31;
 }
 
 .hud-panel {
@@ -82,75 +77,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.hud-attribution {
-  position: relative;
-  pointer-events: auto;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.hud-attribution summary {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-sizing: border-box;
-  min-height: 32px;
-  padding: 5px 9px;
-  border: 1px solid var(--hud-border);
-  border-radius: 4px;
-  background: var(--hud-bg);
-  color: var(--hud-text);
-  white-space: nowrap;
-  cursor: pointer;
-  list-style: none;
-}
-
-.hud-attribution summary::-webkit-details-marker {
-  display: none;
-}
-
-.hud-attribution summary::after {
-  content: '+';
-  color: var(--hud-accent);
-}
-
-.hud-attribution[open] summary::after {
-  content: '−';
-}
-
-.hud-attribution-panel {
-  /* HUD.layoutDataCredits chooses a free viewport slot, including when a
-     portrait chip is anchored at the left edge or the scanner is visible. */
-  position: fixed;
-  box-sizing: border-box;
-  width: min(400px, calc(100vw - 24px));
-  max-height: calc(100dvh - 100px);
-  overflow: auto;
-  overscroll-behavior: contain;
-  padding: 10px 12px;
-  border: 1px solid var(--hud-border);
-  border-radius: 6px;
-  background: #06121c;
-  color: var(--hud-text);
-  overflow-wrap: anywhere;
-}
-
-.hud-attribution-panel p {
-  margin: 0 0 8px;
-}
-
-.hud-attribution-panel p:last-child {
-  margin-bottom: 0;
-}
-
-.hud-attribution-panel a {
-  /* Keep each link in one hit box. Split inline fragments leave the centre
-     of a wrapped link over the paragraph instead of the clickable anchor. */
-  display: inline-block;
-  max-width: 100%;
-  color: var(--hud-accent);
 }
 
 body:not([data-app-state='dive']) .hud-footer,

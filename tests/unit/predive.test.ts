@@ -34,7 +34,7 @@ describe('game modes', () => {
     expect(modeDescription('arcade')).toMatch(/No battery limit or currents/);
     expect(!realistic.visualHints && realistic.batteryOxygen).toBe(true);
     expect(realistic.speedProfile).toBe('research');
-    expect(modeDescription('realistic')).toMatch(/no waypoints, battery and oxygen, currents/);
+    expect(modeDescription('realistic')).toMatch(/Battery, oxygen and currents; no waypoints/);
   });
 });
 

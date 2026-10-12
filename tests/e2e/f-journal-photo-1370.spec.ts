@@ -36,7 +36,10 @@ for (const profile of [
             'titanic-bow',
       );
       const mode = page.locator('.photo-mode');
-      const credit = page.locator('.hud-attribution summary');
+      // A persistent, focusable HUD control the photo mode must hand focus back to.
+      // The touch HUD has none since the data chip left it, so focus restoration is
+      // checked on desktop only; touch keeps the capture/Done/Pause walk.
+      const credit = page.locator('.hud-reset-camera');
       const touchPhoto = page.locator('.tc-btn-photo');
       const capture = mode.locator('.photo-mode-capture');
       const done = mode.locator('.photo-mode-exit');
@@ -48,7 +51,6 @@ for (const profile of [
           // before PHOTO; its pointer handler preserves the previous HUD focus.
           await page.locator('#viewport').tap({ position: { x: 5, y: 200 } });
           await page.clock.runFor(34);
-          await credit.focus();
           await touchPhoto.tap();
         } else {
           await credit.focus();
@@ -66,11 +68,11 @@ for (const profile of [
         if (profile.touch) await done.tap();
         else await done.click();
         await expect(mode).toBeHidden();
-        await expect(credit).toBeFocused();
+        if (!profile.touch) await expect(credit).toBeFocused();
 
-        // A visible persistent HUD control also acts as a keyboard opener at
-        // both touch viewport sizes, including when input switches to keyboard.
-        await credit.focus();
+        // A visible persistent HUD control also acts as a keyboard opener,
+        // including on touch viewports when input switches to keyboard.
+        if (!profile.touch) await credit.focus();
         await page.keyboard.press('p');
         await page.clock.runFor(34);
         await expect(mode).toBeVisible();
@@ -82,7 +84,7 @@ for (const profile of [
         await expect(pause).toBeFocused();
         await page.keyboard.press('Escape');
         await expect(mode).toBeHidden();
-        await expect(credit).toBeFocused();
+        if (!profile.touch) await expect(credit).toBeFocused();
         await expect(page.locator('.pause-menu')).toBeHidden();
       }
       expect(errors).toEqual([]);

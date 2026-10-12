@@ -78,14 +78,3 @@ describe('home Continue focus', () => {
     expect(document.activeElement).toBe(focused);
   });
 });
-
-it('makes globe pin targets 48px without changing or displacing their dots', () => {
-  const pin = new Element();
-  const dot = new Element();
-  pin.append(dot);
-  Object.assign(home.globeSlot, { querySelectorAll: () => [pin] });
-  home.sizeGlobeTargets();
-  home.sizeGlobeTargets();
-  expect(pin.style).toEqual({ width: '48px', height: '48px', margin: '-24px 0 0 -24px' });
-  expect(dot.style).toEqual({});
-});
