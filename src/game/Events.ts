@@ -1,5 +1,5 @@
 import { EXPLORE_CONFIG } from '../core/config/explore.js';
-export type ExploreEventKind = 'plume' | 'turbidity' | 'snow' | 'whale';
+export type ExploreEventKind = 'plume' | 'turbidity' | 'whale';
 export interface EventHabitat {
   site: string;
   depthM: number;
@@ -11,15 +11,14 @@ export interface ExploreEvent {
   durationS: number;
 }
 export const EVENT_CAPTIONS: Record<ExploreEventKind, string> = {
-  plume: 'A vent plume surges into the current',
-  turbidity: 'A drift of silt rolls along the seabed',
-  snow: 'Marine snow falls through the light',
-  whale: 'A whale passes overhead',
+  plume: 'Vent plume: warm mineral-rich water rises from the seabed',
+  turbidity: 'Silt cloud: sediment-laden water flows downslope',
+  whale: 'Whale passing: whales use canyon waters to find food',
 };
-const VENTS = new Set(['lost-city', 'axial-seamount-ashes', 'beebe-vent-field', 'kamaehuakanaloa']);
+const VENTS = new Set(['axial-seamount-ashes', 'beebe-vent-field', 'kamaehuakanaloa']);
 const CANYONS = new Set(['monterey-canyon', 'hudson-canyon', 'hunga-tonga-caldera']);
 export function eventKinds(h: EventHabitat): ExploreEventKind[] {
-  const kinds: ExploreEventKind[] = ['snow'];
+  const kinds: ExploreEventKind[] = [];
   if (VENTS.has(h.site) && h.altitudeM < 70) kinds.push('plume');
   if (CANYONS.has(h.site) && h.altitudeM < 45) kinds.push('turbidity');
   if (
@@ -53,13 +52,17 @@ export class EventScheduler {
     this.remainingS -= dt;
     if (this.remainingS > 0) return null;
     const choices = eventKinds(h);
+    if (!choices.length) {
+      this.remainingS = this.wait();
+      return null;
+    }
     return this.begin(
       choices[Math.min(choices.length - 1, Math.floor(this.random() * choices.length))],
     );
   }
   /** Review hook bypasses the quiet gap, but never overlaps an active event. */
   preview(kind: ExploreEventKind): ExploreEvent | null {
-    if (this.active) return null;
+    if (this.active || !Object.hasOwn(EVENT_CAPTIONS, kind)) return null;
     return this.begin(kind);
   }
   private begin(kind: ExploreEventKind): ExploreEvent {

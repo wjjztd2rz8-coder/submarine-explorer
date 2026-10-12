@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **1393 f-events-reform:** plume, downslope silt and crossing-whale events start ahead within 30–70 m and the active camera view, or defer when terrain/framing prevents a visible placement. Soft billows and a larger readable whale shape retain one particle draw, one merged mesh and the existing tier particle counts; captions explain the cause, prompt an approach outside 45 m and confirm sourced Journal sightings. Events last 18 seconds and retain idempotent 5 RP rewards without a star bonus.
+
 - **f-e2e-regress:** Arcade Lost City opening chase offset now `chaseOffsetXM: -8, chaseOffsetYM: 30` (was -20, 8): the taller scan card on 844x390 phone landscape (card bottom 115 px) had caught the carbonate tower tip (y 117-118 px); the tip now sits at about 124-129 px. Chase radius stays 66. The Blake reticle spec now slides SCAN over the contact itself, since the card, reticle and Scan share one target and the contact opens on-axis.
 
 - **f-hud-overlap-fix:** desktop and tablet scan stack top is now `max(112px, 15%)` (was 84px) so the top-centre `New discovery` notice (72-109px) no longer overlaps the scan card, tutorial hint or objective chip at 1280x720; the 1390 sweep now settles the ResizeObserver-driven layout before measuring and picks a genuinely out-of-range spot (procedural deep-coral targets at Hudson Canyon and Kamaʻehuakanaloa were landing in range of the fixed +10000 m offset).
@@ -971,6 +973,9 @@ without an entry here is not done.
   default stays `medium`, so a fresh install looks the same as before.
 
 ### Removed
+
+- **1393 f-events-reform:** removed the marine-snow event, caption and fallback scheduling because permanent marine snow already supplies the same ambient visual. Sites with no remaining event habitat stay quiet.
+- **1393 f-events-reform:** removed the particle-plume event at Lost City: the repo's sourced research describes clear vent flow, which a billowing particle column would misrepresent; the allowed rendering budget does not provide a separate readable clear-flow effect.
 
 - **F-1110:** cut unsupported Monterey shelf-break identification, Blue Hole
   stalactite depth restriction, Lost City sampling-coordinate attribution, and

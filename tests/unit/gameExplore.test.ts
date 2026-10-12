@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Vector3 } from 'three';
+import { PerspectiveCamera, Vector3 } from 'three';
 import { EventBus } from '../../src/core/EventBus.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EXPLORE_CONFIG } from '../../src/core/config/explore.js';
@@ -11,7 +11,7 @@ import { buildSecret, seatOnSeabed, disposeExploreMesh } from '../../src/game/Se
 import { EventsVisual } from '../../src/game/EventsVisual.js';
 import { buildJournalSite, isEntryUnlocked, isSiteUnlocked } from '../../src/game/JournalData.js';
 
-const habitat = { site: 'lost-city', depthM: 750, altitudeM: 15 };
+const habitat = { site: 'beebe-vent-field', depthM: 750, altitudeM: 15 };
 const contact: ScanTarget = {
   id: 'secret:arch',
   name: 'Unidentified contact',
@@ -62,11 +62,23 @@ describe('short rare events', () => {
   it('waits before the first event, ends it, then enforces cooldown plus a new quiet gap', () => {
     const scheduler = new EventScheduler(() => 0);
     expect(scheduler.update(69, habitat)).toBeNull();
-    expect(scheduler.update(1, habitat)?.kind).toBe('snow');
+    expect(scheduler.update(1, habitat)?.kind).toBe('plume');
     expect(scheduler.update(EXPLORE_CONFIG.eventDurationS, habitat)).toBeNull();
     expect(scheduler.active).toBeNull();
     expect(scheduler.update(EXPLORE_CONFIG.eventCooldownS + 69, habitat)).toBeNull();
-    expect(scheduler.update(1, habitat)?.kind).toBe('snow');
+    expect(scheduler.update(1, habitat)?.kind).toBe('plume');
+  });
+  it('leaves sites without event habitat quiet and rejects removed kinds at runtime', () => {
+    const scheduler = new EventScheduler(() => 0);
+    const quiet = { ...habitat, site: 'titanic' };
+    expect(scheduler.update(1000, quiet)).toBeNull();
+    expect(scheduler.active).toBeNull();
+    expect(scheduler.update(1, quiet)).toBeNull();
+    expect(scheduler.update(70, habitat)?.kind).toBe('plume');
+    scheduler.reset();
+    expect(scheduler.preview('unknown' as never)).toBeNull();
+    expect(scheduler.active).toBeNull();
+    expect(eventKinds({ ...habitat, site: 'lost-city' })).toEqual([]);
   });
   it('does not advance while paused and never overlaps events', () => {
     const scheduler = new EventScheduler(() => 0);
@@ -80,15 +92,14 @@ describe('short rare events', () => {
     expect(scheduler.update(69, habitat)).toBeNull();
   });
   it('restricts plumes, bottom silt and whales to suitable habitat', () => {
-    expect(eventKinds(habitat)).toEqual(['snow', 'plume']);
-    expect(eventKinds({ ...habitat, altitudeM: 100 })).toEqual(['snow']);
+    expect(eventKinds(habitat)).toEqual(['plume']);
+    expect(eventKinds({ ...habitat, altitudeM: 100 })).toEqual([]);
     expect(eventKinds({ site: 'monterey-canyon', depthM: 50, altitudeM: 12 })).toEqual([
-      'snow',
       'turbidity',
       'whale',
     ]);
-    expect(eventKinds({ site: 'monterey-canyon', depthM: 1000, altitudeM: 100 })).toEqual(['snow']);
-    expect(eventKinds({ ...habitat, site: 'great-blue-hole' })).toEqual(['snow']);
+    expect(eventKinds({ site: 'monterey-canyon', depthM: 1000, altitudeM: 100 })).toEqual([]);
+    expect(eventKinds({ ...habitat, site: 'great-blue-hole' })).toEqual([]);
   });
 });
 
@@ -158,13 +169,19 @@ describe('procedural visuals', () => {
   it('keeps event visuals bounded and hides them when the event ends', () => {
     const visual = new EventsVisual('low');
     const event = { kind: 'plume' as const, elapsedS: 3, durationS: 9 };
-    visual.begin(event, new Vector3(0, -90, 0), new Vector3(0, 0, -1), () => -100);
-    expect(visual.origin.y).toBe(-94);
+    const camera = new PerspectiveCamera(60, 844 / 390, 0.1, 1000);
+    camera.position.set(0, -75, 20);
+    camera.lookAt(0, -90, -40);
+    camera.updateMatrixWorld();
+    expect(
+      visual.begin(event, new Vector3(0, -90, 0), new Vector3(0, 0, -1), () => -100, camera),
+    ).toBe(true);
+    expect(visual.origin.y).toBe(-82);
     visual.update(event);
     expect(visual.group.visible).toBe(true);
     expect(visual.group.children).toHaveLength(2);
     visual.update({ ...event, kind: 'whale' });
-    expect(visual.group.children[1].rotation.y).toBe(-Math.PI / 2);
+    expect(visual.group.children[1].visible).toBe(true);
     visual.update(null);
     expect(visual.group.visible).toBe(false);
     visual.dispose();

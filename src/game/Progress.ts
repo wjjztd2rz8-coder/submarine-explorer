@@ -1,3 +1,4 @@
+import { EVENT_CAPTIONS } from './Events.js';
 import type { GameConfig, GameplayOptions } from '../core/Config.js';
 import { PROGRESS_CONFIG, UPGRADES, type UpgradeId } from '../core/config/progress.js';
 import { ProgressSave, type GameplayMode, type ProgressRecord } from '../core/Save.js';
@@ -146,7 +147,10 @@ export class Progress {
       this.credit('secret', `${key.slice(0, slash)}/${subject.slice(7)}`);
     else if (subject.startsWith('sample:'))
       this.credit('sample', `${key.slice(0, slash)}/${subject.slice(7)}`);
-    else this.credit('poi', key);
+    else if (subject.startsWith('event:')) {
+      if (Object.hasOwn(EVENT_CAPTIONS, subject.slice(6)))
+        this.credit('event', `${key.slice(0, slash)}/${subject.slice(6)}`);
+    } else this.credit('poi', key);
   }
   beginDive(): void {
     this.bonus = false;
