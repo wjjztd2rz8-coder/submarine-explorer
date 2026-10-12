@@ -7,7 +7,6 @@
  */
 
 import { dailyRatingKey, utcDate } from '../../game/Daily.js';
-import type { Input } from '../../core/Input.js';
 import {
   MissionRouter,
   missionStartPose,
@@ -26,7 +25,7 @@ export const missionSystem: GameSystem = {
   dispose: () => cleanup.dispose(),
   init(ctx) {
     const { route, params, discovery, meta, terrain, config, sub, rig, headlights, bus } = ctx;
-    const { settings, input, save, settingsScreen } = ctx;
+    const { settings, save } = ctx;
     let lastStart: typeof sub.position | null = null;
     let lastChoice: MissionStartPosition = settings.gameplay.startPosition;
     // D2-PREDIVE: also used to preview the start behind the briefing, so Begin
@@ -89,11 +88,8 @@ export const missionSystem: GameSystem = {
               hull_class: sub.getState().hullClass,
               briefing: {
                 ...route.def.briefing,
-                hazards: route.def.briefing.hazards.map((hazard) =>
-                  /Class [ABC]/.test(hazard)
-                    ? `Class ${sub.getState().hullClass} hull · rated to ${Math.abs(sub.getState().ratedDepth).toLocaleString('en-US')} m. Stay above the rating.`
-                    : hazard,
-                ),
+                // The hull line in the meta row already gives the class and rating.
+                hazards: route.def.briefing.hazards.filter((hazard) => !/Class [ABC]/.test(hazard)),
               },
             },
           },
@@ -131,8 +127,6 @@ export const missionSystem: GameSystem = {
             ctx.setAppState('home');
           },
           simSpeed: sub.simSpeed,
-          keyLabel: (action) =>
-            input.primaryKeyLabel(action as Parameters<Input['primaryKeyLabel']>[0]),
         })
       : null;
     ctx.missionRouter = missionRouter;
@@ -144,18 +138,6 @@ export const missionSystem: GameSystem = {
       }),
     );
 
-    // D-INPUT-HUD: "View controls" in the briefing opens the Controls page.
-    const briefingControls = missionRouter?.briefing?.root.querySelector('.briefing-controls');
-    if (briefingControls) {
-      const controlsButton = document.createElement('button');
-      controlsButton.type = 'button';
-      controlsButton.textContent = 'View controls';
-      controlsButton.addEventListener('click', () => {
-        settingsScreen.open();
-        settingsScreen.showControls(true);
-      });
-      briefingControls.replaceChildren(controlsButton);
-    }
     // D2-PREDIVE: Dive settings on the briefing card.
     const briefing = missionRouter?.briefing ?? null;
     if (briefing) {

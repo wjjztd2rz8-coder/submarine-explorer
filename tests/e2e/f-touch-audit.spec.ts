@@ -108,7 +108,7 @@ for (const viewport of [
           '.tc-btn-boost',
           '.hud-journal',
         ];
-        const hud = ['.sonar', '.hud-readouts', '.scan-panel', '.hud-attribution'];
+        const hud = ['.sonar', '.hud-readouts', '.scan-panel'];
         if (viewport.width < viewport.height)
           await expect(page.locator('.tc-rotate-hint')).toBeHidden();
         await separate(page, [...hud, '.onboard-card', ...controls]);
@@ -209,7 +209,6 @@ for (const viewport of [
         '.tc-btn-sonar',
         '.tc-btn-photo',
         '.tc-btn-pause',
-        '.hud-attribution',
       ]);
       expect(
         await page.locator('.hud-readouts').evaluate((e) => e.scrollWidth <= e.clientWidth),

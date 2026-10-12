@@ -17,7 +17,11 @@ export const HINT_ORDER: readonly HintId[] = [
   'rov',
 ];
 
-/** Key names for the active input device, filled in by the caller. */
+/**
+ * Control names for the active input device, filled in by the caller. On touch
+ * they are button labels (SCAN, PHOTO), never key names, so hint text avoids
+ * "press".
+ */
 export interface HintLabels {
   scan: string;
   rov: string;
@@ -29,8 +33,8 @@ export const HINT_TEXT: Record<HintId, (l: HintLabels) => string> = {
   'battery-low': (l) => `Battery low. Ascend or turn off lights (${l.lights}).`,
   'near-hull': () => 'Near hull rating. Ascend to ease pressure.',
   'scan-target': (l) => `Face the target. Hold ${l.scan} to scan.`,
-  creature: (l) => `Animal nearby. Hold ${l.scan} to scan, or press ${l.photo} for a photo.`,
-  rov: (l) => `Press ${l.rov} to deploy the tethered ROV into tight spots.`,
+  creature: (l) => `Animal nearby. Hold ${l.scan} to scan, or use ${l.photo} for a photo.`,
+  rov: (l) => `Deploy the tethered ROV (${l.rov}) into tight spots.`,
 };
 
 export interface HintContext {

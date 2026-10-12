@@ -1,7 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Locator, type Page } from './helpers/unlocked.js';
+import { expect, test, type Locator } from './helpers/unlocked.js';
 import { clockFramesUntil, pauseClockBeforeNavigation, withClockFrames } from './helpers/clock.js';
 import { openJournalCategory } from './helpers/journal.js';
 import { scanWithKeyboard } from './helpers/scan.js';
@@ -14,12 +14,6 @@ const env = (globalThis as { process?: { env?: Record<string, string> } }).proce
 const rounds = Number(env.ROUNDS ?? 3);
 type Game = { journal: Journal; discovery: Discovery; sub: Submarine; rig: CameraRig };
 const sites = ['titanic', 'lost-city', 'great-blue-hole', 'beebe-vent-field', 'monterey-canyon'];
-
-async function contents(page: Page): Promise<void> {
-  const toggle = page.locator('.jr-contents-toggle');
-  if ((await toggle.isVisible()) && (await toggle.getAttribute('aria-expanded')) === 'false')
-    await toggle.click();
-}
 
 async function fits(panel: Locator): Promise<void> {
   expect(await panel.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(1);
@@ -97,83 +91,109 @@ for (const viewport of [
           await act(debrief.locator('[data-action="journal"]'));
           const journal = page.locator('.journal');
           await expect(journal).toBeVisible();
-          await contents(page);
-          const current = journal.locator(`.jr-nav-list > li > [data-target="${site}"]`);
-          await expect(current).toHaveAttribute('aria-expanded', 'true');
-          await fits(journal.locator('.jr-panel'));
-          await fits(journal.locator('.jr-nav'));
-          const poi = journal.locator(`details[data-category="${site}/poi"]`);
-          if (round === 1) {
-            await expect(journal.locator('.jr-nav-list > li > [aria-expanded="true"]')).toHaveCount(
-              1,
-            );
-            await expect(poi).toHaveAttribute('open', '');
-            await expect(poi.locator('.jr-more-to-find')).toHaveText(/^\d+ more to find$/);
-            await expect(
-              journal.locator('.jr-nav-item', { hasText: /Unscanned target/ }),
-            ).toHaveCount(0);
-            const wildlife = journal.locator(`details[data-category="${site}/life"]`);
-            await expect(wildlife).not.toHaveAttribute('open', '');
-            await shot('journal-default-groups');
-            // Native Enter and Space toggle a category and preserve focus.
-            const summary = wildlife.locator('summary');
-            await summary.focus();
-            await page.keyboard.press('Enter');
-            await expect(wildlife).toHaveAttribute('open', '');
-            await page.keyboard.press('Space');
-            await expect(wildlife).not.toHaveAttribute('open', '');
-            await expect(summary).toBeFocused();
-            // Site collapse restores the same rebuilt control, including on touch.
-            await act(current);
-            await expect(current).toHaveAttribute('aria-expanded', 'false');
-            await expect(journal.locator(`#journal-entries-${site}`)).toBeHidden();
-            if (!viewport.touch) await expect(current).toBeFocused();
-            await act(current);
-            await contents(page);
+          if (viewport.touch) {
+            // The phone sheet has no tree: the site page lists its groups as rows.
+            await fits(journal.locator('.jr-panel'));
+            await expect(journal.locator('.jr-nav')).toBeHidden();
+            await fits(journal.locator('.jr-body'));
+            if (round === 1) {
+              await journal.locator('.jr-spoilers input').check();
+              await openJournalCategory(page, site, 'life');
+              await expect(journal.locator('.jr-site-more summary')).toBeVisible();
+              await act(journal.locator('.jr-row.is-life').first());
+              const tags = journal.locator('.jr-title-row .jr-tag:not(.is-undiscovered)');
+              await expect(tags).toHaveCount(1);
+              await expect(tags).toHaveText('Game addition');
+              await shot('journal-game-addition');
+              await act(journal.locator('.jr-back'));
+              await act(journal.locator('.jr-row.is-secret').first());
+              await expect(tags).toHaveCount(1);
+              await expect(tags).toHaveText('Game addition');
+              await shot('journal-secret');
+              await act(journal.locator('.jr-back'));
+              const axe = await withClockFrames(page, () =>
+                new AxeBuilder({ page }).include('.journal').analyze(),
+              );
+              expect(axe.violations.map((v) => v.id)).toEqual([]);
+              await journal.locator('.jr-spoilers input').uncheck();
+            }
+          } else {
+            const current = journal.locator(`.jr-nav-list > li > [data-target="${site}"]`);
             await expect(current).toHaveAttribute('aria-expanded', 'true');
-            // Collapsed categories are skipped by the stacked focus trap.
-            await summary.focus();
-            await page.keyboard.press('Tab');
-            expect(
-              await page.evaluate(
-                () =>
-                  !!document.activeElement?.closest('.journal') &&
-                  (document.activeElement?.tagName === 'SUMMARY' ||
-                    !document.activeElement?.closest('details:not([open])')),
-              ),
-            ).toBe(true);
-            await page.keyboard.press('Shift+Tab');
-            await expect(summary).toBeFocused();
-            await journal.locator('.jr-spoilers input').check();
-            await expect(wildlife).not.toHaveAttribute('open', '');
-            await openJournalCategory(page, site, 'life');
-            await act(wildlife.locator('.jr-nav-item').first());
-            const tags = journal.locator('.jr-title-row .jr-tag:not(.is-undiscovered)');
-            await expect(tags).toHaveCount(1);
-            await expect(tags).toHaveText('Game addition');
-            await shot('journal-game-addition');
-            await openJournalCategory(page, site, 'secret');
-            await act(
-              journal.locator(`details[data-category="${site}/secret"] .jr-nav-item`).first(),
-            );
-            await expect(tags).toHaveCount(1);
-            await expect(tags).toHaveText('Game addition');
-            await shot('journal-secret');
-            await journal.locator('.jr-spoilers input').uncheck();
-            await openJournalCategory(page, site, 'life');
-            await act(wildlife.locator('summary'));
-            await journal.locator('.jr-spoilers input').check();
-            await expect(wildlife).not.toHaveAttribute('open', '');
-            const axe = await withClockFrames(page, () =>
-              new AxeBuilder({ page }).include('.journal').analyze(),
-            );
-            expect(axe.violations.map((v) => v.id)).toEqual([]);
-            await journal.locator('.jr-spoilers input').uncheck();
-            // Selecting the expanded site from an entry must still open its
-            // overview and mission facts, rather than just collapsing the list.
-            await act(current);
-            await expect(current).toHaveAttribute('aria-expanded', 'true');
-            await expect(journal.locator('.jr-site-more summary')).toBeVisible();
+            await fits(journal.locator('.jr-panel'));
+            await fits(journal.locator('.jr-nav'));
+            const poi = journal.locator(`details[data-category="${site}/poi"]`);
+            if (round === 1) {
+              await expect(
+                journal.locator('.jr-nav-list > li > [aria-expanded="true"]'),
+              ).toHaveCount(1);
+              await expect(poi).toHaveAttribute('open', '');
+              await expect(poi.locator('.jr-more-to-find')).toHaveText(/^\d+ more to find$/);
+              await expect(
+                journal.locator('.jr-nav-item', { hasText: /Unscanned target/ }),
+              ).toHaveCount(0);
+              const wildlife = journal.locator(`details[data-category="${site}/life"]`);
+              await expect(wildlife).not.toHaveAttribute('open', '');
+              await shot('journal-default-groups');
+              // Native Enter and Space toggle a category and preserve focus.
+              const summary = wildlife.locator('summary');
+              await summary.focus();
+              await page.keyboard.press('Enter');
+              await expect(wildlife).toHaveAttribute('open', '');
+              await page.keyboard.press('Space');
+              await expect(wildlife).not.toHaveAttribute('open', '');
+              await expect(summary).toBeFocused();
+              // Site collapse restores the same rebuilt control, including on touch.
+              await act(current);
+              await expect(current).toHaveAttribute('aria-expanded', 'false');
+              await expect(journal.locator(`#journal-entries-${site}`)).toBeHidden();
+              if (!viewport.touch) await expect(current).toBeFocused();
+              await act(current);
+              await expect(current).toHaveAttribute('aria-expanded', 'true');
+              // Collapsed categories are skipped by the stacked focus trap.
+              await summary.focus();
+              await page.keyboard.press('Tab');
+              expect(
+                await page.evaluate(
+                  () =>
+                    !!document.activeElement?.closest('.journal') &&
+                    (document.activeElement?.tagName === 'SUMMARY' ||
+                      !document.activeElement?.closest('details:not([open])')),
+                ),
+              ).toBe(true);
+              await page.keyboard.press('Shift+Tab');
+              await expect(summary).toBeFocused();
+              await journal.locator('.jr-spoilers input').check();
+              await expect(wildlife).not.toHaveAttribute('open', '');
+              await openJournalCategory(page, site, 'life');
+              await act(wildlife.locator('.jr-nav-item').first());
+              const tags = journal.locator('.jr-title-row .jr-tag:not(.is-undiscovered)');
+              await expect(tags).toHaveCount(1);
+              await expect(tags).toHaveText('Game addition');
+              await shot('journal-game-addition');
+              await openJournalCategory(page, site, 'secret');
+              await act(
+                journal.locator(`details[data-category="${site}/secret"] .jr-nav-item`).first(),
+              );
+              await expect(tags).toHaveCount(1);
+              await expect(tags).toHaveText('Game addition');
+              await shot('journal-secret');
+              await journal.locator('.jr-spoilers input').uncheck();
+              await openJournalCategory(page, site, 'life');
+              await act(wildlife.locator('summary'));
+              await journal.locator('.jr-spoilers input').check();
+              await expect(wildlife).not.toHaveAttribute('open', '');
+              const axe = await withClockFrames(page, () =>
+                new AxeBuilder({ page }).include('.journal').analyze(),
+              );
+              expect(axe.violations.map((v) => v.id)).toEqual([]);
+              await journal.locator('.jr-spoilers input').uncheck();
+              // Selecting the expanded site from an entry must still open its
+              // overview and mission facts, rather than just collapsing the list.
+              await act(current);
+              await expect(current).toHaveAttribute('aria-expanded', 'true');
+              await expect(journal.locator('.jr-site-more summary')).toBeVisible();
+            }
           }
           await shot(`round-${round}-journal`);
           await act(journal.locator('.jr-close'));

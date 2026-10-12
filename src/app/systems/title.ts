@@ -220,7 +220,6 @@ export function createTitleSystem(): GameSystem {
         // The selector's CSS hides its globe on exceptionally short screens.
         // Stop that renderer as well; CSS alone leaves its update loop drawing.
         if (ctx.homeGlobe && homeVisible(ctx) && ctx.home.sitesOpen) {
-          ctx.home.sizeGlobeTargets();
           const visible =
             !document.hidden && !covered(ctx) && ctx.home.globeSlot.getClientRects().length > 0;
           if (visible) ctx.homeGlobe.open('api');

@@ -1,7 +1,12 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import process from 'node:process';
 import type { WebGLRenderer } from 'three';
-import { openJournalCategory } from './helpers/journal.js';
+import {
+  journalSiteRows,
+  openJournalCategory,
+  openJournalEntry,
+  openJournalSite,
+} from './helpers/journal.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import type { GameConfig } from '../../src/core/Config.js';
@@ -32,12 +37,6 @@ async function ready(page: Page, wildlife = false): Promise<void> {
     return !!(window.__gameReady && g?.props.loaded && g.discovery.loaded);
   });
   if (wildlife) await clockFramesUntil(page, () => !!(window.__game as unknown as Game).life);
-}
-
-async function contents(page: Page): Promise<void> {
-  const toggle = page.locator('.jr-contents-toggle');
-  if ((await toggle.isVisible()) && (await toggle.getAttribute('aria-expanded')) === 'false')
-    await toggle.click();
 }
 
 test('1000 Journal site count excludes nested About the site entries', async ({ page }) => {
@@ -175,9 +174,8 @@ for (const viewport of [
 
           await page.keyboard.press('j');
           await page.clock.fastForward(34);
-          await expect(page.locator(journalSites)).toHaveCount(13);
-          await contents(page);
-          await page.locator(`${journalSites}[data-target="${site}"]`).click();
+          await expect(await journalSiteRows(page)).toHaveCount(13);
+          await openJournalSite(page, site);
           await page.locator('.jr-site-more summary').click();
           await expect(page.locator('.jr-body')).toContainText(subject);
           await page.locator('.jr-close').click();
@@ -297,11 +295,10 @@ for (const viewport of [
           await page.screenshot({ path: info.outputPath('60-seconds.png') });
           await page.keyboard.press('j');
           await page.clock.fastForward(34);
-          await expect(page.locator(journalSites)).toHaveCount(13);
+          await expect(await journalSiteRows(page)).toHaveCount(13);
           await page.locator('.jr-spoilers input').check();
-          await contents(page);
           await openJournalCategory(page, site, 'life');
-          await page.locator(`.jr-nav-item[data-target="${site}/life/${species}"]`).click();
+          await openJournalEntry(page, `${site}/life/${species}`);
           const tags = page.locator('.jr-title-row .jr-tag:not(.is-undiscovered)');
           await expect(tags).toHaveCount(1);
           await expect(tags).toHaveText('Game addition');

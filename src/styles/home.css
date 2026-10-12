@@ -109,15 +109,6 @@
   width: min(390px, calc(100% - 24px));
   font-size: 14px;
 }
-.globe.is-embedded .globe-pin {
-  width: 28px;
-  height: 28px;
-  margin: -14px 0 0 -14px;
-}
-.globe.is-embedded .globe-pin-dot {
-  width: 12px;
-  height: 12px;
-}
 
 /* Copy + menu plate. */
 .home-panel {
@@ -413,9 +404,9 @@
 .home-screen.has-sites {
   background: radial-gradient(ellipse at 40% 40%, #0a2936 0%, var(--home-canvas) 60%, #020710 100%);
 }
-/* Portrait: a 160 px globe preview above the list; the card would not fit, so it is hidden. */
+/* Portrait: a near full-width globe above the list; the card would not fit, so it is hidden. */
 .home-screen.has-sites .home-globe-wrap {
-  height: 160px;
+  height: clamp(220px, min(100vw, 42dvh), 440px);
 }
 @media (max-width: 959px) {
   .home-screen.has-sites .home-globe-wrap .globe-card {

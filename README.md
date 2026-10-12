@@ -42,7 +42,8 @@ visible above the menu. Picking a site opens a briefing with Dive settings
 (mode, start position and more options); its preview matches the actual spawn.
 
 While diving, **Esc** opens the pause menu: Resume, Objectives (the full list
-with hints), Mission select, Journal, Settings, Controls and Quit to home.
+with hints), Mission select, Journal, Settings, Controls (How to play on touch),
+Data credits and Quit to home.
 Opening the pause menu, Settings, the globe or a briefing card freezes the
 simulation — nothing drains, moves or times out while a menu is open.
 Deep-linking with `?mission=`, `?tile=` or `?skipBriefing=1` skips the home
@@ -480,10 +481,9 @@ Try it with `/?mission=<id>`, or `/?tile=<id>&poi=<poiId>` to jump to a POI.
 
 ## Attribution
 
-During a dive, click or tap **Data: GMRT** (or **Data: synthetic**) to open the
-full tile credit. Keyboard users can focus the chip and press Enter or Space;
-Escape closes the panel before pausing. GMRT credits include source, DOI and
-licence links. Photo mode hides the footer.
+During a dive, open the pause menu and choose **Data credits** to see the full
+tile credit (the dive HUD no longer carries a chip). GMRT credits include
+source, DOI and licence links; Escape steps back to the pause menu.
 
 Bathymetry from the Global Multi-Resolution Topography (GMRT) Synthesis.
 Ryan, W.B.F., et al. (2009), _Global Multi-Resolution Topography synthesis_,

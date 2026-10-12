@@ -388,7 +388,8 @@ describe('fresh-player mission routing and vehicle loadout', () => {
           }
         ).content;
         expect(copy.meta.find(([label]) => label === 'HULL')![1]).toContain('6,500');
-        expect(copy.hazards.join(' ')).toContain('Class B hull');
+        // The hull meta row says it; the hazard list does not repeat it.
+        expect(copy.hazards.join(' ')).not.toMatch(/Class [ABC]|rated to/);
         ctx.save.setGameplayMode('realistic');
         ctx.applyMissionStart('near-site');
         expect(-ctx.sub.position.y).toBeGreaterThan(3500);

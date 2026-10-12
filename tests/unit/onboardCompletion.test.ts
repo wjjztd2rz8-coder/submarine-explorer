@@ -322,7 +322,7 @@ describe('onboarding completion through the system', () => {
       expect(JSON.parse(data.get('subexplorer.onboard.v1')!).seenHints).toEqual([]);
       draw(0.001);
       expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
-        'Animal nearby. Hold G to scan, or press G for a photo.',
+        'Animal nearby. Hold G to scan, or use G for a photo.',
         12,
       );
       expect(onboard.store.get().seenHints).toEqual(['creature']);
@@ -342,7 +342,7 @@ describe('onboarding completion through the system', () => {
       Object.assign(ctx.discovery.overlay, { cardVisible: false });
       tick();
       expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
-        'Animal nearby. Hold G to scan, or press G for a photo.',
+        'Animal nearby. Hold G to scan, or use G for a photo.',
         12,
       );
       expect(onboard.store.get().seenHints).toEqual(['creature']);
@@ -392,7 +392,7 @@ describe('onboarding completion through the system', () => {
       expect(onboard.store.get().seenHints).toEqual([]);
       draw(0.001);
       expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
-        'Animal nearby. Hold G to scan, or press G for a photo.',
+        'Animal nearby. Hold G to scan, or use G for a photo.',
         12,
       );
       expect(onboard.store.get().seenHints).toEqual(['creature']);
@@ -485,7 +485,7 @@ describe('onboarding completion through the system', () => {
       );
       tick();
       expect(views.chip.show).toHaveBeenLastCalledWith(
-        'Animal nearby. Hold G to scan, or press G for a photo.',
+        'Animal nearby. Hold G to scan, or use G for a photo.',
         12,
       );
       expect(onboard.store.get().seenHints).toEqual(['creature']);

@@ -74,7 +74,6 @@ function setup(over: { load?: () => Promise<unknown>; state?: string } = {}) {
         classList: { add: (c: string) => classes.add(c), remove: (c: string) => classes.delete(c) },
       },
       setSceneCaption: caption,
-      sizeGlobeTargets: vi.fn(),
     },
     settingsScreen: { isOpen: false },
     discovery: { guide: { isOpen: false } },

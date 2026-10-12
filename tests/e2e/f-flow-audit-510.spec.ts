@@ -7,6 +7,7 @@ import type { Submarine } from '../../src/sub/Submarine.js';
 import type { CameraRig } from '../../src/sub/CameraRig.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { journalContents, journalIsSheet, openJournalSite } from './helpers/journal.js';
 import { expectCompactPhoneHud } from './helpers/phoneHud.js';
 
 /** Fresh player: no hull unlocks, discoveries, skipped briefing or completed tutorial. */
@@ -77,11 +78,17 @@ async function closeJournal(page: Page, touch: boolean): Promise<void> {
 }
 
 async function checkJournalNavigation(journal: Locator, site: string): Promise<void> {
-  const contents = journal.locator('.jr-contents-toggle');
-  if (await contents.isVisible()) await contents.click();
+  const page = journal.page();
+  if (await journalIsSheet(page)) {
+    // The sheet's contents are the front page: site cards, no tree.
+    await journalContents(page);
+    await contained(journal.locator('.jr-body'));
+    await contained(journal.locator(`.jr-site-card[data-target="${site}"]`));
+    await openJournalSite(page, site);
+    return;
+  }
   await contained(journal.locator('.jr-nav'));
   await contained(journal.locator(`.jr-nav-item[data-target="${site}"]`));
-  if (await contents.isVisible()) await contents.click();
 }
 
 /** Native touch gestures through Chromium, including pointer capture and release. */
@@ -209,7 +216,6 @@ for (const viewport of [
                 '.hud-readouts',
                 '.scan-panel',
                 '.sonar',
-                '.hud-attribution',
                 '.tc-stick',
                 '.tc-slider',
                 '.tc-buttons',

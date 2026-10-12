@@ -168,7 +168,7 @@ test('an animal can be scanned: banner, Journal wildlife entry, persistence', as
   // The Journal's wildlife list now has it, with text and a source link.
   await page.keyboard.press('j');
   await openJournalCategory(page, 'monterey-canyon', 'life');
-  await page.getByRole('button', { name: 'Lobate comb jelly' }).click();
+  await page.locator('.jr-nav').getByRole('button', { name: 'Lobate comb jelly' }).click();
   await expect(page.locator('.jr-title')).toHaveText('Lobate comb jelly');
   await expect(page.locator('.jr-latin i')).toHaveText('Bolinopsis infundibulum');
   await expect(page.locator('.jr-sources a').first()).toHaveAttribute('href', /^https:\/\//);

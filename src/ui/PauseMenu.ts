@@ -12,9 +12,15 @@ export interface PauseActions {
   journal(): void;
   settings(): void;
   controls(): void;
+  /** The Controls entry's label: "How to play" on touch. */
+  controlsLabel?(): string;
+  /** The current tile's data credit (CC BY attribution), shown in its own view. */
+  credits(): HTMLElement;
   quit(): void;
   objectives(): PauseObjective[];
 }
+
+type PauseView = 'menu' | 'objectives' | 'sites' | 'credits';
 
 export class PauseMenu {
   readonly root: HTMLDivElement;
@@ -25,7 +31,9 @@ export class PauseMenu {
   private readonly list: HTMLElement;
   private readonly trap: FocusTrap;
   private open_ = false;
-  private view: 'menu' | 'objectives' | 'sites' = 'menu';
+  private readonly controlsButton: HTMLButtonElement;
+  private readonly creditsSlot: HTMLDivElement;
+  private view: PauseView = 'menu';
 
   constructor(
     private readonly actions: PauseActions,
@@ -47,19 +55,21 @@ export class PauseMenu {
     this.menu = document.createElement('nav');
     this.menu.className = 'pause-actions';
     this.menu.setAttribute('aria-label', 'Pause actions');
-    const entry = (label: string, act: () => void): void => {
+    const entry = (label: string, act: () => void): HTMLButtonElement => {
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = label;
       button.addEventListener('click', act);
       this.menu.append(button);
+      return button;
     };
     entry('Resume', actions.resume);
     entry('Objectives', () => this.showView('objectives'));
     entry('Mission select', () => this.showView('sites'));
     entry('Journal', actions.journal);
     entry('Settings', actions.settings);
-    entry('Controls', actions.controls);
+    this.controlsButton = entry('Controls', actions.controls);
+    entry('Data credits', () => this.showView('credits'));
     entry('Quit to home', actions.quit);
 
     this.detail = document.createElement('section');
@@ -74,7 +84,9 @@ export class PauseMenu {
     this.list.className = 'pause-objectives';
     this.sitesSlot = document.createElement('div');
     this.sitesSlot.className = 'pause-sites-scroll';
-    this.detail.append(back, this.title, this.list, this.sitesSlot);
+    this.creditsSlot = document.createElement('div');
+    this.creditsSlot.className = 'pause-credits';
+    this.detail.append(back, this.title, this.list, this.sitesSlot, this.creditsSlot);
     panel.append(kicker, heading, this.menu, this.detail);
     this.root.append(panel);
     parent.append(this.root);
@@ -89,6 +101,7 @@ export class PauseMenu {
     if (this.open_) return;
     this.open_ = true;
     this.root.hidden = false;
+    this.controlsButton.textContent = this.actions.controlsLabel?.() ?? 'Controls';
     this.showView('menu');
     this.trap.activate();
     this.menu.querySelector('button')?.focus();
@@ -106,12 +119,13 @@ export class PauseMenu {
     else this.showView('menu');
   }
 
-  showView(view: 'menu' | 'objectives' | 'sites'): void {
+  showView(view: PauseView): void {
     this.view = view;
     this.menu.hidden = view !== 'menu';
     this.detail.hidden = view === 'menu';
     this.list.hidden = view !== 'objectives';
     this.sitesSlot.hidden = view !== 'sites';
+    this.creditsSlot.hidden = view !== 'credits';
     if (view === 'objectives') {
       this.title.textContent = 'Objectives';
       const items = this.actions.objectives();
@@ -131,6 +145,9 @@ export class PauseMenu {
       if (!items.length) this.list.textContent = 'Free dive · explore at your own pace.';
     } else if (view === 'sites') {
       this.title.textContent = 'Mission select';
+    } else if (view === 'credits') {
+      this.title.textContent = 'Data credits';
+      this.creditsSlot.replaceChildren(this.actions.credits());
     }
     if (this.open_) {
       if (view === 'menu') this.menu.querySelector('button')?.focus();

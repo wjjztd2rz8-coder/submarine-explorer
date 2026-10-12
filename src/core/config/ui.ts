@@ -37,8 +37,9 @@ export interface GlobeConfig {
   maxLatDeg: number;
   /** Rate (1/s) of the eased turn toward a focused pin. */
   focusLerpPerS: number;
-  /** Pins closer than this on screen (CSS px) are fanned out on a ring. */
-  pinOverlapPx: number;
+  /** Pin hit-area side (CSS px), mouse / touch; pins closer than this merge into a cluster. */
+  pinHitPx: number;
+  pinHitTouchPx: number;
   /** Pins this close to the horizon (dot of normal and view, 0..1) fade out. */
   pinHorizonFade: number;
   /** Land albedo multiplier and saturation (ocean-forward styling). */
@@ -257,7 +258,8 @@ export const DEFAULT_GLOBE: GlobeConfig = {
   wheelZoomPerPx: 0.0015,
   maxLatDeg: 80,
   focusLerpPerS: 5,
-  pinOverlapPx: 16,
+  pinHitPx: 32,
+  pinHitTouchPx: 44,
   pinHorizonFade: 0.18,
   landDim: 0.22,
   landSaturation: 0.35,
