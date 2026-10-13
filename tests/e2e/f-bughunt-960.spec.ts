@@ -105,7 +105,8 @@ for (const layout of [
             const briefing = page.locator('.briefing');
             await expect(briefing).toBeVisible();
             await expect(
-              briefing.getByRole('radio', { name: 'near the first target', exact: true }),
+              // Start position sits in the collapsed Advanced panel, so it is not in the role tree.
+              briefing.locator('.briefing-start input[value="near-site"]'),
             ).toBeChecked();
             const panel = briefing.locator('.briefing-panel');
             expect(await panel.evaluate((e) => e.scrollWidth - e.clientWidth)).toBeLessThanOrEqual(

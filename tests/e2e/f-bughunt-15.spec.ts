@@ -163,6 +163,7 @@ for (const viewport of [
             // The scan card owns the instruction; the tutorial returns once it is out of the way.
             await expect(page.locator('.onboard-card')).toBeHidden();
             await setScanCardSuppressed(page, true);
+            await page.clock.runFor(34);
             for (const step of ['move', 'depth', 'scan']) {
               await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
               if (phase === 'tutorial steps') await separate(page, [...hud, '.onboard-card']);

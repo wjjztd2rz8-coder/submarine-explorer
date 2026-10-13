@@ -47,8 +47,8 @@ export function tutorialText(
       if (scanProgress !== null)
         return `Scanning… ${Math.round(Math.max(0, Math.min(1, scanProgress)) * 100)}% · keep holding ${device === 'touch' ? 'SCAN' : k.scan}.`;
       return device === 'touch'
-        ? 'Face a glowing target and hold SCAN until it finishes.'
-        : `Face a glowing target and hold ${k.scan} until it finishes.`;
+        ? 'Hold SCAN on a glowing target.'
+        : `Hold ${k.scan} on a glowing target.`;
   }
 }
 

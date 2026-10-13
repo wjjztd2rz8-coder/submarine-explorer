@@ -7,6 +7,7 @@ import type { Terrain } from '../../src/world/Terrain.js';
 import type { Props } from '../../src/world/Props.js';
 import type { Save } from '../../src/core/Save.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { openBriefingAdvanced } from './helpers/briefing.js';
 
 interface Game {
   rig: CameraRig;
@@ -162,6 +163,7 @@ test('Lost City briefing mode changes and surface starts restore the appropriate
   await page.evaluate(() => (window.__game as unknown as Game).save.setGameplayMode('arcade'));
   await ready(page, 'mission=lost-city');
   await expect.poll(async () => (await camera(page)).radius).toBeCloseTo(defaultRadius, 6);
+  await openBriefingAdvanced(page);
   await page
     .locator('.briefing')
     .getByRole('radio', { name: /^at the surface/ })

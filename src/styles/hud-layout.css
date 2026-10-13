@@ -954,24 +954,24 @@ html.is-touch .scan-objective-chip:not([hidden]) {
   border-radius: 999px;
 }
 /* The tutorial's own instruction already says where to go. */
-html.is-touch body:has(.onboard-card:not([hidden], [data-step='journal'])) .scan-objective-chip {
+html.is-touch body:has(.onboard-card:not([hidden], [data-step='scan'])) .scan-objective-chip {
   display: none;
 }
 /* Phones up to 900 px wide already use the one-line bottom card above. */
 @media (min-width: 901px) and (max-height: 460px) and (orientation: landscape) {
-  html.is-touch .onboard-card[data-step='journal']:not([hidden]) {
+  html.is-touch .onboard-card[data-step='scan']:not([hidden]) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     column-gap: 8px;
     align-items: center;
     padding: 2px 8px;
   }
-  html.is-touch .onboard-card[data-step='journal'] .onboard-card-head,
-  html.is-touch .onboard-card[data-step='journal'] .onboard-card-title,
-  html.is-touch .onboard-card[data-step='journal'] .onboard-card-text {
+  html.is-touch .onboard-card[data-step='scan'] .onboard-card-head,
+  html.is-touch .onboard-card[data-step='scan'] .onboard-card-title,
+  html.is-touch .onboard-card[data-step='scan'] .onboard-card-text {
     display: none;
   }
-  html.is-touch .onboard-card[data-step='journal'] .onboard-card-phone-text {
+  html.is-touch .onboard-card[data-step='scan'] .onboard-card-phone-text {
     display: block;
     grid-column: 1;
     grid-row: 1;
@@ -981,15 +981,15 @@ html.is-touch body:has(.onboard-card:not([hidden], [data-step='journal'])) .scan
     white-space: nowrap;
     font-size: 12px;
   }
-  html.is-touch .onboard-card[data-step='journal'] .onboard-card-buttons {
+  html.is-touch .onboard-card[data-step='scan'] .onboard-card-buttons {
     grid-column: 2;
     grid-row: 1;
   }
-  html.is-touch .onboard-card[data-step='journal'] .onboard-skip-all {
+  html.is-touch .onboard-card[data-step='scan'] .onboard-skip-all {
     padding: 0 8px;
     font-size: 12px;
   }
-  body:has(.onboard-card[data-step='journal']:not([hidden])) .scan-overlay .scan-stack {
+  body:has(.onboard-card[data-step='scan']:not([hidden])) .scan-overlay .scan-stack {
     top: calc(116px + env(safe-area-inset-top, 0px));
   }
 }
