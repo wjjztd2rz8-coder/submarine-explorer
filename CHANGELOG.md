@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-bluehole Blue Hole sediment terraces:** gallery aprons use smooth sampled normals, softer risers, 3x the triangles on Medium and above, varied bed roughness, silt darkening at riser feet and per-pixel bed shading (dark riser, lit lip) so terraces read as stacked sediment on every tier, Low included at its exact triangle and draw budget. Reason: the golden approach read as flat polygon steps. The apron collision gap stays a separate item. Details: `plan/progress/1410-f-bluehole-bowl-facets.md`.
+
 - **S-hygiene (tooling):** gate runs write builds, Playwright results and logs under `.cache/runs/<id>/` (`.cache/gates/<gate>.log` links to the latest run). `tools/clean-artifacts.sh` lists stale `dist-*`, `test-results-*` and run directories (dry run by default; skips live `PW_OUTDIR`s). Reason: the repo root had accumulated about 3 GB of stale output. One-off shot scripts, `codex-available.sh` and `playwright.bughunt-880.config.ts` moved to `tools/archive/`; seven superseded plan files and the progress images moved to `plan/archive/`. Docs now state 30 e2e shards.
 - **1392 narrow landscape follow-up:** restore Scan to the two right action columns so discovery rewards clear it, and place the small-phone tutorial in the centre lane below wrapped scan guidance and beside telemetry/actions. Reason: the 667×375 reward sweep exposed collisions beyond the Boost column.
 
