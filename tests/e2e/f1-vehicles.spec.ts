@@ -12,13 +12,12 @@ type G = {
     orbitRadius: number;
     orbitAzimuth: number;
     orbitElevation: number;
-    chaseRadius: number;
   };
   sub: { setHullClass(c: string): boolean; position: { y: number } };
   subMesh: { hullClass: string };
 };
 
-test('hull classes, ROV with tether and cockpit view render', async ({ page }) => {
+test('hull classes and cockpit view render', async ({ page }) => {
   await mkdir(shots, { recursive: true });
   // Small viewport: software-GL hosted runners spend most of the test in
   // full-size screenshot captures.
@@ -63,13 +62,4 @@ test('hull classes, ROV with tether and cockpit view render', async ({ page }) =
     await frames(8);
     await page.screenshot({ path: `${shots}/cockpit-${cls}.png`, scale: 'css' });
   }
-
-  await page.evaluate(() => (window.__game as unknown as G).rig.setMode('chase'));
-  await page.evaluate(() => {
-    (window.__game as unknown as G).rig.chaseRadius = 30;
-  });
-  await page.keyboard.press('e');
-  await expect(page.locator('.hud-rov')).toBeVisible();
-  await frames(90);
-  await page.screenshot({ path: `${shots}/rov-tether.png`, scale: 'css' });
 });

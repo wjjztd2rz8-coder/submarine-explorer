@@ -36,7 +36,7 @@ export const FRAME_STAGES = [
   'gate.photo', // photo: enter / leave photo mode, final `frozen`
   'gate.pointer', // pointer: drop pointer lock when frozen, pointer-look hint, keyboard lock
   'gate.input', // loop: the input the sim sees and the fixed steps to run
-  'sim.vehicles', // rov: deploy / retrieve, then fixed steps for the ROV or the sub
+  'sim.vehicles', // submarine: fixed physics steps
   'sim.power', // power: battery and oxygen drain, emergency ascent when empty
   'sim.contact', // props: push the sub out of props
   'controls.camera', // cameraControls: view toggle, reset, mouse look and wheel
@@ -44,18 +44,15 @@ export const FRAME_STAGES = [
   'controls.vehicle', // submarine: lights, sim speed
   'events', // submarine: collision, crush, hull stress, emergency blow events
   'events.power', // power: free-dive "supplies exhausted" debrief
-  'pose', // submarine, rov: meshes and the ROV HUD
-  'camera.pilot', // submarine, rov: what the camera follows
+  'pose', // submarine: hull mesh
+  'camera.pilot', // submarine: what the camera follows
   'camera.rig', // camera: rig update
-  'camera.rov', // rov: ROV camera offset and aim
   'camera.photo', // photo: viewfinder caption and capture request
   'env.atmosphere', // atmosphere: depth-driven fog and light
   'env.presets', // presets: environment preset for the site
   'env.lighting', // atmosphere: headlights, marine snow, water surface
   'world.life', // life: step and draw the marine life, refresh its scan targets
-  'scan.rovRange', // rov: widen scan radii while the ROV pilots
   'scan.discovery', // discovery: scan beam, POIs, journal
-  'scan.rovRangeRestore', // rov: restore scan radii
   'guide.waypoints', // waypoints: next objective marker
   'guide.sonar', // sonar: objective and redraw
   'hud.feeds', // power, currents: HUD inputs
@@ -93,7 +90,7 @@ export interface FrameState {
   realSteps: number;
   /** gate.shell: frozen by the shell or a modal (not by the debriefs). */
   shellFrozen: boolean;
-  /** gate.shell: also blocked by a debrief (ROV and photo mode drop out). */
+  /** gate.shell: also blocked by a debrief (photo mode drops out). */
   blocked: boolean;
   /** gate.shell / gate.photo: nothing simulates this frame. */
   frozen: boolean;
@@ -107,7 +104,7 @@ export interface FrameState {
   sub: SubmarineState;
   /** camera.pilot: the sub's forward vector. */
   forward: THREE.Vector3;
-  /** camera.pilot: the piloted vehicle (ROV when deployed, else the sub). */
+  /** camera.pilot: the submarine. */
   pilotPosition: THREE.Vector3;
   pilotForward: THREE.Vector3;
   pilotYaw: number;

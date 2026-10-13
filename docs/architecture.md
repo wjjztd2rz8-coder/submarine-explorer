@@ -69,11 +69,8 @@ anywhere while expanded; the camera does not zoom in that state). `game/Power.ts
 battery/oxygen system (`docs/power.md`); `world/Currents.ts` loads an offline
 per-tile HYCOM current grid from `data/currents/<tile>.json`
 (`docs/currents.md`); both are gated by the `gameplay.batteryOxygen` and
-`gameplay.currents` settings. `rov/Rov.ts` + `rov/RovVisual.ts` + `ui/RovHUD.ts`
-are the tethered ROV (`E` to deploy/retrieve; it flies, scans and returns, with
-its own chase camera). `ui/PhotoMode.ts` + `game/PhotoStore.ts` are photo mode
-(`P`; `Enter`/`Space` captures): a free-orbit camera around the sub or the
-deployed ROV, saving captioned JPEG thumbnails to `subexplorer.photos.v1`,
+`gameplay.currents` settings. `ui/PhotoMode.ts` + `game/PhotoStore.ts` are photo mode
+(`P`; `Enter`/`Space` captures): a free-orbit camera around the sub, saving captioned JPEG thumbnails to `subexplorer.photos.v1`,
 newest 24 kept. A visible Capture button records photos, and the gallery
 downloads individual JPEGs or one ZIP. `MissionState` gained a `primaries-complete` stage between
 `diving` and `debrief` (`mission:primaryComplete`, `mission:ended`), so
@@ -192,11 +189,6 @@ flowchart TD
       CAM["CameraRig\nchase / first-person / orbit / photo"]
     end
 
-    subgraph rov["rov/ (D-ROV)"]
-      ROV["Rov\ntethered flight, scan, return"]
-      RVIS["RovVisual\nlit chase-view model"]
-    end
-
     subgraph audio["audio/"]
       AUD["AudioSystem\nengine, sonar echo, beds, cues"]
     end
@@ -212,7 +204,6 @@ flowchart TD
       JRN["Journal (D-FLOW)\nreplaces FieldGuide; site/POI/species + photo gallery tab"]
       PGAL["PhotoGallery (D-PHOTO)"]
       PHM["PhotoMode (D-PHOTO)\nfree-orbit viewfinder"]
-      RHUD["RovHUD (D-ROV)"]
       DB["Debrief"]
       BR["Briefing"]
       OP["ObjectivesPanel"]
@@ -257,8 +248,6 @@ flowchart TD
   CUR --> PHY
   MAIN --> PWR
   PHY --> PWR --> HUD
-  MAIN --> ROV --> RVIS & RHUD
-  TER --> ROV
   MAIN --> PHM --> PS --> PGAL --> JRN
 ```
 
@@ -317,7 +306,7 @@ returns to `'dive'`.
 9. `MissionSelect` lists tiles and (via `loadMissionSummaries`) missions; the
    `Home` and `PauseMenu` overlays share it for their site pickers.
 10. `Input`, `Settings` (a dialog opened from Home/PauseMenu, not a key),
-    `Power`, `Currents`, `Rov`/`RovVisual`/`RovHUD`, `PhotoMode`/`PhotoStore`,
+    `Power`, `Currents`, `PhotoMode`/`PhotoStore`,
     then `MissionRouter` (briefing, objectives, completion) if routed. Saved
     tier/detail apply before terrain construction; saved sim speed and the
     saved gameplay mode's speed/descent/light/sensor profile apply after the
@@ -501,8 +490,7 @@ and `env:trench` (pressure creak, sharing the hull-stress cooldown).
 subscribes to `save.onChange()` directly for live changes (captions,
 reduce-motion, palette, post-FX and the live gameplay profile). Tier/detail/
 default-speed apply on reload. `main.ts` also subscribes to `app:state`
-itself (D-SHELL) to pause/resume audio, close photo mode and abort a deployed
-ROV outside the `'dive'` state, and `journal.setHomeMode` toggles the
+itself (D-SHELL) to pause/resume audio and close photo mode outside the `'dive'` state, and `journal.setHomeMode` toggles the
 Journal's home-mode framing. `settings:changed` **is** emitted now (`Save.commit`,
 once per changed key), but still has no subscriber — `main.ts` keeps using
 `save.onChange()` directly. `ui:selectTile` remains declared only, with
@@ -584,7 +572,7 @@ streaming (Tier 4), and a hard draw-call cap.
 `window.__game` keys (`main.ts`): `scene`, `renderer`, `terrain`, `sub`, `rig`,
 `water`, `atmosphere`, `headlights`, `audio`, `bus`, `config`, `power` (see
 [`power.md`](./power.md)), `currents` (see [`currents.md`](./currents.md)),
-`rov`, `rovHud`, `rovVisual`, `photos`, `photoMode`, `meta`, `scanner`,
+`photos`, `photoMode`, `meta`, `scanner`,
 `discoveries`, `discovery`, `debrief`, `fieldGuide` (the `Guide` instance
 `discovery.guide` wraps; `Journal` is the separate `journal` key below),
 `props`, `propsDebug`, `presets`, `mission`, `missionRouter`, `missionSelect`,
@@ -674,7 +662,7 @@ fresh pilot and writes workshop, mission-select and debrief screenshots.
 ### Phase F curiosity integration
 
 `app/systems/explore.ts` owns the local curiosities and the event scheduler. It
-registers after discovery, Journal, audio and ROV; its `world.life` hook runs
+registers after discovery, Journal and audio; its `world.life` hook runs
 before the scanner. `core/config/explore.ts` holds local range, timing and visual
 budgets. `window.__game.explore` exposes `ready`, `secrets`, `sampleTargets`,
 `faintContacts`, `samples`, `scheduler`, `summary()` and `previewEvent(kind)`.

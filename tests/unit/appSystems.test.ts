@@ -36,7 +36,9 @@ describe('createSystems', () => {
   it('has unique names and fresh stateful systems per call', () => {
     expect(new Set(names).size).toBe(names.length);
     const again = createSystems();
-    expect(again.find((s) => s.name === 'rov')).not.toBe(systems.find((s) => s.name === 'rov'));
+    expect(again.find((s) => s.name === 'submarine')).not.toBe(
+      systems.find((s) => s.name === 'submarine'),
+    );
   });
 
   it('keeps the listener-order constraints from the old main.ts', () => {
@@ -45,11 +47,9 @@ describe('createSystems', () => {
     expect(at('power')).toBeLessThan(at('shellKeys'));
     // Settings' capture-phase key handler before the mission router's.
     expect(at('settings')).toBeLessThan(at('mission'));
-    // app:state: journal and audio hear the initial `dive` emit; ROV and photo do not.
+    // app:state: journal and audio hear the initial `dive` emit; photo does not.
     expect(at('journal')).toBeLessThan(at('shellKeys'));
     expect(at('audio')).toBeLessThan(at('shellKeys'));
-    expect(at('rov')).toBeGreaterThan(at('shellKeys'));
-    expect(at('photo')).toBeLessThan(at('rov')); // its app:state listener is added in start()
   });
 
   it('uses every frame stage that has a job, in the pre-F0 frame order', () => {
@@ -58,9 +58,9 @@ describe('createSystems', () => {
     const stages = runner.order.map((e) => e.split(':')[0]);
     expect(new Set(stages)).toEqual(new Set(FRAME_STAGES));
     expect(runner.order).toContain('gate.input: inputGate');
-    expect(runner.order.indexOf('pose: submarine')).toBeLessThan(runner.order.indexOf('pose: rov'));
-    expect(runner.order.indexOf('camera.pilot: submarine')).toBeLessThan(
-      runner.order.indexOf('camera.pilot: rov'),
+    expect(runner.order).toContain('sim.vehicles: submarine');
+    expect(runner.order.indexOf('sim.vehicles: submarine')).toBeLessThan(
+      runner.order.indexOf('sim.power: power'),
     );
     expect(runner.order.indexOf('hud.feeds: power')).toBeLessThan(
       runner.order.indexOf('hud.feeds: currents'),

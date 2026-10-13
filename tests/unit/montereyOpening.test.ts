@@ -147,7 +147,7 @@ describe('Monterey opening habitat', () => {
   }
 });
 
-it('keeps Monterey lamp gains through mode changes, toggles and ROV retrieval', () => {
+it('keeps Monterey lamp gains through mode changes and toggles', () => {
   const config = makeConfig();
   const tier = atmosphereTier(config.water, 'low');
   const standard = new Headlights(config.water, tier);
@@ -161,10 +161,6 @@ it('keeps Monterey lamp gains through mode changes, toggles and ROV retrieval', 
       expect(monterey.lights[0]!.distance).toBeGreaterThan(standard.lights[0]!.distance);
       monterey.setEnabled(false);
       monterey.setEnabled(true);
-      monterey.update(new THREE.Vector3(), new THREE.Vector3(0, 0, -1), undefined, 0, 1, 0.3);
-      expect(monterey.lights[0]!.intensity).toBe(
-        preset.intensity * preset.workLight!.intensityFactor,
-      );
       monterey.update(new THREE.Vector3(), new THREE.Vector3(0, 0, -1));
       expect(monterey.lights[0]!.intensity).toBe(
         preset.intensity * MONTEREY_OPENING.lamps.intensity,

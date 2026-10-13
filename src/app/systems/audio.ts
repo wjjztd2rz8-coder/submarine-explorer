@@ -65,15 +65,13 @@ export const audioSystem: GameSystem = {
       ctx.audio.update({
         ratedDepth: s.ratedDepth,
         hullStress: s.hullStress,
-        rovMode: ctx.rov.mode,
-        tetherUsedM: ctx.rov.tetherUsedM,
         soundSites: sites,
         whaleHabitat: ['monterey-canyon', 'kamaehuakanaloa', 'axial-seamount-ashes'].includes(
           ctx.tileId,
         ),
         depth: s.depth,
-        throttle: ctx.rov.deployed ? 0 : f.state.throttle,
-        ballast: ctx.rov.deployed ? 0 : f.state.ballast,
+        throttle: f.state.throttle,
+        ballast: f.state.ballast,
         speed: s.speed,
         position: f.pilotPosition,
         forward: f.pilotForward,

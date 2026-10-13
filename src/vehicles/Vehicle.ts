@@ -65,8 +65,6 @@ export interface Blueprint {
   decalText: DecalText | null;
   /** Pilot eye for the cockpit view, inside the pressure sphere. */
   cockpitEye: THREE.Vector3;
-  /** Where the ROV tether leaves the vehicle. */
-  tetherAnchor: THREE.Vector3;
   /** Blade count for this vehicle's propellers. */
   blades?: number;
 }
@@ -94,9 +92,8 @@ export class Vehicle {
   readonly id: string;
   readonly label: string;
   readonly lod: VehicleLod;
-  /** Cockpit eye and tether anchor in the parent (world-scale, boat-local) frame. */
+  /** Cockpit eye in the parent (world-scale, boat-local) frame. */
   readonly cockpitEye: THREE.Vector3;
-  readonly tetherAnchor: THREE.Vector3;
   readonly materials: VehicleMaterials;
   readonly props: THREE.InstancedMesh;
   readonly propSpecs: PropSpec[];
@@ -132,7 +129,6 @@ export class Vehicle {
     this.root.name = `vehicle-${bp.id}`;
     this.root.scale.setScalar(opts.scale);
     this.cockpitEye = bp.cockpitEye.clone().multiplyScalar(opts.scale);
-    this.tetherAnchor = bp.tetherAnchor.clone().multiplyScalar(opts.scale);
     this.materials = new VehicleMaterials(opts.look, !low, !low);
     const mats = this.materials;
     const frameMat = mats.bySlot.frame;

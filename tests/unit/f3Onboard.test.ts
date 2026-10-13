@@ -18,10 +18,9 @@ const calm: HintContext = {
   hullHintEligible: true,
   scanTargetInRange: false,
   creatureInView: false,
-  rovAvailable: false,
   canShow: true,
 };
-const labels = { scan: 'F', rov: 'E', photo: 'P', lights: 'L' };
+const labels = { scan: 'F', photo: 'P', lights: 'L' };
 
 describe('hint engine', () => {
   it('defers hull guidance for 20 dive seconds without consuming it', () => {
@@ -119,7 +118,6 @@ describe('hint engine', () => {
     const e = new HintEngine(['creature']);
     expect(e.update(0, { ...calm, battery: null })).toBeNull();
     expect(e.update(0, { ...calm, creatureInView: true })).toBeNull();
-    expect(e.update(0, { ...calm, rovAvailable: true })).toBe('rov');
   });
   it('has a one-line, caveat-free text for every hint', () => {
     for (const make of Object.values(HINT_TEXT)) {
@@ -265,13 +263,13 @@ describe('onboard save', () => {
   });
   it('round-trips and drops unknown hint ids', () => {
     const storage = memory();
-    new TutorialSave(storage).save({ tutorialDone: true, seenHints: ['rov', 'battery-low'] });
+    new TutorialSave(storage).save({ tutorialDone: true, seenHints: ['battery-low'] });
     const back = new TutorialSave(storage).get();
     expect(back.tutorialDone).toBe(true);
-    expect(back.seenHints).toEqual(['battery-low', 'rov']);
-    expect(migrateOnboard({ tutorialDone: true, seenHints: ['x', 'rov'] }).seenHints).toEqual([
-      'rov',
-    ]);
+    expect(back.seenHints).toEqual(['battery-low']);
+    expect(
+      migrateOnboard({ tutorialDone: true, seenHints: ['x', 'rov', 'battery-low'] }).seenHints,
+    ).toEqual(['battery-low']);
   });
   it('never overwrites a newer version', () => {
     const storage = memory('{"version":2,"tutorialDone":true}');
@@ -300,9 +298,8 @@ describe('controls layouts', () => {
     expect(text).not.toContain('Shift');
   });
   it('compact tips follow the device', () => {
-    expect(compactTips('touch', key as never, false)).toBeNull();
-    expect(compactTips('keyboard', key as never, false)).toContain('speed');
-    expect(compactTips('gamepad', key as never, false)).toContain('Left stick');
-    expect(compactTips('keyboard', key as never, true)).toContain('retrieve ROV');
+    expect(compactTips('touch', key as never)).toBeNull();
+    expect(compactTips('keyboard', key as never)).toContain('speed');
+    expect(compactTips('gamepad', key as never)).toContain('Left stick');
   });
 });

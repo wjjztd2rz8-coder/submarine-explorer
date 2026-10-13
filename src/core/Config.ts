@@ -20,7 +20,6 @@ import {
   DEFAULT_DESCENT_PROFILES,
   DEFAULT_LIGHT_PRESETS,
   DEFAULT_POWER,
-  DEFAULT_ROV,
   DEFAULT_SENSOR_PRESETS,
   DEFAULT_SPEED_PROFILES,
 } from './config/gameplay.js';
@@ -77,7 +76,6 @@ export const DEFAULT_CONFIG: GameConfig = {
   sensorPresets: DEFAULT_SENSOR_PRESETS,
   power: DEFAULT_POWER,
   currents: DEFAULT_CURRENTS,
-  rov: DEFAULT_ROV,
   sonarZoom: DEFAULT_SONAR_ZOOM,
   sonarPalettes: DEFAULT_SONAR_PALETTES,
   globe: DEFAULT_GLOBE,
@@ -133,7 +131,6 @@ export function makeConfig(overrides: Partial<GameConfig> = {}): GameConfig {
     sensorPresets: { ...DEFAULT_CONFIG.sensorPresets, ...overrides.sensorPresets },
     power: { ...DEFAULT_CONFIG.power, ...overrides.power },
     currents: { ...DEFAULT_CONFIG.currents, ...overrides.currents },
-    rov: { ...DEFAULT_CONFIG.rov, ...overrides.rov },
     sonarPalettes: { ...DEFAULT_CONFIG.sonarPalettes, ...overrides.sonarPalettes },
     sonarZoom: { ...DEFAULT_CONFIG.sonarZoom, ...overrides.sonarZoom },
     globe: { ...DEFAULT_CONFIG.globe, ...overrides.globe },

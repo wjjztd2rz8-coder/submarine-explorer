@@ -33,8 +33,6 @@ import type { applyFreeDiveHull } from '../game/Spawn.js';
 import type { Atmosphere } from '../render/Atmosphere.js';
 import type { Headlights } from '../render/Headlights.js';
 import type { MarineSnow } from '../render/MarineSnow.js';
-import type { Rov } from '../rov/Rov.js';
-import type { RovVisual } from '../rov/RovVisual.js';
 import type { UnderwaterPass } from '../shaders/underwater.js';
 import type { CameraRig } from '../sub/CameraRig.js';
 import type { SubMesh } from '../sub/SubMesh.js';
@@ -48,7 +46,6 @@ import type { Journal } from '../ui/Journal.js';
 import type { MissionSelect } from '../ui/MissionSelect.js';
 import type { PauseMenu } from '../ui/PauseMenu.js';
 import type { PhotoMode } from '../ui/PhotoMode.js';
-import type { RovHUD } from '../ui/RovHUD.js';
 import type { SettingsScreen } from '../ui/Settings.js';
 import type { Sonar } from '../ui/Sonar.js';
 import type { Waypoints } from '../ui/Waypoints.js';
@@ -178,9 +175,6 @@ export interface GameContext extends BootContext {
   resize(): void;
   /** Draw calls and triangles of the last frame, post pass included. */
   renderStats: { calls: number; triangles: number };
-  rov: Rov;
-  rovVisual: RovVisual;
-  rovHud: RovHUD;
   /** F-TITLE-E: the home backdrop (diagnostics and draw entry). */
   titleScene: TitleBridge;
 }

@@ -33,7 +33,7 @@ test.describe('1020 portrait openings', () => {
           JSON.stringify({
             version: 1,
             tutorialDone: true,
-            seenHints: ['battery-low', 'creature', 'rov'],
+            seenHints: ['battery-low', 'creature'],
           }),
         );
       });

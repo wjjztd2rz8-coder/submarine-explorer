@@ -49,10 +49,7 @@ export class AudioSystem {
   private score: AmbientScore | null = null;
   private soundscape: Soundscape | null = null;
   private scanHum: MachineLoop | null = null;
-  private winch: MachineLoop | null = null;
-  private lastTether = 0;
   private lastThrust = 0;
-  private lastRovMode = 'stowed';
   private scanning = false;
   private disposed = false;
   private readonly echoes = new Set<number>();
@@ -101,7 +98,6 @@ export class AudioSystem {
   idle(): void {
     this.thruster?.update(0);
     this.scanHum?.update(0);
-    this.winch?.update(0);
     this.lastThrust = 0;
   }
 
@@ -170,7 +166,6 @@ export class AudioSystem {
     this.score = new AmbientScore(this.engine, this.config);
     this.soundscape = new Soundscape(this.engine, this.config, this.captions);
     this.scanHum = new MachineLoop(this.engine, 380);
-    this.winch = new MachineLoop(this.engine, 240);
     this.setSettings(this.settings);
     this.wireBusEvents();
   }
@@ -359,23 +354,6 @@ export class AudioSystem {
       frame.whaleHabitat ?? false,
     );
     this.scanHum?.update(this.scanning ? 0.06 : 0);
-    const tether = frame.tetherUsedM ?? 0;
-    const mode = frame.rovMode ?? 'stowed';
-    this.winch?.update(
-      mode === 'returning'
-        ? 0.1
-        : mode === 'piloting' && Math.abs(tether - this.lastTether) > 0.005
-          ? 0.05
-          : 0,
-    );
-    if (mode !== this.lastRovMode && mode !== 'stowed')
-      this.captions.emit({
-        id: 'winch',
-        text: mode === 'returning' ? 'ROV tether reels in' : 'ROV tether pays out',
-        durationS: 2,
-      });
-    this.lastTether = tether;
-    this.lastRovMode = mode;
     const stress = frame.hullStress ?? 0;
     const now = this.engine.ctx.currentTime;
     const gap = 20 - Math.min(1, stress) * 17;
@@ -430,7 +408,6 @@ export class AudioSystem {
     this.score?.stop();
     this.soundscape?.stop();
     this.scanHum?.stop();
-    this.winch?.stop();
 
     for (const u of this.unsubs) u();
     this.unsubs.length = 0;

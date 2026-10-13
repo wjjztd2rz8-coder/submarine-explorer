@@ -989,6 +989,8 @@ without an entry here is not done.
 
 ### Removed
 
+- **1496 (S-rov):** removed the deployable ROV, tether, controls, telemetry, hints, camera/lighting branches, audio winch and scan-radius rewriting. Known binding and onboarding saves drop retired fields while retaining remaps and tutorial progress. Reason: owner decision 2026-10-12; meaningful ROV exploration needs more scene detail than the current scope supports.
+
 - **1393 f-events-reform:** removed the marine-snow event, caption and fallback scheduling because permanent marine snow already supplies the same ambient visual. Sites with no remaining event habitat stay quiet.
 - **1393 f-events-reform:** removed the particle-plume event at Lost City: the repo's sourced research describes clear vent flow, which a billowing particle column would misrepresent; the allowed rendering budget does not provide a separate readable clear-flow effect.
 

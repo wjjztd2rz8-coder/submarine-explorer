@@ -1022,7 +1022,7 @@
       ],
       "gameplay_hooks": [
         "Follow a simulated turbidity current down-canyon",
-        "MBARI-style ROV midwater biology transect"
+        "MBARI-style midwater biology transect"
       ],
       "hazards": ["turbidity currents", "strong upwelling currents", "fishing gear"],
       "notable_species": ["Humboldt squid", "giant larvacean 'ghost' filters", "deep-sea corals"],
@@ -1651,7 +1651,7 @@
         "Grounding line has retreated several kilometers in recent decades, so its precise position is a moving target, hence low confidence here"
       ],
       "gameplay_hooks": [
-        "Under-ice-shelf ROV mission (Icefin-style) mapping the grounding line",
+        "Under-ice-shelf survey mapping the grounding line",
         "Climate-science time-pressure narrative: document retreat before it's gone"
       ],
       "hazards": [

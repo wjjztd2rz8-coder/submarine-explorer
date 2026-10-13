@@ -296,32 +296,3 @@ test('a full photo store reports the dropped oldest; quota failure is explained'
   await page.keyboard.press('Escape');
   await expect(page.locator('.photo-mode')).toBeHidden();
 });
-
-test('with the ROV out, photo mode orbits the ROV and leaves it deployed', async ({ page }) => {
-  await page.goto(DIVE);
-  await ready(page);
-  await page.keyboard.press('e');
-  await expect(page.locator('.hud-rov')).toBeVisible();
-  await page.keyboard.press('p');
-  await expect(page.locator('.photo-mode')).toBeVisible();
-  const view = await page.evaluate(() => {
-    const g = window.__game as unknown as {
-      rov: { deployed: boolean; position: { distanceTo(o: unknown): number } };
-      rig: { mode: string; orbitRadius: number; camera: { position: unknown } };
-    };
-    return {
-      deployed: g.rov.deployed,
-      mode: g.rig.mode,
-      radius: g.rig.orbitRadius,
-      distance: g.rov.position.distanceTo(g.rig.camera.position),
-    };
-  });
-  expect(view.deployed).toBe(true);
-  expect(view.mode).toBe('orbit');
-  expect(view.distance).toBeLessThanOrEqual(view.radius + 1);
-  await page.keyboard.press('Escape');
-  await expect(page.locator('.photo-mode')).toBeHidden();
-  expect(
-    await page.evaluate(() => (window.__game as { rov: { deployed: boolean } }).rov.deployed),
-  ).toBe(true);
-});

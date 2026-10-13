@@ -187,7 +187,7 @@ export function createProgressSystem(): GameSystem {
         const max =
           PROGRESS_CONFIG.boostSeconds * (1 + ctx.progress.level('boost') * UPGRADES[6].step);
         const dt = f.steps * f.fixedDt * ctx.sub.simSpeed;
-        if (f.state.boost && !ctx.rov.deployed) {
+        if (f.state.boost) {
           if (boostLeft <= 0) f.state = { ...f.state, boost: false };
           boostLeft = Math.max(0, boostLeft - dt);
         } else boostLeft = Math.min(max, boostLeft + dt * PROGRESS_CONFIG.boostRecoveryPerSecond);

@@ -93,7 +93,7 @@ capture; Escape and Tab cannot be bound. **Reset key bindings** restores the
 shipped map (`defaultActions()` in `src/core/Input.ts` — see the README's
 controls table for the current defaults: W/S, A/D, R/F pitch, Space rise,
 Ctrl-or-C sink, Shift boost, hold G to scan, L lights, M sonar, Q camera,
-X reset camera, T sim speed, J Journal, E ROV, P photo, Enter capture photo). The pane also has a note that dragging the
+X reset camera, T sim speed, J Journal, P photo, Enter capture photo). The pane also has a note that dragging the
 dive view orbits the camera and the wheel zooms it, an **Enable pointer
 look** button (closes Settings and locks the dive view; menus release it, and
 losing lock while diving opens pause), and a sonar note (`M` expands the map; `+`/`-` or the wheel
@@ -121,7 +121,9 @@ and writes v2 once if storage allows — the v1 key itself is left untouched,
 never deleted. `Input` migrates v2 bindings to v3: unchanged `V` pitch-down and `F` scan
 defaults become `F` and `G`; saved custom bindings are retained and `X` reset
 camera is added. A saved v1 map also migrates through the supported defaults.
-The earlier keys remain untouched. Each field is validated on load; a bad field
+The earlier keys remain untouched. Known binding records are rewritten without
+retired actions; onboarding records likewise drop retired hint IDs while keeping
+tutorial completion and other seen hints. Each field is validated on load; a bad field
 falls back to its default alone, and an invalid `gameplay` value sanitizes
 field by field against `Config.settings.gameplayOptions`. A newer stored
 version (of either key) is read as defaults and left on disk, never

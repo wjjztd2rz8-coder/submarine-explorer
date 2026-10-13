@@ -76,7 +76,6 @@ export function createDailySystem(): GameSystem {
           ctx.hud.setCurrentMode(mode);
           if (modifier === 'low-light') {
             ctx.headlights.setPreset(ctx.config.lightPresets.realistic);
-            ctx.rovVisual.setLightPreset(ctx.config.lightPresets.realistic);
           }
         };
         enforce();

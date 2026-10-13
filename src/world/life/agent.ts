@@ -109,7 +109,7 @@ export interface SimEnv {
   current?(x: number, z: number, out: { x: number; y: number; z: number }): void;
 }
 
-/** The sub (or ROV) as the animals see it. */
+/** The sub as the animals see it. */
 export interface SubInfo {
   x: number;
   y: number;

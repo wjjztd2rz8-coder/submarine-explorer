@@ -50,6 +50,15 @@ export class TutorialSave {
     const version = (raw as { version?: unknown } | null)?.version;
     this.readOnly = typeof version === 'number' && version > ONBOARD_VERSION;
     this.data = migrateOnboard(raw);
+    // Persist the filtered hint list for known saves; never overwrite future data.
+    const seen = (raw as { seenHints?: unknown } | null)?.seenHints;
+    if (
+      !this.readOnly &&
+      (version === undefined || version === ONBOARD_VERSION) &&
+      Array.isArray(seen) &&
+      seen.some((id) => !HINT_ORDER.includes(id as HintId))
+    )
+      this.save({});
   }
 
   get(): OnboardRecord {

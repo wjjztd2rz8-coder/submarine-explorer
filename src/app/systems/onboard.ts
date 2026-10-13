@@ -20,8 +20,6 @@ import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
-/** Seconds into a dive before the ROV hint is offered. */
-const ROV_HINT_AFTER_S = 60;
 
 export function createOnboardSystem(): GameSystem {
   let ctxRef: GameContext | null = null;
@@ -72,18 +70,15 @@ export function createOnboardSystem(): GameSystem {
 
   const hintLabels = (device: InputDevice): HintLabels => {
     const input = ctxRef!.input;
-    // ROV has no touch control; its contextual hint is suppressed below.
-    if (device === 'touch') return { scan: 'SCAN', rov: '', photo: 'PHOTO', lights: 'LIGHTS' };
+    if (device === 'touch') return { scan: 'SCAN', photo: 'PHOTO', lights: 'LIGHTS' };
     if (device === 'gamepad')
       return {
         scan: padLabel('scan', 'Right bumper'),
-        rov: input.primaryKeyLabel('toggleRov'),
         photo: padLabel('togglePhotoMode', 'Start'),
         lights: padLabel('toggleLights', 'X'),
       };
     return {
       scan: input.primaryKeyLabel('scan'),
-      rov: input.primaryKeyLabel('toggleRov'),
       photo: input.primaryKeyLabel('togglePhotoMode'),
       lights: input.primaryKeyLabel('toggleLights'),
     };
@@ -315,11 +310,6 @@ export function createOnboardSystem(): GameSystem {
             creatureHintAllowed(diveS, ctx.discovery.overlay.cardVisible) &&
             !ctx.cameraTips.moved &&
             (ctx.life?.targets.length ?? 0) > 0,
-          rovAvailable:
-            device === 'keyboard' &&
-            !ctx.rov.deployed &&
-            diveS > ROV_HINT_AFTER_S &&
-            !f.sub.emergencyBlow,
           canShow: !tutorial.active,
         });
         if (id) {

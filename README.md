@@ -211,7 +211,6 @@ stick or button is deflected, but its buttons are not rebindable yet.
 | `Q`                         | camera view (chase / first-person)                                                                              | Y                          |
 | `T`                         | sim speed 1x / 2x / 3x (a HUD badge shows it whenever it isn't 1x)                                              | D-pad up                   |
 | `J`                         | Journal (site, POI and species entries, plus your photo gallery)                                                | --                         |
-| `E`                         | deploy / retrieve the tethered ROV                                                                              | --                         |
 | `P`                         | photo mode (free-orbit camera, hidden HUD)                                                                      | Start                      |
 | `Enter`                     | capture a photo in photo mode; `Space` and the Capture button also work                                         | --                         |
 | `Esc`                       | pause menu; closes the top-most open dialog first                                                               | --                         |
@@ -285,8 +284,7 @@ entries" toggle lets you preview what you haven't found yet. Discoveries persist
 across reloads (`subexplorer.discoveries.v1`); the per-dive "already scanned"
 state that blocks re-scanning is separate and always resets on a new dive.
 
-**Photo mode** (`P`) swings a free-orbit camera around your sub — or the
-ROV, while it's deployed — and hides the HUD. `Enter`, `Space` or the visible
+**Photo mode** (`P`) swings a free-orbit camera around your sub and hides the HUD. `Enter`, `Space` or the visible
 **Capture** button captures a JPEG thumbnail (≤ 640 px wide) captioned with whichever site or POI is in
 frame, and saves it into the Journal's photo gallery
 (`subexplorer.photos.v1`, the newest 24 kept, oldest dropped with a notice

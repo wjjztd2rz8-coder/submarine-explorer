@@ -16,7 +16,6 @@ import type {
   GameplayOptions,
   LightPreset,
   PowerConfig,
-  RovConfig,
   SensorPreset,
   SpeedProfile,
 } from './gameplay.js';
@@ -65,7 +64,6 @@ export interface GameConfig {
   sensorPresets: Record<GameplayOptions['sensors'], SensorPreset>;
   power: PowerConfig;
   currents: CurrentsConfig;
-  rov: RovConfig;
   /** C5: sonar minimap palettes (`Sonar.setPalette`). */
   sonarPalettes: Record<SonarPaletteName, SonarPalette>;
   sonarZoom: SonarZoomConfig;

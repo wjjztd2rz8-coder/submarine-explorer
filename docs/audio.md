@@ -53,8 +53,7 @@ Tuning lives in `src/core/config/audio.ts`.
 
 - Thruster pitch and loudness follow absolute thrust; ballast hiss follows
   rise/flood edges. Hull creaks continue at depth and increase with hull stress.
-- Scan events start/stop a beam hum; tether movement and return mode drive the
-  ROV winch. Successful photo captures play a shutter. Scan start/end play a
+- Scan events start/stop a beam hum. Successful photo captures play a shutter. Scan start/end play a
   manipulator servo as the existing vehicle arms deploy/retract;
   `playManipulator()` also supports future sample-arm actions.
 - Two positional equal-power panners attach rumble/creaks to the nearest vent

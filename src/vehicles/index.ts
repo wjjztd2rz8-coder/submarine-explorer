@@ -15,7 +15,6 @@ import { DEFAULT_LOOK, type VehicleLook } from './materials.js';
 import { blueprintFor, type HullClassId } from './hulls.js';
 import { Vehicle, type VehicleLod } from './Vehicle.js';
 import { withDetail } from './kit.js';
-import { rovBlueprint } from './rov.js';
 
 export { Vehicle, type VehicleDrive, type VehicleLod, type VehicleStats } from './Vehicle.js';
 export type { HullClassId } from './hulls.js';
@@ -74,19 +73,4 @@ export function buildVehicle(
       washCount: washFor(tier),
     });
   });
-}
-
-/** Build the work ROV at a graphics tier (life size times `scale`). */
-export function buildRov(tier: string = 'high', scale = 1, opts: BuildOptions = {}): Vehicle {
-  const lod = lodForTier(tier);
-  return withDetail(
-    lod === 'low' ? LOW_DETAIL : 1,
-    () =>
-      new Vehicle(rovBlueprint(lod === 'low'), {
-        scale: scale * (opts.scaleFactor ?? 1),
-        lod,
-        look: { ...DEFAULT_LOOK, ...opts.look },
-        washCount: Math.round(washFor(tier) * 0.4),
-      }),
-  );
 }

@@ -45,7 +45,7 @@ describe('Disposables', () => {
     const names = createSystems()
       .filter((s) => typeof s.dispose === 'function')
       .map((s) => s.name);
-    for (const n of ['audio', 'pointer', 'power', 'rov', 'shellKeys', 'sonarControls', 'render'])
+    for (const n of ['audio', 'pointer', 'power', 'shellKeys', 'sonarControls', 'render'])
       expect(names).toContain(n);
   });
 });

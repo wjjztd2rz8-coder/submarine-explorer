@@ -15,7 +15,6 @@ it('renders fresh hints, expires at the deadline, and still respects settings an
     sub: { simSpeed: 1 },
     rig: { mode: 'chase' },
     save: { get: () => ({ controlTips: enabled }) },
-    rov: { deployed: false },
     controlsCard: { compactTips: () => 'W/S speed' },
     cameraTips: { until: 20_000 },
   } as unknown as GameContext;
