@@ -73,7 +73,7 @@ The newest items go first.
 
 - **Phone-test items** (owner, 2026-10-11; decisions in [PHONE-FEEDBACK-2026-10-11.md](PHONE-FEEDBACK-2026-10-11.md)): all six DONE. P-touch-controls (1392), P-first-dive-flow (1391) and P-events-reform (1393) merged 2026-10-12 (f3c9221, 677cda2, eb8dd33) after full gates in their worktrees and screenshot review.
 - **R-release:** IN FLIGHT (Claude, 2026-10-12): full gates on main at eb8dd33.
-- **Codex dispatcher restored** 2026-10-12 21:26 (`dispatch-max` 3). Running: 1401 (S-tests step 1), 1402 (S-bugs). 1410 (V-bluehole facets) was stopped after its first round and moved to the Claude lane with its wip commit. Queued: 1430 (CI shard 7, S-tests), 1440 (scan-candidate bug hunt), 1496 (S-rov). Held: 1495 (Blue Hole collision) until V-bluehole merges. Claude visual lane, one Sonnet at a time, briefs in `.cache/claude/visual/`: V-bluehole (1410 worktree), V-beebe (1420), V-endurance (1480), S-tiers (1497). 1470 is replaced by 1401. S-rewards waits for S-flow (both touch the completion banner); S-picker (Sonnet) and S-daily (Haiku) follow the current Claude agents.
+- **Codex dispatcher restored** 2026-10-12 21:26 (`dispatch-max` 3). Running: 1401 (S-tests step 1), 1402 (S-bugs). 1410 (V-bluehole facets) was stopped after its first round and moved to the Claude lane with its wip commit. Queued: 1430 (CI shard 7, S-tests), 1440 (scan-candidate bug hunt), 1496 (S-rov). Held: 1495 (Blue Hole collision) until V-bluehole merges. Claude visual lane, one Sonnet at a time, briefs in `.cache/claude/visual/`: V-bluehole (1410 worktree, IN FLIGHT Claude Sonnet 2026-10-12), V-beebe (1420), V-endurance (1480), S-tiers (1497). 1470 is replaced by 1401. S-rewards waits for S-flow (both touch the completion banner); S-picker (Sonnet) and S-daily (Haiku) follow the current Claude agents.
 - **Sol round 2** on the simplification review is in (`.cache/review/simplify-20261011/sol-round2.md`); its corrections are folded into the items below, marked "Sol r2".
 
 ## Backlog
@@ -154,7 +154,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 
     Guard everything with the golden set.
 
-16. **S-hygiene [Haiku]** IN FLIGHT (Claude Haiku, 2026-10-12, worktree S-hygiene) (§7). This touches tools/ and plan/, so Codex refill must not take it.
+16. **S-hygiene [Haiku]** DONE on branch claude/S-hygiene, merges after R-release (§7). This touches tools/ and plan/, so Codex refill must not take it.
     - `tools/clean-artifacts.sh` (dry run by default; skip live `PW_OUTDIR`s).
     - Gates and Codex runs write under `.cache/runs/<id>/`, with retention, instead of `dist-*`/`test-results-*` at the repo root (232 stale directories, 2.3 GB).
     - Archive one-off tools, `playwright.bughunt-880.config.ts` and the 10 historical plan contracts and QA files.
