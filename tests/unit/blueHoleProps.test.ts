@@ -121,9 +121,12 @@ describe('Great Blue Hole props', () => {
         });
         const apron = built.full.getObjectByName('grotto-sediment-apron') as THREE.Mesh;
         const original = baseline.full.getObjectByName('grotto-sediment-apron') as THREE.Mesh;
-        expect(apron.geometry.index!.count).toBe(
-          original.geometry.index!.count * (tier === 'low' ? 1 : 2),
-        );
+        const scale =
+          tier === 'low' ? 1 : cfg.blueHoleApron.rowDensity * cfg.blueHoleApron.columnDensity;
+        // Grid sizes are rounded per axis, so the ratio holds to within a percent.
+        expect(apron.geometry.index!.count / original.geometry.index!.count).toBeCloseTo(scale, 1);
+        if (tier === 'low')
+          expect(apron.geometry.index!.count).toBe(original.geometry.index!.count);
         expect(built.bounds.equals(baseline.bounds)).toBe(true);
         expect(built.colliders).toEqual(baseline.colliders);
         expect(built.full.children.map((o) => o.name)).toEqual(
