@@ -307,7 +307,6 @@ describe('controls layouts', () => {
     expect(input.getAction('toggleJournal')?.pad).toBe('D-pad left');
     expect(input.getAction('resetCamera')?.pad).toBe('D-pad down');
     expect(input.getAction('capturePhoto')?.pad).toBe('Left bumper');
-    expect(input.getAction('toggleRov')?.pad).toBeUndefined();
   });
   it('shows touch buttons and no keyboard keys on touch', () => {
     const text = JSON.stringify(controlGroups('touch', key as never));

@@ -87,7 +87,6 @@ describe('Input action map', () => {
       const check = (expected: keyof InputState | null): void => {
         const state = input.sample();
         for (const [, edge] of padEdges) expect(Boolean(state[edge])).toBe(edge === expected);
-        expect(state.toggleRov).toBe(false);
         expect(state.scan).toBe(false);
         expect(state.boost).toBe(false);
         expect([state.throttle, state.yaw, state.pitch, state.ballast]).toEqual([0, 0, 0, 0]);
@@ -126,7 +125,6 @@ describe('Input action map', () => {
         capturePhoto: true,
         resetCamera: true,
         toggleGuide: true,
-        toggleRov: false,
       });
       input.endFrame();
       expect(input.sample()).toMatchObject({
