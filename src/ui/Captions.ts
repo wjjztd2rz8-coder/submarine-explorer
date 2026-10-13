@@ -16,18 +16,18 @@
  */
 
 /** Structural copy of `CaptionEvent` (src/audio/events.ts); UI does not import audio. */
-export interface CaptionCue {
+interface CaptionCue {
   id: string;
   text: string;
   durationS: number;
 }
 
 /** Structural copy of `CaptionBus.on`. */
-export interface CaptionSource {
+interface CaptionSource {
   on(handler: (cue: CaptionCue) => void): () => void;
 }
 
-export interface CaptionLine {
+interface CaptionLine {
   id: string;
   text: string;
   /** Clock time (seconds) the line disappears. */
@@ -79,7 +79,7 @@ export class CaptionQueue {
   }
 }
 
-export interface CaptionsOptions {
+interface CaptionsOptions {
   enabled?: boolean;
   maxLines?: number;
   minDurationS?: number;

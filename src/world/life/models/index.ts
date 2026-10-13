@@ -21,9 +21,9 @@ import { buildFish } from './fish.js';
 import type { Look } from './look.js';
 
 export type { Look } from './look.js';
-export type ModelBuilder = (look: Look, size: number, detail: 0 | 1 | 2) => THREE.BufferGeometry;
+type ModelBuilder = (look: Look, size: number, detail: 0 | 1 | 2) => THREE.BufferGeometry;
 
-export const MODEL_BUILDERS: Record<string, ModelBuilder> = {
+const MODEL_BUILDERS: Record<string, ModelBuilder> = {
   fish: buildFish,
   medusa: buildMedusa,
   comb: buildComb,

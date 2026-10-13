@@ -10,7 +10,7 @@ import unittest
 
 class TestGates(unittest.TestCase):
     def run_gates(self, *, fail_e2e=False, custom_output=None, args=(), ci='', config_mode='default',
-                  occupied_ports=(), port='4371'):
+                  occupied_ports=(), port='4371', fail_build=False, fail_manifest=False):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
@@ -24,10 +24,14 @@ record = {"kind": kind, "args": args,
           "base": os.getenv("VITE_BASE"), "port": os.getenv("PW_PORT")}
 with open("calls.jsonl", "a") as f:
     f.write(json.dumps(record) + "\\n")
-if kind == "npm" and args[:2] == ["run", "build"]:
+if (kind == "npm" and args[:2] == ["run", "build"] or
+        kind == "npx" and args[:2] == ["vite", "build"]):
+    if os.getenv("FAIL_BUILD") == "1": sys.exit(1)
     pathlib.Path(args[args.index("--outDir") + 1]).mkdir()
-if kind == "node":
+if kind == "node" and args[0] == "--input-type=module":
     pathlib.Path(args[2]).write_text("// bundled gate config")
+if kind == "node" and args[0] == "tools/ci-build-manifest.mjs":
+    if os.getenv("FAIL_MANIFEST") == "1": sys.exit(1)
 if kind == "npm" and args[:2] == ["run", "test:e2e"]:
     assert os.getenv("PW_REUSE_SERVER") == "0"
     assert pathlib.Path(os.environ["PW_OUTDIR"]).is_dir()
@@ -55,8 +59,12 @@ if (kind == "npm" and args[:2] == ["run", "test:e2e"] or
         env.pop('PW_OUTDIR', None)
         env.pop('VITE_BASE', None)
         env['FAIL_E2E'] = '1' if fail_e2e else '0'
+        env['FAIL_BUILD'] = '1' if fail_build else '0'
+        env['FAIL_MANIFEST'] = '1' if fail_manifest else '0'
         if custom_output:
             env['PW_OUTDIR'] = custom_output
+            if '--prebuilt' in args:
+                (root / custom_output).mkdir()
         result = subprocess.run(['bash', str(script), *args], env=env, text=True,
                                 capture_output=True, timeout=20)
         log = root / 'calls.jsonl'
@@ -180,6 +188,78 @@ if (kind == "npm" and args[:2] == ["run", "test:e2e"] or
         self.assertEqual(result.returncode, 1)
         self.assertIn('GATES_CONFIG_MODE', result.stderr)
         self.assertEqual(calls, [])
+
+    def test_canonical_order_and_checks_phase(self):
+        _, result, _ = self.run_gates(args=('--no-e2e',))
+        self.assertEqual(result.stdout.splitlines(),
+                         ['PASS python', 'PASS content', 'PASS build', 'PASS unit',
+                          'PASS attribution', 'PASS prettier'])
+        _, result, calls = self.run_gates(args=('--phase', 'checks'))
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertEqual(len(calls), 6)
+        self.assertEqual(calls[2]['args'], ['run', 'typecheck'])
+        self.assertFalse(any('build' in c['args'] for c in calls))
+        package = json.loads((Path(__file__).parents[2] / 'package.json').read_text())
+        self.assertEqual(package['scripts']['ci'], 'bash tools/gates.sh --full-e2e')
+
+    def test_build_phase_only_bundles_then_writes_manifest_and_retains_output(self):
+        root, result, calls = self.run_gates(args=('--phase', 'build'),
+                                              custom_output='dist-root')
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(calls[0]['args'][:2], ['vite', 'build'])
+        self.assertEqual(calls[0]['base'], '/')
+        self.assertEqual(calls[1]['args'],
+                         ['tools/ci-build-manifest.mjs', 'write', '/', 'dist-root'])
+        self.assertTrue((root / 'dist-root').is_dir())
+        root, result, calls = self.run_gates(args=('--phase', 'build'),
+                                              custom_output='dist-root', fail_build=True)
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(len(calls), 1)  # No manifest after a failed bundle.
+
+    def test_prebuilt_consumers_validate_first_never_build_and_retain_output(self):
+        for phase, base, browser in [('e2e', '/', ('1/30', '--reporter=json')),
+                                     ('e2e-base', '/submarine-explorer/', ('--workers=1',))]:
+            with self.subTest(phase=phase):
+                args = ('--phase', phase, '--prebuilt', '--', *browser)
+                root, result, calls = self.run_gates(args=args, custom_output='dist-prebuilt')
+                self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+                self.assertEqual(len(calls), 2)
+                self.assertEqual(calls[0]['args'],
+                                 ['tools/ci-build-manifest.mjs', 'verify', base, 'dist-prebuilt'])
+                self.assertFalse(any('build' in c['args'] for c in calls))
+                self.assertEqual(calls[1]['reuse'], '0')
+                self.assertEqual(calls[1]['outdir'], 'dist-prebuilt')
+                self.assertEqual(calls[1]['base'], base)
+                self.assertTrue((root / 'dist-prebuilt').is_dir())
+                if phase == 'e2e':
+                    self.assertEqual(calls[1]['args'], ['tools/e2e-shards.mjs', *browser])
+                else:
+                    self.assertIn('tests/e2e/base-url.spec.ts', calls[1]['args'])
+                root, result, calls = self.run_gates(args=args, custom_output='dist-prebuilt',
+                                                      fail_manifest=True)
+                self.assertEqual(result.returncode, 1)
+                self.assertEqual(len(calls), 1)  # No discovery/preview on invalid artifacts.
+                self.assertTrue((root / 'dist-prebuilt').is_dir())
+
+    def test_failed_local_build_cannot_serve_a_retained_output(self):
+        _, result, calls = self.run_gates(fail_build=True, custom_output='dist-stale')
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('Root browser gate requires a successful build', result.stdout)
+        self.assertFalse(any('test:e2e' in c['args'] or 'playwright' in c['args']
+                             for c in calls))
+        self.assertIn('PASS attribution', result.stdout)
+        self.assertIn('PASS prettier', result.stdout)
+
+    def test_ci_consumers_require_explicit_prebuilt_output(self):
+        for args in [('--phase', 'e2e'), ('--phase', 'e2e', '--prebuilt'),
+                     ('--phase', 'build'), ('--prebuilt',),
+                     ('--phase', 'checks', '--full-e2e')]:
+            with self.subTest(args=args):
+                _, result, calls = self.run_gates(args=args)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn('Usage:', result.stderr)
+                self.assertEqual(calls, [])
 
     def test_requested_port_validation_uses_the_full_tcp_range(self):
         _, result, calls = self.run_gates(port='65535')

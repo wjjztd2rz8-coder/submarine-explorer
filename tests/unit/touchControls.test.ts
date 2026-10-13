@@ -1,3 +1,4 @@
+import { el, elWithClass } from '../../src/ui/dom.js';
 import { afterEach, expect, it, vi } from 'vitest';
 import type { GameContext } from '../../src/app/context.js';
 import type { FrameState } from '../../src/app/System.js';
@@ -281,4 +282,29 @@ it.each(['rotation', 'disposal'])('cancels the portrait hint timer on %s', (tran
     expect(hint.hidden).toBe(true);
   } else touch.dispose();
   expect(vi.getTimerCount()).toBe(0);
+});
+
+it('shared DOM construction preserves literal text and optional versus required class assignment', () => {
+  const created: Array<{ tag: string; className?: string; textContent?: string }> = [];
+  vi.stubGlobal('document', {
+    createElement: (tag: string) => {
+      const node = { tag };
+      created.push(node);
+      return node;
+    },
+  });
+  expect(el('button', 'action', '<b>Scan & explore</b>')).toEqual({
+    tag: 'button',
+    className: 'action',
+    textContent: '<b>Scan & explore</b>',
+  });
+  expect(el('div')).toEqual({ tag: 'div' });
+  expect(el('span', '', '')).toEqual({ tag: 'span', textContent: '' });
+  expect(elWithClass('div', '')).toEqual({ tag: 'div', className: '' });
+  expect(elWithClass('button', 'scan', '')).toEqual({
+    tag: 'button',
+    className: 'scan',
+    textContent: '',
+  });
+  expect(created).toHaveLength(5);
 });

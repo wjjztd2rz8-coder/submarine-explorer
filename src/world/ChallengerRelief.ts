@@ -6,17 +6,14 @@
  * wall. A soft shadow across the lower rise separates the far slope from the lander's floor.
  */
 
+import { smoothstep as smooth } from '../util/math.js';
+
 import { DEEP_OPENINGS } from '../core/config/deepOpenings.js';
 
 /** Depth (m, negative) of the lander floor; the gradient starts a few metres above it. */
 const FLOOR_Y = -10935;
 const WALL_RISE_M = 260;
 const SHOULDER_SHADOW = DEEP_OPENINGS['challenger-deep'].slopeShadow;
-
-const smooth = (a: number, b: number, v: number): number => {
-  const t = Math.min(1, Math.max(0, (v - a) / (b - a)));
-  return t * t * (3 - 2 * t);
-};
 
 export function challengerSlopeTint(
   x: number,

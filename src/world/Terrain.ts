@@ -22,6 +22,8 @@
  * increases with +Z and grid column index increases with +X -- no flips needed.
  */
 
+import { hashStringSigned as hashString } from '../util/rng.js';
+
 import { terrainCarveFor, type TerrainCarve } from './terrainFeatures.js';
 import * as THREE from 'three';
 import type { GraphicsTier, TerrainConfig } from '../core/Config.js';
@@ -35,7 +37,7 @@ import { monotoneCubic, valueNoise2 } from './TerrainNoise.js';
 import { latLonToWorld } from '../util/geo.js';
 import type { TerrainFidelity } from '../core/config/terrain.js';
 
-export interface TerrainStats {
+interface TerrainStats {
   chunks: number;
   /** Total vertices resident on the GPU, skirts included. */
   vertices: number;
@@ -73,13 +75,6 @@ export function fitSubdivToBudget(
   if (!(maxVertices > 0)) return sub;
   while (sub > 1 && cols * rows * sub * sub > maxVertices) sub--;
   return sub;
-}
-
-/** FNV-1a, so each tile gets its own scatter layout. */
-function hashString(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
-  return h | 0;
 }
 
 interface RampStop {

@@ -23,7 +23,7 @@ import {
 /** `rock` samples the site's hard-substrate texture; `soft` is plain vertex/instance colour. */
 export type ScatterMaterialKind = 'rock' | 'soft';
 
-export interface ScatterTypeDef {
+interface ScatterTypeDef {
   material: ScatterMaterialKind;
   geometry: () => THREE.BufferGeometry;
   /** Uniform scale range in metres (multiplies the ~1 m unit shape). */
@@ -50,7 +50,7 @@ export interface ScatterTypeDef {
 }
 
 /** sRGB hex -> linear rgb, without importing Color (keeps this node-testable). */
-export function hexToLinear(hex: number, out: [number, number, number]): void {
+function hexToLinear(hex: number, out: [number, number, number]): void {
   const f = (c: number): number => {
     const s = c / 255;
     return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);

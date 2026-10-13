@@ -6,7 +6,7 @@
 
 import type { JournalSite } from '../game/JournalData.js';
 
-export interface AboutLists {
+interface AboutLists {
   /** The mission overview, when the page's summary is something else. */
   overview: string;
   facts: string[];
@@ -106,7 +106,7 @@ export function aboutLists(site: JournalSite, catalogue: boolean, shown = ''): A
 }
 
 /** The terrain data credit for a tile source, or null when none is owed. */
-export interface DataCredit {
+interface DataCredit {
   label: string;
   links: ReadonlyArray<readonly [text: string, href: string]>;
 }

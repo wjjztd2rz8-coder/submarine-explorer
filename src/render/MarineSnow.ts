@@ -12,6 +12,8 @@
  * density, so changing density does not reallocate the buffer.
  */
 
+import { lcg32 } from '../util/rng.js';
+
 import * as THREE from 'three';
 import type { AtmosphereTier, WaterConfig } from '../core/Config.js';
 import type { AtmosphereSample } from './Atmosphere.js';
@@ -26,7 +28,7 @@ export function snowFlowStep(
 }
 
 /** The lamp rig as the snow sees it: where the beams start, where they point and how far they reach. */
-export interface SnowLamp {
+interface SnowLamp {
   origin: THREE.Vector3;
   forward: THREE.Vector3;
   /** Half-angle of the beam, radians. */
@@ -115,11 +117,7 @@ export class MarineSnow {
     const positions = new Float32Array(count * 3);
     const seeds = new Float32Array(count);
     // Deterministic: the same field every run, so screenshots are comparable.
-    let rng = 0x2f6e2b1;
-    const rand = (): number => {
-      rng = (rng * 1664525 + 1013904223) >>> 0;
-      return rng / 0x100000000;
-    };
+    const rand = lcg32(0x2f6e2b1);
     for (let i = 0; i < count; i++) {
       positions[i * 3] = rand() * box;
       positions[i * 3 + 1] = rand() * box;
