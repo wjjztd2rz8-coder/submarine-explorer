@@ -114,6 +114,33 @@ it('prefers an unscanned contact in range over a closer remote hint with a small
 });
 
 describe('Scanner', () => {
+  it.each(['range', 'facing', 'logged'] as const)(
+    'falls back to an eligible sample when the objective is unavailable through %s',
+    (reason) => {
+      const objective = target({
+        id: 'objective',
+        position: reason === 'facing' ? new Vector3(100, -100, 0) : new Vector3(0, -100, -100),
+        radius: reason === 'range' ? 80 : 150,
+      });
+      const sample = target({ id: 'sample:rock', position: new Vector3(0, -100, -40) });
+      const { scanner, log } = setup([objective]);
+      scanner.setObjective(objective.id);
+      scanner.setSupplementalTargets([sample]);
+      scanner.setExtraTargets([target({ id: 'life:fish', position: new Vector3(0, -100, -20) })]);
+      if (reason === 'logged') scanner.scannedThisDive.add('lm/objective');
+      scanner.update(DT, AT, NORTH, true);
+      expect(scanner.view.candidateId).toBe(sample.id);
+      expect(scanner.view.nearestId).toBe(sample.id);
+      expect(scanner.view.activeId).toBe(sample.id);
+      expect(scanner.view.objectiveId).toBe(reason === 'logged' ? null : objective.id);
+      expect(log[0]).toEqual(['scan:started', { poiId: sample.id }]);
+      scanner.update(sample.scanSeconds, AT, NORTH, true);
+      expect(log.filter(([name]) => name === 'scan:complete')).toEqual([
+        ['scan:complete', { poiId: sample.id, landmarkId: 'lm', firstTime: true }],
+      ]);
+    },
+  );
+
   it.each([false, true])(
     'prefers an in-cone objective over nearer contacts (reversed=%s)',
     (reversed) => {

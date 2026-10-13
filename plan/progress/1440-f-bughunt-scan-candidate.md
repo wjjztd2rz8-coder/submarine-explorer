@@ -36,15 +36,32 @@ approaches. Fix confirmed bugs minimally; retain all existing assertions.
   and non-objective contacts remain scannable after all objectives are done.
 - Retained the objective chip/card exclusivity and suppression regressions;
   no tutorial, input, HUD, mission-opening or content production code changed.
+- Resume audit: reviewed `git show --stat HEAD` and the WIP fixes. Added six
+  strict probes for an out-of-range, off-axis or logged objective falling back
+  to a sample, and G / pad RB / real touch Scan continuing from the farther
+  objective to nearer sample and wildlife contacts while held. Card identity,
+  chip suppression, fresh progress and exactly-once completion agree on all
+  devices. No additional production bug was found; no assertion was loosened.
+- Confirmed Reset discoveries and mission Dive again both reload the app. The
+  reboot test exercises fresh tutorial state, discarded deferred actions and
+  detached old listeners; mission-start tests cover clearing within a session.
 
-## Validation (in progress)
+## Validation
 
 - Vite's default config bundler cannot write to the shared read-only
   node_modules. The existing writable-config gate mode and Vitest runner avoid
   this without changing dependencies or repository configuration.
-- Focused capability checks: 197 tests in 11 files passed, including the
-  retained approach, tutorial-order, input and progress regressions.
-- Production build / TypeScript passed. All 806 E2E tests in 96 files collect.
-- Full gate running with
+- The earlier full gate completed build, unit (1,948 tests in 191 files), Python,
+  strict content, attribution and repository formatting checks successfully.
+  Its browser and project-base gates failed before any tests ran.
+- Resume validation: 248 tests in 14 files passed, including all six added
+  probes and retained approach, tutorial-order, Reset/restart, Journal, input
+  and progress regressions. Fresh TypeScript, changed-file formatting and
+  `git diff --check` passed. Production code remains the validated WIP code.
+- All 806 E2E tests in 96 files collect. Browser execution is blocked by this
+  sandbox: `DEBUG=pw:webserver` reports `connect EPERM` for both `::1:4440`
+  and `127.0.0.1:4440`; Playwright's preview exits before running tests. The
+  focused `d-scan.spec.ts` retry confirms the same environment failure.
+- Browser gates still need an environment that permits localhost networking:
   `GATES_CONFIG_MODE=writable PW_PORT=4440 PW_OUTDIR=dist-1440 tools/gates.sh --full-e2e`.
   Logs: `.cache/gates/`; browser collection: `.cache/1440-e2e-collection.log`.

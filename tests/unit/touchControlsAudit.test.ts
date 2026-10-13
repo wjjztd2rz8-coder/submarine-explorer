@@ -187,6 +187,74 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
   },
 );
 
+it.each(['keyboard', 'touch', 'gamepad'] as const)(
+  '%s scans the farther objective before nearer samples and wildlife while held',
+  (device) => {
+    const input = new Input({ storage: null });
+    const f = fixture('', input);
+    const buttons = Array.from({ length: 6 }, () => ({ value: 0, pressed: false }));
+    vi.stubGlobal('navigator', {
+      getGamepads: () =>
+        device === 'gamepad' ? [{ connected: true, index: 0, axes: [0, 0, 0, 0], buttons }] : [],
+    });
+    const bus = new EventBus();
+    const complete = vi.fn();
+    bus.on('scan:complete', complete);
+    const scanner = new Scanner(makeConfig().scan, bus);
+    const contact = (id: string, distance: number) => ({
+      id,
+      name: id,
+      landmarkId: 'site',
+      position: new Vector3(0, -100, -distance),
+      radius: 150,
+      scanSeconds: 2,
+    });
+    scanner.setTargets([contact('objective', 100)]);
+    scanner.setSupplementalTargets([contact('sample:rock', 40)]);
+    scanner.setExtraTargets([contact('life:fish', 20)]);
+    scanner.setObjective('objective');
+    const overlay = new ScanOverlay(makeConfig().scan);
+    const [panel, chip] = (overlay.messages as unknown as TouchElement).children;
+    const card = panel.children[1];
+    const tick = (dt: number) => {
+      scanner.update(dt, new Vector3(0, -100, 0), new Vector3(0, 0, -1), input.sample().scan);
+      overlay.update(scanner.view, { scan: 'G', guide: 'J' }, null, dt);
+      input.endFrame();
+    };
+    try {
+      f.controls.setTouchMode(device === 'touch');
+      if (device === 'touch') pointer(f.scan, 'pointerdown', 1);
+      else if (device === 'keyboard') input.injectKey('KeyG', true);
+      else buttons[5] = { value: 1, pressed: true };
+      for (const id of ['objective', 'sample:rock', 'life:fish']) {
+        tick(0.5);
+        expect(scanner.view.activeId).toBe(id);
+        expect(scanner.view.candidateId).toBe(id);
+        expect(scanner.view.nearestId).toBe(id);
+        expect(card.children[1].textContent).toBe(id);
+        expect(scanner.view.progress).toBe(0.25);
+        expect(chip.hidden).toBe(true);
+        if (id !== 'objective') expect(scanner.view.objectiveId).toBeNull();
+        tick(1.5);
+        expect(scanner.isScanned('site', id)).toBe(true);
+      }
+      tick(2);
+      expect(scanner.view.candidateId).toBeNull();
+      expect(scanner.view.objectiveId).toBeNull();
+      expect(chip.hidden).toBe(true);
+      expect(complete.mock.calls).toEqual(
+        ['objective', 'sample:rock', 'life:fish'].map((poiId) => [
+          { poiId, landmarkId: 'site', firstTime: true },
+        ]),
+      );
+    } finally {
+      overlay.dispose();
+      f.controls.dispose();
+      input.dispose();
+    }
+  },
+);
+
 describe('touch control interruptions', () => {
   it.each(['cancel', 'drag', 'pinch'])(
     'does not pair taps across a %s camera gesture',
