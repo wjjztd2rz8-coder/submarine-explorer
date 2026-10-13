@@ -2,6 +2,7 @@
 import { mkdir } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { openBriefingAdvanced } from './helpers/briefing.js';
 
 /**
  * D2-PREDIVE (playtest #3): the game mode is visible on the home screen, in
@@ -91,6 +92,8 @@ test('briefing Dive settings: mode, start and Advanced persist to settings', asy
   const more = dive.locator('.mode-advanced');
   const toggle = briefing.getByRole('button', { name: 'Advanced' });
   await expect(more).toBeHidden();
+  // Start position is tucked inside Advanced, not on the card face.
+  await expect(dive.locator('.briefing-start')).toBeHidden();
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(briefing.locator('.briefing-begin')).toBeInViewport();
   await page.waitForTimeout(300);
@@ -100,6 +103,7 @@ test('briefing Dive settings: mode, start and Advanced persist to settings', asy
   await toggle.focus();
   await page.keyboard.press('Enter');
   await expect(more).toBeVisible();
+  await expect(dive.locator('.briefing-start')).toBeVisible();
   await expect(briefing).toBeVisible();
   await expect(briefing.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
     'aria-expanded',
@@ -177,6 +181,7 @@ for (const start of ['near-site', 'surface'] as const) {
       })
       .toBeLessThan(0.01);
     if (start === 'surface') {
+      await openBriefingAdvanced(page);
       await page.locator('.briefing-start input[value="surface"]').check();
       await expect.poll(async () => (await pose(page)).y).toBeGreaterThan(-50);
       const surface = await pose(page);

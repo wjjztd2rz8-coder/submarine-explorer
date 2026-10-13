@@ -1,7 +1,6 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from './helpers/unlocked.js';
-import { holdFreshTips } from './helpers/hudTips.js';
 
 const shots = '.cache/codex/shots/d2-camera';
 const feelShots = '.cache/codex/shots/d3-feel';
@@ -23,14 +22,10 @@ async function camera(page: Page): Promise<{ free: boolean; radius: number; mode
   });
 }
 
-test('chase framing, dive-start tips, free look and reset controls', async ({ page }) => {
+test('chase framing, free look and reset controls', async ({ page }) => {
   await mkdir(shots, { recursive: true });
   await dive(page, 'titanic');
-  await holdFreshTips(page);
-  await expect(page.locator('.hud-control-tips')).toContainText(
-    'Drag: look · Wheel: zoom · X: reset camera',
-  );
-  await page.screenshot({ path: `${shots}/tips-row.png` });
+  await page.screenshot({ path: `${shots}/dive-start.png` });
   const radius = (await camera(page)).radius;
   expect(radius).toBeGreaterThan(95);
   const canvas = page.locator('#viewport');
@@ -40,7 +35,6 @@ test('chase framing, dive-start tips, free look and reset controls', async ({ pa
   await page.mouse.move(box.x + box.width / 2 + 140, box.y + box.height / 2 + 40, { steps: 5 });
   await page.mouse.up();
   await expect.poll(async () => (await camera(page)).free).toBe(true);
-  await expect(page.locator('.hud-control-tips')).toBeHidden();
   await page.screenshot({ path: `${shots}/titanic-free-look.png` });
   await mkdir(feelShots, { recursive: true });
   await page.waitForTimeout(250);
@@ -136,8 +130,6 @@ test('pointer look preference survives menus; lock loss pauses and Esc resume sh
   await expect(page.locator('.pause-menu')).toBeVisible();
   await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
   await expect(page.locator('.settings')).toBeVisible();
-  const tips = page.locator('.settings').getByLabel('Control tips');
-  await tips.uncheck();
   await page.locator('.settings-close').click();
   await expect(page.locator('.settings')).toBeHidden();
   await page.keyboard.press('Escape');

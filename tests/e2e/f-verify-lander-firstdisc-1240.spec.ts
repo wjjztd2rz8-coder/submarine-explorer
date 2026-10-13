@@ -126,7 +126,7 @@ for (const touch of [false, true]) {
           const rose = () =>
             clockFramesUntil(
               page,
-              () => (window.__game as unknown as Game).onboard.tutorial.step?.id === 'lights',
+              () => (window.__game as unknown as Game).onboard.tutorial.finished,
               250,
             );
           if (touch) await holdTouch(page, '.tc-slider', 0.05, rose);
@@ -138,13 +138,7 @@ for (const touch of [false, true]) {
               await page.keyboard.up('Space');
             }
           }
-          if (touch) await page.locator('.tc-btn-lights').tap();
-          else await page.keyboard.press('KeyL');
-          await clockFramesUntil(
-            page,
-            () => (window.__game as unknown as Game).onboard.tutorial.step?.id === 'journal',
-          );
-          // Completion is retained without starting another scan or reordering movement/depth/lights.
+          // Completion is retained without starting another scan or reordering movement and depth: the retained scan finishes the last step.
           expect(
             await page.evaluate(
               () => (window.__game as unknown as Game).discovery.scanner.view.completed,

@@ -35,15 +35,17 @@ The HTML social metadata uses the absolute GitHub Pages image URL under
 host or project base changes.
 
 `npm run dev` and open the printed `localhost` URL. The **home screen** opens
-first with the globe from the dive-site picker behind a menu: **Continue**
-(your last dive, disabled until you've started one), **Dive sites**, **Free
-dive**, **Journal**, **Settings** and **Controls**. The Arcade / Realistic / Custom mode selector is
+first with the globe from the dive-site picker behind a menu: one primary
+**Dive** button (a first run opens the Titanic briefing; afterwards it
+continues your last mission), then **Dive sites**, **Free dive**, **Journal**,
+**Settings** and **Controls**. The Arcade / Realistic / Custom mode selector is
 visible above the menu. Picking a site opens a briefing with Dive settings
-(mode, start position and more options); its preview matches the actual spawn.
+(mode, and an **Advanced** disclosure, collapsed by default, with start position
+and more options); its preview matches the actual spawn.
 
 While diving, **Esc** opens the pause menu: Resume, Objectives (the full list
-with hints), Mission select, Journal, Settings, Controls (How to play on touch),
-Data credits and Quit to home.
+with hints), Journal, Settings, Controls (How to play on touch),
+Data credits and Quit to home. Choose another site from Home (Quit to home).
 Opening the pause menu, Settings, the globe or a briefing card freezes the
 simulation — nothing drains, moves or times out while a menu is open.
 Deep-linking with `?mission=`, `?tile=` or `?skipBriefing=1` skips the home
@@ -102,7 +104,7 @@ Cells are ~40–60 m (22 m E-W on `endurance`). `great-blue-hole` and
 `hunga-tonga-caldera` do not show the feature they are named for; see the
 inventory. All 13 landmark sites have a full mission (`data/landmarks/index.json`);
 `demo-synthetic` is a tile-only offline stand-in with no mission. Try
-`?mission=titanic` or choose **Dive sites** on Home or **Mission select** from pause to pick any of the 13.
+`?mission=titanic` or choose **Dive sites** on Home to pick any of the 13.
 
 ## Setup
 
@@ -246,7 +248,7 @@ Examples: `/?mission=titanic`, `/?tile=titanic&landmark=_test&poi=test-bow`
 
 ## Dives and objectives
 
-A mission's briefing offers a start position: **near-site** (default) puts you
+A mission's briefing offers a start position under **Advanced**: **near-site** (default) puts you
 150–300 m from the first primary objective (Titanic: 220 m), at a safe height
 above the seabed, facing it with lights on. Mission scan radii leave an approach
 even with Extended sensors. Follow the waypoint and sonar contact to the target.
@@ -266,8 +268,8 @@ lost, since the discovery itself is already in your Journal.
 
 Dives start with objectives fresh every time, including "Dive again" — your
 Journal discoveries persist, but objectives never arrive pre-completed. When
-every primary objective is done, a banner offers **Keep exploring** (default:
-the dive continues, secondaries remain open) or **Surface and debrief**.
+every primary objective is done, a banner shows your stars and offers **Keep exploring**
+(the primary action: the dive continues, secondaries remain open) or **Surface and debrief**.
 Nothing forces a debrief while you still want to explore. The debrief reports
 X of Y objectives completed and offers Keep exploring, Dive again (fresh
 objectives, same mission), Dive sites, Home and Journal.

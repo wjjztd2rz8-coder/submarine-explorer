@@ -20,7 +20,6 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
 .pause-actions[hidden],
 .pause-detail[hidden],
 .pause-objectives[hidden],
-.pause-sites-scroll[hidden],
 .pause-credits[hidden] {
   display: none;
 }
@@ -77,14 +76,6 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
 .pause-detail > button {
   min-height: 40px;
   font-size: 14px;
-}
-.pause-sites-scroll {
-  min-height: 0;
-  flex: 1;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  margin-top: 18px;
-  scrollbar-color: #6fb5b9 transparent;
 }
 .mission-select.is-shell {
   position: static;

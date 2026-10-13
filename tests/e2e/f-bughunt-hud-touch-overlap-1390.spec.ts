@@ -33,7 +33,6 @@ const selectors = [
   '.tc-btn-pause',
   '.tc-btn-boost',
   '.hud-journal',
-  '.hud-control-tips',
   '.hud-reset-camera',
 ];
 
@@ -169,7 +168,10 @@ for (const viewport of [
         await ready(page);
         const card = page.locator('.onboard-card');
         const chip = page.locator('.scan-objective-chip');
-        await expect(card).toHaveAttribute('data-step', 'move');
+        // The tutorial never shares the screen with an actionable scan card; dim cards only navigate.
+        if (await page.locator('.scan-panel:not([data-tone="dim"])').isVisible())
+          await expect(card).toBeHidden();
+        else await expect(card).toHaveAttribute('data-step', 'move');
         await layout(page, 'opening');
 
         const poi = await page.evaluate(() => {
@@ -212,29 +214,23 @@ for (const viewport of [
           }
         } else await scanWithKeyboard(page, poi.id);
         await page.clock.runFor(34);
-        await expect(card).toHaveAttribute('data-step', 'move');
+        // The tutorial defers while the scan card is up, and the early scan is kept for its step.
+        await expect(card).toBeHidden();
         await expect(page.locator('.hud-notice')).toContainText('New discovery');
         await layout(page, 'early scan reward');
-        for (const step of ['move', 'depth', 'lights']) {
+        await away(page);
+        await expect(page.locator('.scan-panel')).toBeHidden();
+        for (const step of ['move', 'depth']) {
           await expect(card).toHaveAttribute('data-step', step);
+          await expect(card).toBeVisible();
           await layout(page, `reward and tutorial ${step}`);
           if (viewport.touch) await page.locator('.onboard-skip-step').tap();
           else await page.locator('.onboard-skip-step').click();
           await page.clock.runFor(34);
         }
-        await expect(card).toHaveAttribute('data-step', 'journal');
-        await expect(page.locator('.hud-notice')).toBeVisible();
-        await layout(page, 'collapsed journal and reward');
-        await page.screenshot({ path: `${shots}/${site}-${tag}-reward.png` });
-        await away(page);
-        await expect(page.locator('.scan-panel')).toBeHidden();
-        if (viewport.touch) await expect(chip).toBeVisible();
-        await layout(page, 'journal strip with objective chip and reward');
-        await page.screenshot({ path: `${shots}/${site}-${tag}-journal-chip.png` });
-        if (viewport.touch) await page.locator('.onboard-skip-step').tap();
-        else await page.locator('.onboard-skip-step').click();
-        await page.clock.runFor(34);
+        // The remembered scan finishes the last step, so the tutorial ends here.
         await expect(card).toBeHidden();
+        await page.screenshot({ path: `${shots}/${site}-${tag}-reward.png` });
         expect(
           await page.evaluate(
             () => JSON.parse(localStorage.getItem('subexplorer.onboard.v1')!).tutorialDone,

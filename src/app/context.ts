@@ -147,19 +147,18 @@ export interface GameContext extends BootContext {
   home: Home;
   homeSites: MissionSelect;
   pause: PauseMenu;
-  pauseSites: MissionSelect;
   /** Mission summaries once loaded (empty until then). */
   missionSummaries: MissionSummary[];
   setAppState(state: AppState): void;
   globe: Globe;
   homeGlobe: Globe;
   input: Input;
-  /** Control tips show until this `performance.now()` time. */
-  cameraTips: { until: number; moved: boolean };
+  /** True once the pilot has made the first deliberate move or turn of the dive. */
+  cameraTips: { moved: boolean };
   keyboard: { lock(): Promise<void>; unlock(): void };
   pointerLook: { updateHint(): void };
   settingsScreen: SettingsScreen;
-  /** F3-ONBOARD: device layout card; also supplies the compact control tips. */
+  /** F3-ONBOARD: device layout card. */
   controlsCard: ControlsCard;
   missionRouter: MissionRouter | null;
   applyMissionStart(choice: MissionStartPosition): void;

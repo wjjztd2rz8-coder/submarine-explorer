@@ -273,7 +273,7 @@ test('covering home modals stop title draws and return to a usable menu', async 
   }
 });
 
-test('quit after a mission lazily presents home, keeps Continue and freezes the sub', async ({
+test('quit after a mission lazily presents home, keeps Dive on the last mission and freezes the sub', async ({
   page,
 }) => {
   await boot(page, '/?mission=titanic&skipBriefing=1&tier=low');
@@ -284,7 +284,7 @@ test('quit after a mission lazily presents home, keeps Continue and freezes the 
   await expect(page.locator('.home-screen')).toBeVisible();
   await presented(page);
   await expect(page.locator('.globe.is-embedded')).toBeHidden();
-  const resume = page.locator('.home-menu').getByRole('button', { name: 'Continue', exact: true });
+  const resume = page.locator('.home-menu').getByRole('button', { name: 'Dive', exact: true });
   await expect(resume).toBeEnabled();
   await expect(resume).toBeFocused();
   // Shell navigation strips dive/debug params but preserves device preferences.

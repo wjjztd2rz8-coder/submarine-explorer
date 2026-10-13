@@ -45,7 +45,7 @@ test('home copy, semantic order and first focus', async ({ page }) => {
       els.map((e) => (e.classList.contains('mode-selector') ? 'MODE' : (e.textContent ?? ''))),
     );
   expect(order).toEqual([
-    'Continue',
+    'Dive',
     'Dive sites',
     'Free dive',
     'MODE',
@@ -54,8 +54,8 @@ test('home copy, semantic order and first focus', async ({ page }) => {
     'Controls',
     'Upgrades',
   ]);
-  // Fresh save: Continue is disabled, so Dive sites takes first focus.
-  await expect(page.getByRole('button', { name: 'Dive sites' })).toBeFocused();
+  // Fresh save: the single Dive button takes first focus.
+  await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeFocused();
 });
 
 test('both selector entry buttons restore focus on Back and Escape', async ({ page }) => {

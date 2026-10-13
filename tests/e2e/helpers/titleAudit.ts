@@ -66,7 +66,7 @@ export function titleAudit(base = '/') {
   test('title focus order, selectors and modal Escape return', async ({ page }) => {
     await boot(page, `${base}?tier=low`);
     const menu = page.locator('.home-menu');
-    await expect(menu.getByRole('button', { name: 'Dive sites', exact: true })).toBeFocused();
+    await expect(menu.getByRole('button', { name: 'Dive', exact: true })).toBeFocused();
     await trapped(page, '.home-menu');
     for (const entry of ['Dive sites', 'Free dive']) {
       for (const exit of ['Back to menu', 'Escape']) {
@@ -96,12 +96,12 @@ export function titleAudit(base = '/') {
     }
   });
 
-  test('saved Continue has first focus and Enter launches the saved mission', async ({ page }) => {
+  test('Dive has first focus and Enter launches the saved mission', async ({ page }) => {
     await page.addInitScript(() =>
       localStorage.setItem('subexplorer.lastSite.v1', JSON.stringify({ missionId: 'titanic' })),
     );
     await boot(page, `${base}?tier=low`);
-    const button = page.getByRole('button', { name: 'Continue', exact: true });
+    const button = page.getByRole('button', { name: 'Dive', exact: true });
     await expect(button).toBeEnabled();
     await expect(button).toBeFocused();
     await Promise.all([page.waitForURL(/[?&]mission=titanic\b/), page.keyboard.press('Enter')]);
@@ -112,7 +112,7 @@ export function titleAudit(base = '/') {
     expect(await draws(page)).toBe(0);
   });
 
-  test('an unavailable saved mission redirects focus and Daily is absent with an empty catalogue', async ({
+  test('an unavailable saved mission leaves Dive focused and Daily is absent with an empty catalogue', async ({
     page,
   }) => {
     await page.addInitScript(() =>
@@ -125,8 +125,7 @@ export function titleAudit(base = '/') {
       route.fulfill({ json: { version: 1, landmarks: [] } }),
     );
     await boot(page, `${base}?tier=low`);
-    await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeDisabled();
-    await expect(page.getByRole('button', { name: 'Dive sites', exact: true })).toBeFocused();
+    await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeFocused();
     await expect(page.locator('.daily-card')).toBeHidden();
     await trapped(page, '.home-menu');
   });
@@ -260,7 +259,7 @@ export function titleAudit(base = '/') {
       .getByRole('button', { name: 'Quit to home', exact: true })
       .click();
     await expect(page.locator('.home-screen')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Continue', exact: true })).toBeFocused();
+    await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeFocused();
     await expect
       .poll(() =>
         page.evaluate(() => (window.__game as unknown as AuditGame).titleScene.terrainReady),

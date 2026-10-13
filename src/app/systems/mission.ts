@@ -133,6 +133,7 @@ export const missionSystem: GameSystem = {
               },
             },
           },
+          stars: () => ctx.progress.previewStars(ctx.missionRouter!.mission.objectives),
           rating: () => {
             const rating = ctx.progress.finish(
               ctx.daily ? dailyRatingKey(ctx.daily) : route.missionId,

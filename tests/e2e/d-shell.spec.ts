@@ -64,7 +64,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   const existingActions = page.locator('.home-menu > button:not(.daily-card)');
   await expect(existingActions).toHaveCount(7);
   await expect(existingActions).toHaveText([
-    'Continue',
+    'Dive',
     'Dive sites',
     'Free dive',
     'Journal',
@@ -85,7 +85,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
         ),
       ),
   ).toEqual([
-    'Continue',
+    'Dive',
     'Dive sites',
     'Free dive',
     'Daily dive',
@@ -98,7 +98,8 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.home-menu .daily-card')).toHaveCount(1);
   await expect(page.locator('.home-menu .mode-advanced-toggle')).toHaveCount(1);
   await expect(page.locator('.home-menu button')).toHaveCount(9);
-  await expect(page.getByRole('button', { name: 'Continue' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Continue' })).toHaveCount(0);
   // F-TITLE-E: the title scene backs the menu; the embedded globe opens only in the sites view.
   await expect(page.locator('.globe.is-embedded')).toBeHidden();
   const atHome = await pose(page);
@@ -179,7 +180,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.home-screen')).toBeVisible();
   await expect(page.locator('.pause-menu')).toBeHidden();
   expect(new URL(page.url()).search).toBe('');
-  await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeEnabled();
   const homeAgain = await pose(page);
   await waitForFrames(page, 8, 400);
   expect(await pose(page)).toEqual(homeAgain);

@@ -2,6 +2,7 @@
 import { mkdir } from 'node:fs/promises';
 import { MISSION_APPROACH_M } from '../../src/game/Spawn.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { openBriefingAdvanced } from './helpers/briefing.js';
 
 const shots = '.cache/codex/shots/d-start';
 
@@ -95,6 +96,7 @@ test('Custom near-site starts retain the authored approach at deep and shallow s
 
 test('The briefing start choice persists as the saved start position', async ({ page }) => {
   await boot(page, 'titanic');
+  await openBriefingAdvanced(page);
   await page.locator('.briefing-start input[value="surface"]').check();
   await page.locator('.briefing-begin').click();
   await expect(page.locator('.briefing')).toBeHidden();
@@ -117,6 +119,7 @@ test('The briefing start choice persists as the saved start position', async ({ 
   });
   await boot(page, 'titanic');
   await expect(page.locator('.briefing-start input[value="surface"]')).toBeChecked();
+  await openBriefingAdvanced(page);
   await page.locator('.briefing-start input[value="near-site"]').check();
   await page.locator('.briefing-begin').click();
   await expect(page.locator('.briefing')).toBeHidden();

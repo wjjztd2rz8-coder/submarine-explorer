@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Home } from '../../src/ui/Home.js';
 
-/** Small DOM surface for Home's initial/validated Continue focus policy. */
+/** Small DOM surface for Home's primary Dive action and focus. */
 class Element extends EventTarget {
   children: Element[] = [];
   hidden = false;
@@ -30,13 +30,15 @@ class Element extends EventTarget {
   }
 }
 let home: Home;
+let dive = vi.fn();
 beforeEach(() => {
+  dive = vi.fn();
   const body = new Element();
   vi.stubGlobal('HTMLElement', Element);
   vi.stubGlobal('window', new EventTarget());
   vi.stubGlobal('document', { body, activeElement: body, createElement: () => new Element() });
   home = new Home({
-    continueDive: vi.fn(),
+    dive,
     journal: vi.fn(),
     settings: vi.fn(),
     controls: vi.fn(),
@@ -48,33 +50,17 @@ afterEach(() => {
 });
 const focusedLabel = () => document.activeElement?.textContent;
 
-describe('home Continue focus', () => {
-  it('focuses Dive sites for a fresh save', () => {
+describe('home primary action', () => {
+  it('focuses the single enabled Dive button, first-run or returning', () => {
     home.show();
-    expect(home.continueButton.disabled).toBe(true);
-    expect(focusedLabel()).toBe('Dive sites');
-  });
-  it('focuses saved Continue when home is shown again after a dive', () => {
-    home.show();
+    expect(home.diveButton.disabled).toBe(false);
+    expect(focusedLabel()).toBe('Dive');
     home.hide();
-    home.setContinue('titanic');
     home.show();
-    expect(document.activeElement).toBe(home.continueButton);
-    expect(home.continueButton.title).toBe('Continue titanic');
+    expect(document.activeElement).toBe(home.diveButton);
   });
-  it('moves focus to Dive sites when late catalogue validation rejects the saved mission', () => {
-    home.setContinue('removed-mission');
-    home.show();
-    expect(document.activeElement).toBe(home.continueButton);
-    home.setContinue(null);
-    expect(home.continueButton.disabled).toBe(true);
-    expect(focusedLabel()).toBe('Dive sites');
-  });
-  it('does not steal focus when Continue is validated while another action is focused', () => {
-    home.show();
-    const focused = document.activeElement;
-    home.setContinue('titanic');
-    home.setContinue(null);
-    expect(document.activeElement).toBe(focused);
+  it('runs the dive action when Dive is pressed', () => {
+    home.diveButton.dispatchEvent(new Event('click'));
+    expect(dive).toHaveBeenCalledTimes(1);
   });
 });

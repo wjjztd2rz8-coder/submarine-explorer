@@ -28,6 +28,8 @@ export interface NavReadout {
 
 /** The completion banner: a title, a detail line and the two end-of-dive choices. */
 export interface CompletionBanner {
+  /** 0 to 3; omitted when the dive is not rated. */
+  stars?: number;
   title: string;
   detail: string;
   onKeepExploring: () => void;
@@ -113,6 +115,7 @@ export class ObjectivesPanel {
   private readonly bannerEl: HTMLDivElement;
   private readonly bannerTitle: HTMLElement;
   private readonly bannerDetail: HTMLElement;
+  private readonly bannerStars: HTMLElement;
   private banner: CompletionBanner | null = null;
   private readonly navText = new Map<string, HTMLSpanElement>();
   private readonly cache = new Map<string, string>();
@@ -144,9 +147,13 @@ export class ObjectivesPanel {
     this.bannerEl.setAttribute('role', 'status');
     this.bannerEl.hidden = true;
     this.bannerTitle = el('strong', 'obj-banner-title');
+    this.bannerStars = el('span', 'obj-banner-stars');
     this.bannerDetail = el('span', 'obj-banner-detail');
     const text = el('div', 'obj-banner-text');
-    text.append(this.bannerTitle, this.bannerDetail);
+    // Stars share the summary line so the banner does not grow taller on phones.
+    const summary = el('div', 'obj-banner-summary');
+    summary.append(this.bannerStars, this.bannerDetail);
+    text.append(this.bannerTitle, summary);
     const actions = el('div', 'obj-banner-actions');
     const keep = el('button', 'obj-banner-btn is-keep', 'Keep exploring');
     const surface = el('button', 'obj-banner-btn is-surface', 'Surface and debrief');
@@ -222,6 +229,10 @@ export class ObjectivesPanel {
     this.banner = banner;
     this.bannerTitle.textContent = banner.title;
     this.bannerDetail.textContent = banner.detail;
+    const stars = banner.stars ?? 0;
+    this.bannerStars.hidden = banner.stars === undefined;
+    this.bannerStars.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+    this.bannerStars.setAttribute('aria-label', `${stars} of 3 stars`);
     this.bannerEl.hidden = false;
   }
 

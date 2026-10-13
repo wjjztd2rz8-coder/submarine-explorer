@@ -14,10 +14,7 @@ export interface TutorialKeys {
   turn: string;
   rise: string;
   sink: string;
-  lights: string;
   scan: string;
-  photo: string;
-  journal: string;
 }
 
 /** Instruction text for a step on the given device. */
@@ -46,20 +43,12 @@ export function tutorialText(
         : device === 'gamepad'
           ? `Press ${k.rise} to rise or ${k.sink} to sink.`
           : `Hold ${k.rise} to rise or ${k.sink} to sink.`;
-    case 'lights':
-      return device === 'touch'
-        ? 'Tap LIGHTS to switch the headlights.'
-        : `Press ${k.lights} to switch the headlights.`;
     case 'scan':
       if (scanProgress !== null)
         return `Scanning… ${Math.round(Math.max(0, Math.min(1, scanProgress)) * 100)}% · keep holding ${device === 'touch' ? 'SCAN' : k.scan}.`;
       return device === 'touch'
-        ? 'Face a glowing target and hold SCAN until it finishes.'
-        : `Face a glowing target and hold ${k.scan} until it finishes.`;
-    case 'journal':
-      return device === 'touch'
-        ? 'Tap PHOTO to frame a shot, or Pause then Journal to read your finds.'
-        : `Press ${k.photo} for photo mode, or ${k.journal} to open the Journal.`;
+        ? 'Hold SCAN on a glowing target.'
+        : `Hold ${k.scan} on a glowing target.`;
   }
 }
 
@@ -145,13 +134,11 @@ export class TutorialCard {
     this.count.textContent = `Step ${index + 1} of ${TUTORIAL_STEPS.length}`;
     this.title.textContent = TUTORIAL_STEPS[index]?.title ?? '';
     this.text.textContent = text;
-    // Presentation only: the same five steps and skipStep action still run.
+    // Presentation only: the same three steps and skipStep action still run.
     const phoneInstructions: Record<TutorialStepId, string> = {
       move: 'Push left stick forward; sideways to turn.',
       depth: 'Right slider: up to rise, down to sink.',
-      lights: 'Tap LIGHTS to switch the headlights.',
-      scan: 'Face a glowing target; hold SCAN to finish.',
-      journal: 'Tap PHOTO, or Pause → Journal for your finds.',
+      scan: 'Hold SCAN on a glowing target.',
     };
     const step = TUTORIAL_STEPS[index];
     this.phoneText.textContent =

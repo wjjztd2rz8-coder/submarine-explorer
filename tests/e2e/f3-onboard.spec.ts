@@ -1,4 +1,4 @@
-import { dismissTutorial } from './helpers/tutorial.js';
+import { dismissTutorial, setScanCardSuppressed } from './helpers/tutorial.js';
 /**
  * F3-ONBOARD: the first-dive tutorial, one-shot hints and the controls card.
  * These specs use the plain Playwright test (fresh player), not the
@@ -23,7 +23,11 @@ type Probe = {
   scanner: { view: { candidateId: string | null } };
 };
 
-async function boot(page: Page, extra = ''): Promise<void> {
+/**
+ * The fixture starts inside the opening contact's range. The tutorial card yields to the
+ * scan card, so these specs hide the scan card unless they are testing that deference.
+ */
+async function boot(page: Page, extra = '', keepScanCard = false): Promise<void> {
   await page.goto(url + extra, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
   // The first rendered frame precedes async fixture loading and the ?poi=
@@ -40,6 +44,7 @@ async function boot(page: Page, extra = ''): Promise<void> {
     undefined,
     { timeout: 45_000 },
   );
+  if (!keepScanCard) await setScanCardSuppressed(page, true);
 }
 async function shot(page: Page, name: string): Promise<void> {
   await mkdir(shots, { recursive: true });
@@ -56,7 +61,7 @@ test('desktop: tutorial starts, advances, skips and stays skipped after reload',
   await boot(page);
   const card = page.locator('.onboard-card');
   await expect(card).toBeVisible();
-  await expect(card).toContainText('Step 1 of 5');
+  await expect(card).toContainText('Step 1 of 3');
   await expect(card).toContainText('Hold W to move');
   await expect(page.getByRole('button', { name: 'Skip tutorial' })).toBeVisible();
   await shot(page, 'desktop-step1');
@@ -67,7 +72,7 @@ test('desktop: tutorial starts, advances, skips and stays skipped after reload',
   await expect.poll(() => stepIndex(page), { timeout: 15_000 }).toBe(1);
   await page.keyboard.up('KeyW');
   await page.keyboard.up('KeyA');
-  await expect(card).toContainText('Step 2 of 5');
+  await expect(card).toContainText('Step 2 of 3');
   await shot(page, 'desktop-step2');
 
   // The card never freezes the sim or steals focus.
@@ -100,7 +105,10 @@ test('scan coaching waits through held progress and interruption until completio
       g.scanner.view.candidateId === 'test-bow'
     );
   });
-  for (let i = 0; i < 3; i++) await page.locator('.onboard-skip-step').click();
+  // The contact is in range, so its card keeps the tutorial hidden; hold it away to read the coach.
+  await setScanCardSuppressed(page, true);
+  await page.clock.fastForward(50);
+  for (let i = 0; i < 2; i++) await page.locator('.onboard-skip-step').click();
   await page.clock.fastForward(50);
   const card = page.locator('.onboard-card');
   await expect(card).toHaveAttribute('data-step', 'scan');
@@ -108,17 +116,27 @@ test('scan coaching waits through held progress and interruption until completio
   await advanceScan(page, 0.5);
   await page.clock.fastForward(50);
   await expect(card.locator('.onboard-card-text')).toContainText('Scanning…');
-  expect(await stepIndex(page)).toBe(3);
+  expect(await stepIndex(page)).toBe(2);
   await page.keyboard.up('g');
   await page.clock.fastForward(50);
   await expect(card.locator('.onboard-card-text')).not.toContainText('Scanning…');
-  expect(await stepIndex(page)).toBe(3);
+  expect(await stepIndex(page)).toBe(2);
   await page.keyboard.down('g');
   await completeScan(page, 'test-bow');
   await page.keyboard.up('g');
   await page.clock.fastForward(50);
-  expect(await stepIndex(page)).toBe(4);
-  await expect(card).toHaveAttribute('data-step', 'journal');
+  expect(await stepIndex(page)).toBe(3);
+  await expect(card).toBeHidden();
+});
+
+test('tutorial card yields to the scan card instead of stacking with it', async ({ page }) => {
+  // Regression: the coach card and the scan card used to share the centre lane.
+  await boot(page, '', true);
+  await expect(page.locator('.scan-panel')).toBeVisible();
+  await expect(page.locator('.onboard-card')).toBeHidden();
+  expect(await stepIndex(page)).toBe(0);
+  await setScanCardSuppressed(page, true);
+  await expect(page.locator('.onboard-card')).toBeVisible();
 });
 
 test('desktop: Pause opens the controls card for the active device', async ({ page }) => {
@@ -244,14 +262,12 @@ test.describe('touch viewport', () => {
 
   test('Journal returns to Pause without switching out of touch mode', async ({ page }) => {
     await boot(page, '&touch=1');
-    for (let i = 0; i < 4; i++) await page.locator('.onboard-skip-step').tap();
-    await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'journal');
+    await dismissTutorial(page, true);
     await page.locator('.tc-btn-pause').tap();
     const pause = page.locator('.pause-menu');
     await pause.getByRole('button', { name: 'Journal', exact: true }).tap();
     const journal = page.locator('.journal');
     await expect(journal).toBeVisible();
-    await expect.poll(async () => (await saved(page))?.tutorialDone).toBe(true);
     await journal.getByRole('button', { name: 'Close Journal', exact: true }).tap();
     await expect(journal).toBeHidden();
     await expect(pause).toBeVisible();
@@ -342,8 +358,6 @@ test.describe('touch viewport', () => {
     await hold('.tc-slider', 0.5, 0.1);
     await expect.poll(() => stepIndex(page)).toBe(2);
     await release();
-    await page.locator('.tc-btn-lights').tap();
-    await expect.poll(() => stepIndex(page)).toBe(3);
     // Return to the initial scan approach after practising thrust, turn and depth.
     await page.evaluate(
       (p) =>
@@ -359,9 +373,8 @@ test.describe('touch viewport', () => {
       .toBe('test-bow');
     await hold('.tc-btn-scan', 0.5, 0.5);
     await completeScan(page, 'test-bow');
-    await expect.poll(() => stepIndex(page)).toBe(4);
+    await expect.poll(() => stepIndex(page)).toBe(3);
     await release();
-    await expect(card).toContainText('Step 5 of 5');
     await page.locator('.tc-btn-photo').tap();
     const mode = page.locator('.photo-mode');
     await expect(mode).toBeVisible();

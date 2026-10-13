@@ -5,7 +5,7 @@ import type { CameraRig } from '../../src/sub/CameraRig.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
 import { scanAim } from './helpers/scanAim.js';
-import { dismissTutorial } from './helpers/tutorial.js';
+import { dismissTutorial, setScanCardSuppressed } from './helpers/tutorial.js';
 import { expectCompactPhoneHud } from './helpers/phoneHud.js';
 
 type Game = {
@@ -105,7 +105,8 @@ for (const layout of [
             const briefing = page.locator('.briefing');
             await expect(briefing).toBeVisible();
             await expect(
-              briefing.getByRole('radio', { name: 'near the first target', exact: true }),
+              // Start position sits in the collapsed Advanced panel, so it is not in the role tree.
+              briefing.locator('.briefing-start input[value="near-site"]'),
             ).toBeChecked();
             const panel = briefing.locator('.briefing-panel');
             expect(await panel.evaluate((e) => e.scrollWidth - e.clientWidth)).toBeLessThanOrEqual(
@@ -127,6 +128,9 @@ for (const layout of [
             await page.clock.runFor(34);
             await expect(briefing).toBeHidden();
             if (layout.touch) {
+              // The objective card is up, so the tutorial waits; bring it back to read its copy.
+              await setScanCardSuppressed(page, true);
+              await page.clock.runFor(34);
               // A keyboard event in the disclosure changes the active input device.
               await act(page.getByRole('button', { name: 'Skip', exact: true }));
               await page.clock.runFor(34);
@@ -152,7 +156,7 @@ for (const layout of [
               await act(page.getByRole('button', { name: 'Skip', exact: true }));
               await page.clock.runFor(34);
               await expect(page.locator('.onboard-card-phone-text')).toHaveText(
-                'Tap LIGHTS to switch the headlights.',
+                'Hold SCAN on a glowing target.',
               );
             }
             await page.screenshot({ path: info.outputPath('opening.png') });

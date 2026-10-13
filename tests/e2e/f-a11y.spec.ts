@@ -182,7 +182,7 @@ test('briefing controls and cancellation remain keyboard reachable', async ({ pa
 
 // Keep the complete Tab walks, but give each panel family an independent
 // browser context/budget so one long catalogue cannot exhaust a monolithic test.
-test('pause details and mission selection remain keyboard reachable', async ({ page }) => {
+test('pause details and data credits remain keyboard reachable', async ({ page }) => {
   await boot(page, '/?mission=titanic&tier=low&skipBriefing=1');
   await page.keyboard.press('Escape');
   const pause = page.locator('.pause-menu');
@@ -195,7 +195,7 @@ test('pause details and mission selection remain keyboard reachable', async ({ p
     root.prepend(hidden, skipped);
   });
   await cycle(page, pause);
-  for (const name of ['Objectives', 'Mission select']) {
+  for (const name of ['Objectives', 'Data credits']) {
     await pause.getByRole('button', { name, exact: true }).focus();
     await page.keyboard.press('Enter');
     await cycle(page, pause);

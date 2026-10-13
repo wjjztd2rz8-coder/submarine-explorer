@@ -4,7 +4,8 @@ import { FocusTrap } from './FocusTrap.js';
 import { ModeSelector, type GameplaySettingsSource } from './ModeSelector.js';
 
 export interface HomeActions {
-  continueDive(): void;
+  /** The one primary action: first run opens the opening briefing, afterwards the last mission. */
+  dive(): void;
   journal(): void;
   settings(): void;
   controls(): void;
@@ -28,7 +29,7 @@ export class Home {
   readonly root: HTMLDivElement;
   readonly globeSlot: HTMLDivElement;
   readonly sitesSlot: HTMLDivElement;
-  readonly continueButton: HTMLButtonElement;
+  readonly diveButton: HTMLButtonElement;
   /** D2-PREDIVE: the Arcade / Realistic selector with Advanced above the menu (with a settings source). */
   readonly modeSelector: ModeSelector | null;
   private readonly dailyCard: HTMLButtonElement;
@@ -97,15 +98,12 @@ export class Home {
       menu.append(button);
       return button;
     };
-    // DOM order is the Tab order: Continue, Dive sites, Free dive, Daily dive,
+    // DOM order is the Tab order: Dive, Dive sites, Free dive, Daily dive,
     // mode, Journal, Settings, Controls (Upgrades is appended after by progress).
-    this.continueButton = entry('Continue', actions.continueDive);
-    this.continueButton.disabled = true;
-    this.continueButton.className = 'home-primary';
+    this.diveButton = entry('Dive', actions.dive);
+    this.diveButton.className = 'home-primary';
     this.diveSitesButton = entry('Dive sites', () => this.showSites(false, this.diveSitesButton));
-    this.diveSitesButton.className = 'home-primary';
     this.freeDiveButton = entry('Free dive', () => this.showSites(true, this.freeDiveButton));
-    this.freeDiveButton.className = 'home-wide';
     this.dailyCard = document.createElement('button');
     this.dailyCard.type = 'button';
     this.dailyCard.className = 'daily-card';
@@ -169,8 +167,7 @@ export class Home {
     this.open_ = true;
     this.root.hidden = false;
     this.trap.activate();
-    // First focus: Continue when enabled, otherwise Dive sites.
-    (this.continueButton.disabled ? this.diveSitesButton : this.continueButton).focus();
+    this.diveButton.focus();
   }
 
   hide(): void {
@@ -178,12 +175,6 @@ export class Home {
     this.open_ = false;
     this.root.hidden = true;
     this.trap.deactivate();
-  }
-
-  setContinue(missionId: string | null): void {
-    this.continueButton.disabled = !missionId;
-    this.continueButton.title = missionId ? `Continue ${missionId}` : 'Start a mission to continue';
-    if (!missionId && document.activeElement === this.continueButton) this.diveSitesButton.focus();
   }
 
   setDaily(site: string, modifier: string, best: number, streak: number, launch: () => void): void {

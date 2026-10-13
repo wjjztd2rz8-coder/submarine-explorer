@@ -9,6 +9,7 @@ import type { Save } from '../../src/core/Save.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
 import type { Props } from '../../src/world/Props.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { openBriefingAdvanced } from './helpers/briefing.js';
 
 interface Game {
   discovery: Discovery;
@@ -27,7 +28,6 @@ const panels = [
   '.hud-notice',
   '.hud-objective',
   '.hud-prompt',
-  '.hud-control-tips',
   '.hud-reset-camera',
   '.scan-panel',
   '.onboard-card',
@@ -98,6 +98,7 @@ for (const layout of [
         expect(
           await page.evaluate(() => (window.__game as unknown as Game).save.get().gameplayMode),
         ).toBe(mode);
+        await openBriefingAdvanced(page);
         await page.locator('.briefing-start input[value="surface"]').check();
         if (layout.touch) await page.locator('.briefing-begin').tap();
         else await page.locator('.briefing-begin').click();
@@ -196,11 +197,11 @@ for (const layout of [
           const g = window.__game as unknown as Game | undefined;
           return !!(window.__gameReady && g?.discovery.loaded && g.props.loaded && g.explore.ready);
         });
+        await openBriefingAdvanced(page);
         await page.locator('.briefing-start input[value="surface"]').check();
         if (layout.touch) await page.locator('.briefing-begin').tap();
         else await page.locator('.briefing-begin').click();
         await page.clock.runFor(100);
-        await expect(page.locator('.onboard-card')).toBeVisible();
         await dismissTutorial(page, layout.touch, true);
         await page.evaluate(() => {
           const g = window.__game as unknown as Game;

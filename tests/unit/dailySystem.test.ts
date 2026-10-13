@@ -99,7 +99,7 @@ it('removes an inaccessible Daily launch and restores the same card after mode c
     createElement: () => new HomeElement(),
   });
   ctx.home = new Home({
-    continueDive: vi.fn(),
+    dive: vi.fn(),
     journal: vi.fn(),
     settings: vi.fn(),
     controls: vi.fn(),

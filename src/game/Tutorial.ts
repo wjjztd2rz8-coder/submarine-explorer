@@ -1,12 +1,11 @@
 /**
- * First-dive tutorial (F3-ONBOARD): five short steps that advance when the
+ * First-dive tutorial (F3-ONBOARD): three short steps that advance when the
  * player does the thing. Pure logic. The onboarding system feeds it the input
  * the sim sees each frame plus a few events; it never touches input handling.
  */
 
-export type TutorialStepId = 'move' | 'depth' | 'lights' | 'scan' | 'journal';
-export type TutorialEvent =
-  'lights' | 'scan:complete' | 'journal' | 'photo' | 'scan:started' | 'scan:aborted';
+export type TutorialStepId = 'move' | 'depth' | 'scan';
+export type TutorialEvent = 'scan:complete' | 'scan:started' | 'scan:aborted';
 
 export interface TutorialStep {
   id: TutorialStepId;
@@ -16,9 +15,7 @@ export interface TutorialStep {
 export const TUTORIAL_STEPS: readonly TutorialStep[] = [
   { id: 'move', title: 'Move and turn' },
   { id: 'depth', title: 'Rise and sink' },
-  { id: 'lights', title: 'Headlights' },
   { id: 'scan', title: 'Scan a target' },
-  { id: 'journal', title: 'Photo or Journal' },
 ];
 
 /** Seconds of held input before a movement step counts as done. */
@@ -94,9 +91,7 @@ export class Tutorial {
     if (event === 'scan:aborted' || event === 'scan:complete') this.scanning = false;
     const step = this.step;
     if (!step) return false;
-    if (step.id === 'lights' && event === 'lights') return this.advance();
     if (step.id === 'scan' && event === 'scan:complete') return this.advance();
-    if (step.id === 'journal' && (event === 'journal' || event === 'photo')) return this.advance();
     return false;
   }
 
@@ -128,11 +123,7 @@ export class Tutorial {
   }
 
   private waitsFor(id: TutorialStepId, event: TutorialEvent): boolean {
-    return (
-      (id === 'lights' && event === 'lights') ||
-      (id === 'scan' && event === 'scan:complete') ||
-      (id === 'journal' && (event === 'journal' || event === 'photo'))
-    );
+    return id === 'scan' && event === 'scan:complete';
   }
 
   private advance(): boolean {

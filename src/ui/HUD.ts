@@ -12,7 +12,7 @@ import type { CurrentStatus } from '../world/Currents.js';
 import type { HullWarningStyle } from '../core/Save.js';
 import { HullGauge } from './HullGauge.js';
 
-const FIELDS = ['depth', 'heading', 'speed', 'status', 'tile'] as const;
+const FIELDS = ['depth', 'heading', 'speed', 'tile'] as const;
 type Field = (typeof FIELDS)[number];
 
 /** Numeric scale factors; CSS clamps individual text sizes for legibility. */
@@ -48,7 +48,6 @@ export interface HudContext {
   objective?: string | null;
   scanPrompt?: string | null;
   simSpeed?: number;
-  controlTips?: string | null;
 }
 
 /**
@@ -105,7 +104,6 @@ export class HUD {
   private readonly objectiveEl: HTMLDivElement;
   private readonly promptEl: HTMLDivElement;
   private readonly speedEl: HTMLDivElement;
-  private readonly tipsEl: HTMLDivElement;
   private readonly resetCameraEl: HTMLButtonElement;
   private readonly powerEl: HTMLDivElement;
   private readonly currentEl: HTMLDivElement;
@@ -142,7 +140,6 @@ export class HUD {
       <div class="hud-notice" hidden></div>
       <div class="hud-objective" hidden></div>
       <div class="hud-prompt" hidden></div>
-      <div class="hud-control-tips" hidden></div>
       <div class="hud-footer">
         <button class="hud-journal" type="button" title="Journal (J)" aria-label="Journal (J)">JOURNAL</button>
         <button class="hud-reset-camera" type="button" aria-label="Reset camera">Reset camera</button>
@@ -157,7 +154,6 @@ export class HUD {
     this.objectiveEl = this.root.querySelector('.hud-objective') as HTMLDivElement;
     this.promptEl = this.root.querySelector('.hud-prompt') as HTMLDivElement;
     this.speedEl = this.root.querySelector('.hud-sim-speed') as HTMLDivElement;
-    this.tipsEl = this.root.querySelector('.hud-control-tips') as HTMLDivElement;
     this.resetCameraEl = this.root.querySelector('.hud-reset-camera') as HTMLButtonElement;
     this.powerEl = this.root.querySelector('.hud-power') as HTMLDivElement;
     this.currentEl = this.root.querySelector('.hud-current') as HTMLDivElement;
@@ -272,12 +268,6 @@ export class HUD {
     if (speedEl.dataset.knots !== compactSpeed) speedEl.dataset.knots = compactSpeed;
     this.showContext(this.objectiveEl, ctx.objective ? `OBJECTIVE · ${ctx.objective}` : null);
     this.showContext(this.promptEl, ctx.scanPrompt);
-    this.showContext(
-      this.tipsEl,
-      ctx.controlTips && this.powerState?.enabled && this.powerState.low.length
-        ? `${ctx.controlTips} · supplies low`
-        : ctx.controlTips,
-    );
     this.updatePower(this.powerState);
     this.showContext(
       this.speedEl,
@@ -285,25 +275,18 @@ export class HUD {
     );
 
     if (s.hullBreached) {
-      this.set('status', 'HULL BREACH');
       this.showWarning('HULL BREACH — CRUSH DEPTH EXCEEDED');
     } else if (s.crushWarning) {
-      this.set('status', 'pressure high');
       this.showWarning(`HULL RATING EXCEEDED — ASCEND`);
     } else if (this.powerState?.enabled && s.emergencyCause === 'power' && s.emergencyBlow) {
-      this.set('status', 'emergency ascent');
       this.showWarning('SUPPLIES EXHAUSTED — EMERGENCY ASCENT');
     } else if (this.powerState?.enabled && this.powerState.critical.length) {
-      this.set('status', 'supplies critical');
       this.showWarning(`${this.powerState.critical.join(' & ').toUpperCase()} CRITICAL — ASCEND`);
     } else if (this.powerState?.enabled && this.powerState.low.length) {
-      this.set('status', 'supplies low');
       this.showWarning(`${this.powerState.low.join(' & ').toUpperCase()} LOW — PLAN ASCENT`);
     } else if (seabedWarning(s.altitude, s.velocity.y, this.warn, ctx.nearScanTarget)) {
-      this.set('status', 'seabed proximity');
       this.showWarning('SEABED PROXIMITY');
     } else {
-      this.set('status', 'nominal');
       this.hideWarning();
     }
   }

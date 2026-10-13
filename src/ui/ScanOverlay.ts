@@ -175,6 +175,11 @@ export class ScanOverlay {
     return !this.panel.hidden;
   }
 
+  /** An actionable card is up: a target in range, a scan in progress, or a result. Dim cards only navigate. */
+  get promptActive(): boolean {
+    return !this.panel.hidden && this.panel.dataset.tone !== 'dim';
+  }
+
   /**
    * @param screen CSS-pixel position of the nearest POI, or null if it is
    *   off-screen / behind the camera.

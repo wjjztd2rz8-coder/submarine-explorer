@@ -93,11 +93,11 @@ test('free dive: portrait HUD panels do not overlap', async ({ page }) => {
   await expectClearLayout(page);
 });
 
-test('mission with tutorial: card, objectives, scan and readouts stay separate', async ({
+test('mission with tutorial: card, objectives, scan and readouts each stay clear', async ({
   page,
 }) => {
   await boot(page, 'mission=monterey-canyon');
-  await expect(page.locator('.onboard-card')).toBeVisible();
   await expect(page.locator('.objectives-panel')).toBeVisible();
+  await expect(page.locator('.onboard-card')).toBeVisible();
   await expectClearLayout(page);
 });

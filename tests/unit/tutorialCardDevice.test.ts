@@ -33,15 +33,12 @@ it('phone tutorial follows touch, remapped keyboard and gamepad on every step', 
     turn: 'K or O',
     rise: 'U',
     sink: 'N',
-    lights: 'H',
     scan: 'B',
-    photo: 'V',
-    journal: 'Z',
   };
   for (const [index, step] of TUTORIAL_STEPS.entries()) {
     card.show(index, tutorialText(step.id, 'touch', keys), 'touch');
     const touch = phone.textContent;
-    expect(touch).toMatch(/stick|slider|LIGHTS|SCAN|PHOTO/);
+    expect(touch).toMatch(/stick|slider|SCAN/);
     for (const device of ['keyboard', 'gamepad'] as const) {
       const text = tutorialText(step.id, device, keys);
       card.show(index, text, device);
@@ -76,10 +73,7 @@ it('phone scan progress and navigation copy survive the compact presentation', (
     turn: 'A or D',
     rise: 'Space',
     sink: 'Shift',
-    lights: 'L',
     scan: 'G',
-    photo: 'P',
-    journal: 'J',
   };
   for (const destination of ['the bow', 'the north canyon wall', 'the coral mound cluster']) {
     const text = tutorialText('move', 'touch', keys, null, destination);
@@ -87,8 +81,8 @@ it('phone scan progress and navigation copy survive the compact presentation', (
     expect(phone.textContent).toBe('Left stick: follow the marker.');
     expect((card.root as unknown as Element).children[2].textContent).toContain(destination);
   }
-  card.show(3, tutorialText('scan', 'touch', keys, 0.42), 'touch');
+  card.show(2, tutorialText('scan', 'touch', keys, 0.42), 'touch');
   expect(phone.textContent).toBe('Scanning… 42% · keep holding SCAN.');
-  card.show(3, tutorialText('scan', 'touch', keys), 'touch');
-  expect(phone.textContent).toBe('Face a glowing target; hold SCAN to finish.');
+  card.show(2, tutorialText('scan', 'touch', keys), 'touch');
+  expect(phone.textContent).toBe('Hold SCAN on a glowing target.');
 });

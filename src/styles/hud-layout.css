@@ -215,7 +215,7 @@
   }
   /* Supplies add almost 100 px to the old single-column Surface stack.
      Use the full objective width and three rows above the action buttons:
-     depth/speed/status; supplies/hull; current. Keep every live readout. */
+     depth/speed; supplies/hull; current. Keep every live readout. */
   html.is-touch .hud-readouts:has(.hud-power:not([hidden])) {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -224,11 +224,7 @@
   }
   html.is-touch
     .hud-readouts:has(.hud-power:not([hidden]))
-    .hud-row:is(
-      :has([data-field='depth']),
-      :has([data-field='speed']),
-      :has([data-field='status'])
-    ) {
+    .hud-row:is(:has([data-field='depth']), :has([data-field='speed'])) {
     grid-row: 1;
     grid-column: span 2;
     display: flex;
@@ -663,11 +659,7 @@
      stack the labels above values and add a third core telemetry line. */
   html.is-touch
     :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
-    .hud-row:is(
-      :has([data-field='depth']),
-      :has([data-field='speed']),
-      :has([data-field='status'])
-    ) {
+    .hud-row:is(:has([data-field='depth']), :has([data-field='speed'])) {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -696,15 +688,6 @@
   }
   html.is-touch
     :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
-    .hud-row:has([data-field='status']) {
-    grid-area: 2 / 1;
-  }
-  html.is-touch
-    :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
-    .hud-row:has([data-field='status'])
-    .hud-label,
-  html.is-touch
-    :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
     .hud-row:has([data-field='heading']),
   html.is-touch
     :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
@@ -718,9 +701,6 @@
     content: attr(data-knots);
     font-size: 13px;
   }
-  html.is-touch .hud-readouts [data-field='status'] {
-    font-size: 11px;
-  }
   html.is-touch .hud-readouts [data-field='depth'] {
     font-size: 0;
   }
@@ -729,7 +709,7 @@
     font-size: 13px;
   }
   html.is-touch :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden]))) .hull-gauge {
-    grid-area: 2 / 2;
+    grid-area: 2 / 1 / auto / -1;
     margin: 0;
     padding: 0;
     border: 0;
@@ -974,24 +954,24 @@ html.is-touch .scan-objective-chip:not([hidden]) {
   border-radius: 999px;
 }
 /* The tutorial's own instruction already says where to go. */
-html.is-touch body:has(.onboard-card:not([hidden], [data-step='journal'])) .scan-objective-chip {
+html.is-touch body:has(.onboard-card:not([hidden], [data-step='scan'])) .scan-objective-chip {
   display: none;
 }
 /* Phones up to 900 px wide already use the one-line bottom card above. */
 @media (min-width: 901px) and (max-height: 460px) and (orientation: landscape) {
-  html.is-touch .onboard-card[data-step='journal']:not([hidden]) {
+  html.is-touch .onboard-card[data-step='scan']:not([hidden]) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     column-gap: 8px;
     align-items: center;
     padding: 2px 8px;
   }
-  html.is-touch .onboard-card[data-step='journal'] .onboard-card-head,
-  html.is-touch .onboard-card[data-step='journal'] .onboard-card-title,
-  html.is-touch .onboard-card[data-step='journal'] .onboard-card-text {
+  html.is-touch .onboard-card[data-step='scan'] .onboard-card-head,
+  html.is-touch .onboard-card[data-step='scan'] .onboard-card-title,
+  html.is-touch .onboard-card[data-step='scan'] .onboard-card-text {
     display: none;
   }
-  html.is-touch .onboard-card[data-step='journal'] .onboard-card-phone-text {
+  html.is-touch .onboard-card[data-step='scan'] .onboard-card-phone-text {
     display: block;
     grid-column: 1;
     grid-row: 1;
@@ -1001,15 +981,43 @@ html.is-touch body:has(.onboard-card:not([hidden], [data-step='journal'])) .scan
     white-space: nowrap;
     font-size: 12px;
   }
-  html.is-touch .onboard-card[data-step='journal'] .onboard-card-buttons {
+  html.is-touch .onboard-card[data-step='scan'] .onboard-card-buttons {
     grid-column: 2;
     grid-row: 1;
   }
-  html.is-touch .onboard-card[data-step='journal'] .onboard-skip-all {
+  html.is-touch .onboard-card[data-step='scan'] .onboard-skip-all {
     padding: 0 8px;
     font-size: 12px;
   }
-  body:has(.onboard-card[data-step='journal']:not([hidden])) .scan-overlay .scan-stack {
+  body:has(.onboard-card[data-step='scan']:not([hidden])) .scan-overlay .scan-stack {
     top: calc(116px + env(safe-area-inset-top, 0px));
+  }
+}
+
+@media (max-height: 460px) and (orientation: landscape) {
+  /* The completion banner takes the free centre lane (the objective panel
+     column is full of controls below it) and the cards that share that lane
+     step aside while it is up. */
+  html.is-touch .obj-banner {
+    position: fixed;
+    left: var(--hl-col-left);
+    top: calc(58px + env(safe-area-inset-top, 0px));
+    width: var(--hl-col-width);
+    box-sizing: border-box;
+    margin: 0;
+    flex-direction: row;
+    align-items: center;
+    z-index: 20;
+  }
+  html.is-touch .obj-banner-text {
+    flex: 1;
+    min-width: 0;
+  }
+  html.is-touch .obj-banner-actions {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+  html.is-touch body:has(.obj-banner:not([hidden])) :is(.scan-overlay .scan-stack, .onboard-card) {
+    visibility: hidden;
   }
 }

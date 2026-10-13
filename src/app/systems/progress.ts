@@ -127,7 +127,7 @@ export function createProgressSystem(): GameSystem {
         menu.append(button);
         cleanup.add(() => button.remove());
       }
-      const selectors = [ctx.missionSelect, ctx.homeSites, ctx.pauseSites];
+      const selectors = [ctx.missionSelect, ctx.homeSites];
       const updateGlobes = (): void => {
         for (const globe of [ctx.globe, ctx.homeGlobe])
           globe.setMissionAccess((site) => {

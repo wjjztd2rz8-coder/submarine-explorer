@@ -453,7 +453,6 @@ html.is-touch body {
 }
 
 /* The on-screen buttons replace these keyboard-oriented HUD bits. */
-html.is-touch .hud-control-tips,
 html.is-touch .hud-reset-camera {
   display: none !important;
 }

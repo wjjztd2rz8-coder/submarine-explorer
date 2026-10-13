@@ -126,7 +126,6 @@ async function firstActions(page: Page, touch: boolean): Promise<void> {
   if (touch) {
     await holdTouchUntilStep(page, '.tc-stick', 1, 0.8, 0.2);
     await holdTouchUntilStep(page, '.tc-slider', 2, 0.5, 0.15);
-    await page.locator('.tc-btn-lights').tap();
   } else {
     await page.keyboard.down('w');
     await page.keyboard.down('d');
@@ -150,13 +149,12 @@ async function firstActions(page: Page, touch: boolean): Promise<void> {
     } finally {
       await page.keyboard.up('Space');
     }
-    await page.keyboard.press('l');
   }
   await page.clock.runFor(17);
-  await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'scan');
-  // The tutorial asks for a toggle; restore light for the scene observations.
-  if (touch) await page.locator('.tc-btn-lights').tap();
-  else await page.keyboard.press('l');
+  // The scan step is current even while the scan card keeps the tutorial card hidden.
+  expect(await page.evaluate(() => (window.__game as unknown as Game).onboard.tutorial.index)).toBe(
+    2,
+  );
 }
 
 for (const viewport of [
@@ -245,7 +243,8 @@ for (const viewport of [
         await ready(page);
         const home = page.locator('.home-screen');
         await expect(home).toBeVisible();
-        await expect(home.getByRole('button', { name: 'Continue', exact: true })).toBeDisabled();
+        await expect(home.getByRole('button', { name: 'Dive', exact: true })).toBeEnabled();
+        await expect(home.getByRole('button', { name: 'Continue', exact: true })).toHaveCount(0);
         await shot('01-home');
         await act(home.getByRole('button', { name: 'Dive sites', exact: true }), touch);
         const back = home.getByRole('button', { name: 'Back to menu', exact: true });
@@ -279,7 +278,10 @@ for (const viewport of [
         await act(begin, touch);
         // The clock is paused: render frames so the first tutorial step is shown.
         await page.clock.runFor(34);
-        await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'move');
+        // The objective card is up from the start, so the tutorial waits at its first step.
+        expect(
+          await page.evaluate(() => (window.__game as unknown as Game).onboard.tutorial.index),
+        ).toBe(0);
         if (touch) await expectCompactPhoneHud(page);
         await shot('05-dive-start');
         await firstActions(page, touch);

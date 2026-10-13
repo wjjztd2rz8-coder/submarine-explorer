@@ -156,6 +156,10 @@ export class Progress {
     this.bonus = false;
     this.divePoints = 0;
   }
+  /** Stars earned so far; no rewards are granted until the dive is finished. */
+  previewStars(objectives: readonly RatingObjective[]): number {
+    return diveStars(objectives, this.bonus, false);
+  }
   finish(site: string, objectives: readonly RatingObjective[], aborted = false): DiveRating {
     const stars = diveStars(objectives, this.bonus, aborted);
     if (stars > 0) this.award('primary', site);
