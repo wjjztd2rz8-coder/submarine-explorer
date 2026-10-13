@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **1402 S-bugs:** remove the unreachable player sonar ping/echo and residual globe action while preserving active saved bindings and the quiet natural-event sensor cue; add gamepad Journal (D-pad left), reset camera (D-pad down), and photo capture (left bumper), with Controls guide documentation. New players use `auto` graphics detection so weaker devices start on Low; saved fixed tiers remain unchanged. Reason: simplification review §6c input gaps and the default/comment mismatch.
+
 - **1392 narrow landscape follow-up:** restore Scan to the two right action columns so discovery rewards clear it, and place the small-phone tutorial in the centre lane below wrapped scan guidance and beside telemetry/actions. Reason: the 667×375 reward sweep exposed collisions beyond the Boost column.
 
 - **1392 landscape clearance:** the phone tutorial strip ends 8px before the right Boost column, using the same capped edge margin as the touch controls. Reason: the full regression found the strip covering Boost on 844×390 and 667×375 phones; portrait placement stays intact.
