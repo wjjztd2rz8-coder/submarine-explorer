@@ -14,7 +14,7 @@ The owner treats this as a curiosity project about how far current models and wo
   - Analysis files are evidence that items cite: reviews, audits, owner-feedback write-ups, `plan/archive/SIMPLIFY-REVIEW-2026-10-11.md`.
   - [PHASE-F-PLAN.md](PHASE-F-PLAN.md) is reference only: owner decisions and pillars. Its waves are finished.
 - **IDs.** Every item has a stable ID. Codex briefs, worktree branches, `plan/progress/` notes and commit messages name the item ID they serve, for example `S-dead` or `brief 1500 (S-dead)`. Work with no backlog item doesn't start: add the item first.
-- **Lanes.** Each item names a lane: **Codex** (well-specified, self-contained), **Sonnet** (visual, multi-file, judgement) or **Haiku** (small and scoped). Pick the highest unblocked item in your lane whose files don't overlap work in flight.
+- **Lanes.** Each item names a lane: **Codex** (well-specified, self-contained, and NOT visual), **Sonnet** (visual, multi-file, judgement) or **Haiku** (small and scoped). Owner 2026-10-12: Claude owns all visual work (anything judged by how it looks), because Codex cannot render the game (its browser smoke test failed on MCP approval and the browser is off). Codex may still do the numeric/geometry side of a visual item when a Claude package asks for it. Pick the highest unblocked item in your lane whose files don't overlap work in flight.
 - **Status.** Mark items `IN FLIGHT (<who>, <date>)`, `DONE <date> (<commit>)` or `CUT <date>: <why>` (cuts also go in CHANGELOG.md). Delete DONE items at the next comprehensive review. History goes to `plan/archive/DIRECTOR-HISTORY-*.md`.
 
 ## Direction (standing)
@@ -73,7 +73,7 @@ The newest items go first.
 
 - **Phone-test items** (owner, 2026-10-11; decisions in [PHONE-FEEDBACK-2026-10-11.md](PHONE-FEEDBACK-2026-10-11.md)): all six DONE. P-touch-controls (1392), P-first-dive-flow (1391) and P-events-reform (1393) merged 2026-10-12 (f3c9221, 677cda2, eb8dd33) after full gates in their worktrees and screenshot review.
 - **R-release:** IN FLIGHT (Claude, 2026-10-12): full gates on main at eb8dd33.
-- **Codex dispatcher restored** 2026-10-12 21:26 (`dispatch-max` 3). Running: 1401 (S-tests step 1), 1402 (S-bugs), 1410 (V-bluehole facets). Queued: 1420 (V-beebe), 1430 (CI shard 7, S-tests), 1440 (scan-candidate bug hunt), 1480 (V-endurance), 1495 (Blue Hole collision, after 1410), 1496 (S-rov), 1497 (S-tiers). 1470 is replaced by 1401. S-rewards waits for S-flow (both touch the completion banner); S-picker (Sonnet) and S-daily (Haiku) follow the current Claude agents.
+- **Codex dispatcher restored** 2026-10-12 21:26 (`dispatch-max` 3). Running: 1401 (S-tests step 1), 1402 (S-bugs). 1410 (V-bluehole facets) was stopped after its first round and moved to the Claude lane with its wip commit. Queued: 1430 (CI shard 7, S-tests), 1440 (scan-candidate bug hunt), 1496 (S-rov). Held: 1495 (Blue Hole collision) until V-bluehole merges. Claude visual lane, one Sonnet at a time, briefs in `.cache/claude/visual/`: V-bluehole (1410 worktree), V-beebe (1420), V-endurance (1480), S-tiers (1497). 1470 is replaced by 1401. S-rewards waits for S-flow (both touch the completion banner); S-picker (Sonnet) and S-daily (Haiku) follow the current Claude agents.
 - **Sol round 2** on the simplification review is in (`.cache/review/simplify-20261011/sol-round2.md`); its corrections are folded into the items below, marked "Sol r2".
 
 ## Backlog
@@ -120,10 +120,10 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
    - **Step 4:** CI builds once per deployment base and shares the artifact across shards, and `tools/gates.sh` and `npm run ci` share one definition.
    - Target: 30%+ less serial e2e time (provisional: the 8.8 h baseline is summed historical hosted weights). No guard for a real past bug is lost.
 8. **S-guidance [Sonnet]** (§4 item 1), after S-flow and V-first-five. One prioritised guidance slot (urgent warning > scan progress > discovery > next objective > tutorial/hint) replaces the separate tutorial card, hint chip, explore notice, discovery toast, NEW ENTRY card and objective chip. The sonar diamond and world waypoint stay. Remove the persistent "nominal" text and the static hull-rating number (show the gauge only when it matters; test the threshold, 50% is unvalidated). Urgent warnings must not block scanning or navigation. Drop the mission-title strip on phone.
-9. **V-endurance, V-bluehole, V-beebe [Sonnet if the Codex result falls short]:**
-   - Endurance: the opening hull is small and the sub fills the right third (Codex 1480).
-   - Blue Hole: the bowl has flat-shaded polygon steps (Codex 1410).
-   - Beebe: the trunk and scan card overlap (Codex 1420).
+9. **V-endurance, V-bluehole, V-beebe [Sonnet]:**
+   - Endurance: the opening hull is small and the sub fills the right third (brief 1480).
+   - Blue Hole: the bowl has flat-shaded polygon steps (brief 1410; a Codex round-1 wip commit is in its worktree).
+   - Beebe: the trunk and scan card overlap (brief 1420).
 10. **S-hud [Sonnet]** (§4 item 2, §5), after S-guidance, with S-tests step 2 for the HUD spec. Build three HUD regions (top info, guidance, controls) in normal flow, replacing per-element offsets. Target: `hud-layout.css` from 1,077 lines to about 300, all `/* S-hud: remove */` patches gone, portrait and landscape both without special cases. Re-baseline HUD screenshots deliberately.
 11. **S-resolve [Codex]** (§5, §3 Custom). One pure `resolveEffective(settings, mode, progress, daily)`, recomputed when its inputs change, replaces config mutation at boot and live, plus upgrades, the daily modifier and the ROV's per-frame POI-radius rewrite (`rov.ts:143`). With it, Custom shrinks from 10 selects to 4 switches (battery/oxygen, currents, waypoints, start at surface):
     - drop `sonarMarkers`;
@@ -161,7 +161,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
     - Move the 28 MB of progress images out of `plan/progress/`.
     - Fix the shard-count drift in the docs.
 17. **S-boot [Codex]** (§6). Home boots without loading the Titanic dive tile or starting the ~37 dive systems: the title scene only. The dive tile loads after a site is picked.
-18. **S-render [Codex]** (§6):
+18. **S-render [Codex for the code, Sonnet judges the golden set]** (§6):
     - table-drive the `scarp.ts` kinds (golden-guarded);
     - title scene reuses `Headlights`/`MarineSnow`;
     - collapse the three hull-creak audio paths;
@@ -170,7 +170,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
     - **S-rewards [Codex]:** fixed equipment. Remove upgrade purchases and RP-gated hulls: every player starts with the full kit, the hull class still follows mission depth (Class A at Blue Hole). Rewards become cosmetics only (sub paint/decals, photo frames), unlocked by discoveries; make them neat enough to matter. Samples and Secrets present as Journal "finds" (keep `sample:`/`secret:` save keys); events keep Journal and debrief sightings but no RP checklists. Save migration: past purchases map to nothing lost (cosmetics granted for past RP). [Most players won't play regularly; upgrades make the start feel worse. Cosmetics reward the truly interested.]
     - **S-daily [Haiku]:** keep Daily Dive and its mechanics; make its wording shorter (Home card, briefing, debrief). [Concise wording preferred.]
     - **S-rov [Codex]:** cut the ROV (code, bindings, tests, docs; CHANGELOG cut entry). [It only adds something with much more detail, which is too far for now.]
-    - **S-tiers [Codex]:** merge Ultra into High after a golden comparison; keep the valuable Ultra detail inside one High budget; migrate saved `ultra` to High.
+    - **S-tiers [Sonnet]:** merge Ultra into High after a golden comparison; keep the valuable Ultra detail inside one High budget; migrate saved `ultra` to High.
     - **S-picker [Sonnet]:** keep the globe on every screen size. On phones, a swipe-up sheet over the globe lists the sites (one site-list component, also used wherever a list exists today). Remove redundant globe instances (the full-screen overlay and `?globe=1`) only if the sheet covers their use. [The globe already works; the list is there for those who want it.]
 20. **V-lander [Haiku, low]:** Challenger's white lander looks toy-like; add wear and colour.
 
