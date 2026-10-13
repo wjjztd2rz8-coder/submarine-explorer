@@ -160,7 +160,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 
     Guard everything with the golden set.
 
-16. **S-hygiene [Haiku]** (§7). This touches tools/ and plan/, so Codex refill must not take it.
+16. **S-hygiene [Haiku]** IN FLIGHT (Claude Haiku, 2026-10-12, worktree S-hygiene) (§7). This touches tools/ and plan/, so Codex refill must not take it.
     - `tools/clean-artifacts.sh` (dry run by default; skip live `PW_OUTDIR`s).
     - Gates and Codex runs write under `.cache/runs/<id>/`, with retention, instead of `dist-*`/`test-results-*` at the repo root (232 stale directories, 2.3 GB).
     - Archive one-off tools, `playwright.bughunt-880.config.ts` and the 10 historical plan contracts and QA files.
