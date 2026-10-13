@@ -7,8 +7,8 @@
 
 import { FocusTrap } from './FocusTrap.js';
 
-export const PHOTO_WIDTH_PX = 640;
-export const PHOTO_JPEG_QUALITY = 0.76;
+const PHOTO_WIDTH_PX = 640;
+const PHOTO_JPEG_QUALITY = 0.76;
 
 /**
  * A JPEG data URL of `source` scaled to at most `width` pixels wide. Call it

@@ -81,7 +81,7 @@ The newest items go first.
 One list, ordered by player impact and dependencies. Lane is in brackets. "After X" means don't start until X is merged. Evidence: §n = section n of `plan/archive/SIMPLIFY-REVIEW-2026-10-11.md`.
 
 1. **R-release [Haiku]:** after P-first-dive-flow, P-touch-controls and P-events-reform merge, or sooner if they stall. Run full e2e on main on a quiet CPU, push, tag f52, check `gh run list`. Never loosen assertions.
-2. **S-bugs [Codex]** DONE in worktree 1402 (gates PASS), awaiting review/merge. (§6c), no design change:
+2. **S-bugs [Codex]** DONE 2026-10-13 (full e2e green; merged). (§6c), no design change:
    - delete the unreachable sonar ping action and sound (`Input.ts:200`, `AudioSystem.ts:392`);
    - remove the residual `toggleGlobe` declarations (Sol r2: there is no default N binding any more);
    - add gamepad paths for Journal, reset camera and photo capture (ROV waits for S-rov);

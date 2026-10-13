@@ -18,8 +18,8 @@ export const audioSystem: GameSystem = {
   name: 'audio',
   dispose: () => cleanup.dispose(),
   init(ctx) {
-    const { config, bus, terrain, app, settings } = ctx;
-    const audio = new AudioSystem(config.audio, bus, terrain);
+    const { config, bus, app, settings } = ctx;
+    const audio = new AudioSystem(config.audio, bus);
     ctx.audio = audio;
     audio.setSettings(settings);
     cleanup.add(ctx.save.onChange((next) => audio.setSettings(next)));
@@ -77,7 +77,6 @@ export const audioSystem: GameSystem = {
         speed: s.speed,
         position: f.pilotPosition,
         forward: f.pilotForward,
-        pingPressed: f.state.ping,
       });
     },
   },

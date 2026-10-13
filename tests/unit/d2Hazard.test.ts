@@ -24,7 +24,6 @@ const idle = {
   toggleSonar: false,
   boost: false,
   toggleLights: false,
-  ping: false,
   scan: false,
   cycleSimSpeed: false,
   togglePhotoMode: false,

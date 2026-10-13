@@ -26,7 +26,7 @@ import type { PlacedLandmark } from '../world/Landmarks.js';
 import type { PlacedPoi } from '../game/Pois.js';
 import type { SubmarineState } from '../sub/Submarine.js';
 
-export interface SonarOptions {
+interface SonarOptions {
   /** On-screen length of the map's LONG side in CSS pixels. */
   size?: number;
   parent?: HTMLElement;
@@ -140,7 +140,7 @@ export function sonarContourInterval(
   return ([1, 2, 5, 10].find((n) => n * magnitude >= target) ?? 10) * magnitude;
 }
 
-export interface SonarFlatProfile {
+interface SonarFlatProfile {
   /** 0 on sites whose relief already reads, 1 on near-flat seabed. */
   flatness: number;
   /** Multiplier on `hillshadeGain`, so gentle slopes still shade. */
@@ -181,7 +181,7 @@ export function sonarLocalContourInterval(
 }
 
 /** Authored hull plan, in the same world frame and orientation as the 3D prop. */
-export interface SonarFootprint {
+interface SonarFootprint {
   x: number;
   z: number;
   lengthM: number;
@@ -198,7 +198,7 @@ export function sonarReliefRange(
   return { low: (lo + hi - span) / 2, span };
 }
 
-export interface SonarMarker {
+interface SonarMarker {
   poiId: string;
   name: string;
   px: number;
@@ -210,7 +210,7 @@ export interface SonarMarker {
   visible: boolean;
 }
 
-export interface SonarRelief {
+interface SonarRelief {
   minDepthM: number;
   maxDepthM: number;
   spanM: number;

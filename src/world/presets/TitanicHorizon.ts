@@ -7,7 +7,7 @@ const UPPER_WATER = new THREE.Color(ABYSS_HORIZON.upperColor);
 const HAZE_WATER = new THREE.Color(ABYSS_HORIZON.hazeColor);
 
 /** Optional per-site grade of the backdrop (Endurance: a paler water band above the seabed). */
-export interface HorizonLook {
+interface HorizonLook {
   upperColor?: number;
   hazeColor?: number;
   hazePeakElevation?: number;

@@ -25,13 +25,13 @@ import { contentUrl, fetchContentJson } from '../game/ContentPath.js';
 import type { TileIndexEntry } from '../util/types.js';
 
 /** C1: a landmark listed in index.json whose mission.json has not loaded yet. */
-export interface PendingMission {
+interface PendingMission {
   id: string;
   name: string;
   tileAvailable: boolean;
 }
 
-export interface MissionSelectOptions {
+interface MissionSelectOptions {
   parent?: HTMLElement;
   currentTileId?: string;
   /** The running mission, highlighted in the MISSIONS list. */
