@@ -22,6 +22,8 @@ export interface BuiltProp {
    * own collider instead of one box around `bounds`.
    */
   colliders?: THREE.Box3[];
+  /** Optional rendered floor meshes, resolved after the compound volumes. */
+  collisionSurfaces?: THREE.Mesh[];
 }
 
 /** Signature for terrain-following debris: local (x, z) -> ground Y relative to the prop origin. */

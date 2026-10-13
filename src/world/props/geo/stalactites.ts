@@ -655,6 +655,7 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
     impostor: impostorFromBoxes(colliders, bounds, 0x8f8878),
     bounds,
     colliders,
+    collisionSurfaces: [apronMesh],
   };
 }
 

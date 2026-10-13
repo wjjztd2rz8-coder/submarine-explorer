@@ -6,8 +6,10 @@ import {
   collideAll,
   makeBoxCollider,
   makeSphereCollider,
+  makeSurfaceCollider,
   pushOutOfBox,
   pushOutOfSphere,
+  pushOutOfSurface,
 } from '../../src/world/props/Collision.js';
 import { Props, type PropsHeightField } from '../../src/world/Props.js';
 import { PropContact, atSpawnPose, parseAtParam } from '../../src/world/props/Wiring.js';
@@ -108,6 +110,113 @@ describe('collideAll', () => {
     expect(out.length()).toBeCloseTo(1);
     expect(collideAll(cs, v(0, 50, 0), 2, 1, out)).toBe(false);
     expect(out.length()).toBe(0);
+  });
+});
+
+describe('sphere vs rendered floor', () => {
+  function floor(slope = 0, transform = new THREE.Matrix4()) {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute([0, 0, 0, 40, 40 * slope, 0, 0, 0, 40], 3),
+    );
+    geometry.setIndex([0, 1, 2]);
+    const mesh = new THREE.Mesh(geometry);
+    mesh.applyMatrix4(transform);
+    mesh.updateMatrixWorld(true);
+    return makeSurfaceCollider(mesh);
+  }
+
+  it('lifts onto the exact slope tangent without moving horizontally or adding clearance', () => {
+    const c = floor(0.5);
+    const p = v(12, 9, 12);
+    const n = new THREE.Vector3();
+    expect(pushOutOfSurface(p, 8, c, 1, n)).toBeGreaterThan(0);
+    expect(p.toArray()).toEqual([12, 6 + 8 * Math.sqrt(1.25), 12]);
+    expect(c.triangles[0].closestPointToPoint(p, new THREE.Vector3()).distanceTo(p)).toBeCloseTo(8);
+    expect(n.x).toBeCloseTo(-1 / Math.sqrt(5));
+    expect(n.y).toBeCloseTo(2 / Math.sqrt(5));
+    expect(pushOutOfSurface(p, 8, c, 1, n)).toBe(0);
+  });
+
+  it.each([
+    ['edge', -3, 4, Math.sqrt(55)],
+    ['corner', -3, -4, Math.sqrt(39)],
+  ] as const)('resolves a sphere overlapping only the %s', (_name, x, z, height) => {
+    const c = floor();
+    const p = v(x, 1, z);
+    const n = new THREE.Vector3();
+    expect(pushOutOfSurface(p, 8, c, 1, n)).toBeGreaterThan(0);
+    expect(p.y).toBeCloseTo(height);
+    expect(p.x).toBe(x);
+    expect(p.z).toBe(z);
+    expect(c.triangles[0].closestPointToPoint(p, new THREE.Vector3()).distanceTo(p)).toBeCloseTo(8);
+    expect(n.length()).toBeCloseTo(1);
+  });
+
+  it('leaves water outside the triangle open even inside the broad-phase bounds', () => {
+    const c = floor();
+    for (const p of [v(35, -2, 35), v(-9, 1, 4), v(12, 9, 12)]) {
+      const before = p.clone();
+      const n = v(1, 2, 3);
+      expect(pushOutOfSurface(p, 8, c, 1, n)).toBe(0);
+      expect(p).toEqual(before);
+      expect(n.toArray()).toEqual([1, 2, 3]);
+    }
+  });
+
+  it('treats the apron as solid below its skin and respects fractional stiffness', () => {
+    const c = floor();
+    const p = v(12, -20, 12);
+    pushOutOfSurface(p, 8, c, 0.5, new THREE.Vector3());
+    expect(p.y).toBe(-6);
+    pushOutOfSurface(p, 8, c, 1, new THREE.Vector3());
+    expect(p.y).toBe(8);
+  });
+
+  it('uses transformed triangles with heading, translation and unequal scales', () => {
+    const transform = new THREE.Matrix4().compose(v(140, -40, -90), qYaw(37), v(2, 3, 0.7));
+    const c = floor(0.5, transform);
+    const seat = v(12, 6, 12).applyMatrix4(transform);
+    const p = seat.clone().add(v(0, 7, 0));
+    const n = new THREE.Vector3();
+    expect(pushOutOfSurface(p, 8, c, 1, n)).toBeGreaterThan(0);
+    expect(c.triangles[0].closestPointToPoint(p, new THREE.Vector3()).distanceTo(p)).toBeCloseTo(8);
+    expect(p.x).toBe(seat.x);
+    expect(p.z).toBe(seat.z);
+  });
+
+  it('resolves surfaces after boxes even when the surface appears first', () => {
+    const c = floor(0.5);
+    const box = makeBoxCollider(v(4, 10, 12), v(2, 20, 10), new THREE.Quaternion());
+    const p = v(8, 10, 12);
+    const n = new THREE.Vector3();
+    expect(collideAll([c, box], p, 8, 1, n)).toBe(true);
+    expect(p.x).toBe(14);
+    expect(c.triangles[0].closestPointToPoint(p, new THREE.Vector3()).distanceTo(p)).toBeCloseTo(8);
+    expect(n.length()).toBeCloseTo(1);
+  });
+
+  it('escapes a floor/roof pinch through adjoining boxes without trapping or expanding them', () => {
+    const c = floor();
+    const boxes = [
+      makeBoxCollider(v(8, 8, 12), v(5, 1, 4), new THREE.Quaternion()),
+      makeBoxCollider(v(16, 8, 12), v(5, 1, 4), new THREE.Quaternion()),
+    ];
+    const colliders = [c, ...boxes];
+    const p = v(12, -1, 12);
+    const n = new THREE.Vector3();
+    expect(collideAll(colliders, p, 8, 1, n)).toBe(true);
+    expect(c.triangles[0].closestPointToPoint(p, new THREE.Vector3()).distanceTo(p)).toBeCloseTo(8);
+    for (const box of boxes)
+      expect(pushOutOfBox(p.clone(), 8, box, 0, new THREE.Vector3())).toBeLessThan(1e-8);
+    expect(p.distanceTo(v(12, 8, 12))).toBeCloseTo(12);
+    const repeated = p.clone();
+    collideAll(colliders, repeated, 8, 1, n);
+    expect(repeated.distanceTo(p)).toBeLessThan(1e-8);
+    const clear = v(12, 8, -1);
+    expect(collideAll(colliders, clear, 8, 1, n)).toBe(false);
+    expect(clear.toArray()).toEqual([12, 8, -1]);
   });
 });
 
