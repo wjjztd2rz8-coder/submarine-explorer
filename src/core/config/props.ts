@@ -104,7 +104,14 @@ export interface PropsConfig {
     bumpScale: number;
   };
   /** Metre-scale sediment beds on the Blue Hole gallery aprons only. */
-  blueHoleApron: { bedHeightM: number; riserFraction: number };
+  blueHoleApron: {
+    bedHeightM: number;
+    riserFraction: number;
+    rowDensity: number;
+    normalSampleM: number;
+    contactShade: number;
+    roughnessVariation: number;
+  };
   /** `?debugProps=1` placement tool steps. */
   debugNudgeM: number;
   debugNudgeFastM: number;
@@ -180,7 +187,14 @@ export const DEFAULT_PROPS: PropsConfig = {
     scaleM: 1.4,
     bumpScale: 1.3,
   },
-  blueHoleApron: { bedHeightM: 1.7, riserFraction: 0.22 },
+  blueHoleApron: {
+    bedHeightM: 1.7,
+    riserFraction: 0.32,
+    rowDensity: 2,
+    normalSampleM: 0.7,
+    contactShade: 0.18,
+    roughnessVariation: 0.1,
+  },
   debugNudgeM: 1,
   debugNudgeFastM: 10,
   debugRotateDeg: 5,

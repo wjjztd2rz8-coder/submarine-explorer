@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **1410 Blue Hole sediment terraces:** gallery aprons use surface-sampled smooth normals, softer limestone risers, twice as many rows on Medium/High/Ultra, varied bed roughness and soft silt darkening at riser feet. Low retains its exact triangle count; gallery bounds, pendant geometry and draw counts stay unchanged. Reason: the golden approach read as flat polygon steps. The existing collision-envelope defect remains open; browser acceptance is blocked in this workspace. Details: `plan/progress/1410-f-bluehole-bowl-facets.md`.
+
 - **1392 narrow landscape follow-up:** restore Scan to the two right action columns so discovery rewards clear it, and place the small-phone tutorial in the centre lane below wrapped scan guidance and beside telemetry/actions. Reason: the 667×375 reward sweep exposed collisions beyond the Boost column.
 
 - **1392 landscape clearance:** the phone tutorial strip ends 8px before the right Boost column, using the same capped edge margin as the touch controls. Reason: the full regression found the strip covering Boost on 844×390 and 667×375 phones; portrait placement stays intact.

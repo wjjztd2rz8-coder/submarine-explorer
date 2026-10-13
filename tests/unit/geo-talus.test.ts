@@ -114,6 +114,35 @@ describe('sediment terraces', () => {
     original.dispose();
     finished.dispose();
   });
+
+  it('filters sediment normals independently of grid resolution without moving the surface', () => {
+    const colour = (_x: number, _y: number, _z: number, _u: number, c: THREE.Color) =>
+      c.setScalar(0.5);
+    const coarse = buildTalusMesh(terraced, 90, 30, 20, 5, colour, 0.7);
+    const fine = buildTalusMesh(terraced, 90, 60, 40, 5, colour, 0.7);
+    const original = buildTalusMesh(terraced, 90, 30, 20, 5, colour);
+    expect(coarse.index!.array).toEqual(original.index!.array);
+    expect(coarse.getAttribute('position').array).toEqual(original.getAttribute('position').array);
+    const cn = coarse.getAttribute('normal');
+    const fn = fine.getAttribute('normal');
+    const before = original.getAttribute('normal');
+    let filtered = 0;
+    for (let i = 0; i <= 30; i++) {
+      for (let j = 0; j <= 20; j++) {
+        const k = i * 21 + j;
+        const n = new THREE.Vector3().fromBufferAttribute(cn, k);
+        const f = new THREE.Vector3().fromBufferAttribute(fn, i * 2 * 41 + j * 2);
+        expect(n.length()).toBeCloseTo(1, 6);
+        expect(n.y).toBeGreaterThan(0);
+        expect(n.distanceTo(f)).toBeLessThan(1e-5);
+        if (n.distanceTo(new THREE.Vector3().fromBufferAttribute(before, k)) > 0.05) filtered++;
+      }
+    }
+    expect(filtered).toBeGreaterThan(100);
+    coarse.dispose();
+    fine.dispose();
+    original.dispose();
+  });
 });
 
 describe('rocks sit on the final apron surface', () => {

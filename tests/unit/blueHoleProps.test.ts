@@ -6,7 +6,7 @@ import type { TileMeta } from '../../src/util/types.js';
 import { terrainCarveFor } from '../../src/world/terrainFeatures.js';
 import { headingQuaternion } from '../../src/world/Props.js';
 import { parsePropsDoc } from '../../src/world/PropLoader.js';
-import { buildGeo, isGeoFeature } from '../../src/world/props/geo/index.js';
+import { buildGeo, countGeo, isGeoFeature } from '../../src/world/props/geo/index.js';
 import { hashString } from '../../src/world/props/geo/shared.js';
 import doc from '../../data/landmarks/great-blue-hole/props.json';
 import blueHolePoses from '../../tools/blue-hole-poses.json';
@@ -94,6 +94,74 @@ describe('Great Blue Hole props', () => {
   }
 
   for (const def of geo) {
+    for (const tier of ['low', 'medium', 'high', 'ultra']) {
+      it(`${def.id} ${tier}: sediment finish preserves gallery framing and Low's budget`, () => {
+        const input = {
+          def,
+          dims: def.dimensionsM!,
+          seed: hashString(def.id),
+          tier,
+          groundHeight: () => () => 0,
+        };
+        const built = buildGeo({ ...input, cfg });
+        const baseline = buildGeo({
+          ...input,
+          cfg: {
+            ...cfg,
+            blueHoleApron: {
+              ...cfg.blueHoleApron,
+              rowDensity: 1,
+              riserFraction: 0.22,
+              normalSampleM: 0,
+              contactShade: 0,
+              roughnessVariation: 0,
+            },
+          },
+        });
+        const apron = built.full.getObjectByName('grotto-sediment-apron') as THREE.Mesh;
+        const original = baseline.full.getObjectByName('grotto-sediment-apron') as THREE.Mesh;
+        expect(apron.geometry.index!.count).toBe(
+          original.geometry.index!.count * (tier === 'low' ? 1 : 2),
+        );
+        expect(built.bounds.equals(baseline.bounds)).toBe(true);
+        expect(built.colliders).toEqual(baseline.colliders);
+        expect(built.full.children.map((o) => o.name)).toEqual(
+          baseline.full.children.map((o) => o.name),
+        );
+        expect(countGeo(built.full).draws).toBe(countGeo(baseline.full).draws);
+        if (tier === 'low') {
+          expect(countGeo(built.full).triangles).toBe(countGeo(baseline.full).triangles);
+          expect(built.full.getObjectByName('fallen-blocks')).toBeUndefined();
+        }
+        for (const name of ['grotto-overhang', 'stalactite-gallery', 'sponges']) {
+          const mesh = built.full.getObjectByName(name) as THREE.Mesh;
+          const before = baseline.full.getObjectByName(name) as THREE.Mesh;
+          expect(mesh.geometry.getAttribute('position').array).toEqual(
+            before.geometry.getAttribute('position').array,
+          );
+        }
+        const roughness = apron.geometry.getAttribute('sedimentRoughness');
+        const values = Array.from(roughness.array);
+        expect(Math.max(...values) - Math.min(...values)).toBeGreaterThan(0.02);
+        for (const value of values) {
+          expect(Number.isFinite(value)).toBe(true);
+          expect(0.92 + value).toBeGreaterThan(0.85);
+          expect(0.92 + value).toBeLessThan(1);
+        }
+        const material = apron.material as THREE.MeshStandardMaterial;
+        expect(material.flatShading).toBe(false);
+        // The sediment shader must compose with both galleries' existing lighting.
+        const shader = {
+          uniforms: {},
+          vertexShader: THREE.ShaderLib.standard.vertexShader,
+          fragmentShader: THREE.ShaderLib.standard.fragmentShader,
+        } as Parameters<THREE.MeshStandardMaterial['onBeforeCompile']>[0];
+        material.onBeforeCompile(shader, {} as THREE.WebGLRenderer);
+        expect(shader.fragmentShader).toContain('totalEmissiveRadiance *=');
+        expect(shader.fragmentShader).toContain('roughnessFactor = clamp');
+        if (def.id.endsWith('east')) expect(shader.fragmentShader).toContain('openingLight');
+      });
+    }
     for (const tier of ['low', 'high']) {
       it(`${def.id} ${tier}: sediment apron and wall cannot sample the contour detail map`, () => {
         // Node normally returns null for every canvas map. Supply a real texture
