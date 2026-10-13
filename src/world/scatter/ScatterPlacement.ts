@@ -12,6 +12,9 @@
  * as the seabed shader), and clumping by noise blobs plus explicit clumps.
  */
 
+import { mulberry32 as makeRng } from '../../util/rng.js';
+import { smoothstep } from '../../util/math.js';
+
 import type { Biome, ScatterKind, ScatterSpec } from '../TerrainBiome.js';
 import { valueNoise2 } from '../TerrainNoise.js';
 import { SCATTER_TYPES } from './ScatterTypes.js';
@@ -25,7 +28,7 @@ export interface ScatterGround {
 }
 
 /** One instance, in world space. `nx,ny,nz` is the ground normal to lean toward. */
-export interface ScatterInstance {
+interface ScatterInstance {
   x: number;
   y: number;
   z: number;
@@ -56,18 +59,6 @@ export interface CellOptions {
 
 export type CellResult = Partial<Record<ScatterKind, ScatterInstance[]>>;
 
-/** mulberry32. */
-export function makeRng(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 function cellSeed(cx: number, cz: number, seed: number, salt: number): number {
   let h =
     Math.imul(cx | 0, 374761393) ^
@@ -76,11 +67,6 @@ function cellSeed(cx: number, cz: number, seed: number, salt: number): number {
     Math.imul(salt, 2246822519);
   h = Math.imul(h ^ (h >>> 13), 1274126177);
   return (h ^ (h >>> 16)) >>> 0;
-}
-
-function smoothstep(a: number, b: number, x: number): number {
-  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
-  return t * t * (3 - 2 * t);
 }
 
 const KIND_SALT: Record<ScatterKind, number> = {

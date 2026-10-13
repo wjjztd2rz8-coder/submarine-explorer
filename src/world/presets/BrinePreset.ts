@@ -37,7 +37,7 @@ import type {
  * seabed within `searchR` of the centre (a 9x9 grid), filled `lift` metres
  * deep, so the brine settles into the nearest depression.
  */
-export function brinePoolPlacement(
+function brinePoolPlacement(
   terrain: Pick<PresetTerrain, 'sampleHeight'>,
   cx: number,
   cz: number,

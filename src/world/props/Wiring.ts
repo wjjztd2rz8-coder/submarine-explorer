@@ -10,7 +10,7 @@ import { latLonToWorld } from '../../util/geo.js';
 import type { TileMeta } from '../../util/types.js';
 import type { Props, PropsHeightField } from '../Props.js';
 
-export interface AtSpawn {
+interface AtSpawn {
   lat: number;
   lon: number;
   headingDeg: number;
@@ -46,7 +46,7 @@ export function atSpawnPose(
 }
 
 /** The bits of the submarine collision needs (Submarine satisfies it). */
-export interface CollidingBody {
+interface CollidingBody {
   readonly position: THREE.Vector3;
   readonly velocity: THREE.Vector3;
 }

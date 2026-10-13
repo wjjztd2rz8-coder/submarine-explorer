@@ -95,7 +95,7 @@ export const EVENT_SIGHTINGS: Record<ExploreEventKind, GuideEntry> = {
 /** The id a scanned animal is stored under in the discovery store (`<site>/life:<species>`). */
 export const lifeDiscoveryId = (speciesId: string): string => `life:${speciesId}`;
 
-export type JournalEntryKind = 'site' | 'poi' | 'species' | 'life' | 'secret';
+type JournalEntryKind = 'site' | 'poi' | 'species' | 'life' | 'secret';
 
 export interface JournalEntry {
   /** Unique across the Journal: `<site>/<kind>/<id>`. */
@@ -124,7 +124,7 @@ export function journalEntryTag(entry: JournalEntry): 'Game addition' | 'Recreat
 }
 
 /** What `landmarks.json` says about a site. */
-export interface CatalogueInfo {
+interface CatalogueInfo {
   name: string;
   region: string;
   depthM: number | null;
@@ -203,7 +203,7 @@ function entryText(e: GuideEntry): string {
   return [e.title, ...e.paragraphs, ...e.facts.map((f) => `${f.label} ${f.value}`)].join('\n');
 }
 
-export interface JournalSiteInput {
+interface JournalSiteInput {
   id: string;
   catalogue?: CatalogueInfo;
   missionTitle?: string;
@@ -375,7 +375,7 @@ export function isEntryUnlocked(
   });
 }
 
-export interface SiteProgress {
+interface SiteProgress {
   /** Site and POI entries logged / total. */
   logged: number;
   total: number;
@@ -442,7 +442,7 @@ export async function loadJournalSite(
 }
 
 /** URL of the landmark catalogue. */
-export const JOURNAL_CATALOGUE_URL = publicUrl('/data/landmarks.json');
+const JOURNAL_CATALOGUE_URL = publicUrl('/data/landmarks.json');
 
 /**
  * Every site with a mission (index.json order), plus `extraIds` (the current
