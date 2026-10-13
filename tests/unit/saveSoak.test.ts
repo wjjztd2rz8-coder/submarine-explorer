@@ -109,8 +109,11 @@ describe('save schema soak', () => {
       expect(migrated.keys.boost).toEqual([]);
       expect(input.actions.some((a) => a.keys.includes('KeyE'))).toBe(false);
       input.rebind('toggleLights', ['KeyO']);
+      // Retiring an action must leave its old key available for a player's remap.
+      input.rebind('capturePhoto', ['KeyE']);
       const restored = new Input({ storage });
       expect(restored.actions).toEqual(input.actions);
+      expect(restored.getAction('capturePhoto')?.keys).toEqual(['KeyE']);
       if (version < 3) expect(storage.getItem(key)).toBe(original);
       input.dispose();
       restored.dispose();
