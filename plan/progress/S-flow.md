@@ -42,7 +42,9 @@ Tests that pinned removed UI were rewritten to pin the new behaviour; none that 
 
 ## Gate results
 
-See the end of this file (filled in after the runs).
+- `PW_PORT=4581 GATES_CONFIG_MODE=writable tools/gates.sh`: config, build, unit (190 files, 1926 tests), python, content, attribution, prettier, e2e smoke and e2e-base all PASS.
+- Focused e2e on `dist-sflow` (port 4582), after merging main: all touched specs pass (last runs: 102 passed + 129 passed, 26 skipped by project config, 0 failed; one `f-touch-stack` failure fixed by shortening the scan-step copy and retargeting the compact last-step strip CSS from `journal` to `scan`).
+- Late fixes found by the focused runs: `f-briefing-900`, `f-bughunt-18`, `f-bughunt-960` read the start radios by role; they are now inside the collapsed Advanced panel.
 
 ## Screenshots
 
