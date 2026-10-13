@@ -3,8 +3,11 @@ import { expect, test } from './helpers/unlocked.js';
 const sites = ['great-blue-hole', 'endurance', 'lost-city', 'beebe-vent-field', 'titanic'];
 for (const layout of ['desktop', 'portrait'] as const) {
   test.describe(`1200 sonar ${layout}`, () => {
+    // Keep DPR-2 map coverage without rendering a large software-GL scene.
+    const viewport =
+      layout === 'desktop' ? { width: 800, height: 500 } : { width: 390, height: 844 };
     test.use({
-      viewport: layout === 'desktop' ? { width: 1600, height: 900 } : { width: 390, height: 844 },
+      viewport,
       deviceScaleFactor: 2,
       hasTouch: layout === 'portrait',
     });
@@ -74,10 +77,15 @@ for (const layout of ['desktop', 'portrait'] as const) {
           expect(Number.isFinite(state.relief.contourIntervalM)).toBe(true);
         const box = (await sonar.boundingBox())!;
         expect(box.x).toBeCloseTo(12, 0);
-        expect(box.x + box.width).toBeLessThanOrEqual(layout === 'desktop' ? 1600 : 390);
+        expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
         if (layout === 'portrait') expect(box.width).toBeCloseTo(96, 0);
-        await sonar.screenshot({ path: testInfo.outputPath(`${site}-${layout}-minimap.png`) });
-        await page.screenshot({ path: testInfo.outputPath(`${site}-${layout}-hud.png`) });
+        // The pixels and layout are checked above. Capture only the map once;
+        // clipping also avoids locator screenshot's extra stability frames.
+        await page.screenshot({
+          path: testInfo.outputPath(`${site}-${layout}-minimap.png`),
+          clip: box,
+          scale: 'css',
+        });
       });
     }
   });
