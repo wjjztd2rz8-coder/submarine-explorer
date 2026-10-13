@@ -980,3 +980,11 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** Codex 1320 (Monterey wall-foot rubble, Endurance sonar scour; salvaged by Sonnet onto current main, dropping its stale camera edits; offline renders show clear gain, no browser shots). f-scan-candidate (Sonnet): scan card, reticle and prompt now name exactly the contact Scan will scan; I fixed the objective-priority ordering in review. Two tests that pinned the old split behaviour were updated deliberately. Smoke + project-base green on main; no full e2e.
 - **Running:** Codex 1350, 1360, 1370. Queued 1380 (verify 1320), 1390 (HUD/touch overlap hunt), 1400 (fact check).
 - **Not done:** no release; main is ~28 commits ahead of f51 and a full e2e needs a quiet CPU (three Codex tasks running). Next quiet window: full e2e, push, tag f52. Needs owner: nothing.
+
+## 2026-10-13 07:32 CDT headless run (Claude): comprehensive review, joint with Sol
+
+- **Review:** REVIEWS.md, STATUS.md and DIRECTOR.md updated: ~75% to 1.0, four weeks planned (Sol 75%; I proposed 78%). Beauty scores: Titanic 3.5, Beebe 3, Blue Hole 3.5, Lost City 3.5, Monterey 3.5, Challenger 3, Endurance 3.
+- **Merged:** 12 uncollected Codex packages (S-dead, S-unused, S-rov, S-modal stage 1, S-boot stage 1, S-render stage 1, S-tests step 4, V-bluehole collision, scan-candidate fixes), Claude S-flow and V-beebe (reviewed on screenshots), V-endurance close view (opening reframe not done; guards kept). One conflict (S-rov vs S-bugs) and six S-flow conflicts resolved with gates green on each.
+- **Gates / push:** a full local e2e on main was abandoned at ~110 of ~640 tests after 40 min (about 4 h projected, and it would have kept Codex idle). Pushed main without tag f53 instead and used hosted CI as the full-suite signal: 17 of 30 shards red. Cause found: S-flow hides the tutorial under a scan card, breaking f-bughunt-880 (fixed, verified locally); the rest (f-events-reform, f2-explore caption, globe-pins chooser, f-verify-1000 Monterey, f-bluehole-squiggle) go to Codex 1610 with the evidence. No tag until CI is green.
+- **Queue:** Codex 1570 S-resolve, 1580 S-modal, 1590 S-boot, 1610 hosted CI; 1600 S-rewards held behind 1570. Claude lanes in DIRECTOR: V-first-five, S-guidance, S-tests step 2, S-hud, V-titanic.
+- **Needs owner:** a real-phone play of the newest push.
