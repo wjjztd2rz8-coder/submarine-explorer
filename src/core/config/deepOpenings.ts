@@ -45,14 +45,13 @@ export const DEEP_OPENINGS = {
     opening: {
       hero: 'main-hull',
       bearing: 60,
-      range: 26,
+      range: 32,
       altitude: 10,
-      yawOffset: 8,
-      // Close side view (global arm is 98 m): the camera sits beside the sub so the 44 m hull spans
-      // about 45% of the frame and the sub stays a partial foreground accent at the edge.
-      chaseRadius: 44,
+      yawOffset: 10,
+      // Pulled-in side view (global arm is 98 m): the 44 m hull spans over a quarter of the frame.
+      chaseRadius: 70,
       chaseOffsetX: -220,
-      chaseOffsetY: -40,
+      chaseOffsetY: -20,
       portraitChaseOffset: { x: 0, y: -48, radius: 52 },
     },
     fogDensity: 0.01,
