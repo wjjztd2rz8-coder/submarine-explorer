@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   checks:
+    # Preserve the existing status name for branch protection.
     name: build and static checks
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -37,28 +38,59 @@ jobs:
         timeout-minutes: 5
         run: npm ci
 
-      - name: Python pipeline tests (stdlib unittest)
-        run: python3 -m unittest discover -s tools/tests
+      - name: Static gates
+        run: bash tools/gates.sh --phase checks
 
-      - name: Validate every mission pack
-        run: npm run check:content
+  builds:
+    name: build (${{ matrix.label }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: root
+            base: /
+            outdir: dist-root
+          - label: project-base
+            base: /submarine-explorer/
+            outdir: dist-project-base
+    env:
+      CI: true
+      VITE_BASE: ${{ matrix.base }}
+      PW_OUTDIR: ${{ matrix.outdir }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Typecheck and build
-        run: npm run build
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-      - name: Unit tests (vitest)
-        run: npm test
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: npm ci
 
-      - name: Attribution check
-        run: python3 tools/check_attribution.py
+      - name: Build deployment base and manifest
+        timeout-minutes: 5
+        run: bash tools/gates.sh --phase build
 
-      - name: Prettier
-        run: npx prettier --check .
+      - name: Upload immutable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-build-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.label }}
+          path: ${{ matrix.outdir }}/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 14
 
   e2e:
     name: e2e (${{ matrix.shard }}/${{ strategy.job-total }})
     runs-on: ubuntu-latest
-    # Run alongside checks and project-base, so their budgets do not accumulate.
+    needs: builds
+    # Build matrix completes before consumers; static checks run independently.
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -99,6 +131,8 @@ jobs:
     env:
       CI: true
       PLAYWRIGHT_JSON_OUTPUT_FILE: test-results/e2e-timings.json
+      PW_OUTDIR: dist-root
+      VITE_BASE: /
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -113,9 +147,11 @@ jobs:
         timeout-minutes: 5
         run: npm ci
 
-      - name: Typecheck and build
-        timeout-minutes: 5
-        run: npm run build
+      - name: Download root build
+        uses: actions/download-artifact@v4
+        with:
+          name: ci-build-${{ github.run_id }}-${{ github.run_attempt }}-root
+          path: dist-root
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -134,7 +170,8 @@ jobs:
         # Finish every test in the shard so one failure does not hide later failures.
         # The suite budget permits a graceful failure/report before the job deadline.
         run: >-
-          node tools/e2e-shards.mjs ${{ matrix.shard }}/${{ strategy.job-total }}
+          bash tools/gates.sh --phase e2e --prebuilt --
+          ${{ matrix.shard }}/${{ strategy.job-total }}
           --reporter=list,json,html --global-timeout=1500000
 
       - name: Upload e2e timings
@@ -162,11 +199,18 @@ jobs:
           retention-days: 14
 
   project-base:
+    # Preserve the existing status name; builds now owns artifact production.
     name: project-base build and browser check
+    needs: builds
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       CI: true
+      VITE_BASE: /submarine-explorer/
+      PW_BASE: /submarine-explorer/
+      PW_PORT: 4211
+      PW_OUTDIR: dist-project-base
+      PW_BASE_RESULTS: test-results-project-base
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -181,6 +225,12 @@ jobs:
         timeout-minutes: 5
         run: npm ci
 
+      - name: Download project-base build
+        uses: actions/download-artifact@v4
+        with:
+          name: ci-build-${{ github.run_id }}-${{ github.run_attempt }}-project-base
+          path: dist-project-base
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
@@ -191,9 +241,11 @@ jobs:
         timeout-minutes: 8
         run: bash tools/install-playwright-chromium.sh
 
-      - name: Project-base build and browser check
+      - name: Project-base browser check
         timeout-minutes: 10
-        run: npm run test:e2e:base -- --reporter=list,html --workers=1 --global-timeout=480000 --max-failures=1
+        run: >-
+          bash tools/gates.sh --phase e2e-base --prebuilt --
+          --reporter=list,html --workers=1 --global-timeout=480000 --max-failures=1
 
       - name: Upload project-base screenshots and report
         if: failure()
