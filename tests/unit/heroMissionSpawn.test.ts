@@ -255,7 +255,6 @@ for (const { site, primary, before } of heroes) {
             toggleSonar: false,
             boost: false,
             toggleLights: false,
-            ping: false,
             scan: true,
             cycleSimSpeed: false,
             togglePhotoMode: false,

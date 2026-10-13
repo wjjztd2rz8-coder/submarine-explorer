@@ -34,7 +34,7 @@ import {
 } from './Pois.js';
 import { Scanner } from './Scanner.js';
 
-export interface DiscoveryOptions {
+interface DiscoveryOptions {
   bus: EventBus;
   config: GameConfig;
   meta: TileMeta;
@@ -50,7 +50,7 @@ export interface DiscoveryOptions {
   parent?: HTMLElement;
 }
 
-export interface DiscoveryFrameInput {
+interface DiscoveryFrameInput {
   scan: boolean;
   toggleGuide?: boolean;
 }
@@ -101,7 +101,7 @@ export class Discovery {
         const l = landmarks.find((x) => x.id === landmarkId);
         if (l?.name) {
           this.landmarkName = String(l.name);
-          this.pushGuideContent();
+          this.guide.setContent();
         }
       }),
     );
@@ -147,7 +147,7 @@ export class Discovery {
     );
     this.scanner.setTargets(this.pois);
     this.unlocked = this.unlockedSet();
-    this.pushGuideContent();
+    this.guide.setContent();
     this.loaded = true;
     if (this.pois.length || guide) {
       console.info(
@@ -160,20 +160,6 @@ export class Discovery {
   private unlockedSet(): Set<string> {
     return new Set(
       this.entries.filter((e) => this.objectives.isEntryUnlocked(e.id)).map((e) => e.id),
-    );
-  }
-
-  private pushGuideContent(): void {
-    const title = this.guideTitle();
-    const content = {
-      landmarkName: title,
-      entries: this.entries,
-      isUnlocked: (id: string) => this.unlocked.has(id),
-    };
-    this.guide.setContent(
-      this.guideDoc?.memorial_note
-        ? { ...content, memorialNote: this.guideDoc.memorial_note }
-        : content,
     );
   }
 

@@ -12,21 +12,21 @@ import type { Vector3 } from 'three';
 import type { DiscoveryStore } from './DiscoveryStore.js';
 
 /** The part of a POI Objectives needs (`PlacedPoi` satisfies it). */
-export interface ObjectivePoi {
+interface ObjectivePoi {
   id: string;
   name: string;
   primary: boolean;
   guideEntry: string | null;
 }
 
-export interface ObjectiveItem {
+interface ObjectiveItem {
   poiId: string;
   name: string;
   primary: boolean;
   discovered: boolean;
 }
 
-export interface ObjectivesProgress {
+interface ObjectivesProgress {
   landmarkId: string;
   total: number;
   discovered: number;

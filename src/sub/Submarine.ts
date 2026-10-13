@@ -96,7 +96,6 @@ const LOCKED_INPUT: InputState = Object.freeze({
   toggleSonar: false,
   boost: false,
   toggleLights: false,
-  ping: false,
   scan: false,
   cycleSimSpeed: false,
   togglePhotoMode: false,

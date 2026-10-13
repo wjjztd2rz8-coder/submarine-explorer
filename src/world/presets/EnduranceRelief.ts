@@ -13,7 +13,7 @@ const COUNT = 10;
 const LONG = 28;
 const ACROSS = 6;
 
-export interface ScourRidge {
+interface ScourRidge {
   cx: number;
   cz: number;
   dx: number;

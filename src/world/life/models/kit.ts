@@ -8,6 +8,9 @@
  * one unit = one metre.
  */
 
+import { clamp, lerp } from '../../../util/math.js';
+export { clamp, lerp, smoothstep as smooth } from '../../../util/math.js';
+
 import * as THREE from 'three';
 
 export type V3 = [number, number, number];
@@ -19,12 +22,6 @@ export function rgb(hex: number): RGB {
   _c.setHex(hex);
   return [_c.r, _c.g, _c.b];
 }
-export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
-export const clamp = (v: number, lo = 0, hi = 1): number => Math.min(hi, Math.max(lo, v));
-export const smooth = (a: number, b: number, v: number): number => {
-  const t = clamp((v - a) / (b - a));
-  return t * t * (3 - 2 * t);
-};
 export function mixRgb(a: RGB, b: RGB, t: number): RGB {
   return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 }
@@ -60,10 +57,10 @@ export function curvePoint(pts: V3[], t: number, out: V3 = [0, 0, 0]): V3 {
   return out;
 }
 
-export type ColorFn = (t: number, s: number, c: number, p: V3) => RGB;
-export type AnimFn = (t: number, s: number, c: number, p: V3) => V3;
+type ColorFn = (t: number, s: number, c: number, p: V3) => RGB;
+type AnimFn = (t: number, s: number, c: number, p: V3) => V3;
 
-export interface SweepOpts {
+interface SweepOpts {
   /** Control points of the spine. */
   path: V3[];
   /** Rings along the spine. */

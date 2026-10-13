@@ -1,3 +1,4 @@
+import { lcg32 } from '../../src/util/rng.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -519,4 +520,26 @@ describe('460/570 marine snow readability at all shipped sites and tiers', () =>
         }
       });
     }
+});
+
+describe('snow random sources', () => {
+  it.each([
+    [
+      0x2f6e2b1,
+      [
+        3834903644, 1937468427, 3553808878, 2114351221, 788416336, 3868357231, 2018376962,
+        543529081,
+      ],
+    ],
+    [
+      0x51ed27,
+      [
+        233080922, 1344781297, 2111734940, 1020122955, 1560134702, 972701109, 3915854736,
+        1044902319,
+      ],
+    ],
+  ] as const)('keeps the original LCG sequence for snow seed %s', (seed, expected) => {
+    const random = lcg32(seed);
+    expect(Array.from({ length: 8 }, () => random() * 4294967296)).toEqual(expected);
+  });
 });

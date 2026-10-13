@@ -1,5 +1,5 @@
 /** Small ZIP archive writer for stored (uncompressed) files. */
-export interface ZipEntry {
+interface ZipEntry {
   name: string;
   data: Uint8Array;
 }

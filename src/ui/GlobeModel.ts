@@ -17,7 +17,7 @@
 
 import type { GlobeConfig } from '../core/Config.js';
 import { publicUrl } from '../util/publicUrl.js';
-import { CONTENT_ROOT, fetchContentJson, type FetchJson } from '../game/ContentPath.js';
+import { fetchContentJson, type FetchJson } from '../game/ContentPath.js';
 import {
   loadMissionSummaries,
   MISSION_INDEX_URL,
@@ -72,7 +72,7 @@ export function facesCamera(p: Vec3, cam: Vec3, r = 1): boolean {
  * - `tile`: a bathymetry tile exists (free dive), no mission yet.
  * - `catalogue`: in the landmark catalogue only; card, not launchable.
  */
-export type PinState = 'mission' | 'tile' | 'catalogue';
+type PinState = 'mission' | 'tile' | 'catalogue';
 
 export function resolvePinState(
   id: string,
@@ -85,7 +85,7 @@ export function resolvePinState(
 }
 
 /** Sort rank: launchable first, so Tab reaches missions before catalogue dots. */
-export const PIN_STATE_RANK: Record<PinState, number> = { mission: 0, tile: 1, catalogue: 2 };
+const PIN_STATE_RANK: Record<PinState, number> = { mission: 0, tile: 1, catalogue: 2 };
 
 /** The catalogue fields the globe reads from `data/landmarks.json`. */
 export interface CatalogueLandmark {
@@ -190,7 +190,7 @@ export interface GlobeCatalog {
 }
 
 /** URL of the landmark catalogue. */
-export const CATALOGUE_URL = publicUrl('/data/landmarks.json');
+const CATALOGUE_URL = publicUrl('/data/landmarks.json');
 
 /**
  * Load everything the globe needs. `loadMissionSummaries` runs with a silent
@@ -217,9 +217,6 @@ export async function loadGlobeCatalog(
     .map((id) => ({ id, name: names.get(id) ?? id, tileAvailable: tiles.has(id) }));
   return { sites, missions, pending };
 }
-
-/** Where a landmark's content lives (for docs and the card). */
-export const contentFolder = (id: string): string => `${CONTENT_ROOT}/${id}/`;
 
 // ------------------------------------------------------------ pin clusters
 
@@ -283,7 +280,7 @@ export function shortName(name: string): string {
 
 // -------------------------------------------------------------------- orbit
 
-export type OrbitTunables = Pick<
+type OrbitTunables = Pick<
   GlobeConfig,
   | 'minDistance'
   | 'maxDistance'

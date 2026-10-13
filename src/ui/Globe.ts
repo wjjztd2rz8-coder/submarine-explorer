@@ -57,8 +57,6 @@ export interface GlobeOptions {
   tileIds: readonly string[];
   /** The landmark being dived now: highlighted, and the globe starts over it. */
   currentId?: string;
-  /** True for the codes bound to `toggleGlobe`, so the same key closes it. */
-  isToggleKey?: (code: string) => boolean;
   /** Navigate to a URL (tests inject a spy). Default: `location.href = url`. */
   navigate?: (url: string) => void;
   /** Inject the catalogue (tests); default loads it from /data. */
@@ -915,7 +913,7 @@ export class Globe {
       if (e.code === 'Tab') e.stopPropagation();
       else e.stopImmediatePropagation();
       const code = e.code;
-      if (code === 'Escape' || (!e.repeat && this.opts.isToggleKey?.(code))) {
+      if (code === 'Escape') {
         e.preventDefault();
         this.close();
         return;

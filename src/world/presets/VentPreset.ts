@@ -34,14 +34,14 @@ const FILL_TINT = new THREE.Color(0x8a7c6c);
 /** Pale blue-green the distance haze is lifted toward (`hazeLift`). */
 const HAZE_TINT = new THREE.Color(0x2a4a54);
 
-export interface VentSource {
+interface VentSource {
   /** Orifice (top centre) in world space. */
   top: THREE.Vector3;
   /** Chimney height (m); POI sources get 0. Used to rank "most active". */
   height: number;
 }
 
-export interface VentVariety {
+interface VentVariety {
   height: number;
   width: number;
   opacity: number;
@@ -71,10 +71,7 @@ export function ventVariety(top: THREE.Vector3): VentVariety {
 }
 
 /** Chimney props first (tallest first), else vent POIs; at most `max`. */
-export function ventSources(
-  ctx: Pick<PresetEnterContext, 'props' | 'pois'>,
-  max: number,
-): VentSource[] {
+function ventSources(ctx: Pick<PresetEnterContext, 'props' | 'pois'>, max: number): VentSource[] {
   const chimneys = ctx.props
     .filter((p) => p.model === 'procedural:chimney')
     .map((p) => ({ top: p.top.clone(), height: p.height }));
