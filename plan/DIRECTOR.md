@@ -114,11 +114,12 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
    Update README and CHANGELOG.
 
 7. **S-tests [Codex map, then Sonnet]** (§7). This replaces the 1470 sweep; it is also 1.0 "a full run no longer blocks releases".
-   - **Step 1 (Codex 1401, in flight):** an assertion-level coverage map of all ~94 e2e specs into `plan/progress/S-tests-map.md`.
+   - **Step 1 (Codex 1401):** DONE 2026-10-12 (b7e179d). an assertion-level coverage map of all ~94 e2e specs into `plan/progress/S-tests-map.md`.
    - **Step 2 (Sonnet):** fold the HUD/touch (9), opening-framing (12) and Journal/debrief (8) specs into three table-driven capability specs.
    - **Step 3:** move the captures (not their cheap assertions: Sol r2 notes collision guards in `visual-qa.spec.ts:266` and perf guards in `f-fidelity-rollout.spec.ts:192`) of capture-heavy specs (`f-fidelity-rollout`, `f-geo-scarp`, `f-sonar-palette-1200`, `f1-terrain`, `visual-qa`, `f-bluehole-squiggle`) to a nightly `schedule:` workflow with `golden.sh`.
    - **Step 4:** CI builds once per deployment base and shares the artifact across shards, and `tools/gates.sh` and `npm run ci` share one definition.
-   - Target: 30%+ less serial e2e time (provisional: the 8.8 h baseline is summed historical hosted weights). No guard for a real past bug is lost.
+   - Target: 30%+ less serial e2e time was not supported by the map: it estimates 10–19% from steps 2–3 (5–25% planning range); step 4 saves 30 of 32 hosted builds, not test time. Measure a quiet-CPU full run before and after.
+   - Step 4 queued as Codex 1530; CI shard 7 fix (1430) DONE 2026-10-12 (a5299a4). No guard for a real past bug is lost.
 8. **S-guidance [Sonnet]** (§4 item 1), after S-flow and V-first-five. One prioritised guidance slot (urgent warning > scan progress > discovery > next objective > tutorial/hint) replaces the separate tutorial card, hint chip, explore notice, discovery toast, NEW ENTRY card and objective chip. The sonar diamond and world waypoint stay. Remove the persistent "nominal" text and the static hull-rating number (show the gauge only when it matters; test the threshold, 50% is unvalidated). Urgent warnings must not block scanning or navigation. Drop the mission-title strip on phone.
 9. **V-endurance, V-bluehole, V-beebe [Sonnet]:**
    - Endurance: the opening hull is small and the sub fills the right third (brief 1480).
