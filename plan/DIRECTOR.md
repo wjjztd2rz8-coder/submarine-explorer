@@ -67,12 +67,6 @@ Stage (joint review 2026-10-11 13:15): about 75% to 1.0, roughly 3 weeks. Agreed
 
 The newest items go first.
 
-- **2026-10-11 simplification decisions** (evidence: archived review §3, §6, §10). The blocked items wait for these; everything else proceeds.
-  1. **Upgrades:** trim ten purchases (on four tracks) to four (Claude), or fixed equipment plus cosmetic rewards (Sol)? Either way, decide how existing purchases and Realistic hull unlocks translate. Blocks S-rewards (upgrade part).
-  2. **Daily Dive:** keep it, drop modifiers and streaks, or "today's suggested site" only (Sol's pick, with its authored mission)? Blocks S-rewards (daily part).
-  3. **ROV:** cut it, hide it, or give it touch and pad bindings plus a mission role? Sol: cut unless a distinctive role is approved now. Blocks S-rov.
-  4. **Ultra tier:** merge into High after a golden comparison? Both reviewers lean yes (Ultra raises DPR cap 2→3 and scatter 1→1.8). Blocks S-tiers.
-  5. **Phones get a site list; the globe only on wide screens?** Sol objects: you asked for a larger, more usable phone globe on 2026-10-11, so this would reverse that. Blocks S-picker.
 - A five-minute play on a real phone once R-release (f52) ships.
 
 ## In flight
@@ -172,11 +166,12 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
     - title scene reuses `Headlights`/`MarineSnow`;
     - collapse the three hull-creak audio paths;
     - schedule `tools/perf-budget.mjs` (it already records mean/p50/p95) per tier per hero site in the nightly golden run, rather than a new tool.
-19. **Blocked on owner decisions:**
-    - **S-rewards** (decisions 1–2, §3): Samples and Secrets present as Journal "finds" (keep `sample:`/`secret:` save keys, no re-awarded RP); events keep Journal and debrief sightings (1393) but no RP checklists; upgrades and Daily Dive as decided.
-    - **S-rov** (decision 3).
-    - **S-tiers** (decision 4).
-    - **S-picker** (decision 5): one site-list component; delete the full-screen globe overlay and `?globe=1`.
+19. **Owner decisions 2026-10-12** (the five simplification questions; owner's reasons in brackets):
+    - **S-rewards [Codex]:** fixed equipment. Remove upgrade purchases and RP-gated hulls: every player starts with the full kit, the hull class still follows mission depth (Class A at Blue Hole). Rewards become cosmetics only (sub paint/decals, photo frames), unlocked by discoveries; make them neat enough to matter. Samples and Secrets present as Journal "finds" (keep `sample:`/`secret:` save keys); events keep Journal and debrief sightings but no RP checklists. Save migration: past purchases map to nothing lost (cosmetics granted for past RP). [Most players won't play regularly; upgrades make the start feel worse. Cosmetics reward the truly interested.]
+    - **S-daily [Haiku]:** keep Daily Dive and its mechanics; make its wording shorter (Home card, briefing, debrief). [Concise wording preferred.]
+    - **S-rov [Codex]:** cut the ROV (code, bindings, tests, docs; CHANGELOG cut entry). [It only adds something with much more detail, which is too far for now.]
+    - **S-tiers [Codex]:** merge Ultra into High after a golden comparison; keep the valuable Ultra detail inside one High budget; migrate saved `ultra` to High.
+    - **S-picker [Sonnet]:** keep the globe on every screen size. On phones, a swipe-up sheet over the globe lists the sites (one site-list component, also used wherever a list exists today). Remove redundant globe instances (the full-screen overlay and `?globe=1`) only if the sheet covers their use. [The globe already works; the list is there for those who want it.]
 20. **V-lander [Haiku, low]:** Challenger's white lander looks toy-like; add wear and colour.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.
