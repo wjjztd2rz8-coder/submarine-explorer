@@ -43,7 +43,7 @@ Survey cells are 45–61 m on our GMRT tiles (450 m where GEBCO fills). At a few
 
 `?debugTerrain=1` logs chunks, LOD counts, draw calls and fps once a second.
 
-## Known gaps (see plan/QA-A.md)
+## Known gaps (see plan/archive/QA-A.md)
 
 - Formal fps measurement on this Mac was not recorded before the agent was stopped; do it during the Phase A QA pass with `?debugTerrain=1`.
 - A faint cell-aligned pattern is still visible from high altitude in the surface band (docs/img/atmosphere-10.png). Likely the albedo texture repeat coinciding with cell size; try a non-integer `materialTextureScaleM`.

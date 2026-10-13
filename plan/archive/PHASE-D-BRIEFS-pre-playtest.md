@@ -8,7 +8,7 @@ GPT-6 Astra for orchestration/review and GPT-6 Sol for every package below.
 
 ## Phase C retrospective informing this draft
 
-Read `plan/QA-C.md`, its close-out addenda, `plan/STATUS.md`, and
+Read `plan/archive/QA-C.md`, its close-out addenda, `plan/STATUS.md`, and
 `plan/DECISIONS.md` first. All 13 sites now have missions. Automated loading
 and targeted scan tests support integration; teleport-assisted tests cannot
 establish natural navigation quality or whether long dives feel enjoyable.

@@ -17,9 +17,10 @@
       "reconstruction": true,
       "sources": [
         "https://www.gmrt.org/",
-        "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf"
+        "https://tos.org/oceanography/assets/docs/18-3_kelley.pdf",
+        "https://repository.library.noaa.gov/view/noaa/56451/noaa_56451_DS1.pdf"
       ],
-      "note": "The published field position is a rounded 30°07'0\"N 42°07'0\"W (= 30.1167, -42.1167), which is also the data/landmarks.json pin; on this tile that point reads 1,332 m, on the massif's south wall, far outside the field's real 750-900 m depth range. The nearest terrain in the correct depth band is about 665 m north of that pin. This POI is placed there instead; seabed here is 801 m, and depth_m (775 m) sits partway up the ~60 m tower. See sources.md."
+      "note": "The older catalog pin (30.1167, -42.1167) landed on the south wall at 1,332 m. The catalog now uses the published Beehive outlet reference (Aquino et al. 2022, Table 1). This authored tower marker samples seabed at about 801 m; its 775 m scan depth sits partway up the model. It is not an exact surveyed Poseidon footprint."
     },
     {
       "id": "lost-city-beehive",

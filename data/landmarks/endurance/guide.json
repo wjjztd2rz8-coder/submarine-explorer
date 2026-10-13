@@ -7,8 +7,8 @@
       "id": "overview",
       "title": "Endurance: Shackleton's polar ship",
       "paragraphs": [
-        "Endurance carried Sir Ernest Shackleton's Imperial Trans-Antarctic Expedition into the Weddell Sea in 1914-15. Built in 1912 at the Framnæs yard in Sandefjord, Norway, and launched under the name Polaris, she was a three-masted barquentine reinforced for polar ice; Shackleton bought and renamed her in January 1914. Pack ice closed around her in January 1915, and after ten months drifting, beset, the ice finally crushed her hull. Captain Frank Worsley recorded her sinking position on 21 November 1915. All 28 men aboard survived; they camped on the drifting ice and eventually reached Elephant Island, from where Shackleton and five others made the 1,300 km open-boat journey to South Georgia for rescue.",
-        "The wreck was found on 5 March 2022 by the Endurance22 expedition, organised by the Falklands Maritime Heritage Trust (FMHT) aboard the South African polar vessel S.A. Agulhas II -- exactly 100 years to the day after Shackleton was buried at Grytviken, South Georgia. She lies 3,008 m deep in the Weddell Sea, within the search area the team had defined before departure. Mensun Bound, the expedition's Director of Exploration, called her \"by far the finest wooden shipwreck I have ever seen. It is upright, well proud of the seabed, intact, and in a brilliant state of preservation.\"",
+        "Endurance carried Sir Ernest Shackleton's Imperial Trans-Antarctic Expedition into the Weddell Sea in 1914-15. Construction began in 1911 at the Framnæs yard in Sandefjord, Norway. Launched as Polaris on 17 December 1912, she was a three-masted barquentine reinforced for polar ice. Shackleton bought and renamed her in January 1914. Pack ice closed around her in January 1915, and after ten months drifting, beset, the ice finally crushed her hull. Captain Frank Worsley recorded her sinking position on 21 November 1915. All 28 men aboard survived; they camped on the drifting ice and eventually reached Elephant Island, from where Shackleton and five others made the 1,300 km open-boat journey to South Georgia for rescue.",
+        "The wreck was found on 5 March 2022 by the Endurance22 expedition, organised by the Falklands Maritime Heritage Trust (FMHT) aboard the South African polar vessel S.A. Agulhas II -- exactly 100 years to the day after Shackleton was buried at Grytviken, South Georgia. She lies 3,008 m deep in the Weddell Sea, within the search area the team had defined before departure. The expedition found her upright, with much of her hull and fittings preserved.",
         "The wreck had already been designated a protected Historic Site and Monument (HSM No. 93) under the Antarctic Treaty System in 2019, three years before anyone knew exactly where she lay. The UK Antarctic Heritage Trust (UKAHT), working with Historic England, now leads the Conservation Management Plan for the site.",
         "This tile uses GMRT's coarser GEBCO-derived grid, smoothing small features. Endurance22's published imagery shows the 44 m ship in much finer detail; the Conservation Management Plan describes soft mud with pockmarks, small mounds and occasional dropstones around the site."
       ],
@@ -70,7 +70,7 @@
         },
         {
           "title": "Endurance Conservation Management Plan — UKAHT / Historic England, April 2024",
-          "url": "https://www.enduranceshipwreck.org/s/CMP_Endurance_amends_April24-4.pdf"
+          "url": "https://ukaht.org/wp-content/uploads/2026/07/CMP_Endurance_April24_final.pdf"
         }
       ],
       "confidence": "high"
@@ -79,7 +79,7 @@
       "id": "wreck-hull",
       "title": "The hull, upright and intact",
       "paragraphs": [
-        "Endurance rests upright on the seabed, her hull essentially intact -- a rare survival for a wooden ship a century after sinking. Her keel was four layers of solid oak, 2.2 m thick in total, and her planking was oak and Norwegian fir up to 30 in thick, sheathed in greenheart for extra strength against ice: exactly the build that let her hold together against the pack for ten months, and that has kept her hull sound on the seabed since.",
+        "Endurance rests upright, with much of her wooden structure preserved. The Conservation Management Plan describes oak framing and external planking, pine internal planking and greenheart sheathing. Maximum hull thickness was about 0.76 m (30 in). Cold water and the absence of destructive wood-boring animals help explain her preservation.",
         "The Falklands Maritime Heritage Trust's team, led by Director of Exploration Mensun Bound, surveyed her with Saab Sabertooth hybrid underwater vehicles fitted with Voyis optical laser scanners, capturing about 25,000 high-resolution images that were digitally stitched into a precise 44 m bow-to-stern 3D composite.",
         "The preserved hull stands above the sediment, with deck rails, broken spars and the stern fittings still recognizable."
       ],
@@ -98,7 +98,7 @@
         },
         {
           "label": "Hull",
-          "value": "oak keel, oak and fir planking, greenheart-sheathed"
+          "value": "oak framing and external planking, pine internal planking, greenheart sheathing"
         },
         {
           "label": "Orientation",
@@ -126,6 +126,14 @@
         {
           "title": "Endurance (1912 ship) — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/Endurance_(1912_ship)"
+        },
+        {
+          "title": "Endurance survey imaging — Voyis (2024)",
+          "url": "https://voyis.com/endurance-expedition-with-voyis-technology-on-bbc-news/"
+        },
+        {
+          "title": "Endurance Conservation Management Plan — UKAHT / Historic England, April 2024",
+          "url": "https://ukaht.org/wp-content/uploads/2026/07/CMP_Endurance_April24_final.pdf"
         }
       ],
       "confidence": "high"
@@ -168,7 +176,7 @@
         },
         {
           "title": "Endurance Conservation Management Plan — UKAHT / Historic England, April 2024",
-          "url": "https://www.enduranceshipwreck.org/s/CMP_Endurance_amends_April24-4.pdf"
+          "url": "https://ukaht.org/wp-content/uploads/2026/07/CMP_Endurance_April24_final.pdf"
         }
       ],
       "confidence": "medium"
@@ -212,7 +220,7 @@
       "title": "Masts down, funnel toppled",
       "paragraphs": [
         "Although the hull is remarkably sound, Endurance did not come through entirely undamaged. FMHT's survey found her masts down and her funnel toppled, with the heaviest damage concentrated around the poop deck at the stern and the waist amidships. Photographs of the wreck suggest she struck the seabed bow- or keel-first as she went down.",
-        "The damage is consistent with how she sank: crushed by pack ice over months, then going down stern-first as recorded by witnesses in 1915, after a fall of 3 km through freezing water.",
+        "The Conservation Management Plan records that she sank bow-first on 21 November 1915. The precise sequence of damage during the sinking and impact remains uncertain.",
         "Look forward of the hull for the fallen-rigging scan marker."
       ],
       "facts": [
@@ -246,6 +254,10 @@
         {
           "title": "Endurance (1912 ship) — Wikipedia",
           "url": "https://en.wikipedia.org/wiki/Endurance_(1912_ship)"
+        },
+        {
+          "title": "Endurance Conservation Management Plan — UKAHT / Historic England, April 2024",
+          "url": "https://ukaht.org/wp-content/uploads/2026/07/CMP_Endurance_April24_final.pdf"
         }
       ],
       "confidence": "medium"
@@ -254,9 +266,9 @@
       "id": "worsley-position",
       "title": "Worsley's position, and the search that found her",
       "paragraphs": [
-        "Captain Frank Worsley, Endurance's navigator, logged the ship's sinking position from the ice as 68°39′30″S 52°26′30″W. A 2022 peer-reviewed study of his navigation log (Squire & Bell, Journal of Navigation) found the fix itself was sound work under brutal conditions, but flagged real sources of uncertainty: few navigational sights were possible around the time of the sinking, and chronometer error accumulates the longer it goes unchecked at sea. The authors estimate the combined uncertainty at several nautical miles in both latitude and longitude.",
-        "The Endurance22 team used Worsley's position, adjusted for that uncertainty, to define their search box and found the wreck within it. UKAHT describes the wreck as roughly four miles (6.4 km) south of his recorded position. Measuring between the published log and wreck coordinates gives about 10 km to the south-south-east.",
-        "This scan marks seabed at Worsley's logged position. More than a century after the sinking, his navigation helped the expedition find the ship."
+        "Captain Frank Worsley logged the sinking position as 68°39′30″S 52°26′30″W. Bergman and Stuart examined the navigation in a paper published online in 2018 and in the 2019 Journal of Navigation volume. Bergman, Mearns and Stuart’s later chronometer study (2022 volume, first published online in 2023) assessed longitude errors and reported the discovered wreck position in its postscript.",
+        "The later study gives the wreck as 4.9 nautical miles south and 2.4 nautical miles east of the logged position: 5.4 nautical miles overall, about 10 km south-southeast. UKAHT’s public webpage also quotes 6.4 km south, but the coordinates and peer-reviewed postscript support the larger distance; the reason for the webpage’s differing figure is unresolved.",
+        "The logged position helped guide the search. This historical reference has no separate scan target in the current mission."
       ],
       "facts": [
         {
@@ -268,23 +280,31 @@
           "value": "21 November 1915"
         },
         {
-          "label": "Distance to wreck (commonly cited)",
-          "value": "~4 mi / 6.4 km south"
+          "label": "Distance from logged position to wreck",
+          "value": "5.4 nautical miles (~10 km), south-southeast (Bergman, Mearns & Stuart)"
         },
         {
-          "label": "Distance to wreck (this tile's coordinates)",
-          "value": "~10 km, south-south-east"
+          "label": "Components of displacement",
+          "value": "4.9 nautical miles south, 2.4 nautical miles east"
         }
       ],
       "reconstruction": false,
       "sources": [
         {
-          "title": "Squire & Bell, \"On the Location of Shackleton's Vessel Endurance\" — Journal of Navigation (Cambridge University Press, peer-reviewed)",
+          "title": "Bergman & Stuart — On the Location of Shackleton’s Vessel Endurance (2018 online / 2019 volume)",
           "url": "https://www.cambridge.org/core/journals/journal-of-navigation/article/abs/on-the-location-of-shackletons-vessel-endurance/5F1AD80B3445C2653F1C24EAD4B7460D"
         },
         {
           "title": "Endurance Shipwreck — UK Antarctic Heritage Trust",
           "url": "https://ukaht.org/places/endurance-shipwreck/"
+        },
+        {
+          "title": "Bergman, Mearns & Stuart — Influence of chronometer error uncertainties on the longitude of Shackleton’s vessel, Endurance (2022 volume / 2023 online), §7",
+          "url": "https://doi.org/10.1017/S0373463322000649"
+        },
+        {
+          "title": "Endurance Conservation Management Plan — UKAHT / Historic England, April 2024",
+          "url": "https://ukaht.org/wp-content/uploads/2026/07/CMP_Endurance_April24_final.pdf"
         }
       ],
       "confidence": "high"
@@ -322,7 +342,7 @@
         },
         {
           "title": "Endurance Conservation Management Plan — UKAHT / Historic England, April 2024",
-          "url": "https://www.enduranceshipwreck.org/s/CMP_Endurance_amends_April24-4.pdf"
+          "url": "https://ukaht.org/wp-content/uploads/2026/07/CMP_Endurance_April24_final.pdf"
         }
       ],
       "confidence": "medium"

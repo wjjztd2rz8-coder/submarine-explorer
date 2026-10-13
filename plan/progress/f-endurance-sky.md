@@ -9,7 +9,7 @@
 
 ## Screenshots
 
-`plan/progress/f-endurance-sky-shots/before-{1,2,3}.png`, `after-{1,2,3}.png` (golden endurance, desktop).
+`plan/archive/progress-images/f-endurance-sky-shots/before-{1,2,3}.png`, `after-{1,2,3}.png` (golden endurance, desktop).
 
 ## Gaps
 
