@@ -299,18 +299,32 @@ for (const viewport of [
         await expect(journal).toBeVisible();
         await reachable(journal.locator('.jr-spoilers'));
         await journal.locator('.jr-spoilers').tap();
-        await expect(journal.getByRole('checkbox')).toBeChecked();
-        const contents = journal.locator('.jr-contents-toggle');
-        if (await contents.isVisible()) await contents.tap();
-        await reachable(journal.locator('.jr-nav-item').first());
-        await reachable(journal.locator('.jr-nav-item').last());
-        if (await contents.isVisible()) await contents.tap();
+        await expect(
+          journal.getByRole('switch', { name: 'Show spoilers', exact: true }),
+        ).toBeChecked();
+        await expect(journal).toHaveClass(/is-phone/);
+        const sites = journal.locator('.jr-site-card');
+        await reachable(sites.first());
+        await reachable(sites.last());
         const site = journal.locator('.jr-site-card[data-target="titanic"]');
         await reachable(site);
         await site.tap();
-        await reachable(journal.locator('.jr-next'));
-        await journal.locator('.jr-next').tap();
+        await expect(journal.locator('.jr-body .jr-title')).toHaveText('RMS Titanic');
+        const entries = journal.locator('.jr-body .jr-row');
+        await reachable(entries.first());
+        await reachable(entries.last());
+        const entry = entries.first();
+        const title = await entry.locator('.jr-row-title').innerText();
+        await entry.tap();
+        await expect(journal.locator('.jr-body .jr-title')).toHaveText(title);
         await expect(journal.locator('.jr-body .jr-title')).not.toHaveText('Undiscovered');
+        const back = journal.getByRole('button', { name: 'Back', exact: true });
+        await reachable(back);
+        await back.tap();
+        await expect(journal.locator('.jr-body .jr-title')).toHaveText('RMS Titanic');
+        await reachable(back);
+        await back.tap();
+        await expect(journal).toHaveClass(/at-front/);
         expect(
           await journal.locator('.jr-header').evaluate((e) => e.scrollWidth <= e.clientWidth),
         ).toBe(true);

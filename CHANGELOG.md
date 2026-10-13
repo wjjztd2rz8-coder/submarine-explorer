@@ -14,6 +14,10 @@ without an entry here is not done.
 
 ### Changed
 
+- **1392 narrow landscape follow-up:** restore Scan to the two right action columns so discovery rewards clear it, and place the small-phone tutorial in the centre lane below wrapped scan guidance and beside telemetry/actions. Reason: the 667×375 reward sweep exposed collisions beyond the Boost column.
+
+- **1392 landscape clearance:** the phone tutorial strip ends 8px before the right Boost column, using the same capped edge margin as the touch controls. Reason: the full regression found the strip covering Boost on 844×390 and 667×375 phones; portrait placement stays intact.
+
 - **1392 touch controls:** mobile Boost is now a lit tap toggle beside the right rise/sink slider in portrait and above it in landscape/tablet; it clears on depletion, pause, menus, page hiding and dive end. Scan, Lights, Sonar and Photo keep a separate action cluster. A HUD JOURNAL button opens the existing Journal action beside Pause on touch and in the compact desktop footer, with the J keyboard label; the pause entry remains. Reason: owner phone feedback items 7–8, fewer fingers for Boost and direct access to Journal.
 - **f-text-diet (owner phone playtest: too much text):**
   - Briefing: FACTS and HAZARDS left the main card and now sit once each inside one collapsed "About this site" disclosure (with the summary). The CONTROLS section and the "View controls" button are removed, the hull-rating hazard ("Class B hull ... Stay above the rating") is dropped because the HULL meta row says it, "OR PRESS ENTER" is hidden on touch, and the mode descriptions are shortened to one line. Reason: the card was a wall of text on a phone; Begin and every objective now fit without scrolling at 390x844. `SITE_PRIORITIES` is gone.

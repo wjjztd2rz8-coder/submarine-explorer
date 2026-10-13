@@ -29,7 +29,7 @@ async function layout(page: Page): Promise<void> {
     const elements = [
       ...document.querySelectorAll<HTMLElement>(
         '.tc-stick, .tc-slider, .tc-btn, .hud-journal, .sonar, .hud-readouts, ' +
-          '.objectives-panel, .scan-panel, .scan-objective-chip, .hud-attribution, ' +
+          '.objectives-panel, .scan-panel, .scan-objective-chip, ' +
           '.onboard-card, .hud-notice, .hud-reset-camera',
       ),
     ].filter((el) => el.checkVisibility());

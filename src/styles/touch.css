@@ -180,7 +180,7 @@
   color: #fff;
 }
 .tc-btn-scan {
-  grid-column: 1 / span 3;
+  grid-column: 2 / span 2;
   grid-row: 2 / span 2;
   font-size: calc(14 * var(--tc-s));
 }
@@ -313,6 +313,24 @@
   .tc-root.tc-sonar-open .tc-btn-pause {
     /* The expanded map occupies the centre, including the usual Pause slot. */
     left: calc(12px + env(safe-area-inset-left, 0px));
+  }
+}
+
+/* Phone tutorial strips reserve the right Boost column. */
+@media (orientation: landscape) and (max-width: 900px) and (max-height: 460px) {
+  html.is-touch:has(.tc-root) .onboard-card {
+    /* The strip crosses Boost above the slider. End it eight pixels before
+       the right dock, using the same capped edge offset as the controls. */
+    right: calc(env(safe-area-inset-right, 0px) + 20px * min(var(--ui-scale), 0.8) + 56px + 8px);
+  }
+}
+
+@media (orientation: landscape) and (max-width: 700px) and (max-height: 460px) {
+  html.is-touch:has(.tc-root) .onboard-card {
+    /* Wrapped contacts and mission telemetry reach below the wide-phone
+       strip. Use the centre gap below them, beside the right action cluster. */
+    right: calc(270px + env(safe-area-inset-right, 0px));
+    bottom: calc(176px + env(safe-area-inset-bottom, 0px));
   }
 }
 

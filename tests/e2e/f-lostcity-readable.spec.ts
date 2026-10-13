@@ -62,9 +62,9 @@ for (const tier of ['low', 'medium', 'high']) {
             light.intensity * luminance * Math.exp(-Math.pow(density * distance, 2)),
           );
         }
-        // F-LOSTCITY-TOWER authored a 66 m arm with -20 m lateral and +8 m
-        // vertical offsets. Pin the actual eye and tower framing rather than
-        // the obsolete <95 m distance to the tower's foot.
+        // f-e2e-regress changed the 66 m arm's offsets to -8 m lateral and +30 m
+        // vertical so the tower clears the phone scan card. Pin the eye and
+        // framing rather than the obsolete <95 m distance to the tower's foot.
         const localEye = g.rig.camera.position
           .clone()
           .sub(pos)
@@ -97,7 +97,8 @@ for (const tier of ['low', 'medium', 'high']) {
       expect(opening.heroRange).toBeGreaterThan(30);
       expect(opening.heroRange).toBeLessThanOrEqual(40);
       expect(opening.chaseRadius).toBe(66);
-      const expectedEye = [-20, 46, 90];
+      // The vertical offset is added to the base 38 m chase height.
+      const expectedEye = [-8, 68, 90];
       const armScale = 66 / Math.hypot(...expectedEye);
       for (let axis = 0; axis < 3; axis++)
         expect(opening.localEye[axis]).toBeCloseTo(expectedEye[axis] * armScale, 1);
