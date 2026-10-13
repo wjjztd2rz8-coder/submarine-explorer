@@ -78,7 +78,7 @@ The newest items go first.
 
 One list, ordered by player impact and dependencies. Lane is in brackets. "After X" means don't start until X is merged. Evidence: §n = section n of `plan/archive/SIMPLIFY-REVIEW-2026-10-11.md`.
 
-1. **V-first-five [Haiku capture, Sonnet judge]:** an unaided mobile first-five-minutes capture on the current SHA (portrait and landscape): Home → mission → unaided scan → next objective → Journal → debrief. Baseline for S-guidance. Also verify the completion banner counts on a real run (the S-flow fixture screenshot read "0 of 4 objectives"; the real-scan spec expects 2 of 4) and that stars appear.
+1. **V-first-five [Haiku capture, Sonnet judge]** — IN FLIGHT (Haiku, 2026-10-13): an unaided mobile first-five-minutes capture on the current SHA (portrait and landscape): Home → mission → unaided scan → next objective → Journal → debrief. Baseline for S-guidance. Also verify the completion banner counts on a real run (the S-flow fixture screenshot read "0 of 4 objectives"; the real-scan spec expects 2 of 4) and that stars appear.
 2. **S-guidance [Sonnet]** (§4 item 1), after V-first-five. One prioritised guidance slot (urgent warning > scan progress > discovery > next objective > tutorial/hint) replaces the separate tutorial card, hint chip, explore notice, discovery toast, NEW ENTRY card and objective chip. The sonar diamond and world waypoint stay. Remove the persistent "nominal" text and the static hull-rating number (show the gauge only when it matters; test the threshold, 50% is unvalidated). Urgent warnings must not block scanning or navigation. Drop the mission-title strip on phone. Phone is the weakest axis (Sol: phone 2/5 for four sites): this is the top 1.0 item.
 3. **S-tests step 2 [Sonnet]** (§7; after S-flow): fold the HUD/touch (9), opening-framing (12) and Journal/debrief (8) specs into three table-driven capability specs (map: `plan/progress/S-tests-map.md`). Step 3 (captures to nightly) is Codex 1610. Measure a quiet-CPU full run before and after.
 4. **S-hud [Sonnet]** (§4 item 2, §5), after S-guidance and S-tests step 2. Three HUD regions (top info, guidance, controls) in normal flow replace per-element offsets. Target: `hud-layout.css` from 1,077 lines to about 300, all `/* S-hud: remove */` patches gone, portrait and landscape both without special cases. Re-baseline HUD screenshots deliberately.
@@ -105,6 +105,8 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 18. **S-render remainder [Codex for the code, Sonnet judges the golden set]** (§6): table-drive the `scarp.ts` kinds (golden-guarded); title scene reuses `Headlights`/`MarineSnow`; collapse the three hull-creak audio paths. The nightly per-tier perf workflow is merged (`render-nightly.yml`); it needs its first hosted run checked.
 19. **V-lander [Haiku, low]:** Challenger's white lander looks toy-like (Sol: Challenger beauty 3, `challenger-deep-3`); add wear and colour. Challenger's empty dark opening is not itself a blocker.
 20. **R-release [Haiku]:** each release: full e2e on a quiet CPU, push, tag, check `gh run list`. f53 follows the 2026-10-13 collection (see OVERNIGHT-LOG).
+21. **S-verify [Codex]** brief 1620: read-only audit of the 2026-10-13 collection merges; fix semantic merge errors with tests.
+22. **S-bughunt [Codex]** brief 1630: save/input/teardown bug hunt; fix confirmed defects with tests.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.
 
