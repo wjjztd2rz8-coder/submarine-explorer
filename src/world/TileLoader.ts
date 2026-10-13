@@ -13,7 +13,7 @@
 import type { Tile, TileIndex, TileIndexEntry, TileMeta } from '../util/types.js';
 import { publicUrl } from '../util/publicUrl.js';
 
-export const DEFAULT_TILE_ROOT = publicUrl('/data/tiles');
+const DEFAULT_TILE_ROOT = publicUrl('/data/tiles');
 
 export class TileLoadError extends Error {
   constructor(
@@ -169,7 +169,7 @@ function isLittleEndian(): boolean {
   return littleEndian;
 }
 
-export interface TileLoaderOptions {
+interface TileLoaderOptions {
   /**
    * Fetch `heightmap16.bin` (half the bytes, <= quant_scale/2 error) when the
    * tile's meta.json advertises it, falling back to float32 on any failure.

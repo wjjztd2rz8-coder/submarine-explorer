@@ -33,8 +33,8 @@ const des = { x: 0, y: 0, z: 0 };
 const cur = { x: 0, y: 0, z: 0 };
 const goalV = { x: 0, y: 0, z: 0 };
 
-export const TWO_PI = Math.PI * 2;
-export const wrapAngle = (a: number): number => {
+const TWO_PI = Math.PI * 2;
+const wrapAngle = (a: number): number => {
   let v = (a + Math.PI) % TWO_PI;
   if (v < 0) v += TWO_PI;
   return v - Math.PI;
@@ -43,10 +43,10 @@ export const wrapAngle = (a: number): number => {
 export const bodyLen = (a: Agent): number => a.def.size * a.def.visScale * a.scale;
 
 /** The animal's own speed, m/s. */
-export const speedOf = (a: Agent): number => Math.hypot(a.vx, a.vy, a.vz);
+const speedOf = (a: Agent): number => Math.hypot(a.vx, a.vy, a.vz);
 
 /** Depth of an animal in positive metres. */
-export const depthOf = (a: Agent): number => -a.y;
+const depthOf = (a: Agent): number => -a.y;
 
 function norm3(v: { x: number; y: number; z: number }): number {
   const l = Math.hypot(v.x, v.y, v.z);
@@ -251,7 +251,7 @@ function attractTarget(a: Agent, ctx: SteerCtx, speed: number): void {
 // ---------------------------------------------------------------- groups
 
 /** Refresh a group's centroid and mean velocity; returns the live member count. */
-export function groupStats(g: Group): number {
+function groupStats(g: Group): number {
   let n = 0;
   let cx = 0;
   let cy = 0;

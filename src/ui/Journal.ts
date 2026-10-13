@@ -23,8 +23,9 @@
  * re-exports this class under its old name.
  */
 
+import { el } from './dom.js';
+
 import type { GameEvents } from '../core/EventBus.js';
-import type { GuideEntry } from '../game/Guide.js';
 import {
   isEntryUnlocked,
   isSiteUnlocked,
@@ -51,16 +52,8 @@ export interface GuideEmitter {
   emit<K extends keyof GameEvents>(name: K, payload: GameEvents[K]): void;
 }
 
-/** What Discovery pushes for the current dive (the old FieldGuide content). */
-export interface FieldGuideContent {
-  landmarkName: string;
-  memorialNote?: string;
-  entries: GuideEntry[];
-  isUnlocked(entryId: string): boolean;
-}
-
 /** The statement the front page makes once, instead of per-entry caveats. */
-export const JOURNAL_HONESTY =
+const JOURNAL_HONESTY =
   'Dives use real survey data. Recreation tags mark plausible landforms, wrecks, structures and ' +
   'scan markers based on published sources. Game addition tags mark secrets and staged animal ' +
   'encounters. Species lists use OBIS survey records: counts reflect sampling effort and recorded ' +
@@ -107,17 +100,6 @@ async function loadTileSources(): Promise<Map<string, string>> {
     if (typeof t?.id === 'string' && typeof t.source === 'string') out.set(t.id, t.source);
   }
   return out;
-}
-
-function el<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className?: string,
-  text?: string,
-): HTMLElementTagNameMap[K] {
-  const e = document.createElement(tag);
-  if (className) e.className = className;
-  if (text !== undefined) e.textContent = text;
-  return e;
 }
 
 function link(url: string, text: string): HTMLAnchorElement {
@@ -307,7 +289,7 @@ export class Journal {
   }
 
   /** Discovery's current-site content. The Journal loads its own; this only refreshes. */
-  setContent(_content: FieldGuideContent): void {
+  setContent(): void {
     this.refresh();
   }
 

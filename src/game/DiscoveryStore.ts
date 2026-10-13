@@ -16,21 +16,21 @@
 export const DISCOVERY_STORAGE_KEY = 'subexplorer.discoveries.v1';
 export const DISCOVERY_VERSION = 1;
 
-export interface DiscoveryRecord {
+interface DiscoveryRecord {
   /** ISO time of the FIRST successful scan. */
   at: string;
   /** Number of completed scans, including the first. */
   count: number;
 }
 
-export interface DiscoveryStats {
+interface DiscoveryStats {
   /** Completed scans across all POIs. */
   scans: number;
   /** ISO time of the first discovery ever made in this browser. */
   firstAt?: string;
 }
 
-export interface DiscoveryData {
+interface DiscoveryData {
   version: 1;
   discovered: Record<string, DiscoveryRecord>;
   stats: DiscoveryStats;
@@ -43,11 +43,11 @@ export interface StorageLike {
   removeItem(key: string): void;
 }
 
-export function discoveryKey(landmarkId: string, poiId: string): string {
+function discoveryKey(landmarkId: string, poiId: string): string {
   return `${landmarkId}/${poiId}`;
 }
 
-export function emptyDiscoveryData(): DiscoveryData {
+function emptyDiscoveryData(): DiscoveryData {
   return { version: 1, discovered: {}, stats: { scans: 0 } };
 }
 
@@ -122,7 +122,7 @@ export function migrate(raw: unknown, fallbackAt = new Date().toISOString()): Di
   return out;
 }
 
-export interface RecordResult {
+interface RecordResult {
   firstTime: boolean;
   record: DiscoveryRecord;
 }

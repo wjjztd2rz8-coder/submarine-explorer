@@ -3,7 +3,7 @@ import { Vector3, type Camera } from 'three';
 import type { PlacedPoi } from '../game/Pois.js';
 import type { Scanner } from '../game/Scanner.js';
 
-export interface WaypointObjective {
+interface WaypointObjective {
   poiId: string;
   title: string;
   hint?: string;

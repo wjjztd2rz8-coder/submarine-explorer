@@ -20,7 +20,7 @@
 
 import * as THREE from 'three';
 
-export const underwaterVertexShader = /* glsl */ `
+const underwaterVertexShader = /* glsl */ `
 varying vec2 vUv;
 void main() {
   vUv = uv;
@@ -29,7 +29,7 @@ void main() {
 `;
 
 /** The tier knobs the post stack reads (a subset of `AtmosphereTier`). */
-export interface PostTier {
+interface PostTier {
   bloomLevels: 0 | 1 | 2;
   rayOctaves: 0 | 1 | 2;
   msaa: 0 | 2 | 4;
@@ -118,7 +118,7 @@ void main() {
 }
 `;
 
-export const underwaterFragmentShader = /* glsl */ `
+const underwaterFragmentShader = /* glsl */ `
 precision highp float;
 
 uniform sampler2D tDiffuse;
@@ -267,7 +267,7 @@ void main() {
 }
 `;
 
-export interface UnderwaterPassOptions {
+interface UnderwaterPassOptions {
   tint?: THREE.ColorRepresentation;
   vignette?: number;
   tier?: PostTier;

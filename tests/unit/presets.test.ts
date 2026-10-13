@@ -1,3 +1,11 @@
+import {
+  clamp,
+  clamp01,
+  lerp,
+  smoothstep,
+  smoothstep01,
+  smoothstepUnit,
+} from '../../src/util/math.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
@@ -326,5 +334,34 @@ describe('vent haze draw budget', () => {
     expect(scene.children.filter((object) => object instanceof Points)).toHaveLength(1);
     expect(scene.getObjectByName('ventHaze')).toBeUndefined();
     preset.exit();
+  });
+});
+
+describe('shared scalar maths', () => {
+  it('retains clamp boundaries, non-finite inputs and min/max ordering', () => {
+    expect([-Infinity, -1, 0, 0.5, 1, 2, Infinity].map(clamp01)).toEqual([0, 0, 0, 0.5, 1, 1, 1]);
+    expect(clamp(NaN)).toBeNaN();
+    expect(clamp(-0)).toBe(0);
+    expect(clamp(-3, -2, 4)).toBe(-2);
+    expect(clamp(6, -2, 4)).toBe(4);
+    expect(clamp(3, 5, 2)).toBe(2);
+  });
+
+  it('interpolates and extrapolates without clamping the lerp factor', () => {
+    expect([-1, 0, 0.25, 1, 2].map((t) => lerp(2, 10, t))).toEqual([-6, 2, 4, 10, 18]);
+    expect(lerp(10, 2, 0.25)).toBe(8);
+    expect(lerp(2, 10, NaN)).toBeNaN();
+  });
+
+  it('keeps raw, clamped one-input and edge-based cubics distinct', () => {
+    expect([-1, 0, 0.25, 0.5, 1, 2].map(smoothstep01)).toEqual([0, 0, 0.15625, 0.5, 1, 1]);
+    expect(smoothstepUnit(-1)).toBe(5);
+    expect(smoothstepUnit(2)).toBe(-4);
+    expect(smoothstep(10, 20, 12.5)).toBe(0.15625);
+    expect(smoothstep(20, 10, 12.5)).toBe(0.84375);
+    expect(smoothstep(4, 4, 3)).toBe(0);
+    expect(smoothstep(4, 4, 5)).toBe(1);
+    expect(smoothstep(4, 4, 4)).toBeNaN();
+    expect(smoothstep01(NaN)).toBeNaN();
   });
 });

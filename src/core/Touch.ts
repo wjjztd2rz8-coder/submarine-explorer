@@ -7,7 +7,7 @@
 /** Fraction of the stick radius that reads as zero (thumbs are never still). */
 export const STICK_DEAD_ZONE = 0.12;
 
-export interface StickAxes {
+interface StickAxes {
   /** -1 (reverse) .. +1 (ahead). */
   throttle: number;
   /** -1 (port) .. +1 (starboard). */
@@ -83,7 +83,7 @@ export function isTap(durationMs: number, movedPx: number): boolean {
   return durationMs < 280 && movedPx < 14;
 }
 
-export type DeviceClass = 'phone' | 'tablet' | 'desktop';
+type DeviceClass = 'phone' | 'tablet' | 'desktop';
 
 /** Classify by screen short side once the device is known to be touch-first. */
 export function classifyDevice(
