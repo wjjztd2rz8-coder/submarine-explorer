@@ -12,6 +12,7 @@
 
 import { fetchContentJson, type FetchJson } from '../../game/ContentPath.js';
 import { publicUrl } from '../../util/publicUrl.js';
+import { clamp01 as clampUnit } from '../../util/math.js';
 import { SPECIES_BY_ID } from './catalogue.js';
 import type {
   LifeDoc,
@@ -22,7 +23,7 @@ import type {
   SpeciesDef,
 } from './types.js';
 
-export const LIFE_DOC_URL = publicUrl('/data/life/life.json');
+const LIFE_DOC_URL = publicUrl('/data/life/life.json');
 
 const isObj = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -210,5 +211,3 @@ export function pickActiveSpecies(
 export function cellChance(weight: number, density: number, cell: number, radius: number): number {
   return clampUnit((weight * density * cell * cell) / (Math.PI * radius * radius));
 }
-
-const clampUnit = (v: number): number => Math.min(1, Math.max(0, v));

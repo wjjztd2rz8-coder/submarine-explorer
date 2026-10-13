@@ -1,5 +1,5 @@
 /** Appearance rewards only; no physics, depth access or beam settings. */
-export type CosmeticReward =
+type CosmeticReward =
   | { kind: 'default' }
   | { kind: 'stars'; total: number }
   | { kind: 'hero'; stars: number }

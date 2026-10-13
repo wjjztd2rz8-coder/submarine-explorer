@@ -59,7 +59,7 @@ import { bollards, cowlVent, edgePath, openingRow, rusticlesAlong } from './ship
 import { mulberry32, valueNoise3 } from './shared.js';
 
 /** Stations along the stern section (m from the torn forward end). */
-export const TITANIC_STERN = {
+const TITANIC_STERN = {
   /** Depth of the open engine-room cavity behind the tear. */
   cavity: 14,
   superEnd: 60,

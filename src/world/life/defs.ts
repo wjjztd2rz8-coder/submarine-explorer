@@ -11,7 +11,7 @@ import { LIFE_SCALE, type Archetype, type SpeciesDef } from './types.js';
  * never so small that it cannot be read from the chase camera, so a 8 cm fish
  * is drawn about 0.9 m long and a 3 cm shrimp about 0.6 m.
  */
-export function drawnSize(size: number): number {
+function drawnSize(size: number): number {
   return Math.max(size * LIFE_SCALE, 0.9 * Math.pow(size / 0.08, 0.4));
 }
 

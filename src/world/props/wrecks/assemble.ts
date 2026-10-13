@@ -38,7 +38,7 @@ const _cam = new THREE.Vector3();
  * LOD that measures distance to a local-space box instead of to its origin.
  * Level 0 shows inside `levels[1].distance`, level 1 beyond it.
  */
-export class BoxLod extends THREE.LOD {
+class BoxLod extends THREE.LOD {
   level = 0;
 
   constructor(readonly box: THREE.Box3) {

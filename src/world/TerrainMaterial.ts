@@ -26,7 +26,7 @@ import vertGlsl from '../shaders/terrain.vert.glsl?raw';
 import fragGlsl from '../shaders/terrain.frag.glsl?raw';
 import { SET_CONTRAST, type Biome, type TerrainSet } from './TerrainBiome.js';
 
-export interface TerrainMaterialOptions {
+interface TerrainMaterialOptions {
   config: TerrainConfig;
   tier: GraphicsTier;
   biome: Biome;
@@ -36,7 +36,7 @@ export interface TerrainMaterialOptions {
   rockDetailStrength?: number;
 }
 
-export interface TerrainMaterialResult {
+interface TerrainMaterialResult {
   material: THREE.MeshStandardMaterial;
   textures: THREE.Texture[];
   /** Edge length of the shipped albedo textures, for the debug readout. */

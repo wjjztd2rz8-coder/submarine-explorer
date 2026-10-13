@@ -5,6 +5,9 @@
  * Split out of `world/props/Procedural.ts` (F0-CORE).
  */
 
+import { lerp } from '../../../util/math.js';
+export { hashString, mulberry32 } from '../../../util/rng.js';
+
 import * as THREE from 'three';
 import type { ProceduralPropKind, PropsConfig } from '../../../core/Config.js';
 import type { PropDef } from '../../PropLoader.js';
@@ -29,28 +32,6 @@ export type LocalHeightFn = (x: number, z: number) => number;
 
 // ------------------------------------------------------------------ seeding
 
-/** FNV-1a 32-bit hash; stable seed from a prop id. */
-export function hashString(s: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return h >>> 0;
-}
-
-/** mulberry32: tiny, fast, good-enough PRNG returning [0, 1). */
-export function mulberry32(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 /** Hash-based 3D value noise in [0, 1], smooth, seeded. */
 export function valueNoise3(x: number, y: number, z: number, seed: number): number {
   const xi = Math.floor(x);
@@ -67,7 +48,6 @@ export function valueNoise3(x: number, y: number, z: number, seed: number): numb
     n = Math.imul(n ^ (n >>> 13), 1274126177);
     return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
   };
-  const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
   const x00 = lerp(h(xi, yi, zi), h(xi + 1, yi, zi), u);
   const x10 = lerp(h(xi, yi + 1, zi), h(xi + 1, yi + 1, zi), u);
   const x01 = lerp(h(xi, yi, zi + 1), h(xi + 1, yi, zi + 1), u);

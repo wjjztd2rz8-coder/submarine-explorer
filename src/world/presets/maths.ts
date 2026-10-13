@@ -9,7 +9,11 @@
  * direction it flows TOWARD (the oceanographic convention).
  */
 
-export interface Vec3Like {
+export { mulberry32 as mulberry } from '../../util/rng.js';
+import { smoothstep } from '../../util/math.js';
+export { smoothstep } from '../../util/math.js';
+
+interface Vec3Like {
   x: number;
   y: number;
   z: number;
@@ -19,11 +23,6 @@ const DEG = Math.PI / 180;
 
 export function clamp01(v: number): number {
   return v < 0 ? 0 : v > 1 ? 1 : v;
-}
-
-export function smoothstep(a: number, b: number, v: number): number {
-  const t = clamp01((v - a) / (b - a));
-  return t * t * (3 - 2 * t);
 }
 
 /** Unit horizontal vector for a compass bearing: 0 = north = -Z, 90 = east = +X. */
@@ -37,7 +36,7 @@ export function vectorToBearing(x: number, z: number): number {
   return d < 0 ? d + 360 : d;
 }
 
-export interface CanyonCurrentInput {
+interface CanyonCurrentInput {
   /** Bearing the current flows toward, or null to follow the down-slope only. */
   baseDirDeg: number | null;
   baseSpeedMps: number;
@@ -101,7 +100,7 @@ export function canyonCurrent(p: CanyonCurrentInput): { x: number; z: number; sp
 }
 
 /** 1 inside the boundary layer, easing to `aloft` at three boundary-layer heights. */
-export function altitudeFactor(altitudeM: number, layerM: number, aloft: number): number {
+function altitudeFactor(altitudeM: number, layerM: number, aloft: number): number {
   if (layerM <= 0) return 1;
   const t = smoothstep(layerM, 3 * layerM, altitudeM);
   return 1 + (aloft - 1) * t;
@@ -207,18 +206,6 @@ export function trenchInterval(
   const span = Math.max(1, fullDepthM - HADAL_TOP_M);
   const t = clamp01((depthM - HADAL_TOP_M) / span);
   return maxGapS + (minGapS - maxGapS) * t;
-}
-
-/** Deterministic PRNG for particle seeds (screenshots stay comparable run to run). */
-export function mulberry(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }
 
 /** Particle count for a budget at a tier scale, capped. */

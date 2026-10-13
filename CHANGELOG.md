@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **1530 S-tests step 4:** CI builds each deployment base once and shares immutable, SHA/lockfile/Node/base-validated artifacts across all 30 shards and the project-base browser check; `npm run ci` delegates to the canonical full gate runner. Reason: remove 30 redundant hosted builds and prevent gate-order drift while retaining every assertion and shard.
 - **V-bluehole Blue Hole sediment terraces:** gallery aprons use smooth sampled normals, softer risers, 3x the triangles on Medium and above, varied bed roughness, silt darkening at riser feet and per-pixel bed shading (dark riser, lit lip) so terraces read as stacked sediment on every tier, Low included at its exact triangle and draw budget. Reason: the golden approach read as flat polygon steps. The apron collision gap stays a separate item. Details: `plan/progress/1410-f-bluehole-bowl-facets.md`.
 - **1402 S-bugs:** remove the unreachable player sonar ping/echo and residual globe action while preserving active saved bindings and the quiet natural-event sensor cue; add gamepad Journal (D-pad left), reset camera (D-pad down), and photo capture (left bumper), with Controls guide documentation. New players use `auto` graphics detection so weaker devices start on Low; saved fixed tiers remain unchanged. Reason: simplification review §6c input gaps and the default/comment mismatch.
 

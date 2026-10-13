@@ -13,6 +13,8 @@
  * and restores both.
  */
 
+import { lcg32 } from '../../util/rng.js';
+
 import * as THREE from 'three';
 import { buildVehicle, type Vehicle } from '../../vehicles/index.js';
 import type { GraphicsTier } from '../../core/Config.js';
@@ -31,7 +33,7 @@ export interface TitleCropInput {
 export type TitleTier = GraphicsTier;
 export type TitleLayout = 'desktop' | 'portrait' | 'short-landscape';
 
-export interface TitleSceneOptions {
+interface TitleSceneOptions {
   tier: TitleTier;
   reducedMotion: boolean;
 }
@@ -147,7 +149,7 @@ void main() {
 const MIN_FRAME_S = 1 / TITLE_SHOT.maxFps - 1e-9;
 
 /** Pixel rectangle (CSS px, origin top-left) the shot is drawn into. */
-export interface TitleRegion {
+interface TitleRegion {
   x: number;
   y: number;
   w: number;
@@ -579,11 +581,7 @@ export class TitleScene {
     this.disposeSnow();
     const count = TITLE_SHOT.snowCount[this.tier];
     const base = new Float32Array(count * 3);
-    let rng = 0x51ed27;
-    const rand = (): number => {
-      rng = (rng * 1664525 + 1013904223) >>> 0;
-      return rng / 0x100000000;
-    };
+    const rand = lcg32(0x51ed27);
     for (let i = 0; i < count; i++) {
       base[i * 3] = rand() * SNOW_BOX.x;
       base[i * 3 + 1] = rand() * SNOW_BOX.y;

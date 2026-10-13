@@ -17,6 +17,8 @@
  * See docs/atmosphere.md.
  */
 
+import { smoothstep01 as smoothstep } from '../util/math.js';
+
 import * as THREE from 'three';
 import type {
   AtmosphereTier,
@@ -52,16 +54,11 @@ export interface AtmosphereSample {
   causticsStrength: number;
 }
 
-function smoothstep(t: number): number {
-  const x = Math.min(1, Math.max(0, t));
-  return x * x * (3 - 2 * x);
-}
-
 /**
  * Which band a depth falls in. Bands are half-open downwards: exactly -200 m
  * is already "midnight".
  */
-export function bandAt(bands: DepthBandSpec[], depth: number): DepthBandName {
+function bandAt(bands: DepthBandSpec[], depth: number): DepthBandName {
   let name = bands[0]!.name;
   for (const b of bands) {
     if (depth <= b.depth) name = b.name;
@@ -124,7 +121,7 @@ export function sampleAtmosphere(
 
 const TMP_A = new THREE.Color();
 
-export function makeSample(): AtmosphereSample {
+function makeSample(): AtmosphereSample {
   return {
     depth: 0,
     band: 'surface',

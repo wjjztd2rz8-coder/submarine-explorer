@@ -4,4 +4,4 @@
  * uses, so the Journal is `discovery.guide` everywhere.
  */
 
-export { Journal as FieldGuide, type FieldGuideContent, type GuideEmitter } from './Journal.js';
+export { Journal as FieldGuide, type GuideEmitter } from './Journal.js';
