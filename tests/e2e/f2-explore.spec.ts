@@ -201,16 +201,23 @@ test('samples collect per dive, appear in mission debrief, and reset on restart'
 test('short event caption, one witness reward, pause and cooldown', async ({ page }) => {
   await boot(page);
   await park(page, 0);
+  await page.evaluate(() => {
+    const g = window.__game as unknown as Game;
+    g.rig.freeLook = false;
+    g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
+  });
   const points = await page.evaluate(() => (window.__game as unknown as Game).progress.points);
   expect(
-    await page.evaluate(() => (window.__game as unknown as Game).explore.previewEvent('snow')),
+    await page.evaluate(() => (window.__game as unknown as Game).explore.previewEvent('turbidity')),
   ).toBe(true);
-  await expect(page.locator('.explore-caption')).toHaveText('Marine snow falls through the light');
+  await expect(page.locator('.explore-caption')).toContainText(
+    'Silt cloud: sediment-laden water flows downslope',
+  );
   await page.waitForFunction(
     () => (window.__game as unknown as Game).explore.summary().events.length === 1,
   );
   await page.waitForTimeout(1500);
-  await shot(page, 'event-marine-snow');
+  await shot(page, 'event-turbidity');
   expect(await page.evaluate(() => (window.__game as unknown as Game).progress.points)).toBe(
     points + 5,
   );

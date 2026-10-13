@@ -24,6 +24,7 @@ without an entry here is not done.
 - **1391 gate follow-up:** the phone tutorial keeps navigation and scan instructions compact, and narrow landscape reserves its centre column instead of covering telemetry. Mission specs now assert the authored approach and global reset camera; free-dive framing, light, clearance and input assertions remain intact. Touch journey specs follow the picture guide and Journal sheet, including settled async contents before hit-testing.
 
 - **1391-f-first-dive-flow:** missions now open on safe, target-facing approaches 180–260 m from the first primary (Titanic 220 m), with navigation copy and mission scan radii that leave a transit even with Extended sensors. Realistic near-site starts use the same approaches; free-dive beauty frames and surface poses are preserved. The five-step tutorial advances its scan step only on completion, shows held scan progress, and keeps touch hints free of key names.
+- **1393 f-events-reform:** plume, downslope silt and crossing-whale events start ahead within 30–70 m and the active camera view, or defer when terrain/framing prevents a visible placement. Soft billows and a larger readable whale shape retain one particle draw, one merged mesh and the existing tier particle counts; captions explain the cause, prompt an approach outside 45 m and confirm sourced Journal sightings. Events last 18 seconds and retain idempotent 5 RP rewards without a star bonus. Caption placement avoids the projected event, HUD and thumb controls, with a three-second logged confirmation and a search beside the subject when the centre column is occupied; banking reveals the whale’s fins and flukes without adding geometry. Gate specs follow the accepted phone Journal/How to play controls and Lost City opening camera, retaining exact tap-target and geometry checks.
 - **f-text-diet (owner phone playtest: too much text):**
   - Briefing: FACTS and HAZARDS left the main card and now sit once each inside one collapsed "About this site" disclosure (with the summary). The CONTROLS section and the "View controls" button are removed, the hull-rating hazard ("Class B hull ... Stay above the rating") is dropped because the HULL meta row says it, "OR PRESS ENTER" is hidden on touch, and the mode descriptions are shortened to one line. Reason: the card was a wall of text on a phone; Begin and every objective now fit without scrolling at 390x844. `SITE_PRIORITIES` is gone.
   - Dive HUD: the "Data: GMRT +" chip and its placement code (`DataCreditsLayout.ts`) are removed. The full CC BY 4.0 credit (citation, GMRT and DOI links, "not for navigation") is in the pause menu's new "Data credits" view. Reason: the chip did not matter during play. The Journal site page is a later package.
@@ -987,6 +988,9 @@ without an entry here is not done.
   default stays `medium`, so a fresh install looks the same as before.
 
 ### Removed
+
+- **1393 f-events-reform:** removed the marine-snow event, caption and fallback scheduling because permanent marine snow already supplies the same ambient visual. Sites with no remaining event habitat stay quiet.
+- **1393 f-events-reform:** removed the particle-plume event at Lost City: the repo's sourced research describes clear vent flow, which a billowing particle column would misrepresent; the allowed rendering budget does not provide a separate readable clear-flow effect.
 
 - **F-1110:** cut unsupported Monterey shelf-break identification, Blue Hole
   stalactite depth restriction, Lost City sampling-coordinate attribution, and

@@ -681,7 +681,19 @@ budgets. `window.__game.explore` exposes `ready`, `secrets`, `sampleTargets`,
 The preview hook bypasses quiet time for screenshots, without overlapping an event.
 Normal scheduling advances only during active dive time, uses the site's habitat,
 and waits 70–160 seconds initially, then a 100-second cooldown plus another wait.
-`kind` is `plume`, `turbidity`, `snow` or `whale`; an event lasts nine seconds.
+`kind` is `plume`, `turbidity` or `whale`; an event lasts eighteen seconds.
+Sites without suitable habitat stay quiet. Marine snow is ambient only; Lost
+City's clear vent flow is excluded from the billowing particle-plume event.
+A start is deferred unless the visible centre is ahead of the pilot, 30–70 m
+away, within the active camera view and clear of the terrain and submarine.
+The caption explains the event and says “Get closer to log it” outside 45 m.
+After 0.8 seconds, an in-view event within that range logs a persistent
+`<site>/event:<kind>` sighting, with its existing `event:site/kind` reward identity.
+JournalData supplies two-sentence explanations and sources through the existing
+explained-entry layout, labelled as recreations; witnessing can open the site.
+The debrief lists witnessed event names. Sightings add no species/secret counts
+or third-star bonus. The visual keeps the existing tier particle counts, one
+particle draw and one merged whale mesh, without adding lights or textures.
 
 Optional `data/secrets/<site>.json` has `version: 1`, `secrets` and `samples`.
 Secret rows have `id`, `name`, `kind`, `lat`, `lon`, and Journal `text`; samples

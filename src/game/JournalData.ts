@@ -14,6 +14,7 @@
  *   future encounter system.
  */
 
+import { eventKinds, type ExploreEventKind } from './Events.js';
 import { loadSecrets, secretDiscoveryId, type SecretDef } from './Secrets.js';
 import { contentUrl, fetchContentJson, isSafeLandmarkId, type FetchJson } from './ContentPath.js';
 import {
@@ -38,6 +39,58 @@ import { publicUrl } from '../util/publicUrl.js';
 import { SPECIES_BY_ID } from '../world/life/catalogue.js';
 import { loadLifeDoc } from '../world/life/tables.js';
 import type { LifeDoc, LifeJournalEntry, SpeciesDef } from '../world/life/types.js';
+
+/** Persisted by witnessing, with the same idempotent reward identity as events. */
+export const eventDiscoveryId = (kind: ExploreEventKind): string => `event:${kind}`;
+
+/** Sources already cited in docs/research/sites.md; staged encounters are recreations. */
+export const EVENT_SIGHTINGS: Record<ExploreEventKind, GuideEntry> = {
+  plume: {
+    id: 'event:plume',
+    title: 'Sighting: Vent plume',
+    paragraphs: [
+      'Warm, mineral-rich vent fluid rises because it is less dense than the surrounding cold seawater. Mixing with seawater can cause minerals to precipitate into tiny particles.',
+    ],
+    facts: [],
+    reconstruction: true,
+    sources: [
+      {
+        title: 'Mid-Cayman hydrothermal vents — discovery study',
+        url: 'https://www.nature.com/articles/ncomms1636',
+      },
+    ],
+  },
+  turbidity: {
+    id: 'event:turbidity',
+    title: 'Sighting: Silt cloud',
+    paragraphs: [
+      'Suspended sediment makes water denser, so a turbidity current can flow downslope along the seabed. These flows carry sand and mud through submarine canyons.',
+    ],
+    facts: [],
+    reconstruction: true,
+    sources: [
+      {
+        title: 'MBARI — observations inside an underwater landslide',
+        url: 'https://www.mbari.org/news/high-tech-smart-boulders-give-the-first-look-from-inside-an-underwater-landslide/',
+      },
+    ],
+  },
+  whale: {
+    id: 'event:whale',
+    title: 'Sighting: Whale passing',
+    paragraphs: [
+      'Submarine canyon waters provide habitat and feeding grounds for whales. Whales breathe air and return to the surface between dives.',
+    ],
+    facts: [],
+    reconstruction: true,
+    sources: [
+      {
+        title: 'NOAA — Hudson Canyon sanctuary overview',
+        url: 'https://sanctuaries.noaa.gov/hudson-canyon/',
+      },
+    ],
+  },
+};
 
 /** The id a scanned animal is stored under in the discovery store (`<site>/life:<species>`). */
 export const lifeDiscoveryId = (speciesId: string): string => `life:${speciesId}`;
@@ -237,6 +290,23 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
     };
   });
   const wildlife = lifeEntries(id, input.life ?? null);
+  // Use the existing explained-entry surface; Journal layout stays unchanged.
+  const sightings: JournalEntry[] = eventKinds({ site: id, depthM: 0, altitudeM: 0 }).map(
+    (kind) => {
+      const guide = EVENT_SIGHTINGS[kind];
+      return {
+        key: `${id}/poi/${guide.id}`,
+        siteId: id,
+        kind: 'poi',
+        id: guide.id,
+        title: guide.title,
+        poiIds: [eventDiscoveryId(kind)],
+        linkedEntryIds: [],
+        recreation: true,
+        guide,
+      };
+    },
+  );
   const secrets: JournalEntry[] = (input.secrets ?? []).map((d) => ({
     key: `${id}/secret/${d.id}`,
     siteId: id,
@@ -263,8 +333,15 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
     summary: catalogue?.summary ?? '',
     facts: catalogue?.facts ?? [],
     links: catalogue?.links ?? [],
-    entries: [...siteEntries, ...poiEntries, ...speciesEntries, ...wildlife, ...secrets],
-    poiIds: pois.map((p) => p.id),
+    entries: [
+      ...siteEntries,
+      ...poiEntries,
+      ...speciesEntries,
+      ...wildlife,
+      ...secrets,
+      ...sightings,
+    ],
+    poiIds: [...pois.map((p) => p.id), ...sightings.flatMap((e) => e.poiIds)],
     species: input.species,
   };
   if (guide?.memorial_note) site.memorialNote = guide.memorial_note;

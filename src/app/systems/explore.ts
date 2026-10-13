@@ -6,6 +6,7 @@ import {
   type ExploreEvent,
   type ExploreEventKind,
 } from '../../game/Events.js';
+import { eventDiscoveryId, EVENT_SIGHTINGS } from '../../game/JournalData.js';
 import { EventsVisual } from '../../game/EventsVisual.js';
 import {
   loadSecrets,
@@ -43,22 +44,30 @@ export function createExploreSystem(): GameSystem {
   let targets: Array<SecretTarget | SampleTarget> = [];
   const projected = new THREE.Vector3();
 
-  const announce = (ctx: GameContext, event: ExploreEvent): void => {
-    visual.begin(
+  const announce = (ctx: GameContext, event: ExploreEvent): boolean => {
+    const placed = visual.begin(
       event,
       ctx.rov.deployed ? ctx.rov.position : ctx.sub.position,
       ctx.rov.deployed ? ctx.rov.forward : ctx.sub.getForward(),
       (x, z) => ctx.terrain.sampleHeight(x, z),
+      ctx.rig.camera,
     );
+    if (!placed) {
+      scheduler.reset();
+      return false;
+    }
     eventWitnessed = false;
-    notice.show(EVENT_CAPTIONS[event.kind]);
+    notice.show(EVENT_CAPTIONS[event.kind], event.durationS);
     ctx.audio.playExploreCue();
+    return true;
   };
   return {
     name: 'explore',
     init(ctx) {
       visual = new EventsVisual(ctx.tier);
-      notice = new ExploreNotice();
+      notice = new ExploreNotice(undefined, () =>
+        visual.screenBounds(ctx.rig.camera, window.innerWidth, window.innerHeight),
+      );
       ctx.scene.add(visual.group);
       const positions = Float32Array.from({ length: 36 }, (_, i) =>
         i % 3 === 1 ? (i / 36) * 1.5 : Math.sin(i * 7) * 1.5,
@@ -85,7 +94,7 @@ export function createExploreSystem(): GameSystem {
             .filter((t) => ctx.discovery.scanner.isScanned(t.landmarkId, t.id))
             .map((t) => t.def.name),
           samples: [...samples.collected.values()],
-          events: [...witnessed].map((k) => EVENT_CAPTIONS[k]),
+          events: [...witnessed].map((k) => EVENT_SIGHTINGS[k].title.replace('Sighting: ', '')),
         };
       };
       ctx.discovery.debrief.exploration = summary;
@@ -111,8 +120,7 @@ export function createExploreSystem(): GameSystem {
           previewEvent(kind: ExploreEventKind): boolean {
             const e = scheduler.preview(kind);
             if (!e) return false;
-            announce(ctx, e);
-            return true;
+            return announce(ctx, e);
           },
         },
       });
@@ -203,8 +211,10 @@ export function createExploreSystem(): GameSystem {
           scheduler.active &&
           !eventWitnessed &&
           dt > 0 &&
+          scheduler.active.elapsedS >= EXPLORE_CONFIG.eventWitnessDelayS &&
           secretInRange(f.pilotPosition, visual.origin, EXPLORE_CONFIG.eventWitnessM)
         ) {
+          ctx.rig.camera.updateMatrixWorld();
           projected.copy(visual.origin).project(ctx.rig.camera);
           if (
             Math.abs(projected.x) < 1 &&
@@ -215,6 +225,11 @@ export function createExploreSystem(): GameSystem {
             eventWitnessed = true;
             const kind = scheduler.active.kind;
             witnessed.add(kind);
+            const id = eventDiscoveryId(kind);
+            if (!ctx.discovery.store.isDiscovered(ctx.contentLandmark, id))
+              ctx.discovery.store.record(ctx.contentLandmark, id);
+            ctx.journal.focus(id);
+            ctx.journal.refresh();
             ctx.bus.emit('event:witnessed', {
               landmarkId: ctx.contentLandmark,
               eventId: kind,
@@ -222,6 +237,14 @@ export function createExploreSystem(): GameSystem {
             });
             optionalProgress()?.award('event', `${ctx.contentLandmark}/${kind}`);
           }
+        }
+        if (scheduler.active) {
+          notice.event(
+            EVENT_CAPTIONS[scheduler.active.kind],
+            !eventWitnessed &&
+              !secretInRange(f.pilotPosition, visual.origin, EXPLORE_CONFIG.eventWitnessM),
+            eventWitnessed,
+          );
         }
         for (const [i, target] of targets.entries())
           meshes[i].visible = secretInRange(
@@ -237,7 +260,7 @@ export function createExploreSystem(): GameSystem {
           )
             faint.push(target);
         ctx.sonar.setFaintContacts(faint);
-        notice.update(f.dt, f.blocked || f.frozen);
+        notice.update(dt, f.blocked || f.frozen);
       },
       'scan.rovRangeRestore': (f, ctx) => {
         const scanner = ctx.discovery.scanner;

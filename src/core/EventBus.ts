@@ -50,7 +50,7 @@ export interface GameEvents {
   'event:witnessed': {
     landmarkId: string;
     eventId: string;
-    kind: 'plume' | 'turbidity' | 'snow' | 'whale';
+    kind: 'plume' | 'turbidity' | 'whale';
   };
   // --- B3: mission flow ------------------------------------------------------
   'mission:started': { missionId: string; tileId: string };
