@@ -86,7 +86,12 @@ function stubShell(ctx: GameContext): void {
   vi.stubGlobal('document', {
     createElement: () => ({ addEventListener: vi.fn(), getContext: () => null }),
   });
-  ctx.rig = { snap: vi.fn(), setMode: vi.fn(), chaseRadius: 100 } as unknown as GameContext['rig'];
+  ctx.rig = {
+    snap: vi.fn(),
+    setMode: vi.fn(),
+    setChaseRadiusDefault: vi.fn(),
+    chaseRadius: 100,
+  } as unknown as GameContext['rig'];
   ctx.headlights = {
     setEnabled: vi.fn(),
     setConesSuppressed: vi.fn(),
@@ -114,6 +119,7 @@ function context(site: string, mode: GameplayMode): GameContext {
   const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
   return {
     config,
+    baseScanRadii: new Map(),
     save,
     settings: save.get(),
     meta,
@@ -547,7 +553,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
         );
         missionSystem.init?.(ctx);
         await Promise.resolve();
-        expect(ctx.rig.chaseRadius).toBe(66);
+        expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
         const arcadePos = ctx.sub.position.clone();
         // Both boot directions must use current saved settings, even when the
         // near-site choice is unchanged. The preview must match Begin.
@@ -555,16 +561,11 @@ describe('fresh-player mission routing and vehicle loadout', () => {
         await Promise.resolve();
         if (!skipBriefing) expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
         ctx.applyMissionStart('near-site');
-        const legacy = missionStartPose(
-          { ...ctx.route!.def, hull_class: ctx.sub.getState().hullClass },
-          'near-site',
-          pois,
-          ctx.meta,
-          terrain,
-          ctx.config,
-        );
-        expect(ctx.sub.position.toArray()).toEqual([legacy.x, legacy.y, legacy.z]);
-        expect(ctx.sub.position.distanceTo(arcadePos)).toBeGreaterThan(1);
+        const first = pois.find(
+          (p) => p.id === ctx.route!.def.objectives.find((o) => o.primary)!.poi,
+        )!;
+        expect(ctx.sub.position.distanceTo(first.position)).toBeCloseTo(220, 2);
+        expect(ctx.sub.position.distanceTo(arcadePos)).toBeLessThan(1e-6);
         ctx.rig.chaseRadius = 35;
         ctx.rig.resetView();
         expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
@@ -572,12 +573,21 @@ describe('fresh-player mission routing and vehicle loadout', () => {
         await Promise.resolve();
         ctx.applyMissionStart('near-site');
         expect(ctx.sub.position.distanceTo(arcadePos)).toBeLessThan(1e-6);
-        expect(ctx.rig.chaseRadius).toBe(66);
+        expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
         ctx.applyMissionStart('surface');
+        const surface = missionStartPose(
+          { ...ctx.route!.def, hull_class: ctx.sub.getState().hullClass },
+          'surface',
+          pois,
+          ctx.meta,
+          terrain,
+          ctx.config,
+        );
+        expect(ctx.sub.position.toArray()).toEqual([surface.x, surface.y, surface.z]);
         ctx.rig.resetView();
         expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
         ctx.applyMissionStart('near-site');
-        expect(ctx.rig.chaseRadius).toBe(66);
+        expect(ctx.rig.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
         ctx.daily = { start: { x: 0, z: 0, headingDeg: 0 } } as GameContext['daily'];
         ctx.applyMissionStart('near-site');
         ctx.rig.resetView();

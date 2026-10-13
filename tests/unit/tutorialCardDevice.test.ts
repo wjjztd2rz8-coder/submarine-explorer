@@ -65,3 +65,30 @@ it('changing devices repaints phone copy even when the full text is identical', 
   expect(phone.textContent).toBe(text);
   card.dispose();
 });
+
+it('phone scan progress and navigation copy survive the compact presentation', () => {
+  const body = new Element();
+  vi.stubGlobal('document', { body, createElement: () => new Element() });
+  const card = new TutorialCard({ skipStep() {}, skipAll() {} });
+  const phone = (card.root as unknown as Element).children[3];
+  const keys = {
+    move: 'W',
+    turn: 'A or D',
+    rise: 'Space',
+    sink: 'Shift',
+    lights: 'L',
+    scan: 'G',
+    photo: 'P',
+    journal: 'J',
+  };
+  for (const destination of ['the bow', 'the north canyon wall', 'the coral mound cluster']) {
+    const text = tutorialText('move', 'touch', keys, null, destination);
+    card.show(0, text, 'touch');
+    expect(phone.textContent).toBe('Left stick: follow the marker.');
+    expect((card.root as unknown as Element).children[2].textContent).toContain(destination);
+  }
+  card.show(3, tutorialText('scan', 'touch', keys, 0.42), 'touch');
+  expect(phone.textContent).toBe('Scanning… 42% · keep holding SCAN.');
+  card.show(3, tutorialText('scan', 'touch', keys), 'touch');
+  expect(phone.textContent).toBe('Face a glowing target; hold SCAN to finish.');
+});

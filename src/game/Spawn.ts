@@ -25,7 +25,29 @@ import { Vector3 } from 'three';
 import type { Props } from '../world/Props.js';
 import type { GameplayMode } from '../core/Save.js';
 
-/** Arcade mission openings must offer a short approach to an authored primary. */
+/** Per-site transit distance to the first primary contact, measured in 3D metres. */
+export const MISSION_APPROACH_M: Readonly<Record<string, number>> = {
+  titanic: 220,
+  'challenger-deep': 200,
+  'lost-city': 220,
+  'monterey-canyon': 240,
+  endurance: 180,
+  'axial-seamount-ashes': 180,
+  'hudson-canyon': 240,
+  kamaehuakanaloa: 200,
+  'beebe-vent-field': 220,
+  'great-blue-hole': 220,
+  bismarck: 240,
+  'hunga-tonga-caldera': 260,
+  'blake-plateau-corals': 260,
+};
+
+/** Leave a real approach even with Extended sensors (twice the base scan radius). */
+export function missionApproachScanRadius(siteId: string, radius: number): number {
+  return Math.min(radius, ((MISSION_APPROACH_M[siteId] ?? 220) - 60) / 2);
+}
+
+/** Missions navigate to the first primary; free-dive subject framing is independent. */
 export function composedMissionSpawn(
   siteId: string,
   primaries: readonly { position: { x: number; y: number; z: number } }[],
@@ -36,38 +58,91 @@ export function composedMissionSpawn(
   safeDepth: number,
   cameraConfig: CameraConfig = DEFAULT_CAMERA,
 ): SpawnPose | null {
-  const opening = composedFreeDiveSpawn(
-    siteId,
-    meta,
-    seabed,
-    props,
-    settings,
-    safeDepth,
-    cameraConfig,
-  );
-  if (
-    opening &&
-    primaries.some(
-      ({ position: p }) => Math.hypot(p.x - opening.x, p.y - opening.y, p.z - opening.z) <= 300,
-    )
-  )
-    return opening;
-  for (const { position } of primaries) {
-    const pose = nearSiteSpawnPose(
-      position,
-      meta,
-      seabed,
-      settings,
-      safeDepth,
-      undefined,
-      300,
-      (p) =>
-        Math.hypot(position.x - p.x, position.y - p.y, position.z - p.z) <= 300 &&
-        !props.collide(new Vector3(p.x, p.y, p.z), settings.hullRadius + 4, new Vector3()),
-    );
-    if (pose) return pose;
+  const first = primaries[0];
+  if (!first) return null;
+  const target = new Vector3(first.position.x, first.position.y, first.position.z);
+  const range = MISSION_APPROACH_M[siteId] ?? 220;
+  const authored = FREE_DIVE_OPENINGS[siteId];
+  const hero = props.placed.find((p) => p.def.id === authored?.hero);
+  let bearing = ((authored?.bearing ?? 180) * Math.PI) / 180;
+  if (hero) {
+    hero.root.updateMatrixWorld(true);
+    const direction = hero.root
+      .localToWorld(new Vector3(Math.sin(bearing), 0, -Math.cos(bearing)))
+      .sub(hero.root.localToWorld(new Vector3()));
+    bearing = Math.atan2(direction.x, -direction.z);
   }
-  return null;
+  const nw = latLonToWorld(meta, meta.bbox.north, meta.bbox.west);
+  const se = latLonToWorld(meta, meta.bbox.south, meta.bbox.east);
+  const clearance = settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM;
+  const rig = new CameraRig(cameraConfig, 16 / 9, {
+    sampleHeight: (x, z) => seabed.sampleHeight(x, z),
+    getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+  });
+  let best: SpawnPose | null = null;
+  let bestScore = Infinity;
+  for (const turn of [0, 22.5, -22.5, 45, -45, 67.5, -67.5, 90, -90, 135, -135, 180]) {
+    const angle = bearing + (turn * Math.PI) / 180;
+    let y = Math.max(target.y + clearance, safeDepth + settings.hullRadius);
+    let p = target.clone();
+    // Reconcile altitude with the authored 3D range; steep approaches may need a new bearing.
+    for (let pass = 0; pass < 6; pass++) {
+      const dy = y - target.y;
+      if (dy >= range) break;
+      const horizontal = Math.sqrt(range * range - dy * dy);
+      p.set(target.x + Math.sin(angle) * horizontal, y, target.z - Math.cos(angle) * horizontal);
+      let floor = seabed.sampleHeight(p.x, p.z);
+      for (let step = 1; step <= 24; step++) {
+        const t = step / 24;
+        floor = Math.max(
+          floor,
+          seabed.sampleHeight(p.x + (target.x - p.x) * t, p.z + (target.z - p.z) * t),
+        );
+      }
+      const nextY = Math.max(y, floor + clearance);
+      if (nextY === y) break;
+      y = nextY;
+    }
+    if (y - target.y >= range || p.y !== y || y > -settings.hullRadius) continue;
+    if (p.x < nw.x || p.x > se.x || p.z < nw.z || p.z > se.z) continue;
+    if (Math.abs(p.distanceTo(target) - range) > 0.01) continue;
+    // Do not open closer to another primary and send the waypoint in a different direction.
+    if (
+      primaries.slice(1).some(({ position: q }) => p.distanceTo(new Vector3(q.x, q.y, q.z)) < range)
+    )
+      continue;
+    if (props.collide(p.clone(), settings.hullRadius + 4, new Vector3())) continue;
+    let clear = true;
+    // The final contact may be seated inside its subject. Keep the navigable transit clear
+    // until the player is within the mission's scan radius, without crossing a wall.
+    for (let d = 8; d < range - missionApproachScanRadius(siteId, Infinity); d += 8) {
+      const point = p.clone().lerp(target.clone().setY(p.y), d / range);
+      if (
+        seabed.sampleHeight(point.x, point.z) + clearance > p.y ||
+        props.collide(point, settings.hullRadius + 4, new Vector3())
+      )
+        clear = false;
+    }
+    if (!clear) continue;
+    const yaw = Math.atan2(target.x - p.x, -(target.z - p.z));
+    rig.snap(p, yaw, 0);
+    for (let step = 1; step <= 8; step++) {
+      const eye = p.clone().lerp(rig.camera.position, step / 8);
+      if (props.collide(eye, 6, new Vector3())) clear = false;
+    }
+    if (!clear) continue;
+    // Lost City's first contact sits on a terrace beside a deep valley. Prefer
+    // the shelf: a level approach over the valley puts the seabed beyond fog
+    // visibility even though the transit itself clears terrain.
+    const localAltitude = p.y - seabed.sampleHeight(p.x, p.z);
+    const score =
+      (p.y - target.y) * 3 + Math.abs(turn) * 0.12 + (siteId === 'lost-city' ? localAltitude : 0);
+    if (score < bestScore) {
+      bestScore = score;
+      best = { x: p.x, y: p.y, z: p.z, yaw };
+    }
+  }
+  return best;
 }
 
 /** Local approach bearings and clearance from each hero's actual footprint. */

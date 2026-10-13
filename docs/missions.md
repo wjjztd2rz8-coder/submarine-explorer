@@ -51,6 +51,15 @@ seabed + hullRadius + seabedClearance + mission.spawnClearanceM]`. The
    Yaw = `heading_deg · π/180` (physics convention: `+yaw` turns toward +X =
    east). `?poi=` / `?at=` still override the pose afterwards. Missions keep
    `mission.hull_class`; the free-dive hull chooser does not run.
+   Near-site starts instead use `composedMissionSpawn` in `Spawn.ts`: the first
+   primary in mission order sits 150–300 m ahead (authored per site; Titanic
+   220 m). The bearing search checks the terrain corridor, prop collisions,
+   chase arm and fitted hull rating. Mission primary scan radii leave a transit
+   with Extended sensors; surface choices restore the authored radii. The first
+   objective and its waypoint hint say "Head to …" until the contact is in scan
+   range, then restore the authored scan instructions. This opening marker is
+   also shown for Realistic near-site starts; other waypoint preferences resume
+   on arrival. Free dives retain their independent composed beauty frames.
 3. **Briefing.** Title, target depth, hull, objectives, memorial note (italic)
    and the dive settings. Summary, facts and hazards (amber) sit once each in
    one collapsed "About this site" disclosure; a hazard that only repeats the

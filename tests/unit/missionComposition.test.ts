@@ -5,7 +5,7 @@ import { Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
 import { parseMission } from '../../src/game/Mission.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
-import { composedMissionSpawn, spawnSettings } from '../../src/game/Spawn.js';
+import { composedMissionSpawn, MISSION_APPROACH_M, spawnSettings } from '../../src/game/Spawn.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { Props } from '../../src/world/Props.js';
 import type { TileMeta } from '../../src/util/types.js';
@@ -14,7 +14,7 @@ const sites: string[] = readdirSync('data/landmarks').filter(
   (site: string) => !site.startsWith('_') && !site.endsWith('.json'),
 );
 for (const site of sites) {
-  it(`Arcade ${site}: starts within 300 m of a primary before and after props load`, async () => {
+  it(`Arcade ${site}: starts 150–300 m from the first primary before and after props load`, async () => {
     const config = makeConfig();
     const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
     const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
@@ -35,9 +35,9 @@ for (const site of sites) {
       config.scan,
       site,
     );
-    const primaries = pois.filter((p) =>
-      mission.objectives.some((o) => o.primary && o.poi === p.id),
-    );
+    const primaries = mission.objectives
+      .filter((o) => o.primary)
+      .map((o) => pois.find((p) => o.poi === p.id)!);
     const safeDepth = config.submarine.hullClasses[mission.hull_class!].ratedDepth;
     const check = () => {
       const pose = composedMissionSpawn(
@@ -60,6 +60,8 @@ for (const site of sites) {
           Math.hypot(p.x - pose!.x, p.y - pose!.y, p.z - pose!.z),
         ),
       );
+      expect(spatialRange).toBeCloseTo(MISSION_APPROACH_M[site], 2);
+      expect(spatialRange).toBeGreaterThanOrEqual(150);
       expect(spatialRange).toBeLessThanOrEqual(300 + 1e-8);
       expect(pose!.y).toBeGreaterThanOrEqual(safeDepth + config.submarine.hullRadius);
       expect(pose!.y).toBeGreaterThanOrEqual(

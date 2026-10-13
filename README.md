@@ -248,8 +248,9 @@ Examples: `/?mission=titanic`, `/?tile=titanic&landmark=_test&poi=test-bow`
 ## Dives and objectives
 
 A mission's briefing offers a start position: **near-site** (default) puts you
-roughly 350–600 m from the first primary objective, at a safe height above the seabed,
-facing it, lights on — usually reachable in under a minute at Arcade speed.
+150–300 m from the first primary objective (Titanic: 220 m), at a safe height
+above the seabed, facing it with lights on. Mission scan radii leave an approach
+even with Extended sensors. Follow the waypoint and sonar contact to the target.
 **Surface start** descends from the surface instead, for the full descent.
 The briefing previews whichever start you choose and begins there without a teleport.
 Realistic mode still defaults to near-site; surface start is opt-in either way
@@ -257,7 +258,7 @@ Realistic mode still defaults to near-site; surface start is opt-in either way
 
 Every objective carries a plain-language hint saying what it is and roughly
 where (bearing, feature or depth). With **Visual waypoints** on (Arcade default,
-off in Realistic, toggle in Custom) the current objective also gets a
+off in Realistic after the opening approach, toggle in Custom) the current objective also gets a
 world-space waypoint marker, an off-screen edge arrow with distance and depth
 difference, and an "in range" cue. Once you scan a target it is marked scanned
 in the world, on the sonar (when Sonar markers is on) and in the objective tracker for the rest of that

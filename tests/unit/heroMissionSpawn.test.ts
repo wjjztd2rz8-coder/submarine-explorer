@@ -16,6 +16,8 @@ import {
   composedFreeDiveSpawn,
   composedMissionSpawn,
   spawnSettings,
+  missionApproachScanRadius,
+  MISSION_APPROACH_M,
 } from '../../src/game/Spawn.js';
 import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
@@ -50,7 +52,7 @@ afterAll(() => {
 
 for (const { site, primary, before } of heroes) {
   for (const tier of ['low', 'medium', 'high'] as const) {
-    it(`${site} ${tier}: default mission shares free dive's opening and first primary is within 120 m`, async () => {
+    it(`${site} ${tier}: mission opens on a safe approach outside scan range`, async () => {
       const config = makeConfig();
       const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;
       const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
@@ -77,7 +79,7 @@ for (const { site, primary, before } of heroes) {
           config.scan,
           site,
         );
-        const primaries = pois.filter((p) => objectives.some((o) => o.poi === p.id));
+        const primaries = objectives.map((o) => pois.find((p) => o.poi === p.id)!);
         const safeDepth = config.submarine.hullClasses[mission.hull_class!].ratedDepth;
         const poseFor = (targets: typeof primaries) =>
           composedMissionSpawn(
@@ -101,24 +103,43 @@ for (const { site, primary, before } of heroes) {
         )!;
         expect(free).not.toBeNull();
         const pose = poseFor(primaries);
-        // Includes the camera framing overrides as well as translation/yaw.
-        expect(pose).toEqual(free);
+        expect(pose).not.toBeNull();
+        expect(pose).not.toEqual(free);
         const first = pois.find((p) => p.id === objectives[0].poi)!;
         const range = Math.hypot(
           first.position.x - pose.x,
           first.position.y - pose.y,
           first.position.z - pose.z,
         );
-        expect(range).toBeLessThanOrEqual(120);
+        expect(range).toBeCloseTo(MISSION_APPROACH_M[site], 2);
+        expect(range).toBeGreaterThanOrEqual(150);
+        expect(range).toBeLessThanOrEqual(300);
+        expect(range).toBeGreaterThan(missionApproachScanRadius(site, first.radius) * 2);
+        const toTarget = first.position
+          .clone()
+          .sub(new Vector3(pose.x, pose.y, pose.z))
+          .setY(0)
+          .normalize();
+        expect(
+          new Vector3(Math.sin(pose.yaw), 0, -Math.cos(pose.yaw)).dot(toTarget),
+        ).toBeGreaterThan(0.999);
+        expect(
+          props.collide(
+            new Vector3(pose.x, pose.y, pose.z),
+            config.submarine.hullRadius + 4,
+            new Vector3(),
+          ),
+        ).toBe(false);
+        expect(pose.y).toBeGreaterThanOrEqual(safeDepth + config.submarine.hullRadius);
 
         if (site === 'titanic') {
           const sub = new SubMesh({ length: 26, hullClass: mission.hull_class!, tier });
           try {
-            const position = new Vector3(pose.x, pose.y, pose.z);
-            sub.setPose(position, pose.yaw, 0, 0);
+            const position = new Vector3(free.x, free.y, free.z);
+            sub.setPose(position, free.yaw, 0, 0);
             sub.group.updateMatrixWorld(true);
             const rig = new CameraRig(config.camera, 16 / 9, terrain);
-            rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
+            rig.setChaseRadiusDefault(free.chaseRadius, free.chaseOffsetX, free.chaseOffsetY);
             const globalRadius = Math.hypot(
               config.camera.chaseOffset.x,
               config.camera.chaseOffset.y,
@@ -127,7 +148,7 @@ for (const { site, primary, before } of heroes) {
             expect(pose.chaseRadius, 'Titanic inherits the global reset radius').toBeUndefined();
             expect(rig.chaseRadius).toBe(globalRadius);
             expect(rig.chaseRadius).toBeGreaterThan(95);
-            rig.snap(position, pose.yaw, 0);
+            rig.snap(position, free.yaw, 0);
             rig.camera.updateMatrixWorld(true);
             const openingEye = rig.camera.position.clone();
             const screenHull = new Box2();
@@ -185,14 +206,14 @@ for (const { site, primary, before } of heroes) {
             expect(rig.chaseRadius).toBeGreaterThan(globalRadius);
             rig.resetView();
             expect(rig.chaseRadius).toBe(globalRadius);
-            rig.snap(position, pose.yaw, 0);
+            rig.snap(position, free.yaw, 0);
             expect(rig.camera.position).toEqual(openingEye);
           } finally {
             sub.dispose();
           }
         }
 
-        if (site === 'great-blue-hole' || site === 'monterey-canyon') {
+        {
           // Exercise actual Arcade physics and scanner time, rather than infer
           // accessibility from distance or teleport the pilot to the contact.
           const mode = config.settings.gameplayPresets.arcade;
@@ -217,7 +238,12 @@ for (const { site, primary, before } of heroes) {
           run.start(site);
           const scanner = new Scanner(config.scan, bus);
           const multiplier = config.sensorPresets[mode.sensors].scanRadiusMultiplier;
-          scanner.setTargets(pois.map((p) => ({ ...p, radius: p.radius * multiplier })));
+          scanner.setTargets(
+            pois.map((p) => ({
+              ...p,
+              radius: missionApproachScanRadius(site, p.radius) * multiplier,
+            })),
+          );
           const input = {
             throttle: 0,
             yaw: 0,
@@ -234,6 +260,7 @@ for (const { site, primary, before } of heroes) {
             cycleSimSpeed: false,
             togglePhotoMode: false,
           } satisfies InputState;
+          const scanRadius = missionApproachScanRadius(site, first.radius) * multiplier;
           let completedAt: number | null = null;
           let minimumClearance = Infinity;
           const rigs = [1600 / 900, 390 / 844].map((aspect) => {
@@ -241,7 +268,17 @@ for (const { site, primary, before } of heroes) {
             rig.setChaseRadiusDefault(pose.chaseRadius, pose.chaseOffsetX, pose.chaseOffsetY);
             return rig;
           });
-          for (let tick = 0; tick < 3600; tick++) {
+          for (let tick = 0; tick < 7200; tick++) {
+            const delta = first.position.clone().sub(sub.position);
+            input.throttle = delta.length() > scanRadius * 0.8 ? 1 : 0;
+            const desiredYaw = Math.atan2(delta.x, -delta.z);
+            input.yaw = Math.max(
+              -1,
+              Math.min(
+                1,
+                Math.atan2(Math.sin(desiredYaw - sub.yaw), Math.cos(desiredYaw - sub.yaw)),
+              ),
+            );
             sub.step(input, 1 / 60);
             scanner.update(1 / 60, sub.position, sub.getForward(), input.scan);
             run.update(1 / 60);
@@ -260,7 +297,10 @@ for (const { site, primary, before } of heroes) {
                 ).toBeGreaterThanOrEqual(config.camera.terrainClearance - 1e-6);
               }
           }
-          expect(completedAt, 'first primary can be scanned without any transit').not.toBeNull();
+          expect(
+            completedAt,
+            'first primary can be scanned after navigating the approach',
+          ).not.toBeNull();
           expect(completedAt!).toBeLessThanOrEqual(120);
           expect(run.objectives[0].complete).toBe(true);
           expect(sub.hullBreached).toBe(false);
@@ -272,12 +312,12 @@ for (const { site, primary, before } of heroes) {
             tier,
             range,
             completedAt,
-            transit: 0,
+            transit: Math.hypot(sub.position.x - pose.x, sub.position.z - pose.z),
             minimumClearance,
             visualClearance,
           });
           console.log(
-            `VERIFY-1000 ${site} ${tier}: scan=${completedAt}s transit=0m minClearance=${minimumClearance.toFixed(2)}m`,
+            `VERIFY-1000 ${site} ${tier}: scan=${completedAt}s transit=${Math.hypot(sub.position.x - pose.x, sub.position.z - pose.z).toFixed(1)}m minClearance=${minimumClearance.toFixed(2)}m`,
           );
           run.dispose();
         }
@@ -294,7 +334,7 @@ for (const { site, primary, before } of heroes) {
         );
         const oldDelta = Math.hypot(oldPose.x - free.x, oldPose.y - free.y, oldPose.z - free.z);
         console.log(
-          `MISSION-HERO ${site} ${tier}: beforeFirst=${oldRange.toFixed(2)} beforeFreeDelta=${oldDelta.toFixed(2)} afterFirst=${range.toFixed(2)} afterFreeDelta=0.00`,
+          `MISSION-HERO ${site} ${tier}: beforeFirst=${oldRange.toFixed(2)} beforeFreeDelta=${oldDelta.toFixed(2)} afterFirst=${range.toFixed(2)} afterFreeDelta=${Math.hypot(pose.x - free.x, pose.y - free.y, pose.z - free.z).toFixed(2)}`,
         );
       } finally {
         terrain.dispose();

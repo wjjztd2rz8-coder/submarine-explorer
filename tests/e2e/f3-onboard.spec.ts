@@ -9,7 +9,7 @@ import { mkdir } from 'node:fs/promises';
 import { devices, expect, test, type Page } from '@playwright/test';
 import { HINT_THRESHOLDS } from '../../src/game/Hints.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
-import { completeScan } from './helpers/scan.js';
+import { advanceScan, completeScan } from './helpers/scan.js';
 
 const shots = '.cache/codex/shots/f3-onboard';
 const url = '/?tile=titanic&landmark=_test&poi=test-bow&skipBriefing=1&tier=low';
@@ -86,6 +86,41 @@ test('desktop: tutorial starts, advances, skips and stays skipped after reload',
   ).toBe(false);
 });
 
+test('scan coaching waits through held progress and interruption until completion', async ({
+  page,
+}) => {
+  await pauseClockBeforeNavigation(page);
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await clockFramesUntil(page, () => {
+    const g = window.__game as unknown as Probe;
+    return (
+      window.__gameReady === true &&
+      g.discovery.loaded &&
+      g.discovery.spawnedAt === 'test-bow' &&
+      g.scanner.view.candidateId === 'test-bow'
+    );
+  });
+  for (let i = 0; i < 3; i++) await page.locator('.onboard-skip-step').click();
+  await page.clock.fastForward(50);
+  const card = page.locator('.onboard-card');
+  await expect(card).toHaveAttribute('data-step', 'scan');
+  await page.keyboard.down('g');
+  await advanceScan(page, 0.5);
+  await page.clock.fastForward(50);
+  await expect(card.locator('.onboard-card-text')).toContainText('Scanning…');
+  expect(await stepIndex(page)).toBe(3);
+  await page.keyboard.up('g');
+  await page.clock.fastForward(50);
+  await expect(card.locator('.onboard-card-text')).not.toContainText('Scanning…');
+  expect(await stepIndex(page)).toBe(3);
+  await page.keyboard.down('g');
+  await completeScan(page, 'test-bow');
+  await page.keyboard.up('g');
+  await page.clock.fastForward(50);
+  expect(await stepIndex(page)).toBe(4);
+  await expect(card).toHaveAttribute('data-step', 'journal');
+});
+
 test('desktop: Pause opens the controls card for the active device', async ({ page }) => {
   await page.addInitScript((k) => {
     if (!localStorage.getItem(k))
@@ -107,9 +142,11 @@ test('desktop: Pause opens the controls card for the active device', async ({ pa
   // Peek at the touch layout.
   await page.locator('.pause-menu').getByRole('button', { name: 'Controls' }).click();
   await dialog.getByRole('button', { name: 'Touch' }).click();
-  const touchGuide = page.getByRole('dialog', { name: 'How to play', exact: true });
-  await expect(touchGuide).toBeVisible();
-  await expect(touchGuide).toContainText('Left stick');
+  const howTo = page.getByRole('dialog', { name: 'How to play', exact: true });
+  await expect(howTo).toBeVisible();
+  await expect(howTo).toContainText('Left stick');
+  await expect(howTo.locator('.how-to-tile svg')).toHaveCount(10);
+  await expect(howTo.locator('.controls-card-tabs')).toBeVisible();
 });
 
 for (const dismissal of ['button', 'expiry'] as const) {
@@ -263,6 +300,7 @@ test.describe('touch viewport', () => {
     await expect(dialog).toContainText('Left stick');
     await expect(dialog).toContainText('Right slider');
     await expect(dialog.locator('.how-to-tile svg')).toHaveCount(10);
+    await expect(dialog.locator('.controls-card-tabs')).toBeHidden();
     await shot(page, 'touch-controls-card');
   });
 

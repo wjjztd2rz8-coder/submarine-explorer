@@ -3,10 +3,13 @@ import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js
 import type { Discovery } from '../../src/game/Discovery.js';
 import type { Mission } from '../../src/game/Mission.js';
 import type { Props } from '../../src/world/Props.js';
+import { MISSION_APPROACH_M } from '../../src/game/Spawn.js';
+import type { Scanner } from '../../src/game/Scanner.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
 
 interface Game {
   sub: Submarine;
+  scanner: Scanner;
   props: Props;
   discovery: Discovery;
   mission: Mission | null;
@@ -37,6 +40,9 @@ async function pose(page: Page) {
       yaw: g.sub.yaw,
       first: first?.id,
       range: target?.position.distanceTo(g.sub.position),
+      scanRadius: target?.radius,
+      objectiveDistance: g.scanner.view.objectiveDistance,
+      objectiveId: g.scanner.view.objectiveId,
       failedProps: g.props.stats.failed,
     };
   });
@@ -50,7 +56,7 @@ for (const [site, first] of [
   ['lost-city', 'find-poseidon'],
 ]) {
   for (const tier of ['low', 'medium', 'high']) {
-    test(`${site} ${tier}: mission opens at the free-dive scenery with its first primary within 120 m`, async ({
+    test(`${site} ${tier}: mission previews and opens on an approach outside scan range`, async ({
       page,
     }, testInfo) => {
       test.setTimeout(180_000);
@@ -84,9 +90,13 @@ for (const [site, first] of [
       expect(mission.failedProps).toBe(0);
       expect(mission.first).toBe(first);
       expect(mission.range).toBeDefined();
-      expect(mission.range!).toBeLessThanOrEqual(120);
-      expect(distance).toBeLessThanOrEqual(30);
-      expect(yawDegrees).toBeLessThanOrEqual(20);
+      expect(mission.range!).toBeCloseTo(MISSION_APPROACH_M[site], 1);
+      expect(mission.range!).toBeGreaterThan(mission.scanRadius!);
+      expect(mission.range!).toBeLessThanOrEqual(300);
+      expect(distance).toBeGreaterThan(60);
+      expect(mission.objectiveId).toBeTruthy();
+      expect(mission.objectiveDistance).toBeCloseTo(mission.range!, 1);
+      await expect(page.locator('.obj-item.is-current')).toContainText('Head to');
       expect(preview.position).toEqual(mission.position);
       expect(preview.yaw).toEqual(mission.yaw);
       expect(errors).toEqual([]);

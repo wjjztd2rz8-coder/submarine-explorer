@@ -459,6 +459,18 @@ describe('onboarding completion through the system', () => {
       tick();
       expect(onboard.tutorial.step?.id).toBe('scan');
       ctx.bus.emit('scan:started', { poiId: 'test' });
+      expect(onboard.tutorial.step?.id).toBe('scan');
+      tick();
+      expect(views.card.show.mock.lastCall?.[1]).toContain('Scanning…');
+      ctx.bus.emit('scan:progress', { poiId: 'test', progress: 0.42 });
+      tick();
+      expect(views.card.show.mock.lastCall?.[1]).toContain('42%');
+      ctx.bus.emit('scan:aborted', { poiId: 'test', reason: 'released' });
+      tick();
+      expect(onboard.tutorial.step?.id).toBe('scan');
+      expect(views.card.show.mock.lastCall?.[1]).not.toContain('Scanning…');
+      ctx.bus.emit('scan:started', { poiId: 'test' });
+      ctx.bus.emit('scan:complete', { poiId: 'test', landmarkId: 'titanic', firstTime: true });
       expect(onboard.tutorial.step?.id).toBe('journal');
       photos.photos.push({});
       tick();
@@ -495,4 +507,22 @@ describe('onboarding completion through the system', () => {
       system.dispose?.();
     }
   });
+});
+
+it('touch hints use visible button labels and omit the keyboard-only ROV instruction', () => {
+  const { ctx, system, tick, onboard } = setup(['creature']);
+  ctx.input.touchActive = true;
+  try {
+    views.actions!.skipAll();
+    views.chip.show.mockClear();
+    tick(undefined, 61);
+    expect(views.chip.show).not.toHaveBeenCalled();
+    expect(onboard.store.get().seenHints).not.toContain('rov');
+    Object.assign(ctx.power.state, { enabled: true, battery: 0.2 });
+    tick();
+    expect(views.chip.show.mock.lastCall?.[0]).toContain('LIGHTS');
+    expect(views.chip.show.mock.lastCall?.[0]).not.toMatch(/\b(E|G|Space|Shift)\b/);
+  } finally {
+    system.dispose?.();
+  }
 });

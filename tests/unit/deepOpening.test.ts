@@ -164,7 +164,14 @@ describe('Challenger / Endurance opening', () => {
             site === 'challenger-deep' ? -11000 : -6500,
             config.camera,
           );
-          expect(missionPose).toEqual(pose);
+          expect(missionPose).not.toBeNull();
+          expect(missionPose).not.toEqual(pose);
+          expect(
+            target.position.distanceTo(new Vector3(missionPose!.x, missionPose!.y, missionPose!.z)),
+          ).toBeCloseTo(site === 'challenger-deep' ? 200 : 180, 2);
+          expect(missionPose!.y).toBeGreaterThanOrEqual(
+            (site === 'challenger-deep' ? -11000 : -6500) + config.submarine.hullRadius,
+          );
           const scanner = new Scanner(config.scan, new EventBus());
           scanner.setTargets([target]);
           scanner.update(1 / 60, position, forward, false);

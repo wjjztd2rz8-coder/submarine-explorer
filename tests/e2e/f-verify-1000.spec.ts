@@ -21,6 +21,7 @@ import catalog from '../../data/landmarks/index.json' with { type: 'json' };
 const journalSites = '.jr-nav-list > li > .jr-nav-item.is-site';
 
 interface Game {
+  scanner: import('../../src/game/Scanner.js').Scanner;
   config: GameConfig;
   renderer: WebGLRenderer;
   sub: Submarine;
@@ -102,7 +103,7 @@ for (const viewport of [
           'north wall',
         ],
       ]) {
-        test(`${site} ${tier}: first scan without transit, Journal and debrief`, async ({
+        test(`${site} ${tier}: approach, first scan, Journal and debrief`, async ({
           page,
         }, info) => {
           test.setTimeout(240_000);
@@ -130,6 +131,7 @@ for (const viewport of [
             window.dispatchEvent(new Event('resize'));
             return ratio;
           });
+          await page.keyboard.down('w');
           await page.keyboard.down('g');
           let seconds = 0;
           let complete = false;
@@ -142,17 +144,21 @@ for (const viewport of [
               const state = await page.evaluate(() => {
                 const g = window.__game as unknown as Game;
                 return {
+                  range: g.scanner.view.objectiveDistance,
+                  radius: g.scanner.view.objectiveRadius,
                   complete: g.mission!.requiredPrimaries()[0].complete,
                   clearance:
                     g.sub.position.y - g.terrain.sampleHeight(g.sub.position.x, g.sub.position.z),
                   floor: g.config.submarine.hullRadius + g.config.submarine.seabedClearance,
                 };
               });
+              if (state.range < state.radius * 0.8) await page.keyboard.up('w');
               minimumClearance = Math.min(minimumClearance, state.clearance);
               expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 1e-6);
               complete = state.complete;
             }
           } finally {
+            await page.keyboard.up('w');
             await page.keyboard.up('g');
             await page.evaluate((ratio) => {
               (window.__game as unknown as Game).renderer.setPixelRatio(ratio);
@@ -164,7 +170,8 @@ for (const viewport of [
             (window.__game as unknown as Game).sub.position.toArray(),
           );
           const transit = Math.hypot(...end.map((p, i) => p - start.position[i]));
-          expect(transit).toBeLessThan(30);
+          expect(transit).toBeGreaterThan(50);
+          expect(transit).toBeLessThan(300);
           await info.attach('first-scan', {
             body: JSON.stringify({ site, tier, viewport, seconds, transit, minimumClearance, poi }),
             contentType: 'application/json',
