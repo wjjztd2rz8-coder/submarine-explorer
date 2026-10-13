@@ -24,7 +24,7 @@ export function metersPerDegLon(latDeg: number): number {
   return METERS_PER_DEG_LAT * Math.cos((latDeg * Math.PI) / 180);
 }
 
-export interface WorldXZ {
+interface WorldXZ {
   x: number;
   z: number;
 }
@@ -74,14 +74,4 @@ export function normalizeHeadingDeg(deg: number): number {
  */
 export function headingFromForward(dx: number, dz: number): number {
   return normalizeHeadingDeg((Math.atan2(dx, -dz) * 180) / Math.PI);
-}
-
-/** Format a latitude as e.g. `41.7300 N`. */
-export function formatLat(lat: number, digits = 4): string {
-  return `${Math.abs(lat).toFixed(digits)}° ${lat >= 0 ? 'N' : 'S'}`;
-}
-
-/** Format a longitude as e.g. `49.9500 W`. */
-export function formatLon(lon: number, digits = 4): string {
-  return `${Math.abs(lon).toFixed(digits)}° ${lon >= 0 ? 'E' : 'W'}`;
 }

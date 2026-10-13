@@ -1,5 +1,16 @@
 # Beebe Vent Field content: sources and notes (package C4, beebe-vent-field)
 
+## 1400 content fact audit — 2026-10-11
+
+The current claim checks, corrections, primary references and unresolved items are
+recorded in [1400-f-audit-content-facts](../../../plan/progress/1400-f-audit-content-facts.md).
+That review supersedes conflicting positions, depths and source attributions in the
+historical research notes below. Published site references and authored scan-marker
+placements are distinct; the Journal’s existing single provenance tags identify additions without prose caveats.
+The [Connelly et al. 2012 full text](https://pmc.ncbi.nlm.nih.gov/articles/PMC3274706/)
+was read via PMC for this review, confirming the discovery survey and its 80 m
+diameter / 50 m high mound description; the old access limitation below is historical.
+
 ## F-1110 audit (2026-10-09)
 
 [The five-site primary-source audit](../../../plan/progress/F-1110.md) records
@@ -25,7 +36,7 @@ Researched 2026-09-23. Files: `pois.json`, `guide.json`, `props.json`, `mission.
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | Connelly, D.P. et al. 2012, "Hydrothermal vent fields and chemosynthetic biota on the world's deepest seafloor spreading centre", Nature Communications 3:620 (facts taken via WebFetch of Wikipedia's summary and WebSearch results after the Nature.com page itself redirected to a login wall) | https://www.nature.com/articles/ncomms1636                            | Discovery history (2009-2010, RV Cape Hatteras plume detection, RRS James Cook confirmation with Nereus/Autosub6000/HyBIS), depth range 4,957-4,987 m, supercritical venting, ultraslow Mid-Cayman spreading rate, primary citation for the field |
 | 2   | Beebe Hydrothermal Vent Field — Wikipedia                                                                                                                                                                                                                                                         | https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field           | Coordinates (18 32'48"N 81 43'6"W), depth range, max temperature (403 degC at Beebe 1-5), chimney mineralogy, naming origin (William Beebe), Rimicaris hybisae's iron-brown color and eye loss                                                    |
-| 3   | Webber, A.P. et al. 2015, "Geology, sulfide geochemistry and supercritical venting at the Beebe Hydrothermal Vent Field, Cayman Trough", Geochemistry, Geophysics, Geosystems 16 (accessed via WebSearch summary; AGU page not fetched directly)                                                  | https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879 | Seven sulfide mounds on the field's western side, low-salinity fluids around 401–403 °C at about 500 bar, chimney mineralogy detail (pyrite, pyrrhotite)                                                                                          |
+| 3   | Webber, A.P. et al. 2015, "Geology, sulfide geochemistry and supercritical venting at the Beebe Hydrothermal Vent Field, Cayman Trough", Geochemistry, Geophysics, Geosystems 16 (accessed via WebSearch summary; AGU page not fetched directly)                                                  | https://agupubs.onlinelibrary.wiley.com/doi/full/10.1002/2015GC005879 | At least six discrete sulfide mounds, three with focused active venting, low-salinity fluids around 401–403 °C at about 500 bar, chimney mineralogy detail (pyrite, pyrrhotite)                                                                   |
 | 4   | Nye, V. et al. 2012, "A new species of Rimicaris (Crustacea: Decapoda: Caridea: Alvinocarididae) from hydrothermal vent fields on the Mid-Cayman Spreading Centre" (author's own PDF copy)                                                                                                        | http://www.joncopley.com/docs/Rimicaris_hybisae.pdf                   | Species description, naming after HyBIS, eye loss with age, dorsal light-sensing organ, episymbiotic chemosynthetic feeding, relation to Rimicaris exoculata                                                                                      |
 | 5   | Diverse styles of submarine venting on the ultraslow spreading Mid-Cayman Rise — PNAS                                                                                                                                                                                                             | https://www.pnas.org/doi/full/10.1073/pnas.1009205107                 | Corroborates the Mid-Cayman Spreading Centre's ultraslow spreading regime and diverse venting styles (Beebe vs. the off-axis Von Damm field)                                                                                                      |
 | 6   | Von Damm Vent Field — Wikipedia                                                                                                                                                                                                                                                                   | https://en.wikipedia.org/wiki/Von_Damm_Vent_Field                     | Von Damm's coordinates (18 22'36"N 81 47'52"W = 18.37667, -81.79778) and depth (~2,300 m), used only to confirm it falls outside this tile's bbox (south boundary 18.39626 N) -- excluded from this mission per the task brief                    |
@@ -88,8 +99,8 @@ the task brief, so no mid-water spawn shortcut (as used at Challenger Deep) is n
 
 ## Hull class
 
-`hull_class: "C"` is rated to -11,000 m. Hull B's -6,500 m rating also clears
-this tile's terrain; Class C remains the authored mission loadout. The deepest POI
+`hull_class: "C"` is rated to -11,000 m. Hull B’s 6,500 m rating does not clear the entire tile’s 6,575.3 m minimum.
+Class C remains the authored mission loadout and clears the whole grid. The deepest POI
 (`bvf-spreading-axis`, -5,395.8 m) is well within its operating rating.
 
 ## Chimney props

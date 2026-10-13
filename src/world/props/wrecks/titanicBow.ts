@@ -74,7 +74,7 @@ import {
 import { mulberry32, valueNoise3 } from './shared.js';
 
 /** Stations along the bow section (m from the stem). */
-export const TITANIC_BOW = {
+const TITANIC_BOW = {
   forecastleEnd: 39,
   wellEnd: 58,
   bridge: 60.5,

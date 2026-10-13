@@ -24,7 +24,7 @@ export const WRECK_SCATTERS = [
   'endurance-stern',
 ] as const;
 
-export type WreckHullId = (typeof WRECK_HULLS)[number];
+type WreckHullId = (typeof WRECK_HULLS)[number];
 export type WreckScatterId = (typeof WRECK_SCATTERS)[number];
 export type WreckId = WreckHullId | WreckScatterId;
 

@@ -5,6 +5,8 @@
  * `?debrief=1` opens the free-dive variant for screenshots.
  */
 
+import { el } from './dom.js';
+
 import type { DiveRating } from '../game/Progress.js';
 import type { DebriefStats } from '../game/Objectives.js';
 import { FocusTrap } from './FocusTrap.js';
@@ -25,16 +27,12 @@ export interface ExplorationSummary {
   events: string[];
 }
 
-export interface DebriefOptions {
+interface DebriefOptions {
   /** Default: reload the same URL. Used when `show()` gets no actions. */
   onDiveAgain?: () => void;
   /** Opens the Journal. Used when `show()` gets no actions. */
   onFieldGuide?: () => void;
   parent?: HTMLElement;
-}
-
-export function formatDistance(m: number): string {
-  return m >= 1000 ? `${(m / 1000).toFixed(2)} km` : `${m.toFixed(0)} m`;
 }
 
 export function formatDuration(s: number): string {
@@ -109,17 +107,6 @@ export function summarizeDive(
               ? 'Keep exploring to finish the primary objectives.'
               : 'Open the Journal to read your finds.';
   return { highlight, next, kind };
-}
-
-function el<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className?: string,
-  text?: string,
-): HTMLElementTagNameMap[K] {
-  const e = document.createElement(tag);
-  if (className) e.className = className;
-  if (text !== undefined) e.textContent = text;
-  return e;
 }
 
 export class Debrief {

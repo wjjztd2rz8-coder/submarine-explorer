@@ -5,6 +5,8 @@
  * window resize handler and the `?debugTerrain=1` once-a-second log.
  */
 
+import { smoothstep as smooth } from '../../util/math.js';
+
 import type { PostFrame } from '../../shaders/underwater.js';
 import { UnderwaterPass } from '../../shaders/underwater.js';
 import { uiScaleFactors } from '../../ui/HUD.js';
@@ -13,11 +15,6 @@ import { Disposables } from '../Disposables.js';
 import { drawWithReducedMotion } from '../../render/reducedMotion.js';
 
 const cleanup = new Disposables();
-
-const smooth = (a: number, b: number, x: number): number => {
-  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
-  return t * t * (3 - 2 * t);
-};
 
 /** God-ray strength by camera depth: none above the surface, best in the top tens of metres, gone by the twilight base. */
 export function godRayStrength(base: number, depthM: number): number {

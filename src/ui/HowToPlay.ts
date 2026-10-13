@@ -6,7 +6,7 @@
  * Desktop and gamepad keep the key list in {@link ./ControlsCard.ts}.
  */
 
-export interface HowToTile {
+interface HowToTile {
   id: string;
   label: string;
   words: string;
@@ -14,7 +14,7 @@ export interface HowToTile {
   art: string;
 }
 
-export interface HowToGroup {
+interface HowToGroup {
   heading: string;
   tiles: HowToTile[];
 }
@@ -22,7 +22,7 @@ export interface HowToGroup {
 const ARROW = (x: number, y: number, rot: number): string =>
   `<path class="htp-f" d="M0-5 5 3H-5Z" transform="translate(${x} ${y}) rotate(${rot})"/>`;
 
-export const HOW_TO_PLAY: readonly HowToGroup[] = [
+const HOW_TO_PLAY: readonly HowToGroup[] = [
   {
     heading: 'Fly',
     tiles: [

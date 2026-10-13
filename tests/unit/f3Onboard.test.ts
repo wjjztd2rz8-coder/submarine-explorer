@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { Input } from '../../src/core/Input.js';
 import {
   HINT_TEXT,
   HintEngine,
@@ -293,6 +294,22 @@ describe('controls layouts', () => {
       expect(groups.length).toBeGreaterThan(1);
       for (const g of groups) expect(g.rows.length).toBeGreaterThan(0);
     }
+  });
+  it('documents the new gamepad bindings from the action map and without an Input instance', () => {
+    const input = new Input({ storage: null });
+    for (const source of [undefined, input]) {
+      const rows = controlGroups('gamepad', key as never, source).flatMap((group) => group.rows);
+      expect(rows).toContainEqual(['D-pad left', 'Journal']);
+      expect(rows).toContainEqual(['D-pad down', 'Reset camera']);
+      expect(rows).toContainEqual(['Left bumper', 'Capture photo (in photo mode)']);
+      expect(rows).toContainEqual(['D-pad up', 'Sim speed']);
+      expect(rows).toContainEqual(['Right bumper', 'Scan (hold)']);
+      expect(new Set(rows.map(([control]) => control)).size).toBe(rows.length);
+    }
+    expect(input.getAction('toggleJournal')?.pad).toBe('D-pad left');
+    expect(input.getAction('resetCamera')?.pad).toBe('D-pad down');
+    expect(input.getAction('capturePhoto')?.pad).toBe('Left bumper');
+    expect(input.getAction('toggleRov')?.pad).toBeUndefined();
   });
   it('shows touch buttons and no keyboard keys on touch', () => {
     const text = JSON.stringify(controlGroups('touch', key as never));

@@ -116,7 +116,7 @@ describe('scan arm cues', () => {
     const { AudioSystem } = await import('../../src/audio/AudioSystem.js');
     const { EventBus } = await import('../../src/core/EventBus.js');
     const bus = new EventBus();
-    const audio = new AudioSystem(config.audio, bus, { sampleHeight: () => -100 });
+    const audio = new AudioSystem(config.audio, bus);
     const servo = vi.spyOn(audio, 'playManipulator').mockImplementation(() => {});
     vi.spyOn(audio, 'playDiscoveryChime').mockImplementation(() => {});
     (audio as unknown as { wireBusEvents(): void }).wireBusEvents();

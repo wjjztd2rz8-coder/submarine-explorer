@@ -10,7 +10,7 @@
 
 import * as THREE from 'three';
 
-export interface SphereCollider {
+interface SphereCollider {
   kind: 'sphere';
   center: THREE.Vector3;
   radius: number;
@@ -18,7 +18,7 @@ export interface SphereCollider {
   boundRadius: number;
 }
 
-export interface BoxCollider {
+interface BoxCollider {
   kind: 'box';
   center: THREE.Vector3;
   halfExtents: THREE.Vector3;
