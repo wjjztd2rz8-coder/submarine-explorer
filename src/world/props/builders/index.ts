@@ -5,7 +5,6 @@
  *   wrecks.ts   hull-block, rust texture  (wrecks package)
  *   debris.ts   debris                    (wrecks package)
  *   vents.ts    chimney                   (vents / reefs / geology package)
- *   reefs.ts    —                         (vents / reefs / geology package)
  *   geology.ts  —                         (vents / reefs / geology package)
  *   generic.ts  box silhouette impostors  (shared)
  *   shared.ts   seeding, noise, geometry helpers and the builder types
@@ -20,7 +19,6 @@
 import type { ProceduralPropKind } from '../../../core/Config.js';
 import { DEBRIS_BUILDERS } from './debris.js';
 import { GEOLOGY_BUILDERS } from './geology.js';
-import { REEF_BUILDERS } from './reefs.js';
 import type { ProceduralBuilder } from './shared.js';
 import { VENT_BUILDERS } from './vents.js';
 import { WRECK_BUILDERS } from './wrecks.js';
@@ -29,7 +27,6 @@ export const PROCEDURAL_BUILDERS = {
   ...WRECK_BUILDERS,
   ...DEBRIS_BUILDERS,
   ...VENT_BUILDERS,
-  ...REEF_BUILDERS,
   ...GEOLOGY_BUILDERS,
 } satisfies Record<ProceduralPropKind, ProceduralBuilder>;
 
