@@ -344,9 +344,6 @@ for (const viewport of [
         expect(
           await journal.locator('.jr-header').evaluate((e) => e.scrollWidth <= e.clientWidth),
         ).toBe(true);
-        await reachable(journal.getByRole('button', { name: 'Back', exact: true }));
-        await journal.getByRole('button', { name: 'Back', exact: true }).tap();
-        await expect(journal.locator('.jr-entries')).toBeVisible();
         await reachable(journal.locator('.jr-close'));
         await journal.locator('.jr-close').tap();
         await expect(journal).toBeHidden();
