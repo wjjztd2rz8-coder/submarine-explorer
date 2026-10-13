@@ -1,5 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import type { GameContext } from '../../src/app/context.js';
+import type { FrameState } from '../../src/app/System.js';
 import { createTouchSystem } from '../../src/app/systems/touch.js';
 import type { Input } from '../../src/core/Input.js';
 import { TOUCH_SEEN_KEY } from '../../src/core/Touch.js';
@@ -30,7 +31,10 @@ class Element extends EventTarget {
   getBoundingClientRect() {
     return { left: 0, top: 0, width: 120, height: 160 };
   }
-  setAttribute() {}
+  attributes = new Map<string, string>();
+  setAttribute(name: string, value: string) {
+    this.attributes.set(name, value);
+  }
   querySelectorAll() {
     return [];
   }
@@ -72,6 +76,7 @@ function setup(hardwareTouch = false) {
     touchActive: false,
     touchAxes: { throttle: 0, yaw: 0, ballast: 0 },
     touchHeld: new Set(),
+    touchBoost: false,
     touchLook: vi.fn(),
   } as unknown as Input;
   const opts = {
@@ -138,6 +143,89 @@ it('still follows mouse and keyboard input after restoring saved touch detection
   expect(touch.active).toBe(false);
   expect(root.classList.contains('is-touch')).toBe(false);
 });
+
+it('toggles boost on completed taps and clears its visual when gameplay rejects boost', () => {
+  const { create, input } = setup(true);
+  const touch = create();
+  touch.update(true, false);
+  const boost = (touch.root as unknown as Element).children[5]!;
+  boost.dispatchEvent(new Event('pointerdown'));
+  boost.dispatchEvent(new Event('pointercancel'));
+  expect(input.touchBoost).toBe(false);
+  boost.dispatchEvent(new Event('click'));
+  touch.update(true, false, true);
+  expect(input.touchBoost).toBe(true);
+  expect(boost.attributes.get('aria-pressed')).toBe('true');
+  expect(boost.classList.contains('is-active')).toBe(true);
+  boost.dispatchEvent(new Event('click'));
+  expect(input.touchBoost).toBe(false);
+  boost.dispatchEvent(new Event('click'));
+  touch.update(true, false, false);
+  expect(input.touchBoost).toBe(false);
+  expect(boost.attributes.get('aria-pressed')).toBe('false');
+  expect(boost.classList.contains('is-active')).toBe(false);
+  touch.update(true, false, true);
+  expect(input.touchBoost).toBe(false);
+});
+
+it('wires Journal through the action map and follows boost rejection from the frame', () => {
+  const { opts, input } = setup(true);
+  const system = createTouchSystem();
+  let touch: TouchControls;
+  const journal = new Element();
+  input.touchEdge = vi.fn();
+  const ctx = {
+    ...opts,
+    app: { state: 'dive' },
+    params: new URLSearchParams('touch=1'),
+    photoMode: { active: false },
+    hud: {
+      root: { querySelector: () => journal },
+    },
+    expose: (exposed: { touch: TouchControls }) => {
+      touch = exposed.touch;
+    },
+  } as unknown as GameContext;
+  system.init?.(ctx);
+  controls.push(touch!);
+  system.start?.(ctx);
+  journal.dispatchEvent(new Event('click'));
+  expect(input.touchEdge).toHaveBeenCalledExactlyOnceWith('toggleJournal');
+  const frame = { frozen: false, state: { boost: true } } as FrameState;
+  system.frame?.['late.input']?.(frame, ctx);
+  const boost = (touch!.root as unknown as Element).children[5]!;
+  boost.dispatchEvent(new Event('click'));
+  system.frame?.['late.input']?.(frame, ctx);
+  expect(boost.attributes.get('aria-pressed')).toBe('true');
+  frame.state = { ...frame.state, boost: false };
+  system.frame?.['late.input']?.(frame, ctx);
+  expect(input.touchBoost).toBe(false);
+  expect(boost.attributes.get('aria-pressed')).toBe('false');
+  system.dispose?.();
+  journal.dispatchEvent(new Event('click'));
+  expect(input.touchEdge).toHaveBeenCalledOnce();
+});
+
+it.each(['pause', 'photo', 'blur', 'desktop', 'dispose'])(
+  'clears latched boost on %s and requires another tap',
+  (interruption) => {
+    const { create, input, win } = setup(true);
+    const touch = create();
+    touch.update(true, false);
+    const boost = (touch.root as unknown as Element).children[5]!;
+    boost.dispatchEvent(new Event('click'));
+    if (interruption === 'pause') touch.update(false, false);
+    else if (interruption === 'photo') touch.update(true, true);
+    else if (interruption === 'blur') win.dispatchEvent(new Event('blur'));
+    else if (interruption === 'desktop') touch.setTouchMode(false);
+    else touch.dispose();
+    expect(input.touchBoost).toBe(false);
+    expect(boost.attributes.get('aria-pressed')).toBe('false');
+    expect(boost.classList.contains('is-active')).toBe(false);
+    touch.update(true, false, true);
+    expect(input.touchBoost).toBe(false);
+  },
+);
 
 it.each(['resize', 'orientationchange'])(
   'releases held axes, buttons and camera gestures on %s',

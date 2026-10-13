@@ -10,6 +10,7 @@ import type { GameSystem } from '../System.js';
 
 export function createTouchSystem(): GameSystem {
   let touch: TouchControls | null = null;
+  let removeJournal: (() => void) | undefined;
   return {
     name: 'touch',
     init(ctx) {
@@ -25,12 +26,19 @@ export function createTouchSystem(): GameSystem {
       ctx.expose({ touch });
       registerServiceWorker();
     },
+    start(ctx) {
+      const journal = ctx.hud.root.querySelector<HTMLButtonElement>('.hud-journal')!;
+      const open = (): void => ctx.input.touchEdge('toggleJournal');
+      journal.addEventListener('click', open);
+      removeJournal = () => journal.removeEventListener('click', open);
+    },
     frame: {
       'late.input': (f, ctx) => {
-        touch?.update(!f.frozen && ctx.app.state === 'dive', ctx.photoMode.active);
+        touch?.update(!f.frozen && ctx.app.state === 'dive', ctx.photoMode.active, f.state.boost);
       },
     },
     dispose() {
+      removeJournal?.();
       touch?.dispose();
       touch = null;
     },

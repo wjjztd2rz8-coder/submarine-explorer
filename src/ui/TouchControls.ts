@@ -1,6 +1,6 @@
 /**
  * On-screen touch controls (F1-TOUCH): a left virtual stick (thrust and turn),
- * a right ballast slider (rise / sink), hold and tap buttons (Scan, Boost,
+ * a right ballast slider (rise / sink), hold Scan and tap buttons (Boost,
  * Lights, Sonar, Photo, Pause), drag-to-look, pinch zoom and double-tap to
  * reset the camera.
  *
@@ -57,11 +57,12 @@ export class TouchControls {
   private readonly stickKnob: HTMLDivElement;
   private readonly sliderTrack: HTMLDivElement;
   private readonly sliderThumb: HTMLDivElement;
+  private readonly boostButton: HTMLButtonElement;
   private readonly rotateHint: HTMLDivElement;
   private readonly disposers: Array<() => void> = [];
   private stickPointer: number | null = null;
   private sliderPointer: number | null = null;
-  private readonly heldPointers = new Map<number, 'scan' | 'boost'>();
+  private readonly heldPointers = new Map<number, 'scan'>();
   private hintShown = false;
   private hintTimer = 0;
 
@@ -105,11 +106,18 @@ export class TouchControls {
     const buttons = el('div', 'tc-buttons');
     buttons.append(
       this.holdButton('scan', 'SCAN', 'tc-btn-scan'),
-      this.holdButton('boost', 'BOOST', 'tc-btn-boost'),
       this.tapButton('toggleLights', 'LIGHTS', 'tc-btn-lights'),
       this.tapButton('toggleSonar', 'SONAR', 'tc-btn-sonar'),
       this.tapButton('togglePhotoMode', 'PHOTO', 'tc-btn-photo'),
     );
+    this.boostButton = el('button', 'tc-btn tc-btn-boost', 'BOOST');
+    this.boostButton.type = 'button';
+    this.boostButton.setAttribute('aria-label', 'Boost');
+    this.boostButton.setAttribute('aria-pressed', 'false');
+    this.boostButton.addEventListener('click', () => {
+      this.input.touchBoost = !this.input.touchBoost;
+      this.syncBoost();
+    });
     const pause = el('button', 'tc-btn tc-btn-pause');
     pause.type = 'button';
     pause.setAttribute('aria-label', 'Pause');
@@ -120,6 +128,7 @@ export class TouchControls {
     this.rotateHint.hidden = true;
 
     this.root.append(this.stickBase, this.sliderTrack, buttons, pause, this.rotateHint);
+    this.root.append(this.boostButton);
     (opts.parent ?? document.body).append(this.root);
     this.bindCamera();
     this.bindModeSwitch();
@@ -156,9 +165,13 @@ export class TouchControls {
    * menu); `photo` while photo mode frames a shot (controls stay hidden so the
    * frame is clear, look and pinch still work).
    */
-  update(inDive: boolean, photo: boolean): void {
+  update(inDive: boolean, photo: boolean, boostAllowed = true): void {
     if (this.disposed) return;
     const show = this.touchMode && inDive && !photo;
+    // progress can reject the sampled boost once its meter is empty. Drop the
+    // latch so recovery never silently restarts boost without another tap.
+    if (!show || !boostAllowed) this.input.touchBoost = false;
+    this.syncBoost();
     if (show !== this.shouldShow) {
       this.shouldShow = show;
       this.root.hidden = !show;
@@ -316,7 +329,7 @@ export class TouchControls {
 
   // ------------------------------------------------------------- buttons
 
-  private holdButton(id: 'scan' | 'boost', label: string, cls: string): HTMLButtonElement {
+  private holdButton(id: 'scan', label: string, cls: string): HTMLButtonElement {
     const b = el('button', `tc-btn ${cls}`, label);
     b.type = 'button';
     b.addEventListener('pointerdown', (e) => {
@@ -452,10 +465,18 @@ export class TouchControls {
 
   // ------------------------------------------------------------- helpers
 
+  private syncBoost(): void {
+    const on = this.input.touchBoost;
+    this.boostButton.classList.toggle('is-active', on);
+    this.boostButton.setAttribute('aria-pressed', String(on));
+  }
+
   private releaseAll(): void {
     this.releaseStick();
     this.releaseSlider();
     this.input.touchHeld.clear();
+    this.input.touchBoost = false;
+    this.syncBoost();
     this.heldPointers.clear();
     this.looks.clear();
     this.pinchDist = 0;

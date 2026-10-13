@@ -107,7 +107,9 @@ test('desktop: Pause opens the controls card for the active device', async ({ pa
   // Peek at the touch layout.
   await page.locator('.pause-menu').getByRole('button', { name: 'Controls' }).click();
   await dialog.getByRole('button', { name: 'Touch' }).click();
-  await expect(dialog).toContainText('Left stick');
+  const touchGuide = page.getByRole('dialog', { name: 'How to play', exact: true });
+  await expect(touchGuide).toBeVisible();
+  await expect(touchGuide).toContainText('Left stick');
 });
 
 for (const dismissal of ['button', 'expiry'] as const) {
@@ -213,7 +215,7 @@ test.describe('touch viewport', () => {
     const journal = page.locator('.journal');
     await expect(journal).toBeVisible();
     await expect.poll(async () => (await saved(page))?.tutorialDone).toBe(true);
-    await journal.getByRole('button', { name: 'Close', exact: true }).tap();
+    await journal.getByRole('button', { name: 'Close Journal', exact: true }).tap();
     await expect(journal).toBeHidden();
     await expect(pause).toBeVisible();
     await expect(page.locator('html')).toHaveClass(/is-touch/);
@@ -253,9 +255,14 @@ test.describe('touch viewport', () => {
     await dismissTutorial(page, true);
     await expect(card).toBeHidden();
     await page.locator('.tc-btn-pause').tap();
-    await page.locator('.pause-menu').getByRole('button', { name: 'Controls' }).tap();
-    const dialog = page.getByRole('dialog', { name: 'Controls guide' });
-    await expect(dialog).toContainText('Showing the layout for your touch');
+    await page
+      .locator('.pause-menu')
+      .getByRole('button', { name: 'How to play', exact: true })
+      .tap();
+    const dialog = page.getByRole('dialog', { name: 'How to play', exact: true });
+    await expect(dialog).toContainText('Left stick');
+    await expect(dialog).toContainText('Right slider');
+    await expect(dialog.locator('.how-to-tile svg')).toHaveCount(10);
     await shot(page, 'touch-controls-card');
   });
 

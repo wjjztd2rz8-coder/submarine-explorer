@@ -8,6 +8,8 @@
   --tc-bg: rgba(6, 22, 28, 0.34);
   --tc-line: rgba(190, 236, 240, 0.4);
   --tc-hot: rgba(46, 217, 217, 0.5);
+  --tc-slider-height: min(38vh, max(150px, calc(176 * var(--tc-s))));
+  --tc-button-size: max(52px, calc(58 * var(--tc-s)));
   position: fixed;
   inset: 0;
   z-index: 21;
@@ -81,7 +83,7 @@
   right: calc(env(safe-area-inset-right, 0px) + var(--tc-edge));
   bottom: calc(env(safe-area-inset-bottom, 0px) + var(--tc-edge));
   width: max(56px, calc(64 * var(--tc-s)));
-  height: min(38vh, max(150px, calc(176 * var(--tc-s))));
+  height: var(--tc-slider-height);
   border-radius: 999px;
   background: var(--tc-bg);
   border: 2px solid var(--tc-line);
@@ -123,7 +125,7 @@
   bottom: 9%;
 }
 
-/* Buttons: a 2 x 3 grid left of the slider. */
+/* Scan and utility actions stay left of the Boost/ballast dock. */
 .tc-buttons {
   position: absolute;
   right: calc(
@@ -132,8 +134,8 @@
   );
   bottom: calc(env(safe-area-inset-bottom, 0px) + var(--tc-edge));
   display: grid;
-  grid-template-columns: repeat(3, max(52px, calc(58 * var(--tc-s))));
-  grid-auto-rows: max(52px, calc(58 * var(--tc-s)));
+  grid-template-columns: repeat(3, var(--tc-button-size));
+  grid-auto-rows: var(--tc-button-size);
   gap: calc(10 * var(--tc-s));
 }
 .tc-btn {
@@ -149,7 +151,8 @@
   min-width: 48px;
   min-height: 48px;
 }
-.tc-btn.is-held {
+.tc-btn.is-held,
+.tc-btn.is-active {
   background: var(--tc-hot);
   border-color: rgba(214, 246, 248, 0.9);
 }
@@ -166,8 +169,15 @@
   grid-row: 1;
 }
 .tc-btn-boost {
-  grid-column: 1;
-  grid-row: 3;
+  position: absolute;
+  right: calc(env(safe-area-inset-right, 0px) + var(--tc-edge));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--tc-edge) + var(--tc-slider-height) + 12px);
+  width: max(56px, calc(64 * var(--tc-s)));
+  height: var(--tc-button-size);
+}
+.tc-btn-boost.is-active {
+  box-shadow: 0 0 12px rgba(46, 217, 217, 0.45);
+  color: #fff;
 }
 .tc-btn-scan {
   grid-column: 2 / span 2;
@@ -241,6 +251,8 @@
     --tc-portrait-slider-height: min(26vh, max(140px, calc(160 * var(--tc-s))));
     --tc-portrait-button-size: max(48px, calc(52 * var(--tc-s)));
     --tc-portrait-button-gap: calc(8 * var(--tc-s));
+    --tc-slider-height: var(--tc-portrait-slider-height);
+    --tc-button-size: var(--tc-portrait-button-size);
     --tc-portrait-clearance: calc(
       var(--tc-edge) +
         max(
@@ -267,8 +279,17 @@
     grid-row: 2;
   }
   .tc-btn-boost {
-    grid-column: 2;
-    grid-row: 2;
+    /* Beside the slider, in the second-row slot nearest the right thumb.
+       This keeps the portrait control envelope below the tutorial strip. */
+    right: calc(
+      env(safe-area-inset-right, 0px) + var(--tc-edge) + max(56px, calc(64 * var(--tc-s))) +
+        calc(14 * var(--tc-s))
+    );
+    bottom: calc(
+      env(safe-area-inset-bottom, 0px) + var(--tc-edge) + var(--tc-portrait-button-size) +
+        var(--tc-portrait-button-gap)
+    );
+    width: var(--tc-portrait-button-size);
   }
   .tc-btn-scan {
     grid-column: 1 / span 2;
@@ -281,16 +302,83 @@
   .tc-root {
     /* HUD reserves 270 px for this cluster. Keep enlarged controls inside it. */
     --tc-s: min(calc(var(--ui-scale, 1) * 1px), 0.8px);
+    --tc-slider-height: min(50vh, max(140px, calc(164 * var(--tc-s))));
   }
   .tc-stick {
     width: max(104px, calc(118 * var(--tc-s)));
   }
   .tc-slider {
-    height: min(50vh, max(140px, calc(164 * var(--tc-s))));
+    height: var(--tc-slider-height);
   }
   .tc-root.tc-sonar-open .tc-btn-pause {
     /* The expanded map occupies the centre, including the usual Pause slot. */
     left: calc(12px + env(safe-area-inset-left, 0px));
+  }
+}
+
+/* Phone tutorial strips reserve the right Boost column. */
+@media (orientation: landscape) and (max-width: 900px) and (max-height: 460px) {
+  html.is-touch:has(.tc-root) .onboard-card {
+    /* The strip crosses Boost above the slider. End it eight pixels before
+       the right dock, using the same capped edge offset as the controls. */
+    right: calc(env(safe-area-inset-right, 0px) + 20px * min(var(--ui-scale), 0.8) + 56px + 8px);
+  }
+}
+
+@media (orientation: landscape) and (max-width: 700px) and (max-height: 460px) {
+  html.is-touch:has(.tc-root) .onboard-card {
+    /* Wrapped contacts and mission telemetry reach below the wide-phone
+       strip. Use the centre gap below them, beside the right action cluster. */
+    right: calc(270px + env(safe-area-inset-right, 0px));
+    bottom: calc(176px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Journal shares the existing HUD footer on desktop, and the Pause row on touch. */
+.hud-journal {
+  pointer-events: auto;
+  padding: 5px 9px;
+  min-height: 32px;
+  border: 1px solid var(--hud-border);
+  border-radius: 4px;
+  background: var(--hud-bg);
+  color: var(--hud-text);
+  font:
+    600 11px system-ui,
+    sans-serif;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+html.is-touch .hud-journal {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 8px * var(--ui-scale));
+  left: calc(34% + max(48px, 50px * var(--ui-scale)) + 8px);
+  min-width: 64px;
+  width: 72px;
+  min-height: 48px;
+  height: max(48px, 50px * var(--ui-scale));
+}
+@media (orientation: portrait) and (max-width: 700px) {
+  html.is-touch .hud-journal {
+    left: auto;
+    right: calc(20px + env(safe-area-inset-right, 0px) + max(48px, 50px * var(--ui-scale)));
+    top: calc(12px + env(safe-area-inset-top, 0px));
+  }
+}
+@media (orientation: landscape) and (max-height: 460px) {
+  html.is-touch .hud-journal {
+    top: calc(env(safe-area-inset-top, 0px) + 8px * min(var(--ui-scale), 0.8));
+    left: calc(34% + 56px);
+    height: 48px;
+  }
+  html.is-touch:has(.tc-sonar-open) .hud-journal {
+    left: calc(68px + env(safe-area-inset-left, 0px));
+  }
+  html.is-touch:has(.tc-sonar-open) .sonar.d-sonar-expanded {
+    /* Reserve both top buttons on the smallest landscape phone. */
+    max-width: calc(
+      100vw - 418px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+    );
   }
 }
 

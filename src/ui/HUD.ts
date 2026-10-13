@@ -144,6 +144,7 @@ export class HUD {
       <div class="hud-prompt" hidden></div>
       <div class="hud-control-tips" hidden></div>
       <div class="hud-footer">
+        <button class="hud-journal" type="button" title="Journal (J)" aria-label="Journal (J)">JOURNAL</button>
         <button class="hud-reset-camera" type="button" aria-label="Reset camera">Reset camera</button>
       </div>
     `;

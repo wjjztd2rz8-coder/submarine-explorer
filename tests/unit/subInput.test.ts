@@ -4,7 +4,7 @@
  * touch `localStorage`.
  */
 
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
@@ -65,6 +65,39 @@ describe('pointer look preference and lock decisions', () => {
 });
 
 describe('Input action map', () => {
+  it('keeps gamepad boost held only while the trigger is down', () => {
+    const buttons = Array.from({ length: 8 }, () => ({ value: 0, pressed: false }));
+    vi.stubGlobal('navigator', {
+      getGamepads: () => [{ connected: true, index: 0, axes: [0, 0, 0, 0], buttons }],
+    });
+    try {
+      const input = makeInput();
+      buttons[7]!.value = 1;
+      expect(input.sample().boost).toBe(true);
+      input.endFrame();
+      expect(input.sample().boost).toBe(true);
+      buttons[7]!.value = 0;
+      expect(input.sample().boost).toBe(false);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+  it('keeps the touch boost latch independent of keyboard hold and end-of-frame edges', () => {
+    const input = makeInput();
+    input.touchBoost = true;
+    expect(input.sample().boost).toBe(true);
+    input.endFrame();
+    expect(input.sample().boost).toBe(true);
+    input.touchBoost = false;
+    expect(input.sample().boost).toBe(false);
+    input.injectKey('ShiftLeft', true);
+    expect(input.sample().boost).toBe(true);
+    input.injectKey('ShiftLeft', false);
+    expect(input.sample().boost).toBe(false);
+    input.touchBoost = true;
+    input.dispose();
+    expect(input.sample().boost).toBe(false);
+  });
   it('exposes every action with a label and a category for a settings screen', () => {
     const input = makeInput();
     expect(input.actions.length).toBe(defaultActions().length);
