@@ -2,7 +2,7 @@
 
 Source: the owner's playtest #3 of the Phase D build (commit `2a2f424`). The
 playability-first direction and Arcade defaults from `PHASE-D-PLAN.md` still
-apply. Contracts from `PHASE-D-CONTRACTS.md` still bind, except where this
+apply. Contracts from `plan/PHASE-D-CONTRACTS.md` still bind, except where this
 file changes them.
 
 ## 1. Owner findings → package

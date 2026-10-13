@@ -1,5 +1,13 @@
 # Lost City content: sources and notes (package C4a)
 
+## 1400 content fact audit — 2026-10-11
+
+The current claim checks, corrections, primary references and unresolved items are
+recorded in [1400-f-audit-content-facts](../../../plan/progress/1400-f-audit-content-facts.md).
+That review supersedes conflicting positions, depths and source attributions in the
+historical research notes below. Published site references and authored scan-marker
+placements are distinct; the Journal’s existing single provenance tags identify additions without prose caveats.
+
 ## F-1110 audit (2026-10-09)
 
 [The five-site primary-source audit](../../../plan/progress/F-1110.md) records

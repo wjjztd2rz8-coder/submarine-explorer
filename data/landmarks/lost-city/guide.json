@@ -36,6 +36,10 @@
         {
           "label": "Field extent",
           "value": "about 60,000 m² (NOAA 2005)"
+        },
+        {
+          "label": "Field reference position (Beehive outlet, 2018)",
+          "value": "30°07′26.1″N 42°07′11.9″W; outlet depth 743 m"
         }
       ],
       "reconstruction": true,
@@ -71,6 +75,10 @@
         {
           "title": "Kelley et al. 2005 — A Serpentinite-Hosted Ecosystem: The Lost City Hydrothermal Field",
           "url": "https://doi.org/10.1126/science.1102556"
+        },
+        {
+          "title": "Aquino et al. 2022 — vent locations, Table 1 (Beehive reference)",
+          "url": "https://repository.library.noaa.gov/view/noaa/56451/noaa_56451_DS1.pdf"
         }
       ],
       "confidence": "high"
@@ -260,7 +268,7 @@
       "title": "A coordinate discrepancy",
       "paragraphs": [
         "The Atlantis Massif’s south wall falls steeply below the carbonate terrace. At this scan point the terrain is about 1,332 m deep, more than 500 m below the main vent field.",
-        "The catalog’s rounded position lands on this wall. The dive’s tower markers lie farther north, where the terrain matches Lost City’s documented 750–900 m depth range."
+        "An older catalog pin at 30.1167° N, 42.1167° W landed on this wall. The catalog now uses the published Beehive outlet position near Poseidon; the dive’s tower markers lie on terrain within the field’s documented depth band."
       ],
       "facts": [
         {

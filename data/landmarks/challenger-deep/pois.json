@@ -54,7 +54,7 @@
         "http://nora.nerc.ac.uk/id/eprint/524544/1/Stewart_and_Jamieson_2019_The%20five%20deeps.pdf",
         "https://www.gmrt.org/"
       ],
-      "note": "Real GMRT terrain (Ryan et al. 2009; value and slope computed directly from this tile's grid this session): 9,977.7 m deep on the trench's steep north (landward) inner wall, about 3.8 km north of the eastern-pool deepest cell. Local slope measured by central-difference sampling of the heightmap is roughly 25-29 deg depending on the sampling baseline; the true wall is almost certainly steeper than this coarse ~60 m grid can resolve. This is the subducting flank of the trench (Pacific Plate subducts beneath the Mariana Arc system per Stewart & Jamieson 2019)."
+      "note": "GMRT grid depth 9,977.7 m on the north (landward) inner wall. Central-difference slopes are about 25–29° depending on baseline; the approximately 60 m grid does not resolve smaller slopes. This is the overriding-plate side of the trench; the Pacific Plate subducts beneath the Mariana Arc system."
     },
     {
       "id": "cd-central-basin",

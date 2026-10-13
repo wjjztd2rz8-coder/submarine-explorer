@@ -128,7 +128,7 @@ Conventions for all packages: each is sized for one agent session; lists files i
 ### Phase C — World tour (Tier 2) — high parallelism, one Sonnet agent per 2–3 landmarks
 
 > Status 2026-09-23: Phase C implementation is in final close-out.
-> Automated QA is recorded in `plan/QA-C.md` and its addenda. The owner
+> Automated QA is recorded in `plan/archive/QA-C.md` and its addenda. The owner
 > playtest and public deployment remain pending; M3 is not yet fully accepted.
 > Live status and verification: `plan/STATUS.md`.
 
@@ -143,7 +143,7 @@ Conventions for all packages: each is sized for one agent session; lists files i
 
 ### Phase D — Playability, scoped after the owner's first playtest — **done, 2026-09-24**
 
-Arcade-default gameplay modes, faster and better-lit dives, near-site starts, usable controls/HUD/sonar, home and pause menus, objective hints, per-dive scan state, Journal and honest debrief flow. Then battery/oxygen, offline currents, ROV and purposeful photo mode. [Plan](PHASE-D-PLAN.md), [contracts](PHASE-D-CONTRACTS.md), and [briefs](PHASE-D-BRIEFS.md) supersede the pre-playtest proposal. **Old D7 (surface day/night) is dropped.** Samples and inventory have no Phase D package. All twelve packages (D-MODES, D-CONTENT, D-INPUT+HUD, D-SHELL, D-SCAN, D-START, D-FLOW, D-SONAR, D-POWER, D-CURRENTS, D-ROV, D-PHOTO) are implemented and merged; see [`plan/STATUS.md`](STATUS.md) for the package-by-package summary and what remains for the owner (playtest #3, then the go-ahead to publish).
+Arcade-default gameplay modes, faster and better-lit dives, near-site starts, usable controls/HUD/sonar, home and pause menus, objective hints, per-dive scan state, Journal and honest debrief flow. Then battery/oxygen, offline currents, ROV and purposeful photo mode. [Plan](archive/PHASE-D-PLAN.md), [contracts](PHASE-D-CONTRACTS.md), and [briefs](archive/PHASE-D-BRIEFS.md) supersede the pre-playtest proposal. **Old D7 (surface day/night) is dropped.** Samples and inventory have no Phase D package. All twelve packages (D-MODES, D-CONTENT, D-INPUT+HUD, D-SHELL, D-SCAN, D-START, D-FLOW, D-SONAR, D-POWER, D-CURRENTS, D-ROV, D-PHOTO) are implemented and merged; see [`plan/STATUS.md`](STATUS.md) for the package-by-package summary and what remains for the owner (playtest #3, then the go-ahead to publish).
 
 ### Phase E — Future expansions: marine life encounters (formerly D4) — **future, not started**
 

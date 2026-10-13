@@ -1,6 +1,6 @@
 # Phase D contracts — playability
 
-Applies to the package order in [PHASE-D-PLAN.md](PHASE-D-PLAN.md) §3. Schema and event names below are binding; each implementation brief reports a deviation before relying on it. Earlier data and source honesty rules still apply.
+Applies to the package order in [PHASE-D-PLAN.md](archive/PHASE-D-PLAN.md) §3. Schema and event names below are binding; each implementation brief reports a deviation before relying on it. Earlier data and source honesty rules still apply.
 
 ## 1. Settings v2 and tuning
 
@@ -101,7 +101,7 @@ App shell states: `home ↔ dive ↔ pause`; briefing and debrief are dive subvi
 | D-ROV       | new `rov/*`, `Input.ts` new action, `ui/RovHUD.ts`, `Config.ts` rov section; own tests                                                                              | `D-ROV` near input/physics/scanner (`445-454`, `532-542`)                                                                                         |
 | D-PHOTO     | `CameraRig.ts`, new `ui/PhotoGallery.ts`, `ui/Journal.ts` additive gallery, `Input.ts` photo action, new photo store; own tests                                     | `D-PHOTO` at camera toggle/render (`459-465`, `572-586`)                                                                                          |
 
-`D-MODES ∥ D-CONTENT` and `D-SCAN ∥ D-START` are the **only scheduled parallel pairs**; they must keep `main.ts` and CSS fences disjoint. D-INPUT+HUD is one task. Remaining packages run sequentially in §3 order (`plan/PHASE-D-PLAN.md:221-237`). D-CONTENT adds the hint before D-START reads it; D-SCAN and D-START do not edit each other's owned test specs. Shared `Config.ts` sections are additive; no whole-file rewrite during a parallel pair.
+`D-MODES ∥ D-CONTENT` and `D-SCAN ∥ D-START` are the **only scheduled parallel pairs**; they must keep `main.ts` and CSS fences disjoint. D-INPUT+HUD is one task. Remaining packages run sequentially in §3 order (`plan/archive/PHASE-D-PLAN.md:221-237`). D-CONTENT adds the hint before D-START reads it; D-SCAN and D-START do not edit each other's owned test specs. Shared `Config.ts` sections are additive; no whole-file rewrite during a parallel pair.
 
 ## 6. Gates and screenshots
 
