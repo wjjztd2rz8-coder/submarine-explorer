@@ -9,6 +9,7 @@ import type { Terrain } from '../../src/world/Terrain.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { journalEntries } from './helpers/journal.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
+import { dismissTutorial } from './helpers/tutorial.js';
 
 interface Game {
   discovery: Discovery;
@@ -186,11 +187,7 @@ for (const tier of ['low', 'medium']) {
         ).toEqual(snapshot);
       }
       // Use the fresh player's tutorial action, then the real Journal key.
-      const skip = page.getByRole('button', { name: 'Skip tutorial', exact: true });
-      if (await skip.isVisible()) {
-        if (hasTouch) await skip.tap();
-        else await skip.click();
-      }
+      await dismissTutorial(page, hasTouch, true);
       expect(
         await page.evaluate(
           () => JSON.parse(localStorage.getItem('subexplorer.onboard.v1')!).tutorialDone,
