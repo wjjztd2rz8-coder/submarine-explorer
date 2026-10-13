@@ -25,6 +25,10 @@
         {
           "label": "Named for",
           "value": "William Beebe (naturalist, Bathysphere pioneer)"
+        },
+        {
+          "label": "Published field reference position",
+          "value": "18°32′47.7″N 81°43′05.5″W (Lough et al. 2019)"
         }
       ],
       "reconstruction": false,
@@ -40,6 +44,10 @@
         {
           "title": "German et al. 2010 — 2009 plume detection on the Mid-Cayman Rise",
           "url": "https://www.pnas.org/doi/full/10.1073/pnas.1009205107"
+        },
+        {
+          "title": "Lough et al. 2019 — Beebe field position and 4,960 m depth",
+          "url": "https://eprints.whiterose.ac.uk/id/eprint/151944/1/1-s2.0-S0009254119300014-main.pdf"
         }
       ],
       "confidence": "high"
@@ -141,7 +149,7 @@
       "title": "The Mid-Cayman spreading axis",
       "paragraphs": [
         "The Mid-Cayman Spreading Centre is the world’s deepest seafloor spreading centre, with an ultraslow full spreading rate of about 15 mm per year. Its thin crust is cut by faults through which seawater circulates. The pressure at Beebe’s depth, together with its fluid temperature and salinity, allows supercritical fluid to reach the seafloor.",
-        "This tile's real terrain shows a deep, elongated trough running northwest-southeast through its western half, reaching -5,395.8 m at its deepest sounded point here -- consistent with the ridge's axial valley, the rift where new seafloor is created. This is a terrain trace of that trough's general depth and direction on this tile's real GMRT grid, not a citation to a precisely surveyed plate-boundary line."
+        "A northwest–southeast transect through this tile’s western half sampled about 5,395.8 m depth near 18.57667° N, 81.80333° W. That is a terrain-derived axial-valley reference, not a surveyed plate-boundary coordinate or the tile’s deepest cell. Across the entire shipped grid, the deepest cell is about 6,575.3 m."
       ],
       "facts": [
         {
@@ -149,8 +157,12 @@
           "value": "~15 mm/yr (ultraslow)"
         },
         {
-          "label": "Deepest axial-trough sounding (this tile)",
-          "value": "-5,395.8 m"
+          "label": "Axial-valley transect depth (this grid)",
+          "value": "~5,395.8 m at 18.57667° N, 81.80333° W"
+        },
+        {
+          "label": "Deepest cell in the entire tile",
+          "value": "~6,575.3 m (GMRT grid)"
         }
       ],
       "reconstruction": false,

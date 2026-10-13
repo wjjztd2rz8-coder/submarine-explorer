@@ -1,3 +1,5 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -7,30 +9,11 @@ const loadAsync = vi.fn(async (url: string) => {
 });
 vi.mock('three/examples/jsm/loaders/GLTFLoader.js', () => ({
   GLTFLoader: class {
-    setDRACOLoader(): void {}
-    setMeshoptDecoder(): void {}
-    setKTX2Loader(): void {}
     loadAsync = loadAsync;
   },
 }));
-vi.mock('three/examples/jsm/loaders/DRACOLoader.js', () => ({
-  DRACOLoader: class {
-    path = '';
-    setDecoderPath(p: string): void {
-      this.path = p;
-    }
-  },
-}));
-
-const {
-  AssetService,
-  DECODER_PATHS,
-  isGltfUrl,
-  isKtx2Url,
-  mergeManifests,
-  normaliseRequest,
-  resolveAssetUrl,
-} = await import('../../src/core/assets/index.js');
+const { AssetService, isGltfUrl, mergeManifests, normaliseRequest, resolveAssetUrl } =
+  await import('../../src/core/assets/index.js');
 
 describe('asset manifest helpers', () => {
   it('infers the kind from the extension', () => {
@@ -38,13 +21,11 @@ describe('asset manifest helpers', () => {
       kind: 'gltf',
       url: '/assets/models/rock.glb',
     });
-    expect(normaliseRequest('/assets/tex/sand.ktx2?v=2')).toEqual({
+    expect(normaliseRequest('/assets/tex/sand.jpg?v=2')).toEqual({
       kind: 'texture',
-      url: '/assets/tex/sand.ktx2?v=2',
+      url: '/assets/tex/sand.jpg?v=2',
     });
     expect(isGltfUrl('a.GLTF#x')).toBe(true);
-    expect(isKtx2Url('a.ktx2?x')).toBe(true);
-    expect(isKtx2Url('a.png')).toBe(false);
   });
 
   it('merges manifests without repeats', () => {
@@ -73,11 +54,6 @@ describe('resolveAssetUrl', () => {
       expect(resolveAssetUrl(url, '/b/')).toBe(url);
     }
   });
-
-  it('serves the vendored decoders from public/assets/decoders', () => {
-    expect(DECODER_PATHS.draco).toMatch(/assets\/decoders\/draco\/$/);
-    expect(DECODER_PATHS.basis).toMatch(/assets\/decoders\/basis\/$/);
-  });
 });
 
 describe('AssetService', () => {
@@ -98,9 +74,107 @@ describe('AssetService', () => {
     expect(svc.stats.gltf).toBe(1);
   });
 
-  it('refuses KTX2 until a renderer is registered', async () => {
-    const svc = new AssetService();
-    await expect(svc.loadTexture('/t/a.ktx2')).rejects.toThrow(/setRenderer/);
-    expect(svc.stats.textures).toBe(0);
+  it('loads ordinary textures once per option set and retains their disposal', async () => {
+    const load = vi
+      .spyOn(THREE.TextureLoader.prototype, 'loadAsync')
+      .mockImplementation(async () => new THREE.Texture());
+    try {
+      const svc = new AssetService();
+      const [a, b] = await Promise.all([
+        svc.loadTexture('/t/sand.jpg', { repeat: [2, 3] }),
+        svc.loadTexture('/t/sand.jpg', { repeat: [2, 3] }),
+      ]);
+      const linear = await svc.loadTexture('/t/sand.jpg', { srgb: false });
+      expect(a).toBe(b);
+      expect(linear).not.toBe(a);
+      expect(load).toHaveBeenCalledTimes(2);
+      expect(a.colorSpace).toBe(THREE.SRGBColorSpace);
+      expect(a.repeat.toArray()).toEqual([2, 3]);
+      expect(a.wrapS).toBe(THREE.RepeatWrapping);
+      expect(a.wrapT).toBe(THREE.RepeatWrapping);
+      expect(linear.colorSpace).toBe(THREE.NoColorSpace);
+      expect(svc.stats).toEqual({ gltf: 0, textures: 2 });
+      const disposed = vi.fn();
+      a.addEventListener('dispose', disposed);
+      a.dispose();
+      expect(disposed).toHaveBeenCalledOnce();
+    } finally {
+      load.mockRestore();
+    }
   });
+
+  it('retries failed model and texture loads', async () => {
+    loadAsync.mockClear();
+    const load = vi
+      .spyOn(THREE.TextureLoader.prototype, 'loadAsync')
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValue(new THREE.Texture());
+    try {
+      const svc = new AssetService();
+      await expect(svc.loadGLTF('/m/missing.glb')).rejects.toThrow('404');
+      await expect(svc.loadGLTF('/m/missing.glb')).rejects.toThrow('404');
+      expect(loadAsync).toHaveBeenCalledTimes(2);
+      expect(svc.stats.gltf).toBe(0);
+      const result = await svc.preload(['/t/sand.png']);
+      expect(result).toEqual({ loaded: 0, failed: [{ url: '/t/sand.png', error: 'offline' }] });
+      expect(svc.stats.textures).toBe(0);
+      await svc.loadTexture('/t/sand.png');
+      expect(load).toHaveBeenCalledTimes(2);
+      expect(svc.stats.textures).toBe(1);
+    } finally {
+      load.mockRestore();
+    }
+  });
+});
+
+describe('shipped plain GLB fixtures', () => {
+  it.each([
+    ['rock_09.glb', 6628],
+    ['barrel_stove.glb', 6637],
+  ])(
+    'parses %s geometry and ordinary embedded textures without decoders',
+    async (file, vertices) => {
+      const bytes = readFileSync(`public/assets/models/${file}`);
+      const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+      const jsonLength = new DataView(buffer).getUint32(12, true);
+      const doc = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 20, jsonLength)));
+      expect(doc.extensionsUsed ?? []).toEqual([]);
+      expect(doc.extensionsRequired ?? []).toEqual([]);
+      expect(doc.images).toHaveLength(3);
+      expect(
+        doc.images.every((image: { mimeType: string }) => image.mimeType === 'image/jpeg'),
+      ).toBe(true);
+      const { GLTFLoader } = await vi.importActual<
+        typeof import('three/examples/jsm/loaders/GLTFLoader.js')
+      >('three/examples/jsm/loaders/GLTFLoader.js');
+      // Node has no image DOM: stub image IO while exercising the real GLB parser.
+      vi.stubGlobal('self', globalThis);
+      const images = vi
+        .spyOn(THREE.TextureLoader.prototype, 'load')
+        .mockImplementation((_url, done) => {
+          const texture = new THREE.Texture<HTMLImageElement>();
+          done?.(texture);
+          return texture;
+        });
+      try {
+        const gltf = await new GLTFLoader().parseAsync(buffer, '');
+        const meshes: THREE.Mesh[] = [];
+        gltf.scene.traverse((object) => {
+          if ((object as THREE.Mesh).isMesh) meshes.push(object as THREE.Mesh);
+        });
+        expect(meshes).toHaveLength(1);
+        expect(meshes[0]!.geometry.getAttribute('position').count).toBe(vertices);
+        expect(meshes[0]!.geometry.index!.count).toBeGreaterThan(0);
+        const material = meshes[0]!.material as THREE.MeshStandardMaterial;
+        expect(material.isMeshStandardMaterial).toBe(true);
+        expect(material.map).toBeInstanceOf(THREE.Texture);
+        expect(material.normalMap).toBeInstanceOf(THREE.Texture);
+        expect(material.roughnessMap).toBeInstanceOf(THREE.Texture);
+        expect(images).toHaveBeenCalledTimes(3);
+      } finally {
+        images.mockRestore();
+        vi.unstubAllGlobals();
+      }
+    },
+  );
 });

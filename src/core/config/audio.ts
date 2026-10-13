@@ -34,13 +34,6 @@ export interface AudioConfig {
   depthLowpassAbyssHz: number;
   /** Depth (negative metres) at which the low-pass reaches its minimum cutoff. */
   lowpassFullAt: number;
-  /** Speed of sound in seawater, m/s (real-world value, used for echo timing). */
-  sonarSpeedOfSoundMps: number;
-  /** Sonar ray-march: max range considered and step size, metres. */
-  sonarMaxRangeM: number;
-  sonarRayStepM: number;
-  /** Depression of the forward sonar beam below horizontal, degrees. */
-  sonarBeamDownDeg: number;
   /**
    * Ambient bed layers, shallowest first (band[0].depth should be 0). Each is
    * a sine drone + filtered noise, crossfaded by depth -- see
@@ -83,10 +76,6 @@ export const DEFAULT_AUDIO: AudioConfig = {
   depthLowpassSurfaceHz: 18000,
   depthLowpassAbyssHz: 350,
   lowpassFullAt: -1000,
-  sonarSpeedOfSoundMps: 1500,
-  sonarMaxRangeM: 2000,
-  sonarRayStepM: 10,
-  sonarBeamDownDeg: 15,
   // Mirrors the depth-band feel described in docs/atmosphere.md / the master
   // plan (bright near-surface -> near-black by 1,000 m): lower drone pitch
   // and more noise the deeper the band.

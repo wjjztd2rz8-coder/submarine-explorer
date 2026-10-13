@@ -43,7 +43,7 @@ export const SPECIES_DISCLAIMER =
 /** Home page used when a file has no (safe) `source_url`. */
 export const OBIS_HOME_URL = 'https://obis.org/';
 
-export type SpeciesWarn = (message: string) => void;
+type SpeciesWarn = (message: string) => void;
 const defaultWarn: SpeciesWarn = (m) => console.warn(`[species] ${m}`);
 
 const isObj = (v: unknown): v is Record<string, unknown> =>

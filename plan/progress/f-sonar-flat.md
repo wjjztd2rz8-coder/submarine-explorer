@@ -9,8 +9,8 @@
 
 ## Screenshots (desktop golden, 1000 m view, crops 2x)
 
-- Before: `plan/progress/f-sonar-flat-shots/before.png` (titanic 1/3, endurance 1/3, blue hole 1/3)
-- After: `plan/progress/f-sonar-flat-shots/after.png`; Hunga Tonga unchanged: `after-hunga.png`
+- Before: `plan/archive/progress-images/f-sonar-flat-shots/before.png` (titanic 1/3, endurance 1/3, blue hole 1/3)
+- After: `plan/archive/progress-images/f-sonar-flat-shots/after.png`; Hunga Tonga unchanged: `after-hunga.png`
 
 ## Gaps
 

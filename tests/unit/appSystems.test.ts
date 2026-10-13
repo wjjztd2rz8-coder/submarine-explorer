@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { Input } from '../../src/core/Input.js';
+import { inputGateSystem } from '../../src/app/loop.js';
+import { discoverySystem } from '../../src/app/systems/discovery.js';
+import { FROZEN_INPUT } from '../../src/game/MissionRouter.js';
 import type { GameContext } from '../../src/app/context.js';
 import {
   FRAME_STAGES,
@@ -65,5 +69,57 @@ describe('createSystems', () => {
     expect(runner.order.indexOf('hud.feeds: power')).toBeLessThan(
       runner.order.indexOf('hud.feeds: currents'),
     );
+  });
+});
+
+describe('Journal gamepad input through the freeze gate', () => {
+  it('opens and closes once per press, preserves frozen piloting and cannot open behind another modal', () => {
+    const buttons = Array.from({ length: 16 }, () => ({ pressed: false, value: 0 }));
+    vi.stubGlobal('navigator', {
+      getGamepads: () => [{ connected: true, index: 0, axes: [0, -1, 0, 0], buttons }],
+    });
+    try {
+      const input = new Input({ storage: null });
+      const guide = { isOpen: false };
+      const update = vi.fn();
+      const ctx = { discovery: { guide, update }, rig: {} } as unknown as GameContext;
+      const frame = (frozen: boolean): FrameState => {
+        const f = {
+          sampled: input.sample(),
+          frozen,
+          realSteps: 1,
+          fixedDt: 1 / 60,
+          dt: 1 / 60,
+        } as FrameState;
+        inputGateSystem.frame!['gate.input']!(f, ctx);
+        discoverySystem.frame!['scan.discovery']!(f, ctx);
+        return f;
+      };
+      const release = (): void => {
+        input.endFrame();
+        buttons[14] = { pressed: false, value: 0 };
+        input.sample();
+      };
+      buttons[14] = { pressed: true, value: 1 };
+      frame(false);
+      expect(update.mock.calls.at(-1)![4]).toMatchObject({ toggleGuide: true, throttle: 1 });
+      guide.isOpen = true;
+      input.endFrame();
+      frame(true);
+      expect(update.mock.calls.at(-1)![4]).toBe(FROZEN_INPUT); // holding never closes
+      release();
+      buttons[14] = { pressed: true, value: 1 };
+      const closing = frame(true);
+      expect(closing.state).toBe(FROZEN_INPUT);
+      expect(closing.steps).toBe(0);
+      expect(update.mock.calls.at(-1)![4]).toEqual({ ...FROZEN_INPUT, toggleGuide: true });
+      guide.isOpen = false;
+      release();
+      buttons[14] = { pressed: true, value: 1 };
+      frame(true); // a different modal froze the dive
+      expect(update.mock.calls.at(-1)![4]).toBe(FROZEN_INPUT);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

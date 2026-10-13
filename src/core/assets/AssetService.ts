@@ -3,36 +3,32 @@
  * caches, so every package loads models and textures the same way. Import it
  * from `core/assets/index.js`; the manifest types live in `manifest.ts`.
  *
- * - `loadGLTF(url)` loads a .glb/.gltf once (Draco, Meshopt and, once a
- *   renderer is registered, KTX2 textures inside it) and returns the cached
+ * - `loadGLTF(url)` loads a plain .glb/.gltf once and returns the cached
  *   result. Callers clone `scene` if they place it more than once.
- * - `loadTexture(url, { srgb, repeat })` loads a PNG/JPEG/WebP or a `.ktx2`
- *   texture once per URL and option set.
+ * - `loadTexture(url, { srgb, repeat })` loads a PNG/JPEG/WebP texture once
+ *   per URL and option set.
  * - `preload(list)` warms the caches (a manifest for a site or a screen) and
  *   reports failures instead of throwing.
  *
  * URLs: a root-relative path (`/assets/...`, `/data/...`) is resolved under
  * Vite's deployment base with `publicUrl()`; absolute, data: and blob: URLs and
- * paths already under the base are used as they are. Decoders are served from
- * `public/assets/decoders/{draco,basis}/` (ATTRIBUTION.md).
+ * paths already under the base are used as they are.
  *
- * The loaders are imported lazily, so modules that only validate content (and
- * their unit tests) never pull in the decoders.
+ * The glTF loader is imported lazily, so modules that only validate content
+ * (and their unit tests) never pull it in.
  */
 
 import * as THREE from 'three';
 import type { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import type { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
 import { publicUrl } from '../../util/publicUrl.js';
 import {
-  isKtx2Url,
   normaliseRequest,
   type AssetRequest,
   type PreloadResult,
   type TextureOptions,
 } from './manifest.js';
 
-/** Where the vendored decoders live (public/assets/decoders). */
+/** Legacy paths retained for the prop loader compatibility export. */
 export const DECODER_PATHS = {
   draco: publicUrl('/assets/decoders/draco/'),
   basis: publicUrl('/assets/decoders/basis/'),
@@ -52,19 +48,9 @@ function textureKey(url: string, o: TextureOptions): string {
 }
 
 export class AssetService {
-  private renderer: THREE.WebGLRenderer | null = null;
   private gltfLoader: Promise<GLTFLoader> | null = null;
-  private ktx2Loader: Promise<KTX2Loader> | null = null;
   private readonly gltfCache = new Map<string, Promise<GLTF>>();
   private readonly textureCache = new Map<string, Promise<THREE.Texture>>();
-
-  /**
-   * Register the renderer. KTX2 transcoding needs it to pick a GPU format, so
-   * `.ktx2` textures (standalone or inside a glTF) work only after this call.
-   */
-  setRenderer(renderer: THREE.WebGLRenderer): void {
-    this.renderer = renderer;
-  }
 
   /** Load a glTF/GLB once; later calls share the same promise. */
   loadGLTF(url: string): Promise<GLTF> {
@@ -85,9 +71,7 @@ export class AssetService {
     const key = textureKey(resolved, options);
     let p = this.textureCache.get(key);
     if (!p) {
-      const load = isKtx2Url(resolved)
-        ? this.getKtx2Loader().then((l) => l.loadAsync(resolved) as Promise<THREE.Texture>)
-        : new THREE.TextureLoader().loadAsync(resolved);
+      const load = new THREE.TextureLoader().loadAsync(resolved);
       p = load.then((texture) => {
         texture.colorSpace = options.srgb === false ? THREE.NoColorSpace : THREE.SRGBColorSpace;
         if (options.repeat !== undefined) {
@@ -131,37 +115,10 @@ export class AssetService {
   }
 
   private getGltfLoader(): Promise<GLTFLoader> {
-    this.gltfLoader ??= (async () => {
-      const [{ GLTFLoader }, { DRACOLoader }, { MeshoptDecoder }] = await Promise.all([
-        import('three/examples/jsm/loaders/GLTFLoader.js'),
-        import('three/examples/jsm/loaders/DRACOLoader.js'),
-        import('three/examples/jsm/libs/meshopt_decoder.module.js'),
-      ]);
-      const draco = new DRACOLoader();
-      draco.setDecoderPath(DECODER_PATHS.draco);
-      const gltf = new GLTFLoader();
-      gltf.setDRACOLoader(draco);
-      gltf.setMeshoptDecoder(MeshoptDecoder);
-      if (this.renderer) gltf.setKTX2Loader(await this.getKtx2Loader());
-      return gltf;
-    })();
+    this.gltfLoader ??= import('three/examples/jsm/loaders/GLTFLoader.js').then(
+      ({ GLTFLoader }) => new GLTFLoader(),
+    );
     return this.gltfLoader;
-  }
-
-  private getKtx2Loader(): Promise<KTX2Loader> {
-    this.ktx2Loader ??= (async () => {
-      const { KTX2Loader } = await import('three/examples/jsm/loaders/KTX2Loader.js');
-      if (!this.renderer) throw new Error('KTX2 textures need Assets.setRenderer() first');
-      const loader = new KTX2Loader();
-      loader.setTranscoderPath(DECODER_PATHS.basis);
-      loader.detectSupport(this.renderer);
-      return loader;
-    })();
-    // Allow a retry once the renderer is registered.
-    this.ktx2Loader.catch(() => {
-      this.ktx2Loader = null;
-    });
-    return this.ktx2Loader;
   }
 }
 

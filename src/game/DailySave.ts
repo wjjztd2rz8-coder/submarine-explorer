@@ -2,7 +2,7 @@ import type { SettingsStorage } from '../core/Save.js';
 import { validDailyDate } from './Daily.js';
 
 export const DAILY_STORAGE_KEY = 'subexplorer.daily.v1';
-export interface DailyRecord {
+interface DailyRecord {
   version: 1;
   lastCompletedDate: string | null;
   streak: number;

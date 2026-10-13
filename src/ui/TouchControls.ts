@@ -14,6 +14,8 @@
  * can adapt; `src/styles/touch.css` holds all the styling.
  */
 
+import { elWithClass as el } from './dom.js';
+
 import type { Input } from '../core/Input.js';
 import {
   classifyDevice,
@@ -26,7 +28,7 @@ import {
   stickAxes,
 } from '../core/Touch.js';
 
-export interface TouchControlsOptions {
+interface TouchControlsOptions {
   input: Input;
   canvas: HTMLElement;
   /** Open the pause menu. */
@@ -34,17 +36,6 @@ export interface TouchControlsOptions {
   /** Sonar state for the pinch gesture: while expanded, pinch zooms the map. */
   sonar: { readonly expanded: boolean; zoomWheel(direction: number): unknown };
   parent?: HTMLElement;
-}
-
-function el<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  cls: string,
-  text?: string,
-): HTMLElementTagNameMap[K] {
-  const e = document.createElement(tag);
-  e.className = cls;
-  if (text !== undefined) e.textContent = text;
-  return e;
 }
 
 export class TouchControls {

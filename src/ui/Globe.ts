@@ -57,8 +57,6 @@ export interface GlobeOptions {
   tileIds: readonly string[];
   /** The landmark being dived now: highlighted, and the globe starts over it. */
   currentId?: string;
-  /** True for the codes bound to `toggleGlobe`, so the same key closes it. */
-  isToggleKey?: (code: string) => boolean;
   /** Navigate to a URL (tests inject a spy). Default: `location.href = url`. */
   navigate?: (url: string) => void;
   /** Inject the catalogue (tests); default loads it from /data. */
@@ -202,6 +200,7 @@ export class Globe {
   private readonly card: HTMLDivElement;
   private readonly legend: HTMLDivElement;
   private readonly trap: FocusTrap;
+  private readonly chooserTrap: FocusTrap;
   private pins: Pin[] = [];
   private clusterEls: ClusterEl[] = [];
   /** Per-frame scratch, sized to the pin count in setSites (no per-frame allocation). */
@@ -305,7 +304,14 @@ export class Globe {
     this.coarse =
       typeof window.matchMedia === 'function' ? window.matchMedia('(pointer: coarse)') : null;
     (opts.parent ?? document.body).appendChild(this.root);
-    this.trap = new FocusTrap(this.root);
+    this.trap = new FocusTrap(this.root, {
+      onEscape: () => this.close(),
+      onKeyDown: (event) => this.handleKeyDown(event),
+    });
+    this.chooserTrap = new FocusTrap(this.chooser, {
+      onEscape: () => this.closeChooser(),
+      onKeyDown: (event) => this.handleKeyDown(event),
+    });
 
     this.bindPointer();
     this.bindKeys();
@@ -450,7 +456,9 @@ export class Globe {
   dispose(): void {
     this.resizeObserver?.disconnect();
     for (const d of this.disposers) d();
-    this.trap.deactivate();
+    this.close();
+    this.chooserTrap.dispose();
+    this.trap.dispose();
     this.renderer?.dispose();
     this.root.remove();
   }
@@ -801,12 +809,13 @@ export class Globe {
       }),
     );
     this.chooser.hidden = false;
-    this.chooser.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
+    this.chooserTrap.activate();
   }
 
   private closeChooser(): void {
     this.chooserLeader = -1;
     this.chooser.hidden = true;
+    this.chooserTrap.deactivate();
   }
 
   private renderCard(): void {
@@ -880,81 +889,62 @@ export class Globe {
     this.root.addEventListener('wheel', onWheel, { passive: false });
   }
 
+  private applyHeld(): void {
+    const k = this.heldKeys;
+    this.orbit.setHeld(
+      (k.has('ArrowRight') ? 1 : 0) - (k.has('ArrowLeft') ? 1 : 0),
+      (k.has('ArrowUp') ? 1 : 0) - (k.has('ArrowDown') ? 1 : 0),
+    );
+  }
+
+  private handleKeyDown(e: KeyboardEvent): void {
+    if (!this.open_) return;
+    if (e.code === 'Tab' || e.code === 'Escape') return;
+    if (this.opts.embedded) {
+      if (!this.chooserTrap.isTop && !this.root.contains(document.activeElement)) return;
+    }
+    e.stopImmediatePropagation();
+    const code = e.code;
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(code)) {
+      e.preventDefault();
+      this.heldKeys.add(code);
+      this.applyHeld();
+      return;
+    }
+    const zoom = this.opts.config.keyZoomFactor;
+    if (code === 'Equal' || code === 'NumpadAdd' || e.key === '+') {
+      e.preventDefault();
+      this.orbit.zoomBy(1 / zoom);
+      return;
+    }
+    if (code === 'Minus' || code === 'NumpadSubtract' || e.key === '-') {
+      e.preventDefault();
+      this.orbit.zoomBy(zoom);
+      return;
+    }
+    if (code === 'Enter' || code === 'NumpadEnter') {
+      // A focused pin/button activates natively; otherwise select the hovered site.
+      const a = document.activeElement;
+      if (a instanceof HTMLButtonElement && this.root.contains(a)) return;
+      const site = this.cardSite;
+      if (site) {
+        e.preventDefault();
+        this.select(site);
+      }
+    }
+  }
+
   private bindKeys(): void {
-    const arrows: Record<string, true> = {
-      ArrowUp: true,
-      ArrowDown: true,
-      ArrowLeft: true,
-      ArrowRight: true,
-    };
-    const applyHeld = (): void => {
-      const k = this.heldKeys;
-      this.orbit.setHeld(
-        (k.has('ArrowRight') ? 1 : 0) - (k.has('ArrowLeft') ? 1 : 0),
-        (k.has('ArrowUp') ? 1 : 0) - (k.has('ArrowDown') ? 1 : 0),
-      );
-    };
-    const onKeyDown = (e: KeyboardEvent): void => {
-      if (!this.open_) return;
-      if (e.code === 'Escape' && !this.chooser.hidden) {
-        // Escape dismisses the chooser first, before it closes anything else.
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        this.closeChooser();
-        return;
-      }
-      if (this.opts.embedded) {
-        if (!this.root.contains(document.activeElement)) return;
-        if (e.code === 'Tab' || e.code === 'Escape') return;
-      }
-      // Nothing behind the globe sees keys while it is up: not the game's
-      // Input, the guide, the briefing, nor capture listeners on window
-      // registered after this one (mission router, settings; the globe is
-      // built first). Tab only stops propagating, so the FocusTrap listener on
-      // this same node and phase still cycles focus.
-      if (e.code === 'Tab') e.stopPropagation();
-      else e.stopImmediatePropagation();
-      const code = e.code;
-      if (code === 'Escape' || (!e.repeat && this.opts.isToggleKey?.(code))) {
-        e.preventDefault();
-        this.close();
-        return;
-      }
-      if (arrows[code]) {
-        e.preventDefault();
-        this.heldKeys.add(code);
-        applyHeld();
-        return;
-      }
-      const zoom = this.opts.config.keyZoomFactor;
-      if (code === 'Equal' || code === 'NumpadAdd' || e.key === '+') {
-        e.preventDefault();
-        this.orbit.zoomBy(1 / zoom);
-        return;
-      }
-      if (code === 'Minus' || code === 'NumpadSubtract' || e.key === '-') {
-        e.preventDefault();
-        this.orbit.zoomBy(zoom);
-        return;
-      }
-      if (code === 'Enter' || code === 'NumpadEnter') {
-        // A focused pin/button activates natively; otherwise select the hovered site.
-        const a = document.activeElement;
-        if (a instanceof HTMLButtonElement && this.root.contains(a)) return;
-        const site = this.cardSite;
-        if (site) {
-          e.preventDefault();
-          this.select(site);
-        }
-      }
-    };
+    const onKeyDown = (event: KeyboardEvent): void => this.handleKeyDown(event);
     const onKeyUp = (e: KeyboardEvent): void => {
-      if (this.heldKeys.delete(e.code)) applyHeld();
+      if (this.heldKeys.delete(e.code)) this.applyHeld();
     };
-    window.addEventListener('keydown', onKeyDown, true);
+    // The embedded globe shares its host's Tab/Escape ownership. Its ordinary
+    // controls only handle keys targeted inside the globe; modal keys use the stack.
+    if (this.opts.embedded) this.root.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp, true);
     this.disposers.push(
-      () => window.removeEventListener('keydown', onKeyDown, true),
+      () => this.root.removeEventListener('keydown', onKeyDown),
       () => window.removeEventListener('keyup', onKeyUp, true),
     );
   }

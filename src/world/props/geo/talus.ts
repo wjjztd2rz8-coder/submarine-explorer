@@ -81,6 +81,8 @@ export function talusNormal(
  * The apron as a curvilinear grid: `nx` columns along the wall, `ns` rows from
  * just under the wall (s = -1.5) out to the rim. `colour` paints each vertex
  * from (x, y, z, u, out) with u = 0 at the foot and 1 at the rim.
+ * Optional metre-scale normal sampling filters small sediment folds independently
+ * of grid density; the default keeps the triangulated normals of rubble aprons.
  */
 export function buildTalusMesh(
   t: TalusShape,
@@ -89,6 +91,7 @@ export function buildTalusMesh(
   ns: number,
   uvRepeat: number,
   colour: (x: number, y: number, z: number, u: number, out: THREE.Color) => void,
+  normalSampleM = 0,
 ): THREE.BufferGeometry {
   const cols = Math.max(2, nx);
   const rows = Math.max(3, ns);
@@ -96,23 +99,28 @@ export function buildTalusMesh(
   const col = new Float32Array((cols + 1) * (rows + 1) * 3);
   const uv = new Float32Array((cols + 1) * (rows + 1) * 2);
   const c = new THREE.Color();
+  const surface = (x: number, z: number): number => {
+    const rawReach = t.reach(x);
+    const reach = Math.max(0.4, rawReach);
+    const fade = smooth(0.4, 3, rawReach);
+    const s = t.foot(x) - z;
+    const u = Math.max(0, s / reach);
+    const lip = TALUS_LIP_RISE * (1 - smooth(0.78, 1, u)) - 0.7 * smooth(0.9, 1, u);
+    return (
+      t.gnd(x, z) + (talusDepth(t, x, z) + (s > 0 ? lip : TALUS_LIP_RISE)) * fade - 0.8 * (1 - fade)
+    );
+  };
   for (let i = 0; i <= cols; i++) {
     const x = (i / cols - 0.5) * width;
     const rawReach = t.reach(x);
     const reach = Math.max(0.4, rawReach);
-    // Where the apron has thinned to nothing (the wall ends) the strip sinks out of sight.
-    const fade = smooth(0.4, 3, rawReach);
     const foot = t.foot(x);
     for (let j = 0; j <= rows; j++) {
       const s = -1.5 + (j / rows) * (reach + 1.5);
       const z = foot - s;
       const u = Math.max(0, s / reach);
       // Rest slightly proud of the seabed (hides triangulation mismatch) and sink the rim.
-      const lip = TALUS_LIP_RISE * (1 - smooth(0.78, 1, u)) - 0.7 * smooth(0.9, 1, u);
-      const y =
-        t.gnd(x, z) +
-        (talusDepth(t, x, z) + (s > 0 ? lip : TALUS_LIP_RISE)) * fade -
-        0.8 * (1 - fade);
+      const y = surface(x, z);
       const k = i * (rows + 1) + j;
       pos[k * 3] = x;
       pos[k * 3 + 1] = y;
@@ -142,6 +150,21 @@ export function buildTalusMesh(
   g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
   g.setIndex(idx);
   g.computeVertexNormals();
+  if (normalSampleM > 0) {
+    const normal = g.getAttribute('normal');
+    const n = new THREE.Vector3();
+    const e = normalSampleM;
+    for (let k = 0; k < pos.length / 3; k++) {
+      const x = pos[k * 3]!;
+      const z = pos[k * 3 + 2]!;
+      n.set(
+        surface(x - e, z) - surface(x + e, z),
+        2 * e,
+        surface(x, z - e) - surface(x, z + e),
+      ).normalize();
+      normal.setXYZ(k, n.x, n.y, n.z);
+    }
+  }
   return g;
 }
 

@@ -8,7 +8,7 @@ import { contentUrl, fetchContentJson, type FetchJson } from './ContentPath.js';
 import { publicUrl } from '../util/publicUrl.js';
 import type { Confidence } from './Pois.js';
 
-export interface GuideFact {
+interface GuideFact {
   label: string;
   value: string;
 }
@@ -18,7 +18,7 @@ export interface GuideSource {
   url?: string;
 }
 
-export interface GuideImage {
+interface GuideImage {
   url: string;
   credit?: string;
   license?: string;

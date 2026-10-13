@@ -81,7 +81,7 @@ export interface GameEvents {
   /** Hadal pressure ambience tick, at intervals that shorten with depth (for audio creaks). */
   'env:trench': { depth: number };
   // --- C1: globe mission select ---------------------------------------------
-  /** The globe overlay opened (`?globe=1`, the GLOBE button or the toggleGlobe key). */
+  /** The globe overlay opened (`?globe=1` or the GLOBE button). */
   'globe:opened': { source: 'url' | 'button' | 'key' | 'api' };
   /** A launchable pin was chosen (click / Enter), just before navigating. */
   'globe:pinSelected': { landmarkId: string };

@@ -1,5 +1,13 @@
 # Challenger Deep content: sources and notes (package C4)
 
+## 1400 content fact audit — 2026-10-11
+
+The current claim checks, corrections, primary references and unresolved items are
+recorded in [1400-f-audit-content-facts](../../../plan/progress/1400-f-audit-content-facts.md).
+That review supersedes conflicting positions, depths and source attributions in the
+historical research notes below. Published site references and authored scan-marker
+placements are distinct; the Journal’s existing single provenance tags identify additions without prose caveats.
+
 ## 1170 factual audit — 2026-10-09
 
 The `hadal-life` fact card still gave 8,075 m as the global fish record even though its paragraph had already been updated. Corrected it to the 8,336 m snailfish observation in the Izu–Ogasawara Trench, with the [authors' UWA publication record](https://research-repository.uwa.edu.au/en/publications/new-maximum-depth-record-for-bony-fish-teleostei-scorpaeniformes-/) as an accessible primary source. This is a different trench and provides no evidence of fish at Challenger Deep's floor.

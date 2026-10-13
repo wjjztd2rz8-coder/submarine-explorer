@@ -149,6 +149,10 @@ for (const tier of ['low', 'ultra'] as const) {
         expect(floating, `${hero.def.id}: every block touches the rendered apron`).toBe(0);
         expect(contacts).toBeGreaterThan(0);
         expect(missed, `${hero.def.id}: all sampled contacts reach a collider`).toBe(0);
+        expect(
+          unresolved,
+          `${hero.def.id}: resolved hull clears every rendered apron triangle`,
+        ).toBe(0);
         evidence.push({
           site: 'great-blue-hole',
           tier,

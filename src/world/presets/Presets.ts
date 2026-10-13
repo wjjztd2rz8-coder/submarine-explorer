@@ -48,7 +48,7 @@ import type {
 import { VentPreset } from './VentPreset.js';
 import { WreckPreset } from './WreckPreset.js';
 
-export const PRESET_NAMES: readonly EnvPresetName[] = [
+const PRESET_NAMES: readonly EnvPresetName[] = [
   'vent',
   'brine',
   'canyon',
@@ -59,7 +59,7 @@ export const PRESET_NAMES: readonly EnvPresetName[] = [
   'default',
 ];
 
-export function isPresetName(v: unknown): v is EnvPresetName {
+function isPresetName(v: unknown): v is EnvPresetName {
   return typeof v === 'string' && (PRESET_NAMES as readonly string[]).includes(v);
 }
 
@@ -105,9 +105,9 @@ export function landmarkTypeFor(doc: unknown, ids: readonly string[]): string | 
   return null;
 }
 
-export type PresetSource = 'param' | 'mission' | 'type' | 'default';
+type PresetSource = 'param' | 'mission' | 'type' | 'default';
 
-export interface PresetSelection {
+interface PresetSelection {
   preset: EnvPresetName;
   source: PresetSource;
   /** Raw overrides from mission.json (only when they belong to the chosen preset). */
@@ -218,11 +218,7 @@ export function presetDefaults(
   return { ...(config[name] as unknown as Record<string, PresetParamValue>) };
 }
 
-export function createPreset(
-  name: EnvPresetName,
-  look: ParticleLook,
-  water = DEFAULT_WATER,
-): EnvPreset {
+function createPreset(name: EnvPresetName, look: ParticleLook, water = DEFAULT_WATER): EnvPreset {
   switch (name) {
     case 'vent':
       return new VentPreset(look);
@@ -246,7 +242,7 @@ export function createPreset(
 // ------------------------------------------------------------------ system
 
 /** Narrow views of the game objects the system reads. */
-export interface PresetPropSource {
+interface PresetPropSource {
   loaded: boolean;
   placed: ReadonlyArray<{
     def: { id: string; model: string };
@@ -255,12 +251,12 @@ export interface PresetPropSource {
     sphere: THREE.Sphere;
   }>;
 }
-export interface PresetPoiSource {
+interface PresetPoiSource {
   loaded: boolean;
   pois: ReadonlyArray<{ id: string; kind: string; position: THREE.Vector3 }>;
 }
 
-export interface PresetSystemOptions {
+interface PresetSystemOptions {
   scene: THREE.Scene;
   bus: EventBus;
   config: GameConfig;
@@ -283,7 +279,7 @@ export interface PresetSystemOptions {
 }
 
 /** Props reduced to top/centre/height in world space. */
-export function toPresetProps(placed: PresetPropSource['placed']): PresetProp[] {
+function toPresetProps(placed: PresetPropSource['placed']): PresetProp[] {
   return placed.map((p) => {
     p.root.updateMatrixWorld(true);
     // Set pieces name their real orifice height (their bounds also cover plume reach).

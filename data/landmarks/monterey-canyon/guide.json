@@ -113,6 +113,10 @@
       ],
       "facts": [
         {
+          "label": "Depth at this scan point (GMRT grid)",
+          "value": "~1,015 m"
+        },
+        {
           "label": "Turbidity current speed (measured)",
           "value": "up to about 7.2 m/s (Paull et al. 2018)"
         },
@@ -185,6 +189,10 @@
         {
           "label": "Depth",
           "value": "891 m"
+        },
+        {
+          "label": "Published position",
+          "value": "36°42.7481′N 122°11.2139′W"
         },
         {
           "label": "Shore cable length",
