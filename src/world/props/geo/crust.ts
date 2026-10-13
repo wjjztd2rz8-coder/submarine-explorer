@@ -16,6 +16,7 @@ const OCHRE = new THREE.Color(0xc0903f);
 const ORANGE = new THREE.Color(0xb4572c);
 const SULFUR = new THREE.Color(0xd8bb62);
 const COAL = new THREE.Color(0x15110f);
+const SOOT = new THREE.Color(0x0b0908);
 
 const hash01 = (k: number): number => {
   const v = Math.sin(k * 12.9898 + 78.233) * 43758.5453;
@@ -65,7 +66,13 @@ export function paintCrust(
     out.lerp(bandTint > 0.5 ? OCHRE : ORANGE, crest * 0.8);
     out.lerp(SULFUR, smooth(0.7, 0.95, patch) * up * 0.3);
     out.lerp(COAL, smooth(0.35, 0, b.saw) * (1 - b.lip) * 0.65 * (1 - up));
-    out.lerp(COAL, smooth(0.9, 0.995, hh) * 0.7);
-    out.multiplyScalar(1.3); // keeps the trunk's overall brightness despite the darker recesses
+    // Vertical mineral streaks (long in y, tight around the axis) echo the Lost City striations:
+    // warm precipitate runs down some flutes, soot-dark gaps separate them.
+    const streak = fbm3(x * 2.4, y * 0.2, z * 2.4, seed ^ 0x5a, 3);
+    out.lerp(bandTint > 0.35 ? OCHRE : ORANGE, smooth(0.55, 0.78, streak) * 0.5 * (0.5 + 0.5 * up));
+    out.lerp(COAL, smooth(0.42, 0.18, streak) * 0.55);
+    out.multiplyScalar(1.4); // keeps the trunk's overall brightness despite the darker recesses
+    // Orifice: a soot-black rim and bowl so the mouth reads even where lamps wash the crust pale.
+    out.lerp(SOOT, smooth(0.93, 0.985, hh) * (0.55 + 0.4 * up));
   }
 }

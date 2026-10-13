@@ -1,0 +1,9 @@
+{
+  "beebe-chimney-1": {
+    "target": [0, 12, 0],
+    "direction": [0.866, 0, -0.5],
+    "above": 9,
+    "approachRange": 52,
+    "close": { "range": 32, "above": 14 }
+  }
+}

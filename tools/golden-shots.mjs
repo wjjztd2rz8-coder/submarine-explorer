@@ -31,6 +31,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { goldenOptions, selectGoldenHeroes } from './golden-options.mjs';
 import blueHolePoses from './blue-hole-poses.json' with { type: 'json' };
+import beebePoses from './beebe-poses.json' with { type: 'json' };
 import lostCityPoses from './lostcity-poses.json' with { type: 'json' };
 import montereyPoses from './monterey-poses.json' with { type: 'json' };
 
@@ -76,7 +77,8 @@ async function main() {
     ],
     // The south-eastern alcove, framed from inside the hole on its ledge (open side faces the hole centre).
     ['great-blue-hole', 'karst-grotto-east', 'great-blue-hole-east', blueHolePoses.east],
-    ['beebe-vent-field', 'beebe-chimney-1'],
+    // The whole trunk in frame from the dive-in side, aimed low enough that the scan card clears its top.
+    ['beebe-vent-field', 'beebe-chimney-1', 'beebe-vent-field', beebePoses['beebe-chimney-1']],
     ['monterey-canyon', 'canyon-wall-ledge', 'monterey-canyon', montereyPoses.wall],
     ['challenger-deep', 'leggo-lander-marker'],
     ['endurance', 'main-hull'],
