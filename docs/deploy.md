@@ -9,36 +9,54 @@ repository owner does the one-time setup below.
 ## 1. Continuous integration (`.github/workflows/ci.yml`)
 
 Runs on every push to `main` and every pull request targeting `main`. A newer
-push to the same branch or PR cancels the older run (`concurrency`). Three jobs
-run independently on `ubuntu-latest` with Node 22 and npm caching:
+push to the same branch or PR cancels the older run (`concurrency`). Jobs use
+`ubuntu-latest` with Node 22 and npm caching:
 
-| Job                     | Gates                                                                                    | Job limit        |
-| ----------------------- | ---------------------------------------------------------------------------------------- | ---------------- |
-| Build and static checks | Python tests, strict mission content, typecheck/build, unit tests, attribution, Prettier | 15 min           |
-| E2e (30 shards)         | Build, Chromium install, full Playwright suite split by individual test                  | 24 min per shard |
-| Project-base            | Chromium install, project-base build and browser test                                    | 15 min           |
+| Job                     | Gates                                                                                  | Job limit        |
+| ----------------------- | -------------------------------------------------------------------------------------- | ---------------- |
+| Build and static checks | Python tests, strict mission content, one typecheck, unit tests, attribution, Prettier | 15 min           |
+| Builds (two bases)      | One Vite build each for `/` and `/submarine-explorer/`, manifest and artifact upload   | 15 min per base  |
+| E2e (30 shards)         | Download/validate root artifact, Chromium install, balanced full Playwright suite      | 30 min per shard |
+| Project-base            | Download/validate project-base artifact, Chromium install, all eight base cases        | 15 min           |
+
+Both browser consumers depend on the completed build matrix; static checks run
+independently and remain required. Each complete Vite output is an immutable v4
+artifact named `ci-build-<run_id>-<run_attempt>-<root|project-base>`. The embedded
+`ci-build-manifest.json` binds the output to the workflow SHA, lockfile SHA-256,
+exact Node version, deployment base and outdir. Consumers reject mismatches,
+missing essential files and symlinks before starting a preview. Builds include
+portable copies of public data/tiles, models, fonts and PWA files. Root shards
+serve `PW_OUTDIR=dist-root`; project-base serves `dist-project-base` with
+`VITE_BASE`/`PW_BASE=/submarine-explorer/` and port 4211. Consumers never build
+or typecheck, and a failed producer prevents dependent browser jobs from running.
 
 GitHub runners have no GPU, so Chromium renders WebGL on SwiftShader. Each
 shard retains one browser worker, CI's low-tier preference, existing per-test
 limits and one retry. `--fully-parallel` enables test-level sharding even for
 large files; one worker still executes tests sequentially on each runner.
-The shard denominator is derived from the matrix size. E2e has a 20-minute
-suite budget and stops after the first final failure; matrix fail-fast cancels
-other shards. Timeouts and incomplete suites fail CI. A successful run must
-pass every job and all existing tests (including the separate project-base check).
+The shard denominator is derived from the matrix size. Root E2e has a 25-minute
+suite budget and finishes the shard after test failures; `fail-fast: false`
+lets other shards finish too. Timeouts and incomplete suites fail CI. A
+successful run must pass every job and all existing tests, including the
+separate project-base check (eight-minute suite budget).
 
 Chromium is cached by OS, architecture and lockfile hash. Every browser job
-still runs `npx playwright install --with-deps chromium` on cache hits to ensure
-OS dependencies; installation has a five-minute step limit. Failure screenshots,
-reports and retry traces are uploaded for 14 days. The tiles are committed, so
-the tests need no network access. The longest job is bounded below 25 minutes;
-hosted queue delays are outside job timeouts, and passing hosted duration must
-be confirmed after merging.
+runs `tools/install-playwright-chromium.sh` even on cache hits to ensure OS
+dependencies, with three bounded attempts, back-off and an eight-minute step
+limit. Failure screenshots, reports and retry traces are uploaded for 14 days;
+all shards upload their JSON timings. The tiles are committed, so game data
+needs no network access. Hosted queue, artifact-transfer and dependency delays
+still require measurement before claiming wall-time savings.
 
-To reproduce CI locally, run `npm run ci`, which runs the same checks in order
-after `npm ci`. When other people or agents share the checkout, use the isolated
-form from `CONTRIBUTING-AGENTS.md` (`--outDir dist-<you>`,
-`PW_PORT`/`PW_OUTDIR`) instead.
+To reproduce CI locally after `npm ci`, run `npm run ci`. It delegates to
+`tools/gates.sh --full-e2e`, the canonical ordered gate list: Python, strict
+content, build/typecheck, unit, root browser, project-base build/browser,
+attribution and formatting. CI selects runner phases instead of duplicating
+command lists. Local runs build once per base into isolated outputs under
+`.cache/runs/<id>/`; `.cache/gates/<gate>.log` links to each latest gate log.
+Use a unique `PW_PORT` when sharing the checkout. `PW_OUTDIR`, when supplied,
+is built and retained; CI's internal `--prebuilt` phases validate downloaded
+outputs and retain them without rebuilding.
 
 For routine local work, `PW_PORT=4197 bash tools/gates.sh` runs every static
 gate plus the existing `smoke.spec.ts` (home shell, Titanic and Monterey Canyon
@@ -63,7 +81,7 @@ release requirements from `plan/RESUME-PROMPT.md`.
 
 When `CI` is nonempty, the gate script defaults to the full suite as well.
 `--no-e2e` retains the existing explicit static-only option. Each simultaneous
-gate run needs a different `PW_PORT`; project-base uses that port plus 100.
+gate run needs a different `PW_PORT`; its two suites use that port sequentially.
 Per-test limits, retries and browser worker count are unchanged. Reduced local
 test selection avoids repeated long soak, content and visual sweeps on shared
 CPUs; passing wall time still needs measurement in a browser-capable environment.
@@ -72,7 +90,9 @@ CPUs; passing wall time still needs measurement in a browser-capable environment
 pressure-band review is checked against the mission and hull configuration;
 it is printed as a reviewed note. `test:e2e:base` builds into
 `dist-project-base/` and checks `/submarine-explorer/` on port 4211, with
-artifacts in `test-results-project-base/` (also uploaded on CI failure).
+artifacts in `test-results-project-base/`. CI consumes the project-base artifact
+and invokes Playwright directly through the runner, keeping that result path
+for failure uploads.
 
 ## 2. Enabling GitHub Pages (owner, once)
 

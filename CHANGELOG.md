@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **1530 S-tests step 4:** CI builds each deployment base once and shares immutable, SHA/lockfile/Node/base-validated artifacts across all 30 shards and the project-base browser check; `npm run ci` delegates to the canonical full gate runner. Reason: remove 30 redundant hosted builds and prevent gate-order drift while retaining every assertion and shard.
+
 - **S-hygiene (tooling):** gate runs write builds, Playwright results and logs under `.cache/runs/<id>/` (`.cache/gates/<gate>.log` links to the latest run). `tools/clean-artifacts.sh` lists stale `dist-*`, `test-results-*` and run directories (dry run by default; skips live `PW_OUTDIR`s). Reason: the repo root had accumulated about 3 GB of stale output. One-off shot scripts, `codex-available.sh` and `playwright.bughunt-880.config.ts` moved to `tools/archive/`; seven superseded plan files and the progress images moved to `plan/archive/`. Docs now state 30 e2e shards.
 - **1392 narrow landscape follow-up:** restore Scan to the two right action columns so discovery rewards clear it, and place the small-phone tutorial in the centre lane below wrapped scan guidance and beside telemetry/actions. Reason: the 667×375 reward sweep exposed collisions beyond the Boost column.
 
