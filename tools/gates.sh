@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Run static gates and browser smoke checks. CI defaults to the full suite.
-# Usage: tools/gates.sh [--full-e2e | --no-e2e]   Logs: .cache/gates/<gate>.log
-# Builds use temporary outputs unless PW_OUTDIR names a retained output.
+# Usage: tools/gates.sh [--full-e2e | --no-e2e]
+# Each run writes under .cache/runs/<id>/ (builds, test-results, <gate>.log);
+# .cache/gates/<gate>.log links to the latest run's log. tools/clean-artifacts.sh
+# prunes old runs. PW_OUTDIR, when set, names a retained build output instead.
 # Read-only dependency trees: GATES_CONFIG_MODE=writable keeps temporary config
 # bundles in .cache, and uses Vitest's runner without a dependency-tree cache.
 set -uo pipefail
@@ -37,8 +39,11 @@ fi
 port=$((10#$port))
 # A gate run must build exactly what its preview will serve. Unique outputs
 # also prevent another gate process rebuilding/removing a live suite's files.
-outdir="${PW_OUTDIR:-dist-gates-$port-$$}"
-base_outdir="dist-gates-base-$port-$$"
+run_id="$(date +%Y%m%d-%H%M%S)-$$"
+run_dir=".cache/runs/$run_id"
+mkdir -p "$run_dir"
+outdir="${PW_OUTDIR:-$run_dir/dist}"
+base_outdir="$run_dir/dist-base"
 gate_config=".cache/gates/vite-$port-$$.config.mjs"
 cleanup() {
   [[ -n "${PW_OUTDIR:-}" ]] || rm -rf -- "$outdir"
@@ -49,11 +54,12 @@ trap cleanup EXIT
 fail=0
 gate() {
   local name="$1"; shift
-  if "$@" > ".cache/gates/$name.log" 2>&1; then
+  ln -sfn "../runs/$run_id/$name.log" ".cache/gates/$name.log"
+  if "$@" > "$run_dir/$name.log" 2>&1; then
     echo "PASS $name"
   else
-    echo "FAIL $name  (log: .cache/gates/$name.log)"
-    tail -40 ".cache/gates/$name.log" | sed 's/^/    /'
+    echo "FAIL $name  (log: $run_dir/$name.log)"
+    tail -40 "$run_dir/$name.log" | sed 's/^/    /'
     fail=1
   fi
 }
@@ -86,7 +92,7 @@ if [[ "$e2e_mode" != none ]]; then
   # Always let Playwright start/own its server; a port conflict fails early
   # instead of silently depending on another task's preview lifetime/build.
   gate e2e env PW_PORT="$port" PW_OUTDIR="$outdir" PW_REUSE_SERVER=0 \
-    npm run test:e2e -- "${e2e_specs[@]}" --output="test-results-gates-$port-$$"
+    npm run test:e2e -- "${e2e_specs[@]}" --output="$run_dir/test-results"
   project_base() {
     # The suites run sequentially and Playwright has stopped the first preview.
     # Use the requested port again: port + 100 may belong to an unrelated task.
@@ -94,7 +100,7 @@ if [[ "$e2e_mode" != none ]]; then
     VITE_BASE=/submarine-explorer/ npm run build -- --outDir "$base_outdir" "${build_config_args[@]}" && \
       VITE_BASE=/submarine-explorer/ PW_BASE=/submarine-explorer/ PW_PORT="$port" \
       PW_OUTDIR="$base_outdir" PW_REUSE_SERVER=0 \
-      npx playwright test tests/e2e/base-url.spec.ts --output="test-results-project-base-$port-$$"
+      npx playwright test tests/e2e/base-url.spec.ts --output="$run_dir/test-results-project-base"
   }
   gate e2e-base project_base
 fi
