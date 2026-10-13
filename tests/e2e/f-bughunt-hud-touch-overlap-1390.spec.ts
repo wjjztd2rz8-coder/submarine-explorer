@@ -168,7 +168,9 @@ for (const viewport of [
         await ready(page);
         const card = page.locator('.onboard-card');
         const chip = page.locator('.scan-objective-chip');
-        await expect(card).toHaveAttribute('data-step', 'move');
+        // The tutorial and the scan/objective card never share the screen.
+        if (await page.locator('.scan-panel').isVisible()) await expect(card).toBeHidden();
+        else await expect(card).toHaveAttribute('data-step', 'move');
         await layout(page, 'opening');
 
         const poi = await page.evaluate(() => {

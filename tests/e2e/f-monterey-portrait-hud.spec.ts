@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import type { Camera } from 'three';
 import type { Submarine } from '../../src/sub/Submarine.js';
+import { setScanCardSuppressed } from './helpers/tutorial.js';
 
 // Phone portrait at the Monterey Canyon spawn: every HUD panel owns its own
 // space, and the submarine is on screen and not hidden behind any of them.
@@ -93,11 +94,16 @@ test('free dive: portrait HUD panels do not overlap', async ({ page }) => {
   await expectClearLayout(page);
 });
 
-test('mission with tutorial: card, objectives, scan and readouts stay separate', async ({
+test('mission with tutorial: card, objectives, scan and readouts each stay clear', async ({
   page,
 }) => {
   await boot(page, 'mission=monterey-canyon');
-  await expect(page.locator('.onboard-card')).toBeVisible();
   await expect(page.locator('.objectives-panel')).toBeVisible();
+  // The objective card is up from the start, so the tutorial waits; lay out each in turn.
+  await expect(page.locator('.scan-panel')).toBeVisible();
+  await expect(page.locator('.onboard-card')).toBeHidden();
+  await expectClearLayout(page);
+  await setScanCardSuppressed(page, true);
+  await expect(page.locator('.onboard-card')).toBeVisible();
   await expectClearLayout(page);
 });

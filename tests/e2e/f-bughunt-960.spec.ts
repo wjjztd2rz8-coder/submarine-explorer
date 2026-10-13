@@ -5,7 +5,7 @@ import type { CameraRig } from '../../src/sub/CameraRig.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
 import { scanAim } from './helpers/scanAim.js';
-import { dismissTutorial } from './helpers/tutorial.js';
+import { dismissTutorial, setScanCardSuppressed } from './helpers/tutorial.js';
 import { expectCompactPhoneHud } from './helpers/phoneHud.js';
 
 type Game = {
@@ -127,6 +127,9 @@ for (const layout of [
             await page.clock.runFor(34);
             await expect(briefing).toBeHidden();
             if (layout.touch) {
+              // The objective card is up, so the tutorial waits; bring it back to read its copy.
+              await setScanCardSuppressed(page, true);
+              await page.clock.runFor(34);
               // A keyboard event in the disclosure changes the active input device.
               await act(page.getByRole('button', { name: 'Skip', exact: true }));
               await page.clock.runFor(34);

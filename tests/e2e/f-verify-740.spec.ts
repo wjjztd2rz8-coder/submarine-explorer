@@ -202,7 +202,6 @@ for (const layout of [
         if (layout.touch) await page.locator('.briefing-begin').tap();
         else await page.locator('.briefing-begin').click();
         await page.clock.runFor(100);
-        await expect(page.locator('.onboard-card')).toBeVisible();
         await dismissTutorial(page, layout.touch, true);
         await page.evaluate(() => {
           const g = window.__game as unknown as Game;

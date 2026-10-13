@@ -18,7 +18,7 @@ type Game = {
   discovery: Discovery;
   sub: Submarine;
   mission: Mission;
-  onboard: { tutorial: { index: number } };
+  onboard: { tutorial: { index: number; active: boolean } };
 };
 
 async function ready(page: Page): Promise<void> {
@@ -208,7 +208,9 @@ for (const layout of [
         ),
       ).toBe(false);
       // Pausing is not tutorial completion or a change of gameplay defaults.
-      await expect(page.locator('.onboard-card')).toBeVisible();
+      expect(
+        await page.evaluate(() => (window.__game as unknown as Game).onboard.tutorial.active),
+      ).toBe(true);
       if (layout.touch) await page.locator('.tc-btn-pause').tap();
       else await page.keyboard.press('Escape');
       const controls = page

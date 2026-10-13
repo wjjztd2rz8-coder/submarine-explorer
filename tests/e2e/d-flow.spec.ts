@@ -196,6 +196,11 @@ test.describe('D-FLOW dive flow', () => {
       '2 of 4 objectives. 2 optional targets remain.',
     );
     await expect(banner.locator('button')).toHaveText(['Keep exploring', 'Surface and debrief']);
+    // The banner is the one completion presentation: it carries the stars earned so far.
+    await expect(banner.locator('.obj-banner-stars')).toHaveAttribute(
+      'aria-label',
+      /^[0-3] of 3 stars$/,
+    );
     await expect(page.locator('.mission-debrief')).toHaveCount(0);
     await shot(page, 'primaries-complete-banner');
 

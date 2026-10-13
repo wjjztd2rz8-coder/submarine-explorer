@@ -224,10 +224,7 @@
   }
   html.is-touch
     .hud-readouts:has(.hud-power:not([hidden]))
-    .hud-row:is(
-      :has([data-field='depth']),
-      :has([data-field='speed'])
-    ) {
+    .hud-row:is(:has([data-field='depth']), :has([data-field='speed'])) {
     grid-row: 1;
     grid-column: span 2;
     display: flex;
@@ -662,10 +659,7 @@
      stack the labels above values and add a third core telemetry line. */
   html.is-touch
     :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
-    .hud-row:is(
-      :has([data-field='depth']),
-      :has([data-field='speed'])
-    ) {
+    .hud-row:is(:has([data-field='depth']), :has([data-field='speed'])) {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;

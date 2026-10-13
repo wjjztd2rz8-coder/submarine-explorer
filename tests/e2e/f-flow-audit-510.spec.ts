@@ -151,7 +151,10 @@ async function firstActions(page: Page, touch: boolean): Promise<void> {
     }
   }
   await page.clock.runFor(17);
-  await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'scan');
+  // The scan step is current even while the scan card keeps the tutorial card hidden.
+  expect(await page.evaluate(() => (window.__game as unknown as Game).onboard.tutorial.index)).toBe(
+    2,
+  );
 }
 
 for (const viewport of [
@@ -275,7 +278,10 @@ for (const viewport of [
         await act(begin, touch);
         // The clock is paused: render frames so the first tutorial step is shown.
         await page.clock.runFor(34);
-        await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', 'move');
+        // The objective card is up from the start, so the tutorial waits at its first step.
+        expect(
+          await page.evaluate(() => (window.__game as unknown as Game).onboard.tutorial.index),
+        ).toBe(0);
         if (touch) await expectCompactPhoneHud(page);
         await shot('05-dive-start');
         await firstActions(page, touch);
