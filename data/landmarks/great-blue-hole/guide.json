@@ -19,12 +19,16 @@
           "value": "about 125 m"
         },
         {
-          "label": "Terrain reading at hole coordinates (this tile)",
-          "value": "~4.2 m in the unmodified GMRT grid; game floor about 125 m"
+          "label": "Unmodified grid at the published coring position",
+          "value": "~4.1 m; the shaped game sinkhole floor is about 125 m"
         },
         {
           "label": "Protection",
           "value": "Belize Barrier Reef Reserve System, UNESCO World Heritage Site"
+        },
+        {
+          "label": "Published central coring position (BH8)",
+          "value": "17°18′57.2″N 87°32′00.60″W; water depth 125 m"
         }
       ],
       "reconstruction": true,
