@@ -993,3 +993,31 @@ html.is-touch body:has(.onboard-card:not([hidden], [data-step='scan'])) .scan-ob
     top: calc(116px + env(safe-area-inset-top, 0px));
   }
 }
+
+@media (max-height: 460px) and (orientation: landscape) {
+  /* The completion banner takes the free centre lane (the objective panel
+     column is full of controls below it) and the cards that share that lane
+     step aside while it is up. */
+  html.is-touch .obj-banner {
+    position: fixed;
+    left: var(--hl-col-left);
+    top: calc(58px + env(safe-area-inset-top, 0px));
+    width: var(--hl-col-width);
+    box-sizing: border-box;
+    margin: 0;
+    flex-direction: row;
+    align-items: center;
+    z-index: 20;
+  }
+  html.is-touch .obj-banner-text {
+    flex: 1;
+    min-width: 0;
+  }
+  html.is-touch .obj-banner-actions {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+  html.is-touch body:has(.obj-banner:not([hidden])) :is(.scan-overlay .scan-stack, .onboard-card) {
+    visibility: hidden;
+  }
+}

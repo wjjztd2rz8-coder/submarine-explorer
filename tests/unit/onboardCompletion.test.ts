@@ -75,7 +75,7 @@ function setup(seenHints: HintId[] = ['creature']) {
     save: { onChange: () => () => {} },
     discovery: {
       loaded: true,
-      overlay: { messages: {}, cardVisible: false },
+      overlay: { messages: {}, cardVisible: false, promptActive: false },
       guide: { isOpen: false },
     },
     props: { loaded: true },
@@ -134,17 +134,21 @@ describe('onboarding completion through the system', () => {
     });
   }
 
-  it('the tutorial card never shows alongside the scan card', () => {
+  it('the tutorial card never shows alongside an actionable scan card', () => {
     const { ctx, system, tick, onboard } = setup();
     try {
       tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
       tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
       expect(onboard.tutorial.step?.id).toBe('scan');
-      Object.assign(ctx.discovery.overlay, { cardVisible: true });
+      // A dim navigation card leaves the tutorial up.
+      Object.assign(ctx.discovery.overlay, { cardVisible: true, promptActive: false });
+      tick();
+      expect(views.card.show.mock.lastCall?.[0]).toBe(2);
+      Object.assign(ctx.discovery.overlay, { cardVisible: true, promptActive: true });
       tick();
       expect(views.card.show).toHaveBeenLastCalledWith(null);
       expect(onboard.tutorial.step?.id).toBe('scan');
-      Object.assign(ctx.discovery.overlay, { cardVisible: false });
+      Object.assign(ctx.discovery.overlay, { cardVisible: false, promptActive: false });
       tick();
       expect(views.card.show.mock.lastCall?.[0]).toBe(2);
     } finally {

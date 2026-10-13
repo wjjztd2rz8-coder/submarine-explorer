@@ -168,8 +168,9 @@ for (const viewport of [
         await ready(page);
         const card = page.locator('.onboard-card');
         const chip = page.locator('.scan-objective-chip');
-        // The tutorial and the scan/objective card never share the screen.
-        if (await page.locator('.scan-panel').isVisible()) await expect(card).toBeHidden();
+        // The tutorial never shares the screen with an actionable scan card; dim cards only navigate.
+        if (await page.locator('.scan-panel:not([data-tone="dim"])').isVisible())
+          await expect(card).toBeHidden();
         else await expect(card).toHaveAttribute('data-step', 'move');
         await layout(page, 'opening');
 

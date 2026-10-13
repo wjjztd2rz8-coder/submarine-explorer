@@ -130,9 +130,12 @@ for (const viewport of [
             ).toBe(uiScale);
             if (phase === 'opening') {
               // The tutorial card defers to the scan card, so only one of them is up.
-              const scanUp = await page.locator('.scan-panel').isVisible();
+              const scanUp = await page.locator('.scan-panel:not([data-tone="dim"])').isVisible();
               if (scanUp) await expect(page.locator('.onboard-card')).toBeHidden();
-              await separate(page, [...hud, scanUp ? '.scan-panel' : '.onboard-card']);
+              const fresh = [...hud];
+              for (const selector of ['.onboard-card', '.scan-panel'])
+                if (await page.locator(selector).isVisible()) fresh.push(selector);
+              await separate(page, fresh);
               await expect(page.locator('.hud-attribution')).toHaveCount(0);
               await page.screenshot({ path: testInfo.outputPath('arcade-opening.png') });
               return;

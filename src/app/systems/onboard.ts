@@ -244,8 +244,9 @@ export function createOnboardSystem(): GameSystem {
           (o) => o.primary && !o.complete,
         )?.title;
         if (card) {
-          // The scan card carries its own instruction; never stack the two.
-          if (step && playing && !ctx.discovery.overlay.cardVisible)
+          // An actionable scan card carries its own instruction; never stack the two.
+          // Dim navigation cards leave room for the tutorial.
+          if (step && playing && !ctx.discovery.overlay.promptActive)
             card.show(
               tutorial.index,
               tutorialText(

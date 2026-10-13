@@ -46,6 +46,49 @@ for (const viewport of [
       expect(bottom).toBeLessThan(viewport.height * 0.5 + 20);
     });
 
+    test('completion banner clears every touch control and the telemetry', async ({ page }) => {
+      // Regression: on a phone in landscape the banner sat under Sonar/Lights/Boost, hiding Surface.
+      await ready(page, stackUrl);
+      await dismissTutorial(page, true);
+      await page.evaluate(() =>
+        (
+          window.__game as unknown as { missionRouter: { showBanner(kind: 'primary'): void } }
+        ).missionRouter.showBanner('primary'),
+      );
+      const banner = page.locator('.obj-banner');
+      await expect(banner).toBeVisible();
+      await banner.evaluate((e) => Promise.all(e.getAnimations().map((a) => a.finished)));
+      await page.screenshot({ path: `${shots}/completion-banner-${tag}.png` });
+      const hits = await page.evaluate(() => {
+        const b = document.querySelector('.obj-banner')!.getBoundingClientRect();
+        return [
+          '.tc-stick',
+          '.tc-slider',
+          '.tc-buttons',
+          '.tc-btn-pause',
+          '.hud-journal',
+          '.hud-readouts',
+          '.sonar',
+        ].filter((selector) => {
+          const r = document.querySelector(selector)?.getBoundingClientRect();
+          return (
+            !!r &&
+            r.width > 0 &&
+            r.left < b.right &&
+            b.left < r.right &&
+            r.top < b.bottom &&
+            b.top < r.bottom
+          );
+        });
+      });
+      expect(hits).toEqual([]);
+      for (const name of ['Keep exploring', 'Surface and debrief']) {
+        const box = (await banner.getByRole('button', { name }).boundingBox())!;
+        expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+        expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
+      }
+    });
+
     test('objective chip shows when no contact is in range', async ({ page }) => {
       await ready(page, stackUrl);
       await dismissTutorial(page, true);
