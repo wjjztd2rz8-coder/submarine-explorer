@@ -988,3 +988,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Gates / push:** a full local e2e on main was abandoned at ~110 of ~640 tests after 40 min (about 4 h projected, and it would have kept Codex idle). Pushed main without tag f53 instead and used hosted CI as the full-suite signal: 17 of 30 shards red. Cause found: S-flow hides the tutorial under a scan card, breaking f-bughunt-880 (fixed, verified locally); the rest (f-events-reform, f2-explore caption, globe-pins chooser, f-verify-1000 Monterey, f-bluehole-squiggle) go to Codex 1610 with the evidence. No tag until CI is green.
 - **Queue:** Codex 1570 S-resolve, 1580 S-modal, 1590 S-boot, 1610 hosted CI; 1600 S-rewards held behind 1570. Claude lanes in DIRECTOR: V-first-five, S-guidance, S-tests step 2, S-hud, V-titanic.
 - **Needs owner:** a real-phone play of the newest push.
+
+## 2026-10-13 08:09 CDT headless run (Claude)
+
+- **Merged:** V-first-five (Haiku capture; note only, script dropped, no game source change). Real-run banner/stars verified (3 of 4 objectives, 1 of 3 stars). Findings: up to 4 guidance surfaces at once, NEW ENTRY card + hint + toast stacked after a scan, landscape briefing hides Begin dive, SEABED PROXIMITY covers JOURNAL in portrait, debrief scan count and last-scan name wrong. These feed S-guidance, S-hud and the new S-debrief item.
+- **Running:** Codex 1570 S-resolve, 1580 S-modal, 1590 S-boot (no collection yet). Queued 1610 hosted CI, 1620 S-verify, 1630 S-bughunt, 1640 S-debrief. Stale paused-packages file removed (S-flow, V-beebe, S-bugs all merged earlier).
+- **Not done:** no second Claude package (Claude 5h fell to 44%, below the 45% start threshold); next Claude item is S-guidance (Sonnet). No push or tag (f53 untagged until hosted CI is green). Needs owner: real-phone play of the f53 build.
