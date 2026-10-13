@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **V-beebe trunk and golden pose:** the Beebe hero trunk gets vertical mineral streaks (ochre runs, soot gaps), a soot-black orifice rim and a slightly stronger self-lit tint, with identical triangle and draw counts. The golden approach for Beebe now stands 44 m out, aimed at the upper trunk (`tools/beebe-poses.json`), so the whole chimney and its smoke show and the scan card no longer covers the top. Reason: the old pose cut the trunk off and the card sat on it. Details: `plan/progress/V-beebe.md`.
+
 - **V-bluehole Blue Hole sediment terraces:** gallery aprons use smooth sampled normals, softer risers, 3x the triangles on Medium and above, varied bed roughness, silt darkening at riser feet and per-pixel bed shading (dark riser, lit lip) so terraces read as stacked sediment on every tier, Low included at its exact triangle and draw budget. Reason: the golden approach read as flat polygon steps. The apron collision gap stays a separate item. Details: `plan/progress/1410-f-bluehole-bowl-facets.md`.
 
 - **S-hygiene (tooling):** gate runs write builds, Playwright results and logs under `.cache/runs/<id>/` (`.cache/gates/<gate>.log` links to the latest run). `tools/clean-artifacts.sh` lists stale `dist-*`, `test-results-*` and run directories (dry run by default; skips live `PW_OUTDIR`s). Reason: the repo root had accumulated about 3 GB of stale output. One-off shot scripts, `codex-available.sh` and `playwright.bughunt-880.config.ts` moved to `tools/archive/`; seven superseded plan files and the progress images moved to `plan/archive/`. Docs now state 30 e2e shards.
