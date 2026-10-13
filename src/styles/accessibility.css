@@ -8,8 +8,7 @@
   outline-offset: 3px;
 }
 
-.hud-label,
-.hud-control-tips {
+.hud-label {
   opacity: 1;
 }
 

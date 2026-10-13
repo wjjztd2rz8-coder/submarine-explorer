@@ -37,7 +37,6 @@ export interface SettingsValues {
   muted: boolean;
   sonarPalette: SonarPaletteName;
   uiScale: number;
-  controlTips: boolean;
   /** How nearing the hull's rated depth is shown (never screen shake). */
   hullWarningStyle: HullWarningStyle;
   gameplayMode: GameplayMode;
@@ -89,7 +88,6 @@ const GAMEPLAY_KEYS = [
 export const SETTING_KEYS: readonly SettingKey[] = [
   ...DISPLAY_KEYS,
   'uiScale',
-  'controlTips',
   'hullWarningStyle',
   'gameplayMode',
   'gameplay',
@@ -111,7 +109,6 @@ export function defaultSettings(config: SettingsConfigSource): SettingsData {
     muted: false,
     sonarPalette: d.sonarPalette,
     uiScale: 100,
-    controlTips: true,
     hullWarningStyle: 'both',
     gameplayMode: 'arcade',
     gameplay: { ...config.settings.gameplayPresets.arcade },
@@ -180,7 +177,6 @@ export function migrate(raw: unknown, config: SettingsConfigSource): SettingsDat
       );
   }
   if (value.version === 2) {
-    if (typeof value.controlTips === 'boolean') out.controlTips = value.controlTips;
     if (HULL_WARNING_STYLES.includes(value.hullWarningStyle as HullWarningStyle))
       out.hullWarningStyle = value.hullWarningStyle as HullWarningStyle;
     if (typeof value.uiScale === 'number' && Number.isFinite(value.uiScale))
@@ -268,7 +264,9 @@ export class Save {
     }
     this.data = migrate(raw, this.config);
     if (this.storageReadFailed) this.reloadSafe_ = false;
-    if ((absent || recoveredLegacy) && !this.readOnly) this.persist();
+    // Rewrite once when a retired key (controlTips) is dropped, so it does not linger in storage.
+    const retired = !!raw && typeof raw === 'object' && 'controlTips' in (raw as object);
+    if ((absent || recoveredLegacy || retired) && !this.readOnly) this.persist();
     return this.get();
   }
   get(): SettingsData {

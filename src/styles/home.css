@@ -233,33 +233,19 @@
   outline-offset: 3px;
 }
 .home-menu > .home-primary,
-.home-menu > .home-wide,
 .home-menu > .daily-card,
 .home-menu > .mode-selector {
   grid-column: 1 / -1;
 }
 .home-menu > .home-primary {
-  font-size: 18px;
-}
-.home-menu > .home-primary:not(:disabled),
-.home-menu > .home-primary:disabled ~ .home-primary {
   border-color: var(--home-mint);
-}
-.home-menu > .home-primary:not(:disabled):first-child,
-.home-menu > .home-primary:disabled + .home-primary {
   background: var(--home-mint);
   color: var(--home-canvas);
+  font-size: 18px;
 }
-.home-menu > .home-primary:not(:disabled):first-child:hover,
-.home-menu > .home-primary:disabled + .home-primary:hover {
+.home-menu > .home-primary:hover {
   background: #8cefe0;
   border-color: #8cefe0;
-}
-.home-menu > .home-primary:disabled {
-  border-style: dashed;
-  background: transparent;
-  color: var(--home-muted);
-  cursor: not-allowed;
 }
 .home-menu > button.daily-card {
   display: grid;

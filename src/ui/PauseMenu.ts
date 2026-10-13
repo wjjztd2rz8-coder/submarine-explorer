@@ -20,11 +20,10 @@ export interface PauseActions {
   objectives(): PauseObjective[];
 }
 
-type PauseView = 'menu' | 'objectives' | 'sites' | 'credits';
+type PauseView = 'menu' | 'objectives' | 'credits';
 
 export class PauseMenu {
   readonly root: HTMLDivElement;
-  readonly sitesSlot: HTMLDivElement;
   private readonly menu: HTMLElement;
   private readonly detail: HTMLElement;
   private readonly title: HTMLElement;
@@ -65,7 +64,6 @@ export class PauseMenu {
     };
     entry('Resume', actions.resume);
     entry('Objectives', () => this.showView('objectives'));
-    entry('Mission select', () => this.showView('sites'));
     entry('Journal', actions.journal);
     entry('Settings', actions.settings);
     this.controlsButton = entry('Controls', actions.controls);
@@ -82,11 +80,9 @@ export class PauseMenu {
     this.title = document.createElement('h2');
     this.list = document.createElement('ul');
     this.list.className = 'pause-objectives';
-    this.sitesSlot = document.createElement('div');
-    this.sitesSlot.className = 'pause-sites-scroll';
     this.creditsSlot = document.createElement('div');
     this.creditsSlot.className = 'pause-credits';
-    this.detail.append(back, this.title, this.list, this.sitesSlot, this.creditsSlot);
+    this.detail.append(back, this.title, this.list, this.creditsSlot);
     panel.append(kicker, heading, this.menu, this.detail);
     this.root.append(panel);
     parent.append(this.root);
@@ -124,7 +120,6 @@ export class PauseMenu {
     this.menu.hidden = view !== 'menu';
     this.detail.hidden = view === 'menu';
     this.list.hidden = view !== 'objectives';
-    this.sitesSlot.hidden = view !== 'sites';
     this.creditsSlot.hidden = view !== 'credits';
     if (view === 'objectives') {
       this.title.textContent = 'Objectives';
@@ -143,8 +138,6 @@ export class PauseMenu {
         this.list.append(row);
       }
       if (!items.length) this.list.textContent = 'Free dive · explore at your own pace.';
-    } else if (view === 'sites') {
-      this.title.textContent = 'Mission select';
     } else if (view === 'credits') {
       this.title.textContent = 'Data credits';
       this.creditsSlot.replaceChildren(this.actions.credits());

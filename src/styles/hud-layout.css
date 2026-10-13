@@ -215,7 +215,7 @@
   }
   /* Supplies add almost 100 px to the old single-column Surface stack.
      Use the full objective width and three rows above the action buttons:
-     depth/speed/status; supplies/hull; current. Keep every live readout. */
+     depth/speed; supplies/hull; current. Keep every live readout. */
   html.is-touch .hud-readouts:has(.hud-power:not([hidden])) {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -226,8 +226,7 @@
     .hud-readouts:has(.hud-power:not([hidden]))
     .hud-row:is(
       :has([data-field='depth']),
-      :has([data-field='speed']),
-      :has([data-field='status'])
+      :has([data-field='speed'])
     ) {
     grid-row: 1;
     grid-column: span 2;
@@ -665,8 +664,7 @@
     :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
     .hud-row:is(
       :has([data-field='depth']),
-      :has([data-field='speed']),
-      :has([data-field='status'])
+      :has([data-field='speed'])
     ) {
     display: flex;
     flex-direction: row;
@@ -696,15 +694,6 @@
   }
   html.is-touch
     :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
-    .hud-row:has([data-field='status']) {
-    grid-area: 2 / 1;
-  }
-  html.is-touch
-    :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
-    .hud-row:has([data-field='status'])
-    .hud-label,
-  html.is-touch
-    :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
     .hud-row:has([data-field='heading']),
   html.is-touch
     :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden])))
@@ -718,9 +707,6 @@
     content: attr(data-knots);
     font-size: 13px;
   }
-  html.is-touch .hud-readouts [data-field='status'] {
-    font-size: 11px;
-  }
   html.is-touch .hud-readouts [data-field='depth'] {
     font-size: 0;
   }
@@ -729,7 +715,7 @@
     font-size: 13px;
   }
   html.is-touch :is(.hud-readouts, .hud-readouts:has(.hud-power:not([hidden]))) .hull-gauge {
-    grid-area: 2 / 2;
+    grid-area: 2 / 1 / auto / -1;
     margin: 0;
     padding: 0;
     border: 0;

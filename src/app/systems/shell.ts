@@ -18,7 +18,10 @@ import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
 
-/** localStorage key for the last mission dived (Continue). */
+/** The mission a first-time player dives into from Home. */
+const FIRST_MISSION_ID = 'titanic';
+
+/** localStorage key for the last mission dived (Home's Dive button continues it). */
 export const LAST_SITE_KEY = 'subexplorer.lastSite.v1';
 
 /** The saved last mission id, or null when absent or malformed. */
@@ -47,15 +50,10 @@ export const shellSystem: GameSystem = {
     ctx.missionSummaries = [];
     const home = new Home(
       {
-        continueDive: () => {
-          if (app.lastSite) {
-            const m = ctx.missionSummaries.find((entry) => entry.id === app.lastSite);
-            bus.emit('app:siteSelected', {
-              missionId: app.lastSite,
-              tileId: m?.tile ?? app.lastSite,
-            });
-            window.location.href = missionUrl(ctx.shellBaseHref(), app.lastSite);
-          }
+        dive: () => {
+          // A saved mission that the catalogue no longer lists falls back to the opening one.
+          const known = ctx.missionSummaries.some((entry) => entry.id === app.lastSite);
+          selectMission(app.lastSite && known ? app.lastSite : FIRST_MISSION_ID);
         },
         journal: () => discovery.guide.open(),
         settings: () => ctx.settingsScreen.open(),
@@ -69,7 +67,6 @@ export const shellSystem: GameSystem = {
       save,
     );
     ctx.home = home;
-    home.setContinue(app.lastSite);
     const completion = (id: string, pois: string[]): string =>
       `${pois.filter((poi) => discovery.store.isDiscovered(id, poi)).length}/${pois.length} logged`;
     const summaries = loadMissionSummaries();
@@ -112,14 +109,6 @@ export const shellSystem: GameSystem = {
         })) ?? [],
     });
     ctx.pause = pause;
-    const pauseSites = new MissionSelect(index, {
-      parent: pause.sitesSlot,
-      presentation: 'shell',
-      onSelect: selectTile,
-      onSelectMission: selectMission,
-      completion,
-    });
-    ctx.pauseSites = pauseSites;
     if (route)
       void fetchContentJson(contentUrl(route.missionId, 'mission.json')).then((raw) => {
         if (typeof raw !== 'object' || raw === null) return;
@@ -134,13 +123,10 @@ export const shellSystem: GameSystem = {
       ctx.missionSummaries = list;
       missionSelect.setMissions(list);
       homeSites.setMissions(list);
-      pauseSites.setMissions(list);
-      if (!list.some((m) => m.id === app.lastSite)) home.setContinue(null);
     });
     cleanup.add(
       bus.on('mission:started', ({ missionId }) => {
         app.lastSite = missionId;
-        home.setContinue(missionId);
         try {
           localStorage.setItem(LAST_SITE_KEY, JSON.stringify({ missionId }));
         } catch {
@@ -208,7 +194,7 @@ export const shellSystem: GameSystem = {
 export const globeSystem: GameSystem = {
   name: 'globe',
   init(ctx) {
-    const { config, bus, index, contentLandmark, home, homeSites, pauseSites, missionSelect } = ctx;
+    const { config, bus, index, contentLandmark, home, homeSites, missionSelect } = ctx;
     const siteSelected = (site: { id: string; state: string }): void =>
       bus.emit('app:siteSelected', {
         missionId: site.state === 'mission' ? site.id : null,
@@ -234,7 +220,6 @@ export const globeSystem: GameSystem = {
     });
     ctx.homeGlobe = homeGlobe;
     void homeGlobe.catalog.then((c) => homeSites.setPending(c.pending));
-    void globe.catalog.then((c) => pauseSites.setPending(c.pending));
     if (ctx.app.state === 'home') ctx.setAppState('home');
     missionSelect.setGlobeHandler(() => globe.open('button'));
     void globe.catalog.then((c) => missionSelect.setPending(c.pending));

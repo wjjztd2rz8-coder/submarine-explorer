@@ -120,26 +120,6 @@ export function controlGroups(device: InputDevice, key: KeyOf, input?: Input): C
   ];
 }
 
-/** The one-line strip at the bottom of the dive view, for the active device. */
-export function compactTips(
-  device: InputDevice,
-  key: KeyOf,
-  rovDeployed: boolean,
-  input?: Input,
-): string | null {
-  if (device === 'touch') return null; // the on-screen buttons are the tips
-  if (device === 'gamepad') {
-    const pad = (id: ActionId, fallback: string): string =>
-      input?.actions.find((a) => a.id === id)?.pad ?? fallback;
-    return rovDeployed
-      ? 'Left stick fly and turn · A/B rise or sink · Right bumper scan'
-      : `Left stick fly and turn · ${pad('ballastBlow', 'A')}/${pad('ballastFlood', 'B')} rise or sink · ${pad('scan', 'Right bumper')} scan · ${pad('toggleLights', 'X')} lights`;
-  }
-  return rovDeployed
-    ? `${key('thrustForward')}/${key('thrustReverse')} fly · ${key('yawPort')}/${key('yawStarboard')} turn · ${key('ballastBlow')}/${key('ballastFlood')} rise/sink · ${key('scan')} scan · ${key('toggleRov')} retrieve ROV`
-    : `${key('thrustForward')}/${key('thrustReverse')} speed · ${key('yawPort')}/${key('yawStarboard')} turn · ${key('ballastBlow')}/${key('ballastFlood')} rise/sink · Drag: look · Wheel: zoom · ${key('resetCamera')}: reset camera`;
-}
-
 export interface ControlsCardOptions {
   key: KeyOf;
   input?: Input;
@@ -229,10 +209,6 @@ export class ControlsCard {
     this.device_ = device;
     if (!this.open_) this.viewing = device;
     this.render();
-  }
-
-  compactTips(rovDeployed: boolean): string | null {
-    return compactTips(this.device_, this.opts.key, rovDeployed, this.opts.input);
   }
 
   open(): void {

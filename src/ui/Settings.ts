@@ -298,7 +298,6 @@ export class SettingsScreen {
         "How the HUD warns you as the sub nears its hull's rated depth.",
       ),
     );
-    access.append(this.checkbox('controlTips', 'Control tips'));
 
     const keys = this.section(`${id}-keys`, 'Controls');
     this.controlsSection = keys;
@@ -518,7 +517,7 @@ export class SettingsScreen {
   }
 
   private checkbox(
-    key: 'postFx' | 'reduceMotion' | 'captions' | 'controlTips' | 'muted',
+    key: 'postFx' | 'reduceMotion' | 'captions' | 'muted',
     label: string,
     note?: string,
   ): HTMLDivElement {

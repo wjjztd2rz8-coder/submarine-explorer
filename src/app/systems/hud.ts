@@ -42,7 +42,7 @@ export const hudSystem: GameSystem = {
   },
   frame: {
     'hud.draw': (f, ctx) => {
-      const { hud, discovery, input, sub, rig, save, rov, cameraTips } = ctx;
+      const { hud, discovery, input, sub } = ctx;
       const scanView = discovery.scanner.view;
       const key = (action: Parameters<typeof input.primaryKeyLabel>[0]): string =>
         input.primaryKeyLabel(action);
@@ -53,13 +53,6 @@ export const hudSystem: GameSystem = {
         objective: undefined,
         scanPrompt: scanView.candidateId ? `${key('scan')} Scan · ${scanView.nearestName}` : null,
         simSpeed: sub.simSpeed,
-        controlTips:
-          !f.frozen &&
-          rig.mode !== 'orbit' &&
-          save.get().controlTips &&
-          performance.now() < cameraTips.until
-            ? ctx.controlsCard.compactTips(rov.deployed)
-            : null,
       });
     },
   },
