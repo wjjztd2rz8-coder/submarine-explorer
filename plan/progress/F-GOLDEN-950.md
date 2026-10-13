@@ -91,8 +91,8 @@ Retained desktop references (1280×720), copied without alteration from
 
 | Site            | Retained before reference                                                     | Fresh after            |
 | --------------- | ----------------------------------------------------------------------------- | ---------------------- |
-| Challenger Deep | ![Old Challenger opening](F-GOLDEN-950/challenger-deep-reference-desktop.png) | Pending browser access |
-| Endurance       | ![Old Endurance opening](F-GOLDEN-950/endurance-reference-desktop.png)        | Pending browser access |
+| Challenger Deep | ![Old Challenger opening](../archive/progress-images/F-GOLDEN-950/challenger-deep-reference-desktop.png) | Pending browser access |
+| Endurance       | ![Old Endurance opening](../archive/progress-images/F-GOLDEN-950/endurance-reference-desktop.png)        | Pending browser access |
 
 ## Validation
 

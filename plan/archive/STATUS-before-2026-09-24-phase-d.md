@@ -73,12 +73,12 @@ During concurrent work, use isolated build/output directories and ports per
 
 ## Next session
 
-1. Read this status, `plan/QA-C.md` and close-out addenda; inspect git status
+1. Read this status, `plan/archive/QA-C.md` and close-out addenda; inspect git status
    and log. Preserve existing work; only repeat checks when changes justify it.
 2. Resolve any remaining Phase C close-out findings recorded above.
 3. Owner playtest: ordinary navigation/scanning at Titanic, a vent, a canyon,
    Challenger Deep and a shallow site; report visibility, controls and pacing.
-4. Review the proposed `plan/PHASE-D-BRIEFS.md` against that feedback. Write
+4. Review the proposed `plan/archive/PHASE-D-BRIEFS.md` against that feedback. Write
    Phase D contracts before implementation. Do not begin Phase D runtime code
    until the playtest gate is satisfied.
 5. Publishing is a separate owner decision; do not push or enable Pages.

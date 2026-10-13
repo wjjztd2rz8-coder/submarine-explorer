@@ -41,10 +41,10 @@ No after image is fabricated or represented by an archival reference.
 
 | View                             | Before reference                                                                                    | After                 |
 | -------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------- |
-| Titanic desktop 1600×900, High   | [Archival opening](1190-f-titanic-haze-horizon/before-reference-titanic-desktop-high.png)           | Pending fresh capture |
-| Endurance desktop 1600×900, High | [Archival opening](1190-f-titanic-haze-horizon/before-reference-endurance-desktop-high.png)         | Pending fresh capture |
-| Titanic portrait 390×844, Low    | [Earlier archival opening](1190-f-titanic-haze-horizon/before-reference-titanic-portrait-low.png)   | Pending fresh capture |
-| Endurance portrait 390×844, Low  | [Earlier archival opening](1190-f-titanic-haze-horizon/before-reference-endurance-portrait-low.png) | Pending fresh capture |
+| Titanic desktop 1600×900, High   | [Archival opening](../archive/progress-images/1190-f-titanic-haze-horizon/before-reference-titanic-desktop-high.png)           | Pending fresh capture |
+| Endurance desktop 1600×900, High | [Archival opening](../archive/progress-images/1190-f-titanic-haze-horizon/before-reference-endurance-desktop-high.png)         | Pending fresh capture |
+| Titanic portrait 390×844, Low    | [Earlier archival opening](../archive/progress-images/1190-f-titanic-haze-horizon/before-reference-titanic-portrait-low.png)   | Pending fresh capture |
+| Endurance portrait 390×844, Low  | [Earlier archival opening](../archive/progress-images/1190-f-titanic-haze-horizon/before-reference-endurance-portrait-low.png) | Pending fresh capture |
 
 References are copied byte-for-byte from
 `/home/vijay/submarine-explorer/.cache/golden/2026-10-09-221156/` (High desktop)

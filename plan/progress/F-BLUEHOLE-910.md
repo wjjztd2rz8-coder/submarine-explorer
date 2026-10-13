@@ -70,15 +70,15 @@ opening pendant vertices remain framed in desktop and portrait.
 
 Rejected 830 opening:
 
-![Rejected 830: hard sand islands across a brown wall](F-BLUEHOLE-910/rejected-830-opening.png)
+![Rejected 830: hard sand islands across a brown wall](../archive/progress-images/F-BLUEHOLE-910/rejected-830-opening.png)
 
 | Required pose | Before: clean 132858 desktop                                       | 910 after       |
 | ------------- | ------------------------------------------------------------------ | --------------- |
-| Opening / rim | ![Before opening](F-BLUEHOLE-910/great-blue-hole-1.png)            | Pending capture |
-| West approach | ![Before west approach](F-BLUEHOLE-910/great-blue-hole-2.png)      | Pending capture |
-| West detail   | ![Before west detail](F-BLUEHOLE-910/great-blue-hole-3.png)        | Pending capture |
-| East approach | ![Before east approach](F-BLUEHOLE-910/great-blue-hole-east-2.png) | Pending capture |
-| East detail   | ![Before east detail](F-BLUEHOLE-910/great-blue-hole-east-3.png)   | Pending capture |
+| Opening / rim | ![Before opening](../archive/progress-images/F-BLUEHOLE-910/great-blue-hole-1.png)            | Pending capture |
+| West approach | ![Before west approach](../archive/progress-images/F-BLUEHOLE-910/great-blue-hole-2.png)      | Pending capture |
+| West detail   | ![Before west detail](../archive/progress-images/F-BLUEHOLE-910/great-blue-hole-3.png)        | Pending capture |
+| East approach | ![Before east approach](../archive/progress-images/F-BLUEHOLE-910/great-blue-hole-east-2.png) | Pending capture |
+| East detail   | ![Before east detail](../archive/progress-images/F-BLUEHOLE-910/great-blue-hole-east-3.png)   | Pending capture |
 
 Portrait before/after images also remain pending. No substitute render or
 historical image has been labelled as an after capture.

@@ -1,6 +1,6 @@
 # Phase D implementation briefs
 
-Use these after orchestrator review of [PHASE-D-CONTRACTS.md](PHASE-D-CONTRACTS.md). Order follows [PHASE-D-PLAN.md](PHASE-D-PLAN.md) §3. Each block is a standalone brief for `tools/codex-task.sh`. Test and screenshot file ownership includes the named package's new specs; existing shared specs may be updated **only at the package's scheduled turn**. UI screenshots must be written by a Playwright spec that the gate executes, into `.cache/codex/shots/<package-name>/*.png`.
+Use these after orchestrator review of [PHASE-D-CONTRACTS.md](../PHASE-D-CONTRACTS.md). Order follows [PHASE-D-PLAN.md](PHASE-D-PLAN.md) §3. Each block is a standalone brief for `tools/codex-task.sh`. Test and screenshot file ownership includes the named package's new specs; existing shared specs may be updated **only at the package's scheduled turn**. UI screenshots must be written by a Playwright spec that the gate executes, into `.cache/codex/shots/<package-name>/*.png`.
 
 ## D-MODES — game modes and tuning
 

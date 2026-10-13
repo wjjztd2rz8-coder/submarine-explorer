@@ -95,7 +95,7 @@ docs; Opus for engine work; commit a green checkpoint before the window ends.
 
 Phases A and B are integrated in the working tree, along with C2 (tiles). The
 commit covering A + B + C2 is still pending: the only commit is the initial
-scaffold. The QA pass for Phase B is being written to `plan/QA-B.md`.
+scaffold. The QA pass for Phase B is being written to `plan/archive/QA-B.md`.
 
 ## Shipped
 
@@ -122,7 +122,7 @@ Contracts for the Phase B packages: `plan/PHASE-B-CONTRACTS.md`.
 | `npm run build`    | green: `tsc` has zero errors and vite builds 65 modules. Main chunk is 732.7 kB (198.0 kB gzip), which trips vite's 500 kB chunk warning. Dist is 84 MB.            |
 | `npm test`         | green: 258 tests in 23 files                                                                                                                                        |
 | `npm run test:py`  | green: 42 tests                                                                                                                                                     |
-| `npm run test:e2e` | not run by the docs pass because the QA agent is using the ports. Specs: smoke (×2 tiles), atmosphere, sub-playtest, discovery, mission, props. See `plan/QA-B.md`. |
+| `npm run test:e2e` | not run by the docs pass because the QA agent is using the ports. Specs: smoke (×2 tiles), atmosphere, sub-playtest, discovery, mission, props. See `plan/archive/QA-B.md`. |
 
 ## Known gaps
 

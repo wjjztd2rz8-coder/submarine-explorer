@@ -26,11 +26,11 @@ Both writable-config builds succeeded, but preview startup was denied with `list
 | Desktop 1600×900, High | Exact reported golden, 2026-10-09-195308; inspected locally                                            | External High desktop E2E capture; inspected |
 | Portrait 390×844, Low  | Archival 2026-10-09-034952; inspected locally; different tier and earlier build, not a paired baseline | Capture blocked by preview bind policy       |
 
-![Reported Endurance desktop before, High](1180-f-endurance-snow-sonar/before-desktop.png)
+![Reported Endurance desktop before, High](../archive/progress-images/1180-f-endurance-snow-sonar/before-desktop.png)
 
-![Endurance desktop after, High, external E2E](1180-f-endurance-snow-sonar/after-desktop-high.png)
+![Endurance desktop after, High, external E2E](../archive/progress-images/1180-f-endurance-snow-sonar/after-desktop-high.png)
 
-![Archival Endurance portrait reference, Low](1180-f-endurance-snow-sonar/reference-portrait.png)
+![Archival Endurance portrait reference, Low](../archive/progress-images/1180-f-endurance-snow-sonar/reference-portrait.png)
 
 References were copied unchanged from `/home/vijay/submarine-explorer/.cache/golden/<stamp>/`; their original manifests are retained at `.cache/1180/before-desktop-poses.json` and `.cache/1180/reference-portrait-poses.json`. SHA-256 comparisons confirm both image copies are byte-identical to their originals (`.cache/1180/reference-provenance.json`). The Low portrait reference has no large sediment discs, as expected from the disabled wreck layers; both references show a hard seabed edge. Desktop shows dense white sediment and the black sphere patch. The desktop after is copied unchanged from `test-results-gates-4372-1186766/f-endurance-1180-Endurance-5ae46--finite-and-horizon-renders-chromium/endurance-high-desktop.png`. It shows the wreck clearly, fine sediment, no black hull patch, and the softened far seabed. The E2E viewport-resize portrait image was also opened, but it shows an unpresented/blank scene with desktop HUD sizing; it is not a usable portrait golden. Fresh `GOLDEN_SITES=endurance GOLDEN_LAYOUTS=desktop,portrait` captures are still needed outside this sandbox.
 
