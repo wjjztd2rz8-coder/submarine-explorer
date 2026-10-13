@@ -131,7 +131,12 @@ export function composedMissionSpawn(
       if (props.collide(eye, 6, new Vector3())) clear = false;
     }
     if (!clear) continue;
-    const score = (p.y - target.y) * 3 + Math.abs(turn) * 0.12;
+    // Lost City's first contact sits on a terrace beside a deep valley. Prefer
+    // the shelf: a level approach over the valley puts the seabed beyond fog
+    // visibility even though the transit itself clears terrain.
+    const localAltitude = p.y - seabed.sampleHeight(p.x, p.z);
+    const score =
+      (p.y - target.y) * 3 + Math.abs(turn) * 0.12 + (siteId === 'lost-city' ? localAltitude : 0);
     if (score < bestScore) {
       bestScore = score;
       best = { x: p.x, y: p.y, z: p.z, yaw };

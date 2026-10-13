@@ -65,7 +65,7 @@ function luminance(color: Color): number {
 
 describe('F-GOLDEN-CHECK hero spawn and ambient readability', () => {
   for (const limits of heroes) {
-    for (const tier of ['low', 'medium'] as const) {
+    for (const tier of ['low', 'medium', 'high'] as const) {
       it(`${limits.site} ${tier}: Arcade openings have nearby terrain and ambient light without lamps`, async () => {
         const { site } = limits;
         const config = makeConfig();
@@ -193,6 +193,25 @@ describe('F-GOLDEN-CHECK hero spawn and ambient readability', () => {
             // propsSystem applies the authored chase radius; missionSystem currently uses the default arm.
             if (opening === 'free' && pose.chaseRadius) rig.chaseRadius = pose.chaseRadius;
             rig.snap(position, pose.yaw, 0);
+            if (site === 'lost-city' && opening === 'mission') {
+              // Match the browser regression: preserve the global arm and keep
+              // the whole tower axis in frame when choosing the terrace bearing.
+              const localEye = rig.camera.position
+                .clone()
+                .sub(position)
+                .applyAxisAngle(new Vector3(0, 1, 0), pose.yaw);
+              expect(localEye.x).toBeCloseTo(config.camera.chaseOffset.x, 1);
+              expect(localEye.y).toBeCloseTo(config.camera.chaseOffset.y, 1);
+              expect(localEye.z).toBeCloseTo(config.camera.chaseOffset.z, 1);
+              rig.camera.updateMatrixWorld(true);
+              for (let height = 0; height <= 60; height += 5) {
+                const point = hero.root.localToWorld(new Vector3(0, height, 0)).project(rig.camera);
+                expect(Math.abs(point.x)).toBeLessThan(0.9);
+                expect(Math.abs(point.y)).toBeLessThan(0.9);
+                expect(point.z).toBeGreaterThan(-1);
+                expect(point.z).toBeLessThan(1);
+              }
+            }
             // The scene samples the chase camera's depth, not the sub's depth.
             expect(sampleAtmosphere(config.water, pose.y).ambientIntensity).toBeGreaterThan(0);
             let firstAmbient: number | undefined;
@@ -223,9 +242,10 @@ describe('F-GOLDEN-CHECK hero spawn and ambient readability', () => {
                 const point = new Vector3(x, terrain.sampleHeight(x, z), z);
                 const distance = rig.camera.position.distanceTo(point);
                 const transmission = Math.exp(-Math.pow(scene.fog.density * distance, 2));
-                expect(
-                  ambient.intensity * luminance(ambient.color) * transmission,
-                ).toBeGreaterThanOrEqual(0.1);
+                const effective = ambient.intensity * luminance(ambient.color) * transmission;
+                const floor = expect(effective, `${opening}: nearby floor at bearing ${bearing}`);
+                if (site === 'lost-city') floor.toBeGreaterThan(2.5);
+                else floor.toBeGreaterThanOrEqual(0.1);
               }
             }
           }

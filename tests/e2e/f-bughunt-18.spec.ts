@@ -73,6 +73,7 @@ for (const size of [
     test(`Lost City ${route}: reset, wheel and photo at ${size.width}x${size.height}`, async ({
       page,
     }) => {
+      const resetRadius = route === 'mission' ? defaultRadius : lostCityRadius;
       await page.setViewportSize(size);
       await mkdir(shots, { recursive: true });
       await ready(page, `${route}=lost-city`);
@@ -83,7 +84,7 @@ for (const size of [
           .click();
         await expect(page.locator('.briefing')).toBeHidden();
       }
-      await expect.poll(async () => (await camera(page)).radius).toBe(lostCityRadius);
+      await expect.poll(async () => (await camera(page)).radius).toBe(resetRadius);
       const prefix = `${shots}/${route}-${size.width}x${size.height}`;
       await page.screenshot({ path: `${prefix}-opening.png` });
       await page.mouse.move(size.width / 2, size.height * 0.42);
@@ -93,18 +94,18 @@ for (const size of [
       await expect.poll(async () => (await camera(page)).radius).toBe(180);
       await drag(page);
       await page.keyboard.press('x');
-      await expect.poll(async () => (await camera(page)).radius).toBe(lostCityRadius);
+      await expect.poll(async () => (await camera(page)).radius).toBe(resetRadius);
       await expect.poll(async () => (await camera(page)).freeLook).toBe(false);
       await page.screenshot({ path: `${prefix}-reset.png` });
       expect((await camera(page)).clearance).toBeGreaterThanOrEqual(6 - 1e-6);
       await drag(page);
       await page.locator('.hud-reset-camera').click();
       await expect.poll(async () => (await camera(page)).freeLook).toBe(false);
-      expect((await camera(page)).radius).toBe(lostCityRadius);
+      expect((await camera(page)).radius).toBe(resetRadius);
       await drag(page);
       await page.mouse.dblclick(size.width / 2, size.height * 0.42);
       await expect.poll(async () => (await camera(page)).freeLook).toBe(false);
-      expect((await camera(page)).radius).toBe(lostCityRadius);
+      expect((await camera(page)).radius).toBe(resetRadius);
 
       await presentedFrame(page);
       const before = await camera(page);
@@ -121,13 +122,13 @@ for (const size of [
       await page.mouse.wheel(0, 100000);
       await expect.poll(async () => (await camera(page)).orbitRadius).toBe(220);
       expect((await camera(page)).position).toEqual(frozen);
-      expect((await camera(page)).radius).toBe(lostCityRadius);
+      expect((await camera(page)).radius).toBe(resetRadius);
       await page.locator('.photo-mode-exit').click();
       await expect.poll(async () => (await camera(page)).mode).toBe('chase');
       await presentedFrame(page);
       const returned = await camera(page);
       for (let i = 0; i < 3; i++) expect(returned.offset[i]).toBeCloseTo(before.offset[i]!, 2);
-      expect(returned.radius).toBe(lostCityRadius);
+      expect(returned.radius).toBe(resetRadius);
       await page.keyboard.press('q');
       await expect.poll(async () => (await camera(page)).mode).toBe('first-person');
       await page.keyboard.press('p');
@@ -137,7 +138,7 @@ for (const size of [
       await expect.poll(async () => (await camera(page)).mode).toBe('first-person');
       await page.keyboard.press('q');
       await expect.poll(async () => (await camera(page)).mode).toBe('chase');
-      expect((await camera(page)).radius).toBe(lostCityRadius);
+      expect((await camera(page)).radius).toBe(resetRadius);
     });
   }
 }

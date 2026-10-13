@@ -7,10 +7,15 @@ import type { Submarine } from '../../src/sub/Submarine.js';
 import type { Props } from '../../src/world/Props.js';
 import type { Terrain } from '../../src/world/Terrain.js';
 import type { PresetSystem } from '../../src/world/presets/Presets.js';
+import { DEFAULT_CAMERA } from '../../src/core/config/camera.js';
+import type { Discovery } from '../../src/game/Discovery.js';
+import type { Mission } from '../../src/game/Mission.js';
 import type { Headlights } from '../../src/render/Headlights.js';
 
 interface Game {
   save: Save;
+  discovery: Discovery;
+  mission: Mission | null;
   sub: Submarine;
   rig: CameraRig;
   props: Props;
@@ -22,7 +27,7 @@ interface Game {
 
 for (const tier of ['low', 'medium', 'high']) {
   for (const route of ['tile', 'mission']) {
-    test(`Lost City ${route} ${tier}: Arcade starts close with ambient-lit nearby seabed`, async ({
+    test(`Lost City ${route} ${tier}: Arcade preserves its route-specific opening and ambient-lit seabed`, async ({
       page,
     }) => {
       await page.goto(`/?${route}=lost-city&tutorial=0&tier=${tier}`, {
@@ -62,9 +67,7 @@ for (const tier of ['low', 'medium', 'high']) {
             light.intensity * luminance * Math.exp(-Math.pow(density * distance, 2)),
           );
         }
-        // F-LOSTCITY-TOWER authored a 66 m arm with -20 m lateral and +8 m
-        // vertical offsets. Pin the actual eye and tower framing rather than
-        // the obsolete <95 m distance to the tower's foot.
+        // Pin the current free-dive eye and the independent mission approach camera.
         const localEye = g.rig.camera.position
           .clone()
           .sub(pos)
@@ -80,7 +83,11 @@ for (const tier of ['low', 'medium', 'high']) {
               .toArray(),
           );
         }
+        const primary = g.mission?.objectives.find((o) => o.primary);
+        const target = g.discovery.pois.find((p) => p.id === primary?.poiId);
         return {
+          primaryRange: target?.position.distanceTo(pos),
+          scanRadius: target?.radius,
           mode: g.save.get().gameplayMode,
           heroRange: Math.hypot(pos.x - hero.root.position.x, pos.z - hero.root.position.z),
           localEye: localEye.toArray(),
@@ -94,11 +101,25 @@ for (const tier of ['low', 'medium', 'high']) {
         };
       });
       expect(opening.mode).toBe('arcade');
-      expect(opening.heroRange).toBeGreaterThan(30);
-      expect(opening.heroRange).toBeLessThanOrEqual(40);
-      expect(opening.chaseRadius).toBe(66);
-      const expectedEye = [-20, 46, 90];
-      const armScale = 66 / Math.hypot(...expectedEye);
+      if (route === 'tile') {
+        expect(opening.heroRange).toBeGreaterThan(30);
+        expect(opening.heroRange).toBeLessThanOrEqual(40);
+        expect(opening.chaseRadius).toBe(66);
+      } else {
+        expect(opening.primaryRange).toBeCloseTo(220, 0);
+        expect(opening.primaryRange!).toBeGreaterThan(opening.scanRadius!);
+        expect(opening.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
+      }
+      const tuning = DEFAULT_CAMERA.lostCityArcadeOpening;
+      const expectedEye =
+        route === 'tile'
+          ? [
+              tuning.chaseOffsetXM,
+              DEFAULT_CAMERA.chaseOffset.y + tuning.chaseOffsetYM,
+              DEFAULT_CAMERA.chaseOffset.z,
+            ]
+          : [0, DEFAULT_CAMERA.chaseOffset.y, DEFAULT_CAMERA.chaseOffset.z];
+      const armScale = opening.chaseRadius / Math.hypot(...expectedEye);
       for (let axis = 0; axis < 3; axis++)
         expect(opening.localEye[axis]).toBeCloseTo(expectedEye[axis] * armScale, 1);
       for (const [x, y, z] of opening.towerAxis) {

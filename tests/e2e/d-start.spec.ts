@@ -1,5 +1,6 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
+import { MISSION_APPROACH_M } from '../../src/game/Spawn.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
 const shots = '.cache/codex/shots/d-start';
@@ -20,7 +21,7 @@ async function pose(page: Page): Promise<{ x: number; y: number; z: number }> {
   });
 }
 
-test('Custom near-site starts retain the long approach at deep and shallow sites', async ({
+test('Custom near-site starts retain the authored approach at deep and shallow sites', async ({
   page,
 }) => {
   await page.addInitScript(() =>
@@ -46,8 +47,14 @@ test('Custom near-site starts retain the long approach at deep and shallow sites
     await page.screenshot({ path: `${shots}/${filename}` });
     const near = await page.evaluate(() => {
       const g = window.__game as {
-        sub: { position: { x: number; y: number; z: number } };
-        discovery: { pois: Array<{ id: string; position: { x: number; y: number; z: number } }> };
+        sub: { position: { x: number; y: number; z: number }; yaw: number };
+        discovery: {
+          pois: Array<{
+            id: string;
+            position: { x: number; y: number; z: number };
+            radius: number;
+          }>;
+        };
         mission: { objectives: Array<{ poiId: string; primary: boolean }> };
         terrain: { sampleHeight(x: number, z: number): number };
         config: {
@@ -62,18 +69,25 @@ test('Custom near-site starts retain the long approach at deep and shallow sites
       };
       const p = g.sub.position;
       const first = g.mission.objectives.find((o) => o.primary)!;
-      const target = g.discovery.pois.find((poi) => poi.id === first.poiId)!.position;
+      const poi = g.discovery.pois.find((poi) => poi.id === first.poiId)!;
+      const target = poi.position;
       const hull = g.config.submarine;
       return {
-        range: Math.hypot(p.x - target.x, p.z - target.z),
+        range: Math.hypot(p.x - target.x, p.y - target.y, p.z - target.z),
+        scanRadius: poi.radius,
+        turn: Math.atan2(
+          Math.sin(Math.atan2(target.x - p.x, -(target.z - p.z)) - g.sub.yaw),
+          Math.cos(Math.atan2(target.x - p.x, -(target.z - p.z)) - g.sub.yaw),
+        ),
         altitude: p.y - g.terrain.sampleHeight(p.x, p.z),
         minAltitude: hull.hullRadius + hull.seabedClearance + g.config.mission.spawnClearanceM,
         rating: hull.hullClasses[g.missionRouter.mission.def.hull_class]!.crushDepth,
         y: p.y,
       };
     });
-    expect(near.range).toBeGreaterThanOrEqual(349);
-    expect(near.range).toBeLessThanOrEqual(601);
+    expect(near.range).toBeCloseTo(MISSION_APPROACH_M[id], 0);
+    expect(near.range).toBeGreaterThan(near.scanRadius);
+    expect(Math.abs(near.turn)).toBeLessThan(0.02);
     expect(near.altitude).toBeGreaterThanOrEqual(near.minAltitude - 0.5);
     expect(near.y).toBeGreaterThan(near.rating);
   }

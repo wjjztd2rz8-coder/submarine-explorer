@@ -1,3 +1,4 @@
+import catalog from '../../data/landmarks/index.json' with { type: 'json' };
 import { expectCompactPhoneHud } from './helpers/phoneHud.js';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
@@ -61,11 +62,21 @@ async function reachable(target: Locator): Promise<void> {
   const box = await target.evaluate((element) => {
     const r = element.getBoundingClientRect();
     const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-    return { width: r.width, height: r.height, receivesTap: hit !== null && element.contains(hit) };
+    return {
+      width: r.width,
+      height: r.height,
+      x: r.x,
+      y: r.y,
+      hit: hit?.className,
+      receivesTap: hit !== null && element.contains(hit),
+    };
   });
   expect(box.width).toBeGreaterThanOrEqual(44);
   expect(box.height).toBeGreaterThanOrEqual(44);
-  expect(box.receivesTap, 'the centre of the touch target must receive the tap').toBe(true);
+  expect(
+    box.receivesTap,
+    `the centre of the touch target must receive the tap: ${JSON.stringify(box)}`,
+  ).toBe(true);
 }
 
 for (const viewport of [
@@ -275,23 +286,33 @@ for (const viewport of [
           .tap();
         const journal = page.getByRole('dialog', { name: 'Journal', exact: true });
         await expect(journal).toBeVisible();
+        // Initial async catalogue loading replaces the sheet. Measure only its settled content.
+        await page.evaluate(() =>
+          (window.__game as { journal: { load(): Promise<void> } }).journal.load(),
+        );
+        const sites = journal.locator('.jr-site-card[data-target]:not(.is-photos)');
+        await expect(sites).toHaveCount(catalog.landmarks.length);
         await reachable(journal.locator('.jr-spoilers'));
         await journal.locator('.jr-spoilers').tap();
-        await expect(journal.getByRole('checkbox')).toBeChecked();
-        const contents = journal.locator('.jr-contents-toggle');
-        if (await contents.isVisible()) await contents.tap();
-        await reachable(journal.locator('.jr-nav-item').first());
-        await reachable(journal.locator('.jr-nav-item').last());
-        if (await contents.isVisible()) await contents.tap();
+        await expect(journal.getByRole('switch', { name: 'Show spoilers' })).toBeChecked();
+        await reachable(sites.first());
+        await reachable(sites.last());
         const site = journal.locator('.jr-site-card[data-target="titanic"]');
         await reachable(site);
         await site.tap();
-        await reachable(journal.locator('.jr-next'));
-        await journal.locator('.jr-next').tap();
+        const entries = journal.locator('.jr-row');
+        await reachable(entries.first());
+        await reachable(entries.last());
+        const firstEntry = journal.locator('.jr-row.is-poi').first();
+        await reachable(firstEntry);
+        await firstEntry.tap();
         await expect(journal.locator('.jr-body .jr-title')).not.toHaveText('Undiscovered');
         expect(
           await journal.locator('.jr-header').evaluate((e) => e.scrollWidth <= e.clientWidth),
         ).toBe(true);
+        await reachable(journal.getByRole('button', { name: 'Back', exact: true }));
+        await journal.getByRole('button', { name: 'Back', exact: true }).tap();
+        await expect(journal.locator('.jr-entries')).toBeVisible();
         await reachable(journal.locator('.jr-close'));
         await journal.locator('.jr-close').tap();
         await expect(journal).toBeHidden();

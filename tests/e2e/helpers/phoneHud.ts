@@ -1,6 +1,7 @@
 import { expect, type Page } from '@playwright/test';
 import type { Camera } from 'three';
 import type { Submarine } from '../../../src/sub/Submarine.js';
+import type { Save } from '../../../src/core/Save.js';
 
 /** The phone scan card owns the active instruction while a contact is in range. */
 export async function expectObjectiveGuidance(page: Page, touch: boolean): Promise<void> {
@@ -55,7 +56,23 @@ export async function expectCompactPhoneHud(page: Page): Promise<void> {
   expect(metrics.statusHullOffset).toBeLessThanOrEqual(3);
   expect(metrics.secondRowBelowFirst).toBe(true);
   if (await page.locator('.scan-panel').isVisible()) {
-    await expect(page.locator('.d-scan-edge')).toBeHidden();
+    // Dim cards describe a distant/logged contact; their waypoint still leads the approach.
+    // An active scan prompt owns guidance and suppresses the duplicate edge readout.
+    const navigation = await page.evaluate(() => {
+      const g = window.__game as {
+        scanner: { view: { objectiveId: string | null } };
+        save: Save;
+        mission: { objectives: Array<{ poiId: string; title: string }> } | null;
+      };
+      const id = g.scanner.view.objectiveId;
+      const approach =
+        g.mission?.objectives.find((o) => o.poiId === id)?.title.startsWith('Head to ') ?? false;
+      return id !== null && (g.save.get().gameplay.visualHints || approach);
+    });
+    if ((await page.locator('.scan-panel').getAttribute('data-tone')) === 'dim' && navigation) {
+      await expect(page.locator('.d-scan-edge')).toBeVisible();
+      await expect(page.locator('.d-scan-edge')).toHaveText(/\S/);
+    } else await expect(page.locator('.d-scan-edge')).toBeHidden();
     await expect(page.locator('.d-scan-objective-hint')).toBeHidden();
     await expect(page.locator('.objectives-panel .obj-list')).toBeHidden();
     await expect(page.locator('.scan-hint')).toHaveText(/\S/);

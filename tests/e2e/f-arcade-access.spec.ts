@@ -19,7 +19,7 @@ async function shot(page: Page, name: string): Promise<void> {
   await page.screenshot({ path: `${shots}/${name}.png` });
 }
 
-test('fresh Arcade Titanic starts beside the wreck in its deep-ocean vehicle', async ({ page }) => {
+test('fresh Arcade Titanic starts on an approach in its deep-ocean vehicle', async ({ page }) => {
   await page.goto('/?mission=titanic&tutorial=0');
   await ready(page);
   await expect(page.locator('.briefing-start input[value="near-site"]')).toBeChecked();
@@ -32,12 +32,22 @@ test('fresh Arcade Titanic starts beside the wreck in its deep-ocean vehicle', a
       terrain: { sampleHeight(x: number, z: number): number };
       props: Props;
       progress: { lifetime: number };
-      mission: { def: { briefing: { depth_m: number }; hull_class: string } };
+      discovery: { pois: Array<{ id: string; position: Submarine['position']; radius: number }> };
+      mission: {
+        objectives: Array<{ primary: boolean; poiId: string }>;
+        def: { briefing: { depth_m: number }; hull_class: string };
+      };
     };
     const state = g.sub.getState();
+    const first = g.mission.objectives.find((o) => o.primary)!;
+    const target = g.discovery.pois.find((p) => p.id === first.poiId)!;
+    const direction = target.position.clone().sub(g.sub.position).setY(0).normalize();
     const hero = g.props.placed.find((p) => p.def.id === 'bow-hull')!;
     const bounds = hero.localBounds.clone().applyMatrix4(hero.root.matrixWorld);
     return {
+      primaryRange: g.sub.position.distanceTo(target.position),
+      scanRadius: target.radius,
+      facing: g.sub.getForward().setY(0).normalize().dot(direction),
       lifetime: g.progress.lifetime,
       depth: state.depth,
       altitude: g.sub.position.y - g.terrain.sampleHeight(g.sub.position.x, g.sub.position.z),
@@ -55,7 +65,10 @@ test('fresh Arcade Titanic starts beside the wreck in its deep-ocean vehicle', a
   expect(pose.altitude).toBeGreaterThan(10);
   expect(pose.altitude).toBeLessThan(80);
   expect(pose.wreckRange).toBeGreaterThan(8);
-  expect(pose.wreckRange).toBeLessThan(150);
+  expect(pose.primaryRange).toBeCloseTo(220, 0);
+  expect(pose.primaryRange).toBeGreaterThan(pose.scanRadius);
+  expect(pose.facing).toBeGreaterThan(0.999);
+  await expect(page.locator('.obj-item.is-current')).toContainText('Head to the bow');
   expect(pose.hull).toBe('B');
   expect(pose.vehicle).toBe('B');
   expect(pose.missionHull).toBe('B');

@@ -228,10 +228,12 @@ for (const layout of [
       else await page.keyboard.press('Escape');
       const controls = page
         .locator('.pause-menu')
-        .getByRole('button', { name: 'Controls', exact: true });
+        .getByRole('button', { name: layout.touch ? 'How to play' : 'Controls', exact: true });
       if (layout.touch) await controls.tap();
       else await controls.click();
-      await expect(page.getByRole('dialog', { name: 'Controls guide' })).toBeVisible();
+      await expect(
+        page.getByRole('dialog', { name: layout.touch ? 'How to play' : 'Controls guide' }),
+      ).toBeVisible();
     });
 
     test('animal hint and strip fade on the first actual move; scan stays separate', async ({

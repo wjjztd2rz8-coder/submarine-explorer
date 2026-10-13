@@ -155,8 +155,12 @@ export class TutorialCard {
     };
     const step = TUTORIAL_STEPS[index];
     this.phoneText.textContent =
-      step && device === 'touch' && step.id !== 'scan' && !text.startsWith('Follow the marker')
-        ? phoneInstructions[step.id]
+      step && device === 'touch'
+        ? step.id === 'move' && text.startsWith('Follow the marker')
+          ? 'Left stick: follow the marker.'
+          : step.id === 'scan' && text.startsWith('Scanning…')
+            ? text
+            : phoneInstructions[step.id]
         : text;
     this.dots.querySelectorAll('.onboard-dot').forEach((dot, i) => {
       dot.classList.toggle('is-done', i < index);

@@ -14,6 +14,10 @@ without an entry here is not done.
 
 ### Changed
 
+- **1391 second gate follow-up:** Lost City mission approaches prefer the terrace over the deep valley so nearby seabed remains readable with lamps off at the unchanged 220 m range. Added all-tier lighting and camera regressions; repaired the phone HUD helper's saved-settings lookup and restored desktop live-tip preference/remapping checks.
+
+- **1391 gate follow-up:** the phone tutorial keeps navigation and scan instructions compact, and narrow landscape reserves its centre column instead of covering telemetry. Mission specs now assert the authored approach and global reset camera; free-dive framing, light, clearance and input assertions remain intact. Touch journey specs follow the picture guide and Journal sheet, including settled async contents before hit-testing.
+
 - **1391-f-first-dive-flow:** missions now open on safe, target-facing approaches 180–260 m from the first primary (Titanic 220 m), with navigation copy and mission scan radii that leave a transit even with Extended sensors. Realistic near-site starts use the same approaches; free-dive beauty frames and surface poses are preserved. The five-step tutorial advances its scan step only on completion, shows held scan progress, and keeps touch hints free of key names.
 - **f-text-diet (owner phone playtest: too much text):**
   - Briefing: FACTS and HAZARDS left the main card and now sit once each inside one collapsed "About this site" disclosure (with the summary). The CONTROLS section and the "View controls" button are removed, the hull-rating hazard ("Class B hull ... Stay above the rating") is dropped because the HULL meta row says it, "OR PRESS ENTER" is hidden on touch, and the mode descriptions are shortened to one line. Reason: the card was a wall of text on a phone; Begin and every objective now fit without scrolling at 390x844. `SITE_PRIORITIES` is gone.

@@ -81,10 +81,14 @@ it('phone scan progress and navigation copy survive the compact presentation', (
     photo: 'P',
     journal: 'J',
   };
-  card.show(0, tutorialText('move', 'touch', keys, null, 'the bow'), 'touch');
-  expect(phone.textContent).toContain('Follow the marker toward the bow');
+  for (const destination of ['the bow', 'the north canyon wall', 'the coral mound cluster']) {
+    const text = tutorialText('move', 'touch', keys, null, destination);
+    card.show(0, text, 'touch');
+    expect(phone.textContent).toBe('Left stick: follow the marker.');
+    expect((card.root as unknown as Element).children[2].textContent).toContain(destination);
+  }
   card.show(3, tutorialText('scan', 'touch', keys, 0.42), 'touch');
   expect(phone.textContent).toBe('Scanning… 42% · keep holding SCAN.');
   card.show(3, tutorialText('scan', 'touch', keys), 'touch');
-  expect(phone.textContent).not.toContain('Scanning…');
+  expect(phone.textContent).toBe('Face a glowing target; hold SCAN to finish.');
 });

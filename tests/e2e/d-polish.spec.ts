@@ -5,7 +5,7 @@ import { holdFreshTips } from './helpers/hudTips.js';
 
 const shots = '.cache/codex/shots/d-polish';
 
-test('polished dive HUD keeps mission, telemetry, speed and live tips readable', async ({
+test('polished dive HUD keeps mission, telemetry, speed, live tips and the controls guide readable', async ({
   page,
 }) => {
   await mkdir(shots, { recursive: true });
@@ -17,11 +17,12 @@ test('polished dive HUD keeps mission, telemetry, speed and live tips readable',
   );
   await holdFreshTips(page);
   await expect(page.locator('.obj-item')).toHaveCount(4);
-  await expect(page.locator('.obj-item.is-current')).toContainText('Scan the bow');
+  await expect(page.locator('.obj-item.is-current')).toContainText('Head to the bow');
   await expect(page.locator('.obj-item.is-optional')).toHaveCount(2);
   await expect(page.locator('.obj-check')).toHaveText(['○', '○', '○', '○']);
   await expect(page.locator('.obj-hint')).not.toBeEmpty();
   await expect(page.locator('.hud-control-tips')).toBeVisible();
+  await expect(page.locator('.hud-control-tips')).toContainText('W/S speed');
   const depthSize = await page
     .locator('.hud-value[data-field="depth"]')
     .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));
@@ -59,14 +60,35 @@ test('polished dive HUD keeps mission, telemetry, speed and live tips readable',
     }),
   );
   await expect(page.locator('.hud-control-tips')).toBeHidden();
+  await expect(page.locator('.hud-control-tips')).toBeEmpty();
+
+  await page.keyboard.press('Escape');
+  const controls = page
+    .locator('.pause-menu')
+    .getByRole('button', { name: 'Controls', exact: true });
+  await controls.click();
+  const guide = page.getByRole('dialog', { name: 'Controls guide' });
+  await expect(guide).toBeVisible();
+  await expect(guide.locator('.controls-card-control').first()).toHaveText('W / S');
+  await expect(guide).toContainText('Speed ahead and astern');
+  await guide.screenshot({ path: `${shots}/controls-guide.png` });
+  await page.keyboard.press('Escape');
+  await expect(guide).toBeHidden();
+  await expect(page.locator('.pause-menu')).toBeVisible();
   await page.evaluate(() => {
     const g = window.__game as {
-      save: { save(value: { controlTips: boolean }): void };
       input: { rebind(action: 'thrustForward', keys: string[]): boolean };
+      save: { save(value: { controlTips: boolean }): void };
     };
-    g.input.rebind('thrustForward', ['KeyI']);
+    if (!g.input.rebind('thrustForward', ['KeyI'])) throw new Error('Rebind failed');
     g.save.save({ controlTips: true });
   });
+  await controls.click();
+  await expect(guide.locator('.controls-card-control').first()).toHaveText('I / S');
+  await expect(guide).toContainText('Speed ahead and astern');
+  await page.keyboard.press('Escape');
+  await page.locator('.pause-menu').getByRole('button', { name: 'Resume', exact: true }).click();
+  await expect(page.locator('.hud-control-tips')).toBeVisible();
   await expect(page.locator('.hud-control-tips')).toContainText('I/S speed');
 });
 
@@ -76,6 +98,7 @@ test('a long objective list shows the current target and the next few', async ({
   await page.waitForFunction(
     () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
+  await expect(page.locator('.obj-item.is-current')).toContainText('Head to Poseidon');
   await page.evaluate(() => {
     const g = window.__game as {
       mission: { objectives: Array<{ id: string; title: string }> };
@@ -91,9 +114,9 @@ test('a long objective list shows the current target and the next few', async ({
     ]);
   });
   await expect(page.locator('.obj-item')).toHaveCount(4);
-  await expect(page.locator('.obj-item.is-current')).toContainText('Scan Poseidon');
+  await expect(page.locator('.obj-item.is-current')).toContainText('Head to Poseidon');
   await expect(page.locator('.obj-item-title')).toHaveText([
-    'Scan Poseidon',
+    'Head to Poseidon',
     'Scan IMAX Tower',
     'Extra vent one',
     'Scan Beehive',
