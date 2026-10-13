@@ -57,7 +57,7 @@
         "https://www.mbari.org/know-your-ocean/monterey-canyon/",
         "https://www.gmrt.org/"
       ],
-      "note": "GMRT terrain: about 1,018 m deep, the deepest cell of the traced canyon axis, about 640 m south of the north-wall marker at the same longitude. No source publishes a coordinate for a specific axis point; it was located by sampling the grid along that meridian."
+      "note": "GMRT terrain: about 1,015 m deep, a sampled point on the traced canyon axis, about 640 m south of the north-wall marker at the same longitude. No source publishes a coordinate for a specific axis point; it was located by sampling the grid along that meridian."
     },
     {
       "id": "monterey-canyon-wall",
@@ -73,7 +73,7 @@
       "confidence": "medium",
       "reconstruction": false,
       "sources": ["https://www.mbari.org/know-your-ocean/monterey-canyon/"],
-      "note": "Real GMRT terrain: 748 m deep, about 700 m (and 270 m of relief) north of the axis-1000m POI at the same longitude, on the canyon's steep north wall. No specific coordinate is published for a 'wall'; this point was located by sampling terrain perpendicular to the traced axis."
+      "note": "Real GMRT terrain: 748 m deep, about 645 m (and 267 m of grid relief) north of the axis-1000m POI at the same longitude, on the canyon's steep north wall. No specific coordinate is published for a 'wall'; this point was located by sampling terrain perpendicular to the traced axis."
     },
     {
       "id": "mbari-mars-node",
