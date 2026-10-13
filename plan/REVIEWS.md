@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-13 comprehensive review, joint with Sol (golden 2026-10-13-091650 vs 2026-10-11-201343)
+
+Both reviews ran independently; Sol saw my draft only at reconcile. I checked `beebe-vent-field-3`, `endurance-3`, `titanic-3`, `challenger-deep-1` myself and accepted Sol's calibration.
+
+**Changed since the last review:** 12 finished Codex worktrees had sat uncollected (Claude was on its 5h floor overnight) and were collected in this run with gates per package: S-dead, S-unused, S-rov (ROV cut; merge conflict with S-bugs resolved), S-modal stage 1, S-boot stage 1 (module only), S-render stage 1 (nightly workflow), S-tests step 4, V-bluehole collision, scan-candidate bug fixes, then Claude's S-flow and V-beebe (Beebe now frames the stack clear of the scan card). Main carries the whole wave.
+
+| Site       | Readable | Beautiful | Biggest gap                                                                    |
+| ---------- | -------- | --------- | ------------------------------------------------------------------------------ |
+| Titanic    | 4        | 3.5       | close-up: regular panels, bright flat sand, thin rusticles                     |
+| Beebe      | 3-4      | 3-3.5     | bright sub dominates a small stack (card clearance fixed by V-beebe)           |
+| Blue Hole  | 4        | 3.5       | terraces improved (+0.25); faceted, smooth stalactite cones                    |
+| Lost City  | 4        | 3.5       | fluted tower reads; soft stretched seabed                                      |
+| Monterey   | 4        | 3.5       | repeated contour bands                                                         |
+| Challenger | 4        | 3         | toy-like lander; empty opening is not itself a blocker (Sol)                   |
+| Endurance  | 3        | 3         | small hull at the opening; close view overexposed, ghost-white creatures (Sol) |
+
+Credits: Sol: the overexposed Endurance close view, simplification-wave "built" overstated (S-modal, S-boot and S-render are only stage 1), "0 of 4" is a fixture not a bug, golden manifest lacks the commit SHA, goldens are not at mission spawns or on phone. Claude: uncollected-worktree bottleneck, hosted CI failure causes, the S-rov/S-bugs merge. Disputed: none left (Sol corrected my 78% / 2.5 weeks and "every push": a prior CI run was green; recent ones are red).
+
+**Process:** `efficiency.sh`: Claude idle ~166 h and Codex under-used ~160 h of samples, all behind budget-gate skips and the Oct 6-10 lockout. The real waste this time: finished Codex work waited hours for a Claude run with budget. Hosted CI: only e2e shards fail (software-GL 60 s timeouts: f-events-reform whale, f-verify-1000 Monterey phone), on every push since 2026-10-13. Collection took ~1.5 h of wall time because gates ran serially per worktree; a script (merge main in, gates, merge) did it unattended and caught one conflict and one set of stale test references (S-rov). Logged in PROCESS-LOG.
+
+**Priorities:** see DIRECTOR.md. Claude: V-first-five, S-guidance, S-tests step 2, S-hud, V-endurance, V-titanic. Codex queue: 1570 S-resolve, 1580 S-modal, 1590 S-boot, 1610 hosted CI; 1600 S-rewards held behind 1570. **Stage:** ~75%, plan four weeks (Sol 75% / 3-6 weeks; I proposed 78% / 2.5 weeks and accepted the correction). **Needs owner:** a real-phone play of the newest push.
+
 ## 2026-10-11 18:45 simplification review (owner-requested; Claude + Sol round 1)
 
 - **What ran:**

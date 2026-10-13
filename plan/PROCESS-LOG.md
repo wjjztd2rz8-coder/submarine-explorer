@@ -190,3 +190,10 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 
 - **Stall.** The three phone packages (1391/1392/1393) passed full gates by 03:14 but sat unmerged for 18 h: the interactive lock timer kept headless runs out after the phone thread ended. Rule: an interactive thread that stops for the day removes its `interactive` line from `.cache/orchestrator.active` (or stops `subexp-interactive-lock.timer`) so `resume.sh` can collect finished work.
 - **Worktree cleanup lost uncommitted work.** I force-removed the 1380 and 1400 worktrees believing them merged (branch tips were on main). 1400's content fixes were uncommitted and 1380's test was untracked (my `grep -v '^??'` hid it). Both were rebuilt exactly from the Codex session rollouts (`~/.codex/sessions/...jsonl`: replay the edit scripts / apply_patch bodies). Rule: before `git worktree remove`, run `git status --porcelain` with untracked files shown and never use `--force` on a non-empty status.
+
+## 2026-10-13 06:00: collection backlog (review run)
+
+- **Stall.** Twelve Codex worktrees finished between 22:00 and 02:30 and waited for a Claude run with budget (Claude sat on its 20% floor, 16% at 00:20). Codex capacity was not the limit; collection was.
+- **Change.** Collection can be scripted: for each finished worktree, commit, merge main in, run `tools/gates.sh`, merge to main only on PASS, stop on conflict (a /tmp script this run: 7 of 8 merged unattended, 1 conflict resolved by hand, 2 Claude branches via a Sonnet agent for the 6-file conflict). Follow-up for a future run: promote it to `tools/collect-codex.sh` if the pattern recurs.
+- **Merge hazard seen again.** A package that cuts a feature (S-rov) conflicts with a package that edits the same code (S-bugs): ordering cuts before bug fixes avoids it, or run the cut last.
+- **Hosted CI.** Shards fail on software-GL timeouts, not logic. Codex 1610 moves captures to nightly and keeps cheap assertions.
