@@ -18,7 +18,7 @@ import { LIFE_TIERS, type LifeTier, type SiteTable, type SpeciesDef } from './ty
 import { clamp, type Rand } from './rng.js';
 
 /** Structurally a `ScanTarget` (game/Scanner.ts) so the scanner can take them as they are. */
-export interface LifeScanTarget {
+interface LifeScanTarget {
   id: string;
   name: string;
   landmarkId: string;
@@ -29,7 +29,7 @@ export interface LifeScanTarget {
 
 export const LIFE_ID_PREFIX = 'life:';
 
-export interface LifeOptions {
+interface LifeOptions {
   tier: keyof typeof LIFE_TIERS;
   table: SiteTable | undefined;
   env: SimEnv;

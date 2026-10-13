@@ -152,7 +152,7 @@ export function silhouetteMaterial(color: number): THREE.MeshStandardMaterial {
 
 // ------------------------------------------------------------------ paint
 
-export interface PaintOptions {
+interface PaintOptions {
   seed: number;
   /** 0 = original paint shows through, 1 = rust everywhere. */
   rustiness: number;

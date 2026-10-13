@@ -31,8 +31,8 @@ gesture. The app shell suspends the context outside a dive, and hidden
 tabs suspend independently of shell pause. The master is silenced immediately
 while suspension completes; returning to a paused tab keeps it silent.
 One-shots disconnect their complete graphs after their last source ends.
-Disposal stops and disconnects every source and processor, cancels echoes,
-unsubscribes handlers and closes the context. Optional sample-fetch failures
+Disposal stops and disconnects every source and processor, unsubscribes
+handlers and closes the context. Optional sample-fetch failures
 are silent.
 The app audio system also disposes its caption overlay, subscription and expiry
 timer on teardown, including repeated in-page system restarts.
@@ -66,11 +66,11 @@ Tuning lives in `src/core/config/audio.ts`.
 - Important cues use `AudioSystem.captions`, including muted play. Continuous
   ambience captions are rate limited to avoid crowding the HUD.
 
-## Sonar and verification
+## Sensor cue and verification
 
-Sonar retains terrain ray marching and round-trip echo timing `2 * range / 1500`.
-No echo plays for open water; delayed callbacks are cancelled on disposal and
-cancelled on pause or tab hide so old echoes cannot arrive after resume. Existing sonar tests remain unchanged.
+Nearby natural events use a quiet sensor sweep on the sonar bus. The
+unreachable player ping and delayed echo playback were removed in S-bugs;
+the standalone terrain ray-march maths remain covered by audio and terrain tests.
 
 `tests/unit/f3Audio.test.ts` covers depth palettes, pressure state, accent decay,
 reduce motion, spatial falloff and audio persistence. `tests/e2e/f3-audio.spec.ts`

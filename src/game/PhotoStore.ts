@@ -20,7 +20,7 @@ export interface PhotoStorage {
   setItem(key: string, value: string): void;
 }
 
-export type PhotoSaveResult = { saved: true; dropped: number } | { saved: false; error: string };
+type PhotoSaveResult = { saved: true; dropped: number } | { saved: false; error: string };
 
 function safeStorage(): PhotoStorage | null {
   try {

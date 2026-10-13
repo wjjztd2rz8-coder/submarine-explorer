@@ -97,10 +97,12 @@ X reset camera, T sim speed, J Journal, P photo, Enter capture photo). The pane 
 dive view orbits the camera and the wheel zooms it, an **Enable pointer
 look** button (closes Settings and locks the dive view; menus release it, and
 losing lock while diving opens pause), and a sonar note (`M` expands the map; `+`/`-` or the wheel
-anywhere while expanded changes range, leaving camera zoom alone). The retired `toggleSettings`/`toggleGlobe` action ids
-are filtered out of the rendered list even though `defaultActions()` no
-longer produces them either, so the list only ever shows live, keyboard-bound
-actions.
+anywhere while expanded changes range, leaving camera zoom alone). Retired globe and ping entries in saved bindings are ignored; the list
+shows only live, keyboard-bound actions.
+
+Gamepad uses D-pad left for Journal, D-pad down for reset camera, and left
+bumper for capture in photo mode. D-pad up remains sim speed and right bumper
+remains hold-to-scan; ROV deployment stays on its existing keyboard path.
 
 ## Storage
 

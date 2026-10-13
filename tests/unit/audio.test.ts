@@ -90,7 +90,7 @@ describe('audio: scan:complete cues', () => {
     const { EventBus } = await import('../../src/core/EventBus.js');
     const { DEFAULT_CONFIG } = await import('../../src/core/Config.js');
     const bus = new EventBus();
-    const sys = new AudioSystem(DEFAULT_CONFIG.audio, bus, { sampleHeight: () => -100 });
+    const sys = new AudioSystem(DEFAULT_CONFIG.audio, bus);
     const chime = vi.spyOn(sys, 'playDiscoveryChime').mockImplementation(() => {});
     const tick = vi.spyOn(sys, 'playScanTick').mockImplementation(() => {});
     // unlock() needs a real AudioContext; the bus wiring is what is under test.

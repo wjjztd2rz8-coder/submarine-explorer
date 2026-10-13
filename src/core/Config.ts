@@ -58,7 +58,7 @@ export type * from './config/types.js';
 
 export const DEFAULT_CONFIG: GameConfig = {
   defaultTileId: 'titanic',
-  graphicsTier: 'medium',
+  graphicsTier: 'auto',
   physicsHz: 60,
   submarine: DEFAULT_SUBMARINE,
   terrain: DEFAULT_TERRAIN,

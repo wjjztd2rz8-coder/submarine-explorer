@@ -17,14 +17,13 @@ import {
   playDiscoveryChime,
   playEmergencyAlarm,
   playHullCreak,
-  playPing,
+  playSensorCue,
   playScanTick,
 } from './Cues.js';
 import { AmbientBeds, ThrusterLoop } from './Loops.js';
 import { AmbientScore } from './Score.js';
 import { MachineLoop, Soundscape, mechanicalCue } from './Soundscape.js';
-import { castSonarRay } from './Sonar.js';
-import { CaptionBus, type AudioFrameInput, type TerrainSampler } from './events.js';
+import { CaptionBus, type AudioFrameInput } from './events.js';
 // --- C3 begin ---
 import { HADAL_TOP_M } from '../world/presets/maths.js';
 // --- C3 end ---
@@ -52,7 +51,6 @@ export class AudioSystem {
   private lastThrust = 0;
   private scanning = false;
   private disposed = false;
-  private readonly echoes = new Set<number>();
   private settings: {
     masterVolume: number;
     sfxVolume: number;
@@ -110,7 +108,7 @@ export class AudioSystem {
   /** Quiet sensor cue for a nearby natural event, on the existing sonar bus. */
   playExploreCue(): void {
     if (!this.engine || this.playbackBlocked || this.disposed) return;
-    playPing(this.engine, this.config, 0.025, 0.3);
+    playSensorCue(this.engine);
   }
 
   playManipulator(): void {
@@ -122,7 +120,6 @@ export class AudioSystem {
   constructor(
     private readonly config: AudioConfig,
     private readonly bus: EventBus,
-    private readonly terrain: TerrainSampler,
   ) {
     this.settings = {
       masterVolume: config.masterVolume,
@@ -193,8 +190,6 @@ export class AudioSystem {
       // Silence synchronously, including when a resume promise is still pending.
       this.engine.master.gain.cancelScheduledValues(this.engine.ctx.currentTime);
       this.engine.master.gain.value = 0;
-      for (const timer of this.echoes) window.clearTimeout(timer);
-      this.echoes.clear();
       void this.engine.ctx.suspend().then(reconcile, () => {});
     } else {
       this.setSettings(this.settings);
@@ -290,49 +285,6 @@ export class AudioSystem {
     );
   }
 
-  /**
-   * Fire a sonar ping from the most recent frame's sub pose. Normally
-   * triggered automatically by `update()` when `frame.pingPressed` is set
-   * (the `ping` action -- Q / Tab / gamepad LB, see `Input.actions`); safe to
-   * call directly too, e.g. from a debug console.
-   */
-  ping(): void {
-    if (!this.engine || !this.lastFrame || this.playbackBlocked || this.disposed) return;
-    const c = this.config;
-    const engine = this.engine;
-
-    playPing(engine, c);
-    this.captions.emit({ id: 'sonar-ping', text: 'Sonar ping', durationS: 0.6 });
-
-    const { position, forward } = this.lastFrame;
-    const downRad = (c.sonarBeamDownDeg * Math.PI) / 180;
-    const cos = Math.cos(downRad);
-    const dir = {
-      x: forward.x * cos,
-      y: forward.y * cos - Math.sin(downRad),
-      z: forward.z * cos,
-    };
-    const hit = castSonarRay(position, dir, this.terrain, {
-      maxRangeM: c.sonarMaxRangeM,
-      stepM: c.sonarRayStepM,
-      speedOfSoundMps: c.sonarSpeedOfSoundMps,
-    });
-    if (!hit) return;
-
-    const timer = window.setTimeout(() => {
-      this.echoes.delete(timer);
-      if (this.disposed || this.playbackBlocked) return;
-      const rangeGain = 1 / (1 + hit.rangeM / 200);
-      playPing(engine, c, rangeGain * 0.6, 0.9);
-      this.captions.emit({
-        id: 'sonar-echo',
-        text: `Sonar echo, range ${Math.round(hit.rangeM)} m`,
-        durationS: 0.6,
-      });
-    }, hit.delayS * 1000);
-    this.echoes.add(timer);
-  }
-
   /** Call once per rendered frame (small additive hook in src/main.ts). */
   update(frame: AudioFrameInput): void {
     this.lastFrame = frame;
@@ -366,8 +318,6 @@ export class AudioSystem {
       );
       this.captions.emit({ id: 'hull-creak', text: 'Hull creaks under pressure', durationS: 1.5 });
     }
-
-    if (frame.pingPressed) this.ping();
 
     const ballastSign = Math.sign(frame.ballast);
     if (ballastSign !== 0 && ballastSign !== this.lastBallastSign) {
@@ -403,8 +353,6 @@ export class AudioSystem {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
-    for (const timer of this.echoes) window.clearTimeout(timer);
-    this.echoes.clear();
     this.score?.stop();
     this.soundscape?.stop();
     this.scanHum?.stop();

@@ -14,13 +14,13 @@ export interface TextureOptions {
 
 export type AssetKind = 'gltf' | 'texture';
 
-/** A glTF / GLB model (Draco, Meshopt and KTX2 inside it are handled). */
+/** A plain glTF / GLB model. */
 export interface GltfRequest {
   kind: 'gltf';
   url: string;
 }
 
-/** A PNG / JPEG / WebP or `.ktx2` texture. */
+/** A PNG / JPEG / WebP texture. */
 export interface TextureRequest {
   kind: 'texture';
   url: string;
@@ -49,11 +49,6 @@ export interface PreloadResult {
 /** True for a `.glb` / `.gltf` URL (query and hash ignored). */
 export function isGltfUrl(url: string): boolean {
   return /\.(glb|gltf)(\?|#|$)/i.test(url);
-}
-
-/** True for a `.ktx2` URL (query and hash ignored). */
-export function isKtx2Url(url: string): boolean {
-  return /\.ktx2(\?|#|$)/i.test(url);
 }
 
 /** Turn a manifest entry into an explicit request. */

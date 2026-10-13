@@ -36,8 +36,6 @@ export interface InputState {
   boost: boolean;
   /** Headlights (A2 owns the lights themselves; this is just the edge). */
   toggleLights: boolean;
-  /** Legacy audio edge kept for consumers; no player action drives it. */
-  ping: boolean;
   /** Hold-to-scan beam (B1). Level-triggered, not an edge. */
   scan: boolean;
   /** Cycle the sim-speed multiplier 1x -> 2x -> 3x -> 1x. */
@@ -51,8 +49,6 @@ export interface InputState {
    * hand-built InputState literals (tests, Submarine's locked input) still type.
    */
   toggleGuide?: boolean;
-  /** Open/close the globe mission select (C1). Edge-triggered; optional like toggleGuide. */
-  toggleGlobe?: boolean;
 }
 
 /** One rebindable thing the player can do. */
@@ -86,8 +82,7 @@ export type ActionId =
   | 'capturePhoto'
   | 'toggleSettings'
   | 'toggleGuide'
-  | 'toggleJournal'
-  | 'toggleGlobe';
+  | 'toggleJournal';
 
 /** Factory, not a constant: callers get their own mutable copy. */
 export function defaultActions(): ActionBinding[] {
@@ -165,11 +160,23 @@ export function defaultActions(): ActionBinding[] {
       pad: 'D-pad up',
     },
     { id: 'toggleCamera', label: 'Camera view', category: 'View', keys: ['KeyQ'], pad: 'Y' },
-    { id: 'resetCamera', label: 'Reset camera', category: 'View', keys: ['KeyX'] },
+    {
+      id: 'resetCamera',
+      label: 'Reset camera',
+      category: 'View',
+      keys: ['KeyX'],
+      pad: 'D-pad down',
+    },
     { id: 'toggleSonar', label: 'Sonar map', category: 'View', keys: ['KeyM'], pad: 'Back' },
     { id: 'togglePhotoMode', label: 'Photo mode', category: 'View', keys: ['KeyP'], pad: 'Start' },
-    { id: 'capturePhoto', label: 'Capture photo', category: 'View', keys: ['Enter'] },
-    { id: 'toggleJournal', label: 'Journal', category: 'View', keys: ['KeyJ'] },
+    {
+      id: 'capturePhoto',
+      label: 'Capture photo',
+      category: 'View',
+      keys: ['Enter'],
+      pad: 'Left bumper',
+    },
+    { id: 'toggleJournal', label: 'Journal', category: 'View', keys: ['KeyJ'], pad: 'D-pad left' },
   ];
 }
 
@@ -193,7 +200,6 @@ const V1_DEFAULTS: Record<string, string[]> = {
   ballastFlood: ['ShiftLeft', 'ShiftRight'],
   boost: ['KeyX'],
   toggleLights: ['KeyL'],
-  ping: ['KeyQ', 'Tab'],
   scan: ['KeyG'],
   cycleSimSpeed: ['KeyT'],
   toggleCamera: ['KeyC'],
@@ -201,7 +207,6 @@ const V1_DEFAULTS: Record<string, string[]> = {
   togglePhotoMode: ['KeyP'],
   toggleSettings: ['KeyO'],
   toggleGuide: ['KeyJ'],
-  toggleGlobe: ['KeyN'],
 };
 
 const DEAD_ZONE = 0.15;
@@ -261,12 +266,10 @@ export class Input {
     toggleSonar: false,
     boost: false,
     toggleLights: false,
-    ping: false,
     scan: false,
     cycleSimSpeed: false,
     togglePhotoMode: false,
     toggleGuide: false,
-    toggleGlobe: false,
   };
 
   /** The live, rebindable action map. Read it to render a controls screen. */
@@ -665,7 +668,6 @@ export class Input {
       if (this.edgeArmed.has('togglePhotoMode')) s.togglePhotoMode = true;
       if (this.edgeArmed.has('capturePhoto')) s.capturePhoto = true;
       if (this.edgeArmed.has('toggleJournal')) s.toggleGuide = true;
-      if (this.edgeArmed.has('toggleGlobe')) s.toggleGlobe = true;
       this.edgeArmed.clear();
     }
 
@@ -699,8 +701,11 @@ export class Input {
       if (edge(8)) s.toggleSonar = true; // Back / view
       if (edge(9)) s.togglePhotoMode = true; // Start
       if (edge(12)) s.cycleSimSpeed = true; // D-pad up
+      if (edge(13)) s.resetCamera = true; // D-pad down
+      if (edge(14)) s.toggleGuide = true; // D-pad left (Journal)
+      if (edge(4)) s.capturePhoto = true; // LB
       s.boost = s.boost || (pad.buttons[7]?.value ?? 0) > 0.5; // RT
-      this.gamepadActive = Boolean(yaw || throttle || pitch || ballast);
+      this.gamepadActive = Boolean(yaw || throttle || pitch || ballast || pressed.size);
       this.padPressed = pressed;
     } else {
       this.padIndex = null;
@@ -719,12 +724,10 @@ export class Input {
     s.resetCamera = false;
     s.toggleSonar = false;
     s.toggleLights = false;
-    s.ping = false;
     s.cycleSimSpeed = false;
     s.togglePhotoMode = false;
     s.capturePhoto = false;
     s.toggleGuide = false;
-    s.toggleGlobe = false;
   }
 }
 

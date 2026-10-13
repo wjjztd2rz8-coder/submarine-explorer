@@ -68,7 +68,7 @@ import {
 import { mulberry32, valueNoise3 } from './shared.js';
 
 /** Stations along the hull (m from the stem), from the ship's general arrangement. */
-export const BISMARCK = {
+const BISMARCK = {
   /** Where the hull ends: the stern broke away aft of turret Dora. */
   tornAt: 236,
   barbettes: [

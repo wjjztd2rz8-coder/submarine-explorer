@@ -47,7 +47,7 @@ const CELLS_PER_FRAME = 2;
 /** Hard cap on instances per kind (memory and vertex cost). */
 const CAP_PER_KIND = 4096;
 
-export interface ScatterStats {
+interface ScatterStats {
   cells: number;
   instances: number;
   drawCalls: number;

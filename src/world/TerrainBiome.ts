@@ -20,14 +20,6 @@ import { LOST_CITY_STRATA, lostCitySlopeTint } from './LostCityBands.js';
 /** The five packed texture sets in `public/assets/terrain/<set>_{a,n}.jpg`. */
 export type TerrainSet = 'silt' | 'sand' | 'basalt' | 'rubble' | 'carbonate';
 
-export const TERRAIN_SETS: readonly TerrainSet[] = [
-  'silt',
-  'sand',
-  'basalt',
-  'rubble',
-  'carbonate',
-];
-
 /**
  * Albedo pattern contrast per set (1 = as shipped): the silt is nearly flat so it
  * is stretched, the carbonate and rubble sets are already blotchy so they are not.

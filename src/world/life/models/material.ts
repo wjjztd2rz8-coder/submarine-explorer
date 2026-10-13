@@ -32,7 +32,7 @@ const MODE: Record<AnimMode, number> = {
   comb: 7,
 };
 
-export interface LifeMaterialOpts {
+interface LifeMaterialOpts {
   mode: AnimMode;
   /** Bend amplitude as a fraction of `len`. */
   amp: number;

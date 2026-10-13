@@ -8,7 +8,7 @@ Do not use historical pending lists to repeat completed work.
 
 ## Phase D (playability) — complete
 
-All Phase D packages from [`plan/PHASE-D-PLAN.md`](PHASE-D-PLAN.md) and
+All Phase D packages from [`plan/archive/PHASE-D-PLAN.md`](PHASE-D-PLAN.md) and
 [`plan/PHASE-D-CONTRACTS.md`](PHASE-D-CONTRACTS.md) are implemented and merged
 to `main`:
 
@@ -59,11 +59,11 @@ hints and guide text without repeated recreation caveats`, commit `3a09672`).
 
 1. **Playtest #3.** The owner has not yet played the Phase D build. Use the
    checklist below; file findings the same way as playtests #1 and #2 did
-   (which produced `plan/PHASE-D-PLAN.md` and the D-POLISH fixes,
+   (which produced `plan/archive/PHASE-D-PLAN.md` and the D-POLISH fixes,
    respectively).
 2. **After playtest #3 fixes land:** the owner's go-ahead to create the
    GitHub repository and enable GitHub Pages. This was approved as a to-do on
-   2026-09-23 for after Phase D (`plan/PHASE-D-PLAN.md` §3, step 10). It still
+   2026-09-23 for after Phase D (`plan/archive/PHASE-D-PLAN.md` §3, step 10). It still
    requires the owner's **explicit confirmation before any push or repo
    creation** — nothing has been pushed or made public.
 
@@ -96,7 +96,7 @@ hints and guide text without repeated recreation caveats`, commit `3a09672`).
   implementation, QA and documentation roles (Claude-specific instructions
   are preserved for Claude sessions). Phase D packages were built by GPT-6 Sol
   subagents through `tools/codex-task.sh`, reviewed by the orchestrator, and
-  committed at green (`plan/PHASE-D-PLAN.md` §4).
+  committed at green (`plan/archive/PHASE-D-PLAN.md` §4).
 - At most two implementation subagents at once (`D-MODES ∥ D-CONTENT` and
   `D-SCAN ∥ D-START` were the only scheduled parallel pairs); the orchestrator
   reviews each package's diff and screenshots before progressing.
@@ -136,14 +136,14 @@ test.
 
 ## Next session
 
-1. Read this status and `plan/PHASE-D-PLAN.md`/`plan/PHASE-D-CONTRACTS.md`;
+1. Read this status and `plan/archive/PHASE-D-PLAN.md`/`plan/PHASE-D-CONTRACTS.md`;
    inspect git status and log. Preserve existing work; only repeat checks
    when changes justify it.
 2. Run playtest #3 (checklist above) and record findings.
 3. Address any findings; keep packages small and reviewed the same way as
    Phase D.
 4. Once the owner is satisfied, get explicit confirmation, then create the
-   GitHub repository and enable GitHub Pages (`plan/PHASE-D-PLAN.md` §3,
+   GitHub repository and enable GitHub Pages (`plan/archive/PHASE-D-PLAN.md` §3,
    step 10; `docs/deploy.md`).
 
 Known nonblocking limits: existing large-JS-chunk warning, duplicate emitted

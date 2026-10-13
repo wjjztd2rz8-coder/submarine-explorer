@@ -7,8 +7,8 @@
       "id": "lost-city",
       "name": "Lost City Hydrothermal Field",
       "type": "vent",
-      "lat": 30.1167,
-      "lon": -42.1167,
+      "lat": 30.123917,
+      "lon": -42.119972,
       "depth_m": 800,
       "depth_range_m": [750, 900],
       "bbox": {
@@ -20,7 +20,7 @@
       "region": "Mid-Atlantic Ridge",
       "country_eez": "international waters",
       "confidence": "high",
-      "coordinate_source": "https://en.wikipedia.org/wiki/Lost_City_Hydrothermal_Field",
+      "coordinate_source": "https://repository.library.noaa.gov/view/noaa/56451/noaa_56451_DS1.pdf",
       "summary": "A field of towering carbonate chimneys on the Atlantis Massif, venting warm alkaline fluid shaped by seawater reacting with mantle rock and hosting microbial life relevant to origin-of-life research.",
       "facts": [
         "Chimneys are carbonate, not sulfide, and among the tallest known vent structures (~60 m, 'Poseidon')",
@@ -291,10 +291,10 @@
       "id": "beebe-vent-field",
       "name": "Beebe Hydrothermal Vent Field (Piccard)",
       "type": "vent",
-      "lat": 18.5464,
-      "lon": -81.718,
+      "lat": 18.546583,
+      "lon": -81.718194,
       "depth_m": 4960,
-      "depth_range_m": [4957, 4987],
+      "depth_range_m": [4956, 4964],
       "bbox": {
         "north": 18.62,
         "south": 18.47,
@@ -304,7 +304,7 @@
       "region": "Cayman Trough, Caribbean",
       "country_eez": "international waters (Cayman Islands vicinity)",
       "confidence": "high",
-      "coordinate_source": "https://en.wikipedia.org/wiki/Beebe_Hydrothermal_Vent_Field",
+      "coordinate_source": "https://eprints.whiterose.ac.uk/id/eprint/151944/1/1-s2.0-S0009254119300014-main.pdf",
       "summary": "The deepest known active hydrothermal vent field on Earth, on the ultraslow-spreading Mid-Cayman Spreading Centre. Its black smokers release low-salinity fluid measured around 401–403 °C at roughly 500 bar.",
       "facts": [
         "World's deepest known active hydrothermal vent field at ~4,960 m",
@@ -398,7 +398,7 @@
       "type": "trench",
       "lat": 11.3733,
       "lon": 142.5917,
-      "depth_m": 10925,
+      "depth_m": 10935,
       "depth_range_m": [10902, 10935],
       "bbox": {
         "north": 11.55,
@@ -409,14 +409,14 @@
       "region": "Western Pacific",
       "country_eez": "Federated States of Micronesia / international (Mariana Trench)",
       "confidence": "high",
-      "coordinate_source": "https://en.wikipedia.org/wiki/Challenger_Deep",
+      "coordinate_source": "https://doi.org/10.1016/j.earscirev.2019.102896",
       "summary": "The deepest known region of Earth's oceans, in the southern Mariana Trench, with three elongated sub-basins known as the Western, Central and Eastern Pools.",
       "facts": [
-        "Deepest confirmed point on Earth's seafloor",
+        "June 2020 dives measured a deepest observed seafloor depth of 10,935 ± 6 m (Greenaway et al. 2021)",
         "First crewed descent 1960 (Trieste, Piccard & Walsh)",
         "2019 Five Deeps Expedition dived in the Eastern and Central Pools",
         "Pressure exceeds 1,000 atmospheres",
-        "Named after HMS Challenger, first sounded it in 1875"
+        "HMS Challenger first sounded the area in 1875; NOAA identifies Challenger II (1951) as the Deep’s namesake"
       ],
       "gameplay_hooks": [
         "Full-ocean-depth descent sequence with hull-stress mechanic",
@@ -1012,7 +1012,7 @@
       "region": "Central California coast, NE Pacific",
       "country_eez": "United States",
       "confidence": "high",
-      "coordinate_source": "https://en.wikipedia.org/wiki/Monterey_Canyon",
+      "coordinate_source": "https://www.mbari.org/know-your-ocean/monterey-canyon/",
       "summary": "One of the deepest submarine canyons on the US West Coast, comparable in scale to the Grand Canyon, beginning at Moss Landing and continuing offshore through the Monterey Deep Sea Fan to the abyssal plain.",
       "facts": [
         "Comparable in size and depth to the Grand Canyon",
@@ -1418,10 +1418,10 @@
       "id": "great-blue-hole",
       "name": "Lighthouse Reef / Great Blue Hole",
       "type": "hole",
-      "lat": 17.3153,
-      "lon": -87.5346,
-      "depth_m": 124,
-      "depth_range_m": [124, 124],
+      "lat": 17.315889,
+      "lon": -87.5335,
+      "depth_m": 125,
+      "depth_range_m": [125, 125],
       "bbox": {
         "north": 17.325,
         "south": 17.305,
@@ -1431,7 +1431,7 @@
       "region": "Lighthouse Reef, Belize",
       "country_eez": "Belize",
       "confidence": "high",
-      "coordinate_source": "https://en.wikipedia.org/wiki/Great_Blue_Hole",
+      "coordinate_source": "https://onlinelibrary.wiley.com/doi/10.1002/dep2.70021",
       "summary": "Survey Lighthouse Reef’s shallow platform and outer slopes around the Great Blue Hole, a roughly 320 m-wide, 125 m-deep flooded limestone sinkhole in the Belize Barrier Reef Reserve System.",
       "facts": [
         "The real sinkhole is about 320 m across and 125 m deep",
@@ -2083,8 +2083,8 @@
       "id": "endurance",
       "name": "Endurance",
       "type": "wreck",
-      "lat": -68.7297,
-      "lon": -52.319,
+      "lat": -68.739167,
+      "lon": -52.329722,
       "depth_m": 3008,
       "depth_range_m": [3008, 3008],
       "bbox": {
@@ -2096,11 +2096,11 @@
       "region": "Weddell Sea, Antarctica",
       "country_eez": "international waters (Antarctic Treaty area)",
       "confidence": "high",
-      "coordinate_source": "https://endurance22.org/endurance-is-found",
+      "coordinate_source": "https://ukaht.org/wp-content/uploads/2026/07/CMP_Endurance_April24_final.pdf",
       "summary": "Sir Ernest Shackleton's polar expedition ship, crushed by pack ice in 1915; found on 5 March 2022 by the Endurance22 expedition almost perfectly preserved in the cold Weddell Sea.",
       "facts": [
         "Found exactly 100 years after Shackleton's burial at South Georgia",
-        "Discovered ~6.4 km south of the position recorded by Captain Frank Worsley",
+        "Published wreck coordinates put it about 10 km south-southeast of Worsley’s logged sinking position (Bergman, Mearns & Stuart, 2022 volume / 2023 online)",
         "Extraordinarily well preserved due to cold, wood-boring-organism-free Weddell Sea water",
         "Designated a protected historic site and monument under the Antarctic Treaty"
       ],

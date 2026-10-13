@@ -24,6 +24,7 @@ import {
   collideAll,
   makeBoxCollider,
   makeSphereCollider,
+  makeSurfaceCollider,
   type Collider,
 } from './props/Collision.js';
 import {
@@ -57,6 +58,8 @@ export interface PlacedProp {
   colliders: Collider[];
   /** Compound collision boxes from the builder (local, unscaled), or null. */
   localColliders: THREE.Box3[] | null;
+  /** Rendered floor meshes whose world-space collision cache follows placement. */
+  localCollisionSurfaces: THREE.Mesh[];
   lod: PropLod;
 }
 
@@ -340,6 +343,7 @@ export class Props {
       collider: null,
       colliders: [],
       localColliders: built.colliders?.length ? built.colliders : null,
+      localCollisionSurfaces: built.collisionSurfaces ?? [],
       lod: 'full',
     };
     this.placed.push(prop);
@@ -383,6 +387,9 @@ export class Props {
       const r = ((half.x + half.y + half.z) / 3) * this.cfg.sphereColliderFit;
       prop.colliders.push(makeSphereCollider(centre, r));
     }
+    if (def.collision !== 'none')
+      for (const mesh of prop.localCollisionSurfaces)
+        prop.colliders.push(makeSurfaceCollider(mesh));
     prop.collider = prop.colliders[0] ?? null;
     this.colliders.push(...prop.colliders);
     this.stats.colliders = this.colliders.length;
@@ -400,6 +407,7 @@ export class Props {
       prop.impostor = built.impostor;
       prop.localBounds = built.bounds;
       prop.localColliders = built.colliders?.length ? built.colliders : null;
+      prop.localCollisionSurfaces = built.collisionSurfaces ?? [];
       prop.root.add(built.full, built.impostor);
       prop.full.visible = prop.lod === 'full';
       prop.impostor.visible = prop.lod === 'impostor';

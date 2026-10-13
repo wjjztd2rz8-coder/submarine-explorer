@@ -38,7 +38,7 @@ post-fx, terrain detail, default sim speed, reduce-motion, captions, sonar
 palette), `ui/Settings.ts` is the settings screen (opened from the home or
 pause menu, not a dedicated key) that reads and writes it, and
 `ui/Captions.ts` renders the on-screen caption line from `AudioSystem`'s
-`CaptionBus` (sonar ping/echo, scan chimes). See [settings.md](./settings.md)
+`CaptionBus` (vehicle, discovery and environment cues). See [settings.md](./settings.md)
 and [audio.md](./audio.md).
 
 **Phase D — playability (2026-09-24).** The app shell gained explicit
@@ -190,7 +190,7 @@ flowchart TD
     end
 
     subgraph audio["audio/"]
-      AUD["AudioSystem\nengine, sonar echo, beds, cues"]
+      AUD["AudioSystem\nengine, beds, sensor and vehicle cues"]
     end
 
     subgraph ui["ui/ (DOM overlays)"]
@@ -400,7 +400,7 @@ own files.
   7. Anything else gives `medium`.
 
   `ultra` is never automatic. Precedence is `?tier=` (including `?tier=auto`),
-  then the saved setting, then detection. The default setting is `medium`.
+  then the saved setting, then detection. New players default to `auto`; saved fixed tiers are preserved.
   Dynamic resolution (`DynamicResolution`, run by `app/systems/quality.ts`)
   runs only for auto-detected tiers or with `?dynres=1`. `window.__game.perf`
   exposes `drawCalls`, `triangles`, `frameMs`, `tier`, `tierSource`,

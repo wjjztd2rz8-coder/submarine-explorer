@@ -31,8 +31,8 @@ export default defineConfig({
     baseURL,
     ...devices['Desktop Chrome'],
     viewport: { width: 1280, height: 800 },
-    // The game's fixed medium default overrides software-GPU auto-detection.
-    // Seed only the graphics preference in CI; Save fills in all other defaults.
+    // Pin CI to low independently of the device detected by the auto default.
+    // Seed only the graphics preference; Save fills in all other defaults.
     // Explicit ?tier= URLs (including the ocean high-tier tests) still win, and
     // tests remain free to migrate, reset or replace settings and reload.
     ...(isCI

@@ -9,7 +9,7 @@
  * - Dynamic resolution (`core/Quality.ts` `DynamicResolution`) steps the pixel
  *   ratio down while frames run over budget and back up with headroom. It runs
  *   when the tier was auto-detected (`auto` setting or `?tier=auto`), so a
- *   fixed tier (the default is `medium`) renders exactly as before.
+ *   saved fixed tier keeps its chosen pixel ratio.
  *   `?dynres=1` forces it on and `?dynres=0` off.
  */
 

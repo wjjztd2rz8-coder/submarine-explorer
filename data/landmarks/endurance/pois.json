@@ -18,9 +18,9 @@
       "sources": [
         "https://ukaht.org/places/endurance-shipwreck/",
         "https://www.prnewswire.com/news-releases/endurance-is-found-301498505.html",
-        "https://en.wikipedia.org/wiki/Endurance_(1912_ship)"
+        "https://ukaht.org/wp-content/uploads/2026/07/CMP_Endurance_April24_final.pdf"
       ],
-      "note": "Published position 68°44′21″S 52°19′47″W (Wikipedia \"Endurance (1912 ship)\", matching the FMHT-sourced 3,008 m depth). This tile's terrain here reads 3,000.3 m, 7.7 m shallower than the published 3,008 m -- close agreement for a smooth GEBCO-derived fill (see sources.md). depth_m sits ~5 m above the seabed for a scan target at roughly deck height on the intact, upright hull."
+      "note": "Published wreck position 68°44′21″S 52°19′47″W and depth 3,008 m (UKAHT / Historic England Conservation Management Plan, §2.1.4). This grid gives 3,000.3 m beneath the hull. The 2,995 m scan depth is about 5 m above that local seabed."
     },
     {
       "id": "endurance-stern-nameplate",
@@ -75,7 +75,8 @@
       "reconstruction": true,
       "sources": [
         "https://fmht.co.uk/shackletons-endurance-revealed/endurance-at-the-bottom-of-the-sea/",
-        "https://www.history.com/articles/endurance-shackleton-shipwreck-discovery-photos"
+        "https://www.history.com/articles/endurance-shackleton-shipwreck-discovery-photos",
+        "https://ukaht.org/wp-content/uploads/2026/07/CMP_Endurance_April24_final.pdf"
       ],
       "note": "FMHT's survey team (Mensun Bound) found the masts down and the funnel toppled, with damage concentrated around the poop and waist; History.com's photo set shows the ship appears to have struck the seabed bow/keel-first. No coordinates are published for the fallen rigging itself; placed forward of the hull centre, illustrative position."
     }
