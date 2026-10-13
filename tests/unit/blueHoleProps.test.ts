@@ -111,6 +111,7 @@ describe('Great Blue Hole props', () => {
             blueHoleApron: {
               ...cfg.blueHoleApron,
               rowDensity: 1,
+              columnDensity: 1,
               riserFraction: 0.22,
               normalSampleM: 0,
               contactShade: 0,

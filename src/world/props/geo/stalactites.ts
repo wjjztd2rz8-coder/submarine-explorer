@@ -362,7 +362,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   // More samples across each riser remove long triangular wedges. Low keeps its
   // original grid and budget; filtered surface normals soften its coarse folds.
   const apronRows = d.rubble ? Math.round(baseRows * sediment.rowDensity) : baseRows;
-  const apronColumns = baseColumns;
+  const apronColumns = d.rubble ? Math.round(baseColumns * sediment.columnDensity) : baseColumns;
   const bedTone = (y: number): number => {
     const bi = sediment.bedHeightM > 0 ? Math.floor(y / sediment.bedHeightM) : 0;
     return 0.5 + 0.5 * Math.sin(bi * 12.9898 + 2.3) * Math.cos(bi * 5.17);
@@ -431,14 +431,26 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
-        '#include <common>\nattribute float sedimentRoughness;\nvarying float vSedimentRoughness;',
+        '#include <common>\nattribute float sedimentRoughness;\nvarying float vSedimentRoughness;\nvarying float vBedY;',
       )
       .replace(
         '#include <begin_vertex>',
-        '#include <begin_vertex>\nvSedimentRoughness = sedimentRoughness;',
+        '#include <begin_vertex>\nvSedimentRoughness = sedimentRoughness;\nvBedY = position.y;',
       );
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying float vSedimentRoughness;')
+      .replace(
+        '#include <common>',
+        '#include <common>\nvarying float vSedimentRoughness;\nvarying float vBedY;',
+      )
+      // Terraces are contours of height: shade each bed per pixel (lit lip, silted foot) so the
+      // steps read at any triangle density, including Low's coarse grid.
+      .replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+float bedF = fract(vBedY / ${sediment.bedHeightM.toFixed(3)});
+float bedRise = smoothstep(0.04, 0.3, bedF) * (1.0 - smoothstep(0.7, 0.96, bedF));
+diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sediment.lipLight.toFixed(3)} * smoothstep(0.86, 0.99, bedF);`,
+      )
       .replace(
         '#include <roughnessmap_fragment>',
         '#include <roughnessmap_fragment>\nroughnessFactor = clamp(roughnessFactor + vSedimentRoughness, 0.0, 1.0);',

@@ -108,9 +108,13 @@ export interface PropsConfig {
     bedHeightM: number;
     riserFraction: number;
     rowDensity: number;
+    columnDensity: number;
     normalSampleM: number;
     contactShade: number;
     roughnessVariation: number;
+    /** Per-pixel bed shading: darkening on risers and lightening on the lip above them. */
+    riserShade: number;
+    lipLight: number;
   };
   /** `?debugProps=1` placement tool steps. */
   debugNudgeM: number;
@@ -191,9 +195,12 @@ export const DEFAULT_PROPS: PropsConfig = {
     bedHeightM: 1.7,
     riserFraction: 0.32,
     rowDensity: 2,
+    columnDensity: 1.5,
     normalSampleM: 0.7,
     contactShade: 0.18,
     roughnessVariation: 0.1,
+    riserShade: 0.3,
+    lipLight: 0.2,
   },
   debugNudgeM: 1,
   debugNudgeFastM: 10,
