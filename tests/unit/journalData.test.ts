@@ -1,6 +1,10 @@
 /** D-FLOW: the Journal's content model and unlock rules (plan/PHASE-D-CONTRACTS.md §4). */
 
 import { describe, expect, it } from 'vitest';
+import { Vector3 } from 'three';
+import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import { Scanner } from '../../src/game/Scanner.js';
 import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
 import { parseGuide } from '../../src/game/Guide.js';
 import {
@@ -120,6 +124,59 @@ function reader(keys: string[]): DiscoveryReader {
 }
 
 describe('Journal content model', () => {
+  it('retains one unlocked entry and its first timestamp after new-dive rescans', () => {
+    const s = site();
+    const storage = new Map<string, string>();
+    let now = new Date('2026-10-01T12:00:00Z');
+    const store = new DiscoveryStore(
+      {
+        getItem: (key) => storage.get(key) ?? null,
+        setItem: (key, value) => {
+          storage.set(key, value);
+        },
+        removeItem: (key) => {
+          storage.delete(key);
+        },
+      },
+      () => now,
+    );
+    const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus(), store);
+    scanner.setTargets([
+      {
+        id: 'reef-wreck',
+        name: 'Wreck',
+        landmarkId: 'reef',
+        position: new Vector3(0, 0, -50),
+        radius: 100,
+        scanSeconds: 2,
+      },
+    ]);
+    const scan = () => scanner.update(2, new Vector3(), new Vector3(0, 0, -1), true);
+    const unlocked = () => s.entries.filter((e) => isEntryUnlocked(s, e, store)).map((e) => e.key);
+    expect(unlocked()).toEqual([]);
+    scan();
+    const first = store.get('reef', 'reef-wreck');
+    expect(first).toEqual({ at: now.toISOString(), count: 1 });
+    expect(unlocked()).toEqual(['reef/site/overview', 'reef/poi/wreck']);
+    scan();
+    expect(store.get('reef', 'reef-wreck')).toEqual(first);
+    scanner.resetDive();
+    now = new Date('2026-10-02T12:00:00Z');
+    expect(unlocked()).toEqual(['reef/site/overview', 'reef/poi/wreck']);
+    scan();
+    expect(scanner.view.lastCompleteFirstTime).toBe(false);
+    expect(store.get('reef', 'reef-wreck')).toEqual({ at: first!.at, count: 2 });
+    expect(store.stats.scans).toBe(2);
+    expect(unlocked()).toEqual(['reef/site/overview', 'reef/poi/wreck']);
+    expect(
+      new DiscoveryStore({
+        getItem: (key) => storage.get(key) ?? null,
+        setItem: () => {},
+        removeItem: () => {},
+      }).snapshot(),
+    ).toEqual(store.snapshot());
+  });
+
   it('builds site, POI and species entries in order', () => {
     const s = site();
     expect(s.name).toBe('Reef');

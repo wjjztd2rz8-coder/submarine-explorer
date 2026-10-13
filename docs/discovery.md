@@ -48,15 +48,21 @@ entry `debris`. Entry `site` is unreferenced, so it starts unlocked.
 
 ## Scanning
 
-The candidate is the nearest POI within `radius_m` (3D distance) whose
-direction is within `Config.scan.coneHalfAngleDeg` (35°) of `sub.getForward()`.
-Inside `closeRangeM` (25 m) the facing test is skipped. While `InputState.scan`
-is held (G / gamepad RB), progress grows by `dt / scan_seconds`.
+Candidates must be within `radius_m` (3D distance) and
+`Config.scan.coneHalfAngleDeg` (35°) of `sub.getForward()`.
+Inside `closeRangeM` (25 m) the facing test is skipped. An eligible mission
+objective takes priority over nearer POIs or samples; otherwise the nearest
+eligible fixed contact wins, with wildlife as the fallback. An active scan
+keeps its target while that target remains eligible. While `InputState.scan`
+is held (G / gamepad RB / touch Scan), progress grows by `dt / scan_seconds`.
 
 - Released, out of range or off-facing → one `scan:aborted`. Progress then
   decays at `decayPerSecond` (0.35/s), so a target re-acquired quickly resumes.
-- Once a scan completes, G has to be released before that POI can be scanned
-  again. Repeat scans bump `count` and report `firstTime: false`.
+- Completed contacts cannot be scanned again during the same dive. A new dive
+  clears that session state; rescans bump `count` and report `firstTime: false`
+  while preserving Journal unlocks and the first-discovery timestamp.
+- Switching to another eligible contact while holding Scan aborts the old scan
+  and starts the new one with zero progress and its own name and events.
 - Scanning is suppressed while the field guide or the debrief is open. The game
   itself keeps running.
 - `main.ts` calls `discovery.update()` once per frame with
@@ -101,7 +107,8 @@ facing it, and `HOLD G TO SCAN` when it can be scanned. While the beam is on,
 a cyan progress ring fills. A completed scan shows `NEW ENTRY`, and pressing
 J then opens the guide at that entry.
 
-Guidance selects the nearest unscanned fixed contact within scan range, then a
+When a scan candidate exists, the card, reticle and prompt share its identity.
+Otherwise guidance selects the nearest unscanned fixed contact within scan range, then a
 previously scanned POI still in range, then a remote unscanned POI within hint
 range. A distant hint cannot hide the logged-contact card where the pilot is
 hovering. POIs retain hint priority over passing wildlife. The Blue Hole's two authored galleries have separate scan contacts, both
