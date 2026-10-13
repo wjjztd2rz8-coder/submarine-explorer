@@ -302,6 +302,8 @@ export interface MissionRouterOptions {
   meta: TileMeta;
   discovery: MissionDiscovery;
   rating?: () => DiveRating;
+  /** Stars earned so far, shown on the completion banner. */
+  stars?: () => number;
   defaultStartPosition?: MissionStartPosition;
   applyStart?: (choice: MissionStartPosition) => void;
   /** Unused since D-FLOW (the HUD shows a non-1× sim speed); kept for callers. */
@@ -564,6 +566,7 @@ export class MissionRouter {
           (left ? `${left} optional ${left === 1 ? 'target remains' : 'targets remain'}.` : '');
     this.bannerLeft = Math.max(1, this.opts.config.mission.completionBannerS);
     this.panel.showBanner({
+      stars: this.opts.stars?.(),
       title: kind === 'all' ? 'All objectives complete' : 'Primary objectives complete',
       detail: detail.trim(),
       onKeepExploring: () => this.keepExploring(),

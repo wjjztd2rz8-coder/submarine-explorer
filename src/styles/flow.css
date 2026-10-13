@@ -58,9 +58,20 @@
   border-radius: 3px;
   padding: 6px 12px;
 }
+.obj-banner-stars {
+  display: block;
+  color: #ffcb70;
+  font-size: clamp(16px, calc(17px * var(--ui-scale)), 25px);
+  letter-spacing: 0.1em;
+}
+.obj-banner-stars[hidden] {
+  display: none;
+}
 .obj-banner-btn.is-keep {
   border-color: var(--b3-cyan);
-  color: var(--b3-cyan);
+  background: var(--b3-cyan);
+  color: #06161c;
+  font-weight: 700;
 }
 .obj-banner-btn:hover {
   background: rgba(46, 217, 217, 0.16);

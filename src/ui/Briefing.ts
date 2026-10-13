@@ -306,7 +306,9 @@ export class Briefing {
       this.startInputs.push(input);
     }
     start.append(segments);
-    row.append(start);
+    // Start position is rarely changed: it lives inside the collapsed Advanced disclosure.
+    if (this.modeSelector) this.modeSelector.advancedPanel.prepend(start);
+    else row.append(start);
     section.append(row);
 
     slot.replaceChildren(section);

@@ -32,10 +32,6 @@ export function createOnboardSystem(): GameSystem {
   let chip: HintChip | null = null;
   let diveS = 0;
   let startDepth: number | null = null;
-  let wasLights = false;
-  let wasJournal = false;
-  let wasPhotoMode = false;
-  let photoCount = 0;
   let wasGamepad = false;
   let wasTouch = false;
   let creatureHint = false;
@@ -53,20 +49,14 @@ export function createOnboardSystem(): GameSystem {
         turn: 'Left stick',
         rise: padLabel('ballastBlow', 'A'),
         sink: padLabel('ballastFlood', 'B'),
-        lights: padLabel('toggleLights', 'X'),
         scan: padLabel('scan', 'Right bumper'),
-        photo: padLabel('togglePhotoMode', 'Start'),
-        journal: key('toggleJournal'),
       };
     return {
       move: key('thrustForward'),
       turn: `${key('yawPort')} or ${key('yawStarboard')}`,
       rise: key('ballastBlow'),
       sink: key('ballastFlood'),
-      lights: key('toggleLights'),
       scan: key('scan'),
-      photo: key('togglePhotoMode'),
-      journal: key('toggleJournal'),
     };
   };
 
@@ -104,7 +94,6 @@ export function createOnboardSystem(): GameSystem {
     init(ctx) {
       ctxRef = ctx;
       scanCompleted = false;
-      wasLights = ctx.headlights.on;
       const { input, bus, params } = ctx;
       store = new TutorialSave();
       const record = store.get();
@@ -207,8 +196,6 @@ export function createOnboardSystem(): GameSystem {
       });
     },
     start(ctx) {
-      // Mission setup can enable the lamps; only player changes count as practice.
-      wasLights = ctx.headlights.on;
       // A second way into the card, from the Settings header.
       const open =
         ctx.settingsScreen.root.querySelector<HTMLButtonElement>('.settings-controls-open');
@@ -239,30 +226,6 @@ export function createOnboardSystem(): GameSystem {
         // actual approach, rather than interpreting that teleport as descent.
         if (playing && startDepth === null && ctx.props.loaded && ctx.discovery.loaded)
           startDepth = f.sub.depth;
-        const lights = ctx.headlights.on;
-        const journal = ctx.discovery.guide.isOpen || ctx.journal.isOpen;
-        const photoMode = ctx.photoMode.active;
-        const photos = ctx.photos.photos.length;
-        if (tutorial.active && dive) {
-          if (lights !== wasLights) {
-            if (tutorial.notify('lights')) onAdvance();
-            else tutorial.remember('lights');
-          }
-          if ((photoMode && !wasPhotoMode) || photos > photoCount) {
-            if (tutorial.notify('photo')) onAdvance();
-            else tutorial.remember('photo');
-          }
-        }
-        // Touch opens the Journal through Pause, which retains the paused dive.
-        if (tutorial.active && (dive || ctx.app.state === 'pause') && journal && !wasJournal) {
-          if (tutorial.notify('journal')) onAdvance();
-          else tutorial.remember('journal');
-        }
-        wasLights = lights;
-        wasJournal = journal;
-        wasPhotoMode = photoMode;
-        photoCount = photos;
-
         if (tutorial.active && playing) {
           if (
             tutorial.update({
@@ -281,7 +244,8 @@ export function createOnboardSystem(): GameSystem {
           (o) => o.primary && !o.complete,
         )?.title;
         if (card) {
-          if (step && playing)
+          // The scan card carries its own instruction; never stack the two.
+          if (step && playing && !ctx.discovery.overlay.cardVisible)
             card.show(
               tutorial.index,
               tutorialText(
@@ -338,6 +302,7 @@ export function createOnboardSystem(): GameSystem {
     if (tutorial.active) return;
     finishTutorial();
     creatureHint = false;
-    chip?.show('Nice work. The Controls guide is always in the Pause menu.');
+    const guide = ctxRef?.controlsCard.device === 'touch' ? 'How to play' : 'Controls';
+    chip?.show(`Nice work. ${guide} is always in the Pause menu.`);
   }
 }
