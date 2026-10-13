@@ -1,6 +1,6 @@
-# 1410 — Blue Hole bowl facets
+# V-bluehole — Blue Hole bowl terraces
 
-Status: two geometry/implementation review rounds complete; final gates running. **Fresh browser captures and visual acceptance are blocked by the workspace runtime.** All existing assertions are retained.
+Status: visually reviewed and finished by Claude (see Visual review); gates run. All existing assertions are retained.
 
 ## Plan and scope
 
@@ -76,3 +76,15 @@ PW_PORT=4411 PW_OUTDIR=dist-1410 tools/gates.sh --full-e2e
 ```
 
 Copy each generated golden folder, including `poses.json`, into the local shots directory as `after-high` and `after-low`. Compare both gallery approach/detail poses to the supplied before references; inspect tread/riser shading, sediment tone, rock seating, wall/rim seams and Low phone readability. Move across risers to inspect flicker and the known collision-envelope gap. Static geometry evidence does not replace that review.
+
+## Visual review (Claude)
+
+Captured golden Blue Hole poses (High and Low, west and east galleries) from a local preview build.
+
+- Codex round 1 alone: High was smoother but still showed diamond creases and one flat cream tone; terraces barely read. Low was a featureless mud mound (coarse grid cannot resolve 1.7 m beds).
+- Kept: sampled smooth normals, broader riser transition, extra High rows, bed roughness, riser-foot contact darkening, tests. No Codex change reverted.
+- Added: per-pixel bed shading in the apron fragment shader (darker riser, lit lip, from local height modulo bed height; `riserShade`, `lipLight` in `blueHoleApron`), so terraces read as height contours at any triangle density, including Low with unchanged triangles and draws. Added `columnDensity` 1.5 on Medium and above, which removed the remaining diagonal creases on High.
+- Result: clearly better at both tiers. Low now reads as stacked sediment terraces; High reads as draped terraces with soft lips. Not too dark. Low still shows a few straight diagonal riser edges on its coarse grid.
+- Phone-landscape mission opening does not reach the gallery in the first 60 s (217 m away), so the bowl is judged from the golden poses.
+- The Low terrain-merge buffer hash snapshot was updated: triangles (21228) and draws (8) are unchanged; only normals changed.
+- Shots: `.cache/codex/shots/V-bluehole/` (before-_, after-_).
