@@ -6,7 +6,7 @@
 
 import { FIRST_MINUTE_GUIDANCE } from '../core/config/guidance.js';
 
-export type HintId = 'battery-low' | 'near-hull' | 'scan-target' | 'creature' | 'rov';
+export type HintId = 'battery-low' | 'near-hull' | 'scan-target' | 'creature';
 
 /** Highest priority first: when several are due, the earliest one wins. */
 export const HINT_ORDER: readonly HintId[] = [
@@ -14,7 +14,6 @@ export const HINT_ORDER: readonly HintId[] = [
   'near-hull',
   'scan-target',
   'creature',
-  'rov',
 ];
 
 /**
@@ -24,7 +23,6 @@ export const HINT_ORDER: readonly HintId[] = [
  */
 export interface HintLabels {
   scan: string;
-  rov: string;
   photo: string;
   lights: string;
 }
@@ -34,7 +32,6 @@ export const HINT_TEXT: Record<HintId, (l: HintLabels) => string> = {
   'near-hull': () => 'Near hull rating. Ascend to ease pressure.',
   'scan-target': (l) => `Face the target. Hold ${l.scan} to scan.`,
   creature: (l) => `Animal nearby. Hold ${l.scan} to scan, or use ${l.photo} for a photo.`,
-  rov: (l) => `Deploy the tethered ROV (${l.rov}) into tight spots.`,
 };
 
 export interface HintContext {
@@ -46,7 +43,6 @@ export interface HintContext {
   hullHintEligible: boolean;
   scanTargetInRange: boolean;
   creatureInView: boolean;
-  rovAvailable: boolean;
   /** False while a menu, the tutorial or a debrief owns the screen. */
   canShow: boolean;
 }
@@ -82,8 +78,6 @@ export function hintDue(id: HintId, c: HintContext): boolean {
       return c.scanTargetInRange;
     case 'creature':
       return c.creatureInView;
-    case 'rov':
-      return c.rovAvailable;
   }
 }
 

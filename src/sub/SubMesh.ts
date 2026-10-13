@@ -126,12 +126,6 @@ export class SubMesh {
     this.cockpit.object.visible = fp;
   }
 
-  /** Where the ROV tether leaves the hull, in world space. */
-  tetherAnchor(out: THREE.Vector3): THREE.Vector3 {
-    this.group.updateMatrixWorld();
-    return out.copy(this.vehicleRef.tetherAnchor).applyMatrix4(this.group.matrixWorld);
-  }
-
   /**
    * Place the model from the physics pose. `yaw` is the physics compass angle
    * (+yaw = toward east, Submarine.getForward), so the Three.js Y rotation is

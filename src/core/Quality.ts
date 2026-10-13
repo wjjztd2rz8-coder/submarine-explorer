@@ -51,7 +51,7 @@ export interface DeviceCaps {
   devicePixelRatio: number;
 }
 
-export interface TierDecision {
+interface TierDecision {
   tier: GraphicsTier;
   /** One short human-readable reason, shown in `window.__game.quality`. */
   reason: string;
@@ -98,7 +98,7 @@ export function detectTier(caps: DeviceCaps): TierDecision {
 }
 
 /** Minimal slice of a WebGL context used by `readDeviceCaps`. */
-export interface CapsGl {
+interface CapsGl {
   getParameter(pname: number): unknown;
   getExtension(name: string): unknown;
   readonly MAX_TEXTURE_SIZE: number;
@@ -159,7 +159,7 @@ export function readDeviceCaps(gl: CapsGl | null): DeviceCaps {
 }
 
 /** Where the tier for this dive came from. */
-export type TierSource = 'url' | 'setting' | 'auto';
+type TierSource = 'url' | 'setting' | 'auto';
 
 export interface QualityResolution {
   tier: GraphicsTier;

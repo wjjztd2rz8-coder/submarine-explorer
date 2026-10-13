@@ -93,6 +93,7 @@ describe('save schema soak', () => {
         version,
         keys: {
           thrustForward: ['KeyI'],
+          toggleRov: ['KeyE'],
           boost: [],
           [version === 1 ? 'toggleGuide' : 'toggleJournal']: ['KeyH'],
         },
@@ -102,9 +103,17 @@ describe('save schema soak', () => {
       expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
       expect(input.getAction('boost')?.keys).toEqual([]);
       expect(input.getAction('toggleJournal')?.keys).toEqual(['KeyH']);
+      const migrated = JSON.parse(storage.getItem(BINDINGS_STORAGE_KEY)!);
+      expect(migrated.keys).not.toHaveProperty('toggleRov');
+      expect(migrated.keys.thrustForward).toEqual(['KeyI']);
+      expect(migrated.keys.boost).toEqual([]);
+      expect(input.actions.some((a) => a.keys.includes('KeyE'))).toBe(false);
       input.rebind('toggleLights', ['KeyO']);
+      // Retiring an action must leave its old key available for a player's remap.
+      input.rebind('capturePhoto', ['KeyE']);
       const restored = new Input({ storage });
       expect(restored.actions).toEqual(input.actions);
+      expect(restored.getAction('capturePhoto')?.keys).toEqual(['KeyE']);
       if (version < 3) expect(storage.getItem(key)).toBe(original);
       input.dispose();
       restored.dispose();
@@ -182,8 +191,9 @@ describe('save schema soak', () => {
     expect(save.get()).toEqual({
       version: 1,
       tutorialDone: true,
-      seenHints: ['battery-low', 'rov'],
+      seenHints: ['battery-low'],
     });
+    expect(JSON.parse(storage.getItem(ONBOARD_STORAGE_KEY)!)).toEqual(save.get());
     save.save({});
     expect(new TutorialSave(storage).get()).toEqual(save.get());
   });
@@ -256,7 +266,8 @@ describe('damaged localStorage recovery', () => {
 
   it.each(constructors)('session edits preserve a future %s blob byte for byte', (key, write) => {
     const storage = new MemoryStorage();
-    const future = '{"version":99,"unknown":{"valuable":"keep this"}}';
+    const future =
+      '{"version":99,"keys":{"toggleRov":["KeyE"]},"seenHints":["rov"],"unknown":{"valuable":"keep this"}}';
     storage.setItem(key, future);
     write(storage);
     if (key === BINDINGS_STORAGE_KEY) new Input({ storage }).resetBindings();

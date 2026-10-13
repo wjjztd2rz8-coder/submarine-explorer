@@ -1,4 +1,6 @@
 /** Optional dive supplies. All time here is simulated time at 1×. */
+import { clamp01 } from '../util/math.js';
+
 import type { DescentProfile, PowerConfig } from '../core/Config.js';
 
 export type Supply = 'battery' | 'oxygen';
@@ -11,15 +13,13 @@ export interface PowerState {
   depleted: Supply | null;
 }
 
-export interface PowerLoad {
+interface PowerLoad {
   throttle: number;
   ballast: number;
   boost: boolean;
   lights: boolean;
   sensors: boolean;
 }
-
-const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
 
 /** Simulated descent with half ballast duty, lights on, and a 3% maneuver margin. */
 export function startingReserves(

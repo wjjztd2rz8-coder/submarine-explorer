@@ -2,8 +2,7 @@
  * The frame loop (F0-CORE, from the old `main.ts` `frame()`).
  *
  *   - `Time.tick()` converts the real frame delta into N fixed 60 Hz steps.
- *   - Each step advances the piloted vehicle with the sampled input (the ROV
- *     system's `sim.vehicles` stage).
+ *   - Each step advances the submarine with the sampled input.
  *   - Rendering then happens once, using the real frame delta for camera
  *     smoothing and animation, so visuals are smooth at any refresh rate.
  *

@@ -207,13 +207,12 @@ stick or button is deflected, but its buttons are not rebindable yet.
 | `G` (hold)                  | scan the target in range; "Already logged" once it's scanned this dive                                          | right bumper               |
 | `L`                         | headlights                                                                                                      | X                          |
 | `M`                         | sonar map; its buttons, `+`/`-`, or the wheel zoom it (250 m / 500 m / 1 km / 2 km / whole tile) while expanded | Back / view                |
-| `X`                         | reset camera to default chase view                                                                              | --                         |
+| `X`                         | reset camera to default chase view                                                                              | D-pad down                 |
 | `Q`                         | camera view (chase / first-person)                                                                              | Y                          |
 | `T`                         | sim speed 1x / 2x / 3x (a HUD badge shows it whenever it isn't 1x)                                              | D-pad up                   |
-| `J`                         | Journal (site, POI and species entries, plus your photo gallery)                                                | --                         |
-| `E`                         | deploy / retrieve the tethered ROV                                                                              | --                         |
+| `J`                         | Journal (site, POI and species entries, plus your photo gallery)                                                | D-pad left                 |
 | `P`                         | photo mode (free-orbit camera, hidden HUD)                                                                      | Start                      |
-| `Enter`                     | capture a photo in photo mode; `Space` and the Capture button also work                                         | --                         |
+| `Enter`                     | capture a photo in photo mode; `Space` and the Capture button also work                                         | left bumper                |
 | `Esc`                       | pause menu; closes the top-most open dialog first                                                               | --                         |
 | mouse drag                  | free look; camera keeps its world angle as the boat turns                                                       | --                         |
 | mouse wheel                 | zoom the chase camera (35–180 m) unless sonar is expanded                                                       | --                         |
@@ -285,8 +284,7 @@ entries" toggle lets you preview what you haven't found yet. Discoveries persist
 across reloads (`subexplorer.discoveries.v1`); the per-dive "already scanned"
 state that blocks re-scanning is separate and always resets on a new dive.
 
-**Photo mode** (`P`) swings a free-orbit camera around your sub — or the
-ROV, while it's deployed — and hides the HUD. `Enter`, `Space` or the visible
+**Photo mode** (`P`) swings a free-orbit camera around your sub and hides the HUD. `Enter`, `Space` or the visible
 **Capture** button captures a JPEG thumbnail (≤ 640 px wide) captioned with whichever site or POI is in
 frame, and saves it into the Journal's photo gallery
 (`subexplorer.photos.v1`, the newest 24 kept, oldest dropped with a notice
@@ -355,7 +353,7 @@ src/
   world/props/ Procedural builders, Collision, PlacementDebug, Wiring (?at=, sub push-out)
   render/      Atmosphere (depth bands, fog, lights), Headlights, MarineSnow, caustics
   game/        Pois, Guide, Scanner, DiscoveryStore, Objectives, Discovery, Mission, MissionRouter, ContentPath
-  audio/       WebAudio graph, sonar ping/echo, ambient beds, cues (all synthesised)
+  audio/       WebAudio graph, ambient beds, sensor and vehicle cues
   sub/         Submarine (physics), SubMesh (placeholder hull), CameraRig
   ui/          HUD, Sonar, MissionSelect, ScanOverlay, FieldGuide, Debrief, Briefing, ObjectivesPanel
   shaders/     underwater post pass, terrain GLSL

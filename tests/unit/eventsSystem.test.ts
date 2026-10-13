@@ -63,7 +63,6 @@ it('prompts an approach, witnesses once, persists the log and preserves the capt
     bus,
     scene: new THREE.Scene(),
     sub: { position, getForward: () => new THREE.Vector3(0, 0, -1) },
-    rov: { deployed: false },
     rig: { camera },
     terrain: { sampleHeight: () => -100 },
     app: { state: 'dive' },

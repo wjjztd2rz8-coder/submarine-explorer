@@ -1,5 +1,5 @@
 /**
- * Gameplay option profiles (speed, descent, lights, sensors), power, currents and the ROV.
+ * Gameplay option profiles (speed, descent, lights, sensors), power and currents.
  * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
  */
 
@@ -53,13 +53,6 @@ export interface LightPreset {
   coneOpacity: number;
   fillIntensity: number;
   fillDistance: number;
-  /** The ROV camera needs a broad work pool; hull-close tuning must not dim it. */
-  workLight?: {
-    intensityFactor: number;
-    angleDeg: number;
-    fillIntensityFactor: number;
-    fillDistance: number;
-  };
 }
 export interface SensorPreset {
   scanRadiusMultiplier: number;
@@ -77,32 +70,6 @@ export interface PowerConfig {
   boostCostMultiplier: number;
   lowThreshold: number;
   criticalThreshold: number;
-}
-
-export interface RovConfig {
-  tetherLengthM: number;
-  radiusM: number;
-  clearanceM: number;
-  deployAheadM: number;
-  deployBelowM: number;
-  maxSpeedMps: number;
-  verticalSpeedMps: number;
-  yawRateRadS: number;
-  responsePerSecond: number;
-  returnSpeedMps: number;
-  scanRangeFactor: number;
-  cameraDistanceM: number;
-  cameraRaiseM: number;
-  cameraLookAheadM: number;
-  cameraAimAboveM: number;
-  mothershipCameraClearanceM: number;
-  batteryDrainPerHour: number;
-  currentScale: number;
-  spotIntensityFactor: number;
-  spotDistanceFactor: number;
-  fillMinIntensity: number;
-  fillIntensityFactor: number;
-  fillDistanceM: number;
 }
 
 export const DEFAULT_SPEED_PROFILES: Record<GameplayOptions['speedProfile'], SpeedProfile> = {
@@ -155,12 +122,6 @@ export const DEFAULT_LIGHT_PRESETS: Record<GameplayOptions['lights'], LightPrese
     coneOpacity: 0.008,
     fillIntensity: 12,
     fillDistance: 80,
-    workLight: {
-      intensityFactor: 2.75,
-      angleDeg: 38,
-      fillIntensityFactor: 1,
-      fillDistance: 80,
-    },
   },
   enhanced: {
     intensity: 750,
@@ -169,12 +130,6 @@ export const DEFAULT_LIGHT_PRESETS: Record<GameplayOptions['lights'], LightPrese
     coneOpacity: 0.012,
     fillIntensity: 50,
     fillDistance: 220,
-    workLight: {
-      intensityFactor: 3,
-      angleDeg: 52,
-      fillIntensityFactor: 4,
-      fillDistance: 350,
-    },
   },
 };
 
@@ -201,31 +156,4 @@ export const DEFAULT_CURRENTS: CurrentsConfig = {
   hudMinMps: 0.001,
   terrainLookaheadS: 0.5,
   terrainGuardM: 1,
-};
-
-// --- D-ROV: small tethered vehicle. All motion rates are simulated 1x time. ---
-export const DEFAULT_ROV: RovConfig = {
-  tetherLengthM: 150,
-  radiusM: 0.75,
-  clearanceM: 0.5,
-  deployAheadM: 32,
-  deployBelowM: 5,
-  maxSpeedMps: 2,
-  verticalSpeedMps: 1.4,
-  yawRateRadS: 1.8,
-  responsePerSecond: 5,
-  returnSpeedMps: 30,
-  scanRangeFactor: 0.6,
-  cameraDistanceM: 14,
-  cameraRaiseM: 8,
-  cameraLookAheadM: 5,
-  cameraAimAboveM: 1.5,
-  mothershipCameraClearanceM: 18,
-  batteryDrainPerHour: 36,
-  currentScale: 1,
-  spotIntensityFactor: 0.45,
-  spotDistanceFactor: 0.04,
-  fillMinIntensity: 40,
-  fillIntensityFactor: 0.6,
-  fillDistanceM: 12,
 };

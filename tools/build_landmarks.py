@@ -357,7 +357,7 @@ add(id="monterey-canyon", name="Monterey Canyon", type="canyon", lat=36.8, lon=-
     coordinate_source="https://en.wikipedia.org/wiki/Monterey_Canyon",
     summary="The largest submarine canyon on the US West Coast, comparable in scale to the Grand Canyon, extending from Moss Landing beach out to abyssal depths in Monterey Bay.",
     facts=["Comparable in size and depth to the Grand Canyon","Reaches depths of over 3,600 m within roughly 100 km of the shoreline","Intensively studied by MBARI using ROVs and cabled observatories","Hosts frequent turbidity-current sediment flows that reshape the canyon floor"],
-    gameplay_hooks=["Follow a simulated turbidity current down-canyon","MBARI-style ROV midwater biology transect"],
+    gameplay_hooks=["Follow a simulated turbidity current down-canyon","MBARI-style midwater biology transect"],
     hazards=["turbidity currents","strong upwelling currents","fishing gear"], notable_species=["Humboldt squid","giant larvacean 'ghost' filters","deep-sea corals"],
     external_links=["https://en.wikipedia.org/wiki/Monterey_Canyon","https://www.mbari.org/"])
 
@@ -556,7 +556,7 @@ add(id="thwaites-grounding-zone", name="Thwaites Glacier Grounding Zone", type="
     coordinate_source="https://thwaitesglacier.org/",
     summary="The submerged zone where the rapidly retreating Thwaites Glacier ('Doomsday Glacier') meets the seafloor in the Amundsen Sea, a critical site for understanding future sea-level rise; exact grounding-line position shifts yearly and is only approximated here.",
     facts=["Thwaites Glacier alone could raise global sea level by over 60 cm if fully lost","Warm Circumpolar Deep Water intruding beneath the ice shelf is accelerating melt","The International Thwaites Glacier Collaboration deployed the Icefin ROV beneath the ice in 2019-2020","Grounding line has retreated several kilometers in recent decades, so its precise position is a moving target, hence low confidence here"],
-    gameplay_hooks=["Under-ice-shelf ROV mission (Icefin-style) mapping the grounding line","Climate-science time-pressure narrative: document retreat before it's gone"],
+    gameplay_hooks=["Under-ice-shelf survey mapping the grounding line","Climate-science time-pressure narrative: document retreat before it's gone"],
     hazards=["under-ice-shelf entrapment risk","extreme cold","calving ice hazards","rapidly changing, poorly mapped terrain"],
     notable_species=["ice-shelf amphipods","Antarctic silverfish"],
     external_links=["https://thwaitesglacier.org/"])

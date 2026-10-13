@@ -45,12 +45,12 @@ function el<K extends keyof HTMLElementTagNameMap>(
 }
 
 /** "Titanic · Bow section", or just the site when no POI was in frame. */
-export function photoCaption(photo: Pick<Photo, 'siteName' | 'poiName'>): string {
+function photoCaption(photo: Pick<Photo, 'siteName' | 'poiName'>): string {
   return [photo.siteName, photo.poiName].filter(Boolean).join(' · ');
 }
 
 /** "24 Sep 2026, 14:05 · 3,790 m deep" */
-export function photoDetail(photo: Pick<Photo, 'at' | 'depthM'>): string {
+function photoDetail(photo: Pick<Photo, 'at' | 'depthM'>): string {
   const when = new Date(photo.at).toLocaleString(undefined, {
     dateStyle: 'medium',
     timeStyle: 'short',

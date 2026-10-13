@@ -1,0 +1,164 @@
+# S-render: scheduled diagnostics for Claude's golden review, outside release gates.
+name: Nightly golden and performance diagnostics
+
+on:
+  schedule:
+    - cron: '23 8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Serialize scheduled and manual runs, including dispatches on different refs.
+concurrency:
+  group: render-nightly
+  cancel-in-progress: false
+
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    env:
+      CI: true
+      # golden.sh supplies a root URL; perf-budget does not resolve a project base.
+      VITE_BASE: /
+      DIAGNOSTICS_DIR: .cache/render-nightly/${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
+      # src/core/config/quality.ts: keep Ultra until S-tiers merges its migration.
+      PERF_TIERS: low,medium,high,ultra
+      # src/game/Cosmetics.ts HERO_SITES, rather than the seven-site review table.
+      PERF_SITES: titanic,lost-city,great-blue-hole,beebe-vent-field,monterey-canyon
+    steps:
+      - name: Checkout exact run SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Record provenance
+        run: |
+          mkdir -p "$DIAGNOSTICS_DIR"
+          {
+            git rev-parse HEAD
+            sha256sum package-lock.json
+            node --version
+            npm --version
+            printf 'run=%s attempt=%s base=%s\ntiers=%s\nsites=%s\n' \
+              "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$VITE_BASE" "$PERF_TIERS" "$PERF_SITES"
+          } > "$DIAGNOSTICS_DIR/run.txt"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: npm ci 2>&1 | tee "$DIAGNOSTICS_DIR/npm-install.log"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright Chromium
+        id: chromium
+        timeout-minutes: 8
+        run: bash tools/install-playwright-chromium.sh 2>&1 | tee "$DIAGNOSTICS_DIR/chromium-install.log"
+
+      - name: Capture existing golden set
+        id: golden
+        timeout-minutes: 30
+        run: |
+          # Ask the OS for a free loopback port; strictPort rejects any allocation race.
+          GOLDEN_PORT=$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1]); s.close()')
+          export GOLDEN_PORT
+          bash tools/golden.sh 2>&1 | tee "$DIAGNOSTICS_DIR/golden.log"
+
+      - name: Benchmark every supported tier at the five hero sites
+        # Capture failure must not hide numeric diagnostics; cancellation stops new work.
+        if: ${{ !cancelled() && steps.chromium.outcome == 'success' && steps.golden.outcome != 'skipped' }}
+        timeout-minutes: 30
+        run: |
+          # golden.sh has stopped its preview. Reuse its build with a new owned server.
+          test -f dist/index.html
+          port=$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1]); s.close()')
+          base_url="http://127.0.0.1:$port/"
+          preview_pid=''
+          cleanup() {
+            if [[ -n "$preview_pid" ]]; then
+              # A dedicated process group also covers any preview child processes.
+              kill -TERM -- "-$preview_pid" 2>/dev/null || true
+              wait "$preview_pid" 2>/dev/null || true
+            fi
+          }
+          trap cleanup EXIT
+          trap 'exit 130' INT
+          trap 'exit 143' TERM
+          setsid node node_modules/vite/bin/vite.js preview \
+            --host 127.0.0.1 --port "$port" --strictPort \
+            > "$DIAGNOSTICS_DIR/perf-preview.log" 2>&1 &
+          preview_pid=$!
+          ready=false
+          for attempt in {1..60}; do
+            if ! kill -0 "$preview_pid" 2>/dev/null; then
+              cat "$DIAGNOSTICS_DIR/perf-preview.log"
+              exit 1
+            fi
+            if curl --fail --silent --show-error --max-time 2 "$base_url" \
+              -o /dev/null 2>> "$DIAGNOSTICS_DIR/perf-readiness.log"; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          if [[ "$ready" != true ]]; then
+            echo "Preview did not become ready at $base_url" >&2
+            exit 1
+          fi
+          printf 'preview=%s pid=%s\n' "$base_url" "$preview_pid" \
+            >> "$DIAGNOSTICS_DIR/run.txt"
+          # Bash's pipefail preserves the existing benchmark's failure status.
+          node tools/perf-budget.mjs "$base_url" "$DIAGNOSTICS_DIR/perf" \
+            2>&1 | tee "$DIAGNOSTICS_DIR/perf.log"
+
+      - name: Upload golden outputs
+        if: always()
+        timeout-minutes: 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
+          path: .cache/golden/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload numeric results and benchmark captures
+        if: always()
+        timeout-minutes: 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
+          path: ${{ env.DIAGNOSTICS_DIR }}/perf/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload available logs and provenance
+        if: always()
+        timeout-minutes: 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-logs-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
+          path: |
+            ${{ env.DIAGNOSTICS_DIR }}/*.log
+            ${{ env.DIAGNOSTICS_DIR }}/run.txt
+            .cache/golden-build.log
+            .cache/golden-preview.log
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14

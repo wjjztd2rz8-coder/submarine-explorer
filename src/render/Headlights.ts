@@ -23,9 +23,7 @@ export class Headlights {
   private readonly right = new THREE.Vector3();
   private readonly up = new THREE.Vector3(0, 1, 0);
   private enabled = true;
-  private conesSuppressed = false;
   private preset: LightPreset | null = null;
-  private workLighting = false;
 
   constructor(
     private readonly config: WaterConfig,
@@ -98,14 +96,8 @@ export class Headlights {
   setEnabled(on: boolean): void {
     this.enabled = on;
     for (const l of this.lights) l.visible = on;
-    for (const c of this.cones) c.visible = on && !this.conesSuppressed;
+    for (const c of this.cones) c.visible = on;
     this.fill.visible = on && this.fill.intensity > 0;
-  }
-
-  /** Hide additive beam geometry near a separate vehicle camera, keeping real illumination. */
-  setConesSuppressed(suppressed: boolean): void {
-    this.conesSuppressed = suppressed;
-    for (const c of this.cones) c.visible = this.enabled && !suppressed;
   }
 
   setPreset(preset: LightPreset): void {
@@ -133,30 +125,24 @@ export class Headlights {
     this.applyLampPreset();
   }
 
-  /** Keep the short ROV rig's broad working light independent of hull-close tuning. */
   private applyLampPreset(): void {
     const preset = this.preset;
     if (!preset) return;
-    const work = this.workLighting ? preset.workLight : undefined;
-    const tuning = this.workLighting
-      ? { intensity: 1, distance: 1, fillIntensity: 1, fillDistance: 1 }
-      : this.tuning;
     for (const light of this.lights) {
-      light.intensity = preset.intensity * (work?.intensityFactor ?? 1) * tuning.intensity;
-      light.distance = preset.distance * tuning.distance;
-      light.angle = ((work?.angleDeg ?? preset.angleDeg) * Math.PI) / 180;
-      light.penumbra = work ? 0.6 : 0.7;
-      light.decay = work ? 1 : 1.35;
+      light.intensity = preset.intensity * this.tuning.intensity;
+      light.distance = preset.distance * this.tuning.distance;
+      light.angle = (preset.angleDeg * Math.PI) / 180;
+      light.penumbra = 0.7;
+      light.decay = 1.35;
     }
-    this.fill.intensity =
-      preset.fillIntensity * (work?.fillIntensityFactor ?? 1) * tuning.fillIntensity;
-    this.fill.distance = (work?.fillDistance ?? preset.fillDistance) * tuning.fillDistance;
-    this.fill.decay = work ? 1 : 2;
+    this.fill.intensity = preset.fillIntensity * this.tuning.fillIntensity;
+    this.fill.distance = preset.fillDistance * this.tuning.fillDistance;
+    this.fill.decay = 2;
     this.fill.visible = this.enabled && this.fill.intensity > 0;
   }
 
   /**
-   * @param origin  boat (or, while deployed, ROV) position
+   * @param origin  boat position
    * @param forward its forward direction, unit length
    * @param fog     current fog colour / density, so the cones sit in the same
    *                water as everything else
@@ -167,21 +153,11 @@ export class Headlights {
     fog?: { color: THREE.Color; density: number },
     elapsed = 0,
     murk = 1,
-    /** Lamp spacing scale: 1 for the sub, smaller for the ROV's tighter light bar. */
-    separationScale = 1,
   ): void {
-    // The atmosphere system supplies the ROV's smaller lamp-bar spacing.
-    // Resolve the vehicle change even with lamps off, so retrieving or changing
-    // presets cannot leave the work-light gain on the submarine afterward.
-    const workLighting = separationScale < 1;
-    if (workLighting !== this.workLighting) {
-      this.workLighting = workLighting;
-      this.applyLampPreset();
-    }
     if (!this.enabled) return;
     if (this.preset) this.fill.position.copy(origin).addScaledVector(forward, 10);
     this.right.crossVectors(forward, this.up).normalize();
-    const half = (this.config.headlightSeparationM * separationScale) / 2;
+    const half = this.config.headlightSeparationM / 2;
 
     for (let i = 0; i < this.lights.length; i++) {
       const side = i === 0 ? -half : half;

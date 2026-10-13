@@ -84,7 +84,9 @@ it('keeps shared prop placement byte-identical outside the Beebe dispatch', () =
       '',
     )
     .replace(/    \/\/ 850 Beebe ground begin[\s\S]*?    \/\/ 850 Beebe ground end\n/, '');
-  expect(digest(source)).toBe('c73869437510f21786195dde1bde0497b08de26dbaab636d04b8ff93a43a5277');
+  // 1495 adds surface-collider registration and its placement/rebuild cache.
+  // Retain the exact whole-source lock against that reviewed placement baseline.
+  expect(digest(source)).toBe('54531cb69b266ad15124782ab8301f594e746c5e8ede6d36cd1681de1a55db6c');
 });
 
 it('F-1080: confines chimney detail to Beebe while retaining collision and vent sources', () => {

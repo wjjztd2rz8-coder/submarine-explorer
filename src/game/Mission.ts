@@ -30,7 +30,7 @@ export interface MissionSpawn {
   heading_deg: number;
 }
 
-export interface MissionStart {
+interface MissionStart {
   near_site?: MissionSpawn;
 }
 
@@ -54,7 +54,7 @@ export interface MissionObjectiveDef {
   hint: string;
 }
 
-export type CompletionRule = 'all_primary';
+type CompletionRule = 'all_primary';
 
 export interface MissionDef {
   version: number;
@@ -268,13 +268,13 @@ export async function loadMissionSummaries(
  * `aborted → debrief` after an emergency ascent (plan/PHASE-D-CONTRACTS.md §4).
  * "Keep exploring" returns from `debrief` to the state the dive was in.
  */
-export type MissionState = 'briefing' | 'diving' | 'primaries-complete' | 'debrief' | 'aborted';
+type MissionState = 'briefing' | 'diving' | 'primaries-complete' | 'debrief' | 'aborted';
 
 /** Why a dive was aborted. Only crush depth for now (plan/DECISIONS.md failure model). */
 export type AbortReason = 'crush' | 'power';
 
 /** Why the debrief opened: a voluntary surface, everything done, or an abort. */
-export type EndReason = GameEvents['mission:ended']['reason'];
+type EndReason = GameEvents['mission:ended']['reason'];
 
 export interface ObjectiveStatus {
   id: string;
@@ -289,9 +289,9 @@ export interface ObjectiveStatus {
 }
 
 /** The bus subset Mission uses (EventBus satisfies it; tests pass a fake). */
-export type MissionBus = Pick<EventBus, 'on' | 'emit'>;
+type MissionBus = Pick<EventBus, 'on' | 'emit'>;
 
-export interface MissionOptions {
+interface MissionOptions {
   def: MissionDef;
   bus: MissionBus;
   warn?: Warn;

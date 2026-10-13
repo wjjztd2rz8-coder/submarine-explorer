@@ -8,16 +8,9 @@ import { DailySave } from '../../src/game/DailySave.js';
 import { Progress } from '../../src/game/Progress.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { createProgressSystem } from '../../src/app/systems/progress.js';
-import { createRovSystem } from '../../src/app/systems/rov.js';
-import { Scene, SpotLight, PointLight, Vector3 } from 'three';
+import { Scene, Vector3 } from 'three';
 import { shellUrl } from '../../src/util/navigation.js';
 import { Home } from '../../src/ui/Home.js';
-
-vi.mock('../../src/ui/RovHUD.js', () => ({
-  RovHUD: class {
-    update() {}
-  },
-}));
 
 function setup(lowLight = false, href = 'http://localhost/', includeDeep = false) {
   vi.useFakeTimers();
@@ -71,12 +64,8 @@ function setup(lowLight = false, href = 'http://localhost/', includeDeep = false
   } as unknown as GameContext;
   const purchases = createProgressSystem();
   purchases.init?.(ctx);
-  const rovSystem = createRovSystem();
-  rovSystem.init?.(ctx);
   const offPurchase = () => {
     purchases.dispose?.();
-    rovSystem.dispose?.();
-    ctx.rovVisual.dispose();
   };
   const system = createDailySystem();
   system.start?.(ctx);
@@ -225,42 +214,11 @@ it('refreshes Daily access immediately on both mode changes without altering the
 it('preserves Daily Low light after live settings and purchases and unsubscribes enforcement', () => {
   const { ctx, system, offPurchase, setPreset } = setup(true);
   try {
-    const spots: SpotLight[] = [];
-    const fills: PointLight[] = [];
-    ctx.rovVisual.group.traverse((object) => {
-      if (object instanceof SpotLight) spots.push(object);
-      if (object instanceof PointLight) fills.push(object);
-    });
-    const checkRov = () => {
-      const preset = ctx.config.lightPresets.realistic;
-      expect(spots).toHaveLength(2);
-      for (const spot of spots) {
-        expect(spot.intensity).toBeCloseTo(
-          preset.intensity * preset.workLight!.intensityFactor * ctx.config.rov.spotIntensityFactor,
-        );
-        expect(spot.distance).toBe(preset.distance * ctx.config.rov.spotDistanceFactor);
-      }
-      expect(fills[0].intensity).toBeCloseTo(
-        3 *
-          Math.max(
-            ctx.config.rov.fillMinIntensity,
-            preset.fillIntensity *
-              preset.workLight!.fillIntensityFactor *
-              ctx.config.rov.fillIntensityFactor,
-          ),
-      );
-    };
-    checkRov();
     ctx.save.setGameplayMode('realistic');
-    checkRov();
     ctx.save.setGameplayMode('arcade');
     expect(setPreset).toHaveBeenLastCalledWith(ctx.config.lightPresets.realistic);
-    checkRov();
-    expect(ctx.rov.deploy(new Vector3(0, -400, 0), 0)).toBe(true);
-    expect(ctx.rov.position.toArray().every(Number.isFinite)).toBe(true);
     expect(ctx.progress.buy('light-range')).toBe(true);
     expect(setPreset).toHaveBeenLastCalledWith(ctx.config.lightPresets.realistic);
-    checkRov();
     expect(ctx.save.get().gameplay.lights).toBe('enhanced');
     system.dispose?.();
     setPreset.mockClear();

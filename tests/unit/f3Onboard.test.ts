@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { Input } from '../../src/core/Input.js';
 import {
   HINT_TEXT,
   HintEngine,
@@ -18,10 +19,9 @@ const calm: HintContext = {
   hullHintEligible: true,
   scanTargetInRange: false,
   creatureInView: false,
-  rovAvailable: false,
   canShow: true,
 };
-const labels = { scan: 'F', rov: 'E', photo: 'P', lights: 'L' };
+const labels = { scan: 'F', photo: 'P', lights: 'L' };
 
 describe('hint engine', () => {
   it('defers hull guidance for 20 dive seconds without consuming it', () => {
@@ -119,7 +119,6 @@ describe('hint engine', () => {
     const e = new HintEngine(['creature']);
     expect(e.update(0, { ...calm, battery: null })).toBeNull();
     expect(e.update(0, { ...calm, creatureInView: true })).toBeNull();
-    expect(e.update(0, { ...calm, rovAvailable: true })).toBe('rov');
   });
   it('has a one-line, caveat-free text for every hint', () => {
     for (const make of Object.values(HINT_TEXT)) {
@@ -265,13 +264,13 @@ describe('onboard save', () => {
   });
   it('round-trips and drops unknown hint ids', () => {
     const storage = memory();
-    new TutorialSave(storage).save({ tutorialDone: true, seenHints: ['rov', 'battery-low'] });
+    new TutorialSave(storage).save({ tutorialDone: true, seenHints: ['battery-low'] });
     const back = new TutorialSave(storage).get();
     expect(back.tutorialDone).toBe(true);
-    expect(back.seenHints).toEqual(['battery-low', 'rov']);
-    expect(migrateOnboard({ tutorialDone: true, seenHints: ['x', 'rov'] }).seenHints).toEqual([
-      'rov',
-    ]);
+    expect(back.seenHints).toEqual(['battery-low']);
+    expect(
+      migrateOnboard({ tutorialDone: true, seenHints: ['x', 'rov', 'battery-low'] }).seenHints,
+    ).toEqual(['battery-low']);
   });
   it('never overwrites a newer version', () => {
     const storage = memory('{"version":2,"tutorialDone":true}');
@@ -294,15 +293,29 @@ describe('controls layouts', () => {
       for (const g of groups) expect(g.rows.length).toBeGreaterThan(0);
     }
   });
+  it('documents the new gamepad bindings from the action map and without an Input instance', () => {
+    const input = new Input({ storage: null });
+    for (const source of [undefined, input]) {
+      const rows = controlGroups('gamepad', key as never, source).flatMap((group) => group.rows);
+      expect(rows).toContainEqual(['D-pad left', 'Journal']);
+      expect(rows).toContainEqual(['D-pad down', 'Reset camera']);
+      expect(rows).toContainEqual(['Left bumper', 'Capture photo (in photo mode)']);
+      expect(rows).toContainEqual(['D-pad up', 'Sim speed']);
+      expect(rows).toContainEqual(['Right bumper', 'Scan (hold)']);
+      expect(new Set(rows.map(([control]) => control)).size).toBe(rows.length);
+    }
+    expect(input.getAction('toggleJournal')?.pad).toBe('D-pad left');
+    expect(input.getAction('resetCamera')?.pad).toBe('D-pad down');
+    expect(input.getAction('capturePhoto')?.pad).toBe('Left bumper');
+  });
   it('shows touch buttons and no keyboard keys on touch', () => {
     const text = JSON.stringify(controlGroups('touch', key as never));
     expect(text).toContain('SCAN');
     expect(text).not.toContain('Shift');
   });
   it('compact tips follow the device', () => {
-    expect(compactTips('touch', key as never, false)).toBeNull();
-    expect(compactTips('keyboard', key as never, false)).toContain('speed');
-    expect(compactTips('gamepad', key as never, false)).toContain('Left stick');
-    expect(compactTips('keyboard', key as never, true)).toContain('retrieve ROV');
+    expect(compactTips('touch', key as never)).toBeNull();
+    expect(compactTips('keyboard', key as never)).toContain('speed');
+    expect(compactTips('gamepad', key as never)).toContain('Left stick');
   });
 });

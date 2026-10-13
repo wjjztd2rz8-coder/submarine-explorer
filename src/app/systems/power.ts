@@ -69,25 +69,16 @@ export function createPowerSystem(): GameSystem {
     },
     frame: {
       'sim.power': (f, ctx) => {
-        const { power, rov, sub, headlights, sonar, config } = ctx;
+        const { power, sub, headlights, sonar } = ctx;
         const { steps, state } = f;
         if (!steps) return;
         const empty = power.step(steps * f.fixedDt * sub.simSpeed, {
-          throttle: rov.deployed ? 0 : state.throttle,
-          ballast: rov.deployed ? 0 : state.ballast,
-          boost: rov.deployed ? false : state.boost,
+          throttle: state.throttle,
+          ballast: state.ballast,
+          boost: state.boost,
           lights: headlights.on,
           sensors: state.scan || sonar.visible,
         });
-        // D-ROV: the ROV draws on the same battery.
-        if (rov.deployed && power.state.enabled) {
-          const p = power.state;
-          power.setLevels(
-            p.battery -
-              (steps * f.fixedDt * sub.simSpeed) / (config.rov.batteryDrainPerHour * 3600),
-            p.oxygen,
-          );
-        }
         if (power.state.enabled && (empty || power.state.depleted) && !powerEmergencyStarted) {
           sub.startEmergencyAscent();
           powerEmergencyStarted = true;

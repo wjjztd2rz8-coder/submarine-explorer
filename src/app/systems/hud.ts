@@ -42,7 +42,7 @@ export const hudSystem: GameSystem = {
   },
   frame: {
     'hud.draw': (f, ctx) => {
-      const { hud, discovery, input, sub, rig, save, rov, cameraTips } = ctx;
+      const { hud, discovery, input, sub, rig, save, cameraTips } = ctx;
       const scanView = discovery.scanner.view;
       const key = (action: Parameters<typeof input.primaryKeyLabel>[0]): string =>
         input.primaryKeyLabel(action);
@@ -58,7 +58,7 @@ export const hudSystem: GameSystem = {
           rig.mode !== 'orbit' &&
           save.get().controlTips &&
           performance.now() < cameraTips.until
-            ? ctx.controlsCard.compactTips(rov.deployed)
+            ? ctx.controlsCard.compactTips()
             : null,
       });
     },

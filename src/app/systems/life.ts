@@ -110,7 +110,7 @@ export function createLifeSystem(): GameSystem {
         sub.fz = fw.z;
         sub.speed = v.length();
         sub.lightsOn = ctx.headlights.on;
-        sub.hullR = ctx.rov.deployed ? 1.6 : ctx.config.submarine.hullRadius * 0.9;
+        sub.hullR = ctx.config.submarine.hullRadius * 0.9;
         life.update(
           f.frozen ? 0 : f.dt,
           sub,

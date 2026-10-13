@@ -126,11 +126,22 @@ describe('detectTier', () => {
 describe('resolveQuality', () => {
   const sw = caps({ renderer: 'SwiftShader' });
 
-  it('keeps the pre-v2 default: a fixed medium setting ignores detection', () => {
-    expect(DEFAULT_CONFIG.graphicsTier).toBe('medium');
-    const q = resolveQuality(null, DEFAULT_CONFIG.graphicsTier, sw);
-    expect(q).toMatchObject({ tier: 'medium', source: 'setting' });
-    expect(q.detected.tier).toBe('low');
+  it('uses detection for new players and preserves a saved fixed medium tier', () => {
+    expect(DEFAULT_CONFIG.graphicsTier).toBe('auto');
+    expect(resolveQuality(null, DEFAULT_CONFIG.graphicsTier, sw)).toMatchObject({
+      tier: 'low',
+      source: 'auto',
+      detected: { tier: 'low' },
+    });
+    expect(resolveQuality(null, DEFAULT_CONFIG.graphicsTier, desktop)).toMatchObject({
+      tier: 'medium',
+      source: 'auto',
+    });
+    expect(resolveQuality(null, 'medium', sw)).toMatchObject({
+      tier: 'medium',
+      source: 'setting',
+      detected: { tier: 'low' },
+    });
   });
 
   it('lets ?tier= beat the setting, and ?tier=auto force detection', () => {

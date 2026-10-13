@@ -96,7 +96,7 @@ const flush = async () => {
   await Promise.resolve();
 };
 const context = () => Context.instances.at(-1)!;
-const system = (bus = new EventBus()) => new AudioSystem(config, bus, { sampleHeight: () => -100 });
+const system = (bus = new EventBus()) => new AudioSystem(config, bus);
 function visibility(hidden: boolean): void {
   doc.hidden = hidden;
   doc.dispatchEvent(new Event('visibilitychange'));
@@ -273,7 +273,38 @@ describe('audio lifecycle', () => {
     audio.dispose();
   });
 
-  it('suppresses every discrete cue while paused or hidden and cancels old echoes', async () => {
+  it('has no player ping or echo path and preserves the quiet environment sensor cue', async () => {
+    vi.useFakeTimers();
+    const audio = system();
+    audio.unlock();
+    await flush();
+    const captions: string[] = [];
+    audio.captions.on((event) => captions.push(event.id));
+    const before = context().nodes.length;
+    audio.update({
+      depth: -10,
+      throttle: 0,
+      ballast: 0,
+      speed: 0,
+      position: { x: 0, y: -10, z: 0 },
+      forward: { x: 0, y: -1, z: 0 },
+    });
+    expect(context().nodes).toHaveLength(before);
+    expect(audio).not.toHaveProperty('ping');
+    expect(cues).not.toHaveProperty('playPing');
+    audio.playExploreCue();
+    const [osc, gain] = context().nodes.slice(before);
+    expect(osc!.frequency.setValueAtTime).toHaveBeenCalledWith(780, 0);
+    expect(osc!.frequency.exponentialRampToValueAtTime).toHaveBeenCalledWith(270, 0.35);
+    expect(gain!.gain.exponentialRampToValueAtTime).toHaveBeenCalledWith(0.025, 0.01);
+    expect(vi.getTimerCount()).toBe(0);
+    expect(captions).not.toContain('sonar-ping');
+    expect(captions).not.toContain('sonar-echo');
+    audio.dispose();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('suppresses every discrete cue while paused or hidden without echo timers', async () => {
     vi.useFakeTimers();
     Object.assign(window, { setTimeout, clearTimeout });
     const bus = new EventBus();
@@ -287,10 +318,9 @@ describe('audio lifecycle', () => {
       speed: 0,
       position: { x: 0, y: -10, z: 0 },
       forward: { x: 0, y: -1, z: 0 },
-      pingPressed: false,
     });
-    audio.ping();
-    expect(vi.getTimerCount()).toBe(1);
+    audio.playExploreCue();
+    expect(vi.getTimerCount()).toBe(0);
     for (const blocked of ['pause', 'hidden']) {
       if (blocked === 'pause') audio.setPaused(true);
       else visibility(true);
@@ -300,7 +330,6 @@ describe('audio lifecycle', () => {
       audio.playManipulator();
       audio.playShutter();
       audio.playExploreCue();
-      audio.ping();
       bus.emit('env:trench', { depth: -7000 });
       bus.emit('sub:collided', { speed: 10, depth: -10 });
       bus.emit('scan:complete', { poiId: 'bow', landmarkId: 'titanic', firstTime: true });
@@ -315,7 +344,7 @@ describe('audio lifecycle', () => {
 });
 
 const cueCases = [
-  () => (e: AudioEngine) => cues.playPing(e, config),
+  () => (e: AudioEngine) => cues.playSensorCue(e),
   () => (e: AudioEngine) => cues.playCollisionThud(e, config, 20),
   () => (e: AudioEngine) => cues.playHullCreak(e, config, 1),
   () => (e: AudioEngine) => cues.playBallastHiss(e, config),

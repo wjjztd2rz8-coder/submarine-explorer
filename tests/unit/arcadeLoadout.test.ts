@@ -17,7 +17,6 @@ import { Props } from '../../src/world/Props.js';
 import type { TileMeta } from '../../src/util/types.js';
 import { missionSystem } from '../../src/app/systems/mission.js';
 import { propsSystem } from '../../src/app/systems/props.js';
-import { createRovSystem } from '../../src/app/systems/rov.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
 import type { FrameState } from '../../src/app/System.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
@@ -48,11 +47,6 @@ vi.mock('../../src/ui/ObjectivesPanel.js', () => ({
     setObjectives() {}
     setVisible() {}
     dispose() {}
-  },
-}));
-vi.mock('../../src/ui/RovHUD.js', () => ({
-  RovHUD: class {
-    update() {}
   },
 }));
 
@@ -94,7 +88,6 @@ function stubShell(ctx: GameContext): void {
   } as unknown as GameContext['rig'];
   ctx.headlights = {
     setEnabled: vi.fn(),
-    setConesSuppressed: vi.fn(),
   } as unknown as GameContext['headlights'];
   ctx.hud = {
     root: { querySelector: () => null },
@@ -422,42 +415,34 @@ describe('fresh-player mission routing and vehicle loadout', () => {
     });
   }
 
-  it('preserves the mothership while switching both directions with a deployed ROV, including retrieval', () => {
+  it('preserves the fitted hull and physics while switching modes in both directions', () => {
     const ctx = context('titanic', 'arcade');
     stubShell(ctx);
     const progress = createProgressSystem();
     const submarine = createSubmarineSystem();
-    const rov = createRovSystem();
     try {
       progress.init?.(ctx);
       submarine.init?.(ctx);
       ctx.sub.reset(0, -3780, 0);
-      rov.init?.(ctx);
       const frame = {
-        state: { ...FROZEN_INPUT, toggleRov: true },
+        state: { ...FROZEN_INPUT, throttle: 0.5 },
         steps: 10,
         fixedDt: 1 / 60,
         frozen: false,
         blocked: false,
       } as FrameState;
-      rov.frame!['sim.vehicles']!(frame, ctx);
-      expect(ctx.rov.deployed).toBe(true);
-      frame.state = { ...FROZEN_INPUT, throttle: 0.5 };
+      submarine.frame!['sim.vehicles']!(frame, ctx);
       for (const mode of ['realistic', 'arcade'] as const) {
         ctx.save.setGameplayMode(mode);
-        const before = ctx.rov.position.clone();
-        rov.frame!['sim.vehicles']!(frame, ctx);
-        expect(ctx.rov.deployed).toBe(true);
-        expect(ctx.rov.position.distanceTo(before)).toBeGreaterThan(0);
+        const before = ctx.sub.position.clone();
+        submarine.frame!['sim.vehicles']!(frame, ctx);
+        expect(ctx.sub.position.distanceTo(before)).toBeGreaterThan(0);
         safeTicks(ctx);
       }
-      ctx.rov.abort();
-      rov.frame!['sim.vehicles']!(frame, ctx);
+      submarine.frame!['sim.vehicles']!(frame, ctx);
       safeTicks(ctx);
       expect(ctx.sub.getState().hullClass).toBe('B');
     } finally {
-      rov.dispose?.();
-      ctx.rovVisual?.dispose();
       submarine.dispose?.();
       progress.dispose?.();
       ctx.subMesh?.dispose();

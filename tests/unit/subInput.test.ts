@@ -19,6 +19,7 @@ import {
   shouldPauseAfterPointerLookLoss,
   shouldRequestPointerLook,
   type BindingStore,
+  type InputState,
 } from '../../src/core/Input.js';
 
 class MemoryStore implements BindingStore {
@@ -65,6 +66,157 @@ describe('pointer look preference and lock decisions', () => {
 });
 
 describe('Input action map', () => {
+  const padEdges = [
+    [2, 'toggleLights'],
+    [3, 'toggleCamera'],
+    [4, 'capturePhoto'],
+    [8, 'toggleSonar'],
+    [9, 'togglePhotoMode'],
+    [12, 'cycleSimSpeed'],
+    [13, 'resetCamera'],
+    [14, 'toggleGuide'],
+  ] as const;
+
+  it.each(padEdges)('gamepad button %s fires only %s once per press', (button, action) => {
+    const buttons = Array.from({ length: 16 }, () => ({ value: 0, pressed: false }));
+    vi.stubGlobal('navigator', {
+      getGamepads: () => [{ connected: true, index: 0, axes: [0, 0, 0, 0], buttons }],
+    });
+    try {
+      const input = makeInput();
+      const check = (expected: keyof InputState | null): void => {
+        const state = input.sample();
+        for (const [, edge] of padEdges) expect(Boolean(state[edge])).toBe(edge === expected);
+        expect(state.scan).toBe(false);
+        expect(state.boost).toBe(false);
+        expect([state.throttle, state.yaw, state.pitch, state.ballast]).toEqual([0, 0, 0, 0]);
+      };
+      buttons[button] = { value: 1, pressed: true };
+      check(action);
+      expect(input.gamepadActive).toBe(true);
+      input.endFrame();
+      check(null); // holding never repeats an edge
+      buttons[button] = { value: 0, pressed: false };
+      check(null);
+      expect(input.gamepadActive).toBe(false);
+      buttons[button] = { value: 1, pressed: true };
+      check(action);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('keeps existing pad axes, scan and boost alongside the new edges', () => {
+    const buttons = Array.from({ length: 16 }, () => ({ value: 0, pressed: false }));
+    for (const i of [0, 4, 5, 7, 13, 14]) buttons[i] = { value: 1, pressed: true };
+    let connected = true;
+    vi.stubGlobal('navigator', {
+      getGamepads: () => [{ connected, index: 0, axes: [0.5, -0.7, 0, -0.4], buttons }],
+    });
+    try {
+      const input = makeInput();
+      expect(input.sample()).toMatchObject({
+        throttle: 0.7,
+        yaw: 0.5,
+        pitch: 0.4,
+        ballast: 1,
+        scan: true,
+        boost: true,
+        capturePhoto: true,
+        resetCamera: true,
+        toggleGuide: true,
+      });
+      input.endFrame();
+      expect(input.sample()).toMatchObject({
+        scan: true,
+        boost: true,
+        capturePhoto: false,
+        resetCamera: false,
+        toggleGuide: false,
+      });
+      connected = false;
+      input.endFrame();
+      expect(input.sample()).toMatchObject({ scan: false, boost: false, ballast: 0 });
+      connected = true;
+      expect(input.sample()).toMatchObject({
+        capturePhoto: true,
+        resetCamera: true,
+        toggleGuide: true,
+      });
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('leaves N and Tab unbound and Q solely on camera view in a fresh session', () => {
+    const input = makeInput();
+    expect(input.actions.filter((a) => a.keys.includes('KeyQ')).map((a) => a.id)).toEqual([
+      'toggleCamera',
+    ]);
+    expect(input.actions.some((a) => a.keys.includes('KeyN') || a.keys.includes('Tab'))).toBe(
+      false,
+    );
+    input.injectKey('KeyN', true);
+    input.injectKey('Tab', true);
+    input.sample();
+    for (const [, edge] of padEdges) expect(Boolean(input.state[edge])).toBe(false);
+    expect(input.state).not.toHaveProperty('ping');
+    expect(input.state).not.toHaveProperty('toggleGlobe');
+  });
+
+  it.each([
+    [LEGACY_BINDINGS_STORAGE_KEY, 1],
+    [PREVIOUS_BINDINGS_STORAGE_KEY, 2],
+    [BINDINGS_STORAGE_KEY, 3],
+  ] as const)(
+    'ignores obsolete actions in %s without reserving their keys',
+    (storageKey, version) => {
+      store.setItem(
+        storageKey,
+        JSON.stringify({
+          version,
+          keys: {
+            ping: ['KeyQ', 'Tab'],
+            toggleGlobe: ['KeyN', 'KeyH'],
+            toggleSonar: ['KeyN'],
+            thrustForward: ['KeyI'],
+            boost: [],
+            [version === 1 ? 'toggleGuide' : 'toggleJournal']: ['KeyH'],
+          },
+        }),
+      );
+      const input = makeInput();
+      expect(input.actions.map((a) => a.id)).not.toContain('ping');
+      expect(input.actions.map((a) => a.id)).not.toContain('toggleGlobe');
+      expect(input.state).not.toHaveProperty('ping');
+      expect(input.state).not.toHaveProperty('toggleGlobe');
+      expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
+      expect(input.getAction('boost')?.keys).toEqual([]);
+      expect(input.getAction('toggleSonar')?.keys).toEqual(['KeyN']);
+      expect(input.getAction('toggleJournal')?.keys).toEqual(['KeyH']);
+      input.injectKey('KeyN', true);
+      input.injectKey('KeyH', true);
+      input.injectKey('KeyQ', true);
+      expect(input.sample()).toMatchObject({
+        toggleSonar: true,
+        toggleGuide: true,
+        toggleCamera: true,
+      });
+      input.endFrame();
+      input.injectKey('Tab', true);
+      expect(input.sample()).toMatchObject({
+        toggleSonar: false,
+        toggleGuide: false,
+        toggleCamera: false,
+      });
+      input.rebind('thrustForward', ['KeyU']);
+      const saved = JSON.parse(store.getItem(BINDINGS_STORAGE_KEY)!);
+      expect(saved.keys).not.toHaveProperty('ping');
+      expect(saved.keys).not.toHaveProperty('toggleGlobe');
+      expect(makeInput().getAction('toggleSonar')?.keys).toEqual(['KeyN']);
+    },
+  );
+
   it('keeps gamepad boost held only while the trigger is down', () => {
     const buttons = Array.from({ length: 8 }, () => ({ value: 0, pressed: false }));
     vi.stubGlobal('navigator', {

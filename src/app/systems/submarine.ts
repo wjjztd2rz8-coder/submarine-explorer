@@ -1,8 +1,7 @@
 /**
  * The submarine: physics body, spawn pose (free dive, mission, `?depth=`),
  * hull mesh, and the per-frame sub events the audio, HUD and mission listen to.
- * The fixed-step physics loop itself runs in the ROV system (`rov.ts`),
- * because each step drives either the ROV or the sub.
+ * This system also advances submarine physics on the fixed-step clock.
  */
 
 import * as THREE from 'three';
@@ -122,6 +121,9 @@ export function createSubmarineSystem(): GameSystem {
       ctx.expose({ sub, subMesh });
     },
     frame: {
+      'sim.vehicles': (f, ctx) => {
+        for (let i = 0; i < f.steps; i++) ctx.sub.step(f.state, f.fixedDt);
+      },
       'controls.vehicle': (f, ctx) => {
         if (f.state.toggleLights) ctx.headlights.toggle();
         if (f.state.cycleSimSpeed)
@@ -159,16 +161,15 @@ export function createSubmarineSystem(): GameSystem {
         }
       },
       pose: (f, ctx) => {
-        const { sub, subMesh, rov, rig } = ctx;
+        const { sub, subMesh, rig } = ctx;
         // Present the boat.
         subMesh.setHullClass(f.sub.hullClass);
         subMesh.vehicle.reduceMotion = rig.reduceMotion;
         subMesh.setPose(sub.position, sub.yaw, sub.pitch, sub.roll);
-        const live = !rov.deployed;
-        subMesh.update(live ? f.state.throttle : 0, f.dt, {
-          yaw: live ? f.state.yaw : 0,
-          vertical: live ? f.state.ballast : 0,
-          pitch: live ? f.state.pitch : 0,
+        subMesh.update(f.state.throttle, f.dt, {
+          yaw: f.state.yaw,
+          vertical: f.state.ballast,
+          pitch: f.state.pitch,
           scanning: ctx.discovery.scanner.isScanning,
           lightsOn: ctx.headlights.on,
         });
@@ -181,7 +182,6 @@ export function createSubmarineSystem(): GameSystem {
         const { sub } = ctx;
         sub.getForward(forward);
         f.forward = forward;
-        // The ROV system replaces these while it is deployed.
         f.pilotPosition = sub.position;
         f.pilotForward = forward;
         f.pilotYaw = sub.yaw;

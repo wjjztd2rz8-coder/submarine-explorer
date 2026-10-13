@@ -1,6 +1,6 @@
 import { EXPLORE_CONFIG } from '../core/config/explore.js';
 export type ExploreEventKind = 'plume' | 'turbidity' | 'whale';
-export interface EventHabitat {
+interface EventHabitat {
   site: string;
   depthM: number;
   altitudeM: number;

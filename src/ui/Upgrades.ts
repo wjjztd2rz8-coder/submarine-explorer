@@ -15,7 +15,6 @@ export class Upgrades {
   private readonly panel = document.createElement('section');
   private readonly trap: FocusTrap;
   private readonly off: () => void;
-  private previous: HTMLElement | null = null;
   constructor(private readonly progress: Progress) {
     this.root.className = 'upgrades';
     this.root.hidden = true;
@@ -25,34 +24,25 @@ export class Upgrades {
     this.panel.className = 'upgrades-panel';
     this.root.append(this.panel);
     document.body.append(this.root);
-    this.trap = new FocusTrap(this.root);
+    this.trap = new FocusTrap(this.root, { onEscape: () => this.close() });
     this.off = progress.onChange(() => {
       if (this.isOpen) this.render();
     });
-    window.addEventListener('keydown', this.key, true);
   }
   get isOpen(): boolean {
     return !this.root.hidden;
   }
   open(): void {
-    this.previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (this.isOpen) return;
     document.exitPointerLock?.();
     this.render();
     this.root.hidden = false;
     this.trap.activate();
-    this.panel.querySelector<HTMLButtonElement>('.upgrades-close')?.focus();
   }
   close(): void {
     this.root.hidden = true;
     this.trap.deactivate();
-    this.previous?.focus();
   }
-  private readonly key = (event: KeyboardEvent): void => {
-    if (!this.isOpen || event.code !== 'Escape') return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    this.close();
-  };
   private render(): void {
     const focus = (document.activeElement as HTMLElement | null)?.dataset.upgrade;
     const cosmeticFocus = (document.activeElement as HTMLElement | null)?.dataset.cosmetic;
@@ -170,8 +160,7 @@ export class Upgrades {
   }
   dispose(): void {
     this.off();
-    window.removeEventListener('keydown', this.key, true);
-    this.trap.deactivate();
+    this.trap.dispose();
     this.root.remove();
   }
 }

@@ -38,10 +38,10 @@ export const presetsSystem: GameSystem = {
   },
   frame: {
     'env.presets': (f, ctx) => {
-      const { rov, sub, rig, renderer } = ctx;
+      const { sub, rig, renderer } = ctx;
       ctx.presets.update(
         f.frozen ? 0 : f.dt,
-        rov.deployed ? 0 : f.steps * f.fixedDt * sub.simSpeed,
+        f.steps * f.fixedDt * sub.simSpeed,
         f.atmo,
         rig.camera,
         renderer.domElement.height,

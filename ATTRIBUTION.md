@@ -96,7 +96,7 @@ additional subsets. Existing font credits below remain for the current UI.
 
 ## Vehicles
 
-- All submarine, ROV and tether geometry, textures (canvas-generated tiling
+- All submarine geometry, textures (canvas-generated tiling
   surfaces, decal atlas) and livery in `src/vehicles/` are procedural and
   original to this project. No third-party models or images are used. Hull
   names and numbers are fictional.

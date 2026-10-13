@@ -1,6 +1,6 @@
 /**
  * Water currents (D-CURRENTS): the attributed offline field for the site,
- * sampled by the presets (sub drift, snow) and the ROV, shown on the HUD.
+ * sampled by the presets (sub drift, snow) and shown on the HUD.
  */
 
 import { fetchContentJson } from '../../game/ContentPath.js';

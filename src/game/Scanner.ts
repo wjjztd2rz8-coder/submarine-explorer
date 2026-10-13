@@ -2,8 +2,8 @@
  * The scan beam.
  *
  * While the scan control is held, the scanner locks the best candidate POI --
- * the nearest one within its `radius` whose direction lies inside the facing
- * cone -- and accumulates progress over that POI's `scanSeconds`. Releasing the
+ * the mission objective if eligible, otherwise the nearest eligible contact --
+ * and accumulates progress over that POI's `scanSeconds`. Releasing the
  * control, drifting out of range or turning away interrupts the scan: one
  * `scan:aborted` is emitted and the progress *decays* rather than resetting,
  * so re-acquiring the same target quickly resumes where it left off.
@@ -82,7 +82,7 @@ export interface ScanView {
   nearestVertDeg: number;
   /**
    * Active mission objective (set via setObjective), when it is an unscanned
-   * fixed target. Guidance only; it never changes `candidateId`.
+   * fixed target. An eligible objective takes priority when selecting a scan.
    */
   objectiveId: string | null;
   objectiveName: string;
@@ -306,7 +306,7 @@ export class Scanner {
         nearest = t;
         nearestGeo = g;
       }
-      if (g.facing && g.distance < candidateDist) {
+      if (g.facing && candidate?.id !== this.objectivePoiId && g.distance < candidateDist) {
         candidate = t;
         candidateDist = g.distance;
       }
@@ -370,10 +370,13 @@ export class Scanner {
       if (this.active !== candidate) {
         // Switching to a different target abandons the old one outright.
         if (this.active && v.phase === 'scanning') {
-          this.bus.emit('scan:aborted', { poiId: this.active.id, reason: 'facing' });
+          this.bus.emit('scan:aborted', {
+            poiId: this.active.id,
+            reason: activeGeo?.inRange ? 'facing' : 'range',
+          });
         }
+        this.clearActive();
         this.active = candidate;
-        v.progress = 0;
       }
       if (v.phase !== 'scanning') {
         v.phase = 'scanning';

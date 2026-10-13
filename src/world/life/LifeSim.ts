@@ -36,7 +36,7 @@ import type { LifeTier, RareRule, SiteTable, SpeciesDef } from './types.js';
 /** Steering tick rate. Positions integrate every frame; decisions run at this rate. */
 export const TICK = 1 / 15;
 
-export interface SimOptions {
+interface SimOptions {
   tier: LifeTier;
   table: SiteTable | undefined;
   env: SimEnv;
@@ -47,7 +47,7 @@ export interface SimOptions {
   populate?: (sim: LifeSim, sub: SubInfo) => void;
 }
 
-export interface SimStats {
+interface SimStats {
   agents: number;
   groups: number;
   species: number;

@@ -85,7 +85,7 @@ export const propsSystem: GameSystem = {
   frame: {
     // Prop push-out, after physics.
     'sim.contact': (f, ctx) => {
-      if (!f.frozen && !ctx.rov.deployed) ctx.propContact.resolve(ctx.sub, f.dt);
+      if (!f.frozen) ctx.propContact.resolve(ctx.sub, f.dt);
     },
     'play.props': (f, ctx) => {
       ctx.props.update(ctx.rig.camera);

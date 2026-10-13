@@ -77,8 +77,11 @@ export function controlGroups(device: InputDevice, key: KeyOf, input?: Input): C
           [pad('scan', 'Right bumper'), 'Scan (hold)'],
           [pad('toggleLights', 'X'), 'Headlights'],
           [pad('togglePhotoMode', 'Start'), 'Photo mode'],
+          [pad('capturePhoto', 'Left bumper'), 'Capture photo (in photo mode)'],
+          [pad('toggleJournal', 'D-pad left'), 'Journal'],
           [pad('toggleSonar', 'Back'), 'Sonar map'],
           [pad('toggleCamera', 'Y'), 'Camera view'],
+          [pad('resetCamera', 'D-pad down'), 'Reset camera'],
           [pad('cycleSimSpeed', 'D-pad up'), 'Sim speed'],
         ],
       },
@@ -104,7 +107,6 @@ export function controlGroups(device: InputDevice, key: KeyOf, input?: Input): C
         [key('togglePhotoMode'), 'Photo mode'],
         [key('toggleJournal'), 'Journal'],
         [key('toggleSonar'), 'Sonar map'],
-        [key('toggleRov'), 'Deploy or retrieve the ROV'],
       ],
     },
     {
@@ -121,23 +123,14 @@ export function controlGroups(device: InputDevice, key: KeyOf, input?: Input): C
 }
 
 /** The one-line strip at the bottom of the dive view, for the active device. */
-export function compactTips(
-  device: InputDevice,
-  key: KeyOf,
-  rovDeployed: boolean,
-  input?: Input,
-): string | null {
+export function compactTips(device: InputDevice, key: KeyOf, input?: Input): string | null {
   if (device === 'touch') return null; // the on-screen buttons are the tips
   if (device === 'gamepad') {
     const pad = (id: ActionId, fallback: string): string =>
       input?.actions.find((a) => a.id === id)?.pad ?? fallback;
-    return rovDeployed
-      ? 'Left stick fly and turn · A/B rise or sink · Right bumper scan'
-      : `Left stick fly and turn · ${pad('ballastBlow', 'A')}/${pad('ballastFlood', 'B')} rise or sink · ${pad('scan', 'Right bumper')} scan · ${pad('toggleLights', 'X')} lights`;
+    return `Left stick fly and turn · ${pad('ballastBlow', 'A')}/${pad('ballastFlood', 'B')} rise or sink · ${pad('scan', 'Right bumper')} scan · ${pad('toggleLights', 'X')} lights`;
   }
-  return rovDeployed
-    ? `${key('thrustForward')}/${key('thrustReverse')} fly · ${key('yawPort')}/${key('yawStarboard')} turn · ${key('ballastBlow')}/${key('ballastFlood')} rise/sink · ${key('scan')} scan · ${key('toggleRov')} retrieve ROV`
-    : `${key('thrustForward')}/${key('thrustReverse')} speed · ${key('yawPort')}/${key('yawStarboard')} turn · ${key('ballastBlow')}/${key('ballastFlood')} rise/sink · Drag: look · Wheel: zoom · ${key('resetCamera')}: reset camera`;
+  return `${key('thrustForward')}/${key('thrustReverse')} speed · ${key('yawPort')}/${key('yawStarboard')} turn · ${key('ballastBlow')}/${key('ballastFlood')} rise/sink · Drag: look · Wheel: zoom · ${key('resetCamera')}: reset camera`;
 }
 
 export interface ControlsCardOptions {
@@ -231,8 +224,8 @@ export class ControlsCard {
     this.render();
   }
 
-  compactTips(rovDeployed: boolean): string | null {
-    return compactTips(this.device_, this.opts.key, rovDeployed, this.opts.input);
+  compactTips(): string | null {
+    return compactTips(this.device_, this.opts.key, this.opts.input);
   }
 
   open(): void {

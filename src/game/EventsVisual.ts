@@ -95,7 +95,7 @@ export class EventsVisual {
     const heading = Math.atan2(forward.x, forward.z);
     let placed = false;
     // All candidates are ahead of the pilot. Checking the active projection also
-    // respects free look, cockpit/ROV cameras and the phone's view offset.
+    // respects free look, cockpit cameras and the phone's view offset.
     for (const distance of EXPLORE_CONFIG.eventSpawnDistancesM) {
       for (const angle of [-0.35, 0.35, 0, -0.7, 0.7, -1.05, 1.05]) {
         const yaw = heading + angle;

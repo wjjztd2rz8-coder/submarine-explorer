@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { Input } from '../../src/core/Input.js';
+import { Input } from '../../src/core/Input.js';
 import { TouchControls } from '../../src/ui/TouchControls.js';
 import { ScanOverlay } from '../../src/ui/ScanOverlay.js';
 import type { ScanView } from '../../src/game/Scanner.js';
@@ -50,7 +50,7 @@ function pointer(target: TouchElement, type: string, pointerId: number, x = 60, 
   target.dispatchEvent(event);
 }
 
-function fixture(canvasTouchAction = '') {
+function fixture(canvasTouchAction = '', realInput?: Input) {
   const body = new TouchElement();
   const doc = Object.assign(new EventTarget(), {
     body,
@@ -70,7 +70,7 @@ function fixture(canvasTouchAction = '') {
   vi.stubGlobal('window', win);
   vi.stubGlobal('screen', { width: 844, height: 390 });
   vi.stubGlobal('navigator', { maxTouchPoints: 1 });
-  const input = {
+  const input = realInput ?? {
     touchActive: false,
     touchAxes: { throttle: 0, yaw: 0, pitch: 0, ballast: 0 },
     touchHeld: new Set<string>(),
@@ -97,6 +97,163 @@ afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
+
+it.each(['keyboard', 'touch', 'gamepad'] as const)(
+  '%s holds, releases and completes the same selected scan through real input',
+  (device) => {
+    const input = new Input({ storage: null });
+    const f = fixture('', input);
+    const buttons = Array.from({ length: 6 }, () => ({ value: 0, pressed: false }));
+    vi.stubGlobal('navigator', {
+      getGamepads: () =>
+        device === 'gamepad' ? [{ connected: true, index: 0, axes: [0, 0, 0, 0], buttons }] : [],
+    });
+    const bus = new EventBus();
+    const complete = vi.fn();
+    bus.on('scan:complete', complete);
+    const scanner = new Scanner(makeConfig().scan, bus);
+    scanner.setTargets([
+      {
+        id: 'side',
+        name: 'Side',
+        landmarkId: 'site',
+        position: new Vector3(40, -100, 0),
+        radius: 150,
+        scanSeconds: 2,
+      },
+      {
+        id: 'objective',
+        name: 'Objective',
+        landmarkId: 'site',
+        position: new Vector3(0, -100, -100),
+        radius: 150,
+        scanSeconds: 2,
+      },
+    ]);
+    scanner.setObjective('objective');
+    const overlay = new ScanOverlay(makeConfig().scan);
+    const [panel, chip] = (overlay.messages as unknown as TouchElement).children;
+    const card = panel.children[1];
+    const keys = { scan: 'G', guide: 'J' };
+    const held = (down: boolean) => {
+      if (device === 'touch') pointer(f.scan, down ? 'pointerdown' : 'pointerup', 1);
+      else if (device === 'keyboard') input.injectKey('KeyG', down);
+      else buttons[5] = { value: down ? 1 : 0, pressed: down };
+    };
+    const tick = (dt: number) => {
+      const state = input.sample();
+      scanner.update(dt, new Vector3(0, -100, 0), new Vector3(0, 0, -1), state.scan);
+      overlay.update(scanner.view, keys, null, dt);
+      input.endFrame();
+    };
+    try {
+      f.controls.setTouchMode(device === 'touch');
+      tick(0);
+      expect(card.children[1].textContent).toBe('Objective');
+      expect(card.children[2].textContent).toBe(
+        `HOLD ${device === 'touch' ? 'SCAN' : 'G'} TO SCAN`,
+      );
+      expect(chip.hidden).toBe(true);
+      held(true);
+      tick(0.5);
+      tick(0.5);
+      expect(scanner.view.activeId).toBe('objective');
+      expect(scanner.view.progress).toBe(0.5);
+      expect(complete).not.toHaveBeenCalled();
+      held(false);
+      tick(0.1);
+      expect(scanner.view.phase).toBe('interrupted');
+      expect(scanner.view.lastAbort).toBe('released');
+      expect(complete).not.toHaveBeenCalled();
+      held(true);
+      tick(2);
+      expect(complete).toHaveBeenCalledExactlyOnceWith({
+        poiId: 'objective',
+        landmarkId: 'site',
+        firstTime: true,
+      });
+      tick(2);
+      expect(complete).toHaveBeenCalledTimes(1);
+      held(false);
+      tick(0);
+      expect(scanner.view.candidateId).toBeNull();
+      expect(scanner.view.objectiveId).toBeNull();
+      expect(chip.hidden).toBe(true);
+    } finally {
+      overlay.dispose();
+      f.controls.dispose();
+      input.dispose();
+    }
+  },
+);
+
+it.each(['keyboard', 'touch', 'gamepad'] as const)(
+  '%s scans the farther objective before nearer samples and wildlife while held',
+  (device) => {
+    const input = new Input({ storage: null });
+    const f = fixture('', input);
+    const buttons = Array.from({ length: 6 }, () => ({ value: 0, pressed: false }));
+    vi.stubGlobal('navigator', {
+      getGamepads: () =>
+        device === 'gamepad' ? [{ connected: true, index: 0, axes: [0, 0, 0, 0], buttons }] : [],
+    });
+    const bus = new EventBus();
+    const complete = vi.fn();
+    bus.on('scan:complete', complete);
+    const scanner = new Scanner(makeConfig().scan, bus);
+    const contact = (id: string, distance: number) => ({
+      id,
+      name: id,
+      landmarkId: 'site',
+      position: new Vector3(0, -100, -distance),
+      radius: 150,
+      scanSeconds: 2,
+    });
+    scanner.setTargets([contact('objective', 100)]);
+    scanner.setSupplementalTargets([contact('sample:rock', 40)]);
+    scanner.setExtraTargets([contact('life:fish', 20)]);
+    scanner.setObjective('objective');
+    const overlay = new ScanOverlay(makeConfig().scan);
+    const [panel, chip] = (overlay.messages as unknown as TouchElement).children;
+    const card = panel.children[1];
+    const tick = (dt: number) => {
+      scanner.update(dt, new Vector3(0, -100, 0), new Vector3(0, 0, -1), input.sample().scan);
+      overlay.update(scanner.view, { scan: 'G', guide: 'J' }, null, dt);
+      input.endFrame();
+    };
+    try {
+      f.controls.setTouchMode(device === 'touch');
+      if (device === 'touch') pointer(f.scan, 'pointerdown', 1);
+      else if (device === 'keyboard') input.injectKey('KeyG', true);
+      else buttons[5] = { value: 1, pressed: true };
+      for (const id of ['objective', 'sample:rock', 'life:fish']) {
+        tick(0.5);
+        expect(scanner.view.activeId).toBe(id);
+        expect(scanner.view.candidateId).toBe(id);
+        expect(scanner.view.nearestId).toBe(id);
+        expect(card.children[1].textContent).toBe(id);
+        expect(scanner.view.progress).toBe(0.25);
+        expect(chip.hidden).toBe(true);
+        if (id !== 'objective') expect(scanner.view.objectiveId).toBeNull();
+        tick(1.5);
+        expect(scanner.isScanned('site', id)).toBe(true);
+      }
+      tick(2);
+      expect(scanner.view.candidateId).toBeNull();
+      expect(scanner.view.objectiveId).toBeNull();
+      expect(chip.hidden).toBe(true);
+      expect(complete.mock.calls).toEqual(
+        ['objective', 'sample:rock', 'life:fish'].map((poiId) => [
+          { poiId, landmarkId: 'site', firstTime: true },
+        ]),
+      );
+    } finally {
+      overlay.dispose();
+      f.controls.dispose();
+      input.dispose();
+    }
+  },
+);
 
 describe('touch control interruptions', () => {
   it.each(['cancel', 'drag', 'pinch'])(
