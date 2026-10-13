@@ -69,9 +69,9 @@ export function paintCrust(
     // Vertical mineral streaks (long in y, tight around the axis) echo the Lost City striations:
     // warm precipitate runs down some flutes, soot-dark gaps separate them.
     const streak = fbm3(x * 2.4, y * 0.2, z * 2.4, seed ^ 0x5a, 3);
-    out.lerp(bandTint > 0.35 ? OCHRE : ORANGE, smooth(0.55, 0.78, streak) * 0.5 * (0.5 + 0.5 * up));
-    out.lerp(COAL, smooth(0.42, 0.18, streak) * 0.55);
-    out.multiplyScalar(1.4); // keeps the trunk's overall brightness despite the darker recesses
+    out.lerp(bandTint > 0.35 ? OCHRE : ORANGE, smooth(0.52, 0.74, streak) * 0.65 * (0.5 + 0.5 * up));
+    out.lerp(COAL, smooth(0.46, 0.2, streak) * 0.8);
+    out.multiplyScalar(1.35); // keeps the trunk's overall brightness despite the darker recesses
     // Orifice: a soot-black rim and bowl so the mouth reads even where lamps wash the crust pale.
     out.lerp(SOOT, smooth(0.93, 0.985, hh) * (0.55 + 0.4 * up));
   }
