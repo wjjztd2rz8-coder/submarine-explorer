@@ -38,7 +38,7 @@
   letter-spacing: 0.04em;
 }
 .obj-banner-detail {
-  display: block;
+  display: inline;
   font-size: clamp(13px, calc(13px * var(--ui-scale)), 19px);
   opacity: 0.85;
 }
@@ -59,10 +59,10 @@
   padding: 6px 12px;
 }
 .obj-banner-stars {
-  display: block;
   color: #ffcb70;
-  font-size: clamp(16px, calc(17px * var(--ui-scale)), 25px);
   letter-spacing: 0.1em;
+  margin-right: 8px;
+  font-size: clamp(14px, calc(14px * var(--ui-scale)), 20px);
 }
 .obj-banner-stars[hidden] {
   display: none;

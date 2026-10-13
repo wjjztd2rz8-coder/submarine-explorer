@@ -150,7 +150,10 @@ export class ObjectivesPanel {
     this.bannerStars = el('span', 'obj-banner-stars');
     this.bannerDetail = el('span', 'obj-banner-detail');
     const text = el('div', 'obj-banner-text');
-    text.append(this.bannerTitle, this.bannerStars, this.bannerDetail);
+    // Stars share the summary line so the banner does not grow taller on phones.
+    const summary = el('div', 'obj-banner-summary');
+    summary.append(this.bannerStars, this.bannerDetail);
+    text.append(this.bannerTitle, summary);
     const actions = el('div', 'obj-banner-actions');
     const keep = el('button', 'obj-banner-btn is-keep', 'Keep exploring');
     const surface = el('button', 'obj-banner-btn is-surface', 'Surface and debrief');
