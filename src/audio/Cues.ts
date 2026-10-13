@@ -3,24 +3,19 @@
 import type { AudioConfig } from '../core/Config.js';
 import type { AudioEngine } from './AudioEngine.js';
 
-/** A single sonar chirp: a fast downward sine sweep. Reused for the echo. */
-export function playPing(
-  engine: AudioEngine,
-  _config: AudioConfig,
-  gain = 0.5,
-  pitchScale = 1,
-): void {
+/** Quiet downward sensor sweep for a nearby natural event. */
+export function playSensorCue(engine: AudioEngine): void {
   const ctx = engine.ctx;
   const t0 = ctx.currentTime;
 
   const osc = ctx.createOscillator();
   osc.type = 'sine';
-  osc.frequency.setValueAtTime(2600 * pitchScale, t0);
-  osc.frequency.exponentialRampToValueAtTime(900 * pitchScale, t0 + 0.35);
+  osc.frequency.setValueAtTime(780, t0);
+  osc.frequency.exponentialRampToValueAtTime(270, t0 + 0.35);
 
   const g = ctx.createGain();
   g.gain.setValueAtTime(0.0001, t0);
-  g.gain.exponentialRampToValueAtTime(Math.max(gain, 0.0002), t0 + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.025, t0 + 0.01);
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.4);
 
   osc.connect(g).connect(engine.bus('sonar'));

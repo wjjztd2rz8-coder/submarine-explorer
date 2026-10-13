@@ -341,7 +341,6 @@ describe('Challenger / Endurance opening', () => {
             toggleSonar: false,
             boost: false,
             toggleLights: false,
-            ping: false,
             scan: false,
             cycleSimSpeed: false,
             togglePhotoMode: false,
