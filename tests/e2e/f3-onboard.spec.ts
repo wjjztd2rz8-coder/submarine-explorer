@@ -181,7 +181,7 @@ for (const dismissal of ['button', 'expiry'] as const) {
             JSON.stringify({
               version: 1,
               tutorialDone: true,
-              seenHints: ['battery-low', 'creature', 'rov'],
+              seenHints: ['battery-low', 'creature'],
             }),
           );
       }, KEY);

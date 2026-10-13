@@ -7,6 +7,8 @@
  * detail. Independent of the saved/active site and of any scene or storage.
  */
 
+import { smoothstep as smooth } from '../../util/math.js';
+
 import * as THREE from 'three';
 import { latLonToWorld } from '../../util/geo.js';
 import type { Tile } from '../../util/types.js';
@@ -36,11 +38,6 @@ const ROCK = new THREE.Color(0x1f4252);
 const SEDIMENT = new THREE.Color(0x9c8f78);
 /** Metres around the anchor over which warm sediment fades into the cool wall. */
 const SEDIMENT_RADIUS = 70;
-
-function smooth(a: number, b: number, x: number): number {
-  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
-  return t * t * (3 - 2 * t);
-}
 
 /** Deterministic 0..1 hash noise for colour mottling only (never heights). */
 function hash2(i: number, j: number): number {

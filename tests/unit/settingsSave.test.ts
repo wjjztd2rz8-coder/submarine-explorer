@@ -54,6 +54,24 @@ describe('settings defaults and migrate', () => {
     expect(d.bindings).toBe(SAVE_KEYS.bindings);
   });
 
+  it('starts fresh players on auto and keeps fixed tiers through migration and reload', () => {
+    const fresh = new Save({ config, storage: new MemoryStore() });
+    expect(fresh.get().graphicsTier).toBe('auto');
+    for (const version of [1, 2]) {
+      for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+        const store = new MemoryStore();
+        store.setItem(
+          version === 1 ? 'subexplorer.settings.v1' : SETTINGS_STORAGE_KEY,
+          JSON.stringify({ version, graphicsTier: tier }),
+        );
+        const save = new Save({ config, storage: store });
+        expect(save.get().graphicsTier).toBe(tier);
+        save.save({ captions: true });
+        expect(new Save({ config, storage: store }).get().graphicsTier).toBe(tier);
+      }
+    }
+  });
+
   it('keeps saved tiers from before quality tiers v2 and accepts auto and ultra', () => {
     for (const tier of ['low', 'medium', 'high', 'ultra', 'auto'] as const) {
       expect(migrate({ version: 1, graphicsTier: tier }, config).graphicsTier).toBe(tier);

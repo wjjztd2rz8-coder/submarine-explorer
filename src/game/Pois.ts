@@ -27,7 +27,7 @@ export const POI_KINDS = [
   'memorial',
   'other',
 ] as const;
-export type PoiKind = (typeof POI_KINDS)[number];
+type PoiKind = (typeof POI_KINDS)[number];
 
 export type Confidence = 'high' | 'medium' | 'low';
 
@@ -50,12 +50,6 @@ export interface PoiDef {
   /** What the player sees here is a placed prop, not survey data. */
   reconstruction?: boolean;
   sources?: string[];
-}
-
-export interface PoisFile {
-  version: number;
-  landmark: string;
-  pois: PoiDef[];
 }
 
 /** A POI resolved into world space, ready for the {@link Scanner}. */

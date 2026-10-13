@@ -6,7 +6,6 @@ import type { FrameState } from '../../src/app/System.js';
 const context = {
   progress: { level: () => 0 },
   sub: { simSpeed: 1 },
-  rov: { deployed: false },
 } as unknown as GameContext;
 function frame(boost: boolean, seconds = 1): FrameState {
   return { steps: 60, fixedDt: seconds / 60, state: { boost } } as FrameState;
@@ -28,12 +27,10 @@ describe('progress boost integration', () => {
     tick(recovered, context);
     expect(recovered.state.boost).toBe(true);
   });
-  it('does not drain reserves while paused or while the ROV is piloted', () => {
+  it('does not drain reserves while paused', () => {
     const tick = createProgressSystem().frame!['sim.vehicles']!;
     const paused = frame(true, 0);
     for (let i = 0; i < 20; i++) tick(paused, context);
-    const rov = { ...context, rov: { deployed: true } } as unknown as GameContext;
-    for (let i = 0; i < 20; i++) tick(frame(true), rov);
     const active = frame(true);
     tick(active, context);
     expect(active.state.boost).toBe(true);

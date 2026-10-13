@@ -73,7 +73,7 @@ The newest items go first.
 
 - **Phone-test items** (owner, 2026-10-11; decisions in [PHONE-FEEDBACK-2026-10-11.md](PHONE-FEEDBACK-2026-10-11.md)): all six DONE. P-touch-controls (1392), P-first-dive-flow (1391) and P-events-reform (1393) merged 2026-10-12 (f3c9221, 677cda2, eb8dd33) after full gates in their worktrees and screenshot review.
 - **R-release:** DONE 2026-10-12 (f52): full gates 754 passed, 3 failed (a merge leftover in f-touch-audit, fixed; a Blue Hole capture timeout under load, passed on rerun).
-- **Codex dispatcher restored** 2026-10-12 21:26 (`dispatch-max` 3). Running: 1401 (S-tests step 1), 1402 (S-bugs). 1410 (V-bluehole facets) was stopped after its first round and moved to the Claude lane with its wip commit. Queued: 1430 (CI shard 7, S-tests), 1440 (scan-candidate bug hunt), 1496 (S-rov). Held: 1495 (Blue Hole collision) until V-bluehole merges. Claude visual lane, one Sonnet at a time, briefs in `.cache/claude/visual/`: V-bluehole (1410 worktree, IN FLIGHT Claude Sonnet 2026-10-12), V-beebe (1420), V-endurance (1480), S-tiers (1497). 1470 is replaced by 1401. S-rewards waits for S-flow (both touch the completion banner); S-picker (Sonnet) and S-daily (Haiku) follow the current Claude agents.
+- **Codex dispatcher restored** 2026-10-12 21:26 (`dispatch-max` 3). Running: 1401 (S-tests step 1), 1402 (S-bugs). 1410 (V-bluehole facets) was stopped after its first round and moved to the Claude lane with its wip commit. Queued: 1430 (CI shard 7, S-tests), 1440 (scan-candidate bug hunt), 1496 (S-rov). Claude visual lane, one Sonnet at a time, briefs in `.cache/claude/visual/`: V-beebe (1420), V-endurance (1480), S-tiers (1497). 1470 is replaced by 1401. S-rewards waits for S-flow (both touch the completion banner); S-picker (Sonnet) and S-daily (Haiku) follow the current Claude agents.
 - **Sol round 2** on the simplification review is in (`.cache/review/simplify-20261011/sol-round2.md`); its corrections are folded into the items below, marked "Sol r2".
 
 ## Backlog
@@ -81,7 +81,7 @@ The newest items go first.
 One list, ordered by player impact and dependencies. Lane is in brackets. "After X" means don't start until X is merged. Evidence: §n = section n of `plan/archive/SIMPLIFY-REVIEW-2026-10-11.md`.
 
 1. **R-release [Haiku]:** after P-first-dive-flow, P-touch-controls and P-events-reform merge, or sooner if they stall. Run full e2e on main on a quiet CPU, push, tag f52, check `gh run list`. Never loosen assertions.
-2. **S-bugs [Codex]** DONE in worktree 1402 (gates PASS), awaiting review/merge. (§6c), no design change:
+2. **S-bugs [Codex]** DONE 2026-10-13 (full e2e green; merged). (§6c), no design change:
    - delete the unreachable sonar ping action and sound (`Input.ts:200`, `AudioSystem.ts:392`);
    - remove the residual `toggleGlobe` declarations (Sol r2: there is no default N binding any more);
    - add gamepad paths for Journal, reset camera and photo capture (ROV waits for S-rov);
@@ -114,15 +114,16 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
    Update README and CHANGELOG.
 
 7. **S-tests [Codex map, then Sonnet]** (§7). This replaces the 1470 sweep; it is also 1.0 "a full run no longer blocks releases".
-   - **Step 1 (Codex 1401, in flight):** an assertion-level coverage map of all ~94 e2e specs into `plan/progress/S-tests-map.md`.
+   - **Step 1 (Codex 1401):** DONE 2026-10-12 (b7e179d). an assertion-level coverage map of all ~94 e2e specs into `plan/progress/S-tests-map.md`.
    - **Step 2 (Sonnet):** fold the HUD/touch (9), opening-framing (12) and Journal/debrief (8) specs into three table-driven capability specs.
    - **Step 3:** move the captures (not their cheap assertions: Sol r2 notes collision guards in `visual-qa.spec.ts:266` and perf guards in `f-fidelity-rollout.spec.ts:192`) of capture-heavy specs (`f-fidelity-rollout`, `f-geo-scarp`, `f-sonar-palette-1200`, `f1-terrain`, `visual-qa`, `f-bluehole-squiggle`) to a nightly `schedule:` workflow with `golden.sh`.
    - **Step 4:** CI builds once per deployment base and shares the artifact across shards, and `tools/gates.sh` and `npm run ci` share one definition.
-   - Target: 30%+ less serial e2e time (provisional: the 8.8 h baseline is summed historical hosted weights). No guard for a real past bug is lost.
+   - Target: 30%+ less serial e2e time was not supported by the map: it estimates 10–19% from steps 2–3 (5–25% planning range); step 4 saves 30 of 32 hosted builds, not test time. Measure a quiet-CPU full run before and after.
+   - Step 4 queued as Codex 1530; CI shard 7 fix (1430) DONE 2026-10-12 (a5299a4). No guard for a real past bug is lost.
 8. **S-guidance [Sonnet]** (§4 item 1), after S-flow and V-first-five. One prioritised guidance slot (urgent warning > scan progress > discovery > next objective > tutorial/hint) replaces the separate tutorial card, hint chip, explore notice, discovery toast, NEW ENTRY card and objective chip. The sonar diamond and world waypoint stay. Remove the persistent "nominal" text and the static hull-rating number (show the gauge only when it matters; test the threshold, 50% is unvalidated). Urgent warnings must not block scanning or navigation. Drop the mission-title strip on phone.
 9. **V-endurance, V-bluehole, V-beebe [Sonnet]:**
    - Endurance: the opening hull is small and the sub fills the right third (brief 1480).
-   - Blue Hole: the bowl has flat-shaded polygon steps (brief 1410; a Codex round-1 wip commit is in its worktree).
+   - Blue Hole: bowl terraces DONE 2026-10-13 (Codex round 1 + Sonnet visual pass; Low keeps a few straight riser diagonals). Apron collision: Codex 1495 queued.
    - Beebe: the trunk and scan card overlap (brief 1420).
 10. **S-hud [Sonnet]** (§4 item 2, §5), after S-guidance, with S-tests step 2 for the HUD spec. Build three HUD regions (top info, guidance, controls) in normal flow, replacing per-element offsets. Target: `hud-layout.css` from 1,077 lines to about 300, all `/* S-hud: remove */` patches gone, portrait and landscape both without special cases. Re-baseline HUD screenshots deliberately.
 11. **S-resolve [Codex]** HELD (brief 1520 in queue/hold) until S-flow, S-bugs and S-rov merge: all three edit settings/ROV code it rewrites. (§5, §3 Custom). One pure `resolveEffective(settings, mode, progress, daily)`, recomputed when its inputs change, replaces config mutation at boot and live, plus upgrades, the daily modifier and the ROV's per-frame POI-radius rewrite (`rov.ts:143`). With it, Custom shrinks from 10 selects to 4 switches (battery/oxygen, currents, waypoints, start at surface):

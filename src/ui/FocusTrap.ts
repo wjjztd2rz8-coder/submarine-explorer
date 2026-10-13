@@ -1,7 +1,7 @@
 /**
- * Keyboard focus trap for the DOM modals (briefing, debrief, field guide),
- * QA-B #12. While a trap is active, Tab / Shift+Tab cycle through the
- * focusable descendants of its root only, so buttons behind the card (DIVE
+ * Keyboard ownership for the DOM overlays. While a trap is active,
+ * Tab / Shift+Tab cycle through the focusable descendants of its root only,
+ * so buttons behind the card (DIVE
  * SITES, the mission list) cannot be reached and triggered with Enter.
  *
  * Traps stack: when the field guide opens over a debrief, only the guide (the
@@ -20,12 +20,31 @@ const FOCUSABLE =
 
 const stack: FocusTrap[] = [];
 let listening = false;
+let keyboardOwners = 0;
+
+function listen(): void {
+  if (listening) return;
+  window.addEventListener('keydown', onKeyDown, true);
+  listening = true;
+}
+
+function releaseListener(): void {
+  if (stack.length || keyboardOwners || !listening) return;
+  window.removeEventListener('keydown', onKeyDown, true);
+  listening = false;
+}
 
 function onKeyDown(e: KeyboardEvent): void {
-  if (e.key !== 'Tab' && e.code !== 'Tab') return;
   const top = stack[stack.length - 1];
   if (!top) return;
-  top.handleTab(e);
+  top.handleKeyDown(e);
+}
+
+export interface FocusTrapOptions {
+  /** Omitted: leave Escape to the legacy caller. Null: consume without dismissing. */
+  onEscape?: (() => void) | null;
+  /** Other keys owned by this overlay, for example the globe's orbit controls. */
+  onKeyDown?: (event: KeyboardEvent) => void;
 }
 
 function asEl(x: unknown): HTMLElement | null {
@@ -34,29 +53,57 @@ function asEl(x: unknown): HTMLElement | null {
 }
 
 function hiddenByDetails(el: HTMLElement): boolean {
-  const d = el.parentElement?.closest('details:not([open])');
-  return !!d && !(el.tagName === 'SUMMARY' && el.parentElement === d);
+  let d = el.parentElement?.closest('details:not([open])');
+  while (d) {
+    if (el.tagName !== 'SUMMARY' || el.parentElement !== d) return true;
+    d = d.parentElement?.closest('details:not([open])');
+  }
+  return false;
+}
+
+function canFocus(el: HTMLElement): boolean {
+  return (
+    el.isConnected &&
+    !el.closest?.('[hidden], [inert]') &&
+    !el.matches?.(':disabled') &&
+    !hiddenByDetails(el) &&
+    el.getClientRects().length > 0 &&
+    (typeof getComputedStyle === 'undefined' || getComputedStyle(el).visibility === 'visible')
+  );
 }
 
 export class FocusTrap {
   private previous: HTMLElement | null = null;
-  constructor(private readonly root: HTMLElement) {}
+  private ownsKeyboard = false;
+  private disposed = false;
+  constructor(
+    private readonly root: HTMLElement,
+    private readonly options: FocusTrapOptions = {},
+  ) {
+    if (options.onEscape !== undefined && typeof window !== 'undefined') {
+      // Reserve the shared listener before this consumer's surrounding legacy
+      // handlers are bound. Closing/reopening must not change that priority.
+      this.ownsKeyboard = true;
+      keyboardOwners++;
+      listen();
+    }
+  }
 
   get active(): boolean {
     return stack.includes(this);
   }
 
+  get isTop(): boolean {
+    return stack[stack.length - 1] === this;
+  }
+
   activate(): void {
-    if (typeof document === 'undefined') return;
+    if (this.disposed || typeof document === 'undefined') return;
     if (!this.active) this.previous = asEl(document.activeElement);
     const i = stack.indexOf(this);
     if (i >= 0) stack.splice(i, 1);
     stack.push(this);
-    if (!listening) {
-      // Capture phase: runs before any other handler moves focus.
-      window.addEventListener('keydown', onKeyDown, true);
-      listening = true;
-    }
+    listen();
     const a = asEl(document.activeElement);
     if (a && a !== document.body && !this.root.contains(a)) a.blur();
   }
@@ -66,35 +113,61 @@ export class FocusTrap {
     const i = stack.indexOf(this);
     if (i < 0) return;
     const wasTop = i === stack.length - 1;
-    if (i >= 0) stack.splice(i, 1);
-    const a = asEl(document.activeElement);
-    if (a && this.root.contains(a)) a.blur();
-    if (!stack.length && listening) {
-      window.removeEventListener('keydown', onKeyDown, true);
-      listening = false;
+    stack.splice(i, 1);
+    // If an underlying overlay is removed first, carry its return target forward.
+    // A later close must not restore focus into the removed/hidden overlay.
+    for (const trap of stack) {
+      if (trap.previous && this.root.contains(trap.previous)) trap.previous = this.previous;
     }
     const top = stack[stack.length - 1];
+    const a = asEl(document.activeElement);
+    if (a && this.root.contains(a) && (!top || !top.root.contains(a))) a.blur();
+    releaseListener();
     if (
       wasTop &&
-      this.previous?.isConnected &&
-      this.previous.getClientRects().length &&
+      this.previous &&
+      canFocus(this.previous) &&
       (!top || top.root.contains(this.previous))
     )
       this.previous.focus();
     this.previous = null;
   }
 
+  /** Final teardown; migrated consumers retain listener priority until disposal. */
+  dispose(): void {
+    if (this.disposed) return;
+    this.deactivate();
+    this.disposed = true;
+    if (this.ownsKeyboard) {
+      keyboardOwners--;
+      this.ownsKeyboard = false;
+    }
+    releaseListener();
+  }
+
   /** Focusable descendants in DOM order, skipping anything inside a `hidden` subtree. */
   focusables(): HTMLElement[] {
     return [...this.root.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
-      (el) =>
-        el.tabIndex >= 0 &&
-        !el.closest('[hidden], [inert]') &&
-        // Content of a collapsed <details> keeps layout boxes but cannot take focus.
-        !hiddenByDetails(el) &&
-        el.getClientRects().length > 0 &&
-        getComputedStyle(el).visibility === 'visible',
+      (el) => el.tabIndex >= 0 && canFocus(el),
     );
+  }
+
+  /** Dispatch only for the current owner, even when a callback changes the stack. */
+  handleKeyDown(e: KeyboardEvent): void {
+    if (!this.isTop) return;
+    if (e.key === 'Tab' || e.code === 'Tab') {
+      // Legacy callers still need their own Tab side effects (binding capture, etc.).
+      if (this.options.onEscape !== undefined) e.stopImmediatePropagation();
+      this.handleTab(e);
+    } else if (e.key === 'Escape' || e.code === 'Escape') {
+      if (this.options.onEscape === undefined) return;
+      // Consume before calling out: the callback may expose another overlay.
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (!e.repeat) this.options.onEscape?.();
+    } else {
+      this.options.onKeyDown?.(e);
+    }
   }
 
   handleTab(e: KeyboardEvent): void {

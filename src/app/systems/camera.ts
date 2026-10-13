@@ -1,7 +1,7 @@
 /**
  * Camera: the chase / first-person / orbit rig (A3), and the D2-CAMERA
  * controls (view toggle, reset, double-click reset, mouse look and wheel zoom).
- * The rig is built early (the discovery teleport and the ROV snap it); the
+ * The rig is built early (the discovery teleport snaps it); the
  * controls come after the input system.
  */
 
@@ -85,13 +85,13 @@ export const cameraControlsSystem: GameSystem = {
   },
   frame: {
     'controls.camera': (f, ctx) => {
-      const { rig, rov, input } = ctx;
+      const { rig, input } = ctx;
       const { frozen, state, sampled } = f;
       if (!frozen) noteControlUse(sampled);
-      if (!frozen && !rov.deployed && state.toggleCamera) {
+      if (!frozen && state.toggleCamera) {
         rig.toggleMode();
       }
-      if (!frozen && !rov.deployed && state.resetCamera) {
+      if (!frozen && state.resetCamera) {
         rig.resetView();
       }
       // D-INPUT-HUD: drag to look, wheel to zoom (also while framing a photo).

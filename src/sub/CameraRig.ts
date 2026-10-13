@@ -14,7 +14,7 @@ export const PHOTO_ORBIT_MIN_M = 6;
 export const PHOTO_ORBIT_MAX_M = 220;
 
 /** Per-frame extras. All optional so a bare `update(pos, yaw, pitch, dt)` works. */
-export interface CameraUpdateOptions {
+interface CameraUpdateOptions {
   /** Cosmetic bank angle of the boat (radians). */
   roll?: number;
   /** Boat velocity, used for speed-proportional look-ahead. */

@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { publicUrl } from '../util/publicUrl.js';
 import { ALBEDO, vertexGlow } from './props/geo/materials.js';
 
-export const LOST_CITY_SURFACE = {
+const LOST_CITY_SURFACE = {
   repeatM: 2.4,
   contrast: 0.2,
   normalStrength: 0.65,

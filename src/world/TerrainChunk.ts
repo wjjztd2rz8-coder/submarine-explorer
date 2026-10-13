@@ -43,12 +43,12 @@
 import * as THREE from 'three';
 
 /** The height field a chunk samples. Implemented by `Terrain`. */
-export interface ChunkField {
+interface ChunkField {
   /** Final rendered elevation in metres: measured data + exaggeration + detail. */
   surfaceY(x: number, z: number): number;
 }
 
-export interface ChunkOptions {
+interface ChunkOptions {
   field: ChunkField;
   material: THREE.Material;
   /** World position of vertex (0, 0). */

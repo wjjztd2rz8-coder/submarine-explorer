@@ -47,8 +47,8 @@ export function createExploreSystem(): GameSystem {
   const announce = (ctx: GameContext, event: ExploreEvent): boolean => {
     const placed = visual.begin(
       event,
-      ctx.rov.deployed ? ctx.rov.position : ctx.sub.position,
-      ctx.rov.deployed ? ctx.rov.forward : ctx.sub.getForward(),
+      ctx.sub.position,
+      ctx.sub.getForward(),
       (x, z) => ctx.terrain.sampleHeight(x, z),
       ctx.rig.camera,
     );
@@ -262,7 +262,7 @@ export function createExploreSystem(): GameSystem {
         ctx.sonar.setFaintContacts(faint);
         notice.update(dt, f.blocked || f.frozen);
       },
-      'scan.rovRangeRestore': (f, ctx) => {
+      'scan.discovery': (f, ctx) => {
         const scanner = ctx.discovery.scanner;
         const target = sampleTargets.find((t) => t.id === scanner.view.activeId);
         const working = !!target && scanner.isScanning && !f.frozen && !f.blocked;

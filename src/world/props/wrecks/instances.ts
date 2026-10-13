@@ -217,7 +217,7 @@ export function barGeometry(): THREE.BufferGeometry {
   });
 }
 
-export interface RailOptions {
+interface RailOptions {
   height?: number;
   postSpacing?: number;
   /** Fraction of panels missing. */

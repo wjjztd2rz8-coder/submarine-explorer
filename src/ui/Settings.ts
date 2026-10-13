@@ -658,7 +658,7 @@ export class SettingsScreen {
   private renderBindings(): void {
     this.bindButtons.clear();
     const rows = this.opts.input.actions
-      .filter((a) => a.id !== 'toggleSettings' && a.id !== 'toggleGlobe')
+      .filter((a) => a.id !== 'toggleSettings')
       .map((a) => {
         const row = el('div', 'settings-binding');
         row.setAttribute('role', 'listitem');

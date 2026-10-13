@@ -17,7 +17,6 @@ function setup(route: boolean, rig?: CameraRig) {
     canvas: new EventTarget(),
     app: { state: 'home' },
     route: route ? {} : null,
-    rov: { deployed: false },
     input: { wheelDelta: 0 },
     photoMode: { active: false },
     keyboard: { unlock: vi.fn() },

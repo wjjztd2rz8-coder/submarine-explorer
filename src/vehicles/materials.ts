@@ -103,7 +103,7 @@ function addKeyAndRim(mat: THREE.MeshStandardMaterial, u: LitUniforms, rimScale 
       .replace(
         '#include <opaque_fragment>',
         [
-          // Highlight shoulder: pale livery under a close headlight (the ROV
+          // Highlight shoulder: pale livery under a close headlight (the hull
           // 30 m ahead of the boat, the bow inside its own beams) would clip
           // to flat white. Compress the top of the range, keeping hue.
           '{',

@@ -8,16 +8,8 @@
  * extension point rather than editing that lane's files" and to avoid
  * touching a shared file while A1/A2/A3 are also mid-flight.
  *
- * Two things live here because nothing else in the repo owns them yet:
- *
- *   - `TerrainSampler`, a minimal structural interface so this module reads
- *     seabed height for the sonar ray-march without importing
- *     `src/world/Terrain.ts` or `src/sub/Submarine.ts` (Terrain already
- *     satisfies this structurally, so `new AudioSystem(cfg, bus, terrain)`
- *     just works).
- *   - `CaptionBus`, a tiny pub/sub for the caption/subtitle events A4's
- *     deliverable #5 asks for. The accessibility package (C5) is expected to
- *     subscribe to `audioSystem.captions` and render them; see docs/audio.md.
+ * TerrainSampler supplies the standalone terrain ray-march utility; CaptionBus
+ * carries accessibility cues to the caption overlay (see docs/audio.md).
  */
 
 export interface TerrainSampler {
@@ -26,7 +18,7 @@ export interface TerrainSampler {
 
 /** One accessibility caption for an audio cue (A4 deliverable #5). */
 export interface CaptionEvent {
-  /** Stable machine id, e.g. "sonar-ping". Use for de-duplication/localisation. */
+  /** Stable machine id, e.g. "discovery". Use for de-duplication/localisation. */
   id: string;
   /** Human-readable caption text for the CC overlay. */
   text: string;
@@ -67,17 +59,10 @@ export interface AudioFrameInput {
   speed: number;
   ratedDepth?: number;
   hullStress?: number;
-  rovMode?: 'stowed' | 'piloting' | 'returning';
-  tetherUsedM?: number;
   soundSites?: readonly import('./Soundscape.js').SoundSite[];
   whaleHabitat?: boolean;
-  /** Sub world position (metres), used as the sonar ping origin. */
+  /** Sub world position (metres), used for spatial environment audio. */
   position: { x: number; y: number; z: number };
-  /** Sub forward unit vector, used as the sonar ping direction. */
+  /** Sub forward unit vector, used for spatial environment audio. */
   forward: { x: number; y: number; z: number };
-  /**
-   * Edge-triggered: true on the one frame the `ping` action fired (see
-   * `Input.actions`, bound to Q / Tab / gamepad LB by src/core/Input.ts).
-   */
-  pingPressed: boolean;
 }

@@ -334,7 +334,6 @@ export function classB(low: boolean): Blueprint {
       accent: '#ffffff',
     },
     cockpitEye: V(0, -0.5, -2.92),
-    tetherAnchor: V(0, -1.6, -3.3),
   };
 }
 
@@ -583,7 +582,6 @@ export function classA(low: boolean): Blueprint {
       accent: '#16191c',
     },
     cockpitEye: V(0, 0.05, -0.95),
-    tetherAnchor: V(0, -0.85, -1.7),
     blades: 4,
   };
 }
@@ -804,7 +802,6 @@ export function classC(low: boolean): Blueprint {
       accent: '#16191c',
     },
     cockpitEye: V(0, -0.66, -1.95),
-    tetherAnchor: V(0, -1.6, -2.4),
   };
 }
 

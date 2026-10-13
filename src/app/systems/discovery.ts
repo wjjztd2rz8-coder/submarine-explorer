@@ -37,12 +37,17 @@ export const discoverySystem: GameSystem = {
   },
   frame: {
     'scan.discovery': (f, ctx) => {
+      // An open Journal freezes piloting, but its pad button must still close it.
+      const input =
+        ctx.discovery.guide.isOpen && f.sampled.toggleGuide
+          ? { ...f.state, toggleGuide: true }
+          : f.state;
       ctx.discovery.update(
         f.steps * f.fixedDt,
         f.dt,
         f.pilotPosition,
         f.pilotForward,
-        ctx.missionRouter?.debriefOpen ? { ...f.state, scan: false } : f.state, // B3: no beam under the debrief
+        ctx.missionRouter?.debriefOpen ? { ...input, scan: false } : input, // B3: no beam under the debrief
         ctx.rig.camera,
         f.clockDt,
       );

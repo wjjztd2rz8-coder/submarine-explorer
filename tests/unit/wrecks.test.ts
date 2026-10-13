@@ -144,7 +144,7 @@ describe('wreck builders', () => {
     expect(inst('ultra')).toBeGreaterThan(inst('medium'));
   });
 
-  it('exports interior anchor points for later ROV interiors', () => {
+  it('exports interior anchor points for wreck interiors', () => {
     const names = (id: WreckId): string[] =>
       buildWreck(id, DIMS[id], 1, 'medium').anchors.map((a) => a.name);
     expect(names('titanic-bow')).toContain('interior-entry');

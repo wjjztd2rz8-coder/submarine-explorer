@@ -27,7 +27,6 @@ it.each([
       discovery: {},
       expose: vi.fn(),
       sub: { simSpeed: 1, startEmergencyAscent: vi.fn() },
-      rov: { deployed: false },
       headlights: { on: true },
       sonar: { visible: true },
     } as unknown as GameContext;

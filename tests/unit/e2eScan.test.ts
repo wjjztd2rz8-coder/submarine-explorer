@@ -33,8 +33,6 @@ function setup() {
     missionRouter: null,
     input: { sample: () => state },
     sub: { position: new Vector3(0, -120, 0), getForward: () => new Vector3(0, 0, -1) },
-    rov: { deployed: false, position: new Vector3(0, -120, 0), forward: new Vector3(0, 0, -1) },
-    config: { rov: { scanRangeFactor: 2 } },
     discovery: {
       scanner,
       pois: [target],
@@ -146,6 +144,7 @@ it('requires held input and real candidate geometry instead of awarding completi
   target.position.set(0, -120, -9);
   await expect(completeScan(page, 'another')).rejects.toThrow('Expected scan candidate another');
   expect(scanner.view.completed).toBe(0);
+  expect(target.radius).toBe(12);
 });
 
 it('preserves freeze gates and releases the keyboard on failure', async () => {
@@ -164,16 +163,4 @@ it('does not advance scans under Settings, the globe, or the Journal', async () 
     modal.isOpen = false;
   }
   expect(scanner.view.completed).toBe(0);
-});
-
-it('uses the deployed ROV pose/range and restores POI radii even on failure', async () => {
-  const { game, page, scanner, target } = setup();
-  game.rov.deployed = true;
-  game.sub.position.set(100, -120, 0);
-  target.position.set(0, -120, -18);
-  await expect(completeScan(page, 'wrong')).rejects.toThrow('Expected scan candidate wrong');
-  expect(target.radius).toBe(12);
-  await completeScan(page, 'bow');
-  expect(scanner.view.completed).toBe(1);
-  expect(target.radius).toBe(12);
 });

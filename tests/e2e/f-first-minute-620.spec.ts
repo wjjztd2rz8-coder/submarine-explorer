@@ -231,7 +231,7 @@ for (const layout of [
           JSON.stringify({
             version: 1,
             tutorialDone: true,
-            seenHints: ['battery-low', 'near-hull', 'scan-target', 'rov'],
+            seenHints: ['battery-low', 'near-hull', 'scan-target'],
           }),
         );
       });

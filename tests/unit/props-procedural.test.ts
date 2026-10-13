@@ -10,7 +10,11 @@ import {
   layoutDebris,
   makeBoxSilhouette,
   mulberry32,
-} from '../../src/world/props/Procedural.js';
+} from '../../src/world/props/builders/index.js';
+
+import { hashStringSigned, mulberry32 as sharedRng } from '../../src/util/rng.js';
+import { mulberry32 as lifeRng } from '../../src/world/life/rng.js';
+import { mulberry as presetRng } from '../../src/world/presets/maths.js';
 
 const cfg = DEFAULT_CONFIG.props;
 
@@ -325,5 +329,76 @@ describe('box silhouette impostor', () => {
     const mat = m.material as THREE.MeshStandardMaterial;
     expect(mat.transparent).toBe(true);
     expect(mat.opacity).toBe(0.5);
+  });
+});
+
+describe('shared deterministic sources', () => {
+  it.each([
+    [
+      0,
+      [1144304738, 1416247, 958946056, 627933444, 2007157716, 2340967985, 2642484575, 2787370982],
+    ],
+    [
+      42,
+      [
+        2581720956, 1925393290, 3661312704, 2876485805, 750819978, 2261697747, 1173505300,
+        2683257857,
+      ],
+    ],
+    [
+      -1,
+      [
+        3850105811, 813802916, 3073704848, 4054706436, 3630262831, 2315588663, 2922715533,
+        2042566601,
+      ],
+    ],
+    [
+      4294967295,
+      [
+        3850105811, 813802916, 3073704848, 4054706436, 3630262831, 2315588663, 2922715533,
+        2042566601,
+      ],
+    ],
+    [
+      4294967297,
+      [
+        2693262067, 11749833, 2265367787, 4213581821, 4159151403, 1207330352, 2632122864,
+        3095568220,
+      ],
+    ],
+  ])('retains the original sequence for seed %s', (seed, expected) => {
+    for (const make of [sharedRng, mulberry32, lifeRng, presetRng]) {
+      const random = make(seed as number);
+      expect(Array.from({ length: 8 }, () => random() * 4294967296)).toEqual(expected);
+    }
+  });
+
+  it.each([
+    ['', 2166136261, -2128831035],
+    ['bow-hull', 854206817, 854206817],
+    ['stern-hull', 3796350947, -498616349],
+    ['titanic', 1620760713, 1620760713],
+    ['great-blue-hole', 2531406382, -1763560914],
+    ['🌊', 3878647395, -416319901],
+  ] as const)('retains unsigned props and signed terrain hashes for %s', (id, unsigned, signed) => {
+    expect(hashString(id)).toBe(unsigned);
+    expect(hashStringSigned(id)).toBe(signed);
+  });
+
+  it('retains the pre-consolidation debris placement for an unsigned high-bit seed', () => {
+    const first = layoutDebris(80, hashString('stern-hull'), cfg)[0];
+    expect(first.kind).toBe('box');
+    expect(first.size).toBe(3.9893648042343557);
+    expect(first.position).toEqual({
+      x: -33.85002573284293,
+      y: 0.19131650508183123,
+      z: -12.798838811086368,
+    });
+    expect(first.rotation.toArray()).toEqual([
+      0.06573357246816158,
+      3.2970316918153673,
+      -0.14400612213648856,
+      'YXZ',
+    ]);
   });
 });

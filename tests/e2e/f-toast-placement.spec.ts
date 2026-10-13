@@ -103,7 +103,7 @@ for (const layout of [
             JSON.stringify({
               version: 1,
               tutorialDone: false,
-              seenHints: ['battery-low', 'near-hull', 'scan-target', 'rov'],
+              seenHints: ['battery-low', 'near-hull', 'scan-target'],
             }),
           );
         }, layout.scale);

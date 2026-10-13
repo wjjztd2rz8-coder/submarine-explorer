@@ -2,8 +2,7 @@
  * Photo mode (D-PHOTO). Photos live in their own store (subexplorer.photos.v1)
  * and show in the Journal's Photos page and on each POI entry; the viewfinder
  * is PhotoMode. Photo mode freezes the sim like pause; the camera orbits
- * whatever is being piloted (the ROV when deployed) and leaving restores the
- * previous view. The capture reads the canvas right after the draw.
+ * the submarine and leaving restores the previous view. The capture reads the canvas right after the draw.
  */
 
 import type * as THREE from 'three';
@@ -26,10 +25,10 @@ export function createPhotoSystem(): GameSystem {
   let lastCaptureMs = -Infinity;
 
   const enterPhotoMode = (ctx: GameContext): void => {
-    const { journal, rig, rov, sub, photoMode, input } = ctx;
+    const { journal, rig, sub, photoMode, input } = ctx;
     document.exitPointerLock?.();
     void journal.load(); // site names for the caption
-    rig.enterPhotoMode(rov.deployed ? rov.position : sub.position);
+    rig.enterPhotoMode(sub.position);
     photoMode.setActive(true, input.primaryKeyLabel('capturePhoto'));
     photoCaptureRequested = false;
   };
@@ -97,7 +96,7 @@ export function createPhotoSystem(): GameSystem {
       };
       ctx.expose({ photos, photoMode });
     },
-    // After the ROV's listeners, as before F0 (it was the last app:state listener).
+    // Register after init so photo mode misses the initial dive emit.
     start(ctx) {
       cleanup.add(
         ctx.bus.on('app:state', ({ state }) => {

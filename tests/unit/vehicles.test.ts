@@ -1,19 +1,13 @@
 import { Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_CONFIG } from '../../src/core/Config.js';
-import { Rov } from '../../src/rov/Rov.js';
-import { RovVisual } from '../../src/rov/RovVisual.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 import { apertureFor, clearFraction, CockpitView } from '../../src/vehicles/cockpit.js';
-import { buildRov, buildVehicle, lodForTier, Vehicle } from '../../src/vehicles/index.js';
-import { catenarySag, payout, tetherCurve } from '../../src/vehicles/tether.js';
+import { buildVehicle, lodForTier, Vehicle } from '../../src/vehicles/index.js';
 
 /** Per-tier budgets for one vehicle (docs: plan/progress/F1-VEHICLES.md). */
 const BUDGET = {
   low: { drawCalls: 8, triangles: 18_000 },
   full: { drawCalls: 25, triangles: 36_000 },
-  rovLow: { drawCalls: 8, triangles: 10_000 },
-  rovFull: { drawCalls: 18, triangles: 18_000 },
 };
 
 describe('vehicle builds (F1-VEHICLES)', () => {
@@ -41,13 +35,7 @@ describe('vehicle builds (F1-VEHICLES)', () => {
     expect(tris.size).toBe(3);
   });
 
-  it('builds the ROV within budget and falls back to class B for unknown ids', () => {
-    const low = buildRov('low');
-    const high = buildRov('ultra');
-    expect(low.stats.drawCalls).toBeLessThanOrEqual(BUDGET.rovLow.drawCalls);
-    expect(low.stats.triangles).toBeLessThanOrEqual(BUDGET.rovLow.triangles);
-    expect(high.stats.drawCalls).toBeLessThanOrEqual(BUDGET.rovFull.drawCalls);
-    expect(high.stats.triangles).toBeLessThanOrEqual(BUDGET.rovFull.triangles);
+  it('falls back to class B for unknown ids', () => {
     expect(buildVehicle('Z').id).toBe('B');
     expect(lodForTier('medium')).toBe('high');
     expect(lodForTier('low')).toBe('low');
@@ -79,26 +67,6 @@ describe('vehicle builds (F1-VEHICLES)', () => {
   });
 });
 
-describe('tether', () => {
-  it('sags with slack and straightens when taut', () => {
-    expect(catenarySag(10, 10)).toBe(0);
-    expect(catenarySag(10, 12)).toBeCloseTo(Math.sqrt((3 * 10 * 2) / 8));
-    expect(payout(20, 60, true)).toBeCloseTo(20.04);
-    expect(payout(20, 60, false)).toBeGreaterThan(21);
-    // Near the limit, the slack runs out.
-    expect(payout(59.9, 60, false) - 59.9).toBeLessThan(0.5);
-    const pts = Array.from({ length: 9 }, () => new Vector3());
-    const a = new Vector3(0, 0, 0);
-    const b = new Vector3(20, 0, 0);
-    tetherCurve(a, b, 24, pts);
-    expect(pts[0]!.distanceTo(a)).toBeLessThan(1e-9);
-    expect(pts[8]!.distanceTo(b)).toBeLessThan(1e-9);
-    expect(pts[4]!.y).toBeLessThan(-3);
-    tetherCurve(a, b, 20, pts);
-    expect(Math.abs(pts[4]!.y)).toBeLessThan(1e-9);
-  });
-});
-
 describe('cockpit viewport', () => {
   it('keeps most of the view clear at common aspects', () => {
     for (const aspect of [16 / 9, 4 / 3, 21 / 9, 9 / 16]) {
@@ -113,8 +81,8 @@ describe('cockpit viewport', () => {
   });
 });
 
-describe('SubMesh + RovVisual integration', () => {
-  it('follows the fitted hull class, swaps hull and cockpit by view, anchors the tether', () => {
+describe('SubMesh integration', () => {
+  it('follows the fitted hull class, swaps hull and cockpit by view', () => {
     const mesh = new SubMesh({ length: 26, hullClass: 'A', tier: 'medium' });
     expect(mesh.hullClass).toBe('A');
     mesh.setHullClass('C');
@@ -130,29 +98,8 @@ describe('SubMesh + RovVisual integration', () => {
     mesh.update(1, 0.5, { yaw: 0.3, lightsOn: false });
     expect(mesh.propeller).toBe(mesh.vehicle.props);
     mesh.setPose(new Vector3(100, -50, 20), 0, 0, 0);
-    const anchor = mesh.tetherAnchor(new Vector3());
-    // Under the bow, within a hull length of the origin.
-    expect(anchor.y).toBeLessThan(-50);
-    expect(anchor.z).toBeLessThan(20);
-    expect(anchor.distanceTo(new Vector3(100, -50, 20))).toBeLessThan(26);
+    expect(mesh.group.position.toArray()).toEqual([100, -50, 20]);
     mesh.dispose();
-  });
-
-  it('draws the ROV and a sagging tether that ends at the ROV', () => {
-    const floor = { widthM: 1000, depthM: 1000, sampleHeight: () => -400 };
-    const rov = new Rov(DEFAULT_CONFIG.rov, floor);
-    const anchor = new Vector3(0, -100, 0);
-    expect(rov.deploy(anchor, 0)).toBe(true);
-    rov.position.set(0, -104, -25);
-    const visual = new RovVisual(DEFAULT_CONFIG.rov, 'high');
-    visual.update(rov, anchor, 1 / 60);
-    expect(visual.group.visible).toBe(true);
-    const pts = visual.tether.points;
-    expect(pts[0]!.distanceTo(anchor)).toBeLessThan(1e-6);
-    expect(pts[pts.length - 1]!.distanceTo(rov.position)).toBeLessThan(3);
-    const mid = pts[Math.floor(pts.length / 2)]!;
-    expect(mid.y).toBeLessThan((anchor.y + pts[pts.length - 1]!.y) / 2);
-    visual.dispose();
   });
 });
 

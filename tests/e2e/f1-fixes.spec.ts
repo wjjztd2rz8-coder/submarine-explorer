@@ -3,7 +3,7 @@ import { mkdir } from 'node:fs/promises';
 import { expect, test } from './helpers/unlocked.js';
 
 /**
- * F1-FIXES: in-game views of the vent plume, the ROV rig and the geology
+ * F1-FIXES: in-game views of the vent plume and the geology
  * fixes, saved to .cache/codex/shots/f1-fixes/. Asserts only that nothing
  * throws.
  */
@@ -64,16 +64,3 @@ for (const c of CASES) {
     expect(errors).toEqual([]);
   });
 }
-
-test('rov lamps', async ({ page }) => {
-  await mkdir(shots, { recursive: true });
-  const errors: string[] = [];
-  page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto('/?tile=titanic&landmark=_test&poi=test-bow');
-  await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
-  await page.waitForTimeout(1500);
-  await page.keyboard.press('e');
-  await page.waitForTimeout(4000);
-  await page.screenshot({ path: `${shots}/rov-${tag}-0.png` });
-  expect(errors).toEqual([]);
-});
