@@ -108,7 +108,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
    - move service-worker registration out of the touch system;
    - stop shipping sourcemaps to Pages.
 5. **V-first-five [Haiku capture, Sonnet judge]:** an unaided mobile first-five-minutes capture on the current SHA (portrait and landscape): Home → mission → unaided scan → next objective → Journal → debrief. Run it after the P-items merge; it is the baseline for S-flow and S-guidance.
-6. **S-flow [Sonnet]** (§4 items 3, 5–8, §3 tutorial), after P-first-dive-flow; small, low risk, player-visible:
+6. **S-flow [Sonnet]** IN FLIGHT (Claude Sonnet, 2026-10-12, worktree S-flow) (§4 items 3, 5–8, §3 tutorial), after P-first-dive-flow; small, low risk, player-visible:
    - Home gets one primary "Dive" (first run: Titanic briefing; afterwards: continue), and the disabled Continue goes;
    - de-duplicate the pause menu, but keep How to play and Data credits easy to reach (Sol r2: burying them contradicts the phone decisions; no fixed entry count);
    - finishing the primaries shows stars and summary in the banner, with Keep exploring primary (completion does not end the dive);
