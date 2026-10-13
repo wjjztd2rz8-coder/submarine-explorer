@@ -65,7 +65,9 @@ export function createExploreSystem(): GameSystem {
     name: 'explore',
     init(ctx) {
       visual = new EventsVisual(ctx.tier);
-      notice = new ExploreNotice();
+      notice = new ExploreNotice(undefined, () =>
+        visual.screenBounds(ctx.rig.camera, window.innerWidth, window.innerHeight),
+      );
       ctx.scene.add(visual.group);
       const positions = Float32Array.from({ length: 36 }, (_, i) =>
         i % 3 === 1 ? (i / 36) * 1.5 : Math.sin(i * 7) * 1.5,

@@ -5,7 +5,7 @@ import type { EventsVisual } from '../../src/game/EventsVisual.js';
 import type { EventScheduler, ExploreEventKind } from '../../src/game/Events.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
 import type { CameraRig } from '../../src/sub/CameraRig.js';
-import type { Scene, Points, PointsMaterial, BufferGeometry } from 'three';
+import type { Scene, Points, PointsMaterial, BufferGeometry, Mesh } from 'three';
 
 const shots = '.cache/codex/shots/1393-f-events-reform';
 interface Game {
@@ -25,6 +25,76 @@ interface Game {
   journal: { load(): Promise<void>; open(): void; close(): void };
   missionRouter: { endDive(): boolean };
 }
+/** Read actual world vertices/sprite edges and actual DOM boxes, at each capture age. */
+function eventLayout(kind: ExploreEventKind) {
+  const g = window.__game as unknown as Game;
+  const object = g.scene.getObjectByName(
+    kind === 'whale' ? 'exploreEventWhale' : 'exploreEventParticles',
+  ) as Mesh<BufferGeometry>;
+  object.updateWorldMatrix(true, false);
+  const positions = object.geometry.getAttribute('position');
+  const point = object.position.clone(),
+    eye = point.clone();
+  const width = window.innerWidth,
+    height = window.innerHeight;
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
+  for (let i = 0; i < positions.count; i++) {
+    point.fromBufferAttribute(positions, i).applyMatrix4(object.matrixWorld);
+    const depth = -eye.copy(point).applyMatrix4(g.rig.camera.matrixWorldInverse).z;
+    const radius =
+      kind === 'whale'
+        ? 0
+        : Math.min(
+            24,
+            ((object.material as PointsMaterial).size * height) / (4 * Math.max(1, depth)),
+          );
+    point.project(g.rig.camera);
+    const x = ((point.x + 1) * width) / 2,
+      y = ((1 - point.y) * height) / 2;
+    minX = Math.min(minX, x - radius);
+    maxX = Math.max(maxX, x + radius);
+    minY = Math.min(minY, y - radius);
+    maxY = Math.max(maxY, y + radius);
+  }
+  const caption = document.querySelector<HTMLElement>('.explore-caption')!;
+  const a = caption.getBoundingClientRect();
+  const subject = { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+  const covered = !caption.hidden && a.x < maxX && a.right > minX && a.y < maxY && a.bottom > minY;
+  const captionOverlays = [
+    '.sonar',
+    '.hud-readouts',
+    '.scan-panel',
+    '.tc-stick',
+    '.tc-slider',
+    '.tc-buttons',
+    '.tc-btn-pause',
+  ].filter((selector) => {
+    const element = document.querySelector<HTMLElement>(selector);
+    if (caption.hidden || !element || element.hidden || !element.getClientRects().length)
+      return false;
+    const b = element.getBoundingClientRect();
+    return a.x < b.right && a.right > b.x && a.y < b.bottom && a.bottom > b.y;
+  });
+  return {
+    subject,
+    covered,
+    captionOverlays,
+    caption: {
+      visible: !caption.hidden && a.width > 0,
+      x: a.x,
+      y: a.y,
+      width: a.width,
+      height: a.height,
+      maxWidth: caption.style.maxWidth,
+      fontSize: caption.style.fontSize,
+      text: caption.textContent,
+    },
+  };
+}
+
 // Same fresh Arcade / life-seed / normal-effects setup as tools/perf-budget.mjs.
 // Capture actual play framing, including phone controls and captions.
 for (const surface of ['desktop', 'phone'] as const) {
@@ -129,16 +199,37 @@ for (const surface of ['desktop', 'phone'] as const) {
         expect(measurements.calls).toBeLessThanOrEqual(1500);
         expect(measurements.triangles).toBeLessThanOrEqual(1_500_000);
         expect(measurements.tier).toBe('low');
+        // Retain layout evidence even if visibility fails before a shot is saved.
+        await test.info().attach('event-caption-layout', {
+          body: JSON.stringify({ measurements, layout: await page.evaluate(eventLayout, kind) }),
+          contentType: 'application/json',
+        });
+        await expect(page.locator('.explore-caption')).toBeVisible();
+        const startLayout = await page.evaluate(eventLayout, kind);
+        expect(startLayout.covered, 'caption must leave the event visible').toBe(false);
+        expect(
+          startLayout.captionOverlays,
+          'caption must leave HUD and thumb controls clear',
+        ).toEqual([]);
+        if (kind === 'whale') expect(startLayout.subject.height).toBeGreaterThan(8);
         await mkdir(shots, { recursive: true });
         await page.screenshot({ path: `${shots}/${kind}-${surface}-low-start.png` });
         await writeFile(
           `${shots}/${kind}-${surface}-measurements.json`,
-          JSON.stringify(measurements, null, 2),
+          JSON.stringify({ ...measurements, ...startLayout }, null, 2),
         );
-        await page.evaluate(() => {
+        await page.evaluate(async () => {
           (window.__game as unknown as Game).explore.scheduler.active!.elapsedS = 7;
+          // Allow the twice-per-second caption layout to follow the moved subject.
+          const settleUntil = performance.now() + 550;
+          while (performance.now() < settleUntil) await new Promise(requestAnimationFrame);
         });
-        await page.waitForTimeout(100);
+        await expect(page.locator('.explore-caption')).toBeVisible();
+        const movingLayout = await page.evaluate(eventLayout, kind);
+        expect(movingLayout.covered, 'moving event must stay clear of its caption').toBe(false);
+        expect(movingLayout.captionOverlays, 'moving caption must leave controls clear').toEqual(
+          [],
+        );
         await page.screenshot({ path: `${shots}/${kind}-${surface}-low-moving.png` });
         // Approach the currently visible centre, then look at it through the
         // regular chase rig. A distant caption must never silently count as a log.
@@ -175,6 +266,22 @@ for (const surface of ['desktop', 'phone'] as const) {
           g.journal.open();
         });
         await expect(page.locator('.journal')).toContainText('Sighting:');
+        const explanation =
+          kind === 'plume'
+            ? 'Mixing with seawater can cause minerals to precipitate into tiny particles.'
+            : kind === 'turbidity'
+              ? 'These flows carry sand and mud through submarine canyons.'
+              : 'Whales breathe air and return to the surface between dives.';
+        await expect(page.locator('.journal .jr-body')).toContainText(explanation);
+        const source =
+          kind === 'plume'
+            ? 'https://www.nature.com/articles/ncomms1636'
+            : kind === 'turbidity'
+              ? 'https://www.mbari.org/news/high-tech-smart-boulders-give-the-first-look-from-inside-an-underwater-landslide/'
+              : 'https://sanctuaries.noaa.gov/hudson-canyon/';
+        await expect(page.locator('.journal .jr-body').locator(`a[href="${source}"]`)).toHaveCount(
+          1,
+        );
         await page.screenshot({ path: `${shots}/${kind}-${surface}-journal.png` });
         expect(errors).toEqual([]);
         await page.evaluate(() => {

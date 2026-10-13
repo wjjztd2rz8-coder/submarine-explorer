@@ -86,6 +86,8 @@ for (const site of [
           expect(kind === 'plume' ? heightPx : widthPx, `${kind} screen footprint`).toBeGreaterThan(
             45,
           );
+          if (kind === 'whale')
+            expect(heightPx, 'the crossing outline must show fins and flukes').toBeGreaterThan(8);
           const start = visual.origin.clone();
           visual.update({ ...event, elapsedS: 7 });
           if (kind === 'turbidity') expect(visual.origin.y).toBeLessThanOrEqual(start.y + 0.01);

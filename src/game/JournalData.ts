@@ -79,7 +79,7 @@ export const EVENT_SIGHTINGS: Record<ExploreEventKind, GuideEntry> = {
     id: 'event:whale',
     title: 'Sighting: Whale passing',
     paragraphs: [
-      'Submarine canyon waters provide habitat and feeding grounds for whales. A passing silhouette shows an animal travelling through the water above the canyon, rather than living on the seabed.',
+      'Submarine canyon waters provide habitat and feeding grounds for whales. Whales breathe air and return to the surface between dives.',
     ],
     facts: [],
     reconstruction: true,
