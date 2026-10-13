@@ -84,5 +84,5 @@ it('phone scan progress and navigation copy survive the compact presentation', (
   card.show(2, tutorialText('scan', 'touch', keys, 0.42), 'touch');
   expect(phone.textContent).toBe('Scanning… 42% · keep holding SCAN.');
   card.show(2, tutorialText('scan', 'touch', keys), 'touch');
-  expect(phone.textContent).toBe('Face a glowing target; hold SCAN to finish.');
+  expect(phone.textContent).toBe('Hold SCAN on a glowing target.');
 });

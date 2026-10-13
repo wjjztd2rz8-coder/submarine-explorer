@@ -155,7 +155,7 @@ for (const layout of [
               await act(page.getByRole('button', { name: 'Skip', exact: true }));
               await page.clock.runFor(34);
               await expect(page.locator('.onboard-card-phone-text')).toHaveText(
-                'Face a glowing target; hold SCAN to finish.',
+                'Hold SCAN on a glowing target.',
               );
             }
             await page.screenshot({ path: info.outputPath('opening.png') });

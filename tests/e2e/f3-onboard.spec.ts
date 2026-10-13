@@ -105,6 +105,9 @@ test('scan coaching waits through held progress and interruption until completio
       g.scanner.view.candidateId === 'test-bow'
     );
   });
+  // The contact is in range, so its card keeps the tutorial hidden; hold it away to read the coach.
+  await setScanCardSuppressed(page, true);
+  await page.clock.fastForward(50);
   for (let i = 0; i < 2; i++) await page.locator('.onboard-skip-step').click();
   await page.clock.fastForward(50);
   const card = page.locator('.onboard-card');

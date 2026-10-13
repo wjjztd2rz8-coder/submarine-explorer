@@ -138,7 +138,7 @@ export class TutorialCard {
     const phoneInstructions: Record<TutorialStepId, string> = {
       move: 'Push left stick forward; sideways to turn.',
       depth: 'Right slider: up to rise, down to sink.',
-      scan: 'Face a glowing target; hold SCAN to finish.',
+      scan: 'Hold SCAN on a glowing target.',
     };
     const step = TUTORIAL_STEPS[index];
     this.phoneText.textContent =
