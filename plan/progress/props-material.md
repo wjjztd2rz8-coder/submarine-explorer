@@ -1,6 +1,6 @@
 # Props: chimney `material_hint`
 
-Closes the gap flagged in `plan/progress/C4a.md` and `plan/QA-C-INTEGRATION.md`
+Closes the gap flagged in `plan/progress/C4a.md` and `plan/archive/QA-C-INTEGRATION.md`
 (Lost City's carbonate chimneys rendered basalt-grey).
 
 - New optional props.json key `material_hint`: `basalt | carbonate | sulfide`.

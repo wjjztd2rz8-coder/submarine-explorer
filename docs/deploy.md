@@ -15,7 +15,7 @@ run independently on `ubuntu-latest` with Node 22 and npm caching:
 | Job                     | Gates                                                                                    | Job limit        |
 | ----------------------- | ---------------------------------------------------------------------------------------- | ---------------- |
 | Build and static checks | Python tests, strict mission content, typecheck/build, unit tests, attribution, Prettier | 15 min           |
-| E2e (16 shards)         | Build, Chromium install, full Playwright suite split by individual test                  | 24 min per shard |
+| E2e (30 shards)         | Build, Chromium install, full Playwright suite split by individual test                  | 24 min per shard |
 | Project-base            | Chromium install, project-base build and browser test                                    | 15 min           |
 
 GitHub runners have no GPU, so Chromium renders WebGL on SwiftShader. Each
@@ -44,10 +44,11 @@ For routine local work, `PW_PORT=4197 bash tools/gates.sh` runs every static
 gate plus the existing `smoke.spec.ts` (home shell, Titanic and Monterey Canyon
 rendering/error checks) and the separate project-base browser check. With no
 `SMOKE_TILE` override this schedules four browser cases instead of repeating
-the entire suite for every concurrent task. It retains isolated build outputs,
-owned preview servers, browser artifacts and failure propagation. This is a
+the entire suite for every concurrent task. It keeps owned preview servers and failure
+propagation; builds and browser artifacts go under `.cache/runs/<id>/`, which
+`tools/clean-artifacts.sh` prunes. This is a
 smoke pass; the full suite remains required in CI. No test or assertion is
-removed, and the 16-shard CI workflow and `npm run ci` retain full discovery.
+removed, and the 30-shard CI workflow and `npm run ci` retain full discovery.
 
 Use `PW_PORT=4197 bash tools/gates.sh --full-e2e` for the full local gate set,
 including before a release push (Pages deploy does not wait for CI).
