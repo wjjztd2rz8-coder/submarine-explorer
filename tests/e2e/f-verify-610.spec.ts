@@ -18,7 +18,6 @@ const hudSelectors = [
   '.hud-notice',
   '.hud-objective',
   '.hud-prompt',
-  '.hud-control-tips',
   '.objectives-panel',
   '.scan-panel',
   '.onboard-card',

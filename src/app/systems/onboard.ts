@@ -302,7 +302,7 @@ export function createOnboardSystem(): GameSystem {
     if (tutorial.active) return;
     finishTutorial();
     creatureHint = false;
-    const guide = ctxRef?.controlsCard.device === 'touch' ? 'How to play' : 'Controls';
+    const guide = ctxRef?.controlsCard?.device === 'touch' ? 'How to play' : 'The Controls guide';
     chip?.show(`Nice work. ${guide} is always in the Pause menu.`);
   }
 }

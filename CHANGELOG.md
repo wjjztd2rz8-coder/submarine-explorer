@@ -14,6 +14,15 @@ without an entry here is not done.
 
 ### Changed
 
+- **S-flow (calmer first minutes; simplification review items 3, 5–8):**
+  - Home: one primary **Dive** button (first run opens the Titanic briefing, afterwards it continues the last mission). The disabled first-run Continue is removed; Dive sites and Free dive stay as the secondary way to choose a site. Reason: two clicks to the first dive.
+  - Pause menu: **Mission select** is removed (Quit to home reaches the same site list); How to play / Controls and Data credits stay. Reason: one site picker, fewer duplicate entries.
+  - Mission complete: the existing banner now shows the stars earned so far, and Keep exploring is the filled primary action. Completion still never ends the dive.
+  - Settings: the **Control tips** setting and the desktop control-tip footer (`.hud-control-tips`, its 12-second fade, the three-dive learning record `subexplorer.controlsLearned.v1` and `ControlsCard.compactTips`) are removed. How to play / Controls in Pause is the help. Saved `controlTips` is dropped on load and the settings file is rewritten once. Hull-warning style and the SFX slider are kept.
+  - HUD: the seabed status text row (nominal / seabed proximity / pressure high) is removed; the warning banner and hull gauge still report the same conditions. The Reset camera button is kept for now.
+  - Briefing: the start-position choice moved into the collapsed **Advanced** disclosure.
+  - Tutorial: five steps become three (move, rise/sink, completed scan). The Headlights and Photo/Journal steps are removed (the existing contextual hints cover lights and photo). The scan step still completes only on `scan:complete`, including a scan finished earlier. The tutorial card is hidden while a scan card is visible. The finish toast says "How to play" on touch.
+
 - **1392 narrow landscape follow-up:** restore Scan to the two right action columns so discovery rewards clear it, and place the small-phone tutorial in the centre lane below wrapped scan guidance and beside telemetry/actions. Reason: the 667×375 reward sweep exposed collisions beyond the Boost column.
 
 - **1392 landscape clearance:** the phone tutorial strip ends 8px before the right Boost column, using the same capped edge margin as the touch controls. Reason: the full regression found the strip covering Boost on 844×390 and 667×375 phones; portrait placement stays intact.

@@ -1,5 +1,6 @@
 import catalog from '../../data/landmarks/index.json' with { type: 'json' };
 import { expectCompactPhoneHud } from './helpers/phoneHud.js';
+import { setScanCardSuppressed } from './helpers/tutorial.js';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const dive = '/?tile=titanic&landmark=_test&poi=test-bow&skipBriefing=1&touch=1&tier=low';
@@ -122,7 +123,12 @@ for (const viewport of [
         const hud = ['.sonar', '.hud-readouts', '.scan-panel'];
         if (viewport.width < viewport.height)
           await expect(page.locator('.tc-rotate-hint')).toBeHidden();
-        await separate(page, [...hud, '.onboard-card', ...controls]);
+        // The tutorial defers to the scan card, so each is checked on its own.
+        await expect(page.locator('.onboard-card')).toBeHidden();
+        await separate(page, [...hud, ...controls]);
+        await setScanCardSuppressed(page, true);
+        const tutorialHud = hud.filter((selector) => selector !== '.scan-panel');
+        await separate(page, [...tutorialHud, '.onboard-card', ...controls]);
         for (const button of await page.locator('.d2-sonar-controls button:visible, .tc-btn').all())
           await reachable(button);
         await reachable(page.getByRole('button', { name: 'Skip', exact: true }));
@@ -132,19 +138,20 @@ for (const viewport of [
           viewport.width > viewport.height ? 120 : 96,
         );
         // Check every instruction: the last step is longer than the first.
-        for (const step of ['move', 'depth', 'lights', 'scan', 'journal']) {
+        for (const step of ['move', 'depth', 'scan']) {
           await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
           expect(
             await page.locator('.onboard-card').evaluate((e) => e.scrollWidth <= e.clientWidth),
           ).toBe(true);
-          await separate(page, [...hud, '.onboard-card', ...controls]);
+          await separate(page, [...tutorialHud, '.onboard-card', ...controls]);
           await expectCompactPhoneHud(page);
-          if (step !== 'journal') await page.locator('.onboard-skip-step').tap();
+          if (step !== 'scan') await page.locator('.onboard-skip-step').tap();
         }
         if (scale === 100)
           await page.screenshot({ path: testInfo.outputPath('tutorial-landscape.png') });
         await page.getByRole('button', { name: 'Skip', exact: true }).tap();
         await expect(page.locator('.onboard-card')).toBeHidden();
+        await setScanCardSuppressed(page, false);
         // The scan-range hint chip was retired (the scan panel covers it).
         await expect(page.locator('.onboard-hint')).toBeHidden();
         await page.evaluate(() => {
@@ -255,7 +262,7 @@ for (const viewport of [
               ),
             ),
         ).toEqual([
-          'Continue',
+          'Dive',
           'Dive sites',
           'Free dive',
           'Daily dive',

@@ -1,7 +1,8 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
-import { finishAnimations, holdFreshTips, processedFrames } from './helpers/hudTips.js';
+import { finishAnimations } from './helpers/hudTips.js';
+import { setScanCardSuppressed } from './helpers/tutorial.js';
 
 const shots = '.cache/codex/shots/f-hud-layout';
 const env =
@@ -12,10 +13,9 @@ const url = '/?tile=titanic&landmark=_test&poi=test-bow&skipBriefing=1&tier=low'
 async function boot(page: Page, touch: boolean): Promise<void> {
   await page.goto(url + (touch ? '&touch=1' : ''), { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
-  await holdFreshTips(page);
-  await expect(page.locator('.onboard-card')).toBeVisible();
+  // A contact is in range from the start, so its card is up and the tutorial waits.
   await expect(page.locator('.scan-panel')).toBeVisible();
-  await finishAnimations(page, '.onboard-card');
+  await expect(page.locator('.onboard-card')).toBeHidden();
 }
 
 async function shot(page: Page, name: string): Promise<void> {
@@ -66,12 +66,15 @@ for (const layout of [
       await boot(page, layout.touch);
       await shot(page, `${before ? 'before' : 'after'}-${layout.name}`);
       if (before) return; // Capture the unmodified game before applying the fix.
-      const selectors = ['.onboard-card', '.scan-panel', '.hud-readouts'];
-      if (layout.touch) {
-        await expect(page.locator('.hud-control-tips')).toBeHidden();
-        selectors.push('.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause');
-      } else selectors.push('.hud-control-tips', '.hud-reset-camera');
+      const selectors = ['.scan-panel', '.hud-readouts'];
+      if (layout.touch) selectors.push('.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause');
+      else selectors.push('.hud-reset-camera');
       await clearLayout(page, selectors);
+      // The tutorial is laid out on its own: it never shares the screen with the scan card.
+      await setScanCardSuppressed(page, true);
+      await finishAnimations(page, '.onboard-card');
+      const tutorialSelectors = ['.onboard-card', ...selectors.slice(1)];
+      await clearLayout(page, tutorialSelectors);
       for (const name of layout.name === 'phone-landscape'
         ? ['Skip']
         : ['Skip step', 'Skip tutorial']) {
@@ -79,15 +82,15 @@ for (const layout of [
         expect(box.width).toBeGreaterThanOrEqual(44);
         expect(box.height).toBeGreaterThanOrEqual(44);
       }
-      for (let step = 1; step < 5; step++) {
+      for (let step = 1; step < 3; step++) {
         const button = page.locator('.onboard-skip-step');
         if (layout.touch) await button.tap();
         else await button.click();
         await expect(page.locator('.onboard-card')).toHaveAttribute(
           'data-step',
-          ['move', 'depth', 'lights', 'scan', 'journal'][step],
+          ['move', 'depth', 'scan'][step],
         );
-        await clearLayout(page, selectors);
+        await clearLayout(page, tutorialSelectors);
       }
     });
   });
@@ -124,70 +127,11 @@ for (const layout of [
       );
       await expect(page.locator('.onboard-card')).toBeVisible();
       await expect(page.locator('.objectives-panel')).toBeVisible();
-      await holdFreshTips(page);
       await finishAnimations(page, '.onboard-card');
       await shot(page, `mission-${layout.name}`);
       const selectors = ['.onboard-card', '.objectives-panel', '.hud-readouts'];
       if (layout.touch) selectors.push('.tc-stick', '.tc-slider', '.tc-buttons');
-      else selectors.push('.hud-control-tips');
       await clearLayout(page, selectors);
     });
   });
 }
-
-test.describe('controls hint bar', () => {
-  test.use({ viewport: { width: 1280, height: 720 } });
-  test('hides after the first move, still records all controls, and stays in Help', async ({
-    page,
-  }) => {
-    await page.goto('/?mission=titanic&skipBriefing=1&tier=low');
-    await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
-    await holdFreshTips(page);
-    const tips = page.locator('.hud-control-tips');
-    await expect(tips).toBeVisible();
-    await page.keyboard.down('KeyW');
-    try {
-      await page.waitForFunction(
-        () => (window.__game as { cameraTips: { moved: boolean } }).cameraTips.moved,
-      );
-    } finally {
-      await page.keyboard.up('KeyW');
-    }
-    await expect(tips).toBeHidden();
-    expect(
-      await page.evaluate(
-        () => JSON.parse(localStorage.getItem('subexplorer.controlsLearned.v1')!).learned,
-      ),
-    ).toBe(false);
-    for (const key of ['KeyA', 'Space']) {
-      await page.keyboard.down(key);
-      await processedFrames(page);
-      await page.keyboard.up(key);
-    }
-    await expect(tips).toBeHidden();
-    expect(
-      await page.evaluate(
-        () => JSON.parse(localStorage.getItem('subexplorer.controlsLearned.v1')!).learned,
-      ),
-    ).toBe(true);
-    await page.keyboard.press('Escape');
-    await page.locator('.pause-menu').getByRole('button', { name: 'Controls' }).click();
-    await expect(page.getByRole('dialog', { name: 'Controls guide' })).toBeVisible();
-  });
-
-  test('the hint deadline expires without marking controls learned', async ({ page }) => {
-    await page.goto('/?tile=titanic&tier=low');
-    await page.waitForFunction(() => window.__gameReady === true);
-    await holdFreshTips(page);
-    await expect(page.locator('.hud-control-tips')).toBeVisible();
-    await page.evaluate(() => {
-      (window.__game as { cameraTips: { until: number } }).cameraTips.until = performance.now() - 1;
-    });
-    await expect(page.locator('.hud-control-tips')).toBeHidden();
-    expect(
-      await page.evaluate(
-        () => JSON.parse(localStorage.getItem('subexplorer.controlsLearned.v1')!).learned,
-      ),
-    ).toBe(false);
-  });
-});

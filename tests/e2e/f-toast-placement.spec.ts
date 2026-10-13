@@ -5,7 +5,7 @@ import { expect, test, type Page } from '@playwright/test';
 import type { Life } from '../../src/world/life/Life.js';
 import type { ScanOverlay } from '../../src/ui/ScanOverlay.js';
 import type { PerspectiveCamera, Vector3 } from 'three';
-import { finishAnimations, holdFreshTips } from './helpers/hudTips.js';
+import { finishAnimations } from './helpers/hudTips.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
 const shots = '.cache/codex/shots/550-f-toast-placement';
@@ -120,14 +120,14 @@ for (const layout of [
           );
         });
         await page.clock.runFor(34);
-        await holdFreshTips(page);
-        await finishAnimations(page, '.onboard-card');
         await expect(page.locator('.scan-panel')).toBeVisible();
+        // The tutorial card yields to the scan card, so only the scan card is laid out here.
+        await expect(page.locator('.onboard-card')).toBeHidden();
         const hud = ['.sonar', '.hud-readouts'];
         const controls = layout.touch
           ? ['.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause']
-          : ['.hud-control-tips', '.hud-reset-camera'];
-        await separate(page, [...hud, '.scan-panel', '.onboard-card', ...controls]);
+          : ['.hud-reset-camera'];
+        await separate(page, [...hud, '.scan-panel', ...controls]);
         await expect(page.locator('.onboard-hint')).toBeHidden();
 
         // Exercise the actual animal-hint trigger; hold a placed animal so

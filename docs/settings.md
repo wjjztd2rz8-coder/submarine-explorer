@@ -28,11 +28,10 @@ options), `Config.sonarPalettes`.
 | Captions          | immediately        | Text for every audio cue (`AudioSystem.captions`), bottom centre, live region.                                                                                                                                                                                     |
 | Sonar map colours | immediately        | `Sonar.setPalette`: sonar green, colour-blind safe blue-yellow, high contrast.                                                                                                                                                                                     |
 | UI scale (%)      | immediately        | Integer 80–150, default 100, adjustable by slider and step buttons with a separate readable value. Combines with an automatic viewport-based factor (`clamp(innerWidth/1920, 0.8, 1.25)`) through the `--ui-scale` CSS variable; does not resize the WebGL canvas. |
-| Control tips      | immediately        | Shows/hides the HUD's control-tip line (including the G-scan prompt and start-of-dive camera tips). Default on.                                                                                                                                                    |
 | Hull warning      | immediately        | Vignette, gauge or both (default). The gauge shows depth against the fitted hull rating; the vignette begins beyond that rating. Simulated crush is 10% deeper and triggers emergency ascent.                                                                      |
 
 **Reset settings** restores the defaults (Arcade gameplay mode, `uiScale`
-100, `controlTips` on, and the display settings above) and writes those defaults
+100, and the display settings above) and writes those defaults
 to v2 so an older v1 copy cannot be re-imported. When graphics tier, terrain detail, or default sim speed differs from
 its boot value, **Apply and reload** appears. It reloads the current URL,
 preserving the mission and query parameters. A `?tier=` URL override remains
@@ -106,7 +105,7 @@ actions.
 
 | Key                          | Owner                    | Shape                                                                                                                                                                                    |
 | ---------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `subexplorer.settings.v2`    | `core/Save.ts`           | `{ version: 2, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette, uiScale, controlTips, hullWarningStyle, gameplayMode, gameplay, bindings? }` |
+| `subexplorer.settings.v2`    | `core/Save.ts`           | `{ version: 2, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette, uiScale, hullWarningStyle, gameplayMode, gameplay, bindings? }` |
 | `subexplorer.bindings.v3`    | `core/Input.ts`          | `{ version: 3, keys: { <actionId>: string[] } }`, `[]` = deliberately unbound                                                                                                            |
 | `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | unchanged since Phase B                                                                                                                                                                  |
 | `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | photo-mode captures, newest 24 (see `docs/architecture.md`); separate from discoveries                                                                                                   |

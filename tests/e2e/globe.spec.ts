@@ -142,10 +142,11 @@ test.describe('globe mission select', () => {
     await page.keyboard.press('KeyN');
     await expect.poll(() => globeOpen(page)).toBe(false);
     await page.keyboard.press('Escape');
-    await page.locator('.pause-menu').getByRole('button', { name: 'Mission select' }).click();
+    // Closing the globe leaves Pause working; sites are chosen from Home (Quit to home).
+    await expect(page.locator('.pause-menu').getByRole('button', { name: 'Resume' })).toBeVisible();
     await expect(
-      page.locator('.pause-sites-scroll .mission-item.is-mission').first(),
-    ).toBeVisible();
+      page.locator('.pause-menu').getByRole('button', { name: 'Mission select' }),
+    ).toHaveCount(0);
 
     expect(errors).toEqual([]);
   });

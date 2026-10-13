@@ -35,9 +35,6 @@ export async function expectCompactPhoneHud(page: Page): Promise<void> {
     const speed = document
       .querySelector('[data-field="speed"]')!
       .parentElement!.getBoundingClientRect();
-    const status = document
-      .querySelector('[data-field="status"]')!
-      .parentElement!.getBoundingClientRect();
     const hull = document.querySelector('.hull-gauge')!.getBoundingClientRect();
     return {
       textHeight: text.getBoundingClientRect().height,
@@ -45,16 +42,14 @@ export async function expectCompactPhoneHud(page: Page): Promise<void> {
       clips: text.scrollWidth > text.clientWidth || text.scrollHeight > text.clientHeight,
       coversSub: x >= r.left && x <= r.right && y >= r.top && y <= r.bottom,
       depthSpeedOffset: Math.abs(depth.top - speed.top),
-      statusHullOffset: Math.abs(status.top - hull.top),
-      secondRowBelowFirst: status.top >= depth.bottom,
+      hullBelowFirstRow: hull.top >= depth.bottom,
     };
   });
   expect(metrics.textHeight).toBeLessThanOrEqual(metrics.lineHeight * 2);
   expect(metrics.clips).toBe(false);
   expect(metrics.coversSub, 'tutorial must clear the projected submarine centre').toBe(false);
   expect(metrics.depthSpeedOffset).toBeLessThanOrEqual(1);
-  expect(metrics.statusHullOffset).toBeLessThanOrEqual(3);
-  expect(metrics.secondRowBelowFirst).toBe(true);
+  expect(metrics.hullBelowFirstRow).toBe(true);
   if (await page.locator('.scan-panel').isVisible()) {
     // Dim cards describe a distant/logged contact; their waypoint still leads the approach.
     // An active scan prompt owns guidance and suppresses the duplicate edge readout.

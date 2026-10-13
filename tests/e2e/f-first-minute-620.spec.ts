@@ -104,7 +104,6 @@ for (let pass = 1; pass <= rounds; pass++) {
                 const selectors = [
                   '.onboard-card',
                   '.onboard-hint',
-                  '.hud-control-tips',
                   '.scan-panel',
                   '.objectives-panel',
                   '.obj-item.is-current',
@@ -175,7 +174,6 @@ for (let pass = 1; pass <= rounds; pass++) {
           }
           expect(errors).toEqual([]);
           if (round !== 'before') {
-            await expect(page.locator('.hud-control-tips')).toBeHidden();
             await expectObjectiveGuidance(page, layout.touch);
           }
         });
@@ -199,30 +197,17 @@ for (const layout of [
       serviceWorkers: 'block',
     });
 
-    test('idle guidance expires at twelve seconds and Controls remains available', async ({
-      page,
-    }) => {
+    test('Controls stays reachable from Pause while the tutorial is up', async ({ page }) => {
       await page.clock.install();
       await page.goto('/?mission=titanic&skipBriefing=1&tier=low');
       await ready(page);
-      const tips = page.locator('.hud-control-tips');
-      if (!layout.touch) await expect(tips).toBeVisible();
       await expectObjectiveGuidance(page, layout.touch);
-      const remaining = await page.evaluate(() => {
-        const g = window.__game as { cameraTips: { until: number; moved: boolean } };
-        return { ms: g.cameraTips.until - performance.now(), moved: g.cameraTips.moved };
-      });
-      expect(remaining.moved).toBe(false);
-      expect(remaining.ms).toBeGreaterThan(0);
-      expect(remaining.ms).toBeLessThanOrEqual(12_000);
-      await page.clock.fastForward(remaining.ms + 100);
-      await expect(tips).toBeHidden();
       expect(
         await page.evaluate(
           () => (window.__game as { cameraTips: { moved: boolean } }).cameraTips.moved,
         ),
       ).toBe(false);
-      // Expiry is not tutorial completion or a change of gameplay defaults.
+      // Pausing is not tutorial completion or a change of gameplay defaults.
       await expect(page.locator('.onboard-card')).toBeVisible();
       if (layout.touch) await page.locator('.tc-btn-pause').tap();
       else await page.keyboard.press('Escape');
@@ -236,9 +221,7 @@ for (const layout of [
       ).toBeVisible();
     });
 
-    test('animal hint and strip fade on the first actual move; scan stays separate', async ({
-      page,
-    }) => {
+    test('animal hint fades on the first actual move; scan stays separate', async ({ page }) => {
       await page.clock.install();
       await page.addInitScript(() => {
         localStorage.setItem(
@@ -297,7 +280,6 @@ for (const layout of [
       await page.screenshot({ path: `${shots}/checks/${layout.name}-wrapped-toast.png` });
       await hold(page, layout.touch, '.tc-stick', 'KeyW', 0);
       await expect(hint).toBeHidden();
-      await expect(page.locator('.hud-control-tips')).toBeHidden();
       await expect(page.locator('.scan-panel')).toBeVisible();
       await expectObjectiveGuidance(page, layout.touch);
       await page.screenshot({ path: `${shots}/checks/${layout.name}-after-move.png` });

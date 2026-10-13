@@ -1,4 +1,4 @@
-import { dismissTutorial } from './helpers/tutorial.js';
+import { dismissTutorial, setScanCardSuppressed } from './helpers/tutorial.js';
 import { expect, test, type Page } from '@playwright/test';
 
 const shots = '.cache/codex/shots/f-touch-stack';
@@ -19,25 +19,31 @@ for (const viewport of [
     test.use({ viewport, hasTouch: true, isMobile: true });
     const tag = `${viewport.width}x${viewport.height}`;
 
-    test('tutorial collapses to one line at its last step', async ({ page }) => {
+    test('tutorial stays one line at its last step and yields to the scan card', async ({
+      page,
+    }) => {
       await ready(page, tutorialUrl);
       const card = page.locator('.onboard-card');
-      for (const step of ['move', 'depth', 'lights', 'scan']) {
+      // A contact is in range from the start: its card owns the screen, the tutorial waits.
+      await expect(page.locator('.scan-panel')).toBeVisible();
+      await expect(card).toBeHidden();
+      await setScanCardSuppressed(page, true);
+      for (const step of ['move', 'depth']) {
         await expect(card).toHaveAttribute('data-step', step);
         await page.locator('.onboard-skip-step').tap();
       }
-      await expect(card).toHaveAttribute('data-step', 'journal');
-      await page.screenshot({ path: `${shots}/tutorial-journal-${tag}.png` });
+      await expect(card).toHaveAttribute('data-step', 'scan');
+      await page.screenshot({ path: `${shots}/tutorial-scan-${tag}.png` });
       const h = (await card.boundingBox())!.height;
       expect(h).toBeLessThanOrEqual(56);
-      // Scan card + tutorial leave the middle of the screen open.
-      const bottoms = await page.evaluate(() =>
-        ['.onboard-card', '.scan-panel']
-          .map((s) => document.querySelector(s)?.getBoundingClientRect())
-          .filter((r): r is DOMRect => !!r && r.height > 0)
-          .map((r) => r.bottom),
+      await setScanCardSuppressed(page, false);
+      await expect(card).toBeHidden();
+      await expect(page.locator('.scan-panel')).toBeVisible();
+      // The scan card alone leaves the middle of the screen open.
+      const bottom = await page.evaluate(
+        () => document.querySelector('.scan-panel')!.getBoundingClientRect().bottom,
       );
-      expect(Math.max(...bottoms)).toBeLessThan(viewport.height * 0.5 + 20);
+      expect(bottom).toBeLessThan(viewport.height * 0.5 + 20);
     });
 
     test('objective chip shows when no contact is in range', async ({ page }) => {

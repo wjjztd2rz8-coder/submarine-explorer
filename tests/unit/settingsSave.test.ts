@@ -250,7 +250,6 @@ describe('Phase D gameplay settings', () => {
       sonarPalette: 'highContrast',
       gameplayMode: 'arcade',
       uiScale: 100,
-      controlTips: true,
     });
     expect(store.getItem(SETTINGS_STORAGE_KEY)).toContain('"version":2');
     expect(store.getItem('subexplorer.settings.v1')).not.toBeNull();
@@ -270,8 +269,8 @@ describe('Phase D gameplay settings', () => {
     expect(save.get().gameplay.lights).toBe('enhanced');
     save.setGameplayMode('arcade');
     expect(save.get().gameplay).toEqual(config.settings.gameplayPresets.arcade);
-    save.save({ controlTips: false });
-    expect(save.get().controlTips).toBe(false);
+    save.save({ hullWarningStyle: 'gauge' });
+    expect(save.get().hullWarningStyle).toBe('gauge');
     expect(save.get().gameplayMode).toBe('arcade');
   });
 
@@ -291,8 +290,16 @@ describe('Phase D gameplay settings', () => {
       simSpeed: 1,
     });
     expect(custom.uiScale).toBe(150);
-    expect(custom.controlTips).toBe(true);
-    expect(migrate({ version: 2, controlTips: false }, config).controlTips).toBe(false);
+    // The retired Control tips key is dropped, not carried forward.
+    expect(migrate({ version: 2, controlTips: false }, config)).not.toHaveProperty('controlTips');
+    const retiredStore = new MemoryStore();
+    retiredStore.setItem(
+      SETTINGS_STORAGE_KEY,
+      JSON.stringify({ version: 2, controlTips: false, uiScale: 120 }),
+    );
+    const loaded = new Save({ config, storage: retiredStore });
+    expect(loaded.get().uiScale).toBe(120);
+    expect(retiredStore.getItem(SETTINGS_STORAGE_KEY)).not.toContain('controlTips');
     const named = migrate(
       { version: 2, gameplayMode: 'realistic', gameplay: { speedProfile: 'fast' } },
       config,

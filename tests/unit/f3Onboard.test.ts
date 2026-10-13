@@ -8,7 +8,7 @@ import {
 } from '../../src/game/Hints.js';
 import { TUTORIAL_STEPS, Tutorial } from '../../src/game/Tutorial.js';
 import { ONBOARD_STORAGE_KEY, TutorialSave, migrateOnboard } from '../../src/game/TutorialSave.js';
-import { compactTips, controlGroups } from '../../src/ui/ControlsCard.js';
+import { controlGroups } from '../../src/ui/ControlsCard.js';
 import { tutorialText } from '../../src/ui/TutorialCard.js';
 import type { SettingsStorage } from '../../src/core/Save.js';
 
@@ -138,8 +138,8 @@ describe('tutorial progression', () => {
   ) => {
     for (let i = 0; i < n; i += 1) t.update({ dt: 1 / 30, throttle: 0, yaw: 0, ballast: 0, ...s });
   };
-  it('has five steps in the documented order', () => {
-    expect(TUTORIAL_STEPS.map((s) => s.id)).toEqual(['move', 'depth', 'lights', 'scan', 'journal']);
+  it('has three steps in the documented order', () => {
+    expect(TUTORIAL_STEPS.map((s) => s.id)).toEqual(['move', 'depth', 'scan']);
   });
   it('move completes on sustained thrust alone, without turning', () => {
     const t = new Tutorial();
@@ -190,19 +190,20 @@ describe('tutorial progression', () => {
     }
     expect(t.step?.id).toBe('depth');
     hold(t, { ballast: -1 }, 30);
-    expect(t.step?.id).toBe('lights');
+    expect(t.step?.id).toBe('scan');
   });
   it('events only count for the step waiting for them', () => {
     const t = new Tutorial();
     expect(t.notify('scan:complete')).toBe(false);
     hold(t, { throttle: 1, yaw: 1 });
     hold(t, { ballast: -1 });
-    expect(t.step?.id).toBe('lights');
-    expect(t.notify('journal')).toBe(false);
-    expect(t.notify('lights')).toBe(true);
+    expect(t.step?.id).toBe('scan');
+    // Started and aborted scans track progress but never complete the step.
+    expect(t.notify('scan:started')).toBe(false);
+    expect(t.scanning).toBe(true);
+    expect(t.notify('scan:aborted')).toBe(false);
+    expect(t.step?.id).toBe('scan');
     expect(t.notify('scan:complete')).toBe(true);
-    expect(t.step?.id).toBe('journal');
-    expect(t.notify('photo')).toBe(true);
     expect(t.finished).toBe(true);
     expect(t.active).toBe(false);
     expect(t.step).toBeNull();
@@ -210,14 +211,11 @@ describe('tutorial progression', () => {
   it('events done out of order skip their step on arrival', () => {
     const t = new Tutorial();
     t.remember('scan:complete');
-    t.remember('lights');
     expect(t.step?.id).toBe('move'); // a scan during move does not advance it
     hold(t, { throttle: 1 });
     expect(t.step?.id).toBe('depth');
     hold(t, { ballast: -1 });
-    expect(t.step?.id).toBe('journal'); // lights and scan already done
-    expect(t.notify('photo')).toBe(true);
-    expect(t.finished).toBe(true);
+    expect(t.finished).toBe(true); // the scan already happened
   });
   it('skip step moves on; skip all ends it', () => {
     const t = new Tutorial();
@@ -225,7 +223,7 @@ describe('tutorial progression', () => {
     expect(t.index).toBe(1);
     t.skipAll();
     expect(t.active).toBe(false);
-    expect(t.notify('lights')).toBe(false);
+    expect(t.notify('scan:complete')).toBe(false);
   });
   it('writes text for every step on every device', () => {
     const keys = {
@@ -233,10 +231,7 @@ describe('tutorial progression', () => {
       turn: 'A or D',
       rise: 'Space',
       sink: 'Ctrl',
-      lights: 'L',
       scan: 'F',
-      photo: 'P',
-      journal: 'J',
     };
     for (const step of TUTORIAL_STEPS)
       for (const device of ['keyboard', 'gamepad', 'touch'] as const)
@@ -298,11 +293,5 @@ describe('controls layouts', () => {
     const text = JSON.stringify(controlGroups('touch', key as never));
     expect(text).toContain('SCAN');
     expect(text).not.toContain('Shift');
-  });
-  it('compact tips follow the device', () => {
-    expect(compactTips('touch', key as never, false)).toBeNull();
-    expect(compactTips('keyboard', key as never, false)).toContain('speed');
-    expect(compactTips('gamepad', key as never, false)).toContain('Left stick');
-    expect(compactTips('keyboard', key as never, true)).toContain('retrieve ROV');
   });
 });

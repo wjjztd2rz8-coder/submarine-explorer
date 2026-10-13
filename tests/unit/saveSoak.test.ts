@@ -74,7 +74,7 @@ describe('save schema soak', () => {
         sonarPalette: 'highContrast',
         masterVolume: 0.3,
       });
-      save.save({ controlTips: false });
+      save.save({ hullWarningStyle: 'gauge' });
       expect(new Save({ config: DEFAULT_CONFIG, storage }).get()).toEqual(save.get());
       if (key !== SETTINGS_STORAGE_KEY) expect(storage.getItem(key)).toBe(original);
     },

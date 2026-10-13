@@ -152,7 +152,7 @@ for (const layout of [
               await act(page.getByRole('button', { name: 'Skip', exact: true }));
               await page.clock.runFor(34);
               await expect(page.locator('.onboard-card-phone-text')).toHaveText(
-                'Tap LIGHTS to switch the headlights.',
+                'Face a glowing target; hold SCAN to finish.',
               );
             }
             await page.screenshot({ path: info.outputPath('opening.png') });

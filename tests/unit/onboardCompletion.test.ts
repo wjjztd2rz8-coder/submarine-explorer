@@ -67,8 +67,6 @@ function setup(seenHints: HintId[] = ['creature']) {
   vi.stubGlobal('window', new EventTarget());
   vi.stubGlobal('document', { documentElement: { dataset: {} } });
   const exposed: { onboard?: { tutorial: Tutorial; store: TutorialSave } } = {};
-  const headlights = { on: false };
-  const photos = { photos: [] as object[] };
   const ctx = {
     input: { actions: [], primaryKeyLabel: () => 'G', touchActive: false, gamepadActive: false },
     bus: new EventBus(),
@@ -83,9 +81,6 @@ function setup(seenHints: HintId[] = ['creature']) {
     props: { loaded: true },
     app: { state: 'dive' },
     photoMode: { active: false },
-    photos,
-    headlights,
-    journal: { isOpen: false },
     power: { state: { enabled: false } },
     cameraTips: { moved: false },
     life: { targets: [{}] },
@@ -105,13 +100,13 @@ function setup(seenHints: HintId[] = ['creature']) {
       } as FrameState,
       ctx,
     );
-  return { ctx, system, tick, onboard: exposed.onboard!, data, headlights, photos };
+  return { ctx, system, tick, onboard: exposed.onboard!, data };
 }
 
 describe('onboarding completion through the system', () => {
   for (const touch of [false, true]) {
     it(`remembers a completed scan before movement (${touch ? 'touch' : 'keyboard'})`, () => {
-      const { ctx, system, tick, onboard, headlights } = setup();
+      const { ctx, system, tick, onboard } = setup();
       ctx.input.touchActive = touch;
       try {
         ctx.bus.emit('scan:started', { poiId: 'opening-target' });
@@ -124,19 +119,14 @@ describe('onboarding completion through the system', () => {
         expect(onboard.tutorial.step?.id).toBe('move');
         tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
         expect(onboard.tutorial.step?.id).toBe('depth');
-        tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
-        expect(onboard.tutorial.step?.id).toBe('lights');
-        headlights.on = true;
-        tick();
-        expect(onboard.tutorial.step?.id).toBe('journal');
         expect(onboard.store.get().tutorialDone).toBe(false);
-        if (touch) Object.assign(ctx.app, { state: 'pause' });
-        Object.assign(ctx.journal, { isOpen: true });
-        tick();
+        tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
         expect(onboard.tutorial.finished).toBe(true);
         expect(onboard.store.get().tutorialDone).toBe(true);
         expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
-          'Nice work. The Controls guide is always in the Pause menu.',
+          touch
+            ? 'Nice work. How to play is always in the Pause menu.'
+            : 'Nice work. The Controls guide is always in the Pause menu.',
         );
       } finally {
         system.dispose?.();
@@ -144,29 +134,30 @@ describe('onboarding completion through the system', () => {
     });
   }
 
-  it('opening the Journal from home does not complete the dive tutorial', () => {
+  it('the tutorial card never shows alongside the scan card', () => {
     const { ctx, system, tick, onboard } = setup();
     try {
-      for (let i = 0; i < 4; i++) views.actions!.skipStep();
-      expect(onboard.tutorial.step?.id).toBe('journal');
-      Object.assign(ctx.app, { state: 'home' });
-      Object.assign(ctx.journal, { isOpen: true });
+      tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
+      tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
+      expect(onboard.tutorial.step?.id).toBe('scan');
+      Object.assign(ctx.discovery.overlay, { cardVisible: true });
       tick();
-      expect(onboard.tutorial.step?.id).toBe('journal');
-      expect(onboard.store.get().tutorialDone).toBe(false);
+      expect(views.card.show).toHaveBeenLastCalledWith(null);
+      expect(onboard.tutorial.step?.id).toBe('scan');
+      Object.assign(ctx.discovery.overlay, { cardVisible: false });
+      tick();
+      expect(views.card.show.mock.lastCall?.[0]).toBe(2);
     } finally {
       system.dispose?.();
     }
   });
 
   it('an unfinished early scan does not satisfy the later scan step', () => {
-    const { ctx, system, tick, onboard, headlights } = setup();
+    const { ctx, system, tick, onboard } = setup();
     try {
       ctx.bus.emit('scan:started', { poiId: 'opening-target' });
       tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
       tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
-      headlights.on = true;
-      tick();
       expect(onboard.tutorial.step?.id).toBe('scan');
       expect(onboard.store.get().tutorialDone).toBe(false);
     } finally {
@@ -175,7 +166,7 @@ describe('onboarding completion through the system', () => {
   });
 
   it('a new dive clears deferred scan completion', () => {
-    const { ctx, system, tick, onboard, headlights } = setup();
+    const { ctx, system, tick, onboard } = setup();
     try {
       ctx.bus.emit('scan:complete', {
         poiId: 'opening-target',
@@ -185,8 +176,6 @@ describe('onboarding completion through the system', () => {
       ctx.bus.emit('mission:started', { missionId: 'endurance', tileId: 'endurance' });
       tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
       tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
-      headlights.on = true;
-      tick();
       expect(onboard.tutorial.step?.id).toBe('scan');
     } finally {
       system.dispose?.();
@@ -427,7 +416,7 @@ describe('onboarding completion through the system', () => {
   it('Skip step shows completion only when the last step ends', () => {
     const { system, tick, onboard } = setup();
     try {
-      for (let index = 1; index < 5; index++) {
+      for (let index = 1; index < 3; index++) {
         views.actions!.skipStep();
         tick();
         expect(onboard.tutorial.index).toBe(index);
@@ -451,12 +440,10 @@ describe('onboarding completion through the system', () => {
   });
 
   it('normal input/event completion still shows the same toast once', () => {
-    const { ctx, system, tick, onboard, headlights, photos } = setup();
+    const { ctx, system, tick, onboard } = setup();
     try {
       tick({ throttle: 1, yaw: 1, ballast: 0 }, 1);
       tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
-      headlights.on = true;
-      tick();
       expect(onboard.tutorial.step?.id).toBe('scan');
       ctx.bus.emit('scan:started', { poiId: 'test' });
       expect(onboard.tutorial.step?.id).toBe('scan');
@@ -471,9 +458,6 @@ describe('onboarding completion through the system', () => {
       expect(views.card.show.mock.lastCall?.[1]).not.toContain('Scanning…');
       ctx.bus.emit('scan:started', { poiId: 'test' });
       ctx.bus.emit('scan:complete', { poiId: 'test', landmarkId: 'titanic', firstTime: true });
-      expect(onboard.tutorial.step?.id).toBe('journal');
-      photos.photos.push({});
-      tick();
       expect(onboard.tutorial.finished).toBe(true);
       expect(onboard.store.get().tutorialDone).toBe(true);
       expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(

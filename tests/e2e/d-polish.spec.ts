@@ -1,11 +1,10 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test } from './helpers/unlocked.js';
-import { holdFreshTips } from './helpers/hudTips.js';
 
 const shots = '.cache/codex/shots/d-polish';
 
-test('polished dive HUD keeps mission, telemetry, speed, live tips and the controls guide readable', async ({
+test('polished dive HUD keeps mission, telemetry, speed, and the controls guide readable', async ({
   page,
 }) => {
   await mkdir(shots, { recursive: true });
@@ -15,21 +14,17 @@ test('polished dive HUD keeps mission, telemetry, speed, live tips and the contr
   await page.waitForFunction(
     () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
-  await holdFreshTips(page);
   await expect(page.locator('.obj-item')).toHaveCount(4);
   await expect(page.locator('.obj-item.is-current')).toContainText('Head to the bow');
   await expect(page.locator('.obj-item.is-optional')).toHaveCount(2);
   await expect(page.locator('.obj-check')).toHaveText(['○', '○', '○', '○']);
   await expect(page.locator('.obj-hint')).not.toBeEmpty();
-  await expect(page.locator('.hud-control-tips')).toBeVisible();
-  await expect(page.locator('.hud-control-tips')).toContainText('W/S speed');
   const depthSize = await page
     .locator('.hud-value[data-field="depth"]')
     .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));
   expect(depthSize).toBeGreaterThanOrEqual(14);
   await page.screenshot({ path: `${shots}/near-site-start-titanic.png` });
   await page.locator('.objectives-panel').screenshot({ path: `${shots}/objectives-list.png` });
-  await page.locator('.hud-control-tips').screenshot({ path: `${shots}/control-tips.png` });
 
   await page.keyboard.press('t');
   await expect(page.locator('.hud-sim-speed')).toHaveText('2× SIM SPEED');
@@ -54,14 +49,6 @@ test('polished dive HUD keeps mission, telemetry, speed, live tips and the contr
   await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
   await page.screenshot({ path: `${shots}/hud-1920.png` });
 
-  await page.evaluate(() =>
-    (window.__game as { save: { save(value: { controlTips: boolean }): void } }).save.save({
-      controlTips: false,
-    }),
-  );
-  await expect(page.locator('.hud-control-tips')).toBeHidden();
-  await expect(page.locator('.hud-control-tips')).toBeEmpty();
-
   await page.keyboard.press('Escape');
   const controls = page
     .locator('.pause-menu')
@@ -78,18 +65,14 @@ test('polished dive HUD keeps mission, telemetry, speed, live tips and the contr
   await page.evaluate(() => {
     const g = window.__game as {
       input: { rebind(action: 'thrustForward', keys: string[]): boolean };
-      save: { save(value: { controlTips: boolean }): void };
     };
     if (!g.input.rebind('thrustForward', ['KeyI'])) throw new Error('Rebind failed');
-    g.save.save({ controlTips: true });
   });
   await controls.click();
   await expect(guide.locator('.controls-card-control').first()).toHaveText('I / S');
   await expect(guide).toContainText('Speed ahead and astern');
   await page.keyboard.press('Escape');
   await page.locator('.pause-menu').getByRole('button', { name: 'Resume', exact: true }).click();
-  await expect(page.locator('.hud-control-tips')).toBeVisible();
-  await expect(page.locator('.hud-control-tips')).toContainText('I/S speed');
 });
 
 test('a long objective list shows the current target and the next few', async ({ page }) => {

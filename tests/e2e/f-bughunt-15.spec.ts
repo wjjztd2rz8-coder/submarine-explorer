@@ -5,6 +5,7 @@ import type { CameraRig } from '../../src/sub/CameraRig.js';
 import type { HintEngine } from '../../src/game/Hints.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import type { Save } from '../../src/core/Save.js';
+import { setScanCardSuppressed } from './helpers/tutorial.js';
 
 const heroes = [
   { site: 'titanic', poi: 'titanic-bow' },
@@ -128,9 +129,10 @@ for (const viewport of [
               await page.evaluate(() => (window.__game as { save: Save }).save.get().uiScale),
             ).toBe(uiScale);
             if (phase === 'opening') {
-              const fresh = [...hud, '.onboard-card'];
-              if (await page.locator('.scan-panel').isVisible()) fresh.push('.scan-panel');
-              await separate(page, fresh);
+              // The tutorial card defers to the scan card, so only one of them is up.
+              const scanUp = await page.locator('.scan-panel').isVisible();
+              if (scanUp) await expect(page.locator('.onboard-card')).toBeHidden();
+              await separate(page, [...hud, scanUp ? '.scan-panel' : '.onboard-card']);
               await expect(page.locator('.hud-attribution')).toHaveCount(0);
               await page.screenshot({ path: testInfo.outputPath('arcade-opening.png') });
               return;
@@ -155,15 +157,16 @@ for (const viewport of [
                 !!(window.__game as { discovery: Discovery }).discovery.scanner.view.nearestInRange,
             );
             await expect(page.locator('.scan-panel')).toBeVisible();
-            await expect(page.locator('.hud-control-tips')).toBeHidden();
             await expect(page.locator('.hud-prompt')).toBeHidden();
             if (viewport.width < viewport.height)
               await expect(page.locator('.tc-rotate-hint')).toBeHidden();
-            for (const step of ['move', 'depth', 'lights', 'scan', 'journal']) {
+            // The scan card owns the instruction; the tutorial returns once it is out of the way.
+            await expect(page.locator('.onboard-card')).toBeHidden();
+            await setScanCardSuppressed(page, true);
+            for (const step of ['move', 'depth', 'scan']) {
               await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
-              if (phase === 'tutorial steps')
-                await separate(page, [...hud, '.onboard-card', '.scan-panel']);
-              if (step !== 'journal') {
+              if (phase === 'tutorial steps') await separate(page, [...hud, '.onboard-card']);
+              if (step !== 'scan') {
                 await page.locator('.onboard-skip-step').tap();
                 await page.clock.runFor(34);
               }
@@ -173,6 +176,8 @@ for (const viewport of [
               return;
             }
             await page.getByRole('button', { name: 'Skip', exact: true }).tap();
+            await page.clock.runFor(34);
+            await setScanCardSuppressed(page, false);
             await page.clock.runFor(34);
             await expect(page.locator('.onboard-card')).toBeHidden();
             await expect(page.locator('.scan-panel')).toBeVisible();
