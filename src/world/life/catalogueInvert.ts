@@ -198,7 +198,7 @@ export const INVERTEBRATES: SpeciesDef[] = [
     speed: [0.02, 0.12],
     maxCount: 36,
     scanRadius: 9,
-    look: { cA: 0xf1ece2, cB: 0xd8ad90 },
+    look: { cA: 0x8c8170, cB: 0x6e4d3a },
   }),
 
   // ---- rooted animals ----
@@ -304,7 +304,7 @@ export const INVERTEBRATES: SpeciesDef[] = [
     freq: 1.1,
     maxCount: 110,
     scanRadius: 9,
-    look: { cCol: 0xf2efe6, cTent: 0xfaf7ee },
+    look: { cCol: 0x98938a, cTent: 0xa8a399 },
   }),
   def({
     id: 'sea-lily',
