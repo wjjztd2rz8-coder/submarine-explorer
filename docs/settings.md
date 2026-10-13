@@ -103,14 +103,14 @@ actions.
 
 ## Storage
 
-| Key                          | Owner                    | Shape                                                                                                                                                                                    |
-| ---------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Key                          | Owner                    | Shape                                                                                                                                                                       |
+| ---------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `subexplorer.settings.v2`    | `core/Save.ts`           | `{ version: 2, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette, uiScale, hullWarningStyle, gameplayMode, gameplay, bindings? }` |
-| `subexplorer.bindings.v3`    | `core/Input.ts`          | `{ version: 3, keys: { <actionId>: string[] } }`, `[]` = deliberately unbound                                                                                                            |
-| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | unchanged since Phase B                                                                                                                                                                  |
-| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | photo-mode captures, newest 24 (see `docs/architecture.md`); separate from discoveries                                                                                                   |
-| `subexplorer.lastSite.v1`    | `main.ts`                | `{ missionId: string }`, written when a mission starts; drives the home screen's Continue button                                                                                         |
-| `subexplorer.tips.v1`        | `main.ts`                | `{ ctrlW: true }` once the one-time "Ctrl+W may close this tab" tip has been dismissed                                                                                                   |
+| `subexplorer.bindings.v3`    | `core/Input.ts`          | `{ version: 3, keys: { <actionId>: string[] } }`, `[]` = deliberately unbound                                                                                               |
+| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | unchanged since Phase B                                                                                                                                                     |
+| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | photo-mode captures, newest 24 (see `docs/architecture.md`); separate from discoveries                                                                                      |
+| `subexplorer.lastSite.v1`    | `main.ts`                | `{ missionId: string }`, written when a mission starts; drives the home screen's Continue button                                                                            |
+| `subexplorer.tips.v1`        | `main.ts`                | `{ ctrlW: true }` once the one-time "Ctrl+W may close this tab" tip has been dismissed                                                                                      |
 
 `bindings` in the settings record is only a pointer to the bindings key
 (`subexplorer.bindings.v3`). `Save.load` reads `subexplorer.settings.v2`

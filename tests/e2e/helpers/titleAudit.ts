@@ -66,7 +66,7 @@ export function titleAudit(base = '/') {
   test('title focus order, selectors and modal Escape return', async ({ page }) => {
     await boot(page, `${base}?tier=low`);
     const menu = page.locator('.home-menu');
-    await expect(menu.getByRole('button', { name: 'Dive sites', exact: true })).toBeFocused();
+    await expect(menu.getByRole('button', { name: 'Dive', exact: true })).toBeFocused();
     await trapped(page, '.home-menu');
     for (const entry of ['Dive sites', 'Free dive']) {
       for (const exit of ['Back to menu', 'Escape']) {
