@@ -72,8 +72,8 @@ Rejected 830 opening:
 
 ![Rejected 830: hard sand islands across a brown wall](../archive/progress-images/F-BLUEHOLE-910/rejected-830-opening.png)
 
-| Required pose | Before: clean 132858 desktop                                       | 910 after       |
-| ------------- | ------------------------------------------------------------------ | --------------- |
+| Required pose | Before: clean 132858 desktop                                                                  | 910 after       |
+| ------------- | --------------------------------------------------------------------------------------------- | --------------- |
 | Opening / rim | ![Before opening](../archive/progress-images/F-BLUEHOLE-910/great-blue-hole-1.png)            | Pending capture |
 | West approach | ![Before west approach](../archive/progress-images/F-BLUEHOLE-910/great-blue-hole-2.png)      | Pending capture |
 | West detail   | ![Before west detail](../archive/progress-images/F-BLUEHOLE-910/great-blue-hole-3.png)        | Pending capture |

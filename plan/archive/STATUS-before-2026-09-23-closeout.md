@@ -117,11 +117,11 @@ Contracts for the Phase B packages: `plan/PHASE-B-CONTRACTS.md`.
 
 ## Gates (measured 2026-09-22 by the docs pass)
 
-| Gate               | Result                                                                                                                                                              |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run build`    | green: `tsc` has zero errors and vite builds 65 modules. Main chunk is 732.7 kB (198.0 kB gzip), which trips vite's 500 kB chunk warning. Dist is 84 MB.            |
-| `npm test`         | green: 258 tests in 23 files                                                                                                                                        |
-| `npm run test:py`  | green: 42 tests                                                                                                                                                     |
+| Gate               | Result                                                                                                                                                                      |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run build`    | green: `tsc` has zero errors and vite builds 65 modules. Main chunk is 732.7 kB (198.0 kB gzip), which trips vite's 500 kB chunk warning. Dist is 84 MB.                    |
+| `npm test`         | green: 258 tests in 23 files                                                                                                                                                |
+| `npm run test:py`  | green: 42 tests                                                                                                                                                             |
 | `npm run test:e2e` | not run by the docs pass because the QA agent is using the ports. Specs: smoke (×2 tiles), atmosphere, sub-playtest, discovery, mission, props. See `plan/archive/QA-B.md`. |
 
 ## Known gaps

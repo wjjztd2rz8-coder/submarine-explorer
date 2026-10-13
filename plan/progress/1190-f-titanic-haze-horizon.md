@@ -39,8 +39,8 @@ built successfully but preview startup failed with
 runtime also reports `No browser is available`, with an empty browser list.
 No after image is fabricated or represented by an archival reference.
 
-| View                             | Before reference                                                                                    | After                 |
-| -------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------- |
+| View                             | Before reference                                                                                                               | After                 |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------- |
 | Titanic desktop 1600×900, High   | [Archival opening](../archive/progress-images/1190-f-titanic-haze-horizon/before-reference-titanic-desktop-high.png)           | Pending fresh capture |
 | Endurance desktop 1600×900, High | [Archival opening](../archive/progress-images/1190-f-titanic-haze-horizon/before-reference-endurance-desktop-high.png)         | Pending fresh capture |
 | Titanic portrait 390×844, Low    | [Earlier archival opening](../archive/progress-images/1190-f-titanic-haze-horizon/before-reference-titanic-portrait-low.png)   | Pending fresh capture |
