@@ -2,6 +2,14 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-13 22:10 targeted review (red CI, idle Claude, starved Codex)
+
+- **Cause of all three triggers:** one bug. `tools/resume.sh` exited 2 on every timer tick from about 09:00 to 21:15 (state hash over a missing `paused-packages.md` under pipefail), so nothing was collected for 12 h: ten finished Codex packages sat in their worktrees, Claude stayed at 100% and Codex ran dry. The fix (316a2a9) was already in place; the root cause and the visibility gap are in `plan/PROCESS-LOG.md`.
+- **Red CI:** the last three runs (8, 17 and 11 of 30 shards red) were software-GL timeouts plus the tutorial-under-scan-card regression (fixed in 28b4235). Codex 1610 moved continuous render guards and golden bisects to the nightly workflow (`@render` tag), clocked the event captions, and fixed cluster-chooser focus. Merged; hosted result will come from the push of 0a93b80 (brief 1700 reads it). No tag until it is green.
+- **Collected and merged (gates green per package, smoke + project-base; no full e2e):** 1610 hosted CI, 1620 S-verify (production ordering bug: scan objective is now chosen before the beam locks), 1630 S-bughunt, 1640 S-debrief, 1650-1670 S-render (scarp kinds, shared title scene, one hull-creak path), 1590 S-boot, 1580 S-modal and 1570 S-resolve. Two Sonnet agents resolved the conflicts of 1580 (shell/Globe/Journal/discovery) and 1570 (daily/power/saveSoak) keeping both sides' intent; Escape is now handled by the overlay stack. Pushed main 0a93b80.
+- **Queue refilled:** 1600 S-rewards, 1680 S-verify-2, 1690 S-bughunt-2, 1700 hosted-CI follow-up. Claude: S-guidance (Sonnet) in flight.
+- **Needs owner:** unchanged (real-phone play of the newest build).
+
 ## 2026-10-13 comprehensive review, joint with Sol (golden 2026-10-13-091650 vs 2026-10-11-201343)
 
 Both reviews ran independently; Sol saw my draft only at reconcile. I checked `beebe-vent-field-3`, `endurance-3`, `titanic-3`, `challenger-deep-1` myself and accepted Sol's calibration.
