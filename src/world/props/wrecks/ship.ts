@@ -84,6 +84,9 @@ export function edgePath(
   return out;
 }
 
+/** Titanic's rusticles are thick, clumped columns (the real ones reach arm's width). */
+export const HEAVY_RUSTICLES = 1.9;
+
 /** Rusticles along a polyline (a deck edge, a rail), hanging from just outboard of it. */
 export function rusticlesAlong(
   list: InstanceList,
@@ -93,6 +96,7 @@ export function rusticlesAlong(
   lenMax: number,
   rnd: () => number,
   outward?: THREE.Vector3 | ((p: THREE.Vector3) => THREE.Vector3),
+  girth = 1,
 ): void {
   // Rusticles gather in clumps under seams, rails and edges, with bare steel between.
   for (let i = 0; i < path.length - 1; i++) {
@@ -104,14 +108,14 @@ export function rusticlesAlong(
       const c = new THREE.Vector3().lerpVectors(a, b, rnd());
       const o = typeof outward === 'function' ? outward(c) : outward;
       const reach = lenMin + (lenMax - lenMin) * Math.pow(rnd(), 1.6);
-      const strands = 3 + Math.floor(rnd() * 6);
+      const strands = Math.round((3 + Math.floor(rnd() * 6)) * Math.sqrt(girth));
       for (let j = 0; j < strands; j++) {
         const p = c.clone();
         p.lerp(b, (rnd() - 0.5) * Math.min(0.6, 0.5 / Math.max(dist, 0.5)) * 2);
         if (o) p.addScaledVector(o, 0.06 + rnd() * 0.06);
         // Strands in a clump share a rough length; the odd one runs long.
         const len = reach * (0.35 + rnd() * 0.65) * (rnd() < 0.08 ? 1.6 : 1);
-        hangRusticle(list, p, len, rnd);
+        hangRusticle(list, p, len, rnd, girth);
       }
     }
   }
