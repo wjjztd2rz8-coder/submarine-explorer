@@ -390,13 +390,66 @@
 .home-screen.has-sites {
   background: radial-gradient(ellipse at 40% 40%, #0a2936 0%, var(--home-canvas) 60%, #020710 100%);
 }
-/* Portrait: a near full-width globe above the list; the card would not fit, so it is hidden. */
-.home-screen.has-sites .home-globe-wrap {
-  height: clamp(220px, min(100vw, 42dvh), 440px);
+/* Narrow screens: the globe fills the screen above a peeking sheet; swiping the sheet up lists the
+   sites over it. Desktop and sideways phones show the list beside the globe instead (below). */
+.home-sites-grab {
+  display: none;
 }
-@media (max-width: 959px) {
+@media (max-width: 959px) and (not ((min-aspect-ratio: 1/1) and (max-height: 500px))) {
+  .home-screen.has-sites {
+    --sheet-peek: calc(96px + var(--home-safe-b));
+  }
+  .home-screen.has-sites .home-globe-wrap {
+    position: absolute;
+    inset: 0 0 var(--sheet-peek);
+    height: auto;
+  }
   .home-screen.has-sites .home-globe-wrap .globe-card {
     display: none;
+  }
+  .home-screen.has-sites .home-sites {
+    position: fixed;
+    inset: auto 0 0;
+    height: min(72dvh, 600px);
+    padding-bottom: calc(16px + var(--home-safe-b));
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -8px 24px rgba(2, 7, 16, 0.5);
+    transition: transform 0.25s ease;
+  }
+  .home-screen.has-sites .home-sites.is-collapsed {
+    transform: translateY(calc(100% - var(--sheet-peek)));
+  }
+  .home-sites.is-collapsed .home-sites-scroll {
+    visibility: hidden;
+  }
+  .home-sites-grab {
+    display: block;
+    align-self: center;
+    width: 72px;
+    min-height: 24px;
+    margin: -12px 0 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    touch-action: none;
+  }
+  .home-sites-grab::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    margin: 10px auto;
+    border-radius: 2px;
+    background: var(--home-muted);
+  }
+  .home-sites-head {
+    touch-action: none;
+    user-select: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-screen.has-sites .home-sites {
+    transition: none;
   }
 }
 
@@ -568,14 +621,5 @@
   }
   .home-screen.has-sites .home-globe-wrap .globe-card {
     display: none;
-  }
-}
-/* Exceptionally short or zoomed: the globe preview gives way to a usable list. */
-@media (max-height: 360px) {
-  .home-screen.has-sites .home-globe-wrap {
-    display: none;
-  }
-  .home-screen.has-sites .home-sites {
-    grid-column: 1 / -1;
   }
 }

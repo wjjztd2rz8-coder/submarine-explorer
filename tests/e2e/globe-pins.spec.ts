@@ -135,9 +135,13 @@ test.describe('globe pins on touch', () => {
       .locator('.globe.is-embedded .globe-pin:not(.is-catalogue)')
       .evaluateAll((pins) => pins.map((p) => p.getBoundingClientRect().width));
     expect(sizes.length).toBeGreaterThan(0);
-    for (const w of sizes) expect(w).toBeGreaterThanOrEqual(44);
-    // The sites list stays on screen under the globe.
+    for (const w of sizes) expect(w).toBeGreaterThanOrEqual(43.99); // layout rounding
+    // The sites list is a sheet over the globe: collapsed it keeps its rows out of reach, and the
+    // grab bar opens it.
+    await expect(page.locator('.home-sites [data-mission="titanic"]')).toBeHidden();
+    await page.locator('.home-sites-grab').click();
     await expect(page.locator('.home-sites [data-mission="titanic"]')).toBeVisible();
+    await page.locator('.home-sites-grab').click();
 
     const pin = page
       .locator('.globe.is-embedded .globe-pin:not(.is-clustered):not(.is-back):not(.is-catalogue)')
