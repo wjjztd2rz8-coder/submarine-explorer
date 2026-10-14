@@ -90,10 +90,10 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 11. **S-daily [Haiku]:** shorter wording for the Daily Dive Home card, briefing and debrief (mechanics stay).
 12. **V-lander [Haiku, low]:** Challenger's white lander looks toy-like; add wear and colour.
 13. **S-manifest [Sonnet design, Codex migration]** (§5, §6b; S-resolve merged). Move each site's tuning into one typed `data/landmarks/<id>/site.json` with a validator (biome, opening and framing, atmosphere, sonar shading, low-tier framing, Beebe and Monterey configs, currents, secrets); remove the 26 site-id branches in shared code; merge `Spawn.ts` and `DeepOpeningSpawn.ts` into one framing solver; species literals to JSON. Guard with the golden set. Sonnet writes the schema and migrates one site first.
-14. **S-tests step 2 [Codex]** brief 1710 queued: fold HUD/touch, opening-framing and Journal/debrief specs into three table-driven capability specs (`plan/progress/S-tests-map.md`).
+14. **S-tests step 2 [Codex]** brief 1710 queued: fold HUD/touch, opening-framing and Journal/debrief specs into three table-driven capability specs (`plan/progress/S-tests-map.md`). DONE 2026-10-14 (ec1484c).
 15. **S-tests step 3 / hosted CI [Codex]** brief 1740 queued: hosted CI has been red on every push; 1700 repaired 54 test failures, main now carries S-guidance and S-rewards. Hosted CI green is a 1.0 requirement; tag `f53` only on green.
-16. **V-eight-sites tooling [Codex]** brief 1720 queued: commit SHA in golden manifest; mission-spawn and phone capture mode.
-17. **S-verify third pass [Codex]** brief 1730 queued: audit S-rewards (save v2 migration, cosmetics) and S-guidance (slot clears, no stale cards); remove leftover RP/upgrade wording; shorten the "PAUSE -> JOURNAL" reward line.
+16. **V-eight-sites tooling [Codex]** brief 1720 queued: commit SHA in golden manifest; mission-spawn and phone capture mode. DONE 2026-10-14 (d3b40a3; PNG capture and judging remain under V-eight-sites).
+17. **S-verify third pass [Codex]** brief 1730 queued: audit S-rewards (save v2 migration, cosmetics) and S-guidance (slot clears, no stale cards); remove leftover RP/upgrade wording; shorten the "PAUSE -> JOURNAL" reward line. DONE 2026-10-14 (a9171e9).
 18. **S-render remainder [Codex]** brief 1750 queued: validate the never-run nightly workflow, finish table-driving, one hull-creak path, golden pixels unchanged.
 19. **R-release [Haiku]:** after each green hosted CI run on main tag `f<N>` (`git tag f<N> && git push origin f<N>`) and check the Pages deploy. f53 is the next tag; f51 is the last.
 
