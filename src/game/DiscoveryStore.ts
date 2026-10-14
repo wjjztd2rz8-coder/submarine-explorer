@@ -139,7 +139,7 @@ export class DiscoveryStore {
   private data: DiscoveryData;
   private readonly storage: StorageLike | null;
   private readonly now: () => Date;
-  /** Set when the saved blob is from a newer build: we read nothing and never overwrite it. */
+  /** A newer or unreadable save must never be overwritten with session defaults. */
   readonly readOnly: boolean = false;
 
   /**
@@ -150,8 +150,13 @@ export class DiscoveryStore {
     this.storage = storage === undefined ? defaultStorage() : storage;
     this.now = now;
     let raw: unknown = null;
+    let text: string | null = null;
     try {
-      const text = this.storage?.getItem(DISCOVERY_STORAGE_KEY) ?? null;
+      text = this.storage?.getItem(DISCOVERY_STORAGE_KEY) ?? null;
+    } catch {
+      this.readOnly = true;
+    }
+    try {
       raw = text ? (JSON.parse(text) as unknown) : null;
     } catch {
       raw = null; // unreadable storage or corrupt JSON: start empty

@@ -66,6 +66,108 @@ describe('pointer look preference and lock decisions', () => {
 });
 
 describe('Input action map', () => {
+  it('combines simultaneous keyboard/touch/pad input and keeps held pad edges through a pause', () => {
+    const buttons = Array.from({ length: 16 }, () => ({ value: 0, pressed: false }));
+    const axes = [0.5, -0.7, 0, 0];
+    vi.stubGlobal('navigator', {
+      getGamepads: () => [{ connected: true, index: 0, axes, buttons }],
+    });
+    try {
+      const input = makeInput();
+      input.injectKey('KeyS', true);
+      input.injectKey('KeyA', true);
+      input.injectKey('KeyQ', true);
+      input.touchAxes.throttle = 0.4;
+      input.touchHeld.add('scan');
+      buttons[3] = { value: 1, pressed: true };
+      expect(input.sample()).toMatchObject({
+        throttle: 0.7,
+        yaw: 0.5,
+        scan: true,
+        toggleCamera: true,
+      });
+      input.clear(); // Pause clears pending keys/touch, while the pad remains held.
+      expect(input.sample()).toMatchObject({
+        throttle: 0.7,
+        yaw: 0.5,
+        scan: false,
+        toggleCamera: false,
+      });
+      buttons[3] = { value: 0, pressed: false };
+      input.sample();
+      buttons[3] = { value: 1, pressed: true };
+      expect(input.sample().toggleCamera).toBe(true);
+      input.endFrame();
+      axes[0] = axes[1] = 0;
+      input.injectKey('KeyS', true);
+      expect(input.sample().throttle).toBe(-1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it.each(['blur', 'visibilitychange', 'dispose'])('drops held and queued input on %s', (event) => {
+    const win = new EventTarget();
+    const doc = Object.assign(new EventTarget(), { hidden: true });
+    vi.stubGlobal('window', win);
+    vi.stubGlobal('document', doc);
+    const input = makeInput();
+    input.attach();
+    try {
+      input.injectKey('KeyW', true);
+      input.injectKey('KeyQ', true);
+      input.touchAxes.ballast = 1;
+      input.touchHeld.add('scan');
+      input.touchBoost = true;
+      input.touchLook(20, 10);
+      input.touchZoom(100);
+      if (event === 'dispose') input.dispose();
+      else (event === 'blur' ? win : doc).dispatchEvent(new Event(event));
+      expect(input.sample()).toMatchObject({
+        throttle: 0,
+        ballast: 0,
+        scan: false,
+        boost: false,
+        toggleCamera: false,
+        lookDx: 0,
+        lookDy: 0,
+      });
+      expect(input.wheelDelta).toBe(0);
+      input.injectKey('KeyW', true);
+      expect(input.sample().throttle).toBe(1);
+    } finally {
+      input.dispose();
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('attaches once and removes every listener before re-entry', () => {
+    const win = new EventTarget();
+    vi.stubGlobal('window', win);
+    const input = makeInput();
+    const key = () => {
+      const event = Object.assign(new Event('keydown'), { code: 'KeyW' });
+      Object.defineProperty(event, 'target', { value: { closest: () => null } });
+      win.dispatchEvent(event);
+    };
+    try {
+      input.attach();
+      input.attach();
+      input.dispose();
+      key();
+      expect(input.sample().throttle).toBe(0);
+      input.attach();
+      key();
+      expect(input.sample().throttle).toBe(1);
+      input.dispose();
+      key();
+      expect(input.sample().throttle).toBe(0);
+    } finally {
+      input.dispose();
+      vi.unstubAllGlobals();
+    }
+  });
+
   const padEdges = [
     [2, 'toggleLights'],
     [3, 'toggleCamera'],

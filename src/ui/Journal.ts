@@ -134,6 +134,7 @@ export class Journal {
   private readonly footer: HTMLDivElement;
   private readonly trap: FocusTrap;
   private readonly phoneMq: MediaQueryList | null;
+  private readonly onPhoneChange = (): void => this.refresh();
 
   private store: DiscoveryReader = NO_STORE;
   private sites: JournalSite[] = [];
@@ -213,7 +214,7 @@ export class Journal {
     this.trap = new FocusTrap(this.root);
     this.phoneMq = typeof window.matchMedia === 'function' ? window.matchMedia(PHONE_QUERY) : null;
     // Rotating a phone swaps the layout under an open Journal.
-    this.phoneMq?.addEventListener?.('change', () => this.refresh());
+    this.phoneMq?.addEventListener?.('change', this.onPhoneChange);
   }
 
   /** An icon character the screen reader skips (the button carries the label). */
@@ -1049,6 +1050,7 @@ export class Journal {
   }
 
   dispose(): void {
+    this.phoneMq?.removeEventListener?.('change', this.onPhoneChange);
     this.trap.deactivate();
     this.root.remove();
   }

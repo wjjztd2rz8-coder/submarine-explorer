@@ -21,7 +21,7 @@ import { currentsSystem } from './systems/currents.js';
 import { createLifeSystem } from './systems/life.js';
 import { discoverySystem } from './systems/discovery.js';
 import { hudSystem } from './systems/hud.js';
-import { inputSystem } from './systems/input.js';
+import { createInputSystem } from './systems/input.js';
 import { journalSystem } from './systems/journal.js';
 import { createOnboardSystem } from './systems/onboard.js';
 import { missionSystem } from './systems/mission.js';
@@ -69,7 +69,7 @@ export function createSystems(): GameSystem[] {
     shellSystem,
     globeSystem,
     // Input and the controls that need it.
-    inputSystem,
+    createInputSystem(),
     cameraControlsSystem,
     createPointerSystem(),
     createTouchSystem(),

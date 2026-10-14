@@ -19,7 +19,7 @@ export function completeDaily(record: DailyRecord, date: string): DailyRecord {
     lastCompletedDate: date,
     streak:
       record.lastCompletedDate && day(date) - day(record.lastCompletedDate) === 1
-        ? record.streak + 1
+        ? Math.min(Number.MAX_SAFE_INTEGER, record.streak + 1)
         : 1,
   };
 }
@@ -40,8 +40,15 @@ export class DailySave {
     } catch {
       this.storage = null;
     }
+    let text: string | null;
     try {
-      const raw: unknown = JSON.parse(this.storage?.getItem(DAILY_STORAGE_KEY) ?? 'null');
+      text = this.storage?.getItem(DAILY_STORAGE_KEY) ?? null;
+    } catch {
+      this.storage = null;
+      return;
+    }
+    try {
+      const raw: unknown = JSON.parse(text ?? 'null');
       if (!raw || typeof raw !== 'object') return;
       const value = raw as Record<string, unknown>;
       this.protectedVersion = typeof value.version === 'number' && value.version > 1;

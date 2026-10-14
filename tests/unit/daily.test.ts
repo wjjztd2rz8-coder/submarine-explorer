@@ -84,6 +84,34 @@ describe('Daily dive', () => {
   });
 });
 describe('Daily streak save', () => {
+  it('keeps a maximum saved streak readable after completing the next day', () => {
+    const map = new Map<string, string>([
+      [
+        DAILY_STORAGE_KEY,
+        JSON.stringify({
+          version: 1,
+          lastCompletedDate: '2026-10-01',
+          streak: Number.MAX_SAFE_INTEGER,
+        }),
+      ],
+    ]);
+    const storage = {
+      getItem: (key: string) => map.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        map.set(key, value);
+      },
+      removeItem: (key: string) => {
+        map.delete(key);
+      },
+    };
+    const save = new DailySave(storage);
+    save.complete('2026-10-02');
+    expect(new DailySave(storage).get()).toEqual({
+      version: 1,
+      lastCompletedDate: '2026-10-02',
+      streak: Number.MAX_SAFE_INTEGER,
+    });
+  });
   it('counts consecutive UTC dates once and resets after a gap', () => {
     const one = completeDaily({ version: 1, lastCompletedDate: null, streak: 0 }, '2026-09-30');
     const two = completeDaily(one, '2026-10-01');

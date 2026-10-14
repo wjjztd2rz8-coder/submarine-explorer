@@ -45,6 +45,11 @@ class Element extends EventTarget {
   appendChild(child: Element) {
     this.append(child);
   }
+  remove() {
+    if (this.parentElement)
+      this.parentElement.children = this.parentElement.children.filter((child) => child !== this);
+    this.parentElement = null;
+  }
   replaceChildren(...children: Element[]) {
     for (const child of this.children) child.parentElement = null;
     this.children = [];
@@ -115,7 +120,7 @@ function site(id: string): JournalSite {
 let journal: Journal;
 let root: Element;
 /** The phone-sheet media query, flipped per test. */
-const phoneQuery = { matches: false };
+const phoneQuery = Object.assign(new EventTarget(), { matches: false });
 const find = (predicate: (el: Element) => boolean): Element => {
   const el = descendants(root).find(predicate);
   expect(el).toBeDefined();
@@ -144,8 +149,22 @@ beforeEach(() => {
   journal.open();
 });
 afterEach(() => {
-  journal.close();
+  journal.dispose();
   vi.unstubAllGlobals();
+});
+
+it('removes the rotation listener before another Journal is created', () => {
+  const oldRefresh = vi.spyOn(journal, 'refresh');
+  journal.dispose();
+  const next = new Journal();
+  const refresh = vi.spyOn(next, 'refresh');
+  try {
+    phoneQuery.dispatchEvent(new Event('change'));
+    expect(oldRefresh).not.toHaveBeenCalled();
+    expect(refresh).toHaveBeenCalledOnce();
+  } finally {
+    next.dispose();
+  }
 });
 
 it('opens the current site and points of interest, keeping other sites/categories collapsed', () => {
