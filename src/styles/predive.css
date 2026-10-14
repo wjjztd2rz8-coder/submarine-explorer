@@ -523,8 +523,14 @@ html.is-touch .briefing .briefing-hint {
     align-self: start;
     border-top: 0;
   }
+  .briefing .mode-selector.is-briefing .mode-advanced-toggle {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    justify-self: start;
+  }
   .briefing .briefing-go {
     grid-template-columns: 1fr 1fr;
+    order: -1; /* Begin dive stays on top when Advanced opens below it. */
   }
   .briefing .briefing-go .briefing-begin {
     grid-column: 1 / -1;
