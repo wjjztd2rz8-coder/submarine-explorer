@@ -7,8 +7,6 @@ import type { SubmarineConfig } from './submarine.js';
 
 /** D-CURRENTS: controls for the attributed offline water field. */
 export interface CurrentsConfig {
-  /** Fraction of the full field used by the Gentle setting. */
-  gentleScale: number;
   /** The HUD hides flows below this speed (m/s). */
   hudMinMps: number;
   /** Predictive interval for guarding current impulses against terrain. */
@@ -18,18 +16,11 @@ export interface CurrentsConfig {
 }
 
 export interface GameplayOptions {
-  speedProfile: 'research' | 'standard' | 'fast';
-  lights: 'realistic' | 'enhanced';
-  sensors: 'realistic' | 'extended';
   /** In-world waypoint marker, edge arrow and in-range cue ("Visual waypoints"). */
   visualHints: boolean;
-  /** POI / objective / scanned icons on the sonar display (terrain relief always shows). */
-  sonarMarkers: boolean;
   startPosition: 'near-site' | 'surface';
   batteryOxygen: boolean;
-  currents: 'off' | 'gentle' | 'realistic' | 'exaggerated';
-  descentProfile: 'research' | 'standard' | 'fast';
-  simSpeed: 1 | 2 | 3;
+  currents: 'off' | 'realistic';
 }
 
 export type SpeedProfile = Pick<
@@ -41,7 +32,8 @@ export type SpeedProfile = Pick<
   | 'yawRate'
   | 'reverseAccel'
   | 'maxSpeed'
-> & { cruiseSpeed: number; cameraLookAheadPerSpeed: number };
+> &
+  DescentProfile & { cruiseSpeed: number; cameraLookAheadPerSpeed: number };
 export type DescentProfile = Pick<
   SubmarineConfig,
   'ballastAccel' | 'maxVerticalSpeed' | 'ballastHalfLife'
@@ -72,8 +64,11 @@ export interface PowerConfig {
   criticalThreshold: number;
 }
 
-export const DEFAULT_SPEED_PROFILES: Record<GameplayOptions['speedProfile'], SpeedProfile> = {
+export const DEFAULT_SPEED_PROFILES: Record<'research' | 'fast', SpeedProfile> = {
   research: {
+    ballastAccel: 0.18,
+    maxVerticalSpeed: 0.5,
+    ballastHalfLife: 0.7,
     cruiseSpeed: 1,
     maxSpeed: 1.4,
     thrustAccel: 0.25,
@@ -84,18 +79,10 @@ export const DEFAULT_SPEED_PROFILES: Record<GameplayOptions['speedProfile'], Spe
     reverseAccel: 0.14,
     cameraLookAheadPerSpeed: 12,
   },
-  standard: {
-    cruiseSpeed: 4,
-    maxSpeed: 6.8,
-    thrustAccel: 1.6,
-    boostMultiplier: 2.8,
-    dragLinear: 0.08,
-    dragQuadratic: 0.08,
-    yawRate: 0.4,
-    reverseAccel: 0.75,
-    cameraLookAheadPerSpeed: 8,
-  },
   fast: {
+    ballastAccel: 3,
+    maxVerticalSpeed: 8,
+    ballastHalfLife: 0.35,
     cruiseSpeed: 12,
     maxSpeed: 20.6,
     thrustAccel: 3,
@@ -108,13 +95,7 @@ export const DEFAULT_SPEED_PROFILES: Record<GameplayOptions['speedProfile'], Spe
   },
 };
 
-export const DEFAULT_DESCENT_PROFILES: Record<GameplayOptions['descentProfile'], DescentProfile> = {
-  research: { ballastAccel: 0.18, maxVerticalSpeed: 0.5, ballastHalfLife: 0.7 },
-  standard: { ballastAccel: 1.2, maxVerticalSpeed: 2.5, ballastHalfLife: 0.5 },
-  fast: { ballastAccel: 3, maxVerticalSpeed: 8, ballastHalfLife: 0.35 },
-};
-
-export const DEFAULT_LIGHT_PRESETS: Record<GameplayOptions['lights'], LightPreset> = {
+export const DEFAULT_LIGHT_PRESETS: Record<'realistic' | 'enhanced', LightPreset> = {
   realistic: {
     intensity: 500,
     distance: 2000,
@@ -133,7 +114,7 @@ export const DEFAULT_LIGHT_PRESETS: Record<GameplayOptions['lights'], LightPrese
   },
 };
 
-export const DEFAULT_SENSOR_PRESETS: Record<GameplayOptions['sensors'], SensorPreset> = {
+export const DEFAULT_SENSOR_PRESETS: Record<'realistic' | 'extended', SensorPreset> = {
   realistic: { scanRadiusMultiplier: 1, hintRangeMultiplier: 1, sonarPoiRange: 500 },
   extended: { scanRadiusMultiplier: 2, hintRangeMultiplier: 2, sonarPoiRange: 2000 },
 };
@@ -152,7 +133,6 @@ export const DEFAULT_POWER: PowerConfig = {
 
 // --- D-CURRENTS: the full field is the archived HYCOM sample. ---
 export const DEFAULT_CURRENTS: CurrentsConfig = {
-  gentleScale: 0.35,
   hudMinMps: 0.001,
   terrainLookaheadS: 0.5,
   terrainGuardM: 1,

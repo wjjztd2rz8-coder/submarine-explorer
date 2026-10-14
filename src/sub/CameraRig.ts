@@ -66,8 +66,12 @@ export class CameraRig {
   /** Mode the camera returns to when photo mode is switched off. */
   private modeBeforeOrbit: CameraMode = 'chase';
 
+  setConfig(config: CameraConfig): void {
+    this.config = config;
+  }
+
   constructor(
-    private readonly config: CameraConfig,
+    private config: CameraConfig,
     aspect: number,
     /** Optional: without it the camera simply does not collide with the seabed. */
     private readonly terrain: HeightField | null = null,

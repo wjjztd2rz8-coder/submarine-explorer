@@ -113,11 +113,7 @@ for (const site of sites) {
           if (!pose) continue;
           const sub = new Submarine(config.submarine, terrain);
           sub.setHullClass(hull);
-          const preset = config.settings.gameplayPresets.arcade;
-          sub.applyProfiles(
-            config.speedProfiles[preset.speedProfile],
-            config.descentProfiles[preset.descentProfile],
-          );
+          sub.setConfig({ ...config.submarine, ...config.speedProfiles.fast });
           sub.reset(pose.x, pose.y, pose.z, pose.yaw);
           // Reset accepts the authored angle; the first physics tick wraps it
           // into (-PI, PI]. Normalize with a zero-duration tick before measuring.
@@ -174,7 +170,7 @@ for (const site of sites) {
             scanner.setTargets(
               pois.map((p) => ({
                 ...p,
-                radius: p.radius * config.sensorPresets[preset.sensors].scanRadiusMultiplier,
+                radius: p.radius * config.sensorPresets.extended.scanRadiusMultiplier,
               })),
             );
             scanner.update(1 / 60, sub.position, sub.getForward(), false);

@@ -1,5 +1,4 @@
 import { EVENT_CAPTIONS } from './Events.js';
-import type { GameConfig, GameplayOptions } from '../core/Config.js';
 import { PROGRESS_CONFIG, UPGRADES, type UpgradeId } from '../core/config/progress.js';
 import { ProgressSave, type GameplayMode, type ProgressRecord } from '../core/Save.js';
 import {
@@ -186,55 +185,4 @@ export class Progress {
     this.save.save(this.data);
     for (const listener of this.listeners) listener();
   }
-}
-
-/** Reapply from a pristine baseline: purchases and mode changes never compound multipliers. */
-export function applyProgress(
-  config: GameConfig,
-  base: GameConfig,
-  progress: Progress,
-  gameplay: GameplayOptions,
-): void {
-  const factor = (id: UpgradeId) =>
-    1 + progress.level(id) * UPGRADES.find((u) => u.id === id)!.step;
-  for (const key of Object.keys(base.speedProfiles) as GameplayOptions['speedProfile'][]) {
-    const profile = base.speedProfiles[key];
-    config.speedProfiles[key] = {
-      ...profile,
-      thrustAccel: profile.thrustAccel * factor('thrust') ** 2,
-      maxSpeed: profile.maxSpeed * factor('thrust'),
-      cruiseSpeed: profile.cruiseSpeed * factor('thrust'),
-      yawRate: profile.yawRate * factor('turn'),
-      reverseAccel: profile.reverseAccel * factor('reverse'),
-    };
-  }
-  for (const key of Object.keys(base.lightPresets) as GameplayOptions['lights'][]) {
-    const light = base.lightPresets[key];
-    config.lightPresets[key] = {
-      ...light,
-      distance: light.distance * factor('light-range'),
-      angleDeg: light.angleDeg + progress.level('light-beam') * UPGRADES[1].step,
-    };
-  }
-  for (const key of Object.keys(base.sensorPresets) as GameplayOptions['sensors'][]) {
-    const sensor = base.sensorPresets[key];
-    config.sensorPresets[key] = {
-      ...sensor,
-      sonarPoiRange: sensor.sonarPoiRange * factor('sonar-range'),
-      scanRadiusMultiplier: sensor.scanRadiusMultiplier * factor('sonar-detail'),
-      hintRangeMultiplier: sensor.hintRangeMultiplier * factor('sonar-detail'),
-    };
-  }
-  Object.assign(config.power, base.power);
-  for (const key of [
-    'batteryIdleHours',
-    'batteryThrustHours',
-    'batteryLightsHours',
-    'batterySensorsHours',
-  ] as const)
-    config.power[key] *= factor('battery');
-  config.power.oxygenHours *= factor('oxygen');
-  config.power.boostCostMultiplier /= factor('boost');
-  Object.assign(config.submarine, config.speedProfiles[gameplay.speedProfile]);
-  config.scan.hintRangeFactor = base.scan.hintRangeFactor * factor('sonar-detail');
 }

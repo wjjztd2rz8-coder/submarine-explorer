@@ -26,7 +26,7 @@ async function speed(page: Page): Promise<number> {
   });
 }
 
-test('off, gentle and realistic scale the same offline canyon field', async ({ page }) => {
+test('off and realistic switches use the same offline canyon field', async ({ page }) => {
   await pauseClockBeforeNavigation(page);
   await mkdir(shots, { recursive: true });
   await mkdir('.cache/codex/shots/f2-modes', { recursive: true });
@@ -44,9 +44,9 @@ test('off, gentle and realistic scale the same offline canyon field', async ({ p
 
   await openSettings(page);
   const dialog = page.getByRole('dialog', { name: 'Settings' });
-  await expect(dialog.getByLabel('Currents')).toHaveValue('off');
+  await expect(dialog.getByLabel('Currents')).not.toBeChecked();
   await dialog.getByRole('radio', { name: 'Realistic' }).check();
-  await expect(dialog.getByLabel('Currents')).toHaveValue('realistic');
+  await expect(dialog.getByLabel('Currents')).toBeChecked();
   await page.clock.runFor(17);
   await dialog.screenshot({ path: `${shots}/settings-currents.png` });
   await closeSettings(page);
@@ -59,27 +59,17 @@ test('off, gentle and realistic scale the same offline canyon field', async ({ p
   await page.screenshot({ path: `${shots}/realistic.png` });
 
   await openSettings(page);
-  await page.evaluate(() =>
-    (
-      window.__game as { save: { setGameplayOption(key: string, value: string): void } }
-    ).save.setGameplayOption('currents', 'gentle'),
-  );
+  await dialog.getByLabel('Currents').uncheck();
+  await dialog.getByLabel('Currents').check();
   await expect(dialog.locator('.mode-custom-tag')).toBeVisible();
-  await expect.poll(async () => (await speed(page)) / full).toBeCloseTo(0.35, 1);
-  const gentle = await speed(page);
-  expect(gentle).toBeGreaterThan(0);
-  await dialog.getByLabel('Currents').selectOption('exaggerated');
-  await expect.poll(async () => (await speed(page)) / full).toBeCloseTo(8, 1);
-  await dialog.getByLabel('Currents').scrollIntoViewIfNeeded();
-  await page.clock.runFor(17);
-  await page.screenshot({ path: '.cache/codex/shots/f2-modes/exaggerated-currents.png' });
-  await dialog.getByLabel('Currents').selectOption('off');
+  await expect.poll(async () => (await speed(page)) / full).toBeCloseTo(1, 1);
+  await dialog.getByLabel('Currents').uncheck();
   expect(await speed(page)).toBe(0);
   await closeSettings(page);
   await expect(page.locator('.hud-current')).toBeHidden();
 
   await openSettings(page);
-  await dialog.getByLabel('Currents').selectOption('realistic');
+  await dialog.getByLabel('Currents').check();
   await closeSettings(page);
   await page.evaluate(() => {
     const sub = (
@@ -115,10 +105,7 @@ test('a missing offline grid gives zero flow and an honest HUD label', async ({ 
     () => (window.__game as { currents: { status: string } }).currents.status === 'missing',
   );
   await openSettings(page);
-  await page
-    .getByRole('dialog', { name: 'Settings' })
-    .getByLabel('Currents')
-    .selectOption('realistic');
+  await page.getByRole('dialog', { name: 'Settings' }).getByLabel('Currents').check();
   await closeSettings(page);
   expect(await speed(page)).toBe(0);
   await expect(page.locator('.hud-current')).toContainText('offline data unavailable');

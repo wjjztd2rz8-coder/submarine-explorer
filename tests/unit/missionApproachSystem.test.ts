@@ -1,3 +1,5 @@
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { defaultSettings } from '../../src/core/Save.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { afterEach, expect, it, vi } from 'vitest';
@@ -57,6 +59,7 @@ for (const mode of ['arcade', 'realistic'] as const) {
       meta: JSON.parse(readFileSync('data/tiles/titanic/meta.json', 'utf8')),
       terrain,
       config,
+      effective: resolveEffective(defaultSettings(config), mode, { upgrades: {} }, null, config),
       sub,
       props: { placed: [], collide: () => false },
       baseScanRadii: new Map([['titanic-bow', 200]]),
@@ -72,7 +75,7 @@ for (const mode of ['arcade', 'realistic'] as const) {
     missionSystem.init!(ctx);
     ctx.applyMissionStart!('near-site');
     expect(sub.position.distanceTo(target.position)).toBeCloseTo(220, 2);
-    const multiplier = config.sensorPresets[settings.gameplay.sensors].scanRadiusMultiplier;
+    const multiplier = ctx.effective.sensor.scanRadiusMultiplier;
     expect(target.radius).toBe(80 * multiplier);
     expect(ctx.baseScanRadii.get(target.id)).toBe(80);
     const draw = () =>

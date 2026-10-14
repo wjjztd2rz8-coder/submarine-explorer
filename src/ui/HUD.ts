@@ -1,3 +1,4 @@
+import type { CurrentMode } from '../core/config/modes.js';
 /**
  * DOM overlay HUD. Plain DOM on purpose -- no framework, and it never touches
  * the WebGL canvas, so it costs nothing per frame beyond a few textContent
@@ -7,7 +8,6 @@
 import type { TileMeta } from '../util/types.js';
 import type { SubmarineState } from '../sub/Submarine.js';
 import type { PowerState } from '../game/Power.js';
-import type { GameplayOptions } from '../core/Config.js';
 import type { CurrentStatus } from '../world/Currents.js';
 import type { HullWarningStyle } from '../core/Save.js';
 import { HullGauge } from './HullGauge.js';
@@ -107,7 +107,7 @@ export class HUD {
   private readonly resetCameraEl: HTMLButtonElement;
   private readonly powerEl: HTMLDivElement;
   private readonly currentEl: HTMLDivElement;
-  private currentMode: GameplayOptions['currents'] = 'off';
+  private currentMode: CurrentMode = 'off';
   private currentStatus: CurrentStatus = 'loading';
   private current = { dirDeg: 0, speedMps: 0 };
   private powerState: PowerState | undefined;
@@ -209,7 +209,7 @@ export class HUD {
     this.updateCurrent();
   }
 
-  setCurrentMode(mode: GameplayOptions['currents']): void {
+  setCurrentMode(mode: CurrentMode): void {
     this.currentMode = mode;
     this.updateCurrent();
   }

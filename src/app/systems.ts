@@ -44,7 +44,7 @@ import { landmarksSystem, terrainSystem } from './systems/world.js';
 /** A fresh list (systems with per-dive state are built by factories). */
 export function createSystems(): GameSystem[] {
   return [
-    // Research config must be applied before vehicles, power and sensors read it.
+    // Mission access is checked before vehicles and discovery initialise.
     createProgressSystem(),
     // World and vehicle, in scene-build order.
     terrainSystem,

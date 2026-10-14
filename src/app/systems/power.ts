@@ -17,8 +17,8 @@ export function createPowerSystem(): GameSystem {
     name: 'power',
     dispose: () => cleanup.dispose(),
     init(ctx) {
-      const { config, settings, bus, save, route, discovery } = ctx;
-      const power = new Power(config.power, settings.gameplay.batteryOxygen);
+      const { bus, route, discovery } = ctx;
+      const power = new Power(ctx.effective.power, ctx.effective.gameplay.batteryOxygen);
       ctx.power = power;
       cleanup.add(
         bus.on('mission:started', () => {
@@ -27,14 +27,10 @@ export function createPowerSystem(): GameSystem {
           // D2-HAZARD: the descent to a deep start already used some battery.
           void discovery.ready.then(() =>
             queueMicrotask(() => {
-              if (!save.get().gameplay.batteryOxygen || !route) return;
+              if (!ctx.effective.gameplay.batteryOxygen || !route) return;
               const depth = Math.max(0, -ctx.sub.position.y);
               if (depth < 25) return;
-              const reserve = startingReserves(
-                depth,
-                config.descentProfiles[save.get().gameplay.descentProfile],
-                config.power,
-              );
+              const reserve = startingReserves(depth, ctx.effective.submarine, ctx.effective.power);
               power.setLevels(reserve.battery, reserve.oxygen);
               ctx.hud.notice(
                 `Descent to ${Math.round(depth).toLocaleString('en-US')} m used ${Math.round((1 - reserve.battery) * 100)}% battery`,
@@ -43,10 +39,22 @@ export function createPowerSystem(): GameSystem {
           );
         }),
       );
-      cleanup.add(
-        save.onChange((next, changed) => {
-          if (changed.includes('gameplay')) power.setEnabled(next.gameplay.batteryOxygen);
-        }),
+      // The free-dive power debrief cannot be dismissed with Escape.
+      cleanup.listen(
+        window,
+        'keydown',
+        (event) => {
+          if (
+            event.code === 'Escape' &&
+            freeDivePowerDebriefShown &&
+            discovery.debrief.isOpen &&
+            !discovery.guide.isOpen
+          ) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        },
+        true,
       );
       ctx.expose({ power });
     },

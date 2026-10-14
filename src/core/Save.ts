@@ -10,9 +10,9 @@ import { PROGRESS_CONFIG, UPGRADES } from './config/progress.js';
 import { defaultCosmetics, sanitizeCosmetics, type CosmeticSelection } from '../game/Cosmetics.js';
 import type { EventBus } from './EventBus.js';
 
-export const SETTINGS_STORAGE_KEY = 'subexplorer.settings.v2';
-export const SETTINGS_VERSION = 2;
-const LEGACY_SETTINGS_KEY = 'subexplorer.settings.v1';
+export const SETTINGS_STORAGE_KEY = 'subexplorer.settings.v3';
+export const SETTINGS_VERSION = 3;
+const LEGACY_SETTINGS_KEYS = ['subexplorer.settings.v2', 'subexplorer.settings.v1'];
 export const SAVE_KEYS = {
   settings: SETTINGS_STORAGE_KEY,
   bindings: 'subexplorer.bindings.v3',
@@ -27,8 +27,6 @@ export interface SettingsValues {
   graphicsTier: GraphicsTierSetting;
   postFx: boolean;
   detailStrength: number;
-  /** Legacy display preference; gameplay.simSpeed controls the dive. */
-  simSpeedDefault: number;
   reduceMotion: boolean;
   captions: boolean;
   masterVolume: number;
@@ -40,11 +38,12 @@ export interface SettingsValues {
   /** How nearing the hull's rated depth is shown (never screen shake). */
   hullWarningStyle: HullWarningStyle;
   gameplayMode: GameplayMode;
+  gameplayBaseMode: Exclude<GameplayMode, 'custom'>;
   gameplay: GameplayOptions;
 }
 export type SettingKey = keyof SettingsValues;
 export interface SettingsData extends SettingsValues {
-  version: 2;
+  version: 3;
   bindings?: string;
 }
 export interface SettingsStorage {
@@ -64,7 +63,6 @@ const DISPLAY_KEYS = [
   'graphicsTier',
   'postFx',
   'detailStrength',
-  'simSpeedDefault',
   'reduceMotion',
   'captions',
   'masterVolume',
@@ -73,34 +71,31 @@ const DISPLAY_KEYS = [
   'muted',
   'sonarPalette',
 ] as const;
-const GAMEPLAY_KEYS = [
+const GAMEPLAY_KEYS = ['visualHints', 'startPosition', 'batteryOxygen', 'currents'] as const;
+const REMOVED_GAMEPLAY_KEYS = [
   'speedProfile',
+  'descentProfile',
   'lights',
   'sensors',
-  'visualHints',
   'sonarMarkers',
-  'startPosition',
-  'batteryOxygen',
-  'currents',
-  'descentProfile',
   'simSpeed',
-] as const;
+];
 export const SETTING_KEYS: readonly SettingKey[] = [
   ...DISPLAY_KEYS,
   'uiScale',
   'hullWarningStyle',
   'gameplayMode',
+  'gameplayBaseMode',
   'gameplay',
 ];
 
 export function defaultSettings(config: SettingsConfigSource): SettingsData {
   const d = config.settings.defaults;
   return {
-    version: 2,
+    version: 3,
     graphicsTier: config.graphicsTier,
     postFx: d.postFx,
     detailStrength: config.terrain.detailStrength,
-    simSpeedDefault: d.simSpeedDefault,
     reduceMotion: d.reduceMotion,
     captions: d.captions,
     masterVolume: config.audio?.masterVolume ?? DEFAULT_AUDIO.masterVolume,
@@ -111,6 +106,7 @@ export function defaultSettings(config: SettingsConfigSource): SettingsData {
     uiScale: 100,
     hullWarningStyle: 'both',
     gameplayMode: 'arcade',
+    gameplayBaseMode: 'arcade',
     gameplay: { ...config.settings.gameplayPresets.arcade },
     bindings: SAVE_KEYS.bindings,
   };
@@ -139,34 +135,42 @@ function sanitizeDisplay(
       return typeof value === 'number' && Number.isFinite(value)
         ? Math.min(config.settings.detailStrengthMax, Math.max(0, value))
         : fallback;
-    case 'simSpeedDefault':
-      return typeof value === 'number' && config.settings.simSpeedOptions.includes(value)
-        ? value
-        : fallback;
     case 'sonarPalette':
       return typeof value === 'string' && Object.hasOwn(config.sonarPalettes, value)
         ? value
         : fallback;
   }
 }
-function sanitizeGameplay(raw: unknown, config: SettingsConfigSource): GameplayOptions {
-  const fallback = config.settings.gameplayPresets.arcade;
+function sanitizeGameplay(
+  raw: unknown,
+  config: SettingsConfigSource,
+  baseMode: 'arcade' | 'realistic',
+): GameplayOptions {
+  const fallback = config.settings.gameplayPresets[baseMode];
   const source =
     raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
-  const result = { ...fallback };
+  const result = { ...source, ...fallback } as GameplayOptions;
+  for (const key of REMOVED_GAMEPLAY_KEYS)
+    delete (result as unknown as Record<string, unknown>)[key];
   for (const key of GAMEPLAY_KEYS) {
-    const value = source[key];
+    const value =
+      key === 'currents' && (source[key] === 'gentle' || source[key] === 'exaggerated')
+        ? 'realistic'
+        : source[key];
     const choices = config.settings.gameplayOptions[key] as readonly unknown[];
     if (choices.includes(value)) (result as unknown as Record<string, unknown>)[key] = value;
   }
   return result;
 }
-/** Sanitize v2, or translate a v1/v0 object into Arcade plus its display choices. */
+/** Preserve extensions while migrating known settings and retiring removed controls. */
 export function migrate(raw: unknown, config: SettingsConfigSource): SettingsData {
-  const out = defaultSettings(config);
+  let out = defaultSettings(config);
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
   const value = raw as Record<string, unknown>;
-  if (value.version !== undefined && ![0, 1, 2].includes(value.version as number)) return out;
+  if (value.version !== undefined && ![0, 1, 2, 3].includes(value.version as number)) return out;
+  out = { ...value, ...defaultSettings(config) };
+  delete (out as unknown as Record<string, unknown>).simSpeedDefault;
+  delete (out as unknown as Record<string, unknown>).controlTips;
   for (const key of DISPLAY_KEYS) {
     if (key in value)
       (out as unknown as Record<string, unknown>)[key] = sanitizeDisplay(
@@ -176,17 +180,31 @@ export function migrate(raw: unknown, config: SettingsConfigSource): SettingsDat
         config,
       );
   }
-  if (value.version === 2) {
+  out.gameplay = {
+    ...sanitizeGameplay(value.gameplay, config, 'arcade'),
+    ...config.settings.gameplayPresets.arcade,
+  };
+  if (value.version === 2 || value.version === 3) {
+    const legacy = value.gameplay as Record<string, unknown> | null;
+    out.gameplayBaseMode =
+      value.gameplayBaseMode === 'realistic' ||
+      (value.gameplayBaseMode === undefined && legacy?.speedProfile === 'research')
+        ? 'realistic'
+        : 'arcade';
     if (HULL_WARNING_STYLES.includes(value.hullWarningStyle as HullWarningStyle))
       out.hullWarningStyle = value.hullWarningStyle as HullWarningStyle;
     if (typeof value.uiScale === 'number' && Number.isFinite(value.uiScale))
       out.uiScale = Math.max(80, Math.min(150, Math.round(value.uiScale)));
     if (value.gameplayMode === 'arcade' || value.gameplayMode === 'realistic') {
       out.gameplayMode = value.gameplayMode;
-      out.gameplay = { ...config.settings.gameplayPresets[value.gameplayMode] };
+      out.gameplayBaseMode = value.gameplayMode;
+      out.gameplay = {
+        ...sanitizeGameplay(value.gameplay, config, value.gameplayMode),
+        ...config.settings.gameplayPresets[value.gameplayMode],
+      };
     } else if (value.gameplayMode === 'custom') {
       out.gameplayMode = 'custom';
-      out.gameplay = sanitizeGameplay(value.gameplay, config);
+      out.gameplay = sanitizeGameplay(value.gameplay, config, out.gameplayBaseMode);
     }
   }
   return out;
@@ -247,30 +265,34 @@ export class Save {
       );
     let recoveredLegacy = false;
     if (!this.readOnly && (!raw || typeof raw !== 'object' || Array.isArray(raw))) {
-      try {
-        const legacy = read(LEGACY_SETTINGS_KEY);
-        if (legacy) {
-          raw = JSON.parse(legacy);
-          recoveredLegacy = !!raw && typeof raw === 'object' && !Array.isArray(raw);
+      for (const key of LEGACY_SETTINGS_KEYS) {
+        try {
+          const legacy = read(key);
+          const candidate: unknown = legacy ? JSON.parse(legacy) : null;
+          if (candidate && typeof candidate === 'object' && !Array.isArray(candidate)) {
+            raw = candidate;
+            recoveredLegacy = true;
+            break;
+          }
+        } catch {
+          // Try the next older key when a legacy blob is damaged.
         }
-      } catch {
-        raw = null;
       }
       const legacyVersion = (raw as { version?: unknown } | null)?.version;
-      if (typeof legacyVersion === 'number' && legacyVersion > 1) {
+      if (typeof legacyVersion === 'number' && legacyVersion > SETTINGS_VERSION) {
         this.readOnly = true;
         this.reloadSafe_ = false;
       }
     }
     this.data = migrate(raw, this.config);
     if (this.storageReadFailed) this.reloadSafe_ = false;
-    // Rewrite once when a retired key (controlTips) is dropped, so it does not linger in storage.
-    const retired = !!raw && typeof raw === 'object' && 'controlTips' in (raw as object);
-    if ((absent || recoveredLegacy || retired) && !this.readOnly) this.persist();
+    const migrated =
+      version !== SETTINGS_VERSION || JSON.stringify(raw) !== JSON.stringify(this.data);
+    if ((absent || recoveredLegacy || migrated) && !this.readOnly) this.persist();
     return this.get();
   }
   get(): SettingsData {
-    return { ...this.data, gameplay: { ...this.data.gameplay } };
+    return structuredClone(this.data);
   }
   get reloadSafe(): boolean {
     return this.reloadSafe_;
@@ -286,10 +308,11 @@ export class Save {
     return this.commit({
       ...this.data,
       gameplayMode: mode,
+      gameplayBaseMode: mode === 'custom' ? this.data.gameplayBaseMode : mode,
       gameplay:
         mode === 'custom'
           ? { ...this.data.gameplay }
-          : { ...this.config.settings.gameplayPresets[mode] },
+          : { ...this.data.gameplay, ...this.config.settings.gameplayPresets[mode] },
     });
   }
   /** Editing even an unchanged option explicitly enters Custom mode. */
@@ -308,14 +331,26 @@ export class Save {
     const mode = partial.gameplayMode ?? (editingGameplay ? 'custom' : this.data.gameplayMode);
     const gameplay =
       partial.gameplayMode && partial.gameplayMode !== 'custom'
-        ? { ...this.config.settings.gameplayPresets[partial.gameplayMode] }
+        ? { ...this.data.gameplay, ...this.config.settings.gameplayPresets[partial.gameplayMode] }
         : { ...this.data.gameplay, ...partial.gameplay };
-    return this.commit({ ...this.data, ...partial, gameplayMode: mode, gameplay });
+    return this.commit({
+      ...this.data,
+      ...partial,
+      gameplayMode: mode,
+      gameplayBaseMode:
+        mode === 'custom' ? (partial.gameplayBaseMode ?? this.data.gameplayBaseMode) : mode,
+      gameplay,
+    });
   }
   reset(): SettingsData {
-    // Persist defaults in v2. Removing the key would re-import old v1 choices
+    // Persist defaults in v3. Removing the key would re-import old v1 choices
     // on the next launch while the legacy key is intentionally preserved.
-    return this.commit(defaultSettings(this.config));
+    const defaults = defaultSettings(this.config);
+    return this.commit({
+      ...this.data,
+      ...defaults,
+      gameplay: { ...this.data.gameplay, ...defaults.gameplay },
+    });
   }
   onChange(listener: SettingsListener): () => void {
     this.listeners.add(listener);

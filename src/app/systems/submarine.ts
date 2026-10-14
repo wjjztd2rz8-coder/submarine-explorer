@@ -23,7 +23,7 @@ export function createSubmarineSystem(): GameSystem {
     dispose: () => cleanup.dispose(),
     init(ctx) {
       const { config, terrain, meta, route, params, spawnDepth, settings, scene } = ctx;
-      const sub = new Submarine(config.submarine, terrain);
+      const sub = new Submarine(ctx.effective.submarine, terrain);
       ctx.sub = sub;
       // fix S: free-dive spawn (QA-B #3): over the tile centre, or the nearest
       // cell at least `minSpawnSeabedM` deep if the centre is a reef flat /
@@ -101,8 +101,7 @@ export function createSubmarineSystem(): GameSystem {
         );
       }
       ctx.contentLandmark = route?.landmarkId ?? landmarkIdFor(params, meta.id);
-      // C5 / D-MODES: sim speed from the gameplay options.
-      sub.setSimSpeed(settings.gameplay.simSpeed);
+      sub.setSimSpeed(1);
 
       const subMesh = new SubMesh({
         length: 26,

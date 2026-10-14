@@ -46,7 +46,7 @@ async function waitForZoom(page: Page): Promise<void> {
   });
 }
 
-test('visible sonar controls, expanded wheel routing, and live marker setting', async ({
+test('visible sonar controls, expanded wheel routing, and persistent markers across mode changes', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
@@ -76,16 +76,16 @@ test('visible sonar controls, expanded wheel routing, and live marker setting', 
   ).toBe(cameraRadius);
   await page.evaluate(() =>
     (
-      window.__game as { save: { setGameplayOption(key: 'sonarMarkers', value: boolean): void } }
-    ).save.setGameplayOption('sonarMarkers', false),
+      window.__game as { save: { setGameplayOption(key: 'visualHints', value: boolean): void } }
+    ).save.setGameplayOption('visualHints', false),
   );
-  await expect.poll(() => marker(page, 'titanic-bow')).toMatchObject({ visible: false });
-  await expect(sonar).toHaveClass(/d2-sonar-markers-hidden/);
-  await d2Shot(page, 'markers-off');
+  await expect.poll(() => marker(page, 'titanic-bow')).toMatchObject({ visible: true });
+  await expect(sonar).not.toHaveClass(/d2-sonar-markers-hidden/);
+  await d2Shot(page, 'waypoints-off');
   await page.evaluate(() =>
     (
-      window.__game as { save: { setGameplayOption(key: 'sonarMarkers', value: boolean): void } }
-    ).save.setGameplayOption('sonarMarkers', true),
+      window.__game as { save: { setGameplayOption(key: 'visualHints', value: boolean): void } }
+    ).save.setGameplayOption('visualHints', true),
   );
   await expect.poll(() => marker(page, 'titanic-bow')).toMatchObject({ visible: true });
 });
@@ -155,17 +155,17 @@ test('whole-tile step remains available and sensor range gates POIs', async ({ p
   await page.evaluate(() => {
     (
       window.__game as {
-        save: { setGameplayOption(key: 'sensors', value: 'realistic' | 'extended'): void };
+        save: { setGameplayMode(mode: 'realistic' | 'arcade'): void };
       }
-    ).save.setGameplayOption('sensors', 'realistic');
+    ).save.setGameplayMode('realistic');
   });
   await expect.poll(() => marker(page, 'titanic-stern')).toMatchObject({ visible: false });
   await page.evaluate(() => {
     (
       window.__game as {
-        save: { setGameplayOption(key: 'sensors', value: 'realistic' | 'extended'): void };
+        save: { setGameplayMode(mode: 'realistic' | 'arcade'): void };
       }
-    ).save.setGameplayOption('sensors', 'extended');
+    ).save.setGameplayMode('arcade');
   });
   await expect.poll(() => marker(page, 'titanic-stern')).toMatchObject({ visible: true });
   await shot(page, 'zoomed-out');

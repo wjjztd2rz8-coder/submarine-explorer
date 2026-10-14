@@ -82,11 +82,16 @@ describe('save schema soak', () => {
     },
   );
 
-  it.each([undefined, 0, 1, 2])(
+  it.each([undefined, 0, 1, 2, 3])(
     'round trips settings v%s without losing display choices',
     (version) => {
       const storage = new MemoryStorage();
-      const key = version === 2 ? SETTINGS_STORAGE_KEY : legacySettingsKey;
+      const key =
+        version === 3
+          ? SETTINGS_STORAGE_KEY
+          : version === 2
+            ? 'subexplorer.settings.v2'
+            : legacySettingsKey;
       const original = JSON.stringify({
         version,
         graphicsTier: 'low',
@@ -100,7 +105,7 @@ describe('save schema soak', () => {
       storage.setItem(key, original);
       const save = new Save({ config: DEFAULT_CONFIG, storage });
       expect(save.get()).toMatchObject({
-        version: 2,
+        version: 3,
         graphicsTier: 'low',
         postFx: false,
         captions: true,
@@ -426,4 +431,75 @@ describe('damaged localStorage recovery', () => {
       ratings: { titanic: 3 },
     });
   });
+});
+
+it('migrates every retired gameplay field through repeated edits and reloads while preserving unknown data', () => {
+  for (const mode of ['arcade', 'realistic', 'custom'] as const) {
+    for (const speedProfile of ['research', 'standard', 'fast']) {
+      for (const currents of ['off', 'gentle', 'realistic', 'exaggerated']) {
+        const storage = new MemoryStorage();
+        const legacy = JSON.stringify({
+          version: 2,
+          gameplayMode: mode,
+          simSpeedDefault: 3,
+          future: { nested: ['keep', 7] },
+          gameplay: {
+            speedProfile,
+            descentProfile: 'standard',
+            lights: 'enhanced',
+            sensors: 'extended',
+            sonarMarkers: false,
+            simSpeed: 3,
+            currents,
+            batteryOxygen: false,
+            visualHints: false,
+            startPosition: 'surface',
+            futureControl: { keep: true },
+          },
+        });
+        storage.setItem('subexplorer.settings.v2', legacy);
+        storage.setItem('unrelated', 'preserve');
+        let save = new Save({ config: DEFAULT_CONFIG, storage });
+        expect(save.get().version).toBe(3);
+        expect(save.get().gameplayBaseMode).toBe(
+          mode === 'custom' ? (speedProfile === 'research' ? 'realistic' : 'arcade') : mode,
+        );
+        expect(save.get().gameplay.currents).toBe(
+          mode === 'custom'
+            ? currents === 'off'
+              ? 'off'
+              : 'realistic'
+            : DEFAULT_CONFIG.settings.gameplayPresets[mode].currents,
+        );
+        const modeSequence = ['arcade', 'realistic', 'custom'] as const;
+        for (let i = 0; i < 30; i++) {
+          const data = save.get();
+          expect(data).toHaveProperty('future', { nested: ['keep', 7] });
+          expect(data.gameplay).toHaveProperty('futureControl', { keep: true });
+          expect(data).not.toHaveProperty('simSpeedDefault');
+          for (const key of [
+            'speedProfile',
+            'descentProfile',
+            'lights',
+            'sensors',
+            'sonarMarkers',
+            'simSpeed',
+          ])
+            expect(data.gameplay).not.toHaveProperty(key);
+          save.setGameplayOption('visualHints', i % 2 === 0);
+          save.save({ captions: i % 2 === 1 });
+          save.setGameplayMode(modeSequence[i % 3]);
+          const before = save.get();
+          save = new Save({ config: DEFAULT_CONFIG, storage });
+          expect(save.get()).toEqual(before);
+        }
+        save.reset();
+        expect(save.get()).toHaveProperty('future', { nested: ['keep', 7] });
+        expect(save.get().gameplay).toHaveProperty('futureControl', { keep: true });
+        expect(new Save({ config: DEFAULT_CONFIG, storage }).get()).toEqual(save.get());
+        expect(storage.getItem('subexplorer.settings.v2')).toBe(legacy);
+        expect(storage.getItem('unrelated')).toBe('preserve');
+      }
+    }
+  }
 });

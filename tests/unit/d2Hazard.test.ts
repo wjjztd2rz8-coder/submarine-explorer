@@ -67,20 +67,20 @@ describe('rated and crush depths', () => {
 
 describe('descent reserves', () => {
   it('starts full at the surface and uses active descent speed and the supply drain model', () => {
-    const { power, descentProfiles } = config;
-    expect(startingReserves(0, descentProfiles.research, power)).toEqual({
+    const { power, speedProfiles } = config;
+    expect(startingReserves(0, speedProfiles.research, power)).toEqual({
       battery: 1,
       oxygen: 1,
       descentSeconds: 0,
     });
-    const research = startingReserves(3800, descentProfiles.research, power);
-    const fast = startingReserves(3800, descentProfiles.fast, power);
+    const research = startingReserves(3800, speedProfiles.research, power);
+    const fast = startingReserves(3800, speedProfiles.fast, power);
     expect(research.descentSeconds).toBe(7600);
     expect(research.battery).toBeLessThan(fast.battery);
     expect(research.oxygen).toBeLessThan(fast.oxygen);
     expect(research.battery).toBeGreaterThan(0);
-    expect(startingReserves(10931, descentProfiles.research, power).battery).toBeGreaterThan(0);
-    const oneHour = startingReserves(1800, descentProfiles.research, power);
+    expect(startingReserves(10931, speedProfiles.research, power).battery).toBeGreaterThan(0);
+    const oneHour = startingReserves(1800, speedProfiles.research, power);
     expect(oneHour.battery).toBeCloseTo(
       1 -
         1.03 *
@@ -89,7 +89,7 @@ describe('descent reserves', () => {
             1 / power.batteryLightsHours),
     );
     expect(oneHour.oxygen).toBeCloseTo(1 - 1.03 / power.oxygenHours);
-    expect(startingReserves(100000, descentProfiles.research, power).battery).toBe(0);
+    expect(startingReserves(100000, speedProfiles.research, power).battery).toBe(0);
   });
 });
 

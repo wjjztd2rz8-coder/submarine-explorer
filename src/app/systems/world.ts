@@ -12,7 +12,11 @@ export const terrainSystem: GameSystem = {
   name: 'terrain',
   init(ctx) {
     const { tile, meta, config, tier, scene, bus } = ctx;
-    const terrain = new Terrain(tile, config.terrain, tier);
+    const terrain = new Terrain(
+      tile,
+      { ...config.terrain, detailStrength: ctx.settings.detailStrength },
+      tier,
+    );
     ctx.terrain = terrain;
     scene.add(terrain.group);
     bus.emit('terrain:built', {

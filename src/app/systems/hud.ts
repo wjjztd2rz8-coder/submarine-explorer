@@ -37,7 +37,7 @@ export const hudSystem: GameSystem = {
       }),
     );
     // D-CURRENTS: the current readout.
-    hud.setCurrentMode(settings.gameplay.currents);
+    hud.setCurrentMode(ctx.effective.currentMode);
     cleanup.add(bus.on('env:current', (current) => hud.setCurrent(current)));
   },
   frame: {

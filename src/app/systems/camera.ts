@@ -17,9 +17,13 @@ let noteControlUse: (s: { throttle: number; yaw: number; ballast: number }) => v
 export const cameraSystem: GameSystem = {
   name: 'camera',
   init(ctx) {
-    const { config, terrain, sub } = ctx;
+    const { terrain, sub } = ctx;
     // A3: the rig samples the terrain so the camera never clips below the seabed.
-    const rig = new CameraRig(config.camera, window.innerWidth / window.innerHeight, terrain);
+    const rig = new CameraRig(
+      ctx.effective.camera,
+      window.innerWidth / window.innerHeight,
+      terrain,
+    );
     rig.snap(sub.position, sub.yaw, sub.pitch);
     ctx.rig = rig;
     ctx.expose({ rig });

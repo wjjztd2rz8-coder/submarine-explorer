@@ -1,3 +1,7 @@
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { modesSystem } from '../../src/app/systems/modes.js';
+import { Progress } from '../../src/game/Progress.js';
+import { ProgressSave } from '../../src/core/Save.js';
 import { afterEach, expect, it, vi } from 'vitest';
 import { makeConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
@@ -18,21 +22,31 @@ it.each([
     const config = makeConfig();
     const save = new Save({ config, storage: null });
     save.setGameplayMode('realistic');
+    const progress = new Progress(new ProgressSave(null));
     const ctx = {
       config,
       save,
       settings: save.get(),
+      progress,
+      effective: resolveEffective(save.get(), 'realistic', progress.snapshot(), null, config),
+      daily: null,
+      rig: { setConfig: vi.fn() },
+      presets: { setCurrentMode: vi.fn() },
+      hud: { setCurrentMode: vi.fn() },
+      waypoints: { setVisualHints: vi.fn() },
       bus: new EventBus(),
       route: null,
-      discovery: {},
+      discovery: { ready: Promise.resolve(), pois: [], scanner: { setConfig: vi.fn() } },
       expose: vi.fn(),
-      sub: { simSpeed: 1, startEmergencyAscent: vi.fn() },
-      headlights: { on: true },
-      sonar: { visible: true },
+      sub: { simSpeed: 1, setConfig: vi.fn(), startEmergencyAscent: vi.fn() },
+      headlights: { on: true, setPreset: vi.fn() },
+      sonar: { visible: true, setSensorRange: vi.fn() },
     } as unknown as GameContext;
     const system = createPowerSystem();
     try {
       system.init?.(ctx);
+      modesSystem.init?.(ctx);
+      modesSystem.start?.(ctx);
       ctx.power.setLevels(battery, oxygen);
       save.setGameplayMode('arcade');
       const tick = system.frame!['sim.power']!;
@@ -47,6 +61,7 @@ it.each([
       tick(frame, ctx);
       expect(ctx.sub.startEmergencyAscent).toHaveBeenCalledOnce();
     } finally {
+      modesSystem.dispose?.();
       system.dispose?.();
     }
   },

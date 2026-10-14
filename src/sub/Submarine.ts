@@ -29,7 +29,7 @@
  */
 
 import * as THREE from 'three';
-import type { DescentProfile, SpeedProfile, SubmarineConfig } from '../core/Config.js';
+import type { SubmarineConfig } from '../core/Config.js';
 import type { InputState } from '../core/Input.js';
 
 /** The only thing the physics needs from the world. */
@@ -141,7 +141,7 @@ export class Submarine {
   private readonly tmp = new THREE.Vector3();
 
   constructor(
-    private readonly config: SubmarineConfig,
+    private config: SubmarineConfig,
     private readonly terrain: HeightField,
   ) {
     this.simSpeedIndex = clamp(
@@ -199,8 +199,8 @@ export class Submarine {
   }
 
   /** Change handling in place without resetting pose, velocity, or hull state. */
-  applyProfiles(speed: SpeedProfile, descent: DescentProfile): void {
-    Object.assign(this.config, speed, descent);
+  setConfig(config: SubmarineConfig): void {
+    this.config = config;
     this.velocity.y = clamp(
       this.velocity.y,
       -this.config.maxVerticalSpeed,

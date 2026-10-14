@@ -104,14 +104,10 @@ export interface SettingsConfig {
    */
   defaults: {
     postFx: boolean;
-    /** 0 = auto (free dive at 1x, missions at `mission.defaultSimSpeed`). */
-    simSpeedDefault: number;
     reduceMotion: boolean;
     captions: boolean;
     sonarPalette: SonarPaletteName;
   };
-  /** Choices offered for the default sim speed; 0 is "auto". */
-  simSpeedOptions: number[];
   /** Terrain detail slider range (0 = survey only, pure data). */
   detailStrengthMax: number;
   detailStrengthStep: number;
@@ -127,53 +123,33 @@ export interface SettingsConfig {
 export const DEFAULT_SETTINGS: SettingsConfig = {
   defaults: {
     postFx: true,
-    simSpeedDefault: 0,
     reduceMotion: false,
     captions: false,
     sonarPalette: 'default',
   },
-  simSpeedOptions: [0, 1, 2, 3],
   detailStrengthMax: 1.5,
   detailStrengthStep: 0.05,
   captionMaxLines: 2,
   captionMinDurationS: 1.5,
   gameplayPresets: {
     arcade: {
-      speedProfile: 'fast',
-      lights: 'enhanced',
-      sensors: 'extended',
       visualHints: true,
-      sonarMarkers: true,
       startPosition: 'near-site',
       batteryOxygen: false,
       currents: 'off',
-      descentProfile: 'fast',
-      simSpeed: 1,
     },
     realistic: {
-      speedProfile: 'research',
-      lights: 'realistic',
-      sensors: 'realistic',
       visualHints: false,
-      sonarMarkers: true,
       startPosition: 'near-site',
       batteryOxygen: true,
       currents: 'realistic',
-      descentProfile: 'research',
-      simSpeed: 1,
     },
   },
   gameplayOptions: {
-    speedProfile: ['research', 'standard', 'fast'],
-    lights: ['realistic', 'enhanced'],
-    sensors: ['realistic', 'extended'],
     visualHints: [false, true],
-    sonarMarkers: [false, true],
     startPosition: ['near-site', 'surface'],
     batteryOxygen: [false, true],
-    currents: ['off', 'gentle', 'realistic', 'exaggerated'],
-    descentProfile: ['research', 'standard', 'fast'],
-    simSpeed: [1, 2, 3],
+    currents: ['off', 'realistic'],
   },
 };
 

@@ -53,29 +53,24 @@ screen and starts a dive directly (see URL parameters).
 
 ### Modes: Arcade, Realistic, Custom
 
-Home, the mission briefing and Settings → Gameplay expose three modes, using the preset-plus-override
-approach (`Config.settings.gameplayPresets` in `src/core/Config.ts`). Picking
-Arcade or Realistic replaces every gameplay option at once; changing any single
-option afterwards (in either preset, or from scratch) switches the label to
-Custom and keeps the rest of your choices.
+Home, the mission briefing and Settings → Gameplay offer Arcade and Realistic.
+Advanced has four switches; editing one enters Custom and keeps the speed,
+lights and sensors of the last selected preset. Selecting a preset resets the
+four switches together.
 
-| Option           | Arcade (default)                         | Realistic                                | What it does                                                                                      |
-| ---------------- | ---------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Speed profile    | `fast` — up to ~40 kn (20.6 m/s) boosted | `research` — ~1–1.4 m/s, Alvin-like      | Cruise/boost speed, acceleration and drag; `fast` is a game capability, not a real cruising speed |
-| Descent profile  | `fast`                                   | `research`                               | Ballast (vertical) acceleration and speed cap                                                     |
-| Lights           | `enhanced` — brighter, wider, plus fill  | `realistic` — today's narrower spots     | Headlight intensity, distance and cone angle                                                      |
-| Sensors          | `extended` — 2× scan/sonar/hint range    | `realistic` — 1× (unmodified) range      | Scan radius, waypoint hint range, sonar POI pickup range                                          |
-| Visual waypoints | on                                       | off                                      | World-space waypoint, off-screen edge arrow and objective hint text                               |
-| Sonar markers    | on                                       | on                                       | POI, objective and scanned icons on sonar; seabed relief stays visible when off                   |
-| Start position   | near-site                                | near-site (surface is opt-in either way) | See Dives and objectives                                                                          |
-| Battery / oxygen | off                                      | on                                       | See Battery, oxygen and currents                                                                  |
-| Currents         | off                                      | `realistic` (full strength)              | See Battery, oxygen and currents                                                                  |
-| Sim speed        | 1×                                       | 1×                                       | Initial simulated-time rate at the start of a dive; `T` still cycles 1×/2×/3× in either mode      |
+| Setting                  | Arcade (default)                                      | Realistic                                                 | Custom                              |
+| ------------------------ | ----------------------------------------------------- | --------------------------------------------------------- | ----------------------------------- |
+| Speed, including descent | Fast: ~12 m/s cruise, 20.6 m/s boosted; 8 m/s descent | Research: ~1 m/s cruise, 1.4 m/s boosted; 0.5 m/s descent | Inherits the last selected preset   |
+| Lights / sensors         | Enhanced lights / extended sensors                    | Realistic lights / sensors                                | Inherits the last selected preset   |
+| Battery / oxygen         | Off                                                   | On                                                        | Switch                              |
+| Currents                 | Off                                                   | Full sampled strength                                     | Switch: off / full sampled strength |
+| Visual waypoints         | On                                                    | Off                                                       | Switch                              |
+| Start at surface         | Off (near site)                                       | Off (near site)                                           | Switch                              |
 
-Speed and descent numbers are simulated time at 1×; running at 2×/3× makes the
-same simulated motion play out faster per wall-clock second, it does not
-change the vehicle's own top speed. Display, accessibility and UI-scale
-settings are independent of the gameplay mode.
+Sonar markers are always available. Dives start at 1×; **T** and **D-pad Up**
+still cycle 1×/2×/3×. Speed and descent use simulated time: 2×/3× plays the
+same motion faster without changing the vehicle's top speed. Display,
+accessibility and UI-scale settings are independent of the gameplay mode.
 
 ## Dive sites
 
@@ -306,8 +301,8 @@ Realistic (independently switchable in Custom):
 - **Currents** (`docs/currents.md`) are an offline per-site vector field
   sampled once from an archived HYCOM ocean-model snapshot and checked into
   the repo — the game never calls out to a live ocean-data service. The
-  gameplay setting is off, gentle or realistic (Arcade is off, Realistic is
-  full sampled strength; gentle is 35% through Custom). Marine snow drifts
+  gameplay switch is off or full sampled strength (Arcade is off, Realistic is on).
+  Daily Strong currents uses its own multiplier. Marine snow drifts
   with the current.
 
 ## Hull depth

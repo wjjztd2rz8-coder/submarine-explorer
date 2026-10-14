@@ -47,9 +47,9 @@ export const missionSystem: GameSystem = {
   init(ctx) {
     approachOpening = false;
     const { route, params, discovery, meta, terrain, config, sub, rig, headlights, bus } = ctx;
-    const { settings, save } = ctx;
+    const { save } = ctx;
     let lastStart: typeof sub.position | null = null;
-    let lastChoice: MissionStartPosition = settings.gameplay.startPosition;
+    let lastChoice: MissionStartPosition = ctx.effective.gameplay.startPosition;
     const originalScanRadii = new Map<string, number>();
     // D2-PREDIVE: also used to preview the start behind the briefing, so Begin
     // resolves the same pose and the dive starts without a teleport.
@@ -57,7 +57,7 @@ export const missionSystem: GameSystem = {
       if (!route || params.has('poi') || params.has('at') || params.has('depth')) return;
       // Cap only mission primaries: Extended sensors must still leave a transit.
       approachOpening = choice === 'near-site';
-      const sensor = config.sensorPresets[save.get().gameplay.sensors];
+      const sensor = ctx.effective.sensor;
       for (const objective of route.def.objectives.filter((o) => o.primary)) {
         const poi = discovery.pois.find((p) => p.id === objective.poi);
         if (!poi) continue;
@@ -86,7 +86,7 @@ export const missionSystem: GameSystem = {
               ctx.props,
               spawnSettings(config),
               sub.getState().ratedDepth,
-              config.camera,
+              ctx.effective.camera,
             )
           : null;
       const pose =
@@ -155,7 +155,7 @@ export const missionSystem: GameSystem = {
           config,
           meta,
           discovery,
-          defaultStartPosition: settings.gameplay.startPosition,
+          defaultStartPosition: ctx.effective.gameplay.startPosition,
           applyStart: applyMissionStart,
           // D-FLOW: debrief "Dive sites" / "Home" go to the shell without launching a dive.
           onDiveSites: () => {

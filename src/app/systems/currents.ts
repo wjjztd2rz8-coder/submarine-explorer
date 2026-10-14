@@ -14,16 +14,9 @@ export const currentsSystem: GameSystem = {
   name: 'currents',
   dispose: () => cleanup.dispose(),
   init(ctx) {
-    const { meta, save } = ctx;
+    const { meta } = ctx;
     const currents = new Currents(meta.id, meta.id, fetchContentJson);
     ctx.currents = currents;
-    cleanup.add(
-      save.onChange((next, changed) => {
-        if (!changed.includes('gameplay')) return;
-        ctx.hud.setCurrentMode(next.gameplay.currents);
-        ctx.presets.setCurrentMode(next.gameplay.currents);
-      }),
-    );
     ctx.expose({ currents });
   },
   frame: {

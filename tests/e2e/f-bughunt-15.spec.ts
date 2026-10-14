@@ -108,7 +108,7 @@ for (const viewport of [
                 }),
               );
               localStorage.setItem(
-                'subexplorer.settings.v2',
+                'subexplorer.settings.v3',
                 JSON.stringify({ version: 2, uiScale, reduceMotion: true, graphicsTier: 'low' }),
               );
             }, uiScale);

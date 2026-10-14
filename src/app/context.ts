@@ -12,6 +12,7 @@
  * every system has initialised, as before F0).
  */
 
+import type { EffectiveSettings } from '../game/EffectiveSettings.js';
 import type { DailySave } from '../game/DailySave.js';
 import type { DailyDive } from '../game/Daily.js';
 import type { Progress } from '../game/Progress.js';
@@ -86,8 +87,7 @@ export interface BootContext {
   progress: Progress;
   /** Saved settings as they were at boot. */
   settings: SettingsData;
-  /** `config.scan.hintRangeFactor` before the sensor preset was applied. */
-  baseHintRangeFactor: number;
+  effective: EffectiveSettings;
   /** The graphics tier this dive runs at, and how it was chosen. */
   tier: GraphicsTier;
   quality: QualityResolution;

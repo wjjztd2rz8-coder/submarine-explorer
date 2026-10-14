@@ -24,7 +24,6 @@ export const settingsSystem: GameSystem<ShellContext, unknown> = {
       activeTier: tier,
       activeTierSetting: quality.setting,
       activeDetailStrength: settings.detailStrength,
-      activeSimSpeedDefault: settings.simSpeedDefault,
       tierFromUrl: quality.urlForced,
       canOpen: () => !ctx.globe.isOpen,
       onOpen: () => {

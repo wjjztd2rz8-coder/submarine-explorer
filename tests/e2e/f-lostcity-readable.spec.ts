@@ -140,7 +140,7 @@ for (const tier of ['low', 'medium', 'high']) {
 test('Lost City Realistic free dive retains the vent opening and camera arm', async ({ page }) => {
   await page.addInitScript(() =>
     localStorage.setItem(
-      'subexplorer.settings.v2',
+      'subexplorer.settings.v3',
       JSON.stringify({ version: 2, gameplayMode: 'realistic', graphicsTier: 'low' }),
     ),
   );

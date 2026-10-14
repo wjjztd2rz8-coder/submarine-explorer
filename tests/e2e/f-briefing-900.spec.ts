@@ -43,9 +43,8 @@ for (const mission of [titanic, blueHole]) {
       );
       await expect(briefing.getByRole('link', { name: 'Free dive', exact: true })).toBeVisible();
       // Start position sits in the collapsed Advanced panel: out of the role tree and the card face.
-      await expect(briefing.locator('.briefing-start')).toBeHidden();
-      await expect(briefing.locator('.briefing-start input[value="near-site"]')).toBeChecked();
-      await expect(briefing.locator('.briefing-start input[value="surface"]')).not.toBeChecked();
+      await expect(briefing.locator('input[data-gameplay="startPosition"]')).toBeHidden();
+      await expect(briefing.locator('input[data-gameplay="startPosition"]')).not.toBeChecked();
       await expect(briefing.getByRole('button', { name: 'Begin dive', exact: true })).toBeVisible();
 
       if (viewport.height > viewport.width || viewport.width === 1600) {

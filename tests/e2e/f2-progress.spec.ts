@@ -14,7 +14,7 @@ async function ready(page: Page): Promise<void> {
 async function realistic(page: Page): Promise<void> {
   await page.addInitScript(() =>
     localStorage.setItem(
-      'subexplorer.settings.v2',
+      'subexplorer.settings.v3',
       JSON.stringify({ version: 2, gameplayMode: 'realistic', graphicsTier: 'low' }),
     ),
   );

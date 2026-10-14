@@ -9,7 +9,8 @@ import { Globe } from '../../src/ui/Globe.js';
 import type { GlobeSite } from '../../src/ui/GlobeModel.js';
 import { Upgrades } from '../../src/ui/Upgrades.js';
 import { SettingsScreen } from '../../src/ui/Settings.js';
-import { Save } from '../../src/core/Save.js';
+import { Save, defaultSettings } from '../../src/core/Save.js';
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { Input } from '../../src/core/Input.js';
 import { Briefing } from '../../src/ui/Briefing.js';
 import { Debrief } from '../../src/ui/Debrief.js';
@@ -625,7 +626,6 @@ function settings() {
     config: DEFAULT_CONFIG,
     activeTier: 'low',
     activeDetailStrength: save.get().detailStrength,
-    activeSimSpeedDefault: save.get().simSpeedDefault,
   });
   cleanup.push(() => {
     screen.dispose();
@@ -844,6 +844,7 @@ describe('overlay policies across the app', () => {
         showDebrief: (extra: Partial<DebriefStats>, escape: null) =>
           debrief.show({ ...stats, ...extra }, undefined, undefined, escape),
       },
+      effective: resolveEffective(save.get(), save.get().gameplayMode, { upgrades: {} }, null),
       sub: { simSpeed: 1, startEmergencyAscent: vi.fn() },
       headlights: { on: false },
       sonar: { visible: false },
@@ -1106,6 +1107,7 @@ it('Discovery host disposal releases Journal/debrief ownership even with both op
   const ctx = {
     bus: new EventBus(),
     config: DEFAULT_CONFIG,
+    effective: resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', { upgrades: {} }, null),
     meta: { id: 'reef' },
     terrain: { sampleHeight: () => -100 },
     contentLandmark: 'reef',

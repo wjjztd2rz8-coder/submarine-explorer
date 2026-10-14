@@ -56,7 +56,7 @@ export const propsSystem: GameSystem = {
           props,
           spawnSettings(config),
           sub.getState().ratedDepth,
-          config.camera,
+          ctx.effective.camera,
           ctx.settings.gameplayMode,
         );
         if (pose) {

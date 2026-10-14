@@ -33,12 +33,11 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
   await dialog.screenshot({ path: `${shots}/arcade-settings.png` });
   await dialog.getByRole('button', { name: 'Advanced' }).click();
   await dialog.getByRole('radio', { name: 'Realistic' }).check();
-  await expect(dialog.getByLabel('Forward speed')).toHaveValue('research');
-  await expect(dialog.getByLabel('Lights', { exact: true })).toHaveValue('realistic');
+  await expect(dialog.getByRole('switch')).toHaveCount(4);
   await dialog.screenshot({ path: `${shots}/realistic-settings.png` });
   const realistic = await page.evaluate(() => {
     const game = window.__game as {
-      config: {
+      effective: {
         submarine: { maxSpeed: number; maxVerticalSpeed: number };
         scan: { hintRangeFactor: number };
       };
@@ -46,8 +45,8 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
       discovery: { pois: Array<{ id: string; radius: number }> };
     };
     return {
-      forwardCap: game.config.submarine.maxSpeed,
-      descentCap: game.config.submarine.maxVerticalSpeed,
+      forwardCap: game.effective.submarine.maxSpeed,
+      descentCap: game.effective.submarine.maxVerticalSpeed,
       light: game.headlights.lights[0]!.intensity,
       fill: game.headlights.fill.intensity,
       scanRadius: game.discovery.pois.find((poi) => poi.id === 'titanic-bow')!.radius,
@@ -60,9 +59,8 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
     fill: 12,
     scanRadius: 200,
   });
-  await dialog.getByLabel('Lights', { exact: true }).selectOption('enhanced');
+  await dialog.getByLabel('Visual waypoints', { exact: true }).check();
   await expect(dialog.locator('.mode-custom-tag')).toBeVisible();
-  await expect(dialog.getByLabel('Forward speed')).toHaveValue('research');
   await page.keyboard.press('Escape');
   await page.keyboard.press('Escape'); // resume from the pause menu
   await page.screenshot({ path: `${shots}/enhanced-lights.png` });
@@ -72,13 +70,13 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
   await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
   await expect(dialog.locator('.mode-custom-tag')).toBeVisible();
   await dialog.getByRole('button', { name: 'Advanced' }).click();
-  await expect(dialog.getByLabel('Lights', { exact: true })).toHaveValue('enhanced');
-  await expect(dialog.getByLabel('Forward speed')).toHaveValue('research');
+  await expect(dialog.getByLabel('Visual waypoints', { exact: true })).toBeChecked();
 });
 
 test('v1 settings migrate to Arcade while keeping display choices', async ({ page }) => {
   await page.goto('/?tile=titanic');
   await page.evaluate(() => {
+    localStorage.removeItem('subexplorer.settings.v3');
     localStorage.removeItem('subexplorer.settings.v2');
     localStorage.setItem(
       'subexplorer.settings.v1',
@@ -97,15 +95,14 @@ test('v1 settings migrate to Arcade while keeping display choices', async ({ pag
   await page.reload();
   await page.waitForFunction(() => window.__gameReady === true);
   const migrated = await page.evaluate(() => ({
-    current: JSON.parse(localStorage.getItem('subexplorer.settings.v2')!),
+    current: JSON.parse(localStorage.getItem('subexplorer.settings.v3')!),
     legacy: localStorage.getItem('subexplorer.settings.v1'),
   }));
   expect(migrated.current).toMatchObject({
-    version: 2,
+    version: 3,
     graphicsTier: 'low',
     postFx: false,
     detailStrength: 0.5,
-    simSpeedDefault: 3,
     reduceMotion: true,
     captions: true,
     sonarPalette: 'highContrast',

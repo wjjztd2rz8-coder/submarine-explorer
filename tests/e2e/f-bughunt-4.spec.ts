@@ -58,7 +58,7 @@ for (const layout of [
     test('thrust and boost have separate touch targets', async ({ page }) => {
       await page.addInitScript((scale) => {
         localStorage.setItem(
-          'subexplorer.settings.v2',
+          'subexplorer.settings.v3',
           JSON.stringify({ version: 2, uiScale: scale, graphicsTier: 'low' }),
         );
       }, layout.scale);

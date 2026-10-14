@@ -1,0 +1,38 @@
+# S-resolve — effective settings integration
+
+Backlog ID: **S-resolve** (the current Director backlog lists it at item 12; the brief referred to item 11). Work is limited to this item. The pure foundation is absent both in this checkout and on main. The held first-stage brief was located in the primary checkout at `/home/vijay/submarine-explorer/.cache/codex/queue/hold/1520-S-resolve-pure-settings.md` and read as foundation reference; this authorized integration completes its runtime, Custom and migration remainder. No changes to `plan/DIRECTOR.md` or `tools/`.
+
+## Changes
+
+- Added pure `resolveEffective(settings, mode, progress, daily)`, with an optional pristine tuning source for Config overrides. It derives handling (forward speed and descent together), camera look-ahead, scan hints/radii, light/sensor presets, supply rates, boost capacity and currents. Frozen-input tests check purity and repeated resolution.
+- Boot computes effective settings after saved progress and the Daily route load. One live path recomputes after gameplay/mode changes and equipment purchases. Submarine, CameraRig, Scanner and Power replace their config references. Removed boot config mutation, `applyProgress`, live profile-map mutation and separate Daily enforcement listeners. Terrain also receives its saved display preference without mutating Config.
+- Custom replaces ten selects with four native switches: battery/oxygen, currents, visual waypoints and start at surface. Home, Settings and briefing share them; the briefing's duplicate start radio group is removed. Custom remembers the last preset through `gameplayBaseMode`, and the existing description explains inherited speed/lights/sensors.
+- Removed the Standard speed tier, separate descent profile/map, light/sensor choices, sonar-marker preference, both simulation-speed preferences and Gentle/Exaggerated current choices. Sonar markers remain enabled; T and D-pad Up still cycle simulation speed. Daily Strong currents retains its multiplier and Low light retains its lamp preset through purchases and live changes.
+- Mission-depth input boundary: existing `Progress.hullFor(targetDepth, mode)` selects the hull when loading a dive, using the authored mission depth or tile maximum. The resolver returns handling tuning; the fitted hull and pressure limits remain submarine state, and live config replacement does not refit them. Hull selection and next-load access remain unchanged, including Class A at Blue Hole. Live changes preserve fitted hull, pose, pressure state, supplies and selected T speed; the existing velocity caps still apply when handling changes.
+- Settings move to `subexplorer.settings.v3` / schema 3, with v2 then v1 fallback. Legacy blobs remain byte-for-byte intact. Every removed field is retired; Gentle/Exaggerated map to full currents, old Custom Research inherits Realistic, and Standard/Fast inherit Arcade. Unknown root/gameplay fields survive migration, edits, preset changes, reset and reload. Future versions and failed reads remain protected.
+- Updated README's mode table and the settings/architecture contracts. Capability cuts are recorded in CHANGELOG.md. Existing browser fixtures use the current key and switch controls; pressure, spawn, overlap, reachability, scan and geometry assertions remain in place.
+
+## Simplicity rules
+
+Runtime source is smaller (final line-count audit below). Existing controls/descriptions replace the old controls; no guidance surface was added. CSS only transfers existing select selectors to the new switches, retaining the existing target sizes and focus rules; no appearance tuning, offsets, media patches or HUD-layout changes. No new site branches. Settings resolve at boot and once per relevant live change. Tests extend existing capability specs, with no skips or relaxed bug guards. No package numbers added to source/test comments. The resolver uses shared math, and Briefing/ModeSelector reuse `ui/dom.ts`.
+
+## Verification
+
+- Typecheck: PASS.
+- Build: PASS using the repository's writable configuration mechanism (`npm run build -- --config .cache/s-resolve-vite.config.mjs --configLoader native --outDir dist-s-resolve`). The ordinary build first failed because the sandbox makes `node_modules/.vite-temp` read-only.
+- Focused settings/resolver/physics/hull suite: 9 files, 197 tests PASS. Follow-up live Daily/description suite: 17 tests PASS. Updated system fixtures: 8 files, 101 tests PASS. These counts overlap.
+- Save soak: 36 legacy mode/speed/current combinations, each with 30 edits/reloads; display settings, unknown fields, legacy blobs and unrelated collections retained. Existing damaged/future-storage checks retained.
+- Initial `GATES_CONFIG_MODE=writable PW_PORT=4270 bash tools/gates.sh`: config, content, root build, attribution and prettier PASS. Full unit run exposed missing effective settings in four system fixtures (plus a description changed while the run was in progress); all fixed without weakening assertions. The completion fixture was also updated when the next full run reached it; its three UTC-boundary assertions remain unchanged.
+- Python gate: 161/165 tests passed; four unchanged CI-manifest tooling tests fail because this sandbox rejects Node's `spawnSync git` with EPERM, even though git produces its SHA.
+- Browser smoke/project-base and targeted browser launch cannot start their server. A direct native-config preview confirms `listen EPERM` on `127.0.0.1:4271`. Browser/visual verification remains for an environment allowing local servers and Claude's visual review.
+
+## Final audit / handoff
+
+Runtime source (including the new resolver) is **148 lines smaller**: 379 added, 527 removed. Commit staging was attempted and denied: the worktree metadata at `/home/vijay/submarine-explorer/.git/worktrees/1570-S-resolve-integration` is read-only (`index.lock` cannot be created). Changes remain uncommitted; an eventual commit should be named `game: integrate S-resolve effective settings`. No merge, push or tag.
+
+- Final full unit rerun: **192 files / 2,043 tests PASS**, 341.76 s (`npm test -- --configLoader runner --cache=false`). Log: `.cache/codex/S-resolve/unit-final.log`.
+- After that run, final migration review removed object coercion from legacy-current detection. Seven new cases cover null, objects, arrays, shadowed conversion methods, numbers and unknown strings in v2/v3, preserving other fields and reloads. Final focused verification: **7 files / 100 tests PASS**, 594 ms. Final native-config build (including typecheck) and whole-repository prettier check both PASS after this last change. Logs: `.cache/codex/S-resolve/{settings,build,prettier}-final.log`.
+- Full gate run: `GATES_CONFIG_MODE=writable PW_PORT=4270 PW_OUTDIR=dist-s-resolve bash tools/gates.sh`. Config, content, root build, attribution and prettier PASS. Its unit phase passed 2,040 tests and failed three Daily-completion fixtures lacking effective settings; those were corrected, passed their targeted rerun, and then passed the full 2,043-test rerun above. The four Python failures and both browser startup failures are environment restrictions described above, so gates cannot be reported all green. Log: `.cache/codex/S-resolve/gates-final.log`; detailed gate logs remain under `.cache/runs/20261013-080309-65-wcdZyr/`.
+- `git diff --check`: PASS. The Director plan, tools, site data, geometry and past-bug assertions were not changed. Isolated build output removed after validation.
+
+Remaining: browser capability checks and Claude visual review of the four switches, plus a commit from an environment with writable Git metadata. Implementation and save migration are complete; no visual acceptance is claimed.

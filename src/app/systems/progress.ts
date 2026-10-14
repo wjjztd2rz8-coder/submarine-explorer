@@ -1,9 +1,9 @@
-import { PROGRESS_CONFIG, UPGRADES } from '../../core/config/progress.js';
+import { PROGRESS_CONFIG } from '../../core/config/progress.js';
 import { DiscoveryStore } from '../../game/DiscoveryStore.js';
 import { PhotoStore } from '../../game/PhotoStore.js';
 import { dailyRatingKey } from '../../game/Daily.js';
 import { creditPreviousDives } from '../../game/ProgressMigration.js';
-import { Progress, applyProgress, requiredHull } from '../../game/Progress.js';
+import { Progress, requiredHull } from '../../game/Progress.js';
 import { Upgrades } from '../../ui/Upgrades.js';
 import { tileUrl } from '../../ui/MissionSelect.js';
 import type { ShellContext } from '../context.js';
@@ -22,19 +22,14 @@ export function createProgressSystem(): GameSystem {
   const cleanup = new Disposables();
   let upgrades: Upgrades;
   let boostLeft: number = PROGRESS_CONFIG.boostSeconds;
+  let boostCapacity: number = PROGRESS_CONFIG.boostSeconds;
   let lastPhotos: unknown = null;
   let initialLock = '';
   return {
     name: 'progress',
     init(ctx) {
       const progress = ctx.progress;
-      const base = structuredClone(ctx.config);
-      // makeConfig shares nested profile defaults. Clone maps before changing values.
-      ctx.config.speedProfiles = { ...ctx.config.speedProfiles };
-      ctx.config.lightPresets = { ...ctx.config.lightPresets };
-      ctx.config.sensorPresets = { ...ctx.config.sensorPresets };
-      applyProgress(ctx.config, base, progress, ctx.settings.gameplay);
-      boostLeft = PROGRESS_CONFIG.boostSeconds * (1 + progress.level('boost') * UPGRADES[6].step);
+      boostLeft = boostCapacity = ctx.effective.boostSeconds;
       if (
         ctx.route &&
         !progress.canDive(ctx.route.def.briefing.depth_m ?? 0, ctx.settings.gameplayMode)
@@ -75,41 +70,11 @@ export function createProgressSystem(): GameSystem {
       cleanup.add(
         ctx.bus.on('mission:started', () => {
           progress.beginDive();
-          boostLeft =
-            PROGRESS_CONFIG.boostSeconds * (1 + progress.level('boost') * UPGRADES[6].step);
+          boostLeft = ctx.effective.boostSeconds;
         }),
       );
       cleanup.add(ctx.bus.on('mission:restart', () => progress.beginDive()));
       ctx.expose({ progress });
-      // Keep the pristine profile values for live purchases after every system exists.
-      let appliedLevels = JSON.stringify(progress.snapshot().upgrades);
-      let boostLevel = progress.level('boost');
-      cleanup.add(
-        progress.onChange(() => {
-          const levels = JSON.stringify(progress.snapshot().upgrades);
-          if (!ctx.sub || levels === appliedLevels) return;
-          appliedLevels = levels;
-          boostLeft +=
-            PROGRESS_CONFIG.boostSeconds *
-            UPGRADES[6].step *
-            (progress.level('boost') - boostLevel);
-          boostLevel = progress.level('boost');
-          const gameplay = ctx.save.get().gameplay;
-          applyProgress(ctx.config, base, progress, gameplay);
-          ctx.sub.applyProfiles(
-            ctx.config.speedProfiles[gameplay.speedProfile],
-            ctx.config.descentProfiles[gameplay.descentProfile],
-          );
-          ctx.headlights.setPreset(ctx.config.lightPresets[gameplay.lights]);
-          ctx.sonar.setSensorRange(ctx.config.sensorPresets[gameplay.sensors].sonarPoiRange);
-          const sensor = ctx.config.sensorPresets[gameplay.sensors];
-          ctx.config.scan.hintRangeFactor = ctx.baseHintRangeFactor * sensor.hintRangeMultiplier;
-          for (const poi of ctx.discovery.pois)
-            poi.radius =
-              (ctx.baseScanRadii.get(poi.id) ?? poi.radius) * sensor.scanRadiusMultiplier;
-        }),
-      );
-      // Profile updates from settings already read the upgraded profile maps.
     },
     start(ctx) {
       upgrades = initializeProgressMenus(ctx, cleanup);
@@ -139,8 +104,9 @@ export function createProgressSystem(): GameSystem {
         }
       },
       'sim.vehicles': (f, ctx) => {
-        const max =
-          PROGRESS_CONFIG.boostSeconds * (1 + ctx.progress.level('boost') * UPGRADES[6].step);
+        const max = ctx.effective.boostSeconds;
+        boostLeft = Math.min(max, boostLeft + Math.max(0, max - boostCapacity));
+        boostCapacity = max;
         const dt = f.steps * f.fixedDt * ctx.sub.simSpeed;
         if (f.state.boost) {
           if (boostLeft <= 0) f.state = { ...f.state, boost: false };

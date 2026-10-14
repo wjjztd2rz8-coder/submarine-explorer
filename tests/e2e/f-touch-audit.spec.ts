@@ -91,7 +91,7 @@ for (const viewport of [
     test.beforeEach(async ({ page }) => {
       await page.addInitScript(() => {
         localStorage.setItem(
-          'subexplorer.settings.v2',
+          'subexplorer.settings.v3',
           JSON.stringify({ version: 2, uiScale: 150, reduceMotion: true, graphicsTier: 'low' }),
         );
       });
@@ -291,8 +291,8 @@ for (const viewport of [
         await expect(mode.getByRole('radio', { name: 'Realistic' })).toBeChecked();
         const advanced = mode.getByRole('button', { name: 'Advanced' });
         await advanced.tap();
-        for (const select of await mode.locator('select').all()) await reachable(select);
-        await mode.getByLabel('Currents', { exact: true }).selectOption('exaggerated');
+        for (const select of await mode.getByRole('switch').all()) await reachable(select);
+        await mode.getByLabel('Currents', { exact: true }).uncheck();
         await expect(mode.locator('.mode-custom-tag')).toBeVisible();
         for (const name of ['Daily dive', 'Controls', 'Journal'])
           await reachable(menu.getByRole('button', { name: new RegExp(name) }));
@@ -301,8 +301,7 @@ for (const viewport of [
         await expect(page.locator('.briefing')).toBeVisible();
         const briefing = page.locator('.briefing');
         await briefing.getByRole('button', { name: 'Advanced' }).tap();
-        for (const select of await briefing.locator('.mode-advanced select').all())
-          await reachable(select);
+        for (const select of await briefing.getByRole('switch').all()) await reachable(select);
         await reachable(briefing.locator('.briefing-begin'));
         await reachable(briefing.getByRole('link', { name: 'Free dive', exact: true }));
       });

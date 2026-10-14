@@ -45,8 +45,12 @@ export class Power {
   private oxygen = 1;
   private enabled: boolean;
 
+  setConfig(config: PowerConfig): void {
+    this.config = config;
+  }
+
   constructor(
-    private readonly config: PowerConfig,
+    private config: PowerConfig,
     enabled = false,
   ) {
     this.enabled = enabled;

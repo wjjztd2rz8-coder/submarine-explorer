@@ -1,3 +1,5 @@
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { defaultSettings } from '../../src/core/Save.js';
 import { expect, it, vi } from 'vitest';
 import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
@@ -62,6 +64,7 @@ it('a held scan on the first resolved mission frame locks the objective before n
     missionRouter: { mission },
     waypoints: view,
     save: { get: () => ({ gameplay: { visualHints: true } }) },
+    effective: { gameplay: { visualHints: true } },
     scanObjectiveHints: new Map(),
     rig: { camera: {} },
   } as unknown as GameContext;
@@ -150,6 +153,18 @@ it('guides optional objectives after primary completion and scans leftover conta
   const ctx = {
     discovery: { ready: Promise.resolve(), pois, scanner },
     settings,
+    effective: resolveEffective(
+      {
+        ...defaultSettings(DEFAULT_CONFIG),
+        gameplay: {
+          ...DEFAULT_CONFIG.settings.gameplayPresets.arcade,
+          visualHints: settings.gameplay.visualHints,
+        },
+      },
+      'custom',
+      { upgrades: {} },
+      null,
+    ),
     save: { get: () => settings, onChange: () => () => {} },
     sonar: { setScanState: vi.fn(), setPois: vi.fn() },
     expose: () => {},
@@ -210,6 +225,18 @@ it('Realistic retains its approach marker and navigation hint, then resumes norm
   const ctx = {
     discovery: { ready: Promise.resolve(), pois: [], scanner: { setObjective: vi.fn() } },
     settings,
+    effective: resolveEffective(
+      {
+        ...defaultSettings(DEFAULT_CONFIG),
+        gameplay: {
+          ...DEFAULT_CONFIG.settings.gameplayPresets.arcade,
+          visualHints: settings.gameplay.visualHints,
+        },
+      },
+      'custom',
+      { upgrades: {} },
+      null,
+    ),
     save: { get: () => settings, onChange: () => () => {} },
     sonar: { setScanState: vi.fn(), setPois: vi.fn() },
     bus: new EventBus(),
@@ -235,7 +262,7 @@ it('Realistic retains its approach marker and navigation hint, then resumes norm
     objective.hint = 'Hold SCAN to finish.';
     draw();
     expect(view.setVisualHints).toHaveBeenLastCalledWith(false);
-    settings.gameplay.visualHints = true;
+    ctx.effective.gameplay.visualHints = true;
     draw();
     expect(view.setVisualHints).toHaveBeenLastCalledWith(true);
   } finally {

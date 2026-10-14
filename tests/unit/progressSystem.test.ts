@@ -1,10 +1,13 @@
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { defaultSettings } from '../../src/core/Save.js';
+import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { describe, expect, it } from 'vitest';
 import { createProgressSystem } from '../../src/app/systems/progress.js';
 import type { GameContext } from '../../src/app/context.js';
 import type { FrameState } from '../../src/app/System.js';
 
 const context = {
-  progress: { level: () => 0 },
+  effective: resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', { upgrades: {} }, null),
   sub: { simSpeed: 1 },
 } as unknown as GameContext;
 function frame(boost: boolean, seconds = 1): FrameState {
@@ -35,4 +38,28 @@ describe('progress boost integration', () => {
     tick(active, context);
     expect(active.state.boost).toBe(true);
   });
+});
+
+it('a boost purchase adds only its new capacity to exhausted reserves', () => {
+  const ctx = { ...context };
+  const tick = createProgressSystem().frame!['sim.vehicles']!;
+  for (let i = 0; i < 8; i++) tick(frame(true), ctx);
+  const empty = frame(true);
+  tick(empty, ctx);
+  expect(empty.state.boost).toBe(false);
+  ctx.effective = resolveEffective(
+    defaultSettings(DEFAULT_CONFIG),
+    'arcade',
+    { upgrades: { boost: 1 } },
+    null,
+  );
+  const added = frame(true);
+  tick(added, ctx);
+  expect(added.state.boost).toBe(true);
+  const remainder = frame(true);
+  tick(remainder, ctx);
+  expect(remainder.state.boost).toBe(true);
+  const exhausted = frame(true);
+  tick(exhausted, ctx);
+  expect(exhausted.state.boost).toBe(false);
 });

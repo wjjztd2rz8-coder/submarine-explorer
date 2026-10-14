@@ -106,8 +106,8 @@ for (const layout of [
             await expect(briefing).toBeVisible();
             await expect(
               // Start position sits in the collapsed Advanced panel, so it is not in the role tree.
-              briefing.locator('.briefing-start input[value="near-site"]'),
-            ).toBeChecked();
+              briefing.locator('input[data-gameplay="startPosition"]'),
+            ).not.toBeChecked();
             const panel = briefing.locator('.briefing-panel');
             expect(await panel.evaluate((e) => e.scrollWidth - e.clientWidth)).toBeLessThanOrEqual(
               1,

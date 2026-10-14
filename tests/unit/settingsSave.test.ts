@@ -45,7 +45,7 @@ const config = DEFAULT_CONFIG;
 describe('settings defaults and migrate', () => {
   it('defaults come from Config', () => {
     const d = defaultSettings(config);
-    expect(d.version).toBe(2);
+    expect(d.version).toBe(3);
     expect(d.gameplayMode).toBe('arcade');
     expect(d.gameplay).toEqual(config.settings.gameplayPresets.arcade);
     expect(d.graphicsTier).toBe(config.graphicsTier);
@@ -95,7 +95,7 @@ describe('settings defaults and migrate', () => {
     expect(m.graphicsTier).toBe(config.graphicsTier);
     expect(m.postFx).toBe(false);
     expect(m.detailStrength).toBe(config.settings.detailStrengthMax);
-    expect(m.simSpeedDefault).toBe(config.settings.defaults.simSpeedDefault);
+    expect(m).not.toHaveProperty('simSpeedDefault');
     expect(m.reduceMotion).toBe(true);
     expect(m.captions).toBe(config.settings.defaults.captions);
     expect(m.sonarPalette).toBe('deuteranopia');
@@ -105,7 +105,7 @@ describe('settings defaults and migrate', () => {
     const d = defaultSettings(config);
     expect(migrate(null, config)).toEqual(d);
     expect(migrate([1, 2], config)).toEqual(d);
-    expect(migrate({ version: 3, captions: true }, config)).toEqual(d);
+    expect(migrate({ version: 4, captions: true }, config)).toEqual(d);
     expect(migrate({ captions: true }, config).captions).toBe(true); // unversioned v0
     expect(migrate({ sonarPalette: 'constructor' }, config).sonarPalette).toBe('default');
   });
@@ -156,7 +156,7 @@ describe('Save', () => {
 
   it('does not overwrite a newer stored version', () => {
     const store = new MemoryStore();
-    const newer = JSON.stringify({ version: 3, captions: true });
+    const newer = JSON.stringify({ version: 4, captions: true });
     store.setItem(SETTINGS_STORAGE_KEY, newer);
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const s = new Save({ config, storage: store });
@@ -174,7 +174,7 @@ describe('Save', () => {
     expect(s.reloadSafe).toBe(false);
   });
 
-  it.each([2, 3])('preserves an unread v%s save when reads fail but writes work', (version) => {
+  it.each([2, 3, 4])('preserves an unread v%s save when reads fail but writes work', (version) => {
     const store = new MemoryStore();
     const original = JSON.stringify({ version, captions: true, graphicsTier: 'low' });
     store.setItem(SETTINGS_STORAGE_KEY, original);
@@ -191,7 +191,7 @@ describe('Save', () => {
     expect(store.getItem(SETTINGS_STORAGE_KEY)).toBe(original);
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     save.load();
-    if (version === 2) {
+    if (version <= 3) {
       expect(save.get().captions).toBe(true);
       save.save({ musicVolume: 0.25 });
       expect(save.reloadSafe).toBe(true);
@@ -262,14 +262,14 @@ describe('Phase D gameplay settings', () => {
     );
     const save = new Save({ config, storage: store });
     expect(save.get()).toMatchObject({
-      version: 2,
+      version: 3,
       postFx: false,
       captions: true,
       sonarPalette: 'highContrast',
       gameplayMode: 'arcade',
       uiScale: 100,
     });
-    expect(store.getItem(SETTINGS_STORAGE_KEY)).toContain('"version":2');
+    expect(store.getItem(SETTINGS_STORAGE_KEY)).toContain('"version":3');
     expect(store.getItem('subexplorer.settings.v1')).not.toBeNull();
     save.reset();
     expect(new Save({ config, storage: store }).get()).toEqual(defaultSettings(config));
@@ -279,12 +279,12 @@ describe('Phase D gameplay settings', () => {
     const save = new Save({ config, storage: null });
     save.setGameplayMode('realistic');
     expect(save.get().gameplay).toEqual(config.settings.gameplayPresets.realistic);
-    save.setGameplayOption('lights', 'enhanced');
+    save.setGameplayOption('visualHints', true);
     expect(save.get().gameplayMode).toBe('custom');
-    expect(save.get().gameplay.speedProfile).toBe('research');
-    save.setGameplayOption('lights', 'enhanced');
+    expect(save.get().gameplayBaseMode).toBe('realistic');
+    save.setGameplayOption('visualHints', true);
     save.setGameplayMode('custom');
-    expect(save.get().gameplay.lights).toBe('enhanced');
+    expect(save.get().gameplay.visualHints).toBe(true);
     save.setGameplayMode('arcade');
     expect(save.get().gameplay).toEqual(config.settings.gameplayPresets.arcade);
     save.save({ hullWarningStyle: 'gauge' });
@@ -303,9 +303,7 @@ describe('Phase D gameplay settings', () => {
       config,
     );
     expect(custom.gameplay).toMatchObject({
-      speedProfile: 'research',
-      lights: 'enhanced',
-      simSpeed: 1,
+      ...config.settings.gameplayPresets.realistic,
     });
     expect(custom.uiScale).toBe(150);
     // The retired Control tips key is dropped, not carried forward.
@@ -336,7 +334,7 @@ describe('Phase D gameplay settings', () => {
     });
     save.save({ captions: true });
     save.save({ captions: true });
-    save.setGameplayOption('lights', 'enhanced');
+    save.setGameplayOption('visualHints', true);
     expect(events.map((event) => event.key)).toEqual(['captions', 'gameplayMode']);
     expect(events.at(-1)?.value).toBe('custom');
   });
@@ -353,3 +351,56 @@ describe('Phase D gameplay settings', () => {
     expect(store.getItem(SETTINGS_STORAGE_KEY)).toBeNull();
   });
 });
+
+const malformedCurrents: unknown[] = [
+  null,
+  {},
+  [],
+  { toString: null },
+  { toString: {}, valueOf: false },
+  42,
+  'unknown',
+];
+it.each(malformedCurrents.map((currents) => ({ currents })))(
+  'repairs malformed currents %j without coercing objects or losing valid settings',
+  ({ currents }) => {
+    for (const version of [2, 3]) {
+      const store = new MemoryStore();
+      store.setItem(
+        SETTINGS_STORAGE_KEY,
+        JSON.stringify({
+          version,
+          gameplayMode: 'custom',
+          gameplayBaseMode: 'realistic',
+          captions: true,
+          future: { keep: true },
+          gameplay: {
+            currents,
+            batteryOxygen: false,
+            visualHints: true,
+            startPosition: 'surface',
+            futureSwitch: 17,
+          },
+        }),
+      );
+      let save!: Save;
+      expect(() => {
+        save = new Save({ config, storage: store });
+      }).not.toThrow();
+      expect(save.get()).toMatchObject({
+        captions: true,
+        future: { keep: true },
+        gameplayBaseMode: 'realistic',
+        gameplay: {
+          currents: 'realistic',
+          batteryOxygen: false,
+          visualHints: true,
+          startPosition: 'surface',
+          futureSwitch: 17,
+        },
+      });
+      save.save({ captions: false });
+      expect(new Save({ config, storage: store }).get()).toEqual(save.get());
+    }
+  },
+);
