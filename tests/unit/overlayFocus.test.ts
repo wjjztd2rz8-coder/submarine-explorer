@@ -486,7 +486,9 @@ describe('migrated modal consumers', () => {
       };
       const site = { id: 'titanic', name: 'Titanic', state: 'mission' } as GlobeSite;
       internal.showChooser(0, [{ site }, { site }]);
-      expect(active()).toBe(body);
+      // Cluster selection immediately owns a concrete site, unlike generic modals.
+      const items = internal.chooser.children.filter((child) => child.tagName === 'BUTTON');
+      expect(active()).toBe(items[0]);
       const lon = globe.orbit.lon;
       expect(press('ArrowRight').defaultPrevented).toBe(true);
       globe.orbit.update(0.1);
@@ -501,7 +503,7 @@ describe('migrated modal consumers', () => {
       press('Equal');
       expect(globe.orbit.distance).toBeLessThan(distance);
       press('Tab');
-      expect(internal.chooser.contains(active())).toBe(true);
+      expect(active()).toBe(items[1]);
       expect(press('Escape').defaultPrevented).toBe(true);
       expect(internal.chooser.hidden).toBe(true);
       expect(globe.isOpen).toBe(true);
