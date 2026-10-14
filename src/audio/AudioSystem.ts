@@ -23,7 +23,7 @@ import {
 import { AmbientBeds, ThrusterLoop } from './Loops.js';
 import { AmbientScore } from './Score.js';
 import { MachineLoop, Soundscape, mechanicalCue } from './Soundscape.js';
-import { CaptionBus, type AudioFrameInput } from './events.js';
+import { CaptionBus, type AudioFrameInput, type CaptionEvent } from './events.js';
 // --- C3 begin ---
 import { HADAL_TOP_M } from '../world/presets/maths.js';
 // --- C3 end ---
@@ -227,14 +227,10 @@ export class AudioSystem {
     // the collision thud above; creaks are reserved for crush-depth pressure.
     this.unsubs.push(
       this.bus.on('sub:hullStress', ({ stress, cause }) => {
-        if (!this.engine || this.playbackBlocked || cause !== 'pressure') return;
+        if (cause !== 'pressure') return;
         const c = this.config;
-        const now = this.engine.ctx.currentTime;
         const minGap = c.hullCreakMaxGapS - stress * (c.hullCreakMaxGapS - c.hullCreakMinGapS);
-        if (now - this.lastCreakAt < minGap) return;
-        this.lastCreakAt = now;
-        playHullCreak(this.engine, this.config, stress);
-        this.captions.emit({
+        this.tryHullCreak(stress, minGap, {
           id: 'hull-creak',
           text: 'Hull creaks under pressure',
           durationS: 1.2,
@@ -246,13 +242,8 @@ export class AudioSystem {
     // cooldown with pressure stress so both sources cannot creak at once.
     this.unsubs.push(
       this.bus.on('env:trench', ({ depth }) => {
-        if (!this.engine || this.disposed || this.playbackBlocked) return;
-        const now = this.engine.ctx.currentTime;
-        if (now - this.lastCreakAt < this.config.hullCreakMinGapS) return;
-        this.lastCreakAt = now;
         const stress = Math.min(1, Math.max(0, -depth / HADAL_TOP_M - 1));
-        playHullCreak(this.engine, this.config, stress);
-        this.captions.emit({
+        this.tryHullCreak(stress, this.config.hullCreakMinGapS, {
           id: 'trench-creak',
           text: 'Hull creaks under deep pressure',
           durationS: 1.2,
@@ -285,6 +276,16 @@ export class AudioSystem {
     );
   }
 
+  private tryHullCreak(stress: number, minGap: number, caption: CaptionEvent): void {
+    if (!this.engine || this.disposed || this.playbackBlocked) return;
+    const now = this.engine.ctx.currentTime;
+    if (now - this.lastCreakAt < minGap) return;
+    // Reserve the shared cooldown before playback or caption callbacks can re-enter.
+    this.lastCreakAt = now;
+    playHullCreak(this.engine, this.config, stress);
+    this.captions.emit(caption);
+  }
+
   /** Call once per rendered frame (small additive hook in src/main.ts). */
   update(frame: AudioFrameInput): void {
     this.lastFrame = frame;
@@ -307,16 +308,13 @@ export class AudioSystem {
     );
     this.scanHum?.update(this.scanning ? 0.06 : 0);
     const stress = frame.hullStress ?? 0;
-    const now = this.engine.ctx.currentTime;
     const gap = 20 - Math.min(1, stress) * 17;
-    if (frame.depth < -200 && now - this.lastCreakAt >= gap) {
-      this.lastCreakAt = now;
-      playHullCreak(
-        this.engine,
-        this.config,
-        Math.max(stress, Math.min(0.3, -frame.depth / 20000)),
-      );
-      this.captions.emit({ id: 'hull-creak', text: 'Hull creaks under pressure', durationS: 1.5 });
+    if (frame.depth < -200) {
+      this.tryHullCreak(Math.max(stress, Math.min(0.3, -frame.depth / 20000)), gap, {
+        id: 'hull-creak',
+        text: 'Hull creaks under pressure',
+        durationS: 1.5,
+      });
     }
 
     const ballastSign = Math.sign(frame.ballast);
