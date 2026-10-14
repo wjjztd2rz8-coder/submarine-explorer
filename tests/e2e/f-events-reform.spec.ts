@@ -1,6 +1,7 @@
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { renderReview, reviewShot } from './helpers/render.js';
 import { devices, expect, test } from './helpers/unlocked.js';
+import { setScanCardSuppressed } from './helpers/tutorial.js';
 import type { EventsVisual } from '../../src/game/EventsVisual.js';
 import type { EventScheduler, ExploreEventKind } from '../../src/game/Events.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
@@ -65,7 +66,6 @@ function eventLayout(kind: ExploreEventKind) {
   const captionOverlays = [
     '.sonar',
     '.hud-readouts',
-    '.guidance-slot',
     '.tc-stick',
     '.tc-slider',
     '.tc-buttons',
@@ -138,6 +138,9 @@ for (const surface of ['desktop', 'phone'] as const) {
           const g = window.__game as unknown as Game;
           return { calls: g.perf.drawCalls, triangles: g.perf.triangles };
         });
+        // A contact ready to scan outranks a sighting in the one slot. These opening poses
+        // are in range of one, so hold its card back to review the sighting's own layout.
+        await setScanCardSuppressed(page, true);
         expect(
           await page.evaluate(
             (kind) => (window.__game as unknown as Game).explore.previewEvent(kind),
@@ -226,7 +229,9 @@ for (const surface of ['desktop', 'phone'] as const) {
         });
         // Layout checks twice a second; render enough simulation time for it.
         for (let i = 0; i < 6; i++) await page.clock.fastForward(100);
-        await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toBeVisible();
+        // The sighting card retires three seconds after the log, so by now it is gone and
+        // cannot cover the moving event; the layout read below proves it still reports none.
+        await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toBeHidden();
         const movingLayout = await page.evaluate(eventLayout, kind);
         expect(movingLayout.covered, 'moving event must stay clear of its caption').toBe(false);
         expect(movingLayout.captionOverlays, 'moving caption must leave controls clear').toEqual(

@@ -162,9 +162,7 @@ export function tutorialText(
   switch (id) {
     case 'move': {
       if (device === 'touch')
-        return destination
-          ? 'Left stick: follow the marker.'
-          : 'Left stick: move and turn.';
+        return destination ? 'Left stick: follow the marker.' : 'Left stick: move and turn.';
       const guidance = destination ? `Follow the marker toward ${destination}. ` : '';
       return (
         guidance +
