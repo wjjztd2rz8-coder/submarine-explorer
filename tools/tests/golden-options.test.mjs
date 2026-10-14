@@ -1,11 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { goldenOptions } from '../golden-options.mjs';
+import { goldenOptions, goldenUrl, selectGoldenMissions } from '../golden-options.mjs';
 import bismarckPose from '../bismarck-poses.json' with { type: 'json' };
 import lowTierPoses from '../lowtier-poses.json' with { type: 'json' };
 
 test('nightly defaults remain High desktop and the original hero selection', () => {
   assert.deepEqual(goldenOptions({}), {
+    mode: 'free-dive',
     tier: 'high',
     layouts: [{ name: 'desktop', width: 1600, height: 900 }],
     only: undefined,
@@ -20,6 +21,7 @@ test('Low all-site sweep uses exact portrait and landscape phone sizes', () => {
       GOLDEN_SITES: 'all',
     }),
     {
+      mode: 'free-dive',
       tier: 'low',
       layouts: [
         { name: 'portrait', width: 390, height: 844 },
@@ -39,6 +41,7 @@ test('site aliases and whitespace remain supported', () => {
 test('invalid sweep settings fail before browser launch', () => {
   for (const env of [
     { GOLDEN_TIER: 'auto' },
+    { GOLDEN_MODE: 'unknown' },
     { GOLDEN_LAYOUTS: 'phone' },
     { GOLDEN_LAYOUTS: 'constructor' },
     { GOLDEN_SITES: 'all,titanic' },
@@ -110,4 +113,59 @@ test('Low follow-up captures frame the pillow field and exposed tuff wall using 
       ],
     ],
   );
+});
+
+test('mission defaults capture each real catalog mission once across all three layouts', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const catalog = JSON.parse(
+    await readFile(new URL('../../data/landmarks/index.json', import.meta.url)),
+  ).landmarks;
+  const options = goldenOptions({ GOLDEN_MODE: 'mission' });
+  assert.deepEqual(
+    options.layouts.map(({ name }) => name),
+    ['desktop', 'portrait', 'landscape'],
+  );
+  assert.deepEqual(
+    selectGoldenMissions(catalog, options),
+    catalog.map((id) => [id]),
+  );
+  assert.equal(catalog.length * options.layouts.length * 2, 78);
+  for (const site of catalog) {
+    const mission = JSON.parse(
+      await readFile(new URL(`../../data/landmarks/${site}/mission.json`, import.meta.url)),
+    );
+    assert.equal(mission.landmark, site);
+    assert.equal(mission.tile, site);
+    for (const { name } of options.layouts) {
+      const url = goldenUrl('http://localhost:4173/submarine-explorer/', site, options, name);
+      assert.equal(url.pathname, '/submarine-explorer/');
+      assert.equal(url.searchParams.get('mission'), site);
+      assert.equal(url.searchParams.get('skipBriefing'), '1');
+      for (const forbidden of ['tile', 'poi', 'at', 'yaw', 'pitch'])
+        assert.equal(url.searchParams.has(forbidden), false);
+      assert.equal(url.searchParams.get('touch'), name === 'desktop' ? null : '1');
+    }
+  }
+  assert.deepEqual(
+    selectGoldenMissions(
+      catalog,
+      goldenOptions({
+        GOLDEN_MODE: 'mission',
+        GOLDEN_SITES: 'monterey',
+        GOLDEN_LAYOUTS: 'portrait',
+      }),
+    ),
+    [['monterey-canyon']],
+  );
+  assert.throws(
+    () =>
+      selectGoldenMissions(
+        catalog,
+        goldenOptions({ GOLDEN_MODE: 'mission', GOLDEN_SITES: 'great-blue-hole-east' }),
+      ),
+    /Unknown/,
+  );
+  const free = goldenUrl('http://localhost/', 'titanic', goldenOptions({}), 'desktop');
+  assert.equal(free.searchParams.get('tile'), 'titanic');
+  assert.equal(free.searchParams.has('mission'), false);
 });

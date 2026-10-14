@@ -1,5 +1,6 @@
 import { defineConfig, type Plugin, type ResolvedConfig } from 'vite';
 import { pwaPlugin } from './tools/pwaPlugin.js';
+import { goldenBuild } from './tools/golden-build.mjs';
 
 /**
  * Static data serving
@@ -121,7 +122,7 @@ export default defineConfig({
   // tools/codex-browser.sh gives each dev server its own optimizer cache
   // (worktrees share node_modules by symlink).
   cacheDir: env.VITE_CACHE_DIR ?? 'node_modules/.vite',
-  plugins: [copyPublicFiltered(), pwaPlugin()],
+  plugins: [goldenBuild(), copyPublicFiltered(), pwaPlugin()],
   server: { port: 5173 },
   preview: { port: 4173 },
   build: { outDir: 'dist', sourcemap: false, target: 'es2022', copyPublicDir: false },

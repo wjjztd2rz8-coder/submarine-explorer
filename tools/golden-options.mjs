@@ -3,22 +3,50 @@ import bismarckPose from './bismarck-poses.json' with { type: 'json' };
 import lowTierPoses from './lowtier-poses.json' with { type: 'json' };
 
 export function goldenOptions(env = process.env) {
+  const mode = env.GOLDEN_MODE ?? 'free-dive';
+  if (!['free-dive', 'mission'].includes(mode)) throw new Error(`Unknown GOLDEN_MODE: ${mode}`);
   const tier = env.GOLDEN_TIER ?? 'high';
   if (!['low', 'medium', 'high', 'ultra'].includes(tier))
     throw new Error(`Unknown GOLDEN_TIER: ${tier}`);
   const sizes = { desktop: [1600, 900], portrait: [390, 844], landscape: [844, 390] };
-  const layouts = (env.GOLDEN_LAYOUTS ?? 'desktop').split(',').map((name) => {
-    if (!Object.hasOwn(sizes, name)) throw new Error(`Unknown GOLDEN_LAYOUTS: ${name}`);
-    const [width, height] = sizes[name];
-    return { name, width, height };
-  });
+  const layouts = (
+    env.GOLDEN_LAYOUTS ?? (mode === 'mission' ? 'desktop,portrait,landscape' : 'desktop')
+  )
+    .split(',')
+    .map((name) => {
+      if (!Object.hasOwn(sizes, name)) throw new Error(`Unknown GOLDEN_LAYOUTS: ${name}`);
+      const [width, height] = sizes[name];
+      return { name, width, height };
+    });
   const only = env.GOLDEN_SITES?.split(',').map(
     (site) =>
       ({ 'blue-hole': 'great-blue-hole', monterey: 'monterey-canyon' })[site.trim()] ?? site.trim(),
   );
   if (only?.includes('all') && only.length !== 1)
     throw new Error('GOLDEN_SITES=all cannot be combined with individual sites');
-  return { tier, layouts, only, allSites: only?.[0] === 'all' };
+  return { mode, tier, layouts, only, allSites: only?.[0] === 'all' };
+}
+
+/** Missions use the catalog once each, with no hero pose or gallery aliases. */
+export function selectGoldenMissions(catalog, { only, allSites }) {
+  if (only && !allSites && only.some((id) => !catalog.includes(id)))
+    throw new Error(`Unknown GOLDEN_SITES for mission: ${only.join(',')}`);
+  const selected = catalog.filter((id) => !only || allSites || only.includes(id));
+  if (!selected.length) throw new Error('Empty mission catalog');
+  return selected.map((id) => [id]);
+}
+
+export function goldenUrl(base, site, { mode, tier }, layout) {
+  const url = new URL(base);
+  url.search = new URLSearchParams({
+    ...(mode === 'mission' ? { mission: site, skipBriefing: '1' } : { tile: site }),
+    tutorial: '0',
+    tier,
+    lifeSeed: '42',
+    dynres: '0',
+    ...(layout !== 'desktop' ? { touch: '1' } : {}),
+  }).toString();
+  return url;
 }
 
 const extraHeroes = {

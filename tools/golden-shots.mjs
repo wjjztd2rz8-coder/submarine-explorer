@@ -14,11 +14,14 @@
  * Approach/detail use the cockpit camera aimed at the hero. Bearings are searched
  * in a fixed order for one clear side at BOTH distances, using actual prop bounds.
  * The submarine's physics step is frozen after loading to hold each exact pose.
- * A pose manifest accompanies the contact sheet for reproducible comparisons.
+ * A pose manifest records served-build SHA, dirty flag and Vite build mode.
+ * Rebuild/restart Vite after tooling updates to stamp the served document.
  * Output: .cache/golden/<UTC YYYY-MM-DD-HHMMSS>/<site>-<1|2|3>.png + index.html.
  * GOLDEN_SITES=lost-city,beebe-vent-field limits the run to those sites.
  * GOLDEN_SITES=monterey is an alias for monterey-canyon.
- * GOLDEN_MODE=mission loads each default mission; capture filenames end in -mission.png.
+ * GOLDEN_MODE=mission captures all 13 real mission openings and +10 s frames.
+ * It defaults to desktop, portrait and landscape, using ?mission=<id>&skipBriefing=1.
+ * Mission physics and chase cameras run normally; no free-dive poses are applied.
  * Without GOLDEN_MODE, captures still use free dive.
  * GOLDEN_LAYOUTS=desktop,portrait captures 1600×900 and 390×844 at the same authored poses.
  * GOLDEN_TIER=low selects Low (default high); GOLDEN_LAYOUTS=portrait,landscape adds 844×390.
@@ -29,7 +32,15 @@
 import { chromium } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { goldenOptions, selectGoldenHeroes } from './golden-options.mjs';
+import {
+  goldenOptions,
+  goldenUrl,
+  selectGoldenHeroes,
+  selectGoldenMissions,
+} from './golden-options.mjs';
+import { readGoldenBuild } from './golden-build.mjs';
+import { goldenManifest, goldenContactSheet } from './golden-manifest.mjs';
+import { installGoldenFrames } from './golden-frames.mjs';
 import blueHolePoses from './blue-hole-poses.json' with { type: 'json' };
 import beebePoses from './beebe-poses.json' with { type: 'json' };
 import lostCityPoses from './lostcity-poses.json' with { type: 'json' };
@@ -53,12 +64,10 @@ async function main() {
   if (!base.pathname.endsWith('/')) base.pathname += '/';
   base.search = '';
   base.hash = '';
-  const mode = process.env.GOLDEN_MODE ?? 'free-dive';
-  if (!['free-dive', 'mission'].includes(mode)) throw new Error(`Unknown GOLDEN_MODE: ${mode}`);
   const stamp = new Date().toISOString().slice(0, 19).replace('T', '-').replaceAll(':', '');
   const output = resolve('.cache/golden', stamp);
   const options = goldenOptions();
-  const { tier, layouts } = options;
+  const { mode, tier, layouts } = options;
   const closeOverride = process.env.GOLDEN_CLOSE ? JSON.parse(process.env.GOLDEN_CLOSE) : null; // dev: retune the west alcove close pose
   const defaultHeroes = [
     ['titanic', 'bow-hull'],
@@ -86,7 +95,11 @@ async function main() {
   const catalog = JSON.parse(
     await readFile(new URL('../data/landmarks/index.json', import.meta.url), 'utf8'),
   );
-  const heroes = selectGoldenHeroes(defaultHeroes, catalog.landmarks, options);
+  const heroes =
+    mode === 'mission'
+      ? selectGoldenMissions(catalog.landmarks, options)
+      : selectGoldenHeroes(defaultHeroes, catalog.landmarks, options);
+  let provenance = { sha: null, dirty: null, buildMode: null };
   await mkdir(output, { recursive: true });
   const captures = [];
   const failures = [];
@@ -150,42 +163,7 @@ async function main() {
         // Hold the last presented frame during capture so SwiftShader does not
         // continually queue WebGL work ahead of Chromium's screenshot readback.
         // Resume the queued callbacks afterwards; no game/render settings change.
-        await context.addInitScript(() => {
-          const raf = window.requestAnimationFrame.bind(window);
-          const cancel = window.cancelAnimationFrame.bind(window);
-          const pending = new Map();
-          let nextId = 0;
-          let paused = false;
-          const schedule = (id, entry) => {
-            entry.nativeId = raf((now) => {
-              entry.nativeId = null;
-              if (paused) return;
-              pending.delete(id);
-              entry.callback(now);
-            });
-          };
-          window.requestAnimationFrame = (callback) => {
-            const id = ++nextId;
-            const entry = { callback, nativeId: null };
-            pending.set(id, entry);
-            if (!paused) schedule(id, entry);
-            return id;
-          };
-          window.cancelAnimationFrame = (id) => {
-            const entry = pending.get(id);
-            if (entry?.nativeId !== null && entry?.nativeId !== undefined) cancel(entry.nativeId);
-            pending.delete(id);
-          };
-          window.__goldenFrames = {
-            pause: () => {
-              paused = true;
-            },
-            resume: () => {
-              paused = false;
-              for (const [id, entry] of pending) if (entry.nativeId === null) schedule(id, entry);
-            },
-          };
-        });
+        await context.addInitScript(installGoldenFrames, { mission: mode === 'mission' });
         const page = await context.newPage();
         page.setDefaultTimeout(120_000);
         const evaluate = (...args) => bounded(stage, page.evaluate(...args));
@@ -197,7 +175,7 @@ async function main() {
         // has a project base. Follow that link before waiting on game hooks.
         if (!baseResolved) {
           const response = await context.request.get(base.href, { timeout: 30_000 });
-          const body = await response.text();
+          let body = await response.text();
           if (body.includes('The server is configured with a public base URL')) {
             const href = body.match(/<a\s[^>]*href=["']([^"']+)["']/i)?.[1];
             if (!href) throw new Error('Preview base warning has no destination');
@@ -206,23 +184,19 @@ async function main() {
               throw new Error('Preview base must stay on the same origin');
             base = destination;
             if (!base.pathname.endsWith('/')) base.pathname += '/';
+            const resolved = await context.request.get(base.href, { timeout: 30_000 });
+            if (!resolved.ok()) throw new Error(`Preview returned HTTP ${resolved.status()}`);
+            body = await resolved.text();
+            await resolved.dispose();
           } else if (!response.ok()) {
             throw new Error(`Preview returned HTTP ${response.status()} for ${base.href}`);
           }
           await response.dispose();
+          provenance = readGoldenBuild(body);
           baseResolved = true;
           console.log(`Preview base: ${base.href}`);
         }
-        const url = new URL(base);
-        url.search = new URLSearchParams({
-          tile: siteId,
-          ...(mode === 'mission' ? { mission: siteId } : {}),
-          tutorial: '0',
-          tier,
-          lifeSeed: '42',
-          dynres: '0',
-          ...(layout !== 'desktop' ? { touch: '1' } : {}),
-        }).toString();
+        const url = goldenUrl(base, siteId, options, layout);
         const loadStarted = Date.now();
         const loaded = await page.goto(url.href, {
           waitUntil: 'domcontentloaded',
@@ -230,38 +204,43 @@ async function main() {
         });
         if (!loaded?.ok())
           throw new Error(`Preview returned HTTP ${loaded?.status()} for ${url.href}`);
+        const pageBuild = readGoldenBuild(await loaded.text());
+        for (const field of ['sha', 'dirty', 'buildMode'])
+          if (pageBuild[field] !== provenance[field])
+            throw new Error(`Served build ${field} changed during the capture run`);
         stage = `${site}: load game and props`;
         console.log(stage);
         await page.waitForFunction(
           () =>
             window.__gameReady && window.__game?.props.loaded && window.__game?.discovery.loaded,
           null,
-          { timeout: 120_000 },
+          { timeout: 120_000, ...(mode === 'mission' ? { polling: 100 } : {}) },
         );
-        await settle(page);
-        await evaluate(() => window.__game.terrain.texturesReady);
-        const loadMs = Date.now() - loadStarted;
-        await evaluate(() => {
-          // Freeze translation, pitch and ballast; keep normal lighting/render updates.
-          window.__game.sub.step = () => {};
-        });
         if (mode === 'mission') {
-          stage = `${site}: begin default mission`;
-          await (layout === 'desktop'
-            ? page.locator('.briefing-begin').click()
-            : page.locator('.briefing-begin').tap()); // a mouse click would leave touch mode
-          await page.waitForFunction(() => window.__game.mission?.state === 'diving');
+          stage = `${site}: first loaded mission frame`;
+          await page.waitForFunction(() => window.__goldenFrames.paused, null, { polling: 100 });
+          const missionId = await evaluate(() => window.__game.mission?.id);
+          if (missionId !== siteId) throw new Error(`Expected mission ${siteId}, got ${missionId}`);
+        } else {
           await settle(page);
+          await evaluate(() => window.__game.terrain.texturesReady);
+          await evaluate(() => {
+            // Free-dive fixed poses retain the original physics freeze.
+            window.__game.sub.step = () => {};
+          });
         }
-        const capture = async (n, range) => {
+        const loadMs = Date.now() - loadStarted;
+        const capture = async (n, range, timeS = null) => {
           stage = `${site}: capture ${n}`;
           console.log(stage);
-          const frameTimes = await settle(page);
+          const frameTimes = mode === 'mission' ? null : await settle(page);
           if (errors.length) throw new Error(`${site}: ${errors.join('; ')}`);
           const filename = `${site}${layout === 'desktop' ? '' : `-${layout}`}-${n}${mode === 'mission' ? '-mission' : ''}.png`;
           const pose = await evaluate(() => {
             const g = window.__game;
             return {
+              missionId: g.mission?.id ?? null,
+              missionElapsedS: g.mission?.elapsedS ?? null,
               position: g.sub.position.toArray(),
               yaw: g.sub.yaw,
               pitch: g.sub.pitch,
@@ -314,7 +293,7 @@ async function main() {
             'wait for fonts',
             page.evaluate(() => document.fonts.ready.then(() => {})),
           );
-          await evaluate(() => window.__goldenFrames.pause());
+          if (mode !== 'mission') await evaluate(() => window.__goldenFrames.pause());
           let captureMethod = 'playwright';
           let png;
           try {
@@ -346,10 +325,11 @@ async function main() {
               }
             }
           } finally {
-            await bounded(
-              'resume render loop',
-              page.evaluate(() => window.__goldenFrames.resume()),
-            );
+            if (mode !== 'mission')
+              await bounded(
+                'resume render loop',
+                page.evaluate(() => window.__goldenFrames.resume()),
+              );
           }
           if (errors.length) throw new Error(`${site}: ${errors.join('; ')}`);
           if (
@@ -362,7 +342,11 @@ async function main() {
           await writeFile(resolve(output, filename), png);
           captures.push({
             site,
-            heroId,
+            heroId: heroId ?? null,
+            mode,
+            ...provenance,
+            url: url.href,
+            timeS,
             filename,
             range,
             captureMethod,
@@ -374,6 +358,14 @@ async function main() {
           });
           console.log(`${filename} (${pose.hull}, ${pose.tier})`);
         };
+        if (mode === 'mission') {
+          await capture(1, null, 0);
+          stage = `${site}: advance mission by 10 seconds`;
+          await evaluate(() => window.__goldenFrames.advance(10));
+          await page.waitForFunction(() => window.__goldenFrames.paused, null, { polling: 100 });
+          await capture(2, null, 10);
+          continue;
+        }
         if (site === siteId) await capture(1, null);
         stage = `${site}: choose approach`;
         const approach = await evaluate(
@@ -558,33 +550,17 @@ async function main() {
         failures.push({ stage: 'close Chromium', message: error.message });
       });
     // Keep a reviewable partial sheet if a site fails; exit status still reports failure.
-    await writeFile(
-      resolve(output, 'poses.json'),
-      JSON.stringify(
-        {
-          base: base.href,
-          stamp,
-          mode,
-          tier,
-          layouts,
-          plannedHeroes: heroes,
-          complete: failures.length === 0,
-          failures,
-          captures,
-        },
-        null,
-        2,
-      ),
-    );
-    await writeFile(
-      resolve(output, 'index.html'),
-      `<!doctype html>
-<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Golden shots ${stamp}</title><style>
-body{margin:24px;background:#081522;color:#e6f0f7;font:16px system-ui}main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}figure{margin:0}img{width:100%;height:auto}a{color:inherit}figcaption{padding:8px 0}@media(max-width:800px){main{grid-template-columns:1fr}}
-</style><h1>Golden shots · ${stamp} UTC</h1><p>${failures.length ? `INCOMPLETE: ${failures.length} failure(s). ` : ''}${tier[0].toUpperCase() + tier.slice(1)} tier · ${layouts.map((l) => `${l.name} ${l.width} × ${l.height}`).join(', ')} · ${mode} · fresh Arcade profile, life seed 42, dynamic resolution off. 1: spawn; 2–3: approach and detail (ranges below). <a href="poses.json">Pose manifest and failures</a></p>
-<main>${captures.map(({ filename, site, range }) => `<figure><a href="${filename}"><img loading="lazy" src="${filename}" alt="${site}, ${range === null ? 'default spawn' : `${range} m approach`}"></a><figcaption>${filename}</figcaption></figure>`).join('\n')}</main></html>`,
-    );
+    const manifest = goldenManifest({
+      base: base.href,
+      stamp,
+      provenance,
+      options,
+      heroes,
+      failures,
+      captures,
+    });
+    await writeFile(resolve(output, 'poses.json'), JSON.stringify(manifest, null, 2));
+    await writeFile(resolve(output, 'index.html'), goldenContactSheet(manifest));
     console.log(`Contact sheet: ${resolve(output, 'index.html')}`);
     if (failures.length) process.exitCode = 1;
   }
