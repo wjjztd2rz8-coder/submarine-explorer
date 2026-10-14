@@ -211,7 +211,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     tips.push({ x: s.x, y: s.y + s.h, z: s.z });
     // Drooping flanges on the column: wide shelves on the main tower, one or two elsewhere.
     // Saucer flanges read as plates, so only an occasional small one remains on lesser spires.
-    const nf = lone || i === 0 ? 0 : rnd() < 0.3 ? 1 : 0;
+    const nf = lone ? 0 : i === 0 ? 3 : rnd() < 0.3 ? 1 : 0;
     for (let f = 0; f < nf; f++) {
       const t =
         i === 0 ? 0.12 + (f / nf) * 0.6 + rnd() * 0.06 : 0.1 + (f / nf) * 0.6 + rnd() * 0.08;
@@ -373,7 +373,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     const crust = fbm3(x * 0.45, y * 0.24, z * 0.45, seed ^ 0xc4, 2);
     out.lerp(LIVE, smooth(0.48, 0.72, crust) * 0.35 * up);
     // Weathered and fresh carbonate beds follow the flanges; no extra rock geometry.
-    const tint = lostCityBedTint(x, y - gnd(0, 0), z, Math.max(1.2, H / 11), 0.9);
+    const tint = lostCityBedTint(x, y - gnd(0, 0), z, Math.max(1.2, H / 11), 0.5);
     out.r *= tint[0];
     out.g *= tint[1];
     out.b *= tint[2];
@@ -393,10 +393,10 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     // alternating pale and shaded, as fluid ran down the walls.
     const wall = 1 - Math.abs(ny);
     const streak = fbm3(x * 1.3, y * 0.03, z * 1.3, seed ^ 0xf10, 3);
-    out.multiplyScalar(1 + (streak - 0.5) * 1.5 * wall);
+    out.multiplyScalar(1 + (streak - 0.5) * 0.8 * wall);
     // Dark seams between flow sheets: thin, vertically drawn streaks, strongest on walls.
     const seam = fbm3(x * 1.1, y * 0.07, z * 1.1, seed ^ 0x5ea, 3);
-    out.multiplyScalar(1 - 0.22 * smooth(0.5, 0.56, seam) * (1 - smooth(0.56, 0.62, seam)) * wall);
+    out.multiplyScalar(1 - 0.12 * smooth(0.5, 0.56, seam) * (1 - smooth(0.56, 0.62, seam)) * wall);
     // Flow ridges: pale crests catch the light, troughs run grey-brown with a cool film.
     for (const sp of spires) {
       const dx = x - sp.x,
@@ -407,7 +407,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const nn = fbm3(Math.cos(ang) * 1.3 + 3, ly * 0.09, Math.sin(ang) * 1.3 + 3, sp.seed, 3);
       const cr = trunkCrest(ang, ly, nn, sp.ridges ?? 7, sp.seed);
       const cc = cr * cr;
-      out.multiplyScalar(0.72 + 0.4 * cc);
+      out.multiplyScalar(0.82 + 0.25 * cc);
       out.lerp(SHADE, (1 - cc) * (1 - cc) * 0.3 * smooth(0.05, 0.4, ly / sp.h));
       out.lerp(TROUGH, (1 - cc) * 0.55 * smooth(0.02, 0.2, ly / sp.h));
       // Fine flow striations: thin pale and shaded lines running down the wall, drifting
@@ -415,8 +415,8 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const fine = Math.sin(ang * (sp.ridges ?? 7) * 4.5 + nn * 9 + ly * 0.06 + sp.seed);
       const fine2 = Math.sin(ang * (sp.ridges ?? 7) * 11 - nn * 5 + ly * 0.03);
       const line = 0.65 * fine + 0.35 * fine2;
-      out.multiplyScalar(1 + line * 0.32 * wall);
-      out.lerp(FRINGE, smooth(0.55, 0.95, line) * 0.22 * wall * smooth(0.1, 0.5, ly / sp.h));
+      out.multiplyScalar(1 + line * 0.14 * wall);
+      out.lerp(FRINGE, smooth(0.55, 0.95, line) * 0.1 * wall * smooth(0.1, 0.5, ly / sp.h));
       out.lerp(BIOFILM, (1 - cc) * 0.3 * (1 - smooth(0, 0.35, ly / sp.h)) * smooth(0.4, 0.6, n1));
       break;
     }
@@ -431,6 +431,10 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       out.lerp(FRINGE, lip * 0.85);
       out.lerp(VENT, mouth * smooth(-v.depth - 1.2, -0.3, dy) * 0.85);
     }
+    // Broad, slow staining: white crust patches against grey-brown weathered patches.
+    const patch = fbm3(x * 0.07 + 4, y * 0.05, z * 0.07 + 4, seed ^ 0x9a7, 2);
+    out.lerp(TROUGH, smooth(0.5, 0.72, patch) * 0.5 * wall);
+    out.lerp(LIVE, (1 - smooth(0.28, 0.46, patch)) * 0.45 * wall * (0.3 + up));
     // Faint blue-green biofilm: damp, sheltered lower walls and under ledges.
     const film = fbm3(x * 0.22, y * 0.12, z * 0.22, seed ^ 0xb10, 3);
     out.lerp(BIOFILM, smooth(0.48, 0.6, film) * 0.4 * wall * (1 - up * 0.6));

@@ -1,7 +1,7 @@
 /** Broad, irregular carbonate beds, baked into existing Lost City vertices. */
 import { fbm3, smooth } from './props/geo/shared.js';
 
-export const LOST_CITY_STRATA = { periodM: 12.8, amount: 0.85 };
+export const LOST_CITY_STRATA = { periodM: 12.8, amount: 0.4 };
 
 /** Linear colour multipliers: pale resistant beds, cooler weathered beds, soft joints. */
 export function lostCityBedTint(
@@ -11,7 +11,8 @@ export function lostCityBedTint(
   periodM: number,
   strength: number,
 ): readonly [number, number, number] {
-  const warp = (fbm3(x * 0.018, 3, z * 0.018, 600, 2) - 0.5) * 0.65;
+  // Strong low-frequency warp: beds break into drifting patches, not contour-parallel stripes.
+  const warp = (fbm3(x * 0.012, 3, z * 0.012, 600, 3) - 0.5) * 2.4;
   const bed = y / periodM + warp;
   const phase = bed - Math.floor(bed);
   const resistant = 0.5 + 0.5 * Math.cos(phase * Math.PI * 2);
@@ -39,7 +40,7 @@ export function lostCitySlopeTint(
   // balanced about 1.0 so the slope keeps its overall brightness.
   const broad = fbm3(x * 0.045, 11, z * 0.045, 611, 3);
   const fine = fbm3(x * 0.3, 13, z * 0.3, 613, 2);
-  const silt = 0.74 + 0.5 * smooth(0.3, 0.7, broad) + 0.18 * (fine - 0.5);
+  const silt = 0.84 + 0.3 * smooth(0.3, 0.7, broad) + 0.1 * (fine - 0.5);
   const warm = 1 + 0.08 * (fbm3(x * 0.09, 17, z * 0.09, 617, 2) - 0.5);
   return [bed[0] * silt * warm, bed[1] * silt, (bed[2] * silt) / warm];
 }
