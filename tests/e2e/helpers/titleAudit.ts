@@ -237,16 +237,41 @@ export function titleAudit(base = '/') {
       const g = window.__game as unknown as AuditGame;
       return g.props.loaded && g.discovery.loaded && g.explore.ready && !!g.life;
     };
-    await page.waitForFunction(contentReady);
-    await waitForFrames(page, 2);
-    await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
-    const initial = await gameplay(page);
-    for (const key of ['w', 'Space', 'g', 'Shift']) {
-      await page.keyboard.down(key);
-      await page.waitForTimeout(100);
-      await page.keyboard.up(key);
-    }
-    expect(await gameplay(page)).toEqual(initial);
+    // Initial Home has persistent menu data, but no dive may start from pilot input.
+    // Gameplay freeze checks below run after a selected dive has been installed.
+    const homeState = () =>
+      page.evaluate(() => {
+        const g = window.__game as unknown as AuditGame;
+        return {
+          progress: g.progress.snapshot(),
+          discoveries: localStorage.getItem('subexplorer.discoveries.v1'),
+          diveResources: [
+            'terrain',
+            'sub',
+            'scanner',
+            'power',
+            'props',
+            'life',
+            'mission',
+            'missionRouter',
+            'audio',
+            'photoMode',
+            'explore',
+          ].filter((name) => name in g),
+        };
+      });
+    const pilotInput = async () => {
+      await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+      for (const key of ['w', 'Space', 'g', 'Shift']) {
+        await page.keyboard.down(key);
+        await page.waitForTimeout(100);
+        await page.keyboard.up(key);
+      }
+    };
+    const unloaded = await homeState();
+    expect(unloaded.diveResources).toEqual([]);
+    await pilotInput();
+    expect(await homeState()).toEqual(unloaded);
     await boot(page, `${base}?mission=titanic&tier=low&skipBriefing=1`);
     await page.waitForFunction(contentReady);
     await waitForFrames(page, 2);
@@ -270,6 +295,10 @@ export function titleAudit(base = '/') {
     // the next Journal close can look like a two-geometry leak.
     await waitForFrames(page, 2);
     const perf = await page.evaluate(() => ({ ...(window.__game as unknown as AuditGame).perf }));
+    const initial = await gameplay(page);
+    expect(initial).toEqual(paused);
+    await pilotInput();
+    expect(await gameplay(page)).toEqual(initial);
     for (let i = 0; i < 3; i++) {
       const before = await draws(page);
       await page

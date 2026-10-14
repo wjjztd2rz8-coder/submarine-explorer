@@ -76,7 +76,7 @@ function setup(over: { load?: () => Promise<unknown>; state?: string } = {}) {
       setSceneCaption: caption,
     },
     settingsScreen: { isOpen: false },
-    discovery: { guide: { isOpen: false } },
+    journal: { isOpen: false },
     globe: { isOpen: false },
     upgrades: { isOpen: false },
     controlsCard: { isOpen: false },
@@ -91,7 +91,13 @@ function setup(over: { load?: () => Promise<unknown>; state?: string } = {}) {
 beforeEach(() => {
   vi.useFakeTimers();
   vi.stubGlobal('window', Object.assign(new EventTarget(), { innerWidth: 1280, innerHeight: 720 }));
-  vi.stubGlobal('document', Object.assign(new EventTarget(), { hidden: false }));
+  vi.stubGlobal(
+    'document',
+    Object.assign(new EventTarget(), {
+      hidden: false,
+      documentElement: { dataset: { reduceMotion: 'false' } },
+    }),
+  );
   vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 });
 afterEach(() => {
@@ -147,6 +153,19 @@ describe('title lifecycle', () => {
     expect(r.clear).toHaveBeenCalledTimes(1); // navy once, not every frame
     (ctx.home as { sitesOpen: boolean }).sitesOpen = false;
     expect(draw()).toBeGreaterThan(sites);
+  });
+
+  it('presents Home without dive metadata, discovery or a camera rig', async () => {
+    const { ctx, frame, system } = setup();
+    for (const field of ['meta', 'tile', 'rig']) delete (ctx as Record<string, unknown>)[field];
+    frame();
+    ctx.titleScene.present(fakeRenderer() as never);
+    expect(ctx.titleScene.active).toBe(true);
+    expect(ctx.titleScene.drawCount).toBe(1);
+    await vi.runAllTimersAsync();
+    expect(ctx.loader.load).toHaveBeenCalledExactlyOnceWith('monterey-canyon');
+    expect(ctx.titleScene.ownsCanvas).toBe(true);
+    system.dispose!();
   });
 
   it('does not claim the canvas in a dive and never builds a scene there', () => {
@@ -292,12 +311,7 @@ describe('title lifecycle', () => {
       frame();
       ctx.titleScene.present(r as never);
       expect(ctx.titleScene.drawCount).toBe(before + 1);
-      for (const modal of [
-        ctx.settingsScreen,
-        ctx.discovery.guide,
-        ctx.upgrades,
-        ctx.controlsCard,
-      ]) {
+      for (const modal of [ctx.settingsScreen, ctx.journal, ctx.upgrades, ctx.controlsCard]) {
         (modal as { isOpen: boolean }).isOpen = true;
         frame();
         const paused = ctx.titleScene.drawCount;

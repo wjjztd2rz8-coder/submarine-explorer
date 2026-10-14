@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   DeferredStartup,
   type DiveLifetime,
@@ -338,4 +338,248 @@ describe('deferred dive startup', () => {
       vi.useRealTimers();
     }
   });
+});
+
+// Exercise the runtime boundary with the real lifecycle, runner and frame loops.
+// The component lists stand in for WebGL/DOM systems so ordering and readiness
+// can be checked without a browser.
+vi.mock('three', async (original) => ({
+  ...(await original<typeof import('three')>()),
+  WebGLRenderer: vi.fn(function () {
+    return { getContext: () => null, setPixelRatio() {}, setSize() {} };
+  }),
+}));
+vi.mock('../../src/app/boot.js', () => ({ showFatal: vi.fn() }));
+vi.mock('../../src/app/homeStartup.js', async (original) => ({
+  ...(await original<typeof import('../../src/app/homeStartup.js')>()),
+  createHomeSystems: vi.fn(() => []),
+}));
+vi.mock('../../src/app/systems.js', () => ({ createSystems: vi.fn(() => []) }));
+
+import { startRuntime } from '../../src/app/startup.js';
+import { showFatal } from '../../src/app/boot.js';
+import { createHomeSystems } from '../../src/app/homeStartup.js';
+import { createSystems } from '../../src/app/systems.js';
+import { makeExposer, type BootContext, type GameContext } from '../../src/app/context.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import { makeConfig } from '../../src/core/Config.js';
+import { makeSyntheticTile } from './helpers.js';
+
+function runtimeSetup(state: 'home' | 'dive' = 'home') {
+  const frames = new Map<number, FrameRequestCallback>();
+  let nextFrame = 0;
+  const nodes: Array<{ id: string; removed: boolean; remove(): void }> = [];
+  vi.stubGlobal(
+    'requestAnimationFrame',
+    vi.fn((callback: FrameRequestCallback) => {
+      frames.set(++nextFrame, callback);
+      return nextFrame;
+    }),
+  );
+  vi.stubGlobal(
+    'cancelAnimationFrame',
+    vi.fn((id: number) => frames.delete(id)),
+  );
+  vi.stubGlobal('window', new EventTarget());
+  vi.stubGlobal('document', {
+    body: { append: (node: (typeof nodes)[number]) => nodes.push(node) },
+    createElement: () => ({
+      id: '',
+      removed: false,
+      append() {},
+      setAttribute() {},
+      remove() {
+        this.removed = true;
+      },
+    }),
+  });
+  const tile = makeSyntheticTile({ id: 'lost-city' });
+  const load = vi.fn(async (_id: string, _signal?: AbortSignal) => tile);
+  const input = { state: {}, sample: vi.fn(() => ({})) };
+  const ctx = {
+    app: { state },
+    params: new URLSearchParams('tile=lost-city&tier=low'),
+    tileId: 'lost-city',
+    loader: { load },
+    bus: new EventBus(),
+    config: makeConfig(),
+    renderer: {},
+    scene: {},
+    input,
+    sub: { getState: () => ({}), position: {}, velocity: {} },
+    ...makeExposer(),
+  } as unknown as BootContext;
+  const present = () => {
+    const [id, callback] = frames.entries().next().value!;
+    frames.delete(id);
+    callback(100);
+  };
+  return { ctx, load, tile, nodes, frames, present };
+}
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.clearAllMocks();
+  vi.mocked(createHomeSystems).mockReturnValue([]);
+  vi.mocked(createSystems).mockReturnValue([]);
+});
+
+describe('runtime startup capability', () => {
+  it('presents an interactive Home with no selected-tile load or dive factory call', async () => {
+    const h = runtimeSetup();
+    const drawn = vi.fn();
+    vi.mocked(createHomeSystems).mockReturnValue([
+      { name: 'title', frame: { 'render.draw': drawn } },
+    ]);
+    const dispose = await startRuntime(h.ctx);
+    expect(h.load).not.toHaveBeenCalled();
+    expect(createSystems).not.toHaveBeenCalled();
+    expect(window.__gameReady).toBeUndefined();
+    expect(h.nodes).toEqual([]); // No dive loading/briefing surface on Home.
+    h.present();
+    expect(drawn).toHaveBeenCalledTimes(1);
+    expect(window.__gameReady).toBe(true);
+    dispose();
+    expect(h.frames.size).toBe(0);
+  });
+
+  it('keeps loading visible and systems uninitialized until the selected tile arrives', async () => {
+    const h = runtimeSetup('dive');
+    const held = pending<typeof h.tile>();
+    h.load.mockReturnValue(held.promise);
+    const init = vi.fn((ctx: GameContext) => {
+      ctx.expose({ sub: ctx.sub });
+    });
+    const draw = vi.fn(() => {
+      expect(window.__gameReady).toBeUndefined();
+    });
+    vi.mocked(createSystems).mockReturnValue([
+      { name: 'dive', init, frame: { 'render.draw': draw } },
+    ]);
+    const ready = vi.fn();
+    h.ctx.bus.on('game:ready', ready);
+    const result = startRuntime(h.ctx);
+    await vi.waitFor(() =>
+      expect(h.load).toHaveBeenCalledExactlyOnceWith('lost-city', expect.any(AbortSignal)),
+    );
+    expect(init).not.toHaveBeenCalled();
+    expect(window.__gameReady).toBeUndefined();
+    expect(h.nodes[0].id).toBe('startup-loading');
+    expect(h.nodes[0].removed).toBe(false);
+    held.resolve(h.tile);
+    const dispose = await result;
+    expect(init).toHaveBeenCalledExactlyOnceWith(h.ctx);
+    expect((h.ctx as GameContext).tile).toBe(h.tile);
+    expect(window.__gameReady).toBeUndefined();
+    expect(ready).not.toHaveBeenCalled();
+    expect(h.nodes[0].removed).toBe(false);
+    h.present();
+    expect(draw).toHaveBeenCalledTimes(1);
+    expect(window.__gameReady).toBe(true);
+    expect(ready).toHaveBeenCalledExactlyOnceWith({ tileId: 'lost-city' });
+    expect(h.nodes[0].removed).toBe(true);
+    expect(createHomeSystems).not.toHaveBeenCalled();
+    dispose();
+  });
+
+  it('aborts page teardown during loading and never installs a late selected tile', async () => {
+    const h = runtimeSetup('dive');
+    const held = pending<typeof h.tile>();
+    h.load.mockReturnValue(held.promise);
+    const init = vi.fn();
+    vi.mocked(createSystems).mockReturnValue([{ name: 'dive', init }]);
+    const result = startRuntime(h.ctx);
+    await vi.waitFor(() => expect(h.load).toHaveBeenCalled());
+    window.dispatchEvent(new Event('pagehide'));
+    expect(h.load.mock.calls[0][1]!.aborted).toBe(true);
+    held.resolve(h.tile);
+    await result;
+    expect(init).not.toHaveBeenCalled();
+    expect(h.frames.size).toBe(0);
+    expect(h.nodes[0].removed).toBe(true);
+    expect(showFatal).not.toHaveBeenCalled();
+  });
+
+  it('keeps a cached Home interactive when Back navigation restores the page', async () => {
+    const h = runtimeSetup();
+    const dispose = await startRuntime(h.ctx);
+    const event = new Event('pagehide');
+    Object.defineProperty(event, 'persisted', { value: true });
+    window.dispatchEvent(event);
+    expect(h.frames.size).toBe(1);
+    h.present();
+    expect(window.__gameReady).toBe(true);
+    dispose();
+    expect(h.frames.size).toBe(0);
+  });
+
+  it('reports a tile failure without starting any dive systems or hiding the error', async () => {
+    const h = runtimeSetup('dive');
+    h.load.mockRejectedValue(new Error('offline tile'));
+    const init = vi.fn();
+    vi.mocked(createSystems).mockReturnValue([{ name: 'dive', init }]);
+    const error = vi.fn();
+    h.ctx.bus.on('tile:error', error);
+    await startRuntime(h.ctx);
+    expect(init).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalledExactlyOnceWith({ id: 'lost-city', error: 'offline tile' });
+    expect(showFatal).toHaveBeenCalledExactlyOnceWith(
+      'Could not start dive "lost-city": offline tile',
+    );
+    expect(h.frames.size).toBe(0);
+    expect(h.nodes[0].removed).toBe(true);
+  });
+
+  it('rolls back a partially initialized runtime system on failure', async () => {
+    const h = runtimeSetup('dive');
+    const rollback = vi.fn();
+    vi.mocked(createSystems).mockReturnValue([
+      {
+        name: 'dive',
+        init() {
+          throw new Error('partial');
+        },
+        dispose: rollback,
+      },
+    ]);
+    await startRuntime(h.ctx);
+    expect(rollback).toHaveBeenCalledTimes(1);
+    expect(showFatal).toHaveBeenCalledExactlyOnceWith('Could not start dive "lost-city": partial');
+    expect(h.frames.size).toBe(0);
+  });
+});
+
+describe('page boot capability', () => {
+  it.each(['?tier=low', '?tile=lost-city&tier=low'])(
+    'resolves %s without requesting a dive tile before the startup boundary',
+    async (search) => {
+      runtimeSetup();
+      Object.assign(window, {
+        location: { search, href: `https://example.test/${search}` },
+        innerWidth: 1280,
+        innerHeight: 720,
+        devicePixelRatio: 1,
+      });
+      Object.assign(document, { getElementById: () => ({}), body: { dataset: {} } });
+      vi.stubGlobal('localStorage', { getItem: () => null, setItem() {} });
+      const fetch = vi.fn(async (url: string) => {
+        expect(url).toBe('/data/tiles/index.json');
+        return {
+          ok: true,
+          json: async () => ({ tiles: [{ id: 'titanic' }, { id: 'lost-city' }] }),
+        };
+      });
+      vi.stubGlobal('fetch', fetch);
+      const { boot } =
+        await vi.importActual<typeof import('../../src/app/boot.js')>('../../src/app/boot.js');
+      const ctx = await boot();
+      expect(ctx?.app.state).toBe(search.includes('tile=') ? 'dive' : 'home');
+      expect(ctx?.tileId).toBe(search.includes('tile=') ? 'lost-city' : 'titanic');
+      expect(ctx).not.toHaveProperty('tile');
+      expect(ctx).not.toHaveProperty('meta');
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(createSystems).not.toHaveBeenCalled();
+      expect(window.__gameReady).toBeUndefined();
+    },
+  );
 });

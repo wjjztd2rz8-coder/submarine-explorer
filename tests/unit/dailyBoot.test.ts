@@ -6,6 +6,7 @@ import { Progress } from '../../src/game/Progress.js';
 
 const fixtures = vi.hoisted(() => ({
   routes: [] as string[],
+  load: vi.fn(),
   deep: false,
   def: {
     title: 'Shallow',
@@ -33,14 +34,20 @@ vi.mock('../../src/game/MissionRouter.js', () => ({
     return { tileId: 'shallow', def: structuredClone(fixtures.def) };
   },
 }));
+vi.mock('three', async (original) => ({
+  ...(await original<typeof import('three')>()),
+  WebGLRenderer: vi.fn(function () {
+    return { getContext: () => null, setPixelRatio() {}, setSize() {} };
+  }),
+}));
 vi.mock('../../src/world/TileLoader.js', () => ({
   TileLoader: class {
     async loadIndex() {
       return [{ id: 'shallow' }, { id: 'deep' }];
     }
     async load() {
-      // Stop before rendering; this regression targets route resolution during boot.
-      throw new Error('test stop after route resolution');
+      fixtures.load();
+      throw new Error('Gameplay tile loading must wait for the startup boundary');
     }
   },
 }));
@@ -51,6 +58,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
   fixtures.routes = [];
+  fixtures.load.mockClear();
   fixtures.deep = false;
 });
 it.each(['arcade', 'realistic'] as const)(
@@ -78,10 +86,13 @@ it.each(['arcade', 'realistic'] as const)(
     vi.stubGlobal('document', {
       body: { dataset: {}, appendChild: vi.fn() },
       createElement: () => ({ querySelector: () => ({ textContent: '' }) }),
+      getElementById: () => ({}),
     });
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const dive = vi.spyOn(Daily, 'dailyDive');
-    await boot();
+    const ctx = await boot();
+    expect(ctx?.daily?.date).toBe('2026-10-01');
+    expect(fixtures.load).not.toHaveBeenCalled();
     expect(dive).toHaveBeenCalledWith(
       '2026-10-01',
       mode === 'arcade' ? ['shallow', 'deep'] : ['shallow'],
@@ -99,11 +110,14 @@ it('keeps the requested daily date when loading crosses UTC midnight', async () 
   vi.stubGlobal('document', {
     body: { dataset: {}, appendChild: vi.fn() },
     createElement: () => ({ querySelector: () => ({ textContent: '' }) }),
+    getElementById: () => ({}),
   });
   vi.spyOn(console, 'error').mockImplementation(() => {});
   vi.spyOn(console, 'warn').mockImplementation(() => {});
   const dive = vi.spyOn(Daily, 'dailyDive');
-  await boot();
+  const ctx = await boot();
+  expect(ctx?.daily?.date).toBe('2026-10-01');
+  expect(fixtures.load).not.toHaveBeenCalled();
   expect(fixtures.routes).toEqual(['mission=shallow&daily=2026-10-01', 'mission=shallow']);
   expect(dive).toHaveBeenCalledWith('2026-10-01', ['shallow']);
 });

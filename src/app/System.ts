@@ -1,9 +1,8 @@
 /**
  * The game-system contract (F0-CORE).
  *
- * `main.ts` builds a `GameContext` (`app/boot.ts`), then initialises every
- * system in `app/systems.ts` in list order and runs the frame loop
- * (`app/loop.ts`). A system is a small object:
+ * Startup initializes the Home or dive capabilities in list order, then runs
+ * their frame loop. A system is a small object:
  *
  *   - `init(ctx)`   builds its objects, adds DOM and listeners, and publishes
  *                   what others need on `ctx`. Runs once, in list order, so
@@ -12,12 +11,11 @@
  *                   For wiring that must come after all other listeners.
  *   - `frame`       per-frame hooks keyed by stage. Stages run in the order of
  *                   `FRAME_STAGES`; systems sharing a stage run in list order.
- *   - `dispose()`   optional teardown (unused by the page today; tests and a
- *                   future in-page site switch can call it).
+ *   - `dispose()`   optional teardown, also called on page exit or failed startup.
  *
  * Adding a system: write `app/systems/<name>.ts`, append it to `app/systems.ts`,
  * and hook into an existing stage (or add a stage name to `FRAME_STAGES` at the
- * point in the frame where it must run). `main.ts` never changes.
+ * point in the frame where it must run).
  */
 
 import type * as THREE from 'three';
@@ -122,26 +120,31 @@ export interface FrameState {
 
 export type FrameHook = (f: FrameState, ctx: GameContext) => void;
 
-export interface GameSystem {
+export interface GameSystem<Context = GameContext, Frame = FrameState> {
   readonly name: string;
-  init?(ctx: GameContext): void;
-  start?(ctx: GameContext): void;
-  frame?: Partial<Record<FrameStage, FrameHook>>;
+  init?(ctx: Context): void;
+  start?(ctx: Context): void;
+  frame?: Partial<Record<FrameStage, (f: Frame, ctx: Context) => void>>;
   dispose?(): void;
 }
 
 /** Runs systems: init/start in list order, frame hooks by stage then list order. */
-export class SystemRunner {
-  private readonly systems: GameSystem[] = [];
-  private schedule: Array<{ system: string; stage: FrameStage; hook: FrameHook }> = [];
+export class SystemRunner<Context = GameContext, Frame = FrameState> {
+  private readonly systems: GameSystem<Context, Frame>[] = [];
+  private schedule: Array<{
+    system: string;
+    stage: FrameStage;
+    hook: (f: Frame, ctx: Context) => void;
+  }> = [];
 
-  constructor(private readonly ctx: GameContext) {}
+  constructor(private readonly ctx: Context) {}
 
   /** Initialise each system in order, then run every `start`, then build the frame schedule. */
-  init(systems: readonly GameSystem[]): void {
+  init(systems: readonly GameSystem<Context, Frame>[]): void {
     for (const system of systems) {
-      system.init?.(this.ctx);
+      // Include a partially initialized system in startup rollback.
       this.systems.push(system);
+      system.init?.(this.ctx);
     }
     for (const system of this.systems) system.start?.(this.ctx);
     this.schedule = [];
@@ -154,7 +157,7 @@ export class SystemRunner {
   }
 
   /** Run one frame's hooks in stage order. */
-  frame(f: FrameState): void {
+  frame(f: Frame): void {
     for (const entry of this.schedule) entry.hook(f, this.ctx);
   }
 

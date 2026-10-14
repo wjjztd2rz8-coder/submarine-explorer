@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **S-boot:** initial Home starts the title and shared menus without fetching the default dive tile or starting dive simulation systems. Selecting a site keeps the existing navigation and briefing behavior; the briefing surface shows loading until the first dive frame. Journal, Settings, Daily, Upgrades and offline installation remain available. No player capability is cut.
+
 - Endurance close view no longer overexposed: site lamps 2x to 0.7x, fill 3x to 1.5x, hemisphere 3 to 2 (wood grain and sand relief return at 15 m), and the shared pale anemone and squat-lobster albedo is toned down so they stop clipping to white. The opening camera is unchanged: the existing opening gates (whole sub in frame, 8 px gap to the wreck, whole wreck clear of the sub) cap the hull near 380 px.
 
 - **V-beebe trunk and golden pose:** the Beebe hero trunk gets vertical mineral streaks (ochre runs, soot gaps), a soot-black orifice rim and a slightly stronger self-lit tint, with identical triangle and draw counts. The golden approach for Beebe now stands 44 m out, aimed at the upper trunk (`tools/beebe-poses.json`), so the whole chimney and its smoke show and the scan card no longer covers the top. Reason: the old pose cut the trunk off and the card sat on it. Details: `plan/progress/V-beebe.md`.

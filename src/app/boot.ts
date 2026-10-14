@@ -1,9 +1,4 @@
-/**
- * Boot (F0-CORE, from the top of the old `main.ts`): URL params, shell start
- * state, mission route, saved settings, the tile, the renderer and the quality
- * tier. Everything here happens before the first system initialises; the
- * result is the `BootContext` every system builds on.
- */
+/** Resolve route, saved preferences, renderer and quality before starting Home or a selected dive. */
 
 import { DailySave } from '../game/DailySave.js';
 import { dailyDive, dailyMission, utcDate } from '../game/Daily.js';
@@ -106,19 +101,6 @@ export async function boot(): Promise<BootContext | null> {
   const depthParam = Number(params.get('depth'));
   const spawnDepth = Number.isFinite(depthParam) && depthParam > 0 ? depthParam : null;
 
-  // ---------------------------------------------------------------- loading
-  let tile;
-  try {
-    tile = await loader.load(tileId);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    bus.emit('tile:error', { id: tileId, error: message });
-    showFatal(`Could not load tile "${tileId}": ${message}`);
-    return null;
-  }
-  const { meta } = tile;
-  bus.emit('tile:loaded', { meta });
-
   // ---------------------------------------------------------------- renderer
   const canvas = document.getElementById('viewport') as HTMLCanvasElement;
   const renderer = new THREE.WebGLRenderer({
@@ -168,8 +150,6 @@ export async function boot(): Promise<BootContext | null> {
     postFx: settings.postFx,
     debugTerrain,
     spawnDepth,
-    tile,
-    meta,
     canvas,
     renderer,
     scene,

@@ -10,6 +10,7 @@ import {
   type FrameState,
   type GameSystem,
 } from '../../src/app/System.js';
+import { createHomeSystems } from '../../src/app/homeStartup.js';
 import { createSystems } from '../../src/app/systems.js';
 
 describe('SystemRunner', () => {
@@ -130,5 +131,49 @@ describe('Journal gamepad input through the freeze gate', () => {
     } finally {
       vi.unstubAllGlobals();
     }
+  });
+});
+
+describe('Home startup capabilities', () => {
+  it('keeps menus, Daily, Journal input, performance diagnostics and title rendering without simulation stages', () => {
+    const home = createHomeSystems();
+    const names = home.map((system) => system.name);
+    expect(names).toEqual(
+      expect.arrayContaining([
+        'shell',
+        'globe',
+        'settings',
+        'daily',
+        'menuProgress',
+        'shellKeys',
+        'title',
+        'titleRender',
+        'quality',
+      ]),
+    );
+    const stages = home.flatMap((system) => Object.keys(system.frame ?? {}));
+    expect(stages).toContain('render.draw');
+    expect(stages).toContain('late.input');
+    expect(
+      stages.filter(
+        (stage) =>
+          stage.startsWith('sim.') || stage.startsWith('env.') || stage.startsWith('play.mission'),
+      ),
+    ).toEqual([]);
+    const diveOnly = [
+      'terrain',
+      'submarine',
+      'atmosphere',
+      'landmarks',
+      'discovery',
+      'power',
+      'props',
+      'life',
+      'mission',
+      'photo',
+      'audio',
+      'explore',
+    ];
+    expect(names.filter((name) => diveOnly.includes(name))).toEqual([]);
   });
 });

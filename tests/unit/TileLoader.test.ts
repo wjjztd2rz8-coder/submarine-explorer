@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   TileLoadError,
   TileLoader,
@@ -58,6 +58,21 @@ describe('TileLoader', () => {
     expect(loaded.meta.cols).toBe(5);
     expect(loaded.heights.length).toBe(20);
     expect(Array.from(loaded.heights)).toEqual(Array.from(tile.heights));
+  });
+
+  it('passes the dive lifetime signal to metadata and heightmap fetches', async () => {
+    const tile = makeSyntheticTile({ id: 'fixture' });
+    const controller = new AbortController();
+    const original = makeFakeFetch(tile);
+    const fetch = vi.fn<FetchLike>((url, options) => {
+      expect(options?.signal).toBe(controller.signal);
+      return original(url);
+    });
+    await new TileLoader('/data/tiles', fetch).load('fixture', controller.signal);
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      '/data/tiles/fixture/meta.json',
+      '/data/tiles/fixture/heightmap.bin',
+    ]);
   });
 
   it('preserves row-major order with row 0 = north', async () => {

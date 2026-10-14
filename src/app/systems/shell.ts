@@ -12,7 +12,7 @@ import { Globe } from '../../ui/Globe.js';
 import { Home } from '../../ui/Home.js';
 import { MissionSelect, missionUrl, tileUrl } from '../../ui/MissionSelect.js';
 import { PauseMenu } from '../../ui/PauseMenu.js';
-import type { AppState } from '../context.js';
+import type { AppState, ShellContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
@@ -39,138 +39,9 @@ export function readLastSite(): string | null {
 export const shellSystem: GameSystem = {
   name: 'shell',
   dispose: () => cleanup.dispose(),
-  init(ctx) {
-    const { index, meta, route, bus, save, discovery, app } = ctx;
-    const missionSelect = new MissionSelect(index, {
-      currentTileId: meta.id,
-      currentMissionId: route?.missionId,
-      collapsed: route !== null,
-    });
-    ctx.missionSelect = missionSelect;
-    ctx.missionSummaries = [];
-    const home = new Home(
-      {
-        dive: () => {
-          // A saved mission that the catalogue no longer lists falls back to the opening one.
-          const known = ctx.missionSummaries.some((entry) => entry.id === app.lastSite);
-          selectMission(app.lastSite && known ? app.lastSite : FIRST_MISSION_ID);
-        },
-        journal: () => discovery.guide.open(),
-        settings: () => ctx.settingsScreen.open(),
-        controls: () => {
-          ctx.settingsScreen.open();
-          ctx.settingsScreen.showControls(true);
-        },
-      },
-      // D2-PREDIVE: the game mode selector on the home screen.
-      document.body,
-      save,
-    );
-    ctx.home = home;
-    const completion = (id: string, pois: string[]): string =>
-      `${pois.filter((poi) => discovery.store.isDiscovered(id, poi)).length}/${pois.length} logged`;
-    const summaries = loadMissionSummaries();
-    const selectMission = (id: string): void => {
-      const m = ctx.missionSummaries.find((entry) => entry.id === id);
-      bus.emit('app:siteSelected', { missionId: id, tileId: m?.tile ?? id });
-      window.location.href = missionUrl(ctx.shellBaseHref(), id);
-    };
-    const selectTile = (id: string): void => {
-      bus.emit('app:siteSelected', { missionId: null, tileId: id });
-      window.location.href = tileUrl(ctx.shellBaseHref(), id);
-    };
-    const homeSites = new MissionSelect(index, {
-      parent: home.sitesSlot,
-      presentation: 'shell',
-      onSelect: selectTile,
-      onSelectMission: selectMission,
-      completion,
-      onSiteFocus: (id) => ctx.homeGlobe.previewSite(id),
-    });
-    ctx.homeSites = homeSites;
-    const objectiveHints = new Map<string, string>();
-    const pause = new PauseMenu({
-      resume: () => ctx.setAppState('dive'),
-      journal: () => discovery.guide.open(),
-      settings: () => ctx.settingsScreen.open(),
-      controls: () => ctx.controlsCard.open(),
-      controlsLabel: () => (ctx.controlsCard.device === 'touch' ? 'How to play' : 'Controls'),
-      credits: () => buildDataCredits(meta),
-      quit: () => {
-        history.pushState({}, '', ctx.shellBaseHref());
-        ctx.setAppState('home');
-      },
-      objectives: () =>
-        ctx.missionRouter?.mission.objectives.map((objective) => ({
-          title: objective.title,
-          hint: objectiveHints.get(objective.id) ?? 'Explore the site to locate this objective.',
-          complete: objective.complete,
-          primary: objective.primary,
-        })) ?? [],
-    });
-    ctx.pause = pause;
-    if (route)
-      void fetchContentJson(contentUrl(route.missionId, 'mission.json')).then((raw) => {
-        if (typeof raw !== 'object' || raw === null) return;
-        const objectives = (raw as { objectives?: unknown }).objectives;
-        if (!Array.isArray(objectives)) return;
-        for (const entry of objectives) {
-          if (typeof entry?.id === 'string' && typeof entry?.hint === 'string')
-            objectiveHints.set(entry.id, entry.hint);
-        }
-      });
-    void summaries.then((list) => {
-      ctx.missionSummaries = list;
-      missionSelect.setMissions(list);
-      homeSites.setMissions(list);
-    });
-    cleanup.add(
-      bus.on('mission:started', ({ missionId }) => {
-        app.lastSite = missionId;
-        try {
-          localStorage.setItem(LAST_SITE_KEY, JSON.stringify({ missionId }));
-        } catch {
-          /* optional */
-        }
-      }),
-    );
-    ctx.setAppState = (state: AppState): void => {
-      app.state = state;
-      document.body.dataset.appState = state;
-      // The embedded globe is open only in the home sites subview.
-      if (state === 'home') {
-        pause.close();
-        home.show();
-      } else {
-        home.hide();
-        if (state === 'pause') {
-          document.exitPointerLock?.();
-          pause.open();
-        } else pause.close();
-      }
-      reconcileHomeGlobe();
-      bus.emit('app:state', { state });
-    };
-    const reconcileHomeGlobe = (): void => {
-      if (!ctx.homeGlobe) return;
-      if (app.state === 'home' && home.isOpen && home.sitesOpen) ctx.homeGlobe.open('api');
-      else ctx.homeGlobe.close();
-    };
-    cleanup.listen(home.root, 'home:sites', reconcileHomeGlobe);
-    // D-INPUT-HUD: the in-dive list is reached through the pause menu now.
-    missionSelect.root.hidden = true;
-    ctx.expose({
-      missionSelect,
-      home,
-      pause,
-      get appState() {
-        return app.state;
-      },
-    });
-  },
+  init: initializeShell,
   frame: {
-    // While a modal is up nothing simulates and input is ignored (sampling
-    // still runs, so edge presses do not queue up behind the card).
+    // Modals and the shell freeze the dive without queuing input.
     'gate.shell': (f, ctx) => {
       const { app, missionRouter, globe, settingsScreen, discovery } = ctx;
       f.shellFrozen =
@@ -186,12 +57,145 @@ export const shellSystem: GameSystem = {
   },
 };
 
+/** Shared menu construction; no tile or dive simulation is required. */
+export function initializeShell(ctx: ShellContext): void {
+  const { index, meta, route, bus, save, journal, discoveries, app } = ctx;
+  const missionSelect = new MissionSelect(index, {
+    currentTileId: meta?.id,
+    currentMissionId: route?.missionId,
+    collapsed: route !== null,
+  });
+  ctx.missionSelect = missionSelect;
+  ctx.missionSummaries = [];
+  const home = new Home(
+    {
+      dive: () => {
+        // A saved mission that the catalogue no longer lists falls back to the opening one.
+        const known = ctx.missionSummaries.some((entry) => entry.id === app.lastSite);
+        selectMission(app.lastSite && known ? app.lastSite : FIRST_MISSION_ID);
+      },
+      journal: () => journal.open(),
+      settings: () => ctx.settingsScreen.open(),
+      controls: () => {
+        ctx.settingsScreen.open();
+        ctx.settingsScreen.showControls(true);
+      },
+    },
+    // D2-PREDIVE: the game mode selector on the home screen.
+    document.body,
+    save,
+  );
+  ctx.home = home;
+  const completion = (id: string, pois: string[]): string =>
+    `${pois.filter((poi) => discoveries.isDiscovered(id, poi)).length}/${pois.length} logged`;
+  const summaries = loadMissionSummaries();
+  const selectMission = (id: string): void => {
+    const m = ctx.missionSummaries.find((entry) => entry.id === id);
+    bus.emit('app:siteSelected', { missionId: id, tileId: m?.tile ?? id });
+    window.location.href = missionUrl(ctx.shellBaseHref(), id);
+  };
+  const selectTile = (id: string): void => {
+    bus.emit('app:siteSelected', { missionId: null, tileId: id });
+    window.location.href = tileUrl(ctx.shellBaseHref(), id);
+  };
+  const homeSites = new MissionSelect(index, {
+    parent: home.sitesSlot,
+    presentation: 'shell',
+    onSelect: selectTile,
+    onSelectMission: selectMission,
+    completion,
+    onSiteFocus: (id) => ctx.homeGlobe.previewSite(id),
+  });
+  ctx.homeSites = homeSites;
+  const objectiveHints = new Map<string, string>();
+  const pause = meta
+    ? new PauseMenu({
+        resume: () => ctx.setAppState('dive'),
+        journal: () => journal.open(),
+        settings: () => ctx.settingsScreen.open(),
+        controls: () => ctx.controlsCard?.open(),
+        controlsLabel: () => (ctx.controlsCard?.device === 'touch' ? 'How to play' : 'Controls'),
+        credits: () => buildDataCredits(meta),
+        quit: () => {
+          history.pushState({}, '', ctx.shellBaseHref());
+          ctx.setAppState('home');
+        },
+        objectives: () =>
+          ctx.missionRouter?.mission.objectives.map((objective) => ({
+            title: objective.title,
+            hint: objectiveHints.get(objective.id) ?? 'Explore the site to locate this objective.',
+            complete: objective.complete,
+            primary: objective.primary,
+          })) ?? [],
+      })
+    : undefined;
+  ctx.pause = pause;
+  if (route)
+    void fetchContentJson(contentUrl(route.missionId, 'mission.json')).then((raw) => {
+      if (typeof raw !== 'object' || raw === null) return;
+      const objectives = (raw as { objectives?: unknown }).objectives;
+      if (!Array.isArray(objectives)) return;
+      for (const entry of objectives) {
+        if (typeof entry?.id === 'string' && typeof entry?.hint === 'string')
+          objectiveHints.set(entry.id, entry.hint);
+      }
+    });
+  void summaries.then((list) => {
+    ctx.missionSummaries = list;
+    missionSelect.setMissions(list);
+    homeSites.setMissions(list);
+  });
+  cleanup.add(
+    bus.on('mission:started', ({ missionId }) => {
+      app.lastSite = missionId;
+      try {
+        localStorage.setItem(LAST_SITE_KEY, JSON.stringify({ missionId }));
+      } catch {
+        /* optional */
+      }
+    }),
+  );
+  ctx.setAppState = (state: AppState): void => {
+    app.state = state;
+    document.body.dataset.appState = state;
+    // The embedded globe is open only in the home sites subview.
+    if (state === 'home') {
+      pause?.close();
+      home.show();
+    } else {
+      home.hide();
+      if (state === 'pause') {
+        document.exitPointerLock?.();
+        pause?.open();
+      } else pause?.close();
+    }
+    reconcileHomeGlobe();
+    bus.emit('app:state', { state });
+  };
+  const reconcileHomeGlobe = (): void => {
+    if (!ctx.homeGlobe) return;
+    if (app.state === 'home' && home.isOpen && home.sitesOpen) ctx.homeGlobe.open('api');
+    else ctx.homeGlobe.close();
+  };
+  cleanup.listen(home.root, 'home:sites', reconcileHomeGlobe);
+  // D-INPUT-HUD: the in-dive list is reached through the pause menu now.
+  missionSelect.root.hidden = true;
+  ctx.expose({
+    missionSelect,
+    home,
+    pause,
+    get appState() {
+      return app.state;
+    },
+  });
+}
+
 /**
  * Globe mission select (C1, docs/globe.md): `?globe=1` and shell site pins.
  * While open it freezes the game like the briefing. Also loads the site's
  * species list for the Journal.
  */
-export const globeSystem: GameSystem = {
+export const globeSystem: GameSystem<ShellContext, { dt: number }> = {
   name: 'globe',
   init(ctx) {
     const { config, bus, index, contentLandmark, home, homeSites, missionSelect } = ctx;
@@ -223,7 +227,8 @@ export const globeSystem: GameSystem = {
     if (ctx.app.state === 'home') ctx.setAppState('home');
     missionSelect.setGlobeHandler(() => globe.open('button'));
     void globe.catalog.then((c) => missionSelect.setPending(c.pending));
-    void loadSpecies(contentLandmark).then((doc) => ctx.discovery.guide.setSpecies(doc));
+    if (contentLandmark)
+      void loadSpecies(contentLandmark).then((doc) => ctx.journal.setSpecies(doc));
     if (ctx.params.get('globe') === '1') globe.open('url');
     ctx.expose({ globe, homeGlobe });
   },
@@ -240,11 +245,11 @@ export const globeSystem: GameSystem = {
  * pause. Ctrl is swallowed outside a dive. Registered after the settings
  * screen and mission router so their capture-phase handlers see keys first.
  */
-export const shellKeysSystem: GameSystem = {
+export const shellKeysSystem: GameSystem<ShellContext, unknown> = {
   name: 'shellKeys',
   dispose: () => cleanup.dispose(),
   init(ctx) {
-    const { app, discovery, home, pause } = ctx;
+    const { app, home, pause } = ctx;
     const onShellKey = (e: KeyboardEvent): void => {
       if (app.state !== 'dive' && (e.code === 'ControlLeft' || e.code === 'ControlRight')) {
         e.stopPropagation();
@@ -256,17 +261,17 @@ export const shellKeysSystem: GameSystem = {
         ctx.upgrades?.isOpen ||
         ctx.settingsScreen.isOpen ||
         ctx.globe.isOpen ||
-        discovery.guide.isOpen ||
-        discovery.debrief.isOpen ||
+        ctx.journal.isOpen ||
+        (ctx.discovery?.debrief.isOpen ?? false) ||
         ctx.missionRouter?.briefing?.isOpen ||
         ctx.missionRouter?.debriefOpen
       )
         return;
       // D-PHOTO: Escape leaves photo mode first.
-      if (ctx.photoMode.active) {
+      if (ctx.photoMode?.active) {
         e.preventDefault();
         e.stopImmediatePropagation();
-        ctx.exitPhotoMode();
+        ctx.exitPhotoMode?.();
         return;
       }
       if (document.pointerLockElement) {
@@ -281,7 +286,7 @@ export const shellKeysSystem: GameSystem = {
       }
       e.preventDefault();
       e.stopImmediatePropagation();
-      if (app.state === 'pause') pause.escape();
+      if (app.state === 'pause') pause?.escape();
       else ctx.setAppState('pause');
     };
     cleanup.listen(window, 'keydown', onShellKey, true);

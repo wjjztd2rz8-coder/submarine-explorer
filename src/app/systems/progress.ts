@@ -6,6 +6,7 @@ import { creditPreviousDives } from '../../game/ProgressMigration.js';
 import { Progress, applyProgress, requiredHull } from '../../game/Progress.js';
 import { Upgrades } from '../../ui/Upgrades.js';
 import { tileUrl } from '../../ui/MissionSelect.js';
+import type { ShellContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
@@ -111,53 +112,7 @@ export function createProgressSystem(): GameSystem {
       // Profile updates from settings already read the upgraded profile maps.
     },
     start(ctx) {
-      upgrades = new Upgrades(ctx.progress);
-      ctx.upgrades = upgrades;
-      ctx.expose({ upgrades });
-      for (const menu of [
-        ctx.home.root.querySelector('.home-menu'),
-        ctx.pause.root.querySelector('.pause-actions'),
-      ]) {
-        if (!menu) continue;
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'progress-menu-button';
-        button.textContent = 'Upgrades';
-        button.onclick = () => upgrades.open();
-        menu.append(button);
-        cleanup.add(() => button.remove());
-      }
-      const selectors = [ctx.missionSelect, ctx.homeSites];
-      const updateGlobes = (): void => {
-        for (const globe of [ctx.globe, ctx.homeGlobe])
-          globe.setMissionAccess((site) => {
-            const depth =
-              ctx.missionSummaries.find((m) => m.id === site.id)?.depthM ?? site.depthM ?? 0;
-            if (ctx.progress.canDive(depth, ctx.save.get().gameplayMode)) return null;
-            const hull = requiredHull(depth);
-            return `🔒 Class ${hull.id} · ${hull.threshold} lifetime RP required`;
-          });
-      };
-      const updateAccess = (): void => {
-        for (const selector of selectors)
-          selector.setProgress(ctx.progress, ctx.save.get().gameplayMode);
-        updateGlobes();
-      };
-      updateAccess();
-      cleanup.add(
-        ctx.save.onChange((_next, changed) => {
-          if (changed.includes('gameplayMode')) updateAccess();
-        }),
-      );
-      let lastDisplay = '';
-      cleanup.add(
-        ctx.progress.onChange(() => {
-          const display = `${ctx.progress.lifetime}/${JSON.stringify(ctx.progress.snapshot().ratings)}`;
-          if (display === lastDisplay) return;
-          lastDisplay = display;
-          updateAccess();
-        }),
-      );
+      upgrades = initializeProgressMenus(ctx, cleanup);
       lastPhotos = ctx.photos.photos;
       if (initialLock) {
         const notice = document.createElement('div');
@@ -207,4 +162,56 @@ export function createProgressSystem(): GameSystem {
       upgrades?.dispose();
     },
   };
+}
+
+/** Home and dive share purchases and mission access, without starting the sim. */
+export function initializeProgressMenus(ctx: ShellContext, cleanup: Disposables): Upgrades {
+  const upgrades = new Upgrades(ctx.progress);
+  ctx.upgrades = upgrades;
+  ctx.expose({ upgrades });
+  for (const menu of [
+    ctx.home.root.querySelector('.home-menu'),
+    ctx.pause?.root.querySelector('.pause-actions'),
+  ]) {
+    if (!menu) continue;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'progress-menu-button';
+    button.textContent = 'Upgrades';
+    button.onclick = () => upgrades.open();
+    menu.append(button);
+    cleanup.add(() => button.remove());
+  }
+  const selectors = [ctx.missionSelect, ctx.homeSites];
+  const updateGlobes = (): void => {
+    for (const globe of [ctx.globe, ctx.homeGlobe])
+      globe.setMissionAccess((site) => {
+        const depth =
+          ctx.missionSummaries.find((m) => m.id === site.id)?.depthM ?? site.depthM ?? 0;
+        if (ctx.progress.canDive(depth, ctx.save.get().gameplayMode)) return null;
+        const hull = requiredHull(depth);
+        return `🔒 Class ${hull.id} · ${hull.threshold} lifetime RP required`;
+      });
+  };
+  const updateAccess = (): void => {
+    for (const selector of selectors)
+      selector.setProgress(ctx.progress, ctx.save.get().gameplayMode);
+    updateGlobes();
+  };
+  updateAccess();
+  cleanup.add(
+    ctx.save.onChange((_next, changed) => {
+      if (changed.includes('gameplayMode')) updateAccess();
+    }),
+  );
+  let lastDisplay = '';
+  cleanup.add(
+    ctx.progress.onChange(() => {
+      const display = `${ctx.progress.lifetime}/${JSON.stringify(ctx.progress.snapshot().ratings)}`;
+      if (display === lastDisplay) return;
+      lastDisplay = display;
+      updateAccess();
+    }),
+  );
+  return upgrades;
 }

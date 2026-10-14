@@ -2,8 +2,8 @@
  * The shared game context (F0-CORE).
  *
  * `BootContext` is what `app/boot.ts` produces before any system runs: URL
- * params, config, event bus, saved settings, the resolved quality tier, the
- * loaded tile, renderer and scene. `GameContext` adds the objects each system
+ * params, config, event bus, saved settings, the resolved quality tier,
+ * renderer and scene. `GameContext` adds the objects each system
  * publishes during its `init`, in `app/systems.ts` order. A system may read
  * another's field at init time only if that system comes earlier in the list;
  * callbacks and frame hooks may read any field.
@@ -97,8 +97,6 @@ export interface BootContext {
   debugTerrain: boolean;
   /** `?depth=` in metres, or null. */
   spawnDepth: number | null;
-  tile: Tile;
-  meta: TileMeta;
   canvas: HTMLCanvasElement;
   renderer: THREE.WebGLRenderer;
   scene: THREE.Scene;
@@ -109,6 +107,9 @@ export interface BootContext {
 }
 
 export interface GameContext extends BootContext {
+  tile: Tile;
+  meta: TileMeta;
+  discoveries: import('../game/DiscoveryStore.js').DiscoveryStore;
   upgrades: Upgrades;
   // world (terrain, atmosphere, landmarks)
   terrain: Terrain;
@@ -188,3 +189,48 @@ export function makeExposer(): Pick<BootContext, 'exposed' | 'expose'> {
     },
   };
 }
+
+/** Menu capabilities exist without terrain, a vehicle or a dive simulation. */
+export type ShellContext = BootContext &
+  Pick<
+    GameContext,
+    | 'home'
+    | 'homeSites'
+    | 'missionSelect'
+    | 'missionSummaries'
+    | 'setAppState'
+    | 'globe'
+    | 'homeGlobe'
+    | 'input'
+    | 'settingsScreen'
+    | 'journal'
+    | 'discoveries'
+    | 'photos'
+    | 'upgrades'
+    | 'titleScene'
+    | 'renderStats'
+    | 'resize'
+  > &
+  Partial<
+    Pick<
+      GameContext,
+      | 'pause'
+      | 'tile'
+      | 'meta'
+      | 'contentLandmark'
+      | 'discovery'
+      | 'rig'
+      | 'waypoints'
+      | 'sonar'
+      | 'captions'
+      | 'keyboard'
+      | 'pointerLook'
+      | 'controlsCard'
+      | 'missionRouter'
+      | 'photoMode'
+      | 'exitPhotoMode'
+      | 'presets'
+      | 'hud'
+      | 'headlights'
+    >
+  >;

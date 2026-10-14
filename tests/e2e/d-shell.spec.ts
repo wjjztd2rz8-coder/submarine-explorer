@@ -102,11 +102,25 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.getByRole('button', { name: 'Continue' })).toHaveCount(0);
   // F-TITLE-E: the title scene backs the menu; the embedded globe opens only in the sites view.
   await expect(page.locator('.globe.is-embedded')).toBeHidden();
-  const atHome = await pose(page);
+  const diveResources = () =>
+    page.evaluate(() => {
+      const game = window.__game!;
+      return [
+        'terrain',
+        'sub',
+        'scanner',
+        'power',
+        'props',
+        'life',
+        'post',
+        'missionRouter',
+      ].filter((name) => name in game);
+    });
+  expect(await diveResources()).toEqual([]);
   await page.keyboard.down('w');
   await waitForFrames(page, 8, 400);
   await page.keyboard.up('w');
-  expect(await pose(page)).toEqual(atHome);
+  expect(await diveResources()).toEqual([]);
   await page.screenshot({ path: `${shots}/home-1280.png` });
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.screenshot({ path: `${shots}/home-1920.png` });
@@ -182,7 +196,9 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   expect(new URL(page.url()).search).toBe('');
   await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeEnabled();
   const homeAgain = await pose(page);
+  await page.keyboard.down('w');
   await waitForFrames(page, 8, 400);
+  await page.keyboard.up('w');
   expect(await pose(page)).toEqual(homeAgain);
 });
 
@@ -231,4 +247,35 @@ test('a home globe pin launches the same mission as its grid entry', async ({ pa
   await expect(page.locator('.globe.is-embedded .globe-card')).toContainText('Titanic');
   await Promise.all([page.waitForURL(/[?&]mission=titanic\b/), page.keyboard.press('Enter')]);
   await expect(page.locator('.briefing')).toBeVisible();
+});
+
+test('Home needs no dive tile; selecting a site keeps loading until its first frame', async ({
+  page,
+}) => {
+  // Guards eager default-tile requests and premature readiness during a selected dive load.
+  const diveRequests: string[] = [];
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route('**/data/tiles/titanic/**', async (route) => {
+    diveRequests.push(route.request().url());
+    await held;
+    await route.continue();
+  });
+  await boot(page, '/?tier=low');
+  await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeEnabled();
+  await waitForFrames(page, 8, 400);
+  expect(diveRequests).toEqual([]);
+  await page.locator('.home-menu').getByRole('button', { name: 'Dive', exact: true }).click();
+  await expect(page).toHaveURL(/[?&]mission=titanic/);
+  await expect(page.locator('#startup-loading')).toContainText('Loading dive…');
+  expect(await page.evaluate(() => window.__gameReady === true)).toBe(false);
+  expect(await page.evaluate(() => window.__game?.sub)).toBeUndefined();
+  expect(diveRequests).toHaveLength(1);
+  release();
+  await page.waitForFunction(() => window.__gameReady === true);
+  await expect(page.locator('#startup-loading')).toHaveCount(0);
+  await expect(page.locator('.briefing')).toBeVisible();
+  await expect(page.locator('.home-screen')).toBeHidden();
 });

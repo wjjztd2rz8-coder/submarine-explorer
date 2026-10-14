@@ -66,14 +66,14 @@ export function makeFrameState(ctx: GameContext): FrameState {
 }
 
 /** Start the requestAnimationFrame loop. */
-export function startLoop(ctx: GameContext, runner: SystemRunner): void {
+export function startLoop(ctx: GameContext, runner: SystemRunner): () => void {
   const time = new Time(ctx.config.physicsHz);
   const f = makeFrameState(ctx);
   let ready = false;
   let lastTerrainLog = 0;
 
   function frame(nowMs: number): void {
-    requestAnimationFrame(frame);
+    frameId = requestAnimationFrame(frame);
 
     f.nowMs = nowMs;
     f.sampled = ctx.input.sample();
@@ -97,5 +97,6 @@ export function startLoop(ctx: GameContext, runner: SystemRunner): void {
     }
   }
 
-  requestAnimationFrame(frame);
+  let frameId = requestAnimationFrame(frame);
+  return () => cancelAnimationFrame(frameId);
 }

@@ -14,7 +14,7 @@
  */
 
 import { DynamicResolution } from '../../core/Quality.js';
-import type { GameContext } from '../context.js';
+import type { GameContext, ShellContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 
 /** The live `window.__game.perf` shape. */
@@ -48,7 +48,10 @@ export function dynamicResolutionEnabled(
   return source === 'auto';
 }
 
-export function createQualitySystem(): GameSystem {
+export function createQualitySystem(): GameSystem<
+  ShellContext,
+  { nowMs: number; frozen: boolean }
+> {
   let dynres: DynamicResolution | null = null;
   let lastNowMs = 0;
   let frameMs = 0;

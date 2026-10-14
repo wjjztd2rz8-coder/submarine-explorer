@@ -15,7 +15,7 @@
 
 import { TitleScene, type TitleLayout, type TitleTier } from '../../render/title/TitleScene.js';
 import { buildTitleCrop, loadTitleCrop } from '../../render/title/TitleTerrain.js';
-import type { GameContext } from '../context.js';
+import type { GameContext, ShellContext } from '../context.js';
 import { Disposables } from '../Disposables.js';
 import type { GameSystem } from '../System.js';
 import * as THREE from 'three';
@@ -47,10 +47,10 @@ export function titleLayout(w: number, h: number): TitleLayout {
   return w < 960 ? 'portrait' : 'desktop';
 }
 
-export function createTitleSystem(): GameSystem {
+export function createTitleSystem(): GameSystem<ShellContext, { dt: number }> {
   const cleanup = new Disposables();
   let scene: TitleScene | null = null;
-  let ctxRef: GameContext | null = null;
+  let ctxRef: ShellContext | null = null;
   let disposed = false;
   let terrainReady = false;
   let loadStarted = false;
@@ -66,10 +66,10 @@ export function createTitleSystem(): GameSystem {
   let appliedTier: TitleTier | null = null;
   let appliedReduced: boolean | null = null;
 
-  const homeVisible = (ctx: GameContext): boolean => ctx.app.state === 'home' && ctx.home.isOpen;
-  const covered = (ctx: GameContext): boolean =>
+  const homeVisible = (ctx: ShellContext): boolean => ctx.app.state === 'home' && ctx.home.isOpen;
+  const covered = (ctx: ShellContext): boolean =>
     ctx.settingsScreen.isOpen ||
-    ctx.discovery.guide.isOpen ||
+    ctx.journal.isOpen ||
     ctx.globe.isOpen ||
     (ctx.upgrades?.isOpen ?? false) ||
     (ctx.controlsCard?.isOpen ?? false);
@@ -135,9 +135,13 @@ export function createTitleSystem(): GameSystem {
     },
   };
 
-  const ensureScene = (ctx: GameContext): void => {
+  const ensureScene = (ctx: ShellContext): void => {
     if (scene || disposed) return;
-    scene = new TitleScene({ tier: titleTier(ctx.tier), reducedMotion: ctx.rig.reduceMotion });
+    scene = new TitleScene({
+      tier: titleTier(ctx.tier),
+      reducedMotion:
+        ctx.rig?.reduceMotion ?? document.documentElement.dataset.reduceMotion === 'true',
+    });
     ctx.home.root.classList.add('has-title-scene');
     // After the first frame so the load never competes with `__gameReady`.
     if (!loadStarted) {
@@ -147,11 +151,11 @@ export function createTitleSystem(): GameSystem {
     }
   };
 
-  const loadCrop = async (ctx: GameContext): Promise<void> => {
+  const loadCrop = async (ctx: ShellContext): Promise<void> => {
     if (disposed) return;
     try {
       const crop =
-        ctx.meta.id === MONTEREY_TILE
+        ctx.meta?.id === MONTEREY_TILE && ctx.tile
           ? buildTitleCrop(ctx.tile)
           : await loadTitleCrop(() => ctx.loader.load(MONTEREY_TILE));
       if (disposed || !scene) {
@@ -169,7 +173,7 @@ export function createTitleSystem(): GameSystem {
     }
   };
 
-  const reconcile = (ctx: GameContext): void => {
+  const reconcile = (ctx: ShellContext): void => {
     const should =
       homeVisible(ctx) && !ctx.home.sitesOpen && !covered(ctx) && !document.hidden && !!scene;
     active = should;
@@ -245,7 +249,8 @@ export function createTitleSystem(): GameSystem {
           presentationDirty = true;
         }
         const nextTier = titleTier(ctx.tier);
-        const nextReduced = ctx.rig.reduceMotion;
+        const nextReduced =
+          ctx.rig?.reduceMotion ?? document.documentElement.dataset.reduceMotion === 'true';
         if (nextTier !== appliedTier || nextReduced !== appliedReduced) presentationDirty = true;
         appliedTier = nextTier;
         appliedReduced = nextReduced;
