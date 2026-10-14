@@ -4,8 +4,9 @@ import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { Mission, parseMission } from '../../src/game/Mission.js';
 import { Scanner } from '../../src/game/Scanner.js';
 import type { GameContext } from '../../src/app/context.js';
-import type { FrameState } from '../../src/app/System.js';
+import { SystemRunner, type FrameState } from '../../src/app/System.js';
 import { EventBus } from '../../src/core/EventBus.js';
+import { discoverySystem } from '../../src/app/systems/discovery.js';
 import { waypointsSystem } from '../../src/app/systems/waypoints.js';
 
 const view = vi.hoisted(() => ({
@@ -22,6 +23,81 @@ vi.mock('../../src/ui/Waypoints.js', () => ({
     }
   },
 }));
+
+it('a held scan on the first resolved mission frame locks the objective before nearer contacts', () => {
+  const bus = new EventBus();
+  const mission = new Mission({
+    def: parseMission(
+      {
+        spawn: { lat: 0, lon: 0 },
+        objectives: [{ id: 'primary', poi: 'bow', primary: true }],
+      },
+      'site',
+    )!,
+    bus,
+  });
+  const scanner = new Scanner(DEFAULT_CONFIG.scan, bus);
+  scanner.setTargets(
+    ['bow', 'debris'].map((id, index) => ({
+      id,
+      name: id,
+      landmarkId: 'site',
+      position: new Vector3(0, 0, index ? -20 : -100),
+      radius: 150,
+      scanSeconds: 1,
+    })),
+  );
+  const ctx = {
+    discovery: {
+      scanner,
+      guide: { isOpen: false },
+      update: (
+        dt: number,
+        _realDt: number,
+        position: Vector3,
+        forward: Vector3,
+        input: { scan: boolean },
+      ) => scanner.update(dt, position, forward, input.scan),
+    },
+    missionRouter: { mission },
+    waypoints: view,
+    save: { get: () => ({ gameplay: { visualHints: true } }) },
+    scanObjectiveHints: new Map(),
+    rig: { camera: {} },
+  } as unknown as GameContext;
+  const runner = new SystemRunner(ctx);
+  // Preserve production stage ordering while keeping DOM construction out of this capability test.
+  runner.init([discoverySystem, waypointsSystem].map(({ name, frame }) => ({ name, frame })));
+  const frame = {
+    state: { scan: false },
+    sampled: {},
+    steps: 1,
+    fixedDt: 0.1,
+    dt: 0.1,
+    clockDt: 0.1,
+    pilotPosition: new Vector3(),
+    pilotForward: new Vector3(0, 0, -1),
+  } as FrameState;
+  try {
+    // Discovery can finish loading between frames, after the previous guidance pass.
+    mission.resolve([]);
+    runner.frame(frame);
+    expect(scanner.view.candidateId).toBe('debris');
+    mission.resolve(['bow', 'debris']);
+    mission.start('site');
+    frame.state = { ...frame.state, scan: true };
+    runner.frame(frame);
+    expect(scanner.view.candidateId).toBe('bow');
+    expect(scanner.view.activeId).toBe('bow');
+    expect(scanner.view.nearestId).toBe('bow');
+    expect(scanner.view.objectiveId).toBe('bow');
+    runner.frame(frame);
+    expect(scanner.view.activeId).toBe('bow');
+  } finally {
+    mission.dispose();
+    runner.dispose();
+  }
+});
 
 it('guides optional objectives after primary completion and scans leftover contacts after debrief resume', async () => {
   const bus = new EventBus();

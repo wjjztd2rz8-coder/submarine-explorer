@@ -6,6 +6,7 @@
  */
 
 import { Discovery } from '../../game/Discovery.js';
+import { nextScanObjective } from '../../game/Mission.js';
 import type { GameSystem } from '../System.js';
 
 export const discoverySystem: GameSystem = {
@@ -37,6 +38,10 @@ export const discoverySystem: GameSystem = {
   },
   frame: {
     'scan.discovery': (f, ctx) => {
+      // Select before the beam locks; guidance runs later in the same frame.
+      ctx.discovery.scanner.setObjective(
+        nextScanObjective(ctx.missionRouter?.mission.objectives)?.poiId ?? null,
+      );
       // An open Journal freezes piloting, but its pad button must still close it.
       const input =
         ctx.discovery.guide.isOpen && f.sampled.toggleGuide

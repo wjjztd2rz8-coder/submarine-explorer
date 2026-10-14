@@ -15,6 +15,7 @@ without an entry here is not done.
 ### Changed
 
 - **S-tests hosted CI:** pixel captures, the Blue Hole golden/material bisect, continuous High-tier approach checks and 600-frame wildlife checks run in nightly render diagnostics with their existing guards. Push CI retains caption/layout, sighting/persistence, mission-opening, clearance, wildlife-count, Journal and Low/Medium scan-flow assertions. Reason: hosted software GL exhausts transient captions and render budgets; no gameplay capability is cut. Restore immediate keyboard focus in the globe cluster chooser.
+- **S-verify:** mission scan priority is selected before the beam locks each frame. A held scan immediately after objectives load now selects an eligible primary objective instead of sticking to a nearer optional contact. Beam and waypoint guidance share the same priority rule.
 
 - Endurance close view no longer overexposed: site lamps 2x to 0.7x, fill 3x to 1.5x, hemisphere 3 to 2 (wood grain and sand relief return at 15 m), and the shared pale anemone and squat-lobster albedo is toned down so they stop clipping to white. The opening camera is unchanged: the existing opening gates (whole sub in frame, 8 px gap to the wreck, whole wreck clear of the sub) cap the hull near 380 px.
 
