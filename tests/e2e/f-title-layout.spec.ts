@@ -148,5 +148,20 @@ for (const viewport of VIEWPORTS) {
     const bb = (await back.boundingBox())!;
     expect(bb.height).toBeGreaterThanOrEqual(48);
     expect(bb.y + bb.height).toBeLessThanOrEqual(viewport.height);
+
+    // Guards: the globe picker stays on every screen size, and where the list is a sheet it opens
+    // from the grab bar and shows its rows inside the viewport.
+    const globe = (await page.locator('.home-globe-wrap').boundingBox())!;
+    expect(Math.min(globe.width, globe.height), 'globe stays usable').toBeGreaterThanOrEqual(120);
+    const grab = page.locator('.home-sites-grab');
+    if (await grab.isVisible()) {
+      await expect(grab).toHaveAttribute('aria-expanded', 'false');
+      await grab.click();
+      await expect(grab).toHaveAttribute('aria-expanded', 'true');
+      await page.waitForTimeout(400);
+      const row = (await page.locator('.home-sites [data-mission]').first().boundingBox())!;
+      expect(row.y + row.height).toBeLessThanOrEqual(viewport.height);
+      await page.screenshot({ path: `${shots}/sites-open-${size}.png` });
+    }
   });
 }
