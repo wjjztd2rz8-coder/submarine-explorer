@@ -14,14 +14,14 @@
 
 ## Line counts (main -> branch)
 
-| file | before | after |
-| --- | --- | --- |
-| `src/styles/hud-layout.css` | 697 | 301 |
-| `hud.css` | 74 | 42 |
-| `touch.css` | 463 | 426 |
-| `input-hud.css` | 111 | 101 |
-| `flow.css` | 324 | 311 |
-| src total (git diff main) | | +372 / -853 |
+| file                        | before | after       |
+| --------------------------- | ------ | ----------- |
+| `src/styles/hud-layout.css` | 697    | 301         |
+| `hud.css`                   | 74     | 42          |
+| `touch.css`                 | 463    | 426         |
+| `input-hud.css`             | 111    | 101         |
+| `flow.css`                  | 324    | 311         |
+| src total (git diff main)   |        | +372 / -853 |
 
 ## Test changes (by capability, no new specs)
 
@@ -32,7 +32,7 @@
 ## Gates
 
 - `tools/gates.sh --full-e2e` was started (python, content, build, unit all PASS) but the 797-test e2e suite on one worker takes hours, so it was stopped and replaced by targeted specs. Full unit suite: 190 files, 2208 tests pass. `tsc --noEmit` and prettier clean.
-- Targeted e2e on the final build, all passing: hud-touch (except the animal guidance matrix), opening-framing, f-sonar-palette-1200, f3-onboard, journal-debrief frozen-debrief, plus a 244-test batch (d2-*, d-currents, d-polish, d-start, f1-fixes, f2-*, f-arcade-access, f-copy-regress, f-verify-*, f-lowtier-followups, settings, globe, visual-qa, f-save-soak, sub-playtest, f-title-layout) and a 333-test batch (touch, input HUD, scan, sonar, power, photo, hazard, onboarding, first minute, text diet, a11y, events, mission, smoke, briefing, bughunt 880/960).
+- Targeted e2e on the final build, all passing: hud-touch (except the animal guidance matrix), opening-framing, f-sonar-palette-1200, f3-onboard, journal-debrief frozen-debrief, plus a 244-test batch (d2-_, d-currents, d-polish, d-start, f1-fixes, f2-_, f-arcade-access, f-copy-regress, f-verify-*, f-lowtier-followups, settings, globe, visual-qa, f-save-soak, sub-playtest, f-title-layout) and a 333-test batch (touch, input HUD, scan, sonar, power, photo, hazard, onboarding, first minute, text diet, a11y, events, mission, smoke, briefing, bughunt 880/960).
 - Not run: f-bughunt-1090 (long idle renders), perf budget, title scene/audit, other long specs.
 - Failing identically on main (unchanged by this package): `d-modes` (scanRadius 400 vs 480), `d-shell` home menu button count (9 vs 8), `d-sonar` whole-tile/sensor range, and the eight `hud-touch` "animal guidance placement" tests (hint never appears; 1.5 min timeouts).
 
