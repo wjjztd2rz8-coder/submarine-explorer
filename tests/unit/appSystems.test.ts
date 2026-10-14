@@ -91,7 +91,10 @@ describe('Journal gamepad input through the freeze gate', () => {
       const input = new Input({ storage: null });
       const guide = { isOpen: false };
       const update = vi.fn();
-      const ctx = { discovery: { guide, update }, rig: {} } as unknown as GameContext;
+      const ctx = {
+        discovery: { guide, update, scanner: { setObjective: vi.fn() } },
+        rig: {},
+      } as unknown as GameContext;
       const frame = (frozen: boolean): FrameState => {
         const f = {
           sampled: input.sample(),

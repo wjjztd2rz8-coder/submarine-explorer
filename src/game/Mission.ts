@@ -309,6 +309,16 @@ type MissionEventName =
 /** A dive in progress: scans count and the clock runs. */
 const DIVING: ReadonlySet<MissionState> = new Set(['diving', 'primaries-complete']);
 
+/** Shared beam and waypoint priority: unfinished primaries, then optional objectives. */
+export function nextScanObjective(
+  objectives: readonly ObjectiveStatus[] = [],
+): ObjectiveStatus | undefined {
+  return (
+    objectives.find((o) => o.resolved && !o.complete && o.primary) ??
+    objectives.find((o) => o.resolved && !o.complete)
+  );
+}
+
 /**
  * Tracks one mission run. Lifecycle:
  *

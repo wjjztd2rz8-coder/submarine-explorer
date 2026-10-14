@@ -4,6 +4,7 @@
  */
 
 import { contentUrl, fetchContentJson } from '../../game/ContentPath.js';
+import { nextScanObjective as selectScanObjective } from '../../game/Mission.js';
 import { Waypoints } from '../../ui/Waypoints.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
@@ -59,9 +60,7 @@ export const waypointsSystem: GameSystem = {
   frame: {
     'guide.waypoints': (f, ctx) => {
       const { missionRouter, route } = ctx;
-      const nextScanObjective =
-        missionRouter?.mission.objectives.find((o) => o.resolved && !o.complete && o.primary) ??
-        missionRouter?.mission.objectives.find((o) => o.resolved && !o.complete);
+      const nextScanObjective = selectScanObjective(missionRouter?.mission.objectives);
       // Near-site approaches retain their navigation marker in Realistic too.
       // Once in scan range, resume the pilot's normal visual-waypoint preference.
       const approach = nextScanObjective?.title.startsWith('Head to ') ?? false;
