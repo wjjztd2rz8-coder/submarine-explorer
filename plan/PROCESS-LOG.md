@@ -197,3 +197,9 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - **Change.** Collection can be scripted: for each finished worktree, commit, merge main in, run `tools/gates.sh`, merge to main only on PASS, stop on conflict (a /tmp script this run: 7 of 8 merged unattended, 1 conflict resolved by hand, 2 Claude branches via a Sonnet agent for the 6-file conflict). Follow-up for a future run: promote it to `tools/collect-codex.sh` if the pattern recurs.
 - **Merge hazard seen again.** A package that cuts a feature (S-rov) conflicts with a package that edits the same code (S-bugs): ordering cuts before bug fixes avoids it, or run the cut last.
 - **Hosted CI.** Shards fail on software-GL timeouts, not logic. Codex 1610 moves captures to nightly and keeps cheap assertions.
+
+## 2026-10-13 (targeted review): collection stalled 13 h
+
+- **Symptom:** CI red, Claude idle at 100% and Codex empty from about 09:00 to 21:15, with ten finished Codex packages uncollected in their worktrees.
+- **Root cause:** `tools/resume.sh` computed its work-state hash with `ls` over a missing `paused-packages.md`; under `set -o pipefail` that exited 2, so every 30-minute timer run failed before starting Claude (journal: `subexp-resume.service ... status=2/INVALIDARGUMENT`). It was fixed in 316a2a9 at 21:15 but nothing had noticed in 12 hours, and `skips.log` records nothing for crashes.
+- **Fix to adopt:** failed timer runs must be visible. `tools/review-triggers.sh` already fires on idle capacity, which is how this was caught; the cheap extra guard is `tools/efficiency.sh` listing `systemctl --user status subexp-resume.service` failures. Also: the dispatcher kept the Codex queue empty because I had not queued behind S-resolve; four briefs are now queued.
