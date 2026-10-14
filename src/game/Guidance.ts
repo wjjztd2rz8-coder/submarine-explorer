@@ -9,6 +9,10 @@
  *   hint       the tutorial step or a one-shot contextual hint
  *   objective  the standing "where next" line
  *
+ * A scan card that only steers the pilot toward a contact (it cannot be scanned
+ * yet) is "soft": it ranks just below discovery, so a fresh result or sighting
+ * is not buried under a persistent approach cue.
+ *
  * Hints and tutorial steps are timed or one-shot, so they preempt the standing
  * objective line; otherwise the objective would hide them for the whole dive.
  */
@@ -35,6 +39,8 @@ export interface GuidanceMessage {
   tone: GuidanceTone;
   /** A progress ring with a short label (percent or range). */
   ring?: { progress: number; label: string };
+  /** A scan-tier cue that only steers toward a contact; yields to discovery. */
+  soft?: boolean;
   /** Tutorial step id; the slot shows a Skip button for it. */
   step?: string;
 }
@@ -46,6 +52,13 @@ export interface GuidanceOffer {
   since: number;
 }
 
+function rank(offer: GuidanceOffer): number {
+  const base = GUIDANCE_ORDER.indexOf(offer.kind);
+  return offer.kind === 'scan' && offer.message.soft
+    ? GUIDANCE_ORDER.indexOf('discovery') + 0.5
+    : base;
+}
+
 /** The single message to show, or null when nothing is offered. */
 export function pickGuidance(
   offers: Iterable<GuidanceOffer>,
@@ -54,8 +67,8 @@ export function pickGuidance(
   for (const offer of offers) {
     if (!best) best = offer;
     else {
-      const a = GUIDANCE_ORDER.indexOf(offer.kind);
-      const b = GUIDANCE_ORDER.indexOf(best.kind);
+      const a = rank(offer);
+      const b = rank(best);
       if (a < b || (a === b && offer.since >= best.since)) best = offer;
     }
   }

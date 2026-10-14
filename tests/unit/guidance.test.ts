@@ -43,6 +43,19 @@ describe('guidance priority', () => {
     expect(pickGuidance(offers.slice(0, 1))?.message.text).toBe('Bow section');
   });
 
+  it('ranks a steering-only scan card below a result but above hints', () => {
+    const soft: GuidanceOffer = {
+      kind: 'scan',
+      message: { ...msg('TURN 141°'), soft: true },
+      since: 0,
+    };
+    expect(pickGuidance([soft, offer('discovery', 'NEW ENTRY')])?.kind).toBe('discovery');
+    expect(pickGuidance([soft, offer('hint', 'Hold SCAN')])?.message.text).toBe('TURN 141°');
+    expect(pickGuidance([offer('scan', 'Ready'), offer('discovery', 'NEW ENTRY')])?.kind).toBe(
+      'scan',
+    );
+  });
+
   it('lets a tutorial step or one-shot hint preempt the standing objective', () => {
     const offers = [offer('objective', 'Stern section'), offer('hint', 'Hold SCAN')];
     expect(pickGuidance(offers)?.kind).toBe('hint');

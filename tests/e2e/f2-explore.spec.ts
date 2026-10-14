@@ -146,7 +146,7 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
     g.journal.open();
     g.journal.show('monterey-canyon');
   });
-  await expect(page.locator('.jr-progress')).toContainText('3/3 secrets');
+  await expect(page.locator('.jr-progress')).toContainText('3/5 secrets');
   await page
     .locator('.jr-nav')
     .getByRole('button', { name: 'Lost instrument frame', exact: true })
@@ -214,7 +214,8 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
     page,
     () => window.__gameReady === true && (window.__game as unknown as Game).explore?.ready,
   );
-  await park(page, 0);
+  // Out of scan range: a contact card in range would hold the guidance slot.
+  await park(page, 0, false, true);
   await page.evaluate(() => {
     const g = window.__game as unknown as Game;
     g.rig.freeLook = false;
@@ -300,7 +301,7 @@ test.describe('phone curiosity', () => {
     });
     await completeScan(page, id);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    await expect(page.locator('.guidance-hint')).toHaveText('STOWED FOR THIS DIVE');
+    await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toContainText('NEW ENTRY');
     await expectScanPanelFits(page);
     await shot(page, 'phone-sample');
     // The same touch session can rotate or run on a smaller phone.
