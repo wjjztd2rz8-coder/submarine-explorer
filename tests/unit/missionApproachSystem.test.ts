@@ -14,6 +14,7 @@ import { Submarine } from '../../src/sub/Submarine.js';
 vi.mock('../../src/game/MissionRouter.js', async (original) => ({
   ...(await original<typeof import('../../src/game/MissionRouter.js')>()),
   MissionRouter: class {
+    dispose = vi.fn();
     briefing = null;
     mission: { objectives: object[] };
     panel = { setObjectives: vi.fn() };
@@ -95,5 +96,7 @@ for (const mode of ['arcade', 'realistic'] as const) {
     const surface = missionStartPose(def, 'surface', [target], ctx.meta, terrain, config);
     expect(sub.position.toArray()).toEqual([surface.x, surface.y, surface.z]);
     expect(sub.yaw).toBeCloseTo(surface.yaw, 6);
+    missionSystem.dispose?.();
+    expect(ctx.missionRouter!.dispose).toHaveBeenCalledOnce();
   });
 }

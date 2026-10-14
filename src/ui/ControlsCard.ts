@@ -6,6 +6,7 @@
  */
 
 import type { ActionId, Input } from '../core/Input.js';
+import { elWithClass as el } from './dom.js';
 import { FocusTrap } from './FocusTrap.js';
 import { buildHowToPlay } from './HowToPlay.js';
 
@@ -131,17 +132,6 @@ export interface ControlsCardOptions {
   parent?: HTMLElement;
 }
 
-function el<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className: string,
-  text?: string,
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag);
-  node.className = className;
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
-
 export class ControlsCard {
   readonly root: HTMLDivElement;
   private readonly body: HTMLElement;
@@ -152,7 +142,6 @@ export class ControlsCard {
   private readonly trap: FocusTrap;
   private device_: InputDevice;
   private viewing: InputDevice;
-  private open_ = false;
 
   constructor(private readonly opts: ControlsCardOptions) {
     this.device_ = opts.initialDevice;
@@ -193,12 +182,12 @@ export class ControlsCard {
     panel.append(this.heading, tabs, this.body, actions);
     this.root.append(panel);
     (opts.parent ?? document.body).append(this.root);
-    this.trap = new FocusTrap(this.root);
+    this.trap = new FocusTrap(this.root, { onEscape: () => this.close() });
     this.render();
   }
 
   get isOpen(): boolean {
-    return this.open_;
+    return this.trap.active;
   }
 
   /** The device the player last used. */
@@ -209,32 +198,26 @@ export class ControlsCard {
   setDevice(device: InputDevice): void {
     if (device === this.device_) return;
     this.device_ = device;
-    if (!this.open_) this.viewing = device;
+    if (!this.isOpen) this.viewing = device;
     this.render();
   }
 
   open(): void {
-    if (this.open_) return;
-    this.open_ = true;
+    if (this.isOpen) return;
     this.viewing = this.device_;
     this.render();
-    this.root.hidden = false;
     document.exitPointerLock?.();
-    this.trap.activate();
-    this.root
-      .querySelector<HTMLButtonElement>('.controls-card-close')
-      ?.focus({ preventScroll: true });
+    this.trap.show();
   }
 
   close(): void {
-    if (!this.open_) return;
-    this.open_ = false;
-    this.root.hidden = true;
-    this.trap.deactivate();
+    if (!this.isOpen) return;
+    this.trap.hide();
   }
 
   dispose(): void {
     this.close();
+    this.trap.dispose();
     this.root.remove();
   }
 

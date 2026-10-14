@@ -105,14 +105,6 @@ export class Discovery {
         }
       }),
     );
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.code !== 'Escape') return;
-      if (this.guide.isOpen) this.guide.close();
-      else if (this.debrief.isOpen) this.debrief.hide();
-    };
-    window.addEventListener('keydown', onKey);
-    this.disposers.push(() => window.removeEventListener('keydown', onKey));
-
     this.ready = this.load();
 
     const params = opts.params;
@@ -294,9 +286,9 @@ export class Discovery {
   }
 
   /** Open the debrief with this session's stats. B3 passes a title/subtitle. */
-  showDebrief(extra: Partial<DebriefStats> = {}): DebriefStats {
+  showDebrief(extra: Partial<DebriefStats> = {}, onEscape?: (() => void) | null): DebriefStats {
     const stats = this.stats.snapshot({ landmarkName: this.guideTitle(), ...extra });
-    this.debrief.show(stats);
+    this.debrief.show(stats, undefined, undefined, onEscape);
     return stats;
   }
 

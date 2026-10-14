@@ -1,8 +1,7 @@
 /**
  * The ordered system list (F0-CORE). `init` runs top to bottom, so this is also
  * the order objects are built, DOM is appended and listeners are registered;
- * it reproduces the pre-F0 `main.ts` order, which the key handlers and
- * `app:state` listeners depend on (see the notes). Frame hooks run by stage
+ * `app:state` listeners depend on this order (see the notes). Frame hooks run by stage
  * (`FRAME_STAGES` in `System.ts`), then in this order within a stage.
  *
  * To add a system: write `app/systems/<name>.ts` and append it here. Put it
@@ -57,7 +56,6 @@ export function createSystems(): GameSystem[] {
     hudSystem,
     sonarSystem,
     discoverySystem,
-    // Its capture-phase Escape guard must precede the shell's Escape handler.
     createPowerSystem(),
     waypointsSystem,
     modesSystem,
@@ -73,9 +71,7 @@ export function createSystems(): GameSystem[] {
     cameraControlsSystem,
     createPointerSystem(),
     createTouchSystem(),
-    // Onboarding's capture-phase Escape handler must precede Settings and the shell.
     createOnboardSystem(),
-    // Before the mission router, so its capture-phase key handler runs first.
     settingsSystem,
     sonarControlsSystem,
     missionSystem,

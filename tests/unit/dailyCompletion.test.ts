@@ -11,6 +11,7 @@ import { Progress, type DiveRating } from '../../src/game/Progress.js';
 const fixture = vi.hoisted(() => ({ rating: null as (() => DiveRating) | null }));
 vi.mock('../../src/game/MissionRouter.js', () => ({
   MissionRouter: class {
+    dispose = vi.fn();
     briefing = null;
     mission = { objectives: [{ primary: true, complete: true }], endReason: 'surface' };
     constructor(options: { rating: () => DiveRating }) {

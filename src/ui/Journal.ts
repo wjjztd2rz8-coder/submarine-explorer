@@ -148,7 +148,6 @@ export class Journal {
   private readonly expandedCategories = new Map<string, boolean>();
   private view: View = { kind: 'front' };
   private pendingFocus: string | null = null;
-  private open_ = false;
   private opened = false;
   // --- D-PHOTO begin ---
   private photos: PhotoStore | null = null;
@@ -211,7 +210,7 @@ export class Journal {
     panel.append(header, main, this.footer);
     this.root.append(panel);
     parent.appendChild(this.root);
-    this.trap = new FocusTrap(this.root);
+    this.trap = new FocusTrap(this.root, { onEscape: () => this.close() });
     this.phoneMq = typeof window.matchMedia === 'function' ? window.matchMedia(PHONE_QUERY) : null;
     // Rotating a phone swaps the layout under an open Journal.
     this.phoneMq?.addEventListener?.('change', this.onPhoneChange);
@@ -225,7 +224,7 @@ export class Journal {
   }
 
   get isOpen(): boolean {
-    return this.open_;
+    return this.trap.active;
   }
 
   get spoilers(): boolean {
@@ -301,7 +300,7 @@ export class Journal {
 
   /** Re-read unlock state (after a discovery). */
   refresh(): void {
-    if (this.open_) this.render();
+    if (this.isOpen) this.render();
   }
 
   /** The next `open()` without an explicit entry shows this current-site entry. */
@@ -344,12 +343,10 @@ export class Journal {
     }
     this.opened = true;
     this.revealView();
-    this.open_ = true;
-    this.root.hidden = false;
     this.render();
     // A newly focused scan must start at its heading, not the previous entry's scroll.
     this.body.scrollTop = 0;
-    this.trap.activate();
+    this.trap.show();
     const openingView = this.view;
     void this.load().then(() => {
       // A later click/show owns navigation, even when this load was already resolved.
@@ -359,13 +356,11 @@ export class Journal {
   }
 
   close(): void {
-    this.open_ = false;
-    this.root.hidden = true;
-    this.trap.deactivate();
+    this.trap.hide();
   }
 
   toggle(): void {
-    if (this.open_) this.close();
+    if (this.isOpen) this.close();
     else this.open();
   }
 
@@ -1051,7 +1046,7 @@ export class Journal {
 
   dispose(): void {
     this.phoneMq?.removeEventListener?.('change', this.onPhoneChange);
-    this.trap.deactivate();
+    this.trap.dispose();
     this.root.remove();
   }
 }

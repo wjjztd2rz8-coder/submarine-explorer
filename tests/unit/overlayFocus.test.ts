@@ -4,10 +4,32 @@ import { EventBus } from '../../src/core/EventBus.js';
 import type { GameContext } from '../../src/app/context.js';
 import { shellKeysSystem } from '../../src/app/systems/shell.js';
 import type { Progress } from '../../src/game/Progress.js';
-import { FocusTrap, type FocusTrapOptions } from '../../src/ui/FocusTrap.js';
+import { FocusTrap, observeKeyboard, type FocusTrapOptions } from '../../src/ui/FocusTrap.js';
 import { Globe } from '../../src/ui/Globe.js';
 import type { GlobeSite } from '../../src/ui/GlobeModel.js';
 import { Upgrades } from '../../src/ui/Upgrades.js';
+import { SettingsScreen } from '../../src/ui/Settings.js';
+import { Save } from '../../src/core/Save.js';
+import { Input } from '../../src/core/Input.js';
+import { Briefing } from '../../src/ui/Briefing.js';
+import { Debrief } from '../../src/ui/Debrief.js';
+import { Journal } from '../../src/ui/Journal.js';
+import { ControlsCard } from '../../src/ui/ControlsCard.js';
+import { Home } from '../../src/ui/Home.js';
+import { PauseMenu } from '../../src/ui/PauseMenu.js';
+import { PhotoMode } from '../../src/ui/PhotoMode.js';
+import { discoverySystem } from '../../src/app/systems/discovery.js';
+import { SystemRunner } from '../../src/app/System.js';
+import { globeSystem, shellSystem } from '../../src/app/systems/shell.js';
+import { PlacementDebug } from '../../src/world/props/PlacementDebug.js';
+import type { Props, PlacedProp } from '../../src/world/Props.js';
+import * as THREE from 'three';
+import type { DebriefStats } from '../../src/game/Objectives.js';
+import type { FrameState } from '../../src/app/System.js';
+import { createPowerSystem } from '../../src/app/systems/power.js';
+import { parseMission } from '../../src/game/Mission.js';
+import titanicMission from '../../data/landmarks/titanic/mission.json';
+import { MissionRouter } from '../../src/game/MissionRouter.js';
 
 /** The same small EventTarget/DOM approach as the shell and Home focus specs. */
 class Element extends EventTarget {
@@ -23,10 +45,29 @@ class Element extends EventTarget {
   className = '';
   textContent = '';
   type = '';
-  style: Record<string, string> = {};
+  value = '';
+  scrollTop = 0;
+  htmlFor = { add() {} };
+  attributes: Record<string, string> = {};
+  style = { setProperty() {} };
   dataset: Record<string, string> = {};
   tabIndex: number;
-  classList = { add() {}, remove() {}, toggle() {} };
+  classList = {
+    contains: (name: string) => this.className.split(' ').includes(name),
+    toggle: (name: string, on = !this.classList.contains(name)) => {
+      const classes = new Set(this.className.split(' ').filter(Boolean));
+      if (on) classes.add(name);
+      else classes.delete(name);
+      this.className = [...classes].join(' ');
+      return on;
+    },
+    add: (name: string) => {
+      this.classList.toggle(name, true);
+    },
+    remove: (name: string) => {
+      this.classList.toggle(name, false);
+    },
+  };
   constructor(readonly tagName = 'DIV') {
     super();
     this.tabIndex = ['BUTTON', 'SUMMARY', 'INPUT', 'SELECT', 'TEXTAREA', 'A'].includes(tagName)
@@ -36,10 +77,33 @@ class Element extends EventTarget {
   get isConnected(): boolean {
     return this.connected && (!this.parentElement || this.parentElement.isConnected);
   }
-  setAttribute() {}
-  removeAttribute() {}
+  get childElementCount() {
+    return this.children.length;
+  }
+  setAttribute(name: string, value: string) {
+    this.attributes[name] = value;
+  }
+  getAttribute(name: string) {
+    return this.attributes[name] ?? null;
+  }
+  removeAttribute(name: string) {
+    delete this.attributes[name];
+  }
+  after(child: Element) {
+    const parent = this.parentElement!;
+    child.parentElement = parent;
+    parent.children.splice(parent.children.indexOf(this) + 1, 0, child);
+  }
+  replaceWith(child: Element) {
+    const parent = this.parentElement!;
+    child.parentElement = parent;
+    parent.children.splice(parent.children.indexOf(this), 1, child);
+    this.parentElement = null;
+  }
   append(...children: Element[]) {
     for (const child of children) {
+      if (child.parentElement) child.remove();
+      child.connected = true;
       child.parentElement = this;
       this.children.push(child);
     }
@@ -66,15 +130,36 @@ class Element extends EventTarget {
       return this.disabled || !!this.parentElement?.closest('fieldset[disabled]');
     if (selector === 'fieldset[disabled]') return this.tagName === 'FIELDSET' && this.disabled;
     if (selector === 'details:not([open])') return this.tagName === 'DETAILS' && !this.open;
+    if (selector.includes(','))
+      return selector.split(',').some((part) => this.matches(part.trim()));
+    if (selector === '[hidden]') return this.hidden;
+    if (selector === '[inert]') return this.inert;
+    const data = selector.match(/\[data-(\w+)="([^"]+)"\]/);
+    if (data) return this.dataset[data[1]] === data[2];
+    if (selector.startsWith('[tabindex]')) return this.tabIndex >= 0;
+    if (selector.startsWith('.')) return this.classList.contains(selector.slice(1));
+    const tag = selector.match(/^[a-z][a-z0-9]*/i)?.[0];
     return (
-      (selector.includes('[hidden]') && this.hidden) || (selector.includes('[inert]') && this.inert)
+      !!tag &&
+      this.tagName === tag.toUpperCase() &&
+      (!selector.includes(':not([disabled])') || !this.disabled)
     );
   }
   closest(selector: string): Element | null {
     return this.matches(selector) ? this : (this.parentElement?.closest(selector) ?? null);
   }
-  querySelectorAll(): Element[] {
-    return this.children.flatMap((child) => [child, ...child.querySelectorAll()]);
+  querySelectorAll(selector?: string): Element[] {
+    const all = this.children.flatMap((child) => [child, ...child.querySelectorAll()]);
+    if (!selector) return all;
+    const parts = selector.split(' ');
+    if (parts.length === 2)
+      return all.filter(
+        (child) => child.matches(parts[1]) && child.parentElement?.closest(parts[0]),
+      );
+    return all.filter((child) => child.matches(selector));
+  }
+  querySelector(selector: string): Element | null {
+    return this.querySelectorAll(selector)[0] ?? null;
   }
   getClientRects() {
     return this.layout && !this.closest('[hidden]') ? [{}] : [];
@@ -93,7 +178,7 @@ let body: Element;
 const cleanup: Array<() => void> = [];
 beforeEach(() => {
   body = new Element('BODY');
-  const win = new EventTarget();
+  const win = Object.assign(new EventTarget(), { clearTimeout: vi.fn() });
   // Node needs capture normalized on removal to match browser semantics.
   const remove = win.removeEventListener.bind(win);
   win.removeEventListener = (type, listener, options) =>
@@ -101,11 +186,14 @@ beforeEach(() => {
   vi.stubGlobal('window', win);
   vi.stubGlobal('HTMLElement', Element);
   vi.stubGlobal('HTMLButtonElement', Element);
+  vi.stubGlobal('HTMLInputElement', Element);
   vi.stubGlobal('getComputedStyle', (el: Element) => ({ visibility: el.visibility }));
   vi.stubGlobal('document', {
     body,
+    documentElement: new Element('HTML'),
     activeElement: body,
     createElement: (tag: string) => new Element(tag.toUpperCase()),
+    createElementNS: (_ns: string, tag: string) => new Element(tag.toUpperCase()),
     createTextNode: (text: string) => Object.assign(new Element('#TEXT'), { textContent: text }),
     exitPointerLock: vi.fn(),
   });
@@ -519,4 +607,617 @@ describe('migrated modal consumers', () => {
       cleanup.pop();
     },
   );
+});
+
+const stats: DebriefStats = {
+  elapsedS: 30,
+  distanceM: 10,
+  maxDepthM: 100,
+  discoveries: [],
+  newEntries: [],
+};
+function settings() {
+  const input = new Input({ storage: null });
+  const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+  const screen = new SettingsScreen({
+    input,
+    save,
+    config: DEFAULT_CONFIG,
+    activeTier: 'low',
+    activeDetailStrength: save.get().detailStrength,
+    activeSimSpeedDefault: save.get().simSpeedDefault,
+  });
+  cleanup.push(() => {
+    screen.dispose();
+    input.dispose();
+  });
+  return { screen, input };
+}
+function journal() {
+  const guide = new Journal();
+  vi.spyOn(guide, 'load').mockResolvedValue();
+  cleanup.push(() => guide.dispose());
+  return guide;
+}
+function pauseMenu() {
+  const pause = new PauseMenu({
+    resume: () => pause.close(),
+    journal: vi.fn(),
+    settings: vi.fn(),
+    controls: vi.fn(),
+    credits: () => html(element('DIV')),
+    quit: vi.fn(),
+    objectives: () => [],
+  });
+  cleanup.push(() => pause.dispose());
+  return pause;
+}
+function shell() {
+  const setAppState = vi.fn();
+  shellKeysSystem.init?.({
+    app: { state: 'dive' },
+    bus: new EventBus(),
+    setAppState,
+  } as unknown as GameContext);
+  cleanup.push(() => shellKeysSystem.dispose?.());
+  return setAppState;
+}
+
+describe('overlay policies across the app', () => {
+  it.each([true, false])(
+    'Settings closes only the top owner, independent of shell init order (%s)',
+    (first) => {
+      const setAppState = first ? shell() : null;
+      const { screen } = settings();
+      const fallback = setAppState ?? shell();
+      const opener = element();
+      opener.focus();
+      screen.open();
+      expect(active()).toBe(body); // Held Space cannot activate an opening button.
+      press('Tab');
+      const settingsControl = active();
+      const card = new ControlsCard({ key: () => 'G', initialDevice: 'gamepad' });
+      cleanup.push(() => card.dispose());
+      card.open();
+      const seen = vi.fn(() => card.setDevice('keyboard'));
+      cleanup.push(observeKeyboard(seen)); // Observer order cannot change key ownership.
+      expect(press('Escape').defaultPrevented).toBe(true);
+      expect(card.device).toBe('keyboard');
+      expect(seen).toHaveBeenCalledOnce();
+      expect(card.isOpen).toBe(false);
+      expect(screen.isOpen).toBe(true);
+      expect(active()).toBe(settingsControl);
+      expect(fallback).not.toHaveBeenCalled();
+      press('Escape', { repeat: true });
+      expect(screen.isOpen).toBe(true);
+      press('Escape');
+      expect(screen.isOpen).toBe(false);
+      expect(active()).toBe(opener);
+      expect(fallback).not.toHaveBeenCalled();
+      press('Escape');
+      expect(fallback).toHaveBeenCalledExactlyOnceWith('pause');
+    },
+  );
+
+  it('Settings cancels capture on Tab/Escape, then reset confirmation, then closes and restores focus', () => {
+    const { screen, input } = settings();
+    const opener = element();
+    opener.focus();
+    screen.open();
+    screen.showControls(true);
+    const root = screen.root as unknown as Element;
+    const binding = root.querySelector('[data-action="boost"]')!;
+    binding.dispatchEvent(new Event('click'));
+    expect(screen.capturingAction).toBe('boost');
+    expect(press('Tab').defaultPrevented).toBe(true);
+    expect(screen.capturingAction).toBe(null);
+    expect(root.contains(active())).toBe(true);
+    binding.dispatchEvent(new Event('click'));
+    press('Escape');
+    expect(screen.capturingAction).toBe(null);
+    expect(screen.isOpen).toBe(true);
+    const original = [...input.actions.find((action) => action.id === 'boost')!.keys];
+    binding.dispatchEvent(new Event('click'));
+    press('KeyX', { repeat: true });
+    expect(input.actions.find((action) => action.id === 'boost')!.keys).toEqual(original);
+    press('KeyX');
+    expect(input.actions.find((action) => action.id === 'boost')!.keys).toEqual([
+      'KeyX',
+      ...original.slice(1),
+    ]);
+    const reset = root.querySelector('.settings-reset-progress')!;
+    reset.dispatchEvent(new Event('click'));
+    press('Escape', { repeat: true });
+    expect(root.querySelector('.settings-confirm')!.hidden).toBe(false);
+    press('Escape');
+    expect(root.querySelector('.settings-confirm')!.hidden).toBe(true);
+    expect(active()).toBe(reset);
+    expect(screen.isOpen).toBe(true);
+    press('Escape');
+    expect(screen.isOpen).toBe(false);
+    expect(active()).toBe(opener);
+  });
+
+  it('only the top briefing handles Enter, while its Escape policy returns to Home', () => {
+    const begin = vi.fn();
+    const cancel = vi.fn();
+    const briefing = new Briefing({ onBegin: begin, onCancel: cancel });
+    cleanup.push(() => briefing.dispose());
+    briefing.show({
+      kicker: 'Dive',
+      title: 'Site',
+      summary: '',
+      meta: [],
+      facts: [],
+      hazards: [],
+      objectives: [],
+    });
+    const { screen } = settings();
+    screen.open();
+    press('Enter');
+    expect(begin).not.toHaveBeenCalled();
+    expect(briefing.isOpen).toBe(true);
+    press('Escape');
+    expect(screen.isOpen).toBe(false);
+    expect(cancel).not.toHaveBeenCalled();
+    press('Escape');
+    expect(briefing.isOpen).toBe(false);
+    expect(cancel).toHaveBeenCalledOnce();
+  });
+
+  it('mission debrief Escape keeps exploring; Journal closes first and an aborted mission remains a decision point', async () => {
+    const guide = journal();
+    const bus = new EventBus();
+    const router = new MissionRouter({
+      config: DEFAULT_CONFIG,
+      bus,
+      meta: { id: 'reef' } as GameContext['meta'],
+      route: {
+        missionId: 'reef',
+        tileId: 'reef',
+        landmarkId: 'reef',
+        skipBriefing: true,
+        def: {
+          version: 1,
+          id: 'reef',
+          tile: 'reef',
+          landmark: 'reef',
+          title: 'Reef',
+          spawn: { lat: 0, lon: 0, depth_m: 5, heading_deg: 0 },
+          briefing: { summary: '', facts: [], hazards: [] },
+          objectives: [],
+          completion: 'all_primary',
+        },
+      },
+      discovery: {
+        ready: Promise.resolve(),
+        pois: [],
+        guide,
+        stats: { snapshot: (extra) => ({ ...stats, ...extra }) },
+      },
+    });
+    cleanup.push(() => router.dispose());
+    await Promise.resolve();
+    const fallback = shell();
+    expect(router.endDive()).toBe(true);
+    const debrief = router.debrief!;
+    press('Tab');
+    const control = active();
+    guide.open();
+    press('Escape');
+    expect(guide.isOpen).toBe(false);
+    expect(router.debriefOpen).toBe(true);
+    expect(active()).toBe(control);
+    press('Escape');
+    expect(router.debriefOpen).toBe(false);
+    expect(router.mission.diving).toBe(true);
+    bus.emit('sub:emergencyBlow', { depth: 200, lockSeconds: 0, cause: 'power' });
+    router.update(0, 0, { x: 0, y: 0, z: 0 }, 0, { emergencyBlow: false, depth: 5 });
+    expect(debrief.isOpen).toBe(true);
+    expect(router.mission.canResume).toBe(false);
+    guide.open();
+    press('Escape');
+    expect(guide.isOpen).toBe(false);
+    expect(debrief.isOpen).toBe(true);
+    expect(press('Escape').defaultPrevented).toBe(true);
+    expect(debrief.isOpen).toBe(true);
+    expect(fallback).not.toHaveBeenCalled();
+  });
+
+  it('power exhaustion opens a non-dismissible free-dive debrief, with Journal and Settings above it', () => {
+    const guide = journal();
+    const debrief = new Debrief();
+    cleanup.push(() => debrief.dispose());
+    const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+    save.setGameplayMode('realistic');
+    const ctx = {
+      config: DEFAULT_CONFIG,
+      settings: save.get(),
+      save,
+      route: null,
+      bus: new EventBus(),
+      expose: vi.fn(),
+      discovery: {
+        ready: Promise.resolve(),
+        guide,
+        debrief,
+        showDebrief: (extra: Partial<DebriefStats>, escape: null) =>
+          debrief.show({ ...stats, ...extra }, undefined, undefined, escape),
+      },
+      sub: { simSpeed: 1, startEmergencyAscent: vi.fn() },
+      headlights: { on: false },
+      sonar: { visible: false },
+    } as unknown as GameContext;
+    const system = createPowerSystem();
+    system.init?.(ctx);
+    cleanup.push(() => system.dispose?.());
+    const fallback = shell();
+    ctx.power.setLevels(0, 0);
+    system.frame!['sim.power']!(
+      { steps: 1, fixedDt: 1 / 60, state: { throttle: 0, ballast: 0 } } as FrameState,
+      ctx,
+    );
+    system.frame!['events.power']!({ sub: { emergencyBlow: false } } as FrameState, ctx);
+    expect(debrief.last?.title).toBe('Dive aborted');
+    expect(press('Escape').defaultPrevented).toBe(true);
+    expect(debrief.isOpen).toBe(true);
+    guide.open();
+    press('Tab');
+    const opener = active();
+    const { screen } = settings();
+    screen.open();
+    press('Escape');
+    expect(screen.isOpen).toBe(false);
+    expect(guide.isOpen).toBe(true);
+    expect(active()).toBe(opener);
+    press('Escape');
+    expect(guide.isOpen).toBe(false);
+    expect(debrief.isOpen).toBe(true);
+    press('Escape');
+    expect(debrief.isOpen).toBe(true);
+    expect(fallback).not.toHaveBeenCalled();
+    debrief.hide();
+    debrief.show(stats);
+    press('Escape');
+    expect(debrief.isOpen).toBe(false); // A later ordinary summary resets the per-show policy.
+  });
+
+  it('Home site Escape returns to its opener, and Pause steps back before resuming', () => {
+    const home = new Home({
+      dive: vi.fn(),
+      journal: vi.fn(),
+      settings: vi.fn(),
+      controls: vi.fn(),
+    });
+    cleanup.push(() => home.dispose());
+    home.show();
+    const root = home.root as unknown as Element;
+    const sites =
+      root.querySelector('.home-sites-button') ??
+      root.querySelectorAll('button').find((button) => button.textContent === 'Dive sites')!;
+    home.showSites(false, sites as unknown as HTMLButtonElement);
+    const { screen } = settings();
+    screen.open();
+    press('Escape');
+    expect(home.sitesOpen).toBe(true);
+    press('Escape');
+    expect(home.sitesOpen).toBe(false);
+    expect(active()).toBe(sites);
+    home.hide();
+    const pause = pauseMenu();
+    pause.open();
+    pause.showView('objectives');
+    press('Escape');
+    expect(pause.isOpen).toBe(true);
+    expect((pause.root as unknown as Element).querySelector('.pause-actions')!.hidden).toBe(false);
+    press('Escape');
+    expect(pause.isOpen).toBe(false);
+  });
+
+  it.each(['Settings', 'Briefing', 'Debrief', 'Journal', 'Controls', 'Pause', 'Photo'] as const)(
+    '%s exposes every visible control to forward/reverse Tab and returns focus on close',
+    (kind) => {
+      const opener = element();
+      opener.focus();
+      let root: HTMLElement;
+      let open: () => void;
+      let close: () => void;
+      if (kind === 'Settings') {
+        const { screen } = settings();
+        root = screen.root;
+        open = () => screen.open();
+        close = () => screen.close();
+      } else if (kind === 'Briefing') {
+        const ui = new Briefing({ onBegin: vi.fn(), onCancel: vi.fn() });
+        cleanup.push(() => ui.dispose());
+        root = ui.root;
+        open = () =>
+          ui.show({
+            kicker: '',
+            title: '',
+            summary: '',
+            meta: [],
+            facts: [],
+            hazards: [],
+            objectives: [],
+          });
+        close = () => ui.hide();
+      } else if (kind === 'Debrief') {
+        const ui = new Debrief();
+        cleanup.push(() => ui.dispose());
+        root = ui.root;
+        open = () => ui.show(stats);
+        close = () => ui.hide();
+      } else if (kind === 'Journal') {
+        const ui = journal();
+        root = ui.root;
+        open = () => ui.open();
+        close = () => ui.close();
+      } else if (kind === 'Controls') {
+        const ui = new ControlsCard({
+          key: () => 'G',
+          initialDevice: 'keyboard',
+          onRebind: vi.fn(),
+        });
+        cleanup.push(() => ui.dispose());
+        root = ui.root;
+        open = () => ui.open();
+        close = () => ui.close();
+      } else if (kind === 'Pause') {
+        const ui = pauseMenu();
+        root = ui.root;
+        open = () => ui.open();
+        close = () => ui.close();
+      } else {
+        const ui = new PhotoMode(vi.fn(), vi.fn(), vi.fn());
+        cleanup.push(() => ui.dispose());
+        root = ui.root;
+        open = () => ui.setActive(true);
+        close = () => ui.setActive(false);
+      }
+      open();
+      const controls = (root as unknown as Element)
+        .querySelectorAll()
+        .filter((el) => el.tabIndex >= 0 && !el.closest('[hidden], [inert]'));
+      expect(controls.length).toBeGreaterThan(0);
+      const visited = new Set<Element>();
+      for (let i = 0; i < controls.length; i++) {
+        press('Tab');
+        visited.add(active());
+      }
+      expect(visited).toEqual(new Set(controls));
+      const last = active();
+      press('Tab');
+      press('Tab', { shiftKey: true });
+      expect(active()).toBe(last);
+      close();
+      expect(active()).toBe(opener);
+    },
+  );
+});
+
+describe('overlay host teardown', () => {
+  it('disposes both hosted Globes and their chooser ownership', async () => {
+    const proto = Globe.prototype as unknown as { initGl(): void; resize(): void };
+    vi.spyOn(proto, 'initGl').mockImplementation(() => {});
+    vi.spyOn(proto, 'resize').mockImplementation(() => {});
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
+    const ctx = {
+      config: DEFAULT_CONFIG,
+      bus: new EventBus(),
+      index: [],
+      contentLandmark: 'reef',
+      app: { state: 'dive' },
+      params: new URLSearchParams(),
+      home: { globeSlot: html(element('DIV')) },
+      homeSites: { setPending: vi.fn(), highlightSite: vi.fn() },
+      missionSelect: { setPending: vi.fn(), setGlobeHandler: vi.fn() },
+      journal: { setSpecies: vi.fn() },
+      discovery: { guide: { setSpecies: vi.fn() } },
+      expose: vi.fn(),
+    } as unknown as GameContext;
+    globeSystem.init?.(ctx);
+    cleanup.push(() => globeSystem.dispose?.());
+    await Promise.all([ctx.globe.catalog, ctx.homeGlobe.catalog]);
+    const dispose = vi.spyOn(Globe.prototype, 'dispose');
+    ctx.globe.open();
+    ctx.homeGlobe.open();
+    const internal = ctx.homeGlobe as unknown as {
+      showChooser(leader: number, pins: Array<{ site: GlobeSite }>): void;
+    };
+    const site = { id: 'reef', name: 'Reef', state: 'mission' } as GlobeSite;
+    internal.showChooser(0, [{ site }, { site }]);
+    globeSystem.dispose?.();
+    globeSystem.dispose?.();
+    expect(dispose).toHaveBeenCalledTimes(2);
+    for (const globe of [ctx.globe, ctx.homeGlobe]) {
+      expect(globe.isOpen).toBe(false);
+      expect(globe.root.isConnected).toBe(false);
+      globe.open();
+      expect(globe.isOpen).toBe(false);
+    }
+    expect(press('Escape').defaultPrevented).toBe(false);
+  });
+
+  it('does not rebuild a disposed Globe when its catalogue resolves later', async () => {
+    let resolve!: (catalog: Awaited<Globe['catalog']>) => void;
+    const catalog = new Promise<Awaited<Globe['catalog']>>((done) => {
+      resolve = done;
+    });
+    const globe = new Globe({ config: DEFAULT_CONFIG.globe, tileIds: [], catalog });
+    cleanup.push(() => globe.dispose());
+    globe.dispose();
+    resolve({
+      sites: [{ id: 'reef', name: 'Reef', state: 'mission', lat: 0, lon: 0 } as GlobeSite],
+      pending: [],
+      missions: [],
+    });
+    await catalog;
+    expect(globe.pinCount).toBe(0);
+    expect(globe.root.isConnected).toBe(false);
+    expect(press('Escape').defaultPrevented).toBe(false);
+  });
+
+  it('selected prop editing yields Escape to Settings and releases its keyboard owner on disposal', () => {
+    const panel = element('DIV');
+    for (const [tag, className] of [
+      ['UL', 'props-debug-list'],
+      ['PRE', 'props-debug-json'],
+      ['BUTTON', 'props-debug-copy'],
+      ['SPAN', 'props-debug-status'],
+    ]) {
+      element(tag, panel).className = className;
+    }
+    vi.spyOn(document, 'createElement').mockImplementationOnce(
+      () => panel as unknown as HTMLDivElement,
+    );
+    vi.spyOn(console, 'info').mockImplementation(() => {});
+    const root = new THREE.Group();
+    const prop = { root, def: { id: 'reef', model: '', raw: {} } } as PlacedProp;
+    const debug = new PlacementDebug(
+      { placed: [prop] } as Props,
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      html(element('CANVAS')) as HTMLCanvasElement,
+      DEFAULT_CONFIG.props,
+    );
+    cleanup.push(() => debug.dispose());
+    const fallback = shell();
+    debug.select(prop);
+    const { screen } = settings();
+    screen.open();
+    press('Escape');
+    expect(screen.isOpen).toBe(false);
+    expect(panel.querySelector('li')!.classList.contains('selected')).toBe(true);
+    press('Escape');
+    expect(panel.querySelector('li')!.classList.contains('selected')).toBe(false);
+    expect(fallback).not.toHaveBeenCalled();
+    debug.select(prop);
+    debug.dispose();
+    expect(panel.isConnected).toBe(false);
+    press('Escape');
+    expect(fallback).toHaveBeenCalledExactlyOnceWith('pause');
+  });
+});
+
+it('Discovery host disposal releases Journal/debrief ownership even with both open', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
+  vi.spyOn(Journal.prototype, 'load').mockResolvedValue();
+  const ctx = {
+    bus: new EventBus(),
+    config: DEFAULT_CONFIG,
+    meta: { id: 'reef' },
+    terrain: { sampleHeight: () => -100 },
+    contentLandmark: 'reef',
+    params: new URLSearchParams(),
+    expose: vi.fn(),
+  } as unknown as GameContext;
+  discoverySystem.init?.(ctx);
+  cleanup.push(() => discoverySystem.dispose?.());
+  await ctx.discovery.ready;
+  ctx.discovery.showDebrief();
+  ctx.discovery.guide.open();
+  discoverySystem.dispose?.();
+  discoverySystem.dispose?.();
+  expect(ctx.discovery.guide.isOpen).toBe(false);
+  expect(ctx.discovery.debrief.isOpen).toBe(false);
+  expect(ctx.discovery.guide.root.isConnected).toBe(false);
+  expect(ctx.discovery.debrief.root.isConnected).toBe(false);
+  expect(press('Escape').defaultPrevented).toBe(false);
+});
+
+it('Settings keyboard toggle retains typing and repeat guards in the shared dispatcher', () => {
+  const { screen, input } = settings();
+  input.actions.push({ id: 'toggleSettings', label: 'Settings', category: 'View', keys: ['KeyO'] });
+  const fallback = shell();
+  press('KeyO', { repeat: true });
+  expect(screen.isOpen).toBe(false);
+  press('KeyO', { target: html(element('INPUT')) });
+  expect(screen.isOpen).toBe(false);
+  expect(press('KeyO').defaultPrevented).toBe(true);
+  expect(screen.isOpen).toBe(true);
+  press('KeyO', { repeat: true });
+  expect(screen.isOpen).toBe(true);
+  press('KeyO');
+  expect(screen.isOpen).toBe(false);
+  expect(fallback).not.toHaveBeenCalled();
+});
+
+it.each([false, true])(
+  'MissionRouter disposal cancels pending discovery/start callbacks (skip briefing: %s)',
+  async (skipBriefing) => {
+    let resolve!: () => void;
+    const ready = new Promise<void>((done) => {
+      resolve = done;
+    });
+    const applyStart = vi.fn();
+    const def = parseMission(titanicMission, 'titanic')!;
+    const router = new MissionRouter({
+      config: DEFAULT_CONFIG,
+      bus: new EventBus(),
+      meta: { id: 'titanic' } as GameContext['meta'],
+      applyStart,
+      route: { missionId: def.id, tileId: def.tile, landmarkId: def.landmark, skipBriefing, def },
+      discovery: {
+        ready,
+        pois: [],
+        guide: { isOpen: false, open: vi.fn() },
+        stats: { snapshot: () => stats },
+      },
+    });
+    cleanup.push(() => router.dispose());
+    const initialState = router.mission.state;
+    router.begin();
+    router.dispose();
+    resolve();
+    await ready;
+    expect(applyStart).not.toHaveBeenCalled();
+    expect(router.mission.state).toBe(initialState);
+    expect(router.briefing?.isOpen ?? false).toBe(false);
+    expect(press('Escape').defaultPrevented).toBe(false);
+  },
+);
+
+it('shell host teardown releases Home, Pause, both Globes and shell fallback together', async () => {
+  const proto = Globe.prototype as unknown as { initGl(): void; resize(): void };
+  vi.spyOn(proto, 'initGl').mockImplementation(() => {});
+  vi.spyOn(proto, 'resize').mockImplementation(() => {});
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
+  const ctx = {
+    config: DEFAULT_CONFIG,
+    bus: new EventBus(),
+    index: [],
+    contentLandmark: 'reef',
+    meta: { id: 'reef' },
+    route: null,
+    save: new Save({ config: DEFAULT_CONFIG, storage: null }),
+    app: { state: 'home', lastSite: null },
+    controlsCard: { device: 'keyboard' },
+    params: new URLSearchParams(),
+    expose: vi.fn(),
+    journal: { open: vi.fn(), setSpecies: vi.fn() },
+    discoveries: { isDiscovered: () => false },
+    discovery: {
+      guide: { open: vi.fn(), setSpecies: vi.fn() },
+      store: { isDiscovered: () => false },
+    },
+  } as unknown as GameContext;
+  const runner = new SystemRunner(ctx);
+  cleanup.push(() => runner.dispose());
+  runner.init([shellSystem, globeSystem, shellKeysSystem]);
+  await Promise.all([ctx.globe.catalog, ctx.homeGlobe.catalog]);
+  expect(ctx.home.isOpen).toBe(true);
+  ctx.setAppState('pause');
+  expect(ctx.pause.isOpen).toBe(true);
+  press('Escape');
+  expect(ctx.app.state).toBe('dive');
+  ctx.globe.open();
+  ctx.homeGlobe.open();
+  runner.dispose();
+  runner.dispose();
+  for (const ui of [ctx.home, ctx.pause, ctx.globe, ctx.homeGlobe]) {
+    expect(ui.isOpen).toBe(false);
+    expect(ui.root.isConnected).toBe(false);
+  }
+  expect(press('Escape').defaultPrevented).toBe(false);
 });

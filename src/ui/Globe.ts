@@ -25,6 +25,7 @@
 import * as THREE from 'three';
 import type { GlobeConfig } from '../core/Config.js';
 import type { GameEvents } from '../core/EventBus.js';
+import { el } from './dom.js';
 import { FocusTrap } from './FocusTrap.js';
 import {
   clusterPins,
@@ -98,17 +99,6 @@ interface ClusterEl {
 
 /** Pins sit a hair above the surface so the horizon test is not ambiguous. */
 const PIN_ALTITUDE = 1.002;
-
-function el<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className?: string,
-  text?: string,
-): HTMLElementTagNameMap[K] {
-  const e = document.createElement(tag);
-  if (className) e.className = className;
-  if (text !== undefined) e.textContent = text;
-  return e;
-}
 
 const EARTH_VERT = /* glsl */ `
 varying vec2 vUv;
@@ -231,6 +221,7 @@ export class Globe {
   private camera: THREE.PerspectiveCamera | null = null;
   private glFailed = false;
   private resizeObserver: ResizeObserver | null = null;
+  private disposed = false;
   private size = { width: 0, height: 0 };
   private readonly tmp = new THREE.Vector3();
   private readonly disposers: Array<() => void> = [];
@@ -328,7 +319,9 @@ export class Globe {
     }
 
     this.catalog = opts.catalog ?? loadGlobeCatalog(opts.tileIds);
-    void this.catalog.then((c) => this.setSites(c.sites));
+    void this.catalog.then((c) => {
+      if (!this.disposed) this.setSites(c.sites);
+    });
   }
 
   get isOpen(): boolean {
@@ -354,12 +347,12 @@ export class Globe {
   }
 
   open(source: GlobeOpenSource = 'api'): void {
-    if (this.open_) return;
+    if (this.open_ || this.disposed) return;
     this.open_ = true;
     this.root.hidden = false;
     this.initGl();
     this.resize();
-    if (!this.opts.embedded) this.trap.activate();
+    if (!this.opts.embedded) this.trap.show();
     this.orbit.poke();
     this.opts.bus?.emit('globe:opened', { source });
   }
@@ -374,7 +367,7 @@ export class Globe {
     this.orbit.endDrag();
     this.hovered = null;
     this.closeChooser();
-    if (!this.opts.embedded) this.trap.deactivate();
+    if (!this.opts.embedded) this.trap.hide();
   }
 
   toggle(source: GlobeOpenSource = 'api'): void {
@@ -454,6 +447,8 @@ export class Globe {
   }
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     this.resizeObserver?.disconnect();
     for (const d of this.disposers) d();
     this.close();
@@ -808,8 +803,7 @@ export class Globe {
         return b;
       }),
     );
-    this.chooser.hidden = false;
-    this.chooserTrap.activate();
+    this.chooserTrap.show();
     // A cluster chooser is a direct selection action: keyboard users should
     // reach its sites immediately, while general overlays keep neutral focus.
     this.chooserTrap.focusables()[0]?.focus();
@@ -817,8 +811,7 @@ export class Globe {
 
   private closeChooser(): void {
     this.chooserLeader = -1;
-    this.chooser.hidden = true;
-    this.chooserTrap.deactivate();
+    this.chooserTrap.hide();
   }
 
   private renderCard(): void {

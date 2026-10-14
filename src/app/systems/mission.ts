@@ -171,6 +171,7 @@ export const missionSystem: GameSystem = {
         })
       : null;
     ctx.missionRouter = missionRouter;
+    if (missionRouter) cleanup.add(() => missionRouter.dispose());
     // Optional models may finish after discovery. Reframe a waiting pilot once,
     // while preserving surface choices, URL probes and anyone already moving.
     cleanup.add(

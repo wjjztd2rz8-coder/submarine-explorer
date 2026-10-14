@@ -94,6 +94,10 @@ export function createPhotoSystem(): GameSystem {
         ctx.input.state.lookDy = 0;
         ctx.input.wheelDelta = 0;
       };
+      cleanup.add(() => {
+        ctx.exitPhotoMode();
+        photoMode.dispose();
+      });
       ctx.expose({ photos, photoMode });
     },
     // Register after init so photo mode misses the initial dive emit.

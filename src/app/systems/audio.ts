@@ -9,6 +9,7 @@
 import type { SoundSite } from '../../audio/Soundscape.js';
 import { AudioSystem } from '../../audio/AudioSystem.js';
 import { Captions } from '../../ui/Captions.js';
+import { observeKeyboard } from '../../ui/FocusTrap.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
@@ -36,7 +37,8 @@ export const audioSystem: GameSystem = {
     const unlockAudio = (): void => audio.unlock();
     // Touch activation can arrive at release; capture also reaches controls
     // that stop propagation before the event bubbles to window.
-    for (const event of ['pointerdown', 'pointerup', 'touchend', 'keydown'])
+    cleanup.add(observeKeyboard(unlockAudio));
+    for (const event of ['pointerdown', 'pointerup', 'touchend'])
       cleanup.listen(window, event, unlockAudio, { passive: true, capture: true });
     ctx.expose({ audio, captions: ctx.captions });
   },

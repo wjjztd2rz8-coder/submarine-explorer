@@ -21,6 +21,28 @@ const FOCUSABLE =
 const stack: FocusTrap[] = [];
 let listening = false;
 let keyboardOwners = 0;
+const observers = new Set<(event: KeyboardEvent) => void>();
+const fallbacks = new Set<(event: KeyboardEvent) => void>();
+
+/** Passive device detection runs even when the top overlay consumes the key. */
+export function observeKeyboard(observer: (event: KeyboardEvent) => void): () => void {
+  observers.add(observer);
+  listen();
+  return () => {
+    observers.delete(observer);
+    releaseListener();
+  };
+}
+
+/** Shell shortcuts share the dispatcher and run only for keys left unhandled. */
+export function onUnhandledKeyDown(handler: (event: KeyboardEvent) => void): () => void {
+  fallbacks.add(handler);
+  listen();
+  return () => {
+    fallbacks.delete(handler);
+    releaseListener();
+  };
+}
 
 function listen(): void {
   if (listening) return;
@@ -29,15 +51,20 @@ function listen(): void {
 }
 
 function releaseListener(): void {
-  if (stack.length || keyboardOwners || !listening) return;
+  if (stack.length || keyboardOwners || observers.size || fallbacks.size || !listening) return;
   window.removeEventListener('keydown', onKeyDown, true);
   listening = false;
 }
 
 function onKeyDown(e: KeyboardEvent): void {
+  for (const observer of observers) observer(e);
   const top = stack[stack.length - 1];
-  if (!top) return;
-  top.handleKeyDown(e);
+  top?.handleKeyDown(e);
+  if (e.cancelBubble) return;
+  for (const fallback of fallbacks) {
+    fallback(e);
+    if (e.cancelBubble) break;
+  }
 }
 
 export interface FocusTrapOptions {
@@ -45,6 +72,8 @@ export interface FocusTrapOptions {
   onEscape?: (() => void) | null;
   /** Other keys owned by this overlay, for example the globe's orbit controls. */
   onKeyDown?: (event: KeyboardEvent) => void;
+  /** Side effects, such as cancelling a binding capture, before focus cycles. */
+  onTab?: () => void;
 }
 
 function asEl(x: unknown): HTMLElement | null {
@@ -81,8 +110,8 @@ export class FocusTrap {
     private readonly options: FocusTrapOptions = {},
   ) {
     if (options.onEscape !== undefined && typeof window !== 'undefined') {
-      // Reserve the shared listener before this consumer's surrounding legacy
-      // handlers are bound. Closing/reopening must not change that priority.
+      // Keep one shared listener throughout the consumer's lifetime so a
+      // close/reopen cannot move keyboard ownership behind other listeners.
       this.ownsKeyboard = true;
       keyboardOwners++;
       listen();
@@ -95,6 +124,18 @@ export class FocusTrap {
 
   get isTop(): boolean {
     return stack[stack.length - 1] === this;
+  }
+
+  /** Keep visibility, stack removal and focus return in one lifecycle path. */
+  show(): void {
+    if (this.disposed) return;
+    this.root.hidden = false;
+    this.activate();
+  }
+
+  hide(): void {
+    this.root.hidden = true;
+    this.deactivate();
   }
 
   activate(): void {
@@ -136,7 +177,7 @@ export class FocusTrap {
   /** Final teardown; migrated consumers retain listener priority until disposal. */
   dispose(): void {
     if (this.disposed) return;
-    this.deactivate();
+    this.hide();
     this.disposed = true;
     if (this.ownsKeyboard) {
       keyboardOwners--;
@@ -158,6 +199,7 @@ export class FocusTrap {
     if (e.key === 'Tab' || e.code === 'Tab') {
       // Legacy callers still need their own Tab side effects (binding capture, etc.).
       if (this.options.onEscape !== undefined) e.stopImmediatePropagation();
+      this.options.onTab?.();
       this.handleTab(e);
     } else if (e.key === 'Escape' || e.code === 'Escape') {
       if (this.options.onEscape === undefined) return;

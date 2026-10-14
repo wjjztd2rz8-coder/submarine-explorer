@@ -43,23 +43,6 @@ export function createPowerSystem(): GameSystem {
           );
         }),
       );
-      // The free-dive power debrief cannot be dismissed with Escape.
-      cleanup.listen(
-        window,
-        'keydown',
-        (event) => {
-          if (
-            event.code === 'Escape' &&
-            freeDivePowerDebriefShown &&
-            discovery.debrief.isOpen &&
-            !discovery.guide.isOpen
-          ) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-          }
-        },
-        true,
-      );
       cleanup.add(
         save.onChange((next, changed) => {
           if (changed.includes('gameplay')) power.setEnabled(next.gameplay.batteryOxygen);
@@ -92,10 +75,10 @@ export function createPowerSystem(): GameSystem {
           !freeDivePowerDebriefShown
         ) {
           freeDivePowerDebriefShown = true;
-          ctx.discovery.showDebrief({
-            title: 'Dive aborted',
-            subtitle: 'Supplies exhausted · safe ascent completed',
-          });
+          ctx.discovery.showDebrief(
+            { title: 'Dive aborted', subtitle: 'Supplies exhausted · safe ascent completed' },
+            null,
+          );
         }
       },
       'hud.feeds': (_f, ctx) => {

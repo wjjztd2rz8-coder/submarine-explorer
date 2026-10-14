@@ -24,6 +24,7 @@ class Element extends EventTarget {
   focus() {
     (document as unknown as { activeElement: Element }).activeElement = this;
   }
+  remove() {}
   blur() {
     (document as unknown as { activeElement: Element }).activeElement =
       document.body as unknown as Element;
@@ -45,7 +46,7 @@ beforeEach(() => {
   });
 });
 afterEach(() => {
-  home.hide();
+  home.dispose();
   vi.unstubAllGlobals();
 });
 const focusedLabel = () => document.activeElement?.textContent;

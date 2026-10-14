@@ -112,7 +112,7 @@ export function summarizeDive(
 export class Debrief {
   readonly root: HTMLDivElement;
   private readonly panel: HTMLDivElement;
-  private open_ = false;
+  private escape: (() => void) | null = null;
   /** Read when shown, so both free dives and mission debriefs include curiosity. */
   exploration: (() => ExplorationSummary) | null = null;
   /** The stats last shown (for tests / B3). */
@@ -129,15 +129,21 @@ export class Debrief {
     this.panel = el('div', 'debrief-panel');
     this.root.append(this.panel);
     (options.parent ?? document.body).appendChild(this.root);
-    this.trap = new FocusTrap(this.root);
+    this.trap = new FocusTrap(this.root, { onEscape: () => this.escape?.() });
   }
 
   get isOpen(): boolean {
-    return this.open_;
+    return this.trap.active;
   }
 
-  /** @param actions the buttons, in order; default Dive again + Journal. */
-  show(stats: DebriefStats, actions?: DebriefAction[], rating?: DiveRating): void {
+  /** Default: dismiss on Escape. Null keeps an aborted dive as a decision point. */
+  show(
+    stats: DebriefStats,
+    actions?: DebriefAction[],
+    rating?: DiveRating,
+    onEscape?: (() => void) | null,
+  ): void {
+    this.escape = onEscape === undefined ? () => this.hide() : onEscape;
     this.last = stats;
     const p = this.panel;
     p.replaceChildren();
@@ -245,21 +251,17 @@ export class Debrief {
     row.append(navigation, secondary);
     p.append(row);
 
-    this.open_ = true;
-    this.root.hidden = false;
     // Returning from Keep exploring creates a new summary in the same panel.
     p.scrollTop = 0;
-    this.trap.activate();
+    this.trap.show();
   }
 
   hide(): void {
-    this.open_ = false;
-    this.root.hidden = true;
-    this.trap.deactivate();
+    this.trap.hide();
   }
 
   dispose(): void {
-    this.trap.deactivate();
+    this.trap.dispose();
     this.root.remove();
   }
 }
