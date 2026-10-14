@@ -36,12 +36,10 @@ export class Upgrades {
     if (this.isOpen) return;
     document.exitPointerLock?.();
     this.render();
-    this.root.hidden = false;
-    this.trap.activate();
+    this.trap.show();
   }
   close(): void {
-    this.root.hidden = true;
-    this.trap.deactivate();
+    this.trap.hide();
   }
   private render(): void {
     const focus = (document.activeElement as HTMLElement | null)?.dataset.upgrade;

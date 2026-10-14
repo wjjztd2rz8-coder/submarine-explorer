@@ -1,8 +1,6 @@
 /**
  * The settings dialog (C5, docs/settings.md) and live application of display
  * settings (reduce motion, captions, sonar palette, post-processing, UI scale).
- * Built before the mission router so its capture-phase key handler runs first
- * and can keep keys from the briefing / debrief while open.
  */
 
 import { SAVE_KEYS } from '../../core/Save.js';
@@ -63,6 +61,7 @@ export const settingsSystem: GameSystem = {
       },
     });
     ctx.settingsScreen = settingsScreen;
+    cleanup.add(() => settingsScreen.dispose());
 
     // D3-FEEL: the pointer-look toggle in the Controls page.
     const pointerLookButton =

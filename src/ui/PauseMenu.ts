@@ -29,7 +29,6 @@ export class PauseMenu {
   private readonly title: HTMLElement;
   private readonly list: HTMLElement;
   private readonly trap: FocusTrap;
-  private open_ = false;
   private readonly controlsButton: HTMLButtonElement;
   private readonly creditsSlot: HTMLDivElement;
   private view: PauseView = 'menu';
@@ -86,28 +85,29 @@ export class PauseMenu {
     panel.append(kicker, heading, this.menu, this.detail);
     this.root.append(panel);
     parent.append(this.root);
-    this.trap = new FocusTrap(this.root);
+    this.trap = new FocusTrap(this.root, { onEscape: () => this.escape() });
   }
 
   get isOpen(): boolean {
-    return this.open_;
+    return this.trap.active;
   }
 
   open(): void {
-    if (this.open_) return;
-    this.open_ = true;
-    this.root.hidden = false;
+    if (this.isOpen) return;
     this.controlsButton.textContent = this.actions.controlsLabel?.() ?? 'Controls';
     this.showView('menu');
-    this.trap.activate();
-    this.menu.querySelector('button')?.focus();
+    this.trap.show();
   }
 
   close(): void {
-    if (!this.open_) return;
-    this.open_ = false;
-    this.root.hidden = true;
-    this.trap.deactivate();
+    if (!this.isOpen) return;
+    this.trap.hide();
+  }
+
+  dispose(): void {
+    this.close();
+    this.trap.dispose();
+    this.root.remove();
   }
 
   escape(): void {
@@ -142,7 +142,7 @@ export class PauseMenu {
       this.title.textContent = 'Data credits';
       this.creditsSlot.replaceChildren(this.actions.credits());
     }
-    if (this.open_) {
+    if (this.isOpen) {
       if (view === 'menu') this.menu.querySelector('button')?.focus();
       else this.detail.querySelector('button')?.focus();
     }

@@ -50,6 +50,7 @@ class Element extends EventTarget {
     this.children = [];
     this.append(...children);
   }
+  remove() {}
   contains(child: Element): boolean {
     return this === child || this.children.some((e) => e.contains(child));
   }
@@ -144,7 +145,7 @@ beforeEach(() => {
   journal.open();
 });
 afterEach(() => {
-  journal.close();
+  journal.dispose();
   vi.unstubAllGlobals();
 });
 

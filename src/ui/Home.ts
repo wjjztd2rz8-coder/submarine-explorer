@@ -41,7 +41,6 @@ export class Home {
   private sitesOrigin: HTMLButtonElement | null = null;
   private readonly sites: HTMLElement;
   private readonly trap: FocusTrap;
-  private open_ = false;
 
   constructor(
     actions: HomeActions,
@@ -150,12 +149,17 @@ export class Home {
 
     this.root.append(panel, hero, globeWrap, this.sites);
     parent.append(this.root);
-    this.trap = new FocusTrap(this.root);
+    this.trap = new FocusTrap(this.root, {
+      onEscape: () => {
+        document.exitPointerLock?.();
+        if (this.sitesOpen) this.closeSites();
+      },
+    });
     this.panel = panel;
   }
 
   get isOpen(): boolean {
-    return this.open_;
+    return this.trap.active;
   }
 
   get sitesOpen(): boolean {
@@ -163,18 +167,21 @@ export class Home {
   }
 
   show(): void {
-    if (this.open_) return;
-    this.open_ = true;
-    this.root.hidden = false;
-    this.trap.activate();
+    if (this.isOpen) return;
+    this.trap.show();
     this.diveButton.focus();
   }
 
   hide(): void {
-    if (!this.open_) return;
-    this.open_ = false;
-    this.root.hidden = true;
-    this.trap.deactivate();
+    if (!this.isOpen) return;
+    this.trap.hide();
+  }
+
+  dispose(): void {
+    this.hide();
+    this.trap.dispose();
+    this.modeSelector?.dispose();
+    this.root.remove();
   }
 
   setDaily(site: string, modifier: string, best: number, streak: number, launch: () => void): void {

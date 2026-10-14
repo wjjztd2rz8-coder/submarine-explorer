@@ -19,6 +19,7 @@
  */
 
 import type { GameplayOptions } from '../core/Config.js';
+import { el } from './dom.js';
 import { FocusTrap } from './FocusTrap.js';
 import type { MissionStartPosition } from '../game/MissionRouter.js';
 import { ModeSelector, type GameplaySettingsSource } from './ModeSelector.js';
@@ -72,22 +73,9 @@ function unique(items: readonly string[]): string[] {
   });
 }
 
-function el<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className?: string,
-  text?: string,
-): HTMLElementTagNameMap[K] {
-  const e = document.createElement(tag);
-  if (className) e.className = className;
-  if (text !== undefined) e.textContent = text;
-  return e;
-}
-
 export class Briefing {
   readonly root: HTMLDivElement;
   private readonly panel: HTMLDivElement;
-  private open_ = false;
-  private readonly onKey: (e: KeyboardEvent) => void;
   private readonly trap: FocusTrap;
   private choice: MissionStartPosition = 'near-site';
   // --- D2-PREDIVE: Dive settings ---
@@ -108,33 +96,15 @@ export class Briefing {
     this.panel = el('div', 'briefing-panel');
     this.root.append(this.panel);
     (options.parent ?? document.body).appendChild(this.root);
-    this.trap = new FocusTrap(this.root);
-
-    this.onKey = (e) => {
-      if (this.open_ && e.code === 'Escape' && options.onCancel) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        this.hide();
-        options.onCancel();
-        return;
-      }
-      if (!this.open_ || (e.code !== 'Enter' && e.code !== 'NumpadEnter')) return;
-      // Enter on another focused button (Advanced, About this site) or a
-      // select does that control's job, not Begin.
-      const t = e.target;
-      if (
-        t instanceof HTMLElement &&
-        this.root.contains(t) &&
-        (t.tagName === 'SELECT' ||
-          t.tagName === 'SUMMARY' ||
-          t.tagName === 'A' ||
-          (t.tagName === 'BUTTON' && !t.classList.contains('briefing-begin')))
-      )
-        return;
-      e.preventDefault(); // or a focused button would also fire a click
-      this.begin();
-    };
-    window.addEventListener('keydown', this.onKey);
+    this.trap = new FocusTrap(this.root, {
+      onEscape: options.onCancel
+        ? () => {
+            this.hide();
+            options.onCancel?.();
+          }
+        : null,
+      onKeyDown: (event) => this.handleKeyDown(event),
+    });
     // The game's Input swallows Space and the arrows on the window; keys
     // aimed at the card's own controls stop here so buttons, selects and
     // radios keep their native keyboard behaviour. Nothing simulates while
@@ -146,6 +116,24 @@ export class Briefing {
         e.stopPropagation();
     };
     this.root.addEventListener('keydown', this.onPanelKey);
+  }
+
+  private handleKeyDown(e: KeyboardEvent): void {
+    if (!this.isOpen || (e.code !== 'Enter' && e.code !== 'NumpadEnter')) return;
+    // Enter on another focused button (Advanced, About this site) or a
+    // select does that control's job, not Begin.
+    const t = e.target;
+    if (
+      t instanceof HTMLElement &&
+      this.root.contains(t) &&
+      (t.tagName === 'SELECT' ||
+        t.tagName === 'SUMMARY' ||
+        t.tagName === 'A' ||
+        (t.tagName === 'BUTTON' && !t.classList.contains('briefing-begin')))
+    )
+      return;
+    e.preventDefault(); // or a focused button would also fire a click
+    this.begin();
   }
 
   /** The start position Begin will use. */
@@ -173,7 +161,7 @@ export class Briefing {
   }
 
   get isOpen(): boolean {
-    return this.open_;
+    return this.trap.active;
   }
 
   show(c: BriefingContent): void {
@@ -257,10 +245,8 @@ export class Briefing {
     foot.append(this.diveSlot, go);
     p.append(foot);
 
-    this.open_ = true;
-    this.root.hidden = false;
     p.scrollTop = 0;
-    this.trap.activate();
+    this.trap.show();
   }
 
   private renderDiveSettings(): void {
@@ -322,28 +308,25 @@ export class Briefing {
     for (const input of this.startInputs) input.checked = input.value === gameplay.startPosition;
     if (gameplay.startPosition !== this.choice) {
       this.choice = gameplay.startPosition;
-      if (this.open_) this.dive.onStartChange?.(this.choice);
+      if (this.isOpen) this.dive.onStartChange?.(this.choice);
     }
   }
 
   private begin(): void {
-    if (!this.open_) return;
+    if (!this.isOpen) return;
     this.hide();
     this.options.onBegin(this.choice);
   }
 
   hide(): void {
-    this.open_ = false;
-    this.root.hidden = true;
-    this.trap.deactivate();
+    this.trap.hide();
   }
 
   dispose(): void {
-    this.trap.deactivate();
+    this.trap.dispose();
     for (const d of this.diveDisposers) d();
     this.modeSelector?.dispose();
     this.root.removeEventListener('keydown', this.onPanelKey);
-    window.removeEventListener('keydown', this.onKey);
     this.root.remove();
   }
 }

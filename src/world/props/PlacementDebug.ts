@@ -18,6 +18,7 @@ import * as THREE from 'three';
 import type { PropsConfig } from '../../core/Config.js';
 import { METERS_PER_DEG_LAT, metersPerDegLon } from '../../util/geo.js';
 import type { PlacedProp, Props } from '../Props.js';
+import { FocusTrap } from '../../ui/FocusTrap.js';
 
 const round = (v: number, digits: number): number => Number(v.toFixed(digits));
 
@@ -29,6 +30,7 @@ export class PlacementDebug {
   private helper: THREE.BoxHelper | null = null;
   private readonly raycaster = new THREE.Raycaster();
   private downAt: { x: number; y: number } | null = null;
+  private readonly trap: FocusTrap;
 
   constructor(
     private readonly props: Props,
@@ -64,10 +66,11 @@ export class PlacementDebug {
     );
     document.body.appendChild(this.panel);
 
-    // Capture phase on window runs before Input's bubble-phase listener, so a
-    // handled key never also steers the sub.
-    window.addEventListener('keydown', this.onKey, { capture: true });
-    canvas.addEventListener('pointerdown', (e) => (this.downAt = { x: e.clientX, y: e.clientY }));
+    this.trap = new FocusTrap(this.panel, {
+      onEscape: () => this.select(null),
+      onKeyDown: this.onKey,
+    });
+    canvas.addEventListener('pointerdown', this.onDown);
     canvas.addEventListener('pointerup', this.onClick);
     this.refresh();
   }
@@ -91,6 +94,8 @@ export class PlacementDebug {
 
   select(prop: PlacedProp | null): void {
     this.selected = prop;
+    if (prop) this.trap.activate();
+    else this.trap.deactivate();
     for (const li of this.list.querySelectorAll('li')) {
       li.classList.toggle('selected', !!prop && li.dataset.propId === prop.def.id);
     }
@@ -114,6 +119,18 @@ export class PlacementDebug {
     console.info(`[props] ${json}`);
     this.out.textContent = JSON.stringify(this.selected.def.raw, null, 2);
   }
+
+  dispose(): void {
+    this.select(null);
+    this.trap.dispose();
+    this.canvas.removeEventListener('pointerdown', this.onDown);
+    this.canvas.removeEventListener('pointerup', this.onClick);
+    this.panel.remove();
+  }
+
+  private readonly onDown = (e: PointerEvent): void => {
+    this.downAt = { x: e.clientX, y: e.clientY };
+  };
 
   private readonly onClick = (e: PointerEvent): void => {
     if (!this.downAt) return;
@@ -176,11 +193,6 @@ export class PlacementDebug {
       case 'BracketRight':
         turn = this.cfg.debugRotateDeg;
         break;
-      case 'Escape':
-        this.select(null);
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        return;
       default:
         return;
     }

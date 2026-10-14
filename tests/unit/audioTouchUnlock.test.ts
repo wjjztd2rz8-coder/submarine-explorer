@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { GameContext } from '../../src/app/context.js';
+import { FocusTrap } from '../../src/ui/FocusTrap.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 
@@ -34,6 +35,9 @@ afterEach(() => {
 describe('touch unlock integration', () => {
   it('captures press and release gestures and removes every handler on restart', () => {
     const target = new EventTarget();
+    const remove = target.removeEventListener.bind(target);
+    target.removeEventListener = (type, listener, options) =>
+      remove(type, listener, typeof options === 'boolean' ? { capture: options } : options);
     const listen = vi.spyOn(target, 'addEventListener');
     vi.stubGlobal('window', target);
     const ctx = {
@@ -47,13 +51,23 @@ describe('touch unlock integration', () => {
     } as unknown as GameContext;
     for (let round = 0; round < 2; round++) {
       audioSystem.init?.(ctx);
-      for (const name of ['pointerdown', 'pointerup', 'touchend', 'keydown']) {
+      for (const name of ['pointerdown', 'pointerup', 'touchend']) {
         expect(listen).toHaveBeenCalledWith(name, expect.any(Function), {
           passive: true,
           capture: true,
         });
         target.dispatchEvent(new Event(name));
       }
+      expect(listen).toHaveBeenCalledWith('keydown', expect.any(Function), true);
+      // Keyboard gestures still unlock audio when the top modal consumes the key.
+      vi.stubGlobal('document', {});
+      const trap = new FocusTrap({ hidden: false } as HTMLElement, { onEscape: null });
+      trap.activate();
+      const key = new Event('keydown', { cancelable: true });
+      Object.defineProperty(key, 'code', { value: 'Escape' });
+      target.dispatchEvent(key);
+      expect(key.defaultPrevented).toBe(true);
+      trap.dispose();
       expect(calls.unlock).toHaveBeenCalledTimes((round + 1) * 4);
       audioSystem.dispose?.();
       target.dispatchEvent(new Event('touchend'));

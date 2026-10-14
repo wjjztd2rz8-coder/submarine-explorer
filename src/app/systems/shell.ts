@@ -8,6 +8,7 @@ import { contentUrl, fetchContentJson } from '../../game/ContentPath.js';
 import { loadMissionSummaries } from '../../game/Mission.js';
 import { loadSpecies } from '../../game/Species.js';
 import { buildDataCredits } from '../../ui/DataCredits.js';
+import { onUnhandledKeyDown } from '../../ui/FocusTrap.js';
 import { Globe } from '../../ui/Globe.js';
 import { Home } from '../../ui/Home.js';
 import { MissionSelect, missionUrl, tileUrl } from '../../ui/MissionSelect.js';
@@ -17,6 +18,8 @@ import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
+const globeCleanup = new Disposables();
+const keysCleanup = new Disposables();
 
 /** The mission a first-time player dives into from Home. */
 const FIRST_MISSION_ID = 'titanic';
@@ -109,6 +112,12 @@ export const shellSystem: GameSystem = {
         })) ?? [],
     });
     ctx.pause = pause;
+    cleanup.add(() => {
+      pause.dispose();
+      homeSites.dispose();
+      home.dispose();
+      missionSelect.dispose();
+    });
     if (route)
       void fetchContentJson(contentUrl(route.missionId, 'mission.json')).then((raw) => {
         if (typeof raw !== 'object' || raw === null) return;
@@ -193,6 +202,7 @@ export const shellSystem: GameSystem = {
  */
 export const globeSystem: GameSystem = {
   name: 'globe',
+  dispose: () => globeCleanup.dispose(),
   init(ctx) {
     const { config, bus, index, contentLandmark, home, homeSites, missionSelect } = ctx;
     const siteSelected = (site: { id: string; state: string }): void =>
@@ -219,6 +229,10 @@ export const globeSystem: GameSystem = {
       onSiteSelected: siteSelected,
     });
     ctx.homeGlobe = homeGlobe;
+    globeCleanup.add(() => {
+      homeGlobe.dispose();
+      globe.dispose();
+    });
     void homeGlobe.catalog.then((c) => homeSites.setPending(c.pending));
     if (ctx.app.state === 'home') ctx.setAppState('home');
     missionSelect.setGlobeHandler(() => globe.open('button'));
@@ -235,56 +249,25 @@ export const globeSystem: GameSystem = {
   },
 };
 
-/**
- * Escape (D-SHELL): leaves photo mode, closes the home site list, or toggles
- * pause. Ctrl is swallowed outside a dive. Registered after the settings
- * screen and mission router so their capture-phase handlers see keys first.
- */
+/** Escape pauses a dive only after the overlay stack leaves it unhandled. */
 export const shellKeysSystem: GameSystem = {
   name: 'shellKeys',
-  dispose: () => cleanup.dispose(),
+  dispose: () => keysCleanup.dispose(),
   init(ctx) {
-    const { app, discovery, home, pause } = ctx;
-    const onShellKey = (e: KeyboardEvent): void => {
-      if (app.state !== 'dive' && (e.code === 'ControlLeft' || e.code === 'ControlRight')) {
-        e.stopPropagation();
-        return;
-      }
-      if (
-        e.code !== 'Escape' ||
-        e.repeat ||
-        ctx.upgrades?.isOpen ||
-        ctx.settingsScreen.isOpen ||
-        ctx.globe.isOpen ||
-        discovery.guide.isOpen ||
-        discovery.debrief.isOpen ||
-        ctx.missionRouter?.briefing?.isOpen ||
-        ctx.missionRouter?.debriefOpen
-      )
-        return;
-      // D-PHOTO: Escape leaves photo mode first.
-      if (ctx.photoMode.active) {
+    const { app } = ctx;
+    keysCleanup.add(
+      onUnhandledKeyDown((e) => {
+        if (app.state !== 'dive' && (e.code === 'ControlLeft' || e.code === 'ControlRight')) {
+          e.stopPropagation();
+          return;
+        }
+        if (e.code !== 'Escape' || e.repeat || app.state !== 'dive') return;
         e.preventDefault();
         e.stopImmediatePropagation();
-        ctx.exitPhotoMode();
-        return;
-      }
-      if (document.pointerLockElement) {
         document.exitPointerLock?.();
-      }
-      if (app.state === 'home') {
-        if (home.sitesOpen) {
-          e.preventDefault();
-          home.closeSites();
-        }
-        return;
-      }
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      if (app.state === 'pause') pause.escape();
-      else ctx.setAppState('pause');
-    };
-    cleanup.listen(window, 'keydown', onShellKey, true);
+        ctx.setAppState('pause');
+      }),
+    );
     if (app.state === 'dive') ctx.bus.emit('app:state', { state: 'dive' });
   },
 };

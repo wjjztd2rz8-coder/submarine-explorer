@@ -1,9 +1,12 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import type { GameContext } from '../../src/app/context.js';
 import { shellKeysSystem } from '../../src/app/systems/shell.js';
+import { FocusTrap } from '../../src/ui/FocusTrap.js';
 import { EventBus } from '../../src/core/EventBus.js';
 
+const traps: FocusTrap[] = [];
 afterEach(() => {
+  for (const trap of traps.splice(0)) trap.dispose();
   shellKeysSystem.dispose?.();
   vi.unstubAllGlobals();
 });
@@ -15,13 +18,38 @@ function setup() {
   win.removeEventListener = (type, listener, options) =>
     remove(type, listener, typeof options === 'boolean' ? { capture: options } : options);
   vi.stubGlobal('window', win);
-  vi.stubGlobal('document', { pointerLockElement: null });
+  vi.stubGlobal('document', { pointerLockElement: null, exitPointerLock: vi.fn() });
+  const owner = (onEscape: () => void): FocusTrap => {
+    const root = { hidden: true, contains: () => false } as unknown as HTMLElement;
+    const trap = new FocusTrap(root, { onEscape });
+    traps.push(trap);
+    return trap;
+  };
   const app = { state: 'dive' };
   const setAppState = vi.fn();
   const exitPhotoMode = vi.fn();
   const pauseEscape = vi.fn();
-  const settingsScreen = { isOpen: false };
-  const photoMode = { active: false };
+  const settingsTrap = owner(() => settingsTrap.hide());
+  const photoTrap = owner(exitPhotoMode);
+  const pauseTrap = owner(pauseEscape);
+  const settingsScreen = {
+    get isOpen() {
+      return settingsTrap.active;
+    },
+    set isOpen(value: boolean) {
+      if (value) settingsTrap.show();
+      else settingsTrap.hide();
+    },
+  };
+  const photoMode = {
+    get active() {
+      return photoTrap.active;
+    },
+    set active(value: boolean) {
+      if (value) photoTrap.show();
+      else photoTrap.hide();
+    },
+  };
   const ctx = {
     app,
     bus: new EventBus(),
@@ -47,6 +75,8 @@ function setup() {
     pauseEscape,
     setApp: (state: string) => {
       app.state = state;
+      if (state === 'pause') pauseTrap.show();
+      else pauseTrap.hide();
     },
     settingsScreen,
     photoMode,

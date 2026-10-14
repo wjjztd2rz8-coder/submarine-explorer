@@ -11,9 +11,13 @@ import { Props } from '../../world/Props.js';
 import { PlacementDebug } from '../../world/props/PlacementDebug.js';
 import { PropContact, atSpawnPose, parseAtParam } from '../../world/props/Wiring.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export const propsSystem: GameSystem = {
   name: 'props',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { meta, terrain, config, scene, params, rig, canvas, route, contentLandmark, bus } = ctx;
     const { sub, spawnDepth } = ctx;
@@ -25,6 +29,7 @@ export const propsSystem: GameSystem = {
         ? new PlacementDebug(props, scene, rig.camera, canvas, config.props)
         : null;
     ctx.propsDebug = propsDebug;
+    if (propsDebug) cleanup.add(() => propsDebug.dispose());
     const propsLandmark = route ? contentLandmark : landmarkIdFor(params, meta.id);
     const initialPosition = sub.position.clone();
     void props.load(contentUrl(propsLandmark, 'props.json'), propsLandmark).then((st) => {

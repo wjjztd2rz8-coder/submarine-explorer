@@ -26,6 +26,12 @@ const site = buildJournalSite({
 /** Render/focus are DOM concerns; exercise actual Journal navigation and its async callback. */
 function journalWithLoad(loading = Promise.resolve()): Journal {
   const journal = Object.create(Journal.prototype) as Journal;
+  const trap = {
+    active: false,
+    show: vi.fn(() => {
+      trap.active = true;
+    }),
+  };
   Object.assign(journal, {
     sites: [site],
     currentSiteId: site.id,
@@ -36,7 +42,7 @@ function journalWithLoad(loading = Promise.resolve()): Journal {
     body: { scrollTop: 0 },
     render: vi.fn(),
     announce: vi.fn(),
-    trap: { activate: vi.fn() },
+    trap,
     load: () => loading,
   });
   return journal;

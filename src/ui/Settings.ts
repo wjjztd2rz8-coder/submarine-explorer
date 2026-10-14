@@ -30,7 +30,8 @@ import type {
 } from '../core/Config.js';
 import { keyLabel, type ActionBinding, type ActionId } from '../core/Input.js';
 import type { Save, SettingsData, SettingsValues } from '../core/Save.js';
-import { FocusTrap } from './FocusTrap.js';
+import { el } from './dom.js';
+import { FocusTrap, onUnhandledKeyDown } from './FocusTrap.js';
 import { ModeSelector } from './ModeSelector.js';
 
 export const UI_SCALE_MIN = 80;
@@ -143,17 +144,6 @@ export interface SettingsScreenOptions {
 
 let uid = 0;
 
-function el<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className?: string,
-  text?: string,
-): HTMLElementTagNameMap[K] {
-  const e = document.createElement(tag);
-  if (className) e.className = className;
-  if (text !== undefined) e.textContent = text;
-  return e;
-}
-
 export class SettingsScreen {
   readonly root: HTMLDivElement;
   private readonly panel: HTMLDivElement;
@@ -174,9 +164,7 @@ export class SettingsScreen {
   private readonly modeSelector: ModeSelector;
   private uiScaleOut: HTMLOutputElement | null = null;
   private readonly bindButtons = new Map<ActionId, HTMLButtonElement>();
-  private open_ = false;
   private capturing: ActionId | null = null;
-  private returnFocus: HTMLElement | null = null;
   private readonly disposers: Array<() => void> = [];
 
   constructor(private readonly opts: SettingsScreenOptions) {
@@ -423,7 +411,13 @@ export class SettingsScreen {
     this.normalSections = [graphics, gameplay, access, audio];
     this.root.append(this.panel);
     (opts.parent ?? document.body).appendChild(this.root);
-    this.trap = new FocusTrap(this.root);
+    this.trap = new FocusTrap(this.root, {
+      onEscape: () => this.escape(),
+      onTab: () => {
+        if (this.capturing) this.cancelCapture();
+      },
+      onKeyDown: (event) => this.handleKeyDown(event),
+    });
 
     this.renderBindings();
     this.sync();
@@ -432,7 +426,7 @@ export class SettingsScreen {
   }
 
   get isOpen(): boolean {
-    return this.open_;
+    return this.trap.active;
   }
 
   /** The action being captured, if any (tests). */
@@ -441,40 +435,32 @@ export class SettingsScreen {
   }
 
   open(): void {
-    if (this.open_) return;
+    if (this.isOpen) return;
     if (this.opts.canOpen && !this.opts.canOpen()) return;
-    this.open_ = true;
     this.opts.onOpen?.();
-    const a = document.activeElement;
-    this.returnFocus = a instanceof HTMLElement && a !== document.body ? a : null;
-    this.root.hidden = false;
     this.showControls(false);
     this.renderBindings();
     this.sync();
     this.say('');
-    this.trap.activate();
-    this.panel.focus();
+    this.trap.show();
   }
 
   close(): void {
-    if (!this.open_) return;
-    this.open_ = false;
+    if (!this.isOpen) return;
     this.capturing = null;
     this.resetConfirm.hidden = true;
-    this.root.hidden = true;
+    this.trap.hide();
     this.showControls(false);
-    this.trap.deactivate();
-    if (this.returnFocus?.isConnected) this.returnFocus.focus();
-    this.returnFocus = null;
   }
 
   toggle(): void {
-    if (this.open_) this.close();
+    if (this.isOpen) this.close();
     else this.open();
   }
 
   dispose(): void {
     this.close();
+    this.trap.dispose();
     this.modeSelector.dispose();
     for (const d of this.disposers) d();
     this.root.remove();
@@ -486,7 +472,7 @@ export class SettingsScreen {
     this.title.textContent = show ? 'Controls' : 'Settings';
     this.controlsButton.hidden = show;
     this.backButton.hidden = !show;
-    if (this.open_) (show ? this.backButton : this.controlsButton).focus();
+    if (this.isOpen) (show ? this.backButton : this.controlsButton).focus();
   }
 
   // -------------------------------------------------------------- controls
@@ -735,50 +721,39 @@ export class SettingsScreen {
     );
   }
 
+  private escape(): void {
+    if (this.capturing) this.cancelCapture();
+    else if (!this.resetConfirm.hidden) {
+      this.resetConfirm.hidden = true;
+      this.resetProgressButton.focus();
+      this.say('Reset cancelled.');
+    } else this.close();
+  }
+
+  private handleKeyDown(e: KeyboardEvent): void {
+    // Native form keys still work; gameplay and other overlays see none of them.
+    e.stopImmediatePropagation();
+    if (this.capturing) {
+      e.preventDefault();
+      if (!e.repeat) this.commitCapture(e.code);
+    } else if (!e.repeat && this.isToggleKey(e.code)) {
+      e.preventDefault();
+      this.close();
+    }
+  }
+
   private bindKeys(): void {
     const onKeyDown = (e: KeyboardEvent): void => {
-      if (!this.open_) {
-        const t = e.target as HTMLElement | null;
-        const typing =
-          t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
-        if (!e.repeat && !typing && this.isToggleKey(e.code) && this.opts.canOpen?.() !== false) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          this.open();
-        }
-        return;
-      }
-      // Nothing behind the dialog sees keys while it is open: not the game's
-      // Input, nor the briefing/debrief/guide handlers, including capture
-      // listeners registered after this one (main.ts builds the screen before
-      // the mission router). Tab is only stopped from propagating, so the
-      // FocusTrap listener on this same node and phase still cycles focus.
-      if (e.code === 'Tab') e.stopPropagation();
-      else e.stopImmediatePropagation();
-      if (this.capturing) {
-        if (e.code === 'Tab') {
-          this.cancelCapture();
-          return;
-        }
+      if (this.isOpen) return;
+      const t = e.target as HTMLElement | null;
+      const typing =
+        t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+      if (!e.repeat && !typing && this.isToggleKey(e.code) && this.opts.canOpen?.() !== false) {
         e.preventDefault();
-        if (e.repeat) return;
-        if (e.code === 'Escape') this.cancelCapture();
-        else this.commitCapture(e.code);
-        return;
-      }
-      if (!this.resetConfirm.hidden && e.code === 'Escape') {
-        e.preventDefault();
-        this.resetConfirm.hidden = true;
-        this.resetProgressButton.focus();
-        this.say('Reset cancelled.');
-        return;
-      }
-      if (e.code === 'Escape' || (!e.repeat && this.isToggleKey(e.code))) {
-        e.preventDefault();
-        this.close();
+        e.stopImmediatePropagation();
+        this.open();
       }
     };
-    window.addEventListener('keydown', onKeyDown, true);
-    this.disposers.push(() => window.removeEventListener('keydown', onKeyDown, true));
+    this.disposers.push(onUnhandledKeyDown(onKeyDown));
   }
 }

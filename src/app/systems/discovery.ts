@@ -7,9 +7,13 @@
 
 import { Discovery } from '../../game/Discovery.js';
 import type { GameSystem } from '../System.js';
+import { Disposables } from '../Disposables.js';
+
+const cleanup = new Disposables();
 
 export const discoverySystem: GameSystem = {
   name: 'discovery',
+  dispose: () => cleanup.dispose(),
   init(ctx) {
     const { bus, config, meta, terrain, contentLandmark, params, sub, rig } = ctx;
     const discovery = new Discovery({
@@ -27,6 +31,7 @@ export const discoverySystem: GameSystem = {
       },
     });
     ctx.discovery = discovery;
+    cleanup.add(() => discovery.dispose());
     ctx.expose({
       scanner: discovery.scanner,
       discoveries: discovery.store,

@@ -17,6 +17,7 @@ class Element extends EventTarget {
     this.children.push(...children);
   }
   setAttribute() {}
+  remove() {}
   contains(child: Element): boolean {
     return child === this || this.children.some((el) => el.contains(child));
   }
@@ -58,6 +59,7 @@ it('offers visible Capture, Done and Pause actions while the viewfinder is activ
   expect(mode.active).toBe(false);
   expect(root.hidden).toBe(true);
   expect(body.classList.toggle).toHaveBeenLastCalledWith('photo-active', false);
+  mode.dispose();
 });
 
 it('restores the opener only after the dive controls become visible again, over two rounds', () => {
@@ -104,7 +106,7 @@ it('restores the opener only after the dive controls become visible again, over 
       expect(activeElement).toBe(opener);
     }
   } finally {
-    mode.setActive(false);
+    mode.dispose();
   }
 });
 
@@ -173,5 +175,5 @@ it('on touch the capture button and tips name no keys', () => {
   expect(capture.textContent).toBe('Capture');
   expect(tips.textContent).toBe('Drag to orbit · pinch to zoom');
   expect(`${capture.textContent} ${tips.textContent}`).not.toMatch(/Enter|Space|Esc|wheel/);
-  mode.setActive(false);
+  mode.dispose();
 });

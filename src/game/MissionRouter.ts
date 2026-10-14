@@ -380,6 +380,7 @@ export class MissionRouter {
   private bannerLeft = 0;
   private pendingBanner: 'primary' | 'all' | null = null;
   private allAnnounced = false;
+  private disposed = false;
 
   constructor(private readonly opts: MissionRouterOptions) {
     const { route, bus, meta } = opts;
@@ -395,29 +396,17 @@ export class MissionRouter {
     );
 
     void opts.discovery.ready.then(() => {
+      if (this.disposed) return;
       this.mission.resolve(opts.discovery.pois.map((p) => p.id));
       this.panel.setObjectives(this.mission.objectives);
       this.navClock = Infinity; // refresh the nav line on the next frame
     });
 
-    const onKey = (e: KeyboardEvent): void => {
-      // Capture phase, so this runs before Discovery's Escape handler: if the
-      // Journal is open over the debrief, Escape closes only the Journal.
-      if (e.code !== 'Escape' || !this.debrief?.isOpen || opts.discovery.guide.isOpen) return;
-      // Escape is "Keep exploring". The aborted debrief is a decision point
-      // (Dive again / Dive sites / Home), not a summary to dismiss.
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      this.keepExploring();
-    };
-    window.addEventListener('keydown', onKey, true);
-    this.disposers.push(() => window.removeEventListener('keydown', onKey, true));
-
     if (route.skipBriefing) {
       this.briefing = null;
       this.mission.start(meta.id);
       void opts.discovery.ready.then(() =>
-        opts.applyStart?.(opts.defaultStartPosition ?? 'near-site'),
+        this.disposed ? undefined : opts.applyStart?.(opts.defaultStartPosition ?? 'near-site'),
       );
     } else {
       this.briefing = new Briefing({
@@ -456,6 +445,7 @@ export class MissionRouter {
   /** Close the briefing and start the mission clock. */
   begin(choice: MissionStartPosition = this.opts.defaultStartPosition ?? 'near-site'): void {
     void this.opts.discovery.ready.then(() => {
+      if (this.disposed) return;
       this.opts.applyStart?.(choice);
       this.briefing?.hide();
       this.panel.setVisible(true);
@@ -643,7 +633,12 @@ export class MissionRouter {
       { id: 'journal', label: 'Journal', run: () => discovery.guide.open() },
     );
     this.debrief.exploration = this.exploration;
-    this.debrief.show(stats, actions, this.opts.rating?.());
+    this.debrief.show(
+      stats,
+      actions,
+      this.opts.rating?.(),
+      m.canResume ? () => this.keepExploring() : null,
+    );
     this.panel.setVisible(false);
   }
 
@@ -697,6 +692,8 @@ export class MissionRouter {
   }
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     for (const d of this.disposers) d();
     this.mission.dispose();
     this.briefing?.dispose();

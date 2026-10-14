@@ -377,3 +377,48 @@ test.describe('settings screen', () => {
     expect(await page.evaluate(() => localStorage.getItem('subexplorer.settings.v2'))).toBe(newer);
   });
 });
+
+// Guards keyboard-only navigation and nested Escape/focus return without allowing
+// one keypress to dismiss Settings, Journal and Pause together.
+test('keyboard-only Pause, Settings and Journal preserve top-overlay ownership and focus', async ({
+  page,
+}) => {
+  await boot(page, '/?tile=monterey-canyon&tier=low');
+  const pause = page.locator('.pause-menu');
+  const settings = page.locator('.settings');
+  const journal = page.locator('.journal');
+  const reach = async (selector: string): Promise<void> => {
+    const target = page.locator(selector);
+    for (let i = 0; i < 60; i++) {
+      if (await target.evaluate((el) => el === document.activeElement)) break;
+      await page.keyboard.press('Tab');
+    }
+    await expect(target).toBeFocused();
+    await page.keyboard.press('Enter');
+  };
+  await page.keyboard.press('Escape');
+  await expect(pause).toBeVisible();
+  const settingsOpener = '.pause-actions button:text-is("Settings")';
+  await reach(settingsOpener);
+  await expect(settings).toBeVisible();
+  await reach('.settings-controls-open');
+  await expect(settings.locator('.settings-controls-back')).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  expect(await page.evaluate(() => !!document.activeElement?.closest('.settings'))).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(settings).toBeHidden();
+  await expect(pause).toBeVisible();
+  await expect(page.locator(settingsOpener)).toBeFocused();
+  const journalOpener = '.pause-actions button:text-is("Journal")';
+  await reach(journalOpener);
+  await expect(journal).toBeVisible();
+  await page.keyboard.press('Tab');
+  expect(await page.evaluate(() => !!document.activeElement?.closest('.journal'))).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(journal).toBeHidden();
+  await expect(pause).toBeVisible();
+  await expect(page.locator(journalOpener)).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(pause).toBeHidden();
+  expect(await page.evaluate(() => (window.__game as { appState: string }).appState)).toBe('dive');
+});

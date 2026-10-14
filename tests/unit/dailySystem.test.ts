@@ -19,6 +19,8 @@ function setup(lowLight = false, href = 'http://localhost/', includeDeep = false
     setInterval,
     clearInterval,
     location: { href },
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
   });
   const config = makeConfig();
   const save = new Save({ config, storage: null });
@@ -87,6 +89,7 @@ it('removes an inaccessible Daily launch and restores the same card after mode c
     hidden = false;
     onclick: (() => void) | null = null;
     setAttribute() {}
+    remove() {}
     append(...children: HomeElement[]) {
       this.children.push(...children);
     }
@@ -137,6 +140,7 @@ it('removes an inaccessible Daily launch and restores the same card after mode c
     expect(card.onclick).toBe(launch);
     expect(vi.getTimerCount()).toBe(0);
   } finally {
+    ctx.home.dispose();
     system.dispose?.();
     offPurchase();
   }

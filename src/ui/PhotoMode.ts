@@ -42,7 +42,6 @@ export class PhotoMode {
   private readonly flash: HTMLDivElement;
   private toastTimer = 0;
   private flashTimer = 0;
-  private active_ = false;
   private readonly trap: FocusTrap;
 
   constructor(
@@ -101,21 +100,19 @@ export class PhotoMode {
 
     this.root.append(this.flash, top, this.toastEl, bottom);
     parent.append(this.root);
-    this.trap = new FocusTrap(this.root);
+    this.trap = new FocusTrap(this.root, { onEscape: onExit });
   }
 
   get active(): boolean {
-    return this.active_;
+    return this.trap.active;
   }
 
   /** Show or hide the viewfinder; the HUD hides while it is up. */
   setActive(on: boolean, captureKey = 'Enter'): void {
-    this.active_ = on;
-    this.root.hidden = !on;
-    if (on) this.trap.activate();
+    if (on) this.trap.show();
     document.body.classList.toggle('photo-active', on);
     // Hidden dive controls retain layout boxes but cannot receive restored focus.
-    if (!on) this.trap.deactivate();
+    if (!on) this.trap.hide();
     // No keys on a touch screen: the button says what it does, the tip is gestures.
     if (document.documentElement.classList.contains('is-touch')) {
       this.captureButton.textContent = 'Capture';
@@ -126,6 +123,13 @@ export class PhotoMode {
       this.tips.textContent = 'Esc: exit · drag: orbit · wheel: zoom';
     }
     if (!on) this.hideToast();
+  }
+
+  dispose(): void {
+    this.setActive(false);
+    window.clearTimeout(this.flashTimer);
+    this.trap.dispose();
+    this.root.remove();
   }
 
   shutter(): void {

@@ -1,10 +1,11 @@
 /**
  * Onboarding (F3-ONBOARD): the first-dive tutorial, one-shot contextual hints
  * and the controls card. It only reads input state and game events; it never
- * changes how input is handled. Listed before the settings system so its
- * capture-phase Escape handler closes the card before Settings or Pause react.
+ * changes piloting input. The controls card owns its Escape policy in the
+ * shared overlay stack.
  */
 
+import { observeKeyboard } from '../../ui/FocusTrap.js';
 import type { InputDevice } from '../../ui/ControlsCard.js';
 import { ControlsCard } from '../../ui/ControlsCard.js';
 import { HintChip, TutorialCard, tutorialText } from '../../ui/TutorialCard.js';
@@ -128,10 +129,7 @@ export function createOnboardSystem(): GameSystem {
       chip = new HintChip(ctx.discovery.overlay.messages);
 
       // Last input used decides which layout is shown.
-      cleanup.listen(window, 'keydown', () => controlsCard.setDevice('keyboard'), {
-        capture: true,
-        passive: true,
-      });
+      cleanup.add(observeKeyboard(() => controlsCard.setDevice('keyboard')));
       cleanup.listen(
         window,
         'pointerdown',
@@ -141,19 +139,6 @@ export function createOnboardSystem(): GameSystem {
           ),
         { capture: true, passive: true },
       );
-      // Escape closes the card first, so Settings and Pause stay where they are.
-      cleanup.listen(
-        window,
-        'keydown',
-        (event) => {
-          if ((event as KeyboardEvent).code !== 'Escape' || !controlsCard.isOpen) return;
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          controlsCard.close();
-        },
-        true,
-      );
-
       cleanup.add(bus.on('scan:started', () => tutorial.notify('scan:started')));
       cleanup.add(
         bus.on('scan:progress', ({ progress }) => {
