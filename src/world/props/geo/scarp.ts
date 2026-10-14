@@ -62,6 +62,15 @@ export type ScarpPresetId = 'tuff' | 'canyon' | 'hadal';
 const TILE_M = 5;
 
 interface Preset {
+  /** Unequal resistant beds add undercuts, slumps, per-bed albedo and dust. */
+  bedding: 'regular' | 'eroded';
+  /** Dense wall/scar detail above Low; independent of bedding and decoration. */
+  fidelity?: typeof MONTEREY_FIDELITY;
+  /** Fractured, stretched rockfall with this scatter/runout policy. */
+  rockfall?: typeof MONTEREY_RUBBLE;
+  /** Vertex-colour light lift: [strength, tint, floor]. */
+  glow?: { wall: [number, number, number]; rubble: [number, number, number] };
+  decoration?: 'wall-life' | 'seeps';
   tex: GeoTexKind;
   /** (y / H, z / D) control points from the apron join up and over the crest. */
   profile: [number, number][];
@@ -115,6 +124,8 @@ const REAR: [number, number][] = [
 
 const PRESETS: Record<ScarpPresetId, Preset> = {
   tuff: {
+    bedding: 'regular',
+    decoration: 'seeps',
     tex: 'strata',
     profile: [
       [0.14, -0.2],
@@ -157,6 +168,11 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     bedContrast: 1,
   },
   canyon: {
+    bedding: 'eroded',
+    fidelity: MONTEREY_FIDELITY,
+    rockfall: MONTEREY_RUBBLE,
+    glow: { wall: [0.27, 0x8fc0c6, 0.4], rubble: [0.16, 0x8fc0c6, 0.35] },
+    decoration: 'wall-life',
     tex: 'strata',
     profile: [
       [0.13, -0.14],
@@ -201,6 +217,7 @@ const PRESETS: Record<ScarpPresetId, Preset> = {
     bedContrast: 2.8,
   },
   hadal: {
+    bedding: 'regular',
     tex: 'rock',
     profile: [
       [0.16, -0.22],
@@ -482,8 +499,9 @@ function scarHead(scars: Scar[], x: number, y: number): number {
 export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const { dims, seed, tier } = input;
   const d = geoDetail(tier);
-  const fidelity = id === 'canyon' && tier !== 'low' ? MONTEREY_FIDELITY : null;
   const P = PRESETS[id];
+  const fidelity = tier !== 'low' ? (P.fidelity ?? null) : null;
+  const erodedBeds = P.bedding === 'eroded';
   const [W, D, H] = dims;
   const limits = fidelity?.wallSegments[tier as GraphicsTier] ?? [220, 150];
   const nx = Math.min(
@@ -529,7 +547,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   // Per-bed hardness (thick, resistant beds protrude and overhang) and albedo.
   const bedHard: number[] = [];
   const bedColour: THREE.Color[] = [];
-  if (id === 'canyon') {
+  if (erodedBeds) {
     for (let i = 0; i < P.bands; i++) {
       const thick = (beds[i + 1]! - beds[i]!) / MONTEREY_STRATA.thickness[1];
       bedHard.push(Math.min(1, 0.55 * thick + 0.6 * Math.pow(bedRnd(), 1.6)));
@@ -541,7 +559,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   }
   const totalBeds = beds[P.bands]!;
   const bedPhase = (x: number, y: number): number => {
-    if (id !== 'canyon')
+    if (!erodedBeds)
       return ((y + P.dip * x) / H) * P.bands + (fbm3(x * 0.03, 5, seed, seed + 7, 2) - 0.5) * 1.2;
     const [fx, fy] = MONTEREY_STRATA.wanderFrequency;
     const height = ((y + P.dip * x) / H) * totalBeds;
@@ -591,14 +609,13 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     // Round the sub-metre return of each resistant bed rather than sampling a discontinuity.
     const lip = fidelity ? 1 - smooth(0.88, 1, saw) : 1;
     const [minLedge, maxLedge] = MONTEREY_STRATA.ledgeStrength;
-    const strength =
-      id === 'canyon'
-        ? minLedge +
-          (maxLedge - minLedge) *
-            bedHard[Math.min(P.bands - 1, Math.max(0, Math.floor(s)))]! *
-            (0.35 + 1.1 * fbm3(Math.floor(s) * 3.1, x * 0.03, seed + 81, seed + 9, 2))
-        : 1;
-    const slump = id === 'canyon' ? slumpAt(x, y) : 0;
+    const strength = erodedBeds
+      ? minLedge +
+        (maxLedge - minLedge) *
+          bedHard[Math.min(P.bands - 1, Math.max(0, Math.floor(s)))]! *
+          (0.35 + 1.1 * fbm3(Math.floor(s) * 3.1, x * 0.03, seed + 81, seed + 9, 2))
+      : 1;
+    const slump = erodedBeds ? slumpAt(x, y) : 0;
     // Ledge depth varies along each bed (pinching out, then jutting) and vanishes in scars.
     const reach = fidelity
       ? 0.35 + 1.5 * fbm3(x * 0.055, Math.floor(s) * 1.9, seed + 91, seed + 13, 2)
@@ -654,7 +671,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     const bed = fbm3(Math.floor(s) * 3.1 + 0.5, 2.5, seed + 77, seed + 3, 1);
     const bc = fidelity ? 1.5 : P.bedContrast;
     out.copy(P.band).lerp(P.base, Math.min(1.1, 0.25 + 0.85 * ((bed - 0.5) * bc + 0.5)));
-    if (id === 'canyon') {
+    if (erodedBeds) {
       // Each bed keeps its own muted albedo; resistant beds are paler than weak ones.
       const k = Math.min(P.bands - 1, Math.max(0, Math.floor(s)));
       out.copy(bedColour[k]!).multiplyScalar(0.8 + 0.4 * bedHard[k]!);
@@ -674,7 +691,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       const grain = 0.88 + 0.24 * fbm3(x * 1.7, y * 2.2, z * 1.7, seed + 66, 2);
       out.multiplyScalar((0.84 + 0.32 * lam) * lipDark * lipLit * gullyShade * grain);
       // Alternate pale resistant beds with ochre-brown weak ones so bedding survives the teal haze.
-      if (id !== 'canyon') out.lerp(P.drape, 0.22 * smooth(0.5, 0.75, bed));
+      if (!erodedBeds) out.lerp(P.drape, 0.22 * smooth(0.5, 0.75, bed));
     }
     out.lerp(P.crest, smooth(0.75, 1, y / H) * 0.6);
     if (P.joints > 0) {
@@ -683,7 +700,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     }
     // Sediment drape on gentle slopes; exposed rock on steep faces.
     out.lerp(P.drape, smooth(0.45, 0.85, ny_) * 0.7 * (0.6 + 0.4 * tone));
-    if (id === 'canyon') {
+    if (erodedBeds) {
       // Dust catches on interrupted shelves and drapes the occasional slump scar.
       const dust = Math.max(slumpAt(x, y), smooth(0.05, 0.6, ny_) * tone);
       out.lerp(P.drape, dust * MONTEREY_STRATA.dustAmount);
@@ -717,8 +734,11 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   const full = new THREE.Group();
   full.name = `scarp-${id}`;
   const wallMat = geoMaterial(P.tex, d, { roughness: P.rough, side: THREE.DoubleSide });
-  // Monterey: a faint self-lit teal lift stands in for scattered light, so the wall reads in the dark.
-  if (id === 'canyon') vertexGlow(wallMat, 0.27, 0x8fc0c6, 0.4);
+  // A faint self-lit lift stands in for scattered light beyond the headlight beams.
+  const glow = (mat: THREE.MeshStandardMaterial, surface: 'wall' | 'rubble'): void => {
+    if (P.glow) vertexGlow(mat, ...P.glow[surface]);
+  };
+  glow(wallMat, 'wall');
   if (fidelity) canyonRockDetail(wallMat, fidelity.normalStrength);
   full.add(new THREE.Mesh(wall, wallMat));
   const tone = new THREE.Color();
@@ -734,7 +754,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   });
   apron.computeBoundingBox();
   const apronMat = geoMaterial('rock', d, { roughness: P.rough });
-  if (id === 'canyon') vertexGlow(apronMat, 0.16, 0x8fc0c6, 0.35);
+  glow(apronMat, 'rubble');
   full.add(new THREE.Mesh(apron, apronMat));
 
   // --- rocks seated on the final apron surface (instanced)
@@ -746,21 +766,21 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
         size: P.rockSize * scale,
         blocks: P.blocks,
         span: 0.46,
-        scatter: id === 'canyon' ? MONTEREY_RUBBLE : undefined,
+        scatter: P.rockfall,
       }),
     );
     // Monterey: blocks that dropped out of each scar, resting on the apron below it. They replace
     // the same number of ordinary rocks, so instance counts stay unchanged.
-    if (scars.length) {
+    if (scars.length && P.rockfall) {
       const fallen: RockSpot[] = [];
       const fr = mulberry32(seed ^ 0xfa11);
       for (const c of scars) {
         for (let k = 0; k < 3; k++) {
           for (let tries = 0; tries < 8; tries++) {
-            const x = c.cx + (fr() - 0.5) * c.rx * MONTEREY_RUBBLE.scarSpread;
+            const x = c.cx + (fr() - 0.5) * c.rx * P.rockfall.scarSpread;
             const reach = talus.reach(x);
             if (reach < 2) continue;
-            const u = THREE.MathUtils.lerp(...MONTEREY_RUBBLE.scarRunout, fr());
+            const u = THREE.MathUtils.lerp(...P.rockfall.scarRunout, fr());
             const z = talus.foot(x) - u * reach;
             const spot: RockSpot = {
               x,
@@ -769,10 +789,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
               n: talusNormal(talus, x, z),
               r:
                 scale *
-                THREE.MathUtils.lerp(
-                  ...MONTEREY_RUBBLE.scarRadius,
-                  fr() ** MONTEREY_RUBBLE.radiusSkew,
-                ),
+                THREE.MathUtils.lerp(...P.rockfall.scarRadius, fr() ** P.rockfall.radiusSkew),
               u,
             };
             if (isSupported(talus, spot)) {
@@ -786,7 +803,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       rocks.push(...fallen);
     }
     const tmpl = [0, 1, 2].map((k) => {
-      if (id === 'canyon') return fracturedBoulder(d.sphereDetail, seed + k * 5, k);
+      if (P.rockfall) return fracturedBoulder(d.sphereDetail, seed + k * 5, k);
       // Angular blocks: strong noise, faceted shading, dark undersides (contact occlusion).
       const g = lump(d.sphereDetail, seed + k * 5, 0.36, 2.2);
       paint(g, (_x, y, _z, _n, out) => out.setScalar(0.5 + 0.5 * smooth(-1, 0.5, y)));
@@ -795,7 +812,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
     });
     const bm = geoMaterial('rock', d, { roughness: 0.96 });
     bm.flatShading = true;
-    if (id === 'canyon') vertexGlow(bm, 0.16, 0x8fc0c6, 0.35);
+    glow(bm, 'rubble');
     const meshes = tmpl.map((g, k) => {
       const m = new THREE.InstancedMesh(g, bm, Math.max(1, Math.ceil((rocks.length - k) / 3)));
       m.count = 0;
@@ -810,7 +827,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
       const m = meshes[i % 3]!;
       rockMatrix(spot, rnd() * 6.28, 0.55 + rnd() * 0.3, mat);
       // Break the uniform footprint: stretch each block along its own (spun) x axis.
-      if (id === 'canyon') {
+      if (P.rockfall) {
         const stretch = 0.7 + rnd() * 0.75;
         mat.multiply(stretchM.makeScale(stretch, 0.8 + rnd() * 0.5, 1 / Math.sqrt(stretch)));
       }
@@ -831,7 +848,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   }
 
   // Monterey: sponges and cold-water coral fans cling to the lit face of the wall.
-  if (id === 'canyon') {
+  if (P.decoration === 'wall-life') {
     const apronHeight = fidelity ? talusMeshSampler(apron, apronCols, apronRows) : null;
     addWallLife(
       full,
@@ -850,7 +867,7 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   }
 
   // A faint seep of clear fluid on the caldera wall (Hunga Tonga is volcanically active).
-  if (id === 'tuff') {
+  if (P.decoration === 'seeps') {
     for (let i = 0; i < 3; i++) {
       const x = (rnd() - 0.5) * W * 0.6;
       const sh = shimmerPlume(4, 0.6, Math.round(34 * d.plume), seed + 40 + i);
