@@ -57,9 +57,8 @@ describe('Daily dive', () => {
           { id: 'missing', tile: 'missing', depthM: 50, title: '', summary: '' },
         ],
         [{ id: 'shallow' }, { id: 'deep' }] as never,
-        { canDive: (d) => d <= 1000 },
       ),
-    ).toEqual(['shallow']);
+    ).toEqual(['shallow', 'deep']);
   });
   it('focus selects existing objectives, preserves a primary and leaves the source unchanged', () => {
     const def = {

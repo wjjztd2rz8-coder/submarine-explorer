@@ -1,3 +1,4 @@
+import { EVENT_CAPTIONS } from '../../src/game/Events.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { renderReview, reviewShot } from './helpers/render.js';
 import { devices, expect, test } from './helpers/unlocked.js';
@@ -260,7 +261,7 @@ for (const surface of ['desktop', 'phone'] as const) {
             { site, kind },
           ),
         ).toBe(true);
-        await expect(page.locator('.explore-caption')).toContainText('Sighting logged in Journal');
+        await expect(page.locator('.explore-caption')).toHaveText(EVENT_CAPTIONS[kind]);
         await page.evaluate(async () => {
           const g = window.__game as unknown as Game;
           await g.journal.load();

@@ -93,11 +93,8 @@ it.each(['arcade', 'realistic'] as const)(
     const ctx = await boot();
     expect(ctx?.daily?.date).toBe('2026-10-01');
     expect(fixtures.load).not.toHaveBeenCalled();
-    expect(dive).toHaveBeenCalledWith(
-      '2026-10-01',
-      mode === 'arcade' ? ['shallow', 'deep'] : ['shallow'],
-    );
-    expect(fixtures.routes.at(-1)).toBe(`mission=${mode === 'arcade' ? 'deep' : 'shallow'}`);
+    expect(dive).toHaveBeenCalledWith('2026-10-01', ['shallow', 'deep']);
+    expect(fixtures.routes.at(-1)).toBe('mission=deep');
     expect(storage.getItem(SETTINGS_STORAGE_KEY)).toBe(saved);
   },
 );

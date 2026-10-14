@@ -100,7 +100,7 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   await expect(page.locator('.home-screen')).toBeVisible();
   // Preserve all actions and the title menu’s DOM/Tab order, including Daily and mode.
   const existingActions = page.locator('.home-menu > button:not(.daily-card)');
-  await expect(existingActions).toHaveCount(7);
+  await expect(existingActions).toHaveCount(6);
   await expect(existingActions).toHaveText([
     'Dive',
     'Dive sites',
@@ -108,7 +108,6 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
     'Journal',
     'Settings',
     'Controls',
-    'Upgrades',
   ]);
   expect(
     await page
@@ -131,7 +130,6 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
     'Journal',
     'Settings',
     'Controls',
-    'Upgrades',
   ]);
   await expect(page.locator('.home-menu .daily-card')).toHaveCount(1);
   await expect(page.locator('.home-menu .mode-advanced-toggle')).toHaveCount(1);

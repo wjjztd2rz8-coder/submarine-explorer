@@ -11,6 +11,7 @@
  * (<= 25 draw calls) with a wash pool that grows with the tier.
  */
 
+import type { SUB_DECALS } from '../game/Cosmetics.js';
 import { DEFAULT_LOOK, type VehicleLook } from './materials.js';
 import { blueprintFor, type HullClassId } from './hulls.js';
 import { Vehicle, type VehicleLod } from './Vehicle.js';
@@ -45,6 +46,7 @@ export function lodForTier(tier: string): VehicleLod {
 
 export interface BuildOptions {
   look?: Partial<VehicleLook>;
+  decal?: (typeof SUB_DECALS)[number]['text'];
   /** Multiplies the class scale (SubMesh passes length / 26). */
   scaleFactor?: number;
 }
@@ -65,6 +67,7 @@ export function buildVehicle(
   const lod = lodForTier(tier);
   return withDetail(lod === 'low' ? LOW_DETAIL : 1, () => {
     const bp = blueprintFor(hullClass, lod === 'low');
+    if (bp.decalText && opts.decal) bp.decalText = { ...bp.decalText, ...opts.decal };
     const id = bp.id as HullClassId;
     return new Vehicle(bp, {
       scale: VEHICLE_SCALE[id] * (opts.scaleFactor ?? 1),

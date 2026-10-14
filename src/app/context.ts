@@ -16,7 +16,6 @@ import type { EffectiveSettings } from '../game/EffectiveSettings.js';
 import type { DailySave } from '../game/DailySave.js';
 import type { DailyDive } from '../game/Daily.js';
 import type { Progress } from '../game/Progress.js';
-import type { Upgrades } from '../ui/Upgrades.js';
 import type { TitleBridge } from './systems/title.js';
 import type * as THREE from 'three';
 import type { AudioSystem } from '../audio/AudioSystem.js';
@@ -110,7 +109,6 @@ export interface GameContext extends BootContext {
   tile: Tile;
   meta: TileMeta;
   discoveries: import('../game/DiscoveryStore.js').DiscoveryStore;
-  upgrades: Upgrades;
   // world (terrain, atmosphere, landmarks)
   terrain: Terrain;
   atmoTier: AtmosphereTier;
@@ -206,7 +204,6 @@ export type ShellContext = BootContext &
     | 'journal'
     | 'discoveries'
     | 'photos'
-    | 'upgrades'
     | 'titleScene'
     | 'renderStats'
     | 'resize'

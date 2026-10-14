@@ -77,8 +77,7 @@ for (const subject of [
             ? 'whale'
             : 'turbidity'
       ];
-    notice.show(explanation, 18);
-    notice.event(explanation, false, true);
+    notice.show(explanation, 3);
     notice.update(0.1, false);
     expect(root.hidden).toBe(false);
     const caption = root.getBoundingClientRect();

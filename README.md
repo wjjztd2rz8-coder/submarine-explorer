@@ -58,19 +58,38 @@ Advanced has four switches; editing one enters Custom and keeps the speed,
 lights and sensors of the last selected preset. Selecting a preset resets the
 four switches together.
 
-| Setting                  | Arcade (default)                                      | Realistic                                                 | Custom                              |
-| ------------------------ | ----------------------------------------------------- | --------------------------------------------------------- | ----------------------------------- |
-| Speed, including descent | Fast: ~12 m/s cruise, 20.6 m/s boosted; 8 m/s descent | Research: ~1 m/s cruise, 1.4 m/s boosted; 0.5 m/s descent | Inherits the last selected preset   |
-| Lights / sensors         | Enhanced lights / extended sensors                    | Realistic lights / sensors                                | Inherits the last selected preset   |
-| Battery / oxygen         | Off                                                   | On                                                        | Switch                              |
-| Currents                 | Off                                                   | Full sampled strength                                     | Switch: off / full sampled strength |
-| Visual waypoints         | On                                                    | Off                                                       | Switch                              |
-| Start at surface         | Off (near site)                                       | Off (near site)                                           | Switch                              |
+| Setting                  | Arcade (default)                                        | Realistic                                                   | Custom                              |
+| ------------------------ | ------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------- |
+| Speed, including descent | Fast: ~14.9 m/s cruise, 25.5 m/s boosted; 8 m/s descent | Research: ~1.2 m/s cruise, 1.7 m/s boosted; 0.5 m/s descent | Inherits the last selected preset   |
+| Lights / sensors         | Enhanced lights / extended sensors                      | Realistic lights / sensors                                  | Inherits the last selected preset   |
+| Battery / oxygen         | Off                                                     | On                                                          | Switch                              |
+| Currents                 | Off                                                     | Full sampled strength                                       | Switch: off / full sampled strength |
+| Visual waypoints         | On                                                      | Off                                                         | Switch                              |
+| Start at surface         | Off (near site)                                         | Off (near site)                                             | Switch                              |
 
 Sonar markers are always available. Dives start at 1×; **T** and **D-pad Up**
 still cycle 1×/2×/3×. Speed and descent use simulated time: 2×/3× plays the
 same motion faster without changing the vehicle's top speed. Display,
 accessibility and UI-scale settings are independent of the gameplay mode.
+
+Every pilot starts with the full equipment kit. Hulls fit the dive's depth in every
+mode: Class A through 1,000 m (including Blue Hole), B through 6,500 m, and C
+through 11,000 m. There are no upgrade purchases, research-point rewards or
+RP access gates.
+
+The Journal front page's **Cosmetics** picker selects sub paint, hull decals and
+photo frames. Unique scans of points of interest, wildlife and finds unlock them;
+repeat discoveries do not count twice. Sub choices apply when the next dive's sub
+is built; photo frames are baked into new captures. Low quality retains its
+existing omission of hull decals. Samples and secrets appear together as Journal
+**Finds**; event sightings remain in the Journal and debrief without reward
+checklists. Mission stars and Daily streaks remain records of completed dives.
+
+Progress saves migrate in place to schema v2. Past RP, including spent purchases,
+grants cosmetics; previously earned paint and lamp choices are retained. Discovery
+keys (`sample:` and `secret:`), best ratings, Daily records and saved photos stay
+intact. Legacy research values remain archived in the save and have no gameplay
+effect.
 
 ## Dive sites
 

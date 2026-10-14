@@ -1,9 +1,12 @@
-import { EVENT_CAPTIONS } from './Events.js';
-import { PROGRESS_CONFIG, UPGRADES, type UpgradeId } from '../core/config/progress.js';
-import { ProgressSave, type GameplayMode, type ProgressRecord } from '../core/Save.js';
+import { PROGRESS_CONFIG } from '../core/config/progress.js';
 import {
-  HULL_PAINTS,
-  LIGHT_TRIMS,
+  migrateProgress,
+  ProgressSave,
+  type GameplayMode,
+  type ProgressRecord,
+} from '../core/Save.js';
+import {
+  COSMETIC_CHOICES,
   cosmeticUnlocked,
   totalStars,
   type CosmeticDef,
@@ -11,7 +14,8 @@ import {
   type CosmeticSlot,
 } from './Cosmetics.js';
 
-export type AwardKind = keyof typeof PROGRESS_CONFIG.rewards;
+export type AwardKind =
+  'poi' | 'objective' | 'species' | 'photo' | 'primary' | 'rating' | 'secret' | 'sample';
 export interface DiveRating {
   stars: number;
   points: number;
@@ -35,7 +39,7 @@ export function requiredHull(depthM: number) {
   return PROGRESS_CONFIG.hulls.find((h) => depthM <= h.depthM) ?? PROGRESS_CONFIG.hulls[2];
 }
 
-/** Idempotent rewards, best-site ratings and upgrades; independent of DOM and rendering. */
+/** Idempotent rewards, best-site ratings and cosmetics; independent of DOM and rendering. */
 export class Progress {
   private data: ProgressRecord;
   private readonly listeners = new Set<() => void>();
@@ -62,6 +66,11 @@ export class Progress {
   }
   completeLegacyCredit(pending: string[] = []): void {
     if (!this.save.readOnly) {
+      // Only the first backfill predates gameplay; retries also contain modern dive records.
+      if (this.data.legacyPending === undefined) {
+        const credited = migrateProgress({ ...this.data, version: 1 });
+        this.data.cosmeticGrants = credited.cosmeticGrants;
+      }
       this.data.legacyCredited = pending.length === 0;
       this.data.legacyPending = pending;
     }
@@ -73,15 +82,11 @@ export class Progress {
   get lifetime(): number {
     return this.data.lifetime;
   }
-  get hull() {
-    return [...PROGRESS_CONFIG.hulls].reverse().find((h) => this.lifetime >= h.threshold)!;
+  canDive(_depthM: number, _mode: GameplayMode = 'realistic'): boolean {
+    return true;
   }
-  /** Without a mode, report the research entitlement. Only Realistic uses it as a gate. */
-  canDive(depthM: number, mode: GameplayMode = 'realistic'): boolean {
-    return mode !== 'realistic' || depthM <= this.hull.depthM;
-  }
-  hullFor(depthM: number, mode: GameplayMode = 'realistic'): string {
-    return this.canDive(depthM, mode) ? requiredHull(depthM).id : this.hull.id;
+  hullFor(depthM: number, _mode: GameplayMode = 'realistic'): string {
+    return requiredHull(depthM).id;
   }
   rating(site: string): number {
     return Object.hasOwn(this.data.ratings, site) ? this.data.ratings[site] : 0;
@@ -92,11 +97,11 @@ export class Progress {
   get cosmetics(): CosmeticSelection {
     return { ...this.data.cosmetics };
   }
-  ownsCosmetic(def: CosmeticDef): boolean {
+  ownsCosmetic(def: Pick<CosmeticDef, 'id' | 'reward'>): boolean {
     return cosmeticUnlocked(def, this.data);
   }
   selectCosmetic(slot: CosmeticSlot, id: string): boolean {
-    const def = (slot === 'paint' ? HULL_PAINTS : LIGHT_TRIMS).find((item) => item.id === id);
+    const def = COSMETIC_CHOICES[slot].find((item) => item.id === id);
     if (this.save.readOnly || !def || !this.ownsCosmetic(def)) return false;
     if (this.data.cosmetics[slot] === id) return true;
     this.data.cosmetics = { ...this.data.cosmetics, [slot]: id };
@@ -109,24 +114,14 @@ export class Progress {
     this.data.dailyBestStreak = streak;
     this.persist();
   }
-  level(id: UpgradeId): number {
-    return Math.min(UPGRADES.find((u) => u.id === id)!.costs.length, this.data.upgrades[id] ?? 0);
-  }
-  cost(id: UpgradeId): number | null {
-    return UPGRADES.find((u) => u.id === id)!.costs[this.level(id)] ?? null;
-  }
   award(kind: AwardKind, id: string): number {
     if (!id || id.length > 280 || this.save.readOnly) return 0;
     if (kind === 'photo' || kind === 'species') this.bonus = true;
     const key = `${kind}:${id}`;
     if (this.tokens.has(key)) return 0;
     this.tokens.add(key);
-    const amount = PROGRESS_CONFIG.rewards[kind];
-    this.data.points += amount;
-    this.data.lifetime += amount;
-    this.divePoints += amount;
     this.persist();
-    return amount;
+    return 1;
   }
   /** Old discoveries count toward unlocks, without becoming this dive's bonus or earnings. */
   credit(kind: AwardKind, id: string): void {
@@ -146,10 +141,7 @@ export class Progress {
       this.credit('secret', `${key.slice(0, slash)}/${subject.slice(7)}`);
     else if (subject.startsWith('sample:'))
       this.credit('sample', `${key.slice(0, slash)}/${subject.slice(7)}`);
-    else if (subject.startsWith('event:')) {
-      if (Object.hasOwn(EVENT_CAPTIONS, subject.slice(6)))
-        this.credit('event', `${key.slice(0, slash)}/${subject.slice(6)}`);
-    } else this.credit('poi', key);
+    else if (!subject.startsWith('event:')) this.credit('poi', key);
   }
   beginDive(): void {
     this.bonus = false;
@@ -166,15 +158,7 @@ export class Progress {
     if (!this.save.readOnly)
       this.data.ratings = { ...this.data.ratings, [site]: Math.max(this.rating(site), stars) };
     this.persist();
-    return { stars, points: this.divePoints, best: this.rating(site) };
-  }
-  buy(id: UpgradeId): boolean {
-    const cost = this.cost(id);
-    if (this.save.readOnly || cost === null || cost > this.points) return false;
-    this.data.points -= cost;
-    this.data.upgrades[id] = this.level(id) + 1;
-    this.persist();
-    return true;
+    return { stars, points: 0, best: this.rating(site) };
   }
   onChange(listener: () => void): () => void {
     this.listeners.add(listener);

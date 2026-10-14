@@ -69,13 +69,7 @@ function setup(lowLight = false, href = 'http://localhost/', includeDeep = false
     shellBaseHref: () => shellUrl(window.location.href),
     expose: vi.fn(),
   } as unknown as GameContext;
-  ctx.effective = resolveEffective(
-    ctx.settings,
-    ctx.settings.gameplayMode,
-    progress.snapshot(),
-    ctx.daily,
-    config,
-  );
+  ctx.effective = resolveEffective(ctx.settings, ctx.settings.gameplayMode, ctx.daily, config);
   modesSystem.init?.(ctx);
   modesSystem.start?.(ctx);
   const purchases = createProgressSystem();
@@ -93,10 +87,10 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-it('removes an inaccessible Daily launch and restores the same card after mode changes', () => {
+it('keeps the downloaded deep Daily accessible across mode changes and releases its refresh', () => {
   const { ctx, system, offPurchase } = setup(false, 'http://localhost/', true);
   system.dispose?.();
-  // Only a deep site's tile is downloaded; Realistic has no eligible Daily.
+  // Only a deep site's tile is downloaded; every mode can launch it.
   ctx.index = ctx.index.filter((tile) => tile.id === 'deep');
   class HomeElement extends EventTarget {
     children: HomeElement[] = [];
@@ -132,10 +126,10 @@ it('removes an inaccessible Daily launch and restores the same card after mode c
     expect(card.hidden).toBe(false);
     expect(card.onclick).toBeTypeOf('function');
     ctx.save.setGameplayMode('realistic');
-    expect(card.hidden).toBe(true);
-    expect(card.onclick).toBeNull();
+    expect(card.hidden).toBe(false);
+    expect(card.onclick).toBeTypeOf('function');
     vi.advanceTimersByTime(1000);
-    expect(card.hidden).toBe(true);
+    expect(card.hidden).toBe(false);
     ctx.save.setGameplayMode('custom');
     expect(card.hidden).toBe(false);
     card.onclick?.();
@@ -143,7 +137,7 @@ it('removes an inaccessible Daily launch and restores the same card after mode c
     expect(url.searchParams.get('mission')).toBe('deep');
     expect(url.searchParams.get('daily')).toBe('2026-10-02');
     ctx.save.setGameplayMode('realistic');
-    expect(card.hidden).toBe(true);
+    expect(card.hidden).toBe(false);
     // Returning within the same UTC day must also replace the cleared callback.
     ctx.save.setGameplayMode('arcade');
     expect(card.hidden).toBe(false);
@@ -193,7 +187,7 @@ it('rolls the home card over at midnight without mutating the active daily dive 
     system.dispose?.();
     expect(vi.getTimerCount()).toBe(0);
     card.mockClear();
-    expect(ctx.progress.buy('light-range')).toBe(true);
+    expect(ctx.progress.selectCosmetic('paint', 'stock')).toBe(true);
     ctx.save.setGameplayMode('realistic');
     expect(card).not.toHaveBeenCalled();
   } finally {
@@ -201,7 +195,7 @@ it('rolls the home card over at midnight without mutating the active daily dive 
     offPurchase();
   }
 });
-it('refreshes Daily access immediately on both mode changes without altering the loaded dive', () => {
+it('keeps Daily selection through mode changes without altering the loaded dive', () => {
   const { ctx, system, offPurchase } = setup(true, 'http://localhost/', true);
   try {
     const active = structuredClone(ctx.daily);
@@ -209,6 +203,11 @@ it('refreshes Daily access immediately on both mode changes without altering the
     expect(card).toHaveBeenLastCalledWith('Deep', expect.any(String), 0, 0, expect.any(Function));
     card.mockClear();
     ctx.save.setGameplayMode('realistic');
+    expect(card).not.toHaveBeenCalled();
+    ctx.save.setGameplayMode('arcade');
+    expect(card).not.toHaveBeenCalled();
+    // Advancing the clock deliberately chooses tomorrow's site, independently of mode.
+    vi.advanceTimersByTime(1000);
     expect(card).toHaveBeenLastCalledWith(
       'Shallow',
       expect.any(String),
@@ -216,10 +215,8 @@ it('refreshes Daily access immediately on both mode changes without altering the
       0,
       expect.any(Function),
     );
-    ctx.save.setGameplayMode('arcade');
-    expect(card).toHaveBeenLastCalledWith('Deep', expect.any(String), 0, 0, expect.any(Function));
     card.mock.calls.at(-1)![4]();
-    expect(new URL(window.location.href).searchParams.get('mission')).toBe('deep');
+    expect(new URL(window.location.href).searchParams.get('mission')).toBe('shallow');
     expect(ctx.daily).toEqual(active);
     system.dispose?.();
     card.mockClear();
@@ -230,14 +227,14 @@ it('refreshes Daily access immediately on both mode changes without altering the
     offPurchase();
   }
 });
-it('preserves Daily Low light after live settings and purchases and unsubscribes enforcement', () => {
+it('preserves Daily Low light after live settings and cosmetic choices and unsubscribes enforcement', () => {
   const { ctx, system, offPurchase, setPreset } = setup(true);
   try {
     ctx.save.setGameplayMode('realistic');
     ctx.save.setGameplayMode('arcade');
     expect(setPreset).toHaveBeenLastCalledWith(ctx.effective.light);
     expect(ctx.effective.light.intensity).toBe(ctx.config.lightPresets.realistic.intensity);
-    expect(ctx.progress.buy('light-range')).toBe(true);
+    expect(ctx.progress.selectCosmetic('paint', 'stock')).toBe(true);
     expect(setPreset).toHaveBeenLastCalledWith(ctx.effective.light);
     expect(ctx.effective.light.intensity).toBe(ctx.config.lightPresets.realistic.intensity);
     expect(ctx.save.get().gameplayBaseMode).toBe('arcade');
@@ -247,7 +244,7 @@ it('preserves Daily Low light after live settings and purchases and unsubscribes
     ctx.save.setGameplayMode('realistic');
     expect(setPreset).not.toHaveBeenCalled();
     ctx.save.setGameplayMode('arcade');
-    expect(ctx.progress.buy('light-beam')).toBe(true);
+    expect(ctx.progress.selectCosmetic('paint', 'stock')).toBe(true);
     expect(setPreset).not.toHaveBeenCalled();
   } finally {
     system.dispose?.();
@@ -267,15 +264,15 @@ it('awards one dated Daily primary reward and preserves ordinary mission rewards
     expect(ctx.progress.snapshot().awarded).not.toContain('primary:shallow');
     ctx.save.setGameplayMode('arcade');
     const rating = ctx.progress.finish(key, [{ primary: true, complete: true }]);
-    expect(rating).toEqual({ stars: 2, best: 2, points: 70 });
-    expect(ctx.progress.points - initial).toBe(70);
+    expect(rating).toEqual({ stars: 2, best: 2, points: 0 });
+    expect(ctx.progress.points - initial).toBe(0);
     ctx.bus.emit('mission:restart', { missionId: 'shallow' });
     ctx.bus.emit('mission:primaryComplete', { missionId: 'shallow', completed: 1, total: 1 });
     ctx.progress.finish(key, [{ primary: true, complete: true }]);
-    expect(ctx.progress.points - initial).toBe(70);
+    expect(ctx.progress.points - initial).toBe(0);
     ctx.daily = null;
     ctx.bus.emit('mission:primaryComplete', { missionId: 'shallow', completed: 2, total: 2 });
-    expect(ctx.progress.points - initial).toBe(100);
+    expect(ctx.progress.points - initial).toBe(0);
     expect(ctx.progress.snapshot().awarded).toContain('primary:shallow');
   } finally {
     system.dispose?.();
@@ -283,15 +280,15 @@ it('awards one dated Daily primary reward and preserves ordinary mission rewards
   }
 });
 
-it('imports an existing earned Daily streak on startup without spending RP or losing it after reset', () => {
+it('imports an existing earned Daily streak on startup without granting new cosmetics or losing it after reset', () => {
   const { ctx, system, offPurchase } = setup();
   try {
     system.dispose?.();
     for (const date of ['2026-09-29', '2026-09-30', '2026-10-01']) ctx.dailySave.complete(date);
     const points = ctx.progress.points;
     system.start?.(ctx);
-    expect(ctx.progress.selectCosmetic('paint', 'silver')).toBe(true);
-    expect(ctx.progress.selectCosmetic('trim', 'blue')).toBe(true);
+    expect(ctx.progress.selectCosmetic('paint', 'silver')).toBe(false);
+    expect(ctx.progress.selectCosmetic('trim', 'blue')).toBe(false);
     expect(ctx.progress.points).toBe(points);
     expect(ctx.progress.snapshot().dailyBestStreak).toBe(3);
     ctx.dailySave.complete('2026-10-03');
@@ -304,18 +301,12 @@ it('imports an existing earned Daily streak on startup without spending RP or lo
 });
 
 it.each(['calm', 'strong-currents', 'low-light'] as const)(
-  '%s: live settings and purchases preserve the loaded hull, pose, supplies and T speed without compounding',
+  '%s: live settings and cosmetic choices preserve the loaded hull, pose, supplies and T speed without compounding',
   (modifier) => {
     const { ctx, system, offPurchase, setPreset } = setup(true);
     try {
       ctx.daily!.modifier = modifier;
-      ctx.effective = resolveEffective(
-        ctx.save.get(),
-        'arcade',
-        ctx.progress.snapshot(),
-        ctx.daily,
-        ctx.config,
-      );
+      ctx.effective = resolveEffective(ctx.save.get(), 'arcade', ctx.daily, ctx.config);
       const pristine = structuredClone(ctx.config);
       const sub = new Submarine(ctx.effective.submarine, {
         sampleHeight: () => -1000,
@@ -336,7 +327,7 @@ it.each(['calm', 'strong-currents', 'low-light'] as const)(
         ctx.save.setGameplayMode('arcade');
         ctx.save.setGameplayOption('batteryOxygen', true);
         expect(ctx.effective.currentMode).toBe(modifier === 'strong-currents' ? 'strong' : 'off');
-        expect(ctx.discovery.pois[0].radius).toBe(200);
+        expect(ctx.discovery.pois[0].radius).toBe(240);
         expect(sub.position.toArray()).toEqual([10, -120, 20]);
         expect(sub.yaw).toBe(0.7);
         expect(sub.getState().hullClass).toBe('A');
@@ -345,16 +336,17 @@ it.each(['calm', 'strong-currents', 'low-light'] as const)(
         expect(power.state.battery).toBe(0.7);
         expect(power.state.oxygen).toBe(0.6);
       }
-      expect(ctx.progress.buy('light-range')).toBe(true);
+      expect(ctx.progress.selectCosmetic('paint', 'stock')).toBe(true);
       const expectedLight =
         ctx.config.lightPresets[modifier === 'low-light' ? 'realistic' : 'enhanced'];
       expect(setPreset).toHaveBeenLastCalledWith({
         ...expectedLight,
-        distance: expectedLight.distance * 1.1,
+        distance: expectedLight.distance * 1.3,
+        angleDeg: expectedLight.angleDeg + 8,
       });
       ctx.save.setGameplayMode('realistic');
       ctx.save.setGameplayMode('arcade');
-      expect(ctx.effective.light.distance).toBeCloseTo(expectedLight.distance * 1.1);
+      expect(ctx.effective.light.distance).toBeCloseTo(expectedLight.distance * 1.3);
       expect(ctx.config).toEqual(pristine);
       expect(sub.simSpeed).toBe(3);
       expect(sub.getState().hullClass).toBe('A');

@@ -136,29 +136,22 @@ export class ScanOverlay {
   }
 
   /** Show the completion confirmation for `completeBannerSeconds`. */
-  showComplete(
-    title: string,
-    firstTime: boolean,
-    keys: ScanOverlayKeys,
-    kind: 'scan' | 'sample' = 'scan',
-  ): void {
+  showComplete(title: string, firstTime: boolean, keys: ScanOverlayKeys): void {
     // Completion events can arrive between overlay updates. Replace the
     // navigation cue immediately instead of leaving both messages visible.
     this.chip.hidden = true;
     this.bannerLeft = this.config.completeBannerSeconds;
-    this.setTone(firstTime || kind === 'sample' ? 'cyan' : 'dim');
+    this.setTone(firstTime ? 'cyan' : 'dim');
     this.setText(this.kicker, 'kicker', firstTime ? 'NEW ENTRY' : 'SCAN COMPLETE');
     this.setText(this.nameEl, 'name', title);
     this.setText(
       this.hint,
       'hint',
-      kind === 'sample'
-        ? 'STOWED FOR THIS DIVE'
-        : firstTime
-          ? document.documentElement.classList.contains('is-touch')
-            ? 'PAUSE → JOURNAL'
-            : `PRESS ${keys.guide} · JOURNAL`
-          : `LOGGED · JOURNAL`,
+      firstTime
+        ? document.documentElement.classList.contains('is-touch')
+          ? 'PAUSE → JOURNAL'
+          : `PRESS ${keys.guide} · JOURNAL`
+        : `LOGGED · JOURNAL`,
     );
     this.setRing(1, 'OK');
     this.panel.classList.add('is-complete');
@@ -260,7 +253,7 @@ export class ScanOverlay {
       this.setText(
         this.kicker,
         'kicker',
-        view.activeId?.startsWith('sample:') ? 'COLLECTING SAMPLE' : 'SCANNING',
+        view.activeId?.startsWith('sample:') ? 'SCANNING FIND' : 'SCANNING',
       );
       this.setText(this.nameEl, 'name', view.activeName);
       this.setText(this.hint, 'hint', `HOLD ${scan} · KEEP ON TARGET`);
@@ -311,7 +304,7 @@ export class ScanOverlay {
       this.setText(
         this.hint,
         'hint',
-        view.nearestId?.startsWith('sample:') ? `HOLD ${scan} TO COLLECT` : `HOLD ${scan} TO SCAN`,
+        view.nearestId?.startsWith('sample:') ? `HOLD ${scan} TO SCAN` : `HOLD ${scan} TO SCAN`,
       );
     } else if (objective) {
       // Objective guidance replaces the nearest-contact guidance.

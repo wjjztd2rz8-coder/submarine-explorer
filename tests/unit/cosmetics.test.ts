@@ -8,11 +8,14 @@ import {
   ShaderLib,
   WebGLRenderer,
 } from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import * as decals from '../../src/vehicles/decals.js';
 import {
   HULL_PAINTS,
   LIGHT_TRIMS,
-  HERO_SITES,
+  PHOTO_FRAMES,
+  SUB_DECALS,
+  discoveryCount,
   cosmeticUnlocked,
   defaultCosmetics,
   type CosmeticProgress,
@@ -25,7 +28,6 @@ import {
 } from '../../src/core/Save.js';
 import { makeConfig } from '../../src/core/Config.js';
 import { Progress } from '../../src/game/Progress.js';
-import { DailySave } from '../../src/game/DailySave.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 
 function storage(): SettingsStorage {
@@ -41,10 +43,8 @@ function storage(): SettingsStorage {
   };
 }
 const empty: CosmeticProgress = { ratings: {}, awarded: [], dailyBestStreak: 0 };
-function stars(total: number): CosmeticProgress {
-  const ratings: Record<string, number> = {};
-  for (let i = 0; total > 0; i++, total -= 3) ratings[`site-${i}`] = Math.min(3, total);
-  return { ...empty, ratings };
+function discoveries(total: number): CosmeticProgress {
+  return { ...empty, awarded: Array.from({ length: total }, (_, i) => `poi:site/${i}`) };
 }
 const primary = [{ primary: true, complete: true }];
 
@@ -52,7 +52,12 @@ describe('cosmetic rewards', () => {
   it('offers eight paints, two earned trims and current-look defaults', () => {
     expect(HULL_PAINTS).toHaveLength(8);
     expect(LIGHT_TRIMS.filter((def) => def.reward.kind !== 'default')).toHaveLength(2);
-    expect(defaultCosmetics()).toEqual({ paint: 'stock', trim: 'stock' });
+    expect(defaultCosmetics()).toEqual({
+      paint: 'stock',
+      trim: 'stock',
+      decal: 'stock',
+      frame: 'stock',
+    });
     expect(HULL_PAINTS.filter((def) => cosmeticUnlocked(def, empty)).map((def) => def.id)).toEqual([
       'stock',
     ]);
@@ -65,19 +70,23 @@ describe('cosmetic rewards', () => {
     ['blue', 6],
     ['green', 10],
     ['gold', 15],
-  ] as const)('unlocks %s at exactly %i best total stars, independently of RP', (id, threshold) => {
+  ] as const)('unlocks %s at exactly %i unique discoveries', (id, threshold) => {
     const def = HULL_PAINTS.find((paint) => paint.id === id)!;
-    expect(cosmeticUnlocked(def, stars(threshold - 1))).toBe(false);
-    expect(cosmeticUnlocked(def, stars(threshold))).toBe(true);
-    expect(cosmeticUnlocked(def, stars(threshold + 1))).toBe(true);
+    expect(cosmeticUnlocked(def, discoveries(threshold - 1))).toBe(false);
+    expect(cosmeticUnlocked(def, discoveries(threshold))).toBe(true);
+    expect(cosmeticUnlocked(def, discoveries(threshold + 1))).toBe(true);
   });
-  it.each(HERO_SITES)('requires three stars at hero site %s', (site) => {
-    const def = HULL_PAINTS.find((paint) => paint.id === 'orange')!;
-    expect(cosmeticUnlocked(def, { ...empty, ratings: { [site]: 2 } })).toBe(false);
-    expect(cosmeticUnlocked(def, { ...empty, ratings: { [site]: 3 } })).toBe(true);
-    expect(cosmeticUnlocked(def, { ...empty, ratings: { other: 3, 'daily-2026-10-03': 3 } })).toBe(
-      false,
-    );
+  it('does not unlock paints from modern stars, photos, objectives or event sightings', () => {
+    const def = HULL_PAINTS.find((paint) => paint.id === 'red')!;
+    const progress = {
+      ...empty,
+      ratings: { titanic: 3 },
+      awarded: ['photo:site/bow', 'objective:site/bow', 'event:site/whale'],
+    };
+    expect(discoveryCount(progress)).toBe(0);
+    expect(cosmeticUnlocked(def, progress)).toBe(false);
+    expect(cosmeticUnlocked(SUB_DECALS[1], discoveries(5))).toBe(true);
+    expect(cosmeticUnlocked(PHOTO_FRAMES[1], discoveries(3))).toBe(true);
   });
   it('requires an actual secret reward, including migrated discoveries', () => {
     const progress = new Progress(new ProgressSave(null), [
@@ -95,28 +104,23 @@ describe('cosmetic rewards', () => {
     expect(progress.ownsCosmetic(amber)).toBe(true);
     expect(progress.divePoints).toBe(0);
   });
-  it('keeps streak paint and trim earned after a missed day and reload', () => {
+  it('preserves previously earned Daily paint/trim as migration grants, but new streaks grant no cosmetics', () => {
     const store = storage();
-    const progress = new Progress(new ProgressSave(store));
-    const daily = new DailySave(store);
-    const silver = HULL_PAINTS.find((paint) => paint.id === 'silver')!;
-    for (const date of ['2026-10-01', '2026-10-02']) {
-      daily.complete(date);
-      progress.recordDailyStreak(daily.get().streak);
-      expect(progress.ownsCosmetic(silver)).toBe(false);
-    }
-    daily.complete('2026-10-03');
-    progress.recordDailyStreak(daily.get().streak);
-    expect(progress.selectCosmetic('paint', 'silver')).toBe(true);
-    expect(progress.selectCosmetic('trim', 'blue')).toBe(true);
-    daily.complete('2026-10-05');
-    expect(daily.get().streak).toBe(1);
-    for (const streak of [1, -1, NaN, Infinity, 3.5]) progress.recordDailyStreak(streak);
+    store.setItem(
+      PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        dailyBestStreak: 3,
+        cosmetics: { paint: 'silver', trim: 'blue' },
+      }),
+    );
     const restored = new Progress(new ProgressSave(store));
-    expect(restored.snapshot().dailyBestStreak).toBe(3);
-    expect(restored.ownsCosmetic(silver)).toBe(true);
-    expect(restored.cosmetics).toEqual({ paint: 'silver', trim: 'blue' });
-    expect(restored.points).toBe(0);
+    expect(restored.cosmetics).toEqual({ ...defaultCosmetics(), paint: 'silver', trim: 'blue' });
+    restored.recordDailyStreak(1);
+    expect(new Progress(new ProgressSave(store)).cosmetics).toEqual(restored.cosmetics);
+    const fresh = new Progress(new ProgressSave(null));
+    fresh.recordDailyStreak(3);
+    expect(fresh.selectCosmetic('paint', 'silver')).toBe(false);
   });
   it('uses best ratings once, skips aborted/incomplete dives and grants no RP for selection', () => {
     const progress = new Progress(new ProgressSave(null));
@@ -124,6 +128,7 @@ describe('cosmetic rewards', () => {
     progress.finish('titanic', [{ primary: true, complete: false }]);
     expect(progress.stars).toBe(0);
     expect(progress.selectCosmetic('paint', 'red')).toBe(false);
+    for (const id of ['bow', 'stern', 'bridge']) progress.award('poi', `titanic/${id}`);
     progress.award('photo', 'titanic/bow');
     progress.finish('titanic', primary);
     const points = progress.points;
@@ -150,11 +155,11 @@ describe('cosmetic save migration and gameplay isolation', () => {
       awarded: ['rating:titanic/3', 'secret:titanic/find-1'],
       cosmetics: { paint: 'orange', trim: 'amber' },
     });
-    expect(migrated.cosmetics).toEqual({ paint: 'orange', trim: 'amber' });
+    expect(migrated.cosmetics).toEqual({ ...defaultCosmetics(), paint: 'orange', trim: 'amber' });
     expect(migrated.ratings.titanic).toBe(3);
     expect(
       migrateProgress({ ...migrated, cosmetics: { paint: 'gold', trim: 'amber' } }).cosmetics,
-    ).toEqual({ paint: 'stock', trim: 'amber' });
+    ).toEqual({ ...defaultCosmetics(), paint: 'stock', trim: 'amber' });
     for (const raw of [
       [],
       'red',
@@ -171,18 +176,20 @@ describe('cosmetic save migration and gameplay isolation', () => {
     const store = storage();
     const progress = new Progress(new ProgressSave(store), ['titanic/secret:find-1']);
     progress.award('species', 'ray');
+    progress.award('poi', 'titanic/bow');
     progress.finish('titanic', primary);
     expect(progress.selectCosmetic('paint', 'red')).toBe(true);
     expect(progress.selectCosmetic('trim', 'amber')).toBe(true);
     const restored = new Progress(new ProgressSave(store));
-    expect(restored.cosmetics).toEqual({ paint: 'red', trim: 'amber' });
+    expect(restored.cosmetics).toEqual({ ...defaultCosmetics(), paint: 'red', trim: 'amber' });
     const selection = restored.cosmetics;
     selection.paint = 'gold';
     const snapshot = restored.snapshot();
     snapshot.cosmetics.trim = 'blue';
-    expect(restored.cosmetics).toEqual({ paint: 'red', trim: 'amber' });
+    expect(restored.cosmetics).toEqual({ ...defaultCosmetics(), paint: 'red', trim: 'amber' });
     expect(restored.selectCosmetic('paint', 'stock')).toBe(true);
     expect(new Progress(new ProgressSave(store)).cosmetics).toEqual({
+      ...defaultCosmetics(),
       paint: 'stock',
       trim: 'amber',
     });
@@ -206,15 +213,15 @@ describe('cosmetic save migration and gameplay isolation', () => {
     const progress = new Progress(new ProgressSave(null));
     const base = structuredClone(makeConfig());
     let config;
-    config = resolveEffective(defaultSettings(base), 'arcade', progress.snapshot(), null, base);
+    config = resolveEffective(defaultSettings(base), 'arcade', null, base);
     const before = structuredClone(config);
     progress.recordDailyStreak(3);
     progress.selectCosmetic('paint', 'silver');
     progress.selectCosmetic('trim', 'blue');
-    config = resolveEffective(defaultSettings(base), 'arcade', progress.snapshot(), null, base);
+    config = resolveEffective(defaultSettings(base), 'arcade', null, base);
     expect(config).toEqual(before);
     for (const depth of [1000, 6500, 11000]) expect(progress.canDive(depth, 'arcade')).toBe(true);
-    expect(progress.canDive(11000, 'realistic')).toBe(false);
+    expect(progress.canDive(11000, 'realistic')).toBe(true);
   });
 });
 
@@ -237,7 +244,7 @@ describe('sub cosmetic materials', () => {
         expect(uniforms.uHullPaint.value).toBe(0);
         expect(lens.color.getHex()).toBe(0xffffff);
         vehicle.materials.setLensesOn(false);
-        mesh.setCosmetics({ paint: 'blue', trim: 'amber' });
+        mesh.setCosmetics({ ...defaultCosmetics(), paint: 'blue', trim: 'amber' });
         expect(mesh.vehicle).toBe(vehicle);
         expect(uniforms.uHullPaint.value).toBe(1);
         expect(uniforms.uHullBase.value.getHex()).toBe(0x619dce);
@@ -275,4 +282,41 @@ describe('sub cosmetic materials', () => {
       mesh.dispose();
     },
   );
+});
+
+it('grants cosmetics for spent RP, retains the previous look and round-trips entitlements without duplicate grants', () => {
+  const migrated = migrateProgress({
+    version: 1,
+    points: 0,
+    lifetime: 0,
+    upgrades: { 'light-range': 3, 'light-beam': 2 },
+    awarded: ['rating:titanic/3'],
+    cosmetics: { paint: 'orange' },
+  });
+  expect(migrated.lifetime).toBe(315);
+  expect(migrated.cosmetics.paint).toBe('orange');
+  expect(migrated.cosmeticGrants).toContain('decal:explorer');
+  expect(migrated.cosmeticGrants).toContain('frame:gold');
+  expect(migrateProgress(migrated)).toEqual(migrated);
+  expect(new Set(migrated.cosmeticGrants).size).toBe(migrated.cosmeticGrants.length);
+});
+
+it('passes selected decal data to the existing atlas at build time and after hull swaps', () => {
+  const atlas = vi.spyOn(decals, 'decalAtlas');
+  const selection = { ...defaultCosmetics(), paint: 'blue' as const, decal: 'explorer' as const };
+  const mesh = new SubMesh({ hullClass: 'A', tier: 'high', cosmetics: selection });
+  try {
+    expect(atlas).toHaveBeenLastCalledWith(
+      expect.objectContaining({ name: 'EXPLORER', number: 'SEA' }),
+    );
+    expect(mesh.vehicle.materials.paintUniforms.uHullBase.value.getHex()).toBe(0x619dce);
+    mesh.setHullClass('C');
+    expect(atlas).toHaveBeenLastCalledWith(
+      expect.objectContaining({ name: 'EXPLORER', number: 'SEA' }),
+    );
+    expect(mesh.vehicle.materials.paintUniforms.uHullBase.value.getHex()).toBe(0x619dce);
+  } finally {
+    mesh.dispose();
+    atlas.mockRestore();
+  }
 });

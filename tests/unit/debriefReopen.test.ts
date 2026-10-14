@@ -226,7 +226,7 @@ it('renders a collected sample as the single classified highlight and clears it 
     debrief.show(stats);
     expect(highlights()).toHaveLength(1);
     expect(highlights()[0].className).toBe('debrief-highlight is-samples');
-    expect(highlights()[0].textContent).toBe('Collected Sediment core.');
+    expect(highlights()[0].textContent).toBe('Found Sediment core.');
     debrief.hide();
     exploration.samples = [];
     debrief.show(stats);

@@ -93,14 +93,12 @@ describe('curiosity placements on actual site terrain', () => {
 
 it('curiosity rewards persist idempotently and stay finite', () => {
   const progress = new Progress(new ProgressSave(null));
-  expect(progress.award('secret', 'lost-city/arch')).toBe(15);
-  expect(progress.award('sample', 'lost-city/sediment')).toBe(10);
-  expect(progress.award('event', 'beebe-vent-field/plume')).toBe(5);
-  expect(progress.points).toBe(30);
+  expect(progress.award('secret', 'lost-city/arch')).toBe(1);
+  expect(progress.award('sample', 'lost-city/sediment')).toBe(1);
+  expect(progress.points).toBe(0);
   progress.beginDive();
   expect(progress.award('secret', 'lost-city/arch')).toBe(0);
   expect(progress.award('sample', 'lost-city/sediment')).toBe(0);
-  expect(progress.award('event', 'beebe-vent-field/plume')).toBe(0);
-  expect(progress.points).toBe(30);
+  expect(progress.points).toBe(0);
   expect(progress.divePoints).toBe(0);
 });

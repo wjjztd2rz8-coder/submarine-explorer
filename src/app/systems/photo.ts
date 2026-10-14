@@ -38,7 +38,12 @@ export function createPhotoSystem(): GameSystem {
     const now = performance.now();
     if (now - lastCaptureMs < 400) return; // Enter on the focused button fires twice
     lastCaptureMs = now;
-    const image = canvasThumbnail(renderer.domElement);
+    const image = canvasThumbnail(
+      renderer.domElement,
+      undefined,
+      undefined,
+      ctx.progress.cosmetics.frame,
+    );
     if (!image) {
       photoMode.toast('This browser could not create the photo.', true);
       return;

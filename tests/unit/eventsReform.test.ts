@@ -149,15 +149,14 @@ it('logs explained sightings without adding secrets, species or snow to counts o
     }
   }
   const progress = new Progress(new ProgressSave(null));
-  progress.award('event', 'monterey-canyon/turbidity');
   progress.creditDiscovery('monterey-canyon/event:turbidity');
-  expect(progress.points).toBe(5);
+  expect(progress.points).toBe(0);
   expect(progress.bonus).toBe(false);
-  expect(progress.snapshot().awarded).toEqual(['event:monterey-canyon/turbidity']);
+  expect(progress.snapshot().awarded).toEqual([]);
   const restored = new Progress(new ProgressSave(null), ['monterey-canyon/event:turbidity']);
-  expect(restored.points).toBe(5);
+  expect(restored.points).toBe(0);
   expect(restored.divePoints).toBe(0);
-  expect(restored.award('event', 'monterey-canyon/turbidity')).toBe(0);
+  expect(restored.snapshot().awarded).toEqual([]);
   expect(restored.bonus).toBe(false);
 });
 

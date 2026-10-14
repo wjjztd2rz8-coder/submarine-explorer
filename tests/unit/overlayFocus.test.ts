@@ -6,7 +6,6 @@ import { shellKeysSystem } from '../../src/app/systems/shell.js';
 import { FocusTrap, observeKeyboard, type FocusTrapOptions } from '../../src/ui/FocusTrap.js';
 import { Globe } from '../../src/ui/Globe.js';
 import type { GlobeSite } from '../../src/ui/GlobeModel.js';
-import { Upgrades } from '../../src/ui/Upgrades.js';
 import { SettingsScreen } from '../../src/ui/Settings.js';
 import { Save, ProgressSave, defaultSettings } from '../../src/core/Save.js';
 import { Progress as SavedProgress } from '../../src/game/Progress.js';
@@ -501,59 +500,56 @@ describe('overlay keyboard ownership and focus return', () => {
 
 describe('migrated modal consumers', () => {
   it.each([true, false])(
-    'closing Upgrades does not also pause the dive (shell registered first: %s)',
+    'closing Journal cosmetics does not also pause the dive (shell registered first: %s)',
     (first) => {
-      vi.spyOn(Upgrades.prototype as unknown as { render(): void }, 'render').mockImplementation(
+      vi.spyOn(Journal.prototype as unknown as { render(): void }, 'render').mockImplementation(
         () => {},
       );
-      const upgrades = new Upgrades({ onChange: () => vi.fn() } as unknown as Progress);
-      cleanup.push(() => upgrades.dispose());
+      vi.spyOn(Journal.prototype, 'load').mockResolvedValue();
+      const journal = new Journal();
+      cleanup.push(() => journal.dispose());
       const setAppState = vi.fn();
       const context = {
         app: { state: 'dive' },
         bus: new EventBus(),
-        journal: { isOpen: false },
-        discovery: { guide: { isOpen: false }, debrief: { isOpen: false } },
+        journal,
+        discovery: { guide: journal, debrief: { isOpen: false } },
         settingsScreen: { isOpen: false },
         globe: { isOpen: false },
         photoMode: { active: false },
-        upgrades,
         setAppState,
       } as unknown as GameContext;
       cleanup.push(() => shellKeysSystem.dispose?.());
       if (first) shellKeysSystem.init?.(context);
-      upgrades.open();
+      journal.open();
       if (!first) shellKeysSystem.init?.(context);
       expect(press('Escape').defaultPrevented).toBe(true);
-      expect(upgrades.isOpen).toBe(false);
+      expect(journal.isOpen).toBe(false);
       expect(setAppState).not.toHaveBeenCalled();
     },
   );
 
-  it('opens Upgrades without held-Space button focus, returns focus and releases its listener', () => {
-    // Content is independently owned; this capability checks the actual open/close lifecycle.
-    vi.spyOn(Upgrades.prototype as unknown as { render(): void }, 'render').mockImplementation(
+  it('opens Journal without held-Space button focus, returns focus and releases its listener', () => {
+    vi.spyOn(Journal.prototype as unknown as { render(): void }, 'render').mockImplementation(
       () => {},
     );
-    const off = vi.fn();
+    vi.spyOn(Journal.prototype, 'load').mockResolvedValue();
     const add = vi.spyOn(window, 'addEventListener');
     const remove = vi.spyOn(window, 'removeEventListener');
-    const upgrades = new Upgrades({ onChange: () => off } as unknown as Progress);
-    cleanup.push(() => upgrades.dispose());
+    const journal = new Journal();
+    cleanup.push(() => journal.dispose());
     const opener = element();
     opener.focus();
-    upgrades.open();
-    expect(document.exitPointerLock).toHaveBeenCalledOnce();
+    journal.open();
     expect(active()).toBe(body);
-    upgrades.open();
+    journal.open();
     expect(document.exitPointerLock).toHaveBeenCalledOnce();
     expect(add.mock.calls.filter(([name]) => name === 'keydown')).toHaveLength(1);
     press('Escape');
-    expect(upgrades.isOpen).toBe(false);
+    expect(journal.isOpen).toBe(false);
     expect(active()).toBe(opener);
-    upgrades.open();
-    upgrades.dispose();
-    expect(off).toHaveBeenCalledOnce();
+    journal.open();
+    journal.dispose();
     expect(remove.mock.calls.filter(([name]) => name === 'keydown')).toHaveLength(1);
     expect(press('Escape').defaultPrevented).toBe(false);
     cleanup.pop();
@@ -772,7 +768,7 @@ describe('overlay policies across the app', () => {
       progress,
       daily: null,
       route: null,
-      effective: resolveEffective(save.get(), 'arcade', progress.snapshot(), null),
+      effective: resolveEffective(save.get(), 'arcade', null),
       discovery: {
         ready: Promise.resolve(),
         pois: [],
@@ -829,7 +825,7 @@ describe('overlay policies across the app', () => {
       input: new Input({ storage: null }),
       discovery: { ready: Promise.resolve(), pois: [], scanner: {} },
       sonar: { setScanState: vi.fn(), setPois: vi.fn(), setPalette: vi.fn() },
-      effective: resolveEffective(save.get(), 'arcade', { upgrades: {} }, null),
+      effective: resolveEffective(save.get(), 'arcade', null),
       route: null,
       globe: { isOpen: false },
       expose: vi.fn(),
@@ -1073,7 +1069,7 @@ describe('overlay policies across the app', () => {
         showDebrief: (extra: Partial<DebriefStats>, escape: null) =>
           debrief.show({ ...stats, ...extra }, undefined, undefined, escape),
       },
-      effective: resolveEffective(save.get(), save.get().gameplayMode, { upgrades: {} }, null),
+      effective: resolveEffective(save.get(), save.get().gameplayMode, null),
       sub: { simSpeed: 1, startEmergencyAscent: vi.fn() },
       headlights: { on: false },
       sonar: { visible: false },
@@ -1505,7 +1501,7 @@ it('Discovery host disposal releases Journal/debrief ownership even with both op
   const ctx = {
     bus: new EventBus(),
     config: DEFAULT_CONFIG,
-    effective: resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', { upgrades: {} }, null),
+    effective: resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', null),
     meta: { id: 'reef' },
     terrain: { sampleHeight: () => -100 },
     contentLandmark: 'reef',

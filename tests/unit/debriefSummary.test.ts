@@ -63,7 +63,7 @@ describe('compact dive summary', () => {
   it.each([
     ['secrets', 'Found Hidden marker.'],
     ['events', 'Witnessed Hidden marker.'],
-    ['samples', 'Collected Hidden marker.'],
+    ['samples', 'Found Hidden marker.'],
   ] as const)('highlights an exploration %s when there are no scans', (kind, highlight) => {
     const result = summarizeDive(empty, undefined, {
       found: 1,
