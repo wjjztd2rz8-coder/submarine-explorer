@@ -170,6 +170,7 @@ export class Discovery {
 
   /** Clear dive-local scan and session state while retaining Journal unlocks. */
   resetDive(): void {
+    this.overlay.clear();
     this.scanner.resetDive();
     this.stats.reset();
   }
@@ -250,14 +251,15 @@ export class Discovery {
     input: DiscoveryFrameInput,
     camera?: Camera,
     clockDt: number = simDt,
+    blocked = false,
   ): void {
     if (input.toggleGuide) this.guide.toggle();
-    const overlayOpen = this.guide.isOpen || this.debrief.isOpen;
+    const overlayOpen = blocked || this.guide.isOpen || this.debrief.isOpen;
+    this.overlay.setSuppressed(overlayOpen);
     this.scanner.enabled = !overlayOpen;
     this.scanner.update(simDt, position, forward, input.scan);
     this.stats.update(clockDt, position);
 
-    this.overlay.setSuppressed(overlayOpen);
     const keys = this.keys();
     this.guide.setFooter(`${keys.guide} OR ESC TO CLOSE · HOLD ${keys.scan} NEAR A TARGET TO SCAN`);
     let screen: ScreenPoint | null = null;
@@ -283,6 +285,7 @@ export class Discovery {
   /** Open the debrief with this session's stats. B3 passes a title/subtitle. */
   showDebrief(extra: Partial<DebriefStats> = {}, onEscape?: (() => void) | null): DebriefStats {
     const stats = this.stats.snapshot({ landmarkName: this.guideTitle(), ...extra });
+    this.overlay.setSuppressed(true);
     this.debrief.show(stats, undefined, undefined, onEscape);
     return stats;
   }

@@ -116,7 +116,7 @@ export interface CosmeticSelection {
   paint: (typeof HULL_PAINTS)[number]['id'];
   decal: (typeof SUB_DECALS)[number]['id'];
   frame: (typeof PHOTO_FRAMES)[number]['id'];
-  /** Retained for returning pilots; no separate lamp picker. */
+  /** Lamp appearance; does not change lighting range or power. */
   trim: (typeof LIGHT_TRIMS)[number]['id'];
 }
 export type CosmeticSlot = keyof CosmeticSelection;

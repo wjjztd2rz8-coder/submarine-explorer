@@ -89,7 +89,7 @@ for (const touch of [false, true]) {
         await expect(page.locator('.guidance-kicker')).toHaveText('NEW ENTRY');
         await expect(page.locator('.guidance-name')).toHaveText(target.name);
         await expect(page.locator('.guidance-hint')).toHaveText(
-          touch ? 'PAUSE → JOURNAL' : 'PRESS J · JOURNAL',
+          touch ? 'OPEN JOURNAL' : 'PRESS J · JOURNAL',
         );
         const result = await page.evaluate(() => {
           const g = window.__game as unknown as Game;

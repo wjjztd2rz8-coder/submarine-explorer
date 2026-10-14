@@ -185,6 +185,8 @@ test('phone Journal offers cosmetics and all downloaded missions stay open in Re
   await expect(journal).toBeVisible();
   await journal.getByText('Cosmetics', { exact: true }).click();
   await expect(journal.getByLabel('Sub paint', { exact: true })).toHaveValue('stock');
+  // Guards the formerly unreachable lamp slot alongside every existing cosmetic control.
+  await expect(journal.getByLabel('Lamp trim', { exact: true })).toHaveValue('stock');
   await expect(journal.getByLabel('Sub decal', { exact: true })).toHaveValue('stock');
   await expect(journal.getByLabel('Photo frame', { exact: true })).toHaveValue('stock');
   // Preserve the workshop's phone touch-target guard on its replacement controls.
@@ -194,7 +196,7 @@ test('phone Journal offers cosmetics and all downloaded missions stay open in Re
       height: element.getBoundingClientRect().height,
     })),
   );
-  expect(controls).toHaveLength(3);
+  expect(controls).toHaveLength(4);
   expect(controls.every((control) => control.width >= 44 && control.height >= 44)).toBe(true);
   expect(
     await journal.locator('.jr-panel').evaluate((panel) => panel.scrollWidth <= panel.clientWidth),

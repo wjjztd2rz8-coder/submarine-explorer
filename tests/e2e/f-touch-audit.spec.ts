@@ -197,7 +197,7 @@ for (const viewport of [
             { scan: 'G', guide: 'J' },
           );
         });
-        await expect(page.locator('.guidance-hint')).toHaveText('PAUSE → JOURNAL');
+        await expect(page.locator('.guidance-hint')).toHaveText('OPEN JOURNAL');
         expect(
           await page.locator('.guidance-slot').evaluate((e) => e.scrollWidth <= e.clientWidth),
         ).toBe(true);

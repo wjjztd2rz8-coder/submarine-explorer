@@ -62,14 +62,18 @@ export class ScanOverlay {
     parent.appendChild(this.root);
   }
 
-  /** Hide the beam's own guidance (e.g. while the field guide is open). */
+  /** Discard all guidance while play is covered (e.g. by the Journal). */
   setSuppressed(suppressed: boolean): void {
     this.suppressed = suppressed;
-    if (suppressed) {
-      this.reticle.hidden = true;
-      for (const source of ['scan', 'objective', 'complete'] as const)
-        this.slot.offer(source, 'scan', null);
-    }
+    this.slot.setSuppressed(suppressed);
+    if (suppressed) this.clear();
+  }
+
+  /** Discard the previous dive's guidance and result priority. */
+  clear(): void {
+    this.reticle.hidden = true;
+    this.completeLeft = 0;
+    this.slot.clear();
   }
 
   /** Show the completion confirmation for `completeBannerSeconds`. */
@@ -84,7 +88,7 @@ export class ScanOverlay {
         text: title,
         detail: firstTime
           ? isTouch()
-            ? 'PAUSE → JOURNAL'
+            ? 'OPEN JOURNAL'
             : `PRESS ${keys.guide} · JOURNAL`
           : 'LOGGED · JOURNAL',
         tone: firstTime ? 'cyan' : 'dim',
@@ -216,6 +220,7 @@ export class ScanOverlay {
         scan: {
           kicker: 'SCAN TARGET',
           text: view.nearestName,
+          ready: true,
           detail: `HOLD ${scan} TO SCAN`,
           tone: 'cyan',
           ring: { progress: 0, label: dist },

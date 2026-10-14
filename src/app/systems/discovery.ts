@@ -64,6 +64,7 @@ export const discoverySystem: GameSystem = {
         ctx.missionRouter?.debriefOpen ? { ...input, scan: false } : input, // B3: no beam under the debrief
         ctx.rig.camera,
         f.clockDt,
+        f.frozen || f.blocked || ctx.app.state !== 'dive' || !!ctx.missionRouter?.debriefOpen,
       );
     },
   },

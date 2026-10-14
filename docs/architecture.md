@@ -44,7 +44,7 @@ and [audio.md](./audio.md).
 **Phase D — playability (2026-09-24).** The app shell gained explicit
 `'home' | 'dive' | 'pause'` states (`GameEvents['app:state']`), driven by two
 new full-screen overlays: `ui/Home.ts` (Bathyline title screen: Dive/Dive
-sites/Free dive/Daily dive/mode/Journal/Settings/Controls/Upgrades) and `ui/PauseMenu.ts` (`Esc`:
+sites/Free dive/Daily dive/mode/Journal/Settings/Controls) and `ui/PauseMenu.ts` (`Esc`:
 Resume/Objectives/Journal/Settings/Controls/Data credits/Quit to home).
 Both retire the old `O` (settings) and `N` (globe) hotkeys — `Input`'s
 `defaultActions()` no longer binds `toggleSettings` or `toggleGlobe` at all;
@@ -52,7 +52,7 @@ those screens open only from a menu button now. `Save`'s settings record is
 versioned `v3`; its `gameplay` block has four switches: battery/oxygen, currents,
 visual waypoints and surface start. Custom inherits speed (including descent), lights
 and sensors from its last preset (`gameplayBaseMode`). `game/EffectiveSettings.ts`
-resolves modes, upgrades and Daily conditions from pristine tuning —
+resolves modes and Daily conditions from pristine tuning —
 `src/core/Config.ts` `speedProfiles` (including descent) / `lightPresets` /
 `sensorPresets` hold the numeric presets. `Input`'s bindings are versioned
 `v3` (migrating v2), with defaults R/F pitch, Space rise, Ctrl-or-C sink,
@@ -274,7 +274,7 @@ responses in `.cache/gmrt-raw/`, retries with backoff and falls back to ETOPO.
 states — `'home' | 'dive' | 'pause'` (`GameEvents['app:state']`). Plain `/`
 boots into `'home'`: `ui/Home.ts` shows the Bathyline menu over a decorative
 Monterey Canyon title scene. DOM and Tab order is Dive, Dive sites, Free dive,
-Daily dive (when available), mode selector, Journal, Settings, Controls, Upgrades.
+Daily dive (when available), mode selector, Journal, Settings, Controls.
 First focus is the single Dive button. Dive sites and Free
 dive replace the menu with the embedded C1 globe and scrolling selector; Back or
 Escape closes the globe and restores focus to the originating button.
@@ -596,7 +596,7 @@ and [audio.md](./audio.md).
 **Phase D — playability (2026-09-24).** The app shell gained explicit
 `'home' | 'dive' | 'pause'` states (`GameEvents['app:state']`), driven by two
 new full-screen overlays: `ui/Home.ts` (Bathyline title screen: Dive/Dive
-sites/Free dive/Daily dive/mode/Journal/Settings/Controls/Upgrades) and `ui/PauseMenu.ts` (`Esc`:
+sites/Free dive/Daily dive/mode/Journal/Settings/Controls) and `ui/PauseMenu.ts` (`Esc`:
 Resume/Objectives/Journal/Settings/Controls/Data credits/Quit to home).
 Both retire the old `O` (settings) and `N` (globe) hotkeys — `Input`'s
 `defaultActions()` no longer binds `toggleSettings` or `toggleGlobe` at all;
@@ -604,7 +604,7 @@ those screens open only from a menu button now. `Save`'s settings record is
 versioned `v3`; its `gameplay` block has four switches: battery/oxygen, currents,
 visual waypoints and surface start. Custom inherits speed (including descent), lights
 and sensors from its last preset (`gameplayBaseMode`). `game/EffectiveSettings.ts`
-resolves modes, upgrades and Daily conditions from pristine tuning —
+resolves modes and Daily conditions from pristine tuning —
 `src/core/Config.ts` `speedProfiles` (including descent) / `lightPresets` /
 `sensorPresets` hold the numeric presets. `Input`'s bindings are versioned
 `v3` (migrating v2), with defaults R/F pitch, Space rise, Ctrl-or-C sink,
@@ -837,7 +837,7 @@ responses in `.cache/gmrt-raw/`, retries with backoff and falls back to ETOPO.
 states — `'home' | 'dive' | 'pause'` (`GameEvents['app:state']`). Plain `/`
 boots into `'home'`: `ui/Home.ts` shows the Bathyline menu over a decorative
 Monterey Canyon title scene. DOM and Tab order is Dive, Dive sites, Free dive,
-Daily dive (when available), mode selector, Journal, Settings, Controls, Upgrades.
+Daily dive (when available), mode selector, Journal, Settings, Controls.
 First focus is the single Dive button. Dive sites and Free
 dive replace the menu with the embedded C1 globe and scrolling selector; Back or
 Escape closes the globe and restores focus to the originating button.
@@ -1180,7 +1180,7 @@ Vehicle and lighting are illustrative. See [title-scene.md](./title-scene.md).
 The bridge reconciles visibility/layout, quality and motion at `render.prepare`.
 At `render.draw`, home owns the shared canvas: it presents the title or clears once
 to navy in the sites subview, skipping the gameplay/post path. Title draws stop in
-sites, dive/pause, hidden documents and covering Settings/Journal/Controls/Upgrades
+sites, dive/pause, hidden documents and covering Settings/Journal/Controls
 or overlay globe. Return invalidates a fresh frame; scene objects persist across
 home entries and owned resources/listeners are disposed at teardown. The embedded
 globe opens only while home and its sites subview are open, the document is visible,
@@ -1201,39 +1201,41 @@ Home typography is self-hosted DM Sans and Source Serif 4, with system/Georgia
 fallbacks. Bathyline metadata keeps the existing save keys, manifest identity,
 service worker, package and deployment paths.
 
-### Phase F research integration
+### Progress and cosmetics integration
 
 `app/boot.ts` waits for `loadSavedProgress()` alongside the tile index and mission
-route. Old discovery/photo records are credited before hull checks, without changing
-those records. `app/systems/progress.ts` runs first to apply saved upgrades before
-vehicles, lights, sensors and power read their config. Its workshop mounts in `start()`
-and freezes the simulation at `gate.photo`. Tuning lives in `core/config/progress.ts`.
+route. Old discovery/photo records are credited without changing those records.
+All pilots have fixed equipment; hull class follows dive depth. Effective settings
+resolve modes and Daily conditions before the dive systems initialize.
+`app/systems/progress.ts` connects discovery rewards, ratings and the Journal picker.
+Tuning lives in `core/config/progress.ts`; appearance choices and unlock requirements
+live in `game/Cosmetics.ts`.
 
-The new `subexplorer.progress.v1` save contains `version`, spendable `points`,
-`lifetime` earnings, a `legacyCredited` migration marker, reward-token `awarded` keys, upgrade levels and best site
-`ratings`. `Save.ts` sanitizes older/malformed records and protects future versions.
+The unchanged `subexplorer.progress.v1` key now stores schema v2: archived `points`,
+`lifetime` and purchase levels, best site `ratings`, stable `awarded` identities,
+`legacyCredited`/`legacyPending`, `dailyBestStreak`, cosmetic grants and selections.
+Migration preserves old balances and purchases as evidence for cosmetic grants;
+modern play earns discoveries rather than currency. Future versions remain read-only.
 Discovery saves keep the existing `subexplorer.discoveries.v1` schema and key.
-Rating keys accept the same letters, digits, underscores and hyphens as content
-folder IDs, including names that match object properties. Valid rating reward
-tokens recover lost best-star summaries without generating another RP payout.
+Valid rating tokens recover best-star summaries, including site IDs matching object
+property names. Daily dates and streaks remain in their independent save.
 
 `ctx.progress` and `window.__game.progress` expose `award(kind, id): number`.
-Kinds are `poi`, `objective`, `species`, `photo`, `primary`, and `rating`. Use stable
-subject IDs; POIs/photos use `site/subject`, objectives use `mission/objective`,
-and species can use a global species ID. Repeated IDs earn zero. A species scan or
-subject photo also satisfies the current dive's bonus goal on repeat visits.
-F2-LIFE can call `progress.award('species', speciesId)` on a completed animal scan
-and `progress.award('photo', subjectId)` on a successfully captured animal photo.
-Migration uses `credit()` so old subjects do not count as new dive activity, and runs
-once so later discoveries across separate dives cannot generate retroactive ratings.
-Legacy completed surveys use a subject photo or animal scan at that site for the
-three-star bonus; another site's animal scan does not supply the bonus.
+Kinds are `poi`, `objective`, `species`, `photo`, `primary`, `rating`, `secret` and
+`sample`. Stable IDs prevent duplicate credit. Only unique POI, species, secret and
+sample discoveries count toward new cosmetics; stars, Daily streaks, objectives,
+photos and event sightings remain records. Species scans and subject photos also
+satisfy the current dive's bonus goal on repeat visits.
 
-`MissionSelect.setProgress()` adds hull requirements, free-dive ratings and best
-stars. `Globe.setMissionAccess()` keeps locked pins focusable to read their requirement
-and prevents a mission launch. The normal e2e feature specs use
-`tests/e2e/helpers/unlocked.ts` for an experienced pilot; `f2-progress.spec.ts` uses a
-fresh pilot and writes workshop, mission-select and debrief screenshots.
+Migration uses `credit()` so old subjects do not count as new dive activity. Its
+persisted boundary prevents later discoveries across separate dives from generating
+retroactive ratings or old cosmetic entitlements. Legacy completed surveys use a
+subject photo or animal scan at that site for their three-star bonus.
+
+The Journal front page owns the native paint, lamp-trim, decal and photo-frame
+selectors. Selections persist immediately; sub choices apply to a newly constructed
+hull and survive hull swaps, while frames apply to new photos. Site selectors display
+best stars, with every site available from the first dive.
 
 ### Phase F curiosity integration
 
@@ -1278,11 +1280,11 @@ collection itself resets per dive. The Journal loads secrets for every site,
 hides undiscovered names, and labels each revealed entry once as Game addition.
 
 Both debriefs accept an optional exploration provider with persistent `found`
-and `total`, plus this dive's `secrets`, `samples` and `events` lists. Rewards call
-`window.__game.progress.award` when present, using `secret`, `sample` and `event`
-kinds with stable `site/subject` IDs. This checkout already includes F2-PROGRESS:
-its reward table adds 15/10/5 RP and its generic scan listener skips curiosity
-IDs so rewards are not doubled. Bus events are emitted even without progression.
+and `total`, plus this dive's `secrets`, `samples` and `events` lists. Finds call
+`window.__game.progress.award` using `secret` and `sample` with stable `site/subject`
+IDs. The generic scan listener skips curiosity IDs so discoveries are not doubled.
+Sightings persist in the Journal and debrief without reward checklists. Bus events
+are emitted even without progression.
 
 The wildlife debug hook `life.sim.spawnNear` recycles distant animals to keep a
 requested encounter inside the existing agent and species budgets. A singleton

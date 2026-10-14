@@ -158,3 +158,105 @@ and completion checks remain intact.
   a host that permits child-process and loopback-server operations. The local
   gate result is not fully green, despite passing build/unit/formatting checks.
 - No merge, push or tag performed; plan/DIRECTOR.md and tools/ remain unedited.
+
+## Third pass — S-verify, brief 1730 (2026-10-14)
+
+Starting HEAD `259c2a0`. Scope is Backlog **S-verify third pass [Codex]** in
+`plan/DIRECTOR.md`: merged save v2/cosmetics, guidance lifetime/priority, retired
+concepts and the touch reward line. Read-only audit preceded edits. Director is
+unchanged. No visual tuning, capability cuts, weakened historical assertions,
+skips, merge, push or tag.
+
+Confirmed defects and fixes:
+
+- A ready contact hid an event caption for its entire lifetime. Fresh discovery
+  topics now get three seconds ahead of idle ready contacts; detail/ring updates
+  cannot renew that interval. Active/interrupted scans and urgent warnings keep
+  priority. Existing scan-completion priority remains intact.
+- Scan suppression withdrew only scan/objective/completion; an existing notice
+  survived Journal opening. Covered play now clears all offers and rejects new
+  offers until resumed. Discovery receives the existing frozen/blocked/app-state
+  gate; debrief and dive restart also discard completion priority and old offers.
+- Earned lamp trims persisted/applied but were unreachable in the Journal picker.
+  Added a lamp row to the same native picker, reusing its controls/classes.
+- Touch reward copy said “PAUSE → JOURNAL” alongside a direct Journal button.
+  Applied “OPEN JOURNAL”; keyboard remap-aware wording remains covered.
+- Architecture documentation still described current purchases, access locks,
+  workshop mounting and RP event rewards. Updated those sections and duplicate
+  menu/resolver summaries. Remaining source RP/purchase references are required
+  legacy migration evidence; README names past RP only in that migration context.
+  “upgrades” in terrain documentation and DiscoveryStore means mesh/data upgrades.
+  No ExploreNotice or TutorialCard references remain in source/README/docs.
+
+Save audit: no v1-to-v2 loss was found. The only pre-existing historical fixture
+was `f30-legacy-discoveries.json` (content IDs, not a saved player profile).
+Three new deterministic fixtures were serialized by **the actual pre-S-rewards
+v1 ProgressSave, DiscoveryStore and DailySave** from commit
+`526362e73d8a878e6a4f66f8873bfe634ec05703`; they are legacy-runtime output,
+not captured player saves. They cover every purchase track, balances, hero ratings,
+secret/sample/sighting/wildlife identities and discovery counts/timestamps, earned
+paint/lamp choices, best Daily streak and the independent Daily date/streak save.
+The soak tests repeatedly change cosmetics and reload v2, comparing every archived
+field/entitlement and the other saves byte for byte, then advance the Daily streak.
+The existing historical content-ID fixture remains covered by its capability spec.
+
+Simplicity: the shared slot owns clearing and topic age; no second guidance
+surface, setting, site branch, config mutation or layout patch. The lamp row
+restores access inside the existing picker. All regressions extend capability
+specs; existing DOM/math helpers and production scanner/hull logic are reused.
+CHANGELOG records the fixes; no capability is cut.
+
+Validation so far: new regressions fail before the fixes (hidden sighting,
+retained notice, missing lamp selector). The first affected run after fixes passed
+**8 files / 190 tests**. Final build/unit/Prettier/aggregate results follow below.
+
+### Final verification and remaining work
+
+- New regressions before fixes: **8 failures as expected** (sighting priority,
+  suppression/notice persistence and both desktop/phone missing lamp selectors).
+- Final focused save/guidance/Journal/cosmetic/photo/waypoint suite:
+  **6 files / 150 tests PASS**. Additional historical discovery fixture,
+  progression, Daily, onboarding and sighting capabilities: **7 files / 72 tests PASS**.
+- `npx tsc --noEmit`: **PASS** on final source and tests.
+- `npx prettier --check .`: **PASS**, repository-wide. Final note formatting and
+  `git diff --check`: **PASS**.
+- `GATES_CONFIG_MODE=writable bash tools/gates.sh`: **exit 1**. Uses the gate's
+  existing support for read-only dependencies; tools/configuration are unchanged.
+  - Config, strict content, root `npm run build` (TypeScript + Vite), full unit,
+    attribution and repository-wide Prettier: **PASS**.
+  - Full unit: **190 files / 2,208 tests PASS**, 384.50 s. No runtime changes after
+    this run began; later edits only update exact browser copy/count assertions.
+  - Project-base `npm run build`: **PASS**, including service-worker stamping.
+  - Python: **165 run, 161 passed / 4 failed**. All four existing manifest tests
+    fail at fixture setup with **`spawnSync git EPERM`**, as in earlier passes.
+  - Root smoke and project-base browser phases: **startup failure; no browser
+    assertions executed**. Direct preview diagnostic using the same loader/port
+    reports **`listen EPERM: operation not permitted 127.0.0.1:4173`**. It uses
+    `/tmp` solely to diagnose socket startup, not as a browser-test artifact.
+  - Existing large-chunk warning remains non-failing.
+- Updated the exact reward-copy expectations in two existing browser capability
+  specs. The existing phone picker regression now asserts all four selectors and
+  retains its 44 px target/no-horizontal-overflow guards. Playwright discovery of
+  the three affected specs: **PASS — 29 tests**, execution blocked above.
+- Source-route audit: HUD/router warnings use `warning`; scan/progress/interrupt,
+  objectives and scan results use `scan`/`objective`/`complete`; exploration uses
+  `event`; onboarding uses `tutorial`/`hint`; power/onboarding notes use `notice`.
+  All feed the shared slot. Warning presentation leaves scanner/input behavior
+  independent; a real held scan completes while the warning remains visible, and
+  existing pointer-pass-through rules remain covered without changing CSS.
+
+Logs: `.cache/runs/20261014-053458-3-pUK6Uy/` for all gates;
+`.cache/S-verify-3/` for before/after regressions, final focused audits, Prettier,
+TypeScript, browser discovery, preview diagnosis and Git staging rejection.
+
+Rerun Python/browser gates on a host that permits child Git and loopback sockets.
+DOM/material tests establish behavior, not appearance; Claude's Journal/cosmetics
+and phone guidance review remains with the existing visual backlog. No captured
+player save was available; the new fixtures retain their legacy producer SHA and
+explicitly identify their deterministic provenance.
+
+Git staging was attempted and rejected because
+`/home/vijay/submarine-explorer/.git/worktrees/1730-S-verify-3/index.lock` is on a
+read-only filesystem. Changes remain uncommitted; an eventual commit must name
+**S-verify**, e.g. `fix(S-verify): preserve cosmetic access and clear shared guidance`.
+No merge, push or tag; `plan/DIRECTOR.md` remains unchanged.

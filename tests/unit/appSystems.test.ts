@@ -133,6 +133,7 @@ describe('Journal gamepad input through the freeze gate', () => {
       const guide = { isOpen: false, isTop: true };
       const update = vi.fn();
       const ctx = {
+        app: { state: 'dive' },
         discovery: { guide, update, scanner: { setObjective: vi.fn() } },
         rig: {},
       } as unknown as GameContext;

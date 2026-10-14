@@ -20,6 +20,7 @@ import type { TileMeta } from '../../src/util/types.js';
 vi.mock('../../src/ui/ScanOverlay.js', () => ({
   ScanOverlay: class {
     showComplete = vi.fn();
+    clear = vi.fn();
     dispose = vi.fn();
   },
 }));

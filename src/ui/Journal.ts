@@ -706,6 +706,7 @@ export class Journal {
     );
     for (const [slot, label] of [
       ['paint', 'Sub paint'],
+      ['trim', 'Lamp trim'],
       ['decal', 'Sub decal'],
       ['frame', 'Photo frame'],
     ] as const) {

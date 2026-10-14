@@ -6,6 +6,11 @@ import {
   type GuidanceMessage,
   type GuidanceOffer,
 } from '../../src/game/Guidance.js';
+import { ScanOverlay } from '../../src/ui/ScanOverlay.js';
+import { Scanner } from '../../src/game/Scanner.js';
+import { Discovery } from '../../src/game/Discovery.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import { Vector3 } from 'three';
 import { GuidanceSlot } from '../../src/ui/GuidanceSlot.js';
 import { HULL_GAUGE_SHOW_RATIO, hullGaugeVisible } from '../../src/ui/HullGauge.js';
 import { TUTORIAL_STEPS, tutorialText } from '../../src/game/Tutorial.js';
@@ -76,7 +81,8 @@ class FakeElement extends EventTarget {
   textContent = '';
   type = '';
   dataset: Record<string, string> = {};
-  style: Record<string, string> = {};
+  style = { setProperty() {} };
+  classList = { toggle() {} };
   append(...nodes: FakeElement[]) {
     this.children.push(...nodes);
   }
@@ -92,6 +98,8 @@ class FakeElement extends EventTarget {
 describe('guidance slot', () => {
   beforeEach(() => {
     vi.stubGlobal('document', {
+      body: new FakeElement(),
+      documentElement: { classList: { contains: () => false } },
       createElement: () => new FakeElement(),
       createElementNS: () => new FakeElement(),
     });
@@ -136,6 +144,118 @@ describe('guidance slot', () => {
     slot.offer('hint', 'hint', null);
     expect(slot.showsName('stern section')).toBe(true);
     expect(slot.showsName('Bow section')).toBe(false);
+  });
+
+  it('gives a sighting three seconds ahead of a ready contact, without delaying a held scan', () => {
+    const bus = new EventBus();
+    const scanner = new Scanner(DEFAULT_CONFIG.scan, bus);
+    const overlay = new ScanOverlay(DEFAULT_CONFIG.scan);
+    scanner.setTargets([
+      {
+        id: 'bow',
+        name: 'Bow',
+        landmarkId: 'titanic',
+        position: new Vector3(0, 0, -5),
+        radius: 20,
+        scanSeconds: 1,
+      },
+    ]);
+    const position = new Vector3();
+    const forward = new Vector3(0, 0, -1);
+    const keys = { scan: 'G', guide: 'J' };
+    scanner.update(0, position, forward, false);
+    overlay.update(scanner.view, keys, null, 0);
+    overlay.slot.offer('event', 'discovery', msg('Whale passing'));
+    expect(texts(overlay.slot).name).toBe('Whale passing');
+    overlay.update(scanner.view, keys, null, 2.9);
+    // Repeated offers and detail changes must not extend the grace period.
+    overlay.slot.offer('event', 'discovery', { ...msg('Whale passing'), detail: 'Logged' });
+    expect(texts(overlay.slot).name).toBe('Whale passing');
+    overlay.update(scanner.view, keys, null, 0.2);
+    expect(texts(overlay.slot).name).toBe('Bow');
+    overlay.slot.offer('event', 'discovery', msg('Silt cloud'));
+    scanner.update(0.5, position, forward, true);
+    overlay.update(scanner.view, keys, null, 0.5);
+    expect(overlay.slot.kind).toBe('scan');
+    overlay.slot.offer('warning', 'urgent', msg('BATTERY LOW'));
+    scanner.update(0.6, position, forward, true);
+    expect(scanner.view.completed).toBe(1);
+    expect(texts(overlay.slot).name).toBe('BATTERY LOW');
+    overlay.slot.offer('warning', 'urgent', null);
+    expect(texts(overlay.slot).name).toBe('Bow');
+    const css = readFileSync('src/styles/guidance.css', 'utf8');
+    expect(css).toMatch(/\.guidance-slot\s*\{[^}]*pointer-events: none/s);
+    expect(css).toMatch(/\.guidance-skip\s*\{[^}]*pointer-events: auto/s);
+    overlay.dispose();
+  });
+
+  it.each(['Journal', 'pause', 'debrief', 'mission switch'])(
+    'clears every source when covered by %s, rejects covered offers and accepts fresh guidance',
+    () => {
+      const slot = new GuidanceSlot();
+      for (const [source, kind] of [
+        ['scan', 'scan'],
+        ['objective', 'objective'],
+        ['complete', 'discovery'],
+        ['event', 'discovery'],
+        ['tutorial', 'hint'],
+        ['hint', 'hint'],
+        ['warning', 'urgent'],
+        ['notice', 'hint'],
+      ] as const)
+        slot.offer(source, kind, msg(source));
+      slot.setSuppressed(true);
+      expect(slot.visible).toBe(false);
+      slot.offer('warning', 'urgent', msg('covered warning'));
+      slot.notice('covered notice');
+      slot.setSuppressed(false);
+      expect(slot.kind).toBeNull();
+      slot.offer('objective', 'objective', msg('New objective'));
+      expect(texts(slot).name).toBe('New objective');
+    },
+  );
+
+  it('clears completion and every other offer through real Journal, blocked-play and restart paths', () => {
+    const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus());
+    const overlay = new ScanOverlay(DEFAULT_CONFIG.scan);
+    const guide = { isOpen: false, setFooter() {} };
+    const debrief = { isOpen: false };
+    const discovery: Discovery = Object.assign(Object.create(Discovery.prototype) as Discovery, {
+      opts: {},
+      scanner,
+      overlay,
+      guide,
+      debrief,
+      stats: { update() {}, reset() {} },
+    });
+    for (const covered of ['Journal', 'pause', 'debrief', 'restart']) {
+      overlay.showComplete('Old result', true, { scan: 'G', guide: 'J' });
+      overlay.slot.notice('Old notice');
+      if (covered === 'restart') discovery.resetDive();
+      else {
+        guide.isOpen = covered === 'Journal';
+        debrief.isOpen = covered === 'debrief';
+        discovery.update(
+          0,
+          0,
+          new Vector3(),
+          new Vector3(0, 0, -1),
+          { scan: false, toggleGuide: false },
+          undefined,
+          0,
+          covered === 'pause',
+        );
+      }
+      expect(overlay.slot.visible).toBe(false);
+      guide.isOpen = false;
+      debrief.isOpen = false;
+      discovery.update(0, 0, new Vector3(), new Vector3(0, 0, -1), {
+        scan: false,
+        toggleGuide: false,
+      });
+      expect(overlay.slot.visible).toBe(false);
+    }
+    overlay.dispose();
   });
 
   it('offers a Skip button only for tutorial steps and reports the press', () => {

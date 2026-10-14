@@ -11,7 +11,8 @@
  *
  * A scan card that only steers the pilot toward a contact (it cannot be scanned
  * yet) is "soft": it ranks just below discovery, so a fresh result or sighting
- * is not buried under a persistent approach cue.
+ * is not buried under a persistent approach cue. Idle ready contacts also yield
+ * to the first three seconds of a fresh result; active scans keep their priority.
  *
  * Hints and tutorial steps are timed or one-shot, so they preempt the standing
  * objective line; otherwise the objective would hide them for the whole dive.
@@ -41,6 +42,8 @@ export interface GuidanceMessage {
   ring?: { progress: number; label: string };
   /** A scan-tier cue that only steers toward a contact; yields to discovery. */
   soft?: boolean;
+  /** Idle contact; briefly yields to fresh results, unlike an active or interrupted scan. */
+  ready?: boolean;
   /** Tutorial step id; the slot shows a Skip button for it. */
   step?: string;
 }
