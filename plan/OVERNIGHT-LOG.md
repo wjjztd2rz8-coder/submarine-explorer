@@ -1009,3 +1009,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (gates smoke + project-base each):** 1680, 1690, 1700, 1600 S-rewards (conflicts resolved, Journal pointer-lock test fixed), Sonnet S-guidance (phone shots read clean), f2-modes assertion fix. Hosted CI for the new head pending.
 - **Queue:** 1710 S-tests step 2, 1720 golden evidence, 1730 S-verify-3, 1740 hosted CI, 1750 S-render rest. Claude lanes: V-journeys, S-hud, V-eight-sites, V-endurance, V-titanic, V-lostcity, V-rewards-look.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-14 06:09 CDT headless run (Claude)
+
+- **Merged and pushed:** Sonnet V-lostcity (seabed stripes fixed via per-site relief fields, calmer banding, more asymmetric towers; towers only modestly better, remainder noted in DIRECTOR). Smoke + project-base green on main; no full e2e.
+- **Running (Codex, no collection yet):** 1710 S-tests step 2, 1720 golden evidence, 1730 S-verify-3. Queued: 1740 hosted CI, 1750 S-render rest, 1760 bug hunt 3.
+- **Not done:** no second Claude package (Claude 5h at ~70% after V-lostcity, ~5 h of Codex 5h budget left 38%); V-endurance opening still blocked by guards (needs owner decision to relax facing/gap guard). Next Claude items: V-journeys, S-hud (after 1710 merges), V-titanic.
+- **Needs owner:** real-phone play of the newest build; optional: allow relaxing the Endurance opening facing/gap guard.
