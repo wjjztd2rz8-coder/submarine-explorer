@@ -42,6 +42,7 @@ import type { ControlsCard } from '../ui/ControlsCard.js';
 import type { Captions } from '../ui/Captions.js';
 import type { Globe } from '../ui/Globe.js';
 import type { Home } from '../ui/Home.js';
+import type { GuidanceSlot } from '../ui/GuidanceSlot.js';
 import type { HUD } from '../ui/HUD.js';
 import type { Journal } from '../ui/Journal.js';
 import type { MissionSelect } from '../ui/MissionSelect.js';
@@ -130,10 +131,10 @@ export interface GameContext extends BootContext {
   hud: HUD;
   sonar: Sonar;
   discovery: Discovery;
+  /** The single guidance card; sources offer messages to it. */
+  guidance: GuidanceSlot;
   power: Power;
   waypoints: Waypoints;
-  /** Authored mission objective hints for the waypoint label. */
-  scanObjectiveHints: Map<string, string>;
   /** POI scan radii before the sensor preset multiplier. */
   baseScanRadii: Map<string, number>;
   props: Props;
@@ -219,6 +220,7 @@ export type ShellContext = BootContext &
       | 'meta'
       | 'contentLandmark'
       | 'discovery'
+      | 'guidance'
       | 'rig'
       | 'waypoints'
       | 'sonar'

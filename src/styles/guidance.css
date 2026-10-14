@@ -1,0 +1,122 @@
+/* The guidance slot: the one card for every text message (warnings, scan
+   progress, discoveries, tutorial steps, hints and the standing objective).
+   Placement lives in hud-layout.css. The card catches no pointer events except
+   on its Skip button. */
+
+.guidance-slot {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 300px;
+  padding: 10px 16px 10px 10px;
+  background: var(--b1-panel);
+  border: 1px solid var(--b1-hair);
+  border-radius: 3px;
+  pointer-events: none;
+  --tone: var(--b1-cyan);
+}
+
+.guidance-slot[hidden] {
+  display: none;
+}
+
+.guidance-slot[data-tone='amber'] {
+  --tone: var(--b1-amber);
+  border-color: rgba(255, 176, 32, 0.45);
+}
+
+.guidance-slot[data-tone='dim'] {
+  --tone: var(--b1-text);
+  border-color: var(--b1-hair-dim);
+}
+
+.guidance-slot[data-tone='alert'] {
+  --tone: var(--hud-warn);
+  border-color: var(--hud-warn);
+  background: rgba(60, 8, 8, 0.75);
+  font-weight: 700;
+}
+
+.guidance-slot[data-kind='discovery'] {
+  border-color: var(--tone);
+}
+
+.guidance-ring {
+  flex: none;
+  display: block;
+}
+
+.guidance-ring-track {
+  stroke: var(--b1-hair-dim);
+}
+
+.guidance-ring-arc {
+  stroke: var(--tone);
+  transition: stroke-dashoffset 0.12s linear;
+}
+
+.guidance-ring-text {
+  fill: var(--b1-text);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.guidance-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.guidance-kicker {
+  color: var(--tone);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+.guidance-name {
+  font-size: 15px;
+  color: var(--b1-text);
+}
+
+.guidance-hint {
+  color: var(--tone);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  opacity: 0.9;
+}
+
+.guidance-hint[hidden] {
+  display: none;
+}
+
+.guidance-skip {
+  flex: none;
+  pointer-events: auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--hud-border);
+  border-radius: 6px;
+  background: rgba(110, 220, 200, 0.12);
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.guidance-skip[hidden] {
+  display: none;
+}
+
+.guidance-skip:hover,
+.guidance-skip:focus-visible {
+  color: var(--hud-accent);
+  border-color: var(--hud-accent);
+}

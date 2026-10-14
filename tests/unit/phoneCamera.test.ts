@@ -1,10 +1,9 @@
-/** F-PHONE-CAMERA: phone landscape view shift and short mission titles. */
+/** Phone landscape view shift. */
 
 import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { CameraRig, PHONE_LANDSCAPE_SHIFT } from '../../src/sub/CameraRig.js';
-import { phoneMissionTitle } from '../../src/ui/ObjectivesPanel.js';
 
 describe('phone landscape view shift', () => {
   it('slides the sub left on screen only when enabled, and clears again', () => {
@@ -18,15 +17,5 @@ describe('phone landscape view shift', () => {
     expect(after).toBeLessThan(before - PHONE_LANDSCAPE_SHIFT);
     rig.setPhoneLandscape(false);
     expect(sub.clone().project(rig.camera).x).toBeCloseTo(before, 5);
-  });
-});
-
-describe('phoneMissionTitle', () => {
-  it('shortens the long titles and leaves short ones alone', () => {
-    expect(phoneMissionTitle('Lost City hydrothermal field dive')).toBe('Lost City dive');
-    expect(phoneMissionTitle('Lighthouse Reef: around the Great Blue Hole')).toBe(
-      'Lighthouse Reef',
-    );
-    expect(phoneMissionTitle('Titanic dive')).toBe('Titanic dive');
   });
 });

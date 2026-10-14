@@ -86,7 +86,9 @@ export function createSubmarineSystem(): GameSystem {
             );
           previousSettings = next;
           if (changed.includes('gameplayMode') && !startOnly)
-            ctx.hud?.notice('Hull and site access changes apply when you load your next dive.');
+            ctx.guidance?.notice(
+              'Hull and site access changes apply when you load your next dive.',
+            );
         }),
       );
       // D-START: keep URL probes deterministic even when a mission uses a

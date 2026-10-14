@@ -1,6 +1,6 @@
 /**
- * The dive HUD (depth, heading, speed, hull, warnings, prompts and control
- * tips). Other systems feed it in the `hud.feeds` stage; it draws in
+ * The dive HUD (depth, heading, speed, supplies and the hull gauge). Its
+ * warnings go to the guidance slot. Other systems feed it in the `hud.feeds` stage; it draws in
  * `hud.draw`.
  */
 
@@ -42,18 +42,15 @@ export const hudSystem: GameSystem = {
   },
   frame: {
     'hud.draw': (f, ctx) => {
-      const { hud, discovery, input, sub } = ctx;
-      const scanView = discovery.scanner.view;
-      const key = (action: Parameters<typeof input.primaryKeyLabel>[0]): string =>
-        input.primaryKeyLabel(action);
+      const { hud, discovery, sub, guidance, missionRouter } = ctx;
       hud.update(f.sub, {
         nearScanTarget: discovery.focusPoint() !== null,
-        // The objectives panel already shows the current objective; a second
-        // copy here crowded the screen (owner playtest).
-        objective: undefined,
-        scanPrompt: scanView.candidateId ? `${key('scan')} Scan · ${scanView.nearestName}` : null,
         simSpeed: sub.simSpeed,
       });
+      // Warnings are shown by the guidance slot, so they never need their own
+      // spot on the screen. The router's emergency-ascent message wins.
+      const text = missionRouter?.alert ?? hud.warning;
+      guidance.offer('warning', 'urgent', text ? { kicker: 'WARNING', text, tone: 'alert' } : null);
     },
   },
 };

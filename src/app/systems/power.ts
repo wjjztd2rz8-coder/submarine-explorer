@@ -32,7 +32,7 @@ export function createPowerSystem(): GameSystem {
               if (depth < 25) return;
               const reserve = startingReserves(depth, ctx.effective.submarine, ctx.effective.power);
               power.setLevels(reserve.battery, reserve.oxygen);
-              ctx.hud.notice(
+              ctx.guidance.notice(
                 `Descent to ${Math.round(depth).toLocaleString('en-US')} m used ${Math.round((1 - reserve.battery) * 100)}% battery`,
               );
             }),

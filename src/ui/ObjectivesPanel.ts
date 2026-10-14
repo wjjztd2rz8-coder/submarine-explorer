@@ -2,8 +2,9 @@
  * Mission objectives HUD panel. The top-right list shows all short missions;
  * long missions show the current objective and the next few. Navigation and
  * the current hint sit under the list; Esc keeps the full list available.
- * Under it: the amber alert strip and the completion banner
- * ("Primary objectives complete" with Keep exploring / Surface and debrief).
+ * Under it: the completion banner ("Primary objectives complete" with Keep
+ * exploring / Surface and debrief). On phones only the banner shows; the
+ * guidance slot carries the current objective.
  *
  * Bearings use the HUD's compass convention (0 = north, 90 = east); the
  * router computes them with `headingFromForward` from geo.ts, the same maths
@@ -89,19 +90,6 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return e;
 }
 
-/**
- * Short mission name for phone landscape: drop the subtitle after ':' or ',' and
- * the "hydrothermal field" qualifier, e.g. "Lost City hydrothermal field dive"
- * -> "Lost City dive", "Lighthouse Reef: around the Great Blue Hole" -> "Lighthouse Reef".
- */
-export function phoneMissionTitle(title: string): string {
-  const head = title
-    .split(/[:,]/)[0]!
-    .replace(/ hydrothermal field/i, '')
-    .trim();
-  return head || title;
-}
-
 export class ObjectivesPanel {
   readonly root: HTMLDivElement;
   private readonly titleEl: HTMLSpanElement;
@@ -111,12 +99,12 @@ export class ObjectivesPanel {
   private objectives: readonly ObjectiveStatus[] = [];
   private currentId: string | null = null;
   private readonly progressEl: HTMLDivElement;
-  private readonly alertEl: HTMLDivElement;
   private readonly bannerEl: HTMLDivElement;
   private readonly bannerTitle: HTMLElement;
   private readonly bannerDetail: HTMLElement;
   private readonly bannerStars: HTMLElement;
   private banner: CompletionBanner | null = null;
+  private wanted = true;
   private readonly navText = new Map<string, HTMLSpanElement>();
   private readonly cache = new Map<string, string>();
   private resizeObserver: ResizeObserver | null = null;
@@ -136,11 +124,6 @@ export class ObjectivesPanel {
       this.navEl.append(span);
     }
     this.progressEl = el('div', 'obj-progress');
-    // Amber alert strip (e.g. HULL FAILURE — EMERGENCY ASCENT); hidden when empty.
-    this.alertEl = el('div', 'obj-alert');
-    this.alertEl.setAttribute('role', 'alert');
-    this.alertEl.hidden = true;
-
     // Completion banner. Never takes focus: the player's hands are on the
     // flight keys, and Space/Enter on a focused button would end the dive.
     this.bannerEl = el('div', 'obj-banner');
@@ -168,15 +151,7 @@ export class ObjectivesPanel {
     actions.append(keep, surface);
     this.bannerEl.append(text, actions);
 
-    this.root.append(
-      head,
-      this.listEl,
-      this.navEl,
-      this.hintEl,
-      this.progressEl,
-      this.alertEl,
-      this.bannerEl,
-    );
+    this.root.append(head, this.listEl, this.navEl, this.hintEl, this.progressEl, this.bannerEl);
     parent.appendChild(this.root);
 
     // Telemetry sits below this panel; track its live height.
@@ -193,27 +168,21 @@ export class ObjectivesPanel {
     }
   }
 
-  /** Show (or with null, clear) the amber alert strip. */
-  setAlert(text: string | null): void {
-    this.write(this.alertEl, 'alert', text ?? '');
-    this.alertEl.hidden = !text;
+  setVisible(visible: boolean): void {
+    this.wanted = visible;
+    this.sync();
   }
 
-  setVisible(visible: boolean): void {
-    this.root.hidden = !visible;
+  /** Phones show only the completion banner; the guidance slot names the objective. */
+  private sync(): void {
+    const touch = document.documentElement.classList.contains('is-touch');
+    this.root.hidden = !this.wanted || (touch && this.bannerEl.hidden);
   }
 
   setTitle(title: string): void {
-    const text = `MISSION · ${title.toUpperCase()}`;
-    // The prefix has its own span so phone landscape can drop it and fit the name.
-    // F-PHONE-CAMERA: a shorter phone label (not smaller text) so long names do not ellipsize.
-    this.titleEl.replaceChildren(
-      el('span', 'obj-title-prefix', 'MISSION · '),
-      el('span', 'obj-title-full', title.toUpperCase()),
-      el('span', 'obj-title-short', phoneMissionTitle(title).toUpperCase()),
-    );
-    // QA-C #2: long titles are truncated by CSS; the full text stays on hover.
-    this.titleEl.title = text;
+    this.titleEl.textContent = `MISSION · ${title.toUpperCase()}`;
+    // Long titles are truncated by CSS; the full text stays on hover.
+    this.titleEl.title = this.titleEl.textContent;
   }
 
   /** Refresh the "n of m" progress line. Cheap; called when an objective changes. */
@@ -234,11 +203,13 @@ export class ObjectivesPanel {
     this.bannerStars.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
     this.bannerStars.setAttribute('aria-label', `${stars} of 3 stars`);
     this.bannerEl.hidden = false;
+    this.sync();
   }
 
   hideBanner(): void {
     this.banner = null;
     this.bannerEl.hidden = true;
+    this.sync();
   }
 
   get bannerOpen(): boolean {
@@ -247,6 +218,7 @@ export class ObjectivesPanel {
 
   /** The nav line; `allPrimaryDone` marks the target as optional, or shows a notice when none is left. */
   setNav(nav: NavReadout | null, allPrimaryDone: boolean): void {
+    this.sync();
     const currentId = currentObjectiveId(this.objectives, nav?.id ?? this.currentId);
     if (this.currentId !== currentId) {
       this.currentId = currentId;

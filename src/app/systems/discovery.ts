@@ -32,6 +32,7 @@ export const discoverySystem: GameSystem = {
       },
     });
     ctx.discovery = discovery;
+    ctx.guidance = discovery.overlay.slot;
     ctx.journal = discovery.guide;
     ctx.discoveries = discovery.store;
     cleanup.add(() => discovery.dispose());

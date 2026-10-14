@@ -569,20 +569,24 @@ export class MissionRouter {
     this.panel.hideBanner();
   }
 
-  /** Crush depth: amber banner now, the aborted debrief once the blow ends. */
+  /** Crush depth: urgent message now, the aborted debrief once the blow ends. */
   private onEmergencyBlow(depth: number, cause: 'crush' | 'power' = 'crush'): void {
     if (!this.mission.diving) return;
     this.blow = { depth, cause };
     this.clearBanner();
-    this.panel.setAlert(
-      cause === 'power' ? 'SUPPLIES EXHAUSTED — EMERGENCY ASCENT' : HULL_FAILURE_ALERT,
-    );
+  }
+
+  /** The emergency-ascent message while a blow runs; the guidance slot shows it. */
+  get alert(): string | null {
+    if (!this.blow) return null;
+    return this.blow.cause === 'power'
+      ? 'SUPPLIES EXHAUSTED — EMERGENCY ASCENT'
+      : HULL_FAILURE_ALERT;
   }
 
   private onBlowComplete(): void {
     const at = this.blow;
     this.blow = null;
-    this.panel.setAlert(null);
     if (!at) return;
     this.mission.abort(at.cause);
     if (this.mission.state !== 'aborted') return;

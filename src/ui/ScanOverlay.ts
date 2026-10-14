@@ -1,21 +1,21 @@
 /**
- * Scan HUD (DOM + inline SVG only, never the WebGL canvas).
+ * Scan HUD (DOM only, never the WebGL canvas).
  *
  * - A thin corner-bracket reticle over the nearest POI's screen position.
- * - A small panel: target name, range/facing hint or "HOLD F TO SCAN", and a
- *   cyan progress ring while the beam is on. Amber marks states that need the
- *   pilot's attention (interrupted, out of range, turn to face).
- * - After a completion, a "NEW ENTRY" confirmation with the field-guide key.
+ * - The scan, discovery and objective messages for the guidance slot: target
+ *   name and "HOLD F TO SCAN", a progress ring while the beam is on, the
+ *   "NEW ENTRY" confirmation, and the "where next" objective line. Amber marks
+ *   states that need the pilot's attention (interrupted, turn to face).
  *
  * Colours follow docs/art-direction.md §5: cyan #2ED9D9 for the beam and nav
  * readouts, amber #FFB020 for attention, neutral #CDE0E5 for labels.
  */
 
 import type { ScanConfig } from '../core/Config.js';
+import type { GuidanceMessage } from '../game/Guidance.js';
 import type { ScanView } from '../game/Scanner.js';
+import { GuidanceSlot } from './GuidanceSlot.js';
 import { reticleClearOfControls } from './ScanReticleLayout.js';
-
-const SVG_NS = 'http://www.w3.org/2000/svg';
 
 export interface ScreenPoint {
   x: number;
@@ -27,23 +27,13 @@ export interface ScanOverlayKeys {
   guide: string;
 }
 
-type Tone = 'cyan' | 'amber' | 'dim';
+const isTouch = (): boolean => document.documentElement.classList.contains('is-touch');
 
 export class ScanOverlay {
   readonly root: HTMLDivElement;
-  /** Shared flow for the target card and contextual hint, including wrapped text. */
-  readonly messages: HTMLDivElement;
+  /** The one guidance card; every text source offers its message here. */
+  readonly slot: GuidanceSlot;
   private readonly reticle: HTMLDivElement;
-  private readonly panel: HTMLDivElement;
-  private readonly chip: HTMLDivElement;
-  private readonly kicker: HTMLDivElement;
-  private readonly nameEl: HTMLDivElement;
-  private readonly hint: HTMLDivElement;
-  private readonly ringArc: SVGCircleElement;
-  private readonly ringText: SVGTextElement;
-  private readonly circumference: number;
-  private readonly cache = new Map<string, string>();
-  private bannerLeft = 0;
   private suppressed = false;
 
   constructor(
@@ -55,7 +45,6 @@ export class ScanOverlay {
   ) {
     this.root = document.createElement('div');
     this.root.className = 'scan-overlay';
-    this.root.style.setProperty('--scan-ring-size', `${config.ringSizePx}px`);
     this.root.style.setProperty('--scan-reticle-size', `${config.reticleSizePx}px`);
 
     this.reticle = document.createElement('div');
@@ -66,72 +55,18 @@ export class ScanOverlay {
       c.className = `scan-reticle-corner ${corner}`;
       this.reticle.appendChild(c);
     }
-
-    this.panel = document.createElement('div');
-    this.panel.className = 'scan-panel';
-    this.panel.hidden = true;
-
-    // Progress ring: a hairline track plus an arc drawn with stroke-dashoffset.
-    const size = config.ringSizePx;
-    const r = size / 2 - config.ringStrokePx - 1;
-    this.circumference = 2 * Math.PI * r;
-    const svg = document.createElementNS(SVG_NS, 'svg');
-    svg.setAttribute('class', 'scan-ring');
-    svg.setAttribute('width', String(size));
-    svg.setAttribute('height', String(size));
-    svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
-    const track = document.createElementNS(SVG_NS, 'circle');
-    track.setAttribute('class', 'scan-ring-track');
-    this.ringArc = document.createElementNS(SVG_NS, 'circle');
-    this.ringArc.setAttribute('class', 'scan-ring-arc');
-    for (const c of [track, this.ringArc]) {
-      c.setAttribute('cx', String(size / 2));
-      c.setAttribute('cy', String(size / 2));
-      c.setAttribute('r', String(r));
-      c.setAttribute('stroke-width', String(config.ringStrokePx));
-      c.setAttribute('fill', 'none');
-      svg.appendChild(c);
-    }
-    // Start the arc at 12 o'clock and fill clockwise.
-    this.ringArc.setAttribute('transform', `rotate(-90 ${size / 2} ${size / 2})`);
-    this.ringArc.setAttribute('stroke-dasharray', String(this.circumference));
-    this.ringArc.setAttribute('stroke-dashoffset', String(this.circumference));
-    this.ringText = document.createElementNS(SVG_NS, 'text');
-    this.ringText.setAttribute('class', 'scan-ring-text');
-    this.ringText.setAttribute('x', String(size / 2));
-    this.ringText.setAttribute('y', String(size / 2));
-    this.ringText.setAttribute('text-anchor', 'middle');
-    this.ringText.setAttribute('dominant-baseline', 'central');
-    svg.appendChild(this.ringText);
-
-    const text = document.createElement('div');
-    text.className = 'scan-text';
-    this.kicker = document.createElement('div');
-    this.kicker.className = 'scan-kicker';
-    this.nameEl = document.createElement('div');
-    this.nameEl.className = 'scan-name';
-    this.hint = document.createElement('div');
-    this.hint.className = 'scan-hint';
-    text.append(this.kicker, this.nameEl, this.hint);
-
-    this.panel.append(svg, text);
-    this.messages = document.createElement('div');
-    this.messages.className = 'scan-stack';
-    this.chip = document.createElement('div');
-    this.chip.className = 'scan-objective-chip';
-    this.chip.hidden = true;
-    this.messages.append(this.panel, this.chip);
-    this.root.append(this.reticle, this.messages);
+    this.slot = new GuidanceSlot(config.ringSizePx, config.ringStrokePx);
+    this.root.append(this.reticle, this.slot.root);
     parent.appendChild(this.root);
   }
 
-  /** Hide everything (e.g. while the field guide is open). */
+  /** Hide the beam's own guidance (e.g. while the field guide is open). */
   setSuppressed(suppressed: boolean): void {
     this.suppressed = suppressed;
     if (suppressed) {
-      this.panel.hidden = true;
       this.reticle.hidden = true;
-      this.chip.hidden = true;
+      for (const source of ['scan', 'objective', 'complete'] as const)
+        this.slot.offer(source, 'scan', null);
     }
   }
 
@@ -142,42 +77,26 @@ export class ScanOverlay {
     keys: ScanOverlayKeys,
     kind: 'scan' | 'sample' = 'scan',
   ): void {
-    // Completion events can arrive between overlay updates. Replace the
-    // navigation cue immediately instead of leaving both messages visible.
-    this.chip.hidden = true;
-    this.bannerLeft = this.config.completeBannerSeconds;
-    this.setTone(firstTime || kind === 'sample' ? 'cyan' : 'dim');
-    this.setText(this.kicker, 'kicker', firstTime ? 'NEW ENTRY' : 'SCAN COMPLETE');
-    this.setText(this.nameEl, 'name', title);
-    this.setText(
-      this.hint,
-      'hint',
-      kind === 'sample'
-        ? 'STOWED FOR THIS DIVE'
-        : firstTime
-          ? document.documentElement.classList.contains('is-touch')
-            ? 'PAUSE → JOURNAL'
-            : `PRESS ${keys.guide} · JOURNAL`
-          : `LOGGED · JOURNAL`,
+    if (this.suppressed) return;
+    this.slot.flash(
+      'complete',
+      'discovery',
+      {
+        kicker: firstTime ? 'NEW ENTRY' : 'SCAN COMPLETE',
+        text: title,
+        detail:
+          kind === 'sample'
+            ? 'STOWED FOR THIS DIVE'
+            : firstTime
+              ? isTouch()
+                ? 'PAUSE → JOURNAL'
+                : `PRESS ${keys.guide} · JOURNAL`
+              : 'LOGGED · JOURNAL',
+        tone: firstTime || kind === 'sample' ? 'cyan' : 'dim',
+        ring: { progress: 1, label: 'OK' },
+      },
+      this.config.completeBannerSeconds,
     );
-    this.setRing(1, 'OK');
-    this.panel.classList.add('is-complete');
-    if (!this.suppressed) this.panel.hidden = false;
-  }
-
-  /** True while the completion confirmation is up. */
-  get bannerActive(): boolean {
-    return this.bannerLeft > 0;
-  }
-
-  /** Includes target, interrupted scan and completion cards. */
-  get cardVisible(): boolean {
-    return !this.panel.hidden;
-  }
-
-  /** An actionable card is up: a target in range, a scan in progress, or a result. Dim cards only navigate. */
-  get promptActive(): boolean {
-    return !this.panel.hidden && this.panel.dataset.tone !== 'dim';
   }
 
   /**
@@ -185,43 +104,17 @@ export class ScanOverlay {
    *   off-screen / behind the camera.
    */
   update(view: ScanView, keys: ScanOverlayKeys, screen: ScreenPoint | null, dt: number): void {
-    this.updateCard(view, keys, screen, dt);
-    this.updateChip(view);
-  }
-
-  /** Touch only: a one-line "where next" cue while no scan card is showing. */
-  private updateChip(view: ScanView): void {
-    const show =
-      document.documentElement.classList.contains('is-touch') &&
-      !this.suppressed &&
-      this.panel.hidden &&
-      view.objectiveId !== null &&
-      view.objectiveName !== '';
-    this.chip.hidden = !show;
-    if (!show) return;
-    const d = Number.isFinite(view.objectiveDistance)
-      ? ` · ${view.objectiveDistance.toFixed(0)} m`
-      : '';
-    this.setText(this.chip, 'chip', `▸ ${view.objectiveName}${d}`);
-  }
-
-  private updateCard(
-    view: ScanView,
-    keys: ScanOverlayKeys,
-    screen: ScreenPoint | null,
-    dt: number,
-  ): void {
-    const scan = document.documentElement.classList.contains('is-touch') ? 'SCAN' : keys.scan;
-    if (this.bannerLeft > 0) {
-      this.bannerLeft -= dt;
-      if (this.bannerLeft <= 0) this.panel.classList.remove('is-complete');
-    }
+    this.slot.tick(dt);
     if (this.suppressed) return;
+    this.updateReticle(view, screen);
+    const { scan, objective } = this.messages(view, keys);
+    this.slot.offer('scan', 'scan', scan);
+    this.slot.offer('objective', 'objective', objective);
+  }
 
-    const hasTarget = view.nearestId !== null || view.activeId !== null;
-    // Reticle over the nearest contact.
+  private updateReticle(view: ScanView, screen: ScreenPoint | null): void {
     const controls =
-      screen && document.documentElement.classList.contains('is-touch')
+      screen && isTouch()
         ? Array.from(
             document.querySelectorAll<HTMLElement>(
               '.tc-stick, .tc-slider, .tc-buttons, .tc-btn-pause',
@@ -244,56 +137,55 @@ export class ScanOverlay {
     } else {
       this.reticle.hidden = true;
     }
+  }
 
-    if (this.bannerLeft > 0) return;
-    if (!hasTarget || (view.phase === 'idle' && !view.nearestInRange)) {
-      this.panel.hidden = true;
-      return;
-    }
-    this.panel.hidden = false;
-
+  /** What the scan beam and the objective each have to say right now. */
+  private messages(
+    view: ScanView,
+    keys: ScanOverlayKeys,
+  ): { scan: GuidanceMessage | null; objective: GuidanceMessage | null } {
+    const touch = isTouch();
+    const scan = touch ? 'SCAN' : keys.scan;
+    const none = { scan: null, objective: null };
+    const hasTarget = view.nearestId !== null || view.activeId !== null;
+    if (!hasTarget && view.objectiveId === null) return none;
     const dist = Number.isFinite(view.nearestDistance)
       ? `${view.nearestDistance.toFixed(0)} m`
       : '';
-    if (view.phase === 'scanning') {
-      this.setTone('cyan');
-      this.setText(
-        this.kicker,
-        'kicker',
-        view.activeId?.startsWith('sample:') ? 'COLLECTING SAMPLE' : 'SCANNING',
-      );
-      this.setText(this.nameEl, 'name', view.activeName);
-      this.setText(this.hint, 'hint', `HOLD ${scan} · KEEP ON TARGET`);
-      this.setRing(view.progress, `${Math.floor(view.progress * 100)}%`);
-      return;
-    }
 
-    if (view.nearestScanned && view.nearestInRange) {
-      this.setTone('dim');
-      this.setText(this.kicker, 'kicker', '✓ SCANNED THIS DIVE');
-      this.setText(this.nameEl, 'name', view.nearestName);
-      this.setText(this.hint, 'hint', 'Logged · Journal');
-      this.setRing(1, '✓');
-      return;
+    if (view.phase === 'scanning') {
+      return {
+        scan: {
+          kicker: view.activeId?.startsWith('sample:') ? 'COLLECTING SAMPLE' : 'SCANNING',
+          text: view.activeName,
+          detail: `HOLD ${scan} · KEEP ON TARGET`,
+          tone: 'cyan',
+          ring: { progress: view.progress, label: `${Math.floor(view.progress * 100)}%` },
+        },
+        objective: null,
+      };
     }
     if (view.phase === 'interrupted') {
-      this.setTone('amber');
-      this.setText(this.kicker, 'kicker', 'SCAN INTERRUPTED');
-      this.setText(this.nameEl, 'name', view.activeName);
       const why =
         view.lastAbort === 'range'
           ? 'OUT OF RANGE'
           : view.lastAbort === 'facing'
             ? 'BEAM OFF TARGET'
             : `HOLD ${scan} TO RESUME`;
-      this.setText(this.hint, 'hint', why);
-      this.setRing(view.progress, `${Math.floor(view.progress * 100)}%`);
-      return;
+      return {
+        scan: {
+          kicker: 'SCAN INTERRUPTED',
+          text: view.activeName,
+          detail: why,
+          tone: 'amber',
+          ring: { progress: view.progress, label: `${Math.floor(view.progress * 100)}%` },
+        },
+        objective: null,
+      };
     }
 
-    // Idle: guide the pilot towards a scannable pose. The scan prompt follows
-    // the candidate; where-to-go guidance follows the mission objective.
-    const touch = document.documentElement.classList.contains('is-touch');
+    // Guide the pilot towards a scannable pose. The scan prompt follows the
+    // candidate; where-to-go guidance follows the mission objective.
     const guide = (turn: number, vert: number, fallback: string): string => {
       if (Math.abs(turn) >= 10) {
         return `TURN ${Math.abs(turn).toFixed(0)}° ${turn >= 0 ? 'STARBOARD' : 'PORT'}`;
@@ -302,75 +194,58 @@ export class ScanOverlay {
       if (touch) return vert >= 0 ? 'RISE TOWARD TARGET' : 'SINK TOWARD TARGET';
       return fallback;
     };
-    const objective = view.objectiveId != null && view.objectiveId !== view.nearestId;
     if (view.candidateId !== null) {
-      this.setText(this.nameEl, 'name', view.nearestName);
-      this.setRing(0, dist);
-      this.setTone('cyan');
-      this.setText(this.kicker, 'kicker', 'SCAN TARGET');
-      this.setText(
-        this.hint,
-        'hint',
-        view.nearestId?.startsWith('sample:') ? `HOLD ${scan} TO COLLECT` : `HOLD ${scan} TO SCAN`,
-      );
-    } else if (objective) {
-      // Objective guidance replaces the nearest-contact guidance.
-      this.setText(this.nameEl, 'name', view.objectiveName);
-      this.setRing(0, `${view.objectiveDistance.toFixed(0)} m`);
-      this.setTone(view.objectiveInRange ? 'amber' : 'dim');
-      this.setText(this.kicker, 'kicker', 'OBJECTIVE');
+      return {
+        scan: {
+          kicker: 'SCAN TARGET',
+          text: view.nearestName,
+          detail: view.nearestId?.startsWith('sample:')
+            ? `HOLD ${scan} TO COLLECT`
+            : `HOLD ${scan} TO SCAN`,
+          tone: 'cyan',
+          ring: { progress: 0, label: dist },
+        },
+        objective: null,
+      };
+    }
+    // A scanned contact needs no more guidance; look onward.
+    const scanned = view.nearestScanned && view.nearestInRange;
+    const objectiveReady = view.objectiveId === view.nearestId && view.nearestInRange;
+    if (view.objectiveId != null && view.objectiveName && !objectiveReady) {
       const turn = view.objectiveTurnDeg;
       const near = `CLOSE TO ${view.objectiveRadius.toFixed(0)} M`;
-      const msg = view.objectiveInRange
-        ? guide(turn, view.objectiveVertDeg, 'PITCH TOWARD TARGET')
-        : Math.abs(turn) >= 10
-          ? guide(turn, 0, near)
-          : near;
-      this.setText(this.hint, 'hint', msg);
-    } else if (!view.nearestInRange) {
-      this.setText(this.nameEl, 'name', view.nearestName);
-      this.setRing(0, dist);
-      this.setTone('dim');
-      this.setText(this.kicker, 'kicker', 'CONTACT');
-      this.setText(this.hint, 'hint', `CLOSE TO ${view.nearestRadius.toFixed(0)} M`);
-    } else {
-      this.setText(this.nameEl, 'name', view.nearestName);
-      this.setRing(0, dist);
-      this.setTone('amber');
-      this.setText(this.kicker, 'kicker', 'SCAN TARGET');
-      this.setText(
-        this.hint,
-        'hint',
-        guide(view.nearestTurnDeg, view.nearestVertDeg, 'PITCH TOWARD TARGET'),
-      );
+      return {
+        scan: null,
+        objective: {
+          kicker: 'OBJECTIVE',
+          text: view.objectiveName,
+          detail: view.objectiveInRange
+            ? guide(turn, view.objectiveVertDeg, 'PITCH TOWARD TARGET')
+            : Math.abs(turn) >= 10
+              ? guide(turn, 0, near)
+              : near,
+          tone: view.objectiveInRange ? 'amber' : 'dim',
+          ring: { progress: 0, label: `${view.objectiveDistance.toFixed(0)} m` },
+        },
+      };
     }
-  }
-
-  private setTone(tone: Tone): void {
-    if (this.cache.get('tone') === tone) return;
-    this.cache.set('tone', tone);
-    this.panel.dataset.tone = tone;
-  }
-
-  private setRing(progress: number, label: string): void {
-    const offset = (this.circumference * (1 - Math.max(0, Math.min(1, progress)))).toFixed(2);
-    if (this.cache.get('ring') !== offset) {
-      this.cache.set('ring', offset);
-      this.ringArc.setAttribute('stroke-dashoffset', offset);
+    if (hasTarget && view.nearestInRange && !scanned) {
+      return {
+        scan: {
+          kicker: 'SCAN TARGET',
+          text: view.nearestName,
+          detail: guide(view.nearestTurnDeg, view.nearestVertDeg, 'PITCH TOWARD TARGET'),
+          tone: 'amber',
+          ring: { progress: 0, label: dist },
+        },
+        objective: null,
+      };
     }
-    if (this.cache.get('ringText') !== label) {
-      this.cache.set('ringText', label);
-      this.ringText.textContent = label;
-    }
-  }
-
-  private setText(el: HTMLElement, key: string, text: string): void {
-    if (this.cache.get(key) === text) return;
-    this.cache.set(key, text);
-    el.textContent = text;
+    return none;
   }
 
   dispose(): void {
+    this.slot.dispose();
     this.root.remove();
   }
 }

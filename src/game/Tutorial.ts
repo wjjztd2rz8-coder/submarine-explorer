@@ -4,6 +4,8 @@
  * the sim sees each frame plus a few events; it never touches input handling.
  */
 
+import type { InputDevice } from '../ui/ControlsCard.js';
+
 export type TutorialStepId = 'move' | 'depth' | 'scan';
 export type TutorialEvent = 'scan:complete' | 'scan:started' | 'scan:aborted';
 
@@ -138,5 +140,50 @@ export class Tutorial {
     }
     if (this.finished) this.active_ = false;
     return true;
+  }
+}
+
+export interface TutorialKeys {
+  move: string;
+  turn: string;
+  rise: string;
+  sink: string;
+  scan: string;
+}
+
+/** Instruction text for a step on the given device. */
+export function tutorialText(
+  id: TutorialStepId,
+  device: InputDevice,
+  k: TutorialKeys,
+  scanProgress: number | null = null,
+  destination?: string,
+): string {
+  switch (id) {
+    case 'move': {
+      if (device === 'touch')
+        return destination
+          ? 'Left stick: follow the marker.'
+          : 'Push left stick forward; sideways to turn.';
+      const guidance = destination ? `Follow the marker toward ${destination}. ` : '';
+      return (
+        guidance +
+        (device === 'gamepad'
+          ? 'Use the left stick: up to move, sideways to turn.'
+          : `Hold ${k.move} to move, then ${k.turn} to turn.`)
+      );
+    }
+    case 'depth':
+      return device === 'touch'
+        ? 'Right slider: up to rise, down to sink.'
+        : device === 'gamepad'
+          ? `Press ${k.rise} to rise or ${k.sink} to sink.`
+          : `Hold ${k.rise} to rise or ${k.sink} to sink.`;
+    case 'scan':
+      if (scanProgress !== null)
+        return `Scanning… ${Math.round(Math.max(0, Math.min(1, scanProgress)) * 100)}% · keep holding ${device === 'touch' ? 'SCAN' : k.scan}.`;
+      return device === 'touch'
+        ? 'Hold SCAN on a glowing target.'
+        : `Hold ${k.scan} on a glowing target.`;
   }
 }

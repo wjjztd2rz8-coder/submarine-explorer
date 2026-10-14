@@ -45,31 +45,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.hud-warning {
-  position: absolute;
-  top: calc(20px + env(safe-area-inset-top, 0px));
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 8px 18px;
-  border: 1px solid var(--hud-warn);
-  border-radius: 4px;
-  background: rgba(60, 8, 8, 0.75);
-  color: var(--hud-warn);
-  letter-spacing: 0.12em;
-  font-weight: 700;
-  animation: hud-pulse 1.1s ease-in-out infinite;
-}
-
-.hud-warning[hidden] {
-  display: none !important;
-}
-
-@keyframes hud-pulse {
-  50% {
-    opacity: 0.45;
-  }
-}
-
 .hud-footer {
   position: absolute;
   right: calc(12px + env(safe-area-inset-right, 0px));

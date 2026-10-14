@@ -1,6 +1,7 @@
 import type { CurrentMode } from '../core/config/modes.js';
 /**
- * DOM overlay HUD. Plain DOM on purpose -- no framework, and it never touches
+ * DOM overlay HUD: readouts, supplies and the urgent-warning text. Warnings are
+ * shown by the guidance slot. Plain DOM on purpose -- no framework, and it never touches
  * the WebGL canvas, so it costs nothing per frame beyond a few textContent
  * writes (which we skip when the value has not changed).
  */
@@ -43,10 +44,8 @@ const DEFAULT_WARN: HudWarnConfig = {
 
 /** Per-frame context the physics snapshot does not carry. */
 export interface HudContext {
-  /** A scan target is within its scan radius: suppress the static proximity banner. */
+  /** A scan target is within its scan radius: suppress the static proximity warning. */
   nearScanTarget?: boolean;
-  objective?: string | null;
-  scanPrompt?: string | null;
   simSpeed?: number;
 }
 
@@ -98,11 +97,7 @@ export class HUD {
   readonly root: HTMLDivElement;
   private readonly values = new Map<Field, HTMLSpanElement>();
   private readonly cache = new Map<Field, string>();
-  private readonly warningEl: HTMLDivElement;
   private readonly hullGauge: HullGauge;
-  private readonly noticeEl: HTMLDivElement;
-  private readonly objectiveEl: HTMLDivElement;
-  private readonly promptEl: HTMLDivElement;
   private readonly speedEl: HTMLDivElement;
   private readonly resetCameraEl: HTMLButtonElement;
   private readonly powerEl: HTMLDivElement;
@@ -112,6 +107,8 @@ export class HUD {
   private current = { dirDeg: 0, speedMps: 0 };
   private powerState: PowerState | undefined;
   private hullNote = '';
+  /** The urgent message for the guidance slot (hull, supplies, seabed), or null. */
+  warning: string | null = null;
   private readoutsObserver: ResizeObserver | null = null;
 
   constructor(
@@ -136,10 +133,6 @@ export class HUD {
         <div class="hud-current" hidden aria-label="Current direction and speed"><span class="hud-current-arrow">↑</span><span class="hud-current-text"></span></div>
         <div class="hud-sim-speed" hidden></div>
       </div>
-      <div class="hud-warning" hidden></div>
-      <div class="hud-notice" hidden></div>
-      <div class="hud-objective" hidden></div>
-      <div class="hud-prompt" hidden></div>
       <div class="hud-footer">
         <button class="hud-journal" type="button" title="Journal (J)" aria-label="Journal (J)">JOURNAL</button>
         <button class="hud-reset-camera" type="button" aria-label="Reset camera">Reset camera</button>
@@ -148,11 +141,7 @@ export class HUD {
     for (const el of this.root.querySelectorAll<HTMLSpanElement>('[data-field]')) {
       this.values.set(el.dataset.field as Field, el);
     }
-    this.warningEl = this.root.querySelector('.hud-warning') as HTMLDivElement;
-    this.noticeEl = this.root.querySelector('.hud-notice') as HTMLDivElement;
     this.hullGauge = new HullGauge(this.root);
-    this.objectiveEl = this.root.querySelector('.hud-objective') as HTMLDivElement;
-    this.promptEl = this.root.querySelector('.hud-prompt') as HTMLDivElement;
     this.speedEl = this.root.querySelector('.hud-sim-speed') as HTMLDivElement;
     this.resetCameraEl = this.root.querySelector('.hud-reset-camera') as HTMLButtonElement;
     this.powerEl = this.root.querySelector('.hud-power') as HTMLDivElement;
@@ -189,14 +178,6 @@ export class HUD {
 
   setHullWarningStyle(style: HullWarningStyle): void {
     this.hullGauge.setStyle(style);
-  }
-
-  notice(message: string): void {
-    this.noticeEl.textContent = message;
-    this.noticeEl.hidden = false;
-    window.setTimeout(() => {
-      if (this.noticeEl.textContent === message) this.noticeEl.hidden = true;
-    }, 6000);
   }
 
   setPowerState(state: PowerState): void {
@@ -266,8 +247,6 @@ export class HUD {
     const compactSpeed = `${(s.speed * 1.94384).toFixed(1)} kn`;
     const speedEl = this.values.get('speed')!;
     if (speedEl.dataset.knots !== compactSpeed) speedEl.dataset.knots = compactSpeed;
-    this.showContext(this.objectiveEl, ctx.objective ? `OBJECTIVE · ${ctx.objective}` : null);
-    this.showContext(this.promptEl, ctx.scanPrompt);
     this.updatePower(this.powerState);
     this.showContext(
       this.speedEl,
@@ -309,12 +288,11 @@ export class HUD {
   }
 
   private showWarning(text: string): void {
-    if (this.warningEl.textContent !== text) this.warningEl.textContent = text;
-    this.warningEl.hidden = false;
+    this.warning = text;
   }
 
   private hideWarning(): void {
-    this.warningEl.hidden = true;
+    this.warning = null;
   }
 
   dispose(): void {

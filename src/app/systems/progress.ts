@@ -51,10 +51,9 @@ export function createProgressSystem(): GameSystem {
         ctx.bus.on('scan:complete', ({ landmarkId, poiId }) => {
           // Curiosity has its own rewards; avoid also awarding a generic POI.
           if (poiId.startsWith('secret:') || poiId.startsWith('sample:')) return;
-          const earned = poiId.startsWith('life:')
-            ? progress.award('species', poiId.slice('life:'.length))
-            : progress.award('poi', `${landmarkId}/${poiId}`);
-          if (earned) ctx.hud.notice(`New discovery · +${earned} RP`);
+          // The NEW ENTRY card announces the discovery; no second toast.
+          if (poiId.startsWith('life:')) progress.award('species', poiId.slice('life:'.length));
+          else progress.award('poi', `${landmarkId}/${poiId}`);
         }),
       );
       cleanup.add(

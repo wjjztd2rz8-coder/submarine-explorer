@@ -18,7 +18,6 @@ import {
 } from '../../game/Secrets.js';
 import { buildSecret, disposeExploreMesh, seatOnSeabed } from '../../game/SecretsVisual.js';
 import { Samples, placeSamples, type SampleTarget } from '../../game/Samples.js';
-import { ExploreNotice } from '../../ui/ExploreNotice.js';
 import type { ExplorationSummary } from '../../ui/Debrief.js';
 import type { GameContext } from '../context.js';
 import type { GameSystem } from '../System.js';
@@ -33,7 +32,8 @@ export function createExploreSystem(): GameSystem {
   const meshes: THREE.Mesh[] = [];
   const witnessed = new Set<ExploreEventKind>();
   let visual: EventsVisual;
-  let notice: ExploreNotice;
+  /** Event time at which the sighting was logged; its caption then clears soon after. */
+  let loggedAtS = Infinity;
   let effect: THREE.Points;
   let ready = false;
   let disposed = false;
@@ -57,7 +57,7 @@ export function createExploreSystem(): GameSystem {
       return false;
     }
     eventWitnessed = false;
-    notice.show(EVENT_CAPTIONS[event.kind], event.durationS);
+    loggedAtS = Infinity;
     ctx.audio.playExploreCue();
     return true;
   };
@@ -65,9 +65,6 @@ export function createExploreSystem(): GameSystem {
     name: 'explore',
     init(ctx) {
       visual = new EventsVisual(ctx.tier);
-      notice = new ExploreNotice(undefined, () =>
-        visual.screenBounds(ctx.rig.camera, window.innerWidth, window.innerHeight),
-      );
       ctx.scene.add(visual.group);
       const positions = Float32Array.from({ length: 36 }, (_, i) =>
         i % 3 === 1 ? (i / 36) * 1.5 : Math.sin(i * 7) * 1.5,
@@ -185,12 +182,12 @@ export function createExploreSystem(): GameSystem {
           samples.reset();
           witnessed.clear();
           scheduler.reset();
-          notice.clear();
+          ctx.guidance.offer('event', 'discovery', null);
           sampling = false;
           effect.visible = false;
         }),
         ctx.bus.on('app:state', ({ state }) => {
-          if (state !== 'dive') notice.clear();
+          if (state !== 'dive') ctx.guidance.offer('event', 'discovery', null);
         }),
       );
     },
@@ -223,6 +220,7 @@ export function createExploreSystem(): GameSystem {
             projected.z < 1
           ) {
             eventWitnessed = true;
+            loggedAtS = scheduler.active.elapsedS;
             const kind = scheduler.active.kind;
             witnessed.add(kind);
             const id = eventDiscoveryId(kind);
@@ -238,14 +236,24 @@ export function createExploreSystem(): GameSystem {
             optionalProgress()?.award('event', `${ctx.contentLandmark}/${kind}`);
           }
         }
-        if (scheduler.active) {
-          notice.event(
-            EVENT_CAPTIONS[scheduler.active.kind],
-            !eventWitnessed &&
-              !secretInRange(f.pilotPosition, visual.origin, EXPLORE_CONFIG.eventWitnessM),
-            eventWitnessed,
-          );
-        }
+        const live = scheduler.active;
+        const showing = !!live && !f.blocked && !f.frozen && live.elapsedS - loggedAtS < 3;
+        ctx.guidance.offer(
+          'event',
+          'discovery',
+          showing
+            ? {
+                kicker: 'SIGHTING',
+                text: EVENT_CAPTIONS[live.kind],
+                detail: eventWitnessed
+                  ? 'Sighting logged in Journal'
+                  : secretInRange(f.pilotPosition, visual.origin, EXPLORE_CONFIG.eventWitnessM)
+                    ? undefined
+                    : 'Get closer to log it',
+                tone: 'cyan',
+              }
+            : null,
+        );
         for (const [i, target] of targets.entries())
           meshes[i].visible = secretInRange(
             f.pilotPosition,
@@ -260,7 +268,6 @@ export function createExploreSystem(): GameSystem {
           )
             faint.push(target);
         ctx.sonar.setFaintContacts(faint);
-        notice.update(dt, f.blocked || f.frozen);
       },
       'scan.discovery': (f, ctx) => {
         const scanner = ctx.discovery.scanner;
@@ -281,7 +288,6 @@ export function createExploreSystem(): GameSystem {
       for (const off of disposers) off();
       for (const mesh of meshes) disposeExploreMesh(mesh);
       visual?.dispose();
-      notice?.dispose();
       effect?.geometry.dispose();
       (effect?.material as THREE.Material | undefined)?.dispose();
       effect?.removeFromParent();
