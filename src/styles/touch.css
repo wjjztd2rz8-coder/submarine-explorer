@@ -189,7 +189,9 @@
 }
 
 /* Pause lives in the HUD bar beside Journal (placed by hud-layout.css). */
+/* Pause comes first in the bar, whichever button was added first. */
 .tc-btn-pause {
+  order: -1;
   width: max(48px, calc(50px * var(--ui-scale)));
   height: max(48px, calc(50px * var(--ui-scale)));
   display: flex;

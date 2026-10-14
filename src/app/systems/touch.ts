@@ -4,6 +4,7 @@
  * only while touch is the primary input during play.
  */
 
+import { hudBar } from '../../ui/hudRegions.js';
 import { registerServiceWorker } from '../../core/Pwa.js';
 import { TouchControls } from '../../ui/TouchControls.js';
 import type { GameSystem } from '../System.js';
@@ -18,6 +19,7 @@ export function createTouchSystem(): GameSystem {
         input: ctx.input,
         canvas: ctx.canvas,
         sonar: ctx.sonar,
+        bar: hudBar(),
         onPause: () => {
           if (ctx.app.state === 'dive') ctx.setAppState('pause');
         },

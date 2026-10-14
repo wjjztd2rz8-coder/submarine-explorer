@@ -15,7 +15,6 @@
  */
 
 import { elWithClass as el } from './dom.js';
-import { hudBar } from './hudRegions.js';
 
 import type { Input } from '../core/Input.js';
 import {
@@ -37,6 +36,8 @@ interface TouchControlsOptions {
   /** Sonar state for the pinch gesture: while expanded, pinch zooms the map. */
   sonar: { readonly expanded: boolean; zoomWheel(direction: number): unknown };
   parent?: HTMLElement;
+  /** Where the Pause button goes (the HUD bar beside Journal); defaults to the controls root. */
+  bar?: HTMLElement;
 }
 
 export class TouchControls {
@@ -125,7 +126,7 @@ export class TouchControls {
     this.root.append(this.boostButton);
     (opts.parent ?? document.body).append(this.root);
     // Pause sits in the HUD bar beside Journal; it follows the controls' visibility.
-    hudBar().prepend(pause);
+    (opts.bar ?? this.root).append(pause);
     this.bindCamera();
     this.bindModeSwitch();
     // App switching and rotation can swallow pointerup; a stale centre must
