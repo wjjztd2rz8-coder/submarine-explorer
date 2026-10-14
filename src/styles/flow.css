@@ -178,6 +178,9 @@
   gap: 8px;
 }
 .debrief .debrief-rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
   margin: 12px 0;
   padding: 10px 0;
   gap: 8px 14px;
