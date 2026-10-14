@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
 /**
  * C5 settings screen (docs/settings.md), end to end:
@@ -383,7 +384,12 @@ test.describe('settings screen', () => {
 test('keyboard-only Pause, Settings and Journal preserve top-overlay ownership and focus', async ({
   page,
 }) => {
-  await boot(page, '/?tile=monterey-canyon&tier=low');
+  // Traverse the DOM without continuous software-GL frames starving keyboard
+  // round trips. Present a frame after each activation/dismissal so a leaked key
+  // still reaches the game and fails the overlay-ownership guards below.
+  await pauseClockBeforeNavigation(page);
+  await page.goto('/?tile=monterey-canyon&tier=low', { waitUntil: 'domcontentloaded' });
+  await clockFramesUntil(page, () => window.__gameReady === true);
   const pause = page.locator('.pause-menu');
   const settings = page.locator('.settings');
   const journal = page.locator('.journal');
@@ -395,8 +401,10 @@ test('keyboard-only Pause, Settings and Journal preserve top-overlay ownership a
     }
     await expect(target).toBeFocused();
     await page.keyboard.press('Enter');
+    await page.clock.fastForward(50);
   };
   await page.keyboard.press('Escape');
+  await page.clock.fastForward(50);
   await expect(pause).toBeVisible();
   const settingsOpener = '.pause-actions button:text-is("Settings")';
   await reach(settingsOpener);
@@ -406,6 +414,7 @@ test('keyboard-only Pause, Settings and Journal preserve top-overlay ownership a
   await page.keyboard.press('Shift+Tab');
   expect(await page.evaluate(() => !!document.activeElement?.closest('.settings'))).toBe(true);
   await page.keyboard.press('Escape');
+  await page.clock.fastForward(50);
   await expect(settings).toBeHidden();
   await expect(pause).toBeVisible();
   await expect(page.locator(settingsOpener)).toBeFocused();
@@ -415,10 +424,12 @@ test('keyboard-only Pause, Settings and Journal preserve top-overlay ownership a
   await page.keyboard.press('Tab');
   expect(await page.evaluate(() => !!document.activeElement?.closest('.journal'))).toBe(true);
   await page.keyboard.press('Escape');
+  await page.clock.fastForward(50);
   await expect(journal).toBeHidden();
   await expect(pause).toBeVisible();
   await expect(page.locator(journalOpener)).toBeFocused();
   await page.keyboard.press('Escape');
+  await page.clock.fastForward(50);
   await expect(pause).toBeHidden();
   expect(await page.evaluate(() => (window.__game as { appState: string }).appState)).toBe('dive');
 });

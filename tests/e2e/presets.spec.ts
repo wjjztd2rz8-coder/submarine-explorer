@@ -15,8 +15,8 @@ async function enableCurrents(page: Page): Promise<void> {
   await page.locator('.settings .mode-advanced-toggle').click();
   await page
     .getByRole('dialog', { name: 'Settings' })
-    .getByLabel('Currents')
-    .selectOption('realistic');
+    .getByRole('switch', { name: 'Currents', exact: true })
+    .check();
   await page.keyboard.press('Escape');
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => {

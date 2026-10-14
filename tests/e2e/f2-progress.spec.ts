@@ -1,3 +1,4 @@
+import { homeReady } from './helpers/home.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
@@ -177,7 +178,7 @@ test('new researcher earns RP, buys a live upgrade and earns a three-star dive',
   await sites.locator('[data-mission="blake-plateau-corals"]').scrollIntoViewIfNeeded();
   await shot(page, 'mission-select');
   await page.reload();
-  await ready(page);
+  await homeReady(page);
   await page.locator('.home-menu .progress-menu-button').click();
   await expect(page.locator('[data-upgrade="light-range"]').locator('..')).toContainText(
     'Level 1 / 3',
@@ -191,7 +192,7 @@ test('phone workshop is touch-operable and locks leave four starter missions ope
   await realistic(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await ready(page);
+  await homeReady(page);
   await page.locator('.home-menu .progress-menu-button').click();
   await expect(page.locator('.upgrades')).toBeVisible();
   const sizes = await page.locator('.upgrades button').evaluateAll((buttons) =>
@@ -281,7 +282,7 @@ test('species hook pays once and unlocks a full-depth vehicle on the next dive',
       );
   });
   await page.goto('/');
-  await ready(page);
+  await homeReady(page);
   const earned = await page.evaluate(() => {
     const progress = (
       window.__game as { progress: { award(kind: string, id: string): number; lifetime: number } }
