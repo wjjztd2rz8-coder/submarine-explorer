@@ -40,7 +40,7 @@ test('live hull warning styles show vignette, gauge, and both near the rating', 
   const vignette = page.locator('.hull-vignette');
   await expect(gauge).toContainText('11,000 m rated');
   await expect(vignette).toBeHidden();
-  await expect(page.locator('.hud-warning')).toBeHidden();
+  await expect(page.locator('.guidance-slot[data-kind="urgent"]')).toBeHidden();
   await page.screenshot({ path: `${shots}/challenger-floor.png` });
 
   await page.keyboard.press('Escape');
@@ -64,7 +64,9 @@ test('live hull warning styles show vignette, gauge, and both near the rating', 
       hullStress: 0,
     });
   });
-  await expect(page.locator('.hud-warning')).toContainText('HULL RATING EXCEEDED');
+  await expect(page.locator('.guidance-slot[data-kind="urgent"]')).toContainText(
+    'HULL RATING EXCEEDED',
+  );
   for (const style of ['vignette', 'gauge', 'both'] as const) {
     await page.evaluate((next) => {
       const save = (window.__game as { save: { save(v: object): void } }).save;

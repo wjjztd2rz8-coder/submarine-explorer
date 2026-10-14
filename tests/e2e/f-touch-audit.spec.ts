@@ -1,6 +1,7 @@
 import catalog from '../../data/landmarks/index.json' with { type: 'json' };
 import { expectCompactPhoneHud } from './helpers/phoneHud.js';
 import { setScanCardSuppressed } from './helpers/tutorial.js';
+import { completeScan } from './helpers/scan.js';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const dive = '/?tile=titanic&landmark=_test&poi=test-bow&skipBriefing=1&touch=1&tier=low';
@@ -107,8 +108,8 @@ for (const viewport of [
             uiScale,
           });
         }, scale);
-        await expect(page.locator('.scan-panel')).toBeVisible();
-        await expect(page.locator('.scan-hint')).toHaveText('HOLD SCAN TO SCAN');
+        await expect(page.locator('.guidance-slot')).toBeVisible();
+        await expect(page.locator('.guidance-hint')).toHaveText('HOLD SCAN TO SCAN');
         const controls = [
           '.tc-stick',
           '.tc-slider',
@@ -120,40 +121,64 @@ for (const viewport of [
           '.tc-btn-boost',
           '.hud-journal',
         ];
-        const hud = ['.sonar', '.hud-readouts', '.scan-panel'];
+        const hud = ['.sonar', '.hud-readouts', '.guidance-slot'];
         if (viewport.width < viewport.height)
           await expect(page.locator('.tc-rotate-hint')).toBeHidden();
         // The tutorial defers to the scan card, so each is checked on its own.
-        await expect(page.locator('.onboard-card')).toBeHidden();
+        await expect(page.locator('.guidance-slot[data-step]')).toBeHidden();
         await separate(page, [...hud, ...controls]);
         await setScanCardSuppressed(page, true);
-        const tutorialHud = hud.filter((selector) => selector !== '.scan-panel');
-        await separate(page, [...tutorialHud, '.onboard-card', ...controls]);
+        const tutorialHud = hud.filter((selector) => selector !== '.guidance-slot');
+        await separate(page, [...tutorialHud, '.guidance-slot[data-step]', ...controls]);
         for (const button of await page.locator('.d2-sonar-controls button:visible, .tc-btn').all())
           await reachable(button);
         await reachable(page.getByRole('button', { name: 'Skip', exact: true }));
-        await expect(page.locator('.onboard-card button:visible')).toHaveCount(1);
+        await expect(page.locator('.guidance-slot[data-step] button:visible')).toHaveCount(1);
         await expect(page.locator('.d-sonar-legend')).toBeHidden();
         expect((await page.locator('.sonar').boundingBox())!.width).toBe(
           viewport.width > viewport.height ? 120 : 96,
         );
         // Check every instruction: the last step is longer than the first.
         for (const step of ['move', 'depth', 'scan']) {
-          await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
+          await expect(page.locator('.guidance-slot[data-step]')).toHaveAttribute(
+            'data-step',
+            step,
+          );
           expect(
-            await page.locator('.onboard-card').evaluate((e) => e.scrollWidth <= e.clientWidth),
+            await page
+              .locator('.guidance-slot[data-step]')
+              .evaluate((e) => e.scrollWidth <= e.clientWidth),
           ).toBe(true);
-          await separate(page, [...tutorialHud, '.onboard-card', ...controls]);
+          await separate(page, [...tutorialHud, '.guidance-slot[data-step]', ...controls]);
           await expectCompactPhoneHud(page);
-          if (step !== 'scan') await page.locator('.onboard-skip-step').tap();
+          if (step !== 'scan') await page.locator('.guidance-skip').tap();
         }
         if (scale === 100)
           await page.screenshot({ path: testInfo.outputPath('tutorial-landscape.png') });
         await page.getByRole('button', { name: 'Skip', exact: true }).tap();
-        await expect(page.locator('.onboard-card')).toBeHidden();
+        await expect(page.locator('.guidance-slot[data-step]')).toBeHidden();
         await setScanCardSuppressed(page, false);
-        // The scan-range hint chip was retired (the scan panel covers it).
-        await expect(page.locator('.onboard-hint')).toBeHidden();
+        // The scan card carries the scan prompt; no separate hint appears.
+        await expect(
+          page.locator('.guidance-slot[data-kind="hint"]:not([data-step])'),
+        ).toBeHidden();
+        // A ready contact outranks a result, so finish the real scan first (as a player would).
+        {
+          const cdp = await page.context().newCDPSession(page);
+          const button = (await page.locator('.tc-btn-scan').boundingBox())!;
+          try {
+            await cdp.send('Input.dispatchTouchEvent', {
+              type: 'touchStart',
+              touchPoints: [
+                { x: button.x + button.width / 2, y: button.y + button.height / 2, id: 1 },
+              ],
+            });
+            await completeScan(page);
+          } finally {
+            await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+            await cdp.detach();
+          }
+        }
         await page.evaluate(() => {
           const game = window.__game as {
             discovery: {
@@ -172,11 +197,11 @@ for (const viewport of [
             { scan: 'G', guide: 'J' },
           );
         });
-        await expect(page.locator('.scan-hint')).toHaveText('PAUSE → JOURNAL');
+        await expect(page.locator('.guidance-hint')).toHaveText('PAUSE → JOURNAL');
         expect(
-          await page.locator('.scan-panel').evaluate((e) => e.scrollWidth <= e.clientWidth),
+          await page.locator('.guidance-slot').evaluate((e) => e.scrollWidth <= e.clientWidth),
         ).toBe(true);
-        await separate(page, ['.scan-panel', ...controls]);
+        await separate(page, ['.guidance-slot', ...controls]);
         await page.locator('.sonar canvas').tap();
         await expect(page.locator('.sonar')).toHaveClass(/d-sonar-expanded/);
         for (const button of await page.locator('.d2-sonar-controls button').all())
@@ -213,12 +238,12 @@ for (const viewport of [
         );
       });
       await ready(page, '/?mission=monterey-canyon&skipBriefing=1&touch=1&tier=low');
-      await expect(page.locator('.objectives-panel')).toBeVisible();
-      await expect(page.locator('.onboard-card')).toBeVisible();
+      // Phones name the objective in the slot; the panel only carries the completion banner.
+      await expect(page.locator('.objectives-panel')).toBeHidden();
+      await expect(page.locator('.guidance-slot[data-step]')).toBeVisible();
       await separate(page, [
-        '.objectives-panel',
         '.hud-readouts',
-        '.onboard-card',
+        '.guidance-slot[data-step]',
         '.sonar',
         '.tc-stick',
         '.tc-slider',

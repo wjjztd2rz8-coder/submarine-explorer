@@ -5,8 +5,6 @@ import type { Scanner } from '../game/Scanner.js';
 
 interface WaypointObjective {
   poiId: string;
-  title: string;
-  hint?: string;
 }
 
 export function waypointReadout(
@@ -21,21 +19,15 @@ export function waypointReadout(
   return `${Math.round(distance)} m · ${dy >= 0 ? '↑' : '↓'}${Math.round(Math.abs(dy))} m${distance <= radius ? ' · IN RANGE' : ''}`;
 }
 
-/** How long an objective's hint stays on screen after it becomes current. */
-const HINT_VISIBLE_MS = 10_000;
-
 export class Waypoints {
   readonly root: HTMLDivElement;
   private readonly edge: HTMLDivElement;
-  private readonly hint: HTMLDivElement;
   private readonly edgeName = document.createElement('span');
   private readonly edgeInfo = document.createElement('span');
   private readonly markers = new Map<string, HTMLDivElement>();
   private readonly projection = new Vector3();
   private pois: readonly PlacedPoi[] = [];
   private visualHints = true;
-  private hintKey = '';
-  private hintShownAt = 0;
 
   constructor(
     private readonly scanner: Scanner,
@@ -49,9 +41,7 @@ export class Waypoints {
     this.edgeName.className = 'd-scan-edge-name';
     this.edgeInfo.className = 'd-scan-edge-info';
     this.edge.append(this.edgeName, this.edgeInfo);
-    this.hint = document.createElement('div');
-    this.hint.className = 'd-scan-objective-hint';
-    this.root.append(this.edge, this.hint);
+    this.root.append(this.edge);
     parent.appendChild(this.root);
   }
 
@@ -80,19 +70,19 @@ export class Waypoints {
     this.root.dataset.palette = name;
   }
 
-  update(camera: Camera, position: Vector3, objective: WaypointObjective | null): void {
+  /**
+   * @param nameInSlot says whether the guidance slot already shows a name; the
+   *   label then keeps only range and depth.
+   */
+  update(
+    camera: Camera,
+    position: Vector3,
+    objective: WaypointObjective | null,
+    nameInSlot: (name: string) => boolean = () => false,
+  ): void {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const current = objective ? this.pois.find((p) => p.id === objective.poiId) : null;
-    // The hint shows for a while when an objective becomes current, then
-    // fades so it does not permanently cover the view; the Esc menu keeps it.
-    const hintKey = objective?.hint ? `${objective.poiId}|${objective.hint}` : '';
-    if (hintKey !== this.hintKey) {
-      this.hintKey = hintKey;
-      this.hintShownAt = performance.now();
-      this.hint.textContent = objective?.hint ?? '';
-    }
-    this.hint.hidden = !hintKey || performance.now() - this.hintShownAt > HINT_VISIBLE_MS;
     for (const poi of this.pois) {
       const scanned = this.scanner.isScanned(poi.landmarkId, poi.id);
       const isCurrent = poi === current && this.visualHints && !scanned;
@@ -132,6 +122,7 @@ export class Waypoints {
     this.edge.style.left = `${Math.max(130, Math.min(width - 130, ((x + 1) / 2) * width))}px`;
     this.edge.style.top = `${Math.max(100, Math.min(height - 145, ((1 - y) / 2) * height))}px`;
     this.edgeName.textContent = current.name;
+    this.edgeName.hidden = nameInSlot(current.name);
     this.edgeInfo.textContent = waypointReadout(position, current.position, current.radius);
     this.edge.style.setProperty('--direction', `${angle}rad`);
   }

@@ -1,17 +1,18 @@
 import { expect, type Page } from '@playwright/test';
+import { GUIDANCE } from './guidance.js';
 
-/** Use the visible actions: phones have one Skip (step); larger HUDs retain Skip tutorial. */
+/** Press Skip until the tutorial is over: one press per step, on every device. */
 export async function dismissTutorial(
   page: Page,
   touch: boolean,
   pausedClock = false,
 ): Promise<void> {
-  // The card is hidden while a scan card is up; bring it back to dismiss it.
+  // The tutorial step is hidden while a scan card is up; bring it back to dismiss it.
   await setScanCardSuppressed(page, true);
   if (pausedClock) await page.clock.runFor(34);
   // A finished tutorial never shows the card again, so a short wait is the signal either way.
   await page
-    .locator('.onboard-card')
+    .locator(GUIDANCE.tutorial)
     .waitFor({ state: 'visible', timeout: 1500 })
     .catch(() => {});
   try {
@@ -22,16 +23,12 @@ export async function dismissTutorial(
 }
 
 async function dismiss(page: Page, touch: boolean, pausedClock: boolean): Promise<void> {
-  const all = page.locator('.onboard-skip-all');
-  if (await all.isVisible()) {
-    if (touch) await all.tap();
-    else await all.click();
-    return;
-  }
-  const card = page.locator('.onboard-card');
+  const card = page.locator(GUIDANCE.tutorial);
   for (let i = 0; i < 3 && (await card.isVisible()); i++) {
     const step = await card.getAttribute('data-step');
-    await page.getByRole('button', { name: 'Skip', exact: true }).tap();
+    const skip = page.locator(GUIDANCE.skip);
+    if (touch) await skip.tap();
+    else await skip.click();
     // The same real tutorial update that drives the game renders the next card.
     if (pausedClock) await page.clock.runFor(34);
     if (step === 'scan') await expect(card).toBeHidden();
@@ -41,8 +38,8 @@ async function dismiss(page: Page, touch: boolean, pausedClock: boolean): Promis
 }
 
 /**
- * The tutorial card yields to the scan card, so a layout check of the tutorial alone
- * hides the scan card first (and restores it afterwards). Discovery re-applies the
+ * The scan card outranks the tutorial step, so a layout check of the tutorial alone
+ * hides the scan source first (and restores it afterwards). Discovery re-applies the
  * overlay's suppression every frame, so the overlay's own hooks are held while hidden.
  */
 export async function setScanCardSuppressed(page: Page, on: boolean): Promise<void> {

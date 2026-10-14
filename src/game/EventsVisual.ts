@@ -17,9 +17,6 @@ export class EventsVisual {
   private readonly projected = new THREE.Vector3();
   private readonly ray = new THREE.Ray();
   private readonly sightline = new THREE.Vector3();
-  private readonly screenBox = new THREE.Box3();
-  private readonly screenCorner = new THREE.Vector3();
-  private readonly screenDepth = new THREE.Vector3();
   private ground: (x: number, z: number) => number = () => 0;
 
   constructor(tier: keyof typeof EXPLORE_CONFIG.eventParticleCount) {
@@ -237,59 +234,6 @@ export class EventsVisual {
     pos.needsUpdate = true;
     this.origin.copy(this.group.position);
     this.origin.y += kind === 'plume' ? EXPLORE_CONFIG.eventPlumeHeightM / 2 : mat.size / 2 + 2;
-  }
-
-  /** A conservative projected envelope for placing the DOM caption outside the event. */
-  screenBounds(
-    camera: THREE.PerspectiveCamera,
-    width: number,
-    height: number,
-  ): { x: number; y: number; width: number; height: number } | null {
-    if (!this.group.visible) return null;
-    const object = this.whale.visible ? this.whale : this.points;
-    if (object === this.points || !object.geometry.boundingBox)
-      object.geometry.computeBoundingBox();
-    object.updateWorldMatrix(true, false);
-    camera.updateMatrixWorld();
-    this.screenBox.copy(object.geometry.boundingBox!).applyMatrix4(object.matrixWorld);
-    let nearDepth = Infinity;
-    let minX = Infinity,
-      minY = Infinity,
-      maxX = -Infinity,
-      maxY = -Infinity;
-    for (const x of [this.screenBox.min.x, this.screenBox.max.x])
-      for (const y of [this.screenBox.min.y, this.screenBox.max.y])
-        for (const z of [this.screenBox.min.z, this.screenBox.max.z]) {
-          this.screenCorner.set(x, y, z);
-          nearDepth = Math.min(
-            nearDepth,
-            -this.screenDepth.copy(this.screenCorner).applyMatrix4(camera.matrixWorldInverse).z,
-          );
-          this.screenCorner.project(camera);
-          if (this.screenCorner.z < -1 || this.screenCorner.z > 1) continue;
-          const px = ((this.screenCorner.x + 1) * width) / 2;
-          const py = ((1 - this.screenCorner.y) * height) / 2;
-          minX = Math.min(minX, px);
-          minY = Math.min(minY, py);
-          maxX = Math.max(maxX, px);
-          maxY = Math.max(maxY, py);
-        }
-    if (!Number.isFinite(minX)) return null;
-    // Include soft sprite edges, not only the Points' centres.
-    const padding =
-      object === this.points
-        ? Math.min(
-            EXPLORE_CONFIG.eventMaxParticlePx / 2,
-            ((this.points.material as THREE.PointsMaterial).size * height) /
-              (4 * Math.max(1, nearDepth)),
-          )
-        : 0;
-    return {
-      x: minX - padding,
-      y: minY - padding,
-      width: maxX - minX + padding * 2,
-      height: maxY - minY + padding * 2,
-    };
   }
 
   dispose(): void {

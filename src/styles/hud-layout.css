@@ -1,17 +1,16 @@
-/* F-HUD-LAYOUT: one place that gives each HUD element its own space, so the
-   tutorial card, scan-target panel, controls hint bar, objectives and touch
-   controls never stack on each other or on the submarine.
+/* HUD layout: one place that gives each HUD element its own space, so the
+   guidance slot, objectives, readouts and touch controls never stack on each
+   other or on the submarine.
 
    The chase camera keeps the sub low and central, so the bottom centre is the
    sub's. Everything else is arranged around it:
 
-     desktop / tablet   top-left: sonar, then the tutorial card
-                        top-centre (below warnings): scan-target panel, then hint
+     desktop / tablet   top-left: sonar; top-centre: the guidance slot;
                         top-right: objectives, then readouts
-                        bottom-left: controls hint bar
-     phone landscape    top-left: sonar (small); top-centre column: tutorial
-                        card, then the scan-target panel and hint;
-                        top-right: short objectives and readouts
+     phone portrait     sonar left; readouts, then the guidance slot, in the
+                        right-hand column
+     phone landscape    sonar left; the guidance slot in the top-centre lane;
+                        readouts right
 
    Loaded last so it wins over the earlier per-feature files. */
 
@@ -21,17 +20,6 @@
   --hl-scan-width: 300px;
 }
 
-/* Tutorial card: left column under the sonar. */
-.onboard-card {
-  left: calc(12px + env(safe-area-inset-left, 0px));
-  top: calc(var(--hl-sonar-clear) + env(safe-area-inset-top, 0px));
-  bottom: auto;
-  transform: none;
-  width: min(380px, calc(50vw - 150px - 24px));
-  min-width: 270px;
-  max-width: none;
-  animation-name: hl-card-in;
-}
 /* Keep the active instruction readable, including long species names in the
    narrow portrait stack. Other objective rows retain their compact ellipsis. */
 .obj-item.is-current .obj-item-title {
@@ -42,51 +30,17 @@
 .obj-optional {
   flex: none;
 }
-@keyframes hl-card-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-/* F-TOAST-550: the hint follows the target in normal flow, so a wrapped name
-   never needs a guessed offset. With no target it uses the same centre slot. */
-.scan-stack {
+/* The slot is one card, so a wrapped name never needs a guessed offset. */
+.guidance-slot {
   top: calc(max(112px, 15%) + env(safe-area-inset-top, 0px));
   bottom: auto;
   width: var(--hl-scan-width);
   min-width: 0;
   box-sizing: border-box;
 }
-/* ExploreNotice also imports touch card styles. Keep column sizing more
-   specific than those per-feature widths, regardless of stylesheet order. */
-.scan-overlay .scan-stack > .scan-panel {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-}
-.scan-stack .onboard-hint {
-  position: static;
-  transform: none;
-  width: 100%;
-  min-width: 0;
-  max-width: none;
-  font-size: 14px;
-  animation-name: hl-card-in;
-}
-.onboard-hint-text {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.onboard-hint-close {
-  flex: none;
-}
 
 @media (orientation: landscape) {
-  html.is-touch .scan-overlay .scan-stack {
+  html.is-touch .scan-overlay .guidance-slot {
     left: calc(50% - 40px);
     width: var(--hl-scan-width);
     top: calc(max(112px, 15%) + env(safe-area-inset-top, 0px));
@@ -94,8 +48,8 @@
   }
 }
 
-/* Phone landscape: the left column is the sonar and the stick, so the card and
-   scan panel share the top-centre column between the sonar and the readouts. */
+/* Phone landscape: the left column is the sonar and the stick, so the slot sits
+   in the top-centre column between the sonar and the readouts. */
 @media (max-height: 460px) and (orientation: landscape) {
   :root {
     --hl-sonar-clear: 0px;
@@ -205,14 +159,6 @@
     right: calc(12px + env(safe-area-inset-right, 0px));
     transform: none;
   }
-  html.is-touch .objectives-panel .obj-head {
-    margin-bottom: 2px;
-    line-height: 1.15;
-  }
-  html.is-touch .objectives-panel .obj-item {
-    font-size: 12px;
-    line-height: 1.15;
-  }
   /* Supplies add almost 100 px to the old single-column Surface stack.
      Use the full objective width and three rows above the action buttons:
      depth/speed; supplies/hull; current. Keep every live readout. */
@@ -275,112 +221,35 @@
     grid-row: 4;
     grid-column: 1 / -1;
   }
-  html.is-touch .objectives-panel .obj-item:not(.is-current),
-  html.is-touch .objectives-panel .obj-nav,
-  html.is-touch .objectives-panel .obj-more,
-  html.is-touch .objectives-panel .obj-hint,
-  html.is-touch .objectives-panel .obj-progress {
-    display: none;
-  }
-  /* Card: text on the left, buttons on the right, so it stays short. */
-  html.is-touch .onboard-card {
-    top: calc(58px + env(safe-area-inset-top, 0px));
-    left: var(--hl-col-left);
-    width: var(--hl-col-width);
-    min-width: 0;
-  }
-  html.is-touch .onboard-card:not([hidden]) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: 8px;
-    align-items: center;
-  }
-  html.is-touch .onboard-card-head {
-    grid-column: 1;
-    grid-row: 1;
-  }
-  html.is-touch .onboard-card-text {
-    grid-column: 1;
-    grid-row: 2;
-    margin: 0;
-    font-size: 12px;
-    line-height: 1.25;
-  }
-  html.is-touch .onboard-card-buttons {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-  }
-  html.is-touch .onboard-card button {
-    padding: 0 10px;
-    font-size: 13px;
-  }
-  html.is-touch .scan-overlay .scan-stack {
+  html.is-touch .scan-overlay .guidance-slot {
     left: var(--hl-col-left);
     transform: none;
     width: var(--hl-col-width);
     top: calc(58px + env(safe-area-inset-top, 0px));
   }
-  html.is-touch .scan-overlay .scan-panel {
-    padding: 6px 10px 6px 6px;
-    gap: 10px;
+  html.is-touch .scan-overlay .guidance-slot {
+    padding: 5px 8px;
+    gap: 8px;
   }
-  body:has(.onboard-card:not([hidden])) .scan-overlay .scan-stack {
-    top: calc(146px + env(safe-area-inset-top, 0px));
-  }
-  html.is-touch .scan-overlay .scan-ring {
+  html.is-touch .scan-overlay .guidance-ring {
     width: 40px;
     height: 40px;
   }
 }
 
-/* At 667 px the centre column cannot fit text beside both tutorial buttons.
-   Stack the card and reserve enough height for every touch tutorial step. */
-@media (max-width: 740px) and (max-height: 460px) and (orientation: landscape) {
-  html.is-touch .onboard-card:not([hidden]) {
-    display: block;
-  }
-  html.is-touch .onboard-card-text {
-    margin: 4px 0 8px;
-  }
-  html.is-touch .onboard-card-dots {
-    display: none;
-  }
-  html.is-touch .onboard-card button {
-    padding: 0 6px;
-  }
-  body:has(.onboard-card:not([hidden])) .scan-overlay .scan-stack {
-    top: calc(206px + env(safe-area-inset-top, 0px));
-  }
-}
-
-/* Portrait phones: tutorial above the controls, scan stack under the readouts. */
+/* Portrait phones: the slot sits above the controls until a narrower rule moves
+   it under the readouts. */
 @media (orientation: portrait) {
   /* A rotate suggestion must not cover an active instruction or contact. */
-  html.is-touch body:has(.onboard-card:not([hidden])) .tc-rotate-hint,
-  html.is-touch body:has(.onboard-hint:not([hidden])) .tc-rotate-hint,
-  html.is-touch body:has(.scan-panel:not([hidden])) .tc-rotate-hint {
+  html.is-touch body:has(.guidance-slot:not([hidden])) .tc-rotate-hint {
     display: none;
   }
-  html.is-touch .onboard-card {
-    top: auto;
-    bottom: calc(230px + env(safe-area-inset-bottom, 0px));
-    left: calc((100% + env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)) / 2);
-    transform: translateX(-50%);
-    width: calc(100vw - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-    min-width: 0;
-    animation-name: onboard-in;
-  }
-  html.is-touch .scan-overlay .scan-stack {
+  html.is-touch .scan-overlay .guidance-slot {
     left: 50%;
     top: auto;
     /* Leave room for every tutorial step below the target. */
     bottom: calc(400px + env(safe-area-inset-bottom, 0px));
     max-width: calc(100vw - 24px);
-  }
-  /* Hints appear after the tutorial. Reuse its row and grow the target/hint
-     stack upward, leaving the touch controls below. */
-  html.is-touch body:has(.onboard-card[hidden]):has(.onboard-hint:not([hidden])) .scan-stack {
-    bottom: calc(230px + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -432,9 +301,7 @@
     );
     object-fit: contain;
   }
-  html.is-touch body:has(.sonar.d-sonar-expanded) .onboard-card,
-  html.is-touch body:has(.sonar.d-sonar-expanded) .onboard-hint,
-  html.is-touch body:has(.sonar.d-sonar-expanded) .scan-stack {
+  html.is-touch body:has(.sonar.d-sonar-expanded) .guidance-slot {
     visibility: hidden;
   }
   html.is-touch .sonar .d-sonar-header {
@@ -490,16 +357,6 @@
     grid-template-columns: minmax(0, 1fr) minmax(24px, 1fr) 36px;
     gap: 4px;
   }
-  html.is-touch .objectives-panel .obj-item:not(.is-current),
-  html.is-touch .objectives-panel .obj-more,
-  html.is-touch .objectives-panel .obj-hint,
-  html.is-touch .objectives-panel .obj-nav,
-  html.is-touch .objectives-panel .obj-progress {
-    display: none;
-  }
-  html.is-touch .objectives-panel .obj-item-title {
-    white-space: normal;
-  }
   html.is-touch .tc-btn-pause {
     left: auto;
     right: calc(12px + env(safe-area-inset-right, 0px));
@@ -507,26 +364,22 @@
   }
 }
 
-/* Tall portrait: keep contacts and hints in the telemetry column, leaving
+/* Tall portrait: keep guidance in the telemetry column, leaving
    the centre chase hull clear. The measured height includes supplies, hull
    rating and wrapped values; mission telemetry follows the objective bottom. */
 @media (orientation: portrait) and (max-width: 700px) and (min-height: 701px) {
-  html.is-touch .scan-overlay .scan-stack,
-  html.is-touch body:has(.onboard-hint:not([hidden])) .scan-overlay .scan-stack {
+  html.is-touch .scan-overlay .guidance-slot {
     left: var(--hl-portrait-stack-left);
     top: calc(var(--hl-portrait-stack-top) + var(--hud-readouts-height, 120px) + 12px);
     bottom: auto;
     width: calc(100vw - var(--hl-portrait-stack-left) - 12px - env(safe-area-inset-right, 0px));
     transform: none;
   }
-  html.is-touch body:has(.objectives-panel:not([hidden])) .scan-overlay .scan-stack {
-    top: calc(var(--obj-panel-bottom, 240px) + 8px + var(--hud-readouts-height, 120px) + 12px);
-  }
 }
 
 /* 360×640 has no room for the tall portrait telemetry and a scan panel at
    bottom:400px. Use the same compact readouts as landscape, followed by the
-   scan and tutorial rows; keep the 44px tutorial buttons and touch controls. */
+   slot; keep the 44px skip button and touch controls. */
 @media (orientation: portrait) and (max-width: 700px) and (max-height: 700px) {
   /* The enlarged Pause row and wrapped telemetry otherwise enter the scan
      row. Cap only the playing HUD to the normal phone scale; menus and the
@@ -542,8 +395,6 @@
   html.is-touch .objectives-panel,
   html.is-touch .sonar,
   html.is-touch .scan-overlay,
-  html.is-touch .onboard-card,
-  html.is-touch .onboard-hint,
   html.is-touch .tc-root {
     --ui-scale: var(--hl-compact-scale);
   }
@@ -582,44 +433,20 @@
     font-size: 12px;
     line-height: 1.25;
   }
-  html.is-touch .obj-head {
-    font-size: 10px;
-    margin-bottom: 3px;
-  }
-  html.is-touch .onboard-card {
-    padding: 4px 10px 6px;
-    line-height: 1.25;
-    bottom: calc(226px + env(safe-area-inset-bottom, 0px));
-  }
-  html.is-touch .onboard-card-title,
-  html.is-touch .onboard-card-dots {
-    display: none;
-  }
-  html.is-touch .onboard-card-text {
-    margin: 2px 0 4px;
-    font-size: 12px;
-    line-height: 1.25;
-  }
-  html.is-touch .scan-overlay .scan-stack {
+  html.is-touch .scan-overlay .guidance-slot {
     width: calc(100vw - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
     bottom: calc(338px + env(safe-area-inset-bottom, 0px));
   }
-  html.is-touch .scan-overlay .scan-panel {
+  html.is-touch .scan-overlay .guidance-slot {
     padding: 6px 10px 6px 6px;
     gap: 10px;
     font-size: 14px;
     line-height: 1.25;
   }
-  html.is-touch .scan-overlay .scan-ring {
+  html.is-touch .scan-overlay .guidance-ring {
     width: 40px;
     height: 40px;
   }
-}
-
-/* --- F-PHONE-HUD-890: reserve the scene between the top instruments and controls. --- */
-.onboard-card-phone-text,
-.onboard-skip-phone {
-  display: none;
 }
 
 @media (orientation: portrait) and (max-width: 480px),
@@ -721,7 +548,7 @@
     font-size: 0;
   }
   html.is-touch .hull-gauge-label::after {
-    content: attr(data-rating);
+    content: attr(data-compact);
     font-size: 11px;
     white-space: nowrap;
   }
@@ -741,74 +568,20 @@
   html.is-touch .objectives-panel {
     padding: 5px 8px;
   }
-  html.is-touch .objectives-panel .obj-head {
-    margin: 0;
-  }
-  html.is-touch body:has(.scan-panel:not([hidden])) .objectives-panel .obj-list,
-  html.is-touch body:has(.scan-panel:not([hidden])) .d-scan-objective-hint {
+  /* The scan card and its reticle lead while a contact is in range. */
+  html.is-touch body:has(.guidance-slot[data-kind='scan']:not([hidden])) .d-scan-edge {
     display: none;
   }
-  /* A logged (dim) scan panel is not a prompt: keep the next-target chip showing. */
-  html.is-touch body:has(.scan-panel:not([hidden], [data-tone='dim'])) .d-scan-edge {
-    display: none;
-  }
-  /* The navigation chip remains available for targets outside scan range. */
-  /* Sit in the gap just above the touch controls, clear of the sub and target. */
-  html.is-touch .onboard-card {
-    top: auto;
-    bottom: calc(176px + env(safe-area-inset-bottom, 0px));
-    left: calc(12px + env(safe-area-inset-left, 0px));
-    right: calc(12px + env(safe-area-inset-right, 0px));
-    width: auto;
-    min-width: 0;
+  html.is-touch .scan-overlay .guidance-slot {
     padding: 5px 8px;
-    transform: none;
-    animation-name: hl-card-in;
-  }
-  html.is-touch .onboard-card:not([hidden]) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 8px;
-    align-items: center;
-  }
-  html.is-touch .onboard-card-head,
-  html.is-touch .onboard-card-title,
-  html.is-touch .onboard-card-text,
-  html.is-touch .onboard-skip-desktop,
-  html.is-touch .onboard-skip-all {
-    display: none;
-  }
-  html.is-touch .onboard-card-phone-text {
-    display: block;
-    margin: 0;
-    font-size: 13px;
-    line-height: 17px;
-  }
-  html.is-touch .onboard-skip-phone {
-    display: inline;
-  }
-  html.is-touch .onboard-card-buttons {
-    grid-column: 2;
-    grid-row: 1;
-  }
-  html.is-touch .onboard-card button {
-    padding: 0 10px;
-    font-size: 13px;
-  }
-  html.is-touch .scan-overlay .scan-panel {
-    padding: 6px 8px;
     gap: 8px;
     font-size: 13px;
     line-height: 1.2;
   }
-  /* ExploreNotice imports a narrow landscape grid with display:contents on
-     the text wrapper. Keep the ring beside the text at every phone width,
-     regardless of that stylesheet's load order. Hidden cards stay hidden. */
-  html.is-touch .scan-overlay .scan-panel:not([hidden]),
-  html.is-touch .scan-overlay .scan-text {
-    display: flex;
+  html.is-touch .scan-overlay .guidance-text {
+    gap: 0;
   }
-  html.is-touch .scan-overlay .scan-ring {
+  html.is-touch .scan-overlay .guidance-ring {
     width: 40px;
     height: 40px;
   }
@@ -818,10 +591,6 @@
   html.is-touch {
     --hl-portrait-map-width: 96px;
     --hl-portrait-stack-left: calc(120px + env(safe-area-inset-left, 0px));
-  }
-  html.is-touch .onboard-card {
-    /* The enlarged three-row controls grow above the old fixed 176px slot. */
-    bottom: calc(max(176px, var(--tc-portrait-clearance)) + env(safe-area-inset-bottom, 0px));
   }
   html.is-touch .hud-readouts,
   html.is-touch .hud-readouts:has(.hud-power:not([hidden])) {
@@ -839,9 +608,7 @@
   html.is-touch .sonar.d-sonar-expanded canvas {
     min-height: 0;
   }
-  html.is-touch .scan-overlay .scan-stack,
-  html.is-touch body:has(.onboard-hint:not([hidden])) .scan-overlay .scan-stack,
-  html.is-touch body:has(.onboard-card:not([hidden])) .scan-overlay .scan-stack {
+  html.is-touch .scan-overlay .guidance-slot {
     left: var(--hl-portrait-stack-left);
     right: calc(12px + env(safe-area-inset-right, 0px));
     top: calc(var(--hl-portrait-stack-top) + var(--hud-readouts-height, 48px) + 8px);
@@ -850,22 +617,6 @@
     max-width: none;
     transform: none;
   }
-  html.is-touch body:has(.objectives-panel:not([hidden])) .scan-overlay .scan-stack {
-    top: calc(var(--obj-panel-bottom, 120px) + 8px + var(--hud-readouts-height, 48px) + 8px);
-  }
-}
-
-@media (orientation: portrait) and (max-width: 480px) and (max-height: 700px) {
-  /* The short-phone controls are capped at 0.8 scale and occupy 168 px.
-     Dock four pixels above them, below the hull rather than across it. */
-  html.is-touch .onboard-card {
-    bottom: calc(172px + env(safe-area-inset-bottom, 0px));
-  }
-}
-
-/* F-PHONE-CAMERA: the phone-only short title is hidden unless the landscape rule below shows it. */
-.obj-title-short {
-  display: none;
 }
 
 @media (orientation: landscape) and (max-width: 900px) and (max-height: 460px) {
@@ -876,14 +627,6 @@
   }
   html.is-touch .sonar:not(.d-sonar-expanded) canvas {
     max-height: 120px;
-  }
-  /* Mission title: the name matters more than the "MISSION" prefix. */
-  html.is-touch .obj-title-prefix,
-  html.is-touch .obj-title-full {
-    display: none;
-  }
-  html.is-touch .obj-title-short {
-    display: inline;
   }
   html.is-touch .hud-readouts,
   html.is-touch .hud-readouts:has(.hud-power:not([hidden])) {
@@ -913,91 +656,22 @@
   html.is-touch .hud-readouts:has(.hud-power:not([hidden])) .hud-current-arrow {
     width: 1em;
   }
-  html.is-touch .onboard-card {
-    left: calc(132px + env(safe-area-inset-left, 0px));
-    right: calc(12px + env(safe-area-inset-right, 0px));
-    bottom: calc(196px + env(safe-area-inset-bottom, 0px));
-  }
-  html.is-touch .scan-overlay .scan-stack,
-  html.is-touch body:has(.onboard-card:not([hidden])) .scan-overlay .scan-stack {
+  html.is-touch .scan-overlay .guidance-slot {
     left: calc(144px + env(safe-area-inset-left, 0px));
     top: calc(58px + env(safe-area-inset-top, 0px));
     bottom: auto;
     width: calc(100vw - 426px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
     transform: none;
   }
-  html.is-touch body:has(.sonar.d-sonar-expanded) .onboard-card,
-  html.is-touch body:has(.sonar.d-sonar-expanded) .scan-stack {
+  html.is-touch body:has(.sonar.d-sonar-expanded) .guidance-slot {
     visibility: hidden;
-  }
-}
-
-/* F-TOUCH-STACK: objective chip (touch, no contact in range) and a one-line
-   tutorial once the first scan is done (the last step, "journal"). */
-.scan-objective-chip {
-  display: none;
-}
-html.is-touch .scan-objective-chip:not([hidden]) {
-  display: block;
-  align-self: flex-start;
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: 3px 10px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 12px;
-  line-height: 1.3;
-  color: var(--b1-text);
-  background: var(--b1-panel);
-  border: 1px solid var(--b1-hair-dim);
-  border-radius: 999px;
-}
-/* The tutorial's own instruction already says where to go. */
-html.is-touch body:has(.onboard-card:not([hidden], [data-step='scan'])) .scan-objective-chip {
-  display: none;
-}
-/* Phones up to 900 px wide already use the one-line bottom card above. */
-@media (min-width: 901px) and (max-height: 460px) and (orientation: landscape) {
-  html.is-touch .onboard-card[data-step='scan']:not([hidden]) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: 8px;
-    align-items: center;
-    padding: 2px 8px;
-  }
-  html.is-touch .onboard-card[data-step='scan'] .onboard-card-head,
-  html.is-touch .onboard-card[data-step='scan'] .onboard-card-title,
-  html.is-touch .onboard-card[data-step='scan'] .onboard-card-text {
-    display: none;
-  }
-  html.is-touch .onboard-card[data-step='scan'] .onboard-card-phone-text {
-    display: block;
-    grid-column: 1;
-    grid-row: 1;
-    margin: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 12px;
-  }
-  html.is-touch .onboard-card[data-step='scan'] .onboard-card-buttons {
-    grid-column: 2;
-    grid-row: 1;
-  }
-  html.is-touch .onboard-card[data-step='scan'] .onboard-skip-all {
-    padding: 0 8px;
-    font-size: 12px;
-  }
-  body:has(.onboard-card[data-step='scan']:not([hidden])) .scan-overlay .scan-stack {
-    top: calc(116px + env(safe-area-inset-top, 0px));
   }
 }
 
 @media (max-height: 460px) and (orientation: landscape) {
   /* The completion banner takes the free centre lane (the objective panel
-     column is full of controls below it) and the cards that share that lane
-     step aside while it is up. */
+     column is full of controls below it) and the slot steps aside while it
+     is up. */
   html.is-touch .obj-banner {
     position: fixed;
     left: var(--hl-col-left);
@@ -1017,7 +691,7 @@ html.is-touch body:has(.onboard-card:not([hidden], [data-step='scan'])) .scan-ob
     flex-direction: column;
     flex-wrap: nowrap;
   }
-  html.is-touch body:has(.obj-banner:not([hidden])) :is(.scan-overlay .scan-stack, .onboard-card) {
+  html.is-touch body:has(.obj-banner:not([hidden])) .scan-overlay .guidance-slot {
     visibility: hidden;
   }
 }

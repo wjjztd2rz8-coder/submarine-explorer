@@ -11,10 +11,6 @@
 .obj-nav-turn {
   margin-left: 0;
 }
-.obj-alert {
-  margin: 6px 0 0;
-  font-size: clamp(12px, calc(12px * var(--ui-scale)), 18px);
-}
 /* "Primary objectives complete": the dive keeps going unless the player surfaces. */
 .obj-banner {
   display: flex;
@@ -325,13 +321,4 @@ body:has(.objectives-panel:not([hidden])) .hud-readouts {
   background: none;
   color: #ffcb70;
   font-size: clamp(12px, calc(13px * var(--ui-scale)), 18px);
-}
-.hud-prompt {
-  bottom: 56px;
-}
-body:has(.objectives-panel:not([hidden])) .hud-warning {
-  top: 12px;
-}
-body:has(.objectives-panel:not([hidden])) .d-scan-objective-hint {
-  display: none;
 }

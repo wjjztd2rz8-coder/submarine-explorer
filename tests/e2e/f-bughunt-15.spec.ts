@@ -6,6 +6,7 @@ import type { HintEngine } from '../../src/game/Hints.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import type { Save } from '../../src/core/Save.js';
 import { setScanCardSuppressed } from './helpers/tutorial.js';
+import { GUIDANCE } from './helpers/guidance.js';
 
 const heroes = [
   { site: 'titanic', poi: 'titanic-bow' },
@@ -14,20 +15,16 @@ const heroes = [
   { site: 'beebe-vent-field', poi: 'bvf-main-vents' },
   { site: 'monterey-canyon', poi: 'monterey-canyon-wall' },
 ];
-const hud = [
-  '.sonar',
-  '.objectives-panel',
-  '.hud-readouts',
-  '.tc-stick',
-  '.tc-slider',
-  '.tc-buttons',
-  '.tc-btn-pause',
-];
+// Phones have no objectives panel (the guidance slot carries the objective), so
+// callers add it only where it is on screen.
+const hud = ['.sonar', '.hud-readouts', '.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause'];
 
 // Sample visibility and all rectangles together, then poll for the ResizeObserver
 // and entrance animation to settle. Serial visibility calls cost a software-GPU
 // render apiece, repeated for every tutorial step, on hosted runners.
 async function separate(page: Page, selectors: string[]): Promise<void> {
+  if (await page.locator('.objectives-panel').isVisible())
+    selectors = [...selectors, '.objectives-panel'];
   await expect
     .poll(async () =>
       page.evaluate((selectors) => {
@@ -130,11 +127,10 @@ for (const viewport of [
             ).toBe(uiScale);
             if (phase === 'opening') {
               // The tutorial card defers to the scan card, so only one of them is up.
-              const scanUp = await page.locator('.scan-panel:not([data-tone="dim"])').isVisible();
-              if (scanUp) await expect(page.locator('.onboard-card')).toBeHidden();
+              const scanUp = await page.locator('.guidance-slot[data-kind="scan"]').isVisible();
+              if (scanUp) await expect(page.locator('.guidance-slot[data-step]')).toBeHidden();
               const fresh = [...hud];
-              for (const selector of ['.onboard-card', '.scan-panel'])
-                if (await page.locator(selector).isVisible()) fresh.push(selector);
+              if (await page.locator(GUIDANCE.any).isVisible()) fresh.push(GUIDANCE.any);
               await separate(page, fresh);
               await expect(page.locator('.hud-attribution')).toHaveCount(0);
               await page.screenshot({ path: testInfo.outputPath('arcade-opening.png') });
@@ -159,19 +155,22 @@ for (const viewport of [
               () =>
                 !!(window.__game as { discovery: Discovery }).discovery.scanner.view.nearestInRange,
             );
-            await expect(page.locator('.scan-panel')).toBeVisible();
-            await expect(page.locator('.hud-prompt')).toBeHidden();
+            await expect(page.locator('.guidance-slot')).toBeVisible();
             if (viewport.width < viewport.height)
               await expect(page.locator('.tc-rotate-hint')).toBeHidden();
             // The scan card owns the instruction; the tutorial returns once it is out of the way.
-            await expect(page.locator('.onboard-card')).toBeHidden();
+            await expect(page.locator('.guidance-slot[data-step]')).toBeHidden();
             await setScanCardSuppressed(page, true);
             await page.clock.runFor(34);
             for (const step of ['move', 'depth', 'scan']) {
-              await expect(page.locator('.onboard-card')).toHaveAttribute('data-step', step);
-              if (phase === 'tutorial steps') await separate(page, [...hud, '.onboard-card']);
+              await expect(page.locator('.guidance-slot[data-step]')).toHaveAttribute(
+                'data-step',
+                step,
+              );
+              if (phase === 'tutorial steps')
+                await separate(page, [...hud, '.guidance-slot[data-step]']);
               if (step !== 'scan') {
-                await page.locator('.onboard-skip-step').tap();
+                await page.locator('.guidance-skip').tap();
                 await page.clock.runFor(34);
               }
             }
@@ -183,14 +182,13 @@ for (const viewport of [
             await page.clock.runFor(34);
             await setScanCardSuppressed(page, false);
             await page.clock.runFor(34);
-            await expect(page.locator('.onboard-card')).toBeHidden();
-            await expect(page.locator('.scan-panel')).toBeVisible();
-            await expect(page.locator('.scan-hint')).toHaveCount(1);
-            await expect(page.locator('.hud-prompt')).toBeHidden();
+            await expect(page.locator('.guidance-slot[data-step]')).toBeHidden();
+            await expect(page.locator('.guidance-slot')).toBeVisible();
+            await expect(page.locator('.guidance-hint')).toHaveCount(1);
             await expect(
               page.getByText('Something to scan is in range', { exact: false }),
             ).toBeHidden();
-            await expect(page.locator('.onboard-hint')).not.toContainText(
+            await expect(page.locator('.guidance-slot')).not.toContainText(
               /Something to scan is in range|Face the target\. Hold .* to scan\./,
             );
             expect(
@@ -200,10 +198,7 @@ for (const viewport of [
                 ),
               ),
             ).toBe(false);
-            const after = [...hud, '.scan-panel'];
-            // Other contextual hints are legitimate; check their layout too.
-            if (await page.locator('.onboard-hint').isVisible()) after.push('.onboard-hint');
-            await separate(page, after);
+            await separate(page, [...hud, GUIDANCE.any]);
           });
         }
       }

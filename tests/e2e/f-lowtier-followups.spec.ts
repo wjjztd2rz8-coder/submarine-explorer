@@ -24,7 +24,7 @@ test('Blake portrait keeps the contact reticle off SCAN and restores it when con
     (window.__game as unknown as Game).sub.step = () => {};
   });
   await expect(page.locator('.tc-btn-scan')).toBeVisible();
-  await expect(page.locator('.scan-panel')).toBeVisible();
+  await expect(page.locator('.guidance-slot')).toBeVisible();
   // The card, reticle and Scan share one target, so the Blake contact now opens
   // on-axis and clear of the controls. Slide the SCAN button over the contact
   // without moving it: the reticle must hide behind the control.
@@ -97,8 +97,10 @@ test('Blue Hole east gallery owns its scan card at both authored poses', async (
       },
       { fixed: blueHolePoses.east, range },
     );
-    await expect(page.locator('.scan-panel .scan-name')).toHaveText('Eastern stalactite gallery');
-    await expect(page.locator('.scan-panel .scan-hint')).toHaveText('HOLD SCAN TO SCAN');
+    await expect(page.locator('.guidance-slot .guidance-name')).toHaveText(
+      'Eastern stalactite gallery',
+    );
+    await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText('HOLD SCAN TO SCAN');
     expect(
       await page.evaluate(() => (window.__game as unknown as Game).scanner.view.nearestId),
     ).toBe('great-blue-hole-stalactites-east');

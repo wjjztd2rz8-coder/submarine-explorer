@@ -1,19 +1,19 @@
 /**
- * Onboarding (F3-ONBOARD): the first-dive tutorial, one-shot contextual hints
- * and the controls card. It only reads input state and game events; it never
- * changes piloting input. The controls card owns its Escape policy in the
+ * Onboarding: the first-dive tutorial, one-shot contextual hints and the
+ * controls card. Tutorial steps and hints are offered to the guidance slot. It
+ * only reads input state and game events; it never changes piloting input. The controls card owns its Escape policy in the
  * shared overlay stack.
  */
 
 import { observeKeyboard } from '../../ui/FocusTrap.js';
 import type { InputDevice } from '../../ui/ControlsCard.js';
 import { ControlsCard } from '../../ui/ControlsCard.js';
-import { HintChip, TutorialCard, tutorialText } from '../../ui/TutorialCard.js';
-import type { TutorialKeys } from '../../ui/TutorialCard.js';
 import { HINT_TEXT, HintEngine, creatureHintAllowed, hullHintAllowed } from '../../game/Hints.js';
 import type { HintLabels } from '../../game/Hints.js';
-import { Tutorial } from '../../game/Tutorial.js';
+import { TUTORIAL_STEPS, Tutorial, tutorialText } from '../../game/Tutorial.js';
+import type { TutorialKeys } from '../../game/Tutorial.js';
 import { TutorialSave } from '../../game/TutorialSave.js';
+import type { GuidanceKind } from '../../game/Guidance.js';
 import type { ActionId } from '../../core/Input.js';
 import { FIRST_MINUTE_GUIDANCE } from '../../core/Config.js';
 import type { GameContext } from '../context.js';
@@ -22,13 +22,14 @@ import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
 
+const slotBusy = (kind: GuidanceKind | null): boolean =>
+  kind === 'urgent' || kind === 'scan' || kind === 'discovery';
+
 export function createOnboardSystem(): GameSystem {
   let ctxRef: GameContext | null = null;
   let tutorial = new Tutorial(false);
   let hints = new HintEngine();
   let store = new TutorialSave(null);
-  let card: TutorialCard | null = null;
-  let chip: HintChip | null = null;
   let diveS = 0;
   let startDepth: number | null = null;
   let wasGamepad = false;
@@ -81,11 +82,8 @@ export function createOnboardSystem(): GameSystem {
     name: 'onboard',
     dispose: () => {
       cleanup.dispose();
-      card?.dispose();
-      chip?.dispose();
+      ctxRef?.guidance?.setSkipHandler(null);
       ctxRef?.controlsCard.dispose();
-      card = null;
-      chip = null;
     },
     init(ctx) {
       ctxRef = ctx;
@@ -116,17 +114,9 @@ export function createOnboardSystem(): GameSystem {
         }),
       );
 
-      card = new TutorialCard({
-        skipStep: () => {
-          if (tutorial.skipStep()) onAdvance();
-        },
-        skipAll: () => {
-          if (!tutorial.active) return;
-          tutorial.skipAll();
-          onAdvance();
-        },
+      ctx.guidance.setSkipHandler(() => {
+        if (tutorial.skipStep()) onAdvance();
       });
-      chip = new HintChip(ctx.discovery.overlay.messages);
 
       // Last input used decides which layout is shown.
       cleanup.add(observeKeyboard(() => controlsCard.setDevice('keyboard')));
@@ -219,45 +209,54 @@ export function createOnboardSystem(): GameSystem {
           if (scanCompleted && tutorial.notify('scan:complete')) onAdvance();
         }
 
+        const guidance = ctx.guidance;
         const step = tutorial.step;
         const objectiveTitle = ctx.missionRouter?.mission.objectives.find(
           (o) => o.primary && !o.complete,
         )?.title;
-        if (card) {
-          // An actionable scan card carries its own instruction; never stack the two.
-          // Dim navigation cards leave room for the tutorial.
-          if (step && playing && !ctx.discovery.overlay.promptActive)
-            card.show(
-              tutorial.index,
-              tutorialText(
-                step.id,
-                device,
-                tutorialKeys(device),
-                tutorial.scanning ? tutorial.scanProgress : null,
-                objectiveTitle?.startsWith('Head to ') ? objectiveTitle.slice(8) : undefined,
-              ),
-              device,
-            );
-          else card.show(null);
-        }
+        guidance.offer(
+          'tutorial',
+          'hint',
+          step && playing
+            ? {
+                // Phones keep to one short line beside Skip.
+                kicker:
+                  device === 'touch'
+                    ? ''
+                    : `STEP ${tutorial.index + 1} OF ${TUTORIAL_STEPS.length}`,
+                text: tutorialText(
+                  step.id,
+                  device,
+                  tutorialKeys(device),
+                  tutorial.scanning ? tutorial.scanProgress : null,
+                  objectiveTitle?.startsWith('Head to ') ? objectiveTitle.slice(8) : undefined,
+                ),
+                tone: 'cyan',
+                step: step.id,
+              }
+            : null,
+        );
 
-        if (!chip) return;
-        if (!playing || controlsCard.isOpen) {
-          if (chip.visible && !playing) chip.hide();
+        if (!playing) {
+          guidance.offer('hint', 'hint', null);
           return;
         }
+        if (controlsCard.isOpen) return;
         const power = ctx.power.state;
-        if (creatureHint && ctx.cameraTips.moved && chip.visible) chip.fade();
+        if (creatureHint && ctx.cameraTips.moved) guidance.offer('hint', 'hint', null);
         const id = hints.update(f.elapsed, {
           battery: power.enabled ? power.battery : null,
           ratedRatio: f.sub.ratedRatio,
           hullHintEligible:
             startDepth !== null &&
             hullHintAllowed(diveS, f.sub.depth, startDepth, f.sub.ratedDepth),
-          // The scan panel already gives the target name and hold-to-scan prompt.
+          // The scan card already gives the target name and hold-to-scan prompt.
           scanTargetInRange: false,
+          // A warning, scan card or result holds the slot; the animal hint waits
+          // for it rather than being used up unseen.
           creatureInView:
-            creatureHintAllowed(diveS, ctx.discovery.overlay.cardVisible) &&
+            creatureHintAllowed(diveS, guidance.visible) &&
+            !slotBusy(guidance.kind) &&
             !ctx.cameraTips.moved &&
             (ctx.life?.targets.length ?? 0) > 0,
           canShow: !tutorial.active,
@@ -265,8 +264,16 @@ export function createOnboardSystem(): GameSystem {
         if (id) {
           creatureHint = id === 'creature';
           store.save({ seenHints: hints.seen });
-          chip.show(
-            HINT_TEXT[id](hintLabels(device)),
+          // Battery and pressure tips are warnings; the rest are one-shot hints.
+          const safety = id === 'battery-low' || id === 'near-hull';
+          guidance.flash(
+            'hint',
+            safety ? 'urgent' : 'hint',
+            {
+              kicker: safety ? 'WARNING' : 'TIP',
+              text: HINT_TEXT[id](hintLabels(device)),
+              tone: safety ? 'amber' : 'cyan',
+            },
             id === 'creature' ? FIRST_MINUTE_GUIDANCE.lifetimeMs / 1000 : 9,
           );
         }
@@ -279,6 +286,6 @@ export function createOnboardSystem(): GameSystem {
     finishTutorial();
     creatureHint = false;
     const guide = ctxRef?.controlsCard?.device === 'touch' ? 'How to play' : 'The Controls guide';
-    chip?.show(`Nice work. ${guide} is always in the Pause menu.`);
+    ctxRef?.guidance.notice(`Nice work. ${guide} is always in the Pause menu.`);
   }
 }

@@ -5,6 +5,7 @@ import type { CameraRig } from '../../src/sub/CameraRig.js';
 import sites from '../../data/landmarks/index.json' with { type: 'json' };
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
+import { GUIDANCE } from './helpers/guidance.js';
 import { scanAim } from './helpers/scanAim.js';
 
 interface Game {
@@ -12,6 +13,7 @@ interface Game {
   sub: Submarine;
   rig: CameraRig;
   props: { loaded: boolean };
+  terrain: { sampleHeight(x: number, z: number): number };
 }
 
 const shots = '.cache/codex/shots/1390-f-bughunt-hud-touch-overlap';
@@ -19,11 +21,7 @@ const selectors = [
   '.sonar',
   '.objectives-panel',
   '.hud-readouts',
-  '.scan-panel',
-  '.scan-objective-chip',
-  '.onboard-card',
-  '.onboard-hint',
-  '.hud-notice',
+  '.guidance-slot',
   '.tc-stick',
   '.tc-slider',
   '.tc-btn-scan',
@@ -84,6 +82,9 @@ async function ready(page: Page): Promise<void> {
     const g = window.__game as unknown as Game;
     return window.__gameReady === true && g.discovery.loaded && g.props.loaded;
   });
+  // Let the first frames publish the real altitude: an unstepped sub reads as on
+  // the seabed, and the urgent SEABED PROXIMITY warning would own the slot.
+  await page.clock.runFor(500);
   await page.evaluate(() => {
     (window.__game as unknown as Game).sub.step = () => {};
   });
@@ -112,7 +113,12 @@ async function away(page: Page): Promise<void> {
     await page.evaluate(
       ([base, dx, dz]) => {
         const g = window.__game as unknown as Game;
-        g.sub.position.set(base.x + dx, base.y, base.z + dz);
+        // Hold well clear of the unknown terrain out there: the seabed warning is urgent and
+        // would own the slot, which is not what this test is about.
+        const x = base.x + dx;
+        const z = base.z + dz;
+        const ground = g.terrain.sampleHeight(x, z);
+        g.sub.position.set(x, Math.min(-3, Math.max(base.y, ground + 60)), z);
         g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
         // Advance the completion banner without spending wall time or reward lifetime.
         g.discovery.update(0, 10, g.sub.position, g.sub.getForward(), { scan: false });
@@ -166,11 +172,10 @@ for (const viewport of [
           `/?mission=${site}&skipBriefing=1&tier=low${viewport.touch ? '&touch=1' : ''}`,
         );
         await ready(page);
-        const card = page.locator('.onboard-card');
-        const chip = page.locator('.scan-objective-chip');
-        // The tutorial never shares the screen with an actionable scan card; dim cards only navigate.
-        if (await page.locator('.scan-panel:not([data-tone="dim"])').isVisible())
-          await expect(card).toBeHidden();
+        const card = page.locator(GUIDANCE.tutorial);
+        const chip = page.locator(GUIDANCE.objective);
+        // The tutorial never shares the screen with a scan card: one slot, one message.
+        if (await page.locator(GUIDANCE.scan).isVisible()) await expect(card).toBeHidden();
         else await expect(card).toHaveAttribute('data-step', 'move');
         await layout(page, 'opening');
 
@@ -191,7 +196,7 @@ for (const viewport of [
           g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
         }, aim);
         await page.clock.runFor(34);
-        await expect(page.locator('.scan-panel')).toBeVisible();
+        await expect(page.locator(GUIDANCE.scan)).toBeVisible();
         await expect(chip).toBeHidden();
         await layout(page, 'contact in range');
 
@@ -216,16 +221,16 @@ for (const viewport of [
         await page.clock.runFor(34);
         // The tutorial defers while the scan card is up, and the early scan is kept for its step.
         await expect(card).toBeHidden();
-        await expect(page.locator('.hud-notice')).toContainText('New discovery');
+        await expect(page.locator(GUIDANCE.discovery)).toContainText('NEW ENTRY');
         await layout(page, 'early scan reward');
         await away(page);
-        await expect(page.locator('.scan-panel')).toBeHidden();
+        await expect(page.locator(GUIDANCE.discovery)).toBeHidden();
         for (const step of ['move', 'depth']) {
           await expect(card).toHaveAttribute('data-step', step);
           await expect(card).toBeVisible();
           await layout(page, `reward and tutorial ${step}`);
-          if (viewport.touch) await page.locator('.onboard-skip-step').tap();
-          else await page.locator('.onboard-skip-step').click();
+          if (viewport.touch) await page.locator('.guidance-skip').tap();
+          else await page.locator('.guidance-skip').click();
           await page.clock.runFor(34);
         }
         // The remembered scan finishes the last step, so the tutorial ends here.
@@ -239,23 +244,24 @@ for (const viewport of [
         await layout(page, 'finished tutorial and reward');
 
         await away(page);
-        await expect(page.locator('.scan-panel')).toBeHidden();
-        if (viewport.touch) {
-          await expect(chip).toBeVisible();
-          expect((await chip.boundingBox())!.height).toBeLessThanOrEqual(28);
-        } else await expect(chip).toBeHidden();
-        await layout(page, 'out of range chip with hint and reward');
+        await expect(page.locator(GUIDANCE.scan)).toBeHidden();
+        // Phones keep the standing objective line; desktop has the objectives panel.
+        if (viewport.touch) await expect(chip).toBeVisible();
+        else await expect(chip).toBeHidden();
+        await layout(page, 'out of range with the standing objective');
         await page.screenshot({ path: `${shots}/${site}-${tag}-chip.png` });
 
-        // Re-enter range while the chip is visible, without a tutorial hiding it.
+        // Re-enter range, without a tutorial hiding the logged-contact card.
         await page.evaluate((poi) => {
           const g = window.__game as unknown as Game;
           g.sub.position.set(poi.from.x, poi.from.y, poi.from.z);
           g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
         }, poi);
-        await page.clock.runFor(34);
-        await expect(page.locator('.scan-panel')).toBeVisible();
-        await expect(chip).toBeHidden();
+        await page.clock.runFor(500);
+        // An unscanned contact in range outranks the logged one (Scanner), so the
+        // slot may name either; the logged-contact text itself is pinned in d-scan.
+        await expect(page.locator(GUIDANCE.any)).toBeVisible();
+        await expect(card).toBeHidden();
         await layout(page, 'return to scanned contact');
 
         await page.reload();

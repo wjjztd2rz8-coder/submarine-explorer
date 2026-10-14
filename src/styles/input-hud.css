@@ -38,8 +38,6 @@ body {
   font-size: clamp(14px, calc(14px * var(--ui-scale)), 21px);
   font-weight: 400;
 }
-.hud-objective,
-.hud-prompt,
 .hud-sim-speed {
   position: absolute;
   left: 12px;
@@ -51,21 +49,12 @@ body {
   font-size: clamp(14px, calc(16px * var(--ui-scale)), 24px);
   font-weight: 600;
 }
-.hud-objective {
-  top: clamp(205px, calc(220px * var(--ui-scale)), 300px);
-}
-.hud-prompt {
-  bottom: 24px;
-  color: var(--hud-accent);
-}
 .hud-sim-speed {
   top: 12px;
   left: 50%;
   transform: translateX(-50%);
   color: #ffcb70;
 }
-.hud-objective[hidden],
-.hud-prompt[hidden],
 .hud-sim-speed[hidden],
 .hud-ctrl-tip[hidden],
 .settings-section[hidden],
@@ -73,11 +62,11 @@ body {
 .settings-controls-open[hidden] {
   display: none !important;
 }
-.scan-panel {
+.guidance-slot {
   font-size: clamp(14px, calc(15px * var(--ui-scale)), 23px);
 }
-.scan-name,
-.scan-hint {
+.guidance-name,
+.guidance-hint {
   font-size: inherit;
 }
 .settings {

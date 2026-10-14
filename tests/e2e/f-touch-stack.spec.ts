@@ -1,5 +1,6 @@
 import { dismissTutorial, setScanCardSuppressed } from './helpers/tutorial.js';
 import { expect, test, type Page } from '@playwright/test';
+import { GUIDANCE } from './helpers/guidance.js';
 
 const shots = '.cache/codex/shots/f-touch-stack';
 const stackUrl = '/?mission=titanic&skipBriefing=1&touch=1&tier=low';
@@ -23,14 +24,14 @@ for (const viewport of [
       page,
     }) => {
       await ready(page, tutorialUrl);
-      const card = page.locator('.onboard-card');
-      // A contact is in range from the start: its card owns the screen, the tutorial waits.
-      await expect(page.locator('.scan-panel')).toBeVisible();
+      const card = page.locator(GUIDANCE.tutorial);
+      // A contact is in range from the start: its card owns the slot, the tutorial waits.
+      await expect(page.locator(GUIDANCE.scan)).toBeVisible();
       await expect(card).toBeHidden();
       await setScanCardSuppressed(page, true);
       for (const step of ['move', 'depth']) {
         await expect(card).toHaveAttribute('data-step', step);
-        await page.locator('.onboard-skip-step').tap();
+        await page.locator('.guidance-skip').tap();
       }
       await expect(card).toHaveAttribute('data-step', 'scan');
       await page.screenshot({ path: `${shots}/tutorial-scan-${tag}.png` });
@@ -38,10 +39,10 @@ for (const viewport of [
       expect(h).toBeLessThanOrEqual(56);
       await setScanCardSuppressed(page, false);
       await expect(card).toBeHidden();
-      await expect(page.locator('.scan-panel')).toBeVisible();
+      await expect(page.locator(GUIDANCE.scan)).toBeVisible();
       // The scan card alone leaves the middle of the screen open.
       const bottom = await page.evaluate(
-        () => document.querySelector('.scan-panel')!.getBoundingClientRect().bottom,
+        () => document.querySelector('.guidance-slot')!.getBoundingClientRect().bottom,
       );
       expect(bottom).toBeLessThan(viewport.height * 0.5 + 20);
     });
@@ -89,7 +90,7 @@ for (const viewport of [
       }
     });
 
-    test('objective chip shows when no contact is in range', async ({ page }) => {
+    test('the standing objective line shows when no contact is in range', async ({ page }) => {
       await ready(page, stackUrl);
       await dismissTutorial(page, true);
       await page.evaluate(() => {
@@ -100,12 +101,12 @@ for (const viewport of [
         g.sub.position.x += 900;
         g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
       });
-      await expect(page.locator('.scan-panel')).toBeHidden();
-      const chip = page.locator('.scan-objective-chip');
+      await expect(page.locator(GUIDANCE.scan)).toBeHidden();
+      const chip = page.locator(GUIDANCE.objective);
       await expect(chip).toBeVisible();
-      await expect(chip).toContainText('▸');
+      await expect(chip).toContainText('OBJECTIVE');
       const box = (await chip.boundingBox())!;
-      expect(box.height).toBeLessThanOrEqual(28);
+      expect(box.height).toBeLessThanOrEqual(64);
       const overlaps = await page.evaluate((b) => {
         return [
           '.tc-stick',

@@ -28,7 +28,7 @@ test('Arcade hides supplies; Custom enables them; depletion ascends and debriefs
     const power = (window.__game as { power: { setLevels(b: number, o: number): void } }).power;
     power.setLevels(0.24, 0.6);
   });
-  await expect(page.locator('.hud-warning')).toContainText('BATTERY LOW');
+  await expect(page.locator('.guidance-slot[data-kind="urgent"]')).toContainText('BATTERY LOW');
   await page.screenshot({ path: `${shots}/gauge-low-warning.png` });
   await page.evaluate(() => {
     const power = (window.__game as { power: { setLevels(b: number, o: number): void } }).power;
@@ -39,7 +39,9 @@ test('Arcade hides supplies; Custom enables them; depletion ascends and debriefs
       (window.__game as { missionRouter: { emergencyAscent: boolean } }).missionRouter
         .emergencyAscent,
   );
-  await expect(page.locator('.hud-warning')).toContainText('EMERGENCY ASCENT');
+  await expect(page.locator('.guidance-slot[data-kind="urgent"]')).toContainText(
+    'EMERGENCY ASCENT',
+  );
   await page.screenshot({ path: `${shots}/emergency-ascent.png` });
   // Advance the already active blow to the surface without waiting for the
   // full 3,800 m real-time trip. The physics still performs the final step.

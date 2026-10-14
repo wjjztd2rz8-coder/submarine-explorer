@@ -1,6 +1,6 @@
 import { dismissTutorial, setScanCardSuppressed } from './helpers/tutorial.js';
 /**
- * F3-ONBOARD: the first-dive tutorial, one-shot hints and the controls card.
+ * The first-dive tutorial, one-shot hints and the controls card.
  * These specs use the plain Playwright test (fresh player), not the
  * experienced-pilot helper the other feature specs share.
  */
@@ -9,6 +9,7 @@ import { mkdir } from 'node:fs/promises';
 import { devices, expect, test, type Page } from '@playwright/test';
 import { HINT_THRESHOLDS } from '../../src/game/Hints.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { GUIDANCE } from './helpers/guidance.js';
 import { advanceScan, completeScan } from './helpers/scan.js';
 
 const shots = '.cache/codex/shots/f3-onboard';
@@ -59,11 +60,11 @@ test('desktop: tutorial starts, advances, skips and stays skipped after reload',
   page,
 }) => {
   await boot(page);
-  const card = page.locator('.onboard-card');
+  const card = page.locator(GUIDANCE.tutorial);
   await expect(card).toBeVisible();
-  await expect(card).toContainText('Step 1 of 3');
+  await expect(card).toContainText('STEP 1 OF 3');
   await expect(card).toContainText('Hold W to move');
-  await expect(page.getByRole('button', { name: 'Skip tutorial' })).toBeVisible();
+  await expect(page.locator(GUIDANCE.skip)).toBeVisible();
   await shot(page, 'desktop-step1');
 
   // Doing the action advances the step.
@@ -72,20 +73,21 @@ test('desktop: tutorial starts, advances, skips and stays skipped after reload',
   await expect.poll(() => stepIndex(page), { timeout: 15_000 }).toBe(1);
   await page.keyboard.up('KeyW');
   await page.keyboard.up('KeyA');
-  await expect(card).toContainText('Step 2 of 3');
+  await expect(card).toContainText('STEP 2 OF 3');
   await shot(page, 'desktop-step2');
 
   // The card never freezes the sim or steals focus.
   expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
 
-  await page.getByRole('button', { name: 'Skip tutorial' }).click();
+  // One Skip per step: the last press ends the tutorial for good.
+  for (let i = 0; i < 2; i++) await page.locator(GUIDANCE.skip).click();
   await expect(card).toBeHidden();
   expect((await saved(page))?.tutorialDone).toBe(true);
 
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
   await page.waitForTimeout(1500);
-  await expect(page.locator('.onboard-card')).toBeHidden();
+  await expect(page.locator(GUIDANCE.tutorial)).toBeHidden();
   expect(
     await page.evaluate(() => (window.__game as unknown as Probe).onboard.tutorial.active),
   ).toBe(false);
@@ -108,35 +110,35 @@ test('scan coaching waits through held progress and interruption until completio
   // The contact is in range, so its card keeps the tutorial hidden; hold it away to read the coach.
   await setScanCardSuppressed(page, true);
   await page.clock.fastForward(50);
-  for (let i = 0; i < 2; i++) await page.locator('.onboard-skip-step').click();
+  for (let i = 0; i < 2; i++) await page.locator(GUIDANCE.skip).click();
   await page.clock.fastForward(50);
-  const card = page.locator('.onboard-card');
+  const card = page.locator(GUIDANCE.any);
   await expect(card).toHaveAttribute('data-step', 'scan');
   await page.keyboard.down('g');
   await advanceScan(page, 0.5);
   await page.clock.fastForward(50);
-  await expect(card.locator('.onboard-card-text')).toContainText('Scanning…');
+  await expect(card.locator(GUIDANCE.name)).toContainText('Scanning…');
   expect(await stepIndex(page)).toBe(2);
   await page.keyboard.up('g');
   await page.clock.fastForward(50);
-  await expect(card.locator('.onboard-card-text')).not.toContainText('Scanning…');
+  await expect(card.locator(GUIDANCE.name)).not.toContainText('Scanning…');
   expect(await stepIndex(page)).toBe(2);
   await page.keyboard.down('g');
   await completeScan(page, 'test-bow');
   await page.keyboard.up('g');
   await page.clock.fastForward(50);
   expect(await stepIndex(page)).toBe(3);
-  await expect(card).toBeHidden();
+  await expect(page.locator(GUIDANCE.tutorial)).toBeHidden();
 });
 
-test('tutorial card yields to the scan card instead of stacking with it', async ({ page }) => {
+test('the scan card outranks the tutorial step instead of stacking with it', async ({ page }) => {
   // Regression: the coach card and the scan card used to share the centre lane.
   await boot(page, '', true);
-  await expect(page.locator('.scan-panel')).toBeVisible();
-  await expect(page.locator('.onboard-card')).toBeHidden();
+  await expect(page.locator(GUIDANCE.scan)).toBeVisible();
+  await expect(page.locator(GUIDANCE.tutorial)).toBeHidden();
   expect(await stepIndex(page)).toBe(0);
   await setScanCardSuppressed(page, true);
-  await expect(page.locator('.onboard-card')).toBeVisible();
+  await expect(page.locator(GUIDANCE.tutorial)).toBeVisible();
 });
 
 test('desktop: Pause opens the controls card for the active device', async ({ page }) => {
@@ -167,94 +169,86 @@ test('desktop: Pause opens the controls card for the active device', async ({ pa
   await expect(howTo.locator('.controls-card-tabs')).toBeVisible();
 });
 
-for (const dismissal of ['button', 'expiry'] as const) {
-  test(
-    dismissal === 'button'
-      ? 'hints appear once, can be dismissed and are remembered'
-      : 'hints expire after nine seconds and stay remembered after reload',
-    async ({ page }) => {
-      await pauseClockBeforeNavigation(page);
-      await page.addInitScript((k) => {
-        if (!localStorage.getItem(k))
-          localStorage.setItem(
-            k,
-            JSON.stringify({
-              version: 1,
-              tutorialDone: true,
-              seenHints: ['battery-low', 'creature'],
-            }),
-          );
-      }, KEY);
-      // Titanic is only ~58% of its fitted hull rating, so no pressure hint is due.
-      // Leggo's site naturally reaches the hint band without exceeding Class C's rating.
-      await page.goto('/?tile=challenger-deep&poi=cd-leggo-amphipod-site&skipBriefing=1&tier=low', {
-        waitUntil: 'domcontentloaded',
-      });
-      const ready = () => {
-        const game = window.__game as unknown as Probe;
-        // spawnedAt is set just after teleport/cancel, before the next scan/HUD
-        // update. Pump until the intended POI is actually the live candidate.
-        return (
-          window.__gameReady === true &&
-          game.discovery.loaded &&
-          game.discovery.spawnedAt === 'cd-leggo-amphipod-site' &&
-          game.scanner.view.candidateId === 'cd-leggo-amphipod-site'
+{
+  test('hints expire after nine seconds and stay remembered after reload', async ({ page }) => {
+    await pauseClockBeforeNavigation(page);
+    await page.addInitScript((k) => {
+      if (!localStorage.getItem(k))
+        localStorage.setItem(
+          k,
+          JSON.stringify({
+            version: 1,
+            tutorialDone: true,
+            seenHints: ['battery-low', 'creature'],
+          }),
         );
-      };
-      await clockFramesUntil(page, ready);
-      const hull = await page.evaluate(() =>
-        (
-          window.__game as {
-            sub: {
-              getState(): { hullClass: string; ratedRatio: number; hullBreached: boolean };
-            };
-          }
-        ).sub.getState(),
+    }, KEY);
+    // Titanic is only ~58% of its fitted hull rating, so no pressure hint is due.
+    // Leggo's site naturally reaches the hint band without exceeding Class C's rating.
+    await page.goto('/?tile=challenger-deep&poi=cd-leggo-amphipod-site&skipBriefing=1&tier=low', {
+      waitUntil: 'domcontentloaded',
+    });
+    const ready = () => {
+      const game = window.__game as unknown as Probe;
+      // spawnedAt is set just after teleport/cancel, before the next scan/HUD
+      // update. Pump until the intended POI is actually the live candidate.
+      return (
+        window.__gameReady === true &&
+        game.discovery.loaded &&
+        game.discovery.spawnedAt === 'cd-leggo-amphipod-site' &&
+        game.scanner.view.candidateId === 'cd-leggo-amphipod-site'
       );
-      expect(hull.hullClass).toBe('C');
-      expect(hull.ratedRatio).toBeGreaterThanOrEqual(HINT_THRESHOLDS.hull);
-      expect(hull.ratedRatio).toBeLessThan(1);
-      expect(hull.hullBreached).toBe(false);
-      const hint = page.locator('.onboard-hint');
-      await expect(hint).toBeHidden();
-      // The authored deep approach must stay quiet after the opening grace
-      // period as well. Keep physics fixed while advancing real dive frames.
-      await page.evaluate(() => {
-        const g = window.__game as unknown as {
-          sub: { step(): void; position: { y: number } };
-        };
-        g.sub.step = () => {};
-      });
-      for (let i = 0; i < 81; i++) await page.clock.fastForward(250);
-      await expect(hint).toBeHidden();
-      expect((await saved(page))?.seenHints).not.toContain('near-hull');
-      // A new descent beyond the opening depth still earns the one-shot hint.
-      await page.evaluate(() => {
-        const g = window.__game as unknown as { sub: { position: { y: number } } };
-        g.sub.position.y -= 11;
-      });
-      await page.clock.fastForward(250);
-      await expect(hint).toBeVisible({ timeout: 30_000 });
-      await expect(hint).toContainText('Near hull rating');
-      await expect(page.locator('.scan-panel')).toBeVisible();
-      await shot(page, 'desktop-hint');
-      if (dismissal === 'button') {
-        await hint.getByRole('button', { name: 'Dismiss hint' }).click();
-      } else {
-        await page.clock.fastForward(8000);
-        await expect(hint).toBeVisible();
-        await page.clock.fastForward(1001);
-      }
-      await expect(hint).toBeHidden();
-      expect((await saved(page))?.seenHints).toContain('near-hull');
-      expect((await saved(page))?.seenHints).not.toContain('scan-target');
-      await page.reload({ waitUntil: 'domcontentloaded' });
-      await clockFramesUntil(page, ready);
-      await page.clock.fastForward(2500);
-      await expect(page.locator('.scan-panel')).toBeVisible();
-      await expect(page.locator('.onboard-hint')).toBeHidden();
-    },
-  );
+    };
+    await clockFramesUntil(page, ready);
+    const hull = await page.evaluate(() =>
+      (
+        window.__game as {
+          sub: {
+            getState(): { hullClass: string; ratedRatio: number; hullBreached: boolean };
+          };
+        }
+      ).sub.getState(),
+    );
+    expect(hull.hullClass).toBe('C');
+    expect(hull.ratedRatio).toBeGreaterThanOrEqual(HINT_THRESHOLDS.hull);
+    expect(hull.ratedRatio).toBeLessThan(1);
+    expect(hull.hullBreached).toBe(false);
+    // Pressure and battery tips are warnings, so they outrank the scan card.
+    const hint = page.locator(GUIDANCE.urgent);
+    await expect(hint).toBeHidden();
+    // The authored deep approach must stay quiet after the opening grace
+    // period as well. Keep physics fixed while advancing real dive frames.
+    await page.evaluate(() => {
+      const g = window.__game as unknown as {
+        sub: { step(): void; position: { y: number } };
+      };
+      g.sub.step = () => {};
+    });
+    for (let i = 0; i < 81; i++) await page.clock.fastForward(250);
+    await expect(hint).toBeHidden();
+    expect((await saved(page))?.seenHints).not.toContain('near-hull');
+    // A new descent beyond the opening depth still earns the one-shot hint.
+    await page.evaluate(() => {
+      const g = window.__game as unknown as { sub: { position: { y: number } } };
+      g.sub.position.y -= 11;
+    });
+    await page.clock.fastForward(250);
+    await expect(hint).toBeVisible({ timeout: 30_000 });
+    await expect(hint).toContainText('Near hull rating');
+    await shot(page, 'desktop-hint');
+    // Hints run down on dive time, so advance real frames (250 ms each).
+    for (let i = 0; i < 32; i++) await page.clock.fastForward(250);
+    await expect(hint).toBeVisible();
+    for (let i = 0; i < 5; i++) await page.clock.fastForward(250);
+    await expect(hint).toBeHidden();
+    expect((await saved(page))?.seenHints).toContain('near-hull');
+    expect((await saved(page))?.seenHints).not.toContain('scan-target');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await clockFramesUntil(page, ready);
+    await page.clock.fastForward(2500);
+    await expect(page.locator(GUIDANCE.scan)).toBeVisible();
+    await expect(page.locator(GUIDANCE.urgent)).toBeHidden();
+  });
 }
 
 test.describe('touch viewport', () => {
@@ -274,13 +268,13 @@ test.describe('touch viewport', () => {
     await expect(page.locator('html')).toHaveClass(/is-touch/);
     await pause.getByRole('button', { name: 'Resume', exact: true }).tap();
     await expect(page.locator('.tc-btn-pause')).toBeVisible();
-    await expect(page.locator('.onboard-card')).toBeHidden();
+    await expect(page.locator(GUIDANCE.tutorial)).toBeHidden();
   });
 
   test('tutorial card clears the on-screen controls and targets are 44px', async ({ page }) => {
     await boot(page, '&touch=1');
-    const card = page.locator('.onboard-card');
-    await expect(card).toBeVisible();
+    const card = page.locator(GUIDANCE.any);
+    await expect(page.locator(GUIDANCE.tutorial)).toBeVisible();
     await expect(card).toContainText('left stick');
     const box = (await card.boundingBox())!;
     const vp = page.viewportSize()!;
@@ -306,7 +300,7 @@ test.describe('touch viewport', () => {
     await expect(card).toContainText('slider');
     await shot(page, 'touch-step2');
     await dismissTutorial(page, true);
-    await expect(card).toBeHidden();
+    await expect(page.locator(GUIDANCE.tutorial)).toBeHidden();
     await page.locator('.tc-btn-pause').tap();
     await page
       .locator('.pause-menu')
@@ -324,7 +318,7 @@ test.describe('touch viewport', () => {
     page,
   }) => {
     await boot(page, '&touch=1');
-    const card = page.locator('.onboard-card');
+    const card = page.locator(GUIDANCE.tutorial);
     const start = await page.evaluate(() => {
       const sub = (
         window.__game as unknown as {

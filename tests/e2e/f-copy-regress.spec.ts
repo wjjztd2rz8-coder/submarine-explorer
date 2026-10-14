@@ -54,12 +54,48 @@ for (const layout of [
         // The copy fixture and its measurements are one browser task, so the
         // live router cannot overwrite the fixture between setting and reading
         // it. Every authored title/hint and all original bounds are still checked.
+        // Desktop shows the title in the objectives panel; phones show it in the
+        // guidance slot. Both are measured with every authored title.
         const samples = await page.evaluate(
-          ({ copy, activeId }) => {
+          ({ copy, activeId, touch }) => {
             const g = window.__game as {
               mission: { objectives: ObjectiveStatus[] };
               missionRouter: { panel: ObjectivesPanel };
+              guidance: {
+                offer(source: string, kind: string, message: object | null): void;
+              };
             };
+            if (touch) {
+              const samples = copy.map((objective) => {
+                // An urgent offer takes the slot whatever contact is in range.
+                g.guidance.offer('copy-fixture', 'urgent', {
+                  kicker: 'OBJECTIVE',
+                  text: objective.title,
+                  detail: 'TURN 120° STARBOARD',
+                  tone: 'cyan',
+                  ring: { progress: 0, label: '1,250 m' },
+                });
+                const slot = document.querySelector<HTMLElement>('.guidance-slot')!;
+                const element = slot.querySelector<HTMLElement>('.guidance-name')!;
+                const box = element.getBoundingClientRect();
+                const row = slot.getBoundingClientRect();
+                return {
+                  objective,
+                  title: element.textContent,
+                  hint: objective.hint,
+                  visible: slot.checkVisibility() && box.width > 0 && box.height > 0,
+                  clipped:
+                    element.scrollWidth > element.clientWidth + 1 ||
+                    slot.scrollWidth > slot.clientWidth + 1,
+                  left: box.left,
+                  right: box.right,
+                  rowRight: row.right,
+                  optionalLeft: row.right,
+                };
+              });
+              g.guidance.offer('copy-fixture', 'urgent', null);
+              return samples;
+            }
             // Select the fixture's current row explicitly. Live navigation may
             // have changed between scales; copy measurement must not depend on
             // the submarine continuing to favour the same target.
@@ -75,12 +111,7 @@ for (const layout of [
               },
               false,
             );
-            // Objective copy is shown when no scan card owns the instruction.
-            // Measure that real presentation state in the same synchronous task.
-            const scan = document.querySelector<HTMLElement>('.scan-panel')!;
-            const hidden = scan.hidden;
-            scan.hidden = true;
-            const samples = copy.map((objective) => {
+            return copy.map((objective) => {
               g.missionRouter.panel.setObjectives(
                 g.mission.objectives.map((o) =>
                   o.id === activeId
@@ -118,15 +149,13 @@ for (const layout of [
                 optionalLeft: optional?.left ?? row.right,
               };
             });
-            scan.hidden = hidden;
-            return samples;
           },
-          { copy, activeId },
+          { copy, activeId, touch: layout.touch },
         );
         for (const bounds of samples) {
           const objective = bounds.objective;
           expect(bounds.title).toBe(objective.title);
-          expect(bounds.hint).toBe(objective.hint);
+          if (!layout.touch) expect(bounds.hint).toBe(objective.hint);
           expect(bounds.visible, `${scale}%: ${objective.title}`).toBe(true);
           expect(bounds.clipped, `${scale}%: ${objective.title}`).toBe(false);
           expect(bounds.left).toBeGreaterThanOrEqual(0);
@@ -134,13 +163,14 @@ for (const layout of [
           expect(bounds.right).toBeLessThanOrEqual(bounds.rowRight);
           expect(bounds.right).toBeLessThanOrEqual(bounds.optionalLeft);
         }
-        await expect
-          .poll(async () => {
-            const panel = (await page.locator('.objectives-panel').boundingBox())!;
-            const readouts = (await page.locator('.hud-readouts').boundingBox())!;
-            return readouts.y - (panel.y + panel.height);
-          })
-          .toBeGreaterThanOrEqual(0);
+        if (!layout.touch)
+          await expect
+            .poll(async () => {
+              const panel = (await page.locator('.objectives-panel').boundingBox())!;
+              const readouts = (await page.locator('.hud-readouts').boundingBox())!;
+              return readouts.y - (panel.y + panel.height);
+            })
+            .toBeGreaterThanOrEqual(0);
         await page.screenshot({ path: `${shots}/${layout.name}-${scale}.png` });
       }
     });

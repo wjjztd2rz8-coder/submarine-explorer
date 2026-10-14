@@ -689,3 +689,7 @@
   font-size: 0.8em;
   opacity: 0.55;
 }
+
+.jr-nav-item.is-secret {
+  min-height: 44px;
+}

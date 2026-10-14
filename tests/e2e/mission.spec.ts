@@ -378,7 +378,7 @@ test.describe('fix S: mission failure, framing and modals', () => {
       g.sub.setHullClass('A');
       g.sub.reset(0, g.sub.getCrushDepth() - 5, 0, 0);
     });
-    const alert = page.locator('.objectives-panel .obj-alert');
+    const alert = page.locator('.guidance-slot[data-kind="urgent"] .guidance-name');
     await expect(alert).toBeVisible();
     await expect(alert).toHaveText('HULL FAILURE — EMERGENCY ASCENT');
 
@@ -506,7 +506,7 @@ test.describe('fix S: mission failure, framing and modals', () => {
     expect(Math.hypot(offset.x, offset.y, offset.z)).toBeGreaterThan(90);
     expect(offset.x).toBeCloseTo(-offset.chaseBack * Math.sin(offset.yaw), 1);
     expect(offset.z).toBeCloseTo(offset.chaseBack * Math.cos(offset.yaw), 1);
-    await expect(page.locator('.hud-warning')).toBeHidden();
+    await expect(page.locator('.guidance-slot[data-kind="urgent"]')).toBeHidden();
     expect(errors, errors.join(' | ')).toEqual([]);
   });
 });

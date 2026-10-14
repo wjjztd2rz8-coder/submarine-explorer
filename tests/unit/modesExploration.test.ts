@@ -13,12 +13,6 @@ import * as Secrets from '../../src/game/Secrets.js';
 import type { ExplorationSummary } from '../../src/ui/Debrief.js';
 import type { Samples } from '../../src/game/Samples.js';
 
-vi.mock('../../src/ui/ExploreNotice.js', () => ({
-  ExploreNotice: class {
-    dispose() {}
-  },
-}));
-
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
@@ -81,6 +75,7 @@ it.each([
           onSampleCollected: vi.fn(),
         },
         journal: { focus: vi.fn() },
+        guidance: { offer: vi.fn() },
         expose: (value: { explore: typeof exploration }) => {
           exploration = value.explore;
         },

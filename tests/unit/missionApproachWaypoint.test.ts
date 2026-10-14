@@ -65,7 +65,7 @@ it('a held scan on the first resolved mission frame locks the objective before n
     waypoints: view,
     save: { get: () => ({ gameplay: { visualHints: true } }) },
     effective: { gameplay: { visualHints: true } },
-    scanObjectiveHints: new Map(),
+    guidance: { showsName: () => false },
     rig: { camera: {} },
   } as unknown as GameContext;
   const runner = new SystemRunner(ctx);
@@ -211,7 +211,7 @@ it('guides optional objectives after primary completion and scans leftover conta
   }
 });
 
-it('Realistic retains its approach marker and navigation hint, then resumes normal waypoint preferences', async () => {
+it('Realistic retains its approach marker, then resumes normal waypoint preferences', async () => {
   const objective = {
     resolved: true,
     complete: false,
@@ -240,6 +240,7 @@ it('Realistic retains its approach marker and navigation hint, then resumes norm
     bus: new EventBus(),
     expose: () => {},
     missionRouter: { mission: { objectives: [objective] } },
+    guidance: { showsName: () => false },
     rig: { camera: {} },
   } as unknown as GameContext;
   try {
@@ -249,10 +250,7 @@ it('Realistic retains its approach marker and navigation hint, then resumes norm
       waypointsSystem.frame!['guide.waypoints']!({ pilotPosition: {} } as FrameState, ctx);
     draw();
     expect(view.setVisualHints).toHaveBeenLastCalledWith(true);
-    expect(view.update.mock.lastCall?.[2]).toMatchObject({
-      title: 'Head to the bow',
-      hint: 'Head to the bow, 220 m ahead.',
-    });
+    expect(view.update.mock.lastCall?.[2]).toEqual({ poiId: 'bow' });
     const calls = view.setVisualHints.mock.calls.length;
     draw();
     expect(view.setVisualHints).toHaveBeenCalledTimes(calls);

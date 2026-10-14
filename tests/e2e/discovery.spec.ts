@@ -83,7 +83,7 @@ test.describe('B1 scan, discovery, Journal', () => {
     );
     const before = await probe(page);
     expect(before.discovered).toBe(false);
-    await expect(page.locator('.scan-panel .scan-hint')).toHaveText(/HOLD G TO SCAN/);
+    await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText(/HOLD G TO SCAN/);
 
     // Record bus events from inside the page.
     await page.evaluate(() => {
@@ -101,7 +101,7 @@ test.describe('B1 scan, discovery, Journal', () => {
     const mid = await probe(page);
     expect(mid.phase).toBe('scanning');
     expect(mid.progress).toBeGreaterThan(0.1);
-    await expect(page.locator('.scan-panel .scan-kicker')).toHaveText('SCANNING');
+    await expect(page.locator('.guidance-slot .guidance-kicker')).toHaveText('SCANNING');
     await completeScan(page, 'test-bow');
     await advanceScan(page, 0.3);
     await page.keyboard.up('g');
@@ -122,8 +122,8 @@ test.describe('B1 scan, discovery, Journal', () => {
     // Holding past completion must not rescan.
     expect(names.filter((n) => n === 'scan:started')).toHaveLength(1);
 
-    await expect(page.locator('.scan-panel .scan-kicker')).toHaveText('NEW ENTRY');
-    await expect(page.locator('.scan-panel .scan-name')).toHaveText('Bow section (fixture)');
+    await expect(page.locator('.guidance-slot .guidance-kicker')).toHaveText('NEW ENTRY');
+    await expect(page.locator('.guidance-slot .guidance-name')).toHaveText('Bow section (fixture)');
     await page.screenshot({ path: 'tests/e2e/screenshots/discovery-scan.png' });
 
     const saved = await page.evaluate((k) => localStorage.getItem(k), STORAGE_KEY);

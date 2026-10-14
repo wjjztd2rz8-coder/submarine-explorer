@@ -7,10 +7,9 @@ import {
   hullHintAllowed,
   type HintContext,
 } from '../../src/game/Hints.js';
-import { TUTORIAL_STEPS, Tutorial } from '../../src/game/Tutorial.js';
+import { TUTORIAL_STEPS, Tutorial, tutorialText } from '../../src/game/Tutorial.js';
 import { ONBOARD_STORAGE_KEY, TutorialSave, migrateOnboard } from '../../src/game/TutorialSave.js';
 import { controlGroups } from '../../src/ui/ControlsCard.js';
-import { tutorialText } from '../../src/ui/TutorialCard.js';
 import type { SettingsStorage } from '../../src/core/Save.js';
 
 const calm: HintContext = {

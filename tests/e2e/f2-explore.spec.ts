@@ -123,13 +123,13 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
       'aria-label',
       /faint unidentified contact/,
     );
-    await expect(page.locator('.scan-name')).toHaveText('Unidentified contact');
+    await expect(page.locator('.guidance-name')).toHaveText('Unidentified contact');
     await scan(page, id);
     const name = await page.evaluate(
       (i) => (window.__game as unknown as Game).explore.secrets[i].def.name,
       i,
     );
-    await expect(page.locator('.scan-name')).toHaveText(name);
+    await expect(page.locator('.guidance-name')).toHaveText(name);
     await shot(page, `secret-${i + 1}`);
   }
   expect(
@@ -146,7 +146,7 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
     g.journal.open();
     g.journal.show('monterey-canyon');
   });
-  await expect(page.locator('.jr-progress')).toContainText('3/3 secrets');
+  await expect(page.locator('.jr-progress')).toContainText('3/5 secrets');
   await page
     .locator('.jr-nav')
     .getByRole('button', { name: 'Lost instrument frame', exact: true })
@@ -169,9 +169,9 @@ test('samples collect per dive, appear in mission debrief, and reset on restart'
 }) => {
   await boot(page, 'monterey-canyon', true);
   const id = await park(page, 0, true);
-  await expect(page.locator('.scan-hint')).toContainText('TO SCAN');
+  await expect(page.locator('.guidance-hint')).toContainText('TO SCAN');
   await scan(page, id);
-  await expect(page.locator('.scan-name')).toHaveText('Sediment core');
+  await expect(page.locator('.guidance-name')).toHaveText('Sediment core');
   // Regression: a sample must have a persistent Journal entry, beyond its dive-local collection.
   await page.keyboard.press('j');
   await expect(page.locator('.journal .jr-body .jr-title')).toHaveText('Sediment core');
@@ -214,7 +214,8 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
     page,
     () => window.__gameReady === true && (window.__game as unknown as Game).explore?.ready,
   );
-  await park(page, 0);
+  // Out of scan range: a contact card in range would hold the guidance slot.
+  await park(page, 0, false, true);
   await page.evaluate(() => {
     const g = window.__game as unknown as Game;
     g.rig.freeLook = false;
@@ -225,7 +226,7 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
     await page.evaluate(() => (window.__game as unknown as Game).explore.previewEvent('turbidity')),
   ).toBe(true);
   await page.clock.fastForward(100);
-  await expect(page.locator('.explore-caption')).toContainText(
+  await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toContainText(
     'Silt cloud: sediment-laden water flows downslope',
   );
   await clockFramesUntil(
@@ -239,7 +240,7 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
   );
   await page.keyboard.press('Escape');
   await page.clock.fastForward(100);
-  await expect(page.locator('.explore-caption')).toBeHidden();
+  await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toBeHidden();
   const paused = await page.evaluate(
     () => (window.__game as unknown as Game).explore.scheduler.active,
   );
@@ -264,7 +265,7 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
 
 /** Read the actual layout: a result must stay on screen and clear thumb targets. */
 async function expectScanPanelFits(page: Page): Promise<void> {
-  const panel = await page.locator('.scan-panel').boundingBox();
+  const panel = await page.locator('.guidance-slot').boundingBox();
   expect(panel).not.toBeNull();
   const viewport = page.viewportSize()!;
   expect(panel!.x).toBeGreaterThanOrEqual(0);
@@ -300,7 +301,7 @@ test.describe('phone curiosity', () => {
     });
     await completeScan(page, id);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    await expect(page.locator('.scan-hint')).toHaveText('STOWED FOR THIS DIVE');
+    await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toContainText('NEW ENTRY');
     await expectScanPanelFits(page);
     await shot(page, 'phone-sample');
     // The same touch session can rotate or run on a smaller phone.

@@ -9,10 +9,7 @@ const HUD = [
   '.hud-readouts',
   '.hud-footer',
   '.objectives-panel',
-  '.scan-stack',
-  '.onboard-card',
-  '.hud-notice',
-  '.hud-warning',
+  '.guidance-slot',
   '.tc-stick',
   '.tc-slider',
   '.tc-buttons',
@@ -89,7 +86,7 @@ async function expectClearLayout(page: Page): Promise<void> {
 
 test('free dive: portrait HUD panels do not overlap', async ({ page }) => {
   await boot(page, 'tutorial=0');
-  await expect(page.locator('.scan-stack')).toBeVisible();
+  await expect(page.locator('.guidance-slot')).toBeVisible();
   await expectClearLayout(page);
 });
 
@@ -98,6 +95,6 @@ test('mission with tutorial: card, objectives, scan and readouts each stay clear
 }) => {
   await boot(page, 'mission=monterey-canyon');
   await expect(page.locator('.objectives-panel')).toBeVisible();
-  await expect(page.locator('.onboard-card')).toBeVisible();
+  await expect(page.locator('.guidance-slot[data-step]')).toBeVisible();
   await expectClearLayout(page);
 });
