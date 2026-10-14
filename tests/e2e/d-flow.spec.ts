@@ -1,3 +1,4 @@
+import { homeReady } from './helpers/home.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import process from 'node:process';
 import { scanWithKeyboard } from './helpers/scan.js';
@@ -370,7 +371,8 @@ test.describe('D-FLOW Journal', () => {
   test('home front page, site entries, spoilers, reload', async ({ page }) => {
     const errors = collectErrors(page);
     await seed(page);
-    await boot(page, '/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await homeReady(page);
     const raw = await page.evaluate((k) => localStorage.getItem(k), STORAGE_KEY);
 
     await expect(page.locator('.home-screen')).toBeVisible();
@@ -418,7 +420,7 @@ test.describe('D-FLOW Journal', () => {
 
     // Reload: the spoiler toggle is in-memory only; the bow stays logged.
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await ready(page);
+    await homeReady(page);
     await page.locator('.home-menu button', { hasText: 'Journal' }).click();
     await expect(journal.locator('.jr-spoilers input')).not.toBeChecked();
     await journal.locator('.jr-site-card[data-target="titanic"]').click();

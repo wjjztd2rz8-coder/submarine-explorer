@@ -277,7 +277,6 @@ for (const viewport of [
           'Journal',
           'Settings',
           'Controls',
-          'Upgrades',
         ]);
         for (const name of ['Dive sites', 'Free dive']) {
           const origin = menu.getByRole('button', { name, exact: true });

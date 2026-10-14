@@ -341,6 +341,9 @@ export class Globe {
   previewSite(id: string): void {
     const site = this.sites.find((entry) => entry.id === id);
     if (!site) return;
+    // List navigation supersedes the last globe pointer/focus preview.
+    this.hovered = null;
+    this.focused = null;
     this.pinned = site;
     this.orbit.faceLatLon(site.lat, site.lon);
     this.renderCard();

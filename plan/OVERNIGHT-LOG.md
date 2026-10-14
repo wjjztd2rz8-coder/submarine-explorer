@@ -994,3 +994,11 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** V-first-five (Haiku capture; note only, script dropped, no game source change). Real-run banner/stars verified (3 of 4 objectives, 1 of 3 stars). Findings: up to 4 guidance surfaces at once, NEW ENTRY card + hint + toast stacked after a scan, landscape briefing hides Begin dive, SEABED PROXIMITY covers JOURNAL in portrait, debrief scan count and last-scan name wrong. These feed S-guidance, S-hud and the new S-debrief item.
 - **Running:** Codex 1570 S-resolve, 1580 S-modal, 1590 S-boot (no collection yet). Queued 1610 hosted CI, 1620 S-verify, 1630 S-bughunt, 1640 S-debrief. Stale paused-packages file removed (S-flow, V-beebe, S-bugs all merged earlier).
 - **Not done:** no second Claude package (Claude 5h fell to 44%, below the 45% start threshold); next Claude item is S-guidance (Sonnet). No push or tag (f53 untagged until hosted CI is green). Needs owner: real-phone play of the f53 build.
+
+## 2026-10-13 22:45 CDT headless run (Claude): targeted review
+
+- **Cause:** timer runs exited 2 from ~09:00 to 21:15 (resume.sh state hash under pipefail, fixed in 316a2a9), so ten finished Codex packages were uncollected; details in PROCESS-LOG and REVIEWS.
+- **Merged and pushed (main 0a93b80, untagged):** 1610 hosted CI, 1620 S-verify, 1630 S-bughunt, 1640 S-debrief, 1650-1670 S-render, 1590 S-boot, 1580 S-modal, 1570 S-resolve. Smoke + project-base green per merge; no full e2e (hosted CI is the signal).
+- **Queue:** 1600 S-rewards, 1680 S-verify-2, 1690 S-bughunt-2, 1700 hosted-CI follow-up.
+- **Paused:** S-guidance (Sonnet) built and noted but not gated/reviewed; Claude 5h fell to ~24%. See .cache/claude/paused-packages.md.
+- **Needs owner:** real-phone play of the newest build.

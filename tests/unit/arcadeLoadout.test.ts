@@ -116,7 +116,7 @@ function context(site: string, mode: GameplayMode): GameContext {
     baseScanRadii: new Map(),
     save,
     settings: save.get(),
-    effective: resolveEffective(save.get(), mode, { upgrades: {} }, null, config),
+    effective: resolveEffective(save.get(), mode, null, config),
     meta,
     params: new URLSearchParams(`mission=${site}`),
     spawnDepth: null,
@@ -141,7 +141,7 @@ const catalogueSites: string[] = JSON.parse(
 
 describe('fresh-player mission routing and vehicle loadout', () => {
   for (const mode of ['arcade', 'realistic'] as const) {
-    it(`${mode}: selecting Surface does not queue a next-dive notice; explicit modes still do`, () => {
+    it(`${mode}: selecting Surface does not queue a next-dive notice; mode changes keep the depth-fitted hull`, () => {
       const ctx = context('great-blue-hole', mode);
       const notice = vi.fn();
       ctx.guidance = { notice } as unknown as GameContext['guidance'];
@@ -154,37 +154,38 @@ describe('fresh-player mission routing and vehicle loadout', () => {
         expect(notice).not.toHaveBeenCalled();
         expect(ctx.sub.getState().hullClass).toBe(hull);
         ctx.save.setGameplayMode('realistic');
-        expect(notice).toHaveBeenCalledTimes(1);
+        expect(notice).not.toHaveBeenCalled();
         ctx.save.setGameplayMode('arcade');
-        expect(notice).toHaveBeenCalledTimes(2);
+        expect(notice).not.toHaveBeenCalled();
         ctx.save.setGameplayMode('custom');
-        expect(notice).toHaveBeenCalledTimes(3);
+        expect(notice).not.toHaveBeenCalled();
         system.dispose?.();
         ctx.save.setGameplayMode('realistic');
-        expect(notice).toHaveBeenCalledTimes(3);
+        expect(notice).not.toHaveBeenCalled();
       } finally {
         system.dispose?.();
         ctx.subMesh?.dispose();
       }
     });
   }
-  it('loads and applies live cosmetic selections without refitting physics and removes its listener', () => {
+  it('applies saved cosmetics at construction; selections wait for the next dive without refitting physics', () => {
     const ctx = context('titanic', 'arcade');
-    ctx.progress.recordDailyStreak(3);
-    ctx.progress.selectCosmetic('paint', 'silver');
+    ctx.progress.creditDiscovery('titanic/secret:find');
+    ctx.progress.selectCosmetic('paint', 'violet');
     const submarine = createSubmarineSystem();
     try {
       submarine.init?.(ctx);
       const vehicle = ctx.subMesh.vehicle;
       const before = ctx.sub.getState();
-      expect(vehicle.materials.paintUniforms.uHullBase.value.getHex()).toBe(0xabbcc8);
+      expect(vehicle.materials.paintUniforms.uHullBase.value.getHex()).toBe(0xa68ec8);
       ctx.progress.selectCosmetic('paint', 'stock');
-      expect(vehicle.materials.paintUniforms.uHullPaint.value).toBe(0);
+      expect(vehicle.materials.paintUniforms.uHullPaint.value).toBe(1);
       expect(ctx.subMesh.vehicle).toBe(vehicle);
       expect(ctx.sub.getState()).toEqual(before);
       submarine.dispose?.();
-      ctx.progress.selectCosmetic('paint', 'silver');
-      expect(vehicle.materials.paintUniforms.uHullPaint.value).toBe(0);
+      ctx.subMesh.dispose();
+      submarine.init?.(ctx);
+      expect(ctx.subMesh.vehicle.materials.paintUniforms.uHullPaint.value).toBe(0);
     } finally {
       submarine.dispose?.();
       ctx.subMesh?.dispose();
@@ -255,7 +256,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
     const submarine = createSubmarineSystem();
     try {
       submarine.init?.(ctx);
-      expect(ctx.sub.getState().hullClass).toBe('A');
+      expect(ctx.sub.getState().hullClass).toBe('B');
       expect(ctx.props).toBeUndefined();
       safeTicks(ctx);
     } finally {
@@ -265,7 +266,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
     }
   });
 
-  it('a deferred Arcade downgrade is applied safely when the next Realistic dive loads', () => {
+  it('mode changes preserve the depth-fitted hull on the next Realistic dive', () => {
     const ctx = context('titanic', 'arcade');
     stubShell(ctx);
     const firstProgress = createProgressSystem();
@@ -278,17 +279,15 @@ describe('fresh-player mission routing and vehicle loadout', () => {
       ctx.sub.reset(0, -3780, 0);
       ctx.save.setGameplayMode('realistic');
       safeTicks(ctx);
-      expect(ctx.guidance.notice).toHaveBeenCalledWith(
-        'Hull and site access changes apply when you load your next dive.',
-      );
+      expect(ctx.guidance.notice).not.toHaveBeenCalled();
       firstSubmarine.dispose?.();
       firstProgress.dispose?.();
       ctx.subMesh.dispose();
       ctx.settings = ctx.save.get();
       nextProgress.init?.(ctx);
-      expect(ctx.route).toBeNull();
+      expect(ctx.route).not.toBeNull();
       nextSubmarine.init?.(ctx);
-      expect(ctx.sub.getState().hullClass).toBe('A');
+      expect(ctx.sub.getState().hullClass).toBe('B');
       safeTicks(ctx);
     } finally {
       firstProgress.dispose?.();
@@ -308,7 +307,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
     'axial-seamount-ashes',
   ]) {
     for (const propsState of ['delayed', 'failed', 'absent'] as const) {
-      it(`locked Realistic ${site} is safe before ${propsState} props`, async () => {
+      it(`fresh Realistic ${site} is safe before ${propsState} props`, async () => {
         const ctx = context(site, 'realistic');
         stubShell(ctx);
         const terrain = loadTerrain(ctx);
@@ -329,7 +328,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
         vi.stubGlobal('fetch', fetch);
         try {
           progress.init?.(ctx);
-          expect(ctx.route).toBeNull();
+          expect(ctx.route).not.toBeNull();
           submarine.init?.(ctx);
           expect(ctx.sub.position.y).toBeGreaterThanOrEqual(
             ctx.sub.getState().ratedDepth + ctx.config.submarine.hullRadius,
@@ -661,7 +660,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
       }
     });
   }
-  it('Realistic Titanic keeps the research gate and coastal free-dive vehicle', () => {
+  it('Realistic Titanic keeps the mission and depth-fitted vehicle', () => {
     const replaceState = vi.fn();
     vi.stubGlobal('window', { location: { href: 'http://localhost/?mission=titanic' } });
     vi.stubGlobal('history', { replaceState });
@@ -669,12 +668,12 @@ describe('fresh-player mission routing and vehicle loadout', () => {
     const progress = createProgressSystem();
     try {
       progress.init?.(ctx);
-      expect(ctx.route).toBeNull();
-      expect(replaceState).toHaveBeenCalledWith({}, '', 'http://localhost/?tile=titanic');
+      expect(ctx.route).not.toBeNull();
+      expect(replaceState).not.toHaveBeenCalled();
       createSubmarineSystem().init?.(ctx);
-      expect(ctx.sub.getState().hullClass).toBe('A');
-      expect(ctx.sub.getState().ratedDepth).toBe(-1000);
-      expect(ctx.subMesh.hullClass).toBe('A');
+      expect(ctx.sub.getState().hullClass).toBe('B');
+      expect(ctx.sub.getState().ratedDepth).toBe(-6500);
+      expect(ctx.subMesh.hullClass).toBe('B');
     } finally {
       progress.dispose?.();
       ctx.subMesh?.dispose();
@@ -768,11 +767,11 @@ describe('fresh-player mission routing and vehicle loadout', () => {
     const nextDive = createSubmarineSystem();
     try {
       submarine.init?.(ctx);
-      expect(ctx.freeDiveHull?.cleared).toBe(false);
+      expect(ctx.freeDiveHull?.cleared).toBe(true);
       ctx.save.setGameplayMode('arcade');
       for (let i = 0; i < 10; i++) ctx.sub.step(FROZEN_INPUT, 1 / 60);
       expect(ctx.sub.getState()).toMatchObject({
-        hullClass: 'A',
+        hullClass: 'B',
         hullBreached: false,
         emergencyBlow: false,
       });
@@ -780,11 +779,11 @@ describe('fresh-player mission routing and vehicle loadout', () => {
       for (let i = 0; i < 10; i++) ctx.sub.step(FROZEN_INPUT, 1 / 60);
       for (let i = 0; i < 10; i++) ctx.progress.award('primary', `site-${i}`);
       expect(ctx.sub.getState()).toMatchObject({
-        hullClass: 'A',
+        hullClass: 'B',
         hullBreached: false,
         emergencyBlow: false,
       });
-      expect(ctx.freeDiveHull?.cleared).toBe(false);
+      expect(ctx.freeDiveHull?.cleared).toBe(true);
       submarine.dispose?.();
       ctx.subMesh.dispose();
       ctx.settings = ctx.save.get();

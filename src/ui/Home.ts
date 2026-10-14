@@ -98,7 +98,7 @@ export class Home {
       return button;
     };
     // DOM order is the Tab order: Dive, Dive sites, Free dive, Daily dive,
-    // mode, Journal, Settings, Controls (Upgrades is appended after by progress).
+    // mode, Journal, Settings, Controls.
     this.diveButton = entry('Dive', actions.dive);
     this.diveButton.className = 'home-primary';
     this.diveSitesButton = entry('Dive sites', () => this.showSites(false, this.diveSitesButton));

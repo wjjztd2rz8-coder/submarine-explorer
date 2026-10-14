@@ -1,3 +1,4 @@
+import { homeReady } from './helpers/home.js';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import type { Discovery } from '../../src/game/Discovery.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
@@ -79,7 +80,7 @@ for (const layout of [
             await page.goto(`/?tier=${tier}&dynres=0&lifeSeed=42`, {
               waitUntil: 'domcontentloaded',
             });
-            await ready(page);
+            await homeReady(page, true);
             const act = async (target: Locator): Promise<void> => {
               await reachable(target);
               if (layout.touch) await target.tap();

@@ -6,8 +6,15 @@ import type {
   SonarPaletteName,
 } from './Config.js';
 import { DEFAULT_AUDIO } from './config/audio.js';
-import { PROGRESS_CONFIG, UPGRADES } from './config/progress.js';
-import { defaultCosmetics, sanitizeCosmetics, type CosmeticSelection } from '../game/Cosmetics.js';
+import { LEGACY_REWARDS, LEGACY_PURCHASE_COSTS } from './LegacyProgress.js';
+import {
+  COSMETIC_CHOICES,
+  HERO_SITES,
+  totalStars,
+  defaultCosmetics,
+  sanitizeCosmetics,
+  type CosmeticSelection,
+} from '../game/Cosmetics.js';
 import type { EventBus } from './EventBus.js';
 
 export const SETTINGS_STORAGE_KEY = 'subexplorer.settings.v3';
@@ -396,9 +403,10 @@ export class Save {
 
 /** Research is separate from settings and discoveries, so their resets and migrations stay independent. */
 export const PROGRESS_STORAGE_KEY = 'subexplorer.progress.v1';
-export const PROGRESS_VERSION = 1;
+export const PROGRESS_VERSION = 2;
 export interface ProgressRecord {
-  version: 1;
+  version: 2;
+  cosmeticGrants: string[];
   legacyCredited: boolean;
   legacyPending?: string[];
   points: number;
@@ -412,7 +420,8 @@ export interface ProgressRecord {
 }
 export function migrateProgress(raw: unknown): ProgressRecord {
   const out: ProgressRecord = {
-    version: 1,
+    version: 2,
+    cosmeticGrants: [],
     legacyCredited: false,
     points: 0,
     lifetime: 0,
@@ -424,7 +433,7 @@ export function migrateProgress(raw: unknown): ProgressRecord {
   };
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
   const o = raw as Record<string, unknown>;
-  if (o.version !== undefined && o.version !== 0 && o.version !== 1) return out;
+  if (o.version !== undefined && o.version !== 0 && o.version !== 1 && o.version !== 2) return out;
   const integer = (v: unknown): number =>
     typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.floor(v)) : 0;
   out.legacyCredited = o.legacyCredited === true;
@@ -469,24 +478,59 @@ export function migrateProgress(raw: unknown): ProgressRecord {
   // Purchases explain the gap between spendable RP and lifetime research.
   const earned = out.awarded.reduce((sum, token) => {
     const colon = token.indexOf(':');
-    const kind = token.slice(0, colon) as keyof typeof PROGRESS_CONFIG.rewards;
+    const kind = token.slice(0, colon) as keyof typeof LEGACY_REWARDS;
     return (
       sum +
-      (colon > 0 && token.length > colon + 1 && Object.hasOwn(PROGRESS_CONFIG.rewards, kind)
-        ? PROGRESS_CONFIG.rewards[kind]
+      (colon > 0 && token.length > colon + 1 && Object.hasOwn(LEGACY_REWARDS, kind)
+        ? LEGACY_REWARDS[kind]
         : 0)
     );
   }, 0);
-  const spent = UPGRADES.reduce((sum, upgrade) => {
-    const level = Math.min(out.upgrades[upgrade.id] ?? 0, upgrade.costs.length);
-    if (Object.hasOwn(out.upgrades, upgrade.id)) out.upgrades[upgrade.id] = level;
-    return sum + upgrade.costs.slice(0, level).reduce((cost, value) => cost + value, 0);
+  const spent = Object.entries(LEGACY_PURCHASE_COSTS).reduce((sum, [id, costs]) => {
+    const level = Math.min(out.upgrades[id] ?? 0, costs.length);
+    if (Object.hasOwn(out.upgrades, id)) out.upgrades[id] = level;
+    return sum + costs.slice(0, level).reduce((cost, value) => cost + value, 0);
   }, 0);
-  out.lifetime = Math.max(out.lifetime, earned, out.points + spent);
-  out.points = Math.max(out.points, earned - spent);
-  const rawPoints = o.points ?? o.rp;
-  if (typeof rawPoints !== 'number' || !Number.isFinite(rawPoints) || rawPoints < 0)
-    out.points = Math.max(0, out.lifetime - spent);
+  if (o.version !== 2) {
+    out.lifetime = Math.max(out.lifetime, earned, out.points + spent);
+    out.points = Math.max(out.points, earned - spent);
+    const rawPoints = o.points ?? o.rp;
+    if (typeof rawPoints !== 'number' || !Number.isFinite(rawPoints) || rawPoints < 0)
+      out.points = Math.max(0, out.lifetime - spent);
+  }
+  if (Array.isArray(o.cosmeticGrants))
+    out.cosmeticGrants = o.cosmeticGrants.filter(
+      (grant): grant is string =>
+        typeof grant === 'string' &&
+        Object.entries(COSMETIC_CHOICES).some(([slot, choices]) =>
+          choices.some((def) => grant === `${slot}:${def.id}`),
+        ),
+    );
+  // Convert old RP (including spent purchases) and every previously earned cosmetic once.
+  if (o.version !== 2) {
+    const stars = totalStars(out);
+    const oldPaintStars: Record<string, number> = { red: 3, blue: 6, green: 10, gold: 15 };
+    for (const [slot, choices] of Object.entries(COSMETIC_CHOICES))
+      for (const def of choices) {
+        const rp =
+          def.reward.kind === 'discoveries'
+            ? def.reward.total * 10
+            : def.reward.kind === 'secret'
+              ? 150
+              : Infinity;
+        const oldEarned =
+          (slot === 'paint' &&
+            ((Object.hasOwn(oldPaintStars, def.id) && stars >= oldPaintStars[def.id]) ||
+              (def.id === 'orange' &&
+                HERO_SITES.some(
+                  (site) => Object.hasOwn(out.ratings, site) && out.ratings[site] >= 3,
+                )) ||
+              (def.id === 'silver' && out.dailyBestStreak >= 3))) ||
+          (slot === 'trim' && def.id === 'blue' && out.dailyBestStreak >= 3);
+        if (out.lifetime >= rp || oldEarned) out.cosmeticGrants.push(`${slot}:${def.id}`);
+      }
+  }
+  out.cosmeticGrants = [...new Set(out.cosmeticGrants)];
   out.cosmetics = sanitizeCosmetics(o.cosmetics, out);
   return out;
 }

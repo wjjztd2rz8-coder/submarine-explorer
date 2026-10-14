@@ -30,7 +30,7 @@ export function placeSamples(
     const { x, z } = latLonToWorld(meta, def.lat, def.lon);
     return {
       id: `sample:${def.id}`,
-      name: `Sample · ${def.name}`,
+      name: def.name,
       landmarkId: site,
       position: new Vector3(x, ground(x, z) + 0.6, z),
       radius: EXPLORE_CONFIG.sampleRangeM,

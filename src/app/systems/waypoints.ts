@@ -28,7 +28,6 @@ export const waypointsSystem: GameSystem = {
     void discovery.ready.then(() => sonar.setPois(discovery.pois));
     cleanup.add(
       save.onChange((next, changed) => {
-        if (changed.includes('reduceMotion')) waypoints.setReducedMotion(next.reduceMotion);
         if (changed.includes('sonarPalette')) waypoints.setPalette(next.sonarPalette);
       }),
     );

@@ -52,7 +52,6 @@ test('home copy, semantic order and first focus', async ({ page }) => {
     'Journal',
     'Settings',
     'Controls',
-    'Upgrades',
   ]);
   // Fresh save: the single Dive button takes first focus.
   await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeFocused();

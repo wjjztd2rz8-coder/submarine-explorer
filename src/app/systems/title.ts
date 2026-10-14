@@ -71,7 +71,6 @@ export function createTitleSystem(): GameSystem<ShellContext, { dt: number }> {
     ctx.settingsScreen.isOpen ||
     ctx.journal.isOpen ||
     ctx.globe.isOpen ||
-    (ctx.upgrades?.isOpen ?? false) ||
     (ctx.controlsCard?.isOpen ?? false);
 
   const bridge: TitleBridge = {

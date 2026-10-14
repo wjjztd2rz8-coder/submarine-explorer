@@ -22,7 +22,7 @@ export function createSubmarineSystem(): GameSystem {
     name: 'submarine',
     dispose: () => cleanup.dispose(),
     init(ctx) {
-      const { config, terrain, meta, route, params, spawnDepth, settings, scene } = ctx;
+      const { config, terrain, meta, route, params, spawnDepth, scene } = ctx;
       const sub = new Submarine(ctx.effective.submarine, terrain);
       ctx.sub = sub;
       // fix S: free-dive spawn (QA-B #3): over the tile centre, or the nearest
@@ -30,10 +30,9 @@ export function createSubmarineSystem(): GameSystem {
       // caldera rim; `?depth=` clamped between the surface and the seabed. Free
       // dive also fits the lowest hull class rated for the tile's deepest cell
       // (QA-B #2).
-      // The loaded dive keeps its hull and access policy, including the briefing
-      // and restarts. A mode/research change takes effect on the next site load.
+      // The loaded dive keeps its depth-fitted hull, including briefing and restarts.
       const targetDepth = route?.def.briefing.depth_m ?? Math.abs(meta.min_m);
-      const hullClass = ctx.progress.hullFor(targetDepth, settings.gameplayMode);
+      const hullClass = ctx.progress.hullFor(targetDepth);
       sub.setHullClass(hullClass);
       const spawn = chooseSpawn(terrain, meta, spawnDepth, spawnSettings(config));
       // Optional props must never be responsible for pressure safety.
@@ -71,26 +70,6 @@ export function createSubmarineSystem(): GameSystem {
           Math.abs(state.ratedDepth) >= Math.abs(meta.min_m) + config.submarine.freeDiveHullMarginM;
         ctx.hud?.setHullNote(ctx.freeDiveHull.cleared ? '' : 'at rating limit');
       }
-      let previousSettings = ctx.save.get();
-      cleanup.add(
-        ctx.save.onChange((next, changed) => {
-          // Choosing the briefing's start enters Custom without changing the
-          // fitted hull. Keep next-load notices for actual mode selections.
-          const startOnly =
-            next.gameplayMode === 'custom' &&
-            next.gameplay.startPosition !== previousSettings.gameplay.startPosition &&
-            Object.entries(next.gameplay).every(
-              ([key, value]) =>
-                key === 'startPosition' ||
-                value === previousSettings.gameplay[key as keyof typeof next.gameplay],
-            );
-          previousSettings = next;
-          if (changed.includes('gameplayMode') && !startOnly)
-            ctx.guidance?.notice(
-              'Hull and site access changes apply when you load your next dive.',
-            );
-        }),
-      );
       // D-START: keep URL probes deterministic even when a mission uses a
       // near-site default.
       if (route && spawnDepth !== null && !params.has('at') && !params.has('poi')) {
@@ -109,6 +88,7 @@ export function createSubmarineSystem(): GameSystem {
         length: 26,
         // F1-VEHICLES: the fitted hull class picks the model; the tier its detail.
         hullClass: sub.getState().hullClass,
+        cosmetics: ctx.progress.cosmetics,
         tier: ctx.tier,
         // fix S (QA-B #6): faint rim + ambient floor so the hull reads below 300 m.
         rimColor: config.submarine.hullRimColor,
@@ -116,8 +96,7 @@ export function createSubmarineSystem(): GameSystem {
         emissive: config.submarine.hullEmissive,
       });
       ctx.subMesh = subMesh;
-      subMesh.setCosmetics(ctx.progress.cosmetics);
-      cleanup.add(ctx.progress.onChange(() => subMesh.setCosmetics(ctx.progress.cosmetics)));
+
       scene.add(subMesh.group);
       ctx.expose({ sub, subMesh });
     },

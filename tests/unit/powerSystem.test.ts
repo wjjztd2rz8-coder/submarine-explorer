@@ -28,7 +28,7 @@ it.each([
       save,
       settings: save.get(),
       progress,
-      effective: resolveEffective(save.get(), 'realistic', progress.snapshot(), null, config),
+      effective: resolveEffective(save.get(), 'realistic', null, config),
       daily: null,
       rig: { setConfig: vi.fn() },
       presets: { setCurrentMode: vi.fn() },

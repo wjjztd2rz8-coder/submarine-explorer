@@ -53,7 +53,7 @@ export const discoverySystem: GameSystem = {
       );
       // An open Journal freezes piloting, but its pad button must still close it.
       const input =
-        ctx.discovery.guide.isOpen && f.sampled.toggleGuide
+        ctx.discovery.guide.isOpen && ctx.discovery.guide.isTop && f.sampled.toggleGuide
           ? { ...f.state, toggleGuide: true }
           : f.state;
       ctx.discovery.update(

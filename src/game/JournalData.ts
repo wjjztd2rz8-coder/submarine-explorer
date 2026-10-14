@@ -15,7 +15,7 @@
  */
 
 import { eventKinds, type ExploreEventKind } from './Events.js';
-import { loadSecrets, secretDiscoveryId, type SecretDef } from './Secrets.js';
+import { loadSecrets, secretDiscoveryId, type SampleDef, type SecretDef } from './Secrets.js';
 import { contentUrl, fetchContentJson, isSafeLandmarkId, type FetchJson } from './ContentPath.js';
 import {
   buildGuideEntries,
@@ -214,6 +214,7 @@ interface JournalSiteInput {
   /** The marine-life tables and texts; wildlife entries come from the site's table. */
   life?: LifeDoc | null;
   secrets?: SecretDef[];
+  samples?: SampleDef[];
 }
 
 /** Wildlife entries for a site: every animal its spawn table can show, rare appearance included. */
@@ -325,6 +326,24 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
       sources: [],
     },
   }));
+  const samples: JournalEntry[] = (input.samples ?? []).map((d) => ({
+    key: `${id}/sample/${d.id}`,
+    siteId: id,
+    kind: 'secret',
+    id: `sample:${d.id}`,
+    title: d.name,
+    poiIds: [`sample:${d.id}`],
+    linkedEntryIds: [],
+    recreation: false,
+    guide: {
+      id: `sample:${d.id}`,
+      title: d.name,
+      paragraphs: ['Logged during a dive.'],
+      facts: [],
+      sources: [],
+      reconstruction: false,
+    },
+  }));
   const site: JournalSite = {
     id,
     name: guide?.title ?? catalogue?.name ?? input.missionTitle ?? id,
@@ -339,6 +358,7 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
       ...speciesEntries,
       ...wildlife,
       ...secrets,
+      ...samples,
       ...sightings,
     ],
     poiIds: [...pois.map((p) => p.id), ...sightings.flatMap((e) => e.poiIds)],
@@ -431,7 +451,15 @@ export async function loadJournalSite(
     fetchFn ? Promise.resolve(null) : loadLifeDoc(),
     loadSecrets(id, fetchFn),
   ]);
-  const input: JournalSiteInput = { id, guide, pois, species, life, secrets: secrets.secrets };
+  const input: JournalSiteInput = {
+    id,
+    guide,
+    pois,
+    species,
+    life,
+    secrets: secrets.secrets,
+    samples: secrets.samples,
+  };
   const info = catalogue.get(id);
   if (info) input.catalogue = info;
   const title = isObj(mission) ? str(mission.title) : '';

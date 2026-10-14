@@ -102,7 +102,7 @@ it('prompts an approach, witnesses once, persists the log and preserves the capt
     expect(slot.shown).not.toBeNull();
     expect(slot.shown?.detail).toBe('Sighting logged in Journal');
     expect(witnessed).toHaveBeenCalledTimes(1);
-    expect(progress.points).toBe(5);
+    expect(progress.points).toBe(0);
     expect(progress.bonus).toBe(false);
     expect(store.snapshot().discovered['monterey-canyon/event:turbidity'].count).toBe(1);
     frame(18);

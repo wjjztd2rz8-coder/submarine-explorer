@@ -90,7 +90,7 @@ export function summarizeDive(
       : event
         ? `Witnessed ${event}.`
         : sample
-          ? `Collected ${sample}.`
+          ? `Found ${sample}.`
           : entry
             ? `Logged ${entry.title}.`
             : 'The site is waiting for your first scan.';
@@ -167,7 +167,7 @@ export class Debrief {
         '★'.repeat(rating.stars) + '☆'.repeat(3 - rating.stars),
       );
       stars.setAttribute('aria-label', `${rating.stars} of 3 stars`);
-      score.append(stars, el('span', undefined, `${rating.points} research points`));
+      score.append(stars);
     }
     const metric = (field: string, value: string, label: string): void => {
       const item = el('span', 'debrief-score-item');
@@ -251,9 +251,9 @@ export class Debrief {
     row.append(navigation, secondary);
     p.append(row);
 
+    this.trap.show();
     // Returning from Keep exploring creates a new summary in the same panel.
     p.scrollTop = 0;
-    this.trap.show();
   }
 
   hide(): void {

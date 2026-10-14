@@ -71,12 +71,7 @@ export class ScanOverlay {
   }
 
   /** Show the completion confirmation for `completeBannerSeconds`. */
-  showComplete(
-    title: string,
-    firstTime: boolean,
-    keys: ScanOverlayKeys,
-    kind: 'scan' | 'sample' = 'scan',
-  ): void {
+  showComplete(title: string, firstTime: boolean, keys: ScanOverlayKeys): void {
     if (this.suppressed) return;
     this.slot.flash(
       'complete',
@@ -84,15 +79,12 @@ export class ScanOverlay {
       {
         kicker: firstTime ? 'NEW ENTRY' : 'SCAN COMPLETE',
         text: title,
-        detail:
-          kind === 'sample'
-            ? 'STOWED FOR THIS DIVE'
-            : firstTime
-              ? isTouch()
-                ? 'PAUSE → JOURNAL'
-                : `PRESS ${keys.guide} · JOURNAL`
-              : 'LOGGED · JOURNAL',
-        tone: firstTime || kind === 'sample' ? 'cyan' : 'dim',
+        detail: firstTime
+          ? isTouch()
+            ? 'PAUSE → JOURNAL'
+            : `PRESS ${keys.guide} · JOURNAL`
+          : 'LOGGED · JOURNAL',
+        tone: firstTime ? 'cyan' : 'dim',
         ring: { progress: 1, label: 'OK' },
       },
       this.config.completeBannerSeconds,
@@ -158,7 +150,7 @@ export class ScanOverlay {
     if (view.phase === 'scanning') {
       return {
         scan: {
-          kicker: view.activeId?.startsWith('sample:') ? 'COLLECTING SAMPLE' : 'SCANNING',
+          kicker: view.activeId?.startsWith('sample:') ? 'SCANNING FIND' : 'SCANNING',
           text: view.activeName,
           detail: `HOLD ${scan} · KEEP ON TARGET`,
           tone: 'cyan',
@@ -215,9 +207,7 @@ export class ScanOverlay {
         scan: {
           kicker: 'SCAN TARGET',
           text: view.nearestName,
-          detail: view.nearestId?.startsWith('sample:')
-            ? `HOLD ${scan} TO COLLECT`
-            : `HOLD ${scan} TO SCAN`,
+          detail: `HOLD ${scan} TO SCAN`,
           tone: 'cyan',
           ring: { progress: 0, label: dist },
         },

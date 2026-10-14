@@ -9,9 +9,9 @@ import { shouldPauseAfterPointerLookLoss, shouldRequestPointerLook } from '../..
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
-const cleanup = new Disposables();
-
 export function createPointerSystem(): GameSystem {
+  const cleanup = new Disposables();
+  let disposed = false;
   let pointerLookWasBlocked = true;
   let wasFrozen = false;
   let pointerLookBlocked: () => boolean = () => true;
@@ -19,7 +19,10 @@ export function createPointerSystem(): GameSystem {
   let pointerLookHint: HTMLDivElement | null = null;
   return {
     name: 'pointer',
-    dispose: () => cleanup.dispose(),
+    dispose: () => {
+      disposed = true;
+      cleanup.dispose();
+    },
     init(ctx) {
       const { canvas, input, app } = ctx;
       const lockKeyboard = async (): Promise<void> => {
@@ -28,9 +31,11 @@ export function createPointerSystem(): GameSystem {
             keyboard?: { lock?: (keys: string[]) => Promise<void>; unlock?: () => void };
           }
         ).keyboard;
-        if (!document.fullscreenElement || !keyboard?.lock) return;
+        if (disposed || !document.fullscreenElement || !keyboard?.lock) return;
         try {
           await keyboard.lock(['ControlLeft', 'ControlRight', 'KeyW']);
+          // A gesture may finish after the page's runtime has been torn down.
+          if (disposed) keyboard.unlock?.();
         } catch {
           keyboard.unlock?.();
         }
@@ -39,6 +44,11 @@ export function createPointerSystem(): GameSystem {
         (navigator as Navigator & { keyboard?: { unlock?: () => void } }).keyboard?.unlock?.();
       };
       ctx.keyboard = { lock: lockKeyboard, unlock: unlockKeyboard };
+      cleanup.add(() => {
+        unlockKeyboard();
+        if (document.pointerLockElement === canvas) document.exitPointerLock?.();
+        input.setMouseLook(false);
+      });
       cleanup.listen(document, 'fullscreenchange', () => {
         if (document.fullscreenElement) void lockKeyboard();
         else unlockKeyboard();
@@ -55,6 +65,7 @@ export function createPointerSystem(): GameSystem {
         'padding:.35rem .7rem;border-radius:4px;background:#061318cc;color:#d8eef0;' +
         'font:12px sans-serif;pointer-events:none';
       document.body.append(hint);
+      cleanup.add(() => hint.remove());
       pointerLookBlocked = (): boolean =>
         app.state !== 'dive' ||
         ctx.pause.isOpen ||
@@ -91,10 +102,14 @@ export function createPointerSystem(): GameSystem {
         pointerLockPending = true;
         updatePointerLookHint();
         try {
-          void Promise.resolve(canvas.requestPointerLock()).catch(() => {
-            pointerLockPending = false;
-            updatePointerLookHint();
-          });
+          void Promise.resolve(canvas.requestPointerLock())
+            .then(() => {
+              if (disposed && document.pointerLockElement === canvas) document.exitPointerLock?.();
+            })
+            .catch(() => {
+              pointerLockPending = false;
+              if (!disposed) updatePointerLookHint();
+            });
         } catch {
           pointerLockPending = false;
           updatePointerLookHint();
@@ -179,6 +194,7 @@ export function createPointerSystem(): GameSystem {
       });
       ctrlTip.append(fullscreenTip, dismissTip);
       document.body.append(ctrlTip);
+      cleanup.add(() => ctrlTip.remove());
       cleanup.listen(window, 'keydown', (e) => {
         const target = e.target as HTMLElement | null;
         if (

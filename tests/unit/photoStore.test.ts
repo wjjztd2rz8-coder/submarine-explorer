@@ -1,5 +1,6 @@
 import { PerspectiveCamera, Vector3 } from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { canvasThumbnail } from '../../src/ui/PhotoMode.js';
 import {
   PHOTO_LIMIT,
   PHOTO_STORAGE_KEY,
@@ -172,4 +173,22 @@ describe('poiInPhoto', () => {
     expect(poiInPhoto(camera, near, new Vector3(0, 0, 0), 500, 60)?.id).toBe('beside-target');
     expect(poiInPhoto(camera, near, new Vector3(0, 0, 0), 500, 10)).toBeNull();
   });
+});
+
+it('bakes only the selected cosmetic frame into a new capture and keeps stock captures unchanged', () => {
+  const context = { drawImage: vi.fn(), strokeRect: vi.fn(), strokeStyle: '', lineWidth: 0 };
+  const encoded = 'data:image/jpeg;base64,framed';
+  const output = { width: 0, height: 0, getContext: () => context, toDataURL: () => encoded };
+  vi.stubGlobal('document', { createElement: () => output });
+  try {
+    const source = { width: 1280, height: 720 } as HTMLCanvasElement;
+    expect(canvasThumbnail(source)).toBe(encoded);
+    expect(context.strokeRect).not.toHaveBeenCalled();
+    expect(canvasThumbnail(source, undefined, undefined, 'gold')).toBe(encoded);
+    expect(context.drawImage).toHaveBeenLastCalledWith(source, 0, 0, 640, 360);
+    expect(context.strokeStyle).toBe('#d4b46b');
+    expect(context.strokeRect).toHaveBeenCalledExactlyOnceWith(4, 4, 632, 352);
+  } finally {
+    vi.unstubAllGlobals();
+  }
 });

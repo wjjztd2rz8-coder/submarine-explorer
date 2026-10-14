@@ -5,6 +5,7 @@
  * control tips, a capture button and a short-lived status toast.
  */
 
+import { PHOTO_FRAMES, type CosmeticSelection } from '../game/Cosmetics.js';
 import { FocusTrap } from './FocusTrap.js';
 
 const PHOTO_WIDTH_PX = 640;
@@ -20,6 +21,7 @@ export function canvasThumbnail(
   source: HTMLCanvasElement,
   width = PHOTO_WIDTH_PX,
   quality = PHOTO_JPEG_QUALITY,
+  frame: CosmeticSelection['frame'] = 'stock',
 ): string | null {
   const w = Math.min(width, source.width);
   const h = Math.max(1, Math.round((source.height * w) / Math.max(1, source.width)));
@@ -29,6 +31,12 @@ export function canvasThumbnail(
   const ctx = out.getContext('2d');
   if (!ctx || w < 1) return null;
   ctx.drawImage(source, 0, 0, w, h);
+  const color = PHOTO_FRAMES.find((def) => def.id === frame)?.color;
+  if (color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(2, Math.round(w / 80));
+    ctx.strokeRect(ctx.lineWidth / 2, ctx.lineWidth / 2, w - ctx.lineWidth, h - ctx.lineWidth);
+  }
   const url = out.toDataURL('image/jpeg', quality);
   return url.startsWith('data:image/jpeg;base64,') ? url : null;
 }

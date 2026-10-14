@@ -59,7 +59,7 @@ for (const mode of ['arcade', 'realistic'] as const) {
       meta: JSON.parse(readFileSync('data/tiles/titanic/meta.json', 'utf8')),
       terrain,
       config,
-      effective: resolveEffective(defaultSettings(config), mode, { upgrades: {} }, null, config),
+      effective: resolveEffective(defaultSettings(config), mode, null, config),
       sub,
       props: { placed: [], collide: () => false },
       baseScanRadii: new Map([['titanic-bow', 200]]),

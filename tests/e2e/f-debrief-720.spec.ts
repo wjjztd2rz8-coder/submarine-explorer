@@ -103,7 +103,11 @@ for (const viewport of [
             ).toHaveCount(round === 1 ? 1 : 0);
             await expect(debrief.locator('.debrief-highlight')).toHaveCount(1);
             await expect(debrief.locator('.debrief-next')).toHaveCount(1);
-            await expect(debrief.locator('.debrief-rating')).toContainText('research points');
+            await expect(debrief.locator('.debrief-rating')).not.toContainText('research points');
+            await expect(debrief.locator('.debrief-stars')).toHaveAttribute(
+              'aria-label',
+              /[0-3] of 3 stars/,
+            );
             await expect(debrief.locator('.debrief-section.is-samples')).toHaveCount(0);
           }
           await shot(`round-${round}-debrief`);

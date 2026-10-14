@@ -132,7 +132,6 @@ test('home menus and nested dialogs cycle visibly, close with Escape, and restor
     ['Journal', '.journal'],
     ['Settings', '.settings'],
     ['Controls', '.settings'],
-    ['Upgrades', '.upgrades'],
   ]) {
     const opener = home.getByRole('button', { name, exact: true });
     await opener.focus();

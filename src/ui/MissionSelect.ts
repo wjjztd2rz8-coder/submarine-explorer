@@ -19,7 +19,6 @@
  */
 
 import { requiredHull, type Progress } from '../game/Progress.js';
-import type { GameplayMode } from '../core/Save.js';
 import type { MissionSummary } from '../game/Mission.js';
 import { contentUrl, fetchContentJson } from '../game/ContentPath.js';
 import type { TileIndexEntry } from '../util/types.js';
@@ -80,23 +79,8 @@ export class MissionSelect {
   private missions: MissionSummary[] = [];
   private pending: PendingMission[] = [];
   private progress: Progress | null = null;
-  private mode: GameplayMode = 'arcade';
-  setProgress(progress: Progress, mode: GameplayMode = 'arcade'): void {
+  setProgress(progress: Progress): void {
     this.progress = progress;
-    this.mode = mode;
-    for (const button of this.root.querySelectorAll<HTMLButtonElement>('[data-tile]')) {
-      let limit = button.querySelector<HTMLElement>('.mission-hull-limit');
-      if (mode !== 'realistic') {
-        limit?.remove();
-        continue;
-      }
-      if (!limit) {
-        limit = document.createElement('span');
-        limit.className = 'mission-hull-limit mission-item-meta';
-        button.append(limit);
-      }
-      limit.textContent = `Free dive · hull rated to ${progress.hull.depthM.toLocaleString('en-US')} m`;
-    }
     this.renderMissions();
   }
 
@@ -249,12 +233,6 @@ export class MissionSelect {
       btn.className = 'mission-item is-mission';
       btn.dataset.mission = m.id;
       const available = this.tileIds.has(m.tile);
-      const locked =
-        this.progress !== null && m.depthM !== null && !this.progress.canDive(m.depthM, this.mode);
-      if (locked) {
-        btn.classList.add('is-locked');
-        btn.disabled = true;
-      }
       if (!available) btn.classList.add('is-unavailable');
       if (m.id === this.options.currentMissionId) btn.classList.add('is-current');
 
@@ -290,13 +268,6 @@ export class MissionSelect {
         stars.textContent = '★'.repeat(best) + '☆'.repeat(3 - best);
         stars.setAttribute('aria-label', `Best dive: ${best} of 3 stars`);
         btn.append(stars);
-        if (locked) {
-          const hull = requiredHull(m.depthM!);
-          const lock = document.createElement('span');
-          lock.className = 'mission-lock';
-          lock.textContent = `🔒 Class ${hull.id} · ${hull.threshold} lifetime RP required (${this.progress.lifetime} earned)`;
-          btn.append(lock);
-        }
       }
       if (this.options.presentation === 'shell') {
         const progress = document.createElement('span');

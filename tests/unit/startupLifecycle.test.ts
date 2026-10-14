@@ -364,6 +364,8 @@ import { makeExposer, type BootContext, type GameContext } from '../../src/app/c
 import { EventBus } from '../../src/core/EventBus.js';
 import { makeConfig } from '../../src/core/Config.js';
 import { makeSyntheticTile } from './helpers.js';
+import { Save, SETTINGS_STORAGE_KEY, PROGRESS_STORAGE_KEY } from '../../src/core/Save.js';
+import { Input, LEGACY_BINDINGS_STORAGE_KEY } from '../../src/core/Input.js';
 
 function runtimeSetup(state: 'home' | 'dive' = 'home') {
   const frames = new Map<number, FrameRequestCallback>();
@@ -425,6 +427,42 @@ afterEach(() => {
 });
 
 describe('runtime startup capability', () => {
+  it('three page-navigation Home/dive/Home cycles retain one loop and dispose every installed system', async () => {
+    for (let cycle = 0; cycle < 3; cycle++) {
+      for (const state of ['home', 'dive', 'home'] as const) {
+        const h = runtimeSetup(state);
+        const disposeSystem = vi.fn();
+        const factory = state === 'home' ? createHomeSystems : createSystems;
+        vi.mocked(factory).mockReturnValue([{ name: 'presentation', dispose: disposeSystem }]);
+        const dispose = await startRuntime(h.ctx);
+        expect(h.load).toHaveBeenCalledTimes(state === 'dive' ? 1 : 0);
+        expect(h.frames.size).toBe(1);
+        h.present();
+        expect(h.frames.size).toBe(1);
+        window.dispatchEvent(new Event('pagehide'));
+        expect(disposeSystem).toHaveBeenCalledOnce();
+        expect(h.frames.size).toBe(0);
+        dispose();
+        expect(disposeSystem).toHaveBeenCalledOnce();
+      }
+    }
+  });
+
+  it('does not install Home after page teardown during its startup yield', async () => {
+    const h = runtimeSetup();
+    const init = vi.fn();
+    vi.mocked(createHomeSystems).mockReturnValue([{ name: 'title', init }]);
+    const starting = startRuntime(h.ctx);
+    window.dispatchEvent(new Event('pagehide'));
+    const dispose = await starting;
+    expect(init).not.toHaveBeenCalled();
+    expect(createHomeSystems).not.toHaveBeenCalled();
+    expect(h.frames.size).toBe(0);
+    expect(window.__game).toBeUndefined();
+    expect(showFatal).not.toHaveBeenCalled();
+    dispose();
+  });
+
   it('presents an interactive Home with no selected-tile load or dive factory call', async () => {
     const h = runtimeSetup();
     const drawn = vi.fn();
@@ -550,6 +588,112 @@ describe('runtime startup capability', () => {
 });
 
 describe('page boot capability', () => {
+  it.each(['empty', 'legacy', 'corrupt'] as const)(
+    'boots Home with a %s save and preserves live preferences and controls on the next load',
+    async (shape) => {
+      runtimeSetup();
+      Object.assign(window, {
+        location: { search: '', href: 'https://example.test/' },
+        innerWidth: 1280,
+        innerHeight: 720,
+        devicePixelRatio: 1,
+      });
+      Object.assign(document, { getElementById: () => ({}), body: { dataset: {} } });
+      const values = new Map<string, string>();
+      const storage = {
+        getItem: (key: string) => values.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          values.set(key, value);
+        },
+        removeItem: (key: string) => {
+          values.delete(key);
+        },
+      };
+      if (shape === 'legacy') {
+        storage.setItem(
+          'subexplorer.settings.v2',
+          JSON.stringify({
+            version: 2,
+            graphicsTier: 'low',
+            gameplayMode: 'custom',
+            captions: true,
+            gameplay: {
+              speedProfile: 'standard',
+              descentProfile: 'research',
+              sonarMarkers: false,
+              currents: 'gentle',
+            },
+          }),
+        );
+        storage.setItem(
+          LEGACY_BINDINGS_STORAGE_KEY,
+          JSON.stringify({
+            version: 1,
+            keys: { toggleRov: ['KeyE'], thrustForward: ['KeyI'] },
+          }),
+        );
+        storage.setItem(
+          PROGRESS_STORAGE_KEY,
+          JSON.stringify({
+            version: 1,
+            legacyCredited: true,
+            points: 10,
+            lifetime: 40,
+            upgrades: { thrust: 1 },
+          }),
+        );
+      } else if (shape === 'corrupt') {
+        for (const key of [SETTINGS_STORAGE_KEY, LEGACY_BINDINGS_STORAGE_KEY, PROGRESS_STORAGE_KEY])
+          storage.setItem(key, '{broken');
+      }
+      const originalLegacy = storage.getItem('subexplorer.settings.v2');
+      vi.stubGlobal('localStorage', storage);
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async (url: string) => {
+          expect(url).toBe('/data/tiles/index.json');
+          return { ok: true, json: async () => ({ tiles: [{ id: 'titanic' }] }) };
+        }),
+      );
+      const { boot } =
+        await vi.importActual<typeof import('../../src/app/boot.js')>('../../src/app/boot.js');
+      const first = await boot();
+      expect(first?.app.state).toBe('home');
+      expect(first).not.toHaveProperty('tile');
+      expect(first?.settings.gameplayMode).toBe(shape === 'legacy' ? 'custom' : 'arcade');
+      expect(first?.settings.gameplayBaseMode).toBe('arcade');
+      expect(first?.settings.gameplay).not.toHaveProperty('sonarMarkers');
+      expect(first?.settings.gameplay).not.toHaveProperty('descentProfile');
+      expect(first?.settings.gameplay).not.toHaveProperty('speedProfile');
+      if (shape === 'legacy') {
+        expect(first?.progress.snapshot().upgrades).toEqual({ thrust: 1 });
+        expect(first?.tier).toBe('low');
+        expect(first?.settings.gameplay.currents).toBe('realistic');
+      }
+      const input = new Input({ storage });
+      if (shape === 'legacy') expect(input.getAction('thrustForward')?.keys).toEqual(['KeyI']);
+      expect(input.getAction('toggleRov' as never)).toBeUndefined();
+      input.rebind('thrustForward', ['KeyK']);
+      first!.save.setGameplayMode('realistic');
+      first!.save.setGameplayOption('batteryOxygen', false);
+      first!.save.save({
+        graphicsTier: 'medium',
+        reduceMotion: true,
+        captions: true,
+        sonarPalette: 'highContrast',
+        uiScale: 120,
+      });
+      const second = await boot();
+      expect(second?.settings).toEqual(first!.save.get());
+      expect(second?.tier).toBe('medium');
+      expect(second?.effective.gameplay.batteryOxygen).toBe(false);
+      expect(second?.effective.speedName).toBe('research');
+      expect(new Input({ storage }).getAction('thrustForward')?.keys).toEqual(['KeyK']);
+      expect(storage.getItem('subexplorer.settings.v2')).toBe(originalLegacy);
+      expect(new Save({ config: makeConfig(), storage }).get()).toEqual(second!.settings);
+    },
+  );
+
   it.each(['?tier=low', '?tile=lost-city&tier=low'])(
     'resolves %s without requesting a dive tile before the startup boundary',
     async (search) => {
