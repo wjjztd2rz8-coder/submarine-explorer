@@ -311,12 +311,18 @@ export class Terrain {
     // Rounded erosion rills and resistant beds: resolved relief, not independent shader displacement.
     const u = x / f.reliefWavelengthM;
     const v = z / f.reliefWavelengthM;
-    const rill = 1 - Math.abs(2 * valueNoise2(u, v * (f.rillStretch ?? 0.35), this.detail.seed ^ 0x51) - 1);
+    const rill =
+      1 - Math.abs(2 * valueNoise2(u, v * (f.rillStretch ?? 0.35), this.detail.seed ^ 0x51) - 1);
     const bed = Math.sin(
       (u * 0.35 + v + valueNoise2(u * 0.3, v * 0.3, this.detail.seed)) * Math.PI * 2,
     );
     return (
-      broad + (bed * (f.reliefBed ?? 0.35) - rill * rill * 0.65) * f.reliefM * rock * fade * this.detail.strength
+      broad +
+      (bed * (f.reliefBed ?? 0.35) - rill * rill * 0.65) *
+        f.reliefM *
+        rock *
+        fade *
+        this.detail.strength
     );
   }
 

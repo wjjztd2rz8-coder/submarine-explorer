@@ -168,7 +168,7 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
         f = plain === 0 ? 0 : plain * (1 + (f / plain - 1) * smooth(0.25, 0.7, m) * 1.7);
       }
       // Elliptical, twisting cross-section plus broad lumps: no lathe-like symmetry.
-      f *= 1 + irr * 0.3 * Math.cos(2 * (ang - t * 2.4 - o.seed * 0.37));
+      f *= 1 + irr * (o.trunk ? 0.3 : 0.22) * Math.cos(2 * (ang - t * 2.4 - o.seed * 0.37));
       f *=
         1 +
         irr *
