@@ -168,18 +168,19 @@ export function createExploreSystem(): GameSystem {
               name: secret.def.name,
               firstTime: e.firstTime,
             });
-            optionalProgress()?.award('secret', `${e.landmarkId}/${secret.def.id}`);
+            ctx.progress.award('secret', `${e.landmarkId}/${secret.def.id}`);
             return;
           }
           const target = sampleTargets.find((t) => t.id === e.poiId);
           if (!target || !samples.collect(target)) return;
-          ctx.discovery.onSampleCollected(`Sample collected · ${target.def.name}`);
+          ctx.discovery.onLifeScan(target.def.name, e.firstTime, `sample/${target.def.id}`);
+          ctx.journal.focus(`sample:${target.def.id}`);
           ctx.bus.emit('discovery:sample', {
             landmarkId: e.landmarkId,
             sampleId: target.def.id,
             name: target.def.name,
           });
-          optionalProgress()?.award('sample', `${e.landmarkId}/${target.def.id}`);
+          ctx.progress.award('sample', `${e.landmarkId}/${target.def.id}`);
         }),
         ctx.bus.on('mission:restart', () => {
           samples.reset();
@@ -235,16 +236,7 @@ export function createExploreSystem(): GameSystem {
               eventId: kind,
               kind,
             });
-            optionalProgress()?.award('event', `${ctx.contentLandmark}/${kind}`);
           }
-        }
-        if (scheduler.active) {
-          notice.event(
-            EVENT_CAPTIONS[scheduler.active.kind],
-            !eventWitnessed &&
-              !secretInRange(f.pilotPosition, visual.origin, EXPLORE_CONFIG.eventWitnessM),
-            eventWitnessed,
-          );
         }
         for (const [i, target] of targets.entries())
           meshes[i].visible = secretInRange(
@@ -287,9 +279,4 @@ export function createExploreSystem(): GameSystem {
       effect?.removeFromParent();
     },
   };
-}
-/** Reads the optional merge-time extension only after window.__game is published. */
-function optionalProgress(): GameContext['progress'] | undefined {
-  const game = (window as unknown as { __game?: { progress?: GameContext['progress'] } }).__game;
-  return game?.progress;
 }

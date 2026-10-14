@@ -75,10 +75,7 @@ export async function boot(): Promise<BootContext | null> {
   let daily = null;
   if (params.get('daily') === bootDate) {
     const summaries = await loadMissionSummaries();
-    daily = dailyDive(
-      bootDate,
-      unlockedDailySites(summaries, index, progress, settings.gameplayMode),
-    );
+    daily = dailyDive(bootDate, unlockedDailySites(summaries, index));
     if (daily) {
       route = await resolveMissionRoute(new URLSearchParams({ mission: daily.site }));
       if (route) route.def = dailyMission(route.def, daily);
@@ -89,13 +86,7 @@ export async function boot(): Promise<BootContext | null> {
   const tileId = chooseTileId(requested, index, config.defaultTileId);
   // C5: saved settings (docs/settings.md). The saved graphics tier applies
   // unless `?tier=` is given; terrain detail is read once, when the terrain is built.
-  const effective = resolveEffective(
-    settings,
-    settings.gameplayMode,
-    progress.snapshot(),
-    daily,
-    config,
-  );
+  const effective = resolveEffective(settings, settings.gameplayMode, daily, config);
   const debugTerrain = params.get('debugTerrain') === '1';
   // A2: `?depth=300` spawns the boat 300 m down (clamped above the seabed),
   // for the depth-band screenshots in docs/atmosphere.md.

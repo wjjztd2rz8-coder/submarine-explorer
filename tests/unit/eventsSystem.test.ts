@@ -7,11 +7,12 @@ import { EventBus } from '../../src/core/EventBus.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
 import { Progress } from '../../src/game/Progress.js';
 import { ProgressSave } from '../../src/core/Save.js';
+import { EVENT_CAPTIONS } from '../../src/game/Events.js';
 import type { EventScheduler } from '../../src/game/Events.js';
 
 afterEach(() => vi.unstubAllGlobals());
 
-it('prompts an approach, witnesses once, persists the log and preserves the caption while paused', async () => {
+it('shows the event caption, witnesses once, persists the log and preserves the caption while paused', async () => {
   const elements: Array<{ hidden: boolean; textContent: string; style: object }> = [];
   vi.stubGlobal('document', {
     body: { append: vi.fn() },
@@ -91,12 +92,12 @@ it('prompts an approach, witnesses once, persists the log and preserves the capt
     // Move outside range before the minimum witness time. Framing alone cannot log it.
     position.z = 100;
     frame(1);
-    expect(elements[0].textContent).toContain('Get closer to log it');
+    expect(elements[0].textContent).toBe(EVENT_CAPTIONS.turbidity);
     expect(store.keys()).toEqual([]);
     expect(progress.points).toBe(0);
     position.z = 0;
     frame(0.1);
-    expect(elements[0].textContent).toContain('Sighting logged in Journal');
+    expect(elements[0].textContent).toBe(EVENT_CAPTIONS.turbidity);
     expect(store.keys()).toEqual(['monterey-canyon/event:turbidity']);
     expect(focus).toHaveBeenCalledWith('event:turbidity');
     expect(exposed.explore.summary().events).toEqual(['Silt cloud']);
@@ -108,9 +109,9 @@ it('prompts an approach, witnesses once, persists the log and preserves the capt
     expect(exposed.explore.scheduler.active!.elapsedS).toBe(elapsed);
     frame(0.1);
     expect(elements[0].hidden).toBe(false);
-    expect(elements[0].textContent).toContain('Sighting logged in Journal');
+    expect(elements[0].textContent).toBe(EVENT_CAPTIONS.turbidity);
     expect(witnessed).toHaveBeenCalledTimes(1);
-    expect(progress.points).toBe(5);
+    expect(progress.points).toBe(0);
     expect(progress.bonus).toBe(false);
     expect(store.snapshot().discovered['monterey-canyon/event:turbidity'].count).toBe(1);
     frame(18);

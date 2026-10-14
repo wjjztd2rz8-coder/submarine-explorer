@@ -1,15 +1,13 @@
-import { clamp } from '../util/math.js';
 import { DEFAULT_CONFIG, type GameConfig, type GameplayOptions } from '../core/Config.js';
 import type { CurrentMode } from '../core/config/modes.js';
-import { PROGRESS_CONFIG, UPGRADES, type UpgradeId } from '../core/config/progress.js';
-import type { GameplayMode, ProgressRecord, SettingsData } from '../core/Save.js';
+import { PROGRESS_CONFIG, EQUIPMENT } from '../core/config/progress.js';
+import type { GameplayMode, SettingsData } from '../core/Save.js';
 import type { DailyDive } from './Daily.js';
 
-/** Resolve from pristine tuning every time, so modes, purchases and Daily never compound. */
+/** Resolve from pristine tuning every time, so modes, equipment and Daily never compound. */
 export function resolveEffective(
   settings: SettingsData,
   mode: GameplayMode,
-  progress: Pick<ProgressRecord, 'upgrades'>,
   daily: Pick<DailyDive, 'modifier'> | null,
   base: GameConfig = DEFAULT_CONFIG,
 ) {
@@ -17,20 +15,15 @@ export function resolveEffective(
   const gameplay: GameplayOptions = {
     ...(mode === 'custom' ? settings.gameplay : base.settings.gameplayPresets[preset]),
   };
-  const level = (id: UpgradeId) => {
-    const upgrade = UPGRADES.find((u) => u.id === id)!;
-    return clamp(progress.upgrades[id] ?? 0, 0, upgrade.costs.length);
-  };
-  const factor = (id: UpgradeId) => 1 + level(id) * UPGRADES.find((u) => u.id === id)!.step;
   const speedName: 'research' | 'fast' = preset === 'realistic' ? 'research' : 'fast';
   const profile = base.speedProfiles[speedName];
   const speed = {
     ...profile,
-    thrustAccel: profile.thrustAccel * factor('thrust') ** 2,
-    maxSpeed: profile.maxSpeed * factor('thrust'),
-    cruiseSpeed: profile.cruiseSpeed * factor('thrust'),
-    yawRate: profile.yawRate * factor('turn'),
-    reverseAccel: profile.reverseAccel * factor('reverse'),
+    thrustAccel: profile.thrustAccel * EQUIPMENT.thrust ** 2,
+    maxSpeed: profile.maxSpeed * EQUIPMENT.thrust,
+    cruiseSpeed: profile.cruiseSpeed * EQUIPMENT.thrust,
+    yawRate: profile.yawRate * EQUIPMENT.turn,
+    reverseAccel: profile.reverseAccel * EQUIPMENT.reverse,
   };
   const light =
     base.lightPresets[
@@ -44,9 +37,9 @@ export function resolveEffective(
     'batteryLightsHours',
     'batterySensorsHours',
   ] as const)
-    power[key] *= factor('battery');
-  power.oxygenHours *= factor('oxygen');
-  power.boostCostMultiplier /= factor('boost');
+    power[key] *= EQUIPMENT.battery;
+  power.oxygenHours *= EQUIPMENT.oxygen;
+  power.boostCostMultiplier /= EQUIPMENT.boostEfficiency;
   const currentMode: CurrentMode = daily
     ? daily.modifier === 'strong-currents'
       ? 'strong'
@@ -61,22 +54,21 @@ export function resolveEffective(
     scan: {
       ...base.scan,
       hintRangeFactor:
-        base.scan.hintRangeFactor * sensor.hintRangeMultiplier * factor('sonar-detail'),
+        base.scan.hintRangeFactor * sensor.hintRangeMultiplier * EQUIPMENT.scanDetail,
     },
     power,
     light: {
       ...light,
-      distance: light.distance * factor('light-range'),
-      angleDeg:
-        light.angleDeg + level('light-beam') * UPGRADES.find((u) => u.id === 'light-beam')!.step,
+      distance: light.distance * EQUIPMENT.lightRange,
+      angleDeg: light.angleDeg + EQUIPMENT.beamDegrees,
     },
     sensor: {
       ...sensor,
-      sonarPoiRange: sensor.sonarPoiRange * factor('sonar-range'),
-      scanRadiusMultiplier: sensor.scanRadiusMultiplier * factor('sonar-detail'),
-      hintRangeMultiplier: sensor.hintRangeMultiplier * factor('sonar-detail'),
+      sonarPoiRange: sensor.sonarPoiRange * EQUIPMENT.sonarRange,
+      scanRadiusMultiplier: sensor.scanRadiusMultiplier * EQUIPMENT.scanDetail,
+      hintRangeMultiplier: sensor.hintRangeMultiplier * EQUIPMENT.scanDetail,
     },
-    boostSeconds: PROGRESS_CONFIG.boostSeconds * factor('boost'),
+    boostSeconds: PROGRESS_CONFIG.boostSeconds,
   };
 }
 export type EffectiveSettings = ReturnType<typeof resolveEffective>;

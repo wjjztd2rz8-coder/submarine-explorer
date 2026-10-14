@@ -109,7 +109,7 @@ it.each([
           secrets: ['Arch'],
           samples: ['Sediment'],
         });
-        expect(progress.points).toBe(25);
+        expect(progress.points).toBe(0);
       } finally {
         system.dispose?.();
       }

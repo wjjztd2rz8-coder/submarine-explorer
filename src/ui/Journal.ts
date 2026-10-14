@@ -24,6 +24,8 @@
  */
 
 import { el } from './dom.js';
+import { COSMETIC_CHOICES, cosmeticRequirement, type CosmeticSlot } from '../game/Cosmetics.js';
+import type { Progress } from '../game/Progress.js';
 
 import type { GameEvents } from '../core/EventBus.js';
 import {
@@ -80,7 +82,7 @@ const GROUPS: ReadonlyArray<readonly [label: string, kind: JournalEntry['kind']]
   ['Points of interest', 'poi'],
   ['Species', 'species'],
   ['Wildlife', 'life'],
-  ['Secrets', 'secret'],
+  ['Finds', 'secret'],
 ];
 
 /** One short line on finding the first of a hidden group's entries. */
@@ -135,6 +137,11 @@ export class Journal {
   private readonly trap: FocusTrap;
   private readonly phoneMq: MediaQueryList | null;
   private readonly onPhoneChange = (): void => this.refresh();
+
+  private progress: Progress | null = null;
+  setProgress(progress: Progress): void {
+    this.progress = progress;
+  }
 
   private store: DiscoveryReader = NO_STORE;
   private sites: JournalSite[] = [];
@@ -346,6 +353,7 @@ export class Journal {
     this.render();
     // A newly focused scan must start at its heading, not the previous entry's scroll.
     this.body.scrollTop = 0;
+    if (!this.trap.active && typeof document !== 'undefined') document.exitPointerLock?.();
     this.trap.show();
     const openingView = this.view;
     void this.load().then(() => {
@@ -625,8 +633,8 @@ export class Journal {
     }
     const note = !hidden
       ? ''
-      : label === 'Secrets'
-        ? `${hidden} secrets remain. Follow faint nearby sonar contacts.`
+      : label === 'Finds'
+        ? `${hidden} finds remain. Follow faint nearby sonar contacts.`
         : label === 'Wildlife'
           ? `${hidden} animals unscanned. Face one and hold Scan during a dive.`
           : `${hidden} species not yet identified. Show spoilers to read the survey list.`;
@@ -682,9 +690,50 @@ export class Journal {
     return ul;
   }
 
+  /** A single picker in the existing Journal front page; choices apply on the next dive. */
+  private renderCosmetics(): void {
+    const progress = this.progress;
+    if (!progress) return;
+    const section = el('details', 'jr-category');
+    section.append(el('summary', 'jr-group', 'Cosmetics'));
+    section.append(
+      el('p', 'jr-empty', 'Unlocked by discoveries. Sub choices apply on your next dive.'),
+    );
+    for (const [slot, label] of [
+      ['paint', 'Sub paint'],
+      ['decal', 'Sub decal'],
+      ['frame', 'Photo frame'],
+    ] as const) {
+      const row = el('label', 'jr-group', label);
+      const select = el('select', 'jr-nav-item');
+      select.setAttribute('aria-label', label);
+      select.dataset.cosmetic = slot;
+      select.disabled = progress.save.readOnly;
+      for (const def of COSMETIC_CHOICES[slot]) {
+        const available = progress.ownsCosmetic(def);
+        const option = el(
+          'option',
+          undefined,
+          available ? def.name : `${def.name} · ${cosmeticRequirement(def)}`,
+        );
+        option.value = def.id;
+        option.disabled = !available;
+        select.append(option);
+      }
+      select.value = progress.cosmetics[slot];
+      select.addEventListener('change', () =>
+        progress.selectCosmetic(slot as CosmeticSlot, select.value),
+      );
+      row.append(select);
+      section.append(row);
+    }
+    this.body.append(section);
+  }
+
   private renderFront(sites: JournalSite[]): void {
     const b = this.body;
     b.append(el('h2', 'jr-title', 'Dive journal'));
+    this.renderCosmetics();
     let logged = 0;
     let total = 0;
     for (const s of sites) {

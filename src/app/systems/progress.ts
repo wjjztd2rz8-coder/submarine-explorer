@@ -3,14 +3,12 @@ import { DiscoveryStore } from '../../game/DiscoveryStore.js';
 import { PhotoStore } from '../../game/PhotoStore.js';
 import { dailyRatingKey } from '../../game/Daily.js';
 import { creditPreviousDives } from '../../game/ProgressMigration.js';
-import { Progress, requiredHull } from '../../game/Progress.js';
-import { Upgrades } from '../../ui/Upgrades.js';
-import { tileUrl } from '../../ui/MissionSelect.js';
+import { Progress } from '../../game/Progress.js';
 import type { ShellContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
-/** Boot waits for retroactive rewards before deciding which hulls are available. */
+/** Boot waits for retroactive discovery credit before displaying cosmetics. */
 export async function loadSavedProgress(): Promise<Progress> {
   const discoveries = new DiscoveryStore();
   const progress = new Progress();
@@ -20,26 +18,14 @@ export async function loadSavedProgress(): Promise<Progress> {
 
 export function createProgressSystem(): GameSystem {
   const cleanup = new Disposables();
-  let upgrades: Upgrades;
   let boostLeft: number = PROGRESS_CONFIG.boostSeconds;
   let boostCapacity: number = PROGRESS_CONFIG.boostSeconds;
   let lastPhotos: unknown = null;
-  let initialLock = '';
   return {
     name: 'progress',
     init(ctx) {
       const progress = ctx.progress;
       boostLeft = boostCapacity = ctx.effective.boostSeconds;
-      if (
-        ctx.route &&
-        !progress.canDive(ctx.route.def.briefing.depth_m ?? 0, ctx.settings.gameplayMode)
-      ) {
-        const hull = requiredHull(ctx.route.def.briefing.depth_m ?? 0);
-        initialLock = `This mission needs Class ${hull.id} · ${hull.threshold} lifetime RP. Free dive is open to ${progress.hull.depthM.toLocaleString('en-US')} m.`;
-        // Shared deep-site links become free dives, with the player's pressure rating.
-        history.replaceState({}, '', tileUrl(window.location.href, ctx.route.tileId));
-        ctx.route = null;
-      }
       if (ctx.route) {
         const fitted = progress.hullFor(
           ctx.route.def.briefing.depth_m ?? 0,
@@ -51,10 +37,8 @@ export function createProgressSystem(): GameSystem {
         ctx.bus.on('scan:complete', ({ landmarkId, poiId }) => {
           // Curiosity has its own rewards; avoid also awarding a generic POI.
           if (poiId.startsWith('secret:') || poiId.startsWith('sample:')) return;
-          const earned = poiId.startsWith('life:')
-            ? progress.award('species', poiId.slice('life:'.length))
-            : progress.award('poi', `${landmarkId}/${poiId}`);
-          if (earned) ctx.hud.notice(`New discovery · +${earned} RP`);
+          if (poiId.startsWith('life:')) progress.award('species', poiId.slice(5));
+          else progress.award('poi', `${landmarkId}/${poiId}`);
         }),
       );
       cleanup.add(
@@ -77,32 +61,11 @@ export function createProgressSystem(): GameSystem {
       ctx.expose({ progress });
     },
     start(ctx) {
-      upgrades = initializeProgressMenus(ctx, cleanup);
+      initializeProgressMenus(ctx, cleanup);
       lastPhotos = ctx.photos.photos;
-      if (initialLock) {
-        const notice = document.createElement('div');
-        notice.className = 'progress-hull-notice';
-        notice.setAttribute('role', 'status');
-        const text = document.createElement('span');
-        text.textContent = initialLock;
-        const dismiss = document.createElement('button');
-        dismiss.type = 'button';
-        dismiss.textContent = 'Dismiss';
-        dismiss.onclick = () => notice.remove();
-        notice.append(text, dismiss);
-        document.body.append(notice);
-        cleanup.add(() => notice.remove());
-      }
       ctx.expose({ progressMigrationReady: () => true });
     },
     frame: {
-      'gate.photo': (f) => {
-        if (upgrades?.isOpen) {
-          f.shellFrozen = true;
-          f.blocked = true;
-          f.frozen = true;
-        }
-      },
       'sim.vehicles': (f, ctx) => {
         const max = ctx.effective.boostSeconds;
         boostLeft = Math.min(max, boostLeft + Math.max(0, max - boostCapacity));
@@ -125,59 +88,31 @@ export function createProgressSystem(): GameSystem {
     },
     dispose() {
       cleanup.dispose();
-      upgrades?.dispose();
     },
   };
 }
 
-/** Home and dive share purchases and mission access, without starting the sim. */
-export function initializeProgressMenus(ctx: ShellContext, cleanup: Disposables): Upgrades {
-  const upgrades = new Upgrades(ctx.progress);
-  ctx.upgrades = upgrades;
-  ctx.expose({ upgrades });
-  for (const menu of [
-    ctx.home.root.querySelector('.home-menu'),
-    ctx.pause?.root.querySelector('.pause-actions'),
-  ]) {
-    if (!menu) continue;
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'progress-menu-button';
-    button.textContent = 'Upgrades';
-    button.onclick = () => upgrades.open();
-    menu.append(button);
-    cleanup.add(() => button.remove());
-  }
-  const selectors = [ctx.missionSelect, ctx.homeSites];
-  const updateGlobes = (): void => {
-    for (const globe of [ctx.globe, ctx.homeGlobe])
-      globe.setMissionAccess((site) => {
-        const depth =
-          ctx.missionSummaries.find((m) => m.id === site.id)?.depthM ?? site.depthM ?? 0;
-        if (ctx.progress.canDive(depth, ctx.save.get().gameplayMode)) return null;
-        const hull = requiredHull(depth);
-        return `🔒 Class ${hull.id} · ${hull.threshold} lifetime RP required`;
-      });
+/** Journal owns the cosmetic picker; site selectors only display best ratings. */
+export function initializeProgressMenus(ctx: ShellContext, cleanup: Disposables): void {
+  ctx.journal.setProgress(ctx.progress);
+  const update = (): void => {
+    for (const selector of [ctx.missionSelect, ctx.homeSites]) selector.setProgress(ctx.progress);
   };
-  const updateAccess = (): void => {
-    for (const selector of selectors)
-      selector.setProgress(ctx.progress, ctx.save.get().gameplayMode);
-    updateGlobes();
-  };
-  updateAccess();
-  cleanup.add(
-    ctx.save.onChange((_next, changed) => {
-      if (changed.includes('gameplayMode')) updateAccess();
-    }),
-  );
-  let lastDisplay = '';
+  update();
+  let ratings = JSON.stringify(ctx.progress.snapshot().ratings);
+  let discoveries = ctx.progress.snapshot().awarded.length;
   cleanup.add(
     ctx.progress.onChange(() => {
-      const display = `${ctx.progress.lifetime}/${JSON.stringify(ctx.progress.snapshot().ratings)}`;
-      if (display === lastDisplay) return;
-      lastDisplay = display;
-      updateAccess();
+      const next = JSON.stringify(ctx.progress.snapshot().ratings);
+      if (next !== ratings) {
+        ratings = next;
+        update();
+      }
+      const count = ctx.progress.snapshot().awarded.length;
+      if (count !== discoveries) {
+        discoveries = count;
+        ctx.journal.refresh();
+      }
     }),
   );
-  return upgrades;
 }

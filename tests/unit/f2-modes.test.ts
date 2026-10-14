@@ -1,5 +1,5 @@
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
-import { UPGRADES, PROGRESS_CONFIG } from '../../src/core/config/progress.js';
+import { EQUIPMENT, PROGRESS_CONFIG } from '../../src/core/config/progress.js';
 import { expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { Save, migrate, SETTINGS_STORAGE_KEY } from '../../src/core/Save.js';
@@ -83,7 +83,7 @@ it('fills missing Custom keys without discarding Gentle or valid false values', 
   );
 });
 
-it('resolves modes, Custom inheritance, upgrades and Daily from frozen inputs without compounding', () => {
+it('resolves modes, Custom inheritance, fixed equipment and Daily from frozen inputs without compounding', () => {
   const freeze = <T>(value: T): T => {
     if (value && typeof value === 'object') {
       Object.freeze(value);
@@ -92,7 +92,6 @@ it('resolves modes, Custom inheritance, upgrades and Daily from frozen inputs wi
     return value;
   };
   const base = freeze(structuredClone(DEFAULT_CONFIG));
-  const progress = freeze({ upgrades: Object.fromEntries(UPGRADES.map((u) => [u.id, 1])) });
   for (const preset of ['arcade', 'realistic'] as const) {
     const save = new Save({ config: base, storage: null });
     save.setGameplayMode(preset);
@@ -100,22 +99,24 @@ it('resolves modes, Custom inheritance, upgrades and Daily from frozen inputs wi
     const settings = freeze(save.get());
     for (const modifier of [null, 'calm', 'strong-currents', 'low-light'] as const) {
       const daily = modifier ? freeze({ modifier }) : null;
-      const first = resolveEffective(settings, 'custom', progress, daily, base);
-      expect(resolveEffective(settings, 'custom', progress, daily, base)).toEqual(first);
+      const first = resolveEffective(settings, 'custom', daily, base);
+      expect(resolveEffective(settings, 'custom', daily, base)).toEqual(first);
       expect(first.speedName).toBe(preset === 'realistic' ? 'research' : 'fast');
       expect(first.gameplay.visualHints).toBe(true);
       const sensor = base.sensorPresets[preset === 'realistic' ? 'realistic' : 'extended'];
       expect(first.scan.hintRangeFactor).toBeCloseTo(
-        base.scan.hintRangeFactor * sensor.hintRangeMultiplier * 1.1,
+        base.scan.hintRangeFactor * sensor.hintRangeMultiplier * EQUIPMENT.scanDetail,
       );
-      expect(first.sensor.scanRadiusMultiplier).toBeCloseTo(sensor.scanRadiusMultiplier * 1.1);
+      expect(first.sensor.scanRadiusMultiplier).toBeCloseTo(
+        sensor.scanRadiusMultiplier * EQUIPMENT.scanDetail,
+      );
       expect(first.light.intensity).toBe(
         preset === 'realistic' || modifier === 'low-light' ? 500 : 750,
       );
       expect(first.light.distance).toBeCloseTo(
         base.lightPresets[
           preset === 'realistic' || modifier === 'low-light' ? 'realistic' : 'enhanced'
-        ].distance * 1.1,
+        ].distance * EQUIPMENT.lightRange,
       );
       expect(first.currentMode).toBe(
         modifier ? (modifier === 'strong-currents' ? 'strong' : 'off') : settings.gameplay.currents,
@@ -126,11 +127,9 @@ it('resolves modes, Custom inheritance, upgrades and Daily from frozen inputs wi
       expect(first.camera.lookAheadPerSpeed).toBe(
         base.speedProfiles[first.speedName].cameraLookAheadPerSpeed,
       );
-      expect(first.boostSeconds).toBeCloseTo(PROGRESS_CONFIG.boostSeconds * 1.2);
+      expect(first.boostSeconds).toBeCloseTo(PROGRESS_CONFIG.boostSeconds);
     }
-    expect(resolveEffective(settings, 'arcade', progress, null, base).speedName).toBe('fast');
-    expect(resolveEffective(settings, 'realistic', progress, null, base).speedName).toBe(
-      'research',
-    );
+    expect(resolveEffective(settings, 'arcade', null, base).speedName).toBe('fast');
+    expect(resolveEffective(settings, 'realistic', null, base).speedName).toBe('research');
   }
 });

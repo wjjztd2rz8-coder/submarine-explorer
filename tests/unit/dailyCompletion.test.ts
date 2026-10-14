@@ -61,13 +61,7 @@ it.each(['2026-10-01T23:59:59Z', '2026-10-01T19:00:01-05:00', '2026-10-02T14:00:
       dailySave: new DailySave(storage),
       progress: new Progress(new ProgressSave(storage)),
     } as unknown as GameContext;
-    ctx.effective = resolveEffective(
-      save.get(),
-      save.get().gameplayMode,
-      ctx.progress.snapshot(),
-      ctx.daily,
-      config,
-    );
+    ctx.effective = resolveEffective(save.get(), save.get().gameplayMode, ctx.daily, config);
     ctx.dailySave.complete('2026-09-30');
     missionSystem.init?.(ctx);
     save.setGameplayMode('realistic');

@@ -22,6 +22,7 @@ import {
 import { CockpitView } from '../vehicles/cockpit.js';
 import {
   HULL_PAINTS,
+  SUB_DECALS,
   LIGHT_TRIMS,
   defaultCosmetics,
   type CosmeticSelection,
@@ -34,6 +35,7 @@ export interface SubMeshOptions {
   hullClass?: string;
   /** Graphics tier (`low` | `medium` | `high` | `ultra`). */
   tier?: string;
+  cosmetics?: CosmeticSelection;
   /**
    * QA-B #6: below ~300 m the only light is the boat's own, which points
    * away from the hull, so the model rendered as a pure black cut-out. A
@@ -61,6 +63,7 @@ export class SubMesh {
 
   constructor(options: SubMeshOptions = {}) {
     this.options = { length: 24, hullClass: 'B', tier: 'high', ...options };
+    this.cosmetics = { ...(options.cosmetics ?? defaultCosmetics()) };
     this.group.name = 'submarine';
     this.vehicleRef = this.build(this.options.hullClass);
     this.cockpit = new CockpitView(this.options.tier !== 'low');
@@ -73,7 +76,8 @@ export class SubMesh {
     if (o.rimColor !== undefined) look.rimColor = o.rimColor;
     if (o.rimStrength !== undefined) look.rimStrength = o.rimStrength;
     if (o.emissive !== undefined) look.emissive = o.emissive;
-    const v = buildVehicle(hullClass, o.tier, { scaleFactor: o.length / 26, look });
+    const decal = SUB_DECALS.find((def) => def.id === this.cosmetics.decal)?.text;
+    const v = buildVehicle(hullClass, o.tier, { scaleFactor: o.length / 26, look, decal });
     this.applyCosmetics(v);
     this.group.add(v.root);
     return v;
@@ -85,8 +89,20 @@ export class SubMesh {
   }
 
   setCosmetics(selection: CosmeticSelection): void {
-    if (selection.paint === this.cosmetics.paint && selection.trim === this.cosmetics.trim) return;
+    if (
+      selection.paint === this.cosmetics.paint &&
+      selection.trim === this.cosmetics.trim &&
+      selection.decal === this.cosmetics.decal
+    )
+      return;
+    const rebuild = selection.decal !== this.cosmetics.decal;
     this.cosmetics = { ...selection };
+    if (rebuild) {
+      const visible = this.vehicleRef.root.visible;
+      this.vehicleRef.dispose();
+      this.vehicleRef = this.build(this.options.hullClass);
+      this.vehicleRef.root.visible = visible;
+    }
     this.applyCosmetics(this.vehicleRef);
   }
 
@@ -110,6 +126,7 @@ export class SubMesh {
   setHullClass(id: string): void {
     const want = id === 'A' || id === 'C' ? id : 'B';
     if (want === this.vehicleRef.id) return;
+    this.options.hullClass = want;
     const visible = this.vehicleRef.root.visible;
     this.vehicleRef.dispose();
     this.vehicleRef = this.build(want);

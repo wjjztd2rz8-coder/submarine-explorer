@@ -248,7 +248,6 @@ test('covering home modals stop title draws and return to a usable menu', async 
     ['Settings', '.settings'],
     ['Journal', '.journal'],
     ['Controls', '.settings'],
-    ['Upgrades', '.upgrades'],
   ]) {
     await page.locator('.home-menu').getByRole('button', { name, exact: true }).click();
     const dialog = page.locator(selector);

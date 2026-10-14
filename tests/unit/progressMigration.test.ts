@@ -104,7 +104,7 @@ it.each(['animal', 'photo'])(
     );
     expect(progress.rating('legacy')).toBe(2);
     expect(progress.snapshot().awarded).not.toContain('rating:legacy/3');
-    expect(progress.points).toBe(85);
+    expect(progress.points).toBe(0);
     expect(progress.bonus).toBe(false);
     expect(progress.divePoints).toBe(0);
   },
@@ -135,12 +135,12 @@ it('credits a legacy animal scan as a bonus only for its completed site', async 
   expect(progress.rating('without-life')).toBe(2);
   expect(progress.snapshot().awarded).toContain('species:ray');
   expect(progress.snapshot().awarded).not.toContain('poi:with-life/life:ray');
-  expect(progress.points).toBe(205);
+  expect(progress.points).toBe(0);
   expect(progress.bonus).toBe(false);
   expect(progress.divePoints).toBe(0);
 });
 
-it('retroactively credits objectives, completion, photos and best stars once, before hull gating', async () => {
+it('retroactively credits objectives, completion, photos and best stars once, without gating hulls', async () => {
   const discoveries = new DiscoveryStore(null);
   for (const site of ['first', 'second', 'third']) {
     discoveries.record(site, 'a');
@@ -167,14 +167,14 @@ it('retroactively credits objectives, completion, photos and best stars once, be
     return { ok: true, text: async () => JSON.stringify(doc) };
   };
   await creditPreviousDives(progress, discoveries, [{ siteId: 'first', poiId: 'a' }], fetchJson);
-  expect(progress.points).toBe(330);
-  expect(progress.hull.id).toBe('B');
+  expect(progress.points).toBe(0);
+  expect(progress.hullFor(3800)).toBe('B');
   expect(progress.rating('first')).toBe(3);
   expect(progress.rating('second')).toBe(2);
   expect(progress.divePoints).toBe(0);
   expect(progress.bonus).toBe(false);
   await creditPreviousDives(progress, discoveries, [{ siteId: 'first', poiId: 'a' }], fetchJson);
-  expect(progress.points).toBe(330);
+  expect(progress.points).toBe(0);
   expect(discoveries.snapshot()).toEqual(original);
 });
 
@@ -186,7 +186,7 @@ it('keeps discoveries credited when their old content pack is unavailable', asyn
     ok: false,
     text: async () => '',
   }));
-  expect(progress.points).toBe(10);
+  expect(progress.points).toBe(0);
   expect(progress.rating('missing')).toBe(0);
 });
 
@@ -228,7 +228,7 @@ it('does not retroactively rate modern discoveries spread across dives or made b
   });
   expect(fetched).toBe(false);
   expect(reloaded.rating('modern')).toBe(0);
-  expect(reloaded.points).toBe(10);
+  expect(reloaded.points).toBe(0);
 });
 
 it('retries failed legacy content across reload without rating discoveries from later dives', async () => {
@@ -249,9 +249,13 @@ it('retries failed legacy content across reload without rating discoveries from 
   await creditPreviousDives(progress, discoveries, [], async () => {
     throw new Error('offline');
   });
-  expect(progress.points).toBe(20);
+  expect(progress.points).toBe(0);
   expect(progress.legacyCredited).toBe(false);
   discoveries.record('modern', 'a');
+  progress.award('photo', 'titanic/bow');
+  progress.finish('titanic', [{ primary: true, complete: true }]);
+  expect(progress.rating('titanic')).toBe(3);
+  expect(progress.selectCosmetic('paint', 'orange')).toBe(false);
   const restored = new Progress(new ProgressSave(storage));
   const urls: string[] = [];
   await creditPreviousDives(restored, discoveries, [], async (url) => {
@@ -275,14 +279,17 @@ it('retries failed legacy content across reload without rating discoveries from 
   });
   expect(urls).toHaveLength(1);
   expect(urls[0]).toContain('/old/');
-  expect(restored.points).toBe(110); // old 100 RP plus the modern POI, without a modern rating
+  expect(restored.points).toBe(0); // Retry only credits legacy ratings; neither old nor modern POIs earn currency.
   expect(restored.rating('old')).toBe(2);
   expect(restored.rating('modern')).toBe(0);
+  expect(restored.rating('titanic')).toBe(3);
+  // A retry must not reinterpret stars earned after the legacy boundary as old cosmetics.
+  expect(restored.selectCosmetic('paint', 'orange')).toBe(false);
   expect(restored.legacyCredited).toBe(true);
   await creditPreviousDives(new Progress(new ProgressSave(storage)), discoveries, [], async () => {
     throw new Error('must not fetch');
   });
-  expect(new Progress(new ProgressSave(storage)).points).toBe(110);
+  expect(new Progress(new ProgressSave(storage)).points).toBe(0);
 });
 
 it('finishes migration for genuinely absent optional missions', async () => {
@@ -294,7 +301,7 @@ it('finishes migration for genuinely absent optional missions', async () => {
     status: 404,
     text: async () => '',
   }));
-  expect(progress.points).toBe(10);
+  expect(progress.points).toBe(0);
   expect(progress.legacyCredited).toBe(true);
 });
 
@@ -323,7 +330,7 @@ it.each(['constructor', '__proto__', 'toString'])(
     ).resolves.toBeUndefined();
     expect(progress.rating(site)).toBe(2);
     expect(progress.legacyCredited).toBe(true);
-    expect(progress.points).toBe(85);
+    expect(progress.points).toBe(0);
     expect(progress.divePoints).toBe(0);
     expect(discoveries.snapshot()).toEqual(original);
     const earned = progress.snapshot();

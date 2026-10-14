@@ -316,3 +316,23 @@ describe('debrief wording', () => {
     );
   });
 });
+
+it('loads samples and secrets as Journal finds while preserving their discovery keys and mission counts', () => {
+  const site = buildJournalSite({
+    id: 'reef',
+    guide: null,
+    pois: [],
+    species: null,
+    secrets: [{ id: 'arch', name: 'Arch', kind: 'rock', lat: 0, lon: 0, text: 'A hidden arch.' }],
+    samples: [{ id: 'mud', name: 'Sediment', lat: 0, lon: 0 }],
+  });
+  const store = new DiscoveryStore(null);
+  expect(site.entries.map((entry) => entry.kind)).toEqual(['secret', 'secret']);
+  expect(site.entries.map((entry) => entry.poiIds)).toEqual([['secret:arch'], ['sample:mud']]);
+  for (const entry of site.entries) expect(isEntryUnlocked(site, entry, store)).toBe(false);
+  store.record('reef', 'sample:mud');
+  expect(isEntryUnlocked(site, site.entries[1], store)).toBe(true);
+  expect(isSiteUnlocked(site, store)).toBe(true);
+  expect(siteProgress(site, store)).toEqual({ logged: 0, total: 0, species: 0, speciesTotal: 0 });
+  expect(new DiscoveryStore(null).keys()).toEqual([]);
+});

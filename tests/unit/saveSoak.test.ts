@@ -208,7 +208,7 @@ describe('save schema soak', () => {
       );
       const save = new ProgressSave(storage);
       expect(save.get()).toMatchObject({
-        version: 1,
+        version: 2,
         points: 120,
         lifetime: 400,
         awarded: ['poi:titanic/bow'],

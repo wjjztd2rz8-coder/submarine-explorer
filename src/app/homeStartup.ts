@@ -54,12 +54,7 @@ export function createHomeSystems(): GameSystem<
       },
       frame: {
         'scan.discovery': (_f, ctx) => {
-          if (
-            ctx.input.state.toggleGuide &&
-            !ctx.settingsScreen.isOpen &&
-            !ctx.globe.isOpen &&
-            !ctx.upgrades.isOpen
-          )
+          if (ctx.input.state.toggleGuide && !ctx.settingsScreen.isOpen && !ctx.globe.isOpen)
             ctx.journal.toggle();
         },
         'late.input': (_f, ctx) => ctx.input.endFrame(),
@@ -73,8 +68,7 @@ export function createHomeSystems(): GameSystem<
     {
       name: 'menuProgress',
       start(ctx) {
-        const upgrades = initializeProgressMenus(ctx, cleanup);
-        cleanup.add(() => upgrades.dispose());
+        initializeProgressMenus(ctx, cleanup);
       },
     },
     shellKeysSystem,

@@ -106,14 +106,10 @@ test('Arcade opens every card on a phone; switching to Realistic restores locks'
       'realistic',
     ),
   );
-  await expect(sites.locator('[data-mission="titanic"]')).toBeDisabled();
-  await expect(sites.locator('[data-mission="titanic"] .mission-lock')).toContainText(
-    'Class B · 300 lifetime RP',
-  );
-  await expect(sites.locator('[data-mission="challenger-deep"] .mission-lock')).toContainText(
-    'Class C · 900 lifetime RP',
-  );
-  await expect(sites.locator('.is-mission:not(:disabled)')).toHaveCount(4);
+  await expect(sites.locator('[data-mission="titanic"]')).toBeEnabled();
+  await expect(sites.locator('[data-mission="challenger-deep"]')).toBeEnabled();
+  await expect(sites.locator('.mission-lock')).toHaveCount(0);
+  await expect(sites.locator('.is-mission:not(:disabled)')).toHaveCount(13);
   await sites.locator('[data-mission="titanic"]').scrollIntoViewIfNeeded();
   await shot(page, 'realistic-sites-phone');
   await page.evaluate(() =>
@@ -125,7 +121,7 @@ test('Arcade opens every card on a phone; switching to Realistic restores locks'
   await expect(sites.locator('[data-mission="titanic"]')).toBeEnabled();
 });
 
-test('a fresh Realistic shared Titanic link keeps the coastal hull and opens free dive', async ({
+test('a fresh Realistic shared Titanic link keeps its mission and Class B hull', async ({
   page,
 }) => {
   await page.addInitScript(() =>
@@ -136,17 +132,17 @@ test('a fresh Realistic shared Titanic link keeps the coastal hull and opens fre
   );
   await page.goto('/?mission=titanic&tutorial=0');
   await ready(page);
-  await expect(page.locator('.progress-hull-notice')).toContainText('Class B · 300 lifetime RP');
-  await expect(page).toHaveURL(/tile=titanic/);
+  await expect(page.locator('.progress-hull-notice')).toHaveCount(0);
+  await expect(page).toHaveURL(/mission=titanic/);
   const state = await page.evaluate(() => {
     const g = window.__game as { sub: Submarine; subMesh: { hullClass: string }; mission: unknown };
     return {
       hull: g.sub.getState().hullClass,
       rating: g.sub.getState().ratedDepth,
       vehicle: g.subMesh.hullClass,
-      mission: g.mission,
+      mission: Boolean(g.mission),
     };
   });
-  expect(state).toEqual({ hull: 'A', rating: -1000, vehicle: 'A', mission: null });
+  expect(state).toEqual({ hull: 'B', rating: -6500, vehicle: 'B', mission: true });
   await shot(page, 'titanic-realistic-locked');
 });

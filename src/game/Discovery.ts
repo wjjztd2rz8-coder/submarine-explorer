@@ -211,11 +211,6 @@ export class Discovery {
     this.overlay.showComplete(title, firstTime, this.keys());
   }
 
-  /** Samples belong to the current collection, rather than a Journal entry. */
-  onSampleCollected(title: string): void {
-    this.overlay.showComplete(title, false, this.keys(), 'sample');
-  }
-
   /** Pose for the `?poi=` spawn, or null if the POI is unknown. */
   spawnPose(poiId: string): SpawnPose | null {
     const poi = this.pois.find((p) => p.id === poiId);

@@ -1,5 +1,6 @@
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { defaultSettings } from '../../src/core/Save.js';
+import { PROGRESS_CONFIG } from '../../src/core/config/progress.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { describe, expect, it } from 'vitest';
 import { createProgressSystem } from '../../src/app/systems/progress.js';
@@ -7,7 +8,7 @@ import type { GameContext } from '../../src/app/context.js';
 import type { FrameState } from '../../src/app/System.js';
 
 const context = {
-  effective: resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', { upgrades: {} }, null),
+  effective: resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', null),
   sub: { simSpeed: 1 },
 } as unknown as GameContext;
 function frame(boost: boolean, seconds = 1): FrameState {
@@ -17,7 +18,7 @@ describe('progress boost integration', () => {
   it('limits sustained boost and recovers reserves when released', () => {
     const system = createProgressSystem();
     const tick = system.frame!['sim.vehicles']!;
-    for (let second = 0; second < 8; second++) {
+    for (let second = 0; second < Math.ceil(PROGRESS_CONFIG.boostSeconds); second++) {
       const f = frame(true);
       tick(f, context);
       expect(f.state.boost).toBe(true);
@@ -40,25 +41,14 @@ describe('progress boost integration', () => {
   });
 });
 
-it('a boost purchase adds only its new capacity to exhausted reserves', () => {
+it('cosmetic/save changes cannot refill exhausted boost reserves', () => {
   const ctx = { ...context };
   const tick = createProgressSystem().frame!['sim.vehicles']!;
-  for (let i = 0; i < 8; i++) tick(frame(true), ctx);
+  for (let i = 0; i < Math.ceil(PROGRESS_CONFIG.boostSeconds); i++) tick(frame(true), ctx);
   const empty = frame(true);
   tick(empty, ctx);
   expect(empty.state.boost).toBe(false);
-  ctx.effective = resolveEffective(
-    defaultSettings(DEFAULT_CONFIG),
-    'arcade',
-    { upgrades: { boost: 1 } },
-    null,
-  );
-  const added = frame(true);
-  tick(added, ctx);
-  expect(added.state.boost).toBe(true);
-  const remainder = frame(true);
-  tick(remainder, ctx);
-  expect(remainder.state.boost).toBe(true);
+  ctx.effective = resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', null);
   const exhausted = frame(true);
   tick(exhausted, ctx);
   expect(exhausted.state.boost).toBe(false);

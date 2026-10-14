@@ -138,7 +138,7 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
     ),
   ).toEqual(objectives);
   expect(await page.evaluate(() => (window.__game as unknown as Game).progress.points)).toBe(
-    initial + 45,
+    initial,
   );
   await page.evaluate(async () => {
     const g = window.__game as unknown as Game;
@@ -169,9 +169,13 @@ test('samples collect per dive, appear in mission debrief, and reset on restart'
 }) => {
   await boot(page, 'monterey-canyon', true);
   const id = await park(page, 0, true);
-  await expect(page.locator('.scan-hint')).toContainText('TO COLLECT');
+  await expect(page.locator('.scan-hint')).toContainText('TO SCAN');
   await scan(page, id);
-  await expect(page.locator('.scan-name')).toContainText('Sample collected');
+  await expect(page.locator('.scan-name')).toHaveText('Sediment core');
+  // Regression: a sample must have a persistent Journal entry, beyond its dive-local collection.
+  await page.keyboard.press('j');
+  await expect(page.locator('.journal .jr-body .jr-title')).toHaveText('Sediment core');
+  await page.keyboard.press('Escape');
   expect(
     await page.evaluate(() => (window.__game as unknown as Game).explore.samples.collected.size),
   ).toBe(1);
@@ -225,7 +229,7 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
   );
   await shot(page, 'event-turbidity');
   expect(await page.evaluate(() => (window.__game as unknown as Game).progress.points)).toBe(
-    points + 5,
+    points,
   );
   await page.keyboard.press('Escape');
   await page.clock.fastForward(100);

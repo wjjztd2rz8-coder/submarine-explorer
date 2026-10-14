@@ -78,7 +78,6 @@ function setup(over: { load?: () => Promise<unknown>; state?: string } = {}) {
     settingsScreen: { isOpen: false },
     journal: { isOpen: false },
     globe: { isOpen: false },
-    upgrades: { isOpen: false },
     controlsCard: { isOpen: false },
     expose: vi.fn(),
   } as unknown as GameContext & Record<string, any>;
@@ -311,7 +310,7 @@ describe('title lifecycle', () => {
       frame();
       ctx.titleScene.present(r as never);
       expect(ctx.titleScene.drawCount).toBe(before + 1);
-      for (const modal of [ctx.settingsScreen, ctx.journal, ctx.upgrades, ctx.controlsCard]) {
+      for (const modal of [ctx.settingsScreen, ctx.journal, ctx.controlsCard]) {
         (modal as { isOpen: boolean }).isOpen = true;
         frame();
         const paused = ctx.titleScene.drawCount;

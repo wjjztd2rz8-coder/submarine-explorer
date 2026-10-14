@@ -74,14 +74,6 @@ export class ExploreNotice {
     this.layoutWaitS = 0;
   }
   /** Keep approach guidance live; confirmation needs only a short reading time. */
-  event(text: string, needsCloser: boolean, logged: boolean): void {
-    const cue = needsCloser ? 'Get closer to log it' : logged ? 'Sighting logged in Journal' : '';
-    const value = cue ? `${text}\n${cue}` : text;
-    if (this.root.textContent === value) return;
-    this.root.textContent = value;
-    if (logged) this.leftS = Math.min(this.leftS, 3);
-    this.layoutWaitS = 0;
-  }
   update(dt: number, blocked: boolean): void {
     this.leftS = Math.max(0, this.leftS - dt);
     if (blocked || this.leftS <= 0) {

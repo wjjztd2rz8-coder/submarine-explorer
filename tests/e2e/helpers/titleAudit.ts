@@ -81,7 +81,6 @@ export function titleAudit(base = '/') {
       ['Settings', '.settings'],
       ['Controls', '.settings'],
       ['Journal', '.journal'],
-      ['Upgrades', '.upgrades'],
     ]) {
       const origin = menu.getByRole('button', { name, exact: true });
       await origin.click();

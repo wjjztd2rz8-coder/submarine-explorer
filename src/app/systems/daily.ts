@@ -1,27 +1,20 @@
 import { DAILY_MODIFIER_LABELS } from '../../core/config/modes.js';
-import type { GameplayMode } from '../../core/Save.js';
 import { dailyDive, dailyRatingKey, utcDate } from '../../game/Daily.js';
 import { dailyStreak } from '../../game/DailySave.js';
 import type { MissionSummary } from '../../game/Mission.js';
-import type { Progress } from '../../game/Progress.js';
 import { missionUrl } from '../../ui/MissionSelect.js';
 import type { TileIndexEntry } from '../../util/types.js';
 import type { ShellContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
-/** Downloaded missions follow the selected mode's next-dive hull access. */
+/** Every downloaded mission with a known depth is available for Daily selection. */
 export function unlockedDailySites(
   sites: readonly MissionSummary[],
   tiles: readonly TileIndexEntry[],
-  progress: Pick<Progress, 'canDive'>,
-  mode: GameplayMode = 'realistic',
 ): string[] {
   return sites
-    .filter(
-      (s) =>
-        tiles.some((t) => t.id === s.tile) && s.depthM !== null && progress.canDive(s.depthM, mode),
-    )
+    .filter((s) => tiles.some((t) => t.id === s.tile) && s.depthM !== null)
     .map((s) => s.id);
 }
 export function createDailySystem(): GameSystem<ShellContext, unknown> {
@@ -33,15 +26,7 @@ export function createDailySystem(): GameSystem<ShellContext, unknown> {
       let display = '';
       const refresh = () => {
         const date = utcDate();
-        const dive = dailyDive(
-          date,
-          unlockedDailySites(
-            ctx.missionSummaries,
-            ctx.index,
-            ctx.progress,
-            ctx.save.get().gameplayMode,
-          ),
-        );
+        const dive = dailyDive(date, unlockedDailySites(ctx.missionSummaries, ctx.index));
         if (!dive) {
           display = '';
           ctx.home.clearDaily();

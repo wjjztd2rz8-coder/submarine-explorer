@@ -4,7 +4,7 @@ import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
 
-/** The sole live application path for modes, upgrades and Daily conditions. */
+/** The sole live application path for modes and Daily conditions. */
 export const modesSystem: GameSystem = {
   name: 'modes',
   dispose: () => cleanup.dispose(),
@@ -21,13 +21,7 @@ export const modesSystem: GameSystem = {
   start(ctx) {
     const recompute = (): void => {
       const settings = ctx.save.get();
-      const effective = resolveEffective(
-        settings,
-        settings.gameplayMode,
-        ctx.progress.snapshot(),
-        ctx.daily,
-        ctx.config,
-      );
+      const effective = resolveEffective(settings, settings.gameplayMode, ctx.daily, ctx.config);
       ctx.effective = effective;
       ctx.sub.setConfig(effective.submarine);
       ctx.rig.setConfig(effective.camera);
@@ -48,15 +42,6 @@ export const modesSystem: GameSystem = {
       ctx.save.onChange((_next, changed) => {
         if (changed.some((key) => ['gameplay', 'gameplayMode', 'gameplayBaseMode'].includes(key)))
           recompute();
-      }),
-    );
-    let levels = JSON.stringify(ctx.progress.snapshot().upgrades);
-    cleanup.add(
-      ctx.progress.onChange(() => {
-        const next = JSON.stringify(ctx.progress.snapshot().upgrades);
-        if (next === levels) return;
-        levels = next;
-        recompute();
       }),
     );
     ctx.expose({
