@@ -113,7 +113,7 @@ diffuseColor.rgb *= max(vec3(0.3), 1.0 + (carbonatePattern * 4.6 - 1.0) * carbon
     texture2D(carbonateAlbedo, sq.xy + 0.11, carbonateMip).g * carbonateWeights.z;
   float stripe = (sx * 0.6 + sw * 0.4) * 4.6 - 1.0;
   float flow = clamp(stripe * 0.5 + 0.5, 0.0, 1.0);
-  diffuseColor.rgb *= max(0.34, 1.0 + stripe * 1.05 * wall * far);
+  diffuseColor.rgb *= max(0.5, 1.0 + stripe * 0.35 * wall * far);
   // Warm ivory/ochre on the pale runs, cool blue-grey in the shaded flutes.
   diffuseColor.rgb *= mix(vec3(0.84, 0.93, 1.14), vec3(1.16, 1.04, 0.78), flow) * wall * far + (1.0 - wall * far);
 }

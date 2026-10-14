@@ -138,7 +138,7 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
         const fj = uj - Math.floor(uj);
         const strength = 0.15 + 1.1 * hash1(Math.floor(uj) + o.seed);
         const shelf =
-          (o.ledge ?? 0.14) * smooth(0, 0.08, fj) * Math.pow(1 - fj, 2.2) * strength * 0.3;
+          (o.ledge ?? 0.14) * smooth(0, 0.08, fj) * Math.pow(1 - fj, 2.2) * strength * 0.7;
         const m = fbm3(
           Math.cos(ang) * 1.6 + 7,
           Math.floor(uj) * 3.1,
@@ -147,13 +147,13 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
           2,
         );
         // Shelves are strong on one side and vanish on the other.
-        f = plain * (1 + shelf * smooth(0.3, 0.7, m) * 1.5);
+        f = plain * (1 + shelf * smooth(0.4, 0.62, m) * 1.5);
         // Slow swells and waists along the whole trunk.
         f *=
           1 +
           irr *
-            (0.1 * Math.sin(t * TAU * 1.35 + o.seed * 0.7 + Math.cos(ang - o.seed) * 0.6) +
-              0.07 * Math.sin(t * TAU * 3.3 + o.seed * 1.9 - Math.sin(ang) * 0.9));
+            (0.15 * Math.sin(t * TAU * 1.35 + o.seed * 0.7 + Math.cos(ang - o.seed) * 0.6) +
+              0.1 * Math.sin(t * TAU * 3.3 + o.seed * 1.9 - Math.sin(ang) * 0.9));
       } else {
         const u = t * (o.tiers ?? 0);
         const m = fbm3(
@@ -168,7 +168,7 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
         f = plain === 0 ? 0 : plain * (1 + (f / plain - 1) * smooth(0.25, 0.7, m) * 1.7);
       }
       // Elliptical, twisting cross-section plus broad lumps: no lathe-like symmetry.
-      f *= 1 + irr * 0.22 * Math.cos(2 * (ang - t * 2.4 - o.seed * 0.37));
+      f *= 1 + irr * (o.trunk ? 0.3 : 0.22) * Math.cos(2 * (ang - t * 2.4 - o.seed * 0.37));
       f *=
         1 +
         irr *

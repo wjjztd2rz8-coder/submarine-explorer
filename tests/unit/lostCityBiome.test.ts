@@ -32,7 +32,7 @@ describe('lost-city biome', () => {
     const tones = Array.from({ length: 120 }, (_, i) =>
       lostCitySlopeTint(20, -800 + i * 0.25, 30, Math.cos((15 * Math.PI) / 180)),
     ).flat();
-    expect(Math.max(...tones) - Math.min(...tones)).toBeGreaterThan(0.2);
+    expect(Math.max(...tones) - Math.min(...tones)).toBeGreaterThan(0.15);
     expect(Math.min(...tones)).toBeGreaterThan(0.7);
     expect(tones.reduce((sum, tone) => sum + tone, 0) / tones.length).toBeGreaterThan(0.94);
   });

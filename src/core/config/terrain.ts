@@ -101,6 +101,9 @@ export interface TerrainFidelity {
   /** Fine relief is sampled by both geometry and physics, in metres. */
   reliefM: number;
   reliefWavelengthM: number;
+  /** Parallel-bed corrugation share (default 0.35) and rill stretch along z (default 0.35; 1 = round). */
+  reliefBed?: number;
+  rillStretch?: number;
   normalStrength: number;
   /** Reconstructed wall mesh limits; Low retains the original limits. */
   wallSegments: Record<GraphicsTier, [number, number]>;
@@ -127,6 +130,9 @@ export const LOST_CITY_FIDELITY: TerrainFidelity = {
   nearSubdiv: { low: 1, medium: 4, high: 8, ultra: 8 },
   reliefM: 1.8,
   reliefWavelengthM: 36,
+  // Parallel sine beds and z-stretched rills read as stretched stripes on the slope.
+  reliefBed: 0.08,
+  rillStretch: 1,
   normalStrength: 0.2,
 };
 
