@@ -55,7 +55,14 @@ import {
   steelMaterial,
   voidMaterial,
 } from './materials.js';
-import { bollards, cowlVent, edgePath, openingRow, rusticlesAlong } from './ship.js';
+import {
+  HEAVY_RUSTICLES,
+  bollards,
+  cowlVent,
+  edgePath,
+  openingRow,
+  rusticlesAlong,
+} from './ship.js';
 import { mulberry32, valueNoise3 } from './shared.js';
 
 /** Stations along the stern section (m from the torn forward end). */
@@ -374,7 +381,15 @@ export function buildTitanicStern(
     // Dark inside the tear, a little brighter where lights will catch the rim.
     return THREE.MathUtils.lerp(0.5, 1, S(s, 2, T.cavity + 2)) * (y < 0.8 ? 0.9 : 1);
   };
-  paintWreck(hullGeom, { seed, rustiness: 0.82, growth: 0.3, silt: 0.6, mudBand: 1.8, shadeAt });
+  paintWreck(hullGeom, {
+    seed,
+    rustiness: 0.82,
+    growth: 0.3,
+    silt: 0.6,
+    mudBand: 3,
+    plates: [1.9, 5.5, 0.7],
+    shadeAt,
+  });
   projectUVs(hullGeom, 8);
   const hullMesh = meshOf(hullGeom, steelMaterial(detail), 'titanic-stern-hull')!;
   const voidMesh = meshOf(dark.merge(), voidMaterial(), 'titanic-stern-void')!;
@@ -422,7 +437,16 @@ export function buildTitanicStern(
   const rust = new InstanceList();
   for (const side of [-1, 1] as const) {
     const o = v3(side, 0, 0);
-    rusticlesAlong(rust, edgePath(spec, 2, L - 1, 1, top, side, -0.05), 1.2, 0.3, 1.7, rnd, o);
+    rusticlesAlong(
+      rust,
+      edgePath(spec, 2, L - 1, 1, top, side, -0.05),
+      1.2,
+      0.3,
+      1.7,
+      rnd,
+      o,
+      HEAVY_RUSTICLES,
+    );
     rusticlesAlong(
       rust,
       edgePath(spec, 16, L - 6, 1.5, () => 6.5, side, -0.1),
@@ -431,17 +455,19 @@ export function buildTitanicStern(
       1,
       rnd,
       o,
+      HEAVY_RUSTICLES,
     );
   }
   for (const p of under)
-    if (rnd() < 0.4) hangRusticle(rust, p.clone().add(v3(0, -0.28, 0)), 0.25 + rnd() * 0.6, rnd);
+    if (rnd() < 0.4)
+      hangRusticle(rust, p.clone().add(v3(0, -0.28, 0)), 0.25 + rnd() * 0.6, rnd, HEAVY_RUSTICLES);
   for (let i = 0; i < 180; i++) {
     // Curtains at the tear and under the pancaked slabs.
     const s = rnd() < 0.55 ? rnd() * 9 : T.cavity + rnd() * (T.superEnd - T.cavity);
     const side = (rnd() < 0.5 ? -1 : 1) as -1 | 1;
     const p = loftPoint(spec, s, top(s) * (0.4 + rnd() * 0.6), side, new THREE.Vector3());
     p.x *= s < 9 ? rnd() : 1.02;
-    hangRusticle(rust, p, 0.3 + rnd() * 1.5, rnd);
+    hangRusticle(rust, p, 0.3 + rnd() * 1.5, rnd, HEAVY_RUSTICLES);
   }
   rust.thin(detail.growth);
   const rm = makeInstanced(rusticleGeometry(), growthMaterial(), rust, 'titanic-stern-rusticles');

@@ -131,9 +131,10 @@ export function hangRusticle(
   p: THREE.Vector3,
   len: number,
   rnd: () => number,
+  girth = 1,
 ): void {
   const L = len * (0.75 + rnd() * 0.3);
-  const r = Math.max(0.02, L * (0.065 + rnd() * rnd() * 0.1));
+  const r = Math.max(0.02, L * (0.065 + rnd() * rnd() * 0.1)) * girth;
   const m = new THREE.Matrix4().compose(
     p,
     new THREE.Quaternion().setFromEuler(

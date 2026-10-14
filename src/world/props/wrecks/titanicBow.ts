@@ -68,6 +68,7 @@ import {
   hullFrame,
   openingRow,
   rusticlesAlong,
+  HEAVY_RUSTICLES,
   stocklessAnchor,
   welinDavit,
 } from './ship.js';
@@ -460,7 +461,8 @@ export function buildTitanicBow(
     rustiness: 0.72,
     growth: 0.25,
     silt: 0.55,
-    mudBand: 2.2,
+    mudBand: 3.4,
+    plates: [1.9, 5.5, 0.7],
     shadeAt: endShade,
   });
   projectUVs(hullGeom, 8);
@@ -613,6 +615,7 @@ export function buildTitanicBow(
       1.8,
       rnd,
       o,
+      HEAVY_RUSTICLES,
     );
     rusticlesAlong(
       rust,
@@ -622,6 +625,7 @@ export function buildTitanicBow(
       1.4,
       rnd,
       o,
+      HEAVY_RUSTICLES,
     );
     rusticlesAlong(
       rust,
@@ -631,6 +635,7 @@ export function buildTitanicBow(
       1.6,
       rnd,
       o,
+      HEAVY_RUSTICLES,
     );
     rusticlesAlong(
       rust,
@@ -640,19 +645,21 @@ export function buildTitanicBow(
       0.9,
       rnd,
       o,
+      HEAVY_RUSTICLES,
     );
   }
   for (let y = 1; y < T.forecastleY; y += 0.6)
-    hangRusticle(rust, v3(0, y, -L / 2 - 0.05), 0.3 + rnd() * 0.9, rnd);
+    hangRusticle(rust, v3(0, y, -L / 2 - 0.05), 0.3 + rnd() * 0.9, rnd, HEAVY_RUSTICLES);
   for (const p of under)
-    if (rnd() < 0.45) hangRusticle(rust, p.clone().add(v3(0, -0.28, 0)), 0.25 + rnd() * 0.7, rnd);
+    if (rnd() < 0.45)
+      hangRusticle(rust, p.clone().add(v3(0, -0.28, 0)), 0.25 + rnd() * 0.7, rnd, HEAVY_RUSTICLES);
   for (let i = 0; i < 160; i++) {
     const s = L - rnd() * 12;
     const y = 2 + rnd() * 11;
     const side = (rnd() < 0.5 ? -1 : 1) as -1 | 1;
     const p = loftPoint(spec, s, y, side, new THREE.Vector3());
     p.x *= rnd();
-    hangRusticle(rust, p, 0.3 + rnd() * 1.5, rnd);
+    hangRusticle(rust, p, 0.3 + rnd() * 1.5, rnd, HEAVY_RUSTICLES);
   }
   for (let i = 0; i < 60; i++) {
     // Along the well-deck crane jibs and the fallen mast.
@@ -660,7 +667,7 @@ export function buildTitanicBow(
       .clone()
       .lerp(mastTop, rnd())
       .add(v3(0, -0.4, 0));
-    hangRusticle(rust, p, 0.3 + rnd() * 1.1, rnd);
+    hangRusticle(rust, p, 0.3 + rnd() * 1.1, rnd, HEAVY_RUSTICLES);
   }
   rust.thin(detail.growth);
   if (detail.growth > 1) {
@@ -674,6 +681,7 @@ export function buildTitanicBow(
         0.6,
         rnd,
         v3(side, 0, 0),
+        HEAVY_RUSTICLES,
       );
     }
   }

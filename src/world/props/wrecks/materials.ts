@@ -162,6 +162,12 @@ interface PaintOptions {
   silt: number;
   /** Height of the darker mud-splashed band above y = 0 (m). */
   mudBand: number;
+  /**
+   * Plate-by-plate variation for riveted hulls: (plate height m, plate length m,
+   * strength 0..1). Each staggered plate gets its own tone and rust, with a
+   * few plates sprung darker, so the strakes stop repeating.
+   */
+  plates?: readonly [number, number, number];
   /** Wood keeps its grain colour; no rust streaking. */
   wood?: boolean;
   /**
@@ -225,6 +231,17 @@ export function paintWreck(geom: THREE.BufferGeometry, o: PaintOptions): void {
       _c.copy(_base)
         .lerp(_r, rustMix)
         .multiplyScalar(0.8 + 0.35 * mid);
+    }
+    if (o.plates) {
+      const [ph, pl, amt] = o.plates;
+      const row = Math.floor(y / ph);
+      // Stagger each row; hull length runs along z, width folds in via x.
+      const along = Math.floor((z + x * 0.5) / pl + row * 0.37);
+      const h = valueNoise3(row * 7.7 + 0.5, along * 3.1 + 0.5, 4.5, o.seed ^ 0x2d);
+      const h2 = valueNoise3(row * 2.3 + 9.5, along * 5.9 + 0.5, 1.5, o.seed ^ 0x4e);
+      _c.multiplyScalar(1 + amt * (h - 0.5) * 1.1);
+      _c.lerp(RUST_DARK, amt * S(h2, 0.62, 0.9) * 0.55);
+      _c.lerp(RUST_ORANGE, amt * S(h2, 0.1, 0.32) * 0.3);
     }
     const g = S(valueNoise3(x * 0.12, y * 0.2, z * 0.12, o.seed ^ 0x9e), 0.58, 0.85) * o.growth;
     _c.lerp(GROWTH, g * 0.7);
