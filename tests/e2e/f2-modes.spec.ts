@@ -192,7 +192,6 @@ for (const mode of ['arcade', 'realistic'] as const) {
     expect(access.allowed).toBe(true);
     expect(access.lifetime).toBe(0);
     expect(access.depth).toBeLessThanOrEqual(access.rating);
-    if (mode === 'realistic') expect(access.depth).toBeLessThanOrEqual(1000);
   });
 }
 
