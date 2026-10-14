@@ -1043,3 +1043,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h at 0% until 17:15, nothing running. Worktrees 1740-1860 hold uncollected uncommitted work (1760 diff 191 files). Queued 1900 S-verify-4, 1910 hosted-CI triage, 1920 bug hunt (also covers the 1800 spec repair). Hosted CI runs keep getting cancelled by newer pushes; 1910 looks at that.
 - **Not done:** no tag (f53 waits for green hosted CI). V-eight-sites capture, V-endurance opening (guard decision) and V-journeys remain.
 - **Needs owner:** real-phone play of the newest build; optional: allow relaxing the Endurance opening facing/gap guard.
+
+## 2026-10-14 17:36 CDT headless run (Claude)
+
+- **Merged:** Sonnet V-journeys: unaided Titanic + Blue Hole journeys at desktop, phone portrait and landscape; fixed landscape briefing (Begin dive in view), waypoint label covering the sub / touch controls, debrief score row. Smoke + project-base green. Findings in plan/progress/V-journeys.md; new Backlog items 20-24 (S-scan-reach, V-bluehole-opening, S-journal-picture, S-hud-desktop-text, S-briefing-advanced).
+- **Codex:** 5h at 0% until 17:15, nothing running; 1900/1910/1920 queued.
+- **Not done:** no tag (f53 waits for green hosted CI); V-eight-sites capture; V-endurance guard decision.
+- **Needs owner:** real-phone play of the newest build; optional: relax the Endurance opening guard.
