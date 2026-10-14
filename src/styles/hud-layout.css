@@ -294,5 +294,4 @@ html.is-touch .hud-readouts .hud-power-line {
 }
 html.is-touch .hud-readouts .hud-current {
   gap: 3px;
-  white-space: nowrap;
 }
