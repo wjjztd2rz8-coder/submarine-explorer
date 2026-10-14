@@ -19,7 +19,7 @@ vi.mock('../../src/game/MissionRouter.js', async (original) => ({
     dispose = vi.fn();
     briefing = null;
     mission: { objectives: object[] };
-    panel = { setObjectives: vi.fn() };
+    panel = { setObjectives: vi.fn(), setGuided: vi.fn() };
     update = vi.fn();
     constructor(opts: MissionRouterOptions) {
       this.mission = {
@@ -65,6 +65,7 @@ for (const mode of ['arcade', 'realistic'] as const) {
       baseScanRadii: new Map([['titanic-bow', 200]]),
       rig: { setChaseRadiusDefault: vi.fn(), snap: vi.fn() },
       headlights: { setEnabled: vi.fn() },
+      guidance: { visible: false },
       bus: new EventBus(),
       settings,
       input: {},
@@ -86,7 +87,7 @@ for (const mode of ['arcade', 'realistic'] as const) {
     draw();
     const first = ctx.missionRouter!.mission.objectives[0];
     expect(first.title).toBe('Head to the bow');
-    expect(first.hint).toBe('Head to the bow, 220 m ahead.');
+    expect(first.hint).toBe(def.objectives[0].hint);
     sub.position.copy(target.position).add(new Vector3(0, 24, target.radius / 2));
     draw();
     expect(first.title).toBe('Scan the bow');

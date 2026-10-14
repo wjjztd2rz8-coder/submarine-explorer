@@ -19,7 +19,7 @@ import {
   resolveMissionRoute,
 } from '../../src/game/MissionRouter.js';
 import { Submarine, type HeightField } from '../../src/sub/Submarine.js';
-import { formatRange, formatTurn } from '../../src/ui/ObjectivesPanel.js';
+import { formatTurn } from '../../src/ui/ObjectivesPanel.js';
 import { missionUrl, tileUrl } from '../../src/ui/MissionSelect.js';
 import { latLonToWorld } from '../../src/util/geo.js';
 import type { TileMeta } from '../../src/util/types.js';
@@ -305,8 +305,6 @@ describe('bearing and range', () => {
   });
 
   it('panel formatting', () => {
-    expect(formatRange(640.4)).toBe('640 m');
-    expect(formatRange(2140)).toBe('2.14 km');
     expect(formatTurn(4)).toBe('AHEAD');
     expect(formatTurn(35.2)).toBe('35° STBD');
     expect(formatTurn(-120)).toBe('120° PORT');

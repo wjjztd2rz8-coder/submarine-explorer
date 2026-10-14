@@ -51,7 +51,7 @@ export const waypointsSystem: GameSystem = {
         ctx.rig.camera,
         f.pilotPosition,
         nextScanObjective ? { poiId: nextScanObjective.poiId } : null,
-        (name) => ctx.guidance.showsName(name),
+        (name) => ctx.guidance.showsName(name) || !!ctx.missionRouter?.panel.showsTarget(name),
       );
     },
   },

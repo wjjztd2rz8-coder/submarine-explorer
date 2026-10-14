@@ -105,7 +105,6 @@ for (const layout of [
                 name: 'Copy fixture',
                 primary: true,
                 bearingDeg: 0,
-                rangeM: 0,
                 depthM: 0,
                 relativeDeg: 0,
               },
