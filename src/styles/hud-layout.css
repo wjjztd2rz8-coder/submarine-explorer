@@ -65,6 +65,7 @@
 }
 .hud-bar {
   grid-area: bar;
+  align-self: start;
   justify-self: end;
   display: flex;
   align-items: center;
@@ -93,10 +94,13 @@ body:has(.obj-banner:not([hidden])) .guidance-slot {
 
 /* ---- touch: one compact HUD, two arrangements ---- */
 
+/* Touch keeps the whole lower screen for the dock, so the grid is only as tall
+   as its content and the flexible row takes any spare height from the sonar. */
 html.is-touch .hud-regions {
+  bottom: auto;
   --sheet-top: calc(var(--bar-h) + 24px + env(safe-area-inset-top, 0px));
 }
-html.is-touch .sonar {
+html.is-touch .sonar:not(.d-sonar-expanded) {
   --sonar-w: 120px;
   --map-cap: 120px;
   width: var(--sonar-w);
@@ -109,11 +113,19 @@ html.is-touch .sonar:not(.d-sonar-expanded) .d-sonar-header {
   margin-bottom: 2px;
   font-size: 10px;
 }
+/* On phones the guidance slot names the objective; the panel is only its completion banner. */
 html.is-touch .objectives-panel {
   grid-area: guide;
   width: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+html.is-touch .objectives-panel > :not(.obj-banner) {
+  display: none;
+}
+html.is-touch .obj-banner {
   margin: 0;
-  padding: 2px 8px;
 }
 html.is-touch .guidance-slot {
   width: 100%;
@@ -129,9 +141,9 @@ html.is-touch .guidance-ring {
 html.is-touch .guidance-text {
   gap: 0;
 }
-html.is-touch .guidance-slot:not([hidden]),
-html.is-touch .objectives-panel:not([hidden]) {
-  margin-top: var(--hud-gap);
+/* Whatever sits above another region carries the gap to it. */
+html.is-touch :is(.sonar:not(.d-sonar-expanded), .hud, .hud-bar) {
+  margin-bottom: var(--hud-gap);
 }
 html.is-touch .obj-banner {
   flex-direction: row;
@@ -154,9 +166,8 @@ html.is-touch body:has(.guidance-slot[data-kind='scan']:not([hidden])) .d-scan-e
   html.is-touch .hud-regions {
     grid-template-areas:
       'sonar bar   hud'
-      'sonar guide hud'
-      'sonar .     .'
-      '.     .     .';
+      'sonar guide hud';
+    grid-template-rows: auto minmax(0, 1fr);
   }
   html.is-touch .hud-bar {
     justify-self: start;
@@ -175,12 +186,11 @@ html.is-touch body:has(.guidance-slot[data-kind='scan']:not([hidden])) .d-scan-e
     grid-template-areas:
       'sonar bar'
       'sonar hud'
-      'guide guide'
-      '.     .';
-    grid-template-rows: auto auto auto minmax(0, 1fr);
+      'guide guide';
+    grid-template-rows: auto minmax(0, 1fr) auto;
     --sheet-bottom: calc(236px + env(safe-area-inset-bottom, 0px));
   }
-  html.is-touch .sonar {
+  html.is-touch .sonar:not(.d-sonar-expanded) {
     --sonar-w: 96px;
     --map-cap: 96px;
   }

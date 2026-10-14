@@ -248,23 +248,12 @@
       calc(var(--ui-scale, 1) * 1px),
       calc((100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 8px) / 336)
     );
-    /* Share the control envelope with the tutorial's docking offset. Both
-       resolve the effective UI scale, including the short-phone cap. */
     --tc-portrait-stick-size: max(104px, calc(118 * var(--tc-s)));
     --tc-portrait-slider-height: min(26vh, max(140px, calc(160 * var(--tc-s))));
     --tc-portrait-button-size: max(48px, calc(52 * var(--tc-s)));
     --tc-portrait-button-gap: calc(8 * var(--tc-s));
     --tc-slider-height: var(--tc-portrait-slider-height);
     --tc-button-size: var(--tc-portrait-button-size);
-    --tc-portrait-clearance: calc(
-      var(--tc-edge) +
-        max(
-          var(--tc-portrait-stick-size),
-          var(--tc-portrait-slider-height),
-          calc(3 * var(--tc-portrait-button-size) + 2 * var(--tc-portrait-button-gap))
-        ) +
-        8px
-    );
   }
   .tc-stick {
     width: var(--tc-portrait-stick-size);

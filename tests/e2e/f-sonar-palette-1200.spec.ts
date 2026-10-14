@@ -21,12 +21,8 @@ for (const layout of ['desktop', 'portrait'] as const) {
         });
         const sonar = page.locator('.sonar');
         await expect(sonar).toBeVisible();
-        await expect(sonar.locator('.d-sonar-legend span')).toHaveText([
-          '▲ Sub',
-          '◇ Objective',
-          '· Contact',
-          '✓ Scanned',
-        ]);
+        // The permanent legend is gone: the map needs no caption block.
+        await expect(sonar.locator('.d-sonar-legend')).toHaveCount(0);
         const state = await page.evaluate(() => {
           const map = (
             window.__game as {

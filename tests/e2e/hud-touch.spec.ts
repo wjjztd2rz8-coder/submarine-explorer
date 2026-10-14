@@ -312,7 +312,7 @@ freshTest.describe('large UI and menu reachability', () => {
             await reachable(button);
           await reachable(page.getByRole('button', { name: 'Skip', exact: true }));
           await expect(page.locator('.guidance-slot[data-step] button:visible')).toHaveCount(1);
-          await expect(page.locator('.d-sonar-legend')).toBeHidden();
+          await expect(page.locator('.d-sonar-legend')).toHaveCount(0);
           expect((await page.locator('.sonar').boundingBox())!.width).toBe(
             viewport.width > viewport.height ? 120 : 96,
           );
