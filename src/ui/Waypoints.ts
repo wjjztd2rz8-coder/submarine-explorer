@@ -3,6 +3,9 @@ import { Vector3, type Camera } from 'three';
 import type { PlacedPoi } from '../game/Pois.js';
 import type { Scanner } from '../game/Scanner.js';
 
+/** Bottom band (px) the touch controls use; the label stays above it. */
+const CONTROLS_BAND = 180;
+
 interface WaypointObjective {
   poiId: string;
 }
@@ -122,8 +125,9 @@ export class Waypoints {
     // Keep the whole label on screen (its own half-width from each edge). On screen it sits
     // above a target that is low in the view, where the sub is, and below one that is high.
     const half = this.edge.offsetWidth / 2 + 8;
+    const floor = height - CONTROLS_BAND - this.edge.offsetHeight / 2;
     this.edge.style.left = `${Math.max(half, Math.min(width - half, ((x + 1) / 2) * width))}px`;
-    this.edge.style.top = `${Math.max(100, Math.min(height - 145, ((1 - y) / 2) * height))}px`;
+    this.edge.style.top = `${Math.max(100, Math.min(floor, ((1 - y) / 2) * height))}px`;
     this.edge.classList.toggle('is-above', y < 0.24);
     this.edgeName.textContent = current.name;
     this.edgeName.hidden = nameInSlot(current.name);

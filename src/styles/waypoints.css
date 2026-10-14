@@ -32,7 +32,7 @@
   position: absolute;
   transform: translate(-50%, -50%);
   width: max-content;
-  max-width: 250px;
+  max-width: min(250px, 40vw); /* leaves the centre column to the sub on a narrow phone */
   padding: 6px 10px;
   border: 1px solid currentColor;
   border-radius: 4px;
