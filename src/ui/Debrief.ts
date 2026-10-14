@@ -251,9 +251,9 @@ export class Debrief {
     row.append(navigation, secondary);
     p.append(row);
 
+    this.trap.show();
     // Returning from Keep exploring creates a new summary in the same panel.
     p.scrollTop = 0;
-    this.trap.show();
   }
 
   hide(): void {

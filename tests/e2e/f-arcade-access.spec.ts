@@ -1,3 +1,4 @@
+import { homeReady } from './helpers/home.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
@@ -22,7 +23,7 @@ async function shot(page: Page, name: string): Promise<void> {
 test('fresh Arcade Titanic starts on an approach in its deep-ocean vehicle', async ({ page }) => {
   await page.goto('/?mission=titanic&tutorial=0');
   await ready(page);
-  await expect(page.locator('input[data-gameplay="startPosition"]')).not.toBeChecked();
+  await expect(page.locator('.briefing input[data-gameplay="startPosition"]')).not.toBeChecked();
   await page.locator('.briefing-begin').click();
   await expect(page.locator('.briefing')).toBeHidden();
   const pose = await page.evaluate(() => {
@@ -84,7 +85,7 @@ test('Arcade opens every card on a phone; switching to Realistic restores locks'
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?tutorial=0');
-  await ready(page);
+  await homeReady(page);
   await page.locator('.home-menu button', { hasText: /^Dive sites$/ }).click();
   const sites = page.locator('.home-sites');
   await expect(sites.locator('.mission-lock')).toHaveCount(0);

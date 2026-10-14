@@ -1,3 +1,4 @@
+import { homeReady } from './helpers/home.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
@@ -178,7 +179,7 @@ test('phone Journal offers cosmetics and all downloaded missions stay open in Re
   await realistic(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await ready(page);
+  await homeReady(page);
   await page.locator('.home-menu').getByRole('button', { name: 'Journal', exact: true }).click();
   const journal = page.locator('.journal');
   await expect(journal).toBeVisible();
@@ -269,7 +270,7 @@ test('species discovery credits once without research or full-depth access chang
       );
   });
   await page.goto('/');
-  await ready(page);
+  await homeReady(page);
   const earned = await page.evaluate(() => {
     const progress = (
       window.__game as { progress: { award(kind: string, id: string): number; lifetime: number } }

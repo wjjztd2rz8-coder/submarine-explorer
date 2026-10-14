@@ -1,3 +1,4 @@
+import { homeReady } from './helpers/home.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
 async function ready(page: Page) {
@@ -32,8 +33,11 @@ test.describe('F-BUGHUNT-4 portrait telemetry', () => {
   }
   test('Daily objectives have space beside sonar', async ({ page }) => {
     await page.goto('/?tier=low&touch=1');
-    await ready(page);
-    await page.locator('.daily-card').click();
+    await homeReady(page);
+    await Promise.all([
+      page.waitForURL((url) => url.searchParams.has('daily'), { waitUntil: 'domcontentloaded' }),
+      page.locator('.daily-card').click(),
+    ]);
     await ready(page);
     await page.locator('.briefing-begin').click();
     await expect(page.locator('.briefing')).toBeHidden();

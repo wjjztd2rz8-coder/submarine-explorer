@@ -234,6 +234,10 @@ export class Journal {
     return this.trap.active;
   }
 
+  get isTop(): boolean {
+    return this.trap.isTop;
+  }
+
   get spoilers(): boolean {
     return this.spoilers_;
   }
@@ -350,11 +354,11 @@ export class Journal {
     }
     this.opened = true;
     this.revealView();
+    // Reveal the scroll container before rendering/resetting its scroll position.
+    this.trap.show();
     this.render();
     // A newly focused scan must start at its heading, not the previous entry's scroll.
     this.body.scrollTop = 0;
-    if (!this.trap.active && typeof document !== 'undefined') document.exitPointerLock?.();
-    this.trap.show();
     const openingView = this.view;
     void this.load().then(() => {
       // A later click/show owns navigation, even when this load was already resolved.

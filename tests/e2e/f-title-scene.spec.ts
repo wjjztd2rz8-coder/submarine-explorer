@@ -303,7 +303,13 @@ test('quit after a mission lazily presents home, keeps Dive on the last mission 
     await page.keyboard.up('w');
   }
   expect(await pose()).toEqual(before);
-  await resume.click();
+  await Promise.all([
+    page.waitForURL((url) => url.searchParams.get('mission') === 'titanic', {
+      waitUntil: 'domcontentloaded',
+    }),
+    resume.click(),
+  ]);
+  await page.waitForFunction(() => window.__gameReady === true);
   await expect(page.locator('.home-screen')).toBeHidden();
   await expect(page.locator('.briefing')).toBeVisible();
   expect(Object.fromEntries(new URL(page.url()).searchParams)).toEqual({

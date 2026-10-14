@@ -4,6 +4,11 @@
 > [missions.md](missions.md#journal). `FieldGuide.ts` re-exports it, so the
 > `discovery.guide` API below still applies.
 
+`Journal.isTop` reports ownership of the shared overlay stack. The D-pad Left
+close action reaches an open Journal only while it owns that stack; Settings
+above it consumes input until dismissed, preserving the Journal and its focus
+return target.
+
 The Tier 1 discovery loop: approach a point of interest (POI), hold the scan
 beam on it, unlock its field-guide entry, and see what you found in the
 debrief. Schemas are authoritative in `plan/PHASE-B-CONTRACTS.md` §2.1–2.2;

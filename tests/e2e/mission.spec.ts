@@ -1,3 +1,4 @@
+import { homeReady } from './helpers/home.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
@@ -304,17 +305,26 @@ test.describe('B3 mission flow', () => {
     expect(errors, errors.join(' | ')).toEqual([]);
   });
 
-  test('the bare start page boots titanic without a docked mission picker', async ({ page }) => {
+  test('the bare start page presents Home without a docked mission picker', async ({ page }) => {
     const errors = collectErrors(page);
-    await boot(page, '/');
-    expect(await page.evaluate(() => (window.__game as { meta: { id: string } }).meta.id)).toBe(
-      'titanic',
-    );
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await homeReady(page);
+    expect(await page.evaluate(() => window.__game?.discovery)).toBeUndefined();
     await expect(page.locator('.briefing')).toHaveCount(0);
     await expect(page.locator('.objectives-panel')).toHaveCount(0);
     await expect(page.locator('body > .mission-select')).toBeHidden();
-    await page.goto('/?mission=titanic');
-    await expect(page.locator('.briefing')).toBeVisible({ timeout: 45_000 });
+    // Keep the default-Titanic guard at the point where Home actually starts a dive.
+    await Promise.all([
+      page.waitForURL((url) => url.searchParams.get('mission') === 'titanic', {
+        waitUntil: 'domcontentloaded',
+      }),
+      page.locator('.home-menu').getByRole('button', { name: 'Dive', exact: true }).click(),
+    ]);
+    await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
+    expect(await page.evaluate(() => (window.__game as { meta: { id: string } }).meta.id)).toBe(
+      'titanic',
+    );
+    await expect(page.locator('.briefing-begin')).toBeVisible();
     expect(errors, errors.join(' | ')).toEqual([]);
   });
 });

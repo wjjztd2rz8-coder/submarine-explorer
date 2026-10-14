@@ -7,7 +7,9 @@ import { FocusTrap, observeKeyboard, type FocusTrapOptions } from '../../src/ui/
 import { Globe } from '../../src/ui/Globe.js';
 import type { GlobeSite } from '../../src/ui/GlobeModel.js';
 import { SettingsScreen } from '../../src/ui/Settings.js';
-import { Save, defaultSettings } from '../../src/core/Save.js';
+import { Save, ProgressSave, defaultSettings } from '../../src/core/Save.js';
+import { Progress as SavedProgress } from '../../src/game/Progress.js';
+import { DailySave } from '../../src/game/DailySave.js';
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { Input } from '../../src/core/Input.js';
 import { Briefing } from '../../src/ui/Briefing.js';
@@ -29,6 +31,15 @@ import { createPowerSystem } from '../../src/app/systems/power.js';
 import { parseMission } from '../../src/game/Mission.js';
 import titanicMission from '../../data/landmarks/titanic/mission.json';
 import { MissionRouter } from '../../src/game/MissionRouter.js';
+import { createPointerSystem } from '../../src/app/systems/pointer.js';
+import { createInputSystem } from '../../src/app/systems/input.js';
+import { createPhotoSystem } from '../../src/app/systems/photo.js';
+import { createDailySystem } from '../../src/app/systems/daily.js';
+import { inputGateSystem } from '../../src/app/loop.js';
+import { modesSystem } from '../../src/app/systems/modes.js';
+import { settingsSystem } from '../../src/app/systems/settings.js';
+import { waypointsSystem } from '../../src/app/systems/waypoints.js';
+import { Progress } from '../../src/game/Progress.js';
 
 /** The same small EventTarget/DOM approach as the shell and Home focus specs. */
 class Element extends EventTarget {
@@ -660,6 +671,225 @@ function shell() {
 }
 
 describe('overlay policies across the app', () => {
+  it('contains Settings keyboard focus above Home and returns to its opener after touch or Escape dismissal', () => {
+    const { screen } = settings();
+    const home = new Home({
+      dive: vi.fn(),
+      journal: vi.fn(),
+      controls: vi.fn(),
+      settings: () => screen.open(),
+    });
+    cleanup.push(() => home.dispose());
+    home.show();
+    const opener = (home.root as unknown as Element)
+      .querySelectorAll('button')
+      .find((button) => button.textContent === 'Settings')!;
+    for (const closeWithTouch of [true, false]) {
+      opener.focus();
+      opener.dispatchEvent(new Event('click'));
+      expect(screen.isOpen).toBe(true);
+      for (let i = 0; i < 35; i++) {
+        press('Tab', { shiftKey: i > 20 });
+        expect((screen.root as unknown as Element).contains(active())).toBe(true);
+      }
+      if (closeWithTouch)
+        (screen.root as unknown as Element)
+          .querySelector('.settings-close')!
+          .dispatchEvent(new Event('click'));
+      else press('Escape');
+      expect(screen.isOpen).toBe(false);
+      expect(home.isOpen).toBe(true);
+      expect(active()).toBe(opener);
+    }
+  });
+
+  it('ignores the Journal pad button beneath Settings, then closes once and returns to Pause', () => {
+    const pause = pauseMenu();
+    pause.open();
+    press('Tab');
+    const pauseOpener = active();
+    const guide = journal();
+    guide.open();
+    press('Tab');
+    const journalOpener = active();
+    const { screen } = settings();
+    screen.open();
+    const buttons = Array.from({ length: 16 }, () => ({ pressed: false, value: 0 }));
+    vi.stubGlobal('navigator', {
+      getGamepads: () => [{ connected: true, index: 0, axes: [0, -1, 0, 0], buttons }],
+    });
+    const input = new Input({ storage: null });
+    const update = vi.fn((_a, _b, _c, _d, state) => {
+      if (state.toggleGuide) guide.toggle();
+    });
+    const ctx = {
+      discovery: { guide, update, scanner: { setObjective: vi.fn() } },
+      rig: {},
+    } as unknown as GameContext;
+    const frame = () => {
+      const f = { sampled: input.sample(), frozen: true, realSteps: 1, dt: 1 / 60 } as FrameState;
+      inputGateSystem.frame!['gate.input']!(f, ctx);
+      discoverySystem.frame!['scan.discovery']!(f, ctx);
+      expect(f.steps).toBe(0);
+      expect(f.state.throttle).toBe(0);
+      input.endFrame();
+    };
+    buttons[14] = { pressed: true, value: 1 };
+    frame();
+    expect(guide.isOpen).toBe(true);
+    expect(screen.isOpen).toBe(true);
+    press('Escape');
+    expect(active()).toBe(journalOpener);
+    frame(); // A button held while Settings closes must not dismiss Journal.
+    expect(guide.isOpen).toBe(true);
+    buttons[14] = { pressed: false, value: 0 };
+    frame();
+    buttons[14] = { pressed: true, value: 1 };
+    frame();
+    expect(guide.isOpen).toBe(false);
+    expect(pause.isOpen).toBe(true);
+    expect(active()).toBe(pauseOpener);
+  });
+
+  it('keeps the approach waypoint after a live mode change and applies the switch once when the approach ends', async () => {
+    const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+    const progress = new Progress(new ProgressSave(null));
+    const objective = {
+      id: 'bow',
+      poiId: 'bow',
+      title: 'Head to the bow',
+      primary: true,
+      complete: false,
+      resolved: true,
+    };
+    const ctx = {
+      config: DEFAULT_CONFIG,
+      settings: save.get(),
+      save,
+      progress,
+      daily: null,
+      route: null,
+      effective: resolveEffective(save.get(), 'arcade', progress.snapshot(), null),
+      discovery: {
+        ready: Promise.resolve(),
+        pois: [],
+        scanner: { setConfig: vi.fn(), setObjective: vi.fn() },
+      },
+      sonar: { setScanState: vi.fn(), setPois: vi.fn(), setSensorRange: vi.fn() },
+      sub: { setConfig: vi.fn() },
+      rig: { setConfig: vi.fn() },
+      power: { setConfig: vi.fn(), setEnabled: vi.fn() },
+      headlights: { setPreset: vi.fn() },
+      presets: { setCurrentMode: vi.fn() },
+      hud: { setCurrentMode: vi.fn() },
+      expose: vi.fn(),
+      missionRouter: { mission: { objectives: [objective] } },
+    } as unknown as GameContext;
+    waypointsSystem.init!(ctx);
+    modesSystem.init!(ctx);
+    modesSystem.start!(ctx);
+    cleanup.push(() => {
+      modesSystem.dispose?.();
+      waypointsSystem.dispose?.();
+      ctx.waypoints.root.remove();
+    });
+    await ctx.discovery.ready;
+    const frame = () => waypointsSystem.frame!['guide.waypoints']!({} as FrameState, ctx);
+    frame();
+    expect(ctx.waypoints.root.dataset.hints).toBe('true');
+    const apply = vi.spyOn(ctx.waypoints, 'setVisualHints');
+    save.setGameplayMode('realistic');
+    frame();
+    expect(ctx.waypoints.root.dataset.hints).toBe('true');
+    expect(apply).not.toHaveBeenCalled();
+    objective.title = 'Scan the bow';
+    frame();
+    expect(ctx.waypoints.root.dataset.hints).toBe('false');
+    expect(apply).toHaveBeenCalledExactlyOnceWith(false);
+    apply.mockClear();
+    save.setGameplayOption('visualHints', true);
+    frame();
+    frame();
+    expect(apply).toHaveBeenCalledExactlyOnceWith(true);
+  });
+
+  it('applies reduced motion to waypoints once per edit and preserves the OS preference', () => {
+    const motion = Object.assign(new EventTarget(), { matches: true });
+    Object.assign(window, { matchMedia: () => motion });
+    const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+    const ctx = {
+      config: DEFAULT_CONFIG,
+      settings: save.get(),
+      save,
+      tier: 'low',
+      quality: { setting: 'low', urlForced: false },
+      input: new Input({ storage: null }),
+      discovery: { ready: Promise.resolve(), pois: [], scanner: {} },
+      sonar: { setScanState: vi.fn(), setPois: vi.fn(), setPalette: vi.fn() },
+      effective: resolveEffective(save.get(), 'arcade', { upgrades: {} }, null),
+      route: null,
+      globe: { isOpen: false },
+      expose: vi.fn(),
+      rig: {},
+    } as unknown as GameContext;
+    waypointsSystem.init!(ctx);
+    settingsSystem.init!(ctx);
+    cleanup.push(() => {
+      settingsSystem.dispose?.();
+      waypointsSystem.dispose?.();
+      ctx.waypoints.root.remove();
+    });
+    const apply = vi.spyOn(ctx.waypoints, 'setReducedMotion');
+    save.save({ reduceMotion: true });
+    expect(apply).toHaveBeenCalledExactlyOnceWith(true);
+    apply.mockClear();
+    save.save({ reduceMotion: false });
+    expect(apply).toHaveBeenCalledExactlyOnceWith(true);
+    expect(ctx.rig.reduceMotion).toBe(true);
+    motion.matches = false;
+    motion.dispatchEvent(new Event('change'));
+    expect(ctx.rig.reduceMotion).toBe(false);
+    expect(ctx.waypoints.root.dataset.reduceMotion).toBe('false');
+  });
+
+  it.each(['focus', 'pointerenter'])(
+    'rapid Home list previews replace stale globe %s and keep the latest card active',
+    async (event) => {
+      const proto = Globe.prototype as unknown as { initGl(): void; resize(): void };
+      vi.spyOn(proto, 'initGl').mockImplementation(() => {});
+      vi.spyOn(proto, 'resize').mockImplementation(() => {});
+      const sites = ['reef', 'wreck', 'vent'].map((id, i): GlobeSite => ({
+        id,
+        name: id,
+        state: 'tile',
+        lat: i * 10,
+        lon: i * 20,
+        depthM: 100,
+        type: 'other',
+        region: '',
+        summary: '',
+        missionPending: false,
+        tileAvailable: true,
+      }));
+      const globe = new Globe({
+        config: DEFAULT_CONFIG.globe,
+        tileIds: sites.map((s) => s.id),
+        embedded: true,
+        catalog: Promise.resolve({ sites, pending: [], missions: [] }),
+      });
+      cleanup.push(() => globe.dispose());
+      await globe.catalog;
+      globe.open();
+      const pin = (globe.root as unknown as Element).querySelector('.globe-pin')!;
+      pin.dispatchEvent(new Event(event));
+      expect(globe.cardSite?.id).toBe('reef');
+      for (const site of [sites[1], sites[2], sites[1]]) {
+        globe.previewSite(site.id);
+        expect(globe.cardSite?.id).toBe(site.id);
+      }
+    },
+  );
+
   it.each([true, false])(
     'Settings closes only the top owner, independent of shell init order (%s)',
     (first) => {
@@ -994,6 +1224,175 @@ describe('overlay policies across the app', () => {
 });
 
 describe('overlay host teardown', () => {
+  it('three Home/dive/Home shell lifetimes release input, modal ownership and Daily/photo timers', async () => {
+    vi.useFakeTimers();
+    try {
+      const doc = Object.assign(new EventTarget(), document);
+      vi.stubGlobal('document', doc);
+      Object.assign(window, {
+        setTimeout,
+        clearTimeout,
+        setInterval,
+        clearInterval,
+        matchMedia: () => ({ matches: false }),
+      });
+      const proto = Globe.prototype as unknown as { initGl(): void; resize(): void };
+      vi.spyOn(proto, 'initGl').mockImplementation(() => {});
+      vi.spyOn(proto, 'resize').mockImplementation(() => {});
+      vi.spyOn(Journal.prototype, 'load').mockResolvedValue();
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
+      const add = vi.spyOn(window, 'addEventListener');
+      const remove = vi.spyOn(window, 'removeEventListener');
+      for (let i = 0; i < 3; i++) {
+        const guide = new Journal();
+        const ctx = {
+          config: DEFAULT_CONFIG,
+          bus: new EventBus(),
+          index: [],
+          meta: { id: 'reef' },
+          route: null,
+          save: new Save({ config: DEFAULT_CONFIG, storage: null }),
+          progress: new SavedProgress(new ProgressSave(null)),
+          dailySave: new DailySave(null),
+          daily: null,
+          app: { state: 'home', lastSite: null },
+          params: new URLSearchParams(),
+          expose: vi.fn(),
+          journal: guide,
+          discoveries: { isDiscovered: () => false },
+          discovery: { guide, debrief: { isOpen: false } },
+          rig: { exitPhotoMode: vi.fn() },
+          canvas: html(element('CANVAS')),
+        } as unknown as GameContext;
+        const runner = new SystemRunner(ctx);
+        cleanup.push(() => {
+          runner.dispose();
+          guide.dispose();
+        });
+        runner.init([
+          shellSystem,
+          globeSystem,
+          createInputSystem(),
+          createDailySystem(),
+          createPhotoSystem(),
+          shellKeysSystem,
+        ]);
+        await Promise.all([ctx.globe.catalog, ctx.homeGlobe.catalog]);
+        expect(ctx.home.isOpen).toBe(true);
+        ctx.home.showSites(false);
+        press('Escape');
+        expect(ctx.home.sitesOpen).toBe(false);
+        ctx.setAppState('dive');
+        ctx.photoMode.setActive(true);
+        ctx.photoMode.toast('Saved to Journal');
+        ctx.photoMode.shutter();
+        expect(vi.getTimerCount()).toBe(3);
+        press('Escape');
+        expect(ctx.photoMode.active).toBe(false);
+        expect(ctx.app.state).toBe('dive');
+        press('Escape');
+        expect(ctx.pause.isOpen).toBe(true);
+        ctx.setAppState('home');
+        expect(ctx.home.isOpen).toBe(true);
+        runner.dispose();
+        guide.dispose();
+        expect(vi.getTimerCount()).toBe(0);
+        expect(press('Escape').defaultPrevented).toBe(false);
+        expect(body.querySelectorAll('.home-screen')).toHaveLength(0);
+        expect(body.querySelectorAll('.photo-mode')).toHaveLength(0);
+        const before = { ...ctx.input.state };
+        press('KeyW');
+        expect(ctx.input.sample()).toEqual(before);
+        expect(remove.mock.calls).toHaveLength(add.mock.calls.length);
+      }
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it.each(['settled', 'keyboard', 'pointer'] as const)(
+    'pointer teardown releases controls, DOM and pending locks (%s)',
+    async (pending) => {
+      const doc = Object.assign(new EventTarget(), document);
+      const remove = doc.removeEventListener.bind(doc);
+      doc.removeEventListener = (
+        type: string,
+        listener: EventListenerOrEventListenerObject | null,
+        options?: boolean | EventListenerOptions,
+      ) => remove(type, listener, typeof options === 'boolean' ? { capture: options } : options);
+      vi.stubGlobal('document', doc);
+      let resolve!: () => void;
+      const locked = new Promise<void>((done) => {
+        resolve = done;
+      });
+      const unlock = vi.fn();
+      vi.stubGlobal('navigator', { keyboard: { lock: vi.fn(() => locked), unlock } });
+      const canvas = html(element('CANVAS')) as HTMLCanvasElement;
+      let finishPointer!: () => void;
+      const pointerRequest = new Promise<void>((done) => {
+        finishPointer = done;
+      });
+      canvas.requestPointerLock = vi.fn(() => pointerRequest);
+      Object.assign(doc, { fullscreenElement: canvas, pointerLockElement: canvas });
+      const input = new Input({ storage: null });
+      input.setMouseLook(true);
+      const ctx = {
+        canvas,
+        input,
+        app: { state: 'dive' },
+        pause: { isOpen: false },
+        settingsScreen: { isOpen: false },
+        globe: { isOpen: false },
+        discovery: { guide: { isOpen: false }, debrief: { isOpen: false } },
+        photoMode: { active: false },
+        setAppState: vi.fn(),
+      } as unknown as GameContext;
+      const pointer = createPointerSystem();
+      cleanup.push(() => pointer.dispose?.());
+      pointer.init?.(ctx);
+      expect(body.querySelectorAll('.d3-pointer-look-hint')).toHaveLength(1);
+      expect(body.querySelectorAll('.hud-ctrl-tip')).toHaveLength(1);
+      const lock = ctx.keyboard.lock();
+      if (pending !== 'keyboard') {
+        resolve();
+        await lock;
+      }
+      if (pending === 'pointer') {
+        Object.assign(doc, { pointerLockElement: null });
+        input.setMouseLook(false);
+        input.setPointerLookPreference(true);
+        pointer.frame!['gate.pointer']!({ frozen: false } as FrameState, ctx);
+        const down = new Event('mousedown', { cancelable: true });
+        Object.defineProperty(down, 'button', { value: 0 });
+        canvas.dispatchEvent(down);
+        expect(canvas.requestPointerLock).toHaveBeenCalledOnce();
+      }
+      pointer.dispose?.();
+      expect(unlock).toHaveBeenCalled();
+      expect(doc.exitPointerLock).toHaveBeenCalledTimes(pending === 'pointer' ? 0 : 1);
+      expect(input.pointerLookActive).toBe(false);
+      expect(body.querySelectorAll('.d3-pointer-look-hint')).toHaveLength(0);
+      expect(body.querySelectorAll('.hud-ctrl-tip')).toHaveLength(0);
+      unlock.mockClear();
+      resolve();
+      await lock;
+      if (pending === 'keyboard') expect(unlock).toHaveBeenCalledOnce();
+      else expect(unlock).not.toHaveBeenCalled();
+      if (pending === 'pointer') {
+        Object.assign(doc, { pointerLockElement: canvas });
+        finishPointer();
+        await pointerRequest;
+        expect(doc.exitPointerLock).toHaveBeenCalledOnce();
+      }
+      const setMouseLook = vi.spyOn(input, 'setMouseLook');
+      doc.dispatchEvent(new Event('pointerlockchange'));
+      expect(setMouseLook).not.toHaveBeenCalled();
+      press('ControlLeft');
+      expect(ctx.setAppState).not.toHaveBeenCalled();
+      pointer.dispose?.();
+    },
+  );
+
   it('disposes both hosted Globes and their chooser ownership', async () => {
     const proto = Globe.prototype as unknown as { initGl(): void; resize(): void };
     vi.spyOn(proto, 'initGl').mockImplementation(() => {});
