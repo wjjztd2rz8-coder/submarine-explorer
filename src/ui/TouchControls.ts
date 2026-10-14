@@ -15,6 +15,7 @@
  */
 
 import { elWithClass as el } from './dom.js';
+import { hudBar } from './hudRegions.js';
 
 import type { Input } from '../core/Input.js';
 import {
@@ -49,6 +50,7 @@ export class TouchControls {
   private readonly sliderTrack: HTMLDivElement;
   private readonly sliderThumb: HTMLDivElement;
   private readonly boostButton: HTMLButtonElement;
+  private readonly pauseButton: HTMLButtonElement;
   private readonly rotateHint: HTMLDivElement;
   private readonly disposers: Array<() => void> = [];
   private stickPointer: number | null = null;
@@ -109,7 +111,8 @@ export class TouchControls {
       this.input.touchBoost = !this.input.touchBoost;
       this.syncBoost();
     });
-    const pause = el('button', 'tc-btn tc-btn-pause');
+    const pause = (this.pauseButton = el('button', 'tc-btn tc-btn-pause'));
+    pause.hidden = true;
     pause.type = 'button';
     pause.setAttribute('aria-label', 'Pause');
     pause.append(el('span', 'tc-pause-bar'), el('span', 'tc-pause-bar'));
@@ -118,9 +121,11 @@ export class TouchControls {
     this.rotateHint = el('div', 'tc-rotate-hint', 'Rotate your phone for the best view');
     this.rotateHint.hidden = true;
 
-    this.root.append(this.stickBase, this.sliderTrack, buttons, pause, this.rotateHint);
+    this.root.append(this.stickBase, this.sliderTrack, buttons, this.rotateHint);
     this.root.append(this.boostButton);
     (opts.parent ?? document.body).append(this.root);
+    // Pause sits in the HUD bar beside Journal; it follows the controls' visibility.
+    hudBar().prepend(pause);
     this.bindCamera();
     this.bindModeSwitch();
     // App switching and rotation can swallow pointerup; a stale centre must
@@ -166,6 +171,7 @@ export class TouchControls {
     if (show !== this.shouldShow) {
       this.shouldShow = show;
       this.root.hidden = !show;
+      this.pauseButton.hidden = !show;
       if (!show) this.releaseAll();
       else this.maybeShowRotateHint();
     }
@@ -182,6 +188,7 @@ export class TouchControls {
     this.input.touchActive = false;
     document.documentElement.classList.remove('is-touch');
     this.root.remove();
+    this.pauseButton.remove();
   }
 
   // ---------------------------------------------------------------- mode

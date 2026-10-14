@@ -1,8 +1,6 @@
 /* Core HUD: readouts, warning banner and the sonar frame.
    Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
 
-.hud,
-.sonar,
 .mission-select {
   position: fixed;
   z-index: 10;
@@ -10,22 +8,15 @@
 }
 
 .hud {
-  inset: 0;
+  pointer-events: none;
 }
 
 .hud-panel {
-  position: absolute;
   background: var(--hud-bg);
   border: 1px solid var(--hud-border);
   border-radius: 6px;
   padding: 10px 12px;
   backdrop-filter: blur(4px);
-}
-
-.hud-readouts {
-  top: calc(12px + env(safe-area-inset-top, 0px));
-  left: 12px;
-  min-width: 250px;
 }
 
 .hud-row {
@@ -43,29 +34,6 @@
 
 .hud-value {
   font-variant-numeric: tabular-nums;
-}
-
-.hud-footer {
-  position: absolute;
-  right: calc(12px + env(safe-area-inset-right, 0px));
-  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-body:not([data-app-state='dive']) .hud-footer,
-body.photo-active .hud-footer {
-  display: none;
-}
-
-.sonar {
-  right: 12px;
-  top: calc(12px + env(safe-area-inset-top, 0px));
-  padding: 6px;
-  background: var(--hud-bg);
-  border: 1px solid var(--hud-border);
-  border-radius: 6px;
 }
 
 .sonar canvas {

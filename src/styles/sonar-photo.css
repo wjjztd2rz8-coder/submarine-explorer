@@ -23,9 +23,6 @@
   background: #24545f;
   outline-color: #fff;
 }
-.d2-sonar-markers-hidden .d-sonar-legend span:not(:first-child) {
-  display: none;
-}
 .d2-photo-flash {
   position: absolute;
   inset: 0;

@@ -23,6 +23,7 @@ import { BLUE_HOLE_LAT, BLUE_HOLE_LON, blueHoleSonarReef } from '../world/terrai
 import { enduranceRidges, enduranceScourHeight } from '../world/presets/EnduranceRelief.js';
 import type { Terrain } from '../world/Terrain.js';
 import type { PlacedLandmark } from '../world/Landmarks.js';
+import { hudRegions } from './hudRegions.js';
 import type { PlacedPoi } from '../game/Pois.js';
 import type { SubmarineState } from '../sub/Submarine.js';
 
@@ -315,20 +316,12 @@ export class Sonar {
     const dpr = Math.min(2, globalThis.devicePixelRatio || 1);
     this.canvas.width = Math.round(this.w * dpr);
     this.canvas.height = Math.round(this.h * dpr);
-    this.canvas.style.width = `${this.w}px`;
-    this.canvas.style.height = `${this.h}px`;
+    // CSS sizes the map from this natural width, so the layout can shrink it.
+    this.root.style.setProperty('--map-w', `${this.w}px`);
     // C5: a name for assistive tech; the map itself is decorative detail.
     this.canvas.setAttribute('role', 'img');
     this.canvas.setAttribute('aria-label', 'Sonar map: seabed depth, your track and heading');
     this.root.appendChild(this.canvas);
-    const legend = document.createElement('div');
-    legend.className = 'd-sonar-legend';
-    for (const label of ['▲ Sub', '◇ Objective', '· Contact', '✓ Scanned']) {
-      const item = document.createElement('span');
-      item.textContent = label;
-      legend.append(item);
-    }
-    this.root.append(legend);
     this.root.addEventListener(
       'wheel',
       (event) => {
@@ -353,7 +346,7 @@ export class Sonar {
         return;
       this.toggle();
     });
-    (options.parent ?? document.body).append(this.backdrop, this.root);
+    (options.parent ?? hudRegions()).append(this.backdrop, this.root);
 
     const ctx = this.canvas.getContext('2d');
     if (!ctx) throw new Error('2D canvas context unavailable');

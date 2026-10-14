@@ -1,13 +1,16 @@
 /* F1-TOUCH: on-screen controls (ui/TouchControls.ts) and touch-friendly menus.
    Sizes scale with --ui-scale (auto scale x the Settings UI scale). */
 
-.tc-root {
-  --tc-s: calc(var(--ui-scale, 1) * 1px);
-  --tc-edge: calc(20 * var(--tc-s));
+.tc-root,
+.hud-bar {
   --tc-fg: rgba(214, 240, 242, 0.88);
   --tc-bg: rgba(6, 22, 28, 0.34);
   --tc-line: rgba(190, 236, 240, 0.4);
   --tc-hot: rgba(46, 217, 217, 0.5);
+}
+.tc-root {
+  --tc-s: calc(var(--ui-scale, 1) * 1px);
+  --tc-edge: calc(20 * var(--tc-s));
   --tc-slider-height: min(38vh, max(150px, calc(176 * var(--tc-s))));
   --tc-button-size: max(52px, calc(58 * var(--tc-s)));
   position: fixed;
@@ -185,16 +188,17 @@
   font-size: calc(14 * var(--tc-s));
 }
 
+/* Pause lives in the HUD bar beside Journal (placed by hud-layout.css). */
 .tc-btn-pause {
-  position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + calc(8 * var(--tc-s)));
-  left: 34%;
-  width: max(48px, calc(50 * var(--tc-s)));
-  height: max(48px, calc(50 * var(--tc-s)));
+  width: max(48px, calc(50px * var(--ui-scale)));
+  height: max(48px, calc(50px * var(--ui-scale)));
   display: flex;
   gap: 5px;
   align-items: center;
   justify-content: center;
+}
+.tc-btn-pause[hidden] {
+  display: none;
 }
 .tc-pause-bar {
   width: 4px;
@@ -309,13 +313,9 @@
   .tc-slider {
     height: var(--tc-slider-height);
   }
-  .tc-root.tc-sonar-open .tc-btn-pause {
-    /* The expanded map occupies the centre, including the usual Pause slot. */
-    left: calc(12px + env(safe-area-inset-left, 0px));
-  }
 }
 
-/* Journal shares the existing HUD footer on desktop, and the Pause row on touch. */
+/* Journal sits in the HUD bar with Pause (touch) or Reset camera (desktop). */
 .hud-journal {
   pointer-events: auto;
   padding: 5px 9px;
@@ -331,36 +331,8 @@
   cursor: pointer;
 }
 html.is-touch .hud-journal {
-  position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 8px * var(--ui-scale));
-  left: calc(34% + max(48px, 50px * var(--ui-scale)) + 8px);
   min-width: 64px;
-  width: 72px;
-  min-height: 48px;
-  height: max(48px, 50px * var(--ui-scale));
-}
-@media (orientation: portrait) and (max-width: 700px) {
-  html.is-touch .hud-journal {
-    left: auto;
-    right: calc(20px + env(safe-area-inset-right, 0px) + max(48px, 50px * var(--ui-scale)));
-    top: calc(12px + env(safe-area-inset-top, 0px));
-  }
-}
-@media (orientation: landscape) and (max-height: 460px) {
-  html.is-touch .hud-journal {
-    top: calc(env(safe-area-inset-top, 0px) + 8px * min(var(--ui-scale), 0.8));
-    left: calc(34% + 56px);
-    height: 48px;
-  }
-  html.is-touch:has(.tc-sonar-open) .hud-journal {
-    left: calc(68px + env(safe-area-inset-left, 0px));
-  }
-  html.is-touch:has(.tc-sonar-open) .sonar.d-sonar-expanded {
-    /* Reserve both top buttons on the smallest landscape phone. */
-    max-width: calc(
-      100vw - 418px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
-    );
-  }
+  height: max(48px, calc(50px * var(--ui-scale)));
 }
 
 /* ---- Touch-friendly menus (coarse pointers): 44 px targets, no hover-only UI ---- */

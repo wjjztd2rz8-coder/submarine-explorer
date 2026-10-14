@@ -13,37 +13,56 @@ body[data-app-state='home'] .d-sonar-backdrop {
   display: none;
 }
 .sonar {
-  left: 12px;
-  right: auto;
-  top: calc(12px + env(safe-area-inset-top, 0px));
+  box-sizing: border-box;
+  width: fit-content;
+  padding: 6px;
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  border-radius: 6px;
   pointer-events: auto;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
-  transform-origin: center;
+}
+/* The map keeps its tile's aspect; a layout narrows the panel and caps --map-cap. */
+.sonar canvas {
+  width: var(--map-w);
+  max-width: 100%;
+  height: auto;
+  max-height: var(--map-cap, none);
+  object-fit: contain;
 }
 .sonar:focus-visible {
   outline: 2px solid #d9f4d5;
   outline-offset: 2px;
 }
+/* Expanded: a centred sheet inside the free rectangle the layout leaves. */
 .sonar.d-sonar-expanded {
-  left: 50%;
-  top: 50%;
-  right: auto;
-  transform: translate(-50%, -50%) scale(1.8);
+  position: fixed;
+  inset: var(--sheet-top, 12px) var(--sheet-right, 12px) var(--sheet-bottom, 12px)
+    var(--sheet-left, 12px);
+  margin: auto;
+  width: min(460px, 100vw - var(--sheet-left, 12px) - var(--sheet-right, 12px));
+  height: fit-content;
+  max-height: calc(100dvh - var(--sheet-top, 12px) - var(--sheet-bottom, 12px));
+  display: flex;
+  flex-direction: column;
   z-index: 18;
   background: #061318;
   border-color: #8ebdab;
   box-shadow: 0 12px 40px #000;
 }
-.d-sonar-header,
-.d-sonar-legend {
+.sonar.d-sonar-expanded canvas {
+  width: 100%;
+  min-height: 0;
+  max-height: calc(100dvh - var(--sheet-top, 12px) - var(--sheet-bottom, 12px) - 70px);
+}
+.d-sonar-header {
   gap: 6px;
   color: #e1f7ea;
   white-space: nowrap;
   font-size: 11px;
   letter-spacing: 0.03em;
-}
-.d-sonar-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   margin-bottom: 4px;
   font-weight: 700;
@@ -53,16 +72,4 @@ body[data-app-state='home'] .d-sonar-backdrop {
 }
 .d-sonar-range {
   color: #ffdf80;
-}
-.d-sonar-legend {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin-top: 5px;
-  font-size: 10px;
-  letter-spacing: 0;
-}
-@media (max-width: 700px) {
-  .sonar.d-sonar-expanded {
-    transform: translate(-50%, -50%) scale(1.35);
-  }
 }

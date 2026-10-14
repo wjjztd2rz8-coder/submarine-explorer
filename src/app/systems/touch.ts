@@ -27,7 +27,7 @@ export function createTouchSystem(): GameSystem {
       registerServiceWorker();
     },
     start(ctx) {
-      const journal = ctx.hud.root.querySelector<HTMLButtonElement>('.hud-journal')!;
+      const journal = ctx.hud.journalEl;
       const open = (): void => ctx.input.touchEdge('toggleJournal');
       journal.addEventListener('click', open);
       removeJournal = () => journal.removeEventListener('click', open);

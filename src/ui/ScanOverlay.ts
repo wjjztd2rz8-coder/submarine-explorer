@@ -14,6 +14,7 @@
 import type { ScanConfig } from '../core/Config.js';
 import type { GuidanceMessage } from '../game/Guidance.js';
 import type { ScanView } from '../game/Scanner.js';
+import { hudRegions } from './hudRegions.js';
 import { GuidanceSlot } from './GuidanceSlot.js';
 import { reticleClearOfControls } from './ScanReticleLayout.js';
 
@@ -43,7 +44,7 @@ export class ScanOverlay {
       ScanConfig,
       'ringSizePx' | 'ringStrokePx' | 'reticleSizePx' | 'completeBannerSeconds'
     >,
-    parent: HTMLElement = document.body,
+    parent?: HTMLElement,
   ) {
     this.root = document.createElement('div');
     this.root.className = 'scan-overlay';
@@ -58,8 +59,10 @@ export class ScanOverlay {
       this.reticle.appendChild(c);
     }
     this.slot = new GuidanceSlot(config.ringSizePx, config.ringStrokePx);
-    this.root.append(this.reticle, this.slot.root);
-    parent.appendChild(this.root);
+    this.root.append(this.reticle);
+    (parent ?? document.body).appendChild(this.root);
+    // The card lives in the HUD's guidance region; only the reticle floats over the scene.
+    (parent ?? hudRegions()).appendChild(this.slot.root);
   }
 
   /** Discard all guidance while play is covered (e.g. by the Journal). */

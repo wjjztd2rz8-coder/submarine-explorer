@@ -11,6 +11,7 @@
  * the HUD heading reduces to. Text writes are skipped when unchanged.
  */
 
+import { hudRegions } from './hudRegions.js';
 import type { ObjectiveStatus } from '../game/Mission.js';
 
 export interface NavReadout {
@@ -107,9 +108,8 @@ export class ObjectivesPanel {
   private wanted = true;
   private readonly navText = new Map<string, HTMLSpanElement>();
   private readonly cache = new Map<string, string>();
-  private resizeObserver: ResizeObserver | null = null;
 
-  constructor(parent: HTMLElement = document.body) {
+  constructor(parent: HTMLElement = hudRegions()) {
     this.root = el('div', 'objectives-panel');
     this.root.setAttribute('aria-label', 'Mission objectives');
     const head = el('div', 'obj-head');
@@ -153,19 +153,6 @@ export class ObjectivesPanel {
 
     this.root.append(head, this.listEl, this.navEl, this.hintEl, this.progressEl, this.bannerEl);
     parent.appendChild(this.root);
-
-    // Telemetry sits below this panel; track its live height.
-    if (typeof ResizeObserver !== 'undefined') {
-      this.resizeObserver = new ResizeObserver(() => this.syncPanelBottom());
-      this.resizeObserver.observe(this.root);
-    }
-  }
-
-  private syncPanelBottom(): void {
-    const bottom = this.root.hidden ? 0 : this.root.getBoundingClientRect().bottom;
-    if (bottom > 0) {
-      document.documentElement.style.setProperty('--obj-panel-bottom', `${Math.ceil(bottom)}px`);
-    }
   }
 
   setVisible(visible: boolean): void {
@@ -278,7 +265,6 @@ export class ObjectivesPanel {
   }
 
   dispose(): void {
-    this.resizeObserver?.disconnect();
     this.root.remove();
   }
 }

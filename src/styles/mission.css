@@ -194,14 +194,8 @@
   opacity: 0.55;
 }
 
-/* ---- objectives panel (top centre) ---- */
+/* ---- objectives panel (placed by hud-layout.css) ---- */
 .objectives-panel {
-  position: fixed;
-  z-index: 10;
-  top: calc(12px + env(safe-area-inset-top, 0px));
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(430px, 44vw);
   padding: 8px 12px;
   pointer-events: none;
   background: var(--b3-panel);
@@ -348,7 +342,8 @@
 }
 
 /* The mission debrief is not B1's, so B1 does not hide its scan HUD for it. */
-body:has(.mission-debrief:not([hidden])) .scan-overlay {
+body:has(.mission-debrief:not([hidden])) .scan-overlay,
+body:has(.mission-debrief:not([hidden])) .guidance-slot {
   visibility: hidden;
 }
 
