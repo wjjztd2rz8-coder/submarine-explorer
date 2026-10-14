@@ -4,6 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
 const env =
   (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
 const isCI = Boolean(env.CI);
+const renderReview = env.PW_RENDER_REVIEW === '1';
 /**
  * Several agents run e2e concurrently in the same checkout. Give each its own
  * preview port and build output so they do not serve each other's stale dist:
@@ -20,6 +21,9 @@ const baseURL = `http://localhost:${port}`;
  */
 export default defineConfig({
   testDir: './tests/e2e',
+  // Continuous high-tier frame runs and golden bisects retain their guards in
+  // nightly diagnostics. Push CI still runs the associated behavior checks.
+  ...(isCI && !renderReview ? { grepInvert: /@render/ } : {}),
   // Software WebGL makes multi-step UI tests much slower on hosted runners.
   timeout: isCI ? 240_000 : 90_000,
   expect: { timeout: isCI ? 60_000 : 20_000 },

@@ -1,9 +1,9 @@
+import { EXPLORE_CONFIG } from '../../src/core/config/explore.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
-// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import { mkdir } from 'node:fs/promises';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { reviewShot } from './helpers/render.js';
 import { devices, expect, test, type Page } from './helpers/unlocked.js';
 
-const shots = '.cache/codex/shots/f2-explore';
 interface Target {
   id: string;
   position: { x: number; y: number; z: number };
@@ -92,8 +92,7 @@ async function scan(page: Page, id: string): Promise<void> {
   await scanWithKeyboard(page, id);
 }
 async function shot(page: Page, name: string): Promise<void> {
-  await mkdir(shots, { recursive: true });
-  await page.screenshot({ path: `${shots}/${name}.png` });
+  await reviewShot(page, name);
 }
 
 test('three hidden discoveries: close sonar, reveal, Journal, persistent count and rewards', async ({
@@ -199,7 +198,12 @@ test('samples collect per dive, appear in mission debrief, and reset on restart'
 });
 
 test('short event caption, one witness reward, pause and cooldown', async ({ page }) => {
-  await boot(page);
+  await pauseClockBeforeNavigation(page);
+  await page.goto('/?tile=monterey-canyon&tier=low&life=0');
+  await clockFramesUntil(
+    page,
+    () => window.__gameReady === true && (window.__game as unknown as Game).explore?.ready,
+  );
   await park(page, 0);
   await page.evaluate(() => {
     const g = window.__game as unknown as Game;
@@ -210,30 +214,39 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
   expect(
     await page.evaluate(() => (window.__game as unknown as Game).explore.previewEvent('turbidity')),
   ).toBe(true);
+  await page.clock.fastForward(100);
   await expect(page.locator('.explore-caption')).toContainText(
     'Silt cloud: sediment-laden water flows downslope',
   );
-  await page.waitForFunction(
+  await clockFramesUntil(
+    page,
     () => (window.__game as unknown as Game).explore.summary().events.length === 1,
+    100,
   );
-  await page.waitForTimeout(1500);
   await shot(page, 'event-turbidity');
   expect(await page.evaluate(() => (window.__game as unknown as Game).progress.points)).toBe(
     points + 5,
   );
   await page.keyboard.press('Escape');
+  await page.clock.fastForward(100);
   await expect(page.locator('.explore-caption')).toBeHidden();
-  await page.waitForTimeout(500);
+  const paused = await page.evaluate(
+    () => (window.__game as unknown as Game).explore.scheduler.active,
+  );
+  for (let i = 0; i < 5; i++) await page.clock.fastForward(100);
+  expect(
+    await page.evaluate(() => (window.__game as unknown as Game).explore.scheduler.active),
+  ).toEqual(paused);
   expect(
     await page.evaluate(() => (window.__game as unknown as Game).explore.scheduler.active),
   ).not.toBeNull();
   await page.keyboard.press('Escape');
-  await page.waitForFunction(
-    () => (window.__game as unknown as Game).explore.scheduler.active === null,
-    undefined,
-    { timeout: 20_000 },
-  );
-  await page.waitForTimeout(1500);
+  // The engine caps a frame at 250 ms; wall time cannot stand in for dive time.
+  for (let i = 0; i < EXPLORE_CONFIG.eventDurationS * 4; i++) await page.clock.fastForward(250);
+  expect(
+    await page.evaluate(() => (window.__game as unknown as Game).explore.scheduler.active),
+  ).toBeNull();
+  for (let i = 0; i < 6; i++) await page.clock.fastForward(250);
   expect(
     await page.evaluate(() => (window.__game as unknown as Game).explore.scheduler.active),
   ).toBeNull();

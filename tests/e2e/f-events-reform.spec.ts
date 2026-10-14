@@ -1,5 +1,5 @@
-// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import { mkdir, writeFile } from 'node:fs/promises';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
+import { renderReview, reviewShot } from './helpers/render.js';
 import { devices, expect, test } from './helpers/unlocked.js';
 import type { EventsVisual } from '../../src/game/EventsVisual.js';
 import type { EventScheduler, ExploreEventKind } from '../../src/game/Events.js';
@@ -7,7 +7,6 @@ import type { Submarine } from '../../src/sub/Submarine.js';
 import type { CameraRig } from '../../src/sub/CameraRig.js';
 import type { Scene, Points, PointsMaterial, BufferGeometry, Mesh } from 'three';
 
-const shots = '.cache/codex/shots/1393-f-events-reform';
 interface Game {
   sub: Submarine;
   rig: CameraRig;
@@ -114,12 +113,13 @@ for (const surface of ['desktop', 'phone'] as const) {
         test.setTimeout(180_000);
         const errors: string[] = [];
         page.on('pageerror', (e) => errors.push(e.message));
+        await pauseClockBeforeNavigation(page);
         await page.goto(`/?tile=${site}&tier=low&dynres=0&tutorial=0&lifeSeed=42`, {
           waitUntil: 'domcontentloaded',
         });
-        await page.waitForFunction(() => {
+        await clockFramesUntil(page, () => {
           const g = window.__game as unknown as Game;
-          return window.__gameReady && g.explore?.ready && g.props.loaded;
+          return !!(window.__gameReady && g.explore?.ready && g.props.loaded);
         });
         // Whale habitat is upper water. Keep the actual chase framing after a
         // shallow reposition; other events use the site's ordinary opening pose.
@@ -129,10 +129,13 @@ for (const surface of ['desktop', 'phone'] as const) {
             g.sub.position.y = -60;
             g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
           });
-        const before = await page.evaluate(async () => {
+        await page.evaluate(() => {
           const g = window.__game as unknown as Game;
           g.sub.step = () => {};
-          for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
+        });
+        for (let i = 0; i < 5; i++) await page.clock.fastForward(16);
+        const before = await page.evaluate(() => {
+          const g = window.__game as unknown as Game;
           return { calls: g.perf.drawCalls, triangles: g.perf.triangles };
         });
         expect(
@@ -141,6 +144,7 @@ for (const surface of ['desktop', 'phone'] as const) {
             kind,
           ),
         ).toBe(true);
+        await page.clock.fastForward(16);
         await expect(page.locator('.explore-caption')).toBeVisible();
         await expect(page.locator('.explore-caption')).toContainText(
           kind === 'plume'
@@ -149,13 +153,28 @@ for (const surface of ['desktop', 'phone'] as const) {
               ? 'Silt cloud:'
               : 'Whale passing:',
         );
-        const measurements = await page.evaluate(
-          async ({ kind, before }) => {
+        // Holding the scheduler alone does not hold the caption's lifetime.
+        // Advance both through explicit frames so software GL cannot expire it.
+        await page.evaluate(() => {
+          const scheduler = (window.__game as unknown as Game).explore.scheduler;
+          scheduler.update = () => null;
+          scheduler.active!.elapsedS = 2;
+        });
+        const samples: { ms: number; calls: number; triangles: number }[] = [];
+        for (let i = 0; i < (renderReview ? 30 : 1); i++) {
+          const start = Date.now();
+          // Cross a complete RAF interval even when the previous clock advance
+          // landed between ticks; fastForward presents one frame per advance.
+          await page.clock.fastForward(34);
+          const counters = await page.evaluate(() => {
             const g = window.__game as unknown as Game;
-            const scheduler = g.explore.scheduler;
-            // Use previewEvent, then hold a known age for repeatable captures.
-            scheduler.update = () => null;
-            scheduler.active!.elapsedS = 2;
+            return { calls: g.perf.drawCalls, triangles: g.perf.triangles };
+          });
+          samples.push({ ms: Date.now() - start, ...counters });
+        }
+        const measurements = await page.evaluate(
+          ({ kind, before, samples }) => {
+            const g = window.__game as unknown as Game;
             const points = g.scene.getObjectByName('exploreEventParticles') as Points<
               BufferGeometry,
               PointsMaterial
@@ -166,17 +185,6 @@ for (const surface of ['desktop', 'phone'] as const) {
             if (kind === 'turbidity') centre.y += 6;
             const range = centre.distanceTo(g.sub.position);
             const projected = centre.clone().project(g.rig.camera);
-            const samples: { ms: number; calls: number; triangles: number }[] = [];
-            let previous = await new Promise<number>(requestAnimationFrame);
-            for (let i = 0; i < 30; i++) {
-              const now = await new Promise<number>(requestAnimationFrame);
-              samples.push({
-                ms: now - previous,
-                calls: g.perf.drawCalls,
-                triangles: g.perf.triangles,
-              });
-              previous = now;
-            }
             return {
               before,
               range,
@@ -189,7 +197,7 @@ for (const surface of ['desktop', 'phone'] as const) {
               pixelRatio: g.perf.pixelRatio,
             };
           },
-          { kind, before },
+          { kind, before, samples },
         );
         expect(measurements.range).toBeGreaterThanOrEqual(30);
         expect(measurements.range).toBeLessThanOrEqual(70);
@@ -212,25 +220,19 @@ for (const surface of ['desktop', 'phone'] as const) {
           'caption must leave HUD and thumb controls clear',
         ).toEqual([]);
         if (kind === 'whale') expect(startLayout.subject.height).toBeGreaterThan(8);
-        await mkdir(shots, { recursive: true });
-        await page.screenshot({ path: `${shots}/${kind}-${surface}-low-start.png` });
-        await writeFile(
-          `${shots}/${kind}-${surface}-measurements.json`,
-          JSON.stringify({ ...measurements, ...startLayout }, null, 2),
-        );
-        await page.evaluate(async () => {
+        await reviewShot(page, `${kind}-${surface}-low-start`);
+        await page.evaluate(() => {
           (window.__game as unknown as Game).explore.scheduler.active!.elapsedS = 7;
-          // Allow the twice-per-second caption layout to follow the moved subject.
-          const settleUntil = performance.now() + 550;
-          while (performance.now() < settleUntil) await new Promise(requestAnimationFrame);
         });
+        // Layout checks twice a second; render enough simulation time for it.
+        for (let i = 0; i < 6; i++) await page.clock.fastForward(100);
         await expect(page.locator('.explore-caption')).toBeVisible();
         const movingLayout = await page.evaluate(eventLayout, kind);
         expect(movingLayout.covered, 'moving event must stay clear of its caption').toBe(false);
         expect(movingLayout.captionOverlays, 'moving caption must leave controls clear').toEqual(
           [],
         );
-        await page.screenshot({ path: `${shots}/${kind}-${surface}-low-moving.png` });
+        await reviewShot(page, `${kind}-${surface}-low-moving`);
         // Approach the currently visible centre, then look at it through the
         // regular chase rig. A distant caption must never silently count as a log.
         await page.evaluate((kind) => {
@@ -247,19 +249,18 @@ for (const surface of ['desktop', 'phone'] as const) {
           );
           g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
         }, kind);
-        await page.waitForFunction((kind) => {
-          const g = window.__game as unknown as Game;
-          return g.discoveries.isDiscovered(
-            new URLSearchParams(location.search).get('tile')!,
-            `event:${kind}`,
-          );
-        }, kind);
-        await expect(page.locator('.explore-caption')).toContainText('Sighting logged in Journal');
+        await clockFramesUntil(
+          page,
+          () => (window.__game as unknown as Game).explore.summary().events.length === 1,
+        );
         expect(
           await page.evaluate(
-            () => (window.__game as unknown as Game).explore.summary().events.length,
+            ({ site, kind }) =>
+              (window.__game as unknown as Game).discoveries.isDiscovered(site, `event:${kind}`),
+            { site, kind },
           ),
-        ).toBe(1);
+        ).toBe(true);
+        await expect(page.locator('.explore-caption')).toContainText('Sighting logged in Journal');
         await page.evaluate(async () => {
           const g = window.__game as unknown as Game;
           await g.journal.load();
@@ -282,13 +283,13 @@ for (const surface of ['desktop', 'phone'] as const) {
         await expect(page.locator('.journal .jr-body').locator(`a[href="${source}"]`)).toHaveCount(
           1,
         );
-        await page.screenshot({ path: `${shots}/${kind}-${surface}-journal.png` });
+        await reviewShot(page, `${kind}-${surface}-journal`);
         expect(errors).toEqual([]);
         await page.evaluate(() => {
           (window.__game as unknown as Game).journal.close();
         });
         await page.reload();
-        await page.waitForFunction(() => window.__gameReady === true);
+        await clockFramesUntil(page, () => window.__gameReady === true);
         expect(
           await page.evaluate(
             ({ site, kind }) =>

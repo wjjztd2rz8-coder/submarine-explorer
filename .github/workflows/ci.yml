@@ -172,7 +172,7 @@ jobs:
         run: >-
           bash tools/gates.sh --phase e2e --prebuilt --
           ${{ matrix.shard }}/${{ strategy.job-total }}
-          --reporter=list,json,html --global-timeout=1500000
+          --reporter=list,json,html --global-timeout=1500000 --retries=0
 
       - name: Upload e2e timings
         if: always()

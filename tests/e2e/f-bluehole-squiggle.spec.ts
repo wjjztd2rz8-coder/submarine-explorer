@@ -1,3 +1,4 @@
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { execFile } from 'node:child_process';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -49,9 +50,49 @@ interface Manifest {
   captures: Capture[];
 }
 
+function floorMaterials() {
+  const g = window.__game as unknown as FloorGame;
+  const hero = g.props.placed.find((p) => p.def.id === 'karst-grotto')!;
+  const apron = hero.full.getObjectByName('grotto-sediment-apron') as import('three').Mesh;
+  const material = apron.material as import('three').MeshStandardMaterial;
+  const seabed = g.terrain.group.children.find(
+    (o) => (o as import('three').Mesh).isMesh,
+  ) as import('three').Mesh;
+  const uniforms = (seabed.material as import('three').Material).userData.uniforms;
+  return {
+    apronMap: !!material.map,
+    apronBump: !!material.bumpMap,
+    terrainContrast: uniforms.uContrast.value.toArray(),
+    terrainNormalStrength: uniforms.uNormalStrength.value,
+  };
+}
+
+function assertFloorMaterials(evidence: ReturnType<typeof floorMaterials>): void {
+  expect(evidence.apronMap).toBe(false);
+  expect(evidence.apronBump).toBe(false);
+  expect(evidence.terrainContrast).toEqual([0, 0, 0]);
+  expect(evidence.terrainNormalStrength).toBe(0);
+}
+
+// Guard the contour-map regression without invoking golden captures in push CI.
+test('Blue Hole: mapless sediment and neutral terrain material', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await pauseClockBeforeNavigation(page);
+  await page.goto('/?tile=great-blue-hole&tier=high&tutorial=0&dynres=0');
+  await clockFramesUntil(
+    page,
+    () => !!(window.__gameReady && (window.__game as unknown as FloorGame).props.loaded),
+  );
+  await page.evaluate(() => (window.__game as unknown as FloorGame).terrain.texturesReady);
+  await page.clock.fastForward(16);
+  assertFloorMaterials(await page.evaluate(floorMaterials));
+  expect(errors).toEqual([]);
+});
+
 // This is also the review harness: full gates run the actual golden tool on
 // HEAD and the working sources, then isolate the floor's material paths at pose 2.
-test('1280 Blue Hole: golden sediment terraces, brightness and floor material bisect', async ({
+test('Blue Hole: golden sediment terraces, brightness and floor material bisect @render', async ({
   page,
   baseURL,
 }, testInfo) => {
@@ -173,26 +214,8 @@ test('1280 Blue Hole: golden sediment terraces, brightness and floor material bi
     g.rig.lookElevation = p.lookElevation;
     g.rig.snap(g.sub.position, p.yaw, p.pitch);
   }, pose);
-  const materialEvidence = await page.evaluate(() => {
-    const g = window.__game as unknown as FloorGame;
-    const hero = g.props.placed.find((p) => p.def.id === 'karst-grotto')!;
-    const apron = hero.full.getObjectByName('grotto-sediment-apron') as import('three').Mesh;
-    const material = apron.material as import('three').MeshStandardMaterial;
-    const seabed = g.terrain.group.children.find(
-      (o) => (o as import('three').Mesh).isMesh,
-    ) as import('three').Mesh;
-    const uniforms = (seabed.material as import('three').Material).userData.uniforms;
-    return {
-      apronMap: !!material.map,
-      apronBump: !!material.bumpMap,
-      terrainContrast: uniforms.uContrast.value.toArray(),
-      terrainNormalStrength: uniforms.uNormalStrength.value,
-    };
-  });
-  expect(materialEvidence.apronMap).toBe(false);
-  expect(materialEvidence.apronBump).toBe(false);
-  expect(materialEvidence.terrainContrast).toEqual([0, 0, 0]);
-  expect(materialEvidence.terrainNormalStrength).toBe(0);
+  const materialEvidence = await page.evaluate(floorMaterials);
+  assertFloorMaterials(materialEvidence);
 
   // Each ablation starts from the production state. Recover the original rock
   // canvas from the blocks; divide by its mean to keep the diagnosis equally lit.

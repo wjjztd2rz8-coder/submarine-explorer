@@ -1,3 +1,5 @@
+import { pauseClockBeforeNavigation, clockFramesUntil, withClockFrames } from './helpers/clock.js';
+import { reviewShot } from './helpers/render.js';
 import { expectObjectiveGuidance } from './helpers/phoneHud.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -224,7 +226,7 @@ for (const layout of [
     });
 
     test('animal hint fades on the first actual move; scan stays separate', async ({ page }) => {
-      await page.clock.install();
+      await pauseClockBeforeNavigation(page);
       await page.addInitScript(() => {
         localStorage.setItem(
           'subexplorer.onboard.v1',
@@ -236,8 +238,11 @@ for (const layout of [
         );
       });
       await page.goto('/?mission=great-blue-hole&skipBriefing=1&tier=low&lifeSeed=3');
-      await ready(page);
-      await page.waitForFunction(() => !!(window.__game as { life: unknown }).life);
+      await clockFramesUntil(
+        page,
+        () => window.__gameReady === true && (window.__game as unknown as Game).discovery.loaded,
+      );
+      await clockFramesUntil(page, () => !!(window.__game as { life: unknown }).life);
       const spawned = await page.evaluate(() => {
         const g = window.__game as unknown as {
           sub: Submarine;
@@ -264,6 +269,13 @@ for (const layout of [
       });
       expect(spawned).toBe(true);
       const hint = page.locator('.onboard-hint');
+      // Animal guidance intentionally gives the opening scan card eight seconds.
+      await clockFramesUntil(
+        page,
+        () =>
+          document.querySelector('.onboard-hint')?.textContent?.includes('Animal nearby') === true,
+        250,
+      );
       await expect(hint).toContainText('Animal nearby');
       await expect(hint).toBeVisible();
       // Long completion names exercise the same flow as long scan targets.
@@ -278,13 +290,13 @@ for (const layout of [
       const toast = (await hint.boundingBox())!;
       expect(toast.y).toBeGreaterThanOrEqual(target.y + target.height + 7);
       expect(toast.x).toBeCloseTo(target.x, 0);
-      await mkdir(`${shots}/checks`, { recursive: true });
-      await page.screenshot({ path: `${shots}/checks/${layout.name}-wrapped-toast.png` });
-      await hold(page, layout.touch, '.tc-stick', 'KeyW', 0);
+      await reviewShot(page, `${layout.name}-wrapped-toast`);
+      await withClockFrames(page, () => hold(page, layout.touch, '.tc-stick', 'KeyW', 0));
+      await page.clock.fastForward(250);
       await expect(hint).toBeHidden();
       await expect(page.locator('.scan-panel')).toBeVisible();
       await expectObjectiveGuidance(page, layout.touch);
-      await page.screenshot({ path: `${shots}/checks/${layout.name}-after-move.png` });
+      await reviewShot(page, `${layout.name}-after-move`);
     });
   });
 }

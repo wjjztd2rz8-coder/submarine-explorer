@@ -17,7 +17,7 @@ concurrency:
 jobs:
   diagnostics:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 150
     defaults:
       run:
         shell: bash
@@ -78,6 +78,24 @@ jobs:
           GOLDEN_PORT=$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1]); s.close()')
           export GOLDEN_PORT
           bash tools/golden.sh 2>&1 | tee "$DIAGNOSTICS_DIR/golden.log"
+
+      - name: Capture event layouts and run continuous render guards
+        if: ${{ !cancelled() && steps.chromium.outcome == 'success' && steps.golden.outcome != 'skipped' }}
+        timeout-minutes: 60
+        env:
+          PW_RENDER_REVIEW: '1'
+        run: |
+          # Golden built this exact SHA; Playwright owns its preview server.
+          test -f dist/index.html
+          PW_PORT=$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1]); s.close()')
+          export PW_PORT
+          npx playwright test \
+            tests/e2e/f-events-reform.spec.ts tests/e2e/f-verify-1000.spec.ts \
+            tests/e2e/f-bluehole-squiggle.spec.ts tests/e2e/f2-explore.spec.ts \
+            tests/e2e/f-first-minute-620.spec.ts \
+            --grep 'visible spawn|golden sediment|approach, first scan|first minute, one Journal|f2-explore|animal hint fades' \
+            --retries=0 --reporter=list,json --output="$DIAGNOSTICS_DIR/e2e" \
+            2>&1 | tee "$DIAGNOSTICS_DIR/e2e.log"
 
       - name: Benchmark every supported tier at the five hero sites
         # Capture failure must not hide numeric diagnostics; cancellation stops new work.
@@ -159,6 +177,18 @@ jobs:
             ${{ env.DIAGNOSTICS_DIR }}/run.txt
             .cache/golden-build.log
             .cache/golden-preview.log
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload render guard captures and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-guards-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
+          path: |
+            ${{ env.DIAGNOSTICS_DIR }}/e2e/
+            .cache/bluehole-squiggle/
           include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 14

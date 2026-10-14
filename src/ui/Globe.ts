@@ -810,6 +810,9 @@ export class Globe {
     );
     this.chooser.hidden = false;
     this.chooserTrap.activate();
+    // A cluster chooser is a direct selection action: keyboard users should
+    // reach its sites immediately, while general overlays keep neutral focus.
+    this.chooserTrap.focusables()[0]?.focus();
   }
 
   private closeChooser(): void {

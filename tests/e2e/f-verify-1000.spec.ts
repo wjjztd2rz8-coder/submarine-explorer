@@ -1,5 +1,4 @@
-// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
-import process from 'node:process';
+import { reviewShot } from './helpers/render.js';
 import type { WebGLRenderer } from 'three';
 import {
   journalSiteRows,
@@ -103,224 +102,270 @@ for (const viewport of [
           'north wall',
         ],
       ]) {
-        test(`${site} ${tier}: approach, first scan, Journal and debrief`, async ({
-          page,
-        }, info) => {
-          test.setTimeout(240_000);
-          const errors: string[] = [];
-          page.on('pageerror', (e) => errors.push(e.message));
-          await pauseClockBeforeNavigation(page);
-          await page.goto(`/?mission=${site}&tier=${tier}&tutorial=0&dynres=0&lifeSeed=42`);
-          await ready(page);
-          await page.locator('.briefing-begin').click();
-          await page.clock.fastForward(34);
-          const start = await page.evaluate(() => {
-            const g = window.__game as unknown as Game;
-            return {
-              position: g.sub.position.toArray(),
-              first: g.mission!.requiredPrimaries()[0].id,
-            };
+        if (tier === 'high')
+          test(`${site} high: opening objective, clearance and authored Journal`, async ({
+            page,
+          }) => {
+            // Guard mission selection and data on every push; the continuous
+            // high-tier transit retains all scan/clearance guards in diagnostics.
+            const errors: string[] = [];
+            page.on('pageerror', (e) => errors.push(e.message));
+            await pauseClockBeforeNavigation(page);
+            await page.goto(`/?mission=${site}&tier=high&tutorial=0&dynres=0&lifeSeed=42`);
+            await ready(page);
+            await page.locator('.briefing-begin').click();
+            await page.clock.fastForward(34);
+            const state = await page.evaluate(() => {
+              const g = window.__game as unknown as Game;
+              return {
+                first: g.mission!.requiredPrimaries()[0].id,
+                complete: g.mission!.requiredPrimaries()[0].complete,
+                clearance:
+                  g.sub.position.y - g.terrain.sampleHeight(g.sub.position.x, g.sub.position.z),
+                floor: g.config.submarine.hullRadius + g.config.submarine.seabedClearance,
+              };
+            });
+            expect(state.first).toBe(objective);
+            expect(state.complete).toBe(false);
+            expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 1e-6);
+            await page.keyboard.press('j');
+            await page.clock.fastForward(34);
+            await expect(await journalSiteRows(page)).toHaveCount(13);
+            await openJournalSite(page, site);
+            await page.locator('.jr-site-more summary').click();
+            await expect(page.locator('.jr-body')).toContainText(subject);
+            expect(errors).toEqual([]);
           });
-          expect(start.first).toBe(objective);
-          // Preserve the real scan/vehicle frame path and every safety check;
-          // reduce only raster fill work during the held-input interval.
-          const pixelRatio = await page.evaluate(() => {
-            const g = window.__game as unknown as Game;
-            const ratio = g.renderer.getPixelRatio();
-            g.renderer.setPixelRatio(ratio * 0.25);
-            window.dispatchEvent(new Event('resize'));
-            return ratio;
-          });
-          await page.keyboard.down('w');
-          await page.keyboard.down('g');
-          let seconds = 0;
-          let complete = false;
-          let minimumClearance = Infinity;
-          try {
-            while (!complete && seconds < 120) {
-              // Six physics steps fit below the engine's eight-step frame cap.
-              await page.clock.fastForward(100);
-              seconds += 0.1;
-              const state = await page.evaluate(() => {
-                const g = window.__game as unknown as Game;
-                return {
-                  range: g.scanner.view.objectiveDistance,
-                  radius: g.scanner.view.objectiveRadius,
-                  complete: g.mission!.requiredPrimaries()[0].complete,
-                  clearance:
-                    g.sub.position.y - g.terrain.sampleHeight(g.sub.position.x, g.sub.position.z),
-                  floor: g.config.submarine.hullRadius + g.config.submarine.seabedClearance,
-                };
-              });
-              if (state.range < state.radius * 0.8) await page.keyboard.up('w');
-              minimumClearance = Math.min(minimumClearance, state.clearance);
-              expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 1e-6);
-              complete = state.complete;
-            }
-          } finally {
-            await page.keyboard.up('w');
-            await page.keyboard.up('g');
-            await page.evaluate((ratio) => {
-              (window.__game as unknown as Game).renderer.setPixelRatio(ratio);
-              window.dispatchEvent(new Event('resize'));
-            }, pixelRatio);
-          }
-          expect(complete, 'scan completes in at most two minutes of game frames').toBe(true);
-          const end = await page.evaluate(() =>
-            (window.__game as unknown as Game).sub.position.toArray(),
-          );
-          const transit = Math.hypot(...end.map((p, i) => p - start.position[i]));
-          expect(transit).toBeGreaterThan(50);
-          expect(transit).toBeLessThan(300);
-          await info.attach('first-scan', {
-            body: JSON.stringify({ site, tier, viewport, seconds, transit, minimumClearance, poi }),
-            contentType: 'application/json',
-          });
-          await page.clock.fastForward(34);
-          await page.screenshot({ path: info.outputPath('first-scan.png') });
 
-          await page.keyboard.press('j');
-          await page.clock.fastForward(34);
-          await expect(await journalSiteRows(page)).toHaveCount(13);
-          await openJournalSite(page, site);
-          await page.locator('.jr-site-more summary').click();
-          await expect(page.locator('.jr-body')).toContainText(subject);
-          await page.locator('.jr-close').click();
-          await page.keyboard.press('Escape');
-          await page.clock.fastForward(34);
-          await page.locator('.pause-surface').click();
-          await expect(page.locator('.mission-debrief .debrief-highlight')).toContainText(name);
-          await page.screenshot({ path: info.outputPath('debrief.png') });
-          expect(errors).toEqual([]);
-        });
+        test(
+          `${site} ${tier}: approach, first scan, Journal and debrief`,
+          { tag: tier === 'high' ? '@render' : [] },
+          async ({ page }, info) => {
+            test.setTimeout(240_000);
+            const errors: string[] = [];
+            page.on('pageerror', (e) => errors.push(e.message));
+            await pauseClockBeforeNavigation(page);
+            await page.goto(`/?mission=${site}&tier=${tier}&tutorial=0&dynres=0&lifeSeed=42`);
+            await ready(page);
+            await page.locator('.briefing-begin').click();
+            await page.clock.fastForward(34);
+            const start = await page.evaluate(() => {
+              const g = window.__game as unknown as Game;
+              return {
+                position: g.sub.position.toArray(),
+                first: g.mission!.requiredPrimaries()[0].id,
+              };
+            });
+            expect(start.first).toBe(objective);
+            // Preserve the real scan/vehicle frame path and every safety check;
+            // reduce only raster fill work during the held-input interval.
+            const pixelRatio = await page.evaluate(() => {
+              const g = window.__game as unknown as Game;
+              const ratio = g.renderer.getPixelRatio();
+              g.renderer.setPixelRatio(ratio * 0.25);
+              window.dispatchEvent(new Event('resize'));
+              return ratio;
+            });
+            await page.keyboard.down('w');
+            await page.keyboard.down('g');
+            let seconds = 0;
+            let complete = false;
+            let minimumClearance = Infinity;
+            try {
+              while (!complete && seconds < 120) {
+                // Six physics steps fit below the engine's eight-step frame cap.
+                await page.clock.fastForward(100);
+                seconds += 0.1;
+                const state = await page.evaluate(() => {
+                  const g = window.__game as unknown as Game;
+                  return {
+                    range: g.scanner.view.objectiveDistance,
+                    radius: g.scanner.view.objectiveRadius,
+                    complete: g.mission!.requiredPrimaries()[0].complete,
+                    clearance:
+                      g.sub.position.y - g.terrain.sampleHeight(g.sub.position.x, g.sub.position.z),
+                    floor: g.config.submarine.hullRadius + g.config.submarine.seabedClearance,
+                  };
+                });
+                if (state.range < state.radius * 0.8) await page.keyboard.up('w');
+                minimumClearance = Math.min(minimumClearance, state.clearance);
+                expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 1e-6);
+                complete = state.complete;
+              }
+            } finally {
+              await page.keyboard.up('w');
+              await page.keyboard.up('g');
+              await page.evaluate((ratio) => {
+                (window.__game as unknown as Game).renderer.setPixelRatio(ratio);
+                window.dispatchEvent(new Event('resize'));
+              }, pixelRatio);
+            }
+            expect(complete, 'scan completes in at most two minutes of game frames').toBe(true);
+            const end = await page.evaluate(() =>
+              (window.__game as unknown as Game).sub.position.toArray(),
+            );
+            const transit = Math.hypot(...end.map((p, i) => p - start.position[i]));
+            expect(transit).toBeGreaterThan(50);
+            expect(transit).toBeLessThan(300);
+            await info.attach('first-scan', {
+              body: JSON.stringify({
+                site,
+                tier,
+                viewport,
+                seconds,
+                transit,
+                minimumClearance,
+                poi,
+              }),
+              contentType: 'application/json',
+            });
+            await page.clock.fastForward(34);
+            await reviewShot(page, 'first-scan');
+
+            await page.keyboard.press('j');
+            await page.clock.fastForward(34);
+            await expect(await journalSiteRows(page)).toHaveCount(13);
+            await openJournalSite(page, site);
+            await page.locator('.jr-site-more summary').click();
+            await expect(page.locator('.jr-body')).toContainText(subject);
+            await page.locator('.jr-close').click();
+            await page.keyboard.press('Escape');
+            await page.clock.fastForward(34);
+            await page.locator('.pause-surface').click();
+            await expect(page.locator('.mission-debrief .debrief-highlight')).toContainText(name);
+            await reviewShot(page, 'debrief');
+            expect(errors).toEqual([]);
+          },
+        );
       }
 
       for (const [site, species, expectedCount] of [
         ['challenger-deep', 'hadal-amphipod', tier === 'low' ? 12 : 18],
         ['endurance', 'anemone', tier === 'low' ? 5 : 8],
       ] as const) {
-        test(`${site} ${tier}: first minute, one Journal tag and life=0`, async ({
-          page,
-        }, info) => {
-          // Hosted software rendering took >300 s for 600 high-tier frames (shards 2, 3, 6 of
-          // the f45 run); the 600 samples and their assertions are unchanged.
-          test.skip(
-            tier === 'high' && !!process.env.CI,
-            'reason: software-GL hosted runners cannot sustain the frame counts; covered by local full e2e',
-          );
-          test.setTimeout(480_000);
-          const errors: string[] = [];
-          page.on('pageerror', (e) => errors.push(e.message));
-          await pauseClockBeforeNavigation(page);
-          const url = `/?tile=${site}&tier=${tier}&tutorial=0&dynres=0&lifeSeed=42`;
-          await page.goto(url);
-          await ready(page, true);
-          await page.clock.fastForward(250);
-          const count = await page.evaluate(
-            (species) =>
-              (window.__game as unknown as Game)
-                .life!.sim.groups.filter((g) => g.def.id === species)
-                .reduce((n, g) => n + g.members.length, 0),
-            species,
-          );
-          expect(count).toBeGreaterThanOrEqual(expectedCount);
-          await page.screenshot({ path: info.outputPath('opening.png') });
-          // Keep all 600 real 100 ms frames and their safety samples. Only
-          // intermediate raster resolution is reduced; full resolution is
-          // restored before the final frame/screenshot. The camera, viewport,
-          // tier, simulation, geometry and post-processing remain active.
-          interface Sample {
-            elapsedMs: number;
-            clearance: number;
-            floor: number;
-            breached: boolean;
-          }
-          interface Probe {
-            samples: Sample[];
-            request: number;
-            pixelRatio: number;
-          }
-          await page.evaluate(() => {
-            const g = window.__game as unknown as Game;
-            const startMs = performance.now();
-            const probe: Probe = {
-              samples: [],
-              request: 0,
-              pixelRatio: g.renderer.getPixelRatio(),
-            };
-            (window as unknown as { minuteProbe: Probe }).minuteProbe = probe;
-            g.renderer.setPixelRatio(probe.pixelRatio * 0.25);
-            window.dispatchEvent(new Event('resize'));
-            const sample = (): void => {
-              probe.samples.push({
-                elapsedMs: performance.now() - startMs,
-                clearance:
-                  g.sub.position.y - g.terrain.sampleHeight(g.sub.position.x, g.sub.position.z),
-                floor: g.config.submarine.hullRadius + g.config.submarine.seabedClearance,
-                breached: g.sub.hullBreached,
-              });
-              probe.request = requestAnimationFrame(sample);
-            };
-            // The game registered its next frame first, so each sample reads
-            // the completed simulation/render, without an extra browser call.
-            probe.request = requestAnimationFrame(sample);
-          });
-          let samples: Sample[];
-          try {
-            for (let frame = 0; frame < 600; frame++) {
-              if (frame === 599)
+        for (const continuous of [false, true]) {
+          test(
+            `${site} ${tier}: ${continuous ? 'first minute' : 'opening life'}, one Journal tag and life=0`,
+            { tag: continuous ? '@render' : [] },
+            async ({ page }, info) => {
+              test.setTimeout(480_000);
+              const errors: string[] = [];
+              page.on('pageerror', (e) => errors.push(e.message));
+              await pauseClockBeforeNavigation(page);
+              const url = `/?tile=${site}&tier=${tier}&tutorial=0&dynres=0&lifeSeed=42`;
+              await page.goto(url);
+              await ready(page, true);
+              await page.clock.fastForward(250);
+              const count = await page.evaluate(
+                (species) =>
+                  (window.__game as unknown as Game)
+                    .life!.sim.groups.filter((g) => g.def.id === species)
+                    .reduce((n, g) => n + g.members.length, 0),
+                species,
+              );
+              expect(count).toBeGreaterThanOrEqual(expectedCount);
+              await reviewShot(page, 'opening');
+              if (continuous) {
+                // Keep all 600 real 100 ms frames and their safety samples. Only
+                // intermediate raster resolution is reduced; full resolution is
+                // restored before the final frame/screenshot. The camera, viewport,
+                // tier, simulation, geometry and post-processing remain active.
+                interface Sample {
+                  elapsedMs: number;
+                  clearance: number;
+                  floor: number;
+                  breached: boolean;
+                }
+                interface Probe {
+                  samples: Sample[];
+                  request: number;
+                  pixelRatio: number;
+                }
                 await page.evaluate(() => {
                   const g = window.__game as unknown as Game;
-                  const probe = (window as unknown as { minuteProbe: Probe }).minuteProbe;
-                  g.renderer.setPixelRatio(probe.pixelRatio);
+                  const startMs = performance.now();
+                  const probe: Probe = {
+                    samples: [],
+                    request: 0,
+                    pixelRatio: g.renderer.getPixelRatio(),
+                  };
+                  (window as unknown as { minuteProbe: Probe }).minuteProbe = probe;
+                  g.renderer.setPixelRatio(probe.pixelRatio * 0.25);
                   window.dispatchEvent(new Event('resize'));
+                  const sample = (): void => {
+                    probe.samples.push({
+                      elapsedMs: performance.now() - startMs,
+                      clearance:
+                        g.sub.position.y -
+                        g.terrain.sampleHeight(g.sub.position.x, g.sub.position.z),
+                      floor: g.config.submarine.hullRadius + g.config.submarine.seabedClearance,
+                      breached: g.sub.hullBreached,
+                    });
+                    probe.request = requestAnimationFrame(sample);
+                  };
+                  // The game registered its next frame first, so each sample reads
+                  // the completed simulation/render, without an extra browser call.
+                  probe.request = requestAnimationFrame(sample);
                 });
-              await page.clock.fastForward(100);
-            }
-          } finally {
-            samples = await page.evaluate(() => {
-              const g = window.__game as unknown as Game;
-              const probe = (window as unknown as { minuteProbe: Probe }).minuteProbe;
-              cancelAnimationFrame(probe.request);
-              g.renderer.setPixelRatio(probe.pixelRatio);
-              window.dispatchEvent(new Event('resize'));
-              return probe.samples;
-            });
-          }
-          expect(samples).toHaveLength(600);
-          let minimumClearance = Infinity;
-          for (const [index, state] of samples.entries()) {
-            expect(state.elapsedMs).toBe((index + 1) * 100);
-            minimumClearance = Math.min(minimumClearance, state.clearance);
-            expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 1e-6);
-            expect(state.breached).toBe(false);
-          }
-          await info.attach('first-minute', {
-            body: JSON.stringify({ site, tier, viewport, count, minimumClearance }),
-            contentType: 'application/json',
-          });
-          await page.screenshot({ path: info.outputPath('60-seconds.png') });
-          await page.keyboard.press('j');
-          await page.clock.fastForward(34);
-          await expect(await journalSiteRows(page)).toHaveCount(13);
-          await page.locator('.jr-spoilers input').check();
-          await openJournalCategory(page, site, 'life');
-          await openJournalEntry(page, `${site}/life/${species}`);
-          const tags = page.locator('.jr-title-row .jr-tag:not(.is-undiscovered)');
-          await expect(tags).toHaveCount(1);
-          await expect(tags).toHaveText('Game addition');
-          await page.screenshot({ path: info.outputPath('journal.png') });
+                let samples: Sample[];
+                try {
+                  for (let frame = 0; frame < 600; frame++) {
+                    if (frame === 599)
+                      await page.evaluate(() => {
+                        const g = window.__game as unknown as Game;
+                        const probe = (window as unknown as { minuteProbe: Probe }).minuteProbe;
+                        g.renderer.setPixelRatio(probe.pixelRatio);
+                        window.dispatchEvent(new Event('resize'));
+                      });
+                    await page.clock.fastForward(100);
+                  }
+                } finally {
+                  samples = await page.evaluate(() => {
+                    const g = window.__game as unknown as Game;
+                    const probe = (window as unknown as { minuteProbe: Probe }).minuteProbe;
+                    cancelAnimationFrame(probe.request);
+                    g.renderer.setPixelRatio(probe.pixelRatio);
+                    window.dispatchEvent(new Event('resize'));
+                    return probe.samples;
+                  });
+                }
+                expect(samples).toHaveLength(600);
+                let minimumClearance = Infinity;
+                for (const [index, state] of samples.entries()) {
+                  expect(state.elapsedMs).toBe((index + 1) * 100);
+                  minimumClearance = Math.min(minimumClearance, state.clearance);
+                  expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 1e-6);
+                  expect(state.breached).toBe(false);
+                }
+                await info.attach('first-minute', {
+                  body: JSON.stringify({ site, tier, viewport, count, minimumClearance }),
+                  contentType: 'application/json',
+                });
+                await reviewShot(page, '60-seconds');
+              }
+              await page.keyboard.press('j');
+              await page.clock.fastForward(34);
+              await expect(await journalSiteRows(page)).toHaveCount(13);
+              await page.locator('.jr-spoilers input').check();
+              await openJournalCategory(page, site, 'life');
+              await openJournalEntry(page, `${site}/life/${species}`);
+              const tags = page.locator('.jr-title-row .jr-tag:not(.is-undiscovered)');
+              await expect(tags).toHaveCount(1);
+              await expect(tags).toHaveText('Game addition');
+              await reviewShot(page, 'journal');
 
-          await page.goto(`${url}&life=0`);
-          await ready(page);
-          await page.clock.fastForward(1000);
-          const disabled = await page.evaluate(() => {
-            const g = window.__game as unknown as Game;
-            return { life: g.life, targets: g.discovery.scanner.getExtraTargets().length };
-          });
-          expect(disabled).toEqual({ life: null, targets: 0 });
-          expect(errors).toEqual([]);
-        });
+              await page.goto(`${url}&life=0`);
+              await ready(page);
+              await page.clock.fastForward(1000);
+              const disabled = await page.evaluate(() => {
+                const g = window.__game as unknown as Game;
+                return { life: g.life, targets: g.discovery.scanner.getExtraTargets().length };
+              });
+              expect(disabled).toEqual({ life: null, targets: 0 });
+              expect(errors).toEqual([]);
+            },
+          );
+        }
       }
     }
   });
