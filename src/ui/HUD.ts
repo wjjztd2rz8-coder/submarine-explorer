@@ -12,6 +12,8 @@ import type { PowerState } from '../game/Power.js';
 import type { CurrentStatus } from '../world/Currents.js';
 import type { HullWarningStyle } from '../core/Save.js';
 import { HullGauge } from './HullGauge.js';
+import { el } from './dom.js';
+import { hudBar, hudRegions } from './hudRegions.js';
 
 const FIELDS = ['depth', 'heading', 'speed', 'tile'] as const;
 type Field = (typeof FIELDS)[number];
@@ -100,6 +102,7 @@ export class HUD {
   private readonly hullGauge: HullGauge;
   private readonly speedEl: HTMLDivElement;
   private readonly resetCameraEl: HTMLButtonElement;
+  readonly journalEl: HTMLButtonElement;
   private readonly powerEl: HTMLDivElement;
   private readonly currentEl: HTMLDivElement;
   private currentMode: CurrentMode = 'off';
@@ -109,11 +112,10 @@ export class HUD {
   private hullNote = '';
   /** The urgent message for the guidance slot (hull, supplies, seabed), or null. */
   warning: string | null = null;
-  private readoutsObserver: ResizeObserver | null = null;
 
   constructor(
     private readonly meta: TileMeta,
-    parent: HTMLElement = document.body,
+    parent: HTMLElement = hudRegions(),
     private readonly warn: HudWarnConfig = DEFAULT_WARN,
     private readonly currentMinMps = 0.01,
   ) {
@@ -133,30 +135,24 @@ export class HUD {
         <div class="hud-current" hidden aria-label="Current direction and speed"><span class="hud-current-arrow">↑</span><span class="hud-current-text"></span></div>
         <div class="hud-sim-speed" hidden></div>
       </div>
-      <div class="hud-footer">
-        <button class="hud-journal" type="button" title="Journal (J)" aria-label="Journal (J)">JOURNAL</button>
-        <button class="hud-reset-camera" type="button" aria-label="Reset camera">Reset camera</button>
-      </div>
     `;
+    this.journalEl = el('button', 'hud-journal', 'JOURNAL');
+    this.journalEl.type = 'button';
+    this.journalEl.title = 'Journal (J)';
+    this.journalEl.setAttribute('aria-label', 'Journal (J)');
+    this.resetCameraEl = el('button', 'hud-reset-camera', 'Reset camera');
+    this.resetCameraEl.type = 'button';
+    this.resetCameraEl.setAttribute('aria-label', 'Reset camera');
+
     for (const el of this.root.querySelectorAll<HTMLSpanElement>('[data-field]')) {
       this.values.set(el.dataset.field as Field, el);
     }
     this.hullGauge = new HullGauge(this.root);
     this.speedEl = this.root.querySelector('.hud-sim-speed') as HTMLDivElement;
-    this.resetCameraEl = this.root.querySelector('.hud-reset-camera') as HTMLButtonElement;
     this.powerEl = this.root.querySelector('.hud-power') as HTMLDivElement;
     this.currentEl = this.root.querySelector('.hud-current') as HTMLDivElement;
-    parent.appendChild(this.root);
-    if (typeof ResizeObserver !== 'undefined') {
-      const readouts = this.root.querySelector<HTMLElement>('.hud-readouts')!;
-      this.readoutsObserver = new ResizeObserver(() => {
-        document.documentElement.style.setProperty(
-          '--hud-readouts-height',
-          `${readouts.getBoundingClientRect().height}px`,
-        );
-      });
-      this.readoutsObserver.observe(readouts);
-    }
+    parent.append(this.root);
+    hudBar().append(this.journalEl, this.resetCameraEl);
     this.set('tile', `${meta.id} (${meta.cols}×${meta.rows})`);
   }
 
@@ -296,8 +292,9 @@ export class HUD {
   }
 
   dispose(): void {
-    this.readoutsObserver?.disconnect();
     this.root.remove();
+    this.journalEl.remove();
+    this.resetCameraEl.remove();
   }
 }
 

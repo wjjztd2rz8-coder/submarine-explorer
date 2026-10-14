@@ -21,17 +21,14 @@ for (const layout of ['desktop', 'portrait'] as const) {
         });
         const sonar = page.locator('.sonar');
         await expect(sonar).toBeVisible();
-        await expect(sonar.locator('.d-sonar-legend span')).toHaveText([
-          '▲ Sub',
-          '◇ Objective',
-          '· Contact',
-          '✓ Scanned',
-        ]);
+        // The permanent legend is gone: the map needs no caption block.
+        await expect(sonar.locator('.d-sonar-legend')).toHaveCount(0);
         const state = await page.evaluate(() => {
           const map = (
             window.__game as {
               sonar: {
                 canvas: HTMLCanvasElement;
+                root: HTMLElement;
                 base: HTMLCanvasElement;
                 relief: {
                   minDepthM: number;
@@ -62,7 +59,7 @@ for (const layout of ['desktop', 'portrait'] as const) {
             coloured,
             lime,
             colours: colours.size,
-            cssWidth: parseFloat(map.canvas.style.width),
+            cssWidth: parseFloat(map.root.style.getPropertyValue('--map-w')),
             canvasWidth: map.canvas.width,
             rasterWidth: map.base.width,
           };

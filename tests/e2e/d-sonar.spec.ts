@@ -104,7 +104,8 @@ test('sonar follows the sub, zooms by keys and wheel, and marks dive scan state'
     .toMatchObject({ current: true, icon: '◇', visible: true });
   await expect(sonar.locator('.d-scan-sonar-marker')).toHaveCount(0);
   await expect(sonar.locator('.d-sonar-range')).toHaveText('1000 m');
-  await expect(sonar).toHaveCSS('left', '12px');
+  // The sonar sits in the HUD's top-left region, one edge margin in.
+  expect((await sonar.boundingBox())!.x).toBe(12);
   const beforeZoom = await marker(page, 'titanic-bow');
   await shot(page, 'default');
   await shot(page, 'mini-default');

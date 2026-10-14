@@ -1,9 +1,7 @@
 /* D-SHELL: home screen, pause menu and app-state visibility.
    Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
 
-body[data-app-state='home'] > .hud,
-body[data-app-state='home'] > .sonar,
-body[data-app-state='home'] > .objectives-panel,
+body[data-app-state='home'] > .hud-regions,
 body[data-app-state='home'] > .scan-overlay,
 body[data-app-state='home'] > .hud-ctrl-tip,
 body[data-app-state='pause'] > .hud-ctrl-tip {

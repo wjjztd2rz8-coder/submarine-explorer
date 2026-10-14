@@ -40,6 +40,13 @@ class Element extends EventTarget {
     return [];
   }
   remove() {}
+  appendChild(child: Element) {
+    this.children.push(child);
+    return child;
+  }
+  querySelector() {
+    return null;
+  }
 }
 
 const controls: TouchControls[] = [];
@@ -57,6 +64,7 @@ function setup(hardwareTouch = false) {
     documentElement: root,
     addEventListener: () => {},
     removeEventListener: () => {},
+    querySelector: () => null,
     createElement: () => new Element(),
   });
   const win = Object.assign(new EventTarget(), {
@@ -149,7 +157,7 @@ it('toggles boost on completed taps and clears its visual when gameplay rejects 
   const { create, input } = setup(true);
   const touch = create();
   touch.update(true, false);
-  const boost = (touch.root as unknown as Element).children[5]!;
+  const boost = (touch.root as unknown as Element).children[4]!;
   boost.dispatchEvent(new Event('pointerdown'));
   boost.dispatchEvent(new Event('pointercancel'));
   expect(input.touchBoost).toBe(false);
@@ -180,9 +188,7 @@ it('wires Journal through the action map and follows boost rejection from the fr
     app: { state: 'dive' },
     params: new URLSearchParams('touch=1'),
     photoMode: { active: false },
-    hud: {
-      root: { querySelector: () => journal },
-    },
+    hud: { journalEl: journal },
     expose: (exposed: { touch: TouchControls }) => {
       touch = exposed.touch;
     },
@@ -194,7 +200,7 @@ it('wires Journal through the action map and follows boost rejection from the fr
   expect(input.touchEdge).toHaveBeenCalledExactlyOnceWith('toggleJournal');
   const frame = { frozen: false, state: { boost: true } } as FrameState;
   system.frame?.['late.input']?.(frame, ctx);
-  const boost = (touch!.root as unknown as Element).children[5]!;
+  const boost = (touch!.root as unknown as Element).children[4]!;
   boost.dispatchEvent(new Event('click'));
   system.frame?.['late.input']?.(frame, ctx);
   expect(boost.attributes.get('aria-pressed')).toBe('true');
@@ -213,7 +219,7 @@ it.each(['pause', 'photo', 'blur', 'desktop', 'dispose'])(
     const { create, input, win } = setup(true);
     const touch = create();
     touch.update(true, false);
-    const boost = (touch.root as unknown as Element).children[5]!;
+    const boost = (touch.root as unknown as Element).children[4]!;
     boost.dispatchEvent(new Event('click'));
     if (interruption === 'pause') touch.update(false, false);
     else if (interruption === 'photo') touch.update(true, true);
@@ -272,7 +278,7 @@ it.each(['rotation', 'disposal'])('cancels the portrait hint timer on %s', (tran
   win.innerHeight = 844;
   const touch = create();
   touch.update(true, false);
-  const hint = (touch.root as unknown as Element).children[4]!;
+  const hint = (touch.root as unknown as Element).children[3]!;
   expect(hint.hidden).toBe(false);
   expect(vi.getTimerCount()).toBe(1);
   if (transition === 'rotation') {

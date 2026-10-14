@@ -5,6 +5,7 @@
  */
 
 import { HUD } from '../../ui/HUD.js';
+import { hudRegions } from '../../ui/hudRegions.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
@@ -17,7 +18,7 @@ export const hudSystem: GameSystem = {
     const { meta, config, settings, save, bus, freeDiveHull } = ctx;
     const hud = new HUD(
       meta,
-      document.body,
+      hudRegions(),
       {
         hullRadius: config.submarine.hullRadius,
         seabedWarnAltitudeM: config.submarine.seabedWarnAltitudeM,

@@ -14,6 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
+- **S-hud:** the dive HUD is three regions in one grid (top info: sonar, objectives, readouts; guidance; controls: Pause, Journal, Reset camera and the touch dock) instead of per-element screen offsets. Pause and Journal now share one bar, and on landscape phones the guidance card sits in the same column beneath it, a full region gap apart rather than 4 px. The Journal and Reset camera buttons share that bar at the bottom right on desktop. The expanded sonar map is a centred sheet that avoids the bar and touch buttons rather than a 1.8x zoom. Phones use one compact readout style in both orientations.
 - **S-verify:** fresh discovery and sighting captions get three seconds ahead of idle ready contacts; active scans and warnings retain priority. Journal, paused/covered play, debrief and dive restart discard old guidance from every source. The existing Journal picker now includes earned lamp trims, and touch scan rewards say “OPEN JOURNAL” beside the direct Journal button. Legacy-runtime save fixtures verify archived balances, purchases, ratings, finds, Daily records and cosmetic selections across schema v2 reloads. No capability cut.
 - **V-eight-sites tooling:** mission golden captures use the real mission opening and +10 seconds of play across desktop and both phone orientations, replacing mission mode's synthetic approach/detail poses. Free-dive captures retain those poses and their defaults. Served-build SHA, dirty flag and Vite build mode accompany each capture. Reason: reviewers could not identify the captured build or verify mission spawns and phone layouts. No game capability is cut.
 - **1710 S-tests step 2:** consolidate 29 HUD/touch, opening-framing and Journal/debrief entry specs into three capability specs. Hero HUD phases and overlapping Journal journeys share setup; preserve regression guards, state/layout matrices and default repetitions. Home loads use the shared readiness helper; migrate CI timing keys conservatively. No player capability is cut.
@@ -1023,6 +1024,7 @@ without an entry here is not done.
 
 ### Removed
 
+- **S-hud:** the permanent sonar legend (Sub, Objective, Contact, Scanned) is gone on desktop; touch already hid it. Reason: the map markers are self-explanatory and the caption block added height to every map.
 - **1496 (S-rov):** removed the deployable ROV, tether, controls, telemetry, hints, camera/lighting branches, audio winch and scan-radius rewriting. Known binding and onboarding saves drop retired fields while retaining remaps and tutorial progress. Reason: owner decision 2026-10-12; meaningful ROV exploration needs more scene detail than the current scope supports.
 
 - **1393 f-events-reform:** removed the marine-snow event, caption and fallback scheduling because permanent marine snow already supplies the same ambient visual. Sites with no remaining event habitat stay quiet.

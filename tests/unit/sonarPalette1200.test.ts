@@ -77,7 +77,9 @@ describe('1200 shared sonar relief', () => {
   it('samples intermediate bilinear heights at DPR 2 without changing CSS dimensions or contour units', () => {
     const one = render('test', 1);
     const two = render('test', 2);
-    expect(two.sonar.canvas.style).toEqual(one.sonar.canvas.style);
+    const mapW = (r: typeof one) =>
+      (r.sonar.root.style as unknown as Record<string, string>)['--map-w'];
+    expect(mapW(two)).toBe(mapW(one));
     expect(two.rasters[0].width).toBe(one.rasters[0].width * 2);
     expect(two.rasters[0].height).toBe(one.rasters[0].height * 2);
     expect(two.paths.length).toBeGreaterThan(0);

@@ -39,25 +39,20 @@ async function dismiss(page: Page, touch: boolean, pausedClock: boolean): Promis
 
 /**
  * The scan card outranks the tutorial step, so a layout check of the tutorial alone
- * hides the scan source first (and restores it afterwards). Discovery re-applies the
- * overlay's suppression every frame, so the overlay's own hooks are held while hidden.
+ * withdraws the scan source first (and restores it afterwards). Discovery re-offers
+ * the scan card every frame, so the overlay's own update is held while it is hidden.
  */
 export async function setScanCardSuppressed(page: Page, on: boolean): Promise<void> {
   await page.evaluate((on) => {
     type Overlay = {
-      setSuppressed(on: boolean): void;
+      slot: { offer(source: string, kind: string, message: null): void };
       update(...args: unknown[]): void;
     };
     const overlay = (window.__game as unknown as { discovery: { overlay: Overlay } }).discovery
       .overlay;
     if (on) {
-      overlay.setSuppressed(true);
-      overlay.setSuppressed = () => {};
+      overlay.slot.offer('scan', 'scan', null);
       overlay.update = () => {};
-    } else {
-      delete (overlay as Partial<Overlay>).setSuppressed;
-      delete (overlay as Partial<Overlay>).update;
-      overlay.setSuppressed(false);
-    }
+    } else delete (overlay as Partial<Overlay>).update;
   }, on);
 }

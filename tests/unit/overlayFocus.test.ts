@@ -205,6 +205,7 @@ beforeEach(() => {
     createElement: (tag: string) => new Element(tag.toUpperCase()),
     createElementNS: (_ns: string, tag: string) => new Element(tag.toUpperCase()),
     createTextNode: (text: string) => Object.assign(new Element('#TEXT'), { textContent: text }),
+    querySelector: (selector: string) => body.querySelector(selector),
     exitPointerLock: vi.fn(),
   });
 });

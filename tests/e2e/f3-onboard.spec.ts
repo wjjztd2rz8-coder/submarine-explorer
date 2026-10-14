@@ -275,7 +275,7 @@ test.describe('touch viewport', () => {
     await boot(page, '&touch=1');
     const card = page.locator(GUIDANCE.any);
     await expect(page.locator(GUIDANCE.tutorial)).toBeVisible();
-    await expect(card).toContainText('left stick');
+    await expect(card).toContainText(/left stick/i);
     const box = (await card.boundingBox())!;
     const vp = page.viewportSize()!;
     expect(box.x).toBeGreaterThanOrEqual(0);

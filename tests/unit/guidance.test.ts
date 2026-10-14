@@ -149,7 +149,7 @@ describe('guidance slot', () => {
   it('gives a sighting three seconds ahead of a ready contact, without delaying a held scan', () => {
     const bus = new EventBus();
     const scanner = new Scanner(DEFAULT_CONFIG.scan, bus);
-    const overlay = new ScanOverlay(DEFAULT_CONFIG.scan);
+    const overlay = new ScanOverlay(DEFAULT_CONFIG.scan, document.body);
     scanner.setTargets([
       {
         id: 'bow',
@@ -217,7 +217,7 @@ describe('guidance slot', () => {
 
   it('clears completion and every other offer through real Journal, blocked-play and restart paths', () => {
     const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus());
-    const overlay = new ScanOverlay(DEFAULT_CONFIG.scan);
+    const overlay = new ScanOverlay(DEFAULT_CONFIG.scan, document.body);
     const guide = { isOpen: false, setFooter() {} };
     const debrief = { isOpen: false };
     const discovery: Discovery = Object.assign(Object.create(Discovery.prototype) as Discovery, {
