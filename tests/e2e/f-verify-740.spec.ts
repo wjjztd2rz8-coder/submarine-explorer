@@ -112,9 +112,10 @@ for (const layout of [
         expect(surface.start).toBe('surface');
         expect(surface.y).toBeGreaterThan(-20);
         expect(surface.y).toBeLessThanOrEqual(-surface.radius + 1);
+        // Touch layouts carry the objective in the guidance slot, not a panel.
         for (const selector of [
           '.sonar',
-          '.objectives-panel',
+          ...(layout.touch ? [] : ['.objectives-panel']),
           '.hud-readouts',
           ...(layout.touch ? ['.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause'] : []),
         ])
