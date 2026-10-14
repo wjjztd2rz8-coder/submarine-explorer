@@ -71,8 +71,6 @@ The newest items go first.
 
 ## In flight
 
-
-
 - 2026-10-14: S-guidance, S-rewards, S-resolve, S-modal, S-boot, S-verify/S-bughunt passes and the hosted-CI test repairs are merged and pushed. Codex queue: 1710 S-tests step 2, 1720 golden evidence, 1730 S-verify third pass, 1740 hosted CI, 1750 S-render rest.
 
 ## Backlog
@@ -86,7 +84,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 5. **V-titanic [Sonnet]:** close-up (`titanic-3.png`): regular panels, bright flat sand, thin rusticles read as manufactured. Agreed beauty 3.5.
 6. **V-beebe / V-bluehole remainder [Sonnet]:** Beebe opening: the bright sub dominates a small stack; chimney facets and plumes look procedural. Blue Hole: faceted uniform steps and smooth stalactite cones (golden essentially unchanged since 2026-10-13).
 7. **V-lostcity [Sonnet]** PARTLY DONE 2026-10-14 (56eae67): seabed stripes fixed (reliefBed/rillStretch), colour banding calmer; towers only modestly better, still smooth columns with a flat collar and regular dimples on the flat seabed. Remainder: tower surface relief and collar.
-8. **S-picker [Sonnet] IN FLIGHT (Sonnet, 2026-10-14):** keep the globe on every screen size. On phones a swipe-up sheet over the globe lists the sites (one site-list component). Remove redundant globe instances only if the sheet covers them.
+8. **S-picker [Sonnet] DONE 2026-10-14 (b39aecf):** keep the globe on every screen size. On phones a swipe-up sheet over the globe lists the sites (one site-list component). Remove redundant globe instances only if the sheet covers them.
 9. **S-tiers [Sonnet]** (brief `.cache/claude/visual/1497`): merge Ultra into High after a golden comparison; migrate saved `ultra` to High.
 10. **V-rewards-look [Haiku capture, Sonnet judge]:** S-rewards merged without visual review (Codex cannot render). Capture the Journal cosmetics picker, each sub paint/decal and photo frame on phone and desktop; judge against the rubric; fix.
 11. **S-daily [Haiku]:** shorter wording for the Daily Dive Home card, briefing and debrief (mechanics stay).

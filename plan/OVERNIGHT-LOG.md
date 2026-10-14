@@ -1029,3 +1029,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed:** Sonnet S-hud (hud-layout.css 697 to 301 lines, regions grid, Pause in the bar, desktop sonar legend dropped; phone shots read clean). Smoke + project-base green on branch and main; targeted e2e batches in the progress note, no full e2e.
 - **Problems:** Codex 1740/1750/1760 were stopped by the watchdog at 2% 5h with uncommitted work in their worktrees (not collected). Queue 1770/1780/1790 waiting. Eight hud-touch "animal guidance placement" specs plus d-modes, d-shell, d-sonar fail identically on main; they need a repair item.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-14 12:54 CDT headless run (Claude)
+
+- **Merged and pushed:** Sonnet S-picker (globe full size on narrow screens, swipe-up site sheet over it, one list component; phone shots read clean). Smoke + project-base green on main; targeted globe/title/hud-touch specs passed on the branch; no full e2e.
+- **Running:** Codex 1770 S-tests verify, 1780 R-release-ci, 1790 bug hunt 4. Queued 1800 spec repair (d-modes, d-shell, d-sonar, eight hud-touch animal-guidance tests) and resume briefs 1840/1850/1860 for the watchdog-stopped 1740/1750/1760 (uncommitted work in their worktrees; 1760 diff is 191 files, to be reviewed for churn).
+- **Not done:** no second Claude package (Claude 5h at ~46% after S-picker). No tag; f53 waits for green hosted CI.
+- **Needs owner:** real-phone play of the newest build (now includes the phone site sheet).
