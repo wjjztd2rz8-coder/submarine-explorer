@@ -28,6 +28,7 @@ for (const layout of ['desktop', 'portrait'] as const) {
             window.__game as {
               sonar: {
                 canvas: HTMLCanvasElement;
+                root: HTMLElement;
                 base: HTMLCanvasElement;
                 relief: {
                   minDepthM: number;
@@ -58,7 +59,7 @@ for (const layout of ['desktop', 'portrait'] as const) {
             coloured,
             lime,
             colours: colours.size,
-            cssWidth: parseFloat(map.canvas.style.width),
+            cssWidth: parseFloat(map.root.style.getPropertyValue('--map-w')),
             canvasWidth: map.canvas.width,
             rasterWidth: map.base.width,
           };

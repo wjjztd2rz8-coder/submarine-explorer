@@ -1170,7 +1170,8 @@ freshTest.describe('projected submarine clearance', () => {
     page,
   }) => {
     await boot(page, 'mission=monterey-canyon');
-    await expect(page.locator('.objectives-panel')).toBeVisible();
+    // Phones name the objective in the guidance slot; the panel only shows its completion banner.
+    await expect(page.locator('.objectives-panel')).toBeHidden();
     await expect(page.locator('.guidance-slot[data-step]')).toBeVisible();
     await expectClearLayout(page);
   });
