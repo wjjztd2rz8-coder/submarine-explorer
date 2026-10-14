@@ -224,9 +224,7 @@ for (const layout of [
       ).toBeVisible();
     });
 
-    test('animal hint waits for the scan card and fades on the first actual move', async ({
-      page,
-    }) => {
+    test('an animal in range is named by the scan card, with no separate tip', async ({ page }) => {
       await pauseClockBeforeNavigation(page);
       await page.addInitScript(() => {
         localStorage.setItem(
@@ -269,32 +267,23 @@ for (const layout of [
         return animal !== null;
       });
       expect(spawned).toBe(true);
-      const hint = page.locator(GUIDANCE.hint);
-      // The opening scan card holds the slot, so the animal hint waits behind it.
-      await expect(page.locator(GUIDANCE.scan)).toBeVisible();
-      for (let frame = 0; frame < 40; frame++) await page.clock.fastForward(250);
-      await expect(hint).toBeHidden();
-      await page.evaluate(() =>
-        (window.__game as unknown as Game).discovery.overlay.setSuppressed(true),
-      );
+      // An animal in range is announced by the scan card itself, so the separate
+      // "Animal nearby" tip stays out of the slot (it would only repeat the card).
       await clockFramesUntil(
         page,
         () =>
           document
-            .querySelector('.guidance-slot[data-kind="hint"]:not([data-step])')
-            ?.textContent?.includes('Animal nearby') === true,
+            .querySelector('.guidance-slot[data-kind="scan"]')
+            ?.textContent?.includes('Lobate comb jelly') === true,
         250,
       );
-      await expect(hint).toBeVisible();
+      await expect(page.locator(GUIDANCE.scan)).toBeVisible();
+      await expect(page.locator(GUIDANCE.hint)).toBeHidden();
       await reviewShot(page, `${layout.name}-animal-hint`);
       await withClockFrames(page, () => hold(page, layout.touch, '.tc-stick', 'KeyW', 0));
       await page.clock.fastForward(250);
-      await expect(hint).toBeHidden();
-      await page.evaluate(() =>
-        (window.__game as unknown as Game).discovery.overlay.setSuppressed(false),
-      );
+      await expect(page.locator(GUIDANCE.hint)).toBeHidden();
       await page.clock.fastForward(250);
-      await expect(page.locator(GUIDANCE.scan)).toBeVisible();
       await expectObjectiveGuidance(page, layout.touch);
       await reviewShot(page, `${layout.name}-after-move`);
     });
