@@ -227,6 +227,10 @@ export class Journal {
     return this.trap.active;
   }
 
+  get isTop(): boolean {
+    return this.trap.isTop;
+  }
+
   get spoilers(): boolean {
     return this.spoilers_;
   }

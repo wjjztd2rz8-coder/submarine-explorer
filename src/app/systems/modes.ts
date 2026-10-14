@@ -38,7 +38,6 @@ export const modesSystem: GameSystem = {
       ctx.sonar.setSensorRange(effective.sensor.sonarPoiRange);
       ctx.presets.setCurrentMode(effective.currentMode);
       ctx.hud.setCurrentMode(effective.currentMode);
-      ctx.waypoints.setVisualHints(effective.gameplay.visualHints);
       for (const poi of ctx.discovery.pois) {
         const radius = ctx.baseScanRadii.get(poi.id);
         if (radius !== undefined) poi.radius = radius * effective.sensor.scanRadiusMultiplier;

@@ -130,7 +130,7 @@ describe('Journal gamepad input through the freeze gate', () => {
     });
     try {
       const input = new Input({ storage: null });
-      const guide = { isOpen: false };
+      const guide = { isOpen: false, isTop: true };
       const update = vi.fn();
       const ctx = {
         discovery: { guide, update, scanner: { setObjective: vi.fn() } },

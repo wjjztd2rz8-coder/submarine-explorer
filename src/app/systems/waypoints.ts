@@ -47,7 +47,6 @@ export const waypointsSystem: GameSystem = {
     }
     cleanup.add(
       save.onChange((next, changed) => {
-        if (changed.includes('reduceMotion')) waypoints.setReducedMotion(next.reduceMotion);
         if (changed.includes('sonarPalette')) waypoints.setPalette(next.sonarPalette);
       }),
     );
