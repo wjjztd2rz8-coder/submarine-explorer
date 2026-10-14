@@ -348,9 +348,9 @@ export function debriefText(
     };
   }
   if (reason === 'all')
-    return { title: 'Mission complete', subtitle: `Every objective · ${tally}` };
+    return { title: 'All objectives complete', subtitle: `Every objective · ${tally}` };
   if (primaryComplete) {
-    return { title: 'Mission complete', subtitle: `All primary objectives · ${tally}` };
+    return { title: 'Primaries complete', subtitle: `All primary objectives · ${tally}` };
   }
   // Partial dive: warm, not a failure. The tally cell carries the numbers.
   const line =

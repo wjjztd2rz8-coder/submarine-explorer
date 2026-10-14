@@ -95,7 +95,7 @@ export class Discovery {
     });
 
     this.disposers.push(
-      bus.on('scan:complete', (e) => this.onComplete(e.poiId, e.firstTime)),
+      bus.on('scan:complete', (e) => this.onComplete(e.landmarkId, e.poiId, e.firstTime)),
       bus.on('mission:restart', () => this.resetDive()),
       bus.on('landmarks:loaded', ({ landmarks }) => {
         const l = landmarks.find((x) => x.id === landmarkId);
@@ -182,10 +182,16 @@ export class Discovery {
     this.stats.reset();
   }
 
-  private onComplete(poiId: string, firstTime: boolean): void {
-    const poi = this.pois.find((p) => p.id === poiId);
+  private onComplete(landmarkId: string, poiId: string, firstTime: boolean): void {
+    const target = [
+      ...this.scanner.getTargets(),
+      ...this.scanner.getExtraTargets(),
+      ...this.scanner.getSupplementalTargets(),
+    ].find((t) => t.landmarkId === landmarkId && t.id === poiId);
+    if (!target) return;
+    this.stats.noteScan(poiId, target.discoveryName ?? target.name, landmarkId);
+    const poi = this.pois.find((p) => p.landmarkId === landmarkId && p.id === poiId);
     if (!poi) return;
-    this.stats.noteScan(poi.id, poi.name);
     const entryId = entryIdForPoi(poi, this.entries);
     const before = this.unlocked;
     this.unlocked = this.unlockedSet();
@@ -203,9 +209,9 @@ export class Discovery {
   }
 
   /**
-   * F2-LIFE: an animal was scanned. Not a POI, so objectives and the debrief's
-   * scan list are untouched; it adds a Journal entry (the store already holds
-   * the discovery) and shows the same confirmation banner.
+   * Wildlife and secrets use the same per-dive scan list as POIs. Their
+   * listeners add a Journal entry and show the revealed name in the banner;
+   * mission objectives are unaffected.
    */
   onLifeScan(title: string, firstTime: boolean, entryId: string): void {
     if (firstTime) this.stats.noteNewEntry(entryId, title);

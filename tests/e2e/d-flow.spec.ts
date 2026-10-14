@@ -236,7 +236,7 @@ test.describe('D-FLOW dive flow', () => {
       completed: 3,
       total: 4,
     });
-    await expect(debrief.locator('.debrief-title')).toHaveText('Mission complete');
+    await expect(debrief.locator('.debrief-title')).toHaveText('Primaries complete');
     await expect(debrief.locator('.debrief-next')).toHaveText(
       'Next: Finish the remaining objectives for 2 stars.',
     );

@@ -35,6 +35,39 @@ class Element extends EventTarget {
 
 afterEach(() => vi.unstubAllGlobals());
 
+it.each([0, 1, 5, 6])('renders %s scans from the per-dive discovery list', (count) => {
+  const body = new Element();
+  vi.stubGlobal('HTMLElement', Element);
+  vi.stubGlobal('window', new EventTarget());
+  vi.stubGlobal('document', { body, activeElement: body, createElement: () => new Element() });
+  const debrief = new Debrief();
+  try {
+    debrief.show({
+      elapsedS: 60,
+      distanceM: 20,
+      maxDepthM: 100,
+      discoveries: Array.from({ length: count }, (_, i) => ({
+        poiId: `target-${i}`,
+        name: `Target ${i}`,
+      })),
+      newEntries: [],
+      objectives: { completed: 3, total: 4 },
+    });
+    const panel = (debrief.root as unknown as Element).children[0];
+    const score = panel.children.find((el) => el.className.includes('debrief-score'))!;
+    const scans = score.children.find((el) => el.dataset.field === 'discoveries')!;
+    expect(scans.children.map((el) => el.textContent)).toEqual([
+      String(count),
+      count === 1 ? ' scan' : ' scans',
+    ]);
+    expect(
+      score.children.find((el) => el.dataset.field === 'objectives')!.children[0].textContent,
+    ).toBe('3 of 4');
+  } finally {
+    debrief.dispose();
+  }
+});
+
 it('switches the primary and quiet actions after the first scan without stale More state', () => {
   const body = new Element();
   vi.stubGlobal('HTMLElement', Element);
