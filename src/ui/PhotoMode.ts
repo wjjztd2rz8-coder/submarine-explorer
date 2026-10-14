@@ -106,7 +106,8 @@ export class PhotoMode {
     actions.append(capture, exit, pause);
     bottom.append(this.tips, actions);
 
-    this.root.append(this.flash, top, this.toastEl, bottom);
+    top.append(this.toastEl);
+    this.root.append(this.flash, top, bottom);
     parent.append(this.root);
     this.trap = new FocusTrap(this.root, { onEscape: onExit });
   }

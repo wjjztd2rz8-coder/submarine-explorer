@@ -24,7 +24,12 @@
  */
 
 import { el } from './dom.js';
-import { COSMETIC_CHOICES, cosmeticRequirement, type CosmeticSlot } from '../game/Cosmetics.js';
+import {
+  COSMETIC_CHOICES,
+  cosmeticRequirement,
+  discoveryCount,
+  type CosmeticSlot,
+} from '../game/Cosmetics.js';
 import type { Progress } from '../game/Progress.js';
 
 import type { GameEvents } from '../core/EventBus.js';
@@ -695,14 +700,26 @@ export class Journal {
     return ul;
   }
 
-  /** A single picker in the existing Journal front page; choices apply on the next dive. */
+  /** A single picker in the existing Journal front page; sub choices apply on the next dive. */
   private renderCosmetics(): void {
     const progress = this.progress;
     if (!progress) return;
+    const found = discoveryCount(progress.snapshot());
+    const next = Math.min(
+      ...Object.values(COSMETIC_CHOICES).flatMap((defs) =>
+        defs.flatMap(({ reward }) =>
+          reward.kind === 'discoveries' && reward.total > found ? [reward.total] : [],
+        ),
+      ),
+    );
     const section = el('details', 'jr-category');
     section.append(el('summary', 'jr-group', 'Cosmetics'));
     section.append(
-      el('p', 'jr-empty', 'Unlocked by discoveries. Sub choices apply on your next dive.'),
+      el(
+        'p',
+        'jr-empty',
+        `${found} discoveries${Number.isFinite(next) ? ` · next unlock at ${next}` : ''} · applies next dive`,
+      ),
     );
     for (const [slot, label] of [
       ['paint', 'Sub paint'],
@@ -710,8 +727,16 @@ export class Journal {
       ['decal', 'Sub decal'],
       ['frame', 'Photo frame'],
     ] as const) {
-      const row = el('label', 'jr-group', label);
+      const row = el('label', 'jr-group jr-cosmetic', label);
       const select = el('select', 'jr-nav-item');
+      const swatch = el('span', 'jr-swatch');
+      const tint = (id: string): string => {
+        const def: { id: string; swatch?: string; color?: unknown } | undefined = COSMETIC_CHOICES[
+          slot
+        ].find((choice) => choice.id === id);
+        const color = def?.swatch ?? def?.color;
+        return typeof color === 'string' ? color : 'transparent';
+      };
       select.setAttribute('aria-label', label);
       select.dataset.cosmetic = slot;
       select.disabled = progress.save.readOnly;
@@ -727,10 +752,14 @@ export class Journal {
         select.append(option);
       }
       select.value = progress.cosmetics[slot];
-      select.addEventListener('change', () =>
-        progress.selectCosmetic(slot as CosmeticSlot, select.value),
-      );
-      row.append(select);
+      swatch.style.background = tint(select.value);
+      select.addEventListener('change', () => {
+        progress.selectCosmetic(slot as CosmeticSlot, select.value);
+        swatch.style.background = tint(select.value);
+      });
+      const pick = el('span', 'jr-cosmetic-pick');
+      pick.append(swatch, select);
+      row.append(pick);
       section.append(row);
     }
     this.body.append(section);
