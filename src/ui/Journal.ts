@@ -355,6 +355,7 @@ export class Journal {
     this.opened = true;
     this.revealView();
     // Reveal the scroll container before rendering/resetting its scroll position.
+    if (!this.trap.active && typeof document !== 'undefined') document.exitPointerLock?.();
     this.trap.show();
     this.render();
     // A newly focused scan must start at its heading, not the previous entry's scroll.

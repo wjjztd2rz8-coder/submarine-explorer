@@ -541,6 +541,7 @@ describe('migrated modal consumers', () => {
     const opener = element();
     opener.focus();
     journal.open();
+    expect(document.exitPointerLock).toHaveBeenCalledOnce();
     expect(active()).toBe(body);
     journal.open();
     expect(document.exitPointerLock).toHaveBeenCalledOnce();
