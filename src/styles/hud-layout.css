@@ -228,8 +228,8 @@
     top: calc(58px + env(safe-area-inset-top, 0px));
   }
   html.is-touch .scan-overlay .guidance-slot {
-    padding: 6px 10px 6px 6px;
-    gap: 10px;
+    padding: 5px 8px;
+    gap: 8px;
   }
   html.is-touch .scan-overlay .guidance-ring {
     width: 40px;
