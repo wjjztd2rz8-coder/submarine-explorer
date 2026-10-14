@@ -75,27 +75,28 @@
   overscroll-behavior: contain;
 }
 .mode-advanced-field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 5px 8px;
   min-width: 0;
   font-size: 13px;
 }
 .mode-advanced-field small {
+  grid-column: 1 / -1;
   color: #c3d5da;
   line-height: 1.4;
 }
+/* A text-sized checkbox on the label's line, not a tap-sized square. */
 .mode-selector .mode-advanced-field input[role='switch'] {
-  min-height: 44px;
-  min-width: 44px;
-  max-width: 100%;
-  width: 100%;
-  padding: 8px;
-  color: #e9fbfc;
-  background: #0a2735;
-  border: 1px solid #456976;
-  border-radius: 4px;
-  font: inherit;
+  width: 16px;
+  height: 16px;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: #8affeb;
+  cursor: pointer;
 }
 .mode-advanced-toggle:focus-visible,
 .mode-advanced-field input[role='switch']:focus-visible {

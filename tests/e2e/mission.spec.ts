@@ -156,12 +156,12 @@ test.describe('B3 mission flow', () => {
     );
     const off = Math.abs(((brg - heading + 540) % 360) - 180);
     expect(off).toBeLessThan(15);
-    // RNG is slant range: Arcade opens on a composed approach (tens of metres
-    // from the set piece); the classic near-site offset is 350-600 m.
-    await expect(panel.locator('.obj-nav-range')).toHaveText(/RNG (\d{2,3}) m/);
-    const rng = Number(
-      ((await panel.locator('.obj-nav-range').textContent()) ?? '').replace(/\D/g, ''),
-    );
+    // The range is the waypoint label's slant range (the nav line keeps bearing and
+    // depth): Arcade opens on a composed approach (tens of metres from the set piece);
+    // the classic near-site offset is 350-600 m.
+    const edge = page.locator('.d-scan-edge-info');
+    await expect(edge).toHaveText(/^\d{2,3} m · [↑↓]\d+ m/);
+    const rng = Number.parseInt((await edge.textContent()) ?? '', 10);
     expect(rng).toBeGreaterThanOrEqual(40);
     expect(rng).toBeLessThan(700);
 

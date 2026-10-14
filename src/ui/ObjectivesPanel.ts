@@ -20,8 +20,6 @@ export interface NavReadout {
   primary: boolean;
   /** 0 = north, 90 = east. */
   bearingDeg: number;
-  /** 3D slant range, metres: `RNG`, the same metric the scan panel shows (QA-B #11). */
-  rangeM: number;
   /** Target depth, positive metres. */
   depthM: number;
   /** Bearing minus current heading, -180..180 (+ = to starboard). */
@@ -36,10 +34,6 @@ export interface CompletionBanner {
   detail: string;
   onKeepExploring: () => void;
   onSurface: () => void;
-}
-
-export function formatRange(m: number): string {
-  return m >= 1000 ? `${(m / 1000).toFixed(2)} km` : `${Math.round(m)} m`;
 }
 
 /** "AHEAD" inside ±`aheadDeg`, else e.g. "35° STBD" / "120° PORT". */
@@ -106,6 +100,8 @@ export class ObjectivesPanel {
   private readonly bannerStars: HTMLElement;
   private banner: CompletionBanner | null = null;
   private wanted = true;
+  /** The guidance card is showing, so the hint line stays down. */
+  private guided = false;
   private readonly navText = new Map<string, HTMLSpanElement>();
   private readonly cache = new Map<string, string>();
 
@@ -118,7 +114,7 @@ export class ObjectivesPanel {
     this.navEl = el('div', 'obj-nav');
     this.listEl = el('div', 'obj-list');
     this.hintEl = el('div', 'obj-hint');
-    for (const f of ['target', 'bearing', 'range', 'depth', 'turn']) {
+    for (const f of ['target', 'bearing', 'depth', 'turn']) {
       const span = el('span', `obj-nav-${f}`);
       this.navText.set(f, span);
       this.navEl.append(span);
@@ -158,6 +154,21 @@ export class ObjectivesPanel {
   setVisible(visible: boolean): void {
     this.wanted = visible;
     this.sync();
+  }
+
+  /** True when the nav line on screen names `name` (its bearing and range then cover the waypoint label). */
+  showsTarget(name: string): boolean {
+    return (
+      !this.root.hidden &&
+      (this.navText.get('target')?.textContent ?? '').toLowerCase().includes(name.toLowerCase())
+    );
+  }
+
+  /** Hide the hint line while the guidance card carries an instruction; it returns when the card empties. */
+  setGuided(guided: boolean): void {
+    if (this.guided === guided) return;
+    this.guided = guided;
+    this.hintEl.hidden = guided || !this.hintEl.textContent;
   }
 
   /** Phones show only the completion banner; the guidance slot names the objective. */
@@ -218,13 +229,12 @@ export class ObjectivesPanel {
     this.navEl.classList.toggle('is-done', allPrimaryDone);
     if (!nav) {
       t('target', allPrimaryDone ? 'ALL OBJECTIVES COMPLETE' : 'NO TARGET POSITION');
-      for (const f of ['bearing', 'range', 'depth', 'turn']) t(f, '');
+      for (const f of ['bearing', 'depth', 'turn']) t(f, '');
       return;
     }
     const prefix = nav.primary ? '→ ' : 'OPTIONAL → ';
     t('target', `${prefix}${nav.name.toUpperCase()}`);
     t('bearing', `BRG ${String(Math.round(nav.bearingDeg) % 360).padStart(3, '0')}°`);
-    t('range', `RNG ${formatRange(nav.rangeM)}`);
     t('depth', `DEPTH ${Math.round(nav.depthM).toLocaleString('en-US')} m`);
     t('turn', formatTurn(nav.relativeDeg));
   }
@@ -255,7 +265,7 @@ export class ObjectivesPanel {
     const more = sorted.length - shown.length;
     if (more > 0) this.listEl.append(el('div', 'obj-more', `+${more} more · Esc for all`));
     this.hintEl.textContent = current?.hint ?? '';
-    this.hintEl.hidden = !current?.hint;
+    this.hintEl.hidden = this.guided || !current?.hint;
   }
 
   private write(target: HTMLElement, key: string, text: string): void {

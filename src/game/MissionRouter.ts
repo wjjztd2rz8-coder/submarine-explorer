@@ -501,7 +501,6 @@ export class MissionRouter {
         name: t.name,
         primary: t.objective.primary,
         bearingDeg: t.bearingDeg,
-        rangeM: t.rangeM,
         depthM: t.depthM,
         relativeDeg: ((t.bearingDeg - headingDeg + 540) % 360) - 180,
       };

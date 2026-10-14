@@ -14,12 +14,7 @@ import {
 } from '../../game/MissionRouter.js';
 import { tileUrl } from '../../ui/MissionSelect.js';
 import type { GameSystem } from '../System.js';
-import {
-  MISSION_APPROACH_M,
-  missionApproachScanRadius,
-  spawnHeight,
-  spawnSettings,
-} from '../../game/Spawn.js';
+import { missionApproachScanRadius, spawnHeight, spawnSettings } from '../../game/Spawn.js';
 import { composedMissionSpawn } from '../../game/DeepOpeningSpawn.js';
 import { Disposables } from '../Disposables.js';
 
@@ -220,18 +215,16 @@ export const missionSystem: GameSystem = {
       if (first && original && target) {
         const distance = ctx.sub.position.distanceTo(target.position);
         const navigating = approachOpening && !first.complete && distance > target.radius;
-        const site = ctx.route!.landmarkId;
-        const destination = APPROACH_DESTINATIONS[site] ?? target.name;
+        const destination = APPROACH_DESTINATIONS[ctx.route!.landmarkId] ?? target.name;
         const title = navigating ? `Head to ${destination}` : original.title;
-        const hint = navigating
-          ? `Head to ${destination}, ${MISSION_APPROACH_M[site] ?? 220} m ahead.`
-          : original.hint;
-        if (first.title !== title || first.hint !== hint) {
+        if (first.title !== title) {
           first.title = title;
-          first.hint = hint;
           ctx.missionRouter!.panel.setObjectives(mission!.objectives);
         }
       }
+      // The objectives hint line and the guidance card never show at once: the hint
+      // returns when the card empties, so its text is never lost.
+      ctx.missionRouter?.panel.setGuided(ctx.guidance.visible);
       ctx.missionRouter?.update(f.clockDt, f.dt, ctx.sub.position, f.sub.headingDeg, f.sub);
     },
   },
