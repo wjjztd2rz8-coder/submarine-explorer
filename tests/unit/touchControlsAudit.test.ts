@@ -132,8 +132,7 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
     ]);
     scanner.setObjective('objective');
     const overlay = new ScanOverlay(makeConfig().scan);
-    const [panel, chip] = (overlay.messages as unknown as TouchElement).children;
-    const card = panel.children[1];
+    const card = (overlay.slot.root as unknown as TouchElement).children[1];
     const keys = { scan: 'G', guide: 'J' };
     const held = (down: boolean) => {
       if (device === 'touch') pointer(f.scan, down ? 'pointerdown' : 'pointerup', 1);
@@ -153,7 +152,7 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
       expect(card.children[2].textContent).toBe(
         `HOLD ${device === 'touch' ? 'SCAN' : 'G'} TO SCAN`,
       );
-      expect(chip.hidden).toBe(true);
+      expect(overlay.slot.kind).toBe('scan');
       held(true);
       tick(0.5);
       tick(0.5);
@@ -178,7 +177,8 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
       tick(0);
       expect(scanner.view.candidateId).toBeNull();
       expect(scanner.view.objectiveId).toBeNull();
-      expect(chip.hidden).toBe(true);
+      // No objective is left to name; only the logged-contact card may remain.
+      expect(card.children[0].textContent).not.toBe('OBJECTIVE');
     } finally {
       overlay.dispose();
       f.controls.dispose();
@@ -214,8 +214,7 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
     scanner.setExtraTargets([contact('life:fish', 20)]);
     scanner.setObjective('objective');
     const overlay = new ScanOverlay(makeConfig().scan);
-    const [panel, chip] = (overlay.messages as unknown as TouchElement).children;
-    const card = panel.children[1];
+    const card = (overlay.slot.root as unknown as TouchElement).children[1];
     const tick = (dt: number) => {
       scanner.update(dt, new Vector3(0, -100, 0), new Vector3(0, 0, -1), input.sample().scan);
       overlay.update(scanner.view, { scan: 'G', guide: 'J' }, null, dt);
@@ -233,7 +232,7 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
         expect(scanner.view.nearestId).toBe(id);
         expect(card.children[1].textContent).toBe(id);
         expect(scanner.view.progress).toBe(0.25);
-        expect(chip.hidden).toBe(true);
+        expect(overlay.slot.kind).toBe('scan');
         if (id !== 'objective') expect(scanner.view.objectiveId).toBeNull();
         tick(1.5);
         expect(scanner.isScanned('site', id)).toBe(true);
@@ -241,7 +240,7 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
       tick(2);
       expect(scanner.view.candidateId).toBeNull();
       expect(scanner.view.objectiveId).toBeNull();
-      expect(chip.hidden).toBe(true);
+      expect(card.children[0].textContent).not.toBe('OBJECTIVE');
       expect(complete.mock.calls).toEqual(
         ['objective', 'sample:rock', 'life:fish'].map((poiId) => [
           { poiId, landmarkId: 'site', firstTime: true },
@@ -478,8 +477,7 @@ it('scan instructions use on-screen controls on touch and key bindings on keyboa
     nearestDistance: 5,
     candidateId: 'bow',
   } as ScanView;
-  const messages = overlay.messages as unknown as TouchElement;
-  const hint = messages.children[0].children[1].children[2];
+  const hint = (overlay.slot.root as unknown as TouchElement).children[1].children[2];
   try {
     f.controls.setTouchMode(false);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
@@ -487,6 +485,9 @@ it('scan instructions use on-screen controls on touch and key bindings on keyboa
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(hint.textContent).toBe('HOLD SCAN TO SCAN');
+    // The scanned contact is no longer a target, so the result takes the slot.
+    Object.assign(view, { candidateId: null, nearestScanned: true });
+    overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     overlay.showComplete('Bow', true, { scan: 'G', guide: 'J' });
     expect(hint.textContent).toBe('PAUSE → JOURNAL');
     f.controls.setTouchMode(false);
@@ -524,8 +525,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     objectiveTurnDeg: 40,
     objectiveVertDeg: -20,
   } as ScanView;
-  const messages = overlay.messages as unknown as TouchElement;
-  const card = messages.children[0].children[1];
+  const card = (overlay.slot.root as unknown as TouchElement).children[1];
   const [kicker, name, hint] = [card.children[0], card.children[1], card.children[2]];
   try {
     f.controls.setTouchMode(false);
@@ -557,15 +557,14 @@ it('scan card guidance points at the mission objective, not the nearest contact'
   }
 });
 
-it('keeps the objective chip exclusive with in-range contacts and completion cards', () => {
+it('the standing objective yields to an in-range contact and to a completion card, then returns', () => {
   const f = fixture();
   const overlay = new ScanOverlay(makeConfig().scan);
   const scanner = new Scanner(makeConfig().scan, new EventBus(), {
     record: () => ({ firstTime: true }),
   });
   const view = scanner.view;
-  const messages = overlay.messages as unknown as TouchElement;
-  const [panel, chip] = messages.children;
+  const name = (overlay.slot.root as unknown as TouchElement).children[1].children[1];
   const keys = { scan: 'G', guide: 'J' };
   Object.assign(view, {
     objectiveId: 'stern',
@@ -575,9 +574,8 @@ it('keeps the objective chip exclusive with in-range contacts and completion car
   try {
     f.controls.setTouchMode(true);
     overlay.update(view, keys, null, 0);
-    expect(panel.hidden).toBe(true);
-    expect(chip.hidden).toBe(false);
-    expect(chip.textContent).toBe('▸ Stern section · 692 m');
+    expect(overlay.slot.kind).toBe('objective');
+    expect(name.textContent).toBe('Stern section');
     Object.assign(view, {
       nearestId: 'bow',
       nearestName: 'Bow',
@@ -586,53 +584,44 @@ it('keeps the objective chip exclusive with in-range contacts and completion car
       candidateId: 'bow',
     });
     overlay.update(view, keys, null, 0);
-    expect(panel.hidden).toBe(false);
-    expect(chip.hidden).toBe(true);
+    expect(overlay.slot.kind).toBe('scan');
     view.nearestInRange = false;
     view.candidateId = null;
     overlay.update(view, keys, null, 0);
-    expect(panel.hidden).toBe(true);
-    expect(chip.hidden).toBe(false);
+    expect(overlay.slot.kind).toBe('objective');
     overlay.showComplete('Bow', true, keys);
-    expect(panel.hidden).toBe(false);
-    expect(chip.hidden).toBe(true);
+    expect(overlay.slot.kind).toBe('discovery');
     overlay.update(view, keys, null, makeConfig().scan.completeBannerSeconds + 1);
-    expect(panel.hidden).toBe(true);
-    expect(chip.hidden).toBe(false);
+    expect(overlay.slot.kind).toBe('objective');
     view.objectiveId = null;
     overlay.update(view, keys, null, 0);
-    expect(chip.hidden).toBe(true);
-    view.objectiveId = 'stern';
-    f.controls.setTouchMode(false);
-    overlay.update(view, keys, null, 0);
-    expect(chip.hidden).toBe(true);
+    expect(overlay.slot.kind).toBeNull();
   } finally {
     overlay.dispose();
     f.controls.dispose();
   }
 });
 
-it('suppresses a visible objective chip immediately and restores it on the next unblocked update', () => {
+it('suppresses a visible objective immediately and restores it on the next unblocked update', () => {
   const f = fixture();
   const overlay = new ScanOverlay(makeConfig().scan);
   const scanner = new Scanner(makeConfig().scan, new EventBus(), {
     record: () => ({ firstTime: true }),
   });
   const view = scanner.view;
-  const chip = (overlay.messages as unknown as TouchElement).children[1];
   const keys = { scan: 'G', guide: 'J' };
   Object.assign(view, { objectiveId: 'stern', objectiveName: 'Stern section' });
   try {
     f.controls.setTouchMode(true);
     overlay.update(view, keys, null, 0);
-    expect(chip.hidden).toBe(false);
+    expect(overlay.slot.kind).toBe('objective');
     overlay.setSuppressed(true);
-    expect(chip.hidden).toBe(true);
+    expect(overlay.slot.kind).toBeNull();
     overlay.update(view, keys, null, 0);
-    expect(chip.hidden).toBe(true);
+    expect(overlay.slot.kind).toBeNull();
     overlay.setSuppressed(false);
     overlay.update(view, keys, null, 0);
-    expect(chip.hidden).toBe(false);
+    expect(overlay.slot.kind).toBe('objective');
   } finally {
     overlay.dispose();
     f.controls.dispose();
@@ -673,7 +662,7 @@ it('hides an anchored reticle behind visible touch controls and restores it afte
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
     expect(reticle.hidden).toBe(true);
-    expect(overlay.cardVisible).toBe(true);
+    expect(overlay.slot.visible).toBe(true);
     left = 300;
     overlay.update(view, { scan: 'G', guide: 'J' }, { x: 217, y: 794 }, 0);
     expect(reticle.hidden).toBe(false);
@@ -717,18 +706,16 @@ it('replaces the completion banner with the logged contact card even when a remo
     },
   ]);
   const keys = { scan: 'G', guide: 'J' };
-  const messages = overlay.messages as unknown as TouchElement;
-  const hint = messages.children[0].children[1].children[2];
+  const hint = (overlay.slot.root as unknown as TouchElement).children[1].children[2];
   bus.on('scan:complete', () => overlay.showComplete('Bow', true, keys));
   try {
     f.controls.setTouchMode(false);
     scanner.update(1, new Vector3(0, -100, 0), new Vector3(0, 0, -1), true);
     expect(hint.textContent).toBe('PRESS J · JOURNAL');
-    expect(overlay.bannerActive).toBe(true);
+    expect(overlay.slot.kind).toBe('discovery');
     scanner.update(0, new Vector3(0, -100, 0), new Vector3(0, 0, -1), false);
     overlay.update(scanner.view, keys, null, config.scan.completeBannerSeconds);
-    expect(overlay.bannerActive).toBe(false);
-    expect(overlay.cardVisible).toBe(true);
+    expect(overlay.slot.kind).toBe('objective');
     expect(hint.textContent).toBe('Logged · Journal');
     expect(scanner.view.completed).toBe(1);
   } finally {

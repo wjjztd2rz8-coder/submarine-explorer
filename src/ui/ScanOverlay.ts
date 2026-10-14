@@ -148,7 +148,9 @@ export class ScanOverlay {
     const scan = touch ? 'SCAN' : keys.scan;
     const none = { scan: null, objective: null };
     const hasTarget = view.nearestId !== null || view.activeId !== null;
-    if (!hasTarget && view.objectiveId === null) return none;
+    // A card is for a contact in range or a scan under way; the objective may stand alone.
+    const inContact = hasTarget && (view.phase !== 'idle' || view.nearestInRange);
+    if (!inContact && view.objectiveId === null) return none;
     const dist = Number.isFinite(view.nearestDistance)
       ? `${view.nearestDistance.toFixed(0)} m`
       : '';
@@ -163,6 +165,20 @@ export class ScanOverlay {
           ring: { progress: view.progress, label: `${Math.floor(view.progress * 100)}%` },
         },
         objective: null,
+      };
+    }
+    // A logged contact is standing information: it sits in the objective tier
+    // and gives way to everything above it.
+    if (view.nearestScanned && view.nearestInRange) {
+      return {
+        scan: null,
+        objective: {
+          kicker: '✓ SCANNED THIS DIVE',
+          text: view.nearestName,
+          detail: 'Logged · Journal',
+          tone: 'dim',
+          ring: { progress: 1, label: '✓' },
+        },
       };
     }
     if (view.phase === 'interrupted') {
@@ -208,10 +224,9 @@ export class ScanOverlay {
         objective: null,
       };
     }
-    // A scanned contact needs no more guidance; look onward.
-    const scanned = view.nearestScanned && view.nearestInRange;
     const objectiveReady = view.objectiveId === view.nearestId && view.nearestInRange;
-    if (view.objectiveId != null && view.objectiveName && !objectiveReady) {
+    // Phones have no objectives list, so the line stands; elsewhere it appears with a contact.
+    if (view.objectiveId != null && view.objectiveName && !objectiveReady && (touch || inContact)) {
       const turn = view.objectiveTurnDeg;
       const near = `CLOSE TO ${view.objectiveRadius.toFixed(0)} M`;
       return {
@@ -229,7 +244,7 @@ export class ScanOverlay {
         },
       };
     }
-    if (hasTarget && view.nearestInRange && !scanned) {
+    if (inContact) {
       return {
         scan: {
           kicker: 'SCAN TARGET',

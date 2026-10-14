@@ -6,35 +6,38 @@ import { EventBus } from '../../src/core/EventBus.js';
 import type { HintId } from '../../src/game/Hints.js';
 import type { Tutorial } from '../../src/game/Tutorial.js';
 import type { TutorialSave } from '../../src/game/TutorialSave.js';
-import type { TutorialCardActions } from '../../src/ui/TutorialCard.js';
 
-// Keep real tutorial, hint engine, save and system frame logic. Replace DOM
-// views only: these tests verify how actual card callbacks reach the toast.
-const views = vi.hoisted(() => ({
-  actions: null as TutorialCardActions | null,
-  card: { show: vi.fn(), dispose: vi.fn() },
-  chip: {
-    visible: false,
-    show: vi.fn(),
-    hide: vi.fn(),
-    fade: vi.fn(),
-    dispose: vi.fn(),
-  },
-}));
-vi.mock('../../src/ui/TutorialCard.js', async (original) => ({
-  ...(await original<typeof import('../../src/ui/TutorialCard.js')>()),
-  TutorialCard: class {
-    constructor(actions: TutorialCardActions) {
-      views.actions = actions;
-      return views.card;
-    }
-  },
-  HintChip: class {
-    constructor() {
-      return views.chip;
-    }
-  },
-}));
+// Keep real tutorial, hint engine, save and system frame logic. Replace the
+// guidance slot with a recorder: these tests verify what the system offers it
+// and how the Skip button reaches the tutorial.
+const views = vi.hoisted(() => {
+  const state = {
+    skip: null as (() => void) | null,
+    skipAll: () => {
+      for (let i = 0; i < 3; i += 1) state.skip?.();
+    },
+    /** Every hint or note text, with its lifetime when timed. */
+    chip: { show: vi.fn() },
+    offers: [] as Array<{ source: string; message: Record<string, unknown> | null }>,
+    guidance: {
+      visible: false,
+      setSkipHandler: (handler: (() => void) | null) => {
+        state.skip = handler;
+      },
+      notice: (text: string) => state.chip.show(text),
+      flash: (_source: string, _kind: string, message: { text: string }, seconds: number) =>
+        state.chip.show(message.text, seconds),
+      offer: (source: string, _kind: string, message: Record<string, unknown> | null) => {
+        state.offers.push({ source, message });
+      },
+    },
+  };
+  return state;
+});
+/** The latest tutorial message offered to the slot, or null when it was withdrawn. */
+const lastTutorial = () =>
+  views.offers.filter((o) => o.source === 'tutorial').at(-1)?.message ?? null;
+
 vi.mock('../../src/ui/ControlsCard.js', () => ({
   ControlsCard: class {
     device = 'keyboard';
@@ -50,13 +53,8 @@ afterEach(() => vi.unstubAllGlobals());
 
 function setup(seenHints: HintId[] = ['creature']) {
   vi.clearAllMocks();
-  views.chip.visible = false;
-  views.chip.show.mockImplementation(() => {
-    views.chip.visible = true;
-  });
-  views.chip.hide.mockImplementation(() => {
-    views.chip.visible = false;
-  });
+  views.offers.length = 0;
+  views.guidance.visible = false;
   const data = new Map([
     ['subexplorer.onboard.v1', JSON.stringify({ version: 1, tutorialDone: false, seenHints })],
   ]);
@@ -73,11 +71,8 @@ function setup(seenHints: HintId[] = ['creature']) {
     params: new URLSearchParams('tutorial=1'),
     settings: { reduceMotion: true },
     save: { onChange: () => () => {} },
-    discovery: {
-      loaded: true,
-      overlay: { messages: {}, cardVisible: false, promptActive: false },
-      guide: { isOpen: false },
-    },
+    guidance: views.guidance,
+    discovery: { loaded: true, guide: { isOpen: false } },
     props: { loaded: true },
     app: { state: 'dive' },
     photoMode: { active: false },
@@ -212,23 +207,18 @@ describe('onboarding completion through the system', () => {
     });
   }
 
-  it('the tutorial card never shows alongside an actionable scan card', () => {
-    const { ctx, system, tick, onboard } = setup();
+  it('keeps offering the tutorial step under a scan card; the slot decides what shows', () => {
+    const { system, tick, onboard } = setup();
     try {
       tick({ throttle: 1, yaw: 0, ballast: 0 }, 1);
       tick({ throttle: 0, yaw: 0, ballast: 1 }, 1);
       expect(onboard.tutorial.step?.id).toBe('scan');
-      // A dim navigation card leaves the tutorial up.
-      Object.assign(ctx.discovery.overlay, { cardVisible: true, promptActive: false });
+      views.guidance.visible = true;
       tick();
-      expect(views.card.show.mock.lastCall?.[0]).toBe(2);
-      Object.assign(ctx.discovery.overlay, { cardVisible: true, promptActive: true });
+      expect(lastTutorial()).toMatchObject({ step: 'scan', kicker: 'STEP 3 OF 3' });
+      views.guidance.visible = false;
       tick();
-      expect(views.card.show).toHaveBeenLastCalledWith(null);
-      expect(onboard.tutorial.step?.id).toBe('scan');
-      Object.assign(ctx.discovery.overlay, { cardVisible: false, promptActive: false });
-      tick();
-      expect(views.card.show.mock.lastCall?.[0]).toBe(2);
+      expect(lastTutorial()).toMatchObject({ step: 'scan' });
     } finally {
       system.dispose?.();
     }
@@ -278,7 +268,7 @@ describe('onboarding completion through the system', () => {
         ctx,
       );
     try {
-      views.actions!.skipAll();
+      views.skipAll();
       views.chip.show.mockClear();
       ctx.props.loaded = false;
       draw(1, -100);
@@ -314,7 +304,7 @@ describe('onboarding completion through the system', () => {
         ctx,
       );
     try {
-      views.actions!.skipAll();
+      views.skipAll();
       views.chip.show.mockClear();
       draw(1, -100);
       draw(18.999, -9900);
@@ -333,36 +323,20 @@ describe('onboarding completion through the system', () => {
       system.dispose?.();
     }
   });
-  it('960: passes the active device to the phone card after switching inputs', () => {
+  it('960: offers copy for the active device after switching inputs', () => {
     const { ctx, system, tick } = setup();
     try {
       tick();
-      expect(views.card.show).toHaveBeenLastCalledWith(
-        0,
-        'Hold G to move, then G or G to turn.',
-        'keyboard',
-      );
+      expect(lastTutorial()?.text).toBe('Hold G to move, then G or G to turn.');
       ctx.input.touchActive = true;
       tick();
-      expect(views.card.show).toHaveBeenLastCalledWith(
-        0,
-        'Push the left stick forward to move, then sideways to turn.',
-        'touch',
-      );
+      expect(lastTutorial()?.text).toBe('Push left stick forward; sideways to turn.');
       window.dispatchEvent(new Event('keydown'));
       tick();
-      expect(views.card.show).toHaveBeenLastCalledWith(
-        0,
-        'Hold G to move, then G or G to turn.',
-        'keyboard',
-      );
+      expect(lastTutorial()?.text).toBe('Hold G to move, then G or G to turn.');
       ctx.input.gamepadActive = true;
       tick();
-      expect(views.card.show).toHaveBeenLastCalledWith(
-        0,
-        'Use the left stick: up to move, sideways to turn.',
-        'gamepad',
-      );
+      expect(lastTutorial()?.text).toBe('Use the left stick: up to move, sideways to turn.');
     } finally {
       system.dispose?.();
     }
@@ -382,8 +356,8 @@ describe('onboarding completion through the system', () => {
         ctx,
       );
     try {
-      Object.assign(ctx.discovery.overlay, { cardVisible: true });
-      views.actions!.skipAll();
+      views.guidance.visible = true;
+      views.skipAll();
       views.chip.show.mockClear();
       draw(7);
       ctx.bus.emit('mission:started', { missionId: 'great-blue-hole', tileId: 'great-blue-hole' });
@@ -403,14 +377,14 @@ describe('onboarding completion through the system', () => {
   });
 
   it('880: hiding the scan card releases the deferred animal hint before eight seconds', () => {
-    const { ctx, system, tick, onboard } = setup([]);
+    const { system, tick, onboard } = setup([]);
     try {
-      Object.assign(ctx.discovery.overlay, { cardVisible: true });
-      views.actions!.skipAll();
+      views.guidance.visible = true;
+      views.skipAll();
       views.chip.show.mockClear();
       tick();
       expect(onboard.store.get().seenHints).toEqual([]);
-      Object.assign(ctx.discovery.overlay, { cardVisible: false });
+      views.guidance.visible = false;
       tick();
       expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
         'Animal nearby. Hold G to scan, or use G for a photo.',
@@ -425,9 +399,9 @@ describe('onboarding completion through the system', () => {
   it('880: delaying animal guidance never delays the low-battery safety hint', () => {
     const { ctx, system, tick, onboard } = setup([]);
     try {
-      Object.assign(ctx.discovery.overlay, { cardVisible: true });
+      views.guidance.visible = true;
       Object.assign(ctx.power.state, { enabled: true, battery: 0.2 });
-      views.actions!.skipAll();
+      views.skipAll();
       views.chip.show.mockClear();
       tick();
       expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
@@ -454,8 +428,8 @@ describe('onboarding completion through the system', () => {
         ctx,
       );
     try {
-      Object.assign(ctx.discovery.overlay, { cardVisible: true });
-      views.actions!.skipAll();
+      views.guidance.visible = true;
+      views.skipAll();
       views.chip.show.mockClear();
       draw(7.999);
       draw(20, true);
@@ -477,17 +451,16 @@ describe('onboarding completion through the system', () => {
     try {
       tick();
       expect(onboard.tutorial.active).toBe(true);
-      views.actions!.skipAll();
+      views.skipAll();
       tick();
       expect(onboard.tutorial.active).toBe(false);
       expect(onboard.store.get().tutorialDone).toBe(true);
       expect(JSON.parse(data.get('subexplorer.onboard.v1')!).tutorialDone).toBe(true);
-      expect(views.card.show).toHaveBeenLastCalledWith(null);
-      expect(views.chip.visible).toBe(true);
+      expect(lastTutorial()).toBeNull();
       expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
         'Nice work. The Controls guide is always in the Pause menu.',
       );
-      views.actions!.skipAll();
+      views.skipAll();
       tick();
       expect(views.chip.show).toHaveBeenCalledTimes(1);
     } finally {
@@ -499,22 +472,22 @@ describe('onboarding completion through the system', () => {
     const { system, tick, onboard } = setup();
     try {
       for (let index = 1; index < 3; index++) {
-        views.actions!.skipStep();
+        views.skip!();
         tick();
         expect(onboard.tutorial.index).toBe(index);
         expect(onboard.tutorial.active).toBe(true);
         expect(onboard.store.get().tutorialDone).toBe(false);
         expect(views.chip.show).not.toHaveBeenCalled();
       }
-      views.actions!.skipStep();
+      views.skip!();
       tick();
       expect(onboard.tutorial.finished).toBe(true);
       expect(onboard.store.get().tutorialDone).toBe(true);
-      expect(views.card.show).toHaveBeenLastCalledWith(null);
+      expect(lastTutorial()).toBeNull();
       expect(views.chip.show).toHaveBeenCalledExactlyOnceWith(
         'Nice work. The Controls guide is always in the Pause menu.',
       );
-      views.actions!.skipStep();
+      views.skip!();
       expect(views.chip.show).toHaveBeenCalledTimes(1);
     } finally {
       system.dispose?.();
@@ -530,14 +503,14 @@ describe('onboarding completion through the system', () => {
       ctx.bus.emit('scan:started', { poiId: 'test' });
       expect(onboard.tutorial.step?.id).toBe('scan');
       tick();
-      expect(views.card.show.mock.lastCall?.[1]).toContain('Scanning…');
+      expect(lastTutorial()?.text).toContain('Scanning…');
       ctx.bus.emit('scan:progress', { poiId: 'test', progress: 0.42 });
       tick();
-      expect(views.card.show.mock.lastCall?.[1]).toContain('42%');
+      expect(lastTutorial()?.text).toContain('42%');
       ctx.bus.emit('scan:aborted', { poiId: 'test', reason: 'released' });
       tick();
       expect(onboard.tutorial.step?.id).toBe('scan');
-      expect(views.card.show.mock.lastCall?.[1]).not.toContain('Scanning…');
+      expect(lastTutorial()?.text).not.toContain('Scanning…');
       ctx.bus.emit('scan:started', { poiId: 'test' });
       ctx.bus.emit('scan:complete', { poiId: 'test', landmarkId: 'titanic', firstTime: true });
       expect(onboard.tutorial.finished).toBe(true);
@@ -557,7 +530,7 @@ describe('onboarding completion through the system', () => {
     try {
       tick();
       expect(views.chip.show).not.toHaveBeenCalled();
-      views.actions!.skipAll();
+      views.skipAll();
       expect(views.chip.show).toHaveBeenLastCalledWith(
         'Nice work. The Controls guide is always in the Pause menu.',
       );
@@ -579,7 +552,7 @@ it('touch hints use visible button labels', () => {
   const { ctx, system, tick } = setup(['creature']);
   ctx.input.touchActive = true;
   try {
-    views.actions!.skipAll();
+    views.skipAll();
     views.chip.show.mockClear();
     tick(undefined, 61);
     expect(views.chip.show).not.toHaveBeenCalled();

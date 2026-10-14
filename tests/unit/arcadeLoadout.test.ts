@@ -90,9 +90,9 @@ function stubShell(ctx: GameContext): void {
   ctx.headlights = {
     setEnabled: vi.fn(),
   } as unknown as GameContext['headlights'];
+  ctx.guidance = { notice: vi.fn() } as unknown as GameContext['guidance'];
   ctx.hud = {
     root: { querySelector: () => null },
-    notice: vi.fn(),
     setHullNote: vi.fn(),
   } as unknown as GameContext['hud'];
   ctx.currents = {
@@ -144,7 +144,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
     it(`${mode}: selecting Surface does not queue a next-dive notice; explicit modes still do`, () => {
       const ctx = context('great-blue-hole', mode);
       const notice = vi.fn();
-      ctx.hud = { notice } as unknown as GameContext['hud'];
+      ctx.guidance = { notice } as unknown as GameContext['guidance'];
       const system = createSubmarineSystem();
       try {
         system.init?.(ctx);
@@ -278,7 +278,7 @@ describe('fresh-player mission routing and vehicle loadout', () => {
       ctx.sub.reset(0, -3780, 0);
       ctx.save.setGameplayMode('realistic');
       safeTicks(ctx);
-      expect(ctx.hud.notice).toHaveBeenCalledWith(
+      expect(ctx.guidance.notice).toHaveBeenCalledWith(
         'Hull and site access changes apply when you load your next dive.',
       );
       firstSubmarine.dispose?.();
