@@ -37,7 +37,7 @@ export function recordSonarCanvas() {
     createElement: (tag: string) => {
       const classes = new Set<string>();
       const element = {
-        style: {},
+        style: {} as Record<string, unknown>,
         dataset: {},
         children: [] as unknown[],
         width: 0,
@@ -64,10 +64,14 @@ export function recordSonarCanvas() {
         addEventListener: () => {},
         getContext: () => context,
       };
+      element.style.setProperty = (name: string, value: string) => {
+        element.style[name] = value;
+      };
       if (tag === 'canvas') canvases.push(element as unknown as HTMLCanvasElement);
       return element;
     },
-    body: { append: () => {} },
+    body: { append: () => {}, appendChild: (item: unknown) => item },
+    querySelector: () => null,
   } as unknown as Document;
   return { document, rasters, paths, labels, draws, canvases };
 }

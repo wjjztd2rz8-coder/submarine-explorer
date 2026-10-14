@@ -34,6 +34,9 @@ class TouchElement extends EventTarget {
     return child;
   }
   setAttribute(): void {}
+  querySelector(): null {
+    return null;
+  }
   setPointerCapture(): void {}
   remove(): void {}
   getBoundingClientRect() {
@@ -56,6 +59,7 @@ function fixture(canvasTouchAction = '', realInput?: Input) {
     body,
     hidden: false,
     documentElement: new TouchElement(),
+    querySelector: () => null,
     createElement: () => new TouchElement(),
     createElementNS: () => new TouchElement(),
   });
@@ -417,7 +421,7 @@ describe('touch control interruptions', () => {
         pointer(f.stick, 'pointerdown', 1);
         pointer(f.slider, 'pointerdown', 2, 60, 160);
         pointer(f.scan, 'pointerdown', 3);
-        const boost = (f.controls.root as unknown as TouchElement).children[5];
+        const boost = (f.controls.root as unknown as TouchElement).children[4];
         boost.dispatchEvent(new Event('click'));
         expect(f.input.touchBoost).toBe(true);
         expect(f.input.touchAxes.throttle).toBeGreaterThan(0.8);
