@@ -125,6 +125,35 @@ afterEach(() => {
 });
 
 describe('audio lifecycle', () => {
+  it('three dive-to-Home lifetimes silence audio and release voices, timers and visibility listeners', async () => {
+    vi.useFakeTimers();
+    const remove = vi.spyOn(doc, 'removeEventListener');
+    for (let i = 0; i < 3; i++) {
+      const audio = system();
+      audio.unlock();
+      await flush();
+      const ctx = context();
+      audio.update(creakFrame());
+      audio.setPaused(true);
+      await flush();
+      expect(audio.diagnostics.masterGain).toBe(0);
+      expect(ctx.state).toBe('suspended');
+      audio.dispose();
+      audio.dispose();
+      expect(ctx.close).toHaveBeenCalledOnce();
+      expect(ctx.state).toBe('closed');
+      for (const node of ctx.nodes) expect(node.connections).toEqual([]);
+      expect(vi.getTimerCount()).toBe(0);
+      const suspends = ctx.suspend.mock.calls.length;
+      visibility(true);
+      visibility(false);
+      audio.unlock();
+      expect(ctx.suspend).toHaveBeenCalledTimes(suspends);
+      expect(Context.instances).toHaveLength(i + 1);
+    }
+    expect(remove.mock.calls.filter(([type]) => type === 'visibilitychange')).toHaveLength(3);
+  });
+
   it('unlocks on the first gesture while paused and warms a source synchronously', async () => {
     const audio = system();
     audio.setPaused(true);

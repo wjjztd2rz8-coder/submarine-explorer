@@ -9,7 +9,9 @@ import { Globe } from '../../src/ui/Globe.js';
 import type { GlobeSite } from '../../src/ui/GlobeModel.js';
 import { Upgrades } from '../../src/ui/Upgrades.js';
 import { SettingsScreen } from '../../src/ui/Settings.js';
-import { Save, defaultSettings } from '../../src/core/Save.js';
+import { Save, ProgressSave, defaultSettings } from '../../src/core/Save.js';
+import { Progress as SavedProgress } from '../../src/game/Progress.js';
+import { DailySave } from '../../src/game/DailySave.js';
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { Input } from '../../src/core/Input.js';
 import { Briefing } from '../../src/ui/Briefing.js';
@@ -31,6 +33,10 @@ import { createPowerSystem } from '../../src/app/systems/power.js';
 import { parseMission } from '../../src/game/Mission.js';
 import titanicMission from '../../data/landmarks/titanic/mission.json';
 import { MissionRouter } from '../../src/game/MissionRouter.js';
+import { createPointerSystem } from '../../src/app/systems/pointer.js';
+import { createInputSystem } from '../../src/app/systems/input.js';
+import { createPhotoSystem } from '../../src/app/systems/photo.js';
+import { createDailySystem } from '../../src/app/systems/daily.js';
 
 /** The same small EventTarget/DOM approach as the shell and Home focus specs. */
 class Element extends EventTarget {
@@ -998,6 +1004,175 @@ describe('overlay policies across the app', () => {
 });
 
 describe('overlay host teardown', () => {
+  it('three Home/dive/Home shell lifetimes release input, modal ownership and Daily/photo timers', async () => {
+    vi.useFakeTimers();
+    try {
+      const doc = Object.assign(new EventTarget(), document);
+      vi.stubGlobal('document', doc);
+      Object.assign(window, {
+        setTimeout,
+        clearTimeout,
+        setInterval,
+        clearInterval,
+        matchMedia: () => ({ matches: false }),
+      });
+      const proto = Globe.prototype as unknown as { initGl(): void; resize(): void };
+      vi.spyOn(proto, 'initGl').mockImplementation(() => {});
+      vi.spyOn(proto, 'resize').mockImplementation(() => {});
+      vi.spyOn(Journal.prototype, 'load').mockResolvedValue();
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
+      const add = vi.spyOn(window, 'addEventListener');
+      const remove = vi.spyOn(window, 'removeEventListener');
+      for (let i = 0; i < 3; i++) {
+        const guide = new Journal();
+        const ctx = {
+          config: DEFAULT_CONFIG,
+          bus: new EventBus(),
+          index: [],
+          meta: { id: 'reef' },
+          route: null,
+          save: new Save({ config: DEFAULT_CONFIG, storage: null }),
+          progress: new SavedProgress(new ProgressSave(null)),
+          dailySave: new DailySave(null),
+          daily: null,
+          app: { state: 'home', lastSite: null },
+          params: new URLSearchParams(),
+          expose: vi.fn(),
+          journal: guide,
+          discoveries: { isDiscovered: () => false },
+          discovery: { guide, debrief: { isOpen: false } },
+          rig: { exitPhotoMode: vi.fn() },
+          canvas: html(element('CANVAS')),
+        } as unknown as GameContext;
+        const runner = new SystemRunner(ctx);
+        cleanup.push(() => {
+          runner.dispose();
+          guide.dispose();
+        });
+        runner.init([
+          shellSystem,
+          globeSystem,
+          createInputSystem(),
+          createDailySystem(),
+          createPhotoSystem(),
+          shellKeysSystem,
+        ]);
+        await Promise.all([ctx.globe.catalog, ctx.homeGlobe.catalog]);
+        expect(ctx.home.isOpen).toBe(true);
+        ctx.home.showSites(false);
+        press('Escape');
+        expect(ctx.home.sitesOpen).toBe(false);
+        ctx.setAppState('dive');
+        ctx.photoMode.setActive(true);
+        ctx.photoMode.toast('Saved to Journal');
+        ctx.photoMode.shutter();
+        expect(vi.getTimerCount()).toBe(3);
+        press('Escape');
+        expect(ctx.photoMode.active).toBe(false);
+        expect(ctx.app.state).toBe('dive');
+        press('Escape');
+        expect(ctx.pause.isOpen).toBe(true);
+        ctx.setAppState('home');
+        expect(ctx.home.isOpen).toBe(true);
+        runner.dispose();
+        guide.dispose();
+        expect(vi.getTimerCount()).toBe(0);
+        expect(press('Escape').defaultPrevented).toBe(false);
+        expect(body.querySelectorAll('.home-screen')).toHaveLength(0);
+        expect(body.querySelectorAll('.photo-mode')).toHaveLength(0);
+        const before = { ...ctx.input.state };
+        press('KeyW');
+        expect(ctx.input.sample()).toEqual(before);
+        expect(remove.mock.calls).toHaveLength(add.mock.calls.length);
+      }
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it.each(['settled', 'keyboard', 'pointer'] as const)(
+    'pointer teardown releases controls, DOM and pending locks (%s)',
+    async (pending) => {
+      const doc = Object.assign(new EventTarget(), document);
+      const remove = doc.removeEventListener.bind(doc);
+      doc.removeEventListener = (
+        type: string,
+        listener: EventListenerOrEventListenerObject | null,
+        options?: boolean | EventListenerOptions,
+      ) => remove(type, listener, typeof options === 'boolean' ? { capture: options } : options);
+      vi.stubGlobal('document', doc);
+      let resolve!: () => void;
+      const locked = new Promise<void>((done) => {
+        resolve = done;
+      });
+      const unlock = vi.fn();
+      vi.stubGlobal('navigator', { keyboard: { lock: vi.fn(() => locked), unlock } });
+      const canvas = html(element('CANVAS')) as HTMLCanvasElement;
+      let finishPointer!: () => void;
+      const pointerRequest = new Promise<void>((done) => {
+        finishPointer = done;
+      });
+      canvas.requestPointerLock = vi.fn(() => pointerRequest);
+      Object.assign(doc, { fullscreenElement: canvas, pointerLockElement: canvas });
+      const input = new Input({ storage: null });
+      input.setMouseLook(true);
+      const ctx = {
+        canvas,
+        input,
+        app: { state: 'dive' },
+        pause: { isOpen: false },
+        settingsScreen: { isOpen: false },
+        globe: { isOpen: false },
+        discovery: { guide: { isOpen: false }, debrief: { isOpen: false } },
+        photoMode: { active: false },
+        setAppState: vi.fn(),
+      } as unknown as GameContext;
+      const pointer = createPointerSystem();
+      cleanup.push(() => pointer.dispose?.());
+      pointer.init?.(ctx);
+      expect(body.querySelectorAll('.d3-pointer-look-hint')).toHaveLength(1);
+      expect(body.querySelectorAll('.hud-ctrl-tip')).toHaveLength(1);
+      const lock = ctx.keyboard.lock();
+      if (pending !== 'keyboard') {
+        resolve();
+        await lock;
+      }
+      if (pending === 'pointer') {
+        Object.assign(doc, { pointerLockElement: null });
+        input.setMouseLook(false);
+        input.setPointerLookPreference(true);
+        pointer.frame!['gate.pointer']!({ frozen: false } as FrameState, ctx);
+        const down = new Event('mousedown', { cancelable: true });
+        Object.defineProperty(down, 'button', { value: 0 });
+        canvas.dispatchEvent(down);
+        expect(canvas.requestPointerLock).toHaveBeenCalledOnce();
+      }
+      pointer.dispose?.();
+      expect(unlock).toHaveBeenCalled();
+      expect(doc.exitPointerLock).toHaveBeenCalledTimes(pending === 'pointer' ? 0 : 1);
+      expect(input.pointerLookActive).toBe(false);
+      expect(body.querySelectorAll('.d3-pointer-look-hint')).toHaveLength(0);
+      expect(body.querySelectorAll('.hud-ctrl-tip')).toHaveLength(0);
+      unlock.mockClear();
+      resolve();
+      await lock;
+      if (pending === 'keyboard') expect(unlock).toHaveBeenCalledOnce();
+      else expect(unlock).not.toHaveBeenCalled();
+      if (pending === 'pointer') {
+        Object.assign(doc, { pointerLockElement: canvas });
+        finishPointer();
+        await pointerRequest;
+        expect(doc.exitPointerLock).toHaveBeenCalledOnce();
+      }
+      const setMouseLook = vi.spyOn(input, 'setMouseLook');
+      doc.dispatchEvent(new Event('pointerlockchange'));
+      expect(setMouseLook).not.toHaveBeenCalled();
+      press('ControlLeft');
+      expect(ctx.setAppState).not.toHaveBeenCalled();
+      pointer.dispose?.();
+    },
+  );
+
   it('disposes both hosted Globes and their chooser ownership', async () => {
     const proto = Globe.prototype as unknown as { initGl(): void; resize(): void };
     vi.spyOn(proto, 'initGl').mockImplementation(() => {});
