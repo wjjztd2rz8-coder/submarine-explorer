@@ -15,20 +15,16 @@ const heroes = [
   { site: 'beebe-vent-field', poi: 'bvf-main-vents' },
   { site: 'monterey-canyon', poi: 'monterey-canyon-wall' },
 ];
-const hud = [
-  '.sonar',
-  '.objectives-panel',
-  '.hud-readouts',
-  '.tc-stick',
-  '.tc-slider',
-  '.tc-buttons',
-  '.tc-btn-pause',
-];
+// Phones have no objectives panel (the guidance slot carries the objective), so
+// callers add it only where it is on screen.
+const hud = ['.sonar', '.hud-readouts', '.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause'];
 
 // Sample visibility and all rectangles together, then poll for the ResizeObserver
 // and entrance animation to settle. Serial visibility calls cost a software-GPU
 // render apiece, repeated for every tutorial step, on hosted runners.
 async function separate(page: Page, selectors: string[]): Promise<void> {
+  if (await page.locator('.objectives-panel').isVisible())
+    selectors = [...selectors, '.objectives-panel'];
   await expect
     .poll(async () =>
       page.evaluate((selectors) => {
@@ -131,9 +127,7 @@ for (const viewport of [
             ).toBe(uiScale);
             if (phase === 'opening') {
               // The tutorial card defers to the scan card, so only one of them is up.
-              const scanUp = await page
-                .locator('.guidance-slot:not([data-tone="dim"])')
-                .isVisible();
+              const scanUp = await page.locator('.guidance-slot[data-kind="scan"]').isVisible();
               if (scanUp) await expect(page.locator('.guidance-slot[data-step]')).toBeHidden();
               const fresh = [...hud];
               if (await page.locator(GUIDANCE.any).isVisible()) fresh.push(GUIDANCE.any);
@@ -194,9 +188,7 @@ for (const viewport of [
             await expect(
               page.getByText('Something to scan is in range', { exact: false }),
             ).toBeHidden();
-            await expect(
-              page.locator('.guidance-slot[data-kind="hint"]:not([data-step])'),
-            ).not.toContainText(
+            await expect(page.locator('.guidance-slot')).not.toContainText(
               /Something to scan is in range|Face the target\. Hold .* to scan\./,
             );
             expect(
