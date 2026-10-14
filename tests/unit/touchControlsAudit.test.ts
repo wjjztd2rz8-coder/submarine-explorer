@@ -489,7 +489,7 @@ it('scan instructions use on-screen controls on touch and key bindings on keyboa
     Object.assign(view, { candidateId: null, nearestScanned: true });
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     overlay.showComplete('Bow', true, { scan: 'G', guide: 'J' });
-    expect(hint.textContent).toBe('PAUSE → JOURNAL');
+    expect(hint.textContent).toBe('OPEN JOURNAL');
     f.controls.setTouchMode(false);
     overlay.showComplete('Bow', true, { scan: 'G', guide: 'J' });
     expect(hint.textContent).toBe('PRESS J · JOURNAL');

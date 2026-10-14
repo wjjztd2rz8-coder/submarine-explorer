@@ -50,6 +50,7 @@ it('a held scan on the first resolved mission frame locks the objective before n
     })),
   );
   const ctx = {
+    app: { state: 'dive' },
     discovery: {
       scanner,
       guide: { isOpen: false },
@@ -151,6 +152,7 @@ it('guides optional objectives after primary completion and scans leftover conta
   mission.start('site');
   const settings = { gameplay: { visualHints: true } };
   const ctx = {
+    app: { state: 'dive' },
     discovery: { ready: Promise.resolve(), pois, scanner },
     settings,
     effective: resolveEffective(
@@ -222,6 +224,7 @@ it('Realistic retains its approach marker, then resumes normal waypoint preferen
   };
   const settings = { gameplay: { visualHints: false } };
   const ctx = {
+    app: { state: 'dive' },
     discovery: { ready: Promise.resolve(), pois: [], scanner: { setObjective: vi.fn() } },
     settings,
     effective: resolveEffective(

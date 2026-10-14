@@ -74,11 +74,10 @@ accessibility and UI-scale settings are independent of the gameplay mode.
 
 Every pilot starts with the full equipment kit. Hulls fit the dive's depth in every
 mode: Class A through 1,000 m (including Blue Hole), B through 6,500 m, and C
-through 11,000 m. There are no upgrade purchases, research-point rewards or
-RP access gates.
+through 11,000 m. Every site is open from the first dive.
 
-The Journal front page's **Cosmetics** picker selects sub paint, hull decals and
-photo frames. Unique scans of points of interest, wildlife and finds unlock them;
+The Journal front page's **Cosmetics** picker selects sub paint, lamp trims, hull
+decals and photo frames. Unique scans of points of interest, wildlife and finds unlock them;
 repeat discoveries do not count twice. Sub choices apply when the next dive's sub
 is built; photo frames are baked into new captures. Low quality retains its
 existing omission of hull decals. Samples and secrets appear together as Journal

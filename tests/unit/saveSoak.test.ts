@@ -1,3 +1,8 @@
+import { Progress } from '../../src/game/Progress.js';
+import { COSMETIC_CHOICES, type CosmeticSlot } from '../../src/game/Cosmetics.js';
+import spentKit from '../fixtures/legacy-save-spent-kit.json';
+import secretSample from '../fixtures/legacy-save-secret-sample.json';
+import heroStars from '../fixtures/legacy-save-hero-stars.json';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import {
@@ -503,3 +508,55 @@ it('migrates every retired gameplay field through repeated edits and reloads whi
     }
   }
 });
+
+it.each([spentKit, secretSample, heroStars])(
+  'round trips saves serialized by legacy runtime $source_commit without losing earned data',
+  ({ records }) => {
+    const storage = new MemoryStorage();
+    for (const [key, record] of Object.entries(records))
+      storage.setItem(key, JSON.stringify(record));
+    const original = records[PROGRESS_STORAGE_KEY];
+    const discoveriesBefore = new DiscoveryStore(storage).snapshot();
+    const dailyBefore = new DailySave(storage).get();
+    const discoveryBytes = storage.getItem(DISCOVERY_STORAGE_KEY);
+    const dailyBytes = storage.getItem(DAILY_STORAGE_KEY);
+    let progress = new Progress(new ProgressSave(storage));
+    const migrated = progress.snapshot();
+    expect(migrated).toMatchObject({
+      version: 2,
+      points: original.points,
+      lifetime: original.lifetime,
+      upgrades: original.upgrades,
+      ratings: original.ratings,
+      awarded: original.awarded,
+      dailyBestStreak: original.dailyBestStreak,
+      cosmetics: original.cosmetics,
+    });
+    for (const slot of ['paint', 'trim'] as const) {
+      const choice = COSMETIC_CHOICES[slot].find((def) => def.id === original.cosmetics[slot])!;
+      expect(progress.ownsCosmetic(choice)).toBe(true);
+    }
+    for (let round = 0; round < 3; round++) {
+      for (const slot of Object.keys(COSMETIC_CHOICES) as CosmeticSlot[])
+        for (const choice of COSMETIC_CHOICES[slot])
+          if (progress.ownsCosmetic(choice)) {
+            expect(progress.selectCosmetic(slot, choice.id)).toBe(true);
+            progress = new Progress(new ProgressSave(storage));
+            expect(progress.cosmetics[slot]).toBe(choice.id);
+          }
+      const { cosmetics: _selected, ...retained } = progress.snapshot();
+      const { cosmetics: _original, ...expected } = migrated;
+      expect(retained).toEqual(expected);
+    }
+    expect(storage.getItem(DISCOVERY_STORAGE_KEY)).toBe(discoveryBytes);
+    expect(storage.getItem(DAILY_STORAGE_KEY)).toBe(dailyBytes);
+    expect(new DiscoveryStore(storage).snapshot()).toEqual(discoveriesBefore);
+    expect(new DailySave(storage).get()).toEqual(dailyBefore);
+    expect(discoveriesBefore.discovered['titanic/secret:find-1'].count).toBe(2);
+    expect(discoveriesBefore.discovered).toHaveProperty('titanic/sample:sample-1');
+    new DailySave(storage).complete('2026-10-14');
+    expect(new DailySave(storage).get().streak).toBe(dailyBefore.streak + 1);
+    const reload = new Progress(new ProgressSave(storage));
+    expect(reload.snapshot()).toEqual(progress.snapshot());
+  },
+);

@@ -1,3 +1,4 @@
+import { PHOTO_FRAMES } from '../../src/game/Cosmetics.js';
 import { PerspectiveCamera, Vector3 } from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { canvasThumbnail } from '../../src/ui/PhotoMode.js';
@@ -188,6 +189,31 @@ it('bakes only the selected cosmetic frame into a new capture and keeps stock ca
     expect(context.drawImage).toHaveBeenLastCalledWith(source, 0, 0, 640, 360);
     expect(context.strokeStyle).toBe('#d4b46b');
     expect(context.strokeRect).toHaveBeenCalledExactlyOnceWith(4, 4, 632, 352);
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});
+
+it.each(PHOTO_FRAMES)('captures the selected $id photo frame', (frame) => {
+  const context = { drawImage: vi.fn(), strokeRect: vi.fn(), strokeStyle: '', lineWidth: 0 };
+  const output = {
+    width: 0,
+    height: 0,
+    getContext: () => context,
+    toDataURL: () => 'data:image/jpeg;base64,capture',
+  };
+  vi.stubGlobal('document', { createElement: () => output });
+  try {
+    canvasThumbnail(
+      { width: 1280, height: 720 } as HTMLCanvasElement,
+      undefined,
+      undefined,
+      frame.id,
+    );
+    if (frame.color) {
+      expect(context.strokeStyle).toBe(frame.color);
+      expect(context.strokeRect).toHaveBeenCalledExactlyOnceWith(4, 4, 632, 352);
+    } else expect(context.strokeRect).not.toHaveBeenCalled();
   } finally {
     vi.unstubAllGlobals();
   }

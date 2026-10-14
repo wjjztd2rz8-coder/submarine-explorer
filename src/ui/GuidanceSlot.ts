@@ -19,6 +19,8 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 interface Entry extends GuidanceOffer {
   /** Seconds left for a timed offer; Infinity for a standing one. */
   left: number;
+  /** Age of the topic; detail updates do not restart its brief priority over ready contacts. */
+  age: number;
 }
 
 export class GuidanceSlot {
@@ -35,6 +37,7 @@ export class GuidanceSlot {
   private readonly entries = new Map<string, Entry>();
   private readonly cache = new Map<string, string>();
   private serial = 0;
+  private suppressed = false;
   private skipHandler: (() => void) | null = null;
   private shown: { kind: GuidanceKind; message: GuidanceMessage } | null = null;
 
@@ -120,6 +123,17 @@ export class GuidanceSlot {
     this.set(source, kind, message, seconds);
   }
 
+  /** Covering play discards all guidance; resumed sources must offer their current state. */
+  setSuppressed(suppressed: boolean): void {
+    this.suppressed = suppressed;
+    if (suppressed) this.clear();
+  }
+
+  clear(): void {
+    this.entries.clear();
+    this.render();
+  }
+
   /** A short system note, e.g. what a settings change will do. */
   notice(text: string, seconds = 6): void {
     this.flash('notice', 'hint', { kicker: 'NOTE', text, tone: 'dim' }, seconds);
@@ -129,7 +143,10 @@ export class GuidanceSlot {
   tick(dt: number): void {
     let changed = false;
     for (const [source, entry] of this.entries) {
+      const wasFresh = entry.age < 3;
+      entry.age += dt;
       entry.left -= dt;
+      if (wasFresh && entry.age >= 3) changed = true;
       if (entry.left <= 0) {
         this.entries.delete(source);
         changed = true;
@@ -144,6 +161,7 @@ export class GuidanceSlot {
     message: GuidanceMessage | null,
     left: number,
   ): void {
+    if (this.suppressed) return;
     const old = this.entries.get(source);
     if (!message) {
       if (old) {
@@ -167,12 +185,21 @@ export class GuidanceSlot {
       message,
       since: sameTopic ? old.since : (this.serial += 1),
       left,
+      age: sameTopic ? old.age : 0,
     });
     this.render();
   }
 
   private render(): void {
-    this.shown = pickGuidance(this.entries.values());
+    const offers = [...this.entries.values()];
+    const freshResult = offers.some((entry) => entry.kind === 'discovery' && entry.age < 3);
+    this.shown = pickGuidance(
+      offers.map((entry) =>
+        freshResult && entry.kind === 'scan' && entry.message.ready
+          ? { ...entry, message: { ...entry.message, soft: true } }
+          : entry,
+      ),
+    );
     const shown = this.shown;
     this.root.hidden = !shown;
     if (!shown) return;

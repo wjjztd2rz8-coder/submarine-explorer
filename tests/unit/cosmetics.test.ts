@@ -320,3 +320,70 @@ it('passes selected decal data to the existing atlas at build time and after hul
     atlas.mockRestore();
   }
 });
+
+it.each(HULL_PAINTS)(
+  'applies selected $id paint to newly constructed and replacement hulls',
+  (paint) => {
+    const mesh = new SubMesh({
+      tier: 'low',
+      hullClass: 'A',
+      cosmetics: { ...defaultCosmetics(), paint: paint.id },
+    });
+    try {
+      for (const hull of ['A', 'B', 'C']) {
+        mesh.setHullClass(hull);
+        const uniforms = mesh.vehicle.materials.paintUniforms;
+        expect(uniforms.uHullPaint.value).toBe(paint.colors ? 1 : 0);
+        if (paint.colors) {
+          expect(uniforms.uHullBase.value.getHex()).toBe(paint.colors.base);
+          expect(uniforms.uHullAccent.value.getHex()).toBe(paint.colors.accent);
+        }
+      }
+    } finally {
+      mesh.dispose();
+    }
+  },
+);
+
+it.each(LIGHT_TRIMS)(
+  'applies selected $id lamp trim to newly constructed and replacement hulls',
+  (trim) => {
+    const mesh = new SubMesh({
+      tier: 'low',
+      hullClass: 'A',
+      cosmetics: { ...defaultCosmetics(), trim: trim.id },
+    });
+    try {
+      for (const hull of ['A', 'B', 'C']) {
+        mesh.setHullClass(hull);
+        mesh.vehicle.materials.setLensesOn(true);
+        expect((mesh.vehicle.materials.bySlot.lens as MeshBasicMaterial).color.getHex()).toBe(
+          trim.color ?? 0xffffff,
+        );
+      }
+    } finally {
+      mesh.dispose();
+    }
+  },
+);
+
+it.each(SUB_DECALS.filter((def) => def.text))(
+  'applies selected $id decal on new and replacement hulls',
+  (decal) => {
+    const atlas = vi.spyOn(decals, 'decalAtlas');
+    const mesh = new SubMesh({
+      tier: 'high',
+      hullClass: 'A',
+      cosmetics: { ...defaultCosmetics(), decal: decal.id },
+    });
+    try {
+      for (const hull of ['A', 'B', 'C']) {
+        mesh.setHullClass(hull);
+        expect(atlas).toHaveBeenLastCalledWith(expect.objectContaining(decal.text!));
+      }
+    } finally {
+      mesh.dispose();
+      atlas.mockRestore();
+    }
+  },
+);

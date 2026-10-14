@@ -1,4 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { COSMETIC_CHOICES, type CosmeticSlot } from '../../src/game/Cosmetics.js';
+import { Progress } from '../../src/game/Progress.js';
+import { ProgressSave } from '../../src/core/Save.js';
+import { SubMesh } from '../../src/sub/SubMesh.js';
 import { Journal } from '../../src/ui/Journal.js';
 import type { JournalEntry, JournalSite } from '../../src/game/JournalData.js';
 
@@ -13,6 +17,8 @@ class Element extends EventTarget {
   textContent = '';
   hidden = false;
   open = false;
+  value = '';
+  disabled = false;
   scrollTop = 0;
   tagName: string;
   tabIndex: number;
@@ -316,3 +322,60 @@ describe('phone sheet', () => {
     expect(journal.viewKey).toBe('front');
   });
 });
+
+it.each([false, true])(
+  'makes every cosmetic selectable and persistent on the Journal front page (phone=%s)',
+  (phone) => {
+    phoneQuery.matches = phone;
+    const values = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        values.set(key, value);
+      },
+      removeItem: (key: string) => {
+        values.delete(key);
+      },
+    };
+    const progress = new Progress(new ProgressSave(storage));
+    journal.setProgress(progress);
+    journal.show('front');
+    const selects = () =>
+      descendants(root).filter((el) => el.tagName === 'SELECT' && el.dataset.cosmetic);
+    expect(
+      selects()
+        .map((el) => el.dataset.cosmetic)
+        .sort(),
+    ).toEqual(Object.keys(COSMETIC_CHOICES).sort());
+    for (const select of selects())
+      for (const option of select.children) expect(option.disabled).toBe(option.value !== 'stock');
+    for (let i = 0; i < 25; i++) progress.award('poi', `reef/${i}`);
+    progress.award('secret', 'reef/find');
+    journal.refresh();
+    for (const select of selects()) {
+      const slot = select.dataset.cosmetic as CosmeticSlot;
+      expect(select.children.map((option) => option.value)).toEqual(
+        COSMETIC_CHOICES[slot].map((def) => def.id),
+      );
+      for (const option of select.children) {
+        expect(option.disabled).toBe(false);
+        select.value = option.value;
+        select.dispatchEvent(new Event('change'));
+        const restored = new Progress(new ProgressSave(storage));
+        expect(restored.cosmetics[slot]).toBe(option.value);
+        journal.setProgress(restored);
+        journal.refresh();
+        expect(selects().find((el) => el.dataset.cosmetic === slot)!.value).toBe(option.value);
+      }
+    }
+    const restored = new Progress(new ProgressSave(storage));
+    const mesh = new SubMesh({ tier: 'low', hullClass: 'A', cosmetics: restored.cosmetics });
+    try {
+      expect(mesh.vehicle.materials.paintUniforms.uHullBase.value.getHex()).toBe(0xabbcc8);
+      mesh.setHullClass('C');
+      expect(mesh.vehicle.materials.paintUniforms.uHullBase.value.getHex()).toBe(0xabbcc8);
+    } finally {
+      mesh.dispose();
+    }
+  },
+);

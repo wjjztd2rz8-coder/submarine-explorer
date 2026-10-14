@@ -1,0 +1,73 @@
+{
+  "source_commit": "526362e73d8a878e6a4f66f8873bfe634ec05703",
+  "producer": "Pre-fixed-kit ProgressSave, DiscoveryStore and DailySave; deterministic scenario, not a captured player save",
+  "records": {
+    "subexplorer.progress.v1": {
+      "version": 1,
+      "legacyCredited": true,
+      "points": 77,
+      "lifetime": 2142,
+      "awarded": [
+        "poi:titanic/titanic-bow",
+        "rating:titanic/1",
+        "rating:titanic/2",
+        "rating:titanic/3"
+      ],
+      "upgrades": {
+        "light-range": 3,
+        "light-beam": 2,
+        "sonar-range": 3,
+        "sonar-detail": 2,
+        "battery": 3,
+        "oxygen": 2,
+        "boost": 3,
+        "thrust": 3,
+        "turn": 2,
+        "reverse": 2
+      },
+      "ratings": {
+        "titanic": 3,
+        "great-blue-hole": 2
+      },
+      "cosmetics": {
+        "paint": "silver",
+        "trim": "blue"
+      },
+      "dailyBestStreak": 12
+    },
+    "subexplorer.discoveries.v1": {
+      "version": 1,
+      "discovered": {
+        "titanic/titanic-bow": {
+          "at": "2026-10-13T12:00:00.000Z",
+          "count": 1
+        },
+        "titanic/secret:find-1": {
+          "at": "2026-10-13T12:00:00.000Z",
+          "count": 2
+        },
+        "titanic/sample:sample-1": {
+          "at": "2026-10-13T12:00:00.000Z",
+          "count": 1
+        },
+        "titanic/event:whale": {
+          "at": "2026-10-13T12:00:00.000Z",
+          "count": 1
+        },
+        "titanic/life:shark": {
+          "at": "2026-10-13T12:00:00.000Z",
+          "count": 1
+        }
+      },
+      "stats": {
+        "scans": 6,
+        "firstAt": "2026-10-13T12:00:00.000Z"
+      }
+    },
+    "subexplorer.daily.v1": {
+      "version": 1,
+      "lastCompletedDate": "2026-10-13",
+      "streak": 2
+    }
+  }
+}
