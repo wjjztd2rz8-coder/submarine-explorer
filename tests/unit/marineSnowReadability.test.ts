@@ -1,11 +1,15 @@
 import { lcg32 } from '../../src/util/rng.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync, writeFileSync } from 'node:fs';
-import { afterAll, describe, expect, it } from 'vitest';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { createHash } from 'node:crypto';
+import { afterAll, describe, expect, it, vi } from 'vitest';
 import {
   AmbientLight,
   BufferAttribute,
   Color,
+  DataTexture,
+  PointsMaterial,
   FogExp2,
   MathUtils,
   PerspectiveCamera,
@@ -26,7 +30,11 @@ import {
 } from '../../src/game/Spawn.js';
 import { atmosphereTier, sampleAtmosphere } from '../../src/render/Atmosphere.js';
 import type { AtmosphereSample } from '../../src/render/Atmosphere.js';
-import { MarineSnow, snowParticleAppearance } from '../../src/render/MarineSnow.js';
+import {
+  MarineSnow,
+  snowParticleAppearance,
+  type SnowFieldConfig,
+} from '../../src/render/MarineSnow.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { latLonToWorld } from '../../src/util/geo.js';
 import type { TileMeta } from '../../src/util/types.js';
@@ -542,4 +550,149 @@ describe('snow random sources', () => {
     const random = lcg32(seed);
     expect(Array.from({ length: 8 }, () => random() * 4294967296)).toEqual(expected);
   });
+});
+
+const DIVE_PARTICLE_BASELINES = [
+  [
+    'low',
+    '05ca2ffa8c66aebe1278a6cfaebed6b72860c037df13fcccdb31f7ef7a88c9aa',
+    '567dfc70ac29aaee3c9018b9457de17b97b3b7fc9812f8773282161b2dcf40a9',
+  ],
+  [
+    'medium',
+    'd1b57d7e2343bf506a9ed47c7bcb5c33e7cfbb7cd8619ced18dfd47637e6e609',
+    '013034279fa38387d5cd73af4221aa64958dc3fec3b3449d6549997eb6ad995e',
+  ],
+  [
+    'high',
+    '53506cfb50c6d9c637a1bc7697536c97c422ea3708475e2ac35b55d66270a09d',
+    '9f4cf6576d318d0b889bb971eefef3f1f7616cc318704432e919a130c1c26cac',
+  ],
+  [
+    'ultra',
+    '53506cfb50c6d9c637a1bc7697536c97c422ea3708475e2ac35b55d66270a09d',
+    '9f4cf6576d318d0b889bb971eefef3f1f7616cc318704432e919a130c1c26cac',
+  ],
+] as const;
+
+describe('MarineSnow shared field ownership and deterministic buffers', () => {
+  it.each(DIVE_PARTICLE_BASELINES)(
+    'preserves the original %s dive position/seed draw order',
+    (tier, positionHash, seedHash) => {
+      const config = makeConfig().water;
+      const before = JSON.stringify(config);
+      const snow = new MarineSnow(config, config.tiers[tier]);
+      const digest = (name: string) =>
+        createHash('sha256')
+          .update(JSON.stringify(Array.from(snow.points!.geometry.getAttribute(name).array)))
+          .digest('hex');
+      try {
+        expect(digest('position')).toBe(positionHash);
+        expect(digest('aSeed')).toBe(seedHash);
+        snow.update(new PerspectiveCamera(), sampleAtmosphere(config, -1200), 4, 720, {
+          x: 0.2,
+          z: -0.1,
+        });
+        expect(digest('position')).toBe(positionHash);
+        expect(digest('aSeed')).toBe(seedHash);
+        expect(JSON.stringify(config)).toBe(before);
+      } finally {
+        snow.dispose();
+      }
+    },
+  );
+
+  it('places a bounded sprite field at absolute time without reallocating or owning its map', () => {
+    const sprite = new DataTexture();
+    const options: SnowFieldConfig = {
+      box: new Vector3(170, 80, 170),
+      seed: 0x51ed27,
+      sprite: { map: sprite, size: 0.55, opacity: 0.7, fog: true, depthWrite: false },
+      drift: {
+        lateralM: 1.2,
+        xRate: 0.11,
+        zRate: 0.09,
+        phaseStep: 0.37,
+        sinkMps: 0.45,
+        sinkBase: 0.7,
+        sinkSpread: 0.6,
+        sinkCycle: 7,
+      },
+    };
+    const snow = new MarineSnow(options, { snowCount: 200 });
+    const points = snow.points!;
+    const geometry = points.geometry;
+    const positions = geometry.getAttribute('position') as BufferAttribute;
+    const buffer = positions.array;
+    const material = points.material as PointsMaterial;
+    const before = JSON.stringify(options);
+    const releaseMap = vi.spyOn(sprite, 'dispose');
+    const releaseGeometry = vi.spyOn(geometry, 'dispose');
+    const releaseMaterial = vi.spyOn(material, 'dispose');
+    const scene = new Scene();
+    scene.add(points);
+    try {
+      snow.place(new Vector3(0, 8.8, 0), 0);
+      const hash = createHash('sha256')
+        .update(JSON.stringify(Array.from(buffer)))
+        .digest('hex');
+      expect(hash).toBe('20720c8c668764a68afff879e3f0b39327a78c01c1ca91c847ad4a34d643905d');
+      snow.place(new Vector3(0, 8.8, 0), 400);
+      const later = Array.from(buffer);
+      snow.place(new Vector3(0, 8.8, 0), 2);
+      expect(Array.from(buffer)).not.toEqual(later);
+      snow.place(new Vector3(0, 8.8, 0), 400);
+      expect(Array.from(buffer)).toEqual(later);
+      expect(points.geometry).toBe(geometry);
+      expect(positions.array).toBe(buffer);
+      expect(points.material).toBe(material);
+      expect(material.map).toBe(sprite);
+      expect(points.frustumCulled).toBe(false);
+      expect(geometry.boundingSphere!.radius).toBe(Infinity);
+      expect(geometry.getAttribute('aSeed')).toBeUndefined();
+      // The centre follows the seabed anchor, independent of camera or hover.
+      snow.place(new Vector3(10, 408.8, -5), 400);
+      const elevated = Array.from(buffer);
+      for (let i = 0; i < later.length; i += 3) {
+        expect(elevated[i] - later[i]).toBeCloseTo(10, 4);
+        expect(elevated[i + 1] - later[i + 1]).toBeCloseTo(400, 3);
+        expect(elevated[i + 2] - later[i + 2]).toBeCloseTo(-5, 4);
+      }
+      snow.dispose();
+      snow.dispose();
+      const version = positions.version;
+      snow.place(new Vector3(), 0);
+      expect(positions.version).toBe(version);
+      expect(points.parent).toBeNull();
+      expect(releaseGeometry).toHaveBeenCalledTimes(1);
+      expect(releaseMaterial).toHaveBeenCalledTimes(1);
+      expect(releaseMap).not.toHaveBeenCalled();
+      expect(JSON.stringify(options)).toBe(before);
+    } finally {
+      snow.dispose();
+      sprite.dispose();
+    }
+  });
+
+  it.each([0, 8])(
+    'disposes a dive field with %s particles once and ignores later updates',
+    (count) => {
+      const config = makeConfig().water;
+      const snow = new MarineSnow(config, { snowCount: count });
+      const geometry = snow.points?.geometry;
+      const material = snow.points?.material as ShaderMaterial | undefined;
+      const releaseGeometry = geometry ? vi.spyOn(geometry, 'dispose') : undefined;
+      const releaseMaterial = material ? vi.spyOn(material, 'dispose') : undefined;
+      snow.update(new PerspectiveCamera(), sampleAtmosphere(config, -1200), 4, 720);
+      snow.dispose();
+      snow.dispose();
+      snow.update(new PerspectiveCamera(), sampleAtmosphere(config, -1200), 4, 720);
+      if (count === 0) expect(snow.points).toBeNull();
+      else {
+        expect(material!.uniforms.uTime.value).toBe(4);
+        expect(releaseGeometry).toHaveBeenCalledTimes(1);
+        expect(releaseMaterial).toHaveBeenCalledTimes(1);
+      }
+    },
+  );
 });

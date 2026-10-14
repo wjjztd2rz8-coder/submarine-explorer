@@ -13,7 +13,8 @@
  * and restores both.
  */
 
-import { lcg32 } from '../../util/rng.js';
+import { Headlights } from '../Headlights.js';
+import { MarineSnow, type SnowFieldConfig } from '../MarineSnow.js';
 
 import * as THREE from 'three';
 import { buildVehicle, type Vehicle } from '../../vehicles/index.js';
@@ -90,7 +91,42 @@ const FRAMING: Record<TitleLayout, { x: number; y: number; silhouette: number }>
 
 const FOG_COLOR = 0x0f3a52;
 const SKY_TOP = 0x0a2a42;
-const SNOW_BOX = new THREE.Vector3(170, 80, 170);
+const TITLE_LAMPS = {
+  headlightColor: 0xffd79a,
+  headlightIntensity: 250,
+  headlightDistance: 150,
+  headlightAngleDeg: (0.62 / Math.PI) * 180,
+  headlightSeparationM: 5.2,
+  headlightConeOpacity: 0.5,
+};
+const TITLE_BEAMS = {
+  penumbra: 0.85,
+  decay: 1.3,
+  surfaceBeam: { color: 0xffd29a, strength: 0.5, segments: 28, angle: 0.42, lengthScale: 1.08 },
+};
+const TITLE_SNOW = {
+  box: new THREE.Vector3(170, 80, 170),
+  seed: 0x51ed27,
+  sprite: {
+    color: 0xdff1f2,
+    size: 0.55,
+    sizeAttenuation: true,
+    transparent: true,
+    opacity: 0.7,
+    depthWrite: false,
+    fog: true,
+  },
+  drift: {
+    lateralM: 1.2,
+    xRate: 0.11,
+    zRate: 0.09,
+    phaseStep: 0.37,
+    sinkMps: 0.45,
+    sinkBase: 0.7,
+    sinkSpread: 0.6,
+    sinkCycle: 7,
+  },
+} satisfies SnowFieldConfig;
 /** Lamp pool lands this far ahead of each lamp, measured on the ground plane. */
 const POOL_AHEAD_M = 9;
 
@@ -122,30 +158,6 @@ function radialTexture(
   return t;
 }
 
-const BEAM_VERT = `
-varying float vAxis;
-varying vec3 vN;
-varying vec3 vV;
-void main() {
-  vAxis = position.z;
-  vN = normalize(normalMatrix * normal);
-  vec4 mv = modelViewMatrix * vec4(position, 1.0);
-  vV = normalize(-mv.xyz);
-  gl_Position = projectionMatrix * mv;
-}`;
-const BEAM_FRAG = `
-uniform vec3 uColor;
-uniform float uStrength;
-varying float vAxis;
-varying vec3 vN;
-varying vec3 vV;
-void main() {
-  float f = abs(dot(normalize(vN), normalize(vV)));
-  float a = pow(f, 1.6) * pow(1.0 - vAxis, 1.3) * smoothstep(0.02, 0.4, vAxis) * uStrength;
-  gl_FragColor = vec4(uColor, a);
-  #include <tonemapping_fragment>
-  #include <colorspace_fragment>
-}`;
 const MIN_FRAME_S = 1 / TITLE_SHOT.maxFps - 1e-9;
 
 /** Pixel rectangle (CSS px, origin top-left) the shot is drawn into. */
@@ -193,16 +205,12 @@ export class TitleScene {
   /** Carries the vehicle and its lamps: position, heading, hover. */
   private readonly rig = new THREE.Group();
   private vehicle: Vehicle;
-  private readonly lamps: THREE.SpotLight[] = [];
-  private snow: THREE.Points | null = null;
-  private snowBase: Float32Array | null = null;
+  private readonly headlights: Headlights;
+  private snow: MarineSnow | null = null;
   private readonly hemi = new THREE.HemisphereLight(0x4a9cc4, 0x0e2c3c, 1.2);
   private readonly rim = new THREE.DirectionalLight(0x8fd0ea, 5);
-  private readonly beams: THREE.Mesh[] = [];
-  private readonly beamMaterials: THREE.ShaderMaterial[] = [];
   private sky: THREE.Mesh | null = null;
   private contact: THREE.Mesh | null = null;
-  private readonly fx: THREE.Texture[] = [];
 
   // Scratch.
   private readonly basePos = new THREE.Vector3();
@@ -227,15 +235,19 @@ export class TitleScene {
     this.scene.add(this.hemi, this.rim, this.rim.target);
 
     this.buildSky();
-    for (const side of [-1, 1]) {
-      const lamp = new THREE.SpotLight(0xffd79a, 250, 150, 0.62, 0.85, 1.3);
+    this.headlights = new Headlights(
+      TITLE_LAMPS,
+      { headlightCones: true, beamDetail: 0 },
+      undefined,
+      TITLE_BEAMS,
+    );
+    this.headlights.lights.forEach((lamp, i) => {
+      const side = i === 0 ? -1 : 1;
       lamp.name = `titleLamp${side}`;
       lamp.position.set(side * 2.6, -1.6, -12);
-      lamp.target.position.set(side * 5, -9, -30);
-      this.lamps.push(lamp);
-      this.rig.add(lamp, lamp.target);
-      this.buildBeam(side);
-    }
+      this.headlights.beams[i]!.name = `titleBeam${side}`;
+    });
+    this.rig.add(this.headlights.group);
     this.scene.add(this.rig);
 
     this.vehicle = this.buildVehicle();
@@ -310,7 +322,7 @@ export class TitleScene {
     this.reduced = b;
     if (b) this.time = 0;
     this.sinceDraw = Infinity;
-    if (this.snow) this.snow.visible = !b;
+    if (this.snow?.points) this.snow.points.visible = !b;
     this.vehicle.update({ lightsOn: true }, 0);
     this.applyMotion();
     this.frame();
@@ -359,17 +371,17 @@ export class TitleScene {
     this.releaseCrop();
     this.disposeContact();
     this.vehicle.dispose();
-    this.disposeSnow();
-    for (const m of this.beamMaterials) m.dispose();
-    for (const b of this.beams) b.geometry.dispose();
+    this.snow?.dispose();
+    this.snow = null;
+    this.headlights.dispose();
     if (this.sky) {
       this.sky.geometry.dispose();
       (this.sky.material as THREE.Material).dispose();
     }
-    for (const t of this.fx) t.dispose();
+    this.snowTex?.dispose();
+    this.snowTex = null;
     this.hemi.dispose();
     this.rim.dispose();
-    for (const l of this.lamps) l.dispose();
     this.scene.remove(this.rig, this.hemi, this.rim, this.rim.target);
     this.scene.clear();
     this.stats.calls = 0;
@@ -386,11 +398,6 @@ export class TitleScene {
     v.update({ lightsOn: true }, 0);
     this.rig.add(v.root);
     return v;
-  }
-
-  private track<T extends THREE.Texture>(t: T): T {
-    this.fx.push(t);
-    return t;
   }
 
   /** Inverted gradient dome: fog colour at the horizon fading to deep navy overhead. */
@@ -422,40 +429,6 @@ export class TitleScene {
     sky.frustumCulled = false;
     this.sky = sky;
     this.scene.add(sky);
-  }
-
-  /** Additive cone with fresnel and length falloff: a cheap volumetric lamp beam. */
-  private buildBeam(side: number): void {
-    const geo = new THREE.ConeGeometry(1, 1, 28, 1, true);
-    geo.rotateX(Math.PI / 2); // axis along +z, base at z = 0.5
-    geo.translate(0, 0, 0.5);
-    // After the rotate the apex sits at z = 1 and the base at z = 0: flip so
-    // z = 0 is the lamp and z = 1 the far end.
-    const p = geo.getAttribute('position');
-    for (let i = 0; i < p.count; i++) p.setZ(i, 1 - p.getZ(i));
-    const flipped = geo.index!;
-    for (let i = 0; i < flipped.count; i += 3) {
-      const b = flipped.getX(i + 1);
-      flipped.setX(i + 1, flipped.getX(i + 2));
-      flipped.setX(i + 2, b);
-    }
-    geo.computeVertexNormals();
-    const mat = new THREE.ShaderMaterial({
-      uniforms: { uColor: { value: new THREE.Color(0xffd29a) }, uStrength: { value: 0.5 } },
-      vertexShader: BEAM_VERT,
-      fragmentShader: BEAM_FRAG,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide,
-      fog: false,
-    });
-    const beam = new THREE.Mesh(geo, mat);
-    beam.name = `titleBeam${side}`;
-    beam.frustumCulled = false;
-    this.beams.push(beam);
-    this.beamMaterials.push(mat);
-    this.rig.add(beam);
   }
 
   /** Soft contact shadow draped over the real seabed beneath the hull. */
@@ -499,7 +472,7 @@ export class TitleScene {
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
     geo.setIndex(idx);
-    const tex = this.track(radialTexture(64, [2, 8, 12], 0.78));
+    const tex = radialTexture(64, [2, 8, 12], 0.78);
     const mat = new THREE.MeshBasicMaterial({
       map: tex,
       transparent: true,
@@ -538,10 +511,7 @@ export class TitleScene {
     const fz = fwd.z;
     const lampWorld = new THREE.Vector3();
     const targetWorld = new THREE.Vector3();
-    const dir = new THREE.Vector3();
-    const q = new THREE.Quaternion();
-    const zAxis = new THREE.Vector3(0, 0, 1);
-    this.lamps.forEach((lamp, k) => {
+    this.headlights.lights.forEach((lamp, k) => {
       lamp.getWorldPosition(lampWorld);
       const side = lamp.position.x > 0 ? 1 : -1;
       // Outward is rig-local +x for the right lamp.
@@ -549,22 +519,7 @@ export class TitleScene {
       const tx = lampWorld.x + fx * POOL_AHEAD_M + out.x * 2.5;
       const tz = lampWorld.z + fz * POOL_AHEAD_M + out.z * 2.5;
       targetWorld.set(tx, this.floorAt(tx, tz) + 0.2, tz);
-      lamp.target.position.copy(this.rig.worldToLocal(targetWorld.clone()));
-      lamp.target.updateMatrixWorld(true);
-      const beam = this.beams[k];
-      if (!beam) return;
-      dir.copy(targetWorld).sub(lampWorld);
-      const len = dir.length() * 1.08;
-      dir.normalize();
-      // Beam lives in rig space: convert direction to local.
-      const local = dir
-        .clone()
-        .transformDirection(new THREE.Matrix4().copy(this.rig.matrixWorld).invert());
-      q.setFromUnitVectors(zAxis, local);
-      beam.position.copy(lamp.position);
-      beam.quaternion.copy(q);
-      const r = len * Math.tan(0.42);
-      beam.scale.set(r, r, len);
+      this.headlights.aimAt(k, targetWorld);
     });
   }
 
@@ -578,73 +533,20 @@ export class TitleScene {
   }
 
   private rebuildSnow(): void {
-    this.disposeSnow();
-    const count = TITLE_SHOT.snowCount[this.tier];
-    const base = new Float32Array(count * 3);
-    const rand = lcg32(0x51ed27);
-    for (let i = 0; i < count; i++) {
-      base[i * 3] = rand() * SNOW_BOX.x;
-      base[i * 3 + 1] = rand() * SNOW_BOX.y;
-      base[i * 3 + 2] = rand() * SNOW_BOX.z;
-    }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(base), 3));
-    geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), Infinity);
-    const mat = new THREE.PointsMaterial({
-      color: 0xdff1f2,
-      map: this.snowSprite(),
-      size: 0.55,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0.7,
-      depthWrite: false,
-      fog: true,
-    });
-    const pts = new THREE.Points(geo, mat);
-    pts.name = 'titleSnow';
-    pts.frustumCulled = false;
-    pts.visible = !this.reduced;
-    this.snow = pts;
-    this.snowBase = base;
-    this.scene.add(pts);
+    this.snow?.dispose();
+    this.snow = new MarineSnow(
+      { ...TITLE_SNOW, sprite: { ...TITLE_SNOW.sprite, map: this.snowSprite() } },
+      { snowCount: TITLE_SHOT.snowCount[this.tier] },
+    );
+    const points = this.snow.points!;
+    points.name = 'titleSnow';
+    points.visible = !this.reduced;
+    this.scene.add(points);
   }
 
   private snowTex: THREE.DataTexture | null = null;
   private snowSprite(): THREE.DataTexture {
-    return (this.snowTex ??= this.track(radialTexture(16, [255, 255, 255], 1)));
-  }
-
-  private disposeSnow(): void {
-    const s = this.snow;
-    if (!s) return;
-    this.scene.remove(s);
-    s.geometry.dispose();
-    (s.material as THREE.Material).dispose();
-    this.snow = null;
-    this.snowBase = null;
-  }
-
-  /** Slow sink plus lateral drift, wrapped into a box around the vehicle. */
-  private placeSnow(t: number): void {
-    const s = this.snow;
-    const base = this.snowBase;
-    if (!s || !base) return;
-    const pos = (s.geometry.getAttribute('position') as THREE.BufferAttribute)
-      .array as Float32Array;
-    const cx = this.basePos.x;
-    const cy = this.basePos.y;
-    const cz = this.basePos.z;
-    const wrap = (v: number, size: number): number => ((v % size) + size) % size;
-    for (let i = 0; i < base.length; i += 3) {
-      const phase = i * 0.37;
-      const x = base[i]! + 1.2 * Math.sin(t * 0.11 + phase);
-      const y = base[i + 1]! - 0.45 * t * (0.7 + 0.6 * ((i % 7) / 7));
-      const z = base[i + 2]! + 1.2 * Math.cos(t * 0.09 + phase);
-      pos[i] = cx + wrap(x, SNOW_BOX.x) - SNOW_BOX.x / 2;
-      pos[i + 1] = cy + wrap(y, SNOW_BOX.y) - SNOW_BOX.y / 2;
-      pos[i + 2] = cz + wrap(z, SNOW_BOX.z) - SNOW_BOX.z / 2;
-    }
-    (s.geometry.getAttribute('position') as THREE.BufferAttribute).needsUpdate = true;
+    return (this.snowTex ??= radialTexture(16, [255, 255, 255], 1));
   }
 
   private floorAt(x: number, z: number): number {
@@ -704,7 +606,7 @@ export class TitleScene {
     this.camera.quaternion.premultiply(this.yawQ);
     this.camera.updateMatrixWorld(true);
     // Assets can change the anchor immediately before draw, without an update.
-    this.placeSnow(this.time);
+    this.snow?.place(this.basePos, this.time);
     this.sky?.position.copy(this.camera.position);
   }
 

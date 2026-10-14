@@ -4,7 +4,7 @@
  * "aquarium" water, so this field is on at every depth -- only its density and
  * drift rate change with the band.
  *
- * Implementation is entirely GPU-side. The points are generated once inside a
+ * The default implementation is entirely GPU-side. The points are generated once inside a
  * cube of edge `Config.water.snowBoxM`; every frame the vertex shader drifts
  * them and wraps them modulo the cube *around the current camera position*, so
  * the field follows the camera forever with no CPU work and no re-upload. A
@@ -96,15 +96,40 @@ export function snowParticleAppearance(
   };
 }
 
+/**
+ * A seeded rectangular field centred on an authored anchor, with absolute-time
+ * drift. The sprite map is borrowed; the field owns its geometry and material.
+ */
+export interface SnowFieldConfig {
+  box: THREE.Vector3;
+  seed: number;
+  sprite: THREE.PointsMaterialParameters;
+  drift: {
+    lateralM: number;
+    xRate: number;
+    zRate: number;
+    phaseStep: number;
+    sinkMps: number;
+    sinkBase: number;
+    sinkSpread: number;
+    sinkCycle: number;
+  };
+}
+
 export class MarineSnow {
   readonly points: THREE.Points | null;
 
-  private readonly material: THREE.ShaderMaterial | null;
+  private readonly material: THREE.ShaderMaterial | THREE.PointsMaterial | null;
   private readonly geometry: THREE.BufferGeometry | null;
   private elapsed = 0;
+  private disposed = false;
+  private readonly field: SnowFieldConfig | null;
+  private readonly base: Float32Array | null;
   private flow = { x: 0, z: 0 };
 
-  constructor(config: WaterConfig, tier: AtmosphereTier) {
+  constructor(config: WaterConfig | SnowFieldConfig, tier: Pick<AtmosphereTier, 'snowCount'>) {
+    this.field = 'box' in config ? config : null;
+    this.base = null;
     const count = tier.snowCount;
     if (count <= 0) {
       this.points = null;
@@ -113,30 +138,38 @@ export class MarineSnow {
       return;
     }
 
-    const box = config.snowBoxM;
+    const box = 'box' in config ? config.box : new THREE.Vector3().setScalar(config.snowBoxM);
     const positions = new Float32Array(count * 3);
-    const seeds = new Float32Array(count);
+    const seeds = this.field ? null : new Float32Array(count);
     // Deterministic: the same field every run, so screenshots are comparable.
-    const rand = lcg32(0x2f6e2b1);
+    const rand = lcg32('box' in config ? config.seed : 0x2f6e2b1);
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = rand() * box;
-      positions[i * 3 + 1] = rand() * box;
-      positions[i * 3 + 2] = rand() * box;
-      seeds[i] = rand();
+      positions[i * 3] = rand() * box.x;
+      positions[i * 3 + 1] = rand() * box.y;
+      positions[i * 3 + 2] = rand() * box.z;
+      if (seeds) seeds[i] = rand();
     }
 
     this.geometry = new THREE.BufferGeometry();
     this.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    this.geometry.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
+    if (seeds) this.geometry.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
     // The shader relocates every point around the camera, so Three must never
     // cull the object on its authored bounds.
     this.geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(), Infinity);
+
+    if ('box' in config) {
+      this.base = new Float32Array(positions);
+      this.material = new THREE.PointsMaterial(config.sprite);
+      this.points = new THREE.Points(this.geometry, this.material);
+      this.points.frustumCulled = false;
+      return;
+    }
 
     this.material = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
         uCam: { value: new THREE.Vector3() },
-        uBox: { value: box },
+        uBox: { value: config.snowBoxM },
         uDensity: { value: 1 },
         uDrift: { value: 0.2 },
         uFlow: { value: new THREE.Vector2() },
@@ -182,7 +215,7 @@ export class MarineSnow {
     current: Pick<CurrentVector, 'x' | 'z'> = { x: 0, z: 0 },
     lamp?: SnowLamp,
   ): void {
-    if (!this.material) return;
+    if (this.disposed || !(this.material instanceof THREE.ShaderMaterial)) return;
     this.elapsed += frameDelta;
     this.flow = snowFlowStep(this.flow, current, frameDelta);
     const u = this.material.uniforms;
@@ -207,9 +240,36 @@ export class MarineSnow {
     }
   }
 
+  /** Place the bounded field without integrating time or changing its seed pool. */
+  place(center: THREE.Vector3, elapsed: number): void {
+    const field = this.field;
+    const base = this.base;
+    if (this.disposed || !field || !base || !this.geometry) return;
+    const attribute = this.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const positions = attribute.array as Float32Array;
+    const { box, drift } = field;
+    for (let i = 0; i < base.length; i += 3) {
+      const phase = i * drift.phaseStep;
+      const x = base[i]! + drift.lateralM * Math.sin(elapsed * drift.xRate + phase);
+      const y =
+        base[i + 1]! -
+        drift.sinkMps *
+          elapsed *
+          (drift.sinkBase + drift.sinkSpread * ((i % drift.sinkCycle) / drift.sinkCycle));
+      const z = base[i + 2]! + drift.lateralM * Math.cos(elapsed * drift.zRate + phase);
+      positions[i] = center.x + THREE.MathUtils.euclideanModulo(x, box.x) - box.x / 2;
+      positions[i + 1] = center.y + THREE.MathUtils.euclideanModulo(y, box.y) - box.y / 2;
+      positions[i + 2] = center.z + THREE.MathUtils.euclideanModulo(z, box.z) - box.z / 2;
+    }
+    attribute.needsUpdate = true;
+  }
+
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     this.geometry?.dispose();
     this.material?.dispose();
+    this.points?.removeFromParent();
   }
 }
 
