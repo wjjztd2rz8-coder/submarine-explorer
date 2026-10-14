@@ -45,8 +45,8 @@ export const HULL_PAINTS = [
   {
     id: 'gold',
     name: 'Gold',
-    swatch: '#d4b46b',
-    colors: { base: 0xd4b46b, accent: 0xf5e9ca },
+    swatch: '#e2b23c',
+    colors: { base: 0xe2b23c, accent: 0xf5e9ca },
     reward: { kind: 'discoveries', total: 15 },
   },
   {

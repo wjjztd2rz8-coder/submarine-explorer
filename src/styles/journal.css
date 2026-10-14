@@ -242,6 +242,28 @@
   margin-left: 8px;
   letter-spacing: 0;
 }
+.jr-cosmetic {
+  display: block;
+}
+.jr-cosmetic-pick {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+.jr-cosmetic-pick select {
+  flex: 1;
+  margin: 0;
+  align-items: center;
+}
+.jr-swatch {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  box-sizing: border-box;
+  border: 1px solid var(--b1-hair);
+  border-radius: 50%;
+}
 .jr-category {
   border-bottom: 1px solid var(--b1-hair-dim);
 }
