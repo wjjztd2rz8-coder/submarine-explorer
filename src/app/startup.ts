@@ -53,7 +53,10 @@ export async function startRuntime(ctx: BootContext): Promise<() => void> {
   }
   const offReady = ctx.bus.on('game:ready', () => loading?.remove());
   let stopHome: (() => void) | undefined;
+  let disposed = false;
   const dispose = () => {
+    if (disposed) return;
+    disposed = true;
     loading?.remove();
     offReady();
     stopHome?.();
@@ -67,7 +70,7 @@ export async function startRuntime(ctx: BootContext): Promise<() => void> {
   window.addEventListener('pagehide', onPageHide);
   try {
     if (ctx.app.state === 'home') {
-      if ((await startup.start({ state: 'home' })) !== 'home') return dispose;
+      if ((await startup.start({ state: 'home' })) !== 'home' || disposed) return dispose;
       const shell = ctx as ShellContext;
       const runner = new SystemRunner<ShellContext, { dt: number; nowMs: number; frozen: boolean }>(
         shell,

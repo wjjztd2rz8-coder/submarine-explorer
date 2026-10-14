@@ -425,6 +425,42 @@ afterEach(() => {
 });
 
 describe('runtime startup capability', () => {
+  it('three page-navigation Home/dive/Home cycles retain one loop and dispose every installed system', async () => {
+    for (let cycle = 0; cycle < 3; cycle++) {
+      for (const state of ['home', 'dive', 'home'] as const) {
+        const h = runtimeSetup(state);
+        const disposeSystem = vi.fn();
+        const factory = state === 'home' ? createHomeSystems : createSystems;
+        vi.mocked(factory).mockReturnValue([{ name: 'presentation', dispose: disposeSystem }]);
+        const dispose = await startRuntime(h.ctx);
+        expect(h.load).toHaveBeenCalledTimes(state === 'dive' ? 1 : 0);
+        expect(h.frames.size).toBe(1);
+        h.present();
+        expect(h.frames.size).toBe(1);
+        window.dispatchEvent(new Event('pagehide'));
+        expect(disposeSystem).toHaveBeenCalledOnce();
+        expect(h.frames.size).toBe(0);
+        dispose();
+        expect(disposeSystem).toHaveBeenCalledOnce();
+      }
+    }
+  });
+
+  it('does not install Home after page teardown during its startup yield', async () => {
+    const h = runtimeSetup();
+    const init = vi.fn();
+    vi.mocked(createHomeSystems).mockReturnValue([{ name: 'title', init }]);
+    const starting = startRuntime(h.ctx);
+    window.dispatchEvent(new Event('pagehide'));
+    const dispose = await starting;
+    expect(init).not.toHaveBeenCalled();
+    expect(createHomeSystems).not.toHaveBeenCalled();
+    expect(h.frames.size).toBe(0);
+    expect(window.__game).toBeUndefined();
+    expect(showFatal).not.toHaveBeenCalled();
+    dispose();
+  });
+
   it('presents an interactive Home with no selected-tile load or dive factory call', async () => {
     const h = runtimeSetup();
     const drawn = vi.fn();
