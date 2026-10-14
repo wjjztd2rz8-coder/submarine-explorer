@@ -460,10 +460,18 @@ export class ProgressSave {
   readonly storage: SettingsStorage | null;
   private data: ProgressRecord;
   constructor(storage: SettingsStorage | null = safeStorage()) {
-    this.storage = storage;
     let raw: unknown = null;
+    let text: string | null = null;
+    let readFailed = false;
     try {
-      raw = JSON.parse(storage?.getItem(PROGRESS_STORAGE_KEY) ?? 'null');
+      text = storage?.getItem(PROGRESS_STORAGE_KEY) ?? null;
+    } catch {
+      readFailed = true;
+    }
+    // Keep session rewards usable without risking an unreadable persisted save.
+    this.storage = readFailed ? null : storage;
+    try {
+      raw = JSON.parse(text ?? 'null');
     } catch {
       /* Session only. */
     }

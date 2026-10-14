@@ -42,13 +42,20 @@ export class TutorialSave {
 
   constructor(private readonly storage: SettingsStorage | null = safeStorage()) {
     let raw: unknown = null;
+    let text: string | null = null;
+    let readFailed = false;
     try {
-      raw = JSON.parse(storage?.getItem(ONBOARD_STORAGE_KEY) ?? 'null');
+      text = storage?.getItem(ONBOARD_STORAGE_KEY) ?? null;
+    } catch {
+      readFailed = true;
+    }
+    try {
+      raw = JSON.parse(text ?? 'null');
     } catch {
       /* Session only. */
     }
     const version = (raw as { version?: unknown } | null)?.version;
-    this.readOnly = typeof version === 'number' && version > ONBOARD_VERSION;
+    this.readOnly = readFailed || (typeof version === 'number' && version > ONBOARD_VERSION);
     this.data = migrateOnboard(raw);
     // Persist the filtered hint list for known saves; never overwrite future data.
     const seen = (raw as { seenHints?: unknown } | null)?.seenHints;

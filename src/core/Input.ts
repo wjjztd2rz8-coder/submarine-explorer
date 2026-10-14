@@ -423,8 +423,15 @@ export class Input {
       [PREVIOUS_BINDINGS_STORAGE_KEY, 2],
       [LEGACY_BINDINGS_STORAGE_KEY, 1],
     ] as const) {
+      let raw: string | null;
       try {
-        const raw = this.storage.getItem(key);
+        raw = this.storage.getItem(key);
+      } catch {
+        // A failed read cannot prove the save absent or safe to replace.
+        this.protectedBindings = true;
+        return;
+      }
+      try {
         if (!raw) continue;
         const value: unknown = JSON.parse(raw);
         if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
@@ -511,6 +518,7 @@ export class Input {
   }
 
   attach(): void {
+    if (this.disposers.length) return;
     const onKeyDown = (e: KeyboardEvent) => {
       // Ignore keystrokes aimed at a text field (including a rebind capture box).
       const t = e.target as HTMLElement | null;
@@ -551,11 +559,9 @@ export class Input {
       }
     };
     const onKeyUp = (e: KeyboardEvent) => this.keys.delete(e.code);
-    const onBlur = () => {
-      this.keys.clear();
-      this.mouseDown = false;
-      this.state.lookDx = 0;
-      this.state.lookDy = 0;
+    const onBlur = () => this.clear();
+    const onVisibility = () => {
+      if (document.hidden) this.clear();
     };
     const onMouseDown = (e: MouseEvent) => {
       if (e.button === 0) this.mouseDown = true;
@@ -573,6 +579,8 @@ export class Input {
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('blur', onBlur);
+    const doc = typeof document === 'undefined' ? null : document;
+    doc?.addEventListener('visibilitychange', onVisibility);
     const el: HTMLElement | Window = this.target ?? window;
     el.addEventListener('mousedown', onMouseDown as EventListener);
     window.addEventListener('mouseup', onMouseUp);
@@ -587,6 +595,7 @@ export class Input {
       () => window.removeEventListener('keydown', onKeyDown),
       () => window.removeEventListener('keyup', onKeyUp),
       () => window.removeEventListener('blur', onBlur),
+      () => doc?.removeEventListener('visibilitychange', onVisibility),
       () => el.removeEventListener('mousedown', onMouseDown as EventListener),
       () => window.removeEventListener('mouseup', onMouseUp),
       () => window.removeEventListener('mousemove', onMouseMove),
@@ -597,12 +606,25 @@ export class Input {
   dispose(): void {
     for (const d of this.disposers) d();
     this.disposers = [];
+    this.clear();
+    this.padIndex = null;
+    this.padPressed.clear();
+  }
+
+  /** Interruptions discard piloting and queued actions; a new press starts again. */
+  clear(): void {
     this.keys.clear();
     this.edgeArmed.clear();
     this.touchHeld.clear();
     this.touchBoost = false;
-    this.padIndex = null;
-    this.padPressed.clear();
+    for (const axis of ['throttle', 'yaw', 'pitch', 'ballast'] as const) {
+      this.touchAxes[axis] = 0;
+      this.state[axis] = 0;
+    }
+    this.state.scan = false;
+    this.state.boost = false;
+    this.mouseDown = false;
+    this.endFrame();
   }
 
   private isBound(code: string): boolean {

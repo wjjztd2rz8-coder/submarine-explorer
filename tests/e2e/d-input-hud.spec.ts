@@ -1,6 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { waitForFrames } from './helpers/frames.js';
 
 const shots = '.cache/codex/shots/d-input-hud';
 const diveUrl = '/?tile=titanic&landmark=_test&poi=test-bow';
@@ -12,6 +13,43 @@ async function ready(page: Page, url = diveUrl): Promise<void> {
     () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
 }
+
+test('held keys and queued toggles are discarded across focus loss and pause/resume', async ({
+  page,
+}) => {
+  // Guards unintended thrust and delayed camera toggles after an interruption.
+  await ready(page, '/?tile=great-blue-hole&tier=low');
+  const throttle = () =>
+    page.evaluate(
+      () => (window.__game as { input: { state: { throttle: number } } }).input.state.throttle,
+    );
+  await page.keyboard.down('w');
+  await expect.poll(throttle).toBe(1);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.pause-menu')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.pause-menu')).toBeHidden();
+  await expect.poll(throttle).toBe(0);
+  await page.keyboard.up('w');
+  await page.keyboard.down('w');
+  await expect.poll(throttle).toBe(1);
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  await expect.poll(throttle).toBe(0);
+  await page.keyboard.up('w');
+  const mode = await page.evaluate(() => {
+    const game = window.__game as {
+      input: { injectKey(code: string, down: boolean): void };
+      rig: { mode: string };
+    };
+    game.input.injectKey('KeyQ', true);
+    window.dispatchEvent(new Event('blur'));
+    return game.rig.mode;
+  });
+  await waitForFrames(page, 3);
+  await expect
+    .poll(() => page.evaluate(() => (window.__game as { rig: { mode: string } }).rig.mode))
+    .toBe(mode);
+});
 
 test('readable contextual HUD, controls and UI scale survive reload', async ({ page }) => {
   await mkdir(shots, { recursive: true });

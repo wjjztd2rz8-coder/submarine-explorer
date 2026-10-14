@@ -10,6 +10,44 @@ async function boot(page: Page, url: string): Promise<void> {
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
 }
 
+test('returning Home and selecting another site keeps one HUD and touch control tree', async ({
+  page,
+}) => {
+  // Guards duplicate controls and stale input after leaving a dive and re-entering.
+  await boot(page, '/?tile=great-blue-hole&tier=low&touch=1');
+  await page.keyboard.down('w');
+  await page.keyboard.press('Escape');
+  await page.locator('.pause-menu').getByRole('button', { name: 'Quit to home' }).click();
+  await page.keyboard.up('w');
+  await expect(page.locator('.home-screen')).toBeVisible();
+  await expect(page.locator('.tc-root')).toBeHidden();
+  await page.locator('.home-menu').getByRole('button', { name: 'Free dive', exact: true }).click();
+  await Promise.all([
+    page.waitForURL(/[?&]tile=blake-plateau-corals\b/),
+    page.locator('.home-sites [data-tile="blake-plateau-corals"]').click(),
+  ]);
+  await page.waitForFunction(() => window.__gameReady === true);
+  await expect(page.locator('.hud')).toHaveCount(1);
+  await expect(page.locator('.tc-root')).toHaveCount(1);
+  await expect(page.locator('.home-screen')).toHaveCount(1);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window.__game as { input: { state: { throttle: number } } }).input.state.throttle,
+      ),
+    )
+    .toBe(0);
+  await page.keyboard.down('w');
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window.__game as { input: { state: { throttle: number } } }).input.state.throttle,
+      ),
+    )
+    .toBe(1);
+  await page.keyboard.up('w');
+});
+
 async function pose(page: Page): Promise<number[]> {
   return page.evaluate(() => {
     const p = (window.__game as { sub: { position: { x: number; y: number; z: number } } }).sub

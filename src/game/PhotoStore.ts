@@ -56,9 +56,15 @@ export class PhotoStore {
   private readOnly = false;
 
   constructor(storage: PhotoStorage | null = safeStorage()) {
+    let raw: string | null;
+    try {
+      raw = storage?.getItem(PHOTO_STORAGE_KEY) ?? null;
+    } catch {
+      this.storage = null;
+      return;
+    }
     this.storage = storage;
     try {
-      const raw = storage?.getItem(PHOTO_STORAGE_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw) as { version?: number; photos?: unknown };
       if (typeof parsed.version === 'number' && parsed.version > 1) {

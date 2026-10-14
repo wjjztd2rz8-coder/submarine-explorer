@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Input } from '../../src/core/Input.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import { createInputSystem } from '../../src/app/systems/input.js';
 import { inputGateSystem } from '../../src/app/loop.js';
 import { discoverySystem } from '../../src/app/systems/discovery.js';
 import { FROZEN_INPUT } from '../../src/game/MissionRouter.js';
@@ -13,6 +15,43 @@ import {
 import { createSystems } from '../../src/app/systems.js';
 
 describe('SystemRunner', () => {
+  it('discards held keys across pause/Home and removes input listeners before re-entry', () => {
+    const win = new EventTarget();
+    vi.stubGlobal('window', win);
+    const bus = new EventBus();
+    const inputSystem = createInputSystem();
+    const ctx = {
+      bus,
+      canvas: null,
+      expose: vi.fn(),
+      photoMode: { active: false },
+    } as unknown as GameContext;
+    try {
+      inputSystem.init!(ctx);
+      const old = ctx.input;
+      old.injectKey('KeyW', true);
+      expect(old.sample().throttle).toBe(1);
+      bus.emit('app:state', { state: 'pause' });
+      bus.emit('app:state', { state: 'dive' });
+      expect(old.sample().throttle).toBe(0);
+      old.injectKey('KeyW', true);
+      inputSystem.frame!['late.input']!({ frozen: true } as FrameState, ctx);
+      expect(old.sample().throttle).toBe(0);
+      old.injectKey('KeyW', true);
+      bus.emit('app:state', { state: 'home' });
+      expect(old.sample().throttle).toBe(0);
+      inputSystem.dispose!();
+      inputSystem.init!(ctx);
+      const event = Object.assign(new Event('keydown'), { code: 'KeyW' });
+      Object.defineProperty(event, 'target', { value: { closest: () => null } });
+      win.dispatchEvent(event);
+      expect(old.sample().throttle).toBe(0);
+      expect(ctx.input.sample().throttle).toBe(1);
+    } finally {
+      inputSystem.dispose!();
+      vi.unstubAllGlobals();
+    }
+  });
   it('inits in list order, starts after every init, and runs hooks by stage then list order', () => {
     const log: string[] = [];
     const sys = (name: string, stages: (typeof FRAME_STAGES)[number][]): GameSystem => ({
@@ -40,6 +79,7 @@ describe('createSystems', () => {
   it('has unique names and fresh stateful systems per call', () => {
     expect(new Set(names).size).toBe(names.length);
     const again = createSystems();
+    expect(again.find((s) => s.name === 'input')).not.toBe(systems.find((s) => s.name === 'input'));
     expect(again.find((s) => s.name === 'submarine')).not.toBe(
       systems.find((s) => s.name === 'submarine'),
     );

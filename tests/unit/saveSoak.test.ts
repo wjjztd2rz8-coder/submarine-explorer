@@ -47,6 +47,41 @@ const legacySettingsKey = 'subexplorer.settings.v1';
 const damaged = [null, '', '{broken', '{"version":1,"discovered":', 'null', '[]', '42'];
 
 describe('save schema soak', () => {
+  it.each(['legacy', 'partial'])(
+    'keeps Journal namespaces through a %s migration and reload',
+    (shape) => {
+      const storage = new MemoryStorage();
+      const keys = [
+        'titanic/bow',
+        'titanic/life:shark',
+        'titanic/event:whale',
+        'titanic/sample:rust',
+        'titanic/secret:cabin',
+      ];
+      storage.setItem(
+        DISCOVERY_STORAGE_KEY,
+        JSON.stringify(
+          shape === 'legacy'
+            ? { version: 0, discoveries: keys }
+            : {
+                version: 1,
+                discovered: Object.fromEntries(keys.map((key) => [key, { at }])),
+                stats: null,
+              },
+        ),
+      );
+      const store = new DiscoveryStore(storage, now);
+      expect(store.keys()).toEqual(keys);
+      expect(store.stats).toEqual({ scans: keys.length, firstAt: at });
+      store.record('titanic', 'bow');
+      const restored = new DiscoveryStore(storage, now);
+      expect(restored.snapshot()).toEqual(store.snapshot());
+      expect(restored.discoveredFor('titanic')).toEqual(
+        keys.map((key) => key.slice('titanic/'.length)),
+      );
+    },
+  );
+
   it.each([undefined, 0, 1, 2])(
     'round trips settings v%s without losing display choices',
     (version) => {
@@ -272,6 +307,17 @@ describe('damaged localStorage recovery', () => {
     write(storage);
     if (key === BINDINGS_STORAGE_KEY) new Input({ storage }).resetBindings();
     expect(storage.getItem(key)).toBe(future);
+  });
+
+  it.each(constructors)('failed reads cannot erase an intact %s save', (key, write) => {
+    const storage = new MemoryStorage();
+    const original = '{"version":99,"valuable":"keep this"}';
+    storage.setItem(key, original);
+    storage.getItem = () => {
+      throw new Error('read denied');
+    };
+    expect(() => write(storage)).not.toThrow();
+    expect(storage.data.get(key)).toBe(original);
   });
 
   it.each(damaged)('boots all stores for %j and persists fresh work across reload', (text) => {
