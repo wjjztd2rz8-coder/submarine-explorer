@@ -176,7 +176,13 @@ test('samples collect per dive, appear in mission debrief, and reset on restart'
     await page.evaluate(() => (window.__game as unknown as Game).explore.samples.collected.size),
   ).toBe(1);
   await page.evaluate(() => (window.__game as unknown as Game).missionRouter.endDive());
-  await expect(page.locator('.mission-debrief .is-samples')).toContainText('Sediment core');
+  // Supplemental scans now share the debrief's scan count and latest-scan highlight.
+  await expect(page.locator('.mission-debrief .debrief-highlight.is-discoveries')).toContainText(
+    'Sediment core',
+  );
+  await expect(
+    page.locator('.mission-debrief [data-field="discoveries"] .debrief-value'),
+  ).toHaveText('1');
   await expect(page.locator('.mission-debrief .is-secrets')).toHaveCount(0);
   expect(
     await page.evaluate(() => (window.__game as unknown as Game).explore.summary().found),

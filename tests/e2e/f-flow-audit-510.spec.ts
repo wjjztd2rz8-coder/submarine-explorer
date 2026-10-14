@@ -1,3 +1,4 @@
+import { homeReady } from './helpers/home.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir, writeFile } from 'node:fs/promises';
 import { expect, test, type Locator, type Page } from '@playwright/test';
@@ -222,10 +223,12 @@ for (const viewport of [
                 '.debrief-panel',
               ];
               return {
-                elapsedS: g.discovery.stats.elapsedS,
-                tutorialStep: g.onboard.tutorial.index,
-                candidate: g.discovery.scanner.view.candidateId,
-                position: { x: g.sub.position.x, y: g.sub.position.y, z: g.sub.position.z },
+                elapsedS: g.discovery?.stats.elapsedS ?? null,
+                tutorialStep: g.onboard?.tutorial.index ?? null,
+                candidate: g.discovery?.scanner.view.candidateId ?? null,
+                position: g.sub
+                  ? { x: g.sub.position.x, y: g.sub.position.y, z: g.sub.position.z }
+                  : null,
                 panels: selectors.flatMap((selector) => {
                   const e = document.querySelector<HTMLElement>(selector);
                   if (!e?.getClientRects().length) return [];
@@ -240,7 +243,7 @@ for (const viewport of [
         };
         const touch = viewport.touch;
         await page.goto('/', { waitUntil: 'domcontentloaded' });
-        await ready(page);
+        await homeReady(page, true);
         const home = page.locator('.home-screen');
         await expect(home).toBeVisible();
         await expect(home.getByRole('button', { name: 'Dive', exact: true })).toBeEnabled();
