@@ -69,7 +69,7 @@ export function summarizeDive(
       kind: null,
     };
 
-  const scan = stats.discoveries[0];
+  const scan = stats.discoveries.at(-1);
   const secret = exploration?.secrets[0];
   const event = exploration?.events[0];
   const sample = exploration?.samples[0];

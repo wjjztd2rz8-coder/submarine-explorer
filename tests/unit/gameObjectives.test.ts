@@ -68,4 +68,19 @@ describe('SessionStats', () => {
     expect(snap.newEntries).toEqual([{ id: 'bow', title: 'The bow section' }]);
     expect(snap.title).toBe('Mission complete');
   });
+
+  it('keeps distinct discoveries in order, scoped by landmark, and clears them for a new dive', () => {
+    const s = new SessionStats(250);
+    s.noteScan('bow', 'Bow', 'titanic');
+    s.noteScan('life:coral', 'Golden coral', 'titanic');
+    s.noteScan('stern', 'Stern', 'titanic');
+    s.noteScan('bow', 'Bow', 'titanic'); // A duplicate is not a new discovery.
+    expect(s.snapshot().discoveries.map((d) => d.name)).toEqual(['Bow', 'Golden coral', 'Stern']);
+    s.noteScan('bow', 'Another bow', 'elsewhere');
+    expect(s.snapshot().discoveries).toHaveLength(4);
+    s.reset();
+    expect(s.snapshot().discoveries).toEqual([]);
+    s.noteScan('stern', 'Stern', 'titanic'); // A previously logged target counts in a fresh dive.
+    expect(s.snapshot().discoveries).toEqual([{ poiId: 'stern', name: 'Stern' }]);
+  });
 });

@@ -105,6 +105,7 @@ export function placeSecrets(
     return {
       id: secretDiscoveryId(def.id),
       name: 'Unidentified contact',
+      discoveryName: def.name,
       landmarkId: site,
       position: new Vector3(x, ground(x, z) + 2, z),
       radius: EXPLORE_CONFIG.secretScanRangeM,

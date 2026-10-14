@@ -356,8 +356,11 @@ describe('Scanner', () => {
     expect(scanner.view.nearestScanned).toBe(true);
     expect(scanner.view.candidateId).toBeNull();
     expect(scanner.isScanned('lm', 'bow')).toBe(true);
+    expect(scanner.view.completed).toBe(1);
     expect(store.get('lm', 'bow')?.count).toBe(1);
     scanner.resetDive();
+    expect(scanner.view.completed).toBe(0);
+    expect(scanner.view.lastCompleteId).toBeNull();
     expect(scanner.isScanned('lm', 'bow')).toBe(false);
     run(scanner, 2.2, AT, NORTH, true);
     const completes = log.filter(([n]) => n === 'scan:complete');
@@ -365,6 +368,7 @@ describe('Scanner', () => {
     expect((completes[1]?.[1] as { firstTime: boolean }).firstTime).toBe(false);
     expect(store.get('lm', 'bow')?.count).toBe(2);
     expect(store.isDiscovered('lm', 'bow')).toBe(true);
+    expect(scanner.view.completed).toBe(1);
   });
 
   it('is suppressed while disabled (an overlay is open)', () => {

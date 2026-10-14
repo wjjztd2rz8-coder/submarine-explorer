@@ -25,6 +25,8 @@ import type { GameEvents } from '../core/EventBus.js';
 export interface ScanTarget {
   id: string;
   name: string;
+  /** Revealed name after scanning, when the contact starts unidentified. */
+  discoveryName?: string;
   landmarkId: string;
   position: Vector3;
   radius: number;
@@ -95,7 +97,7 @@ export interface ScanView {
   objectiveVertDeg: number;
   /** Reason for the most recent interruption, while phase === 'interrupted'. */
   lastAbort: AbortReason | null;
-  /** Completed scans since construction (handy for tests and e2e). */
+  /** Distinct discoveries this dive, including POIs, wildlife and curiosity targets. */
   completed: number;
   lastCompleteId: string | null;
   lastCompleteFirstTime: boolean;
@@ -449,11 +451,11 @@ export class Scanner {
     if (this.isScanned(t.landmarkId, t.id)) return;
     this.scannedThisDive.add(`${t.landmarkId}/${t.id}`);
     const firstTime = this.recorder ? this.recorder.record(t.landmarkId, t.id).firstTime : true;
-    this.bus.emit('scan:progress', { poiId: t.id, progress: 1 });
-    this.bus.emit('scan:complete', { poiId: t.id, landmarkId: t.landmarkId, firstTime });
-    v.completed += 1;
+    v.completed = this.scannedThisDive.size;
     v.lastCompleteId = t.id;
     v.lastCompleteFirstTime = firstTime;
+    this.bus.emit('scan:progress', { poiId: t.id, progress: 1 });
+    this.bus.emit('scan:complete', { poiId: t.id, landmarkId: t.landmarkId, firstTime });
     this.clearActive();
     v.candidateId = null;
   }

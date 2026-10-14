@@ -98,7 +98,7 @@ export interface DebriefStats {
   elapsedS: number;
   /** Mission objectives done this dive ("X of Y objectives"); absent in a free dive. */
   objectives?: { completed: number; total: number };
-  /** POIs scanned this session (first-time or repeat). */
+  /** Distinct targets scanned this dive, in discovery order, including previously logged finds. */
   discoveries: Array<{ poiId: string; name: string }>;
   /** Journal entries first unlocked this session. */
   newEntries: Array<{ id: string; title: string }>;
@@ -109,7 +109,7 @@ export class SessionStats {
   /** Positive metres. */
   maxDepthM = 0;
   elapsedS = 0;
-  private readonly scanned = new Map<string, string>();
+  private readonly scanned = new Map<string, { poiId: string; name: string }>();
   private readonly entries = new Map<string, string>();
   private last: { x: number; y: number; z: number } | null = null;
 
@@ -136,8 +136,9 @@ export class SessionStats {
     this.last = null;
   }
 
-  noteScan(poiId: string, name: string): void {
-    if (!this.scanned.has(poiId)) this.scanned.set(poiId, name);
+  noteScan(poiId: string, name: string, landmarkId = ''): void {
+    const key = `${landmarkId}/${poiId}`;
+    if (!this.scanned.has(key)) this.scanned.set(key, { poiId, name });
   }
 
   noteNewEntry(id: string, title: string): void {
@@ -149,7 +150,7 @@ export class SessionStats {
       distanceM: this.distanceM,
       maxDepthM: this.maxDepthM,
       elapsedS: this.elapsedS,
-      discoveries: [...this.scanned].map(([poiId, name]) => ({ poiId, name })),
+      discoveries: [...this.scanned.values()].map((discovery) => ({ ...discovery })),
       newEntries: [...this.entries].map(([id, title]) => ({ id, title })),
       ...extra,
     };

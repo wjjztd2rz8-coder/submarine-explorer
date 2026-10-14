@@ -265,7 +265,7 @@ test.describe('B3 mission flow', () => {
     expect(m.state).toBe('debrief');
     expect(m.emitted.slice(-2)).toEqual(['mission:complete', 'mission:ended']);
     expect(m.durationS).toBeGreaterThan(3);
-    await expect(debrief.locator('.debrief-title')).toHaveText('Mission complete');
+    await expect(debrief.locator('.debrief-title')).toHaveText('Primaries complete');
     await expect(debrief.locator('.debrief-kicker')).toHaveText('TITANIC DIVE');
     await expect(debrief.locator('.debrief-btn')).toHaveText([
       'Dive sites',
@@ -274,7 +274,7 @@ test.describe('B3 mission flow', () => {
       'Dive again',
       'Home',
     ]);
-    await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Bow section.');
+    await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Stern section.');
     await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText('2');
     await page.waitForTimeout(300);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-debrief.png' });

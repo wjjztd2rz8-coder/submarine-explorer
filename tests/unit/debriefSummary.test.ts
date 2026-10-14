@@ -27,12 +27,24 @@ describe('compact dive summary', () => {
       kind: null,
     });
   });
-  it('chooses one scan despite multiple discoveries and new Journal entries', () => {
+  it('names the latest discovery despite earlier scans and new Journal entries', () => {
     expect(summarizeDive(scanned, { stars: 0, points: 40, best: 0 })).toEqual({
-      highlight: 'Scanned Bow section.',
+      highlight: 'Scanned Stern section.',
       next: 'Keep exploring to finish the primary objectives.',
       kind: 'discoveries',
     });
+  });
+  it.each([
+    ['life:coral', 'Golden coral'],
+    ['secret:frame', 'Buried steel frame'],
+    ['sample:mud', 'Sediment core'],
+  ])('can name a most recent %s discovery after a mission scan', (poiId, name) => {
+    expect(
+      summarizeDive({
+        ...scanned,
+        discoveries: [...scanned.discoveries, { poiId, name }],
+      }).highlight,
+    ).toBe(`Scanned ${name}.`);
   });
   it.each([
     [1, 'Finish the remaining objectives for 2 stars.'],
