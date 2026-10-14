@@ -10,6 +10,7 @@ import type { Submarine } from '../../src/sub/Submarine.js';
 import type { Props } from '../../src/world/Props.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { openBriefingAdvanced } from './helpers/briefing.js';
+import { GUIDANCE } from './helpers/guidance.js';
 
 interface Game {
   discovery: Discovery;
@@ -24,14 +25,8 @@ const panels = [
   '.sonar',
   '.objectives-panel',
   '.hud-readouts',
-  '.hud-warning',
-  '.hud-notice',
-  '.hud-objective',
-  '.hud-prompt',
+  '.guidance-slot',
   '.hud-reset-camera',
-  '.scan-panel',
-  '.onboard-card',
-  '.onboard-hint',
   '.tc-stick',
   '.tc-slider',
   '.tc-buttons',
@@ -182,7 +177,7 @@ for (const layout of [
         // produce its real toast, then render an authored contact's completion
         // card without claiming a scan occurred at the surface.
         await page.evaluate(() => {
-          // The completion toast shares a chip with contextual hints. This
+          // The completion note shares the slot with contextual hints. This
           // fixture owns completion; animal hints have separate live coverage
           // in f-toast-placement and f-first-minute-620.
           localStorage.setItem(
@@ -210,9 +205,10 @@ for (const layout of [
           g.discovery.overlay.showComplete(contact.name, true, { scan: 'G', guide: 'J' });
         });
         await page.clock.runFor(100);
-        await expect(page.locator('.onboard-card')).toBeHidden();
-        await expect(page.locator('.onboard-hint')).toContainText('Nice work.');
-        await expect(page.locator('.scan-panel')).toBeVisible();
+        await expect(page.locator(GUIDANCE.tutorial)).toBeHidden();
+        await expect(page.locator(GUIDANCE.discovery)).toBeVisible();
+        // The "Nice work" note waits behind the result instead of stacking with it.
+        await expect(page.locator(GUIDANCE.any)).toHaveCount(1);
         expect(
           await page.evaluate(() => (window.__game as unknown as Game).sub.position.y),
         ).toBeGreaterThan(-20);

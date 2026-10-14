@@ -82,7 +82,6 @@ export class GuidanceSlot {
 
     this.skip = el('button', 'guidance-skip', 'Skip');
     this.skip.type = 'button';
-    this.skip.setAttribute('aria-label', 'Skip tutorial step');
     this.skip.addEventListener('click', () => {
       this.skipHandler?.();
       // Space (ballast) must not re-press a focused button.

@@ -29,7 +29,7 @@ async function screenshot(page: Page, name: string): Promise<void> {
 
 test('scanned contacts stay marked and cannot be rescanned until a new dive', async ({ page }) => {
   await boot(page, scanUrl);
-  await expect(page.locator('.scan-panel .scan-hint')).toHaveText(/HOLD G TO SCAN/);
+  await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText(/HOLD G TO SCAN/);
   await scanWithKeyboard(page, 'test-bow');
   await expect
     .poll(() =>
@@ -49,10 +49,10 @@ test('scanned contacts stay marked and cannot be rescanned until a new dive', as
   await screenshot(page, 'scanned');
   await page.waitForFunction(
     () =>
-      !(window.__game as { discovery: { overlay: { bannerActive: boolean } } }).discovery.overlay
-        .bannerActive,
+      (window.__game as { discovery: { overlay: { slot: { kind: string | null } } } }).discovery
+        .overlay.slot.kind !== 'discovery',
   );
-  await expect(page.locator('.scan-panel .scan-hint')).toHaveText('Logged · Journal');
+  await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText('Logged · Journal');
   await screenshot(page, 'already-logged-prompt');
   await page.keyboard.down('g');
   await advanceScan(page, 3.6);
@@ -78,7 +78,7 @@ test('scanned contacts stay marked and cannot be rescanned until a new dive', as
       (window.__game as { discovery?: { spawnedAt: string | null } }).discovery?.spawnedAt ===
       'test-bow',
   );
-  await expect(page.locator('.scan-panel .scan-hint')).toHaveText(/HOLD G TO SCAN/);
+  await expect(page.locator('.guidance-slot .guidance-hint')).toHaveText(/HOLD G TO SCAN/);
   await scanWithKeyboard(page, 'test-bow');
   expect(
     await page.evaluate(() => {
@@ -93,7 +93,6 @@ test('scanned contacts stay marked and cannot be rescanned until a new dive', as
 
 test('visual hints show an objective waypoint and obey the saved toggle', async ({ page }) => {
   await boot(page, '/?mission=titanic&skipBriefing=1&poi=titanic-bow');
-  await expect(page.locator('.d-scan-objective-hint')).toContainText('bow');
   await expect(page.locator('.d-scan-edge')).toBeVisible();
   await expect(page.locator('.d-scan-edge')).toContainText(/m · [↑↓]\d+ m/);
   await screenshot(page, 'waypoint-onscreen');
@@ -118,10 +117,8 @@ test('visual hints show an objective waypoint and obey the saved toggle', async 
   });
   await expect(page.locator('.d-scan-waypoints')).toHaveAttribute('data-hints', 'false');
   await expect(page.locator('.d-scan-edge')).toBeHidden();
-  await expect(page.locator('.d-scan-objective-hint')).toContainText('bow');
   await screenshot(page, 'hints-off');
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
   await expect(page.locator('.d-scan-waypoints')).toHaveAttribute('data-hints', 'false');
-  await expect(page.locator('.d-scan-objective-hint')).toContainText('bow');
 });

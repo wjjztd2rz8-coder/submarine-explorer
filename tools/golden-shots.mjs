@@ -291,7 +291,7 @@ async function main() {
               hud: [
                 '.hud-readouts',
                 '.hud-attribution',
-                '.scan-panel',
+                '.guidance-slot',
                 '.sonar',
                 '.tc-stick',
                 '.tc-slider',

@@ -48,14 +48,11 @@ export const waypointsSystem: GameSystem = {
       }
       f.nextScanObjective = nextScanObjective;
       ctx.discovery.scanner.setObjective(nextScanObjective?.poiId ?? null);
-      const target = nextScanObjective
-        ? ctx.discovery.pois.find((p) => p.id === nextScanObjective.poiId)
-        : undefined;
       ctx.waypoints.update(
         ctx.rig.camera,
         f.pilotPosition,
         nextScanObjective ? { poiId: nextScanObjective.poiId } : null,
-        !!target && ctx.guidance.showsName(target.name),
+        (name) => ctx.guidance.showsName(name),
       );
     },
   },

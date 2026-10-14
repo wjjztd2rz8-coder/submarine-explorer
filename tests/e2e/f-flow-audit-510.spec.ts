@@ -209,10 +209,9 @@ for (const viewport of [
             ...(await page.evaluate(() => {
               const g = window.__game as unknown as Game;
               const selectors = [
-                '.onboard-card',
                 '.objectives-panel',
                 '.hud-readouts',
-                '.scan-panel',
+                '.guidance-slot',
                 '.sonar',
                 '.tc-stick',
                 '.tc-slider',

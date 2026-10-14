@@ -2,6 +2,7 @@
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { waitForFrames } from './helpers/frames.js';
+import { GUIDANCE } from './helpers/guidance.js';
 
 const shots = '.cache/codex/shots/d-input-hud';
 const diveUrl = '/?tile=titanic&landmark=_test&poi=test-bow';
@@ -56,7 +57,7 @@ test('readable contextual HUD, controls and UI scale survive reload', async ({ p
   await ready(page);
   await expect(page.locator('.hud-help')).toHaveCount(0);
   await expect(page.locator('body > .mission-select')).toBeHidden();
-  await expect(page.locator('.hud-prompt')).toContainText('G Scan');
+  await expect(page.locator(`${GUIDANCE.scan} ${GUIDANCE.detail}`)).toContainText('HOLD G TO SCAN');
   await page.screenshot({ path: `${shots}/hud-1280.png` });
   await page.screenshot({ path: `${shots}/dive.png` });
   await page.setViewportSize({ width: 1920, height: 1080 });
@@ -90,7 +91,7 @@ test('readable contextual HUD, controls and UI scale survive reload', async ({ p
       () => (window.__game as { save: { get(): { uiScale: number } } }).save.get().uiScale,
     ),
   ).toBe(150);
-  await expect(page.locator('.hud-prompt')).toContainText('G Scan');
+  await expect(page.locator(`${GUIDANCE.scan} ${GUIDANCE.detail}`)).toContainText('HOLD G TO SCAN');
   await page.screenshot({ path: `${shots}/scaled-150.png` });
   await page.keyboard.press('t');
   await expect(page.locator('.hud-sim-speed')).toHaveText('2× SIM SPEED');

@@ -3,9 +3,10 @@ import { dismissTutorial } from './helpers/tutorial.js';
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
 import type { Life } from '../../src/world/life/Life.js';
+import type { HintEngine } from '../../src/game/Hints.js';
 import type { ScanOverlay } from '../../src/ui/ScanOverlay.js';
 import type { PerspectiveCamera, Vector3 } from 'three';
-import { finishAnimations } from './helpers/hudTips.js';
+import { GUIDANCE } from './helpers/guidance.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
 const shots = '.cache/codex/shots/550-f-toast-placement';
@@ -16,6 +17,7 @@ interface Probe {
   rig: { camera: PerspectiveCamera };
   discovery: { loaded: boolean; overlay: ScanOverlay };
   props: { loaded: boolean };
+  onboard: { hints: HintEngine };
 }
 
 async function separate(page: Page, selectors: string[]): Promise<void> {
@@ -91,7 +93,9 @@ for (const layout of [
         ? 'great-blue-hole'
         : 'monterey-canyon',
     ]) {
-      test(`${site}: animal toast stays clear of HUD and can be dismissed`, async ({ page }) => {
+      test(`${site}: the animal hint waits for the scan card, then clears the HUD`, async ({
+        page,
+      }) => {
         await pauseClockBeforeNavigation(page);
         await page.addInitScript((scale) => {
           localStorage.setItem(
@@ -120,15 +124,15 @@ for (const layout of [
           );
         });
         await page.clock.runFor(34);
-        await expect(page.locator('.scan-panel')).toBeVisible();
-        // The tutorial card yields to the scan card, so only the scan card is laid out here.
-        await expect(page.locator('.onboard-card')).toBeHidden();
+        await expect(page.locator(GUIDANCE.scan)).toBeVisible();
+        // The scan card outranks the tutorial step, so only the scan card is laid out here.
+        await expect(page.locator(GUIDANCE.tutorial)).toBeHidden();
         const hud = ['.sonar', '.hud-readouts'];
         const controls = layout.touch
           ? ['.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause']
           : ['.hud-reset-camera'];
-        await separate(page, [...hud, '.scan-panel', ...controls]);
-        await expect(page.locator('.onboard-hint')).toBeHidden();
+        await separate(page, [...hud, GUIDANCE.any, ...controls]);
+        await expect(page.locator(GUIDANCE.hint)).toBeHidden();
 
         // Exercise the actual animal-hint trigger; hold a placed animal so
         // drift and ambient spawn timing do not decide whether the hint fires.
@@ -157,11 +161,22 @@ for (const layout of [
         expect(spawned.targets).toBeGreaterThan(0);
         await dismissTutorial(page, layout.touch, true);
         await page.clock.runFor(50);
-        const hint = page.locator('.onboard-hint');
-        await expect(page.locator('.onboard-card')).toBeHidden();
-        // Give the real eight-second trigger enough clamped game frames.
-        // Bound by simulated time (up to ten seconds), not a 45 s wall-clock
-        // poll that can expire before 32 software-GPU renders have completed.
+        const hint = page.locator(GUIDANCE.hint);
+        await expect(page.locator(GUIDANCE.tutorial)).toBeHidden();
+        // The opening contact's scan card holds the slot, so the animal hint waits
+        // behind it and is not used up unseen.
+        for (let frame = 0; frame < 40; frame++) await page.clock.fastForward(250);
+        await expect(page.locator(GUIDANCE.scan)).toBeVisible();
+        await expect(hint).toBeHidden();
+        expect(
+          await page.evaluate(() =>
+            (window.__game as unknown as Probe).onboard.hints.hasSeen('creature'),
+          ),
+        ).toBe(false);
+        // Once the contact is out of the way the hint takes the same slot, clear of the HUD.
+        await page.evaluate(() => {
+          (window.__game as unknown as Probe).discovery.overlay.setSuppressed(true);
+        });
         for (let frame = 0; frame < 40; frame++) {
           if (await hint.textContent().then((text) => text?.includes('Animal nearby.'))) break;
           await page.clock.fastForward(250);
@@ -171,54 +186,10 @@ for (const layout of [
             ? 'Animal nearby. Hold SCAN to scan, or use PHOTO for a photo.'
             : 'Animal nearby. Hold G to scan, or use P for a photo.',
         );
-        await finishAnimations(page, '.onboard-hint');
-        // The clock was paused before navigation; screenshots and geometry
-        // round trips cannot consume the real hint's twelve-second lifetime.
         await screenshot(page, `${site}-${name}`);
-        await separate(page, [...hud, '.scan-panel', '.onboard-hint', ...controls]);
-        const target = (await page.locator('.scan-panel').boundingBox())!;
-        const toast = (await hint.boundingBox())!;
-        expect(toast.y - target.y - target.height).toBeCloseTo(8, 0);
-        expect(toast.x + toast.width / 2).toBeCloseTo(target.x + target.width / 2, 0);
-        expect(toast.width).toBeCloseTo(target.width, 0);
-        if (!layout.touch) expect(toast.x + toast.width / 2).toBe(layout.width / 2);
-
-        await page.evaluate(() => {
-          (window.__game as unknown as Probe).discovery.overlay.showComplete(
-            'Long named contact with identifier ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-            true,
-            { scan: 'G', guide: 'J' },
-          );
-        });
-        await screenshot(page, `${site}-${name}-wrapped`);
-        await separate(page, [...hud, '.scan-panel', '.onboard-hint', ...controls]);
-        const wrappedTarget = (await page.locator('.scan-panel').boundingBox())!;
-        const wrappedToast = (await hint.boundingBox())!;
-        expect(wrappedToast.y - wrappedTarget.y - wrappedTarget.height).toBeCloseTo(8, 0);
-        expect(wrappedToast.x).toBeCloseTo(wrappedTarget.x, 0);
-        expect(wrappedToast.width).toBeCloseTo(wrappedTarget.width, 0);
-
-        // An absent target must leave the hint visible in the same safe slot.
-        await page.evaluate(() => {
-          (window.__game as unknown as Probe).discovery.overlay.setSuppressed(true);
-        });
-        await expect(page.locator('.scan-panel')).toBeHidden();
-        await separate(page, [...hud, '.onboard-hint', ...controls]);
-        const close = hint.getByRole('button', { name: 'Dismiss hint' });
-        const hit = await close.evaluate((button) => {
-          const r = button.getBoundingClientRect();
-          const target = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-          return {
-            width: r.width,
-            height: r.height,
-            reachable: !!target && button.contains(target),
-          };
-        });
-        expect(hit.width).toBeGreaterThanOrEqual(44);
-        expect(hit.height).toBeGreaterThanOrEqual(44);
-        expect(hit.reachable).toBe(true);
-        if (layout.touch) await close.tap();
-        else await close.click();
+        await separate(page, [...hud, GUIDANCE.any, ...controls]);
+        // The clock was paused before navigation, so only these frames spend its lifetime.
+        for (let frame = 0; frame < 60; frame++) await page.clock.fastForward(250);
         await expect(hint).toBeHidden();
       });
     }

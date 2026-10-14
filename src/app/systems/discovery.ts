@@ -40,6 +40,7 @@ export const discoverySystem: GameSystem = {
       scanner: discovery.scanner,
       discoveries: discovery.store,
       discovery,
+      guidance: discovery.overlay.slot,
       debrief: discovery.debrief,
       fieldGuide: discovery.guide,
     });

@@ -93,7 +93,7 @@ for (const viewport of [
                 z: top.z,
               };
             }
-            const panel = document.querySelector<HTMLElement>('.scan-panel')!;
+            const panel = document.querySelector<HTMLElement>('.guidance-slot')!;
             const card = panel.getBoundingClientRect();
             return {
               tip,

@@ -71,14 +71,14 @@ export class Waypoints {
   }
 
   /**
-   * @param nameInSlot the guidance slot already shows the target's name, so the
-   *   label keeps only range and depth.
+   * @param nameInSlot says whether the guidance slot already shows a name; the
+   *   label then keeps only range and depth.
    */
   update(
     camera: Camera,
     position: Vector3,
     objective: WaypointObjective | null,
-    nameInSlot = false,
+    nameInSlot: (name: string) => boolean = () => false,
   ): void {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -122,7 +122,7 @@ export class Waypoints {
     this.edge.style.left = `${Math.max(130, Math.min(width - 130, ((x + 1) / 2) * width))}px`;
     this.edge.style.top = `${Math.max(100, Math.min(height - 145, ((1 - y) / 2) * height))}px`;
     this.edgeName.textContent = current.name;
-    this.edgeName.hidden = nameInSlot;
+    this.edgeName.hidden = nameInSlot(current.name);
     this.edgeInfo.textContent = waypointReadout(position, current.position, current.radius);
     this.edge.style.setProperty('--direction', `${angle}rad`);
   }

@@ -9,6 +9,7 @@ import type { Discovery } from '../../src/game/Discovery.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
 import type { Mission } from '../../src/game/Mission.js';
 import { processedFrames } from './helpers/hudTips.js';
+import { GUIDANCE } from './helpers/guidance.js';
 
 const env =
   (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
@@ -104,9 +105,7 @@ for (let pass = 1; pass <= rounds; pass++) {
               ...(await page.evaluate(() => {
                 const g = window.__game as unknown as Game;
                 const selectors = [
-                  '.onboard-card',
-                  '.onboard-hint',
-                  '.scan-panel',
+                  '.guidance-slot',
                   '.objectives-panel',
                   '.obj-item.is-current',
                   '.hud-readouts',
@@ -170,7 +169,7 @@ for (let pass = 1; pass <= rounds; pass++) {
             if (seconds === 10) await hold(page, layout.touch, '.tc-stick', 'KeyW', 1500);
             if (
               seconds === 20 &&
-              ((await page.locator('.scan-hint').textContent()) ?? '').includes('HOLD')
+              ((await page.locator('.guidance-hint').textContent()) ?? '').includes('HOLD')
             )
               await hold(page, layout.touch, '.tc-btn-scan', 'KeyG', 4500);
           }
@@ -225,7 +224,9 @@ for (const layout of [
       ).toBeVisible();
     });
 
-    test('animal hint fades on the first actual move; scan stays separate', async ({ page }) => {
+    test('animal hint waits for the scan card and fades on the first actual move', async ({
+      page,
+    }) => {
       await pauseClockBeforeNavigation(page);
       await page.addInitScript(() => {
         localStorage.setItem(
@@ -268,33 +269,32 @@ for (const layout of [
         return animal !== null;
       });
       expect(spawned).toBe(true);
-      const hint = page.locator('.onboard-hint');
-      // Animal guidance intentionally gives the opening scan card eight seconds.
+      const hint = page.locator(GUIDANCE.hint);
+      // The opening scan card holds the slot, so the animal hint waits behind it.
+      await expect(page.locator(GUIDANCE.scan)).toBeVisible();
+      for (let frame = 0; frame < 40; frame++) await page.clock.fastForward(250);
+      await expect(hint).toBeHidden();
+      await page.evaluate(() =>
+        (window.__game as unknown as Game).discovery.overlay.setSuppressed(true),
+      );
       await clockFramesUntil(
         page,
         () =>
-          document.querySelector('.onboard-hint')?.textContent?.includes('Animal nearby') === true,
+          document
+            .querySelector('.guidance-slot[data-kind="hint"]:not([data-step])')
+            ?.textContent?.includes('Animal nearby') === true,
         250,
       );
-      await expect(hint).toContainText('Animal nearby');
       await expect(hint).toBeVisible();
-      // Long completion names exercise the same flow as long scan targets.
-      await page.evaluate(() =>
-        (window.__game as unknown as Game).discovery.overlay.showComplete(
-          'A long contact name ABCDEFGHIJKLMNOPQRSTUVWXYZ with a wrapped second line',
-          true,
-          { scan: 'G', guide: 'J' },
-        ),
-      );
-      const target = (await page.locator('.scan-panel').boundingBox())!;
-      const toast = (await hint.boundingBox())!;
-      expect(toast.y).toBeGreaterThanOrEqual(target.y + target.height + 7);
-      expect(toast.x).toBeCloseTo(target.x, 0);
-      await reviewShot(page, `${layout.name}-wrapped-toast`);
+      await reviewShot(page, `${layout.name}-animal-hint`);
       await withClockFrames(page, () => hold(page, layout.touch, '.tc-stick', 'KeyW', 0));
       await page.clock.fastForward(250);
       await expect(hint).toBeHidden();
-      await expect(page.locator('.scan-panel')).toBeVisible();
+      await page.evaluate(() =>
+        (window.__game as unknown as Game).discovery.overlay.setSuppressed(false),
+      );
+      await page.clock.fastForward(250);
+      await expect(page.locator(GUIDANCE.scan)).toBeVisible();
       await expectObjectiveGuidance(page, layout.touch);
       await reviewShot(page, `${layout.name}-after-move`);
     });

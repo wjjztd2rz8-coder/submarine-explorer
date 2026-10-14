@@ -2,6 +2,7 @@
 import { mkdir } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
 import { finishAnimations } from './helpers/hudTips.js';
+import { GUIDANCE } from './helpers/guidance.js';
 import { setScanCardSuppressed } from './helpers/tutorial.js';
 
 const shots = '.cache/codex/shots/f-hud-layout';
@@ -14,8 +15,8 @@ async function boot(page: Page, touch: boolean): Promise<void> {
   await page.goto(url + (touch ? '&touch=1' : ''), { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
   // A contact is in range from the start, so its card is up and the tutorial waits.
-  await expect(page.locator('.scan-panel')).toBeVisible();
-  await expect(page.locator('.onboard-card')).toBeHidden();
+  await expect(page.locator(GUIDANCE.scan)).toBeVisible();
+  await expect(page.locator(GUIDANCE.tutorial)).toBeHidden();
 }
 
 async function shot(page: Page, name: string): Promise<void> {
@@ -66,27 +67,23 @@ for (const layout of [
       await boot(page, layout.touch);
       await shot(page, `${before ? 'before' : 'after'}-${layout.name}`);
       if (before) return; // Capture the unmodified game before applying the fix.
-      const selectors = ['.scan-panel', '.hud-readouts'];
+      const selectors = ['.guidance-slot', '.hud-readouts'];
       if (layout.touch) selectors.push('.tc-stick', '.tc-slider', '.tc-buttons', '.tc-btn-pause');
       else selectors.push('.hud-reset-camera');
       await clearLayout(page, selectors);
       // The tutorial is laid out on its own: it never shares the screen with the scan card.
       await setScanCardSuppressed(page, true);
-      await finishAnimations(page, '.onboard-card');
-      const tutorialSelectors = ['.onboard-card', ...selectors.slice(1)];
+      await finishAnimations(page, '.guidance-slot[data-step]');
+      const tutorialSelectors = ['.guidance-slot[data-step]', ...selectors.slice(1)];
       await clearLayout(page, tutorialSelectors);
-      for (const name of layout.name === 'phone-landscape'
-        ? ['Skip']
-        : ['Skip step', 'Skip tutorial']) {
-        const box = (await page.getByRole('button', { name, exact: true }).boundingBox())!;
-        expect(box.width).toBeGreaterThanOrEqual(44);
-        expect(box.height).toBeGreaterThanOrEqual(44);
-      }
+      const skip = (await page.getByRole('button', { name: 'Skip', exact: true }).boundingBox())!;
+      expect(skip.width).toBeGreaterThanOrEqual(44);
+      expect(skip.height).toBeGreaterThanOrEqual(44);
       for (let step = 1; step < 3; step++) {
-        const button = page.locator('.onboard-skip-step');
+        const button = page.locator('.guidance-skip');
         if (layout.touch) await button.tap();
         else await button.click();
-        await expect(page.locator('.onboard-card')).toHaveAttribute(
+        await expect(page.locator('.guidance-slot[data-step]')).toHaveAttribute(
           'data-step',
           ['move', 'depth', 'scan'][step],
         );
@@ -96,7 +93,7 @@ for (const layout of [
   });
 }
 
-// A real mission: the objectives panel is up too, and the card still has its own space.
+// A real mission: on desktop the objectives panel is up too; phones name the objective in the slot.
 for (const layout of [
   { name: 'desktop-1280', width: 1280, height: 720, touch: false },
   { name: 'phone-landscape', width: 844, height: 390, touch: true },
@@ -125,11 +122,13 @@ for (const layout of [
       await page.waitForFunction(
         () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
       );
-      await expect(page.locator('.onboard-card')).toBeVisible();
-      await expect(page.locator('.objectives-panel')).toBeVisible();
-      await finishAnimations(page, '.onboard-card');
+      await expect(page.locator('.guidance-slot[data-step]')).toBeVisible();
+      if (!layout.touch) await expect(page.locator('.objectives-panel')).toBeVisible();
+      else await expect(page.locator('.objectives-panel')).toBeHidden();
+      await finishAnimations(page, '.guidance-slot[data-step]');
       await shot(page, `mission-${layout.name}`);
-      const selectors = ['.onboard-card', '.objectives-panel', '.hud-readouts'];
+      const selectors = ['.guidance-slot[data-step]', '.hud-readouts'];
+      if (!layout.touch) selectors.push('.objectives-panel');
       if (layout.touch) selectors.push('.tc-stick', '.tc-slider', '.tc-buttons');
       await clearLayout(page, selectors);
     });

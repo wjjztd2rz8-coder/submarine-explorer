@@ -21,6 +21,7 @@ const views = vi.hoisted(() => {
     offers: [] as Array<{ source: string; message: Record<string, unknown> | null }>,
     guidance: {
       visible: false,
+      kind: null as string | null,
       setSkipHandler: (handler: (() => void) | null) => {
         state.skip = handler;
       },

@@ -10,7 +10,9 @@ import { GuidanceSlot } from '../../src/ui/GuidanceSlot.js';
 import { HULL_GAUGE_SHOW_RATIO, hullGaugeVisible } from '../../src/ui/HullGauge.js';
 import { TUTORIAL_STEPS, tutorialText } from '../../src/game/Tutorial.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
-import { readFileSync, readdirSync } from 'node:fs';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
+import sites from '../../data/landmarks/index.json';
 
 const msg = (text: string): GuidanceMessage => ({ kicker: 'K', text, tone: 'cyan' });
 const offer = (kind: GuidanceKind, text: string, since = 0): GuidanceOffer => ({
@@ -151,18 +153,17 @@ describe('hull gauge threshold', () => {
   it('is quiet at every authored mission depth except Challenger Deep', () => {
     const classes = DEFAULT_CONFIG.submarine.hullClasses;
     const quiet: Record<string, number> = {};
-    for (const dir of readdirSync('data/landmarks', { withFileTypes: true })) {
-      if (!dir.isDirectory()) continue;
+    for (const id of sites.landmarks) {
       let mission: { briefing?: { depth_m?: number }; hull_class?: string };
       try {
-        mission = JSON.parse(readFileSync(`data/landmarks/${dir.name}/mission.json`, 'utf8'));
+        mission = JSON.parse(readFileSync(`data/landmarks/${id}/mission.json`, 'utf8'));
       } catch {
         continue;
       }
       const depth = mission.briefing?.depth_m;
       const rated = classes[mission.hull_class ?? '']?.ratedDepth;
       if (depth === undefined || rated === undefined) continue;
-      quiet[dir.name] = depth / -rated;
+      quiet[id] = depth / -rated;
     }
     expect(Object.keys(quiet).length).toBeGreaterThan(8);
     for (const [site, ratio] of Object.entries(quiet)) {

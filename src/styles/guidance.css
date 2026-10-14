@@ -80,6 +80,10 @@
   letter-spacing: 0.16em;
 }
 
+.guidance-kicker:empty {
+  display: none;
+}
+
 .guidance-name {
   font-size: 15px;
   color: var(--b1-text);

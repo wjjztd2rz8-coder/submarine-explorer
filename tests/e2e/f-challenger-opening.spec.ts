@@ -126,12 +126,12 @@ test.describe('1020 portrait openings', () => {
       } else {
         expect(opening.hullNdc[0]).toBeCloseTo(0, 6);
       }
-      await expect(page.locator('.scan-panel')).toBeVisible();
-      await expect(page.locator('.onboard-hint')).toBeHidden();
+      await expect(page.locator('.guidance-slot')).toBeVisible();
+      await expect(page.locator('.guidance-slot[data-kind="urgent"]')).toBeHidden();
       await mkdir(shots, { recursive: true });
       await page.screenshot({ path: `${shots}/${site}-portrait-opening.png` });
       for (let i = 0; i < 81; i++) await page.clock.fastForward(250);
-      await expect(page.locator('.onboard-hint')).toBeHidden();
+      await expect(page.locator('.guidance-slot[data-kind="urgent"]')).toBeHidden();
       expect(
         await page.evaluate(
           () => JSON.parse(localStorage.getItem('subexplorer.onboard.v1')!).seenHints,

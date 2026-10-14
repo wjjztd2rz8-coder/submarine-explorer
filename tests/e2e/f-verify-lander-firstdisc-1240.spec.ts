@@ -83,12 +83,12 @@ for (const touch of [false, true]) {
         }, site.poi);
         expect(target.candidate).toBe(site.poi);
         expect(target.title).not.toBe(target.name); // Authored copy really differs at these sites.
-        await expect(page.locator('.scan-name')).toHaveText(target.name);
+        await expect(page.locator('.guidance-name')).toHaveText(target.name);
         if (touch) await holdTouch(page, '.tc-btn-scan', 0.5, () => completeScan(page, site.poi));
         else await scanWithKeyboard(page, site.poi);
-        await expect(page.locator('.scan-kicker')).toHaveText('NEW ENTRY');
-        await expect(page.locator('.scan-name')).toHaveText(target.name);
-        await expect(page.locator('.scan-hint')).toHaveText(
+        await expect(page.locator('.guidance-kicker')).toHaveText('NEW ENTRY');
+        await expect(page.locator('.guidance-name')).toHaveText(target.name);
+        await expect(page.locator('.guidance-hint')).toHaveText(
           touch ? 'PAUSE → JOURNAL' : 'PRESS J · JOURNAL',
         );
         const result = await page.evaluate(() => {

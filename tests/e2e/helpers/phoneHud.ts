@@ -1,16 +1,15 @@
 import { expect, type Page } from '@playwright/test';
+import { GUIDANCE } from './guidance.js';
 import type { Camera } from 'three';
 import type { Submarine } from '../../../src/sub/Submarine.js';
 import type { Save } from '../../../src/core/Save.js';
 
-/** The phone scan card owns the active instruction while a contact is in range. */
+/** Phones have no objectives list: the guidance slot always names what to do or where to go. */
 export async function expectObjectiveGuidance(page: Page, touch: boolean): Promise<void> {
-  const current = page.locator('.obj-item[aria-current="step"]');
-  if (touch && (await page.locator('.scan-panel').isVisible())) {
-    await expect(current).toBeHidden();
-    await expect(page.locator('.scan-name')).toHaveText(/\S/);
-    await expect(page.locator('.scan-hint')).toHaveText(/\S/);
-  } else await expect(current).toBeVisible();
+  if (touch) {
+    await expect(page.locator(GUIDANCE.any)).toBeVisible();
+    await expect(page.locator(GUIDANCE.name)).toHaveText(/\S/);
+  } else await expect(page.locator('.obj-item[aria-current="step"]')).toBeVisible();
 }
 
 /** Measure actual text and camera projection; do not guess the sub's screen centre. */
@@ -20,9 +19,9 @@ export async function expectCompactPhoneHud(page: Page): Promise<void> {
   expect((await page.locator('.sonar').boundingBox())!.width).toBe(landscape ? 120 : 96);
   await expect(page.locator('.d2-sonar-controls')).toBeHidden();
   // The tutorial card yields to the scan card, so its own checks run only while it is up.
-  const tutorialUp = await page.locator('.onboard-card').isVisible();
+  const tutorialUp = await page.locator('.guidance-slot[data-step]').isVisible();
   if (tutorialUp) {
-    await expect(page.locator('.onboard-card button:visible')).toHaveCount(1);
+    await expect(page.locator('.guidance-slot[data-step] button:visible')).toHaveCount(1);
     await expect(page.getByRole('button', { name: 'Skip', exact: true })).toBeVisible();
   }
   const metrics = await page.evaluate((tutorialUp) => {
@@ -33,7 +32,8 @@ export async function expectCompactPhoneHud(page: Page): Promise<void> {
     const speed = document
       .querySelector('[data-field="speed"]')!
       .parentElement!.getBoundingClientRect();
-    const hull = document.querySelector('.hull-gauge')!.getBoundingClientRect();
+    const gauge = document.querySelector<HTMLElement>('.hull-gauge')!;
+    const hull = gauge.hidden ? null : gauge.getBoundingClientRect();
     let card: {
       textHeight: number;
       lineHeight: number;
@@ -41,8 +41,8 @@ export async function expectCompactPhoneHud(page: Page): Promise<void> {
       coversSub: boolean;
     } | null = null;
     if (tutorialUp) {
-      const root = document.querySelector<HTMLElement>('.onboard-card')!;
-      const text = root.querySelector<HTMLElement>('.onboard-card-phone-text')!;
+      const root = document.querySelector<HTMLElement>('.guidance-slot[data-step]')!;
+      const text = root.querySelector<HTMLElement>('.guidance-name')!;
       const projected = game.sub.position.clone().project(game.rig.camera);
       const x = ((projected.x + 1) / 2) * innerWidth;
       const y = ((1 - projected.y) / 2) * innerHeight;
@@ -57,7 +57,7 @@ export async function expectCompactPhoneHud(page: Page): Promise<void> {
     return {
       card,
       depthSpeedOffset: Math.abs(depth.top - speed.top),
-      hullBelowFirstRow: hull.top >= depth.bottom,
+      hullBelowFirstRow: hull ? hull.top >= depth.bottom : true,
     };
   }, tutorialUp);
   if (metrics.card) {
@@ -69,9 +69,10 @@ export async function expectCompactPhoneHud(page: Page): Promise<void> {
   }
   expect(metrics.depthSpeedOffset).toBeLessThanOrEqual(1);
   expect(metrics.hullBelowFirstRow).toBe(true);
-  if (await page.locator('.scan-panel').isVisible()) {
-    // Dim cards describe a distant/logged contact; their waypoint still leads the approach.
-    // An active scan prompt owns guidance and suppresses the duplicate edge readout.
+  if (await page.locator(GUIDANCE.any).isVisible()) {
+    // The scan card and its reticle lead while a contact is in range, so the waypoint
+    // label waits; every other message leaves the label to lead the approach.
+    const kind = await page.locator(GUIDANCE.any).getAttribute('data-kind');
     const navigation = await page.evaluate(() => {
       const g = window.__game as {
         scanner: { view: { objectiveId: string | null } };
@@ -83,12 +84,12 @@ export async function expectCompactPhoneHud(page: Page): Promise<void> {
         g.mission?.objectives.find((o) => o.poiId === id)?.title.startsWith('Head to ') ?? false;
       return id !== null && (g.save.get().gameplay.visualHints || approach);
     });
-    if ((await page.locator('.scan-panel').getAttribute('data-tone')) === 'dim' && navigation) {
+    if (kind !== 'scan' && navigation) {
       await expect(page.locator('.d-scan-edge')).toBeVisible();
       await expect(page.locator('.d-scan-edge')).toHaveText(/\S/);
     } else await expect(page.locator('.d-scan-edge')).toBeHidden();
-    await expect(page.locator('.d-scan-objective-hint')).toBeHidden();
-    await expect(page.locator('.objectives-panel .obj-list')).toBeHidden();
-    await expect(page.locator('.scan-hint')).toHaveText(/\S/);
+    // Phones carry no objectives list: the slot names the target.
+    await expect(page.locator('.objectives-panel')).toBeHidden();
+    await expect(page.locator(GUIDANCE.name)).toHaveText(/\S/);
   }
 }

@@ -123,13 +123,13 @@ test('three hidden discoveries: close sonar, reveal, Journal, persistent count a
       'aria-label',
       /faint unidentified contact/,
     );
-    await expect(page.locator('.scan-name')).toHaveText('Unidentified contact');
+    await expect(page.locator('.guidance-name')).toHaveText('Unidentified contact');
     await scan(page, id);
     const name = await page.evaluate(
       (i) => (window.__game as unknown as Game).explore.secrets[i].def.name,
       i,
     );
-    await expect(page.locator('.scan-name')).toHaveText(name);
+    await expect(page.locator('.guidance-name')).toHaveText(name);
     await shot(page, `secret-${i + 1}`);
   }
   expect(
@@ -169,9 +169,9 @@ test('samples collect per dive, appear in mission debrief, and reset on restart'
 }) => {
   await boot(page, 'monterey-canyon', true);
   const id = await park(page, 0, true);
-  await expect(page.locator('.scan-hint')).toContainText('TO COLLECT');
+  await expect(page.locator('.guidance-hint')).toContainText('TO COLLECT');
   await scan(page, id);
-  await expect(page.locator('.scan-name')).toContainText('Sample collected');
+  await expect(page.locator('.guidance-name')).toContainText('Sample collected');
   expect(
     await page.evaluate(() => (window.__game as unknown as Game).explore.samples.collected.size),
   ).toBe(1);
@@ -215,7 +215,7 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
     await page.evaluate(() => (window.__game as unknown as Game).explore.previewEvent('turbidity')),
   ).toBe(true);
   await page.clock.fastForward(100);
-  await expect(page.locator('.explore-caption')).toContainText(
+  await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toContainText(
     'Silt cloud: sediment-laden water flows downslope',
   );
   await clockFramesUntil(
@@ -229,7 +229,7 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
   );
   await page.keyboard.press('Escape');
   await page.clock.fastForward(100);
-  await expect(page.locator('.explore-caption')).toBeHidden();
+  await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toBeHidden();
   const paused = await page.evaluate(
     () => (window.__game as unknown as Game).explore.scheduler.active,
   );
@@ -254,7 +254,7 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
 
 /** Read the actual layout: a result must stay on screen and clear thumb targets. */
 async function expectScanPanelFits(page: Page): Promise<void> {
-  const panel = await page.locator('.scan-panel').boundingBox();
+  const panel = await page.locator('.guidance-slot').boundingBox();
   expect(panel).not.toBeNull();
   const viewport = page.viewportSize()!;
   expect(panel!.x).toBeGreaterThanOrEqual(0);
@@ -290,7 +290,7 @@ test.describe('phone curiosity', () => {
     });
     await completeScan(page, id);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    await expect(page.locator('.scan-hint')).toHaveText('STOWED FOR THIS DIVE');
+    await expect(page.locator('.guidance-hint')).toHaveText('STOWED FOR THIS DIVE');
     await expectScanPanelFits(page);
     await shot(page, 'phone-sample');
     // The same touch session can rotate or run on a smaller phone.

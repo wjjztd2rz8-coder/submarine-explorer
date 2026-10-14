@@ -137,25 +137,23 @@ for (const layout of [
               await expectCompactPhoneHud(page);
               await page.keyboard.press('F9');
               await page.clock.runFor(34);
-              await expect(page.locator('.onboard-card-phone-text')).toHaveText(
+              await expect(page.locator('.guidance-name')).toHaveText(
                 'Hold Space to rise or Ctrl to sink.',
               );
-              await expect(
-                page.getByRole('button', { name: 'Skip step', exact: true }),
-              ).toBeVisible();
+              await expect(page.getByRole('button', { name: 'Skip', exact: true })).toBeVisible();
               // Keys switch the entire HUD to keyboard mode. A real touch on
               // the scene restores phone controls before looking up their names.
               await page.locator('#viewport').tap({
                 position: { x: layout.width / 2, y: layout.height - 80 },
               });
               await page.clock.runFor(34);
-              await expect(page.locator('.onboard-card-phone-text')).toBeVisible();
-              await expect(page.locator('.onboard-card-phone-text')).toHaveText(
+              await expect(page.locator('.guidance-name')).toBeVisible();
+              await expect(page.locator('.guidance-name')).toHaveText(
                 'Right slider: up to rise, down to sink.',
               );
               await act(page.getByRole('button', { name: 'Skip', exact: true }));
               await page.clock.runFor(34);
-              await expect(page.locator('.onboard-card-phone-text')).toHaveText(
+              await expect(page.locator('.guidance-name')).toHaveText(
                 'Hold SCAN on a glowing target.',
               );
             }
@@ -188,7 +186,6 @@ for (const layout of [
             await page.clock.runFor(34);
             if (layout.touch) {
               await expect(page.locator('.d-scan-edge')).toBeHidden();
-              await expect(page.locator('.d-scan-objective-hint')).toBeHidden();
               await expect(page.locator('.objectives-panel .obj-list')).toBeHidden();
               const scan = page.locator('.tc-btn-scan');
               await reachable(scan);

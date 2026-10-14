@@ -113,12 +113,8 @@ test('system and saved reduced motion apply live to camera, particles, warnings 
   expect(await drawnParticles()).toBe(0);
   await page.keyboard.press('Escape');
   await page.keyboard.press('Escape');
-  await page.evaluate(() => {
-    const warning = document.querySelector<HTMLElement>('.hud-warning')!;
-    warning.hidden = false;
-    warning.textContent = 'Hull pressure warning';
-  });
-  await expect(page.locator('.hud-warning')).toHaveCSS('animation-name', 'none');
+  // The guidance slot never animates, so warnings need no reduced-motion exemption.
+  await expect(page.locator('.guidance-slot')).toHaveCSS('animation-name', 'none');
   await page.reload();
   await clockFramesUntil(page, () => window.__gameReady === true);
   await expect.poll(reduced).toBe(true);

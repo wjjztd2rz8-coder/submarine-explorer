@@ -13,6 +13,7 @@ import type { HintLabels } from '../../game/Hints.js';
 import { TUTORIAL_STEPS, Tutorial, tutorialText } from '../../game/Tutorial.js';
 import type { TutorialKeys } from '../../game/Tutorial.js';
 import { TutorialSave } from '../../game/TutorialSave.js';
+import type { GuidanceKind } from '../../game/Guidance.js';
 import type { ActionId } from '../../core/Input.js';
 import { FIRST_MINUTE_GUIDANCE } from '../../core/Config.js';
 import type { GameContext } from '../context.js';
@@ -20,6 +21,9 @@ import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
+
+const slotBusy = (kind: GuidanceKind | null): boolean =>
+  kind === 'urgent' || kind === 'scan' || kind === 'discovery';
 
 export function createOnboardSystem(): GameSystem {
   let ctxRef: GameContext | null = null;
@@ -215,7 +219,11 @@ export function createOnboardSystem(): GameSystem {
           'hint',
           step && playing
             ? {
-                kicker: `STEP ${tutorial.index + 1} OF ${TUTORIAL_STEPS.length}`,
+                // Phones keep to one short line beside Skip.
+                kicker:
+                  device === 'touch'
+                    ? ''
+                    : `STEP ${tutorial.index + 1} OF ${TUTORIAL_STEPS.length}`,
                 text: tutorialText(
                   step.id,
                   device,
@@ -244,8 +252,11 @@ export function createOnboardSystem(): GameSystem {
             hullHintAllowed(diveS, f.sub.depth, startDepth, f.sub.ratedDepth),
           // The scan card already gives the target name and hold-to-scan prompt.
           scanTargetInRange: false,
+          // A warning, scan card or result holds the slot; the animal hint waits
+          // for it rather than being used up unseen.
           creatureInView:
             creatureHintAllowed(diveS, guidance.visible) &&
+            !slotBusy(guidance.kind) &&
             !ctx.cameraTips.moved &&
             (ctx.life?.targets.length ?? 0) > 0,
           canShow: !tutorial.active,
@@ -253,10 +264,16 @@ export function createOnboardSystem(): GameSystem {
         if (id) {
           creatureHint = id === 'creature';
           store.save({ seenHints: hints.seen });
+          // Battery and pressure tips are warnings; the rest are one-shot hints.
+          const safety = id === 'battery-low' || id === 'near-hull';
           guidance.flash(
             'hint',
-            'hint',
-            { kicker: 'TIP', text: HINT_TEXT[id](hintLabels(device)), tone: 'cyan' },
+            safety ? 'urgent' : 'hint',
+            {
+              kicker: safety ? 'WARNING' : 'TIP',
+              text: HINT_TEXT[id](hintLabels(device)),
+              tone: safety ? 'amber' : 'cyan',
+            },
             id === 'creature' ? FIRST_MINUTE_GUIDANCE.lifetimeMs / 1000 : 9,
           );
         }
