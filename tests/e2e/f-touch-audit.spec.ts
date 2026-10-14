@@ -1,6 +1,7 @@
 import catalog from '../../data/landmarks/index.json' with { type: 'json' };
 import { expectCompactPhoneHud } from './helpers/phoneHud.js';
 import { setScanCardSuppressed } from './helpers/tutorial.js';
+import { completeScan } from './helpers/scan.js';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const dive = '/?tile=titanic&landmark=_test&poi=test-bow&skipBriefing=1&touch=1&tier=low';
@@ -161,6 +162,23 @@ for (const viewport of [
         await expect(
           page.locator('.guidance-slot[data-kind="hint"]:not([data-step])'),
         ).toBeHidden();
+        // A ready contact outranks a result, so finish the real scan first (as a player would).
+        {
+          const cdp = await page.context().newCDPSession(page);
+          const button = (await page.locator('.tc-btn-scan').boundingBox())!;
+          try {
+            await cdp.send('Input.dispatchTouchEvent', {
+              type: 'touchStart',
+              touchPoints: [
+                { x: button.x + button.width / 2, y: button.y + button.height / 2, id: 1 },
+              ],
+            });
+            await completeScan(page);
+          } finally {
+            await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+            await cdp.detach();
+          }
+        }
         await page.evaluate(() => {
           const game = window.__game as {
             discovery: {

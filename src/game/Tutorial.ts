@@ -164,7 +164,7 @@ export function tutorialText(
       if (device === 'touch')
         return destination
           ? 'Left stick: follow the marker.'
-          : 'Push left stick forward; sideways to turn.';
+          : 'Left stick: move and turn.';
       const guidance = destination ? `Follow the marker toward ${destination}. ` : '';
       return (
         guidance +

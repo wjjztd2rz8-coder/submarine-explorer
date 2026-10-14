@@ -331,7 +331,7 @@ describe('onboarding completion through the system', () => {
       expect(lastTutorial()?.text).toBe('Hold G to move, then G or G to turn.');
       ctx.input.touchActive = true;
       tick();
-      expect(lastTutorial()?.text).toBe('Push left stick forward; sideways to turn.');
+      expect(lastTutorial()?.text).toBe('Left stick: move and turn.');
       window.dispatchEvent(new Event('keydown'));
       tick();
       expect(lastTutorial()?.text).toBe('Hold G to move, then G or G to turn.');
