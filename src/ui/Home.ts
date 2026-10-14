@@ -40,6 +40,9 @@ export class Home {
   private readonly sceneCaption: HTMLSpanElement;
   private sitesOrigin: HTMLButtonElement | null = null;
   private readonly sites: HTMLElement;
+  private readonly grab: HTMLButtonElement;
+  /** The last pointer gesture was a swipe, so the click that follows it must not toggle again. */
+  private swiped = false;
   private readonly trap: FocusTrap;
 
   constructor(
@@ -145,7 +148,20 @@ export class Home {
     sitesHead.append(sitesTitle, back);
     this.sitesSlot = document.createElement('div');
     this.sitesSlot.className = 'home-sites-scroll';
-    this.sites.append(sitesHead, this.sitesSlot);
+    // Narrow screens show the list as a bottom sheet over the globe (CSS); the grab bar and a swipe on
+    // the header both toggle it. Elsewhere the grab bar is hidden and the list is always open.
+    const grab = document.createElement('button');
+    grab.type = 'button';
+    grab.className = 'home-sites-grab';
+    grab.setAttribute('aria-label', 'Show all sites');
+    grab.addEventListener(
+      'click',
+      () => !this.swiped && this.setSheetOpen(this.sites.classList.contains('is-collapsed')),
+    );
+    this.grab = grab;
+    this.sites.append(grab, sitesHead, this.sitesSlot);
+    this.bindSheetSwipe(sitesHead);
+    this.bindSheetSwipe(grab);
 
     this.root.append(panel, hero, globeWrap, this.sites);
     parent.append(this.root);
@@ -220,6 +236,7 @@ export class Home {
   showSites(freeDive: boolean, origin?: HTMLButtonElement): void {
     this.sitesOrigin = origin ?? (freeDive ? this.freeDiveButton : this.diveSitesButton);
     this.sites.hidden = false;
+    this.setSheetOpen(false);
     this.panel.classList.add('is-sites');
     this.menu.hidden = true;
     this.root.classList.add('has-sites');
@@ -227,6 +244,31 @@ export class Home {
     this.sites.querySelector('h2')!.textContent = freeDive ? 'Free dive' : 'Dive sites';
     this.sitesSlot.querySelector('.mission-select')?.classList.toggle('is-free-dive', freeDive);
     this.sites.querySelector<HTMLButtonElement>('.home-sites-head button')?.focus();
+  }
+
+  private setSheetOpen(open: boolean): void {
+    this.sites.classList.toggle('is-collapsed', !open);
+    this.grab.setAttribute('aria-expanded', String(open));
+    this.grab.setAttribute('aria-label', open ? 'Hide site list' : 'Show all sites');
+  }
+
+  /** A vertical swipe of at least 24 px opens (up) or collapses (down) the sheet. */
+  private bindSheetSwipe(target: HTMLElement): void {
+    let startY: number | null = null;
+    target.addEventListener('pointerdown', (e) => {
+      if ((e.target as HTMLElement).closest('.home-sites-head button')) return;
+      startY = e.clientY;
+      this.swiped = false;
+      target.setPointerCapture(e.pointerId);
+    });
+    target.addEventListener('pointerup', (e) => {
+      if (startY === null) return;
+      const dy = e.clientY - startY;
+      startY = null;
+      this.swiped = Math.abs(dy) >= 24;
+      if (this.swiped) this.setSheetOpen(dy < 0);
+    });
+    target.addEventListener('pointercancel', () => (startY = null));
   }
 
   closeSites(): void {
