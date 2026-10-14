@@ -1016,3 +1016,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Running (Codex, no collection yet):** 1710 S-tests step 2, 1720 golden evidence, 1730 S-verify-3. Queued: 1740 hosted CI, 1750 S-render rest, 1760 bug hunt 3.
 - **Not done:** no second Claude package (Claude 5h at ~70% after V-lostcity, ~5 h of Codex 5h budget left 38%); V-endurance opening still blocked by guards (needs owner decision to relax facing/gap guard). Next Claude items: V-journeys, S-hud (after 1710 merges), V-titanic.
 - **Needs owner:** real-phone play of the newest build; optional: allow relaxing the Endurance opening facing/gap guard.
+
+## 2026-10-14 07:08 CDT headless run (Claude)
+
+- **Merged and pushed:** Codex 1730 S-verify-3, 1720 V-eight-sites tooling, 1710 S-tests step 2 (94 to 68 specs; 29 folded into hud-touch, journal-debrief, opening-framing; one conflict with 1730's "OPEN JOURNAL" wording resolved). Smoke + project-base green on main; the new capability specs were not run in a browser locally (CPU contention, run timed out), so hosted CI is the signal and 1770 verifies them.
+- **Running:** Codex 1740 hosted CI, 1750 S-render rest, 1760 bug hunt 3. Codex 5h is at 2% until ~10:21, so watchdog may stop them. Queued 1770 S-tests verify, 1780 release CI triage, 1790 bug hunt 4.
+- **Not done:** no Claude package this run (the gates and spec runs used the time). V-eight-sites PNG capture and judging remain. No tag; f53 waits for green hosted CI.
+- **Needs owner:** real-phone play of the newest build.
