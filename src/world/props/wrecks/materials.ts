@@ -239,8 +239,8 @@ export function paintWreck(geom: THREE.BufferGeometry, o: PaintOptions): void {
       const along = Math.floor((z + x * 0.5) / pl + row * 0.37);
       const h = valueNoise3(row * 7.7 + 0.5, along * 3.1 + 0.5, 4.5, o.seed ^ 0x2d);
       const h2 = valueNoise3(row * 2.3 + 9.5, along * 5.9 + 0.5, 1.5, o.seed ^ 0x4e);
-      _c.multiplyScalar(1 + amt * (h - 0.5) * 1.1);
-      _c.lerp(RUST_DARK, amt * S(h2, 0.62, 0.9) * 0.55);
+      _c.multiplyScalar(0.74 + amt * (h - 0.5) * 0.9);
+      _c.lerp(RUST_DARK, amt * S(h2, 0.55, 0.85) * 0.6);
       _c.lerp(RUST_ORANGE, amt * S(h2, 0.1, 0.32) * 0.3);
     }
     const g = S(valueNoise3(x * 0.12, y * 0.2, z * 0.12, o.seed ^ 0x9e), 0.58, 0.85) * o.growth;

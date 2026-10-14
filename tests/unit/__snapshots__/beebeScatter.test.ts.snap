@@ -200,7 +200,7 @@ exports[`1130: other sites retain byte-identical scatter geometry, placement, co
     },
   },
   "titanic": {
-    "meshes": "be17cfce3710a02afce6cf748b9938cbc83ce4cbb74b3d3163fe169f3f855004",
+    "meshes": "256a7351e1ea91ab5f46e5c62364cdf828ccbe09abd954b16faec2dc1aa4e024",
     "stats": {
       "cells": 21,
       "drawCalls": 2,
