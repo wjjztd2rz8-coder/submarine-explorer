@@ -133,10 +133,10 @@ html.is-touch .obj-banner {
 }
 html.is-touch .guidance-slot {
   width: 100%;
-  padding: 5px 8px;
+  padding: 4px 8px;
   gap: 8px;
   font-size: 13px;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 html.is-touch .guidance-ring {
   width: 40px;
