@@ -7,7 +7,7 @@ import { AmbientScore } from '../../src/audio/Score.js';
 import { MachineLoop, Soundscape, mechanicalCue } from '../../src/audio/Soundscape.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
-import { CaptionBus } from '../../src/audio/events.js';
+import { CaptionBus, type AudioFrameInput } from '../../src/audio/events.js';
 
 class Param {
   value = 1;
@@ -97,6 +97,15 @@ const flush = async () => {
 };
 const context = () => Context.instances.at(-1)!;
 const system = (bus = new EventBus()) => new AudioSystem(config, bus);
+const creakFrame = (depth = -7000, hullStress?: number): AudioFrameInput => ({
+  depth,
+  hullStress,
+  throttle: 0,
+  ballast: 0,
+  speed: 0,
+  position: { x: 0, y: depth, z: 0 },
+  forward: { x: 0, y: 0, z: -1 },
+});
 function visibility(hidden: boolean): void {
   doc.hidden = hidden;
   doc.dispatchEvent(new Event('visibilitychange'));
@@ -340,6 +349,297 @@ describe('audio lifecycle', () => {
     visibility(false);
     vi.runAllTimers();
     audio.dispose();
+  });
+});
+
+describe('hull creak dispatch', () => {
+  it.each([0, 0.5, 1])(
+    'keeps pressure stress %s and its configured boundary gap',
+    async (stress) => {
+      const bus = new EventBus();
+      const custom = { ...config, hullCreakMinGapS: 1, hullCreakMaxGapS: 5 };
+      const audio = new AudioSystem(custom, bus);
+      const creak = vi.spyOn(cues, 'playHullCreak');
+      const caption = vi.fn();
+      audio.captions.on(caption);
+      audio.unlock();
+      await flush();
+      const emit = () => bus.emit('sub:hullStress', { stress, cause: 'pressure', depth: -100 });
+      emit();
+      expect(creak).toHaveBeenCalledWith(expect.any(AudioEngine), custom, stress);
+      expect(caption).toHaveBeenLastCalledWith({
+        id: 'hull-creak',
+        text: 'Hull creaks under pressure',
+        durationS: 1.2,
+      });
+      const gap = 5 - stress * 4;
+      context().currentTime = gap - 0.001;
+      emit();
+      expect(creak).toHaveBeenCalledTimes(1);
+      expect(caption).toHaveBeenCalledTimes(1);
+      context().currentTime = gap;
+      emit();
+      expect(creak).toHaveBeenCalledTimes(2);
+      expect(caption).toHaveBeenCalledTimes(2);
+      audio.dispose();
+    },
+  );
+
+  it.each([
+    [0, 0],
+    [-6000, 0],
+    [-9000, 0.5],
+    [-12000, 1],
+    [-18000, 1],
+  ])('keeps trench depth %s at stress %s and the minimum boundary gap', async (depth, stress) => {
+    const bus = new EventBus();
+    const audio = system(bus);
+    const creak = vi.spyOn(cues, 'playHullCreak');
+    const caption = vi.fn();
+    audio.captions.on(caption);
+    audio.unlock();
+    await flush();
+    const emit = () => bus.emit('env:trench', { depth });
+    emit();
+    expect(creak).toHaveBeenCalledWith(expect.any(AudioEngine), config, stress);
+    expect(caption).toHaveBeenLastCalledWith({
+      id: 'trench-creak',
+      text: 'Hull creaks under deep pressure',
+      durationS: 1.2,
+    });
+    context().currentTime = config.hullCreakMinGapS - 0.001;
+    emit();
+    expect(creak).toHaveBeenCalledTimes(1);
+    expect(caption).toHaveBeenCalledTimes(1);
+    context().currentTime = config.hullCreakMinGapS;
+    emit();
+    expect(creak).toHaveBeenCalledTimes(2);
+    expect(caption).toHaveBeenCalledTimes(2);
+    audio.dispose();
+  });
+
+  it.each([
+    [-201, undefined, 0.01005, 20],
+    [-4000, undefined, 0.2, 20],
+    [-10000, undefined, 0.3, 20],
+    [-8000, 0.5, 0.5, 11.5],
+    [-8000, 1.5, 1.5, 3],
+  ])(
+    'keeps frame depth %s, stress %s, cue ratio %s and gap %s',
+    async (depth, stress, ratio, gap) => {
+      const audio = system();
+      const creak = vi.spyOn(cues, 'playHullCreak');
+      const caption = vi.fn();
+      audio.captions.on(caption);
+      audio.unlock();
+      await flush();
+      audio.update(creakFrame(-200, stress));
+      expect(creak).not.toHaveBeenCalled();
+      const frame = creakFrame(depth, stress);
+      audio.update(frame);
+      expect(creak).toHaveBeenCalledWith(expect.any(AudioEngine), config, ratio);
+      expect(caption).toHaveBeenLastCalledWith({
+        id: 'hull-creak',
+        text: 'Hull creaks under pressure',
+        durationS: 1.5,
+      });
+      context().currentTime = gap - 0.001;
+      audio.update(frame);
+      expect(creak).toHaveBeenCalledTimes(1);
+      expect(caption).toHaveBeenCalledTimes(1);
+      context().currentTime = gap;
+      audio.update(frame);
+      expect(creak).toHaveBeenCalledTimes(2);
+      expect(caption).toHaveBeenCalledTimes(2);
+      audio.dispose();
+    },
+  );
+
+  it('ignores impact stress while collision thuds stay independent of creak cooldown', async () => {
+    const bus = new EventBus();
+    const audio = system(bus);
+    const creak = vi.spyOn(cues, 'playHullCreak');
+    const thud = vi.spyOn(cues, 'playCollisionThud');
+    const caption = vi.fn();
+    audio.captions.on(caption);
+    audio.unlock();
+    await flush();
+    bus.emit('sub:hullStress', { stress: 1, cause: 'impact', depth: -7000 });
+    expect(creak).not.toHaveBeenCalled();
+    expect(thud).not.toHaveBeenCalled();
+    expect(caption).not.toHaveBeenCalled();
+    bus.emit('sub:collided', { speed: 10, depth: -7000 });
+    bus.emit('sub:hullStress', { stress: 1, cause: 'pressure', depth: -7000 });
+    bus.emit('sub:collided', { speed: 20, depth: -7000 });
+    expect(creak).toHaveBeenCalledTimes(1);
+    expect(thud).toHaveBeenCalledTimes(2);
+    expect(thud).toHaveBeenLastCalledWith(expect.any(AudioEngine), config, 20);
+    expect(caption.mock.calls.map(([event]) => event.id)).toEqual([
+      'collision',
+      'hull-creak',
+      'collision',
+    ]);
+    expect(caption).toHaveBeenLastCalledWith({
+      id: 'collision',
+      text: 'Hull scrapes bottom',
+      durationS: 1.5,
+    });
+    audio.dispose();
+  });
+
+  it.each([
+    ['pressure', 'trench', 'frame'],
+    ['pressure', 'frame', 'trench'],
+    ['trench', 'pressure', 'frame'],
+    ['trench', 'frame', 'pressure'],
+    ['frame', 'pressure', 'trench'],
+    ['frame', 'trench', 'pressure'],
+  ])('shares cooldown for coincident %s, %s, %s inputs and caption re-entry', async (...order) => {
+    const bus = new EventBus();
+    const audio = system(bus);
+    const creak = vi.spyOn(cues, 'playHullCreak');
+    const caption = vi.fn(() => bus.emit('env:trench', { depth: -9000 }));
+    audio.captions.on(caption);
+    audio.unlock();
+    await flush();
+    const inputs: Record<string, () => void> = {
+      pressure: () => bus.emit('sub:hullStress', { stress: 1, cause: 'pressure', depth: -9000 }),
+      trench: () => bus.emit('env:trench', { depth: -9000 }),
+      frame: () => audio.update(creakFrame(-9000, 1)),
+    };
+    for (const source of order) inputs[source]();
+    expect(creak).toHaveBeenCalledTimes(1);
+    expect(caption).toHaveBeenCalledTimes(1);
+    expect(caption).toHaveBeenLastCalledWith({
+      id: order[0] === 'trench' ? 'trench-creak' : 'hull-creak',
+      text:
+        order[0] === 'trench' ? 'Hull creaks under deep pressure' : 'Hull creaks under pressure',
+      durationS: order[0] === 'frame' ? 1.5 : 1.2,
+    });
+    context().currentTime = config.hullCreakMinGapS - 0.001;
+    for (const source of order) inputs[source]();
+    expect(creak).toHaveBeenCalledTimes(1);
+    expect(caption).toHaveBeenCalledTimes(1);
+    // The incoming frame still uses its longer gap after a trench/pressure cue.
+    context().currentTime = config.hullCreakMinGapS;
+    inputs.frame();
+    expect(creak).toHaveBeenCalledTimes(1);
+    inputs.trench();
+    inputs.pressure();
+    expect(creak).toHaveBeenCalledTimes(2);
+    expect(caption).toHaveBeenCalledTimes(2);
+    audio.dispose();
+  });
+
+  it.each(['pause', 'hidden'])(
+    'blocks all inputs during %s without consuming cooldown on return',
+    async (blocked) => {
+      const bus = new EventBus();
+      const audio = system(bus);
+      const creak = vi.spyOn(cues, 'playHullCreak');
+      const caption = vi.fn();
+      audio.captions.on(caption);
+      const inputs = () => {
+        bus.emit('sub:hullStress', { stress: 1, cause: 'pressure', depth: -9000 });
+        bus.emit('env:trench', { depth: -9000 });
+        audio.update(creakFrame(-9000, 1));
+      };
+      inputs();
+      expect(Context.instances).toHaveLength(0);
+      expect(creak).not.toHaveBeenCalled();
+      expect(caption).not.toHaveBeenCalled();
+      audio.unlock();
+      await flush();
+      inputs();
+      if (blocked === 'pause') audio.setPaused(true);
+      else visibility(true);
+      context().currentTime = 3;
+      inputs();
+      expect(creak).toHaveBeenCalledTimes(1);
+      expect(caption).toHaveBeenCalledTimes(1);
+      if (blocked === 'pause') audio.setPaused(false);
+      else visibility(false);
+      inputs();
+      expect(creak).toHaveBeenCalledTimes(2);
+      expect(caption).toHaveBeenCalledTimes(2);
+      audio.dispose();
+    },
+  );
+
+  it.each(['pressure', 'trench'] as const)(
+    'ignores a queued %s callback when an earlier event listener disposes audio',
+    async (source) => {
+      const bus = new EventBus();
+      let audio: AudioSystem;
+      const off = bus.on(source === 'pressure' ? 'sub:hullStress' : 'env:trench', () =>
+        audio.dispose(),
+      );
+      audio = system(bus);
+      const creak = vi.spyOn(cues, 'playHullCreak');
+      const caption = vi.fn();
+      audio.captions.on(caption);
+      audio.unlock();
+      await flush();
+      // EventBus snapshots listeners, so unsubscription alone cannot cancel this callback.
+      if (source === 'pressure')
+        bus.emit('sub:hullStress', { stress: 1, cause: 'pressure', depth: -9000 });
+      else bus.emit('env:trench', { depth: -9000 });
+      expect(creak).not.toHaveBeenCalled();
+      expect(caption).not.toHaveBeenCalled();
+      expect(context().close).toHaveBeenCalledTimes(1);
+      off();
+    },
+  );
+
+  it('keeps captions and sound gains when muted, cleans up, and starts a fresh system on re-entry', async () => {
+    const bus = new EventBus();
+    const audio = system(bus);
+    const creak = vi.spyOn(cues, 'playHullCreak');
+    const caption = vi.fn();
+    const off = audio.captions.on(caption);
+    const removed = vi.spyOn(doc, 'removeEventListener');
+    audio.setSettings({ muted: true, masterVolume: 0.8, sfxVolume: 0.3, musicVolume: 0.2 });
+    audio.unlock();
+    audio.unlock();
+    await flush();
+    bus.emit('env:trench', { depth: -9000 });
+    expect(Context.instances).toHaveLength(1);
+    expect(creak).toHaveBeenCalledTimes(1);
+    expect(caption).toHaveBeenCalledTimes(1);
+    expect(audio.diagnostics).toMatchObject({
+      muted: true,
+      masterGain: 0,
+      sfxGain: 0.3,
+      musicGain: 0.2,
+    });
+    const ctx = context();
+    audio.dispose();
+    audio.dispose();
+    ctx.currentTime = 100;
+    audio.unlock();
+    audio.setPaused(false);
+    visibility(true);
+    bus.emit('sub:hullStress', { stress: 1, cause: 'pressure', depth: -9000 });
+    bus.emit('env:trench', { depth: -9000 });
+    audio.update(creakFrame(-9000, 1));
+    expect(creak).toHaveBeenCalledTimes(1);
+    expect(caption).toHaveBeenCalledTimes(1);
+    expect(ctx.close).toHaveBeenCalledTimes(1);
+    expect(removed).toHaveBeenCalledTimes(1);
+    for (const node of ctx.nodes) expect(node.connections).toEqual([]);
+    off();
+    visibility(false);
+    const next = system(bus);
+    const nextCaption = vi.fn();
+    next.captions.on(nextCaption);
+    next.unlock();
+    await flush();
+    bus.emit('env:trench', { depth: -9000 });
+    expect(Context.instances).toHaveLength(2);
+    expect(creak).toHaveBeenCalledTimes(2);
+    expect(caption).toHaveBeenCalledTimes(1);
+    expect(nextCaption).toHaveBeenCalledTimes(1);
+    next.dispose();
   });
 });
 
