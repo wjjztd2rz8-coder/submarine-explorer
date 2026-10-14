@@ -27,3 +27,5 @@ Before: functional but flat, with a cropped frame, a broken button label and a p
 ## Gates
 
 `PW_PORT=4610 tools/gates.sh`: see the result appended below. No snapshots re-baselined and no assertions changed. Temporary capture spec was not kept (not a capability test).
+
+Result: `PW_PORT=4610 tools/gates.sh` PASS (python, content, build, unit, e2e, e2e-base, attribution, prettier). Also ran f2-progress and d-photo specs (7 tests) PASS.
