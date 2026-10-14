@@ -2,6 +2,36 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-14 comprehensive review, joint with Sol (golden 2026-10-14-064710)
+
+Sol reviewed independently from the then-current stored evidence; I read it after my draft and updated the draft for merges that landed meanwhile. Reconciled in one round; I checked the cited files and accepted Sol's corrections that held.
+
+**Changed since the last review (2026-10-13):** 14 merges, all pushed. Codex: 1570 S-resolve, 1580 S-modal, 1590 S-boot, 1610 to 1670 (hosted CI, S-verify, S-bughunt, S-debrief, S-render), 1680 S-verify-2 (teardown and pointer fixes), 1690 S-bughunt-2, 1700 hosted-CI test repairs (54 failures were stale Home readiness, selectors and an Advanced switch), 1600 S-rewards (fixed kit, cosmetics-only, Finds, save v2; conflicts with main resolved by me and one pointer-lock regression caught by the unit gate). Claude (Sonnet, 2.4 h): S-guidance, one guidance slot replacing seven surfaces; phone portrait and landscape shots read clean. I also dropped the obsolete shallow-depth assertion in f2-modes (S-rewards made hull fixed). Gates on every merge: smoke + project-base only; hosted CI for the new head is pending.
+
+| Site       | Readable | Beautiful   | Biggest gap                                                                 |
+| ---------- | -------- | ----------- | --------------------------------------------------------------------------- |
+| Titanic    | 4        | 3.5         | close-up: regular panels, bright flat sand, thin rusticles                  |
+| Beebe      | 3.5      | 3           | bright sub dominates a small stack; procedural chimney and plumes           |
+| Blue Hole  | 4        | 3 (was 3.5) | stair-like uniform terraces, smooth stalactite cones; unchanged since 10-13 |
+| Lost City  | 4        | 3 (was 3.5) | towers read as textured tubes; stretched slope texture                      |
+| Monterey   | 4        | 3.5         | repeated contour bands, sparse growth                                       |
+| Challenger | 4        | 3           | toy-like lander; empty opening is coherent                                  |
+| Endurance  | 3        | 3           | hull ~380 px of 1600 at the opening, sub dominates                          |
+
+None reaches 4. Blue Hole and Lost City dropped 0.5 on Sol's calibration, which I accepted after re-viewing `great-blue-hole-1` and `lost-city-1`: the evidence is unchanged, my earlier scores were generous.
+
+**Agreed stage: about 76% to 1.0, four weeks (four to six credible).** The simplification wave and S-guidance moved the code and phone HUD forward; art did not move.
+
+**Top blockers (agreed, in order):** (1) unaided Titanic and Blue Hole journeys verified on the merged build at desktop and both phone orientations (the golden set is desktop High free-dive only; V-journeys); (2) green hosted CI for the new head (1740) and a reliable release path; (3) real-phone Low performance (owner); (4) all five hero sites to beauty 4; (5) the eight non-hero sites at real mission spawns (1720 tooling, then V-eight-sites).
+
+**Credits.** Sol: Blue Hole and Lost City at 3, the free-dive goldens are no proof of an unaided journey, the f2-modes failure is mission depth not hull rating (my reading was wrong), Endurance and Challenger ranking below acceptance gaps, "PAUSE -> JOURNAL" is an extra step when the Journal button is visible, a single slot can hide an event caption behind a ready contact, DIRECTOR hero mapping omitted Lost City. Claude: S-guidance and S-rewards merged since Sol's snapshot, so phone guidance is no longer an open overlap bug. Disputed: none; Sol keeps provisional phone scores, I agree they are unverified rather than 2/5.
+
+**Process notes.** `tools/efficiency.sh`: Claude idle with at least 50% for 179 h and Codex under-used 167 h over 10 days, almost all from budget-gate skips (240) and the 13 h resume stall of 10-13 (already fixed). Today's run collected four Codex packages in one pass; Codex packages finish uncommitted because the sandbox cannot write git metadata, so collection stays Claude-bound (the cost: every Codex package waits for a Claude run). The S-guidance Sonnet agent ran 2.4 h against the 1 to 2 h guideline; split large packages. The Codex review itself took about 5 min of read-only work. No Codex task was running when this review started, so five briefs (1710 to 1750) were queued.
+
+**New priorities:** V-journeys, S-hud, V-eight-sites, hero beauty (V-endurance, V-titanic, V-beebe/V-bluehole, new V-lostcity), V-rewards-look (S-rewards merged without a visual check). Codex: 1710 S-tests step 2, 1720 golden evidence, 1730 S-verify-3, 1740 hosted CI, 1750 S-render rest.
+
+**Needs owner:** a five-minute play on a real phone on the newest build (Low performance, first five minutes after S-guidance and S-rewards).
+
 ## 2026-10-13 22:10 targeted review (red CI, idle Claude, starved Codex)
 
 - **Cause of all three triggers:** one bug. `tools/resume.sh` exited 2 on every timer tick from about 09:00 to 21:15 (state hash over a missing `paused-packages.md` under pipefail), so nothing was collected for 12 h: ten finished Codex packages sat in their worktrees, Claude stayed at 100% and Codex ran dry. The fix (316a2a9) was already in place; the root cause and the visibility gap are in `plan/PROCESS-LOG.md`.

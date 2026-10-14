@@ -203,3 +203,9 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - **Symptom:** CI red, Claude idle at 100% and Codex empty from about 09:00 to 21:15, with ten finished Codex packages uncollected in their worktrees.
 - **Root cause:** `tools/resume.sh` computed its work-state hash with `ls` over a missing `paused-packages.md`; under `set -o pipefail` that exited 2, so every 30-minute timer run failed before starting Claude (journal: `subexp-resume.service ... status=2/INVALIDARGUMENT`). It was fixed in 316a2a9 at 21:15 but nothing had noticed in 12 hours, and `skips.log` records nothing for crashes.
 - **Fix to adopt:** failed timer runs must be visible. `tools/review-triggers.sh` already fires on idle capacity, which is how this was caught; the cheap extra guard is `tools/efficiency.sh` listing `systemctl --user status subexp-resume.service` failures. Also: the dispatcher kept the Codex queue empty because I had not queued behind S-resolve; four briefs are now queued.
+
+## 2026-10-14 (comprehensive review)
+
+- **Finding:** Codex packages finish uncommitted (sandbox cannot write git metadata) and wait for a Claude run to be gated and merged; four were collected in one pass today, and each needed a main merge with conflicts in shared test files. Queue was empty at review start.
+- **Change:** five briefs queued (1710 to 1750); S-tests step 2 moved to the Codex lane (non-visual) to keep Claude's budget for visual items. Large Claude packages are split (S-guidance took 2.4 h in one agent).
+- **Check:** a merge that passes smoke can still break a unit test hidden by a conflict resolution (S-rewards Journal pointer lock); merge main into the package branch and run the full unit gate there before merging, as done today.

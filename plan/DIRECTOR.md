@@ -52,61 +52,50 @@ Reviewers send work back if it breaks one of these:
 
 ## What 1.0 means
 
-| Requirement                                                                   | Backlog items                                     |
-| ----------------------------------------------------------------------------- | ------------------------------------------------- |
-| Five hero sites look beautiful (4 of 5) in opening, approach and detail views | V-endurance, V-bluehole, V-beebe, V-titanic       |
-| The other eight sites are coherent with no major visual defect                | V-eight-sites                                     |
-| A new player understands the first five minutes on desktop and phone          | P-*, V-first-five, S-guidance, S-hud              |
-| Acceptable Low-tier performance on a real phone                               | Owner check; S-boot helps                         |
-| Hosted CI green, and a full run no longer blocks releases                     | R-release, S-tests (1610)                         |
-| No known blockers; the code is simple enough to keep changing safely          | S-resolve, S-modal, S-boot, S-rewards, S-manifest |
+| Requirement                                                                   | Backlog items                                           |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Five hero sites look beautiful (4 of 5) in opening, approach and detail views | V-endurance, V-bluehole, V-beebe, V-titanic, V-lostcity |
+| The other eight sites are coherent with no major visual defect                | V-eight-sites                                           |
+| A new player understands the first five minutes on desktop and phone          | V-journeys, S-guidance (done), S-hud                    |
+| Acceptable Low-tier performance on a real phone                               | Owner check; S-boot helps                               |
+| Hosted CI green, and a full run no longer blocks releases                     | R-release, S-tests (1740)                               |
+| No known blockers; the code is simple enough to keep changing safely          | S-resolve, S-modal, S-boot, S-rewards, S-manifest       |
 
-Stage (joint review 2026-10-13, agreed with Sol): about 75% to 1.0; plan four weeks (three to six plausible). Agreed "beautiful" scores: Titanic 3.5, Beebe 3, Blue Hole 3.5, Lost City 3.5, Monterey 3.5, Challenger 3, Endurance 3. Top blockers: phone guidance, green hosted CI, hero beauty and the eight mission spawns, real-phone Low performance.
+Stage (joint review 2026-10-14, agreed with Sol): about 76% to 1.0; plan four weeks (four to six credible). Agreed "beautiful" scores: Titanic 3.5, Beebe 3, Blue Hole 3, Lost City 3, Monterey 3.5, Challenger 3, Endurance 3. Top blockers: unaided journeys verified on the merged build (desktop and both phone orientations), green hosted CI, real-phone Low performance, hero beauty (none at 4 yet), eight mission spawns unverified.
 
 ## Needs owner
 
 The newest items go first.
 
-- A five-minute play on a real phone on the f53 build (Low-tier performance, first five minutes after S-flow).
+- A five-minute play on a real phone on the newest build (S-guidance and S-rewards are new) (Low-tier performance, first five minutes after S-flow).
 
 ## In flight
 
-- 2026-10-13 evening: all ten finished Codex packages collected and pushed (main 0a93b80, untagged until hosted CI is green). Codex queue: 1600 S-rewards, 1680 S-verify-2, 1690 S-bughunt-2, 1700 hosted-CI follow-up. Claude: S-guidance IN FLIGHT (Sonnet, 2026-10-13).
+- 2026-10-14: S-guidance, S-rewards, S-resolve, S-modal, S-boot, S-verify/S-bughunt passes and the hosted-CI test repairs are merged and pushed. Codex queue: 1710 S-tests step 2, 1720 golden evidence, 1730 S-verify third pass, 1740 hosted CI, 1750 S-render rest.
 
 ## Backlog
 
-One list, ordered by player impact and dependencies. Lane is in brackets. "After X" means don't start until X is merged. Evidence: §n = section n of `plan/archive/SIMPLIFY-REVIEW-2026-10-11.md`.
+One list, ordered by player impact and dependencies. Lane is in brackets. "After X" means don't start until X is merged. Evidence: §n = section n of `plan/archive/SIMPLIFY-REVIEW-2026-10-11.md`; joint review 2026-10-14 in `plan/REVIEWS.md`.
 
-1. **V-first-five** DONE 2026-10-13: capture in `plan/progress/V-first-five.md` (shots in `.cache/np/v-first-five/`). Banner counts and stars verified on a real run (3 of 4, 1 of 3 stars). Findings feed S-guidance (up to 4 guidance surfaces at once; NEW ENTRY card + hint + toast stacked after a scan; bow name duplicated on card and waypoint), S-hud (landscape briefing hides Begin dive in the first frame; SEABED PROXIMITY warning covers JOURNAL in portrait) and S-debrief.
-2. **S-guidance [Sonnet]** IN FLIGHT (2026-10-13) (§4 item 1), after V-first-five. One prioritised guidance slot (urgent warning > scan progress > discovery > next objective > tutorial/hint) replaces the separate tutorial card, hint chip, explore notice, discovery toast, NEW ENTRY card and objective chip. The sonar diamond and world waypoint stay. Remove the persistent "nominal" text and the static hull-rating number (show the gauge only when it matters; test the threshold, 50% is unvalidated). Urgent warnings must not block scanning or navigation. Drop the mission-title strip on phone. Phone is the weakest axis (Sol: phone 2/5 for four sites): this is the top 1.0 item.
-3. **S-tests step 2 [Sonnet]** (§7; after S-flow): fold the HUD/touch (9), opening-framing (12) and Journal/debrief (8) specs into three table-driven capability specs (map: `plan/progress/S-tests-map.md`). Step 3 (captures to nightly) is Codex 1610. Measure a quiet-CPU full run before and after.
-4. **S-hud [Sonnet]** (§4 item 2, §5), after S-guidance and S-tests step 2. Three HUD regions (top info, guidance, controls) in normal flow replace per-element offsets. Target: `hud-layout.css` from 1,077 lines to about 300, all `/* S-hud: remove */` patches gone, portrait and landscape both without special cases. Re-baseline HUD screenshots deliberately.
-5. **V-endurance [Sonnet]** (brief `.cache/claude/visual/1480`): close view merged 2026-10-13 (lamps 0.7x, pale life albedo lowered; wood grain now reads; lobsters and anemones are still the lightest things in frame). Opening still open: the hull is ~380 px of 1600 with the sub in the right third. Every reframe up to 560-700 px failed `deepOpening.test.ts` / `openingClearance1290.test.ts` (sub faces the hull within 11 degrees, whole sub in frame, wreck and rigging clear of the sub box, sub 8 px right of the wreck on landscape). Director decision: those guards protect past overlap bugs, so keep them and get a larger hull by scaling or placing the wreck side (data) and moving the sub closer, not by relaxing the guards. Landscape: the sub sits behind the touch buttons at the opening.
-6. **V-titanic [Sonnet]:** the close-up (`titanic-3.png`) has regular panels, bright flat sand and thin rusticles that read as manufactured.
-7. **V-beebe, V-bluehole remainder [Sonnet]:** Beebe opening: the bright sub dominates a small stack (golden `beebe-vent-field-1`); the card no longer covers the trunk after the 2026-10-13 merge, so re-check the golden pose. Blue Hole: terraces and collision merged; faceted uniform steps and smooth stalactite cones remain (Low keeps a few straight riser diagonals).
-8. **V-eight-sites [Haiku capture, Sonnet judge]:** add the eight non-hero sites at their real mission spawns to the golden set (current goldens are desktop High free-dive, not mission or phone evidence; Sol), and fix major defects. Also record the commit SHA in the golden manifest (`tools/golden-shots.mjs`; both reviewers found captures can't be tied to a commit).
+1. **V-journeys [Haiku capture, Sonnet judge]:** the top 1.0 blocker (both reviewers): record a complete, unaided Titanic and Blue Hole journey (Home, briefing, first 60 s, approach by sonar/waypoint only, scan, Journal, debrief) on the merged build at desktop, phone portrait and phone landscape; screenshots with SHA in `.cache/np/`, findings in `plan/progress/V-journeys.md`. Judge each against the rubric and open items for what fails. Known to check: landscape briefing hides Begin dive; waypoint label covers the sub after a scan (portrait); the guidance slot hiding an event caption behind a ready contact.
+2. **S-hud [Sonnet]** (§4 item 2, §5; S-guidance merged). Three HUD regions (top info, guidance, controls) in normal flow replace per-element offsets. `hud-layout.css` is now ~690 lines; target about 300 with all `/* S-hud: remove */` patches gone and portrait and landscape without special cases. Landscape guidance slot sits 4 px below Pause/Journal: make that structural. Re-baseline HUD screenshots deliberately. Desktop: drop the permanent sonar legend (touch already hides it).
+3. **V-eight-sites [Haiku capture, Sonnet judge]**, after 1720 (golden evidence tooling): capture the eight non-hero sites at real mission spawns on desktop and phone, judge each (Sol: Axial, Bismarck, Blake, Hudson, Hunga, Kamaʻehuakanaloa may have weak subject visibility) and fix major defects.
+4. **V-endurance [Sonnet]:** close view merged. Opening still open: the hull is ~380 px of 1600 with the sub large at right. Keep `deepOpening.test.ts` / `openingClearance1290.test.ts` guards; enlarge the wreck or move it/the sub in data. Landscape: sub behind the touch buttons at the opening.
+5. **V-titanic [Sonnet]:** close-up (`titanic-3.png`): regular panels, bright flat sand, thin rusticles read as manufactured. Agreed beauty 3.5.
+6. **V-beebe / V-bluehole remainder [Sonnet]:** Beebe opening: the bright sub dominates a small stack; chimney facets and plumes look procedural. Blue Hole: faceted uniform steps and smooth stalactite cones (golden essentially unchanged since 2026-10-13).
+7. **V-lostcity [Sonnet]** (new, Sol + Claude both 3): towers read as textured tubes; the seabed texture stretches on the slope; add irregular carbonate flanges and break the surface colour.
+8. **S-picker [Sonnet]:** keep the globe on every screen size. On phones a swipe-up sheet over the globe lists the sites (one site-list component). Remove redundant globe instances only if the sheet covers them.
 9. **S-tiers [Sonnet]** (brief `.cache/claude/visual/1497`): merge Ultra into High after a golden comparison; migrate saved `ultra` to High.
-10. **S-picker [Sonnet]:** keep the globe on every screen size. On phones a swipe-up sheet over the globe lists the sites (one site-list component). Remove redundant globe instances (full-screen overlay, `?globe=1`) only if the sheet covers them.
+10. **V-rewards-look [Haiku capture, Sonnet judge]:** S-rewards merged without visual review (Codex cannot render). Capture the Journal cosmetics picker, each sub paint/decal and photo frame on phone and desktop; judge against the rubric; fix.
 11. **S-daily [Haiku]:** shorter wording for the Daily Dive Home card, briefing and debrief (mechanics stay).
-12. **S-resolve [Codex]** DONE 2026-10-13 (0a93b80): merged; verify in 1680/1690. Spec was: One pure `resolveEffective(settings, mode, progress, daily)` replaces config mutation at boot and live, upgrades, the daily modifier. Custom shrinks to 4 switches (battery/oxygen, currents, waypoints, start at surface); drop `sonarMarkers`, merge descent into speed, drop the `standard` tier, the sim-speed setting and gentle/exaggerated currents. Save migration and README mode table.
-13. **S-modal remainder [Codex]** DONE 2026-10-13 (c73ba1d): stage 1 merged (FocusTrap extended; Upgrades, Globe). Migrate Settings, MissionRouter, shell, onboarding, power; replace the copied close/hide helpers.
-14. **S-boot remainder [Codex]** DONE 2026-10-13 (b1fa94f): `deferredStartup.ts` exists but is unwired; Home boots the title scene only and the dive tile and systems load after a site is picked.
-15. **S-tests step 3 / hosted CI [Codex]** merged 2026-10-13; hosted result pending (brief 1700 checks it): CI e2e shards are red on every push (software-GL 60 s timeouts: f-events-reform whale, f-verify-1000 Monterey phone). Move captures to the nightly workflow; keep the cheap assertions. Hosted CI green is a 1.0 requirement. Hosted validation of the S-tests step 4 build-once change comes with it.
-16. **S-rewards [Codex]** brief 1600 queued (S-resolve merged): fixed equipment, cosmetics-only rewards (owner 2026-10-12). Remove upgrade purchases and RP-gated hulls; hull class still follows mission depth (Class A at Blue Hole); cosmetics (sub paint/decals, photo frames) unlock by discoveries; Samples/Secrets become Journal "finds" (keep `sample:`/`secret:` keys); no RP checklists; save migration loses nothing. The pause menu still lists Upgrades (S-flow note) and goes with this. Claude reviews the cosmetics look.
-17. **S-manifest [Sonnet design, Codex migration]** (§5, §6b), after S-resolve.
-    - Move each site's tuning into one typed `data/landmarks/<id>/site.json` with a validator: biome, opening and framing, atmosphere, sonar shading, low-tier framing, Beebe and Monterey configs, currents and secrets.
-    - Remove the 26 site-id branches in shared code.
-    - Merge `Spawn.ts` and `DeepOpeningSpawn.ts` into one framing solver with two policies: mission approach (150-300 m) and free-dive beauty frame.
-    - Move species literals to JSON; trim unread catalogue text in `landmarks.json`; make the TS loader the single props validator.
-
-    Guard everything with the golden set.
-
-18. **S-render remainder [Codex for the code, Sonnet judges the golden set]** (§6; scarp kinds, shared title scene and hull-creak audio merged 2026-10-13 — Sonnet to check the golden set for scarp regressions): table-drive the `scarp.ts` kinds (golden-guarded); title scene reuses `Headlights`/`MarineSnow`; collapse the three hull-creak audio paths. The nightly per-tier perf workflow is merged (`render-nightly.yml`); it needs its first hosted run checked.
-19. **V-lander [Haiku, low]:** Challenger's white lander looks toy-like (Sol: Challenger beauty 3, `challenger-deep-3`); add wear and colour. Challenger's empty dark opening is not itself a blocker.
-20. **R-release [Haiku]:** push main after every gated merge (owner 2026-10-13; rule in RESUME-PROMPT); tag `f<N>` only on green hosted CI. f53 waits for brief 1700 (0a93b80 CI: S-resolve/S-boot broke older specs). A local 1-vs-3-worker full-suite timing runs as `workers-exp` (log `.cache/workers-exp.log`); local full runs are optional, not a release gate.
-21. **S-verify [Codex]** DONE 2026-10-13 (1620 merged; scan objective ordering fixed); second pass over the evening merges is brief 1680: read-only audit of the 2026-10-13 collection merges; fix semantic merge errors with tests.
-22. **S-bughunt [Codex]** DONE 2026-10-13 (1630 merged); second pass over S-resolve/S-modal/S-boot is brief 1690: save/input/teardown bug hunt; fix confirmed defects with tests.
-23. **S-debrief [Codex]** DONE 2026-10-13 (1640 merged): debrief says "4 scans" while the scanner counted 5-6, names the first primary ("Scanned Bow section") instead of the latest scan, and reads "Mission complete" with primaries done but 1 of 3 stars; fix the counts and the title logic with unit tests (wording stays short).
+12. **V-lander [Haiku, low]:** Challenger's white lander looks toy-like; add wear and colour.
+13. **S-manifest [Sonnet design, Codex migration]** (§5, §6b; S-resolve merged). Move each site's tuning into one typed `data/landmarks/<id>/site.json` with a validator (biome, opening and framing, atmosphere, sonar shading, low-tier framing, Beebe and Monterey configs, currents, secrets); remove the 26 site-id branches in shared code; merge `Spawn.ts` and `DeepOpeningSpawn.ts` into one framing solver; species literals to JSON. Guard with the golden set. Sonnet writes the schema and migrates one site first.
+14. **S-tests step 2 [Codex]** brief 1710 queued: fold HUD/touch, opening-framing and Journal/debrief specs into three table-driven capability specs (`plan/progress/S-tests-map.md`).
+15. **S-tests step 3 / hosted CI [Codex]** brief 1740 queued: hosted CI has been red on every push; 1700 repaired 54 test failures, main now carries S-guidance and S-rewards. Hosted CI green is a 1.0 requirement; tag `f53` only on green.
+16. **V-eight-sites tooling [Codex]** brief 1720 queued: commit SHA in golden manifest; mission-spawn and phone capture mode.
+17. **S-verify third pass [Codex]** brief 1730 queued: audit S-rewards (save v2 migration, cosmetics) and S-guidance (slot clears, no stale cards); remove leftover RP/upgrade wording; shorten the "PAUSE -> JOURNAL" reward line.
+18. **S-render remainder [Codex]** brief 1750 queued: validate the never-run nightly workflow, finish table-driving, one hull-creak path, golden pixels unchanged.
+19. **R-release [Haiku]:** after each green hosted CI run on main tag `f<N>` (`git tag f<N> && git push origin f<N>`) and check the Pages deploy. f53 is the next tag; f51 is the last.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.
 
