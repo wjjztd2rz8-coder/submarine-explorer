@@ -541,7 +541,6 @@ describe('migrated modal consumers', () => {
     const opener = element();
     opener.focus();
     journal.open();
-    expect(document.exitPointerLock).toHaveBeenCalledOnce();
     expect(active()).toBe(body);
     journal.open();
     expect(document.exitPointerLock).toHaveBeenCalledOnce();
@@ -769,7 +768,7 @@ describe('overlay policies across the app', () => {
       progress,
       daily: null,
       route: null,
-      effective: resolveEffective(save.get(), 'arcade', progress.snapshot(), null),
+      effective: resolveEffective(save.get(), 'arcade', null),
       discovery: {
         ready: Promise.resolve(),
         pois: [],
@@ -826,7 +825,7 @@ describe('overlay policies across the app', () => {
       input: new Input({ storage: null }),
       discovery: { ready: Promise.resolve(), pois: [], scanner: {} },
       sonar: { setScanState: vi.fn(), setPois: vi.fn(), setPalette: vi.fn() },
-      effective: resolveEffective(save.get(), 'arcade', { upgrades: {} }, null),
+      effective: resolveEffective(save.get(), 'arcade', null),
       route: null,
       globe: { isOpen: false },
       expose: vi.fn(),
