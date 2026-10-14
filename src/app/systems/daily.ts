@@ -6,6 +6,7 @@ import type { MissionSummary } from '../../game/Mission.js';
 import type { Progress } from '../../game/Progress.js';
 import { missionUrl } from '../../ui/MissionSelect.js';
 import type { TileIndexEntry } from '../../util/types.js';
+import type { ShellContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
@@ -23,7 +24,7 @@ export function unlockedDailySites(
     )
     .map((s) => s.id);
 }
-export function createDailySystem(): GameSystem {
+export function createDailySystem(): GameSystem<ShellContext, unknown> {
   const cleanup = new Disposables();
   return {
     name: 'daily',
@@ -72,10 +73,10 @@ export function createDailySystem(): GameSystem {
         const modifier = ctx.daily.modifier;
         const enforce = () => {
           const mode = modifier === 'strong-currents' ? 'exaggerated' : 'off';
-          ctx.presets.setCurrentMode(mode);
-          ctx.hud.setCurrentMode(mode);
+          ctx.presets?.setCurrentMode(mode);
+          ctx.hud?.setCurrentMode(mode);
           if (modifier === 'low-light') {
-            ctx.headlights.setPreset(ctx.config.lightPresets.realistic);
+            ctx.headlights?.setPreset(ctx.config.lightPresets.realistic);
           }
         };
         enforce();

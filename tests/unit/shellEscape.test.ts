@@ -25,6 +25,7 @@ function setup() {
   const ctx = {
     app,
     bus: new EventBus(),
+    journal: { isOpen: false },
     discovery: { guide: { isOpen: false }, debrief: { isOpen: false } },
     settingsScreen,
     globe: { isOpen: false },

@@ -269,17 +269,18 @@ responses in `.cache/gmrt-raw/`, retries with backoff and falls back to ETOPO.
 `--quant16`, `heightmap16.bin` + the `quant_*` meta keys. See
 [`docs/tiles-inventory.md`](./tiles-inventory.md).
 
-**Boot (per page load, `app/boot.ts`, then each system's `init` in
-`app/systems.ts` order).** The app shell starts in one of three
+**Boot (per page load, `app/boot.ts`, then `app/startup.ts`).** The app shell starts in one of three
 states — `'home' | 'dive' | 'pause'` (`GameEvents['app:state']`). Plain `/`
 boots into `'home'`: `ui/Home.ts` shows the Bathyline menu over a decorative
-Monterey Canyon title scene. DOM and Tab order is Continue, Dive sites, Free dive,
+Monterey Canyon title scene. DOM and Tab order is Dive, Dive sites, Free dive,
 Daily dive (when available), mode selector, Journal, Settings, Controls, Upgrades.
-First focus is Continue when enabled, otherwise Dive sites. Dive sites and Free
+First focus is the single Dive button. Dive sites and Free
 dive replace the menu with the embedded C1 globe and scrolling selector; Back or
-Escape closes the globe and restores focus to the originating button. The loaded
-gameplay world stays paused (no physics, audio or mission clock) until a site is
-chosen. `?mission=`, `?tile=` or `?skipBriefing=1` (and the existing
+Escape closes the globe and restores focus to the originating button.
+No gameplay tile or dive systems start on initial Home. The menu uses its own
+Journal store, saved preferences and title loop; the optional Monterey title crop
+loads independently of readiness. Choosing a site navigates to the existing dive
+URL. `?mission=`, `?tile=` or `?skipBriefing=1` (and the existing
 debug params `?poi=`, `?at=`, `?depth=`, `?debrief=1`, `?globe=1`) bypass home
 and boot straight to `'dive'`, as they did before D-SHELL. `Esc` during a dive
 enters `'pause'` (`ui/PauseMenu.ts`), which freezes the sim the same way the
@@ -290,7 +291,13 @@ returns to `'dive'`.
    (fetches `data/landmarks/<id>/mission.json` for `?mission=`).
 2. `chooseTileId`: the mission's tile, else `?tile=`, else
    `Config.defaultTileId` (`titanic`) if indexed, else the first indexed tile.
-3. `TileLoader.load` → `tile:loaded` (or `tile:error` + a fatal overlay).
+3. Home starts shared menus and the title only. A dive route goes through
+   `DeferredStartup`: `TileLoader.load(tileId, signal)` fetches the selected tile
+   alongside importing the ordered dive systems, then emits `tile:loaded` (or
+   `tile:error` + a fatal overlay). A loading status reuses the briefing surface
+   until the first presented dive frame; the real briefing and its start timing
+   stay unchanged. Page teardown aborts the fetch and cancels the frame loop.
+   Steps 4–12 describe the dive route only.
 4. `Terrain` meshes the tile → `terrain:built`. `Atmosphere`, `Headlights`,
    `MarineSnow`, `Water` install lighting and effects. `Landmarks` loads
    `data/landmarks.json` asynchronously → `landmarks:loaded`.
@@ -363,7 +370,8 @@ own files.
 
 - **App systems (`src/app/`).** `main.ts` only boots, initialises the systems
   and starts the loop. `boot.ts` builds the `BootContext`: params, config, bus,
-  save, quality tier, tile, renderer and scene. Each file in `app/systems/`
+  save, quality tier, renderer and scene. `startup.ts` wires `DeferredStartup`
+  for selected dives and `homeStartup.ts` for the menu/title capabilities. Each file in `app/systems/`
   exports a `GameSystem` with the following parts:
   - `init(ctx)` builds its objects and publishes them on the shared
     `GameContext`.
@@ -823,17 +831,18 @@ responses in `.cache/gmrt-raw/`, retries with backoff and falls back to ETOPO.
 `--quant16`, `heightmap16.bin` + the `quant_*` meta keys. See
 [`docs/tiles-inventory.md`](./tiles-inventory.md).
 
-**Boot (per page load, `app/boot.ts`, then each system's `init` in
-`app/systems.ts` order).** The app shell starts in one of three
+**Boot (per page load, `app/boot.ts`, then `app/startup.ts`).** The app shell starts in one of three
 states — `'home' | 'dive' | 'pause'` (`GameEvents['app:state']`). Plain `/`
 boots into `'home'`: `ui/Home.ts` shows the Bathyline menu over a decorative
-Monterey Canyon title scene. DOM and Tab order is Continue, Dive sites, Free dive,
+Monterey Canyon title scene. DOM and Tab order is Dive, Dive sites, Free dive,
 Daily dive (when available), mode selector, Journal, Settings, Controls, Upgrades.
-First focus is Continue when enabled, otherwise Dive sites. Dive sites and Free
+First focus is the single Dive button. Dive sites and Free
 dive replace the menu with the embedded C1 globe and scrolling selector; Back or
-Escape closes the globe and restores focus to the originating button. The loaded
-gameplay world stays paused (no physics, audio or mission clock) until a site is
-chosen. `?mission=`, `?tile=` or `?skipBriefing=1` (and the existing
+Escape closes the globe and restores focus to the originating button.
+No gameplay tile or dive systems start on initial Home. The menu uses its own
+Journal store, saved preferences and title loop; the optional Monterey title crop
+loads independently of readiness. Choosing a site navigates to the existing dive
+URL. `?mission=`, `?tile=` or `?skipBriefing=1` (and the existing
 debug params `?poi=`, `?at=`, `?depth=`, `?debrief=1`, `?globe=1`) bypass home
 and boot straight to `'dive'`, as they did before D-SHELL. `Esc` during a dive
 enters `'pause'` (`ui/PauseMenu.ts`), which freezes the sim the same way the
@@ -844,7 +853,13 @@ returns to `'dive'`.
    (fetches `data/landmarks/<id>/mission.json` for `?mission=`).
 2. `chooseTileId`: the mission's tile, else `?tile=`, else
    `Config.defaultTileId` (`titanic`) if indexed, else the first indexed tile.
-3. `TileLoader.load` → `tile:loaded` (or `tile:error` + a fatal overlay).
+3. Home starts shared menus and the title only. A dive route goes through
+   `DeferredStartup`: `TileLoader.load(tileId, signal)` fetches the selected tile
+   alongside importing the ordered dive systems, then emits `tile:loaded` (or
+   `tile:error` + a fatal overlay). A loading status reuses the briefing surface
+   until the first presented dive frame; the real briefing and its start timing
+   stay unchanged. Page teardown aborts the fetch and cancels the frame loop.
+   Steps 4–12 describe the dive route only.
 4. `Terrain` meshes the tile → `terrain:built`. `Atmosphere`, `Headlights`,
    `MarineSnow`, `Water` install lighting and effects. `Landmarks` loads
    `data/landmarks.json` asynchronously → `landmarks:loaded`.
@@ -917,7 +932,8 @@ own files.
 
 - **App systems (`src/app/`).** `main.ts` only boots, initialises the systems
   and starts the loop. `boot.ts` builds the `BootContext`: params, config, bus,
-  save, quality tier, tile, renderer and scene. Each file in `app/systems/`
+  save, quality tier, renderer and scene. `startup.ts` wires `DeferredStartup`
+  for selected dives and `homeStartup.ts` for the menu/title capabilities. Each file in `app/systems/`
   exports a `GameSystem` with the following parts:
   - `init(ctx)` builds its objects and publishes them on the shared
     `GameContext`.
@@ -1141,6 +1157,9 @@ fades after that move or 12 seconds; completing all three steering controls stil
 records learning independently. Layout fixtures can
 hold this deadline at Infinity without changing the clock, visibility rules,
 learning, bindings, or saved Control tips preference.
+On initial Home, `window.__game` exposes menus, Journal, saved preferences,
+title and performance diagnostics; dive-only handles such as `sub`, `terrain`,
+`scanner` and `missionRouter` exist only after starting a selected dive.
 `window.__gameReady` flips to `true` after the first presented frame;
 `window.__gameError` holds a fatal startup message.
 

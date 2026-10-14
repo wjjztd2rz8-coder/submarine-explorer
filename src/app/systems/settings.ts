@@ -8,16 +8,17 @@
 import { SAVE_KEYS } from '../../core/Save.js';
 import { DISCOVERY_VERSION } from '../../game/DiscoveryStore.js';
 import { SettingsScreen } from '../../ui/Settings.js';
+import type { ShellContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
 
-export const settingsSystem: GameSystem = {
+export const settingsSystem: GameSystem<ShellContext, unknown> = {
   name: 'settings',
   dispose: () => cleanup.dispose(),
   init(ctx) {
-    const { save, input, config, tier, quality, settings, discovery } = ctx;
+    const { save, input, config, tier, quality, settings, discoveries } = ctx;
     const settingsScreen = new SettingsScreen({
       save,
       input,
@@ -30,15 +31,15 @@ export const settingsSystem: GameSystem = {
       canOpen: () => !ctx.globe.isOpen,
       onOpen: () => {
         document.exitPointerLock?.();
-        ctx.keyboard.unlock();
+        ctx.keyboard?.unlock();
       },
       onResetProgress: () => {
-        if (discovery.store.readOnly) return 'protected';
+        if (discoveries.readOnly) return 'protected';
         let storage: Storage | null;
         try {
           storage = window.localStorage;
         } catch {
-          discovery.store.reset();
+          discoveries.reset();
           return 'sessionOnly';
         }
         try {
@@ -58,7 +59,7 @@ export const settingsSystem: GameSystem = {
         } catch {
           return 'unavailable';
         }
-        discovery.store.reset();
+        discoveries.reset();
         return storage ? 'cleared' : 'sessionOnly';
       },
     });
@@ -82,7 +83,7 @@ export const settingsSystem: GameSystem = {
         event.stopPropagation();
         input.setPointerLookPreference(!input.pointerLookEnabled);
         syncPointerLookButton();
-        ctx.pointerLook.updateHint();
+        ctx.pointerLook?.updateHint();
       },
       true,
     );
@@ -91,19 +92,19 @@ export const settingsSystem: GameSystem = {
     const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     const syncMotion = (): void => {
       const reduced = save.get().reduceMotion || motionPreference.matches;
-      ctx.rig.reduceMotion = reduced;
-      ctx.waypoints.setReducedMotion(reduced);
+      if (ctx.rig) ctx.rig.reduceMotion = reduced;
+      ctx.waypoints?.setReducedMotion(reduced);
       document.documentElement.dataset.reduceMotion = String(reduced);
     };
     syncMotion();
     motionPreference.addEventListener('change', syncMotion);
     cleanup.add(() => motionPreference.removeEventListener('change', syncMotion));
-    ctx.sonar.setPalette(settings.sonarPalette);
+    ctx.sonar?.setPalette(settings.sonarPalette);
     cleanup.add(
       save.onChange((next, changed) => {
         if (changed.includes('reduceMotion')) syncMotion();
-        if (changed.includes('captions')) ctx.captions.setEnabled(next.captions);
-        if (changed.includes('sonarPalette')) ctx.sonar.setPalette(next.sonarPalette);
+        if (changed.includes('captions')) ctx.captions?.setEnabled(next.captions);
+        if (changed.includes('sonarPalette')) ctx.sonar?.setPalette(next.sonarPalette);
         if (changed.includes('postFx')) ctx.postFx = next.postFx;
         // D-INPUT-HUD
         if (changed.includes('uiScale'))

@@ -413,6 +413,7 @@ describe('migrated modal consumers', () => {
       const context = {
         app: { state: 'dive' },
         bus: new EventBus(),
+        journal: { isOpen: false },
         discovery: { guide: { isOpen: false }, debrief: { isOpen: false } },
         settingsScreen: { isOpen: false },
         globe: { isOpen: false },

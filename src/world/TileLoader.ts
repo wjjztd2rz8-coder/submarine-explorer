@@ -26,7 +26,10 @@ export class TileLoadError extends Error {
 }
 
 /** Minimal fetch surface, so tests can inject a fake without a DOM. */
-export type FetchLike = (input: string) => Promise<{
+export type FetchLike = (
+  input: string,
+  options?: { signal?: AbortSignal },
+) => Promise<{
   ok: boolean;
   status: number;
   json(): Promise<unknown>;
@@ -181,8 +184,8 @@ interface TileLoaderOptions {
 export class TileLoader {
   constructor(
     private readonly root: string = DEFAULT_TILE_ROOT,
-    private readonly fetchFn: FetchLike = (input) =>
-      fetch(input) as unknown as ReturnType<FetchLike>,
+    private readonly fetchFn: FetchLike = (input, options) =>
+      fetch(input, options) as unknown as ReturnType<FetchLike>,
     private readonly options: TileLoaderOptions = {},
   ) {}
 
@@ -199,10 +202,11 @@ export class TileLoader {
   }
 
   /** Load one tile's metadata and heightmap. */
-  async load(tileId: string): Promise<Tile> {
+  async load(tileId: string, signal?: AbortSignal): Promise<Tile> {
     const base = `${this.root}/${tileId}`;
+    const fetchTile = (url: string) => (signal ? this.fetchFn(url, { signal }) : this.fetchFn(url));
 
-    const metaRes = await this.fetchFn(`${base}/meta.json`);
+    const metaRes = await fetchTile(`${base}/meta.json`);
     if (!metaRes.ok) {
       throw new TileLoadError(`could not fetch ${base}/meta.json (${metaRes.status})`, tileId);
     }
@@ -210,14 +214,14 @@ export class TileLoader {
 
     if (this.options.prefer16 && hasHeightmap16(meta)) {
       try {
-        const res16 = await this.fetchFn(`${base}/heightmap16.bin`);
+        const res16 = await fetchTile(`${base}/heightmap16.bin`);
         if (res16.ok) return { meta, heights: decodeHeightmap16(await res16.arrayBuffer(), meta) };
       } catch {
         // Fall through to the canonical float32 heightmap.
       }
     }
 
-    const binRes = await this.fetchFn(`${base}/heightmap.bin`);
+    const binRes = await fetchTile(`${base}/heightmap.bin`);
     if (!binRes.ok) {
       throw new TileLoadError(`could not fetch ${base}/heightmap.bin (${binRes.status})`, tileId);
     }

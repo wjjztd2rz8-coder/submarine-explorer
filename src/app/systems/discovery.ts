@@ -28,6 +28,8 @@ export const discoverySystem: GameSystem = {
       },
     });
     ctx.discovery = discovery;
+    ctx.journal = discovery.guide;
+    ctx.discoveries = discovery.store;
     ctx.expose({
       scanner: discovery.scanner,
       discoveries: discovery.store,
