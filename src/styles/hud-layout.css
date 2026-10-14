@@ -578,6 +578,9 @@
     font-size: 13px;
     line-height: 1.2;
   }
+  html.is-touch .scan-overlay .guidance-text {
+    gap: 0;
+  }
   html.is-touch .scan-overlay .guidance-ring {
     width: 40px;
     height: 40px;
