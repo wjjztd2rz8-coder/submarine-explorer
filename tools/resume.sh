@@ -42,7 +42,9 @@ sys.exit(0 if left("five_hour")>=50 and left("seven_day")>=max(10,7+1.5*days) el
 # work: on 2026-10-08 that alone started two "nothing to collect" runs.
 tools/review-triggers.sh > /dev/null 2>&1 || true
 # Log-only commits (each run logs itself) don't count, or every run would start another.
-state=$( { git log -1 --format=%H -- . ':!plan/OVERNIGHT-LOG.md' ':!plan/PROCESS-LOG.md'; ls -l --time-style=+%s .cache/codex/*-result.md .cache/claude/paused-packages.md 2>/dev/null; } | md5sum | cut -c1-12)
+# ls exits 2 when paused-packages.md is absent; under pipefail that silently killed
+# every run from 2026-10-13 08:09 to 21:15, hence the || true.
+state=$( { git log -1 --format=%H -- . ':!plan/OVERNIGHT-LOG.md' ':!plan/PROCESS-LOG.md'; ls -l --time-style=+%s .cache/codex/*-result.md .cache/claude/paused-packages.md 2>/dev/null || true; } | md5sum | cut -c1-12)
 if [[ "${1:-}" == "--headless" && ! -f .cache/review-due && -f .cache/resume-state && "$(cut -d' ' -f1 .cache/resume-state)" == "$state" ]] \
    && (( $(date +%s) - $(stat -c %Y .cache/resume-state) < 10800 )); then
   echo "no new work since last run; exiting"; exit 0
