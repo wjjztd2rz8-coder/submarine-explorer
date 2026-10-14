@@ -1023,3 +1023,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Running:** Codex 1740 hosted CI, 1750 S-render rest, 1760 bug hunt 3. Codex 5h is at 2% until ~10:21, so watchdog may stop them. Queued 1770 S-tests verify, 1780 release CI triage, 1790 bug hunt 4.
 - **Not done:** no Claude package this run (the gates and spec runs used the time). V-eight-sites PNG capture and judging remain. No tag; f53 waits for green hosted CI.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-14 12:14 CDT headless run (Claude)
+
+- **Merged and pushed:** Sonnet S-hud (hud-layout.css 697 to 301 lines, regions grid, Pause in the bar, desktop sonar legend dropped; phone shots read clean). Smoke + project-base green on branch and main; targeted e2e batches in the progress note, no full e2e.
+- **Problems:** Codex 1740/1750/1760 were stopped by the watchdog at 2% 5h with uncommitted work in their worktrees (not collected). Queue 1770/1780/1790 waiting. Eight hud-touch "animal guidance placement" specs plus d-modes, d-shell, d-sonar fail identically on main; they need a repair item.
+- **Needs owner:** real-phone play of the newest build.

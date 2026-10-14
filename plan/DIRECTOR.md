@@ -71,6 +71,8 @@ The newest items go first.
 
 ## In flight
 
+
+
 - 2026-10-14: S-guidance, S-rewards, S-resolve, S-modal, S-boot, S-verify/S-bughunt passes and the hosted-CI test repairs are merged and pushed. Codex queue: 1710 S-tests step 2, 1720 golden evidence, 1730 S-verify third pass, 1740 hosted CI, 1750 S-render rest.
 
 ## Backlog
@@ -78,7 +80,7 @@ The newest items go first.
 One list, ordered by player impact and dependencies. Lane is in brackets. "After X" means don't start until X is merged. Evidence: §n = section n of `plan/archive/SIMPLIFY-REVIEW-2026-10-11.md`; joint review 2026-10-14 in `plan/REVIEWS.md`.
 
 1. **V-journeys [Haiku capture, Sonnet judge]:** the top 1.0 blocker (both reviewers): record a complete, unaided Titanic and Blue Hole journey (Home, briefing, first 60 s, approach by sonar/waypoint only, scan, Journal, debrief) on the merged build at desktop, phone portrait and phone landscape; screenshots with SHA in `.cache/np/`, findings in `plan/progress/V-journeys.md`. Judge each against the rubric and open items for what fails. Known to check: landscape briefing hides Begin dive; waypoint label covers the sub after a scan (portrait); the guidance slot hiding an event caption behind a ready contact.
-2. **S-hud [Sonnet]** (§4 item 2, §5; S-guidance merged). Three HUD regions (top info, guidance, controls) in normal flow replace per-element offsets. `hud-layout.css` is now ~690 lines; target about 300 with all `/* S-hud: remove */` patches gone and portrait and landscape without special cases. Landscape guidance slot sits 4 px below Pause/Journal: make that structural. Re-baseline HUD screenshots deliberately. Desktop: drop the permanent sonar legend (touch already hides it).
+2. **S-hud [Sonnet] DONE 2026-10-14 (510aca9)** (§4 item 2, §5; S-guidance merged). Three HUD regions (top info, guidance, controls) in normal flow replace per-element offsets. `hud-layout.css` is now ~690 lines; target about 300 with all `/* S-hud: remove */` patches gone and portrait and landscape without special cases. Landscape guidance slot sits 4 px below Pause/Journal: make that structural. Re-baseline HUD screenshots deliberately. Desktop: drop the permanent sonar legend (touch already hides it).
 3. **V-eight-sites [Haiku capture, Sonnet judge]**, after 1720 (golden evidence tooling): capture the eight non-hero sites at real mission spawns on desktop and phone, judge each (Sol: Axial, Bismarck, Blake, Hudson, Hunga, Kamaʻehuakanaloa may have weak subject visibility) and fix major defects.
 4. **V-endurance [Sonnet]:** close view merged. Opening still open: the hull is ~380 px of 1600 with the sub large at right. Keep `deepOpening.test.ts` / `openingClearance1290.test.ts` guards; enlarge the wreck or move it/the sub in data. Landscape: sub behind the touch buttons at the opening.
 5. **V-titanic [Sonnet]:** close-up (`titanic-3.png`): regular panels, bright flat sand, thin rusticles read as manufactured. Agreed beauty 3.5.
