@@ -109,6 +109,10 @@ html.is-touch .sonar:not(.d-sonar-expanded) {
 html.is-touch .sonar:not(.d-sonar-expanded) .d2-sonar-controls {
   display: none;
 }
+html.is-touch .d2-sonar-controls button {
+  min-width: 44px;
+  min-height: 44px;
+}
 html.is-touch .sonar:not(.d-sonar-expanded) .d-sonar-header {
   margin-bottom: 2px;
   font-size: 10px;

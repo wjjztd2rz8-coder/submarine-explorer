@@ -166,6 +166,68 @@ freshTest.describe('fixture and mission layout', () => {
       });
     });
   }
+
+  // The HUD is three regions in one grid: top info (sonar, objectives, readouts), the guidance
+  // slot and the controls (Pause, Journal, Reset camera and the touch dock).
+  for (const layout of [
+    { name: 'phone-portrait', width: 390, height: 844, touch: true },
+    { name: 'phone-landscape', width: 844, height: 390, touch: true },
+    { name: 'desktop-1280', width: 1280, height: 720, touch: false },
+  ]) {
+    test.describe(`regions ${layout.name}`, () => {
+      test.use({
+        viewport: { width: layout.width, height: layout.height },
+        hasTouch: layout.touch,
+        isMobile: layout.touch,
+      });
+      // Regression guard: landscape guidance sat 4 px under Pause/Journal, and the permanent
+      // sonar legend added a caption block to every map.
+      test('top info, guidance and controls stay clear of each other', async ({ page }) => {
+        await page.addInitScript(() =>
+          localStorage.setItem(
+            'subexplorer.progress.v1',
+            JSON.stringify({
+              version: 1,
+              points: 0,
+              lifetime: 900,
+              awarded: [],
+              upgrades: {},
+              ratings: {},
+            }),
+          ),
+        );
+        await page.goto(
+          `/?mission=monterey-canyon&skipBriefing=1&tier=low${layout.touch ? '&touch=1' : ''}`,
+        );
+        await page.waitForFunction(() => window.__gameReady === true, undefined, {
+          timeout: 45_000,
+        });
+        await finishAnimations(page, '.guidance-slot[data-step]');
+        await shot(page, `regions-${layout.name}`);
+        await expect(page.locator('.d-sonar-legend')).toHaveCount(0);
+        const selectors = ['.sonar', '.hud-readouts', '.guidance-slot', '.hud-journal'];
+        if (layout.touch) selectors.push('.tc-btn-pause', '.tc-stick', '.tc-slider', '.tc-buttons');
+        else selectors.push('.objectives-panel', '.hud-reset-camera');
+        await clearLayout(page, selectors);
+        if (layout.touch) {
+          // Pause/Journal and the card are separate flow items with the region gap between.
+          const gaps = await page.evaluate(() => {
+            const bottom = (selector: string): number =>
+              document.querySelector(selector)!.getBoundingClientRect().bottom;
+            const card = document.querySelector('.guidance-slot')!.getBoundingClientRect();
+            return {
+              pause: card.top - bottom('.tc-btn-pause'),
+              journal: card.top - bottom('.hud-journal'),
+            };
+          });
+          if (layout.width > layout.height) {
+            expect(gaps.pause).toBeGreaterThanOrEqual(8);
+            expect(gaps.journal).toBeGreaterThanOrEqual(8);
+          }
+        }
+      });
+    });
+  }
 });
 
 freshTest.describe('large UI and menu reachability', () => {
@@ -1345,9 +1407,8 @@ freshTest.describe('catalog tutorial and reload', () => {
   ];
 
   async function layout(page: Page, phase: string): Promise<void> {
-    // The objectives panel republishes --obj-panel-bottom from a ResizeObserver, which
-    // runs in the next real rendering step (not on the fake clock). Wait for one
-    // so a measurement taken right after a content change sees the settled layout.
+    // Layout settles in the next real rendering step (not on the fake clock). Wait for
+    // one so a measurement taken right after a content change sees the settled grid.
     await page.evaluate(
       () =>
         new Promise<void>((resolve) => {
