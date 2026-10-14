@@ -189,9 +189,9 @@ for (const viewport of [
         test.setTimeout(captureSeconds > 10 ? 480_000 : 240_000);
         await pauseClockBeforeNavigation(page);
         await page.addInitScript(() => {
-          if (!localStorage.getItem('subexplorer.settings.v2'))
+          if (!localStorage.getItem('subexplorer.settings.v3'))
             localStorage.setItem(
-              'subexplorer.settings.v2',
+              'subexplorer.settings.v3',
               JSON.stringify({ version: 2, graphicsTier: 'low' }),
             );
         });

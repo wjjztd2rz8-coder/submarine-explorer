@@ -1,3 +1,7 @@
+import { Submarine } from '../../src/sub/Submarine.js';
+import { Power } from '../../src/game/Power.js';
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { modesSystem } from '../../src/app/systems/modes.js';
 import { afterEach, expect, it, vi } from 'vitest';
 import { makeConfig } from '../../src/core/Config.js';
 import { ProgressSave, Save } from '../../src/core/Save.js';
@@ -34,11 +38,12 @@ function setup(lowLight = false, href = 'http://localhost/', includeDeep = false
     settings: save.get(),
     route: null,
     bus: new EventBus(),
-    sub: { applyProfiles: vi.fn() },
+    sub: { setConfig: vi.fn() },
+    power: { setConfig: vi.fn(), setEnabled: vi.fn() },
+    waypoints: { setVisualHints: vi.fn() },
     sonar: { setSensorRange: vi.fn() },
-    discovery: { pois: [] },
+    discovery: { pois: [], ready: Promise.resolve(), scanner: { setConfig: vi.fn() } },
     baseScanRadii: new Map(),
-    baseHintRangeFactor: config.scan.hintRangeFactor,
     missionSummaries: [
       { id: 'shallow', tile: 'shallow', title: 'Shallow', depthM: 125 },
       ...(includeDeep ? [{ id: 'deep', tile: 'deep', title: 'Deep', depthM: 3800 }] : []),
@@ -58,14 +63,24 @@ function setup(lowLight = false, href = 'http://localhost/', includeDeep = false
     },
     scene: new Scene(),
     tier: 'low',
-    rig: { chaseRadius: 100 },
+    rig: { chaseRadius: 100, setConfig: vi.fn() },
     shellBaseHref: () => shellUrl(window.location.href),
     expose: vi.fn(),
   } as unknown as GameContext;
+  ctx.effective = resolveEffective(
+    ctx.settings,
+    ctx.settings.gameplayMode,
+    progress.snapshot(),
+    ctx.daily,
+    config,
+  );
+  modesSystem.init?.(ctx);
+  modesSystem.start?.(ctx);
   const purchases = createProgressSystem();
   purchases.init?.(ctx);
   const offPurchase = () => {
     purchases.dispose?.();
+    modesSystem.dispose?.();
   };
   const system = createDailySystem();
   system.start?.(ctx);
@@ -216,18 +231,20 @@ it('preserves Daily Low light after live settings and purchases and unsubscribes
   try {
     ctx.save.setGameplayMode('realistic');
     ctx.save.setGameplayMode('arcade');
-    expect(setPreset).toHaveBeenLastCalledWith(ctx.config.lightPresets.realistic);
+    expect(setPreset).toHaveBeenLastCalledWith(ctx.effective.light);
+    expect(ctx.effective.light.intensity).toBe(ctx.config.lightPresets.realistic.intensity);
     expect(ctx.progress.buy('light-range')).toBe(true);
-    expect(setPreset).toHaveBeenLastCalledWith(ctx.config.lightPresets.realistic);
-    expect(ctx.save.get().gameplay.lights).toBe('enhanced');
+    expect(setPreset).toHaveBeenLastCalledWith(ctx.effective.light);
+    expect(ctx.effective.light.intensity).toBe(ctx.config.lightPresets.realistic.intensity);
+    expect(ctx.save.get().gameplayBaseMode).toBe('arcade');
     system.dispose?.();
+    modesSystem.dispose?.();
     setPreset.mockClear();
     ctx.save.setGameplayMode('realistic');
     expect(setPreset).not.toHaveBeenCalled();
     ctx.save.setGameplayMode('arcade');
     expect(ctx.progress.buy('light-beam')).toBe(true);
-    expect(setPreset).toHaveBeenCalledTimes(1);
-    expect(setPreset).toHaveBeenLastCalledWith(ctx.config.lightPresets.enhanced);
+    expect(setPreset).not.toHaveBeenCalled();
   } finally {
     system.dispose?.();
     offPurchase();
@@ -281,3 +298,67 @@ it('imports an existing earned Daily streak on startup without spending RP or lo
     offPurchase();
   }
 });
+
+it.each(['calm', 'strong-currents', 'low-light'] as const)(
+  '%s: live settings and purchases preserve the loaded hull, pose, supplies and T speed without compounding',
+  (modifier) => {
+    const { ctx, system, offPurchase, setPreset } = setup(true);
+    try {
+      ctx.daily!.modifier = modifier;
+      ctx.effective = resolveEffective(
+        ctx.save.get(),
+        'arcade',
+        ctx.progress.snapshot(),
+        ctx.daily,
+        ctx.config,
+      );
+      const pristine = structuredClone(ctx.config);
+      const sub = new Submarine(ctx.effective.submarine, {
+        sampleHeight: () => -1000,
+        getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+      });
+      ctx.sub = sub;
+      sub.setHullClass('A');
+      sub.reset(10, -120, 20, 0.7);
+      sub.setSimSpeed(3);
+      const power = new Power(ctx.effective.power, true);
+      power.setLevels(0.7, 0.6);
+      ctx.power = power;
+      ctx.discovery.pois = [{ id: 'target', radius: 100 }] as GameContext['discovery']['pois'];
+      ctx.baseScanRadii.set('target', 100);
+      for (let i = 0; i < 10; i++) {
+        ctx.save.setGameplayMode('realistic');
+        ctx.save.setGameplayOption('currents', 'realistic');
+        ctx.save.setGameplayMode('arcade');
+        ctx.save.setGameplayOption('batteryOxygen', true);
+        expect(ctx.effective.currentMode).toBe(modifier === 'strong-currents' ? 'strong' : 'off');
+        expect(ctx.discovery.pois[0].radius).toBe(200);
+        expect(sub.position.toArray()).toEqual([10, -120, 20]);
+        expect(sub.yaw).toBe(0.7);
+        expect(sub.getState().hullClass).toBe('A');
+        expect(sub.getState().ratedDepth).toBe(ctx.config.submarine.hullClasses.A.ratedDepth);
+        expect(sub.simSpeed).toBe(3);
+        expect(power.state.battery).toBe(0.7);
+        expect(power.state.oxygen).toBe(0.6);
+      }
+      expect(ctx.progress.buy('light-range')).toBe(true);
+      const expectedLight =
+        ctx.config.lightPresets[modifier === 'low-light' ? 'realistic' : 'enhanced'];
+      expect(setPreset).toHaveBeenLastCalledWith({
+        ...expectedLight,
+        distance: expectedLight.distance * 1.1,
+      });
+      ctx.save.setGameplayMode('realistic');
+      ctx.save.setGameplayMode('arcade');
+      expect(ctx.effective.light.distance).toBeCloseTo(expectedLight.distance * 1.1);
+      expect(ctx.config).toEqual(pristine);
+      expect(sub.simSpeed).toBe(3);
+      expect(sub.getState().hullClass).toBe('A');
+      expect(ctx.save.get().gameplay.currents).toBe('off');
+      expect(ctx.save.get().gameplayBaseMode).toBe('arcade');
+    } finally {
+      system.dispose?.();
+      offPurchase();
+    }
+  },
+);

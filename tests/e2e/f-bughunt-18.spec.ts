@@ -180,7 +180,7 @@ for (const mode of ['realistic', 'custom'])
       await page.addInitScript(
         (gameplayMode) =>
           localStorage.setItem(
-            'subexplorer.settings.v2',
+            'subexplorer.settings.v3',
             JSON.stringify({ version: 2, gameplayMode, graphicsTier: 'low' }),
           ),
         mode,

@@ -18,7 +18,7 @@ export const waypointsSystem: GameSystem = {
     const { discovery, settings, sonar, route, save } = ctx;
     const waypoints = new Waypoints(discovery.scanner);
     ctx.waypoints = waypoints;
-    visualHints = settings.gameplay.visualHints;
+    visualHints = ctx.effective.gameplay.visualHints;
     waypoints.setVisualHints(visualHints);
     waypoints.setReducedMotion(settings.reduceMotion);
     waypoints.setPalette(settings.sonarPalette);
@@ -46,10 +46,6 @@ export const waypointsSystem: GameSystem = {
     }
     cleanup.add(
       save.onChange((next, changed) => {
-        if (changed.includes('gameplay')) {
-          visualHints = next.gameplay.visualHints;
-          waypoints.setVisualHints(visualHints);
-        }
         if (changed.includes('reduceMotion')) waypoints.setReducedMotion(next.reduceMotion);
         if (changed.includes('sonarPalette')) waypoints.setPalette(next.sonarPalette);
       }),
@@ -65,7 +61,7 @@ export const waypointsSystem: GameSystem = {
       // Near-site approaches retain their navigation marker in Realistic too.
       // Once in scan range, resume the pilot's normal visual-waypoint preference.
       const approach = nextScanObjective?.title.startsWith('Head to ') ?? false;
-      const showHints = ctx.save.get().gameplay.visualHints || approach;
+      const showHints = ctx.effective.gameplay.visualHints || approach;
       if (showHints !== visualHints) {
         visualHints = showHints;
         ctx.waypoints.setVisualHints(visualHints);

@@ -17,7 +17,7 @@ import { lowSiteWater } from '../../core/config/atmosphere.js';
 export const atmosphereSystem: GameSystem = {
   name: 'atmosphere',
   init(ctx) {
-    const { config, tier, scene, bus, settings, terrain } = ctx;
+    const { config, tier, scene, bus, terrain } = ctx;
     const atmoTier = atmosphereTier(config.water, tier);
     const atmosphere = new Atmosphere(
       scene,
@@ -45,7 +45,7 @@ export const atmosphereSystem: GameSystem = {
       deep?.lamps ?? (monterey ? MONTEREY_OPENING.lamps : undefined),
     );
     // D-MODES: the lights preset from the gameplay options.
-    headlights.setPreset(config.lightPresets[settings.gameplay.lights]);
+    headlights.setPreset(ctx.effective.light);
     scene.add(headlights.group);
     const snow = new MarineSnow(config.water, atmoTier);
     if (snow.points) scene.add(snow.points);

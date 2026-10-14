@@ -14,7 +14,7 @@ export const sonarSystem: GameSystem = {
   name: 'sonar',
   dispose: () => cleanup.dispose(),
   init(ctx) {
-    const { terrain, landmarks, config, settings, save } = ctx;
+    const { terrain, landmarks, config } = ctx;
     const sonar = new Sonar(terrain, landmarks.placed, {
       palettes: config.sonarPalettes,
       zoom: config.sonarZoom,
@@ -39,16 +39,8 @@ export const sonarSystem: GameSystem = {
         );
       }),
     );
-    sonar.setSensorRange(config.sensorPresets[settings.gameplay.sensors].sonarPoiRange);
-    sonar.setMarkersVisible(settings.gameplay.sonarMarkers);
-    cleanup.add(
-      save.onChange((next, changed) => {
-        if (changed.includes('gameplay')) {
-          sonar.setSensorRange(config.sensorPresets[next.gameplay.sensors].sonarPoiRange);
-          sonar.setMarkersVisible(next.gameplay.sonarMarkers);
-        }
-      }),
-    );
+    sonar.setSensorRange(ctx.effective.sensor.sonarPoiRange);
+
     ctx.expose({ sonar });
   },
   frame: {

@@ -252,7 +252,7 @@ test.describe('settings screen', () => {
     expect(new URL(page.url()).search).toBe('?mission=titanic&skipBriefing=1');
     const saved = await page.evaluate(() => ({
       discoveries: localStorage.getItem('subexplorer.discoveries.v1'),
-      settings: localStorage.getItem('subexplorer.settings.v2'),
+      settings: localStorage.getItem('subexplorer.settings.v3'),
       bindings: localStorage.getItem('subexplorer.bindings.v1'),
       keys: (window.__game as { discoveries: { keys(): string[] } }).discoveries.keys(),
     }));
@@ -272,7 +272,7 @@ test.describe('settings screen', () => {
     await expect(dialog.getByRole('button', { name: 'Apply and reload' })).toBeHidden();
     await dialog.getByLabel('Terrain detail on top of the survey data').fill('0.5');
     await dialog.getByRole('button', { name: 'Advanced' }).click();
-    await dialog.getByLabel('Simulation speed').selectOption('2');
+    await expect(dialog.getByLabel('Simulation speed')).toHaveCount(0);
     await dialog.getByRole('button', { name: 'Apply and reload' }).scrollIntoViewIfNeeded();
     await page.screenshot({ path: 'test-results-settings-closeout/settings-apply.png' });
     const reloaded = page.waitForEvent('load');
@@ -282,17 +282,17 @@ test.describe('settings screen', () => {
     expect(new URL(page.url()).search).toBe('?tile=challenger-deep&tier=low');
     const applied = await page.evaluate(() => {
       const g = window.__game as {
-        config: { terrain: { detailStrength: number } };
+        terrain: { detail: { strength: number } };
         sub: { simSpeed: number };
         save: { get(): { graphicsTier: string } };
       };
       return {
-        detail: g.config.terrain.detailStrength,
+        detail: g.terrain.detail.strength,
         speed: g.sub.simSpeed,
         savedTier: g.save.get().graphicsTier,
       };
     });
-    expect(applied).toEqual({ detail: 0.5, speed: 2, savedTier: 'high' });
+    expect(applied).toEqual({ detail: 0.5, speed: 1, savedTier: 'high' });
     await openSettings(page);
     await expect(dialog.getByRole('button', { name: 'Apply and reload' })).toBeHidden();
   });
@@ -361,8 +361,8 @@ test.describe('settings screen', () => {
 
   test('protected settings cannot be offered as a reloadable change', async ({ page }) => {
     await boot(page, '/');
-    const newer = JSON.stringify({ version: 3, detailStrength: 0.25 });
-    await page.evaluate((value) => localStorage.setItem('subexplorer.settings.v2', value), newer);
+    const newer = JSON.stringify({ version: 4, detailStrength: 0.25 });
+    await page.evaluate((value) => localStorage.setItem('subexplorer.settings.v3', value), newer);
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.__gameReady === true);
     await openSettings(page);
@@ -374,6 +374,6 @@ test.describe('settings screen', () => {
     await expect(dialog.locator('.settings-status')).toContainText(
       'newer saved version was left intact',
     );
-    expect(await page.evaluate(() => localStorage.getItem('subexplorer.settings.v2'))).toBe(newer);
+    expect(await page.evaluate(() => localStorage.getItem('subexplorer.settings.v3'))).toBe(newer);
   });
 });

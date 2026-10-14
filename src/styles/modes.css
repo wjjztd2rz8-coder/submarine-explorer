@@ -85,7 +85,7 @@
   color: #c3d5da;
   line-height: 1.4;
 }
-.mode-selector .mode-advanced-field select {
+.mode-selector .mode-advanced-field input[role='switch'] {
   min-height: 44px;
   min-width: 44px;
   max-width: 100%;
@@ -98,7 +98,7 @@
   font: inherit;
 }
 .mode-advanced-toggle:focus-visible,
-.mode-advanced-field select:focus-visible {
+.mode-advanced-field input[role='switch']:focus-visible {
   outline: 3px solid #8affeb;
   outline-offset: 2px;
 }

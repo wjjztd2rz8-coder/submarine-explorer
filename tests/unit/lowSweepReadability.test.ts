@@ -1,3 +1,5 @@
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { defaultSettings } from '../../src/core/Save.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { AmbientLight, Raycaster, Scene, Vector3 } from 'three';
@@ -66,7 +68,13 @@ for (const site of LOW_READABILITY_SITES) {
       scene,
       bus: new EventBus(),
       meta: { id: site },
-      settings: { gameplay: { lights: 'enhanced' } },
+      effective: resolveEffective(
+        defaultSettings(config),
+        'arcade',
+        { upgrades: {} },
+        null,
+        config,
+      ),
       terrain: { widthM: 1000, depthM: 1000 },
       rig,
       sub: { position: new Vector3(0, -720, 0) },

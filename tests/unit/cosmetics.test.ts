@@ -1,3 +1,5 @@
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { defaultSettings } from '../../src/core/Save.js';
 import {
   Color,
   Mesh,
@@ -22,7 +24,7 @@ import {
   type SettingsStorage,
 } from '../../src/core/Save.js';
 import { makeConfig } from '../../src/core/Config.js';
-import { Progress, applyProgress } from '../../src/game/Progress.js';
+import { Progress } from '../../src/game/Progress.js';
 import { DailySave } from '../../src/game/DailySave.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 
@@ -203,13 +205,13 @@ describe('cosmetic save migration and gameplay isolation', () => {
   it('changes neither gameplay profiles nor Arcade access at any depth', () => {
     const progress = new Progress(new ProgressSave(null));
     const base = structuredClone(makeConfig());
-    const config = structuredClone(base);
-    applyProgress(config, base, progress, base.settings.gameplayPresets.arcade);
+    let config;
+    config = resolveEffective(defaultSettings(base), 'arcade', progress.snapshot(), null, base);
     const before = structuredClone(config);
     progress.recordDailyStreak(3);
     progress.selectCosmetic('paint', 'silver');
     progress.selectCosmetic('trim', 'blue');
-    applyProgress(config, base, progress, base.settings.gameplayPresets.arcade);
+    config = resolveEffective(defaultSettings(base), 'arcade', progress.snapshot(), null, base);
     expect(config).toEqual(before);
     for (const depth of [1000, 6500, 11000]) expect(progress.canDive(depth, 'arcade')).toBe(true);
     expect(progress.canDive(11000, 'realistic')).toBe(false);

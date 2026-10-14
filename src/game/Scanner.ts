@@ -171,8 +171,12 @@ export class Scanner {
   private sinceProgressEmit = Infinity;
   private readonly cosCone: number;
 
+  setConfig(config: ScannerConfig): void {
+    this.config = config;
+  }
+
   constructor(
-    private readonly config: ScannerConfig,
+    private config: ScannerConfig,
     private readonly bus: ScanEmitter,
     private readonly recorder: DiscoveryRecorder | null = null,
   ) {

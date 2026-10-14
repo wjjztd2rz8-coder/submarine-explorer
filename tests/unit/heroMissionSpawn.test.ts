@@ -216,13 +216,9 @@ for (const { site, primary, before } of heroes) {
         {
           // Exercise actual Arcade physics and scanner time, rather than infer
           // accessibility from distance or teleport the pilot to the contact.
-          const mode = config.settings.gameplayPresets.arcade;
           const sub = new Submarine(config.submarine, terrain);
           sub.setHullClass(mission.hull_class!);
-          sub.applyProfiles(
-            config.speedProfiles[mode.speedProfile],
-            config.descentProfiles[mode.descentProfile],
-          );
+          sub.setConfig({ ...config.submarine, ...config.speedProfiles.fast });
           sub.reset(pose.x, pose.y, pose.z, pose.yaw);
           const mesh = new SubMesh({ length: 26, hullClass: mission.hull_class!, tier });
           mesh.setView('chase');
@@ -237,7 +233,7 @@ for (const { site, primary, before } of heroes) {
           run.resolve(pois.map((p) => p.id));
           run.start(site);
           const scanner = new Scanner(config.scan, bus);
-          const multiplier = config.sensorPresets[mode.sensors].scanRadiusMultiplier;
+          const multiplier = config.sensorPresets.extended.scanRadiusMultiplier;
           scanner.setTargets(
             pois.map((p) => ({
               ...p,

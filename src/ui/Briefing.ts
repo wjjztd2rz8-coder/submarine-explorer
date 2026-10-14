@@ -19,6 +19,7 @@
  */
 
 import type { GameplayOptions } from '../core/Config.js';
+import { el } from './dom.js';
 import { FocusTrap } from './FocusTrap.js';
 import type { MissionStartPosition } from '../game/MissionRouter.js';
 import { ModeSelector, type GameplaySettingsSource } from './ModeSelector.js';
@@ -54,13 +55,6 @@ export interface DiveSettingsOptions {
   onStartChange?: (choice: MissionStartPosition) => void;
 }
 
-const START_CHOICES = [
-  ['near-site', 'near the first target'],
-  ['surface', 'at the surface'],
-] as const;
-
-let uid = 0;
-
 /** The lines in order, without blanks or repeats (case and spacing ignored). */
 function unique(items: readonly string[]): string[] {
   const seen = new Set<string>();
@@ -72,17 +66,6 @@ function unique(items: readonly string[]): string[] {
   });
 }
 
-function el<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  className?: string,
-  text?: string,
-): HTMLElementTagNameMap[K] {
-  const e = document.createElement(tag);
-  if (className) e.className = className;
-  if (text !== undefined) e.textContent = text;
-  return e;
-}
-
 export class Briefing {
   readonly root: HTMLDivElement;
   private readonly panel: HTMLDivElement;
@@ -91,11 +74,9 @@ export class Briefing {
   private readonly trap: FocusTrap;
   private choice: MissionStartPosition = 'near-site';
   // --- D2-PREDIVE: Dive settings ---
-  private readonly uid = ++uid;
   private dive: DiveSettingsOptions | null = null;
   private diveDisposers: Array<() => void> = [];
   private diveSlot: HTMLDivElement | null = null;
-  private startInputs: HTMLInputElement[] = [];
   private readonly onPanelKey: (e: KeyboardEvent) => void;
   private modeSelector: ModeSelector | null = null;
 
@@ -266,7 +247,6 @@ export class Briefing {
   private renderDiveSettings(): void {
     const slot = this.diveSlot;
     if (!slot) return;
-    const focusedKey = (document.activeElement as HTMLElement | null)?.dataset?.diveKey;
     this.modeSelector?.dispose();
     this.modeSelector = null;
     const section = el('section', 'briefing-dive');
@@ -277,49 +257,31 @@ export class Briefing {
         'is-briefing',
         this.dive.settings,
         'Mode',
-        ['startPosition'],
         this.dive.choices,
       );
       row.append(this.modeSelector.root);
     }
-    const start = el('div', 'briefing-start');
-    start.setAttribute('role', 'radiogroup');
-    start.setAttribute('aria-label', 'Start position');
-    start.append(el('span', 'briefing-start-label', 'Start:'));
-    const segments = el('div', 'briefing-start-segments');
-    this.startInputs = [];
-    for (const [value, label] of START_CHOICES) {
-      const option = el('label', 'briefing-start-option');
+    if (!this.modeSelector) {
+      const label = el('label', 'briefing-start-option');
       const input = el('input');
-      input.type = 'radio';
-      input.name = `briefing-start-${this.uid}`;
-      input.value = value;
-      input.dataset.diveKey = `start-${value}`;
-      input.checked = this.choice === value;
+      input.type = 'checkbox';
+      input.setAttribute('role', 'switch');
+      input.checked = this.choice === 'surface';
       input.addEventListener('change', () => {
-        if (!input.checked) return;
-        if (this.dive) this.dive.settings.setGameplayOption('startPosition', value);
-        else this.choice = value;
+        this.choice = input.checked ? 'surface' : 'near-site';
       });
-      option.append(input, el('span', undefined, label));
-      segments.append(option);
-      this.startInputs.push(input);
+      label.append(input, el('span', undefined, 'Start at surface'));
+      row.append(label);
     }
-    start.append(segments);
-    // Start position is rarely changed: it lives inside the collapsed Advanced disclosure.
-    if (this.modeSelector) this.modeSelector.advancedPanel.prepend(start);
-    else row.append(start);
     section.append(row);
 
     slot.replaceChildren(section);
-    if (focusedKey) slot.querySelector<HTMLElement>(`[data-dive-key="${focusedKey}"]`)?.focus();
   }
 
   /** Repaint the Dive settings from the saved values (a preset, Settings, or this card). */
   private syncDive(): void {
     if (!this.dive) return;
     const gameplay = this.dive.settings.get().gameplay;
-    for (const input of this.startInputs) input.checked = input.value === gameplay.startPosition;
     if (gameplay.startPosition !== this.choice) {
       this.choice = gameplay.startPosition;
       if (this.open_) this.dive.onStartChange?.(this.choice);

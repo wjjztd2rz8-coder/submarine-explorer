@@ -95,7 +95,7 @@ for (const layout of [
         await pauseClockBeforeNavigation(page);
         await page.addInitScript((scale) => {
           localStorage.setItem(
-            'subexplorer.settings.v2',
+            'subexplorer.settings.v3',
             JSON.stringify({ version: 2, uiScale: scale, reduceMotion: true, graphicsTier: 'low' }),
           );
           localStorage.setItem(

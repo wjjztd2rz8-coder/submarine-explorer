@@ -84,7 +84,7 @@ for (const layout of [
         await pauseClockBeforeNavigation(page);
         await page.addInitScript((gameplayMode) => {
           localStorage.setItem(
-            'subexplorer.settings.v2',
+            'subexplorer.settings.v3',
             JSON.stringify({ version: 2, gameplayMode, reduceMotion: true }),
           );
         }, mode);
@@ -99,7 +99,7 @@ for (const layout of [
           await page.evaluate(() => (window.__game as unknown as Game).save.get().gameplayMode),
         ).toBe(mode);
         await openBriefingAdvanced(page);
-        await page.locator('.briefing-start input[value="surface"]').check();
+        await page.locator('input[data-gameplay="startPosition"]').check();
         if (layout.touch) await page.locator('.briefing-begin').tap();
         else await page.locator('.briefing-begin').click();
         await expect(page.locator('.briefing')).toBeHidden();
@@ -198,7 +198,7 @@ for (const layout of [
           return !!(window.__gameReady && g?.discovery.loaded && g.props.loaded && g.explore.ready);
         });
         await openBriefingAdvanced(page);
-        await page.locator('.briefing-start input[value="surface"]').check();
+        await page.locator('input[data-gameplay="startPosition"]').check();
         if (layout.touch) await page.locator('.briefing-begin').tap();
         else await page.locator('.briefing-begin').click();
         await page.clock.runFor(100);

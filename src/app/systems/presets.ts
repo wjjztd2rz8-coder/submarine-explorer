@@ -25,7 +25,7 @@ export const presetsSystem: GameSystem = {
       terrain,
       sub,
       currents: ctx.currents,
-      currentMode: ctx.settings.gameplay.currents,
+      currentMode: ctx.effective.currentMode,
       props: ctx.props,
       discovery: ctx.discovery,
       atmosphere: ctx.atmosphere,

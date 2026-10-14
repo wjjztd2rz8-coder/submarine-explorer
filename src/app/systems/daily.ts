@@ -68,21 +68,6 @@ export function createDailySystem(): GameSystem {
         }),
       );
       refresh();
-      if (ctx.daily) {
-        const modifier = ctx.daily.modifier;
-        const enforce = () => {
-          const mode = modifier === 'strong-currents' ? 'exaggerated' : 'off';
-          ctx.presets.setCurrentMode(mode);
-          ctx.hud.setCurrentMode(mode);
-          if (modifier === 'low-light') {
-            ctx.headlights.setPreset(ctx.config.lightPresets.realistic);
-          }
-        };
-        enforce();
-        cleanup.add(ctx.save.onChange(enforce));
-        // Purchases reapply saved light preferences before this run's modifier.
-        cleanup.add(ctx.progress.onChange(enforce));
-      }
       ctx.expose({ daily: ctx.daily });
     },
     dispose: () => cleanup.dispose(),

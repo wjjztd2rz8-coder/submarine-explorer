@@ -1,3 +1,4 @@
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -115,6 +116,7 @@ function context(site: string, mode: GameplayMode): GameContext {
     baseScanRadii: new Map(),
     save,
     settings: save.get(),
+    effective: resolveEffective(save.get(), mode, { upgrades: {} }, null, config),
     meta,
     params: new URLSearchParams(`mission=${site}`),
     spawnDepth: null,

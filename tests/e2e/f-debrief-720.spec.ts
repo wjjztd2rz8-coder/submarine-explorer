@@ -70,7 +70,7 @@ for (const viewport of [
         // Rendering tier only: mode retains the Arcade default, discoveries start empty.
         await page.addInitScript(() => {
           localStorage.setItem(
-            'subexplorer.settings.v2',
+            'subexplorer.settings.v3',
             JSON.stringify({ version: 2, graphicsTier: 'low' }),
           );
         });

@@ -12,8 +12,6 @@ import type { CameraConfig } from './camera.js';
 import type { LandmarksConfig, ScanConfig } from './discovery.js';
 import type {
   CurrentsConfig,
-  DescentProfile,
-  GameplayOptions,
   LightPreset,
   PowerConfig,
   SensorPreset,
@@ -58,10 +56,9 @@ export interface GameConfig {
   mission: MissionConfig;
   /** C5: settings screen defaults and ranges (docs/settings.md). */
   settings: SettingsConfig;
-  speedProfiles: Record<GameplayOptions['speedProfile'], SpeedProfile>;
-  descentProfiles: Record<GameplayOptions['descentProfile'], DescentProfile>;
-  lightPresets: Record<GameplayOptions['lights'], LightPreset>;
-  sensorPresets: Record<GameplayOptions['sensors'], SensorPreset>;
+  speedProfiles: Record<'research' | 'fast', SpeedProfile>;
+  lightPresets: Record<'realistic' | 'enhanced', LightPreset>;
+  sensorPresets: Record<'realistic' | 'extended', SensorPreset>;
   power: PowerConfig;
   currents: CurrentsConfig;
   /** C5: sonar minimap palettes (`Sonar.setPalette`). */

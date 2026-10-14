@@ -14,7 +14,7 @@ export const discoverySystem: GameSystem = {
     const { bus, config, meta, terrain, contentLandmark, params, sub, rig } = ctx;
     const discovery = new Discovery({
       bus,
-      config,
+      config: { ...config, scan: ctx.effective.scan, submarine: ctx.effective.submarine },
       meta,
       seabed: terrain,
       landmarkId: contentLandmark,

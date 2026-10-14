@@ -184,7 +184,7 @@ for (const preference of ['OS', 'saved'] as const) {
     else
       await page.addInitScript(() => {
         localStorage.setItem(
-          'subexplorer.settings.v2',
+          'subexplorer.settings.v3',
           JSON.stringify({ version: 2, reduceMotion: true }),
         );
       });

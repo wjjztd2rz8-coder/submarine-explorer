@@ -18,7 +18,7 @@ import { Save } from '../core/Save.js';
 import { chooseTileId, resolveMissionRoute } from '../game/MissionRouter.js';
 import { TileLoader } from '../world/TileLoader.js';
 import { makeExposer, type AppState, type BootContext } from './context.js';
-import { applyBootModes } from './systems/modes.js';
+import { resolveEffective } from '../game/EffectiveSettings.js';
 import { readLastSite } from './systems/shell.js';
 import { shellUrl } from '../util/navigation.js';
 
@@ -94,12 +94,13 @@ export async function boot(): Promise<BootContext | null> {
   const tileId = chooseTileId(requested, index, config.defaultTileId);
   // C5: saved settings (docs/settings.md). The saved graphics tier applies
   // unless `?tier=` is given; terrain detail is read once, when the terrain is built.
-  if (daily) {
-    settings.gameplay.currents = daily.modifier === 'strong-currents' ? 'exaggerated' : 'off';
-    if (daily.modifier === 'low-light') settings.gameplay.lights = 'realistic';
-  }
-  const { baseHintRangeFactor } = applyBootModes(config, settings);
-  config.terrain.detailStrength = settings.detailStrength;
+  const effective = resolveEffective(
+    settings,
+    settings.gameplayMode,
+    progress.snapshot(),
+    daily,
+    config,
+  );
   const debugTerrain = params.get('debugTerrain') === '1';
   // A2: `?depth=300` spawns the boat 300 m down (clamped above the seabed),
   // for the depth-band screenshots in docs/atmosphere.md.
@@ -162,7 +163,7 @@ export async function boot(): Promise<BootContext | null> {
     save,
     progress,
     settings,
-    baseHintRangeFactor,
+    effective,
     tier,
     quality,
     postFx: settings.postFx,

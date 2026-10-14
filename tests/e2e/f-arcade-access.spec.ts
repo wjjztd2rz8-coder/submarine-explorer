@@ -22,7 +22,7 @@ async function shot(page: Page, name: string): Promise<void> {
 test('fresh Arcade Titanic starts on an approach in its deep-ocean vehicle', async ({ page }) => {
   await page.goto('/?mission=titanic&tutorial=0');
   await ready(page);
-  await expect(page.locator('.briefing-start input[value="near-site"]')).toBeChecked();
+  await expect(page.locator('input[data-gameplay="startPosition"]')).not.toBeChecked();
   await page.locator('.briefing-begin').click();
   await expect(page.locator('.briefing')).toBeHidden();
   const pose = await page.evaluate(() => {
@@ -130,7 +130,7 @@ test('a fresh Realistic shared Titanic link keeps the coastal hull and opens fre
 }) => {
   await page.addInitScript(() =>
     localStorage.setItem(
-      'subexplorer.settings.v2',
+      'subexplorer.settings.v3',
       JSON.stringify({ version: 2, gameplayMode: 'realistic', graphicsTier: 'low' }),
     ),
   );

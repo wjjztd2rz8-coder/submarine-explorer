@@ -127,7 +127,6 @@ export interface SettingsScreenOptions {
   activeTierSetting?: GraphicsTierSetting;
   /** Boot values; these settings cannot change the current terrain or dive. */
   activeDetailStrength: number;
-  activeSimSpeedDefault: number;
   /** True when `?tier=` overrides the saved tier. */
   tierFromUrl?: boolean;
   /** False while something else owns the keyboard (e.g. the globe). */
@@ -245,7 +244,6 @@ export class SettingsScreen {
       'is-settings',
       opts.save,
       'Game mode',
-      [],
       cfg.settings.gameplayOptions,
     );
     const modeRow = el('div', 'settings-row settings-mode-row');
@@ -532,7 +530,7 @@ export class SettingsScreen {
   }
 
   private select(
-    key: 'graphicsTier' | 'simSpeedDefault' | 'sonarPalette' | 'hullWarningStyle',
+    key: 'graphicsTier' | 'sonarPalette' | 'hullWarningStyle',
     label: string,
     options: Array<[string, string]>,
     note?: string,
@@ -545,7 +543,7 @@ export class SettingsScreen {
       sel.append(o);
     }
     sel.addEventListener('change', () => {
-      const v = key === 'simSpeedDefault' ? Number(sel.value) : sel.value;
+      const v = sel.value;
       this.opts.save.save({ [key]: v } as Partial<SettingsValues>);
     });
     this.controls.set(key, sel);
@@ -640,8 +638,7 @@ export class SettingsScreen {
     const pending =
       (!this.opts.tierFromUrl &&
         s.graphicsTier !== (this.opts.activeTierSetting ?? this.opts.activeTier)) ||
-      s.detailStrength !== this.opts.activeDetailStrength ||
-      s.simSpeedDefault !== this.opts.activeSimSpeedDefault;
+      s.detailStrength !== this.opts.activeDetailStrength;
     this.reloadButton.hidden = !pending || !this.opts.save.reloadSafe;
     this.reloadNote.hidden = !pending;
     if (!this.reloadNote.hidden) {

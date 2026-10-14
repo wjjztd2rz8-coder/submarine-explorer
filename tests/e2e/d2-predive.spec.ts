@@ -66,7 +66,7 @@ test('home screen shows the game mode and changes it', async ({ page }) => {
   await expect(mode.getByRole('radio', { name: 'Realistic' })).toBeChecked();
   await expect(mode.locator('.mode-desc')).toContainText('Battery, oxygen');
   expect((await saved(page)).gameplayMode).toBe('realistic');
-  expect((await saved(page)).gameplay.speedProfile).toBe('research');
+  expect((await saved(page)).gameplay.currents).toBe('realistic');
 
   // Same setting in Settings: the segmented control there follows.
   await page.locator('.home-menu').getByRole('button', { name: 'Settings' }).click();
@@ -86,14 +86,14 @@ test('briefing Dive settings: mode, start and Advanced persist to settings', asy
   const dive = briefing.locator('.briefing-dive');
   await expect(dive).toHaveAttribute('aria-label', 'Dive settings');
   await expect(dive.getByRole('radio', { name: 'Arcade' })).toBeChecked();
-  await expect(dive.locator('.briefing-start input[value="near-site"]')).toBeChecked();
+  await expect(dive.getByLabel('Start at surface')).not.toBeChecked();
   // One start choice only: the old footer radiogroup merged into Dive settings.
-  await expect(briefing.locator('input[value="near-site"]')).toHaveCount(1);
+  await expect(briefing.getByLabel('Start at surface')).toHaveCount(1);
   const more = dive.locator('.mode-advanced');
   const toggle = briefing.getByRole('button', { name: 'Advanced' });
   await expect(more).toBeHidden();
   // Start position is tucked inside Advanced, not on the card face.
-  await expect(dive.locator('.briefing-start')).toBeHidden();
+  await expect(dive.getByLabel('Start at surface')).toBeHidden();
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(briefing.locator('.briefing-begin')).toBeInViewport();
   await page.waitForTimeout(300);
@@ -103,33 +103,27 @@ test('briefing Dive settings: mode, start and Advanced persist to settings', asy
   await toggle.focus();
   await page.keyboard.press('Enter');
   await expect(more).toBeVisible();
-  await expect(dive.locator('.briefing-start')).toBeVisible();
+  await expect(dive.getByLabel('Start at surface')).toBeVisible();
   await expect(briefing).toBeVisible();
   await expect(briefing.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
     'aria-expanded',
     'true',
   );
-  for (const label of [
-    'Visual waypoints',
-    'Sonar markers',
-    'Battery and oxygen',
-    'Currents',
-    'Forward speed',
-  ]) {
+  for (const label of ['Visual waypoints', 'Battery and oxygen', 'Currents', 'Start at surface']) {
     await expect(more.getByLabel(label, { exact: true })).toBeVisible();
   }
   await expect(briefing.locator('.briefing-begin')).toBeInViewport();
   await page.screenshot({ path: `${shots}/briefing-expanded.png` });
 
   // Mouse: an option edit persists and flips the mode to Custom.
-  await more.getByLabel('Sonar markers', { exact: true }).selectOption('false');
+  await more.getByLabel('Visual waypoints', { exact: true }).uncheck();
   await expect(dive.locator('.mode-custom-tag')).toBeVisible();
   let s = await saved(page);
   expect(s.gameplayMode).toBe('custom');
-  expect(s.gameplay.sonarMarkers).toBe(false);
-  expect(s.gameplay.visualHints).toBe(true);
-  await more.getByLabel('Currents', { exact: true }).selectOption('exaggerated');
-  expect((await saved(page)).gameplay.currents).toBe('exaggerated');
+  expect(s.gameplay.visualHints).toBe(false);
+  expect(s.gameplay.visualHints).toBe(false);
+  await more.getByLabel('Currents', { exact: true }).check();
+  expect((await saved(page)).gameplay.currents).toBe('realistic');
 
   // Keyboard: arrows on the mode radios apply a preset; options re-sync.
   await dive.getByRole('radio', { name: 'Arcade' }).focus();
@@ -138,12 +132,10 @@ test('briefing Dive settings: mode, start and Advanced persist to settings', asy
   await expect(briefing).toBeVisible();
   s = await saved(page);
   expect(s.gameplayMode).toBe('realistic');
-  await expect(more.getByLabel('Visual waypoints', { exact: true })).toHaveValue('false');
-  await expect(more.getByLabel('Battery and oxygen', { exact: true })).toHaveValue('true');
-  await expect(more.getByLabel('Forward speed', { exact: true })).toHaveValue('research');
+  await expect(more.getByLabel('Visual waypoints', { exact: true })).not.toBeChecked();
+  await expect(more.getByLabel('Battery and oxygen', { exact: true })).toBeChecked();
   await dive.getByRole('radio', { name: 'Arcade' }).click();
-  await expect(more.getByLabel('Sonar markers', { exact: true })).toHaveValue('true');
-  await expect(more.getByLabel('Forward speed', { exact: true })).toHaveValue('fast');
+  await expect(more.getByLabel('Visual waypoints', { exact: true })).toBeChecked();
 
   // Focus stays in the card; axe is clean.
   for (let i = 0; i < 25; i++) await page.keyboard.press('Tab');
@@ -152,7 +144,7 @@ test('briefing Dive settings: mode, start and Advanced persist to settings', asy
   expect(axe.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
 
   // Reload: the choices persisted and the briefing shows them.
-  await more.getByLabel('Visual waypoints', { exact: true }).selectOption('false');
+  await more.getByLabel('Visual waypoints', { exact: true }).uncheck();
   await boot(page, '/?mission=titanic');
   await expect(page.locator('.briefing-dive').locator('.mode-custom-tag')).toBeVisible();
   expect((await saved(page)).gameplay.visualHints).toBe(false);
@@ -182,7 +174,7 @@ for (const start of ['near-site', 'surface'] as const) {
       .toBeLessThan(0.01);
     if (start === 'surface') {
       await openBriefingAdvanced(page);
-      await page.locator('.briefing-start input[value="surface"]').check();
+      await page.locator('.briefing').getByLabel('Start at surface').check();
       await expect.poll(async () => (await pose(page)).y).toBeGreaterThan(-50);
       const surface = await pose(page);
       expect(dist(surface, near)).toBeGreaterThan(500);
@@ -190,10 +182,10 @@ for (const start of ['near-site', 'surface'] as const) {
       expect(s.gameplay.startPosition).toBe('surface');
       expect(s.gameplayMode).toBe('custom');
       // Back and forth: the preview follows the choice.
-      await page.locator('.briefing-start input[value="near-site"]').check();
+      await page.locator('.briefing').getByLabel('Start at surface').uncheck();
       // Choosing a start makes the mode Custom, which keeps the classic long approach.
       await expect.poll(async () => (await pose(page)).y).toBeLessThan(-3000);
-      await page.locator('.briefing-start input[value="surface"]').check();
+      await page.locator('.briefing').getByLabel('Start at surface').check();
       await expect.poll(async () => (await pose(page)).y).toBeGreaterThan(-50);
     }
     await page.waitForTimeout(300); // frozen: nothing drifts under the card
@@ -223,24 +215,20 @@ test('Settings: mode on top of Gameplay, separate waypoint toggles, hull warning
   await expect(gameplay.locator('.mode-desc')).toContainText('Fast travel');
 
   await gameplay.getByRole('button', { name: 'Advanced' }).click();
-  // Two separate waypoint settings, each with its own one-line description.
-  for (const [label, words] of [
-    ['Visual waypoints', 'dive view'],
-    ['Sonar markers', 'sonar map'],
-  ] as const) {
+  // The world-waypoint switch retains its description.
+  for (const [label, words] of [['Visual waypoints', 'dive view']] as const) {
     const control = gameplay.getByLabel(label, { exact: true });
     await expect(control).toBeVisible();
     const noteId = await control.getAttribute('aria-describedby');
     expect(noteId).toBeTruthy();
     await expect(page.locator(`[id="${noteId}"]`)).toContainText(words);
   }
-  await gameplay.getByLabel('Sonar markers', { exact: true }).selectOption('false');
+  await gameplay.getByLabel('Visual waypoints', { exact: true }).uncheck();
   await expect(gameplay.locator('.mode-custom-tag')).toBeVisible();
   let s = await saved(page);
-  expect(s.gameplay.sonarMarkers).toBe(false);
-  expect(s.gameplay.visualHints).toBe(true);
+  expect(s.gameplay.visualHints).toBe(false);
   await gameplay.getByRole('radio', { name: 'Arcade' }).check();
-  await expect(gameplay.getByLabel('Sonar markers', { exact: true })).toHaveValue('true');
+  await expect(gameplay.getByLabel('Visual waypoints', { exact: true })).toBeChecked();
   await gameplay.scrollIntoViewIfNeeded();
   await gameplay.screenshot({ path: `${shots}/settings-gameplay.png` });
 

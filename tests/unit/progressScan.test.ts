@@ -14,7 +14,7 @@ import { scanAim } from '../e2e/helpers/scanAim.js';
 
 const site = 'blake-plateau-corals';
 const config = makeConfig();
-Object.assign(config.submarine, config.speedProfiles.fast, config.descentProfiles.fast);
+Object.assign(config.submarine, config.speedProfiles.fast);
 const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
 const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
 const heights = new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows);

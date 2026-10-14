@@ -36,10 +36,10 @@ for (const viewport of [
     await page.keyboard.press('Enter');
     await expect(toggle).toHaveAttribute('aria-expanded', 'true');
     const currents = mode.getByLabel('Currents', { exact: true });
-    await expect(currents.locator('option')).toHaveText(['Off', 'Realistic', 'Exaggerated']);
-    await currents.selectOption('exaggerated');
+    await expect(mode.getByRole('switch')).toHaveCount(4);
+    await currents.check();
     await expect(mode.locator('.mode-custom-tag')).toBeVisible();
-    await expect(mode.locator('input:checked')).toHaveCount(0);
+    await expect(mode.getByRole('radio', { checked: true })).toHaveCount(0);
     await expect
       .poll(() =>
         page.evaluate(
@@ -56,10 +56,10 @@ for (const viewport of [
     }
     await page.screenshot({ path: `${shots}/home-${viewport.width}-advanced.png` });
     await mode.getByRole('radio', { name: 'Realistic' }).check();
-    await expect(currents).toHaveValue('realistic');
+    await expect(currents).toBeChecked();
     await expect(mode.locator('.mode-custom-tag')).toBeHidden();
     await mode.getByRole('radio', { name: 'Arcade' }).check();
-    await expect(currents).toHaveValue('off');
+    await expect(currents).not.toBeChecked();
     await toggle.click();
     await expect(mode.locator('.mode-advanced')).toBeHidden();
 
@@ -204,7 +204,7 @@ test.describe('phone touch', () => {
     const mode = page.locator('.home-screen .mode-selector');
     await mode.getByRole('button', { name: 'Advanced' }).tap();
     await expect(mode.locator('.mode-advanced')).toBeVisible();
-    await mode.getByLabel('Currents', { exact: true }).selectOption('exaggerated');
+    await mode.getByLabel('Currents', { exact: true }).check();
     await expect(mode.locator('.mode-custom-tag')).toBeVisible();
     await mode.getByLabel('Currents', { exact: true }).scrollIntoViewIfNeeded();
     await page.screenshot({ path: `${shots}/phone-touch-advanced.png` });

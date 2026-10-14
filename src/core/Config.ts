@@ -17,7 +17,6 @@ import { DEFAULT_CAMERA } from './config/camera.js';
 import { DEFAULT_LANDMARKS, DEFAULT_SCAN } from './config/discovery.js';
 import {
   DEFAULT_CURRENTS,
-  DEFAULT_DESCENT_PROFILES,
   DEFAULT_LIGHT_PRESETS,
   DEFAULT_POWER,
   DEFAULT_SENSOR_PRESETS,
@@ -71,7 +70,6 @@ export const DEFAULT_CONFIG: GameConfig = {
   mission: DEFAULT_MISSION,
   settings: DEFAULT_SETTINGS,
   speedProfiles: DEFAULT_SPEED_PROFILES,
-  descentProfiles: DEFAULT_DESCENT_PROFILES,
   lightPresets: DEFAULT_LIGHT_PRESETS,
   sensorPresets: DEFAULT_SENSOR_PRESETS,
   power: DEFAULT_POWER,
@@ -126,7 +124,6 @@ export function makeConfig(overrides: Partial<GameConfig> = {}): GameConfig {
       },
     },
     speedProfiles: { ...DEFAULT_CONFIG.speedProfiles, ...overrides.speedProfiles },
-    descentProfiles: { ...DEFAULT_CONFIG.descentProfiles, ...overrides.descentProfiles },
     lightPresets: { ...DEFAULT_CONFIG.lightPresets, ...overrides.lightPresets },
     sensorPresets: { ...DEFAULT_CONFIG.sensorPresets, ...overrides.sensorPresets },
     power: { ...DEFAULT_CONFIG.power, ...overrides.power },

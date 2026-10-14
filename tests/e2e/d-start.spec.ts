@@ -27,7 +27,7 @@ test('Custom near-site starts retain the authored approach at deep and shallow s
 }) => {
   await page.addInitScript(() =>
     localStorage.setItem(
-      'subexplorer.settings.v2',
+      'subexplorer.settings.v3',
       JSON.stringify({ version: 2, gameplayMode: 'custom' }),
     ),
   );
@@ -38,7 +38,7 @@ test('Custom near-site starts retain the authored approach at deep and shallow s
     ['lost-city', 'near-site-lost-city.png'],
   ]) {
     await boot(page, id);
-    await expect(page.locator('.briefing-start input[value="near-site"]')).toBeChecked();
+    await expect(page.locator('.briefing').getByLabel('Start at surface')).not.toBeChecked();
     if (id === 'titanic') await page.screenshot({ path: `${shots}/briefing-start-choice.png` });
     await page.locator('.briefing-begin').click();
     await expect(page.locator('.briefing')).toBeHidden();
@@ -97,14 +97,14 @@ test('Custom near-site starts retain the authored approach at deep and shallow s
 test('The briefing start choice persists as the saved start position', async ({ page }) => {
   await boot(page, 'titanic');
   await openBriefingAdvanced(page);
-  await page.locator('.briefing-start input[value="surface"]').check();
+  await page.locator('.briefing').getByLabel('Start at surface').check();
   await page.locator('.briefing-begin').click();
   await expect(page.locator('.briefing')).toBeHidden();
   expect((await pose(page)).y).toBeGreaterThan(-20);
   await page.screenshot({ path: `${shots}/surface.png` });
   // D2-PREDIVE: the Dive settings panel writes the setting (and so Custom).
   await boot(page, 'titanic');
-  await expect(page.locator('.briefing-start input[value="surface"]')).toBeChecked();
+  await expect(page.locator('.briefing').getByLabel('Start at surface')).toBeChecked();
   await page.evaluate(() => {
     const save = (
       window.__game as {
@@ -118,12 +118,12 @@ test('The briefing start choice persists as the saved start position', async ({ 
     save.setGameplayOption('startPosition', 'surface');
   });
   await boot(page, 'titanic');
-  await expect(page.locator('.briefing-start input[value="surface"]')).toBeChecked();
+  await expect(page.locator('.briefing').getByLabel('Start at surface')).toBeChecked();
   await openBriefingAdvanced(page);
-  await page.locator('.briefing-start input[value="near-site"]').check();
+  await page.locator('.briefing').getByLabel('Start at surface').uncheck();
   await page.locator('.briefing-begin').click();
   await expect(page.locator('.briefing')).toBeHidden();
   expect((await pose(page)).y).toBeLessThan(-3000);
   await boot(page, 'titanic');
-  await expect(page.locator('.briefing-start input[value="near-site"]')).toBeChecked();
+  await expect(page.locator('.briefing').getByLabel('Start at surface')).not.toBeChecked();
 });

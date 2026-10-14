@@ -1,3 +1,5 @@
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { defaultSettings } from '../../src/core/Save.js';
 import { describe, expect, it } from 'vitest';
 import { makeConfig } from '../../src/core/Config.js';
 import { PROGRESS_CONFIG, UPGRADES } from '../../src/core/config/progress.js';
@@ -7,7 +9,7 @@ import {
   migrateProgress,
   type SettingsStorage,
 } from '../../src/core/Save.js';
-import { Progress, applyProgress, diveStars, requiredHull } from '../../src/game/Progress.js';
+import { Progress, diveStars, requiredHull } from '../../src/game/Progress.js';
 
 function storage(): SettingsStorage {
   const values = new Map<string, string>();
@@ -222,34 +224,26 @@ describe('upgrade purchases and effects', () => {
   it('gives every upgrade a tangible bounded effect without compounding or changing defaults', () => {
     const base = structuredClone(makeConfig());
     const original = structuredClone(base);
-    const config = structuredClone(base);
+    let config;
     const { progress } = researcher(5000);
     for (const upgrade of UPGRADES) progress.buy(upgrade.id);
-    applyProgress(config, base, progress, base.settings.gameplayPresets.arcade);
-    expect(config.lightPresets.enhanced.distance).toBeCloseTo(
-      base.lightPresets.enhanced.distance * 1.1,
-    );
-    expect(config.lightPresets.enhanced.angleDeg).toBe(base.lightPresets.enhanced.angleDeg + 4);
-    expect(config.sensorPresets.extended.sonarPoiRange).toBeCloseTo(
+    config = resolveEffective(defaultSettings(base), 'arcade', progress.snapshot(), null, base);
+    expect(config.light.distance).toBeCloseTo(base.lightPresets.enhanced.distance * 1.1);
+    expect(config.light.angleDeg).toBe(base.lightPresets.enhanced.angleDeg + 4);
+    expect(config.sensor.sonarPoiRange).toBeCloseTo(
       base.sensorPresets.extended.sonarPoiRange * 1.15,
     );
-    expect(config.sensorPresets.extended.scanRadiusMultiplier).toBeCloseTo(
+    expect(config.sensor.scanRadiusMultiplier).toBeCloseTo(
       base.sensorPresets.extended.scanRadiusMultiplier * 1.1,
     );
     expect(config.power.oxygenHours).toBeCloseTo(base.power.oxygenHours * 1.12);
     expect(config.power.batteryIdleHours).toBeCloseTo(base.power.batteryIdleHours * 1.12);
     expect(config.power.boostCostMultiplier).toBeCloseTo(base.power.boostCostMultiplier / 1.2);
-    expect(config.speedProfiles.standard.maxSpeed).toBeCloseTo(
-      base.speedProfiles.standard.maxSpeed * 1.08,
-    );
-    expect(config.speedProfiles.standard.yawRate).toBeCloseTo(
-      base.speedProfiles.standard.yawRate * 1.08,
-    );
-    expect(config.speedProfiles.standard.reverseAccel).toBeCloseTo(
-      base.speedProfiles.standard.reverseAccel * 1.1,
-    );
+    expect(config.submarine.maxSpeed).toBeCloseTo(base.speedProfiles.fast.maxSpeed * 1.08);
+    expect(config.submarine.yawRate).toBeCloseTo(base.speedProfiles.fast.yawRate * 1.08);
+    expect(config.submarine.reverseAccel).toBeCloseTo(base.speedProfiles.fast.reverseAccel * 1.1);
     const once = structuredClone(config);
-    applyProgress(config, base, progress, base.settings.gameplayPresets.arcade);
+    config = resolveEffective(defaultSettings(base), 'arcade', progress.snapshot(), null, base);
     expect(config).toEqual(once);
     expect(base).toEqual(original);
   });

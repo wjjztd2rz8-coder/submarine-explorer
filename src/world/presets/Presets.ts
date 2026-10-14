@@ -1,3 +1,4 @@
+import type { CurrentMode } from '../../core/config/modes.js';
 /**
  * Environment preset registry and selection (docs/presets.md, contracts §1-2).
  *
@@ -20,7 +21,6 @@ import * as THREE from 'three';
 import type {
   EnvPresetName,
   GameConfig,
-  GameplayOptions,
   GraphicsTier,
   PresetParamValue,
 } from '../../core/Config.js';
@@ -269,7 +269,7 @@ interface PresetSystemOptions {
   terrain: PresetTerrain;
   sub: { position: THREE.Vector3; velocity: THREE.Vector3; floorFor(ground: number): number };
   currents: Currents;
-  currentMode: GameplayOptions['currents'];
+  currentMode: CurrentMode;
   props: PresetPropSource;
   discovery: PresetPoiSource;
   atmosphere: { ambient: THREE.AmbientLight; caustics: THREE.SpotLight | null };
@@ -323,7 +323,7 @@ export class PresetSystem {
   private readonly spawn: THREE.Vector3;
   private waited = 0;
   private lastCurrent = { dir: 0, speed: 0, at: -Infinity };
-  private currentMode: GameplayOptions['currents'];
+  private currentMode: CurrentMode;
 
   constructor(private readonly o: PresetSystemOptions) {
     const pc = o.config.presets;
@@ -353,7 +353,7 @@ export class PresetSystem {
     this.ready = this.resolve();
   }
 
-  setCurrentMode(mode: GameplayOptions['currents']): void {
+  setCurrentMode(mode: CurrentMode): void {
     if (mode === this.currentMode) return;
     this.currentMode = mode;
     this.lastCurrent.at = -Infinity;
@@ -485,12 +485,9 @@ export class PresetSystem {
     const pc = this.o.config.presets;
     const c = this.current.copy(this.frame.current);
     if (this.currentMode === 'off' || this.o.currents.status !== 'ready') c.set(0, 0, 0);
-    else c.multiplyScalar(currentScale(this.currentMode, this.o.config.currents));
+    else c.multiplyScalar(currentScale(this.currentMode));
     if (!this.visuals && !pc.lowTierCurrents) c.set(0, 0, 0);
-    capVector(
-      c,
-      pc.maxCurrentMps * Math.max(1, currentScale(this.currentMode, this.o.config.currents)),
-    );
+    capVector(c, pc.maxCurrentMps * Math.max(1, currentScale(this.currentMode)));
     if (simDt > 0) {
       currentCouplingDelta(this.o.sub.velocity, c, pc.currentCouplingPerS, simDt, this.delta);
       const guard = this.o.config.currents;

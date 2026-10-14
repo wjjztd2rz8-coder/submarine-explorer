@@ -49,10 +49,11 @@ Resume/Objectives/Journal/Settings/Controls/Data credits/Quit to home).
 Both retire the old `O` (settings) and `N` (globe) hotkeys — `Input`'s
 `defaultActions()` no longer binds `toggleSettings` or `toggleGlobe` at all;
 those screens open only from a menu button now. `Save`'s settings record is
-versioned `v2` and gained a `gameplay` block (`Config.settings.gameplayPresets`
-'arcade' | 'realistic', plus 'custom') covering speed/descent profile, lights,
-sensors, visual waypoints, sonar markers, start position, battery/oxygen and currents —
-`src/core/Config.ts` `speedProfiles` / `descentProfiles` / `lightPresets` /
+versioned `v3`; its `gameplay` block has four switches: battery/oxygen, currents,
+visual waypoints and surface start. Custom inherits speed (including descent), lights
+and sensors from its last preset (`gameplayBaseMode`). `game/EffectiveSettings.ts`
+resolves modes, upgrades and Daily conditions from pristine tuning —
+`src/core/Config.ts` `speedProfiles` (including descent) / `lightPresets` /
 `sensorPresets` hold the numeric presets. `Input`'s bindings are versioned
 `v3` (migrating v2), with defaults R/F pitch, Space rise, Ctrl-or-C sink,
 Shift boost, G scan, Q camera, X reset camera and no `ping` action. `ui/Journal.ts` (`game/JournalData.ts`)
@@ -61,7 +62,7 @@ of site/POI/species entries built from existing content files, still reading
 `DiscoveryStore`'s unchanged `subexplorer.discoveries.v1` for unlocks, plus a
 photo gallery tab (`ui/PhotoGallery.ts`). `ui/Waypoints.ts` draws the D-SCAN
 world-space waypoint, off-screen edge arrow and objective hint text when the
-`visualHints` gameplay option is on. `sonarMarkers` separately controls
+`visualHints` gameplay option is on. Sonar always displays
 POI/objective/scanned icons on the sonar; seabed relief remains visible. `ui/Sonar.ts` gained POI/objective icons
 and zoom levels (`Config.sonarZoom`: 250/500/1000/2000 m or the whole tile,
 `M` to expand, buttons or `+`/`-` to change range, and the mouse wheel
@@ -501,14 +502,14 @@ EventBus; see [`docs/audio.md`](./audio.md).
 
 ## Persistence
 
-| localStorage key             | Owner                    | Shape                                                                                                                                                                                                                        |
-| ---------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `subexplorer.bindings.v3`    | `core/Input.ts`          | `{ version: 3, keys: Record<ActionId, string[]> }`; migrates saved v2 and v1 bindings, preserving custom keys                                                                                                                |
-| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }` — unchanged since Phase B, now also read by the Journal                                                                                                   |
-| `subexplorer.settings.v2`    | `core/Save.ts`           | `{ version: 2, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette, uiScale, hullWarningStyle, gameplayMode, gameplay, bindings? }`; migrates a saved `subexplorer.settings.v1` once |
-| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | `{ version: 1, photos: [{ id, image (JPEG data URL, ≤640 px), siteId, siteName, poiId, poiName, at, depthM }] }`, newest 24 (D-PHOTO)                                                                                        |
-| `subexplorer.lastSite.v1`    | `main.ts`                | `{ missionId: string }`, written when a mission starts; enables the home screen's Continue button (D-SHELL)                                                                                                                  |
-| `subexplorer.tips.v1`        | `main.ts`                | `{ ctrlW: true }` once the one-time "Ctrl+W may close this tab" tip has been dismissed (D-INPUT+HUD)                                                                                                                         |
+| localStorage key             | Owner                    | Shape                                                                                                                                                                                                                         |
+| ---------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `subexplorer.bindings.v3`    | `core/Input.ts`          | `{ version: 3, keys: Record<ActionId, string[]> }`; migrates saved v2 and v1 bindings, preserving custom keys                                                                                                                 |
+| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }` — unchanged since Phase B, now also read by the Journal                                                                                                    |
+| `subexplorer.settings.v3`    | `core/Save.ts`           | `{ version: 3, graphicsTier, postFx, detailStrength, reduceMotion, captions, sonarPalette, uiScale, hullWarningStyle, gameplayMode, gameplayBaseMode, gameplay, bindings? }`; migrates a saved `subexplorer.settings.v1` once |
+| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | `{ version: 1, photos: [{ id, image (JPEG data URL, ≤640 px), siteId, siteName, poiId, poiName, at, depthM }] }`, newest 24 (D-PHOTO)                                                                                         |
+| `subexplorer.lastSite.v1`    | `main.ts`                | `{ missionId: string }`, written when a mission starts; enables the home screen's Continue button (D-SHELL)                                                                                                                   |
+| `subexplorer.tips.v1`        | `main.ts`                | `{ ctrlW: true }` once the one-time "Ctrl+W may close this tab" tip has been dismissed (D-INPUT+HUD)                                                                                                                          |
 
 All are versioned, guarded (no storage → in-memory), and never throw. The
 legacy `subexplorer.bindings.v1` / `.v2` and `subexplorer.settings.v1` keys
@@ -570,7 +571,7 @@ streaming (Tier 4), and a hard draw-call cap.
 | Debug in the browser                  | `window.__game` (see below), `?debugTerrain=1`, `?debugProps=1`                                                                                                                        |
 
 `window.__game` keys (`main.ts`): `scene`, `renderer`, `terrain`, `sub`, `rig`,
-`water`, `atmosphere`, `headlights`, `audio`, `bus`, `config`, `power` (see
+`water`, `atmosphere`, `headlights`, `audio`, `bus`, `config` (pristine tuning), `effective` (current resolved settings), `power` (see
 [`power.md`](./power.md)), `currents` (see [`currents.md`](./currents.md)),
 `rov`, `rovHud`, `rovVisual`, `photos`, `photoMode`, `meta`, `scanner`,
 `discoveries`, `discovery`, `debrief`, `fieldGuide` (the `Guide` instance
@@ -592,10 +593,11 @@ Resume/Objectives/Journal/Settings/Controls/Data credits/Quit to home).
 Both retire the old `O` (settings) and `N` (globe) hotkeys — `Input`'s
 `defaultActions()` no longer binds `toggleSettings` or `toggleGlobe` at all;
 those screens open only from a menu button now. `Save`'s settings record is
-versioned `v2` and gained a `gameplay` block (`Config.settings.gameplayPresets`
-'arcade' | 'realistic', plus 'custom') covering speed/descent profile, lights,
-sensors, visual waypoints, sonar markers, start position, battery/oxygen and currents —
-`src/core/Config.ts` `speedProfiles` / `descentProfiles` / `lightPresets` /
+versioned `v3`; its `gameplay` block has four switches: battery/oxygen, currents,
+visual waypoints and surface start. Custom inherits speed (including descent), lights
+and sensors from its last preset (`gameplayBaseMode`). `game/EffectiveSettings.ts`
+resolves modes, upgrades and Daily conditions from pristine tuning —
+`src/core/Config.ts` `speedProfiles` (including descent) / `lightPresets` /
 `sensorPresets` hold the numeric presets. `Input`'s bindings are versioned
 `v3` (migrating v2), with defaults R/F pitch, Space rise, Ctrl-or-C sink,
 Shift boost, G scan, Q camera, X reset camera and no `ping` action. `ui/Journal.ts` (`game/JournalData.ts`)
@@ -604,7 +606,7 @@ of site/POI/species entries built from existing content files, still reading
 `DiscoveryStore`'s unchanged `subexplorer.discoveries.v1` for unlocks, plus a
 photo gallery tab (`ui/PhotoGallery.ts`). `ui/Waypoints.ts` draws the D-SCAN
 world-space waypoint, off-screen edge arrow and objective hint text when the
-`visualHints` gameplay option is on. `sonarMarkers` separately controls
+`visualHints` gameplay option is on. Sonar always displays
 POI/objective/scanned icons on the sonar; seabed relief remains visible. `ui/Sonar.ts` gained POI/objective icons
 and zoom levels (`Config.sonarZoom`: 250/500/1000/2000 m or the whole tile,
 `M` to expand, buttons or `+`/`-` to change range, and the mouse wheel
@@ -1056,14 +1058,14 @@ EventBus; see [`docs/audio.md`](./audio.md).
 
 ## Persistence
 
-| localStorage key             | Owner                    | Shape                                                                                                                                                                                                                        |
-| ---------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `subexplorer.bindings.v3`    | `core/Input.ts`          | `{ version: 3, keys: Record<ActionId, string[]> }`; migrates saved v2 and v1 bindings, preserving custom keys                                                                                                                |
-| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }` — unchanged since Phase B, now also read by the Journal                                                                                                   |
-| `subexplorer.settings.v2`    | `core/Save.ts`           | `{ version: 2, graphicsTier, postFx, detailStrength, simSpeedDefault, reduceMotion, captions, sonarPalette, uiScale, hullWarningStyle, gameplayMode, gameplay, bindings? }`; migrates a saved `subexplorer.settings.v1` once |
-| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | `{ version: 1, photos: [{ id, image (JPEG data URL, ≤640 px), siteId, siteName, poiId, poiName, at, depthM }] }`, newest 24 (D-PHOTO)                                                                                        |
-| `subexplorer.lastSite.v1`    | `main.ts`                | `{ missionId: string }`, written when a mission starts; enables the home screen's Continue button (D-SHELL)                                                                                                                  |
-| `subexplorer.tips.v1`        | `main.ts`                | `{ ctrlW: true }` once the one-time "Ctrl+W may close this tab" tip has been dismissed (D-INPUT+HUD)                                                                                                                         |
+| localStorage key             | Owner                    | Shape                                                                                                                                                                                                                         |
+| ---------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `subexplorer.bindings.v3`    | `core/Input.ts`          | `{ version: 3, keys: Record<ActionId, string[]> }`; migrates saved v2 and v1 bindings, preserving custom keys                                                                                                                 |
+| `subexplorer.discoveries.v1` | `game/DiscoveryStore.ts` | `{ version: 1, discovered: { "<landmark>/<poi>": {...} }, stats }` — unchanged since Phase B, now also read by the Journal                                                                                                    |
+| `subexplorer.settings.v3`    | `core/Save.ts`           | `{ version: 3, graphicsTier, postFx, detailStrength, reduceMotion, captions, sonarPalette, uiScale, hullWarningStyle, gameplayMode, gameplayBaseMode, gameplay, bindings? }`; migrates a saved `subexplorer.settings.v1` once |
+| `subexplorer.photos.v1`      | `game/PhotoStore.ts`     | `{ version: 1, photos: [{ id, image (JPEG data URL, ≤640 px), siteId, siteName, poiId, poiName, at, depthM }] }`, newest 24 (D-PHOTO)                                                                                         |
+| `subexplorer.lastSite.v1`    | `main.ts`                | `{ missionId: string }`, written when a mission starts; enables the home screen's Continue button (D-SHELL)                                                                                                                   |
+| `subexplorer.tips.v1`        | `main.ts`                | `{ ctrlW: true }` once the one-time "Ctrl+W may close this tab" tip has been dismissed (D-INPUT+HUD)                                                                                                                          |
 
 All are versioned, guarded (no storage → in-memory), and never throw. The
 legacy `subexplorer.bindings.v1` / `.v2` and `subexplorer.settings.v1` keys
@@ -1125,7 +1127,7 @@ streaming (Tier 4), and a hard draw-call cap.
 | Debug in the browser                  | `window.__game` (see below), `?debugTerrain=1`, `?debugProps=1`                                                                                                                        |
 
 `window.__game` keys (`main.ts`): `scene`, `renderer`, `terrain`, `sub`, `rig`,
-`water`, `atmosphere`, `headlights`, `audio`, `bus`, `config`, `power` (see
+`water`, `atmosphere`, `headlights`, `audio`, `bus`, `config` (pristine tuning), `effective` (current resolved settings), `power` (see
 [`power.md`](./power.md)), `currents` (see [`currents.md`](./currents.md)),
 `photos`, `photoMode`, `meta`, `scanner`,
 `discoveries`, `discovery`, `debrief`, `fieldGuide` (the `Guide` instance

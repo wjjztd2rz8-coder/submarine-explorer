@@ -2,12 +2,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
-import {
-  GAME_MODES,
-  gameplayValueLabel,
-  modeDescription,
-  parseGameplayValue,
-} from '../../src/ui/ModeSelector.js';
+import { GAME_MODES, modeDescription } from '../../src/ui/ModeSelector.js';
 import {
   GAMEPLAY_LABELS,
   GAMEPLAY_NOTES,
@@ -19,7 +14,7 @@ import {
 describe('game modes', () => {
   it('lists only Arcade and Realistic, each with a one-line description', () => {
     expect(GAME_MODES.map((m) => m.id)).toEqual(['arcade', 'realistic']);
-    expect(modeDescription('custom')).toBe('Your own mix of the individual options.');
+    expect(modeDescription('custom')).toBe('Your switches with Arcade speed, lights and sensors.');
     for (const mode of GAME_MODES) {
       expect(modeDescription(mode.id)).toBe(mode.description);
       expect(mode.description).not.toMatch(/\n/);
@@ -33,56 +28,32 @@ describe('game modes', () => {
     expect(modeDescription('arcade')).toMatch(/waypoints/);
     expect(modeDescription('arcade')).toMatch(/No battery limit or currents/);
     expect(!realistic.visualHints && realistic.batteryOxygen).toBe(true);
-    expect(realistic.speedProfile).toBe('research');
+    expect(realistic.currents).toBe('realistic');
     expect(modeDescription('realistic')).toMatch(/Battery, oxygen and currents; no waypoints/);
   });
 });
 
 describe('gameplay option labels and values', () => {
-  it('labels values for selects', () => {
-    expect(gameplayValueLabel('visualHints', true)).toBe('On');
-    expect(gameplayValueLabel('sonarMarkers', false)).toBe('Off');
-    expect(gameplayValueLabel('simSpeed', 2)).toBe('2×');
-    expect(gameplayValueLabel('startPosition', 'near-site')).toBe('Near site');
-    expect(gameplayValueLabel('currents', 'gentle')).toBe('Gentle');
-  });
-
-  it('parses control strings back to the option type', () => {
-    const o = DEFAULT_CONFIG.settings.gameplayOptions;
-    expect(parseGameplayValue(o.sonarMarkers, 'false')).toBe(false);
-    expect(parseGameplayValue(o.visualHints, 'true')).toBe(true);
-    expect(parseGameplayValue(o.simSpeed, '3')).toBe(3);
-    expect(parseGameplayValue(o.currents, 'realistic')).toBe('realistic');
-  });
-
-  it('keeps visual waypoints and sonar markers as separate, described settings', () => {
+  it('names the four switches and describes world waypoints', () => {
     expect(GAMEPLAY_LABELS.visualHints).toBe('Visual waypoints');
-    expect(GAMEPLAY_LABELS.sonarMarkers).toBe('Sonar markers');
+    expect(GAMEPLAY_LABELS.startPosition).toBe('Start at surface');
     expect(GAMEPLAY_NOTES.visualHints).toMatch(/dive view/);
-    expect(GAMEPLAY_NOTES.sonarMarkers).toMatch(/sonar map/);
   });
 
-  it('orders every configured option, pairing related ones', () => {
+  it('orders only the four supported switches', () => {
     const keys = gameplayKeysInOrder(DEFAULT_CONFIG.settings.gameplayOptions);
     expect([...keys].sort()).toEqual(Object.keys(DEFAULT_CONFIG.settings.gameplayOptions).sort());
-    expect(keys.indexOf('sonarMarkers')).toBe(keys.indexOf('visualHints') + 1);
     expect(
       gameplayKeysInOrder({ ...DEFAULT_CONFIG.settings.gameplayOptions, future: [] }).at(-1),
-    ).toBe('future');
+    ).toBe('startPosition');
   });
 
   it('includes every advanced option in the shared control', () => {
     expect(gameplayKeysInOrder(DEFAULT_CONFIG.settings.gameplayOptions)).toEqual([
-      'speedProfile',
-      'descentProfile',
-      'lights',
-      'sensors',
-      'visualHints',
-      'sonarMarkers',
       'batteryOxygen',
       'currents',
+      'visualHints',
       'startPosition',
-      'simSpeed',
     ]);
   });
 });

@@ -295,7 +295,7 @@
   max-height: none;
   overflow: visible;
 }
-.home-menu .mode-selector .mode-advanced-field select {
+.home-menu .mode-selector .mode-advanced-field input[role='switch'] {
   min-height: 48px;
 }
 @media (max-width: 480px) {

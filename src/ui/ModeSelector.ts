@@ -9,14 +9,10 @@
  * arrow keys move between modes (and apply them, as radios do).
  */
 
+import { el } from './dom.js';
 import type { GameplayOptions } from '../core/Config.js';
 import { DEFAULT_SETTINGS } from '../core/config/ui.js';
-import {
-  CURRENT_CHOICES,
-  GAMEPLAY_LABELS,
-  GAMEPLAY_NOTES,
-  gameplayKeysInOrder,
-} from '../core/config/modes.js';
+import { GAMEPLAY_LABELS, GAMEPLAY_NOTES, gameplayKeysInOrder } from '../core/config/modes.js';
 import type { GameplayMode, SettingsData } from '../core/Save.js';
 
 export const GAME_MODES: ReadonlyArray<{ id: GameplayMode; label: string; description: string }> = [
@@ -33,32 +29,13 @@ export const GAME_MODES: ReadonlyArray<{ id: GameplayMode; label: string; descri
 ];
 
 /** One-line description of a mode. */
-export function modeDescription(mode: GameplayMode): string {
-  if (mode === 'custom') return 'Your own mix of the individual options.';
-  return GAME_MODES.find((m) => m.id === mode)?.description ?? '';
-}
-
-/** Display label for one value of a gameplay option (select option text). */
-export function gameplayValueLabel(
-  key: keyof GameplayOptions,
-  value: string | number | boolean,
+export function modeDescription(
+  mode: GameplayMode,
+  baseMode: 'arcade' | 'realistic' = 'arcade',
 ): string {
-  if (typeof value === 'boolean') return value ? 'On' : 'Off';
-  if (key === 'simSpeed') return `${value}×`;
-  if (value === 'near-site') return 'Near site';
-  const text = String(value).replaceAll('-', ' ');
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-/** Parse a control's string value back into the option's type. */
-export function parseGameplayValue(
-  choices: readonly (string | number | boolean)[],
-  raw: string,
-): string | number | boolean {
-  const sample = choices[0];
-  if (typeof sample === 'number') return Number(raw);
-  if (typeof sample === 'boolean') return raw === 'true';
-  return raw;
+  if (mode === 'custom')
+    return `Your switches with ${baseMode === 'realistic' ? 'Realistic' : 'Arcade'} speed, lights and sensors.`;
+  return GAME_MODES.find((m) => m.id === mode)?.description ?? '';
 }
 
 /** The part of {@link Save} the pre-dive controls use. */
@@ -77,7 +54,7 @@ export class ModeSelector {
   readonly advancedToggle: HTMLButtonElement;
   readonly advancedPanel: HTMLDivElement;
   private readonly customTag: HTMLSpanElement;
-  private readonly controls = new Map<keyof GameplayOptions, HTMLSelectElement>();
+  private readonly controls = new Map<keyof GameplayOptions, HTMLInputElement>();
   private readonly desc: HTMLParagraphElement;
   private readonly unsubscribe: () => void;
 
@@ -89,12 +66,10 @@ export class ModeSelector {
     className: string,
     private readonly source: GameplaySettingsSource,
     label = 'Game mode',
-    exclude: readonly (keyof GameplayOptions)[] = [],
     optionChoices = DEFAULT_SETTINGS.gameplayOptions,
   ) {
     const id = `mode-${++uid}`;
-    this.root = document.createElement('div');
-    this.root.className = `mode-selector ${className}`.trim();
+    this.root = el('div', `mode-selector ${className}`.trim());
     const heading = document.createElement('span');
     heading.className = 'mode-selector-label';
     heading.id = `${id}-label`;
@@ -143,42 +118,36 @@ export class ModeSelector {
       this.setAdvancedOpen(!!this.advancedPanel.hidden),
     );
     for (const key of gameplayKeysInOrder(optionChoices)) {
-      if (exclude.includes(key)) continue;
-      const choices = key === 'currents' ? CURRENT_CHOICES : optionChoices[key];
-      const field = document.createElement('div');
-      field.className = 'mode-advanced-field';
-      const name = document.createElement('label');
+      const field = el('div', 'mode-advanced-field');
+      const name = el('label', undefined, GAMEPLAY_LABELS[key]);
       name.htmlFor = `${id}-${key}`;
-      name.textContent = GAMEPLAY_LABELS[key];
-      const select = document.createElement('select');
-      select.id = name.htmlFor;
-      select.dataset.gameplay = key;
-      for (const choice of choices) {
-        const option = document.createElement('option');
-        option.value = String(choice);
-        option.textContent = gameplayValueLabel(key, choice);
-        select.append(option);
-      }
-      // Preserve the retired Gentle value until the player chooses another setting.
-      if (key === 'currents' && source.get().gameplay.currents === 'gentle') {
-        const legacy = document.createElement('option');
-        legacy.value = 'gentle';
-        legacy.textContent = 'Gentle';
-        legacy.hidden = true;
-        select.append(legacy);
-      }
-      select.addEventListener('change', () =>
-        source.setGameplayOption(key, parseGameplayValue(choices, select.value) as never),
-      );
-      field.append(name, select);
+      const control = el('input');
+      control.type = 'checkbox';
+      control.setAttribute('role', 'switch');
+      control.id = name.htmlFor;
+      control.dataset.gameplay = key;
+      control.addEventListener('change', () => {
+        const value =
+          key === 'currents'
+            ? control.checked
+              ? 'realistic'
+              : 'off'
+            : key === 'startPosition'
+              ? control.checked
+                ? 'surface'
+                : 'near-site'
+              : control.checked;
+        source.setGameplayOption(key, value as never);
+      });
+      field.append(name, control);
       if (GAMEPLAY_NOTES[key]) {
         const note = document.createElement('small');
         note.id = `${id}-${key}-note`;
         note.textContent = GAMEPLAY_NOTES[key]!;
-        select.setAttribute('aria-describedby', note.id);
+        control.setAttribute('aria-describedby', note.id);
         field.append(note);
       }
-      this.controls.set(key, select);
+      this.controls.set(key, control);
       this.advancedPanel.append(field);
     }
     this.root.append(heading, group, this.desc, this.advancedToggle, this.advancedPanel);
@@ -188,24 +157,19 @@ export class ModeSelector {
 
   /** Show `mode` as selected (does not write the setting). */
   set(mode: GameplayMode): void {
+    const settings = this.source.get();
     for (const [id, input] of this.inputs) input.checked = id === mode;
     this.root.dataset.mode = mode;
-    this.desc.textContent = modeDescription(mode);
+    this.desc.textContent = modeDescription(mode, settings.gameplayBaseMode);
     this.customTag.hidden = mode !== 'custom';
-    const gameplay = this.source.get().gameplay;
+    const gameplay = settings.gameplay;
     for (const [key, control] of this.controls) {
-      if (
-        key === 'currents' &&
-        gameplay.currents === 'gentle' &&
-        !control.querySelector('option[value="gentle"]')
-      ) {
-        const legacy = document.createElement('option');
-        legacy.value = 'gentle';
-        legacy.textContent = 'Gentle';
-        legacy.hidden = true;
-        control.append(legacy);
-      }
-      control.value = String(gameplay[key]);
+      control.checked =
+        key === 'currents'
+          ? gameplay.currents !== 'off'
+          : key === 'startPosition'
+            ? gameplay.startPosition === 'surface'
+            : Boolean(gameplay[key]);
     }
   }
 
