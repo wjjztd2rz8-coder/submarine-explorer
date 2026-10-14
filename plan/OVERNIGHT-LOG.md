@@ -1036,3 +1036,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Running:** Codex 1770 S-tests verify, 1780 R-release-ci, 1790 bug hunt 4. Queued 1800 spec repair (d-modes, d-shell, d-sonar, eight hud-touch animal-guidance tests) and resume briefs 1840/1850/1860 for the watchdog-stopped 1740/1750/1760 (uncommitted work in their worktrees; 1760 diff is 191 files, to be reviewed for churn).
 - **Not done:** no second Claude package (Claude 5h at ~46% after S-picker). No tag; f53 waits for green hosted CI.
 - **Needs owner:** real-phone play of the newest build (now includes the phone site sheet).
+
+## 2026-10-14 16:31 CDT headless run (Claude)
+
+- **Merged and pushed (smoke + project-base green, no full e2e):** Sonnet V-titanic (dark silt seabed, per-plate hull variation, thicker rusticles; wide view clearly better, close view still flat peach, ~3.8; remainder noted in DIRECTOR) and Sonnet V-rewards-look (picker swatches and one-line progress, gold paint fixed, frames no longer cropped in Journal, phone photo-mode toast/top panel fixed).
+- **Codex:** 5h at 0% until 17:15, nothing running. Worktrees 1740-1860 hold uncollected uncommitted work (1760 diff 191 files). Queued 1900 S-verify-4, 1910 hosted-CI triage, 1920 bug hunt (also covers the 1800 spec repair). Hosted CI runs keep getting cancelled by newer pushes; 1910 looks at that.
+- **Not done:** no tag (f53 waits for green hosted CI). V-eight-sites capture, V-endurance opening (guard decision) and V-journeys remain.
+- **Needs owner:** real-phone play of the newest build; optional: allow relaxing the Endurance opening facing/gap guard.
