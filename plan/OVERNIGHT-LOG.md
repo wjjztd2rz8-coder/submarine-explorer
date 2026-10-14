@@ -1050,3 +1050,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h at 0% until 17:15, nothing running; 1900/1910/1920 queued.
 - **Not done:** no tag (f53 waits for green hosted CI); V-eight-sites capture; V-endurance guard decision.
 - **Needs owner:** real-phone play of the newest build; optional: relax the Endurance opening guard.
+
+## 2026-10-14 18:07 CDT headless run (Claude)
+
+- **Merged and pushed:** Haiku S-hud-desktop-text + S-briefing-advanced (guidance card is the one instruction; RNG and desktop label name dropped; 16 px Advanced check boxes; phone Home fits Journal/Settings in both orientations, Controls still scrolls in landscape). Smoke + project-base green on main; no full e2e.
+- **Codex:** weekly at 5% (resets Oct 20), so nothing launched; queue 1900/1910/1920 waits, watchdog will stop anything below floor. Worktrees 1740-1860 still hold uncollected work.
+- **Not done:** no second Claude package (Claude 5h at ~46%). Next Claude items: S-scan-reach, V-bluehole-opening, S-journal-picture. No tag (f53 waits for green hosted CI).
+- **Needs owner:** real-phone play of the newest build; Codex weekly reset/credit when convenient.

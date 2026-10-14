@@ -99,8 +99,8 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 20. **S-scan-reach [Sonnet design]** (V-journeys): both Blue Hole primaries scan from 150 to 190 m while surfaced at 8 to 25 m depth, so the dive into the hole never happens; Titanic also scans at 160 to 190 m, so the close view is never seen. Set per-site reach (about 60 m for wrecks and galleries, plus a minimum depth for the Blue Hole galleries) and check the guidance copy and star rules still hold.
 21. **V-bluehole-opening [Sonnet]** (V-journeys): the sub fills the lower half of the frame at the surface start and the stalactite galleries read as floating brown slabs from range. Pull the camera back or lower the sub and give the galleries a visible cave context.
 22. **S-journal-picture [Sonnet design]** (V-journeys): the Journal entry for a fresh scan is text only. Show the photo or a still of the thing just scanned at the top (the reward moment).
-23. **S-hud-desktop-text [Haiku]** (V-journeys): at the start the desktop HUD repeats one instruction four times (guidance card, objective list line "Head to the bow, 220 m ahead", BRG/RNG row, waypoint label). Keep one.
-24. **S-briefing-advanced [Haiku]** (V-journeys): Advanced shows oversized empty square check boxes; phone Home has Journal and Settings under the fold (portrait clipped mid-button, landscape fully below). Style the check boxes and keep both buttons in view.
+23. **S-hud-desktop-text [Haiku]** DONE 2026-10-14 (d7bdc95) (V-journeys): at the start the desktop HUD repeats one instruction four times (guidance card, objective list line "Head to the bow, 220 m ahead", BRG/RNG row, waypoint label). Keep one.
+24. **S-briefing-advanced [Haiku]** DONE 2026-10-14 (d7bdc95) (V-journeys): Advanced shows oversized empty square check boxes; phone Home has Journal and Settings under the fold (portrait clipped mid-button, landscape fully below). Style the check boxes and keep both buttons in view.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.
 
