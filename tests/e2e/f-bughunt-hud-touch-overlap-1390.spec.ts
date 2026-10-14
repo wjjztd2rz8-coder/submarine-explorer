@@ -13,6 +13,7 @@ interface Game {
   sub: Submarine;
   rig: CameraRig;
   props: { loaded: boolean };
+  terrain: { sampleHeight(x: number, z: number): number };
 }
 
 const shots = '.cache/codex/shots/1390-f-bughunt-hud-touch-overlap';
@@ -81,6 +82,9 @@ async function ready(page: Page): Promise<void> {
     const g = window.__game as unknown as Game;
     return window.__gameReady === true && g.discovery.loaded && g.props.loaded;
   });
+  // Let the first frames publish the real altitude: an unstepped sub reads as on
+  // the seabed, and the urgent SEABED PROXIMITY warning would own the slot.
+  await page.clock.runFor(500);
   await page.evaluate(() => {
     (window.__game as unknown as Game).sub.step = () => {};
   });
@@ -109,7 +113,12 @@ async function away(page: Page): Promise<void> {
     await page.evaluate(
       ([base, dx, dz]) => {
         const g = window.__game as unknown as Game;
-        g.sub.position.set(base.x + dx, base.y, base.z + dz);
+        // Hold well clear of the unknown terrain out there: the seabed warning is urgent and
+        // would own the slot, which is not what this test is about.
+        const x = base.x + dx;
+        const z = base.z + dz;
+        const ground = g.terrain.sampleHeight(x, z);
+        g.sub.position.set(x, Math.min(-3, Math.max(base.y, ground + 60)), z);
         g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
         // Advance the completion banner without spending wall time or reward lifetime.
         g.discovery.update(0, 10, g.sub.position, g.sub.getForward(), { scan: false });
@@ -248,8 +257,11 @@ for (const viewport of [
           g.sub.position.set(poi.from.x, poi.from.y, poi.from.z);
           g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
         }, poi);
-        await page.clock.runFor(34);
-        await expect(chip).toContainText('Logged');
+        await page.clock.runFor(500);
+        // An unscanned contact in range outranks the logged one (Scanner), so the
+        // slot may name either; the logged-contact text itself is pinned in d-scan.
+        await expect(page.locator(GUIDANCE.any)).toBeVisible();
+        await expect(card).toBeHidden();
         await layout(page, 'return to scanned contact');
 
         await page.reload();

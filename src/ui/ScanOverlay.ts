@@ -35,6 +35,8 @@ export class ScanOverlay {
   readonly slot: GuidanceSlot;
   private readonly reticle: HTMLDivElement;
   private suppressed = false;
+  /** Seconds the completion result still holds the slot over the approach card. */
+  private completeLeft = 0;
 
   constructor(
     private readonly config: Pick<
@@ -73,6 +75,7 @@ export class ScanOverlay {
   /** Show the completion confirmation for `completeBannerSeconds`. */
   showComplete(title: string, firstTime: boolean, keys: ScanOverlayKeys): void {
     if (this.suppressed) return;
+    this.completeLeft = this.config.completeBannerSeconds;
     this.slot.flash(
       'complete',
       'discovery',
@@ -99,7 +102,16 @@ export class ScanOverlay {
     this.slot.tick(dt);
     if (this.suppressed) return;
     this.updateReticle(view, screen);
-    const { scan, objective } = this.messages(view, keys);
+    const messages = this.messages(view, keys);
+    const objective = messages.objective;
+    let scan = messages.scan;
+    // The result outranks the approach card for its few seconds (the contact
+    // just scanned is usually still the nearest one); a new scan outranks it.
+    if (view.phase === 'scanning') this.completeLeft = 0;
+    else if (this.completeLeft > 0) {
+      this.completeLeft -= dt;
+      scan = null;
+    }
     this.slot.offer('scan', 'scan', scan);
     this.slot.offer('objective', 'objective', objective);
   }

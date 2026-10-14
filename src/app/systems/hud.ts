@@ -44,7 +44,9 @@ export const hudSystem: GameSystem = {
     'hud.draw': (f, ctx) => {
       const { hud, discovery, sub, guidance, missionRouter } = ctx;
       hud.update(f.sub, {
-        nearScanTarget: discovery.focusPoint() !== null,
+        // Any contact in range (animals too): its result card must not lose the
+        // slot to the static altitude warning the moment the pose is read as shallow.
+        nearScanTarget: discovery.scanner.view.nearestInRange,
         simSpeed: sub.simSpeed,
       });
       // Warnings are shown by the guidance slot, so they never need their own
