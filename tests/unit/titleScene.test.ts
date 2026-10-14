@@ -1,4 +1,8 @@
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { createHash } from 'node:crypto';
 import * as THREE from 'three';
+import { Headlights } from '../../src/render/Headlights.js';
+import { MarineSnow } from '../../src/render/MarineSnow.js';
 import { describe, expect, it, vi } from 'vitest';
 import {
   TITLE_SHOT,
@@ -563,5 +567,258 @@ describe('TitleScene look pass (lamp beams, contact shadow)', () => {
     s.setCrop(null);
     expect(s.scene.getObjectByName('titleContactShadow')).toBeUndefined();
     s.dispose();
+  });
+});
+
+/** Digests record the authored float buffers and shader programs before helper reuse. */
+const digest = (value: string | number[]): string =>
+  createHash('sha256')
+    .update(typeof value === 'string' ? value : JSON.stringify(value))
+    .digest('hex');
+
+const PARTICLE_BASELINES = [
+  [
+    'low',
+    [
+      '20720c8c668764a68afff879e3f0b39327a78c01c1ca91c847ad4a34d643905d',
+      'b20c1e34cc8c00ab868caeb866fbe6eb3472d086b5c7b38db8e804edc542b300',
+      '657fcb13aabf67a9105eb4650b332c3b715bcfd62416b5adf97d79e1a33d62f5',
+      'd72f8c3e5c251ea8539369a34e47523594b4636584da1ad68f13ba1745682c4c',
+      '052a3c12c4d3880c92e4f1ee7301b09b68f05c6feaa2a137e88ada8ea364eaff',
+      '15c16f957b6af4f89189a7a11bb2cf9e1b237436a1ad1fc7935757cfc7df23ef',
+      'bf8980a7a0020b6a0b9d21f4784bd452fd244859a545cda96f87bbfc2c7f55d6',
+    ],
+  ],
+  [
+    'high',
+    [
+      'bf8980a7a0020b6a0b9d21f4784bd452fd244859a545cda96f87bbfc2c7f55d6',
+      '15c16f957b6af4f89189a7a11bb2cf9e1b237436a1ad1fc7935757cfc7df23ef',
+      '08b4e2634e2edd3899a8ace1dd168947eebf3d54c3f77a94efdcb2667a20dd34',
+      '052a3c12c4d3880c92e4f1ee7301b09b68f05c6feaa2a137e88ada8ea364eaff',
+      'd72f8c3e5c251ea8539369a34e47523594b4636584da1ad68f13ba1745682c4c',
+      'b20c1e34cc8c00ab868caeb866fbe6eb3472d086b5c7b38db8e804edc542b300',
+      '20720c8c668764a68afff879e3f0b39327a78c01c1ca91c847ad4a34d643905d',
+    ],
+  ],
+] as const;
+
+describe('TitleScene shared lighting and snow', () => {
+  it.each(['low', 'medium', 'high', 'ultra'] as const)(
+    'uses the shared instances through %s recreation and motion changes',
+    (tier) => {
+      const aim = vi.spyOn(Headlights.prototype, 'aimAt');
+      const place = vi.spyOn(MarineSnow.prototype, 'place');
+      const releaseSnow = vi.spyOn(MarineSnow.prototype, 'dispose');
+      const releaseLights = vi.spyOn(Headlights.prototype, 'dispose');
+      const s = new TitleScene({ tier, reducedMotion: false });
+      try {
+        const lamps = aim.mock.contexts[0] as Headlights;
+        const snow = place.mock.contexts[0] as MarineSnow;
+        expect(lamps).toBeInstanceOf(Headlights);
+        expect(snow).toBeInstanceOf(MarineSnow);
+        expect(s.scene.getObjectByName('titleSnow')).toBe(snow.points);
+        expect(snow.points!.geometry.getAttribute('position').count).toBe(
+          TITLE_SHOT.snowCount[tier],
+        );
+        for (const lamp of lamps.lights) expect(lamp.parent).toBe(lamps.group);
+        expect(lamps.beams[0].geometry).toBe(lamps.beams[1].geometry);
+        expect(lamps.beams[0].material).toBe(lamps.beams[1].material);
+        s.setCrop(makeCrop());
+        const before = place.mock.calls.length;
+        s.update(0.1);
+        expect(place.mock.calls.length).toBe(before + 1);
+        expect(aim.mock.contexts.every((instance) => instance === lamps)).toBe(true);
+        const next = tier === 'low' ? 'ultra' : 'low';
+        const geometry = snow.points!.geometry;
+        const releasedGeometry = vi.spyOn(geometry, 'dispose');
+        s.setQuality(next);
+        const replacement = place.mock.contexts.at(-1) as MarineSnow;
+        expect(replacement).not.toBe(snow);
+        expect(snow.points!.parent).toBeNull();
+        expect(releasedGeometry).toHaveBeenCalledTimes(1);
+        expect(releaseSnow.mock.contexts).toEqual([snow]);
+        expect(s.scene.getObjectByName('titleSnow')).toBe(replacement.points);
+        expect(replacement.points!.geometry.getAttribute('position').count).toBe(
+          TITLE_SHOT.snowCount[next],
+        );
+        s.setQuality(next);
+        expect(place.mock.contexts.at(-1)).toBe(replacement);
+        expect(releaseSnow.mock.contexts).toEqual([snow]);
+        const positions = replacement.points!.geometry.getAttribute('position');
+        const moving = Array.from(positions.array);
+        s.setReducedMotion(true);
+        expect(replacement.points!.visible).toBe(false);
+        expect(place.mock.calls.at(-1)![1]).toBe(0);
+        const reset = Array.from(positions.array);
+        expect(reset).not.toEqual(moving);
+        const frozen = place.mock.calls.length;
+        s.update(0.1);
+        expect(place.mock.calls.length).toBe(frozen);
+        expect(Array.from(positions.array)).toEqual(reset);
+        s.setQuality('medium');
+        const staticSnow = place.mock.contexts.at(-1) as MarineSnow;
+        expect(staticSnow.points!.visible).toBe(false);
+        s.setReducedMotion(false);
+        expect(staticSnow.points!.visible).toBe(true);
+        s.update(0.1);
+        expect(place.mock.calls.at(-1)![1]).toBe(0.1);
+        s.dispose();
+        s.dispose();
+        expect(releaseLights.mock.contexts).toEqual([lamps]);
+        expect(releaseSnow.mock.contexts).toEqual([snow, replacement, staticSnow]);
+      } finally {
+        s.dispose();
+        aim.mockRestore();
+        place.mockRestore();
+        releaseSnow.mockRestore();
+        releaseLights.mockRestore();
+      }
+    },
+  );
+
+  it.each(PARTICLE_BASELINES)(
+    'retains the authored %s particle buffers through crop, time, tier and motion changes',
+    (tier, expected) => {
+      const s = new TitleScene({ tier, reducedMotion: false });
+      const observe = () =>
+        digest(
+          Array.from(
+            (s.scene.getObjectByName('titleSnow') as THREE.Points).geometry.getAttribute('position')
+              .array,
+          ),
+        );
+      try {
+        const actual = [observe()];
+        const crop = makeCrop();
+        crop.anchorFloorY = 400;
+        crop.sampleFloor = (x, z) => 400 + Math.max(0, x - 5) * 0.4 + Math.max(0, -z - 20) * 0.2;
+        s.setCrop(crop);
+        actual.push(observe());
+        for (const dt of [NaN, -1, 0, Infinity, 1, 0.03, 0.07]) s.update(dt);
+        actual.push(observe());
+        for (let i = 0; i < 399; i++) s.update(0.1);
+        actual.push(observe());
+        s.setQuality(tier === 'low' ? 'ultra' : 'low');
+        actual.push(observe());
+        s.setReducedMotion(true);
+        actual.push(observe());
+        s.setCrop(null);
+        actual.push(observe());
+        expect(actual).toEqual(expected);
+      } finally {
+        s.dispose();
+      }
+    },
+  );
+
+  it('retains authored lamp and beam state, including the surface shader and winding', () => {
+    const s = new TitleScene({ tier: 'low', reducedMotion: false });
+    try {
+      for (const side of [-1, 1]) {
+        const lamp = s.scene.getObjectByName(`titleLamp${side}`) as THREE.SpotLight;
+        const beam = s.scene.getObjectByName(`titleBeam${side}`) as THREE.Mesh;
+        const material = beam.material as THREE.ShaderMaterial;
+        expect(lamp.position.toArray()).toEqual([side * 2.6, -1.6, -12]);
+        expect(lamp.color.getHex()).toBe(0xffd79a);
+        expect([lamp.intensity, lamp.distance, lamp.angle, lamp.penumbra, lamp.decay]).toEqual([
+          250, 150, 0.62, 0.85, 1.3,
+        ]);
+        const target = lamp.target.getWorldPosition(new THREE.Vector3());
+        const expected =
+          side === -1
+            ? [18.96446522204758, 0.2, -10.361421661227185]
+            : [21.604419482093295, 0.2, -0.508978233078687];
+        target.toArray().forEach((v, i) => expect(v).toBeCloseTo(expected[i], 11));
+        beam.scale
+          .toArray()
+          .forEach((v, i) =>
+            expect(v).toBeCloseTo(
+              [5.629684174718203, 5.629684174718203, 12.606426932323053][i],
+              11,
+            ),
+          );
+        expect(material.uniforms.uStrength.value).toBe(0.5);
+        expect(material.uniforms.uColor.value.getHex()).toBe(0xffd29a);
+        expect([material.side, material.blending, material.depthWrite, beam.renderOrder]).toEqual([
+          THREE.DoubleSide,
+          THREE.AdditiveBlending,
+          false,
+          0,
+        ]);
+        expect(digest(material.vertexShader)).toBe(
+          '8e69bf02d6fb3f46a0703ec63b136a91a6bc41fa254708b96f1d10fc6b3b394a',
+        );
+        expect(digest(material.fragmentShader)).toBe(
+          'f31c0a75f4824b033cbcc6f867c48da139113a94ce2f61f8c30de6e9373b77da',
+        );
+        expect(digest(Array.from(beam.geometry.getAttribute('position').array))).toBe(
+          '535e1968846b5c045968517a7782a257bb7fede5fe543823239d02a945d55e8d',
+        );
+        expect(digest(Array.from(beam.geometry.getAttribute('normal').array))).toBe(
+          '1d8b077a3d93c44504f1e89d5be3bc66b86722fdc2a817898ad2dd19c770c5d8',
+        );
+        expect(digest(Array.from(beam.geometry.index!.array))).toBe(
+          '64ff6fe73235bb3d3ce6e8dd1ab85f3ebd5374276c74e367e2c02f4206e0f1cc',
+        );
+      }
+      const snow = s.scene.getObjectByName('titleSnow') as THREE.Points;
+      const mat = snow.material as THREE.PointsMaterial;
+      expect([
+        mat.color.getHex(),
+        mat.size,
+        mat.opacity,
+        mat.sizeAttenuation,
+        mat.fog,
+        mat.depthWrite,
+        snow.renderOrder,
+      ]).toEqual([0xdff1f2, 0.55, 0.7, true, true, false, 0]);
+      expect(digest(Array.from((mat.map!.image as { data: Uint8Array }).data))).toBe(
+        '32629fde3c9da1c16ec66f501570ad141bde40b70e606dda17d626640322cb94',
+      );
+    } finally {
+      s.dispose();
+    }
+  });
+
+  it('releases shared resources once and retains the borrowed sprite across tier changes', () => {
+    const s = new TitleScene({ tier: 'high', reducedMotion: false });
+    const first = s.scene.getObjectByName('titleSnow') as THREE.Points;
+    const sprite = (first.material as THREE.PointsMaterial).map!;
+    const spriteDispose = vi.spyOn(sprite, 'dispose');
+    const beam = s.scene.getObjectByName('titleBeam-1') as THREE.Mesh;
+    const geometryDispose = vi.spyOn(beam.geometry, 'dispose');
+    const materialDispose = vi.spyOn(beam.material as THREE.Material, 'dispose');
+    const lampDispose = [-1, 1].map((side) =>
+      vi.spyOn(s.scene.getObjectByName(`titleLamp${side}`) as THREE.SpotLight, 'dispose'),
+    );
+    const crop = makeCrop();
+    s.setCrop(crop);
+    const shadow = s.scene.getObjectByName('titleContactShadow') as THREE.Mesh;
+    const contactDispose = vi.spyOn((shadow.material as THREE.MeshBasicMaterial).map!, 'dispose');
+    try {
+      s.setQuality('low');
+      const snow = s.scene.getObjectByName('titleSnow') as THREE.Points;
+      expect((snow.material as THREE.PointsMaterial).map).toBe(sprite);
+      expect(spriteDispose).not.toHaveBeenCalled();
+      expect(geometryDispose).not.toHaveBeenCalled();
+      const snowGeometryDispose = vi.spyOn(snow.geometry, 'dispose');
+      const snowMaterialDispose = vi.spyOn(snow.material as THREE.Material, 'dispose');
+      s.setCrop(null);
+      expect(contactDispose).toHaveBeenCalledTimes(1);
+      s.dispose();
+      s.dispose();
+      expect(spriteDispose).toHaveBeenCalledTimes(1);
+      expect(contactDispose).toHaveBeenCalledTimes(1);
+      expect(geometryDispose).toHaveBeenCalledTimes(1);
+      expect(materialDispose).toHaveBeenCalledTimes(1);
+      expect(snowGeometryDispose).toHaveBeenCalledTimes(1);
+      expect(snowMaterialDispose).toHaveBeenCalledTimes(1);
+      for (const release of lampDispose) expect(release).toHaveBeenCalledTimes(1);
+      expect(crop.disposed).toBe(1);
+      expect(s.scene.children).toHaveLength(0);
+    } finally {
+      s.dispose();
+    }
   });
 });

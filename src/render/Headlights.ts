@@ -12,23 +12,48 @@
 import * as THREE from 'three';
 import type { AtmosphereTier, LightPreset, WaterConfig } from '../core/Config.js';
 
+type HeadlightConfig = Pick<
+  WaterConfig,
+  | 'headlightColor'
+  | 'headlightIntensity'
+  | 'headlightDistance'
+  | 'headlightAngleDeg'
+  | 'headlightSeparationM'
+  | 'headlightConeOpacity'
+>;
+
+/** Optional surface-falloff beams for lamps aimed at a nearby surface. */
+interface HeadlightAppearance {
+  penumbra?: number;
+  decay?: number;
+  surfaceBeam?: {
+    color: number;
+    strength: number;
+    segments: number;
+    angle: number;
+    lengthScale: number;
+  };
+}
+
 export class Headlights {
   readonly group = new THREE.Group();
   readonly lights: THREE.SpotLight[] = [];
   readonly fill = new THREE.PointLight(0xfff3dd, 0, 0, 2);
 
-  private readonly cones: THREE.Mesh[] = [];
+  readonly beams: THREE.Mesh[] = [];
   private readonly coneMaterial: THREE.ShaderMaterial | null;
   private readonly aim = new THREE.Vector3();
   private readonly right = new THREE.Vector3();
   private readonly up = new THREE.Vector3(0, 1, 0);
   private enabled = true;
+  private disposed = false;
   private preset: LightPreset | null = null;
 
   constructor(
-    private readonly config: WaterConfig,
-    private readonly tier: AtmosphereTier,
+    private readonly config: HeadlightConfig,
+    private readonly tier: Pick<AtmosphereTier, 'headlightCones' | 'beamDetail'>,
     private readonly tuning = { intensity: 1, distance: 1, fillIntensity: 1, fillDistance: 1 },
+    private readonly appearance: HeadlightAppearance = {},
   ) {
     const angle = (config.headlightAngleDeg * Math.PI) / 180;
     for (let i = 0; i < 2; i++) {
@@ -37,8 +62,8 @@ export class Headlights {
         config.headlightIntensity,
         config.headlightDistance,
         angle,
-        0.7,
-        1.35,
+        appearance.penumbra ?? 0.7,
+        appearance.decay ?? 1.35,
       );
       light.name = `headlight${i}`;
       this.lights.push(light);
@@ -46,6 +71,7 @@ export class Headlights {
     }
     this.fill.name = 'headlightFill';
     this.group.add(this.fill);
+    if (appearance.surfaceBeam) this.fill.visible = false;
 
     if (tier.headlightCones) {
       // A cone whose apex sits at the lamp. The shader fades it out at the
@@ -53,30 +79,40 @@ export class Headlights {
       // and at the rim (so the cone has no visible hard edge).
       const length = Math.min(config.headlightDistance, 420);
       const radius = Math.tan(angle) * length;
-      const geo = coneGeometry(radius, length, tier.beamDetail);
+      const surface = appearance.surfaceBeam;
+      const geo = surface
+        ? surfaceGeometry(surface.segments)
+        : coneGeometry(radius, length, tier.beamDetail);
       this.coneMaterial = new THREE.ShaderMaterial({
-        uniforms: {
-          uColor: { value: new THREE.Color(config.headlightColor) },
-          uOpacity: { value: config.headlightConeOpacity },
-          uLength: { value: length },
-          uSlope: { value: Math.tan(angle) },
-          uTime: { value: 0 },
-          uMurk: { value: 1 },
-          fogDensity: { value: 0 },
-        },
-        defines: { BEAM_STEPS: tier.beamDetail >= 2 ? 12 : tier.beamDetail === 1 ? 8 : 6 },
-        vertexShader: CONE_VERT,
-        fragmentShader: CONE_FRAG,
+        uniforms: surface
+          ? {
+              uColor: { value: new THREE.Color(surface.color) },
+              uStrength: { value: surface.strength },
+            }
+          : {
+              uColor: { value: new THREE.Color(config.headlightColor) },
+              uOpacity: { value: config.headlightConeOpacity },
+              uLength: { value: length },
+              uSlope: { value: Math.tan(angle) },
+              uTime: { value: 0 },
+              uMurk: { value: 1 },
+              fogDensity: { value: 0 },
+            },
+        defines: surface
+          ? {}
+          : { BEAM_STEPS: tier.beamDetail >= 2 ? 12 : tier.beamDetail === 1 ? 8 : 6 },
+        vertexShader: surface ? SURFACE_VERT : CONE_VERT,
+        fragmentShader: surface ? SURFACE_FRAG : CONE_FRAG,
         transparent: true,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
-        side: THREE.BackSide,
+        side: surface ? THREE.DoubleSide : THREE.BackSide,
       });
       for (let i = 0; i < 2; i++) {
         const mesh = new THREE.Mesh(geo, this.coneMaterial);
         mesh.frustumCulled = false;
-        mesh.renderOrder = 2;
-        this.cones.push(mesh);
+        mesh.renderOrder = surface ? 0 : 2;
+        this.beams.push(mesh);
         this.group.add(mesh);
       }
     } else {
@@ -94,13 +130,15 @@ export class Headlights {
   }
 
   setEnabled(on: boolean): void {
+    if (this.disposed) return;
     this.enabled = on;
     for (const l of this.lights) l.visible = on;
-    for (const c of this.cones) c.visible = on;
+    for (const c of this.beams) c.visible = on;
     this.fill.visible = on && this.fill.intensity > 0;
   }
 
   setPreset(preset: LightPreset): void {
+    if (this.disposed) return;
     this.preset = preset;
     const angle = (preset.angleDeg * Math.PI) / 180;
     for (const light of this.lights) {
@@ -111,11 +149,11 @@ export class Headlights {
     this.fill.intensity = preset.fillIntensity;
     this.fill.distance = preset.fillDistance;
     const length = Math.min(preset.distance, 420);
-    if (this.cones.length) {
+    if (this.beams.length && !this.appearance.surfaceBeam) {
       const radius = Math.tan(angle) * length;
       const geo = coneGeometry(radius, length, this.tier.beamDetail);
-      const old = this.cones[0]!.geometry;
-      for (const cone of this.cones) cone.geometry = geo;
+      const old = this.beams[0]!.geometry;
+      for (const cone of this.beams) cone.geometry = geo;
       old.dispose();
       this.coneMaterial!.uniforms.uOpacity!.value = preset.coneOpacity;
       this.coneMaterial!.uniforms.uLength!.value = length;
@@ -132,8 +170,8 @@ export class Headlights {
       light.intensity = preset.intensity * this.tuning.intensity;
       light.distance = preset.distance * this.tuning.distance;
       light.angle = (preset.angleDeg * Math.PI) / 180;
-      light.penumbra = 0.7;
-      light.decay = 1.35;
+      light.penumbra = this.appearance.penumbra ?? 0.7;
+      light.decay = this.appearance.decay ?? 1.35;
     }
     this.fill.intensity = preset.fillIntensity * this.tuning.fillIntensity;
     this.fill.distance = preset.fillDistance * this.tuning.fillDistance;
@@ -154,7 +192,7 @@ export class Headlights {
     elapsed = 0,
     murk = 1,
   ): void {
-    if (!this.enabled) return;
+    if (this.disposed || !this.enabled) return;
     if (this.preset) this.fill.position.copy(origin).addScaledVector(forward, 10);
     this.right.crossVectors(forward, this.up).normalize();
     const half = this.config.headlightSeparationM / 2;
@@ -167,23 +205,51 @@ export class Headlights {
       light.target.position.copy(this.aim);
       light.target.updateMatrixWorld();
 
-      const cone = this.cones[i];
+      const cone = this.beams[i];
       if (cone) {
         cone.position.copy(light.position);
         cone.lookAt(this.aim);
       }
     }
 
-    if (this.coneMaterial && fog) {
+    if (this.coneMaterial && fog && !this.appearance.surfaceBeam) {
       this.coneMaterial.uniforms.fogDensity!.value = fog.density;
       this.coneMaterial.uniforms.uTime!.value = elapsed;
       this.coneMaterial.uniforms.uMurk!.value = murk;
     }
   }
 
+  /** Aim one lamp at a world-space surface; the group may ride a moving rig. */
+  aimAt(index: number, target: THREE.Vector3): void {
+    if (this.disposed) return;
+    const light = this.lights[index]!;
+    this.group.updateWorldMatrix(true, false);
+    const origin = light.getWorldPosition(new THREE.Vector3());
+    light.target.position.copy(this.group.worldToLocal(target.clone()));
+    light.target.updateMatrixWorld(true);
+    const beam = this.beams[index];
+    const surface = this.appearance.surfaceBeam;
+    if (!beam || !surface) return;
+    const direction = target.clone().sub(origin);
+    const length = direction.length() * surface.lengthScale;
+    direction
+      .normalize()
+      .transformDirection(new THREE.Matrix4().copy(this.group.matrixWorld).invert());
+    beam.position.copy(light.position);
+    beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), direction);
+    const radius = length * Math.tan(surface.angle);
+    beam.scale.set(radius, radius, length);
+  }
+
   dispose(): void {
-    this.cones[0]?.geometry.dispose();
+    if (this.disposed) return;
+    this.disposed = true;
+    this.beams[0]?.geometry.dispose();
     this.coneMaterial?.dispose();
+    for (const light of this.lights) light.dispose();
+    this.fill.dispose();
+    this.group.removeFromParent();
+    this.group.clear();
   }
 }
 
@@ -283,3 +349,45 @@ void main() {
   #include <colorspace_fragment>
 }
 `;
+
+/** Unit open cone, allowing each lamp's reach to follow its surface target. */
+function surfaceGeometry(segments: number): THREE.BufferGeometry {
+  const geo = new THREE.ConeGeometry(1, 1, segments, 1, true);
+  geo.rotateX(Math.PI / 2);
+  geo.translate(0, 0, 0.5);
+  const p = geo.getAttribute('position');
+  for (let i = 0; i < p.count; i++) p.setZ(i, 1 - p.getZ(i));
+  const index = geo.index!;
+  for (let i = 0; i < index.count; i += 3) {
+    const b = index.getX(i + 1);
+    index.setX(i + 1, index.getX(i + 2));
+    index.setX(i + 2, b);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+
+const SURFACE_VERT = `
+varying float vAxis;
+varying vec3 vN;
+varying vec3 vV;
+void main() {
+  vAxis = position.z;
+  vN = normalize(normalMatrix * normal);
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  vV = normalize(-mv.xyz);
+  gl_Position = projectionMatrix * mv;
+}`;
+const SURFACE_FRAG = `
+uniform vec3 uColor;
+uniform float uStrength;
+varying float vAxis;
+varying vec3 vN;
+varying vec3 vV;
+void main() {
+  float f = abs(dot(normalize(vN), normalize(vV)));
+  float a = pow(f, 1.6) * pow(1.0 - vAxis, 1.3) * smoothstep(0.02, 0.4, vAxis) * uStrength;
+  gl_FragColor = vec4(uColor, a);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}`;
