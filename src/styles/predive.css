@@ -503,10 +503,39 @@ html.is-touch .briefing .briefing-hint {
   }
 }
 
-/* F-CHALLENGER-CAM: short landscape phones. The sticky Dive settings/Begin footer
-   covered the objectives list; let the card scroll as one so the list reads in full. */
+/* Short landscape screens: facts on the left, Dive settings and Begin dive in a column that
+   stays in view, so the button never scrolls away and never covers the list. */
 @media (max-height: 500px) and (orientation: landscape) {
-  .briefing .briefing-actions {
-    position: static;
+  .briefing .briefing-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 250px;
+    column-gap: 18px;
+    align-content: start;
+  }
+  .briefing .briefing-panel > * {
+    grid-column: 1;
+  }
+  .briefing .briefing-panel > .briefing-actions {
+    grid-column: 2;
+    grid-row: 1 / span 6;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    border-top: 0;
+  }
+  .briefing .briefing-go {
+    grid-template-columns: 1fr 1fr;
+  }
+  .briefing .briefing-go .briefing-begin {
+    grid-column: 1 / -1;
+  }
+  .briefing .briefing-go .briefing-cancel,
+  .briefing .briefing-go .briefing-free-dive {
+    grid-row: 2;
+    grid-column: auto;
+    justify-self: start;
+  }
+  .briefing .briefing-go .briefing-hint {
+    display: none;
   }
 }

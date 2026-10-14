@@ -67,6 +67,10 @@
   /* Sit below the target so the centre scan bracket never crosses the text. */
   transform: translate(-50%, calc(var(--scan-reticle-size, 44px) / 2 + 14px));
 }
+/* A target low in the view is where the sub is drawn: sit above it instead. */
+.d-scan-edge.is-onscreen.is-above {
+  transform: translate(-50%, calc(-100% - var(--scan-reticle-size, 44px) / 2 - 14px));
+}
 .d-scan-edge.is-onscreen::before {
   content: '◇';
   transform: none;
