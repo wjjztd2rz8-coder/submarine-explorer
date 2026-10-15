@@ -1,5 +1,5 @@
-/* C1: globe mission select and the Journal SPECIES tab.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+/* Globe mission select and the Journal SPECIES tab.
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 /* Globe mission select overlay (docs/globe.md) and the field guide SPECIES tab.
    Art direction §0: flat dark panels, 1px hairlines, cyan for navigation;

@@ -1,5 +1,5 @@
 /**
- * Quality tiers v2 (F0-CORE): picks the graphics tier at boot and scales the
+ * Quality tiers v2: picks the graphics tier at boot and scales the
  * pixel ratio at run time.
  *
  * - `detectTier(caps)` is a pure function over a `DeviceCaps` snapshot, so the

@@ -1081,7 +1081,7 @@ export class Journal {
   }
   // --- D-PHOTO end ---
 
-  /** A scanned animal (F2-LIFE): its text, a few facts and one source. */
+  /** A scanned animal: its text, a few facts and one source. */
   private renderLife(entry: JournalEntry): void {
     const b = this.body;
     const { def, info, rare } = entry.life!;

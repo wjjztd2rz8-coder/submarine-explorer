@@ -53,7 +53,7 @@ afterAll(() => {
     writeFileSync('.cache/snow-audit-measurements.json', JSON.stringify(rows, null, 2) + '\n');
 });
 
-/** Exact pre-570 centre bounds, retaining 460's foreground guard. The old
+/** Reference centre bounds retain the foreground guard. The old
  * alpha has no distance fade; reconstruct it rather than inheriting the new one.
  */
 function before570Appearance(

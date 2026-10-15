@@ -1,6 +1,6 @@
 /**
  * Procedural audio mix and cues (docs/audio.md).
- * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
+ * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
 export interface AudioConfig {

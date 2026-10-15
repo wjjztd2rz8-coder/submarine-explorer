@@ -2,7 +2,7 @@ import { expect, test } from './helpers/unlocked.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
 /**
- * A2 acceptance: three depth bands must look clearly different. Each case
+ * Acceptance: three depth bands must look clearly different. Each case
  * spawns the boat at a fixed depth (`?depth=`) and writes a frame to
  * tests/e2e/screenshots/atmosphere-<depth>.png (gitignored), then asserts the
  * frames are not near-black and differ from each other in mean colour.

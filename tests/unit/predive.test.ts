@@ -1,4 +1,4 @@
-/** D2-PREDIVE pure parts: mode copy, option labels, UI scale steps, option order. */
+/** Pure parts: mode copy, option labels, UI scale steps, option order. */
 
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';

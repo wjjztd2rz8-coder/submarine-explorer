@@ -24,12 +24,10 @@ import { AmbientBeds, ThrusterLoop } from './Loops.js';
 import { AmbientScore } from './Score.js';
 import { MachineLoop, Soundscape, mechanicalCue } from './Soundscape.js';
 import { CaptionBus, type AudioFrameInput, type CaptionEvent } from './events.js';
-// --- C3 begin ---
 import { HADAL_TOP_M } from '../world/presets/maths.js';
-// --- C3 end ---
 
 export class AudioSystem {
-  /** Accessibility captions for every cue this system plays (A4 deliverable #5). */
+  /** Accessibility captions for every cue this system plays. */
   readonly captions = new CaptionBus();
 
   private engine: AudioEngine | null = null;
@@ -220,7 +218,7 @@ export class AudioSystem {
         this.captions.emit({ id: 'collision', text: 'Hull scrapes bottom', durationS: 1.5 });
       }),
     );
-    // A3's `sub:hullStress` already rate-limits itself to whenever stress
+    // `sub:hullStress` already rate-limits itself to whenever stress
     // crosses `hullStressEventThreshold`; we additionally throttle creaks so
     // a sustained high-stress state doesn't retrigger every single frame.
     // `cause: 'impact'` is skipped here -- that moment is already covered by
@@ -237,7 +235,6 @@ export class AudioSystem {
         });
       }),
     );
-    // --- C3 begin ---
     // Trench events supply the depth-dependent cadence. Share the existing
     // cooldown with pressure stress so both sources cannot creak at once.
     this.unsubs.push(
@@ -250,8 +247,7 @@ export class AudioSystem {
         });
       }),
     );
-    // --- C3 end ---
-    // B1's scan beam: a new catalogue entry gets the chime, a repeat scan of
+    // A new catalogue entry gets the chime; a repeat scan of
     // something already logged gets a quiet tick so it still confirms.
     this.unsubs.push(
       this.bus.on('scan:complete', ({ firstTime }) => {

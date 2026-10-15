@@ -1,5 +1,5 @@
 /* D-PHOTO: photo mode viewfinder and Journal photos.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 /* Photo mode: everything but the scene and the viewfinder hides. */
 body.photo-active > :not(#viewport, .photo-mode) {

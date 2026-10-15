@@ -28,7 +28,7 @@ function actualTile(id: string): Tile {
 }
 
 describe('F-BUGHUNT-4 audit reproductions', () => {
-  // Retain the original audit grid; 920 turns the repaired collision findings into regressions.
+  // Retain the original audit grid to guard the repaired collision findings.
   it('keeps low-tier Blue Hole collision on the mesh while measuring sonar relief', () => {
     const config = makeConfig();
     const terrain = new Terrain(actualTile('great-blue-hole'), config.terrain, 'low');
@@ -121,7 +121,7 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
       const sampler = terrain.sampleDataHeight(x, z);
       console.log('Blue Hole without procedural detail', { mesh, sampler, error: mesh - sampler });
       expect(Math.abs(terrain.sampleHeight(x, z) - mesh)).toBeLessThan(0.002);
-      // 1030 resolves the reconstructed bowl on Low, including with noise off:
+      // Resolve the reconstructed bowl on Low, including with noise off:
       // the old difference exceeded hull clearance; now it stays within 2 m.
       expect(Math.abs(mesh - sampler)).toBeLessThan(2);
     } finally {

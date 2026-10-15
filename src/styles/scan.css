@@ -1,5 +1,5 @@
-/* B1: scan beam HUD, scan overlay and colour tokens.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+/* Scan beam HUD, scan overlay and colour tokens.
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 /* Scan beam HUD, field guide, debrief. docs/art-direction.md §5: monospace,
    1px hairlines, flat dark translucent panels, cyan for nav/scan, amber for

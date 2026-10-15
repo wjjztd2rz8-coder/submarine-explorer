@@ -1,5 +1,5 @@
 /**
- * Audio (A4) and captions (C5). WebAudio can only start from inside a
+ * Audio and captions. WebAudio can only start from inside a
  * user-gesture handler, so the engine unlocks on the first keydown or
  * pointerdown rather than at load. `terrain` already satisfies the audio
  * module's minimal TerrainSampler interface (sampleHeight). Audio pauses

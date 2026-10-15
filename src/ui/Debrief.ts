@@ -115,9 +115,9 @@ export class Debrief {
   private escape: (() => void) | null = null;
   /** Read when shown, so both free dives and mission debriefs include curiosity. */
   exploration: (() => ExplorationSummary) | null = null;
-  /** The stats last shown (for tests / B3). */
+  /** The stats last shown, exposed for tests. */
   last: DebriefStats | null = null;
-  /** QA-B #12: Tab stays inside the debrief while it is open. */
+  /** Tab stays inside the debrief while it is open. */
   private readonly trap: FocusTrap;
 
   constructor(private readonly options: DebriefOptions = {}) {

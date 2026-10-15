@@ -3,7 +3,7 @@ import { expect, test, type Page } from './helpers/unlocked.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 
 /**
- * C5 settings screen (docs/settings.md), end to end:
+ * Settings screen (docs/settings.md), end to end:
  *  (a) The pause menu opens it and the game freezes (a held key moves nothing); settings
  *      apply live; a rebinding conflict unbinds the loser; Escape closes;
  *      after a reload settings and the displaced binding persist, and

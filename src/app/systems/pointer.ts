@@ -1,5 +1,5 @@
 /**
- * Pointer and keyboard locks (D-INPUT-HUD, D3-FEEL, D2-CAMERA): fullscreen
+ * Pointer and keyboard locks: fullscreen
  * keyboard lock (so Ctrl+W steers instead of closing the tab), pointer-look
  * capture with its "Click to resume mouse look" hint, pause when the lock is
  * lost, and the one-time Ctrl+W tip.
@@ -54,7 +54,7 @@ export function createPointerSystem(): GameSystem {
         else unlockKeyboard();
       });
 
-      // D3-FEEL: pointer look.
+      // Pointer look.
       const hint = document.createElement('div');
       pointerLookHint = hint;
       hint.className = 'd3-pointer-look-hint';
@@ -221,9 +221,9 @@ export function createPointerSystem(): GameSystem {
     },
     frame: {
       'gate.pointer': (f, ctx) => {
-        // D2-CAMERA: a modal or pause releases the mouse.
+        // A modal or pause releases the mouse.
         if (f.frozen && document.pointerLockElement === ctx.canvas) document.exitPointerLock?.();
-        // D3-FEEL: show the resume hint once nothing blocks pointer look.
+        // Show the resume hint once nothing blocks pointer look.
         if (pointerLookWasBlocked && !pointerLookBlocked()) updatePointerLookHint();
         pointerLookWasBlocked = pointerLookBlocked();
         if (pointerLookWasBlocked && pointerLookHint) pointerLookHint.hidden = true;

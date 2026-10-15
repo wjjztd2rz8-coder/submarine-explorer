@@ -3,7 +3,7 @@ import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
 /**
- * B3 mission flow, end to end, on B2's real Titanic content:
+ * Mission flow, end to end, on real Titanic content:
  *  (a) `/?mission=titanic` shows the briefing with the game frozen; Enter
  *      starts the mission near the first primary objective with the objectives panel up.
  *  (b) `?poi=titanic-bow&skipBriefing=1`: scan the bow, teleport to the stern
@@ -11,7 +11,7 @@ import { expect, test, type Page } from './helpers/unlocked.js';
  *      debrief -> `mission:complete` + `mission:ended` -> the mission debrief
  *      (D-FLOW: nothing ends the dive on its own).
  *  (c) the free-dive view keeps mission select off the HUD while deep links still work.
- * Also covers F2 (sonar canvas takes the tile aspect) and F3 (HUD help keys).
+ * Also covers the sonar canvas aspect and HUD help keys.
  *
  * State is read through `window.__game.{mission, missionRouter, discovery, scanner}`.
  */
@@ -179,7 +179,7 @@ test.describe('B3 mission flow', () => {
 
     await expect(page.locator('.hud-help')).toHaveCount(0);
     await expect(page.locator('.hud-sim-speed')).toHaveText('2× SIM SPEED');
-    // F2: on the portrait Titanic tile the sonar canvas is portrait too (no letterbox).
+    // On the portrait Titanic tile the sonar canvas is portrait too (no letterbox).
     const sonar = await page.evaluate(() => {
       const c = document.querySelector('.sonar canvas') as HTMLCanvasElement;
       const t = (window.__game as { terrain: { widthM: number; depthM: number } }).terrain;
@@ -221,7 +221,7 @@ test.describe('B3 mission flow', () => {
     await page.waitForTimeout(300);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-objectives.png' });
 
-    // Teleport next to the stern, the same way B1's ?poi= spawn does.
+    // Teleport next to the stern, using the same placement as the ?poi= spawn.
     await page.evaluate(() => {
       const g = window.__game as {
         sub: {
@@ -337,7 +337,7 @@ test.describe('fix S: mission failure, framing and modals', () => {
     await boot(page, '/?mission=titanic&skipBriefing=1');
     expect((await missionProbe(page)).state).toBe('diving');
 
-    // QA-B #10: the mission clock uses unfrozen frame time, independent of
+    // The mission clock uses unfrozen frame time, independent of
     // the eight-step physics cap. Time.tick clamps each frame to 250 ms;
     // accumulate the same observed frame deltas instead of sleeping for two
     // wall seconds, which can contain only a few frames on SwiftShader.
@@ -419,7 +419,7 @@ test.describe('fix S: mission failure, framing and modals', () => {
     expect(st.emergencyBlow).toBe(false);
     expect(st.frozen).toBe(true); // nothing simulates under the aborted debrief
 
-    // Escape does not dismiss the decision; Tab stays inside the card (QA-B #12).
+    // Escape does not dismiss the decision; Tab stays inside the card.
     await page.keyboard.press('Escape');
     await page.waitForTimeout(300);
     await expect(debrief).toBeVisible();

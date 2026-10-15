@@ -34,9 +34,9 @@ export interface InputState {
   resetCamera?: boolean;
   toggleSonar: boolean;
   boost: boolean;
-  /** Headlights (A2 owns the lights themselves; this is just the edge). */
+  /** Headlight input edge; the atmosphere system owns the lights. */
   toggleLights: boolean;
-  /** Hold-to-scan beam (B1). Level-triggered, not an edge. */
+  /** Hold-to-scan beam. Level-triggered, not an edge. */
   scan: boolean;
   /** Cycle the sim-speed multiplier 1x -> 2x -> 3x -> 1x. */
   cycleSimSpeed: boolean;
@@ -45,7 +45,7 @@ export interface InputState {
   /** Enter or Space captures the current photo-mode frame. */
   capturePhoto?: boolean;
   /**
-   * Open/close the field guide (B1). Edge-triggered. Optional so existing
+   * Open/close the field guide. Edge-triggered. Optional so existing
    * hand-built InputState literals (tests, Submarine's locked input) still type.
    */
   toggleGuide?: boolean;
@@ -298,7 +298,7 @@ export class Input {
   private padPressed = new Set<number>();
   wheelDelta = 0;
 
-  // F1-TOUCH ---------------------------------------------------------------
+  // Touch controls ----------------------------------------------------------
   /**
    * Analog axes written by the on-screen controls (`ui/TouchControls.ts`). A
    * non-zero axis overrides the keyboard value, like a deflected gamepad stick.
@@ -681,7 +681,7 @@ export class Input {
     s.boost = this.isDown('boost');
     s.scan = this.isDown('scan');
 
-    // F1-TOUCH: on-screen controls override like a deflected stick.
+    // On-screen controls override like a deflected stick.
     const ta = this.touchAxes;
     if (ta.throttle) s.throttle = ta.throttle;
     if (ta.yaw) s.yaw = ta.yaw;

@@ -1,5 +1,5 @@
 /**
- * The vehicle construction kit (F1-VEHICLES).
+ * The vehicle construction kit.
  *
  * Every vehicle is assembled from these parts in its own metres (front -Z,
  * up +Y, starboard +X) and then merged: a {@link PartBuilder} collects

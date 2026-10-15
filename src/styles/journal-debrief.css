@@ -1,5 +1,5 @@
-/* B1: Journal (was the field guide) and free-dive debrief overlays.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+/* Journal (was the field guide) and free-dive debrief overlays.
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 /* ---- Journal (was the field guide) and debrief overlays ---- */
 .field-guide,

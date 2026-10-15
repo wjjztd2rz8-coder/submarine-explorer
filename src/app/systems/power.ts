@@ -1,6 +1,6 @@
 /**
  * Battery and oxygen (D-POWER): drain while diving, an emergency ascent when
- * either runs out, the free-dive "Dive aborted" debrief, and the D2-HAZARD
+ * either runs out, the free-dive "Dive aborted" debrief, and the
  * descent cost when a mission starts below 25 m.
  */
 
@@ -24,7 +24,7 @@ export function createPowerSystem(): GameSystem {
         bus.on('mission:started', () => {
           power.reset();
           powerEmergencyStarted = false;
-          // D2-HAZARD: the descent to a deep start already used some battery.
+          // The descent to a deep start already used some battery.
           void discovery.ready.then(() =>
             queueMicrotask(() => {
               if (!ctx.effective.gameplay.batteryOxygen || !route) return;

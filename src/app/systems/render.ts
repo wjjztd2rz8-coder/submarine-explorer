@@ -1,5 +1,5 @@
 /**
- * Drawing: the scene to an offscreen target and the underwater post pass (A2
+ * Drawing: the scene to an offscreen target and the underwater post pass (
  * grade and vignette from the current depth band) to the screen, or the scene
  * straight to the canvas on the low tier / with post-processing off. Also the
  * window resize handler and the `?debugTerrain=1` once-a-second log.
@@ -74,14 +74,14 @@ export const renderSystem: GameSystem = {
         renderStats.triangles = ctx.titleScene.triangles;
         return;
       }
-      // C5: post-processing can be switched off in Settings.
+      // Post-processing can be switched off in Settings.
       if (atmoTier.post && ctx.postFx) {
         // The composite applies the band gain itself: undo any direct-path exposure.
         renderer.toneMappingExposure = baseExposure;
         renderer.setRenderTarget(post.target);
         renderer.clear();
         drawWithReducedMotion(scene, rig.reduceMotion, () => renderer.render(scene, rig.camera));
-        // Grade, vignette, fog and light come from the current depth band (A2).
+        // Grade, vignette, fog and light come from the current depth band.
         const a = f.atmo;
         const frame: PostFrame = {
           elapsed: f.elapsed,

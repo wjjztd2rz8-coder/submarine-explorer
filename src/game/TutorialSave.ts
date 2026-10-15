@@ -1,5 +1,5 @@
 /**
- * Onboarding save (F3-ONBOARD): whether the first-dive tutorial is finished and
+ * Onboarding save: whether the first-dive tutorial is finished and
  * which hints were shown. Own key, so it never disturbs settings or discovery
  * migrations; a missing, old or malformed record means "new player".
  */

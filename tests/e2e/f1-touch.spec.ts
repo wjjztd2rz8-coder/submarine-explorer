@@ -1,6 +1,6 @@
 import { completeScan } from './helpers/scan.js';
 /**
- * F1-TOUCH: touch play on emulated phones and a tablet. Real touches go through
+ * Touch play on emulated phones and a tablet. Real touches go through
  * the CDP `Input.dispatchTouchEvent`, so the pointer events the controls listen
  * to are the ones a browser produces on a device.
  */

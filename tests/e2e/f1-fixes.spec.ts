@@ -2,11 +2,7 @@
 import { mkdir } from 'node:fs/promises';
 import { expect, test } from './helpers/unlocked.js';
 
-/**
- * F1-FIXES: in-game views of the vent plume and the geology
- * fixes, saved to .cache/codex/shots/f1-fixes/. Asserts only that nothing
- * throws.
- */
+/** Vent plume and geology smoke checks save diagnostic frames and catch runtime errors. */
 const shots = '.cache/codex/shots/f1-fixes';
 const tag =
   (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env

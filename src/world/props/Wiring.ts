@@ -1,7 +1,4 @@
-/**
- * Glue between Props and the game loop, kept out of main.ts so its fenced B4
- * blocks stay a few lines long (plan/PHASE-B-CONTRACTS.md §5).
- */
+/** Prop/game-loop glue stays separate so startup wiring remains small. */
 
 import * as THREE from 'three';
 import type { PropsConfig } from '../../core/Config.js';

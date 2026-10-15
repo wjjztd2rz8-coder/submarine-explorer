@@ -1,5 +1,5 @@
 /**
- * Quality tiers v2 at run time (F0-CORE): `window.__game.perf` counters and
+ * Quality tiers v2 at run time: `window.__game.perf` counters and
  * dynamic resolution.
  *
  * - `perf` reports the last frame's draw calls and triangles (post pass

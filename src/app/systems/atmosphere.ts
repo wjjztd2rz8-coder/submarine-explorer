@@ -1,5 +1,5 @@
 /**
- * Atmosphere (A2): depth-driven fog, lighting and caustics, the headlights,
+ * Atmosphere: depth-driven fog, lighting and caustics, the headlights,
  * marine snow and the surface lid. Updated in two stages around the
  * environment preset: the preset reads this frame's atmosphere sample, and the
  * lights, snow and water read the preset's result.
@@ -69,7 +69,7 @@ export const atmosphereSystem: GameSystem = {
       const dark = 1 - Math.min(1, f.atmo.ambientIntensity / 0.9);
       const murk = f.atmo.snowDensity * (0.25 + 0.75 * dark);
       ctx.headlights.update(sub.position, f.forward, f.fog, f.elapsed, murk);
-      // D2-HAZARD: snow drifts with the preset's current.
+      // Snow drifts with the preset's current.
       const lamp = ctx.headlights.lights[0]!;
       ctx.snow.update(rig.camera, f.atmo, f.dt, renderer.domElement.height, ctx.presets.current, {
         origin: sub.position,

@@ -1,5 +1,5 @@
 /**
- * The ordered system list (F0-CORE). `init` runs top to bottom, so this is also
+ * The ordered system list. `init` runs top to bottom, so this is also
  * the order objects are built, DOM is appended and listeners are registered;
  * `app:state` listeners depend on this order (see the notes). Frame hooks run by stage
  * (`FRAME_STAGES` in `System.ts`), then in this order within a stage.

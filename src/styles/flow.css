@@ -1,5 +1,5 @@
 /* D-FLOW: compact objectives, completion banner, mission debrief; D-POLISH right-hand stack.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 /* Compact objectives panel: title, current target + nav line, "n of m". */
 .obj-title {

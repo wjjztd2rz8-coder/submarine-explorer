@@ -1,5 +1,5 @@
 /**
- * Touch controls (F1-TOUCH, ui/TouchControls.ts): builds the on-screen stick,
+ * Touch controls (ui/TouchControls.ts): builds the on-screen stick,
  * slider and buttons after the input and camera controls exist, and shows them
  * only while touch is the primary input during play.
  */

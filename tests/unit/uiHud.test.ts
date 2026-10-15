@@ -1,4 +1,4 @@
-/** Fix S: HUD depth sign (QA-B #3c), hull line (#2) and SEABED PROXIMITY rules (#14). */
+/** Guard HUD depth signs, hull ratings and seabed proximity warnings. */
 
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';

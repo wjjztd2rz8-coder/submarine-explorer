@@ -31,7 +31,7 @@ interface SonarOptions {
   /** On-screen length of the map's LONG side in CSS pixels. */
   size?: number;
   parent?: HTMLElement;
-  /** Initial palette (C5). Default `default`. */
+  /** Initial palette. Default `default`. */
   palette?: SonarPaletteName;
   /** Palette table; default `Config.sonarPalettes`. */
   palettes?: Record<SonarPaletteName, SonarPalette>;
@@ -71,7 +71,7 @@ export function relativeLuminance(r: number, g: number, b: number): number {
 /**
  * Canvas size (CSS px) for a tile: the long side is `maxPx`, the short side
  * follows the tile's aspect, so the map fills the canvas with no letterbox
- * (QA-A #1: the 25 x 33 km Titanic tile used to draw as a narrow strip
+ * (the 25 x 33 km Titanic tile used to draw as a narrow strip
  * between transparent bars).
  */
 export function sonarCanvasSize(
@@ -318,7 +318,7 @@ export class Sonar {
     this.canvas.height = Math.round(this.h * dpr);
     // CSS sizes the map from this natural width, so the layout can shrink it.
     this.root.style.setProperty('--map-w', `${this.w}px`);
-    // C5: a name for assistive tech; the map itself is decorative detail.
+    // A name for assistive tech; the map itself is decorative detail.
     this.canvas.setAttribute('role', 'img');
     this.canvas.setAttribute('aria-label', 'Sonar map: seabed depth, your track and heading');
     this.root.appendChild(this.canvas);
@@ -458,7 +458,7 @@ export class Sonar {
   }
 
   /**
-   * Switch colour scheme (C5): refreshes relief and symbol colours from
+   * Switch colour scheme: refreshes relief and symbol colours from
    * `Config.sonarPalettes[name]`. Unknown
    * names are ignored. Returns the active palette name.
    */

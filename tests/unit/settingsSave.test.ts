@@ -1,5 +1,5 @@
 /**
- * C5 settings persistence (src/core/Save.ts): defaults from Config, per-field
+ * Settings persistence (src/core/Save.ts): defaults from Config, per-field
  * sanitising, reload round trip, and hostile storage that must never throw.
  */
 

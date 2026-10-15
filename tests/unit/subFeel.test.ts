@@ -1,8 +1,4 @@
-/**
- * A3 "submarine feel" checks. Each `it()` here is numbered to match a row in
- * `docs/playtest-A3.md`, so a change of feel shows up as a named failure rather
- * than as a vague "it handles oddly".
- */
+/** Named handling cases make acceleration, turning and braking regressions easy to locate. */
 
 import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';

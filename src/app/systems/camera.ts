@@ -1,5 +1,5 @@
 /**
- * Camera: the chase / first-person / orbit rig (A3), and the D2-CAMERA
+ * Camera: the chase / first-person / orbit rig, and the camera
  * controls (view toggle, reset, double-click reset, mouse look and wheel zoom).
  * The rig is built early (the discovery teleport snaps it); the
  * controls come after the input system.
@@ -18,7 +18,7 @@ export const cameraSystem: GameSystem = {
   name: 'camera',
   init(ctx) {
     const { terrain, sub } = ctx;
-    // A3: the rig samples the terrain so the camera never clips below the seabed.
+    // The rig samples the terrain so the camera never clips below the seabed.
     const rig = new CameraRig(
       ctx.effective.camera,
       window.innerWidth / window.innerHeight,

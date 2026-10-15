@@ -1,5 +1,5 @@
 /**
- * B3 mission core: mission.json validation, the landmarks manifest, and the
+ * Mission core: mission.json validation, the landmarks manifest, and the
  * Mission state machine driven by a fake bus (no DOM, no Three.js).
  */
 

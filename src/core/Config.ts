@@ -3,7 +3,7 @@
  * here rather than scattered through the modules. Values are SI (metres,
  * seconds, radians unless a name says Deg).
  *
- * F0-CORE: each domain's types and defaults now live in `core/config/*.ts`
+ * each domain's types and defaults now live in `core/config/*.ts`
  * (submarine, terrain, atmosphere, camera, audio, discovery, props, mission,
  * presets, gameplay, ui, quality) and the `GameConfig` contract in
  * `core/config/types.ts`. This file assembles `DEFAULT_CONFIG`, owns

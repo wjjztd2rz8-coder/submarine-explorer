@@ -1,5 +1,5 @@
 /**
- * B3 time budget: the Titanic mission must be playable start -> debrief in
+ * Time budget: the Titanic mission must be playable start -> debrief in
  * under 10 minutes at 2x sim speed (plan/WORK-PACKAGES.md). This drives the
  * real Submarine physics with Config's numbers and checks the budget, so a
  * tuning change that breaks it fails here. The numbers are written up in

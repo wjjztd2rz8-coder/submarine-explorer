@@ -100,7 +100,7 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
             expect(size.x).toBeGreaterThanOrEqual(width * 0.99);
             expect(size.y).toBeGreaterThanOrEqual(height * 0.99);
           } else {
-            // Measured before 1030 on the old Low opening. The newly resolved
+            // Reference geometry uses the old Low opening. The newly resolved
             // bowl may improve the automatic bearing, but cannot shrink the gallery.
             const previous =
               aspect === 16 / 9 ? [0.0504748702, 0.0879778568] : [0.0897615816, 0.0406749029];

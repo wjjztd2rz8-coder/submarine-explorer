@@ -1,5 +1,5 @@
 /**
- * Cockpit viewport (F1-VEHICLES): what the first-person view looks through.
+ * Cockpit viewport: what the first-person view looks through.
  *
  * The first-person camera keeps its gameplay pose (Config.camera
  * firstPersonOffset); this overlay only frames it as the view out of the

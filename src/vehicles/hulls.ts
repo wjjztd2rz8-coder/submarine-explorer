@@ -1,5 +1,5 @@
 /**
- * The three hull classes (F1-VEHICLES), all built from the same kit and all
+ * The three hull classes, all built from the same kit and all
  * facing -Z in their own metres. Each one is in the design language of real
  * deep-submergence vehicles without copying any of them:
  *

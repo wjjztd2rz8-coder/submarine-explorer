@@ -1,5 +1,5 @@
-/* D2-PREDIVE: game mode control, home layout, briefing dive settings, UI scale row.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+/* Game mode control, home layout, briefing dive settings, UI scale row.
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 /* Game mode segmented control: home screen, briefing Dive settings, Settings. */
 .mode-selector {
@@ -270,7 +270,7 @@
   white-space: nowrap;
 }
 
-/* --- F-BRIEFING-900: objectives first, one launch action --- */
+/* Put objectives first so the briefing leads to one launch action. */
 .briefing .briefing-head + .briefing-section {
   margin-top: 14px;
 }

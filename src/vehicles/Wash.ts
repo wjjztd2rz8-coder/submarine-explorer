@@ -1,5 +1,5 @@
 /**
- * Thruster wash (F1-VEHICLES): small particulates stirred out of each duct in
+ * Thruster wash: small particulates stirred out of each duct in
  * proportion to its thrust, plus the odd bubble rising and wobbling away.
  *
  * One `THREE.Points` draw call, simulated on the CPU in world space so the

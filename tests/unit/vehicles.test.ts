@@ -4,7 +4,7 @@ import { SubMesh } from '../../src/sub/SubMesh.js';
 import { apertureFor, clearFraction, CockpitView } from '../../src/vehicles/cockpit.js';
 import { buildVehicle, lodForTier, Vehicle } from '../../src/vehicles/index.js';
 
-/** Per-tier budgets for one vehicle (docs: plan/progress/F1-VEHICLES.md). */
+/** Per-tier budgets for one vehicle. */
 const BUDGET = {
   low: { drawCalls: 8, triangles: 18_000 },
   full: { drawCalls: 25, triangles: 36_000 },

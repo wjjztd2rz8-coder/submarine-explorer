@@ -1,5 +1,5 @@
 /**
- * Settings screen (C5, docs/settings.md, plan/PHASE-C-CONTRACTS.md §4).
+ * Settings screen (docs/settings.md, plan/PHASE-C-CONTRACTS.md §4).
  *
  * A modal DOM dialog opened with the `toggleSettings` binding (O by default)
  * or the HUD's settings hint. It edits {@link Save} (graphics tier, post FX,
@@ -225,7 +225,7 @@ export class SettingsScreen {
 
     // --- D-MODES begin ---
     const gameplay = this.section(`${id}-gameplay`, 'Gameplay');
-    // D2-PREDIVE: the mode is a segmented control at the top of Gameplay,
+    // The mode is a segmented control at the top of Gameplay,
     // the same control as on the home screen and in the briefing.
     this.modeSelector = new ModeSelector(
       'is-settings',
@@ -269,7 +269,7 @@ export class SettingsScreen {
       audio.append(row);
     }
 
-    // --- D2-PREDIVE: UI scale and hull warning ---
+    // --- UI scale and hull warning ---
     access.append(this.uiScaleRow());
     access.append(
       this.select(
@@ -561,7 +561,7 @@ export class SettingsScreen {
   }
 
   /**
-   * D2-PREDIVE (playtest #3): the old number box clipped its last digit
+   * The old number box clipped its last digit
    * behind the spinner at 100% and above. Now − / slider / + and a separate
    * readout sized for "150%", so nothing overlaps at any scale.
    */

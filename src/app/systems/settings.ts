@@ -1,5 +1,5 @@
 /**
- * The settings dialog (C5, docs/settings.md) and live application of display
+ * The settings dialog (docs/settings.md) and live application of display
  * settings (reduce motion, captions, sonar palette, post-processing, UI scale).
  */
 
@@ -63,7 +63,7 @@ export const settingsSystem: GameSystem<ShellContext, unknown> = {
     ctx.settingsScreen = settingsScreen;
     cleanup.add(() => settingsScreen.dispose());
 
-    // D3-FEEL: the pointer-look toggle in the Controls page.
+    // The pointer-look toggle in the Controls page.
     const pointerLookButton =
       settingsScreen.root.querySelector<HTMLButtonElement>('.settings-pointer-lock');
     const syncPointerLookButton = (): void => {

@@ -149,7 +149,7 @@ export class Scanner {
 
   private targets: ScanTarget[] = [];
   /**
-   * Live targets that come and go (F2-LIFE animals). The array is owned by the
+   * Live targets that come and go (animals). The array is owned by the
    * caller and may change every frame; POIs always win over these for the
    * hint and the candidate, so objectives never lose the beam to a passing fish.
    */

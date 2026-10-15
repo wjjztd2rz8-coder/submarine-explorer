@@ -1,7 +1,7 @@
 /**
  * Mission / dive-site selector: plain DOM.
  *
- * - MISSIONS (B3): built from `/data/landmarks/index.json` + each listed
+ * - MISSIONS: built from `/data/landmarks/index.json` + each listed
  *   `mission.json` (see `loadMissionSummaries` in game/Mission.ts), filled in
  *   asynchronously with {@link MissionSelect.setMissions}. Click -> `?mission=<id>`.
  * - DIVE SITES: free dives, from `/data/tiles/index.json`, which the Python
@@ -12,7 +12,7 @@
  * shareable. During a mission the panel starts collapsed behind a small
  * toggle so it is not in the way.
  *
- * C1: landmarks listed in index.json whose mission.json has not loaded (the
+ * landmarks listed in index.json whose mission.json has not loaded (the
  * content packs are still being written) are shown as "content coming" rows
  * via {@link MissionSelect.setPending}; a GLOBE button opens the globe
  * mission select ({@link MissionSelect.setGlobeHandler}).
@@ -23,7 +23,7 @@ import type { MissionSummary } from '../game/Mission.js';
 import { contentUrl, fetchContentJson } from '../game/ContentPath.js';
 import type { TileIndexEntry } from '../util/types.js';
 
-/** C1: a landmark listed in index.json whose mission.json has not loaded yet. */
+/** A landmark listed in index.json whose mission.json has not loaded yet. */
 interface PendingMission {
   id: string;
   name: string;
@@ -63,7 +63,7 @@ export function tileUrl(href: string, tileId: string): string {
   url.searchParams.delete('mission');
   url.searchParams.delete('daily'); // Daily routing would otherwise override the chosen tile.
   url.searchParams.delete('skipBriefing');
-  url.searchParams.delete('globe'); // C1: do not reopen the globe after choosing from it
+  url.searchParams.delete('globe'); // Do not reopen the globe after choosing from it
   url.searchParams.set('tile', tileId);
   return url.toString();
 }
@@ -74,7 +74,6 @@ export class MissionSelect {
   private readonly missionsEl: HTMLDivElement;
   private readonly toggleEl: HTMLButtonElement;
   private readonly tileIds: Set<string>;
-  // C1
   private readonly globeBtn: HTMLButtonElement;
   private missions: MissionSummary[] = [];
   private pending: PendingMission[] = [];
@@ -104,7 +103,7 @@ export class MissionSelect {
     this.body.className = 'mission-select-body';
     this.root.appendChild(this.body);
 
-    // C1: GLOBE button, shown once a handler is set.
+    // GLOBE button, shown once a handler is set.
     this.globeBtn = document.createElement('button');
     this.globeBtn.type = 'button';
     this.globeBtn.className = 'mission-globe-btn';
@@ -190,7 +189,7 @@ export class MissionSelect {
     }
   }
 
-  /** C1: show the GLOBE button; clicking it calls `open`. */
+  /** Show the GLOBE button; clicking it calls `open`. */
   setGlobeHandler(open: () => void, keyHint = ''): void {
     this.globeBtn.hidden = false;
     this.globeBtn.textContent = keyHint ? `GLOBE  ${keyHint}` : 'GLOBE';
@@ -204,7 +203,7 @@ export class MissionSelect {
   }
 
   /**
-   * C1: index.json ids whose mission.json did not load, shown as "content
+   * Index.json ids whose mission.json did not load, shown as "content
    * coming" rows (a free dive on the tile when one exists).
    */
   setPending(pending: PendingMission[]): void {

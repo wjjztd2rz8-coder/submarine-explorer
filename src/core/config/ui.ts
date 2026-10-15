@@ -1,6 +1,6 @@
 /**
  * Settings screen, sonar minimap and globe UI tunables (docs/settings.md, docs/globe.md).
- * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
+ * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
 import { publicUrl } from '../../util/publicUrl.js';
@@ -8,7 +8,7 @@ import type { GameplayOptions } from './gameplay.js';
 
 export { FIRST_MINUTE_GUIDANCE } from './guidance.js';
 
-/** C1: globe mission select overlay (docs/globe.md). Distances in globe radii. */
+/** Globe mission select overlay (docs/globe.md). Distances in globe radii. */
 export interface GlobeConfig {
   /** Equirectangular Earth texture (public/assets/globe, ATTRIBUTION.md). */
   textureUrl: string;
@@ -58,7 +58,7 @@ export interface GlobeConfig {
   maxPixelRatio: number;
 }
 
-// --- C5: settings, save, accessibility (docs/settings.md) ---
+// --- settings, save, accessibility (docs/settings.md) ---
 /** Sonar minimap colour schemes (`Sonar.setPalette`). */
 export type SonarPaletteName = 'default' | 'deuteranopia' | 'highContrast';
 
@@ -119,7 +119,7 @@ export interface SettingsConfig {
   gameplayOptions: { [K in keyof GameplayOptions]: readonly GameplayOptions[K][] };
 }
 
-// C5: settings (docs/settings.md).
+// Settings (docs/settings.md).
 export const DEFAULT_SETTINGS: SettingsConfig = {
   defaults: {
     postFx: true,
@@ -216,7 +216,7 @@ export const DEFAULT_SONAR_PALETTES: Record<SonarPaletteName, SonarPalette> = {
   },
 };
 
-// C1: globe mission select (docs/globe.md).
+// Globe mission select (docs/globe.md).
 export const DEFAULT_GLOBE: GlobeConfig = {
   textureUrl: publicUrl('/assets/globe/earth-bmng-topo-bathy-4096.jpg'),
   minDistance: 1.35,

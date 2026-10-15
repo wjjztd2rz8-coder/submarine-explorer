@@ -1,5 +1,5 @@
 /**
- * Environment presets (C3, docs/presets.md): per-site look and events (vent
+ * Environment presets (docs/presets.md): per-site look and events (vent
  * smoke, brine pool, reef light, wreck haze, …) and the current applied to
  * the sub. Runs between the atmosphere sample and the lights.
  */

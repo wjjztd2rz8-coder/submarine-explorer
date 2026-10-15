@@ -1,6 +1,6 @@
 /**
  * Gameplay option profiles (speed, descent, lights, sensors), power and currents.
- * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
+ * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
 import type { SubmarineConfig } from './submarine.js';

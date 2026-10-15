@@ -2,12 +2,7 @@
 import { mkdir } from 'node:fs/promises';
 import { expect, test } from './helpers/unlocked.js';
 
-/**
- * F1-OCEAN: the water column at shallow, mid and deep sites on each tier,
- * plus the look-up view (Snell's window and god rays) near the surface.
- * Frames land in .cache/codex/shots/f1-ocean/. Asserts only that nothing
- * throws and that no frame is crushed to black.
- */
+/** Water-column checks cover depth, tier and look-up views, including black-frame regressions. */
 const shots = '.cache/codex/shots/f1-ocean';
 
 type G = {

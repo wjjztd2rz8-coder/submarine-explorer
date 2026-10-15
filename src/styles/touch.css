@@ -1,4 +1,4 @@
-/* F1-TOUCH: on-screen controls (ui/TouchControls.ts) and touch-friendly menus.
+/* On-screen controls (ui/TouchControls.ts) and touch-friendly menus.
    Sizes scale with --ui-scale (auto scale x the Settings UI scale). */
 
 .tc-root,

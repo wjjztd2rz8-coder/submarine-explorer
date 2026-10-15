@@ -1,5 +1,5 @@
 /**
- * First-dive tutorial (F3-ONBOARD): three short steps that advance when the
+ * First-dive tutorial: three short steps that advance when the
  * player does the thing. Pure logic. The onboarding system feeds it the input
  * the sim sees each frame plus a few events; it never touches input handling.
  */

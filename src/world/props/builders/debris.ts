@@ -1,8 +1,7 @@
 /**
  * Debris builder: `procedural:debris`, 20-60 plates and pipes scattered within
  * dimensions_m[0] m, instanced by shape and tinted rust / growth. Uses the
- * wreck rust texture (`wrecks.ts`). Split out of `world/props/Procedural.ts`
- * (F0-CORE); owned by the wrecks package.
+ * wreck rust texture (`wrecks.ts`); keep its palette consistent with hulls.
  */
 
 import * as THREE from 'three';

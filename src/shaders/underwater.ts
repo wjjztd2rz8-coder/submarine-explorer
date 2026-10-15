@@ -257,7 +257,7 @@ void main() {
   // The scene was rendered into a linear half-float target, where Three skips
   // tone mapping and output encoding. Apply both here, once, on the way to the
   // screen -- without these the frame is shown as raw linear values, which
-  // crushes the darks and over-saturates every mid-tone (QA-B #4).
+  // crushes the darks and over-saturates every mid-tone.
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
 
@@ -421,7 +421,7 @@ export class UnderwaterPass {
   /**
    * Draw calls of the scene render that preceded the last `render()`. The
    * pass's own `renderer.render` auto-resets `renderer.info`, so without this
-   * the debug readout only ever sees the post quad (QA-B #8).
+   * the debug readout only ever sees the post quad.
    */
   sceneDrawCalls = 0;
   sceneTriangles = 0;

@@ -1,5 +1,5 @@
 /**
- * Vehicle components (F1-VEHICLES): the reusable pieces every hull class and
+ * Vehicle components: the reusable pieces every hull class and
  * the hull classes are assembled from. Static parts go straight into a
  * {@link PartBuilder}; moving parts (propellers, manipulator links, the
  * pan/tilt camera, the strobe) are returned as descriptors that `Vehicle.ts`

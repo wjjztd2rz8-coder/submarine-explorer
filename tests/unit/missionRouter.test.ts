@@ -1,5 +1,5 @@
 /**
- * B3 routing + navigation maths: `?mission=` resolution, the surface-start
+ * Routing + navigation maths: `?mission=` resolution, the surface-start
  * spawn pose, hull/sim-speed loadout, the frozen input, and the objectives
  * panel's bearing/range (checked against the Submarine's own heading).
  */

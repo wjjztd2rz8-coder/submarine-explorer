@@ -18,7 +18,7 @@ import { PresetSystem } from '../../src/world/presets/Presets.js';
 
 const read = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 
-// Tighter Lost City acceptance than 380's broad five-site audit: use actual
+// Lost City acceptance uses actual
 // terrain/props and scene light, with no screenshot or GPU-brightness threshold.
 describe('Lost City first-ten-second Arcade opening', () => {
   for (const tier of ['low', 'medium', 'high'] as const) {

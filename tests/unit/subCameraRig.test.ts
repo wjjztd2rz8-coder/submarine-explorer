@@ -226,7 +226,7 @@ describe('CameraRig mouse response and framing', () => {
   });
 });
 
-// B3 / F1: the hull and the chase camera used to be mirrored across the N-S
+// The hull and chase camera used to be mirrored across the N-S
 // axis. Physics yaw is a compass angle (+yaw = east, Submarine.getForward);
 // a raw Three.js +Y rotation turns -Z to the west, so the presentation side
 // has to negate it.

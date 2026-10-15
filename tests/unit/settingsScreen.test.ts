@@ -1,4 +1,4 @@
-/** C5 settings screen, pure parts (src/ui/Settings.ts): rebinding plan and messages. */
+/** Settings screen, pure parts (src/ui/Settings.ts): rebinding plan and messages. */
 
 import { describe, expect, it } from 'vitest';
 import { defaultActions } from '../../src/core/Input.js';

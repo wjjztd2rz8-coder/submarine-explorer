@@ -1,7 +1,7 @@
 import { expect, test, type Page } from './helpers/unlocked.js';
 
 /**
- * B4 prop pipeline: boots the Titanic tile with the `_test` fixture folder
+ * Prop pipeline: boots the Titanic tile with the `_test` fixture folder
  * (data/landmarks/_test/props.json: one of each procedural kind plus two
  * Poly Haven GLBs), spawned by `?at=` just south of the props and facing north.
  */
@@ -118,7 +118,7 @@ test.describe('B4 props', () => {
   });
 
   test('Titanic hull ends read differently: prow, torn end, counter stern', async ({ page }) => {
-    // QA-B #5. Spawn ~100 m off each end of both sections, looking at it, and
+    // Spawn off each end to catch a reversed wreck silhouette, and
     // screenshot in the chase view (as played) and first-person (no own-boat
     // silhouette). Bow: 143 m, heading 0, ends [prow, cut]. Stern: 107 m,
     // heading 190, ends [cut, rounded]; its counter stern points at the bow.

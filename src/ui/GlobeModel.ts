@@ -1,5 +1,5 @@
 /**
- * Globe mission select (C1): the pure half. No DOM, no Three.js, so vitest
+ * Globe mission select: the pure half. No DOM, no Three.js, so vitest
  * (node environment) can cover it; `Globe.ts` owns the canvas and the pins.
  *
  * - {@link latLonToUnit}: lat/lon -> point on the globe, in the frame of

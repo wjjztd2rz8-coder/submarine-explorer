@@ -162,7 +162,7 @@ for (const site of ['titanic', 'great-blue-hole']) {
             ).toHaveLength(0);
           }
           if (site === 'titanic') {
-            // 780 begins at 300 view metres and belongs only to terrain.
+            // Far-distance haze begins at 300 view metres and belongs only to terrain.
             expect(distance).toBeLessThan(300);
             for (const prop of props.placed)
               prop.full.traverse((object) => {

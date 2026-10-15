@@ -30,7 +30,7 @@ describe('Great Blue Hole props', () => {
     expect(geo.length).toBeGreaterThan(0);
   });
 
-  // Measured on main before 910 with level seating. Preserve the pendant
+  // Reference geometry uses level seating. Preserve the pendant
   // envelope independently of terrain refinements and the roof's reduced crest.
   const originalGallery = [
     {

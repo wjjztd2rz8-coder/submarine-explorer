@@ -160,7 +160,7 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
   const sediment = new THREE.Color(cfg.sediment_color);
   const stain = new THREE.Color(cfg.stain_color);
   const basalt = new THREE.Color(0x2e2d2b);
-  // Keep every supporting height (and therefore the 850 clumps) unchanged. The plate
+  // Keep every supporting height (and therefore the habitat clumps) unchanged. The plate
   // came from a plain pale material with radial edge tint, not the height mesh.
   // A neutral cavity lets this mesh use exactly the surrounding floor's shader.
   apron.setAttribute(

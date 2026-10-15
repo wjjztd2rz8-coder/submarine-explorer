@@ -1,5 +1,5 @@
 /**
- * Asset service entry point (F0-CORE). `assets` is the shared instance; see
+ * Asset service entry point. `assets` is the shared instance; see
  * `AssetService.ts` for loading and caching and `manifest.ts` for the types.
  */
 

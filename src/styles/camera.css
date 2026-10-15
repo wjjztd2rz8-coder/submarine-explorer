@@ -1,5 +1,5 @@
-/* D2-CAMERA: reset camera button.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+/* Reset camera button.
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 .hud-reset-camera {
   min-height: 32px;

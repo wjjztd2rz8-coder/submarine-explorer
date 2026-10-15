@@ -1,5 +1,5 @@
 /**
- * The shared game context (F0-CORE).
+ * The shared game context.
  *
  * `BootContext` is what `app/boot.ts` produces before any system runs: URL
  * params, config, event bus, saved settings, the resolved quality tier,
@@ -9,7 +9,7 @@
  * callbacks and frame hooks may read any field.
  *
  * `expose()` adds debug handles to `window.__game` (assigned by `main.ts` after
- * every system has initialised, as before F0).
+ * every system has initialised).
  */
 
 import type { EffectiveSettings } from '../game/EffectiveSettings.js';
@@ -158,7 +158,7 @@ export interface GameContext extends BootContext {
   keyboard: { lock(): Promise<void>; unlock(): void };
   pointerLook: { updateHint(): void };
   settingsScreen: SettingsScreen;
-  /** F3-ONBOARD: device layout card. */
+  /** Device layout card. */
   controlsCard: ControlsCard;
   missionRouter: MissionRouter | null;
   applyMissionStart(choice: MissionStartPosition): void;

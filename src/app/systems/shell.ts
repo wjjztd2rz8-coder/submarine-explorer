@@ -1,5 +1,5 @@
 /**
- * The app shell (D-SHELL, C1): home screen, pause menu, site lists, the two
+ * The app shell (D-SHELL, ): home screen, pause menu, site lists, the two
  * globes (overlay and home), app state (home / dive / pause) and the Escape
  * key. Selecting a site navigates to its URL; the page reloads into the dive.
  */
@@ -84,7 +84,7 @@ export function initializeShell(ctx: ShellContext): void {
         ctx.settingsScreen.showControls(true);
       },
     },
-    // D2-PREDIVE: the game mode selector on the home screen.
+    // The game mode selector on the home screen.
     document.body,
     save,
   );
@@ -200,7 +200,7 @@ export function initializeShell(ctx: ShellContext): void {
 }
 
 /**
- * Globe mission select (C1, docs/globe.md): `?globe=1` and shell site pins.
+ * Globe mission select (docs/globe.md): `?globe=1` and shell site pins.
  * While open it freezes the game like the briefing. Also loads the site's
  * species list for the Journal.
  */

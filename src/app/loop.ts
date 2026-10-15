@@ -1,5 +1,5 @@
 /**
- * The frame loop (F0-CORE, from the old `main.ts` `frame()`).
+ * The frame loop (from the old `main.ts` `frame()`).
  *
  *   - `Time.tick()` converts the real frame delta into N fixed 60 Hz steps.
  *   - Each step advances the submarine with the sampled input.

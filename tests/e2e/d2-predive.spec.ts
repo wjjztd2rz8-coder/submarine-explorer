@@ -5,7 +5,7 @@ import { expect, test, type Page } from './helpers/unlocked.js';
 import { openBriefingAdvanced } from './helpers/briefing.js';
 
 /**
- * D2-PREDIVE (playtest #3): the game mode is visible on the home screen, in
+ * The game mode is visible on the home screen, in
  * the briefing's Dive settings and at the top of Settings > Gameplay, all
  * bound to one setting; the briefing previews the real start pose; the UI
  * scale readout never clips.

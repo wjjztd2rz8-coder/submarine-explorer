@@ -104,7 +104,7 @@ describe('Titanic far-field horizon', () => {
       expect(Math.min(...ring)).toBeGreaterThan(
         luminance(new THREE.Color(ABYSS_HORIZON.upperColor)),
       );
-      // 1310: depth remains perceptible while the fixed 0.025 ceiling below
+      // Depth remains perceptible while the fixed 0.025 ceiling below
       // keeps the abyss mood. Check contrast independently of the tuned palette.
       expect(Math.min(...ring)).toBeGreaterThan(
         1.25 * luminance(new THREE.Color(ABYSS_HORIZON.upperColor)),

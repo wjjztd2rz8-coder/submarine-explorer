@@ -1,9 +1,9 @@
 /**
  * Mission flow timings (docs/missions.md).
- * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
+ * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
-/** B3: mission flow (docs/missions.md). */
+/** Mission flow (docs/missions.md). */
 export interface MissionConfig {
   /**
    * Sim-speed multiplier a mission starts at (must be one of
@@ -24,7 +24,7 @@ export interface MissionConfig {
   /** Objectives-panel nav line refresh rate (Hz). Text writes are skipped when unchanged. */
   navUpdateHz: number;
 
-  // --- fix S (QA-B #3) -------------------------------------------------------
+  // Safe free-dive spawn -----------------------------------------------------
   /**
    * Free dive: if the tile centre's seabed is shallower than this (negative
    * metres), spawn over the nearest grid cell at least this deep instead.
@@ -34,7 +34,7 @@ export interface MissionConfig {
   freeDiveSpawnAltitudeM: number;
 }
 
-// B3: mission flow. See docs/missions.md for the timeline these produce.
+// Mission flow. See docs/missions.md for the timeline these produce.
 export const DEFAULT_MISSION: MissionConfig = {
   defaultSimSpeed: 3, // keeps the Titanic descent under 4 min real time
   completeDelayS: 3, // let the scan's "NEW ENTRY" banner land before the completion banner

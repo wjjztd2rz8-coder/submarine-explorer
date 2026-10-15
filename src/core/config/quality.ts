@@ -1,7 +1,6 @@
 /**
  * Graphics quality tiers, the `auto` setting and dynamic resolution tunables.
- * Detection itself lives in `core/Quality.ts`. Split out of `core/Config.ts`
- * (F0-CORE); import from `core/Config.js`.
+ * Detection itself lives in `core/Quality.ts`; import from `core/Config.js`.
  */
 
 /**

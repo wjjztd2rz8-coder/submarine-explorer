@@ -1,6 +1,6 @@
 /**
  * Chase / first-person / orbit camera rig.
- * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
+ * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
 export interface CameraConfig {
@@ -21,7 +21,7 @@ export interface CameraConfig {
   /** Time to bring the free-look aim from chase framing onto the hull. */
   freeLookAimSeconds: number;
 
-  // --- A3: rig -------------------------------------------------------------
+  // --- rig -------------------------------------------------------------
   /**
    * Distance ahead of the boat the camera aims, per mode. Longer look-ahead in
    * first person reads as "looking where you are going" rather than at the bow.

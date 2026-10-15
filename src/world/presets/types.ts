@@ -78,7 +78,7 @@ export interface PresetFrameContext {
   headlightsOn: boolean;
   /** Offline site flow before preset modulation (world m/s). */
   baseCurrent: THREE.Vector3;
-  /** C3 canyon speed setting before mission overrides; sets its scale reference. */
+  /** Canyon speed before mission overrides; sets its scale reference. */
   canyonReferenceSpeedMps: number;
   /**
    * Write the water velocity at the sub here (m/s, world frame). The system

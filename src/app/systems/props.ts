@@ -1,5 +1,5 @@
 /**
- * Placed props (B4, docs/props.md): wrecks, rocks and chimneys from the site's
+ * Placed props (docs/props.md): wrecks, rocks and chimneys from the site's
  * props.json, prop collision, `?at=lat,lon[,heading]` spawns (at `?depth=` if
  * given) and the `?debugProps=1` placement tool.
  */

@@ -112,7 +112,7 @@ describe('wreck builders', () => {
   });
 
   it('stays inside the per-tier triangle budgets (near LOD, instances counted)', () => {
-    // Budgets per hull in thousands of triangles; see plan/progress/F1-WRECKS.md.
+    // Budgets per hull in thousands of triangles.
     const budget: Record<string, number> = { low: 180, medium: 400, high: 700 };
     for (const id of WRECK_HULLS) {
       for (const tier of TIERS) {

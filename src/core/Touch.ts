@@ -1,5 +1,5 @@
 /**
- * Touch input maths and device detection (F1-TOUCH), unit-tested in
+ * Touch input maths and device detection, unit-tested in
  * tests/unit/touch.test.ts. `ui/TouchControls.ts` feeds them pointer events and
  * writes the results into `Input.touchAxes` / `Input.touchLook` / `touchZoom`.
  */

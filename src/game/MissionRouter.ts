@@ -1,5 +1,5 @@
 /**
- * `?mission=<id>` routing and the in-game mission flow (B3, docs/missions.md).
+ * `?mission=<id>` routing and the in-game mission flow (docs/missions.md).
  *
  * Boot (main.ts, before the tile loads):
  *   `resolveMissionRoute(params)` fetches `/data/landmarks/<id>/mission.json`;
@@ -9,7 +9,7 @@
  *
  * Spawn (main.ts, where the default spawn used to be):
  *   `applyMissionLoadout()` fits the hull class, sets the mission sim speed
- *   and returns the surface-start pose. `?poi=` (B1) and `?at=` (B4) still
+ *   and returns the surface-start pose. `?poi=` and `?at=` still
  *   override the pose afterwards, because tests depend on them.
  *
  * Flow (`MissionRouter`, constructed once Discovery and Input exist; D-FLOW):
@@ -87,7 +87,7 @@ export async function resolveMissionRoute(
  * is sorted alphabetically by the pipeline, so `index[0]` alone would boot
  * whatever tile happens to sort first.
  *
- * QA-B #13: an unknown `?tile=` falls back with a warning instead of fetching
+ * an unknown `?tile=` falls back with a warning instead of fetching
  * a meta.json that does not exist (the dev server answers with index.html,
  * which surfaced as a fatal JSON parse error). With an empty index (it failed
  * to load) the request cannot be checked and is passed through.
@@ -225,7 +225,7 @@ export interface NavTarget {
   name: string;
   /** Compass bearing sub -> target, 0 = north, 90 = east (same as the HUD heading). */
   bearingDeg: number;
-  /** 3D slant range, metres (QA-B #11: the same metric as the scan panel). */
+  /** 3D slant range, metres (the same metric as the scan panel). */
   rangeM: number;
   /** Horizontal range, metres. */
   horizontalM: number;
@@ -286,7 +286,7 @@ export function pickNavTarget(
 
 // --------------------------------------------------------------- controller
 
-/** The parts of B1's Discovery the mission uses (Discovery satisfies it). */
+/** The parts of Discovery the mission uses (Discovery satisfies it). */
 export interface MissionDiscovery {
   readonly ready: Promise<void>;
   readonly pois: ReadonlyArray<{ id: string; name: string; position: XYZ }>;
@@ -475,7 +475,7 @@ export class MissionRouter {
   /**
    * Once per rendered frame.
    * @param dt real (wall-clock) seconds of unfrozen play this frame, 0 while
-   *   frozen: the mission clock (QA-B #10). Not physics dt, which the 8-step
+   *   frozen: the mission clock. Not physics dt, which the 8-step
    *   cap in Time.ts shortens at low frame rates.
    * @param realDt real frame delta, for the nav refresh clock
    * @param hull the sub's state; the end of an emergency blow aborts the dive

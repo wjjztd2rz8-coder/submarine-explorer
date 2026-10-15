@@ -1,5 +1,5 @@
 /**
- * On-screen touch controls (F1-TOUCH): a left virtual stick (thrust and turn),
+ * On-screen touch controls: a left virtual stick (thrust and turn),
  * a right ballast slider (rise / sink), hold Scan and tap buttons (Boost,
  * Lights, Sonar, Photo, Pause), drag-to-look, pinch zoom and double-tap to
  * reset the camera.

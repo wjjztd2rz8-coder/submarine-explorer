@@ -2,7 +2,7 @@
  * Points of interest: the scan targets of a landmark.
  *
  * Schema: `data/landmarks/<landmark>/pois.json` (plan/PHASE-B-CONTRACTS.md §2.1,
- * docs/discovery.md). B2 authors the files; this module is the loader, the
+ * docs/discovery.md). Content packs author the files; this module is the loader, the
  * validator and the world placement. The file is untrusted and optional:
  * malformed entries are dropped with a warning and a missing file is "no POIs".
  *

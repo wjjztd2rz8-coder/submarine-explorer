@@ -1,8 +1,8 @@
 /**
- * Fix S (QA-B) submarine checks:
- *  - #3a constraint order: the seabed push-out runs before the surface clamp,
+ * Submarine constraint and handling regressions:
+ *  - Constraint order: the seabed push-out runs before the surface clamp,
  *    so shallow water no longer lifts the hull out of the sea;
- *  - #15 turn rate at 2x/3x sim speed stays at the 1x real rate unless
+ *  - Turn rate at 2x/3x sim speed stays at the 1x real rate unless
  *    `simSpeedScalesTurnRate` is set.
  */
 

@@ -87,7 +87,7 @@ export class Objectives {
   }
 }
 
-/** What {@link Debrief.show} renders. B3 may fill `title`/`subtitle`. */
+/** What {@link Debrief.show} renders. Missions may fill `title`/`subtitle`. */
 export interface DebriefStats {
   title?: string;
   subtitle?: string;

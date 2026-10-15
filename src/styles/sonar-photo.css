@@ -1,5 +1,5 @@
-/* D2-SONARPHOTO: sonar and photo polish.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+/* Sonar and photo polish.
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 .d2-sonar-controls {
   display: inline-flex;

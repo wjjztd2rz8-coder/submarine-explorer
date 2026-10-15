@@ -1,12 +1,12 @@
 /**
- * Vehicle materials (F1-VEHICLES).
+ * Vehicle materials.
  *
  * One small set per built vehicle, one material per "slot". `kit.ts` merges
  * every static part by slot, so the slot count is the static draw-call count.
  *
  * Readability in dark water. Below ~300 m the only light is the boat's own,
  * and it points away from the hull, so a physically lit model is a black
- * cut-out (QA-B #6). Documentary footage solves this with a light on the
+ * cut-out. Documentary footage solves this with a light on the
  * camera; the lit slots do the same in the shader:
  *
  * - a soft "camera key": a view-space light from above and behind the camera

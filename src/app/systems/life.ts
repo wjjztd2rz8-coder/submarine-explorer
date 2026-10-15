@@ -1,5 +1,5 @@
 /**
- * Marine life (F2-LIFE, docs/life.md): instanced, steering-driven animals
+ * Marine life (docs/life.md): instanced, steering-driven animals
  * around the sub from the site's spawn table in `data/life/life.json`.
  *
  *  - The animals are scan targets for the existing scanner (extra, moving

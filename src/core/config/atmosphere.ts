@@ -1,6 +1,6 @@
 /**
  * Depth bands, fog, water surface and per-tier atmosphere knobs (docs/atmosphere.md).
- * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
+ * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
 import type { GraphicsTier } from './quality.js';
@@ -71,18 +71,18 @@ export interface AtmosphereTier {
   headlightCones: boolean;
   /** Chromatic-aberration strength multiplier. */
   aberration: number;
-  /** F1-OCEAN: bloom blur levels (0 = off, 1 = one quarter-res level, 2 = adds an eighth-res level). */
+  /** Bloom blur levels (0 = off, 1 = one quarter-res level, 2 = adds an eighth-res level). */
   bloomLevels: 0 | 1 | 2;
-  /** F1-OCEAN: god-ray noise octaves in the post pass (0 = off). */
+  /** God-ray noise octaves in the post pass (0 = off). */
   rayOctaves: 0 | 1 | 2;
-  /** F1-OCEAN: MSAA samples on the scene render target (0 = none). */
+  /** MSAA samples on the scene render target (0 = none). */
   msaa: 0 | 2 | 4;
-  /** F1-OCEAN: headlight beam detail: 0 = plain cheap cone, 1 = dusty, 2 = dusty with more segments. */
+  /** Headlight beam detail: 0 = plain cheap cone, 1 = dusty, 2 = dusty with more segments. */
   beamDetail: 0 | 1 | 2;
 }
 
 export interface WaterConfig {
-  // --- superseded by `bands` (A2); kept so nothing that still reads them
+  // --- superseded by `bands`; kept so nothing that still reads them
   // --- breaks. Safe to delete once no module references them.
   /** @deprecated use {@link WaterConfig.bands}. */
   fogDensityShallow: number;
@@ -100,7 +100,7 @@ export interface WaterConfig {
   headlightDistance: number;
   headlightAngleDeg: number;
 
-  // --- A2: depth-driven atmosphere (docs/atmosphere.md) --------------------
+  // --- depth-driven atmosphere (docs/atmosphere.md) --------------------
   /** Depth-band stops, shallowest first. Must be ordered and non-empty. */
   bands: DepthBandSpec[];
   /**
@@ -173,7 +173,7 @@ export const DEFAULT_WATER: WaterConfig = {
   headlightAngleDeg: 32,
 
   // Colours, fog coefficients and band edges are verbatim from
-  // docs/art-direction.md §0. Light intensities and grades are A2's.
+  // docs/art-direction.md §0. The atmosphere owns light intensities and grades.
   bands: [
     {
       name: 'surface',
@@ -182,8 +182,8 @@ export const DEFAULT_WATER: WaterConfig = {
       fogColor: 0x5aafc4,
       fogDensity: 0.01,
       ambientColor: 0xbfe4e8,
-      // Intensities assume the post pass tone-maps and sRGB-encodes (it did
-      // not before QA-B #4, and these were ~3x hotter to compensate).
+      // Tone mapping and sRGB encoding keep these light intensities from
+      // overexposing the surface band.
       ambientIntensity: 0.9,
       // Warm sun highlight #FFE9B8 lives on the directional light.
       sunIntensity: 1.0,
@@ -302,7 +302,7 @@ export const DEFAULT_WATER: WaterConfig = {
   },
 };
 
-/** The six 990 openings whose floor disappears outside the lamps on Low. */
+/** These six openings need ambient fill so their floors remain visible on Low. */
 export const LOW_READABILITY_SITES: readonly string[] = [
   'axial-seamount-ashes',
   'bismarck',

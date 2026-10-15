@@ -24,13 +24,13 @@ function brandMark(): HTMLElement {
   return box;
 }
 
-/** Title screen; the C1 globe is mounted in `globeSlot` by the app. */
+/** Title screen; the globe is mounted in `globeSlot` by the app. */
 export class Home {
   readonly root: HTMLDivElement;
   readonly globeSlot: HTMLDivElement;
   readonly sitesSlot: HTMLDivElement;
   readonly diveButton: HTMLButtonElement;
-  /** D2-PREDIVE: the Arcade / Realistic selector with Advanced above the menu (with a settings source). */
+  /** The Arcade / Realistic selector with Advanced above the menu (with a settings source). */
   readonly modeSelector: ModeSelector | null;
   private readonly dailyCard: HTMLButtonElement;
   private readonly diveSitesButton: HTMLButtonElement;

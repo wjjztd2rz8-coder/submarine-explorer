@@ -1,22 +1,15 @@
 /**
- * Audio-owned types and a small dedicated event channel.
- *
- * Deliberately NOT added to `GameEvents` (src/core/EventBus.ts). The audio
- * system only *subscribes* to events other lanes already emit there
- * (`sub:collided`, `sub:crushWarning`, `game:ready`) rather than defining new
- * shared events, per CONTRIBUTING-AGENTS.md's "add through an existing
- * extension point rather than editing that lane's files" and to avoid
- * touching a shared file while A1/A2/A3 are also mid-flight.
- *
- * TerrainSampler supplies the standalone terrain ray-march utility; CaptionBus
- * carries accessibility cues to the caption overlay (see docs/audio.md).
+ * Audio-owned types and a dedicated event channel. Audio subscribes to shared
+ * game events without adding its own cue-specific events to GameEvents.
+ * TerrainSampler keeps ray marching independent of the world implementation;
+ * CaptionBus carries accessibility cues to the caption overlay (docs/audio.md).
  */
 
 export interface TerrainSampler {
   sampleHeight(x: number, z: number): number;
 }
 
-/** One accessibility caption for an audio cue (A4 deliverable #5). */
+/** One accessibility caption for an audio cue. */
 export interface CaptionEvent {
   /** Stable machine id, e.g. "discovery". Use for de-duplication/localisation. */
   id: string;

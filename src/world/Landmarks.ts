@@ -4,7 +4,7 @@
  * text label for every landmark whose lat/lon falls inside the current tile.
  *
  * The markers are a free-dive navigation aid and are kept deliberately quiet
- * (QA-B #1; art-direction §0 "no loot-sparkle", pillar 3 "found, not
+ * (art-direction §0 "no loot-sparkle", pillar 3 "found, not
  * signposted"):
  *   - the dot is small, depth-tested (it never pierces a wreck) and fades out
  *     as the camera arrives;

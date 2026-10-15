@@ -1,5 +1,5 @@
 /**
- * Free-dive loadout and spawn (fix S, QA-B #2 / #3). Pure TS, no DOM.
+ * Free-dive loadout and spawn. Pure TS, no DOM.
  *
  *  - {@link chooseFreeDiveHull}: the lowest hull class whose rated depth
  *    clears the tile's deepest cell by a margin, so deep tiles (Bismarck,

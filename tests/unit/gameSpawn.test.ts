@@ -1,6 +1,4 @@
-/**
- * Fix S: free-dive hull class (QA-B #2) and shallow-tile spawn (QA-B #3b).
- */
+/** Guard depth-rated free-dive hull selection and safe shallow-tile spawning. */
 
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';

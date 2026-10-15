@@ -1,4 +1,4 @@
-/** C5 caption queue (src/ui/Captions.ts): refresh-by-id, line limit, expiry. */
+/** Caption queue (src/ui/Captions.ts): refresh-by-id, line limit, expiry. */
 
 import { describe, expect, it } from 'vitest';
 import { CaptionQueue } from '../../src/ui/Captions.js';

@@ -1,5 +1,5 @@
 /**
- * Hull markings (F1-VEHICLES): hull numbers, names, depth ratings, a fictional
+ * Hull markings: hull numbers, names, depth ratings, a fictional
  * expedition flag and warning placards, painted into one canvas atlas per
  * vehicle and applied as thin planes merged into a single decal mesh.
  *

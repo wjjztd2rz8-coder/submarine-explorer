@@ -2,7 +2,7 @@
  * Shared helpers for the procedural prop builders: the built-prop shape,
  * seeded hashing / PRNG / value noise, and geometry utilities. Pure maths
  * plus three.js geometry, so everything here is testable headlessly.
- * Split out of `world/props/Procedural.ts` (F0-CORE).
+ * Split out of `world/props/Procedural.ts`.
  */
 
 import { lerp } from '../../../util/math.js';

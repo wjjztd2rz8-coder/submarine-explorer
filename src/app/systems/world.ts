@@ -43,7 +43,7 @@ export const landmarksSystem: GameSystem = {
     const { meta, config, route, scene, terrain, bus } = ctx;
     const landmarks = new Landmarks(meta, config.landmarks);
     ctx.landmarks = landmarks;
-    // QA-B #1: in a mission the POI reticle and objectives guide you; the
+    // In a mission the POI reticle and objectives guide you; the
     // free-dive markers would only clutter the wreck. Sonar blips stay.
     landmarks.setVisible(route === null);
     scene.add(landmarks.group);

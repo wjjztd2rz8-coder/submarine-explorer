@@ -102,7 +102,7 @@ test('The briefing start choice persists as the saved start position', async ({ 
   await expect(page.locator('.briefing')).toBeHidden();
   expect((await pose(page)).y).toBeGreaterThan(-20);
   await page.screenshot({ path: `${shots}/surface.png` });
-  // D2-PREDIVE: the Dive settings panel writes the setting (and so Custom).
+  // The Dive settings panel writes the setting (and so Custom).
   await boot(page, 'titanic');
   await expect(page.locator('.briefing').getByLabel('Start at surface')).toBeChecked();
   await page.evaluate(() => {

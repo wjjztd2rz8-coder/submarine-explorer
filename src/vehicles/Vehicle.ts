@@ -1,5 +1,5 @@
 /**
- * A built vehicle (F1-VEHICLES): merged static meshes plus the few moving
+ * A built vehicle: merged static meshes plus the few moving
  * parts, animated from the pilot's commands.
  *
  * - Propellers: one `InstancedMesh` for every thruster; each spins toward its

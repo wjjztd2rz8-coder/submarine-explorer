@@ -1,5 +1,5 @@
 /**
- * Asset manifest types (F0-CORE). A manifest lists what a site, screen or
+ * Asset manifest types. A manifest lists what a site, screen or
  * feature needs loaded before it looks right; `AssetService.preload()` warms
  * the caches from it. Pure data and pure helpers only, so content tools and
  * unit tests can use them without three.js loaders.

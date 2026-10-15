@@ -22,7 +22,7 @@ const build = (tier: string, entry = def) =>
     dims: entry.dimensionsM!,
     seed: hashString(entry.id),
     cfg: DEFAULT_CONFIG.props,
-    // This suite isolates the apron from the independent 850 flow-margin layer.
+    // This suite isolates the apron from the independent flow-margin layer.
     def: { ...entry, raw: { ...entry.raw, beebe_habitat: undefined } },
     tier,
     groundHeight: () => ground,

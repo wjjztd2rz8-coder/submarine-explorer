@@ -1,5 +1,5 @@
 /* D-INPUT-HUD: UI scale variables, HUD layout, control tips.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 html,
 body {

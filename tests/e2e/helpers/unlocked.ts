@@ -19,7 +19,7 @@ export const test = base.extend({
               ratings: {},
             }),
           );
-        // F3-ONBOARD: experienced pilots have finished the tutorial and seen the hints.
+        // Experienced pilots have finished the tutorial and seen the hints.
         const onboard = 'subexplorer.onboard.v1';
         if (!localStorage.getItem(onboard))
           localStorage.setItem(

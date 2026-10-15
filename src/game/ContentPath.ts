@@ -5,7 +5,7 @@
  *
  * The landmark folder defaults to the tile id; `?landmark=<id>` overrides it so
  * tests can point the Titanic tile at the `_test` fixture folder. Shared with
- * B4 (props) and B3 (missions), so keep this file tiny and dependency-free.
+ * props and missions, so keep this file tiny and dependency-free.
  */
 
 import { publicUrl } from '../util/publicUrl.js';

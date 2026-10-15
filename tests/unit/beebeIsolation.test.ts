@@ -61,7 +61,7 @@ it('850: other sites retain byte-identical biome, terrain buffers, uniforms, sha
     }
     evidence[id] = { biome: digest(JSON.stringify(biome)), tiers };
   }
-  // Pin shared spawning too; 1391 deliberately changes mission approaches while retaining free-dive frames.
+  // Pin shared spawning too, including mission approaches and free-dive frames.
   evidence.spawn = digest(
     readFileSync('src/game/Spawn.ts', 'utf8').replace(
       /  'beebe-vent-field': \{[\s\S]*?\n  \},/,
@@ -74,17 +74,23 @@ it('850: other sites retain byte-identical biome, terrain buffers, uniforms, sha
 // The additive dispatch is Beebe-only; pin the rest of the shared placement code too.
 it('keeps shared prop placement byte-identical outside the Beebe dispatch', () => {
   const source = readFileSync('src/world/Props.ts', 'utf8')
-    .replace(/    \/\/ 850: Beebe[\s\S]*?def.raw.beebe_habitat !== null\) \|\|\n/, '')
+    .replace(
+      /    \/\/ Beebe's optional cooler-flow habitat[\s\S]*?def.raw.beebe_habitat !== null\) \|\|\n/,
+      '',
+    )
     .replace(
       "import { beebeRenderedGround, beebeSeabedMaterial } from './props/geo/beebe.js';\n",
       '',
     )
     .replace(
-      /        \/\/ 930 Beebe material begin[\s\S]*?        \/\/ 930 Beebe material end\n/,
+      /        \/\/ Blend the vent foundation into the rendered seabed\.[\s\S]*?        \/\/ Other props retain their own materials\.\n/,
       '',
     )
-    .replace(/    \/\/ 850 Beebe ground begin[\s\S]*?    \/\/ 850 Beebe ground end\n/, '');
-  // 1495 adds surface-collider registration and its placement/rebuild cache.
+    .replace(
+      /    \/\/ Ground the vent habitat relative to its foundation\.[\s\S]*?    \/\/ Other props use the ordinary terrain sampler\.\n/,
+      '',
+    );
+  // Include surface-collider registration and its placement/rebuild cache.
   // Retain the exact whole-source lock against that reviewed placement baseline.
   expect(digest(source)).toBe('54531cb69b266ad15124782ab8301f594e746c5e8ede6d36cd1681de1a55db6c');
 });

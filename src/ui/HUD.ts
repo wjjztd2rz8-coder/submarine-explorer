@@ -52,7 +52,7 @@ export interface HudContext {
 }
 
 /**
- * QA-B #3c: the depth readout. Engine depth is negative below sea level; a
+ * The depth readout. Engine depth is negative below sea level; a
  * boat at the surface ceiling (-hullRadius) or above it reads SURFACED, and
  * never as a positive depth. Keeps a leading number so "N m" parsers work.
  */
@@ -63,7 +63,7 @@ export function formatDepth(depthY: number, hullRadius: number): string {
 }
 
 /**
- * QA-B #14: SEABED PROXIMITY. Two triggers:
+ * SEABED PROXIMITY. Two triggers:
  *  - static: altitude below `seabedWarnAltitudeM` (3 m above contact by
  *    default). Suppressed while a scan target is in range, because wreck
  *    inspection happens at 12-25 m altitude on purpose;
@@ -84,7 +84,7 @@ export function seabedWarning(
   return false;
 }
 
-/** The tile line: tile id + fitted hull class and rating (QA-B #2). */
+/** The tile line: tile id + fitted hull class and rating. */
 export function formatTileLine(
   meta: Pick<TileMeta, 'id' | 'cols' | 'rows'>,
   hullClass: string,

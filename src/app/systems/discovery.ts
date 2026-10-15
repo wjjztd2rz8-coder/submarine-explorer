@@ -1,5 +1,5 @@
 /**
- * Discovery (B1): POIs, scan beam, discoveries, the Journal (J) and the
+ * Discovery: POIs, scan beam, discoveries, the Journal (J) and the
  * free-dive debrief. `?landmark=` picks the content folder, `?poi=` spawns next
  * to a POI, `?debrief=1` opens the debrief after a few seconds.
  * See docs/discovery.md.
@@ -66,7 +66,7 @@ export const discoverySystem: GameSystem = {
         f.dt,
         f.pilotPosition,
         f.pilotForward,
-        ctx.missionRouter?.debriefOpen ? { ...input, scan: false } : input, // B3: no beam under the debrief
+        ctx.missionRouter?.debriefOpen ? { ...input, scan: false } : input, // No beam under the debrief
         ctx.rig.camera,
         f.clockDt,
         f.frozen || f.blocked || ctx.app.state !== 'dive' || !!ctx.missionRouter?.debriefOpen,

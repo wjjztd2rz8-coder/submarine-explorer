@@ -179,7 +179,7 @@ it.each([
         });
     }
     expect(total.draws).toBe(draws);
-    // Beebe's merged rock detail adds 660 triangles relative to f43; V-sub-scale's larger hero stack adds 820 more.
+    // Beebe's merged rock detail and larger hero stack need extra triangles.
     expect(total.triangles).toBeLessThanOrEqual(triangles);
     expect({ ...total, buffers: digest.digest('hex') }).toMatchSnapshot();
   },

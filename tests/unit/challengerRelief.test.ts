@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import { challengerSlopeTint } from '../../src/world/ChallengerRelief.js';
 
-// Pre-1310 tint at the lander's approximate world position on the measured
+// Reference tint at the lander's approximate world position on the measured
 // gentle floor. Pin the near field and upper wall independently of the shadow tuning.
 it('1310: preserves the lander floor and upper-wall exposure', () => {
   const floor = challengerSlopeTint(-468, -10926, 510, 0.9998);

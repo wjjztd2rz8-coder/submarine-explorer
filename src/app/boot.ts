@@ -64,7 +64,7 @@ export async function boot(): Promise<BootContext | null> {
   const lastSite = readLastSite();
   const shellBaseHref = (): string => shellUrl(window.location.href, params);
   const loader = new TileLoader();
-  // B3: `?mission=<id>` (docs/missions.md) names the tile and the content
+  // `?mission=<id>` (docs/missions.md) names the tile and the content
   // folder; without it (or if its mission.json is missing) this is the free dive.
   const [index, initialRoute, progress] = await Promise.all([
     loader.loadIndex(),
@@ -84,11 +84,11 @@ export async function boot(): Promise<BootContext | null> {
   }
   const requested = route?.tileId ?? params.get('tile');
   const tileId = chooseTileId(requested, index, config.defaultTileId);
-  // C5: saved settings (docs/settings.md). The saved graphics tier applies
+  // Saved settings (docs/settings.md). The saved graphics tier applies
   // unless `?tier=` is given; terrain detail is read once, when the terrain is built.
   const effective = resolveEffective(settings, settings.gameplayMode, daily, config);
   const debugTerrain = params.get('debugTerrain') === '1';
-  // A2: `?depth=300` spawns the boat 300 m down (clamped above the seabed),
+  // `?depth=300` spawns the boat 300 m down (clamped above the seabed),
   // for the depth-band screenshots in docs/atmosphere.md.
   const depthParam = Number(params.get('depth'));
   const spawnDepth = Number.isFinite(depthParam) && depthParam > 0 ? depthParam : null;

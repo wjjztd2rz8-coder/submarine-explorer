@@ -1,5 +1,5 @@
 /**
- * Mission flow core (B3, D-FLOW): the `mission.json` schema
+ * Mission flow core (D-FLOW): the `mission.json` schema
  * (plan/PHASE-B-CONTRACTS.md §2.4), its validator/loader, the
  * `data/landmarks/index.json` manifest, and the {@link Mission} state machine
  * that turns `scan:complete` events into objective progress. Finishing the

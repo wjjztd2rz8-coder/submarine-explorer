@@ -1,11 +1,11 @@
 /**
  * Environment presets by landmark type (docs/presets.md).
- * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
+ * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
 import type { GraphicsTier } from './quality.js';
 
-// --- C3: environment presets (docs/presets.md) ------------------------------
+// --- environment presets (docs/presets.md) ------------------------------
 /** Environment preset names (plan/PHASE-C-CONTRACTS.md §1). */
 export type EnvPresetName =
   'vent' | 'brine' | 'canyon' | 'reef' | 'trench' | 'wreck' | 'seamount' | 'default';
@@ -221,7 +221,7 @@ export interface PresetsConfig {
   seamount: SeamountPresetConfig;
 }
 
-// C3: environment presets. See docs/presets.md for what each key does.
+// Environment presets. See docs/presets.md for what each key does.
 export const DEFAULT_PRESETS: PresetsConfig = {
   maxCurrentMps: 0.8,
   currentCouplingPerS: 0.5,

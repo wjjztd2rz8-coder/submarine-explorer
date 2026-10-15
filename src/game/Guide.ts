@@ -1,6 +1,6 @@
 /**
  * Field-guide content: `data/landmarks/<landmark>/guide.json`
- * (plan/PHASE-B-CONTRACTS.md §2.2). B2 authors it; the {@link FieldGuide}
+ * (plan/PHASE-B-CONTRACTS.md §2.2). Content packs author it; the {@link FieldGuide}
  * overlay renders it. Untrusted and optional, like every content file.
  */
 
@@ -39,7 +39,7 @@ export interface GuideEntry {
 export interface GuideDoc {
   version: number;
   landmark: string;
-  /** Optional display name for the site (B1 extension; unknown keys are ignored elsewhere). */
+  /** Optional display name for the site; unknown keys are ignored elsewhere. */
   title?: string;
   memorial_note?: string;
   entries: GuideEntry[];

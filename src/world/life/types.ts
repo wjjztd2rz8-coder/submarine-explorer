@@ -1,5 +1,5 @@
 /**
- * F2-LIFE shared types: species definitions, archetypes and the numbers the
+ * Shared types: species definitions, archetypes and the numbers the
  * simulation and the renderer both read. Pure data, no Three.js.
  */
 

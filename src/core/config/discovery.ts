@@ -1,6 +1,6 @@
 /**
- * Free-dive landmarks and the B1 scan / discovery loop (docs/discovery.md).
- * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
+ * Free-dive landmarks and the scan / discovery loop (docs/discovery.md).
+ * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
 /**
@@ -28,7 +28,7 @@ export interface LandmarksConfig {
   labelFadeM: [number, number];
 }
 
-// --- B1: scan & discovery (docs/discovery.md) ------------------------------
+// --- scan & discovery (docs/discovery.md) ------------------------------
 export interface ScanConfig {
   /** Seconds of continuous beam time to scan a POI that has no `scan_seconds`. */
   defaultSeconds: number;
@@ -80,7 +80,7 @@ export const DEFAULT_LANDMARKS: LandmarksConfig = {
   labelFadeM: [250, 500],
 };
 
-// B1: scan & discovery. See docs/discovery.md.
+// Scan & discovery. See docs/discovery.md.
 export const DEFAULT_SCAN: ScanConfig = {
   defaultSeconds: 4, // the master plan's "hold the beam 3-5 s"
   defaultRadiusM: 150,

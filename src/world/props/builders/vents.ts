@@ -1,7 +1,7 @@
 /**
  * Vent builders: `procedural:chimney`, a knobbly tapered rock column with
  * height dimensions_m[2] and a palette from material_hint (basalt | carbonate
- * | sulfide). Split out of `world/props/Procedural.ts` (F0-CORE); owned by the
+ * | sulfide). Split out of `world/props/Procedural.ts`; owned by the
  * vents / reefs / geology package.
  */
 

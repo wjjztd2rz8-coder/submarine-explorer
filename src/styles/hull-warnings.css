@@ -1,5 +1,5 @@
-/* fix S (QA-B, QA-C): warning placement next to the objectives panel, aborted debrief.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+/* Place hull warnings next to objectives, including the aborted debrief.
+   The @import order in src/styles.css is the cascade order. */
 
 /* "Dive aborted" debrief: amber kicker/title, the memorial-quiet tone kept. */
 .mission-debrief.is-aborted .debrief-kicker,

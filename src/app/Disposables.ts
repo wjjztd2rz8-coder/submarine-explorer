@@ -1,5 +1,5 @@
 /**
- * Teardown bookkeeping for systems (F1-FIXES, F0-CORE audit finding 3). A
+ * Teardown bookkeeping for systems. A
  * system registers its window/DOM listeners, bus and save subscriptions
  * through one of these in `init`, and calls `dispose()` from its own
  * `dispose()` so an in-page restart does not stack a second set on top.

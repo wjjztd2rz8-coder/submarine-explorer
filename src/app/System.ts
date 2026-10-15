@@ -1,5 +1,5 @@
 /**
- * The game-system contract (F0-CORE).
+ * The game-system contract.
  *
  * Startup initializes the Home or dive capabilities in list order, then runs
  * their frame loop. A system is a small object:
@@ -27,7 +27,7 @@ import type { GameContext } from './context.js';
 
 /**
  * The frame, in order. Each comment names the systems that use the stage
- * today; the order is the pre-F0 `main.ts` frame order, step for step.
+ * today; the order is the original `main.ts` frame order, step for step.
  */
 export const FRAME_STAGES = [
   'gate.shell', // shell: frozen by the app state, briefing, globe, settings, journal

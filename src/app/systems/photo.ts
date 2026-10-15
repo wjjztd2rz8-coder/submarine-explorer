@@ -22,7 +22,7 @@ export function createPhotoSystem(): GameSystem {
   const cleanup = new Disposables();
   let photoCaptureRequested = false;
   let photoPoi: PlacedPoi | null = null;
-  /** F2-LIFE: the animal in frame when no POI is (an `id` of the form `life:<species>`). */
+  /** The animal in frame when no POI is (an `id` of the form `life:<species>`). */
   let photoAnimal: { id: string; name: string } | null = null;
   let lastCaptureMs = -Infinity;
   /** A first scan waiting for the next draw to be read as its Journal still. */

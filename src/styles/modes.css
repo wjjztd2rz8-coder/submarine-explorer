@@ -1,5 +1,5 @@
 /* D-MODES: gameplay mode controls.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 .settings-section:has([data-gameplay]) {
   display: grid;
@@ -25,7 +25,7 @@
   }
 }
 
-/* F2-MODES: the same compact control and accessible disclosure everywhere. */
+/* The same compact control and accessible disclosure everywhere. */
 .mode-selector .mode-seg {
   min-height: 44px;
   box-sizing: border-box;

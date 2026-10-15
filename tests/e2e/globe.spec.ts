@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from './helpers/unlocked.js';
 
 /**
- * C1 globe mission select (docs/globe.md) and the field guide SPECIES tab:
+ * Globe mission select (docs/globe.md) and the field guide SPECIES tab:
  *  (a) `?globe=1` opens the globe with a loaded texture and pins; content
  *      packs with a mission.json are mission pins; the game is frozen and
  *      keys do not reach it; retired O/N shortcuts do nothing; Tab focuses a

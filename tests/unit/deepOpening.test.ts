@@ -72,7 +72,7 @@ describe('Challenger / Endurance opening', () => {
           expect(pose).not.toBeNull();
           const position = new Vector3(pose.x, pose.y, pose.z);
           if (site === 'challenger-deep') {
-            // 1310: include the enlarged rocks in actual GMRT opening sightlines.
+            // Include the enlarged rocks in actual GMRT opening sightlines.
             // Only Scatter needs a document sentinel to build headless instance buffers.
             vi.stubGlobal('document', {});
             const normal = new Vector3();

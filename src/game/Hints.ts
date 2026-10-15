@@ -1,5 +1,5 @@
 /**
- * Contextual hints (F3-ONBOARD): one-line tips that appear once each, at most
+ * Contextual hints: one-line tips that appear once each, at most
  * one per `minGapS` seconds. Pure logic: the onboarding system feeds a
  * {@link HintContext} every frame and shows whatever `update` returns.
  */

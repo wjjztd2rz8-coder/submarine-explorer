@@ -1,5 +1,5 @@
 /* D-SONAR: expanded sonar map, zoom controls and legend.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 .d-sonar-backdrop {
   position: fixed;

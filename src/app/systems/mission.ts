@@ -1,7 +1,7 @@
 /**
- * Missions (B3, docs/missions.md): the briefing (freezes the game until "Begin
+ * Missions (docs/missions.md): the briefing (freezes the game until "Begin
  * dive" / Enter), objectives panel, completion and the mission debrief.
- * `?skipBriefing=1` starts immediately. D-START / D2-PREDIVE: the briefing's
+ * `?skipBriefing=1` starts immediately. D-START / the briefing's
  * Dive settings edit the saved gameplay options, and while the card is up the
  * sub already sits where the dive will start.
  */
@@ -46,7 +46,7 @@ export const missionSystem: GameSystem = {
     let lastStart: typeof sub.position | null = null;
     let lastChoice: MissionStartPosition = ctx.effective.gameplay.startPosition;
     const originalScanRadii = new Map<string, number>();
-    // D2-PREDIVE: also used to preview the start behind the briefing, so Begin
+    // Also used to preview the start behind the briefing, so Begin
     // resolves the same pose and the dive starts without a teleport.
     const applyMissionStart = (choice: MissionStartPosition): void => {
       if (!route || params.has('poi') || params.has('at') || params.has('depth')) return;
@@ -175,7 +175,7 @@ export const missionSystem: GameSystem = {
       }),
     );
 
-    // D2-PREDIVE: Dive settings on the briefing card.
+    // Dive settings on the briefing card.
     const briefing = missionRouter?.briefing ?? null;
     if (briefing) {
       const previewStart = (choice: MissionStartPosition): void => {

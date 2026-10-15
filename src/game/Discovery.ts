@@ -1,5 +1,5 @@
 /**
- * B1 wiring: loads a landmark's POIs + guide, runs the {@link Scanner},
+ * Wiring: loads a landmark's POIs + guide, runs the {@link Scanner},
  * persists to the {@link DiscoveryStore}, feeds {@link Objectives} and
  * {@link SessionStats}, and drives the three DOM overlays. main.ts only
  * constructs this and calls `update()` once per frame (docs/discovery.md).
@@ -226,7 +226,7 @@ export class Discovery {
   }
 
   /**
-   * The POI the chase camera should keep clear of the hull (QA-B #6): the
+   * The POI the chase camera should keep clear of the hull: the
    * nearest target while it is inside its scan radius, else null. The
    * returned vector is the POI's own; do not mutate it.
    */
@@ -241,7 +241,7 @@ export class Discovery {
    * @param simDt simulated seconds this frame (fixed steps x fixed delta)
    * @param realDt real frame delta, for UI animation
    * @param clockDt real seconds of unfrozen play, for the debrief's DIVE TIME
-   *   (QA-B #10); defaults to `simDt`
+   *  ; defaults to `simDt`
    */
   update(
     simDt: number,
@@ -282,7 +282,7 @@ export class Discovery {
     this.overlay.update(this.scanner.view, keys, screen, realDt);
   }
 
-  /** Open the debrief with this session's stats. B3 passes a title/subtitle. */
+  /** Open the debrief with this session's stats and an optional mission title/subtitle. */
   showDebrief(extra: Partial<DebriefStats> = {}, onEscape?: (() => void) | null): DebriefStats {
     const stats = this.stats.snapshot({ landmarkName: this.guideTitle(), ...extra });
     this.overlay.setSuppressed(true);

@@ -1,5 +1,5 @@
 /**
- * Game mode segmented control (D2-PREDIVE, playtest #3): Arcade / Realistic
+ * Game mode segmented control: Arcade / Realistic
  * as two radio segments with Custom options in Advanced. A one-line description shows the current
  * mode. The same control appears on the home screen, in the briefing's Dive
  * settings and at the top of Settings > Gameplay; each instance reads and

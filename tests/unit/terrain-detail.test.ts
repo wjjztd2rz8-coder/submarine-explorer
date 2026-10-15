@@ -1,7 +1,4 @@
-/**
- * The procedural detail layer, chunk LOD and frustum bookkeeping added in A1.
- * See docs/terrain.md.
- */
+/** Procedural detail, chunk LOD and frustum bookkeeping; see docs/terrain.md. */
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';

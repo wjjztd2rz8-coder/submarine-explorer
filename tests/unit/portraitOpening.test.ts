@@ -14,7 +14,7 @@ const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 const rect = (x: number, y: number, width: number, height: number) =>
   new Box2(new Vector2(x, y), new Vector2(x + width, y + height));
 
-// Envelopes from the external 610 DOM dumps at 390×844, with the contact
+// Envelopes from external DOM dumps at 390×844, with the contact
 // stack now below telemetry in that same right column. Browser specs retain
 // their exact live-rectangle assertions; these are headless framing guards.
 const obstacles = [

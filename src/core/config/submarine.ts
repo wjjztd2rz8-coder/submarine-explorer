@@ -1,6 +1,6 @@
 /**
  * Submarine physics, hull classes and failure thresholds.
- * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
+ * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
 export interface SubmarineConfig {
@@ -43,7 +43,7 @@ export interface SubmarineConfig {
   /** Fraction of speed retained after scraping the bottom. */
   collisionSpeedPenalty: number;
 
-  // --- A3: feel ------------------------------------------------------------
+  // --- feel ------------------------------------------------------------
   /**
    * Throttle response curve exponent. `effective = sign(t) * |t|^n`. n > 1 gives
    * fine control near centre (station-keeping) while still reaching full thrust.
@@ -79,7 +79,7 @@ export interface SubmarineConfig {
    */
   trimStrength: number;
 
-  // --- A3: hull integrity --------------------------------------------------
+  // --- hull integrity --------------------------------------------------
   /** Which entry of {@link hullClasses} is fitted. Sets the crush depth. */
   hullClass: string;
   hullClasses: Record<string, HullClass>;
@@ -90,34 +90,34 @@ export interface SubmarineConfig {
   /** Hull stress below which no event is emitted (noise gate). */
   hullStressEventThreshold: number;
 
-  // --- A3: emergency blow --------------------------------------------------
+  // --- emergency blow --------------------------------------------------
   /** Upward acceleration during an emergency blow (m/s^2). */
   emergencyBlowAccel: number;
   /** Seconds the pilot's controls stay locked out during the blow. */
   emergencyBlowLockSeconds: number;
 
-  // --- A3: sim speed -------------------------------------------------------
+  // --- sim speed -------------------------------------------------------
   /** Selectable sim-speed multipliers. Must be positive integers. */
   simSpeeds: number[];
   /** Index into {@link simSpeeds} used at spawn. */
   defaultSimSpeedIndex: number;
 
-  // --- fix S (QA-B) --------------------------------------------------------
+  // --- Hull and navigation safeguards --------------------------------------
   /**
-   * QA-B #15. When false (the default) the yaw/pitch *input* is divided by the
+   * When false (the default) the yaw/pitch *input* is divided by the
    * sim-speed multiplier inside each physics tick, so the boat turns at its 1x
    * real-time rate while translation still runs 2x/3x. True restores the
    * Phase A behaviour (turn rate scales with sim speed too).
    */
   simSpeedScalesTurnRate: boolean;
   /**
-   * QA-B #2. Free dive fits the lowest hull class whose rated depth clears the
+   * Free dive fits the lowest hull class whose rated depth clears the
    * tile's deepest cell (`meta.min_m`) by this many metres. Soft: if no class
    * clears it, the deepest class is fitted and the HUD says the margin is thin.
    */
   freeDiveHullMarginM: number;
   /**
-   * QA-B #14. The HUD's SEABED PROXIMITY banner: shown below this altitude
+   * The HUD's SEABED PROXIMITY banner: shown below this altitude
    * (hull centre above the seabed; contact is at hullRadius + seabedClearance).
    */
   seabedWarnAltitudeM: number;
@@ -128,7 +128,7 @@ export interface SubmarineConfig {
    */
   seabedWarnTimeToContactS: number;
   seabedApproachAltitudeM: number;
-  /** QA-B #6. Hull look below 300 m: a faint fresnel rim and an ambient floor. */
+  /** Hull look below 300 m: a faint fresnel rim and an ambient floor. */
   hullRimColor: number;
   hullRimStrength: number;
   hullEmissive: number;

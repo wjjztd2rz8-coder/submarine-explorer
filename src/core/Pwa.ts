@@ -1,5 +1,5 @@
 /**
- * PWA service-worker registration (F1-TOUCH). Production builds only, and
+ * PWA service-worker registration. Production builds only, and
  * never under automation (`navigator.webdriver`), so the e2e suites keep
  * talking to the network. The worker lives at `<base>sw.js` (`public/sw.js`,
  * stamped by `tools/pwaPlugin.ts`), which puts its scope at the Vite base,

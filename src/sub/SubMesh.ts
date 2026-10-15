@@ -1,5 +1,5 @@
 /**
- * The player's submarine model (F1-VEHICLES): a detailed procedural
+ * The player's submarine model: a detailed procedural
  * deep-submergence vehicle from `src/vehicles/`, one of three hull classes,
  * plus the cockpit viewport shown in the first-person view.
  *
@@ -37,7 +37,7 @@ export interface SubMeshOptions {
   tier?: string;
   cosmetics?: CosmeticSelection;
   /**
-   * QA-B #6: below ~300 m the only light is the boat's own, which points
+   * Below ~300 m the only light is the boat's own, which points
    * away from the hull, so the model rendered as a pure black cut-out. A
    * faint view-dependent (fresnel) rim plus a small emissive floor keeps its
    * outline readable without making it glow. `Config.submarine.hullRim*`.

@@ -1,8 +1,4 @@
-/**
- * F2 (QA-A #1): the sonar canvas takes the tile's aspect, so the map fills it
- * with no transparent letterbox, and world positions still land on the right
- * pixels. Pure helpers; the canvas itself is covered by tests/e2e/mission.spec.ts.
- */
+/** The sonar follows tile aspect to prevent letterboxing and preserve map coordinates. */
 
 import { describe, expect, it } from 'vitest';
 import {

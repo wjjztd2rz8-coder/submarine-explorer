@@ -1,5 +1,5 @@
-/* B3: mission briefing, objectives panel, mission-select MISSIONS section.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+/* Mission briefing, objectives panel, mission-select MISSIONS section.
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 /* Mission briefing, objectives panel, mission-select MISSIONS section.
    docs/art-direction.md §0: monospace, 1px hairlines, flat translucent
@@ -225,7 +225,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  /* QA-C #2: flex items don't shrink below their content size by default,
+  /* Flex items don't shrink below their content size by default,
      so the ellipsis above never kicked in; min-width: 0 lets it shrink. */
   min-width: 0;
   flex: 1 1 auto;
@@ -341,7 +341,7 @@
   opacity: 0.5;
 }
 
-/* The mission debrief is not B1's, so B1 does not hide its scan HUD for it. */
+/* The mission debrief must hide the scan HUD independently of discovery. */
 body:has(.mission-debrief:not([hidden])) .scan-overlay,
 body:has(.mission-debrief:not([hidden])) .guidance-slot {
   visibility: hidden;

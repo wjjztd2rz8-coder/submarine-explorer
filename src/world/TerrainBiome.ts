@@ -281,7 +281,7 @@ export const BIOMES: Record<string, Biome> = {
     burrow: 0.22,
     contrast: 0.7,
     detail: 0.75,
-    // Reuse 780's fog-after-output seabed fade; no extra draw or texture fetch.
+    // Reuse the fog-after-output seabed fade; no extra draw or texture fetch.
     abyssFadeM: [300, 1100],
     scatter: [
       { kind: 'pillow', density: 2.6, slopeMaxDeg: 35, on: 'any' },

@@ -1,5 +1,5 @@
 /**
- * Vehicles (F1-VEHICLES): public entry point.
+ * Vehicles: public entry point.
  *
  *     const v = buildVehicle('B', 'high');
  *     scene.add(v.root);

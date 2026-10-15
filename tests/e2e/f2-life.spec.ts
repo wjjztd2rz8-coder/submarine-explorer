@@ -6,7 +6,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 
 /**
- * F2-LIFE: animals spawn from the site's table, stay inside the draw-call
+ * Animals spawn from the site's table, stay inside the draw-call
  * budget, can be scanned (a first scan logs a Journal wildlife entry and a
  * photo names them), and never touch the objectives.
  */

@@ -24,7 +24,7 @@ for (const site of ['great-blue-hole', 'lost-city']) {
         }
         if (tier === 'medium') {
           for (const count of s.counts) {
-            // Same strict ceiling/reserve as 810, over all golden poses and ±2 m drift.
+            // Keep the strict ceiling and reserve over all golden poses and ±2 m drift.
             // Sub, swimming life, scatter and effects are not in this CPU census.
             expect(
               count.triangles + 200_000,

@@ -113,7 +113,7 @@ export interface JournalEntry {
   linkedEntryIds: string[];
   /** A POI entry for a recreated object (`reconstruction: true` in pois.json). */
   recreation: boolean;
-  /** Wildlife only: the animal and its Journal text (F2-LIFE). */
+  /** Wildlife only: the animal and its Journal text. */
   life?: { def: SpeciesDef; info: LifeJournalEntry; rare: boolean };
 }
 
@@ -420,7 +420,7 @@ export function siteProgress(site: JournalSite, store: DiscoveryReader): SitePro
   return out;
 }
 
-/** Animals scanned / animals the site can show (F2-LIFE). */
+/** Animals scanned / animals the site can show. */
 export function wildlifeProgress(
   site: JournalSite,
   store: DiscoveryReader,

@@ -25,11 +25,10 @@ export function createSubmarineSystem(): GameSystem {
       const { config, terrain, meta, route, params, spawnDepth, scene } = ctx;
       const sub = new Submarine(ctx.effective.submarine, terrain);
       ctx.sub = sub;
-      // fix S: free-dive spawn (QA-B #3): over the tile centre, or the nearest
+      // Free-dive spawn: over the tile centre, or the nearest
       // cell at least `minSpawnSeabedM` deep if the centre is a reef flat /
       // caldera rim; `?depth=` clamped between the surface and the seabed. Free
-      // dive also fits the lowest hull class rated for the tile's deepest cell
-      // (QA-B #2).
+      // dive also fits the lowest hull class rated for the tile's deepest cell.
       // The loaded dive keeps its depth-fitted hull, including briefing and restarts.
       const targetDepth = route?.def.briefing.depth_m ?? Math.abs(meta.min_m);
       const hullClass = ctx.progress.hullFor(targetDepth);
@@ -50,7 +49,7 @@ export function createSubmarineSystem(): GameSystem {
             meta.min_m,
             config.submarine.freeDiveHullMarginM,
           );
-      // B3: mission surface start + hull class + sim speed. `?poi=` / `?at=`
+      // Mission surface start + hull class + sim speed. `?poi=` / `?at=`
       // later still override the pose (tests rely on them).
       if (route) {
         const pose = applyMissionLoadout(
@@ -86,11 +85,11 @@ export function createSubmarineSystem(): GameSystem {
 
       const subMesh = new SubMesh({
         length: 26,
-        // F1-VEHICLES: the fitted hull class picks the model; the tier its detail.
+        // The fitted hull class picks the model; the tier its detail.
         hullClass: sub.getState().hullClass,
         cosmetics: ctx.progress.cosmetics,
         tier: ctx.tier,
-        // fix S (QA-B #6): faint rim + ambient floor so the hull reads below 300 m.
+        // A faint rim and ambient floor keep the hull readable below 300 m.
         rimColor: config.submarine.hullRimColor,
         rimStrength: config.submarine.hullRimStrength,
         emissive: config.submarine.hullEmissive,
@@ -115,7 +114,7 @@ export function createSubmarineSystem(): GameSystem {
         f.sub = s;
         if (s.touchedBottom) bus.emit('sub:collided', { depth: s.depth, speed: s.impactSpeed });
         if (s.crushWarning) bus.emit('sub:crushWarning', { depth: s.depth, ratio: s.crushRatio });
-        // A3: hull stress + emergency blow, for audio (A4), HUD and mission
+        // Hull stress and emergency blow feed audio, HUD and mission
         // restart. Only on a meaningful change, so a long pressure hold is not
         // a per-frame event storm for the audio bus.
         if (

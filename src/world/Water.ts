@@ -1,14 +1,14 @@
 /**
  * Sea surface lid, seen from below.
  *
- * A2 moved fog, ambient/sun lighting and the caustic projector into
+ * Fog, ambient/sun lighting and the caustic projector live in
  * `render/Atmosphere.ts` and the headlights into `render/Headlights.ts`. What is
  * left here is only the surface plane: a finite, camera-following disc at y = 0
  * with a gentle vertex wobble, drawn only while the camera is shallower than
  * `WaterConfig.surfaceVisibleAboveM` (there is nothing to see from the abyss
  * and it saves a draw call).
  *
- * F1-OCEAN: the lid now follows the optics. From below, light from the sky
+ * The lid follows underwater optics. From below, light from the sky
  * only gets in through Snell's window, a ~97 degree cone straight overhead
  * whose rim is bright and rippled; outside it the surface is a mirror of the
  * water itself (total internal reflection), which we draw as the fog colour so

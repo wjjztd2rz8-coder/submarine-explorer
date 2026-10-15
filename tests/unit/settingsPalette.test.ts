@@ -1,5 +1,5 @@
 /**
- * C5 sonar palettes (Config.sonarPalettes): depth order must read without hue,
+ * Sonar palettes (Config.sonarPalettes): depth order must read without hue,
  * so relative luminance rises along every palette's stops.
  */
 

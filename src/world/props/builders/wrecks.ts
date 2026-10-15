@@ -3,7 +3,7 @@
  * [length, width, height], length along local -Z), plus the rusted steel
  * palette and detail texture it shares with debris (`debris.ts`,
  * docs/art-direction.md §4).
- * Split out of `world/props/Procedural.ts` (F0-CORE); owned by the wrecks package.
+ * Split out of `world/props/Procedural.ts`; owned by the wrecks package.
  */
 
 import * as THREE from 'three';

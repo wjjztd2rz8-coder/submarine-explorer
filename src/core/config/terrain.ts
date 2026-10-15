@@ -1,6 +1,6 @@
 /**
  * Terrain mesh, procedural detail, LOD and seabed material (docs/terrain.md).
- * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
+ * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
 import type { GraphicsTier } from './quality.js';
@@ -13,11 +13,11 @@ export interface TerrainTier {
   detailOctaves: number;
   /** Edge length (px) of the seabed albedo maps as shipped; informational. */
   textureSize: number;
-  /** Load the packed normal/roughness maps and evaluate texture normals (F1-TERRAIN). */
+  /** Load the packed normal/roughness maps and evaluate texture normals. */
   pbrNormals: boolean;
   /** Blend a second, larger sample of the primary slot in so the repeat never reads. */
   textureBreakup: boolean;
-  /** Instanced scatter density multiplier, 0 = none (F1-TERRAIN). */
+  /** Instanced scatter density multiplier, 0 = none. */
   scatterDensity: number;
   /** Scatter streaming radius around the camera, metres. */
   scatterRangeM: number;
@@ -164,7 +164,7 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
    * ~200 m, sediment #7A6E5C below it, drifting slightly greyer on the
    * abyssal plain. Hue comes from here and from the lights; keep every stop
    * low-saturation -- a green or teal stop multiplied by the cyan water light
-   * is what turned the shallow tiles neon (QA-B #4).
+   * is what turned the shallow tiles neon.
    */
   colorRamp: [
     { depth: -6000, color: 0x6f6a62 },

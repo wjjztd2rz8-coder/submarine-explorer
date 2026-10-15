@@ -2,8 +2,8 @@ import { expect, test, type Page } from './helpers/unlocked.js';
 import { processedFrames } from './helpers/hudTips.js';
 
 /**
- * A3 playtest harness: drives the *real* game with scripted key presses and
- * asserts the handling checks listed in `docs/playtest-A3.md`.
+ * The playtest harness: drives the *real* game with scripted key presses and
+ * asserts the handling checks for submarine handling.
  *
  * It reads state through `window.__game`, which main.ts already exposes for
  * debugging, so nothing test-only leaks into the shipped engine. Physics is
@@ -173,7 +173,7 @@ test.describe('A3 submarine feel', () => {
     expect(consoleErrors, consoleErrors.join(' | ')).toEqual([]);
   });
 
-  // B3 / F1: the hull and chase camera were mirrored across the N-S axis.
+  // The hull and chase camera must agree on east/west at every heading.
   test('after turning to ~090 the chase camera sits west of the boat, behind it', async ({
     page,
   }) => {

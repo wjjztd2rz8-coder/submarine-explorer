@@ -1,5 +1,5 @@
 /**
- * The `GameConfig` contract (F0-CORE): one field per tuning domain. Each
+ * The `GameConfig` contract: one field per tuning domain. Each
  * domain's own types and defaults live beside this file (`submarine.ts`,
  * `terrain.ts`, `atmosphere.ts`, …); `core/Config.ts` assembles the defaults
  * and stays the import path for everything (`makeConfig`, `DEFAULT_CONFIG`,
@@ -48,27 +48,27 @@ export interface GameConfig {
   audio: AudioConfig;
   /** Free-dive landmark markers and labels. */
   landmarks: LandmarksConfig;
-  /** B1: scan beam, discovery and debrief tunables. */
+  /** Scan beam, discovery and debrief tunables. */
   scan: ScanConfig;
-  /** B4: placed props (wrecks, rocks, chimneys). */
+  /** Placed props (wrecks, rocks, chimneys). */
   props: PropsConfig;
-  /** B3: mission flow. */
+  /** Mission flow. */
   mission: MissionConfig;
-  /** C5: settings screen defaults and ranges (docs/settings.md). */
+  /** Settings screen defaults and ranges (docs/settings.md). */
   settings: SettingsConfig;
   speedProfiles: Record<'research' | 'fast', SpeedProfile>;
   lightPresets: Record<'realistic' | 'enhanced', LightPreset>;
   sensorPresets: Record<'realistic' | 'extended', SensorPreset>;
   power: PowerConfig;
   currents: CurrentsConfig;
-  /** C5: sonar minimap palettes (`Sonar.setPalette`). */
+  /** Sonar minimap palettes (`Sonar.setPalette`). */
   sonarPalettes: Record<SonarPaletteName, SonarPalette>;
   sonarZoom: SonarZoomConfig;
-  /** C1: globe mission select. */
+  /** Globe mission select. */
   globe: GlobeConfig;
   physicsHz: number;
-  /** C3: environment presets by landmark type (docs/presets.md). */
+  /** Environment presets by landmark type (docs/presets.md). */
   presets: PresetsConfig;
-  /** F0-CORE: per-tier pixel-ratio caps and dynamic resolution. */
+  /** Per-tier pixel-ratio caps and dynamic resolution. */
   quality: QualityConfig;
 }

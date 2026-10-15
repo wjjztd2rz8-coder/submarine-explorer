@@ -283,7 +283,7 @@ export class Submarine {
     // Spinning up uses `*Accel`; coasting back to zero once the stick is
     // centred uses `*Damping`, so "how fast it responds" and "how long it
     // carries" are separately tunable.
-    // QA-B #15: at 2x/3x this tick runs 2-3 times per frame, so scale the
+    // At 2x/3x this tick runs 2-3 times per frame, so scale the
     // stick down by the multiplier and the boat still turns at its 1x real
     // rate (translation keeps the full speed-up). `simSpeedScalesTurnRate`
     // restores the Phase A behaviour.
@@ -361,7 +361,7 @@ export class Submarine {
     this.position.addScaledVector(v, dt);
 
     // --- constraints --------------------------------------------------------
-    // Seabed first, surface last (QA-B #3): the surface clamp used to run
+    // Seabed first, surface last: the surface clamp used to run
     // first, so in water shallower than ~20 m the push-out then lifted the
     // hull clean out of the sea. The floor is relaxed in shallow water (see
     // floorFor), and the surface ceiling never pushes the hull into rock.

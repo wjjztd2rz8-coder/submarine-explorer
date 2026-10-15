@@ -1,5 +1,5 @@
 /**
- * Procedural surface textures for the vehicles (F1-VEHICLES).
+ * Procedural surface textures for the vehicles.
  *
  * Everything here is generated into `DataTexture`s from a seeded noise, so it
  * needs no canvas, no download and no attribution, and it runs unchanged in

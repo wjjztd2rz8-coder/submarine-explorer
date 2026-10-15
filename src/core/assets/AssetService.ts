@@ -1,5 +1,5 @@
 /**
- * Asset service (F0-CORE): one place that owns the three.js loaders and their
+ * Asset service: one place that owns the three.js loaders and their
  * caches, so every package loads models and textures the same way. Import it
  * from `core/assets/index.js`; the manifest types live in `manifest.ts`.
  *

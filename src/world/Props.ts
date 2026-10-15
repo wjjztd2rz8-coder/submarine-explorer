@@ -98,7 +98,7 @@ export function followsTerrain(def: PropDef): boolean {
   return (
     def.procedural === 'debris' ||
     def.feature !== null ||
-    // 850: Beebe's optional cooler-flow habitat uses a centre-relative ground sampler.
+    // Beebe's optional cooler-flow habitat uses a centre-relative ground sampler.
     // Footprint snapping would sink these plain chimneys as their decoration bounds grow.
     (['beebe-chimney-1', 'beebe-chimney-2', 'beebe-chimney-3'].includes(def.id) &&
       typeof def.raw.beebe_habitat === 'object' &&
@@ -272,11 +272,11 @@ export class Props {
         cfg: this.cfg,
         tier: this.tier,
         groundHeight: () => this.debrisHeightFn(def),
-        // 930 Beebe material begin
+        // Blend the vent foundation into the rendered seabed.
         ...(def.id === 'beebe-chimney-1' && def.feature === 'smoker-cluster'
           ? { seabedMaterial: beebeSeabedMaterial(this.hf) }
           : {}),
-        // 930 Beebe material end
+        // Other props retain their own materials.
       });
     }
     // A GLB model.
@@ -308,7 +308,7 @@ export class Props {
     const q = headingQuaternion(def.headingDeg);
     const [sx, sy, sz] = def.scale;
     const v = new THREE.Vector3();
-    // 850 Beebe ground begin
+    // Ground the vent habitat relative to its foundation.
     if (
       ['beebe-chimney-1', 'beebe-chimney-2', 'beebe-chimney-3'].includes(def.id) &&
       def.feature === null &&
@@ -320,7 +320,7 @@ export class Props {
         return (sample(x + v.x, z + v.z) + def.yOffsetM - originY) / sy;
       };
     }
-    // 850 Beebe ground end
+    // Other props use the ordinary terrain sampler.
     return (lx, lz) => {
       v.set(lx * sx, 0, lz * sz).applyQuaternion(q);
       return (this.hf.sampleHeight(x + v.x, z + v.z) + def.yOffsetM - originY) / sy;

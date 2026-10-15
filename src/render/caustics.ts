@@ -9,7 +9,7 @@
  * and a couple of hundred milliseconds to generate; the medium tier uses ten
  * 128 px frames.
  *
- * F1-OCEAN: the pattern is now a two-layer animated Voronoi web. The cell
+ * The pattern is a two-layer animated Voronoi web. The cell
  * borders (where the gap between the nearest and second-nearest feature point
  * closes) are the bright filaments, which is what focused light on a rippled
  * surface looks like. The earlier interference formula rendered a flat texture

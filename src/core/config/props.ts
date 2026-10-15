@@ -1,9 +1,9 @@
 /**
  * Placed props: GLB models and procedural builders (docs/props.md).
- * Split out of `core/Config.ts` (F0-CORE); import from `core/Config.js`.
+ * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
-// --- B4: props (docs/props.md) ---------------------------------------------
+// --- props (docs/props.md) ---------------------------------------------
 export type PropCollisionKind = 'none' | 'sphere' | 'box';
 export type ProceduralPropKind = 'hull-block' | 'debris' | 'chimney' | 'geo';
 /** Shape of one end of a procedural:hull-block (docs/props.md). */
@@ -124,7 +124,7 @@ export interface PropsConfig {
   atSpawnClearanceM: number;
 }
 
-// B4: props. See docs/props.md.
+// Props. See docs/props.md.
 export const DEFAULT_PROPS: PropsConfig = {
   // Titanic's fog (abyss band) hides almost everything past ~1.5 km, so
   // full meshes out to 900 m and silhouettes to 2.5 km are invisible swaps.

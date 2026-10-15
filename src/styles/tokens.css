@@ -1,5 +1,5 @@
 /* Colour variables, reset and the full-screen canvas.
-   Split out of src/styles.css (F0-CORE); the @import order there is the cascade order. */
+   Split out of src/styles.css; the @import order there is the cascade order. */
 
 :root {
   color-scheme: dark;

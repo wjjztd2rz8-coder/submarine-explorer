@@ -1,6 +1,6 @@
 /**
  * Generic stand-ins shared by every family and by loaded GLB models.
- * Split out of `world/props/Procedural.ts` (F0-CORE).
+ * Split out of `world/props/Procedural.ts`.
  */
 
 import * as THREE from 'three';

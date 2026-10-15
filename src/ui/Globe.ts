@@ -1,5 +1,5 @@
 /**
- * Globe mission select (C1, docs/globe.md): a full-screen DOM overlay with its
+ * Globe mission select (docs/globe.md): a full-screen DOM overlay with its
  * own canvas and a small dedicated Three.js renderer (never the game canvas).
  *
  * - Earth: NASA Blue Marble Next Generation with topography and bathymetry

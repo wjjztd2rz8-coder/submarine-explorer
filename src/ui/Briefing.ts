@@ -1,15 +1,15 @@
 /**
- * Mission briefing card (B3), shown before the dive. While it is open the
+ * Mission briefing card, shown before the dive. While it is open the
  * mission router freezes the game (no physics, input ignored); "Begin dive"
  * or Enter closes it. All text goes in via `textContent`: mission.json is
  * content, not markup.
  *
- * Keyboard (QA-B #12): Tab is trapped inside the card (FocusTrap), so the
+ * Keyboard: Tab is trapped inside the card (FocusTrap), so the
  * DIVE SITES / mission buttons behind it are unreachable. Escape returns to
  * home when a cancel action is supplied. Enter begins the dive,
  * except on another focused button or a select, which keep their own action.
  *
- * D2-PREDIVE: the sticky footer holds "Dive settings" (game mode, start
+ * the sticky footer holds "Dive settings" (game mode, start
  * position and a "Advanced" disclosure) beside Begin. With
  * {@link Briefing.attachDiveSettings} they edit the saved settings, and a
  * start change is reported so the scene previews the real start pose.
@@ -44,7 +44,7 @@ export interface BriefingOptions {
 }
 
 /**
- * D2-PREDIVE: what the briefing's Dive settings panel edits. Without it the
+ * What the briefing's Dive settings panel edits. Without it the
  * panel shows only the start choice, for this launch.
  */
 export interface DiveSettingsOptions {
@@ -71,7 +71,7 @@ export class Briefing {
   private readonly panel: HTMLDivElement;
   private readonly trap: FocusTrap;
   private choice: MissionStartPosition = 'near-site';
-  // --- D2-PREDIVE: Dive settings ---
+  // --- Dive settings ---
   private dive: DiveSettingsOptions | null = null;
   private diveDisposers: Array<() => void> = [];
   private diveSlot: HTMLDivElement | null = null;
@@ -138,7 +138,7 @@ export class Briefing {
   }
 
   /**
-   * D2-PREDIVE: connect the Dive settings panel to the saved settings. The
+   * Connect the Dive settings panel to the saved settings. The
    * mode, start position and Advanced then read and write `settings`;
    * a start change (here, or from a preset or Settings) calls `onStartChange`.
    */
@@ -214,7 +214,7 @@ export class Briefing {
       p.append(more);
     }
 
-    // D2-PREDIVE: Dive settings (mode, start, more options) and Begin share
+    // Dive settings (mode, start, more options) and Begin share
     // the sticky footer, so they stay visible even when the card scrolls.
     const foot = el('div', 'briefing-actions');
     this.diveSlot = el('div', 'briefing-dive-slot');
