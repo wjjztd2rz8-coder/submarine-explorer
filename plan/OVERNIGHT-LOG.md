@@ -1129,3 +1129,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h was 6% (resets 07:17), so 2030/2040/2050 stopped mid-task with uncommitted worktrees; the queue (2060/2070/2080) waits for the dispatcher. Stale worktrees 1740-1860 remain.
 - **Not done:** no tag (hosted CI result for d0e57ba and later pending). Next: V-eight-sites, V-titanic remainder, S-manifest.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 07:18 CDT headless run 2 (Claude)
+
+- **Merged and pushed:** Sonnet V-titanic close view: a `plateStains` shader patch in the shared steel material (per-plate tone, seam stain bands, rust streaks); close view ~4.0, hull still more orange than real. Smoke + project-base green on main; no full e2e.
+- **Codex:** 5h was 6% (resets 07:17); queue 2060/2070/2080 waits for the dispatcher. Stale worktrees 1740-1860, 2030-2050 remain. V-sub-scale still parked.
+- **Not done:** no tag (waits for green hosted CI). Next: V-eight-sites, S-manifest, V-sub-scale data fix.
+- **Needs owner:** real-phone play of the newest build.
