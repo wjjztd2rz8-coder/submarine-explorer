@@ -92,7 +92,10 @@ export class PhotoStore {
     next.length = Math.min(next.length, PHOTO_LIMIT);
     while (next.length) {
       try {
-        this.storage.setItem(PHOTO_STORAGE_KEY, JSON.stringify({ version: 1, photos: next }));
+        const text = JSON.stringify({ version: 1, photos: next });
+        this.storage.setItem(PHOTO_STORAGE_KEY, text);
+        if (this.storage.getItem(PHOTO_STORAGE_KEY) !== text)
+          return { saved: false, error: 'Photo storage is unavailable.' };
         this.photos_ = next;
         return { saved: true, dropped };
       } catch (error) {
@@ -114,7 +117,9 @@ export class PhotoStore {
     const next = this.photos_.filter((photo) => photo.id !== id);
     if (next.length === this.photos_.length) return false;
     try {
-      this.storage.setItem(PHOTO_STORAGE_KEY, JSON.stringify({ version: 1, photos: next }));
+      const text = JSON.stringify({ version: 1, photos: next });
+      this.storage.setItem(PHOTO_STORAGE_KEY, text);
+      if (this.storage.getItem(PHOTO_STORAGE_KEY) !== text) return false;
       this.photos_ = next;
       return true;
     } catch {

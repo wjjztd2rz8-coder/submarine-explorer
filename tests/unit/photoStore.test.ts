@@ -154,6 +154,21 @@ describe('PhotoStore', () => {
     expect(new PhotoStore(storage).photos.map((p) => p.id)).toEqual(['p2']);
   });
 
+  it('does not report a save or deletion when storage silently drops the write', () => {
+    const storage = new MemoryStorage();
+    const store = new PhotoStore(storage);
+    store.save(photo(1));
+    const write = vi.spyOn(storage, 'setItem').mockImplementation(() => {});
+    expect(store.save(photo(2)).saved).toBe(false);
+    expect(store.photos.map((p) => p.id)).toEqual(['p1']);
+    expect(store.delete('p1')).toBe(false);
+    expect(store.photos).toEqual(new PhotoStore(storage).photos);
+    write.mockRestore();
+    expect(store.save(photo(2))).toEqual({ saved: true, dropped: 0 });
+    expect(store.delete('p1')).toBe(true);
+    expect(new PhotoStore(storage).photos.map((p) => p.id)).toEqual(['p2']);
+  });
+
   it('does not evict existing photos after a transient non-quota write error', () => {
     const storage = new MemoryStorage();
     const store = new PhotoStore(storage);
