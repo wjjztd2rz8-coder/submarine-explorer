@@ -52,6 +52,52 @@ function withMean(mat: THREE.MeshStandardMaterial, map: THREE.Texture | null): v
   mat.color.setScalar(1 / Math.max(0.2, mean));
 }
 
+/**
+ * Plate-scale tone and rust streaks in texture space, on top of the vertex paint
+ * (too coarse to resolve a plate at close range). One cell = one plate of the
+ * detail map (four strakes, two plates per repeat; see `steelMaps`): its own brightness and
+ * saturation, a darker stain band under the upper seam and thin rust streaks
+ * running down. A handful of ALU ops per fragment, identical on every tier.
+ */
+function plateStains(mat: THREE.MeshStandardMaterial): void {
+  mat.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+float pHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float pNoise(vec2 p) {
+  vec2 i = floor(p); vec2 f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(pHash(i), pHash(i + vec2(1.0, 0.0)), f.x),
+             mix(pHash(i + vec2(0.0, 1.0)), pHash(i + vec2(1.0, 1.0)), f.x), f.y);
+}`,
+      )
+      .replace(
+        '#include <map_fragment>',
+        `#include <map_fragment>
+#ifdef USE_MAP
+{
+  vec2 g = vec2(vMapUv.x * 2.0, vMapUv.y * 4.0);
+  vec2 cell = vec2(floor(g.x + floor(g.y) * 0.37), floor(g.y));
+  float h1 = pHash(cell);
+  float h2 = pHash(cell + 17.3);
+  float lum = dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11));
+  // Per-plate brightness; some plates bleached grey-brown, a few sprung dark.
+  float tone = 0.7 + 0.5 * h1 - 0.25 * smoothstep(0.82, 0.97, h2);
+  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(lum), (0.3 + 0.35 * smoothstep(0.3, 0.9, h2))) * tone * vec3(1.0, 0.95, 0.9);
+  // Stain band below the plate's upper seam, and long thin streaks running down.
+  float down = 1.0 - fract(g.y);
+  float band = smoothstep(0.0, 0.5, down) * (1.0 - smoothstep(0.5, 1.0, down));
+  float streak = pNoise(vec2(vMapUv.x * 50.0, vMapUv.y * 3.0 + h1 * 9.0));
+  float stain = clamp(band * (0.35 + h2) * 0.5 + smoothstep(0.6, 0.95, streak) * 0.4, 0.0, 0.75);
+  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.2, 0.09, 0.05), stain);
+}
+#endif`,
+      );
+  };
+  mat.customProgramCacheKey = () => 'wreck-steel-plates';
+}
+
 /** Rusted steel: vertex colours carry the hue; a neutral riveted-plate map adds detail. */
 export function steelMaterial(detail: WreckDetail): THREE.MeshStandardMaterial {
   return cachedMat(`steel:${detail.textureSize}:${detail.normalMap}`, () => {
@@ -66,6 +112,7 @@ export function steelMaterial(detail: WreckDetail): THREE.MeshStandardMaterial {
     });
     if (mat.normalMap) mat.normalScale.set(0.8, 0.8);
     withMean(mat, mat.map);
+    if (mat.map) plateStains(mat);
     mat.name = 'wreck-steel';
     return mat;
   });
