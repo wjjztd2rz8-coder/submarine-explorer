@@ -34,6 +34,7 @@ describe('parsePois', () => {
   it('accepts the contract shape and a bare array', () => {
     expect(parsePois({ version: 1, landmark: 't', pois: [bow] }, quiet)).toHaveLength(1);
     expect(parsePois([bow], quiet)[0]).toMatchObject({ id: 'bow', primary: true, kind: 'wreck' });
+    expect(parsePois([{ ...bow, min_depth_m: 10 }], quiet)[0]?.min_depth_m).toBe(10);
   });
 
   it('drops invalid entries and duplicates, defaults unknown kinds to other', () => {
