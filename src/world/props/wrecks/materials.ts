@@ -215,6 +215,11 @@ interface PaintOptions {
    * few plates sprung darker, so the strakes stop repeating.
    */
   plates?: readonly [number, number, number];
+  /**
+   * Pull the weathered colour toward a grey-brown of the same brightness (0..1),
+   * for hulls whose orange rust reads too warm under the lights.
+   */
+  muted?: number;
   /** Wood keeps its grain colour; no rust streaking. */
   wood?: boolean;
   /**
@@ -304,6 +309,10 @@ export function paintWreck(geom: THREE.BufferGeometry, o: PaintOptions): void {
         SILT,
         up * o.silt * (0.35 + 0.65 * valueNoise3(x * 0.11, 5.3, z * 0.11, o.seed ^ 0x5)),
       );
+    }
+    if (o.muted) {
+      const lum = _c.r * 0.3 + _c.g * 0.59 + _c.b * 0.11;
+      _c.lerp(_r.setRGB(lum * 0.92, lum * 0.88, lum * 0.8), o.muted);
     }
     if (o.shadeAt) _c.multiplyScalar(o.shadeAt(x, y, z));
     col.setXYZ(i, _c.r, _c.g, _c.b);
