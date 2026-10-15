@@ -198,7 +198,10 @@ export class AudioSystem {
   private wireBusEvents(): void {
     this.unsubs.push(
       this.bus.on('scan:started', () => {
+        if (this.disposed || this.playbackBlocked) return;
         this.playManipulator();
+        // Caption subscribers may pause or dispose the scene synchronously.
+        if (this.disposed || this.playbackBlocked) return;
         this.scanning = true;
         this.captions.emit({ id: 'scan-hum', text: 'Scan beam hums', durationS: 1.5 });
       }),

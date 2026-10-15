@@ -67,6 +67,74 @@ describe('pointer look preference and lock decisions', () => {
 
 describe('Input action map', () => {
   it.each(['INPUT', 'TEXTAREA', 'SELECT', 'contenteditable'])(
+    'keeps gamepad and touch input neutral while %s owns focus without deferring pad edges',
+    (tag) => {
+      const win = new EventTarget();
+      const editor = { tagName: tag, isContentEditable: tag === 'contenteditable' };
+      const doc = Object.assign(new EventTarget(), { activeElement: editor });
+      const buttons = Array.from({ length: 16 }, () => ({ value: 0, pressed: false }));
+      vi.stubGlobal('window', win);
+      vi.stubGlobal('document', doc);
+      vi.stubGlobal('navigator', {
+        getGamepads: () => [{ connected: true, index: 0, axes: [0.5, -1, 0, -1], buttons }],
+      });
+      const input = makeInput();
+      input.attach();
+      try {
+        for (let round = 0; round < 2; round++) {
+          doc.activeElement = editor;
+          const focus = new Event('focusin');
+          Object.defineProperty(focus, 'target', { value: editor });
+          doc.dispatchEvent(focus);
+          input.touchAxes.ballast = 1;
+          input.touchHeld.add('scan');
+          input.touchBoost = true;
+          input.touchEdge('toggleLights');
+          input.touchLook(20, 10);
+          input.touchZoom(100);
+          buttons[3] = { value: 1, pressed: true };
+          buttons[5] = { value: 1, pressed: true };
+          expect(input.sample()).toMatchObject({
+            throttle: 0,
+            yaw: 0,
+            pitch: 0,
+            ballast: 0,
+            scan: false,
+            boost: false,
+            toggleLights: false,
+            toggleCamera: false,
+            lookDx: 0,
+            lookDy: 0,
+          });
+          expect(input.gamepadActive).toBe(false);
+          expect(input.wheelDelta).toBe(0);
+          // Returning to play may restore held axes, but never a queued toggle.
+          doc.activeElement = { tagName: 'BODY', isContentEditable: false };
+          expect(input.sample()).toMatchObject({
+            throttle: 1,
+            scan: true,
+            ballast: 0,
+            boost: false,
+            toggleCamera: false,
+            toggleLights: false,
+          });
+          expect(input.gamepadActive).toBe(true);
+          buttons[3] = { value: 0, pressed: false };
+          input.sample();
+          buttons[3] = { value: 1, pressed: true };
+          expect(input.sample().toggleCamera).toBe(true);
+          input.endFrame();
+          buttons[3] = { value: 0, pressed: false };
+          input.sample();
+        }
+      } finally {
+        input.dispose();
+        vi.unstubAllGlobals();
+      }
+    },
+  );
+
+  it.each(['INPUT', 'TEXTAREA', 'SELECT', 'contenteditable'])(
     'clears held and queued flight controls when focus moves into %s',
     (tag) => {
       const win = new EventTarget();

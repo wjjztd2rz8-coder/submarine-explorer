@@ -379,6 +379,67 @@ describe('audio lifecycle', () => {
     vi.runAllTimers();
     audio.dispose();
   });
+
+  it.each(['pause', 'hidden'])(
+    'ignores scan starts during %s without leaving captions or a scan hum on resume',
+    async (blocked) => {
+      const bus = new EventBus();
+      const audio = system(bus);
+      audio.unlock();
+      await flush();
+      const caption = vi.fn();
+      audio.captions.on(caption);
+      const loop = vi.spyOn(MachineLoop.prototype, 'update');
+      try {
+        if (blocked === 'pause') audio.setPaused(true);
+        else visibility(true);
+        bus.emit('scan:started', { poiId: 'bow' });
+        expect(caption).not.toHaveBeenCalled();
+        if (blocked === 'pause') audio.setPaused(false);
+        else visibility(false);
+        audio.update(creakFrame(-100));
+        expect(loop).toHaveBeenLastCalledWith(0);
+        bus.emit('scan:started', { poiId: 'bow' });
+        expect(caption.mock.calls.map(([event]) => event.id)).toEqual(['servo', 'scan-hum']);
+        audio.update(creakFrame(-100));
+        expect(loop).toHaveBeenLastCalledWith(0.06);
+        bus.emit('scan:aborted', { poiId: 'bow', reason: 'released' });
+        expect(loop).toHaveBeenLastCalledWith(0);
+      } finally {
+        audio.dispose();
+      }
+    },
+  );
+
+  it.each(['earlier bus listener', 'servo caption listener'])(
+    'does not emit a scan hum when disposed by the %s',
+    async (source) => {
+      const bus = new EventBus();
+      let audio: AudioSystem;
+      const off =
+        source === 'earlier bus listener'
+          ? bus.on('scan:started', () => audio.dispose())
+          : () => {};
+      audio = system(bus);
+      const caption = vi.fn((event: { id: string }) => {
+        if (source === 'servo caption listener' && event.id === 'servo') audio.dispose();
+      });
+      audio.captions.on(caption);
+      audio.unlock();
+      await flush();
+      try {
+        bus.emit('scan:started', { poiId: 'bow' });
+        expect(caption.mock.calls.map(([event]) => event.id)).toEqual(
+          source === 'earlier bus listener' ? [] : ['servo'],
+        );
+        expect(context().close).toHaveBeenCalledOnce();
+        for (const node of context().nodes) expect(node.connections).toEqual([]);
+      } finally {
+        audio.dispose();
+        off();
+      }
+    },
+  );
 });
 
 describe('hull creak dispatch', () => {
