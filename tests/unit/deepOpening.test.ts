@@ -281,10 +281,15 @@ describe('Challenger / Endurance opening', () => {
               expect(wreck.intersectsBox(bounds), 'whole wreck silhouette clears the sub').toBe(
                 false,
               );
+              // The sub sits behind the hull's near edge, so separation may be vertical or horizontal.
               if (width > height)
                 expect(
-                  bounds.min.x - wreck.max.x,
-                  'wreck beside sub with a visible gap',
+                  Math.max(
+                    bounds.min.x - wreck.max.x,
+                    wreck.min.x - bounds.max.x,
+                    wreck.min.y - bounds.max.y,
+                  ),
+                  'wreck clear of the sub with a visible gap',
                 ).toBeGreaterThan(8);
               const eye = rig.camera.position.clone();
               // The opening pulls the chase arm in so the 44 m hull dominates the first frame.

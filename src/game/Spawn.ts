@@ -205,7 +205,7 @@ const FREE_DIVE_OPENINGS: Record<
     chaseOffsetY: -2,
     chaseOffsetX: 14,
   },
-  endurance: { hero: 'main-hull', bearing: 60, range: 70 },
+  endurance: { hero: 'main-hull', bearing: 90, range: 70 },
   'axial-seamount-ashes': { hero: 'mushroom-chimney', bearing: 45, range: 60 },
   'hudson-canyon': { hero: 'coral-ledge-mound', bearing: 0, range: 75 },
   kamaehuakanaloa: { hero: 'hiolo-north-chimney-1', bearing: 45, range: 45 },
