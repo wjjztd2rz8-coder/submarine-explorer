@@ -337,10 +337,10 @@ export const BIOMES: Record<string, Biome> = {
     stain: 0x8f8764,
     stainAmount: 0,
     patch: 0,
-    ripple: 0.6,
+    ripple: 0.25,
     rippleLenM: 0.4,
     rippleDir: 0.2,
-    burrow: 0.15,
+    burrow: 0,
     rockBias: 0.3,
     // Lower walls fall away to deep blue-grey (the real hole is dark below the ledge) but stay readable.
     depthShade: { startM: 30, endM: 105, tint: 0x3f6a82 },
@@ -355,8 +355,7 @@ export const BIOMES: Record<string, Biome> = {
       { kind: 'sponge', density: 2.6, slopeMaxDeg: 40, on: 'rock', sizeMul: 2.2 },
       { kind: 'sponge', density: 1.6, slopeMaxDeg: 24, on: 'flat', sizeMul: 1.8 },
       { kind: 'whip', density: 1.8, slopeMaxDeg: 45, on: 'rock', sizeMul: 1.8 },
-      // Real overhangs: a heightfield cannot undercut, so rock awnings (dark undersides) jut from the beds.
-      { kind: 'ledge', density: 1.8, slopeMaxDeg: 62, on: 'rock' },
+      // No rock awnings here: on the smooth reef treads they read as plates hovering over the bed.
       { kind: 'tube', density: 5.5, slopeMaxDeg: 50, on: 'any', sizeMul: 1.6 },
       { kind: 'rubble', density: 3, slopeMaxDeg: 30, on: 'any' },
       { kind: 'boulder', density: 1.6, slopeMaxDeg: 45, on: 'any' },

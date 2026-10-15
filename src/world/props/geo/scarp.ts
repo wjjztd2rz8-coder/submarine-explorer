@@ -321,6 +321,12 @@ export interface ExtrudeOpts {
   plan?: (x: number) => number;
   /** Extra downward y at x (burying the ends). */
   sink?: (x: number) => number;
+  /**
+   * Terrain height at (x, z). Profile points behind the foot (z > 0) never stand above it, and the
+   * overhanging front comes down to it toward the wall ends, so a shelf runs into the ground
+   * instead of hanging over a lower slope.
+   */
+  ground?: (x: number, z: number) => number;
   /** Metres per texture tile: writes `uv` as (x, arc length along the profile). A pair is (along, up). */
   uvTile?: number | [number, number];
 }
@@ -363,7 +369,10 @@ export function extrudeProfile(
       const z = (z0 + disp(x, y0, z0) * (1 - edge * 0.6)) * (1 - edge * 0.55) + plan;
       const n = i * (ny + 1) + j;
       pos[n * 3] = x;
-      pos[n * 3 + 1] = y + (lift ? lift(x, y0, z0) : 0) - sink;
+      let py = y + (lift ? lift(x, y0, z0) : 0) - sink;
+      if (opts.ground)
+        py = Math.min(py, opts.ground(x, z) + (z0 > 0 ? -0.15 : 0.15 + 4 * height * (1 - edge) ** 2));
+      pos[n * 3 + 1] = py;
       pos[n * 3 + 2] = z;
       if (uv) {
         uv[n * 2] = (x + plan * 0.35) / tu;
@@ -431,7 +440,6 @@ export function extrudeProfile(
   g.setIndex([...idx, ...capIdx]);
   g.computeVertexNormals();
   // The profile runs up the front and down the back, so the winding is outward all round.
-  void height;
   return g;
 }
 

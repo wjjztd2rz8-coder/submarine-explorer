@@ -194,8 +194,8 @@ export const DEFAULT_PROPS: PropsConfig = {
   blueHoleApron: {
     bedHeightM: 1.7,
     riserFraction: 0.32,
-    rowDensity: 2,
-    columnDensity: 1.5,
+    rowDensity: 3,
+    columnDensity: 2.5,
     normalSampleM: 0.7,
     contactShade: 0.18,
     roughnessVariation: 0.1,
