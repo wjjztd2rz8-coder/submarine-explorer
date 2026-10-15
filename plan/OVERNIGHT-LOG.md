@@ -1064,3 +1064,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed:** Codex 1900 S-verify-4, 1910 hosted-CI spec repairs, 1920 stale-spec repairs (collected from worktrees; smoke + project-base green); Sonnet V-endurance opening (hull ~33% of frame; Endurance mission approach side changed by the bearing). Hosted CI on the b1de6c0 head was red (20 of 30 shards); result for the new head pending, no tag.
 - **Queued (Codex, runs after Oct 20 reset):** 2000 hosted-CI triage, 2010 S-verify-5, 2020 S-tests step 3 and worktree triage. Ten stale worktrees 1740 to 1860 remain.
 - **Needs owner:** real-phone play of the newest build; optional Codex credit.
+
+## 2026-10-14 21:54 CDT headless run (Claude)
+
+- **Merged and pushed:** Sonnet S-scan-reach (Titanic reach 72 m, Blue Hole galleries 86 m Arcade, new per-POI min_depth_m so the surface start can't scan the galleries, "DIVE DEEPER" guidance). Smoke + project-base green on main; targeted e2e 169 pass, 6 "endurance merged opening" camera-radius failures in opening-framing (expected 70, got 54) probably from V-endurance, needs a spec repair or check in hosted CI.
+- **Codex:** weekly at 5% (resets Oct 20), queue 2000/2010/2020 waits. Stale worktrees 1740-1860 remain.
+- **Not done:** no tag (waits for green hosted CI); next Claude items V-bluehole-opening, S-journal-picture.
+- **Needs owner:** real-phone play of the newest build.
