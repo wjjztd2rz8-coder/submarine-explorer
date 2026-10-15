@@ -2,20 +2,19 @@
  * `feature: "stalactite-cluster"` (Great Blue Hole): a drowned karst alcove, a
  * curved limestone wall with a scalloped overhanging ceiling whose underside
  * carries clusters of fluted stalactites, fallen blocks blending the foot of
- * the wall into the seabed, and a few Caribbean sponges high on the face. The
+ * the wall into the seabed,. The
  * stalactites formed in air-filled caves during glacial sea-level lows and now
  * sit at roughly 40–50 m depth. dims = [width, ledge projection, height].
  */
 
 import * as THREE from 'three';
 import { geoDetail } from './detail.js';
-import { geoMaterial as baseGeoMaterial, LIFE_TINT, vertexGlow } from './materials.js';
+import { geoMaterial as baseGeoMaterial, vertexGlow } from './materials.js';
 import {
   endRatio,
   pinchScale,
   endSink,
   extrudeProfile,
-  interp,
   talusColliders,
   wallColliders,
   wallEnvelope,
@@ -24,7 +23,6 @@ import {
   boxCH,
   fbm3,
   impostorFromBoxes,
-  instanced,
   lump,
   mergeAll,
   mulberry32,
@@ -33,7 +31,6 @@ import {
   projectUVs,
   smooth,
   type BuiltProp,
-  type InstanceSpec,
 } from './shared.js';
 import {
   buildTalusMesh,
@@ -236,7 +233,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
         .replace('#include <common>', '#include <common>\nvarying float vGrottoDepth;')
         .replace(
           '#include <emissivemap_fragment>',
-          `#include <emissivemap_fragment>\nfloat openingLight = 1.0 - smoothstep(${(-D * 0.95).toFixed(3)}, ${(-D * 0.12).toFixed(3)}, vGrottoDepth);\ntotalEmissiveRadiance *= 0.28 + 0.72 * openingLight;`,
+          `#include <emissivemap_fragment>\nfloat openingLight = 1.0 - smoothstep(${(-D * 0.95).toFixed(3)}, ${(-D * 0.12).toFixed(3)}, vGrottoDepth);\ntotalEmissiveRadiance *= 0.5 + 0.5 * openingLight;`,
         );
     };
     m.customProgramCacheKey = () => `blue-hole-east-opening-${D}`;
@@ -316,20 +313,20 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     out.lerp(GREY_BROWN, 0.5 * (1 - smooth(0.05, 0.75, hf)));
     out.lerp(DEEP_TEAL, 0.22 * (1 - smooth(0.1, 0.8, hf)));
     out.multiplyScalar(0.62 + 0.5 * smooth(0, 0.14, bed - Math.floor(bed)));
-    out.multiplyScalar(0.62 + 0.38 * smooth(0, 0.22, hf));
-    if (ny < -0.35) out.multiplyScalar(0.7);
+    out.multiplyScalar(0.78 + 0.22 * smooth(0, 0.22, hf));
+    if (ny < -0.35) out.multiplyScalar(0.82);
     // Wall read: cream-ochre near the lip grading to cool blue-grey below the halocline, with
     // each ledge lip catching light and the recess under it falling into shadow. Floors keep
     // the tone readable (never below ~0.55 of the base).
     const { bedI, bedF } = ledgeBed(x, y);
     const face = 1 - smooth(0.2, 0.55, ny < 0 ? -ny : ny); // steep faces only
     const depthF = 1 - smooth(0.12, 0.62, hf);
-    out.lerp(BLUE_GREY, 0.75 * depthF * (0.4 + 0.6 * face));
+    out.lerp(BLUE_GREY, 0.5 * depthF * (0.4 + 0.6 * face));
     out.lerp(CREAM_OCHRE, 0.3 * smooth(0.45, 0.95, hf) * face);
     const bedTone = 0.72 + 0.5 * fbm3(bedI * 3.3, 9, seed + 29, seed + 7, 2);
     const lipLight = 1 + 0.3 * (1 - smooth(0, 0.22, bedF));
     const recess = 1 - 0.45 * smooth(0.3, 0.55, bedF) * (1 - smooth(0.7, 1, bedF));
-    out.multiplyScalar(bedTone * lipLight * recess * (1 - 0.3 * depthF * face));
+    out.multiplyScalar(bedTone * lipLight * recess);
   });
   wall.computeBoundingBox();
   const full = new THREE.Group();
@@ -596,58 +593,6 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
   longest.sort((a, b) => b.len - a.len);
   for (const s of longest.slice(0, 7)) {
     colliders.push(boxCH(s.x, s.y - s.len * 0.42, s.z, s.r * 0.7, s.len * 0.42, s.r * 0.7));
-  }
-
-  // --- a few sponges high on the face, above the sediment line (none on the floor)
-  // Capsule-bodied tube sponge: closed rounded crown, slight belly, soft base; no hard cylinder rim.
-  const sponge = new THREE.LatheGeometry(
-    [
-      [0.0, 0.0],
-      [0.17, 0.25],
-      [0.14, 0.62],
-      [0.0, 0.8],
-    ].map(([r, y]) => new THREE.Vector2(r as number, y as number)),
-    5,
-  );
-  const sp: InstanceSpec[] = [];
-  const ns = Math.round(12 * d.growth);
-  for (let i = 0; i < ns; i++) {
-    const x = (rnd() - 0.5) * W * 0.7;
-    const y = H * (0.28 + rnd() * 0.2);
-    const { edge } = wallEnvelope(x, W, EDGE_START);
-    const z =
-      (interp(profile, y) + disp(x, y, interp(profile, y)) * (1 - edge * 0.6)) * (1 - edge * 0.55) +
-      plan(x) -
-      0.05;
-    const s = 0.7 + rnd() * 1.4;
-    const hue = [0.78, 0.07, 0.13, 0.95, 0.5][Math.floor(rnd() * 5)]!;
-    sp.push({
-      t: {
-        x,
-        y: y * scaleAt(x) + liftAt(x),
-        z,
-        rx: -Math.PI / 2 + (rnd() - 0.5) * 0.5,
-        ry: rnd() * 6.28,
-        sx: s,
-        sy: s * (0.7 + rnd()),
-        sz: s,
-      },
-      color: new THREE.Color().setHSL(hue, 0.34, 0.4 + rnd() * 0.15),
-    });
-  }
-  if (sp.length) {
-    full.add(
-      instanced(
-        sponge,
-        new THREE.MeshStandardMaterial({
-          color: LIFE_TINT,
-          roughness: 0.8,
-          side: THREE.DoubleSide,
-        }),
-        sp,
-        'sponges',
-      ),
-    );
   }
 
   const bounds = wall.boundingBox!.clone().union(apron.boundingBox!);

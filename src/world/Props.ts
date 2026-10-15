@@ -353,7 +353,7 @@ export class Props {
   }
 
   /** True if (x, z) lies within `pad` metres of a `clear_ground` prop's footprint. */
-  coversGround(x: number, z: number, pad = 3): boolean {
+  coversGround(x: number, z: number, pad = 4): boolean {
     for (const p of this.placed) {
       if (!p.def.clearsGround) continue;
       this.local.set(x, 0, z);
