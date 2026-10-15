@@ -127,7 +127,7 @@ it.each([
 });
 
 it.each([
-  ['great-blue-hole', 8, 21300],
+  ['great-blue-hole', 6, 21300],
   ['lost-city', 14, 67472],
   ['beebe-vent-field', 13, 20758],
   ['monterey-canyon', 30, 284010],

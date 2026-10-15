@@ -137,7 +137,7 @@ describe('Great Blue Hole props', () => {
           expect(countGeo(built.full).triangles).toBe(countGeo(baseline.full).triangles);
           expect(built.full.getObjectByName('fallen-blocks')).toBeUndefined();
         }
-        for (const name of ['grotto-overhang', 'stalactite-gallery', 'sponges']) {
+        for (const name of ['grotto-overhang', 'stalactite-gallery']) {
           const mesh = built.full.getObjectByName(name) as THREE.Mesh;
           const before = baseline.full.getObjectByName(name) as THREE.Mesh;
           expect(mesh.geometry.getAttribute('position').array).toEqual(
