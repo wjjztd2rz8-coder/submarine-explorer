@@ -30,6 +30,8 @@ export interface ScanTarget {
   landmarkId: string;
   position: Vector3;
   radius: number;
+  /** The sub must be at least this deep (m) to scan; absent = any depth. */
+  minDepthM?: number;
   scanSeconds: number;
 }
 
@@ -479,7 +481,7 @@ export class Scanner {
     const dy = t.position.y - p.y;
     const dz = t.position.z - p.z;
     const distance = Math.hypot(dx, dy, dz);
-    const inRange = distance <= t.radius;
+    const inRange = distance <= t.radius && -p.y >= (t.minDepthM ?? 0);
     let cos = 1;
     if (distance > 1e-6) {
       const fl = Math.hypot(f.x, f.y, f.z) || 1;

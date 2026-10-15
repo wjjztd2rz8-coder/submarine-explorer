@@ -274,6 +274,13 @@ for (const { site, primary, before } of heroes) {
                 Math.atan2(Math.sin(desiredYaw - sub.yaw), Math.cos(desiredYaw - sub.yaw)),
               ),
             );
+            const desiredPitch = Math.atan2(delta.y, Math.hypot(delta.x, delta.z));
+            input.pitch = Math.max(-1, Math.min(1, (desiredPitch - sub.pitch) * 4));
+            // Close in, then trim depth: a gallery may need the sub below its minimum depth.
+            input.ballast =
+              Math.hypot(delta.x, delta.z) < scanRadius * 0.8
+                ? Math.max(-1, Math.min(1, (delta.y + 16) / 10))
+                : 0;
             sub.step(input, 1 / 60);
             scanner.update(1 / 60, sub.position, sub.getForward(), input.scan);
             run.update(1 / 60);
