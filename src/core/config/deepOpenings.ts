@@ -35,7 +35,7 @@ export const DEEP_OPENINGS = {
     ambientColor: 0x879399,
     ambientIntensity: 20,
     vignette: 0.34,
-    hemisphere: { sky: 0xa8bbc8, ground: 0x50473e, intensity: 2 },
+    hemisphere: { sky: 0xa8bbc8, ground: 0x7a6c5c, intensity: 6 },
     // Close timber and pale sand clip at 2x lamps; 0.7x keeps the wood grain at 15 m and the hull legible at 40 m.
     lamps: { intensity: 0.7, distance: 1, fillIntensity: 1.5, fillDistance: 1.5 },
   },

@@ -14,14 +14,14 @@
       "hero": "main-hull",
       "range": 6,
       "altitude": 10,
-      "yawOffset": -10,
-      "chaseRadius": 54,
-      "chaseOffsetX": 0,
+      "yawOffset": -11,
+      "chaseRadius": 50,
+      "chaseOffsetX": -45,
       "chaseOffsetY": -34,
       "portraitChaseOffset": {
         "x": 0,
-        "y": -48,
-        "radius": 52
+        "y": -40,
+        "radius": 50
       }
     }
   },
