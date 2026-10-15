@@ -1449,9 +1449,14 @@ freshTest.describe('animal guidance placement', () => {
           ).toBe(true);
           await screenshot(page, `${site}-${name}`);
           await separate(page, [...hud, GUIDANCE.any, ...controls]);
-          // The clock was paused before navigation, so only these frames spend its lifetime.
-          for (let frame = 0; frame < 60; frame++) await page.clock.fastForward(250);
-          await expect(hint).toBeHidden();
+          // Spend at most 15 simulated seconds in real game frames. Stop when
+          // the hint expires rather than rendering the remaining software-GL
+          // frames. A DOM-only wait cannot advance this paused clock.
+          for (let frame = 0; frame < 60 && (await hint.isVisible()); frame++)
+            await page.clock.fastForward(250);
+          expect(await hint.isVisible(), 'animal hint expires within 15 simulated seconds').toBe(
+            false,
+          );
         });
       }
     });
