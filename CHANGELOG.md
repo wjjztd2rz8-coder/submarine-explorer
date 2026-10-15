@@ -14,7 +14,7 @@ without an entry here is not done.
 
 ### Changed
 
-- **V-endurance:** the Endurance opening is reframed so the wreck is the subject: the sub starts 12 m off the hull and sits smaller (chase arm 70 m), with the camera offset sideways to show the hull's flank, and the deep-water ground fill is brighter so the lower hull side reads. Portrait uses a matching offset.
+- **V-endurance:** the Endurance opening is reframed so the wreck is the subject: the chase camera is closer and offset sideways so the hull fills about 37% of the frame (was about 33%) and the sub sits to one side above it, and the deep-water ground fill is brighter so the lower hull side reads. Portrait uses a matching offset.
 
 ### Removed
 

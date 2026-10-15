@@ -12,16 +12,16 @@
     },
     "reframe": {
       "hero": "main-hull",
-      "range": 12,
+      "range": 6,
       "altitude": 10,
-      "yawOffset": -10,
-      "chaseRadius": 70,
-      "chaseOffsetX": -30,
-      "chaseOffsetY": -40,
+      "yawOffset": -11,
+      "chaseRadius": 50,
+      "chaseOffsetX": -45,
+      "chaseOffsetY": -34,
       "portraitChaseOffset": {
         "x": 0,
         "y": -40,
-        "radius": 68
+        "radius": 50
       }
     }
   },
