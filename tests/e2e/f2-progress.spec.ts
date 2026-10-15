@@ -215,7 +215,7 @@ for (const width of [1280, 390])
     });
     for (let round = 0; round < 2; round++) {
       await page.goto('/');
-      await homeReady(page);
+      await homeReady(page, true);
       await page
         .locator('.home-menu')
         .getByRole('button', { name: 'Journal', exact: true })

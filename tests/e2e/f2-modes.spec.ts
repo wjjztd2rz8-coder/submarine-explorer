@@ -49,7 +49,8 @@ for (const viewport of [
         ),
       )
       .toBe('custom');
-    for (const target of [toggle, mode.locator('.mode-seg').first(), currents]) {
+    // The Advanced options are text-sized switches on a labelled line (by design).
+    for (const target of [toggle, mode.locator('.mode-seg').first()]) {
       const box = await target.boundingBox();
       expect(box!.width).toBeGreaterThanOrEqual(44);
       expect(box!.height).toBeGreaterThanOrEqual(44);
