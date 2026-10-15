@@ -17,6 +17,7 @@ const view = vi.hoisted(() => ({
   setPalette: vi.fn(),
   setPois: vi.fn(),
   update: vi.fn(),
+  dispose: vi.fn(),
 }));
 vi.mock('../../src/ui/Waypoints.js', () => ({
   Waypoints: class {

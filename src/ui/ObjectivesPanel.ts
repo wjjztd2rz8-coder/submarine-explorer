@@ -138,8 +138,8 @@ export class ObjectivesPanel {
     const surface = el('button', 'obj-banner-btn is-surface', 'Surface and debrief');
     for (const b of [keep, surface]) {
       b.type = 'button';
-      b.tabIndex = -1;
-      // Keep keyboard focus on the page so flight keys keep working.
+      // Pointer activation keeps flight focus; deliberate Tab navigation
+      // still reaches both choices through their native button behavior.
       b.addEventListener('mousedown', (e) => e.preventDefault());
     }
     keep.addEventListener('click', () => this.banner?.onKeepExploring());

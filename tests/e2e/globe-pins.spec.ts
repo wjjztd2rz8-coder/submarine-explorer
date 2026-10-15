@@ -124,6 +124,48 @@ test.describe('globe pins', () => {
 test.describe('globe pins on touch', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 
+  for (const name of ['Dive sites', 'Free dive']) {
+    test(`${name} sheet keeps keyboard control after swiping and Escape restores its opener`, async ({
+      page,
+    }) => {
+      // Regression: a completed swipe used to disable subsequent keyboard clicks on the grab.
+      await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
+      await page.waitForFunction(() => window.__gameReady === true);
+      const origin = page.locator('.home-menu').getByRole('button', { name, exact: true });
+      await origin.click();
+      const sheet = page.locator('.home-sites');
+      const back = sheet.getByRole('button', { name: 'Back to menu' });
+      const grab = sheet.locator('.home-sites-grab');
+      await expect(back).toBeFocused();
+      await expect(sheet).toHaveClass(/is-collapsed/);
+      await page.keyboard.press('Shift+Tab');
+      await expect(grab).toBeFocused();
+      const box = (await grab.boundingBox())!;
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 - 70, { steps: 4 });
+      await page.mouse.up();
+      await expect(grab).toHaveAttribute('aria-expanded', 'true');
+      await grab.focus();
+      await page.keyboard.press('Enter');
+      await expect(grab).toHaveAttribute('aria-expanded', 'false');
+      await expect(sheet.locator('.home-sites-scroll')).toBeHidden();
+      await page.keyboard.press('Space');
+      await expect(grab).toHaveAttribute('aria-expanded', 'true');
+      await page.keyboard.press('Tab');
+      await expect(back).toBeFocused();
+      await page.keyboard.press('Tab');
+      expect(
+        await sheet
+          .locator('.home-sites-scroll')
+          .evaluate((list) => list.contains(document.activeElement)),
+      ).toBe(true);
+      await page.keyboard.press('Escape');
+      await expect(sheet).toBeHidden();
+      await expect(origin).toBeFocused();
+    });
+  }
+
   test('hit areas are 44 px, the globe is wide, and the first tap names a pin', async ({
     page,
   }) => {

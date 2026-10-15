@@ -17,15 +17,23 @@ export const waypointsSystem: GameSystem = {
   init(ctx) {
     const { discovery, settings, sonar, save } = ctx;
     const waypoints = new Waypoints(discovery.scanner);
+    let disposed = false;
+    cleanup.add(() => {
+      disposed = true;
+      waypoints.dispose();
+    });
     ctx.waypoints = waypoints;
     visualHints = ctx.effective.gameplay.visualHints;
     waypoints.setVisualHints(visualHints);
     waypoints.setReducedMotion(settings.reduceMotion);
     waypoints.setPalette(settings.sonarPalette);
-    void discovery.ready.then(() => waypoints.setPois(discovery.pois));
     // D-SONAR: scanned ticks and POIs on the sonar.
     sonar.setScanState((poi) => discovery.scanner.isScanned(poi.landmarkId, poi.id));
-    void discovery.ready.then(() => sonar.setPois(discovery.pois));
+    void discovery.ready.then(() => {
+      if (disposed) return;
+      waypoints.setPois(discovery.pois);
+      sonar.setPois(discovery.pois);
+    });
     cleanup.add(
       save.onChange((next, changed) => {
         if (changed.includes('sonarPalette')) waypoints.setPalette(next.sonarPalette);

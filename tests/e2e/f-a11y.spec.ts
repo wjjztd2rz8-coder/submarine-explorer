@@ -256,3 +256,36 @@ test('photo, HUD and debrief remain keyboard reachable with accessible contrast'
     'Sonar zoom out',
   );
 });
+
+test('completion banner choices accept Tab, Shift+Tab and native keyboard activation', async ({
+  page,
+}) => {
+  // Regression: both visible completion actions used to have negative tabindex.
+  await boot(page, '/?mission=titanic&tier=low&skipBriefing=1');
+  await page.evaluate(() => {
+    const game = window.__game as unknown as {
+      missionRouter: { showBanner(kind: 'primary'): void };
+    };
+    game.missionRouter.showBanner('primary');
+  });
+  const banner = page.locator('.obj-banner');
+  const keep = banner.getByRole('button', { name: 'Keep exploring' });
+  const surface = banner.getByRole('button', { name: 'Surface and debrief' });
+  await keep.focus();
+  await page.keyboard.press('Tab');
+  await expect(surface).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(keep).toBeFocused();
+  await page.keyboard.press('Space');
+  await expect(banner).toBeHidden();
+  await page.evaluate(() => {
+    const game = window.__game as unknown as {
+      missionRouter: { showBanner(kind: 'primary'): void };
+    };
+    game.missionRouter.showBanner('primary');
+  });
+  await keep.focus();
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.mission-debrief')).toBeVisible();
+});
