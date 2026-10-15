@@ -25,7 +25,7 @@ import bismarckPose from '../../tools/bismarck-poses.json';
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 
-test('Low seabed lighting is isolated to the six observed dark sites and leaves surface water intact', () => {
+test('Low seabed lighting is isolated to the observed dark sites and leaves surface water intact', () => {
   const water = makeConfig().water;
   const before = JSON.stringify(water);
   for (const site of LOW_READABILITY_SITES) {
@@ -49,8 +49,6 @@ test('Low seabed lighting is isolated to the six observed dark sites and leaves 
     'titanic',
     'monterey-canyon',
     'great-blue-hole',
-    'lost-city',
-    'beebe-vent-field',
     'unknown',
   ])
     expect(lowSiteWater(site, 'low', water)).toBe(water);
