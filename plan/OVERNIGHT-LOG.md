@@ -1099,3 +1099,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** weekly 5% until Oct 20; queue 2000/2010/2020 waits. Stale worktrees 1740-1860 remain.
 - **Not done:** no tag (waits for green hosted CI). Next: V-lander (Haiku), S-tiers, V-titanic remainder.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 02:57 CDT headless run (Claude)
+
+- **Merged and pushed:** Haiku V-lander (Challenger lander: grey-ochre frame, sediment-streaked legs, dark cage, camera dome and release details; round 2 after my review said round 1 looked unchanged). Smoke + project-base green on main; no full e2e.
+- **Codex:** 2000/2010/2020 running (about 46% 5h left). Queued 2030 S-verify-6, 2040 S-bughunt-5, 2050 R-ci-time. Hosted CI for 61b2caf was still running at the time; no tag. Stale worktrees 1740-1860 remain.
+- **Not done:** next Claude items S-tiers (Sonnet), V-titanic remainder.
+- **Needs owner:** real-phone play of the newest build.

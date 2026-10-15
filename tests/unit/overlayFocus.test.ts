@@ -44,6 +44,8 @@ import { makeSyntheticTile } from './helpers.js';
 import { PROGRESS_STORAGE_KEY } from '../../src/core/Save.js';
 import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
 import { buildJournalSite } from '../../src/game/JournalData.js';
+import { ObjectivesPanel } from '../../src/ui/ObjectivesPanel.js';
+import { hudSystem } from '../../src/app/systems/hud.js';
 
 /** The same small EventTarget/DOM approach as the shell and Home focus specs. */
 class Element extends EventTarget {
@@ -122,6 +124,11 @@ class Element extends EventTarget {
       this.children.push(child);
     }
   }
+  prepend(child: Element) {
+    this.append(child);
+    this.children.unshift(this.children.pop()!);
+  }
+  setPointerCapture() {}
   appendChild(child: Element) {
     this.append(child);
     return child;
@@ -1319,6 +1326,62 @@ describe('overlay policies across the app', () => {
     expect(pause.isOpen).toBe(false);
   });
 
+  it('the site sheet grab keeps keyboard activation after a swipe and ignores its trailing pointer click', () => {
+    const home = new Home({
+      dive: vi.fn(),
+      journal: vi.fn(),
+      settings: vi.fn(),
+      controls: vi.fn(),
+    });
+    cleanup.push(() => home.dispose());
+    home.show();
+    home.showSites(false);
+    const root = home.root as unknown as Element;
+    const grab = root.querySelector('.home-sites-grab')!;
+    const sites = root.querySelector('.home-sites')!;
+    for (const [type, clientY] of [
+      ['pointerdown', 100],
+      ['pointerup', 40],
+    ] as const) {
+      const event = Object.assign(new Event(type), { clientY, pointerId: 1 });
+      grab.dispatchEvent(event);
+    }
+    expect(sites.classList.contains('is-collapsed')).toBe(false);
+    grab.dispatchEvent(Object.assign(new Event('click'), { detail: 1 }));
+    expect(sites.classList.contains('is-collapsed')).toBe(false);
+    grab.focus();
+    grab.dispatchEvent(Object.assign(new Event('click'), { detail: 0 }));
+    expect(sites.classList.contains('is-collapsed')).toBe(true);
+    grab.dispatchEvent(Object.assign(new Event('click'), { detail: 0 }));
+    expect(sites.classList.contains('is-collapsed')).toBe(false);
+    press('Escape');
+    expect(home.sitesOpen).toBe(false);
+  });
+
+  it('completion choices are keyboard reachable without stealing flight focus or piloting on Space', () => {
+    const panel = new ObjectivesPanel();
+    cleanup.push(() => panel.dispose());
+    const keep = vi.fn();
+    const surface = vi.fn();
+    panel.showBanner({ title: 'Complete', detail: '', onKeepExploring: keep, onSurface: surface });
+    expect(active()).toBe(body);
+    const buttons = (panel.root as unknown as Element).querySelectorAll('button');
+    expect(buttons).toHaveLength(2);
+    expect(buttons.every((button) => button.tabIndex === 0)).toBe(true);
+    vi.stubGlobal('document', Object.assign(new EventTarget(), document));
+    const input = new Input({ storage: null });
+    input.attach();
+    cleanup.push(() => input.dispose());
+    for (const button of buttons) {
+      button.focus();
+      expect(press('Space', { target: html(button) }).defaultPrevented).toBe(false);
+      expect(input.sample().ballast).toBe(0);
+      button.dispatchEvent(new Event('click'));
+    }
+    expect(keep).toHaveBeenCalledOnce();
+    expect(surface).toHaveBeenCalledOnce();
+  });
+
   it.each(['Settings', 'Briefing', 'Debrief', 'Journal', 'Controls', 'Pause', 'Photo'] as const)(
     '%s exposes every visible control to forward/reverse Tab and returns focus on close',
     (kind) => {
@@ -1570,6 +1633,72 @@ describe('overlay host teardown', () => {
       pointer.dispose?.();
     },
   );
+
+  it.each([false, true])(
+    'waypoint teardown removes its DOM and ignores late POIs (pending: %s)',
+    async (pending) => {
+      let finish!: () => void;
+      const ready = new Promise<void>((resolve) => {
+        finish = resolve;
+      });
+      const sonar = { setPois: vi.fn(), setScanState: vi.fn() };
+      const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+      const ctx = {
+        discovery: { ready, pois: [], scanner: {} },
+        settings: save.get(),
+        save,
+        effective: resolveEffective(save.get(), 'arcade', null),
+        sonar,
+        expose: vi.fn(),
+      } as unknown as GameContext;
+      waypointsSystem.init!(ctx);
+      cleanup.push(() => waypointsSystem.dispose?.());
+      const setPois = vi.spyOn(ctx.waypoints, 'setPois');
+      if (!pending) {
+        finish();
+        await ready;
+      }
+      setPois.mockClear();
+      sonar.setPois.mockClear();
+      waypointsSystem.dispose?.();
+      expect(ctx.waypoints.root.isConnected).toBe(false);
+      finish();
+      await ready;
+      expect(setPois).not.toHaveBeenCalled();
+      expect(sonar.setPois).not.toHaveBeenCalled();
+      waypointsSystem.dispose?.();
+    },
+  );
+
+  it('HUD host teardown removes readouts and both bar buttons across repeated lifetimes', () => {
+    const save = new Save({ config: DEFAULT_CONFIG, storage: null });
+    const ctx = {
+      meta: { id: 'reef', cols: 1, rows: 1 },
+      config: DEFAULT_CONFIG,
+      settings: save.get(),
+      save,
+      bus: new EventBus(),
+      effective: resolveEffective(save.get(), 'arcade', null),
+    } as unknown as GameContext;
+    cleanup.push(() => hudSystem.dispose?.());
+    element('DIV').className = 'hud-regions';
+    for (let i = 0; i < 2; i++) {
+      // Supply the static template nodes; this fixture does not parse innerHTML.
+      const hud = element('DIV');
+      for (const className of ['hud-readouts', 'hud-sim-speed', 'hud-power', 'hud-current']) {
+        element('DIV', hud).className = className;
+      }
+      vi.spyOn(document, 'createElement').mockImplementationOnce(() => html(hud));
+      hudSystem.init!(ctx);
+      const dispose = vi.spyOn(ctx.hud, 'dispose');
+      expect(body.querySelectorAll('.hud-journal')).toHaveLength(1);
+      hudSystem.dispose?.();
+      hudSystem.dispose?.();
+      expect(dispose).toHaveBeenCalledOnce();
+      for (const selector of ['.hud', '.hud-journal', '.hud-reset-camera'])
+        expect(body.querySelectorAll(selector)).toHaveLength(0);
+    }
+  });
 
   it('disposes both hosted Globes and their chooser ownership', async () => {
     const proto = Globe.prototype as unknown as { initGl(): void; resize(): void };
