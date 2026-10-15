@@ -240,7 +240,9 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   await page.evaluate(() =>
     (window.__game as { journal: { show(key: string): void } }).journal.show('titanic/poi/bow'),
   );
-  await expect(journal.locator('.jr-entry-photos .jr-photo-card')).toHaveCount(1);
+  // A single photo of the entry is its hero picture; the grid appears with a second.
+  await expect(journal.locator('.jr-hero img')).toHaveCount(1);
+  await expect(journal.locator('.jr-entry-photos .jr-photo-card')).toHaveCount(0);
 
   // ---- reload: still there; delete empties it without touching discoveries.
   await page.reload();

@@ -213,3 +213,10 @@ body.photo-active > :not(#viewport, .photo-mode) {
 .jr-photo-error {
   color: #ffc2bb;
 }
+.jr-hero img {
+  display: block;
+  max-width: 100%;
+  max-height: 50vh;
+  margin: 0 auto;
+  object-fit: contain;
+}
