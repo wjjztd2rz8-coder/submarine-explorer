@@ -1,3 +1,4 @@
+import { waitForFrames } from './helpers/frames.js';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
@@ -177,7 +178,7 @@ test.describe('settings screen', () => {
     const dialog = page.getByRole('dialog', { name: 'Settings' });
     await expect(dialog).toBeVisible();
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(300);
+    await waitForFrames(page, 2);
     await expect(page.locator('.pause-menu')).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();

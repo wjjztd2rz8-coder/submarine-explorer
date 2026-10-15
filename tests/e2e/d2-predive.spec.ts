@@ -96,7 +96,6 @@ test('briefing Dive settings: mode, start and Advanced persist to settings', asy
   await expect(dive.getByLabel('Start at surface')).toBeHidden();
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(briefing.locator('.briefing-begin')).toBeInViewport();
-  await page.waitForTimeout(300);
   await page.screenshot({ path: `${shots}/briefing-collapsed.png` });
 
   // Keyboard: Enter on the disclosure opens it and does not start the dive.

@@ -123,6 +123,7 @@ describe('TileLoader', () => {
     expect(() => validateMeta({ id: 'x' }, 'x')).toThrow(/cols/);
     const { meta } = makeSyntheticTile();
     expect(() => validateMeta({ ...meta, cols: 1 }, 'x')).toThrow(/grid size/);
+    expect(() => validateMeta({ ...meta, cellsize_m_x: 0 }, 'x')).toThrow(/cellsize_m_x/);
     expect(validateMeta(meta, 'x')).toBe(meta);
   });
 

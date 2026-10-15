@@ -1,3 +1,4 @@
+import { waitForFrames } from './helpers/frames.js';
 import { homeReady } from './helpers/home.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
@@ -104,7 +105,6 @@ test.describe('B3 mission flow', () => {
     // The mission picker is collapsed out of the way during a mission.
     await expect(page.locator('body > .mission-select')).toHaveClass(/is-collapsed/);
     expect((await missionProbe(page)).state).toBe('briefing');
-    await page.waitForTimeout(400);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-briefing.png' });
 
     // Frozen: holding thrust + flood does nothing while the card is up.
@@ -218,7 +218,6 @@ test.describe('B3 mission flow', () => {
     const panel = page.locator('.objectives-panel');
     await expect(panel.locator('.obj-progress')).toHaveText('1 of 4 objectives · 1 of 2 primary');
     await expect(panel.locator('.obj-nav-target')).toHaveText('→ STERN SECTION');
-    await page.waitForTimeout(300);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-objectives.png' });
 
     // Teleport next to the stern, using the same placement as the ?poi= spawn.
@@ -277,7 +276,6 @@ test.describe('B3 mission flow', () => {
     ]);
     await expect(debrief.locator('.debrief-highlight')).toHaveText('Scanned Stern section.');
     await expect(debrief.locator('[data-field="discoveries"] .debrief-value')).toHaveText('2');
-    await page.waitForTimeout(300);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-debrief.png' });
 
     // "Dive again" announces a restart, then reloads the same URL.
@@ -421,7 +419,7 @@ test.describe('fix S: mission failure, framing and modals', () => {
 
     // Escape does not dismiss the decision; Tab stays inside the card.
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
+    await waitForFrames(page, 2);
     await expect(debrief).toBeVisible();
     for (let i = 0; i < 5; i++) {
       await page.keyboard.press('Tab');
@@ -468,7 +466,6 @@ test.describe('fix S: mission failure, framing and modals', () => {
     await page.keyboard.press('Shift+Tab');
     expect(await page.evaluate(() => !!document.activeElement?.closest('.briefing'))).toBe(true);
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
     await expect(briefing).toBeHidden();
     expect((await missionProbe(page)).state).toBe('briefing');
     await expect(page.locator('.home-screen')).toBeVisible();

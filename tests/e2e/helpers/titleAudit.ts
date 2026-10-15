@@ -27,7 +27,7 @@ async function idle(page: Page) {
       ),
   );
   const before = await draws(page);
-  await page.waitForTimeout(300);
+  await waitForFrames(page, 2, 300);
   expect(await draws(page)).toBe(before);
 }
 async function trapped(page: Page, selector: string) {
@@ -263,7 +263,7 @@ export function titleAudit(base = '/') {
       await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
       for (const key of ['w', 'Space', 'g', 'Shift']) {
         await page.keyboard.down(key);
-        await page.waitForTimeout(100);
+        await waitForFrames(page, 2, 100);
         await page.keyboard.up(key);
       }
     };

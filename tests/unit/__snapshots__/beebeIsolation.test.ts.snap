@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms, shaders and opening presets 1`] = `
+exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-identical 1`] = `
 {
   "axial-seamount-ashes": {
     "biome": "a43c11d2a8c38441d88be9ffc1797c8de88d83efd73069832cb8f44f62c9b157",
@@ -349,7 +349,6 @@ exports[`850: other sites retain byte-identical biome, terrain buffers, uniforms
       },
     },
   },
-  "spawn": "fbbf0273544d4d3851eea0e2bcb814402bd0be91753d0a19ed9d5a5d9d0b987d",
   "titanic": {
     "biome": "956a054d23aeb0ba901011d42753134183a3ce0bbf4041263341dd586a19a43d",
     "tiers": {

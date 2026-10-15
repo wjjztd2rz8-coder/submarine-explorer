@@ -14,9 +14,13 @@ without an entry here is not done.
 
 ### Removed
 
+- **2140 / S-tests:** remove shared-source hashes from the Beebe isolation tests, a duplicate zero-cell-spacing case, an obsolete wall-enlargement cost comparison, and redundant cache-object identity assertions. Placement, collision, spawn, metadata rejection, cache isolation and current performance coverage remain. The ranked audit and individual cuts are in `plan/progress/2140-S-verify-11.md`.
+
 - **S-tiers (graphics):** the Ultra graphics tier is cut; Low, Medium, High and Auto remain. Reason: at the hero-site golden poses Ultra differed from High only by slightly denser seabed scatter and wall life and a richer rusticle and plume budget, for 28 to 65 percent more triangles (software-GL High 0.98 to 1.13 M, Ultra 1.33 to 1.62 M) and a 3x pixel-ratio cap that costs fill rate and does nothing at 1x or 2x. None of it was folded into High, so High and Low and Medium render as before. A saved `ultra` setting migrates to `high`; `?tier=ultra` is ignored like any unknown value. Settings, config, tests, docs and tooling no longer mention it.
 
 ### Changed
+
+- **2140 / S-tests:** remove screenshot/readiness sleeps from mission and pre-dive tests; observe rendered frames for negative menu/title checks, retaining the title checks' minimum observation periods.
 
 - **S-tests step 3:** fold five narrow e2e entries into terrain, sonar and Journal capability tables; share each wall site’s five-view boot and make review-only images optional, preserving every assertion and enabling the catalog collision guards in ordinary runs. Nightly review reuses the golden build and archives the evidence.
 
