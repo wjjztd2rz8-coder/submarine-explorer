@@ -1,6 +1,6 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
-import { MISSION_APPROACH_M } from '../../src/game/Spawn.js';
+import { missionApproachRanges as MISSION_APPROACH_M } from './helpers/site.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
 import { openBriefingAdvanced } from './helpers/briefing.js';
 

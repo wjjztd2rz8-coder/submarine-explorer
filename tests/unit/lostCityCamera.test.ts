@@ -1,3 +1,4 @@
+import { siteManifest } from '../../src/core/SiteManifest.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -135,7 +136,10 @@ describe('Lost City camera geometry', () => {
 describe('Lost City chase reset and photo return', () => {
   it('restores the opening distance after wheel zoom, free look and view toggles', () => {
     const rig = new CameraRig(config.camera, 16 / 9);
-    rig.setChaseRadiusDefault(66, config.camera.lostCityArcadeOpening.chaseOffsetXM);
+    rig.setChaseRadiusDefault(
+      66,
+      siteManifest('lost-city')!.opening!.freeDive!.modes!.arcade!.chaseOffsetX!,
+    );
     const pos = new Vector3(0, -750, 0);
     rig.snap(pos, 0.5, 0);
     const openingEye = rig.camera.position.clone();

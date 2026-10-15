@@ -1,0 +1,928 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > axial-seamount-ashes: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -341.6034770506058,
+    "y": -1519.0012970480527,
+    "yaw": -2.3561944901923435,
+    "z": 1783.5050365784364,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -341.6034770506058,
+    "y": -1519.0012970480527,
+    "yaw": -2.3561944901923435,
+    "z": 1783.5050365784364,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > axial-seamount-ashes: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -341.6034770506058,
+    "y": -1519.0012970480527,
+    "yaw": -2.3561944901923435,
+    "z": 1783.5050365784364,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -341.6034770506058,
+    "y": -1519.0012970480527,
+    "yaw": -2.3561944901923435,
+    "z": 1783.5050365784364,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > axial-seamount-ashes: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -341.6034770506058,
+    "y": -1519.0012970480527,
+    "yaw": -2.3561944901923435,
+    "z": 1783.5050365784364,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -341.6034770506058,
+    "y": -1519.0012970480527,
+    "yaw": -2.3561944901923435,
+    "z": 1783.5050365784364,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > beebe-vent-field: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": -48,
+    "chaseOffsetY": -12,
+    "chaseRadius": 54,
+    "x": 10.007403608846598,
+    "y": -4967.671606868395,
+    "yaw": 3.0717794835100207,
+    "z": -87.70518834554093,
+  },
+  "framed": {
+    "chaseOffsetX": -48,
+    "chaseOffsetY": -12,
+    "chaseRadius": 54,
+    "x": 10.007403608846598,
+    "y": -4967.671606868395,
+    "yaw": 3.0717794835100207,
+    "z": -87.70518834554093,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > beebe-vent-field: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": -48,
+    "chaseOffsetY": -12,
+    "chaseRadius": 54,
+    "x": 10.007403608846598,
+    "y": -4967.671606868395,
+    "yaw": 3.0717794835100207,
+    "z": -87.70518834554093,
+  },
+  "framed": {
+    "chaseOffsetX": -48,
+    "chaseOffsetY": -12,
+    "chaseRadius": 54,
+    "x": 10.007403608846598,
+    "y": -4967.671606868395,
+    "yaw": 3.0717794835100207,
+    "z": -87.70518834554093,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > beebe-vent-field: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": -48,
+    "chaseOffsetY": -12,
+    "chaseRadius": 54,
+    "x": 10.007403608846598,
+    "y": -4967.671606868395,
+    "yaw": 3.0717794835100207,
+    "z": -87.70518834554093,
+  },
+  "framed": {
+    "chaseOffsetX": -48,
+    "chaseOffsetY": -12,
+    "chaseRadius": 54,
+    "x": 10.007403608846598,
+    "y": -4967.671606868395,
+    "yaw": 3.0717794835100207,
+    "z": -87.70518834554093,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > bismarck: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 103.89072089180793,
+    "y": -4198.227937196452,
+    "yaw": -1.5271630954950386,
+    "z": 7.003946242258797,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 103.89072089180793,
+    "y": -4198.227937196452,
+    "yaw": -1.5271630954950386,
+    "z": 7.003946242258797,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > bismarck: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 103.89072089180793,
+    "y": -4198.227937196452,
+    "yaw": -1.5271630954950386,
+    "z": 7.003946242258797,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 103.89072089180793,
+    "y": -4198.227937196452,
+    "yaw": -1.5271630954950386,
+    "z": 7.003946242258797,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > bismarck: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 103.89072089180793,
+    "y": -4198.227937196452,
+    "yaw": -1.5271630954950386,
+    "z": 7.003946242258797,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 103.89072089180793,
+    "y": -4198.227937196452,
+    "yaw": -1.5271630954950386,
+    "z": 7.003946242258797,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > blake-plateau-corals: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -28003.97156550957,
+    "y": -738.6020199320303,
+    "yaw": 2.705260340591257,
+    "z": -17909.829368037852,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -28003.97156550957,
+    "y": -738.6020199320303,
+    "yaw": 2.705260340591257,
+    "z": -17909.829368037852,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > blake-plateau-corals: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -28003.97156550957,
+    "y": -738.6020199320303,
+    "yaw": 2.705260340591257,
+    "z": -17909.829368037852,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -28003.97156550957,
+    "y": -738.6020199320303,
+    "yaw": 2.705260340591257,
+    "z": -17909.829368037852,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > blake-plateau-corals: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -28003.97156550957,
+    "y": -738.6020199320303,
+    "yaw": 2.705260340591257,
+    "z": -17909.829368037852,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -28003.97156550957,
+    "y": -738.6020199320303,
+    "yaw": 2.705260340591257,
+    "z": -17909.829368037852,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > challenger-deep: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -408.37020246779036,
+    "y": -10895.805741147005,
+    "yaw": -0.7853981633974483,
+    "z": 564.8882317601355,
+  },
+  "framed": {
+    "chaseOffsetX": -28,
+    "chaseOffsetY": -10,
+    "chaseRadius": 48,
+    "portraitChaseOffset": {
+      "x": -28,
+      "y": -10,
+    },
+    "x": -433.11893980931967,
+    "y": -10902.58285433173,
+    "yaw": -0.6457718232379012,
+    "z": 540.1394944186062,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > challenger-deep: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -408.37020246779036,
+    "y": -10895.805741147005,
+    "yaw": -0.7853981633974483,
+    "z": 564.8882317601355,
+  },
+  "framed": {
+    "chaseOffsetX": -28,
+    "chaseOffsetY": -10,
+    "chaseRadius": 48,
+    "portraitChaseOffset": {
+      "x": -28,
+      "y": -10,
+    },
+    "x": -433.11893980931967,
+    "y": -10902.58285433173,
+    "yaw": -0.6457718232379012,
+    "z": 540.1394944186062,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > challenger-deep: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -408.37020246779036,
+    "y": -10895.805741147005,
+    "yaw": -0.7853981633974483,
+    "z": 564.8882317601355,
+  },
+  "framed": {
+    "chaseOffsetX": -28,
+    "chaseOffsetY": -10,
+    "chaseRadius": 48,
+    "portraitChaseOffset": {
+      "x": -28,
+      "y": -10,
+    },
+    "x": -433.11893980931967,
+    "y": -10902.58285433173,
+    "yaw": -0.6457718232379012,
+    "z": 540.1394944186062,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > endurance: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -354.43083884995036,
+    "y": -2978.383841246773,
+    "yaw": -1.5707963267948966,
+    "z": 1073.0767879517714,
+  },
+  "framed": {
+    "chaseOffsetX": 0,
+    "chaseOffsetY": -34,
+    "chaseRadius": 54,
+    "portraitChaseOffset": {
+      "radius": 52,
+      "x": 0,
+      "y": -48,
+    },
+    "x": -418.43083884995036,
+    "y": -2978.6714816259787,
+    "yaw": -1.7453292519943295,
+    "z": 1073.0767879517714,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > endurance: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -354.43083884995036,
+    "y": -2978.383841246773,
+    "yaw": -1.5707963267948966,
+    "z": 1073.0767879517714,
+  },
+  "framed": {
+    "chaseOffsetX": 0,
+    "chaseOffsetY": -34,
+    "chaseRadius": 54,
+    "portraitChaseOffset": {
+      "radius": 52,
+      "x": 0,
+      "y": -48,
+    },
+    "x": -418.43083884995036,
+    "y": -2978.6714816259787,
+    "yaw": -1.7453292519943295,
+    "z": 1073.0767879517714,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > endurance: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -354.43083884995036,
+    "y": -2978.383841246773,
+    "yaw": -1.5707963267948966,
+    "z": 1073.0767879517714,
+  },
+  "framed": {
+    "chaseOffsetX": 0,
+    "chaseOffsetY": -34,
+    "chaseRadius": 54,
+    "portraitChaseOffset": {
+      "radius": 52,
+      "x": 0,
+      "y": -48,
+    },
+    "x": -418.43083884995036,
+    "y": -2978.6714816259787,
+    "yaw": -1.7453292519943295,
+    "z": 1073.0767879517714,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > great-blue-hole: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": 10,
+    "chaseRadius": undefined,
+    "x": -256.8705508373226,
+    "y": -61.970780147247964,
+    "yaw": -1.5707963267948966,
+    "z": -44.80193984705082,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": 10,
+    "chaseRadius": undefined,
+    "x": -256.8705508373226,
+    "y": -61.970780147247964,
+    "yaw": -1.5707963267948966,
+    "z": -44.80193984705082,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > great-blue-hole: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": 10,
+    "chaseRadius": undefined,
+    "x": -256.8705508373226,
+    "y": -61.970780147247964,
+    "yaw": -1.5707963267948966,
+    "z": -44.80193984705082,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": 10,
+    "chaseRadius": undefined,
+    "x": -256.8705508373226,
+    "y": -61.970780147247964,
+    "yaw": -1.5707963267948966,
+    "z": -44.80193984705082,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > great-blue-hole: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": 10,
+    "chaseRadius": undefined,
+    "x": -256.8705508373226,
+    "y": -61.970780147247964,
+    "yaw": -1.5707963267948966,
+    "z": -44.80193984705082,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": 10,
+    "chaseRadius": undefined,
+    "x": -256.8705508373226,
+    "y": -61.970780147247964,
+    "yaw": -1.5707963267948966,
+    "z": -44.80193984705082,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > hudson-canyon: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 19044.740225302772,
+    "y": -924.1431749897904,
+    "yaw": -1.5707963267948966,
+    "z": -1096.8356297318167,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 19044.740225302772,
+    "y": -924.1431749897904,
+    "yaw": -1.5707963267948966,
+    "z": -1096.8356297318167,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > hudson-canyon: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 19044.740225302772,
+    "y": -924.1431749897904,
+    "yaw": -1.5707963267948966,
+    "z": -1096.8356297318167,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 19044.740225302772,
+    "y": -924.1431749897904,
+    "yaw": -1.5707963267948966,
+    "z": -1096.8356297318167,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > hudson-canyon: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 19044.740225302772,
+    "y": -924.1431749897904,
+    "yaw": -1.5707963267948966,
+    "z": -1096.8356297318167,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 19044.740225302772,
+    "y": -924.1431749897904,
+    "yaw": -1.5707963267948966,
+    "z": -1096.8356297318167,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > hunga-tonga-caldera: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -2184.412961095436,
+    "y": -446.1301732604908,
+    "yaw": 1.5707963267948966,
+    "z": 2270.7714868499484,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -2184.412961095436,
+    "y": -446.1301732604908,
+    "yaw": 1.5707963267948966,
+    "z": 2270.7714868499484,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > hunga-tonga-caldera: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -2184.412961095436,
+    "y": -446.1301732604908,
+    "yaw": 1.5707963267948966,
+    "z": 2270.7714868499484,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -2184.412961095436,
+    "y": -446.1301732604908,
+    "yaw": 1.5707963267948966,
+    "z": 2270.7714868499484,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > hunga-tonga-caldera: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -2184.412961095436,
+    "y": -446.1301732604908,
+    "yaw": 1.5707963267948966,
+    "z": 2270.7714868499484,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -2184.412961095436,
+    "y": -446.1301732604908,
+    "yaw": 1.5707963267948966,
+    "z": 2270.7714868499484,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > kamaehuakanaloa: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -166.2900885800627,
+    "y": -1288.8436635214136,
+    "yaw": 0.6981317007976946,
+    "z": 511.65468475728045,
+  },
+  "framed": {
+    "chaseOffsetX": 0,
+    "chaseOffsetY": -10,
+    "chaseRadius": undefined,
+    "portraitChaseOffset": undefined,
+    "x": -189.3327543472543,
+    "y": -1282.2404001735033,
+    "yaw": 0.8311465036540616,
+    "z": 524.4667646362323,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > kamaehuakanaloa: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -166.2900885800627,
+    "y": -1288.8436635214136,
+    "yaw": 0.6981317007976946,
+    "z": 511.65468475728045,
+  },
+  "framed": {
+    "chaseOffsetX": 0,
+    "chaseOffsetY": -10,
+    "chaseRadius": undefined,
+    "portraitChaseOffset": undefined,
+    "x": -189.3327543472543,
+    "y": -1282.2404001735033,
+    "yaw": 0.8311465036540616,
+    "z": 524.4667646362323,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > kamaehuakanaloa: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": -166.2900885800627,
+    "y": -1288.8436635214136,
+    "yaw": 0.6981317007976946,
+    "z": 511.65468475728045,
+  },
+  "framed": {
+    "chaseOffsetX": 0,
+    "chaseOffsetY": -10,
+    "chaseRadius": undefined,
+    "portraitChaseOffset": undefined,
+    "x": -189.3327543472543,
+    "y": -1282.2404001735033,
+    "yaw": 0.8311465036540616,
+    "z": 524.4667646362323,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > lost-city: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": -8,
+    "chaseOffsetY": 30,
+    "chaseRadius": 66,
+    "x": 68.2472358820348,
+    "y": -781.5715762665793,
+    "yaw": 0.17453292519943295,
+    "z": -928.0286616148973,
+  },
+  "framed": {
+    "chaseOffsetX": -8,
+    "chaseOffsetY": 30,
+    "chaseRadius": 66,
+    "x": 68.2472358820348,
+    "y": -781.5715762665793,
+    "yaw": 0.17453292519943295,
+    "z": -928.0286616148973,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > lost-city: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 68.2472358820348,
+    "y": -781.9844051841244,
+    "yaw": 0.17453292519943295,
+    "z": -922.0286616148973,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 68.2472358820348,
+    "y": -781.9844051841244,
+    "yaw": 0.17453292519943295,
+    "z": -922.0286616148973,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > lost-city: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 68.2472358820348,
+    "y": -781.9844051841244,
+    "yaw": 0.17453292519943295,
+    "z": -922.0286616148973,
+  },
+  "framed": {
+    "chaseOffsetX": undefined,
+    "chaseOffsetY": undefined,
+    "chaseRadius": undefined,
+    "x": 68.2472358820348,
+    "y": -781.9844051841244,
+    "yaw": 0.17453292519943295,
+    "z": -922.0286616148973,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > monterey-canyon: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": 14,
+    "chaseOffsetY": -2,
+    "chaseRadius": 64,
+    "x": -3400.927430367679,
+    "y": -721.6887958076273,
+    "yaw": 0.10471975511965977,
+    "z": -1304.1090951236051,
+  },
+  "framed": {
+    "chaseOffsetX": 14,
+    "chaseOffsetY": -2,
+    "chaseRadius": 64,
+    "x": -3400.927430367679,
+    "y": -721.6887958076273,
+    "yaw": 0.10471975511965977,
+    "z": -1304.1090951236051,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > monterey-canyon: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": 14,
+    "chaseOffsetY": -2,
+    "chaseRadius": 64,
+    "x": -3400.927430367679,
+    "y": -721.6887958076273,
+    "yaw": 0.10471975511965977,
+    "z": -1304.1090951236051,
+  },
+  "framed": {
+    "chaseOffsetX": 14,
+    "chaseOffsetY": -2,
+    "chaseRadius": 64,
+    "x": -3400.927430367679,
+    "y": -721.6887958076273,
+    "yaw": 0.10471975511965977,
+    "z": -1304.1090951236051,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > monterey-canyon: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": 14,
+    "chaseOffsetY": -2,
+    "chaseRadius": 64,
+    "x": -3400.927430367679,
+    "y": -721.6887958076273,
+    "yaw": 0.10471975511965977,
+    "z": -1304.1090951236051,
+  },
+  "framed": {
+    "chaseOffsetX": 14,
+    "chaseOffsetY": -2,
+    "chaseRadius": 64,
+    "x": -3400.927430367679,
+    "y": -721.6887958076273,
+    "yaw": 0.10471975511965977,
+    "z": -1304.1090951236051,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > titanic: faces a visible hero with hull and camera clearance > arcade 1`] = `
+{
+  "base": {
+    "chaseOffsetX": -70,
+    "chaseOffsetY": -10,
+    "chaseRadius": undefined,
+    "x": 336.12570463358924,
+    "y": -3778.0033071047696,
+    "yaw": -1.396263401595464,
+    "z": -292.8876647495783,
+  },
+  "framed": {
+    "chaseOffsetX": -70,
+    "chaseOffsetY": -10,
+    "chaseRadius": undefined,
+    "x": 336.12570463358924,
+    "y": -3778.0033071047696,
+    "yaw": -1.396263401595464,
+    "z": -292.8876647495783,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > titanic: faces a visible hero with hull and camera clearance > custom 1`] = `
+{
+  "base": {
+    "chaseOffsetX": -70,
+    "chaseOffsetY": -10,
+    "chaseRadius": undefined,
+    "x": 336.12570463358924,
+    "y": -3778.0033071047696,
+    "yaw": -1.396263401595464,
+    "z": -292.8876647495783,
+  },
+  "framed": {
+    "chaseOffsetX": -70,
+    "chaseOffsetY": -10,
+    "chaseRadius": undefined,
+    "x": 336.12570463358924,
+    "y": -3778.0033071047696,
+    "yaw": -1.396263401595464,
+    "z": -292.8876647495783,
+  },
+}
+`;
+
+exports[`free-dive openings on actual survey terrain and procedural hero geometry > titanic: faces a visible hero with hull and camera clearance > realistic 1`] = `
+{
+  "base": {
+    "chaseOffsetX": -70,
+    "chaseOffsetY": -10,
+    "chaseRadius": undefined,
+    "x": 336.12570463358924,
+    "y": -3778.0033071047696,
+    "yaw": -1.396263401595464,
+    "z": -292.8876647495783,
+  },
+  "framed": {
+    "chaseOffsetX": -70,
+    "chaseOffsetY": -10,
+    "chaseRadius": undefined,
+    "x": 336.12570463358924,
+    "y": -3778.0033071047696,
+    "yaw": -1.396263401595464,
+    "z": -292.8876647495783,
+  },
+}
+`;

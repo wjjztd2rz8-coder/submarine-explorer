@@ -11,6 +11,7 @@ import { Props } from '../../world/Props.js';
 import { PlacementDebug } from '../../world/props/PlacementDebug.js';
 import { PropContact, atSpawnPose, parseAtParam } from '../../world/props/Wiring.js';
 import type { GameSystem } from '../System.js';
+import { siteManifest } from '../../core/SiteManifest.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
@@ -61,7 +62,10 @@ export const propsSystem: GameSystem = {
         );
         if (pose) {
           sub.reset(pose.x, pose.y, pose.z, pose.yaw);
-          if (propsLandmark === 'lost-city' || pose.chaseOffsetY !== undefined)
+          if (
+            siteManifest(propsLandmark)?.opening?.camera?.applyDefaults ||
+            pose.chaseOffsetY !== undefined
+          )
             rig.setChaseRadiusDefault(
               pose.chaseRadius,
               pose.chaseOffsetX,

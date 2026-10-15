@@ -1,10 +1,6 @@
 import { Vector3 } from 'three';
-import {
-  deepOpeningFor,
-  DEFAULT_CAMERA,
-  KAMAEHUAKANALOA_OPENING,
-  type CameraConfig,
-} from '../core/Config.js';
+import { DEFAULT_CAMERA, type CameraConfig } from '../core/Config.js';
+import { siteManifest } from '../core/SiteManifest.js';
 import { CameraRig } from '../sub/CameraRig.js';
 import type { Props } from '../world/Props.js';
 import type { SeabedSampler, SpawnPose } from './Pois.js';
@@ -24,7 +20,7 @@ function reframe(
   safeDepth: number,
   camera: CameraConfig,
 ): SpawnPose | null {
-  const tuning = site === 'kamaehuakanaloa' ? KAMAEHUAKANALOA_OPENING : deepOpeningFor(site);
+  const tuning = siteManifest(site)?.opening?.reframe;
   const hero = props.placed.find((p) => p.def.id === tuning?.hero);
   if (!pose || !tuning || !hero || hero.localBounds.isEmpty()) return pose;
   hero.root.updateMatrixWorld(true);
@@ -37,7 +33,7 @@ function reframe(
     half.x / Math.max(Math.abs(local.x), 1e-6),
     half.z / Math.max(Math.abs(local.z), 1e-6),
   );
-  const p = target.clone().addScaledVector(direction, edge + tuning.opening.range);
+  const p = target.clone().addScaledVector(direction, edge + tuning.range);
   let floor = seabed.sampleHeight(p.x, p.z);
   for (let i = 1; i <= 8; i++) {
     const t = i / 10;
@@ -48,7 +44,7 @@ function reframe(
   }
   p.y = Math.max(
     floor + settings.hullRadius + settings.seabedClearance + settings.spawnClearanceM,
-    hero.root.position.y + tuning.opening.altitude,
+    hero.root.position.y + tuning.altitude,
     safeDepth + settings.hullRadius,
   );
   if (
@@ -65,13 +61,12 @@ function reframe(
     ? aimHero.root.localToWorld(aimHero.localBounds.getCenter(new Vector3()))
     : target;
   const yaw =
-    Math.atan2(aimTarget.x - p.x, -(aimTarget.z - p.z)) +
-    (tuning.opening.yawOffset * Math.PI) / 180;
+    Math.atan2(aimTarget.x - p.x, -(aimTarget.z - p.z)) + (tuning.yawOffset * Math.PI) / 180;
   const rig = new CameraRig(camera, 16 / 9, {
     sampleHeight: (x, z) => seabed.sampleHeight(x, z),
     getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
   });
-  const opening = tuning.opening;
+  const opening = tuning;
   rig.setChaseRadiusDefault(opening.chaseRadius, opening.chaseOffsetX, opening.chaseOffsetY);
   rig.snap(p, yaw, 0);
   for (let i = 1; i <= 6; i++)

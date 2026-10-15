@@ -39,12 +39,13 @@ event whales do not). Behaviour is identical.
 
 ## Next slices (remaining inventory rows, by suggested order)
 
-1. Openings: rows 9 and 31 and the opening/framing tables (`deepOpenings.ts`, `lowTierFraming.ts`,
-   `monterey.ts`) -> `opening` / `life.opening`.
-2. Life predicates (Challenger/Endurance and similar) -> `life`.
-3. Props and materials: Beebe chimney rows 28 etc., `props.ts` crust lists, Blue Hole
+Completed opening framing and staged life in
+[`2160-S-manifest-slice.md`](2160-S-manifest-slice.md): inventory rows 2, 4, 5, 7,
+8, 9 and 31 migrated. **20 discriminator expressions remain.**
+
+1. Props and materials: Beebe chimney rows 28 etc., `props.ts` crust lists, Blue Hole
    apron, `beebe.ts` biome lookup -> `props.<id>`.
-4. Remaining rows from `plan/progress/2110-S-verify-9.md` (rows 1-5, 7-8, 10, 14-27, 29-30)
+2. Remaining rows from `plan/progress/2110-S-verify-9.md` (rows 1, 3, 10, 14-27, 29-30)
    grouped by consuming module; take them in that file's order.
 
 ## How to brief a migration

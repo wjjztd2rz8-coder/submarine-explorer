@@ -15,7 +15,8 @@ import { Life, LIFE_ID_PREFIX } from '../../world/life/Life.js';
 import { loadLifeDoc } from '../../world/life/tables.js';
 import type { SubInfo } from '../../world/life/agent.js';
 import type { GameSystem } from '../System.js';
-import { populateMontereyOpening } from '../../world/life/MontereyOpening.js';
+import { populateGroupOpening } from '../../world/life/GroupOpening.js';
+import { siteManifest } from '../../core/SiteManifest.js';
 import { populateDeepOpening } from '../../world/life/DeepOpening.js';
 
 export function createLifeSystem(): GameSystem {
@@ -70,12 +71,12 @@ export function createLifeSystem(): GameSystem {
           },
         };
         if (seed !== undefined) opts.seed = seed;
-        if (contentLandmark === 'monterey-canyon') {
-          opts.populate = (sim, pilot) => populateMontereyOpening(sim, pilot, ctx.props);
-        }
-        if (contentLandmark === 'challenger-deep' || contentLandmark === 'endurance') {
-          opts.populate = (sim, pilot) =>
-            populateDeepOpening(contentLandmark, sim, pilot, ctx.props);
+        const opening = siteManifest(contentLandmark)?.life?.opening;
+        if (opening) {
+          opts.populate =
+            opening.strategy === 'groups'
+              ? (sim, pilot) => populateGroupOpening(opening, sim, pilot, ctx.props)
+              : (sim, pilot) => populateDeepOpening(opening, sim, pilot, ctx.props);
         }
         life = new Life(opts);
         ctx.life = life;

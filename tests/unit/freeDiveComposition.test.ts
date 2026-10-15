@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
 import { composedFreeDiveSpawn, spawnSettings } from '../../src/game/Spawn.js';
+import { composedFreeDiveSpawn as framedSpawn } from '../../src/game/DeepOpeningSpawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
@@ -51,6 +52,23 @@ describe('free-dive openings on actual survey terrain and procedural hero geomet
           -11000,
         );
         expect(spawn).not.toBeNull();
+        // Pin both passes and modes so tuning moves preserve the opening behavior.
+        for (const mode of ['arcade', 'realistic', 'custom'] as const) {
+          const args = [
+            site,
+            meta,
+            terrain,
+            props,
+            spawnSettings(config),
+            -11000,
+            config.camera,
+            mode,
+          ] as const;
+          expect({
+            base: composedFreeDiveSpawn(...args),
+            framed: framedSpawn(...args),
+          }).toMatchSnapshot(mode);
+        }
         const pos = new Vector3(spawn!.x, spawn!.y, spawn!.z);
         if (site === 'great-blue-hole')
           expect(pos.y - terrain.sampleHeight(pos.x, pos.z)).toBeGreaterThan(25);

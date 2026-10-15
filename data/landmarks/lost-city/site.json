@@ -1,3 +1,29 @@
 {
-  "id": "lost-city"
+  "id": "lost-city",
+  "opening": {
+    "mission": {
+      "rangeM": 220,
+      "destinationLabel": "Poseidon",
+      "localAltitudeWeight": 1
+    },
+    "freeDive": {
+      "hero": "poseidon-tower",
+      "bearing": 90,
+      "range": 44,
+      "fromCentre": true,
+      "altitude": 18,
+      "yawOffset": 10,
+      "modes": {
+        "arcade": {
+          "range": 38,
+          "chaseRadius": 66,
+          "chaseOffsetX": -8,
+          "chaseOffsetY": 30
+        }
+      }
+    },
+    "camera": {
+      "applyDefaults": true
+    }
+  }
 }

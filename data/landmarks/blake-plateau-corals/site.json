@@ -1,3 +1,14 @@
 {
-  "id": "blake-plateau-corals"
+  "id": "blake-plateau-corals",
+  "opening": {
+    "mission": {
+      "rangeM": 160,
+      "destinationLabel": "the coral mound cluster"
+    },
+    "freeDive": {
+      "hero": "lophelia-mound",
+      "bearing": 45,
+      "range": 75
+    }
+  }
 }

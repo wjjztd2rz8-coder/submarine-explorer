@@ -4,5 +4,16 @@
     "turbidity": {
       "maxAltitudeM": 45
     }
+  },
+  "opening": {
+    "mission": {
+      "rangeM": 160,
+      "destinationLabel": "the volcanic rim slope"
+    },
+    "freeDive": {
+      "hero": "caldera-tuff-wall",
+      "bearing": 0,
+      "range": 75
+    }
   }
 }

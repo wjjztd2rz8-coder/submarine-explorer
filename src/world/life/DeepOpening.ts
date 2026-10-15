@@ -1,5 +1,5 @@
 import { Raycaster, Vector3 } from 'three';
-import { DEEP_OPENINGS, deepOpeningFor } from '../../core/Config.js';
+import type { ApproachOpeningLife } from '../../core/SiteManifest.js';
 import type { Props } from '../Props.js';
 import type { LifeSim } from './LifeSim.js';
 import type { SubInfo } from './agent.js';
@@ -7,16 +7,17 @@ import { entryBand, inBand } from './tables.js';
 
 /** One staged group beside the approach, using the normal pool, depth bands and steering. */
 export function populateDeepOpening(
-  site: string,
+  spec: ApproachOpeningLife,
   sim: LifeSim,
   sub: SubInfo,
   props: Pick<Props, 'placed' | 'collide'>,
 ): void {
-  const tuning = deepOpeningFor(site);
-  if (!tuning) return;
-  const hero = props.placed.find((p) => p.def.id === tuning.hero);
-  if (!hero || Math.hypot(sub.x - hero.root.position.x, sub.z - hero.root.position.z) > 100) return;
-  const spec = tuning.habitat;
+  const hero = props.placed.find((p) => p.def.id === spec.anchorHero);
+  if (
+    !hero ||
+    Math.hypot(sub.x - hero.root.position.x, sub.z - hero.root.position.z) > spec.habitatRadiusM
+  )
+    return;
   const row = sim.activeRows.find((r) => r.def.id === spec.species);
   const band = row && entryBand(row);
   if (!row || !band) return;
@@ -43,10 +44,10 @@ export function populateDeepOpening(
   });
   if (spec.onWreck) {
     // Sessile animals attach to actual timber instead of floating above the mud.
-    const hull = hero.root.getObjectByName('endurance-hull');
+    const hull = hero.root.getObjectByName(spec.mesh!);
     if (!hull) return;
     hero.root.updateMatrixWorld(true);
-    const patch = DEEP_OPENINGS.endurance.deckPatch;
+    const patch = spec.deckPatch!;
     const ray = new Raycaster();
     const deck: Vector3[] = [];
     for (let i = 0; i < count; i++) {

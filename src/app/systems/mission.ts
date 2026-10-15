@@ -16,25 +16,11 @@ import { tileUrl } from '../../ui/MissionSelect.js';
 import type { GameSystem } from '../System.js';
 import { missionApproachScanRadius, spawnHeight, spawnSettings } from '../../game/Spawn.js';
 import { composedMissionSpawn } from '../../game/DeepOpeningSpawn.js';
+import { siteManifest } from '../../core/SiteManifest.js';
 import { Disposables } from '../Disposables.js';
 
 const cleanup = new Disposables();
 let approachOpening = false;
-const APPROACH_DESTINATIONS: Readonly<Record<string, string>> = {
-  titanic: 'the bow',
-  'challenger-deep': "Leggo's lander site",
-  'lost-city': 'Poseidon',
-  'monterey-canyon': 'the north canyon wall',
-  endurance: 'the main hull',
-  'axial-seamount-ashes': 'Mushroom vent',
-  'hudson-canyon': 'the coral ledge',
-  kamaehuakanaloa: 'Hiolo North',
-  'beebe-vent-field': 'the Beebe smokers',
-  'great-blue-hole': 'the stalactite gallery',
-  bismarck: 'the main hull',
-  'hunga-tonga-caldera': 'the volcanic rim slope',
-  'blake-plateau-corals': 'the coral mound cluster',
-};
 
 export const missionSystem: GameSystem = {
   name: 'mission',
@@ -215,7 +201,8 @@ export const missionSystem: GameSystem = {
       if (first && original && target) {
         const distance = ctx.sub.position.distanceTo(target.position);
         const navigating = approachOpening && !first.complete && distance > target.radius;
-        const destination = APPROACH_DESTINATIONS[ctx.route!.landmarkId] ?? target.name;
+        const destination =
+          siteManifest(ctx.route!.landmarkId)?.opening?.mission?.destinationLabel ?? target.name;
         const title = navigating ? `Head to ${destination}` : original.title;
         if (first.title !== title) {
           first.title = title;

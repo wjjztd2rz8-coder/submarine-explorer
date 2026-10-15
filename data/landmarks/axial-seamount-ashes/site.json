@@ -7,5 +7,16 @@
     "plume": {
       "maxAltitudeM": 70
     }
+  },
+  "opening": {
+    "mission": {
+      "rangeM": 180,
+      "destinationLabel": "Mushroom vent"
+    },
+    "freeDive": {
+      "hero": "mushroom-chimney",
+      "bearing": 45,
+      "range": 60
+    }
   }
 }
