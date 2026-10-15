@@ -101,6 +101,14 @@ export function spireRadius(o: SpireOpts, t0: number): number {
   return o.r0 * taper * flare * ledge * lip;
 }
 
+/** How far (m) the torn rim of an irregular trunk sits below the full height at an angle. */
+export function rimDrop(o: SpireOpts, ang: number): number {
+  const broad = fbm3(Math.cos(ang) * 1.7 + 5, 3, Math.sin(ang) * 1.7 + 5, o.seed + 91, 3);
+  const teeth = fbm3(Math.cos(ang) * 5 + 2, 8, Math.sin(ang) * 5 + 2, o.seed + 93, 2);
+  const drop = Math.pow(smooth(0.35, 0.7, broad), 1.5) * 1.6 + smooth(0.5, 0.8, teeth) * 0.5;
+  return o.r0 * o.topFrac * drop;
+}
+
 /** A tiered, fluted column standing on y = 0. */
 export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
   const g = new THREE.CylinderGeometry(
@@ -199,7 +207,17 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
       o.crater && t > 0.999 && Math.hypot(x, z) < 1e-6
         ? o.crater * o.r0 * o.topFrac * (o.trunk ? 2.4 : 1)
         : 0;
-    p.setXYZ(i, x * f, y - sink, z * f);
+    let yy = y - sink;
+    if (o.irregular && o.trunk) {
+      // Broken rim: the top metres are a mouth with a torn edge, not a lathe ring. Angular
+      // notches and teeth drop the wall by up to a rim radius, and the rim thins and
+      // wavers in radius. Wall and cap rings share the formula, so the seam stays closed.
+      const k = smooth(0.8, 1, t);
+      yy -= k * k * rimDrop(o, ang);
+      const teeth = fbm3(Math.cos(ang) * 5 + 2, 8, Math.sin(ang) * 5 + 2, o.seed + 93, 2);
+      f *= 1 + k * (teeth - 0.5) * 0.5;
+    }
+    p.setXYZ(i, x * f, yy, z * f);
   }
   g.deleteAttribute('uv');
   g.computeVertexNormals();

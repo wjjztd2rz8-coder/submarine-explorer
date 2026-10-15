@@ -35,7 +35,7 @@ import {
   type InstanceSpec,
 } from './shared.js';
 import { scatterRubble } from './talus.js';
-import { spireRadius, tieredSpire, trunkCrest, type SpireOpts } from './spire.js';
+import { rimDrop, spireRadius, tieredSpire, trunkCrest, type SpireOpts } from './spire.js';
 import type { GeoBuildInput } from './types.js';
 
 const OLD = new THREE.Color(0xc8c0ac); // weathered, inactive carbonate
@@ -82,7 +82,9 @@ function roughenTrunk(g: THREE.BufferGeometry, s: SpireOpts, seed: number, pocke
     const broken = smooth(0.35, 0.6, mid + 0.5 + Math.sin(a * 3 + Math.floor(band)) * 0.2);
     const ledge = smooth(0.7, 0.96, frac) * (1 - smooth(0.96, 1, frac)) * broken;
     const undercut = smooth(0.0, 0.25, frac) * (1 - smooth(0.25, 0.5, frac)) * broken;
-    let k = 1 + big * 0.6 + mid * 0.3 + ridge * 0.1 + ledge * 0.04 - undercut * 0.03;
+    // Fine flowstone pitting and rib crests (small, high-frequency) on top of the broad relief.
+    const pit = fbm3(ca * 9 + 3, y * 0.9, sa * 9 + 3, seed ^ 0x2a3, 2) - 0.5;
+    let k = 1 + big * 0.6 + mid * 0.4 + ridge * 0.16 + ledge * 0.09 - undercut * 0.07 + pit * 0.07;
     // Orifice pocket.
     const da = Math.atan2(Math.sin(a - orA), Math.cos(a - orA)) * rad;
     const dy = y - 0.8 * s.h;
@@ -294,6 +296,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       ),
     ),
     r: s.r0 * s.topFrac * (1 + (s.lip ?? 0)),
+    drop: (a: number): number => rimDrop(s, a),
     depth: s.crater ? s.crater * s.r0 * s.topFrac * 2.4 : 0,
   }));
   // A dark side orifice high on the main trunk, in the prop frame.
@@ -330,7 +333,11 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const tw = finRnd() * 0.6 - 0.3; // sideways curl
       const ca = Math.cos(a),
         sa = Math.sin(a);
-      const base = new THREE.Vector3(v.p.x + ca * v.r * 0.95, v.p.y - 0.3, v.p.z + sa * v.r * 0.95);
+      const base = new THREE.Vector3(
+        v.p.x + ca * v.r * 0.95,
+        v.p.y - 0.3 - v.drop(a),
+        v.p.z + sa * v.r * 0.95,
+      );
       const segs = 3;
       const pos: number[] = [];
       for (let j = 0; j <= segs; j++) {
@@ -548,7 +555,11 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     const v = vents[k]!;
     for (let j = 0; j < 28; j++) {
       const a = (j / 28) * Math.PI * 2 + k;
-      fringe.push(v.p.x + Math.cos(a) * v.r * 0.95, v.p.y + 0.15, v.p.z + Math.sin(a) * v.r * 0.95);
+      fringe.push(
+        v.p.x + Math.cos(a) * v.r * 0.95,
+        v.p.y + 0.15 - v.drop(a),
+        v.p.z + Math.sin(a) * v.r * 0.95,
+      );
     }
   }
   if (fringe.length) {
