@@ -1,4 +1,5 @@
 import { homeReady } from './helpers/home.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
@@ -6,10 +7,18 @@ import { expect, test, type Page } from '@playwright/test';
 import { scanAim } from './helpers/scanAim.js';
 
 const shots = '.cache/codex/shots/f2-progress';
+// Reward, persistence and focus guards need presented frames, not a continuous
+// software-GL loop between every Journal action. Phone coverage sets its own viewport.
+test.use({ viewport: { width: 960, height: 600 } });
+test.describe.configure({ timeout: 120_000 });
+test.beforeEach(async ({ page }) => pauseClockBeforeNavigation(page));
+
 async function ready(page: Page): Promise<void> {
-  await page.waitForFunction(() => window.__gameReady === true);
-  await page.waitForFunction(
-    () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
+  await clockFramesUntil(
+    page,
+    () =>
+      window.__gameReady === true &&
+      (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
   );
 }
 async function realistic(page: Page): Promise<void> {
@@ -61,13 +70,20 @@ async function scan(page: Page, id: string): Promise<void> {
     g.sub.pitch = pitch;
     g.rig.snap(g.sub.position, yaw, pitch);
   }, aim);
-  await page.waitForFunction(
-    (poi) =>
-      (window.__game as { scanner: { view: { candidateId: string } } }).scanner.view.candidateId ===
-      poi,
-    id,
-    { timeout: 10_000 },
-  );
+  await expect
+    .poll(
+      async () => {
+        await page.clock.fastForward(50);
+        return page.evaluate(
+          (poi) =>
+            (window.__game as { scanner: { view: { candidateId: string } } }).scanner.view
+              .candidateId === poi,
+          id,
+        );
+      },
+      { timeout: 10_000, intervals: [20] },
+    )
+    .toBe(true);
   await scanWithKeyboard(page, id);
   expect(
     await page.evaluate(
@@ -84,7 +100,6 @@ async function scan(page: Page, id: string): Promise<void> {
 test('discoveries unlock Journal cosmetics; photo bonus and best stars survive reload', async ({
   page,
 }) => {
-  test.setTimeout(180_000);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await realistic(page);
@@ -98,6 +113,7 @@ test('discoveries unlock Journal cosmetics; photo bonus and best stars survive r
   ])
     await scan(page, id);
   await page.keyboard.press('Escape');
+  await page.clock.fastForward(50);
   await expect(
     page.locator('.pause-actions').getByRole('button', { name: 'Upgrades', exact: true }),
   ).toHaveCount(0);
@@ -118,25 +134,31 @@ test('discoveries unlock Journal cosmetics; photo bonus and best stars survive r
   const held = await page.evaluate(
     () => (window.__game as { sub: { position: { y: number } } }).sub.position.y,
   );
-  await page.waitForTimeout(400);
+  // Keep the full freeze interval: every scheduled frame must leave the sub still.
+  await page.clock.runFor(400);
   expect(
     await page.evaluate(
       () => (window.__game as { sub: { position: { y: number } } }).sub.position.y,
     ),
   ).toBe(held);
   await page.keyboard.press('Escape');
+  await page.clock.fastForward(50);
   await expect(journal).toBeHidden();
   await expect(page.locator('.pause-menu')).toBeVisible();
   await page.locator('.pause-actions button', { hasText: /^Resume$/ }).click();
   await page.keyboard.press('p');
+  await page.clock.fastForward(50);
   await expect(page.locator('.photo-mode')).toBeVisible();
   await page.locator('.photo-mode-capture').click();
-  await page.waitForFunction(
+  await clockFramesUntil(
+    page,
     () => (window.__game as { progress: { bonus: boolean } }).progress.bonus,
   );
   await page.keyboard.press('p');
+  await page.clock.fastForward(50);
   await expect(page.locator('.photo-mode')).toBeHidden();
   await page.keyboard.press('Escape');
+  await page.clock.fastForward(50);
   await expect(page.locator('.pause-menu')).toBeVisible();
   await page.locator('.pause-surface').click();
   const debrief = page.locator('.mission-debrief');
@@ -145,6 +167,7 @@ test('discoveries unlock Journal cosmetics; photo bonus and best stars survive r
   await expect(debrief).not.toContainText('research points');
   await shot(page, 'debrief');
   await debrief.locator('[data-action="dive-sites"]').click();
+  await homeReady(page, true);
   const sites = page.locator('.home-sites');
   await expect(sites.locator('[data-mission="blake-plateau-corals"] .mission-stars')).toHaveText(
     '★★★',
@@ -241,7 +264,7 @@ test('phone Journal offers cosmetics and all downloaded missions stay open in Re
   await realistic(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await homeReady(page);
+  await homeReady(page, true);
   await page.locator('.home-menu').getByRole('button', { name: 'Journal', exact: true }).click();
   const journal = page.locator('.journal');
   await expect(journal).toBeVisible();
@@ -305,7 +328,7 @@ test('old discoveries are credited before fitting a deep-mission vehicle', async
     (value) => localStorage.setItem('subexplorer.discoveries.v1', value),
     old,
   );
-  await page.goto('/?mission=titanic&skipBriefing=1');
+  await page.goto('/?mission=titanic&skipBriefing=1&tier=low');
   await ready(page);
   const result = await page.evaluate(() => {
     const g = window.__game as {
@@ -334,7 +357,7 @@ test('species discovery credits once without research or full-depth access chang
       );
   });
   await page.goto('/');
-  await homeReady(page);
+  await homeReady(page, true);
   const earned = await page.evaluate(() => {
     const progress = (
       window.__game as { progress: { award(kind: string, id: string): number; lifetime: number } }
@@ -346,7 +369,7 @@ test('species discovery credits once without research or full-depth access chang
     };
   });
   expect(earned).toEqual({ first: 1, repeat: 0, lifetime: 899 });
-  await page.goto('/?mission=challenger-deep&skipBriefing=1');
+  await page.goto('/?mission=challenger-deep&skipBriefing=1&tier=low');
   await ready(page);
   expect(
     await page.evaluate(

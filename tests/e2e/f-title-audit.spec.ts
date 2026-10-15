@@ -38,6 +38,10 @@ test.describe('title touch navigation', () => {
       )
       .toBe(true);
     await page.setViewportSize({ width: 667, height: 320 });
+    // The landscape picker now displays its globe. Exercise CSS hiding directly
+    // so the renderer-stop guard survives layout changes.
+    await expect(page.locator('.home-globe-slot')).toBeVisible();
+    await page.addStyleTag({ content: '.home-globe-wrap { display: none !important; }' });
     await expect
       .poll(() =>
         page.evaluate(() => (window.__game as { homeGlobe: { isOpen: boolean } }).homeGlobe.isOpen),

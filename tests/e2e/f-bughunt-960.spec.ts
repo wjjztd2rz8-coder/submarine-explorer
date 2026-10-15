@@ -1,4 +1,4 @@
-import { homeReady } from './helpers/home.js';
+import { homeReady, openSiteList } from './helpers/home.js';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import type { Discovery } from '../../src/game/Discovery.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
@@ -93,6 +93,7 @@ for (const layout of [
             await act(
               home.locator('.home-menu').getByRole('button', { name: 'Dive sites', exact: true }),
             );
+            await openSiteList(page, layout.touch, true);
             // The mission button replaces the document. A tap can finish
             // before navigation commits, while the home game's ready flag is
             // still true. Wait for the destination before pumping its clock.

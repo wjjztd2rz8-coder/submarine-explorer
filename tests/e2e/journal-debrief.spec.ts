@@ -1,6 +1,6 @@
 import { expect, test as freshTest, type Page, type Locator } from '@playwright/test';
 import { test as experiencedTest } from './helpers/unlocked.js';
-import { homeReady } from './helpers/home.js';
+import { homeReady, openSiteList } from './helpers/home.js';
 import { diveReady, loadDive } from './helpers/dive.js';
 import { advanceScan, completeScan, scanWithKeyboard } from './helpers/scan.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -1529,6 +1529,7 @@ freshTest.describe('Home to scan and return journey', () => {
           await act(back, touch);
           await expect(home.locator('.home-sites')).toBeHidden();
           await act(home.getByRole('button', { name: 'Dive sites', exact: true }), touch);
+          await openSiteList(page, touch, true);
           const choice = home.locator(`.mission-item[data-mission="${site}"]`);
           await expect(choice).toBeEnabled();
           await choice.scrollIntoViewIfNeeded();
@@ -1536,7 +1537,12 @@ freshTest.describe('Home to scan and return journey', () => {
           await shot('02-pick-site');
           // Site selection navigates; tap/click can resolve before the new
           // document commits. Do not pump/evaluate the outgoing game.
-          await Promise.all([page.waitForEvent('load'), act(choice, touch)]);
+          await Promise.all([
+            page.waitForURL((url) => url.searchParams.get('mission') === site, {
+              waitUntil: 'domcontentloaded',
+            }),
+            act(choice, touch),
+          ]);
           await ready(page);
           await expect(page.locator('.briefing')).toBeVisible();
           await shot('03-briefing');
@@ -1545,8 +1551,11 @@ freshTest.describe('Home to scan and return journey', () => {
           await act(cancel, touch);
           await expect(home).toBeVisible();
           await act(home.getByRole('button', { name: 'Dive sites', exact: true }), touch);
+          await openSiteList(page, touch, true);
           await Promise.all([
-            page.waitForEvent('load'),
+            page.waitForURL((url) => url.searchParams.get('mission') === site, {
+              waitUntil: 'domcontentloaded',
+            }),
             act(home.locator(`.mission-item[data-mission="${site}"]`), touch),
           ]);
           await ready(page);

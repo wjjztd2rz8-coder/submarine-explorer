@@ -5,7 +5,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { finishAnimations } from './helpers/hudTips.js';
 import { GUIDANCE } from './helpers/guidance.js';
 import { dismissTutorial, setScanCardSuppressed } from './helpers/tutorial.js';
-import { expectCompactPhoneHud } from './helpers/phoneHud.js';
+import { expectCompactPhoneHud, expectObjectiveGuidance } from './helpers/phoneHud.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
 import { homeReady } from './helpers/home.js';
 import { type Discovery } from '../../src/game/Discovery.js';
@@ -1025,7 +1025,9 @@ freshTest.describe('portrait telemetry and small controls', () => {
       // The daily route reboots without ?touch=1; a real touch restores touch mode.
       await page.touchscreen.tap(195, 420);
       await expect(page.locator('html.is-touch')).toHaveCount(1);
-      await separate(page, '.sonar', '.objectives-panel');
+      await expectObjectiveGuidance(page, true);
+      await expect(page.locator('.objectives-panel')).toBeHidden();
+      await separate(page, '.sonar', GUIDANCE.any);
       await separate(page, '.sonar', '.hud-readouts');
     });
   });
@@ -1359,7 +1361,16 @@ freshTest.describe('animal guidance placement', () => {
           // Withdraw only the scan source: covering play would suppress every hint too.
           await setScanCardSuppressed(page, true);
           for (let frame = 0; frame < 40; frame++) {
-            if (await hint.textContent().then((text) => text?.includes('Animal nearby.'))) break;
+            // Read the stable slot: a hint selector is absent until a frame offers it.
+            if (
+              await page
+                .locator(GUIDANCE.any)
+                .evaluate(
+                  (slot) =>
+                    slot.dataset.kind === 'hint' && slot.textContent?.includes('Animal nearby.'),
+                )
+            )
+              break;
             await page.clock.fastForward(250);
           }
           await expect(hint).toContainText(
@@ -1462,7 +1473,7 @@ freshTest.describe('catalog tutorial and reload', () => {
     });
     // Let the first frames publish the real altitude: an unstepped sub reads as on
     // the seabed, and the urgent SEABED PROXIMITY warning would own the slot.
-    await page.clock.runFor(500);
+    await page.clock.runFor(50);
     await page.evaluate(() => {
       (window.__game as unknown as Game).sub.step = () => {};
     });

@@ -8,3 +8,14 @@ export async function homeReady(page: Page, pausedClock = false): Promise<void> 
   else await page.waitForFunction(ready, undefined, { timeout: 45_000 });
   await expect(page.locator('.home-screen')).toBeVisible();
 }
+
+/** Expand the portrait site sheet through its public control before selecting a mission. */
+export async function openSiteList(page: Page, touch = false, pausedClock = false): Promise<void> {
+  const expand = page.getByRole('button', { name: 'Show all sites', exact: true });
+  if (await expand.isVisible()) {
+    if (touch) await expand.tap();
+    else await expand.click();
+    if (pausedClock) await page.clock.fastForward(300);
+    await expect(page.locator('.home-sites-grab')).toHaveAttribute('aria-expanded', 'true');
+  }
+}
