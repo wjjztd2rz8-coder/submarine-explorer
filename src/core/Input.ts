@@ -526,14 +526,10 @@ export class Input {
 
   attach(): void {
     if (this.disposers.length) return;
-    const editing = (target: EventTarget | null): boolean => {
-      const t = target as HTMLElement | null;
-      return !!t && (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable);
-    };
     const onKeyDown = (e: KeyboardEvent) => {
       // Ignore keystrokes aimed at a text field (including a rebind capture box).
       const t = e.target as HTMLElement | null;
-      if (editing(t)) return;
+      if (isEditing(t)) return;
       // Native UI activation/navigation must not also trigger game actions or
       // lose its default behavior (Space activates a focused button on keyup).
       if (
@@ -575,7 +571,7 @@ export class Input {
       if (document.hidden) this.clear();
     };
     const onFocus = (e: FocusEvent) => {
-      if (editing(e.target)) this.clear();
+      if (isEditing(e.target)) this.clear();
     };
     const onMouseDown = (e: MouseEvent) => {
       if (e.button === 0) this.mouseDown = true;
@@ -749,6 +745,12 @@ export class Input {
       this.padIndex = null;
       this.padPressed.clear();
     }
+    // Keep polling pad edges during editing so a held menu press cannot fire
+    // on return to play, but let the focused editor own every input source.
+    if (typeof document !== 'undefined' && isEditing(document.activeElement)) {
+      this.clear();
+      this.gamepadActive = false;
+    }
     return s;
   }
 
@@ -767,6 +769,11 @@ export class Input {
     s.capturePhoto = false;
     s.toggleGuide = false;
   }
+}
+
+function isEditing(target: EventTarget | null | undefined): boolean {
+  const t = target as HTMLElement | null | undefined;
+  return !!t && (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable);
 }
 
 function safeStorage(): BindingStore | null {
