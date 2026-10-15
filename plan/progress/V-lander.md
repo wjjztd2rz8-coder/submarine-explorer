@@ -5,11 +5,14 @@
 File: `src/world/props/geo/lander.ts` only. No site branches, no settings, no new helpers
 (uses `lerp` and `smoothstep` from `src/util/math.ts`).
 
-- Palette: aluminium and the pressure housing are greyer and less white; flotation spheres are
-  orange-yellow instead of bright yellow glass.
+- Palette (director review round 2): the frame is a mid grey-ochre (`0x5b5a52`, matte roughness
+  0.85), the pressure housing is a dull grey, and the flotation spheres are orange-yellow instead
+  of bright yellow glass. The bait arm and cage are a dark mesh and slightly thicker.
+- Mast: thicker (radius 0.05 of the scale) with a dark cap at the top; the strobe is smaller.
 - Weathering pass (`weather()`): a per-vertex pass over the merged frame, so no extra triangles
-  or draw calls. Sediment darkens the lower sections (strongest at the seabed), and irregular
-  rust stains patch the structure below about 1.6 units.
+  or draw calls. Sediment darkens the lower 40% of the height with vertical streaks that follow
+  the angle around each leg, strongest at the seabed. Dark brown rust stains patch the lower
+  structure below about 1.6 units.
 - Legs use four height rings instead of one, so the grime gradient runs along the leg.
 - Sediment rings settle around each foot pad.
 - Details: a dark camera lens dome, an acoustic release (dark body with an orange ring) on the
@@ -35,7 +38,7 @@ structure.
 
 - `PW_PORT=4871 tools/gates.sh --no-e2e`: PASS (content, build, unit, attribution, prettier).
 - `PW_PORT=4871 tools/gates.sh` (default, smoke and project-base): PASS (python, content, build,
-  unit, e2e smoke, e2e-base, attribution, prettier). Exit 0.
+  unit, e2e smoke, e2e-base, attribution, prettier). Exit 0. Run again after the round-2 changes.
 
 ## Follow-ups
 
