@@ -70,15 +70,15 @@ The newest items go first.
 
 ## In flight
 
-- Codex 2120 S-verify-10, 2130 S-bughunt-8, 2140 S-verify-11 running (2026-10-15 eve). Queue: 2150 R-ci-green, 2160 S-manifest slices, 2170 J-journeys-repeat.
+- Codex 2150 R-ci-green and 2160 S-manifest slice running; queue 2170 J-journeys-repeat, 2180 S-verify-12, 2190 S-bughunt-9.
 
 ## Backlog
 
 One list, ordered by player impact and dependencies. Lane is in brackets. "After X" means don't start until X is merged. Evidence: joint review 2026-10-15 eve in `plan/REVIEWS.md`.
 
 1. **J-journeys-repeat [Codex 2170, then Sonnet judges]:** repeat the unaided Titanic and Blue Hole journeys (Home, pick, first 60 s, reward, next objective, Journal, debrief) on the merged build at desktop, portrait and landscape; list every confusion or dead end as a fix item here.
-2. **V-low-tier [Sonnet]:** all golden and mission captures so far are High desktop. Capture the five heroes and four dark sites at Low tier in portrait; judge readability (Blake, Hudson, Bismarck, Hunga especially, since V-darksites excluded Low) and fix in data.
-3. **V-golden-monterey [Haiku]:** `tools/golden.sh` timed out on Monterey in 2026-10-15-172432 (poses.json:146). Find why, raise the wait or fix the pose, so every golden set has all heroes; also capture Endurance at its mission spawn.
+2. **DONE 2026-10-15 (Low ambient 3→6, Lost City and Beebe added to the Low readability table; Blake still dimmest at 3, needs palette) V-low-tier [Sonnet]:** all golden and mission captures so far are High desktop. Capture the five heroes and four dark sites at Low tier in portrait; judge readability (Blake, Hudson, Bismarck, Hunga especially, since V-darksites excluded Low) and fix in data.
+3. **DONE 2026-10-15 (fallback screenshot wait 30→90 s) V-golden-monterey [Haiku]:** `tools/golden.sh` timed out on Monterey in 2026-10-15-172432 (poses.json:146). Find why, raise the wait or fix the pose, so every golden set has all heroes; also capture Endurance at its mission spawn.
 4. **V-bluehole [Sonnet]:** weakest hero (2.5-3). Detached canopy/stalactite slab, terrain seams, floating stones in `great-blue-hole-east-3.png`; faceted terraces. Fix geometry/materials, not tuning.
 5. **V-lostcity [Sonnet]:** towers are hollow, flat-rimmed tubes with a smooth collar (`lost-city-3.png`); add rim breakup and surface relief; remove the regular dimples on the flat slope.
 6. **V-endurance [Sonnet]:** opening still has a large, bright, centred sub over a small wreck; lower hull side dark. Make the wreck the subject (data: framing, sub offset or lighting), keep `deepOpening` and `openingClearance1290` guards.

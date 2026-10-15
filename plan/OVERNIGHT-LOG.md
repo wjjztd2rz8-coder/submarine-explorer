@@ -1179,3 +1179,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 2120/2130/2140 running; queued 2150 R-ci-green, 2160 S-manifest slices, 2170 J-journeys-repeat. Removed 13 stale worktrees.
 - **Not done:** no Claude packages this run (review only); no tag (last completed hosted CI red on one shard).
 - **Needs owner:** real-phone play of the newest build (Low tier).
+
+## 2026-10-15 13:44 CDT headless run 9 (Claude)
+
+- **Merged and pushed:** Codex 2120/2130/2140 (verification, audio/input bug fixes, e2e audit; gates green after fixing prettier on plan docs). Haiku V-golden-monterey (golden fallback wait 30→90 s; Endurance mission spawn already captured via GOLDEN_MODE=mission). Sonnet V-low-tier (Low ambient floor 3→6, Lost City and Beebe added to Low readability table; Hudson/Bismarck/Hunga ~3.5, Blake still 3). Smoke + project-base green; no full e2e.
+- **Codex:** 2150 R-ci-green and 2160 S-manifest slice running; queued 2170, 2180, 2190. Codex 5h near 3% until 17:24 reset.
+- **Not done:** no tag (waits for green hosted CI), Blake palette, V-bluehole/lostcity/endurance/beebe.
+- **Needs owner:** real-phone play of the newest build (Low tier).
