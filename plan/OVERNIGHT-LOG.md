@@ -1078,3 +1078,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** weekly 5% until Oct 20; queue 2000/2010/2020 waits. Stale worktrees 1740-1860 remain.
 - **Not done:** no tag (waits for green hosted CI). Next: S-journal-picture. Known: faint repeating pattern in the sub headlight pool on the Blue Hole wall.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-14 23:09 CDT headless run (Claude)
+
+- **Merged and pushed:** Sonnet S-journal-picture (first scan of a POI or animal files a still; newest photo shows full width under the Journal entry title; grid only for 2+ photos; spec on desktop and phone). I centred the capped image. Smoke + project-base green on main; no full e2e.
+- **Codex:** weekly 5% until Oct 20; queue 2000/2010/2020 waits. Stale worktrees 1740-1860 remain.
+- **Not done:** no tag (waits for green hosted CI; latest completed CI run was red). Auto-open of the entry after a scan was not confirmed by the spec.
+- **Needs owner:** real-phone play of the newest build.
