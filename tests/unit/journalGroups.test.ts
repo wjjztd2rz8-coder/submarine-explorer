@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { COSMETIC_CHOICES, type CosmeticSlot } from '../../src/game/Cosmetics.js';
 import { Progress } from '../../src/game/Progress.js';
-import { ProgressSave } from '../../src/core/Save.js';
+import { ProgressSave, PROGRESS_STORAGE_KEY } from '../../src/core/Save.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 import { Journal } from '../../src/ui/Journal.js';
 import type { JournalEntry, JournalSite } from '../../src/game/JournalData.js';
@@ -377,5 +377,59 @@ it.each([false, true])(
     } finally {
       mesh.dispose();
     }
+  },
+);
+
+it.each([150, 900])('shows the next unowned reward after migrating %i lifetime RP', (lifetime) => {
+  const values = new Map([
+    [PROGRESS_STORAGE_KEY, JSON.stringify({ version: 1, lifetime, cosmetics: { paint: 'gold' } })],
+  ]);
+  const storage = {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      values.set(key, value);
+    },
+    removeItem: (key: string) => {
+      values.delete(key);
+    },
+  };
+  for (let round = 0; round < 2; round++) {
+    const progress = new Progress(new ProgressSave(storage));
+    journal.setProgress(progress);
+    journal.show('front');
+    const info = descendants(root).find((el) => el.textContent.startsWith('0 discoveries'))!;
+    expect(info.textContent.includes('next unlock')).toBe(lifetime === 150);
+    if (lifetime === 150) expect(info.textContent).toContain('next unlock at 20');
+    const paint = find((el) => el.dataset.cosmetic === 'paint');
+    expect(paint.value).toBe('gold');
+    expect(paint.children.find((option) => option.value === 'gold')!.disabled).toBe(false);
+    expect(paint.parentElement!.children[0].style.background).toBe('#e2b23c');
+    expect(progress.selectCosmetic('paint', 'gold')).toBe(true);
+    // Persist the migrated grants even when the selected choice does not change.
+    progress.selectCosmetic('frame', 'gold');
+  }
+});
+
+it.each([false, true])(
+  'keeps the cosmetics disclosure and picker focus through refresh (phone=%s)',
+  (phone) => {
+    phoneQuery.matches = phone;
+    journal.setProgress(new Progress(new ProgressSave(null)));
+    journal.show('front');
+    const disclosure = () =>
+      find((el) => el.tagName === 'DETAILS' && el.children[0]?.textContent === 'Cosmetics');
+    const picker = () => find((el) => el.dataset.cosmetic === 'paint');
+    disclosure().open = true;
+    disclosure().dispatchEvent(new Event('toggle'));
+    picker().focus();
+    journal.refresh();
+    expect(disclosure().open).toBe(true);
+    expect(document.activeElement).toBe(picker());
+    disclosure().open = false;
+    disclosure().dispatchEvent(new Event('toggle'));
+    disclosure().children[0].focus();
+    journal.refresh();
+    expect(disclosure().open).toBe(false);
+    expect(document.activeElement).toBe(disclosure().children[0]);
   },
 );

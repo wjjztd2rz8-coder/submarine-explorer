@@ -449,6 +449,7 @@ export class Journal {
     const target = focused?.dataset.target;
     const category = focused?.dataset.category;
     const row = focused?.dataset.row;
+    const cosmetic = focused?.dataset.cosmetic;
     const inside = !!focused && this.root.contains(focused);
     this.renderContent();
     // Moving the switch between the tree and the page drops its focus.
@@ -457,7 +458,8 @@ export class Journal {
       return;
     }
     if (inside && !focused?.isConnected) {
-      if (this.phone) {
+      // Cosmetics stay on the front page; phone site navigation instead focuses the article.
+      if (this.phone && !cosmetic && category !== 'cosmetics') {
         this.body.focus({ preventScroll: true });
         return;
       }
@@ -466,9 +468,11 @@ export class Journal {
       const replacement = controls.find((control) =>
         target
           ? control.dataset.target === target
-          : row
-            ? control.dataset.row === row
-            : !!category && control.dataset.category === category,
+          : cosmetic
+            ? control.dataset.cosmetic === cosmetic
+            : row
+              ? control.dataset.row === row
+              : !!category && control.dataset.category === category,
       );
       (
         replacement ??
@@ -707,18 +711,27 @@ export class Journal {
     const found = discoveryCount(progress.snapshot());
     const next = Math.min(
       ...Object.values(COSMETIC_CHOICES).flatMap((defs) =>
-        defs.flatMap(({ reward }) =>
-          reward.kind === 'discoveries' && reward.total > found ? [reward.total] : [],
+        defs.flatMap((def) =>
+          def.reward.kind === 'discoveries' && !progress.ownsCosmetic(def)
+            ? [def.reward.total]
+            : [],
         ),
       ),
     );
     const section = el('details', 'jr-category');
-    section.append(el('summary', 'jr-group', 'Cosmetics'));
+    section.dataset.category = 'cosmetics';
+    section.open = this.expandedCategories.get('cosmetics') ?? false;
+    section.addEventListener('toggle', () => {
+      if (section.isConnected) this.expandedCategories.set('cosmetics', section.open);
+    });
+    const summary = el('summary', 'jr-group', 'Cosmetics');
+    summary.dataset.category = 'cosmetics';
+    section.append(summary);
     section.append(
       el(
         'p',
         'jr-empty',
-        `${found} discoveries${Number.isFinite(next) ? ` · next unlock at ${next}` : ''} · applies next dive`,
+        `${found} discoveries${Number.isFinite(next) ? ` · next unlock at ${next}` : ''} · sub changes next dive`,
       ),
     );
     for (const [slot, label] of [

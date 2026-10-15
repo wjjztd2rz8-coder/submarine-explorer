@@ -28,9 +28,63 @@ class Element extends EventTarget {
 let touch = false;
 afterEach(() => {
   touch = false;
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 const documentElement = { classList: { contains: (name: string) => touch && name === 'is-touch' } };
+
+it('replaces the toast in the top panel, restarts its timeout, and cancels it on exit/dispose', () => {
+  vi.useFakeTimers();
+  const body = new Element();
+  vi.stubGlobal('document', { body, documentElement, createElement: () => new Element() });
+  vi.stubGlobal('window', {
+    setTimeout,
+    clearTimeout,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  });
+  const mode = new PhotoMode(vi.fn(), vi.fn(), vi.fn());
+  const top = (mode.root as unknown as Element).children[1];
+  const toast = top.children.at(-1)!;
+  try {
+    for (let round = 0; round < 2; round++) {
+      mode.setActive(true);
+      mode.toast('Saved to Journal');
+      expect(top.children.filter((el) => el.className === 'photo-mode-toast')).toHaveLength(1);
+      vi.advanceTimersByTime(2000);
+      mode.toast('Photo storage is full', true);
+      vi.advanceTimersByTime(500); // The previous success timer must not hide the error.
+      expect(toast.hidden).toBe(false);
+      expect(toast.textContent).toBe('Photo storage is full');
+      expect(toast.classList.toggle).toHaveBeenLastCalledWith('is-error', true);
+      vi.advanceTimersByTime(5499);
+      expect(toast.hidden).toBe(false);
+      vi.advanceTimersByTime(1);
+      expect(toast.hidden).toBe(true);
+
+      mode.toast('Photo storage is full', true);
+      vi.advanceTimersByTime(1000);
+      mode.toast('Saved to Journal');
+      expect(toast.classList.toggle).toHaveBeenLastCalledWith('is-error', false);
+      vi.advanceTimersByTime(2499);
+      expect(toast.hidden).toBe(false);
+      vi.advanceTimersByTime(1);
+      expect(toast.hidden).toBe(true);
+
+      mode.toast('Saved to Journal');
+      mode.setActive(false);
+      expect(toast.hidden).toBe(true);
+      expect(vi.getTimerCount()).toBe(0);
+      mode.setActive(true);
+      expect(toast.hidden).toBe(true);
+    }
+    mode.toast('Saved to Journal');
+  } finally {
+    mode.dispose();
+  }
+  expect(vi.getTimerCount()).toBe(0);
+});
+
 it('offers visible Capture, Done and Pause actions while the viewfinder is active', () => {
   const body = new Element();
   vi.stubGlobal('document', { body, documentElement, createElement: () => new Element() });

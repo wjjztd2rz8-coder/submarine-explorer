@@ -14,12 +14,13 @@ import {
   isWreckScatter,
   type WreckId,
 } from '../../src/world/props/wrecks/index.js';
-import { InstanceList } from '../../src/world/props/wrecks/instances.js';
+import { hangRusticle, InstanceList } from '../../src/world/props/wrecks/instances.js';
 import { countTriangles, flipFaces, makeStations } from '../../src/world/props/wrecks/kit.js';
 import { paintWreck } from '../../src/world/props/wrecks/materials.js';
 import { wreckScatterSpec } from '../../src/world/props/wrecks/scatter.js';
 import { layoutScatter, scatterCount } from '../../src/world/props/wrecks/scatterLayout.js';
 import { mulberry32 } from '../../src/world/props/wrecks/shared.js';
+import { HEAVY_RUSTICLES, rusticlesAlong } from '../../src/world/props/wrecks/ship.js';
 import { makeSyntheticTile } from './helpers.js';
 
 const DIMS: Record<WreckId, [number, number, number]> = {
@@ -272,6 +273,41 @@ describe('kit helpers', () => {
     expect(new THREE.Vector3().setFromMatrixPosition(l.matrices[1]!).x).toBe(4);
   });
 
+  it('rusticle girth defaults to one and only scales a strand radially', () => {
+    const strand = (girth?: number) => {
+      const list = new InstanceList();
+      hangRusticle(list, new THREE.Vector3(2, 3, 4), 1.5, mulberry32(19), girth);
+      return list;
+    };
+    const original = strand();
+    expect(strand(1)).toEqual(original);
+    const thick = strand(HEAVY_RUSTICLES);
+    const p = new THREE.Vector3(),
+      q = new THREE.Quaternion(),
+      s = new THREE.Vector3();
+    original.matrices[0].decompose(p, q, s);
+    const tp = new THREE.Vector3(),
+      tq = new THREE.Quaternion(),
+      ts = new THREE.Vector3();
+    thick.matrices[0].decompose(tp, tq, ts);
+    expect(tp).toEqual(p);
+    expect(tq.angleTo(q)).toBeCloseTo(0);
+    expect(ts.y).toBeCloseTo(s.y);
+    expect(ts.x / s.x).toBeCloseTo(HEAVY_RUSTICLES);
+    expect(ts.z / s.z).toBeCloseTo(HEAVY_RUSTICLES);
+    expect(thick.colors).toEqual(original.colors);
+
+    const path = [new THREE.Vector3(), new THREE.Vector3(0, 0, 10)];
+    const a = new InstanceList(),
+      b = new InstanceList();
+    const ra = mulberry32(19),
+      rb = mulberry32(19);
+    rusticlesAlong(a, path, 1, 0.3, 1.5, ra);
+    rusticlesAlong(b, path, 1, 0.3, 1.5, rb, undefined, 1);
+    expect(a).toEqual(b);
+    expect(ra()).toBe(rb()); // Default girth must preserve the caller's later random choices too.
+  });
+
   it('paintWreck darkens the mud line and silts up-facing surfaces', () => {
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute([0, 0.05, 0, 0, 8, 0, 0, 8, 0], 3));
@@ -283,6 +319,24 @@ describe('kit helpers', () => {
     const lum = (i: number): number => c.getX(i) + c.getY(i) + c.getZ(i);
     expect(lum(0)).toBeLessThan(lum(1)); // mud line darker than the side above it
     expect(Math.abs(c.getX(2) - c.getZ(2))).toBeGreaterThan(0.01); // silt tints the top
+  });
+
+  it('plate variation is opt-in and does not leak into later wreck paint', () => {
+    const source = new THREE.BoxGeometry(12, 10, 30, 2, 2, 2);
+    const colors = new Float32Array(source.getAttribute('position').count * 3).fill(0.5);
+    source.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    const options = { seed: 19, rustiness: 0.72, growth: 0.25, silt: 0.55, mudBand: 2.2 };
+    const normal = source.clone();
+    const plated = source.clone();
+    const later = source.clone();
+    paintWreck(normal, options);
+    paintWreck(plated, { ...options, plates: [1.9, 5.5, 1.1] });
+    paintWreck(later, options);
+    expect(plated.getAttribute('color').array).not.toEqual(normal.getAttribute('color').array);
+    expect(later.getAttribute('color').array).toEqual(normal.getAttribute('color').array);
+    for (const attribute of ['position', 'normal', 'uv'])
+      expect(plated.getAttribute(attribute).array).toEqual(source.getAttribute(attribute).array);
+    for (const geometry of [source, normal, plated, later]) geometry.dispose();
   });
 });
 
