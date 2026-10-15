@@ -2,7 +2,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 import { Box2, InstancedMesh, Matrix4, Mesh, Raycaster, Vector2, Vector3 } from 'three';
-import { DEEP_OPENINGS, deepSiteWater, makeConfig } from '../../src/core/Config.js';
+import { deepSiteWater, makeConfig } from '../../src/core/Config.js';
+import { siteManifest, type ApproachOpeningLife } from '../../src/core/SiteManifest.js';
 import { spawnSettings } from '../../src/game/Spawn.js';
 import { composedFreeDiveSpawn, composedMissionSpawn } from '../../src/game/DeepOpeningSpawn.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
@@ -98,7 +99,9 @@ describe('Challenger / Endurance opening', () => {
             vi.unstubAllGlobals();
           }
           const forward = new Vector3(Math.sin(pose.yaw), 0, -Math.cos(pose.yaw));
-          const hero = props.placed.find((p) => p.def.id === DEEP_OPENINGS[site].hero)!;
+          const hero = props.placed.find(
+            (p) => p.def.id === siteManifest(site)!.life!.opening!.anchorHero,
+          )!;
           hero.root.updateMatrixWorld(true);
           const toHero = hero.root
             .localToWorld(hero.localBounds.getCenter(new Vector3()))
@@ -132,16 +135,30 @@ describe('Challenger / Endurance opening', () => {
             env: { groundAt: (x, z) => terrain.sampleHeight(x, z) },
             seed: 42,
             populate: (s, p) => {
-              populateDeepOpening(site, s, p, props);
+              populateDeepOpening(
+                siteManifest(site)!.life!.opening as ApproachOpeningLife,
+                s,
+                p,
+                props,
+              );
               staged.push(...s.groups.map((g) => g.id));
             },
           });
           sim.update(1 / 60, pilot);
           const groups = sim.groups.filter((g) => staged.includes(g.id));
           expect(groups).toHaveLength(1);
+          expect({
+            pose,
+            groups: groups.map((g) => ({
+              species: g.def.id,
+              positions: g.members.map((a) => [a.x, a.y, a.z]),
+            })),
+          }).toMatchSnapshot();
           const group = groups[0]!;
           expect(group.members).toHaveLength(
-            tier === 'low' ? DEEP_OPENINGS[site].habitat.low : DEEP_OPENINGS[site].habitat.count,
+            tier === 'low'
+              ? (siteManifest(site)!.life!.opening as ApproachOpeningLife).low
+              : (siteManifest(site)!.life!.opening as ApproachOpeningLife).count,
           );
           const targets = placePois(
             parsePois(json(`data/landmarks/${site}/pois.json`)),
@@ -293,7 +310,7 @@ describe('Challenger / Endurance opening', () => {
                 ).toBeGreaterThan(8);
               const eye = rig.camera.position.clone();
               // The opening pulls the chase arm in so the 44 m hull dominates the first frame.
-              const radius = DEEP_OPENINGS.endurance.opening.chaseRadius;
+              const radius = siteManifest('endurance')!.opening!.reframe!.chaseRadius!;
               expect(pose.chaseRadius).toBe(radius);
               expect(rig.chaseRadius).toBe(radius);
               rig.orbit(0.2, 0.1, 0.5);
@@ -406,7 +423,7 @@ describe('Challenger / Endurance opening', () => {
             life,
           });
           const entries = journal.entries.filter(
-            (e) => e.id === DEEP_OPENINGS[site].habitat.species,
+            (e) => e.id === (siteManifest(site)!.life!.opening as ApproachOpeningLife).species,
           );
           expect(entries).toHaveLength(1);
           expect(journalEntryTag(entries[0]!)).toBe('Game addition');

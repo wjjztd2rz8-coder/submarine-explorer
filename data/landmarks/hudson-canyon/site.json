@@ -7,5 +7,16 @@
     "whale": {
       "maxDepthM": 180
     }
+  },
+  "opening": {
+    "mission": {
+      "rangeM": 160,
+      "destinationLabel": "the coral ledge"
+    },
+    "freeDive": {
+      "hero": "coral-ledge-mound",
+      "bearing": 0,
+      "range": 75
+    }
   }
 }

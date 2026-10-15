@@ -1,8 +1,9 @@
+import { siteManifest } from '../../src/core/SiteManifest.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { Raycaster, Vector3 } from 'three';
-import { DEEP_OPENINGS, makeConfig } from '../../src/core/Config.js';
+import { makeConfig } from '../../src/core/Config.js';
 import { composedFreeDiveSpawn } from '../../src/game/DeepOpeningSpawn.js';
 import { spawnSettings } from '../../src/game/Spawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
@@ -42,7 +43,7 @@ describe('1290 merged opening camera clearance', () => {
           )!;
           expect(pose).not.toBeNull();
           expect(pose.chaseRadius).toBe(
-            site === 'endurance' ? DEEP_OPENINGS.endurance.opening.chaseRadius : 66,
+            site === 'endurance' ? siteManifest('endurance')!.opening!.reframe!.chaseRadius! : 66,
           );
           const position = new Vector3(pose.x, pose.y, pose.z);
           for (const [width, height] of [

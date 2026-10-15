@@ -13,7 +13,8 @@ import { Props } from '../../src/world/Props.js';
 import { LifeSim } from '../../src/world/life/LifeSim.js';
 import { LIFE_TIERS } from '../../src/world/life/types.js';
 import { parseLifeDoc } from '../../src/world/life/tables.js';
-import { populateMontereyOpening } from '../../src/world/life/MontereyOpening.js';
+import { populateGroupOpening } from '../../src/world/life/GroupOpening.js';
+import { siteManifest, type GroupOpeningLife } from '../../src/core/SiteManifest.js';
 import { Headlights } from '../../src/render/Headlights.js';
 import { atmosphereTier } from '../../src/render/Atmosphere.js';
 import type { SubInfo } from '../../src/world/life/agent.js';
@@ -63,12 +64,23 @@ describe('Monterey opening habitat', () => {
           env: { groundAt: (x, z) => terrain.sampleHeight(x, z) },
           seed: 42,
           populate: (sim, pilot) => {
-            populateMontereyOpening(sim, pilot, props);
+            populateGroupOpening(
+              siteManifest(site)!.life!.opening as GroupOpeningLife,
+              sim,
+              pilot,
+              props,
+            );
             staged.push(...sim.groups.map((g) => g.id));
           },
         });
         sim.update(1 / 60, pilot);
         const openingGroups = sim.groups.filter((g) => staged.includes(g.id));
+        expect(
+          openingGroups.map((g) => ({
+            species: g.def.id,
+            positions: g.members.map((a) => [a.x, a.y, a.z]),
+          })),
+        ).toMatchSnapshot();
         expect(openingGroups.filter((g) => g.def.id === 'pacific-hake')).toHaveLength(2);
         expect(openingGroups.filter((g) => g.def.id === 'sablefish')).toHaveLength(1);
         expect(openingGroups.filter((g) => g.def.id === 'sea-pen')).toHaveLength(1);

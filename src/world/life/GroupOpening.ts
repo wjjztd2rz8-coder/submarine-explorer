@@ -1,26 +1,26 @@
 import { Vector3 } from 'three';
-import { MONTEREY_OPENING } from '../../core/Config.js';
+import type { GroupOpeningLife } from '../../core/SiteManifest.js';
 import type { Props } from '../Props.js';
 import type { LifeSim } from './LifeSim.js';
 import type { SubInfo } from './agent.js';
 import { entryBand, inBand } from './tables.js';
 
 /** Populate the opening bend only; all groups use normal steering, scans and tier caps. */
-export function populateMontereyOpening(
+export function populateGroupOpening(
+  tuning: GroupOpeningLife,
   sim: LifeSim,
   sub: SubInfo,
   props: Pick<Props, 'placed' | 'collide'>,
 ): void {
-  const ledge = props.placed.find((p) => p.def.id === 'canyon-wall-ledge');
+  const ledge = props.placed.find((p) => p.def.id === tuning.anchorHero);
   if (
     !ledge ||
-    Math.hypot(sub.x - ledge.root.position.x, sub.z - ledge.root.position.z) >
-      MONTEREY_OPENING.habitatRadiusM
+    Math.hypot(sub.x - ledge.root.position.x, sub.z - ledge.root.position.z) > tuning.habitatRadiusM
   )
     return;
   const position = new Vector3();
   const normal = new Vector3();
-  for (const spec of MONTEREY_OPENING.groups) {
+  for (const spec of tuning.groups) {
     const row = sim.activeRows.find((r) => r.def.id === spec.species);
     if (!row) continue;
     const band = entryBand(row);
@@ -44,8 +44,8 @@ export function populateMontereyOpening(
     // Keep the shoals travelling north along the local canyon axis.
     if (def.archetype === 'school') {
       group.gx = x;
-      group.gz = z - MONTEREY_OPENING.schoolRunM;
-      group.goalIn = MONTEREY_OPENING.schoolHoldS;
+      group.gz = z - tuning.schoolRunM;
+      group.goalIn = tuning.schoolHoldS;
       for (const a of group.members) {
         a.hd = a.yaw = Math.PI;
         a.vx = 0;
@@ -53,10 +53,10 @@ export function populateMontereyOpening(
       }
     }
     if (def.archetype === 'sessile') {
-      group.cell = 'monterey-opening';
+      group.cell = tuning.cell;
       for (const [i, a] of group.members.entries()) {
-        a.x = x + ((i % 3) - 1) * MONTEREY_OPENING.penSpacingM;
-        a.z = z + (Math.floor(i / 3) - 1) * MONTEREY_OPENING.penSpacingM;
+        a.x = x + ((i % 3) - 1) * tuning.penSpacingM;
+        a.z = z + (Math.floor(i / 3) - 1) * tuning.penSpacingM;
         a.y = sim.env.groundAt(a.x, a.z);
       }
     }

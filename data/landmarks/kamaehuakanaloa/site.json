@@ -7,5 +7,25 @@
     "plume": {
       "maxAltitudeM": 70
     }
+  },
+  "opening": {
+    "mission": {
+      "rangeM": 200,
+      "destinationLabel": "Hiolo North"
+    },
+    "freeDive": {
+      "hero": "hiolo-north-chimney-1",
+      "bearing": 45,
+      "range": 45
+    },
+    "reframe": {
+      "hero": "hiolo-north-pillows",
+      "aimHero": "hiolo-north-chimney-1",
+      "range": 55,
+      "altitude": 18,
+      "yawOffset": 0,
+      "chaseOffsetX": 0,
+      "chaseOffsetY": -10
+    }
   }
 }

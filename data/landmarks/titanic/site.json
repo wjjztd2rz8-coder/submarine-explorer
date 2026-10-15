@@ -1,3 +1,18 @@
 {
-  "id": "titanic"
+  "id": "titanic",
+  "opening": {
+    "mission": {
+      "rangeM": 220,
+      "destinationLabel": "the bow"
+    },
+    "freeDive": {
+      "hero": "bow-hull",
+      "bearing": 100,
+      "range": 28,
+      "altitude": 26,
+      "yawOffset": 0,
+      "chaseOffsetX": -70,
+      "chaseOffsetY": -10
+    }
+  }
 }

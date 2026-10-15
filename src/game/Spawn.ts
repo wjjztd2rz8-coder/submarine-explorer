@@ -15,6 +15,7 @@
  */
 
 import type { GameConfig, HullClass, CameraConfig } from '../core/Config.js';
+import { allSiteManifests, siteManifest } from '../core/SiteManifest.js';
 import { DEFAULT_CAMERA } from '../core/config/camera.js';
 import { CameraRig } from '../sub/CameraRig.js';
 import { headingFromForward, latLonToWorld } from '../util/geo.js';
@@ -25,22 +26,12 @@ import { Vector3 } from 'three';
 import type { Props } from '../world/Props.js';
 import type { GameplayMode } from '../core/Save.js';
 
-/** Per-site transit distance to the first primary contact, measured in 3D metres. */
-export const MISSION_APPROACH_M: Readonly<Record<string, number>> = {
-  titanic: 220,
-  'challenger-deep': 200,
-  'lost-city': 220,
-  'monterey-canyon': 240,
-  endurance: 180,
-  'axial-seamount-ashes': 180,
-  'hudson-canyon': 160,
-  kamaehuakanaloa: 200,
-  'beebe-vent-field': 220,
-  'great-blue-hole': 150,
-  bismarck: 150,
-  'hunga-tonga-caldera': 160,
-  'blake-plateau-corals': 160,
-};
+/** Per-site mission ranges, retained as a derived view for capability consumers. */
+export const MISSION_APPROACH_M: Readonly<Record<string, number>> = Object.fromEntries(
+  allSiteManifests().flatMap((site) =>
+    site.opening?.mission ? [[site.id, site.opening.mission.rangeM]] : [],
+  ),
+);
 
 /** Leave a real approach even with Extended sensors (twice the base scan radius). */
 export function missionApproachScanRadius(siteId: string, radius: number): number {
@@ -62,7 +53,7 @@ export function composedMissionSpawn(
   if (!first) return null;
   const target = new Vector3(first.position.x, first.position.y, first.position.z);
   const range = MISSION_APPROACH_M[siteId] ?? 220;
-  const authored = FREE_DIVE_OPENINGS[siteId];
+  const authored = siteManifest(siteId)?.opening?.freeDive;
   const hero = props.placed.find((p) => p.def.id === authored?.hero);
   let bearing = ((authored?.bearing ?? 180) * Math.PI) / 180;
   if (hero) {
@@ -131,12 +122,12 @@ export function composedMissionSpawn(
       if (props.collide(eye, 6, new Vector3())) clear = false;
     }
     if (!clear) continue;
-    // Lost City's first contact sits on a terrace beside a deep valley. Prefer
-    // the shelf: a level approach over the valley puts the seabed beyond fog
-    // visibility even though the transit itself clears terrain.
+    // A shelf preference keeps the seabed visible beside deep valleys.
     const localAltitude = p.y - seabed.sampleHeight(p.x, p.z);
     const score =
-      (p.y - target.y) * 3 + Math.abs(turn) * 0.12 + (siteId === 'lost-city' ? localAltitude : 0);
+      (p.y - target.y) * 3 +
+      Math.abs(turn) * 0.12 +
+      localAltitude * (siteManifest(siteId)?.opening?.mission?.localAltitudeWeight ?? 0);
     if (score < bestScore) {
       bestScore = score;
       best = { x: p.x, y: p.y, z: p.z, yaw };
@@ -144,102 +135,6 @@ export function composedMissionSpawn(
   }
   return best;
 }
-
-/** Local approach bearings and clearance from each hero's actual footprint. */
-const FREE_DIVE_OPENINGS: Record<
-  string,
-  {
-    hero: string;
-    bearing: number;
-    range: number;
-    /** Measure `range` from the hero's centre instead of its footprint edge (sprawling sets). */
-    fromCentre?: boolean;
-    /** Hold this height above the hero's base (its local origin) instead of rising to the target. */
-    altitude?: number;
-    /** Minimum opening altitude over the local seabed, even beside a shallow ledge. */
-    minSeabedAltitudeM?: number;
-    /** Turn the sub this many degrees off the hero so the hull does not hide it (chase view). */
-    yawOffset?: number;
-    /** The approach crosses open water (a sinkhole): skip the clear-seabed-line-of-sight raise. */
-    openWater?: boolean;
-    /** Score cost per degree of turn away from `bearing` (default 0.12): high keeps a face-on view. */
-    turnWeight?: number;
-    /** Pull the chase camera in to this arm length (m): a long wreck then fills the frame. */
-    chaseRadius?: number;
-    /** Extra lateral chase offset, preserving the sub's authored approach heading. */
-    chaseOffsetX?: number;
-    /** Extra vertical chase offset (m): a positive value tilts the opening view down. */
-    chaseOffsetY?: number;
-  }
-> = {
-  titanic: {
-    hero: 'bow-hull',
-    bearing: 100,
-    range: 28,
-    altitude: 26,
-    yawOffset: 0,
-    // Keep the global opening/reset radius; offsets put the sub beside the bow contact.
-    chaseOffsetX: -70,
-    chaseOffsetY: -10,
-  },
-  'challenger-deep': { hero: 'leggo-lander-marker', bearing: 135, range: 65 },
-  'lost-city': {
-    hero: 'poseidon-tower',
-    bearing: 90,
-    range: 44,
-    fromCentre: true,
-    altitude: 18,
-    yawOffset: 10,
-  },
-  'monterey-canyon': {
-    hero: 'canyon-wall-ledge',
-    bearing: 0,
-    // Leave room for the scan cone's vertical angle above the seated wall contact,
-    // including Low's coarser terrain triangles.
-    range: 34,
-    altitude: 10,
-    yawOffset: 6,
-    turnWeight: 3,
-    // Frame the bend beside the hull while keeping X reset at the global chase distance.
-    chaseRadius: 64,
-    chaseOffsetY: -2,
-    chaseOffsetX: 14,
-  },
-  endurance: { hero: 'main-hull', bearing: 90, range: 70 },
-  'axial-seamount-ashes': { hero: 'mushroom-chimney', bearing: 45, range: 60 },
-  'hudson-canyon': { hero: 'coral-ledge-mound', bearing: 0, range: 75 },
-  kamaehuakanaloa: { hero: 'hiolo-north-chimney-1', bearing: 45, range: 45 },
-  'beebe-vent-field': {
-    hero: 'beebe-chimney-1',
-    bearing: 60,
-    range: 76,
-    fromCentre: true,
-    altitude: 8,
-    yawOffset: 11,
-    // Three-quarter stern view: show hull length and deck, with the smoker to port.
-    chaseRadius: 54,
-    chaseOffsetX: -48,
-    chaseOffsetY: -12,
-  },
-  // Inside the hole, facing the ledge alcove across the water: the wall, the light shafts
-  // and the fish above the ledge share the frame instead of a bare rim.
-  'great-blue-hole': {
-    hero: 'karst-grotto',
-    bearing: 90,
-    // Reach the existing gallery scan in the opening frame, rather than crossing the hole first.
-    range: 58,
-    fromCentre: true,
-    // ~20 m below the ledge the grotto stands on: the gallery sits against the hole wall under the surface light shafts.
-    altitude: -28,
-    minSeabedAltitudeM: 26,
-    openWater: true,
-    chaseOffsetY: 10,
-  },
-  // Keep the first scan within 120 m, including the hull's footprint and the depth difference.
-  bismarck: { hero: 'main-hull', bearing: 50, range: 85 },
-  'hunga-tonga-caldera': { hero: 'caldera-tuff-wall', bearing: 0, range: 75 },
-  'blake-plateau-corals': { hero: 'lophelia-mound', bearing: 45, range: 75 },
-};
 
 /**
  * Compose a free dive after props load. Bounds follow the placed hero's real
@@ -257,19 +152,9 @@ export function composedFreeDiveSpawn(
   cameraConfig: CameraConfig = DEFAULT_CAMERA,
   gameplayMode: GameplayMode = 'arcade',
 ): SpawnPose | null {
-  const authored = FREE_DIVE_OPENINGS[siteId];
-  // Keep the vent pass's Realistic/Custom approach; Arcade opens with a
-  // shorter chase arm so the full tower and nearby floor share the frame.
-  const opening =
-    siteId === 'lost-city' && gameplayMode === 'arcade'
-      ? {
-          ...authored!,
-          range: cameraConfig.lostCityArcadeOpening.rangeM,
-          chaseRadius: cameraConfig.lostCityArcadeOpening.chaseRadiusM,
-          chaseOffsetX: cameraConfig.lostCityArcadeOpening.chaseOffsetXM,
-          chaseOffsetY: cameraConfig.lostCityArcadeOpening.chaseOffsetYM,
-        }
-      : authored;
+  const authored = siteManifest(siteId)?.opening?.freeDive;
+  const mode = authored?.modes?.[gameplayMode];
+  const opening = mode ? { ...authored!, ...mode } : authored;
   const hero = props.placed.find((p) => p.def.id === opening?.hero);
   if (!opening || !hero || hero.localBounds.isEmpty()) return null;
   hero.root.updateMatrixWorld(true);

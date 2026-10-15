@@ -4,5 +4,22 @@
     "plume": {
       "maxAltitudeM": 70
     }
+  },
+  "opening": {
+    "mission": {
+      "rangeM": 220,
+      "destinationLabel": "the Beebe smokers"
+    },
+    "freeDive": {
+      "hero": "beebe-chimney-1",
+      "bearing": 60,
+      "range": 76,
+      "fromCentre": true,
+      "altitude": 8,
+      "yawOffset": 11,
+      "chaseRadius": 54,
+      "chaseOffsetX": -48,
+      "chaseOffsetY": -12
+    }
   }
 }

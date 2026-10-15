@@ -21,11 +21,10 @@ import { type Atmosphere } from '../../src/render/Atmosphere.js';
 import { type Terrain } from '../../src/world/Terrain.js';
 import { type PresetSystem } from '../../src/world/presets/Presets.js';
 import { DEFAULT_CAMERA } from '../../src/core/config/camera.js';
-import { DEEP_OPENINGS } from '../../src/core/config/deepOpenings.js';
 import { type Discovery } from '../../src/game/Discovery.js';
 import { type Mission } from '../../src/game/Mission.js';
 import { type Headlights } from '../../src/render/Headlights.js';
-import { MISSION_APPROACH_M } from '../../src/game/Spawn.js';
+import { siteData, missionApproachRanges as MISSION_APPROACH_M } from './helpers/site.js';
 import { type Scanner } from '../../src/game/Scanner.js';
 import { type PerfStats } from '../../src/app/systems/quality.js';
 import { waitForFrames } from './helpers/frames.js';
@@ -335,12 +334,12 @@ freshTest.describe('route and mode camera poses', () => {
           expect(opening.primaryRange!).toBeGreaterThan(opening.scanRadius!);
           expect(opening.chaseRadius).toBeCloseTo(Math.hypot(38, 90), 6);
         }
-        const tuning = DEFAULT_CAMERA.lostCityArcadeOpening;
+        const tuning = siteData('lost-city').opening!.freeDive!.modes!.arcade!;
         const expectedEye =
           route === 'tile'
             ? [
-                tuning.chaseOffsetXM,
-                DEFAULT_CAMERA.chaseOffset.y + tuning.chaseOffsetYM,
+                tuning.chaseOffsetX!,
+                DEFAULT_CAMERA.chaseOffset.y + tuning.chaseOffsetY!,
                 DEFAULT_CAMERA.chaseOffset.z,
               ]
             : [0, DEFAULT_CAMERA.chaseOffset.y, DEFAULT_CAMERA.chaseOffset.z];
@@ -1189,7 +1188,7 @@ freshTest.describe('camera terrain and solid tip clearance', () => {
             expect(opening.props.failed).toBe(0);
             // The camera distance is the site's authored opening arm, not a fixed number; endurance tunes it per V-endurance.
             expect(opening.radius).toBe(
-              site === 'endurance' ? DEEP_OPENINGS.endurance.opening.chaseRadius : 66,
+              site === 'endurance' ? siteData('endurance').opening!.reframe!.chaseRadius! : 66,
             );
             expect(opening.radius).toBeGreaterThanOrEqual(35);
             expect(opening.radius).toBeLessThanOrEqual(180);

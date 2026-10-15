@@ -1,3 +1,49 @@
 {
-  "id": "endurance"
+  "id": "endurance",
+  "opening": {
+    "mission": {
+      "rangeM": 180,
+      "destinationLabel": "the main hull"
+    },
+    "freeDive": {
+      "hero": "main-hull",
+      "bearing": 90,
+      "range": 70
+    },
+    "reframe": {
+      "hero": "main-hull",
+      "range": 6,
+      "altitude": 10,
+      "yawOffset": -10,
+      "chaseRadius": 54,
+      "chaseOffsetX": 0,
+      "chaseOffsetY": -34,
+      "portraitChaseOffset": {
+        "x": 0,
+        "y": -48,
+        "radius": 52
+      }
+    }
+  },
+  "life": {
+    "opening": {
+      "strategy": "approach",
+      "anchorHero": "main-hull",
+      "habitatRadiusM": 100,
+      "species": "anemone",
+      "aheadM": 19,
+      "sideM": 9,
+      "low": 5,
+      "count": 8,
+      "spacingM": 0.8,
+      "onWreck": true,
+      "mesh": "endurance-hull",
+      "deckPatch": {
+        "x": 1.8,
+        "z": -13,
+        "rowSpacingM": 3,
+        "castHeightM": 20
+      }
+    }
+  }
 }

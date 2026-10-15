@@ -1,3 +1,19 @@
 {
-  "id": "great-blue-hole"
+  "id": "great-blue-hole",
+  "opening": {
+    "mission": {
+      "rangeM": 150,
+      "destinationLabel": "the stalactite gallery"
+    },
+    "freeDive": {
+      "hero": "karst-grotto",
+      "bearing": 90,
+      "range": 58,
+      "fromCentre": true,
+      "altitude": -28,
+      "minSeabedAltitudeM": 26,
+      "openWater": true,
+      "chaseOffsetY": 10
+    }
+  }
 }

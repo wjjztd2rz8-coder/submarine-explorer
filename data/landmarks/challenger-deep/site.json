@@ -1,3 +1,41 @@
 {
-  "id": "challenger-deep"
+  "id": "challenger-deep",
+  "opening": {
+    "mission": {
+      "rangeM": 200,
+      "destinationLabel": "Leggo's lander site"
+    },
+    "freeDive": {
+      "hero": "leggo-lander-marker",
+      "bearing": 135,
+      "range": 65
+    },
+    "reframe": {
+      "hero": "leggo-lander-marker",
+      "range": 30,
+      "altitude": 8,
+      "yawOffset": 8,
+      "chaseRadius": 48,
+      "chaseOffsetX": -28,
+      "chaseOffsetY": -10,
+      "portraitChaseOffset": {
+        "x": -28,
+        "y": -10
+      }
+    }
+  },
+  "life": {
+    "opening": {
+      "strategy": "approach",
+      "anchorHero": "leggo-lander-marker",
+      "habitatRadiusM": 100,
+      "species": "hadal-amphipod",
+      "aheadM": 24,
+      "sideM": 5,
+      "low": 24,
+      "count": 45,
+      "spacingM": 1,
+      "onWreck": false
+    }
+  }
 }
