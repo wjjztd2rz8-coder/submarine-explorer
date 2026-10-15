@@ -129,7 +129,7 @@ it.each([
 it.each([
   ['great-blue-hole', 8, 21300],
   ['lost-city', 14, 67472],
-  ['beebe-vent-field', 13, 19938],
+  ['beebe-vent-field', 13, 20758],
   ['monterey-canyon', 30, 284010],
 ] as const)(
   '1140: %s Low buffers are finite and draw counts stay within f43',
@@ -179,7 +179,7 @@ it.each([
         });
     }
     expect(total.draws).toBe(draws);
-    // Beebe's merged rock detail intentionally adds 660 triangles relative to f43.
+    // Beebe's merged rock detail adds 660 triangles relative to f43; V-sub-scale's larger hero stack adds 820 more.
     expect(total.triangles).toBeLessThanOrEqual(triangles);
     expect({ ...total, buffers: digest.digest('hex') }).toMatchSnapshot();
   },

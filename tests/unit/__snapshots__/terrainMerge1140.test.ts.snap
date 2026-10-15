@@ -2,9 +2,9 @@
 
 exports[`1140: beebe-vent-field Low buffers are finite and draw counts stay within f43 1`] = `
 {
-  "buffers": "234c7de30848d46910ef0ad2cac30d83bc00bd058b8ba6515b5f58bc381bc596",
+  "buffers": "9bcb138a3a61a2fe41b58c26971271951c1d98e182037f4a0e1326f11785d5a7",
   "draws": 13,
-  "triangles": 19926,
+  "triangles": 20758,
 }
 `;
 

@@ -421,16 +421,16 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
     {
       "budget": {
         "draws": 9,
-        "triangles": 95374,
+        "triangles": 102790,
       },
-      "geometry": "3a3ee51edaa9e50f8c474b38353a15d5f5b937d0793e39d4d728bfb7a1fa2b40",
+      "geometry": "64ceb1ac5b3a10463fdedcba3600bdef64a4a20eb54c5d8e420a1d0b2687ebb8",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
         "triangles": 156,
       },
-      "placement": "76c051eb00e50380ef061bca051fb5de45242fc157c7a9e2eff2caa04d9108c4",
-      "ventTop": 20.879654845411523,
+      "placement": "f837b0a6e5813e4ea63d23d064a1f28b4bfd4ab15cca41fda073d85e7e476273",
+      "ventTop": 27.84017557996292,
     },
     {
       "budget": {
@@ -465,16 +465,16 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
     {
       "budget": {
         "draws": 9,
-        "triangles": 17598,
+        "triangles": 18430,
       },
-      "geometry": "4decd3d7f0ad6c1f73a00ca8e2a59a155cd33b2cb3990f96c5edc58d4be0e43b",
+      "geometry": "475f8ac0a0ef1f3e79fa5e53b833a05a1fca89cf3b8c8efd9b62e2cec7418927",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
         "triangles": 156,
       },
-      "placement": "76c051eb00e50380ef061bca051fb5de45242fc157c7a9e2eff2caa04d9108c4",
-      "ventTop": 20.879654845411523,
+      "placement": "13b4797438d6e1fa1dd785f73aa630e7035603145b26efc18491e6d75928d804",
+      "ventTop": 27.84017557996292,
     },
     {
       "budget": {
@@ -509,16 +509,16 @@ exports[`F-1080: confines chimney detail to Beebe while retaining collision and 
     {
       "budget": {
         "draws": 9,
-        "triangles": 53728,
+        "triangles": 58624,
       },
-      "geometry": "a9cc9114353a5a57021d99646e5899dcca2e59d0ed87d388bc804df37b131d79",
+      "geometry": "6c7da9e8810404ca9ffdbbe48b076b9d624df0e4ca62eff3df67e5b250abc733",
       "id": "beebe-chimney-1",
       "impostor": {
         "draws": 1,
         "triangles": 156,
       },
-      "placement": "76c051eb00e50380ef061bca051fb5de45242fc157c7a9e2eff2caa04d9108c4",
-      "ventTop": 20.879654845411523,
+      "placement": "13b4797438d6e1fa1dd785f73aa630e7035603145b26efc18491e6d75928d804",
+      "ventTop": 27.84017557996292,
     },
     {
       "budget": {
