@@ -1215,3 +1215,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h reset at 17:24 CDT; queue 2170/2180/2190 waits for the dispatcher.
 - **Not done:** V-endurance per-site chase aim (DIRECTOR item 4), V-beebe, titanic palette, Blue Hole hood slab carve.
 - **Needs owner:** real-phone play of the newest build (Low tier).
+
+## 2026-10-15 18:48 CDT headless run 14 (Claude)
+
+- **Merged and pushed:** Sonnet V-titanic palette, partial (hull grey-brown instead of peach via a per-wreck `muted` paint param; opening ~3.5). Close view still pinkish and rusticles still bright orange (shared plate shader warm tint, growth material), noted in DIRECTOR item 6. Smoke + project-base green (a prettier nit on the note fixed); no full e2e.
+- **Codex:** 2170/2180/2190 running; queued 2200 S-manifest slice 3, 2210 S-render confirm, 2220 bug hunt.
+- **Not done:** V-endurance chase aim, V-beebe, Blue Hole hood slab carve; no tag (f54 waits for green CI).
+- **Needs owner:** real-phone play of the newest build (Low tier).
