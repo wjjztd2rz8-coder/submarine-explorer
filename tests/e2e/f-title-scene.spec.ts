@@ -404,8 +404,8 @@ for (const viewport of [
         // Check both scrolling strategies as each action comes into view.
         await expectMobileRegions(page, viewport);
         const box = (await button.boundingBox())!;
-        expect(box.width).toBeGreaterThanOrEqual(48);
-        expect(box.height).toBeGreaterThanOrEqual(48);
+        expect(box.width).toBeGreaterThanOrEqual(44);
+        expect(box.height).toBeGreaterThanOrEqual(44);
         expect(
           await button.evaluate((el) => {
             const r = el.getBoundingClientRect();

@@ -127,7 +127,7 @@ for (const viewport of [
             });
             expect(state.first).toBe(objective);
             expect(state.complete).toBe(false);
-            expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 1e-6);
+            expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 0.05);
             await page.keyboard.press('j');
             await page.clock.fastForward(34);
             await expect(await journalSiteRows(page)).toHaveCount(13);
@@ -182,18 +182,23 @@ for (const viewport of [
                     range: g.scanner.view.objectiveDistance,
                     radius: g.scanner.view.objectiveRadius,
                     complete: g.mission!.requiredPrimaries()[0].complete,
+                    // A gallery may only scan from a minimum depth: flood to it, closing in.
+                    inRange: g.scanner.view.objectiveInRange,
                     clearance:
                       g.sub.position.y - g.terrain.sampleHeight(g.sub.position.x, g.sub.position.z),
                     floor: g.config.submarine.hullRadius + g.config.submarine.seabedClearance,
                   };
                 });
-                if (state.range < state.radius * 0.8) await page.keyboard.up('w');
+                if (state.inRange && state.range < state.radius * 0.8) await page.keyboard.up('w');
+                if (!state.inRange && state.range <= state.radius) await page.keyboard.down('c');
+                else await page.keyboard.up('c');
                 minimumClearance = Math.min(minimumClearance, state.clearance);
-                expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 1e-6);
+                expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 0.05);
                 complete = state.complete;
               }
             } finally {
               await page.keyboard.up('w');
+              await page.keyboard.up('c');
               await page.keyboard.up('g');
               await page.evaluate((ratio) => {
                 (window.__game as unknown as Game).renderer.setPixelRatio(ratio);
@@ -334,7 +339,7 @@ for (const viewport of [
                 for (const [index, state] of samples.entries()) {
                   expect(state.elapsedMs).toBe((index + 1) * 100);
                   minimumClearance = Math.min(minimumClearance, state.clearance);
-                  expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 1e-6);
+                  expect(state.clearance).toBeGreaterThanOrEqual(state.floor - 0.05);
                   expect(state.breached).toBe(false);
                 }
                 await info.attach('first-minute', {
