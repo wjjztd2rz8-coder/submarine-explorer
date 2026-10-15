@@ -20,6 +20,7 @@ import { type Atmosphere } from '../../src/render/Atmosphere.js';
 import { type Terrain } from '../../src/world/Terrain.js';
 import { type PresetSystem } from '../../src/world/presets/Presets.js';
 import { DEFAULT_CAMERA } from '../../src/core/config/camera.js';
+import { DEEP_OPENINGS } from '../../src/core/config/deepOpenings.js';
 import { type Discovery } from '../../src/game/Discovery.js';
 import { type Mission } from '../../src/game/Mission.js';
 import { type Headlights } from '../../src/render/Headlights.js';
@@ -1184,7 +1185,12 @@ freshTest.describe('camera terrain and solid tip clearance', () => {
             });
             expect(errors).toEqual([]);
             expect(opening.props.failed).toBe(0);
-            expect(opening.radius).toBe(site === 'endurance' ? 70 : 66);
+            // The camera distance is the site's authored opening arm, not a fixed number; endurance tunes it per V-endurance.
+            expect(opening.radius).toBe(
+              site === 'endurance' ? DEEP_OPENINGS.endurance.opening.chaseRadius : 66,
+            );
+            expect(opening.radius).toBeGreaterThanOrEqual(35);
+            expect(opening.radius).toBeLessThanOrEqual(180);
             expect(opening.eyeClearance).toBeGreaterThanOrEqual(6 - 1e-8);
             expect(Math.min(...opening.nearClearances)).toBeGreaterThan(0);
             if (tier === 'low') {
