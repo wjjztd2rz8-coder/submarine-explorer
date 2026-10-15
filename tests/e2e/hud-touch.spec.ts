@@ -1250,6 +1250,7 @@ freshTest.describe('animal guidance placement', () => {
     discovery: { loaded: boolean; overlay: ScanOverlay };
     props: { loaded: boolean };
     onboard: { hints: HintEngine };
+    renderer: { render(): void };
   }
 
   async function separate(page: Page, selectors: string[]): Promise<void> {
@@ -1419,22 +1420,9 @@ freshTest.describe('animal guidance placement', () => {
           ).toBe(false);
           // Withdraw only the scan source: covering play would suppress every hint too.
           await setScanCardSuppressed(page, true);
-          for (let frame = 0; frame < 40; frame++) {
-            // Read the slot without auto-waiting: the clock is paused, so a locator wait
-            // for an absent slot would never advance the frames that offer the hint.
-            if (
-              await page.evaluate((selector) => {
-                const slot = document.querySelector<HTMLElement>(selector);
-                return (
-                  !!slot &&
-                  slot.dataset.kind === 'hint' &&
-                  !!slot.textContent?.includes('Animal nearby.')
-                );
-              }, GUIDANCE.any)
-            )
-              break;
-            await page.clock.fastForward(250);
-          }
+          // The next game frame offers the deferred hint; a DOM-only wait
+          // cannot publish it while the clock is paused.
+          await page.clock.fastForward(250);
           await expect(hint).toContainText(
             layout.touch
               ? 'Animal nearby. Hold SCAN to scan, or use PHOTO for a photo.'
@@ -1449,9 +1437,13 @@ freshTest.describe('animal guidance placement', () => {
           ).toBe(true);
           await screenshot(page, `${site}-${name}`);
           await separate(page, [...hud, GUIDANCE.any, ...controls]);
-          // Spend at most 15 simulated seconds in real game frames. Stop when
-          // the hint expires rather than rendering the remaining software-GL
-          // frames. A DOM-only wait cannot advance this paused clock.
+          // Placement is checked. Keep real lifecycle frames for expiry without
+          // redrawing the unchanged 3D scene on every software-rendered frame.
+          await page.evaluate(() => {
+            (window.__game as unknown as Probe).renderer.render = () => {};
+          });
+          // Spend at most 15 simulated seconds in real game frames, stopping
+          // at expiry. A DOM-only wait cannot advance this paused clock.
           for (let frame = 0; frame < 60 && (await hint.isVisible()); frame++)
             await page.clock.fastForward(250);
           expect(await hint.isVisible(), 'animal hint expires within 15 simulated seconds').toBe(

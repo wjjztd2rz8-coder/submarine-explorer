@@ -8,8 +8,8 @@ on:
   pull_request:
     branches: [main]
 
-# A newer push to a PR cancels the run it supersedes. Runs on main always finish:
-# merges are pushed one by one, and cancelling them left no completed result to triage.
+# A newer push to a PR cancels the run it supersedes. Running main jobs finish;
+# a newer push can replace the group's single pending run before its jobs start.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
