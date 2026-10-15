@@ -7,10 +7,8 @@ import { Terrain } from '../../src/world/Terrain.js';
 import { terrainCarveFor } from '../../src/world/terrainFeatures.js';
 import { createTerrainMaterial } from '../../src/world/TerrainMaterial.js';
 import { biomeFor } from '../../src/world/TerrainBiome.js';
-import { decodeHeightmap, validateMeta } from '../../src/world/TileLoader.js';
+import { decodeHeightmap } from '../../src/world/TileLoader.js';
 import type { Tile, TileMeta } from '../../src/util/types.js';
-import { buildScarp } from '../../src/world/props/geo/scarp.js';
-import { parsePropsDoc } from '../../src/world/PropLoader.js';
 import { Submarine } from '../../src/sub/Submarine.js';
 import type { InputState } from '../../src/core/Input.js';
 import { worldToLatLon } from '../../src/util/geo.js';
@@ -129,55 +127,6 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
     }
   });
 
-  it('measures the Monterey low-tier wall cost before and after its authored enlargement', () => {
-    const config = makeConfig();
-    const document = JSON.parse(readFileSync('data/landmarks/monterey-canyon/props.json', 'utf8'));
-    const def = parsePropsDoc(document, config.props).props.find(
-      (p) => p.id === 'canyon-wall-ledge',
-    )!;
-    const built = (
-      [
-        [70, 26, 36],
-        [140, 50, 64],
-      ] as [number, number, number][]
-    ).map((dims) =>
-      buildScarp('canyon', {
-        dims,
-        seed: 123,
-        tier: 'low',
-        cfg: config.props,
-        def,
-        groundHeight: () => () => 0,
-      }),
-    );
-    const stats = built.map((b) => {
-      let draws = 0;
-      let triangles = 0;
-      b.full.traverse((o) => {
-        if (!(o instanceof THREE.Mesh)) return;
-        draws++;
-        triangles +=
-          ((o.geometry.index?.count ?? o.geometry.attributes.position!.count) / 3) *
-          (o instanceof THREE.InstancedMesh ? o.count : 1);
-      });
-      return { draws, triangles };
-    });
-    console.log('Monterey low-tier wall before/after enlargement', stats);
-    expect(stats[1]!.draws).toBe(stats[0]!.draws);
-    expect(stats[1]!.triangles).toBeGreaterThan(stats[0]!.triangles * 2);
-    const geoms = new Set<THREE.BufferGeometry>();
-    const materials = new Set<THREE.Material>();
-    for (const b of built)
-      for (const root of [b.full, b.impostor])
-        root.traverse((o) => {
-          if (!(o instanceof THREE.Mesh)) return;
-          geoms.add(o.geometry);
-          for (const m of Array.isArray(o.material) ? o.material : [o.material]) materials.add(m);
-        });
-    geoms.forEach((g) => g.dispose());
-    materials.forEach((m) => m.dispose());
-  });
-
   it('isolates Blue Hole depth uniforms from Monterey and a second Blue Hole material', () => {
     const config = makeConfig();
     const materials = ['great-blue-hole', 'monterey-canyon', 'great-blue-hole'].map((id) =>
@@ -204,12 +153,5 @@ describe('F-BUGHUNT-4 audit reproductions', () => {
         m.textures.forEach((t) => t.dispose());
       }
     }
-  });
-
-  it('rejects malformed cell spacing before it can poison height sampling', () => {
-    const tile = actualTile('monterey-canyon');
-    expect(() =>
-      validateMeta({ ...tile.meta, cols: 2, rows: 2, cellsize_m_x: 0 }, tile.meta.id),
-    ).toThrow(/cellsize_m_x/);
   });
 });

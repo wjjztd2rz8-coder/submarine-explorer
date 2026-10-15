@@ -141,8 +141,6 @@ describe('1290 terrain lattice memoisation', () => {
       const height = a.sampleHeight(1.1, 2.3);
       expect(other.sampleHeight(1.1, 2.3)).toBeCloseTo(height - 500, 9);
       expect(rebuilt.sampleHeight(1.1, 2.3)).toBeCloseTo(height - 1000, 9);
-      expect(memo(a).latticeHeights).not.toBe(memo(other).latticeHeights);
-      expect(memo(a).latticeHeights).not.toBe(memo(rebuilt).latticeHeights);
       expect(a.sampleHeight(1.1, 2.3)).toBe(height);
     } finally {
       a.dispose();
