@@ -9,8 +9,84 @@ import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { Terrain, fitSubdivToBudget } from '../../src/world/Terrain.js';
 import { detailAmplitude, fbm2, valueNoise2 } from '../../src/world/TerrainNoise.js';
 import { makeSyntheticTile } from './helpers.js';
+import sites from '../../data/landmarks/index.json';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
+import type { TileMeta } from '../../src/util/types.js';
 
 const base = DEFAULT_CONFIG.terrain;
+
+describe('terrain fidelity field defaults', () => {
+  it.each(
+    sites.landmarks
+      .filter((id) => id !== 'lost-city')
+      .flatMap((site) =>
+        (['low', 'medium', 'high', 'ultra'] as const).map((tier) => ({ site, tier })),
+      ),
+  )(
+    '$site $tier keeps mesh and collision bytes identical to explicit legacy relief constants',
+    ({ site, tier }) => {
+      const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;
+      const focus = base.fidelity?.[site]?.focus ?? meta.center;
+      // A small sloped survey exercises the full relief envelope without rebuilding
+      // thirteen large surveys twice per tier. Coordinates use the shipped profiles.
+      const tile = makeSyntheticTile({
+        id: site,
+        cols: 9,
+        rows: 9,
+        centerLat: focus.lat,
+        centerLon: focus.lon,
+        cellsizeDeg: 0.0001,
+        height: (c, r) => -1000 + c * 8 + r * 6,
+      });
+      const previous = structuredClone(base);
+      for (const profile of Object.values(previous.fidelity ?? {})) {
+        profile.reliefBed = 0.35;
+        profile.rillStretch = 0.35;
+      }
+      const current = new Terrain(tile, base, tier);
+      const legacy = new Terrain(tile, previous, tier);
+      const bytes = (array: ArrayBufferView) =>
+        new Uint8Array(array.buffer, array.byteOffset, array.byteLength);
+      try {
+        const meshes = (terrain: Terrain) =>
+          terrain.group.children.filter(
+            (child): child is THREE.Mesh => (child as THREE.Mesh).isMesh,
+          );
+        const now = meshes(current),
+          before = meshes(legacy);
+        expect(now.length).toBeGreaterThan(0);
+        expect(now).toHaveLength(before.length);
+        for (let i = 0; i < now.length; i++) {
+          expect(Object.keys(now[i].geometry.attributes)).toEqual(
+            Object.keys(before[i].geometry.attributes),
+          );
+          for (const key of Object.keys(now[i].geometry.attributes))
+            expect(bytes(now[i].geometry.getAttribute(key).array), key).toEqual(
+              bytes(before[i].geometry.getAttribute(key).array),
+            );
+          expect(bytes(now[i].geometry.index!.array)).toEqual(
+            bytes(before[i].geometry.index!.array),
+          );
+        }
+        const samples = (terrain: Terrain) =>
+          new Float64Array(
+            [-20, -1, 0, 7, 20].flatMap((x) =>
+              [-20, 0, 20].flatMap((z) => [
+                terrain.sampleHeight(x, z),
+                terrain.detailHeight(x, z),
+                ...terrain.getNormal(x, z, new THREE.Vector3()).toArray(),
+              ]),
+            ),
+          );
+        expect(bytes(samples(current))).toEqual(bytes(samples(legacy)));
+      } finally {
+        current.dispose();
+        legacy.dispose();
+      }
+    },
+  );
+});
 
 /** A tile with real relief so slopes (and therefore detail amplitudes) vary. */
 function ridgedTile(cols = 40, rows = 34) {

@@ -154,6 +154,12 @@ from contact) still fires.
 **DIVE TIME** counts real seconds of unfrozen play (`Discovery.update`'s
 `clockDt`), not capped physics time (QA-B #10).
 
+`Discovery.update` also accepts `blocked` after `clockDt`. The app passes
+its blocked state so Pause, Settings, briefing, photo mode and debrief dismiss all
+guidance offers. Entering Pause dismisses them immediately; after Resume the
+scan, objective and warning sources offer current messages again. Timed results
+and hints from before the menu do not reappear.
+
 ## Debug params
 
 - `?landmark=<id>`: which content folder to load.

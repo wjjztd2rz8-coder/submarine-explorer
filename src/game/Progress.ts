@@ -137,11 +137,15 @@ export class Progress {
     const subject = key.slice(slash + 1);
     if (slash < 1 || !subject) return;
     if (subject.startsWith('life:')) this.credit('species', subject.slice(5));
-    else if (subject.startsWith('secret:'))
-      this.credit('secret', `${key.slice(0, slash)}/${subject.slice(7)}`);
-    else if (subject.startsWith('sample:'))
-      this.credit('sample', `${key.slice(0, slash)}/${subject.slice(7)}`);
-    else if (!subject.startsWith('event:')) this.credit('poi', key);
+    else if (subject.startsWith('secret:') || subject.startsWith('sample:')) {
+      // Truncated old records identify a namespace, not an earned discovery.
+      const id = subject.slice(7);
+      if (id)
+        this.credit(
+          subject.startsWith('secret:') ? 'secret' : 'sample',
+          `${key.slice(0, slash)}/${id}`,
+        );
+    } else if (!subject.startsWith('event:')) this.credit('poi', key);
   }
   beginDive(): void {
     this.bonus = false;

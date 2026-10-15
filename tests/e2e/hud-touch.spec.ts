@@ -1,3 +1,4 @@
+import { renderReview, reviewScreenshot } from './helpers/render.js';
 import { expect, test as freshTest, type Page, type Locator } from '@playwright/test';
 import { test as experiencedTest } from './helpers/unlocked.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -6,8 +7,9 @@ import { finishAnimations } from './helpers/hudTips.js';
 import { GUIDANCE } from './helpers/guidance.js';
 import { dismissTutorial, setScanCardSuppressed } from './helpers/tutorial.js';
 import { expectCompactPhoneHud, expectObjectiveGuidance } from './helpers/phoneHud.js';
-import { completeScan, scanWithKeyboard } from './helpers/scan.js';
+import { advanceScan, completeScan, scanWithKeyboard } from './helpers/scan.js';
 import { homeReady } from './helpers/home.js';
+import { diveReady, loadDive } from './helpers/dive.js';
 import { type Discovery } from '../../src/game/Discovery.js';
 import { type Submarine } from '../../src/sub/Submarine.js';
 import { type CameraRig } from '../../src/sub/CameraRig.js';
@@ -26,6 +28,74 @@ import { openBriefingAdvanced } from './helpers/briefing.js';
 import catalog from '../../data/landmarks/index.json' with { type: 'json' };
 import sites from '../../data/landmarks/index.json' with { type: 'json' };
 
+experiencedTest.describe('guidance lifecycle', () => {
+  for (const transition of ['scan', 'pause', 'crush', 'power'] as const) {
+    // Regression guard: scan progress/results replace the target, and covered or
+    // failed dives discard timed messages instead of restoring stale guidance.
+    experiencedTest(`clears obsolete guidance through ${transition}`, async ({ page }) => {
+      await loadDive(
+        page,
+        '/?mission=titanic&landmark=_test&poi=test-bow&skipBriefing=1&tier=low&tutorial=0',
+      );
+      await expect(page.locator(GUIDANCE.scan)).toBeVisible();
+      if (transition === 'scan') {
+        await page.keyboard.down('g');
+        try {
+          await advanceScan(page, 1 / 60);
+          await expect(page.locator(GUIDANCE.kicker)).toHaveText('SCANNING');
+          await completeScan(page, 'test-bow');
+        } finally {
+          await page.keyboard.up('g');
+        }
+        await expect(page.locator(GUIDANCE.discovery)).toBeVisible();
+        await expect(page.locator(GUIDANCE.kicker)).toHaveText('NEW ENTRY');
+        await expect(page.locator(GUIDANCE.scan)).toBeHidden();
+        return;
+      }
+      await page.evaluate(() => {
+        const g = window.__game as unknown as { discovery: Discovery };
+        g.discovery.overlay.slot.notice('Obsolete dive notice', 60);
+      });
+      if (transition === 'pause') {
+        await page.keyboard.press('Escape');
+        await expect(page.locator('.pause-menu')).toBeVisible();
+      } else {
+        await page.evaluate((cause) => {
+          const sub = (window.__game as unknown as { sub: Submarine }).sub;
+          if (cause === 'crush') {
+            sub.setHullClass('A');
+            sub.reset(0, sub.getCrushDepth() - 1, 0);
+            sub.velocity.y = 20; // Clear the crush threshold before the blow's lock expires.
+          } else {
+            sub.reset(0, -10, 0);
+            sub.startEmergencyAscent();
+          }
+        }, transition);
+        await expect(page.locator('.mission-debrief.is-aborted')).toBeVisible();
+      }
+      await expect(page.locator(GUIDANCE.any)).toBeHidden();
+      if (transition === 'pause') {
+        await page.keyboard.press('Escape');
+        await expect(page.locator('.pause-menu')).toBeHidden();
+        await expect(page.locator(GUIDANCE.scan)).toBeVisible();
+      }
+      // Drop current offers: a hidden timed notice must have been discarded, not just covered.
+      const remaining = await page.evaluate(() => {
+        const slot = (window.__game as unknown as { discovery: Discovery }).discovery.overlay.slot;
+        for (const [source, kind] of [
+          ['scan', 'scan'],
+          ['objective', 'objective'],
+          ['warning', 'urgent'],
+          ['complete', 'discovery'],
+        ] as const)
+          slot.offer(source, kind, null);
+        return slot.visible;
+      });
+      expect(remaining).toBe(false);
+    });
+  }
+});
+
 freshTest.describe('fixture and mission layout', () => {
   const test = freshTest;
   const shots = '.cache/codex/shots/hud-touch/layout';
@@ -41,7 +111,7 @@ freshTest.describe('fixture and mission layout', () => {
 
   async function shot(page: Page, name: string): Promise<void> {
     await mkdir(shots, { recursive: true });
-    await page.screenshot({ path: `${shots}/${name}.png` });
+    await reviewScreenshot(page, { path: `${shots}/${name}.png` });
   }
 
   async function clearLayout(page: Page, selectors: string[]): Promise<void> {
@@ -148,12 +218,7 @@ freshTest.describe('fixture and mission layout', () => {
         await page.goto(
           `/?mission=monterey-canyon&skipBriefing=1&tier=low${layout.touch ? '&touch=1' : ''}`,
         );
-        await page.waitForFunction(() => window.__gameReady === true, undefined, {
-          timeout: 45_000,
-        });
-        await page.waitForFunction(
-          () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
-        );
+        await diveReady(page, {});
         await expect(page.locator('.guidance-slot[data-step]')).toBeVisible();
         if (!layout.touch) await expect(page.locator('.objectives-panel')).toBeVisible();
         else await expect(page.locator('.objectives-panel')).toBeHidden();
@@ -394,7 +459,7 @@ freshTest.describe('large UI and menu reachability', () => {
             if (step !== 'scan') await page.locator('.guidance-skip').tap();
           }
           if (scale === 100)
-            await page.screenshot({ path: testInfo.outputPath('tutorial-landscape.png') });
+            await reviewScreenshot(page, { path: testInfo.outputPath('tutorial-landscape.png') });
           await page.getByRole('button', { name: 'Skip', exact: true }).tap();
           await expect(page.locator('.guidance-slot[data-step]')).toBeHidden();
           await setScanCardSuppressed(page, false);
@@ -457,7 +522,7 @@ freshTest.describe('large UI and menu reachability', () => {
             '.hud-journal',
           ]);
           if (scale === 100)
-            await page.screenshot({ path: testInfo.outputPath('expanded-sonar.png') });
+            await reviewScreenshot(page, { path: testInfo.outputPath('expanded-sonar.png') });
           await page.locator('.tc-btn-sonar').tap();
           await expect(page.locator('.tc-stick')).toBeVisible();
         });
@@ -670,7 +735,7 @@ freshTest.describe('landscape guidance and completion', () => {
           await page.locator('.guidance-skip').tap();
         }
         await expect(card).toHaveAttribute('data-step', 'scan');
-        await page.screenshot({ path: `${shots}/tutorial-scan-${tag}.png` });
+        await reviewScreenshot(page, { path: `${shots}/tutorial-scan-${tag}.png` });
         const h = (await card.boundingBox())!.height;
         expect(h).toBeLessThanOrEqual(56);
         await setScanCardSuppressed(page, false);
@@ -697,7 +762,7 @@ freshTest.describe('landscape guidance and completion', () => {
         const banner = page.locator('.obj-banner');
         await expect(banner).toBeVisible();
         await banner.evaluate((e) => Promise.all(e.getAnimations().map((a) => a.finished)));
-        await page.screenshot({ path: `${shots}/completion-banner-${tag}.png` });
+        await reviewScreenshot(page, { path: `${shots}/completion-banner-${tag}.png` });
         const hits = await page.evaluate(() => {
           const b = document.querySelector('.obj-banner')!.getBoundingClientRect();
           return [
@@ -770,7 +835,7 @@ freshTest.describe('landscape guidance and completion', () => {
             ).length;
         }, box);
         expect(overlaps).toBe(0);
-        await page.screenshot({ path: `${shots}/objective-chip-${tag}.png` });
+        await reviewScreenshot(page, { path: `${shots}/objective-chip-${tag}.png` });
       });
     });
   }
@@ -910,7 +975,7 @@ freshTest.describe('hero guidance sequence', () => {
               if (await page.locator(GUIDANCE.any).isVisible()) fresh.push(GUIDANCE.any);
               await separate(page, fresh);
               await expect(page.locator('.hud-attribution')).toHaveCount(0);
-              await page.screenshot({ path: testInfo.outputPath('arcade-opening.png') });
+              await reviewScreenshot(page, { path: testInfo.outputPath('arcade-opening.png') });
             }
 
             // Exercise the real in-range scanner even for openings farther from
@@ -950,7 +1015,9 @@ freshTest.describe('hero guidance sequence', () => {
               }
             }
             {
-              await page.screenshot({ path: testInfo.outputPath('contact-and-tutorial.png') });
+              await reviewScreenshot(page, {
+                path: testInfo.outputPath('contact-and-tutorial.png'),
+              });
             }
             await page.getByRole('button', { name: 'Skip', exact: true }).tap();
             await page.clock.runFor(34);
@@ -982,13 +1049,6 @@ freshTest.describe('hero guidance sequence', () => {
 
 freshTest.describe('portrait telemetry and small controls', () => {
   const test = experiencedTest;
-  async function ready(page: Page) {
-    await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
-    await page.waitForFunction(
-      () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
-    );
-  }
-
   async function separate(page: Page, a: string, b: string) {
     await expect(page.locator(a)).toBeVisible();
     await expect(page.locator(b)).toBeVisible();
@@ -1008,7 +1068,7 @@ freshTest.describe('portrait telemetry and small controls', () => {
       // Regression guard: portrait sonar collided with readouts or Daily objectives and thrust shared a boost target.
       test(`${site} Free dive sonar has space beside readouts and pause`, async ({ page }) => {
         await page.goto(`/?tile=${site}&tier=low&touch=1`);
-        await ready(page);
+        await diveReady(page, {});
         await separate(page, '.sonar', '.hud-readouts');
         await separate(page, '.sonar', '.tc-btn-pause');
       });
@@ -1021,7 +1081,7 @@ freshTest.describe('portrait telemetry and small controls', () => {
         page.waitForURL((url) => url.searchParams.has('daily'), { waitUntil: 'domcontentloaded' }),
         page.locator('.daily-card').click(),
       ]);
-      await ready(page);
+      await diveReady(page, {});
       await page.locator('.briefing-begin').click();
       await expect(page.locator('.briefing')).toBeHidden();
       // The daily route reboots without ?touch=1; a real touch restores touch mode.
@@ -1053,7 +1113,7 @@ freshTest.describe('portrait telemetry and small controls', () => {
           );
         }, layout.scale);
         await page.goto('/?tile=great-blue-hole&tier=low&touch=1');
-        await ready(page);
+        await diveReady(page, {});
         await separate(page, '.tc-stick', '.tc-btn-boost');
         await separate(page, '.tc-stick', '.tc-buttons');
         await separate(page, '.tc-slider', '.tc-buttons');
@@ -1107,10 +1167,7 @@ freshTest.describe('projected submarine clearance', () => {
       ),
     );
     await page.goto(`/?tile=monterey-canyon&tier=low&touch=1&skipBriefing=1&${query}`);
-    await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
-    await page.waitForFunction(
-      () => (window.__game as { discovery: { loaded: boolean } }).discovery.loaded,
-    );
+    await diveReady(page, {});
   }
 
   async function expectClearLayout(page: Page): Promise<void> {
@@ -1240,7 +1297,7 @@ freshTest.describe('animal guidance placement', () => {
 
   async function screenshot(page: Page, name: string): Promise<void> {
     await mkdir(shots, { recursive: true });
-    await page.screenshot({ path: `${shots}/${name}.png` });
+    await reviewScreenshot(page, { path: `${shots}/${name}.png` });
   }
 
   for (const layout of [
@@ -1632,7 +1689,7 @@ freshTest.describe('catalog tutorial and reload', () => {
           }
           // The remembered scan finishes the last step, so the tutorial ends here.
           await expect(card).toBeHidden();
-          await page.screenshot({ path: `${shots}/${site}-${tag}-reward.png` });
+          await reviewScreenshot(page, { path: `${shots}/${site}-${tag}-reward.png` });
           expect(
             await page.evaluate(
               () => JSON.parse(localStorage.getItem('subexplorer.onboard.v1')!).tutorialDone,
@@ -1646,7 +1703,7 @@ freshTest.describe('catalog tutorial and reload', () => {
           if (viewport.touch) await expect(chip).toBeVisible();
           else await expect(chip).toBeHidden();
           await layout(page, 'out of range with the standing objective');
-          await page.screenshot({ path: `${shots}/${site}-${tag}-chip.png` });
+          await reviewScreenshot(page, { path: `${shots}/${site}-${tag}-chip.png` });
 
           // Re-enter range, without a tutorial hiding the logged-contact card.
           await page.evaluate((poi) => {
@@ -1749,7 +1806,7 @@ freshTest.describe('boost and Journal actions', () => {
       }) => {
         await boot(page, v.touch);
         await layout(page);
-        await page.screenshot({ path: `${shots}/${v.name}.png` });
+        await reviewScreenshot(page, { path: `${shots}/${v.name}.png` });
         const journal = page.locator('.hud-journal');
         await expect(journal).toHaveAttribute('title', 'Journal (J)');
         if (v.touch) {
@@ -1774,11 +1831,11 @@ freshTest.describe('boost and Journal actions', () => {
           expect(
             await page.evaluate(() => (window.__game as unknown as Game).input.state.boost),
           ).toBe(true);
-          await page.screenshot({ path: `${shots}/${v.name}-boost-on.png` });
+          await reviewScreenshot(page, { path: `${shots}/${v.name}-boost-on.png` });
           await boost.tap();
           await page.clock.fastForward(50);
           await expect(boost).toHaveAttribute('aria-pressed', 'false');
-          await page.screenshot({ path: `${shots}/${v.name}-boost-off.png` });
+          await reviewScreenshot(page, { path: `${shots}/${v.name}-boost-off.png` });
           await boost.tap();
           await page.clock.fastForward(50);
           await journal.tap();
@@ -2001,7 +2058,7 @@ freshTest.describe('surface mode HUD', () => {
             const boxes = await bounds(page);
             // Save evidence before assertions: a persistent collision must be reviewable.
             const screenshot = testInfo.outputPath(`${name}.png`);
-            await page.screenshot({ path: screenshot });
+            await reviewScreenshot(page, { path: screenshot });
             const diagnostics = testInfo.outputPath(`${name}.json`);
             await writeFile(
               diagnostics,
@@ -2020,7 +2077,8 @@ freshTest.describe('surface mode HUD', () => {
                 2,
               ),
             );
-            await testInfo.attach(name, { path: screenshot, contentType: 'image/png' });
+            if (renderReview)
+              await testInfo.attach(name, { path: screenshot, contentType: 'image/png' });
             await testInfo.attach(`${name}-bounds`, {
               path: diagnostics,
               contentType: 'application/json',

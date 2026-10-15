@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **S-tests step 3:** fold five narrow e2e entries into terrain, sonar and Journal capability tables; share each wall site’s five-view boot and make review-only images optional, preserving every assertion and enabling the catalog collision guards in ordinary runs. Nightly review reuses the golden build and archives the evidence.
+
 - **S-hud-desktop-text:** the desktop dive start stops repeating one instruction four times. Removed from the desktop HUD: the objectives hint line's approach copy ("Head to X, N m ahead."), so the approach hint is the mission's own hint; the hint line now shows only while the guidance card is empty, so no instruction shows twice. The waypoint label drops its target name on desktop (the objectives nav line names it) and keeps range, depth and the direction arrow. The nav line drops RNG (the label carries the same slant range). Reason: the same instruction showed in the guidance card, the hint line, the nav line and the label. Phones are unchanged.
 - **S-briefing-advanced:** Advanced check boxes are text-sized (16 px) on their label line instead of 44 px squares. Phone Home keeps Journal and Settings on screen at 390x844 and 844x390: the hero band is shorter (112 to 150 px), panel padding and gaps are 12 px, and on sideways phones the Advanced toggle sits beside the mode segments. No capability cut.
 - **S-picker:** on narrow screens the Home site picker keeps the globe full size and the site list becomes a swipe-up sheet over it (one list component, unchanged), replacing the globe-above-list stack; the rule that hid the globe on very short screens is gone. Desktop and sideways phones are unchanged. No capability cut.

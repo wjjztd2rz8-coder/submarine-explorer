@@ -1,3 +1,4 @@
+import { renderReview, reviewScreenshot } from './helpers/render.js';
 import { expect, test as freshTest, type Page } from '@playwright/test';
 import { test as experiencedTest } from './helpers/unlocked.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
@@ -85,7 +86,7 @@ freshTest.describe('vent framing over real time', () => {
         expect(framing.tip[0]).toBeLessThan(-0.1);
         expect(Math.abs(framing.tip[0]!)).toBeLessThan(0.9);
         expect(Math.abs(framing.tip[1]!)).toBeLessThan(0.9);
-        await page.screenshot({
+        await reviewScreenshot(page, {
           path: `${shots}/beebe-${view.name}-${second}s.png`,
           timeout: 60_000,
         });
@@ -219,7 +220,7 @@ freshTest.describe('level portrait hull framing', () => {
         await expect(page.locator('.guidance-slot')).toBeVisible();
         await expect(page.locator('.guidance-slot[data-kind="urgent"]')).toBeHidden();
         await mkdir(shots, { recursive: true });
-        await page.screenshot({ path: `${shots}/${site}-portrait-opening.png` });
+        await reviewScreenshot(page, { path: `${shots}/${site}-portrait-opening.png` });
         for (let i = 0; i < 81; i++) await page.clock.fastForward(250);
         await expect(page.locator('.guidance-slot[data-kind="urgent"]')).toBeHidden();
         expect(
@@ -680,13 +681,14 @@ freshTest.describe('live portrait opening', () => {
         await mkdir(shots, { recursive: true });
         const name = `${site}-low-390x844-round-${testInfo.repeatEachIndex + 1}${testInfo.retry ? `-retry-${testInfo.retry}` : ''}`;
         const screenshot = `${shots}/${name}.png`;
-        await page.screenshot({ path: screenshot, timeout: 60_000 });
+        await reviewScreenshot(page, { path: screenshot, timeout: 60_000 });
         const diagnostics = `${shots}/${name}.json`;
         await writeFile(
           diagnostics,
           JSON.stringify({ site, settleMs: 3000, ...opening, errors }, null, 2),
         );
-        await testInfo.attach(name, { path: screenshot, contentType: 'image/png' });
+        if (renderReview)
+          await testInfo.attach(name, { path: screenshot, contentType: 'image/png' });
         await testInfo.attach(`${name}-bounds`, {
           path: diagnostics,
           contentType: 'application/json',
@@ -812,7 +814,7 @@ freshTest.describe('settled opening render work', () => {
             if (site === 'monterey-canyon' && baselineURL) {
               await opening(page, site, tier, layout.touch, baselineURL.replace(/\/$/, ''));
               baseline = await perf(page);
-              await page.screenshot({ path: info.outputPath('main-minus-3.png') });
+              await reviewScreenshot(page, { path: info.outputPath('main-minus-3.png') });
             }
             await opening(page, site, tier, layout.touch);
             await expect(page.locator('canvas').first()).toBeVisible();
@@ -940,7 +942,7 @@ freshTest.describe('settled opening render work', () => {
             }
             expect(errors).toEqual([]);
             // Pixel readability is reviewed from these captures, independently of geometry assertions.
-            await page.screenshot({ path: info.outputPath(`${site}-${tier}-opening.png`) });
+            await reviewScreenshot(page, { path: info.outputPath(`${site}-${tier}-opening.png`) });
           });
         }
       }
@@ -969,7 +971,7 @@ freshTest.describe('mesh and physics agreement', () => {
           const g = window.__game as unknown as Game;
           return window.__gameReady && g?.props.loaded && g.discovery.loaded;
         });
-        await page.screenshot({ path: testInfo.outputPath('opening.png') });
+        await reviewScreenshot(page, { path: testInfo.outputPath('opening.png') });
         const centre =
           site === 'monterey-canyon'
             ? { x: -3230.927430367679, z: -1358.837559250192 }
@@ -1060,7 +1062,7 @@ freshTest.describe('mesh and physics agreement', () => {
           body: JSON.stringify(measurements, null, 2),
           contentType: 'application/json',
         });
-        await page.screenshot({ path: testInfo.outputPath('inspection.png') });
+        await reviewScreenshot(page, { path: testInfo.outputPath('inspection.png') });
         expect(errors).toEqual([]);
       });
     }
@@ -1176,7 +1178,7 @@ freshTest.describe('camera terrain and solid tip clearance', () => {
                 props: { ...g.props.stats },
               };
             }, site);
-            await page.screenshot({
+            await reviewScreenshot(page, {
               path: testInfo.outputPath(`${site}-${tier}-${viewport.name}.png`),
             });
             await testInfo.attach('opening-probe', {
@@ -1325,7 +1327,7 @@ freshTest.describe('catalog underwater and approach poses', () => {
         }, site.hero);
         expect(opening.facing).toBeGreaterThan(0.98);
         expect(opening.collision).toBe(false);
-        await page.screenshot({ path: `${shots}/${site.id}-spawn.png` });
+        await reviewScreenshot(page, { path: `${shots}/${site.id}-spawn.png` });
 
         if (site.detail) {
           const approach = await page.evaluate((heroId) => {
@@ -1399,14 +1401,14 @@ freshTest.describe('catalog underwater and approach poses', () => {
               g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
             }, approach.target);
             await settle(page);
-            await page.screenshot({ path: `${shots}/${site.id}-${range}m.png` });
+            await reviewScreenshot(page, { path: `${shots}/${site.id}-${range}m.png` });
           }
           if (site.id === 'titanic') {
             await page.evaluate(() =>
               (window.__game as unknown as Game).save.setGameplayMode('realistic'),
             );
             await settle(page);
-            await page.screenshot({ path: `${shots}/${site.id}-15m-realistic.png` });
+            await reviewScreenshot(page, { path: `${shots}/${site.id}-15m-realistic.png` });
           }
         }
         expect(errors).toEqual([]);
@@ -1495,12 +1497,12 @@ freshTest.describe('Titanic first-frame light and snow', () => {
         expect(opening.density).toBeGreaterThan(0);
         expect(opening.foregroundAlpha).toBeGreaterThan(0);
         expect(opening.maxSize).toBe(3);
-        await page.screenshot({ path: info.outputPath('titanic-spawn.png') });
+        await reviewScreenshot(page, { path: info.outputPath('titanic-spawn.png') });
         await page.evaluate(() =>
           (window.__game as unknown as TitanicGame).headlights.setEnabled(false),
         );
         await waitForFrames(page, 3);
-        await page.screenshot({ path: info.outputPath('titanic-without-lamps.png') });
+        await reviewScreenshot(page, { path: info.outputPath('titanic-without-lamps.png') });
       });
     }
   }
@@ -1714,11 +1716,12 @@ freshTest.describe('settled landscape light and budget', () => {
       // The list reporter does not persist inline attachment bodies. Keep files
       // in the test output so the orchestrator's captures can be visually reviewed.
       const screenshot = testInfo.outputPath(`${site.id}-low-844x390.png`);
-      await page.screenshot({ path: screenshot, timeout: 60_000 });
-      await testInfo.attach(`${site.id}-low-844x390`, {
-        path: screenshot,
-        contentType: 'image/png',
-      });
+      await reviewScreenshot(page, { path: screenshot, timeout: 60_000 });
+      if (renderReview)
+        await testInfo.attach(`${site.id}-low-844x390`, {
+          path: screenshot,
+          contentType: 'image/png',
+        });
       const diagnostics = testInfo.outputPath(`${site.id}-opening.json`);
       await writeFile(diagnostics, JSON.stringify(opening, null, 2));
       await testInfo.attach(`${site.id}-opening`, {

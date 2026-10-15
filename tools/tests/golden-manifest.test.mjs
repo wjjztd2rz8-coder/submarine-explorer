@@ -10,6 +10,20 @@ import { goldenBuild, readGoldenBuild } from '../golden-build.mjs';
 import { goldenOptions } from '../golden-options.mjs';
 import { goldenManifest, goldenContactSheet } from '../golden-manifest.mjs';
 
+for (const missing of ['sha', 'dirty', 'build-mode']) {
+  test(`a document missing golden-${missing} cannot claim build provenance`, () => {
+    const html = [
+      ['sha', 'a'.repeat(40)],
+      ['dirty', 'true'],
+      ['build-mode', 'production'],
+    ]
+      .filter(([name]) => name !== missing)
+      .map(([name, value]) => `<meta name="golden-${name}" content="${value}">`)
+      .join('\n');
+    assert.throws(() => readGoldenBuild(html), /provenance; rebuild or restart Vite/);
+  });
+}
+
 test('served build provenance survives checkout changes and distinguishes clean, tracked and untracked dirt', async () => {
   const root = await mkdtemp(join(tmpdir(), 'golden-build-'));
   const git = async (args) =>

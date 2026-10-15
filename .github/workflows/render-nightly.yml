@@ -18,6 +18,8 @@ jobs:
   diagnostics:
     runs-on: ubuntu-latest
     timeout-minutes: 150
+    outputs:
+      review_build: ${{ steps.review_build.outcome }}
     defaults:
       run:
         shell: bash
@@ -79,11 +81,28 @@ jobs:
           export GOLDEN_PORT
           bash tools/golden.sh 2>&1 | tee "$DIAGNOSTICS_DIR/golden.log"
 
+      - name: Bind review build to this SHA and deployment base
+        if: ${{ !cancelled() && steps.golden.outcome == 'success' }}
+        run: node tools/ci-build-manifest.mjs write / dist
+
+      - name: Share the golden build with capability review shards
+        id: review_build
+        if: ${{ !cancelled() && steps.golden.outcome == 'success' && success() }}
+        timeout-minutes: 5
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-build-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
+          path: dist/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Capture event layouts and run continuous render guards
         if: ${{ !cancelled() && steps.chromium.outcome == 'success' && steps.golden.outcome != 'skipped' }}
         timeout-minutes: 60
         env:
           PW_RENDER_REVIEW: '1'
+          PLAYWRIGHT_JSON_OUTPUT_FILE: ${{ env.DIAGNOSTICS_DIR }}/e2e/report.json
         run: |
           # Golden built this exact SHA; Playwright owns its preview server.
           test -f dist/index.html
@@ -92,8 +111,7 @@ jobs:
           npx playwright test \
             tests/e2e/f-events-reform.spec.ts tests/e2e/f-verify-1000.spec.ts \
             tests/e2e/f-bluehole-squiggle.spec.ts tests/e2e/f2-explore.spec.ts \
-            tests/e2e/f-first-minute-620.spec.ts \
-            --grep 'visible spawn|golden sediment|approach, first scan|first minute, one Journal|f2-explore|animal hint fades' \
+            --grep 'visible spawn|golden sediment|approach, first scan|first minute, one Journal|f2-explore' \
             --retries=0 --reporter=list,json --output="$DIAGNOSTICS_DIR/e2e" \
             2>&1 | tee "$DIAGNOSTICS_DIR/e2e.log"
 
@@ -189,6 +207,71 @@ jobs:
           path: |
             ${{ env.DIAGNOSTICS_DIR }}/e2e/
             .cache/bluehole-squiggle/
+            .cache/codex/shots/f-geo-scarp/
+            .cache/codex/shots/f1-terrain/
+            .cache/codex/shots/f-visual-qa/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14
+
+  capability-review:
+    # Review images from the folded HUD/opening/Journal families stay available
+    # nightly, using the exact build already captured by golden.sh.
+    needs: diagnostics
+    if: ${{ !cancelled() && needs.diagnostics.outputs.review_build == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    env:
+      CI: true
+      VITE_BASE: /
+      PW_RENDER_REVIEW: '1'
+      PW_OUTDIR: dist
+      PW_PORT: '4473'
+      PLAYWRIGHT_JSON_OUTPUT_FILE: .cache/capability-review/report.json
+    steps:
+      - name: Checkout exact run SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        timeout-minutes: 5
+        run: npm ci
+      - name: Download this run's golden build
+        uses: actions/download-artifact@v4
+        with:
+          name: render-build-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
+          path: dist/
+      - name: Verify SHA, base and dependencies
+        run: node tools/ci-build-manifest.mjs verify / dist
+      - name: Install Playwright Chromium
+        timeout-minutes: 8
+        run: bash tools/install-playwright-chromium.sh
+      - name: Capture capability evidence and run its assertions
+        run: >-
+          npx playwright test tests/e2e/hud-touch.spec.ts
+          tests/e2e/opening-framing.spec.ts tests/e2e/journal-debrief.spec.ts
+          tests/e2e/terrain-render.spec.ts tests/e2e/d-sonar.spec.ts
+          --fully-parallel --workers=1 --shard=${{ matrix.shard }}/4
+          --retries=0 --reporter=list,json
+          --output=.cache/capability-review/tests
+      - name: Upload captures, numeric evidence and failure reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capability-review-${{ matrix.shard }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
+          path: |
+            .cache/capability-review/
+            .cache/codex/shots/
+            tests/e2e/screenshots/
           include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 14

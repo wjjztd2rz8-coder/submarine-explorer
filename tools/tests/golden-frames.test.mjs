@@ -2,6 +2,53 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { installGoldenFrames } from '../golden-frames.mjs';
 
+for (const pauses of [1, 2, 3]) {
+  test(`mission hold excludes the entire readback interval after ${pauses} pause call(s)`, () => {
+    const originalWindow = globalThis.window;
+    const originalPerformance = globalThis.performance;
+    let now = 100;
+    let nativeId = 0;
+    const callbacks = new Map();
+    globalThis.window = {
+      requestAnimationFrame(callback) {
+        callbacks.set(++nativeId, callback);
+        return nativeId;
+      },
+      cancelAnimationFrame(id) {
+        callbacks.delete(id);
+      },
+    };
+    globalThis.performance = { now: () => now };
+    try {
+      installGoldenFrames({ mission: true });
+      const timestamps = [];
+      const canceled = window.requestAnimationFrame(() => assert.fail('canceled frame ran'));
+      window.requestAnimationFrame((time) => timestamps.push(time));
+      window.cancelAnimationFrame(canceled);
+      window.__goldenFrames.pause();
+      for (let i = 1; i < pauses; i++) {
+        now += 100;
+        window.__goldenFrames.pause();
+      }
+      // Native callbacks already queued at pause must remain pending, even if dispatched.
+      const due = [...callbacks.values()];
+      callbacks.clear();
+      due.forEach((callback) => callback(now));
+      assert.deepEqual(timestamps, []);
+      now = 1100;
+      window.__goldenFrames.resume();
+      window.__goldenFrames.resume();
+      assert.equal(callbacks.size, 1);
+      now += 16;
+      [...callbacks.values()].forEach((callback) => callback(now));
+      assert.deepEqual(timestamps, [116]);
+    } finally {
+      globalThis.window = originalWindow;
+      globalThis.performance = originalPerformance;
+    }
+  });
+}
+
 test('mission holds the first fully loaded frame and +10 seconds, excluding screenshot latency without overriding physics', async () => {
   const originalWindow = globalThis.window;
   const nativePerformance = globalThis.performance;

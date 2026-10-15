@@ -1108,6 +1108,12 @@ export type SpongeKind = 0 | 1 | 2;
 /** Size and colour limits for wall sponges (metres, HSL), kept in one place for tests. */
 export const SPONGE_LIMITS = { maxScale: 2.4, maxSat: 0.3, maxLight: 0.46 } as const;
 
+const SPONGE_SHAPES = [
+  { width: [0.9, 0.9], height: (sx: number, r: number) => sx * (0.8 + r * 0.5), tilt: 1 },
+  { width: [0.9, 0.9], height: (_sx: number, r: number) => 1.1 + r * 1.3, tilt: 1 },
+  { width: [1.2, 1.2], height: (_sx: number, r: number) => 0.5 + r * 0.5, tilt: 0.6 },
+] as const;
+
 /** One wall sponge: kind 0 vase, 1 tall tube, 2 encrusting dome. Small, dull and varied. */
 export function wallSpongeSpec(
   kind: SpongeKind,
@@ -1117,20 +1123,11 @@ export function wallSpongeSpec(
   tilt: number,
   rnd: () => number,
 ): InstanceSpec {
-  let sx: number;
-  let sy: number;
-  if (kind === 1) {
-    sx = 0.9 + rnd() * 0.9;
-    sy = 1.1 + rnd() * 1.3;
-  } else if (kind === 2) {
-    sx = 1.2 + rnd() * 1.2;
-    sy = 0.5 + rnd() * 0.5;
-  } else {
-    sx = 0.9 + rnd() * 0.9;
-    sy = sx * (0.8 + rnd() * 0.5);
-  }
+  const shape = SPONGE_SHAPES[kind];
+  const sx = shape.width[0] + rnd() * shape.width[1];
+  const sy = shape.height(sx, rnd());
   return {
-    t: { x, y, z, ry: rnd() * 6.28, rx: kind === 2 ? tilt * 0.6 : tilt, sx, sy, sz: sx },
+    t: { x, y, z, ry: rnd() * 6.28, rx: tilt * shape.tilt, sx, sy, sz: sx },
     color: new THREE.Color().setHSL(0.04 + rnd() * 0.1, 0.14 + rnd() * 0.16, 0.26 + rnd() * 0.2),
   };
 }

@@ -133,9 +133,30 @@ test.describe('globe pins on touch', () => {
     expect(box!.height).toBeGreaterThanOrEqual(220);
     const sizes = await page
       .locator('.globe.is-embedded .globe-pin:not(.is-catalogue)')
-      .evaluateAll((pins) => pins.map((p) => p.getBoundingClientRect().width));
+      .evaluateAll((pins) =>
+        pins.map((p) => {
+          const style = getComputedStyle(p);
+          // Fractional translations can subtract to 43.999996 in DOMRect.
+          // Measure the layout box and prove neither it nor its ancestors
+          // shrink the hit area on screen.
+          const transforms = [];
+          for (let element: Element | null = p; element; element = element.parentElement) {
+            const transform = new DOMMatrixReadOnly(getComputedStyle(element).transform);
+            transforms.push([transform.a, transform.b, transform.c, transform.d]);
+          }
+          return {
+            width: parseFloat(style.width),
+            height: parseFloat(style.height),
+            transforms,
+          };
+        }),
+      );
     expect(sizes.length).toBeGreaterThan(0);
-    for (const w of sizes) expect(w).toBeGreaterThanOrEqual(43.99); // layout rounding
+    for (const size of sizes) {
+      expect(size.width).toBeGreaterThanOrEqual(44);
+      expect(size.height).toBeGreaterThanOrEqual(44);
+      for (const linear of size.transforms) expect(linear).toEqual([1, 0, 0, 1]);
+    }
     // The sites list is a sheet over the globe: collapsed it keeps its rows out of reach, and the
     // grab bar opens it.
     await expect(page.locator('.home-sites [data-mission="titanic"]')).toBeHidden();

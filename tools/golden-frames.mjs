@@ -12,6 +12,7 @@ export function installGoldenFrames({ mission }) {
   let firstElapsedS = null;
   let targetElapsedS = null;
   const pause = () => {
+    if (paused) return;
     paused = true;
     pausedAt = performance.now();
   };

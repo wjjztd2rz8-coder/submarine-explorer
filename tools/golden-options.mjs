@@ -18,10 +18,11 @@ export function goldenOptions(env = process.env) {
       const [width, height] = sizes[name];
       return { name, width, height };
     });
-  const only = env.GOLDEN_SITES?.split(',').map(
-    (site) =>
-      ({ 'blue-hole': 'great-blue-hole', monterey: 'monterey-canyon' })[site.trim()] ?? site.trim(),
-  );
+  const aliases = { 'blue-hole': 'great-blue-hole', monterey: 'monterey-canyon' };
+  const only = env.GOLDEN_SITES?.split(',').map((site) => {
+    const id = site.trim();
+    return Object.hasOwn(aliases, id) ? aliases[id] : id;
+  });
   if (only?.includes('all') && only.length !== 1)
     throw new Error('GOLDEN_SITES=all cannot be combined with individual sites');
   return { mode, tier, layouts, only, allSites: only?.[0] === 'all' };

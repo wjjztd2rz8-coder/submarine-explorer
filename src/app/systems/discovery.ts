@@ -36,6 +36,11 @@ export const discoverySystem: GameSystem = {
     ctx.journal = discovery.guide;
     ctx.discoveries = discovery.store;
     cleanup.add(() => discovery.dispose());
+    cleanup.add(
+      bus.on('app:state', ({ state }) => {
+        if (state !== 'dive') discovery.overlay.setSuppressed(true);
+      }),
+    );
     ctx.expose({
       scanner: discovery.scanner,
       discoveries: discovery.store,

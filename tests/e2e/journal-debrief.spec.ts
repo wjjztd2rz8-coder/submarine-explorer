@@ -1,3 +1,4 @@
+import { reviewScreenshot } from './helpers/render.js';
 import { expect, test as freshTest, type Page, type Locator } from '@playwright/test';
 import { test as experiencedTest } from './helpers/unlocked.js';
 import { homeReady, openSiteList } from './helpers/home.js';
@@ -26,6 +27,60 @@ import { expectCompactPhoneHud } from './helpers/phoneHud.js';
 import process from 'node:process';
 import AxeBuilder from '@axe-core/playwright';
 import catalog from '../../data/landmarks/index.json' with { type: 'json' };
+import spentKit from '../fixtures/legacy-save-spent-kit.json' with { type: 'json' };
+import secretSample from '../fixtures/legacy-save-secret-sample.json' with { type: 'json' };
+import heroStars from '../fixtures/legacy-save-hero-stars.json' with { type: 'json' };
+import type { Progress } from '../../src/game/Progress.js';
+
+freshTest.describe('legacy save persistence', () => {
+  for (const [name, fixture] of [
+    ['spent kit', spentKit],
+    ['secret and sample', secretSample],
+    ['hero stars', heroStars],
+  ] as const) {
+    // Regression guard: runtime migration and subsequent saves must retain archived
+    // balances, purchases, ratings, cosmetic grants and independent Journal/Daily data.
+    freshTest(`${name} survives migration, a cosmetic edit and reload`, async ({ page }) => {
+      await page.addInitScript((records) => {
+        for (const [key, value] of Object.entries(records))
+          if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify(value));
+      }, fixture.records);
+      await loadDive(page, '/?tile=titanic&tier=low&tutorial=0');
+      const probe = () =>
+        page.evaluate(() => {
+          const progress = (window.__game as unknown as { progress: Progress }).progress;
+          return {
+            progress: progress.snapshot(),
+            discoveries: JSON.parse(localStorage.getItem('subexplorer.discoveries.v1')!),
+            daily: JSON.parse(localStorage.getItem('subexplorer.daily.v1')!),
+          };
+        });
+      const before = await probe();
+      expect(before.progress).toMatchObject({
+        ...fixture.records['subexplorer.progress.v1'],
+        version: 2,
+      });
+      expect(before.discoveries).toEqual(fixture.records['subexplorer.discoveries.v1']);
+      expect(before.daily).toEqual(fixture.records['subexplorer.daily.v1']);
+      expect(
+        await page.evaluate(() =>
+          (window.__game as unknown as { progress: Progress }).progress.selectCosmetic(
+            'paint',
+            'stock',
+          ),
+        ),
+      ).toBe(true);
+      const edited = await probe();
+      expect(edited.progress).toEqual({
+        ...before.progress,
+        cosmetics: { ...before.progress.cosmetics, paint: 'stock' },
+      });
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await diveReady(page);
+      expect(await probe()).toEqual(edited);
+    });
+  }
+});
 
 freshTest.describe('mission progression and Home Journal', () => {
   const test = experiencedTest;
@@ -48,7 +103,7 @@ freshTest.describe('mission progression and Home Journal', () => {
   async function shot(page: Page, name: string): Promise<void> {
     await mkdir(shots, { recursive: true });
     await page.waitForTimeout(350);
-    await page.screenshot({ path: `${shots}/${name}.png` });
+    await reviewScreenshot(page, { path: `${shots}/${name}.png` });
   }
 
   function collectErrors(page: Page): string[] {
@@ -576,7 +631,7 @@ freshTest.describe('scan persistence and fixture debrief', () => {
       await expect(page.locator('.guidance-slot .guidance-name')).toHaveText(
         'Bow section (fixture)',
       );
-      await page.screenshot({ path: 'tests/e2e/screenshots/discovery-scan.png' });
+      await reviewScreenshot(page, { path: 'tests/e2e/screenshots/discovery-scan.png' });
 
       const saved = await page.evaluate((k) => localStorage.getItem(k), STORAGE_KEY);
       expect(saved).not.toBeNull();
@@ -589,10 +644,7 @@ freshTest.describe('scan persistence and fixture debrief', () => {
 
       // --- reload: still discovered -------------------------------------------
       await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
-      await page.waitForFunction(
-        () => (window.__game as { discovery?: { loaded: boolean } } | undefined)?.discovery?.loaded,
-      );
+      await diveReady(page, {});
       expect((await probe(page)).discovered).toBe(true);
 
       // --- Journal (J) --------------------------------------------------------
@@ -623,7 +675,7 @@ freshTest.describe('scan persistence and fixture debrief', () => {
           () => (window.__game as { scanner: { enabled: boolean } }).scanner.enabled,
         ),
       ).toBe(false);
-      await page.screenshot({ path: 'tests/e2e/screenshots/discovery-guide.png' });
+      await reviewScreenshot(page, { path: 'tests/e2e/screenshots/discovery-guide.png' });
 
       await page.keyboard.press('Escape');
       await expect(journal).toBeHidden();
@@ -644,7 +696,7 @@ freshTest.describe('scan persistence and fixture debrief', () => {
         'Next: Face a target and hold Scan.',
       );
       await expect(page.locator('.debrief-btn')).toHaveText(['Dive again', 'Journal']);
-      await page.screenshot({ path: 'tests/e2e/screenshots/discovery-debrief.png' });
+      await reviewScreenshot(page, { path: 'tests/e2e/screenshots/discovery-debrief.png' });
 
       // "Journal" opens the Journal on top of the debrief.
       await page.locator('.debrief-btn', { hasText: 'Journal' }).click();
@@ -726,7 +778,7 @@ freshTest.describe('frozen debrief and resume', () => {
           await mkdir(directory, { recursive: true });
           const shot = async (name: string) => {
             await page.clock.runFor(34);
-            await page.screenshot({ path: `${directory}/${name}.png` });
+            await reviewScreenshot(page, { path: `${directory}/${name}.png` });
           };
           const act = async (selector: string) => {
             const control = page.locator(selector);
@@ -964,7 +1016,7 @@ freshTest.describe('summary, disclosures and provenance', () => {
           await mkdir(directory, { recursive: true });
           const shot = async (name: string) => {
             await page.clock.runFor(34);
-            await page.screenshot({ path: `${directory}/${name}.png` });
+            await reviewScreenshot(page, { path: `${directory}/${name}.png` });
           };
           const act = async (control: Locator) => {
             if (viewport.touch) await control.tap();
@@ -1255,7 +1307,7 @@ freshTest.describe('photo capture and focus', () => {
           else await capture.click();
           await page.clock.runFor(34);
           await expect(mode.locator('.photo-mode-toast')).toHaveText('Saved to Journal');
-          await page.screenshot({ path: info.outputPath(`round-${round}-photo.png`) });
+          await reviewScreenshot(page, { path: info.outputPath(`round-${round}-photo.png`) });
           if (profile.touch) await done.tap();
           else await done.click();
           await expect(mode).toBeHidden();
@@ -1480,7 +1532,7 @@ freshTest.describe('Home to scan and return journey', () => {
           const shot = async (name: string): Promise<void> => {
             await page.clock.runFor(34);
             const path = `${directory}/${name}.png`;
-            await page.screenshot({ path });
+            await reviewScreenshot(page, { path });
             records.push({
               path,
               ...(await page.evaluate(() => {
@@ -1766,9 +1818,81 @@ freshTest.describe('catalog Journal additions', () => {
               );
           }
         }
-        await page.screenshot({ path: testInfo.outputPath('journal-addition.png') });
+        await reviewScreenshot(page, { path: testInfo.outputPath('journal-addition.png') });
         expect(errors).toEqual([]);
       });
+    });
+  }
+});
+
+freshTest.describe('scan still', () => {
+  const test = experiencedTest;
+  const shots = '.cache/codex/shots/S-journal-picture';
+  const DIVE = '/?mission=titanic&poi=titanic-bow&skipBriefing=1';
+
+  const VIEWPORTS = [
+    { name: 'desktop', width: 1280, height: 800, touch: false },
+    { name: 'phone-portrait', width: 390, height: 844, touch: true },
+    { name: 'phone-landscape', width: 844, height: 390, touch: true },
+  ];
+
+  for (const viewport of VIEWPORTS) {
+    // Regression guard: a first scan files a still above its Journal text on every viewport.
+    test(`a fresh scan opens its Journal entry with a picture (${viewport.name})`, async ({
+      browser,
+    }) => {
+      await mkdir(shots, { recursive: true });
+      const context = await browser.newContext({
+        viewport: { width: viewport.width, height: viewport.height },
+        hasTouch: viewport.touch,
+        isMobile: viewport.touch,
+      });
+      const page = await context.newPage();
+      const errors: string[] = [];
+      page.on('pageerror', (e) => errors.push(e.message));
+      await page.goto(DIVE);
+      await diveReady(page);
+      await page.waitForFunction(
+        () =>
+          (window.__game as { discovery: { spawnedAt: string | null } }).discovery.spawnedAt ===
+          'titanic-bow',
+      );
+      await scanWithKeyboard(page, 'titanic-bow');
+      // The still is read on the next drawn frame, not at the scan itself.
+      await page.waitForFunction(() => {
+        const raw = localStorage.getItem('subexplorer.photos.v1');
+        return (
+          !!raw && JSON.parse(raw).photos.some((p: { poiId: string }) => p.poiId === 'titanic-bow')
+        );
+      });
+      await page.evaluate(() =>
+        (window.__game as { journal: { open(): void; show(key: string): void } }).journal.open(),
+      );
+      const journal = page.locator('.journal');
+      await expect(journal).toBeVisible();
+      await page.evaluate(() =>
+        (window.__game as { journal: { show(key: string): void } }).journal.show('titanic/poi/bow'),
+      );
+      const hero = journal.locator('.jr-hero img');
+      await expect(hero).toHaveCount(1);
+      // At the top: the picture precedes the first paragraph of the entry.
+      const order = await journal.evaluate((root) => {
+        const img = root.querySelector('.jr-hero');
+        const para = root.querySelector('.jr-para');
+        return (
+          !!img &&
+          !!para &&
+          !!(img.compareDocumentPosition(para) & Node.DOCUMENT_POSITION_FOLLOWING)
+        );
+      });
+      expect(order).toBe(true);
+      const box = (await hero.boundingBox())!;
+      expect(box.width).toBeGreaterThan(150);
+      expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
+      await page.waitForTimeout(400);
+      await reviewScreenshot(page, { path: `${shots}/${viewport.name}.png` });
+      expect(errors).toEqual([]);
+      await context.close();
     });
   }
 });

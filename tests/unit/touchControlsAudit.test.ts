@@ -632,6 +632,69 @@ it('suppresses a visible objective immediately and restores it on the next unblo
   }
 });
 
+it.each(['keyboard', 'touch'] as const)(
+  '%s keeps simultaneous result/objective/hazard guidance in one slot and drops stale offers when blocked',
+  (device) => {
+    const f = fixture();
+    const overlay = new ScanOverlay(makeConfig().scan);
+    const view = new Scanner(makeConfig().scan, new EventBus()).view;
+    const keys = { scan: 'G', guide: 'J' };
+    Object.assign(view, {
+      nearestId: 'bow',
+      nearestName: 'Bow',
+      nearestInRange: true,
+      nearestDistance: 5,
+      candidateId: 'bow',
+      objectiveId: 'stern',
+      objectiveName: 'Stern section',
+      objectiveDistance: 692,
+    });
+    const name = (overlay.slot.root as unknown as TouchElement).children[1].children[1];
+    try {
+      f.controls.setTouchMode(device === 'touch');
+      overlay.update(view, keys, null, 0);
+      overlay.showComplete('Bow result', true, keys);
+      overlay.slot.offer('warning', 'urgent', { kicker: 'WARNING', text: 'Hazard', tone: 'alert' });
+      overlay.slot.notice('A hint');
+      overlay.update(view, keys, null, 0);
+      expect(overlay.slot.kind).toBe('urgent');
+      expect(name.textContent).toBe('Hazard');
+      expect(
+        Array.from(document.body.querySelectorAll('*')).filter(
+          (c) => c.className === 'guidance-slot',
+        ),
+      ).toHaveLength(1);
+      overlay.slot.offer('warning', 'urgent', null);
+      expect(overlay.slot.kind).toBe('discovery');
+      expect(name.textContent).toBe('Bow result');
+      overlay.slot.offer('warning', 'urgent', { kicker: 'WARNING', text: 'Hazard', tone: 'alert' });
+      overlay.setSuppressed(true);
+      expect(overlay.slot.visible).toBe(false);
+      overlay.slot.notice('While paused');
+      overlay.slot.offer('warning', 'urgent', {
+        kicker: 'WARNING',
+        text: 'Old hazard',
+        tone: 'alert',
+      });
+      overlay.update(view, keys, null, 0);
+      expect(overlay.slot.visible).toBe(false);
+      overlay.setSuppressed(false);
+      expect(overlay.slot.visible).toBe(false);
+      overlay.update(view, keys, null, 0);
+      expect(overlay.slot.kind).toBe('scan');
+      expect(name.textContent).toBe('Bow');
+      view.nearestInRange = false;
+      view.candidateId = null;
+      overlay.update(view, keys, null, 0);
+      expect(overlay.slot.kind).toBe(device === 'touch' ? 'objective' : null);
+      expect(overlay.slot.showsName('Bow result')).toBe(false);
+    } finally {
+      overlay.dispose();
+      f.controls.dispose();
+    }
+  },
+);
+
 it('hides an anchored reticle behind visible touch controls and restores it after they move or hide', () => {
   const f = fixture();
   const overlay = new ScanOverlay({

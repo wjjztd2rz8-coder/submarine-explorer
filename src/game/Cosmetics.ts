@@ -134,8 +134,11 @@ export function totalStars(progress: CosmeticProgress): number {
 }
 /** Only discoveries count: objectives, star tokens, photos and sightings are not checklists. */
 export function discoveryCount(progress: CosmeticProgress): number {
-  return new Set(progress.awarded.filter((token) => /^(poi|species|sample|secret):.+/.test(token)))
-    .size;
+  return new Set(progress.awarded.filter(isDiscoveryAward)).size;
+}
+/** A namespace without a site or subject is a truncated record, not a discovery. */
+export function isDiscoveryAward(token: string): boolean {
+  return /^(?:(?:poi|sample|secret):[^/]+\/.+|species:.+)$/.test(token);
 }
 export function cosmeticUnlocked(
   def: Pick<CosmeticDef, 'id' | 'reward'>,

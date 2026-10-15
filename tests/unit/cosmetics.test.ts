@@ -142,6 +142,28 @@ describe('cosmetic rewards', () => {
 });
 
 describe('cosmetic save migration and gameplay isolation', () => {
+  it.each([0, 1, 2])(
+    'does not turn truncated v%s discovery records or reward tokens into cosmetic unlocks',
+    (version) => {
+      const red = HULL_PAINTS.find((paint) => paint.id === 'red')!;
+      const progress = new Progress(new ProgressSave(null), [
+        'titanic/secret:',
+        'titanic/sample:',
+        'lost-city/secret:',
+        'lost-city/life:',
+      ]);
+      expect(progress.snapshot().awarded).toEqual([]);
+      expect(progress.ownsCosmetic(red)).toBe(false);
+      const migrated = migrateProgress({
+        version,
+        awarded: ['poi:/', 'secret:titanic/', 'sample:lost-city/', 'species:', 'sample:'],
+        cosmetics: { paint: 'red', frame: 'white' },
+      });
+      expect(discoveryCount(migrated)).toBe(0);
+      expect(migrated.lifetime).toBe(0);
+      expect(migrated.cosmetics).toEqual(defaultCosmetics());
+    },
+  );
   it.each([null, {}, { version: 0, rp: 70 }, { version: 1, points: 50 }, 'bad', []])(
     'defaults old or malformed save %j to the current look',
     (raw) => {

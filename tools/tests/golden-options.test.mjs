@@ -1,6 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { goldenOptions, goldenUrl, selectGoldenMissions } from '../golden-options.mjs';
+import {
+  goldenOptions,
+  goldenUrl,
+  selectGoldenHeroes,
+  selectGoldenMissions,
+} from '../golden-options.mjs';
 import bismarckPose from '../bismarck-poses.json' with { type: 'json' };
 import lowTierPoses from '../lowtier-poses.json' with { type: 'json' };
 
@@ -38,6 +43,17 @@ test('site aliases and whitespace remain supported', () => {
     'monterey-canyon',
   ]);
 });
+for (const site of ['unknown-site', 'constructor', '__proto__', 'toString', '']) {
+  test(`unknown site ${JSON.stringify(site)} stays a string and is rejected in both capture modes`, () => {
+    const options = goldenOptions({ GOLDEN_SITES: site });
+    assert.deepEqual(options.only, [site]);
+    assert.throws(
+      () => selectGoldenHeroes([['titanic', 'bow-hull']], ['titanic'], options),
+      /Unknown or empty GOLDEN_SITES/,
+    );
+    assert.throws(() => selectGoldenMissions(['titanic'], options), /Unknown GOLDEN_SITES/);
+  });
+}
 test('invalid sweep settings fail before browser launch', () => {
   for (const env of [
     { GOLDEN_TIER: 'auto' },

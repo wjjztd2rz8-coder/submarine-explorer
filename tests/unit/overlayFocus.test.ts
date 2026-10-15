@@ -40,6 +40,10 @@ import { modesSystem } from '../../src/app/systems/modes.js';
 import { settingsSystem } from '../../src/app/systems/settings.js';
 import { waypointsSystem } from '../../src/app/systems/waypoints.js';
 import { Progress } from '../../src/game/Progress.js';
+import { makeSyntheticTile } from './helpers.js';
+import { PROGRESS_STORAGE_KEY } from '../../src/core/Save.js';
+import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
+import { buildJournalSite } from '../../src/game/JournalData.js';
 
 /** The same small EventTarget/DOM approach as the shell and Home focus specs. */
 class Element extends EventTarget {
@@ -500,6 +504,179 @@ describe('overlay keyboard ownership and focus return', () => {
 });
 
 describe('migrated modal consumers', () => {
+  it.each(['keyboard', 'touch'] as const)(
+    '%s Pause/Resume dismisses simultaneous guidance and rebuilds the current card',
+    async (device) => {
+      vi.spyOn(Journal.prototype, 'load').mockResolvedValue();
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
+      document.documentElement.classList.toggle('is-touch', device === 'touch');
+      const ctx = {
+        bus: new EventBus(),
+        config: DEFAULT_CONFIG,
+        effective: resolveEffective(defaultSettings(DEFAULT_CONFIG), 'arcade', null),
+        meta: makeSyntheticTile().meta,
+        terrain: { sampleHeight: () => -100 },
+        contentLandmark: 'reef',
+        params: new URLSearchParams(),
+        sub: {},
+        rig: {},
+        input: { primaryKeyLabel: () => 'G' },
+        expose: vi.fn(),
+        app: { state: 'dive' },
+      } as unknown as GameContext;
+      discoverySystem.init?.(ctx);
+      cleanup.push(() => discoverySystem.dispose?.());
+      await ctx.discovery.ready;
+      const pause = new PauseMenu({
+        resume: () => ctx.setAppState('dive'),
+        controls: vi.fn(),
+        credits: () => html(new Element()),
+        objectives: () => [],
+        journal: vi.fn(),
+        settings: vi.fn(),
+        quit: vi.fn(),
+      });
+      cleanup.push(() => pause.dispose());
+      ctx.setAppState = (state) => {
+        ctx.app.state = state;
+        if (state === 'pause') pause.open();
+        else pause.close();
+        ctx.bus.emit('app:state', { state });
+      };
+      shellKeysSystem.init?.(ctx);
+      cleanup.push(() => shellKeysSystem.dispose?.());
+      const slot = ctx.guidance;
+      slot.offer('objective', 'objective', {
+        kicker: 'OBJECTIVE',
+        text: 'Old objective',
+        tone: 'dim',
+      });
+      ctx.discovery.overlay.showComplete('Bow result', true, { scan: 'G', guide: 'J' });
+      slot.offer('warning', 'urgent', { kicker: 'WARNING', text: 'Hazard', tone: 'alert' });
+      if (device === 'keyboard') press('Escape');
+      else ctx.setAppState('pause'); // The touch Pause callback uses this same shell entry.
+      expect(pause.isOpen).toBe(true);
+      expect(slot.visible).toBe(false);
+      const frame = (frozen: boolean) =>
+        discoverySystem.frame!['scan.discovery']!(
+          {
+            steps: 0,
+            fixedDt: 1 / 60,
+            dt: 1 / 60,
+            clockDt: 0,
+            frozen,
+            state: {},
+            sampled: {},
+            pilotPosition: new THREE.Vector3(),
+            pilotForward: new THREE.Vector3(0, 0, -1),
+          } as FrameState,
+          ctx,
+        );
+      frame(true);
+      expect(slot.visible).toBe(false);
+      press('Escape');
+      expect(ctx.app.state).toBe('dive');
+      frame(false);
+      expect(slot.visible).toBe(false);
+      slot.offer('objective', 'objective', {
+        kicker: 'OBJECTIVE',
+        text: 'Next target',
+        tone: 'dim',
+      });
+      expect(slot.kind).toBe('objective');
+      expect(slot.showsName('Next target')).toBe(true);
+      expect(body.querySelectorAll('.guidance-slot')).toHaveLength(1);
+    },
+  );
+
+  it.each([
+    [
+      'legacy RP',
+      JSON.stringify({ version: 0, rp: 60, cosmetics: { paint: 'blue' } }),
+      'blue',
+      false,
+    ],
+    [
+      'legacy stars',
+      JSON.stringify({ version: 1, ratings: { titanic: 3 }, cosmetics: { paint: 'orange' } }),
+      'orange',
+      false,
+    ],
+    [
+      'current grants',
+      JSON.stringify({ version: 2, cosmeticGrants: ['paint:blue'], cosmetics: { paint: 'blue' } }),
+      'blue',
+      false,
+    ],
+    [
+      'damaged fields',
+      JSON.stringify({
+        version: 2,
+        ratings: [],
+        awarded: [null],
+        cosmetics: { paint: '__proto__' },
+      }),
+      'stock',
+      false,
+    ],
+    ['broken JSON', '{broken', 'stock', false],
+    [
+      'future version',
+      JSON.stringify({ version: 99, cosmetics: { paint: 'gold' } }),
+      'stock',
+      true,
+    ],
+  ] as const)(
+    'opens debrief → Journal cosmetics after %s and reloads safely',
+    async (_name, raw, paint, readOnly) => {
+      vi.spyOn(Journal.prototype, 'load').mockResolvedValue();
+      const values = new Map([
+        [PROGRESS_STORAGE_KEY, raw],
+        [DISCOVERY_STORAGE_KEY, '{broken'],
+      ]);
+      const storage = {
+        getItem: (key: string) => values.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          values.set(key, value);
+        },
+        removeItem: (key: string) => {
+          values.delete(key);
+        },
+      };
+      const progress = new Progress(new ProgressSave(storage));
+      const guide = new Journal();
+      cleanup.push(() => guide.dispose());
+      Object.assign(guide, {
+        sites: [buildJournalSite({ id: 'reef', guide: null, pois: [], species: null })],
+      });
+      guide.setStore(new DiscoveryStore(storage));
+      guide.setProgress(progress);
+      const debrief = new Debrief({ onFieldGuide: () => guide.open() });
+      cleanup.push(() => debrief.dispose());
+      const rating = progress.finish('reef', [{ primary: true, complete: true }]);
+      debrief.show({ ...stats, discoveries: [{ poiId: 'bow', name: 'Bow' }] }, undefined, rating);
+      const journalButton = (debrief.root as unknown as Element)
+        .querySelectorAll('button')
+        .find((b) => b.dataset.action === 'journal')!;
+      journalButton.dispatchEvent(new Event('click'));
+      await Promise.resolve();
+      expect(guide.isOpen).toBe(true);
+      const select = (guide.root as unknown as Element)
+        .querySelectorAll('select')
+        .find((s) => s.dataset.cosmetic === 'paint')!;
+      expect(select.value).toBe(paint);
+      expect(select.disabled).toBe(readOnly);
+      if (!readOnly) {
+        select.value = 'stock';
+        select.dispatchEvent(new Event('change'));
+        expect(new Progress(new ProgressSave(storage)).cosmetics.paint).toBe('stock');
+      } else expect(storage.getItem(PROGRESS_STORAGE_KEY)).toBe(raw);
+      press('Escape');
+      expect(guide.isOpen).toBe(false);
+      expect(debrief.isOpen).toBe(true);
+      expect(storage.getItem(DISCOVERY_STORAGE_KEY)).toBe('{broken');
+    },
+  );
   it.each([true, false])(
     'closing Journal cosmetics does not also pause the dive (shell registered first: %s)',
     (first) => {

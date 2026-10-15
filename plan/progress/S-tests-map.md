@@ -101,6 +101,8 @@ Only assertion-level duplication is established here. A same-selector check made
 
 ## Step 3: nightly captures, ordinary assertion survivors
 
+Implementation status (2026-10-15): [2020-S-tests-step3.md](2020-S-tests-step3.md) records the current survivors, assertion audit, inventory and environment limits. The original contracts below remain historical source evidence.
+
 Add scheduled and manual nightly runs (e.g. `schedule: cron: '0 8 * * *'`, `workflow_dispatch`, UTC). Use the same built artifact, owned preview and Chromium installer as gates; run `tools/golden.sh` for authored poses and archive contact sheets, manifests, diagnostics and failure reports with the tested SHA. Existing `golden.sh` always rebuilds and starts a preview: step4 needs an explicit validated prebuilt mode or caller-supplied base URL so it can reuse artifacts. A GPU runner is desirable for frame-time evidence; software-GPU measurements must be labelled. Do not assume golden's chase/cockpit poses reproduce scarp's bright-fill orbit angles or terrain's close-camera poses: keep those explicit capture recipes.
 
 | Nightly capture list                                                                                                       | Ordinary survivor / full retained checks                                                                                                                                                                                                                                                                                                                                                           | Cost boundary                                                                                                                                            |

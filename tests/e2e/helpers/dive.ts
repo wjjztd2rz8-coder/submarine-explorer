@@ -1,12 +1,16 @@
 import type { Page } from '@playwright/test';
 
 /** Dive reloads need both the game shell and authored discovery content. */
-export async function diveReady(page: Page): Promise<void> {
+export async function diveReady(
+  page: Page,
+  // Pass {} when the caller needs Playwright's configured default discovery wait.
+  discoveryWait: { timeout?: number } = { timeout: 20_000 },
+): Promise<void> {
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
   await page.waitForFunction(
     () => (window.__game as { discovery?: { loaded: boolean } } | undefined)?.discovery?.loaded,
     undefined,
-    { timeout: 20_000 },
+    discoveryWait,
   );
 }
 

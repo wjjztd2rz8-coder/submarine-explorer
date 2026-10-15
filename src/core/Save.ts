@@ -13,6 +13,7 @@ import {
   totalStars,
   defaultCosmetics,
   sanitizeCosmetics,
+  isDiscoveryAward,
   type CosmeticSelection,
 } from '../game/Cosmetics.js';
 import type { EventBus } from './EventBus.js';
@@ -479,6 +480,8 @@ export function migrateProgress(raw: unknown): ProgressRecord {
   const earned = out.awarded.reduce((sum, token) => {
     const colon = token.indexOf(':');
     const kind = token.slice(0, colon) as keyof typeof LEGACY_REWARDS;
+    if (['poi', 'species', 'sample', 'secret'].includes(kind) && !isDiscoveryAward(token))
+      return sum;
     return (
       sum +
       (colon > 0 && token.length > colon + 1 && Object.hasOwn(LEGACY_REWARDS, kind)

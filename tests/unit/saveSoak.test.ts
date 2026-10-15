@@ -3,7 +3,8 @@ import { COSMETIC_CHOICES, type CosmeticSlot } from '../../src/game/Cosmetics.js
 import spentKit from '../fixtures/legacy-save-spent-kit.json';
 import secretSample from '../fixtures/legacy-save-secret-sample.json';
 import heroStars from '../fixtures/legacy-save-hero-stars.json';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { loadSavedProgress } from '../../src/app/systems/progress.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import {
   BINDINGS_STORAGE_KEY,
@@ -558,5 +559,36 @@ it.each([spentKit, secretSample, heroStars])(
     expect(new DailySave(storage).get().streak).toBe(dailyBefore.streak + 1);
     const reload = new Progress(new ProgressSave(storage));
     expect(reload.snapshot()).toEqual(progress.snapshot());
+  },
+);
+
+it.each([
+  ['spent kit', spentKit],
+  ['secret/sample', secretSample],
+  ['hero stars', heroStars],
+] as const)(
+  'loads the %s legacy fixture through production startup and reload',
+  async (_, fixture) => {
+    const storage = new MemoryStorage();
+    for (const [key, record] of Object.entries(fixture.records))
+      storage.setItem(key, JSON.stringify(record));
+    const original = new Map(storage.data);
+    vi.stubGlobal('localStorage', storage);
+    try {
+      const progress = await loadSavedProgress();
+      expect(progress.snapshot()).toEqual(new ProgressSave(storage).get());
+      // Reading a previously credited save must neither backfill rewards again nor
+      // mutate its archived bytes before the player actually saves an edit.
+      expect(storage.data).toEqual(original);
+      expect(progress.selectCosmetic('paint', 'stock')).toBe(true);
+      const edited = progress.snapshot();
+      expect(JSON.parse(storage.getItem(PROGRESS_STORAGE_KEY)!)).toEqual(edited);
+      for (let round = 0; round < 3; round++)
+        expect((await loadSavedProgress()).snapshot()).toEqual(edited);
+      for (const key of [DISCOVERY_STORAGE_KEY, DAILY_STORAGE_KEY])
+        expect(storage.getItem(key)).toBe(original.get(key));
+    } finally {
+      vi.unstubAllGlobals();
+    }
   },
 );
