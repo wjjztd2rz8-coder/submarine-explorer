@@ -41,6 +41,8 @@ export interface PoiDef {
   depth_m?: number;
   snap_to_seabed?: boolean;
   radius_m?: number;
+  /** Sub depth (positive metres) needed to scan; absent = any depth. */
+  min_depth_m?: number;
   kind: PoiKind;
   primary: boolean;
   scan_seconds?: number;
@@ -63,6 +65,7 @@ export interface PlacedPoi {
   position: Vector3;
   /** Scan radius, metres. */
   radius: number;
+  minDepthM?: number;
   /** Beam time needed, seconds. */
   scanSeconds: number;
   def: PoiDef;
@@ -118,6 +121,7 @@ export function parsePois(doc: unknown, warn: Warn = defaultWarn): PoiDef[] {
     const kind = POI_KINDS.includes(o.kind as PoiKind) ? (o.kind as PoiKind) : 'other';
     const depth = num(o.depth_m);
     const radius = num(o.radius_m);
+    const minDepth = num(o.min_depth_m);
     const seconds = num(o.scan_seconds);
     const conf = o.confidence;
     const def: PoiDef = {
@@ -131,6 +135,7 @@ export function parsePois(doc: unknown, warn: Warn = defaultWarn): PoiDef[] {
     if (o.snap_to_seabed === true) def.snap_to_seabed = true;
     if (depth !== undefined) def.depth_m = depth;
     if (radius !== undefined && radius > 0) def.radius_m = radius;
+    if (minDepth !== undefined && minDepth > 0) def.min_depth_m = minDepth;
     if (seconds !== undefined && seconds > 0) def.scan_seconds = seconds;
     const guide = str(o.guide_entry);
     if (guide) def.guide_entry = guide;
@@ -181,6 +186,7 @@ export function placePois(
       guideEntry: def.guide_entry ?? null,
       position: new Vector3(x, y, z),
       radius: def.radius_m ?? scan.defaultRadiusM,
+      minDepthM: def.min_depth_m,
       scanSeconds: def.scan_seconds ?? scan.defaultSeconds,
       def,
     });

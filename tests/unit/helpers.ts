@@ -7,6 +7,8 @@
 import { METERS_PER_DEG_LAT, metersPerDegLon } from '../../src/util/geo.js';
 import type { FetchLike } from '../../src/world/TileLoader.js';
 import type { Tile, TileMeta } from '../../src/util/types.js';
+import { DEFAULT_SENSOR_PRESETS } from '../../src/core/config/gameplay.js';
+import { EQUIPMENT } from '../../src/core/config/progress.js';
 
 export interface SyntheticTileOptions {
   id?: string;
@@ -108,4 +110,11 @@ export function makeFakeFetch(tile: Tile, root = '/data/tiles'): FetchLike {
       arrayBuffer: async () => buffer ?? new ArrayBuffer(0),
     };
   };
+}
+
+/** Scales placed POI radii the way the live Arcade defaults do (extended sensors, fixed equipment). */
+export function withArcadeReach<T extends { radius: number }>(pois: T[]): T[] {
+  const scale = DEFAULT_SENSOR_PRESETS.extended.scanRadiusMultiplier * EQUIPMENT.scanDetail;
+  for (const p of pois) p.radius *= scale;
+  return pois;
 }

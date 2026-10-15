@@ -234,6 +234,15 @@ describe('Scanner', () => {
     expect(scanner.view.nearestInRange).toBe(false);
   });
 
+  it('needs the sub below a target minimum depth, however close it is', () => {
+    const { scanner, log } = setup([target({ minDepthM: 60 })]);
+    run(scanner, 3, new Vector3(0, -50, 0), NORTH, true);
+    expect(scanner.view.nearestInRange).toBe(false);
+    expect(names(log)).not.toContain('scan:complete');
+    run(scanner, 3, new Vector3(0, -70, 0), NORTH, true);
+    expect(names(log)).toContain('scan:complete');
+  });
+
   it('does nothing while facing away, and says which way to turn', () => {
     const { scanner, log } = setup();
     run(scanner, 3, AT, EAST, true);

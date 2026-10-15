@@ -235,7 +235,10 @@ export class ScanOverlay {
     // Phones have no objectives list, so the line stands; elsewhere it appears with a contact.
     if (view.objectiveId != null && view.objectiveName && !objectiveReady && (touch || inContact)) {
       const turn = view.objectiveTurnDeg;
-      const near = `CLOSE TO ${view.objectiveRadius.toFixed(0)} M`;
+      const near =
+        view.objectiveDistance <= view.objectiveRadius
+          ? 'DIVE DEEPER'
+          : `CLOSE TO ${view.objectiveRadius.toFixed(0)} M`;
       return {
         scan: null,
         objective: {

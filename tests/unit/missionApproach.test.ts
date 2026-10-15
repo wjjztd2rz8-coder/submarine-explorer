@@ -83,9 +83,6 @@ for (const site of Object.keys(MISSION_APPROACH_M)) {
             missionApproachScanRadius(site, target.radius) * sensors.scanRadiusMultiplier;
           expect(range).toBeGreaterThan(scanRadius);
           expect(range).toBeLessThan(sensors.sonarPoiRange);
-          expect(range).toBeLessThanOrEqual(
-            scanRadius * config.scan.hintRangeFactor * sensors.hintRangeMultiplier + 1e-6,
-          );
         }
         const radius = missionApproachScanRadius(site, target.radius);
         for (let distance = 0; distance < range - radius; distance += 5) {

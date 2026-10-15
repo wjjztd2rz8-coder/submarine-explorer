@@ -18,7 +18,7 @@ import { placeCell } from '../../src/world/scatter/ScatterPlacement.js';
 import { SCATTER_TYPES } from '../../src/world/scatter/ScatterTypes.js';
 import type { ScatterKind } from '../../src/world/TerrainBiome.js';
 import type { TileMeta } from '../../src/util/types.js';
-import { makeSyntheticTile } from './helpers.js';
+import { makeSyntheticTile, withArcadeReach } from './helpers.js';
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 const audit: unknown[] = [];
@@ -174,12 +174,14 @@ describe('920 shipped carve surfaces', () => {
             }
           }
 
-          const pois = placePois(
-            parsePois(json(`data/landmarks/${site}/pois.json`)),
-            meta,
-            terrain,
-            config.scan,
-            site,
+          const pois = withArcadeReach(
+            placePois(
+              parsePois(json(`data/landmarks/${site}/pois.json`)),
+              meta,
+              terrain,
+              config.scan,
+              site,
+            ),
           );
           for (const poi of pois) {
             const floor = meshHeight(poi.position.x, poi.position.z);
