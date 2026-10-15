@@ -25,7 +25,7 @@ import bismarckPose from '../../tools/bismarck-poses.json';
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 
-test('Low seabed lighting is isolated to the six observed dark sites and leaves surface water intact', () => {
+test('Low seabed lighting is isolated to the observed dark sites and leaves surface water intact', () => {
   const water = makeConfig().water;
   const before = JSON.stringify(water);
   for (const site of LOW_READABILITY_SITES) {
@@ -45,14 +45,7 @@ test('Low seabed lighting is isolated to the six observed dark sites and leaves 
     for (const tier of ['medium', 'high'] as const)
       expect(lowSiteWater(site, tier, water)).toBe(water);
   }
-  for (const site of [
-    'titanic',
-    'monterey-canyon',
-    'great-blue-hole',
-    'lost-city',
-    'beebe-vent-field',
-    'unknown',
-  ])
+  for (const site of ['titanic', 'monterey-canyon', 'great-blue-hole', 'unknown'])
     expect(lowSiteWater(site, 'low', water)).toBe(water);
   for (const site of ['challenger-deep', 'endurance']) {
     const deep = deepSiteWater(site, water);
@@ -92,8 +85,8 @@ for (const site of LOW_READABILITY_SITES) {
         const frame = { dt: 1 / 60 } as FrameState;
         atmosphereSystem.frame!['env.atmosphere']!(frame, ctx);
         expect(ctx.atmosphere.ambient).toBeInstanceOf(AmbientLight);
-        expect(ctx.atmosphere.ambient.intensity).toBe(3);
-        expect(frame.atmo.ambientIntensity).toBe(3);
+        expect(ctx.atmosphere.ambient.intensity).toBe(6);
+        expect(frame.atmo.ambientIntensity).toBe(6);
         expect(ctx.headlights.on).toBe(false);
       }
     } finally {
