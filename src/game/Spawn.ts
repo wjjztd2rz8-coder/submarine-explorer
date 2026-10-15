@@ -33,13 +33,13 @@ export const MISSION_APPROACH_M: Readonly<Record<string, number>> = {
   'monterey-canyon': 240,
   endurance: 180,
   'axial-seamount-ashes': 180,
-  'hudson-canyon': 240,
+  'hudson-canyon': 160,
   kamaehuakanaloa: 200,
   'beebe-vent-field': 220,
   'great-blue-hole': 150,
-  bismarck: 240,
-  'hunga-tonga-caldera': 260,
-  'blake-plateau-corals': 260,
+  bismarck: 150,
+  'hunga-tonga-caldera': 160,
+  'blake-plateau-corals': 160,
 };
 
 /** Leave a real approach even with Extended sensors (twice the base scan radius). */
