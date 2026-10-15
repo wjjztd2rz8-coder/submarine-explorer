@@ -19,4 +19,4 @@
 
 ## Gate
 
-See the final report in the session; result recorded below.
+`PW_PORT=4732 tools/gates.sh` passes: python, content, build, unit, e2e, e2e-base, attribution and prettier.
