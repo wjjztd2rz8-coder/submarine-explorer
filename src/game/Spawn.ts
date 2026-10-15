@@ -212,7 +212,7 @@ const FREE_DIVE_OPENINGS: Record<
   'beebe-vent-field': {
     hero: 'beebe-chimney-1',
     bearing: 60,
-    range: 80,
+    range: 100,
     fromCentre: true,
     altitude: 8,
     yawOffset: 11,
