@@ -1092,3 +1092,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** weekly 5% until Oct 20; queue 2000/2010/2020 waits. Stale worktrees 1740-1860 remain.
 - **Not done:** no tag (waits for green hosted CI). Next: V-lander (Haiku), S-tiers, V-titanic remainder.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 02:13 CDT headless run (Claude)
+
+- **Merged and pushed:** Sonnet R-ci-triage (27 failing hosted-CI e2e cases from run 38682281312): one real app fix (Journal shows the photo on an undiscovered entry too, d-photo), the rest spec repairs (16 px Advanced switches, 44 px phone Home buttons, paused-clock homeReady, scan-depth driver for Blue Hole, guidance helper clock, CI-only buoyancy drift). Smoke + project-base green on main; targeted specs green locally; no full e2e. New hosted CI result pending.
+- **Codex:** weekly 5% until Oct 20; queue 2000/2010/2020 waits. Stale worktrees 1740-1860 remain.
+- **Not done:** no tag (waits for green hosted CI). Next: V-lander (Haiku), S-tiers, V-titanic remainder.
+- **Needs owner:** real-phone play of the newest build.
