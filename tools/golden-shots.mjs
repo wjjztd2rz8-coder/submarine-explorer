@@ -316,7 +316,7 @@ async function main() {
                     fromSurface: false,
                     captureBeyondViewport: false,
                   }),
-                  30_000,
+                  90_000,
                 );
                 png = Buffer.from(data, 'base64');
                 captureMethod = 'cdp-viewport';
