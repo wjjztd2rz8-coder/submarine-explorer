@@ -60,7 +60,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                     | R-release, R-ci-green                                   |
 | No known blockers; the code is simple enough to keep changing safely          | S-resolve, S-modal, S-boot, S-rewards, S-manifest       |
 
-Stage (joint review with Sol, 2026-10-15 eve): about 79% to 1.0; budget four to six weeks (Sol), Claude said three. Beautiful: Titanic 3.5-3.8, Beebe 3-3.3, Blue Hole 2.5-3, Lost City 3-3.3, Monterey ~3.3 (old capture), Challenger 3.3, Endurance 3.2. Top blockers: current unaided journeys on the merged build, real-phone Low readability and performance, hero beauty (Blue Hole geometry, Lost City towers), eight-site mission acceptance incl. Endurance, a completed green hosted CI on the release commit.
+Stage (Claude-alone review, 2026-10-15 late; Sol skipped, Codex budget 2%): about 80%; before that joint review with Sol: about 79% to 1.0; budget four to six weeks (Sol), Claude said three. Beautiful: Titanic 3.5-3.8, Beebe 3-3.3, Blue Hole 2.5-3, Lost City 3-3.3, Monterey ~3.3 (old capture), Challenger 3.3, Endurance 3.2. Top blockers: current unaided journeys on the merged build, real-phone Low readability and performance, hero beauty (Blue Hole geometry, Lost City towers), eight-site mission acceptance incl. Endurance, a completed green hosted CI on the release commit.
 
 ## Needs owner
 
@@ -70,24 +70,22 @@ The newest items go first.
 
 ## In flight
 
-- Codex 2150 R-ci-green and 2160 S-manifest slice running; queue 2170 J-journeys-repeat, 2180 S-verify-12, 2190 S-bughunt-9.
+- Codex queue 2170 J-journeys-repeat, 2180 S-verify-12, 2190 S-bughunt-9 waits for the 17:24 CDT Codex reset. No Claude package running.
 
 ## Backlog
 
 One list, ordered by player impact and dependencies. Lane is in brackets. "After X" means don't start until X is merged. Evidence: joint review 2026-10-15 eve in `plan/REVIEWS.md`.
 
 1. **J-journeys-repeat [Codex 2170, then Sonnet judges]:** repeat the unaided Titanic and Blue Hole journeys (Home, pick, first 60 s, reward, next objective, Journal, debrief) on the merged build at desktop, portrait and landscape; list every confusion or dead end as a fix item here.
-2. **DONE 2026-10-15 (Low ambient 3→6, Lost City and Beebe added to the Low readability table; Blake still dimmest at 3, needs palette) V-low-tier [Sonnet]:** all golden and mission captures so far are High desktop. Capture the five heroes and four dark sites at Low tier in portrait; judge readability (Blake, Hudson, Bismarck, Hunga especially, since V-darksites excluded Low) and fix in data.
-3. **DONE 2026-10-15 (fallback screenshot wait 30→90 s) V-golden-monterey [Haiku]:** `tools/golden.sh` timed out on Monterey in 2026-10-15-172432 (poses.json:146). Find why, raise the wait or fix the pose, so every golden set has all heroes; also capture Endurance at its mission spawn.
-4. **PARTLY DONE 2026-10-15 (hood grounded, ledge scatter removed, denser apron); remaining: east hood is a free-standing slab (needs terrain carve behind gallery seats), life exclusion over gallery footprints for floating purple corals, heavy side curtain. V-bluehole [Sonnet]:** weakest hero (2.5-3). Detached canopy/stalactite slab, terrain seams, floating stones in `great-blue-hole-east-3.png`; faceted terraces. Fix geometry/materials, not tuning.
-5. **DONE 2026-10-15 (0727440; torn rims, wall relief, slope dimples removed, ~3.5; remaining: smooth wall planes between ribs, vent throat keyed to old rim height, regular honeycomb pattern still visible on the Low-tier slope in after-low/lost-city-1.png) V-lostcity [Sonnet]:** towers are hollow, flat-rimmed tubes with a smooth collar (`lost-city-3.png`); add rim breakup and surface relief; remove the regular dimples on the flat slope.
-6. **V-endurance [Sonnet]:** opening still has a large, bright, centred sub over a small wreck; lower hull side dark. Make the wreck the subject (data: framing, sub offset or lighting), keep `deepOpening` and `openingClearance1290` guards.
-7. **V-beebe [Sonnet]:** stack is better but faceted and the sub is brightest; plumes good. Smooth chimney facets, dim sub specular in the vent glow.
-8. **V-titanic palette [Sonnet, small]:** hull peach-orange vs real grey-brown rust; close view still manufactured. Palette and plate variation only.
-9. **S-manifest slices [Codex 2160]:** step 1 done (habitat). Migrate the next slices per `plan/progress/S-manifest.md` (inventory: 27 site-id expressions left); one slice per brief; golden unchanged.
-10. **R-ci-green [Codex 2150]:** read the failing shard of run 38769418092 (e2e 1/38) and any later completed run; fix specs or code; confirm cancelled runs are only superseded pending runs (concurrency keeps one pending run, which cancels older pending ones). Deploy workflow depends on its build, not on CI: propose gating tags, not deploys.
-11. **R-release [Haiku]:** after a completed green hosted CI run on main tag `f<N>` and check Pages. f53 is next; f51 is the last tag.
-12. **S-render remainder [Codex]:** confirm the first nightly run passes and golden pixels are unchanged.
+2. **V-bluehole remainder [Sonnet]** (hood grounded, ledge scatter removed, denser apron done; golden 2026-10-15-211537 still ~3: faceted terraces, bright flat sand shelf, floating rock/crystal scatter): east hood is a free-standing slab (needs terrain carve behind gallery seats), life exclusion over gallery footprints for floating purple corals, heavy side curtain. V-bluehole [Sonnet]:** weakest hero (2.5-3). Detached canopy/stalactite slab, terrain seams, floating stones in `great-blue-hole-east-3.png`; faceted terraces. Fix geometry/materials, not tuning.
+3. **V-lostcity remainder [Sonnet, small]** (torn rims, wall relief done, ~3.5): smooth wall planes between ribs, vent throat keyed to old rim height, regular honeycomb pattern still visible on the Low-tier slope in after-low/lost-city-1.png) V-lostcity [Sonnet]:** towers are hollow, flat-rimmed tubes with a smooth collar (`lost-city-3.png`); add rim breakup and surface relief; remove the regular dimples on the flat slope.
+4. **V-endurance [Sonnet]:** opening still has a large, bright, centred sub over a small wreck; lower hull side dark. Make the wreck the subject (data: framing, sub offset or lighting), keep `deepOpening` and `openingClearance1290` guards.
+5. **V-beebe [Sonnet]:** stack is better but faceted and the sub is brightest; plumes good. Smooth chimney facets, dim sub specular in the vent glow.
+6. **V-titanic palette [Sonnet, small]:** hull peach-orange vs real grey-brown rust; close view still manufactured. Palette and plate variation only.
+7. **S-manifest slices [Codex 2160]:** step 1 done (habitat). Migrate the next slices per `plan/progress/S-manifest.md` (inventory: 27 site-id expressions left); one slice per brief; golden unchanged.
+8. **S-render remainder [Codex]:** confirm the first nightly run passes and golden pixels are unchanged.
+
+9. **R-release [Haiku]:** f53 tagged 2026-10-15 on green CI (26b9892). Next tag f54 after the next completed green run.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.
 

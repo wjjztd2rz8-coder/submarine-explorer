@@ -2,6 +2,30 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-15 late comprehensive review, Claude alone (golden 2026-10-15-211537)
+
+Sol skipped: Codex 5h was 2% (exit 0 "budget too low"). Findings are Claude's only; the eve joint review stands for what it covered.
+
+**Changed since the eve review:** 11 merges, all pushed, last completed hosted CI green (38803817919) and **f53 tagged** on 26b9892. Codex 2120/2130/2140 bug fixes and audits, 2150 R-ci-green, 2160 S-manifest slice (opening framing, staged life); Claude V-low-tier, V-golden-monterey (all 7 heroes now captured), V-bluehole (part), V-lostcity.
+
+| Site       | Readable | Beautiful | Notes                                                                                                 |
+| ---------- | -------- | --------- | ----------------------------------------------------------------------------------------------------- |
+| Titanic    | 4        | 3.7       | hull still uniform peach-orange, but plates, davits and rust streaks read as a wreck; palette item    |
+| Beebe      | 4        | 3.2       | stack still faceted and one-tone brown; sub no longer brightest in this pose; plumes good             |
+| Blue Hole  | 3.5      | 3 (up)    | ceiling and stalactites now grounded; terraced shelf banding and floating rock/crystal scatter remain |
+| Lost City  | 4        | 3.5 (up)  | torn tower rims and wall relief work; towers smooth between ribs                                      |
+| Monterey   | 4        | 3.5       | strong layered canyon wall, life on it; boulders and flat sand floor are plain                        |
+| Challenger | 3.5      | 3.2       | lander is a flat-shaded prop with glowing orange floats; field empty                                  |
+| Endurance  | 4        | 3.5       | wreck is the subject in this pose, clear hull detail; sand floor and lighting good                    |
+
+**Stage:** about 80% to 1.0. Time: keep the four to six weeks from the eve review. Largest gaps: real-phone Low readability and performance (owner), Blue Hole terraces, Beebe/Challenger materials, repeated unaided journeys (2170 waits for Codex reset).
+
+**Process:** efficiency unchanged (Claude idle ~194 h at >=50%, Codex under-used ~180 h, both from budget-gate skips; Codex weekly 55% but 5h at 2% all afternoon means Codex is the binding constraint, so Claude owns the visual backlog now). Golden takes 8 minutes. Not a process fault this run.
+
+**Priorities:** J-journeys-repeat (Codex), V-bluehole remainder, V-endurance (reframe check on mission spawn), V-beebe, V-titanic palette, V-lostcity remainder, S-manifest slices.
+
+**Needs owner:** real-phone Low-tier play (still open).
+
 ## 2026-10-15 eve comprehensive review, joint with Codex Sol (golden 2026-10-15-172432)
 
 Sol ran (Codex 5h was back to 100%). One reconcile round; corrections below were checked against the images and files.
