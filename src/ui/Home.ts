@@ -154,10 +154,12 @@ export class Home {
     grab.type = 'button';
     grab.className = 'home-sites-grab';
     grab.setAttribute('aria-label', 'Show all sites');
-    grab.addEventListener(
-      'click',
-      () => !this.swiped && this.setSheetOpen(this.sites.classList.contains('is-collapsed')),
-    );
+    grab.addEventListener('click', (event) => {
+      // A swipe suppresses its trailing pointer click; keyboard activation
+      // (detail zero) must keep working before the next pointer gesture.
+      if (!this.swiped || event.detail === 0)
+        this.setSheetOpen(this.sites.classList.contains('is-collapsed'));
+    });
     this.grab = grab;
     this.sites.append(grab, sitesHead, this.sitesSlot);
     this.bindSheetSwipe(sitesHead);

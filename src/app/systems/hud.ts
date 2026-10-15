@@ -29,6 +29,7 @@ export const hudSystem: GameSystem = {
       config.currents.hudMinMps,
     );
     ctx.hud = hud;
+    cleanup.add(() => hud.dispose());
     if (freeDiveHull && !freeDiveHull.cleared) hud.setHullNote('at rating limit');
     // D2-HAZARD: how nearing the rated depth is shown.
     hud.setHullWarningStyle(settings.hullWarningStyle);
