@@ -1186,3 +1186,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 2150 R-ci-green and 2160 S-manifest slice running; queued 2170, 2180, 2190. Codex 5h near 3% until 17:24 reset.
 - **Not done:** no tag (waits for green hosted CI), Blake palette, V-bluehole/lostcity/endurance/beebe.
 - **Needs owner:** real-phone play of the newest build (Low tier).
+
+## 2026-10-15 14:47 CDT headless run 10 (Claude)
+
+- **Merged and pushed:** Sonnet V-bluehole, partial (gallery hood grounded at both ends, hovering ledge scatter removed, denser apron, less dimpling; rated ~3 from 2.5-3). Remainder in DIRECTOR item 4: terrain carve behind the east hood, coral exclusion, heavy side curtain. Smoke + project-base green; no full e2e.
+- **Codex:** 5h at 3% until 17:24; 2150/2160 worktrees have uncommitted work and wait for the dispatcher; queue 2170/2180/2190.
+- **Not done:** no tag (hosted CI pending), Blake palette, V-lostcity/endurance/beebe.
+- **Needs owner:** real-phone play of the newest build (Low tier).
