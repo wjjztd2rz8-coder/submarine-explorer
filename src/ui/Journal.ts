@@ -986,6 +986,7 @@ export class Journal {
               : 'Face this target and hold Scan to log it, or show spoilers.',
         ),
       );
+      this.renderEntryHero(site, entry);
       this.renderEntryPhotos(site, entry);
       return;
     }
