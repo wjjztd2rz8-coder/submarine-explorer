@@ -892,6 +892,8 @@ freshTest.describe('frozen debrief and resume', () => {
             expect(await page.evaluate(() => !!document.activeElement?.closest('.debrief'))).toBe(
               false,
             );
+            // The first resumed frame carries no clock time; the next one ticks.
+            await page.clock.fastForward(250);
             await page.clock.fastForward(250);
             const ticking = await snapshot(page);
             expect(ticking.elapsed).toBeGreaterThan(resumed.elapsed);

@@ -12,7 +12,7 @@ import { Water } from '../../world/Water.js';
 import type { GameSystem } from '../System.js';
 import { MONTEREY_OPENING, deepOpeningFor, deepSiteWater } from '../../core/Config.js';
 import { HemisphereLight } from 'three';
-import { lowSiteWater } from '../../core/config/atmosphere.js';
+import { lowSiteWater, siteLightWater } from '../../core/config/atmosphere.js';
 
 export const atmosphereSystem: GameSystem = {
   name: 'atmosphere',
@@ -21,7 +21,11 @@ export const atmosphereSystem: GameSystem = {
     const atmoTier = atmosphereTier(config.water, tier);
     const atmosphere = new Atmosphere(
       scene,
-      lowSiteWater(ctx.meta.id, tier, deepSiteWater(ctx.meta.id, config.water)),
+      lowSiteWater(
+        ctx.meta.id,
+        tier,
+        siteLightWater(ctx.meta.id, tier, deepSiteWater(ctx.meta.id, config.water)),
+      ),
       atmoTier,
       bus,
     );

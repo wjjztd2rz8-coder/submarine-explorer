@@ -395,8 +395,15 @@ export class Input {
       this.storage?.removeItem(BINDINGS_STORAGE_KEY);
       this.storage?.removeItem(PREVIOUS_BINDINGS_STORAGE_KEY);
       this.storage?.removeItem(LEGACY_BINDINGS_STORAGE_KEY);
+      if (
+        [BINDINGS_STORAGE_KEY, PREVIOUS_BINDINGS_STORAGE_KEY, LEGACY_BINDINGS_STORAGE_KEY].some(
+          (key) => this.storage?.getItem(key) != null,
+        )
+      )
+        this.saveBindings();
     } catch {
-      // Privacy mode / hostile storage: the defaults still apply this session.
+      // A surviving legacy key must not resurrect old remaps after a partial reset.
+      this.saveBindings();
     }
   }
 

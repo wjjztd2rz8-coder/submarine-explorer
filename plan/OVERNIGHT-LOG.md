@@ -1151,3 +1151,17 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **CI:** hosted runs for the merges are queued; no tag f53 yet.
 - **Not done:** S-manifest (Sonnet schema), Hudson/Blake brightness, Beebe/Blue Hole remainder.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 09:42 CDT headless run 5 (Claude)
+
+- **Merged and pushed:** Sonnet V-darksites (data: per-site seabed ambient floor for Blake, Bismarck, Hunga, Hudson on Medium/High; Hudson sediment plumes calmed; all four ~3.5, Blake still dimmest). Smoke + project-base green; no full e2e.
+- **Codex:** 2090/2100/2110 running; queued 2120 S-verify-10, 2130 S-bughunt-8, 2140 S-tests audit.
+- **CI:** hosted runs still pending; no tag f53 yet.
+- **Not done:** S-manifest (waits for 2110 inventory), Blake palette, Beebe/Blue Hole remainder.
+- **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 11:29 CDT headless run 6 (Claude, targeted review)
+
+- **Trigger:** CI red 3 runs. Cause: journal-debrief frozen-debrief spec stale after Codex 2070's zero-time resume frame; fixed in the spec (gates green, pushed). hud-touch monterey timeout seen once in CI, passes locally; watching. Details in plan/REVIEWS.md.
+- **Not done:** no new packages this run (review only). No tag until hosted CI is green. Codex 5h at 5%.
+- **Needs owner:** real-phone play of the newest build.

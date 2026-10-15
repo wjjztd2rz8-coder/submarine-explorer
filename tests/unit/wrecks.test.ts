@@ -1,7 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { parsePropsDoc, validatePropEntry, type PropDef } from '../../src/world/PropLoader.js';
 import { Props, type PropsHeightField } from '../../src/world/Props.js';
@@ -38,6 +38,66 @@ const DIMS: Record<WreckId, [number, number, number]> = {
   'endurance-stern': [4, 4, 2],
 };
 const TIERS = ['low', 'medium', 'high'] as const;
+
+it('textured steel shares the plate layer across tiers without adding GPU resources or changing lighting', async () => {
+  // Node normally returns no canvas maps. Supply textures so this test exercises
+  // the browser material path, including Low and Medium without normal maps.
+  const map = new THREE.CanvasTexture();
+  const normal = new THREE.CanvasTexture();
+  vi.resetModules();
+  const wreckTextures = await import('../../src/world/props/wrecks/textures.js');
+  const maps = vi.spyOn(wreckTextures, 'steelMaps').mockImplementation((_size, withNormal) => ({
+    map,
+    normal: withNormal ? normal : null,
+  }));
+  const { steelMaterial, fittingMaterial } =
+    await import('../../src/world/props/wrecks/materials.js');
+  try {
+    for (const tier of TIERS) {
+      const detail = wreckDetail(tier);
+      const material = steelMaterial(detail);
+      expect(steelMaterial(detail)).toBe(material);
+      expect(material.map).toBe(map);
+      expect(material.normalMap).toBe(tier === 'high' ? normal : null);
+      expect(material.roughness).toBe(0.9);
+      expect(material.metalness).toBe(0.12);
+      expect(material.emissive.getHex()).toBe(0);
+      const shader = {
+        ...THREE.ShaderLib.standard,
+        uniforms: { ...THREE.ShaderLib.standard.uniforms },
+      };
+      const uniforms = { ...shader.uniforms };
+      material.onBeforeCompile(
+        shader as Parameters<typeof material.onBeforeCompile>[0],
+        {} as THREE.WebGLRenderer,
+      );
+      expect(shader.vertexShader).toBe(THREE.ShaderLib.standard.vertexShader);
+      expect(shader.uniforms).toEqual(uniforms);
+      // The layer changes diffuse colour; all standard normal, roughness, light,
+      // fog and output chunks must survive, and texture-fetch count stays fixed.
+      const chunks = (source: string) => source.match(/#include <[^>]+>/g);
+      expect(chunks(shader.fragmentShader)).toEqual(
+        chunks(THREE.ShaderLib.standard.fragmentShader),
+      );
+      const samplers = (source: string) =>
+        source.match(/\b(?:uniform\s+sampler\w*|texture\w*\s*\()/g);
+      expect(samplers(shader.fragmentShader)).toEqual(
+        samplers(THREE.ShaderLib.standard.fragmentShader),
+      );
+      expect(shader.fragmentShader).toContain('diffuseColor.rgb = mix(');
+      expect(material.customProgramCacheKey()).not.toBe(fittingMaterial().customProgramCacheKey());
+    }
+    expect(maps.mock.calls).toEqual([
+      [256, false],
+      [512, false],
+      [512, true],
+    ]);
+  } finally {
+    maps.mockRestore();
+    map.dispose();
+    normal.dispose();
+  }
+});
 
 /** Triangles in the near LOD level (what the player sees up close). */
 function nearStats(id: WreckId, tier: string): { draws: number; triangles: number } {

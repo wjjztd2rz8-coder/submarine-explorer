@@ -111,7 +111,8 @@ remains hold-to-scan; ROV deployment stays on its existing keyboard path.
 `bindings` in the settings record is only a pointer to the bindings key
 (`subexplorer.bindings.v3`). `Save.load` reads `subexplorer.settings.v3`
 first, then v2 and v1 when the current key is absent or damaged. Legacy keys
-remain byte-for-byte intact. Migration writes v3: the six retired gameplay
+remain byte-for-byte intact. A malformed version field is also damaged; recovery
+skips it and tries the next older key. Migration writes v3: the six retired gameplay
 fields (`speedProfile`, `descentProfile`, `lights`, `sensors`, `sonarMarkers`,
 `simSpeed`) and `simSpeedDefault` are removed. Gentle and Exaggerated currents
 become full sampled strength. Old Custom research speed inherits Realistic;
@@ -121,8 +122,10 @@ switch defaults. The retired `controlTips` field is still removed. `Input` migra
 defaults become `F` and `G`; saved custom bindings are retained and `X` reset
 camera is added. A saved v1 map also migrates through the supported defaults.
 The earlier keys remain untouched. Known binding records are rewritten without
-retired actions; onboarding records likewise drop retired hint IDs while keeping
-tutorial completion and other seen hints. Each field is validated on load; a bad field
+retired actions. Reset removes all supported binding keys; if removal fails or
+leaves a key behind, it writes current defaults to v3 so old remaps cannot return.
+Onboarding records likewise drop retired hint IDs while keeping tutorial completion
+and other seen hints. Each field is validated on load; a bad field
 falls back to its default alone, and an invalid `gameplay` value sanitizes
 field by field against `Config.settings.gameplayOptions`. A newer stored
 version (of either key) is read as defaults and left on disk, never

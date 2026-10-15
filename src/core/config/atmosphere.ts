@@ -330,3 +330,34 @@ export function lowSiteWater(site: string, tier: GraphicsTier, water: WaterConfi
     ),
   };
 }
+
+/**
+ * Per-site ambient floor for dark real-world seabeds on Medium and High. Authored
+ * exposure, not sunlight: the mission opening should show the floor and the
+ * first subject without leaving the lamp pool. Hero sites have their own
+ * deep-opening table and are not listed here.
+ */
+export const SITE_SEABED_LIGHT: Record<string, { color: number; intensity: number }> = {
+  bismarck: { color: 0x879399, intensity: 6 },
+  'blake-plateau-corals': { color: 0x879399, intensity: 6 },
+  'hudson-canyon': { color: 0x879399, intensity: 6 },
+  'hunga-tonga-caldera': { color: 0x879399, intensity: 6 },
+};
+
+/** Low keeps its own calibrated floor (`lowSiteWater`). */
+export function siteLightWater(site: string, tier: GraphicsTier, water: WaterConfig): WaterConfig {
+  const light = SITE_SEABED_LIGHT[site];
+  if (!light || tier === 'low') return water;
+  return {
+    ...water,
+    bands: water.bands.map((band) =>
+      band.depth <= -200
+        ? {
+            ...band,
+            ambientColor: light.color,
+            ambientIntensity: Math.max(band.ambientIntensity, light.intensity),
+          }
+        : band,
+    ),
+  };
+}

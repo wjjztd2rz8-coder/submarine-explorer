@@ -5,7 +5,12 @@
   "title": "Hudson Canyon: down the wall",
   "hull_class": "B",
   "environment": {
-    "preset": "canyon"
+    "preset": "canyon",
+    "overrides": {
+      "plumeOpacity": 0.1,
+      "plumeSizeM": 2.2,
+      "plumeColor": 4801592
+    }
   },
   "species_file": "species.json",
   "spawn": {
