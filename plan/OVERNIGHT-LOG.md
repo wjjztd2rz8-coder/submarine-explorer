@@ -1057,3 +1057,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** weekly at 5% (resets Oct 20), so nothing launched; queue 1900/1910/1920 waits, watchdog will stop anything below floor. Worktrees 1740-1860 still hold uncollected work.
 - **Not done:** no second Claude package (Claude 5h at ~46%). Next Claude items: S-scan-reach, V-bluehole-opening, S-journal-picture. No tag (f53 waits for green hosted CI).
 - **Needs owner:** real-phone play of the newest build; Codex weekly reset/credit when convenient.
+
+## 2026-10-14 20:59 CDT headless run (Claude): comprehensive review
+
+- **Review:** plan/REVIEWS.md, STATUS.md, DIRECTOR.md updated (Claude alone: Codex weekly 5%, Sol skipped). Stage about 78%, three and a half weeks. Golden set 2026-10-15-011533.
+- **Merged and pushed:** Codex 1900 S-verify-4, 1910 hosted-CI spec repairs, 1920 stale-spec repairs (collected from worktrees; smoke + project-base green); Sonnet V-endurance opening (hull ~33% of frame; Endurance mission approach side changed by the bearing). Hosted CI on the b1de6c0 head was red (20 of 30 shards); result for the new head pending, no tag.
+- **Queued (Codex, runs after Oct 20 reset):** 2000 hosted-CI triage, 2010 S-verify-5, 2020 S-tests step 3 and worktree triage. Ten stale worktrees 1740 to 1860 remain.
+- **Needs owner:** real-phone play of the newest build; optional Codex credit.
