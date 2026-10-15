@@ -209,3 +209,9 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - **Finding:** Codex packages finish uncommitted (sandbox cannot write git metadata) and wait for a Claude run to be gated and merged; four were collected in one pass today, and each needed a main merge with conflicts in shared test files. Queue was empty at review start.
 - **Change:** five briefs queued (1710 to 1750); S-tests step 2 moved to the Codex lane (non-visual) to keep Claude's budget for visual items. Large Claude packages are split (S-guidance took 2.4 h in one agent).
 - **Check:** a merge that passes smoke can still break a unit test hidden by a conflict resolution (S-rewards Journal pointer lock); merge main into the package branch and run the full unit gate there before merging, as done today.
+
+## 2026-10-15 (comprehensive review, pm)
+
+- **Finding:** 11 of the last 15 hosted CI runs on main were `cancelled`, not failed. `ci.yml` had `cancel-in-progress: true` and the push rule pushes after every merge, so each push cancelled the 45-minute run before it completed. This, more than test quality, is why hosted CI has "never been green" and why releases (f53) stalled.
+- **Change:** `cancel-in-progress` now applies only to pull requests; runs on main finish (GitHub still collapses queued runs to the newest). Expect one completed result per ~45 min of merges. Tag only when a completed run on the tagged commit is green.
+- **Codex:** 5h at 6%, so the joint review's Sol pass was skipped again (exit 75); 2060/2070/2080 are queued.
