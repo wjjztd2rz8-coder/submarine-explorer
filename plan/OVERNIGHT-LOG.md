@@ -1200,3 +1200,11 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h at 2% until 17:24; queue 2170/2180/2190 waits for the dispatcher. S-hud-base worktree is stale.
 - **Not done:** no tag (hosted CI pending), Blake palette, V-endurance/beebe/titanic palette; V-lostcity leftovers noted in DIRECTOR item 5 (Low-tier slope honeycomb).
 - **Needs owner:** real-phone play of the newest build (Low tier).
+
+## 2026-10-15 17:08 CDT headless run 12 (Claude, comprehensive review, alone)
+
+- **Review:** golden 2026-10-15-211537; Sol skipped (Codex 5h 1-2%). Stage ~80%; f53 tagged on green CI (26b9892). Details in plan/REVIEWS.md, STATUS.md.
+- **Merged and pushed:** Sonnet V-bluehole remainder (gallery sponges removed, clear_ground scatter exclusion, lighter hood; ~3.2). Smoke + project-base green; no full e2e.
+- **Codex:** queue 2170/2180/2190 waits for the 17:24 CDT reset.
+- **Not done:** V-endurance/beebe/titanic palette, Blue Hole hood slab carve.
+- **Needs owner:** real-phone play of the newest build (Low tier).
