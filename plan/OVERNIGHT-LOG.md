@@ -1143,3 +1143,11 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 2060/2070/2080 running. V-sub-scale still parked. Stale worktrees remain.
 - **Not done:** no tag (waits for green hosted CI). Next: S-manifest, V-sub-scale data fix, Hudson/Blake brightness.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 08:54 CDT headless run 4 (Claude)
+
+- **Merged and pushed:** Codex 2060 (S-verify-7: ultra remnants, daily/quality/settings tests), 2070 (S-bughunt-6: frame-resume clock, photo/gallery dispose, Input focus clear, date sort), 2080 (R-ci-time: 38 shards, refreshed timings, hud-touch hint wait bounded). Sonnet V-sub-scale done in data (Challenger lander 26x26x34 m, Beebe stack 31x24x16 m; camera tweaks reverted). Smoke + project-base green; no full e2e.
+- **Codex:** queued 2090 S-verify-8, 2100 S-bughunt-7, 2110 S-verify-9 (site-branch inventory for S-manifest). Stale worktrees 1740-1860, 2030-2050 remain (all superseded, uncommitted leftovers).
+- **CI:** hosted runs for the merges are queued; no tag f53 yet.
+- **Not done:** S-manifest (Sonnet schema), Hudson/Blake brightness, Beebe/Blue Hole remainder.
+- **Needs owner:** real-phone play of the newest build.
