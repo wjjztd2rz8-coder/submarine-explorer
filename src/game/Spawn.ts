@@ -229,11 +229,11 @@ const FREE_DIVE_OPENINGS: Record<
     // Reach the existing gallery scan in the opening frame, rather than crossing the hole first.
     range: 85,
     fromCentre: true,
-    // ~14 m below the ledge the grotto stands on: the ledge, its shoals and the surface light all stay in view.
-    altitude: -22,
+    // ~20 m below the ledge the grotto stands on: the ledge, its shoals and the surface light all stay in view.
+    altitude: -28,
     minSeabedAltitudeM: 26,
     openWater: true,
-    chaseOffsetY: 22,
+    chaseOffsetY: 10,
   },
   // Keep the first scan within 120 m, including the hull's footprint and the depth difference.
   bismarck: { hero: 'main-hull', bearing: 50, range: 85 },
