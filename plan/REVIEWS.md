@@ -8,15 +8,15 @@ Sol ran (Codex 5h was back to 100%). One reconcile round; corrections below were
 
 **Changed since the pm review:** 12 merges, all pushed. Codex: 2060 S-verify-7, 2070 S-bughunt-6, 2080 R-ci-time (38 shards), 2090 S-verify-8, 2100 S-bughunt-7, 2110 S-verify-9 (package-number comments stripped, manifest inventory). Claude: V-sub-scale (data), V-eight-sites, V-darksites, S-manifest step 1 (schema, validator, loader, habitat slice), spec repair for journal-debrief. Gates: smoke + project-base.
 
-| Site | Readable | Beautiful | Biggest gap |
-| --- | --- | --- | --- |
-| Titanic | 4 | 3.5 (Sol) to 3.8 (Claude) | close hull still peach and manufactured |
-| Beebe | 4 | 3 to 3.3 | faceted stack; sub is brightest object |
-| Blue Hole | 3.5 | 2.5 to 3 | detached canopy, terrain seams, floating stones (Sol) |
-| Lost City | 4 | 3 to 3.3 | hollow flat-rimmed tower tubes |
-| Monterey | 4 | ~3.3 (old capture) | golden capture timed out this run (Sol found the cause in poses.json) |
-| Challenger | 4 | 3.3 | lander reads well; empty field |
-| Endurance | 3.5 | 3.2 | centred bright sub over a small wreck |
+| Site       | Readable | Beautiful                 | Biggest gap                                                           |
+| ---------- | -------- | ------------------------- | --------------------------------------------------------------------- |
+| Titanic    | 4        | 3.5 (Sol) to 3.8 (Claude) | close hull still peach and manufactured                               |
+| Beebe      | 4        | 3 to 3.3                  | faceted stack; sub is brightest object                                |
+| Blue Hole  | 3.5      | 2.5 to 3                  | detached canopy, terrain seams, floating stones (Sol)                 |
+| Lost City  | 4        | 3 to 3.3                  | hollow flat-rimmed tower tubes                                        |
+| Monterey   | 4        | ~3.3 (old capture)        | golden capture timed out this run (Sol found the cause in poses.json) |
+| Challenger | 4        | 3.3                       | lander reads well; empty field                                        |
+| Endurance  | 3.5      | 3.2                       | centred bright sub over a small wreck                                 |
 
 **Agreed stage:** about 79% to 1.0. **Time:** Sol says four to six weeks, Claude said three; adopt four to six (hero geometry work and unverified release gates remain). Disputed: Titanic beauty 3.5 vs 3.8, left as a range.
 

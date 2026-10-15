@@ -57,7 +57,7 @@ Reviewers send work back if it breaks one of these:
 | The other eight sites are coherent with no major visual defect                | V-eight-sites                                           |
 | A new player understands the first five minutes on desktop and phone          | V-journeys, S-guidance (done), S-hud                    |
 | Acceptable Low-tier performance on a real phone                               | Owner check; S-boot helps                               |
-| Hosted CI green, and a full run no longer blocks releases                     | R-release, R-ci-green                                |
+| Hosted CI green, and a full run no longer blocks releases                     | R-release, R-ci-green                                   |
 | No known blockers; the code is simple enough to keep changing safely          | S-resolve, S-modal, S-boot, S-rewards, S-manifest       |
 
 Stage (joint review with Sol, 2026-10-15 eve): about 79% to 1.0; budget four to six weeks (Sol), Claude said three. Beautiful: Titanic 3.5-3.8, Beebe 3-3.3, Blue Hole 2.5-3, Lost City 3-3.3, Monterey ~3.3 (old capture), Challenger 3.3, Endurance 3.2. Top blockers: current unaided journeys on the merged build, real-phone Low readability and performance, hero beauty (Blue Hole geometry, Lost City towers), eight-site mission acceptance incl. Endurance, a completed green hosted CI on the release commit.
