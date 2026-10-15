@@ -86,6 +86,23 @@ describe('Daily dive', () => {
   });
 });
 describe('Daily streak save', () => {
+  it.each([
+    ['2026-03-07T20:00:00-06:00', '2026-03-08T20:00:00-05:00'],
+    ['2026-10-31T20:00:00-05:00', '2026-11-01T20:00:00-06:00'],
+    ['2024-02-28T12:00:00Z', '2024-02-29T12:00:00Z'],
+    ['2024-02-29T12:00:00Z', '2024-03-01T12:00:00Z'],
+    ['2026-12-31T23:59:59Z', '2027-01-01T00:00:00Z'],
+  ])('counts UTC days across DST and calendar boundaries: %s to %s', (first, second) => {
+    const date = utcDate(new Date(first));
+    const nextDate = utcDate(new Date(second));
+    const one = completeDaily({ version: 1, lastCompletedDate: null, streak: 0 }, date);
+    const two = completeDaily(one, nextDate);
+    expect(two.streak).toBe(2);
+    expect(dailyStreak(one, nextDate)).toBe(1);
+    expect(completeDaily(two, date)).toEqual(two);
+    expect(completeDaily(two, nextDate)).toEqual(two);
+  });
+
   it('keeps a maximum saved streak readable after completing the next day', () => {
     const map = new Map<string, string>([
       [

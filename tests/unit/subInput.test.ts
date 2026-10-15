@@ -531,6 +531,27 @@ describe('Input bindings across reloads (C5)', () => {
     expect(input.getAction('boost')?.keys).toEqual(['ShiftLeft', 'ShiftRight']);
   });
 
+  it.each(['throws', 'silently fails'])(
+    'does not reimport old remaps when legacy cleanup %s during reset',
+    (failure) => {
+      store.setItem(
+        LEGACY_BINDINGS_STORAGE_KEY,
+        JSON.stringify({ version: 1, keys: { thrustForward: ['KeyI'] } }),
+      );
+      const input = makeInput();
+      const remove = vi.spyOn(store, 'removeItem').mockImplementation((key) => {
+        if (key === LEGACY_BINDINGS_STORAGE_KEY) {
+          if (failure === 'throws') throw new Error('removal denied');
+          return;
+        }
+        store.map.delete(key);
+      });
+      input.resetBindings();
+      expect(makeInput().actions).toEqual(input.actions);
+      remove.mockRestore();
+    },
+  );
+
   it('a throwing getItem keeps the defaults', () => {
     const input = new Input({
       storage: {

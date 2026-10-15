@@ -274,12 +274,21 @@ export class Save {
         `[save] ${SETTINGS_STORAGE_KEY} is version ${version}; using defaults and not overwriting it`,
       );
     let recoveredLegacy = false;
-    if (!this.readOnly && (!raw || typeof raw !== 'object' || Array.isArray(raw))) {
+    const isCandidate = (candidate: unknown): candidate is Record<string, unknown> => {
+      if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return false;
+      const v = (candidate as Record<string, unknown>).version;
+      return (
+        v === undefined ||
+        [0, 1, 2, 3].includes(v as number) ||
+        (typeof v === 'number' && v > SETTINGS_VERSION)
+      );
+    };
+    if (!this.readOnly && !isCandidate(raw)) {
       for (const key of LEGACY_SETTINGS_KEYS) {
         try {
           const legacy = read(key);
           const candidate: unknown = legacy ? JSON.parse(legacy) : null;
-          if (candidate && typeof candidate === 'object' && !Array.isArray(candidate)) {
+          if (isCandidate(candidate)) {
             raw = candidate;
             recoveredLegacy = true;
             break;

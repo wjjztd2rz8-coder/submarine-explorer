@@ -42,6 +42,41 @@ const throwing: SettingsStorage = {
 
 const config = DEFAULT_CONFIG;
 
+it.each(['3', null, -1])(
+  'recovers earlier settings when the newer key has malformed version %j',
+  (version) => {
+    const store = new MemoryStore();
+    const original = JSON.stringify({
+      version: 2,
+      graphicsTier: 'low',
+      gameplayMode: 'custom',
+      gameplayBaseMode: 'realistic',
+      gameplay: { visualHints: true, batteryOxygen: false },
+    });
+    store.setItem('subexplorer.settings.v2', original);
+    store.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ version }));
+    const save = new Save({ config, storage: store });
+    expect(save.get()).toMatchObject({
+      graphicsTier: 'low',
+      gameplayMode: 'custom',
+      gameplayBaseMode: 'realistic',
+      gameplay: { visualHints: true, batteryOxygen: false },
+    });
+    expect(new Save({ config, storage: store }).get()).toEqual(save.get());
+    expect(store.getItem('subexplorer.settings.v2')).toBe(original);
+  },
+);
+
+it('skips a malformed intermediate settings version while recovering v1', () => {
+  const store = new MemoryStore();
+  store.setItem(SETTINGS_STORAGE_KEY, '{bad');
+  store.setItem('subexplorer.settings.v2', '{"version":"2"}');
+  store.setItem('subexplorer.settings.v1', '{"version":1,"graphicsTier":"ultra","captions":true}');
+  const save = new Save({ config, storage: store });
+  expect(save.get()).toMatchObject({ graphicsTier: 'high', captions: true });
+  expect(new Save({ config, storage: store }).get()).toEqual(save.get());
+});
+
 describe('settings defaults and migrate', () => {
   it('defaults come from Config', () => {
     const d = defaultSettings(config);
