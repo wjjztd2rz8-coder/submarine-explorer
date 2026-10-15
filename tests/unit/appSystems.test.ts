@@ -15,6 +15,8 @@ import {
 import { createHomeSystems } from '../../src/app/homeStartup.js';
 import { createSystems } from '../../src/app/systems.js';
 import { Vector3 } from 'three';
+import { Mission, parseMission } from '../../src/game/Mission.js';
+import { SessionStats } from '../../src/game/Objectives.js';
 
 it('resumes the dive clock without counting paused or hidden time and removes clock listeners', () => {
   const doc = Object.assign(new EventTarget(), { hidden: false });
@@ -31,6 +33,15 @@ it('resumes the dive clock without counting paused or hidden time and removes cl
   vi.stubGlobal('cancelAnimationFrame', (id: number) => callbacks.delete(id));
   const input = new Input({ storage: null });
   const bus = new EventBus();
+  const mission = new Mission({
+    def: parseMission(
+      { spawn: { lat: 0, lon: 0 }, objectives: [{ id: 'first', poi: 'target' }] },
+      'test',
+    )!,
+    bus,
+  });
+  mission.start('test');
+  const stats = new SessionStats(100);
   const ctx = {
     config: { physicsHz: 60 },
     input,
@@ -44,6 +55,8 @@ it('resumes the dive clock without counting paused or hidden time and removes cl
     frame(f: FrameState) {
       f.frozen = frozen;
       inputGateSystem.frame!['gate.input']!(f, ctx);
+      mission.update(f.clockDt);
+      stats.update(f.clockDt, ctx.sub.position);
       frames.push({ dt: f.dt, steps: f.steps, elapsed: f.elapsed, clock: f.clockDt });
     },
   } as SystemRunner;
@@ -73,10 +86,28 @@ it('resumes the dive clock without counting paused or hidden time and removes cl
     doc.dispatchEvent(new Event('visibilitychange'));
     expect(step(120_300)).toMatchObject({ dt: 0.25, steps: 0, clock: 0 });
     expect(step(120_400).clock).toBeCloseTo(0.1);
+    // Hidden tabs can continue receiving throttled animation frames.
+    doc.hidden = true;
+    doc.dispatchEvent(new Event('visibilitychange'));
+    for (const now of [121_400, 122_400, 123_400])
+      expect(step(now)).toMatchObject({ dt: 0.25, steps: 0, clock: 0 });
+    doc.hidden = false;
+    doc.dispatchEvent(new Event('visibilitychange'));
+    expect(step(180_000)).toMatchObject({ steps: 0, clock: 0 });
+    // Paused fractions cannot combine with the next interval into a physics step.
+    expect(step(180_008)).toMatchObject({ steps: 0, clock: expect.closeTo(0.008) });
+    bus.emit('app:state', { state: 'pause' });
+    bus.emit('app:state', { state: 'dive' });
+    expect(step(240_000)).toMatchObject({ steps: 0, clock: 0 });
+    expect(step(240_008).steps).toBe(0);
+    expect(step(240_017).steps).toBe(1);
+    expect(mission.elapsedS).toBeCloseTo(0.325);
+    expect(stats.snapshot().elapsedS).toBeCloseTo(mission.elapsedS);
     // Camera/UI animation time still advances during frozen frames.
     expect(frames.at(-1)!.elapsed).toBeGreaterThan(1);
   } finally {
     stop();
+    mission.dispose();
     expect(callbacks.size).toBe(0);
     expect(unlisten).toHaveBeenCalledWith('visibilitychange', listen.mock.calls[0][1]);
     vi.unstubAllGlobals();
