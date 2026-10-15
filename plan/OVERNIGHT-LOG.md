@@ -1106,3 +1106,11 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 2000/2010/2020 running (about 46% 5h left). Queued 2030 S-verify-6, 2040 S-bughunt-5, 2050 R-ci-time. Hosted CI for 61b2caf was still running at the time; no tag. Stale worktrees 1740-1860 remain.
 - **Not done:** next Claude items S-tiers (Sonnet), V-titanic remainder.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 04:37 CDT headless run (Claude)
+
+- **Merged and pushed:** Codex 2000 (d-photo spec race), 2010 (HUD/waypoint dispose, keyboard Sites grab, Tab-reachable banner buttons) and 2020 (spec consolidation into capability specs, nightly workflow, golden tool tests, sponge-shape table; I resolved an overlayFocus import conflict). Sonnet S-tiers: Ultra tier cut, nothing folded into High (it costs 20 to 65 percent more triangles for slightly denser scatter); saved `ultra` migrates to `high`. Haiku fixed the last two hosted-CI failures (legacy fixture dailyBestStreak 0 to 2; unbounded wait in the hud-touch animal-hint spec, not reproduced locally). Smoke + project-base green on main; no full e2e.
+- **CI:** run 38705533888 went from about 20 failing shards to 2 (both addressed above, result pending). No tag yet (waits for green hosted CI).
+- **Codex:** 2030/2040/2050 running; 5h at 6% (resets 07:17), weekly 85%. Queued 2060 S-verify-7, 2070 S-bughunt-6, 2080 R-ci-time. Stale worktrees 1740-1860 remain.
+- **Not done:** V-titanic remainder, V-eight-sites, S-manifest.
+- **Needs owner:** real-phone play of the newest build.
