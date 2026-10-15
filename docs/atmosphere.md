@@ -73,7 +73,7 @@ These settings reduce large seabed flecks outside the foreground guard while
 preserving the 30-intensity ambient fill that lights the hull. Low skips both
 wreck particle layers.
 Regression coverage:
-`tests/unit/marineSnowReadability.test.ts` (13 sites, four tiers, free/mission openings).
+`tests/unit/marineSnowReadability.test.ts` (13 sites, three tiers, free/mission openings).
 
 ## Surface lid
 

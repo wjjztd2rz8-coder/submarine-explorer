@@ -80,6 +80,24 @@ describe('settings defaults and migrate', () => {
     }
   });
 
+  it.each([
+    [1, 'subexplorer.settings.v1'],
+    [2, 'subexplorer.settings.v2'],
+    [3, SETTINGS_STORAGE_KEY],
+  ] as const)('persists removed Ultra as High from settings v%s', (version, key) => {
+    const store = new MemoryStore();
+    store.setItem(key, JSON.stringify({ version, graphicsTier: 'ultra', captions: true }));
+    const save = new Save({ config, storage: store });
+    expect(save.get()).toMatchObject({ graphicsTier: 'high', captions: true });
+    expect(JSON.parse(store.getItem(SETTINGS_STORAGE_KEY)!)).toMatchObject({
+      version: 3,
+      graphicsTier: 'high',
+      captions: true,
+    });
+    save.save({ detailStrength: 0.5 });
+    expect(new Save({ config, storage: store }).get()).toEqual(save.get());
+  });
+
   it('keeps valid fields and replaces bad ones one by one', () => {
     const m = migrate(
       {
