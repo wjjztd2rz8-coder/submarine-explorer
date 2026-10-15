@@ -1,4 +1,5 @@
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 
@@ -26,13 +27,13 @@ type Game = {
   appState: string;
 };
 
-async function ready(page: Page): Promise<void> {
-  await page.waitForFunction(
-    () =>
-      window.__gameReady &&
-      (window.__game as { discovery: { spawnedAt: string | null } }).discovery.spawnedAt ===
-        'titanic-bow',
-  );
+async function ready(page: Page, pausedClock = false): Promise<void> {
+  const loaded = () =>
+    window.__gameReady === true &&
+    (window.__game as { discovery: { spawnedAt: string | null } }).discovery.spawnedAt ===
+      'titanic-bow';
+  if (pausedClock) await clockFramesUntil(page, loaded);
+  else await page.waitForFunction(loaded);
 }
 
 function simSnapshot(page: Page) {
@@ -70,9 +71,11 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   await mkdir(d2Shots, { recursive: true });
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
+  // Keep the short capture status alive while software WebGL handles browser commands.
+  await pauseClockBeforeNavigation(page);
   await page.goto(DIVE);
-  await ready(page);
-  await page.waitForTimeout(1500);
+  await ready(page, true);
+  for (let frame = 0; frame < 6; frame++) await page.clock.fastForward(250);
   const discoveriesBefore = await page.evaluate(() =>
     localStorage.getItem('subexplorer.discoveries.v1'),
   );
@@ -82,6 +85,7 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
 
   // ---- enter: HUD hidden, caption names the site and the POI in frame.
   await page.keyboard.press('p');
+  await page.clock.runFor(34);
   const mode = page.locator('.photo-mode');
   await expect(mode).toBeVisible();
   await expect(page.locator('.hud')).toBeHidden();
@@ -96,7 +100,7 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   // ---- frozen: throttle held, nothing moves or drains.
   const before = await simSnapshot(page);
   await page.keyboard.down('w');
-  await page.waitForTimeout(1500);
+  for (let frame = 0; frame < 6; frame++) await page.clock.fastForward(250);
   await page.keyboard.up('w');
   expect(await simSnapshot(page)).toEqual(before);
 
@@ -110,6 +114,7 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   await page.mouse.move(760, 430, { steps: 6 });
   await page.mouse.up();
   await page.mouse.wheel(0, 300);
+  await page.clock.runFor(34);
   await expect
     .poll(() => page.evaluate(() => (window.__game as unknown as Game).rig.orbitRadius))
     .toBeGreaterThan(orbit0.radius);
@@ -126,17 +131,20 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   await page.mouse.move(640, 400, { steps: 6 });
   await page.mouse.up();
   await page.mouse.wheel(0, -300);
+  await page.clock.runFor(34);
   await expect
     .poll(() => page.evaluate(() => (window.__game as unknown as Game).rig.orbitRadius))
     .toBeLessThan(orbit0.radius * 1.2);
   await expect(mode.locator('.photo-mode-caption')).toContainText('Bow section');
-  await page.waitForTimeout(300);
+  await page.clock.fastForward(300);
   await page.screenshot({ path: `${shots}/photo-mode.png` });
   await page.screenshot({ path: `${d2Shots}/photo-mode.png` });
 
   // ---- capture.
   await page.keyboard.press('Enter');
+  await page.clock.runFor(34);
   await expect(mode.locator('.photo-mode-toast')).toHaveText('Saved to Journal');
+  await expect(mode.locator('.photo-mode-toast')).toBeVisible();
   // Regression guard: the status belongs below the caption in the shared top panel.
   await expect(mode.locator('.photo-mode-top > .photo-mode-toast')).toHaveCount(1);
   const captionBox = await mode.locator('.photo-mode-caption').boundingBox();
@@ -177,9 +185,13 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   expect(image.width).toBeLessThanOrEqual(640);
   expect(image.mean).toBeGreaterThan(8);
   expect(image.sd).toBeGreaterThan(3);
+  // The status must still expire; measuring it must not depend on runner speed.
+  await page.clock.fastForward(2500);
+  await expect(mode.locator('.photo-mode-toast')).toBeHidden();
 
   // ---- Esc leaves photo mode (not into pause) and restores the view exactly.
   await page.keyboard.press('Escape');
+  await page.clock.runFor(34);
   await expect(mode).toBeHidden();
   await expect(page.locator('.hud')).toBeVisible();
   expect(await page.evaluate(() => (window.__game as unknown as Game).appState)).toBe('dive');
@@ -195,16 +207,20 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
     .toBe(true);
   // Mouse Done also returns to the dive.
   await page.keyboard.press('p');
+  await page.clock.runFor(34);
   await mode.getByRole('button', { name: 'Done', exact: true }).click();
   await expect(mode).toBeHidden();
   // P also toggles in and out.
   await page.keyboard.press('p');
+  await page.clock.runFor(34);
   await expect(mode).toBeVisible();
   await page.keyboard.press('p');
+  await page.clock.runFor(34);
   await expect(mode).toBeHidden();
 
   // ---- Journal: Photos page, viewer, and the POI entry's photos.
   await page.keyboard.press('j');
+  await page.clock.runFor(34);
   const journal = page.locator('.journal');
   await expect(journal).toBeVisible();
   await journal.locator('.jr-nav-item[data-target="photos"]').click();
@@ -213,7 +229,7 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   await expect(journal.locator('.jr-photo-card')).toContainText('Bow section');
   // Regression guard: portrait captures and their baked frames must remain fully visible.
   await expect(journal.locator('.jr-photo-card img')).toHaveCSS('object-fit', 'contain');
-  await page.waitForTimeout(300);
+  await page.clock.fastForward(300);
   await page.screenshot({ path: `${shots}/journal-photos.png` });
   await expect(journal.getByRole('button', { name: 'Download all' })).toBeVisible();
   await expect(
@@ -235,7 +251,7 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   await journal.locator('.jr-photo-card').click();
   await expect(journal.locator('.jr-photo-caption')).toHaveText(/Titanic.* · Bow section$/);
   await expect(journal.locator('.jr-photo-detail')).toContainText('m deep');
-  await page.waitForTimeout(300);
+  await page.clock.fastForward(300);
   await page.screenshot({ path: `${shots}/photo-viewer.png` });
   await page.evaluate(() =>
     (window.__game as { journal: { show(key: string): void } }).journal.show('titanic/poi/bow'),
@@ -246,8 +262,9 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
 
   // ---- reload: still there; delete empties it without touching discoveries.
   await page.reload();
-  await ready(page);
+  await ready(page, true);
   await page.keyboard.press('j');
+  await page.clock.runFor(34);
   await expect(journal).toBeVisible();
   await journal.locator('.jr-nav-item[data-target="photos"]').click();
   await expect(journal.locator('.jr-photo-card')).toHaveCount(1);
