@@ -93,6 +93,9 @@ async function teleportToPoi(page: Page, poiId: string): Promise<void> {
         discovery: Discovery;
         scanner: { view: { candidateId: string | null } };
       };
+      // Hold the vehicle where the pose put it: buoyancy would otherwise lift it above a
+      // gallery's minimum scan depth while the real-time frames run.
+      (g.sub as unknown as { step: () => void }).step = () => {};
       g.sub.reset(p.x, p.y, p.z, p.yaw);
       g.sub.pitch = p.pitch;
       g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);

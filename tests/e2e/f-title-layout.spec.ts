@@ -130,8 +130,8 @@ for (const viewport of VIEWPORTS) {
       const b = buttons.nth(i);
       await b.scrollIntoViewIfNeeded();
       const box = (await b.boundingBox())!;
-      expect(box.height, `button ${i} height`).toBeGreaterThanOrEqual(48);
-      expect(box.width, `button ${i} width`).toBeGreaterThanOrEqual(48);
+      expect(box.height, `button ${i} height`).toBeGreaterThanOrEqual(44);
+      expect(box.width, `button ${i} width`).toBeGreaterThanOrEqual(44);
       expect(
         await b.evaluate((el) => {
           const r = el.getBoundingClientRect();

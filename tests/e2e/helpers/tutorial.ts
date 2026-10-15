@@ -45,14 +45,15 @@ async function dismiss(page: Page, touch: boolean, pausedClock: boolean): Promis
 export async function setScanCardSuppressed(page: Page, on: boolean): Promise<void> {
   await page.evaluate((on) => {
     type Overlay = {
-      slot: { offer(source: string, kind: string, message: null): void };
+      slot: { offer(source: string, kind: string, message: null): void; tick(dt: number): void };
       update(...args: unknown[]): void;
     };
     const overlay = (window.__game as unknown as { discovery: { overlay: Overlay } }).discovery
       .overlay;
     if (on) {
       overlay.slot.offer('scan', 'scan', null);
-      overlay.update = () => {};
+      // Timed guidance still runs down while the scan source is held back.
+      overlay.update = (...args) => overlay.slot.tick(args[3] as number);
     } else delete (overlay as Partial<Overlay>).update;
   }, on);
 }

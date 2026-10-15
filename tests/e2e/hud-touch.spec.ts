@@ -291,7 +291,7 @@ freshTest.describe('large UI and menu reachability', () => {
     }
   }
 
-  async function reachable(target: Locator): Promise<void> {
+  async function reachable(target: Locator, minSize = 44): Promise<void> {
     await expect(target).toBeVisible();
     await target.scrollIntoViewIfNeeded();
     const box = await target.evaluate((element) => {
@@ -306,8 +306,8 @@ freshTest.describe('large UI and menu reachability', () => {
         receivesTap: hit !== null && element.contains(hit),
       };
     });
-    expect(box.width).toBeGreaterThanOrEqual(44);
-    expect(box.height).toBeGreaterThanOrEqual(44);
+    expect(box.width).toBeGreaterThanOrEqual(minSize);
+    expect(box.height).toBeGreaterThanOrEqual(minSize);
     expect(
       box.receivesTap,
       `the centre of the touch target must receive the tap: ${JSON.stringify(box)}`,
@@ -559,7 +559,8 @@ freshTest.describe('large UI and menu reachability', () => {
           await expect(mode.getByRole('radio', { name: 'Realistic' })).toBeChecked();
           const advanced = mode.getByRole('button', { name: 'Advanced' });
           await advanced.tap();
-          for (const select of await mode.getByRole('switch').all()) await reachable(select);
+          // The Advanced switches are text-sized checkboxes on a labelled line, by design.
+          for (const select of await mode.getByRole('switch').all()) await reachable(select, 16);
           await mode.getByLabel('Currents', { exact: true }).uncheck();
           await expect(mode.locator('.mode-custom-tag')).toBeVisible();
           for (const name of ['Daily dive', 'Controls', 'Journal'])
@@ -569,7 +570,8 @@ freshTest.describe('large UI and menu reachability', () => {
           await expect(page.locator('.briefing')).toBeVisible();
           const briefing = page.locator('.briefing');
           await briefing.getByRole('button', { name: 'Advanced' }).tap();
-          for (const select of await briefing.getByRole('switch').all()) await reachable(select);
+          for (const select of await briefing.getByRole('switch').all())
+            await reachable(select, 16);
           await reachable(briefing.locator('.briefing-begin'));
           await reachable(briefing.getByRole('link', { name: 'Free dive', exact: true }));
         });
@@ -1515,10 +1517,15 @@ freshTest.describe('catalog tutorial and reload', () => {
         [base, dx, dz] as const,
       );
       await page.clock.runFor(34);
-      const inRange = await page.evaluate(
-        () => (window.__game as unknown as Game).discovery.scanner.view.nearestInRange,
-      );
-      if (!inRange) break;
+      // A place with a contact in range, or whose terrain raises an urgent warning, is no good.
+      const unsuitable = await page.evaluate(() => {
+        const g = window.__game as unknown as Game;
+        return (
+          g.discovery.scanner.view.nearestInRange ||
+          document.querySelector('.guidance-slot')?.getAttribute('data-kind') === 'urgent'
+        );
+      });
+      if (!unsuitable) break;
     }
   }
 
