@@ -95,7 +95,12 @@ export class PhotoStore {
         this.storage.setItem(PHOTO_STORAGE_KEY, JSON.stringify({ version: 1, photos: next }));
         this.photos_ = next;
         return { saved: true, dropped };
-      } catch {
+      } catch (error) {
+        // Eviction can only help an actual quota failure. A transient denial
+        // must not turn a later successful retry into silent photo loss.
+        const name = (error as { name?: string } | null)?.name;
+        if (name !== 'QuotaExceededError' && name !== 'NS_ERROR_DOM_QUOTA_REACHED')
+          return { saved: false, error: 'Photo storage is unavailable.' };
         if (next.length === 1) break;
         next.pop();
         dropped++;

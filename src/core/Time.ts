@@ -31,6 +31,12 @@ export class Time {
     this.maxStepsPerFrame = maxStepsPerFrame;
   }
 
+  /** Discard frozen physics steps while preserving camera and animation timing. */
+  discardSteps(): void {
+    this.accumulator = 0;
+    this.alpha = 0;
+  }
+
   /** Advance the clock. Returns how many fixed steps the caller should run. */
   tick(nowMs: number): number {
     if (!this.started) {

@@ -519,10 +519,14 @@ export class Input {
 
   attach(): void {
     if (this.disposers.length) return;
+    const editing = (target: EventTarget | null): boolean => {
+      const t = target as HTMLElement | null;
+      return !!t && (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable);
+    };
     const onKeyDown = (e: KeyboardEvent) => {
       // Ignore keystrokes aimed at a text field (including a rebind capture box).
       const t = e.target as HTMLElement | null;
-      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (editing(t)) return;
       // Native UI activation/navigation must not also trigger game actions or
       // lose its default behavior (Space activates a focused button on keyup).
       if (
@@ -563,6 +567,9 @@ export class Input {
     const onVisibility = () => {
       if (document.hidden) this.clear();
     };
+    const onFocus = (e: FocusEvent) => {
+      if (editing(e.target)) this.clear();
+    };
     const onMouseDown = (e: MouseEvent) => {
       if (e.button === 0) this.mouseDown = true;
     };
@@ -581,6 +588,7 @@ export class Input {
     window.addEventListener('blur', onBlur);
     const doc = typeof document === 'undefined' ? null : document;
     doc?.addEventListener('visibilitychange', onVisibility);
+    doc?.addEventListener('focusin', onFocus);
     const el: HTMLElement | Window = this.target ?? window;
     el.addEventListener('mousedown', onMouseDown as EventListener);
     window.addEventListener('mouseup', onMouseUp);
@@ -596,6 +604,7 @@ export class Input {
       () => window.removeEventListener('keyup', onKeyUp),
       () => window.removeEventListener('blur', onBlur),
       () => doc?.removeEventListener('visibilitychange', onVisibility),
+      () => doc?.removeEventListener('focusin', onFocus),
       () => el.removeEventListener('mousedown', onMouseDown as EventListener),
       () => window.removeEventListener('mouseup', onMouseUp),
       () => window.removeEventListener('mousemove', onMouseMove),

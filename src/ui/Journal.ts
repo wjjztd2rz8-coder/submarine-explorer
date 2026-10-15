@@ -265,6 +265,7 @@ export class Journal {
 
   // --- D-PHOTO begin ---
   setPhotoGallery(store: PhotoStore, gallery: PhotoGallery): void {
+    this.photoGallery?.dispose();
     this.photos = store;
     this.photoGallery = gallery;
     this.refresh();
@@ -1162,6 +1163,7 @@ export class Journal {
   }
 
   dispose(): void {
+    this.photoGallery?.dispose();
     this.phoneMq?.removeEventListener?.('change', this.onPhoneChange);
     this.trap.dispose();
     this.root.remove();
