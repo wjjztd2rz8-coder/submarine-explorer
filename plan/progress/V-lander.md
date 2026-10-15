@@ -34,7 +34,8 @@ structure.
 ## Gates
 
 - `PW_PORT=4871 tools/gates.sh --no-e2e`: PASS (content, build, unit, attribution, prettier).
-- `PW_PORT=4871 tools/gates.sh` (default, smoke and project-base): see the result line below.
+- `PW_PORT=4871 tools/gates.sh` (default, smoke and project-base): PASS (python, content, build,
+  unit, e2e smoke, e2e-base, attribution, prettier). Exit 0.
 
 ## Follow-ups
 
