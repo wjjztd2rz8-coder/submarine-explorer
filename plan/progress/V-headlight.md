@@ -13,3 +13,4 @@ The star/honeycomb pattern in the headlight pool on Blue Hole rock walls came fr
 - Monterey and Challenger: no star pattern before or after (Monterey sand has only faint soft blotches in both); unchanged otherwise.
 - Pool brightness (mean luminance in the lit region): 70.5 before, 68.4 after, so no meaningful darkening.
 - Before: `.cache/golden/2026-10-15-094654/` (great-blue-hole-1, monterey-canyon-1, challenger-deep-1). After: `.cache/golden/2026-10-15-103058/`.
+- Gates: PW_PORT=4731 tools/gates.sh all PASS (the shader-hash snapshot in tests/unit/__snapshots__/beebeIsolation.test.ts.snap was regenerated because the shared terrain shader changed).
