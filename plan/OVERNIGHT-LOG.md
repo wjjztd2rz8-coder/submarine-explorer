@@ -1136,3 +1136,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h was 6% (resets 07:17); queue 2060/2070/2080 waits for the dispatcher. Stale worktrees 1740-1860, 2030-2050 remain. V-sub-scale still parked.
 - **Not done:** no tag (waits for green hosted CI). Next: V-eight-sites, S-manifest, V-sub-scale data fix.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 08:13 CDT headless run 3 (Claude)
+
+- **Merged and pushed:** Sonnet V-eight-sites: captured the eight non-hero sites at mission spawns; first target was invisible at Bismarck, Blake, Hunga, Hudson, so MISSION_APPROACH_M shortened (data only). Verdicts in plan/progress/V-eight-sites.md (Hudson 2.5, Blake seabed near-black remain). Smoke + project-base green; no full e2e.
+- **Codex:** 2060/2070/2080 running. V-sub-scale still parked. Stale worktrees remain.
+- **Not done:** no tag (waits for green hosted CI). Next: S-manifest, V-sub-scale data fix, Hudson/Blake brightness.
+- **Needs owner:** real-phone play of the newest build.
