@@ -75,6 +75,8 @@ export interface PropDef {
   /** Tilt the prop to the terrain normal (only meaningful when snapping). */
   alignToSlope: boolean;
   reconstruction: boolean;
+  /** Seabed scatter and sessile life stay off the prop's footprint (it already dresses the ground). */
+  clearsGround: boolean;
   note: string | null;
   /** The entry as authored (unknown keys kept), for the placement tool's JSON output. */
   raw: Record<string, unknown>;
@@ -292,6 +294,7 @@ export function validatePropEntry(
     collision,
     alignToSlope: alignToSlope && snap,
     reconstruction: entry.reconstruction === true,
+    clearsGround: entry.clear_ground === true,
     note: typeof entry.note === 'string' ? entry.note : null,
     raw: { ...entry },
   };

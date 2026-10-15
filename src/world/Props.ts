@@ -181,6 +181,7 @@ export class Props {
 
   private readonly models = new ModelCache();
   private readonly colliders: Collider[] = [];
+  private readonly local = new THREE.Vector3();
   private readonly frustum = new THREE.Frustum();
   private readonly projView = new THREE.Matrix4();
   private readonly camPos = new THREE.Vector3();
@@ -349,6 +350,25 @@ export class Props {
     this.placed.push(prop);
     this.group.add(root);
     this.place(prop);
+  }
+
+  /** True if (x, z) lies within `pad` metres of a `clear_ground` prop's footprint. */
+  coversGround(x: number, z: number, pad = 3): boolean {
+    for (const p of this.placed) {
+      if (!p.def.clearsGround) continue;
+      this.local.set(x, 0, z);
+      p.root.worldToLocal(this.local);
+      const b = p.localBounds;
+      const s = p.def.scale;
+      if (
+        this.local.x >= b.min.x - pad / s[0] &&
+        this.local.x <= b.max.x + pad / s[0] &&
+        this.local.z >= b.min.z - pad / s[2] &&
+        this.local.z <= b.max.z + pad / s[2]
+      )
+        return true;
+    }
+    return false;
   }
 
   /** (Re)compute transform, bounding sphere and collider from `prop.def`. */

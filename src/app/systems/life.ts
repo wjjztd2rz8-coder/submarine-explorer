@@ -65,6 +65,7 @@ export function createLifeSystem(): GameSystem {
           landmarkId: contentLandmark,
           env: {
             groundAt: (x, z) => terrain.sampleHeight(x, z),
+            blocked: (x, z) => ctx.props?.coversGround(x, z) ?? false,
             current: (x, z, out) => {
               currents.sample(x, z, out);
             },

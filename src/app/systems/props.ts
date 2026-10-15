@@ -34,6 +34,8 @@ export const propsSystem: GameSystem = {
     const propsLandmark = route ? contentLandmark : landmarkIdFor(params, meta.id);
     const initialPosition = sub.position.clone();
     void props.load(contentUrl(propsLandmark, 'props.json'), propsLandmark).then((st) => {
+      if (props.placed.some((p) => p.def.clearsGround))
+        terrain.scatter.setGroundKeepout((x, z) => props.coversGround(x, z));
       if (propsLandmark === 'challenger-deep') {
         const lander = props.placed.find((p) => p.def.id === 'leggo-lander-marker');
         if (lander) {

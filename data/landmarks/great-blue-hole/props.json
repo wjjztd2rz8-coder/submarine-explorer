@@ -14,6 +14,7 @@
       "dimensions_m": [70, 22, 18],
       "lod_distance_m": 700,
       "collision": "box",
+      "clear_ground": true,
       "reconstruction": true,
       "note": "Game addition: the Blue Hole's walls are not resolved by the survey grid (cells are about 58 m), so the near-circular, ~320 m wide, 125 m deep sinkhole is a reconstruction at its reported position, with a ledge at about 40 m. This drowned limestone alcove (curved wall, scalloped shelf and fluted stalactites) sits on that ledge, modelled on the stalactites the flooded cave system is known for (Cousteau 1971). Sulphide-rich water lies below about 90 m."
     },
@@ -29,6 +30,7 @@
       "dimensions_m": [56, 20, 16],
       "lod_distance_m": 700,
       "collision": "box",
+      "clear_ground": true,
       "reconstruction": true,
       "note": "Game addition: a second, smaller drowned alcove on the south-eastern ledge of the Great Blue Hole, with a defined limestone overhang, varied fluted stalactite clusters and faint scattered opening light. The real stalactites formed in air-filled caves during glacial sea-level lows and now sit at roughly 40–50 m depth. Placement and shape here are plausible, not surveyed."
     }

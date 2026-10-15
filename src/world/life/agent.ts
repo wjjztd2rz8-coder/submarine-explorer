@@ -105,6 +105,8 @@ export interface Group {
 export interface SimEnv {
   /** Seabed height (negative metres) at x, z. */
   groundAt(x: number, z: number): number;
+  /** True where sessile life must not settle (a prop already dresses the ground). */
+  blocked?(x: number, z: number): boolean;
   /** Water velocity (m/s) at a point; optional. */
   current?(x: number, z: number, out: { x: number; y: number; z: number }): void;
 }

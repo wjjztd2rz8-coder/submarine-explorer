@@ -635,6 +635,7 @@ export class LifeSim {
       const rr = radius * rf;
       const px = x + Math.cos(th) * rr;
       const pz = z + Math.sin(th) * rr;
+      if (this.env.blocked?.(px, pz)) continue;
       const a = this.addAgent(g, px, this.env.groundAt(px, pz), pz, instant);
       if (!a) break;
       // Colonies: large old heads at the core, small young ones toward the fringe.

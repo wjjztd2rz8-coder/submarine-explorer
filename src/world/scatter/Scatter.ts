@@ -77,11 +77,18 @@ export class Scatter {
   private readonly up = new THREE.Vector3(0, 1, 0);
   private readonly color = new THREE.Color();
   private boulderKeepout: THREE.Box3 | null = null;
+  private groundKeepout: ((x: number, z: number) => boolean) | null = null;
   private readonly instanceBounds = new THREE.Box3();
 
   /** Reserve a loaded prop's world bounds without regenerating any scatter cells. */
   setBoulderKeepout(bounds: THREE.Box3): void {
     this.boulderKeepout = bounds.clone();
+    this.dirty = true;
+  }
+
+  /** Drop every kind where a prop already dresses the ground (applied when instances gather). */
+  setGroundKeepout(covers: (x: number, z: number) => boolean): void {
+    this.groundKeepout = covers;
     this.dirty = true;
   }
 
@@ -204,6 +211,7 @@ export class Scatter {
           const dz = inst.z - cz;
           if (dx * dx + dz * dz > r2) continue;
           if (n >= CAP_PER_KIND) break;
+          if (this.groundKeepout?.(inst.x, inst.z)) continue;
           this.axis.set(inst.tiltX, 0, inst.tiltZ);
           if (inst.tilt > 1e-6) this.q.setFromAxisAngle(this.axis, inst.tilt);
           else this.q.identity();
