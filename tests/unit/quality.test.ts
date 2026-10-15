@@ -10,6 +10,9 @@ import {
 } from '../../src/core/Quality.js';
 import { dynamicResolutionEnabled } from '../../src/app/systems/quality.js';
 
+// @ts-expect-error The Node CLI module intentionally has no browser declarations.
+import { diagnosticTiers } from '../../tools/diagnostic-tiers.mjs';
+
 const desktop: DeviceCaps = {
   renderer: 'ANGLE (Apple, Apple M2, OpenGL 4.1)',
   vendor: 'Google Inc. (Apple)',
@@ -151,6 +154,14 @@ describe('resolveQuality', () => {
     expect(resolveQuality('bogus', 'high', sw)).toMatchObject({ tier: 'high', source: 'setting' });
   });
 
+  it.each(['low', 'medium', 'high', 'auto'] as const)(
+    'ignores ?tier=ultra with saved %s, including reload availability',
+    (setting) => {
+      expect(resolveQuality('ultra', setting, sw)).toEqual(resolveQuality(null, setting, sw));
+      expect(resolveQuality('ultra', setting, sw).urlForced).toBe(false);
+    },
+  );
+
   it('detects when the setting is auto', () => {
     expect(resolveQuality(null, 'auto', sw)).toMatchObject({
       tier: 'low',
@@ -159,7 +170,7 @@ describe('resolveQuality', () => {
     });
   });
 
-  it('keeps resolveGraphicsTier for the four tiers', () => {
+  it('keeps resolveGraphicsTier for the three fixed tiers', () => {
     for (const tier of GRAPHICS_TIERS) expect(resolveGraphicsTier(tier)).toBe(tier);
     expect(resolveGraphicsTier('auto')).toBe('medium');
     expect(resolveGraphicsTier(null, 'high')).toBe('high');
@@ -348,5 +359,22 @@ describe('DynamicResolution', () => {
   it('caps pixel ratio per tier', () => {
     const t = DEFAULT_CONFIG.quality.tiers;
     expect([t.low.maxPixelRatio, t.medium.maxPixelRatio, t.high.maxPixelRatio]).toEqual([2, 2, 2]);
+  });
+});
+
+describe('diagnostic graphics tiers', () => {
+  it('geometry diagnostics default to every supported fixed tier', () => {
+    expect(diagnosticTiers()).toEqual(['low', 'medium', 'high']);
+    expect(diagnosticTiers()).toEqual(GRAPHICS_TIERS);
+  });
+
+  it('performance subsets retain their order and accept surrounding whitespace', () => {
+    expect(diagnosticTiers('low,high')).toEqual(['low', 'high']);
+    expect(diagnosticTiers(' medium , low ')).toEqual(['medium', 'low']);
+  });
+
+  it('rejects removed, detected, empty and unknown tiers before scene setup', () => {
+    for (const value of ['ultra', 'low,ultra', 'auto', '', 'low,', 'bogus', 'constructor'])
+      expect(() => diagnosticTiers(value)).toThrow(/Unknown diagnostic graphics tier/);
   });
 });

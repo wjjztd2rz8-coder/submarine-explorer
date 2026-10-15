@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   dailyDive,
   dailyMission,
@@ -12,10 +12,13 @@ import {
   DAILY_STORAGE_KEY,
   dailyStreak,
 } from '../../src/game/DailySave.js';
-import { unlockedDailySites } from '../../src/app/systems/daily.js';
+import { createDailySystem, unlockedDailySites } from '../../src/app/systems/daily.js';
 import { Progress } from '../../src/game/Progress.js';
-import { ProgressSave } from '../../src/core/Save.js';
+import { PROGRESS_STORAGE_KEY, ProgressSave } from '../../src/core/Save.js';
 import type { MissionDef } from '../../src/game/Mission.js';
+
+import type { ShellContext } from '../../src/app/context.js';
+import secretSample from '../fixtures/legacy-save-secret-sample.json';
 
 const sites = ['titanic', 'great-blue-hole', 'monterey-canyon'];
 describe('Daily dive', () => {
@@ -175,4 +178,61 @@ it('stores best stars today in the unchanged progress schema and round trips', (
   progress.finish(key, [{ primary: true, complete: true }]);
   expect(new Progress(new ProgressSave(storage)).rating(key)).toBe(2);
   expect(new Progress(new ProgressSave(storage)).rating('daily-2026-10-02')).toBe(0);
+});
+
+describe('Daily boot synchronization', () => {
+  it.each([0, 1, 2, 12])(
+    'retains the larger of saved best %s and the independent Daily streak through reload',
+    (best) => {
+      const records = structuredClone(secretSample.records);
+      // Recreate the pre-22e1cf2 mismatch too, without changing the archived fixture.
+      records['subexplorer.progress.v1'].dailyBestStreak = best;
+      const map = new Map(
+        Object.entries(records).map(([key, value]) => [key, JSON.stringify(value)]),
+      );
+      const storage = {
+        getItem: (key: string) => map.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          map.set(key, value);
+        },
+        removeItem: (key: string) => {
+          map.delete(key);
+        },
+      };
+      const progress = new Progress(new ProgressSave(storage));
+      const before = progress.snapshot();
+      const dailySave = new DailySave(storage);
+      const system = createDailySystem();
+      vi.useFakeTimers();
+      vi.stubGlobal('window', { setInterval, clearInterval });
+      try {
+        system.start!({
+          progress,
+          dailySave,
+          missionSummaries: [],
+          index: [],
+          home: { clearDaily: vi.fn() },
+          save: { onChange: () => () => {} },
+          expose: vi.fn(),
+          daily: null,
+        } as unknown as ShellContext);
+        const expected = { ...before, dailyBestStreak: Math.max(best, 2) };
+        expect(progress.snapshot()).toEqual(expected);
+        expect(new Progress(new ProgressSave(storage)).snapshot()).toEqual(expected);
+        expect(progress.selectCosmetic('paint', 'stock')).toBe(true);
+        const edited = { ...expected, cosmetics: { ...expected.cosmetics, paint: 'stock' } };
+        expect(new Progress(new ProgressSave(storage)).snapshot()).toEqual(edited);
+        expect(JSON.parse(storage.getItem(PROGRESS_STORAGE_KEY)!)).toEqual(edited);
+        expect(dailySave.get()).toEqual(records['subexplorer.daily.v1']);
+        expect(JSON.parse(storage.getItem('subexplorer.discoveries.v1')!)).toEqual(
+          records['subexplorer.discoveries.v1'],
+        );
+      } finally {
+        system.dispose!();
+        expect(vi.getTimerCount()).toBe(0);
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+      }
+    },
+  );
 });

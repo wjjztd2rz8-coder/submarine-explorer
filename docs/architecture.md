@@ -408,7 +408,7 @@ own files.
   6. Old Intel gives `low`.
   7. Anything else gives `medium`.
 
-  A saved `ultra` (a removed tier) migrates to `high`. Precedence is `?tier=` (including `?tier=auto`),
+  A saved `ultra` (a removed tier) migrates to `high`; `?tier=ultra` is ignored. Precedence is `?tier=` (including `?tier=auto`),
   then the saved setting, then detection. New players default to `auto`; saved fixed tiers are preserved.
   Dynamic resolution (`DynamicResolution`, run by `app/systems/quality.ts`)
   runs only for auto-detected tiers or with `?dynres=1`. `window.__game.perf`
@@ -971,8 +971,8 @@ own files.
   6. Old Intel gives `low`.
   7. Anything else gives `medium`.
 
-  A saved `ultra` (a removed tier) migrates to `high`. Precedence is `?tier=` (including `?tier=auto`),
-  then the saved setting, then detection. The default setting is `medium`.
+  A saved `ultra` (a removed tier) migrates to `high`; `?tier=ultra` is ignored. Precedence is `?tier=` (including `?tier=auto`),
+  then the saved setting, then detection. New players default to `auto`; saved fixed tiers are preserved.
   Dynamic resolution (`DynamicResolution`, run by `app/systems/quality.ts`)
   runs only for auto-detected tiers or with `?dynres=1`. `window.__game.perf`
   exposes `drawCalls`, `triangles`, `frameMs`, `tier`, `tierSource`,
