@@ -69,7 +69,7 @@ for (const viewport of [
     );
     const briefing = page.locator('.briefing');
     await expect(briefing).toBeVisible();
-    await expect(briefing.locator('.briefing-title')).toContainText('Daily dive');
+    await expect(briefing.locator('.briefing-title')).toContainText('Daily ·');
     const diveMode = briefing.locator('.mode-selector');
     await expect(diveMode.getByRole('radio')).toHaveCount(2);
     await expect(diveMode.locator('.mode-advanced')).toBeHidden();
