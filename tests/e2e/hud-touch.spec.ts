@@ -1420,14 +1420,17 @@ freshTest.describe('animal guidance placement', () => {
           // Withdraw only the scan source: covering play would suppress every hint too.
           await setScanCardSuppressed(page, true);
           for (let frame = 0; frame < 40; frame++) {
-            // Read the stable slot: a hint selector is absent until a frame offers it.
+            // Read the slot without auto-waiting: the clock is paused, so a locator wait
+            // for an absent slot would never advance the frames that offer the hint.
             if (
-              await page
-                .locator(GUIDANCE.any)
-                .evaluate(
-                  (slot) =>
-                    slot.dataset.kind === 'hint' && slot.textContent?.includes('Animal nearby.'),
-                )
+              await page.evaluate((selector) => {
+                const slot = document.querySelector<HTMLElement>(selector);
+                return (
+                  !!slot &&
+                  slot.dataset.kind === 'hint' &&
+                  !!slot.textContent?.includes('Animal nearby.')
+                );
+              }, GUIDANCE.any)
             )
               break;
             await page.clock.fastForward(250);
