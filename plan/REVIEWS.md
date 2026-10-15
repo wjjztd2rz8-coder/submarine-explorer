@@ -2,6 +2,32 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-15 eve comprehensive review, joint with Codex Sol (golden 2026-10-15-172432)
+
+Sol ran (Codex 5h was back to 100%). One reconcile round; corrections below were checked against the images and files.
+
+**Changed since the pm review:** 12 merges, all pushed. Codex: 2060 S-verify-7, 2070 S-bughunt-6, 2080 R-ci-time (38 shards), 2090 S-verify-8, 2100 S-bughunt-7, 2110 S-verify-9 (package-number comments stripped, manifest inventory). Claude: V-sub-scale (data), V-eight-sites, V-darksites, S-manifest step 1 (schema, validator, loader, habitat slice), spec repair for journal-debrief. Gates: smoke + project-base.
+
+| Site | Readable | Beautiful | Biggest gap |
+| --- | --- | --- | --- |
+| Titanic | 4 | 3.5 (Sol) to 3.8 (Claude) | close hull still peach and manufactured |
+| Beebe | 4 | 3 to 3.3 | faceted stack; sub is brightest object |
+| Blue Hole | 3.5 | 2.5 to 3 | detached canopy, terrain seams, floating stones (Sol) |
+| Lost City | 4 | 3 to 3.3 | hollow flat-rimmed tower tubes |
+| Monterey | 4 | ~3.3 (old capture) | golden capture timed out this run (Sol found the cause in poses.json) |
+| Challenger | 4 | 3.3 | lander reads well; empty field |
+| Endurance | 3.5 | 3.2 | centred bright sub over a small wreck |
+
+**Agreed stage:** about 79% to 1.0. **Time:** Sol says four to six weeks, Claude said three; adopt four to six (hero geometry work and unverified release gates remain). Disputed: Titanic beauty 3.5 vs 3.8, left as a range.
+
+**Sol's corrections accepted:** unaided journeys were done earlier, so the gap is a current repeat, not never done; the manifest count is 27 expressions left (31 inventoried, 4 removed), not 26; V-eight-sites is not acceptance evidence for Endurance; V-darksites excluded Low, so phone Low readability is unproven; Pages deploys on its own build, not on CI; "cancelled" runs are not yet explained (GitHub unreachable for Sol). Claude check afterwards: the cancelled runs have no jobs, consistent with a concurrency group that keeps one pending run and cancels older pending ones; the last completed run (38769418092) failed on one shard (e2e 1/38), queued as 2150.
+
+**Process:** efficiency: Claude idle ~192 h at >=50%, Codex under-used ~180 h over the project (mostly budget-gate skips). Removed 13 stale Codex worktrees and branches (all work already on main). Hosted CI takes up to 60 min, so pushes outpace it; releases need a completed green run.
+
+**New priorities:** J-journeys-repeat, V-low-tier, V-golden-monterey, V-bluehole, V-lostcity, V-endurance, V-beebe, V-titanic palette; Codex 2150 R-ci-green, 2160 S-manifest slices, 2170 J-journeys-repeat.
+
+**Needs owner:** a five-minute real-phone play of the newest build (Low tier readability and performance). It is now the largest unverified 1.0 requirement.
+
 ## 2026-10-15 targeted review: CI red on main for 3 runs
 
 **Trigger:** hosted CI failed on the last three pushes (38742636827, 38746684662, 38753754222).
