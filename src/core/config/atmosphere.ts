@@ -302,17 +302,19 @@ export const DEFAULT_WATER: WaterConfig = {
   },
 };
 
-/** These six openings need ambient fill so their floors remain visible on Low. */
+/** These openings need ambient fill so their floors remain visible on Low. */
 export const LOW_READABILITY_SITES: readonly string[] = [
   'axial-seamount-ashes',
+  'beebe-vent-field',
   'bismarck',
   'blake-plateau-corals',
   'hudson-canyon',
   'hunga-tonga-caldera',
   'kamaehuakanaloa',
+  'lost-city',
 ];
 
-const LOW_SEABED_LIGHT = { depthM: -200, color: 0x879399, intensity: 3 };
+const LOW_SEABED_LIGHT = { depthM: -200, color: 0x879399, intensity: 6 };
 
 /** Reuse the existing ambient light; no extra lights, geometry or post passes. */
 export function lowSiteWater(site: string, tier: GraphicsTier, water: WaterConfig): WaterConfig {
