@@ -27,10 +27,9 @@ export const inputGateSystem: GameSystem = {
   frame: {
     'gate.input': (f) => {
       f.state = f.frozen ? FROZEN_INPUT : f.sampled;
-      f.steps = f.frozen ? 0 : f.realSteps;
-      // fix S (QA-B #10): mission clock and DIVE TIME count real seconds of
-      // unfrozen play, not capped physics time.
-      f.clockDt = f.frozen ? 0 : f.dt;
+      f.steps = f.frozen || f.resumeFrame ? 0 : f.realSteps;
+      // Mission and dive clocks exclude freezes and the first resumed interval.
+      f.clockDt = f.frozen || f.resumeFrame ? 0 : f.dt;
     },
   },
 };
@@ -51,6 +50,7 @@ export function makeFrameState(ctx: GameContext): FrameState {
     state: sampled,
     steps: 0,
     clockDt: 0,
+    resumeFrame: false,
     sub: ctx.sub.getState(),
     forward: new THREE.Vector3(),
     pilotPosition: ctx.sub.position,
@@ -71,6 +71,13 @@ export function startLoop(ctx: GameContext, runner: SystemRunner): () => void {
   const f = makeFrameState(ctx);
   let ready = false;
   let lastTerrainLog = 0;
+  let resetSimulation = true;
+  let wasFrozen = false;
+  const resetClock = (): void => {
+    resetSimulation = true;
+  };
+  const offState = ctx.bus.on('app:state', resetClock);
+  document.addEventListener('visibilitychange', resetClock);
 
   function frame(nowMs: number): void {
     frameId = requestAnimationFrame(frame);
@@ -84,9 +91,14 @@ export function startLoop(ctx: GameContext, runner: SystemRunner): () => void {
     f.shellFrozen = false;
     f.blocked = false;
     f.frozen = false;
+    f.resumeFrame = resetSimulation || wasFrozen;
+    resetSimulation = false;
     f.debugLogDue = ctx.debugTerrain && nowMs - lastTerrainLog > 1000;
 
     runner.frame(f);
+    // A modal can close between frames, including while RAF is suspended.
+    if (f.frozen || f.resumeFrame || document.hidden) time.discardSteps();
+    wasFrozen = f.frozen || document.hidden;
 
     if (f.debugLogDue) lastTerrainLog = nowMs;
     if (!ready) {
@@ -98,5 +110,9 @@ export function startLoop(ctx: GameContext, runner: SystemRunner): () => void {
   }
 
   let frameId = requestAnimationFrame(frame);
-  return () => cancelAnimationFrame(frameId);
+  return () => {
+    cancelAnimationFrame(frameId);
+    offState();
+    document.removeEventListener('visibilitychange', resetClock);
+  };
 }

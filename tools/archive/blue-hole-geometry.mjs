@@ -1,12 +1,15 @@
 /** CPU audit of every Blue Hole golden camera, not a WebGL capture.
  * Prepare main sources with git show as documented in F-BLUEHOLE-910.md.
  */
+import { diagnosticTiers } from '../diagnostic-tiers.mjs';
 import { createServer } from 'vite';
 import { format } from 'prettier';
 import * as THREE from 'three';
 import { readFileSync } from 'node:fs';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, basename } from 'node:path';
+
+const tiers = diagnosticTiers(process.env.BLUEHOLE_TIERS);
 
 const json = (p) => JSON.parse(readFileSync(p, 'utf8'));
 async function audit(
@@ -218,7 +221,7 @@ for (const version of ['before', 'after']) {
         ].map((p) => server.ssrLoadModule(p)),
       )),
     );
-    for (const tier of (process.env.BLUEHOLE_TIERS ?? 'low,medium,high,ultra').split(',')) {
+    for (const tier of tiers) {
       const result = await audit(tier, modules);
       output[version].push(result);
       console.log(version, tier, result.openingDistance.toFixed(2), result.stats.vertices);

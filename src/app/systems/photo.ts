@@ -18,9 +18,8 @@ import type { GameContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
-const cleanup = new Disposables();
-
 export function createPhotoSystem(): GameSystem {
+  const cleanup = new Disposables();
   let photoCaptureRequested = false;
   let photoPoi: PlacedPoi | null = null;
   /** F2-LIFE: the animal in frame when no POI is (an `id` of the form `life:<species>`). */
@@ -110,7 +109,9 @@ export function createPhotoSystem(): GameSystem {
       const { journal } = ctx;
       const photos = new PhotoStore();
       ctx.photos = photos;
-      journal.setPhotoGallery(photos, new PhotoGallery(photos, () => journal.refresh()));
+      const gallery = new PhotoGallery(photos, () => journal.refresh());
+      journal.setPhotoGallery(photos, gallery);
+      cleanup.add(() => gallery.dispose());
       const photoMode = new PhotoMode(
         () => {
           photoCaptureRequested = true;

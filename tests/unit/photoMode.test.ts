@@ -4,6 +4,8 @@ import type { GameContext } from '../../src/app/context.js';
 import type { FrameState } from '../../src/app/System.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { PhotoMode } from '../../src/ui/PhotoMode.js';
+import { PhotoGallery } from '../../src/ui/PhotoGallery.js';
+import { PhotoStore, type Photo } from '../../src/game/PhotoStore.js';
 
 // Only the DOM operations used by the viewfinder; event dispatch exercises its real listeners.
 class Element extends EventTarget {
@@ -12,9 +14,13 @@ class Element extends EventTarget {
   className = '';
   hidden = false;
   type = '';
+  dataset: Record<string, string> = {};
   classList = { toggle: vi.fn() };
   append(...children: Element[]) {
     this.children.push(...children);
+  }
+  replaceChildren(...children: Element[]) {
+    this.children = children;
   }
   setAttribute() {}
   remove() {}
@@ -32,6 +38,57 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 const documentElement = { classList: { contains: (name: string) => touch && name === 'is-touch' } };
+
+it('releases photo ZIP URLs and timers on gallery teardown without affecting another gallery', () => {
+  vi.useFakeTimers();
+  vi.stubGlobal('document', { body: new Element(), createElement: () => new Element() });
+  vi.stubGlobal('window', { setTimeout, clearTimeout });
+  let serial = 0;
+  const create = vi
+    .spyOn(URL, 'createObjectURL')
+    .mockImplementation(() => `blob:photo-${++serial}`);
+  const revoke = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+  const saved = [
+    {
+      id: 'p1',
+      siteId: 'titanic',
+      siteName: 'Titanic',
+      poiId: null,
+      poiName: null,
+      at: '2026-10-01T00:00:00Z',
+      depthM: 100,
+      image: 'data:image/jpeg;base64,YQ==',
+    },
+  ] satisfies Photo[];
+  const first = new PhotoGallery(new PhotoStore(null));
+  const second = new PhotoGallery(new PhotoStore(null));
+  const download = (gallery: PhotoGallery) => {
+    const container = new Element();
+    gallery.render(container as unknown as HTMLElement, saved);
+    container.children[0].children[1].click();
+  };
+  try {
+    download(first);
+    download(second);
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(vi.getTimerCount()).toBe(2);
+    first.dispose();
+    expect(revoke.mock.calls).toEqual([['blob:photo-1']]);
+    expect(vi.getTimerCount()).toBe(1);
+    first.dispose();
+    vi.advanceTimersByTime(30_000);
+    expect(revoke.mock.calls).toEqual([['blob:photo-1'], ['blob:photo-2']]);
+    download(second);
+    second.dispose();
+    expect(revoke).toHaveBeenCalledWith('blob:photo-3');
+    expect(vi.getTimerCount()).toBe(0);
+  } finally {
+    first.dispose();
+    second.dispose();
+    create.mockRestore();
+    revoke.mockRestore();
+  }
+});
 
 it('replaces the toast in the top panel, restarts its timeout, and cancels it on exit/dispose', () => {
   vi.useFakeTimers();
@@ -205,6 +262,45 @@ it('Done uses the photo system exit and Pause leaves photo mode for the pause me
     expect(exit).toHaveBeenCalledTimes(2);
   } finally {
     system.dispose?.();
+  }
+});
+
+it('disposing one photo system preserves the other live system over two lifetimes', () => {
+  const body = new Element();
+  vi.stubGlobal('document', { body, documentElement, createElement: () => new Element() });
+  vi.stubGlobal('window', {
+    clearTimeout: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  });
+  for (let round = 0; round < 2; round++) {
+    const setup = () => {
+      const ctx = {
+        bus: new EventBus(),
+        journal: { setPhotoGallery: vi.fn() },
+        expose: vi.fn(),
+        rig: { exitPhotoMode: vi.fn() },
+        input: { state: { lookDx: 0, lookDy: 0 }, wheelDelta: 0 },
+        setAppState: vi.fn(),
+      } as unknown as GameContext;
+      const system = createPhotoSystem();
+      system.init?.(ctx);
+      system.start?.(ctx);
+      return { ctx, system };
+    };
+    const first = setup();
+    const second = setup();
+    try {
+      second.ctx.photoMode.setActive(true);
+      first.system.dispose?.();
+      expect(second.ctx.photoMode.active).toBe(true);
+      second.ctx.bus.emit('app:state', { state: 'pause' });
+      expect(second.ctx.photoMode.active).toBe(false);
+      expect(second.ctx.rig.exitPhotoMode).toHaveBeenCalledOnce();
+    } finally {
+      first.system.dispose?.();
+      second.system.dispose?.();
+    }
   }
 });
 

@@ -153,6 +153,23 @@ describe('PhotoStore', () => {
     expect(store.delete('missing')).toBe(false);
     expect(new PhotoStore(storage).photos.map((p) => p.id)).toEqual(['p2']);
   });
+
+  it('does not evict existing photos after a transient non-quota write error', () => {
+    const storage = new MemoryStorage();
+    const store = new PhotoStore(storage);
+    store.save(photo(1));
+    store.save(photo(2));
+    const write = vi.spyOn(storage, 'setItem');
+    write.mockImplementationOnce(() => {
+      throw new DOMException('Storage temporarily denied', 'SecurityError');
+    });
+    expect(store.save(photo(3)).saved).toBe(false);
+    expect(write).toHaveBeenCalledTimes(1);
+    expect(store.photos.map((p) => p.id)).toEqual(['p2', 'p1']);
+    expect(new PhotoStore(storage).photos).toEqual(store.photos);
+    expect(store.save(photo(3))).toEqual({ saved: true, dropped: 0 });
+    expect(new PhotoStore(storage).photos.map((p) => p.id)).toEqual(['p3', 'p2', 'p1']);
+  });
 });
 
 describe('poiInPhoto', () => {

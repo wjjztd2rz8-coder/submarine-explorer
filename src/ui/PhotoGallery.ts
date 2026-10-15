@@ -59,6 +59,8 @@ function photoDetail(photo: Pick<Photo, 'at' | 'depthM'>): string {
 }
 
 export class PhotoGallery {
+  private readonly downloads = new Map<string, number>();
+
   constructor(
     private readonly store: PhotoStore,
     /** Called after a delete so the owner can re-render (counts, lists). */
@@ -88,8 +90,12 @@ export class PhotoGallery {
         const url = URL.createObjectURL(
           new Blob([bytes.buffer as ArrayBuffer], { type: 'application/zip' }),
         );
+        const timer = window.setTimeout(() => {
+          URL.revokeObjectURL(url);
+          this.downloads.delete(url);
+        }, 30_000);
+        this.downloads.set(url, timer);
         download(url, 'journal-photos.zip');
-        window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
       });
       heading.append(all);
     }
@@ -124,6 +130,14 @@ export class PhotoGallery {
       grid.append(item);
     }
     container.append(grid);
+  }
+
+  dispose(): void {
+    for (const [url, timer] of this.downloads) {
+      window.clearTimeout(timer);
+      URL.revokeObjectURL(url);
+    }
+    this.downloads.clear();
   }
 
   private renderViewer(

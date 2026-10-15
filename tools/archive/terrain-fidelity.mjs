@@ -1,11 +1,12 @@
 /** Headless geometry census; no WebGL/effects. Run before and after with a distinct output path. */
+import { diagnosticTiers } from '../diagnostic-tiers.mjs';
 import { createServer } from 'vite';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import * as THREE from 'three';
 
 const output = resolve(process.argv[2] ?? '.cache/fidelity-810/geometry.json');
-const tiers = (process.env.FIDELITY_TIERS ?? 'low,medium,high,ultra').split(',');
+const tiers = diagnosticTiers(process.env.FIDELITY_TIERS);
 const server = await createServer({
   configFile: false,
   cacheDir: '.cache/fidelity-810/vite',

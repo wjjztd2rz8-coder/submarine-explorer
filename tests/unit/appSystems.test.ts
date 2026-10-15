@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { Input } from '../../src/core/Input.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { createInputSystem } from '../../src/app/systems/input.js';
-import { inputGateSystem } from '../../src/app/loop.js';
+import { inputGateSystem, startLoop } from '../../src/app/loop.js';
 import { discoverySystem } from '../../src/app/systems/discovery.js';
 import { FROZEN_INPUT } from '../../src/game/MissionRouter.js';
 import type { GameContext } from '../../src/app/context.js';
@@ -14,6 +14,74 @@ import {
 } from '../../src/app/System.js';
 import { createHomeSystems } from '../../src/app/homeStartup.js';
 import { createSystems } from '../../src/app/systems.js';
+import { Vector3 } from 'three';
+
+it('resumes the dive clock without counting paused or hidden time and removes clock listeners', () => {
+  const doc = Object.assign(new EventTarget(), { hidden: false });
+  const listen = vi.spyOn(doc, 'addEventListener');
+  const unlisten = vi.spyOn(doc, 'removeEventListener');
+  const callbacks = new Map<number, FrameRequestCallback>();
+  let nextId = 0;
+  vi.stubGlobal('document', doc);
+  vi.stubGlobal('window', {});
+  vi.stubGlobal('requestAnimationFrame', (fn: FrameRequestCallback) => {
+    callbacks.set(++nextId, fn);
+    return nextId;
+  });
+  vi.stubGlobal('cancelAnimationFrame', (id: number) => callbacks.delete(id));
+  const input = new Input({ storage: null });
+  const bus = new EventBus();
+  const ctx = {
+    config: { physicsHz: 60 },
+    input,
+    bus,
+    meta: { id: 'test' },
+    sub: { getState: () => ({}), position: new Vector3(), velocity: new Vector3() },
+  } as unknown as GameContext;
+  const frames: { dt: number; steps: number; elapsed: number; clock: number }[] = [];
+  let frozen = false;
+  const runner = {
+    frame(f: FrameState) {
+      f.frozen = frozen;
+      inputGateSystem.frame!['gate.input']!(f, ctx);
+      frames.push({ dt: f.dt, steps: f.steps, elapsed: f.elapsed, clock: f.clockDt });
+    },
+  } as SystemRunner;
+  const step = (now: number) => {
+    const [id, fn] = callbacks.entries().next().value!;
+    callbacks.delete(id);
+    fn(now);
+    return frames.at(-1)!;
+  };
+  const stop = startLoop(ctx, runner);
+  try {
+    step(0);
+    expect(step(100).clock).toBeCloseTo(0.1);
+    // Pause and resume can both occur while RAF is suspended.
+    bus.emit('app:state', { state: 'pause' });
+    bus.emit('app:state', { state: 'dive' });
+    expect(step(60_100)).toMatchObject({ dt: 0.25, steps: 0, clock: 0 });
+    expect(step(60_200).clock).toBeCloseTo(0.1);
+    frozen = true;
+    expect(step(60_300)).toMatchObject({ dt: expect.closeTo(0.1), clock: 0 });
+    expect(step(60_400)).toMatchObject({ dt: expect.closeTo(0.1), clock: 0 });
+    frozen = false;
+    expect(step(90_300)).toMatchObject({ dt: 0.25, steps: 0, clock: 0 });
+    doc.hidden = true;
+    doc.dispatchEvent(new Event('visibilitychange'));
+    doc.hidden = false;
+    doc.dispatchEvent(new Event('visibilitychange'));
+    expect(step(120_300)).toMatchObject({ dt: 0.25, steps: 0, clock: 0 });
+    expect(step(120_400).clock).toBeCloseTo(0.1);
+    // Camera/UI animation time still advances during frozen frames.
+    expect(frames.at(-1)!.elapsed).toBeGreaterThan(1);
+  } finally {
+    stop();
+    expect(callbacks.size).toBe(0);
+    expect(unlisten).toHaveBeenCalledWith('visibilitychange', listen.mock.calls[0][1]);
+    vi.unstubAllGlobals();
+  }
+});
 
 describe('SystemRunner', () => {
   it('discards held keys across pause/Home and removes input listeners before re-entry', () => {

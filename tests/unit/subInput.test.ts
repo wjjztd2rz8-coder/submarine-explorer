@@ -66,6 +66,40 @@ describe('pointer look preference and lock decisions', () => {
 });
 
 describe('Input action map', () => {
+  it.each(['INPUT', 'TEXTAREA', 'SELECT', 'contenteditable'])(
+    'clears held and queued flight controls when focus moves into %s',
+    (tag) => {
+      const win = new EventTarget();
+      const doc = new EventTarget();
+      vi.stubGlobal('window', win);
+      vi.stubGlobal('document', doc);
+      const input = makeInput();
+      input.attach();
+      try {
+        for (let round = 0; round < 2; round++) {
+          input.injectKey('KeyW', true);
+          input.injectKey('KeyQ', true);
+          input.touchLook(20, 10);
+          const event = new Event('focusin');
+          Object.defineProperty(event, 'target', {
+            value: {
+              tagName: tag,
+              isContentEditable: tag === 'contenteditable',
+            },
+          });
+          doc.dispatchEvent(event);
+          expect(input.sample()).toMatchObject({ throttle: 0, toggleCamera: false, lookDx: 0 });
+          input.injectKey('KeyW', true);
+          expect(input.sample().throttle).toBe(1);
+          input.clear();
+        }
+      } finally {
+        input.dispose();
+        vi.unstubAllGlobals();
+      }
+    },
+  );
+
   it('combines simultaneous keyboard/touch/pad input and keeps held pad edges through a pause', () => {
     const buttons = Array.from({ length: 16 }, () => ({ value: 0, pressed: false }));
     const axes = [0.5, -0.7, 0, 0];

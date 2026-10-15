@@ -1121,3 +1121,25 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Found and fixed:** hosted CI runs on main were being cancelled by the next push; `ci.yml` now cancels only PR runs. First completed result decides tag f53.
 - **New items:** V-headlight, V-sub-scale. Codex queue 2060/2070/2080 unchanged. No package launched this run.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 06:56 CDT headless run (Claude)
+
+- **Merged and pushed:** Sonnet V-headlight (the headlight-pool star pattern was the terrain roughness texture under the lamps; one-line shader fix keeps 25% of it; Blue Hole pattern gone, brightness 70.5 to 68.4; shader-hash snapshot regenerated). Smoke + project-base green on main; no full e2e.
+- **Parked, not merged:** Sonnet V-sub-scale (branch claude/V-sub-scale, worktree ../subexp-wt/V-sub-scale). Camera-only changes did not make the subject larger than the sub: Challenger lander still ~2/3 the sub's height and the frame emptier; Beebe needs a pull-back that breaks two framing tests. Next step is in DIRECTOR item 9.
+- **Codex:** 5h was 6% (resets 07:17), so 2030/2040/2050 stopped mid-task with uncommitted worktrees; the queue (2060/2070/2080) waits for the dispatcher. Stale worktrees 1740-1860 remain.
+- **Not done:** no tag (hosted CI result for d0e57ba and later pending). Next: V-eight-sites, V-titanic remainder, S-manifest.
+- **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 07:18 CDT headless run 2 (Claude)
+
+- **Merged and pushed:** Sonnet V-titanic close view: a `plateStains` shader patch in the shared steel material (per-plate tone, seam stain bands, rust streaks); close view ~4.0, hull still more orange than real. Smoke + project-base green on main; no full e2e.
+- **Codex:** 5h was 6% (resets 07:17); queue 2060/2070/2080 waits for the dispatcher. Stale worktrees 1740-1860, 2030-2050 remain. V-sub-scale still parked.
+- **Not done:** no tag (waits for green hosted CI). Next: V-eight-sites, S-manifest, V-sub-scale data fix.
+- **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 08:13 CDT headless run 3 (Claude)
+
+- **Merged and pushed:** Sonnet V-eight-sites: captured the eight non-hero sites at mission spawns; first target was invisible at Bismarck, Blake, Hunga, Hudson, so MISSION_APPROACH_M shortened (data only). Verdicts in plan/progress/V-eight-sites.md (Hudson 2.5, Blake seabed near-black remain). Smoke + project-base green; no full e2e.
+- **Codex:** 2060/2070/2080 running. V-sub-scale still parked. Stale worktrees remain.
+- **Not done:** no tag (waits for green hosted CI). Next: S-manifest, V-sub-scale data fix, Hudson/Blake brightness.
+- **Needs owner:** real-phone play of the newest build.

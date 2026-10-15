@@ -7,6 +7,7 @@
  * Software WebGL keeps this reproducible without a physical GPU; timings are
  * host-specific diagnostics, not a phone/desktop GPU performance prediction.
  */
+import { diagnosticTiers } from './diagnostic-tiers.mjs';
 import { chromium } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -16,7 +17,7 @@ const output = resolve(process.argv[3] ?? '.cache/perf-budget');
 const sites = (
   process.env.PERF_SITES ?? 'titanic,lost-city,great-blue-hole,beebe-vent-field,monterey-canyon'
 ).split(',');
-const tiers = (process.env.PERF_TIERS ?? 'low,high').split(',');
+const tiers = diagnosticTiers(process.env.PERF_TIERS ?? 'low,high');
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
