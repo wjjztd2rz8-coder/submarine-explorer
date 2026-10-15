@@ -245,7 +245,9 @@ float terrRough = 0.92;
     nAcc += r.xyz * wC; rAcc += r.w * wC; wSum += wC;
   }
   nAcc /= max(wSum, 0.05);
-  terrRough = clamp(rAcc / max(wSum, 0.05), 0.4, 1.0);
+  // The texture's roughness channel is high contrast; lit by the lamps it shows as a regular
+  // speckle on rock walls, so keep only a gentle share of it.
+  terrRough = mix(0.9, clamp(rAcc / max(wSum, 0.05), 0.4, 1.0), 0.25);
 #else
   nAcc = wn;
   terrRough = mix(0.93, 0.8, wC);
