@@ -23,6 +23,25 @@ const T0 = new Date('2026-09-22T10:00:00.000Z');
 const T1 = new Date('2026-09-22T11:00:00.000Z');
 
 describe('DiscoveryStore', () => {
+  it.each([
+    ['2026-09-22T11:00:00+02:00', '2026-09-22T09:30:00Z'],
+    ['2026-09-22T09:00:00Z', '2026-09-22T09:00:00.500Z'],
+  ])('orders migrated timestamps by instant: %s before %s', (early, late) => {
+    const storage = new MemoryStorage();
+    storage.setItem(
+      DISCOVERY_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        discovered: { 'site/late': late, 'site/early': early },
+      }),
+    );
+    const store = new DiscoveryStore(storage, () => T1);
+    expect(store.discoveredFor('site')).toEqual(['early', 'late']);
+    expect(store.stats.firstAt).toBe(early);
+    store.record('site', 'late');
+    expect(new DiscoveryStore(storage).discoveredFor('site')).toEqual(['early', 'late']);
+  });
+
   it('records first discovery and persists under the versioned key', () => {
     const storage = new MemoryStorage();
     const store = new DiscoveryStore(storage, () => T0);

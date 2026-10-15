@@ -94,10 +94,12 @@ export interface FrameState {
   frozen: boolean;
   /** gate.input: `sampled`, or the frozen neutral input. */
   state: Readonly<InputState>;
-  /** gate.input: fixed steps to simulate (0 when frozen). */
+  /** gate.input: fixed steps to simulate (0 when frozen or resuming). */
   steps: number;
-  /** gate.input: mission clock / dive time delta (0 when frozen). */
+  /** gate.input: mission clock / dive time delta (0 when frozen or resuming). */
   clockDt: number;
+  /** First frame after a shell/visibility transition or a frozen frame: no catch-up. */
+  resumeFrame: boolean;
   /** events: the sub's state after this frame's physics. */
   sub: SubmarineState;
   /** camera.pilot: the sub's forward vector. */

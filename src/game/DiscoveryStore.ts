@@ -117,7 +117,7 @@ export function migrate(raw: unknown, fallbackAt = new Date().toISOString()): Di
   const minScans = records.reduce((n, r) => counter(n + r.count), 0);
   if (out.stats.scans < minScans) out.stats.scans = minScans;
   if (!out.stats.firstAt && records.length) {
-    out.stats.firstAt = records.map((r) => r.at).sort()[0];
+    out.stats.firstAt = records.map((r) => r.at).sort((a, b) => Date.parse(a) - Date.parse(b))[0];
   }
   return out;
 }
@@ -205,7 +205,7 @@ export class DiscoveryStore {
     const prefix = `${landmarkId}/`;
     return Object.entries(this.data.discovered)
       .filter(([k]) => k.startsWith(prefix))
-      .sort((a, b) => a[1].at.localeCompare(b[1].at))
+      .sort((a, b) => Date.parse(a[1].at) - Date.parse(b[1].at))
       .map(([k]) => k.slice(prefix.length));
   }
 

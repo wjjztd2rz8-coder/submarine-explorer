@@ -383,18 +383,21 @@ function runtimeSetup(state: 'home' | 'dive' = 'home') {
     vi.fn((id: number) => frames.delete(id)),
   );
   vi.stubGlobal('window', new EventTarget());
-  vi.stubGlobal('document', {
-    body: { append: (node: (typeof nodes)[number]) => nodes.push(node) },
-    createElement: () => ({
-      id: '',
-      removed: false,
-      append() {},
-      setAttribute() {},
-      remove() {
-        this.removed = true;
-      },
+  vi.stubGlobal(
+    'document',
+    Object.assign(new EventTarget(), {
+      body: { append: (node: (typeof nodes)[number]) => nodes.push(node) },
+      createElement: () => ({
+        id: '',
+        removed: false,
+        append() {},
+        setAttribute() {},
+        remove() {
+          this.removed = true;
+        },
+      }),
     }),
-  });
+  );
   const tile = makeSyntheticTile({ id: 'lost-city' });
   const load = vi.fn(async (_id: string, _signal?: AbortSignal) => tile);
   const input = { state: {}, sample: vi.fn(() => ({})) };
