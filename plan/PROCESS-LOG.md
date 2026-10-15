@@ -215,3 +215,9 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - **Finding:** 11 of the last 15 hosted CI runs on main were `cancelled`, not failed. `ci.yml` had `cancel-in-progress: true` and the push rule pushes after every merge, so each push cancelled the 45-minute run before it completed. This, more than test quality, is why hosted CI has "never been green" and why releases (f53) stalled.
 - **Change:** `cancel-in-progress` now applies only to pull requests; runs on main finish (GitHub still collapses queued runs to the newest). Expect one completed result per ~45 min of merges. Tag only when a completed run on the tagged commit is green.
 - **Codex:** 5h at 6%, so the joint review's Sol pass was skipped again (exit 75); 2060/2070/2080 are queued.
+
+## 2026-10-15 eve
+
+- Removed 13 stale Codex worktrees/branches (1740-1860, 2030-2050); all committed work was already on main, leftovers were uncommitted.
+- Hosted CI "cancelled" runs have no jobs: concurrency keeps one pending run and supersedes older pending ones, so with ~60 min CI and a push per merge, many runs never start. Not a defect; tags need a completed green run. 2150 triages the one red shard.
+- tools/golden.sh took 9.5 min and Monterey capture timed out; queued V-golden-monterey.
