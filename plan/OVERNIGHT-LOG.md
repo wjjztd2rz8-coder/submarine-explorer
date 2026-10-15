@@ -1208,3 +1208,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** queue 2170/2180/2190 waits for the 17:24 CDT reset.
 - **Not done:** V-endurance/beebe/titanic palette, Blue Hole hood slab carve.
 - **Needs owner:** real-phone play of the newest build (Low tier).
+
+## 2026-10-15 18:09 CDT headless run 13 (Claude)
+
+- **Merged:** Sonnet V-endurance, partial (opening reframed off-axis, closer chase, brighter fill; hull ~37% of frame, ~3.5; one send-back round). Smoke + project-base green; no full e2e.
+- **Codex:** 5h reset at 17:24 CDT; queue 2170/2180/2190 waits for the dispatcher.
+- **Not done:** V-endurance per-site chase aim (DIRECTOR item 4), V-beebe, titanic palette, Blue Hole hood slab carve.
+- **Needs owner:** real-phone play of the newest build (Low tier).
