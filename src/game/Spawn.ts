@@ -227,7 +227,7 @@ const FREE_DIVE_OPENINGS: Record<
     hero: 'karst-grotto',
     bearing: 90,
     // Reach the existing gallery scan in the opening frame, rather than crossing the hole first.
-    range: 70,
+    range: 85,
     fromCentre: true,
     // ~14 m below the ledge the grotto stands on: the ledge, its shoals and the surface light all stay in view.
     altitude: -22,
