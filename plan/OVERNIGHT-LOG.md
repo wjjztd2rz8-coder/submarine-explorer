@@ -1071,3 +1071,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** weekly at 5% (resets Oct 20), queue 2000/2010/2020 waits. Stale worktrees 1740-1860 remain.
 - **Not done:** no tag (waits for green hosted CI); next Claude items V-bluehole-opening, S-journal-picture.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-14 22:38 CDT headless run (Claude)
+
+- **Merged and pushed:** Sonnet V-bluehole-opening (start 6 m deeper, sub lower in frame, gallery now against the hole wall; readable, desktop and portrait checked) and Haiku spec repair (endurance opening radius spec now reads DEEP_OPENINGS; the 6 opening-framing failures pass). Smoke + project-base green; no full e2e.
+- **Codex:** weekly 5% until Oct 20; queue 2000/2010/2020 waits. Stale worktrees 1740-1860 remain.
+- **Not done:** no tag (waits for green hosted CI). Next: S-journal-picture. Known: faint repeating pattern in the sub headlight pool on the Blue Hole wall.
+- **Needs owner:** real-phone play of the newest build.
