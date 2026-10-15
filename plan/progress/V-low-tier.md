@@ -4,15 +4,15 @@ Mission-mode portrait captures at Low. Before: `.cache/golden/2026-10-15-182213`
 
 ## Scores (1-5, first frame and +10 s)
 
-| Site       | Low before | Low after | Notes                                                                    |
-| ---------- | ---------- | --------- | ------------------------------------------------------------------------ |
-| Hudson     | 2.5        | 3.5       | Ledge, floor and lamp pool readable.                                     |
-| Bismarck   | 3          | 3.5       | Hull plates and dropstones read.                                         |
-| Hunga      | 3          | 3.5       | Rim slope and basin patches read.                                        |
-| Blake      | 2.5        | 3         | Still the darkest; jelly target small and dim.                           |
-| Lost City  | 2 (frame 1 black) | 3.5 | Slope and towers visible from frame 1; slightly bright slope.          |
-| Beebe      | 2 (no seabed in frame 1) | 3 | Floor and stack visible, still muted.                               |
-| Titanic, Blue Hole, Monterey | 4 | 4 | Unchanged; fine at Low.                                              |
+| Site                         | Low before               | Low after | Notes                                                         |
+| ---------------------------- | ------------------------ | --------- | ------------------------------------------------------------- |
+| Hudson                       | 2.5                      | 3.5       | Ledge, floor and lamp pool readable.                          |
+| Bismarck                     | 3                        | 3.5       | Hull plates and dropstones read.                              |
+| Hunga                        | 3                        | 3.5       | Rim slope and basin patches read.                             |
+| Blake                        | 2.5                      | 3         | Still the darkest; jelly target small and dim.                |
+| Lost City                    | 2 (frame 1 black)        | 3.5       | Slope and towers visible from frame 1; slightly bright slope. |
+| Beebe                        | 2 (no seabed in frame 1) | 3         | Floor and stack visible, still muted.                         |
+| Titanic, Blue Hole, Monterey | 4                        | 4         | Unchanged; fine at Low.                                       |
 
 High is unchanged by construction (tier gate, covered by the unit test); Blake High re-captured.
 

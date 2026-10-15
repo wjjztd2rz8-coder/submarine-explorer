@@ -45,12 +45,7 @@ test('Low seabed lighting is isolated to the observed dark sites and leaves surf
     for (const tier of ['medium', 'high'] as const)
       expect(lowSiteWater(site, tier, water)).toBe(water);
   }
-  for (const site of [
-    'titanic',
-    'monterey-canyon',
-    'great-blue-hole',
-    'unknown',
-  ])
+  for (const site of ['titanic', 'monterey-canyon', 'great-blue-hole', 'unknown'])
     expect(lowSiteWater(site, 'low', water)).toBe(water);
   for (const site of ['challenger-deep', 'endurance']) {
     const deep = deepSiteWater(site, water);
