@@ -1,5 +1,7 @@
 import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import { DEFAULT_SENSOR_PRESETS } from '../../src/core/config/gameplay.js';
+import { EQUIPMENT } from '../../src/core/config/progress.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 
@@ -144,12 +146,35 @@ test('sonar follows the sub, zooms by keys and wheel, and marks dive scan state'
 test('whole-tile step remains available and sensor range gates POIs', async ({ page }) => {
   await page.goto('/?mission=titanic&skipBriefing=1', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => window.__gameReady === true, undefined, { timeout: 45_000 });
+  await page.waitForFunction(() => {
+    const game = window.__game as { discovery: { loaded: boolean }; props: { loaded: boolean } };
+    return game.discovery.loaded && game.props.loaded;
+  });
   await page.evaluate(() => {
     (window.__game as { sonar: { setZoom(level: 'tile'): void } }).sonar.setZoom('tile');
   });
   const sonar = page.locator('.sonar');
   await expect(sonar.locator('.d-sonar-range')).toHaveText('Whole tile');
   await waitForZoom(page);
+  // The fixed kit extends both modes' range. Hold the sub between their ranges,
+  // rather than depending on how close a mission opening happens to put the stern.
+  const realisticRange = DEFAULT_SENSOR_PRESETS.realistic.sonarPoiRange * EQUIPMENT.sonarRange;
+  const arcadeRange = DEFAULT_SENSOR_PRESETS.extended.sonarPoiRange * EQUIPMENT.sonarRange;
+  const distance = (realisticRange + arcadeRange) / 2;
+  expect(distance).toBeGreaterThan(realisticRange);
+  expect(distance).toBeLessThan(arcadeRange);
+  const opening = await page.evaluate((distance) => {
+    const game = window.__game as {
+      sub: { position: { x: number; y: number; z: number }; step(): void };
+      discovery: { pois: Array<{ id: string; position: { x: number; z: number } }> };
+    };
+    const opening = { ...game.sub.position };
+    const stern = game.discovery.pois.find((poi) => poi.id === 'titanic-stern')!;
+    game.sub.step = () => {};
+    game.sub.position.x = stern.position.x + distance;
+    game.sub.position.z = stern.position.z;
+    return opening;
+  }, distance);
   await expect
     .poll(() => marker(page, 'titanic-stern'))
     .toMatchObject({ icon: '·', visible: true });
@@ -170,6 +195,13 @@ test('whole-tile step remains available and sensor range gates POIs', async ({ p
   });
   await expect.poll(() => marker(page, 'titanic-stern')).toMatchObject({ visible: true });
   await shot(page, 'zoomed-out');
+  await page.evaluate((opening) => {
+    const game = window.__game as {
+      sub: { position: { x: number; y: number; z: number }; step?: () => void };
+    };
+    Object.assign(game.sub.position, opening);
+    delete game.sub.step;
+  }, opening);
   await page.evaluate(() => {
     const map = (
       window.__game as {

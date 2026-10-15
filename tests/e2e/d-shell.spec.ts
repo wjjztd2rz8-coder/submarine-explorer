@@ -133,7 +133,17 @@ test('home, site grid, pause, objectives, resume and quit', async ({ page }) => 
   ]);
   await expect(page.locator('.home-menu .daily-card')).toHaveCount(1);
   await expect(page.locator('.home-menu .mode-advanced-toggle')).toHaveCount(1);
-  await expect(page.locator('.home-menu button')).toHaveCount(9);
+  // Six actions, Daily and Advanced; modes are native radios, not buttons.
+  await expect(page.locator('.home-menu button')).toHaveCount(8);
+  const mode = page.locator('.home-menu').getByRole('radiogroup', { name: 'Game mode' });
+  await expect(mode.getByRole('radio')).toHaveCount(2);
+  await expect(mode.getByRole('radio', { name: 'Arcade' })).toBeChecked();
+  await expect(mode.getByRole('radio', { name: 'Realistic' })).toBeVisible();
+  await expect(page.locator('.home-menu .mode-advanced-toggle')).toHaveAttribute(
+    'aria-expanded',
+    'false',
+  );
+  await expect(page.locator('.home-menu .mode-advanced')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Dive', exact: true })).toBeEnabled();
   await expect(page.getByRole('button', { name: 'Continue' })).toHaveCount(0);
   // F-TITLE-E: the title scene backs the menu; the embedded globe opens only in the sites view.

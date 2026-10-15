@@ -1356,10 +1356,8 @@ freshTest.describe('animal guidance placement', () => {
               (window.__game as unknown as Probe).onboard.hints.hasSeen('creature'),
             ),
           ).toBe(false);
-          // Once the contact is out of the way the hint takes the same slot, clear of the HUD.
-          await page.evaluate(() => {
-            (window.__game as unknown as Probe).discovery.overlay.setSuppressed(true);
-          });
+          // Withdraw only the scan source: covering play would suppress every hint too.
+          await setScanCardSuppressed(page, true);
           for (let frame = 0; frame < 40; frame++) {
             if (await hint.textContent().then((text) => text?.includes('Animal nearby.'))) break;
             await page.clock.fastForward(250);
@@ -1369,6 +1367,13 @@ freshTest.describe('animal guidance placement', () => {
               ? 'Animal nearby. Hold SCAN to scan, or use PHOTO for a photo.'
               : 'Animal nearby. Hold G to scan, or use P for a photo.',
           );
+          await expect(hint).toBeVisible();
+          await expect(page.locator(GUIDANCE.scan)).toBeHidden();
+          expect(
+            await page.evaluate(() =>
+              (window.__game as unknown as Probe).onboard.hints.hasSeen('creature'),
+            ),
+          ).toBe(true);
           await screenshot(page, `${site}-${name}`);
           await separate(page, [...hud, GUIDANCE.any, ...controls]);
           // The clock was paused before navigation, so only these frames spend its lifetime.

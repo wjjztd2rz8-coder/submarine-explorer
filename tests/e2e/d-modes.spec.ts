@@ -1,8 +1,12 @@
 // @ts-expect-error Node types are intentionally absent from this browser-focused tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test } from './helpers/unlocked.js';
+import { DEFAULT_SENSOR_PRESETS, DEFAULT_SPEED_PROFILES } from '../../src/core/config/gameplay.js';
+import { EQUIPMENT } from '../../src/core/config/progress.js';
+import titanicPois from '../../data/landmarks/titanic/pois.json' with { type: 'json' };
 
 const shots = '.cache/codex/shots/d-modes';
+const bowRadius = titanicPois.pois.find((poi) => poi.id === 'titanic-bow')!.radius_m;
 
 test('Arcade, Realistic and Custom apply live and survive reload', async ({ page }) => {
   await mkdir(shots, { recursive: true });
@@ -25,7 +29,14 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
       scanRadius: game.discovery.pois.find((poi) => poi.id === 'titanic-bow')!.radius,
     };
   });
-  expect(initial).toEqual({ mode: 'arcade', speed: 1, light: 750, scanRadius: 400 });
+  // Every pilot carries the full kit; changing mode must still apply its sensor preset.
+  expect(initial).toEqual({
+    mode: 'arcade',
+    speed: 1,
+    light: 750,
+    scanRadius:
+      bowRadius * DEFAULT_SENSOR_PRESETS.extended.scanRadiusMultiplier * EQUIPMENT.scanDetail,
+  });
   await page.keyboard.press('Escape');
   await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();
   const dialog = page.getByRole('dialog', { name: 'Settings' });
@@ -53,11 +64,12 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
     };
   });
   expect(realistic).toEqual({
-    forwardCap: 1.4,
+    forwardCap: DEFAULT_SPEED_PROFILES.research.maxSpeed * EQUIPMENT.thrust,
     descentCap: 0.5,
     light: 500,
     fill: 12,
-    scanRadius: 200,
+    scanRadius:
+      bowRadius * DEFAULT_SENSOR_PRESETS.realistic.scanRadiusMultiplier * EQUIPMENT.scanDetail,
   });
   await dialog.getByLabel('Visual waypoints', { exact: true }).check();
   await expect(dialog.locator('.mode-custom-tag')).toBeVisible();
