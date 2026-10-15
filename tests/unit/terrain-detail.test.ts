@@ -20,9 +20,7 @@ describe('terrain fidelity field defaults', () => {
   it.each(
     sites.landmarks
       .filter((id) => id !== 'lost-city')
-      .flatMap((site) =>
-        (['low', 'medium', 'high'] as const).map((tier) => ({ site, tier })),
-      ),
+      .flatMap((site) => (['low', 'medium', 'high'] as const).map((tier) => ({ site, tier }))),
   )(
     '$site $tier keeps mesh and collision bytes identical to explicit legacy relief constants',
     ({ site, tier }) => {

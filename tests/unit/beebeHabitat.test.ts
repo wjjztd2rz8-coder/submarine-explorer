@@ -31,9 +31,7 @@ describe('850 Beebe sediment and cooler vent margins', () => {
         expect(habitat.userData.mussels).toBeGreaterThan(0);
         expect(habitat.userData.rubble).toBeGreaterThan(0);
         expect(countGeo(habitat).draws).toBe(1);
-        expect(countGeo(habitat).triangles).toBeLessThan(
-          tier === 'low' ? 1600 : 16000,
-        );
+        expect(countGeo(habitat).triangles).toBeLessThan(tier === 'low' ? 1600 : 16000);
         expect((habitat.material as THREE.MeshStandardMaterial).emissive.getHex()).toBe(0);
         expect(built.bounds.containsBox(new THREE.Box3().setFromObject(habitat))).toBe(true);
         const bare = build(tier, { ...def, raw: { ...def.raw, beebe_habitat: undefined } });
