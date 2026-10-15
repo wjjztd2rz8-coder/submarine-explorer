@@ -212,14 +212,14 @@ const FREE_DIVE_OPENINGS: Record<
   'beebe-vent-field': {
     hero: 'beebe-chimney-1',
     bearing: 60,
-    range: 80,
+    range: 76,
     fromCentre: true,
     altitude: 8,
     yawOffset: 11,
-    // Pulled-back three-quarter stern view: the smoker and its plume read larger than the sub.
-    chaseRadius: 66,
-    chaseOffsetX: -62,
-    chaseOffsetY: -14,
+    // Three-quarter stern view: show hull length and deck, with the smoker to port.
+    chaseRadius: 54,
+    chaseOffsetX: -48,
+    chaseOffsetY: -12,
   },
   // Inside the hole, facing the ledge alcove across the water: the wall, the light shafts
   // and the fish above the ledge share the frame instead of a bare rim.
