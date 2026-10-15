@@ -12,8 +12,8 @@ The daily copy was already close to minimal. Each surface was checked:
 
 ## Change
 
-| Surface | Old | New |
-|---|---|---|
+| Surface                                                               | Old                            | New                       |
+| --------------------------------------------------------------------- | ------------------------------ | ------------------------- |
 | Briefing title and debrief title (`src/game/Daily.ts` `dailyMission`) | `Daily dive · <mission title>` | `Daily · <mission title>` |
 
 No illustrative or reconstructed caveats were found in daily text, so none were removed.

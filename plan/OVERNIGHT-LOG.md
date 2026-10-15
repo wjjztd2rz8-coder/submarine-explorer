@@ -1085,3 +1085,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** weekly 5% until Oct 20; queue 2000/2010/2020 waits. Stale worktrees 1740-1860 remain.
 - **Not done:** no tag (waits for green hosted CI; latest completed CI run was red). Auto-open of the entry after a scan was not confirmed by the spec.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-14 23:35 CDT headless run (Claude)
+
+- **Merged and pushed:** Haiku S-daily (briefing/debrief title prefix "Daily dive" to "Daily"; the Home card and labels were already minimal; one spec string updated). Smoke + project-base green on main; no full e2e. Note: f2-modes has 2 touch-target failures that predate this (not in gates), worth a look in hosted CI.
+- **Codex:** weekly 5% until Oct 20; queue 2000/2010/2020 waits. Stale worktrees 1740-1860 remain.
+- **Not done:** no tag (waits for green hosted CI). Next: V-lander (Haiku), S-tiers, V-titanic remainder.
+- **Needs owner:** real-phone play of the newest build.
