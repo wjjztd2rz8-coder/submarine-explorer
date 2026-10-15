@@ -279,7 +279,9 @@ float terrRough = 0.92;
 #ifdef TERRAIN_ROCK_DETAIL
   // Fine dipping lamination and grain; analytical gradients cost no extra texture fetches.
   // Filter each frequency before it becomes smaller than a pixel, then project onto the surface.
-  vec3 phase = P * vec3(7.0, 11.0, 6.0);
+  // Warp the phases with low-frequency noise so the cosines never line up into a visible lattice under the lamps.
+  vec3 grainWarp = vec3(terrainNoise(P.xz / 2.3).x, terrainNoise(P.xy / 2.9 + 5.0).x, terrainNoise(P.zy / 3.1 + 9.0).x) - 0.5;
+  vec3 phase = P * vec3(7.0, 11.0, 6.0) + grainWarp * 12.0;
   vec3 filterWidth = fwidth(phase);
   vec3 filtered = vec3(1.0) - smoothstep(vec3(0.8), vec3(2.5), filterWidth);
   vec3 grainGrad = cos(phase) * filtered * vec3(0.35, 0.5, 0.35);
