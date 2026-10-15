@@ -2,6 +2,34 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-15 pm comprehensive review, Claude alone (golden 2026-10-15-093704)
+
+Sol was skipped again (Codex 5h at 6%, `codex-review.sh` exit 75). Scores are mine and provisional.
+
+**Changed since the morning review:** about 10 merges, all pushed. Codex: 2000 (d-photo spec race), 2010 (HUD/waypoint dispose, keyboard Sites grab, Tab-reachable banner buttons), 2020 (specs consolidated into capability specs, nightly workflow, golden tool tests). Claude: R-ci-triage (27 hosted-CI failures: one real fix, Journal photo on an undiscovered entry; the rest spec repairs), V-lander (Challenger lander wear and colour), S-tiers (Ultra cut, saved `ultra` migrates to `high`), and two spec repairs. Gates: smoke + project-base.
+
+| Site       | Readable | Beautiful | Biggest gap                                                                  |
+| ---------- | -------- | --------- | ---------------------------------------------------------------------------- |
+| Titanic    | 4        | 3.8       | close view: rust-peach hull is lit flat; seabed ripples fine                 |
+| Beebe      | 4        | 3.2       | the bright sub is the biggest object; chimney still a small procedural stack |
+| Blue Hole  | 3.5      | 3         | faceted terraces; faint repeating star pattern in the headlight pool         |
+| Lost City  | 4        | 3.3       | towers are smooth columns with flat tops, blurred slope texture              |
+| Monterey   | 4        | 3.5       | repeated contour bands on the wall                                           |
+| Challenger | 4        | 3.1 (3)   | lander now reads as kit (orange flag, bait); still tiny in an empty field    |
+| Endurance  | 3.5      | 3.2 (3)   | hull and sub both small; sub is the brightest, centre-frame object           |
+
+Golden frames are visually unchanged apart from the lander; no regression. None at 4. HUD clean on all frames (scan card, sonar, depth).
+
+**Agreed stage: about 79% to 1.0 (Claude alone), about three and a half weeks.** Movement is test and process work, not art.
+
+**Biggest gaps (ranked):** (1) hosted CI has never produced a completed result lately: 11 of the last 15 runs on main were cancelled by the next push (`cancel-in-progress: true` plus push-per-merge). Fixed in `ci.yml` (PRs only). (2) Sub scale at openings (Beebe, Challenger, Endurance): new V-sub-scale. (3) Headlight pool pattern: new V-headlight. (4) Eight non-hero sites unjudged. (5) Real-phone Low performance (owner).
+
+**Process notes.** See PROCESS-LOG 2026-10-15 pm. Codex is idle in practice until 07:17 today (5h) and its weekly is fine (85%), so the binding limit is the 5h window; briefs 2060/2070/2080 wait for it.
+
+**New priorities (Claude):** V-sub-scale, V-headlight, V-eight-sites, V-titanic close view, V-lostcity towers, V-beebe/V-bluehole. Codex: S-verify-7, S-bughunt-6, R-ci-time (reads the first completed CI run).
+
+**Needs owner:** a five-minute real-phone play of the newest build.
+
 ## 2026-10-15 comprehensive review, Claude alone (golden 2026-10-15-011533)
 
 Sol was skipped: Codex weekly is at 5% (resets Oct 20), below the review floor. Scores are mine and unchallenged; treat them as provisional until Sol can re-check.

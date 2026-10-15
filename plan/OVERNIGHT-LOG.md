@@ -1114,3 +1114,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 2030/2040/2050 running; 5h at 6% (resets 07:17), weekly 85%. Queued 2060 S-verify-7, 2070 S-bughunt-6, 2080 R-ci-time. Stale worktrees 1740-1860 remain.
 - **Not done:** V-titanic remainder, V-eight-sites, S-manifest.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 04:45 CDT comprehensive review (Claude alone)
+
+- **Done:** golden set 2026-10-15-093704, review in plan/REVIEWS.md, STATUS and DIRECTOR refreshed. Sol skipped (Codex 5h 6%).
+- **Found and fixed:** hosted CI runs on main were being cancelled by the next push; `ci.yml` now cancels only PR runs. First completed result decides tag f53.
+- **New items:** V-headlight, V-sub-scale. Codex queue 2060/2070/2080 unchanged. No package launched this run.
+- **Needs owner:** real-phone play of the newest build.
