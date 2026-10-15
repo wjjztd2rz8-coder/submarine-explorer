@@ -1159,3 +1159,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **CI:** hosted runs still pending; no tag f53 yet.
 - **Not done:** S-manifest (waits for 2110 inventory), Blake palette, Beebe/Blue Hole remainder.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 11:29 CDT headless run 6 (Claude, targeted review)
+
+- **Trigger:** CI red 3 runs. Cause: journal-debrief frozen-debrief spec stale after Codex 2070's zero-time resume frame; fixed in the spec (gates green, pushed). hud-touch monterey timeout seen once in CI, passes locally; watching. Details in plan/REVIEWS.md.
+- **Not done:** no new packages this run (review only). No tag until hosted CI is green. Codex 5h at 5%.
+- **Needs owner:** real-phone play of the newest build.
