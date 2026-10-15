@@ -16,6 +16,7 @@ import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import poses from '../../tools/lowtier-poses.json';
 import blueHolePoses from '../../tools/blue-hole-poses.json';
+import { withArcadeReach } from './helpers.js';
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 async function scene(site: string, tier: GraphicsTier = 'low') {
@@ -299,12 +300,14 @@ test('Blue Hole Low: both east poses guide to their local unscanned gallery befo
   const site = 'great-blue-hole';
   const { config, meta, terrain, props } = await scene(site);
   try {
-    const pois = placePois(
-      parsePois(json(`data/landmarks/${site}/pois.json`)),
-      meta,
-      terrain,
-      config.scan,
-      site,
+    const pois = withArcadeReach(
+      placePois(
+        parsePois(json(`data/landmarks/${site}/pois.json`)),
+        meta,
+        terrain,
+        config.scan,
+        site,
+      ),
     );
     const hero = props.placed.find((p) => p.def.id === 'karst-grotto-east')!;
     const fixed = blueHolePoses.east;

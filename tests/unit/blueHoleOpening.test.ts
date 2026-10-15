@@ -11,6 +11,7 @@ import { CameraRig } from '../../src/sub/CameraRig.js';
 import type { TileMeta } from '../../src/util/types.js';
 import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
+import { withArcadeReach } from './helpers.js';
 
 const site = 'great-blue-hole';
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
@@ -40,7 +41,7 @@ describe('770 Blue Hole opening on actual terrain and procedural scenery', () =>
         config.submarine.freeDiveHullMarginM,
       )!;
       const poiDoc = json(`data/landmarks/${site}/pois.json`);
-      const pois = placePois(parsePois(poiDoc), meta, terrain, config.scan, site);
+      const pois = withArcadeReach(placePois(parsePois(poiDoc), meta, terrain, config.scan, site));
       try {
         await props.load('props.json', site, async () => json(`data/landmarks/${site}/props.json`));
         expect(props.stats.failed).toBe(0);

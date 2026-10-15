@@ -19,6 +19,7 @@ import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { terrainCarveFor } from '../../src/world/terrainFeatures.js';
 import legacy from '../fixtures/f30-legacy-discoveries.json' with { type: 'json' };
+import { withArcadeReach } from './helpers.js';
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 afterEach(() => vi.unstubAllGlobals());
@@ -97,12 +98,14 @@ for (const site of ['titanic', 'great-blue-hole']) {
       const props = new Props(meta, terrain, cfg.props, tier);
       try {
         await props.placeAll(json(`data/landmarks/${site}/props.json`), site);
-        const pois = placePois(
-          parsePois(json(`data/landmarks/${site}/pois.json`)),
-          meta,
-          terrain,
-          cfg.scan,
-          site,
+        const pois = withArcadeReach(
+          placePois(
+            parsePois(json(`data/landmarks/${site}/pois.json`)),
+            meta,
+            terrain,
+            cfg.scan,
+            site,
+          ),
         );
         const pose = composedFreeDiveSpawn(
           site,

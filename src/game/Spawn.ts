@@ -36,7 +36,7 @@ export const MISSION_APPROACH_M: Readonly<Record<string, number>> = {
   'hudson-canyon': 240,
   kamaehuakanaloa: 200,
   'beebe-vent-field': 220,
-  'great-blue-hole': 220,
+  'great-blue-hole': 150,
   bismarck: 240,
   'hunga-tonga-caldera': 260,
   'blake-plateau-corals': 260,
@@ -227,7 +227,7 @@ const FREE_DIVE_OPENINGS: Record<
     hero: 'karst-grotto',
     bearing: 90,
     // Reach the existing gallery scan in the opening frame, rather than crossing the hole first.
-    range: 100,
+    range: 70,
     fromCentre: true,
     // ~14 m below the ledge the grotto stands on: the ledge, its shoals and the surface light all stay in view.
     altitude: -22,
