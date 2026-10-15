@@ -70,6 +70,6 @@ export function dailyMission(def: MissionDef, dive: DailyDive): MissionDef {
     out.objectives = [...pick(true), ...pick(false)];
   }
   out.briefing.summary = `${DAILY_MODIFIER_LABELS[dive.modifier]}. ${out.briefing.summary}`;
-  out.title = `Daily dive · ${out.title}`;
+  out.title = `Daily · ${out.title}`;
   return out;
 }
