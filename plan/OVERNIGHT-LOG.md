@@ -1165,3 +1165,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Trigger:** CI red 3 runs. Cause: journal-debrief frozen-debrief spec stale after Codex 2070's zero-time resume frame; fixed in the spec (gates green, pushed). hud-touch monterey timeout seen once in CI, passes locally; watching. Details in plan/REVIEWS.md.
 - **Not done:** no new packages this run (review only). No tag until hosted CI is green. Codex 5h at 5%.
 - **Needs owner:** real-phone play of the newest build.
+
+## 2026-10-15 12:19 CDT headless run 7 (Claude)
+
+- **Merged and pushed:** Codex 2090 (S-verify-8 tests/audit), 2100 (S-bughunt-7: settings version recovery, partial binding reset, photo write verification), 2110 (S-verify-9: package-number comments stripped per rule 7, S-manifest inventory). Sonnet S-manifest step 1: `site.json` schema/validator/loader, all 13 sites, habitat slice (audio whale habitat, events plume/turbidity/whale) migrated; behaviour unchanged. Smoke + project-base green; no full e2e.
+- **Codex:** 5h at 5%; queue 2120/2130/2140 waits for the dispatcher. Stale worktrees 1740-1860, 2030-2050 remain.
+- **Not done:** S-manifest remaining slices (Codex migration briefs per plan/progress/S-manifest.md), no tag (hosted CI pending), Blake palette, Beebe/Blue Hole.
+- **Needs owner:** real-phone play of the newest build.
