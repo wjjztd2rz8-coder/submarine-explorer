@@ -5,12 +5,12 @@ After: `.cache/golden/2026-10-15-141805` (final values). Intermediate tries: `-1
 
 ## Scores (1-5, desktop and portrait agree)
 
-| Site     | Before | After | Notes                                                                                   |
-| -------- | ------ | ----- | --------------------------------------------------------------------------------------- |
-| Blake    | 3      | 3.5   | Floor, rubble and the mound silhouette now read; still the darkest of the four.         |
-| Bismarck | 3      | 3.5   | Dropstone field and hull plates read beyond the lamp pool; stays cold and muted.        |
-| Hunga    | 3      | 3.5   | Rim slope and basin patches read; orange lamp pool still gives the sub a clear anchor.  |
-| Hudson   | 2.5    | 3.5   | Ledge and floor readable; the big pale blobs (sediment plumes) are now faint haze.      |
+| Site     | Before | After | Notes                                                                                  |
+| -------- | ------ | ----- | -------------------------------------------------------------------------------------- |
+| Blake    | 3      | 3.5   | Floor, rubble and the mound silhouette now read; still the darkest of the four.        |
+| Bismarck | 3      | 3.5   | Dropstone field and hull plates read beyond the lamp pool; stays cold and muted.       |
+| Hunga    | 3      | 3.5   | Rim slope and basin patches read; orange lamp pool still gives the sub a clear anchor. |
+| Hudson   | 2.5    | 3.5   | Ledge and floor readable; the big pale blobs (sediment plumes) are now faint haze.     |
 
 ## What changed (data only, no site branches)
 
