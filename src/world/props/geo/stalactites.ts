@@ -310,8 +310,8 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     // joints and a shadowed foot and underside, so the wall reads as stacked limestone.
     const hf = clamp(y / (0.62 * H));
     out.lerp(OCHRE, 0.34 * smooth(0.25, 0.9, hf) * (0.5 + bh));
-    out.lerp(GREY_BROWN, 0.5 * (1 - smooth(0.05, 0.75, hf)));
-    out.lerp(DEEP_TEAL, 0.22 * (1 - smooth(0.1, 0.8, hf)));
+    out.lerp(GREY_BROWN, 0.3 * (1 - smooth(0.05, 0.75, hf)));
+    out.lerp(DEEP_TEAL, 0.1 * (1 - smooth(0.1, 0.8, hf)));
     out.multiplyScalar(0.62 + 0.5 * smooth(0, 0.14, bed - Math.floor(bed)));
     out.multiplyScalar(0.78 + 0.22 * smooth(0, 0.22, hf));
     if (ny < -0.35) out.multiplyScalar(0.82);
@@ -321,7 +321,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const { bedI, bedF } = ledgeBed(x, y);
     const face = 1 - smooth(0.2, 0.55, ny < 0 ? -ny : ny); // steep faces only
     const depthF = 1 - smooth(0.12, 0.62, hf);
-    out.lerp(BLUE_GREY, 0.5 * depthF * (0.4 + 0.6 * face));
+    out.lerp(BLUE_GREY, 0.3 * depthF * (0.4 + 0.6 * face));
     out.lerp(CREAM_OCHRE, 0.3 * smooth(0.45, 0.95, hf) * face);
     const bedTone = 0.72 + 0.5 * fbm3(bedI * 3.3, 9, seed + 29, seed + 7, 2);
     const lipLight = 1 + 0.3 * (1 - smooth(0, 0.22, bedF));
