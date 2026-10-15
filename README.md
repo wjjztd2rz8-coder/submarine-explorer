@@ -9,6 +9,9 @@ The repository, package and deployment URLs retain `submarine-explorer`.
 
 ## Playing it
 
+The game requires WebGL2, including on Low quality. The installed Three.js renderer
+does not support WebGL1; quality tiers reduce rendering cost within WebGL2.
+
 The home screen's backdrop is a fixed title scene: a research submarine beside a
 Monterey Canyon crop built from the checked-in GMRT tile, with the globe kept for
 the Dive sites / Free dive picker (see [`docs/title-scene.md`](docs/title-scene.md)).

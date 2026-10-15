@@ -16,7 +16,18 @@ without an entry here is not done.
 
 - **S-tiers (graphics):** the Ultra graphics tier is cut; Low, Medium, High and Auto remain. Reason: at the hero-site golden poses Ultra differed from High only by slightly denser seabed scatter and wall life and a richer rusticle and plume budget, for 28 to 65 percent more triangles (software-GL High 0.98 to 1.13 M, Ultra 1.33 to 1.62 M) and a 3x pixel-ratio cap that costs fill rate and does nothing at 1x or 2x. None of it was folded into High, so High and Low and Medium render as before. A saved `ultra` setting migrates to `high`; `?tier=ultra` is ignored like any unknown value. Settings, config, tests, docs and tooling no longer mention it.
 
+### Fixed
+
+- **S-bughunt:** preserve photos after non-quota write errors; scope photo cleanup to each system and release pending ZIP URLs/timers at Journal teardown. Clear held flight input when editable controls gain focus, order migrated discoveries by timestamp instant, and discard paused/hidden physics backlog and dive-clock catch-up on resume. Save keys and schemas are unchanged.
+
 ### Changed
+
+- **V-headlight:** damp terrain texture roughness toward 0.9 to remove the repeating speckle under the lamps. Low keeps its existing non-PBR branch; no shader resources or geometry are added.
+- **V-titanic close view:** shared wreck steel adds texture-space plate tones and rust stains on Titanic, Bismarck and their steel scatter. Existing textures, lighting and tier budgets remain; the layer adds fragment arithmetic on all tiers.
+- **V-eight-sites approaches:** Bismarck's mission approach shortens from 240 to 150 m, Hudson's from 240 to 160 m, and Hunga's and Blake's from 260 to 160 m so the first subject is nearer at spawn. The scan-radius cap follows the existing table rule and preserves at least 60 m of transit with Extended sensors.
+- **V-sub-scale:** enlarge Challenger's lander from 9×9×12 to 26×26×34 m and Beebe's hero stack from 26×20×12 to 31×24×16 m in authored prop data to improve opening subject scale. Camera experiments were reverted. Beebe's Low flat-ground prop census increases from 19,926 to 20,758 triangles with the same 13 draws.
+- **R-ci-time:** refresh hosted timing weights and increase CI from 30 to 38 shards; animal-guidance expiry checks stop rendering once the hint disappears and still enforce the original 15-second simulated budget. Root browser shards keep one worker, zero retries and the existing deadlines. The next hosted run must establish wall-time improvement.
+- **S-verify tooling:** archived geometry diagnostics now default to Low/Medium/High and reject removed or invalid tiers before scene setup.
 
 - **S-tests step 3:** fold five narrow e2e entries into terrain, sonar and Journal capability tables; share each wall site’s five-view boot and make review-only images optional, preserving every assertion and enabling the catalog collision guards in ordinary runs. Nightly review reuses the golden build and archives the evidence.
 

@@ -17,9 +17,31 @@ import { CameraRig } from '../../src/sub/CameraRig.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 import { hullClearance } from './helpers/hullClearance.js';
 import type { TileMeta } from '../../src/util/types.js';
+import sites from '../../data/landmarks/index.json';
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
-for (const site of Object.keys(MISSION_APPROACH_M)) {
+it('every authored site retains its mission approach distance', () => {
+  // Enumerate content independently: deleting a tuning row must not delete its
+  // three geometry cases or silently substitute the generic spawn distance.
+  expect(Object.keys(MISSION_APPROACH_M).sort()).toEqual([...sites.landmarks].sort());
+  expect(MISSION_APPROACH_M).toEqual({
+    titanic: 220,
+    'challenger-deep': 200,
+    'lost-city': 220,
+    'monterey-canyon': 240,
+    endurance: 180,
+    'axial-seamount-ashes': 180,
+    'hudson-canyon': 160,
+    kamaehuakanaloa: 200,
+    'beebe-vent-field': 220,
+    'great-blue-hole': 150,
+    bismarck: 150,
+    'hunga-tonga-caldera': 160,
+    'blake-plateau-corals': 160,
+  });
+});
+
+for (const site of sites.landmarks) {
   for (const tier of ['low', 'medium', 'high'] as const) {
     it(`${site} ${tier}: first primary has a clear, hull-safe approach and visible navigation`, async () => {
       const config = makeConfig();
@@ -82,6 +104,7 @@ for (const site of Object.keys(MISSION_APPROACH_M)) {
           const scanRadius =
             missionApproachScanRadius(site, target.radius) * sensors.scanRadiusMultiplier;
           expect(range).toBeGreaterThan(scanRadius);
+          expect(range - scanRadius).toBeGreaterThanOrEqual(60 - 0.01);
           expect(range).toBeLessThan(sensors.sonarPoiRange);
         }
         const radius = missionApproachScanRadius(site, target.radius);

@@ -73,6 +73,10 @@ it('textured steel shares the plate layer across tiers without adding GPU resour
       );
       expect(shader.vertexShader).toBe(THREE.ShaderLib.standard.vertexShader);
       expect(shader.uniforms).toEqual(uniforms);
+      const declarations = (source: string) => source.match(/\buniform\s+[^;]+;/g);
+      expect(declarations(shader.fragmentShader)).toEqual(
+        declarations(THREE.ShaderLib.standard.fragmentShader),
+      );
       // The layer changes diffuse colour; all standard normal, roughness, light,
       // fog and output chunks must survive, and texture-fetch count stays fixed.
       const chunks = (source: string) => source.match(/#include <[^>]+>/g);
@@ -96,6 +100,39 @@ it('textured steel shares the plate layer across tiers without adding GPU resour
     maps.mockRestore();
     map.dispose();
     normal.dispose();
+  }
+});
+
+it('steel without canvas maps retains the standard shader at every tier', async () => {
+  vi.resetModules();
+  const wreckTextures = await import('../../src/world/props/wrecks/textures.js');
+  const maps = vi.spyOn(wreckTextures, 'steelMaps').mockReturnValue(null);
+  const { steelMaterial } = await import('../../src/world/props/wrecks/materials.js');
+  try {
+    for (const tier of TIERS) {
+      const material = steelMaterial(wreckDetail(tier));
+      expect(material.map).toBeNull();
+      expect(material.normalMap).toBeNull();
+      const shader = {
+        ...THREE.ShaderLib.standard,
+        uniforms: { ...THREE.ShaderLib.standard.uniforms },
+      };
+      material.onBeforeCompile(
+        shader as Parameters<typeof material.onBeforeCompile>[0],
+        {} as THREE.WebGLRenderer,
+      );
+      expect(shader.fragmentShader).toBe(THREE.ShaderLib.standard.fragmentShader);
+      expect(shader.vertexShader).toBe(THREE.ShaderLib.standard.vertexShader);
+      expect(shader.uniforms).toEqual(THREE.ShaderLib.standard.uniforms);
+      expect(material.customProgramCacheKey()).not.toBe('wreck-steel-plates');
+    }
+    expect(maps.mock.calls).toEqual([
+      [256, false],
+      [512, false],
+      [512, true],
+    ]);
+  } finally {
+    maps.mockRestore();
   }
 });
 

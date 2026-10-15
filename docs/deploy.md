@@ -9,14 +9,15 @@ repository owner does the one-time setup below.
 ## 1. Continuous integration (`.github/workflows/ci.yml`)
 
 Runs on every push to `main` and every pull request targeting `main`. A newer
-push to the same branch or PR cancels the older run (`concurrency`). Jobs use
+push to a PR cancels its older run (`concurrency`); main runs finish so each
+merge has a completed result to inspect. Jobs use
 `ubuntu-latest` with Node 22 and npm caching:
 
 | Job                     | Gates                                                                                  | Job limit        |
 | ----------------------- | -------------------------------------------------------------------------------------- | ---------------- |
 | Build and static checks | Python tests, strict mission content, one typecheck, unit tests, attribution, Prettier | 15 min           |
 | Builds (two bases)      | One Vite build each for `/` and `/submarine-explorer/`, manifest and artifact upload   | 15 min per base  |
-| E2e (30 shards)         | Download/validate root artifact, Chromium install, balanced full Playwright suite      | 30 min per shard |
+| E2e (38 shards)         | Download/validate root artifact, Chromium install, balanced full Playwright suite      | 30 min per shard |
 | Project-base            | Download/validate project-base artifact, Chromium install, all eight base cases        | 15 min           |
 
 Both browser consumers depend on the completed build matrix; static checks run
@@ -32,7 +33,8 @@ or typecheck, and a failed producer prevents dependent browser jobs from running
 
 GitHub runners have no GPU, so Chromium renders WebGL on SwiftShader. Each
 shard retains one browser worker, CI's low-tier preference, existing per-test
-limits and one retry. `--fully-parallel` enables test-level sharding even for
+limits and zero hosted retries (the workflow overrides Playwright's CI default).
+`--fully-parallel` enables test-level sharding even for
 large files; one worker still executes tests sequentially on each runner.
 The shard denominator is derived from the matrix size. Root E2e has a 25-minute
 suite budget and finishes the shard after test failures; `fail-fast: false`
@@ -43,7 +45,7 @@ separate project-base check (eight-minute suite budget).
 Chromium is cached by OS, architecture and lockfile hash. Every browser job
 runs `tools/install-playwright-chromium.sh` even on cache hits to ensure OS
 dependencies, with three bounded attempts, back-off and an eight-minute step
-limit. Failure screenshots, reports and retry traces are uploaded for 14 days;
+limit. Failure screenshots and reports are uploaded for 14 days;
 all shards upload their JSON timings. The tiles are committed, so game data
 needs no network access. Hosted queue, artifact-transfer and dependency delays
 still require measurement before claiming wall-time savings.
@@ -61,12 +63,13 @@ outputs and retain them without rebuilding.
 For routine local work, `PW_PORT=4197 bash tools/gates.sh` runs every static
 gate plus the existing `smoke.spec.ts` (home shell, Titanic and Monterey Canyon
 rendering/error checks) and the separate project-base browser check. With no
-`SMOKE_TILE` override this schedules four browser cases instead of repeating
+`SMOKE_TILE` override this schedules three root smoke cases plus eight
+project-base cases instead of repeating
 the entire suite for every concurrent task. It keeps owned preview servers and failure
 propagation; builds and browser artifacts go under `.cache/runs/<id>/`, which
 `tools/clean-artifacts.sh` prunes. This is a
 smoke pass; the full suite remains required in CI. No test or assertion is
-removed, and the 30-shard CI workflow and `npm run ci` retain full discovery.
+removed, and the 38-shard CI workflow and `npm run ci` retain full discovery.
 
 Use `PW_PORT=4197 bash tools/gates.sh --full-e2e` for the full local gate set,
 including before a release push (Pages deploy does not wait for CI).
