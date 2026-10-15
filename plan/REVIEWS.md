@@ -2,6 +2,16 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-15 targeted review: CI red on main for 3 runs
+
+**Trigger:** hosted CI failed on the last three pushes (38742636827, 38746684662, 38753754222).
+
+**Diagnosis:** the same spec each time, `journal-debrief.spec.ts` "frozen debrief and resume" (all 3 sites, both viewports, 5-6 shards). Codex 2070 (S-bughunt-6) made the first frame after a resume carry zero clock time (`resumeFrame` in `loop.ts`), so the spec's single `fastForward(250)` no longer ticked `elapsed`. The game behaviour is intended; the spec expectation was stale. Local gates missed it because smoke runs no full e2e. Second failure, in the latest run only: `hud-touch.spec.ts` monterey-canyon animal hint hit the 240 s timeout inside the new bounded wait loop (2080). It passes in 1.7 s locally, so it is probably a one-off CI stall; if it recurs, make the loop step by 1000 ms.
+
+**Fix:** the spec now advances two 250 ms steps (resume frame, then a ticking frame). Local spec passes; `tools/gates.sh` green. Hosted CI will confirm; no tag until it is green.
+
+**Process:** a Codex package that changes timing semantics should run the specs that mention the clock (`FULL_E2E=1` in its brief env line) before merging.
+
 ## 2026-10-15 pm comprehensive review, Claude alone (golden 2026-10-15-093704)
 
 Sol was skipped again (Codex 5h at 6%, `codex-review.sh` exit 75). Scores are mine and provisional.
