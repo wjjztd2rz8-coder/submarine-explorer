@@ -148,7 +148,6 @@
     "f-endurance-1180.spec.ts › Endurance high: hull-close lighting stays finite and horizon renders": 27.2,
     "f-endurance-1180.spec.ts › Endurance low: hull-close lighting stays finite and horizon renders": 5.4,
     "f-endurance-1180.spec.ts › Endurance medium: hull-close lighting stays finite and horizon renders": 9,
-    "f-endurance-1180.spec.ts › Endurance ultra: hull-close lighting stays finite and horizon renders": 28.3,
     "f-fidelity-rollout.spec.ts › great-blue-hole Medium desktop: every golden pose stays below 900k rendered triangles": 491,
     "f-fidelity-rollout.spec.ts › great-blue-hole Medium desktop: karst-grotto-2 stays below 900k rendered triangles": 149.3,
     "f-fidelity-rollout.spec.ts › great-blue-hole Medium desktop: karst-grotto-3 stays below 900k rendered triangles": 100.9,

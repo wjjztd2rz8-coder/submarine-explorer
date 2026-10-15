@@ -3,7 +3,7 @@
  * Every species lined up on a seabed with name labels, lit like a dive
  * (dark water, warm-white spotlight). Query: `?ids=a,b,c` to pick species,
  * `?real=1` for true size (default: each scaled to fit a 2.4 m cell),
- * `?tier=low|medium|high|ultra`, `?bg=day|deep`, `?cols=6`.
+ * `?tier=low|medium|high`, `?bg=day|deep`, `?cols=6`.
  * `window.__preview.focus(id)` frames one species for screenshots.
  */
 

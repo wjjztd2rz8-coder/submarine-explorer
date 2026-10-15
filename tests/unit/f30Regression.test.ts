@@ -57,7 +57,7 @@ it('880: a queued Journal key opens only when a frame samples it and does not to
   expect(guide.isOpen).toBe(true);
 });
 
-for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+for (const tier of ['low', 'medium', 'high'] as const) {
   it(`880 Monterey ${tier}: cubic reconstruction retains the canyon carve at survey knots`, () => {
     const cfg = makeConfig();
     const meta = json('data/tiles/monterey-canyon/meta.json') as TileMeta;

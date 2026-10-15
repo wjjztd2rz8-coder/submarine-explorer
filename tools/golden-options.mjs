@@ -6,7 +6,7 @@ export function goldenOptions(env = process.env) {
   const mode = env.GOLDEN_MODE ?? 'free-dive';
   if (!['free-dive', 'mission'].includes(mode)) throw new Error(`Unknown GOLDEN_MODE: ${mode}`);
   const tier = env.GOLDEN_TIER ?? 'high';
-  if (!['low', 'medium', 'high', 'ultra'].includes(tier))
+  if (!['low', 'medium', 'high'].includes(tier))
     throw new Error(`Unknown GOLDEN_TIER: ${tier}`);
   const sizes = { desktop: [1600, 900], portrait: [390, 844], landscape: [844, 390] };
   const layouts = (

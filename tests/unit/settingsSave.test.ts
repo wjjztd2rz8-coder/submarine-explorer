@@ -58,7 +58,7 @@ describe('settings defaults and migrate', () => {
     const fresh = new Save({ config, storage: new MemoryStore() });
     expect(fresh.get().graphicsTier).toBe('auto');
     for (const version of [1, 2]) {
-      for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+      for (const tier of ['low', 'medium', 'high'] as const) {
         const store = new MemoryStore();
         store.setItem(
           version === 1 ? 'subexplorer.settings.v1' : SETTINGS_STORAGE_KEY,
@@ -72,8 +72,10 @@ describe('settings defaults and migrate', () => {
     }
   });
 
-  it('keeps saved tiers from before quality tiers v2 and accepts auto and ultra', () => {
-    for (const tier of ['low', 'medium', 'high', 'ultra', 'auto'] as const) {
+  it('keeps saved tiers from before quality tiers v2 and accepts auto', () => {
+    // The removed Ultra tier migrates to High.
+    expect(migrate({ version: 3, graphicsTier: 'ultra' }, config).graphicsTier).toBe('high');
+    for (const tier of ['low', 'medium', 'high', 'auto'] as const) {
       expect(migrate({ version: 1, graphicsTier: tier }, config).graphicsTier).toBe(tier);
     }
   });

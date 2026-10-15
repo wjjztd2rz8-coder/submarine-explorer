@@ -1,8 +1,7 @@
 /**
  * Per-quality-tier detail for the wrecks. Everything a phone cannot afford is
  * scaled here: rusticle and sessile-life counts, railings, small debris, texture
- * resolution and the normal map. Unknown tiers (for example a future `ultra`
- * before this table learns it) fall back to `high`.
+ * resolution and the normal map. Unknown tiers fall back to `high`.
  */
 
 export interface WreckDetail {
@@ -59,17 +58,6 @@ export const WRECK_DETAIL: Record<string, WreckDetail> = {
     normalMap: true,
     nearLodM: 110,
     meshDensity: 1,
-  },
-  ultra: {
-    growth: 1.6,
-    railings: true,
-    openings: true,
-    debrisDensity: 1.4,
-    smallDebris: true,
-    textureSize: 1024,
-    normalMap: true,
-    nearLodM: 160,
-    meshDensity: 1.25,
   },
 };
 

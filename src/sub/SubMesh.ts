@@ -33,7 +33,7 @@ export interface SubMeshOptions {
   length?: number;
   /** `Config.submarine.hullClasses` key: A coastal, B deep ocean, C full ocean depth. */
   hullClass?: string;
-  /** Graphics tier (`low` | `medium` | `high` | `ultra`). */
+  /** Graphics tier (`low` | `medium` | `high`). */
   tier?: string;
   cosmetics?: CosmeticSelection;
   /**

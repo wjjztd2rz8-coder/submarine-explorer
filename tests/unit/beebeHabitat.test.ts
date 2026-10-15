@@ -20,7 +20,7 @@ const build = (tier: string, def = defs[0]!) =>
   });
 
 describe('850 Beebe sediment and cooler vent margins', () => {
-  for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+  for (const tier of ['low', 'medium', 'high'] as const) {
     it(`${tier}: adds attached clumps and broken chimney rubble to every smoker, within a small budget`, () => {
       for (const def of defs) {
         const built = build(tier, def);
@@ -32,7 +32,7 @@ describe('850 Beebe sediment and cooler vent margins', () => {
         expect(habitat.userData.rubble).toBeGreaterThan(0);
         expect(countGeo(habitat).draws).toBe(1);
         expect(countGeo(habitat).triangles).toBeLessThan(
-          tier === 'low' ? 1600 : tier === 'ultra' ? 30000 : 16000,
+          tier === 'low' ? 1600 : 16000,
         );
         expect((habitat.material as THREE.MeshStandardMaterial).emissive.getHex()).toBe(0);
         expect(built.bounds.containsBox(new THREE.Box3().setFromObject(habitat))).toBe(true);

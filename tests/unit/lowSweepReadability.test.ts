@@ -37,7 +37,7 @@ test('Low seabed lighting is isolated to the six observed dark sites and leaves 
       expect(sample.fogDensity).toBe(base.fogDensity);
       expect(sample.sunIntensity).toBe(base.sunIntensity);
     }
-    for (const tier of ['medium', 'high', 'ultra'] as const)
+    for (const tier of ['medium', 'high'] as const)
       expect(lowSiteWater(site, tier, water)).toBe(water);
   }
   for (const site of [

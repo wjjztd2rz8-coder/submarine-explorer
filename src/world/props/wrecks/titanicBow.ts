@@ -670,21 +670,6 @@ export function buildTitanicBow(
     hangRusticle(rust, p, 0.3 + rnd() * 1.1, rnd, HEAVY_RUSTICLES);
   }
   rust.thin(detail.growth);
-  if (detail.growth > 1) {
-    // Ultra: a second pass of short ones along the boat-deck edges.
-    for (const side of [-1, 1] as const) {
-      rusticlesAlong(
-        rust,
-        edgePath(spec, T.wellEnd, T.tornStart, 1, bY, side, -0.05),
-        detail.growth - 1,
-        0.2,
-        0.6,
-        rnd,
-        v3(side, 0, 0),
-        HEAVY_RUSTICLES,
-      );
-    }
-  }
   const rm = makeInstanced(rusticleGeometry(), growthMaterial(), rust, 'titanic-bow-rusticles');
   if (rm) near.push(rm);
 

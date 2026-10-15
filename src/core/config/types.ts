@@ -38,7 +38,7 @@ export interface GameConfig {
    * Default graphics setting for new players: a fixed tier, or `auto`
    * (detected at boot by `core/Quality.ts`). `medium` keeps the pre-Phase-F
    * default; switching the default to `auto` is a Phase F follow-up once the
-   * tiers are tuned. Override at runtime with `?tier=low|medium|high|ultra|auto`.
+   * tiers are tuned. Override at runtime with `?tier=low|medium|high|auto`.
    */
   graphicsTier: GraphicsTierSetting;
   submarine: SubmarineConfig;

@@ -33,7 +33,7 @@ function release(built: ReturnType<typeof build>): void {
 }
 
 describe('merged Challenger lander', () => {
-  for (const tier of ['low', 'medium', 'high', 'ultra']) {
+  for (const tier of ['low', 'medium', 'high']) {
     it(`${tier}: three opaque draw calls, bounded triangles and finite vertex tint`, () => {
       const built = build(tier);
       try {

@@ -93,7 +93,7 @@ it('F-1080: confines chimney detail to Beebe while retaining collision and vent 
   const cfg = makeConfig();
   const defs = parsePropsDoc(beebeDoc, cfg.props).props;
   const evidence: Record<string, unknown> = {};
-  for (const tier of ['low', 'medium', 'high', 'ultra']) {
+  for (const tier of ['low', 'medium', 'high']) {
     evidence[tier] = defs.map((def) => {
       const built = VENT_BUILDERS.chimney({
         def,

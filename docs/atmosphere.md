@@ -52,7 +52,7 @@ Spawn at a depth with `?depth=<metres>`; it is clamped 40 m above the seabed.
 GPU point field of `snowCount` particles in a `snowBoxM` cube that wraps around
 the camera; density and drift per band. Permanent flakes use `snowSizeM` (0.08 m),
 `snowOpacity` (0.24), and `snowLampGain` (0.8 extra linear brightness in the lamp
-cone). The budgets are 300/1,200/3,000/3,000 for Low/Medium/High/Ultra; one draw
+cone). The budgets are 300/1,200/3,000 for Low/Medium/High; one draw
 with GPU drift and no per-frame particle uploads on every tier.
 
 Readability guard: within `snowForegroundM` (6 m radial distance from the camera),
@@ -84,9 +84,9 @@ Regression coverage:
 
 ## Post pass
 
-`UnderwaterPass` (`src/shaders/underwater.ts`) renders the scene into a half-float target with a depth texture (4x MSAA on high and ultra), then:
+`UnderwaterPass` (`src/shaders/underwater.ts`) renders the scene into a half-float target with a depth texture (4x MSAA on high), then:
 
-1. **Bloom**: soft-knee bright pass into a quarter-resolution target, two separable blurs, and on high/ultra an eighth-resolution second level. Added in linear light before tone mapping.
+1. **Bloom**: soft-knee bright pass into a quarter-resolution target, two separable blurs, and on high an eighth-resolution second level. Added in linear light before tone mapping.
 2. **Composite** in one full-screen shader: slow UV wobble (fades with depth); chromatic fringing toward the frame edge; **view-direction scattering** (the water is brighter looking up, darker looking down, weighted by the fog fraction rebuilt from the depth texture so the far terrain still melts into the open-water colour); **god rays** (noise around the sun axis, 1 or 2 octaves by tier, strongest in the top tens of metres, `godRayStrength()` in `app/systems/render.ts`); bloom; the per-band grade (gain, tint, saturation), warm highlights over blue-green shadows while sunlit; a highlight shoulder so lamp pools keep detail; the **readability floor** (a faint lift in the fog hue on the darkest pixels); vignette; ACES and sRGB; a hair of dither.
 
 **Colour pipeline.** The scene renders into a linear **half-float** target, and Three skips tone mapping and output encoding for render targets. The pass therefore ends with `#include <tonemapping_fragment>` and `<colorspace_fragment>`: ACES with `toneMappingExposure`, then sRGB, applied once on the way to the screen.
@@ -108,7 +108,6 @@ Regression coverage:
 | low    | no   | 0            | 0               | 0    | 300  | 0           | 0 (plain)   |
 | medium | yes  | 1            | 1               | 0    | 1200 | 128         | 1           |
 | high   | yes  | 2            | 2               | 4    | 3000 | 256         | 2           |
-| ultra  | yes  | 2            | 2               | 4    | 3000 | 256         | 2           |
 
 ## Follow-ups
 

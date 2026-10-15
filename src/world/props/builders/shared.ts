@@ -113,7 +113,7 @@ export interface ProceduralBuildInput {
   /** Stable seed from the prop id (`hashString`). */
   seed: number;
   cfg: PropsConfig;
-  /** Graphics tier (`low` / `medium` / `high` / `ultra`); detail budgets key off it. */
+  /** Graphics tier (`low` / `medium` / `high`); detail budgets key off it. */
   tier: string;
   /**
    * Terrain-following in the prop's local frame (local x, z -> ground Y), or

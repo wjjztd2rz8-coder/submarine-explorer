@@ -55,7 +55,7 @@ describe('Lost City carbonate surface', () => {
       }
     }
     vi.stubGlobal('Image', ImageStub);
-    for (const tier of ['low', 'medium', 'high', 'ultra']) {
+    for (const tier of ['low', 'medium', 'high']) {
       pending.length = 0;
       const material = createLostCityCarbonateMaterial(tier);
       const uniforms = material.userData.uniforms;

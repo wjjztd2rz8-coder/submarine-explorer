@@ -3,7 +3,7 @@
  * /preview/vehicles.html. Query parameters:
  *
  *   ?v=A|B|C|all   vehicle (default B; `all` lines up the three hulls)
- *   &tier=low|medium|high|ultra
+ *   &tier=low|medium|high
  *   &scan=1            deploy the manipulators
  *   &az=<deg>&el=<deg>&dist=<m>   fixed camera instead of the slow orbit
  *   &cockpit=1         the first-person cockpit viewport over a seabed
@@ -90,7 +90,7 @@ window.addEventListener('keydown', (e) => {
     which = map[e.key]!;
     build();
   } else if (e.key === 'l') {
-    const tiers = ['low', 'medium', 'high', 'ultra'];
+    const tiers = ['low', 'medium', 'high'];
     tier = tiers[(tiers.indexOf(tier) + 1) % tiers.length]!;
     build();
   } else if (e.key === 's') scanning = !scanning;

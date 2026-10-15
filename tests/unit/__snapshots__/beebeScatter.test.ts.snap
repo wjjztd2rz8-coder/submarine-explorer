@@ -80,32 +80,6 @@ exports[`1130: Beebe rocks darken and fracture in the same three draws with iden
       "triangles": 80,
     },
   ],
-  "ultra": [
-    {
-      "color": "a740d4c90b61cf7a7aabc449471681230a0b104a07fba97b8f48f184a2f11d09",
-      "instances": 1590,
-      "name": "scatter:pillow",
-      "normal": "9cbe9a8cb7c066373cf323d612f65fe001fc2a755951a82714ed8376fe26b235",
-      "position": "d9bb52631e9d95ee617ecd5d11eb2b688908ea1beb1d1a260bed619a0211202e",
-      "triangles": 80,
-    },
-    {
-      "color": "ca45c2c3fdb55dfc7ae8398397d1a90c0f1d1e4fcbef6d3ab6559a129c735437",
-      "instances": 360,
-      "name": "scatter:rubble",
-      "normal": "d88d88bd99f912677e30cbab04b02182f4ee1d687d8ae906b8436ff6341663dc",
-      "position": "8643d4b2ae87c4e6024b141fca654b480c06a2e37f386c42554e37b7e66b3079",
-      "triangles": 20,
-    },
-    {
-      "color": "e06d08ccd357fc1b36307593b6bae2c909b5f281ed5bc7c5c3907fc45fc210c3",
-      "instances": 246,
-      "name": "scatter:boulder",
-      "normal": "ef78f942cb8c51e7bf842eb05d5a710de755809e4ddd0397232de6f5b3e1ad2e",
-      "position": "50a1114643ee83ca8124096df9d2488c165b40204be90f0268ae326cfcb0129c",
-      "triangles": 80,
-    },
-  ],
 }
 `;
 

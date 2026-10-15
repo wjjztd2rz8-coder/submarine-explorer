@@ -50,11 +50,11 @@ Survey cells are 45–61 m on our GMRT tiles (450 m where GEBCO fills). At a few
 
 ## Monterey fidelity profile (810)
 
-`terrain.fidelity['monterey-canyon']` opts Medium/High/Ultra into a local mesh
+`terrain.fidelity['monterey-canyon']` opts Medium/High into a local mesh
 profile around the opening canyon ledge. Low and all other sites retain their
 existing buffers and shading. Within a 1,400 m focus radius plus a 450 m fade,
 four survey chunks are split into 16-cell patches. Near patches use 4 subdivisions
-on Medium and 8 on High/Ultra; distant chunks keep the budget-fitted 2 subdivisions
+on Medium and 8 on High; distant chunks keep the budget-fitted 2 subdivisions
 and 64-cell footprint. Local upgrades account for skirts and duplicate edges in
 the resident vertex budget. `stats.subdivisionCounts` reports the actual allocation;
 `subdiv` and `requestedSubdiv` continue to report the distant base mesh.

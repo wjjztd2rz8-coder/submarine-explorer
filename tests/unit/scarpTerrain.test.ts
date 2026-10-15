@@ -15,7 +15,7 @@ import type { BuiltProp } from '../../src/world/props/geo/shared.js';
 import type { PropDef } from '../../src/world/PropLoader.js';
 
 describe('Monterey wall anchors on the real sloping tile', () => {
-  it.each(['low', 'medium', 'high', 'ultra'] as const)(
+  it.each(['low', 'medium', 'high'] as const)(
     '%s: every instance clears the seabed and exposed growth keeps its requested counts',
     async (tier) => {
       const meta = JSON.parse(
@@ -162,7 +162,7 @@ function scarpObservations(built: BuiltProp) {
 }
 
 const scarpKinds: ScarpPresetId[] = ['tuff', 'canyon', 'hadal'];
-const scarpTiers = ['low', 'medium', 'high', 'ultra'] as const;
+const scarpTiers = ['low', 'medium', 'high'] as const;
 const slope = (x: number, z: number) => 0.045 * x + 0.025 * z;
 
 // Each digest combines a small flat, unsnapped wall (seed 42) and a larger
@@ -186,12 +186,6 @@ const scarpBaseline: Record<string, string[]> = {
     'd9b5179cf5fa338c3f0ef468096ece4376a72afd4df38ae85b33621b6841214e',
     '4d8e50adb9da01413cdb925e189b066d407a6aef77708b2da1024478051429c4',
   ],
-  'tuff-ultra': [
-    '4ba21842ed2da7d0f72cad6bccaf03a082644f22d5b7ab56096289c5299a40b2',
-    '4dff5edb487e6b5716d798399dc02436e6d4a39240a0b4c0ed409c969f8f1c47',
-    'd9b5179cf5fa338c3f0ef468096ece4376a72afd4df38ae85b33621b6841214e',
-    'f1648f65d53f34171bece5a0a69c1f61cb8b2a21049188faa9c9233f0b5612a4',
-  ],
   'canyon-low': [
     '49fb77c72c521fe20771a6d570ca37d8e8d81cd50f9756c8740bcd72382747ee',
     'f2a610d7d3a9f202b7fa35be81b8f0ccb67638256327807cfb080cc2ff4bc346',
@@ -210,12 +204,6 @@ const scarpBaseline: Record<string, string[]> = {
     'c799bedaae7fffa61896021f4d01c9ebbd7fa5bdbd2da46c29ce61da779944f8',
     'b31c55238f554318f9d498ff0122f4e84671d17e4f3ded786871c6aff785d727',
   ],
-  'canyon-ultra': [
-    'a441f856e2c2c52f5aab1d39f719555491ea2d4838f8d80bd786834df3f13fe8',
-    '7c1689d36cbe8aa45f0200a97d59587ae2a7e16b719f2dcc5fcc5ab1bcabd4c6',
-    'c799bedaae7fffa61896021f4d01c9ebbd7fa5bdbd2da46c29ce61da779944f8',
-    '472c6e72930e2a3011ee7b4a1437a6dff003a6e4f1ae356d0373bcada30ca319',
-  ],
   'hadal-low': [
     'a71578ade963941be6625523d7665e0a3c4bdc5973923acd50e141e6cc2c3087',
     'acf440dfd5b22af1084fa1315766c7540efca512411b1027f0f5013bb7eb55a9',
@@ -233,12 +221,6 @@ const scarpBaseline: Record<string, string[]> = {
     '9f8492eeb54d9689cddf82a640957c848c5a783558b922bd9a301712be17b805',
     'a2b8093d4198d54331faa284d0f3a6f4e00f03c6d4ec334b1a50ac43d6b07c8a',
     '0c62feb8e5bf6bfa6b8e8d84383b9c2f0bc056fab60047e0a140466a500001f1',
-  ],
-  'hadal-ultra': [
-    '5064425cb79bb78e0f89e6103edb1b9ae66b9376884c96f89544541e0d284747',
-    '78e0b37cc2983edb1ffdfd1effa90cd70204bfca371826821e262b16c04bfe01',
-    'a2b8093d4198d54331faa284d0f3a6f4e00f03c6d4ec334b1a50ac43d6b07c8a',
-    'c1cf88db6c1394de2a9892d732c7288d71fd5d02441fffe1572ecc20980d410b',
   ],
 };
 

@@ -50,7 +50,7 @@ async function main() {
   const args = process.argv.slice(2);
   if (args.includes('--help') || args.includes('-h')) {
     console.log(
-      'Usage: node tools/golden-shots.mjs [base-url | --base-url URL] (default http://localhost:4173/)\nEnv: GOLDEN_TIER=low|medium|high|ultra, GOLDEN_LAYOUTS=desktop,portrait,landscape, GOLDEN_SITES=all|site,..., GOLDEN_MODE=free-dive|mission',
+      'Usage: node tools/golden-shots.mjs [base-url | --base-url URL] (default http://localhost:4173/)\nEnv: GOLDEN_TIER=low|medium|high, GOLDEN_LAYOUTS=desktop,portrait,landscape, GOLDEN_SITES=all|site,..., GOLDEN_MODE=free-dive|mission',
     );
     return;
   }

@@ -112,13 +112,13 @@ export interface TerrainFidelity {
 export const MONTEREY_FIDELITY: TerrainFidelity = {
   focus: { lat: 36.7872, lon: -122.0133, radiusM: 1400, fadeM: 450 },
   chunkCells: 16,
-  nearSubdiv: { low: 1, medium: 4, high: 8, ultra: 8 },
+  nearSubdiv: { low: 1, medium: 4, high: 8 },
   reliefM: 1.2,
   reliefWavelengthM: 48,
   normalStrength: 0.24,
   // Medium reserves frame geometry for the sub, swimming life and scatter even when all
   // four canyon banks are in view. Keep the old vertical resolution and refine the hero face.
-  wallSegments: { low: [220, 150], medium: [230, 150], high: [520, 280], ultra: [640, 320] },
+  wallSegments: { low: [220, 150], medium: [230, 150], high: [520, 280] },
 };
 
 export const LOST_CITY_FIDELITY: TerrainFidelity = {
@@ -127,7 +127,7 @@ export const LOST_CITY_FIDELITY: TerrainFidelity = {
   // inside the dense envelope, with rounded relief on the carbonate massif.
   focus: { lat: 30.124, lon: -42.1195, radiusM: 650, fadeM: 250 },
   chunkCells: 16,
-  nearSubdiv: { low: 1, medium: 4, high: 8, ultra: 8 },
+  nearSubdiv: { low: 1, medium: 4, high: 8 },
   reliefM: 1.8,
   reliefWavelengthM: 36,
   // Parallel sine beds and z-stretched rills read as stretched stripes on the slope.
@@ -146,11 +146,11 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
       resolveLow: true,
       focus: { lat: 17.3156, lon: -87.5356, radiusM: 240, fadeM: 60 },
       chunkCells: 8,
-      nearSubdiv: { low: 16, medium: 16, high: 32, ultra: 32 },
+      nearSubdiv: { low: 16, medium: 16, high: 32 },
       reliefM: 0,
       reliefWavelengthM: 24,
       normalStrength: 0.18,
-      wallSegments: { low: [200, 140], medium: [200, 140], high: [200, 140], ultra: [200, 140] },
+      wallSegments: { low: [200, 140], medium: [200, 140], high: [200, 140] },
     },
   },
   // 64 source cells x subdiv 2 = a 129x129 vertex chunk, which still fits in
@@ -234,16 +234,6 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
       textureBreakup: true,
       scatterDensity: 1,
       scatterRangeM: 220,
-    },
-    ultra: {
-      detailSubdiv: 3,
-      detailOctaves: 4,
-      textureSize: 1024,
-      lodDistanceScale: 1.8,
-      pbrNormals: true,
-      textureBreakup: true,
-      scatterDensity: 1.8,
-      scatterRangeM: 320,
     },
   },
 };

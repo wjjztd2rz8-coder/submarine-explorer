@@ -28,8 +28,7 @@ jobs:
       # golden.sh supplies a root URL; perf-budget does not resolve a project base.
       VITE_BASE: /
       DIAGNOSTICS_DIR: .cache/render-nightly/${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
-      # src/core/config/quality.ts: keep Ultra until S-tiers merges its migration.
-      PERF_TIERS: low,medium,high,ultra
+      PERF_TIERS: low,medium,high
       # src/game/Cosmetics.ts HERO_SITES, rather than the seven-site review table.
       PERF_SITES: titanic,lost-city,great-blue-hole,beebe-vent-field,monterey-canyon
     steps:

@@ -20,7 +20,6 @@
  *   5. A discrete desktop GPU (GeForce/RTX/Quadro, Radeon RX/Pro, Intel Arc,
  *      Apple M-series Pro/Max/Ultra) -> high.
  *   6. Old Intel HD graphics -> low; other integrated or unknown GPUs -> medium.
- * `ultra` is never picked automatically; players choose it.
  */
 
 import {

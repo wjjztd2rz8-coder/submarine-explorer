@@ -568,11 +568,6 @@ const DIVE_PARTICLE_BASELINES = [
     '53506cfb50c6d9c637a1bc7697536c97c422ea3708475e2ac35b55d66270a09d',
     '9f4cf6576d318d0b889bb971eefef3f1f7616cc318704432e919a130c1c26cac',
   ],
-  [
-    'ultra',
-    '53506cfb50c6d9c637a1bc7697536c97c422ea3708475e2ac35b55d66270a09d',
-    '9f4cf6576d318d0b889bb971eefef3f1f7616cc318704432e919a130c1c26cac',
-  ],
 ] as const;
 
 describe('MarineSnow shared field ownership and deterministic buffers', () => {

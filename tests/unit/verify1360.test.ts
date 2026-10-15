@@ -22,7 +22,7 @@ afterAll(() => {
     writeFileSync('.cache/1360/geometry.json', JSON.stringify(evidence, null, 2) + '\n');
 });
 
-function terrainFor(site: string, tier: 'low' | 'ultra') {
+function terrainFor(site: string, tier: 'low' | 'high') {
   const config = makeConfig();
   const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;
   const bytes = readFileSync(`data/tiles/${site}/heightmap.bin`);
@@ -70,7 +70,7 @@ function surfacesCross(a: THREE.Mesh, b: THREE.Object3D): boolean {
   return false;
 }
 
-for (const tier of ['low', 'ultra'] as const) {
+for (const tier of ['low', 'high'] as const) {
   it(`1360 Blue Hole ${tier}: audit actual apron triangles and contacts`, async () => {
     const config = makeConfig();
     const terrain = terrainFor('great-blue-hole', tier);

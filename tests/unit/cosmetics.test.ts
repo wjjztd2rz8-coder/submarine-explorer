@@ -248,7 +248,7 @@ describe('cosmetic save migration and gameplay isolation', () => {
 });
 
 describe('sub cosmetic materials', () => {
-  it.each(['low', 'medium', 'high', 'ultra'])(
+  it.each(['low', 'medium', 'high'])(
     'applies at %s quality without changing geometry or budgets, survives hull swaps and resets',
     (tier) => {
       const mesh = new SubMesh({ tier, hullClass: 'A' });

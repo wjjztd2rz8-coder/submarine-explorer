@@ -7,14 +7,13 @@
 /**
  * Graphics quality tier. `medium` is the floor we hold 60 fps at 1080p on
  * (Apple M-series); `high` targets a discrete desktop GPU; `low` is the
- * integrated-Intel and phone escape hatch. `ultra` starts as `high` with a
- * higher pixel-ratio cap; Phase F packages add to it. See docs/terrain.md and
+ * integrated-Intel and phone escape hatch. See docs/terrain.md and
  * plan/DECISIONS.md.
  */
-export type GraphicsTier = 'low' | 'medium' | 'high' | 'ultra';
+export type GraphicsTier = 'low' | 'medium' | 'high';
 
 /** Every tier, lowest first. */
-export const GRAPHICS_TIERS: readonly GraphicsTier[] = ['low', 'medium', 'high', 'ultra'];
+export const GRAPHICS_TIERS: readonly GraphicsTier[] = ['low', 'medium', 'high'];
 
 /** The saved setting: a fixed tier, or `auto` (detected at boot, `core/Quality.ts`). */
 export type GraphicsTierSetting = GraphicsTier | 'auto';
@@ -58,11 +57,9 @@ export interface QualityConfig {
 
 export const DEFAULT_QUALITY: QualityConfig = {
   tiers: {
-    // low..high keep the pre-Phase-F cap of 2 so their look is unchanged.
     low: { maxPixelRatio: 2 },
     medium: { maxPixelRatio: 2 },
     high: { maxPixelRatio: 2 },
-    ultra: { maxPixelRatio: 3 },
   },
   dynamicResolution: {
     budgetMs: 1000 / 55,

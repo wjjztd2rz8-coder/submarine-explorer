@@ -100,7 +100,7 @@ export async function boot(): Promise<BootContext | null> {
     antialias: true,
     powerPreference: 'high-performance',
   });
-  // Quality tiers v2: `?tier=low|medium|high|ultra` beats the saved setting,
+  // Quality tiers v2: `?tier=low|medium|high` beats the saved setting,
   // and `auto` (the default) detects from the GPU and device (core/Quality.ts).
   const quality = resolveQuality(
     params.get('tier'),

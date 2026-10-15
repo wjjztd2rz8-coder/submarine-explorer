@@ -163,7 +163,7 @@ for (const id of [...WRECK_HULLS, ...WRECK_SCATTERS]) sel.add(new Option(id, id)
 sel.value = wreckId;
 sel.onchange = () => show(sel.value as WreckId);
 const tierSel = document.getElementById('tier') as HTMLSelectElement;
-for (const t of ['low', 'medium', 'high', 'ultra']) tierSel.add(new Option(t, t));
+for (const t of ['low', 'medium', 'high']) tierSel.add(new Option(t, t));
 tierSel.value = tier;
 tierSel.onchange = () => show(wreckId, tierSel.value);
 const lodSel = document.getElementById('lod') as HTMLSelectElement;

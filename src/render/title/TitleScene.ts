@@ -73,12 +73,11 @@ export const TITLE_SHOT = {
   maxFps: 30,
   maxDt: 0.1,
   fallbackColor: 0x06131f,
-  snowCount: { low: 200, medium: 600, high: 600, ultra: 600 } as Record<TitleTier, number>,
+  snowCount: { low: 200, medium: 600, high: 600 } as Record<TitleTier, number>,
   budgets: {
     low: { calls: 35, triangles: 100_000 },
     medium: { calls: 60, triangles: 200_000 },
     high: { calls: 60, triangles: 200_000 },
-    ultra: { calls: 60, triangles: 200_000 },
   } as Record<TitleTier, { calls: number; triangles: number }>,
 } as const;
 

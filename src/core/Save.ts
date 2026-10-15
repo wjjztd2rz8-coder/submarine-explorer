@@ -66,7 +66,7 @@ export type SettingsConfigSource = Pick<
   terrain: Pick<GameConfig['terrain'], 'detailStrength'>;
   audio?: Pick<GameConfig['audio'], 'masterVolume' | 'sfxVolume' | 'musicVolume'>;
 };
-const TIERS: readonly GraphicsTierSetting[] = ['auto', 'low', 'medium', 'high', 'ultra'];
+const TIERS: readonly GraphicsTierSetting[] = ['auto', 'low', 'medium', 'high'];
 const DISPLAY_KEYS = [
   'graphicsTier',
   'postFx',
@@ -127,6 +127,8 @@ function sanitizeDisplay(
 ): unknown {
   switch (key) {
     case 'graphicsTier':
+      // The removed Ultra tier maps to High, the closest remaining tier.
+      if (value === 'ultra') return 'high';
       return TIERS.includes(value as GraphicsTierSetting) ? value : fallback;
     case 'masterVolume':
     case 'sfxVolume':

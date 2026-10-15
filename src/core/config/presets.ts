@@ -229,7 +229,7 @@ export const DEFAULT_PRESETS: PresetsConfig = {
   currentEventSpeedMps: 0.005,
   currentEventMinIntervalS: 1,
   lowTierCurrents: true,
-  tierParticleScale: { low: 0, medium: 0.5, high: 1, ultra: 1 },
+  tierParticleScale: { low: 0, medium: 0.5, high: 1 },
   maxParticles: 20000,
   particleAmbient: 0.12,
   particleHeadlightGain: 1.6,

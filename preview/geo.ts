@@ -168,7 +168,7 @@ for (const k of Object.keys(SPECS)) sel.add(new Option(k, k));
 sel.value = id;
 sel.onchange = () => show(sel.value);
 const tierSel = document.getElementById('tier') as HTMLSelectElement;
-for (const t of ['low', 'medium', 'high', 'ultra']) tierSel.add(new Option(t, t));
+for (const t of ['low', 'medium', 'high']) tierSel.add(new Option(t, t));
 tierSel.value = tier;
 tierSel.onchange = () => show(id, tierSel.value);
 const lodSel = document.getElementById('lod') as HTMLSelectElement;

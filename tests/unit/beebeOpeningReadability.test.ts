@@ -44,7 +44,7 @@ function hullScreenBounds(
 }
 
 describe('650 Beebe opening scan contact stays clear of the submarine', () => {
-  for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+  for (const tier of ['low', 'medium', 'high'] as const) {
     it(`${tier}: target reticle and whole hull fit desktop, touch landscape and portrait`, async () => {
       const site = 'beebe-vent-field';
       const config = makeConfig();

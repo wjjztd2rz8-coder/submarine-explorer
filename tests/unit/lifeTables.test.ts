@@ -184,7 +184,6 @@ describe('spawn selection', () => {
   it('has tier budgets of at most 12 draw calls at high and 5 at low', () => {
     expect(LIFE_TIERS.low.maxSpecies + 1).toBeLessThanOrEqual(5);
     expect(LIFE_TIERS.high.maxSpecies + 1).toBeLessThanOrEqual(12);
-    expect(LIFE_TIERS.ultra.maxSpecies + 1).toBeLessThanOrEqual(12);
     expect(LIFE_TIERS.low.maxAgents).toBeLessThan(LIFE_TIERS.medium.maxAgents);
     expect(LIFE_TIERS.medium.maxAgents).toBeLessThan(LIFE_TIERS.high.maxAgents);
   });

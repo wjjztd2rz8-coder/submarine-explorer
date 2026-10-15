@@ -16,7 +16,7 @@ interface Game {
   presets: { entered: boolean };
 }
 
-for (const tier of ['low', 'medium', 'high', 'ultra']) {
+for (const tier of ['low', 'medium', 'high']) {
   test(`Endurance ${tier}: hull-close lighting stays finite and horizon renders`, async ({
     page,
   }, testInfo) => {

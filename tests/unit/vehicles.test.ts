@@ -106,7 +106,7 @@ describe('SubMesh integration', () => {
 // Exercise the injected shader expressions in floating-point arithmetic:
 // the old positive-exponential tanh form could turn bright hull pixels into NaN.
 describe('hull-close highlight compression', () => {
-  for (const tier of ['low', 'medium', 'high', 'ultra']) {
+  for (const tier of ['low', 'medium', 'high']) {
     it(`${tier}: remains finite under extreme lamps and preserves the highlight shoulder`, async () => {
       const THREE = await import('three');
       const vehicle = buildVehicle('B', tier);

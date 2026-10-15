@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GameContext } from '../../src/app/context.js';
 import type { FrameState } from '../../src/app/System.js';
-import { createTitleSystem, titleLayout, titleTier } from '../../src/app/systems/title.js';
+import { createTitleSystem, titleLayout } from '../../src/app/systems/title.js';
 import * as terrain from '../../src/render/title/TitleTerrain.js';
 import { TitleScene } from '../../src/render/title/TitleScene.js';
 import { renderSystem } from '../../src/app/systems/render.js';
@@ -106,13 +106,11 @@ afterEach(() => {
 });
 
 describe('title layout helpers', () => {
-  it('maps layouts and tiers', () => {
+  it('maps layouts', () => {
     expect(titleLayout(1920, 1080)).toBe('desktop');
     expect(titleLayout(390, 844)).toBe('portrait');
     expect(titleLayout(844, 390)).toBe('short-landscape');
     expect(titleLayout(1280, 500)).toBe('short-landscape');
-    expect(titleTier('low')).toBe('low');
-    expect(titleTier('ultra')).toBe('high');
   });
 });
 

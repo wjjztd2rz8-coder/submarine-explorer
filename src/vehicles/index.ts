@@ -21,8 +21,8 @@ export { Vehicle, type VehicleDrive, type VehicleLod, type VehicleStats } from '
 export type { HullClassId } from './hulls.js';
 export type { VehicleLook } from './materials.js';
 
-/** Graphics tiers this module understands (F0-CORE adds `ultra`). */
-export type VehicleTier = 'low' | 'medium' | 'high' | 'ultra';
+/** Graphics tiers this module understands. */
+export type VehicleTier = 'low' | 'medium' | 'high';
 
 /**
  * World metres per vehicle metre, per class. The in-game boat is drawn about
@@ -37,7 +37,6 @@ export const WASH_PARTICLES: Record<VehicleTier, number> = {
   low: 0,
   medium: 120,
   high: 220,
-  ultra: 360,
 };
 
 export function lodForTier(tier: string): VehicleLod {

@@ -36,7 +36,7 @@ function fixture(id = 'memo-fixture', offset = 0, tier: GraphicsTier = 'low') {
       resolveLow: true,
       focus: { ...tile.meta.center, radiusM: 35, fadeM: 20 },
       chunkCells: 8,
-      nearSubdiv: { low: 4, medium: 4, high: 8, ultra: 8 },
+      nearSubdiv: { low: 4, medium: 4, high: 8 },
     },
   };
   return new Terrain(tile, config, tier);
@@ -44,7 +44,7 @@ function fixture(id = 'memo-fixture', offset = 0, tier: GraphicsTier = 'low') {
 
 describe('1290 terrain lattice memoisation', () => {
   for (const site of ['great-blue-hole', 'lost-city']) {
-    for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+    for (const tier of ['low', 'medium', 'high'] as const) {
       it(`${site} ${tier}: shipped survey/profile samples retain pre-cache elevations`, () => {
         const config = makeConfig().terrain;
         const meta = JSON.parse(readFileSync(`data/tiles/${site}/meta.json`, 'utf8')) as TileMeta;

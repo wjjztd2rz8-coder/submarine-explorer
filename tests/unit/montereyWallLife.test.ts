@@ -12,7 +12,7 @@ import { projectedRaycast } from './projectedRaycast.js';
 
 /** Real sloping bathymetry and authored transforms expose buried wall-life seats. */
 describe('Monterey wall life on surveyed terrain', () => {
-  for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+  for (const tier of ['low', 'medium', 'high'] as const) {
     it(`${tier}: wall colonies sit above the seabed and apron without removing the planted life`, async () => {
       const site = 'monterey-canyon';
       const config = makeConfig();

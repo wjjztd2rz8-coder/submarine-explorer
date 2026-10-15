@@ -15,7 +15,7 @@
 
 import { TitleScene, type TitleLayout, type TitleTier } from '../../render/title/TitleScene.js';
 import { buildTitleCrop, loadTitleCrop } from '../../render/title/TitleTerrain.js';
-import type { GameContext, ShellContext } from '../context.js';
+import type { ShellContext } from '../context.js';
 import { Disposables } from '../Disposables.js';
 import type { GameSystem } from '../System.js';
 import * as THREE from 'three';
@@ -36,10 +36,6 @@ export interface TitleBridge {
 
 const MONTEREY_TILE = 'monterey-canyon';
 const NAVY = new THREE.Color(0x06131f);
-
-export function titleTier(tier: GameContext['tier']): TitleTier {
-  return tier === 'low' ? 'low' : tier === 'medium' ? 'medium' : 'high';
-}
 
 /** Match home.css: min-aspect-ratio includes square viewports. */
 export function titleLayout(w: number, h: number): TitleLayout {
@@ -137,7 +133,7 @@ export function createTitleSystem(): GameSystem<ShellContext, { dt: number }> {
   const ensureScene = (ctx: ShellContext): void => {
     if (scene || disposed) return;
     scene = new TitleScene({
-      tier: titleTier(ctx.tier),
+      tier: ctx.tier,
       reducedMotion:
         ctx.rig?.reduceMotion ?? document.documentElement.dataset.reduceMotion === 'true',
     });
@@ -247,7 +243,7 @@ export function createTitleSystem(): GameSystem<ShellContext, { dt: number }> {
           scene.invalidate();
           presentationDirty = true;
         }
-        const nextTier = titleTier(ctx.tier);
+        const nextTier = ctx.tier;
         const nextReduced =
           ctx.rig?.reduceMotion ?? document.documentElement.dataset.reduceMotion === 'true';
         if (nextTier !== appliedTier || nextReduced !== appliedReduced) presentationDirty = true;

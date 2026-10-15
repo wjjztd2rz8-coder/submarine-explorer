@@ -94,7 +94,7 @@ describe('Great Blue Hole props', () => {
   }
 
   for (const def of geo) {
-    for (const tier of ['low', 'medium', 'high', 'ultra']) {
+    for (const tier of ['low', 'medium', 'high']) {
       it(`${def.id} ${tier}: sediment finish preserves gallery framing and Low's budget`, () => {
         const input = {
           def,

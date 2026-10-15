@@ -29,7 +29,7 @@ export type { WreckId } from './variants.js';
  *
  * @param dims    props.json `dimensions_m` ([length, beam, height]; scatter: [radius, width, height])
  * @param seed    hash of the prop id
- * @param tier    graphics tier name (`low` / `medium` / `high` / `ultra`)
+ * @param tier    graphics tier name (`low` / `medium` / `high`)
  * @param heightAt terrain height in the prop's local frame (scatter kits)
  */
 export function buildWreck(

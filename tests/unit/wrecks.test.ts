@@ -37,7 +37,7 @@ const DIMS: Record<WreckId, [number, number, number]> = {
   'endurance-rigging': [35, 35, 3],
   'endurance-stern': [4, 4, 2],
 };
-const TIERS = ['low', 'medium', 'high', 'ultra'] as const;
+const TIERS = ['low', 'medium', 'high'] as const;
 
 /** Triangles in the near LOD level (what the player sees up close). */
 function nearStats(id: WreckId, tier: string): { draws: number; triangles: number } {
@@ -103,18 +103,17 @@ describe('wreck builders', () => {
     }
   });
 
-  it('detail scales with the tier: low < medium <= high <= ultra', () => {
+  it('detail scales with the tier: low < medium <= high', () => {
     for (const id of WRECK_HULLS) {
       const t = TIERS.map((tier) => nearStats(id, tier).triangles);
       expect(t[0]).toBeLessThan(t[1]!);
       expect(t[1]).toBeLessThanOrEqual(t[2]!);
-      expect(t[2]).toBeLessThanOrEqual(t[3]!);
     }
   });
 
   it('stays inside the per-tier triangle budgets (near LOD, instances counted)', () => {
     // Budgets per hull in thousands of triangles; see plan/progress/F1-WRECKS.md.
-    const budget: Record<string, number> = { low: 180, medium: 400, high: 700, ultra: 1200 };
+    const budget: Record<string, number> = { low: 180, medium: 400, high: 700 };
     for (const id of WRECK_HULLS) {
       for (const tier of TIERS) {
         expect(nearStats(id, tier).triangles / 1000, `${id}@${tier}`).toBeLessThan(budget[tier]!);
@@ -122,7 +121,7 @@ describe('wreck builders', () => {
     }
   });
 
-  it('low tier drops small debris; ultra has more scatter than medium', () => {
+  it('low tier drops small debris; high has more scatter than medium', () => {
     const count = (tier: string): number =>
       buildWreck(
         'titanic-field',
@@ -142,7 +141,7 @@ describe('wreck builders', () => {
       });
       return n;
     };
-    expect(inst('ultra')).toBeGreaterThan(inst('medium'));
+    expect(inst('high')).toBeGreaterThan(inst('medium'));
   });
 
   it('exports interior anchor points for wreck interiors', () => {

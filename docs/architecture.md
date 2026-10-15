@@ -397,8 +397,8 @@ own files.
   family: `wrecks`, `debris`, `vents`, `reefs`, `geology`, `generic`, and
   `shared` for helpers and types. `PROCEDURAL_BUILDERS` maps each kind to its
   builder. `props/Procedural.ts` is a compatibility barrel.
-- **Quality tiers v2 (`src/core/Quality.ts`).** There are four tiers, `low`,
-  `medium`, `high` and `ultra`, plus the `auto` setting. `detectTier()` is a
+- **Quality tiers v2 (`src/core/Quality.ts`).** There are three tiers, `low`,
+  `medium` and `high`, plus the `auto` setting. `detectTier()` is a
   pure heuristic over a `DeviceCaps` snapshot and checks, in order:
   1. A software renderer gives `low`.
   2. Tiny GPU limits, or 2 cores or 2 GB or less, give `low`.
@@ -408,7 +408,7 @@ own files.
   6. Old Intel gives `low`.
   7. Anything else gives `medium`.
 
-  `ultra` is never automatic. Precedence is `?tier=` (including `?tier=auto`),
+  A saved `ultra` (a removed tier) migrates to `high`. Precedence is `?tier=` (including `?tier=auto`),
   then the saved setting, then detection. New players default to `auto`; saved fixed tiers are preserved.
   Dynamic resolution (`DynamicResolution`, run by `app/systems/quality.ts`)
   runs only for auto-detected tiers or with `?dynres=1`. `window.__game.perf`
@@ -960,8 +960,8 @@ own files.
   family: `wrecks`, `debris`, `vents`, `reefs`, `geology`, `generic`, and
   `shared` for helpers and types. `PROCEDURAL_BUILDERS` maps each kind to its
   builder. `props/Procedural.ts` is a compatibility barrel.
-- **Quality tiers v2 (`src/core/Quality.ts`).** There are four tiers, `low`,
-  `medium`, `high` and `ultra`, plus the `auto` setting. `detectTier()` is a
+- **Quality tiers v2 (`src/core/Quality.ts`).** There are three tiers, `low`,
+  `medium` and `high`, plus the `auto` setting. `detectTier()` is a
   pure heuristic over a `DeviceCaps` snapshot and checks, in order:
   1. A software renderer gives `low`.
   2. Tiny GPU limits, or 2 cores or 2 GB or less, give `low`.
@@ -971,7 +971,7 @@ own files.
   6. Old Intel gives `low`.
   7. Anything else gives `medium`.
 
-  `ultra` is never automatic. Precedence is `?tier=` (including `?tier=auto`),
+  A saved `ultra` (a removed tier) migrates to `high`. Precedence is `?tier=` (including `?tier=auto`),
   then the saved setting, then detection. The default setting is `medium`.
   Dynamic resolution (`DynamicResolution`, run by `app/systems/quality.ts`)
   runs only for auto-detected tiers or with `?dynres=1`. `window.__game.perf`

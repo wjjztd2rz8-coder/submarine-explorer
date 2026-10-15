@@ -175,7 +175,7 @@ test('Kamaehuakanaloa Low: opening and approach contain the full pillow mesh in 
   }
 });
 
-for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+for (const tier of ['low', 'medium', 'high'] as const) {
   test(`Kamaehuakanaloa ${tier}: pillow framing preserves the vent-facing opening for free dive and missions`, async () => {
     const site = 'kamaehuakanaloa';
     const { config, meta, terrain, props } = await scene(site, tier);

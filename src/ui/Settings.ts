@@ -208,7 +208,6 @@ export class SettingsScreen {
           ['low', 'Low'],
           ['medium', 'Medium'],
           ['high', 'High'],
-          ['ultra', 'Ultra'],
         ],
         tierNote,
       ),

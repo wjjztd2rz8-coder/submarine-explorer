@@ -299,19 +299,6 @@ export const DEFAULT_WATER: WaterConfig = {
       msaa: 4,
       beamDetail: 2,
     },
-    // F0-CORE: ultra starts as high; wave-1 packages raise its budgets.
-    ultra: {
-      post: true,
-      godRays: true,
-      snowCount: 3000,
-      causticsSize: 256,
-      headlightCones: true,
-      aberration: 1.4,
-      bloomLevels: 2,
-      rayOctaves: 2,
-      msaa: 4,
-      beamDetail: 2,
-    },
   },
 };
 

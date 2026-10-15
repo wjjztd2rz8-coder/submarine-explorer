@@ -5,7 +5,7 @@ import { MarineSnow } from '../../src/render/MarineSnow.js';
 
 describe('F1-OCEAN', () => {
   it('570: allocates the deliberately reduced snow budgets, with Low at one tenth of High', () => {
-    const counts = { low: 300, medium: 1200, high: 3000, ultra: 3000 };
+    const counts = { low: 300, medium: 1200, high: 3000 };
     for (const tier of GRAPHICS_TIERS) {
       expect(DEFAULT_CONFIG.water.tiers[tier].snowCount).toBe(counts[tier]);
       const snow = new MarineSnow(DEFAULT_CONFIG.water, DEFAULT_CONFIG.water.tiers[tier]);

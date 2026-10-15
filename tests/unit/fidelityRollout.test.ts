@@ -5,7 +5,7 @@ import { latLonToWorld } from '../../src/util/geo.js';
 import type { TerrainChunk } from '../../src/world/TerrainChunk.js';
 
 for (const site of ['great-blue-hole', 'lost-city']) {
-  for (const tier of ['medium', 'high', 'ultra'] as const) {
+  for (const tier of ['medium', 'high'] as const) {
     it(`${site} ${tier}: dense opening, golden collision parity, seats and consistent seams/LODs`, async () => {
       const s = await fidelityScene(site, tier);
       // The frozen west close golden already intersects a gallery proxy on the

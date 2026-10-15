@@ -83,7 +83,7 @@ describe('LifeSim population', () => {
   });
 
   it('respects the draw-call budget of every tier while the sub dives through every band', () => {
-    for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+    for (const tier of ['low', 'medium', 'high'] as const) {
       const sim = makeSim(tier, 11);
       const sub = makeSub({ y: -10 });
       let worst = 0;
@@ -207,7 +207,7 @@ describe('rooted animals and crawlers', () => {
 
 describe('steering stability', () => {
   it('keeps every animal finite, above the seabed and below the surface under hard flying', () => {
-    const sim = makeSim('ultra', 31);
+    const sim = makeSim('high', 31);
     const sub = makeSub({ y: -450 });
     // Circles at 35 m/s, plunging and climbing, lights on and off.
     run(sim, sub, 120, (t, s) => {

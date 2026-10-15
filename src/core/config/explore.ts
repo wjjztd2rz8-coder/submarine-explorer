@@ -27,5 +27,5 @@ export const EXPLORE_CONFIG = {
   eventWhaleHalfHeightM: 6,
   eventWhaleSurfaceDepthM: 8,
   shallowDepthM: 180,
-  eventParticleCount: { low: 100, medium: 180, high: 280, ultra: 360 },
+  eventParticleCount: { low: 100, medium: 180, high: 280 },
 } as const;

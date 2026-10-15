@@ -23,7 +23,7 @@ const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 const site = 'monterey-canyon';
 
 describe('Monterey opening habitat', () => {
-  for (const tier of ['low', 'medium', 'high', 'ultra'] as GraphicsTier[]) {
+  for (const tier of ['low', 'medium', 'high'] as GraphicsTier[]) {
     it(`${tier}: shows fish and a floor field immediately, retaining the first scan`, async () => {
       const config = makeConfig();
       const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;

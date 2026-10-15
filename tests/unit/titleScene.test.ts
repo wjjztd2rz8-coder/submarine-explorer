@@ -446,13 +446,13 @@ describe('F-BUGHUNT-12 title regressions', () => {
     }
   });
 
-  it.each(['construct', 'change'])('supports resolved Ultra quality on %s', (operation) => {
+  it.each(['construct', 'change'])('supports resolved High quality on %s', (operation) => {
     const s = new TitleScene({
-      tier: operation === 'construct' ? 'ultra' : 'low',
+      tier: operation === 'construct' ? 'high' : 'low',
       reducedMotion: false,
     });
     try {
-      if (operation === 'change') s.setQuality('ultra');
+      if (operation === 'change') s.setQuality('high');
       const snow = s.scene.getObjectByName('titleSnow') as THREE.Points;
       expect(snow.geometry.getAttribute('position').count).toBe(600);
       expect(s.stats.calls).toBeLessThanOrEqual(60);
@@ -604,7 +604,7 @@ const PARTICLE_BASELINES = [
 ] as const;
 
 describe('TitleScene shared lighting and snow', () => {
-  it.each(['low', 'medium', 'high', 'ultra'] as const)(
+  it.each(['low', 'medium', 'high'] as const)(
     'uses the shared instances through %s recreation and motion changes',
     (tier) => {
       const aim = vi.spyOn(Headlights.prototype, 'aimAt');
@@ -629,7 +629,7 @@ describe('TitleScene shared lighting and snow', () => {
         s.update(0.1);
         expect(place.mock.calls.length).toBe(before + 1);
         expect(aim.mock.contexts.every((instance) => instance === lamps)).toBe(true);
-        const next = tier === 'low' ? 'ultra' : 'low';
+        const next = tier === 'low' ? 'high' : 'low';
         const geometry = snow.points!.geometry;
         const releasedGeometry = vi.spyOn(geometry, 'dispose');
         s.setQuality(next);
@@ -699,7 +699,7 @@ describe('TitleScene shared lighting and snow', () => {
         actual.push(observe());
         for (let i = 0; i < 399; i++) s.update(0.1);
         actual.push(observe());
-        s.setQuality(tier === 'low' ? 'ultra' : 'low');
+        s.setQuality(tier === 'low' ? 'high' : 'low');
         actual.push(observe());
         s.setReducedMotion(true);
         actual.push(observe());

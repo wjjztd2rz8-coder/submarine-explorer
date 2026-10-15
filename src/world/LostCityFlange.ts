@@ -12,7 +12,7 @@ export function lostCityFlange(o: {
 }): THREE.BufferGeometry {
   const { r0, w } = o;
   const low = o.tier === 'low';
-  const radialSegments = low ? 28 : o.tier === 'medium' ? 56 : o.tier === 'ultra' ? 96 : 72;
+  const radialSegments = low ? 28 : o.tier === 'medium' ? 56 : 72;
   const th = Math.min(0.28, 0.06 + w * 0.035);
   // A closed half-ellipse around the nose has a vertical tangent at its tip,
   // without spline overshoot when the overhang is much wider than the lip.

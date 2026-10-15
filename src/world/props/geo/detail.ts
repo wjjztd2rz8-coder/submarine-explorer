@@ -55,16 +55,6 @@ export const GEO_DETAIL: Record<string, GeoDetail> = {
     bump: true,
     rubble: true,
   },
-  ultra: {
-    growth: 1.6,
-    plume: 1.5,
-    sphereDetail: 3,
-    meshDensity: 1.4,
-    branchDepth: 3,
-    textureSize: 1024,
-    bump: true,
-    rubble: true,
-  },
 };
 
 export function geoDetail(tier: string): GeoDetail {

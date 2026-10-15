@@ -10,7 +10,7 @@ import { geoDetail } from '../../src/world/props/geo/detail.js';
 
 /** Check each fractured instance: group-wide bounds can hide a buried rock. */
 describe('650 Monterey fractured boulders on surveyed seabed', () => {
-  for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+  for (const tier of ['low', 'medium', 'high'] as const) {
     it(`${tier}: all four canyon walls retain exposed rocks; Low omits rubble`, async () => {
       const site = 'monterey-canyon';
       const config = makeConfig();

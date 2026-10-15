@@ -16,7 +16,7 @@ afterAll(() => {
     writeFileSync('.cache/1495/clearance.json', JSON.stringify(evidence, null, 2) + '\n');
 });
 
-function actualTerrain(tier: 'low' | 'medium' | 'high' | 'ultra') {
+function actualTerrain(tier: 'low' | 'medium' | 'high') {
   const config = makeConfig();
   const meta = JSON.parse(readFileSync('data/tiles/great-blue-hole/meta.json', 'utf8')) as TileMeta;
   const bytes = readFileSync('data/tiles/great-blue-hole/heightmap.bin');
@@ -57,7 +57,7 @@ function distance(triangles: THREE.Triangle[], p: THREE.Vector3): number {
   return Math.sqrt(squared);
 }
 
-for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+for (const tier of ['low', 'medium', 'high'] as const) {
   it(`1495 ${tier}: both galleries clear shallow/deep contacts and retain open water`, async () => {
     const terrain = actualTerrain(tier);
     const config = makeConfig();

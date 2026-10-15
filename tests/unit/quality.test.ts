@@ -64,12 +64,6 @@ describe('detectTier', () => {
     expect(detectTier(caps({ renderer: '', vendor: '' })).tier).toBe('medium');
   });
 
-  it('never picks ultra', () => {
-    for (const renderer of ['NVIDIA GeForce RTX 4090', 'Apple M3 Max', '']) {
-      expect(detectTier(caps({ renderer })).tier).not.toBe('ultra');
-    }
-  });
-
   it('keeps phone detection stable when the screen rotates', () => {
     for (const [screenW, screenH] of [
       [390, 844],
@@ -146,7 +140,8 @@ describe('resolveQuality', () => {
 
   it('lets ?tier= beat the setting, and ?tier=auto force detection', () => {
     expect(resolveQuality('high', 'low', sw)).toMatchObject({ tier: 'high', source: 'url' });
-    expect(resolveQuality('ultra', 'auto', sw)).toMatchObject({ tier: 'ultra', source: 'url' });
+    // The removed Ultra tier is not a valid URL value any more.
+    expect(resolveQuality('ultra', 'high', sw)).toMatchObject({ tier: 'high', source: 'setting' });
     expect(resolveQuality('auto', 'high', sw)).toMatchObject({ tier: 'low', source: 'auto' });
     // Both URL overrides make a saved-tier change unappliable by reloading.
     expect(resolveQuality('auto', 'high', sw).urlForced).toBe(true);
@@ -350,9 +345,8 @@ describe('DynamicResolution', () => {
     expect(dynamicResolutionEnabled('1', 'setting')).toBe(true);
   });
 
-  it('caps pixel ratio per tier, with low..high unchanged from before v2', () => {
+  it('caps pixel ratio per tier', () => {
     const t = DEFAULT_CONFIG.quality.tiers;
     expect([t.low.maxPixelRatio, t.medium.maxPixelRatio, t.high.maxPixelRatio]).toEqual([2, 2, 2]);
-    expect(t.ultra.maxPixelRatio).toBeGreaterThan(2);
   });
 });

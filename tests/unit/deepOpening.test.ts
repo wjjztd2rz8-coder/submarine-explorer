@@ -38,7 +38,7 @@ afterAll(() => {
 
 describe('Challenger / Endurance opening', () => {
   for (const site of ['challenger-deep', 'endurance'] as const) {
-    for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+    for (const tier of ['low', 'medium', 'high'] as const) {
       it(`${site} ${tier}: safe hull, visible target and staged wildlife through 60 s`, async () => {
         const config = makeConfig();
         const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;

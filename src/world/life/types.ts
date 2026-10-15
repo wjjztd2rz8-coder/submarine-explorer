@@ -144,7 +144,7 @@ export interface LifeTier {
   cell: number;
 }
 
-export const LIFE_TIERS: Record<'low' | 'medium' | 'high' | 'ultra', LifeTier> = {
+export const LIFE_TIERS: Record<'low' | 'medium' | 'high', LifeTier> = {
   low: { maxAgents: 44, maxSpecies: 4, radius: 55, density: 0.55, detail: 0, sparks: 48, cell: 36 },
   medium: {
     maxAgents: 100,
@@ -163,14 +163,5 @@ export const LIFE_TIERS: Record<'low' | 'medium' | 'high' | 'ultra', LifeTier> =
     detail: 2,
     sparks: 260,
     cell: 26,
-  },
-  ultra: {
-    maxAgents: 280,
-    maxSpecies: 11,
-    radius: 140,
-    density: 1.5,
-    detail: 2,
-    sparks: 420,
-    cell: 22,
   },
 };

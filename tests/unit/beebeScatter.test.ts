@@ -65,7 +65,7 @@ it('1130: Beebe rocks darken and fracture in the same three draws with identical
   const biome = BIOMES['beebe-vent-field']!;
   const cfg = makeConfig();
   const evidence: Record<string, unknown> = {};
-  for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+  for (const tier of ['low', 'medium', 'high'] as const) {
     const { scatterDensity, scatterRangeM } = cfg.terrain.tiers[tier];
     const original = populated({ ...biome, scatterRock: undefined }, scatterDensity, scatterRangeM);
     const changed = populated(biome, scatterDensity, scatterRangeM);
@@ -149,7 +149,7 @@ it('1310: larger Challenger boulders retain every tier instance and triangle bud
   const oldMatrix = new THREE.Matrix4();
   const scale = new THREE.Vector3();
   const oldScale = new THREE.Vector3();
-  for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+  for (const tier of ['low', 'medium', 'high'] as const) {
     const { scatterDensity, scatterRangeM } = cfg.terrain.tiers[tier];
     const before = populated(previous, scatterDensity, scatterRangeM);
     const after = populated(biome, scatterDensity, scatterRangeM);

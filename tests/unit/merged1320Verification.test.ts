@@ -37,7 +37,7 @@ async function scene(site: string, tier: GraphicsTier) {
 }
 
 describe('1380 merged Monterey rubble verification', () => {
-  for (const tier of ['medium', 'high', 'ultra'] as const) {
+  for (const tier of ['medium', 'high'] as const) {
     it(`${tier}: varied rubble stays in both opening frames and clears the spawn corridor`, async () => {
       const { config, terrain, props, pose } = await scene('monterey-canyon', tier);
       try {

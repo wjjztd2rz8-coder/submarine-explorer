@@ -47,7 +47,7 @@ export type ScatterKind =
 
 export interface ScatterSpec {
   kind: ScatterKind;
-  /** Instances per 1000 m² at the `ultra` tier on ideal ground. */
+  /** Instances per 1000 m² at the `high` tier on ideal ground. */
   density: number;
   /** Ground slope window (degrees) where it may sit. */
   slopeMaxDeg: number;

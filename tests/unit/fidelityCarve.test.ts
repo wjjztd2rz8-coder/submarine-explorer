@@ -8,7 +8,7 @@ import { terrainCarveFor } from '../../src/world/terrainFeatures.js';
 import type { TileMeta } from '../../src/util/types.js';
 
 for (const site of ['monterey-canyon', 'great-blue-hole']) {
-  for (const tier of ['medium', 'high', 'ultra'] as const) {
+  for (const tier of ['medium', 'high'] as const) {
     it(`${site} ${tier}: cubic surface, collision and mesh retain the analytic carve`, () => {
       const config = makeConfig().terrain;
       expect(config.fidelity?.[site]).toBeDefined();
