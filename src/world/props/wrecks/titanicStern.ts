@@ -387,6 +387,7 @@ export function buildTitanicStern(
     growth: 0.3,
     silt: 0.6,
     mudBand: 3,
+    muted: 0.6,
     plates: [1.9, 5.5, 1.1],
     shadeAt,
   });
