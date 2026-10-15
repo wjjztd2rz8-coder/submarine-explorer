@@ -2,6 +2,34 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-15 comprehensive review, Claude alone (golden 2026-10-15-011533)
+
+Sol was skipped: Codex weekly is at 5% (resets Oct 20), below the review floor. Scores are mine and unchallenged; treat them as provisional until Sol can re-check.
+
+**Changed since the last review (2026-10-14 morning):** 10 merges, all pushed. Codex: 1710 S-tests step 2 (94 to 68 specs), 1720 golden tooling, 1730 S-verify-3, and, collected in this run, 1900 S-verify-4 (Journal next-unlock hint ignored migration grants; Cosmetics disclosure lost state on refresh; Titanic triangle budget checked), 1910 hosted-CI repairs, 1920 stale-spec repairs (d-modes, d-shell, d-sonar, eight animal-guidance cases). Claude: S-hud (hud-layout.css 697 to 301 lines), S-picker (phone site sheet over the globe), V-titanic, V-rewards-look, V-journeys, S-hud-desktop-text and S-briefing-advanced (Haiku). Gates on every merge: smoke + project-base. Hosted CI on b1de6c0 was red (20 of 30 shards, 45 min); 1910/1920 were written against that class of failure and are now on main, result pending.
+
+| Site       | Readable | Beautiful | Biggest gap                                                                 |
+| ---------- | -------- | --------- | --------------------------------------------------------------------------- |
+| Titanic    | 4        | 3.8 (3.5) | wide view now dark silt and rust, reads real; close view still flat peach   |
+| Beebe      | 4        | 3.2 (3)   | plumes good; sub is the biggest, brightest object; chimney still procedural |
+| Blue Hole  | 3.5      | 3         | stair-step faceted terraces; stalactite gallery floats as a brown slab      |
+| Lost City  | 4        | 3.3 (3)   | seabed stripes fixed; towers still smooth columns                           |
+| Monterey   | 4        | 3.5       | repeated contour banding on the wall, sparse growth                         |
+| Challenger | 4        | 3         | toy-like white lander, big empty seabed                                     |
+| Endurance  | 3        | 3         | hull ~380 px of 1600 at the opening; sub fills the right quarter            |
+
+None reaches 4. The HUD is clean on all seven frames: one scan card, sonar, depth; no repeated instruction.
+
+**Agreed stage: about 78% to 1.0 (Claude only), about three and a half weeks.** Gain is from UI simplification and Titanic; art on four heroes is flat.
+
+**Biggest gaps (ranked):** (1) hosted CI still unproven green (45-minute runs, shards timing out under software GL); (2) the sub dominates the opening frame at Endurance, Beebe and Blue Hole, which hurts "beautiful" more than any asset; (3) Blue Hole scan reach (150 to 190 m) means the dive into the hole never happens (S-scan-reach); (4) Journal entry for a fresh scan has no picture (S-journal-picture); (5) eight non-hero sites unjudged; (6) real-phone Low performance (owner).
+
+**Process notes.** `tools/efficiency.sh` over the run: Claude idle at 50%+ for 184 h and Codex under-used for 173 h, nearly all budget-gate skips (250). Codex weekly is the binding constraint now (5%); the Codex queue therefore only helps after Oct 20. Three Codex worktrees (1900/1910/1920) finished uncommitted again and waited for a Claude run; collection was clean and small. 1910 and 1920 overlapped on four spec files; I kept 1920's version (derives radii from tuning modules) and 1910 only for non-overlapping files. Ten older worktrees (1740 to 1860) still hold stale uncommitted work; brief 2020 asks Codex to triage them. Codex stalls when its weekly budget is spent: no scheduling fix exists for that, so Claude lanes carry all work until reset.
+
+**New priorities:** V-endurance (opening framing), S-scan-reach, V-bluehole-opening, S-journal-picture, then V-eight-sites capture. Codex (when budget returns): 2000 hosted-CI triage, 2010 S-verify-5, 2020 S-tests step 3 and worktree triage.
+
+**Needs owner:** a five-minute play on a real phone on the newest build (Low performance); optionally Codex weekly credit, since it is the binding limit.
+
 ## 2026-10-14 comprehensive review, joint with Sol (golden 2026-10-14-064710)
 
 Sol reviewed independently from the then-current stored evidence; I read it after my draft and updated the draft for merges that landed meanwhile. Reconciled in one round; I checked the cited files and accepted Sol's corrections that held.

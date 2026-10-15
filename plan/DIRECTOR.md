@@ -61,7 +61,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                     | R-release, S-tests (1740)                               |
 | No known blockers; the code is simple enough to keep changing safely          | S-resolve, S-modal, S-boot, S-rewards, S-manifest       |
 
-Stage (joint review 2026-10-14, agreed with Sol): about 76% to 1.0; plan four weeks (four to six credible). Agreed "beautiful" scores: Titanic 3.5, Beebe 3, Blue Hole 3, Lost City 3, Monterey 3.5, Challenger 3, Endurance 3. Top blockers: unaided journeys verified on the merged build (desktop and both phone orientations), green hosted CI, real-phone Low performance, hero beauty (none at 4 yet), eight mission spawns unverified.
+Stage (Claude-only review 2026-10-15; Sol skipped, Codex weekly at 5%): about 78% to 1.0; plan about three and a half weeks (four credible). Beautiful scores: Titanic 3.8 (wide), Beebe 3.2, Blue Hole 3, Lost City 3.3, Monterey 3.5, Challenger 3, Endurance 3. Top blockers: unaided journeys verified on the merged build (desktop and both phone orientations), green hosted CI, real-phone Low performance, hero beauty (none at 4 yet), eight mission spawns unverified.
 
 ## Needs owner
 
@@ -71,36 +71,30 @@ The newest items go first.
 
 ## In flight
 
-- 2026-10-14: S-guidance, S-rewards, S-resolve, S-modal, S-boot, S-verify/S-bughunt passes and the hosted-CI test repairs are merged and pushed. Codex queue: 1710 S-tests step 2, 1720 golden evidence, 1730 S-verify third pass, 1740 hosted CI, 1750 S-render rest.
+- 2026-10-15 review: Codex weekly is at 5% until Oct 20, so only Claude runs. Queued for Codex when budget returns: 2000 hosted-CI triage (S-tests step 3 / R-release), 2010 S-verify fifth pass, 2020 S-tests step 3 and stale-worktree triage. 1910/1920 merged (94ea748); hosted CI result for it pending.
 
 ## Backlog
 
 One list, ordered by player impact and dependencies. Lane is in brackets. "After X" means don't start until X is merged. Evidence: §n = section n of `plan/archive/SIMPLIFY-REVIEW-2026-10-11.md`; joint review 2026-10-14 in `plan/REVIEWS.md`.
 
-1. **V-journeys DONE 2026-10-14 (branch claude/V-journeys; `plan/progress/V-journeys.md`):** three defects fixed (landscape Begin dive, waypoint label over the sub, debrief score row); design findings are items 20 to 24. Original brief: **[Haiku capture, Sonnet judge]:** the top 1.0 blocker (both reviewers): record a complete, unaided Titanic and Blue Hole journey (Home, briefing, first 60 s, approach by sonar/waypoint only, scan, Journal, debrief) on the merged build at desktop, phone portrait and phone landscape; screenshots with SHA in `.cache/np/`, findings in `plan/progress/V-journeys.md`. Judge each against the rubric and open items for what fails. Known to check: landscape briefing hides Begin dive; waypoint label covers the sub after a scan (portrait); the guidance slot hiding an event caption behind a ready contact.
-2. **S-hud [Sonnet] DONE 2026-10-14 (510aca9)** (§4 item 2, §5; S-guidance merged). Three HUD regions (top info, guidance, controls) in normal flow replace per-element offsets. `hud-layout.css` is now ~690 lines; target about 300 with all `/* S-hud: remove */` patches gone and portrait and landscape without special cases. Landscape guidance slot sits 4 px below Pause/Journal: make that structural. Re-baseline HUD screenshots deliberately. Desktop: drop the permanent sonar legend (touch already hides it).
 3. **V-eight-sites [Haiku capture, Sonnet judge]**, after 1720 (golden evidence tooling): capture the eight non-hero sites at real mission spawns on desktop and phone, judge each (Sol: Axial, Bismarck, Blake, Hudson, Hunga, Kamaʻehuakanaloa may have weak subject visibility) and fix major defects.
 4. **V-endurance [Sonnet]:** close view merged. Opening still open: the hull is ~380 px of 1600 with the sub large at right. Keep `deepOpening.test.ts` / `openingClearance1290.test.ts` guards; enlarge the wreck or move it/the sub in data. Landscape: sub behind the touch buttons at the opening.
 5. **V-titanic [Sonnet]:** close-up (`titanic-3.png`): regular panels, bright flat sand, thin rusticles read as manufactured. Agreed beauty 3.5. PARTLY DONE 2026-10-14 (9d23755): dark silt seabed, per-plate hull variation, thicker rusticles; wide view clearly better (~3.8). Remainder: close view still flat peach under lights, needs a texture-space plate/stain layer.
 6. **V-beebe / V-bluehole remainder [Sonnet]:** Beebe opening: the bright sub dominates a small stack; chimney facets and plumes look procedural. Blue Hole: faceted uniform steps and smooth stalactite cones (golden essentially unchanged since 2026-10-13).
 7. **V-lostcity [Sonnet]** PARTLY DONE 2026-10-14 (56eae67): seabed stripes fixed (reliefBed/rillStretch), colour banding calmer; towers only modestly better, still smooth columns with a flat collar and regular dimples on the flat seabed. Remainder: tower surface relief and collar.
-8. **S-picker [Sonnet] DONE 2026-10-14 (b39aecf):** keep the globe on every screen size. On phones a swipe-up sheet over the globe lists the sites (one site-list component). Remove redundant globe instances only if the sheet covers them.
-9. **S-tiers [Sonnet]** (brief `.cache/claude/visual/1497`): merge Ultra into High after a golden comparison; migrate saved `ultra` to High.
-10. **V-rewards-look DONE 2026-10-14 (d445643):** S-rewards merged without visual review (Codex cannot render). Capture the Journal cosmetics picker, each sub paint/decal and photo frame on phone and desktop; judge against the rubric; fix.
-11. **S-daily [Haiku]:** shorter wording for the Daily Dive Home card, briefing and debrief (mechanics stay).
-12. **V-lander [Haiku, low]:** Challenger's white lander looks toy-like; add wear and colour.
-13. **S-manifest [Sonnet design, Codex migration]** (§5, §6b; S-resolve merged). Move each site's tuning into one typed `data/landmarks/<id>/site.json` with a validator (biome, opening and framing, atmosphere, sonar shading, low-tier framing, Beebe and Monterey configs, currents, secrets); remove the 26 site-id branches in shared code; merge `Spawn.ts` and `DeepOpeningSpawn.ts` into one framing solver; species literals to JSON. Guard with the golden set. Sonnet writes the schema and migrates one site first.
-14. **S-tests step 2 [Codex]** brief 1710 queued: fold HUD/touch, opening-framing and Journal/debrief specs into three table-driven capability specs (`plan/progress/S-tests-map.md`). DONE 2026-10-14 (ec1484c).
-15. **S-tests step 3 / hosted CI [Codex]** brief 1740 queued: hosted CI has been red on every push; 1700 repaired 54 test failures, main now carries S-guidance and S-rewards. Hosted CI green is a 1.0 requirement; tag `f53` only on green.
-16. **V-eight-sites tooling [Codex]** brief 1720 queued: commit SHA in golden manifest; mission-spawn and phone capture mode. DONE 2026-10-14 (d3b40a3; PNG capture and judging remain under V-eight-sites).
-17. **S-verify third pass [Codex]** brief 1730 queued: audit S-rewards (save v2 migration, cosmetics) and S-guidance (slot clears, no stale cards); remove leftover RP/upgrade wording; shorten the "PAUSE -> JOURNAL" reward line. DONE 2026-10-14 (a9171e9).
-18. **S-render remainder [Codex]** brief 1750 queued: validate the never-run nightly workflow, finish table-driving, one hull-creak path, golden pixels unchanged.
-19. **R-release [Haiku]:** after each green hosted CI run on main tag `f<N>` (`git tag f<N> && git push origin f<N>`) and check the Pages deploy. f53 is the next tag; f51 is the last.
-20. **S-scan-reach [Sonnet design]** (V-journeys): both Blue Hole primaries scan from 150 to 190 m while surfaced at 8 to 25 m depth, so the dive into the hole never happens; Titanic also scans at 160 to 190 m, so the close view is never seen. Set per-site reach (about 60 m for wrecks and galleries, plus a minimum depth for the Blue Hole galleries) and check the guidance copy and star rules still hold.
-21. **V-bluehole-opening [Sonnet]** (V-journeys): the sub fills the lower half of the frame at the surface start and the stalactite galleries read as floating brown slabs from range. Pull the camera back or lower the sub and give the galleries a visible cave context.
-22. **S-journal-picture [Sonnet design]** (V-journeys): the Journal entry for a fresh scan is text only. Show the photo or a still of the thing just scanned at the top (the reward moment).
-23. **S-hud-desktop-text [Haiku]** DONE 2026-10-14 (d7bdc95) (V-journeys): at the start the desktop HUD repeats one instruction four times (guidance card, objective list line "Head to the bow, 220 m ahead", BRG/RNG row, waypoint label). Keep one.
-24. **S-briefing-advanced [Haiku]** DONE 2026-10-14 (d7bdc95) (V-journeys): Advanced shows oversized empty square check boxes; phone Home has Journal and Settings under the fold (portrait clipped mid-button, landscape fully below). Style the check boxes and keep both buttons in view.
+8. **S-tiers [Sonnet]** (brief `.cache/claude/visual/1497`): merge Ultra into High after a golden comparison; migrate saved `ultra` to High.
+9. **S-daily [Haiku]:** shorter wording for the Daily Dive Home card, briefing and debrief (mechanics stay).
+10. **V-lander [Haiku, low]:** Challenger's white lander looks toy-like; add wear and colour.
+11. **S-manifest [Sonnet design, Codex migration]** (§5, §6b; S-resolve merged). Move each site's tuning into one typed `data/landmarks/<id>/site.json` with a validator (biome, opening and framing, atmosphere, sonar shading, low-tier framing, Beebe and Monterey configs, currents, secrets); remove the 26 site-id branches in shared code; merge `Spawn.ts` and `DeepOpeningSpawn.ts` into one framing solver; species literals to JSON. Guard with the golden set. Sonnet writes the schema and migrates one site first.
+12. **S-tests step 3 / hosted CI [Codex]** brief 1740 queued: hosted CI has been red on every push; 1700 repaired 54 test failures, main now carries S-guidance and S-rewards. Hosted CI green is a 1.0 requirement; tag `f53` only on green.
+13. **S-render remainder [Codex]** brief 1750 queued: validate the never-run nightly workflow, finish table-driving, one hull-creak path, golden pixels unchanged.
+14. **R-release [Haiku]:** after each green hosted CI run on main tag `f<N>` (`git tag f<N> && git push origin f<N>`) and check the Pages deploy. f53 is the next tag; f51 is the last.
+15. **S-scan-reach [Sonnet design]** (V-journeys): both Blue Hole primaries scan from 150 to 190 m while surfaced at 8 to 25 m depth, so the dive into the hole never happens; Titanic also scans at 160 to 190 m, so the close view is never seen. Set per-site reach (about 60 m for wrecks and galleries, plus a minimum depth for the Blue Hole galleries) and check the guidance copy and star rules still hold.
+16. **V-bluehole-opening [Sonnet]** (V-journeys): the sub fills the lower half of the frame at the surface start and the stalactite galleries read as floating brown slabs from range. Pull the camera back or lower the sub and give the galleries a visible cave context.
+17. **S-journal-picture [Sonnet design]** (V-journeys): the Journal entry for a fresh scan is text only. Show the photo or a still of the thing just scanned at the top (the reward moment).
+
+18. **R-ci-time [Codex, 2000]:** hosted CI takes 45 min and 20 of 30 shards failed on b1de6c0; the 1910/1920 repairs are merged but unproven. Triage the next completed run by failing spec; cut the shard time.
+19. **V-challenger-lander** is item 12; **V-endurance** (item 4) is the next Claude package: sub is ~25% of frame at the opening and the hull ~380 px of 1600.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.
 
