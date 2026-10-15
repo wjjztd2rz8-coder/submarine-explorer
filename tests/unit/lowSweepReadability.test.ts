@@ -8,7 +8,12 @@ import { atmosphereSystem } from '../../src/app/systems/atmosphere.js';
 import type { GameContext } from '../../src/app/context.js';
 import type { FrameState } from '../../src/app/System.js';
 import { makeConfig } from '../../src/core/Config.js';
-import { LOW_READABILITY_SITES, lowSiteWater } from '../../src/core/config/atmosphere.js';
+import {
+  LOW_READABILITY_SITES,
+  SITE_SEABED_LIGHT,
+  lowSiteWater,
+  siteLightWater,
+} from '../../src/core/config/atmosphere.js';
 import { deepSiteWater } from '../../src/core/config/deepOpenings.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { sampleAtmosphere } from '../../src/render/Atmosphere.js';
@@ -151,5 +156,19 @@ test('Bismarck golden approach/detail aim at visible hull above the slope from c
     }
   } finally {
     terrain.dispose();
+  }
+});
+
+test('Per-site seabed light lifts only the deep bands of listed sites on Medium and High (Low keeps its own floor)', () => {
+  const water = makeConfig().water;
+  expect(siteLightWater('titanic', 'high', water)).toBe(water);
+  for (const site of Object.keys(SITE_SEABED_LIGHT)) {
+    expect(siteLightWater(site, 'low', water)).toBe(water);
+    const lit = siteLightWater(site, 'high', water);
+    for (const depth of [0, -5, -20])
+      expect(sampleAtmosphere(lit, depth)).toEqual(sampleAtmosphere(water, depth));
+    expect(sampleAtmosphere(lit, -700).ambientIntensity).toBeGreaterThan(
+      sampleAtmosphere(water, -700).ambientIntensity,
+    );
   }
 });
