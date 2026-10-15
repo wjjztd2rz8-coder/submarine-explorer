@@ -29,9 +29,9 @@ describe('Blue Hole overhangs and benthos', () => {
     expect(g.boundingBox!.max.y).toBeCloseTo(1, 1);
     for (const v of g.getAttribute('position').array) expect(Number.isFinite(v)).toBe(true);
   });
-  it('the Blue Hole biome scatters both new kinds with registered types', () => {
+  it('the Blue Hole biome scatters tubes but no rock awnings, which hovered over the reef treads', () => {
     const kinds = Object.values(BIOMES['great-blue-hole']!.scatter!).map((s) => s.kind);
-    expect(kinds).toContain('ledge');
+    expect(kinds).not.toContain('ledge');
     expect(kinds).toContain('tube');
     expect(SCATTER_TYPES.ledge.size[0]).toBeGreaterThan(SCATTER_TYPES.sponge.size[1]);
   });

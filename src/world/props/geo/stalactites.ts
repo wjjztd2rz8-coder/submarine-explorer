@@ -216,7 +216,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   const shelf = (x: number): number => {
     const scallop = smooth(0.32, 0.62, fbm3(x * 0.075 + 4, 1, seed + 61, seed + 8, 3));
     // The shelf draws back into the wall toward both ends instead of cantilevering over the slope.
-    const ends = 1 - 0.9 * smooth(0.5, 0.95, endRatio(x, W));
+    const ends = 1 - 0.85 * smooth(0.7, 1, endRatio(x, W));
     return (east ? 0.88 + 0.3 * scallop : 0.42 + 0.95 * scallop) * ends;
   };
 
@@ -273,11 +273,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       const m = smooth(0.38, 0.62, fbm3(x * 0.07 + fx * 40, 2, seed + 71, seed + 3, 3));
       notch += depth * scale * m * Math.exp(-(((y - fy * H) / (hw * H)) ** 2));
     }
-    // Broken, uneven lip: the roof edge lumps in and out and its thickness varies along the shelf.
-    const lipBreak = (fbm3(x * 0.3, y * 0.7, seed + 12, seed + 14, 3) - 0.5) * 2.4 * win;
-    return (
-      (bulge + flute) * env + z * (shelf(x) - 1) * win + lipBreak + ledges + notch * (1 - win) * env
-    );
+    return (bulge + flute) * env + z * (shelf(x) - 1) * win + ledges + notch * (1 - win) * env;
   };
 
   // --- the wall

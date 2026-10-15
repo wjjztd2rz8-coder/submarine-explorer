@@ -322,9 +322,8 @@ export interface ExtrudeOpts {
   /** Extra downward y at x (burying the ends). */
   sink?: (x: number) => number;
   /**
-   * Terrain height at (x, z). Profile points behind the foot (z > 0) never stand above it, and the
-   * overhanging front comes down to it toward the wall ends, so a shelf runs into the ground
-   * instead of hanging over a lower slope.
+   * Terrain height at (x, z). Toward the wall ends every point comes down to it, so a shelf runs
+   * into the ground instead of hanging over a lower slope; mid-wall it is unconstrained.
    */
   ground?: (x: number, z: number) => number;
   /** Metres per texture tile: writes `uv` as (x, arc length along the profile). A pair is (along, up). */
@@ -370,8 +369,7 @@ export function extrudeProfile(
       const n = i * (ny + 1) + j;
       pos[n * 3] = x;
       let py = y + (lift ? lift(x, y0, z0) : 0) - sink;
-      if (opts.ground)
-        py = Math.min(py, opts.ground(x, z) + (z0 > 0 ? -0.15 : 0.15 + 4 * height * (1 - edge) ** 2));
+      if (opts.ground) py = Math.min(py, opts.ground(x, z) + 0.15 + 4 * height * (1 - edge) ** 2);
       pos[n * 3 + 1] = py;
       pos[n * 3 + 2] = z;
       if (uv) {
