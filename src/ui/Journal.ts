@@ -1000,6 +1000,7 @@ export class Journal {
       );
     if (!open) titleRow.append(el('span', 'jr-tag is-undiscovered', 'Undiscovered'));
     b.append(titleRow);
+    this.renderEntryHero(site, entry);
     if (entry.kind === 'life' && entry.life) {
       this.renderLife(entry);
       this.renderEntryPhotos(site, entry);
@@ -1042,14 +1043,32 @@ export class Journal {
   }
 
   // --- D-PHOTO begin ---
-  private renderEntryPhotos(site: JournalSite, entry: JournalEntry): void {
+  /** Photos of this entry's place or animal, newest first. */
+  private entryPhotos(site: JournalSite, entry: JournalEntry) {
     if ((entry.kind !== 'poi' && entry.kind !== 'life') || !this.photoGallery || !this.photos)
-      return;
+      return [];
     const ids = entry.kind === 'life' ? [lifeDiscoveryId(entry.id)] : entry.poiIds;
-    const photos = this.photos.photos.filter(
+    return this.photos.photos.filter(
       (photo) => photo.siteId === site.id && photo.poiId !== null && ids.includes(photo.poiId),
     );
-    if (!photos.length) return;
+  }
+
+  /** The newest photo of the entry, large under the title: the picture of what was scanned. */
+  private renderEntryHero(site: JournalSite, entry: JournalEntry): void {
+    const photo = this.entryPhotos(site, entry)[0];
+    if (!photo) return;
+    const fig = el('figure', 'jr-figure jr-hero');
+    const img = el('img');
+    img.src = photo.image;
+    img.alt = photo.poiName ?? entry.title;
+    fig.append(img);
+    this.body.append(fig);
+  }
+
+  /** The full set, when there is more than the hero to browse. */
+  private renderEntryPhotos(site: JournalSite, entry: JournalEntry): void {
+    const photos = this.entryPhotos(site, entry);
+    if (photos.length < 2 || !this.photoGallery) return;
     const section = el('section', 'jr-entry-photos');
     this.body.append(section);
     this.photoGallery.render(

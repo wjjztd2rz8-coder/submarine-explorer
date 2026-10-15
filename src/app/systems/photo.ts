@@ -3,6 +3,8 @@
  * and show in the Journal's Photos page and on each POI entry; the viewfinder
  * is PhotoMode. Photo mode freezes the sim like pause; the camera orbits
  * the submarine and leaving restores the previous view. The capture reads the canvas right after the draw.
+ * A first scan of a POI or animal also files a still of the moment as a photo of it, so its
+ * Journal entry opens with a picture.
  */
 
 import type * as THREE from 'three';
@@ -10,6 +12,7 @@ import { PHOTO_LIMIT, PhotoStore, poiInPhoto } from '../../game/PhotoStore.js';
 import type { PlacedPoi } from '../../game/Pois.js';
 import { PhotoGallery } from '../../ui/PhotoGallery.js';
 import { PhotoMode, canvasThumbnail } from '../../ui/PhotoMode.js';
+import { SPECIES_BY_ID } from '../../world/life/catalogue.js';
 import { LIFE_ID_PREFIX } from '../../world/life/Life.js';
 import type { GameContext } from '../context.js';
 import type { GameSystem } from '../System.js';
@@ -23,6 +26,8 @@ export function createPhotoSystem(): GameSystem {
   /** F2-LIFE: the animal in frame when no POI is (an `id` of the form `life:<species>`). */
   let photoAnimal: { id: string; name: string } | null = null;
   let lastCaptureMs = -Infinity;
+  /** A first scan waiting for the next draw to be read as its Journal still. */
+  let scanStill: { id: string; name: string } | null = null;
 
   const enterPhotoMode = (ctx: GameContext): void => {
     const { journal, rig, sub, photoMode, input } = ctx;
@@ -73,6 +78,31 @@ export function createPhotoSystem(): GameSystem {
     journal.refresh();
   };
 
+  /** Files the canvas as a quiet, unannounced photo of what was just scanned. */
+  const captureScanStill = (ctx: GameContext, target: THREE.Vector3): void => {
+    if (!scanStill) return;
+    const { id, name } = scanStill;
+    scanStill = null;
+    const image = canvasThumbnail(
+      ctx.renderer.domElement,
+      undefined,
+      undefined,
+      ctx.progress.cosmetics.frame,
+    );
+    if (!image) return;
+    const saved = ctx.photos.save({
+      id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      image,
+      siteId: ctx.contentLandmark,
+      siteName: ctx.journal.siteName(ctx.contentLandmark),
+      poiId: id,
+      poiName: name,
+      at: new Date().toISOString(),
+      depthM: Math.round(Math.max(0, -target.y) * 10) / 10,
+    });
+    if (saved.saved) ctx.journal.refresh();
+  };
+
   return {
     name: 'photo',
     dispose: () => cleanup.dispose(),
@@ -108,6 +138,17 @@ export function createPhotoSystem(): GameSystem {
     // Register after init so photo mode misses the initial dive emit.
     start(ctx) {
       cleanup.add(
+        ctx.bus.on('scan:complete', ({ poiId, firstTime }) => {
+          if (!firstTime) return;
+          const poi = ctx.discovery.pois.find((p) => p.id === poiId);
+          const animal = poiId.startsWith(LIFE_ID_PREFIX)
+            ? SPECIES_BY_ID.get(poiId.slice(LIFE_ID_PREFIX.length))
+            : undefined;
+          const name = poi?.name ?? animal?.common;
+          if (name) scanStill = { id: poiId, name };
+        }),
+      );
+      cleanup.add(
         ctx.bus.on('app:state', ({ state }) => {
           if (state !== 'dive') ctx.exitPhotoMode();
         }),
@@ -136,6 +177,7 @@ export function createPhotoSystem(): GameSystem {
       },
       // Read the canvas in the same task as the render, before it is composited.
       'render.capture': (f, ctx) => {
+        if (scanStill) captureScanStill(ctx, f.pilotPosition);
         if (!photoCaptureRequested) return;
         photoCaptureRequested = false;
         if (ctx.photoMode.active) capturePhoto(ctx, f.pilotPosition);
