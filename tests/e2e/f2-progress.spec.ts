@@ -173,6 +173,68 @@ test('discoveries unlock Journal cosmetics; photo bonus and best stars survive r
 });
 
 // Guards phone access to the single picker and removal of the old purchase/access surface.
+// Guards migrated grants showing as selected swatches, misleading unlock hints and refresh losing focus.
+for (const width of [1280, 390])
+  test(`migrated Journal cosmetics keep labels, swatches and keyboard focus at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.addInitScript(() => {
+      if (!localStorage.getItem('subexplorer.progress.v1'))
+        localStorage.setItem(
+          'subexplorer.progress.v1',
+          JSON.stringify({
+            version: 1,
+            lifetime: 150,
+            cosmetics: { paint: 'gold', trim: 'amber', decal: 'finder', frame: 'gold' },
+          }),
+        );
+    });
+    for (let round = 0; round < 2; round++) {
+      await page.goto('/');
+      await homeReady(page);
+      await page
+        .locator('.home-menu')
+        .getByRole('button', { name: 'Journal', exact: true })
+        .click();
+      const journal = page.locator('.journal');
+      const summary = journal.locator('summary').filter({ hasText: /^Cosmetics$/ });
+      await summary.click();
+      await expect(journal.locator('.jr-empty').filter({ hasText: '0 discoveries' })).toContainText(
+        'next unlock at 20',
+      );
+      for (const [name, value, color] of [
+        ['Sub paint', 'gold', 'rgb(226, 178, 60)'],
+        ['Lamp trim', 'amber', 'rgb(255, 212, 154)'],
+        ['Sub decal', 'finder', 'rgba(0, 0, 0, 0)'],
+        ['Photo frame', 'gold', 'rgb(212, 180, 107)'],
+      ]) {
+        const select = journal.getByRole('combobox', { name, exact: true });
+        await expect(select).toHaveValue(value);
+        await expect(select.locator('..').locator('.jr-swatch')).toHaveCSS(
+          'background-color',
+          color,
+        );
+        await page.keyboard.press('Tab');
+        await select.focus();
+        expect(await select.evaluate((el) => getComputedStyle(el).outlineStyle)).toBe('solid');
+        await page.keyboard.press('Tab');
+        await page.keyboard.press('Shift+Tab');
+        await expect(select).toBeFocused();
+      }
+      const paint = journal.getByRole('combobox', { name: 'Sub paint', exact: true });
+      await paint.focus();
+      // Crossing the Journal's phone breakpoint rebuilds the page, as rotation does.
+      await page.setViewportSize({ width: width === 390 ? 1280 : 390, height: 844 });
+      await expect(summary.locator('..')).toHaveJSProperty('open', true);
+      await expect(paint).toBeFocused();
+      await paint.selectOption('red');
+      await paint.selectOption('gold'); // Write v2 and check the migrated grants after reload.
+      await journal.locator('.jr-close').click();
+      await page.setViewportSize({ width, height: 844 });
+    }
+  });
+
 test('phone Journal offers cosmetics and all downloaded missions stay open in Realistic', async ({
   page,
 }) => {

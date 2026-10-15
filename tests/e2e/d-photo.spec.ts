@@ -137,6 +137,11 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   // ---- capture.
   await page.keyboard.press('Enter');
   await expect(mode.locator('.photo-mode-toast')).toHaveText('Saved to Journal');
+  // Regression guard: the status belongs below the caption in the shared top panel.
+  await expect(mode.locator('.photo-mode-top > .photo-mode-toast')).toHaveCount(1);
+  const captionBox = await mode.locator('.photo-mode-caption').boundingBox();
+  const toastBox = await mode.locator('.photo-mode-toast').boundingBox();
+  expect(toastBox!.y).toBeGreaterThanOrEqual(captionBox!.y + captionBox!.height);
   const stored = await storedPhotos(page);
   expect(stored?.version).toBe(1);
   expect(stored?.photos).toHaveLength(1);
@@ -206,6 +211,8 @@ test('photo mode freezes the sim, saves to the Journal, persists and deletes', a
   await expect(journal.locator('.jr-photo-title')).toHaveText('Photos · 1 of 24');
   await expect(journal.locator('.jr-photo-card')).toHaveCount(1);
   await expect(journal.locator('.jr-photo-card')).toContainText('Bow section');
+  // Regression guard: portrait captures and their baked frames must remain fully visible.
+  await expect(journal.locator('.jr-photo-card img')).toHaveCSS('object-fit', 'contain');
   await page.waitForTimeout(300);
   await page.screenshot({ path: `${shots}/journal-photos.png` });
   await expect(journal.getByRole('button', { name: 'Download all' })).toBeVisible();
