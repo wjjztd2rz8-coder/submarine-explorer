@@ -24,8 +24,8 @@ Problem: both Blue Hole galleries scanned from 150 to 190 m while surfaced at 8 
 
 ## Verified
 
-- `PW_PORT=4711 tools/gates.sh`: see the final line of the run in the commit message; python, content, build,
-  unit, e2e smoke, e2e-base, attribution and prettier passed.
+- `PW_PORT=4711 tools/gates.sh`: all passed (python, content, build,
+  unit, e2e smoke, e2e-base, attribution, prettier).
 - Targeted e2e (d-scan, mission, f-bughunt-880, f-lowtier-followups, d-start, journal-debrief, content-missions,
   opening-framing): 169 passed. 6 failures are all `opening-framing` "endurance merged opening" camera radius
   (expected 70, got 54), from the V-endurance camera work and not from this package (no Endurance data touched).
