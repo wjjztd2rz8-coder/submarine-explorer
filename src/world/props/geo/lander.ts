@@ -1,27 +1,33 @@
 /**
  * `feature: "benthic-lander"` (Challenger Deep, the "Leggo" bait station): a free-vehicle lander
- * seen as a readable hero object. Three-legged aluminium frame with a ring and cross braces, yellow
- * glass flotation, a ballast plate, a camera housing, an arm carrying a wire bait cage with
- * mackerel, and a tall mast with an orange recovery flag and a white strobe. dims = [footprint
- * width, footprint depth, overall height incl. mast]. Parts are merged with vertex colours into
- * one frame mesh; the flag (emissive) and strobe (unlit) are two small extra meshes, so the whole
- * lander is three draw calls at every tier. Real lander dimensions are unpublished: the shape is
- * generic, only the position is the real one.
+ * seen as a readable hero object. Three-legged frame with a ring and cross braces, orange glass
+ * flotation, a ballast plate with an acoustic release and a coil of cable on the seabed, a camera
+ * housing, an arm carrying a wire bait cage with mackerel, and a tall mast with an orange recovery
+ * flag and a white strobe. The frame is aged: sediment darkens its lower sections and rust stains
+ * patch the legs. dims = [footprint width, footprint depth, overall height incl. mast]. Parts are
+ * merged with vertex colours into one frame mesh; the flag (emissive) and strobe (unlit) are two
+ * small extra meshes, so the whole lander is three draw calls at every tier. Real lander dimensions
+ * are unpublished: the shape is generic, only the position is the real one.
  */
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { lerp, smoothstep } from '../../../util/math.js';
 import { geoDetail } from './detail.js';
 import { boxCH, impostorFromBoxes, normalise, place, type BuiltProp } from './shared.js';
 import type { GeoBuildInput } from './types.js';
 
-const ALU = new THREE.Color(0xb9c3c8);
+const ALU = new THREE.Color(0x7f898e);
 const DARK = new THREE.Color(0x2c3236);
-const FLOAT = new THREE.Color(0xe9b21c);
-const WHITE = new THREE.Color(0xdfe6e8);
+const FLOAT = new THREE.Color(0xe8921a);
+const WHITE = new THREE.Color(0x9da5a7);
 const FISH = new THREE.Color(0x8fa6b4);
 const FLAG = new THREE.Color(0xff5a16);
 const STROBE = new THREE.Color(0xd6f4ff);
+const GLASS = new THREE.Color(0x1f3a48);
+const MUD = new THREE.Color(0x5e5443);
+const SEDIMENT = new THREE.Color(0x3d372c);
+const RUST = new THREE.Color(0x9a5530);
 
 /** Give a piece one flat colour and strip it to position/normal/colour so it can merge. */
 function tint(g: THREE.BufferGeometry, c: THREE.Color): THREE.BufferGeometry {
@@ -33,10 +39,38 @@ function tint(g: THREE.BufferGeometry, c: THREE.Color): THREE.BufferGeometry {
   return out;
 }
 
+/**
+ * Age the merged frame in place: sediment creeps up from the seabed so the low sections are
+ * darker, and rust blooms in irregular patches on the lower structure. Works per vertex, so it
+ * costs nothing at render time and adds no triangles.
+ */
+function weather(g: THREE.BufferGeometry, k: number): void {
+  const pos = g.getAttribute('position');
+  const col = g.getAttribute('color');
+  const c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i) / k;
+    const y = pos.getY(i) / k;
+    const z = pos.getZ(i) / k;
+    c.setRGB(col.getX(i), col.getY(i), col.getZ(i));
+    c.lerp(SEDIMENT, smoothstep(1.1, 0, y) * 0.6);
+    const stain = Math.sin(x * 7.3 + z * 4.1) * Math.cos(y * 9.7 - z * 3.3);
+    if (y < 1.6 && stain > 0.55) c.lerp(RUST, lerp(0.1, 0.35, smoothstep(0.55, 1, stain)));
+    col.setXYZ(i, c.r, c.g, c.b);
+  }
+  col.needsUpdate = true;
+}
+
 /** A cylinder of radius `r` joining two points. */
-function strut(a: THREE.Vector3, b: THREE.Vector3, r: number, seg: number): THREE.BufferGeometry {
+function strut(
+  a: THREE.Vector3,
+  b: THREE.Vector3,
+  r: number,
+  seg: number,
+  rings = 1,
+): THREE.BufferGeometry {
   const len = a.distanceTo(b);
-  const g = new THREE.CylinderGeometry(r, r, len, seg, 1);
+  const g = new THREE.CylinderGeometry(r, r, len, seg, rings);
   const q = new THREE.Quaternion().setFromUnitVectors(
     new THREE.Vector3(0, 1, 0),
     b.clone().sub(a).normalize(),
@@ -63,7 +97,7 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
     const cx = Math.cos(a);
     const cz = Math.sin(a);
     parts.push(
-      tint(strut(v(cx * 1.5, 0.1, cz * 1.5), v(cx * 0.9, ringY, cz * 0.9), 0.07 * k, seg), ALU),
+      tint(strut(v(cx * 1.5, 0.1, cz * 1.5), v(cx * 0.9, ringY, cz * 0.9), 0.07 * k, seg, 4), ALU),
     );
     parts.push(
       tint(
@@ -73,6 +107,17 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
           cz * 1.5 * k,
         ),
         DARK,
+      ),
+    );
+    // Sediment that has settled around each foot pad.
+    parts.push(
+      tint(
+        new THREE.CylinderGeometry(0.46 * k, 0.52 * k, 0.05 * k, seg + 3).translate(
+          cx * 1.5 * k,
+          0.025 * k,
+          cz * 1.5 * k,
+        ),
+        MUD,
       ),
     );
     // Cross braces to the next leg at mid height.
@@ -134,6 +179,42 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
       DARK,
     ),
   );
+  parts.push(
+    tint(
+      new THREE.SphereGeometry(0.1 * k, seg, 4, 0, Math.PI * 2, 0, Math.PI / 2)
+        .rotateZ(-Math.PI / 2)
+        .translate(0.6 * k, 1.2 * k, 0),
+      GLASS,
+    ),
+  );
+  // Acoustic release on the ballast plate, opposite the camera, with its orange ring.
+  parts.push(
+    tint(
+      new THREE.CylinderGeometry(0.1 * k, 0.1 * k, 0.42 * k, seg + 2).translate(
+        -0.5 * k,
+        0.55 * k,
+        -0.42 * k,
+      ),
+      DARK,
+    ),
+  );
+  parts.push(
+    tint(
+      new THREE.TorusGeometry(0.1 * k, 0.025 * k, 3, seg + 2)
+        .rotateX(Math.PI / 2)
+        .translate(-0.5 * k, 0.74 * k, -0.42 * k),
+      FLAG,
+    ),
+  );
+  // A coil of cable left on the seabed, tilted to lie in the sediment.
+  parts.push(
+    tint(
+      new THREE.TorusGeometry(0.42 * k, 0.022 * k, 3, seg * 2)
+        .rotateX(Math.PI / 2 + 0.15)
+        .translate(-0.9 * k, 0.03 * k, 0.72 * k),
+      DARK,
+    ),
+  );
 
   // Bait arm and wire cage with a mackerel inside, ahead of the lander on +x.
   const hub = v(0.9, 1.0, 0);
@@ -185,6 +266,7 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
 
   const frameGeom = mergeGeometries(parts, false)!;
   for (const p of parts) p.dispose();
+  weather(frameGeom, k);
   frameGeom.computeBoundingBox();
   frameGeom.computeBoundingSphere();
   const frame = new THREE.Mesh(
