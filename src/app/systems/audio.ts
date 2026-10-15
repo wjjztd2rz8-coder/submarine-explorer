@@ -12,6 +12,7 @@ import { Captions } from '../../ui/Captions.js';
 import { observeKeyboard } from '../../ui/FocusTrap.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
+import { siteManifest } from '../../core/SiteManifest.js';
 
 const cleanup = new Disposables();
 
@@ -68,9 +69,7 @@ export const audioSystem: GameSystem = {
         ratedDepth: s.ratedDepth,
         hullStress: s.hullStress,
         soundSites: sites,
-        whaleHabitat: ['monterey-canyon', 'kamaehuakanaloa', 'axial-seamount-ashes'].includes(
-          ctx.tileId,
-        ),
+        whaleHabitat: siteManifest(ctx.tileId)?.audio?.whaleHabitat === true,
         depth: s.depth,
         throttle: f.state.throttle,
         ballast: f.state.ballast,

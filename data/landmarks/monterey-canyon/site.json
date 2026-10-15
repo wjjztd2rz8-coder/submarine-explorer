@@ -1,0 +1,14 @@
+{
+  "id": "monterey-canyon",
+  "audio": {
+    "whaleHabitat": true
+  },
+  "events": {
+    "turbidity": {
+      "maxAltitudeM": 45
+    },
+    "whale": {
+      "maxDepthM": 180
+    }
+  }
+}

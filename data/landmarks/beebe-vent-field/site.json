@@ -1,0 +1,8 @@
+{
+  "id": "beebe-vent-field",
+  "events": {
+    "plume": {
+      "maxAltitudeM": 70
+    }
+  }
+}

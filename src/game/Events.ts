@@ -1,4 +1,5 @@
 import { EXPLORE_CONFIG } from '../core/config/explore.js';
+import { siteManifest } from '../core/SiteManifest.js';
 export type ExploreEventKind = 'plume' | 'turbidity' | 'whale';
 interface EventHabitat {
   site: string;
@@ -15,17 +16,12 @@ export const EVENT_CAPTIONS: Record<ExploreEventKind, string> = {
   turbidity: 'Silt cloud: sediment-laden water flows downslope',
   whale: 'Whale passing: whales use canyon waters to find food',
 };
-const VENTS = new Set(['axial-seamount-ashes', 'beebe-vent-field', 'kamaehuakanaloa']);
-const CANYONS = new Set(['monterey-canyon', 'hudson-canyon', 'hunga-tonga-caldera']);
 export function eventKinds(h: EventHabitat): ExploreEventKind[] {
+  const events = siteManifest(h.site)?.events;
   const kinds: ExploreEventKind[] = [];
-  if (VENTS.has(h.site) && h.altitudeM < 70) kinds.push('plume');
-  if (CANYONS.has(h.site) && h.altitudeM < 45) kinds.push('turbidity');
-  if (
-    (h.site === 'monterey-canyon' || h.site === 'hudson-canyon') &&
-    h.depthM < EXPLORE_CONFIG.shallowDepthM
-  )
-    kinds.push('whale');
+  if (events?.plume && h.altitudeM < events.plume.maxAltitudeM) kinds.push('plume');
+  if (events?.turbidity && h.altitudeM < events.turbidity.maxAltitudeM) kinds.push('turbidity');
+  if (events?.whale && h.depthM < events.whale.maxDepthM) kinds.push('whale');
   return kinds;
 }
 /** Uses active dive time only, with one short event and a guaranteed quiet gap. */

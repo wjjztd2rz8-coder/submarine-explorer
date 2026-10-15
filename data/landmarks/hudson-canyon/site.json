@@ -1,0 +1,11 @@
+{
+  "id": "hudson-canyon",
+  "events": {
+    "turbidity": {
+      "maxAltitudeM": 45
+    },
+    "whale": {
+      "maxDepthM": 180
+    }
+  }
+}

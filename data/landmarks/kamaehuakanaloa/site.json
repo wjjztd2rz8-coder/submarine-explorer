@@ -1,0 +1,11 @@
+{
+  "id": "kamaehuakanaloa",
+  "audio": {
+    "whaleHabitat": true
+  },
+  "events": {
+    "plume": {
+      "maxAltitudeM": 70
+    }
+  }
+}

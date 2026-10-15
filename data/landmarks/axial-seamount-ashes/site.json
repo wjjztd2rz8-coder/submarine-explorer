@@ -1,0 +1,11 @@
+{
+  "id": "axial-seamount-ashes",
+  "audio": {
+    "whaleHabitat": true
+  },
+  "events": {
+    "plume": {
+      "maxAltitudeM": 70
+    }
+  }
+}
