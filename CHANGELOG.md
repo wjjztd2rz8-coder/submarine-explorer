@@ -12,6 +12,10 @@ without an entry here is not done.
 
 ## [Unreleased]
 
+### Changed
+
+- **V-endurance:** the Endurance opening is reframed so the wreck is the subject: the sub starts 12 m off the hull and sits smaller (chase arm 70 m), with the camera offset sideways to show the hull's flank, and the deep-water ground fill is brighter so the lower hull side reads. Portrait uses a matching offset.
+
 ### Removed
 
 - **2140 / S-tests:** remove shared-source hashes from the Beebe isolation tests, a duplicate zero-cell-spacing case, an obsolete wall-enlargement cost comparison, and redundant cache-object identity assertions. Placement, collision, spawn, metadata rejection, cache isolation and current performance coverage remain. The ranked audit and individual cuts are in `plan/progress/2140-S-verify-11.md`.
