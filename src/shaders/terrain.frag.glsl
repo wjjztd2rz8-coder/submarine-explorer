@@ -68,7 +68,7 @@ varying vec3 vTerrainWorldNormal;
 varying float vCavity;
 
 const float TERRAIN_ALBEDO_GAIN = 4.6;
-const float TERRAIN_FAR_MIP_BIAS = 3.0;
+const float TERRAIN_FAR_MIP_BIAS = 5.0;
 
 vec3 terrainBlendWeights(vec3 n) {
   vec3 w = pow(abs(n), vec3(4.0));
@@ -138,12 +138,13 @@ vec3 terrainContrast(vec3 s, float c) {
 // larger and rotated sample so the repeat never reads.
 //
 // The gravel-scale albedo aliases into a regular houndstooth/checker on distant
-// and grazing slopes (anisotropic taps and mip selection are too sharp for a
+// and grazing slopes, worst on Low where no normal map or geometry hides it
+// (anisotropic taps and mip selection are too sharp for a
 // high-contrast pattern). A distance-driven mip bias keeps the near field crisp
 // and lets the far field fall back to the smooth mip levels; it costs no fetch.
 vec3 terrainAlbedo(sampler2D t, vec3 p, vec3 w, float s, bool brk, float dist) {
   vec3 c = vec3(0.0);
-  float bias = TERRAIN_FAR_MIP_BIAS * smoothstep(3.0, 40.0, dist);
+  float bias = TERRAIN_FAR_MIP_BIAS * smoothstep(3.0, 25.0, dist);
   if (w.y > 0.02) {
     vec2 uv = p.xz * s;
     vec3 a = texture2D(t, uv, bias).rgb;
