@@ -155,7 +155,7 @@ describe('Beebe mineral finish', () => {
         expect(mean).toBeGreaterThan(0);
         // Variation must survive on Low too, where no bump map is available.
         expect(new Set(lift.map((n) => Math.round(n * 1000))).size).toBeGreaterThan(10);
-        expect(Math.max(...lift)).toBeGreaterThan(mean * 2);
+        expect(lift.reduce((m, n) => Math.max(m, n), -Infinity)).toBeGreaterThan(mean * 2);
       });
     }
 

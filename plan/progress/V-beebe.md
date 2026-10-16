@@ -1,17 +1,16 @@
-# V-beebe: Beebe trunk surface and golden pose 2
+# V-beebe
 
-## What changed
+## Changed
 
-- `src/world/props/geo/crust.ts`: trunk branch of `paintCrust` adds vertical mineral streaks (long in y, tight around the axis), a soot-black orifice rim/bowl, softer crest oxide and a retuned brightness. Colours only, so triangle and draw budgets are unchanged.
-- `src/world/props/geo/smokers.ts`: Beebe hero body self-lit tint 0.13 to 0.16 (per-hero value in the existing `beebeHero` ternaries, no site id test in shared code).
-- `tools/beebe-poses.json` (new) wired in `tools/golden-shots.mjs`: pose 2 stands 44 m out aimed at 16 m up the trunk; pose 3 stands 32 m out, 14 m up. The first-person camera sits about 12 m ahead of the sub, so the previous 40 m / default close shot put the eye only 28 m / 18 m from the axis while aiming 5 m up, cutting off the top and putting the card over it.
-- Snapshot re-baseline (deliberate): geometry/buffer digests in `beebeIsolation` and `terrainMerge1140` changed because vertex colours changed; triangles and draws in the same snapshots are identical. No assertion loosened.
+- Beebe hero chimney mesh denser on Medium/High (64 segments, a ring every 0.18 m, was 40 / 0.3 m); chimneys 2-3 48 segments and a ring every 0.2 m (was 28 / 0.32 m). Low unchanged. Silhouette edges and banding are smoother; high-tier hero triangles 103k to 149k.
+- Tests: beebeIsolation snapshot, props-geo max-of-spread fix. A global sub tone-down was tried and reverted: barely visible and affected every site.
 
-## Visual review
+## Screenshots (golden, beebe-vent-field, high)
 
-Shots in `.cache/codex/shots/V-beebe/` (before-_, after-_).
+- Before: .cache/golden/2026-10-15-235623/beebe-vent-field-{1,2,3}.png
+- After chimney mesh: .cache/golden/2026-10-15-235806/
 
-- High desktop pose 2: whole trunk and both smoke columns in frame, trunk top at about y=320 versus card bottom 236, so the card clears it. Phones: portrait 390x844 trunk top at y~410 (card ends 195); landscape 844x390 top just under the card on Low (card ends ~115, top ~140). Trunk is dim but readable on High; honest verdict: better, not a hero still yet.
-- Close pose 3 (High and Low): three orifices read as black mouths with smoke, flute streaks visible.
-- Low: the coarse mesh averages the streaks, so the trunk still reads as a warm terracotta flute cone with little crust relief; geometry (not colour) is the limit and the Low triangle budget is pinned. Follow-up idea: a Low-only normal/bump or a darker Low palette.
-- Not done: no ring/shelf count change (would alter budgets); mission opening camera itself unchanged (the framing spec still passes).
+## Remains
+
+- The white hull is still the brightest object in the opening: it is lit by Beebe's ambientFill 8 and headlights; a per-site hull dim needs a channel from the vent preset to vehicle materials (not added, to keep code simple).
+- Remaining "facets" are the authored crust ledges, not mesh resolution.
