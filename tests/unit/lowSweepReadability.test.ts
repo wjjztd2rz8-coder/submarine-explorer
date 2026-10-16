@@ -148,8 +148,8 @@ for (const site of ['beebe-vent-field', 'axial-seamount-ashes', 'unknown']) {
               const effective = resolveEffective(custom, mode, daily, config);
               const effectiveBefore = JSON.stringify(effective);
               const preset = effective.light;
-              const spotGain = site === 'beebe-vent-field' ? 0.55 : 1;
-              const fillGain = site === 'beebe-vent-field' ? 0.6 : 1;
+              const spotGain = site === 'beebe-vent-field' ? 0.45 : 1;
+              const fillGain = site === 'beebe-vent-field' ? 0.35 : 1;
               for (let repeat = 0; repeat < 3; repeat++) {
                 const oldGeometry = ctx.headlights.beams[0]?.geometry;
                 const disposed = oldGeometry ? vi.spyOn(oldGeometry, 'dispose') : undefined;
