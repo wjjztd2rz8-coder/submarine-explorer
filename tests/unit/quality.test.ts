@@ -8,7 +8,12 @@ import {
   resolveQuality,
   type DeviceCaps,
 } from '../../src/core/Quality.js';
-import { dynamicResolutionEnabled } from '../../src/app/systems/quality.js';
+import {
+  createQualitySystem,
+  dynamicResolutionEnabled,
+  type PerfStats,
+} from '../../src/app/systems/quality.js';
+import type { ShellContext } from '../../src/app/context.js';
 
 // @ts-expect-error The Node CLI module intentionally has no browser declarations.
 import { diagnosticTiers } from '../../tools/diagnostic-tiers.mjs';
@@ -360,6 +365,84 @@ describe('DynamicResolution', () => {
     const t = DEFAULT_CONFIG.quality.tiers;
     expect([t.low.maxPixelRatio, t.medium.maxPixelRatio, t.high.maxPixelRatio]).toEqual([2, 2, 2]);
   });
+});
+
+describe('frame quality sampling', () => {
+  function setup() {
+    const doc = { hidden: false };
+    vi.stubGlobal('document', doc);
+    let ratio = 2;
+    let perf!: PerfStats;
+    const resize = vi.fn();
+    const ctx = {
+      config: DEFAULT_CONFIG,
+      quality: { source: 'auto' },
+      params: new URLSearchParams(),
+      renderer: {
+        getPixelRatio: () => ratio,
+        setPixelRatio: (next: number) => {
+          ratio = next;
+        },
+      },
+      resize,
+      expose: (values: { perf: PerfStats }) => {
+        perf = values.perf;
+      },
+    } as unknown as ShellContext;
+    const quality = createQualitySystem();
+    quality.init!(ctx);
+    const frame = (nowMs: number, flags = {}) =>
+      quality.frame!['late.perf']!({ nowMs, frozen: false, ...flags }, ctx);
+    frame(0);
+    frame(16);
+    return { doc, perf, resize, frame };
+  }
+
+  // Regression: the cutoff discarded phone stalls, while an unbounded sample would swamp the EMA.
+  it.each([250, 300, 5000])('counts a %i ms stall as a bounded sample and recovers', (gap) => {
+    const { perf, resize, frame } = setup();
+    expect(perf.frameMs).toBe(16);
+    frame(16 + gap);
+    expect(perf.frameMs).toBeCloseTo(39.4);
+    expect(resize).not.toHaveBeenCalled();
+    frame(32 + gap);
+    expect(perf.frameMs).toBeCloseTo(37.06);
+  });
+
+  // Regression: accepting stalls only in telemetry still leaves dynamic resolution blind to load.
+  it('lowers resolution when active frames repeatedly stall above the old cutoff', () => {
+    const { perf, resize, frame } = setup();
+    for (let i = 1; i <= 40; i++) frame(16 + i * 500);
+    expect(perf.frameMs).toBeGreaterThan(240);
+    expect(perf.frameMs).toBeLessThanOrEqual(250);
+    expect(perf.pixelRatio).toBeLessThan(perf.maxPixelRatio);
+    expect(perf.pixelRatio).toBeGreaterThanOrEqual(
+      DEFAULT_CONFIG.quality.dynamicResolution.minPixelRatio,
+    );
+    expect(resize).toHaveBeenCalled();
+  });
+
+  // Regression: capped hidden/frozen/resume gaps must not pollute either average or lower resolution.
+  it.each(['hidden', 'frozen', 'resumeFrame'])(
+    'excludes %s intervals and starts timing from the last skipped frame',
+    (interruption) => {
+      const { doc, perf, resize, frame } = setup();
+      let now = 16;
+      doc.hidden = interruption === 'hidden';
+      const flags = { [interruption]: true };
+      for (const gap of [8, ...Array<number>(40).fill(5000)]) {
+        frame((now += gap), flags);
+        expect(perf.frameMs).toBe(16);
+        expect(perf.resolutionScale).toBe(1);
+      }
+      doc.hidden = false;
+      frame((now += 5000), { resumeFrame: true });
+      expect(perf.frameMs).toBe(16);
+      frame(now + 16);
+      expect(perf.frameMs).toBe(16);
+      expect(resize).not.toHaveBeenCalled();
+    },
+  );
 });
 
 describe('diagnostic graphics tiers', () => {
