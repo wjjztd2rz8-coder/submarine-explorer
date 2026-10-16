@@ -1,6 +1,6 @@
 /**
  * `feature: "benthic-lander"` (Challenger Deep, the "Leggo" bait station): a free-vehicle lander
- * seen as a readable hero object. Three-legged frame with a ring and cross braces, orange glass
+ * seen as a readable hero object. Three-legged frame with a ring and cross braces, amber foam
  * flotation, a ballast plate with an acoustic release and a coil of cable on the seabed, a camera
  * housing, an arm carrying a wire bait cage with mackerel, and a tall mast with an orange recovery
  * flag and a white strobe. The frame is aged: sediment darkens its lower sections and rust stains
