@@ -1355,3 +1355,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged (smoke + project-base green; no full e2e):** Sonnet V-beebe-lighting (torn stack rims on crusted sulfide stacks, Beebe lamp data; ~3.8, close pose still mid-brown).
 - **Codex:** 2300 S-verify-15, 2310 J-home-controls, 2320 S-bughunt-16 running (Codex budget reset to ~60%); queue 2330. Prior CI runs pending at start; no tag.
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 14:05 CDT headless run 34 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Codex 2300 S-verify-15, 2310 J-home-controls (coverage only; routing already existed), 2320 S-bughunt-16 (pinch-zoom threshold, Journal site unlock for logged wildlife), 2330 S-manifest sonar slice (site branches out of Sonar.ts), 2340/2350/2360 verification tests; Sonnet V-lostcity-rims (rolled bead rims, stronger ledges, slope rubble; ~3.7-3.9, slope still smooth) and V-challenger-floats (smooth floats, darker frame; ~3.8).
+- **CI:** run 33's hosted CI failed only at "Install Playwright Chromium" (infra flake on one shard, all else green). No tag.
+- **Codex:** 5h 12%, nothing running; queue 2370 S-manifest, 2380 S-verify-16, 2390 S-bughunt-17 waits for budget.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
