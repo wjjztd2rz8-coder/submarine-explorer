@@ -308,6 +308,7 @@ export class VentPreset implements EnvPreset {
       ctx.atmo.ambientIntensity += fill;
       ctx.atmo.ambientColor.lerp(FILL_TINT, 0.8);
     }
+    ctx.atmo.hullLight = num(this.params.hullLight, 1);
     // Distance haze (opt-in per site): thicker and a little lighter than the abyssal fog, so a
     // far ridge fades into the water instead of standing as a hard dark cut-out.
     const haze = num(this.params.hazeScale, 1);

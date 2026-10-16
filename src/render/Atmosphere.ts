@@ -52,6 +52,8 @@ export interface AtmosphereSample {
   snowDriftMps: number;
   /** 1 above `causticsStartM`, easing to 0 at `causticsEndM`. */
   causticsStrength: number;
+  /** Multiplier on the player vehicle's lit result; a site preset lowers it where the hull outshines the scene. */
+  hullLight: number;
 }
 
 /**
@@ -112,6 +114,7 @@ export function sampleAtmosphere(
   out.vignette = mix(a.grade.vignette, b.grade.vignette);
   out.snowDensity = mix(a.snowDensity, b.snowDensity);
   out.snowDriftMps = mix(a.snowDriftMps, b.snowDriftMps);
+  out.hullLight = 1;
 
   // Caustics ease out between the two config depths rather than cutting off.
   const span = config.causticsStartM - config.causticsEndM;
@@ -139,6 +142,7 @@ function makeSample(): AtmosphereSample {
     snowDensity: 0,
     snowDriftMps: 0,
     causticsStrength: 0,
+    hullLight: 1,
   };
 }
 
