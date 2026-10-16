@@ -128,15 +128,19 @@ test('home menus and nested dialogs cycle visibly, close with Escape, and restor
   const home = page.locator('.home-screen');
   await expect(home).toBeVisible();
   await cycle(page, home);
-  for (const name of ['Journal', 'Settings', 'Controls']) {
+  for (const [name, selector, accessibleName] of [
+    ['Journal', '.journal', 'Journal'],
+    ['Settings', '.settings', 'Settings'],
+    ['Controls', '.controls-card', 'Controls guide'],
+  ]) {
     const opener = home.getByRole('button', { name, exact: true });
     await opener.focus();
     await page.keyboard.press('Enter');
-    // Controls opens the device guide card, not the settings dialog.
-    const dialog = page.locator(
-      { Journal: '.journal', Settings: '.settings', Controls: '.controls-card' }[name]!,
-    );
+    // Regression: Home Controls must expose the named device guide to keyboard users.
+    const dialog = page.locator(selector);
     await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveAccessibleName(accessibleName);
+    if (name === 'Controls') await expect(page.locator('.settings')).toBeHidden();
     await cycle(page, dialog);
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
@@ -150,6 +154,42 @@ test('home menus and nested dialogs cycle visibly, close with Escape, and restor
     await page.keyboard.press('Escape');
     await expect(page.locator('.home-sites')).toBeHidden();
   }
+});
+
+test.describe('touch Home guidance', () => {
+  test.use({ hasTouch: true });
+  test('Controls exposes the touch guide and restores focus on close', async ({ page }) => {
+    // Regression: touch Home opened keyboard rebinding instead of the accessible touch guide.
+    await boot(page, '/?tier=low');
+    const opener = page
+      .locator('.home-menu')
+      .getByRole('button', { name: 'Controls', exact: true });
+    const guide = page.getByRole('dialog', { name: 'How to play', exact: true });
+    for (let opening = 0; opening < 2; opening++) {
+      await opener.focus();
+      await opener.tap();
+      await expect(guide).toBeVisible();
+      await expect(guide).toHaveAttribute('aria-modal', 'true');
+      const close = guide.getByRole('button', { name: 'Close', exact: true });
+      await expect(opener).not.toBeFocused();
+      await expect(guide.getByRole('button')).toHaveCount(1);
+      await expect(guide.getByRole('group', { name: 'Input device' })).toHaveCount(0);
+      await expect(guide.getByRole('button', { name: 'Change keys' })).toHaveCount(0);
+      await expect(page.locator('.settings')).toBeHidden();
+      await expect(page.getByRole('dialog')).toHaveCount(1);
+      const result = await withClockFrames(page, () =>
+        new AxeBuilder({ page })
+          .include('.controls-card')
+          .withRules(['aria-dialog-name', 'button-name'])
+          .analyze(),
+      );
+      expect(result.violations).toEqual([]);
+      await close.tap();
+      await expect(guide).toBeHidden();
+      await expect(opener).toBeFocused();
+      await expect(page.locator('body')).toHaveAttribute('data-app-state', 'home');
+    }
+  });
 });
 
 test('standalone globe is keyboard reachable', async ({ page }) => {
