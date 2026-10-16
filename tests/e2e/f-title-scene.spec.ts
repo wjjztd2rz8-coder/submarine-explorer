@@ -241,30 +241,45 @@ for (const preference of ['OS', 'saved'] as const) {
   });
 }
 
-test('covering home modals stop title draws and return to a usable menu', async ({ page }) => {
-  await boot(page);
-  await presented(page);
-  for (const [name, selector] of [
-    ['Settings', '.settings'],
-    ['Journal', '.journal'],
-    ['Controls', '.controls-card'],
-  ]) {
-    await page.locator('.home-menu').getByRole('button', { name, exact: true }).click();
-    const dialog = page.locator(selector);
-    await expect(dialog).toBeVisible();
-    if (name !== 'Controls') await expect(dialog).toHaveAccessibleName(name);
-    await expect.poll(async () => (await title(page)).active).toBe(false);
-    await stopped(page);
-    const before = (await title(page)).drawCount;
-    await page.keyboard.press('Escape');
-    await expect(dialog).toBeHidden();
-    await expect(
-      page.locator('.home-menu').getByRole('button', { name, exact: true }),
-    ).toBeFocused();
-    await expect.poll(async () => (await title(page)).active).toBe(true);
-    await expect.poll(async () => (await title(page)).drawCount).toBeGreaterThan(before);
-  }
-});
+for (const touch of [false, true]) {
+  test.describe(`home modals with ${touch ? 'touch' : 'desktop'} input`, () => {
+    test.use({ hasTouch: touch });
+    test('covering home modals stop title draws and return to a usable menu', async ({ page }) => {
+      // Regression: Home Controls must cover the title with the device guide, without a dive.
+      await boot(page);
+      await presented(page);
+      for (const [name, selector, accessibleName] of [
+        ['Settings', '.settings', 'Settings'],
+        ['Journal', '.journal', 'Journal'],
+        ['Controls', '.controls-card', touch ? 'How to play' : 'Controls guide'],
+      ]) {
+        const opener = page.locator('.home-menu').getByRole('button', { name, exact: true });
+        await opener.focus();
+        if (touch) await opener.tap();
+        else await opener.click();
+        const dialog = page.locator(selector);
+        await expect(dialog).toBeVisible();
+        await expect(dialog).toHaveAccessibleName(accessibleName);
+        if (name === 'Controls') {
+          await expect(page.locator('.controls-card')).toHaveCount(1);
+          await expect(page.locator('.settings')).toBeHidden();
+          await expect(dialog.locator('.how-to-play')).toHaveCount(touch ? 1 : 0);
+        }
+        await expect(page.locator('body')).toHaveAttribute('data-app-state', 'home');
+        expect(await page.evaluate(() => 'sub' in window.__game!)).toBe(false);
+        await expect.poll(async () => (await title(page)).active).toBe(false);
+        await stopped(page);
+        const before = (await title(page)).drawCount;
+        if (touch) await dialog.getByRole('button', { name: /close/i }).tap();
+        else await page.keyboard.press('Escape');
+        await expect(dialog).toBeHidden();
+        await expect(opener).toBeFocused();
+        await expect.poll(async () => (await title(page)).active).toBe(true);
+        await expect.poll(async () => (await title(page)).drawCount).toBeGreaterThan(before);
+      }
+    });
+  });
+}
 
 test('quit after a mission lazily presents home, keeps Dive on the last mission and freezes the sub', async ({
   page,
