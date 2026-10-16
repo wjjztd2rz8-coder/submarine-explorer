@@ -48,6 +48,7 @@ export const shellSystem: GameSystem = {
     'gate.shell': (f, ctx) => {
       const { app, missionRouter, globe, settingsScreen, discovery } = ctx;
       f.shellFrozen =
+        !!globalThis.document?.hidden ||
         app.state !== 'dive' ||
         (missionRouter?.frozen ?? false) ||
         globe.isOpen ||

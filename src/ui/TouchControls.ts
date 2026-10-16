@@ -169,6 +169,8 @@ export class TouchControls {
     // latch so recovery never silently restarts boost without another tap.
     if (!show || !boostAllowed) this.input.touchBoost = false;
     this.syncBoost();
+    // Photo mode already hides flight controls; pausing must still end its camera gesture.
+    if (!inDive && !photo) this.releaseAll();
     if (show !== this.shouldShow) {
       this.shouldShow = show;
       this.root.hidden = !show;
@@ -226,6 +228,8 @@ export class TouchControls {
     // from the new geometry rather than retaining thrust or old look positions.
     const resetLayout = (): void => {
       this.releaseAll();
+      // A drag or pinch may already be queued for the next animation frame.
+      this.input.endFrame();
       if (window.innerHeight <= window.innerWidth) {
         this.rotateHint.hidden = true;
         window.clearTimeout(this.hintTimer);

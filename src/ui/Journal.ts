@@ -343,11 +343,11 @@ export class Journal {
   }
 
   /**
-   * Open on `entryId` (a current-site guide entry), else on the entry a scan
-   * just logged, else the front page from home, else the current site's page.
+   * Open on an explicit `entryId`, or the front page from Home. During a dive,
+   * prefer the entry a scan just logged, then the current site's page.
    */
   open(entryId?: string): void {
-    const focus = entryId ?? this.pendingFocus;
+    const focus = entryId ?? (this.homeMode ? null : this.pendingFocus);
     this.pendingFocus = null;
     const site = this.currentSiteId;
     if (focus && site) {

@@ -260,6 +260,21 @@ it('opens a focused scan even when its category was manually collapsed', () => {
   expect(journal.selectedId).toBe('entry');
 });
 
+it('opens the front page from Home after quitting with an unread scan, then consumes that focus', () => {
+  journal.close();
+  journal.focus('entry');
+  journal.setHomeMode(true);
+  journal.open();
+  expect(journal.viewKey).toBe('front');
+  journal.close();
+  journal.setHomeMode(false);
+  journal.open();
+  expect(journal.viewKey).toBe('reef');
+  journal.close();
+  journal.open('entry');
+  expect(journal.selectedId).toBe('entry');
+});
+
 it('keeps one front-page caveat through refreshes and only a provenance tag on entries', () => {
   for (let round = 0; round < 2; round++) {
     journal.show('front');

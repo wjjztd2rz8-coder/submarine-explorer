@@ -4,6 +4,7 @@ import { EventBus } from '../../src/core/EventBus.js';
 import { createInputSystem } from '../../src/app/systems/input.js';
 import { inputGateSystem, startLoop } from '../../src/app/loop.js';
 import { discoverySystem } from '../../src/app/systems/discovery.js';
+import { shellSystem } from '../../src/app/systems/shell.js';
 import { FROZEN_INPUT } from '../../src/game/MissionRouter.js';
 import type { GameContext } from '../../src/app/context.js';
 import {
@@ -17,6 +18,64 @@ import { createSystems } from '../../src/app/systems.js';
 import { Vector3 } from 'three';
 import { Mission, parseMission } from '../../src/game/Mission.js';
 import { SessionStats } from '../../src/game/Objectives.js';
+
+it('withholds polled gamepad actions during hidden frames and restores visible play', () => {
+  const doc = { hidden: false };
+  const buttons = Array.from({ length: 16 }, () => ({ pressed: false, value: 0 }));
+  vi.stubGlobal('document', doc);
+  vi.stubGlobal('navigator', {
+    getGamepads: () => [{ connected: true, index: 0, axes: [0, -1, 0, 0], buttons }],
+  });
+  const input = new Input({ storage: null });
+  const guide = { isOpen: false, isTop: true };
+  const ctx = {
+    app: { state: 'dive' },
+    globe: { isOpen: false },
+    settingsScreen: { isOpen: false },
+    discovery: {
+      guide,
+      debrief: { isOpen: false },
+      scanner: { setObjective: vi.fn() },
+      update: vi.fn(),
+    },
+    rig: {},
+  } as unknown as GameContext;
+  const frame = () => {
+    input.endFrame();
+    const f = { sampled: input.sample(), realSteps: 1, dt: 0.1 } as FrameState;
+    shellSystem.frame!['gate.shell']!(f, ctx);
+    inputGateSystem.frame!['gate.input']!(f, ctx);
+    return f;
+  };
+  try {
+    expect(frame().state.throttle).toBe(1);
+    doc.hidden = true;
+    buttons[2] = { pressed: true, value: 1 };
+    const hidden = frame();
+    expect(hidden.sampled.toggleLights).toBe(true);
+    expect(hidden.state).toBe(FROZEN_INPUT);
+    expect(hidden).toMatchObject({
+      shellFrozen: true,
+      blocked: true,
+      frozen: true,
+      steps: 0,
+      clockDt: 0,
+    });
+    doc.hidden = false;
+    const resumed = frame();
+    expect(resumed.state.throttle).toBe(1);
+    expect(resumed.state.toggleLights).toBe(false);
+    guide.isOpen = true;
+    doc.hidden = true;
+    buttons[14] = { pressed: true, value: 1 };
+    const reading = frame();
+    discoverySystem.frame!['scan.discovery']!(reading, ctx);
+    expect(vi.mocked(ctx.discovery.update).mock.calls.at(-1)![4].toggleGuide).toBe(false);
+  } finally {
+    input.dispose();
+    vi.unstubAllGlobals();
+  }
+});
 
 it('resumes the dive clock without counting paused or hidden time and removes clock listeners', () => {
   const doc = Object.assign(new EventTarget(), { hidden: false });
