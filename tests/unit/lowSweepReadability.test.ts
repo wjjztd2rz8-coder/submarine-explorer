@@ -2,18 +2,14 @@ import { resolveEffective } from '../../src/game/EffectiveSettings.js';
 import { defaultSettings } from '../../src/core/Save.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
-import { AmbientLight, Raycaster, Scene, Vector3 } from 'three';
-import { expect, test } from 'vitest';
+import { AmbientLight, HemisphereLight, Light, Raycaster, Scene, Vector3 } from 'three';
+import { expect, test, vi } from 'vitest';
 import { atmosphereSystem } from '../../src/app/systems/atmosphere.js';
 import type { GameContext } from '../../src/app/context.js';
 import type { FrameState } from '../../src/app/System.js';
+import * as siteManifests from '../../src/core/SiteManifest.js';
 import { makeConfig } from '../../src/core/Config.js';
-import {
-  LOW_READABILITY_SITES,
-  SITE_SEABED_LIGHT,
-  lowSiteWater,
-  siteLightWater,
-} from '../../src/core/config/atmosphere.js';
+import { siteLightWater } from '../../src/core/config/atmosphere.js';
 import { deepSiteWater } from '../../src/core/config/deepOpenings.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { sampleAtmosphere } from '../../src/render/Atmosphere.js';
@@ -23,13 +19,36 @@ import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import bismarckPose from '../../tools/bismarck-poses.json';
 
+// Numeric light checks need a texture handle, not a DOM canvas pattern.
+vi.mock('../../src/render/caustics.js', async () => {
+  const { Texture } = await import('three');
+  return { makeCausticFrames: () => [new Texture()] };
+});
+
+const lowReadabilitySites = [
+  'axial-seamount-ashes',
+  'beebe-vent-field',
+  'bismarck',
+  'blake-plateau-corals',
+  'hudson-canyon',
+  'hunga-tonga-caldera',
+  'kamaehuakanaloa',
+  'lost-city',
+];
+const allTierFloorSites = [
+  'bismarck',
+  'blake-plateau-corals',
+  'hudson-canyon',
+  'hunga-tonga-caldera',
+];
+
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 
 test('Low seabed lighting is isolated to the observed dark sites and leaves surface water intact', () => {
   const water = makeConfig().water;
   const before = JSON.stringify(water);
-  for (const site of LOW_READABILITY_SITES) {
-    const low = lowSiteWater(site, 'low', water);
+  for (const site of lowReadabilitySites) {
+    const low = siteLightWater(site, 'low', water);
     for (const depth of [0, -5, -20])
       expect(sampleAtmosphere(low, depth)).toEqual(sampleAtmosphere(water, depth));
     for (const depth of [-200, -700, -1500, -4200]) {
@@ -42,19 +61,20 @@ test('Low seabed lighting is isolated to the observed dark sites and leaves surf
       expect(sample.fogDensity).toBe(base.fogDensity);
       expect(sample.sunIntensity).toBe(base.sunIntensity);
     }
-    for (const tier of ['medium', 'high'] as const)
-      expect(lowSiteWater(site, tier, water)).toBe(water);
+    if (!allTierFloorSites.includes(site))
+      for (const tier of ['medium', 'high'] as const)
+        expect(siteLightWater(site, tier, water)).toBe(water);
   }
   for (const site of ['titanic', 'monterey-canyon', 'great-blue-hole', 'unknown'])
-    expect(lowSiteWater(site, 'low', water)).toBe(water);
+    expect(siteLightWater(site, 'low', water)).toBe(water);
   for (const site of ['challenger-deep', 'endurance']) {
     const deep = deepSiteWater(site, water);
-    expect(lowSiteWater(site, 'low', deep)).toBe(deep);
+    expect(siteLightWater(site, 'low', deep)).toBe(deep);
   }
   expect(JSON.stringify(water)).toBe(before);
 });
 
-for (const site of LOW_READABILITY_SITES) {
+for (const site of lowReadabilitySites) {
   test(`${site}: atmosphere system applies Low fill each frame with lamps off and no new scene lights`, () => {
     const config = makeConfig();
     const scene = new Scene();
@@ -152,12 +172,11 @@ test('Bismarck golden approach/detail aim at visible hull above the slope from c
   }
 });
 
-test('Per-site seabed light lifts only the deep bands of listed sites on Medium and High (Low keeps its own floor)', () => {
+test('Per-site seabed light also lifts only the deep bands of the four all-tier sites on Medium and High', () => {
   const water = makeConfig().water;
   expect(siteLightWater('titanic', 'high', water)).toBe(water);
-  for (const site of Object.keys(SITE_SEABED_LIGHT))
+  for (const site of allTierFloorSites)
     for (const tier of ['medium', 'high'] as const) {
-      expect(siteLightWater(site, 'low', water)).toBe(water);
       const lit = siteLightWater(site, tier, water);
       for (const depth of [0, -5, -20])
         expect(sampleAtmosphere(lit, depth)).toEqual(sampleAtmosphere(water, depth));
@@ -165,4 +184,138 @@ test('Per-site seabed light lifts only the deep bands of listed sites on Medium 
         sampleAtmosphere(water, -700).ambientIntensity,
       );
     }
+});
+
+// Capture numeric policy and system results independently of pixel rendering.
+const atmosphereSites = [...json('data/landmarks/index.json').landmarks, 'unknown'] as string[];
+for (const site of atmosphereSites) {
+  for (const tier of ['low', 'medium', 'high'] as const) {
+    test(`${site} ${tier}: preserves atmosphere bands, boundaries and light selection`, () => {
+      const config = makeConfig();
+      const before = JSON.stringify(config);
+      const manifestBefore = JSON.stringify(siteManifests.siteManifest(site));
+      const compose = (water: typeof config.water) =>
+        siteLightWater(site, tier, deepSiteWater(site, water));
+      const water = compose(config.water);
+      const boundaryWater = {
+        ...config.water,
+        bands: [-199.999, -200, -200.001, -1000].map((depth, i) => ({
+          ...config.water.bands[i]!,
+          depth,
+          ambientIntensity: i % 2 ? 2 : 9,
+        })),
+      };
+      const boundaryBefore = JSON.stringify(boundaryWater);
+      const boundary = compose(boundaryWater);
+      const ctx = {
+        config,
+        tier,
+        scene: new Scene(),
+        bus: new EventBus(),
+        meta: { id: site },
+        effective: resolveEffective(defaultSettings(config), 'arcade', null, config),
+        terrain: { widthM: 1000, depthM: 1000 },
+        expose: () => {},
+      } as unknown as GameContext;
+      atmosphereSystem.init!(ctx);
+      try {
+        const samples = [
+          0, -20, -199.999, -200, -200.001, -700, -999.999, -1000, -1000.001, -4200,
+        ].map((depth) => {
+          const sample = sampleAtmosphere(water, depth);
+          expect(ctx.atmosphere.update(depth, new Vector3(), 0)).toEqual(sample);
+          return [
+            depth,
+            sample.band,
+            sample.ambientColor.toArray(),
+            sample.ambientIntensity,
+            sample.fogColor.toArray(),
+            sample.fogDensity,
+            sample.snowDensity,
+            sample.vignette,
+          ];
+        });
+        const lights: unknown[] = [];
+        ctx.scene.traverse((object) => {
+          if (!(object instanceof Light)) return;
+          lights.push({
+            name: object.name,
+            type: object.type,
+            color: object.color.toArray(),
+            intensity: object.intensity,
+            ground: object instanceof HemisphereLight ? object.groundColor.toArray() : undefined,
+            distance: 'distance' in object ? object.distance : undefined,
+            angle: 'angle' in object ? object.angle : undefined,
+          });
+        });
+        expect(
+          JSON.stringify({
+            bands: water.bands,
+            boundary: boundary.bands,
+            samples,
+            lights,
+            tier: ctx.atmoTier,
+          }),
+        ).toMatchSnapshot();
+        expect(JSON.stringify(config)).toBe(before);
+        expect(JSON.stringify(siteManifests.siteManifest(site))).toBe(manifestBefore);
+        expect(JSON.stringify(boundaryWater)).toBe(boundaryBefore);
+      } finally {
+        ctx.atmosphere.dispose();
+        ctx.headlights.dispose();
+        ctx.snow.dispose();
+        ctx.water.dispose();
+      }
+    });
+  }
+}
+
+for (const atmosphere of [
+  undefined,
+  {},
+  { tiers: {} },
+  { tiers: { high: { depthM: -200, color: 0, intensity: 1 } } },
+]) {
+  test('absent atmosphere or tier policy returns the original water', () => {
+    const read = vi
+      .spyOn(siteManifests, 'siteManifest')
+      .mockReturnValue({ id: 'unknown', atmosphere });
+    try {
+      const water = makeConfig().water;
+      expect(siteLightWater('unknown', 'low', water)).toBe(water);
+    } finally {
+      read.mockRestore();
+    }
+  });
+}
+
+test('deep lamps take precedence over manifest lamps and keep their independent hemisphere', () => {
+  const policy = siteManifests.siteManifest('monterey-canyon')!.atmosphere!;
+  const read = vi
+    .spyOn(siteManifests, 'siteManifest')
+    .mockReturnValue({ id: 'endurance', atmosphere: policy });
+  const config = makeConfig();
+  const ctx = {
+    config,
+    tier: 'low',
+    scene: new Scene(),
+    bus: new EventBus(),
+    meta: { id: 'endurance' },
+    effective: resolveEffective(defaultSettings(config), 'arcade', null, config),
+    terrain: { widthM: 1000, depthM: 1000 },
+    expose: () => {},
+  } as unknown as GameContext;
+  try {
+    atmosphereSystem.init!(ctx);
+    expect(ctx.headlights.lights[0]!.intensity).toBe(ctx.effective.light.intensity * 0.7);
+    expect(ctx.headlights.lights[0]!.distance).toBe(ctx.effective.light.distance);
+    expect(ctx.scene.getObjectByName('enduranceFill')).toBeInstanceOf(HemisphereLight);
+    expect(ctx.scene.getObjectByName('montereyFill')).toBeInstanceOf(HemisphereLight);
+  } finally {
+    read.mockRestore();
+    ctx.atmosphere?.dispose();
+    ctx.headlights?.dispose();
+    ctx.snow?.dispose();
+    ctx.water?.dispose();
+  }
 });

@@ -51,14 +51,14 @@ Reviewers send work back if it breaks one of these:
 
 ## What 1.0 means
 
-| Requirement                                                                                                                                                                                                                      | Backlog items                                                             |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Five hero sites look beautiful (4 of 5) in opening, approach and detail views. Note: code's `HERO_SITES` (Cosmetics.ts) is Titanic, Lost City, Blue Hole, Beebe and Monterey; Endurance is a polish site. Reconcile (V-hero-set) | V-bluehole, V-beebe, V-titanic, V-lostcity, V-monterey-floor, V-endurance |
-| The other eight sites are coherent with no major visual defect                                                                                                                                                                   | V-eight-sites                                                             |
-| A new player understands the first five minutes on desktop and phone                                                                                                                                                             | V-journeys, S-guidance (done), S-hud                                      |
-| Acceptable Low-tier performance on a real phone                                                                                                                                                                                  | Owner check; S-boot helps                                                 |
-| Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                        | R-release, R-ci-green                                                     |
-| No known blockers; the code is simple enough to keep changing safely                                                                                                                                                             | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
+| Requirement                                                                                                                                                                                                                               | Backlog items                                                             |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Five hero sites look beautiful (4 of 5) in opening, approach and detail views. The set is `HERO_SITES` (Cosmetics.ts): Titanic, Lost City, Blue Hole, Beebe and Monterey; Endurance is a polish site covered by the eight-site acceptance | V-bluehole, V-beebe, V-titanic, V-lostcity, V-monterey-floor, V-endurance |
+| The other eight sites are coherent with no major visual defect                                                                                                                                                                            | V-eight-sites                                                             |
+| A new player understands the first five minutes on desktop and phone                                                                                                                                                                      | V-journeys, S-guidance (done), S-hud                                      |
+| Acceptable Low-tier performance on a real phone                                                                                                                                                                                           | Owner check; S-boot helps                                                 |
+| Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
+| No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
 Stage (joint review with Sol, 2026-10-16): see plan/REVIEWS.md; about 81% to 1.0. Beautiful: Titanic 3.9, Lost City 3.6, Endurance 3.6, Blue Hole 3.5, Monterey 3.5, Beebe 3.3, Challenger 3.2. Top blockers: real-phone Low readability and performance (owner), Beebe/Challenger materials, Blue Hole roof, J-* P2 journey fixes, a completed green hosted CI on the release commit (f55).
 
@@ -70,7 +70,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running. Codex queue 2240-2290 waits for the dispatcher.
+- No Claude package running. Codex 2240, 2250, 2290 running; queue 2300-2320.
 - V-endurance-aim parked 2026-10-15: branch claude/V-endurance-aim (worktree ../subexp-wt/V-endurance-aim, commit 5fa58fc) reached hull 45% but the sub is too large and dominant in frame; not merged (new shared camera code for a small gain). Needs the camera forward of the sub, or drop item 4.
 
 ## Backlog
@@ -83,7 +83,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
    - **J-picker-density [Sonnet, P3]:** simplify the long site-card list and make Blue Hole easier to identify under its Lighthouse Reef title.
    - **J-desktop-repetition [Sonnet, P3]:** review repeated destination/turn information in the card, mission block and waypoint; consolidate through existing HUD regions.
    - **J-journal-preview [Sonnet, P2]:** review tall portrait captures pushing entry text below the fold, repeated memorial text and captures that show the bow under a debris-field entry. The Journal now has images; the older text-only finding is resolved.
-   - **J-atoll-transit [Sonnet, P2]:** explain the jump from two nearby galleries to optional atoll targets more than 4 km away, especially before the debrief's invitation to finish them for two stars.
+   - **J-atoll-transit [Sonnet, P2] DONE 2026-10-16 (9deb960):** explain the jump from two nearby galleries to optional atoll targets more than 4 km away, especially before the debrief's invitation to finish them for two stars.
    - **J-completion-contrast [Sonnet, P2], DONE 2026-10-16 (86bee20):** the primary-completion banner has cyan text over a translucent cyan fill on bright Blue Hole water; touch removes the objectives panel's dark backdrop. Keep the existing banner, improve its legibility.
    - **J-home-controls [Codex, P2]:** Home's Controls entry opens keyboard/pad rebinding settings on touch, while Pause has a touch How to play guide. Route both entry points to the existing device guide without adding a dialog or loading the dive on Home.
    - Opening gallery hood/terraces and orange Titanic materials remain with V-bluehole and V-titanic below; no visual tuning in this repeat.
@@ -95,12 +95,13 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
    6b. **V-monterey-floor [Sonnet, small], DONE 2026-10-16 (2947c7f; ~3.8):** was ~3.5: flat sand floor between boulders; add ripple/pebble variation using the existing sediment material.
 7. **S-manifest slices [Codex 2160]:** step 1 done (habitat). Migrate the next slices per `plan/progress/S-manifest.md` (inventory: 27 site-id expressions left); one slice per brief; golden unchanged.
 8. **S-render remainder [Codex 2280]:** the nightly workflow failed on both scheduled runs (38574704463, 38743060407; ~1.5 h each, exit 1 after golden/perf steps; artifacts exist) and 2210 found exact golden identity fails. Diagnose from `gh run view <id> --log-failed` and the artifacts, fix the workflow or its thresholds, and make golden comparison use a justified tolerance.
+   Implementation and evidence: [progress/2280-S-render-nightly.md](progress/2280-S-render-nightly.md). Hosted confirmation remains pending; a green diagnostic workflow does not establish visual acceptance.
 
 9. **R-release [Haiku]:** f54 tagged 2026-10-15 on green CI (04a1d8c). Next tag f55 after the next completed green run.
 
 10. **S-verify / S-bughunt [Codex, standing]:** after each batch of visual merges, a numeric/static verification (no site branches, no package numbers, `hullLight`/bank/footprint data paths, snapshot rebaselines justified) and a bug hunt over newly merged code. Latest: [2260 S-verify-13](progress/2260-S-verify-13.md) audits V-bluehole-3, V-lostcity-2 and V-beebe-hull; late-prop life exclusion fixed, no new simplicity violation or masked numeric regression found. Browser verification remains environment-blocked.
 
-11. **V-hero-set [Haiku, small]:** make the 1.0 table and `HERO_SITES` agree (Sol, 2026-10-16: the table counts Endurance, the code counts Monterey). Pick one set, update the table and golden poses; eight-site acceptance must then cover the other eight including Endurance mission spawn.
+11. **V-hero-set [Haiku, small], DONE 2026-10-16 (table follows the code; HERO_SITES unchanged, so saves are unaffected):** make the 1.0 table and `HERO_SITES` agree (Sol, 2026-10-16: the table counts Endurance, the code counts Monterey). Pick one set, update the table and golden poses; eight-site acceptance must then cover the other eight including Endurance mission spawn.
 12. **S-perf-stall [Codex 2270]:** `perf.frameMs` (`src/app/systems/quality.ts`) ignores every interval >=250 ms, so real stalls on a phone never lower quality or show in metrics. Separate hidden-tab gaps (document.hidden/visibility) from stalls and clamp stalls into the average; unit test by capability.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.
@@ -119,3 +120,10 @@ If it fails, send it back to the same agent or Codex session with concrete feedb
 ## Golden screenshots
 
 `tools/golden.sh` captures the hero sites at fixed poses into `.cache/golden/<date>/`. Compare the newest set with the previous one after any visual merge. A merge must not make them worse.
+
+Use `node tools/golden-compare.mjs <before-dir> <after-dir>` for numeric review:
+two RGB byte levels of tolerance, with larger differences limited to 0.1% of
+pixels per image. It rejects incomplete sets and changed poses/options. Exit 1
+flags changes for review; exit 2 means the inputs cannot be compared. `--report`
+retains metrics without failing on pixel changes. This screen does not replace
+Claude's visual judgement or make captures across art changes equivalent.

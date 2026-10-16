@@ -529,7 +529,8 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
   // The wall's buried base: straight down from the foot so the apron hides the join.
   const profile: [number, number][] = [[joinY - 0.09 * H, footZ + 0.025 * D], ...rawProfile];
   const scale = Math.max(0.6, H / 30);
-  const gnd = input.groundHeight() ?? ((): number => 0);
+  const ground = input.groundHeight();
+  const gnd = ground ?? ((): number => 0);
   const plan = (x: number): number => planOffset(P, x, W, D, seed);
   const footAt = (x: number): number => {
     const { edge } = wallEnvelope(x, W, P.edgeStart);
@@ -886,6 +887,27 @@ export function buildScarp(id: ScarpPresetId, input: GeoBuildInput): BuiltProp {
         full.add(sh);
       }
     }
+  }
+
+  // Audit capped reconstructions: their dense buried faces consume the frame budget.
+  // Keep vertices, normals and bounds for anchors and seated colonies. Smaller walls
+  // retain their original topology and avoid this terrain-sampling cost.
+  if (fidelity && ground && nx === limits[0] && ny === limits[1]) {
+    const pos = wall.getAttribute('position');
+    const buried = Array.from(
+      { length: pos.count },
+      (_, i) => pos.getY(i) < ground(pos.getX(i), pos.getZ(i)) - 1,
+    );
+    const index = wall.getIndex()!;
+    const visible: number[] = [];
+    for (let i = 0; i < index.count; i += 3) {
+      const a = index.getX(i),
+        b = index.getX(i + 1),
+        c = index.getX(i + 2);
+      if (buried[a] && buried[b] && buried[c]) continue;
+      visible.push(a, b, c);
+    }
+    wall.setIndex(visible);
   }
 
   const bounds = wall.boundingBox!.clone().union(apron.boundingBox!);

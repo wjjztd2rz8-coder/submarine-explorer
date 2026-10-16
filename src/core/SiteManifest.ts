@@ -3,6 +3,8 @@
  * branches on a site id. Add a new concern as another optional section here,
  * in validateSiteManifest, and in the sites' JSON; nothing else changes.
  */
+import type { GraphicsTier } from './config/quality.js';
+
 /** Local approach bearing and clearance from the hero's actual footprint. */
 export interface OpeningPose {
   hero: string;
@@ -67,7 +69,6 @@ const chimneyShapeKeys = [
 ] as const;
 const smokerDetailKeys = [
   'ridges',
-  'topFraction',
   'shelfStart',
   'mainShelfStep',
   'sideShelfStep',
@@ -113,7 +114,10 @@ export type GalleryApron = Record<(typeof galleryApronKeys)[number], number>;
 export type ChimneyShape = Record<(typeof chimneyShapeKeys)[number], number>;
 export type SmokerProfile = ChimneyShape &
   Record<(typeof smokerDetailKeys)[number], number> & {
+    /** Top/base radius ratio in (0, 1]; omitted data defaults to the original 0.45 taper. */
+    topFraction: number;
     mouthColor: number;
+    /** Mouth-disc emissive RGB (0x000000–0xffffff); defaults to unlit black (0). */
     throatColor: number;
     collarColor: number;
     collarEmissive: number;
@@ -136,6 +140,12 @@ export interface PropManifest {
 }
 
 export interface SiteManifest {
+  atmosphere?: {
+    hemisphere?: { name: string; sky: number; ground: number; intensity: number };
+    lamps?: { intensity: number; distance: number; fillIntensity: number; fillDistance: number };
+    /** Ambient floors apply to band stops at or below depthM, preserving brighter inputs. */
+    tiers?: Partial<Record<GraphicsTier, { depthM: number; color: number; intensity: number }>>;
+  };
   props?: Record<string, PropManifest>;
   id: string;
   opening?: {
@@ -152,6 +162,10 @@ export interface SiteManifest {
     camera?: { applyDefaults?: boolean };
   };
   life?: { opening?: GroupOpeningLife | ApproachOpeningLife };
+  scatter?: {
+    /** Reserve opening.freeDive.hero's world bounds from boulders after props load. */
+    keepoutHero?: boolean;
+  };
   audio?: {
     /** Habitat whale calls may play here (separate from event whale eligibility). */
     whaleHabitat?: boolean;
@@ -301,6 +315,35 @@ const color: Check = (id, path, value) => {
   count(id, path, value);
   if ((value as number) > 0xffffff) fail(id, path, 'expected a color from 0 to 0xffffff');
 };
+const nonnegative: Check = (id, path, value) => {
+  finite(id, path, value);
+  if ((value as number) < 0) fail(id, path, 'expected a nonnegative number');
+};
+const submergedDepth: Check = (id, path, value) => {
+  finite(id, path, value);
+  if ((value as number) > 0) fail(id, path, 'expected a depth at or below zero');
+};
+const ambientFloorCheck = fields({ depthM: submergedDepth, color, intensity: nonnegative });
+const atmosphereCheck = fields(
+  {},
+  {
+    hemisphere: fields({ name: text, sky: color, ground: color, intensity: nonnegative }),
+    lamps: fields({
+      intensity: nonnegative,
+      distance: nonnegative,
+      fillIntensity: nonnegative,
+      fillDistance: nonnegative,
+    }),
+    tiers: fields(
+      {},
+      { low: ambientFloorCheck, medium: ambientFloorCheck, high: ambientFloorCheck },
+    ),
+  },
+);
+const positiveFraction: Check = (id, path, value) => {
+  aboveZero(id, path, value);
+  if ((value as number) > 1) fail(id, path, 'expected a fraction greater than 0 and at most 1');
+};
 const threshold: Check = (id, path, value) => {
   if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0)
     fail(id, path, 'expected a positive number');
@@ -321,17 +364,19 @@ const propCheck = fields(
     habitat: flag,
     seabed: fields({ biome: text }),
     mineralCrust: flag,
-    smoker: fields({
-      ...numericFields(chimneyShapeKeys, aboveZero),
-      ...numericFields(smokerDetailKeys, aboveZero),
-      mouthColor: color,
-      throatColor: color,
-      collarColor: color,
-      collarEmissive: color,
-      mainShelves: count,
-      sideShelves: count,
-      outletCount: count,
-    }),
+    smoker: fields(
+      {
+        ...numericFields(chimneyShapeKeys, aboveZero),
+        ...numericFields(smokerDetailKeys, aboveZero),
+        mouthColor: color,
+        collarColor: color,
+        collarEmissive: color,
+        mainShelves: count,
+        sideShelves: count,
+        outletCount: count,
+      },
+      { topFraction: positiveFraction, throatColor: color },
+    ),
     chimney: fields({
       ...numericFields(chimneyVariationKeys, aboveZero),
       lean: finite,
@@ -346,9 +391,22 @@ const propCheck = fields(
 /** Throws with the site id and field path on the first problem. */
 export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
   const root = obj(id, '$', raw);
-  noExtra(id, '$', root, ['id', 'audio', 'events', 'opening', 'life', 'props']);
+  noExtra(id, '$', root, [
+    'id',
+    'audio',
+    'events',
+    'opening',
+    'life',
+    'props',
+    'scatter',
+    'atmosphere',
+  ]);
   if (root.id !== id) fail(id, 'id', `expected "${id}"`);
   const out: SiteManifest = { id };
+  if (root.atmosphere !== undefined) {
+    atmosphereCheck(id, 'atmosphere', root.atmosphere);
+    out.atmosphere = root.atmosphere as SiteManifest['atmosphere'];
+  }
   if (root.audio !== undefined) {
     fields({}, { whaleHabitat: flag })(id, 'audio', root.audio);
     out.audio = { whaleHabitat: (root.audio as NonNullable<SiteManifest['audio']>).whaleHabitat };
@@ -372,13 +430,34 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
     fields({}, { opening: lifeOpeningCheck })(id, 'life', root.life);
     out.life = root.life as SiteManifest['life'];
   }
+  if (root.scatter !== undefined) {
+    fields({}, { keepoutHero: flag })(id, 'scatter', root.scatter);
+    out.scatter = root.scatter as SiteManifest['scatter'];
+    if (out.scatter?.keepoutHero && !out.opening?.freeDive)
+      fail(id, 'scatter.keepoutHero', 'requires opening.freeDive.hero');
+  }
   if (root.props !== undefined) {
     const props = obj(id, 'props', root.props);
     for (const [key, value] of Object.entries(props)) {
       text(id, 'props', key);
       propCheck(id, `props.${key}`, value);
     }
-    out.props = props as SiteManifest['props'];
+    // Resolve compatibility defaults once, without mutating the authored data.
+    out.props = Object.fromEntries(
+      Object.entries(props as Record<string, PropManifest>).map(([key, prop]) => [
+        key,
+        prop.smoker
+          ? {
+              ...prop,
+              smoker: {
+                ...prop.smoker,
+                topFraction: prop.smoker.topFraction ?? 0.45,
+                throatColor: prop.smoker.throatColor ?? 0,
+              },
+            }
+          : prop,
+      ]),
+    );
   }
   return out;
 }

@@ -13,8 +13,80 @@ const ids = (
 ).landmarks;
 
 describe('site manifest validator', () => {
+  it('defaults omitted smoker taper and throat emission without changing the source profile', () => {
+    const {
+      topFraction: _top,
+      throatColor: _throat,
+      ...smoker
+    } = propManifest('beebe-chimney-1')!.smoker!;
+    const raw = { id: 's', props: { p: { smoker } } };
+    const resolved = validateSiteManifest(raw, 's').props!.p!.smoker!;
+    expect(resolved).toEqual({ ...smoker, topFraction: 0.45, throatColor: 0 });
+    expect(smoker).not.toHaveProperty('topFraction');
+    expect(smoker).not.toHaveProperty('throatColor');
+  });
+
+  it.each([0.01, 0.3, 1])(
+    'preserves valid taper %s and an explicitly unlit throat',
+    (topFraction) => {
+      const smoker = { ...propManifest('beebe-chimney-1')!.smoker!, topFraction, throatColor: 0 };
+      expect(
+        validateSiteManifest({ id: 's', props: { p: { smoker } } }, 's').props!.p!.smoker,
+      ).toEqual(smoker);
+    },
+  );
+
+  it.each([
+    ['topFraction', NaN],
+    ['topFraction', Infinity],
+    ['topFraction', -0.1],
+    ['topFraction', 0],
+    ['topFraction', 1.01],
+    ['throatColor', NaN],
+    ['throatColor', -1],
+    ['throatColor', 0x1000000],
+    ['topMouthRadiusFraction', 0],
+    ['outletBaseRadiusM', 0],
+    ['outletTipRadiusM', 0],
+    ['outletMouthRadiusM', 0],
+  ])('rejects unsafe smoker %s=%s before geometry construction', (key, value) => {
+    const smoker = { ...propManifest('beebe-chimney-1')!.smoker!, [key]: value };
+    expect(() => validateSiteManifest({ id: 's', props: { p: { smoker } } }, 's')).toThrow(
+      `props.p.smoker.${key}`,
+    );
+  });
+
   const cases: [string, unknown, string | null][] = [
     ['minimal', { id: 's' }, null],
+    ['empty scatter', { id: 's', scatter: {} }, null],
+    ['disabled keepout', { id: 's', scatter: { keepoutHero: false } }, null],
+    ['opening hero keepout', { ...siteManifest('challenger-deep'), id: 's' }, null],
+    ['invalid scatter object', { id: 's', scatter: [] }, 'scatter: expected an object'],
+    ['null scatter', { id: 's', scatter: null }, 'scatter: expected an object'],
+    [
+      'unknown scatter policy',
+      { id: 's', scatter: { keepoutHeros: true } },
+      'scatter.keepoutHeros: unknown field',
+    ],
+    ...['leggo-lander-marker', 1, null, {}].map((keepoutHero): [string, unknown, string] => [
+      `invalid keepout flag ${JSON.stringify(keepoutHero)}`,
+      { id: 's', scatter: { keepoutHero } },
+      'scatter.keepoutHero: expected a boolean',
+    ]),
+    [
+      'keepout requires the opening hero',
+      { id: 's', scatter: { keepoutHero: true } },
+      'scatter.keepoutHero: requires opening.freeDive.hero',
+    ],
+    [
+      'reframe alone cannot bind keepout',
+      {
+        id: 's',
+        scatter: { keepoutHero: true },
+        opening: { reframe: siteManifest('challenger-deep')!.opening!.reframe },
+      },
+      'scatter.keepoutHero: requires opening.freeDive.hero',
+    ],
     [
       'gallery apron',
       { id: 's', props: { p: { galleryApron: propManifest('karst-grotto')!.galleryApron } } },
@@ -316,6 +388,17 @@ describe('shipped site manifests', () => {
     expect(siteManifest('no-such-site')).toBeUndefined();
     expect(propManifest('no-such-prop')).toBeUndefined();
   });
+
+  it('only Challenger reserves its existing opening hero, which belongs to its prop content', () => {
+    const keepouts = allSiteManifests().filter((m) => m.scatter?.keepoutHero);
+    expect(keepouts.map((m) => m.id)).toEqual(['challenger-deep']);
+    for (const manifest of keepouts) {
+      const hero = manifest.opening!.freeDive!.hero;
+      const doc = JSON.parse(readFileSync(`data/landmarks/${manifest.id}/props.json`, 'utf8'));
+      expect(hero).toBe('leggo-lander-marker');
+      expect(doc.props.filter((p: { id: string }) => p.id === hero)).toHaveLength(1);
+    }
+  });
 });
 
 it('binds each authored prop profile once in its owning content pack', () => {
@@ -341,4 +424,127 @@ it('binds each authored prop profile once in its owning content pack', () => {
     }
   }
   expect(seen.size).toBe(6);
+});
+
+describe('site manifest atmosphere validation', () => {
+  const floor = { depthM: -200, color: 0x879399, intensity: 6 };
+  const hemisphere = { name: 'fill', sky: 0xa8bbc8, ground: 0x493d32, intensity: 3 };
+  const lamps = { intensity: 2, distance: 1.2, fillIntensity: 3, fillDistance: 1.5 };
+  const wrap = (path: string, value: unknown) => ({
+    id: 's',
+    atmosphere: path.startsWith('tiers.')
+      ? { tiers: { [path.slice(6)]: value } }
+      : { [path]: value },
+  });
+  const cases: [string, unknown, string | null][] = [
+    ['absent', { id: 's' }, null],
+    ['empty section', { id: 's', atmosphere: {} }, null],
+    ['empty tiers', { id: 's', atmosphere: { tiers: {} } }, null],
+    ['unknown section field', wrap('fog', {}), 'atmosphere.fog: unknown field'],
+    ['unknown tier', wrap('tiers.ultra', floor), 'atmosphere.tiers.ultra: unknown field'],
+    ['zero floor', wrap('tiers.low', { depthM: 0, color: 0, intensity: 0 }), null],
+    [
+      'zero lamps',
+      wrap('lamps', { intensity: 0, distance: 0, fillIntensity: 0, fillDistance: 0 }),
+      null,
+    ],
+    ['zero fill', wrap('hemisphere', { ...hemisphere, intensity: 0 }), null],
+    ['positive depth', wrap('tiers.low', { ...floor, depthM: 200 }), 'atmosphere.tiers.low.depthM'],
+    [
+      'blank light name',
+      wrap('hemisphere', { ...hemisphere, name: ' ' }),
+      'atmosphere.hemisphere.name',
+    ],
+  ];
+  for (const value of [null, [], 'water', 1]) {
+    cases.push([
+      'malformed section',
+      { id: 's', atmosphere: value },
+      'atmosphere: expected an object',
+    ]);
+    cases.push(['malformed tiers', wrap('tiers', value), 'atmosphere.tiers: expected an object']);
+  }
+  const rows: [string, Record<string, unknown>][] = [
+    ['hemisphere', hemisphere],
+    ['lamps', lamps],
+    ...(['low', 'medium', 'high'] as const).map((tier): [string, Record<string, unknown>] => [
+      `tiers.${tier}`,
+      floor,
+    ]),
+  ];
+  for (const [path, row] of rows) {
+    cases.push([`${path} alone`, wrap(path, row), null]);
+    for (const value of [null, [], 'invalid'])
+      cases.push([
+        `malformed ${path}`,
+        wrap(path, value),
+        `atmosphere.${path}: expected an object`,
+      ]);
+    cases.push([
+      `unknown ${path} field`,
+      wrap(path, { ...row, typo: 1 }),
+      `atmosphere.${path}.typo: unknown field`,
+    ]);
+    for (const [key, value] of Object.entries(row)) {
+      const field = `atmosphere.${path}.${key}`;
+      cases.push([`missing ${field}`, wrap(path, { ...row, [key]: undefined }), field]);
+      cases.push([
+        `wrong type ${field}`,
+        wrap(path, { ...row, [key]: typeof value === 'number' ? '1' : 1 }),
+        field,
+      ]);
+      if (typeof value !== 'number') continue;
+      for (const invalid of [NaN, Infinity, -Infinity])
+        cases.push([
+          `nonfinite ${field}: ${invalid}`,
+          wrap(path, { ...row, [key]: invalid }),
+          field,
+        ]);
+      if (key === 'depthM') continue;
+      cases.push([`negative ${field}`, wrap(path, { ...row, [key]: -1 }), field]);
+      if (['sky', 'ground', 'color'].includes(key))
+        for (const invalid of [0x1000000, 1.5])
+          cases.push([
+            `invalid color ${field}: ${invalid}`,
+            wrap(path, { ...row, [key]: invalid }),
+            field,
+          ]);
+    }
+  }
+  it.each(cases)('%s', (_name, raw, error) => {
+    const before = structuredClone(raw);
+    if (error === null) validateSiteManifest(raw, 's');
+    else expect(() => validateSiteManifest(raw, 's')).toThrow(error);
+    expect(raw).toEqual(before);
+  });
+});
+
+it('ships exactly the authored atmosphere policies and leaves other sites absent', () => {
+  const low = [
+    'axial-seamount-ashes',
+    'beebe-vent-field',
+    'bismarck',
+    'blake-plateau-corals',
+    'hudson-canyon',
+    'hunga-tonga-caldera',
+    'kamaehuakanaloa',
+    'lost-city',
+  ];
+  const allTiers = ['bismarck', 'blake-plateau-corals', 'hudson-canyon', 'hunga-tonga-caldera'];
+  for (const id of ids) {
+    const atmosphere = siteManifest(id)!.atmosphere;
+    if (id === 'monterey-canyon') {
+      expect(atmosphere).toEqual({
+        hemisphere: { name: 'montereyFill', sky: 0xa8bbc8, ground: 0x493d32, intensity: 3 },
+        lamps: { intensity: 2, distance: 1.2, fillIntensity: 3, fillDistance: 1.5 },
+      });
+    } else if (low.includes(id)) {
+      const tiers = allTiers.includes(id) ? ['low', 'medium', 'high'] : ['low'];
+      expect(atmosphere).toEqual({
+        tiers: Object.fromEntries(
+          tiers.map((tier) => [tier, { depthM: -200, color: 0x879399, intensity: 6 }]),
+        ),
+      });
+    } else expect(atmosphere).toBeUndefined();
+  }
 });

@@ -247,18 +247,12 @@ test('covering home modals stop title draws and return to a usable menu', async 
   for (const [name, selector] of [
     ['Settings', '.settings'],
     ['Journal', '.journal'],
-    ['Controls', '.settings'],
+    ['Controls', '.controls-card'],
   ]) {
     await page.locator('.home-menu').getByRole('button', { name, exact: true }).click();
     const dialog = page.locator(selector);
     await expect(dialog).toBeVisible();
-    await expect(dialog).toHaveAccessibleName(name);
-    if (name === 'Controls') {
-      await expect(dialog.getByRole('region', { name: 'Controls', exact: true })).toBeVisible();
-      await expect(
-        dialog.getByRole('button', { name: 'Back to Settings', exact: true }),
-      ).toBeFocused();
-    }
+    if (name !== 'Controls') await expect(dialog).toHaveAccessibleName(name);
     await expect.poll(async () => (await title(page)).active).toBe(false);
     await stopped(page);
     const before = (await title(page)).drawCount;

@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { makeConfig, MONTEREY_OPENING, type GraphicsTier } from '../../src/core/Config.js';
+import { makeConfig, type GraphicsTier } from '../../src/core/Config.js';
 import { composedFreeDiveSpawn, spawnSettings } from '../../src/game/Spawn.js';
 import { parsePois, placePois } from '../../src/game/Pois.js';
 import { Scanner } from '../../src/game/Scanner.js';
@@ -163,7 +163,7 @@ it('keeps Monterey lamp gains through mode changes and toggles', () => {
   const config = makeConfig();
   const tier = atmosphereTier(config.water, 'low');
   const standard = new Headlights(config.water, tier);
-  const monterey = new Headlights(config.water, tier, MONTEREY_OPENING.lamps);
+  const monterey = new Headlights(config.water, tier, siteManifest(site)!.atmosphere!.lamps!);
   try {
     for (const preset of Object.values(config.lightPresets)) {
       standard.setPreset(preset);
@@ -175,7 +175,7 @@ it('keeps Monterey lamp gains through mode changes and toggles', () => {
       monterey.setEnabled(true);
       monterey.update(new THREE.Vector3(), new THREE.Vector3(0, 0, -1));
       expect(monterey.lights[0]!.intensity).toBe(
-        preset.intensity * MONTEREY_OPENING.lamps.intensity,
+        preset.intensity * siteManifest(site)!.atmosphere!.lamps!.intensity,
       );
     }
   } finally {

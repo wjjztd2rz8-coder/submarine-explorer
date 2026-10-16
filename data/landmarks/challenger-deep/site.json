@@ -1,5 +1,8 @@
 {
   "id": "challenger-deep",
+  "scatter": {
+    "keepoutHero": true
+  },
   "opening": {
     "mission": {
       "rangeM": 200,

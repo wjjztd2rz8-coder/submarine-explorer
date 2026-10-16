@@ -1296,3 +1296,32 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h at 2% (resets 05:15); queue 2240-2290 waits for the dispatcher.
 - **Not done:** V-bluehole remainder, V-hero-set, other J-* sub-items; V-endurance-aim parked.
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 05:15 CDT headless run 25 (Claude, collection only)
+
+- **Merged:** nothing. Codex 2240, 2250 and 2260 launched at 05:15 and are running; their worktrees have no commits yet. No Claude agent launched.
+- **CI:** run 23 is red on e2e shards 21/38 and 35/38. `gh run view --log` returns nothing for either, same as run 22's shard, so the failing specs are unknown. Run 24 CI is still queued. No tag (f55 waits for green CI).
+- **Queue:** 2270, 2280 and 2290 are queued.
+- **Process issue:** CI e2e logs aren't retrievable, which blocks triage. Next run should try downloading the Playwright artifacts or reproduce the shards locally.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 05:58 CDT headless run 26 (Claude, CI triage)
+
+- **CI triage:** run 24's red shards were f-title-scene (Controls now opens the controls card, same cause as the a11y spec) and the Monterey wall triangle budget (913k vs 900k after V-monterey-floor pebbles; budget raised to 950k). Fixed both; smoke + project-base green; no full e2e.
+- **Process fix:** CI e2e logs ARE retrievable: `gh api repos/{owner}/{repo}/actions/jobs/<job id>/logs | grep -aE "✘|Error"` (job ids from `gh run view <run> --json jobs`). `gh run view --log` returns nothing.
+- **Codex:** 2240, 2250, 2270 running; 2260 worktree has uncommitted work; queue holds 2280, 2290. No Claude agent launched. No tag (f55 waits for green CI).
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 06:30 CDT headless run 27 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet J-atoll-transit (debrief next line now says optional objectives can be a long transit away; Blue Hole western hint gives ~6 km).
+- **Codex:** 2240, 2250, 2280 running (2260 and 2270 worktrees hold uncommitted work); queue holds 2290, 2300. No tag (f55 waits for green CI; run 25/26 CI pending).
+- **Not done:** other J-* items, V-bluehole remainder, V-hero-set; V-endurance-aim parked.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 06:46 CDT headless run 28 (Claude, light)
+
+- **Tagged and pushed f55** on e142419 (hosted CI green; Pages deploy green). Run 27's CI was still queued.
+- **Merged:** V-hero-set (docs only: the 1.0 table now follows `HERO_SITES`; Endurance stays a polish site). No Claude agent launched (budget ~53%, V-bluehole remainder would risk the 23% kill line).
+- **Codex:** 2240, 2250, 2290 running (2260/2270/2280 worktrees hold uncommitted work, tasks finished; collect next run). Queue: 2300, 2310 J-home-controls, 2320 bughunt.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.

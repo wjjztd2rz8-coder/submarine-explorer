@@ -112,6 +112,11 @@ builders use the same biome through the terrain material factory.
   looks for chimney props); use that for vent pieces. Preview: `/preview/geo.html` on the dev server.
   - `smoker-cluster`: sulfide mound + 3–7 black smokers, `variant: "shrimp"` swaps tubeworms for
     shrimp swarms. Stacks 2 and 3 have their own shader-animated smoke plumes.
+    The optional `props.<prop-id>.smoker` profile in `site.json` supplies the authored shape and
+    mineral shelves. `topFraction` is the top/base radius ratio, greater than 0 and at most 1;
+    omitted values default to 0.45. `throatColor` is the mouth-disc emissive RGB integer
+    (0–0xffffff), defaulting to 0 (unlit). `SiteManifest` resolves these defaults once during
+    validation; all other smoker profile fields remain required, finite and validated.
   - `carbonate-tower`: Lost City edifice: a tall fluted spire, a ring of lesser ones, flanges, on a
     talus skirt that sinks into the seabed downhill. dims = [width, depth, tallest height].
   - `coral-mound`: rubble mound with hundreds of instanced branching colonies and vase sponges.

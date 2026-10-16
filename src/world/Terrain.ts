@@ -489,7 +489,11 @@ export class Terrain {
       chunk.setLod(level);
       this.sphere.center.copy(chunk.center);
       this.sphere.radius = chunk.radius;
-      if (this.frustum.intersectsSphere(this.sphere)) {
+      // Steep chunks have broad spheres that can reach the view while every
+      // triangle is offscreen. The bounds include skirts, so reject those boxes too.
+      chunk.mesh.visible =
+        this.frustum.intersectsSphere(this.sphere) && this.frustum.intersectsBox(chunk.bounds);
+      if (chunk.mesh.visible) {
         visible++;
         drawn += chunk.activeTriangles;
         counts[chunk.currentLod] = (counts[chunk.currentLod] as number) + 1;

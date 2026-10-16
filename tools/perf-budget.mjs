@@ -23,6 +23,51 @@ const browser = await chromium.launch({
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
 const results = [];
+const failures = [];
+// Persist each measurement before attempting readback: a screenshot stall must
+// not discard numeric evidence or imply that the rest of the matrix completed.
+async function saveResults() {
+  await writeFile(
+    resolve(output, 'results.json'),
+    JSON.stringify(
+      {
+        capturedAt: new Date().toISOString(),
+        base: base.href,
+        viewport: [1280, 720],
+        warmupFrames: 30,
+        sampleFrames: 60,
+        planned: sites.flatMap((site) => tiers.map((tier) => ({ site, tier }))),
+        complete:
+          results.length === sites.length * tiers.length &&
+          results.every((r) => r.capture === 'complete') &&
+          failures.length === 0,
+        failures,
+        results,
+      },
+      null,
+      2,
+    ),
+  );
+  await writeFile(
+    resolve(output, 'results.md'),
+    [
+      `Measured ${results.length}/${sites.length * tiers.length} pairs; ${failures.length} failure(s). See results.json for completeness and capture errors.`,
+      '',
+      '| Site | Tier | Max draws | Max triangles | Mean frame ms | p50 ms | p95 ms |',
+      '| --- | --- | ---: | ---: | ---: | ---: | ---: |',
+      ...results.map(
+        (r) =>
+          `| ${r.site} | ${r.tier} | ${r.drawCalls} | ${r.triangles} | ${r.meanMs.toFixed(1)} | ${r.medianMs.toFixed(1)} | ${r.p95Ms.toFixed(1)} |`,
+      ),
+      '',
+      'Headless Chromium / SwiftShader; 1280×720, DPR 1; 30 warmup + 60 sampled frames.',
+      'Default free-dive spawn, chase camera, Arcade, life seed 42, dynamic resolution off.',
+      'Frame ms = requestAnimationFrame interval, including GPU/browser scheduling. Geometry totals use renderer.info via __game.perf, including the High-tier post pass.',
+      '',
+    ].join('\n'),
+  );
+}
+await saveResults();
 try {
   for (const site of sites) {
     for (const tier of tiers) {
@@ -116,44 +161,20 @@ try {
           );
         if (result.tier !== tier || result.dynamicResolution || result.pixelRatio !== 1)
           throw new Error(`${site}/${tier}: unexpected quality settings`);
-        await page.screenshot({ path: resolve(output, `${site}-${tier}.png`), timeout: 90_000 });
-        if (errors.length) throw new Error(`${site}/${tier}: ${errors.join('; ')}`);
-        results.push({ site, ...result });
+        const measurement = { site, ...result, capture: 'pending' };
+        results.push(measurement);
+        await saveResults();
         console.log(
           `${site} ${tier}: ${result.drawCalls} calls, ${result.triangles} triangles; mean ${result.meanMs.toFixed(1)} ms, p50 ${result.medianMs.toFixed(1)}, p95 ${result.p95Ms.toFixed(1)}`,
         );
-        await writeFile(
-          resolve(output, 'results.json'),
-          JSON.stringify(
-            {
-              capturedAt: new Date().toISOString(),
-              base: base.href,
-              viewport: [1280, 720],
-              warmupFrames: 30,
-              sampleFrames: 60,
-              results,
-            },
-            null,
-            2,
-          ),
-        );
-        await writeFile(
-          resolve(output, 'results.md'),
-          [
-            '| Site | Tier | Max draws | Max triangles | Mean frame ms | p50 ms | p95 ms |',
-            '| --- | --- | ---: | ---: | ---: | ---: | ---: |',
-            ...results.map(
-              (r) =>
-                `| ${r.site} | ${r.tier} | ${r.drawCalls} | ${r.triangles} | ${r.meanMs.toFixed(1)} | ${r.medianMs.toFixed(1)} | ${r.p95Ms.toFixed(1)} |`,
-            ),
-            '',
-            'Headless Chromium / SwiftShader; 1280×720, DPR 1; 30 warmup + 60 sampled frames.',
-            'Default free-dive spawn, chase camera, Arcade, life seed 42, dynamic resolution off.',
-            'Frame ms = requestAnimationFrame interval, including GPU/browser scheduling. Geometry totals use renderer.info via __game.perf, including the High-tier post pass.',
-            '',
-          ].join('\n'),
-        );
+        await page.screenshot({ path: resolve(output, `${site}-${tier}.png`), timeout: 90_000 });
+        measurement.capture = 'complete';
+        if (errors.length) throw new Error(`${site}/${tier}: ${errors.join('; ')}`);
+      } catch (error) {
+        failures.push({ site, tier, message: error.message });
+        console.error(`${site}/${tier}: ${error.message}`);
       } finally {
+        await saveResults();
         await context.close();
       }
     }
@@ -161,3 +182,4 @@ try {
 } finally {
   await browser.close();
 }
+if (failures.length) process.exitCode = 1;

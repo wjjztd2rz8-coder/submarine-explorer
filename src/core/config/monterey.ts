@@ -1,9 +1,3 @@
-/** Monterey's authored opening: visibility aids. */
-export const MONTEREY_OPENING = {
-  hemisphere: { sky: 0xa8bbc8, ground: 0x493d32, intensity: 3 },
-  lamps: { intensity: 2, distance: 1.2, fillIntensity: 3, fillDistance: 1.5 },
-} as const;
-
 /** Irregular mudstone beds, local slump scars and pale sediment on exposed shelves. */
 export const MONTEREY_STRATA = {
   /** Bed thickness range (relative); drawn with a skew so thin beds dominate and a few are massive. */
