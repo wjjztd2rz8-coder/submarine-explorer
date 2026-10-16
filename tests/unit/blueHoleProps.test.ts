@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { createHash } from 'node:crypto';
 import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { latLonToWorld } from '../../src/util/geo.js';
@@ -95,6 +97,57 @@ describe('Great Blue Hole props', () => {
 
   for (const def of geo) {
     for (const tier of ['low', 'medium', 'high']) {
+      it(`${def.id} ${tier}: all roof and bed buffers and collision envelopes are finite and seeded`, () => {
+        const input = {
+          def,
+          dims: def.dimensionsM!,
+          seed: hashString(def.id),
+          cfg,
+          tier,
+          groundHeight: () => () => 0,
+        };
+        const built = buildGeo(input);
+        const repeated = buildGeo(input);
+        const buffers = (root: THREE.Object3D) => {
+          const hash = createHash('sha256');
+          root.traverse((object) => {
+            if (!(object instanceof THREE.Mesh)) return;
+            for (const attribute of Object.values(
+              object.geometry.attributes as Record<string, THREE.BufferAttribute>,
+            )) {
+              expect(Array.from(attribute.array).every(Number.isFinite), object.name).toBe(true);
+              hash.update(attribute.array);
+            }
+            if (object.geometry.index) hash.update(object.geometry.index.array);
+            if (object instanceof THREE.InstancedMesh) hash.update(object.instanceMatrix.array);
+          });
+          return hash.digest('hex');
+        };
+        expect(buffers(built.full)).toBe(buffers(repeated.full));
+        expect(built.bounds).toEqual(repeated.bounds);
+        expect(built.colliders).toEqual(repeated.colliders);
+        for (const box of [built.bounds, ...built.colliders!]) {
+          expect([...box.min.toArray(), ...box.max.toArray()].every(Number.isFinite)).toBe(true);
+          expect(box.isEmpty()).toBe(false);
+          expect(box.intersectsBox(built.bounds)).toBe(true);
+        }
+        for (const name of ['grotto-overhang', 'grotto-sediment-apron']) {
+          const mesh = built.full.getObjectByName(name) as THREE.Mesh;
+          mesh.geometry.computeBoundingBox();
+          expect(built.bounds.containsBox(mesh.geometry.boundingBox!)).toBe(true);
+        }
+        for (const result of [built, repeated])
+          for (const root of [result.full, result.impostor])
+            root.traverse((object) => {
+              if (!(object instanceof THREE.Mesh)) return;
+              object.geometry.dispose();
+              for (const material of Array.isArray(object.material)
+                ? object.material
+                : [object.material])
+                material.dispose();
+            });
+      });
+
       it(`${def.id} ${tier}: sediment finish preserves gallery framing and Low's budget`, () => {
         const input = {
           def,
@@ -197,60 +250,61 @@ describe('Great Blue Hole props', () => {
         }
       });
     }
-    it(`${def.id}: stands on the ledge and its foot never floats above the sampled terrain`, () => {
-      const { x, z } = latLonToWorld(meta, def.lat, def.lon);
-      const originY = ground(x, z);
-      // Over the ledge (about 40 m down), not out over the 125 m drop.
-      expect(originY).toBeGreaterThan(-60);
-      const q = headingQuaternion(def.headingDeg);
-      const v = new THREE.Vector3();
-      const built = buildGeo({
-        def,
-        dims: def.dimensionsM!,
-        seed: hashString(def.id),
-        cfg,
-        tier: 'high',
-        groundHeight: () => (lx: number, lz: number) => {
+    for (const tier of ['low', 'medium', 'high'])
+      it(`${def.id} ${tier}: stands on the ledge and its foot never floats above the sampled terrain`, () => {
+        const { x, z } = latLonToWorld(meta, def.lat, def.lon);
+        const originY = ground(x, z);
+        // Over the ledge (about 40 m down), not out over the 125 m drop.
+        expect(originY).toBeGreaterThan(-60);
+        const q = headingQuaternion(def.headingDeg);
+        const v = new THREE.Vector3();
+        const built = buildGeo({
+          def,
+          dims: def.dimensionsM!,
+          seed: hashString(def.id),
+          cfg,
+          tier,
+          groundHeight: () => (lx: number, lz: number) => {
+            v.set(lx, 0, lz).applyQuaternion(q);
+            return ground(x + v.x, z + v.z) - originY;
+          },
+        });
+        built.full.updateMatrixWorld(true);
+        const foot: number[] = [];
+        let minY = Infinity;
+        const pts: THREE.Vector3[] = [];
+        built.full.traverse((o) => {
+          const m = o as THREE.Mesh;
+          if (!m.isMesh || (m as THREE.InstancedMesh).isInstancedMesh) return;
+          const pos = m.geometry.getAttribute('position');
+          for (let i = 0; i < pos.count; i++) {
+            const p = new THREE.Vector3().fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld);
+            minY = Math.min(minY, p.y);
+            pts.push(p);
+          }
+        });
+        for (const p of pts) {
+          if (p.y > minY + 4) continue;
+          const w = p.clone().applyQuaternion(q);
+          foot.push(originY + p.y - ground(x + w.x, z + w.z));
+        }
+        expect(foot.length).toBeGreaterThan(3);
+        // Every low vertex sits within 3 m of the terrain beneath it (none hangs in mid-water).
+        expect(Math.max(...foot)).toBeLessThan(3);
+        // The shelf's lip is carried by the ledge (not out over the drop (20 m)) and the ground rises behind the wall.
+        const [W, D] = def.dimensionsM!;
+        const at = (lx: number, lz: number): number => {
           v.set(lx, 0, lz).applyQuaternion(q);
-          return ground(x + v.x, z + v.z) - originY;
-        },
-      });
-      built.full.updateMatrixWorld(true);
-      const foot: number[] = [];
-      let minY = Infinity;
-      const pts: THREE.Vector3[] = [];
-      built.full.traverse((o) => {
-        const m = o as THREE.Mesh;
-        if (!m.isMesh || (m as THREE.InstancedMesh).isInstancedMesh) return;
-        const pos = m.geometry.getAttribute('position');
-        for (let i = 0; i < pos.count; i++) {
-          const p = new THREE.Vector3().fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld);
-          minY = Math.min(minY, p.y);
-          pts.push(p);
+          return ground(x + v.x, z + v.z);
+        };
+        for (let f = -0.3; f <= 0.3; f += 0.1) {
+          expect(at(f * W, -D)).toBeGreaterThan(originY - 20);
+          expect(at(f * W, 12)).toBeGreaterThanOrEqual(originY - 0.5);
         }
       });
-      for (const p of pts) {
-        if (p.y > minY + 4) continue;
-        const w = p.clone().applyQuaternion(q);
-        foot.push(originY + p.y - ground(x + w.x, z + w.z));
-      }
-      expect(foot.length).toBeGreaterThan(3);
-      // Every low vertex sits within 3 m of the terrain beneath it (none hangs in mid-water).
-      expect(Math.max(...foot)).toBeLessThan(3);
-      // The shelf's lip is carried by the ledge (not out over the drop (20 m)) and the ground rises behind the wall.
-      const [W, D] = def.dimensionsM!;
-      const at = (lx: number, lz: number): number => {
-        v.set(lx, 0, lz).applyQuaternion(q);
-        return ground(x + v.x, z + v.z);
-      };
-      for (let f = -0.3; f <= 0.3; f += 0.1) {
-        expect(at(f * W, -D)).toBeGreaterThan(originY - 20);
-        expect(at(f * W, 12)).toBeGreaterThanOrEqual(originY - 0.5);
-      }
-    });
   }
 
-  for (const tier of ['low', 'high']) {
+  for (const tier of ['low', 'medium', 'high']) {
     it(`east ${tier}: has a roof over the mouth, pendant clearance and a clear close camera`, () => {
       const def = geo.find((p) => p.id === 'karst-grotto-east')!;
       const { x, z } = latLonToWorld(meta, def.lat, def.lon);
@@ -287,6 +341,30 @@ describe('Great Blue Hole props', () => {
         expect(underside, `missing overhang at ${lx}`).toBeTruthy();
         expect(top.point.y - underside.point.y).toBeGreaterThan(0.4);
         expect(underside.point.y - localGround(lx, -14)).toBeGreaterThan(3);
+      }
+      // Probe the notch centres, shoulders and overhanging flanks, which the
+      // three central mouth rays alone can miss. They retain solid limestone.
+      for (const [centre, halfWidth] of [
+        [-0.27, 0.05],
+        [0.08, 0.04],
+        [0.31, 0.055],
+      ]) {
+        for (const offset of [-1.25, -0.85, 0, 0.85, 1.25]) {
+          const x = (centre + offset * halfWidth) * def.dimensionsM![0];
+          const up = new THREE.Raycaster(
+            new THREE.Vector3(x, -100, -14),
+            new THREE.Vector3(0, 1, 0),
+          );
+          const down = new THREE.Raycaster(
+            new THREE.Vector3(x, 100, -14),
+            new THREE.Vector3(0, -1, 0),
+          );
+          const underside = up.intersectObject(roof)[0];
+          const top = down.intersectObject(roof)[0];
+          expect(underside, `missing notch underside at ${x}`).toBeDefined();
+          expect(top, `missing notch top at ${x}`).toBeDefined();
+          expect(top.point.y - underside.point.y).toBeGreaterThan(0.4);
+        }
       }
       const vertices = gallery.geometry.getAttribute('position');
       let minClearance = Infinity;
