@@ -82,6 +82,7 @@ function fixture(canvasTouchAction = '', realInput?: Input) {
     touchEdge: vi.fn(),
     touchLook: vi.fn(),
     touchZoom: vi.fn(),
+    endFrame: vi.fn(),
   };
   const canvas = new TouchElement();
   canvas.style.touchAction = canvasTouchAction;
@@ -259,6 +260,67 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
 );
 
 describe('touch control interruptions', () => {
+  it.each(['resize', 'orientationchange'])(
+    'discards unsampled drag and pinch deltas when %s changes the phone layout',
+    (event) => {
+      const input = new Input({ storage: null });
+      const f = fixture('', input);
+      const send = (type: string, id: number, x: number) => {
+        const e = new Event(type);
+        Object.assign(e, { pointerId: id, pointerType: 'touch', clientX: x, clientY: 60 });
+        Object.defineProperty(e, 'target', { value: f.canvas });
+        f.win.dispatchEvent(e);
+      };
+      try {
+        send('pointerdown', 1, 60);
+        send('pointermove', 1, 70);
+        send('pointerdown', 2, 100);
+        send('pointermove', 2, 120);
+        expect(input.state.lookDx).toBe(10);
+        expect(input.wheelDelta).toBeLessThan(0);
+        f.win.dispatchEvent(new Event(event));
+        expect(input.sample()).toMatchObject({ lookDx: 0, lookDy: 0 });
+        expect(input.wheelDelta).toBe(0);
+        send('pointermove', 1, 40);
+        expect(input.state.lookDx).toBe(0);
+        send('pointerdown', 3, 60);
+        send('pointermove', 3, 75);
+        expect(input.state.lookDx).toBe(15);
+      } finally {
+        f.controls.dispose();
+        input.dispose();
+      }
+    },
+  );
+
+  it('drops a photo drag when pause opens while the flight controls are already hidden', () => {
+    const f = fixture();
+    const send = (type: string, x: number) => {
+      const event = new Event(type);
+      Object.assign(event, { pointerId: 9, pointerType: 'touch', clientX: x, clientY: 60 });
+      Object.defineProperty(event, 'target', { value: f.canvas });
+      f.win.dispatchEvent(event);
+    };
+    try {
+      f.controls.update(false, true);
+      send('pointerdown', 60);
+      f.controls.update(false, true);
+      send('pointermove', 70);
+      expect(f.input.touchLook).toHaveBeenCalledWith(10, 0);
+      vi.mocked(f.input.touchLook).mockClear();
+      f.controls.update(false, false);
+      f.controls.update(true, false);
+      send('pointermove', 100);
+      expect(f.input.touchLook).not.toHaveBeenCalled();
+      send('pointerup', 100);
+      send('pointerdown', 100);
+      send('pointermove', 110);
+      expect(f.input.touchLook).toHaveBeenCalledExactlyOnceWith(10, 0);
+    } finally {
+      f.controls.dispose();
+    }
+  });
+
   it.each(['cancel', 'drag', 'pinch'])(
     'does not pair taps across a %s camera gesture',
     (gesture) => {
