@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-16 (third) comprehensive review, joint with Codex Sol (golden 2026-10-16-204522)
+
+**Changed since the last review (8 merges, all pushed):** Claude V-titanic-seabed slice 1, V-bluehole-roof-2, V-beebe-lighting, V-lostcity-rims, V-challenger-floats; Codex S-verify-15, S-bughunt-16, J-home-controls coverage, S-manifest sonar slice, 2340-2360 verification. CI green on the latest main (run 38952303725). Codex 2370 (S-manifest terrain carve, inventory 4 to 2), 2380, 2390 finished and are collected this run.
+
+**Scores (beautiful; Claude / Sol band):** Titanic 3.9 / 3.5-3.9; Monterey 3.8 / 3.5-3.8; Beebe 3.8 / 3.5-3.8; Lost City 3.7 / 3.5-3.7; Blue Hole 3.5 (Claude, lowered after checking `great-blue-hole-east-3.png`) / 3.0-3.9 disputed; Challenger 3.8 / 3.5-3.8; Endurance 3.6 / 3.5-3.6. Readable 3.5-4 (Beebe close pose and Blue Hole depend on distance). No hero is at a consistent 4.
+
+**Biggest gaps:** Titanic seabed flat at approach; Beebe close pose washes mid-brown; Lost City slope smooth; Blue Hole hood is a smooth slab with a pale interior (Sol's catch; my earlier 3.9 was too generous); Monterey opening pose.
+
+**Sol's additional findings (credited to Sol):** the legacy-save retry can award stars using later discoveries (S-bughunt-16 note) and needs a disposition; the nightly capture step is allowed to fail so a green workflow does not establish visual acceptance; `perf.frameMs` clamps to 250 ms and smooths, so record raw stall tails during phone acceptance; the eight non-heroes (Endurance included) lack current mission-spawn acceptance. Added to the backlog as S-bughunt-18 scope and the owner phone check.
+
+**Disputed:** Blue Hole score (resolved toward Sol at 3.5, band kept); Sol disagrees that composition-led briefs mean camera-only changes; agreed, the briefs name material/geometry changes too.
+
+**Play:** no new flow captures; P2s J-contact-choice and J-journal-preview remain.
+
+**Stage:** about 82% to 1.0 (80-84), four to five weeks (six if art capacity is limited). Agreed with Sol.
+
+**Process:** Claude weekly burns ~27%/day, Codex ~63%/day; both lanes ran. Run skips are budget gates (expected). Codex's sandbox cannot run browser gates (EPERM), so Claude re-runs gates on its worktrees before merging.
+
+**New priorities (single backlog in DIRECTOR.md):** Sonnet V-titanic-seabed, V-beebe-close, V-lostcity-slope, V-bluehole-hood, V-monterey-pose, J-contact-choice, J-journal-preview; Codex 2400 S-manifest, 2410 S-verify-17, 2420 S-bughunt-18.
+
+**Needs owner:** real-phone Low-tier play (still the largest unverified 1.0 requirement).
+
 ## 2026-10-16 (second) comprehensive review, Claude alone (golden 2026-10-16-135921)
 
 Sol skipped: Codex 5h was 3% (below the 5% floor; resets 10:15). Findings are Claude's only; the morning joint review stands for what it covered.

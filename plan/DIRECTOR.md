@@ -60,7 +60,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (review 2026-10-16 second, Claude alone): about 82% to 1.0. Beautiful: Titanic 3.9, Monterey 3.8, Lost City 3.6, Blue Hole 3.6, Beebe 3.6, Challenger 3.6, Endurance 3.6. Top blockers: real-phone Low readability and performance (owner), Blue Hole roof, Titanic seabed, J-* P2 journey fixes.
+Stage (review 2026-10-16 third): about 82% to 1.0 (80-84, agreed with Sol). Beautiful: Titanic 3.9, Blue Hole 3.5 (Sol 3.0-3.9; Claude accepts 3.5), Monterey 3.8, Beebe 3.8, Challenger 3.8, Lost City 3.7, Endurance 3.6. Top blockers: real-phone Low readability and performance (owner), no hero at 4.0 yet (Titanic seabed, Beebe close pose), J-* P2 journey fixes.
 
 ## Needs owner
 
@@ -70,26 +70,23 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running. Codex queue: 2370 S-manifest slice, 2380 S-verify-16, 2390 S-bughunt-17.
+- No Claude package running. Codex 2370/2380/2390 finished (collected in the third review); queue 2400+ below.
 
 ## Backlog
 
-One list, ordered by player impact and dependencies. Lane is in brackets. Evidence: review 2026-10-16 (second) in `plan/REVIEWS.md`; DONE items from earlier lists were removed at this review (history in git and `plan/progress/`).
+One list, ordered by player impact and dependencies. Lane is in brackets. Evidence: review 2026-10-16 (third) in `plan/REVIEWS.md`. DONE items were removed at that review (history in git and `plan/progress/`). Per-package art gains are now ~0.1-0.2: each V-* brief below names a target composition (what the frame should look like), not a geometry list.
 
-1. **V-bluehole-roof-2 [Sonnet] DONE 2026-10-16 (merged run 32; roof notches, thin lip, tilted beds, varied apron; ~4.0; underside still unchanged)**, ~3.6: from the east pose the roof is still one rolled slab with a uniform thick rim and a flat blue-green pool; stalactites are the only relief. Vary roof thickness along the rim, add two or three overhang notches and drop-offs, tilt the beds so they do not run parallel, and break the flat sand shelf with the existing sediment material. Geometry, not tuning. Evidence: [progress/V-bluehole-roof.md](progress/V-bluehole-roof.md), golden `great-blue-hole-east-2.png`.
-2. **V-titanic-seabed [Sonnet]** (slice 1 merged 2026-10-16: ripples and stones/rubble scatter via Titanic biome data, faint at approach distance; remaining: scour moat at the hull, hull plating repetition), ~3.9: hull now reads as a wreck; the approach view is a flat dark brown plane with a few sparse plants. Add sediment ripples, a debris trail and scour around the hull using the existing sediment material (as V-monterey-floor did). Hull plating repetition is the second gap.
-3. **V-beebe-lighting [Sonnet] DONE 2026-10-16 (7a0a14b; torn stack rims, Beebe lamp data; ~3.8, close pose still mid-brown, vent glow faint)**, ~3.6 (up from 3.3): the chimney is now orange-brown with collars and reads; side stacks still have flat stump tops and the close pose washes beige under headlights. Fix on the lighting side (`hullLight`/spot falloff), not paint; give side stacks the same tapered tops.
-4. **V-challenger-floats [Sonnet, small] DONE 2026-10-16 (5e29935; smooth radial-normal floats, darker frame)**, ~3.6: floats are faceted and the frame pale under headlights; swap to a smooth dull syntactic-foam material and darken the frame. Non-hero, so cap at one package.
-5. **V-lostcity-rims [Sonnet] DONE 2026-10-16 (merged run 34; rolled bead rims, stronger ledges, slope rubble ring; ~3.7-3.9; slope still smooth terrain)**, ~3.6: thin hollow tower rims and broad planar surfaces; the middle ground slope is smeared. Thicken rims, add crust ledges.
-6. **V-endurance-frame [Sonnet]** CUT 2026-10-16: Endurance is a polish site and its opening pose is fine (3.6); the aim attempt made the sub dominate the frame. Owner delegated the call. Work kept as tag `parked/V-endurance-aim` (5fa58fc).
-7. **J-contact-choice [Sonnet, P2], J-journal-preview [Sonnet, P2], J-picker-density [Sonnet, P3], J-desktop-repetition [Sonnet, P3]:** from [progress/J-journeys-repeat.md](progress/J-journeys-repeat.md). One package each, in that order. J-contact-choice: scan-card identity when a curiosity competes with the mission objective. J-journal-preview: tall portrait captures pushing text below the fold, repeated memorial text. J-picker-density: shorten the site-card list; Blue Hole under its Lighthouse Reef title. J-desktop-repetition: destination/turn information repeated in card, mission block and waypoint.
-8. **J-home-controls [Codex 2310, P2] DONE 2026-10-16 (already implemented; coverage added):** Home's Controls entry opens rebinding settings on touch; route it to the existing device guide.
-9. **S-manifest slices [Codex 2330]:** migrate the next slice per `plan/progress/S-manifest.md` (site-id expressions left: recount); one slice per brief; golden unchanged.
-10. **S-verify / S-bughunt [Codex, standing]:** 2300 S-verify-15 and 2320 S-bughunt-16 queued. After each batch of visual merges, verify numerics/simplicity rules and hunt bugs in newly merged code.
-11. **S-render hosted confirmation [Haiku, small]:** the nightly workflow (S-render, merged 2026-10-16) is still running; on its next completed run, confirm green or log the failing step. No new work unless it fails.
-12. **R-release [Haiku]:** f55 tagged 2026-10-16. Next tag after the next completed green CI on a main commit with visual merges.
+1. **V-titanic-seabed [Sonnet]** (slice 1 merged: ripples, stones/rubble; faint at approach), ~3.9: approach view is still a flat dark brown plane. Target: from the opening pose the hull sits in a visible scour moat with a debris trail leading away and ripples readable at 60 m; hull plating repetition broken with panel variation. Use the existing sediment material.
+2. **V-beebe-close [Sonnet]**, ~3.8: close pose washes mid-brown under headlights and vent glow is faint. Target: the chimney close frame has a dark flank, bright orange crust highlights and a visible warm vent glow; fix in `hullLight`/spot falloff and emissive, not paint.
+3. **V-lostcity-slope [Sonnet]**, ~3.7: the middle-ground slope is smooth terrain. Target: the approach frame shows broken carbonate ledges and rubble terraces between the towers, using existing sediment/rock materials.
+4. **V-bluehole-hood [Sonnet]**, ~3.5 (Sol: smooth hood, pale interior, repeated terraces; accepted after checking `great-blue-hole-east-3.png`): the hood is still a smooth slab with a pale interior and evenly repeated terraces. Target: the east frame shows an irregular, darker, cracked hood with uneven terrace spacing and shadowed undercuts; the underside is unchanged and should get the same treatment.
+5. **V-monterey-pose [Sonnet, small]**, ~3.8: the opening pose puts the sub awkwardly against the wall; reframe so wall, floor and sub read in one shot.
+6. **J-contact-choice [Sonnet, P2], J-journal-preview [Sonnet, P2], J-picker-density [Sonnet, P3], J-desktop-repetition [Sonnet, P3]:** from [progress/J-journeys-repeat.md](progress/J-journeys-repeat.md). One package each, in that order. J-contact-choice: scan-card identity when a curiosity competes with the mission objective. J-journal-preview: tall portrait captures pushing text below the fold, repeated memorial text. J-picker-density: shorten the site-card list; Blue Hole under its Lighthouse Reef title. J-desktop-repetition: destination/turn information repeated in card, mission block and waypoint.
+7. **S-manifest slices [Codex]:** remaining inventory is 2 site-id expressions, both in WreckPreset (after 2370). One slice per brief; golden unchanged. Then close the item.
+8. **S-verify / S-bughunt [Codex, standing]:** after each batch of visual merges, verify numerics/simplicity rules and hunt bugs in newly merged code.
+9. **R-release [Haiku]:** f55 tagged. Tag f56 on the latest green-CI main commit after this review's merges are CI-green.
 
-Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.
+Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish, Endurance framing (CUT 2026-10-16; work kept as tag `parked/V-endurance-aim`).
 
 ## Review rubric (every package, before merge)
 
