@@ -1,8 +1,11 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { createHash } from 'node:crypto';
 import { Vector3 } from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import { DEFAULT_CONFIG, type SonarPaletteName, type SonarZoom } from '../../src/core/Config.js';
+import * as manifests from '../../src/core/SiteManifest.js';
 import type { PlacedPoi } from '../../src/game/Pois.js';
 import { Sonar } from '../../src/ui/Sonar.js';
 import { Terrain } from '../../src/world/Terrain.js';
@@ -10,12 +13,23 @@ import { latLonToWorld } from '../../src/util/geo.js';
 import type { TileMeta } from '../../src/util/types.js';
 import { recordSonarCanvas } from './helpers/sonarCanvas.js';
 
-afterEach(() => vi.unstubAllGlobals());
-
-function render(id: string, hull: boolean, dpr = 1) {
+afterEach(() => {
   vi.unstubAllGlobals();
-  const meta = JSON.parse(readFileSync('data/tiles/endurance/meta.json', 'utf8')) as TileMeta;
-  const bytes = readFileSync('data/tiles/endurance/heightmap.bin');
+  vi.restoreAllMocks();
+});
+
+function render(
+  id: string,
+  hull: boolean,
+  dpr = 1,
+  tileId = 'endurance',
+  zoom: SonarZoom = DEFAULT_CONFIG.sonarZoom.initial,
+  palette: SonarPaletteName = 'default',
+  policySiteId = id,
+) {
+  vi.unstubAllGlobals();
+  const meta = JSON.parse(readFileSync(`data/tiles/${tileId}/meta.json`, 'utf8')) as TileMeta;
+  const bytes = readFileSync(`data/tiles/${tileId}/heightmap.bin`);
   const terrain = new Terrain(
     {
       meta: { ...meta, id },
@@ -25,10 +39,15 @@ function render(id: string, hull: boolean, dpr = 1) {
     'low',
   );
   const recorded = recordSonarCanvas();
+  // Keep the survey and carve fixed when testing another sonar policy identity.
+  terrain.meta.id = policySiteId;
   vi.stubGlobal('document', recorded.document);
   vi.stubGlobal('devicePixelRatio', dpr);
   const centre = latLonToWorld(meta, -68.739167, -52.329722);
-  const sonar = new Sonar(terrain);
+  const sonar = new Sonar(terrain, [], {
+    zoom: { ...DEFAULT_CONFIG.sonarZoom, initial: zoom },
+    palette,
+  });
   if (hull)
     sonar.setPois([
       {
@@ -42,7 +61,10 @@ function render(id: string, hull: boolean, dpr = 1) {
     relief: { minDepthM: number; maxDepthM: number; contourIntervalM: number };
   };
   const surveyBefore = terrain.sampleDataHeight(centre.x, centre.z);
-  internals.renderBathymetry(centre.x + 80, centre.z + 40);
+  internals.renderBathymetry(
+    tileId === 'endurance' ? centre.x + 80 : 0,
+    tileId === 'endurance' ? centre.z + 40 : 0,
+  );
   expect(terrain.sampleDataHeight(centre.x, centre.z)).toBe(surveyBefore);
   terrain.dispose();
   return { ...recorded, relief: internals.relief };
@@ -78,4 +100,69 @@ describe('1320 Endurance sonar scour contours', () => {
     expect(other.paths).toEqual(plain.paths);
     expect(other.labels).toEqual(plain.labels);
   });
+});
+
+describe('sonar rendering equivalence', () => {
+  it.each([
+    ['endurance', true, 'endurance'],
+    ['great-blue-hole', false, 'great-blue-hole'],
+  ] as const)('selects %s rendering through policy on another site', (id, hull, tileId) => {
+    const authored = render(id, hull, 1, tileId);
+    const policy = manifests.siteManifest(id)!.sonar;
+    vi.spyOn(manifests, 'siteManifest').mockReturnValue({ id: 'unknown', sonar: policy });
+    const relocated = render(
+      id,
+      hull,
+      1,
+      tileId,
+      DEFAULT_CONFIG.sonarZoom.initial,
+      'default',
+      'unknown',
+    );
+    expect(
+      relocated.rasters[0].data.every((value, index) => value === authored.rasters[0].data[index]),
+    ).toBe(true);
+    expect(relocated.paths).toEqual(authored.paths);
+    expect(relocated.labels).toEqual(authored.labels);
+    expect(relocated.relief).toEqual(authored.relief);
+  });
+
+  it('uses generic relief when a known site omits its sonar policy', () => {
+    const generic = render('unknown', true);
+    vi.spyOn(manifests, 'siteManifest').mockReturnValue({ id: 'endurance' });
+    const omitted = render('endurance', true);
+    expect(omitted.rasters[0].data).toEqual(generic.rasters[0].data);
+    expect(omitted.paths).toEqual(generic.paths);
+    expect(omitted.labels).toEqual(generic.labels);
+  });
+
+  // Frozen before moving site policy: protects pixels, contours, labels and depth limits.
+  for (const dpr of [1, 2]) {
+    for (const zoom of [250, 1000, 'tile'] as const) {
+      it.each([
+        ['endurance', true, 'endurance', 'default'],
+        ['endurance', false, 'endurance', 'highContrast'],
+        ['unknown', true, 'endurance', 'deuteranopia'],
+        ['great-blue-hole', false, 'great-blue-hole', 'default'],
+        ['great-blue-hole', false, 'great-blue-hole', 'highContrast'],
+        ['great-blue-hole', false, 'endurance', 'deuteranopia'],
+      ] as const)(
+        'preserves %s hull=%s survey=%s palette=%s at DPR ' + dpr + ' zoom ' + zoom,
+        (id, hull, tileId, palette) => {
+          const { rasters, paths, labels, relief } = render(id, hull, dpr, tileId, zoom, palette);
+          const image = rasters[0];
+          const hash = (value: Uint8ClampedArray | string) =>
+            createHash('sha256').update(value).digest('hex');
+          expect({
+            width: image.width,
+            height: image.height,
+            pixels: hash(image.data),
+            contours: hash(JSON.stringify(paths)),
+            labels: hash(JSON.stringify(labels)),
+            relief,
+          }).toMatchSnapshot();
+        },
+      );
+    }
+  }
 });

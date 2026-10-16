@@ -1,5 +1,9 @@
 {
   "id": "great-blue-hole",
+  "sonar": {
+    "maxContourIntervalM": 10,
+    "reef": true
+  },
   "opening": {
     "mission": {
       "rangeM": 150,
