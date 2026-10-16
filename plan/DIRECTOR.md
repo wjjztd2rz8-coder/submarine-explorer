@@ -94,7 +94,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 6. **V-lostcity-low [Sonnet, small], DONE 2026-10-16 (e89dc28; far mip bias 5 by 25 m)**: was Low-tier honeycomb on the slope needs a texture/normal fix; High is ~3.6.
    6b. **V-monterey-floor [Sonnet, small], DONE 2026-10-16 (2947c7f; ~3.8):** was ~3.5: flat sand floor between boulders; add ripple/pebble variation using the existing sediment material.
 7. **S-manifest slices [Codex 2160]:** step 1 done (habitat). Migrate the next slices per `plan/progress/S-manifest.md` (inventory: 27 site-id expressions left); one slice per brief; golden unchanged.
-8. **S-render remainder [Codex 2280]:** the nightly workflow failed on both scheduled runs (38574704463, 38743060407; ~1.5 h each, exit 1 after golden/perf steps; artifacts exist) and 2210 found exact golden identity fails. Diagnose from `gh run view <id> --log-failed` and the artifacts, fix the workflow or its thresholds, and make golden comparison use a justified tolerance.
+8. **S-render remainder [Codex 2280] (merged 2026-10-16, awaiting hosted nightly):** the nightly workflow failed on both scheduled runs (38574704463, 38743060407; ~1.5 h each, exit 1 after golden/perf steps; artifacts exist) and 2210 found exact golden identity fails. Diagnose from `gh run view <id> --log-failed` and the artifacts, fix the workflow or its thresholds, and make golden comparison use a justified tolerance.
    Implementation and evidence: [progress/2280-S-render-nightly.md](progress/2280-S-render-nightly.md). Hosted confirmation remains pending; a green diagnostic workflow does not establish visual acceptance.
 
 9. **R-release [Haiku]:** f54 tagged 2026-10-15 on green CI (04a1d8c). Next tag f55 after the next completed green run.
@@ -102,7 +102,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 10. **S-verify / S-bughunt [Codex, standing]:** after each batch of visual merges, a numeric/static verification (no site branches, no package numbers, `hullLight`/bank/footprint data paths, snapshot rebaselines justified) and a bug hunt over newly merged code. Latest: [2260 S-verify-13](progress/2260-S-verify-13.md) audits V-bluehole-3, V-lostcity-2 and V-beebe-hull; late-prop life exclusion fixed, no new simplicity violation or masked numeric regression found. Browser verification remains environment-blocked.
 
 11. **V-hero-set [Haiku, small], DONE 2026-10-16 (table follows the code; HERO_SITES unchanged, so saves are unaffected):** make the 1.0 table and `HERO_SITES` agree (Sol, 2026-10-16: the table counts Endurance, the code counts Monterey). Pick one set, update the table and golden poses; eight-site acceptance must then cover the other eight including Endurance mission spawn.
-12. **S-perf-stall [Codex 2270]:** `perf.frameMs` (`src/app/systems/quality.ts`) ignores every interval >=250 ms, so real stalls on a phone never lower quality or show in metrics. Separate hidden-tab gaps (document.hidden/visibility) from stalls and clamp stalls into the average; unit test by capability.
+12. **S-perf-stall [Codex 2270] DONE 2026-10-16 (merged this run):** `perf.frameMs` (`src/app/systems/quality.ts`) ignores every interval >=250 ms, so real stalls on a phone never lower quality or show in metrics. Separate hidden-tab gaps (document.hidden/visibility) from stalls and clamp stalls into the average; unit test by capability.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.
 
