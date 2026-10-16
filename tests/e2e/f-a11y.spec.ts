@@ -128,15 +128,14 @@ test('home menus and nested dialogs cycle visibly, close with Escape, and restor
   const home = page.locator('.home-screen');
   await expect(home).toBeVisible();
   await cycle(page, home);
-  for (const [name, selector] of [
-    ['Journal', '.journal'],
-    ['Settings', '.settings'],
-    ['Controls', '.settings'],
-  ]) {
+  for (const name of ['Journal', 'Settings', 'Controls']) {
     const opener = home.getByRole('button', { name, exact: true });
     await opener.focus();
     await page.keyboard.press('Enter');
-    const dialog = page.locator(selector!);
+    // Controls opens the device guide card, not the settings dialog.
+    const dialog = page.locator(
+      { Journal: '.journal', Settings: '.settings', Controls: '.controls-card' }[name]!,
+    );
     await expect(dialog).toBeVisible();
     await cycle(page, dialog);
     await page.keyboard.press('Escape');
