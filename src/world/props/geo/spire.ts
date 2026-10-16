@@ -208,8 +208,8 @@ export function tieredSpire(o: SpireOpts): THREE.BufferGeometry {
         ? o.crater * o.r0 * o.topFrac * (o.trunk ? 2.4 : 1)
         : 0;
     let yy = y - sink;
-    if (o.irregular && o.trunk) {
-      // Broken rim: the top metres are a mouth with a torn edge, not a lathe ring. Angular
+    if (o.irregular && (o.trunk || o.crust)) {
+      // Broken rim (carbonate trunks and crusted sulfide stacks): the top metres are a mouth with a torn edge, not a lathe ring. Angular
       // notches and teeth drop the wall by up to a rim radius, and the rim thins and
       // wavers in radius. Wall and cap rings share the formula, so the seam stays closed.
       const k = smooth(0.8, 1, t);
