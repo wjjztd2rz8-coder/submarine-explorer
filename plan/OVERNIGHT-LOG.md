@@ -1362,3 +1362,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **CI:** run 33's hosted CI failed only at "Install Playwright Chromium" (infra flake on one shard, all else green). No tag.
 - **Codex:** 5h 12%, nothing running; queue 2370 S-manifest, 2380 S-verify-16, 2390 S-bughunt-17 waits for budget.
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 16:21 CDT headless run 35 (comprehensive review, joint with Sol)
+
+- Third comprehensive review recorded (REVIEWS.md, STATUS.md; stage ~82%, 4-5 weeks); backlog re-planned with target-composition V-* briefs. Blue Hole lowered to 3.5 after Sol's challenge.
+- **Merged and pushed (smoke + project-base green; no full e2e):** Codex 2370 S-manifest terrain-carve slice (inventory 4 to 2), 2380 S-verify-16, 2390 S-bughunt-17 (pinch zoom, guide focus, modal shortcuts, touch/gamepad routing).
+- **Codex:** queued 2400 S-manifest, 2410 S-verify-17, 2420 S-bughunt-18. No Claude package launched. f56 tag deferred until CI of these merges is green.
+- **Needs owner:** real-phone Low-tier play.
