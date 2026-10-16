@@ -371,9 +371,10 @@ export const BIOMES: Record<string, Biome> = {
     colorC: 0x55524a,
     stain: 0x54503a,
     stainAmount: 0.08,
-    patch: 0.35,
-    ripple: 0.4,
-    rippleLenM: 0.5,
+    // Broad current-ripple fields and cobble-sand patches vary the floor between the wall rubble.
+    patch: 0.55,
+    ripple: 0.9,
+    rippleLenM: 1.3,
     rippleDir: 1.4,
     burrow: 0.6,
     rockBias: 0.08,
@@ -382,6 +383,8 @@ export const BIOMES: Record<string, Biome> = {
     scatter: [
       { kind: 'boulder', density: 1.1, slopeMaxDeg: 40, on: 'rock' },
       { kind: 'rubble', density: 3, slopeMaxDeg: 35, on: 'any' },
+      // Pebbles and cobbles strewn across the open floor.
+      { kind: 'dropstone', density: 30, slopeMaxDeg: 15, on: 'flat', sizeMul: 2.2 },
       { kind: 'sponge', density: 0.5, slopeMaxDeg: 40, on: 'rock' },
       { kind: 'whip', density: 0.3, slopeMaxDeg: 25, on: 'any' },
       { kind: 'seapen', density: 0.9, slopeMaxDeg: 12, on: 'flat' },
