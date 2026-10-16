@@ -8,6 +8,7 @@
  */
 
 import * as THREE from 'three';
+import { propManifest } from '../../../core/SiteManifest.js';
 import { lostCityBedTint } from '../../LostCityBands.js';
 import { createLostCityCarbonateMaterial } from '../../LostCityCarbonate.js';
 import { lostCityFlange } from '../../LostCityFlange.js';
@@ -481,7 +482,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   // Poseidon's inactive apron: three small thickets, clear of the active columns.
   // Reuse the prop coral and life anemone templates; two instanced draws at every tier.
   // A separate RNG keeps the chimney layout and shimmer unchanged.
-  if (!lone && input.def.id === 'poseidon-tower') {
+  if (!lone && propManifest(input.def.id)?.apronHabitat) {
     const lifeRnd = mulberry32(seed ^ 0x600);
     const colonies: InstanceSpec[] = [];
     const anemones: InstanceSpec[] = [];

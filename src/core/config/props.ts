@@ -3,6 +3,8 @@
  * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
+import { propManifest, type GalleryApron } from '../SiteManifest.js';
+
 // --- props (docs/props.md) ---------------------------------------------
 export type PropCollisionKind = 'none' | 'sphere' | 'box';
 export type ProceduralPropKind = 'hull-block' | 'debris' | 'chimney' | 'geo';
@@ -97,25 +99,13 @@ export interface PropsConfig {
   chimneyMaterials: Record<Exclude<ChimneyMaterial, 'basalt'>, { rock: number; stain: number }>;
   /** Patchy mineral precipitate on selected chimney bodies, without extra geometry or draws. */
   chimneyCrust: {
-    propIds: string[];
     color: number;
     amount: number;
     scaleM: number;
     bumpScale: number;
   };
   /** Metre-scale sediment beds on the Blue Hole gallery aprons only. */
-  blueHoleApron: {
-    bedHeightM: number;
-    riserFraction: number;
-    rowDensity: number;
-    columnDensity: number;
-    normalSampleM: number;
-    contactShade: number;
-    roughnessVariation: number;
-    /** Per-pixel bed shading: darkening on risers and lightening on the lip above them. */
-    riserShade: number;
-    lipLight: number;
-  };
+  blueHoleApron: GalleryApron;
   /** `?debugProps=1` placement tool steps. */
   debugNudgeM: number;
   debugNudgeFastM: number;
@@ -185,23 +175,13 @@ export const DEFAULT_PROPS: PropsConfig = {
     sulfide: { rock: 0x24201e, stain: 0x7a4e2c }, // black smoker sulphide, rusty Fe-oxide staining
   },
   chimneyCrust: {
-    propIds: ['beebe-chimney-1', 'beebe-chimney-2', 'beebe-chimney-3'],
     color: 0x9a8e7b,
     amount: 0.08,
     scaleM: 1.4,
     bumpScale: 1.3,
   },
-  blueHoleApron: {
-    bedHeightM: 1.7,
-    riserFraction: 0.32,
-    rowDensity: 3,
-    columnDensity: 2.5,
-    normalSampleM: 0.7,
-    contactShade: 0.18,
-    roughnessVariation: 0.1,
-    riserShade: 0.2,
-    lipLight: 0.12,
-  },
+  // Compatibility view: preserve config overrides and generic gallery defaults.
+  blueHoleApron: propManifest('karst-grotto')!.galleryApron!,
   debugNudgeM: 1,
   debugNudgeFastM: 10,
   debugRotateDeg: 5,

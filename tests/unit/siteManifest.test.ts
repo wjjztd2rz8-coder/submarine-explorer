@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import {
   allSiteManifests,
   siteManifest,
+  propManifest,
   validateSiteManifest,
 } from '../../src/core/SiteManifest.js';
 
@@ -14,6 +15,157 @@ const ids = (
 describe('site manifest validator', () => {
   const cases: [string, unknown, string | null][] = [
     ['minimal', { id: 's' }, null],
+    [
+      'gallery apron',
+      { id: 's', props: { p: { galleryApron: propManifest('karst-grotto')!.galleryApron } } },
+      null,
+    ],
+    [
+      'missing apron dimensions',
+      { id: 's', props: { p: { galleryApron: {} } } },
+      'props.p.galleryApron.bedHeightM',
+    ],
+    [
+      'unknown apron field',
+      {
+        id: 's',
+        props: { p: { galleryApron: { ...propManifest('karst-grotto')!.galleryApron, typo: 1 } } },
+      },
+      'props.p.galleryApron.typo: unknown field',
+    ],
+    ['empty props', { id: 's', props: {} }, null],
+    [
+      'prop policies',
+      {
+        id: 's',
+        props: {
+          p: {
+            habitat: false,
+            mineralCrust: false,
+            apronHabitat: true,
+            grounding: 'rendered',
+            grotto: 'hood',
+            seabed: { biome: 'b' },
+          },
+        },
+      },
+      null,
+    ],
+    ['chimney profiles', { id: 's', props: siteManifest('beebe-vent-field')!.props }, null],
+    ['invalid props object', { id: 's', props: [] }, 'props: expected an object'],
+    ['invalid prop row', { id: 's', props: { p: null } }, 'props.p: expected an object'],
+    ['empty prop id', { id: 's', props: { '': {} } }, 'props: expected a nonempty string'],
+    [
+      'unknown prop field',
+      { id: 's', props: { p: { habitual: true } } },
+      'props.p.habitual: unknown field',
+    ],
+    [
+      'invalid habitat flag',
+      { id: 's', props: { p: { habitat: 1 } } },
+      'props.p.habitat: expected a boolean',
+    ],
+    [
+      'invalid crust flag',
+      { id: 's', props: { p: { mineralCrust: 'yes' } } },
+      'props.p.mineralCrust: expected a boolean',
+    ],
+    [
+      'invalid apron flag',
+      { id: 's', props: { p: { apronHabitat: {} } } },
+      'props.p.apronHabitat: expected a boolean',
+    ],
+    [
+      'unknown grounding',
+      { id: 's', props: { p: { grounding: 'bed' } } },
+      'props.p.grounding: expected rendered',
+    ],
+    [
+      'unknown grotto',
+      { id: 's', props: { p: { grotto: 'east' } } },
+      'props.p.grotto: expected hood',
+    ],
+    [
+      'missing biome',
+      { id: 's', props: { p: { seabed: {} } } },
+      'props.p.seabed.biome: expected a nonempty string',
+    ],
+    [
+      'unknown seabed field',
+      { id: 's', props: { p: { seabed: { biome: 'b', extra: true } } } },
+      'props.p.seabed.extra: unknown field',
+    ],
+    ['missing smoker profile', { id: 's', props: { p: { smoker: {} } } }, 'props.p.smoker.ledge'],
+    [
+      'unknown profile field',
+      {
+        id: 's',
+        props: { p: { smoker: { ...propManifest('beebe-chimney-1')!.smoker, typo: 1 } } },
+      },
+      'props.p.smoker.typo: unknown field',
+    ],
+    [
+      'nonfinite profile',
+      {
+        id: 's',
+        props: { p: { smoker: { ...propManifest('beebe-chimney-1')!.smoker, wobble: Infinity } } },
+      },
+      'props.p.smoker.wobble: expected a finite number',
+    ],
+    [
+      'negative shape',
+      {
+        id: 's',
+        props: { p: { smoker: { ...propManifest('beebe-chimney-1')!.smoker, lip: -1 } } },
+      },
+      'props.p.smoker.lip: expected a positive number',
+    ],
+    [
+      'fractional shelf count',
+      {
+        id: 's',
+        props: { p: { smoker: { ...propManifest('beebe-chimney-1')!.smoker, mainShelves: 0.5 } } },
+      },
+      'props.p.smoker.mainShelves: expected a nonnegative integer',
+    ],
+    [
+      'invalid color',
+      {
+        id: 's',
+        props: {
+          p: { smoker: { ...propManifest('beebe-chimney-1')!.smoker, mouthColor: 0x1000000 } },
+        },
+      },
+      'props.p.smoker.mouthColor: expected a color',
+    ],
+    [
+      'missing side shape',
+      {
+        id: 's',
+        props: {
+          p: { chimney: { ...propManifest('beebe-chimney-2')!.chimney, shape: undefined } },
+        },
+      },
+      'props.p.chimney.shape: expected an object',
+    ],
+    [
+      'fractional flange count',
+      {
+        id: 's',
+        props: { p: { chimney: { ...propManifest('beebe-chimney-2')!.chimney, flanges: 1.5 } } },
+      },
+      'props.p.chimney.flanges: expected a nonnegative integer',
+    ],
+    [
+      'signed lean and angle',
+      {
+        id: 's',
+        props: {
+          p: { chimney: { ...propManifest('beebe-chimney-2')!.chimney, lean: 0, leanDir: -1 } },
+        },
+      },
+      null,
+    ],
     [
       'full',
       { id: 's', audio: { whaleHabitat: true }, events: { plume: { maxAltitudeM: 70 } } },
@@ -162,5 +314,31 @@ describe('shipped site manifests', () => {
     ).toEqual([...ids].sort());
     for (const id of ids) expect(siteManifest(id)?.id).toBe(id);
     expect(siteManifest('no-such-site')).toBeUndefined();
+    expect(propManifest('no-such-prop')).toBeUndefined();
   });
+});
+
+it('binds each authored prop profile once in its owning content pack', () => {
+  const seen = new Set<string>();
+  const owners = new Map<string, string[]>();
+  for (const site of ids) {
+    const doc = JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8')) as {
+      props: { id: string }[];
+    };
+    for (const prop of doc.props) owners.set(prop.id, [...(owners.get(prop.id) ?? []), site]);
+  }
+  for (const manifest of allSiteManifests()) {
+    const doc = JSON.parse(readFileSync(`data/landmarks/${manifest.id}/props.json`, 'utf8')) as {
+      props: { id: string }[];
+    };
+    for (const [id, tuning] of Object.entries(manifest.props ?? {})) {
+      expect(seen.has(id)).toBe(false);
+      expect(doc.props.some((prop) => prop.id === id)).toBe(true);
+      expect(propManifest(id)).toBe(tuning);
+      expect(owners.get(id)).toEqual([manifest.id]);
+      if (tuning.seabed) expect(siteManifest(tuning.seabed.biome)).toBeDefined();
+      seen.add(id);
+    }
+  }
+  expect(seen.size).toBe(6);
 });

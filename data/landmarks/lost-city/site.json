@@ -25,5 +25,10 @@
     "camera": {
       "applyDefaults": true
     }
+  },
+  "props": {
+    "poseidon-tower": {
+      "apronHabitat": true
+    }
   }
 }

@@ -51,7 +51,90 @@ export interface ApproachOpeningLife extends OpeningLifeBase {
   deckPatch?: { x: number; z: number; rowSpacingM: number; castHeightM: number };
 }
 
+const chimneyShapeKeys = [
+  'ledge',
+  'wobble',
+  'rough',
+  'ridgeAmp',
+  'lip',
+  'crater',
+  'irregular',
+  'shelfRadiusFraction',
+  'shelfWidthMin',
+  'shelfWidthVariation',
+  'shelfArcMin',
+  'shelfArcVariation',
+] as const;
+const smokerDetailKeys = [
+  'ridges',
+  'shelfStart',
+  'mainShelfStep',
+  'sideShelfStep',
+  'shelfJitter',
+  'mouthClearanceM',
+  'topMouthRadiusFraction',
+  'topMouthRecessFraction',
+  'outletStartHeightFraction',
+  'outletHeightStepFraction',
+  'outletStartAngleRad',
+  'outletAngleStepRad',
+  'outletLengthM',
+  'outletBaseRadiusM',
+  'outletTipRadiusM',
+  'outletMouthRadiusM',
+  'outletEmbedM',
+  'outletRayStartM',
+  'outletMaxAxisRadiusFactor',
+] as const;
+const chimneyVariationKeys = [
+  'heightScale',
+  'widthScale',
+  'lean',
+  'leanDir',
+  'flanges',
+  'ridges',
+  'crust',
+] as const;
+
+const galleryApronKeys = [
+  'bedHeightM',
+  'riserFraction',
+  'rowDensity',
+  'columnDensity',
+  'normalSampleM',
+  'contactShade',
+  'roughnessVariation',
+  'riserShade',
+  'lipLight',
+] as const;
+export type GalleryApron = Record<(typeof galleryApronKeys)[number], number>;
+
+export type ChimneyShape = Record<(typeof chimneyShapeKeys)[number], number>;
+export type SmokerProfile = ChimneyShape &
+  Record<(typeof smokerDetailKeys)[number], number> & {
+    mouthColor: number;
+    collarColor: number;
+    collarEmissive: number;
+    mainShelves: number;
+    sideShelves: number;
+    outletCount: number;
+  };
+
+/** Configured prop ids must be unique across content packs. */
+export interface PropManifest {
+  galleryApron?: GalleryApron;
+  grounding?: 'rendered';
+  grotto?: 'hood';
+  apronHabitat?: boolean;
+  habitat?: boolean;
+  seabed?: { biome: string };
+  mineralCrust?: boolean;
+  smoker?: SmokerProfile;
+  chimney?: Record<(typeof chimneyVariationKeys)[number], number> & { shape: ChimneyShape };
+}
+
 export interface SiteManifest {
+  props?: Record<string, PropManifest>;
   id: string;
   opening?: {
     mission?: { rangeM: number; destinationLabel?: string; localAltitudeWeight?: number };
@@ -96,19 +179,6 @@ function noExtra(id: string, path: string, o: Obj, allowed: string[]): void {
   for (const k of Object.keys(o)) {
     if (!allowed.includes(k)) fail(id, `${path}.${k}`, 'unknown field');
   }
-}
-
-function positive(id: string, path: string, o: Obj, key: string): number {
-  const v = o[key];
-  if (typeof v !== 'number' || !Number.isFinite(v) || v <= 0)
-    fail(id, `${path}.${key}`, 'expected a positive number');
-  return v;
-}
-
-function section(id: string, root: Obj, name: string, key: string): Obj | undefined {
-  const parent = root[name] === undefined ? undefined : obj(id, name, root[name]);
-  if (!parent || parent[key] === undefined) return undefined;
-  return obj(id, `${name}.${key}`, parent[key]);
 }
 
 type Check = (id: string, path: string, value: unknown) => void;
@@ -225,40 +295,71 @@ const lifeOpeningCheck: Check = (id, path, value) => {
   } else fail(id, `${path}.strategy`, 'expected groups or approach');
 };
 
+const color: Check = (id, path, value) => {
+  count(id, path, value);
+  if ((value as number) > 0xffffff) fail(id, path, 'expected a color from 0 to 0xffffff');
+};
+const threshold: Check = (id, path, value) => {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0)
+    fail(id, path, 'expected a positive number');
+};
+const numericFields = (keys: readonly string[], check: Check): Record<string, Check> =>
+  Object.fromEntries(keys.map((key) => [key, check]));
+const propCheck = fields(
+  {},
+  {
+    grounding: (id, path, value) => {
+      if (value !== 'rendered') fail(id, path, 'expected rendered');
+    },
+    grotto: (id, path, value) => {
+      if (value !== 'hood') fail(id, path, 'expected hood');
+    },
+    galleryApron: fields(numericFields(galleryApronKeys, aboveZero)),
+    apronHabitat: flag,
+    habitat: flag,
+    seabed: fields({ biome: text }),
+    mineralCrust: flag,
+    smoker: fields({
+      ...numericFields(chimneyShapeKeys, aboveZero),
+      ...numericFields(smokerDetailKeys, aboveZero),
+      mouthColor: color,
+      collarColor: color,
+      collarEmissive: color,
+      mainShelves: count,
+      sideShelves: count,
+      outletCount: count,
+    }),
+    chimney: fields({
+      ...numericFields(chimneyVariationKeys, aboveZero),
+      lean: finite,
+      leanDir: finite,
+      flanges: count,
+      ridges: count,
+      shape: fields(numericFields(chimneyShapeKeys, aboveZero)),
+    }),
+  },
+);
+
 /** Throws with the site id and field path on the first problem. */
 export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
   const root = obj(id, '$', raw);
-  noExtra(id, '$', root, ['id', 'audio', 'events', 'opening', 'life']);
+  noExtra(id, '$', root, ['id', 'audio', 'events', 'opening', 'life', 'props']);
   if (root.id !== id) fail(id, 'id', `expected "${id}"`);
   const out: SiteManifest = { id };
   if (root.audio !== undefined) {
-    const a = obj(id, 'audio', root.audio);
-    noExtra(id, 'audio', a, ['whaleHabitat']);
-    if (a.whaleHabitat !== undefined && typeof a.whaleHabitat !== 'boolean')
-      fail(id, 'audio.whaleHabitat', 'expected a boolean');
-    out.audio = { whaleHabitat: a.whaleHabitat as boolean | undefined };
+    fields({}, { whaleHabitat: flag })(id, 'audio', root.audio);
+    out.audio = { whaleHabitat: (root.audio as NonNullable<SiteManifest['audio']>).whaleHabitat };
   }
   if (root.events !== undefined) {
-    noExtra(id, 'events', obj(id, 'events', root.events), ['plume', 'turbidity', 'whale']);
-    const events: NonNullable<SiteManifest['events']> = {};
-    const plume = section(id, root, 'events', 'plume');
-    if (plume) {
-      noExtra(id, 'events.plume', plume, ['maxAltitudeM']);
-      events.plume = { maxAltitudeM: positive(id, 'events.plume', plume, 'maxAltitudeM') };
-    }
-    const turbidity = section(id, root, 'events', 'turbidity');
-    if (turbidity) {
-      noExtra(id, 'events.turbidity', turbidity, ['maxAltitudeM']);
-      events.turbidity = {
-        maxAltitudeM: positive(id, 'events.turbidity', turbidity, 'maxAltitudeM'),
-      };
-    }
-    const whale = section(id, root, 'events', 'whale');
-    if (whale) {
-      noExtra(id, 'events.whale', whale, ['maxDepthM']);
-      events.whale = { maxDepthM: positive(id, 'events.whale', whale, 'maxDepthM') };
-    }
-    out.events = events;
+    fields(
+      {},
+      {
+        plume: fields({ maxAltitudeM: threshold }),
+        turbidity: fields({ maxAltitudeM: threshold }),
+        whale: fields({ maxDepthM: threshold }),
+      },
+    )(id, 'events', root.events);
+    out.events = root.events as SiteManifest['events'];
   }
   if (root.opening !== undefined) {
     openingCheck(id, 'opening', root.opening);
@@ -267,6 +368,14 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
   if (root.life !== undefined) {
     fields({}, { opening: lifeOpeningCheck })(id, 'life', root.life);
     out.life = root.life as SiteManifest['life'];
+  }
+  if (root.props !== undefined) {
+    const props = obj(id, 'props', root.props);
+    for (const [key, value] of Object.entries(props)) {
+      text(id, 'props', key);
+      propCheck(id, `props.${key}`, value);
+    }
+    out.props = props as SiteManifest['props'];
   }
   return out;
 }
@@ -289,4 +398,18 @@ export function siteManifest(id: string): SiteManifest | undefined {
 
 export function allSiteManifests(): readonly SiteManifest[] {
   return [...manifests.values()];
+}
+
+// Builders can also be called without a tile (previews and headless geometry tests).
+// Derive their prop lookup from the same validated manifests as the runtime loader.
+const propManifests = new Map<string, PropManifest>();
+for (const manifest of manifests.values()) {
+  for (const [id, tuning] of Object.entries(manifest.props ?? {})) {
+    if (propManifests.has(id)) fail(manifest.id, `props.${id}`, 'duplicate prop id');
+    propManifests.set(id, tuning);
+  }
+}
+
+export function propManifest(id: string): PropManifest | undefined {
+  return propManifests.get(id);
 }

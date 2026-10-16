@@ -1,0 +1,751 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`authored prop geometry golden > axial-seamount-ashes high: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 280,
+    },
+    "buffers": "16d0d06f126f897cf5ab4738b28d3296062c034b692c2544b30caed02bc262aa",
+    "id": "mushroom-chimney",
+    "placement": "b9e6232fb1f41e560527fed9e7874a8b5939d318fcc46d8081dcf25fd25f84e6",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 420,
+    },
+    "buffers": "4e0dc28c2d99f8b31cc1bd3fd8aedde2a89f7749d840864b89cf097b3289699e",
+    "id": "inferno-chimney",
+    "placement": "1be5c5d7c68d460c6413c2383fd87d66bae4629144aec8ce6b01409ed5e8e005",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 420,
+    },
+    "buffers": "bac6f3eb98c3a7c13867a58ef8f2094ad0c6a45171e15ea13fedc49da334b5ad",
+    "id": "hell-chimney",
+    "placement": "e9816b6c2df4e819960488ba331503f4e7ef748294f3b301c5e3625a859a574c",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 420,
+    },
+    "buffers": "72930ac8e43bc8e959c2de7a7904ab220c91e388ea09c4bd3c22565f41d07bae",
+    "id": "phoenix-chimney",
+    "placement": "1e2e22371805440e1e71a649fef07d18c6f69450b95c9a7c669d15573df70ffe",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 280,
+    },
+    "buffers": "570517af33664578746d50b2717da5065e7ba01abfe8c8ee3b16aaf18382cbd2",
+    "id": "virgin-chimney",
+    "placement": "d386aa33f5e3dbf9c88e6a51e3f375c4beea80d6b33a6ad231482c352db468ef",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 28668,
+    },
+    "buffers": "0af938a79b3cfcba4688312008ee15d2e182e03f3d7a2f33447dd7aff5aed3f2",
+    "id": "ashes-smoker-mound",
+    "placement": "4d07b0e14f99b24371825b473d2500522a45121a7b3ffa6126d6cc0e233d72f1",
+    "ventTop": 6.388528390240593,
+  },
+]
+`;
+
+exports[`authored prop geometry golden > axial-seamount-ashes low: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 280,
+    },
+    "buffers": "16d0d06f126f897cf5ab4738b28d3296062c034b692c2544b30caed02bc262aa",
+    "id": "mushroom-chimney",
+    "placement": "b9e6232fb1f41e560527fed9e7874a8b5939d318fcc46d8081dcf25fd25f84e6",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 420,
+    },
+    "buffers": "4e0dc28c2d99f8b31cc1bd3fd8aedde2a89f7749d840864b89cf097b3289699e",
+    "id": "inferno-chimney",
+    "placement": "1be5c5d7c68d460c6413c2383fd87d66bae4629144aec8ce6b01409ed5e8e005",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 420,
+    },
+    "buffers": "bac6f3eb98c3a7c13867a58ef8f2094ad0c6a45171e15ea13fedc49da334b5ad",
+    "id": "hell-chimney",
+    "placement": "e9816b6c2df4e819960488ba331503f4e7ef748294f3b301c5e3625a859a574c",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 420,
+    },
+    "buffers": "72930ac8e43bc8e959c2de7a7904ab220c91e388ea09c4bd3c22565f41d07bae",
+    "id": "phoenix-chimney",
+    "placement": "1e2e22371805440e1e71a649fef07d18c6f69450b95c9a7c669d15573df70ffe",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 280,
+    },
+    "buffers": "570517af33664578746d50b2717da5065e7ba01abfe8c8ee3b16aaf18382cbd2",
+    "id": "virgin-chimney",
+    "placement": "d386aa33f5e3dbf9c88e6a51e3f375c4beea80d6b33a6ad231482c352db468ef",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 6386,
+    },
+    "buffers": "5239c2110ebf93ecd8c90f6a928d7e4fb98ac8a6c637cf68abcb7220136b439e",
+    "id": "ashes-smoker-mound",
+    "placement": "4d07b0e14f99b24371825b473d2500522a45121a7b3ffa6126d6cc0e233d72f1",
+    "ventTop": 6.388528390240593,
+  },
+]
+`;
+
+exports[`authored prop geometry golden > axial-seamount-ashes medium: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 280,
+    },
+    "buffers": "16d0d06f126f897cf5ab4738b28d3296062c034b692c2544b30caed02bc262aa",
+    "id": "mushroom-chimney",
+    "placement": "b9e6232fb1f41e560527fed9e7874a8b5939d318fcc46d8081dcf25fd25f84e6",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 420,
+    },
+    "buffers": "4e0dc28c2d99f8b31cc1bd3fd8aedde2a89f7749d840864b89cf097b3289699e",
+    "id": "inferno-chimney",
+    "placement": "1be5c5d7c68d460c6413c2383fd87d66bae4629144aec8ce6b01409ed5e8e005",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 420,
+    },
+    "buffers": "bac6f3eb98c3a7c13867a58ef8f2094ad0c6a45171e15ea13fedc49da334b5ad",
+    "id": "hell-chimney",
+    "placement": "e9816b6c2df4e819960488ba331503f4e7ef748294f3b301c5e3625a859a574c",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 420,
+    },
+    "buffers": "72930ac8e43bc8e959c2de7a7904ab220c91e388ea09c4bd3c22565f41d07bae",
+    "id": "phoenix-chimney",
+    "placement": "1e2e22371805440e1e71a649fef07d18c6f69450b95c9a7c669d15573df70ffe",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 280,
+    },
+    "buffers": "570517af33664578746d50b2717da5065e7ba01abfe8c8ee3b16aaf18382cbd2",
+    "id": "virgin-chimney",
+    "placement": "d386aa33f5e3dbf9c88e6a51e3f375c4beea80d6b33a6ad231482c352db468ef",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 5,
+      "triangles": 14830,
+    },
+    "buffers": "0986e22fccd05909ab89f5ca31082515dd4fe35660d385b7e4cd979f1023da1c",
+    "id": "ashes-smoker-mound",
+    "placement": "4d07b0e14f99b24371825b473d2500522a45121a7b3ffa6126d6cc0e233d72f1",
+    "ventTop": 6.388528390240593,
+  },
+]
+`;
+
+exports[`authored prop geometry golden > beebe-vent-field high: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 9,
+      "triangles": 148814,
+    },
+    "buffers": "7f34a779d0527ae654b33649cd2e54317f2e83f7eebfcd6eb01f10ae71c2c38d",
+    "id": "beebe-chimney-1",
+    "placement": "f837b0a6e5813e4ea63d23d064a1f28b4bfd4ab15cca41fda073d85e7e476273",
+    "ventTop": 27.84017557996292,
+  },
+  {
+    "budget": {
+      "draws": 2,
+      "triangles": 16304,
+    },
+    "buffers": "31387b2756b56443ee5e34b7e54827470d3453d9c61e42b55c23dca4bcc9453e",
+    "id": "beebe-chimney-2",
+    "placement": "bbc25cd97b9d443a19a9b7cb856193b910e9862bbef137bee9f62346d3915936",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 2,
+      "triangles": 15472,
+    },
+    "buffers": "a81ee6327acc946999cdb4f8797c60768b7e4456f15cdc770020487afb8c04f7",
+    "id": "beebe-chimney-3",
+    "placement": "aa7f27c788a220374f3d0db96ecf1e4cc28d49d9161cedd95c500ca65e5a5c57",
+    "ventTop": undefined,
+  },
+]
+`;
+
+exports[`authored prop geometry golden > beebe-vent-field low: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 9,
+      "triangles": 18430,
+    },
+    "buffers": "456cbef67339958b7d9614b348efcdbe2c93a62a12660c26c846a10cc6a59f67",
+    "id": "beebe-chimney-1",
+    "placement": "13b4797438d6e1fa1dd785f73aa630e7035603145b26efc18491e6d75928d804",
+    "ventTop": 27.84017557996292,
+  },
+  {
+    "budget": {
+      "draws": 2,
+      "triangles": 1214,
+    },
+    "buffers": "f09cdbba9b25679b5a606895eb99cf58bc6b4615574ade4520d0e2983c816b73",
+    "id": "beebe-chimney-2",
+    "placement": "941d73d4439af2dae20cefd1afba00b9e349c68496912db03bcefa43dce791b4",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 2,
+      "triangles": 1114,
+    },
+    "buffers": "7a3b503f3a1fb88eb8564b913f866449f973806b188324408b301ca9ba9c7526",
+    "id": "beebe-chimney-3",
+    "placement": "7c59685bc2b63e5bb21e6da48816415f68e078a1d7921071457deb38f7a547cf",
+    "ventTop": undefined,
+  },
+]
+`;
+
+exports[`authored prop geometry golden > beebe-vent-field medium: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 9,
+      "triangles": 88610,
+    },
+    "buffers": "cd102083311025296de0735a312bb603c6a152c3795d7d102cc20d019ad98547",
+    "id": "beebe-chimney-1",
+    "placement": "13b4797438d6e1fa1dd785f73aa630e7035603145b26efc18491e6d75928d804",
+    "ventTop": 27.84017557996292,
+  },
+  {
+    "budget": {
+      "draws": 2,
+      "triangles": 8420,
+    },
+    "buffers": "5fb0cb1b37b7ee3b217e67d033aa2085eace1217934e6898156c8044f8554771",
+    "id": "beebe-chimney-2",
+    "placement": "d195cdfba449cc9ca5716679781db300ee1d45fe7c4a1dfab5b6680e998ed47a",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 2,
+      "triangles": 7864,
+    },
+    "buffers": "5eba7a39074761a0d5917ccb9843bc1459dbb0b6dbd86bf68cdccd6c9ab88967",
+    "id": "beebe-chimney-3",
+    "placement": "9dba5d73cc954a90d12c46b5ff63ccf384d981db6c84dd22ade96551df2dd69d",
+    "ventTop": undefined,
+  },
+]
+`;
+
+exports[`authored prop geometry golden > great-blue-hole high: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 4,
+      "triangles": 81108,
+    },
+    "buffers": "87d74f661f23c84fa851f2b7be5bbd53d39abd159c12097cb05c71c14367fcff",
+    "id": "karst-grotto",
+    "placement": "65f8f569620274b20ececbff576ac464a1d53bea0cf9e91fe6fb976b88d625ef",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 4,
+      "triangles": 71676,
+    },
+    "buffers": "911f0f362a29333f5421abd8c27bb420074a8c4bd8527bfb64197d8cd1afdd9b",
+    "id": "karst-grotto-east",
+    "placement": "8cffb98952cf400483171ec379767aaa842e9ba05b9dda7c97310262806b3dff",
+    "ventTop": undefined,
+  },
+]
+`;
+
+exports[`authored prop geometry golden > great-blue-hole low: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 3,
+      "triangles": 11392,
+    },
+    "buffers": "eff37d70a5ee969c1f7517a1781102e978edab09b6c3295d44cba8700e277f1d",
+    "id": "karst-grotto",
+    "placement": "4d085663075139fa11405347d064afe28d5f0345c6594894e8237f29fd0668f1",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 3,
+      "triangles": 9656,
+    },
+    "buffers": "b109bff220f53de001cf64379994318fbc5040c269345fae92977a0e6c2ff2ed",
+    "id": "karst-grotto-east",
+    "placement": "50455b50510db6e4e07f166582c0e5aaf160eed1aeab1baaaeaf4c28f447886a",
+    "ventTop": undefined,
+  },
+]
+`;
+
+exports[`authored prop geometry golden > great-blue-hole medium: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 4,
+      "triangles": 50342,
+    },
+    "buffers": "14dede5099ec94aeff147227dc9c076aef9bf0b4b43c8473fa4a3ea105feb525",
+    "id": "karst-grotto",
+    "placement": "8cd16e25188331747119702db76d51e071a6b4bd6953c95ac9183acdf16d9b66",
+    "ventTop": undefined,
+  },
+  {
+    "budget": {
+      "draws": 4,
+      "triangles": 43098,
+    },
+    "buffers": "fe8d933d986981958f0371eba1d501f1f901515a2faa1b56a16a53accd0cd415",
+    "id": "karst-grotto-east",
+    "placement": "bab3bf1fb019beb30140047c656cadbdc0c9209038a6a96931b56bf92d5d575c",
+    "ventTop": undefined,
+  },
+]
+`;
+
+exports[`authored prop geometry golden > lost-city high: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 3,
+      "triangles": 69972,
+    },
+    "buffers": "e9e6c40ce6acb216ecef4914cf32cad883976fa1406ad2f21c068d52b624a180",
+    "id": "poseidon-tower",
+    "placement": "648cb42041d850fa3d9bb50fb9482af483a1fdb987547d73cbb76cc3b7149bac",
+    "ventTop": 60,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 5780,
+    },
+    "buffers": "72b12f4f3ed60e780b1bfff35d7a8a05ad7ba540d13293dc28b600f22a2cb079",
+    "id": "beehive-chimney",
+    "placement": "6af690f1a7f8de359cc10510d8b2b2f9e90062392ab6d4ee9ae86ceaefab0def",
+    "ventTop": 0.9999999999999999,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 6604,
+    },
+    "buffers": "852d7c27af09f0b6ac6f3740aaf8afcf30fa40c26fcaaac54e61c2b3c39ace0c",
+    "id": "imax-tower",
+    "placement": "d178190fbcea5d714012cb15eb9c2533f83279d72d5879d7eea93d40954c3ef1",
+    "ventTop": 8,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 6164,
+    },
+    "buffers": "4151e8387ef8529e28624b8e09e194cbff34077677728d20170c5b584029551a",
+    "id": "unnamed-chimney-1",
+    "placement": "aa21c354b287b96037ac00789f51adc9c7cf823318651f357d285d02cc7ec29d",
+    "ventTop": 6,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 6772,
+    },
+    "buffers": "29ef83099b027cb1178ec26778ef0345a224f488c6ccd04d062257b5746ea06c",
+    "id": "unnamed-chimney-2",
+    "placement": "a986822abc534ed7ef740bcaff982be0c9245dab17ae6dc1c5ff02b69098560b",
+    "ventTop": 9,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 10868,
+    },
+    "buffers": "751817b3ac30a5ac534a31b3e6952ca59a72804c175f69c594be07dd632ad744",
+    "id": "far-spire-1",
+    "placement": "36f593115559cd1f029a9aa426276b92ad91a1884b4b465b98cd20fa179e7ac5",
+    "ventTop": 38,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 11592,
+    },
+    "buffers": "b71363d0aafa55f7450b02d334a5ebe0595cd91c4882d3cc6e29ae51fa09591b",
+    "id": "far-spire-2",
+    "placement": "4cd73a3c6869a1d3c58bf6ff0945cf15f9f0fd9f385af3eec0b403eca652fe0a",
+    "ventTop": 46,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 10288,
+    },
+    "buffers": "88589f6cc526c749423e5ea8154e54ea03ccab471323198a2efad76ddd95f0f4",
+    "id": "far-spire-3",
+    "placement": "808a886abb0e62e48208d91fdd8e20f0004d5142f93b53adad153ff65070a2a1",
+    "ventTop": 28,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 11976,
+    },
+    "buffers": "56e484521ea5d12fc9268b57ac9c64a043309b7966a8a28765c61508bc11328e",
+    "id": "far-spire-4",
+    "placement": "bae435e119811cca8b5c18acd8db6c14695e1e034b955ea23e3be9aee3a9c07b",
+    "ventTop": 52,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 10764,
+    },
+    "buffers": "b8fb46d1d97c31db8632aed779b11e72546d687d0b3926975b902607f230dba4",
+    "id": "far-spire-5",
+    "placement": "19af8e95648ba4585ff8c80f23d06e87ef96f0f8dee902499688c3e8e5802bce",
+    "ventTop": 34,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 10052,
+    },
+    "buffers": "86498d7a43c09df7b6945de3451645b5780c27fdcca0c3b9bfc1499b35e1dbeb",
+    "id": "far-spire-6",
+    "placement": "117e03270d66ddff8179d57efef963bc49c2880538bb9b2ffd4d64cc6002bd05",
+    "ventTop": 24,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 11352,
+    },
+    "buffers": "d874491b4256c53c4ef4784ae2d1fa3c5583ec198f2c82451f6f279f9d6b07f3",
+    "id": "far-spire-7",
+    "placement": "f27ac3ca8dc25089a59cace0a409d40d3d9d98f49e3cacc4b80f923c95be8926",
+    "ventTop": 42,
+  },
+]
+`;
+
+exports[`authored prop geometry golden > lost-city low: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 3,
+      "triangles": 15400,
+    },
+    "buffers": "2d2cfebb1373dbcfddac3c4c0658e9de1b07bcf176709a0a7a5f274ad3989b77",
+    "id": "poseidon-tower",
+    "placement": "3f232030b9f9cc9123e27c0672c4a008a4f46ac18cfde9278cf95508aa03eab9",
+    "ventTop": 60,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 2000,
+    },
+    "buffers": "4a8e7c83f30dd1fa3af2232694bd50eae7e97a75a6ffcea6dfd10ebfb89267d8",
+    "id": "beehive-chimney",
+    "placement": "dc82c38be81c0b3a539029edc8614a0c25048a9d184fd538df9b85b45b4b8d0c",
+    "ventTop": 0.9999999999999999,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 2184,
+    },
+    "buffers": "ad912fcec208fdcca9ea949cdb0b83306b09cad50a6b365ad47eeb78a5ee6e4e",
+    "id": "imax-tower",
+    "placement": "018f56a6a606fd34025183034e95c5ac7d7eeef66d915aef42ab5d831ef5beeb",
+    "ventTop": 8,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 2148,
+    },
+    "buffers": "3c668593bf2ab56179be15ba0204d6d9e1acb20afa6813a2d1621bd0d0860e6f",
+    "id": "unnamed-chimney-1",
+    "placement": "dbb95be3bce8ddd8cf57c470deb0ce7400176546a15110860fcfaed9918cc179",
+    "ventTop": 6,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 2184,
+    },
+    "buffers": "1214dd7ab1cfc936febc2ea24c3ed1526a4bd6e0a88fdb1ac97299908d15f29e",
+    "id": "unnamed-chimney-2",
+    "placement": "a986822abc534ed7ef740bcaff982be0c9245dab17ae6dc1c5ff02b69098560b",
+    "ventTop": 9,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 2860,
+    },
+    "buffers": "6e8dac94c78a46c5a7054d98b5c6c35425d6472146c32805d3c473d537bb3ca8",
+    "id": "far-spire-1",
+    "placement": "83a48166128d2fe81096b84b08843302b8edc729f93e09979bd5ffcae4b9f2bf",
+    "ventTop": 38,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 3084,
+    },
+    "buffers": "46e2bf465c4f76ee8ebe3b4ff042fbc3cf8c951b8ea199b7ffdd44e4dbc432c6",
+    "id": "far-spire-2",
+    "placement": "7d0c9cf4e1344009970764ff8a785ee540fa7455539965f06ae57166434bc45d",
+    "ventTop": 46,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 2660,
+    },
+    "buffers": "69d679505d8c1120d3e8bbbefc884415a45412216719ef63861634674dc6fecb",
+    "id": "far-spire-3",
+    "placement": "e4da5e1ac2a3846573dca81dead6b1a3912015aa00c689084a16eae97511fe44",
+    "ventTop": 28,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 3212,
+    },
+    "buffers": "8932db3704e69a38abb7ba3cb1e7d1b869ea6943c25a98b75e281da0fc950fe3",
+    "id": "far-spire-4",
+    "placement": "94ad80ef64b15a69f3774f3eb79bb48d68624066aeec8d50815bff0d7fc35806",
+    "ventTop": 52,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 2808,
+    },
+    "buffers": "4d481b6a08d4d27c34dcae579b0728e168c982d5d63f74cd9ca2d636659bb155",
+    "id": "far-spire-5",
+    "placement": "e2abdf5656ee3c7f996df3f34ce2e67eed01d3144b53122b91d96747df44af5a",
+    "ventTop": 34,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 2568,
+    },
+    "buffers": "6f3ec0e84345b8e9dd0da2ab372651ff9dc399a8562a98f0023795362e6a13e3",
+    "id": "far-spire-6",
+    "placement": "19955796cfc1090bd46ea4d6388637fc804131e2188fd0f414f8220b43245f6a",
+    "ventTop": 24,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 3012,
+    },
+    "buffers": "c1004401f1b67271ea1aa4672a07a9195167e6da0de7a56e1f9dd2807e4435a0",
+    "id": "far-spire-7",
+    "placement": "f27ac3ca8dc25089a59cace0a409d40d3d9d98f49e3cacc4b80f923c95be8926",
+    "ventTop": 42,
+  },
+]
+`;
+
+exports[`authored prop geometry golden > lost-city medium: retains buffers, materials and anchors 1`] = `
+[
+  {
+    "budget": {
+      "draws": 3,
+      "triangles": 49644,
+    },
+    "buffers": "4d0fca978a80f9fecceafffa6dd24998b0126ff7cb4078c03a2ac86e6bbdab7f",
+    "id": "poseidon-tower",
+    "placement": "6b354cd05d898badd045b21de5b793ab49dd665bf4dbcd5622c86e019e4e1237",
+    "ventTop": 60,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 3828,
+    },
+    "buffers": "add8a1cd208ff7c489241d5c37849853cc74e931a5886722141f2a811c0891a6",
+    "id": "beehive-chimney",
+    "placement": "5a226e9e09f969fd9ef5bc6c9362eca3b1c79f20c54b68100018520739428c35",
+    "ventTop": 0.9999999999999999,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 4336,
+    },
+    "buffers": "93cf9e2d758be0fd266ddc40df261ca95936e530e4c591671c1ff5b5b4068d38",
+    "id": "imax-tower",
+    "placement": "e19ae3f64b05f26f528b112943b28301bb7526744fb1e2fd1ba2968cc1a95a12",
+    "ventTop": 8,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 4076,
+    },
+    "buffers": "8e9703f6d5d58b4133525aa39fb703a392b830b9df2af8ed5adb7f8e8ae797a1",
+    "id": "unnamed-chimney-1",
+    "placement": "6072c0f33bd0b7f24163e48c6c7de67d9c3510f7060bcea46e728a705c82cfbd",
+    "ventTop": 6,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 4490,
+    },
+    "buffers": "db56d0949292af6ddfd02c8fb7c57e33ac914a5fb710a150e03728056a208265",
+    "id": "unnamed-chimney-2",
+    "placement": "a986822abc534ed7ef740bcaff982be0c9245dab17ae6dc1c5ff02b69098560b",
+    "ventTop": 9,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 8104,
+    },
+    "buffers": "e5d9a461df5160278a3978e3b34f6cdffb3afeb20234ae2f08f59472b4a8e90a",
+    "id": "far-spire-1",
+    "placement": "523ee1e2b7ca3a76b02456f5d7b207514b7a65308c831538a70e713ae3ac9860",
+    "ventTop": 38,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 8652,
+    },
+    "buffers": "5bf5de7aa9558c83392c28575785702ce0bcb9d33bde3a5a6dc786e414cc115f",
+    "id": "far-spire-2",
+    "placement": "f56b560b4c91fdc10c56793dfb81f183815fe225ace3020155c4ed32c92b7516",
+    "ventTop": 46,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 7784,
+    },
+    "buffers": "36ddfe695846a3e9a2e1e6b0e768be11d403d2397a6a5091aa5e5d69d8035db8",
+    "id": "far-spire-3",
+    "placement": "524729e7fe7ec55781bd2c38af7bdf399b4f83603602a5dee08bdadc1dbd3d6a",
+    "ventTop": 28,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 8900,
+    },
+    "buffers": "06598804226a8661e41f363aeddcbb0d6925afc311e69c29e0c98e732c3ccea2",
+    "id": "far-spire-4",
+    "placement": "95feaeaffb956cdbdb7ef9a2b62db9e47246f4b5e54755e1edad5141bbe67f9a",
+    "ventTop": 52,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 8058,
+    },
+    "buffers": "03f6239970be940f80477b067bb4b53dce9c656834863d810fd07cf1a1267ec9",
+    "id": "far-spire-5",
+    "placement": "19af8e95648ba4585ff8c80f23d06e87ef96f0f8dee902499688c3e8e5802bce",
+    "ventTop": 34,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 7050,
+    },
+    "buffers": "3a9ed4bd1027cdbf093f26f0d01702009a2f2ac9ffba57c447d761b06fcfc2c1",
+    "id": "far-spire-6",
+    "placement": "9646aac954d6f314956e37beea70b2690b090c3a41ef6044b2e8b541d672e76a",
+    "ventTop": 24,
+  },
+  {
+    "budget": {
+      "draws": 1,
+      "triangles": 8478,
+    },
+    "buffers": "bf50f08da30a889a8b7784532f5289d2e491872fbe26b843a66c07190e0e887b",
+    "id": "far-spire-7",
+    "placement": "9c632c392fae7e37ae1a3b05ce22292f380a58f735336bcc845d36ba515be8a3",
+    "ventTop": 42,
+  },
+]
+`;

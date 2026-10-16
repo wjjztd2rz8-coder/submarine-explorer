@@ -15,5 +15,23 @@
       "openWater": true,
       "chaseOffsetY": 10
     }
+  },
+  "props": {
+    "karst-grotto-east": {
+      "grotto": "hood"
+    },
+    "karst-grotto": {
+      "galleryApron": {
+        "bedHeightM": 1.7,
+        "riserFraction": 0.32,
+        "rowDensity": 3.0,
+        "columnDensity": 2.5,
+        "normalSampleM": 0.7,
+        "contactShade": 0.18,
+        "roughnessVariation": 0.1,
+        "riserShade": 0.2,
+        "lipLight": 0.12
+      }
+    }
   }
 }

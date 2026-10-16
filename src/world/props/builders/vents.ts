@@ -6,13 +6,14 @@
  */
 
 import * as THREE from 'three';
+import { propManifest } from '../../../core/SiteManifest.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { ChimneyMaterial, PropsConfig } from '../../../core/Config.js';
 import { geoDetail } from '../geo/detail.js';
 import { geoMaterial, mineralCrust } from '../geo/materials.js';
 import { buildGeo } from '../geo/index.js';
 import { buildCarbonateChimney } from '../geo/towers.js';
-import { buildCrustedChimney, isCrustedSideChimney } from '../geo/crustChimney.js';
+import { buildCrustedChimney } from '../geo/crustChimney.js';
 import { addBeebeSeabed } from '../geo/beebe.js';
 import {
   mulberry32,
@@ -173,7 +174,7 @@ export const VENT_BUILDERS = {
   chimney: (input) => {
     const built = input.def.feature
       ? buildGeo(input)
-      : isCrustedSideChimney(input.def.id)
+      : propManifest(input.def.id)?.chimney
         ? buildCrustedChimney(input)
         : input.def.materialHint === 'carbonate' && !(input.dims[0] > 0)
           ? buildCarbonateChimney(input)
@@ -185,7 +186,7 @@ export const VENT_BUILDERS = {
               input.tier,
             );
     // Feature builders handle their merged body; plain Beebe chimneys use the same mineral finish.
-    if (!input.def.feature && input.cfg.chimneyCrust.propIds.includes(input.def.id)) {
+    if (!input.def.feature && propManifest(input.def.id)?.mineralCrust) {
       const body = built.full as THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
       mineralCrust(body.geometry, input.seed, input.cfg.chimneyCrust);
       body.material.bumpScale = input.cfg.chimneyCrust.bumpScale;

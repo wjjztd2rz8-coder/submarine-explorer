@@ -9,7 +9,7 @@
  */
 
 import * as THREE from 'three';
-import { BEEBE_CHIMNEY as beebe } from '../../../core/config/beebeChimney.js';
+import { propManifest } from '../../../core/SiteManifest.js';
 import { geoDetail } from './detail.js';
 import { geoMaterial, LIFE_TINT, mineralCrust, vertexGlow } from './materials.js';
 import { shimmerPlume, smokePlume } from './plume.js';
@@ -50,7 +50,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   const rnd = mulberry32(seed);
   const shapeRnd = mulberry32(seed ^ 0x1080be);
   const shrimp = def.raw.variant === 'shrimp';
-  const beebeHero = def.id === 'beebe-chimney-1';
+  const profile = propManifest(def.id)?.smoker;
   const moundH = THREE.MathUtils.clamp(H0 * 0.32, 0.8, 5);
 
   const shape = (x: number, z: number): number => {
@@ -94,34 +94,34 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
       r0: s.r0,
       topFrac: 0.45,
       seed: seed + i * 7,
-      segs: (beebeHero && tier !== 'low' ? 64 : 22) * d.meshDensity + 4,
-      rings: (s.h / (beebeHero && tier !== 'low' ? 0.18 : 0.7)) * d.meshDensity + 6,
-      crust: beebeHero ? 1 : 0,
+      segs: (profile && tier !== 'low' ? 64 : 22) * d.meshDensity + 4,
+      rings: (s.h / (profile && tier !== 'low' ? 0.18 : 0.7)) * d.meshDensity + 6,
+      crust: profile ? 1 : 0,
       tiers: Math.max(2, Math.round(s.h / 3.2)),
-      ledge: beebeHero ? beebe.ledge : 0.1,
-      wobble: beebeHero ? beebe.wobble : 0.2,
-      rough: beebeHero ? beebe.rough : 0.07,
-      ridges: beebeHero ? beebe.ridges : 4,
-      ridgeAmp: beebeHero ? beebe.ridgeAmp : 0.08,
+      ledge: profile?.ledge ?? 0.1,
+      wobble: profile?.wobble ?? 0.2,
+      rough: profile?.rough ?? 0.07,
+      ridges: profile?.ridges ?? 4,
+      ridgeAmp: profile?.ridgeAmp ?? 0.08,
       flare: 0.75,
-      lip: beebeHero ? beebe.lip : 0.3,
-      crater: beebeHero ? beebe.crater : 0.7,
-      irregular: beebeHero ? beebe.irregular : 0,
+      lip: profile?.lip ?? 0.3,
+      crater: profile?.crater ?? 0.7,
+      irregular: profile?.irregular ?? 0,
     });
     pieces.push(place(c, { x: s.x, y: s.y, z: s.z }));
-    if (beebeHero) {
+    if (profile) {
       // Partial sulfide shelves interrupt the long trunk without changing the vent axis.
-      const shelves = i === 0 ? beebe.mainShelves : beebe.sideShelves;
+      const shelves = i === 0 ? profile.mainShelves : profile.sideShelves;
       for (let k = 0; k < shelves; k++) {
         const t =
-          beebe.shelfStart +
-          (k + beebe.shelfJitter * shapeRnd()) *
-            (i === 0 ? beebe.mainShelfStep : beebe.sideShelfStep);
+          profile.shelfStart +
+          (k + profile.shelfJitter * shapeRnd()) *
+            (i === 0 ? profile.mainShelfStep : profile.sideShelfStep);
         const localR = s.r0 * (1 - 0.55 * t);
         const shelf = flange({
-          r0: localR * beebe.shelfRadiusFraction,
-          w: localR * (beebe.shelfWidthMin + shapeRnd() * beebe.shelfWidthVariation),
-          arc: beebe.shelfArcMin + shapeRnd() * beebe.shelfArcVariation,
+          r0: localR * profile.shelfRadiusFraction,
+          w: localR * (profile.shelfWidthMin + shapeRnd() * profile.shelfWidthVariation),
+          arc: profile.shelfArcMin + shapeRnd() * profile.shelfArcVariation,
           start: shapeRnd() * Math.PI * 2,
           seed: seed + i * 37 + k * 11,
           segs: 18 * d.meshDensity,
@@ -175,7 +175,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
         // The stack whose axis is closest (in its own radii) owns the vertex. Choosing by
         // height fraction let the shorter side stacks claim the main trunk's upper flanks.
         const rel = d2 / s.r0;
-        if (beebeHero ? rel < nearest : t > best) {
+        if (profile ? rel < nearest : t > best) {
           nearest = rel;
           best = t;
           hh = t;
@@ -183,7 +183,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
         }
       }
     }
-    if (best > 0 && beebeHero) {
+    if (best > 0 && profile) {
       // Crusted sulfide: coal-black recesses, ochre/orange oxide on band crests, sulfur bloom
       // and pale anhydrite on the upper flanges. Relief and colour share crustBand().
       paintCrust(
@@ -214,7 +214,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     );
     if (ny > 0.85 && best === 0) out.multiplyScalar(1.08);
   });
-  const crusted = cfg.chimneyCrust.propIds.includes(def.id);
+  const crusted = propManifest(def.id)?.mineralCrust;
   if (crusted) mineralCrust(geom, seed, cfg.chimneyCrust);
   projectUVs(geom, 3);
   geom.computeBoundingBox();
@@ -228,15 +228,15 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   // Black smokers are dark but not black: lift the albedo, and give the warm fluid a faint
   // self-lit tint that follows the pale and rusty parts of the crust.
   bodyMat.color.multiplyScalar(1.25);
-  vertexGlow(bodyMat, beebeHero ? 0.16 : 0.13, 0xff9a68, 0.5);
+  vertexGlow(bodyMat, profile ? 0.16 : 0.13, 0xff9a68, 0.5);
   const body = new THREE.Mesh(geom, bodyMat);
   body.name = 'smoker-body';
   full.add(body);
-  if (beebeHero) {
+  if (profile) {
     // Dark fluid surfaces sit below the top rims, within the modeled crater bowls.
     // They are visual only: smoke origins, colliders and impostor retain their existing anchors.
     const mouthMaterial = new THREE.MeshStandardMaterial({
-      color: beebe.mouthColor,
+      color: profile.mouthColor,
       roughness: 1,
       side: THREE.DoubleSide,
       polygonOffset: true,
@@ -247,11 +247,11 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     const sideMouths: Array<{ centre: number[]; normal: number[] }> = [];
     for (const s of stacks) {
       const topRadius = s.r0 * 0.45;
-      const radius = topRadius * beebe.topMouthRadiusFraction;
+      const radius = topRadius * profile.topMouthRadiusFraction;
       mouths.push(
         place(new THREE.CircleGeometry(radius, 16), {
           x: s.x,
-          y: s.y + s.h - beebe.crater * topRadius * beebe.topMouthRecessFraction,
+          y: s.y + s.h - profile.crater * topRadius * profile.topMouthRecessFraction,
           z: s.z,
           rx: -Math.PI / 2,
         }),
@@ -260,24 +260,24 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     // The opening view sees the main stack from below its summit. Broken side vents
     // give that view a readable aperture even when the top rim is outside the frame.
     const crustMaterial = new THREE.MeshStandardMaterial({
-      color: beebe.collarColor,
+      color: profile.collarColor,
       roughness: 1,
-      emissive: beebe.collarEmissive,
+      emissive: profile.collarEmissive,
     });
     const outward = new THREE.Vector3();
     const axisY = new THREE.Vector3(0, 1, 0);
     const axisZ = new THREE.Vector3(0, 0, 1);
     const stack = stacks[0]!;
     const ray = new THREE.Raycaster();
-    for (let k = 0; k < beebe.outletCount; k++) {
-      const t = beebe.outletStartHeightFraction + k * beebe.outletHeightStepFraction;
-      const angle = beebe.outletStartAngleRad + k * beebe.outletAngleStepRad;
+    for (let k = 0; k < profile.outletCount; k++) {
+      const t = profile.outletStartHeightFraction + k * profile.outletHeightStepFraction;
+      const angle = profile.outletStartAngleRad + k * profile.outletAngleStepRad;
       outward.set(Math.cos(angle), 0, Math.sin(angle));
       ray.set(
         new THREE.Vector3(
-          stack.x + outward.x * beebe.outletRayStartM,
+          stack.x + outward.x * profile.outletRayStartM,
           stack.y + stack.h * t,
-          stack.z + outward.z * beebe.outletRayStartM,
+          stack.z + outward.z * profile.outletRayStartM,
         ),
         outward.clone().negate(),
       );
@@ -286,15 +286,15 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
         .find(
           (intersection) =>
             Math.hypot(intersection.point.x - stack.x, intersection.point.z - stack.z) <
-            stack.r0 * beebe.outletMaxAxisRadiusFactor,
+            stack.r0 * profile.outletMaxAxisRadiusFactor,
         );
       if (!hit) continue;
-      const halfLength = beebe.outletLengthM / 2;
-      const centre = hit.point.clone().addScaledVector(outward, halfLength - beebe.outletEmbedM);
+      const halfLength = profile.outletLengthM / 2;
+      const centre = hit.point.clone().addScaledVector(outward, halfLength - profile.outletEmbedM);
       const collar = new THREE.CylinderGeometry(
-        beebe.outletTipRadiusM,
-        beebe.outletBaseRadiusM,
-        beebe.outletLengthM,
+        profile.outletTipRadiusM,
+        profile.outletBaseRadiusM,
+        profile.outletLengthM,
         11,
         2,
       );
@@ -306,10 +306,10 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
         ),
       );
       collars.push(collar);
-      const mouth = new THREE.CircleGeometry(beebe.outletMouthRadiusM, 16);
+      const mouth = new THREE.CircleGeometry(profile.outletMouthRadiusM, 16);
       const mouthCentre = centre
         .clone()
-        .addScaledVector(outward, halfLength + beebe.mouthClearanceM);
+        .addScaledVector(outward, halfLength + profile.mouthClearanceM);
       mouth.applyMatrix4(
         new THREE.Matrix4().compose(
           mouthCentre,

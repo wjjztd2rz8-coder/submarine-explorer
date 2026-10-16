@@ -14,6 +14,7 @@
  */
 
 import * as THREE from 'three';
+import { propManifest } from '../core/SiteManifest.js';
 import { beebeRenderedGround, beebeSeabedMaterial } from './props/geo/beebe.js';
 import type { PropsConfig } from '../core/Config.js';
 import { fetchContentJson } from '../game/ContentPath.js';
@@ -100,7 +101,7 @@ export function followsTerrain(def: PropDef): boolean {
     def.feature !== null ||
     // Beebe's optional cooler-flow habitat uses a centre-relative ground sampler.
     // Footprint snapping would sink these plain chimneys as their decoration bounds grow.
-    (['beebe-chimney-1', 'beebe-chimney-2', 'beebe-chimney-3'].includes(def.id) &&
+    (propManifest(def.id)?.grounding === 'rendered' &&
       typeof def.raw.beebe_habitat === 'object' &&
       def.raw.beebe_habitat !== null) ||
     // The carbonate builder makes a terrain-following apron even without a feature id.
@@ -277,7 +278,7 @@ export class Props {
         tier: this.tier,
         groundHeight: () => this.debrisHeightFn(def),
         // Blend the vent foundation into the rendered seabed.
-        ...(def.id === 'beebe-chimney-1' && def.feature === 'smoker-cluster'
+        ...(propManifest(def.id)?.seabed && def.feature === 'smoker-cluster'
           ? { seabedMaterial: beebeSeabedMaterial(this.hf) }
           : {}),
         // Other props retain their own materials.
@@ -314,7 +315,7 @@ export class Props {
     const v = new THREE.Vector3();
     // Ground the vent habitat relative to its foundation.
     if (
-      ['beebe-chimney-1', 'beebe-chimney-2', 'beebe-chimney-3'].includes(def.id) &&
+      propManifest(def.id)?.grounding === 'rendered' &&
       def.feature === null &&
       def.raw.beebe_habitat
     ) {

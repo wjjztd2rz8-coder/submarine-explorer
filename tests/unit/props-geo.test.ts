@@ -1,5 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { createHash } from 'node:crypto';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
@@ -121,7 +123,7 @@ describe('Beebe mineral finish', () => {
     JSON.parse(readFileSync('data/landmarks/beebe-vent-field/props.json', 'utf8')),
     cfg,
   ).props;
-  const bareCfg = { ...cfg, chimneyCrust: { ...cfg.chimneyCrust, propIds: [] } };
+  const bareCfg = { ...cfg, chimneyCrust: { ...cfg.chimneyCrust, amount: 0 } };
 
   for (const tier of ['low', 'high']) {
     for (const def of beebe) {
@@ -296,4 +298,80 @@ describe('props.json "feature"', () => {
     expect(r.errors).toEqual([]);
     expect(r.props[0]!.feature).toBe('hadal-scarp');
   });
+});
+
+// Regression guard: prop policies and profiles must preserve the authored geometry,
+// finish, vent sources, collision bounds and tier budgets exactly.
+describe('authored prop geometry golden', () => {
+  const digest = (value: ArrayBufferView): string =>
+    createHash('sha256').update(value).digest('hex');
+  for (const site of ['beebe-vent-field', 'great-blue-hole', 'lost-city', 'axial-seamount-ashes']) {
+    for (const tier of ['low', 'medium', 'high']) {
+      it(`${site} ${tier}: retains buffers, materials and anchors`, () => {
+        const doc = JSON.parse(readFileSync(`data/landmarks/${site}/props.json`, 'utf8'));
+        const evidence = parsePropsDoc(doc, cfg)
+          .props.filter((def) => def.procedural)
+          .map((def) => {
+            const built = PROCEDURAL_BUILDERS[def.procedural!]({
+              def,
+              dims: def.dimensionsM!,
+              seed: hashString(def.id),
+              cfg,
+              tier,
+              groundHeight: () => (x, z) => x * 0.07 - z * 0.1,
+            });
+            const meshes: unknown[] = [];
+            for (const root of [built.full, built.impostor])
+              root.traverse((object) => {
+                if (!(object instanceof THREE.Mesh)) return;
+                const materials = Array.isArray(object.material)
+                  ? object.material
+                  : [object.material];
+                meshes.push({
+                  name: object.name,
+                  attributes: Object.fromEntries(
+                    Object.entries(
+                      object.geometry.attributes as Record<string, THREE.BufferAttribute>,
+                    ).map(([key, value]) => [key, digest(value.array)]),
+                  ),
+                  index: object.geometry.index ? digest(object.geometry.index.array) : null,
+                  matrix: object.matrix.elements,
+                  instances:
+                    object instanceof THREE.InstancedMesh
+                      ? digest(object.instanceMatrix.array)
+                      : null,
+                  instanceColor:
+                    object instanceof THREE.InstancedMesh && object.instanceColor
+                      ? digest(object.instanceColor.array)
+                      : null,
+                  material: materials.map((m) => {
+                    const mat = m as THREE.MeshStandardMaterial;
+                    return {
+                      type: m.type,
+                      color: mat.color,
+                      emissive: mat.emissive,
+                      roughness: mat.roughness,
+                      metalness: mat.metalness,
+                      bumpScale: mat.bumpScale,
+                      side: m.side,
+                      transparent: m.transparent,
+                      opacity: m.opacity,
+                    };
+                  }),
+                });
+              });
+            return {
+              id: def.id,
+              buffers: createHash('sha256').update(JSON.stringify(meshes)).digest('hex'),
+              placement: createHash('sha256')
+                .update(JSON.stringify({ bounds: built.bounds, colliders: built.colliders }))
+                .digest('hex'),
+              ventTop: built.full.userData.ventTop,
+              budget: countGeo(built.full),
+            };
+          });
+        expect(evidence).toMatchSnapshot();
+      });
+    }
+  }
 });

@@ -41,12 +41,17 @@ event whales do not). Behaviour is identical.
 
 Completed opening framing and staged life in
 [`2160-S-manifest-slice.md`](2160-S-manifest-slice.md): inventory rows 2, 4, 5, 7,
-8, 9 and 31 migrated. **20 discriminator expressions remain.**
+8, 9 and 31 migrated. Completed props/material selection in
+[`2200-S-manifest-3.md`](2200-S-manifest-3.md): rows 23–30 migrated, including
+Beebe chimney profiles, crust/habitat/grounding selection, Blue Hole's hood grotto
+variant and apron defaults, and Lost City's inactive-apron habitat. **12 discriminator expressions
+remain.**
 
-1. Props and materials: Beebe chimney rows 28 etc., `props.ts` crust lists, Blue Hole
-   apron, `beebe.ts` biome lookup -> `props.<id>`.
-2. Remaining rows from `plan/progress/2110-S-verify-9.md` (rows 1, 3, 10, 14-27, 29-30)
-   grouped by consuming module; take them in that file's order.
+Next: remaining rows from `plan/progress/2110-S-verify-9.md` (rows 1, 3, 10 and
+14–22), grouped by consuming module; take them in that file's order. Challenger
+scatter keepout, atmosphere/terrain/wreck tuning and sonar remain. Shared numeric
+material defaults stay shared; the gallery-apron config default is a derived view
+of site data, preserving generic fallback behavior and explicit config overrides.
 
 ## How to brief a migration
 

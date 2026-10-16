@@ -1,5 +1,6 @@
 /** Local sediment and broken sulfide around Beebe's opening smoker cluster. */
 import * as THREE from 'three';
+import { propManifest } from '../../../core/SiteManifest.js';
 import { DEFAULT_CONFIG, isGraphicsTier } from '../../../core/Config.js';
 import { biomeFor } from '../../TerrainBiome.js';
 import { createTerrainMaterial } from '../../TerrainMaterial.js';
@@ -36,7 +37,7 @@ interface BeebeSeabed {
 
 function settings(input: ProceduralBuildInput): BeebeSeabed | undefined {
   // The raw authoring extension keeps this treatment confined to the Beebe content pack.
-  if (input.def.id !== 'beebe-chimney-1' || input.def.feature !== 'smoker-cluster') return;
+  if (!propManifest(input.def.id)?.seabed || input.def.feature !== 'smoker-cluster') return;
   const raw = input.def.raw.beebe_seabed;
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return;
   const value = raw as Record<string, unknown>;
@@ -172,7 +173,7 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
     createTerrainMaterial({
       config: DEFAULT_CONFIG.terrain,
       tier: isGraphicsTier(input.tier) ? input.tier : 'high',
-      biome: biomeFor('beebe-vent-field'),
+      biome: biomeFor(propManifest(input.def.id)!.seabed!.biome),
       exaggeration: 1,
     }).material;
   const material = new THREE.MeshStandardMaterial({
@@ -249,7 +250,7 @@ function addBeebeApron(built: BuiltProp, input: ProceduralBuildInput): BuiltProp
 
 /** Beebe's authored cool-flow margins; kept separate from the existing shrimp-covered stacks. */
 function addBeebeHabitat(built: BuiltProp, input: ProceduralBuildInput): void {
-  if (!['beebe-chimney-1', 'beebe-chimney-2', 'beebe-chimney-3'].includes(input.def.id)) return;
+  if (!propManifest(input.def.id)?.habitat) return;
   const raw = input.def.raw.beebe_habitat;
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return;
   const cfg = raw as Record<string, number>;

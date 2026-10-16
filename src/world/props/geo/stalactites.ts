@@ -8,6 +8,7 @@
  */
 
 import * as THREE from 'three';
+import { propManifest } from '../../../core/SiteManifest.js';
 import { geoDetail } from './detail.js';
 import { geoMaterial as baseGeoMaterial, vertexGlow } from './materials.js';
 import {
@@ -176,14 +177,14 @@ function pendant(o: {
 
 export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   const { dims, seed, tier } = input;
-  const east = input.def.id === 'karst-grotto-east';
+  const hood = propManifest(input.def.id)?.grotto === 'hood';
   const gnd = input.groundHeight() ?? ((): number => 0);
   const d = geoDetail(tier);
   const [W, D, H] = dims;
   const rnd = mulberry32(seed);
   const vr = mulberry32(seed ^ 0x7e11);
   // A continuous, thicker lip frames the east mouth; retain the west alcove's scallops.
-  const mouthProfile = east
+  const mouthProfile = hood
     ? PROFILE.map(([y, z]): [number, number] =>
         y === 0.63 ? [0.65, -1.02] : y === 0.66 ? [0.69, -0.5] : [y, z],
       )
@@ -215,14 +216,14 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const scallop = smooth(0.32, 0.62, fbm3(x * 0.075 + 4, 1, seed + 61, seed + 8, 3));
     // The shelf draws back into the wall toward both ends instead of cantilevering over the slope.
     const ends = 1 - 0.85 * smooth(0.7, 1, endRatio(x, W));
-    return (east ? 0.88 + 0.3 * scallop : 0.42 + 0.95 * scallop) * ends;
+    return (hood ? 0.88 + 0.3 * scallop : 0.42 + 0.95 * scallop) * ends;
   };
 
   // Opening light multiplies the banded vertex glow, preserving the strata and
   // underside shading without a new light or transparent fog plane.
   const surfaceMaterial: typeof geoMaterial = (kind, detail, opts) => {
     const m = geoMaterial(kind, detail, opts);
-    if (!east) return m;
+    if (!hood) return m;
     m.emissive.set(0xa4ced8).multiplyScalar(0.16);
     const inherited = m.onBeforeCompile;
     m.onBeforeCompile = (shader, renderer) => {
@@ -539,13 +540,13 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
   colliders.push(...talusColliders(talus, W));
   const parts: THREE.BufferGeometry[] = [];
   const longest: { x: number; z: number; y: number; len: number; r: number }[] = [];
-  const clusters = Math.max(4, Math.round((east ? 10 : 8) * Math.sqrt(d.growth)));
+  const clusters = Math.max(4, Math.round((hood ? 10 : 8) * Math.sqrt(d.growth)));
   for (let k = 0; k < clusters; k++) {
-    const cx = east
+    const cx = hood
       ? ((k + 0.25 + rnd() * 0.5) / clusters - 0.5) * W * 0.62
       : (rnd() - 0.5) * W * 0.5;
     // Alternate lip silhouettes and recessed clusters, leaving water between them.
-    const cf = east ? (k % 3 === 0 ? 0.84 : k % 3 === 1 ? 0.57 : 0.32) : 0.25 + rnd() * 0.65;
+    const cf = hood ? (k % 3 === 0 ? 0.84 : k % 3 === 1 ? 0.57 : 0.32) : 0.25 + rnd() * 0.65;
     const members = 2 + Math.floor(rnd() * 4);
     for (let i = 0; i < members; i++) {
       const x = cx + (rnd() - 0.5) * 3.2;
@@ -556,19 +557,19 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
       if (sc * f < 0.12) continue; // no shelf here: nothing to hang from
       const yBase = undersideY(f) * H;
       const { edge } = wallEnvelope(x, W, EDGE_START);
-      const z = east
+      const z = hood
         ? (z0 + disp(x, yBase, z0) * (1 - edge * 0.6)) * (1 - edge * 0.55) + plan(x)
         : z0 + disp(x, yBase, z0) + plan(x);
-      const yTop = yBase * scaleAt(x) + liftAt(x) + 0.5 - (east ? sinkAt(x) : 0);
+      const yTop = yBase * scaleAt(x) + liftAt(x) + 0.5 - (hood ? sinkAt(x) : 0);
       const main = i === 0;
       const generatedLength =
         (1.4 + rnd() * rnd() * 0.36 * H) *
         (main ? 1.35 : 0.55 + rnd() * 0.5) *
         (0.6 + 0.4 * scaleAt(x));
-      const len = east
+      const len = hood
         ? Math.min(H * (main ? 0.27 + rnd() * 0.17 : 0.065 + rnd() * 0.13), yTop - gnd(x, z) - 0.7)
         : generatedLength;
-      if (east && len < 0.5) continue;
+      if (hood && len < 0.5) continue;
       // Thick, uneven columns: some stout, some slender, so no two read alike.
       // Variation draws use their own stream, so the placement of the original gallery is unchanged.
       const lean = main ? 0 : 0.05 + vr() * 0.14;

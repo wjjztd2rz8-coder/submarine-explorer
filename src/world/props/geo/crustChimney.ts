@@ -7,18 +7,13 @@
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { BEEBE_CHIMNEY as beebe, BEEBE_SIDE_CHIMNEYS } from '../../../core/config/beebeChimney.js';
+import { propManifest } from '../../../core/SiteManifest.js';
 import { paintCrust } from './crust.js';
 import { geoDetail } from './detail.js';
 import { geoMaterial, vertexGlow } from './materials.js';
 import { flange, tieredSpire } from './spire.js';
 import { fbm3, mulberry32, paint, place, projectUVs, type BuiltProp } from './shared.js';
 import type { GeoBuildInput } from './types.js';
-
-/** True for the plain chimneys that use the crusted look. */
-export function isCrustedSideChimney(id: string): boolean {
-  return Object.hasOwn(BEEBE_SIDE_CHIMNEYS, id);
-}
 
 const HERO_MUTE = new THREE.Color(0x4c4038);
 
@@ -42,7 +37,8 @@ function paintColumn(
 
 export function buildCrustedChimney(input: GeoBuildInput): BuiltProp {
   const { dims, seed, cfg, tier, def } = input;
-  const v = BEEBE_SIDE_CHIMNEYS[def.id]!;
+  const v = propManifest(def.id)!.chimney!;
+  const shape = v.shape;
   const d = geoDetail(tier);
   const dense = tier !== 'low';
   const rnd = mulberry32(seed);
@@ -59,15 +55,15 @@ export function buildCrustedChimney(input: GeoBuildInput): BuiltProp {
     rings: dense ? (H / 0.2) * d.meshDensity + 6 : H / 1.4 + 3,
     crust: v.crust,
     tiers: Math.max(2, Math.round(H / 3.2)),
-    ledge: beebe.ledge,
-    wobble: beebe.wobble,
-    rough: beebe.rough,
+    ledge: shape.ledge,
+    wobble: shape.wobble,
+    rough: shape.rough,
     ridges: v.ridges,
-    ridgeAmp: beebe.ridgeAmp,
+    ridgeAmp: shape.ridgeAmp,
     flare: 0.75,
-    lip: beebe.lip,
-    crater: beebe.crater,
-    irregular: beebe.irregular,
+    lip: shape.lip,
+    crater: shape.crater,
+    irregular: shape.irregular,
   });
   const lean = {
     rz: Math.cos(v.leanDir) * v.lean,
@@ -82,9 +78,9 @@ export function buildCrustedChimney(input: GeoBuildInput): BuiltProp {
     const t = 0.2 + ((k + 0.25 * rnd()) / flanges) * 0.6;
     const localR = r0 * (1 - 0.55 * t);
     const shelf = flange({
-      r0: localR * beebe.shelfRadiusFraction,
-      w: localR * (beebe.shelfWidthMin + rnd() * beebe.shelfWidthVariation),
-      arc: beebe.shelfArcMin + rnd() * beebe.shelfArcVariation,
+      r0: localR * shape.shelfRadiusFraction,
+      w: localR * (shape.shelfWidthMin + rnd() * shape.shelfWidthVariation),
+      arc: shape.shelfArcMin + rnd() * shape.shelfArcVariation,
       start: rnd() * Math.PI * 2,
       seed: seed + k * 11,
       segs: dense ? 18 * d.meshDensity : 6,

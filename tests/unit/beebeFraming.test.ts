@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { Box2, InstancedMesh, Matrix4, Mesh, Raycaster, Vector2, Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
-import { BEEBE_CHIMNEY } from '../../src/core/config/beebeChimney.js';
+import { propManifest } from '../../src/core/SiteManifest.js';
 import { composedFreeDiveSpawn, spawnSettings } from '../../src/game/Spawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
@@ -11,6 +11,7 @@ import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import type { TileMeta } from '../../src/util/types.js';
 
+const chimney = propManifest('beebe-chimney-1')!.smoker!;
 const config = makeConfig();
 const meta = JSON.parse(readFileSync('data/tiles/beebe-vent-field/meta.json', 'utf8')) as TileMeta;
 const bytes = readFileSync('data/tiles/beebe-vent-field/heightmap.bin');
@@ -102,11 +103,11 @@ describe('Beebe opening keeps its active main stack beside the hull', () => {
             const tangent = new Vector3().crossVectors(facing, new Vector3(0, 1, 0)).normalize();
             const a = point
               .clone()
-              .addScaledVector(tangent, BEEBE_CHIMNEY.outletMouthRadiusM)
+              .addScaledVector(tangent, chimney.outletMouthRadiusM)
               .project(camera);
             const b = point
               .clone()
-              .addScaledVector(tangent, -BEEBE_CHIMNEY.outletMouthRadiusM)
+              .addScaledVector(tangent, -chimney.outletMouthRadiusM)
               .project(camera);
             if (Math.abs(a.x - b.x) * 800 <= 3) return false;
             const ray = new Raycaster(
