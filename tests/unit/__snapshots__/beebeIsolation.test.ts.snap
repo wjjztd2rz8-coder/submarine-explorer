@@ -319,7 +319,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
     },
   },
   "monterey-canyon": {
-    "biome": "4d142b977dfe2df97074a1dd936f5a51ab22b78efcc8bc64a76b90200c3eb639",
+    "biome": "a51621ee0d8bfeec78ab10c66c91e679de9972507c406bbe8dbcf5503099bad1",
     "tiers": {
       "high": {
         "buffers": [
@@ -332,7 +332,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP#define TERRAIN_ROCK_DETAIL",
         "shader": "94d9c1d19dca6e7305eadf8928dd24499045dcc6b57a7f15605807a8b4c577b5",
-        "uniforms": "61d68fadc05ab4ca7ffbb06dc829ab51bb8e3bd055a105f95a3c13630c307168",
+        "uniforms": "2c8f29d8f50e1bced7db1a155a69499a142b39852473c4e9ab2145de192bfe31",
       },
       "low": {
         "buffers": [
@@ -345,7 +345,7 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
         ],
         "cache": "seabed-",
         "shader": "c44a3fcf1b4eb17a0cd04bbaf0a685f6fece97cb112a13df66cd7f359e03ad5b",
-        "uniforms": "317283bc15d3be878c6f39343195645e2dba82a14cef11b9f756ed861beea573",
+        "uniforms": "88ef04cc6f23243383fdafd31e6a948e4e4da403dc074093b9c37fdb979c1247",
       },
     },
   },
