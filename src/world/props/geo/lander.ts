@@ -24,15 +24,15 @@ import {
 } from './shared.js';
 import type { GeoBuildInput } from './types.js';
 
-const ALU = new THREE.Color(0x5b5a52);
+const ALU = new THREE.Color(0x302f2a);
 const CAGE = new THREE.Color(0x35352f);
 const TIP = new THREE.Color(0x3b3a36);
 const DARK = new THREE.Color(0x2c3236);
-const FOAM = new THREE.Color(0x5c3818);
-const FOAM_DARK = new THREE.Color(0x2a1c12);
+const FOAM = new THREE.Color(0x3d2d1c);
+const FOAM_DARK = new THREE.Color(0x1f1812);
 const STEEL = new THREE.Color(0x45484a);
 const STRAP = new THREE.Color(0x2f3234);
-const WHITE = new THREE.Color(0x9da5a7);
+const WHITE = new THREE.Color(0x535b5d);
 const FISH = new THREE.Color(0x8fa6b4);
 const FLAG = new THREE.Color(0xff5a16);
 const STROBE = new THREE.Color(0xd6f4ff);
@@ -52,8 +52,8 @@ function tint(g: THREE.BufferGeometry, c: THREE.Color): THREE.BufferGeometry {
 }
 
 /**
- * A syntactic-foam flotation sphere centred at (x, y, z): a matte, slightly lumpy ball whose
- * vertex colour mottles between two muted ambers, so it reads as moulded foam, not a lamp.
+ * A syntactic-foam flotation sphere centred at (x, y, z): a dull, faintly lumpy ball with radial
+ * (smooth) normals whose vertex colour mottles between two muted ambers, so it reads as moulded foam, not a lamp.
  */
 function foamSphere(
   r: number,
@@ -65,6 +65,7 @@ function foamSphere(
 ): THREE.BufferGeometry {
   const g = normalise(new THREE.IcosahedronGeometry(r, detail));
   const pos = g.getAttribute('position');
+  const nor = g.getAttribute('normal');
   const col = new Float32Array(pos.count * 3);
   const c = new THREE.Color();
   const f = 5 / r;
@@ -74,13 +75,14 @@ function foamSphere(
     const pz = pos.getZ(i);
     const lump = valueNoise3(px * f, py * f, pz * f, seed);
     const speck = valueNoise3(px * f * 4, py * f * 4, pz * f * 4, seed + 1);
-    const s = 1 + 0.05 * (lump - 0.5);
+    // Normals stay radial, so the ball shades smooth whatever its face count.
+    nor.setXYZ(i, px / r, py / r, pz / r);
+    const s = 1 + 0.03 * (lump - 0.5);
     pos.setXYZ(i, px * s + x, py * s + y, pz * s + z);
     c.copy(FOAM).lerp(FOAM_DARK, Math.min(1, Math.max(0, 1.1 * speck + 0.4 * lump - 0.3)));
     col.set([c.r, c.g, c.b], i * 3);
   }
   g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  g.computeVertexNormals();
   return g;
 }
 
@@ -218,9 +220,10 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
         STEEL,
       ),
     );
-    // Flotation: a syntactic-foam sphere at each leg top, with a strap, and one between.
+    // Flotation: a syntactic-foam sphere at each leg top (always 80 faces, the nearest and biggest
+    // silhouette), with a strap, and a smaller one between (coarser on low).
     const fd = d.sphereDetail > 1 ? 1 : 0;
-    parts.push(foamSphere(0.3 * k, fd, cx * 0.9 * k, (ringY + 0.28) * k, cz * 0.9 * k, i * 2));
+    parts.push(foamSphere(0.3 * k, 1, cx * 0.9 * k, (ringY + 0.28) * k, cz * 0.9 * k, i * 2));
     parts.push(
       tint(
         new THREE.TorusGeometry(0.3 * k, 0.02 * k, 3, seg * 2)
