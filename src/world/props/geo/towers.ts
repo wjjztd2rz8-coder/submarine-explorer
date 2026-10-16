@@ -84,7 +84,19 @@ function roughenTrunk(g: THREE.BufferGeometry, s: SpireOpts, seed: number, pocke
     const undercut = smooth(0.0, 0.25, frac) * (1 - smooth(0.25, 0.5, frac)) * broken;
     // Fine flowstone pitting and rib crests (small, high-frequency) on top of the broad relief.
     const pit = fbm3(ca * 9 + 3, y * 0.9, sa * 9 + 3, seed ^ 0x2a3, 2) - 0.5;
-    let k = 1 + big * 0.6 + mid * 0.4 + ridge * 0.16 + ledge * 0.09 - undercut * 0.07 + pit * 0.07;
+    // Scalloped flowstone sheets: broad plates with soft shoulders that break up the flat wall
+    // between the ribs.
+    const sheet =
+      smooth(0.38, 0.62, fbm3(ca * 3.2 + 7, y * 0.32, sa * 3.2 + 7, seed ^ 0x2a4, 2)) - 0.5;
+    let k =
+      1 +
+      big * 0.6 +
+      mid * 0.4 +
+      ridge * 0.16 +
+      ledge * 0.09 -
+      undercut * 0.07 +
+      pit * 0.07 +
+      sheet * 0.14;
     // Orifice pocket.
     const da = Math.atan2(Math.sin(a - orA), Math.cos(a - orA)) * rad;
     const dy = y - 0.8 * s.h;
@@ -429,7 +441,8 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     }
     // Vent orifices: a dark, sulphide-stained mouth at each column tip.
     for (const v of vents) {
-      const dy = y - v.p.y;
+      // Measured from the torn rim, so the throat follows the notched edge.
+      const dy = y - v.p.y + v.drop(Math.atan2(z - v.p.z, x - v.p.x));
       if (dy < -v.depth - 1.2 || dy > 3) continue;
       const dd = Math.hypot(x - v.p.x, z - v.p.z) / v.r;
       const mouth = 1 - smooth(0.3, 0.95, dd);
