@@ -94,7 +94,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 6. **V-lostcity-low [Sonnet, small]**: Low-tier honeycomb on the slope needs a texture/normal fix; High is ~3.6.
    6b. **V-monterey-floor [Sonnet, small]**, ~3.5: flat sand floor between boulders; add ripple/pebble variation using the existing sediment material.
 7. **S-manifest slices [Codex 2160]:** step 1 done (habitat). Migrate the next slices per `plan/progress/S-manifest.md` (inventory: 27 site-id expressions left); one slice per brief; golden unchanged.
-8. **S-render remainder [Codex]:** confirm the first nightly run passes and golden pixels are unchanged.
+8. **S-render remainder [Codex 2280]:** the nightly workflow failed on both scheduled runs (38574704463, 38743060407; ~1.5 h each, exit 1 after golden/perf steps; artifacts exist) and 2210 found exact golden identity fails. Diagnose from `gh run view <id> --log-failed` and the artifacts, fix the workflow or its thresholds, and make golden comparison use a justified tolerance.
 
 9. **R-release [Haiku]:** f54 tagged 2026-10-15 on green CI (04a1d8c). Next tag f55 after the next completed green run.
 
