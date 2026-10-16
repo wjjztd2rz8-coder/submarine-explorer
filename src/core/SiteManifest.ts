@@ -67,6 +67,7 @@ const chimneyShapeKeys = [
 ] as const;
 const smokerDetailKeys = [
   'ridges',
+  'topFraction',
   'shelfStart',
   'mainShelfStep',
   'sideShelfStep',
@@ -113,6 +114,7 @@ export type ChimneyShape = Record<(typeof chimneyShapeKeys)[number], number>;
 export type SmokerProfile = ChimneyShape &
   Record<(typeof smokerDetailKeys)[number], number> & {
     mouthColor: number;
+    throatColor: number;
     collarColor: number;
     collarEmissive: number;
     mainShelves: number;
@@ -323,6 +325,7 @@ const propCheck = fields(
       ...numericFields(chimneyShapeKeys, aboveZero),
       ...numericFields(smokerDetailKeys, aboveZero),
       mouthColor: color,
+      throatColor: color,
       collarColor: color,
       collarEmissive: color,
       mainShelves: count,

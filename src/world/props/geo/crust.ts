@@ -49,15 +49,24 @@ export function paintCrust(
   const fine = fbm3(x * 4.2, y * 5, z * 4.2, seed ^ 0x19, 2);
   out.copy(COAL).lerp(SULFIDE, 0.3 + 0.7 * nz);
   const oxide = smooth(0.2, 0.75, b.lip * 2.2 + (patch - 0.5) * 1.2) * (0.55 + 0.45 * fine);
-  out.lerp(bandTint > 0.5 ? OCHRE : ORANGE, oxide * 0.9);
+  out.lerp(bandTint > 0.5 ? OCHRE : ORANGE, oxide * 0.7);
   out.lerp(RUST, smooth(0.5, 0.8, patch) * 0.6 * (1 - oxide));
-  out.lerp(SULFUR, smooth(0.78, 0.95, fine) * smooth(0.3, 0.8, b.lip) * 0.6);
+  out.lerp(SULFUR, smooth(0.78, 0.95, fine) * smooth(0.3, 0.8, b.lip) * 0.4);
   out.lerp(
     ANHYDRITE,
     (smooth(0.85, 1, hh + (nz - 0.5) * 0.25) * 0.32 + smooth(0.84, 0.97, patch) * 0.22) *
       (trunk ? 0.4 : 1),
   );
   out.multiplyScalar(0.8 + 0.5 * fine);
+  // Mineral zoning: broad bands of black sulfide, rust and ochre oxide climb the shaft with an
+  // irregular period, then pale anhydrite caps the upper third, so it reads as layered chemistry
+  // rather than one brown tone.
+  const zone = ly / 2.6 + (nz - 0.5) * 1.6;
+  const zk = hash01(Math.floor(zone) * 2.9 + bandSeed);
+  const zoneTint = zk < 0.4 ? COAL : zk < 0.7 ? RUST : OCHRE;
+  const zoneAmount = zk < 0.4 ? 0.85 : zk < 0.7 ? 0.7 : 0.45;
+  out.lerp(zoneTint, zoneAmount * smooth(0, 0.25, zone - Math.floor(zone)));
+  out.lerp(ANHYDRITE, smooth(0.78, 0.97, hh + (patch - 0.5) * 0.3) * 0.3);
   if (trunk) {
     // Hero trunk: more colour separation. Upward faces of flanges and band crests catch warm
     // ochre/sulfur precipitate; undercuts stay near-black; the orifice is soot-stained.
