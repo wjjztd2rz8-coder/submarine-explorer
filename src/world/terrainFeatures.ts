@@ -116,20 +116,35 @@ function boulderField(dx: number, dz: number): number {
 const clamp01 = (t: number): number => Math.max(0, Math.min(1, t));
 
 /**
+ * Both gallery seats: bearing, angular half-width of the window the other carves leave alone, and
+ * the radius (in the carve's own, outline-warped frame) of the hood's foot.
+ */
+const GALLERY_SEATS: readonly (readonly [number, number, number])[] = [
+  [Math.PI, 0.3, 162],
+  [1.0, 0.25, 155],
+];
+
+/** 0 inside a seat's angular window, rising to 1 over 0.15 rad beyond its half-width. */
+function seatMouth(a: number, bearing: number, width: number): number {
+  const da = Math.abs(Math.atan2(Math.sin(a - bearing), Math.cos(a - bearing)));
+  return smoothstep(clamp01((da - width) / 0.15));
+}
+
+/** 0 inside either gallery window, 1 clear of both. */
+function galleryMouth(a: number): number {
+  let mouth = 1;
+  for (const [bearing, width] of GALLERY_SEATS) mouth *= seatMouth(a, bearing, width);
+  return mouth;
+}
+
+/**
  * Replace the smooth bowl with broad beds, from the upper reef to the lower
  * wall. The beds wander slowly with bearing, without quantisation seams or
  * isolated rock skins. Returns a height delta; both gallery mouths and the
  * floor retain their original surface.
  */
 export function blueHoleTerraces(a: number, r: number): number {
-  let mouth = 1;
-  for (const [bearing, width] of [
-    [Math.PI, 0.3],
-    [1.0, 0.25],
-  ]) {
-    const da = Math.abs(Math.atan2(Math.sin(a - bearing!), Math.cos(a - bearing!)));
-    mouth *= smoothstep(clamp01((da - width!) / 0.15));
-  }
+  let mouth = galleryMouth(a);
   // Below the gallery seat (r < ~135, deeper than ~45 m) the mouth windows terrace too: the sub
   // looks straight down this sector, and an untouched smooth ramp there read as a blank slope.
   mouth += (1 - mouth) * (1 - smoothstep(clamp01((r - 126) / 10)));
@@ -153,14 +168,7 @@ export function blueHoleTerraces(a: number, r: number): number {
  */
 export function blueHoleApron(a: number, r: number): number {
   if (r < 112 || r > 152) return 0;
-  let mouth = 1;
-  for (const [bearing, width] of [
-    [Math.PI, 0.3],
-    [1.0, 0.25],
-  ]) {
-    const da = Math.abs(Math.atan2(Math.sin(a - bearing!), Math.cos(a - bearing!)));
-    mouth *= smoothstep(clamp01((da - width!) / 0.15));
-  }
+  const mouth = galleryMouth(a);
   const window = 1 - mouth;
   if (window <= 0) return 0;
   const rr = r + 1.6 * Math.sin(9 * a + 0.3 + r * 0.04) + 1.0 * Math.sin(23 * a + 1.1);
@@ -168,6 +176,25 @@ export function blueHoleApron(a: number, r: number): number {
   for (const edge of [146, 139.5, 133, 126.5]) drop += 1.7 * smoothstep(clamp01((edge - rr) / 2.2));
   const ends = smoothstep(clamp01((r - 112) / 8)) * (1 - smoothstep(clamp01((r - 146) / 6)));
   return -drop * window * ends;
+}
+
+/**
+ * The ground behind each gallery seat climbs to meet the hood's roof, so the roof reads as a
+ * lip of the wall rather than a plank laid on a smooth slope. Starts just behind the seat
+ * radius (the hood snaps to the ground at its foot, which stays put) and fades into the reef
+ * above; the angular shoulders also bank up around the hood's ends.
+ */
+export function blueHoleSeatBank(a: number, r: number): number {
+  let bank = 0;
+  for (const [bearing, width, foot] of GALLERY_SEATS) {
+    const window = 1 - seatMouth(a, bearing, width);
+    if (window <= 0) continue;
+    const rise =
+      smoothstep(clamp01((r - foot) / 6)) * (1 - smoothstep(clamp01((r - foot - 21) / 20)));
+    bank += window * rise;
+  }
+  const ragged = 1 + 0.25 * Math.sin(13 * a + r * 0.2) + 0.15 * Math.sin(29 * a + 1.3);
+  return 15 * bank * ragged;
 }
 
 /** Riser feet (radius) that shed talus; each gets a ring of fallen blocks. */
@@ -201,14 +228,7 @@ export function blueHoleTalus(a: number, r: number): number {
       if (d2 < 1) sum += (1.0 + 1.0 * h1) * (1 - d2) * (1 - d2) * 1.5;
     }
   }
-  let mouth = 1;
-  for (const [bearing, width] of [
-    [Math.PI, 0.3],
-    [1.0, 0.25],
-  ]) {
-    const da = Math.abs(Math.atan2(Math.sin(a - bearing!), Math.cos(a - bearing!)));
-    mouth *= smoothstep(clamp01((da - width!) / 0.15));
-  }
+  const mouth = galleryMouth(a);
   return sum * mouth;
 }
 
@@ -220,14 +240,7 @@ export function blueHoleWallRelief(a: number, r: number): number {
   const ends =
     smoothstep(Math.max(0, Math.min(1, (r - 96) / 12))) *
     (1 - smoothstep(Math.max(0, Math.min(1, (r - 177) / 13))));
-  let mouth = 1;
-  for (const [bearing, width] of [
-    [Math.PI, 0.3],
-    [1.0, 0.25],
-  ]) {
-    const da = Math.abs(Math.atan2(Math.sin(a - bearing!), Math.cos(a - bearing!)));
-    mouth *= smoothstep(Math.max(0, Math.min(1, (da - width!) / 0.15)));
-  }
+  const mouth = galleryMouth(a);
   const flute = (0.5 + 0.5 * Math.sin(43 * a + 0.2 * Math.sin(r * 0.12))) ** 3;
   const bench = Math.exp(-(((r - 139 - 2 * Math.sin(9 * a)) / 3.5) ** 2));
   const lower = Math.exp(-(((r - 115 - 1.5 * Math.sin(7 * a)) / 2.8) ** 2));
@@ -488,7 +501,8 @@ export function terrainCarveFor(meta: TileMeta): TerrainCarve | null {
           blueHoleWallRelief(a, r) +
           blueHoleTerraces(a, r) +
           blueHoleApron(a, r) +
-          blueHoleTalus(a, r),
+          blueHoleTalus(a, r) +
+          blueHoleSeatBank(a, r),
       );
     },
   };
