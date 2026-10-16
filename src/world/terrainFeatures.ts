@@ -180,7 +180,8 @@ export function blueHoleApron(a: number, r: number): number {
     const height = 1.7 * (0.55 + 0.9 * (0.5 + 0.5 * Math.sin(4 * a + i * 2.3)));
     drop += height * smoothstep(clamp01((edge + wander - rr) / 2.2));
   });
-  drop -= 1.3 * Math.max(0, Math.sin(0.5 * r + 6 * a)) * Math.max(0, Math.sin(19 * a + r * 0.16 + 1));
+  drop -=
+    1.3 * Math.max(0, Math.sin(0.5 * r + 6 * a)) * Math.max(0, Math.sin(19 * a + r * 0.16 + 1));
   const ends = smoothstep(clamp01((r - 112) / 8)) * (1 - smoothstep(clamp01((r - 160) / 8)));
   return -drop * window * ends;
 }

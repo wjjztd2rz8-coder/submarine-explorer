@@ -366,7 +366,8 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     out.multiplyScalar(1 - 0.18 * smooth(0.7, 1, Math.sin(y * 0.9 + n * 4)));
     if (y > H * 0.48 && y < H * 0.64 && ny < -0.3) out.multiplyScalar(0.78);
     // Strata: uneven warm and grey beds with a dark joint between, so the face is not one flat tone.
-    const bed = y / (2.6 * scale) + 1.3 * fbm3(x * 0.05, 1, z * 0.05, seed ^ 0x77, 2) - x * 0.035 + z * 0.02;
+    const bed =
+      y / (2.6 * scale) + 1.3 * fbm3(x * 0.05, 1, z * 0.05, seed ^ 0x77, 2) - x * 0.035 + z * 0.02;
     const bh = fbm3(Math.floor(bed) * 3.1, 7, 1, seed ^ 0x13, 2);
     out.lerp(BED_WARM, smooth(0.45, 0.75, bh) * 0.45).lerp(BED_COOL, smooth(0.45, 0.2, bh) * 0.4);
     out.multiplyScalar(0.72 + 0.28 * smooth(0, 0.12, bed - Math.floor(bed)));
