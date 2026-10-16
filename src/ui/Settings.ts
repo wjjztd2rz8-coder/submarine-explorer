@@ -165,6 +165,7 @@ export class SettingsScreen {
   private readonly bindButtons = new Map<ActionId, HTMLButtonElement>();
   private capturing: ActionId | null = null;
   private readonly disposers: Array<() => void> = [];
+  private reloadTimer: number | undefined;
 
   constructor(private readonly opts: SettingsScreenOptions) {
     const id = `settings-${++uid}`;
@@ -336,7 +337,11 @@ export class SettingsScreen {
             ? 'Discoveries cleared. Reloading this dive…'
             : 'Session discoveries cleared. Saved progress was inaccessible and may return. Reloading this dive…',
         );
-        window.setTimeout(() => window.location.reload(), 600);
+        if (this.reloadTimer !== undefined) window.clearTimeout(this.reloadTimer);
+        this.reloadTimer = window.setTimeout(() => {
+          this.reloadTimer = undefined;
+          window.location.reload();
+        }, 600);
       } else {
         this.say(
           result === 'protected'
@@ -456,6 +461,8 @@ export class SettingsScreen {
   }
 
   dispose(): void {
+    if (this.reloadTimer !== undefined) window.clearTimeout(this.reloadTimer);
+    this.reloadTimer = undefined;
     this.close();
     this.trap.dispose();
     this.modeSelector.dispose();

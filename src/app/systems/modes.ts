@@ -9,9 +9,14 @@ export const modesSystem: GameSystem = {
   name: 'modes',
   dispose: () => cleanup.dispose(),
   init(ctx) {
+    let disposed = false;
+    cleanup.add(() => {
+      disposed = true;
+    });
     const baseScanRadii = new Map<string, number>();
     ctx.baseScanRadii = baseScanRadii;
     void ctx.discovery.ready.then(() => {
+      if (disposed) return;
       for (const poi of ctx.discovery.pois) {
         baseScanRadii.set(poi.id, poi.radius);
         poi.radius *= ctx.effective.sensor.scanRadiusMultiplier;

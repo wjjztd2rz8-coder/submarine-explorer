@@ -99,6 +99,44 @@ function setup(seenHints: HintId[] = ['creature']) {
 }
 
 describe('onboarding completion through the system', () => {
+  it('disposing the previous dive again leaves the next dive handlers intact', () => {
+    const { ctx, system, tick, exposed } = setup();
+    system.dispose?.();
+    const next = createOnboardSystem();
+    try {
+      next.init!(ctx);
+      system.dispose?.();
+      views.skipAll();
+      tick(undefined, 0.1, next);
+      expect(exposed.onboard!.tutorial.finished).toBe(true);
+      expect(exposed.onboard!.store.get().tutorialDone).toBe(true);
+      expect(views.chip.show).toHaveBeenCalledOnce();
+    } finally {
+      next.dispose?.();
+    }
+  });
+
+  it.each(['ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight', 'pen'])(
+    'keeps touch tutorial copy when %s does not change the visible controls',
+    (deviceEvent) => {
+      const { ctx, system, tick } = setup();
+      ctx.input.touchActive = true;
+      try {
+        tick();
+        expect(lastTutorial()?.text).toBe('Left stick: move and turn.');
+        const event =
+          deviceEvent === 'pen'
+            ? Object.assign(new Event('pointerdown'), { pointerType: 'pen' })
+            : Object.assign(new Event('keydown'), { code: deviceEvent });
+        window.dispatchEvent(event);
+        tick();
+        expect(lastTutorial()?.text).toBe('Left stick: move and turn.');
+      } finally {
+        system.dispose?.();
+      }
+    },
+  );
+
   it('rebooting an unfinished dive discards early scans and old scan listeners', () => {
     const { ctx, system, tick, exposed } = setup();
     ctx.bus.emit('scan:complete', { poiId: 'opening-target', landmarkId: 'site', firstTime: true });

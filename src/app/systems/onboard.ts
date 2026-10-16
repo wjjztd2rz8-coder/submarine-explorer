@@ -20,12 +20,11 @@ import type { GameContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 import { Disposables } from '../Disposables.js';
 
-const cleanup = new Disposables();
-
 const slotBusy = (kind: GuidanceKind | null): boolean =>
   kind === 'urgent' || kind === 'scan' || kind === 'discovery';
 
 export function createOnboardSystem(): GameSystem {
+  const cleanup = new Disposables();
   let ctxRef: GameContext | null = null;
   let tutorial = new Tutorial(false);
   let hints = new HintEngine();
@@ -80,11 +79,7 @@ export function createOnboardSystem(): GameSystem {
 
   return {
     name: 'onboard',
-    dispose: () => {
-      cleanup.dispose();
-      ctxRef?.guidance?.setSkipHandler(null);
-      ctxRef?.controlsCard.dispose();
-    },
+    dispose: () => cleanup.dispose(),
     init(ctx) {
       ctxRef = ctx;
       scanCompleted = false;
@@ -105,6 +100,7 @@ export function createOnboardSystem(): GameSystem {
         },
       });
       ctx.controlsCard = controlsCard;
+      cleanup.add(() => controlsCard.dispose());
       const root = document.documentElement;
       root.dataset.reduceMotion = String(ctx.settings.reduceMotion);
       cleanup.add(
@@ -117,16 +113,25 @@ export function createOnboardSystem(): GameSystem {
       ctx.guidance.setSkipHandler(() => {
         if (tutorial.skipStep()) onAdvance();
       });
+      cleanup.add(() => ctx.guidance.setSkipHandler(null));
 
       // Last input used decides which layout is shown.
-      cleanup.add(observeKeyboard(() => controlsCard.setDevice('keyboard')));
+      cleanup.add(
+        observeKeyboard((event) => {
+          // Match TouchControls: modifiers alone leave the touch layout active.
+          if (['ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight'].includes(event.code))
+            return;
+          controlsCard.setDevice('keyboard');
+        }),
+      );
       cleanup.listen(
         window,
         'pointerdown',
-        (event) =>
-          controlsCard.setDevice(
-            (event as PointerEvent).pointerType === 'touch' ? 'touch' : 'keyboard',
-          ),
+        (event) => {
+          const type = (event as PointerEvent).pointerType;
+          if (type === 'touch') controlsCard.setDevice('touch');
+          else if (type === 'mouse') controlsCard.setDevice('keyboard');
+        },
         { capture: true, passive: true },
       );
       cleanup.add(bus.on('scan:started', () => tutorial.notify('scan:started')));
