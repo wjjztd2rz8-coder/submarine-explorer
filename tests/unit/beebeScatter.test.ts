@@ -211,3 +211,79 @@ it('late ground keepout filters already-resident scatter without moving the came
     scatter.dispose();
   }
 });
+
+// Tier ranges differ from the legacy 128 m isolation fixture.
+it.each([
+  ['low', 9, [12, 13], [190, 68, 13]],
+  ['medium', 25, [75, 30], [1228, 164, 30]],
+  ['high', 45, [268, 55], [4096, 270, 55]],
+] as const)(
+  'wreck-floor %s streaming retains its seeded costs and grounded transforms',
+  (tier, cells, oldCounts, counts) => {
+    const biome = BIOMES.titanic!;
+    const previous: Biome = {
+      ...biome,
+      scatter: [
+        { kind: 'dropstone', density: 1.8, slopeMaxDeg: 18, on: 'flat' },
+        { kind: 'mound', density: 3.5, slopeMaxDeg: 10, on: 'flat' },
+      ],
+    };
+    const { scatterDensity, scatterRangeM } = makeConfig().terrain.tiers[tier];
+    const before = populated(previous, scatterDensity, scatterRangeM);
+    const after = populated(biome, scatterDensity, scatterRangeM);
+    const replay = populated(biome, scatterDensity, scatterRangeM);
+    try {
+      expect(before.stats).toEqual({ cells, instances: oldCounts[0] + oldCounts[1], drawCalls: 2 });
+      expect(after.stats).toEqual({
+        cells,
+        instances: counts[0] + counts[1] + counts[2],
+        drawCalls: 3,
+      });
+      expect(replay.stats).toEqual(after.stats);
+      const trianglesPerKind = [180, 20, 100];
+      let triangles = 0;
+      for (const [index, child] of after.group.children.entries()) {
+        const mesh = child as THREE.InstancedMesh;
+        const repeated = replay.group.children[index] as THREE.InstancedMesh;
+        expect(mesh.name).toBe(['scatter:dropstone', 'scatter:rubble', 'scatter:mound'][index]);
+        expect(mesh.count).toBe(counts[index]);
+        expect(mesh.count).toBeLessThanOrEqual(4096);
+        expect(mesh.instanceMatrix.count).toBe(4096);
+        const faces =
+          (mesh.geometry.index?.count ?? mesh.geometry.getAttribute('position').count) / 3;
+        expect(faces).toBe(trianglesPerKind[index]);
+        triangles += mesh.count * faces;
+        expect(digest(mesh.instanceMatrix.array)).toBe(digest(repeated.instanceMatrix.array));
+        expect(digest(mesh.instanceColor!.array)).toBe(digest(repeated.instanceColor!.array));
+        const position = mesh.geometry.getAttribute('position');
+        const matrix = new THREE.Matrix4();
+        const vertex = new THREE.Vector3();
+        for (let i = 0; i < mesh.count; i++) {
+          mesh.getMatrixAt(i, matrix);
+          expect(matrix.elements.every(Number.isFinite)).toBe(true);
+          expect(matrix.determinant()).toBeGreaterThan(0);
+          let min = Infinity;
+          let max = -Infinity;
+          for (let j = 0; j < position.count; j++) {
+            vertex.fromBufferAttribute(position, j).applyMatrix4(matrix);
+            const distance = vertex.y - (-100 + vertex.x * 0.05 - vertex.z * 0.1);
+            min = Math.min(min, distance);
+            max = Math.max(max, distance);
+          }
+          // The rendered shape straddles the bed, rather than floating or disappearing below it.
+          expect(min).toBeLessThan(0);
+          expect(max).toBeGreaterThan(0);
+        }
+      }
+      expect(triangles).toBe(counts[0] * 180 + counts[1] * 20 + counts[2] * 100);
+      const oldMound = before.group.getObjectByName('scatter:mound') as THREE.InstancedMesh;
+      const newMound = after.group.getObjectByName('scatter:mound') as THREE.InstancedMesh;
+      expect(digest(newMound.instanceMatrix.array)).toBe(digest(oldMound.instanceMatrix.array));
+      expect(digest(newMound.instanceColor!.array)).toBe(digest(oldMound.instanceColor!.array));
+    } finally {
+      before.dispose();
+      after.dispose();
+      replay.dispose();
+    }
+  },
+);
