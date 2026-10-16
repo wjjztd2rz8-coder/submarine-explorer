@@ -1325,3 +1325,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged:** V-hero-set (docs only: the 1.0 table now follows `HERO_SITES`; Endurance stays a polish site). No Claude agent launched (budget ~53%, V-bluehole remainder would risk the 23% kill line).
 - **Codex:** 2240, 2250, 2290 running (2260/2270/2280 worktrees hold uncommitted work, tasks finished; collect next run). Queue: 2300, 2310 J-home-controls, 2320 bughunt.
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 08:59 CDT headless run 29 (Claude)
+
+- **Merged and pushed (smoke + project-base green each; no full e2e):** Codex 2270 S-perf-stall, 2280 S-render (nightly diagnosis; hosted nightly unconfirmed), 2290 S-verify-14, 2240 S-manifest scatter keepout, 2250 S-manifest atmosphere policy, 2260 S-verify-13 (SiteManifest.ts and f-title-scene spec conflicts resolved, main's title spec kept); Sonnet V-bluehole-roof (stepped roof shelves, bed spacing, calmer blue tang; modest visual gain, still slab-like from the east pose).
+- **Codex:** 5h 6% (resets 10:15), weekly 9%; nothing running; queue 2300, 2310, 2320 waits for budget. All six Codex worktrees removed.
+- **CI:** prior main run still queued at start; no tag (f55 already tagged).
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim (worktree still parked).
