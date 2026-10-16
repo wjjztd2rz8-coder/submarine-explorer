@@ -9,11 +9,16 @@ export function collectTests(report) {
     const titles = [...parents, suite.title];
     for (const spec of suite.specs ?? []) {
       for (const test of spec.tests) {
+        const title = [test.projectName, ...titles, spec.title].join(' ');
+        // JSON strips @; inline tags already belong to the literal title path.
+        const tags = (spec.tags ?? [])
+          .map((tag) => (tag.startsWith('@') ? tag : `@${tag}`))
+          .filter((tag) => !title.split(/\s+/).includes(tag));
         tests.push({
           // CI lists report source locations, including tests declared in helpers.
           key: [spec.file, ...titles.slice(1), spec.title].join(' › '),
           // grep matches the entry spec's title path, not the helper's location.
-          title: [test.projectName, ...titles, spec.title, ...(spec.tags ?? [])].join(' '),
+          title: [title, ...tags].join(' '),
           file: entryFile,
           skipped: test.expectedStatus === 'skipped',
         });

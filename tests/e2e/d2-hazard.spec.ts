@@ -1,6 +1,7 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 import { expect, test } from './helpers/unlocked.js';
+import { waitForFrames } from './helpers/frames.js';
 
 const shots = '.cache/codex/shots/d2-hazard';
 
@@ -108,7 +109,8 @@ test('current indicator and snow advect with the measured field', async ({ page 
       return { x: flow.x, z: flow.y, cx: game.presets.current.x, cz: game.presets.current.z };
     });
   const before = await sample();
-  await page.waitForTimeout(1200);
+  // A busy software GPU can spend the entire wall-clock wait between rendered frames.
+  await waitForFrames(page, 3, 1200);
   const after = await sample();
   expect((after.x - before.x) * after.cx + (after.z - before.z) * after.cz).toBeGreaterThan(0);
   await page.screenshot({ path: `${shots}/currents-on.png` });
