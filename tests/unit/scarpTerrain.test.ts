@@ -8,6 +8,7 @@ import { InstancedMesh, Matrix4, Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
 import type { TileMeta } from '../../src/util/types.js';
 import { Props } from '../../src/world/Props.js';
+import { CameraRig } from '../../src/sub/CameraRig.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { geoDetail } from '../../src/world/props/geo/detail.js';
 import { buildScarp, type ScarpPresetId } from '../../src/world/props/geo/scarp.js';
@@ -270,5 +271,76 @@ describe('scarp output equivalence', () => {
         expect(combined).toEqual(scarpBaseline[`${kind}-${tier}`]);
       },
     );
+  }
+});
+
+it('rejects offscreen steep terrain boxes in the elevated wall view without changing geometry', async () => {
+  const meta = JSON.parse(readFileSync('data/tiles/monterey-canyon/meta.json', 'utf8')) as TileMeta;
+  const bytes = readFileSync('data/tiles/monterey-canyon/heightmap.bin');
+  const config = makeConfig();
+  const terrain = new Terrain(
+    { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
+    config.terrain,
+    'medium',
+  );
+  const props = new Props(meta, terrain, config.props, 'medium');
+  try {
+    await props.placeAll(
+      JSON.parse(readFileSync('data/landmarks/monterey-canyon/props.json', 'utf8')),
+      meta.id,
+    );
+    const hero = props.placed.find((p) => p.def.id === 'canyon-wall-ledge')!;
+    hero.root.updateMatrixWorld(true);
+    const b = hero.localBounds;
+    const cx = (b.min.x + b.max.x) / 2;
+    // Same elevated wall pose as the browser's view-budget guard.
+    const position = hero.root.localToWorld(
+      new Vector3(cx - 0.15 * (b.max.x - b.min.x), 0, b.min.z - 6),
+    );
+    const aim = hero.root.localToWorld(new Vector3(cx, 0, 0));
+    position.y = Math.min(-2, terrain.sampleHeight(position.x, position.z) + 8);
+    const yaw = Math.atan2(aim.x - position.x, -(aim.z - position.z));
+    const rig = new CameraRig(config.camera, 1280 / 720, terrain);
+    rig.setMode('orbit');
+    rig.orbitRadius = 75;
+    rig.orbitElevation = 0.6;
+    rig.orbitAzimuth = Math.atan2(-Math.sin(yaw), Math.cos(yaw)) - 0.4;
+    rig.snap(position, yaw, 0);
+    const chunks = terrain.group.children.filter((o): o is THREE.Mesh => o instanceof THREE.Mesh);
+    const buffers = chunks.map((mesh) => mesh.geometry.getAttribute('position').array.slice());
+    terrain.update(rig.camera);
+    const frustum = new THREE.Frustum().setFromProjectionMatrix(
+      new Matrix4().multiplyMatrices(rig.camera.projectionMatrix, rig.camera.matrixWorldInverse),
+    );
+    let sphereTriangles = 0;
+    let submitted = 0;
+    for (const mesh of chunks) {
+      const geometry = mesh.geometry;
+      const triangles = geometry.index!.count / 3;
+      const sphereInView = frustum.intersectsSphere(geometry.boundingSphere!);
+      if (sphereInView) sphereTriangles += triangles;
+      if (mesh.visible && sphereInView) submitted += triangles;
+      if (!mesh.visible)
+        expect(
+          frustum.intersectsSphere(geometry.boundingSphere!) &&
+            frustum.intersectsBox(geometry.boundingBox!),
+        ).toBe(false);
+    }
+    // Regression: sphere-only culling submitted 101,760 fully offscreen triangles here.
+    expect(sphereTriangles - submitted).toBeGreaterThanOrEqual(100_000);
+    expect(terrain.stats.drawnTriangles).toBe(submitted);
+    chunks.forEach((mesh, i) =>
+      expect(mesh.geometry.getAttribute('position').array).toEqual(buffers[i]),
+    );
+    // A later viewpoint must restore visible chunks rather than leaving them hidden.
+    rig.camera.position.set(0, 5000, 0);
+    rig.camera.lookAt(0, 9000, 0);
+    terrain.update(rig.camera);
+    expect(chunks.every((mesh) => !mesh.visible)).toBe(true);
+    rig.snap(position, yaw, 0);
+    terrain.update(rig.camera);
+    expect(terrain.stats.drawnTriangles).toBe(submitted);
+  } finally {
+    terrain.dispose();
   }
 });

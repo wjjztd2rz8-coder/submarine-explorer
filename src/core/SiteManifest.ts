@@ -3,6 +3,8 @@
  * branches on a site id. Add a new concern as another optional section here,
  * in validateSiteManifest, and in the sites' JSON; nothing else changes.
  */
+import type { GraphicsTier } from './config/quality.js';
+
 /** Local approach bearing and clearance from the hero's actual footprint. */
 export interface OpeningPose {
   hero: string;
@@ -136,6 +138,12 @@ export interface PropManifest {
 }
 
 export interface SiteManifest {
+  atmosphere?: {
+    hemisphere?: { name: string; sky: number; ground: number; intensity: number };
+    lamps?: { intensity: number; distance: number; fillIntensity: number; fillDistance: number };
+    /** Ambient floors apply to band stops at or below depthM, preserving brighter inputs. */
+    tiers?: Partial<Record<GraphicsTier, { depthM: number; color: number; intensity: number }>>;
+  };
   props?: Record<string, PropManifest>;
   id: string;
   opening?: {
@@ -301,6 +309,31 @@ const color: Check = (id, path, value) => {
   count(id, path, value);
   if ((value as number) > 0xffffff) fail(id, path, 'expected a color from 0 to 0xffffff');
 };
+const nonnegative: Check = (id, path, value) => {
+  finite(id, path, value);
+  if ((value as number) < 0) fail(id, path, 'expected a nonnegative number');
+};
+const submergedDepth: Check = (id, path, value) => {
+  finite(id, path, value);
+  if ((value as number) > 0) fail(id, path, 'expected a depth at or below zero');
+};
+const ambientFloorCheck = fields({ depthM: submergedDepth, color, intensity: nonnegative });
+const atmosphereCheck = fields(
+  {},
+  {
+    hemisphere: fields({ name: text, sky: color, ground: color, intensity: nonnegative }),
+    lamps: fields({
+      intensity: nonnegative,
+      distance: nonnegative,
+      fillIntensity: nonnegative,
+      fillDistance: nonnegative,
+    }),
+    tiers: fields(
+      {},
+      { low: ambientFloorCheck, medium: ambientFloorCheck, high: ambientFloorCheck },
+    ),
+  },
+);
 const threshold: Check = (id, path, value) => {
   if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0)
     fail(id, path, 'expected a positive number');
@@ -346,9 +379,13 @@ const propCheck = fields(
 /** Throws with the site id and field path on the first problem. */
 export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
   const root = obj(id, '$', raw);
-  noExtra(id, '$', root, ['id', 'audio', 'events', 'opening', 'life', 'props']);
+  noExtra(id, '$', root, ['id', 'audio', 'events', 'opening', 'life', 'props', 'atmosphere']);
   if (root.id !== id) fail(id, 'id', `expected "${id}"`);
   const out: SiteManifest = { id };
+  if (root.atmosphere !== undefined) {
+    atmosphereCheck(id, 'atmosphere', root.atmosphere);
+    out.atmosphere = root.atmosphere as SiteManifest['atmosphere'];
+  }
   if (root.audio !== undefined) {
     fields({}, { whaleHabitat: flag })(id, 'audio', root.audio);
     out.audio = { whaleHabitat: (root.audio as NonNullable<SiteManifest['audio']>).whaleHabitat };

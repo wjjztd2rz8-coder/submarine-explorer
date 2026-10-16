@@ -27,5 +27,14 @@
       "chaseOffsetX": 0,
       "chaseOffsetY": -10
     }
+  },
+  "atmosphere": {
+    "tiers": {
+      "low": {
+        "depthM": -200,
+        "color": 8885145,
+        "intensity": 6
+      }
+    }
   }
 }

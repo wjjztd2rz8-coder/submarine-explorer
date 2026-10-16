@@ -10,5 +10,24 @@
       "bearing": 50,
       "range": 85
     }
+  },
+  "atmosphere": {
+    "tiers": {
+      "low": {
+        "depthM": -200,
+        "color": 8885145,
+        "intensity": 6
+      },
+      "medium": {
+        "depthM": -200,
+        "color": 8885145,
+        "intensity": 6
+      },
+      "high": {
+        "depthM": -200,
+        "color": 8885145,
+        "intensity": 6
+      }
+    }
   }
 }

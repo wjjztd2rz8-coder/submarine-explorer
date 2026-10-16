@@ -64,5 +64,19 @@
       ],
       "cell": "monterey-opening"
     }
+  },
+  "atmosphere": {
+    "hemisphere": {
+      "name": "montereyFill",
+      "sky": 11058120,
+      "ground": 4799794,
+      "intensity": 3
+    },
+    "lamps": {
+      "intensity": 2,
+      "distance": 1.2,
+      "fillIntensity": 3,
+      "fillDistance": 1.5
+    }
   }
 }

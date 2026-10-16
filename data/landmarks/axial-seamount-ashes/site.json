@@ -18,5 +18,14 @@
       "bearing": 45,
       "range": 60
     }
+  },
+  "atmosphere": {
+    "tiers": {
+      "low": {
+        "depthM": -200,
+        "color": 8885145,
+        "intensity": 6
+      }
+    }
   }
 }

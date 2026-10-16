@@ -3,6 +3,7 @@
  * Split out of `core/Config.ts`; import from `core/Config.js`.
  */
 
+import { siteManifest } from '../SiteManifest.js';
 import type { GraphicsTier } from './quality.js';
 
 /** Titanic / Endurance's existing unlit dome; no extra particle or mesh budget. */
@@ -302,58 +303,14 @@ export const DEFAULT_WATER: WaterConfig = {
   },
 };
 
-/** These openings need ambient fill so their floors remain visible on Low. */
-export const LOW_READABILITY_SITES: readonly string[] = [
-  'axial-seamount-ashes',
-  'beebe-vent-field',
-  'bismarck',
-  'blake-plateau-corals',
-  'hudson-canyon',
-  'hunga-tonga-caldera',
-  'kamaehuakanaloa',
-  'lost-city',
-];
-
-const LOW_SEABED_LIGHT = { depthM: -200, color: 0x879399, intensity: 6 };
-
-/** Reuse the existing ambient light; no extra lights, geometry or post passes. */
-export function lowSiteWater(site: string, tier: GraphicsTier, water: WaterConfig): WaterConfig {
-  if (tier !== 'low' || !LOW_READABILITY_SITES.includes(site)) return water;
-  return {
-    ...water,
-    bands: water.bands.map((band) =>
-      band.depth <= LOW_SEABED_LIGHT.depthM
-        ? {
-            ...band,
-            ambientColor: LOW_SEABED_LIGHT.color,
-            ambientIntensity: Math.max(band.ambientIntensity, LOW_SEABED_LIGHT.intensity),
-          }
-        : band,
-    ),
-  };
-}
-
-/**
- * Per-site ambient floor for dark real-world seabeds on Medium and High. Authored
- * exposure, not sunlight: the mission opening should show the floor and the
- * first subject without leaving the lamp pool. Hero sites have their own
- * deep-opening table and are not listed here.
- */
-export const SITE_SEABED_LIGHT: Record<string, { color: number; intensity: number }> = {
-  bismarck: { color: 0x879399, intensity: 6 },
-  'blake-plateau-corals': { color: 0x879399, intensity: 6 },
-  'hudson-canyon': { color: 0x879399, intensity: 6 },
-  'hunga-tonga-caldera': { color: 0x879399, intensity: 6 },
-};
-
-/** Low keeps its own calibrated floor (`lowSiteWater`). */
+/** Reuse the existing ambient light, preserving the upper column and brighter inputs. */
 export function siteLightWater(site: string, tier: GraphicsTier, water: WaterConfig): WaterConfig {
-  const light = SITE_SEABED_LIGHT[site];
-  if (!light || tier === 'low') return water;
+  const light = siteManifest(site)?.atmosphere?.tiers?.[tier];
+  if (!light) return water;
   return {
     ...water,
     bands: water.bands.map((band) =>
-      band.depth <= -200
+      band.depth <= light.depthM
         ? {
             ...band,
             ambientColor: light.color,

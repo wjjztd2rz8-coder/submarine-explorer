@@ -247,13 +247,32 @@ test('covering home modals stop title draws and return to a usable menu', async 
   for (const [name, selector] of [
     ['Settings', '.settings'],
     ['Journal', '.journal'],
-    ['Controls', '.settings'],
+    ['Controls', '.controls-card'],
   ]) {
     await page.locator('.home-menu').getByRole('button', { name, exact: true }).click();
-    const dialog = page.locator(selector);
+    let dialog = page.locator(selector);
     await expect(dialog).toBeVisible();
-    await expect(dialog).toHaveAccessibleName(name);
+    await expect(dialog).toHaveAccessibleName(name === 'Controls' ? 'Controls guide' : name);
     if (name === 'Controls') {
+      // The shared device guide covers Home before its Change keys action opens Settings.
+      await expect(dialog.getByRole('heading', { name: 'Controls', exact: true })).toBeVisible();
+      await expect(dialog.getByRole('group', { name: 'Input device', exact: true })).toBeVisible();
+      await expect.poll(async () => (await title(page)).active).toBe(false);
+      await stopped(page);
+      const guideDraws = (await title(page)).drawCount;
+      await page.keyboard.press('Escape');
+      await expect(dialog).toBeHidden();
+      const opener = page.locator('.home-menu').getByRole('button', { name, exact: true });
+      await expect(opener).toBeFocused();
+      await expect.poll(async () => (await title(page)).active).toBe(true);
+      await expect.poll(async () => (await title(page)).drawCount).toBeGreaterThan(guideDraws);
+      await opener.click();
+      await expect(dialog).toBeVisible();
+      await dialog.getByRole('button', { name: 'Change keys', exact: true }).click();
+      await expect(dialog).toBeHidden();
+      dialog = page.locator('.settings');
+      await expect(dialog).toBeVisible();
+      await expect(dialog).toHaveAccessibleName('Controls');
       await expect(dialog.getByRole('region', { name: 'Controls', exact: true })).toBeVisible();
       await expect(
         dialog.getByRole('button', { name: 'Back to Settings', exact: true }),

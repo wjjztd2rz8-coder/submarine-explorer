@@ -10,9 +10,10 @@ import { Headlights } from '../../render/Headlights.js';
 import { MarineSnow } from '../../render/MarineSnow.js';
 import { Water } from '../../world/Water.js';
 import type { GameSystem } from '../System.js';
-import { MONTEREY_OPENING, deepOpeningFor, deepSiteWater } from '../../core/Config.js';
+import { deepOpeningFor, deepSiteWater } from '../../core/Config.js';
+import { siteManifest } from '../../core/SiteManifest.js';
 import { HemisphereLight } from 'three';
-import { lowSiteWater, siteLightWater } from '../../core/config/atmosphere.js';
+import { siteLightWater } from '../../core/config/atmosphere.js';
 
 export const atmosphereSystem: GameSystem = {
   name: 'atmosphere',
@@ -21,15 +22,11 @@ export const atmosphereSystem: GameSystem = {
     const atmoTier = atmosphereTier(config.water, tier);
     const atmosphere = new Atmosphere(
       scene,
-      lowSiteWater(
-        ctx.meta.id,
-        tier,
-        siteLightWater(ctx.meta.id, tier, deepSiteWater(ctx.meta.id, config.water)),
-      ),
+      siteLightWater(ctx.meta.id, tier, deepSiteWater(ctx.meta.id, config.water)),
       atmoTier,
       bus,
     );
-    const monterey = ctx.meta.id === 'monterey-canyon';
+    const policy = siteManifest(ctx.meta.id)?.atmosphere;
     const deep = deepOpeningFor(ctx.meta.id);
     if (deep) {
       const fill = deep.hemisphere;
@@ -37,17 +34,13 @@ export const atmosphereSystem: GameSystem = {
       hemisphere.name = `${ctx.meta.id}Fill`;
       atmosphere.group.add(hemisphere);
     }
-    if (monterey) {
-      const fill = MONTEREY_OPENING.hemisphere;
+    if (policy?.hemisphere) {
+      const fill = policy.hemisphere;
       const hemisphere = new HemisphereLight(fill.sky, fill.ground, fill.intensity);
-      hemisphere.name = 'montereyFill';
+      hemisphere.name = fill.name;
       atmosphere.group.add(hemisphere);
     }
-    const headlights = new Headlights(
-      config.water,
-      atmoTier,
-      deep?.lamps ?? (monterey ? MONTEREY_OPENING.lamps : undefined),
-    );
+    const headlights = new Headlights(config.water, atmoTier, deep?.lamps ?? policy?.lamps);
     // D-MODES: the lights preset from the gameplay options.
     headlights.setPreset(ctx.effective.light);
     scene.add(headlights.group);
