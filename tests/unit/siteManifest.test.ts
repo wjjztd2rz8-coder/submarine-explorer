@@ -541,6 +541,10 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
     } else if (low.includes(id)) {
       const tiers = allTiers.includes(id) ? ['low', 'medium', 'high'] : ['low'];
       expect(atmosphere).toEqual({
+        // Beebe tones its lamps down so close sulfide keeps its texture instead of washing pale.
+        ...(id === 'beebe-vent-field'
+          ? { lamps: { intensity: 0.55, distance: 1, fillIntensity: 0.6, fillDistance: 1 } }
+          : {}),
         tiers: Object.fromEntries(
           tiers.map((tier) => [tier, { depthM: -200, color: 0x879399, intensity: 6 }]),
         ),
