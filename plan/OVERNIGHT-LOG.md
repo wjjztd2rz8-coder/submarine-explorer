@@ -1343,3 +1343,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged (smoke + project-base green; no full e2e):** Sonnet V-titanic-seabed slice 1 (Titanic biome data: stronger ripples, dropstone/rubble scatter; gain modest, faint at approach distance). Scour and plating repetition remain on the item.
 - **Codex:** 5h at 3%, nothing running; queue 2300, 2310, 2320, 2330 waits for budget. Prior CI runs were pending at start; no tag.
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 10:23 CDT headless run 32 (Claude)
+
+- **Merged (smoke + project-base green; no full e2e):** Sonnet V-bluehole-roof-2 (thin/thick lip, three notches with overhang blocks, tilted beds, varied sand apron; ~4.0; underside unchanged; apron widened to r~168).
+- **Codex:** 5h ~3%, nothing running; queue 2300-2330 waits for budget. Prior CI runs still pending at start; no tag.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
