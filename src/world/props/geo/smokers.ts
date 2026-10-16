@@ -69,6 +69,8 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     y: number;
     h: number;
     r0: number;
+    /** Top radius as a fraction of r0. */
+    top: number;
   }
   const n = THREE.MathUtils.clamp(Math.round(2 + H / 2.6), 3, 6);
   const stacks: Stack[] = [];
@@ -81,7 +83,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     const a = i * 2.4 + rnd() * 0.8;
     const x = Math.cos(a) * ring;
     const z = Math.sin(a) * ring;
-    stacks.push({ x, z, y: mound(x, z) - 0.3, h, r0 });
+    stacks.push({ x, z, y: mound(x, z) - 0.3, h, r0, top: profile?.topFraction ?? 0.45 });
   }
 
   // ---- geometry: mound + chimneys, one mesh.
@@ -92,7 +94,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     const c = tieredSpire({
       h: s.h,
       r0: s.r0,
-      topFrac: 0.45,
+      topFrac: s.top,
       seed: seed + i * 7,
       segs: (profile && tier !== 'low' ? 64 : 22) * d.meshDensity + 4,
       rings: (s.h / (profile && tier !== 'low' ? 0.18 : 0.7)) * d.meshDensity + 6,
@@ -227,7 +229,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
   });
   // Black smokers are dark but not black: lift the albedo, and give the warm fluid a faint
   // self-lit tint that follows the pale and rusty parts of the crust.
-  bodyMat.color.multiplyScalar(1.25);
+  bodyMat.color.multiplyScalar(profile ? 0.95 : 1.25);
   vertexGlow(bodyMat, profile ? 0.16 : 0.13, 0xff9a68, 0.5);
   const body = new THREE.Mesh(geom, bodyMat);
   body.name = 'smoker-body';
@@ -237,6 +239,8 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     // They are visual only: smoke origins, colliders and impostor retain their existing anchors.
     const mouthMaterial = new THREE.MeshStandardMaterial({
       color: profile.mouthColor,
+      // Hot fluid glows in the throat; the dark rim and bowl around it stay black.
+      emissive: profile.throatColor,
       roughness: 1,
       side: THREE.DoubleSide,
       polygonOffset: true,
@@ -246,7 +250,7 @@ export function buildSmokerCluster(input: GeoBuildInput): BuiltProp {
     const collars: THREE.BufferGeometry[] = [];
     const sideMouths: Array<{ centre: number[]; normal: number[] }> = [];
     for (const s of stacks) {
-      const topRadius = s.r0 * 0.45;
+      const topRadius = s.r0 * s.top;
       const radius = topRadius * profile.topMouthRadiusFraction;
       mouths.push(
         place(new THREE.CircleGeometry(radius, 16), {
