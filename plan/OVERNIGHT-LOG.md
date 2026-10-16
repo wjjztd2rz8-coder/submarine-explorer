@@ -1258,3 +1258,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h ~2% until 23:09 CDT yesterday reset window; 2170/2180/2190 worktrees hold uncommitted work, queue 2200/2210/2220 waits for the dispatcher. No tag (f55 waits for green CI).
 - **Not done:** Blue Hole roof silhouette and parallel beds; V-endurance-aim parked.
 - **Needs owner:** real-phone play of the newest build (Low tier).
+
+## 2026-10-16 00:27 CDT headless run 20 (Claude, orchestration only)
+
+- **Merged and pushed:** Codex J-journeys-repeat (guidance handoff fix + journey findings, new J-* sub-items in DIRECTOR), S-verify-12 (slope-aligned clear_ground footprints), S-bughunt-9 (hidden-tab gamepad, photo drag on pause, rotation stale input, Home Journal focus). Smoke + project-base green on merged main; no full e2e.
+- **Codex:** 2200/2210/2220 running (5h reset to 100%). Queue holds only 1520 on hold; no new briefs written this run.
+- **Not done:** no Claude agent launched (kept window); J-* Sonnet sub-items, Blue Hole roof, V-endurance-aim parked. No tag (f55 waits for green CI).
+- **Needs owner:** real-phone play of the newest build (Low tier).

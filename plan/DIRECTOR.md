@@ -70,14 +70,14 @@ The newest items go first.
 
 ## In flight
 
-- Codex queue 2170 J-journeys-repeat, 2180 S-verify-12, 2190 S-bughunt-9 waits for the 17:24 CDT Codex reset. No Claude package running.
+- Codex 2200/2220/2210 running (S-manifest-3, S-bughunt-10, S-render-confirm). No Claude package running.
 - V-endurance-aim parked 2026-10-15: branch claude/V-endurance-aim (worktree ../subexp-wt/V-endurance-aim, commit 5fa58fc) reached hull 45% but the sub is too large and dominant in frame; not merged (new shared camera code for a small gain). Needs the camera forward of the sub, or drop item 4.
 
 ## Backlog
 
 One list, ordered by player impact and dependencies. Lane is in brackets. "After X" means don't start until X is merged. Evidence: joint review 2026-10-15 eve in `plan/REVIEWS.md`.
 
-1. **J-journeys-repeat [Codex 2170, then Sonnet judges], IN FLIGHT (Codex, 2026-10-15):** repeat the unaided Titanic and Blue Hole journeys (Home, pick, first 60 s, reward, next objective, Journal, debrief) on the merged build at desktop, portrait and landscape. Evidence and severity table: [progress/J-journeys-repeat.md](progress/J-journeys-repeat.md); screenshots `.cache/codex/shots/2170/`.
+1. **J-journeys-repeat [Codex 2170, then Sonnet judges], DONE 2026-10-16 (merged; sub-items below open):** repeat the unaided Titanic and Blue Hole journeys (Home, pick, first 60 s, reward, next objective, Journal, debrief) on the merged build at desktop, portrait and landscape. Evidence and severity table: [progress/J-journeys-repeat.md](progress/J-journeys-repeat.md); screenshots `.cache/codex/shots/2170/`.
    - **J-guidance-handoff [Codex, fixed; verification in progress]:** a logged contact can withhold the next objective/turn after the reward. Keep the reward, then let the outstanding objective lead; retain the logged-contact confirmation without a mission objective.
    - **J-contact-choice [Sonnet, P2]:** review scan-card identity when a nearby curiosity/optional contact competes with the mission objective (memorial/debris versus stern), and wildlife rewards interrupt the next-gallery directions; distinguish scan counts from mission objectives.
    - **J-picker-density [Sonnet, P3]:** simplify the long site-card list and make Blue Hole easier to identify under its Lighthouse Reef title.
