@@ -221,3 +221,7 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - Removed 13 stale Codex worktrees/branches (1740-1860, 2030-2050); all committed work was already on main, leftovers were uncommitted.
 - Hosted CI "cancelled" runs have no jobs: concurrency keeps one pending run and supersedes older pending ones, so with ~60 min CI and a push per merge, many runs never start. Not a defect; tags need a completed green run. 2150 triages the one red shard.
 - tools/golden.sh took 9.5 min and Monterey capture timed out; queued V-golden-monterey.
+
+## 2026-10-16
+
+- Comprehensive review: Codex finished 2210/2220 but nobody collected them for a run; collection is step 1 of every run, so no change except noting it. Efficiency idle totals are sample extrapolations (Sol), reported as upper bounds. Added standing Codex item S-verify/S-bughunt so a verification brief is always queued after visual merges.

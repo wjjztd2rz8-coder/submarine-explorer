@@ -53,14 +53,14 @@ Reviewers send work back if it breaks one of these:
 
 | Requirement                                                                   | Backlog items                                           |
 | ----------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Five hero sites look beautiful (4 of 5) in opening, approach and detail views | V-endurance, V-bluehole, V-beebe, V-titanic, V-lostcity |
+| Five hero sites look beautiful (4 of 5) in opening, approach and detail views. Note: code's `HERO_SITES` (Cosmetics.ts) is Titanic, Lost City, Blue Hole, Beebe and Monterey; Endurance is a polish site. Reconcile (V-hero-set) | V-bluehole, V-beebe, V-titanic, V-lostcity, V-monterey-floor, V-endurance |
 | The other eight sites are coherent with no major visual defect                | V-eight-sites                                           |
 | A new player understands the first five minutes on desktop and phone          | V-journeys, S-guidance (done), S-hud                    |
 | Acceptable Low-tier performance on a real phone                               | Owner check; S-boot helps                               |
 | Hosted CI green, and a full run no longer blocks releases                     | R-release, R-ci-green                                   |
 | No known blockers; the code is simple enough to keep changing safely          | S-resolve, S-modal, S-boot, S-rewards, S-manifest       |
 
-Stage (Claude-alone review, 2026-10-15 late; Sol skipped, Codex budget 2%): about 80%; before that joint review with Sol: about 79% to 1.0; budget four to six weeks (Sol), Claude said three. Beautiful: Titanic 3.5-3.8, Beebe 3-3.3, Blue Hole 2.5-3, Lost City 3-3.3, Monterey ~3.3 (old capture), Challenger 3.3, Endurance 3.2. Top blockers: current unaided journeys on the merged build, real-phone Low readability and performance, hero beauty (Blue Hole geometry, Lost City towers), eight-site mission acceptance incl. Endurance, a completed green hosted CI on the release commit.
+Stage (joint review with Sol, 2026-10-16): see plan/REVIEWS.md; about 81% to 1.0. Beautiful: Titanic 3.9, Lost City 3.6, Endurance 3.6, Blue Hole 3.5, Monterey 3.5, Beebe 3.3, Challenger 3.2. Top blockers: real-phone Low readability and performance (owner), Beebe/Challenger materials, Blue Hole roof, J-* P2 journey fixes, a completed green hosted CI on the release commit (f55).
 
 ## Needs owner
 
@@ -87,16 +87,21 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
    - **J-completion-contrast [Sonnet, P2]:** the primary-completion banner has cyan text over a translucent cyan fill on bright Blue Hole water; touch removes the objectives panel's dark backdrop. Keep the existing banner, improve its legibility.
    - **J-home-controls [Codex, P2]:** Home's Controls entry opens keyboard/pad rebinding settings on touch, while Pause has a touch How to play guide. Route both entry points to the existing device guide without adding a dialog or loading the dive on Home.
    - Opening gallery hood/terraces and orange Titanic materials remain with V-bluehole and V-titanic below; no visual tuning in this repeat.
-2. **PARTLY DONE 2026-10-16 (ed62186 V-bluehole-3: ground banked behind hoods, chipped roof lip, uneven beds, ~3.4-3.6; left: roof still rolled tube, beds parallel, thin curtain edge) earlier: PARTLY DONE 2026-10-15 (gallery sponges removed, clear_ground scatter exclusion, lighter hood; ~3.2) V-bluehole remainder [Sonnet]; left: free-standing hood slab (terrain carve), slate-blue end walls, terrace banding** (hood grounded, ledge scatter removed, denser apron done; golden 2026-10-15-211537 still ~3: faceted terraces, bright flat sand shelf, floating rock/crystal scatter): east hood is a free-standing slab (needs terrain carve behind gallery seats), life exclusion over gallery footprints for floating purple corals, heavy side curtain. V-bluehole [Sonnet]:** weakest hero (2.5-3). Detached canopy/stalactite slab, terrain seams, floating stones in `great-blue-hole-east-3.png`; faceted terraces. Fix geometry/materials, not tuning.
-   Blue Hole follow-up: make `clear_ground` life exclusion survive late prop loading; existing sessile patches are never reconsidered. Numeric reproduction and scope: [S-verify-12](progress/2180-S-verify-12.md).
-3. **DONE 2026-10-15 (V-lostcity-2 merge; wall relief, vent paint on torn rim, High slope variety, ~3.8; left: Low-tier honeycomb needs a texture/normal fix) V-lostcity remainder [Sonnet, small]** (torn rims, wall relief done, ~3.5): smooth wall planes between ribs, vent throat keyed to old rim height, regular honeycomb pattern still visible on the Low-tier slope in after-low/lost-city-1.png) V-lostcity [Sonnet]:** towers are hollow, flat-rimmed tubes with a smooth collar (`lost-city-3.png`); add rim breakup and surface relief; remove the regular dimples on the flat slope.
-4. **PARTLY DONE 2026-10-15 (closer off-axis chase, brighter fill; hull ~37% of frame, ~3.5) V-endurance remainder [Sonnet]:** the facing guard keeps the sub between camera and hull, so the hull can't fill the frame. Next: a per-site chase aim in site data (camera aims at the hull independent of sub heading); shared camera change, keep `deepOpening` and `openingClearance1290` guards.
-5. **DONE 2026-10-15 (bd09bf1; chimney mesh smoother, per-site hullLight 0.2 at Beebe; sub still among the brighter objects, next would be a darker site hull tint) V-beebe remainder [Sonnet]:** stack is better but faceted and the sub is brightest; plumes good. Smooth chimney facets, dim sub specular in the vent glow.
-6. **DONE 2026-10-15 (hull grey-brown, rusticles/railings deeper brown; rust streaks subtle, needs shader) V-titanic palette remainder [Sonnet, small]:** hull peach-orange vs real grey-brown rust; close view still manufactured. Palette and plate variation only.
+2. **V-bluehole remainder [Sonnet]**, ~3.5 (2026-10-16 golden): ground banking, chipped lip and uneven beds done. Left: roof still reads as one rolled tube (break it into shelves/overhangs), beds run parallel, flat bright sand shelf, over-saturated blue fish. Geometry/materials, not tuning. Follow-up from [S-verify-12](progress/2180-S-verify-12.md): `clear_ground` exclusion should survive late prop loading.
+3. **V-beebe-stack [Sonnet]**, ~3.3: the chimney is smeared and one-tone brown with ragged stacked collars. Give it a chimney silhouette (tapering spire, mineral crust colour bands, hot-orange throat) rather than more smoothing.
+4. **V-challenger-lander [Sonnet]**, ~3.2: lander is a flat-shaded prop with glowing orange float spheres. Dull the floats (syntactic foam, not lamps), add frame thickness/detail and a bait-plate; the amphipod swarm is the reward.
+5. **V-endurance remainder [Sonnet]**, ~3.6: hull is the subject, but the sub vanishes in the pose. V-endurance-aim is parked (see In flight); take the camera-forward-of-sub approach or cut item 4 with the owner's nod.
+6. **V-lostcity-low [Sonnet, small]**: Low-tier honeycomb on the slope needs a texture/normal fix; High is ~3.6.
+6b. **V-monterey-floor [Sonnet, small]**, ~3.5: flat sand floor between boulders; add ripple/pebble variation using the existing sediment material.
 7. **S-manifest slices [Codex 2160]:** step 1 done (habitat). Migrate the next slices per `plan/progress/S-manifest.md` (inventory: 27 site-id expressions left); one slice per brief; golden unchanged.
 8. **S-render remainder [Codex]:** confirm the first nightly run passes and golden pixels are unchanged.
 
-9. **R-release [Haiku]:** f53 tagged 2026-10-15 on green CI (26b9892). Next tag f54 after the next completed green run.
+9. **R-release [Haiku]:** f54 tagged 2026-10-15 on green CI (04a1d8c). Next tag f55 after the next completed green run.
+
+10. **S-verify / S-bughunt [Codex, standing]:** after each batch of visual merges, a numeric/static verification (no site branches, no package numbers, `hullLight`/bank/footprint data paths, snapshot rebaselines justified) and a bug hunt over newly merged code. Queued: 2260 S-verify-13 (V-bluehole-3, V-lostcity-2, V-beebe-hull merges).
+
+11. **V-hero-set [Haiku, small]:** make the 1.0 table and `HERO_SITES` agree (Sol, 2026-10-16: the table counts Endurance, the code counts Monterey). Pick one set, update the table and golden poses; eight-site acceptance must then cover the other eight including Endurance mission spawn.
+12. **S-perf-stall [Codex 2270]:** `perf.frameMs` (`src/app/systems/quality.ts`) ignores every interval >=250 ms, so real stalls on a phone never lower quality or show in metrics. Separate hidden-tab gaps (document.hidden/visibility) from stalls and clamp stalls into the average; unit test by capability.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.
 

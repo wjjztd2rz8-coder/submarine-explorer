@@ -2,6 +2,34 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-16 comprehensive review, joint with Codex Sol (golden 2026-10-16-053027)
+
+Sol ran (Codex 5h 59%); one reconcile round, corrections checked against files.
+
+**Changed since the last review:** 5 Claude merges (V-titanic-palette-2, V-beebe-hull, V-lostcity-2, V-bluehole-3, plus f54 tag) and Codex 2170 J-journeys-repeat (guidance handoff fix), 2180 S-verify-12 (slope-aligned clear_ground), 2190 S-bughunt-9. All pushed; no full local e2e. Parked: V-endurance-aim.
+
+| Site       | Readable | Beautiful (Claude / Sol band) | Biggest gap                                                |
+| ---------- | -------- | ----------------------------- | ---------------------------------------------------------- |
+| Titanic    | 4        | 3.9 / 3.5-3.9 (up)            | repetitive plating, flat seabed in approach view           |
+| Beebe      | 4 (Sol 3.5-4) | 3.3 / 3-3.3              | smeared one-tone chimney with ragged collars; sub prominent in opening |
+| Blue Hole  | 3.5-4    | 3.5 / 3-3.5 (up)              | roof still a rolled tube, parallel beds, flat sand shelf   |
+| Lost City  | 4        | 3.6 / 3.3-3.6                 | thin hollow rims, broad planar surfaces; Low honeycomb     |
+| Monterey   | 4        | 3.5 / 3.5                     | flat floor, repetitive strata                              |
+| Challenger | 3.5      | 3.2 / 3.2                     | flat-shaded lander, glowing float blobs                    |
+| Endurance  | 4        | 3.6 / 3.3-3.6                 | sub absent in approach poses (first-person by design in 2-3; Sol: sub is visible in capture 1) |
+
+Disputed and left as bands: exact beauty scores (Titanic, Lost City, Endurance). Sol's note that Challenger is a non-hero, so material polish is not itself a 1.0 blocker (coherence only), is accepted; V-challenger-lander stays as a medium item.
+
+**Agreed stage:** about 80-81% to 1.0; four to six weeks. Adding coding capacity alone will not close the visual gap; art direction (Claude) is the bottleneck.
+
+**Sol's findings accepted (checked):** (1) `HERO_SITES` in `src/game/Cosmetics.ts` lists Monterey, not Endurance, while the 1.0 table counted Endurance: new item V-hero-set. (2) `perf.frameMs` drops every interval >=250 ms (`src/app/systems/quality.ts:108`), so real phone stalls never register: new Codex item S-perf-stall (2270). (3) 2170 does not close current-build journey acceptance (baseline predates main, desktop 1600x900, results pending): treated as "unverified", J-* sub-items stay open. (4) The efficiency idle totals extrapolate samples and are not causal accounting; there was also an orchestrator crash (PROCESS-LOG). (5) Eight-site acceptance still lacks Endurance. Claude had missed all five.
+
+**Process:** efficiency tool: Claude idle ~198 h at >=50% and Codex under-used ~181 h, mostly budget-gate skips (read as upper bounds). 2210 and 2220 have PASS results but their worktrees were not collected until now; 2200/2230 running. Golden takes ~9 min of the run budget. Queue: 2240, 2250 (S-manifest), 2260 (S-verify-13), 2270 (S-perf-stall).
+
+**New priorities:** Sonnet: V-bluehole remainder, V-beebe-stack, V-challenger-lander, V-endurance remainder, V-lostcity-low, V-monterey-floor, J-* P2s; Haiku: V-hero-set, R-release f55; Codex: S-manifest slices, S-verify-13, S-perf-stall, J-home-controls.
+
+**Needs owner:** real-phone Low-tier play (largest unverified 1.0 requirement); decide whether to drop V-endurance-aim item 4.
+
 ## 2026-10-15 late comprehensive review, Claude alone (golden 2026-10-15-211537)
 
 Sol skipped: Codex 5h was 2% (exit 0 "budget too low"). Findings are Claude's only; the eve joint review stands for what it covered.
