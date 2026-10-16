@@ -50,10 +50,10 @@ export function dynamicResolutionEnabled(
 
 export function createQualitySystem(): GameSystem<
   ShellContext,
-  { nowMs: number; frozen: boolean }
+  { nowMs: number; frozen: boolean; resumeFrame?: boolean }
 > {
   let dynres: DynamicResolution | null = null;
-  let lastNowMs = 0;
+  let lastNowMs: number | null = null;
   let frameMs = 0;
   return {
     name: 'quality',
@@ -102,11 +102,12 @@ export function createQualitySystem(): GameSystem<
     },
     frame: {
       'late.perf': (f, ctx) => {
-        const ms = lastNowMs ? f.nowMs - lastNowMs : 0;
+        const ms = lastNowMs === null ? 0 : Math.min(250, f.nowMs - lastNowMs);
         lastNowMs = f.nowMs;
-        // A hidden tab or a debugger pause is not a slow frame.
-        if (ms > 0 && ms < 250) frameMs = frameMs ? frameMs + (ms - frameMs) * 0.1 : ms;
-        if (!dynres || f.frozen) return;
+        // Exclude interrupted intervals; real stalls still count, with bounded influence.
+        if (f.frozen || f.resumeFrame || document.hidden || !(ms > 0)) return;
+        frameMs = frameMs ? frameMs + (ms - frameMs) * 0.1 : ms;
+        if (!dynres) return;
         const next = dynres.update(ms);
         if (next !== null) {
           ctx.renderer.setPixelRatio(next);
