@@ -70,8 +70,6 @@ The newest items go first.
 
 ## In flight
 
-- V-challenger-lander IN FLIGHT (Sonnet, 2026-10-16), worktree ../subexp-wt/V-challenger-lander.
-
 - Codex 2200/2220/2210 running (S-manifest-3, S-bughunt-10, S-render-confirm). No Claude package running.
 - V-endurance-aim parked 2026-10-15: branch claude/V-endurance-aim (worktree ../subexp-wt/V-endurance-aim, commit 5fa58fc) reached hull 45% but the sub is too large and dominant in frame; not merged (new shared camera code for a small gain). Needs the camera forward of the sub, or drop item 4.
 
@@ -91,7 +89,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
    - Opening gallery hood/terraces and orange Titanic materials remain with V-bluehole and V-titanic below; no visual tuning in this repeat.
 2. **V-bluehole remainder [Sonnet]**, ~3.5 (2026-10-16 golden): ground banking, chipped lip and uneven beds done. Left: roof still reads as one rolled tube (break it into shelves/overhangs), beds run parallel, flat bright sand shelf, over-saturated blue fish. Geometry/materials, not tuning. Follow-up from [S-verify-12](progress/2180-S-verify-12.md): `clear_ground` exclusion should survive late prop loading.
 3. **V-beebe-stack [Sonnet], DONE 2026-10-16 (merged; ~3.5, remainder open):** side stacks keep flat stump tops and the close pose washes beige under headlights (needs a lighting-side fix, not paint). Original: ~3.3: the chimney is smeared and one-tone brown with ragged stacked collars. Give it a chimney silhouette (tapering spire, mineral crust colour bands, hot-orange throat) rather than more smoothing.
-4. **V-challenger-lander [Sonnet]**, ~3.2: lander is a flat-shaded prop with glowing orange float spheres. Dull the floats (syntactic foam, not lamps), add frame thickness/detail and a bait-plate; the amphipod swarm is the reward.
+4. **V-challenger-lander [Sonnet], DONE 2026-10-16 (98ce6fd; ~3.6, remainder: faceted floats, pale frame under headlights):** was ~3.2: lander is a flat-shaded prop with glowing orange float spheres. Dull the floats (syntactic foam, not lamps), add frame thickness/detail and a bait-plate; the amphipod swarm is the reward.
 5. **V-endurance remainder [Sonnet]**, ~3.6: hull is the subject, but the sub vanishes in the pose. V-endurance-aim is parked (see In flight); take the camera-forward-of-sub approach or cut item 4 with the owner's nod.
 6. **V-lostcity-low [Sonnet, small]**: Low-tier honeycomb on the slope needs a texture/normal fix; High is ~3.6.
    6b. **V-monterey-floor [Sonnet, small]**, ~3.5: flat sand floor between boulders; add ripple/pebble variation using the existing sediment material.

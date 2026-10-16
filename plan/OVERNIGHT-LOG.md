@@ -1273,3 +1273,11 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Queued Codex:** 2240, 2250 (S-manifest), 2260 S-verify-13, 2270 S-perf-stall, 2280 S-render nightly (both nightly runs failed).
 - **Not done:** no Claude visual package launched this run (golden + review used the window); no tag.
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 03:26 CDT headless run 22 (Claude)
+
+- **CI triage:** run 21's only red shard was f-a11y home-menus (Home Controls now opens the controls card, not Settings); fixed the spec, pushed.
+- **Merged and pushed (each after smoke + project-base green; no full e2e):** Sonnet V-beebe-stack (tapered banded chimney, hot throat; ~3.5, close pose still washes beige under headlights), Sonnet V-challenger-lander (foam floats, braced frame, ballast, bait plate; ~3.6).
+- **Codex:** 5h at 2% (reset window), no tasks running; queue holds 2240, 2250, 2260, 2270, 2280, plus new 2290 S-verify-14. No tag (f55 waits for green CI on the newest main).
+- **Not done:** V-hero-set (needs a table decision: Endurance vs Monterey in the hero set), V-bluehole remainder, V-endurance-aim parked, V-lostcity-low, V-monterey-floor.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
