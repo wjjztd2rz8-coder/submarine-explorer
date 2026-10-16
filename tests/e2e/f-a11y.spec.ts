@@ -256,6 +256,24 @@ test('photo, HUD and debrief remain keyboard reachable with accessible contrast'
   );
 });
 
+test('completion banner keeps AA contrast over bright Blue Hole water', async ({ page }) => {
+  // Regression: cyan text on a translucent cyan fill was illegible over bright water.
+  await boot(page, '/?mission=great-blue-hole&tier=low&skipBriefing=1');
+  await page.evaluate(() => {
+    const game = window.__game as unknown as {
+      missionRouter: { showBanner(kind: 'primary'): void };
+    };
+    game.missionRouter.showBanner('primary');
+  });
+  const banner = page.locator('.obj-banner');
+  await expect(banner).toBeVisible();
+  await banner.evaluate((e) => Promise.all(e.getAnimations().map((a) => a.finished)));
+  const result = await withClockFrames(page, () =>
+    new AxeBuilder({ page }).include('.obj-banner').withRules(['color-contrast']).analyze(),
+  );
+  expect(result.violations).toEqual([]);
+});
+
 test('completion banner choices accept Tab, Shift+Tab and native keyboard activation', async ({
   page,
 }) => {
