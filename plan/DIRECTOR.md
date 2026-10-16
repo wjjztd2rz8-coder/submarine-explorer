@@ -60,7 +60,7 @@ Reviewers send work back if it breaks one of these:
 | Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                                 | R-release, R-ci-green                                                     |
 | No known blockers; the code is simple enough to keep changing safely                                                                                                                                                                      | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
-Stage (joint review with Sol, 2026-10-16): see plan/REVIEWS.md; about 81% to 1.0. Beautiful: Titanic 3.9, Lost City 3.6, Endurance 3.6, Blue Hole 3.5, Monterey 3.5, Beebe 3.3, Challenger 3.2. Top blockers: real-phone Low readability and performance (owner), Beebe/Challenger materials, Blue Hole roof, J-* P2 journey fixes, a completed green hosted CI on the release commit (f55).
+Stage (review 2026-10-16 second, Claude alone): about 82% to 1.0. Beautiful: Titanic 3.9, Monterey 3.8, Lost City 3.6, Blue Hole 3.6, Beebe 3.6, Challenger 3.6, Endurance 3.6. Top blockers: real-phone Low readability and performance (owner), Blue Hole roof, Titanic seabed, J-* P2 journey fixes.
 
 ## Needs owner
 
@@ -70,39 +70,25 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running. Codex 2240, 2250, 2290 running; queue 2300-2320.
-- V-endurance-aim parked 2026-10-15: branch claude/V-endurance-aim (worktree ../subexp-wt/V-endurance-aim, commit 5fa58fc) reached hull 45% but the sub is too large and dominant in frame; not merged (new shared camera code for a small gain). Needs the camera forward of the sub, or drop item 4.
+- No Claude package running. Codex nothing running (5h at 3%, resets 10:15); queue 2300 S-verify-15, 2310 J-home-controls, 2320 S-bughunt-16, 2330 S-manifest next slice.
+- V-endurance-aim parked 2026-10-15: branch claude/V-endurance-aim (worktree ../subexp-wt/V-endurance-aim, commit 5fa58fc) reached hull 45% but the sub is too large and dominant in frame; not merged. See V-endurance-frame below.
 
 ## Backlog
 
-One list, ordered by player impact and dependencies. Lane is in brackets. "After X" means don't start until X is merged. Evidence: joint review 2026-10-15 eve in `plan/REVIEWS.md`.
+One list, ordered by player impact and dependencies. Lane is in brackets. Evidence: review 2026-10-16 (second) in `plan/REVIEWS.md`; DONE items from earlier lists were removed at this review (history in git and `plan/progress/`).
 
-1. **J-journeys-repeat [Codex 2170, then Sonnet judges], DONE 2026-10-16 (merged; sub-items below open):** repeat the unaided Titanic and Blue Hole journeys (Home, pick, first 60 s, reward, next objective, Journal, debrief) on the merged build at desktop, portrait and landscape. Evidence and severity table: [progress/J-journeys-repeat.md](progress/J-journeys-repeat.md); screenshots `.cache/codex/shots/2170/`.
-   - **J-guidance-handoff [Codex, fixed; verification in progress]:** a logged contact can withhold the next objective/turn after the reward. Keep the reward, then let the outstanding objective lead; retain the logged-contact confirmation without a mission objective.
-   - **J-contact-choice [Sonnet, P2]:** review scan-card identity when a nearby curiosity/optional contact competes with the mission objective (memorial/debris versus stern), and wildlife rewards interrupt the next-gallery directions; distinguish scan counts from mission objectives.
-   - **J-picker-density [Sonnet, P3]:** simplify the long site-card list and make Blue Hole easier to identify under its Lighthouse Reef title.
-   - **J-desktop-repetition [Sonnet, P3]:** review repeated destination/turn information in the card, mission block and waypoint; consolidate through existing HUD regions.
-   - **J-journal-preview [Sonnet, P2]:** review tall portrait captures pushing entry text below the fold, repeated memorial text and captures that show the bow under a debris-field entry. The Journal now has images; the older text-only finding is resolved.
-   - **J-atoll-transit [Sonnet, P2] DONE 2026-10-16 (9deb960):** explain the jump from two nearby galleries to optional atoll targets more than 4 km away, especially before the debrief's invitation to finish them for two stars.
-   - **J-completion-contrast [Sonnet, P2], DONE 2026-10-16 (86bee20):** the primary-completion banner has cyan text over a translucent cyan fill on bright Blue Hole water; touch removes the objectives panel's dark backdrop. Keep the existing banner, improve its legibility.
-   - **J-home-controls [Codex, P2]:** Home's Controls entry opens keyboard/pad rebinding settings on touch, while Pause has a touch How to play guide. Route both entry points to the existing device guide without adding a dialog or loading the dive on Home.
-   - Opening gallery hood/terraces and orange Titanic materials remain with V-bluehole and V-titanic below; no visual tuning in this repeat.
-2. **V-bluehole remainder [Sonnet] (roof shelves + bed spacing + tang merged 2026-10-16, ~3.7; roof still reads as a slab from the east pose, see progress/V-bluehole-roof.md)**, ~3.5 (2026-10-16 golden): ground banking, chipped lip and uneven beds done. Left: roof still reads as one rolled tube (break it into shelves/overhangs), beds run parallel, flat bright sand shelf, over-saturated blue fish. Geometry/materials, not tuning. Late-loading `clear_ground` exclusion fixed in [S-verify-13](progress/2260-S-verify-13.md).
-3. **V-beebe-stack [Sonnet], DONE 2026-10-16 (merged; ~3.5, remainder open):** side stacks keep flat stump tops and the close pose washes beige under headlights (needs a lighting-side fix, not paint). Original: ~3.3: the chimney is smeared and one-tone brown with ragged stacked collars. Give it a chimney silhouette (tapering spire, mineral crust colour bands, hot-orange throat) rather than more smoothing.
-4. **V-challenger-lander [Sonnet], DONE 2026-10-16 (98ce6fd; ~3.6, remainder: faceted floats, pale frame under headlights):** was ~3.2: lander is a flat-shaded prop with glowing orange float spheres. Dull the floats (syntactic foam, not lamps), add frame thickness/detail and a bait-plate; the amphipod swarm is the reward.
-5. **V-endurance remainder [Sonnet]**, ~3.6: hull is the subject, but the sub vanishes in the pose. V-endurance-aim is parked (see In flight); take the camera-forward-of-sub approach or cut item 4 with the owner's nod.
-6. **V-lostcity-low [Sonnet, small], DONE 2026-10-16 (e89dc28; far mip bias 5 by 25 m)**: was Low-tier honeycomb on the slope needs a texture/normal fix; High is ~3.6.
-   6b. **V-monterey-floor [Sonnet, small], DONE 2026-10-16 (2947c7f; ~3.8):** was ~3.5: flat sand floor between boulders; add ripple/pebble variation using the existing sediment material.
-7. **S-manifest slices [Codex 2160]:** step 1 done (habitat). Migrate the next slices per `plan/progress/S-manifest.md` (inventory: 27 site-id expressions left); one slice per brief; golden unchanged.
-8. **S-render remainder [Codex 2280] (merged 2026-10-16, awaiting hosted nightly):** the nightly workflow failed on both scheduled runs (38574704463, 38743060407; ~1.5 h each, exit 1 after golden/perf steps; artifacts exist) and 2210 found exact golden identity fails. Diagnose from `gh run view <id> --log-failed` and the artifacts, fix the workflow or its thresholds, and make golden comparison use a justified tolerance.
-   Implementation and evidence: [progress/2280-S-render-nightly.md](progress/2280-S-render-nightly.md). Hosted confirmation remains pending; a green diagnostic workflow does not establish visual acceptance.
-
-9. **R-release [Haiku]:** f54 tagged 2026-10-15 on green CI (04a1d8c). Next tag f55 after the next completed green run.
-
-10. **S-verify / S-bughunt [Codex, standing]:** after each batch of visual merges, a numeric/static verification (no site branches, no package numbers, `hullLight`/bank/footprint data paths, snapshot rebaselines justified) and a bug hunt over newly merged code. Latest: [2260 S-verify-13](progress/2260-S-verify-13.md) audits V-bluehole-3, V-lostcity-2 and V-beebe-hull; late-prop life exclusion fixed, no new simplicity violation or masked numeric regression found. Browser verification remains environment-blocked.
-
-11. **V-hero-set [Haiku, small], DONE 2026-10-16 (table follows the code; HERO_SITES unchanged, so saves are unaffected):** make the 1.0 table and `HERO_SITES` agree (Sol, 2026-10-16: the table counts Endurance, the code counts Monterey). Pick one set, update the table and golden poses; eight-site acceptance must then cover the other eight including Endurance mission spawn.
-12. **S-perf-stall [Codex 2270] DONE 2026-10-16 (merged this run):** `perf.frameMs` (`src/app/systems/quality.ts`) ignores every interval >=250 ms, so real stalls on a phone never lower quality or show in metrics. Separate hidden-tab gaps (document.hidden/visibility) from stalls and clamp stalls into the average; unit test by capability.
+1. **V-bluehole-roof-2 [Sonnet]**, ~3.6: from the east pose the roof is still one rolled slab with a uniform thick rim and a flat blue-green pool; stalactites are the only relief. Vary roof thickness along the rim, add two or three overhang notches and drop-offs, tilt the beds so they do not run parallel, and break the flat sand shelf with the existing sediment material. Geometry, not tuning. Evidence: [progress/V-bluehole-roof.md](progress/V-bluehole-roof.md), golden `great-blue-hole-east-2.png`.
+2. **V-titanic-seabed [Sonnet]**, ~3.9: hull now reads as a wreck; the approach view is a flat dark brown plane with a few sparse plants. Add sediment ripples, a debris trail and scour around the hull using the existing sediment material (as V-monterey-floor did). Hull plating repetition is the second gap.
+3. **V-beebe-lighting [Sonnet]**, ~3.6 (up from 3.3): the chimney is now orange-brown with collars and reads; side stacks still have flat stump tops and the close pose washes beige under headlights. Fix on the lighting side (`hullLight`/spot falloff), not paint; give side stacks the same tapered tops.
+4. **V-challenger-floats [Sonnet, small]**, ~3.6: floats are faceted and the frame pale under headlights; swap to a smooth dull syntactic-foam material and darken the frame. Non-hero, so cap at one package.
+5. **V-lostcity-rims [Sonnet]**, ~3.6: thin hollow tower rims and broad planar surfaces; the middle ground slope is smeared. Thicken rims, add crust ledges.
+6. **V-endurance-frame [Sonnet]**: the opening pose is fine (sub and wreck both visible, 3.6) but the parked aim branch broke the framing. Decide with the owner whether to drop; otherwise move the camera forward of the sub only for the mission spawn, as data in the site's opening pose, with no shared camera code.
+7. **J-contact-choice [Sonnet, P2], J-journal-preview [Sonnet, P2], J-picker-density [Sonnet, P3], J-desktop-repetition [Sonnet, P3]:** from [progress/J-journeys-repeat.md](progress/J-journeys-repeat.md). One package each, in that order. J-contact-choice: scan-card identity when a curiosity competes with the mission objective. J-journal-preview: tall portrait captures pushing text below the fold, repeated memorial text. J-picker-density: shorten the site-card list; Blue Hole under its Lighthouse Reef title. J-desktop-repetition: destination/turn information repeated in card, mission block and waypoint.
+8. **J-home-controls [Codex 2310, P2]:** Home's Controls entry opens rebinding settings on touch; route it to the existing device guide.
+9. **S-manifest slices [Codex 2330]:** migrate the next slice per `plan/progress/S-manifest.md` (site-id expressions left: recount); one slice per brief; golden unchanged.
+10. **S-verify / S-bughunt [Codex, standing]:** 2300 S-verify-15 and 2320 S-bughunt-16 queued. After each batch of visual merges, verify numerics/simplicity rules and hunt bugs in newly merged code.
+11. **S-render hosted confirmation [Haiku, small]:** the nightly workflow (S-render, merged 2026-10-16) is still running; on its next completed run, confirm green or log the failing step. No new work unless it fails.
+12. **R-release [Haiku]:** f55 tagged 2026-10-16. Next tag after the next completed green CI on a main commit with visual merges.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.
 

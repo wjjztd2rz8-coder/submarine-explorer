@@ -225,3 +225,7 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 ## 2026-10-16
 
 - Comprehensive review: Codex finished 2210/2220 but nobody collected them for a run; collection is step 1 of every run, so no change except noting it. Efficiency idle totals are sample extrapolations (Sol), reported as upper bounds. Added standing Codex item S-verify/S-bughunt so a verification brief is always queued after visual merges.
+
+## 2026-10-16 (second review)
+
+- Codex 5h at 3% all morning made a joint review impossible; review ran Claude alone. No tooling change: the budget gate is working as designed, and Claude carries visual work while Codex recovers. Queue refilled to four small briefs so Codex starts when it resets (10:15).

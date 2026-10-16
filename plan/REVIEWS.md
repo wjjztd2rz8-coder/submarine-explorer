@@ -2,6 +2,32 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-16 (second) comprehensive review, Claude alone (golden 2026-10-16-135921)
+
+Sol skipped: Codex 5h was 3% (below the 5% floor; resets 10:15). Findings are Claude's only; the morning joint review stands for what it covered.
+
+**Changed since the last review (9 merges, all pushed, smoke + project-base each; no full local e2e):** Claude V-beebe-stack, V-challenger-lander, V-lostcity-low, V-monterey-floor, V-hero-set, V-bluehole-roof, J-atoll-transit, J-completion-contrast; Codex S-perf-stall, S-render, S-verify-14, S-verify-13, S-manifest scatter keepout and atmosphere policy; f55 tagged on green CI.
+
+| Site       | Readable | Beautiful    | Biggest gap                                                                                       |
+| ---------- | -------- | ------------ | ------------------------------------------------------------------------------------------------- |
+| Titanic    | 4        | 3.9          | flat dark seabed in the approach view; plating repetition                                         |
+| Beebe      | 4        | 3.6 (up 0.3) | chimney now has orange-brown collars and reads; side stack tops flat, beige wash under headlights |
+| Blue Hole  | 3.5-4    | 3.6 (up 0.1) | roof still a uniform slab from the east pose; flat pool and sand                                  |
+| Lost City  | 4        | 3.6          | thin hollow rims, smeared mid slope                                                               |
+| Monterey   | 4        | 3.8 (up 0.3) | wall strong, floor now varied; sub placement in the pose is the only nit                          |
+| Challenger | 3.5-4    | 3.6 (up 0.4) | lander has a frame, bait plate and swarm; floats faceted, frame pale                              |
+| Endurance  | 4        | 3.6          | sub large in the frame; parked aim branch                                                         |
+
+**Play:** no new flow captures this run (2170 evidence stands); P2s remain J-contact-choice and J-journal-preview.
+
+**Stage:** about 82% to 1.0; four to six weeks stays, bound by art direction and the unverified real-phone check. No hero is at 4 yet; Titanic (3.9) and Monterey (3.8) are closest.
+
+**Process:** efficiency: Claude idle ~203 h at >=50%, Codex under-used ~182 h, both from budget-gate skips (upper bounds, not causal). Codex is the binding constraint (5h 3%, weekly 9%), so Claude carries the visual backlog and Codex gets only small briefs. Golden took 7.5 min. Hosted CI for the latest main still queued; nightly diagnostic in progress.
+
+**New priorities:** Sonnet: V-bluehole-roof-2, V-titanic-seabed, V-beebe-lighting, J-contact-choice, J-journal-preview, V-lostcity-rims; Haiku: V-challenger-floats, S-render confirmation; Codex: 2300 S-verify-15, 2310 J-home-controls, 2320 S-bughunt-16, 2330 S-manifest.
+
+**Needs owner:** real-phone Low-tier play; decide whether to drop the parked V-endurance-aim branch.
+
 ## 2026-10-16 comprehensive review, joint with Codex Sol (golden 2026-10-16-053027)
 
 Sol ran (Codex 5h 59%); one reconcile round, corrections checked against files.
