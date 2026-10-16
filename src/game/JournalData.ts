@@ -6,7 +6,7 @@
  * `ui/Journal.ts`.
  *
  * Unlocks read the discovery store (`subexplorer.discoveries.v1`, unchanged):
- * - a site unlocks when any of its POIs has been scanned;
+ * - a site unlocks when any of its targets or wildlife has been scanned;
  * - a POI entry unlocks when a POI that points at it has been scanned;
  * - a site-level guide entry (no POI points at it) unlocks with the site;
  * - a species unlocks only through a documented linkage: a POI entry whose
@@ -370,12 +370,14 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
   return site;
 }
 
-/** A site unlocks when any of its POIs has been scanned. */
+/** Any logged target or animal opens the site page containing its Journal entry. */
 export function isSiteUnlocked(site: JournalSite, store: DiscoveryReader): boolean {
   return (
     site.poiIds.some((p) => store.isDiscovered(site.id, p)) ||
     site.entries.some(
-      (e) => e.kind === 'secret' && e.poiIds.some((p) => store.isDiscovered(site.id, p)),
+      (e) =>
+        (e.kind === 'secret' && e.poiIds.some((p) => store.isDiscovered(site.id, p))) ||
+        (e.kind === 'life' && store.isDiscovered(site.id, lifeDiscoveryId(e.id))),
     )
   );
 }
