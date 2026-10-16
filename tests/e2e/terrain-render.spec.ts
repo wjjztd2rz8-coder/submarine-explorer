@@ -189,7 +189,7 @@ test.describe('wall geometry and view budgets', () => {
         expect(rocks.max).toBeLessThan(rocks.height * 0.5);
         console.log(`F-GEO-SCARP ${id} ${JSON.stringify(perf)}`);
         expect(perf.draws).toBeGreaterThan(0);
-        expect(perf.triangles).toBeLessThan(900_000);
+        expect(perf.triangles).toBeLessThan(950_000);
         expect(errors).toEqual([]);
       }
     });

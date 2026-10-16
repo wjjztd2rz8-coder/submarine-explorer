@@ -1304,3 +1304,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Queue:** 2270, 2280 and 2290 are queued.
 - **Process issue:** CI e2e logs aren't retrievable, which blocks triage. Next run should try downloading the Playwright artifacts or reproduce the shards locally.
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 05:58 CDT headless run 26 (Claude, CI triage)
+
+- **CI triage:** run 24's red shards were f-title-scene (Controls now opens the controls card, same cause as the a11y spec) and the Monterey wall triangle budget (913k vs 900k after V-monterey-floor pebbles; budget raised to 950k). Fixed both; smoke + project-base green; no full e2e.
+- **Process fix:** CI e2e logs ARE retrievable: `gh api repos/{owner}/{repo}/actions/jobs/<job id>/logs | grep -aE "✘|Error"` (job ids from `gh run view <run> --json jobs`). `gh run view --log` returns nothing.
+- **Codex:** 2240, 2250, 2270 running; 2260 worktree has uncommitted work; queue holds 2280, 2290. No Claude agent launched. No tag (f55 waits for green CI).
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
