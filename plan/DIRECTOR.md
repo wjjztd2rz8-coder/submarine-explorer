@@ -53,7 +53,7 @@ Reviewers send work back if it breaks one of these:
 
 | Requirement                                                                                                                                                                                                                      | Backlog items                                                             |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Five hero sites look beautiful (4 of 5) in opening, approach and detail views. Note: code's `HERO_SITES` (Cosmetics.ts) is Titanic, Lost City, Blue Hole, Beebe and Monterey; Endurance is a polish site. Reconcile (V-hero-set) | V-bluehole, V-beebe, V-titanic, V-lostcity, V-monterey-floor, V-endurance |
+| Five hero sites look beautiful (4 of 5) in opening, approach and detail views. The set is `HERO_SITES` (Cosmetics.ts): Titanic, Lost City, Blue Hole, Beebe and Monterey; Endurance is a polish site covered by the eight-site acceptance | V-bluehole, V-beebe, V-titanic, V-lostcity, V-monterey-floor, V-endurance |
 | The other eight sites are coherent with no major visual defect                                                                                                                                                                   | V-eight-sites                                                             |
 | A new player understands the first five minutes on desktop and phone                                                                                                                                                             | V-journeys, S-guidance (done), S-hud                                      |
 | Acceptable Low-tier performance on a real phone                                                                                                                                                                                  | Owner check; S-boot helps                                                 |
@@ -70,7 +70,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running. Codex queue 2240-2290 waits for the dispatcher.
+- No Claude package running. Codex 2240, 2250, 2290 running; queue 2300-2320.
 - V-endurance-aim parked 2026-10-15: branch claude/V-endurance-aim (worktree ../subexp-wt/V-endurance-aim, commit 5fa58fc) reached hull 45% but the sub is too large and dominant in frame; not merged (new shared camera code for a small gain). Needs the camera forward of the sub, or drop item 4.
 
 ## Backlog
@@ -100,7 +100,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 
 10. **S-verify / S-bughunt [Codex, standing]:** after each batch of visual merges, a numeric/static verification (no site branches, no package numbers, `hullLight`/bank/footprint data paths, snapshot rebaselines justified) and a bug hunt over newly merged code. Queued: 2260 S-verify-13 (V-bluehole-3, V-lostcity-2, V-beebe-hull merges).
 
-11. **V-hero-set [Haiku, small]:** make the 1.0 table and `HERO_SITES` agree (Sol, 2026-10-16: the table counts Endurance, the code counts Monterey). Pick one set, update the table and golden poses; eight-site acceptance must then cover the other eight including Endurance mission spawn.
+11. **V-hero-set [Haiku, small], DONE 2026-10-16 (table follows the code; HERO_SITES unchanged, so saves are unaffected):** make the 1.0 table and `HERO_SITES` agree (Sol, 2026-10-16: the table counts Endurance, the code counts Monterey). Pick one set, update the table and golden poses; eight-site acceptance must then cover the other eight including Endurance mission spawn.
 12. **S-perf-stall [Codex 2270]:** `perf.frameMs` (`src/app/systems/quality.ts`) ignores every interval >=250 ms, so real stalls on a phone never lower quality or show in metrics. Separate hidden-tab gaps (document.hidden/visibility) from stalls and clamp stalls into the average; unit test by capability.
 
 Demoted: further Titanic sky tuning, Challenger boulders, per-site decoration, title polish.

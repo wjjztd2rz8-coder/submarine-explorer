@@ -1318,3 +1318,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 2240, 2250, 2280 running (2260 and 2270 worktrees hold uncommitted work); queue holds 2290, 2300. No tag (f55 waits for green CI; run 25/26 CI pending).
 - **Not done:** other J-* items, V-bluehole remainder, V-hero-set; V-endurance-aim parked.
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 06:46 CDT headless run 28 (Claude, light)
+
+- **Tagged and pushed f55** on e142419 (hosted CI green; Pages deploy green). Run 27's CI was still queued.
+- **Merged:** V-hero-set (docs only: the 1.0 table now follows `HERO_SITES`; Endurance stays a polish site). No Claude agent launched (budget ~53%, V-bluehole remainder would risk the 23% kill line).
+- **Codex:** 2240, 2250, 2290 running (2260/2270/2280 worktrees hold uncommitted work, tasks finished; collect next run). Queue: 2300, 2310 J-home-controls, 2320 bughunt.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
