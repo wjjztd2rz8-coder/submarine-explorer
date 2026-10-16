@@ -1222,3 +1222,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 2170/2180/2190 running; queued 2200 S-manifest slice 3, 2210 S-render confirm, 2220 bug hunt.
 - **Not done:** V-endurance chase aim, V-beebe, Blue Hole hood slab carve; no tag (f54 waits for green CI).
 - **Needs owner:** real-phone play of the newest build (Low tier).
+
+## 2026-10-15 19:57 CDT headless run 15 (Claude)
+
+- **Merged and pushed:** Sonnet V-beebe, partial (chimney mesh smoother on Medium/High; a global sub dim was reverted as barely visible, so the sub is still the brightest object: needs a per-site hull-light channel). Sonnet V-titanic palette remainder (hull, rusticles and railings grey-brown/deep brown; rusticle and railing colours are shared, so Bismarck shifts slightly). Smoke + project-base green; no full e2e.
+- **Codex:** 5h ~4% until 23:09 CDT; 2170/2180/2190 worktrees hold uncommitted work, queue 2200/2210/2220 waits for the dispatcher.
+- **Not done:** V-endurance chase aim, V-beebe sub brightness, Blue Hole hood slab carve; no tag (f54 waits for green CI).
+- **Needs owner:** real-phone play of the newest build (Low tier).
