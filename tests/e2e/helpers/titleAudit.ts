@@ -79,7 +79,7 @@ export function titleAudit(base = '/') {
     }
     for (const [name, selector] of [
       ['Settings', '.settings'],
-      ['Controls', '.settings'],
+      ['Controls', '.controls-card'],
       ['Journal', '.journal'],
     ]) {
       const origin = menu.getByRole('button', { name, exact: true });
