@@ -331,3 +331,23 @@ it('retains a close portrait arm through zoom, free look, rotation and reset', (
   rig.snap(position, 0.7, 0);
   expect(rig.camera.position.distanceTo(position)).toBeCloseTo(defaultRadius, 8);
 });
+
+it('a chase aim moves the look-at point without moving the eye or changing the default aim', () => {
+  // Guards close openings whose hero lies off the sub's heading: the aim must
+  // reframe the view, and sites without one keep the stock look-at.
+  const pos = new Vector3(0, -3000, 0);
+  const rig = new CameraRig(cam, 16 / 9, flatSeabed(-3100));
+  rig.snap(pos, 0, 0);
+  const eye = rig.camera.position.clone();
+  const dir = rig.camera.getWorldDirection(new Vector3());
+  rig.setChaseRadiusDefault(undefined, 0, 0, undefined, { x: 0, y: 0, z: 0 });
+  rig.snap(pos, 0, 0);
+  expect(rig.camera.getWorldDirection(new Vector3()).angleTo(dir)).toBeCloseTo(0, 8);
+  rig.setChaseRadiusDefault(undefined, 0, 0, undefined, { x: 30, y: -20, z: 40 });
+  rig.snap(pos, 0, 0);
+  expect(rig.camera.position.distanceTo(eye)).toBeCloseTo(0, 8);
+  expect(rig.camera.getWorldDirection(new Vector3()).angleTo(dir)).toBeGreaterThan(0.05);
+  rig.setChaseRadiusDefault();
+  rig.snap(pos, 0, 0);
+  expect(rig.camera.getWorldDirection(new Vector3()).angleTo(dir)).toBeCloseTo(0, 8);
+});

@@ -235,6 +235,7 @@ exports[`Challenger / Endurance opening > challenger-deep high: safe hull, visib
     },
   ],
   "pose": {
+    "chaseAim": undefined,
     "chaseOffsetX": -28,
     "chaseOffsetY": -10,
     "chaseRadius": 48,
@@ -380,6 +381,7 @@ exports[`Challenger / Endurance opening > challenger-deep low: safe hull, visibl
     },
   ],
   "pose": {
+    "chaseAim": undefined,
     "chaseOffsetX": -28,
     "chaseOffsetY": -10,
     "chaseRadius": 48,
@@ -630,6 +632,7 @@ exports[`Challenger / Endurance opening > challenger-deep medium: safe hull, vis
     },
   ],
   "pose": {
+    "chaseAim": undefined,
     "chaseOffsetX": -28,
     "chaseOffsetY": -10,
     "chaseRadius": 48,
@@ -695,9 +698,14 @@ exports[`Challenger / Endurance opening > endurance high: safe hull, visible tar
     },
   ],
   "pose": {
-    "chaseOffsetX": -45,
+    "chaseAim": {
+      "x": 14,
+      "y": -27,
+      "z": 30,
+    },
+    "chaseOffsetX": -60,
     "chaseOffsetY": -34,
-    "chaseRadius": 50,
+    "chaseRadius": 34,
     "portraitChaseOffset": {
       "radius": 50,
       "x": 0,
@@ -746,9 +754,14 @@ exports[`Challenger / Endurance opening > endurance low: safe hull, visible targ
     },
   ],
   "pose": {
-    "chaseOffsetX": -45,
+    "chaseAim": {
+      "x": 14,
+      "y": -27,
+      "z": 30,
+    },
+    "chaseOffsetX": -60,
     "chaseOffsetY": -34,
-    "chaseRadius": 50,
+    "chaseRadius": 34,
     "portraitChaseOffset": {
       "radius": 50,
       "x": 0,
@@ -812,9 +825,14 @@ exports[`Challenger / Endurance opening > endurance medium: safe hull, visible t
     },
   ],
   "pose": {
-    "chaseOffsetX": -45,
+    "chaseAim": {
+      "x": 14,
+      "y": -27,
+      "z": 30,
+    },
+    "chaseOffsetX": -60,
     "chaseOffsetY": -34,
-    "chaseRadius": 50,
+    "chaseRadius": 34,
     "portraitChaseOffset": {
       "radius": 50,
       "x": 0,
