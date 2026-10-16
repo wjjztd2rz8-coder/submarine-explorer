@@ -1237,3 +1237,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** no tasks running, 5h at 2% until 23:09 CDT; 2170/2180/2190 worktrees hold uncommitted work and queue 2200/2210/2220 waits for the dispatcher.
 - **Not done:** V-beebe sub brightness, Blue Hole hood slab carve.
 - **Needs owner:** real-phone play of the newest build (Low tier); decide whether to drop endurance item 4.
+
+## 2026-10-15 22:11 CDT headless run 17 (Claude)
+
+- **Merged and pushed:** Sonnet V-beebe-hull (per-site `hullLight` vent-preset channel to vehicle materials; Beebe 0.2, others 1; sub dimmer but still among the brighter objects). Smoke + project-base green; no full e2e.
+- **Codex:** 5h 2% until 23:09 CDT; 2170/2180/2190 worktrees hold uncommitted work, queue 2200/2210/2220 waits for the dispatcher. No tag (f55 waits for green CI).
+- **Not done:** Blue Hole hood slab carve; V-endurance-aim parked.
+- **Needs owner:** real-phone play of the newest build (Low tier).
