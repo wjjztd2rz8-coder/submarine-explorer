@@ -130,7 +130,7 @@
     }
   },
   "atmosphere": {
-    "lamps": { "intensity": 0.55, "distance": 1, "fillIntensity": 0.6, "fillDistance": 1 },
+    "lamps": { "intensity": 0.45, "distance": 1, "fillIntensity": 0.35, "fillDistance": 1 },
     "tiers": {
       "low": {
         "depthM": -200,

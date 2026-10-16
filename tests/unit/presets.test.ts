@@ -429,7 +429,7 @@ describe('per-site vehicle light', () => {
         });
         try {
           await system.ready;
-          const expected = site === 'beebe-vent-field' ? 0.2 : 1;
+          const expected = site === 'beebe-vent-field' ? 0.27 : 1;
           for (let frame = 0; frame < 3; frame++) {
             const sample = atmosphere.update(position.y, position, 1 / 60);
             expect(sample.hullLight).toBe(1);
