@@ -15,6 +15,6 @@ def left(s,k):
 print(left("claude","five_hour") or "-",left("claude","seven_day") or "-",left("codex","five_hour") or "-",left("codex","seven_day") or "-")')
 # Review runs start with "THIS RUN IS A ..." not "Resume Submarine", so match the flag, not the prompt.
 run=$({ pgrep -f 'claude -p .*--permission-mode bypassPermissions' >/dev/null || [[ -f .cache/orchestrator.active ]]; } && echo 1 || echo 0)
-cr=$(systemctl --user list-units --type=service --state=running --no-legend 'subexp-*' | awk '{print $1}' | grep -vc '^subexp-resume')
+cr=$(systemctl --user list-units --type=service --state=running --no-legend 'subexp-*' | awk '{print $1}' | grep -vEc '^subexp-(resume|tick)')
 q=$(ls .cache/codex/queue/*.md 2>/dev/null | wc -l)
 echo "$(date '+%F %H:%M'),$c5,$c7,$x5,$x7,$run,$cr,$q" >> $f

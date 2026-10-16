@@ -229,3 +229,13 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 ## 2026-10-16 (second review)
 
 - Codex 5h at 3% all morning made a joint review impossible; review ran Claude alone. No tooling change: the budget gate is working as designed, and Claude carries visual work while Codex recovers. Queue refilled to four small briefs so Codex starts when it resets (10:15).
+
+## 2026-10-16 10:20: workflow audit (interactive, owner-delegated)
+
+- **Codex spent its week in ~29 h.** The weekly window went from 85% to 9% between 04:36 Oct 15 and 07:15 Oct 16, because the dispatcher only checked the 5h window (weekly ≥ 8%), which shut the lane for 6 days. The owner used a Codex reset. Change: `codex-dispatch.sh` paces the week (weekly left ≥ 8 + 92·days/7 − 15: a 15% head start, then roughly linear). The prompt no longer lets runs launch Codex around the dispatcher.
+- **Claude's week was on track to run dry ~4 days early** (31% in 27 h). The old 1.5%/day reserve was too loose. Change: the `resume.sh` gate needs weekly left ≥ 7 + 93·days/7 − 20 (a 20% head start, then linear). Runs will skip more often; that is intended.
+- **Dispatch and sampling stopped during every headless run.** `subexp-resume.service` is a oneshot, and its timer can't fire while a run is active (runs last 30–90 min), so neither Codex dispatch nor `usage.csv` sampling ran then. Change: a new `subexp-tick.timer`/`.service` in `~/.config/systemd/user/` (outside the repo) runs `usage-sample.sh; codex-dispatch.sh` every 15 min; `resume.sh` no longer calls them. Unit-count filters exclude `subexp-tick` as well as `subexp-resume`.
+- **Every successful headless run showed as failed in systemd** (26 in 24 h). The run deletes `.cache/orchestrator.active` itself; the last line of `resume.sh` then returned grep's exit 2. That made the 2026-10-13 "failed timer runs must be visible" guard useless. Fixed. `efficiency.sh` now counts failed timer runs over 24 h.
+- **The efficiency report was lifetime-only** ("204 h idle"), so it couldn't be acted on. It now reports 24 h and 7 d windows, plus weekly burn and run-out per side, which would have flagged the Codex burn a day earlier.
+- **Review rule:** judge visual packages from screenshots, not the agent's self-rating. After a low-gain second pass, rewrite the brief around a target composition (added to RESUME-PROMPT §3).
+- **Cleanup:** cleared five stale failed Codex units. Dropped V-endurance-aim: its worktree and branch are removed, and the work is kept as tag `parked/V-endurance-aim` (5fa58fc). DIRECTOR item 6 should be marked CUT by the next run (run 32 had DIRECTOR.md open).

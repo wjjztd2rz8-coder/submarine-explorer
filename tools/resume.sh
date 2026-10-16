@@ -9,9 +9,9 @@ mkdir -p .cache
 # Never run two timed sessions at once (a long run may overlap the next hour).
 exec 9>.cache/resume.lock
 flock -n 9 || { echo "another resume run is active; exiting"; exit 0; }
-# Cheap every tick (no Claude): record metrics and dispatch queued Codex briefs.
-tools/usage-sample.sh 2>/dev/null || true
-tools/codex-dispatch.sh > /dev/null 2>&1 || true
+# Metrics and Codex dispatch run from subexp-tick.timer (every 15 min): here
+# they were skipped for the whole of every headless run, since a oneshot
+# service that is still active swallows its timer's ticks.
 log_skip() { echo "- $(date '+%Y-%m-%d %H:%M %Z') headless run: skipped: $1" >> .cache/skips.log; }
 # Skip cheaply (without starting Claude) when another orchestrator is active or
 # the budget floors (owner: Claude 5h >=20%, Codex 5h >=5%, weekly >=5%) are hit.
@@ -28,12 +28,12 @@ def left(k):
     w=c.get(k) or {}
     if "used" not in w: return -1
     return 100 if w.get("resets_at") and w["resets_at"]<now else 100-w["used"]
-# Weekly pacing: keep 7% (watchdog floor) plus ~1.5% per day left before
-# the weekly reset, so the week is spread out instead of spent by day 2
-# (2026-10-04: 18% left with 4 days to go).
+# Weekly pacing: a 20% head start, then roughly linear spend to the 7%
+# floor. The old 1.5%/day reserve let 2026-10-15/16 burn 31% in 27 h, on
+# track to run dry ~4 days before the reset.
 w=c.get("seven_day") or {}
-days=max(0,(w.get("resets_at") or now)-now)/86400
-sys.exit(0 if left("five_hour")>=50 and left("seven_day")>=max(10,7+1.5*days) else 1)'
+days=max(0,min(7,((w.get("resets_at") or now)-now)/86400))
+sys.exit(0 if left("five_hour")>=50 and left("seven_day")>=max(10,7+93*days/7-20) else 1)'
 }
 # Work state: main HEAD, finished Codex results and paused Claude packages. If it
 # hasn't changed since the last run started (and that was < 3 h ago), a new run
@@ -73,7 +73,9 @@ if [[ "${1:-}" == "--headless" ]]; then
   wait "$cpid" || true
   kill "$wpid" 2>/dev/null || true
   # A crashed timed run must not block the next hour (never clear an interactive lock).
-  grep -qs '^headless' .cache/orchestrator.active && rm -f .cache/orchestrator.active
+  # `|| true`: a clean run deletes the file itself, and grep's exit 2 used to
+  # mark every successful run as failed in systemd, hiding real crashes.
+  if grep -qs '^headless' .cache/orchestrator.active; then rm -f .cache/orchestrator.active; fi
 else
   exec claude "$PROMPT"
 fi

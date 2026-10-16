@@ -2,9 +2,9 @@
 # Launch queued Codex briefs without needing a Claude run. Briefs wait in
 # .cache/codex/queue/NN-<name>.md (oldest first). An optional first line
 # `<!-- env: NET=1 ROUNDS=3 -->` sets task options. A brief launches when
-# fewer than MAX (3) Codex tasks are running and Codex has >= 20% (5h) and
-# >= 8% (weekly) left (the watchdog still enforces the hard floors).
-# Called every 30 min from tools/resume.sh; safe to run by hand.
+# fewer than MAX (3) Codex tasks are running, Codex has >= 20% (5h) left and
+# the weekly window is on pace (below); the watchdog still enforces the floors.
+# Called every 15 min by subexp-tick.timer; safe to run by hand.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 export PATH="$HOME/.local/node/bin:$HOME/.local/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
@@ -17,7 +17,7 @@ MAX="${MAX:-3}"
 # A review can lower the cap (e.g. to 1 while Sol reviews, since Sol plus three
 # tasks exhausted the Codex 5h window on 2026-10-11) by writing this file.
 [[ -s .cache/codex/dispatch-max ]] && MAX=$(cat .cache/codex/dispatch-max)
-running() { systemctl --user list-units --type=service --state=running --no-legend 'subexp-*' | awk '{print $1}' | grep -vc '^subexp-resume'; }
+running() { systemctl --user list-units --type=service --state=running --no-legend 'subexp-*' | awk '{print $1}' | grep -vEc '^subexp-(resume|tick)'; }
 codex_ok() { ai-limits --json 2>/dev/null | python3 -c '
 import json,sys,time
 c=json.load(sys.stdin).get("codex",{}); now=time.time()
@@ -25,7 +25,11 @@ def left(k):
     w=c.get(k) or {}
     if "used" not in w: return -1
     return 100 if w.get("resets_at") and w["resets_at"]<now else 100-w["used"]
-sys.exit(0 if left("five_hour")>=20 and left("seven_day")>=8 else 1)'; }
+# Weekly pacing: 2026-10-15/16 spent 91% of the Codex week in ~29 h, leaving
+# the lane shut for 6 days. Allow a 15% head start, then roughly linear spend.
+w=c.get("seven_day") or {}
+days=max(0,min(7,((w.get("resets_at") or now)-now)/86400))
+sys.exit(0 if left("five_hour")>=20 and left("seven_day")>=max(8,8+92*days/7-15) else 1)'; }
 # Codex readings come from its last session log, so a manual reset (or a reset
 # while idle) stays invisible until a Codex run happens. When the reading says
 # low, nothing is running and the reading is >30 min old, refresh it once.

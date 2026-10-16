@@ -38,7 +38,7 @@ print(left("claude","five_hour"),left("claude","seven_day"),left("codex","five_h
     log "CODEX recovered: 5h ${x5}% weekly ${x7}% left; re-armed"; codex_stopped=0
   fi
   if [[ $codex_stopped == 0 ]] && { below "$x5" "$CODEX_STOP" || below "$x7" "$WEEKLY_STOP"; }; then
-    units=$(systemctl --user list-units --type=service --state=running --no-legend 'subexp-*' | awk '{print $1}' | grep -v '^subexp-resume')
+    units=$(systemctl --user list-units --type=service --state=running --no-legend 'subexp-*' | awk '{print $1}' | grep -vE '^subexp-(resume|tick)')
     log "CODEX floor: 5h ${x5}% weekly ${x7}% left; stopping: ${units:-none}"
     [[ -n "$units" ]] && systemctl --user stop $units
     codex_stopped=1
