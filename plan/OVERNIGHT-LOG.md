@@ -1311,3 +1311,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Process fix:** CI e2e logs ARE retrievable: `gh api repos/{owner}/{repo}/actions/jobs/<job id>/logs | grep -aE "✘|Error"` (job ids from `gh run view <run> --json jobs`). `gh run view --log` returns nothing.
 - **Codex:** 2240, 2250, 2270 running; 2260 worktree has uncommitted work; queue holds 2280, 2290. No Claude agent launched. No tag (f55 waits for green CI).
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 06:30 CDT headless run 27 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet J-atoll-transit (debrief next line now says optional objectives can be a long transit away; Blue Hole western hint gives ~6 km).
+- **Codex:** 2240, 2250, 2280 running (2260 and 2270 worktrees hold uncommitted work); queue holds 2290, 2300. No tag (f55 waits for green CI; run 25/26 CI pending).
+- **Not done:** other J-* items, V-bluehole remainder, V-hero-set; V-endurance-aim parked.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.

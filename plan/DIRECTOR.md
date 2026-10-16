@@ -83,7 +83,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
    - **J-picker-density [Sonnet, P3]:** simplify the long site-card list and make Blue Hole easier to identify under its Lighthouse Reef title.
    - **J-desktop-repetition [Sonnet, P3]:** review repeated destination/turn information in the card, mission block and waypoint; consolidate through existing HUD regions.
    - **J-journal-preview [Sonnet, P2]:** review tall portrait captures pushing entry text below the fold, repeated memorial text and captures that show the bow under a debris-field entry. The Journal now has images; the older text-only finding is resolved.
-   - **J-atoll-transit [Sonnet, P2]:** explain the jump from two nearby galleries to optional atoll targets more than 4 km away, especially before the debrief's invitation to finish them for two stars.
+   - **J-atoll-transit [Sonnet, P2] DONE 2026-10-16 (9deb960):** explain the jump from two nearby galleries to optional atoll targets more than 4 km away, especially before the debrief's invitation to finish them for two stars.
    - **J-completion-contrast [Sonnet, P2], DONE 2026-10-16 (86bee20):** the primary-completion banner has cyan text over a translucent cyan fill on bright Blue Hole water; touch removes the objectives panel's dark backdrop. Keep the existing banner, improve its legibility.
    - **J-home-controls [Codex, P2]:** Home's Controls entry opens keyboard/pad rebinding settings on touch, while Pause has a touch How to play guide. Route both entry points to the existing device guide without adding a dialog or loading the dive on Home.
    - Opening gallery hood/terraces and orange Titanic materials remain with V-bluehole and V-titanic below; no visual tuning in this repeat.
