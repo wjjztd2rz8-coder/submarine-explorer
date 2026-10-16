@@ -30,6 +30,26 @@ const CONCAVE = 1.8;
 /** Apron vertex lift above the analytic surface, hiding terrain triangulation gaps. */
 export const TALUS_LIP_RISE = 0.3;
 
+/**
+ * Height of tread `j`: bed tops sit up to a quarter bed below the even spacing, by a different
+ * amount per bed that also shifts along the wall, so the treads are never evenly spaced
+ * contours. Independent of depth into the apron, so each tread stays level across it.
+ */
+function talusBedTop(t: TalusShape, x: number, j: number): number {
+  const bed = t.terraces?.bedHeightM || 1;
+  const pick = Math.abs(Math.sin(j * 12.9898 + t.seed * 0.01) * 43758.5453) % 1;
+  const along = fbm3(x * 0.05, j * 1.7, t.seed + 33, t.seed + 7, 2);
+  return bed * (j - 0.3 * pick * (0.4 + 1.2 * along));
+}
+
+/** Sediment bed index at height `h`; the fractional part is the position within that bed. */
+export function talusBedLevel(t: TalusShape, x: number, h: number): number {
+  let k = Math.floor(h / (t.terraces?.bedHeightM || 1));
+  if (h >= talusBedTop(t, x, k + 1)) k++;
+  const lo = talusBedTop(t, x, k);
+  return k + (h - lo) / (talusBedTop(t, x, k + 1) - lo);
+}
+
 /** Apron thickness above the ground at (x, z); 0 outside the apron. */
 export function talusDepth(t: TalusShape, x: number, z: number): number {
   const reach = t.reach(x);
@@ -49,12 +69,14 @@ export function talusDepth(t: TalusShape, x: number, z: number): number {
   // Terrace the final elevation, not thickness: a sloping ground field would
   // otherwise tilt every tread back into a ramp. Only lift sediment, by at most
   // one bed, and feather to the original wall contact and buried outer rim.
-  const bed = t.terraces.bedHeightM;
   const ground = t.gnd(x, z);
-  const level = (ground + Math.max(0, d)) / bed;
-  const phase = level - Math.floor(level);
-  const stepped = bed * (Math.floor(level) + smooth(0, t.terraces.riserFraction, phase));
-  const lift = Math.max(0, stepped - ground - Math.max(0, d));
+  const h = ground + Math.max(0, d);
+  const level = talusBedLevel(t, x, h);
+  const k = Math.floor(level);
+  const lo = talusBedTop(t, x, k);
+  const stepped =
+    lo + (talusBedTop(t, x, k + 1) - lo) * smooth(0, t.terraces.riserFraction, level - k);
+  const lift = Math.max(0, stepped - h);
   const mask = smooth(0.04, 0.18, u) * (1 - smooth(0.78, 1, u));
   return Math.max(0, d) + lift * mask;
 }
