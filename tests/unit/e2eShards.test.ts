@@ -56,6 +56,25 @@ test('helper-defined cases retain their entry file selector and source timing ke
   ]);
 });
 
+test.each([
+  { title: 'Frame', tags: ['render'] },
+  { title: 'Frame', tags: ['@render'] },
+  { title: 'Frame @render', tags: ['render'] },
+])('tagged discovery matches the executable grep title: %j', ({ title, tags }) => {
+  const discovered = collectTests({
+    suites: [
+      {
+        file: 'render.spec.ts',
+        title: 'render.spec.ts',
+        specs: [{ file: 'render.spec.ts', title, tags, tests: [{ projectName: 'chromium' }] }],
+      },
+    ],
+  });
+  const grep = new RegExp(shardGrep({ tests: discovered }));
+  expect(grep.test('chromium render.spec.ts Frame @render')).toBe(true);
+  expect(grep.test('chromium other.spec.ts Frame @render')).toBe(false);
+});
+
 test('empty discovery, overlapping selectors and invalid budgets fail closed', () => {
   expect(() => collectTests({ suites: [] })).toThrow('no tests');
   expect(() =>

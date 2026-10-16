@@ -135,6 +135,58 @@ describe('guidance slot', () => {
     expect(slot.kind).toBe('objective');
   });
 
+  it.each([false, true])(
+    'hands off a logged contact to the next objective after the reward (touch=%s)',
+    (touch) => {
+      document.documentElement.classList.contains = () => touch;
+      const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus());
+      const overlay = new ScanOverlay(DEFAULT_CONFIG.scan, document.body);
+      scanner.setTargets([
+        {
+          id: 'first',
+          name: 'First contact',
+          landmarkId: 'site',
+          position: new Vector3(0, 0, -5),
+          radius: 20,
+          scanSeconds: 1,
+        },
+        {
+          id: 'next',
+          name: 'Next contact',
+          landmarkId: 'site',
+          position: new Vector3(100, 0, 0),
+          radius: 20,
+          scanSeconds: 1,
+        },
+      ]);
+      const position = new Vector3();
+      const forward = new Vector3(0, 0, -1);
+      const keys = { scan: 'G', guide: 'J' };
+      scanner.setObjective('first');
+      scanner.update(1.1, position, forward, true);
+      expect(scanner.view.completed).toBe(1);
+      overlay.showComplete('First contact', true, keys);
+      scanner.setObjective('next');
+      scanner.update(0, position, forward, false);
+      expect(scanner.view.nearestScanned).toBe(true);
+      overlay.update(scanner.view, keys, null, 0);
+      expect(texts(overlay.slot)).toMatchObject({ name: 'First contact', kind: 'discovery' });
+      overlay.update(scanner.view, keys, null, DEFAULT_CONFIG.scan.completeBannerSeconds + 0.1);
+      // Hovering beside the logged contact must still tell the pilot where to go next.
+      expect(texts(overlay.slot)).toMatchObject({ name: 'Next contact', kind: 'objective' });
+      const detail = (overlay.slot.root as unknown as FakeElement).children[1].children[2];
+      expect(detail.textContent).toBe('TURN 90° STARBOARD');
+
+      // Free exploration retains its logged-contact confirmation without an objective.
+      scanner.setObjective(null);
+      scanner.update(0, position, forward, false);
+      overlay.update(scanner.view, keys, null, 0);
+      expect(texts(overlay.slot)).toMatchObject({ name: 'First contact', kind: 'objective' });
+      expect(detail.textContent).toBe('Logged · Journal');
+      overlay.dispose();
+    },
+  );
+
   it('keeps a message in place when only its detail changes, and reports names it shows', () => {
     const slot = new GuidanceSlot();
     slot.offer('objective', 'objective', { ...msg('Stern section'), detail: 'TURN 40° PORT' });

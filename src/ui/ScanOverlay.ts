@@ -175,9 +175,9 @@ export class ScanOverlay {
         objective: null,
       };
     }
-    // A logged contact is standing information: it sits in the objective tier
-    // and gives way to everything above it.
-    if (view.nearestScanned && view.nearestInRange) {
+    // A logged contact is standing information; an outstanding mission objective
+    // leads the next approach even while the pilot is still beside this contact.
+    if (view.nearestScanned && view.nearestInRange && view.objectiveId === null) {
       return {
         scan: null,
         objective: {
