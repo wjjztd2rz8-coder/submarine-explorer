@@ -70,7 +70,7 @@ The newest items go first.
 
 ## In flight
 
-- Codex 2200/2220/2210 running (S-manifest-3, S-bughunt-10, S-render-confirm). No Claude package running.
+- Claude Sonnet: J-completion-contrast and V-monterey-floor IN FLIGHT (Claude, 2026-10-16). Codex queue 2240-2290 waits for the dispatcher.
 - V-endurance-aim parked 2026-10-15: branch claude/V-endurance-aim (worktree ../subexp-wt/V-endurance-aim, commit 5fa58fc) reached hull 45% but the sub is too large and dominant in frame; not merged (new shared camera code for a small gain). Needs the camera forward of the sub, or drop item 4.
 
 ## Backlog
