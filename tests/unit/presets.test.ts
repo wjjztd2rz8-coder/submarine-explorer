@@ -9,9 +9,11 @@ import {
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { Points, Scene, Vector3 } from 'three';
+import { PerspectiveCamera, Points, Scene, Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
+import { Atmosphere } from '../../src/render/Atmosphere.js';
+import { Currents } from '../../src/world/Currents.js';
 import { VentPreset } from '../../src/world/presets/VentPreset.js';
 import type { PresetEnterContext, PresetParams } from '../../src/world/presets/types.js';
 import {
@@ -19,6 +21,7 @@ import {
   mergePresetParams,
   presetDefaults,
   presetForType,
+  PresetSystem,
   resetOverrideWarnings,
   selectPreset,
 } from '../../src/world/presets/Presets.js';
@@ -364,4 +367,97 @@ describe('shared scalar maths', () => {
     expect(smoothstep(4, 4, 4)).toBeNaN();
     expect(smoothstep01(NaN)).toBeNaN();
   });
+});
+
+// Guard the complete mission -> preset -> reusable atmosphere sample path, including
+// Low's particle-free update and a missing mission/type for an unknown site.
+describe('per-site vehicle light', () => {
+  const sites = (
+    JSON.parse(readFileSync('data/tiles/index.json', 'utf8')).tiles as { id: string }[]
+  )
+    .map((tile) => tile.id)
+    .filter((id) => id !== 'demo-synthetic');
+  const landmarks = JSON.parse(readFileSync('data/landmarks.json', 'utf8'));
+
+  it('covers every shipped site with a neutral vent default', () => {
+    expect(sites).toHaveLength(13);
+    expect(DEFAULT_CONFIG.presets.vent.hullLight).toBe(1);
+  });
+
+  for (const tier of ['low', 'medium', 'high'] as const) {
+    it.each([...sites, 'unknown-site'])(
+      `%s ${tier}: only Beebe dims the hull and the next base sample resets it`,
+      async (site) => {
+        const config = DEFAULT_CONFIG;
+        const scene = new Scene();
+        const atmosphere = new Atmosphere(scene, config.water, {
+          ...config.water.tiers[tier],
+          causticsSize: 0,
+        });
+        const currents = new Currents(site, site, async () => null);
+        await currents.ready;
+        const position = new Vector3(0, -800, 0);
+        const camera = new PerspectiveCamera();
+        const mission =
+          site === 'unknown-site'
+            ? null
+            : JSON.parse(readFileSync(`data/landmarks/${site}/mission.json`, 'utf8'));
+        const system = new PresetSystem({
+          scene,
+          bus: new EventBus(),
+          config,
+          tier,
+          params: new URLSearchParams(),
+          tileId: site,
+          landmarkId: site,
+          missionId: null,
+          terrain: {
+            sampleHeight: () => -1000,
+            getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+            widthM: 1000,
+            depthM: 1000,
+          },
+          props: { loaded: true, placed: [] },
+          discovery: { loaded: true, pois: [] },
+          sub: { position, velocity: new Vector3(), floorFor: (ground) => ground + 10 },
+          currents,
+          currentMode: 'off',
+          atmosphere,
+          headlights: { on: false },
+          toWorld: () => ({ x: 0, z: 0 }),
+          fetchJson: async (url) => (url.endsWith('/mission.json') ? mission : landmarks),
+        });
+        try {
+          await system.ready;
+          const expected = site === 'beebe-vent-field' ? 0.2 : 1;
+          for (let frame = 0; frame < 3; frame++) {
+            const sample = atmosphere.update(position.y, position, 1 / 60);
+            expect(sample.hullLight).toBe(1);
+            system.update(1 / 60, 0, sample, camera, 844, frame / 60);
+            expect(Number.isFinite(sample.hullLight)).toBe(true);
+            expect(sample.hullLight).toBe(expected);
+          }
+          system.dispose();
+          expect(atmosphere.update(-100, position, 0).hullLight).toBe(1);
+        } finally {
+          system.dispose();
+          atmosphere.dispose();
+        }
+      },
+    );
+  }
+
+  it.each([undefined, NaN, Infinity, '0.2', -1])(
+    'rejects an invalid hull override (%s)',
+    (hullLight) => {
+      resetOverrideWarnings();
+      const params = mergePresetParams(
+        'vent',
+        presetDefaults(DEFAULT_CONFIG.presets, 'vent'),
+        { hullLight },
+        vi.fn(),
+      );
+      expect(params.hullLight).toBe(1);
+    },
+  );
 });

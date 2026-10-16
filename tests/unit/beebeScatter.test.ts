@@ -190,3 +190,24 @@ it('1310: larger Challenger boulders retain every tier instance and triangle bud
     }
   }
 });
+
+it('late ground keepout filters already-resident scatter without moving the camera', () => {
+  const scatter = populated(BIOMES['great-blue-hole']!);
+  const camera = new THREE.PerspectiveCamera();
+  camera.position.set(32, -85, 32);
+  const meshes = scatter.group.children as THREE.InstancedMesh[];
+  const counts = meshes.map((mesh) => mesh.count);
+  expect(counts.reduce((sum, count) => sum + count, 0)).toBeGreaterThan(0);
+  try {
+    // Props finish after cells are cached. The next stationary frame must
+    // re-gather every kind through the completed footprint predicate.
+    scatter.setGroundKeepout(() => true);
+    scatter.update(camera);
+    expect(meshes.every((mesh) => mesh.count === 0)).toBe(true);
+    scatter.setGroundKeepout(() => false);
+    scatter.update(camera);
+    expect(meshes.map((mesh) => mesh.count)).toEqual(counts);
+  } finally {
+    scatter.dispose();
+  }
+});

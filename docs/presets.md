@@ -35,6 +35,11 @@ Warm orifice haze is opt-in: `hazeGlow` defaults to 0 and `hazeGlowSizeM` to
 draw for the field (three total with smoke and shimmer). Generic vent presets
 retain their two-draw budget; carbonate flow does not build this warm haze.
 
+Vent `hullLight` multiplies the player vehicle's lit result before highlight
+compression. It defaults to 1; Beebe overrides it to 0.2 to keep ambient seabed
+fill from washing out the white hull. It applies on every graphics tier and
+resets to 1 with each base atmosphere sample. Other presets keep 1.
+
 The base current is the attributed [offline HYCOM site grid](currents.md).
 The canyon bends and scales that base flow; it does not add a separate fixed
 current. The current's bearing is the direction water flows **toward**: 0° north

@@ -120,6 +120,12 @@ describe('hull-close highlight compression', () => {
             uniforms: { ...THREE.ShaderLib.standard.uniforms },
           } as Parameters<typeof mat.onBeforeCompile>[0];
           mat.onBeforeCompile(shader, {} as InstanceType<typeof THREE.WebGLRenderer>);
+          expect(vehicle.materials.uniforms.uHullLight.value).toBe(1);
+          expect(shader.uniforms.uHullLight).toBe(vehicle.materials.uniforms.uHullLight);
+          expect(shader.fragmentShader).toContain('outgoingLight *= uHullLight;');
+          expect(shader.fragmentShader.indexOf('outgoingLight *= uHullLight;')).toBeLessThan(
+            shader.fragmentShader.indexOf('float hi ='),
+          );
           const decay = shader.fragmentShader.match(/float shoulderDecay = (.*);/)![1]!;
           const shoulder = shader.fragmentShader.match(/float sh = (.*);/)![1]!;
           const scale = new Function(

@@ -9,6 +9,7 @@ import {
   BLUE_HOLE_LAT,
   BLUE_HOLE_LON,
   blueHoleTerraces,
+  blueHoleSeatBank,
   blueHoleWallRelief,
 } from '../../src/world/terrainFeatures.js';
 import { latLonToWorld } from '../../src/util/geo.js';
@@ -150,7 +151,7 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
   });
 
   for (const tier of ['low', 'medium', 'high'] as const) {
-    it(`${tier}: resolves walls locally within budget and physics follows rendered triangles`, () => {
+    it(`${tier}: resolves walls locally within budget and physics follows rendered triangles`, async () => {
       const cfg = makeConfig().terrain;
       const terrain = new Terrain({ meta, heights }, cfg, tier);
       try {
@@ -178,6 +179,26 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
           expect(treadRise).toBeLessThan(3);
           expect(riserRise).toBeGreaterThan(4);
           expect(riserRise / 4).toBeGreaterThan((2 * treadRise) / 7);
+        }
+
+        // The bank must leave the occupied gallery seat clear, on the actual
+        // rendered ground as well as the analytic carve.
+        const props = new Props(meta, terrain, makeConfig().props, tier);
+        await props.placeAll(doc, 'great-blue-hole');
+        expect(props.stats.failed).toBe(0);
+        expect(props.placed).toHaveLength(doc.props.length);
+        for (const prop of props.placed) {
+          prop.root.updateMatrixWorld(true);
+          const gallery = prop.root.getObjectByName('stalactite-gallery') as THREE.Mesh;
+          const positions = gallery.geometry.getAttribute('position');
+          let clearance = Infinity;
+          for (let i = 0; i < positions.count; i++) {
+            const point = new THREE.Vector3()
+              .fromBufferAttribute(positions, i)
+              .applyMatrix4(gallery.matrixWorld);
+            clearance = Math.min(clearance, point.y - terrain.sampleHeight(point.x, point.z));
+          }
+          expect(clearance, prop.def.id).toBeGreaterThan(0);
         }
 
         const chunks = terrain.group.children.filter(
@@ -231,4 +252,27 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
     }
     expect(blueHoleTerraces(1e-4, 139)).toBeCloseTo(blueHoleTerraces(2 * Math.PI + 1e-4, 139), 10);
   });
+});
+
+// A positive-only bank cannot introduce a carve depression under the opening
+// or move the foot before the authored seat radius.
+it('gallery banks are finite, additive and start behind both seat radii', () => {
+  let largest = 0;
+  for (let a = -Math.PI; a <= Math.PI; a += 0.05) {
+    for (let r = 0; r <= 230; r += 0.5) {
+      const bank = blueHoleSeatBank(a, r);
+      expect(Number.isFinite(bank)).toBe(true);
+      expect(bank).toBeGreaterThanOrEqual(0);
+      if (r <= 155 || r >= 206) expect(bank).toBe(0);
+      largest = Math.max(largest, bank);
+    }
+  }
+  expect(largest).toBeGreaterThan(10);
+  for (const [bearing, foot] of [
+    [Math.PI, 162],
+    [1, 155],
+  ]) {
+    for (let r = foot - 10; r <= foot; r += 0.25) expect(blueHoleSeatBank(bearing, r)).toBe(0);
+    expect(blueHoleSeatBank(bearing, foot + 12)).toBeGreaterThan(0);
+  }
 });

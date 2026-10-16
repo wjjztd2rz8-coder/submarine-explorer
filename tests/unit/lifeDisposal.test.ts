@@ -3,6 +3,8 @@ import { PerspectiveCamera, Scene, Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { createLifeSystem } from '../../src/app/systems/life.js';
+import type { FrameState } from '../../src/app/System.js';
+import type { Props } from '../../src/world/Props.js';
 import type { GameContext } from '../../src/app/context.js';
 import { Scanner } from '../../src/game/Scanner.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
@@ -162,3 +164,56 @@ it('reuses target selection storage in populated frozen frames and preserves tar
     life.dispose();
   }
 });
+
+it.each([false, true])(
+  'delayed props (%s clear_ground): first population uses the final footprint',
+  async (clearGround) => {
+    vi.mocked(loadLifeDoc).mockResolvedValue({
+      ...doc,
+      sites: {
+        site: {
+          spawns: [{ species: 'cold-water-coral', weight: 100, depth: [150, 900], group: [4, 4] }],
+        },
+      },
+    });
+    const { ctx, system } = setup('site', new URLSearchParams('lifeSeed=7'));
+    // Model a fetch whose footprint is unknown until it finishes. Keep the
+    // real Life/Sim path so prematurely cached cells cannot silently survive.
+    const props = {
+      loaded: false,
+      coversGround: (x: number) => props.loaded && clearGround && x >= 0,
+    };
+    ctx.props = props as unknown as Props;
+    ctx.terrain.sampleHeight = () => -700;
+    ctx.rig = { reduceMotion: false, camera: new PerspectiveCamera() } as GameContext['rig'];
+    ctx.headlights = { on: true } as GameContext['headlights'];
+    ctx.renderer = { domElement: { height: 844 } } as GameContext['renderer'];
+    const frame = {
+      dt: 1 / 60,
+      frozen: false,
+      pilotPosition: new Vector3(0, -690, 0),
+      pilotVelocity: new Vector3(),
+      pilotForward: new Vector3(0, 0, -1),
+      fog: { density: 0 },
+    } as FrameState;
+    const update = () => system.frame!['world.life']!(frame, ctx);
+    try {
+      system.init?.(ctx);
+      await Promise.resolve();
+      const life = ctx.life!;
+      const step = vi.spyOn(life, 'update');
+      for (let i = 0; i < 180; i++) update();
+      expect(step.mock.calls.length).toBe(0);
+      expect(life.sim.liveCount).toBe(0);
+      props.loaded = true;
+      for (let i = 0; i < 180; i++) update();
+      const rooted = life.sim.pool.filter((a) => a.alive && a.def.archetype === 'sessile');
+      expect(rooted.length).toBeGreaterThan(0);
+      if (clearGround) expect(rooted.every((a) => !props.coversGround(a.x))).toBe(true);
+      else expect(rooted.some((a) => a.x >= 0)).toBe(true);
+      expect(step).toHaveBeenCalled();
+    } finally {
+      system.dispose?.();
+    }
+  },
+);

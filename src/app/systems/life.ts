@@ -96,7 +96,10 @@ export function createLifeSystem(): GameSystem {
     },
     frame: {
       'world.life': (f, ctx) => {
-        if (!life) return;
+        // Rooted patches cache their cells on first population. Wait until
+        // prop footprints are complete so late clear_ground props cannot leave
+        // already-rooted colonies inside the gallery.
+        if (!life || (ctx.props && !ctx.props.loaded)) return;
         life.render.reduceMotion = ctx.rig.reduceMotion;
         const p = f.pilotPosition;
         const v = f.pilotVelocity;
