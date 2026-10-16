@@ -73,6 +73,7 @@ export const propsSystem: GameSystem = {
               pose.chaseOffsetX,
               pose.chaseOffsetY,
               pose.portraitChaseOffset,
+              pose.chaseAim,
             );
           else if (pose.chaseRadius) rig.chaseRadius = pose.chaseRadius;
           rig.snap(sub.position, sub.yaw, sub.pitch);

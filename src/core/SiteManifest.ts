@@ -17,6 +17,7 @@ export interface OpeningPose {
   chaseRadius?: number;
   chaseOffsetX?: number;
   chaseOffsetY?: number;
+  chaseAim?: { x: number; y: number; z: number };
   portraitChaseOffset?: { x: number; y: number; radius?: number };
 }
 
@@ -146,6 +147,7 @@ function fields(required: Record<string, Check>, optional: Record<string, Check>
 const cameraFields = { chaseRadius: aboveZero, chaseOffsetX: finite, chaseOffsetY: finite };
 const poseFields = {
   ...cameraFields,
+  chaseAim: fields({ x: finite, y: finite, z: finite }),
   fromCentre: flag,
   altitude: finite,
   minSeabedAltitudeM: aboveZero,

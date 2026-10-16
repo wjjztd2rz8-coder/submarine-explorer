@@ -46,6 +46,7 @@ export class CameraRig {
   chaseRadius: number;
   private chaseRadiusDefault: number;
   private chaseOffsetX = 0;
+  private chaseAim: { x: number; y: number; z: number } | null = null;
   private portraitChaseOffset: { x: number; y: number; radius?: number } | null = null;
   private chaseOffsetY = 0;
 
@@ -176,12 +177,14 @@ export class CameraRig {
     offsetX = 0,
     offsetY = 0,
     portraitOffset?: { x: number; y: number; radius?: number },
+    aim?: { x: number; y: number; z: number },
   ): void {
     this.chaseRadiusDefault = radius;
     this.chaseRadius = radius;
     this.chaseOffsetX = offsetX;
     this.portraitChaseOffset = portraitOffset ?? null;
     this.chaseOffsetY = offsetY;
+    this.chaseAim = aim ?? null;
   }
 
   /** Return to this dive's chase view and zoom. */
@@ -316,7 +319,11 @@ export class CameraRig {
           this.desiredTarget.copy(subPos).addScaledVector(this.freeLookTargetOffset, 1 - eased);
         } else
           this.desiredTarget
-            .set(0, c.chaseLookRise, -c.chaseLookAhead)
+            .set(
+              this.chaseAim?.x ?? 0,
+              c.chaseLookRise + (this.chaseAim?.y ?? 0),
+              -c.chaseLookAhead + (this.chaseAim?.z ?? 0),
+            )
             .applyAxisAngle(new THREE.Vector3(0, 1, 0), -yaw)
             .add(subPos);
       } else {

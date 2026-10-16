@@ -15,13 +15,18 @@
       "range": 6,
       "altitude": 10,
       "yawOffset": -11,
-      "chaseRadius": 50,
-      "chaseOffsetX": -45,
-      "chaseOffsetY": -34,
+      "chaseRadius": 50.0,
+      "chaseOffsetX": -45.0,
+      "chaseOffsetY": -34.0,
       "portraitChaseOffset": {
         "x": 0,
         "y": -40,
         "radius": 50
+      },
+      "chaseAim": {
+        "x": 0.0,
+        "y": -15.0,
+        "z": 50.0
       }
     }
   },

@@ -95,6 +95,7 @@ export const missionSystem: GameSystem = {
         opening?.chaseOffsetX,
         opening?.chaseOffsetY,
         opening?.portraitChaseOffset,
+        opening?.chaseAim,
       );
       rig.snap(sub.position, sub.yaw, sub.pitch);
       headlights.setEnabled(true);

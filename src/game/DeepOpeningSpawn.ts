@@ -67,7 +67,13 @@ function reframe(
     getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
   });
   const opening = tuning;
-  rig.setChaseRadiusDefault(opening.chaseRadius, opening.chaseOffsetX, opening.chaseOffsetY);
+  rig.setChaseRadiusDefault(
+    opening.chaseRadius,
+    opening.chaseOffsetX,
+    opening.chaseOffsetY,
+    undefined,
+    opening.chaseAim,
+  );
   rig.snap(p, yaw, 0);
   for (let i = 1; i <= 6; i++)
     if (props.collide(p.clone().lerp(rig.camera.position, i / 6), 6, new Vector3())) return pose;
@@ -79,6 +85,7 @@ function reframe(
     chaseRadius: opening.chaseRadius,
     chaseOffsetX: opening.chaseOffsetX,
     chaseOffsetY: opening.chaseOffsetY,
+    chaseAim: opening.chaseAim,
     portraitChaseOffset: opening.portraitChaseOffset,
   };
 }
