@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { Input } from '../../src/core/Input.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import { createInputSystem } from '../../src/app/systems/input.js';
+import { createQualitySystem, type PerfStats } from '../../src/app/systems/quality.js';
+import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { inputGateSystem, startLoop } from '../../src/app/loop.js';
 import { discoverySystem } from '../../src/app/systems/discovery.js';
 import { shellSystem } from '../../src/app/systems/shell.js';
@@ -77,7 +79,7 @@ it('withholds polled gamepad actions during hidden frames and restores visible p
   }
 });
 
-it('resumes the dive clock without counting paused or hidden time and removes clock listeners', () => {
+it('resumes dive clocks and quality sampling without counting paused or hidden time and removes clock listeners', () => {
   const doc = Object.assign(new EventTarget(), { hidden: false });
   const listen = vi.spyOn(doc, 'addEventListener');
   const unlisten = vi.spyOn(doc, 'removeEventListener');
@@ -101,14 +103,30 @@ it('resumes the dive clock without counting paused or hidden time and removes cl
   });
   mission.start('test');
   const stats = new SessionStats(100);
+  let perf!: PerfStats;
+  let pixelRatio = 2;
   const ctx = {
-    config: { physicsHz: 60 },
+    config: DEFAULT_CONFIG,
+    quality: { source: 'auto' },
+    params: new URLSearchParams(),
+    renderer: {
+      getPixelRatio: () => pixelRatio,
+      setPixelRatio: (ratio: number) => {
+        pixelRatio = ratio;
+      },
+    },
+    resize: vi.fn(),
+    expose: (values: { perf: PerfStats }) => {
+      perf = values.perf;
+    },
     input,
     bus,
     meta: { id: 'test' },
     sub: { getState: () => ({}), position: new Vector3(), velocity: new Vector3() },
   } as unknown as GameContext;
   const frames: { dt: number; steps: number; elapsed: number; clock: number }[] = [];
+  const quality = createQualitySystem();
+  quality.init!(ctx);
   let frozen = false;
   const runner = {
     frame(f: FrameState) {
@@ -116,6 +134,10 @@ it('resumes the dive clock without counting paused or hidden time and removes cl
       inputGateSystem.frame!['gate.input']!(f, ctx);
       mission.update(f.clockDt);
       stats.update(f.clockDt, ctx.sub.position);
+      // Regression: the loop's actual resume flag must exclude even capped gaps from quality.
+      const before = perf.frameMs;
+      quality.frame!['late.perf']!(f, ctx);
+      if (f.frozen || f.resumeFrame || doc.hidden) expect(perf.frameMs).toBe(before);
       frames.push({ dt: f.dt, steps: f.steps, elapsed: f.elapsed, clock: f.clockDt });
     },
   } as SystemRunner;
@@ -162,6 +184,8 @@ it('resumes the dive clock without counting paused or hidden time and removes cl
     expect(step(240_017).steps).toBe(1);
     expect(mission.elapsedS).toBeCloseTo(0.325);
     expect(stats.snapshot().elapsedS).toBeCloseTo(mission.elapsedS);
+    expect(perf.pixelRatio).toBe(2);
+    expect(ctx.resize).not.toHaveBeenCalled();
     // Camera/UI animation time still advances during frozen frames.
     expect(frames.at(-1)!.elapsed).toBeGreaterThan(1);
   } finally {

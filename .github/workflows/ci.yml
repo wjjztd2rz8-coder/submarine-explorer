@@ -89,7 +89,8 @@ jobs:
 
   e2e:
     name: e2e (${{ matrix.shard }}/${{ strategy.job-total }})
-    runs-on: ubuntu-latest
+    # Match the nightly browser/font baseline during ubuntu-latest migrations.
+    runs-on: ubuntu-24.04
     needs: builds
     # Build matrix completes before consumers; static checks run independently.
     timeout-minutes: 30
@@ -166,7 +167,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ hashFiles('package-lock.json') }}
+          key: ubuntu-24.04-${{ runner.arch }}-playwright-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright Chromium
         # Always ensure OS dependencies, even when the browser cache was restored.
@@ -212,7 +213,7 @@ jobs:
     # Preserve the existing status name; builds now owns artifact production.
     name: project-base build and browser check
     needs: builds
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       CI: true
@@ -245,7 +246,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-${{ runner.arch }}-playwright-${{ hashFiles('package-lock.json') }}
+          key: ubuntu-24.04-${{ runner.arch }}-playwright-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright Chromium
         timeout-minutes: 8

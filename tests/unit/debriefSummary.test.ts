@@ -47,7 +47,7 @@ describe('compact dive summary', () => {
     ).toBe(`Scanned ${name}.`);
   });
   it.each([
-    [1, 'Finish the remaining objectives for 2 stars.'],
+    [1, 'Finish the optional objectives for 2 stars; some are a long transit away.'],
     [2, 'Take a photo or scan a species for 3 stars.'],
     [3, 'Try another dive site.'],
   ])('suggests the next step for a %s-star dive', (stars, next) => {

@@ -1,7 +1,11 @@
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync, writeFileSync } from 'node:fs';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { createHash } from 'node:crypto';
 import { afterAll, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
+import type { GameContext } from '../../src/app/context.js';
+import { propsSystem } from '../../src/app/systems/props.js';
 import { makeConfig } from '../../src/core/Config.js';
 import type { TileMeta } from '../../src/util/types.js';
 import { Terrain } from '../../src/world/Terrain.js';
@@ -174,10 +178,34 @@ for (const tier of ['low', 'high'] as const) {
     const config = makeConfig();
     const site = 'challenger-deep';
     const terrain = terrainFor(site, tier);
-    const props = new Props(terrain.meta, terrain, config.props, tier);
+    const bounds = vi.spyOn(terrain.scatter, 'setBoulderKeepout');
+    let loaded!: () => void;
+    const ready = new Promise<void>((resolve) => (loaded = resolve));
+    const ctx = {
+      meta: terrain.meta,
+      terrain,
+      config,
+      tier,
+      scene: new THREE.Scene(),
+      params: new URLSearchParams('depth=11000'),
+      sub: { position: new THREE.Vector3() },
+      bus: { emit: loaded },
+      expose: () => {},
+    } as unknown as GameContext;
+    const fetch = vi.fn(async () => ({
+      ok: true,
+      text: async () => readFileSync(`data/landmarks/${site}/props.json`, 'utf8'),
+    }));
+    vi.stubGlobal('fetch', fetch);
     let scatter: Scatter | undefined;
+    const keepoutEvidence: unknown[] = [];
     try {
-      await props.placeAll(json(`data/landmarks/${site}/props.json`), site);
+      propsSystem.init?.(ctx);
+      expect(bounds).not.toHaveBeenCalled();
+      await ready;
+      const props = ctx.props;
+      expect(fetch).toHaveBeenCalledWith(`/data/landmarks/${site}/props.json`);
+      expect(bounds).toHaveBeenCalledTimes(1);
       const pose = composedFreeDiveSpawn(
         site,
         terrain.meta,
@@ -240,7 +268,8 @@ for (const tier of ['low', 'high'] as const) {
           };
         });
         const beforeDraws = scatter.stats.drawCalls;
-        scatter.setBoulderKeepout(heroBounds);
+        expect(bounds.mock.calls[0][0]).toEqual(heroBounds);
+        scatter.setBoulderKeepout(bounds.mock.calls[0][0]);
         scatter.update(rig.camera);
         expect(scatter.stats.drawCalls).toBe(beforeDraws);
         for (const [i, o] of scatter.group.children.entries()) {
@@ -255,6 +284,20 @@ for (const tier of ['low', 'high'] as const) {
             expect(mesh.instanceMatrix.array).toEqual(before[i].matrices);
           }
         }
+        keepoutEvidence.push({
+          viewport: [width, height],
+          bounds: { min: heroBounds.min.toArray(), max: heroBounds.max.toArray() },
+          stats: { ...scatter.stats },
+          meshes: scatter.group.children.map((o) => {
+            const mesh = o as THREE.InstancedMesh;
+            return {
+              name: mesh.name,
+              count: mesh.count,
+              matrices: createHash('sha256').update(mesh.instanceMatrix.array).digest('hex'),
+              colors: createHash('sha256').update(mesh.instanceColor!.array).digest('hex'),
+            };
+          }),
+        });
         scatter.group.updateMatrixWorld(true);
         const rocks = scatter.group.getObjectByName('scatter:boulder') as THREE.InstancedMesh;
         rocks.geometry.computeBoundingBox();
@@ -328,7 +371,10 @@ for (const tier of ['low', 'high'] as const) {
         expect(eyeGap).toBeGreaterThan(1);
         expect(armGap).toBeGreaterThan(1);
       }
+      // Bounds and every placement/color buffer were captured before the policy moved to data.
+      expect(keepoutEvidence).toEqual(json('tests/fixtures/challenger-keepout.json')[tier]);
     } finally {
+      bounds.mockRestore();
       vi.unstubAllGlobals();
       scatter?.dispose();
       terrain.dispose();

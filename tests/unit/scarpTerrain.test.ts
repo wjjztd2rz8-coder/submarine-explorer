@@ -71,7 +71,53 @@ describe('Monterey wall anchors on the real sloping tile', () => {
         expect(boulders).toBe(tier === 'low' ? 0 : Math.round(160 * geoDetail(tier).growth));
         expect(sponges).toBe(Math.round(90 * growth));
         expect(corals).toBe(Math.round(70 * growth));
-        if (tier === 'medium') expect(count).toBe(192);
+        if (tier === 'medium') {
+          expect(count).toBe(192);
+          // Buried-face culling must retain every exposed triangle of the dense grid.
+          // Probe omitted faces in world space against the real rendered terrain.
+          const wall = hero.full.children[0] as THREE.Mesh;
+          const pos = wall.geometry.getAttribute('position');
+          const index = wall.geometry.getIndex()!;
+          const kept = new Set<string>();
+          for (let i = 0; i < index.count; i += 3)
+            kept.add(`${index.getX(i)},${index.getX(i + 1)},${index.getX(i + 2)}`);
+          const [nx, ny] = config.terrain.fidelity![meta.id]!.wallSegments.medium;
+          const a = new Vector3(),
+            b = new Vector3(),
+            c = new Vector3(),
+            p = new Vector3();
+          let omitted = 0;
+          let highestClearance = -Infinity;
+          for (let x = 0; x < nx; x++)
+            for (let y = 0; y < ny; y++) {
+              const start = x * (ny + 1) + y;
+              const next = start + ny + 1;
+              for (const triangle of [
+                [start, start + 1, next],
+                [start + 1, next + 1, next],
+              ]) {
+                if (kept.has(triangle.join(','))) continue;
+                omitted++;
+                a.fromBufferAttribute(pos, triangle[0]);
+                b.fromBufferAttribute(pos, triangle[1]);
+                c.fromBufferAttribute(pos, triangle[2]);
+                for (let u = 0; u <= 3; u++)
+                  for (let v = 0; v <= 3 - u; v++) {
+                    p.copy(a)
+                      .multiplyScalar(u / 3)
+                      .addScaledVector(b, v / 3)
+                      .addScaledVector(c, 1 - (u + v) / 3);
+                    hero.root.localToWorld(p);
+                    highestClearance = Math.max(
+                      highestClearance,
+                      p.y - terrain.sampleHeight(p.x, p.z),
+                    );
+                  }
+              }
+            }
+          expect(omitted).toBeGreaterThan(0);
+          expect(highestClearance).toBeLessThan(0);
+        }
       } finally {
         terrain.dispose();
       }
