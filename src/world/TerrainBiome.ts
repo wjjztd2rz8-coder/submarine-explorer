@@ -168,9 +168,15 @@ export const BIOMES: Record<string, Biome> = {
     colorC: 0x2e2b28,
     contrast: 0.65,
     detail: 0.65,
-    ripple: 0.12,
-    rippleLenM: 0.9,
+    // Current-swept crests and scattered clinker and rubble read as a lived-in bed from the approach.
+    ripple: 0.8,
+    rippleLenM: 1.2,
     burrow: 0.3,
+    scatter: [
+      { kind: 'dropstone', density: 30, slopeMaxDeg: 18, on: 'flat', sizeMul: 2.2 },
+      { kind: 'rubble', density: 10, slopeMaxDeg: 18, on: 'flat' },
+      { kind: 'mound', density: 3.5, slopeMaxDeg: 10, on: 'flat' },
+    ],
   },
   bismarck: {
     ...ABYSSAL,

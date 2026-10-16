@@ -22,4 +22,12 @@ describe('open sediment floor variety', () => {
     expect(biome.rippleLenM).toBeGreaterThan(1);
     expect(biome.ripple).toBeGreaterThan(0.6);
   });
+
+  it('the wreck-site abyssal plain strews debris and carries visible ripples', () => {
+    const biome = biomeFor('titanic');
+    expect(placeCell(0, 0, flatGround, biome, cell).dropstone?.length).toBeGreaterThan(40);
+    expect(placeCell(0, 0, flatGround, biome, cell).rubble?.length).toBeGreaterThan(10);
+    expect(biome.rippleLenM).toBeGreaterThan(1);
+    expect(biome.ripple).toBeGreaterThan(0.6);
+  });
 });
