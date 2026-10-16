@@ -148,6 +148,10 @@ export interface SiteManifest {
   };
   props?: Record<string, PropManifest>;
   id: string;
+  terrain?: {
+    /** Select an analytic reconstruction where the survey grid cannot resolve the feature. */
+    carve?: 'canyon-bend' | 'sinkhole';
+  };
   sonar?: {
     /** Authored hull POI anchoring scour contours on flat terrain. */
     scourHullPoi?: string;
@@ -408,9 +412,22 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
     'scatter',
     'atmosphere',
     'sonar',
+    'terrain',
   ]);
   if (root.id !== id) fail(id, 'id', `expected "${id}"`);
   const out: SiteManifest = { id };
+  if (root.terrain !== undefined) {
+    fields(
+      {},
+      {
+        carve: (id, path, value) => {
+          if (value !== 'canyon-bend' && value !== 'sinkhole')
+            fail(id, path, 'expected canyon-bend or sinkhole');
+        },
+      },
+    )(id, 'terrain', root.terrain);
+    out.terrain = root.terrain as SiteManifest['terrain'];
+  }
   if (root.sonar !== undefined) {
     fields({}, { scourHullPoi: text, maxContourIntervalM: aboveZero, reef: flag })(
       id,

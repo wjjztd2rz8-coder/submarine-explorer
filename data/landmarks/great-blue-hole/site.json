@@ -1,5 +1,8 @@
 {
   "id": "great-blue-hole",
+  "terrain": {
+    "carve": "sinkhole"
+  },
   "sonar": {
     "maxContourIntervalM": 10,
     "reef": true

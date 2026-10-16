@@ -1,14 +1,21 @@
 import * as THREE from 'three';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { createHash } from 'node:crypto';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import type { PropDef } from '../../src/world/PropLoader.js';
 import { createLostCityCarbonateMaterial } from '../../src/world/LostCityCarbonate.js';
 import { lostCityFlange } from '../../src/world/LostCityFlange.js';
 import { buildCarbonateChimney, buildCarbonateTower } from '../../src/world/props/geo/towers.js';
-import { flange } from '../../src/world/props/geo/spire.js';
+import { flange, tieredSpire } from '../../src/world/props/geo/spire.js';
 import { countGeo } from '../../src/world/props/geo/shared.js';
+import * as shared from '../../src/world/props/geo/shared.js';
+import * as talus from '../../src/world/props/geo/talus.js';
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
 describe('Lost City carbonate surface', () => {
   it('builds UV-free chimney and tower geometry while retaining vertex colour beds', () => {
@@ -208,4 +215,166 @@ describe('Lost City rounded flanges', () => {
     expect(high.triangles).toBeLessThan(180_000);
     expect(low.draws).toBe(high.draws);
   });
+});
+
+// Guards the solid rolled mouth without spending more triangles or opening the cap seam.
+describe('carbonate trunk rims and slope rubble', () => {
+  it('rolls the lip back above its shoulder and keeps the wall joined to the crater', () => {
+    const opts = {
+      h: 50,
+      r0: 10,
+      topFrac: 0.3,
+      seed: 820,
+      segs: 24,
+      rings: 100,
+      irregular: Number.EPSILON,
+      wobble: 0,
+      ridgeAmp: 0,
+      ledge: 0,
+      crater: 0.7,
+    };
+    // Negligible irregularity isolates the lip from the broad trunk swells.
+    // Negligible crust provides an unrolled torn-rim reference.
+    const plain = tieredSpire({ ...opts, crust: Number.EPSILON });
+    const rolled = tieredSpire({ ...opts, trunk: true });
+    try {
+      expect(rolled.index!.array).toEqual(plain.index!.array);
+      const a = rolled.getAttribute('position');
+      const b = plain.getAttribute('position');
+      for (const [row, min, max] of [
+        [6, 1.19, 1.21],
+        [0, 1.06, 1.08],
+      ]) {
+        for (let segment = 0; segment <= opts.segs; segment++) {
+          const i = row * (opts.segs + 1) + segment;
+          const ratio = Math.hypot(a.getX(i), a.getZ(i)) / Math.hypot(b.getX(i), b.getZ(i));
+          expect(ratio).toBeGreaterThan(min);
+          expect(ratio).toBeLessThan(max);
+        }
+      }
+      const capStart = (opts.rings + 1) * (opts.segs + 1) + opts.segs;
+      for (let i = 0; i <= opts.segs; i++) {
+        expect(a.getX(capStart + i)).toBeCloseTo(a.getX(i), 5);
+        expect(a.getY(capStart + i)).toBeCloseTo(a.getY(i), 5);
+        expect(a.getZ(capStart + i)).toBeCloseTo(a.getZ(i), 5);
+      }
+      for (const name of ['position', 'normal'])
+        expect(Array.from(rolled.getAttribute(name).array).every(Number.isFinite)).toBe(true);
+    } finally {
+      plain.dispose();
+      rolled.dispose();
+    }
+  });
+
+  const make = (tier: string, seed = 820, lone = false) =>
+    buildCarbonateTower(
+      {
+        def: { id: 'surface-fixture' } as PropDef,
+        dims: lone ? [16, 16, 10] : [100, 100, 60],
+        seed,
+        cfg: DEFAULT_CONFIG.props,
+        tier,
+        groundHeight: () => (x, z) => x * 0.07 - z * 0.1,
+      },
+      lone,
+    );
+  const dispose = (built: ReturnType<typeof make>) => {
+    for (const root of [built.full, built.impostor])
+      root.traverse((object) => {
+        if (!(object instanceof THREE.Mesh || object instanceof THREE.Points)) return;
+        object.geometry.dispose();
+        for (const material of Array.isArray(object.material) ? object.material : [object.material])
+          material.dispose();
+      });
+  };
+  const digest = (built: ReturnType<typeof make>) => {
+    const hash = createHash('sha256');
+    for (const root of [built.full, built.impostor])
+      root.traverse((object) => {
+        if (!(object instanceof THREE.Mesh || object instanceof THREE.Points)) return;
+        for (const attribute of Object.values(
+          object.geometry.attributes as Record<string, THREE.BufferAttribute>,
+        )) {
+          expect(Array.from(attribute.array).every(Number.isFinite)).toBe(true);
+          hash.update(attribute.array);
+        }
+        if (object.geometry.index) hash.update(object.geometry.index.array);
+        if (object instanceof THREE.InstancedMesh) hash.update(object.instanceMatrix.array);
+      });
+    hash.update(JSON.stringify({ bounds: built.bounds, colliders: built.colliders }));
+    return hash.digest('hex');
+  };
+
+  for (const tier of ['low', 'medium', 'high']) {
+    it(`${tier}: keeps all seeded buffers repeatable and bounds the merged rock budget`, () => {
+      const built = [make(tier), make(tier), make(tier, 821)];
+      try {
+        expect(digest(built[0])).toBe(digest(built[1]));
+        expect(digest(built[0])).not.toBe(digest(built[2]));
+        expect(countGeo(built[0].full).draws).toBe(1);
+        expect(countGeo(built[0].full).triangles).toBeLessThan(
+          { low: 30_000, medium: 85_000, high: 120_000 }[tier]!,
+        );
+      } finally {
+        built.forEach(dispose);
+      }
+    });
+
+    for (const lone of [false, true]) {
+      it(`${tier} lone=${lone}: seats outer rubble across the slope and excludes it from lone chimneys`, () => {
+        const apron = vi.spyOn(shared, 'heightMesh');
+        const scatter = talus.scatterRubble;
+        const centres: [number, number][] = [];
+        const rubble = vi
+          .spyOn(talus, 'scatterRubble')
+          .mockImplementation((surface, keep, opts) => {
+            let calls = 0;
+            return scatter(
+              (x, z) => {
+                // Each accepted block samples its centre, then two slope axes.
+                if (calls++ % 5 === 0) centres.push([x, z]);
+                return surface(x, z);
+              },
+              keep,
+              opts,
+            );
+          });
+        const built = make(tier, 820, lone);
+        try {
+          if (tier === 'low') {
+            expect(rubble).not.toHaveBeenCalled();
+            return;
+          }
+          expect(rubble).toHaveBeenCalledOnce();
+          const skirt = apron.mock.calls[0][4];
+          const [surface, keep, options] = rubble.mock.calls[0];
+          const blocks = rubble.mock.results[0].value as THREE.BufferGeometry[];
+          expect(blocks.length).toBeLessThanOrEqual(lone ? 34 : 260);
+          expect(centres).toHaveLength(blocks.length);
+          const outer = centres.flatMap(([x, z], i) => {
+            const ground = x * 0.07 - z * 0.1;
+            if (skirt(x, z) >= ground - 1) return [];
+            expect(surface(x, z)).toBeCloseTo(ground + 0.05, 6);
+            const p = blocks[i].getAttribute('position');
+            const heights = Array.from(
+              { length: p.count },
+              (_, j) => p.getY(j) - (p.getX(j) * 0.07 - p.getZ(j) * 0.1),
+            );
+            expect(Math.min(...heights)).toBeLessThan(0);
+            expect(Math.max(...heights)).toBeGreaterThan(0);
+            return [i];
+          });
+          if (lone) expect(outer).toHaveLength(0);
+          else expect(outer.length).toBeGreaterThan(0);
+          // The scatter stays inside the existing build plane and does not run onto distant terrain.
+          for (const sign of [-1, 1]) {
+            expect(keep(sign * options.halfX, 0)).toBe(0);
+            expect(keep(0, sign * options.halfZ)).toBe(0);
+          }
+        } finally {
+          dispose(built);
+        }
+      });
+    }
+  }
 });

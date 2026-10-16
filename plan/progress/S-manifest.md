@@ -48,10 +48,11 @@ variant and apron defaults, and Lost City's inactive-apron habitat. The landed
 [scatter keepout](2240-S-manifest-scatter-keepout.md) and
 [atmosphere policy](2250-S-manifest-atmosphere-policy.md) slices remove rows 1/19
 and 3/10 respectively. Recount on 2026-10-16 found **8 expressions** before the
-sonar slice below; **4 discriminator expressions now remain**.
+sonar slice below, then four after sonar; **2 discriminator expressions now remain**
+after the terrain-carve slice below.
 
-Next: remaining rows from `plan/progress/2110-S-verify-9.md` (14, 15, 20 and 21),
-grouped by consuming module: terrain carve selection and wreck atmosphere/relief.
+Next: remaining rows from `plan/progress/2110-S-verify-9.md` (20 and 21):
+wreck atmosphere/relief in `WreckPreset.ts`.
 Shared numeric material defaults stay shared; the gallery-apron config default is a derived view
 of site data, preserving generic fallback behavior and explicit config overrides.
 
@@ -126,6 +127,86 @@ Validation:
   the 36 headless sonar render comparisons are byte-identical to baseline.
   Full gates require a rerun where subprocess provenance and preview startup
   work, with the golden CLI failure also resolved or diagnosed there.
+
+## Terrain-carve slice (2026-10-16)
+
+Recounted the original 31-expression inventory against current `src/` before
+editing: **four remained**, rows 14, 15, 20 and 21. This slice migrates the two
+terrain selectors (14 and 15), outside the preceding sonar slice's renderer
+and policy. **Two expressions remain**, both in `src/world/presets/WreckPreset.ts`:
+
+| Row | Remaining expression                                                       |
+| --: | -------------------------------------------------------------------------- |
+|  20 | `pois.some`: Endurance hull eligibility for atmosphere, horizon and relief |
+|  21 | `pois.find`: Endurance hull anchor lookup                                  |
+
+The count follows the original inventory's tuning/selection scope. The title
+backdrop's Monterey tile comparison selects whether to reuse an already-loaded
+resource; it applies no per-site tuning and was outside that inventory.
+
+The optional, strictly validated `terrain.carve` selects `"canyon-bend"` for
+Monterey and `"sinkhole"` for Blue Hole. All other sites omit it. Unknown sites,
+absent manifests and empty terrain policy return no carve. The existing shared
+reconstruction algorithms, geographic anchors, numeric constants, tint centre
+side effect and public API are unchanged. Both JSON files differ only by the
+new terrain section; their existing sonar and other authored fields are intact.
+
+Net simplification: the shared terrain path reads one policy instead of knowing
+two site identities. A small typed selector replaces both inline site comparisons;
+there is no new lookup table, helper, setting or UI. Schema/strict validation adds
+17 production TypeScript lines and the consumer adds two. Geometry details stay
+with the existing algorithms rather than expanding two strategy selectors into
+a configurable terrain framework.
+
+Before runtime edits, extended the existing terrain-feature capability suite and
+froze four baseline snapshots: both reconstructions with real tile centres and
+shifted centres. Each hashes a 5 m grid spanning the floor, banks, alcoves and
+falloff boundaries at four incoming measured heights. Together they cover
+**421,776 heights and 632,664 Blue Hole RGB tint triples**. Baseline: **8 tests
+passed**. Snapshot SHA-256:
+`ed3da0a984b01055ad5a3d0c87089664cebd88363906fc8e31b206092625d06b`.
+The baseline file is unchanged after migration; no existing golden or assertion
+was rebaselined or weakened.
+
+Capability checks also move each policy to an unknown site and remove policy
+from known sites. Validator table cases cover empty terrain, both strategies,
+unknown fields, malformed sections and invalid strategies. The shipped-manifest
+check requires exactly the two authored policies across all 13 sites.
+
+The existing sonar relocation test initially mocked away every other manifest
+section, inadvertently removing the newly data-selected terrain carve. Its mock
+now relocates only the sonar policy and preserves real manifest reads for the
+survey tile. Pixel, contour, label and relief assertions are unchanged; no sonar
+runtime code or frozen render snapshots changed.
+
+Validation:
+
+- Focused terrain features, manifest validation, fidelity carve, Blue Hole props,
+  carve agreement and sonar suites: **372 tests across six files passed** across
+  the initial run and corrected sonar rerun (42/42). All four terrain baseline
+  snapshots and all 36 pre-existing sonar baseline snapshots remain identical.
+- Typecheck, changed-file Prettier and `git diff --check`: **passed**.
+- Structural comparison against `HEAD`: terrain code is identical after
+  normalizing only the manifest import/read and two strategy selectors; both
+  JSON files retain every previous authored field.
+- Gate invocation:
+  `GATES_CONFIG_MODE=writable PW_PORT=4233 bash tools/gates.sh` (smoke + project-base).
+  Logs: `.cache/runs/20261016-151650-2-5v9nZt/`. **Completed, exit 1**.
+  Config, content, production build, unit, attribution and repository-wide
+  Prettier passed. Unit: **2,831 tests in 192 files passed** (370.71 s).
+  The project-base production build also passed.
+- Python: **161/166 passed**. The same five failures documented by the sonar
+  slice recur: four build-manifest cases report `spawnSync git EPERM`; the
+  unchanged golden CLI case fails parsing empty subprocess stdout with
+  `Unexpected end of JSON input` at `golden-manifest.test.mjs:151`.
+- Smoke and project-base e2e stop before tests because their preview server
+  cannot start. A direct bind check confirms
+  `listen EPERM: operation not permitted 127.0.0.1:4233`.
+  Browser screenshot acceptance remains unverified in this sandbox. Existing
+  golden files are untouched, the four pre-edit terrain baselines and all 36
+  sonar render baselines match exactly, and the reconstruction code is unchanged.
+  Full gates and screenshot acceptance need a rerun where preview startup and
+  the recorded tooling subprocess failures can be resolved.
 
 ## How to brief a migration
 

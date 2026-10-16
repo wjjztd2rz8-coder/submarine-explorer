@@ -26,6 +26,7 @@ function render(
   zoom: SonarZoom = DEFAULT_CONFIG.sonarZoom.initial,
   palette: SonarPaletteName = 'default',
   policySiteId = id,
+  hullId = 'endurance-hull',
 ) {
   vi.unstubAllGlobals();
   const meta = JSON.parse(readFileSync(`data/tiles/${tileId}/meta.json`, 'utf8')) as TileMeta;
@@ -51,7 +52,7 @@ function render(
   if (hull)
     sonar.setPois([
       {
-        id: 'endurance-hull',
+        id: hullId,
         position: new Vector3(centre.x, -2995, centre.z),
         radius: 60,
       } as PlacedPoi,
@@ -103,13 +104,58 @@ describe('1320 Endurance sonar scour contours', () => {
 });
 
 describe('sonar rendering equivalence', () => {
+  // Guards accidental scour/reef leakage onto any site without authored policy.
+  it.each([
+    ...manifests
+      .allSiteManifests()
+      .filter((site) => !site.sonar)
+      .map((site) => site.id),
+    'unknown',
+  ])('%s retains generic pixels, contours and measured depths even with a hull contact', (id) => {
+    const generic = render('endurance', true, 1, 'endurance', 250, 'default', 'unknown');
+    const actual = render('endurance', true, 1, 'endurance', 250, 'default', id);
+    expect(actual.rasters[0].data).toEqual(generic.rasters[0].data);
+    expect(actual.paths).toEqual(generic.paths);
+    expect(actual.labels).toEqual(generic.labels);
+    expect(actual.relief).toEqual(generic.relief);
+  });
+
+  it('anchors scour to the configured POI rather than a hardcoded hull identity', () => {
+    const authored = render('endurance', true);
+    vi.spyOn(manifests, 'siteManifest').mockReturnValue({
+      id: 'fixture',
+      sonar: { scourHullPoi: 'fixture-hull' },
+    });
+    const renamed = render(
+      'endurance',
+      true,
+      1,
+      'endurance',
+      DEFAULT_CONFIG.sonarZoom.initial,
+      'default',
+      'fixture',
+      'fixture-hull',
+    );
+    expect(renamed.rasters[0].data).toEqual(authored.rasters[0].data);
+    expect(renamed.paths).toEqual(authored.paths);
+    expect(renamed.labels).toEqual(authored.labels);
+    expect(renamed.relief).toEqual(authored.relief);
+    const missing = render('endurance', true);
+    expect(missing.paths).not.toEqual(renamed.paths);
+    expect(missing.labels.length).toBeGreaterThan(0);
+  });
+
   it.each([
     ['endurance', true, 'endurance'],
     ['great-blue-hole', false, 'great-blue-hole'],
   ] as const)('selects %s rendering through policy on another site', (id, hull, tileId) => {
     const authored = render(id, hull, 1, tileId);
     const policy = manifests.siteManifest(id)!.sonar;
-    vi.spyOn(manifests, 'siteManifest').mockReturnValue({ id: 'unknown', sonar: policy });
+    const lookup = manifests.siteManifest;
+    // Relocate sonar policy while retaining the survey's authored terrain reconstruction.
+    vi.spyOn(manifests, 'siteManifest').mockImplementation((site) =>
+      site === 'unknown' ? { id: site, sonar: policy } : lookup(site),
+    );
     const relocated = render(
       id,
       hull,

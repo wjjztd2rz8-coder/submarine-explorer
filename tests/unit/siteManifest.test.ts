@@ -58,6 +58,25 @@ describe('site manifest validator', () => {
 
   const cases: [string, unknown, string | null][] = [
     ['minimal', { id: 's' }, null],
+    ['empty terrain', { id: 's', terrain: {} }, null],
+    ...['canyon-bend', 'sinkhole'].map((carve): [string, unknown, null] => [
+      `terrain carve ${carve}`,
+      { id: 's', terrain: { carve } },
+      null,
+    ]),
+    ...[null, [], 'terrain', 1].map((terrain): [string, unknown, string] => [
+      `malformed terrain ${JSON.stringify(terrain)}`,
+      { id: 's', terrain },
+      'terrain: expected an object',
+    ]),
+    ['unknown terrain field', { id: 's', terrain: { typo: 1 } }, 'terrain.typo: unknown field'],
+    ...['', ' ', 'monterey-canyon', 'great-blue-hole', 1, null, {}, []].map(
+      (carve): [string, unknown, string] => [
+        `invalid terrain carve ${JSON.stringify(carve)}`,
+        { id: 's', terrain: { carve } },
+        'terrain.carve: expected canyon-bend or sinkhole',
+      ],
+    ),
     ['empty sonar', { id: 's', sonar: {} }, null],
     ['disabled reef', { id: 's', sonar: { reef: false } }, null],
     [
@@ -424,6 +443,15 @@ it('ships only authored sonar policies with an existing scour anchor', () => {
 });
 
 describe('shipped site manifests', () => {
+  it('ships only the two authored terrain reconstructions', () => {
+    const expected = new Map([
+      ['monterey-canyon', { carve: 'canyon-bend' }],
+      ['great-blue-hole', { carve: 'sinkhole' }],
+    ]);
+    for (const id of ids) expect(siteManifest(id)!.terrain).toEqual(expected.get(id));
+    expect(siteManifest('unknown')?.terrain).toBeUndefined();
+  });
+
   it('every landmark has a valid manifest, and unknown sites have none', () => {
     expect(
       allSiteManifests()

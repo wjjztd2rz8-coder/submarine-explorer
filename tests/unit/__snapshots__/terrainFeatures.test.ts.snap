@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`terrain carve equivalence > great-blue-hole, shifted tile centre false: preserves heights and vertex tint 1`] = `
+{
+  "centre": {
+    "x": -157.43050033975456,
+    "z": -44.80193984705082,
+  },
+  "heightSamples": 105444,
+  "heights": "5eb190f5b8cb5d3303b69bffc8318686ffc0d0d8240fe549dc3fcfc5331fb2fa",
+  "tint": "b95f472175fe16841c2fa61593dda67bed3d96c95db565fc1e38f1df0b0290f4",
+}
+`;
+
+exports[`terrain carve equivalence > great-blue-hole, shifted tile centre true: preserves heights and vertex tint 1`] = `
+{
+  "centre": {
+    "x": -51.15503420373391,
+    "z": 66.51806015308523,
+  },
+  "heightSamples": 105444,
+  "heights": "fb12201857ce69d062af2ba9f4c2d64c173684d1d5c0a2daa51bf50ca3714d49",
+  "tint": "3ee5bbcc2939cd95b720ac07cddbf0f8d6260f110aab2f4fa74c665ec9b6ce94",
+}
+`;
+
+exports[`terrain carve equivalence > monterey-canyon, shifted tile centre false: preserves heights and vertex tint 1`] = `
+{
+  "centre": {
+    "x": -3230.927430367679,
+    "z": -1358.837559250192,
+  },
+  "heightSamples": 105444,
+  "heights": "0500880791ece7a02ca8cfaf840a7468040b74a5efef9e279cc65c85f3c77faa",
+  "tint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+}
+`;
+
+exports[`terrain carve equivalence > monterey-canyon, shifted tile centre true: preserves heights and vertex tint 1`] = `
+{
+  "centre": {
+    "x": -3141.71771694984,
+    "z": -1247.5175592504515,
+  },
+  "heightSamples": 105444,
+  "heights": "0500880791ece7a02ca8cfaf840a7468040b74a5efef9e279cc65c85f3c77faa",
+  "tint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+}
+`;

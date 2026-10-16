@@ -1,5 +1,8 @@
 {
   "id": "monterey-canyon",
+  "terrain": {
+    "carve": "canyon-bend"
+  },
   "audio": {
     "whaleHabitat": true
   },

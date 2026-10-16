@@ -1,5 +1,14 @@
-import { describe, expect, it } from 'vitest';
-import { terrainCarveFor, BLUE_HOLE_RADIUS_M } from '../../src/world/terrainFeatures.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import * as manifests from '../../src/core/SiteManifest.js';
+import {
+  terrainCarveFor,
+  BLUE_HOLE_RADIUS_M,
+  blueHoleTint,
+} from '../../src/world/terrainFeatures.js';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { createHash } from 'node:crypto';
 import type { TileMeta } from '../../src/util/types.js';
 
 const meta = {
@@ -10,7 +19,7 @@ const meta = {
 describe('Blue Hole carve', () => {
   const carve = terrainCarveFor(meta)!;
   const { x, z } = carve.centre;
-  it('only exists for the Blue Hole tile', () => {
+  it('leaves sites without a reconstruction unchanged', () => {
     expect(terrainCarveFor({ ...meta, id: 'titanic' } as TileMeta)).toBeNull();
   });
   it('digs a ~125 m deep hole under a 4 m deep shelf and leaves the shelf alone outside', () => {
@@ -28,4 +37,75 @@ describe('Blue Hole carve', () => {
     expect(h).toBeLessThan(-30);
     expect(h).toBeGreaterThan(-50);
   });
+});
+
+describe('terrain carve policy', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it.each(['monterey-canyon', 'great-blue-hole'])(
+    '%s reconstruction follows policy on an unknown site',
+    (id) => {
+      // Guard against reintroducing site identity checks in the shared terrain path.
+      const tile = JSON.parse(readFileSync(`data/tiles/${id}/meta.json`, 'utf8')) as TileMeta;
+      const original = terrainCarveFor(tile)!;
+      const terrain = manifests.siteManifest(id)!.terrain;
+      vi.spyOn(manifests, 'siteManifest').mockImplementation((id) => ({ id, terrain }));
+      const moved = terrainCarveFor({ ...tile, id: 'unknown' })!;
+      expect(moved.centre).toEqual(original.centre);
+      for (const dx of [-240, -160, -90, 0, 30, 140, 215, 231])
+        for (const dz of [-621, -450, 0, 450, 619, 620]) {
+          const x = original.centre.x + dx;
+          const z = original.centre.z + dz;
+          expect(moved.apply(x, z, -4)).toBe(original.apply(x, z, -4));
+        }
+    },
+  );
+
+  it.each([undefined, {}, { terrain: {} }])(
+    'does not infer a carve without policy %j',
+    (policy) => {
+      vi.spyOn(manifests, 'siteManifest').mockImplementation((id) =>
+        policy ? { id, ...policy } : undefined,
+      );
+      for (const id of ['monterey-canyon', 'great-blue-hole', 'unknown'])
+        expect(terrainCarveFor({ ...meta, id })).toBeNull();
+    },
+  );
+});
+
+describe('terrain carve equivalence', () => {
+  for (const id of ['monterey-canyon', 'great-blue-hole']) {
+    for (const shifted of [false, true]) {
+      it(`${id}, shifted tile centre ${shifted}: preserves heights and vertex tint`, () => {
+        // Freeze the original reconstruction across floors, banks, alcoves and falloff edges.
+        // A shifted tile also guards the conversion from geographic to local coordinates.
+        const tile = JSON.parse(readFileSync(`data/tiles/${id}/meta.json`, 'utf8')) as TileMeta;
+        if (shifted) tile.center = { lat: tile.center.lat + 0.001, lon: tile.center.lon - 0.001 };
+        const carve = terrainCarveFor(tile)!;
+        const heights: number[] = [];
+        const tint: number[] = [];
+        for (let dz = -650; dz <= 650; dz += 5) {
+          for (let dx = -250; dx <= 250; dx += 5) {
+            const x = carve.centre.x + dx;
+            const z = carve.centre.z + dz;
+            for (const measured of [-4, -100, -800, -1100]) {
+              const y = carve.apply(x, z, measured);
+              heights.push(y);
+              if (id === 'great-blue-hole') {
+                for (const normalY of [0, 0.5, 1]) tint.push(...blueHoleTint(x, y, z, normalY));
+              }
+            }
+          }
+        }
+        const hash = (values: number[]) =>
+          createHash('sha256').update(JSON.stringify(values)).digest('hex');
+        expect({
+          centre: carve.centre,
+          heightSamples: heights.length,
+          heights: hash(heights),
+          tint: hash(tint),
+        }).toMatchSnapshot();
+      });
+    }
+  }
 });
