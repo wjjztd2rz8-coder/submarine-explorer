@@ -1244,3 +1244,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h 2% until 23:09 CDT; 2170/2180/2190 worktrees hold uncommitted work, queue 2200/2210/2220 waits for the dispatcher. No tag (f55 waits for green CI).
 - **Not done:** Blue Hole hood slab carve; V-endurance-aim parked.
 - **Needs owner:** real-phone play of the newest build (Low tier).
+
+## 2026-10-15 22:55 CDT headless run 18 (Claude)
+
+- **Merged and pushed:** Sonnet V-lostcity-2 (tower wall relief, vent paint keyed to torn rim, High-tier slope variety; ~3.8). Smoke + project-base green; no full e2e. Low-tier honeycomb remains (texture/normal fix).
+- **Codex:** 5h 2% until 23:09 CDT; 2170/2180/2190 worktrees hold uncommitted work, queue 2200/2210/2220 waits for the dispatcher. No tag (f55 waits for green CI).
+- **Not done:** Blue Hole hood slab carve; V-endurance-aim parked.
+- **Needs owner:** real-phone play of the newest build (Low tier).
