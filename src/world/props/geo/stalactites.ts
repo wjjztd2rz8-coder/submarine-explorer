@@ -36,6 +36,7 @@ import {
   buildTalusMesh,
   placeRocks,
   rockMatrix,
+  talusBedLevel,
   talusMeshSampler,
   talusSurface,
   type TalusShape,
@@ -386,8 +387,8 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   // original grid and budget; filtered surface normals soften its coarse folds.
   const apronRows = d.rubble ? Math.round(baseRows * sediment.rowDensity) : baseRows;
   const apronColumns = d.rubble ? Math.round(baseColumns * sediment.columnDensity) : baseColumns;
-  const bedTone = (y: number): number => {
-    const bi = sediment.bedHeightM > 0 ? Math.floor(y / sediment.bedHeightM) : 0;
+  const bedTone = (level: number): number => {
+    const bi = Math.floor(level);
     return 0.5 + 0.5 * Math.sin(bi * 12.9898 + 2.3) * Math.cos(bi * 5.17);
   };
   const apron = buildTalusMesh(
@@ -415,7 +416,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
       out.multiplyScalar(0.5 + 0.5 * smooth(0, 0.4, u));
       // Broad, light sediment beds follow actual apron terraces. Thin painted
       // joints drew contour lines even when the shared rock map was disabled.
-      out.multiplyScalar(1.03 + 0.3 * bedTone(y));
+      out.multiplyScalar(1.03 + 0.3 * bedTone(talusBedLevel(talus, x, y)));
       // Concave riser feet trap silt; shade their soft contact, rather than drawing
       // a contour stripe across every tread. Feather away from the buried joins.
       const e = sediment.normalSampleM;
@@ -444,9 +445,13 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   // plastic sheen; retain the inherited scattered/opening-light shader.
   const positions = apron.getAttribute('position');
   const roughness = new Float32Array(positions.count);
-  for (let i = 0; i < positions.count; i++)
-    roughness[i] = (bedTone(positions.getY(i)) - 0.5) * sediment.roughnessVariation;
+  const bedLevel = new Float32Array(positions.count);
+  for (let i = 0; i < positions.count; i++) {
+    bedLevel[i] = talusBedLevel(talus, positions.getX(i), positions.getY(i));
+    roughness[i] = (bedTone(bedLevel[i]!) - 0.5) * sediment.roughnessVariation;
+  }
   apron.setAttribute('sedimentRoughness', new THREE.BufferAttribute(roughness, 1));
+  apron.setAttribute('bedLevel', new THREE.BufferAttribute(bedLevel, 1));
   const inherited = apronMaterial.onBeforeCompile;
   const cacheKey = apronMaterial.customProgramCacheKey();
   apronMaterial.onBeforeCompile = (shader, renderer) => {
@@ -454,23 +459,23 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
-        '#include <common>\nattribute float sedimentRoughness;\nvarying float vSedimentRoughness;\nvarying float vBedY;',
+        '#include <common>\nattribute float sedimentRoughness;\nattribute float bedLevel;\nvarying float vSedimentRoughness;\nvarying float vBedLevel;',
       )
       .replace(
         '#include <begin_vertex>',
-        '#include <begin_vertex>\nvSedimentRoughness = sedimentRoughness;\nvBedY = position.y;',
+        '#include <begin_vertex>\nvSedimentRoughness = sedimentRoughness;\nvBedLevel = bedLevel;',
       );
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        '#include <common>\nvarying float vSedimentRoughness;\nvarying float vBedY;',
+        '#include <common>\nvarying float vSedimentRoughness;\nvarying float vBedLevel;',
       )
       // Terraces are contours of height: shade each bed per pixel (lit lip, silted foot) so the
       // steps read at any triangle density, including Low's coarse grid.
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
-float bedF = fract(vBedY / ${sediment.bedHeightM.toFixed(3)});
+float bedF = fract(vBedLevel);
 float bedRise = smoothstep(0.04, 0.3, bedF) * (1.0 - smoothstep(0.7, 0.96, bedF));
 diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sediment.lipLight.toFixed(3)} * smoothstep(0.86, 0.99, bedF);`,
       )
