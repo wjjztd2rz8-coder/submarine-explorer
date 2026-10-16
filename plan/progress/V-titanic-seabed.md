@@ -25,3 +25,7 @@ Net: no new machinery, one data entry, no shared-code branch, no settings, test 
 ## Remaining issues
 
 Seabed beside the hull is still modest from the approach; a scour moat would need a terrain change. Hull plating repetition untouched. Own rating: Titanic seabed ~3.2 before, ~3.6 after (judgement from screenshots).
+
+## Gates
+
+`PW_PORT=4733 tools/gates.sh`: all PASS.
