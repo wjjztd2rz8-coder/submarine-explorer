@@ -243,7 +243,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
   };
 
   const ledgeBed = (x: number, y: number): { bedI: number; bedF: number } => {
-    const bedY = y / (2.1 * scale) + 0.9 * fbm3(x * 0.04, 3, seed + 9, seed + 4, 2);
+    const bedY = y / (2.1 * scale) + 0.9 * fbm3(x * 0.04, 3, seed + 9, seed + 4, 2) + x * 0.045;
     const bedI = Math.floor(bedY);
     return { bedI, bedF: bedY - bedI };
   };
@@ -282,7 +282,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const lipZone = smooth(0.5, 0.95, -z / D) * win;
     const chip = (fbm3(x * 0.3, y * 0.5, seed + 83, seed + 12, 3) - 0.34) * 2.4;
     // Raised bays also draw back, so each step reads as an overhang over the one below.
-    const draw = hood ? shelfStep(x) * 0.12 * D * roofZone(y, z, x) : 0;
+    const draw = hood ? (shelfStep(x) * 0.12 - 0.09 * overhangAt(x)) * D * roofZone(y, z, x) : 0;
     return disp(x, y, z) - lipZone * Math.max(0, chip) * 4.5 * scale + draw;
   };
 
@@ -299,12 +299,44 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     smooth(0.56 * H, 0.64 * H, y) *
     smooth(0.25, 0.8, -z / D) *
     (1 - smooth(0.6, 1, endRatio(x, W)));
-  const roofRise = (x: number, y: number, z: number): number =>
-    hood
-      ? roofZone(y, z, x) *
-        H *
-        (0.2 * shelfStep(x) + 0.12 * shelfStep(x, 31) * smooth(0.6 * H, 0.66 * H, y))
-      : 0;
+  /**
+   * Three drop-offs where the roof steps down (a missing slab) and the neighbouring block overhangs
+   * the gap: 0 outside, 1 in the notch, with near-sharp sides. Positions are fractions of the width.
+   */
+  const NOTCHES: readonly (readonly [number, number])[] = [
+    [-0.27, 0.05],
+    [0.08, 0.04],
+    [0.31, 0.055],
+  ];
+  const notchAt = (x: number): number => {
+    let n = 0;
+    for (const [f, hw] of NOTCHES) {
+      const dx = Math.abs(x - f * W) / (hw * W);
+      n = Math.max(n, 1 - smooth(0.85, 1.05, dx));
+    }
+    return n;
+  };
+  /** The blocks flanking each notch jut out over the gap. */
+  const overhangAt = (x: number): number => {
+    let n = 0;
+    for (const [f, hw] of NOTCHES) {
+      const dx = Math.abs(x - f * W) / (hw * W);
+      n = Math.max(n, smooth(1.05, 1.25, dx) * (1 - smooth(1.9, 2.4, dx)));
+    }
+    return n;
+  };
+  /** Front-lip thickness 0..1 per x: thin plateau fronts alternate with thick ones. */
+  const lipThick = (x: number): number => 0.12 + 0.88 * shelfStep(x * 1.3 + 40, 53);
+  const roofRise = (x: number, y: number, z: number): number => {
+    if (!hood) return 0;
+    const zone = roofZone(y, z, x);
+    const body = H * (0.2 * shelfStep(x) + 0.12 * shelfStep(x, 31) * smooth(0.6 * H, 0.66 * H, y));
+    // Thin the front lip where the plateau is thin; the roof top behind keeps its full height.
+    const lip = 1 - smooth(0.63 * H, 0.68 * H, y);
+    const thin = 1 - lip * (1 - lipThick(x)) * 0.85;
+    const drop = H * 0.13 * notchAt(x) * smooth(0.58 * H, 0.64 * H, y);
+    return zone * (body * thin - drop);
+  };
 
   // --- the wall
   const wall = extrudeProfile(
@@ -334,7 +366,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     out.multiplyScalar(1 - 0.18 * smooth(0.7, 1, Math.sin(y * 0.9 + n * 4)));
     if (y > H * 0.48 && y < H * 0.64 && ny < -0.3) out.multiplyScalar(0.78);
     // Strata: uneven warm and grey beds with a dark joint between, so the face is not one flat tone.
-    const bed = y / (2.6 * scale) + 1.3 * fbm3(x * 0.05, 1, z * 0.05, seed ^ 0x77, 2);
+    const bed = y / (2.6 * scale) + 1.3 * fbm3(x * 0.05, 1, z * 0.05, seed ^ 0x77, 2) - x * 0.035 + z * 0.02;
     const bh = fbm3(Math.floor(bed) * 3.1, 7, 1, seed ^ 0x13, 2);
     out.lerp(BED_WARM, smooth(0.45, 0.75, bh) * 0.45).lerp(BED_COOL, smooth(0.45, 0.2, bh) * 0.4);
     out.multiplyScalar(0.72 + 0.28 * smooth(0, 0.12, bed - Math.floor(bed)));

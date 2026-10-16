@@ -167,14 +167,21 @@ export function blueHoleTerraces(a: number, r: number): number {
  * edges), well below the pendants and clear of the original seat radius.
  */
 export function blueHoleApron(a: number, r: number): number {
-  if (r < 112 || r > 152) return 0;
+  if (r < 112 || r > 168) return 0;
   const mouth = galleryMouth(a);
   const window = 1 - mouth;
   if (window <= 0) return 0;
   const rr = r + 1.6 * Math.sin(9 * a + 0.3 + r * 0.04) + 1.0 * Math.sin(23 * a + 1.1);
   let drop = 0;
-  for (const edge of [146, 139.5, 133, 126.5]) drop += 1.7 * smoothstep(clamp01((edge - rr) / 2.2));
-  const ends = smoothstep(clamp01((r - 112) / 8)) * (1 - smoothstep(clamp01((r - 146) / 6)));
+  // Each step has its own height and wanders in depth with bearing, so the treads fan and
+  // pinch instead of running as even parallel shelves; low mounds of slumped sediment break them.
+  [146, 139.5, 133, 126.5].forEach((edge, i) => {
+    const wander = 3.2 * Math.sin(5 * a + i * 1.9) + 1.6 * Math.sin(13 * a + i * 0.7);
+    const height = 1.7 * (0.55 + 0.9 * (0.5 + 0.5 * Math.sin(4 * a + i * 2.3)));
+    drop += height * smoothstep(clamp01((edge + wander - rr) / 2.2));
+  });
+  drop -= 1.3 * Math.max(0, Math.sin(0.5 * r + 6 * a)) * Math.max(0, Math.sin(19 * a + r * 0.16 + 1));
+  const ends = smoothstep(clamp01((r - 112) / 8)) * (1 - smoothstep(clamp01((r - 160) / 8)));
   return -drop * window * ends;
 }
 
