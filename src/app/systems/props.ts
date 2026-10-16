@@ -36,14 +36,15 @@ export const propsSystem: GameSystem = {
     void props.load(contentUrl(propsLandmark, 'props.json'), propsLandmark).then((st) => {
       if (props.placed.some((p) => p.def.clearsGround))
         terrain.scatter.setGroundKeepout((x, z) => props.coversGround(x, z));
-      if (propsLandmark === 'challenger-deep') {
-        const lander = props.placed.find((p) => p.def.id === 'leggo-lander-marker');
-        if (lander) {
-          lander.root.updateMatrixWorld(true);
-          terrain.scatter.setBoulderKeepout(
-            lander.localBounds.clone().applyMatrix4(lander.root.matrixWorld),
-          );
-        }
+      const manifest = siteManifest(propsLandmark);
+      const hero = manifest?.scatter?.keepoutHero
+        ? props.placed.find((p) => p.def.id === manifest.opening?.freeDive?.hero)
+        : undefined;
+      if (hero) {
+        hero.root.updateMatrixWorld(true);
+        terrain.scatter.setBoulderKeepout(
+          hero.localBounds.clone().applyMatrix4(hero.root.matrixWorld),
+        );
       }
       // Explicit probes and missions keep their poses; don't teleport a pilot
       // who has already moved while optional models were downloading.
@@ -64,10 +65,7 @@ export const propsSystem: GameSystem = {
         );
         if (pose) {
           sub.reset(pose.x, pose.y, pose.z, pose.yaw);
-          if (
-            siteManifest(propsLandmark)?.opening?.camera?.applyDefaults ||
-            pose.chaseOffsetY !== undefined
-          )
+          if (manifest?.opening?.camera?.applyDefaults || pose.chaseOffsetY !== undefined)
             rig.setChaseRadiusDefault(
               pose.chaseRadius,
               pose.chaseOffsetX,

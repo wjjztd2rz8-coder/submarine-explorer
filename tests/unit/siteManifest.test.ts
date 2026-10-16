@@ -15,6 +15,35 @@ const ids = (
 describe('site manifest validator', () => {
   const cases: [string, unknown, string | null][] = [
     ['minimal', { id: 's' }, null],
+    ['empty scatter', { id: 's', scatter: {} }, null],
+    ['disabled keepout', { id: 's', scatter: { keepoutHero: false } }, null],
+    ['opening hero keepout', { ...siteManifest('challenger-deep'), id: 's' }, null],
+    ['invalid scatter object', { id: 's', scatter: [] }, 'scatter: expected an object'],
+    ['null scatter', { id: 's', scatter: null }, 'scatter: expected an object'],
+    [
+      'unknown scatter policy',
+      { id: 's', scatter: { keepoutHeros: true } },
+      'scatter.keepoutHeros: unknown field',
+    ],
+    ...['leggo-lander-marker', 1, null, {}].map((keepoutHero): [string, unknown, string] => [
+      `invalid keepout flag ${JSON.stringify(keepoutHero)}`,
+      { id: 's', scatter: { keepoutHero } },
+      'scatter.keepoutHero: expected a boolean',
+    ]),
+    [
+      'keepout requires the opening hero',
+      { id: 's', scatter: { keepoutHero: true } },
+      'scatter.keepoutHero: requires opening.freeDive.hero',
+    ],
+    [
+      'reframe alone cannot bind keepout',
+      {
+        id: 's',
+        scatter: { keepoutHero: true },
+        opening: { reframe: siteManifest('challenger-deep')!.opening!.reframe },
+      },
+      'scatter.keepoutHero: requires opening.freeDive.hero',
+    ],
     [
       'gallery apron',
       { id: 's', props: { p: { galleryApron: propManifest('karst-grotto')!.galleryApron } } },
@@ -315,6 +344,17 @@ describe('shipped site manifests', () => {
     for (const id of ids) expect(siteManifest(id)?.id).toBe(id);
     expect(siteManifest('no-such-site')).toBeUndefined();
     expect(propManifest('no-such-prop')).toBeUndefined();
+  });
+
+  it('only Challenger reserves its existing opening hero, which belongs to its prop content', () => {
+    const keepouts = allSiteManifests().filter((m) => m.scatter?.keepoutHero);
+    expect(keepouts.map((m) => m.id)).toEqual(['challenger-deep']);
+    for (const manifest of keepouts) {
+      const hero = manifest.opening!.freeDive!.hero;
+      const doc = JSON.parse(readFileSync(`data/landmarks/${manifest.id}/props.json`, 'utf8'));
+      expect(hero).toBe('leggo-lander-marker');
+      expect(doc.props.filter((p: { id: string }) => p.id === hero)).toHaveLength(1);
+    }
   });
 });
 

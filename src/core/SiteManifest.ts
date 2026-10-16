@@ -152,6 +152,10 @@ export interface SiteManifest {
     camera?: { applyDefaults?: boolean };
   };
   life?: { opening?: GroupOpeningLife | ApproachOpeningLife };
+  scatter?: {
+    /** Reserve opening.freeDive.hero's world bounds from boulders after props load. */
+    keepoutHero?: boolean;
+  };
   audio?: {
     /** Habitat whale calls may play here (separate from event whale eligibility). */
     whaleHabitat?: boolean;
@@ -346,7 +350,7 @@ const propCheck = fields(
 /** Throws with the site id and field path on the first problem. */
 export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
   const root = obj(id, '$', raw);
-  noExtra(id, '$', root, ['id', 'audio', 'events', 'opening', 'life', 'props']);
+  noExtra(id, '$', root, ['id', 'audio', 'events', 'opening', 'life', 'props', 'scatter']);
   if (root.id !== id) fail(id, 'id', `expected "${id}"`);
   const out: SiteManifest = { id };
   if (root.audio !== undefined) {
@@ -371,6 +375,12 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
   if (root.life !== undefined) {
     fields({}, { opening: lifeOpeningCheck })(id, 'life', root.life);
     out.life = root.life as SiteManifest['life'];
+  }
+  if (root.scatter !== undefined) {
+    fields({}, { keepoutHero: flag })(id, 'scatter', root.scatter);
+    out.scatter = root.scatter as SiteManifest['scatter'];
+    if (out.scatter?.keepoutHero && !out.opening?.freeDive)
+      fail(id, 'scatter.keepoutHero', 'requires opening.freeDive.hero');
   }
   if (root.props !== undefined) {
     const props = obj(id, 'props', root.props);

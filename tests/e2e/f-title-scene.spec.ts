@@ -244,19 +244,23 @@ for (const preference of ['OS', 'saved'] as const) {
 test('covering home modals stop title draws and return to a usable menu', async ({ page }) => {
   await boot(page);
   await presented(page);
-  for (const [name, selector] of [
-    ['Settings', '.settings'],
-    ['Journal', '.journal'],
-    ['Controls', '.settings'],
+  for (const [name, selector, accessibleName] of [
+    ['Settings', '.settings', 'Settings'],
+    ['Journal', '.journal', 'Journal'],
+    ['Controls', '.controls-card', 'Controls guide'],
   ]) {
     await page.locator('.home-menu').getByRole('button', { name, exact: true }).click();
     const dialog = page.locator(selector);
     await expect(dialog).toBeVisible();
-    await expect(dialog).toHaveAccessibleName(name);
+    await expect(dialog).toHaveAccessibleName(accessibleName);
     if (name === 'Controls') {
-      await expect(dialog.getByRole('region', { name: 'Controls', exact: true })).toBeVisible();
+      // Home opens the device guide; key rebinding remains a separate Settings page.
+      await expect(dialog.getByRole('heading', { name: 'Controls', exact: true })).toBeVisible();
+      await expect(dialog.getByRole('group', { name: 'Input device', exact: true })).toBeVisible();
+      await expect(page.locator('.settings')).toBeHidden();
+      await page.keyboard.press('Tab');
       await expect(
-        dialog.getByRole('button', { name: 'Back to Settings', exact: true }),
+        dialog.getByRole('button', { name: 'Keyboard and mouse', exact: true }),
       ).toBeFocused();
     }
     await expect.poll(async () => (await title(page)).active).toBe(false);
@@ -269,6 +273,29 @@ test('covering home modals stop title draws and return to a usable menu', async 
     ).toBeFocused();
     await expect.poll(async () => (await title(page)).active).toBe(true);
     await expect.poll(async () => (await title(page)).drawCount).toBeGreaterThan(before);
+    if (name === 'Controls') {
+      // Guard the guide-to-rebinding handoff as well as its direct Escape path.
+      await page.locator('.home-menu').getByRole('button', { name, exact: true }).click();
+      await dialog.getByRole('button', { name: 'Change keys', exact: true }).click();
+      const settings = page.locator('.settings');
+      await expect(dialog).toBeHidden();
+      await expect(settings).toBeVisible();
+      await expect(settings).toHaveAccessibleName('Controls');
+      await expect(settings.getByRole('region', { name: 'Controls', exact: true })).toBeVisible();
+      await expect(
+        settings.getByRole('button', { name: 'Back to Settings', exact: true }),
+      ).toBeFocused();
+      await expect.poll(async () => (await title(page)).active).toBe(false);
+      await stopped(page);
+      const paused = (await title(page)).drawCount;
+      await page.keyboard.press('Escape');
+      await expect(settings).toBeHidden();
+      await expect(
+        page.locator('.home-menu').getByRole('button', { name, exact: true }),
+      ).toBeFocused();
+      await expect.poll(async () => (await title(page)).active).toBe(true);
+      await expect.poll(async () => (await title(page)).drawCount).toBeGreaterThan(paused);
+    }
   }
 });
 
