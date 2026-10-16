@@ -70,7 +70,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running. Codex 2370/2380/2390 finished (collected in the third review); queue 2400+ below.
+- V-beebe-close IN FLIGHT (Sonnet, 2026-10-16, ../subexp-wt/V-beebe-close). Codex 2370/2380/2390 finished (collected in the third review); queue 2400+ below.
 
 ## Backlog
 
