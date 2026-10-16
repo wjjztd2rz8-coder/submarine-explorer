@@ -71,6 +71,7 @@ The newest items go first.
 ## In flight
 
 - Codex queue 2170 J-journeys-repeat, 2180 S-verify-12, 2190 S-bughunt-9 waits for the 17:24 CDT Codex reset. No Claude package running.
+- V-endurance-aim [Sonnet, 2026-10-15]: per-site chase aim (item 4).
 
 ## Backlog
 
