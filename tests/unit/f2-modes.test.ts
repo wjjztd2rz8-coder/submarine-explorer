@@ -4,6 +4,35 @@ import { expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { Save, migrate, SETTINGS_STORAGE_KEY } from '../../src/core/Save.js';
 import { currentScale, MODES_CONFIG } from '../../src/core/config/modes.js';
+import { modesSystem } from '../../src/app/systems/modes.js';
+import type { GameContext } from '../../src/app/context.js';
+
+it('does not apply sensor radii after disposal when the previous site finishes loading', async () => {
+  let ready!: () => void;
+  const pending = new Promise<void>((resolve) => {
+    ready = resolve;
+  });
+  const context = (loaded: Promise<void>) =>
+    ({
+      discovery: { ready: loaded, pois: [{ id: 'target', radius: 10 }] },
+      effective: { sensor: { scanRadiusMultiplier: 2 } },
+    }) as unknown as GameContext;
+  const old = context(pending);
+  const next = context(Promise.resolve());
+  try {
+    modesSystem.init!(old);
+    modesSystem.dispose?.();
+    modesSystem.init!(next);
+    ready();
+    await pending;
+    expect(old.discovery.pois[0].radius).toBe(10);
+    expect(old.baseScanRadii.size).toBe(0);
+    expect(next.discovery.pois[0].radius).toBe(20);
+    expect(next.baseScanRadii.get('target')).toBe(10);
+  } finally {
+    modesSystem.dispose?.();
+  }
+});
 
 it('maps modes to options and every advanced edit to Custom, then resets all options', () => {
   const save = new Save({ config: DEFAULT_CONFIG, storage: null });

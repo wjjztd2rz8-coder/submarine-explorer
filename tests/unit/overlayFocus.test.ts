@@ -809,7 +809,7 @@ const stats: DebriefStats = {
   discoveries: [],
   newEntries: [],
 };
-function settings() {
+function settings(onResetProgress?: () => 'cleared' | 'sessionOnly') {
   const input = new Input({ storage: null });
   const save = new Save({ config: DEFAULT_CONFIG, storage: null });
   const screen = new SettingsScreen({
@@ -818,6 +818,7 @@ function settings() {
     config: DEFAULT_CONFIG,
     activeTier: 'low',
     activeDetailStrength: save.get().detailStrength,
+    onResetProgress,
   });
   cleanup.push(() => {
     screen.dispose();
@@ -825,6 +826,50 @@ function settings() {
   });
   return { screen, input };
 }
+
+it.each(['cleared', 'sessionOnly'] as const)(
+  'cancels the pending %s discoveries reload when Settings is disposed',
+  (result) => {
+    vi.useFakeTimers();
+    const reload = vi.fn();
+    Object.assign(window, { setTimeout, clearTimeout, location: { reload } });
+    const { screen } = settings(() => result);
+    try {
+      const root = screen.root as unknown as Element;
+      const confirm = root.querySelector('.settings-confirm')!.querySelector('button')!;
+      confirm.dispatchEvent(new Event('click'));
+      expect(vi.getTimerCount()).toBe(1);
+      screen.dispose();
+      vi.runAllTimers();
+      expect(reload).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  },
+);
+
+it('keeps repeated discovery resets to one delayed reload while Settings remains alive', () => {
+  vi.useFakeTimers();
+  const reload = vi.fn();
+  Object.assign(window, { setTimeout, clearTimeout, location: { reload } });
+  const { screen } = settings(() => 'cleared');
+  try {
+    const root = screen.root as unknown as Element;
+    const confirm = root.querySelector('.settings-confirm')!.querySelector('button')!;
+    confirm.dispatchEvent(new Event('click'));
+    vi.advanceTimersByTime(300);
+    confirm.dispatchEvent(new Event('click'));
+    expect(vi.getTimerCount()).toBe(1);
+    vi.advanceTimersByTime(599);
+    expect(reload).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
+    expect(reload).toHaveBeenCalledOnce();
+    expect(vi.getTimerCount()).toBe(0);
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
 function journal() {
   const guide = new Journal();
   vi.spyOn(guide, 'load').mockResolvedValue();
