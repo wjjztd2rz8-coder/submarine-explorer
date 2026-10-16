@@ -47,6 +47,7 @@ import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryS
 import { buildJournalSite } from '../../src/game/JournalData.js';
 import { ObjectivesPanel } from '../../src/ui/ObjectivesPanel.js';
 import { hudSystem } from '../../src/app/systems/hud.js';
+import { createHomeSystems } from '../../src/app/homeStartup.js';
 
 /** The same small EventTarget/DOM approach as the shell and Home focus specs. */
 class Element extends EventTarget {
@@ -1518,9 +1519,99 @@ describe('overlay policies across the app', () => {
 });
 
 describe('overlay host teardown', () => {
-  it.each(['keyboard', 'gamepad', 'touch'] as const)(
-    'Home routes %s Controls to the shared guide without dive state or settings',
+  it.each(['keyboard', 'gamepad'] as const)(
+    'switching an open %s guide to touch shows How to play and releases hidden focus',
     (device) => {
+      const opener = element();
+      opener.focus();
+      const card = new ControlsCard({
+        key: () => 'G',
+        initialDevice: device,
+        onRebind: vi.fn(),
+      });
+      cleanup.push(() => card.dispose());
+      card.open();
+      const root = card.root as unknown as Element;
+      const tab = root.querySelector('.controls-card-tab')!;
+      tab.focus();
+      card.setDevice('touch');
+      expect(card.root.getAttribute('aria-label')).toBe('How to play');
+      expect(root.querySelector('.how-to-play')).not.toBeNull();
+      expect(root.querySelector('.controls-card-tabs')!.hidden).toBe(true);
+      expect(root.querySelector('.controls-card-rebind')!.hidden).toBe(true);
+      expect(active()).toBe(root.querySelector('.controls-card-close'));
+      press('Tab');
+      expect(active()).toBe(root.querySelector('.controls-card-close'));
+      press('Escape');
+      expect(active()).toBe(opener);
+    },
+  );
+
+  it('Home ignores the Journal pad shortcut while Controls owns the modal stack', () => {
+    const home = new Home({
+      dive: vi.fn(),
+      journal: vi.fn(),
+      settings: vi.fn(),
+      controls: vi.fn(),
+    });
+    cleanup.push(() => home.dispose());
+    home.show();
+    const guide = journal();
+    const card = new ControlsCard({ key: () => 'G', initialDevice: 'gamepad' });
+    cleanup.push(() => card.dispose());
+    const opener = (home.root as unknown as Element)
+      .querySelectorAll('button')
+      .find((button) => button.textContent === 'Controls')!;
+    opener.focus();
+    card.open();
+    const buttons = Array.from({ length: 16 }, () => ({ pressed: false, value: 0 }));
+    vi.stubGlobal('navigator', {
+      getGamepads: () => [{ connected: true, index: 0, axes: [0, 0, 0, 0], buttons }],
+    });
+    const input = new Input({ storage: null });
+    const ctx = {
+      input,
+      journal: guide,
+      controlsCard: card,
+      settingsScreen: { isOpen: false },
+      globe: { isOpen: false },
+    } as unknown as GameContext;
+    const menu = createHomeSystems().find((system) => system.name === 'menuData')!;
+    const frame = () => {
+      input.sample();
+      menu.frame!['scan.discovery']!({ dt: 0, nowMs: 0, frozen: true }, ctx);
+      input.endFrame();
+    };
+    buttons[14] = { pressed: true, value: 1 };
+    frame();
+    expect(guide.isOpen).toBe(false);
+    expect(card.isOpen).toBe(true);
+    press('Tab');
+    expect(card.root.contains(document.activeElement)).toBe(true);
+    press('Escape');
+    expect(active()).toBe(opener);
+    frame();
+    expect(guide.isOpen).toBe(false);
+    buttons[14] = { pressed: false, value: 0 };
+    frame();
+    buttons[14] = { pressed: true, value: 1 };
+    frame();
+    expect(guide.isOpen).toBe(true);
+    buttons[14] = { pressed: false, value: 0 };
+    frame();
+    buttons[14] = { pressed: true, value: 1 };
+    frame();
+    expect(guide.isOpen).toBe(false);
+    expect(active()).toBe(opener);
+  });
+
+  it.each(
+    (['home', 'pause'] as const).flatMap((source) =>
+      (['keyboard', 'gamepad', 'touch'] as const).map((device) => ({ source, device })),
+    ),
+  )(
+    '$source routes $device Controls to the shared guide without simulation or settings',
+    ({ source, device }) => {
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
       const controls = createControlsSystem();
       const settingsOpen = vi.fn();
@@ -1529,6 +1620,7 @@ describe('overlay host teardown', () => {
         bus: new EventBus(),
         index: [],
         route: null,
+        meta: source === 'pause' ? { id: 'reef' } : undefined,
         save: new Save({ config: DEFAULT_CONFIG, storage: null }),
         app: { state: 'home', lastSite: null },
         params: new URLSearchParams(),
@@ -1540,17 +1632,24 @@ describe('overlay host teardown', () => {
       } as unknown as GameContext;
       const runner = new SystemRunner(ctx);
       cleanup.push(() => runner.dispose());
+      // A phone keeps its touch controls active when a pad supplies the first frame.
+      if (source === 'pause' && device === 'gamepad') ctx.input.touchActive = true;
       runner.init([shellSystem, controls]);
-      ctx.setAppState('home');
       if (device === 'touch')
         window.dispatchEvent(Object.assign(new Event('pointerdown'), { pointerType: 'touch' }));
       if (device === 'gamepad') {
         ctx.input.gamepadActive = true;
         controls.frame!['hud.draw']!({}, ctx);
       }
-      const opener = (ctx.home.root as unknown as Element)
+      ctx.setAppState(source);
+      expect(ctx.controlsCard.device).toBe(device);
+      const opener = ((source === 'home' ? ctx.home : ctx.pause).root as unknown as Element)
         .querySelectorAll('button')
-        .find((button) => button.textContent === 'Controls')!;
+        .find(
+          (button) =>
+            button.textContent ===
+            (source === 'pause' && device === 'touch' ? 'How to play' : 'Controls'),
+        )!;
       for (let cycle = 0; cycle < 3; cycle++) {
         // DOM activation keeps the sampled device rather than synthesizing a mouse input.
         opener.focus();
@@ -1561,7 +1660,7 @@ describe('overlay host teardown', () => {
           device === 'touch' ? 'How to play' : 'Controls guide',
         );
         expect(settingsOpen).not.toHaveBeenCalled();
-        expect(ctx.app.state).toBe('home');
+        expect(ctx.app.state).toBe(source);
         expect(ctx).not.toHaveProperty('terrain');
         expect(ctx).not.toHaveProperty('sub');
         const close = (ctx.controlsCard.root as unknown as Element)

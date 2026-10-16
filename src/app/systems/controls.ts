@@ -15,6 +15,7 @@ export function createControlsSystem(): GameSystem<ShellContext, unknown> {
     dispose: () => cleanup.dispose(),
     init(ctx) {
       const { input } = ctx;
+      wasTouch = input.touchActive;
       const controlsCard = new ControlsCard({
         key: (id) => input.primaryKeyLabel(id),
         input,

@@ -884,3 +884,63 @@ it('zooms the sonar with a gradual pinch and resets its threshold between gestur
     f.controls.dispose();
   }
 });
+
+it('does not carry unfinished sonar pinch motion into camera zoom', () => {
+  const f = fixture();
+  const send = (type: string, id: number, x: number) => {
+    const event = new Event(type);
+    Object.assign(event, { pointerId: id, pointerType: 'touch', clientX: x, clientY: 60 });
+    Object.defineProperty(event, 'target', { value: f.canvas });
+    f.win.dispatchEvent(event);
+  };
+  try {
+    f.sonar.expanded = true;
+    send('pointerdown', 1, 60);
+    send('pointerdown', 2, 100);
+    send('pointermove', 2, 103);
+    expect(f.sonar.zoomWheel).not.toHaveBeenCalled();
+    f.sonar.expanded = false;
+    send('pointermove', 2, 104);
+    expect(f.input.touchZoom).toHaveBeenCalledExactlyOnceWith(-4);
+    f.sonar.expanded = true;
+    send('pointermove', 2, 107);
+    expect(f.sonar.zoomWheel).not.toHaveBeenCalled();
+    send('pointermove', 2, 108);
+    expect(f.sonar.zoomWheel).toHaveBeenCalledExactlyOnceWith(-1);
+    expect(f.input.touchLook).not.toHaveBeenCalled();
+  } finally {
+    f.controls.dispose();
+  }
+});
+
+it.each(['start together', 'meet during pinch'])(
+  'recovers sonar zoom when fingers %s',
+  (gesture) => {
+    const f = fixture();
+    const send = (type: string, id: number, x: number) => {
+      const event = new Event(type);
+      Object.assign(event, { pointerId: id, pointerType: 'touch', clientX: x, clientY: 60 });
+      Object.defineProperty(event, 'target', { value: f.canvas });
+      f.win.dispatchEvent(event);
+    };
+    try {
+      f.sonar.expanded = true;
+      send('pointerdown', 1, 60);
+      send('pointerdown', 2, gesture === 'start together' ? 60 : 100);
+      if (gesture === 'meet during pinch') {
+        send('pointermove', 2, 60);
+        expect(f.sonar.zoomWheel).not.toHaveBeenCalled();
+      }
+      f.sonar.zoomWheel.mockClear();
+      send('pointermove', 2, 61);
+      for (const x of [62, 63, 64]) send('pointermove', 2, x);
+      expect(f.sonar.zoomWheel).not.toHaveBeenCalled();
+      send('pointermove', 2, 65);
+      expect(f.sonar.zoomWheel).toHaveBeenCalledExactlyOnceWith(-1);
+      expect(f.input.touchZoom).not.toHaveBeenCalled();
+      expect(f.input.touchLook).not.toHaveBeenCalled();
+    } finally {
+      f.controls.dispose();
+    }
+  },
+);

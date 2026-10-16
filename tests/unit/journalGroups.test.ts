@@ -5,6 +5,7 @@ import { ProgressSave, PROGRESS_STORAGE_KEY } from '../../src/core/Save.js';
 import { SubMesh } from '../../src/sub/SubMesh.js';
 import { Journal } from '../../src/ui/Journal.js';
 import type { JournalEntry, JournalSite } from '../../src/game/JournalData.js';
+import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
 
 /** Lifecycle DOM double; native disclosure keys and layout are covered in e2e. */
 class Element extends EventTarget {
@@ -203,6 +204,40 @@ it('opens another site on demand and displays its overview', () => {
   expect(journal.viewKey).toBe('wreck');
   expect(category('wreck/poi').open).toBe(true);
 });
+
+it.each([false, true])(
+  'shows wildlife-first site rows after a legacy save reload without unlocking another site (phone=%s)',
+  (phone) => {
+    phoneQuery.matches = phone;
+    const raw = JSON.stringify(['reef/life:life-entry']);
+    const storage = {
+      getItem: (key: string) => (key === DISCOVERY_STORAGE_KEY ? raw : null),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+    };
+    for (let reload = 0; reload < 2; reload++) {
+      journal.setStore(new DiscoveryStore(storage));
+      journal.show('front');
+      const cards = descendants(root).filter((el) => el.className.includes('jr-site-card'));
+      expect(
+        cards.find((el) => el.dataset.target === 'reef')!.classList.contains('is-locked'),
+      ).toBe(false);
+      expect(
+        cards.find((el) => el.dataset.target === 'wreck')!.classList.contains('is-locked'),
+      ).toBe(true);
+      journal.show('reef');
+      expect(descendants(root).some((el) => el.textContent === 'No scans logged')).toBe(false);
+      const rows = descendants(root).filter((el) => el.classList.contains('jr-row'));
+      expect(rows.map((el) => el.dataset.row)).toContain('reef/life/entry');
+      expect(rows.map((el) => el.dataset.row)).toContain('reef/site/entry');
+      expect(rows.map((el) => el.dataset.row)).not.toContain('reef/poi/entry');
+      journal.show('wreck');
+      expect(descendants(root).some((el) => el.classList.contains('jr-locked'))).toBe(true);
+    }
+    expect(storage.setItem).not.toHaveBeenCalled();
+    expect(storage.removeItem).not.toHaveBeenCalled();
+  },
+);
 it('routes an expanded site row back from an entry, then collapses it on the overview', () => {
   journal.show('reef/poi/entry');
   const button = header('reef');
