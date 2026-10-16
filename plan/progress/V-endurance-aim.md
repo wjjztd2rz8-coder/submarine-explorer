@@ -14,7 +14,7 @@ Hull about 45% of frame width on desktop (was 37%), sub secondary and clear of t
 
 ## Gates
 
-`PW_PORT=4871 tools/gates.sh`: e2e, e2e-base, attribution, prettier PASS. deepOpening and openingClearance1290 green after snapshot update.
+`PW_PORT=4871 tools/gates.sh`: all PASS (e2e smoke, e2e-base, attribution, prettier; full unit run 2320 pass after snapshot refresh).
 
 ## Left
 

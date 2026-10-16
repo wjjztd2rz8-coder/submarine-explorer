@@ -704,7 +704,7 @@ exports[`Challenger / Endurance opening > endurance high: safe hull, visible tar
       "z": 30,
     },
     "chaseOffsetX": -60,
-    "chaseOffsetY": -56,
+    "chaseOffsetY": -48,
     "chaseRadius": 34,
     "portraitChaseOffset": {
       "radius": 50,
@@ -760,7 +760,7 @@ exports[`Challenger / Endurance opening > endurance low: safe hull, visible targ
       "z": 30,
     },
     "chaseOffsetX": -60,
-    "chaseOffsetY": -34,
+    "chaseOffsetY": -48,
     "chaseRadius": 34,
     "portraitChaseOffset": {
       "radius": 50,
@@ -831,7 +831,7 @@ exports[`Challenger / Endurance opening > endurance medium: safe hull, visible t
       "z": 30,
     },
     "chaseOffsetX": -60,
-    "chaseOffsetY": -34,
+    "chaseOffsetY": -48,
     "chaseRadius": 34,
     "portraitChaseOffset": {
       "radius": 50,
