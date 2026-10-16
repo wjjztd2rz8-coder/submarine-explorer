@@ -70,7 +70,7 @@ The newest items go first.
 
 ## In flight
 
-- Claude Sonnet: J-completion-contrast and V-monterey-floor IN FLIGHT (Claude, 2026-10-16). Codex queue 2240-2290 waits for the dispatcher.
+- No Claude package running. Codex queue 2240-2290 waits for the dispatcher.
 - V-endurance-aim parked 2026-10-15: branch claude/V-endurance-aim (worktree ../subexp-wt/V-endurance-aim, commit 5fa58fc) reached hull 45% but the sub is too large and dominant in frame; not merged (new shared camera code for a small gain). Needs the camera forward of the sub, or drop item 4.
 
 ## Backlog
@@ -84,7 +84,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
    - **J-desktop-repetition [Sonnet, P3]:** review repeated destination/turn information in the card, mission block and waypoint; consolidate through existing HUD regions.
    - **J-journal-preview [Sonnet, P2]:** review tall portrait captures pushing entry text below the fold, repeated memorial text and captures that show the bow under a debris-field entry. The Journal now has images; the older text-only finding is resolved.
    - **J-atoll-transit [Sonnet, P2]:** explain the jump from two nearby galleries to optional atoll targets more than 4 km away, especially before the debrief's invitation to finish them for two stars.
-   - **J-completion-contrast [Sonnet, P2]:** the primary-completion banner has cyan text over a translucent cyan fill on bright Blue Hole water; touch removes the objectives panel's dark backdrop. Keep the existing banner, improve its legibility.
+   - **J-completion-contrast [Sonnet, P2], DONE 2026-10-16 (86bee20):** the primary-completion banner has cyan text over a translucent cyan fill on bright Blue Hole water; touch removes the objectives panel's dark backdrop. Keep the existing banner, improve its legibility.
    - **J-home-controls [Codex, P2]:** Home's Controls entry opens keyboard/pad rebinding settings on touch, while Pause has a touch How to play guide. Route both entry points to the existing device guide without adding a dialog or loading the dive on Home.
    - Opening gallery hood/terraces and orange Titanic materials remain with V-bluehole and V-titanic below; no visual tuning in this repeat.
 2. **V-bluehole remainder [Sonnet]**, ~3.5 (2026-10-16 golden): ground banking, chipped lip and uneven beds done. Left: roof still reads as one rolled tube (break it into shelves/overhangs), beds run parallel, flat bright sand shelf, over-saturated blue fish. Geometry/materials, not tuning. Follow-up from [S-verify-12](progress/2180-S-verify-12.md): `clear_ground` exclusion should survive late prop loading.
@@ -92,7 +92,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 4. **V-challenger-lander [Sonnet], DONE 2026-10-16 (98ce6fd; ~3.6, remainder: faceted floats, pale frame under headlights):** was ~3.2: lander is a flat-shaded prop with glowing orange float spheres. Dull the floats (syntactic foam, not lamps), add frame thickness/detail and a bait-plate; the amphipod swarm is the reward.
 5. **V-endurance remainder [Sonnet]**, ~3.6: hull is the subject, but the sub vanishes in the pose. V-endurance-aim is parked (see In flight); take the camera-forward-of-sub approach or cut item 4 with the owner's nod.
 6. **V-lostcity-low [Sonnet, small]**: Low-tier honeycomb on the slope needs a texture/normal fix; High is ~3.6.
-   6b. **V-monterey-floor [Sonnet, small]**, ~3.5: flat sand floor between boulders; add ripple/pebble variation using the existing sediment material.
+   6b. **V-monterey-floor [Sonnet, small], DONE 2026-10-16 (2947c7f; ~3.8):** was ~3.5: flat sand floor between boulders; add ripple/pebble variation using the existing sediment material.
 7. **S-manifest slices [Codex 2160]:** step 1 done (habitat). Migrate the next slices per `plan/progress/S-manifest.md` (inventory: 27 site-id expressions left); one slice per brief; golden unchanged.
 8. **S-render remainder [Codex 2280]:** the nightly workflow failed on both scheduled runs (38574704463, 38743060407; ~1.5 h each, exit 1 after golden/perf steps; artifacts exist) and 2210 found exact golden identity fails. Diagnose from `gh run view <id> --log-failed` and the artifacts, fix the workflow or its thresholds, and make golden comparison use a justified tolerance.
 
