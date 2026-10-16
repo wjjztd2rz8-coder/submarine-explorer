@@ -39,7 +39,10 @@ function talusBedTop(t: TalusShape, x: number, j: number): number {
   const bed = t.terraces?.bedHeightM || 1;
   const pick = Math.abs(Math.sin(j * 12.9898 + t.seed * 0.01) * 43758.5453) % 1;
   const along = fbm3(x * 0.05, j * 1.7, t.seed + 33, t.seed + 7, 2);
-  return bed * (j - 0.3 * pick * (0.4 + 1.2 * along));
+  // Each bed also swells and leans along the wall (bounded, so neighbours converge and part
+  // without crossing).
+  const lean = (Math.abs(Math.sin(j * 7.31 + t.seed * 0.02) * 12543.17) % 1) - 0.5;
+  return bed * (j - 0.2 * pick * (0.4 + 1.2 * along) + 0.5 * lean * Math.sin(x * 0.04 + j * 2.1));
 }
 
 /** Sediment bed index at height `h`; the fractional part is the position within that bed. */

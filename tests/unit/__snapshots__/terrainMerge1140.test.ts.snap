@@ -10,7 +10,7 @@ exports[`1140: beebe-vent-field Low buffers are finite and draw counts stay with
 
 exports[`1140: great-blue-hole Low buffers are finite and draw counts stay within f43 1`] = `
 {
-  "buffers": "1c07dc489684fe1af4ed284506ba7c5cca45b89d0754b244700b84a154deb437",
+  "buffers": "6ed84323859b223429089c6f59ab3e1b455f566187c845b6ab8c80bffd56ab8a",
   "draws": 6,
   "triangles": 21048,
 }
