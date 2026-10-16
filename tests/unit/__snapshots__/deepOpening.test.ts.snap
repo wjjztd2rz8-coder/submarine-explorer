@@ -704,7 +704,7 @@ exports[`Challenger / Endurance opening > endurance high: safe hull, visible tar
       "z": 30,
     },
     "chaseOffsetX": -60,
-    "chaseOffsetY": -34,
+    "chaseOffsetY": -56,
     "chaseRadius": 34,
     "portraitChaseOffset": {
       "radius": 50,

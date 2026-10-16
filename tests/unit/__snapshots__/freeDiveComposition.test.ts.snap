@@ -378,7 +378,7 @@ exports[`free-dive openings on actual survey terrain and procedural hero geometr
       "z": 30,
     },
     "chaseOffsetX": -60,
-    "chaseOffsetY": -34,
+    "chaseOffsetY": -48,
     "chaseRadius": 34,
     "portraitChaseOffset": {
       "radius": 50,
@@ -411,7 +411,7 @@ exports[`free-dive openings on actual survey terrain and procedural hero geometr
       "z": 30,
     },
     "chaseOffsetX": -60,
-    "chaseOffsetY": -34,
+    "chaseOffsetY": -48,
     "chaseRadius": 34,
     "portraitChaseOffset": {
       "radius": 50,
@@ -444,7 +444,7 @@ exports[`free-dive openings on actual survey terrain and procedural hero geometr
       "z": 30,
     },
     "chaseOffsetX": -60,
-    "chaseOffsetY": -34,
+    "chaseOffsetY": -48,
     "chaseRadius": 34,
     "portraitChaseOffset": {
       "radius": 50,

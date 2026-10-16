@@ -210,6 +210,7 @@ describe('Challenger / Endurance opening', () => {
               pose.chaseOffsetX,
               pose.chaseOffsetY,
               pose.portraitChaseOffset,
+              pose.chaseAim,
             );
             rig.snap(position, pose.yaw, 0);
             rig.camera.updateMatrixWorld(true);
