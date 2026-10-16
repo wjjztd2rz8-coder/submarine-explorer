@@ -40,7 +40,12 @@ export function lostCitySlopeTint(
   // balanced about 1.0 so the slope keeps its overall brightness.
   const broad = fbm3(x * 0.045, 11, z * 0.045, 611, 3);
   const fine = fbm3(x * 0.3, 13, z * 0.3, 613, 2);
-  const silt = 0.84 + 0.3 * smooth(0.3, 0.7, broad) + 0.1 * (fine - 0.5);
+  // Cobble-sized patches on a warped lattice, so the slope never repeats.
+  const wx = x + (fbm3(x * 0.1, 19, z * 0.1, 619, 2) - 0.5) * 6;
+  const wz = z + (fbm3(x * 0.1, 23, z * 0.1, 623, 2) - 0.5) * 6;
+  const cobble = fbm3(wx * 0.7, 29, wz * 0.7, 629, 2);
+  const silt =
+    0.84 + 0.3 * smooth(0.3, 0.7, broad) + 0.1 * (fine - 0.5) + 0.5 * (smooth(0.3, 0.7, cobble) - 0.5) * 0.4 * slope;
   const warm = 1 + 0.08 * (fbm3(x * 0.09, 17, z * 0.09, 617, 2) - 0.5);
   return [bed[0] * silt * warm, bed[1] * silt, (bed[2] * silt) / warm];
 }
