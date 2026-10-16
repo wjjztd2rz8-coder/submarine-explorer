@@ -86,9 +86,17 @@ function roughenTrunk(g: THREE.BufferGeometry, s: SpireOpts, seed: number, pocke
     const pit = fbm3(ca * 9 + 3, y * 0.9, sa * 9 + 3, seed ^ 0x2a3, 2) - 0.5;
     // Scalloped flowstone sheets: broad plates with soft shoulders that break up the flat wall
     // between the ribs.
-    const sheet = smooth(0.38, 0.62, fbm3(ca * 3.2 + 7, y * 0.32, sa * 3.2 + 7, seed ^ 0x2a4, 2)) - 0.5;
+    const sheet =
+      smooth(0.38, 0.62, fbm3(ca * 3.2 + 7, y * 0.32, sa * 3.2 + 7, seed ^ 0x2a4, 2)) - 0.5;
     let k =
-      1 + big * 0.6 + mid * 0.4 + ridge * 0.16 + ledge * 0.09 - undercut * 0.07 + pit * 0.07 + sheet * 0.14;
+      1 +
+      big * 0.6 +
+      mid * 0.4 +
+      ridge * 0.16 +
+      ledge * 0.09 -
+      undercut * 0.07 +
+      pit * 0.07 +
+      sheet * 0.14;
     // Orifice pocket.
     const da = Math.atan2(Math.sin(a - orA), Math.cos(a - orA)) * rad;
     const dy = y - 0.8 * s.h;
