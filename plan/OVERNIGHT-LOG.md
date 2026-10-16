@@ -1296,3 +1296,11 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h at 2% (resets 05:15); queue 2240-2290 waits for the dispatcher.
 - **Not done:** V-bluehole remainder, V-hero-set, other J-* sub-items; V-endurance-aim parked.
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 05:15 CDT headless run 25 (Claude, collection only)
+
+- **Merged:** nothing. Codex 2240, 2250 and 2260 launched at 05:15 and are running; their worktrees have no commits yet. No Claude agent launched.
+- **CI:** run 23 is red on e2e shards 21/38 and 35/38. `gh run view --log` returns nothing for either, same as run 22's shard, so the failing specs are unknown. Run 24 CI is still queued. No tag (f55 waits for green CI).
+- **Queue:** 2270, 2280 and 2290 are queued.
+- **Process issue:** CI e2e logs aren't retrievable, which blocks triage. Next run should try downloading the Playwright artifacts or reproduce the shards locally.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
