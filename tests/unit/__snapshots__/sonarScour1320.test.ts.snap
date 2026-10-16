@@ -1,0 +1,613 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`sonar rendering equivalence > preserves endurance hull=false survey=endurance palette=highContrast at DPR 1 zoom 250 1`] = `
+{
+  "contours": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "height": 268,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "c2b4ee896c86f41cf5fcf0c4e8ab963a685958d3ad9efd7ed061c558b6482379",
+  "relief": {
+    "contourIntervalM": Infinity,
+    "flatness": 1,
+    "maxDepthM": 3001.367525142643,
+    "minDepthM": 3000.1820087949045,
+    "spanM": 8,
+  },
+  "width": 224,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves endurance hull=false survey=endurance palette=highContrast at DPR 1 zoom 1000 1`] = `
+{
+  "contours": "da5197d0b6e8e1006f79e886cfcdef422cec47bdf2548c61ea468862b595dbdc",
+  "height": 268,
+  "labels": "0f1209cdf0b92ff46734f70b2a20c3a741081d06a01be3341d12a8728a25e832",
+  "pixels": "0998a947b6a1a298b40cb9e894415177f208cde011231a47c7811d7eec4c55a9",
+  "relief": {
+    "contourIntervalM": 1,
+    "flatness": 1,
+    "maxDepthM": 3003.1434470574645,
+    "minDepthM": 2998.4012081406795,
+    "spanM": 20,
+  },
+  "width": 224,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves endurance hull=false survey=endurance palette=highContrast at DPR 1 zoom tile 1`] = `
+{
+  "contours": "937d7b376311f45e6f9060271931c0866e2685749e7fec9567b16132e491dc91",
+  "height": 220,
+  "labels": "40fe2347427dddc6481948407badc7d5d84453d87aece753d631a56d0817ea33",
+  "pixels": "bb6994816b04c351e7fa626001c6d00c4d9b5d66b959a363360d481ebe81431b",
+  "relief": {
+    "contourIntervalM": 50,
+    "flatness": 1,
+    "maxDepthM": 3086.7716391588965,
+    "minDepthM": 2915.300048828125,
+    "spanM": 171.4715903307715,
+  },
+  "width": 176,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves endurance hull=false survey=endurance palette=highContrast at DPR 2 zoom 250 1`] = `
+{
+  "contours": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "height": 536,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "fb827541a4b15f713fd4e176b426785937478b06af631e057311d4940d5da789",
+  "relief": {
+    "contourIntervalM": Infinity,
+    "flatness": 1,
+    "maxDepthM": 3001.3708518179305,
+    "minDepthM": 3000.1820087949045,
+    "spanM": 8,
+  },
+  "width": 448,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves endurance hull=false survey=endurance palette=highContrast at DPR 2 zoom 1000 1`] = `
+{
+  "contours": "5212b8a91a4ce67e314cf2dad0211b4df2504a225624ecb621aefc0ad0f153b8",
+  "height": 536,
+  "labels": "f0332aa13a8fd9a3a6f1eaee1b562ca9dc717b4971f0d771dd9b3f90140d5f9e",
+  "pixels": "14f14bcf17f73fad2ac44bba5c48c9b80c5a84dd512ffacb438b5cfda859ff58",
+  "relief": {
+    "contourIntervalM": 1,
+    "flatness": 1,
+    "maxDepthM": 3003.1568025982074,
+    "minDepthM": 2998.4012081406795,
+    "spanM": 20,
+  },
+  "width": 448,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves endurance hull=false survey=endurance palette=highContrast at DPR 2 zoom tile 1`] = `
+{
+  "contours": "174ccad932d5b71add196908707a30f9bbcfa1110d01d401afce773f9457edba",
+  "height": 440,
+  "labels": "28f018db9618109995a1ba11c930f26e593307935741194be64d3595eeac0199",
+  "pixels": "a4ade28d8d445c2f6c8d34f2f6cebcc7749e8e96dde87a28c46d702dec0204c1",
+  "relief": {
+    "contourIntervalM": 50,
+    "flatness": 1,
+    "maxDepthM": 3086.7716391588965,
+    "minDepthM": 2915.300048828125,
+    "spanM": 171.4715903307715,
+  },
+  "width": 352,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves endurance hull=true survey=endurance palette=default at DPR 1 zoom 250 1`] = `
+{
+  "contours": "2164651c771eb07883dbbf15bb7aaa636dc8130ae4c96d6eacee72876c83cb77",
+  "height": 268,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "213bf3da00ecb2660db44d9b456cf92babe2eb80dcfcb4b863743dd3ac8fa6d1",
+  "relief": {
+    "contourIntervalM": 2,
+    "flatness": 1,
+    "maxDepthM": 3001.367525142643,
+    "minDepthM": 3000.1820087949045,
+    "spanM": 8,
+  },
+  "width": 224,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves endurance hull=true survey=endurance palette=default at DPR 1 zoom 1000 1`] = `
+{
+  "contours": "7ed9a1dac02c413c7af9fb2003c451a1ca6a5fca12ebc9cbd8bfa0aee2bfee9c",
+  "height": 268,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "a4c192b242d82fc9d4c35dca5a69def4665f4dc809b95603ed9c0f1e6717cc90",
+  "relief": {
+    "contourIntervalM": 2,
+    "flatness": 1,
+    "maxDepthM": 3003.1434470574645,
+    "minDepthM": 2998.4012081406795,
+    "spanM": 20,
+  },
+  "width": 224,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves endurance hull=true survey=endurance palette=default at DPR 1 zoom tile 1`] = `
+{
+  "contours": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "height": 220,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "07c44464bb00b1e13c12694f32ed1953dd82f339ea8cab7f2a6612ac0828acc0",
+  "relief": {
+    "contourIntervalM": Infinity,
+    "flatness": 1,
+    "maxDepthM": 3086.7716391588965,
+    "minDepthM": 2915.300048828125,
+    "spanM": 171.4715903307715,
+  },
+  "width": 176,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves endurance hull=true survey=endurance palette=default at DPR 2 zoom 250 1`] = `
+{
+  "contours": "61715d641a3cec42dadb044a59af496ad81b2a63a21ea26a568d26429c8eee1f",
+  "height": 536,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "666db4a65722ff694ab939ae1bb42c85ccba138826627f240b6458b0eefdc413",
+  "relief": {
+    "contourIntervalM": 2,
+    "flatness": 1,
+    "maxDepthM": 3001.3708518179305,
+    "minDepthM": 3000.1820087949045,
+    "spanM": 8,
+  },
+  "width": 448,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves endurance hull=true survey=endurance palette=default at DPR 2 zoom 1000 1`] = `
+{
+  "contours": "c62fe17d2b2d1ba2f5360290bafc7e0a39a8c4aa2a5275d9e7bd2128cb9c600b",
+  "height": 536,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "3d13292b8de3f86d0a95b994686a89fd5f6425d11ee801da51ac209a5e504d4d",
+  "relief": {
+    "contourIntervalM": 2,
+    "flatness": 1,
+    "maxDepthM": 3003.1568025982074,
+    "minDepthM": 2998.4012081406795,
+    "spanM": 20,
+  },
+  "width": 448,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves endurance hull=true survey=endurance palette=default at DPR 2 zoom tile 1`] = `
+{
+  "contours": "3e32abf6b70b33591a8cec885f9dc194c5232e2f406029a2bb460e0eb38895b0",
+  "height": 440,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "d47b82d2248b350edeece240eba660744980ed40890db84469633bcd936407d2",
+  "relief": {
+    "contourIntervalM": 1,
+    "flatness": 1,
+    "maxDepthM": 3086.7716391588965,
+    "minDepthM": 2915.300048828125,
+    "spanM": 171.4715903307715,
+  },
+  "width": 352,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=endurance palette=deuteranopia at DPR 1 zoom 250 1`] = `
+{
+  "contours": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "height": 268,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "c189a45c8431c6d33bdd2b4777f3d4c7b377601b4e2d78e109a7c62731754c6b",
+  "relief": {
+    "contourIntervalM": Infinity,
+    "flatness": 1,
+    "maxDepthM": 3001.367525142643,
+    "minDepthM": 3000.1820087949045,
+    "spanM": 8,
+  },
+  "width": 224,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=endurance palette=deuteranopia at DPR 1 zoom 1000 1`] = `
+{
+  "contours": "3e7e664bfdecb490997b377597ea462abdfc3eefa22251b4eaeccf5bcf5277be",
+  "height": 268,
+  "labels": "0f1209cdf0b92ff46734f70b2a20c3a741081d06a01be3341d12a8728a25e832",
+  "pixels": "ab693c38c40051ea6764ad364a2d91afebaa1572f6c3d5531fd62b489ae87d7d",
+  "relief": {
+    "contourIntervalM": 1,
+    "flatness": 1,
+    "maxDepthM": 3003.1434470574645,
+    "minDepthM": 2998.4012081406795,
+    "spanM": 20,
+  },
+  "width": 224,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=endurance palette=deuteranopia at DPR 1 zoom tile 1`] = `
+{
+  "contours": "fff7fc99aaf2e455af605d02acf6fff229b23cd7b9707bb3972a01224925c4d1",
+  "height": 220,
+  "labels": "449936b1ce9f81adb637029a1baca8be9f47b9dd6985181602ba50a146eb40d1",
+  "pixels": "9c5446c1de2fc65349bf48c845202b6e89bcb82c9bc05290555263e435bf2a96",
+  "relief": {
+    "contourIntervalM": 10,
+    "flatness": 1,
+    "maxDepthM": 3086.7716391588965,
+    "minDepthM": 2915.300048828125,
+    "spanM": 171.4715903307715,
+  },
+  "width": 176,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=endurance palette=deuteranopia at DPR 2 zoom 250 1`] = `
+{
+  "contours": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "height": 536,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "0b7e0e92e92a6e78d4f809215cf78df6a6ce0959a01d8d375876d2296383aefc",
+  "relief": {
+    "contourIntervalM": Infinity,
+    "flatness": 1,
+    "maxDepthM": 3001.3708518179305,
+    "minDepthM": 3000.1820087949045,
+    "spanM": 8,
+  },
+  "width": 448,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=endurance palette=deuteranopia at DPR 2 zoom 1000 1`] = `
+{
+  "contours": "446598398b1e2f201d6b7f906c2e91567724974c5f914940bac93ee56799e584",
+  "height": 536,
+  "labels": "f0332aa13a8fd9a3a6f1eaee1b562ca9dc717b4971f0d771dd9b3f90140d5f9e",
+  "pixels": "52aa18da93ccca8f9c47d5a2165561bb1df59cf6a8014b8216cb42d5147df4dc",
+  "relief": {
+    "contourIntervalM": 1,
+    "flatness": 1,
+    "maxDepthM": 3003.1568025982074,
+    "minDepthM": 2998.4012081406795,
+    "spanM": 20,
+  },
+  "width": 448,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=endurance palette=deuteranopia at DPR 2 zoom tile 1`] = `
+{
+  "contours": "d89a64df4c05617ca7141d9955a4122b68bdd794faa0b5f531a068e747b00948",
+  "height": 440,
+  "labels": "6f9933d6ee747cc5cc9bb480a071c8b360853bf3d0bcd94b66e0103e14266275",
+  "pixels": "0eba4997722f5b2e9ee107bebb353d7a919be0632a9638432314e9f01a7417eb",
+  "relief": {
+    "contourIntervalM": 10,
+    "flatness": 1,
+    "maxDepthM": 3086.7716391588965,
+    "minDepthM": 2915.300048828125,
+    "spanM": 171.4715903307715,
+  },
+  "width": 352,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 1 zoom 250 1`] = `
+{
+  "contours": "470177c3cd5d27d381aa5fe7c402790a58c8dabbb34da7b0963a662fba1dc555",
+  "height": 268,
+  "labels": "1a7a14c5331a13001823a1cb62874eeae05e958d07b0ff5f6ca7d4126a83438e",
+  "pixels": "ccae452eebed765d7914ac42f3606a0f4419c2178bf3fde4ab68303edd9b4cc1",
+  "relief": {
+    "contourIntervalM": 10,
+    "flatness": 0,
+    "maxDepthM": 126.15820399693357,
+    "minDepthM": 4.066478747952143,
+    "spanM": 122.09172524898142,
+  },
+  "width": 268,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 1 zoom 1000 1`] = `
+{
+  "contours": "e8de244b66127914bcba3ea993a7b63a9ecff7bbebc9cc54089e937bae94c7a8",
+  "height": 268,
+  "labels": "fbd9127451aac1dde8963438e8c58b3205c4b199480f23b7ab5dd3f42598a203",
+  "pixels": "595851f9e80fcc70e2e3e254b4835f1e9a4031315c59f9b3e0eac4b4a5c45cac",
+  "relief": {
+    "contourIntervalM": 10,
+    "flatness": 0,
+    "maxDepthM": 126.41007168764978,
+    "minDepthM": 2.9923008139538316,
+    "spanM": 123.41777087369594,
+  },
+  "width": 268,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 1 zoom tile 1`] = `
+{
+  "contours": "86af013db87696e308fddd628d902880520e9a358e5e072cd221b15a22850ed3",
+  "height": 220,
+  "labels": "db69ec1b338f8beb6dd91d85a202afdfb5610d31adc3d922984153589c312056",
+  "pixels": "78031cda16f1fc8133f0b910f4f7c602dbb311535ef5547b7147185626fecad5",
+  "relief": {
+    "contourIntervalM": 200,
+    "flatness": 0,
+    "maxDepthM": 3633.6349700595956,
+    "minDepthM": -96.22678382884325,
+    "spanM": 3729.8617538884387,
+  },
+  "width": 220,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 2 zoom 250 1`] = `
+{
+  "contours": "49447d27a39b0ab7c9b226f87d3dc0eec372a54c821900daf2f13d37b04ec4b5",
+  "height": 536,
+  "labels": "94111f02e6edb01e139bb947a1583c0e2b98f61dd0c83660b2cdfed9dff1207e",
+  "pixels": "e03fa5362fcac84091ccd6ec2a22c82689df652f45d0317ffa14a3f4d0ac221d",
+  "relief": {
+    "contourIntervalM": 10,
+    "flatness": 0,
+    "maxDepthM": 126.16340232279585,
+    "minDepthM": 4.066385716587395,
+    "spanM": 122.09701660620846,
+  },
+  "width": 536,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 2 zoom 1000 1`] = `
+{
+  "contours": "848a228924b1da9515d67589ddcde6578fe5718bb51b2792c0953816e9f39fc5",
+  "height": 536,
+  "labels": "f3855c5102b7d2f48e2ba1863695def63939884e2c97d5fb30c50bdd7b923d28",
+  "pixels": "f3af42ad762cdea5ec96c6b3b43b455c47af2a1b4d816cc29d93346b136fbfaa",
+  "relief": {
+    "contourIntervalM": 10,
+    "flatness": 0,
+    "maxDepthM": 126.41007168764978,
+    "minDepthM": 2.985191314191041,
+    "spanM": 123.42488037345873,
+  },
+  "width": 536,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=default at DPR 2 zoom tile 1`] = `
+{
+  "contours": "a3806dcb2648496578a302a084462cd34652b01d714d3fc893e15cf2030201bc",
+  "height": 440,
+  "labels": "a894341bd7a2ecbe8fa08a6473b8e30b885a11088b233baca697f2eee1cf4afd",
+  "pixels": "688bcc942cc9ae9ff9ccf08536c78f38d3a82bb547341a562373633c80c1fd16",
+  "relief": {
+    "contourIntervalM": 200,
+    "flatness": 0,
+    "maxDepthM": 3638.2169885405715,
+    "minDepthM": -97.15903413840574,
+    "spanM": 3735.3760226789773,
+  },
+  "width": 440,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 1 zoom 250 1`] = `
+{
+  "contours": "853341e23ac1c7efd0d9f5d335d8039896813ba0f38607426504f1bc6f3ef870",
+  "height": 268,
+  "labels": "1a7a14c5331a13001823a1cb62874eeae05e958d07b0ff5f6ca7d4126a83438e",
+  "pixels": "f9bc63ded0843824b0dd934b213440b81933af58772ab443883a646722acc45a",
+  "relief": {
+    "contourIntervalM": 10,
+    "flatness": 0,
+    "maxDepthM": 126.15820399693357,
+    "minDepthM": 4.066478747952143,
+    "spanM": 122.09172524898142,
+  },
+  "width": 268,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 1 zoom 1000 1`] = `
+{
+  "contours": "9273de6685a061f39219f87fef7c9374187b932ca97a299e64bca8c5e23498c0",
+  "height": 268,
+  "labels": "fbd9127451aac1dde8963438e8c58b3205c4b199480f23b7ab5dd3f42598a203",
+  "pixels": "5c2b7ce73df7784dfe3de0636330dcf6b39455c0b5ba9aebd52f30b35ef6e480",
+  "relief": {
+    "contourIntervalM": 10,
+    "flatness": 0,
+    "maxDepthM": 126.41007168764978,
+    "minDepthM": 2.9923008139538316,
+    "spanM": 123.41777087369594,
+  },
+  "width": 268,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 1 zoom tile 1`] = `
+{
+  "contours": "7f6dcb95cf9bcd27554dcdeeaefee5f9cbcca33e696b0925e0adce5168aacd0c",
+  "height": 220,
+  "labels": "db69ec1b338f8beb6dd91d85a202afdfb5610d31adc3d922984153589c312056",
+  "pixels": "25d45fbaaa5f00375f5a3cfb9c72d4ee7f7c293790989de47dc425550348eb7f",
+  "relief": {
+    "contourIntervalM": 200,
+    "flatness": 0,
+    "maxDepthM": 3633.6349700595956,
+    "minDepthM": -96.22678382884325,
+    "spanM": 3729.8617538884387,
+  },
+  "width": 220,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 2 zoom 250 1`] = `
+{
+  "contours": "2c308c638da062720a82015b61ea7cfad511fda54c97568bc015d47ebd3199f2",
+  "height": 536,
+  "labels": "94111f02e6edb01e139bb947a1583c0e2b98f61dd0c83660b2cdfed9dff1207e",
+  "pixels": "6103f13a85e6405f643a6897393714775ed0454f9e4ef70dff32d249fe2f33b9",
+  "relief": {
+    "contourIntervalM": 10,
+    "flatness": 0,
+    "maxDepthM": 126.16340232279585,
+    "minDepthM": 4.066385716587395,
+    "spanM": 122.09701660620846,
+  },
+  "width": 536,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 2 zoom 1000 1`] = `
+{
+  "contours": "2d4716bfe6fe5b622287c3e02bd70391d38beb243a53d571690dd61b67b098c2",
+  "height": 536,
+  "labels": "f3855c5102b7d2f48e2ba1863695def63939884e2c97d5fb30c50bdd7b923d28",
+  "pixels": "26e46336a40cd8aec357aaea9e1c27d0063c47b376b7f36dccb88834f67c910b",
+  "relief": {
+    "contourIntervalM": 10,
+    "flatness": 0,
+    "maxDepthM": 126.41007168764978,
+    "minDepthM": 2.985191314191041,
+    "spanM": 123.42488037345873,
+  },
+  "width": 536,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves great-blue-hole hull=false survey=great-blue-hole palette=highContrast at DPR 2 zoom tile 1`] = `
+{
+  "contours": "b650355efcbe018d2eed8474a850bd334065ece6b947dbf62b6f642b93bdbb4f",
+  "height": 440,
+  "labels": "a894341bd7a2ecbe8fa08a6473b8e30b885a11088b233baca697f2eee1cf4afd",
+  "pixels": "91ec9e839b2716676e753539b9b6e70fde2cf559bf0d7d3d21e1a8f26551bc9f",
+  "relief": {
+    "contourIntervalM": 200,
+    "flatness": 0,
+    "maxDepthM": 3638.2169885405715,
+    "minDepthM": -97.15903413840574,
+    "spanM": 3735.3760226789773,
+  },
+  "width": 440,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves unknown hull=true survey=endurance palette=deuteranopia at DPR 1 zoom 250 1`] = `
+{
+  "contours": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "height": 268,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "c189a45c8431c6d33bdd2b4777f3d4c7b377601b4e2d78e109a7c62731754c6b",
+  "relief": {
+    "contourIntervalM": Infinity,
+    "flatness": 1,
+    "maxDepthM": 3001.367525142643,
+    "minDepthM": 3000.1820087949045,
+    "spanM": 8,
+  },
+  "width": 224,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves unknown hull=true survey=endurance palette=deuteranopia at DPR 1 zoom 1000 1`] = `
+{
+  "contours": "3e7e664bfdecb490997b377597ea462abdfc3eefa22251b4eaeccf5bcf5277be",
+  "height": 268,
+  "labels": "0f1209cdf0b92ff46734f70b2a20c3a741081d06a01be3341d12a8728a25e832",
+  "pixels": "ab693c38c40051ea6764ad364a2d91afebaa1572f6c3d5531fd62b489ae87d7d",
+  "relief": {
+    "contourIntervalM": 1,
+    "flatness": 1,
+    "maxDepthM": 3003.1434470574645,
+    "minDepthM": 2998.4012081406795,
+    "spanM": 20,
+  },
+  "width": 224,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves unknown hull=true survey=endurance palette=deuteranopia at DPR 1 zoom tile 1`] = `
+{
+  "contours": "4f4fe1e094299d5566a847fff92f3580ec254060f80a1b80859645a9f618a998",
+  "height": 220,
+  "labels": "40fe2347427dddc6481948407badc7d5d84453d87aece753d631a56d0817ea33",
+  "pixels": "9c5446c1de2fc65349bf48c845202b6e89bcb82c9bc05290555263e435bf2a96",
+  "relief": {
+    "contourIntervalM": 50,
+    "flatness": 1,
+    "maxDepthM": 3086.7716391588965,
+    "minDepthM": 2915.300048828125,
+    "spanM": 171.4715903307715,
+  },
+  "width": 176,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves unknown hull=true survey=endurance palette=deuteranopia at DPR 2 zoom 250 1`] = `
+{
+  "contours": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "height": 536,
+  "labels": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "pixels": "0b7e0e92e92a6e78d4f809215cf78df6a6ce0959a01d8d375876d2296383aefc",
+  "relief": {
+    "contourIntervalM": Infinity,
+    "flatness": 1,
+    "maxDepthM": 3001.3708518179305,
+    "minDepthM": 3000.1820087949045,
+    "spanM": 8,
+  },
+  "width": 448,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves unknown hull=true survey=endurance palette=deuteranopia at DPR 2 zoom 1000 1`] = `
+{
+  "contours": "446598398b1e2f201d6b7f906c2e91567724974c5f914940bac93ee56799e584",
+  "height": 536,
+  "labels": "f0332aa13a8fd9a3a6f1eaee1b562ca9dc717b4971f0d771dd9b3f90140d5f9e",
+  "pixels": "52aa18da93ccca8f9c47d5a2165561bb1df59cf6a8014b8216cb42d5147df4dc",
+  "relief": {
+    "contourIntervalM": 1,
+    "flatness": 1,
+    "maxDepthM": 3003.1568025982074,
+    "minDepthM": 2998.4012081406795,
+    "spanM": 20,
+  },
+  "width": 448,
+}
+`;
+
+exports[`sonar rendering equivalence > preserves unknown hull=true survey=endurance palette=deuteranopia at DPR 2 zoom tile 1`] = `
+{
+  "contours": "cdb982bf09da5403e11196869e9465548c7fad4ae6356642510b2ea1cc583147",
+  "height": 440,
+  "labels": "28f018db9618109995a1ba11c930f26e593307935741194be64d3595eeac0199",
+  "pixels": "0eba4997722f5b2e9ee107bebb353d7a919be0632a9638432314e9f01a7417eb",
+  "relief": {
+    "contourIntervalM": 50,
+    "flatness": 1,
+    "maxDepthM": 3086.7716391588965,
+    "minDepthM": 2915.300048828125,
+    "spanM": 171.4715903307715,
+  },
+  "width": 352,
+}
+`;

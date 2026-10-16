@@ -19,6 +19,7 @@ import {
   type SonarZoomConfig,
 } from '../core/Config.js';
 import { latLonToWorld } from '../util/geo.js';
+import { siteManifest } from '../core/SiteManifest.js';
 import { BLUE_HOLE_LAT, BLUE_HOLE_LON, blueHoleSonarReef } from '../world/terrainFeatures.js';
 import { enduranceRidges, enduranceScourHeight } from '../world/presets/EnduranceRelief.js';
 import type { Terrain } from '../world/Terrain.js';
@@ -524,14 +525,17 @@ export class Sonar {
       zoom === 'tile' ? Math.max(this.terrain.widthM, this.terrain.depthM) : zoom,
     );
     this.flatness = flat.flatness;
+    const policy = siteManifest(this.terrain.meta.id)?.sonar;
     // Endurance contours show scour height above the local plain, matching the
     // authored 3D swells. Absolute survey depths still drive the palette/readouts.
-    const hull = this.terrain.meta.id === 'endurance' && flat.flatness > 0 ? this.hullPoi() : null;
+    const hull =
+      flat.flatness > 0 ? this.pois.find((poi) => poi.id === policy?.scourHullPoi) : null;
     const ridges = hull ? enduranceRidges(hull.position) : null;
     let contourInterval = sonarLocalContourInterval(
-      this.terrain.meta.id === 'great-blue-hole'
-        ? Math.min(10, this.zoomConfig.contourIntervalM[reference])
-        : this.zoomConfig.contourIntervalM[reference],
+      Math.min(
+        policy?.maxContourIntervalM ?? Infinity,
+        this.zoomConfig.contourIntervalM[reference],
+      ),
       actualSpan,
       this.zoomConfig.maxContours,
       flat.flatness,
@@ -547,10 +551,9 @@ export class Sonar {
     const contourHeights = ridges ? new Float32Array(heights.length) : heights;
     const contourLo = ridges ? 0 : lo;
     let contourHi = ridges ? 0 : hi;
-    const blueHoleCentre =
-      this.terrain.meta.id === 'great-blue-hole'
-        ? latLonToWorld(this.terrain.meta, BLUE_HOLE_LAT, BLUE_HOLE_LON)
-        : null;
+    const blueHoleCentre = policy?.reef
+      ? latLonToWorld(this.terrain.meta, BLUE_HOLE_LAT, BLUE_HOLE_LON)
+      : null;
     // Only where the hole is on this tile (the shared-ramp test uses a synthetic tile elsewhere).
     const shadeReef =
       blueHoleCentre !== null && this.terrain.contains(blueHoleCentre.x, blueHoleCentre.z);
@@ -731,10 +734,6 @@ export class Sonar {
    * contact halos, so the wreck and objectives
    * show against featureless seabed. Faded out as relief takes over.
    */
-  private hullPoi(): PlacedPoi | undefined {
-    return this.pois.find((poi) => poi.id === 'endurance-hull');
-  }
-
   private drawFlatGuides(ctx: CanvasRenderingContext2D, s: SubmarineState): void {
     const flat = this.flatness;
     if (flat <= 0 || !this.showMarkers) return;

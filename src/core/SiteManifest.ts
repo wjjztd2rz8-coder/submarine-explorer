@@ -148,6 +148,13 @@ export interface SiteManifest {
   };
   props?: Record<string, PropManifest>;
   id: string;
+  sonar?: {
+    /** Authored hull POI anchoring scour contours on flat terrain. */
+    scourHullPoi?: string;
+    maxContourIntervalM?: number;
+    /** Calm reef gradient around the reconstructed sinkhole, when it is on this tile. */
+    reef?: boolean;
+  };
   opening?: {
     mission?: { rangeM: number; destinationLabel?: string; localAltitudeWeight?: number };
     freeDive?: OpeningPose & {
@@ -400,9 +407,18 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
     'props',
     'scatter',
     'atmosphere',
+    'sonar',
   ]);
   if (root.id !== id) fail(id, 'id', `expected "${id}"`);
   const out: SiteManifest = { id };
+  if (root.sonar !== undefined) {
+    fields({}, { scourHullPoi: text, maxContourIntervalM: aboveZero, reef: flag })(
+      id,
+      'sonar',
+      root.sonar,
+    );
+    out.sonar = root.sonar as SiteManifest['sonar'];
+  }
   if (root.atmosphere !== undefined) {
     atmosphereCheck(id, 'atmosphere', root.atmosphere);
     out.atmosphere = root.atmosphere as SiteManifest['atmosphere'];

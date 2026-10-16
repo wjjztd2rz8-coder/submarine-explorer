@@ -58,6 +58,36 @@ describe('site manifest validator', () => {
 
   const cases: [string, unknown, string | null][] = [
     ['minimal', { id: 's' }, null],
+    ['empty sonar', { id: 's', sonar: {} }, null],
+    ['disabled reef', { id: 's', sonar: { reef: false } }, null],
+    [
+      'sonar policies',
+      { id: 's', sonar: { scourHullPoi: 'hull', maxContourIntervalM: 10, reef: true } },
+      null,
+    ],
+    ...[null, [], 'sonar', 1].map((sonar): [string, unknown, string] => [
+      `malformed sonar ${JSON.stringify(sonar)}`,
+      { id: 's', sonar },
+      'sonar: expected an object',
+    ]),
+    ['unknown sonar field', { id: 's', sonar: { typo: 1 } }, 'sonar.typo: unknown field'],
+    ...['', ' ', 1, null, {}].map((scourHullPoi): [string, unknown, string] => [
+      `invalid scour anchor ${JSON.stringify(scourHullPoi)}`,
+      { id: 's', sonar: { scourHullPoi } },
+      'sonar.scourHullPoi: expected a nonempty string',
+    ]),
+    ...[0, -1, NaN, Infinity, -Infinity, '10', null].map(
+      (maxContourIntervalM): [string, unknown, string] => [
+        `invalid contour cap ${maxContourIntervalM}`,
+        { id: 's', sonar: { maxContourIntervalM } },
+        'sonar.maxContourIntervalM',
+      ],
+    ),
+    ...[1, 'true', null, {}].map((reef): [string, unknown, string] => [
+      `invalid reef flag ${JSON.stringify(reef)}`,
+      { id: 's', sonar: { reef } },
+      'sonar.reef: expected a boolean',
+    ]),
     ['empty scatter', { id: 's', scatter: {} }, null],
     ['disabled keepout', { id: 's', scatter: { keepoutHero: false } }, null],
     ['opening hero keepout', { ...siteManifest('challenger-deep'), id: 's' }, null],
@@ -375,6 +405,22 @@ describe('site manifest validator', () => {
     if (error === null) expect(validateSiteManifest(raw, 's').id).toBe('s');
     else expect(() => validateSiteManifest(raw, 's')).toThrow(error);
   });
+});
+
+it('ships only authored sonar policies with an existing scour anchor', () => {
+  const expected = new Map([
+    ['endurance', { scourHullPoi: 'endurance-hull' }],
+    ['great-blue-hole', { maxContourIntervalM: 10, reef: true }],
+  ]);
+  for (const id of ids) {
+    const policy = siteManifest(id)!.sonar;
+    expect(policy).toEqual(expected.get(id));
+    if (policy?.scourHullPoi) {
+      const { pois } = JSON.parse(readFileSync(`data/landmarks/${id}/pois.json`, 'utf8'));
+      expect(pois.map((poi: { id: string }) => poi.id)).toContain(policy.scourHullPoi);
+    }
+  }
+  expect(siteManifest('unknown')?.sonar).toBeUndefined();
 });
 
 describe('shipped site manifests', () => {
