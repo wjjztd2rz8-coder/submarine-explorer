@@ -126,15 +126,15 @@ describe('hull-close highlight compression', () => {
             'hi',
             `const shoulderDecay = ${decay.replace('exp(', 'Math.exp(')}; const sh = ${shoulder}; return sh / hi;`,
           ) as (hi: number) => number;
-          for (const hi of [0.50001, 0.6, 1, 5, 20, 100, 1000, 1e6, 1e20]) {
+          for (const hi of [0.45001, 0.6, 1, 5, 20, 100, 1000, 1e6, 1e20]) {
             const factor = Math.fround(scale(Math.fround(hi)));
             for (const color of [hi, hi * 0.7, hi * 0.1]) {
               const compressed = Math.fround(color * factor);
               expect(Number.isFinite(compressed)).toBe(true);
               expect(compressed).toBeGreaterThan(0);
-              expect(compressed).toBeLessThanOrEqual(0.900001);
+              expect(compressed).toBeLessThanOrEqual(0.750001);
             }
-            expect(hi * factor).toBeCloseTo(0.5 + 0.4 * Math.tanh((hi - 0.5) / 0.4), 6);
+            expect(hi * factor).toBeCloseTo(0.45 + 0.3 * Math.tanh((hi - 0.45) / 0.3), 6);
           }
           expect(shader.fragmentShader).not.toContain('tanh(');
         }
