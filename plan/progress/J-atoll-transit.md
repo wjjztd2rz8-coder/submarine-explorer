@@ -6,4 +6,4 @@ Reused: the existing debrief "next" line and the objectives' hint text. No new c
 
 Tests: debrief unit and e2e expectations updated for the new text.
 
-Gates: see final run below.
+Gates: PW_PORT=4871 tools/gates.sh all PASS (python, content, build, unit, e2e, e2e-base, attribution, prettier).
