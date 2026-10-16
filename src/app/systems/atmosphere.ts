@@ -68,7 +68,7 @@ export const atmosphereSystem: GameSystem = {
     },
     'env.lighting': (f, ctx) => {
       const { rig, sub, renderer } = ctx;
-      sub.vehicle.materials.uniforms.uHullLight.value = f.atmo.hullLight;
+      ctx.subMesh.vehicle.materials.uniforms.uHullLight.value = f.atmo.hullLight;
       f.fog = { color: f.atmo.fogColor, density: f.atmo.fogDensity };
       // Beams show in dark, particle-laden water and wash out in daylight.
       const dark = 1 - Math.min(1, f.atmo.ambientIntensity / 0.9);

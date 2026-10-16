@@ -61,7 +61,6 @@ opt-in fog/backdrop still apply.
 
 Canyon `ambientFillColor` is an optional numeric RGB colour, defaulting to
 `0x4f7480`; it tints the extra ambient fill when `ambientFill` is positive.
-Vent `hullLight` (default 1) scales the player vehicle's lit result at that site; Beebe lowers it because its strong ambient fill makes the white hull the brightest thing in view.
 Monterey overrides it with `0x71858b` and raises fill to 28. Monterey also adds
 a modest hemisphere light and increases the submarine lamp intensity and
 range through `Config.MONTEREY_OPENING`. These are visibility aids at depth;
