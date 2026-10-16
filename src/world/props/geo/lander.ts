@@ -14,14 +14,24 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { lerp, smoothstep } from '../../../util/math.js';
 import { geoDetail } from './detail.js';
-import { boxCH, impostorFromBoxes, normalise, place, type BuiltProp } from './shared.js';
+import {
+  boxCH,
+  impostorFromBoxes,
+  normalise,
+  place,
+  valueNoise3,
+  type BuiltProp,
+} from './shared.js';
 import type { GeoBuildInput } from './types.js';
 
 const ALU = new THREE.Color(0x5b5a52);
 const CAGE = new THREE.Color(0x35352f);
 const TIP = new THREE.Color(0x3b3a36);
 const DARK = new THREE.Color(0x2c3236);
-const FLOAT = new THREE.Color(0xe8921a);
+const FOAM = new THREE.Color(0x5c3818);
+const FOAM_DARK = new THREE.Color(0x2a1c12);
+const STEEL = new THREE.Color(0x45484a);
+const STRAP = new THREE.Color(0x2f3234);
 const WHITE = new THREE.Color(0x9da5a7);
 const FISH = new THREE.Color(0x8fa6b4);
 const FLAG = new THREE.Color(0xff5a16);
@@ -39,6 +49,39 @@ function tint(g: THREE.BufferGeometry, c: THREE.Color): THREE.BufferGeometry {
   for (let i = 0; i < n; i++) col.set([c.r, c.g, c.b], i * 3);
   out.setAttribute('color', new THREE.BufferAttribute(col, 3));
   return out;
+}
+
+/**
+ * A syntactic-foam flotation sphere centred at (x, y, z): a matte, slightly lumpy ball whose
+ * vertex colour mottles between two muted ambers, so it reads as moulded foam, not a lamp.
+ */
+function foamSphere(
+  r: number,
+  detail: number,
+  x: number,
+  y: number,
+  z: number,
+  seed: number,
+): THREE.BufferGeometry {
+  const g = normalise(new THREE.IcosahedronGeometry(r, detail));
+  const pos = g.getAttribute('position');
+  const col = new Float32Array(pos.count * 3);
+  const c = new THREE.Color();
+  const f = 5 / r;
+  for (let i = 0; i < pos.count; i++) {
+    const px = pos.getX(i);
+    const py = pos.getY(i);
+    const pz = pos.getZ(i);
+    const lump = valueNoise3(px * f, py * f, pz * f, seed);
+    const speck = valueNoise3(px * f * 4, py * f * 4, pz * f * 4, seed + 1);
+    const s = 1 + 0.05 * (lump - 0.5);
+    pos.setXYZ(i, px * s + x, py * s + y, pz * s + z);
+    c.copy(FOAM).lerp(FOAM_DARK, Math.min(1, Math.max(0, 1.1 * speck + 0.4 * lump - 0.3)));
+    col.set([c.r, c.g, c.b], i * 3);
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  g.computeVertexNormals();
+  return g;
 }
 
 /**
@@ -102,7 +145,7 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
     const cx = Math.cos(a);
     const cz = Math.sin(a);
     parts.push(
-      tint(strut(v(cx * 1.5, 0.1, cz * 1.5), v(cx * 0.9, ringY, cz * 0.9), 0.07 * k, seg, 4), ALU),
+      tint(strut(v(cx * 1.5, 0.1, cz * 1.5), v(cx * 0.9, ringY, cz * 0.9), 0.09 * k, seg, 4), ALU),
     );
     parts.push(
       tint(
@@ -132,26 +175,64 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
         strut(
           v(cx * 1.2, 0.85, cz * 1.2),
           v(Math.cos(b) * 1.2, 0.85, Math.sin(b) * 1.2),
-          0.045 * k,
+          0.06 * k,
           seg,
         ),
         ALU,
       ),
     );
-    // Flotation: a yellow glass sphere at each leg top, and one between.
-    const fl = new THREE.IcosahedronGeometry(0.3 * k, d.sphereDetail > 1 ? 1 : 0);
-    parts.push(tint(fl.translate(cx * 0.9 * k, (ringY + 0.28) * k, cz * 0.9 * k), FLOAT));
+    // Cross-bracing: a diagonal from this leg's foot area up to the next leg's upper section.
+    parts.push(
+      tint(
+        strut(
+          v(cx * 1.35, 0.35, cz * 1.35),
+          v(Math.cos(b) * 1.0, 1.45, Math.sin(b) * 1.0),
+          0.04 * k,
+          seg,
+        ),
+        ALU,
+      ),
+    );
+    // A flange collar where the leg meets the ring, and a steel ballast weight clamped low on it.
+    parts.push(
+      tint(
+        new THREE.CylinderGeometry(0.11 * k, 0.11 * k, 0.1 * k, seg).translate(
+          cx * 0.9 * k,
+          ringY * k,
+          cz * 0.9 * k,
+        ),
+        STEEL,
+      ),
+    );
+    parts.push(
+      tint(
+        place(new THREE.BoxGeometry(1, 1, 1), {
+          x: cx * 1.38 * k,
+          y: 0.42 * k,
+          z: cz * 1.38 * k,
+          ry: -a,
+          sx: 0.2 * k,
+          sy: 0.3 * k,
+          sz: 0.3 * k,
+        }),
+        STEEL,
+      ),
+    );
+    // Flotation: a syntactic-foam sphere at each leg top, with a strap, and one between.
+    const fd = d.sphereDetail > 1 ? 1 : 0;
+    parts.push(foamSphere(0.3 * k, fd, cx * 0.9 * k, (ringY + 0.28) * k, cz * 0.9 * k, i * 2));
+    parts.push(
+      tint(
+        new THREE.TorusGeometry(0.3 * k, 0.02 * k, 3, seg * 2)
+          .rotateX(Math.PI / 2)
+          .translate(cx * 0.9 * k, (ringY + 0.2) * k, cz * 0.9 * k),
+        STRAP,
+      ),
+    );
     const mx = Math.cos(a + Math.PI / 3);
     const mz = Math.sin(a + Math.PI / 3);
     parts.push(
-      tint(
-        new THREE.IcosahedronGeometry(0.26 * k, d.sphereDetail > 1 ? 1 : 0).translate(
-          mx * 0.75 * k,
-          (ringY + 0.3) * k,
-          mz * 0.75 * k,
-        ),
-        FLOAT,
-      ),
+      foamSphere(0.26 * k, fd, mx * 0.75 * k, (ringY + 0.3) * k, mz * 0.75 * k, i * 2 + 7),
     );
   }
   // Top ring and the ballast plate hung under the frame.
@@ -192,6 +273,43 @@ export function buildBenthicLander(input: GeoBuildInput): BuiltProp {
       GLASS,
     ),
   );
+  // A battery/electronics box strapped to the central housing, and a bait plate on the ballast
+  // plate (a shallow tray on two stand-offs, where the mackerel is lashed).
+  parts.push(
+    tint(
+      place(new THREE.BoxGeometry(1, 1, 1), {
+        x: -0.3 * k,
+        y: 1.05 * k,
+        z: 0.2 * k,
+        ry: 0.5,
+        sx: 0.3 * k,
+        sy: 0.5 * k,
+        sz: 0.22 * k,
+      }),
+      DARK,
+    ),
+  );
+  parts.push(
+    tint(
+      place(new THREE.BoxGeometry(1, 1, 1), {
+        x: 0.2 * k,
+        y: 0.46 * k,
+        z: 0.55 * k,
+        ry: -0.4,
+        sx: 0.55 * k,
+        sy: 0.04 * k,
+        sz: 0.3 * k,
+      }),
+      CAGE,
+    ),
+  );
+  for (const sx of [-1, 1])
+    parts.push(
+      tint(
+        strut(v(0.2 + sx * 0.2, 0.34, 0.55), v(0.2 + sx * 0.2, 0.44, 0.55), 0.025 * k, 4),
+        STEEL,
+      ),
+    );
   // Acoustic release on the ballast plate, opposite the camera, with its orange ring.
   parts.push(
     tint(
