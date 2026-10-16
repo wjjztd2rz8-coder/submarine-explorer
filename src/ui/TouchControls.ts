@@ -430,10 +430,16 @@ export class TouchControls {
       if (this.looks.size >= 2) {
         const d = dist();
         const delta = pinchWheelDelta(this.pinchDist, d);
-        this.pinchDist = d;
         if (this.opts.sonar.expanded) {
-          if (Math.abs(delta) > 14) this.opts.sonar.zoomWheel(delta < 0 ? -1 : 1);
-        } else this.input.touchZoom(delta);
+          // Keep sub-threshold motion so a slow pinch can reach the next zoom step.
+          if (Math.abs(delta) > 14) {
+            this.opts.sonar.zoomWheel(delta < 0 ? -1 : 1);
+            this.pinchDist = d;
+          }
+        } else {
+          this.pinchDist = d;
+          this.input.touchZoom(delta);
+        }
       } else if (!this.opts.sonar.expanded) {
         this.input.touchLook(dx, dy);
       }

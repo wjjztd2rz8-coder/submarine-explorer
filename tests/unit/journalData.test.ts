@@ -19,6 +19,8 @@ import {
 import { debriefText } from '../../src/game/MissionRouter.js';
 import { parsePois } from '../../src/game/Pois.js';
 import { parseSpecies } from '../../src/game/Species.js';
+import { parseLifeDoc } from '../../src/world/life/tables.js';
+import lifeDoc from '../../data/life/life.json';
 import type { FetchJson } from '../../src/game/ContentPath.js';
 import titanic from '../../data/landmarks/titanic/mission.json';
 import blueHole from '../../data/landmarks/great-blue-hole/mission.json';
@@ -335,4 +337,35 @@ it('loads samples and secrets as Journal finds while preserving their discovery 
   expect(isSiteUnlocked(site, store)).toBe(true);
   expect(siteProgress(site, store)).toEqual({ logged: 0, total: 0, species: 0, speciesTotal: 0 });
   expect(new DiscoveryStore(null).keys()).toEqual([]);
+});
+
+it('opens a site and its overview when wildlife is the first scan, including after reload', () => {
+  const site = buildJournalSite({
+    id: 'monterey-canyon',
+    guide: GUIDE,
+    pois: [],
+    species: null,
+    life: parseLifeDoc(lifeDoc),
+  });
+  const values = new Map<string, string>();
+  const storage = {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      values.set(key, value);
+    },
+    removeItem: (key: string) => {
+      values.delete(key);
+    },
+  };
+  const store = new DiscoveryStore(storage);
+  const animal = site.entries.find((entry) => entry.kind === 'life')!;
+  expect(animal).toBeDefined();
+  expect(isSiteUnlocked(site, store)).toBe(false);
+  store.record(site.id, `life:${animal.id}`);
+  for (const saved of [store, new DiscoveryStore(storage)]) {
+    expect(isEntryUnlocked(site, animal, saved)).toBe(true);
+    expect(isSiteUnlocked(site, saved)).toBe(true);
+    expect(isEntryUnlocked(site, site.entries[0], saved)).toBe(true);
+  }
+  expect(isSiteUnlocked(site, reader([`other/life:${animal.id}`]))).toBe(false);
 });

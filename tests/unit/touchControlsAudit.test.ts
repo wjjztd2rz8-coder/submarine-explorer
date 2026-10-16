@@ -86,16 +86,17 @@ function fixture(canvasTouchAction = '', realInput?: Input) {
   };
   const canvas = new TouchElement();
   canvas.style.touchAction = canvasTouchAction;
+  const sonar = { expanded: false, zoomWheel: vi.fn() };
   const controls = new TouchControls({
     input: input as unknown as Input,
     canvas: canvas as unknown as HTMLElement,
-    sonar: { expanded: false, zoomWheel: vi.fn() },
+    sonar,
     onPause: vi.fn(),
   });
   controls.update(true, false);
   const root = controls.root as unknown as TouchElement;
   const [stick, slider, buttons] = root.children;
-  return { controls, input, doc, win, stick, slider, scan: buttons.children[0], canvas };
+  return { controls, input, doc, win, stick, slider, scan: buttons.children[0], canvas, sonar };
 }
 
 afterEach(() => {
@@ -849,6 +850,37 @@ it('replaces the completion banner with the logged contact card even when a remo
     expect(scanner.view.completed).toBe(1);
   } finally {
     overlay.dispose();
+    f.controls.dispose();
+  }
+});
+
+it('zooms the sonar with a gradual pinch and resets its threshold between gestures', () => {
+  const f = fixture();
+  f.sonar.expanded = true;
+  const send = (type: string, id: number, x: number) => {
+    const event = new Event(type);
+    Object.assign(event, { pointerId: id, pointerType: 'touch', clientX: x, clientY: 60 });
+    Object.defineProperty(event, 'target', { value: f.canvas });
+    f.win.dispatchEvent(event);
+  };
+  try {
+    send('pointerdown', 1, 60);
+    send('pointerdown', 2, 100);
+    for (const x of [101, 102, 103]) send('pointermove', 2, x);
+    expect(f.sonar.zoomWheel).not.toHaveBeenCalled();
+    send('pointermove', 2, 104);
+    expect(f.sonar.zoomWheel).toHaveBeenCalledExactlyOnceWith(-1);
+    for (const x of [103, 102, 101, 100]) send('pointermove', 2, x);
+    expect(f.sonar.zoomWheel.mock.calls).toEqual([[-1], [1]]);
+    expect(f.input.touchZoom).not.toHaveBeenCalled();
+    expect(f.input.touchLook).not.toHaveBeenCalled();
+    send('pointerup', 2, 100);
+    send('pointerdown', 3, 200);
+    send('pointermove', 3, 201);
+    expect(f.sonar.zoomWheel).toHaveBeenCalledTimes(2);
+    send('pointermove', 3, 204);
+    expect(f.sonar.zoomWheel.mock.calls).toEqual([[-1], [1], [-1]]);
+  } finally {
     f.controls.dispose();
   }
 });
