@@ -1349,3 +1349,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged (smoke + project-base green; no full e2e):** Sonnet V-bluehole-roof-2 (thin/thick lip, three notches with overhang blocks, tilted beds, varied sand apron; ~4.0; underside unchanged; apron widened to r~168).
 - **Codex:** 5h ~3%, nothing running; queue 2300-2330 waits for budget. Prior CI runs still pending at start; no tag.
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 11:07 CDT headless run 33 (Claude)
+
+- **Merged (smoke + project-base green; no full e2e):** Sonnet V-beebe-lighting (torn stack rims on crusted sulfide stacks, Beebe lamp data; ~3.8, close pose still mid-brown).
+- **Codex:** 2300 S-verify-15, 2310 J-home-controls, 2320 S-bughunt-16 running (Codex budget reset to ~60%); queue 2330. Prior CI runs pending at start; no tag.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.

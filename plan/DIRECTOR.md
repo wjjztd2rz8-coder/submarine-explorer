@@ -70,7 +70,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running. Codex nothing running (5h at 3%, resets 10:15); queue 2300 S-verify-15, 2310 J-home-controls, 2320 S-bughunt-16, 2330 S-manifest next slice.
+- No Claude package running. Codex 2300 S-verify-15, 2310 J-home-controls, 2320 S-bughunt-16 running; queue 2330 S-manifest next slice.
 
 ## Backlog
 
@@ -78,7 +78,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. Eviden
 
 1. **V-bluehole-roof-2 [Sonnet] DONE 2026-10-16 (merged run 32; roof notches, thin lip, tilted beds, varied apron; ~4.0; underside still unchanged)**, ~3.6: from the east pose the roof is still one rolled slab with a uniform thick rim and a flat blue-green pool; stalactites are the only relief. Vary roof thickness along the rim, add two or three overhang notches and drop-offs, tilt the beds so they do not run parallel, and break the flat sand shelf with the existing sediment material. Geometry, not tuning. Evidence: [progress/V-bluehole-roof.md](progress/V-bluehole-roof.md), golden `great-blue-hole-east-2.png`.
 2. **V-titanic-seabed [Sonnet]** (slice 1 merged 2026-10-16: ripples and stones/rubble scatter via Titanic biome data, faint at approach distance; remaining: scour moat at the hull, hull plating repetition), ~3.9: hull now reads as a wreck; the approach view is a flat dark brown plane with a few sparse plants. Add sediment ripples, a debris trail and scour around the hull using the existing sediment material (as V-monterey-floor did). Hull plating repetition is the second gap.
-3. **V-beebe-lighting [Sonnet]**, ~3.6 (up from 3.3): the chimney is now orange-brown with collars and reads; side stacks still have flat stump tops and the close pose washes beige under headlights. Fix on the lighting side (`hullLight`/spot falloff), not paint; give side stacks the same tapered tops.
+3. **V-beebe-lighting [Sonnet] DONE 2026-10-16 (7a0a14b; torn stack rims, Beebe lamp data; ~3.8, close pose still mid-brown, vent glow faint)**, ~3.6 (up from 3.3): the chimney is now orange-brown with collars and reads; side stacks still have flat stump tops and the close pose washes beige under headlights. Fix on the lighting side (`hullLight`/spot falloff), not paint; give side stacks the same tapered tops.
 4. **V-challenger-floats [Sonnet, small]**, ~3.6: floats are faceted and the frame pale under headlights; swap to a smooth dull syntactic-foam material and darken the frame. Non-hero, so cap at one package.
 5. **V-lostcity-rims [Sonnet]**, ~3.6: thin hollow tower rims and broad planar surfaces; the middle ground slope is smeared. Thicken rims, add crust ledges.
 6. **V-endurance-frame [Sonnet]** CUT 2026-10-16: Endurance is a polish site and its opening pose is fine (3.6); the aim attempt made the sub dominate the frame. Owner delegated the call. Work kept as tag `parked/V-endurance-aim` (5fa58fc).
