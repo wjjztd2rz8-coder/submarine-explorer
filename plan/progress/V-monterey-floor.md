@@ -30,4 +30,4 @@ All other sites are byte-identical.
 
 ## Gates
 
-`PW_PORT=4712 tools/gates.sh`: see final run below.
+`PW_PORT=4712 tools/gates.sh`: all PASS (python, content, build, unit, e2e, e2e-base, attribution, prettier).
