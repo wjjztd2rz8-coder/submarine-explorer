@@ -1229,3 +1229,11 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h ~4% until 23:09 CDT; 2170/2180/2190 worktrees hold uncommitted work, queue 2200/2210/2220 waits for the dispatcher.
 - **Not done:** V-endurance chase aim, V-beebe sub brightness, Blue Hole hood slab carve; no tag (f54 waits for green CI).
 - **Needs owner:** real-phone play of the newest build (Low tier).
+
+## 2026-10-15 21:52 CDT headless run 16 (Claude)
+
+- **Tagged:** f54 on green CI (04a1d8c); Pages deploy ok.
+- **Not merged:** Sonnet V-endurance-aim (per-site chase aim): hull 37% to 45% but the sub grew large and dominates the frame; parked on branch claude/V-endurance-aim (5fa58fc), recorded in DIRECTOR.
+- **Codex:** no tasks running, 5h at 2% until 23:09 CDT; 2170/2180/2190 worktrees hold uncommitted work and queue 2200/2210/2220 waits for the dispatcher.
+- **Not done:** V-beebe sub brightness, Blue Hole hood slab carve.
+- **Needs owner:** real-phone play of the newest build (Low tier); decide whether to drop endurance item 4.

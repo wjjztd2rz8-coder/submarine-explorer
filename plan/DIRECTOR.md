@@ -71,7 +71,7 @@ The newest items go first.
 ## In flight
 
 - Codex queue 2170 J-journeys-repeat, 2180 S-verify-12, 2190 S-bughunt-9 waits for the 17:24 CDT Codex reset. No Claude package running.
-- V-endurance-aim [Sonnet, 2026-10-15]: per-site chase aim (item 4).
+- V-endurance-aim parked 2026-10-15: branch claude/V-endurance-aim (worktree ../subexp-wt/V-endurance-aim, commit 5fa58fc) reached hull 45% but the sub is too large and dominant in frame; not merged (new shared camera code for a small gain). Needs the camera forward of the sub, or drop item 4.
 
 ## Backlog
 
