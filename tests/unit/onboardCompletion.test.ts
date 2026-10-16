@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { GameContext } from '../../src/app/context.js';
-import type { FrameState } from '../../src/app/System.js';
+import type { GameSystem, FrameState } from '../../src/app/System.js';
+import { createControlsSystem } from '../../src/app/systems/controls.js';
 import { createOnboardSystem } from '../../src/app/systems/onboard.js';
 import { EventBus } from '../../src/core/EventBus.js';
 import type { HintId } from '../../src/game/Hints.js';
@@ -82,9 +83,26 @@ function setup(seenHints: HintId[] = ['creature']) {
     life: { targets: [{}] },
     expose: (fields: object) => Object.assign(exposed, fields),
   } as unknown as GameContext;
-  const system = createOnboardSystem();
-  system.init?.(ctx);
-  const tick = (state = { throttle: 0, yaw: 0, ballast: 0 }, dt = 0.1, activeSystem = system) =>
+  const onboardSystem = createOnboardSystem();
+  const controlsSystem = createControlsSystem();
+  const system = {
+    ...onboardSystem,
+    init: (ctx: GameContext) => {
+      controlsSystem.init?.(ctx);
+      onboardSystem.init?.(ctx);
+    },
+    dispose: () => {
+      onboardSystem.dispose?.();
+      controlsSystem.dispose?.();
+    },
+  };
+  system.init(ctx);
+  const tick = (
+    state = { throttle: 0, yaw: 0, ballast: 0 },
+    dt = 0.1,
+    activeSystem: GameSystem = system,
+  ) => {
+    controlsSystem.frame!['hud.draw']!({}, ctx);
     activeSystem.frame!['hud.draw']!(
       {
         state,
@@ -95,6 +113,7 @@ function setup(seenHints: HintId[] = ['creature']) {
       } as FrameState,
       ctx,
     );
+  };
   return { ctx, system, tick, onboard: exposed.onboard!, exposed, data };
 }
 

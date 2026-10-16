@@ -2,7 +2,7 @@
  * Controls card: a reference dialog for the control layout of the
  * device the player is using. The device follows the last input (keyboard,
  * gamepad or touch); the tabs let anyone peek at the others. Reachable from
- * Pause and Settings. Also supplies the compact bottom-of-screen tip text.
+ * Home, Pause and Settings.
  */
 
 import type { ActionId, Input } from '../core/Input.js';

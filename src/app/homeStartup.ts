@@ -9,6 +9,7 @@ import { PhotoGallery } from '../ui/PhotoGallery.js';
 import type { ShellContext } from './context.js';
 import { Disposables } from './Disposables.js';
 import type { GameSystem } from './System.js';
+import { createControlsSystem } from './systems/controls.js';
 import { createDailySystem } from './systems/daily.js';
 import { initializeProgressMenus } from './systems/progress.js';
 import { settingsSystem } from './systems/settings.js';
@@ -64,6 +65,7 @@ export function createHomeSystems(): GameSystem<
     { name: 'shell', init: initializeShell, dispose: shellSystem.dispose },
     globeSystem,
     settingsSystem,
+    createControlsSystem(),
     createDailySystem(),
     {
       name: 'menuProgress',

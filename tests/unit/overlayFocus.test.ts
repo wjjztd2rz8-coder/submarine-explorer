@@ -33,6 +33,7 @@ import titanicMission from '../../data/landmarks/titanic/mission.json';
 import { MissionRouter } from '../../src/game/MissionRouter.js';
 import { createPointerSystem } from '../../src/app/systems/pointer.js';
 import { createInputSystem } from '../../src/app/systems/input.js';
+import { createControlsSystem } from '../../src/app/systems/controls.js';
 import { createPhotoSystem } from '../../src/app/systems/photo.js';
 import { createDailySystem } from '../../src/app/systems/daily.js';
 import { inputGateSystem } from '../../src/app/loop.js';
@@ -95,6 +96,13 @@ class Element extends EventTarget {
   }
   get childElementCount() {
     return this.children.length;
+  }
+  get firstElementChild() {
+    return this.children[0] ?? null;
+  }
+  set innerHTML(markup: string) {
+    // Static SVG roots are enough to exercise the touch guide's DOM lifecycle.
+    if (markup.trim().startsWith('<svg')) this.replaceChildren(new Element('SVG'));
   }
   setAttribute(name: string, value: string) {
     this.attributes[name] = value;
@@ -1510,6 +1518,62 @@ describe('overlay policies across the app', () => {
 });
 
 describe('overlay host teardown', () => {
+  it.each(['keyboard', 'gamepad', 'touch'] as const)(
+    'Home routes %s Controls to the shared guide without dive state or settings',
+    (device) => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
+      const controls = createControlsSystem();
+      const settingsOpen = vi.fn();
+      const ctx = {
+        config: DEFAULT_CONFIG,
+        bus: new EventBus(),
+        index: [],
+        route: null,
+        save: new Save({ config: DEFAULT_CONFIG, storage: null }),
+        app: { state: 'home', lastSite: null },
+        params: new URLSearchParams(),
+        expose: vi.fn(),
+        journal: { open: vi.fn() },
+        discoveries: { isDiscovered: () => false },
+        input: new Input({ storage: null }),
+        settingsScreen: { root: html(element('DIV')), open: settingsOpen },
+      } as unknown as GameContext;
+      const runner = new SystemRunner(ctx);
+      cleanup.push(() => runner.dispose());
+      runner.init([shellSystem, controls]);
+      ctx.setAppState('home');
+      if (device === 'touch')
+        window.dispatchEvent(Object.assign(new Event('pointerdown'), { pointerType: 'touch' }));
+      if (device === 'gamepad') {
+        ctx.input.gamepadActive = true;
+        controls.frame!['hud.draw']!({}, ctx);
+      }
+      const opener = (ctx.home.root as unknown as Element)
+        .querySelectorAll('button')
+        .find((button) => button.textContent === 'Controls')!;
+      for (let cycle = 0; cycle < 3; cycle++) {
+        // DOM activation keeps the sampled device rather than synthesizing a mouse input.
+        opener.focus();
+        opener.dispatchEvent(new Event('click'));
+        expect(ctx.controlsCard.isOpen).toBe(true);
+        expect(ctx.controlsCard.device).toBe(device);
+        expect(ctx.controlsCard.root.getAttribute('aria-label')).toBe(
+          device === 'touch' ? 'How to play' : 'Controls guide',
+        );
+        expect(settingsOpen).not.toHaveBeenCalled();
+        expect(ctx.app.state).toBe('home');
+        expect(ctx).not.toHaveProperty('terrain');
+        expect(ctx).not.toHaveProperty('sub');
+        const close = (ctx.controlsCard.root as unknown as Element)
+          .querySelectorAll('button')
+          .find((button) => button.textContent === 'Close')!;
+        close.dispatchEvent(new Event('click'));
+        expect(ctx.controlsCard.isOpen).toBe(false);
+        expect(active()).toBe(opener);
+      }
+    },
+  );
+
   it('three Home/dive/Home shell lifetimes release input, modal ownership and Daily/photo timers', async () => {
     vi.useFakeTimers();
     try {
@@ -1529,6 +1593,7 @@ describe('overlay host teardown', () => {
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
       const add = vi.spyOn(window, 'addEventListener');
       const remove = vi.spyOn(window, 'removeEventListener');
+      let previousControls: ReturnType<typeof createControlsSystem> | undefined;
       for (let i = 0; i < 3; i++) {
         const guide = new Journal();
         const ctx = {
@@ -1549,8 +1614,10 @@ describe('overlay host teardown', () => {
           discovery: { guide, debrief: { isOpen: false } },
           rig: { exitPhotoMode: vi.fn() },
           canvas: html(element('CANVAS')),
+          settingsScreen: { root: html(element('DIV')) },
         } as unknown as GameContext;
         const runner = new SystemRunner(ctx);
+        const controls = createControlsSystem();
         cleanup.push(() => {
           runner.dispose();
           guide.dispose();
@@ -1559,12 +1626,27 @@ describe('overlay host teardown', () => {
           shellSystem,
           globeSystem,
           createInputSystem(),
+          controls,
           createDailySystem(),
           createPhotoSystem(),
           shellKeysSystem,
         ]);
         await Promise.all([ctx.globe.catalog, ctx.homeGlobe.catalog]);
+        previousControls?.dispose?.();
         expect(ctx.home.isOpen).toBe(true);
+        for (let cycle = 0; cycle < 3; cycle++) {
+          const opener = (ctx.home.root as unknown as Element)
+            .querySelectorAll('button')
+            .find((button) => button.textContent === 'Controls')!;
+          opener.focus();
+          opener.dispatchEvent(new Event('click'));
+          expect(body.querySelectorAll('.controls-card')).toHaveLength(1);
+          press('Tab');
+          expect(ctx.controlsCard.root.contains(document.activeElement)).toBe(true);
+          press('Escape');
+          expect(ctx.controlsCard.isOpen).toBe(false);
+          expect(active()).toBe(opener);
+        }
         ctx.home.showSites(false);
         press('Escape');
         expect(ctx.home.sitesOpen).toBe(false);
@@ -1585,11 +1667,13 @@ describe('overlay host teardown', () => {
         expect(vi.getTimerCount()).toBe(0);
         expect(press('Escape').defaultPrevented).toBe(false);
         expect(body.querySelectorAll('.home-screen')).toHaveLength(0);
+        expect(body.querySelectorAll('.controls-card')).toHaveLength(0);
         expect(body.querySelectorAll('.photo-mode')).toHaveLength(0);
         const before = { ...ctx.input.state };
         press('KeyW');
         expect(ctx.input.sample()).toEqual(before);
         expect(remove.mock.calls).toHaveLength(add.mock.calls.length);
+        previousControls = controls;
       }
     } finally {
       vi.useRealTimers();

@@ -11,10 +11,91 @@ import { HINT_THRESHOLDS } from '../../src/game/Hints.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
 import { GUIDANCE } from './helpers/guidance.js';
 import { advanceScan, completeScan } from './helpers/scan.js';
+import { homeReady } from './helpers/home.js';
 
 const shots = '.cache/codex/shots/f3-onboard';
 const url = '/?tile=titanic&landmark=_test&poi=test-bow&skipBriefing=1&tier=low';
 const KEY = 'subexplorer.onboard.v1';
+
+async function expectHomeWithoutDive(page: Page, terrainRequests: string[]): Promise<void> {
+  await expect(page.locator('body')).toHaveAttribute('data-app-state', 'home');
+  await expect(page.locator('.home-screen')).toBeVisible();
+  await expect(page.locator('#startup-loading, .hud, .tc-root, .briefing')).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      ['terrain', 'sub', 'scanner', 'power', 'props', 'life', 'missionRouter', 'onboard'].filter(
+        (name) => name in window.__game!,
+      ),
+    ),
+  ).toEqual([]);
+  expect(terrainRequests).toEqual([]);
+}
+
+for (const device of ['keyboard', 'gamepad'] as const) {
+  test(`${device}: Home opens the device guide and retains Change keys`, async ({ page }) => {
+    // Regression: Home bypassed the device guide and opened rebinding settings directly.
+    const terrainRequests: string[] = [];
+    page.on('request', (request) => {
+      // The existing decorative title crop loads independently; guard the default dive's tile.
+      if (request.url().includes('/data/tiles/titanic/')) terrainRequests.push(request.url());
+    });
+    if (device === 'gamepad') {
+      await page.addInitScript(() => {
+        Object.defineProperty(navigator, 'getGamepads', {
+          configurable: true,
+          value: () => [{ connected: true, index: 0, axes: [0, -1, 0, 0], buttons: [] }],
+        });
+      });
+    }
+    await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
+    await homeReady(page);
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => (window.__game as { controlsCard: { device: string } }).controlsCard.device,
+        ),
+      )
+      .toBe(device);
+    const opener = page
+      .locator('.home-menu')
+      .getByRole('button', { name: 'Controls', exact: true });
+    const dialog = page.getByRole('dialog', { name: 'Controls guide', exact: true });
+    for (let cycle = 0; cycle < 3; cycle++) {
+      await opener.focus();
+      // A DOM activation retains the sampled pad device; mouse/keyboard events select theirs.
+      if (device === 'gamepad') await opener.dispatchEvent('click');
+      else await page.keyboard.press('Enter');
+      await expect(dialog).toBeVisible();
+      await expect(dialog).toContainText(
+        `Showing the layout for your ${device === 'gamepad' ? 'gamepad' : 'keyboard and mouse'}`,
+      );
+      await expect(page.locator('.settings')).toBeHidden();
+      await expect(page.locator('.controls-card')).toHaveCount(1);
+      if (device === 'keyboard') await page.keyboard.press('Tab');
+      else await dialog.getByRole('button', { name: 'Gamepad', exact: true }).focus();
+      expect(await dialog.evaluate((node) => node.contains(document.activeElement))).toBe(true);
+      const close = dialog.getByRole('button', { name: 'Close', exact: true });
+      if (device === 'gamepad') await close.dispatchEvent('click');
+      else if (cycle % 2) await close.click();
+      else await page.keyboard.press('Escape');
+      await expect(dialog).toBeHidden();
+      await expect(opener).toBeFocused();
+      await expectHomeWithoutDive(page, terrainRequests);
+    }
+    await opener.focus();
+    await opener.dispatchEvent('click');
+    await dialog.getByRole('button', { name: 'Keyboard and mouse', exact: true }).click();
+    await dialog.getByRole('button', { name: 'Change keys', exact: true }).click();
+    await expect(dialog).toBeHidden();
+    const settings = page.locator('.settings');
+    await expect(settings).toBeVisible();
+    await expect(settings).toContainText('Choose an action, then press a key');
+    await page.keyboard.press('Escape');
+    await expect(settings).toBeHidden();
+    await expect(opener).toBeFocused();
+    await expectHomeWithoutDive(page, terrainRequests);
+  });
+}
 
 const { defaultBrowserType: _p, ...phoneLandscape } = devices['iPhone 13 landscape'];
 
@@ -142,6 +223,7 @@ test('the scan card outranks the tutorial step instead of stacking with it', asy
 });
 
 test('desktop: Pause opens the controls card for the active device', async ({ page }) => {
+  // Regression: sharing Home's guide must retain Pause's overlay ownership and opener focus.
   await page.addInitScript((k) => {
     if (!localStorage.getItem(k))
       localStorage.setItem(k, JSON.stringify({ version: 1, tutorialDone: true, seenHints: [] }));
@@ -149,7 +231,8 @@ test('desktop: Pause opens the controls card for the active device', async ({ pa
   await boot(page);
   await page.keyboard.press('Escape');
   await expect(page.locator('.pause-menu')).toBeVisible();
-  await page.locator('.pause-menu').getByRole('button', { name: 'Controls' }).click();
+  const opener = page.locator('.pause-menu').getByRole('button', { name: 'Controls', exact: true });
+  await opener.click();
   const dialog = page.getByRole('dialog', { name: 'Controls guide' });
   await expect(dialog).toBeVisible();
   await expect(dialog).toContainText('Showing the layout for your keyboard and mouse');
@@ -159,6 +242,15 @@ test('desktop: Pause opens the controls card for the active device', async ({ pa
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
   await expect(page.locator('.pause-menu')).toBeVisible();
+  await expect(opener).toBeFocused();
+  for (let cycle = 0; cycle < 2; cycle++) {
+    await opener.click();
+    await expect(page.locator('.controls-card')).toHaveCount(1);
+    await dialog.getByRole('button', { name: 'Close', exact: true }).click();
+    await expect(dialog).toBeHidden();
+    await expect(opener).toBeFocused();
+    await expect(page.locator('body')).toHaveAttribute('data-app-state', 'pause');
+  }
   // Peek at the touch layout.
   await page.locator('.pause-menu').getByRole('button', { name: 'Controls' }).click();
   await dialog.getByRole('button', { name: 'Touch' }).click();
@@ -253,6 +345,54 @@ test('desktop: Pause opens the controls card for the active device', async ({ pa
 
 test.describe('touch viewport', () => {
   test.use({ ...phoneLandscape });
+
+  test('touch: Home and Pause reuse How to play through repeated close and back', async ({
+    page,
+  }) => {
+    // Regression: touch Home showed key rebinding; the guide must work before any dive loads.
+    const terrainRequests: string[] = [];
+    page.on('request', (request) => {
+      // The existing decorative title crop loads independently; guard the default dive's tile.
+      if (request.url().includes('/data/tiles/titanic/')) terrainRequests.push(request.url());
+    });
+    await page.goto('/?tier=low', { waitUntil: 'domcontentloaded' });
+    await homeReady(page);
+    const dialog = page.getByRole('dialog', { name: 'How to play', exact: true });
+    for (const source of ['home', 'pause'] as const) {
+      if (source === 'pause') {
+        await boot(page, '&touch=1');
+        await page.locator('.tc-btn-pause').tap();
+      }
+      const opener = page
+        .locator(source === 'home' ? '.home-menu' : '.pause-menu')
+        .getByRole('button', { name: source === 'home' ? 'Controls' : 'How to play', exact: true });
+      for (let cycle = 0; cycle < 3; cycle++) {
+        await opener.tap();
+        await expect(dialog).toBeVisible();
+        await expect(dialog).toContainText('Left stick');
+        await expect(dialog).toContainText('Right slider');
+        await expect(dialog.locator('.how-to-tile svg')).toHaveCount(10);
+        await expect(dialog.locator('.controls-card-tabs')).toBeHidden();
+        await expect(dialog.getByRole('button', { name: 'Change keys' })).toHaveCount(0);
+        await expect(page.locator('.settings')).toBeHidden();
+        await expect(page.locator('.controls-card')).toHaveCount(1);
+        if (source === 'home') await expectHomeWithoutDive(page, terrainRequests);
+        if (cycle === 1) await page.keyboard.press('Escape');
+        else await dialog.getByRole('button', { name: 'Close', exact: true }).tap();
+        await expect(dialog).toBeHidden();
+        await expect(opener).toBeFocused();
+        await expect(page.locator('body')).toHaveAttribute('data-app-state', source);
+      }
+    }
+    await page.locator('.pause-menu').getByRole('button', { name: 'Quit to home' }).tap();
+    await page.locator('.home-menu').getByRole('button', { name: 'Controls', exact: true }).tap();
+    await expect(dialog).toBeVisible();
+    await expect(page.locator('.controls-card')).toHaveCount(1);
+    await dialog.getByRole('button', { name: 'Close', exact: true }).tap();
+    await expect(
+      page.locator('.home-menu').getByRole('button', { name: 'Controls', exact: true }),
+    ).toBeFocused();
+  });
 
   test('Journal returns to Pause without switching out of touch mode', async ({ page }) => {
     await boot(page, '&touch=1');

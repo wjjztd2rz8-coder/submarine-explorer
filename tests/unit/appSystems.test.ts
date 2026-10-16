@@ -345,6 +345,7 @@ describe('Home startup capabilities', () => {
         'shell',
         'globe',
         'settings',
+        'controls',
         'daily',
         'menuProgress',
         'shellKeys',

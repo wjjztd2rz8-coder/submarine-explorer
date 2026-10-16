@@ -80,10 +80,7 @@ export function initializeShell(ctx: ShellContext): void {
       },
       journal: () => journal.open(),
       settings: () => ctx.settingsScreen.open(),
-      controls: () => {
-        ctx.settingsScreen.open();
-        ctx.settingsScreen.showControls(true);
-      },
+      controls: () => ctx.controlsCard.open(),
     },
     // The game mode selector on the home screen.
     document.body,

@@ -8,6 +8,7 @@
  * earlier only when another system reads its `ctx` field during `init`.
  */
 
+import { createControlsSystem } from './systems/controls.js';
 import { createDailySystem } from './systems/daily.js';
 import { createExploreSystem } from './systems/explore.js';
 import { createProgressSystem } from './systems/progress.js';
@@ -71,6 +72,7 @@ export function createSystems(): GameSystem[] {
     cameraControlsSystem,
     createPointerSystem(),
     createTouchSystem(),
+    createControlsSystem(),
     createOnboardSystem(),
     settingsSystem,
     sonarControlsSystem,

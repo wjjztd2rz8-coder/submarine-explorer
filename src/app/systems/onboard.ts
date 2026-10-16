@@ -1,13 +1,9 @@
 /**
- * Onboarding: the first-dive tutorial, one-shot contextual hints and the
- * controls card. Tutorial steps and hints are offered to the guidance slot. It
- * only reads input state and game events; it never changes piloting input. The controls card owns its Escape policy in the
- * shared overlay stack.
+ * Onboarding: the first-dive tutorial and one-shot contextual hints offered to
+ * the guidance slot. Reads input state and game events without changing piloting input.
  */
 
-import { observeKeyboard } from '../../ui/FocusTrap.js';
 import type { InputDevice } from '../../ui/ControlsCard.js';
-import { ControlsCard } from '../../ui/ControlsCard.js';
 import { HINT_TEXT, HintEngine, creatureHintAllowed, hullHintAllowed } from '../../game/Hints.js';
 import type { HintLabels } from '../../game/Hints.js';
 import { TUTORIAL_STEPS, Tutorial, tutorialText } from '../../game/Tutorial.js';
@@ -31,8 +27,6 @@ export function createOnboardSystem(): GameSystem {
   let store = new TutorialSave(null);
   let diveS = 0;
   let startDepth: number | null = null;
-  let wasGamepad = false;
-  let wasTouch = false;
   let creatureHint = false;
   let scanCompleted = false;
 
@@ -83,57 +77,18 @@ export function createOnboardSystem(): GameSystem {
     init(ctx) {
       ctxRef = ctx;
       scanCompleted = false;
-      const { input, bus, params } = ctx;
+      const { bus, params } = ctx;
       store = new TutorialSave();
       const record = store.get();
       const forced = params.get('tutorial');
       tutorial = new Tutorial(forced === '1' || (forced !== '0' && !record.tutorialDone));
       hints = new HintEngine(record.seenHints);
 
-      const controlsCard = new ControlsCard({
-        key: (id) => input.primaryKeyLabel(id),
-        input,
-        initialDevice: input.touchActive ? 'touch' : 'keyboard',
-        onRebind: () => {
-          if (!ctx.settingsScreen.isOpen) ctx.settingsScreen.open();
-          ctx.settingsScreen.showControls(true);
-        },
-      });
-      ctx.controlsCard = controlsCard;
-      cleanup.add(() => controlsCard.dispose());
-      const root = document.documentElement;
-      root.dataset.reduceMotion = String(ctx.settings.reduceMotion);
-      cleanup.add(
-        ctx.save.onChange((next, changed) => {
-          if (changed.includes('reduceMotion'))
-            root.dataset.reduceMotion = String(next.reduceMotion);
-        }),
-      );
-
       ctx.guidance.setSkipHandler(() => {
         if (tutorial.skipStep()) onAdvance();
       });
       cleanup.add(() => ctx.guidance.setSkipHandler(null));
 
-      // Last input used decides which layout is shown.
-      cleanup.add(
-        observeKeyboard((event) => {
-          // Match TouchControls: modifiers alone leave the touch layout active.
-          if (['ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight'].includes(event.code))
-            return;
-          controlsCard.setDevice('keyboard');
-        }),
-      );
-      cleanup.listen(
-        window,
-        'pointerdown',
-        (event) => {
-          const type = (event as PointerEvent).pointerType;
-          if (type === 'touch') controlsCard.setDevice('touch');
-          else if (type === 'mouse') controlsCard.setDevice('keyboard');
-        },
-        { capture: true, passive: true },
-      );
       cleanup.add(bus.on('scan:started', () => tutorial.notify('scan:started')));
       cleanup.add(
         bus.on('scan:progress', ({ progress }) => {
@@ -160,7 +115,6 @@ export function createOnboardSystem(): GameSystem {
       );
 
       ctx.expose({
-        controlsCard,
         onboard: {
           get tutorial() {
             return tutorial;
@@ -171,7 +125,7 @@ export function createOnboardSystem(): GameSystem {
       });
     },
     start(ctx) {
-      // A second way into the card, from the Settings header.
+      // Retain the existing dive Settings shortcut to the shared device guide.
       const open =
         ctx.settingsScreen.root.querySelector<HTMLButtonElement>('.settings-controls-open');
       if (!open) return;
@@ -179,19 +133,13 @@ export function createOnboardSystem(): GameSystem {
       layout.type = 'button';
       layout.className = open.className.replace('settings-controls-open', 'settings-layout-open');
       layout.textContent = 'Device layout';
-      layout.addEventListener('click', () => ctx.controlsCard.open());
+      cleanup.listen(layout, 'click', () => ctx.controlsCard.open());
       open.after(layout);
+      cleanup.add(() => layout.remove());
     },
     frame: {
       'hud.draw': (f, ctx) => {
-        const { input, controlsCard } = ctx;
-        // Gamepad and touch have flags; keyboard and mouse come from events.
-        if (input.gamepadActive && !wasGamepad) controlsCard.setDevice('gamepad');
-        wasGamepad = input.gamepadActive;
-        if (input.touchActive !== wasTouch) {
-          wasTouch = input.touchActive;
-          if (wasTouch) controlsCard.setDevice('touch');
-        }
+        const { controlsCard } = ctx;
         const device = controlsCard.device;
         const dive = ctx.app.state === 'dive';
         const playing = dive && !f.frozen && !ctx.photoMode.active;
