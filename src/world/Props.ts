@@ -182,6 +182,9 @@ export class Props {
   private readonly models = new ModelCache();
   private readonly colliders: Collider[] = [];
   private readonly local = new THREE.Vector3();
+  private readonly groundRay = new THREE.Ray();
+  private readonly groundInverse = new THREE.Matrix4();
+  private readonly groundBounds = new THREE.Box3();
   private readonly frustum = new THREE.Frustum();
   private readonly projView = new THREE.Matrix4();
   private readonly camPos = new THREE.Vector3();
@@ -356,17 +359,15 @@ export class Props {
   coversGround(x: number, z: number, pad = 4): boolean {
     for (const p of this.placed) {
       if (!p.def.clearsGround) continue;
-      this.local.set(x, 0, z);
-      p.root.worldToLocal(this.local);
-      const b = p.localBounds;
       const s = p.def.scale;
-      if (
-        this.local.x >= b.min.x - pad / s[0] &&
-        this.local.x <= b.max.x + pad / s[0] &&
-        this.local.z >= b.min.z - pad / s[2] &&
-        this.local.z <= b.max.z + pad / s[2]
-      )
-        return true;
+      this.groundBounds
+        .copy(p.localBounds)
+        .expandByVector(this.local.set(pad / s[0], pad / s[1], pad / s[2]));
+      // Project vertically onto the whole tilted box; sea-level Y skews deep slope-aligned props.
+      this.groundRay.origin.set(x, p.sphere.center.y + p.sphere.radius + pad * Math.sqrt(3), z);
+      this.groundRay.direction.set(0, -1, 0);
+      this.groundRay.applyMatrix4(this.groundInverse.copy(p.root.matrixWorld).invert());
+      if (this.groundRay.intersectsBox(this.groundBounds)) return true;
     }
     return false;
   }

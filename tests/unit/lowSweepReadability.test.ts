@@ -155,13 +155,14 @@ test('Bismarck golden approach/detail aim at visible hull above the slope from c
 test('Per-site seabed light lifts only the deep bands of listed sites on Medium and High (Low keeps its own floor)', () => {
   const water = makeConfig().water;
   expect(siteLightWater('titanic', 'high', water)).toBe(water);
-  for (const site of Object.keys(SITE_SEABED_LIGHT)) {
-    expect(siteLightWater(site, 'low', water)).toBe(water);
-    const lit = siteLightWater(site, 'high', water);
-    for (const depth of [0, -5, -20])
-      expect(sampleAtmosphere(lit, depth)).toEqual(sampleAtmosphere(water, depth));
-    expect(sampleAtmosphere(lit, -700).ambientIntensity).toBeGreaterThan(
-      sampleAtmosphere(water, -700).ambientIntensity,
-    );
-  }
+  for (const site of Object.keys(SITE_SEABED_LIGHT))
+    for (const tier of ['medium', 'high'] as const) {
+      expect(siteLightWater(site, 'low', water)).toBe(water);
+      const lit = siteLightWater(site, tier, water);
+      for (const depth of [0, -5, -20])
+        expect(sampleAtmosphere(lit, depth)).toEqual(sampleAtmosphere(water, depth));
+      expect(sampleAtmosphere(lit, -700).ambientIntensity).toBeGreaterThan(
+        sampleAtmosphere(water, -700).ambientIntensity,
+      );
+    }
 });
