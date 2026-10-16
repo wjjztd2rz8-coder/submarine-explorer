@@ -273,13 +273,22 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     return (bulge + flute) * env + z * (shelf(x) - 1) * win + ledges + notch * (1 - win) * env;
   };
 
+  // Broken roof edge: the lip is chipped back by solution pockets, so its silhouette is never
+  // one rolled tube. Only the wall surface and its colliders see it; pendants hang from `disp`.
+  const wallDisp = (x: number, y: number, z: number): number => {
+    const win = smooth(0.46 * H, 0.5 * H, y) * (1 - smooth(0.66 * H, 0.7 * H, y));
+    const lipZone = smooth(0.5, 0.95, -z / D) * win;
+    const chip = (fbm3(x * 0.3, y * 0.5, seed + 83, seed + 12, 3) - 0.34) * 2.4;
+    return disp(x, y, z) - lipZone * Math.max(0, chip) * 4.5 * scale;
+  };
+
   // --- the wall
   const wall = extrudeProfile(
     profile,
     W,
     Math.min(200, Math.round(W * 3 * d.meshDensity)),
     Math.min(140, Math.round(H * 3 * d.meshDensity)),
-    disp,
+    wallDisp,
     H,
     (x) => liftAt(x),
     EDGE_START,
@@ -327,6 +336,21 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const lipLight = 1 + 0.3 * (1 - smooth(0, 0.22, bedF));
     const recess = 1 - 0.45 * smooth(0.3, 0.55, bedF) * (1 - smooth(0.7, 1, bedF));
     out.multiplyScalar(bedTone * lipLight * recess);
+    // End walls and cavity: stained streaks run down the ends, warm limestone near the lip
+    // grades to cool shadow deep in the bay, so the sides are not one flat slate.
+    const endF = smooth(0.35, 0.95, endRatio(x, W));
+    const stain = fbm3(x * 0.9, y * 0.07, z * 0.9, seed ^ 0x6d, 3);
+    out.lerp(CREAM_OCHRE, 0.3 * endF);
+    out.lerp(OCHRE, 0.5 * endF * smooth(0.35, 0.65, stain) * (0.5 + 0.5 * hf));
+    out.lerp(WALL_DARK, 0.45 * endF * smooth(0.5, 0.3, stain));
+    const bay = smooth(-0.9 * D, -0.05 * D, z);
+    out.lerp(CREAM_OCHRE, 0.18 * (1 - bay) * smooth(0.3, 0.8, hf));
+    out.multiplyScalar(0.88 + 0.22 * (1 - bay) + 0.12 * endF * (stain - 0.5));
+    // The roof lip is mottled with silt pockets and grey-brown stain, not one clean cream roll.
+    const lipM = smooth(0.7, 0.95, -z / D) * smooth(0.4 * H, 0.5 * H, y);
+    const pit = fbm3(x * 0.7, y * 0.9, z * 0.7, seed ^ 0x3a, 3);
+    out.lerp(GREY_BROWN, 0.6 * lipM * smooth(0.45, 0.62, pit));
+    out.multiplyScalar(1 - 0.2 * lipM * smooth(0.3, 0.45, pit));
   });
   wall.computeBoundingBox();
   const full = new THREE.Group();
@@ -501,7 +525,7 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
 
   // --- stalactites: clusters of fluted pendants hung from the underside of the shelf
   const colliders: THREE.Box3[] = wallColliders(profile, W, D, H, 12, gnd, {
-    disp,
+    disp: wallDisp,
     edgeStart: EDGE_START,
     plan,
     liftAt,
