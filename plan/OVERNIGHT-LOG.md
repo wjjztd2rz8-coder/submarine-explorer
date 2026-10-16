@@ -1337,3 +1337,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Golden captured and reviewed; Sol skipped (Codex 5h 3%). Backlog re-planned in DIRECTOR.md (DONE items removed, 6 Sonnet visual items + J-* P2s, Codex queue 2300-2330). REVIEWS.md and STATUS.md updated; stage ~82%.
 - Nothing merged; no agents launched. Needs owner: real-phone Low-tier play; drop V-endurance-aim?
+
+## 2026-10-16 09:36 CDT headless run 31 (Claude)
+
+- **Merged (smoke + project-base green; no full e2e):** Sonnet V-titanic-seabed slice 1 (Titanic biome data: stronger ripples, dropstone/rubble scatter; gain modest, faint at approach distance). Scour and plating repetition remain on the item.
+- **Codex:** 5h at 3%, nothing running; queue 2300, 2310, 2320, 2330 waits for budget. Prior CI runs were pending at start; no tag.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
