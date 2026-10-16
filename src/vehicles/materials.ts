@@ -47,7 +47,7 @@ export const DEFAULT_LOOK: VehicleLook = {
   rimColor: 0x6f93a3,
   rimStrength: 0.55,
   emissive: 0x0b1318,
-  key: 0.45,
+  key: 0.55,
 };
 
 /** Shared uniforms: every lit vehicle material points at the same objects. */
@@ -96,7 +96,7 @@ function addKeyAndRim(mat: THREE.MeshStandardMaterial, u: LitUniforms, rimScale 
           '  float kSpec = pow( saturate( dot( normal, kHalf ) ), mix( 90.0, 6.0, roughnessFactor ) );',
           '  vec3 kSpecCol = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );',
           '  totalEmissiveRadiance += uKeyColor * ( diffuseColor.rgb * kWrap * ( 1.0 - 0.65 * metalnessFactor )',
-          '    + kSpecCol * kSpec * ( 1.0 - roughnessFactor ) * 1.0 );',
+          '    + kSpecCol * kSpec * ( 1.0 - roughnessFactor ) * 1.6 );',
           '}',
         ].join('\n'),
       )
@@ -108,11 +108,11 @@ function addKeyAndRim(mat: THREE.MeshStandardMaterial, u: LitUniforms, rimScale 
           // to flat white. Compress the top of the range, keeping hue.
           '{',
           '  float hi = max( max( outgoingLight.r, outgoingLight.g ), outgoingLight.b );',
-          '  if ( hi > 0.45 ) {',
+          '  if ( hi > 0.5 ) {',
           // tanh can overflow its positive exponential on software GPUs
           // under hull-close lamps. This equivalent uses only exp(x <= 0).
-          '    float shoulderDecay = exp( -2.0 * ( hi - 0.45 ) / 0.3 );',
-          '    float sh = 0.45 + 0.3 * ( 1.0 - shoulderDecay ) / ( 1.0 + shoulderDecay );',
+          '    float shoulderDecay = exp( -2.0 * ( hi - 0.5 ) / 0.4 );',
+          '    float sh = 0.5 + 0.4 * ( 1.0 - shoulderDecay ) / ( 1.0 + shoulderDecay );',
           '    outgoingLight *= sh / hi;',
           '  }',
           '}',
