@@ -1369,3 +1369,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green; no full e2e):** Codex 2370 S-manifest terrain-carve slice (inventory 4 to 2), 2380 S-verify-16, 2390 S-bughunt-17 (pinch zoom, guide focus, modal shortcuts, touch/gamepad routing).
 - **Codex:** queued 2400 S-manifest, 2410 S-verify-17, 2420 S-bughunt-18. No Claude package launched. f56 tag deferred until CI of these merges is green.
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-16 17:03 CDT headless run 36 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-beebe-close slice 1 (site-data lighting: darker flank, warm seabed; ~4.0; main stack mouth glow still faint, needs orifice emissive geometry).
+- **Codex:** queue 2400 S-manifest, 2410 S-verify-17, 2420 S-bughunt-18 waits for budget/dispatch. CI for run 35 merges pending at start; no tag (f56 waits for green).
+- **Needs owner:** real-phone Low-tier play.
