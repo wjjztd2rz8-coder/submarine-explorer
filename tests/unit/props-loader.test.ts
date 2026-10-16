@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import type { GameContext } from '../../src/app/context.js';
+import { propsSystem } from '../../src/app/systems/props.js';
+import * as manifests from '../../src/core/SiteManifest.js';
 import { DEFAULT_CONFIG, makeConfig } from '../../src/core/Config.js';
 import { latLonToWorld } from '../../src/util/geo.js';
 import {
@@ -385,4 +388,130 @@ describe('Props.placeAll', () => {
     props.update(cam);
     expect(props.stats.hiddenFrustum).toBe(1);
   });
+});
+
+describe('loaded prop scatter policy', () => {
+  const cases = [
+    ...manifests.allSiteManifests().map((m) => ({ site: m.id })),
+    { site: 'unknown' },
+    { site: 'challenger-deep', missingHero: true },
+    { site: 'challenger-deep', missingContent: true },
+    { site: 'challenger-deep', content: 'unknown' },
+    { site: 'unknown', content: 'challenger-deep' },
+    { site: 'unknown', content: 'challenger-deep', mission: true },
+    { site: 'custom', customHero: true },
+    { site: 'challenger-deep', disabled: true },
+  ];
+  it.each(cases)(
+    'resolves keepout from loaded content: %j',
+    async (row: {
+      site: string;
+      content?: string;
+      missingHero?: boolean;
+      missingContent?: boolean;
+      mission?: boolean;
+      customHero?: boolean;
+      disabled?: boolean;
+    }) => {
+      const content = row.content ?? row.site;
+      const heroId = row.customHero ? 'custom-hero' : 'leggo-lander-marker';
+      const originalLoad = Props.prototype.load;
+      let finish!: (doc: unknown) => void;
+      const pending = new Promise<unknown>((resolve) => (finish = resolve));
+      const load = vi.spyOn(Props.prototype, 'load').mockImplementationOnce(function (
+        this: Props,
+        url,
+        id,
+      ) {
+        return originalLoad.call(this, url, id, () => pending);
+      });
+      const manifest = vi.spyOn(manifests, 'siteManifest');
+      if (row.customHero || row.disabled)
+        manifest.mockReturnValue({
+          id: content,
+          scatter: { keepoutHero: !row.disabled },
+          opening: { freeDive: { hero: heroId, bearing: 0, range: 30 } },
+        });
+      const order: string[] = [];
+      const setGroundKeepout = vi.fn(() => order.push('ground'));
+      const setBoulderKeepout = vi.fn((_bounds: THREE.Box3) => order.push('boulders'));
+      let loaded!: () => void;
+      const ready = new Promise<void>((resolve) => (loaded = resolve));
+      const emit = vi.fn(() => {
+        order.push('loaded');
+        loaded();
+      });
+      const ctx = {
+        meta: { ...meta, id: row.site },
+        terrain: { ...slope, scatter: { setGroundKeepout, setBoulderKeepout } },
+        config: DEFAULT_CONFIG,
+        tier: 'medium',
+        scene: new THREE.Scene(),
+        params: new URLSearchParams({ depth: '3800', landmark: content }),
+        route: row.mission ? {} : null,
+        contentLandmark: content,
+        sub: { position: new THREE.Vector3() },
+        bus: { emit },
+        expose: () => {},
+      } as unknown as GameContext;
+      const info = vi.spyOn(console, 'info').mockImplementation(() => {});
+      try {
+        propsSystem.init?.(ctx);
+        expect(load).toHaveBeenCalledWith(`/data/landmarks/${content}/props.json`, content);
+        expect(order).toEqual([]);
+        finish(
+          row.missingContent
+            ? null
+            : {
+                props: [
+                  {
+                    ...base,
+                    id: row.missingHero ? 'other-prop' : heroId,
+                    snap_to_seabed: true,
+                    clear_ground: true,
+                    dimensions_m: [60, 12, 10],
+                    heading_deg: 37,
+                    scale: [2, 1, 0.5],
+                    align_to_slope: true,
+                  },
+                ],
+              },
+        );
+        await ready;
+        const enabled =
+          (content === 'challenger-deep' || row.customHero) &&
+          !row.missingHero &&
+          !row.missingContent &&
+          !row.disabled;
+        expect(setBoulderKeepout).toHaveBeenCalledTimes(enabled ? 1 : 0);
+        expect(order).toEqual(
+          row.missingContent
+            ? ['loaded']
+            : enabled
+              ? ['ground', 'boulders', 'loaded']
+              : ['ground', 'loaded'],
+        );
+        expect(emit).toHaveBeenCalledWith('props:loaded', {
+          landmarkId: content,
+          count: row.missingContent ? 0 : 1,
+          models: 0,
+          procedural: row.missingContent ? 0 : 1,
+        });
+        if (enabled) {
+          const prop = ctx.props.placed[0];
+          const local = prop.localBounds.clone();
+          const expected = local.clone().applyMatrix4(prop.root.matrixWorld);
+          expect(setBoulderKeepout.mock.calls[0][0]).toEqual(expected);
+          expect(setBoulderKeepout.mock.calls[0][0]).not.toBe(prop.localBounds);
+          expect(expected).not.toEqual(local);
+          expect(prop.localBounds).toEqual(local);
+        }
+      } finally {
+        info.mockRestore();
+        manifest.mockRestore();
+        load.mockRestore();
+        propsSystem.dispose?.();
+      }
+    },
+  );
 });

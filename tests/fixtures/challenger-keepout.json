@@ -1,0 +1,234 @@
+{
+  "low": [
+    {
+      "viewport": [1600, 900],
+      "bounds": {
+        "min": [-484.3211063720522, -10924.859178454482, 493.76746796970417],
+        "max": [-449.3814033843813, -10890.72942817291, 518.9262909830098]
+      },
+      "stats": {
+        "cells": 12,
+        "instances": 289,
+        "drawCalls": 4
+      },
+      "meshes": [
+        {
+          "name": "scatter:dropstone",
+          "count": 86,
+          "matrices": "e56964125eb1b7b1a90a44faaef8ce3c95ced1bf7c80c7ca134703e5187656d2",
+          "colors": "4a4cb3aa826087d5b44447a35ece6bc12cf7a0b90393868f5ea4eeff431e6fd1"
+        },
+        {
+          "name": "scatter:boulder",
+          "count": 10,
+          "matrices": "ec7271eebaa170380f0b30819dde89ccd63cc9e48a41cf1ce885e8e226842df7",
+          "colors": "284dab371ae3d0a262edfcc30896fd2ae92e60da9824dde715e14b69f30e113b"
+        },
+        {
+          "name": "scatter:rubble",
+          "count": 146,
+          "matrices": "5d85821b3dfc587142971452f64c144b2f8b0f827c8d333e004754c4f691d8f0",
+          "colors": "5f42b65c609c0a9796cb4067ca71a0b4830c8fec7f84a4c74c76089fa2ee7b4b"
+        },
+        {
+          "name": "scatter:mound",
+          "count": 47,
+          "matrices": "9fbaf6cd80aa19b377323c1c701eb6e1a4309a7a3a18f6d034fd9a372c675ca4",
+          "colors": "66fa4de41d157cd49742fa3fbf14355c267f03b6a605ca732fe772727631228a"
+        }
+      ]
+    },
+    {
+      "viewport": [844, 390],
+      "bounds": {
+        "min": [-484.3211063720522, -10924.859178454482, 493.76746796970417],
+        "max": [-449.3814033843813, -10890.72942817291, 518.9262909830098]
+      },
+      "stats": {
+        "cells": 12,
+        "instances": 289,
+        "drawCalls": 4
+      },
+      "meshes": [
+        {
+          "name": "scatter:dropstone",
+          "count": 86,
+          "matrices": "e56964125eb1b7b1a90a44faaef8ce3c95ced1bf7c80c7ca134703e5187656d2",
+          "colors": "4a4cb3aa826087d5b44447a35ece6bc12cf7a0b90393868f5ea4eeff431e6fd1"
+        },
+        {
+          "name": "scatter:boulder",
+          "count": 10,
+          "matrices": "ec7271eebaa170380f0b30819dde89ccd63cc9e48a41cf1ce885e8e226842df7",
+          "colors": "284dab371ae3d0a262edfcc30896fd2ae92e60da9824dde715e14b69f30e113b"
+        },
+        {
+          "name": "scatter:rubble",
+          "count": 146,
+          "matrices": "5d85821b3dfc587142971452f64c144b2f8b0f827c8d333e004754c4f691d8f0",
+          "colors": "5f42b65c609c0a9796cb4067ca71a0b4830c8fec7f84a4c74c76089fa2ee7b4b"
+        },
+        {
+          "name": "scatter:mound",
+          "count": 47,
+          "matrices": "9fbaf6cd80aa19b377323c1c701eb6e1a4309a7a3a18f6d034fd9a372c675ca4",
+          "colors": "66fa4de41d157cd49742fa3fbf14355c267f03b6a605ca732fe772727631228a"
+        }
+      ]
+    },
+    {
+      "viewport": [390, 844],
+      "bounds": {
+        "min": [-484.3211063720522, -10924.859178454482, 493.76746796970417],
+        "max": [-449.3814033843813, -10890.72942817291, 518.9262909830098]
+      },
+      "stats": {
+        "cells": 12,
+        "instances": 289,
+        "drawCalls": 4
+      },
+      "meshes": [
+        {
+          "name": "scatter:dropstone",
+          "count": 86,
+          "matrices": "e56964125eb1b7b1a90a44faaef8ce3c95ced1bf7c80c7ca134703e5187656d2",
+          "colors": "4a4cb3aa826087d5b44447a35ece6bc12cf7a0b90393868f5ea4eeff431e6fd1"
+        },
+        {
+          "name": "scatter:boulder",
+          "count": 10,
+          "matrices": "ec7271eebaa170380f0b30819dde89ccd63cc9e48a41cf1ce885e8e226842df7",
+          "colors": "284dab371ae3d0a262edfcc30896fd2ae92e60da9824dde715e14b69f30e113b"
+        },
+        {
+          "name": "scatter:rubble",
+          "count": 146,
+          "matrices": "5d85821b3dfc587142971452f64c144b2f8b0f827c8d333e004754c4f691d8f0",
+          "colors": "5f42b65c609c0a9796cb4067ca71a0b4830c8fec7f84a4c74c76089fa2ee7b4b"
+        },
+        {
+          "name": "scatter:mound",
+          "count": 47,
+          "matrices": "9fbaf6cd80aa19b377323c1c701eb6e1a4309a7a3a18f6d034fd9a372c675ca4",
+          "colors": "66fa4de41d157cd49742fa3fbf14355c267f03b6a605ca732fe772727631228a"
+        }
+      ]
+    }
+  ],
+  "high": [
+    {
+      "viewport": [1600, 900],
+      "bounds": {
+        "min": [-484.2806314803896, -10925.259231232789, 493.92854260807087],
+        "max": [-449.3814033843813, -10891.106605284598, 518.9262909830098]
+      },
+      "stats": {
+        "cells": 51,
+        "instances": 3178,
+        "drawCalls": 4
+      },
+      "meshes": [
+        {
+          "name": "scatter:dropstone",
+          "count": 2128,
+          "matrices": "b5577dcfa397803985b2686cbbb171765290cb359aa4d3f2ecb817df4aa615f2",
+          "colors": "cc1728e23541e1dd73faea3c7c0e08e10d7951cc780f8bff93bf9ee13601f706"
+        },
+        {
+          "name": "scatter:boulder",
+          "count": 249,
+          "matrices": "47bd38c18e177753b6df8d08da0ee5d79eb078a8cd062f48f05832eacda71cfd",
+          "colors": "d5c9a1a550104e43c76bd4e0f339aace3807d08fa22bfa2d9ac200c08fe5bb2a"
+        },
+        {
+          "name": "scatter:rubble",
+          "count": 587,
+          "matrices": "224d6e981a237d5f2baf5002dcc30e839c175adf0cf0fc192f80d85743f542a4",
+          "colors": "f77dddd389c53d1c8725ed032ff2bed2ad5abad518fd55a47409152b03c6c505"
+        },
+        {
+          "name": "scatter:mound",
+          "count": 214,
+          "matrices": "95ef9650ddf9db79b8f45627c49b81f60aba2f5e8f2564a9413e54dd9ed09b86",
+          "colors": "8a074daadbd1977860acf1b264495eff8bec2906914e84981e450a07cae54d62"
+        }
+      ]
+    },
+    {
+      "viewport": [844, 390],
+      "bounds": {
+        "min": [-484.2806314803896, -10925.259231232789, 493.92854260807087],
+        "max": [-449.3814033843813, -10891.106605284598, 518.9262909830098]
+      },
+      "stats": {
+        "cells": 51,
+        "instances": 3178,
+        "drawCalls": 4
+      },
+      "meshes": [
+        {
+          "name": "scatter:dropstone",
+          "count": 2128,
+          "matrices": "b5577dcfa397803985b2686cbbb171765290cb359aa4d3f2ecb817df4aa615f2",
+          "colors": "cc1728e23541e1dd73faea3c7c0e08e10d7951cc780f8bff93bf9ee13601f706"
+        },
+        {
+          "name": "scatter:boulder",
+          "count": 249,
+          "matrices": "47bd38c18e177753b6df8d08da0ee5d79eb078a8cd062f48f05832eacda71cfd",
+          "colors": "d5c9a1a550104e43c76bd4e0f339aace3807d08fa22bfa2d9ac200c08fe5bb2a"
+        },
+        {
+          "name": "scatter:rubble",
+          "count": 587,
+          "matrices": "224d6e981a237d5f2baf5002dcc30e839c175adf0cf0fc192f80d85743f542a4",
+          "colors": "f77dddd389c53d1c8725ed032ff2bed2ad5abad518fd55a47409152b03c6c505"
+        },
+        {
+          "name": "scatter:mound",
+          "count": 214,
+          "matrices": "95ef9650ddf9db79b8f45627c49b81f60aba2f5e8f2564a9413e54dd9ed09b86",
+          "colors": "8a074daadbd1977860acf1b264495eff8bec2906914e84981e450a07cae54d62"
+        }
+      ]
+    },
+    {
+      "viewport": [390, 844],
+      "bounds": {
+        "min": [-484.2806314803896, -10925.259231232789, 493.92854260807087],
+        "max": [-449.3814033843813, -10891.106605284598, 518.9262909830098]
+      },
+      "stats": {
+        "cells": 51,
+        "instances": 3178,
+        "drawCalls": 4
+      },
+      "meshes": [
+        {
+          "name": "scatter:dropstone",
+          "count": 2128,
+          "matrices": "b5577dcfa397803985b2686cbbb171765290cb359aa4d3f2ecb817df4aa615f2",
+          "colors": "cc1728e23541e1dd73faea3c7c0e08e10d7951cc780f8bff93bf9ee13601f706"
+        },
+        {
+          "name": "scatter:boulder",
+          "count": 249,
+          "matrices": "47bd38c18e177753b6df8d08da0ee5d79eb078a8cd062f48f05832eacda71cfd",
+          "colors": "d5c9a1a550104e43c76bd4e0f339aace3807d08fa22bfa2d9ac200c08fe5bb2a"
+        },
+        {
+          "name": "scatter:rubble",
+          "count": 587,
+          "matrices": "224d6e981a237d5f2baf5002dcc30e839c175adf0cf0fc192f80d85743f542a4",
+          "colors": "f77dddd389c53d1c8725ed032ff2bed2ad5abad518fd55a47409152b03c6c505"
+        },
+        {
+          "name": "scatter:mound",
+          "count": 214,
+          "matrices": "95ef9650ddf9db79b8f45627c49b81f60aba2f5e8f2564a9413e54dd9ed09b86",
+          "colors": "8a074daadbd1977860acf1b264495eff8bec2906914e84981e450a07cae54d62"
+        }
+      ]
+    }
+  ]
+}
