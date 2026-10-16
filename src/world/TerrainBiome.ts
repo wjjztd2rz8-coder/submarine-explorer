@@ -384,7 +384,7 @@ export const BIOMES: Record<string, Biome> = {
       { kind: 'boulder', density: 1.1, slopeMaxDeg: 40, on: 'rock' },
       { kind: 'rubble', density: 3, slopeMaxDeg: 35, on: 'any' },
       // Pebbles and cobbles strewn across the open floor.
-      { kind: 'dropstone', density: 28, slopeMaxDeg: 15, on: 'flat', sizeMul: 1.5 },
+      { kind: 'dropstone', density: 30, slopeMaxDeg: 15, on: 'flat', sizeMul: 2.2 },
       { kind: 'sponge', density: 0.5, slopeMaxDeg: 40, on: 'rock' },
       { kind: 'whip', density: 0.3, slopeMaxDeg: 25, on: 'any' },
       { kind: 'seapen', density: 0.9, slopeMaxDeg: 12, on: 'flat' },
