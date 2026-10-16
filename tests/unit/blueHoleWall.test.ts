@@ -11,12 +11,14 @@ import {
   blueHoleTerraces,
   blueHoleSeatBank,
   blueHoleWallRelief,
+  blueHoleApron,
 } from '../../src/world/terrainFeatures.js';
 import { latLonToWorld } from '../../src/util/geo.js';
 import { chooseFreeDiveHull, composedFreeDiveSpawn, spawnSettings } from '../../src/game/Spawn.js';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import { Props } from '../../src/world/Props.js';
 import doc from '../../data/landmarks/great-blue-hole/props.json';
+import mission from '../../data/landmarks/great-blue-hole/mission.json';
 
 const meta = JSON.parse(readFileSync('data/tiles/great-blue-hole/meta.json', 'utf8')) as TileMeta;
 const bytes = readFileSync('data/tiles/great-blue-hole/heightmap.bin');
@@ -152,7 +154,8 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
 
   for (const tier of ['low', 'medium', 'high'] as const) {
     it(`${tier}: resolves walls locally within budget and physics follows rendered triangles`, async () => {
-      const cfg = makeConfig().terrain;
+      const config = makeConfig();
+      const cfg = config.terrain;
       const terrain = new Terrain({ meta, heights }, cfg, tier);
       try {
         expect(terrain.stats.vertices).toBeLessThanOrEqual(cfg.maxVertices);
@@ -183,7 +186,7 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
 
         // The bank must leave the occupied gallery seat clear, on the actual
         // rendered ground as well as the analytic carve.
-        const props = new Props(meta, terrain, makeConfig().props, tier);
+        const props = new Props(meta, terrain, config.props, tier);
         await props.placeAll(doc, 'great-blue-hole');
         expect(props.stats.failed).toBe(0);
         expect(props.placed).toHaveLength(doc.props.length);
@@ -199,6 +202,61 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
             clearance = Math.min(clearance, point.y - terrain.sampleHeight(point.x, point.z));
           }
           expect(clearance, prop.def.id).toBeGreaterThan(0);
+
+          // The wider apron reaches the seats: check the entire authored footprint,
+          // including its joins, against the same ground and normals physics samples.
+          const [width, depth] = prop.def.dimensionsM!;
+          for (let ix = -4; ix <= 4; ix++) {
+            for (let iz = -4; iz <= 4; iz++) {
+              const point = new THREE.Vector3((ix * width) / 8, 0, (iz * depth) / 4)
+                .applyQuaternion(prop.root.quaternion)
+                .add(prop.root.position);
+              const height = terrain.sampleHeight(point.x, point.z);
+              expect(Number.isFinite(height)).toBe(true);
+              const normal = terrain.getNormal(point.x, point.z);
+              expect(normal.toArray().every(Number.isFinite)).toBe(true);
+              expect(normal.length()).toBeCloseTo(1, 5);
+              expect(Math.abs(terrain.sampleHeight(point.x + 1e-5, point.z) - height)).toBeLessThan(
+                0.001,
+              );
+              expect(Math.abs(terrain.sampleHeight(point.x, point.z + 1e-5) - height)).toBeLessThan(
+                0.001,
+              );
+            }
+          }
+        }
+
+        const hull = chooseFreeDiveHull(
+          config.submarine.hullClasses,
+          meta.min_m,
+          config.submarine.freeDiveHullMarginM,
+        )!;
+        const opening = composedFreeDiveSpawn(
+          meta.id,
+          meta,
+          terrain,
+          props,
+          spawnSettings(config),
+          hull.hull.ratedDepth,
+          config.camera,
+          'arcade',
+        )!;
+        expect(opening).not.toBeNull();
+        expect([opening.x, opening.y, opening.z].every(Number.isFinite)).toBe(true);
+        expect(opening.y - terrain.sampleHeight(opening.x, opening.z)).toBeGreaterThan(
+          config.submarine.hullRadius,
+        );
+        for (const spawn of [opening, latLonToWorld(meta, mission.spawn.lat, mission.spawn.lon)]) {
+          for (let ix = -6; ix <= 6; ix++) {
+            for (let iz = -6; iz <= 6; iz++) {
+              const x = spawn.x + ix * 2;
+              const z = spawn.z + iz * 2;
+              const height = terrain.sampleHeight(x, z);
+              expect(Number.isFinite(height)).toBe(true);
+              expect(Math.abs(terrain.sampleHeight(x + 1e-5, z) - height)).toBeLessThan(0.001);
+              expect(Math.abs(terrain.sampleHeight(x, z + 1e-5) - height)).toBeLessThan(0.001);
+            }
+          }
         }
 
         const chunks = terrain.group.children.filter(
@@ -252,6 +310,60 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
     }
     expect(blueHoleTerraces(1e-4, 139)).toBeCloseTo(blueHoleTerraces(2 * Math.PI + 1e-4, 139), 10);
   });
+});
+
+it('gallery aprons remain bounded and continuous through radial and angular transitions', () => {
+  let min = Infinity;
+  let max = -Infinity;
+  let radialJump = 0;
+  let angularJump = 0;
+  const epsilon = 1e-5;
+  // Dense probes cover wandering risers and clipped sediment mounds as well as
+  // the radial fade endpoints; neither side of a join may open a height seam.
+  for (let i = 0; i <= 360; i++) {
+    const a = -Math.PI + (i * Math.PI) / 180;
+    for (let r = 110; r <= 170; r += 0.25) {
+      const height = blueHoleApron(a, r);
+      expect(Number.isFinite(height)).toBe(true);
+      min = Math.min(min, height);
+      max = Math.max(max, height);
+      if (r <= 112 || r >= 168) expect(height).toBeCloseTo(0, 12);
+      radialJump = Math.max(
+        radialJump,
+        Math.abs(blueHoleApron(a, r + epsilon) - blueHoleApron(a, r - epsilon)),
+      );
+      angularJump = Math.max(
+        angularJump,
+        Math.abs(blueHoleApron(a + epsilon, r) - blueHoleApron(a - epsilon, r)),
+      );
+    }
+  }
+  // Four steps are each at most 1.7 * 1.45 m; mounds add at most 1.3 m.
+  expect(min).toBeGreaterThanOrEqual(-4 * 1.7 * 1.45);
+  expect(min).toBeLessThan(-3);
+  expect(max).toBeGreaterThan(0);
+  expect(max).toBeLessThanOrEqual(1.3);
+  expect(radialJump).toBeLessThan(0.001);
+  expect(angularJump).toBeLessThan(0.01);
+  for (const [bearing, width] of [
+    [Math.PI, 0.3],
+    [1, 0.25],
+  ]) {
+    for (const a of [
+      bearing - width - 0.15,
+      bearing - width,
+      bearing,
+      bearing + width,
+      bearing + width + 0.15,
+    ]) {
+      for (const r of [112, 120, 126.5, 133, 139.5, 146, 152, 160, 168]) {
+        expect(blueHoleApron(a, r)).toBeCloseTo(blueHoleApron(a + 2 * Math.PI, r), 10);
+        expect(
+          Math.abs(blueHoleApron(a + epsilon, r) - blueHoleApron(a - epsilon, r)),
+        ).toBeLessThan(0.01);
+      }
+    }
+  }
 });
 
 // A positive-only bank cannot introduce a carve depression under the opening
