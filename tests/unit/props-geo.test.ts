@@ -3,8 +3,9 @@ import { readFileSync } from 'node:fs';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { createHash } from 'node:crypto';
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
+import * as manifests from '../../src/core/SiteManifest.js';
 import { PROCEDURAL_BUILDERS } from '../../src/world/props/builders/index.js';
 import { buildPlacedChimney } from '../../src/world/props/builders/vents.js';
 import {
@@ -19,6 +20,71 @@ import { hashString } from '../../src/world/props/geo/shared.js';
 import { parsePropsDoc, validatePropEntry, type PropDef } from '../../src/world/PropLoader.js';
 
 const cfg = DEFAULT_CONFIG.props;
+
+describe('smoker profile capability', () => {
+  for (const tier of ['low', 'medium', 'high']) {
+    it(`${tier}: applies validated taper and throat colour to an arbitrary prop id`, () => {
+      const authored = manifests.propManifest('beebe-chimney-1')!.smoker!;
+      const profile = manifests.validateSiteManifest(
+        {
+          id: 'fixture',
+          props: { fixture: { smoker: { ...authored, topFraction: 0.6, throatColor: 0x123456 } } },
+        },
+        'fixture',
+      ).props!.fixture!;
+      const lookup = vi.spyOn(manifests, 'propManifest').mockReturnValue(profile);
+      const input = {
+        def: { id: 'fixture', feature: 'smoker-cluster', raw: {} } as PropDef,
+        dims: [22, 18, 9] as [number, number, number],
+        seed: 42,
+        cfg,
+        tier,
+        groundHeight: () => undefined,
+      };
+      const built: ReturnType<typeof buildGeo>[] = [];
+      try {
+        const profiled = buildGeo(input);
+        built.push(profiled);
+        const body = profiled.full.getObjectByName('smoker-body') as THREE.Mesh;
+        const mouths = profiled.full.getObjectByName('beebe-orifices') as THREE.Mesh;
+        expect((mouths.material as THREE.MeshStandardMaterial).emissive.getHex()).toBe(0x123456);
+        const positions = mouths.geometry.getAttribute('position');
+        // The first merged triangle has two rim vertices followed by the disc centre.
+        expect(
+          Math.hypot(positions.getX(0) - positions.getX(2), positions.getZ(0) - positions.getZ(2)),
+        ).toBeCloseTo((9 * 1.5 * 0.15 + 0.6) * 0.6 * authored.topMouthRadiusFraction, 5);
+        profiled.full.traverse((object) => {
+          if (!(object instanceof THREE.Mesh)) return;
+          for (const name of ['position', 'normal', 'color']) {
+            const attribute = object.geometry.getAttribute(name);
+            if (attribute) expect(Array.from(attribute.array).every(Number.isFinite)).toBe(true);
+          }
+        });
+        lookup.mockReturnValue(undefined);
+        const plain = buildGeo(input);
+        built.push(plain);
+        const plainBody = plain.full.getObjectByName('smoker-body') as THREE.Mesh;
+        expect(
+          (body.material as THREE.MeshStandardMaterial).color.r /
+            (plainBody.material as THREE.MeshStandardMaterial).color.r,
+        ).toBeCloseTo(0.95 / 1.25);
+        expect(plain.full.getObjectByName('beebe-orifices')).toBeUndefined();
+      } finally {
+        lookup.mockRestore();
+        for (const result of built)
+          for (const root of [result.full, result.impostor])
+            root.traverse((object) => {
+              if (!(object instanceof THREE.Mesh)) return;
+              object.geometry.dispose();
+              for (const material of Array.isArray(object.material)
+                ? object.material
+                : [object.material])
+                material.dispose();
+            });
+      }
+    });
+  }
+});
 
 const DIMS: Record<GeoFeatureId, [number, number, number]> = {
   'smoker-cluster': [22, 18, 9],

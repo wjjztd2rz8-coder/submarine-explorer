@@ -67,7 +67,6 @@ const chimneyShapeKeys = [
 ] as const;
 const smokerDetailKeys = [
   'ridges',
-  'topFraction',
   'shelfStart',
   'mainShelfStep',
   'sideShelfStep',
@@ -113,7 +112,10 @@ export type GalleryApron = Record<(typeof galleryApronKeys)[number], number>;
 export type ChimneyShape = Record<(typeof chimneyShapeKeys)[number], number>;
 export type SmokerProfile = ChimneyShape &
   Record<(typeof smokerDetailKeys)[number], number> & {
+    /** Top/base radius ratio in (0, 1]; omitted data defaults to the original 0.45 taper. */
+    topFraction: number;
     mouthColor: number;
+    /** Mouth-disc emissive RGB (0x000000–0xffffff); defaults to unlit black (0). */
     throatColor: number;
     collarColor: number;
     collarEmissive: number;
@@ -301,6 +303,10 @@ const color: Check = (id, path, value) => {
   count(id, path, value);
   if ((value as number) > 0xffffff) fail(id, path, 'expected a color from 0 to 0xffffff');
 };
+const positiveFraction: Check = (id, path, value) => {
+  aboveZero(id, path, value);
+  if ((value as number) > 1) fail(id, path, 'expected a fraction greater than 0 and at most 1');
+};
 const threshold: Check = (id, path, value) => {
   if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0)
     fail(id, path, 'expected a positive number');
@@ -321,17 +327,19 @@ const propCheck = fields(
     habitat: flag,
     seabed: fields({ biome: text }),
     mineralCrust: flag,
-    smoker: fields({
-      ...numericFields(chimneyShapeKeys, aboveZero),
-      ...numericFields(smokerDetailKeys, aboveZero),
-      mouthColor: color,
-      throatColor: color,
-      collarColor: color,
-      collarEmissive: color,
-      mainShelves: count,
-      sideShelves: count,
-      outletCount: count,
-    }),
+    smoker: fields(
+      {
+        ...numericFields(chimneyShapeKeys, aboveZero),
+        ...numericFields(smokerDetailKeys, aboveZero),
+        mouthColor: color,
+        collarColor: color,
+        collarEmissive: color,
+        mainShelves: count,
+        sideShelves: count,
+        outletCount: count,
+      },
+      { topFraction: positiveFraction, throatColor: color },
+    ),
     chimney: fields({
       ...numericFields(chimneyVariationKeys, aboveZero),
       lean: finite,
@@ -378,7 +386,22 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
       text(id, 'props', key);
       propCheck(id, `props.${key}`, value);
     }
-    out.props = props as SiteManifest['props'];
+    // Resolve compatibility defaults once, without mutating the authored data.
+    out.props = Object.fromEntries(
+      Object.entries(props as Record<string, PropManifest>).map(([key, prop]) => [
+        key,
+        prop.smoker
+          ? {
+              ...prop,
+              smoker: {
+                ...prop.smoker,
+                topFraction: prop.smoker.topFraction ?? 0.45,
+                throatColor: prop.smoker.throatColor ?? 0,
+              },
+            }
+          : prop,
+      ]),
+    );
   }
   return out;
 }

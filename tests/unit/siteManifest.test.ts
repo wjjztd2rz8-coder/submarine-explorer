@@ -13,6 +13,49 @@ const ids = (
 ).landmarks;
 
 describe('site manifest validator', () => {
+  it('defaults omitted smoker taper and throat emission without changing the source profile', () => {
+    const {
+      topFraction: _top,
+      throatColor: _throat,
+      ...smoker
+    } = propManifest('beebe-chimney-1')!.smoker!;
+    const raw = { id: 's', props: { p: { smoker } } };
+    const resolved = validateSiteManifest(raw, 's').props!.p!.smoker!;
+    expect(resolved).toEqual({ ...smoker, topFraction: 0.45, throatColor: 0 });
+    expect(smoker).not.toHaveProperty('topFraction');
+    expect(smoker).not.toHaveProperty('throatColor');
+  });
+
+  it.each([0.01, 0.3, 1])(
+    'preserves valid taper %s and an explicitly unlit throat',
+    (topFraction) => {
+      const smoker = { ...propManifest('beebe-chimney-1')!.smoker!, topFraction, throatColor: 0 };
+      expect(
+        validateSiteManifest({ id: 's', props: { p: { smoker } } }, 's').props!.p!.smoker,
+      ).toEqual(smoker);
+    },
+  );
+
+  it.each([
+    ['topFraction', NaN],
+    ['topFraction', Infinity],
+    ['topFraction', -0.1],
+    ['topFraction', 0],
+    ['topFraction', 1.01],
+    ['throatColor', NaN],
+    ['throatColor', -1],
+    ['throatColor', 0x1000000],
+    ['topMouthRadiusFraction', 0],
+    ['outletBaseRadiusM', 0],
+    ['outletTipRadiusM', 0],
+    ['outletMouthRadiusM', 0],
+  ])('rejects unsafe smoker %s=%s before geometry construction', (key, value) => {
+    const smoker = { ...propManifest('beebe-chimney-1')!.smoker!, [key]: value };
+    expect(() => validateSiteManifest({ id: 's', props: { p: { smoker } } }, 's')).toThrow(
+      `props.p.smoker.${key}`,
+    );
+  });
+
   const cases: [string, unknown, string | null][] = [
     ['minimal', { id: 's' }, null],
     [
