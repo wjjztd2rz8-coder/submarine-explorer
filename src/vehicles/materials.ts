@@ -55,6 +55,8 @@ export interface LitUniforms {
   uRimColor: { value: THREE.Color };
   uKeyColor: { value: THREE.Color };
   uKeyDir: { value: THREE.Vector3 };
+  /** Per-site brightness scale on the lit result (1 = unchanged). */
+  uHullLight: { value: number };
 }
 
 function litUniforms(look: VehicleLook): LitUniforms {
@@ -63,6 +65,7 @@ function litUniforms(look: VehicleLook): LitUniforms {
     // Slightly cool key, like an HMI on a companion vehicle filtered by water.
     uKeyColor: { value: new THREE.Color(0xcfe6f0).multiplyScalar(look.key) },
     uKeyDir: { value: new THREE.Vector3(0.35, 0.82, 0.45).normalize() },
+    uHullLight: { value: 1 },
   };
 }
 
@@ -76,11 +79,12 @@ function addKeyAndRim(mat: THREE.MeshStandardMaterial, u: LitUniforms, rimScale 
     shader.uniforms.uRimColor = u.uRimColor;
     shader.uniforms.uKeyColor = u.uKeyColor;
     shader.uniforms.uKeyDir = u.uKeyDir;
+    shader.uniforms.uHullLight = u.uHullLight;
     shader.uniforms.uRimScale = { value: rimScale };
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        '#include <common>\nuniform vec3 uRimColor;\nuniform vec3 uKeyColor;\nuniform vec3 uKeyDir;\nuniform float uRimScale;',
+        '#include <common>\nuniform vec3 uRimColor;\nuniform vec3 uKeyColor;\nuniform vec3 uKeyDir;\nuniform float uRimScale;\nuniform float uHullLight;',
       )
       .replace(
         '#include <emissivemap_fragment>',
@@ -107,6 +111,7 @@ function addKeyAndRim(mat: THREE.MeshStandardMaterial, u: LitUniforms, rimScale 
           // 30 m ahead of the boat, the bow inside its own beams) would clip
           // to flat white. Compress the top of the range, keeping hue.
           '{',
+          '  outgoingLight *= uHullLight;',
           '  float hi = max( max( outgoingLight.r, outgoingLight.g ), outgoingLight.b );',
           '  if ( hi > 0.5 ) {',
           // tanh can overflow its positive exponential on software GPUs
@@ -120,7 +125,7 @@ function addKeyAndRim(mat: THREE.MeshStandardMaterial, u: LitUniforms, rimScale 
         ].join('\n'),
       );
   };
-  mat.customProgramCacheKey = () => `vehicle-key-rim-stable-shoulder-${rimScale}`;
+  mat.customProgramCacheKey = () => `vehicle-key-rim-stable-shoulder-light-${rimScale}`;
 }
 
 /** Owns one vehicle's materials. */
@@ -255,7 +260,7 @@ export class VehicleMaterials {
           ].join('\n'),
         );
     };
-    foam.customProgramCacheKey = () => 'vehicle-key-rim-stable-shoulder-hull-paint-v1';
+    foam.customProgramCacheKey = () => 'vehicle-key-rim-stable-shoulder-light-hull-paint-v1';
   }
 
   /** Lens tint is visual only: scene lights and their range/intensity stay intact. */
