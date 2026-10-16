@@ -70,7 +70,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running. Codex 2300 S-verify-15, 2310 J-home-controls, 2320 S-bughunt-16 running; queue 2330 S-manifest next slice.
+- No Claude package running. Codex queue: 2370 S-manifest slice, 2380 S-verify-16, 2390 S-bughunt-17.
 
 ## Backlog
 
@@ -80,10 +80,10 @@ One list, ordered by player impact and dependencies. Lane is in brackets. Eviden
 2. **V-titanic-seabed [Sonnet]** (slice 1 merged 2026-10-16: ripples and stones/rubble scatter via Titanic biome data, faint at approach distance; remaining: scour moat at the hull, hull plating repetition), ~3.9: hull now reads as a wreck; the approach view is a flat dark brown plane with a few sparse plants. Add sediment ripples, a debris trail and scour around the hull using the existing sediment material (as V-monterey-floor did). Hull plating repetition is the second gap.
 3. **V-beebe-lighting [Sonnet] DONE 2026-10-16 (7a0a14b; torn stack rims, Beebe lamp data; ~3.8, close pose still mid-brown, vent glow faint)**, ~3.6 (up from 3.3): the chimney is now orange-brown with collars and reads; side stacks still have flat stump tops and the close pose washes beige under headlights. Fix on the lighting side (`hullLight`/spot falloff), not paint; give side stacks the same tapered tops.
 4. **V-challenger-floats [Sonnet, small]**, ~3.6: floats are faceted and the frame pale under headlights; swap to a smooth dull syntactic-foam material and darken the frame. Non-hero, so cap at one package.
-5. **V-lostcity-rims [Sonnet]**, ~3.6: thin hollow tower rims and broad planar surfaces; the middle ground slope is smeared. Thicken rims, add crust ledges.
+5. **V-lostcity-rims [Sonnet] DONE 2026-10-16 (merged run 34; rolled bead rims, stronger ledges, slope rubble ring; ~3.7-3.9; slope still smooth terrain)**, ~3.6: thin hollow tower rims and broad planar surfaces; the middle ground slope is smeared. Thicken rims, add crust ledges.
 6. **V-endurance-frame [Sonnet]** CUT 2026-10-16: Endurance is a polish site and its opening pose is fine (3.6); the aim attempt made the sub dominate the frame. Owner delegated the call. Work kept as tag `parked/V-endurance-aim` (5fa58fc).
 7. **J-contact-choice [Sonnet, P2], J-journal-preview [Sonnet, P2], J-picker-density [Sonnet, P3], J-desktop-repetition [Sonnet, P3]:** from [progress/J-journeys-repeat.md](progress/J-journeys-repeat.md). One package each, in that order. J-contact-choice: scan-card identity when a curiosity competes with the mission objective. J-journal-preview: tall portrait captures pushing text below the fold, repeated memorial text. J-picker-density: shorten the site-card list; Blue Hole under its Lighthouse Reef title. J-desktop-repetition: destination/turn information repeated in card, mission block and waypoint.
-8. **J-home-controls [Codex 2310, P2]:** Home's Controls entry opens rebinding settings on touch; route it to the existing device guide.
+8. **J-home-controls [Codex 2310, P2] DONE 2026-10-16 (already implemented; coverage added):** Home's Controls entry opens rebinding settings on touch; route it to the existing device guide.
 9. **S-manifest slices [Codex 2330]:** migrate the next slice per `plan/progress/S-manifest.md` (site-id expressions left: recount); one slice per brief; golden unchanged.
 10. **S-verify / S-bughunt [Codex, standing]:** 2300 S-verify-15 and 2320 S-bughunt-16 queued. After each batch of visual merges, verify numerics/simplicity rules and hunt bugs in newly merged code.
 11. **S-render hosted confirmation [Haiku, small]:** the nightly workflow (S-render, merged 2026-10-16) is still running; on its next completed run, confirm green or log the failing step. No new work unless it fails.
