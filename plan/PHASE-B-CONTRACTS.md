@@ -175,6 +175,8 @@ get a row in `ATTRIBUTION.md`; otherwise omit `image`.
 - (Props addition, post-C) Optional `material_hint`: `basalt | carbonate | sulfide`,
   the `procedural:chimney` rock palette (absent = `basalt`, the original look).
   An unknown value is an error; on other kinds it is ignored with a warning.
+- Optional `clear_ground` (bool, default false) keeps seabed scatter and sessile
+  life off the prop's projected footprint; only literal `true` enables it.
 
 ### 2.4 `mission.json` (B3 defines loader; B2 authors)
 

@@ -265,35 +265,51 @@ describe('Props.placeAll', () => {
     warn.mockRestore();
   });
 
-  it('reports the footprint of a clear_ground prop as covered ground, and only that prop', async () => {
-    const props = new Props(meta, slope, cfg);
-    await props.placeAll(
-      {
-        props: [
-          {
-            ...base,
-            id: 'dressed',
-            snap_to_seabed: true,
-            dimensions_m: [60, 12, 10],
-            clear_ground: true,
-          },
-          { ...base, id: 'plain', lat: 41.74, snap_to_seabed: true, dimensions_m: [60, 12, 10] },
-        ],
-      },
-      't',
-    );
-    const dressed = props.placed.find((p) => p.def.id === 'dressed')!;
-    const plain = props.placed.find((p) => p.def.id === 'plain')!;
-    expect(dressed.def.clearsGround).toBe(true);
-    expect(plain.def.clearsGround).toBe(false);
-    const inside = dressed.localBounds.getCenter(new THREE.Vector3());
-    dressed.root.localToWorld(inside);
-    expect(props.coversGround(inside.x, inside.z)).toBe(true);
-    expect(props.coversGround(inside.x + 400, inside.z + 400)).toBe(false);
-    const other = plain.localBounds.getCenter(new THREE.Vector3());
-    plain.root.localToWorld(other);
-    expect(props.coversGround(other.x, other.z)).toBe(false);
-  });
+  it.each([false, true])(
+    'covers only the clear_ground prop footprint (slope alignment: %s)',
+    async (aligned) => {
+      const props = new Props(meta, slope, cfg);
+      await props.placeAll(
+        {
+          props: [
+            {
+              ...base,
+              id: 'dressed',
+              snap_to_seabed: true,
+              dimensions_m: [60, 12, 10],
+              clear_ground: true,
+              align_to_slope: aligned,
+              heading_deg: 37,
+              scale: [2, 1, 0.5],
+            },
+            { ...base, id: 'plain', lat: 41.74, snap_to_seabed: true, dimensions_m: [60, 12, 10] },
+          ],
+        },
+        't',
+      );
+      const dressed = props.placed.find((p) => p.def.id === 'dressed')!;
+      const plain = props.placed.find((p) => p.def.id === 'plain')!;
+      expect(dressed.def.clearsGround).toBe(true);
+      expect(plain.def.clearsGround).toBe(false);
+      const inside = dressed.localBounds.getCenter(new THREE.Vector3());
+      dressed.root.localToWorld(inside);
+      expect(props.coversGround(inside.x, inside.z)).toBe(true);
+      // A vertical projection must include both the base and crown of a tilted prop.
+      for (const x of [0.01, 0.99])
+        for (const y of [0.01, 0.99])
+          for (const z of [0.01, 0.99]) {
+            const point = dressed.localBounds.getSize(new THREE.Vector3());
+            point.multiply(new THREE.Vector3(x, y, z));
+            point.add(dressed.localBounds.min);
+            dressed.root.localToWorld(point);
+            expect(props.coversGround(point.x, point.z, 0)).toBe(true);
+          }
+      expect(props.coversGround(inside.x + 400, inside.z + 400)).toBe(false);
+      const other = plain.localBounds.getCenter(new THREE.Vector3());
+      plain.root.localToWorld(other);
+      expect(props.coversGround(other.x, other.z)).toBe(false);
+    },
+  );
 
   it('passes a chimney material_hint through to the built palette', async () => {
     const props = new Props(meta, slope, cfg);
