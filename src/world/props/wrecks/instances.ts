@@ -213,7 +213,7 @@ export function facingMatrix(
 export function barGeometry(): THREE.BufferGeometry {
   return cachedGeo('bar', () => {
     const g = new THREE.CylinderGeometry(1, 1, 1, 5, 1, true);
-    const c = new THREE.Color(0x5a2c18);
+    const c = new THREE.Color(0x4d3222);
     return colourise(normalise(g), () => c);
   });
 }
