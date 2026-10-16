@@ -114,8 +114,8 @@ export function rusticleGeometry(): THREE.BufferGeometry {
       pos.setXYZ(i, x * k + sway, y, z * k);
     }
     g.computeVertexNormals();
-    const root = new THREE.Color(0x8a5424);
-    const tip = new THREE.Color(0x4a2a14);
+    const root = new THREE.Color(0x553821);
+    const tip = new THREE.Color(0x2e2012);
     const c = new THREE.Color();
     return colourise(normalise(g), (_x, y) => c.copy(root).lerp(tip, Math.pow(-y, 0.7)));
   });
@@ -142,8 +142,8 @@ export function hangRusticle(
     ),
     _up.set(r * 2, L, r * 2),
   );
-  // Ochre to brown, subtle; never neon.
-  const shade = 0.8 + rnd() * 0.35;
+  // Deep ochre to brown, subtle; never neon.
+  const shade = 0.66 + rnd() * 0.26;
   const warm = rnd();
   list.push(m, new THREE.Color(shade, shade * (0.8 + warm * 0.15), shade * (0.7 + warm * 0.15)));
 }

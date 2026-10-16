@@ -312,7 +312,7 @@ export function paintWreck(geom: THREE.BufferGeometry, o: PaintOptions): void {
     }
     if (o.muted) {
       const lum = _c.r * 0.3 + _c.g * 0.59 + _c.b * 0.11;
-      _c.lerp(_r.setRGB(lum * 0.92, lum * 0.88, lum * 0.8), o.muted);
+      _c.lerp(_r.setRGB(lum * 0.9, lum * 0.89, lum * 0.82), o.muted);
     }
     if (o.shadeAt) _c.multiplyScalar(o.shadeAt(x, y, z));
     col.setXYZ(i, _c.r, _c.g, _c.b);
