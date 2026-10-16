@@ -51,14 +51,14 @@ Reviewers send work back if it breaks one of these:
 
 ## What 1.0 means
 
-| Requirement                                                                   | Backlog items                                           |
-| ----------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Requirement                                                                                                                                                                                                                      | Backlog items                                                             |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | Five hero sites look beautiful (4 of 5) in opening, approach and detail views. Note: code's `HERO_SITES` (Cosmetics.ts) is Titanic, Lost City, Blue Hole, Beebe and Monterey; Endurance is a polish site. Reconcile (V-hero-set) | V-bluehole, V-beebe, V-titanic, V-lostcity, V-monterey-floor, V-endurance |
-| The other eight sites are coherent with no major visual defect                | V-eight-sites                                           |
-| A new player understands the first five minutes on desktop and phone          | V-journeys, S-guidance (done), S-hud                    |
-| Acceptable Low-tier performance on a real phone                               | Owner check; S-boot helps                               |
-| Hosted CI green, and a full run no longer blocks releases                     | R-release, R-ci-green                                   |
-| No known blockers; the code is simple enough to keep changing safely          | S-resolve, S-modal, S-boot, S-rewards, S-manifest       |
+| The other eight sites are coherent with no major visual defect                                                                                                                                                                   | V-eight-sites                                                             |
+| A new player understands the first five minutes on desktop and phone                                                                                                                                                             | V-journeys, S-guidance (done), S-hud                                      |
+| Acceptable Low-tier performance on a real phone                                                                                                                                                                                  | Owner check; S-boot helps                                                 |
+| Hosted CI green, and a full run no longer blocks releases                                                                                                                                                                        | R-release, R-ci-green                                                     |
+| No known blockers; the code is simple enough to keep changing safely                                                                                                                                                             | S-resolve, S-modal, S-boot, S-rewards, S-manifest                         |
 
 Stage (joint review with Sol, 2026-10-16): see plan/REVIEWS.md; about 81% to 1.0. Beautiful: Titanic 3.9, Lost City 3.6, Endurance 3.6, Blue Hole 3.5, Monterey 3.5, Beebe 3.3, Challenger 3.2. Top blockers: real-phone Low readability and performance (owner), Beebe/Challenger materials, Blue Hole roof, J-* P2 journey fixes, a completed green hosted CI on the release commit (f55).
 
@@ -92,7 +92,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 4. **V-challenger-lander [Sonnet]**, ~3.2: lander is a flat-shaded prop with glowing orange float spheres. Dull the floats (syntactic foam, not lamps), add frame thickness/detail and a bait-plate; the amphipod swarm is the reward.
 5. **V-endurance remainder [Sonnet]**, ~3.6: hull is the subject, but the sub vanishes in the pose. V-endurance-aim is parked (see In flight); take the camera-forward-of-sub approach or cut item 4 with the owner's nod.
 6. **V-lostcity-low [Sonnet, small]**: Low-tier honeycomb on the slope needs a texture/normal fix; High is ~3.6.
-6b. **V-monterey-floor [Sonnet, small]**, ~3.5: flat sand floor between boulders; add ripple/pebble variation using the existing sediment material.
+   6b. **V-monterey-floor [Sonnet, small]**, ~3.5: flat sand floor between boulders; add ripple/pebble variation using the existing sediment material.
 7. **S-manifest slices [Codex 2160]:** step 1 done (habitat). Migrate the next slices per `plan/progress/S-manifest.md` (inventory: 27 site-id expressions left); one slice per brief; golden unchanged.
 8. **S-render remainder [Codex]:** confirm the first nightly run passes and golden pixels are unchanged.
 

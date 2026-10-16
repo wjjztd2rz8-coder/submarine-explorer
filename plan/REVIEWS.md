@@ -8,15 +8,15 @@ Sol ran (Codex 5h 59%); one reconcile round, corrections checked against files.
 
 **Changed since the last review:** 5 Claude merges (V-titanic-palette-2, V-beebe-hull, V-lostcity-2, V-bluehole-3, plus f54 tag) and Codex 2170 J-journeys-repeat (guidance handoff fix), 2180 S-verify-12 (slope-aligned clear_ground), 2190 S-bughunt-9. All pushed; no full local e2e. Parked: V-endurance-aim.
 
-| Site       | Readable | Beautiful (Claude / Sol band) | Biggest gap                                                |
-| ---------- | -------- | ----------------------------- | ---------------------------------------------------------- |
-| Titanic    | 4        | 3.9 / 3.5-3.9 (up)            | repetitive plating, flat seabed in approach view           |
-| Beebe      | 4 (Sol 3.5-4) | 3.3 / 3-3.3              | smeared one-tone chimney with ragged collars; sub prominent in opening |
-| Blue Hole  | 3.5-4    | 3.5 / 3-3.5 (up)              | roof still a rolled tube, parallel beds, flat sand shelf   |
-| Lost City  | 4        | 3.6 / 3.3-3.6                 | thin hollow rims, broad planar surfaces; Low honeycomb     |
-| Monterey   | 4        | 3.5 / 3.5                     | flat floor, repetitive strata                              |
-| Challenger | 3.5      | 3.2 / 3.2                     | flat-shaded lander, glowing float blobs                    |
-| Endurance  | 4        | 3.6 / 3.3-3.6                 | sub absent in approach poses (first-person by design in 2-3; Sol: sub is visible in capture 1) |
+| Site       | Readable      | Beautiful (Claude / Sol band) | Biggest gap                                                                                    |
+| ---------- | ------------- | ----------------------------- | ---------------------------------------------------------------------------------------------- |
+| Titanic    | 4             | 3.9 / 3.5-3.9 (up)            | repetitive plating, flat seabed in approach view                                               |
+| Beebe      | 4 (Sol 3.5-4) | 3.3 / 3-3.3                   | smeared one-tone chimney with ragged collars; sub prominent in opening                         |
+| Blue Hole  | 3.5-4         | 3.5 / 3-3.5 (up)              | roof still a rolled tube, parallel beds, flat sand shelf                                       |
+| Lost City  | 4             | 3.6 / 3.3-3.6                 | thin hollow rims, broad planar surfaces; Low honeycomb                                         |
+| Monterey   | 4             | 3.5 / 3.5                     | flat floor, repetitive strata                                                                  |
+| Challenger | 3.5           | 3.2 / 3.2                     | flat-shaded lander, glowing float blobs                                                        |
+| Endurance  | 4             | 3.6 / 3.3-3.6                 | sub absent in approach poses (first-person by design in 2-3; Sol: sub is visible in capture 1) |
 
 Disputed and left as bands: exact beauty scores (Titanic, Lost City, Endurance). Sol's note that Challenger is a non-hero, so material polish is not itself a 1.0 blocker (coherence only), is accepted; V-challenger-lander stays as a medium item.
 

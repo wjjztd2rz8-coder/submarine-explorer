@@ -4,14 +4,14 @@
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                        |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Requirement                               | State                                                                                                                          |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | Five heroes beautiful (4 of 5)            | None at 4 yet: Titanic 3.5-3.9, Lost City 3.3-3.6, Blue Hole 3-3.5, Beebe 3-3.3, Monterey 3.5 (Endurance 3.3-3.6, polish site) |
-| Other eight sites coherent                | Mission spawns judged; Endurance spawn and Low tier unchecked                                                |
-| New player understands first five minutes | Journeys repeated (2170) but baseline predates main: unverified; several P2s open (J-*)                      |
-| Acceptable Low-tier phone performance     | Unverified: needs owner phone play; stall metric under-reports (S-perf-stall)                                |
-| Hosted CI green, releases tagged          | f54 tagged on green CI; f55 waits for a completed green run                                                  |
-| Code simple enough                        | S-manifest slices in progress (27 site-id expressions at last count); tests consolidated                     |
+| Other eight sites coherent                | Mission spawns judged; Endurance spawn and Low tier unchecked                                                                  |
+| New player understands first five minutes | Journeys repeated (2170) but baseline predates main: unverified; several P2s open (J-*)                                        |
+| Acceptable Low-tier phone performance     | Unverified: needs owner phone play; stall metric under-reports (S-perf-stall)                                                  |
+| Hosted CI green, releases tagged          | f54 tagged on green CI; f55 waits for a completed green run                                                                    |
+| Code simple enough                        | S-manifest slices in progress (27 site-id expressions at last count); tests consolidated                                       |
 
 ## Done recently
 
