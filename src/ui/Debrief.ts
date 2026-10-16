@@ -100,7 +100,7 @@ export function summarizeDive(
       : rating?.stars === 2
         ? 'Take a photo or scan a species for 3 stars.'
         : rating?.stars === 1
-          ? 'Finish the remaining objectives for 2 stars.'
+          ? 'Finish the optional objectives for 2 stars; some are a long transit away.'
           : !scan && !entry
             ? 'Face a target and hold Scan.'
             : stats.objectives && stats.objectives.completed < stats.objectives.total

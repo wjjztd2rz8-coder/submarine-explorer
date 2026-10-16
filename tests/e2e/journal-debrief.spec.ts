@@ -304,7 +304,7 @@ freshTest.describe('mission progression and Home Journal', () => {
       });
       await expect(debrief.locator('.debrief-title')).toHaveText('Primaries complete');
       await expect(debrief.locator('.debrief-next')).toHaveText(
-        'Next: Finish the remaining objectives for 2 stars.',
+        'Next: Finish the optional objectives for 2 stars; some are a long transit away.',
       );
       await expect(debrief.locator('[data-field="objectives"] .debrief-value')).toHaveText(
         '3 of 4',
