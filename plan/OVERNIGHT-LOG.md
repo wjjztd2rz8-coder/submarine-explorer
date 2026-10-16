@@ -1265,3 +1265,11 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 2200/2210/2220 running (5h reset to 100%). Queue holds only 1520 on hold; no new briefs written this run.
 - **Not done:** no Claude agent launched (kept window); J-* Sonnet sub-items, Blue Hole roof, V-endurance-aim parked. No tag (f55 waits for green CI).
 - **Needs owner:** real-phone play of the newest build (Low tier).
+
+## 2026-10-16 01:32 CDT headless run 21 (Claude, comprehensive review)
+
+- **Review:** joint with Sol, ~80-81% to 1.0, 4-6 weeks; recorded in plan/REVIEWS.md and plan/STATUS.md; DIRECTOR backlog re-planned (new V-beebe-stack, V-challenger-lander, V-monterey-floor, V-lostcity-low, V-hero-set, S-perf-stall).
+- **Merged and pushed:** Codex 2200 S-manifest-3 (props/materials slice), 2220 S-bughunt-10, 2230 J-home-controls (Home Controls opens the device guide; title audit updated), 2210 evidence note. Smoke + project-base green; no full e2e.
+- **Queued Codex:** 2240, 2250 (S-manifest), 2260 S-verify-13, 2270 S-perf-stall, 2280 S-render nightly (both nightly runs failed).
+- **Not done:** no Claude visual package launched this run (golden + review used the window); no tag.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
