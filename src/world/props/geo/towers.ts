@@ -94,8 +94,8 @@ function roughenTrunk(g: THREE.BufferGeometry, s: SpireOpts, seed: number, pocke
       big * 0.6 +
       mid * 0.4 +
       ridge * 0.16 +
-      ledge * 0.09 -
-      undercut * 0.07 +
+      ledge * 0.17 -
+      undercut * 0.12 +
       pit * 0.07 +
       sheet * 0.14;
     // Orifice pocket.
@@ -195,20 +195,22 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
   const pieces: THREE.BufferGeometry[] = [
     heightMesh(pw, pd, Math.round(48 * dens), Math.round(48 * dens), skirt),
   ];
-  // Loose carbonate blocks across the apron, thinning toward the outline and clear of the columns.
+  // Loose carbonate blocks across the apron, thinning toward the outline and clear of the columns,
+  // then a sparse scatter of the same blocks on the slope beyond it so the ground there has relief.
   if (d.rubble) {
     const keep = (x: number, z: number): number => {
       const r = rim(x, z);
-      if (r > 1.02) return 0;
       for (const s of spires) if (Math.hypot(x - s.x, z - s.z) < s.r0 * 0.9) return 0;
+      if (r > 1.02) return lone || r > 1.25 ? 0 : 0.12;
       return 0.25 + 0.75 * (1 - smooth(0.5, 1, r));
     };
     const area = lone ? W * D : W * D * 1.1;
+    const onGround = (x: number, z: number): number => Math.max(skirt(x, z), gnd(x, z) + 0.05);
     pieces.push(
-      ...scatterRubble(skirt, keep, {
+      ...scatterRubble(onGround, keep, {
         halfX: pw / 2,
         halfZ: pd / 2,
-        count: Math.min(lone ? 34 : 190, Math.round(area * (lone ? 0.03 : 0.014) * d.growth)),
+        count: Math.min(lone ? 34 : 260, Math.round(area * (lone ? 0.03 : 0.019) * d.growth)),
         size: lone ? 0.7 : 1.2,
         detail: Math.min(d.sphereDetail, 1),
         seed: seed + 313,
