@@ -66,6 +66,7 @@ export class TouchControls {
     { x: number; y: number; t0: number; moved: number; tap: boolean }
   >();
   private pinchDist = 0;
+  private pinchSonar = false;
   private doubleTap = new DoubleTap();
   private disposed = false;
 
@@ -415,6 +416,7 @@ export class TouchControls {
       });
       if (this.looks.size >= 2) {
         this.pinchDist = dist();
+        this.pinchSonar = this.opts.sonar.expanded;
         for (const p of this.looks.values()) p.tap = false;
         this.doubleTap = new DoubleTap();
       }
@@ -422,6 +424,11 @@ export class TouchControls {
     const move = (e: PointerEvent): void => {
       const p = this.looks.get(e.pointerId);
       if (!p) return;
+      // A map toggle must not send its unfinished zoom step to the camera (or vice versa).
+      if (this.pinchSonar !== this.opts.sonar.expanded) {
+        this.pinchDist = dist();
+        this.pinchSonar = this.opts.sonar.expanded;
+      }
       const dx = e.clientX - p.x;
       const dy = e.clientY - p.y;
       p.x = e.clientX;
@@ -429,6 +436,11 @@ export class TouchControls {
       p.moved += Math.abs(dx) + Math.abs(dy);
       if (this.looks.size >= 2) {
         const d = dist();
+        // Coincident pointers cannot define a pinch; recover from the next valid distance.
+        if (!(this.pinchDist > 0) || !(d > 0)) {
+          this.pinchDist = d;
+          return;
+        }
         const delta = pinchWheelDelta(this.pinchDist, d);
         if (this.opts.sonar.expanded) {
           // Keep sub-threshold motion so a slow pinch can reach the next zoom step.

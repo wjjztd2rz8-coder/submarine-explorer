@@ -55,7 +55,13 @@ export function createHomeSystems(): GameSystem<
       },
       frame: {
         'scan.discovery': (_f, ctx) => {
-          if (ctx.input.state.toggleGuide && !ctx.settingsScreen.isOpen && !ctx.globe.isOpen)
+          if (
+            ctx.input.state.toggleGuide &&
+            !ctx.settingsScreen.isOpen &&
+            !ctx.globe.isOpen &&
+            !ctx.controlsCard.isOpen &&
+            (!ctx.journal.isOpen || ctx.journal.isTop)
+          )
             ctx.journal.toggle();
         },
         'late.input': (_f, ctx) => ctx.input.endFrame(),

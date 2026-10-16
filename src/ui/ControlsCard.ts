@@ -198,7 +198,8 @@ export class ControlsCard {
   setDevice(device: InputDevice): void {
     if (device === this.device_) return;
     this.device_ = device;
-    if (!this.isOpen) this.viewing = device;
+    // Touch hides the device tabs, so it must also select their touch layout.
+    if (!this.isOpen || device === 'touch') this.viewing = device;
     this.render();
   }
 
@@ -222,6 +223,7 @@ export class ControlsCard {
   }
 
   private render(): void {
+    const focused = document.activeElement;
     for (const [device, button] of this.tabs) {
       button.setAttribute('aria-pressed', String(device === this.viewing));
       button.classList.toggle('is-current', device === this.device_);
@@ -230,6 +232,14 @@ export class ControlsCard {
     this.body.replaceChildren();
     // Touch: a picture-first "How to play" with no key names, and no device tabs.
     this.tabsRow.hidden = this.device_ === 'touch';
+    // Device changes can hide the focused tab or Change keys action.
+    if (
+      this.trap.isTop &&
+      focused instanceof HTMLElement &&
+      this.root.contains(focused) &&
+      focused.closest('[hidden]')
+    )
+      this.root.querySelector<HTMLButtonElement>('.controls-card-close')?.focus();
     this.heading.textContent = this.viewing === 'touch' ? 'How to play' : 'Controls';
     this.root.setAttribute(
       'aria-label',
