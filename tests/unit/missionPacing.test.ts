@@ -6,7 +6,7 @@ import { Mission, parseMission } from '../../src/game/Mission.js';
 import type { TileMeta } from '../../src/util/types.js';
 
 /**
- * f-mission-pacing: consecutive required (primary) objectives, in mission
+ * Consecutive required (primary) objectives, in mission
  * order, must be close enough that the next target is exploration rather than
  * transit. The mission opens at the first primary (see heroMissionSpawn), so
  * only target-to-target gaps are measured.
@@ -56,7 +56,7 @@ describe('mission pacing: required-target gaps', () => {
 
 // Check the authored depth claims against actual survey cells, and exercise
 // mission completion so making the remote target optional cannot hide a broken route.
-describe('1220 terrain surveys', () => {
+describe('nearby terrain surveys', () => {
   for (const [site, added, optional, depthM] of [
     ['challenger-deep', 'eastern-floor', 'north-wall', 10919.8],
     ['hunga-tonga-caldera', 'flank-transect', 'caldera-floor', 292.9],
@@ -117,4 +117,41 @@ describe('1220 terrain surveys', () => {
       }
     });
   }
+});
+
+describe('optional long-transit guidance', () => {
+  it.each([
+    ['outer-dropoff', 'east'],
+    ['western-dropoff', 'west'],
+  ])('%s warns of the distance and direction without blocking completion', (id, direction) => {
+    const site = 'great-blue-hole';
+    const def = parseMission(json(`${root}/${site}/mission.json`), site)!;
+    const pois: Poi[] = json(`${root}/${site}/pois.json`).pois;
+    const objective = def.objectives.find((o) => o.id === id)!;
+    expect(objective.primary).toBe(false);
+    const hint = objective.hint!.match(/^Optional:.*about (\d+(?:\.\d+)?) km (east|west)\b/);
+    expect(hint).not.toBeNull();
+    expect(hint![2]).toBe(direction);
+    const origin = pois.find((p) => p.id === def.objectives.find((o) => o.primary)!.poi)!;
+    const target = pois.find((p) => p.id === objective.poi)!;
+    const distance = distanceM(origin, target);
+    expect(distance).toBeGreaterThan(MAX_GAP_M);
+    // Whole-kilometre hints must remain honest if a survey contact moves.
+    expect(Math.abs(Number(hint![1]) * 1000 - distance)).toBeLessThan(1000);
+    expect(Math.sign(target.lon - origin.lon)).toBe(direction === 'east' ? 1 : -1);
+
+    const bus = new EventBus();
+    const mission = new Mission({ def, bus });
+    try {
+      mission.resolve(pois.map((p) => p.id));
+      mission.start(site);
+      for (const primary of def.objectives.filter((o) => o.primary))
+        bus.emit('scan:complete', { poiId: primary.poi, landmarkId: site, firstTime: true });
+      expect(mission.primaryComplete).toBe(true);
+      expect(mission.allComplete).toBe(false);
+      expect(mission.end()).toBe(true);
+    } finally {
+      mission.dispose();
+    }
+  });
 });

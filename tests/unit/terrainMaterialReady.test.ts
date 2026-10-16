@@ -1,10 +1,65 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { IUniform, Texture } from 'three';
+import * as THREE from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { biomeFor } from '../../src/world/TerrainBiome.js';
 import { createTerrainMaterial } from '../../src/world/TerrainMaterial.js';
+import { smoothstep } from '../../src/util/math.js';
 
 afterEach(() => vi.unstubAllGlobals());
+
+describe('terrain albedo distance filtering', () => {
+  it.each(['low', 'medium', 'high'] as const)(
+    '%s: suppresses distant carbonate aliasing while preserving nearby detail',
+    (tier) => {
+      const result = createTerrainMaterial({
+        config: DEFAULT_CONFIG.terrain,
+        tier,
+        biome: biomeFor('lost-city'),
+        exaggeration: 1,
+      });
+      try {
+        const shader = {
+          ...THREE.ShaderLib.standard,
+          uniforms: { ...THREE.ShaderLib.standard.uniforms },
+        };
+        result.material.onBeforeCompile(
+          shader as Parameters<typeof result.material.onBeforeCompile>[0],
+          {} as THREE.WebGLRenderer,
+        );
+        const source = shader.fragmentShader;
+        const gain = Number(source.match(/const float TERRAIN_FAR_MIP_BIAS = ([\d.]+);/)![1]);
+        const ramp = source.match(
+          /float bias = TERRAIN_FAR_MIP_BIAS \* smoothstep\(([\d.]+), ([\d.]+), dist\);/,
+        )!;
+        const bias = (distance: number) =>
+          gain * smoothstep(Number(ramp[1]), Number(ramp[2]), distance);
+        expect(bias(0)).toBe(0);
+        expect(bias(3)).toBe(0);
+        expect(bias(25)).toBeCloseTo(5);
+        expect(bias(1000)).toBeCloseTo(5);
+        const distances = [3, 10, 15, 20, 25];
+        for (let i = 1; i < distances.length; i++)
+          expect(bias(distances[i])).toBeGreaterThan(bias(distances[i - 1]));
+        // Every triplanar albedo tap, including breakup, uses the same bias.
+        const albedo = source.slice(
+          source.indexOf('vec3 terrainAlbedo('),
+          source.indexOf('vec4 terrainNormalRough('),
+        );
+        const taps = [...albedo.matchAll(/texture2D\(([^)]+)\)/g)];
+        expect(taps).toHaveLength(4);
+        for (const tap of taps) expect(tap[1]).toMatch(/, bias$/);
+        expect(source.includes('#define TERRAIN_BREAKUP')).toBe(tier !== 'low');
+        expect(source.includes('#define TERRAIN_PBR_NORMALS')).toBe(tier !== 'low');
+        // Low keeps the extra albedo fetch behind the existing compile-time switch.
+        expect(albedo).toMatch(/#ifdef TERRAIN_BREAKUP\s+if \(brk\)/);
+      } finally {
+        result.material.dispose();
+        for (const texture of result.textures) texture.dispose();
+      }
+    },
+  );
+});
 
 describe('terrain map readiness and temporary texture lifetime', () => {
   for (const tier of ['low', 'high'] as const) {
