@@ -1288,3 +1288,11 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Codex:** 5h at 2% (resets 05:15); queue 2240-2290 waits for the dispatcher. No tag (f55 waits for green CI).
 - **Not done:** V-bluehole remainder, V-lostcity-low, V-hero-set, other J-* sub-items; V-endurance-aim parked.
 - **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
+
+## 2026-10-16 05:14 CDT headless run 24 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-lostcity-low (terrain far mip bias 3->5 by 25 m, removes Low-tier slope honeycomb; shared by all sites, far terrain slightly softer; one shader-digest snapshot rebaselined).
+- **CI:** run 22's only red shard (e2e 25/38) had no retrievable log; run 23 CI was still queued. No tag (f55 waits for green CI).
+- **Codex:** 5h at 2% (resets 05:15); queue 2240-2290 waits for the dispatcher.
+- **Not done:** V-bluehole remainder, V-hero-set, other J-* sub-items; V-endurance-aim parked.
+- **Needs owner:** real-phone Low-tier play; optionally drop V-endurance-aim.
