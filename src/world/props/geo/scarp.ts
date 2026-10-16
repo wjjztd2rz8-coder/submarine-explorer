@@ -326,6 +326,8 @@ export interface ExtrudeOpts {
    * into the ground instead of hanging over a lower slope; mid-wall it is unconstrained.
    */
   ground?: (x: number, z: number) => number;
+  /** Extra y at (x, profile point): vertical variation of the section, such as a stepped roof lip. */
+  rise?: (x: number, y: number, z: number) => number;
   /** Metres per texture tile: writes `uv` as (x, arc length along the profile). A pair is (along, up). */
   uvTile?: number | [number, number];
 }
@@ -368,7 +370,7 @@ export function extrudeProfile(
       const z = (z0 + disp(x, y0, z0) * (1 - edge * 0.6)) * (1 - edge * 0.55) + plan;
       const n = i * (ny + 1) + j;
       pos[n * 3] = x;
-      let py = y + (lift ? lift(x, y0, z0) : 0) - sink;
+      let py = y + (lift ? lift(x, y0, z0) : 0) - sink + (opts.rise ? opts.rise(x, y0, z0) : 0);
       if (opts.ground) py = Math.min(py, opts.ground(x, z) + 0.15 + 4 * height * (1 - edge) ** 2);
       pos[n * 3 + 1] = py;
       pos[n * 3 + 2] = z;

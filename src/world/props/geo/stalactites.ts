@@ -281,8 +281,29 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const win = smooth(0.46 * H, 0.5 * H, y) * (1 - smooth(0.66 * H, 0.7 * H, y));
     const lipZone = smooth(0.5, 0.95, -z / D) * win;
     const chip = (fbm3(x * 0.3, y * 0.5, seed + 83, seed + 12, 3) - 0.34) * 2.4;
-    return disp(x, y, z) - lipZone * Math.max(0, chip) * 4.5 * scale;
+    // Raised bays also draw back, so each step reads as an overhang over the one below.
+    const draw = hood ? shelfStep(x) * 0.12 * D * roofZone(y, z, x) : 0;
+    return disp(x, y, z) - lipZone * Math.max(0, chip) * 4.5 * scale + draw;
   };
+
+  /**
+   * Roof shelves: the lip steps up in plateaus along x (sharp risers between them), so the
+   * silhouette is stacked ledges and overhangs rather than one rolled tube. 0..1 per x.
+   */
+  const shelfStep = (x: number, phase = 0): number => {
+    const q = 5 * fbm3(x * 0.05 + 9 + phase, 4, seed + 97 + phase, seed + 14, 3);
+    return (Math.floor(q) + smooth(0.78, 1, q - Math.floor(q))) / 5;
+  };
+  const roofZone = (y: number, z: number, x: number): number =>
+    smooth(0.46 * H, 0.52 * H, y) *
+    smooth(0.25, 0.8, -z / D) *
+    (1 - smooth(0.6, 1, endRatio(x, W)));
+  const roofRise = (x: number, y: number, z: number): number =>
+    hood
+      ? roofZone(y, z, x) *
+        H *
+        (0.2 * shelfStep(x) + 0.12 * shelfStep(x, 31) * smooth(0.57 * H, 0.64 * H, y))
+      : 0;
 
   // --- the wall
   const wall = extrudeProfile(
@@ -294,7 +315,7 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     H,
     (x) => liftAt(x),
     EDGE_START,
-    { plan, sink: sinkAt, ground: gnd, uvTile: [6, 6] },
+    { plan, sink: sinkAt, ground: gnd, uvTile: [6, 6], rise: roofRise },
   );
   paint(wall, (x, yAbs, z, ny, out) => {
     const y = yAbs - liftAt(x);
@@ -560,7 +581,8 @@ diffuseColor.rgb *= 1.0 - ${sediment.riserShade.toFixed(3)} * bedRise + ${sedime
       const z = hood
         ? (z0 + disp(x, yBase, z0) * (1 - edge * 0.6)) * (1 - edge * 0.55) + plan(x)
         : z0 + disp(x, yBase, z0) + plan(x);
-      const yTop = yBase * scaleAt(x) + liftAt(x) + 0.5 - (hood ? sinkAt(x) : 0);
+      const yTop =
+        yBase * scaleAt(x) + liftAt(x) + 0.5 - (hood ? sinkAt(x) : 0) + roofRise(x, yBase, z0);
       const main = i === 0;
       const generatedLength =
         (1.4 + rnd() * rnd() * 0.36 * H) *
