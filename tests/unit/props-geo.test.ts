@@ -17,9 +17,68 @@ import {
 } from '../../src/world/props/geo/index.js';
 import { billowRadius, makePlume, smokePlume } from '../../src/world/props/geo/plume.js';
 import { hashString } from '../../src/world/props/geo/shared.js';
+import { tieredSpire } from '../../src/world/props/geo/spire.js';
 import { parsePropsDoc, validatePropEntry, type PropDef } from '../../src/world/PropLoader.js';
 
 const cfg = DEFAULT_CONFIG.props;
+
+describe('spire buffer boundaries', () => {
+  for (const profile of [
+    { irregular: 1.15, crust: 1 },
+    { irregular: 0.6, crust: 0.8 },
+    { irregular: 1, crust: 0 },
+    { irregular: 0, crust: 1 },
+  ]) {
+    for (const topFrac of [0, 0.45, 1]) {
+      it(`irregular=${profile.irregular} crust=${profile.crust} top=${topFrac}: finite deterministic bounded buffers`, () => {
+        for (const seed of [0, 42, -7]) {
+          for (const [segs, rings] of [
+            [0, 0],
+            [10.4, 4.6],
+            [48, 23],
+          ]) {
+            const opts = Object.freeze({
+              h: 10,
+              r0: 2,
+              topFrac,
+              seed,
+              segs: segs!,
+              rings: rings!,
+              tiers: 3,
+              flare: 0.75,
+              lip: 0.3,
+              crater: 0.7,
+              ...profile,
+            });
+            const a = tieredSpire(opts);
+            const b = tieredSpire(opts);
+            try {
+              for (const name of ['position', 'normal']) {
+                const values = a.getAttribute(name).array;
+                expect(Array.from(values).every(Number.isFinite)).toBe(true);
+                expect(values).toEqual(b.getAttribute(name).array);
+              }
+              expect(a.index!.array).toEqual(b.index!.array);
+              const count = a.getAttribute('position').count;
+              expect(Array.from(a.index!.array).every((i) => i >= 0 && i < count)).toBe(true);
+              a.computeBoundingBox();
+              a.computeBoundingSphere();
+              expect(a.boundingBox!.min.y).toBeCloseTo(0, 5);
+              expect(a.boundingBox!.max.y).toBeLessThanOrEqual(opts.h);
+              expect(a.boundingBox!.max.y).toBeGreaterThan(opts.h * 0.5);
+              expect(a.boundingSphere!.radius).toBeGreaterThan(0);
+              expect(Number.isFinite(a.boundingSphere!.radius)).toBe(true);
+              expect(a.boundingBox!.getSize(new THREE.Vector3()).x).toBeLessThan(opts.r0 * 6);
+            } finally {
+              a.dispose();
+              b.dispose();
+            }
+          }
+        }
+      });
+    }
+  }
+});
 
 describe('smoker profile capability', () => {
   for (const tier of ['low', 'medium', 'high']) {

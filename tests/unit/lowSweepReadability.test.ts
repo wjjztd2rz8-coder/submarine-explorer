@@ -118,6 +118,84 @@ for (const site of lowReadabilitySites) {
   });
 }
 
+for (const site of ['beebe-vent-field', 'axial-seamount-ashes', 'unknown']) {
+  for (const tier of ['low', 'medium', 'high'] as const) {
+    test(`${site} ${tier}: composes lamps once from effective modes and preserves inputs`, () => {
+      const config = makeConfig();
+      const settings = defaultSettings(config);
+      const before = JSON.stringify({
+        config,
+        settings,
+        manifest: siteManifests.siteManifest(site),
+      });
+      const ctx = {
+        config,
+        tier,
+        scene: new Scene(),
+        bus: new EventBus(),
+        meta: { id: site },
+        effective: resolveEffective(settings, 'arcade', null, config),
+        terrain: { widthM: 1000, depthM: 1000 },
+        expose: () => {},
+      } as unknown as GameContext;
+      atmosphereSystem.init!(ctx);
+      try {
+        const children = ctx.headlights.group.children.length;
+        for (const base of ['arcade', 'realistic'] as const) {
+          const custom = { ...settings, gameplayBaseMode: base };
+          for (const mode of ['arcade', 'realistic', 'custom'] as const) {
+            for (const daily of [null, { modifier: 'low-light' }] as const) {
+              const effective = resolveEffective(custom, mode, daily, config);
+              const effectiveBefore = JSON.stringify(effective);
+              const preset = effective.light;
+              const spotGain = site === 'beebe-vent-field' ? 0.55 : 1;
+              const fillGain = site === 'beebe-vent-field' ? 0.6 : 1;
+              for (let repeat = 0; repeat < 3; repeat++) {
+                const oldGeometry = ctx.headlights.beams[0]?.geometry;
+                const disposed = oldGeometry ? vi.spyOn(oldGeometry, 'dispose') : undefined;
+                ctx.headlights.setPreset(preset);
+                expect(ctx.headlights.group.children).toHaveLength(children);
+                if (oldGeometry) {
+                  expect(disposed).toHaveBeenCalledTimes(1);
+                  expect(ctx.headlights.beams[0]!.geometry).not.toBe(oldGeometry);
+                  expect(ctx.headlights.beams[1]!.geometry).toBe(ctx.headlights.beams[0]!.geometry);
+                  disposed!.mockRestore();
+                }
+                ctx.headlights.setEnabled(false);
+                expect(ctx.headlights.fill.visible).toBe(false);
+                ctx.headlights.setEnabled(true);
+                ctx.headlights.update(new Vector3(0, -4200, 0), new Vector3(0, 0, -1));
+                for (const light of ctx.headlights.lights) {
+                  expect(light.intensity).toBe(preset.intensity * spotGain);
+                  expect(light.distance).toBe(preset.distance);
+                  expect(light.angle).toBe((preset.angleDeg * Math.PI) / 180);
+                  expect(
+                    [light.intensity, light.distance, light.angle].every(Number.isFinite),
+                  ).toBe(true);
+                  expect(light.visible).toBe(true);
+                }
+                expect(ctx.headlights.fill.intensity).toBe(preset.fillIntensity * fillGain);
+                expect(ctx.headlights.fill.distance).toBe(preset.fillDistance);
+                expect(ctx.headlights.fill.visible).toBe(preset.fillIntensity > 0);
+                expect(Number.isFinite(ctx.headlights.fill.intensity)).toBe(true);
+              }
+              expect(JSON.stringify(effective)).toBe(effectiveBefore);
+            }
+          }
+        }
+        expect(
+          JSON.stringify({ config, settings, manifest: siteManifests.siteManifest(site) }),
+        ).toBe(before);
+      } finally {
+        ctx.atmosphere.dispose();
+        ctx.headlights.dispose();
+        ctx.snow.dispose();
+        ctx.water.dispose();
+      }
+    });
+  }
+}
+
 test('Bismarck golden approach/detail aim at visible hull above the slope from clear cockpit seats', async () => {
   const config = makeConfig();
   const meta = json('data/tiles/bismarck/meta.json') as TileMeta;
