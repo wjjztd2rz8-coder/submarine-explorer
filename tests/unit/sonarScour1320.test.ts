@@ -109,7 +109,11 @@ describe('sonar rendering equivalence', () => {
   ] as const)('selects %s rendering through policy on another site', (id, hull, tileId) => {
     const authored = render(id, hull, 1, tileId);
     const policy = manifests.siteManifest(id)!.sonar;
-    vi.spyOn(manifests, 'siteManifest').mockReturnValue({ id: 'unknown', sonar: policy });
+    const lookup = manifests.siteManifest;
+    // Relocate sonar policy while retaining the survey's authored terrain reconstruction.
+    vi.spyOn(manifests, 'siteManifest').mockImplementation((site) =>
+      site === 'unknown' ? { id: site, sonar: policy } : lookup(site),
+    );
     const relocated = render(
       id,
       hull,
