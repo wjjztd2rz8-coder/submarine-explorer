@@ -190,11 +190,11 @@ export function blueHoleSeatBank(a: number, r: number): number {
     const window = 1 - seatMouth(a, bearing, width);
     if (window <= 0) continue;
     const rise =
-      smoothstep(clamp01((r - foot) / 6)) * (1 - smoothstep(clamp01((r - foot - 21) / 20)));
+      smoothstep(clamp01((r - foot) / 11)) * (1 - smoothstep(clamp01((r - foot - 24) / 20)));
     bank += window * rise;
   }
   const ragged = 1 + 0.25 * Math.sin(13 * a + r * 0.2) + 0.15 * Math.sin(29 * a + 1.3);
-  return 15 * bank * ragged;
+  return 17 * bank * ragged;
 }
 
 /** Riser feet (radius) that shed talus; each gets a ring of fallen blocks. */
