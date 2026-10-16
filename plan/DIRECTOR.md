@@ -70,6 +70,8 @@ The newest items go first.
 
 ## In flight
 
+- V-beebe-stack IN FLIGHT (Sonnet, 2026-10-16), worktree ../subexp-wt/V-beebe-stack.
+
 - Codex 2200/2220/2210 running (S-manifest-3, S-bughunt-10, S-render-confirm). No Claude package running.
 - V-endurance-aim parked 2026-10-15: branch claude/V-endurance-aim (worktree ../subexp-wt/V-endurance-aim, commit 5fa58fc) reached hull 45% but the sub is too large and dominant in frame; not merged (new shared camera code for a small gain). Needs the camera forward of the sub, or drop item 4.
 
