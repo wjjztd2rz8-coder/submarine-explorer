@@ -3,12 +3,14 @@ import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 const run = promisify(execFile);
-import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { goldenBuild, readGoldenBuild } from '../golden-build.mjs';
 import { goldenOptions } from '../golden-options.mjs';
 import { goldenManifest, goldenContactSheet } from '../golden-manifest.mjs';
+import { comparePixels, compareGoldenSets } from '../golden-compare.mjs';
+import { PNG } from 'playwright-core/lib/utilsBundle';
 
 for (const missing of ['sha', 'dirty', 'build-mode']) {
   test(`a document missing golden-${missing} cannot claim build provenance`, () => {
@@ -76,6 +78,96 @@ test('served build provenance survives checkout changes and distinguishes clean,
       built.replace('production', ''),
     ])
       assert.throws(() => readGoldenBuild(bad), /provenance/);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('golden comparison tolerates byte rounding and sparse edges but flags shading and missing detail', () => {
+  const image = () => ({ width: 100, height: 100, data: Buffer.alloc(100 * 100 * 4, 255) });
+  const before = image();
+  const rounded = image();
+  for (let i = 0; i < rounded.data.length; i += 4) rounded.data[i] -= 2;
+  const rounding = comparePixels(before, rounded);
+  assert.equal(rounding.withinTolerance, true);
+  assert.equal(rounding.changed, 10000);
+  assert.equal(rounding.significant, 0);
+  assert.equal(rounding.mae, 2 / 3);
+  assert.equal(rounding.max, 2);
+  const edges = image();
+  for (let i = 0; i < 10; i++) edges.data[i * 4] = 0;
+  assert.equal(comparePixels(before, edges).withinTolerance, true);
+  edges.data[10 * 4] = 0;
+  assert.equal(comparePixels(before, edges).withinTolerance, false);
+  const shading = image();
+  for (let i = 0; i < shading.data.length; i += 4) shading.data[i] -= 3;
+  assert.equal(comparePixels(before, shading).withinTolerance, false);
+  const missing = image();
+  for (let i = 0; i < 100; i++) missing.data[i * 4] = 0;
+  assert.equal(comparePixels(before, missing).withinTolerance, false);
+  assert.throws(() => comparePixels(before, { ...before, width: 200 }), /matching/);
+  missing.data[3] = 0;
+  assert.throws(() => comparePixels(before, missing), /opaque/);
+});
+
+test('golden comparison refuses partial sets, missing files and incompatible poses', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'golden-compare-'));
+  const before = join(root, 'before');
+  const after = join(root, 'after');
+  const shot = {
+    filename: 'titanic-1.png',
+    position: [1, 2, 3],
+    camera: [4, 5, 6],
+    viewport: [2, 2],
+  };
+  const manifest = {
+    sha: 'a'.repeat(40),
+    dirty: false,
+    buildMode: 'production',
+    mode: 'free-dive',
+    tier: 'high',
+    layouts: [{ name: 'desktop', width: 2, height: 2 }],
+    complete: true,
+    failures: [],
+    captures: [shot],
+  };
+  const writeManifest = (dir, m) => writeFile(join(dir, 'poses.json'), JSON.stringify(m));
+  try {
+    await mkdir(before);
+    await mkdir(after);
+    const png = new PNG({ width: 2, height: 2 });
+    png.data.fill(255);
+    for (const dir of [before, after]) {
+      await writeManifest(dir, manifest);
+      await writeFile(join(dir, shot.filename), PNG.sync.write(png));
+    }
+    assert.equal((await compareGoldenSets(before, after)).withinTolerance, true);
+    const cli = resolve('tools/golden-compare.mjs');
+    await run(process.execPath, [cli, before, after]);
+    png.data[0] = 0;
+    await writeFile(join(after, shot.filename), PNG.sync.write(png));
+    await assert.rejects(run(process.execPath, [cli, before, after]), (error) => error.code === 1);
+    const report = await run(process.execPath, [cli, before, after, '--report']);
+    assert.equal(JSON.parse(report.stdout).withinTolerance, false);
+    png.data[0] = 255;
+    await writeFile(join(after, shot.filename), PNG.sync.write(png));
+    await writeManifest(after, { ...manifest, sha: null });
+    await assert.rejects(compareGoldenSets(before, after), /provenance/);
+    await writeManifest(after, { ...manifest, complete: false });
+    await assert.rejects(compareGoldenSets(before, after), /Incomplete/);
+    await writeManifest(after, { ...manifest, captures: [] });
+    await assert.rejects(compareGoldenSets(before, after), /Incomplete/);
+    await writeManifest(after, { ...manifest, captures: [{ ...shot, filename: 'titanic-2.png' }] });
+    await assert.rejects(compareGoldenSets(before, after), /sets differ/);
+    await writeManifest(after, { ...manifest, captures: [{ ...shot, camera: [4, 5, 7] }] });
+    await assert.rejects(compareGoldenSets(before, after), /camera/);
+    for (const dir of [before, after])
+      await writeManifest(dir, { ...manifest, captures: [{ ...shot, viewport: [3, 3] }] });
+    await assert.rejects(compareGoldenSets(before, after), /dimensions/);
+    await writeManifest(before, manifest);
+    await writeManifest(after, manifest);
+    await rm(join(after, shot.filename));
+    await assert.rejects(compareGoldenSets(before, after), /ENOENT/);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

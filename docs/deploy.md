@@ -11,7 +11,10 @@ repository owner does the one-time setup below.
 Runs on every push to `main` and every pull request targeting `main`. A newer
 push to a PR cancels its older run (`concurrency`); main runs finish so each
 merge has a completed result to inspect. Jobs use
-`ubuntu-latest` with Node 22 and npm caching:
+Node 22 and npm caching; browser jobs use `ubuntu-24.04` to keep rendering and
+fonts stable across `ubuntu-latest` migrations. Build/static/deploy jobs retain
+`ubuntu-latest`. Playwright installs Chromium **and OS dependencies** on every
+browser runner, including cache hits:
 
 | Job                     | Gates                                                                                  | Job limit        |
 | ----------------------- | -------------------------------------------------------------------------------------- | ---------------- |

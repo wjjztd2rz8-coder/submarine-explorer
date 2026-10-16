@@ -95,6 +95,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
    6b. **V-monterey-floor [Sonnet, small], DONE 2026-10-16 (2947c7f; ~3.8):** was ~3.5: flat sand floor between boulders; add ripple/pebble variation using the existing sediment material.
 7. **S-manifest slices [Codex 2160]:** step 1 done (habitat). Migrate the next slices per `plan/progress/S-manifest.md` (inventory: 27 site-id expressions left); one slice per brief; golden unchanged.
 8. **S-render remainder [Codex 2280]:** the nightly workflow failed on both scheduled runs (38574704463, 38743060407; ~1.5 h each, exit 1 after golden/perf steps; artifacts exist) and 2210 found exact golden identity fails. Diagnose from `gh run view <id> --log-failed` and the artifacts, fix the workflow or its thresholds, and make golden comparison use a justified tolerance.
+   Implementation and evidence: [progress/2280-S-render-nightly.md](progress/2280-S-render-nightly.md). Hosted confirmation remains pending; a green diagnostic workflow does not establish visual acceptance.
 
 9. **R-release [Haiku]:** f54 tagged 2026-10-15 on green CI (04a1d8c). Next tag f55 after the next completed green run.
 
@@ -119,3 +120,10 @@ If it fails, send it back to the same agent or Codex session with concrete feedb
 ## Golden screenshots
 
 `tools/golden.sh` captures the hero sites at fixed poses into `.cache/golden/<date>/`. Compare the newest set with the previous one after any visual merge. A merge must not make them worse.
+
+Use `node tools/golden-compare.mjs <before-dir> <after-dir>` for numeric review:
+two RGB byte levels of tolerance, with larger differences limited to 0.1% of
+pixels per image. It rejects incomplete sets and changed poses/options. Exit 1
+flags changes for review; exit 2 means the inputs cannot be compared. `--report`
+retains metrics without failing on pixel changes. This screen does not replace
+Claude's visual judgement or make captures across art changes equivalent.
