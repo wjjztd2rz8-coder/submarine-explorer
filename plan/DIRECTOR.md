@@ -71,7 +71,6 @@ The newest items go first.
 ## In flight
 
 - Codex queue 2170 J-journeys-repeat, 2180 S-verify-12, 2190 S-bughunt-9 waits for the 17:24 CDT Codex reset. No Claude package running.
-- V-beebe [Sonnet, IN FLIGHT 2026-10-15] in ../subexp-wt/V-beebe.
 
 ## Backlog
 
@@ -81,7 +80,7 @@ One list, ordered by player impact and dependencies. Lane is in brackets. "After
 2. **PARTLY DONE 2026-10-15 (gallery sponges removed, clear_ground scatter exclusion, lighter hood; ~3.2) V-bluehole remainder [Sonnet]; left: free-standing hood slab (terrain carve), slate-blue end walls, terrace banding** (hood grounded, ledge scatter removed, denser apron done; golden 2026-10-15-211537 still ~3: faceted terraces, bright flat sand shelf, floating rock/crystal scatter): east hood is a free-standing slab (needs terrain carve behind gallery seats), life exclusion over gallery footprints for floating purple corals, heavy side curtain. V-bluehole [Sonnet]:** weakest hero (2.5-3). Detached canopy/stalactite slab, terrain seams, floating stones in `great-blue-hole-east-3.png`; faceted terraces. Fix geometry/materials, not tuning.
 3. **V-lostcity remainder [Sonnet, small]** (torn rims, wall relief done, ~3.5): smooth wall planes between ribs, vent throat keyed to old rim height, regular honeycomb pattern still visible on the Low-tier slope in after-low/lost-city-1.png) V-lostcity [Sonnet]:** towers are hollow, flat-rimmed tubes with a smooth collar (`lost-city-3.png`); add rim breakup and surface relief; remove the regular dimples on the flat slope.
 4. **PARTLY DONE 2026-10-15 (closer off-axis chase, brighter fill; hull ~37% of frame, ~3.5) V-endurance remainder [Sonnet]:** the facing guard keeps the sub between camera and hull, so the hull can't fill the frame. Next: a per-site chase aim in site data (camera aims at the hull independent of sub heading); shared camera change, keep `deepOpening` and `openingClearance1290` guards.
-5. **IN FLIGHT (Sonnet, 2026-10-15) V-beebe [Sonnet]:** stack is better but faceted and the sub is brightest; plumes good. Smooth chimney facets, dim sub specular in the vent glow.
+5. **PARTLY DONE 2026-10-15 (chimney mesh smoother on Med/High; sub still brightest: needs a per-site hull-light channel from the vent preset, not a global dim) V-beebe remainder [Sonnet]:** stack is better but faceted and the sub is brightest; plumes good. Smooth chimney facets, dim sub specular in the vent glow.
 6. **PARTLY DONE 2026-10-15 (opening grey-brown, ~3.5; close view still pinkish, rusticles/fittings still bright orange: shared plate shader warm tint + growth material) V-titanic palette remainder [Sonnet, small]:** hull peach-orange vs real grey-brown rust; close view still manufactured. Palette and plate variation only.
 7. **S-manifest slices [Codex 2160]:** step 1 done (habitat). Migrate the next slices per `plan/progress/S-manifest.md` (inventory: 27 site-id expressions left); one slice per brief; golden unchanged.
 8. **S-render remainder [Codex]:** confirm the first nightly run passes and golden pixels are unchanged.
