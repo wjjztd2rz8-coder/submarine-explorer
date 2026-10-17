@@ -284,6 +284,11 @@ export function paintWreck(geom: THREE.BufferGeometry, o: PaintOptions): void {
         .lerp(_r, rustMix)
         .multiplyScalar(0.8 + 0.35 * mid);
     }
+    // Before the plates, so their rust and sprung-dark tints keep their hue.
+    if (o.muted) {
+      const lum = _c.r * 0.3 + _c.g * 0.59 + _c.b * 0.11;
+      _c.lerp(_r.setRGB(lum * 0.9, lum * 0.89, lum * 0.82), o.muted);
+    }
     if (o.plates) {
       const [ph, pl, amt] = o.plates;
       const row = Math.floor(y / ph);
@@ -309,10 +314,6 @@ export function paintWreck(geom: THREE.BufferGeometry, o: PaintOptions): void {
         SILT,
         up * o.silt * (0.35 + 0.65 * valueNoise3(x * 0.11, 5.3, z * 0.11, o.seed ^ 0x5)),
       );
-    }
-    if (o.muted) {
-      const lum = _c.r * 0.3 + _c.g * 0.59 + _c.b * 0.11;
-      _c.lerp(_r.setRGB(lum * 0.9, lum * 0.89, lum * 0.82), o.muted);
     }
     if (o.shadeAt) _c.multiplyScalar(o.shadeAt(x, y, z));
     col.setXYZ(i, _c.r, _c.g, _c.b);

@@ -463,7 +463,7 @@ export function buildTitanicBow(
     silt: 0.55,
     mudBand: 3.4,
     muted: 0.75,
-    plates: [1.9, 5.5, 1.1],
+    plates: [1.9, 5.5, 1.4],
     shadeAt: endShade,
   });
   projectUVs(hullGeom, 8);
