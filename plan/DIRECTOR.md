@@ -70,7 +70,7 @@ The newest items go first.
 
 ## In flight
 
-- No Claude package running.
+- J-journal-preview [Sonnet] IN FLIGHT (claude, 2026-10-17), worktree ../subexp-wt/J-journal-preview.
 
 ## Backlog
 
