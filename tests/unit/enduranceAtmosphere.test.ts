@@ -177,25 +177,38 @@ describe('wreck site policy', () => {
     generic.preset.exit();
   });
 
-  it('keeps authored particle tuning above mission overrides without mutating them', () => {
-    const params = Object.freeze({
-      ...config.presets.wreck,
-      hazeParticles: 7,
-      hazeSizeM: 9,
-      hazeOpacity: 1,
-      motesPerHull: 8,
-      moteSizeM: 3,
-      moteOpacity: 1,
-      maxSizePx: 99,
-      maxBrightness: 99,
-    });
-    const baseline = setup('high');
-    const overridden = setup('high', true, { params });
-    expect(JSON.stringify(appearance(overridden))).toBe(JSON.stringify(appearance(baseline)));
-    expect(params.hazeParticles).toBe(7);
-    baseline.preset.exit();
-    overridden.preset.exit();
-  });
+  it.each(GRAPHICS_TIERS)(
+    '%s: resolves frozen site and mission tuning without mutation',
+    (tier) => {
+      const params = Object.freeze({
+        ...config.presets.wreck,
+        hazeParticles: 7,
+        hazeSizeM: 9,
+        hazeOpacity: 1,
+        motesPerHull: 8,
+        moteSizeM: 3,
+        moteOpacity: 1,
+        maxSizePx: 99,
+        maxBrightness: 99,
+      });
+      const site = Object.freeze({
+        id: 'policy-fixture',
+        wreck: Object.freeze({
+          ...wreck,
+          atmosphere: Object.freeze({ ...wreck.atmosphere }),
+          horizon: Object.freeze({ ...wreck.horizon }),
+        }),
+      });
+      const before = JSON.stringify({ site, params });
+      const baseline = setup(tier);
+      const overridden = setup(tier, true, { params, site });
+      expect(JSON.stringify(appearance(overridden))).toBe(JSON.stringify(appearance(baseline)));
+      expect(params.hazeParticles).toBe(7);
+      expect(JSON.stringify({ site, params })).toBe(before);
+      baseline.preset.exit();
+      overridden.preset.exit();
+    },
+  );
 
   it('reads particle and horizon values from policy and anchors relief to the selected POI', () => {
     const position = new THREE.Vector3(90, -2980, -70);

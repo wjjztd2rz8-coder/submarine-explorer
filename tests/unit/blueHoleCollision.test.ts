@@ -58,6 +58,56 @@ function distance(triangles: THREE.Triangle[], p: THREE.Vector3): number {
 }
 
 for (const tier of ['low', 'medium', 'high'] as const) {
+  it(`${tier}: bounds roof proxy error and keeps deep contacts stable`, async () => {
+    const terrain = actualTerrain(tier);
+    const config = makeConfig();
+    const radius = config.submarine.hullRadius;
+    const props = new Props(terrain.meta, terrain, config.props, tier);
+    try {
+      await props.placeAll(doc, 'great-blue-hole');
+      const hero = props.placed.find((p) => p.def.id === 'karst-grotto-east')!;
+      const roof = hero.full.getObjectByName('grotto-overhang') as THREE.Mesh;
+      const triangles = renderedTriangles(roof);
+      const ray = new THREE.Raycaster();
+      const probes: {
+        x: number;
+        penetration: number;
+        hit: boolean;
+        clearance: number;
+        stable: number;
+      }[] = [];
+      for (const x of [-16, -8, 0, 8, 16]) {
+        const top = new THREE.Vector3(x, 100, -14).applyMatrix4(roof.matrixWorld);
+        ray.set(top, new THREE.Vector3(0, -1, 0));
+        const hit = ray.intersectObject(roof)[0];
+        expect(hit).toBeDefined();
+        for (const penetration of [0.4, 2.5]) {
+          const p = hit.point.clone().add(new THREE.Vector3(0, radius - penetration, 0));
+          const n = new THREE.Vector3();
+          const collided = props.collide(p, radius, n);
+          const clearance = distance(triangles, p);
+          const repeated = p.clone();
+          props.collide(repeated, radius, new THREE.Vector3());
+          probes.push({ x, penetration, hit: collided, clearance, stable: repeated.distanceTo(p) });
+        }
+      }
+      expect(probes).toHaveLength(10);
+      // Wall boxes omit the roof's vertical rise. Keep the measured error bounded
+      // until they follow the roof too; the apron below still requires exact clearance.
+      for (const p of probes) {
+        expect(p.clearance, `roof clearance at ${p.x}/${p.penetration}`).toBeGreaterThanOrEqual(
+          radius - 0.85,
+        );
+        expect(p.stable).toBeLessThan(1e-4);
+        if (p.penetration === 2.5) expect(p.hit).toBe(true);
+        if (!p.hit) expect(p.clearance).toBeGreaterThanOrEqual(radius - 0.43);
+      }
+      expect(probes.filter((p) => !p.hit).length).toBeLessThanOrEqual(1);
+    } finally {
+      terrain.dispose();
+    }
+  });
+
   it(`1495 ${tier}: both galleries clear shallow/deep contacts and retain open water`, async () => {
     const terrain = actualTerrain(tier);
     const config = makeConfig();

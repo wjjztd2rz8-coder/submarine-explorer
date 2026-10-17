@@ -14,6 +14,7 @@ import doc from '../../data/landmarks/great-blue-hole/props.json';
 import blueHolePoses from '../../tools/blue-hole-poses.json';
 import { CameraRig } from '../../src/sub/CameraRig.js';
 import * as textures from '../../src/world/props/geo/textures.js';
+import * as manifests from '../../src/core/SiteManifest.js';
 
 // The measured grid shows only a flat 4 m platform; the carve digs the hole into it.
 const meta = {
@@ -22,6 +23,16 @@ const meta = {
 } as unknown as TileMeta;
 const carve = terrainCarveFor(meta)!;
 const ground = (x: number, z: number): number => carve.apply(x, z, -4);
+
+function disposeGeo(built: ReturnType<typeof buildGeo>): void {
+  for (const root of [built.full, built.impostor])
+    root.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      object.geometry.dispose();
+      for (const material of Array.isArray(object.material) ? object.material : [object.material])
+        material.dispose();
+    });
+}
 
 describe('Great Blue Hole props', () => {
   const cfg = DEFAULT_CONFIG.props;
@@ -136,16 +147,44 @@ describe('Great Blue Hole props', () => {
           mesh.geometry.computeBoundingBox();
           expect(built.bounds.containsBox(mesh.geometry.boundingBox!)).toBe(true);
         }
-        for (const result of [built, repeated])
-          for (const root of [result.full, result.impostor])
-            root.traverse((object) => {
-              if (!(object instanceof THREE.Mesh)) return;
-              object.geometry.dispose();
-              for (const material of Array.isArray(object.material)
-                ? object.material
-                : [object.material])
-                material.dispose();
-            });
+        for (const result of [built, repeated]) disposeGeo(result);
+      });
+
+      it(`${def.id} ${tier}: roof cracks keep the indexed shell joined through its caps`, () => {
+        const built = buildGeo({
+          def,
+          dims: def.dimensionsM!,
+          seed: hashString(def.id),
+          cfg,
+          tier,
+          groundHeight: () => () => 0,
+        });
+        const roof = built.full.getObjectByName('grotto-overhang') as THREE.Mesh;
+        const p = roof.geometry.getAttribute('position');
+        const index = roof.geometry.index!;
+        // Weld duplicate cap vertices by position. Every exposed edge must have a
+        // partner; only the open bottom profile is allowed below the sediment join.
+        const keys = Array.from(
+          { length: p.count },
+          (_, i) => `${p.getX(i)}|${p.getY(i)}|${p.getZ(i)}`,
+        );
+        const edges = new Map<string, { count: number; high: number }>();
+        for (let i = 0; i < index.count; i += 3) {
+          const tri = [index.getX(i), index.getX(i + 1), index.getX(i + 2)];
+          for (let j = 0; j < 3; j++) {
+            const a = tri[j],
+              b = tri[(j + 1) % 3];
+            const key = [keys[a], keys[b]].sort().join('/');
+            const edge = edges.get(key) ?? { count: 0, high: Math.max(p.getY(a), p.getY(b)) };
+            edge.count++;
+            edges.set(key, edge);
+          }
+        }
+        const boundary = [...edges.values()].filter((edge) => edge.count === 1);
+        expect(boundary.length).toBeGreaterThan(0);
+        expect(boundary.every((edge) => edge.high <= def.dimensionsM![2] * 0.011)).toBe(true);
+        expect([...edges.values()].every((edge) => edge.count <= 2)).toBe(true);
+        disposeGeo(built);
       });
 
       it(`${def.id} ${tier}: sediment finish preserves gallery framing and Low's budget`, () => {
@@ -305,6 +344,65 @@ describe('Great Blue Hole props', () => {
   }
 
   for (const tier of ['low', 'medium', 'high']) {
+    it(`hood ${tier}: the flag darkens the interior and follows a renamed prop`, () => {
+      const def = geo.find((p) => manifests.propManifest(p.id)?.grotto === 'hood')!;
+      const input = {
+        def,
+        dims: def.dimensionsM!,
+        seed: hashString(def.id),
+        cfg,
+        tier,
+        groundHeight: () => () => 0,
+      };
+      const policy = manifests.propManifest(def.id)!;
+      const before = JSON.stringify(cfg);
+      const hood = buildGeo(input);
+      const built = [hood];
+      const lookup = vi.spyOn(manifests, 'propManifest');
+      try {
+        lookup.mockReturnValue(policy);
+        const renamed = buildGeo({ ...input, def: { ...def, id: 'hood-fixture' } });
+        built.push(renamed);
+        lookup.mockReturnValue({ ...policy, grotto: undefined });
+        const plain = buildGeo(input);
+        built.push(plain);
+        const mesh = (built: typeof hood) =>
+          built.full.getObjectByName('grotto-overhang') as THREE.Mesh;
+        const roof = mesh(hood),
+          other = mesh(renamed),
+          original = mesh(plain);
+        for (const key of Object.keys(roof.geometry.attributes))
+          expect(roof.geometry.getAttribute(key).array).toEqual(
+            other.geometry.getAttribute(key).array,
+          );
+        expect(hood.colliders).toEqual(renamed.colliders);
+        const interior = (mesh: THREE.Mesh) => {
+          const p = mesh.geometry.getAttribute('position');
+          const n = mesh.geometry.getAttribute('normal');
+          const c = mesh.geometry.getAttribute('color');
+          let sum = 0,
+            count = 0;
+          for (let i = 0; i < p.count; i++) {
+            if (
+              p.getY(i) < 0.48 * input.dims[2] ||
+              p.getY(i) > 0.55 * input.dims[2] ||
+              n.getY(i) > -0.3
+            )
+              continue;
+            sum += c.getX(i) + c.getY(i) + c.getZ(i);
+            count++;
+          }
+          expect(count).toBeGreaterThan(10);
+          return sum / count;
+        };
+        expect(interior(roof)).toBeLessThan(interior(original) * 0.95);
+        expect(JSON.stringify(cfg)).toBe(before);
+      } finally {
+        lookup.mockRestore();
+        built.forEach(disposeGeo);
+      }
+    });
+
     it(`east ${tier}: has a roof over the mouth, pendant clearance and a clear close camera`, () => {
       const def = geo.find((p) => p.id === 'karst-grotto-east')!;
       const { x, z } = latLonToWorld(meta, def.lat, def.lon);
