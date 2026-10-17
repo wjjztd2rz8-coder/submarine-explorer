@@ -1519,9 +1519,14 @@ describe('overlay policies across the app', () => {
 });
 
 describe('overlay host teardown', () => {
-  it.each(['keyboard', 'gamepad'] as const)(
-    'switching an open %s guide to touch shows How to play and releases hidden focus',
-    (device) => {
+  it.each([
+    { device: 'keyboard', focused: '.controls-card-tab' },
+    { device: 'keyboard', focused: '.controls-card-rebind' },
+    { device: 'gamepad', focused: '.controls-card-tab' },
+  ] as const)(
+    'switching an open $device guide to touch releases hidden $focused focus',
+    ({ device, focused }) => {
+      // Device changes must release focus from either kind of newly hidden control.
       const opener = element();
       opener.focus();
       const card = new ControlsCard({
@@ -1532,8 +1537,7 @@ describe('overlay host teardown', () => {
       cleanup.push(() => card.dispose());
       card.open();
       const root = card.root as unknown as Element;
-      const tab = root.querySelector('.controls-card-tab')!;
-      tab.focus();
+      root.querySelector(focused)!.focus();
       card.setDevice('touch');
       expect(card.root.getAttribute('aria-label')).toBe('How to play');
       expect(root.querySelector('.how-to-play')).not.toBeNull();
@@ -1546,6 +1550,28 @@ describe('overlay host teardown', () => {
       expect(active()).toBe(opener);
     },
   );
+
+  it('a covered controls guide changing device leaves focus with the top overlay', () => {
+    // A background device update cannot steal focus or restore a hidden tab on dismissal.
+    const opener = element();
+    opener.focus();
+    const card = new ControlsCard({ key: () => 'G', initialDevice: 'keyboard' });
+    cleanup.push(() => card.dispose());
+    card.open();
+    (card.root as unknown as Element).querySelector('.controls-card-tab')!.focus();
+    const top = overlay();
+    top.owner.show();
+    top.first.focus();
+    card.setDevice('touch');
+    expect(active()).toBe(top.first);
+    expect(card.root.getAttribute('aria-label')).toBe('How to play');
+    press('Escape');
+    expect(active().closest('[hidden]')).toBeNull();
+    press('Tab');
+    expect(active()).toBe((card.root as unknown as Element).querySelector('.controls-card-close'));
+    press('Escape');
+    expect(active()).toBe(opener);
+  });
 
   it('Home ignores the Journal pad shortcut while Controls owns the modal stack', () => {
     const home = new Home({
@@ -1605,13 +1631,41 @@ describe('overlay host teardown', () => {
     expect(active()).toBe(opener);
   });
 
+  it('Home leaves an open Journal alone while another overlay owns its keyboard focus', () => {
+    // Guard the Journal's own top-owner check, independently of the named shell modals.
+    const guide = journal();
+    guide.open();
+    const top = overlay();
+    top.owner.show();
+    top.first.focus();
+    const ctx = {
+      input: { state: { toggleGuide: true } },
+      journal: guide,
+      controlsCard: { isOpen: false },
+      settingsScreen: { isOpen: false },
+      globe: { isOpen: false },
+    } as unknown as GameContext;
+    const menu = createHomeSystems().find((system) => system.name === 'menuData')!;
+    const draw = () => menu.frame!['scan.discovery']!({ dt: 0, nowMs: 0, frozen: true }, ctx);
+    draw();
+    expect(guide.isOpen).toBe(true);
+    expect(guide.isTop).toBe(false);
+    expect(active()).toBe(top.first);
+    press('Escape');
+    expect(guide.isTop).toBe(true);
+    draw();
+    expect(guide.isOpen).toBe(false);
+  });
+
   it.each(
     (['home', 'pause'] as const).flatMap((source) =>
-      (['keyboard', 'gamepad', 'touch'] as const).map((device) => ({ source, device })),
+      (['keyboard', 'gamepad', 'touch'] as const).flatMap((device) =>
+        [false, true].map((initialTouch) => ({ source, device, initialTouch })),
+      ),
     ),
   )(
-    '$source routes $device Controls to the shared guide without simulation or settings',
-    ({ source, device }) => {
+    '$source routes $device Controls with initial touch=$initialTouch without simulation or settings',
+    ({ source, device, initialTouch }) => {
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, text: async () => '[]' }));
       const controls = createControlsSystem();
       const settingsOpen = vi.fn();
@@ -1633,8 +1687,9 @@ describe('overlay host teardown', () => {
       const runner = new SystemRunner(ctx);
       cleanup.push(() => runner.dispose());
       // A phone keeps its touch controls active when a pad supplies the first frame.
-      if (source === 'pause' && device === 'gamepad') ctx.input.touchActive = true;
+      ctx.input.touchActive = initialTouch;
       runner.init([shellSystem, controls]);
+      if (device === 'keyboard') press('KeyW');
       if (device === 'touch')
         window.dispatchEvent(Object.assign(new Event('pointerdown'), { pointerType: 'touch' }));
       if (device === 'gamepad') {

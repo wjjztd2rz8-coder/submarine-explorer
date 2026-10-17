@@ -43,6 +43,56 @@ describe('terrain carve policy', () => {
   afterEach(() => vi.restoreAllMocks());
 
   it.each(['monterey-canyon', 'great-blue-hole'])(
+    '%s resolves policy once and keeps independent carves deterministic',
+    (id) => {
+      // Sampling must not re-resolve policy or depend on which tile was built last.
+      const tile = JSON.parse(readFileSync(`data/tiles/${id}/meta.json`, 'utf8')) as TileMeta;
+      const before = JSON.stringify(tile);
+      const lookup = vi.spyOn(manifests, 'siteManifest');
+      const carve = terrainCarveFor(tile)!;
+      expect(lookup).toHaveBeenCalledExactlyOnceWith(id);
+      const points = [-621, -450, 0, 450, 621].flatMap((dz) =>
+        [-231, -160, -90, 0, 90, 160, 231].flatMap((dx) =>
+          [-4, -100, -800, -1100].map((height) => ({
+            x: carve.centre.x + dx,
+            z: carve.centre.z + dz,
+            height,
+          })),
+        ),
+      );
+      const sample = () => points.map(({ x, z, height }) => carve.apply(x, z, height));
+      const original = sample();
+      expect(lookup).toHaveBeenCalledTimes(1);
+      const shifted = terrainCarveFor({
+        ...tile,
+        center: { lat: tile.center.lat + 0.001, lon: tile.center.lon - 0.001 },
+      })!;
+      expect(shifted.centre).not.toEqual(carve.centre);
+      expect(sample()).toEqual(original);
+      expect([...points].reverse().map(({ x, z, height }) => carve.apply(x, z, height))).toEqual(
+        [...original].reverse(),
+      );
+      for (const [i, height] of original.entries()) {
+        expect(Number.isFinite(height)).toBe(true);
+        expect(height).toBeLessThanOrEqual(points[i].height);
+      }
+      expect(lookup).toHaveBeenCalledTimes(2);
+      expect(JSON.stringify(tile)).toBe(before);
+    },
+  );
+
+  it.each([
+    ...manifests
+      .allSiteManifests()
+      .filter((site) => !site.terrain?.carve)
+      .map((site) => site.id),
+    'unknown',
+  ])('%s remains uncarved at a reconstruction coordinate', (id) => {
+    // Geographic proximity cannot opt an unconfigured site into a reconstruction.
+    expect(terrainCarveFor({ ...meta, id })).toBeNull();
+  });
+
+  it.each(['monterey-canyon', 'great-blue-hole'])(
     '%s reconstruction follows policy on an unknown site',
     (id) => {
       // Guard against reintroducing site identity checks in the shared terrain path.
