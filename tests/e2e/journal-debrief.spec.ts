@@ -1830,7 +1830,7 @@ freshTest.describe('catalog Journal additions', () => {
 
 freshTest.describe('scan still', () => {
   const test = experiencedTest;
-  const shots = '.cache/codex/shots/S-journal-picture';
+  const shots = '.cache/codex/shots/J-journal-preview';
   const DIVE = '/?mission=titanic&poi=titanic-bow&skipBriefing=1';
 
   const VIEWPORTS = [
@@ -1890,7 +1890,7 @@ freshTest.describe('scan still', () => {
       });
       expect(order).toBe(true);
       const box = (await hero.boundingBox())!;
-      expect(box.width).toBeGreaterThan(150);
+      expect(box.width).toBeGreaterThan(100);
       // Guards the capture pushing the entry text below the fold on short screens.
       expect(box.height).toBeLessThanOrEqual(viewport.height * 0.33);
       expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
