@@ -109,7 +109,13 @@ describe('guidance slot', () => {
   const texts = (slot: GuidanceSlot) => {
     const root = slot.root as unknown as FakeElement;
     const text = root.children[1];
-    return { hidden: root.hidden, name: text.children[1].textContent, kind: root.dataset.kind };
+    return {
+      hidden: root.hidden,
+      kicker: text.children[0].textContent,
+      name: text.children[1].textContent,
+      detail: text.children[2].textContent,
+      kind: root.dataset.kind,
+    };
   };
 
   it('shows the winner, withdraws it and falls back to the next offer', () => {
@@ -240,6 +246,48 @@ describe('guidance slot', () => {
     expect(css).toMatch(/\.guidance-skip\s*\{[^}]*pointer-events: auto/s);
     overlay.dispose();
   });
+
+  it.each([false, true])(
+    'marks a ready curiosity optional beside an objective (touch=%s)',
+    (touch) => {
+      document.documentElement.classList.contains = () => touch;
+      const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus());
+      const overlay = new ScanOverlay(DEFAULT_CONFIG.scan, document.body);
+      const t = (id: string, name: string, x: number, z: number) => ({
+        id,
+        name,
+        landmarkId: 'titanic',
+        position: new Vector3(x, 0, z),
+        radius: 20,
+        scanSeconds: 1,
+      });
+      scanner.setTargets([t('memorial', 'Memorial', 0, -5), t('stern', 'Stern', -300, 0)]);
+      scanner.setObjective('stern');
+      const keys = { scan: 'G', guide: 'J' };
+      const position = new Vector3();
+      const forward = new Vector3(0, 0, -1);
+      scanner.update(0, position, forward, false);
+      overlay.update(scanner.view, keys, null, 0);
+      const card = texts(overlay.slot);
+      expect(scanner.view.candidateId).toBe('memorial');
+      expect(card.kicker).toContain('OPTIONAL');
+      if (touch) {
+        expect(card.detail).toContain('Stern');
+        expect(card.detail).toMatch(/TURN \d+° PORT/);
+      } else expect(card.detail).toBe('HOLD G TO SCAN');
+      // On touch a NEW ENTRY card keeps the direction to the objective; elsewhere it keeps its own line.
+      overlay.showComplete('Memorial', true, keys);
+      if (touch) expect(texts(overlay.slot).detail).toContain('Stern');
+      else expect(texts(overlay.slot).detail).toBe('PRESS J · JOURNAL');
+      // When the contact is the objective there is no tag.
+      scanner.setObjective('memorial');
+      scanner.update(0, position, forward, false);
+      overlay.clear();
+      overlay.update(scanner.view, keys, null, 0);
+      expect(texts(overlay.slot).kicker).toBe('SCAN TARGET');
+      overlay.dispose();
+    },
+  );
 
   it.each(['Journal', 'pause', 'debrief', 'mission switch'])(
     'clears every source when covered by %s, rejects covered offers and accepts fresh guidance',
