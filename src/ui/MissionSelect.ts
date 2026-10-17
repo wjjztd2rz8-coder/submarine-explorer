@@ -256,10 +256,14 @@ export class MissionSelect {
       ]
         .filter(Boolean)
         .join(' · ');
-      const summary = document.createElement('span');
-      summary.className = 'mission-item-summary';
-      summary.textContent = m.summary;
-      btn.append(row, meta, summary);
+      btn.append(row, meta);
+      if (this.options.presentation !== 'shell') {
+        // The shell picker stays one line per site; the summary lives in the tooltip and briefing.
+        const summary = document.createElement('span');
+        summary.className = 'mission-item-summary';
+        summary.textContent = m.summary;
+        btn.append(summary);
+      }
       if (this.progress) {
         const stars = document.createElement('span');
         stars.className = 'mission-stars';

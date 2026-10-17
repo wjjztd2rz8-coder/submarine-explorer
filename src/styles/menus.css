@@ -102,19 +102,22 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
 .mission-select.is-shell .mission-missions {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 9px;
+  gap: 6px;
   border: 0;
 }
 .mission-select.is-shell .mission-missions > .mission-title {
   display: none;
 }
+/* One compact row per site: name and depth/hull on the left, stars and progress on the right. */
 .mission-select.is-shell .mission-item {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px;
+  row-gap: 2px;
+  align-items: baseline;
   width: 100%;
-  min-height: 108px;
-  padding: 15px;
+  min-height: 56px;
+  padding: 8px 14px;
   background: #0a2735;
   border: 1px solid #365b69;
   border-radius: 5px;
@@ -127,24 +130,30 @@ body[data-app-state='pause'] > .hud-ctrl-tip {
   border-color: #85eee1;
   background: #123a4c;
 }
+.mission-select.is-shell .mission-item-row,
+.mission-select.is-shell .mission-item-meta {
+  grid-column: 1;
+  min-width: 0;
+}
 .mission-select.is-shell .mission-item-name {
   color: #f2ffff;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
 }
 .mission-select.is-shell .mission-item-meta {
   color: #a9cbd0;
   font-size: 13px;
 }
-.mission-select.is-shell .mission-item-summary {
-  font-size: 13px;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.mission-select.is-shell .mission-stars,
+.mission-select.is-shell .mission-item-progress {
+  grid-column: 2;
+  justify-self: end;
+}
+.mission-select.is-shell .mission-stars {
+  grid-row: 1;
 }
 .mission-select.is-shell .mission-item-progress {
+  grid-row: 2;
   color: #81ead8;
   font-size: 12px;
   font-weight: 700;

@@ -1,18 +1,18 @@
 {
   "version": 1,
   "landmarks": [
-    "titanic",
-    "challenger-deep",
+    "great-blue-hole",
+    "hunga-tonga-caldera",
+    "blake-plateau-corals",
     "lost-city",
-    "monterey-canyon",
-    "endurance",
+    "kamaehuakanaloa",
     "axial-seamount-ashes",
     "hudson-canyon",
-    "kamaehuakanaloa",
-    "beebe-vent-field",
-    "great-blue-hole",
+    "monterey-canyon",
+    "endurance",
+    "titanic",
     "bismarck",
-    "hunga-tonga-caldera",
-    "blake-plateau-corals"
+    "beebe-vent-field",
+    "challenger-deep"
   ]
 }
