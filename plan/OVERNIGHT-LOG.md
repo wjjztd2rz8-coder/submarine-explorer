@@ -1461,3 +1461,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green):** J-picker-density (Sonnet, compact site rows, depth order, Blue Hole title). CI red on d-shell hang only (passes locally); logged in REVIEWS.md.
 - **Codex:** 3 running (2460, 2470, 2480); 2430-2450 queued. No tag.
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 18:10 CDT headless run 51 (Claude)
+
+- **Merged and pushed (gates green, no full e2e):** six Codex packages (S-verify 18, titanic-seabed and beebe-profile guards; S-bughunt 19 input/modal/photo fixes; legacy-retry evidence fix; S-manifest inventory closed) and Sonnet J-desktop-repetition (desktop "where next" now only in the mission panel nav line; finished rows hidden). Residual: card and nav line overlap briefly in scan range.
+- **Codex:** 2490, 2500, 2510 queued; dispatch waits (5h 12% left).
+- **Needs owner:** real-phone Low-tier play.
