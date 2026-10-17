@@ -241,4 +241,5 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - **Cleanup:** cleared five stale failed Codex units. Dropped V-endurance-aim: its worktree and branch are removed, and the work is kept as tag `parked/V-endurance-aim` (5fa58fc). DIRECTOR item 6 should be marked CUT by the next run (run 32 had DIRECTOR.md open).
 
 ## 2026-10-17 review
+
 - Prop-adding packages can break `f-perf-budget.spec.ts` (Low-tier prop counts), which gates.sh does not run. Run 41's CI failed on it. Rule added to V-titanic-seabed in DIRECTOR.md; fixed in 3e554a0.
