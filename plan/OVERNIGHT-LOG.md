@@ -1433,3 +1433,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged (smoke + project-base green; no full e2e):** Sonnet J-journal-preview (capture height capped, memorial note shown once on the site page; portrait Journal now shows entry text above the fold). Debris-field capture still shows the bow (needs scan-time camera aim; left in backlog).
 - **Codex:** queue 2430, 2440, 2450, 2460 waits (weekly pacing). No tag.
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 09:54 CDT headless run 46 (Claude)
+
+- CI on main failed only on journal-debrief "primaries complete" (click on Dive sites hung ~100 s in the input-ack wait; passes locally in 8 s). Switched that click to `dispatchEvent` with longer waits; gates green, pushed. Hosted result pending; no tag.
+- No new Claude package: weekly 52% is under the pace gate (53.4%). Codex queue 2430-2460 still waits on weekly pacing (62%).
+- **Needs owner:** real-phone Low-tier play.
