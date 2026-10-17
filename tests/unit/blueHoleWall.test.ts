@@ -271,6 +271,12 @@ describe('910 Blue Hole wall relief on the terrain surface', () => {
           [2.12, 115],
           [3.14, 145],
           [1, 145],
+          [Math.PI, 160],
+          [Math.PI, 168],
+          [Math.PI, 172],
+          [1, 160],
+          [1, 168],
+          [1, 172],
           [4.8, 75],
           [2.7, 400],
         ]) {
@@ -388,3 +394,50 @@ it('gallery banks are finite, additive and start behind both seat radii', () => 
     expect(blueHoleSeatBank(bearing, foot + 12)).toBeGreaterThan(0);
   }
 });
+
+for (const tier of ['low', 'medium', 'high'] as const) {
+  it(`${tier}: the camera stays clear across gallery apron steps and the 168 m fade`, () => {
+    // Regression guard: widening the apron must not bury the chase eye or put
+    // terrain between the eye and the submarine while turning near a riser.
+    const config = makeConfig();
+    const terrain = new Terrain({ meta, heights }, config.terrain, tier);
+    const rig = new CameraRig(config.camera, 16 / 9, terrain);
+    const point = new THREE.Vector3();
+    let checked = 0;
+    try {
+      for (const bearing of [Math.PI - 0.15, Math.PI, Math.PI + 0.15, 0.85, 1, 1.15]) {
+        for (const radius of [112, 120, 126.5, 133, 139.5, 146, 152, 160, 164, 168, 172]) {
+          const sub = new THREE.Vector3(
+            centre.x + Math.cos(bearing) * radius,
+            0,
+            centre.z + Math.sin(bearing) * radius,
+          );
+          sub.y = terrain.sampleHeight(sub.x, sub.z) + config.submarine.hullRadius + 0.01;
+          // The outer reef can be too shallow for the hull to fit underwater.
+          if (sub.y > -config.submarine.hullRadius) continue;
+          for (let heading = 0; heading < 24; heading++) {
+            rig.snap(sub, (heading * Math.PI) / 12, 0);
+            const eye = rig.camera.position;
+            expect(
+              [...eye.toArray(), ...rig.camera.quaternion.toArray()].every(Number.isFinite),
+            ).toBe(true);
+            expect(eye.y).toBeLessThanOrEqual(-config.camera.surfaceClearance);
+            expect(eye.y - terrain.sampleHeight(eye.x, eye.z)).toBeGreaterThanOrEqual(
+              config.camera.terrainClearance - 1e-8,
+            );
+            // Independent dense probes check visibility along the entire arm;
+            // the eye-height assertion alone misses a ridge between its ends.
+            for (let i = 0; i <= 100; i++) {
+              point.copy(sub).lerp(eye, i / 100);
+              expect(point.y - terrain.sampleHeight(point.x, point.z)).toBeGreaterThan(0);
+            }
+            checked++;
+          }
+        }
+      }
+      expect(checked).toBeGreaterThan(1000);
+    } finally {
+      terrain.dispose();
+    }
+  });
+}

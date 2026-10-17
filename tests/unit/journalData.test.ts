@@ -1,5 +1,7 @@
 /** D-FLOW: the Journal's content model and unlock rules (plan/PHASE-D-CONTRACTS.md §4). */
 
+// @ts-expect-error Node types are intentionally absent from the browser tsconfig.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
@@ -26,6 +28,101 @@ import titanic from '../../data/landmarks/titanic/mission.json';
 import blueHole from '../../data/landmarks/great-blue-hole/mission.json';
 
 const quiet = (): void => {};
+
+const HERO_CONTENT_IDS = ['titanic', 'great-blue-hole', 'beebe-vent-field', 'lost-city'] as const;
+
+const realContentFetch: FetchJson = async (url) => {
+  if (url === '/data/landmarks/index.json') {
+    return {
+      ok: true,
+      text: async () => JSON.stringify({ version: 1, landmarks: HERO_CONTENT_IDS }),
+    };
+  }
+  // Read the shipped content through the same URL paths as the runtime loader.
+  if (!/^\/data\/landmarks(?:\.json|\/[a-z0-9-]+\/[a-z]+\.json)$/.test(url)) {
+    return { ok: false, text: async () => '' };
+  }
+  try {
+    const source = readFileSync(`.${url}`, 'utf8');
+    return { ok: true, text: async () => source };
+  } catch {
+    return { ok: false, text: async () => '' };
+  }
+};
+
+it.each(HERO_CONTENT_IDS)(
+  '%s: an authored POI scan survives reload and unlocks only its Journal target',
+  async (id) => {
+    const sites = await loadJournalSites([], realContentFetch);
+    expect(sites.map((site) => site.id)).toEqual(HERO_CONTENT_IDS);
+    const current = sites.find((site) => site.id === id)!;
+    const defs = parsePois(
+      JSON.parse(readFileSync(`data/landmarks/${id}/pois.json`, 'utf8')),
+      quiet,
+    );
+    expect(defs.length).toBeGreaterThan(1);
+    const target = defs[0]!;
+    const entry = current.entries.find(
+      (item) => item.kind === 'poi' && item.poiIds.includes(target.id),
+    );
+    expect(entry, 'the authored scan must map to a Journal entry').toBeDefined();
+    const otherDef = defs.find((def) => !entry!.poiIds.includes(def.id));
+    expect(otherDef, 'the site must contain another authored Journal target').toBeDefined();
+    const otherTarget = current.entries.find(
+      (item) => item.kind === 'poi' && item.poiIds.includes(otherDef!.id),
+    );
+    expect(otherTarget, 'the site must contain another locked target').toBeDefined();
+
+    const bytes = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => bytes.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        bytes.set(key, value);
+      },
+      removeItem: (key: string) => {
+        bytes.delete(key);
+      },
+    };
+    const store = new DiscoveryStore(storage, () => new Date('2026-10-17T00:00:00Z'));
+    expect(sites.every((site) => !isSiteUnlocked(site, store))).toBe(true);
+    const depth = Math.max(target.depth_m ?? 100, target.min_depth_m ?? 0);
+    const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus(), store);
+    scanner.setTargets([
+      {
+        id: target.id,
+        name: target.name,
+        landmarkId: id,
+        position: new Vector3(0, -depth, -10),
+        radius: target.radius_m ?? DEFAULT_CONFIG.scan.closeRangeM,
+        minDepthM: target.min_depth_m,
+        scanSeconds: target.scan_seconds ?? DEFAULT_CONFIG.scan.defaultSeconds,
+      },
+    ]);
+    scanner.update(
+      target.scan_seconds ?? DEFAULT_CONFIG.scan.defaultSeconds,
+      new Vector3(0, -depth, 0),
+      new Vector3(0, 0, -1),
+      true,
+    );
+    expect(scanner.view.lastCompleteId).toBe(target.id);
+    expect(scanner.view.lastCompleteFirstTime).toBe(true);
+    expect(store.keys()).toEqual([`${id}/${target.id}`]);
+
+    const archived = bytes.get(DISCOVERY_STORAGE_KEY);
+    expect(archived).toBeDefined();
+    const reloaded = new DiscoveryStore(storage);
+    expect(reloaded.get(id, target.id)).toEqual({ at: '2026-10-17T00:00:00.000Z', count: 1 });
+    expect(isSiteUnlocked(current, reloaded)).toBe(true);
+    expect(isEntryUnlocked(current, entry!, reloaded)).toBe(true);
+    expect(isEntryUnlocked(current, otherTarget!, reloaded)).toBe(false);
+    for (const site of sites.filter((site) => site.id !== id)) {
+      expect(isSiteUnlocked(site, reloaded)).toBe(false);
+      expect(site.entries.every((item) => !isEntryUnlocked(site, item, reloaded))).toBe(true);
+    }
+    // Journal reads and store migration must leave the saved document byte-for-byte intact.
+    expect(bytes.get(DISCOVERY_STORAGE_KEY)).toBe(archived);
+  },
+);
 
 it.each([titanic, blueHole])(
   'retains every verified briefing bullet in the Journal ($landmark)',

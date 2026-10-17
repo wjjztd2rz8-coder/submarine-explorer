@@ -10,6 +10,7 @@ import type { PlacedPoi } from '../../src/game/Pois.js';
 import { Sonar } from '../../src/ui/Sonar.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import { latLonToWorld } from '../../src/util/geo.js';
+import { BLUE_HOLE_LAT, BLUE_HOLE_LON } from '../../src/world/terrainFeatures.js';
 import type { TileMeta } from '../../src/util/types.js';
 import { recordSonarCanvas } from './helpers/sonarCanvas.js';
 
@@ -104,6 +105,74 @@ describe('1320 Endurance sonar scour contours', () => {
 });
 
 describe('sonar rendering equivalence', () => {
+  for (const tier of ['low', 'high'] as const) {
+    it(`${tier}: Blue Hole sonar samples finite apron relief across the 168 m boundary`, () => {
+      // Regression guard: the widened reconstruction must reach sonar through
+      // sampleDataHeight, including the fade beyond the original apron radius.
+      const meta = JSON.parse(
+        readFileSync('data/tiles/great-blue-hole/meta.json', 'utf8'),
+      ) as TileMeta;
+      const bytes = readFileSync('data/tiles/great-blue-hole/heightmap.bin');
+      const terrain = new Terrain(
+        { meta, heights: new Float32Array(bytes.buffer, bytes.byteOffset, meta.cols * meta.rows) },
+        DEFAULT_CONFIG.terrain,
+        tier,
+      );
+      const centre = latLonToWorld(meta, BLUE_HOLE_LAT, BLUE_HOLE_LON);
+      const recorded = recordSonarCanvas();
+      vi.stubGlobal('document', recorded.document);
+      vi.stubGlobal('devicePixelRatio', 1);
+      const sample = vi.spyOn(terrain, 'sampleDataHeight');
+      try {
+        const sonar = new Sonar(terrain, [], {
+          zoom: { ...DEFAULT_CONFIG.sonarZoom, initial: 250 },
+        });
+        const internals = sonar as unknown as {
+          renderBathymetry(x: number, z: number): void;
+          relief: { minDepthM: number; maxDepthM: number; contourIntervalM: number };
+        };
+        for (const bearing of [Math.PI, 1]) {
+          sample.mockClear();
+          const rasterCount = recorded.rasters.length;
+          internals.renderBathymetry(
+            centre.x + Math.cos(bearing) * 168,
+            centre.z + Math.sin(bearing) * 168,
+          );
+          expect(recorded.rasters.length).toBeGreaterThan(rasterCount);
+          const results = sample.mock.results;
+          const samples = sample.mock.calls.map(([x, z], i) => ({
+            radius: Math.hypot(x - centre.x, z - centre.z),
+            height: results[i].value as number,
+          }));
+          for (const band of [
+            [152, 160],
+            [160, 168],
+            [168, 176],
+          ]) {
+            const heights = samples
+              .filter((p) => p.radius >= band[0] && p.radius < band[1])
+              .map((p) => p.height);
+            expect(heights.length).toBeGreaterThan(0);
+            expect(heights.every(Number.isFinite)).toBe(true);
+          }
+          const relief = internals.relief;
+          expect(Object.values(relief).every(Number.isFinite)).toBe(true);
+          expect(relief.maxDepthM).toBeGreaterThan(relief.minDepthM);
+          expect(relief.contourIntervalM).toBeGreaterThan(0);
+          expect(recorded.paths.flatMap((path) => path.points.flat()).every(Number.isFinite)).toBe(
+            true,
+          );
+          expect(
+            recorded.labels.every((label) => Number.isFinite(label.x) && Number.isFinite(label.y)),
+          ).toBe(true);
+        }
+      } finally {
+        sample.mockRestore();
+        terrain.dispose();
+      }
+    });
+  }
+
   // Guards accidental scour/reef leakage onto any site without authored policy.
   it.each([
     ...manifests
