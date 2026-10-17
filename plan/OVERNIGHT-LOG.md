@@ -1415,3 +1415,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - Fixed CI failure from run 41 (perf-budget titanic props 6 to 7); pushed. Hosted rerun pending; no tag.
 - Codex: queued 2430, 2440, 2450, 2460 (legacy-retry star award).
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 06:02 CDT headless run 43 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-beebe-close slice 2 (smoker `bodyShade`/`bodyGlow` profile fields in site data; darker flank, brighter orifices; ~4.3); Sonnet J-contact-choice (OPTIONAL tag on non-objective scan target; objective cue on touch cards, desktop keeps HOLD G TO SCAN after I sent back the first version that dropped it; desktop screenshots not retaken).
+- **Process note:** a no-op `git stash` then `stash pop` re-applied an old stash and I committed conflict markers locally; caught by gates, reset before any push. Avoid stash in the orchestrator.
+- **Codex:** queue 2430, 2440, 2450, 2460 waits for dispatch. No tag (CI of run 42 still pending at start).
+- **Needs owner:** real-phone Low-tier play.
