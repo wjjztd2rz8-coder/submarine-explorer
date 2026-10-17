@@ -2,6 +2,30 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-17 comprehensive review, joint with Codex Sol (golden 2026-10-17-091522)
+
+Sol ran; one reconcile round, corrections checked against files.
+
+**Changed since the last review (9 merges):** Claude V-beebe-close slice 1, V-monterey-pose (plus yawOffset CI fix), V-lostcity-slope, V-bluehole-hood, V-titanic-seabed slice 2; Codex 2400 S-manifest Endurance, 2410 S-verify-17, 2420 S-bughunt-18. Tags f56-f58. CI for run 41's main failed one spec: `f-perf-budget` titanic prop count 6 to 7 after the seabed slice; fixed and pushed this run (hosted rerun not yet confirmed).
+
+**Scores, readable / beautiful (Claude draft; agreed bands with Sol):** Titanic 4 / 3.5-3.9; Monterey 4 / 3.5-3.8; Beebe 3.5-4 / 3.5-3.8; Lost City 4 / 3-3.8; Blue Hole 3.5-4 / 3-3.6; Challenger 3.5-4 / 3.5-3.7; Endurance 4 / 3.5-3.7. Bands, not unanimous points. No hero is consistently at 4.
+
+**Biggest gaps:** Titanic plating repetition and flat light (`titanic-3.png`); Beebe close flanks smeared brown; Lost City thin faceted rims; Blue Hole hood still pale and slab-like; Monterey banding and abrupt wall/base transition.
+
+**Disputes settled on evidence:** my Challenger "orange wedge artifact" is the authored emissive flag behind the HUD card (lander.ts:414), so a framing nit, not a blocker (Sol correct). Home text below the fold is deliberate scroll (home.css:318), not clipping (Sol correct). My "4.0 for Titanic" and "3.8 Lost City" were generous (Sol's views hold). Still disputed: exact point scores; Sol holds lower floors.
+
+**Sol's additional findings:** Beebe already has emissive mouth geometry (smokers.ts:240), so tune visibility before adding geometry; the Monterey facing>0.98 spec constrains the art; the legacy-save retry star award still needs a disposition (queued as 2460); the blocker list is not only art (journeys, eight-site acceptance, CI).
+
+**Play:** no new flow captures; Home and debrief screenshots from the e2e suite looked clean; P2 journey items remain.
+
+**Stage:** about 82% to 1.0, four weeks targeted, 4-6 allowed (agreed with Sol).
+
+**Process:** a prop-adding package broke a Low-tier budget spec that local gates do not run; now written into V-titanic-seabed. Claude weekly 55% left (~16%/day), Codex 67% (~46%/day); skips are budget gates. Codex briefs queued: 2430, 2440, 2450, 2460.
+
+**New priorities:** unchanged order in DIRECTOR.md; Claude lanes have V-titanic-seabed 3, V-beebe-close, V-lostcity-slope, V-bluehole-hood, V-monterey-pose, J-contact-choice, J-journal-preview.
+
+**Needs owner:** real-phone Low-tier play.
+
 ## 2026-10-16 (third) comprehensive review, joint with Codex Sol (golden 2026-10-16-204522)
 
 **Changed since the last review (8 merges, all pushed):** Claude V-titanic-seabed slice 1, V-bluehole-roof-2, V-beebe-lighting, V-lostcity-rims, V-challenger-floats; Codex S-verify-15, S-bughunt-16, J-home-controls coverage, S-manifest sonar slice, 2340-2360 verification. CI green on the latest main (run 38952303725). Codex 2370 (S-manifest terrain carve, inventory 4 to 2), 2380, 2390 finished and are collected this run.
