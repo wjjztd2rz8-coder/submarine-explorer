@@ -1402,3 +1402,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged (smoke + project-base green; no full e2e):** Sonnet V-bluehole-hood slice 1 (warped terraces, cracks, darker hood interior via the hood flag; before/after east frame clearly more irregular; ~3.8). Underside geometry and pale sand shelf remain.
 - **Codex:** queue 2400 S-manifest, 2410 S-verify-17, 2420 S-bughunt-18 still waits (dispatch said budget low; Codex 5h resets 02:00).
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 02:25 CDT headless run 41 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Codex 2400 S-manifest (Endurance wreck policy into site data; inventory closed pending 2450 check), 2410 S-verify-17, 2420 S-bughunt-18 (tests only); Sonnet V-titanic-seabed slice 2 (scour moat, silty rim, debris trail; approach frame modestly better, ~3.95).
+- **Codex:** queued 2430 S-verify-18, 2440 S-bughunt-19, 2450 S-manifest-close. No tag this run (f58 current; tag after CI of these merges is green).
+- **Needs owner:** real-phone Low-tier play.
