@@ -2,7 +2,7 @@ import type { FetchJson } from '../../src/game/ContentPath.js';
 import { expect, it } from 'vitest';
 import { Progress } from '../../src/game/Progress.js';
 import { creditPreviousDives } from '../../src/game/ProgressMigration.js';
-import { ProgressSave } from '../../src/core/Save.js';
+import { ProgressSave, PROGRESS_STORAGE_KEY } from '../../src/core/Save.js';
 import { DiscoveryStore } from '../../src/game/DiscoveryStore.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { readFileSync } from 'node:fs';
@@ -303,6 +303,116 @@ it('finishes migration for genuinely absent optional missions', async () => {
   }));
   expect(progress.points).toBe(0);
   expect(progress.legacyCredited).toBe(true);
+});
+
+it.each([
+  { evidence: 'primary', old: ['a'], added: 'b', primary: true, stars: 0 },
+  { evidence: 'secondary', old: ['a'], added: 'b', primary: false, stars: 1 },
+  { evidence: 'animal', old: ['a', 'b'], added: 'life:ray', stars: 2 },
+  { evidence: 'photo', old: ['a', 'b'], newPhoto: true, stars: 2 },
+  { evidence: 'old animal', old: ['a', 'b', 'life:ray'], stars: 3 },
+  { evidence: 'old photo', old: ['a', 'b'], oldPhoto: true, stars: 3 },
+])('freezes $evidence evidence at a pending site across retries and reloads', async (test) => {
+  const values = new Map<string, string>();
+  const storage = {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      values.set(key, value);
+    },
+    removeItem: (key: string) => {
+      values.delete(key);
+    },
+  };
+  const discoveries = new DiscoveryStore(storage);
+  for (const poi of test.old) discoveries.record('old', poi);
+  const progress = new Progress(new ProgressSave(storage));
+  const offline: FetchJson = async () => {
+    throw new Error('offline');
+  };
+  const photo = { siteId: 'old', poiId: 'a' };
+  await creditPreviousDives(progress, discoveries, test.oldPhoto ? [photo] : [], offline);
+  if (test.added) discoveries.record('old', test.added);
+  // The later dive aborts; its new evidence must never improve a legacy rating.
+  progress.finish('old', [{ primary: true, complete: true }], true);
+  await creditPreviousDives(
+    new Progress(new ProgressSave(storage)),
+    new DiscoveryStore(storage),
+    test.newPhoto ? [photo] : [],
+    offline,
+  );
+  const restored = new Progress(new ProgressSave(storage));
+  await creditPreviousDives(
+    restored,
+    new DiscoveryStore(storage),
+    test.newPhoto ? [photo] : [],
+    async () => ({
+      ok: true,
+      text: async () =>
+        JSON.stringify({
+          version: 1,
+          landmark: 'old',
+          tile: 'old',
+          title: 'Old',
+          spawn: { lat: 0, lon: 0 },
+          objectives: [
+            { id: 'a', poi: 'a', primary: true },
+            { id: 'b', poi: 'b', primary: test.primary ?? true },
+          ],
+          completion: 'all_primary',
+        }),
+    }),
+  );
+  expect(restored.rating('old')).toBe(test.stars);
+  if (test.added === 'b') expect(restored.snapshot().awarded).not.toContain('objective:old/b');
+  expect(restored.points).toBe(0);
+  expect(restored.bonus).toBe(false);
+  expect(restored.divePoints).toBe(0);
+  expect(restored.legacyCredited).toBe(true);
+  const earned = restored.snapshot();
+  const reloaded = new Progress(new ProgressSave(storage));
+  await creditPreviousDives(reloaded, new DiscoveryStore(storage), [], async () => {
+    throw new Error('must not fetch');
+  });
+  expect(reloaded.snapshot()).toEqual(earned);
+});
+
+it('retires site-only pending retries whose original evidence is unavailable', async () => {
+  const values = new Map<string, string>([
+    [
+      PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        version: 2,
+        legacyCredited: false,
+        legacyPending: ['old'],
+        ratings: { old: 1 },
+        cosmeticGrants: ['paint:orange'],
+      }),
+    ],
+  ]);
+  const storage = {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      values.set(key, value);
+    },
+    removeItem: (key: string) => {
+      values.delete(key);
+    },
+  };
+  const discoveries = new DiscoveryStore(storage);
+  discoveries.record('old', 'a');
+  let fetched = false;
+  const progress = new Progress(new ProgressSave(storage));
+  await creditPreviousDives(progress, discoveries, [], async () => {
+    fetched = true;
+    throw new Error('must not fetch');
+  });
+  expect(fetched).toBe(false);
+  expect(progress.rating('old')).toBe(1);
+  expect(progress.selectCosmetic('paint', 'orange')).toBe(true);
+  const restored = new Progress(new ProgressSave(storage));
+  expect(restored.legacyCredited).toBe(true);
+  expect(restored.legacyPending).toEqual([]);
+  expect(restored.rating('old')).toBe(1);
 });
 
 it.each(['constructor', '__proto__', 'toString'])(

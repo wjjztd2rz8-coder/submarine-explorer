@@ -416,11 +416,16 @@ export class Save {
 /** Research is separate from settings and discoveries, so their resets and migrations stay independent. */
 export const PROGRESS_STORAGE_KEY = 'subexplorer.progress.v1';
 export const PROGRESS_VERSION = 2;
+export interface LegacyEvidence {
+  site: string;
+  keys: string[];
+  bonus: boolean;
+}
 export interface ProgressRecord {
   version: 2;
   cosmeticGrants: string[];
   legacyCredited: boolean;
-  legacyPending?: string[];
+  legacyPending?: (string | LegacyEvidence)[];
   points: number;
   lifetime: number;
   awarded: string[];
@@ -452,14 +457,30 @@ export function migrateProgress(raw: unknown): ProgressRecord {
   out.dailyBestStreak = Number.isSafeInteger(o.dailyBestStreak)
     ? Math.max(0, Number(o.dailyBestStreak))
     : 0;
-  if (Array.isArray(o.legacyPending))
-    out.legacyPending = [
-      ...new Set(
-        o.legacyPending.filter(
-          (s): s is string => typeof s === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(s),
-        ),
-      ),
-    ];
+  if (Array.isArray(o.legacyPending)) {
+    out.legacyPending = [];
+    const seen = new Set<string>();
+    for (const entry of o.legacyPending) {
+      const site = typeof entry === 'string' ? entry : entry?.site;
+      if (typeof site !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(site) || seen.has(site))
+        continue;
+      seen.add(site);
+      if (typeof entry === 'string') out.legacyPending.push(site);
+      else if (Array.isArray(entry.keys) && typeof entry.bonus === 'boolean')
+        out.legacyPending.push({
+          site,
+          keys: [
+            ...new Set(
+              entry.keys.filter(
+                (key: unknown): key is string =>
+                  typeof key === 'string' && key.startsWith(`${site}/`),
+              ),
+            ),
+          ] as string[],
+          bonus: entry.bonus,
+        });
+    }
+  }
   out.points = integer(o.points ?? o.rp);
   out.lifetime = Math.max(out.points, integer(o.lifetime ?? o.rp));
   if (Array.isArray(o.awarded))

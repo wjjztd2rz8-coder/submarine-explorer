@@ -3,6 +3,7 @@ import {
   migrateProgress,
   ProgressSave,
   type GameplayMode,
+  type LegacyEvidence,
   type ProgressRecord,
 } from '../core/Save.js';
 import {
@@ -61,10 +62,10 @@ export class Progress {
   get legacyCredited(): boolean {
     return this.data.legacyCredited;
   }
-  get legacyPending(): readonly string[] | undefined {
+  get legacyPending(): readonly (string | LegacyEvidence)[] | undefined {
     return this.data.legacyPending;
   }
-  completeLegacyCredit(pending: string[] = []): void {
+  completeLegacyCredit(pending: LegacyEvidence[] = []): void {
     if (!this.save.readOnly) {
       // Only the first backfill predates gameplay; retries also contain modern dive records.
       if (this.data.legacyPending === undefined) {

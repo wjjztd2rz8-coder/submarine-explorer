@@ -1231,6 +1231,11 @@ Migration uses `credit()` so old subjects do not count as new dive activity. Its
 persisted boundary prevents later discoveries across separate dives from generating
 retroactive ratings or old cosmetic entitlements. Legacy completed surveys use a
 subject photo or animal scan at that site for their three-star bonus.
+Pending retries store `{ site, keys, bonus }` evidence snapshots inside the existing
+`legacyPending` field; objective and bonus credit never reads later discoveries or
+photos. Older site-ID-only pending entries are retired without awarding further
+legacy stars because their original evidence cannot be recovered. Existing ratings
+and cosmetic grants remain intact.
 
 The Journal front page owns the native paint, lamp-trim, decal and photo-frame
 selectors. Selections persist immediately; sub choices apply to a newly constructed
