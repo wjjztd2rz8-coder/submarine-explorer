@@ -292,8 +292,19 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
    * stays put, so the pendants keep hanging from it. 0..1 per x.
    */
   const shelfStep = (x: number, phase = 0): number => {
-    const q = 5 * fbm3(x * 0.05 + 9 + phase, 4, seed + 97 + phase, seed + 14, 3);
-    return (Math.floor(q) + smooth(0.78, 1, q - Math.floor(q))) / 5;
+    // Warped in x and curved in height, so plateau widths and riser heights are never an even stair.
+    const xw = x + 7 * Math.sin(x * 0.13 + seed * 0.01 + phase);
+    const q = 5 * fbm3(xw * 0.05 + 9 + phase, 4, seed + 97 + phase, seed + 14, 3);
+    const level = (Math.floor(q) + smooth(0.78, 1, q - Math.floor(q))) / 5;
+    return Math.pow(level, 1.45);
+  };
+  /**
+   * Narrow fissures running across the roof: 0..1 per x, peaked on thin ridged lines at uneven
+   * spacing. They cut the roof top down and darken the face and underside beneath them.
+   */
+  const crackAt = (x: number): number => {
+    const ridge = 1 - Math.abs(2 * fbm3(x * 0.11 + 21, 6, seed + 41, seed + 19, 3) - 1);
+    return smooth(0.84, 0.95, ridge);
   };
   const roofZone = (y: number, z: number, x: number): number =>
     smooth(0.56 * H, 0.64 * H, y) *
@@ -335,7 +346,8 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const lip = 1 - smooth(0.63 * H, 0.68 * H, y);
     const thin = 1 - lip * (1 - lipThick(x)) * 0.85;
     const drop = H * 0.13 * notchAt(x) * smooth(0.58 * H, 0.64 * H, y);
-    return zone * (body * thin - drop);
+    const crack = H * 0.14 * crackAt(x) * smooth(0.58 * H, 0.64 * H, y);
+    return zone * (body * thin - drop - crack);
   };
 
   // --- the wall
@@ -408,6 +420,18 @@ export function buildStalactiteCluster(input: GeoBuildInput): BuiltProp {
     const pit = fbm3(x * 0.7, y * 0.9, z * 0.7, seed ^ 0x3a, 3);
     out.lerp(GREY_BROWN, 0.6 * lipM * smooth(0.45, 0.62, pit));
     out.multiplyScalar(1 - 0.2 * lipM * smooth(0.3, 0.45, pit));
+    // Hood: a darker, cracked, uneven-toned roof. Tone steps with the plateau, fissures run dark,
+    // and the underside is shadowed and mottled in the same way (floors keep it readable).
+    if (hood) {
+      const roof = smooth(0.46 * H, 0.56 * H, y) * (1 - 0.6 * smooth(0.45, 0.8, endRatio(x, W)));
+      const plateau = 0.78 + 0.34 * shelfStep(x, 31);
+      const mottle = 0.62 + 0.6 * fbm3(x * 0.35, y * 0.3, z * 0.35, seed ^ 0x2f, 4);
+      const under = ny < -0.3 ? 0.7 : 1;
+      const crackTone =
+        1 - 0.7 * crackAt(x + 0.4 * Math.sin(y * 0.5)) * smooth(0.5 * H, 0.6 * H, y);
+      out.multiplyScalar(1 - roof * (1 - 0.58 * plateau * mottle * under * crackTone));
+      out.lerp(GREY_BROWN, 0.45 * roof * smooth(0.35, 0.65, pit));
+    }
   });
   wall.computeBoundingBox();
   const full = new THREE.Group();
