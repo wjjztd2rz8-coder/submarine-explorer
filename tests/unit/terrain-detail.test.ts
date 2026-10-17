@@ -92,6 +92,36 @@ function ridgedTile(cols = 40, rows = 34) {
   });
 }
 
+describe('terrain scour moat', () => {
+  it('dips toward the footprint, lifts a rim beyond it, and tints only the rim', () => {
+    const profile = base.fidelity!.titanic!;
+    const tile = makeSyntheticTile({
+      id: 'titanic',
+      cols: 40,
+      rows: 40,
+      centerLat: profile.focus.lat,
+      centerLon: profile.focus.lon,
+      cellsizeDeg: 0.0005,
+      height: () => -3800,
+    });
+    for (const tier of ['low', 'high'] as const) {
+      const terrain = new Terrain(tile, base, tier);
+      try {
+        const p = profile.scour!;
+        const at = (offset: number) => terrain.scourAt(p.halfWidthM + offset, 0);
+        expect(at(1).height).toBeLessThan(-0.3 * p.depthM);
+        expect(at(p.widthM * 1.3).height).toBeGreaterThan(0.3 * p.rimM);
+        expect(at(p.widthM * 3).height).toBe(0);
+        expect(at(p.widthM * 1.3).rim).toBeGreaterThan(0.9);
+        expect(at(1).rim).toBe(0);
+        expect(terrain.detailHeight(p.halfWidthM + 1, 0)).toBeLessThan(0);
+      } finally {
+        terrain.dispose();
+      }
+    }
+  });
+});
+
 describe('TerrainNoise', () => {
   it('value noise is deterministic and bounded to [0, 1)', () => {
     for (let i = 0; i < 2000; i++) {

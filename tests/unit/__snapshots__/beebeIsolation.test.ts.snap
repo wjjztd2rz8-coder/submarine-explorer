@@ -355,10 +355,11 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
       "high": {
         "buffers": [
           {
-            "aCavity": "e82110b82efca97c0d90bcca1ca24b6f0b0d47b69b7617b0a143cf3419f60027",
-            "index": "7c1852a00357b51457b976d4c6dc363c77c52ab5c7400c0f1747b7340c46e6ad",
-            "normal": "8b289c9b180b16cd8d70d0f54e41f2869a9dae29d27f71598049c27ec62ff759",
-            "position": "4c159ea778fc573444c4dee5733e86c36fe394113d1acb5e919af0fc8435e9c2",
+            "aCavity": "97097675fbd2e11bf4a6beb6a0ab819ef7497260afdf659c38c2d743f971e447",
+            "color": "3478cb33801c8ae7f401646fe2282dba0c1514ccfc99c22971506f61419678a6",
+            "index": "f99cbbcd98870d781adc69e4d513fa038faf0885c106a0d3834f8f21aec2dcec",
+            "normal": "513818f4499b7ddabe6984fc038cc29fa33511d5b264f9c80a52f68195e58a41",
+            "position": "aeeb9a46e7f91627f6f171d9ea24574b2cce3508a170fab762841d73437fb44a",
           },
         ],
         "cache": "seabed-#define TERRAIN_PBR_NORMALS#define TERRAIN_BREAKUP-abyss-fade",
@@ -368,10 +369,11 @@ exports[`Cross-site biome, terrain buffers, uniforms and shaders remain byte-ide
       "low": {
         "buffers": [
           {
-            "aCavity": "dcc3de334a31e83a21ee6161a4c53fbeedb7d0cba84e30ae62cda296aa7078d5",
-            "index": "6bc8c8eeb4c40bd917147fdae616d552d291d819709f3dfe137d70d514363a50",
-            "normal": "cc359605e285edbfd2ec2cc0982c2bfb6acd4575853ce12c294a1b67f8742330",
-            "position": "da42615646809f271502b8d5581cce5c7d709986253ba9c788100fba5ae7c6cd",
+            "aCavity": "5ad35bfcf6e5d05741012a812d8cc3070ab47e52d7c40d7f71e34231abb7a7db",
+            "color": "3b8e8b0656e88f647db16c159d00c9ac204c90d4501c45317356a6d06040d0a4",
+            "index": "bef797cfac7f24a4d614b6c1145bf2aa4db3537c68f6fe12f395a34d3ba543b5",
+            "normal": "2f606654f54ad78a285972e2b14ddd7ff46ecb414b31a491ec9249b5fc15ad9b",
+            "position": "6d7d707f3d2f475063dca4f2f5fcc57bb0483968118d3ef1bf962a45aeb5261b",
           },
         ],
         "cache": "seabed--abyss-fade",

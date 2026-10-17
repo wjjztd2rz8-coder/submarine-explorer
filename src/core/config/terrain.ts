@@ -180,7 +180,8 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
         rimM: 1.5,
         tint: 0.65,
       },
-      normalStrength: 0.18,
+      // No rock normal detail: the bed is soft sediment.
+      normalStrength: 0,
       wallSegments: { low: [220, 150], medium: [230, 150], high: [220, 150] },
     },
     // The 320 m sinkhole fits inside six survey cells. Resolve its reconstructed

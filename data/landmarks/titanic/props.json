@@ -9,6 +9,7 @@
       "lat": 41.7325,
       "lon": -49.94694,
       "snap_to_seabed": true,
+      "y_offset_m": 3,
       "heading_deg": 0,
       "scale": 1,
       "dimensions_m": [143, 28, 16],
