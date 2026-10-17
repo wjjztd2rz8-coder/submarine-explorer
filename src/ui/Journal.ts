@@ -1017,8 +1017,6 @@ export class Journal {
       this.renderEntryPhotos(site, entry);
       return;
     }
-    if (site.memorialNote && entry.kind === 'poi')
-      b.append(el('p', 'jr-memorial', site.memorialNote));
     if (g.image) {
       const fig = el('figure', 'jr-figure');
       const img = el('img');
