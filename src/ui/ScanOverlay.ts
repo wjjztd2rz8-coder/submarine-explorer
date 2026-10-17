@@ -256,8 +256,14 @@ export class ScanOverlay {
       };
     }
     const objectiveReady = view.objectiveId === view.nearestId && view.nearestInRange;
-    // Phones have no objectives list, so the line stands; elsewhere it appears with a contact.
-    if (view.objectiveId != null && view.objectiveName && !objectiveReady && (touch || inContact)) {
+    // Phones have no objectives panel, so the card stands. Elsewhere the panel's nav line
+    // already names the target and the turn; the card only adds the final aim once in scan range.
+    if (
+      view.objectiveId != null &&
+      view.objectiveName &&
+      !objectiveReady &&
+      (touch || (inContact && view.objectiveInRange))
+    ) {
       const turn = view.objectiveTurnDeg;
       const near =
         view.objectiveDistance <= view.objectiveRadius
@@ -278,7 +284,9 @@ export class ScanOverlay {
         },
       };
     }
-    if (inContact) {
+    // Steering toward a side contact would compete with the objective the nav line leads;
+    // once that contact is aimed at, the optional scan card above still offers it.
+    if (inContact && (view.objectiveId == null || view.nearestId === view.objectiveId)) {
       return {
         scan: {
           kicker: 'SCAN TARGET',

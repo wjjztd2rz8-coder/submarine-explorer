@@ -1,4 +1,5 @@
 import { waitForFrames } from './helpers/frames.js';
+import { GUIDANCE } from './helpers/guidance.js';
 import { homeReady } from './helpers/home.js';
 import { scanWithKeyboard } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
@@ -218,6 +219,10 @@ test.describe('B3 mission flow', () => {
     const panel = page.locator('.objectives-panel');
     await expect(panel.locator('.obj-progress')).toHaveText('1 of 4 objectives · 1 of 2 primary');
     await expect(panel.locator('.obj-nav-target')).toHaveText('→ STERN SECTION');
+    // Guards the desktop repeat of one "where next": while the stern is far, only the nav line
+    // names it (no standing objective card), and the finished bow row has left the list.
+    await expect(page.locator(GUIDANCE.objective)).toHaveCount(0);
+    await expect(panel.locator('.obj-item.is-complete')).toHaveCount(0);
     await page.screenshot({ path: 'tests/e2e/screenshots/mission-objectives.png' });
 
     // Teleport next to the stern, using the same placement as the ?poi= spawn.

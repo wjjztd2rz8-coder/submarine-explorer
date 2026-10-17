@@ -240,7 +240,12 @@ export class ObjectivesPanel {
   }
 
   private renderList(): void {
-    const sorted = [...this.objectives].sort((a, b) => Number(b.primary) - Number(a.primary));
+    // Finished rows collapse into the progress line while something is outstanding,
+    // so the list and the nav line below it both point at what is next.
+    const open = this.objectives.filter((o) => !o.complete);
+    const sorted = [...(open.length ? open : this.objectives)].sort(
+      (a, b) => Number(b.primary) - Number(a.primary),
+    );
     const current = sorted.find((o) => o.id === this.currentId);
     // For a long mission, continue from the active objective and wrap to the
     // next entries if it is near the end of the ordered list.
