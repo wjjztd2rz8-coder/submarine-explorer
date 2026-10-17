@@ -666,7 +666,8 @@ freshTest.describe('scan persistence and fixture debrief', () => {
       await journal.locator('.jr-nav-item[data-target="_test/poi/bow"]').click();
       await expect(journal.locator('.jr-body .jr-title')).toHaveText('The bow section');
       await expect(journal.locator('.jr-tag.is-recreation')).toHaveText('Recreation');
-      await expect(journal.locator('.jr-memorial')).toBeVisible();
+      // Guards the memorial note repeating on every entry: it belongs to the site page only.
+      await expect(journal.locator('.jr-memorial')).toHaveCount(0);
       await expect(journal.locator('.jr-facts tr')).toHaveCount(3);
       await expect(journal.locator('.jr-sources a')).toHaveCount(1);
       // Scanning is suppressed while the Journal is open.
@@ -1890,6 +1891,8 @@ freshTest.describe('scan still', () => {
       expect(order).toBe(true);
       const box = (await hero.boundingBox())!;
       expect(box.width).toBeGreaterThan(150);
+      // Guards the capture pushing the entry text below the fold on short screens.
+      expect(box.height).toBeLessThanOrEqual(viewport.height * 0.33);
       expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
       await page.waitForTimeout(400);
       await reviewScreenshot(page, { path: `${shots}/${viewport.name}.png` });
