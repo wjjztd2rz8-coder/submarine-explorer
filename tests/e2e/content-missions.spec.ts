@@ -116,7 +116,8 @@ test('smoke cases match the shipped catalog', async ({ request }) => {
   const response = await request.get('/data/landmarks/index.json');
   expect(response.ok()).toBe(true);
   const catalog = (await response.json()) as { landmarks: string[] };
-  expect(missionIds).toEqual(catalog.landmarks);
+  // Coverage, not display order: the catalog is ordered for the picker.
+  expect([...missionIds].sort()).toEqual([...catalog.landmarks].sort());
 });
 
 for (const id of missionIds) {
