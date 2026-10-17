@@ -637,7 +637,11 @@ it('scan card guidance points at the mission objective, not the nearest contact'
   const card = (overlay.slot.root as unknown as TouchElement).children[1];
   const [kicker, name, hint] = [card.children[0], card.children[1], card.children[2]];
   try {
+    // Desktop: the mission panel's nav line names a distant objective, so the card stays out.
     f.controls.setTouchMode(false);
+    overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
+    expect(kicker.textContent).not.toBe('OBJECTIVE');
+    f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');
     expect(name.textContent).toBe('Stern section');

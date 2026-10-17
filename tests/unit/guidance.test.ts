@@ -178,10 +178,16 @@ describe('guidance slot', () => {
       overlay.update(scanner.view, keys, null, 0);
       expect(texts(overlay.slot)).toMatchObject({ name: 'First contact', kind: 'discovery' });
       overlay.update(scanner.view, keys, null, DEFAULT_CONFIG.scan.completeBannerSeconds + 0.1);
-      // Hovering beside the logged contact must still tell the pilot where to go next.
-      expect(texts(overlay.slot)).toMatchObject({ name: 'Next contact', kind: 'objective' });
+      // Hovering beside the logged contact must never leave the logged contact's card in
+      // charge. Phones (no mission panel) get the direction on the card; on desktop the panel's
+      // nav line carries it, so the card steps aside rather than repeating it.
       const detail = (overlay.slot.root as unknown as FakeElement).children[1].children[2];
-      expect(detail.textContent).toBe('TURN 90° STARBOARD');
+      if (touch) {
+        expect(texts(overlay.slot)).toMatchObject({ name: 'Next contact', kind: 'objective' });
+        expect(detail.textContent).toBe('TURN 90° STARBOARD');
+      } else {
+        expect(texts(overlay.slot)).toMatchObject({ hidden: true });
+      }
 
       // Free exploration retains its logged-contact confirmation without an objective.
       scanner.setObjective(null);
