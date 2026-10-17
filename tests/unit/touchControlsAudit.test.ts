@@ -913,34 +913,75 @@ it('does not carry unfinished sonar pinch motion into camera zoom', () => {
   }
 });
 
-it.each(['start together', 'meet during pinch'])(
-  'recovers sonar zoom when fingers %s',
-  (gesture) => {
-    const f = fixture();
-    const send = (type: string, id: number, x: number) => {
-      const event = new Event(type);
-      Object.assign(event, { pointerId: id, pointerType: 'touch', clientX: x, clientY: 60 });
-      Object.defineProperty(event, 'target', { value: f.canvas });
-      f.win.dispatchEvent(event);
-    };
-    try {
-      f.sonar.expanded = true;
-      send('pointerdown', 1, 60);
-      send('pointerdown', 2, gesture === 'start together' ? 60 : 100);
-      if (gesture === 'meet during pinch') {
-        send('pointermove', 2, 60);
-        expect(f.sonar.zoomWheel).not.toHaveBeenCalled();
-      }
-      f.sonar.zoomWheel.mockClear();
-      send('pointermove', 2, 61);
-      for (const x of [62, 63, 64]) send('pointermove', 2, x);
+it('keeps diagonal sonar pinch motion through the wheel threshold and reversal', () => {
+  // The threshold is in wheel units; below-threshold events must not discard distance.
+  const f = fixture();
+  f.sonar.expanded = true;
+  const send = (type: string, id: number, distance: number) => {
+    const event = new Event(type);
+    Object.assign(event, {
+      pointerId: id,
+      pointerType: 'touch',
+      clientX: 60 + distance * 0.6,
+      clientY: 60 + distance * 0.8,
+    });
+    Object.defineProperty(event, 'target', { value: f.canvas });
+    f.win.dispatchEvent(event);
+  };
+  try {
+    send('pointerdown', 1, 0);
+    send('pointerdown', 2, 40);
+    for (const distance of [41, 42, 43, 43.25]) send('pointermove', 2, distance);
+    expect(f.sonar.zoomWheel).not.toHaveBeenCalled();
+    send('pointermove', 2, 44);
+    expect(f.sonar.zoomWheel.mock.calls).toEqual([[-1]]);
+    for (const distance of [43, 42, 41, 40.75]) send('pointermove', 2, distance);
+    expect(f.sonar.zoomWheel.mock.calls).toEqual([[-1]]);
+    send('pointermove', 2, 40);
+    expect(f.sonar.zoomWheel.mock.calls).toEqual([[-1], [1]]);
+    expect(f.input.touchZoom).not.toHaveBeenCalled();
+    expect(f.input.touchLook).not.toHaveBeenCalled();
+  } finally {
+    f.controls.dispose();
+  }
+});
+
+it.each(
+  ['start together', 'meet during pinch'].flatMap((gesture) =>
+    [false, true].map((sonar) => ({ gesture, sonar })),
+  ),
+)('recovers finite zoom when fingers $gesture with sonar=$sonar', ({ gesture, sonar }) => {
+  // Both zoom destinations must recover without issuing a reversed or nonfinite delta.
+  const f = fixture();
+  const send = (type: string, id: number, x: number) => {
+    const event = new Event(type);
+    Object.assign(event, { pointerId: id, pointerType: 'touch', clientX: x, clientY: 60 });
+    Object.defineProperty(event, 'target', { value: f.canvas });
+    f.win.dispatchEvent(event);
+  };
+  try {
+    f.sonar.expanded = sonar;
+    send('pointerdown', 1, 60);
+    send('pointerdown', 2, gesture === 'start together' ? 60 : 100);
+    if (gesture === 'meet during pinch') {
+      send('pointermove', 2, 60);
       expect(f.sonar.zoomWheel).not.toHaveBeenCalled();
-      send('pointermove', 2, 65);
+      expect(f.input.touchZoom).not.toHaveBeenCalled();
+    }
+    f.sonar.zoomWheel.mockClear();
+    send('pointermove', 2, 61);
+    for (const x of [62, 63, 64]) send('pointermove', 2, x);
+    expect(f.sonar.zoomWheel).not.toHaveBeenCalled();
+    send('pointermove', 2, 65);
+    if (sonar) {
       expect(f.sonar.zoomWheel).toHaveBeenCalledExactlyOnceWith(-1);
       expect(f.input.touchZoom).not.toHaveBeenCalled();
-      expect(f.input.touchLook).not.toHaveBeenCalled();
-    } finally {
-      f.controls.dispose();
+    } else {
+      expect(f.sonar.zoomWheel).not.toHaveBeenCalled();
+      expect(vi.mocked(f.input.touchZoom).mock.calls).toEqual([[-4], [-4], [-4], [-4]]);
     }
-  },
-);
+    expect(f.input.touchLook).not.toHaveBeenCalled();
+  } finally {
+    f.controls.dispose();
+  }
+});
