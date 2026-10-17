@@ -12,7 +12,7 @@
 
 import * as THREE from 'three';
 import type { EnvPresetName } from '../../core/Config.js';
-import { DEFAULT_WATER, DEEP_OPENINGS, type WaterConfig } from '../../core/Config.js';
+import { DEFAULT_WATER, type WaterConfig } from '../../core/Config.js';
 import { snowReadabilityUniforms } from '../../render/MarineSnow.js';
 import { fitSeabedPlane, mulberry, particleBudget } from './maths.js';
 import { TitanicHorizon } from './TitanicHorizon.js';
@@ -90,32 +90,22 @@ export class WreckPreset implements EnvPreset {
   ) {}
 
   enter(ctx: PresetEnterContext): void {
-    const endurance = ctx.pois.some((poi) => poi.id === 'endurance-hull');
-    const tuning = endurance ? DEEP_OPENINGS.endurance.wreckAtmosphere : null;
+    const policy = ctx.site?.wreck;
+    const hull = policy && ctx.pois.find((poi) => poi.id === policy.hullPoi);
+    const wreck = hull ? policy : undefined;
+    const tuning = wreck?.atmosphere;
     this.params = tuning ? { ...ctx.params, ...tuning } : ctx.params;
     this.maxSizePx = tuning?.maxSizePx ?? 256;
     this.maxBrightness = tuning?.maxBrightness ?? 1_000_000;
     this.scene = ctx.scene;
     this.visuals = ctx.visuals;
-    if (ctx.params.titanicHorizon === true || endurance) {
-      this.horizon = new TitanicHorizon(
-        ctx.scene,
-        endurance
-          ? {
-              upperColor: 0x2c5266,
-              hazeColor: 0x4a7a8c,
-              hazePeakElevation: 0.32,
-              fogLift: 0.4,
-              fogHaze: 0.45,
-            }
-          : undefined,
-      );
-      if (endurance) this.horizon.dome.name = 'enduranceHorizon';
+    if (ctx.params.titanicHorizon === true || wreck) {
+      this.horizon = new TitanicHorizon(ctx.scene, wreck?.horizon);
+      if (wreck) this.horizon.dome.name = wreck.horizon.name;
       this.stats.draws = 1;
     }
     if (!ctx.visuals) return;
-    const hull = ctx.pois.find((poi) => poi.id === 'endurance-hull');
-    if (endurance && hull) {
+    if (hull) {
       const relief = buildEnduranceRelief(ctx.terrain, hull.position);
       ctx.scene.add(relief);
       this.objects.push(relief);

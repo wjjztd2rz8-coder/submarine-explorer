@@ -11,6 +11,7 @@
 import type * as THREE from 'three';
 import type { EnvPresetName, PresetParamValue } from '../../core/Config.js';
 import type { EventBus } from '../../core/EventBus.js';
+import type { SiteManifest } from '../../core/SiteManifest.js';
 import type { AtmosphereSample } from '../../render/Atmosphere.js';
 
 export type PresetParams = Record<string, PresetParamValue>;
@@ -45,6 +46,8 @@ export interface PresetPoi {
 
 /** Everything a preset may read when it is entered. */
 export interface PresetEnterContext {
+  /** Authored site policy; absent for contexts that use only generic preset defaults. */
+  site?: SiteManifest;
   scene: THREE.Scene;
   terrain: PresetTerrain;
   props: readonly PresetProp[];

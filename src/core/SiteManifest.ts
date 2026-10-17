@@ -148,6 +148,28 @@ export interface SiteManifest {
   };
   props?: Record<string, PropManifest>;
   id: string;
+  wreck?: {
+    /** Hull POI gating the local atmosphere, backdrop and ice-scour relief. */
+    hullPoi: string;
+    atmosphere: {
+      hazeParticles: number;
+      hazeSizeM: number;
+      hazeOpacity: number;
+      motesPerHull: number;
+      moteSizeM: number;
+      moteOpacity: number;
+      maxSizePx: number;
+      maxBrightness: number;
+    };
+    horizon: {
+      name: string;
+      upperColor: number;
+      hazeColor: number;
+      hazePeakElevation: number;
+      fogLift: number;
+      fogHaze: number;
+    };
+  };
   terrain?: {
     /** Select an analytic reconstruction where the survey grid cannot resolve the feature. */
     carve?: 'canyon-bend' | 'sinkhole';
@@ -330,6 +352,10 @@ const nonnegative: Check = (id, path, value) => {
   finite(id, path, value);
   if ((value as number) < 0) fail(id, path, 'expected a nonnegative number');
 };
+const fraction: Check = (id, path, value) => {
+  nonnegative(id, path, value);
+  if ((value as number) > 1) fail(id, path, 'expected a fraction from 0 to 1');
+};
 const submergedDepth: Check = (id, path, value) => {
   finite(id, path, value);
   if ((value as number) > 0) fail(id, path, 'expected a depth at or below zero');
@@ -413,9 +439,34 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
     'atmosphere',
     'sonar',
     'terrain',
+    'wreck',
   ]);
   if (root.id !== id) fail(id, 'id', `expected "${id}"`);
   const out: SiteManifest = { id };
+  if (root.wreck !== undefined) {
+    fields({
+      hullPoi: text,
+      atmosphere: fields({
+        hazeParticles: count,
+        hazeSizeM: aboveZero,
+        hazeOpacity: fraction,
+        motesPerHull: count,
+        moteSizeM: aboveZero,
+        moteOpacity: fraction,
+        maxSizePx: aboveZero,
+        maxBrightness: nonnegative,
+      }),
+      horizon: fields({
+        name: text,
+        upperColor: color,
+        hazeColor: color,
+        hazePeakElevation: positiveFraction,
+        fogLift: nonnegative,
+        fogHaze: fraction,
+      }),
+    })(id, 'wreck', root.wreck);
+    out.wreck = root.wreck as SiteManifest['wreck'];
+  }
   if (root.terrain !== undefined) {
     fields(
       {},

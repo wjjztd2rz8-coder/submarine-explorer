@@ -1,5 +1,9 @@
 # S-manifest, step 1: manifest schema and habitat slice
 
+**Closeable (2026-10-17): zero of the original 31 site-id discriminator
+expressions remain.** The final wreck slice is recorded below; outstanding gate
+environment limitations are tracked separately from the completed inventory.
+
 ## Schema
 
 `data/landmarks/<id>/site.json`, typed and validated in `src/core/SiteManifest.ts`.
@@ -48,11 +52,9 @@ variant and apron defaults, and Lost City's inactive-apron habitat. The landed
 [scatter keepout](2240-S-manifest-scatter-keepout.md) and
 [atmosphere policy](2250-S-manifest-atmosphere-policy.md) slices remove rows 1/19
 and 3/10 respectively. Recount on 2026-10-16 found **8 expressions** before the
-sonar slice below, then four after sonar; **2 discriminator expressions now remain**
-after the terrain-carve slice below.
-
-Next: remaining rows from `plan/progress/2110-S-verify-9.md` (20 and 21):
-wreck atmosphere/relief in `WreckPreset.ts`.
+sonar slice below, then four after sonar and two after terrain carve. The final
+wreck slice removes rows 20 and 21: **0 discriminator expressions now remain**
+from `plan/progress/2110-S-verify-9.md`. No further slice is needed for that inventory.
 Shared numeric material defaults stay shared; the gallery-apron config default is a derived view
 of site data, preserving generic fallback behavior and explicit config overrides.
 
@@ -207,6 +209,91 @@ Validation:
   sonar render baselines match exactly, and the reconstruction code is unchanged.
   Full gates and screenshot acceptance need a rerun where preview startup and
   the recorded tooling subprocess failures can be resolved.
+
+## Wreck atmosphere/relief slice (2026-10-17)
+
+Migrated the final two expressions, inventory rows 20 and 21 in
+`WreckPreset.ts`. The optional, strictly validated `wreck` policy owns the hull
+POI reference, eight particle values, five horizon values and the existing dome
+name. Only Endurance authors it. `PresetSystem` supplies the current landmark's
+manifest; the preset finds that configured POI once and uses it for atmosphere,
+horizon and relief eligibility and for the relief position. The sonar policy is
+unchanged and references the same authored hull.
+
+Missing manifest, missing wreck policy and missing configured hull retain generic
+wreck behavior. An explicit `titanicHorizon` still enables its original fallback
+without a hull. Authored particle values retain precedence over mission overrides,
+without mutating either input. Low retains the horizon and skips particles and
+relief. All seeds, shaders, geometry builders, numeric values and draw accounting
+are unchanged. Endurance's old `DEEP_OPENINGS.endurance.wreckAtmosphere` row is deleted;
+its remaining water/light configuration is outside this slice.
+
+Net simplification: two identity predicates and two POI traversals become one
+data-owned anchor lookup. The consumer is ten lines shorter, and eleven lines
+of the old tuning row are removed. Strict schema/validation adds 51 production
+TypeScript lines and context wiring adds five; this small schema cost removes
+identity knowledge and selected numeric tuning from the consumer. No new lookup
+table, strategy framework, setting or UI is added.
+
+Before runtime edits, extended the existing atmosphere capability spec and froze
+nine scene snapshots across Low/Medium/High, authored/generic wrecks and the
+explicit-horizon fallback without a hull. These record hashes of every geometry
+attribute/index and shader, plus particle uniforms, atmosphere/fog, transforms,
+visibility, material flags and draw/particle/light stats. Baseline: **13 tests
+passed**. Snapshot SHA-256:
+`bb7ca66d0ede5eb9b7eb1e746cfd8ffee25982f6871f464dcf27680ca48e9805`.
+No snapshot update was run after the runtime migration.
+
+Capability checks move policy to an unknown site and rename the anchor across all
+three tiers, remove policy while retaining the old hull id, remove/mismatch the
+configured hull, change authored tuning, select a moved anchor among competing
+POIs and preserve mission-override precedence. The existing preset-system table
+also exercises manifest forwarding across all 13 sites plus an unknown site on
+all three tiers with the same hull id present everywhere. Validator table cases
+cover omitted policy, missing/unknown fields, malformed sections, invalid strings,
+nonfinite/wrong-type values, invalid counts/colors/sizes/fractions and disabled
+particle/fog values. Shipped-content checks require the configured POI to exist
+and agree with the unchanged sonar reference.
+
+Recount: reviewed all 17 files from the original 31-expression inventory (including
+the removed `MontereyOpening.ts`, now the generic `GroupOpening.ts`) and searched
+all `src/` TypeScript for shipped site, prop and POI identity literals. **Zero
+inventory discriminators remain; S-manifest is closeable.** Data-selected strategy
+checks, configured-ID lookups, indexed tuning tables, model-family dispatch,
+content definitions and startup/title resource selection are outside the original
+count, as documented by the inventory and previous terrain slice. They do not
+justify another migration in this brief. `plan/DIRECTOR.md` is left for the owner
+to close the backlog item.
+
+Validation:
+
+- Focused atmosphere, manifest validation, preset system, terrain features, sonar
+  equivalence, horizon and shared scour suites: **578 tests in seven files passed**
+  (48.19 s). The nine pre-edit wreck scenes, four frozen terrain snapshots and
+  all 36 frozen sonar snapshots match unchanged baselines.
+- The production build includes typecheck and passed. `git diff --check` passed.
+- Structural comparisons against `HEAD`: Endurance's JSON differs only by its
+  new `wreck` section; `deepOpenings.ts` differs only by removal of the migrated
+  row; all particle generation/update/disposal code and shaders are byte-identical.
+  Terrain, sonar, relief and horizon algorithms, all existing snapshots and all
+  golden files are untouched.
+- Full gate invocation: `GATES_CONFIG_MODE=writable PW_PORT=4233 bash tools/gates.sh`
+  (default smoke + project-base). Logs: `.cache/runs/20261017-010325-3-NkHwdJ/`.
+  **Completed, exit 1.** Config, content, production build (including typecheck),
+  unit, attribution and repository-wide Prettier passed. Unit: **3,014 tests in
+  192 files passed** (570.04 s). The project-base production build also passed.
+- Python: **161/166 passed**. The same five failures recorded by earlier slices
+  recur: four build-manifest provenance cases report `spawnSync git EPERM`; the
+  unchanged golden CLI tooling case fails parsing empty subprocess stdout with
+  `Unexpected end of JSON input` at `golden-manifest.test.mjs:151`.
+- Smoke and project-base e2e both stop before tests because their owned preview
+  cannot start. A direct bind check confirms
+  `listen EPERM: operation not permitted 127.0.0.1:4233`. Browser screenshot
+  acceptance remains unverified in this sandbox. All existing golden files and
+  frozen terrain/sonar outputs remain unchanged; full gates and screenshot
+  acceptance require a rerun where preview startup and the recorded tooling
+  subprocess failures can be resolved.
+- Final progress-note formatting and `git diff --check`: **passed**.
 
 ## How to brief a migration
 
