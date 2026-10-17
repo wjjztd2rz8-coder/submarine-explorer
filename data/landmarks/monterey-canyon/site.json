@@ -22,9 +22,9 @@
     "freeDive": {
       "hero": "canyon-wall-ledge",
       "bearing": 0,
-      "range": 34,
-      "altitude": 10,
-      "yawOffset": 6,
+      "range": 40,
+      "altitude": 16,
+      "yawOffset": 28,
       "turnWeight": 3,
       "chaseRadius": 64,
       "chaseOffsetY": -2,
