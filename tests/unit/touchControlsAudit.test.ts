@@ -607,11 +607,12 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(hint.textContent).toBe('SINK TOWARD TARGET');
-    // A scannable contact keeps the scan prompt.
+    // A scannable contact beside the objective is optional and keeps the objective's direction.
     view.candidateId = 'debris';
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
+    expect(kicker.textContent).toContain('OPTIONAL');
     expect(name.textContent).toBe('Debris field');
-    expect(hint.textContent).toBe('HOLD SCAN TO SCAN');
+    expect(hint.textContent).toContain('Stern section');
     // No objective: nearest-contact guidance as before.
     view.candidateId = null;
     view.objectiveId = null;
