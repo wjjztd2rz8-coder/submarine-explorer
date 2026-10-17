@@ -92,6 +92,127 @@ function ridgedTile(cols = 40, rows = 34) {
   });
 }
 
+describe('terrain terrace capability', () => {
+  const profile = base.fidelity!['lost-city'];
+  const tile = (id = 'lost-city', flat = false) =>
+    makeSyntheticTile({
+      id,
+      cols: 33,
+      rows: 33,
+      centerLat: profile.focus.lat,
+      centerLon: profile.focus.lon,
+      cellsizeDeg: 0.0001,
+      height: (c, r) => -850 + (flat ? 0 : c * 5 + r * 3),
+    });
+  const withoutTerraces = structuredClone(base);
+  delete withoutTerraces.fidelity!['lost-city'].terrace;
+
+  for (const tier of ['low', 'medium', 'high'] as const) {
+    it(`${tier}: bounds and repeats shelves, gates them by slope/focus/strength, and preserves Low`, () => {
+      const before = JSON.stringify(base);
+      const current = new Terrain(tile(), base, tier);
+      const legacy = new Terrain(tile(), withoutTerraces, tier);
+      const flat = new Terrain(tile('lost-city', true), base, tier);
+      const flatLegacy = new Terrain(tile('lost-city', true), withoutTerraces, tier);
+      const pure = new Terrain(tile(), { ...base, detailStrength: 0 }, tier);
+      const renamed = new Terrain(
+        tile('terraced-fixture'),
+        {
+          ...base,
+          fidelity: { 'terraced-fixture': profile },
+        },
+        tier,
+      );
+      try {
+        const deltas: number[] = [];
+        for (let i = 0; i < 100; i++) {
+          const x = ((i * 37.13) % 240) - 120;
+          const z = ((i * 17.71) % 240) - 120;
+          const height = current.detailHeight(x, z);
+          const delta = height - legacy.detailHeight(x, z);
+          expect(Number.isFinite(height)).toBe(true);
+          expect(current.detailHeight(x, z)).toBe(height);
+          expect(renamed.detailHeight(x, z)).toBe(height);
+          expect(renamed.sampleHeight(x, z)).toBe(current.sampleHeight(x, z));
+          expect(Math.abs(delta)).toBeLessThanOrEqual(
+            profile.terrace!.periodM * profile.terrace!.amount * base.detailStrength * 0.5,
+          );
+          expect(flat.detailHeight(x, z)).toBe(flatLegacy.detailHeight(x, z));
+          expect(pure.detailHeight(x, z)).toBe(0);
+          expect(pure.sampleHeight(x, z)).toBe(pure.sampleDataHeight(x, z));
+          deltas.push(delta);
+        }
+        const outside = profile.focus.radiusM + profile.focus.fadeM + 1;
+        expect(current.detailHeight(outside, 0)).toBe(legacy.detailHeight(outside, 0));
+        if (tier === 'low') {
+          expect(deltas.every((delta) => delta === 0)).toBe(true);
+          expect(current.stats).toEqual(legacy.stats);
+          const a = current.group.children.filter((o) => o instanceof THREE.Mesh);
+          const b = legacy.group.children.filter((o) => o instanceof THREE.Mesh);
+          for (let i = 0; i < a.length; i++) {
+            for (const key of Object.keys(a[i].geometry.attributes))
+              expect(a[i].geometry.getAttribute(key).array).toEqual(
+                b[i].geometry.getAttribute(key).array,
+              );
+            expect(a[i].geometry.index!.array).toEqual(b[i].geometry.index!.array);
+          }
+        } else {
+          // Exercise both the tread and the riser, rather than passing with a disabled term.
+          expect(Math.min(...deltas)).toBeLessThan(-0.3);
+          expect(Math.max(...deltas)).toBeGreaterThan(0.1);
+        }
+        expect(JSON.stringify(base)).toBe(before);
+      } finally {
+        for (const t of [current, legacy, flat, flatLegacy, pure, renamed]) t.dispose();
+      }
+    });
+  }
+
+  for (const tier of ['medium', 'high'] as const) {
+    it(`${tier}: terrace triangles agree with physics between vertices and across chunk seams`, () => {
+      const terrain = new Terrain(tile(), base, tier);
+      const ray = new THREE.Raycaster();
+      const seen = new Map<string, number>();
+      let shared = 0;
+      try {
+        const meshes = terrain.group.children.filter((o) => o instanceof THREE.Mesh);
+        expect(meshes.length).toBeGreaterThan(1);
+        for (const mesh of meshes) {
+          for (const attribute of Object.values(
+            mesh.geometry.attributes as Record<string, THREE.BufferAttribute>,
+          ))
+            expect(Array.from(attribute.array).every(Number.isFinite)).toBe(true);
+          const pos = mesh.geometry.getAttribute('position');
+          const surface = pos.count - skirtVertexCount(mesh.geometry);
+          for (let i = 0; i < surface; i++) {
+            const x = pos.getX(i),
+              z = pos.getZ(i),
+              y = pos.getY(i);
+            expect(Math.abs(terrain.sampleHeight(x, z) - y)).toBeLessThan(0.001);
+            const key = `${x}|${z}`;
+            if (seen.has(key)) {
+              expect(y).toBe(seen.get(key));
+              shared++;
+            } else seen.set(key, y);
+          }
+        }
+        expect(shared).toBeGreaterThan(50);
+        for (let i = 0; i < 60; i++) {
+          // Non-lattice probes catch analytic-height collision against a faceted tread.
+          const x = ((i * 41.39) % 240) - 120;
+          const z = ((i * 23.17) % 240) - 120;
+          ray.set(new THREE.Vector3(x, 0, z), new THREE.Vector3(0, -1, 0));
+          const hit = ray.intersectObjects(meshes)[0];
+          expect(hit).toBeDefined();
+          expect(Math.abs(hit.point.y - terrain.sampleHeight(x, z))).toBeLessThan(0.001);
+        }
+      } finally {
+        terrain.dispose();
+      }
+    });
+  }
+});
+
 describe('terrain scour moat', () => {
   it('dips toward the footprint, lifts a rim beyond it, and tints only the rim', () => {
     const profile = base.fidelity!.titanic!;
