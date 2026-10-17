@@ -546,6 +546,8 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
                 ...prop.smoker,
                 topFraction: prop.smoker.topFraction ?? 0.45,
                 throatColor: prop.smoker.throatColor ?? 0,
+                bodyShade: prop.smoker.bodyShade ?? 0.95,
+                bodyGlow: prop.smoker.bodyGlow ?? 0.16,
               },
             }
           : prop,
