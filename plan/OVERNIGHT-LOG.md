@@ -1395,3 +1395,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-lostcity-slope slice 1 (stepped terrace relief via terrain fidelity data; ~3.8-3.9; Low unchanged, treads faceted).
 - **Codex:** queue 2400 S-manifest, 2410 S-verify-17, 2420 S-bughunt-18 waits (dispatch said budget low).
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 01:26 CDT headless run 40 (Claude)
+
+- **Tagged f58** (CI green on run 39's main; Pages ok).
+- **Merged (smoke + project-base green; no full e2e):** Sonnet V-bluehole-hood slice 1 (warped terraces, cracks, darker hood interior via the hood flag; before/after east frame clearly more irregular; ~3.8). Underside geometry and pale sand shelf remain.
+- **Codex:** queue 2400 S-manifest, 2410 S-verify-17, 2420 S-bughunt-18 still waits (dispatch said budget low; Codex 5h resets 02:00).
+- **Needs owner:** real-phone Low-tier play.
