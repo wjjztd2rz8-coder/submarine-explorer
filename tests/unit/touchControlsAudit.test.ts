@@ -641,6 +641,12 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     f.controls.setTouchMode(false);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).not.toBe('OBJECTIVE');
+    // In scan range the card returns on desktop with the aim cue, for the same target.
+    view.objectiveInRange = true;
+    overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
+    expect(kicker.textContent).toBe('OBJECTIVE');
+    expect(name.textContent).toBe('Stern section');
+    view.objectiveInRange = false;
     f.controls.setTouchMode(true);
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toBe('OBJECTIVE');

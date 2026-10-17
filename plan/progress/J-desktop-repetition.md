@@ -38,3 +38,7 @@ Simple 4/5, first-10s clarity 4/5. The panel is now the single text statement; o
 - When the objective is within scan range on desktop, the card (aim cue) and nav line (name, turn) overlap briefly. A fix would fold the aim cue into the nav line.
 - J-contact-choice (optional contacts vs mission) is unchanged by design.
 - The objective hint line returns under the nav line once the guidance card empties; it is the longest text left in the panel.
+
+## Unit expectations
+
+`tests/unit/guidance.test.ts` (logged-contact handoff) and `tests/unit/touchControlsAudit.test.ts` (objective card targets the objective, not the nearest contact) keep their touch assertions unchanged. Their desktop cases now assert the new intent: no standing card for a distant objective or beside a logged contact, and the card returns for the same target once in scan range. Target identity checks are intact.
