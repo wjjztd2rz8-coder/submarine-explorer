@@ -1424,5 +1424,12 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Needs owner:** real-phone Low-tier play.
 
 ## 2026-10-17 08:31 CDT headless run 44 (Claude): targeted review
+
 - Raised e2e timeouts for hud-touch boost depletion and journal-debrief banner (CI-only slowness since Titanic seabed slice 2). See REVIEWS.md. Codex queue waits on weekly pacing (62% < ~73% floor).
+- **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 09:01 CDT headless run 45 (Claude)
+
+- **Merged (smoke + project-base green; no full e2e):** Sonnet J-journal-preview (capture height capped, memorial note shown once on the site page; portrait Journal now shows entry text above the fold). Debris-field capture still shows the bow (needs scan-time camera aim; left in backlog).
+- **Codex:** queue 2430, 2440, 2450, 2460 waits (weekly pacing). No tag.
 - **Needs owner:** real-phone Low-tier play.
