@@ -20,6 +20,14 @@ since=f'--since=@{int(now-last)}' if last<1e8 else ''
 if last<1e8:
     if sh(f'git log {since} --merges --oneline | wc -l').strip().isdigit() and int(sh(f'git log {since} --merges --oneline | wc -l'))>=8: why['comprehensive'].append('8+ merges since the last review')
     if sh(f'git log {since} --simplify-by-decoration --decorate --oneline | grep -c "tag: f"').strip() not in ('','0') and last>12*3600: why['comprehensive'].append('new release tag')
+def claude_week_ok():
+    # Same weekly pacing as resume.sh claude_ok: a run blocked by the weekly gate is deliberate, not idle.
+    try:
+        import json
+        w=json.loads(sh('ai-limits --json')).get('claude',{}).get('seven_day') or {}
+        days=max(0,min(7,((w.get('resets_at') or now)-now)/86400))
+        return 100-w['used']>=max(10,7+93*days/7-20)
+    except Exception: return True
 log=open('plan/OVERNIGHT-LOG.md').read()
 runs=re.split(r'\n## ',log)[-3:]
 if len(runs)==3 and all(re.search(r'Nothing merged|nothing to do|no unblocked',r,re.I) for r in runs):
@@ -29,7 +37,7 @@ if len(ci)==3 and all(c=='failure' for c in ci): why['targeted'].append('CI red 
 try:
     rows=list(csv.DictReader(open('.cache/metrics/usage.csv')))[-4:]
     num=lambda v: float(v) if v not in ('','-') else -1
-    if len(rows)==4 and all(num(r['claude5h'])>=50 and r['run']=='0' for r in rows) and not any(now-os.path.getmtime(os.path.join('.cache',f))<2*3600 for f in os.listdir('.cache') if f.startswith('resume-2')): why['targeted'].append('Claude idle at >=50% for 2 h')
+    if len(rows)==4 and claude_week_ok() and all(num(r['claude5h'])>=50 and r['run']=='0' for r in rows) and not any(now-os.path.getmtime(os.path.join('.cache',f))<2*3600 for f in os.listdir('.cache') if f.startswith('resume-2')): why['targeted'].append('Claude idle at >=50% for 2 h')
     if len(rows)==4 and all(num(r['codex5h'])>=30 and int(r['codex_running'] or 0)<2 and int(r['codex_queued'] or 0)==0 for r in rows): why['targeted'].append('Codex starved for 2 h (empty queue)')
 except Exception: pass
 fails=sh('find .cache/codex -name "*-result.md" -mtime -2 -print0 2>/dev/null | xargs -0 -r grep -h "^FAIL" 2>/dev/null | sort | uniq -c | sort -rn | head -1').split()

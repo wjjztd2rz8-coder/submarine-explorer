@@ -2,6 +2,10 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-17 targeted review (idle trigger)
+
+- Trigger was a false positive: runs were skipped by the weekly pacing gate, not by a scheduling fault. Fixed the trigger (see PROCESS-LOG.md). No backlog changes; Claude and Codex both resume as weekly pacing allows. CI on main green (run 47).
+
 ## 2026-10-17 08:30 targeted review (CI red x3; Claude idle at >=50%)
 
 - **CI red:** four consecutive reds since the titanic-seabed slice 2 merge. Failing specs: `hud-touch` boost-depletion (wall-bound frame pump, 45 s, failed on retry too), `journal-debrief` primaries banner (8 s, Titanic) and `d-shell` (240 s software-GL stall, once). All pass locally in 4-9 s; the Titanic scene got heavier, so hosted software GL is slower. Fix: timeouts raised (pump 120 s for boost, banner 30 s); gates green, pushed. If CI is still red, next step is a Titanic Low-tier frame-cost cut, not more timeout.
