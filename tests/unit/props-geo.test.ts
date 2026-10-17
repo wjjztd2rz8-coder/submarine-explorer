@@ -82,7 +82,7 @@ describe('spire buffer boundaries', () => {
 
 describe('smoker profile capability', () => {
   for (const tier of ['low', 'medium', 'high']) {
-    it(`${tier}: applies validated taper and throat colour to an arbitrary prop id`, () => {
+    it(`${tier}: applies validated taper, body shade and throat colour to an arbitrary prop id`, () => {
       const authored = manifests.propManifest('beebe-chimney-1')!.smoker!;
       const profile = manifests.validateSiteManifest(
         {
@@ -126,7 +126,7 @@ describe('smoker profile capability', () => {
         expect(
           (body.material as THREE.MeshStandardMaterial).color.r /
             (plainBody.material as THREE.MeshStandardMaterial).color.r,
-        ).toBeCloseTo(0.95 / 1.25);
+        ).toBeCloseTo(authored.bodyShade / 1.25);
         expect(plain.full.getObjectByName('beebe-orifices')).toBeUndefined();
       } finally {
         lookup.mockRestore();

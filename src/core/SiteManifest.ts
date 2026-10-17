@@ -119,6 +119,10 @@ export type SmokerProfile = ChimneyShape &
     mouthColor: number;
     /** Mouth-disc emissive RGB (0x000000–0xffffff); defaults to unlit black (0). */
     throatColor: number;
+    /** Body albedo multiplier in (0, 1]; omitted data keeps the 0.95 smoker default. */
+    bodyShade: number;
+    /** Self-lit crust tint strength in (0, 1]; omitted data keeps the 0.16 smoker default. */
+    bodyGlow: number;
     collarColor: number;
     collarEmissive: number;
     mainShelves: number;
@@ -412,7 +416,12 @@ const propCheck = fields(
         sideShelves: count,
         outletCount: count,
       },
-      { topFraction: positiveFraction, throatColor: color },
+      {
+        topFraction: positiveFraction,
+        throatColor: color,
+        bodyShade: positiveFraction,
+        bodyGlow: positiveFraction,
+      },
     ),
     chimney: fields({
       ...numericFields(chimneyVariationKeys, aboveZero),
