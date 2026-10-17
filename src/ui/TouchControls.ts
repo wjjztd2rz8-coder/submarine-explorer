@@ -46,6 +46,7 @@ export class TouchControls {
   private readonly opts: TouchControlsOptions;
   private touchMode: boolean;
   private shouldShow = false;
+  private photoMode = false;
   private readonly stickBase: HTMLDivElement;
   private readonly stickKnob: HTMLDivElement;
   private readonly sliderTrack: HTMLDivElement;
@@ -165,6 +166,7 @@ export class TouchControls {
    */
   update(inDive: boolean, photo: boolean, boostAllowed = true): void {
     if (this.disposed) return;
+    this.photoMode = photo;
     const show = this.touchMode && inDive && !photo;
     // progress can reject the sampled boost once its meter is empty. Drop the
     // latch so recovery never silently restarts boost without another tap.
@@ -229,8 +231,8 @@ export class TouchControls {
     // from the new geometry rather than retaining thrust or old look positions.
     const resetLayout = (): void => {
       this.releaseAll();
-      // A drag or pinch may already be queued for the next animation frame.
-      this.input.endFrame();
+      // Discard both accumulated camera motion and shortcuts not yet sampled.
+      this.input.clear();
       if (window.innerHeight <= window.innerWidth) {
         this.rotateHint.hidden = true;
         window.clearTimeout(this.hintTimer);
@@ -383,6 +385,9 @@ export class TouchControls {
   /** Drag to look, two fingers to pinch, double-tap to reset (all on the view). */
   private bindCamera(): void {
     const canvas = this.opts.canvas;
+    // Photo mode hides the map; its camera owns gestures even if the map
+    // will still be expanded when the player returns to the dive.
+    const mapExpanded = (): boolean => this.opts.sonar.expanded && !this.photoMode;
     const touchAction = canvas.style.touchAction;
     canvas.style.touchAction = 'none';
     this.disposers.push(() => {
@@ -392,7 +397,7 @@ export class TouchControls {
       if (target === canvas) return true;
       // While the sonar map is expanded a pinch on it zooms the map.
       return (
-        this.opts.sonar.expanded &&
+        mapExpanded() &&
         target instanceof HTMLElement &&
         target.closest('.sonar, .d-sonar-backdrop') !== null
       );
@@ -416,7 +421,7 @@ export class TouchControls {
       });
       if (this.looks.size >= 2) {
         this.pinchDist = dist();
-        this.pinchSonar = this.opts.sonar.expanded;
+        this.pinchSonar = mapExpanded();
         for (const p of this.looks.values()) p.tap = false;
         this.doubleTap = new DoubleTap();
       }
@@ -425,9 +430,9 @@ export class TouchControls {
       const p = this.looks.get(e.pointerId);
       if (!p) return;
       // A map toggle must not send its unfinished zoom step to the camera (or vice versa).
-      if (this.pinchSonar !== this.opts.sonar.expanded) {
+      if (this.pinchSonar !== mapExpanded()) {
         this.pinchDist = dist();
-        this.pinchSonar = this.opts.sonar.expanded;
+        this.pinchSonar = mapExpanded();
       }
       const dx = e.clientX - p.x;
       const dy = e.clientY - p.y;
@@ -442,7 +447,7 @@ export class TouchControls {
           return;
         }
         const delta = pinchWheelDelta(this.pinchDist, d);
-        if (this.opts.sonar.expanded) {
+        if (mapExpanded()) {
           // Keep sub-threshold motion so a slow pinch can reach the next zoom step.
           if (Math.abs(delta) > 14) {
             this.opts.sonar.zoomWheel(delta < 0 ? -1 : 1);
@@ -452,7 +457,7 @@ export class TouchControls {
           this.pinchDist = d;
           this.input.touchZoom(delta);
         }
-      } else if (!this.opts.sonar.expanded) {
+      } else if (!mapExpanded()) {
         this.input.touchLook(dx, dy);
       }
     };

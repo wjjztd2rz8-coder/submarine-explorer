@@ -47,6 +47,34 @@ function saved(storage: MemoryStorage): { version: number; photos: Photo[] } {
 }
 
 describe('PhotoStore', () => {
+  it.each(['YQ==', 'YWI=', 'YWJj', 'YQ', 'YWI'])(
+    'retains decodable legacy base64 %s with or without padding',
+    (payload) => {
+      const storage = new MemoryStorage();
+      const old = photo(1, { image: `data:image/jpeg;base64,${payload}` });
+      storage.map.set(PHOTO_STORAGE_KEY, JSON.stringify({ version: 1, photos: [old] }));
+      expect(new PhotoStore(storage).photos).toEqual([old]);
+    },
+  );
+
+  it.each(['', 'not!base64', 'A', 'YQ=', 'YQ===', 'Y=Q='])(
+    'drops a damaged image payload %j while retaining and round-tripping old photos',
+    (payload) => {
+      const storage = new MemoryStorage();
+      const damaged = photo(2, { image: `data:image/jpeg;base64,${payload}` });
+      storage.map.set(
+        PHOTO_STORAGE_KEY,
+        JSON.stringify({ version: 1, photos: [damaged, photo(1)] }),
+      );
+      const store = new PhotoStore(storage);
+      expect(store.photos).toEqual([photo(1)]);
+      expect(() => atob(store.photos[0]!.image.split(',')[1]!)).not.toThrow();
+      expect(store.save(damaged).saved).toBe(false);
+      expect(store.save(photo(3))).toEqual({ saved: true, dropped: 0 });
+      expect(new PhotoStore(storage).photos).toEqual([photo(3), photo(1)]);
+    },
+  );
+
   it('saves newest first under its own versioned key and reloads', () => {
     const storage = new MemoryStorage();
     storage.map.set(DISCOVERY_STORAGE_KEY, '{"version":1,"discovered":{},"stats":{"scans":0}}');

@@ -33,10 +33,16 @@ function safeStorage(): PhotoStorage | null {
 function isPhoto(value: unknown): value is Photo {
   if (!value || typeof value !== 'object') return false;
   const p = value as Partial<Photo>;
+  const encoded =
+    typeof p.image === 'string' ? p.image.slice('data:image/jpeg;base64,'.length) : '';
   return (
     typeof p.id === 'string' &&
     typeof p.image === 'string' &&
     p.image.startsWith('data:image/jpeg;base64,') &&
+    // A damaged old image must not make Download all throw during base64 decoding.
+    /^[A-Za-z0-9+/]+={0,2}$/.test(encoded) &&
+    encoded.length % 4 !== 1 &&
+    (!encoded.includes('=') || encoded.length % 4 === 0) &&
     typeof p.siteId === 'string' &&
     typeof p.siteName === 'string' &&
     (p.poiId === null || typeof p.poiId === 'string') &&

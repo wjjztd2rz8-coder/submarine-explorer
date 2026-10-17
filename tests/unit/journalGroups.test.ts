@@ -174,6 +174,19 @@ it('removes the rotation listener before another Journal is created', () => {
   }
 });
 
+it('moves focus to the article when rotation hides the connected spoilers switch', () => {
+  journal.setStore({ isDiscovered: () => true });
+  journal.open('site-entry');
+  const box = find((el) => el.tagName === 'INPUT');
+  // The phone stylesheet hides the desktop nav, including its still-connected switch.
+  vi.spyOn(box, 'getClientRects').mockImplementation(() => (phoneQuery.matches ? [] : [{}]));
+  box.focus();
+  phoneQuery.matches = true;
+  phoneQuery.dispatchEvent(new Event('change'));
+  expect(box.isConnected).toBe(true);
+  expect(document.activeElement).toBe(find((el) => el.className === 'jr-body'));
+});
+
 it('opens the current site and points of interest, keeping other sites/categories collapsed', () => {
   expect(header('reef').attributes['aria-expanded']).toBe('true');
   expect(header('wreck').attributes['aria-expanded']).toBe('false');

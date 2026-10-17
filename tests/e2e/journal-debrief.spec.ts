@@ -32,6 +32,36 @@ import secretSample from '../fixtures/legacy-save-secret-sample.json' with { typ
 import heroStars from '../fixtures/legacy-save-hero-stars.json' with { type: 'json' };
 import type { Progress } from '../../src/game/Progress.js';
 
+freshTest(
+  'Journal rotation releases focus from the hidden desktop spoilers switch',
+  async ({ page }) => {
+    // Regression guard: rotation hid the focused input in the desktop nav,
+    // leaving keyboard ownership on an invisible control in the phone sheet.
+    await loadDive(page, '/?tile=great-blue-hole&tier=low&tutorial=0');
+    await page.evaluate(async () => {
+      const { journal, discovery } = window.__game as unknown as {
+        journal: Journal;
+        discovery: Discovery;
+      };
+      discovery.store.record('great-blue-hole', 'great-blue-hole-stalactites');
+      await journal.load();
+      journal.open('overview');
+    });
+    const journal = page.locator('.journal');
+    const box = journal.locator('.jr-spoilers input');
+    await box.focus();
+    await expect(box).toBeFocused();
+    await page.setViewportSize({ width: 600, height: 900 });
+    await expect(journal).toHaveClass(/is-phone/);
+    await expect(box).toBeHidden();
+    await expect(journal.locator('.jr-body')).toBeFocused();
+    await page.keyboard.press('Tab');
+    expect(await journal.evaluate((root) => root.contains(document.activeElement))).toBe(true);
+    await page.keyboard.press('Escape');
+    await expect(journal).toBeHidden();
+  },
+);
+
 freshTest.describe('legacy save persistence', () => {
   for (const [name, fixture] of [
     ['spent kit', spentKit],

@@ -9,6 +9,42 @@ import { mkdir } from 'node:fs/promises';
 const shots = '.cache/codex/shots/d-sonar';
 const d2Shots = '.cache/codex/shots/d2-sonarphoto';
 
+test('expanded sonar yields wheel and range shortcuts to Journal and photo mode', async ({
+  page,
+}) => {
+  // Regression guard: expanded sonar consumed Journal scrolling and changed
+  // its range behind the modal when wheel or +/- shortcuts were used.
+  await page.goto('/?tile=great-blue-hole&tier=low&tutorial=0');
+  await page.waitForFunction(() => window.__gameReady === true);
+  await page.keyboard.press('m');
+  await expect(page.locator('.sonar')).toHaveClass(/d-sonar-expanded/);
+  await page.keyboard.press('j');
+  await expect(page.locator('.journal')).toBeVisible();
+  const range = page.locator('.d-sonar-range');
+  const before = await range.textContent();
+  const consumed = await page.locator('.jr-body').evaluate((body) => {
+    const event = new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY: -100 });
+    body.dispatchEvent(event);
+    return event.defaultPrevented;
+  });
+  expect(consumed).toBe(false);
+  await page.keyboard.press('Equal');
+  await expect(range).toHaveText(before!);
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Equal');
+  await expect(range).not.toHaveText(before!);
+  const restored = await range.textContent();
+  await page.keyboard.press('p');
+  await expect(page.locator('.photo-mode')).toBeVisible();
+  const radius = () =>
+    page.evaluate(() => (window.__game as { rig: { orbitRadius: number } }).rig.orbitRadius);
+  const photoRadius = await radius();
+  await page.mouse.move(640, 400);
+  await page.mouse.wheel(0, 300);
+  await expect.poll(radius).toBeGreaterThan(photoRadius);
+  await expect(range).toHaveText(restored!);
+});
+
 interface MarkerState {
   poiId: string;
   icon: string;
