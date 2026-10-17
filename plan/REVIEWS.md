@@ -2,6 +2,22 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-17 evening comprehensive review (Claude alone; Sol skipped, Codex 5h 12%, exit 75)
+
+**Changed since last review (8 merges):** V-titanic-seabed slice 3, J-journal-preview, J-contact-choice, J-picker-density, J-desktop-repetition; Codex S-verify 18/beebe/titanic guards, S-bughunt 19, S-manifest closed (zero site-id discriminators left). Golden 2026-10-17-231115.
+
+**Scores, readable / beautiful:** Titanic 4 / 3.8 (plating varied, trail visible; hull cast pink, opening frame small and dark); Lost City 4 / 3.9 (terraces read; tower flat pale); Blue Hole 3.5 / 3.6 (hood now irregular with stalactites, but an oversized blue fish and a blue shard in frame); Beebe 3.5 / 3.9 (warm orifice glow and flank, smoker plume good; flank still dark brown mass); Monterey 4 / 3.7 (banded wall unchanged); Challenger 3.5 / 3.6 (lander reads, flat); Endurance 3.5 / 3.4 (lobsters and anemones blown out white). No hero consistently at 4.
+
+**Biggest gaps:** close-frame rendering oddities (Blue Hole fish/shard, Endurance whites, Titanic pink) and Monterey banding. Added V-closeup-artifacts and V-lostcity-slice2 to the Backlog.
+
+**Play:** no new flow captures this review; journey P2s are all merged, desktop card/nav overlap in scan range noted. Needs a fresh walkthrough once Codex budget returns.
+
+**Process:** efficiency: weekly pacing gates both lanes (Claude 48% left ~12%/day, Codex 86% ~22%/day); no failed timer runs. CI on 22:35 main failed (cause not extracted; run 51 CI pending), prior reds were CI-only hangs. Codex queue 2490-2510 waits on 5h budget. Not a joint review: Sol skipped for budget.
+
+**Stage:** about 82% to 1.0, four weeks targeted (unchanged; art gains small per package).
+
+**Needs owner:** real-phone Low-tier play.
+
 ## 2026-10-17 17:00 targeted review (Claude idle at >=50%)
 
 - Cause: weekly pacing again (gate cleared only once the week crossed ~48%); not a scheduling fault. Codex queue also released (6 tasks, 3 running: 2470/2480 verifications plus 2460).

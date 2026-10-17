@@ -1,4 +1,4 @@
-# Status (2026-10-17, review joint with Codex Sol)
+# Status (2026-10-17 evening, Claude-alone review; Sol skipped for budget)
 
 **Stage:** about 82% to 1.0. Four weeks targeted, 4-6 allowed.
 
@@ -18,6 +18,8 @@
 Titanic seabed slice 2 (scour moat, debris trail), Blue Hole hood, Lost City slope terraces, Beebe close lighting, Monterey pose, Endurance wreck policy in site data, verification and bug-hunt tests.
 
 ## Left
+
+New: V-closeup-artifacts (Blue Hole fish/shard, Endurance blown-out whites, Titanic pink cast), V-lostcity-slice2.
 
 Titanic plating and light, Beebe close flanks, Lost City rims, Blue Hole hood and underside, Monterey framing, journey P2s, last S-manifest slice, legacy-save retry star award (queued), nightly capture failure allowed to pass.
 

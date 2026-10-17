@@ -1467,3 +1467,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (gates green, no full e2e):** six Codex packages (S-verify 18, titanic-seabed and beebe-profile guards; S-bughunt 19 input/modal/photo fixes; legacy-retry evidence fix; S-manifest inventory closed) and Sonnet J-desktop-repetition (desktop "where next" now only in the mission panel nav line; finished rows hidden). Residual: card and nav line overlap briefly in scan range.
 - **Codex:** 2490, 2500, 2510 queued; dispatch waits (5h 12% left).
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 18:19 headless run 52 (Claude): comprehensive review
+
+- Claude-alone review (Sol skipped, Codex 5h low). Backlog gained V-closeup-artifacts and V-lostcity-slice2; REVIEWS.md and STATUS.md updated. No package merged. Codex queue 2490-2510 waits.
+- **Needs owner:** real-phone Low-tier play.
