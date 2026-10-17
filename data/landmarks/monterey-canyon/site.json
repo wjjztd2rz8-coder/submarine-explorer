@@ -24,7 +24,7 @@
       "bearing": 0,
       "range": 40,
       "altitude": 16,
-      "yawOffset": 28,
+      "yawOffset": 11,
       "turnWeight": 3,
       "chaseRadius": 64,
       "chaseOffsetY": -2,
