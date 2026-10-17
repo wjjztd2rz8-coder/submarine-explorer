@@ -178,7 +178,7 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
         depthM: 5.5,
         widthM: 18,
         rimM: 1.5,
-        tint: 0.65,
+        tint: 0.45,
       },
       // No rock normal detail: the bed is soft sediment.
       normalStrength: 0,

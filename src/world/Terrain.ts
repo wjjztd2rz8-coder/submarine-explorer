@@ -375,7 +375,7 @@ export class Terrain {
     const irregular = 0.65 + 0.7 * valueNoise2(x / 17, z / 17, this.detail.seed ^ 0x3b);
     const moat = p.depthM * irregular * (1 - ease(d, 0, p.widthM));
     const rim =
-      ease(d, p.widthM * 0.7, p.widthM * 1.3) * (1 - ease(d, p.widthM * 1.3, p.widthM * 2.6));
+      ease(d, p.widthM * 0.85, p.widthM * 1.1) * (1 - ease(d, p.widthM * 1.1, p.widthM * 1.9));
     return { height: (rim * p.rimM - moat) * this.detail.strength, rim };
   }
 

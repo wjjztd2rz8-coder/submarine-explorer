@@ -60,6 +60,8 @@ interface KitKind extends ScatterKind {
   big?: boolean;
   /** Per-instance tint palette (hex); default: brightness jitter on white. */
   tints?: readonly number[];
+  /** Brightens the per-instance tint (default 1), for pieces that read dark against the bed. */
+  gain?: number;
 }
 
 interface KitSpec extends Omit<ScatterSpec, 'kinds'> {
@@ -364,6 +366,8 @@ const disc = (dims: readonly [number, number, number]): { rx: number; rz: number
   rx: dims[0],
   rz: dims[0],
 });
+/** Warm rust tones: debris plates must read against grey-brown silt. */
+const TRAIL_TINTS = [0xffdcb8, 0xf0b890, 0xffe8d0] as const;
 const CREAM = [0xd7d0c4, 0xcfc6b5, 0xbdb3a2] as const;
 
 const KITS: Record<WreckScatterId, Kit> = {
@@ -552,6 +556,8 @@ const KITS: Record<WreckScatterId, Kit> = {
           sink: 0.1,
           align: 1.4,
           cluster: 0.3,
+          tints: TRAIL_TINTS,
+          gain: 1.7,
         },
         {
           name: 'frames',
@@ -567,6 +573,8 @@ const KITS: Record<WreckScatterId, Kit> = {
           pose: 'lie',
           sink: 0.1,
           align: 1.4,
+          tints: TRAIL_TINTS,
+          gain: 1.7,
         },
         {
           name: 'pipes',
@@ -1077,6 +1085,7 @@ export function buildWreckScatter(
     const tint = kind.tints
       ? new THREE.Color(kind.tints[Math.floor(tintRnd() * kind.tints.length)]!)
       : new THREE.Color().setScalar(0.8 + tintRnd() * 0.35);
+    if (kind.gain) tint.multiplyScalar(kind.gain);
     list.push(m, tint);
   }
   const core: THREE.Mesh[] = [];
