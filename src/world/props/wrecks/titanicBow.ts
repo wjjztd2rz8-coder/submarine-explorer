@@ -454,15 +454,15 @@ export function buildTitanicBow(
   const hullGeom = hull.merge()!;
   const endShade = (_x: number, _y: number, z: number): number => {
     const s = z + L / 2;
-    return THREE.MathUtils.lerp(1, 0.45, THREE.MathUtils.smoothstep(s, L - 16, L - 2));
+    return 0.68 * THREE.MathUtils.lerp(1, 0.45, THREE.MathUtils.smoothstep(s, L - 16, L - 2));
   };
   paintWreck(hullGeom, {
     seed,
-    rustiness: 0.72,
+    rustiness: 0.85,
     growth: 0.25,
     silt: 0.55,
     mudBand: 3.4,
-    muted: 0.6,
+    muted: 0.25,
     plates: [1.9, 5.5, 1.4],
     shadeAt: endShade,
   });

@@ -134,9 +134,17 @@ export class LifeRender {
 
   /**
    * Write this frame's instance buffers and advance the sparks.
+   * @param eye camera position; animals near it shrink away
    * @param viewScale pixels per metre at distance 1 (viewport height / (2 tan(fov/2)))
    */
-  sync(sim: LifeSim, sub: SubInfo, dt: number, viewScale: number, fogDensity: number): void {
+  sync(
+    sim: LifeSim,
+    sub: SubInfo,
+    eye: { x: number; y: number; z: number },
+    dt: number,
+    viewScale: number,
+    fogDensity: number,
+  ): void {
     this.dark = darkness(-sub.y);
     for (const k of this.counts.keys()) this.counts.set(k, 0);
     const m4 = this.m4;
@@ -148,7 +156,14 @@ export class LifeRender {
       if (i >= sm.capacity) continue;
       this.counts.set(id, i + 1);
       const f = smoothstep(0, 1, a.fade);
-      const s = a.def.visScale * a.scale * Math.max(0.02, f);
+      // Animals close to the eye shrink away instead of filling the view or clipping the lens.
+      const len = a.def.size * a.def.visScale * a.scale;
+      const near = smoothstep(
+        Math.min(1.5 * len, 5),
+        Math.min(3.5 * len, 10),
+        Math.hypot(a.x - eye.x, a.y - eye.y, a.z - eye.z),
+      );
+      const s = a.def.visScale * a.scale * Math.max(0.02, f * near);
       const cy = Math.cos(a.yaw);
       const sy = Math.sin(a.yaw);
       const th = -a.pitch;

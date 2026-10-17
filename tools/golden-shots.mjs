@@ -44,6 +44,7 @@ import { installGoldenFrames } from './golden-frames.mjs';
 import blueHolePoses from './blue-hole-poses.json' with { type: 'json' };
 import beebePoses from './beebe-poses.json' with { type: 'json' };
 import lostCityPoses from './lostcity-poses.json' with { type: 'json' };
+import titanicPoses from './titanic-poses.json' with { type: 'json' };
 import montereyPoses from './monterey-poses.json' with { type: 'json' };
 
 async function main() {
@@ -70,7 +71,8 @@ async function main() {
   const { mode, tier, layouts } = options;
   const closeOverride = process.env.GOLDEN_CLOSE ? JSON.parse(process.env.GOLDEN_CLOSE) : null; // dev: retune the west alcove close pose
   const defaultHeroes = [
-    ['titanic', 'bow-hull'],
+    // Side-on from the starboard quarter, so the hull face fills the frame instead of a look down at the mud.
+    ['titanic', 'bow-hull', 'titanic', titanicPoses['bow-hull']],
     // Poseidon: shot 3 looks up the trunk so the vent orifice is in frame.
     ['lost-city', 'poseidon-tower', 'lost-city', lostCityPoses['poseidon-tower']],
     // The west alcove, framed from the hole's interior on its ledge (the hole centre lies due east).

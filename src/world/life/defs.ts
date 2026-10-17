@@ -9,10 +9,11 @@ import { LIFE_SCALE, type Archetype, type SpeciesDef } from './types.js';
 /**
  * How large an animal is drawn (metres): `LIFE_SCALE` times its real size, but
  * never so small that it cannot be read from the chase camera, so a 8 cm fish
- * is drawn about 0.9 m long and a 3 cm shrimp about 0.6 m.
+ * is drawn about 0.9 m long and a 3 cm shrimp about 0.6 m. The floor stops
+ * growing at 15 cm so mid-sized fish are not inflated past the vehicle's scale.
  */
 function drawnSize(size: number): number {
-  return Math.max(size * LIFE_SCALE, 0.9 * Math.pow(size / 0.08, 0.4));
+  return Math.max(size * LIFE_SCALE, 0.9 * Math.pow(Math.min(size, 0.15) / 0.08, 0.4));
 }
 
 type Required2 =

@@ -137,7 +137,7 @@ export function createLifeMaterial(o: LifeMaterialOpts): THREE.MeshStandardMater
     uAlphaBase: { value: o.translucent ?? 1 },
   };
   mat.userData.life = uniforms;
-  mat.defines = { LIFE_MODE: MODE[o.mode] };
+  mat.defines = { LIFE_MODE: MODE[o.mode], LIT_KNEE: '0.28', LIT_CEIL: '0.45' };
   mat.customProgramCacheKey = (): string =>
     `life-${o.mode}-${o.translucent !== undefined ? 't' : 'o'}`;
   mat.onBeforeCompile = (shader): void => {
@@ -149,6 +149,23 @@ export function createLifeMaterial(o: LifeMaterialOpts): THREE.MeshStandardMater
       .replace(
         '#include <common>',
         '#include <common>\nvarying float vGlow;\nuniform vec3 uGlowColor;\nuniform float uTint;\nuniform float uAlphaBase;',
+      )
+      .replace(
+        '#include <aomap_fragment>',
+        `#include <aomap_fragment>
+        {
+          // Matte-down specular and a soft ceiling on lamp-lit tissue: pale animals close to the lights keep their hue instead of clipping to white.
+          reflectedLight.directSpecular *= 0.4;
+          reflectedLight.indirectSpecular *= 0.4;
+          vec3 lit = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular;
+          float peak = max( lit.r, max( lit.g, lit.b ) );
+          float capped = peak < LIT_KNEE ? peak : LIT_KNEE + ( LIT_CEIL - LIT_KNEE ) * ( 1.0 - exp( -( peak - LIT_KNEE ) / ( LIT_CEIL - LIT_KNEE ) ) );
+          float k = capped / max( peak, 1e-4 );
+          reflectedLight.directDiffuse *= k;
+          reflectedLight.indirectDiffuse *= k;
+          reflectedLight.directSpecular *= k;
+          reflectedLight.indirectSpecular *= k;
+        }`,
       )
       .replace(
         '#include <emissivemap_fragment>',
