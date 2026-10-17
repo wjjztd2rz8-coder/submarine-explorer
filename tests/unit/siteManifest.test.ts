@@ -443,6 +443,21 @@ it('ships only authored sonar policies with an existing scour anchor', () => {
 });
 
 describe('shipped site manifests', () => {
+  it('ships hull-gated wreck policy only for its owning POI, shared with sonar', () => {
+    for (const id of ids) {
+      const manifest = siteManifest(id)!;
+      if (id !== 'endurance') {
+        expect(manifest.wreck).toBeUndefined();
+        continue;
+      }
+      const { pois } = JSON.parse(readFileSync(`data/landmarks/${id}/pois.json`, 'utf8'));
+      expect(manifest.wreck!.hullPoi).toBe('endurance-hull');
+      expect(manifest.wreck!.hullPoi).toBe(manifest.sonar!.scourHullPoi);
+      expect(pois.filter((poi: { id: string }) => poi.id === manifest.wreck!.hullPoi)).toHaveLength(
+        1,
+      );
+    }
+  });
   it('ships only the two authored terrain reconstructions', () => {
     const expected = new Map([
       ['monterey-canyon', { carve: 'canyon-bend' }],
@@ -472,6 +487,95 @@ describe('shipped site manifests', () => {
       expect(hero).toBe('leggo-lander-marker');
       expect(doc.props.filter((p: { id: string }) => p.id === hero)).toHaveLength(1);
     }
+  });
+});
+
+describe('site manifest wreck validation', () => {
+  const wreck = siteManifest('endurance')!.wreck!;
+  const wrap = (path: string, value: unknown) => {
+    const [section, key] = path.split('.');
+    return {
+      id: 's',
+      wreck: key
+        ? { ...wreck, [section!]: { ...wreck[section as 'atmosphere' | 'horizon'], [key]: value } }
+        : { ...wreck, [section!]: value },
+    };
+  };
+  const cases: [string, unknown, string | null][] = [
+    ['omitted policy', { id: 's' }, null],
+    ['authored policy', { id: 's', wreck }, null],
+    ['empty policy', { id: 's', wreck: {} }, 'wreck.hullPoi'],
+    ...[null, [], 'wreck', 1].map((value): [string, unknown, string] => [
+      `malformed policy ${JSON.stringify(value)}`,
+      { id: 's', wreck: value },
+      'wreck: expected an object',
+    ]),
+    ['unknown policy field', wrap('typo', true), 'wreck.typo: unknown field'],
+    ...['atmosphere', 'horizon'].flatMap((section): [string, unknown, string][] => [
+      [`missing ${section}`, wrap(section, undefined), `wreck.${section}`],
+      [`empty ${section}`, wrap(section, {}), `wreck.${section}`],
+      ...[null, [], 1].map((value): [string, unknown, string] => [
+        `malformed ${section} ${JSON.stringify(value)}`,
+        wrap(section, value),
+        `wreck.${section}: expected an object`,
+      ]),
+      [
+        `unknown ${section} field`,
+        wrap(`${section}.typo`, 1),
+        `wreck.${section}.typo: unknown field`,
+      ],
+    ]),
+    ...['hullPoi', 'horizon.name'].flatMap((path) =>
+      ['', ' ', 1, null, {}, []].map((value): [string, unknown, string] => [
+        `invalid ${path} ${JSON.stringify(value)}`,
+        wrap(path, value),
+        `wreck.${path}: expected a nonempty string`,
+      ]),
+    ),
+    ...[
+      ...Object.keys(wreck.atmosphere).map((key) => `atmosphere.${key}`),
+      ...Object.keys(wreck.horizon)
+        .filter((key) => key !== 'name')
+        .map((key) => `horizon.${key}`),
+    ].flatMap((path) =>
+      [NaN, Infinity, -Infinity, -1, '1', null].map((value): [string, unknown, string] => [
+        `invalid ${path} ${String(value)}`,
+        wrap(path, value),
+        `wreck.${path}`,
+      ]),
+    ),
+    ...[
+      ['atmosphere.hazeParticles', 0.5],
+      ['atmosphere.motesPerHull', 0.5],
+      ['atmosphere.hazeSizeM', 0],
+      ['atmosphere.moteSizeM', 0],
+      ['atmosphere.maxSizePx', 0],
+      ['atmosphere.hazeOpacity', 1.1],
+      ['atmosphere.moteOpacity', 1.1],
+      ['horizon.upperColor', 0.5],
+      ['horizon.hazeColor', 0x1000000],
+      ['horizon.hazePeakElevation', 0],
+      ['horizon.hazePeakElevation', 1.1],
+      ['horizon.fogHaze', 1.1],
+    ].map(([path, value]): [string, unknown, string] => [
+      `out of range ${path} ${value}`,
+      wrap(path as string, value),
+      `wreck.${path}`,
+    ]),
+    ...[
+      'atmosphere.hazeParticles',
+      'atmosphere.motesPerHull',
+      'atmosphere.hazeOpacity',
+      'atmosphere.moteOpacity',
+      'atmosphere.maxBrightness',
+      'horizon.fogLift',
+      'horizon.fogHaze',
+    ].map((path): [string, unknown, null] => [`allows disabled ${path}`, wrap(path, 0), null]),
+  ];
+  it.each(cases)('%s', (_name, raw, error) => {
+    if (error === null)
+      expect(validateSiteManifest(raw, 's').wreck).toEqual((raw as { wreck?: unknown }).wreck);
+    else expect(() => validateSiteManifest(raw, 's')).toThrow(error);
   });
 });
 

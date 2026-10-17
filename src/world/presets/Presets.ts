@@ -17,6 +17,7 @@ import type { CurrentMode } from '../../core/config/modes.js';
 
 import { currentScale } from '../../core/config/modes.js';
 import { DEFAULT_WATER } from '../../core/Config.js';
+import { siteManifest } from '../../core/SiteManifest.js';
 import * as THREE from 'three';
 import type {
   EnvPresetName,
@@ -414,6 +415,7 @@ export class PresetSystem {
       position: p.position,
     }));
     this.preset.enter({
+      site: siteManifest(this.o.landmarkId),
       scene: this.o.scene,
       terrain: this.o.terrain,
       props: toPresetProps(this.o.props.placed),

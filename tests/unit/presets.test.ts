@@ -371,7 +371,7 @@ describe('shared scalar maths', () => {
 
 // Guard the complete mission -> preset -> reusable atmosphere sample path, including
 // Low's particle-free update and a missing mission/type for an unknown site.
-describe('per-site vehicle light', () => {
+describe('per-site preset atmosphere', () => {
   const sites = (
     JSON.parse(readFileSync('data/tiles/index.json', 'utf8')).tiles as { id: string }[]
   )
@@ -386,7 +386,7 @@ describe('per-site vehicle light', () => {
 
   for (const tier of ['low', 'medium', 'high'] as const) {
     it.each([...sites, 'unknown-site'])(
-      `%s ${tier}: only Beebe dims the hull and the next base sample resets it`,
+      `%s ${tier}: applies authored hull light and hull-gated wreck policy`,
       async (site) => {
         const config = DEFAULT_CONFIG;
         const scene = new Scene();
@@ -418,7 +418,11 @@ describe('per-site vehicle light', () => {
             depthM: 1000,
           },
           props: { loaded: true, placed: [] },
-          discovery: { loaded: true, pois: [] },
+          // The same POI id everywhere must not enable another site's policy.
+          discovery: {
+            loaded: true,
+            pois: [{ id: 'endurance-hull', kind: 'wreck', position: new Vector3(0, -990, 0) }],
+          },
           sub: { position, velocity: new Vector3(), floorFor: (ground) => ground + 10 },
           currents,
           currentMode: 'off',
@@ -436,6 +440,12 @@ describe('per-site vehicle light', () => {
             system.update(1 / 60, 0, sample, camera, 844, frame / 60);
             expect(Number.isFinite(sample.hullLight)).toBe(true);
             expect(sample.hullLight).toBe(expected);
+            expect(scene.getObjectByName('enduranceHorizon') !== undefined).toBe(
+              site === 'endurance',
+            );
+            expect(scene.getObjectByName('enduranceRelief') !== undefined).toBe(
+              site === 'endurance' && tier !== 'low',
+            );
           }
           system.dispose();
           expect(atmosphere.update(-100, position, 0).hullLight).toBe(1);

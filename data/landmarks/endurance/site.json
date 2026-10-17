@@ -1,5 +1,26 @@
 {
   "id": "endurance",
+  "wreck": {
+    "hullPoi": "endurance-hull",
+    "atmosphere": {
+      "hazeParticles": 1500,
+      "hazeSizeM": 0.08,
+      "hazeOpacity": 0.075,
+      "motesPerHull": 100,
+      "moteSizeM": 0.04,
+      "moteOpacity": 0.12,
+      "maxSizePx": 2,
+      "maxBrightness": 0.75
+    },
+    "horizon": {
+      "name": "enduranceHorizon",
+      "upperColor": 2904678,
+      "hazeColor": 4881036,
+      "hazePeakElevation": 0.32,
+      "fogLift": 0.4,
+      "fogHaze": 0.45
+    }
+  },
   "sonar": {
     "scourHullPoi": "endurance-hull"
   },
