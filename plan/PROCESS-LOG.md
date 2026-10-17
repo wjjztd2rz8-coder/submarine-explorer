@@ -245,5 +245,6 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 - Prop-adding packages can break `f-perf-budget.spec.ts` (Low-tier prop counts), which gates.sh does not run. Run 41's CI failed on it. Rule added to V-titanic-seabed in DIRECTOR.md; fixed in 3e554a0.
 
 ## 2026-10-17 targeted review: false "Claude idle" trigger
+
 - Cause: review-triggers.sh fired "Claude idle at >=50% for 2 h" while resume.sh was correctly skipping runs on the weekly pacing gate (52% left vs 53.4% floor). Idle was deliberate, not waste; efficiency.sh's idle hours overstate it for the same reason.
 - Fix: the idle trigger now requires the same weekly pacing check as resume.sh (claude_week_ok). Codex queue 2430-2460 also waits on its weekly pacing by design (burn ~24%/day).

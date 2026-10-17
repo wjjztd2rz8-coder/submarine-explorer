@@ -1446,5 +1446,6 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Needs owner:** real-phone Low-tier play.
 
 ## 2026-10-17 12:45 CDT headless run 48 (Claude): targeted review
+
 - False idle trigger fixed (weekly pacing now respected); CI green on main. Nothing merged; weekly pacing still gates Claude and Codex.
 - **Needs owner:** real-phone Low-tier play.
