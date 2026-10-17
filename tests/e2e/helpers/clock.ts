@@ -15,6 +15,7 @@ export async function clockFramesUntil(
   page: Page,
   ready: () => boolean,
   frameMs = 50,
+  timeout = 45_000,
 ): Promise<void> {
   await expect
     .poll(
@@ -24,7 +25,7 @@ export async function clockFramesUntil(
         await page.clock.fastForward(frameMs);
         return page.evaluate(ready);
       },
-      { timeout: 45_000, intervals: [20] },
+      { timeout, intervals: [20] },
     )
     .toBe(true);
 }

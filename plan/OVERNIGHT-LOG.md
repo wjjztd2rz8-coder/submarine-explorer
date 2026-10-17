@@ -1422,3 +1422,7 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Process note:** a no-op `git stash` then `stash pop` re-applied an old stash and I committed conflict markers locally; caught by gates, reset before any push. Avoid stash in the orchestrator.
 - **Codex:** queue 2430, 2440, 2450, 2460 waits for dispatch. No tag (CI of run 42 still pending at start).
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 08:31 CDT headless run 44 (Claude): targeted review
+- Raised e2e timeouts for hud-touch boost depletion and journal-debrief banner (CI-only slowness since Titanic seabed slice 2). See REVIEWS.md. Codex queue waits on weekly pacing (62% < ~73% floor).
+- **Needs owner:** real-phone Low-tier play.

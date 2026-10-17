@@ -2,6 +2,12 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-17 08:30 targeted review (CI red x3; Claude idle at >=50%)
+
+- **CI red:** four consecutive reds since the titanic-seabed slice 2 merge. Failing specs: `hud-touch` boost-depletion (wall-bound frame pump, 45 s, failed on retry too), `journal-debrief` primaries banner (8 s, Titanic) and `d-shell` (240 s software-GL stall, once). All pass locally in 4-9 s; the Titanic scene got heavier, so hosted software GL is slower. Fix: timeouts raised (pump 120 s for boost, banner 30 s); gates green, pushed. If CI is still red, next step is a Titanic Low-tier frame-cost cut, not more timeout.
+- **Codex idle was pacing, not a bug:** weekly 62% left vs a pace floor of ~73% (Codex week was spent fast on 10-15/16), so the queue (2430-2460) correctly waits; the log line "codex low" is misleading but harmless. Queue stays at 4 briefs.
+- **Claude idle:** run cadence, not scheduling: runs 41-43 each ran; 5h window refilled between them.
+
 ## 2026-10-17 comprehensive review, joint with Codex Sol (golden 2026-10-17-091522)
 
 Sol ran; one reconcile round, corrections checked against files.

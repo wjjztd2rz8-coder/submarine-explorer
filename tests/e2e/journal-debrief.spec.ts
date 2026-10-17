@@ -256,7 +256,7 @@ freshTest.describe('mission progression and Home Journal', () => {
       let p = await probe(page);
       expect(p.state).toBe('primaries-complete');
       const banner = page.locator('.obj-banner');
-      await expect(banner).toBeVisible({ timeout: 8_000 });
+      await expect(banner).toBeVisible({ timeout: 30_000 });
       await expect(banner.locator('.obj-banner-title')).toHaveText('Primary objectives complete');
       await expect(banner.locator('.obj-banner-detail')).toHaveText(
         '2 of 4 objectives. 2 optional targets remain.',

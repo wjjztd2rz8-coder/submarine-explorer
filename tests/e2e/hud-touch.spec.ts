@@ -1891,7 +1891,12 @@ freshTest.describe('boost and Journal actions', () => {
       await expect(boost).toHaveAttribute('aria-pressed', 'true');
       // Each rendered frame permits at most eight fixed steps. Advance until
       // the real progress system rejects boost rather than counting wall time.
-      await clockFramesUntil(page, () => !(window.__game as unknown as Game).input.touchBoost, 250);
+      await clockFramesUntil(
+        page,
+        () => !(window.__game as unknown as Game).input.touchBoost,
+        250,
+        120_000,
+      );
       await expect(boost).toHaveAttribute('aria-pressed', 'false');
       expect(await page.evaluate(() => (window.__game as unknown as Game).input.touchBoost)).toBe(
         false,
