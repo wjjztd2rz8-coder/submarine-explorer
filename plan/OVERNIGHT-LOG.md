@@ -1388,3 +1388,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **CI triage:** run 37's CI failed on one spec (monterey free-dive facing 0.883 < 0.98; yawOffset 28 from the pose slice). Sonnet reduced yawOffset to 11 (facing spec caps the turn at ~11°); merged and pushed (smoke + project-base green; no full e2e). Pose gain from slice 1 is now mostly undone; further Monterey framing needs range/offset retune, not yaw.
 - **Codex:** queue 2400 S-manifest, 2410 S-verify-17, 2420 S-bughunt-18 waits for budget/dispatch. No tag (f56 is current).
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-16 23:05 CDT headless run 39 (Claude)
+
+- **Tagged f57** (CI green on run 38's main; Pages ok).
+- **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-lostcity-slope slice 1 (stepped terrace relief via terrain fidelity data; ~3.8-3.9; Low unchanged, treads faceted).
+- **Codex:** queue 2400 S-manifest, 2410 S-verify-17, 2420 S-bughunt-18 waits (dispatch said budget low).
+- **Needs owner:** real-phone Low-tier play.
