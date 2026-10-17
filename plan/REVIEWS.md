@@ -2,6 +2,12 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-17 17:00 targeted review (Claude idle at >=50%)
+
+- Cause: weekly pacing again (gate cleared only once the week crossed ~48%); not a scheduling fault. Codex queue also released (6 tasks, 3 running: 2470/2480 verifications plus 2460).
+- Merged J-picker-density (compact rows, depth order, Blue Hole title; 7 sites visible at 1280x720). Gates green.
+- CI on 92ec9e0 red on one spec only: `d-shell` "home, site grid" hung 4 min on CI, passes in 4 s locally (also with the new picker). Same CI-only hang class as journal-debrief; if it recurs, queue a Codex brief to replace the wall-clock waits in shell specs.
+
 ## 2026-10-17 targeted review (idle trigger)
 
 - Trigger was a false positive: runs were skipped by the weekly pacing gate, not by a scheduling fault. Fixed the trigger (see PROCESS-LOG.md). No backlog changes; Claude and Codex both resume as weekly pacing allows. CI on main green (run 47).

@@ -1455,3 +1455,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-titanic-seabed slice 3 (hull plate tint variation, rust-tinted trail plates via kit `gain`, crisper moat rim; ~4.1; hull cast slightly pink, strake grid still repeats at distance). Also prettier-formatted two plan logs that failed the gate.
 - Codex queue 2430-2460 still waits on weekly pacing. No tag (CI of previous run pending).
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 17:06 CDT headless run 50 (Claude): targeted review
+
+- **Merged and pushed (smoke + project-base green):** J-picker-density (Sonnet, compact site rows, depth order, Blue Hole title). CI red on d-shell hang only (passes locally); logged in REVIEWS.md.
+- **Codex:** 3 running (2460, 2470, 2480); 2430-2450 queued. No tag.
+- **Needs owner:** real-phone Low-tier play.
