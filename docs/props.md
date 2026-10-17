@@ -115,8 +115,11 @@ builders use the same biome through the terrain material factory.
     The optional `props.<prop-id>.smoker` profile in `site.json` supplies the authored shape and
     mineral shelves. `topFraction` is the top/base radius ratio, greater than 0 and at most 1;
     omitted values default to 0.45. `throatColor` is the mouth-disc emissive RGB integer
-    (0–0xffffff), defaulting to 0 (unlit). `SiteManifest` resolves these defaults once during
-    validation; all other smoker profile fields remain required, finite and validated.
+    (0–0xffffff), defaulting to 0 (unlit). `bodyShade` (body albedo multiplier) and `bodyGlow`
+    (self-lit crust tint strength) are greater than 0 and at most 1, defaulting to 0.95 and 0.16.
+    `SiteManifest` resolves these defaults once during validation; all other smoker profile
+    fields remain required, finite and validated. Without a profile, the builder retains its
+    separate body albedo multiplier of 1.25 and tint strength of 0.13.
   - `carbonate-tower`: Lost City edifice: a tall fluted spire, a ring of lesser ones, flanges, on a
     talus skirt that sinks into the seabed downhill. dims = [width, depth, tallest height].
   - `coral-mound`: rubble mound with hundreds of instanced branching colonies and vase sponges.

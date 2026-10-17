@@ -13,17 +13,54 @@ const ids = (
 ).landmarks;
 
 describe('site manifest validator', () => {
-  it('defaults omitted smoker taper and throat emission without changing the source profile', () => {
+  it('resolves omitted smoker defaults without changing the source profile', () => {
     const {
       topFraction: _top,
       throatColor: _throat,
+      bodyShade: _shade,
+      bodyGlow: _glow,
       ...smoker
     } = propManifest('beebe-chimney-1')!.smoker!;
+    Object.freeze(smoker);
     const raw = { id: 's', props: { p: { smoker } } };
     const resolved = validateSiteManifest(raw, 's').props!.p!.smoker!;
-    expect(resolved).toEqual({ ...smoker, topFraction: 0.45, throatColor: 0 });
+    expect(resolved).toEqual({
+      ...smoker,
+      topFraction: 0.45,
+      throatColor: 0,
+      bodyShade: 0.95,
+      bodyGlow: 0.16,
+    });
     expect(smoker).not.toHaveProperty('topFraction');
     expect(smoker).not.toHaveProperty('throatColor');
+    expect(smoker).not.toHaveProperty('bodyShade');
+    expect(smoker).not.toHaveProperty('bodyGlow');
+  });
+
+  for (const key of ['bodyShade', 'bodyGlow']) {
+    it.each([Number.MIN_VALUE, 0.01, 1])('preserves valid smoker ' + key + '=%s', (value) => {
+      const smoker = { ...propManifest('beebe-chimney-1')!.smoker!, [key]: value };
+      expect(
+        validateSiteManifest({ id: 's', props: { p: { smoker } } }, 's').props!.p!.smoker,
+      ).toEqual(smoker);
+    });
+
+    it.each([NaN, Infinity, -Infinity, -0.1, 0, 1 + Number.EPSILON, null, '0.5', true, {}, []])(
+      'rejects malformed smoker ' + key + '=%s',
+      (value) => {
+        const smoker = { ...propManifest('beebe-chimney-1')!.smoker!, [key]: value };
+        expect(() => validateSiteManifest({ id: 's', props: { p: { smoker } } }, 's')).toThrow(
+          `props.p.smoker.${key}`,
+        );
+      },
+    );
+  }
+
+  it.each([0, 0xffffff])('preserves throat RGB boundary %s', (throatColor) => {
+    const smoker = { ...propManifest('beebe-chimney-1')!.smoker!, throatColor };
+    expect(
+      validateSiteManifest({ id: 's', props: { p: { smoker } } }, 's').props!.p!.smoker,
+    ).toEqual(smoker);
   });
 
   it.each([0.01, 0.3, 1])(
@@ -43,6 +80,14 @@ describe('site manifest validator', () => {
     ['topFraction', 0],
     ['topFraction', 1.01],
     ['throatColor', NaN],
+    ['throatColor', Infinity],
+    ['throatColor', -Infinity],
+    ['throatColor', null],
+    ['throatColor', '16738330'],
+    ['throatColor', true],
+    ['throatColor', {}],
+    ['throatColor', []],
+    ['throatColor', 0.5],
     ['throatColor', -1],
     ['throatColor', 0x1000000],
     ['topMouthRadiusFraction', 0],
