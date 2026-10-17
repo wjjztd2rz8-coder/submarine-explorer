@@ -38,6 +38,8 @@ export class ScanOverlay {
   private suppressed = false;
   /** Seconds the result just shown still outranks a ready contact (see update). */
   private completeLeft = 0;
+  /** The standing objective's direction line, kept for a result card to carry. */
+  private cue: string | null = null;
 
   constructor(
     private readonly config: Pick<
@@ -76,6 +78,7 @@ export class ScanOverlay {
   clear(): void {
     this.reticle.hidden = true;
     this.completeLeft = 0;
+    this.cue = null;
     this.slot.clear();
   }
 
@@ -89,11 +92,13 @@ export class ScanOverlay {
       {
         kicker: firstTime ? 'NEW ENTRY' : 'SCAN COMPLETE',
         text: title,
-        detail: firstTime
-          ? isTouch()
-            ? 'OPEN JOURNAL'
-            : `PRESS ${keys.guide} · JOURNAL`
-          : 'LOGGED · JOURNAL',
+        detail: this.cue
+          ? this.cue
+          : firstTime
+            ? isTouch()
+              ? 'OPEN JOURNAL'
+              : `PRESS ${keys.guide} · JOURNAL`
+            : 'LOGGED · JOURNAL',
         tone: firstTime ? 'cyan' : 'dim',
         ring: { progress: 1, label: 'OK' },
       },
@@ -109,6 +114,7 @@ export class ScanOverlay {
     this.slot.tick(dt);
     if (this.suppressed) return;
     this.updateReticle(view, screen);
+    this.cue = this.objectiveCue(view);
     const { scan, objective } = this.messages(view, keys);
     // A result has just been shown: the next contact is usually already in range and
     // ready, but for the result's few seconds that card steps aside. A new scan under
@@ -145,6 +151,20 @@ export class ScanOverlay {
     } else {
       this.reticle.hidden = true;
     }
+  }
+
+  /** "STERN · TURN 30° PORT": where the outstanding objective lies, or null when none/at hand. */
+  private objectiveCue(view: ScanView): string | null {
+    if (view.objectiveId == null || !view.objectiveName) return null;
+    if (view.objectiveId === view.nearestId && view.nearestInRange) return null;
+    const turn = view.objectiveTurnDeg;
+    const how =
+      Math.abs(turn) >= 10
+        ? `TURN ${Math.abs(turn).toFixed(0)}° ${turn >= 0 ? 'STARBOARD' : 'PORT'}`
+        : view.objectiveDistance <= view.objectiveRadius
+          ? 'DIVE DEEPER'
+          : `${view.objectiveDistance.toFixed(0)} m AHEAD`;
+    return `${view.objectiveName} · ${how}`;
   }
 
   /** What the scan beam and the objective each have to say right now. */
@@ -219,12 +239,15 @@ export class ScanOverlay {
       return fallback;
     };
     if (view.candidateId !== null) {
+      // A curiosity beside an outstanding objective is marked optional and keeps the
+      // objective's direction on the same card.
+      const optional = view.objectiveId != null && view.candidateId !== view.objectiveId;
       return {
         scan: {
-          kicker: 'SCAN TARGET',
+          kicker: optional ? 'SCAN TARGET · OPTIONAL' : 'SCAN TARGET',
           text: view.nearestName,
           ready: true,
-          detail: `HOLD ${scan} TO SCAN`,
+          detail: optional && this.cue ? this.cue : `HOLD ${scan} TO SCAN`,
           tone: 'cyan',
           ring: { progress: 0, label: dist },
         },

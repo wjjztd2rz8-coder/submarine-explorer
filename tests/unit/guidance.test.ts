@@ -109,7 +109,13 @@ describe('guidance slot', () => {
   const texts = (slot: GuidanceSlot) => {
     const root = slot.root as unknown as FakeElement;
     const text = root.children[1];
-    return { hidden: root.hidden, name: text.children[1].textContent, kind: root.dataset.kind };
+    return {
+      hidden: root.hidden,
+      kicker: text.children[0].textContent,
+      name: text.children[1].textContent,
+      detail: text.children[2].textContent,
+      kind: root.dataset.kind,
+    };
   };
 
   it('shows the winner, withdraws it and falls back to the next offer', () => {
@@ -238,6 +244,41 @@ describe('guidance slot', () => {
     const css = readFileSync('src/styles/guidance.css', 'utf8');
     expect(css).toMatch(/\.guidance-slot\s*\{[^}]*pointer-events: none/s);
     expect(css).toMatch(/\.guidance-skip\s*\{[^}]*pointer-events: auto/s);
+    overlay.dispose();
+  });
+
+  it('marks a ready curiosity optional beside an objective and keeps the objective direction', () => {
+    const scanner = new Scanner(DEFAULT_CONFIG.scan, new EventBus());
+    const overlay = new ScanOverlay(DEFAULT_CONFIG.scan, document.body);
+    const t = (id: string, name: string, x: number, z: number) => ({
+      id,
+      name,
+      landmarkId: 'titanic',
+      position: new Vector3(x, 0, z),
+      radius: 20,
+      scanSeconds: 1,
+    });
+    scanner.setTargets([t('memorial', 'Memorial', 0, -5), t('stern', 'Stern', -300, 0)]);
+    scanner.setObjective('stern');
+    const keys = { scan: 'G', guide: 'J' };
+    const position = new Vector3();
+    const forward = new Vector3(0, 0, -1);
+    scanner.update(0, position, forward, false);
+    overlay.update(scanner.view, keys, null, 0);
+    const card = texts(overlay.slot);
+    expect(scanner.view.candidateId).toBe('memorial');
+    expect(card.kicker).toContain('OPTIONAL');
+    expect(card.detail).toContain('Stern');
+    expect(card.detail).toMatch(/TURN \d+° PORT/);
+    // A NEW ENTRY card keeps the direction to the objective.
+    overlay.showComplete('Memorial', true, keys);
+    expect(texts(overlay.slot).detail).toContain('Stern');
+    // When the contact is the objective there is no tag.
+    scanner.setObjective('memorial');
+    scanner.update(0, position, forward, false);
+    overlay.clear();
+    overlay.update(scanner.view, keys, null, 0);
+    expect(texts(overlay.slot).kicker).toBe('SCAN TARGET');
     overlay.dispose();
   });
 
