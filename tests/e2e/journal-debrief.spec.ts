@@ -349,9 +349,10 @@ freshTest.describe('mission progression and Home Journal', () => {
       await page.evaluate(() => {
         (window as unknown as { __samePage: boolean }).__samePage = true;
       });
-      await debrief.locator('[data-action="dive-sites"]').click();
-      await expect(debrief).toBeHidden();
-      await expect(page.locator('.home-screen')).toBeVisible();
+      // dispatchEvent skips Playwright's input-ack wait, which stalls behind the dive's frames on software GL.
+      await debrief.locator('[data-action="dive-sites"]').dispatchEvent('click');
+      await expect(debrief).toBeHidden({ timeout: 60_000 });
+      await expect(page.locator('.home-screen')).toBeVisible({ timeout: 30_000 });
       await expect(page.locator('.home-sites')).toBeVisible();
       await expect(page.locator('.home-sites h2')).toHaveText('Dive sites');
       expect(new URL(page.url()).searchParams.get('mission')).toBeNull();
