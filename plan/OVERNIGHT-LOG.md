@@ -1375,3 +1375,10 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-beebe-close slice 1 (site-data lighting: darker flank, warm seabed; ~4.0; main stack mouth glow still faint, needs orifice emissive geometry).
 - **Codex:** queue 2400 S-manifest, 2410 S-verify-17, 2420 S-bughunt-18 waits for budget/dispatch. CI for run 35 merges pending at start; no tag (f56 waits for green).
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-16 19:25 CDT headless run 37 (Claude)
+
+- **Tagged f56** (CI green on run 35 and 36 merges; Pages deploy ok).
+- **Merged and pushed (smoke + project-base green; no full e2e):** Sonnet V-monterey-pose slice 1 (free-dive opening turned away from ledge, site data only; ~3.7, sub still at ledge foot; wider pose needs sablefish/sea-pen offset retune).
+- **Codex:** queue 2400 S-manifest, 2410 S-verify-17, 2420 S-bughunt-18 waits for dispatch.
+- **Needs owner:** real-phone Low-tier play.
