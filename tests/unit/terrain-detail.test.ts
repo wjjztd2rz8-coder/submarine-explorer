@@ -104,7 +104,7 @@ describe('terrain scour moat', () => {
       cellsizeDeg: 0.0005,
       height: () => -3800,
     });
-    for (const tier of ['low', 'high'] as const) {
+    for (const tier of ['low', 'medium', 'high'] as const) {
       const terrain = new Terrain(tile, base, tier);
       try {
         const p = profile.scour!;
@@ -115,6 +115,35 @@ describe('terrain scour moat', () => {
         expect(at(p.widthM * 1.1).rim).toBeGreaterThan(0.9);
         expect(at(1).rim).toBe(0);
         expect(terrain.detailHeight(p.halfWidthM + 1, 0)).toBeLessThan(0);
+        // Guard discontinuities at both shoulders and the crest of the narrow rim,
+        // including the rounded footprint corner where the distance formula changes.
+        for (const d of [0, p.widthM * 0.85, p.widthM, p.widthM * 1.1, p.widthM * 1.9]) {
+          for (const angle of [0, Math.PI / 4, Math.PI / 2]) {
+            const atCorner = (offset: number) =>
+              terrain.scourAt(
+                p.halfWidthM + offset * Math.cos(angle),
+                p.halfLengthM + offset * Math.sin(angle),
+              );
+            const left = atCorner(d - 1e-4),
+              right = atCorner(d + 1e-4);
+            expect(Math.abs(left.height - right.height)).toBeLessThan(0.002);
+            expect(Math.abs(left.rim - right.rim)).toBeLessThan(0.0001);
+          }
+        }
+        const ray = new THREE.Raycaster();
+        for (let d = -2; d <= p.widthM * 2; d += 1.7) {
+          for (const z of [0, p.halfLengthM, p.halfLengthM + 7]) {
+            const x = p.halfWidthM + d;
+            const scour = terrain.scourAt(x, z);
+            expect(Number.isFinite(scour.height)).toBe(true);
+            expect(scour.rim).toBeGreaterThanOrEqual(0);
+            expect(scour.rim).toBeLessThanOrEqual(1);
+            ray.set(new THREE.Vector3(x, 0, z), new THREE.Vector3(0, -1, 0));
+            const hit = ray.intersectObject(terrain.group, true)[0];
+            expect(hit).toBeDefined();
+            expect(Math.abs(terrain.sampleHeight(x, z) - hit.point.y)).toBeLessThan(0.002);
+          }
+        }
       } finally {
         terrain.dispose();
       }

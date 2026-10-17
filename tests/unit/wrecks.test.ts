@@ -170,6 +170,25 @@ describe('wreck builders', () => {
         expect(lod.levels).toHaveLength(2);
         expect(lod.levels[1]!.distance).toBe(WRECK_DETAIL[tier]!.nearLodM);
         expect(countTriangles(a.full).triangles).toBe(countTriangles(b.full).triangles);
+        // Bounds alone miss NaN colours and seeded instance-buffer regressions.
+        const buffers = (root: THREE.Object3D) => {
+          const result: Array<ArrayLike<number>> = [];
+          root.traverse((o) => {
+            if (!(o instanceof THREE.Mesh)) return;
+            for (const attribute of Object.values(
+              o.geometry.attributes as Record<string, THREE.BufferAttribute>,
+            ))
+              result.push(attribute.array);
+            if (o instanceof THREE.InstancedMesh) {
+              result.push(o.instanceMatrix.array);
+              if (o.instanceColor) result.push(o.instanceColor.array);
+            }
+          });
+          return result;
+        };
+        const current = buffers(a.full);
+        expect(current).toEqual(buffers(b.full));
+        expect(current.every((array) => Array.from(array).every(Number.isFinite))).toBe(true);
       }
     });
   }
@@ -294,6 +313,42 @@ describe('wreck builders', () => {
       expect(Math.abs(p.y - tilt(p.x, p.z))).toBeLessThan(1);
     }
     expect(boilers.count).toBe(5);
+  });
+
+  it('isolates warm HDR instance tints to trail plates and frames at every tier', () => {
+    // Guard accidental gain/palette leakage through shared materials or kind names.
+    const palette = [0xffdcb8, 0xf0b890, 0xffe8d0].map((hex) =>
+      new THREE.Color(hex).multiplyScalar(1.7),
+    );
+    for (const tier of TIERS) {
+      let warmKinds = 0;
+      for (const id of WRECK_SCATTERS) {
+        const built = buildWreck(id, DIMS[id], 99, tier, () => 0);
+        for (const kind of ['plates', 'frames', 'pipes']) {
+          const mesh = built.full.getObjectByName(`${id}-${kind}`) as THREE.InstancedMesh;
+          if (!mesh) continue;
+          if (id === 'titanic-trail' && kind !== 'pipes') warmKinds++;
+          const color = new THREE.Color();
+          for (let i = 0; i < mesh.count; i++) {
+            mesh.getColorAt(i, color);
+            if (id === 'titanic-trail' && kind !== 'pipes') {
+              expect(
+                palette.some((p) =>
+                  p.toArray().every((v, j) => Math.abs(v - color.toArray()[j]) < 1e-6),
+                ),
+              ).toBe(true);
+              expect(color.r).toBeGreaterThan(1);
+            } else {
+              expect(color.r).toBe(color.g);
+              expect(color.g).toBe(color.b);
+              expect(color.r).toBeGreaterThanOrEqual(0.8 - 1e-6);
+              expect(color.r).toBeLessThanOrEqual(1.15 + 1e-6);
+            }
+          }
+        }
+      }
+      expect(warmKinds).toBe(2);
+    }
   });
 });
 
