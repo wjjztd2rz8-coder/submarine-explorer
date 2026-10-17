@@ -92,13 +92,14 @@ export class ScanOverlay {
       {
         kicker: firstTime ? 'NEW ENTRY' : 'SCAN COMPLETE',
         text: title,
-        detail: this.cue
-          ? this.cue
-          : firstTime
-            ? isTouch()
-              ? 'OPEN JOURNAL'
-              : `PRESS ${keys.guide} · JOURNAL`
-            : 'LOGGED · JOURNAL',
+        detail:
+          this.cue && isTouch()
+            ? this.cue
+            : firstTime
+              ? isTouch()
+                ? 'OPEN JOURNAL'
+                : `PRESS ${keys.guide} · JOURNAL`
+              : 'LOGGED · JOURNAL',
         tone: firstTime ? 'cyan' : 'dim',
         ring: { progress: 1, label: 'OK' },
       },
@@ -247,7 +248,7 @@ export class ScanOverlay {
           kicker: optional ? 'SCAN TARGET · OPTIONAL' : 'SCAN TARGET',
           text: view.nearestName,
           ready: true,
-          detail: optional && this.cue ? this.cue : `HOLD ${scan} TO SCAN`,
+          detail: optional && touch && this.cue ? this.cue : `HOLD ${scan} TO SCAN`,
           tone: 'cyan',
           ring: { progress: 0, label: dist },
         },

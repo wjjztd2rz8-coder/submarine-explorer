@@ -612,7 +612,7 @@ it('scan card guidance points at the mission objective, not the nearest contact'
     overlay.update(view, { scan: 'G', guide: 'J' }, null, 0);
     expect(kicker.textContent).toContain('OPTIONAL');
     expect(name.textContent).toBe('Debris field');
-    expect(hint.textContent).toContain('Stern section');
+    expect(hint.textContent).toContain('Stern section'); // touch is on here
     // No objective: nearest-contact guidance as before.
     view.candidateId = null;
     view.objectiveId = null;
