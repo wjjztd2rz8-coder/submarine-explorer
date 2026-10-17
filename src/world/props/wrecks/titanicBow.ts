@@ -462,7 +462,7 @@ export function buildTitanicBow(
     growth: 0.25,
     silt: 0.55,
     mudBand: 3.4,
-    muted: 0.75,
+    muted: 0.6,
     plates: [1.9, 5.5, 1.4],
     shadeAt: endShade,
   });
