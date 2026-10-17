@@ -66,6 +66,52 @@ describe('pointer look preference and lock decisions', () => {
 });
 
 describe('Input action map', () => {
+  it.each([false, true])(
+    'suppresses pad input across blur without replaying edges (background frames: %s)',
+    (poll) => {
+      const win = new EventTarget();
+      vi.stubGlobal('window', win);
+      vi.stubGlobal('document', new EventTarget());
+      const buttons = Array.from({ length: 16 }, () => ({ value: 0, pressed: false }));
+      vi.stubGlobal('navigator', {
+        getGamepads: () => [{ connected: true, index: 0, axes: [0.5, -1, 0, 0], buttons }],
+      });
+      const input = makeInput();
+      input.attach();
+      try {
+        expect(input.sample().throttle).toBe(1);
+        win.dispatchEvent(new Event('blur'));
+        buttons[3] = { value: 1, pressed: true };
+        buttons[5] = { value: 1, pressed: true };
+        if (poll) {
+          expect(input.sample()).toMatchObject({
+            throttle: 0,
+            yaw: 0,
+            scan: false,
+            toggleCamera: false,
+          });
+          expect(input.gamepadActive).toBe(false);
+        }
+        // Another press can arrive after the final background RAF has run.
+        buttons[14] = { value: 1, pressed: true };
+        win.dispatchEvent(new Event('focus'));
+        expect(input.sample()).toMatchObject({
+          throttle: 1,
+          scan: true,
+          toggleCamera: false,
+          toggleGuide: false,
+        });
+        buttons[3] = { value: 0, pressed: false };
+        input.sample();
+        buttons[3] = { value: 1, pressed: true };
+        expect(input.sample().toggleCamera).toBe(true);
+      } finally {
+        input.dispose();
+        vi.unstubAllGlobals();
+      }
+    },
+  );
+
   it.each(['INPUT', 'TEXTAREA', 'SELECT', 'contenteditable'])(
     'keeps gamepad and touch input neutral while %s owns focus without deferring pad edges',
     (tag) => {

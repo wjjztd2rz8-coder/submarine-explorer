@@ -453,6 +453,12 @@ export class Journal {
     const cosmetic = focused?.dataset.cosmetic;
     const inside = !!focused && this.root.contains(focused);
     this.renderContent();
+    // Rotation can hide the desktop nav without detaching its focused switch.
+    // Returning focus to that input would leave keyboard ownership invisible.
+    if (inside && focused?.isConnected && !focused.getClientRects().length) {
+      if (this.trap.isTop) this.body.focus({ preventScroll: true });
+      return;
+    }
     // Moving the switch between the tree and the page drops its focus.
     if (focused === this.spoilerBox && document.activeElement !== focused) {
       this.spoilerBox.focus({ preventScroll: true });

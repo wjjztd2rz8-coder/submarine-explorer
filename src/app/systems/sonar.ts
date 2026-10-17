@@ -64,15 +64,17 @@ export const sonarControlsSystem: GameSystem = {
     sonarControls.textContent =
       'Sonar: M expands the map; + / − change range. Wheel over the map also changes range.';
     settingsScreen.root.querySelector('.settings-bindings')?.before(sonarControls);
+    const canZoom = (): boolean =>
+      ctx.app.state === 'dive' &&
+      !settingsScreen.isOpen &&
+      !ctx.controlsCard?.isOpen &&
+      !ctx.globe.isOpen &&
+      !ctx.discovery.guide.isOpen &&
+      !ctx.discovery.debrief.isOpen &&
+      !ctx.photoMode.active &&
+      !(ctx.missionRouter?.frozen ?? false);
     cleanup.listen(window, 'keydown', (event) => {
-      if (
-        ctx.app.state !== 'dive' ||
-        settingsScreen.isOpen ||
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey
-      )
-        return;
+      if (!canZoom() || event.altKey || event.ctrlKey || event.metaKey) return;
       if (
         event.target instanceof HTMLElement &&
         event.target.closest('input, select, textarea, button, [contenteditable="true"]')
@@ -87,7 +89,7 @@ export const sonarControlsSystem: GameSystem = {
       window,
       'wheel',
       (event) => {
-        if (!sonar.expanded || ctx.app.state !== 'dive') return;
+        if (!sonar.expanded || !canZoom()) return;
         event.preventDefault();
         event.stopImmediatePropagation();
         sonar.zoomWheel(event.deltaY < 0 ? -1 : 1);

@@ -82,7 +82,7 @@ function fixture(canvasTouchAction = '', realInput?: Input) {
     touchEdge: vi.fn(),
     touchLook: vi.fn(),
     touchZoom: vi.fn(),
-    endFrame: vi.fn(),
+    clear: vi.fn(),
   };
   const canvas = new TouchElement();
   canvas.style.touchAction = canvasTouchAction;
@@ -261,6 +261,48 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
 );
 
 describe('touch control interruptions', () => {
+  it('routes drag and pinch to the photo camera while an expanded sonar map is hidden', () => {
+    const f = fixture();
+    const send = (type: string, id: number, x: number) => {
+      const event = new Event(type);
+      Object.assign(event, { pointerId: id, pointerType: 'touch', clientX: x, clientY: 60 });
+      Object.defineProperty(event, 'target', { value: f.canvas });
+      f.win.dispatchEvent(event);
+    };
+    try {
+      f.sonar.expanded = true;
+      f.controls.update(false, true);
+      send('pointerdown', 1, 60);
+      send('pointermove', 1, 70);
+      expect(f.input.touchLook).toHaveBeenCalledExactlyOnceWith(10, 0);
+      send('pointerdown', 2, 100);
+      send('pointermove', 2, 110);
+      expect(f.input.touchZoom).toHaveBeenCalledExactlyOnceWith(-40);
+      expect(f.sonar.zoomWheel).not.toHaveBeenCalled();
+    } finally {
+      f.controls.dispose();
+    }
+  });
+
+  it.each(['resize', 'orientationchange'])(
+    'discards an unsampled touch shortcut when %s interrupts its press',
+    (event) => {
+      const input = new Input({ storage: null });
+      const f = fixture('', input);
+      const lights = (f.controls.root as unknown as TouchElement).children[2].children[1];
+      try {
+        pointer(lights, 'pointerdown', 7);
+        f.win.dispatchEvent(new Event(event));
+        expect(input.sample().toggleLights).toBe(false);
+        pointer(lights, 'pointerdown', 8);
+        expect(input.sample().toggleLights).toBe(true);
+      } finally {
+        f.controls.dispose();
+        input.dispose();
+      }
+    },
+  );
+
   it.each(['resize', 'orientationchange'])(
     'discards unsampled drag and pinch deltas when %s changes the phone layout',
     (event) => {

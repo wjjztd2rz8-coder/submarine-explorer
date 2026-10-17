@@ -296,6 +296,8 @@ export class Input {
   private readonly edgeArmed = new Set<ActionId>();
   private padIndex: number | null = null;
   private padPressed = new Set<number>();
+  private padSuspended = false;
+  private padNeedsBaseline = false;
   wheelDelta = 0;
 
   // Touch controls ----------------------------------------------------------
@@ -566,9 +568,20 @@ export class Input {
       }
     };
     const onKeyUp = (e: KeyboardEvent) => this.keys.delete(e.code);
-    const onBlur = () => this.clear();
+    const onBlur = () => {
+      this.padSuspended = true;
+      this.padNeedsBaseline = true;
+      this.clear();
+    };
+    const onWindowFocus = () => {
+      this.padSuspended = false;
+      this.padNeedsBaseline = true;
+    };
     const onVisibility = () => {
-      if (document.hidden) this.clear();
+      this.padNeedsBaseline = true;
+      if (document.hidden) {
+        this.clear();
+      }
     };
     const onFocus = (e: FocusEvent) => {
       if (isEditing(e.target)) this.clear();
@@ -589,6 +602,7 @@ export class Input {
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('blur', onBlur);
+    window.addEventListener('focus', onWindowFocus);
     const doc = typeof document === 'undefined' ? null : document;
     doc?.addEventListener('visibilitychange', onVisibility);
     doc?.addEventListener('focusin', onFocus);
@@ -606,6 +620,7 @@ export class Input {
       () => window.removeEventListener('keydown', onKeyDown),
       () => window.removeEventListener('keyup', onKeyUp),
       () => window.removeEventListener('blur', onBlur),
+      () => window.removeEventListener('focus', onWindowFocus),
       () => doc?.removeEventListener('visibilitychange', onVisibility),
       () => doc?.removeEventListener('focusin', onFocus),
       () => el.removeEventListener('mousedown', onMouseDown as EventListener),
@@ -621,6 +636,8 @@ export class Input {
     this.clear();
     this.padIndex = null;
     this.padPressed.clear();
+    this.padSuspended = false;
+    this.padNeedsBaseline = false;
   }
 
   /** Interruptions discard piloting and queued actions; a new press starts again. */
@@ -716,35 +733,41 @@ export class Input {
       pad.buttons.forEach((button, index) => {
         if (button.pressed) pressed.add(index);
       });
-      const edge = (index: number): boolean => pressed.has(index) && !this.padPressed.has(index);
-      // W3C standard mapping: 0/1 left stick, 2/3 right stick.
-      const [lx = 0, ly = 0, , ry = 0] = pad.axes;
-      const yaw = applyDeadZone(lx);
-      const throttle = applyDeadZone(-ly);
-      const pitch = applyDeadZone(-ry);
-      if (yaw) s.yaw = yaw;
-      if (throttle) s.throttle = throttle;
-      if (pitch) s.pitch = pitch;
-      const up = pad.buttons[0]?.value ?? 0; // A / cross
-      const down = pad.buttons[1]?.value ?? 0; // B / circle
-      const ballast = applyDeadZone(up - down);
-      if (ballast) s.ballast = ballast;
-      if (edge(3)) s.toggleCamera = true; // Y
-      if (edge(2)) s.toggleLights = true; // X
-      s.scan = s.scan || (pad.buttons[5]?.pressed ?? false); // RB
-      if (edge(8)) s.toggleSonar = true; // Back / view
-      if (edge(9)) s.togglePhotoMode = true; // Start
-      if (edge(12)) s.cycleSimSpeed = true; // D-pad up
-      if (edge(13)) s.resetCamera = true; // D-pad down
-      if (edge(14)) s.toggleGuide = true; // D-pad left (Journal)
-      if (edge(4)) s.capturePhoto = true; // LB
-      s.boost = s.boost || (pad.buttons[7]?.value ?? 0) > 0.5; // RT
-      this.gamepadActive = Boolean(yaw || throttle || pitch || ballast || pressed.size);
+      // RAF may have stopped while unfocused. Baseline the first returning
+      // sample so a press made in another app cannot replay a shortcut here.
+      const edge = (index: number): boolean =>
+        !this.padNeedsBaseline && pressed.has(index) && !this.padPressed.has(index);
+      if (!this.padSuspended) {
+        // W3C standard mapping: 0/1 left stick, 2/3 right stick.
+        const [lx = 0, ly = 0, , ry = 0] = pad.axes;
+        const yaw = applyDeadZone(lx);
+        const throttle = applyDeadZone(-ly);
+        const pitch = applyDeadZone(-ry);
+        if (yaw) s.yaw = yaw;
+        if (throttle) s.throttle = throttle;
+        if (pitch) s.pitch = pitch;
+        const up = pad.buttons[0]?.value ?? 0; // A / cross
+        const down = pad.buttons[1]?.value ?? 0; // B / circle
+        const ballast = applyDeadZone(up - down);
+        if (ballast) s.ballast = ballast;
+        if (edge(3)) s.toggleCamera = true; // Y
+        if (edge(2)) s.toggleLights = true; // X
+        s.scan = s.scan || (pad.buttons[5]?.pressed ?? false); // RB
+        if (edge(8)) s.toggleSonar = true; // Back / view
+        if (edge(9)) s.togglePhotoMode = true; // Start
+        if (edge(12)) s.cycleSimSpeed = true; // D-pad up
+        if (edge(13)) s.resetCamera = true; // D-pad down
+        if (edge(14)) s.toggleGuide = true; // D-pad left (Journal)
+        if (edge(4)) s.capturePhoto = true; // LB
+        s.boost = s.boost || (pad.buttons[7]?.value ?? 0) > 0.5; // RT
+        this.gamepadActive = Boolean(yaw || throttle || pitch || ballast || pressed.size);
+      }
       this.padPressed = pressed;
     } else {
       this.padIndex = null;
       this.padPressed.clear();
     }
+    this.padNeedsBaseline = false;
     // Keep polling pad edges during editing so a held menu press cannot fire
     // on return to play, but let the focused editor own every input source.
     if (typeof document !== 'undefined' && isEditing(document.activeElement)) {

@@ -87,7 +87,7 @@ function setup(hardwareTouch = false) {
     touchHeld: new Set(),
     touchBoost: false,
     touchLook: vi.fn(),
-    endFrame: vi.fn(),
+    clear: vi.fn(),
   } as unknown as Input;
   const opts = {
     input,

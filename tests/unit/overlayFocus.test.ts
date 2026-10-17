@@ -35,6 +35,7 @@ import { createPointerSystem } from '../../src/app/systems/pointer.js';
 import { createInputSystem } from '../../src/app/systems/input.js';
 import { createControlsSystem } from '../../src/app/systems/controls.js';
 import { createPhotoSystem } from '../../src/app/systems/photo.js';
+import { sonarControlsSystem } from '../../src/app/systems/sonar.js';
 import { createDailySystem } from '../../src/app/systems/daily.js';
 import { inputGateSystem } from '../../src/app/loop.js';
 import { modesSystem } from '../../src/app/systems/modes.js';
@@ -910,6 +911,49 @@ function shell() {
 }
 
 describe('overlay policies across the app', () => {
+  it.each(['journal', 'settings', 'controls', 'globe', 'debrief', 'briefing', 'photo'])(
+    'leaves wheel scrolling and range shortcuts to the %s overlay above expanded sonar',
+    (modal) => {
+      const ctx = {
+        app: { state: 'dive' },
+        settingsScreen: { root: html(element('DIV')), isOpen: modal === 'settings' },
+        controlsCard: { isOpen: modal === 'controls' },
+        globe: { isOpen: modal === 'globe' },
+        discovery: {
+          guide: { isOpen: modal === 'journal' },
+          debrief: { isOpen: modal === 'debrief' },
+        },
+        missionRouter: { frozen: modal === 'briefing' },
+        photoMode: { active: modal === 'photo' },
+        sonar: { expanded: true, zoomWheel: vi.fn(), zoomBy: vi.fn() },
+      } as unknown as GameContext;
+      sonarControlsSystem.init!(ctx);
+      cleanup.push(() => sonarControlsSystem.dispose?.());
+      const wheel = new Event('wheel', { cancelable: true });
+      Object.assign(wheel, { deltaY: 100 });
+      window.dispatchEvent(wheel);
+      const key = press('Equal');
+      expect(wheel.defaultPrevented).toBe(false);
+      expect(key.defaultPrevented).toBe(false);
+      expect(ctx.sonar.zoomWheel).not.toHaveBeenCalled();
+      expect(ctx.sonar.zoomBy).not.toHaveBeenCalled();
+      Object.assign(ctx.settingsScreen, { isOpen: false });
+      Object.assign(ctx.controlsCard, { isOpen: false });
+      Object.assign(ctx.globe, { isOpen: false });
+      Object.assign(ctx.discovery.guide, { isOpen: false });
+      Object.assign(ctx.discovery.debrief, { isOpen: false });
+      Object.assign(ctx.missionRouter!, { frozen: false });
+      Object.assign(ctx.photoMode, { active: false });
+      const resumed = new Event('wheel', { cancelable: true });
+      Object.assign(resumed, { deltaY: -100 });
+      window.dispatchEvent(resumed);
+      expect(resumed.defaultPrevented).toBe(true);
+      expect(ctx.sonar.zoomWheel).toHaveBeenCalledExactlyOnceWith(-1);
+      press('Equal');
+      expect(ctx.sonar.zoomBy).toHaveBeenCalledExactlyOnceWith(-1);
+    },
+  );
+
   it('contains Settings keyboard focus above Home and returns to its opener after touch or Escape dismissal', () => {
     const { screen } = settings();
     const home = new Home({
