@@ -16,6 +16,7 @@ export const WRECK_HULLS = ['titanic-bow', 'titanic-stern', 'bismarck', 'enduran
 export const WRECK_SCATTERS = [
   'titanic-boilers',
   'titanic-field',
+  'titanic-trail',
   'titanic-stern-field',
   'bismarck-turrets',
   'bismarck-field',

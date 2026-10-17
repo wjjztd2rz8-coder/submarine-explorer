@@ -30,6 +30,7 @@ const DIMS: Record<WreckId, [number, number, number]> = {
   endurance: [44, 7.6, 8],
   'titanic-boilers': [25, 25, 5],
   'titanic-field': [150, 150, 2],
+  'titanic-trail': [55, 10, 2],
   'titanic-stern-field': [80, 80, 3],
   'bismarck-turrets': [50, 50, 6],
   'bismarck-field': [60, 60, 3],

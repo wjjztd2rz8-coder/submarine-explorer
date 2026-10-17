@@ -106,6 +106,22 @@ export interface TerrainFidelity {
   rillStretch?: number;
   /** Broken shelves on rock slopes: bed thickness (m) and how far treads and risers pull the surface (0..1). */
   terrace?: { periodM: number; amount: number };
+  /**
+   * Current scour around a large object lying on soft bed: a moat that dips toward the footprint
+   * (a rectangle centred on `lat`/`lon`, `headingDeg` along its length) and a silty rim beyond it.
+   * Depths and widths in metres; `tint` lightens the rim in vertex colour.
+   */
+  scour?: {
+    lat: number;
+    lon: number;
+    headingDeg: number;
+    halfLengthM: number;
+    halfWidthM: number;
+    depthM: number;
+    widthM: number;
+    rimM: number;
+    tint: number;
+  };
   normalStrength: number;
   /** Reconstructed wall mesh limits; Low retains the original limits. */
   wallSegments: Record<GraphicsTier, [number, number]>;
@@ -144,6 +160,29 @@ export const DEFAULT_TERRAIN: TerrainConfig = {
   fidelity: {
     'monterey-canyon': MONTEREY_FIDELITY,
     'lost-city': LOST_CITY_FIDELITY,
+    // The bow section lies in a shallow current scour: a moat dipping toward the hull and a
+    // lighter silty rim, resolved on the bed itself so Low shows it too.
+    titanic: {
+      resolveLow: true,
+      focus: { lat: 41.7325, lon: -49.94694, radiusM: 130, fadeM: 40 },
+      chunkCells: 8,
+      nearSubdiv: { low: 6, medium: 8, high: 12 },
+      reliefM: 0,
+      reliefWavelengthM: 24,
+      scour: {
+        lat: 41.7325,
+        lon: -49.94694,
+        headingDeg: 0,
+        halfLengthM: 71.5,
+        halfWidthM: 14,
+        depthM: 5.5,
+        widthM: 18,
+        rimM: 1.5,
+        tint: 0.65,
+      },
+      normalStrength: 0.18,
+      wallSegments: { low: [220, 150], medium: [230, 150], high: [220, 150] },
+    },
     // The 320 m sinkhole fits inside six survey cells. Resolve its reconstructed
     // ledges on the sand/rock surface itself, avoiding intersecting prop skins.
     'great-blue-hole': {

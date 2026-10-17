@@ -13,6 +13,8 @@
  *                        Room No. 1, with coal (Ballard 1987; WHOI 2010).
  *   titanic-field        the field between the sections: hull plates, frames,
  *                        pipes, cowl vents, bench ends, crockery, bottles, coal.
+ *   titanic-trail        a strip of plates, frames and pipes strung out from a hull
+ *                        along its long axis [half-length, half-width, height].
  *   titanic-stern-field  heavier plating and frames around the stern.
  *   bismarck-turrets     the four 38 cm turrets that fell out as she capsized,
  *                        two upside down with their trunks up, one on its side,
@@ -522,6 +524,70 @@ const KITS: Record<WreckScatterId, Kit> = {
           geom: 'coal',
           mat: 'fitting',
           count: 160,
+          size: [0.15, 0.5],
+          pose: 'tumble',
+          sink: 0.35,
+          small: true,
+        },
+      ],
+    }),
+  },
+  'titanic-trail': {
+    spec: (dims) => ({
+      rx: dims[1],
+      rz: dims[0],
+      kinds: [
+        {
+          name: 'plates',
+          geom: 'plate',
+          mat: 'steel',
+          big: true,
+          count: 26,
+          size: [
+            [2, 7],
+            [1, 1.5],
+            [1.5, 6],
+          ],
+          pose: 'lie',
+          sink: 0.1,
+          align: 1.4,
+          cluster: 0.3,
+        },
+        {
+          name: 'frames',
+          geom: 'frame',
+          mat: 'steel',
+          big: true,
+          count: 7,
+          size: [
+            [1, 1.4],
+            [1, 1.4],
+            [3, 8],
+          ],
+          pose: 'lie',
+          sink: 0.1,
+          align: 1.4,
+        },
+        {
+          name: 'pipes',
+          geom: 'pipe',
+          mat: 'steel',
+          count: 10,
+          size: [
+            [0.15, 0.35],
+            [0.15, 0.35],
+            [1.5, 5],
+          ],
+          proportional: true,
+          pose: 'lie',
+          sink: 0.3,
+          small: true,
+        },
+        {
+          name: 'coal',
+          geom: 'coal',
+          mat: 'fitting',
+          count: 50,
           size: [0.15, 0.5],
           pose: 'tumble',
           sink: 0.35,
