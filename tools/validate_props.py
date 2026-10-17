@@ -33,7 +33,7 @@ HULL_ENDS = ("prow", "cut", "rounded")  # hull-block "ends": [forward, aft]
 CHIMNEY_MATERIALS = ("basalt", "carbonate", "sulfide")  # chimney "material_hint"
 # "wreck": hand-built wreck ids (src/world/props/wrecks/variants.ts); keep in step.
 WRECK_HULLS = ("titanic-bow", "titanic-stern", "bismarck", "endurance")
-WRECK_SCATTERS = ("titanic-boilers", "titanic-field", "titanic-stern-field", "bismarck-turrets",
+WRECK_SCATTERS = ("titanic-boilers", "titanic-field", "titanic-trail", "titanic-stern-field", "bismarck-turrets",
                   "bismarck-field", "bismarck-landslide", "endurance-rigging", "endurance-stern")
 # "feature": procedural:geo set pieces (src/world/props/geo/features.ts); keep in step.
 GEO_FEATURES = ("smoker-cluster", "carbonate-tower", "coral-mound", "stalactite-cluster",

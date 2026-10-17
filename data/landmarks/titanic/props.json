@@ -9,6 +9,7 @@
       "lat": 41.7325,
       "lon": -49.94694,
       "snap_to_seabed": true,
+      "y_offset_m": 3,
       "heading_deg": 0,
       "scale": 1,
       "dimensions_m": [143, 28, 16],
@@ -78,6 +79,21 @@
       "collision": "none",
       "reconstruction": true,
       "note": "Small scatter of plating and fittings beside the bow, so the section does not sit on a bare floor. Debris lies all around both sections (Wikipedia 'Wreck of the Titanic', 'Debris fields'); this 60 m cluster, ~45 m east of the bow's centre, is an estimate and its contents are not a survey of particular objects."
+    },
+    {
+      "id": "debris-trail",
+      "model": "procedural:debris",
+      "wreck": "titanic-trail",
+      "lat": 41.73223,
+      "lon": -49.94653,
+      "snap_to_seabed": true,
+      "heading_deg": 120,
+      "scale": 1,
+      "dimensions_m": [55, 10, 2],
+      "lod_distance_m": 600,
+      "collision": "none",
+      "reconstruction": true,
+      "note": "A strip of plating and frames strung out east-south-east from the bow's starboard side. Debris lies all around both sections (Wikipedia 'Wreck of the Titanic', 'Debris fields'); the strip's position and contents are an estimate, not a survey of particular objects."
     },
     {
       "id": "debris-stern",

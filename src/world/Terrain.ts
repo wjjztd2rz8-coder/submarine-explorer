@@ -113,6 +113,8 @@ export class Terrain {
   private readonly detail: DetailParams;
   private readonly fidelity: TerrainFidelity | null;
   private readonly focus: { x: number; z: number } | null;
+  /** The fidelity profile's scour moat, placed in world metres. */
+  private readonly scour: { x: number; z: number; cos: number; sin: number } | null;
   private readonly normalSubdiv: number;
   private baseSubdiv = 1;
   private readonly patchSubdivs = new Map<string, number>();
@@ -160,6 +162,12 @@ export class Terrain {
     this.focus = this.fidelity
       ? latLonToWorld(tile.meta, this.fidelity.focus.lat, this.fidelity.focus.lon)
       : null;
+    const scour = this.fidelity?.scour;
+    if (scour) {
+      const at = latLonToWorld(tile.meta, scour.lat, scour.lon);
+      const a = (scour.headingDeg * Math.PI) / 180;
+      this.scour = { ...at, cos: Math.cos(a), sin: Math.sin(a) };
+    } else this.scour = null;
     this.normalSubdiv = this.fidelity?.nearSubdiv[tier] ?? tierCfg.detailSubdiv;
     const cellM = Math.min(this.dx, this.dz);
     this.detail = {
@@ -196,22 +204,25 @@ export class Terrain {
     this.stats = this.build(config, tier, subdiv, built.textureSize);
     this.stats.requestedSubdiv = requested;
 
-    if (this.biome.vertexTint) {
-      // Only Lost City opts in. Reuse every LOD's existing vertices and draw calls.
+    const rimTint = this.fidelity?.scour?.tint ?? 0;
+    if (this.biome.vertexTint || rimTint > 0) {
+      // Reuse every LOD's existing vertices and draw calls.
       built.material.vertexColors = true;
-      (built.material.userData.uniforms.uStrata.value as THREE.Vector2).y = 0;
+      if (this.biome.vertexTint)
+        (built.material.userData.uniforms.uStrata.value as THREE.Vector2).y = 0;
       for (const chunk of this.chunks) {
         const position = chunk.geometry.getAttribute('position');
         const normal = chunk.geometry.getAttribute('normal');
         const colors = new Float32Array(position.count * 3);
         for (let i = 0; i < position.count; i++) {
-          const tint = this.biome.vertexTint(
+          const tint = this.biome.vertexTint?.(
             position.getX(i),
             position.getY(i) / this.exaggeration,
             position.getZ(i),
             normal.getY(i),
-          );
-          colors.set(tint, i * 3);
+          ) ?? [1, 1, 1];
+          const rim = 1 + rimTint * this.scourAt(position.getX(i), position.getZ(i)).rim;
+          colors.set([tint[0] * rim, tint[1] * rim, tint[2] * rim], i * 3);
         }
         chunk.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
       }
@@ -304,6 +315,7 @@ export class Terrain {
     const broad = detailAt(x, z, slope, this.detail);
     if (!this.fidelity || !this.focus) return broad;
     const f = this.fidelity;
+    const scour = this.scourAt(x, z);
     const distance = Math.hypot(x - this.focus.x, z - this.focus.z);
     const fade =
       1 - THREE.MathUtils.smoothstep(distance, f.focus.radiusM, f.focus.radiusM + f.focus.fadeM);
@@ -333,6 +345,7 @@ export class Terrain {
     }
     return (
       broad +
+      scour.height +
       shelf * rock * fade * this.detail.strength +
       (bed * (f.reliefBed ?? 0.35) - rill * rill * 0.65) *
         f.reliefM *
@@ -340,6 +353,30 @@ export class Terrain {
         fade *
         this.detail.strength
     );
+  }
+
+  /**
+   * Scour moat at a position: height offset (m) and rim weight 0..1. The moat is deepest against
+   * the footprint and irregular along its length; the rim is a low silty berm just outside it.
+   */
+  scourAt(x: number, z: number): { height: number; rim: number } {
+    const s = this.scour;
+    const p = this.fidelity?.scour;
+    if (!s || !p) return { height: 0, rim: 0 };
+    // Footprint frame: +z along the heading.
+    const ox = x - s.x;
+    const oz = z - s.z;
+    const lx = ox * s.cos + oz * s.sin;
+    const lz = -ox * s.sin + oz * s.cos;
+    const qx = Math.abs(lx) - p.halfWidthM;
+    const qz = Math.abs(lz) - p.halfLengthM;
+    const d = Math.hypot(Math.max(qx, 0), Math.max(qz, 0)) + Math.min(Math.max(qx, qz), 0);
+    const ease = THREE.MathUtils.smoothstep;
+    const irregular = 0.65 + 0.7 * valueNoise2(x / 17, z / 17, this.detail.seed ^ 0x3b);
+    const moat = p.depthM * irregular * (1 - ease(d, 0, p.widthM));
+    const rim =
+      ease(d, p.widthM * 0.7, p.widthM * 1.3) * (1 - ease(d, p.widthM * 1.3, p.widthM * 2.6));
+    return { height: (rim * p.rimM - moat) * this.detail.strength, rim };
   }
 
   /**
