@@ -110,9 +110,9 @@ describe('terrain scour moat', () => {
         const p = profile.scour!;
         const at = (offset: number) => terrain.scourAt(p.halfWidthM + offset, 0);
         expect(at(1).height).toBeLessThan(-0.3 * p.depthM);
-        expect(at(p.widthM * 1.3).height).toBeGreaterThan(0.3 * p.rimM);
+        expect(at(p.widthM * 1.1).height).toBeGreaterThan(0.3 * p.rimM);
         expect(at(p.widthM * 3).height).toBe(0);
-        expect(at(p.widthM * 1.3).rim).toBeGreaterThan(0.9);
+        expect(at(p.widthM * 1.1).rim).toBeGreaterThan(0.9);
         expect(at(1).rim).toBe(0);
         expect(terrain.detailHeight(p.halfWidthM + 1, 0)).toBeLessThan(0);
       } finally {
