@@ -1495,3 +1495,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged and pushed (smoke + project-base green; no full e2e):** Codex S-bughunt-21 (nav panel no longer says ALL OBJECTIVES COMPLETE with unfinished optionals and no target position) and S-bughunt-22 (settings/photo-quota guards, tests only).
 - **Codex:** 2520 (verify closeup artifacts) still running; 2550-2570 queued, dispatch waits on 5h budget. No Claude package: week 44% left, on the pace line, so saved it. No tag.
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-18 01:36 CDT headless run 57 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Codex S-verify-closeup-artifacts (Titanic pose clearance fix 4 m to 18 m above terrain, life near-camera tests) and Sonnet V-lostcity-slice2 (tower carbonate mottle, narrower vent lip, foot rubble; ~4.1, torn rim facets remain and need rim-notching geometry).
+- **Codex:** 2550-2570 queued, dispatch waits on 5h budget. No tag (CI of recent pushes pending).
+- **Needs owner:** real-phone Low-tier play.
