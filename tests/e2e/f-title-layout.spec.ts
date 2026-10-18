@@ -48,8 +48,9 @@ test('home copy, semantic order and first focus', async ({ page }) => {
           : (e.textContent ?? '').replace(/^Dive: .*/, 'Dive'),
       ),
     );
+  // The primary reads "Dive: <site>" (or plain "Dive" while the catalogue loads); normalised above.
   expect(order).toEqual([
-    /^Dive(:|$)/,
+    'Dive',
     'Dive sites',
     'Free dive',
     'MODE',

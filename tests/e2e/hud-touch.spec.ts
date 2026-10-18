@@ -1616,7 +1616,7 @@ freshTest.describe('catalog tutorial and reload', () => {
             );
           });
           await page.goto(
-            `/?mission=${site}&skipBriefing=1&tier=low${viewport.touch ? '&touch=1' : ''}`,
+            `/?mission=${site}&skipBriefing=1&tier=low&life=0${viewport.touch ? '&touch=1' : ''}`,
           );
           await ready(page);
           const card = page.locator(GUIDANCE.tutorial);
@@ -1692,9 +1692,8 @@ freshTest.describe('catalog tutorial and reload', () => {
 
           await away(page);
           await expect(page.locator(GUIDANCE.scan)).toBeHidden();
-          // Phones keep the standing objective line; desktop has the objectives panel.
-          if (viewport.touch) await expect(chip).toBeVisible();
-          else await expect(chip).toBeHidden();
+          // The standing objective line (with its range instruction) shows on every device.
+          await expect(chip).toBeVisible();
           await layout(page, 'out of range with the standing objective');
           await reviewScreenshot(page, { path: `${shots}/${site}-${tag}-chip.png` });
 
@@ -1705,10 +1704,7 @@ freshTest.describe('catalog tutorial and reload', () => {
             g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
           }, poi);
           await page.clock.runFor(500);
-          // Phones keep a standing card. Desktop's objectives panel names the next target, so
-          // a side contact gets no card until the objective itself is aimed at; the
-          // logged-contact text is pinned in d-scan.
-          if (viewport.touch) await expect(page.locator(GUIDANCE.any)).toBeVisible();
+          await expect(page.locator(GUIDANCE.any)).toBeVisible();
           await expect(card).toBeHidden();
           await layout(page, 'return to scanned contact');
 

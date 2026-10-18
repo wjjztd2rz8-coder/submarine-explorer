@@ -182,6 +182,14 @@ html.is-touch body:has(.guidance-slot[data-kind='scan']:not([hidden])) .d-scan-e
   html.is-touch .hud {
     width: 250px;
   }
+  /* The narrow card's text names the distance ("Get closer to scan · 1116 m"); the ring's
+     copy of it, and wide tracking, would wrap that line. */
+  html.is-touch .guidance-slot[data-kind='objective'] .guidance-ring {
+    display: none;
+  }
+  html.is-touch .guidance-slot[data-kind='objective'] .guidance-hint {
+    letter-spacing: 0.02em;
+  }
 }
 
 @media (orientation: portrait) {
