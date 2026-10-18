@@ -1483,3 +1483,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - CI red x3 diagnosed and fixed (stale hud-touch desktop expectation; d-shell frame-wait hang). Pushed, gates green. No packages merged. Codex queue unchanged.
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 22:59 CDT headless run 55 (Claude)
+
+- **Merged and pushed (smoke + project-base green; no full e2e):** Codex S-bughunt-contact-choice (ScanOverlay result card refreshes directions without renewing its lifetime), S-verify-picker-density (tests), S-bughunt-20 (corrupt legacyPending record no longer shadows intact evidence). One test-import conflict resolved by hand.
+- **Codex:** 2520-2540 queued (dispatched if pacing allowed). No Claude package started: Claude week 44% left, just under pace. No tag.
+- **Needs owner:** real-phone Low-tier play.
