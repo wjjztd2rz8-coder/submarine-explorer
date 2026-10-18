@@ -118,6 +118,40 @@ describe('guidance slot', () => {
     };
   };
 
+  const target = (id: string, name: string, x: number, y: number, z: number, radius = 20) => ({
+    id,
+    name,
+    landmarkId: 'site',
+    position: new Vector3(x, y, z),
+    radius,
+    scanSeconds: 1,
+  });
+
+  const contactGuidance = (touch: boolean) => {
+    document.documentElement.classList.contains = () => touch;
+    const bus = new EventBus();
+    const scanner = new Scanner(DEFAULT_CONFIG.scan, bus);
+    const overlay = new ScanOverlay(DEFAULT_CONFIG.scan, document.body);
+    const targets = [
+      target('memorial', 'Memorial', 0, 0, -5),
+      target('stern', 'Stern', -300, 0, 0),
+    ];
+    scanner.setTargets(targets);
+    scanner.setObjective('stern');
+    const position = new Vector3();
+    const forward = new Vector3(0, 0, -1);
+    const keys = { scan: 'G', guide: 'J' };
+    bus.on('scan:complete', ({ poiId, firstTime }) =>
+      overlay.showComplete(targets.find((t) => t.id === poiId)!.name, firstTime, keys),
+    );
+    const step = (dt = 0, held = false) => {
+      scanner.update(dt, position, forward, held);
+      overlay.update(scanner.view, keys, null, dt);
+      return texts(overlay.slot);
+    };
+    return { scanner, overlay, targets, position, forward, keys, step };
+  };
+
   it('shows the winner, withdraws it and falls back to the next offer', () => {
     const slot = new GuidanceSlot();
     slot.offer('objective', 'objective', msg('Stern section'));
@@ -292,6 +326,184 @@ describe('guidance slot', () => {
       overlay.update(scanner.view, keys, null, 0);
       expect(texts(overlay.slot).kicker).toBe('SCAN TARGET');
       overlay.dispose();
+    },
+  );
+
+  it.each([false, true])(
+    'refreshes contact choice without clearing the slot (touch=%s)',
+    (touch) => {
+      const f = contactGuidance(touch);
+      expect(f.step()).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET · OPTIONAL' });
+      f.scanner.setObjective('memorial');
+      expect(f.step()).toMatchObject({
+        name: 'Memorial',
+        kicker: 'SCAN TARGET',
+        detail: touch ? 'HOLD SCAN TO SCAN' : 'HOLD G TO SCAN',
+      });
+      f.scanner.setObjective(null);
+      expect(f.step().kicker).toBe('SCAN TARGET');
+      f.scanner.setObjective('stern');
+      f.keys.scan = 'X';
+      expect(f.step().detail).toBe(touch ? 'Stern · TURN 90° PORT' : 'HOLD X TO SCAN');
+      // The objective wins when it becomes eligible, even beside a nearer contact.
+      f.targets[1].position.set(0, 0, -15);
+      expect(f.step()).toMatchObject({
+        name: 'Stern',
+        kicker: 'SCAN TARGET',
+        detail: touch ? 'HOLD SCAN TO SCAN' : 'HOLD X TO SCAN',
+      });
+      f.targets[1].position.set(-300, 0, 0);
+      f.position.set(0, 0, 1000);
+      expect(f.step()).toMatchObject(
+        touch ? { name: 'Stern', kind: 'objective' } : { hidden: true },
+      );
+      f.position.set(0, 0, 0);
+      expect(f.step()).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET · OPTIONAL' });
+      // Removing both sources must withdraw guidance without a manual overlay clear.
+      f.scanner.setTargets([]);
+      expect(f.step().hidden).toBe(true);
+      expect(f.overlay.slot.kind).toBeNull();
+      expect(
+        (document.body as unknown as FakeElement).children.filter(
+          (el) => el.className === 'guidance-slot',
+        ),
+      ).toHaveLength(1);
+      f.overlay.dispose();
+    },
+  );
+
+  it.each([false, true])(
+    'keeps active and interrupted scans ahead of results and objectives (touch=%s)',
+    (touch) => {
+      const f = contactGuidance(touch);
+      f.step();
+      f.overlay.showComplete('Whale', true, f.keys);
+      expect(f.step().name).toBe('Whale');
+      expect(f.step(0.2, true)).toMatchObject({
+        name: 'Memorial',
+        kicker: 'SCANNING',
+        detail: touch ? 'HOLD SCAN · KEEP ON TARGET' : 'HOLD G · KEEP ON TARGET',
+      });
+      expect(f.step(0.1)).toMatchObject({
+        name: 'Memorial',
+        kicker: 'SCAN INTERRUPTED',
+        detail: touch ? 'HOLD SCAN TO RESUME' : 'HOLD G TO RESUME',
+      });
+      f.overlay.slot.offer('warning', 'urgent', msg('BATTERY LOW'));
+      expect(texts(f.overlay.slot).name).toBe('BATTERY LOW');
+      f.overlay.slot.offer('warning', 'urgent', null);
+      expect(texts(f.overlay.slot).kicker).toBe('SCAN INTERRUPTED');
+      // Detail refreshes must not restart a result's three-second grace over ready contacts.
+      expect(f.step(0.6).name).toBe('Whale');
+      expect(f.step(2.2)).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET · OPTIONAL' });
+      f.position.set(0, 0, 1000);
+      f.step(DEFAULT_CONFIG.scan.completeBannerSeconds + 0.1);
+      expect(texts(f.overlay.slot)).toMatchObject(
+        touch ? { name: 'Stern', kind: 'objective' } : { hidden: true },
+      );
+      f.position.set(0, 0, 0);
+      expect(f.step().kicker).toBe('SCAN TARGET · OPTIONAL');
+      f.step(0.2, true);
+      f.scanner.setTargets([]);
+      expect(f.step().hidden).toBe(true);
+      f.overlay.dispose();
+    },
+  );
+
+  it.each([true, false])(
+    'updates a result cue as its objective moves, changes or disappears (firstTime=%s)',
+    (firstTime) => {
+      const f = contactGuidance(true);
+      f.step();
+      f.overlay.showComplete('Whale', firstTime, f.keys);
+      expect(texts(f.overlay.slot)).toMatchObject({
+        name: 'Whale',
+        detail: 'Stern · TURN 90° PORT',
+      });
+      f.forward.set(-1, 0, 0);
+      expect(f.step(0.2).detail).toBe('Stern · 300 m AHEAD');
+      f.scanner.setObjective('memorial');
+      expect(f.step(0.2).detail).toBe(firstTime ? 'OPEN JOURNAL' : 'LOGGED · JOURNAL');
+      f.scanner.setObjective('stern');
+      expect(f.step(0.2).detail).toContain('Stern');
+      f.scanner.setTargets([f.targets[0]]);
+      expect(f.step(0.2).detail).toBe(firstTime ? 'OPEN JOURNAL' : 'LOGGED · JOURNAL');
+      // Updating a result must not renew its priority or lifetime.
+      f.scanner.setTargets([]);
+      expect(f.step(DEFAULT_CONFIG.scan.completeBannerSeconds - 0.9)).toMatchObject({
+        name: 'Whale',
+        hidden: false,
+      });
+      expect(f.step(0.2).hidden).toBe(true);
+      f.overlay.dispose();
+    },
+  );
+
+  it.each([true, false])(
+    'updates a visible result when the input mode or bindings change (firstTime=%s)',
+    (firstTime) => {
+      const f = contactGuidance(false);
+      f.step();
+      f.overlay.showComplete('Whale', firstTime, f.keys);
+      expect(texts(f.overlay.slot).detail).toBe(
+        firstTime ? 'PRESS J · JOURNAL' : 'LOGGED · JOURNAL',
+      );
+      document.documentElement.classList.contains = () => true;
+      expect(f.step(0.2).detail).toBe('Stern · TURN 90° PORT');
+      document.documentElement.classList.contains = () => false;
+      f.keys.guide = 'K';
+      expect(f.step(0.2).detail).toBe(firstTime ? 'PRESS K · JOURNAL' : 'LOGGED · JOURNAL');
+      f.overlay.dispose();
+    },
+  );
+
+  it('carries the next objective on a result created during scanner completion', () => {
+    const f = contactGuidance(true);
+    f.scanner.setObjective('memorial');
+    f.step(0.2, true);
+    expect(f.step(0.9, true)).toMatchObject({ name: 'Memorial', kicker: 'NEW ENTRY' });
+    f.scanner.setObjective('stern');
+    expect(f.step().detail).toBe('Stern · TURN 90° PORT');
+    f.scanner.setObjective(null);
+    expect(f.step().detail).toBe('OPEN JOURNAL');
+    f.overlay.dispose();
+  });
+
+  it('keeps the result cue while an objective in range still needs aiming', () => {
+    const f = contactGuidance(true);
+    f.targets[1].position.set(50, 0, 0);
+    f.targets[1].radius = 60;
+    f.scanner.setTargets([f.targets[1]]);
+    f.step();
+    expect(f.scanner.view.candidateId).toBeNull();
+    f.overlay.showComplete('Whale', true, f.keys);
+    expect(texts(f.overlay.slot)).toMatchObject({
+      name: 'Whale',
+      detail: 'Stern · TURN 90° STARBOARD',
+    });
+    f.forward.set(1, 0, 0);
+    expect(f.step().detail).toBe('OPEN JOURNAL');
+    expect(f.scanner.view.candidateId).toBe('stern');
+    f.overlay.dispose();
+  });
+
+  it.each([40, -40])(
+    'steers vertically toward an in-range objective beside an optional contact (height=%s)',
+    (height) => {
+      const f = contactGuidance(true);
+      f.targets[1].position.set(0, height, -30);
+      f.targets[1].radius = 60;
+      expect(f.step()).toMatchObject({
+        name: 'Memorial',
+        kicker: 'SCAN TARGET · OPTIONAL',
+        detail: `Stern · ${height > 0 ? 'RISE' : 'SINK'} TOWARD TARGET`,
+      });
+      expect(f.scanner.view.objectiveInRange).toBe(true);
+      f.overlay.showComplete('Whale', true, f.keys);
+      expect(texts(f.overlay.slot).detail).toBe(
+        `Stern · ${height > 0 ? 'RISE' : 'SINK'} TOWARD TARGET`,
+      );
+      f.overlay.dispose();
     },
   );
 

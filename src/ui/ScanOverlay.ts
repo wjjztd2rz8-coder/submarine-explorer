@@ -36,8 +36,13 @@ export class ScanOverlay {
   readonly slot: GuidanceSlot;
   private readonly reticle: HTMLDivElement;
   private suppressed = false;
-  /** Seconds the result just shown still outranks a ready contact (see update). */
-  private completeLeft = 0;
+  /** Result content and lifetime; starting another scan ends its ready-contact priority. */
+  private complete: {
+    title: string;
+    firstTime: boolean;
+    left: number;
+    holdsReady: boolean;
+  } | null = null;
   /** The standing objective's direction line, kept for a result card to carry. */
   private cue: string | null = null;
 
@@ -77,7 +82,7 @@ export class ScanOverlay {
   /** Discard the previous dive's guidance and result priority. */
   clear(): void {
     this.reticle.hidden = true;
-    this.completeLeft = 0;
+    this.complete = null;
     this.cue = null;
     this.slot.clear();
   }
@@ -85,26 +90,39 @@ export class ScanOverlay {
   /** Show the completion confirmation for `completeBannerSeconds`. */
   showComplete(title: string, firstTime: boolean, keys: ScanOverlayKeys): void {
     if (this.suppressed) return;
-    this.completeLeft = this.config.completeBannerSeconds;
+    this.complete = {
+      title,
+      firstTime,
+      left: this.config.completeBannerSeconds,
+      holdsReady: true,
+    };
     this.slot.flash(
       'complete',
       'discovery',
-      {
-        kicker: firstTime ? 'NEW ENTRY' : 'SCAN COMPLETE',
-        text: title,
-        detail:
-          this.cue && isTouch()
-            ? this.cue
-            : firstTime
-              ? isTouch()
-                ? 'OPEN JOURNAL'
-                : `PRESS ${keys.guide} · JOURNAL`
-              : 'LOGGED · JOURNAL',
-        tone: firstTime ? 'cyan' : 'dim',
-        ring: { progress: 1, label: 'OK' },
-      },
+      this.completeMessage(title, firstTime, keys),
       this.config.completeBannerSeconds,
     );
+  }
+
+  private completeMessage(
+    title: string,
+    firstTime: boolean,
+    keys: ScanOverlayKeys,
+  ): GuidanceMessage {
+    return {
+      kicker: firstTime ? 'NEW ENTRY' : 'SCAN COMPLETE',
+      text: title,
+      detail:
+        this.cue && isTouch()
+          ? this.cue
+          : firstTime
+            ? isTouch()
+              ? 'OPEN JOURNAL'
+              : `PRESS ${keys.guide} · JOURNAL`
+            : 'LOGGED · JOURNAL',
+      tone: firstTime ? 'cyan' : 'dim',
+      ring: { progress: 1, label: 'OK' },
+    };
   }
 
   /**
@@ -116,13 +134,24 @@ export class ScanOverlay {
     if (this.suppressed) return;
     this.updateReticle(view, screen);
     this.cue = this.objectiveCue(view);
+    if (this.complete) {
+      this.complete.left -= dt;
+      if (this.complete.left <= 0) this.complete = null;
+      else if (view.phase === 'scanning') this.complete.holdsReady = false;
+    }
+    // Refresh directions and input labels without renewing the result's topic or lifetime.
+    this.slot.offer(
+      'complete',
+      'discovery',
+      this.complete
+        ? this.completeMessage(this.complete.title, this.complete.firstTime, keys)
+        : null,
+    );
     const { scan, objective } = this.messages(view, keys);
     // A result has just been shown: the next contact is usually already in range and
     // ready, but for the result's few seconds that card steps aside. A new scan under
     // way (or an interrupted one) takes the slot back at once.
-    const resultHolds = this.completeLeft > 0 && view.phase === 'idle';
-    if (view.phase === 'scanning') this.completeLeft = 0;
-    else this.completeLeft -= dt;
+    const resultHolds = this.complete?.holdsReady && view.phase === 'idle';
     this.slot.offer('scan', 'scan', scan && resultHolds ? { ...scan, soft: true } : scan);
     this.slot.offer('objective', 'objective', objective);
   }
@@ -154,17 +183,21 @@ export class ScanOverlay {
     }
   }
 
-  /** "STERN · TURN 30° PORT": where the outstanding objective lies, or null when none/at hand. */
+  /** "STERN · TURN 30° PORT": where the outstanding objective lies, unless ready to scan. */
   private objectiveCue(view: ScanView): string | null {
     if (view.objectiveId == null || !view.objectiveName) return null;
-    if (view.objectiveId === view.nearestId && view.nearestInRange) return null;
+    if (view.objectiveId === view.candidateId) return null;
     const turn = view.objectiveTurnDeg;
     const how =
       Math.abs(turn) >= 10
         ? `TURN ${Math.abs(turn).toFixed(0)}° ${turn >= 0 ? 'STARBOARD' : 'PORT'}`
-        : view.objectiveDistance <= view.objectiveRadius
-          ? 'DIVE DEEPER'
-          : `${view.objectiveDistance.toFixed(0)} m AHEAD`;
+        : view.objectiveInRange
+          ? view.objectiveVertDeg >= 0
+            ? 'RISE TOWARD TARGET'
+            : 'SINK TOWARD TARGET'
+          : view.objectiveDistance <= view.objectiveRadius
+            ? 'DIVE DEEPER'
+            : `${view.objectiveDistance.toFixed(0)} m AHEAD`;
     return `${view.objectiveName} · ${how}`;
   }
 
