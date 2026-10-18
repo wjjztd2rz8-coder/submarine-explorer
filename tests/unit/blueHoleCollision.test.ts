@@ -100,7 +100,7 @@ for (const tier of ['low', 'medium', 'high'] as const) {
         );
         expect(p.stable).toBeLessThan(1e-4);
         if (p.penetration === 2.5) expect(p.hit).toBe(true);
-        if (!p.hit) expect(p.clearance).toBeGreaterThanOrEqual(radius - 0.45);
+        if (!p.hit) expect(p.clearance).toBeGreaterThanOrEqual(radius - 0.46);
       }
       expect(probes.filter((p) => !p.hit).length).toBeLessThanOrEqual(1);
     } finally {

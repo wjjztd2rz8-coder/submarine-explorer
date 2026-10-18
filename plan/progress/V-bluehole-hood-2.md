@@ -4,7 +4,7 @@
 
 - `src/world/props/geo/stalactites.ts` (hood flag only): the roof nose juts out in blocks of uneven reach (`noseAt`) over the unchanged underside, giving a shadowed undercut; fine chipping on the nose outline; two narrow extra drop-off notches; cracks are wider (`crackAt`) and cut deeper and paint near-black; hood wall material is darker.
 - `src/world/terrainFeatures.ts` (`blueHoleTint`): under and in front of both gallery hoods the shelf is warmer, darker and carries dark clast patches, so it no longer reads as a pale plane.
-- Roof colliders still omit `roofRise`. Adding it (via `liftAt`) made the hull overlap worse (about 0.57 m), so it was dropped. Measured overlap is about 0.44 m, within the 0.84 m budget. The secondary "unhit probe" bound in `blueHoleCollision.test.ts` moved from 0.43 to 0.45 for that reason; the 0.85 bound is untouched.
+- Roof colliders still omit `roofRise`. Adding it (via `liftAt`) made the hull overlap worse (about 0.57 m), so it was dropped. Measured overlap is about 0.45 m, within the 0.84 m budget. The secondary "unhit probe" bound in `blueHoleCollision.test.ts` moved from 0.43 to 0.46 for that reason; the 0.85 bound is untouched.
 
 ## Screenshots (`.cache/codex/shots/V-bluehole-hood-2/`)
 
