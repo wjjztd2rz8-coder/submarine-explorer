@@ -1533,3 +1533,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **CI:** run 61 red on one shard: f-bughunt-18 "restore the global chase radius" timed out at 60 s; passes locally 8/8, treated as load flake (watch for recurrence). No tag.
 - **Codex:** 2550-2600 queued; dispatch waits on weekly pace.
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-18 14:45 CDT headless run 63 (Claude): targeted review
+
+- False "Claude idle" trigger (weekly pace gate was the cause); added a 3-point margin in review-triggers.sh. No package merged; week is on the pace line so budget saved. Codex 2550-2600 queued.
+- **Needs owner:** real-phone Low-tier play.

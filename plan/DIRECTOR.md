@@ -66,7 +66,6 @@ Stage (review 2026-10-18 midday, joint with Sol): about 80% to 1.0, 4-5 weeks ta
 
 The newest items go first.
 
-- Claude weekly window: 37% left on 2026-10-18 at ~15%/day, so it runs out around Oct 20, before its Oct 22 reset. Your one Claude reset also expires Oct 22: applying it when the window runs low costs nothing extra.
 - A short phone retest once the P2 items below land (boost gone, scan range, anchored events, Your sub screen).
 
 ## In flight

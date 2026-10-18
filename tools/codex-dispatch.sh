@@ -26,10 +26,18 @@ def left(k):
     if "used" not in w: return -1
     return 100 if w.get("resets_at") and w["resets_at"]<now else 100-w["used"]
 # Weekly pacing: 2026-10-15/16 spent 91% of the Codex week in ~29 h, leaving
-# the lane shut for 6 days. Allow a 15% head start, then roughly linear spend.
+# the lane shut for 6 days. Allow a head start, then roughly linear spend. The
+# head start went 15% -> 30% on 2026-10-18 (owner): Claude has no reset left,
+# so Codex should carry more of the work early in its week.
 w=c.get("seven_day") or {}
 days=max(0,min(7,((w.get("resets_at") or now)-now)/86400))
-sys.exit(0 if left("five_hour")>=20 and left("seven_day")>=max(8,8+92*days/7-15) else 1)'; }
+# 2026-10-18: OpenAI is refilling Codex every few days (global resets plus a
+# 28-day "improvement or reset" pledge from Oct 4; our samples show 9 refills in
+# 16 days), so weekly pacing only wasted budget. Pacing is off until Nov 2;
+# the weekly floor (8%) and the 5h floor still apply.
+paced=time.time()>=time.mktime((2026,11,2,0,0,0,0,0,-1))
+week_need=max(8,8+92*days/7-30) if paced else 8
+sys.exit(0 if left("five_hour")>=20 and left("seven_day")>=week_need else 1)'; }
 # Codex readings come from its last session log, so a manual reset (or a reset
 # while idle) stays invisible until a Codex run happens. When the reading says
 # low, nothing is running and the reading is >30 min old, refresh it once.

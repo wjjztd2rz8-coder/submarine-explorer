@@ -248,3 +248,13 @@ Changes to how the work is done (tooling, scheduling, agent use), with the reaso
 
 - Cause: review-triggers.sh fired "Claude idle at >=50% for 2 h" while resume.sh was correctly skipping runs on the weekly pacing gate (52% left vs 53.4% floor). Idle was deliberate, not waste; efficiency.sh's idle hours overstate it for the same reason.
 - Fix: the idle trigger now requires the same weekly pacing check as resume.sh (claude_week_ok). Codex queue 2430-2460 also waits on its weekly pacing by design (burn ~24%/day).
+
+## 2026-10-18 midday review: Codex weekly head start 15% -> 30% (owner)
+
+- The owner asked why the queue waited ~10 h for the weekly pacing gate when Codex had budget. They had also already used their one Claude reset, so Claude is the scarce lane until Oct 22 and Codex should carry more of the work early in its week.
+- Change: `codex-dispatch.sh` needs weekly left >= 8 + 92*days/7 - 30 (was -15). At 65% left with 6.2 days to go, it opened at once; 2541-2543 launched 11:21. It still throttles to about linear after roughly half a day at three tasks, so the Oct 15-16 "week gone in 29 h" failure stays guarded.
+- Merge verification gap (smoke-only gates hid a red e2e): R-merge-verify queued and launched.
+- **Later the same day: Codex weekly pacing off until Nov 2 (owner tip, verified).** The owner suspected global Codex resets that aren't banked. `.cache/metrics/usage.csv` shows the Codex week refilled to 90-100% nine times in 16 days (Oct 2, 3, 6, 8, 11, 12, 15, 16, 17); only Oct 17 16:15 fits the natural weekly reset. A Haiku web check found OpenAI global resets (Sept 7, Oct 2) and an Oct 4 "28-day: an improvement or a full reset each day" pledge (moderate-high confidence; the individual October days are unverified). Pacing to one refill a week was therefore wasting budget. `codex-dispatch.sh` now needs only weekly ≥ 8% and 5h ≥ 20% until Nov 2, then the paced rule returns. If refills stop before then, the watchdog floor still stops the lane at 7%.
+- **2026-10-18 14:50 — false "Claude idle" trigger**
+  - **Evidence:** the trigger fired with Claude 5h at 73-100% and the week at 36% left, exactly on the resume.sh pace line (36.0). Runs had been skipped by the weekly gate (322 skips), which is deliberate, not idle.
+  - **Change:** `claude_week_ok()` in `tools/review-triggers.sh` now needs a 3-point margin above the pace line, so sitting on the line no longer counts as idle.

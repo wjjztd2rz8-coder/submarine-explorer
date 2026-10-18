@@ -1,8 +1,7 @@
 /**
  * On-screen touch controls: a left virtual stick (thrust and turn),
- * a right ballast slider (rise / sink), hold Scan and tap buttons (Boost,
- * Lights, Sonar, Photo, Pause), drag-to-look, pinch zoom and double-tap to
- * reset the camera.
+ * a right ballast slider (rise / sink), hold Scan and tap buttons (Lights,
+ * Sonar, Photo, Pause), drag-to-look, pinch zoom and double-tap to reset the camera.
  *
  * Everything maps onto the existing {@link Input} (`touchAxes`, `touchHeld`,
  * `touchEdge`, `touchLook`, `touchZoom`), so gameplay code is unchanged.
@@ -51,7 +50,6 @@ export class TouchControls {
   private readonly stickKnob: HTMLDivElement;
   private readonly sliderTrack: HTMLDivElement;
   private readonly sliderThumb: HTMLDivElement;
-  private readonly boostButton: HTMLButtonElement;
   private readonly pauseButton: HTMLButtonElement;
   private readonly rotateHint: HTMLDivElement;
   private readonly disposers: Array<() => void> = [];
@@ -106,14 +104,6 @@ export class TouchControls {
       this.tapButton('toggleSonar', 'SONAR', 'tc-btn-sonar'),
       this.tapButton('togglePhotoMode', 'PHOTO', 'tc-btn-photo'),
     );
-    this.boostButton = el('button', 'tc-btn tc-btn-boost', 'BOOST');
-    this.boostButton.type = 'button';
-    this.boostButton.setAttribute('aria-label', 'Boost');
-    this.boostButton.setAttribute('aria-pressed', 'false');
-    this.boostButton.addEventListener('click', () => {
-      this.input.touchBoost = !this.input.touchBoost;
-      this.syncBoost();
-    });
     const pause = (this.pauseButton = el('button', 'tc-btn tc-btn-pause'));
     pause.hidden = true;
     pause.type = 'button';
@@ -125,7 +115,6 @@ export class TouchControls {
     this.rotateHint.hidden = true;
 
     this.root.append(this.stickBase, this.sliderTrack, buttons, this.rotateHint);
-    this.root.append(this.boostButton);
     (opts.parent ?? document.body).append(this.root);
     // Pause sits in the HUD bar beside Journal; it follows the controls' visibility.
     (opts.bar ?? this.root).append(pause);
@@ -164,14 +153,10 @@ export class TouchControls {
    * menu); `photo` while photo mode frames a shot (controls stay hidden so the
    * frame is clear, look and pinch still work).
    */
-  update(inDive: boolean, photo: boolean, boostAllowed = true): void {
+  update(inDive: boolean, photo: boolean): void {
     if (this.disposed) return;
     this.photoMode = photo;
     const show = this.touchMode && inDive && !photo;
-    // progress can reject the sampled boost once its meter is empty. Drop the
-    // latch so recovery never silently restarts boost without another tap.
-    if (!show || !boostAllowed) this.input.touchBoost = false;
-    this.syncBoost();
     // Photo mode already hides flight controls; pausing must still end its camera gesture.
     if (!inDive && !photo) this.releaseAll();
     if (show !== this.shouldShow) {
@@ -491,18 +476,10 @@ export class TouchControls {
 
   // ------------------------------------------------------------- helpers
 
-  private syncBoost(): void {
-    const on = this.input.touchBoost;
-    this.boostButton.classList.toggle('is-active', on);
-    this.boostButton.setAttribute('aria-pressed', String(on));
-  }
-
   private releaseAll(): void {
     this.releaseStick();
     this.releaseSlider();
     this.input.touchHeld.clear();
-    this.input.touchBoost = false;
-    this.syncBoost();
     this.heldPointers.clear();
     this.looks.clear();
     this.pinchDist = 0;

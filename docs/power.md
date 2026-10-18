@@ -8,9 +8,9 @@ Warnings begin at 25% and become critical at 10%.
 At 1× simulated time, oxygen lasts 10 hours. Battery has an 18-hour idle
 component, plus load-dependent use from thrust, ballast, lights and sensors.
 Full thrust draws an additional 1/12 of a battery per hour; lights add 1/22,
-and active sensors add 1/24. Boost multiplies thrust use by 2.5. Typical
+and active sensors add 1/24. Typical
 research-speed operation with lights and sensors lasts roughly 6–10 hours;
-continuous full thrust and boost shorten that. At 2× or 3×, the same simulation
+continuous full thrust shortens that. At 2× or 3×, the same simulation
 plays faster in wall time, so supplies drain 2× or 3× faster per wall second.
 All tuning values live in `Config.power`.
 

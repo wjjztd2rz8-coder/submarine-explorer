@@ -286,9 +286,7 @@ describe('createSystems', () => {
     expect(new Set(stages)).toEqual(new Set(FRAME_STAGES));
     expect(runner.order).toContain('gate.input: inputGate');
     expect(runner.order).toContain('sim.vehicles: submarine');
-    // Limit boost before physics consumes it; sampling reads the updated scanner.
     expect(runner.order.filter((hook) => hook.startsWith('sim.vehicles:'))).toEqual([
-      'sim.vehicles: progress',
       'sim.vehicles: submarine',
     ]);
     expect(runner.order.indexOf('sim.vehicles: submarine')).toBeLessThan(
