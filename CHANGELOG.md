@@ -18,6 +18,8 @@ without an entry here is not done.
 
 ### Removed
 
+- **P2-boost-cut:** remove boost from touch, Shift and gamepad RT, including its reserve/recovery logic, thrust multiplier, power surcharge and tuning. Reason: the owner phone test found no useful perceived effect; fewer controls simplify piloting. X remains camera reset.
+
 - **V-endurance-frame (cut 2026-10-16):** the extra Endurance mission-spawn framing pass is dropped. The current opening already shows the sub and the wreck, and the attempted reframe made the sub dominate. The attempt is kept as git tag `parked/V-endurance-aim`.
 
 - **2140 / S-tests:** remove shared-source hashes from the Beebe isolation tests, a duplicate zero-cell-spacing case, an obsolete wall-enlargement cost comparison, and redundant cache-object identity assertions. Placement, collision, spawn, metadata rejection, cache isolation and current performance coverage remain. The ranked audit and individual cuts are in `plan/progress/2140-S-verify-11.md`.

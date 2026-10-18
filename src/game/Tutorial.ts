@@ -158,6 +158,7 @@ export function tutorialText(
   k: TutorialKeys,
   scanProgress: number | null = null,
   destination?: string,
+  scanDistanceM?: number,
 ): string {
   switch (id) {
     case 'move': {
@@ -180,6 +181,7 @@ export function tutorialText(
     case 'scan':
       if (scanProgress !== null)
         return `Scanning… ${Math.round(Math.max(0, Math.min(1, scanProgress)) * 100)}% · keep holding ${device === 'touch' ? 'SCAN' : k.scan}.`;
+      if (scanDistanceM !== undefined) return `Get closer to scan · ${scanDistanceM.toFixed(0)} m`;
       return device === 'touch'
         ? 'Hold SCAN on a glowing target.'
         : `Hold ${k.scan} on a glowing target.`;

@@ -17,7 +17,6 @@ function input(partial: Partial<InputState> = {}): InputState {
     lookDy: 0,
     toggleCamera: false,
     toggleSonar: false,
-    boost: false,
     toggleLights: false,
     scan: false,
     cycleSimSpeed: false,
@@ -119,10 +118,10 @@ describe('Submarine drag', () => {
     expect(new Vector3(sub.velocity.x, 0, sub.velocity.z).length()).toBeLessThan(0.05);
   });
 
-  it('never exceeds maxSpeed even with boost', () => {
+  it('never exceeds maxSpeed', () => {
     const sub = new Submarine({ ...cfg, dragLinear: 0, dragQuadratic: 0 }, flatSeabed(-9000));
     sub.reset(0, -1000, 0);
-    run(sub, input({ throttle: 1, boost: true }), 3600);
+    run(sub, input({ throttle: 1 }), 3600);
     expect(sub.velocity.length()).toBeLessThanOrEqual(cfg.maxSpeed + 1e-6);
   });
 });

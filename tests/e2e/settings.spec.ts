@@ -49,7 +49,7 @@ interface Probe {
   reduceMotion: boolean;
   palette: string;
   captions: boolean;
-  boost: string[];
+  thrustReverse: string[];
   ahead: string[];
 }
 
@@ -67,7 +67,7 @@ async function probe(page: Page): Promise<Probe> {
       reduceMotion: g.rig.reduceMotion,
       palette: g.sonar.paletteName,
       captions: g.captions.enabled,
-      boost: g.input.getAction('boost')?.keys ?? [],
+      thrustReverse: g.input.getAction('thrustReverse')?.keys ?? [],
       ahead: g.input.getAction('thrustForward')?.keys ?? [],
     };
   });
@@ -104,16 +104,16 @@ test.describe('settings screen', () => {
     expect(p.captions).toBe(true);
     expect(p.palette).toBe('highContrast');
 
-    // Rebind Ahead to a boost key; Boost keeps its second key.
+    // Rebind Ahead to an Astern key; Astern keeps its second key.
     await dialog.getByRole('button', { name: 'Controls' }).click();
     await dialog.locator('[data-action="thrustForward"]').click();
     await expect(dialog.locator('[data-action="thrustForward"]')).toHaveText('Press a key…');
-    await page.keyboard.press('ShiftLeft');
-    await expect(dialog.locator('[data-action="boost"]')).toContainText('Shift');
-    await expect(dialog.locator('.settings-status')).toContainText('removed from Boost');
+    await page.keyboard.press('KeyS');
+    await expect(dialog.locator('[data-action="thrustReverse"]')).toContainText('Down');
+    await expect(dialog.locator('.settings-status')).toContainText('removed from Astern');
     p = await probe(page);
-    expect(p.ahead).toEqual(['ShiftLeft', 'ArrowUp']);
-    expect(p.boost).toEqual(['ShiftRight']);
+    expect(p.ahead).toEqual(['KeyS', 'ArrowUp']);
+    expect(p.thrustReverse).toEqual(['ArrowDown']);
     await page.screenshot({ path: 'tests/e2e/screenshots/settings.png' });
 
     await page.keyboard.press('Escape');
@@ -128,8 +128,8 @@ test.describe('settings screen', () => {
       reduceMotion: true,
       captions: true,
       palette: 'highContrast',
-      boost: ['ShiftRight'],
-      ahead: ['ShiftLeft', 'ArrowUp'],
+      thrustReverse: ['ArrowDown'],
+      ahead: ['KeyS', 'ArrowUp'],
     });
     await expect(page.locator('.hud-help')).toHaveCount(0);
     await page.keyboard.press('q');

@@ -39,6 +39,7 @@ function setup(site = 'site', params = new URLSearchParams()) {
   const on = vi.spyOn(bus, 'on');
   const scanner = new Scanner(config.scan, bus, new DiscoveryStore(null));
   const ctx = {
+    effective: { scan: { radiusFloorM: 100 } },
     params,
     scene: new Scene(),
     tier: 'low',
@@ -113,6 +114,34 @@ it('loaded disposal clears scene ownership, scanner targets, and bus subscriptio
   life.update(1, sub, new PerspectiveCamera(), 800, 0);
   expect(life.targets).toHaveLength(0);
 });
+it('keeps wildlife available at the Arcade floor and restores data reach in Realistic', () => {
+  const life = new Life({
+    tier: 'low',
+    table: undefined,
+    env: { groundAt: () => -200 },
+    scene: new Scene(),
+    landmarkId: 'site',
+    seed: 7,
+  });
+  try {
+    life.sim.spawnNear('comb-jelly', sub, 14, 1);
+    const agent = life.sim.pool.find((a) => a.alive)!;
+    Object.assign(agent, { x: 0, y: -100, z: -100, fade: 1 });
+    const camera = new PerspectiveCamera();
+    life.update(0, sub, camera, 800, 0, 100);
+    expect(life.targets).toHaveLength(1);
+    expect(life.targets[0].radius).toBe(100);
+    life.update(0, sub, camera, 800, 0, 0);
+    expect(life.targets).toHaveLength(0);
+    agent.z = -10;
+    life.update(0, sub, camera, 800, 0, 0);
+    expect(life.targets).toHaveLength(1);
+    expect(life.targets[0].radius).toBeLessThan(100);
+  } finally {
+    life.dispose();
+  }
+});
+
 it('reuses target selection storage in populated frozen frames and preserves target stickiness', () => {
   const life = new Life({
     tier: 'low',
