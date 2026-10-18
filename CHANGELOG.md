@@ -14,6 +14,8 @@ without an entry here is not done.
 
 ### Changed
 
+- **P2-events-anchored:** replace random event timers and camera-relative spawns with named optional contacts at authored spots across the six event sites. Arrivals play the existing effects; remaining inside does not replay them. No event kind is cut pending Claude’s Low-tier visual review.
+
 - **V-endurance:** the Endurance opening is reframed so the wreck is the subject: the chase camera is closer and offset sideways so the hull fills about 37% of the frame (was about 33%) and the sub sits to one side above it, and the deep-water ground fill is brighter so the lower hull side reads. Portrait uses a matching offset.
 
 ### Removed

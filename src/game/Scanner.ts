@@ -33,6 +33,8 @@ export interface ScanTarget {
   /** The sub must be at least this deep (m) to scan; absent = any depth. */
   minDepthM?: number;
   scanSeconds: number;
+  /** An approach contact plays on arrival; it never takes the scan beam. */
+  arrivalRadiusM?: number;
 }
 
 /** Records a completed scan; returns true if it was the first time. */
@@ -72,6 +74,7 @@ export interface ScanView {
   nearestFacing: boolean;
   /** The nearest contact has already been scanned during this dive. */
   nearestScanned: boolean;
+  nearestArrivalRadiusM?: number;
   /** Angle between forward and the nearest POI, degrees. */
   nearestAngleDeg: number;
   /**
@@ -314,7 +317,12 @@ export class Scanner {
         nearest = t;
         nearestGeo = g;
       }
-      if (g.facing && candidate?.id !== this.objectivePoiId && g.distance < candidateDist) {
+      if (
+        t.arrivalRadiusM === undefined &&
+        g.facing &&
+        candidate?.id !== this.objectivePoiId &&
+        g.distance < candidateDist
+      ) {
         candidate = t;
         candidateDist = g.distance;
       }
@@ -363,6 +371,7 @@ export class Scanner {
     v.candidateId = candidate?.id ?? null;
     v.nearestId = nearest?.id ?? null;
     v.nearestName = nearest?.name ?? '';
+    v.nearestArrivalRadiusM = nearest?.arrivalRadiusM;
     v.nearestDistance = nearestGeo?.distance ?? Infinity;
     v.nearestRadius = nearest?.radius ?? 0;
     v.nearestInRange = nearestGeo?.inRange ?? false;

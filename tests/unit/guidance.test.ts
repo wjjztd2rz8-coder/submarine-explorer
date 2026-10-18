@@ -152,6 +152,37 @@ describe('guidance slot', () => {
     return { scanner, overlay, targets, position, forward, keys, step };
   };
 
+  it.each([false, true])(
+    'offers named arrival contacts in the existing slot without a scan prompt (touch=%s)',
+    (touch) => {
+      const { scanner, overlay, position, forward, step } = contactGuidance(touch);
+      scanner.setTargets([]);
+      const contact = {
+        ...target('event:plume', 'Vent plume', 0, 0, -60, 110),
+        arrivalRadiusM: 40,
+      };
+      scanner.setSupplementalTargets([contact]);
+      expect(step(1, true)).toMatchObject({
+        kicker: 'OPTIONAL CONTACT',
+        name: 'Vent plume',
+        detail: 'APPROACH TO 40 M',
+      });
+      expect(scanner.view.candidateId).toBeNull();
+      expect(scanner.view.phase).toBe('idle');
+      forward.set(1, 0, 0);
+      expect(step().detail).toContain('TURN');
+      forward.set(0, 0, -1);
+      position.y = -60;
+      expect(step().detail).toBe('RISE TOWARD TARGET');
+      overlay.slot.offer('event', 'discovery', msg('Sighting'));
+      expect(texts(overlay.slot).name).toBe('Sighting');
+      overlay.slot.offer('event', 'discovery', null);
+      position.set(0, 0, 51);
+      expect(step().hidden).toBe(true);
+      overlay.dispose();
+    },
+  );
+
   it('shows the winner, withdraws it and falls back to the next offer', () => {
     const slot = new GuidanceSlot();
     slot.offer('objective', 'objective', msg('Stern section'));

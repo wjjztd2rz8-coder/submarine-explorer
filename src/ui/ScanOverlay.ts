@@ -272,6 +272,27 @@ export class ScanOverlay {
       if (touch) return vert >= 0 ? 'RISE TOWARD TARGET' : 'SINK TOWARD TARGET';
       return fallback;
     };
+    if (inContact && view.nearestArrivalRadiusM !== undefined) {
+      const approach = `APPROACH TO ${view.nearestArrivalRadiusM.toFixed(0)} M`;
+      return {
+        scan: {
+          kicker: 'OPTIONAL CONTACT',
+          text: view.nearestName,
+          detail:
+            Math.abs(view.nearestTurnDeg) >= 10
+              ? guide(view.nearestTurnDeg, view.nearestVertDeg, approach)
+              : Math.abs(view.nearestVertDeg) >= 10
+                ? view.nearestVertDeg >= 0
+                  ? 'RISE TOWARD TARGET'
+                  : 'SINK TOWARD TARGET'
+                : approach,
+          tone: 'cyan',
+          soft: true,
+          ring: { progress: 0, label: dist },
+        },
+        objective: null,
+      };
+    }
     if (view.candidateId !== null) {
       // A curiosity beside an outstanding objective is marked optional and keeps the
       // objective's direction on the same card.

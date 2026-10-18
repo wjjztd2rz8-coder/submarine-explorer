@@ -3,7 +3,7 @@ import { renderReview, reviewShot } from './helpers/render.js';
 import { devices, expect, test } from './helpers/unlocked.js';
 import { setScanCardSuppressed } from './helpers/tutorial.js';
 import type { EventsVisual } from '../../src/game/EventsVisual.js';
-import type { EventScheduler, ExploreEventKind } from '../../src/game/Events.js';
+import type { AnchoredEvents, EventContact, ExploreEventKind } from '../../src/game/Events.js';
 import type { Submarine } from '../../src/sub/Submarine.js';
 import type { CameraRig } from '../../src/sub/CameraRig.js';
 import type { Scene, Points, PointsMaterial, BufferGeometry, Mesh } from 'three';
@@ -17,8 +17,8 @@ interface Game {
   props: { loaded: boolean };
   explore: {
     ready: boolean;
-    scheduler: EventScheduler;
-    previewEvent(kind: ExploreEventKind): boolean;
+    events: AnchoredEvents;
+    eventContacts: EventContact[];
     summary(): { events: string[] };
   };
   discoveries: { isDiscovered(site: string, id: string): boolean };
@@ -103,11 +103,16 @@ for (const surface of ['desktop', 'phone'] as const) {
       test.use({ ...phone });
     } else test.use({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
     for (const [kind, site] of [
+      ['plume', 'axial-seamount-ashes'],
+      ['turbidity', 'hunga-tonga-caldera'],
       ['plume', 'beebe-vent-field'],
+      ['plume', 'kamaehuakanaloa'],
+      ['turbidity', 'hudson-canyon'],
+      ['whale', 'monterey-canyon'],
       ['turbidity', 'monterey-canyon'],
       ['whale', 'hudson-canyon'],
     ] as const) {
-      test(`${kind}: visible spawn, live cue, sighting and bounded active frame`, async ({
+      test(`${site}/${kind}: anchored arrival, live cue, sighting and bounded active frame`, async ({
         page,
       }) => {
         test.setTimeout(180_000);
@@ -121,14 +126,6 @@ for (const surface of ['desktop', 'phone'] as const) {
           const g = window.__game as unknown as Game;
           return !!(window.__gameReady && g.explore?.ready && g.props.loaded);
         });
-        // Whale habitat is upper water. Keep the actual chase framing after a
-        // shallow reposition; other events use the site's ordinary opening pose.
-        if (kind === 'whale')
-          await page.evaluate(() => {
-            const g = window.__game as unknown as Game;
-            g.sub.position.y = -60;
-            g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
-          });
         await page.evaluate(() => {
           const g = window.__game as unknown as Game;
           g.sub.step = () => {};
@@ -138,15 +135,42 @@ for (const surface of ['desktop', 'phone'] as const) {
           const g = window.__game as unknown as Game;
           return { calls: g.perf.drawCalls, triangles: g.perf.triangles };
         });
+        // Guards remote/timer firing: the contact is available before its arrival range.
+        await page.evaluate((kind) => {
+          const g = window.__game as unknown as Game;
+          const target = g.explore.eventContacts.find((c) => c.kind === kind)!;
+          const p = target.position.clone();
+          p.z += 80;
+          p.y = Math.max(p.y + 12, g.terrain.sampleHeight(p.x, p.z) + 15);
+          g.sub.reset(p.x, p.y, p.z, 0);
+          g.rig.snap(g.sub.position, 0, 0);
+        }, kind);
+        for (let i = 0; i < 4; i++) await page.clock.fastForward(250);
+        expect(
+          await page.evaluate(() => (window.__game as unknown as Game).explore.events.active),
+        ).toBeNull();
+        expect(
+          await page.evaluate((kind) => {
+            const g = window.__game as unknown as Game;
+            const contact = g.explore.eventContacts.find((c) => c.kind === kind)!;
+            return g.explore.events.available(contact);
+          }, kind),
+        ).toBe(true);
         // A contact ready to scan outranks a sighting in the one slot. These opening poses
         // are in range of one, so hold its card back to review the sighting's own layout.
         await setScanCardSuppressed(page, true);
-        expect(
-          await page.evaluate(
-            (kind) => (window.__game as unknown as Game).explore.previewEvent(kind),
-            kind,
-          ),
-        ).toBe(true);
+        // Guards the regression where an event could only be found by waiting for a timer.
+        await page.evaluate((kind) => {
+          const g = window.__game as unknown as Game;
+          g.explore.events.reset();
+          const target = g.explore.eventContacts.find((c) => c.kind === kind)!;
+          const p = target.position.clone();
+          p.z += 35;
+          p.y += kind === 'plume' ? 12 : kind === 'turbidity' ? 6 : 0;
+          p.y = Math.max(p.y, g.terrain.sampleHeight(p.x, p.z) + 15);
+          g.sub.reset(p.x, p.y, p.z, 0);
+          g.rig.snap(g.sub.position, 0, 0);
+        }, kind);
         await page.clock.fastForward(16);
         await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toBeVisible();
         await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toContainText(
@@ -156,12 +180,12 @@ for (const surface of ['desktop', 'phone'] as const) {
               ? 'Silt cloud:'
               : 'Whale passing:',
         );
-        // Holding the scheduler alone does not hold the caption's lifetime.
+        // Holding event time alone does not hold the caption's lifetime.
         // Advance both through explicit frames so software GL cannot expire it.
         await page.evaluate(() => {
-          const scheduler = (window.__game as unknown as Game).explore.scheduler;
-          scheduler.update = () => null;
-          scheduler.active!.elapsedS = 2;
+          const events = (window.__game as unknown as Game).explore.events;
+          events.update = () => null;
+          events.active!.elapsedS = 2;
         });
         const samples: { ms: number; calls: number; triangles: number }[] = [];
         for (let i = 0; i < (renderReview ? 30 : 1); i++) {
@@ -223,9 +247,9 @@ for (const surface of ['desktop', 'phone'] as const) {
           'caption must leave HUD and thumb controls clear',
         ).toEqual([]);
         if (kind === 'whale') expect(startLayout.subject.height).toBeGreaterThan(8);
-        await reviewShot(page, `${kind}-${surface}-low-start`);
+        await reviewShot(page, `${site}-${kind}-${surface}-low-start`);
         await page.evaluate(() => {
-          (window.__game as unknown as Game).explore.scheduler.active!.elapsedS = 7;
+          (window.__game as unknown as Game).explore.events.active!.elapsedS = 7;
         });
         // Layout checks twice a second; render enough simulation time for it.
         for (let i = 0; i < 6; i++) await page.clock.fastForward(100);
@@ -237,7 +261,7 @@ for (const surface of ['desktop', 'phone'] as const) {
         expect(movingLayout.captionOverlays, 'moving caption must leave controls clear').toEqual(
           [],
         );
-        await reviewShot(page, `${kind}-${surface}-low-moving`);
+        await reviewShot(page, `${site}-${kind}-${surface}-low-moving`);
         // Approach the currently visible centre, then look at it through the
         // regular chase rig. A distant caption must never silently count as a log.
         await page.evaluate((kind) => {
@@ -290,7 +314,7 @@ for (const surface of ['desktop', 'phone'] as const) {
         await expect(page.locator('.journal .jr-body').locator(`a[href="${source}"]`)).toHaveCount(
           1,
         );
-        await reviewShot(page, `${kind}-${surface}-journal`);
+        await reviewShot(page, `${site}-${kind}-${surface}-journal`);
         expect(errors).toEqual([]);
         await page.evaluate(() => {
           (window.__game as unknown as Game).journal.close();

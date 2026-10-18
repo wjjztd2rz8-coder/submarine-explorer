@@ -8,10 +8,26 @@
   },
   "events": {
     "turbidity": {
-      "maxAltitudeM": 45
+      "name": "Silt flow",
+      "anchor": {
+        "lat": 36.78702034,
+        "lon": -122.01229065,
+        "altitudeM": 6
+      },
+      "contactRadiusM": 110,
+      "arrivalRadiusM": 40,
+      "headingDeg": 90
     },
     "whale": {
-      "maxDepthM": 180
+      "name": "Whale route",
+      "anchor": {
+        "lat": 36.78702034,
+        "lon": -122.01229065,
+        "depthM": 60
+      },
+      "contactRadiusM": 110,
+      "arrivalRadiusM": 40,
+      "headingDeg": 90
     }
   },
   "opening": {

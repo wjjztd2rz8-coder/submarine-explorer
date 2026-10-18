@@ -2,7 +2,15 @@
   "id": "beebe-vent-field",
   "events": {
     "plume": {
-      "maxAltitudeM": 70
+      "name": "Vent plume",
+      "anchor": {
+        "lat": 18.54670932,
+        "lon": -81.71795,
+        "altitudeM": 6
+      },
+      "contactRadiusM": 110,
+      "arrivalRadiusM": 40,
+      "headingDeg": 90
     }
   },
   "opening": {
@@ -132,7 +140,12 @@
     }
   },
   "atmosphere": {
-    "lamps": { "intensity": 0.45, "distance": 1, "fillIntensity": 0.35, "fillDistance": 1 },
+    "lamps": {
+      "intensity": 0.45,
+      "distance": 1,
+      "fillIntensity": 0.35,
+      "fillDistance": 1
+    },
     "tiers": {
       "low": {
         "depthM": -200,

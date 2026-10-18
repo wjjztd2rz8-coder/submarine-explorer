@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { EXPLORE_CONFIG } from '../../core/config/explore.js';
 import {
-  EventScheduler,
+  AnchoredEvents,
+  placeEventContacts,
+  type EventContact,
   EVENT_CAPTIONS,
   type ExploreEvent,
   type ExploreEventKind,
@@ -22,13 +24,14 @@ import type { ExplorationSummary } from '../../ui/Debrief.js';
 import type { GameContext } from '../context.js';
 import type { GameSystem } from '../System.js';
 
-/** Hidden curiosities share the scan control, but never the mission target list. */
+/** Curiosities share local contacts, but never the mission target list. */
 export function createExploreSystem(): GameSystem {
   let doc: SecretsDoc = { version: 1, secrets: [], samples: [] };
   let secrets: SecretTarget[] = [];
   let sampleTargets: SampleTarget[] = [];
   const samples = new Samples();
-  const scheduler = new EventScheduler();
+  const events = new AnchoredEvents();
+  let eventContacts: EventContact[] = [];
   const meshes: THREE.Mesh[] = [];
   const witnessed = new Set<ExploreEventKind>();
   let visual: EventsVisual;
@@ -43,23 +46,13 @@ export function createExploreSystem(): GameSystem {
   const faint: SecretTarget[] = [];
   let targets: Array<SecretTarget | SampleTarget> = [];
   const projected = new THREE.Vector3();
+  const sightline = new THREE.Vector3();
 
-  const announce = (ctx: GameContext, event: ExploreEvent): boolean => {
-    const placed = visual.begin(
-      event,
-      ctx.sub.position,
-      ctx.sub.getForward(),
-      (x, z) => ctx.terrain.sampleHeight(x, z),
-      ctx.rig.camera,
-    );
-    if (!placed) {
-      scheduler.reset();
-      return false;
-    }
+  const announce = (ctx: GameContext, event: ExploreEvent): void => {
+    visual.begin(event, (x, z) => ctx.terrain.sampleHeight(x, z));
     eventWitnessed = false;
     loggedAtS = Infinity;
     ctx.audio.playExploreCue();
-    return true;
   };
   return {
     name: 'explore',
@@ -111,14 +104,11 @@ export function createExploreSystem(): GameSystem {
             return faint;
           },
           samples,
-          scheduler,
-          summary,
-          /** Deterministic screenshot hook. Normal play uses the scheduler's quiet gaps. */
-          previewEvent(kind: ExploreEventKind): boolean {
-            const e = scheduler.preview(kind);
-            if (!e) return false;
-            return announce(ctx, e);
+          events,
+          get eventContacts() {
+            return eventContacts;
           },
+          summary,
         },
       });
       void Promise.all([loadSecrets(ctx.contentLandmark), ctx.discovery.ready]).then(([loaded]) => {
@@ -147,8 +137,9 @@ export function createExploreSystem(): GameSystem {
           meshes.push(mesh);
           ctx.scene.add(mesh);
         }
+        eventContacts = placeEventContacts(ctx.contentLandmark, ctx.meta, ground);
         targets = [...secrets, ...sampleTargets];
-        ctx.discovery.scanner.setSupplementalTargets(targets);
+        ctx.discovery.scanner.setSupplementalTargets([...targets, ...eventContacts]);
         ready = true;
       });
       disposers.push(
@@ -182,7 +173,10 @@ export function createExploreSystem(): GameSystem {
         ctx.bus.on('mission:restart', () => {
           samples.reset();
           witnessed.clear();
-          scheduler.reset();
+          events.reset();
+          visual.update(null);
+          eventWitnessed = false;
+          loggedAtS = Infinity;
           ctx.guidance.offer('event', 'discovery', null);
           sampling = false;
           effect.visible = false;
@@ -195,34 +189,42 @@ export function createExploreSystem(): GameSystem {
     frame: {
       'world.life': (f, ctx) => {
         if (!ready) return;
-        const dt = f.blocked || f.frozen ? 0 : f.clockDt;
-        const ground = ctx.terrain.sampleHeight(f.pilotPosition.x, f.pilotPosition.z);
-        const event = scheduler.update(dt, {
-          site: ctx.contentLandmark,
-          depthM: -f.pilotPosition.y,
-          altitudeM: f.pilotPosition.y - ground,
-        });
+        const dt = f.blocked || f.frozen || ctx.app.state !== 'dive' ? 0 : f.clockDt;
+        const event = events.update(dt, f.pilotPosition, eventContacts);
         if (event) announce(ctx, event);
-        visual.update(scheduler.active);
+        const availableContacts = eventContacts.filter((contact) => events.available(contact));
+        ctx.discovery.scanner.setSupplementalTargets([...targets, ...availableContacts]);
+        visual.update(events.active);
         visual.group.visible &&= !f.blocked && ctx.app.state === 'dive';
         if (
-          scheduler.active &&
+          events.active &&
           !eventWitnessed &&
           dt > 0 &&
-          scheduler.active.elapsedS >= EXPLORE_CONFIG.eventWitnessDelayS &&
+          events.active.elapsedS >= EXPLORE_CONFIG.eventWitnessDelayS &&
           secretInRange(f.pilotPosition, visual.origin, EXPLORE_CONFIG.eventWitnessM)
         ) {
           ctx.rig.camera.updateMatrixWorld();
           projected.copy(visual.origin).project(ctx.rig.camera);
+          // Anchors do not move to suit the camera. Keep the former spawn
+          // sightline guard at witness time so a ridge cannot log an unseen effect.
+          let clear = true;
+          for (let step = 1; step < 10; step++) {
+            sightline.lerpVectors(ctx.rig.camera.position, visual.origin, step / 10);
+            if (sightline.y < ctx.terrain.sampleHeight(sightline.x, sightline.z) + 1) {
+              clear = false;
+              break;
+            }
+          }
           if (
+            clear &&
             Math.abs(projected.x) < 1 &&
             Math.abs(projected.y) < 1 &&
             projected.z > -1 &&
             projected.z < 1
           ) {
             eventWitnessed = true;
-            loggedAtS = scheduler.active.elapsedS;
-            const kind = scheduler.active.kind;
+            loggedAtS = events.active.elapsedS;
+            const kind = events.active.kind;
             witnessed.add(kind);
             const id = eventDiscoveryId(kind);
             if (!ctx.discovery.store.isDiscovered(ctx.contentLandmark, id))
@@ -236,8 +238,13 @@ export function createExploreSystem(): GameSystem {
             });
           }
         }
-        const live = scheduler.active;
-        const showing = !!live && !f.blocked && !f.frozen && live.elapsedS - loggedAtS < 3;
+        const live = events.active;
+        const showing =
+          !!live &&
+          !f.blocked &&
+          !f.frozen &&
+          ctx.app.state === 'dive' &&
+          live.elapsedS - loggedAtS < 3;
         ctx.guidance.offer(
           'event',
           'discovery',
@@ -267,7 +274,12 @@ export function createExploreSystem(): GameSystem {
             secretInRange(f.pilotPosition, target.position)
           )
             faint.push(target);
-        ctx.sonar.setFaintContacts(faint);
+        ctx.sonar.setFaintContacts([
+          ...faint,
+          ...availableContacts.filter((contact) =>
+            secretInRange(f.pilotPosition, contact.position, contact.radius),
+          ),
+        ]);
       },
       'scan.discovery': (f, ctx) => {
         const scanner = ctx.discovery.scanner;

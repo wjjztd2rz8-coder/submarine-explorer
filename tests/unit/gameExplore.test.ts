@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { PerspectiveCamera, Vector3 } from 'three';
+import { Vector3 } from 'three';
 import { EventBus } from '../../src/core/EventBus.js';
 import { DEFAULT_CONFIG } from '../../src/core/Config.js';
 import { EXPLORE_CONFIG } from '../../src/core/config/explore.js';
-import { EventScheduler, eventKinds } from '../../src/game/Events.js';
+import { AnchoredEvents, placeEventContacts } from '../../src/game/Events.js';
 import { parseSecrets, secretInRange, secretProgress } from '../../src/game/Secrets.js';
 import { Scanner, type ScanTarget } from '../../src/game/Scanner.js';
 import { Samples, type SampleTarget } from '../../src/game/Samples.js';
@@ -11,7 +11,10 @@ import { buildSecret, seatOnSeabed, disposeExploreMesh } from '../../src/game/Se
 import { EventsVisual } from '../../src/game/EventsVisual.js';
 import { buildJournalSite, isEntryUnlocked, isSiteUnlocked } from '../../src/game/JournalData.js';
 
-const habitat = { site: 'beebe-vent-field', depthM: 750, altitudeM: 15 };
+const eventMeta = {
+  center: { lat: 18.54635, lon: -81.71795 },
+} as import('../../src/util/types.js').TileMeta;
+const eventContacts = placeEventContacts('beebe-vent-field', eventMeta, () => -100);
 const contact: ScanTarget = {
   id: 'secret:arch',
   name: 'Unidentified contact',
@@ -58,48 +61,52 @@ describe('local curiosity range', () => {
   });
 });
 
-describe('short rare events', () => {
-  it('waits before the first event, ends it, then enforces cooldown plus a new quiet gap', () => {
-    const scheduler = new EventScheduler(() => 0);
-    expect(scheduler.update(69, habitat)).toBeNull();
-    expect(scheduler.update(1, habitat)?.kind).toBe('plume');
-    expect(scheduler.update(EXPLORE_CONFIG.eventDurationS, habitat)).toBeNull();
-    expect(scheduler.active).toBeNull();
-    expect(scheduler.update(EXPLORE_CONFIG.eventCooldownS + 69, habitat)).toBeNull();
-    expect(scheduler.update(1, habitat)?.kind).toBe('plume');
+describe('anchored event arrivals', () => {
+  it('never starts remotely, even after hours of active time', () => {
+    const events = new AnchoredEvents();
+    const remote = eventContacts[0].position.clone().add(new Vector3(0, 0, 111));
+    const above = eventContacts[0].position.clone().add(new Vector3(0, 111, 0));
+    for (const position of [remote, above])
+      for (let i = 0; i < 10; i++) expect(events.update(10000, position, eventContacts)).toBeNull();
+    expect(events.active).toBeNull();
+    expect(placeEventContacts('titanic', eventMeta, () => -100)).toEqual([]);
   });
-  it('leaves sites without event habitat quiet and rejects removed kinds at runtime', () => {
-    const scheduler = new EventScheduler(() => 0);
-    const quiet = { ...habitat, site: 'titanic' };
-    expect(scheduler.update(1000, quiet)).toBeNull();
-    expect(scheduler.active).toBeNull();
-    expect(scheduler.update(1, quiet)).toBeNull();
-    expect(scheduler.update(70, habitat)?.kind).toBe('plume');
-    scheduler.reset();
-    expect(scheduler.preview('unknown' as never)).toBeNull();
-    expect(scheduler.active).toBeNull();
-    expect(eventKinds({ ...habitat, site: 'lost-city' })).toEqual([]);
+  it('enters at the inclusive boundary and requires exit before another arrival', () => {
+    const events = new AnchoredEvents();
+    const position = eventContacts[0].position.clone().add(new Vector3(0, 0, 40.01));
+    expect(events.update(1, position, eventContacts)).toBeNull();
+    position.z -= 0.01;
+    expect(events.update(1, position, eventContacts)?.kind).toBe('plume');
+    expect(events.available(eventContacts[0])).toBe(false);
+    events.update(EXPLORE_CONFIG.eventDurationS, position, eventContacts);
+    expect(events.active).toBeNull();
+    expect(events.update(10000, position, eventContacts)).toBeNull();
+    position.z += 1;
+    events.update(1, position, eventContacts);
+    expect(events.available(eventContacts[0])).toBe(true);
+    position.z -= 1;
+    expect(events.update(1, position, eventContacts)?.kind).toBe('plume');
   });
-  it('does not advance while paused and never overlaps events', () => {
-    const scheduler = new EventScheduler(() => 0);
-    scheduler.update(70, habitat);
-    scheduler.update(0, habitat);
-    scheduler.update(NaN, habitat);
-    expect(scheduler.active?.elapsedS).toBe(0);
-    expect(scheduler.preview('plume')).toBeNull();
-    scheduler.reset();
-    expect(scheduler.active).toBeNull();
-    expect(scheduler.update(69, habitat)).toBeNull();
-  });
-  it('restricts plumes, bottom silt and whales to suitable habitat', () => {
-    expect(eventKinds(habitat)).toEqual(['plume']);
-    expect(eventKinds({ ...habitat, altitudeM: 100 })).toEqual([]);
-    expect(eventKinds({ site: 'monterey-canyon', depthM: 50, altitudeM: 12 })).toEqual([
-      'turbidity',
-      'whale',
-    ]);
-    expect(eventKinds({ site: 'monterey-canyon', depthM: 1000, altitudeM: 100 })).toEqual([]);
-    expect(eventKinds({ ...habitat, site: 'great-blue-hole' })).toEqual([]);
+  it('ignores paused/invalid steps, does not overlap or queue arrivals, and resets', () => {
+    const events = new AnchoredEvents();
+    const first = eventContacts[0];
+    const second = {
+      ...first,
+      id: 'other',
+      position: first.position.clone().add(new Vector3(200, 0, 0)),
+    };
+    const contacts = [first, second];
+    for (const dt of [0, -1, NaN, Infinity])
+      expect(events.update(dt, first.position, contacts)).toBeNull();
+    events.update(1, first.position, contacts);
+    events.update(0, second.position, contacts);
+    expect(events.active?.elapsedS).toBe(0);
+    expect(events.update(1, second.position, contacts)).toBeNull();
+    events.update(18, second.position, contacts);
+    expect(events.update(100, second.position, contacts)).toBeNull();
+    events.reset();
+    expect(events.active).toBeNull();
+    expect(events.update(1, second.position, contacts)?.contact.id).toBe('other');
   });
 });
 
@@ -169,18 +176,16 @@ describe('procedural visuals', () => {
   it('keeps event visuals bounded and hides them when the event ends', () => {
     const visual = new EventsVisual('low');
     const event = { kind: 'plume' as const, elapsedS: 3, durationS: 9 };
-    const camera = new PerspectiveCamera(60, 844 / 390, 0.1, 1000);
-    camera.position.set(0, -75, 20);
-    camera.lookAt(0, -90, -40);
-    camera.updateMatrixWorld();
-    expect(
-      visual.begin(event, new Vector3(0, -90, 0), new Vector3(0, 0, -1), () => -100, camera),
-    ).toBe(true);
+    const anchored = {
+      ...event,
+      contact: { ...eventContacts[0], position: new Vector3(0, -94, -40) },
+    };
+    visual.begin(anchored, () => -100);
     expect(visual.origin.y).toBe(-82);
-    visual.update(event);
+    visual.update(anchored);
     expect(visual.group.visible).toBe(true);
     expect(visual.group.children).toHaveLength(2);
-    visual.update({ ...event, kind: 'whale' });
+    visual.update({ ...anchored, kind: 'whale' });
     expect(visual.group.children[1].visible).toBe(true);
     visual.update(null);
     expect(visual.group.visible).toBe(false);

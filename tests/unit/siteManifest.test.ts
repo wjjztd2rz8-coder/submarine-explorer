@@ -8,6 +8,14 @@ import {
   validateSiteManifest,
 } from '../../src/core/SiteManifest.js';
 
+const eventSpot = {
+  name: 'Vent plume',
+  anchor: { lat: 1, lon: 2, altitudeM: 6 },
+  contactRadiusM: 110,
+  arrivalRadiusM: 40,
+  headingDeg: 90,
+};
+
 const ids = (
   JSON.parse(readFileSync('data/landmarks/index.json', 'utf8')) as { landmarks: string[] }
 ).landmarks;
@@ -332,22 +340,18 @@ describe('site manifest validator', () => {
       },
       null,
     ],
-    [
-      'full',
-      { id: 's', audio: { whaleHabitat: true }, events: { plume: { maxAltitudeM: 70 } } },
-      null,
-    ],
+    ['full', { id: 's', audio: { whaleHabitat: true }, events: { plume: eventSpot } }, null],
     ['not an object', 'x', 'site manifest "s": $: expected an object'],
     ['id mismatch', { id: 'other' }, 'site manifest "s": id: expected "s"'],
     [
       'missing field',
       { id: 's', events: { whale: {} } },
-      'events.whale.maxDepthM: expected a positive number',
+      'events.whale.name: expected a nonempty string',
     ],
     [
       'wrong type',
-      { id: 's', events: { plume: { maxAltitudeM: '70' } } },
-      'events.plume.maxAltitudeM',
+      { id: 's', events: { plume: { ...eventSpot, arrivalRadiusM: '40' } } },
+      'events.plume.arrivalRadiusM',
     ],
     [
       'wrong flag type',
@@ -356,7 +360,7 @@ describe('site manifest validator', () => {
     ],
     [
       'unknown field',
-      { id: 's', events: { plume: { maxAltitudeM: 5, x: 1 } } },
+      { id: 's', events: { plume: { ...eventSpot, x: 1 } } },
       'events.plume.x: unknown field',
     ],
     ['unknown section', { id: 's', extra: {} }, '$.extra: unknown field'],
@@ -773,5 +777,31 @@ it('ships exactly the authored atmosphere policies and leaves other sites absent
         ),
       });
     } else expect(atmosphere).toBeUndefined();
+  }
+});
+
+describe('event anchor validation', () => {
+  for (const [path, value] of [
+    ['name', ' '],
+    ['contactRadiusM', 0],
+    ['arrivalRadiusM', -1],
+    ['arrivalRadiusM', 110],
+    ['arrivalRadiusM', 111],
+    ['headingDeg', Infinity],
+    ['anchor', {}],
+    ['anchor', { lat: 0, lon: 0 }],
+    ['anchor', { lat: 0, lon: 0, altitudeM: 6, depthM: 60 }],
+    ['anchor', { lat: 91, lon: 0, depthM: 60 }],
+    ['anchor', { lat: 0, lon: -181, depthM: 60 }],
+    ['anchor', { lat: NaN, lon: 0, depthM: 60 }],
+    ['anchor', { lat: 0, lon: 0, altitudeM: 0 }],
+    ['anchor', { lat: 0, lon: 0, depthM: -60 }],
+    ['anchor', { lat: 0, lon: 0, depthM: 60, x: 0 }],
+  ] as const) {
+    it(`rejects event ${path}=${JSON.stringify(value)}`, () => {
+      expect(() =>
+        validateSiteManifest({ id: 's', events: { plume: { ...eventSpot, [path]: value } } }, 's'),
+      ).toThrow(`events.plume.${path}`);
+    });
   }
 });

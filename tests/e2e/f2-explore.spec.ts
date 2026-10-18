@@ -1,3 +1,4 @@
+import type { EventContact, AnchoredEvents } from '../../src/game/Events.js';
 import { EXPLORE_CONFIG } from '../../src/core/config/explore.js';
 import { completeScan, scanWithKeyboard } from './helpers/scan.js';
 import { clockFramesUntil, pauseClockBeforeNavigation } from './helpers/clock.js';
@@ -16,8 +17,8 @@ interface Game {
     sampleTargets: Target[];
     faintContacts: Target[];
     samples: { collected: Map<string, string> };
-    scheduler: { active: unknown };
-    previewEvent(kind: string): boolean;
+    events: AnchoredEvents;
+    eventContacts: EventContact[];
     summary(): { found: number; total: number; samples: string[]; events: string[] };
   };
   sub: {
@@ -207,24 +208,25 @@ test('samples collect per dive, appear in mission debrief, and reset on restart'
   ).toBe(1);
 });
 
-test('short event caption, one witness reward, pause and cooldown', async ({ page }) => {
+test('short event caption, one witness log, pause and no repeat while inside', async ({ page }) => {
   await pauseClockBeforeNavigation(page);
   await page.goto('/?tile=monterey-canyon&tier=low&life=0');
   await clockFramesUntil(
     page,
     () => window.__gameReady === true && (window.__game as unknown as Game).explore?.ready,
   );
-  // Out of scan range: a contact card in range would hold the guidance slot.
-  await park(page, 0, false, true);
-  await page.evaluate(() => {
+  // Guards automatic arrival triggering and prevents scan completion from substituting for witnessing.
+  const points = await page.evaluate(() => {
     const g = window.__game as unknown as Game;
+    const target = g.explore.eventContacts.find((c) => c.kind === 'turbidity')!;
+    const p = target.position.clone();
+    p.z -= 35;
+    p.y = Math.max(p.y + 6, g.terrain.sampleHeight(p.x, p.z) + 15);
+    g.sub.reset(p.x, p.y, p.z, Math.PI);
     g.rig.freeLook = false;
     g.rig.snap(g.sub.position, g.sub.yaw, g.sub.pitch);
+    return g.progress.points;
   });
-  const points = await page.evaluate(() => (window.__game as unknown as Game).progress.points);
-  expect(
-    await page.evaluate(() => (window.__game as unknown as Game).explore.previewEvent('turbidity')),
-  ).toBe(true);
   await page.clock.fastForward(100);
   await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toContainText(
     'Silt cloud: sediment-laden water flows downslope',
@@ -242,24 +244,24 @@ test('short event caption, one witness reward, pause and cooldown', async ({ pag
   await page.clock.fastForward(100);
   await expect(page.locator('.guidance-slot[data-kind="discovery"]')).toBeHidden();
   const paused = await page.evaluate(
-    () => (window.__game as unknown as Game).explore.scheduler.active,
+    () => (window.__game as unknown as Game).explore.events.active,
   );
   for (let i = 0; i < 5; i++) await page.clock.fastForward(100);
   expect(
-    await page.evaluate(() => (window.__game as unknown as Game).explore.scheduler.active),
+    await page.evaluate(() => (window.__game as unknown as Game).explore.events.active),
   ).toEqual(paused);
   expect(
-    await page.evaluate(() => (window.__game as unknown as Game).explore.scheduler.active),
+    await page.evaluate(() => (window.__game as unknown as Game).explore.events.active),
   ).not.toBeNull();
   await page.keyboard.press('Escape');
   // The engine caps a frame at 250 ms; wall time cannot stand in for dive time.
   for (let i = 0; i < EXPLORE_CONFIG.eventDurationS * 4; i++) await page.clock.fastForward(250);
   expect(
-    await page.evaluate(() => (window.__game as unknown as Game).explore.scheduler.active),
+    await page.evaluate(() => (window.__game as unknown as Game).explore.events.active),
   ).toBeNull();
   for (let i = 0; i < 6; i++) await page.clock.fastForward(250);
   expect(
-    await page.evaluate(() => (window.__game as unknown as Game).explore.scheduler.active),
+    await page.evaluate(() => (window.__game as unknown as Game).explore.events.active),
   ).toBeNull();
 });
 

@@ -14,9 +14,6 @@ export class EventsVisual {
   private readonly layout: Float32Array;
   private readonly direction = new THREE.Vector3();
   private readonly start = new THREE.Vector3();
-  private readonly projected = new THREE.Vector3();
-  private readonly ray = new THREE.Ray();
-  private readonly sightline = new THREE.Vector3();
   private ground: (x: number, z: number) => number = () => 0;
 
   constructor(tier: keyof typeof EXPLORE_CONFIG.eventParticleCount) {
@@ -79,82 +76,15 @@ export class EventsVisual {
     this.group.visible = false;
   }
 
-  /** Defer when the floor/a turned-away camera leaves no honest visible spawn. */
-  begin(
-    event: ExploreEvent,
-    position: THREE.Vector3,
-    forward: THREE.Vector3,
-    ground: (x: number, z: number) => number,
-    camera: THREE.PerspectiveCamera,
-  ): boolean {
+  /** The effect starts at the authored contact, independent of pilot/camera pose. */
+  begin(event: ExploreEvent, ground: (x: number, z: number) => number): void {
     this.ground = ground;
-    camera.updateMatrixWorld();
-    const heading = Math.atan2(forward.x, forward.z);
-    let placed = false;
-    // All candidates are ahead of the pilot. Checking the active projection also
-    // respects free look, cockpit cameras and the phone's view offset.
-    for (const distance of EXPLORE_CONFIG.eventSpawnDistancesM) {
-      for (const angle of [-0.35, 0.35, 0, -0.7, 0.7, -1.05, 1.05]) {
-        const yaw = heading + angle;
-        this.start.set(
-          position.x + Math.sin(yaw) * distance,
-          0,
-          position.z + Math.cos(yaw) * distance,
-        );
-        const floor = ground(this.start.x, this.start.z);
-        this.start.y =
-          event.kind === 'whale'
-            ? Math.max(
-                floor + EXPLORE_CONFIG.eventFloorClearanceM + EXPLORE_CONFIG.eventWhaleHalfHeightM,
-                Math.min(-EXPLORE_CONFIG.eventWhaleSurfaceDepthM, position.y + 14),
-              )
-            : floor + EXPLORE_CONFIG.eventFloorClearanceM;
-        if (
-          event.kind === 'whale' &&
-          (this.start.y > -EXPLORE_CONFIG.eventWhaleSurfaceDepthM || this.start.y <= position.y)
-        )
-          continue;
-        this.origin.copy(this.start);
-        if (event.kind === 'plume') this.origin.y += EXPLORE_CONFIG.eventPlumeHeightM / 2;
-        if (event.kind === 'turbidity')
-          this.origin.y += EXPLORE_CONFIG.eventParticleSizeM.turbidity / 2 + 2;
-        const range = this.origin.distanceTo(position);
-        this.projected.copy(this.origin).project(camera);
-        if (
-          range >= 30 &&
-          range <= 70 &&
-          Math.abs(this.projected.x) < EXPLORE_CONFIG.eventViewMargin &&
-          Math.abs(this.projected.y) < EXPLORE_CONFIG.eventViewMargin &&
-          this.projected.z > -1 &&
-          this.projected.z < 1
-        ) {
-          this.ray.set(
-            camera.position,
-            this.sightline.copy(this.origin).sub(camera.position).normalize(),
-          );
-          if (this.ray.distanceToPoint(position) < 7) continue;
-          let clear = true;
-          for (let step = 1; step < 10; step++) {
-            this.sightline.lerpVectors(camera.position, this.origin, step / 10);
-            if (this.sightline.y < ground(this.sightline.x, this.sightline.z) + 1) {
-              clear = false;
-              break;
-            }
-          }
-          if (!clear) continue;
-          placed = true;
-          break;
-        }
-      }
-      if (placed) break;
-    }
-    if (!placed) {
-      this.group.visible = false;
-      return false;
-    }
+    this.start.copy(event.contact.position);
+    const heading = (event.contact.headingDeg * Math.PI) / 180;
+    const forward = new THREE.Vector3(Math.sin(heading), 0, -Math.cos(heading));
     if (event.kind === 'turbidity') {
       // Negative height gradient gives actual local downslope travel. A flat
-      // patch follows the viewing direction until the next lower bed sample.
+      // patch follows the authored heading until the next lower bed sample.
       this.direction.set(
         ground(this.start.x - 8, this.start.z) - ground(this.start.x + 8, this.start.z),
         0,
@@ -162,13 +92,12 @@ export class EventsVisual {
       );
       if (this.direction.lengthSq() < 0.0001) this.direction.copy(forward).setY(0);
     } else {
-      this.direction.setFromMatrixColumn(camera.matrixWorld, 0).setY(0);
+      this.direction.copy(forward);
     }
     this.direction.normalize();
     this.whale.rotation.y = Math.atan2(-this.direction.x, -this.direction.z);
     this.group.position.copy(this.start);
     this.update(event);
-    return true;
   }
 
   update(event: ExploreEvent | null): void {

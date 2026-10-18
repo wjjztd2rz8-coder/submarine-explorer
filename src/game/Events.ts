@@ -1,12 +1,18 @@
+import { Vector3 } from 'three';
 import { EXPLORE_CONFIG } from '../core/config/explore.js';
 import { siteManifest } from '../core/SiteManifest.js';
+import type { ScanTarget } from './Scanner.js';
+import { latLonToWorld } from '../util/geo.js';
+import type { TileMeta } from '../util/types.js';
+
 export type ExploreEventKind = 'plume' | 'turbidity' | 'whale';
-interface EventHabitat {
-  site: string;
-  depthM: number;
-  altitudeM: number;
+export interface EventContact extends ScanTarget {
+  kind: ExploreEventKind;
+  arrivalRadiusM: number;
+  headingDeg: number;
 }
 export interface ExploreEvent {
+  contact: EventContact;
   kind: ExploreEventKind;
   elapsedS: number;
   durationS: number;
@@ -16,57 +22,76 @@ export const EVENT_CAPTIONS: Record<ExploreEventKind, string> = {
   turbidity: 'Silt cloud: sediment-laden water flows downslope',
   whale: 'Whale passing: whales use canyon waters to find food',
 };
-export function eventKinds(h: EventHabitat): ExploreEventKind[] {
-  const events = siteManifest(h.site)?.events;
-  const kinds: ExploreEventKind[] = [];
-  if (events?.plume && h.altitudeM < events.plume.maxAltitudeM) kinds.push('plume');
-  if (events?.turbidity && h.altitudeM < events.turbidity.maxAltitudeM) kinds.push('turbidity');
-  if (events?.whale && h.depthM < events.whale.maxDepthM) kinds.push('whale');
-  return kinds;
+export function eventKinds(site: string): ExploreEventKind[] {
+  return Object.keys(siteManifest(site)?.events ?? {}) as ExploreEventKind[];
 }
-/** Uses active dive time only, with one short event and a guaranteed quiet gap. */
-export class EventScheduler {
+
+/** Full 3D contacts make the authored depth/altitude the arrival eligibility. */
+export function placeEventContacts(
+  site: string,
+  meta: TileMeta,
+  ground: (x: number, z: number) => number,
+): EventContact[] {
+  return eventKinds(site).map((kind) => {
+    const spot = siteManifest(site)!.events![kind]!;
+    const { x, z } = latLonToWorld(meta, spot.anchor.lat, spot.anchor.lon);
+    return {
+      id: `event:${kind}`,
+      landmarkId: site,
+      position: new Vector3(
+        x,
+        spot.anchor.depthM !== undefined
+          ? -spot.anchor.depthM
+          : ground(x, z) + spot.anchor.altitudeM!,
+        z,
+      ),
+      radius: spot.contactRadiusM,
+      scanSeconds: 0,
+      name: spot.name,
+      arrivalRadiusM: spot.arrivalRadiusM,
+      headingDeg: spot.headingDeg,
+      kind,
+    };
+  });
+}
+
+/** Arrivals replace timers: no overlap, and staying inside never fires twice. */
+export class AnchoredEvents {
   active: ExploreEvent | null = null;
-  private remainingS: number;
-  constructor(private readonly random: () => number = Math.random) {
-    this.remainingS = this.wait();
-  }
-  private wait(): number {
-    const [lo, hi] = EXPLORE_CONFIG.eventWaitS;
-    return lo + (hi - lo) * Math.max(0, Math.min(1, this.random()));
-  }
-  update(dt: number, h: EventHabitat): ExploreEvent | null {
+  private readonly inside = new Set<string>();
+
+  update(dt: number, position: Vector3, contacts: readonly EventContact[]): ExploreEvent | null {
     if (!Number.isFinite(dt) || dt <= 0) return null;
+    const wasActive = this.active !== null;
     if (this.active) {
       this.active.elapsedS = Math.min(this.active.durationS, this.active.elapsedS + dt);
-      if (this.active.elapsedS >= this.active.durationS) {
-        this.active = null;
-        this.remainingS = EXPLORE_CONFIG.eventCooldownS + this.wait();
-      }
-      return null;
+      if (this.active.elapsedS >= this.active.durationS) this.active = null;
     }
-    this.remainingS -= dt;
-    if (this.remainingS > 0) return null;
-    const choices = eventKinds(h);
-    if (!choices.length) {
-      this.remainingS = this.wait();
-      return null;
+    let arriving: EventContact | undefined;
+    for (const contact of contacts) {
+      const inside = position.distanceToSquared(contact.position) <= contact.arrivalRadiusM ** 2;
+      if (inside) {
+        if (!this.inside.has(contact.id) && !arriving) arriving = contact;
+        this.inside.add(contact.id);
+      } else this.inside.delete(contact.id);
     }
-    return this.begin(
-      choices[Math.min(choices.length - 1, Math.floor(this.random() * choices.length))],
-    );
-  }
-  /** Review hook bypasses the quiet gap, but never overlaps an active event. */
-  preview(kind: ExploreEventKind): ExploreEvent | null {
-    if (this.active || !Object.hasOwn(EVENT_CAPTIONS, kind)) return null;
-    return this.begin(kind);
-  }
-  private begin(kind: ExploreEventKind): ExploreEvent {
-    this.active = { kind, elapsedS: 0, durationS: EXPLORE_CONFIG.eventDurationS };
+    if (wasActive || !arriving) return null;
+    this.active = {
+      contact: arriving,
+      kind: arriving.kind,
+      elapsedS: 0,
+      durationS: EXPLORE_CONFIG.eventDurationS,
+    };
     return this.active;
   }
+
+  /** Retire the approach cue until another entry can actually play. */
+  available(contact: EventContact): boolean {
+    return !this.active && !this.inside.has(contact.id);
+  }
+
   reset(): void {
     this.active = null;
-    this.remainingS = this.wait();
+    this.inside.clear();
   }
 }

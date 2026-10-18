@@ -5,7 +5,15 @@
   },
   "events": {
     "plume": {
-      "maxAltitudeM": 70
+      "name": "Vent plume",
+      "anchor": {
+        "lat": 18.91277932,
+        "lon": -155.26778,
+        "altitudeM": 6
+      },
+      "contactRadiusM": 110,
+      "arrivalRadiusM": 40,
+      "headingDeg": 90
     }
   },
   "opening": {

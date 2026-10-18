@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
 import { EXPLORE_CONFIG } from '../../src/core/config/explore.js';
-import { EventScheduler, eventKinds, type ExploreEventKind } from '../../src/game/Events.js';
+import {
+  AnchoredEvents,
+  placeEventContacts,
+  type ExploreEventKind,
+} from '../../src/game/Events.js';
 import { EventsVisual } from '../../src/game/EventsVisual.js';
 import {
   buildJournalSite,
@@ -29,15 +33,27 @@ const floor = (x: number, _z: number): number => -100 + x * 0.08;
 for (const aspect of [844 / 390, 1280 / 720]) {
   describe(`Low event geometry in landscape ${aspect}`, () => {
     for (const kind of ['plume', 'turbidity', 'whale'] as const) {
-      it(`${kind} starts visible, ahead and 30–70 m away, with bounded render work`, () => {
+      it(`${kind} has projected geometry at a fixed anchor 30–70 m away, with bounded render work`, () => {
         const visual = new EventsVisual('low');
-        const event = { kind, elapsedS: 0, durationS: EXPLORE_CONFIG.eventDurationS };
+        const event = {
+          kind,
+          contact: {
+            ...placeEventContacts(
+              'beebe-vent-field',
+              { center: { lat: 0, lon: 0 } } as never,
+              floor,
+            )[0],
+            position: new THREE.Vector3(0, kind === 'whale' ? -71 : -94, -40),
+          },
+          elapsedS: 0,
+          durationS: EXPLORE_CONFIG.eventDurationS,
+        };
         const view = camera(aspect);
         try {
-          expect(visual.begin(event, pilot, forward, floor, view)).toBe(true);
+          visual.begin(event, floor);
           const centre = visual.origin.clone().project(view);
-          expect(Math.abs(centre.x)).toBeLessThan(EXPLORE_CONFIG.eventViewMargin);
-          expect(Math.abs(centre.y)).toBeLessThan(EXPLORE_CONFIG.eventViewMargin);
+          expect(Math.abs(centre.x)).toBeLessThan(0.82);
+          expect(Math.abs(centre.y)).toBeLessThan(0.82);
           expect(centre.z).toBeGreaterThan(-1);
           expect(centre.z).toBeLessThan(1);
           expect(visual.origin.distanceTo(pilot)).toBeGreaterThanOrEqual(30);
@@ -96,33 +112,25 @@ for (const aspect of [844 / 390, 1280 / 720]) {
   });
 }
 
-it('defers when looking backwards or when the bed cannot be placed in the view', () => {
+it('keeps its authored origin regardless of where the pilot looks', () => {
   const visual = new EventsVisual('low');
-  const view = camera();
-  view.lookAt(0, -80, 100);
-  view.updateMatrixWorld();
-  const event = { kind: 'plume' as const, elapsedS: 0, durationS: 18 };
-  expect(visual.begin(event, pilot, forward, floor, view)).toBe(false);
-  expect(visual.group.visible).toBe(false);
-  expect(visual.begin(event, pilot, forward, () => 100, camera())).toBe(false);
-  visual.dispose();
-});
-
-it('defers a whale when there is no underwater space above the pilot', () => {
-  const visual = new EventsVisual('low');
-  const view = camera();
-  const nearSurface = new THREE.Vector3(0, -3, 0);
-  view.position.set(0, 5, 20);
-  view.lookAt(0, -5, -40);
-  const event = { kind: 'whale' as const, elapsedS: 0, durationS: 18 };
-  expect(visual.begin(event, nearSurface, forward, () => -100, view)).toBe(false);
-  expect(visual.group.visible).toBe(false);
+  const contact = {
+    ...placeEventContacts('beebe-vent-field', { center: { lat: 0, lon: 0 } } as never, floor)[0],
+    position: new THREE.Vector3(0, -94, -40),
+  };
+  visual.begin({ kind: 'plume', contact, elapsedS: 0, durationS: 18 }, floor);
+  expect(visual.group.position.toArray()).toEqual([0, -94, -40]);
+  expect(visual.origin.toArray()).toEqual([0, -82, -40]);
   visual.dispose();
 });
 
 it('logs explained sightings without adding secrets, species or snow to counts or bonuses', () => {
   for (const [siteId, kinds] of [
+    ['axial-seamount-ashes', ['plume']],
+    ['hunga-tonga-caldera', ['turbidity']],
     ['beebe-vent-field', ['plume']],
+    ['hudson-canyon', ['turbidity', 'whale']],
+    ['kamaehuakanaloa', ['plume']],
     ['monterey-canyon', ['turbidity', 'whale']],
     ['titanic', []],
     ['lost-city', []],
@@ -160,12 +168,12 @@ it('logs explained sightings without adding secrets, species or snow to counts o
   expect(restored.bonus).toBe(false);
 });
 
-it('quiet sites never schedule undefined events even after repeated overdue updates', () => {
-  const scheduler = new EventScheduler(() => 1);
-  const habitat = { site: 'titanic', depthM: 3800, altitudeM: 20 };
-  expect(eventKinds(habitat)).toEqual([]);
+it('sites without authored contacts remain quiet', () => {
+  const events = new AnchoredEvents();
+  const contacts = placeEventContacts('titanic', { center: { lat: 0, lon: 0 } } as never, floor);
+  expect(contacts).toEqual([]);
   for (let i = 0; i < 10; i++) {
-    expect(scheduler.update(10000, habitat)).toBeNull();
-    expect(scheduler.active).toBeNull();
+    expect(events.update(10000, pilot, contacts)).toBeNull();
+    expect(events.active).toBeNull();
   }
 });

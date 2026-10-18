@@ -2,10 +2,26 @@
   "id": "hudson-canyon",
   "events": {
     "turbidity": {
-      "maxAltitudeM": 45
+      "name": "Silt flow",
+      "anchor": {
+        "lat": 39.41,
+        "lon": -72.17936062,
+        "altitudeM": 6
+      },
+      "contactRadiusM": 110,
+      "arrivalRadiusM": 40,
+      "headingDeg": 90
     },
     "whale": {
-      "maxDepthM": 180
+      "name": "Whale route",
+      "anchor": {
+        "lat": 39.41,
+        "lon": -72.17936062,
+        "depthM": 60
+      },
+      "contactRadiusM": 110,
+      "arrivalRadiusM": 40,
+      "headingDeg": 90
     }
   },
   "opening": {

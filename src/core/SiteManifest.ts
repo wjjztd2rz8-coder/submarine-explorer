@@ -143,6 +143,17 @@ export interface PropManifest {
   chimney?: Record<(typeof chimneyVariationKeys)[number], number> & { shape: ChimneyShape };
 }
 
+/** Illustrative event locations, not surveyed occurrences. Exactly one vertical reference. */
+export interface EventSpot {
+  name: string;
+  anchor: { lat: number; lon: number } & (
+    { altitudeM: number; depthM?: never } | { depthM: number; altitudeM?: never }
+  );
+  contactRadiusM: number;
+  arrivalRadiusM: number;
+  headingDeg: number;
+}
+
 export interface SiteManifest {
   atmosphere?: {
     hemisphere?: { name: string; sky: number; ground: number; intensity: number };
@@ -207,14 +218,7 @@ export interface SiteManifest {
     /** Habitat whale calls may play here (separate from event whale eligibility). */
     whaleHabitat?: boolean;
   };
-  events?: {
-    /** Vent plume when the sub is below this altitude above the seabed. */
-    plume?: { maxAltitudeM: number };
-    /** Silt cloud when the sub is below this altitude above the seabed. */
-    turbidity?: { maxAltitudeM: number };
-    /** Whale passing when shallower than this depth. */
-    whale?: { maxDepthM: number };
-  };
+  events?: Partial<Record<'plume' | 'turbidity' | 'whale', EventSpot>>;
 }
 
 type Obj = Record<string, unknown>;
@@ -385,9 +389,28 @@ const positiveFraction: Check = (id, path, value) => {
   aboveZero(id, path, value);
   if ((value as number) > 1) fail(id, path, 'expected a fraction greater than 0 and at most 1');
 };
-const threshold: Check = (id, path, value) => {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0)
-    fail(id, path, 'expected a positive number');
+const eventSpotCheck: Check = (id, path, value) => {
+  fields({
+    name: text,
+    anchor: (id, path, value) => {
+      fields({ lat: finite, lon: finite }, { altitudeM: aboveZero, depthM: aboveZero })(
+        id,
+        path,
+        value,
+      );
+      const anchor = value as EventSpot['anchor'];
+      if (Math.abs(anchor.lat) > 90) fail(id, `${path}.lat`, 'outside latitude range');
+      if (Math.abs(anchor.lon) > 180) fail(id, `${path}.lon`, 'outside longitude range');
+      if ((anchor.altitudeM === undefined) === (anchor.depthM === undefined))
+        fail(id, path, 'expected exactly one of altitudeM or depthM');
+    },
+    contactRadiusM: aboveZero,
+    arrivalRadiusM: aboveZero,
+    headingDeg: finite,
+  })(id, path, value);
+  const spot = value as EventSpot;
+  if (spot.arrivalRadiusM >= spot.contactRadiusM)
+    fail(id, `${path}.arrivalRadiusM`, 'must be smaller than contactRadiusM');
 };
 const numericFields = (keys: readonly string[], check: Check): Record<string, Check> =>
   Object.fromEntries(keys.map((key) => [key, check]));
@@ -508,9 +531,9 @@ export function validateSiteManifest(raw: unknown, id: string): SiteManifest {
     fields(
       {},
       {
-        plume: fields({ maxAltitudeM: threshold }),
-        turbidity: fields({ maxAltitudeM: threshold }),
-        whale: fields({ maxDepthM: threshold }),
+        plume: eventSpotCheck,
+        turbidity: eventSpotCheck,
+        whale: eventSpotCheck,
       },
     )(id, 'events', root.events);
     out.events = root.events as SiteManifest['events'];

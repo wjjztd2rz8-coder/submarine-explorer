@@ -292,22 +292,20 @@ export function buildJournalSite(input: JournalSiteInput): JournalSite {
   });
   const wildlife = lifeEntries(id, input.life ?? null);
   // Use the existing explained-entry surface; Journal layout stays unchanged.
-  const sightings: JournalEntry[] = eventKinds({ site: id, depthM: 0, altitudeM: 0 }).map(
-    (kind) => {
-      const guide = EVENT_SIGHTINGS[kind];
-      return {
-        key: `${id}/poi/${guide.id}`,
-        siteId: id,
-        kind: 'poi',
-        id: guide.id,
-        title: guide.title,
-        poiIds: [eventDiscoveryId(kind)],
-        linkedEntryIds: [],
-        recreation: true,
-        guide,
-      };
-    },
-  );
+  const sightings: JournalEntry[] = eventKinds(id).map((kind) => {
+    const guide = EVENT_SIGHTINGS[kind];
+    return {
+      key: `${id}/poi/${guide.id}`,
+      siteId: id,
+      kind: 'poi',
+      id: guide.id,
+      title: guide.title,
+      poiIds: [eventDiscoveryId(kind)],
+      linkedEntryIds: [],
+      recreation: true,
+      guide,
+    };
+  });
   const secrets: JournalEntry[] = (input.secrets ?? []).map((d) => ({
     key: `${id}/secret/${d.id}`,
     siteId: id,

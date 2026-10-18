@@ -2,7 +2,15 @@
   "id": "hunga-tonga-caldera",
   "events": {
     "turbidity": {
-      "maxAltitudeM": 45
+      "name": "Silt flow",
+      "anchor": {
+        "lat": -20.57,
+        "lon": -175.42038374,
+        "altitudeM": 6
+      },
+      "contactRadiusM": 110,
+      "arrivalRadiusM": 40,
+      "headingDeg": 90
     }
   },
   "opening": {
