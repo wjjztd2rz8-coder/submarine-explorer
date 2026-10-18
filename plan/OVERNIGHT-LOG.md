@@ -1478,3 +1478,8 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 - **Merged (gates green, no full e2e):** Sonnet V-closeup-artifacts: life shrinks near camera and matte life material (Blue Hole tang/shard, Endurance blown-out lobsters), Titanic detail pose via tools/titanic-poses.json and rustier paint. Residual: Titanic hull still slightly warm; Blue Hole east frame now has no life; life changes are global (only Monterey spot-checked).
 - **Codex:** 2490-2510 queued; dispatch waits on 5h budget. No tag (CI for run 52 pending).
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 22:28 CDT headless run 54 (Claude): targeted review
+
+- CI red x3 diagnosed and fixed (stale hud-touch desktop expectation; d-shell frame-wait hang). Pushed, gates green. No packages merged. Codex queue unchanged.
+- **Needs owner:** real-phone Low-tier play.
