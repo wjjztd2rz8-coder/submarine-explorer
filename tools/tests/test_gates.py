@@ -10,7 +10,8 @@ import unittest
 
 class TestGates(unittest.TestCase):
     def run_gates(self, *, fail_e2e=False, custom_output=None, args=(), ci='', config_mode='default',
-                  occupied_ports=(), port='4371', fail_build=False, fail_manifest=False):
+                  occupied_ports=(), port='4371', fail_build=False, fail_manifest=False,
+                  changed_path=None, change_kind='branch'):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
@@ -53,6 +54,25 @@ if (kind == "npm" and args[:2] == ["run", "test:e2e"] or
             source = source.replace(command + ' ', shlex.quote(str(shim)) + ' ' + command + ' ')
         script = root / 'tools' / 'gates.sh'
         script.write_text(source)
+        if changed_path:
+            # Real branch/working-tree diffs guard against silently dropping
+            # the camera-radius regression specs from smoke feedback.
+            def git(*arguments):
+                subprocess.run(['git', '-C', str(root), '-c', 'user.name=Gate tests',
+                                '-c', 'user.email=gates@example.invalid', *arguments],
+                               check=True, capture_output=True, text=True)
+            git('init', '-q', '-b', 'main')
+            changed = root / changed_path
+            changed.parent.mkdir(parents=True, exist_ok=True)
+            if change_kind != 'untracked':
+                changed.write_text('before\n')
+            git('add', '.')
+            git('commit', '-qm', 'baseline')
+            git('checkout', '-qb', 'feature')
+            changed.write_text('after\n')
+            if change_kind == 'branch':
+                git('add', changed_path)
+                git('commit', '-qm', 'change')
         env = dict(os.environ, PW_PORT=port, PW_REUSE_SERVER='1', CI=ci,
                    GATES_CONFIG_MODE=config_mode)
         env['OCCUPIED_PORTS'] = json.dumps(list(occupied_ports))
@@ -75,6 +95,7 @@ if (kind == "npm" and args[:2] == ["run", "test:e2e"] or
         _, result, calls = self.run_gates()
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
         self.assertIn('E2E mode: smoke + project-base', result.stdout)
+        self.assertEqual(result.stdout.splitlines()[-1], 'PASS gates (e2e=smoke)')
         for gate in ['build', 'unit', 'python', 'content', 'attribution', 'prettier',
                      'e2e', 'e2e-base']:
             self.assertIn('PASS ' + gate + '\n', result.stdout)
@@ -85,12 +106,36 @@ if (kind == "npm" and args[:2] == ["run", "test:e2e"] or
                     and c['args'][:2] == ['playwright', 'test'])
         self.assertEqual(base['args'][2], 'tests/e2e/base-url.spec.ts')
 
+    def test_sensitive_diffs_add_spawn_camera_specs_to_smoke(self):
+        expected = ['tests/e2e/smoke.spec.ts', 'tests/e2e/opening-framing.spec.ts',
+                    'tests/e2e/d2-camera.spec.ts', 'tests/e2e/d-input-hud.spec.ts',
+                    'tests/e2e/f-bughunt-18.spec.ts']
+        for path, sensitive in [('data/landmarks/titanic/site.json', True),
+                                ('src/game/Spawn.ts', True),
+                                ('src/game/DeepOpeningSpawn.ts', True),
+                                ('src/sub/CameraRig.ts', True),
+                                ('src/core/config/camera.ts', True),
+                                ('src/app/systems/camera.ts', True),
+                                ('src/styles/camera.css', False),
+                                ('plan/progress/example.md', False)]:
+            for kind in ['branch', 'dirty', 'untracked']:
+                with self.subTest(path=path, kind=kind):
+                    _, result, calls = self.run_gates(changed_path=path, change_kind=kind)
+                    self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+                    preview = next(c for c in calls if c['kind'] == 'npm'
+                                   and c['args'][:2] == ['run', 'test:e2e'])
+                    self.assertEqual(preview['args'][2], '--')
+                    self.assertTrue(preview['args'][-1].startswith('--output='))
+                    self.assertEqual(preview['args'][3:-1], expected if sensitive else expected[:1])
+
     def test_full_local_opt_in_and_ci_default_have_no_test_selection_filter(self):
         for args, ci in [(('--full-e2e',), ''), ((), 'true')]:
             with self.subTest(args=args, ci=ci):
-                _, result, calls = self.run_gates(args=args, ci=ci)
+                _, result, calls = self.run_gates(args=args, ci=ci,
+                                                  changed_path='src/sub/CameraRig.ts')
                 self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
                 self.assertIn('E2E mode: full suite + project-base', result.stdout)
+                self.assertEqual(result.stdout.splitlines()[-1], 'PASS gates (e2e=full)')
                 preview = next(c for c in calls if c['kind'] == 'npm'
                                and c['args'][:2] == ['run', 'test:e2e'])
                 self.assertEqual(preview['args'][2], '--')
@@ -98,10 +143,11 @@ if (kind == "npm" and args[:2] == ["run", "test:e2e"] or
                 self.assertTrue(preview['args'][3].startswith('--output='))
 
     def test_no_e2e_retains_static_gates(self):
-        _, result, calls = self.run_gates(args=('--no-e2e',))
+        _, result, calls = self.run_gates(args=('--no-e2e',), changed_path='src/game/Spawn.ts')
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
         self.assertEqual(len(calls), 6)
         self.assertNotIn('PASS e2e', result.stdout)
+        self.assertEqual(result.stdout.splitlines()[-1], 'PASS gates (e2e=none)')
 
     def test_unknown_or_conflicting_options_fail_before_running_gates(self):
         for args in [('--ful-e2e',), ('--full-e2e', '--no-e2e')]:
@@ -133,6 +179,7 @@ if (kind == "npm" and args[:2] == ["run", "test:e2e"] or
         self.assertEqual(result.returncode, 1, result.stderr)
         self.assertIn('FAIL e2e ', result.stdout)
         self.assertIn('PASS e2e-base', result.stdout)
+        self.assertEqual(result.stdout.splitlines()[-1], 'FAIL gates (e2e=smoke)')
         self.assertEqual(len([c for c in calls if c['kind'] == 'npx'
                               and c['args'][:2] == ['playwright', 'test']]), 1)
         self.assertFalse(list(root.glob('dist-gates-*')))
@@ -193,12 +240,13 @@ if (kind == "npm" and args[:2] == ["run", "test:e2e"] or
         _, result, _ = self.run_gates(args=('--no-e2e',))
         self.assertEqual(result.stdout.splitlines(),
                          ['PASS python', 'PASS content', 'PASS build', 'PASS unit',
-                          'PASS attribution', 'PASS prettier'])
+                          'PASS attribution', 'PASS prettier', 'PASS gates (e2e=none)'])
         _, result, calls = self.run_gates(args=('--phase', 'checks'))
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
         self.assertEqual(len(calls), 6)
         self.assertEqual(calls[2]['args'], ['run', 'typecheck'])
         self.assertFalse(any('build' in c['args'] for c in calls))
+        self.assertEqual(result.stdout.splitlines()[-1], 'PASS gates (e2e=none)')
         package = json.loads((Path(__file__).parents[2] / 'package.json').read_text())
         self.assertEqual(package['scripts']['ci'], 'bash tools/gates.sh --full-e2e')
 
