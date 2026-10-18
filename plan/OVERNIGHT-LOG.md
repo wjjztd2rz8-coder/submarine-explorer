@@ -1472,3 +1472,9 @@ Comprehensive review (Codex 5h at 0%, no Sol pass): see REVIEWS.md. Merged nothi
 
 - Claude-alone review (Sol skipped, Codex 5h low). Backlog gained V-closeup-artifacts and V-lostcity-slice2; REVIEWS.md and STATUS.md updated. No package merged. Codex queue 2490-2510 waits.
 - **Needs owner:** real-phone Low-tier play.
+
+## 2026-10-17 19:19 CDT headless run 53 (Claude)
+
+- **Merged (gates green, no full e2e):** Sonnet V-closeup-artifacts: life shrinks near camera and matte life material (Blue Hole tang/shard, Endurance blown-out lobsters), Titanic detail pose via tools/titanic-poses.json and rustier paint. Residual: Titanic hull still slightly warm; Blue Hole east frame now has no life; life changes are global (only Monterey spot-checked).
+- **Codex:** 2490-2510 queued; dispatch waits on 5h budget. No tag (CI for run 52 pending).
+- **Needs owner:** real-phone Low-tier play.
