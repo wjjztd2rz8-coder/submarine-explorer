@@ -428,11 +428,6 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       OCHRE,
       smooth(0.44, 0.62, fbm3(x * 0.2 + 9, y * 0.06, z * 0.2, seed ^ 0x0c4, 3)) * 0.8,
     );
-    // Mottling: broad grey and ochre patches break the white wall; the foot is dirtier.
-    const mottle = fbm3(x * 0.11 + 5, y * 0.09, z * 0.11 + 5, seed ^ 0x6d1, 3);
-    const foot = 1 - smooth(0.04, 0.4, (y - gnd(x, z)) / H);
-    out.lerp(TROUGH, (smooth(0.42, 0.6, mottle) * 0.55 + foot * 0.4) * (0.5 + 0.5 * (1 - up * 0.5)));
-    out.lerp(OCHRE, (1 - smooth(0.3, 0.42, mottle)) * 0.4);
     // Flow streaks: narrow vertical bands (high horizontal, very low vertical frequency)
     // alternating pale and shaded, as fluid ran down the walls.
     const wall = 1 - Math.abs(ny);
@@ -472,7 +467,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       const dd = Math.hypot(x - v.p.x, z - v.p.z) / v.r;
       const mouth = 1 - smooth(0.3, 0.95, dd);
       // A white brucite fringe round the lip, then the dark throat inside it.
-      const lip = smooth(0.6, 1.0, dd) * (1 - smooth(1.5, 2.3, dd)) * smooth(-2.5, -0.2, dy);
+      const lip = smooth(0.6, 1.0, dd) * (1 - smooth(1.1, 1.6, dd)) * smooth(-2.5, -0.2, dy);
       out.lerp(FRINGE, lip * 0.85);
       out.lerp(VENT, mouth * smooth(-v.depth - 1.2, -0.3, dy) * 0.85);
     }
@@ -480,6 +475,11 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
     const patch = fbm3(x * 0.07 + 4, y * 0.05, z * 0.07 + 4, seed ^ 0x9a7, 2);
     out.lerp(TROUGH, smooth(0.5, 0.72, patch) * 0.5 * wall);
     out.lerp(LIVE, (1 - smooth(0.28, 0.46, patch)) * 0.45 * wall * (0.3 + up));
+    // Mottling: broad grey and ochre patches break the white wall; the foot is dirtier.
+    const mottle = 0.5 + 2 * (fbm3(x * 0.11 + 5, y * 0.09, z * 0.11 + 5, seed ^ 0x6d1, 3) - 0.5);
+    const foot = 1 - smooth(0.04, 0.4, (y - gnd(x, z)) / H);
+    out.lerp(TROUGH, Math.min(1, smooth(0.55, 0.68, mottle) * 0.7 + foot * 0.5));
+    out.lerp(OCHRE, (1 - smooth(0.2, 0.36, mottle)) * 0.45);
     // Faint blue-green biofilm: damp, sheltered lower walls and under ledges.
     const film = fbm3(x * 0.22, y * 0.12, z * 0.22, seed ^ 0xb10, 3);
     out.lerp(BIOFILM, smooth(0.48, 0.6, film) * 0.4 * wall * (1 - up * 0.6));

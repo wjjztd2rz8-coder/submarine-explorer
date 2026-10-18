@@ -325,10 +325,13 @@ describe('carbonate trunk rims and slope rubble', () => {
         const apron = vi.spyOn(shared, 'heightMesh');
         const scatter = talus.scatterRubble;
         const centres: [number, number][] = [];
+        let scatters = 0;
         const rubble = vi
           .spyOn(talus, 'scatterRubble')
           .mockImplementation((surface, keep, opts) => {
             let calls = 0;
+            // The first scatter is the apron-wide one; the second packs blocks round the foot.
+            if (scatters++ > 0) return scatter(surface, keep, opts);
             return scatter(
               (x, z) => {
                 // Each accepted block samples its centre, then two slope axes.
@@ -345,7 +348,7 @@ describe('carbonate trunk rims and slope rubble', () => {
             expect(rubble).not.toHaveBeenCalled();
             return;
           }
-          expect(rubble).toHaveBeenCalledOnce();
+          expect(rubble).toHaveBeenCalledTimes(2);
           const skirt = apron.mock.calls[0][4];
           const [surface, keep, options] = rubble.mock.calls[0];
           const blocks = rubble.mock.results[0].value as THREE.BufferGeometry[];
