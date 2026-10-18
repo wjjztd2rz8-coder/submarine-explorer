@@ -167,6 +167,99 @@ describe('settings defaults and migrate', () => {
 });
 
 describe('Save', () => {
+  it.each([2, 3])(
+    'keeps accessibility choices through v%s migration, mode edits, reload and reset',
+    (version) => {
+      const store = new MemoryStore();
+      const key = version === 2 ? 'subexplorer.settings.v2' : SETTINGS_STORAGE_KEY;
+      const original = JSON.stringify({
+        version,
+        reduceMotion: true,
+        uiScale: 137,
+        captions: 'damaged',
+        gameplayMode: 'custom',
+        gameplayBaseMode: 'realistic',
+        gameplay: { batteryOxygen: false },
+        extension: { keep: true },
+      });
+      store.setItem(key, original);
+      const save = new Save({ config, storage: store });
+      expect(save.get()).toMatchObject({
+        reduceMotion: true,
+        uiScale: 137,
+        captions: config.settings.defaults.captions,
+        extension: { keep: true },
+      });
+      save.setGameplayMode('arcade');
+      save.setGameplayOption('startPosition', 'surface');
+      const restored = new Save({ config, storage: store });
+      expect(restored.get()).toEqual(save.get());
+      expect(restored.get()).toMatchObject({ reduceMotion: true, uiScale: 137 });
+      restored.save({ reduceMotion: false, uiScale: 80 });
+      expect(new Save({ config, storage: store }).get()).toMatchObject({
+        reduceMotion: false,
+        uiScale: 80,
+      });
+      restored.reset();
+      expect(new Save({ config, storage: store }).get()).toMatchObject({
+        reduceMotion: config.settings.defaults.reduceMotion,
+        uiScale: 100,
+        extension: { keep: true },
+      });
+      if (version === 2) expect(store.getItem(key)).toBe(original);
+    },
+  );
+
+  it.each([
+    { reduceMotion: 'true', uiScale: 125, expectedMotion: false, expectedScale: 125 },
+    { reduceMotion: null, uiScale: 150, expectedMotion: false, expectedScale: 150 },
+    { reduceMotion: 1, uiScale: 80, expectedMotion: false, expectedScale: 80 },
+    { reduceMotion: true, uiScale: '125', expectedMotion: true, expectedScale: 100 },
+    { reduceMotion: true, uiScale: null, expectedMotion: true, expectedScale: 100 },
+    { reduceMotion: true, uiScale: {}, expectedMotion: true, expectedScale: 100 },
+    { reduceMotion: true, uiScale: -100, expectedMotion: true, expectedScale: 80 },
+    { reduceMotion: true, uiScale: 999, expectedMotion: true, expectedScale: 150 },
+    { reduceMotion: true, uiScale: 123.6, expectedMotion: true, expectedScale: 124 },
+  ])('repairs only the damaged accessibility field: %j', (fixture) => {
+    for (const version of [2, 3]) {
+      const store = new MemoryStore();
+      store.setItem(
+        version === 2 ? 'subexplorer.settings.v2' : SETTINGS_STORAGE_KEY,
+        JSON.stringify({
+          version,
+          reduceMotion: fixture.reduceMotion,
+          uiScale: fixture.uiScale,
+          captions: true,
+        }),
+      );
+      const save = new Save({ config, storage: store });
+      expect(save.get()).toMatchObject({
+        reduceMotion: fixture.expectedMotion,
+        uiScale: fixture.expectedScale,
+        captions: true,
+      });
+      expect(save.reloadSafe).toBe(true);
+      expect(new Save({ config, storage: store }).get()).toEqual(save.get());
+    }
+  });
+
+  it('keeps accessibility edits in session after quota failure and persists an unchanged retry', () => {
+    const store = new MemoryStore();
+    const save = new Save({ config, storage: store });
+    const original = store.getItem(SETTINGS_STORAGE_KEY);
+    const write = vi.spyOn(store, 'setItem').mockImplementation(() => {
+      throw new DOMException('Full', 'QuotaExceededError');
+    });
+    save.save({ reduceMotion: true, uiScale: 150 });
+    expect(save.get()).toMatchObject({ reduceMotion: true, uiScale: 150 });
+    expect(save.reloadSafe).toBe(false);
+    expect(store.getItem(SETTINGS_STORAGE_KEY)).toBe(original);
+    write.mockRestore();
+    save.save({ reduceMotion: true, uiScale: 150 });
+    expect(save.reloadSafe).toBe(true);
+    expect(new Save({ config, storage: store }).get()).toEqual(save.get());
+  });
+
   it('persists, reloads in a new session, and notifies changed keys only', () => {
     const store = new MemoryStore();
     const a = new Save({ config, storage: store });

@@ -7,7 +7,7 @@ import { FocusTrap, observeKeyboard, type FocusTrapOptions } from '../../src/ui/
 import { Globe } from '../../src/ui/Globe.js';
 import type { GlobeSite } from '../../src/ui/GlobeModel.js';
 import { SettingsScreen } from '../../src/ui/Settings.js';
-import { Save, ProgressSave, defaultSettings } from '../../src/core/Save.js';
+import { Save, ProgressSave, defaultSettings, SETTINGS_STORAGE_KEY } from '../../src/core/Save.js';
 import { Progress as SavedProgress } from '../../src/game/Progress.js';
 import { DailySave } from '../../src/game/DailySave.js';
 import { resolveEffective } from '../../src/game/EffectiveSettings.js';
@@ -1263,6 +1263,68 @@ describe('overlay policies across the app', () => {
     motion.dispatchEvent(new Event('change'));
     expect(ctx.rig.reduceMotion).toBe(false);
     expect(ctx.waypoints.root.dataset.reduceMotion).toBe('false');
+  });
+
+  it.each([
+    { savedMotion: false, osMotion: false },
+    { savedMotion: true, osMotion: false },
+    { savedMotion: false, osMotion: true },
+    { savedMotion: true, osMotion: true },
+  ])('restores accessibility controls and live values after reload: %j', (fixture) => {
+    const motion = Object.assign(new EventTarget(), { matches: fixture.osMotion });
+    Object.assign(window, { matchMedia: () => motion });
+    const records = new Map<string, string>([
+      [
+        SETTINGS_STORAGE_KEY,
+        JSON.stringify({ version: 3, reduceMotion: fixture.savedMotion, uiScale: 135 }),
+      ],
+    ]);
+    const storage = {
+      getItem: (key: string) => records.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        records.set(key, value);
+      },
+      removeItem: (key: string) => {
+        records.delete(key);
+      },
+    };
+    const scale = vi.spyOn(document.documentElement.style, 'setProperty');
+    for (let session = 0; session < 2; session++) {
+      const save = new Save({ config: DEFAULT_CONFIG, storage });
+      const ctx = {
+        config: DEFAULT_CONFIG,
+        settings: save.get(),
+        save,
+        tier: 'low',
+        quality: { setting: 'low', urlForced: false },
+        input: new Input({ storage: null }),
+        globe: { isOpen: false },
+        expose: vi.fn(),
+        rig: {},
+        waypoints: { setReducedMotion: vi.fn() },
+      } as unknown as GameContext;
+      settingsSystem.init!(ctx);
+      cleanup.push(() => settingsSystem.dispose?.());
+      const root = ctx.settingsScreen.root;
+      const reduce = root.querySelector<HTMLInputElement>('[data-setting="reduceMotion"]')!;
+      const size = root.querySelector<HTMLInputElement>('[data-setting="uiScale"]')!;
+      const savedMotion = session === 0 ? fixture.savedMotion : !fixture.savedMotion;
+      expect(reduce.checked).toBe(savedMotion);
+      expect(size.value).toBe(session === 0 ? '135' : '150');
+      expect(ctx.rig.reduceMotion).toBe(savedMotion || fixture.osMotion);
+      expect(document.documentElement.dataset.reduceMotion).toBe(String(ctx.rig.reduceMotion));
+      expect(ctx.waypoints.setReducedMotion).toHaveBeenLastCalledWith(ctx.rig.reduceMotion);
+      if (session === 0) {
+        reduce.checked = !fixture.savedMotion;
+        reduce.dispatchEvent(new Event('change'));
+        size.value = '150';
+        size.dispatchEvent(new Event('change'));
+        expect(scale).toHaveBeenLastCalledWith('--ui-user-scale', '1.5');
+        expect(ctx.rig.reduceMotion).toBe(!fixture.savedMotion || fixture.osMotion);
+        expect(save.reloadSafe).toBe(true);
+      }
+      settingsSystem.dispose?.();
+    }
   });
 
   it.each(['focus', 'pointerenter'])(

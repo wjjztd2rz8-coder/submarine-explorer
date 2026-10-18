@@ -118,6 +118,69 @@ describe('PhotoStore', () => {
     expect(store.photos.map((p) => p.id)).not.toContain('p0');
   });
 
+  it.each(['QuotaExceededError', 'NS_ERROR_DOM_QUOTA_REACHED'])(
+    'evicts exactly the oldest photos at byte boundaries after %s, including the count limit',
+    (name) => {
+      for (const retained of [1, 5, PHOTO_LIMIT - 1, PHOTO_LIMIT]) {
+        const storage = new MemoryStorage();
+        const old = Array.from({ length: PHOTO_LIMIT }, (_, i) => photo(PHOTO_LIMIT - i));
+        storage.map.set(PHOTO_STORAGE_KEY, JSON.stringify({ version: 1, photos: old }));
+        const discoveries = '{"version":1,"discovered":{},"stats":{"scans":0}}';
+        storage.map.set(DISCOVERY_STORAGE_KEY, discoveries);
+        const store = new PhotoStore(storage);
+        const capture = photo(99, { image: `data:image/jpeg;base64,${'A'.repeat(200)}` });
+        const expected = [capture, ...old.slice(0, retained - 1)];
+        const fits = JSON.stringify({ version: 1, photos: expected }).length;
+        const write = vi.spyOn(storage, 'setItem').mockImplementation((key, value) => {
+          if (value.length > fits) throw new DOMException('Full', name);
+          storage.map.set(key, value);
+        });
+        expect(store.save(capture)).toEqual({ saved: true, dropped: PHOTO_LIMIT + 1 - retained });
+        expect(store.photos).toEqual(expected);
+        expect(new PhotoStore(storage).photos).toEqual(expected);
+        expect(storage.getItem(DISCOVERY_STORAGE_KEY)).toBe(discoveries);
+        write.mockRestore();
+      }
+    },
+  );
+
+  it('leaves a full collection byte-for-byte intact when an oversized capture cannot fit, then recovers', () => {
+    const storage = new MemoryStorage();
+    const old = Array.from({ length: PHOTO_LIMIT }, (_, i) => photo(PHOTO_LIMIT - i));
+    const original = JSON.stringify({ version: 1, photos: old });
+    storage.map.set(PHOTO_STORAGE_KEY, original);
+    storage.limit = JSON.stringify({ version: 1, photos: [photo(99), ...old.slice(0, -1)] }).length;
+    const store = new PhotoStore(storage);
+    const oversized = photo(99, {
+      image: `data:image/jpeg;base64,${'A'.repeat(original.length * 4)}`,
+    });
+    expect(store.save(oversized)).toMatchObject({
+      saved: false,
+      error: expect.stringMatching(/full/i),
+    });
+    expect(store.photos).toEqual(old);
+    expect(storage.getItem(PHOTO_STORAGE_KEY)).toBe(original);
+    expect(new PhotoStore(storage).photos).toEqual(old);
+    expect(store.delete(old.at(-1)!.id)).toBe(true);
+    expect(store.save(photo(99))).toEqual({ saved: true, dropped: 0 });
+    expect(new PhotoStore(storage).photos).toEqual([photo(99), ...old.slice(0, -1)]);
+  });
+
+  it('loads only valid photos before applying the count limit to an overfull legacy collection', () => {
+    const storage = new MemoryStorage();
+    const old = Array.from({ length: PHOTO_LIMIT + 3 }, (_, i) => photo(30 - i));
+    const original = JSON.stringify({
+      version: 1,
+      photos: [null, { id: 'damaged' }, photo(99, { depthM: -1 }), ...old],
+    });
+    storage.map.set(PHOTO_STORAGE_KEY, original);
+    const store = new PhotoStore(storage);
+    expect(store.photos).toEqual(old.slice(0, PHOTO_LIMIT));
+    expect(storage.getItem(PHOTO_STORAGE_KEY)).toBe(original);
+    expect(store.save(photo(100))).toEqual({ saved: true, dropped: 1 });
+    expect(new PhotoStore(storage).photos).toEqual([photo(100), ...old.slice(0, PHOTO_LIMIT - 1)]);
+  });
+
   it('fails clearly and keeps the collection when not even one photo fits', () => {
     const storage = new MemoryStorage();
     const store = new PhotoStore(storage);
