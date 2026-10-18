@@ -1,26 +1,27 @@
-# Status (2026-10-18, joint review with Codex Sol)
+# Status (2026-10-18 midday, joint review with Codex Sol)
 
-**Stage:** about 82% to 1.0. Four weeks targeted, 4-6 for planning.
+**Stage:** about 80% to 1.0 (was 82%: art moved up a little; the owner's phone test added eleven concrete playability items). 4-5 weeks targeted, 4-6 for planning.
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                               |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.5-4, Lost City 3-4.1 (disputed), Blue Hole 3-3.5, Beebe 3.5-3.8, Monterey 3.5-3.7 |
-| Other eight sites coherent                | Challenger 3.5-3.6, Endurance 3.5-3.8; spawn acceptance for all eight not certified (V-spawn-capture queued)        |
-| New player understands first five minutes | Journeys repeated earlier, P2s merged; current unaided journeys unverified                                          |
-| Acceptable Low-tier phone performance     | Owner 2026-10-18 (iPhone 17 Pro): Low great, High stutters at Lost City; weaker phones untested                     |
-| Hosted CI green, releases tagged          | CI green on run 59; f60 tagged; deploy not gated on CI (R-deploy-gate queued)                                       |
-| Code simple enough                        | S-manifest closed; standing S-verify / S-bughunt                                                                    |
+| Requirement                               | State                                                                                                            |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.5, Lost City 3-3.5, Blue Hole 3-3.5, Beebe 3.5-3.8, Monterey 3.5               |
+| Other eight sites coherent                | Challenger 3.5, Endurance 3.5-3.7; mission-spawn acceptance for all eight not certified (V-spawn-capture queued) |
+| New player understands first five minutes | Owner phone test: scan range, boost and events confuse; P2-scan-range and P2-boost-cut queued, then V-journeys   |
+| Acceptable Low-tier phone performance     | iPhone 17 Pro: Low great; High (opt-in only) stutters at Lost City; weaker phones untested                       |
+| Hosted CI green, releases tagged          | Red for two runs (stale test), fixed in 9b57c01; deploy not gated on CI (R-deploy-gate queued)                   |
+| Code simple enough                        | Standing S-verify / S-bughunt; R-merge-verify queued so smoke-only gates can't hide a red e2e                    |
 
 ## Done recently
 
-Close-up artifacts fix (Endurance lobsters, Titanic tint), Lost City carbonate mottle and notched rims, Blue Hole ragged hood, Titanic seabed slice 3, journey P2s, S-manifest closed.
+Titanic opening (hull fills the frame; plate tint varied by lanes), Beebe flank (crust ridges catch warm light), owner phone test written up as P2 items, red CI fixed.
 
 ## Left
 
-Lost City tower thickness, Titanic opening frame, Beebe flank, Monterey banding, Challenger seabed, Blue Hole hood facets and 0.45 m overlap, eight-site acceptance, deploy gating.
+First-five-minute scanning and guidance (agreed top blocker), deploy gating, phone defects (Class A clipping, Beebe Low caps), Lost City tower, Titanic plating patchwork, Monterey bands, Challenger seabed, Blue Hole hood and overlap, eight-site acceptance.
 
 ## Needs owner
 
-Phone test done 2026-10-18 ([PHONE-FEEDBACK-2026-10-18.md](PHONE-FEEDBACK-2026-10-18.md)); the P2 items lead the backlog. A short retest once they land.
+- Claude weekly window runs out around Oct 20 at the current pace (resets Oct 22). Your Claude reset also expires Oct 22, so applying it then costs nothing extra.
+- A short phone retest once the P2 items land.

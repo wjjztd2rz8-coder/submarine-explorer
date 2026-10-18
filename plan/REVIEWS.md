@@ -2,6 +2,28 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-18 midday comprehensive review, joint with Codex Sol (golden 2026-10-18-155545; owner-requested)
+
+Sol ran (no live browser: Codex browser is off since 2026-10-12); one reconcile round, claims checked against images and source.
+
+**Changed since the morning review:** V-titanic-opening, V-beebe-flank, owner phone test write-up (11 P2 items). The other five heroes are materially unchanged (Sol corrected my "pixel-identical": all pairs differ by a few pixels of particles).
+
+**Scores (readable / beautiful, bands):** Titanic 4 / 3.5; Lost City 3.5 / 3-3.5; Blue Hole 3.5 / 3-3.5; Beebe 4 / 3.5-3.8; Monterey 4 / 3.5; Challenger 3.5 / 3.5; Endurance 4 / 3.5-3.7. Simplicity and phone scores are provisional (no fresh unaided journeys). Titanic's opening now fills the frame, but the new lane tint reads as a rust/grey patchwork up close and deck tops wash pale blue (both reviews; V-titanic-plating). Beebe's flank ridges catch warm light; facets still conspicuous (Sol).
+
+**Found and fixed:** CI red on main for two runs, deterministic: f-bughunt-18 expected the global chase radius for `tile=titanic` after V-titanic-opening authored 97. Fixed in 9b57c01. Root cause (Claude): local gates default to smoke e2e (gates.sh:13), progress notes said "e2e pass", and Beebe merged on top of red main; queued R-merge-verify.
+
+**Sol's catches (verified):** the P2-boost-cut item named X, which is camera reset (boost is Shift/RT, Input.ts:150); the mission scan cap `missionApproachScanRadius` (Spawn.ts:37) would cut a 100 m Arcade floor back to 80 m; eight-site acceptance belonged in the blockers; consistent beauty 4 is a 1.0 requirement, not "should fix". Sol also corrected my "events untriggerable": they fire automatically under site conditions; the problem is that players can't find or summon them.
+
+**Settled:** Lost City High stutter is lower priority than Low defects, because Auto caps phones at Medium (Quality.ts:78; Claude).
+
+**Process:** Codex "under-used" 16-33 h/24 h is the weekly pacing gate working as designed (69% left vs ~74% required; reopens in ~10 h). No P2 Codex briefs had been queued, so bug hunts would have run first: queued 2541 P2-scan-range, 2542 P2-boost-cut, 2543 R-merge-verify, and moved R-deploy-gate to 2544. Claude weekly burn ~15%/day with 37% left.
+
+**Agreed blockers:** (1) first-five-minute scanning, guidance and reward verified unaided on desktop and both phone orientations; (2) green CI on the release SHA with deploy gated; (3) phone defects and a complete Low journey; (4) heroes consistently at 4, Blue Hole overlap; (5) eight-site acceptance at mission spawns.
+
+**Stage:** about 80% to 1.0, 4-5 weeks targeted, 4-6 for planning (agreed with Sol).
+
+**Needs owner:** Claude weekly runs out around Oct 20 (reset Oct 22; your reset expires Oct 22). Phone retest after the P2 items.
+
 ## 2026-10-18 comprehensive review, joint with Codex Sol (golden 2026-10-18-104523)
 
 Sol ran; one reconcile round, claims checked against the images and files.
