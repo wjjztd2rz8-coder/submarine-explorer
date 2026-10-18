@@ -399,7 +399,26 @@ export function blueHoleTint(
     1 +
     0.1 * Math.exp(-(((r - 179) / 4.5) ** 2)) * (1 - rock) -
     0.2 * Math.exp(-(((r - 171) / 5.5) ** 2));
-  return [tr * m * fm * sr * rim, tg * m * fm * sg * rim, tb * m * fm * sb * rim];
+  // Under the gallery hoods the shelf is warmer and darker (silt shaded by the roof), with a
+  // scatter of dark fallen blocks, so it is not the same pale plane as the open reef.
+  let hoodWindow = 0;
+  for (const [bearing, width] of GALLERY_SEATS) {
+    const da = Math.abs(Math.atan2(Math.sin(a - bearing), Math.cos(a - bearing)));
+    hoodWindow = Math.max(hoodWindow, 1 - smoothstep(clamp01((da - width) / 0.45)));
+  }
+  const hoodShade =
+    hoodWindow * smoothstep(clamp01((r - 112) / 10)) * (1 - smoothstep(clamp01((r - 200) / 16)));
+  const clast = smoothstep(
+    clamp01(
+      (Math.sin(x * 0.83 + 2 * Math.sin(z * 0.61)) * Math.sin(z * 0.77 - x * 0.41) - 0.35) / 0.3,
+    ),
+  );
+  const under = 1 - hoodShade * (0.4 + 0.3 * clast);
+  return [
+    tr * m * fm * sr * rim * under * (1 + 0.18 * hoodShade),
+    tg * m * fm * sg * rim * under * (1 - 0.1 * hoodShade),
+    tb * m * fm * sb * rim * under * (1 - 0.3 * hoodShade),
+  ];
 }
 
 /**

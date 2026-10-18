@@ -8,7 +8,7 @@ exports[`terrain carve equivalence > great-blue-hole, shifted tile centre false:
   },
   "heightSamples": 105444,
   "heights": "5eb190f5b8cb5d3303b69bffc8318686ffc0d0d8240fe549dc3fcfc5331fb2fa",
-  "tint": "b95f472175fe16841c2fa61593dda67bed3d96c95db565fc1e38f1df0b0290f4",
+  "tint": "9bbfeba55d5cac13b8aa0985ff5dfd2a3d914cc2ada03a87bcf9f057e5f3c753",
 }
 `;
 
@@ -20,7 +20,7 @@ exports[`terrain carve equivalence > great-blue-hole, shifted tile centre true: 
   },
   "heightSamples": 105444,
   "heights": "fb12201857ce69d062af2ba9f4c2d64c173684d1d5c0a2daa51bf50ca3714d49",
-  "tint": "3ee5bbcc2939cd95b720ac07cddbf0f8d6260f110aab2f4fa74c665ec9b6ce94",
+  "tint": "7d58f0d90fab549e5ee5190c388cac5355bf0472c2b9baa5bdc74d9f7f45c76a",
 }
 `;
 
