@@ -139,7 +139,16 @@ export class VentPreset implements EnvPreset {
         ctx.scene,
         this.sources
           .slice(0, glowCount)
-          .map((s) => s.top.clone().add(new THREE.Vector3(0, carbonate ? 2 : -4, 0))),
+          .map((s) =>
+            s.top.clone().add(
+              // Beside the stack, not on its axis: a light inside the column only lights the ground.
+              new THREE.Vector3(
+                this.hazeLean.x * num(p.glowStandoffM, 0),
+                carbonate ? 2 : -num(p.glowDropM, 4),
+                this.hazeLean.y * num(p.glowStandoffM, 0),
+              ),
+            ),
+          ),
         num(p.glowColor, 0xff9a4a),
         num(p.glowIntensity, 260) * scale,
         num(p.glowDistanceM, 60),
