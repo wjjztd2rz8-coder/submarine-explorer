@@ -41,6 +41,9 @@ export interface VentPresetConfig {
   /** Candela; decay 2, so ~glowIntensity/d^2 at d metres. */
   glowIntensity: number;
   glowDistanceM: number;
+  /** Sulfide glow lights sit this far below the chimney top and this far to the side (m), to wash the flank. */
+  glowDropM: number;
+  glowStandoffM: number;
   /** Carbonate (Lost City) fluid is ~40-90 C, far cooler than a black smoker: glow x this. */
   glowCarbonateScale: number;
   /** Extra ambient light intensity added near the field (0 = none): keeps the seabed readable. */
@@ -254,6 +257,8 @@ export const DEFAULT_PRESETS: PresetsConfig = {
     glowColor: 0xff9a4a,
     glowIntensity: 260,
     glowDistanceM: 60,
+    glowDropM: 4,
+    glowStandoffM: 0,
     glowCarbonateScale: 0.35,
     ambientFill: 0,
     hullLight: 1,

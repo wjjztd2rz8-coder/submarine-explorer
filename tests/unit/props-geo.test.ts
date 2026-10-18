@@ -220,7 +220,7 @@ describe('smoker profile capability', () => {
         const baseline = make('beebe-vent-field', 'beebe-chimney-1');
         const baselineBefore = propEvidence(baseline);
         const geometryBefore = propEvidence(baseline, false);
-        checkBody(baseline, 0.5, 0.1);
+        checkBody(baseline, 0.85, 0.16);
         expect(mouthMaterial(baseline).emissive.getHex()).toBe(0xff681a);
 
         for (const smoker of [
