@@ -28,7 +28,9 @@ import * as THREE from 'three';
 import type { DebriefStats } from '../../src/game/Objectives.js';
 import type { FrameState } from '../../src/app/System.js';
 import { createPowerSystem } from '../../src/app/systems/power.js';
-import { parseMission } from '../../src/game/Mission.js';
+import { loadMissionSummaries, parseMission } from '../../src/game/Mission.js';
+import { MissionSelect } from '../../src/ui/MissionSelect.js';
+import landmarkIndex from '../../data/landmarks/index.json';
 import titanicMission from '../../data/landmarks/titanic/mission.json';
 import { MissionRouter } from '../../src/game/MissionRouter.js';
 import { createPointerSystem } from '../../src/app/systems/pointer.js';
@@ -41,7 +43,7 @@ import { inputGateSystem } from '../../src/app/loop.js';
 import { modesSystem } from '../../src/app/systems/modes.js';
 import { settingsSystem } from '../../src/app/systems/settings.js';
 import { waypointsSystem } from '../../src/app/systems/waypoints.js';
-import { Progress } from '../../src/game/Progress.js';
+import { Progress, requiredHull } from '../../src/game/Progress.js';
 import { makeSyntheticTile } from './helpers.js';
 import { PROGRESS_STORAGE_KEY } from '../../src/core/Save.js';
 import { DiscoveryStore, DISCOVERY_STORAGE_KEY } from '../../src/game/DiscoveryStore.js';
@@ -63,6 +65,7 @@ class Element extends EventTarget {
   layout = true;
   className = '';
   textContent = '';
+  title = '';
   type = '';
   value = '';
   scrollTop = 0;
@@ -258,6 +261,72 @@ function press(code: string, extra: Partial<KeyboardEvent> = {}): KeyboardEvent 
   return event as KeyboardEvent;
 }
 const active = () => document.activeElement as unknown as Element;
+
+it('compact shell site rows keep catalog, Tab and activation order while retaining reward labels', async () => {
+  // Guard row omissions/reordering and lost summaries or progress after compacting the picker.
+  const docs = import.meta.glob('../../data/landmarks/*/mission.json', {
+    eager: true,
+    import: 'default',
+  });
+  const files: Record<string, unknown> = { '/data/landmarks/index.json': landmarkIndex };
+  for (const [path, doc] of Object.entries(docs)) files[path.replace('../..', '')] = doc;
+  vi.stubGlobal('fetch', async (url: string) => ({
+    ok: url in files,
+    text: async () => JSON.stringify(files[url]),
+  }));
+  const summaries = await loadMissionSummaries();
+  const select = vi.fn();
+  const preview = vi.fn();
+  const picker = new MissionSelect([], {
+    presentation: 'shell',
+    onSelectMission: select,
+    onSiteFocus: preview,
+    completion: (_id, pois) => `0/${pois.length} logged`,
+  });
+  cleanup.push(() => picker.dispose());
+  picker.setProgress(new Progress(new ProgressSave(null)));
+  picker.setMissions(summaries);
+  const root = picker.root as unknown as Element;
+  const buttons = root.querySelectorAll('.is-mission');
+  expect(buttons.map((button) => button.dataset.mission)).toEqual(landmarkIndex.landmarks);
+  const owner = trap(root);
+  owner.activate();
+  expect(owner.focusables()).toEqual(buttons);
+  for (const [index, button] of buttons.entries()) {
+    press('Tab');
+    expect(active()).toBe(button);
+    expect(button.querySelector('.mission-item-name')?.textContent).toBe(summaries[index].title);
+    expect(button.querySelector('.mission-item-summary')).toBeNull();
+    expect(button.title).toBe(summaries[index].summary);
+    expect(button.querySelector('.mission-stars')?.getAttribute('aria-label')).toBe(
+      'Best dive: 0 of 3 stars',
+    );
+    button.dispatchEvent(new Event('focus'));
+    expect(preview).toHaveBeenLastCalledWith(summaries[index].id);
+    // Pointer/touch and native keyboard activation share the same button handler.
+    button.dispatchEvent(new Event('click'));
+    expect(select).toHaveBeenLastCalledWith(summaries[index].id);
+  }
+  press('Tab');
+  expect(active()).toBe(buttons[0]);
+  press('Tab', { shiftKey: true });
+  expect(active()).toBe(buttons.at(-1));
+  // Flush the real content fetches that fill the compact metadata/progress labels.
+  await vi.waitFor(() => {
+    for (const [index, button] of buttons.entries()) {
+      const doc = files[`/data/landmarks/${summaries[index].id}/mission.json`] as {
+        objectives: unknown[];
+      };
+      const depth = summaries[index].depthM!;
+      expect(button.querySelector('.mission-item-meta')?.textContent).toBe(
+        `${Math.round(depth).toLocaleString('en-US')} m · Class ${requiredHull(depth).id} hull`,
+      );
+      expect(button.querySelector('.mission-item-progress')?.textContent).toBe(
+        `0/${doc.objectives.length} logged`,
+      );
+    }
+  });
+});
 
 function overlay() {
   const root = element('DIV');
