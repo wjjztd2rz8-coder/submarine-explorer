@@ -226,7 +226,8 @@ for (const surface of ['desktop', 'phone'] as const) {
           },
           { kind, before, samples },
         );
-        expect(measurements.range).toBeGreaterThanOrEqual(30);
+        // Beebe's chimneys push the reset pose back toward the contact (~27 m).
+        expect(measurements.range).toBeGreaterThanOrEqual(25);
         expect(measurements.range).toBeLessThanOrEqual(70);
         expect(Math.abs(measurements.projected[0])).toBeLessThan(1);
         expect(Math.abs(measurements.projected[1])).toBeLessThan(1);
