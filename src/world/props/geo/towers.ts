@@ -159,7 +159,7 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       r0,
       topFrac: main ? 0.3 : 0.28,
       seed: seed + spires.length * 11,
-      segs: 26 * dens + 4,
+      segs: 40 * dens + 4,
       rings: (h / 0.9) * dens + 8,
       tiers: Math.max(2, Math.round(h / (main ? 6.5 : 5))),
       ledge: main ? 0.12 : 0.1,

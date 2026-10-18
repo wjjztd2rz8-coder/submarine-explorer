@@ -105,9 +105,15 @@ export function spireRadius(o: SpireOpts, t0: number): number {
 export function rimDrop(o: SpireOpts, ang: number): number {
   const broad = fbm3(Math.cos(ang) * 1.7 + 5, 3, Math.sin(ang) * 1.7 + 5, o.seed + 91, 3);
   const teeth = fbm3(Math.cos(ang) * 5 + 2, 8, Math.sin(ang) * 5 + 2, o.seed + 93, 2);
+  // Spalled notches and small steps: a staircase of the fine noise plus deep, narrow bites,
+  // so the broad drop never leaves one long planar facet.
+  const chip = fbm3(Math.cos(ang) * 11 + 6, 2, Math.sin(ang) * 11 + 6, o.seed + 97, 2);
+  const steps = Math.floor(chip * 5) / 5;
+  const bite = smooth(0.62, 0.78, chip);
   const drop =
-    Math.pow(smooth(0.35, 0.7, broad), 1.5) * 1.6 +
-    smooth(0.5, 0.8, teeth) * (o.trunk ? 0.25 : 0.5);
+    Math.pow(smooth(0.35, 0.7, broad), 1.5) * (o.trunk ? 1.1 : 1.6) +
+    smooth(0.5, 0.8, teeth) * (o.trunk ? 0.25 : 0.5) +
+    (o.trunk ? steps * 0.3 + bite * 0.3 : 0);
   return o.r0 * o.topFrac * drop;
 }
 
