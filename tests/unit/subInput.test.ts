@@ -67,6 +67,68 @@ describe('pointer look preference and lock decisions', () => {
 
 describe('Input action map', () => {
   it.each([false, true])(
+    'suppresses hidden-page pad polling without blur or replayed edges (background frames: %s)',
+    (poll) => {
+      const win = new EventTarget();
+      const doc = Object.assign(new EventTarget(), { hidden: false });
+      const buttons = Array.from({ length: 16 }, () => ({ value: 0, pressed: false }));
+      vi.stubGlobal('window', win);
+      vi.stubGlobal('document', doc);
+      vi.stubGlobal('navigator', {
+        getGamepads: () => [{ connected: true, index: 0, axes: [0.5, -1, 0, -0.4], buttons }],
+      });
+      const input = makeInput();
+      input.attach();
+      try {
+        expect(input.sample().throttle).toBe(1);
+        input.endFrame();
+        doc.hidden = true;
+        doc.dispatchEvent(new Event('visibilitychange'));
+        buttons[0] = buttons[5] = buttons[7] = { value: 1, pressed: true };
+        if (poll) {
+          const neutral = () => {
+            expect(input.sample()).toMatchObject({
+              throttle: 0,
+              yaw: 0,
+              pitch: 0,
+              ballast: 0,
+              scan: false,
+              toggleCamera: false,
+              toggleGuide: false,
+            });
+            expect(input.gamepadActive).toBe(false);
+          };
+          neutral();
+          // A focus event must not override the page's hidden state.
+          win.dispatchEvent(new Event('focus'));
+          neutral();
+          buttons[3] = buttons[14] = { value: 1, pressed: true };
+          neutral();
+        } else buttons[3] = buttons[14] = { value: 1, pressed: true };
+        doc.hidden = false;
+        doc.dispatchEvent(new Event('visibilitychange'));
+        expect(input.sample()).toMatchObject({
+          throttle: 1,
+          yaw: 0.5,
+          pitch: 0.4,
+          ballast: 1,
+          scan: true,
+          toggleCamera: false,
+          toggleGuide: false,
+        });
+        expect(input.gamepadActive).toBe(true);
+        buttons[3] = buttons[14] = { value: 0, pressed: false };
+        input.sample();
+        buttons[3] = buttons[14] = { value: 1, pressed: true };
+        expect(input.sample()).toMatchObject({ toggleCamera: true, toggleGuide: true });
+      } finally {
+        input.dispose();
+        vi.unstubAllGlobals();
+      }
+    },
+  );
+
+  it.each([false, true])(
     'suppresses pad input across blur without replaying edges (background frames: %s)',
     (poll) => {
       const win = new EventTarget();

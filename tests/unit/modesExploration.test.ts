@@ -12,11 +12,107 @@ import { Scanner } from '../../src/game/Scanner.js';
 import * as Secrets from '../../src/game/Secrets.js';
 import type { ExplorationSummary } from '../../src/ui/Debrief.js';
 import type { Samples } from '../../src/game/Samples.js';
+import { Input } from '../../src/core/Input.js';
+import { Submarine } from '../../src/sub/Submarine.js';
+import { resolveEffective } from '../../src/game/EffectiveSettings.js';
+import { modesSystem } from '../../src/app/systems/modes.js';
 
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
+
+it.each(['keyboard', 'touch', 'gamepad'] as const)(
+  '%s held controls and scan progress survive live Arcade/Realistic switches without replayed edges',
+  async (device) => {
+    const config = makeConfig();
+    const original = structuredClone(config);
+    const save = new Save({ config, storage: null });
+    const input = new Input({ storage: null });
+    const buttons = Array.from({ length: 16 }, () => ({ value: 0, pressed: false }));
+    vi.stubGlobal('navigator', {
+      getGamepads: () =>
+        device === 'gamepad' ? [{ connected: true, index: 0, axes: [0.5, -1, 0, 0], buttons }] : [],
+    });
+    if (device === 'keyboard') {
+      for (const code of ['KeyW', 'KeyD', 'KeyC', 'KeyG', 'KeyQ']) input.injectKey(code, true);
+    } else if (device === 'touch') {
+      Object.assign(input.touchAxes, { throttle: 1, yaw: 1, ballast: -1 });
+      input.touchHeld.add('scan');
+      input.touchEdge('toggleCamera');
+    } else {
+      for (const i of [1, 3, 5]) buttons[i] = { value: 1, pressed: true };
+    }
+    const effective = resolveEffective(save.get(), 'arcade', null, config);
+    const sub = new Submarine(effective.submarine, {
+      sampleHeight: () => -5000,
+      getNormal: (_x, _z, out = new Vector3()) => out.set(0, 1, 0),
+    });
+    sub.reset(0, -1000, 0);
+    const scanner = new Scanner(effective.scan, new EventBus());
+    const poi = {
+      id: 'contact',
+      name: 'Contact',
+      landmarkId: 'fixture',
+      position: new Vector3(0, -1000, -10),
+      radius: 100,
+      scanSeconds: 10,
+    };
+    scanner.setTargets([poi]);
+    const ctx = {
+      config,
+      save,
+      effective,
+      daily: null,
+      sub,
+      discovery: { ready: Promise.resolve(), pois: [poi], scanner },
+      rig: { setConfig: vi.fn() },
+      power: { setConfig: vi.fn(), setEnabled: vi.fn() },
+      headlights: { setPreset: vi.fn() },
+      sonar: { setSensorRange: vi.fn() },
+      presets: { setCurrentMode: vi.fn() },
+      hud: { setCurrentMode: vi.fn() },
+      expose: vi.fn(),
+    } as unknown as GameContext;
+    try {
+      modesSystem.init!(ctx);
+      modesSystem.start!(ctx);
+      await ctx.discovery.ready;
+      expect(input.sample().toggleCamera).toBe(true);
+      input.endFrame();
+      for (const [index, mode] of (
+        ['realistic', 'arcade', 'realistic', 'arcade'] as const
+      ).entries()) {
+        const before = sub.position.clone();
+        const hull = sub.getState().hullClass;
+        save.setGameplayMode(mode);
+        expect(sub.position.equals(before)).toBe(true);
+        expect(sub.getState().hullClass).toBe(hull);
+        expect(ctx.effective.speedName).toBe(mode === 'arcade' ? 'fast' : 'research');
+        expect(poi.radius).toBe(100 * ctx.effective.sensor.scanRadiusMultiplier);
+        const state = input.sample();
+        expect(state).toMatchObject({
+          throttle: 1,
+          yaw: device === 'gamepad' ? 0.5 : 1,
+          ballast: -1,
+          scan: true,
+          toggleCamera: false,
+        });
+        scanner.update(0.5, sub.position, new Vector3(0, 0, -1), state.scan);
+        expect(scanner.view.activeId).toBe('contact');
+        expect(scanner.view.progress).toBeCloseTo((index + 1) * 0.05);
+        sub.step(state, 1 / 60);
+        expect(sub.position.distanceTo(before)).toBeGreaterThan(0);
+        expect(sub.velocity.length()).toBeLessThanOrEqual(ctx.effective.submarine.maxSpeed);
+        input.endFrame();
+      }
+      expect(config).toEqual(original);
+    } finally {
+      modesSystem.dispose?.();
+      input.dispose();
+    }
+  },
+);
 
 it.each([
   ['arcade', 'realistic', false],

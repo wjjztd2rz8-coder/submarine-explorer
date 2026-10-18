@@ -260,6 +260,40 @@ it.each(['keyboard', 'touch', 'gamepad'] as const)(
 );
 
 describe('touch control interruptions', () => {
+  it.each(['pointercancel', 'lostpointercapture'])(
+    'releases each held control on %s without accepting stale moves',
+    (event) => {
+      const f = fixture();
+      try {
+        pointer(f.stick, 'pointerdown', 1);
+        pointer(f.slider, 'pointerdown', 2, 60, 160);
+        pointer(f.scan, 'pointerdown', 3);
+        expect(f.input.touchAxes.throttle).toBeGreaterThan(0.8);
+        expect(f.input.touchAxes.ballast).toBe(-1);
+        expect(f.input.touchHeld.has('scan')).toBe(true);
+        for (const control of [f.stick, f.slider, f.scan]) pointer(control, event, 99);
+        expect(f.input.touchAxes.throttle).toBeGreaterThan(0.8);
+        expect(f.input.touchAxes.ballast).toBe(-1);
+        expect(f.input.touchHeld.has('scan')).toBe(true);
+        pointer(f.stick, event, 1);
+        pointer(f.slider, event, 2);
+        pointer(f.scan, event, 3);
+        pointer(f.stick, 'pointermove', 1);
+        pointer(f.slider, 'pointermove', 2);
+        expect(f.input.touchAxes).toEqual({ throttle: 0, yaw: 0, pitch: 0, ballast: 0 });
+        expect(f.input.touchHeld.size).toBe(0);
+        pointer(f.stick, 'pointerdown', 4);
+        pointer(f.slider, 'pointerdown', 5);
+        pointer(f.scan, 'pointerdown', 6);
+        expect(f.input.touchAxes.throttle).toBeGreaterThan(0.8);
+        expect(f.input.touchAxes.ballast).toBe(1);
+        expect(f.input.touchHeld.has('scan')).toBe(true);
+      } finally {
+        f.controls.dispose();
+      }
+    },
+  );
+
   it('routes drag and pinch to the photo camera while an expanded sonar map is hidden', () => {
     const f = fixture();
     const send = (type: string, id: number, x: number) => {

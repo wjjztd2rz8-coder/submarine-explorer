@@ -720,7 +720,8 @@ export class Input {
       // sample so a press made in another app cannot replay a shortcut here.
       const edge = (index: number): boolean =>
         !this.padNeedsBaseline && pressed.has(index) && !this.padPressed.has(index);
-      if (!this.padSuspended) {
+      // Visibility loss need not deliver blur; a background poll must stay neutral.
+      if (!this.padSuspended && !(typeof document !== 'undefined' && document.hidden)) {
         // W3C standard mapping: 0/1 left stick, 2/3 right stick.
         const [lx = 0, ly = 0, , ry = 0] = pad.axes;
         const yaw = applyDeadZone(lx);

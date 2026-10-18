@@ -54,7 +54,7 @@ it('withholds polled gamepad actions during hidden frames and restores visible p
     doc.hidden = true;
     buttons[2] = { pressed: true, value: 1 };
     const hidden = frame();
-    expect(hidden.sampled.toggleLights).toBe(true);
+    expect(hidden.sampled.toggleLights).toBe(false);
     expect(hidden.state).toBe(FROZEN_INPUT);
     expect(hidden).toMatchObject({
       shellFrozen: true,
