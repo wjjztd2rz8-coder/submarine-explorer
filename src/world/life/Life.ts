@@ -90,7 +90,7 @@ export class Life {
     if (dt > 0) this.sim.update(dt, sub);
     const fov = (camera.fov * Math.PI) / 180;
     const viewScale = viewHeightPx / (2 * Math.tan(fov / 2));
-    this.render.sync(this.sim, sub, dt, viewScale, fogDensity);
+    this.render.sync(this.sim, sub, camera.position, dt, viewScale, fogDensity);
     this.updateTargets(sub);
   }
 
