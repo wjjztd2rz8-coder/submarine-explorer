@@ -34,8 +34,10 @@ test('Arcade, Realistic and Custom apply live and survive reload', async ({ page
     mode: 'arcade',
     speed: 1,
     light: 750,
-    scanRadius:
+    scanRadius: Math.max(
+      100,
       bowRadius * DEFAULT_SENSOR_PRESETS.extended.scanRadiusMultiplier * EQUIPMENT.scanDetail,
+    ),
   });
   await page.keyboard.press('Escape');
   await page.locator('.pause-menu').getByRole('button', { name: 'Settings' }).click();

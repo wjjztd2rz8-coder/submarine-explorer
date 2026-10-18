@@ -1,5 +1,6 @@
 import { scanWithKeyboard, advanceScan } from './helpers/scan.js';
 import { expect, test, type Page } from './helpers/unlocked.js';
+import type { Discovery } from '../../src/game/Discovery.js';
 // @ts-expect-error Node types are intentionally absent from the browser tsconfig.
 import { mkdir } from 'node:fs/promises';
 
@@ -25,6 +26,45 @@ async function boot(page: Page, url: string): Promise<void> {
 async function screenshot(page: Page, name: string): Promise<void> {
   await mkdir(shots, { recursive: true });
   await page.screenshot({ path: `${shots}/${name}.png` });
+}
+
+for (const [dive, url] of [
+  ['mission', '/?mission=titanic&skipBriefing=1&tutorial=0'],
+  ['free dive', '/?tile=titanic&landmark=titanic&tutorial=0'],
+] as const) {
+  test(`Titanic ${dive} resolves the Arcade scan floor after mission caps`, async ({ page }) => {
+    // Guards the actual loaded reach: raw POI radii alone miss the mission cap.
+    await boot(page, url);
+    await page.waitForFunction(
+      () => (window.__game as { props: { loaded: boolean } }).props.loaded,
+    );
+    const result = await page.evaluate(() => {
+      const game = window.__game as { discovery: Discovery };
+      const scanner = game.discovery.scanner;
+      const bow = game.discovery.pois.find((p) => p.id === 'titanic-bow')!;
+      const radii = game.discovery.pois.map((p) => p.radius);
+      scanner.resetDive();
+      scanner.setObjective(bow.id);
+      const forward = bow.position.clone().set(0, 0, -1);
+      const probe = (distance: number) => {
+        scanner.update(
+          0.1,
+          bow.position.clone().addScaledVector(forward, -distance),
+          forward,
+          distance <= 100,
+        );
+        return {
+          radius: scanner.view.objectiveRadius,
+          inRange: scanner.view.objectiveInRange,
+          scanning: scanner.isScanning,
+        };
+      };
+      return { radii, outside: probe(101), boundary: probe(100) };
+    });
+    expect(result.radii.every((radius) => radius >= 100)).toBe(true);
+    expect(result.outside).toEqual({ radius: 100, inRange: false, scanning: false });
+    expect(result.boundary).toEqual({ radius: 100, inRange: true, scanning: true });
+  });
 }
 
 test('scanned contacts stay marked and cannot be rescanned until a new dive', async ({ page }) => {

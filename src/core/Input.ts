@@ -33,7 +33,6 @@ export interface InputState {
   toggleCamera: boolean;
   resetCamera?: boolean;
   toggleSonar: boolean;
-  boost: boolean;
   /** Headlight input edge; the atmosphere system owns the lights. */
   toggleLights: boolean;
   /** Hold-to-scan beam. Level-triggered, not an edge. */
@@ -71,7 +70,6 @@ export type ActionId =
   | 'pitchDown'
   | 'ballastBlow'
   | 'ballastFlood'
-  | 'boost'
   | 'toggleCamera'
   | 'resetCamera'
   | 'toggleSonar'
@@ -143,13 +141,6 @@ export function defaultActions(): ActionBinding[] {
       keys: ['ControlLeft', 'ControlRight', 'KeyC'],
       pad: 'B / circle',
     },
-    {
-      id: 'boost',
-      label: 'Boost',
-      category: 'Piloting',
-      keys: ['ShiftLeft', 'ShiftRight'],
-      pad: 'Right trigger',
-    },
     { id: 'toggleLights', label: 'Headlights', category: 'Systems', keys: ['KeyL'], pad: 'X' },
     { id: 'scan', label: 'Scan (hold)', category: 'Systems', keys: ['KeyG'], pad: 'Right bumper' },
     {
@@ -198,7 +189,6 @@ const V1_DEFAULTS: Record<string, string[]> = {
   pitchDown: ['KeyF'],
   ballastBlow: ['Space'],
   ballastFlood: ['ShiftLeft', 'ShiftRight'],
-  boost: ['KeyX'],
   toggleLights: ['KeyL'],
   scan: ['KeyG'],
   cycleSimSpeed: ['KeyT'],
@@ -264,7 +254,6 @@ export class Input {
     toggleCamera: false,
     resetCamera: false,
     toggleSonar: false,
-    boost: false,
     toggleLights: false,
     scan: false,
     cycleSimSpeed: false,
@@ -308,8 +297,6 @@ export class Input {
   readonly touchAxes = { throttle: 0, yaw: 0, pitch: 0, ballast: 0 };
   /** Level-triggered actions held by an on-screen button (`scan`). */
   readonly touchHeld = new Set<ActionId>();
-  /** Touch Boost stays on between taps; desktop and gamepad still hold. */
-  touchBoost = false;
   /** True while the touch controls are the player's primary input. */
   touchActive = false;
 
@@ -645,13 +632,11 @@ export class Input {
     this.keys.clear();
     this.edgeArmed.clear();
     this.touchHeld.clear();
-    this.touchBoost = false;
     for (const axis of ['throttle', 'yaw', 'pitch', 'ballast'] as const) {
       this.touchAxes[axis] = 0;
       this.state[axis] = 0;
     }
     this.state.scan = false;
-    this.state.boost = false;
     this.mouseDown = false;
     this.endFrame();
   }
@@ -698,7 +683,6 @@ export class Input {
     s.yaw = this.axis('yawPort', 'yawStarboard');
     s.pitch = this.axis('pitchDown', 'pitchUp');
     s.ballast = this.axis('ballastFlood', 'ballastBlow');
-    s.boost = this.isDown('boost');
     s.scan = this.isDown('scan');
 
     // On-screen controls override like a deflected stick.
@@ -707,7 +691,6 @@ export class Input {
     if (ta.yaw) s.yaw = ta.yaw;
     if (ta.pitch) s.pitch = ta.pitch;
     if (ta.ballast) s.ballast = ta.ballast;
-    if (this.touchBoost) s.boost = true;
     if (this.touchHeld.has('scan')) s.scan = true;
 
     if (this.edgeArmed.size) {
@@ -759,7 +742,6 @@ export class Input {
         if (edge(13)) s.resetCamera = true; // D-pad down
         if (edge(14)) s.toggleGuide = true; // D-pad left (Journal)
         if (edge(4)) s.capturePhoto = true; // LB
-        s.boost = s.boost || (pad.buttons[7]?.value ?? 0) > 0.5; // RT
         this.gamepadActive = Boolean(yaw || throttle || pitch || ballast || pressed.size);
       }
       this.padPressed = pressed;

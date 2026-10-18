@@ -2,6 +2,12 @@
 
 Dated director reviews, newest first. Comprehensive reviews run about daily, after release tags or after 8+ merges. Targeted reviews run when something stalls (dry backlog, red CI, idle capacity).
 
+## 2026-10-18 14:50 targeted review: "Claude idle at >=50% for 2 h"
+
+- **Finding:** false trigger. Claude's week (36% left) sat exactly on the resume.sh pace line, so the weekly gate had deliberately skipped runs; the 5h window only looked idle. Codex is at 44% week / 34% 5h with 2550-2600 queued; nothing is wrong there.
+- **Fix:** 3-point margin on the weekly check in `tools/review-triggers.sh` (see PROCESS-LOG). No package started: Claude week is at the pace line and the 5h window refilled only just now, so the run saves budget.
+- **Needs owner:** real-phone Low-tier play.
+
 ## 2026-10-18 midday comprehensive review, joint with Codex Sol (golden 2026-10-18-155545; owner-requested)
 
 Sol ran (no live browser: Codex browser is off since 2026-10-12); one reconcile round, claims checked against images and source.
@@ -22,7 +28,7 @@ Sol ran (no live browser: Codex browser is off since 2026-10-12); one reconcile 
 
 **Stage:** about 80% to 1.0, 4-5 weeks targeted, 4-6 for planning (agreed with Sol).
 
-**Needs owner:** Claude weekly runs out around Oct 20 (reset Oct 22; your reset expires Oct 22). Phone retest after the P2 items.
+**Needs owner:** phone retest after the P2 items. (Correction from the owner: the Claude reset was already used, so there is no reset to apply; Claude stays paced and Codex's weekly head start went from 15% to 30% to carry more work. Briefs 2541-2543 launched 11:21.)
 
 ## 2026-10-18 comprehensive review, joint with Codex Sol (golden 2026-10-18-104523)
 

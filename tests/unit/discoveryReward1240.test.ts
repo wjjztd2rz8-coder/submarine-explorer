@@ -4,7 +4,12 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { Vector3 } from 'three';
 import { makeConfig } from '../../src/core/Config.js';
 import { EventBus } from '../../src/core/EventBus.js';
+import { ProgressSave } from '../../src/core/Save.js';
+import { createProgressSystem } from '../../src/app/systems/progress.js';
+import type { GameContext } from '../../src/app/context.js';
 import { Discovery } from '../../src/game/Discovery.js';
+import { DiscoveryStore, type StorageLike } from '../../src/game/DiscoveryStore.js';
+import { Progress } from '../../src/game/Progress.js';
 import { entryIdForPoi } from '../../src/game/Guide.js';
 import { buildJournalSite, isEntryUnlocked } from '../../src/game/JournalData.js';
 import { Mission, parseMission } from '../../src/game/Mission.js';
@@ -19,6 +24,8 @@ import type { TileMeta } from '../../src/util/types.js';
 // objectives, discovery wiring, guide-entry mapping and Journal unlock logic.
 vi.mock('../../src/ui/ScanOverlay.js', () => ({
   ScanOverlay: class {
+    setSuppressed = vi.fn();
+    update = vi.fn();
     showComplete = vi.fn();
     clear = vi.fn();
     dispose = vi.fn();
@@ -26,6 +33,7 @@ vi.mock('../../src/ui/ScanOverlay.js', () => ({
 }));
 vi.mock('../../src/ui/FieldGuide.js', () => ({
   FieldGuide: class {
+    setFooter = vi.fn();
     focus = vi.fn();
     refresh = vi.fn();
     setContent = vi.fn();
@@ -34,6 +42,13 @@ vi.mock('../../src/ui/FieldGuide.js', () => ({
 }));
 vi.mock('../../src/ui/Debrief.js', () => ({
   Debrief: class {
+    isOpen = false;
+    show = vi.fn(() => {
+      this.isOpen = true;
+    });
+    hide = vi.fn(() => {
+      this.isOpen = false;
+    });
     dispose = vi.fn();
   },
 }));
@@ -41,7 +56,7 @@ vi.mock('../../src/ui/Debrief.js', () => ({
 afterEach(() => vi.unstubAllGlobals());
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 
-function setup(site: string) {
+function setup(site: string, storage: StorageLike | null = null) {
   vi.stubGlobal('window', new EventTarget());
   vi.stubGlobal('fetch', async (url: string) => new Response(readFileSync(`.${url}`, 'utf8')));
   const meta = json(`data/tiles/${site}/meta.json`) as TileMeta;
@@ -52,7 +67,7 @@ function setup(site: string) {
     meta,
     seabed: { sampleHeight: () => meta.min_m },
     landmarkId: site,
-    storage: null,
+    storage,
     keyLabel: (action) => (action === 'scan' ? 'G' : 'J'),
   });
   return { bus, discovery, meta };
@@ -247,3 +262,128 @@ it('counts scanned secrets and samples and records the revealed discovery name',
     discovery.dispose();
   }
 });
+
+it.each([false, true])(
+  'keeps partial scans out of debrief and retains Journal/reward identity on return dives (quota failure: %s)',
+  async (quotaFailure) => {
+    const values = new Map<string, string>();
+    let failWrites = false;
+    const storage: StorageLike = {
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => {
+        if (failWrites) throw new DOMException('Storage full', 'QuotaExceededError');
+        values.set(key, value);
+      },
+      removeItem: (key) => {
+        values.delete(key);
+      },
+    };
+    // An unsuccessful write must retain the prior save, not replace it with an empty dive.
+    new DiscoveryStore(storage).record('previous-site', 'old-find');
+    new Progress(new ProgressSave(storage)).award('poi', 'previous-site/old-find');
+    const savedBefore = new Map(values);
+    failWrites = quotaFailure;
+    const { bus, discovery } = setup('titanic', storage);
+    const progress = new Progress(new ProgressSave(storage));
+    const rewards = createProgressSystem();
+    rewards.init!({
+      bus,
+      progress,
+      effective: { boostSeconds: 0 },
+      expose: vi.fn(),
+    } as unknown as GameContext);
+    const mission = new Mission({ def: parseMission(titanicMission, 'titanic')!, bus });
+    try {
+      await discovery.ready;
+      mission.resolve(discovery.pois.map((p) => p.id));
+      const journal = buildJournalSite({
+        id: 'titanic',
+        guide: discovery.guideDoc,
+        pois: discovery.pois.map((p) => p.def),
+        species: null,
+      });
+      const first = discovery.pois[0]!;
+      const entryId = entryIdForPoi(first, discovery.entries);
+      const entry = journal.entries.find((e) => e.kind === 'poi' && e.id === entryId)!;
+      const forward = new Vector3(0, 0, -1);
+      const scan = (target: ScanTarget, seconds = target.scanSeconds + 0.01) => {
+        discovery.scanner.setTargets([target]);
+        discovery.update(seconds, 0, target.position, forward, { scan: true }, undefined, 0);
+      };
+
+      mission.start('titanic');
+      scan(first, first.scanSeconds / 2);
+      expect(discovery.scanner.view.progress).toBeCloseTo(0.5);
+      expect(mission.end()).toBe(true);
+      const empty = discovery.showDebrief({ objectives: mission.counts() });
+      expect(empty.discoveries).toEqual([]);
+      expect(empty.newEntries).toEqual([]);
+      expect(empty.objectives).toEqual({ completed: 0, total: 4 });
+      expect(isEntryUnlocked(journal, entry, discovery.store)).toBe(false);
+      expect(progress.finish('titanic', mission.objectives)).toEqual({
+        stars: 0,
+        best: 0,
+        points: 0,
+      });
+      expect(progress.snapshot().awarded).toEqual(['poi:previous-site/old-find']);
+      // Held Scan cannot finish while a debrief or the Journal over it freezes play.
+      for (let frame = 0; frame < 3; frame++)
+        discovery.update(0, 1, first.position, forward, { scan: true }, undefined, 0, true);
+      expect(discovery.scanner.view.completed).toBe(0);
+      expect(discovery.store.isDiscovered('titanic', first.id)).toBe(false);
+      discovery.debrief.hide();
+      expect(mission.resume()).toBe(true);
+      scan(first, first.scanSeconds / 2 + 0.01);
+      expect(isEntryUnlocked(journal, entry, discovery.store)).toBe(true);
+      expect(discovery.stats.snapshot().newEntries).toContainEqual({
+        id: entryId,
+        title: entry.title,
+      });
+      // The already shown zero-discovery summary is an isolated snapshot.
+      expect(empty.discoveries).toEqual([]);
+
+      for (const target of discovery.pois) scan(target);
+      expect(mission.end()).toBe(true);
+      expect(progress.finish('titanic', mission.objectives)).toEqual({
+        stars: 2,
+        best: 2,
+        points: 0,
+      });
+      const earned = progress.snapshot().awarded;
+      expect(discovery.stats.snapshot().discoveries).toHaveLength(discovery.pois.length);
+      expect(progress.selectCosmetic('paint', 'red')).toBe(true);
+
+      mission.restart();
+      mission.start('titanic');
+      expect(discovery.stats.snapshot().discoveries).toEqual([]);
+      expect(discovery.stats.snapshot().newEntries).toEqual([]);
+      expect(mission.counts()).toEqual({ completed: 0, total: 4 });
+      expect(isEntryUnlocked(journal, entry, discovery.store)).toBe(true);
+      for (const target of discovery.pois) scan(target);
+      expect(discovery.scanner.view.lastCompleteFirstTime).toBe(false);
+      expect(discovery.stats.snapshot().newEntries).toEqual([]);
+      expect(discovery.stats.snapshot().discoveries).toHaveLength(discovery.pois.length);
+      expect(mission.end()).toBe(true);
+      expect(progress.finish('titanic', mission.objectives).best).toBe(2);
+      expect(progress.snapshot().awarded).toEqual(earned);
+      expect(discovery.store.get('titanic', first.id)?.count).toBe(2);
+
+      if (quotaFailure) {
+        expect(values).toEqual(savedBefore);
+        expect(new DiscoveryStore(storage).isDiscovered('titanic', first.id)).toBe(false);
+        expect(new Progress(new ProgressSave(storage)).rating('titanic')).toBe(0);
+        // Once writes recover, the next save includes the retained session finds and rewards.
+        failWrites = false;
+        discovery.resetDive();
+        scan(first);
+        progress.finish('titanic', mission.objectives);
+      }
+      expect(new DiscoveryStore(storage).snapshot()).toEqual(discovery.store.snapshot());
+      expect(new Progress(new ProgressSave(storage)).snapshot()).toEqual(progress.snapshot());
+    } finally {
+      mission.dispose();
+      rewards.dispose!();
+      discovery.dispose();
+    }
+  },
+);

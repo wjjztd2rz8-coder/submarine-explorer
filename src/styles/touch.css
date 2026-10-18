@@ -128,7 +128,7 @@
   bottom: 9%;
 }
 
-/* Scan and utility actions stay left of the Boost/ballast dock. */
+/* Scan and utility actions stay left of the ballast dock. */
 .tc-buttons {
   position: absolute;
   right: calc(
@@ -154,8 +154,7 @@
   min-width: 48px;
   min-height: 48px;
 }
-.tc-btn.is-held,
-.tc-btn.is-active {
+.tc-btn.is-held {
   background: var(--tc-hot);
   border-color: rgba(214, 246, 248, 0.9);
 }
@@ -170,17 +169,6 @@
 .tc-btn-photo {
   grid-column: 1;
   grid-row: 1;
-}
-.tc-btn-boost {
-  position: absolute;
-  right: calc(env(safe-area-inset-right, 0px) + var(--tc-edge));
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--tc-edge) + var(--tc-slider-height) + 12px);
-  width: max(56px, calc(64 * var(--tc-s)));
-  height: var(--tc-button-size);
-}
-.tc-btn-boost.is-active {
-  box-shadow: 0 0 12px rgba(46, 217, 217, 0.45);
-  color: #fff;
 }
 .tc-btn-scan {
   grid-column: 2 / span 2;
@@ -271,19 +259,6 @@
   .tc-btn-lights {
     grid-column: 1;
     grid-row: 2;
-  }
-  .tc-btn-boost {
-    /* Beside the slider, in the second-row slot nearest the right thumb.
-       This keeps the portrait control envelope below the tutorial strip. */
-    right: calc(
-      env(safe-area-inset-right, 0px) + var(--tc-edge) + max(56px, calc(64 * var(--tc-s))) +
-        calc(14 * var(--tc-s))
-    );
-    bottom: calc(
-      env(safe-area-inset-bottom, 0px) + var(--tc-edge) + var(--tc-portrait-button-size) +
-        var(--tc-portrait-button-gap)
-    );
-    width: var(--tc-portrait-button-size);
   }
   .tc-btn-scan {
     grid-column: 1 / span 2;

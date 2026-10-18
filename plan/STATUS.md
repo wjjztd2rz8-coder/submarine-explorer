@@ -23,5 +23,5 @@ First-five-minute scanning and guidance (agreed top blocker), deploy gating, pho
 
 ## Needs owner
 
-- Claude weekly window runs out around Oct 20 at the current pace (resets Oct 22). Your Claude reset also expires Oct 22, so applying it then costs nothing extra.
+- None for budget: the Claude reset is already used, so the Claude week (resets Oct 22) is paced by the run gate and Codex carries more work (dispatch head start widened to 30%).
 - A short phone retest once the P2 items land.
