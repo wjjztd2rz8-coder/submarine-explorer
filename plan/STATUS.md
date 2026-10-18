@@ -4,14 +4,14 @@
 
 ## 1.0 table
 
-| Requirement                               | State                                                                                                                       |
-| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.5-4, Lost City 3-4.1 (disputed), Blue Hole 3-3.5, Beebe 3.5-3.8, Monterey 3.5-3.7          |
-| Other eight sites coherent                | Challenger 3.5-3.6, Endurance 3.5-3.8; spawn acceptance for all eight not certified (V-spawn-capture queued)                |
-| New player understands first five minutes | Journeys repeated earlier, P2s merged; current unaided journeys unverified                                                  |
-| Acceptable Low-tier phone performance     | Unverified: needs owner phone play                                                                                          |
-| Hosted CI green, releases tagged          | CI green on run 59; f60 tagged; deploy not gated on CI (R-deploy-gate queued)                                               |
-| Code simple enough                        | S-manifest closed; standing S-verify / S-bughunt                                                                            |
+| Requirement                               | State                                                                                                               |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Five heroes beautiful (4 of 5)            | None consistently at 4: Titanic 3.5-4, Lost City 3-4.1 (disputed), Blue Hole 3-3.5, Beebe 3.5-3.8, Monterey 3.5-3.7 |
+| Other eight sites coherent                | Challenger 3.5-3.6, Endurance 3.5-3.8; spawn acceptance for all eight not certified (V-spawn-capture queued)        |
+| New player understands first five minutes | Journeys repeated earlier, P2s merged; current unaided journeys unverified                                          |
+| Acceptable Low-tier phone performance     | Unverified: needs owner phone play                                                                                  |
+| Hosted CI green, releases tagged          | CI green on run 59; f60 tagged; deploy not gated on CI (R-deploy-gate queued)                                       |
+| Code simple enough                        | S-manifest closed; standing S-verify / S-bughunt                                                                    |
 
 ## Done recently
 
