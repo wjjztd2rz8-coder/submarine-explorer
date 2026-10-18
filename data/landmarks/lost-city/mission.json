@@ -13,7 +13,7 @@
       "hazeLift": 0.2,
       "smokeIntensity": 0,
       "glowLights": 0,
-      "shimmerStrength": 0.03
+      "shimmerStrength": 0
     }
   },
   "species_file": "species.json",

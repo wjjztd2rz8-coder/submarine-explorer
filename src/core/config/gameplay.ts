@@ -25,13 +25,7 @@ export interface GameplayOptions {
 
 export type SpeedProfile = Pick<
   SubmarineConfig,
-  | 'thrustAccel'
-  | 'boostMultiplier'
-  | 'dragLinear'
-  | 'dragQuadratic'
-  | 'yawRate'
-  | 'reverseAccel'
-  | 'maxSpeed'
+  'thrustAccel' | 'dragLinear' | 'dragQuadratic' | 'yawRate' | 'reverseAccel' | 'maxSpeed'
 > &
   DescentProfile & { cruiseSpeed: number; cameraLookAheadPerSpeed: number };
 export type DescentProfile = Pick<
@@ -59,7 +53,6 @@ export interface PowerConfig {
   batteryLightsHours: number;
   batterySensorsHours: number;
   oxygenHours: number;
-  boostCostMultiplier: number;
   lowThreshold: number;
   criticalThreshold: number;
 }
@@ -72,7 +65,6 @@ export const DEFAULT_SPEED_PROFILES: Record<'research' | 'fast', SpeedProfile> =
     cruiseSpeed: 1,
     maxSpeed: 1.4,
     thrustAccel: 0.25,
-    boostMultiplier: 1.8,
     dragLinear: 0.05,
     dragQuadratic: 0.2,
     yawRate: 0.55,
@@ -86,7 +78,6 @@ export const DEFAULT_SPEED_PROFILES: Record<'research' | 'fast', SpeedProfile> =
     cruiseSpeed: 12,
     maxSpeed: 20.6,
     thrustAccel: 3,
-    boostMultiplier: 2.7,
     dragLinear: 0.05,
     dragQuadratic: 0.0165,
     yawRate: 0.45,
@@ -126,7 +117,6 @@ export const DEFAULT_POWER: PowerConfig = {
   batteryLightsHours: 22,
   batterySensorsHours: 24,
   oxygenHours: 10,
-  boostCostMultiplier: 2.5,
   lowThreshold: 0.25,
   criticalThreshold: 0.1,
 };

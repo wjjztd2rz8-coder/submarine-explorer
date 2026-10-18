@@ -183,6 +183,53 @@ describe('guidance slot', () => {
     },
   );
 
+  it.each([false, true])(
+    'explains the distance before offering a scan in a free dive (touch=%s)',
+    (touch) => {
+      document.documentElement.classList.contains = () => touch;
+      const scanner = new Scanner({ ...DEFAULT_CONFIG.scan, radiusFloorM: 100 }, new EventBus());
+      const overlay = new ScanOverlay(DEFAULT_CONFIG.scan, document.body);
+      scanner.setTargets([target('bow', 'Bow', 0, 0, -217, 30)]);
+      const position = new Vector3();
+      const forward = new Vector3(0, 0, -1);
+      const keys = { scan: 'G', guide: 'J' };
+      scanner.update(0, position, forward, true);
+      overlay.update(scanner.view, keys, null, 0);
+      expect(texts(overlay.slot)).toMatchObject({
+        name: 'Bow',
+        kind: 'objective',
+        detail: 'Get closer to scan · 217 m',
+      });
+      expect(scanner.isScanning).toBe(false);
+      position.z = -117;
+      scanner.update(0, position, forward, false);
+      overlay.update(scanner.view, keys, null, 0);
+      expect(texts(overlay.slot)).toMatchObject({
+        name: 'Bow',
+        kind: 'scan',
+        detail: touch ? 'HOLD SCAN TO SCAN' : 'HOLD G TO SCAN',
+      });
+      scanner.update(0.2, position, forward, true);
+      position.z = 0;
+      scanner.update(0, position, forward, true);
+      overlay.update(scanner.view, keys, null, 0);
+      expect(texts(overlay.slot)).toMatchObject({
+        kicker: 'SCAN INTERRUPTED',
+        detail: 'Get closer to scan · 217 m',
+      });
+      // An interrupted scan still names its held target beyond the remote hint range.
+      position.z = 800;
+      scanner.update(0, position, forward, true);
+      overlay.update(scanner.view, keys, null, 0);
+      expect(scanner.view.nearestId).toBeNull();
+      expect(texts(overlay.slot)).toMatchObject({
+        name: 'Bow',
+        detail: 'Get closer to scan · 1017 m',
+      });
+      overlay.dispose();
+    },
+  );
+
   it('shows the winner, withdraws it and falls back to the next offer', () => {
     const slot = new GuidanceSlot();
     slot.offer('objective', 'objective', msg('Stern section'));
@@ -243,16 +290,13 @@ describe('guidance slot', () => {
       overlay.update(scanner.view, keys, null, 0);
       expect(texts(overlay.slot)).toMatchObject({ name: 'First contact', kind: 'discovery' });
       overlay.update(scanner.view, keys, null, DEFAULT_CONFIG.scan.completeBannerSeconds + 0.1);
-      // Hovering beside the logged contact must never leave the logged contact's card in
-      // charge. Phones (no mission panel) get the direction on the card; on desktop the panel's
-      // nav line carries it, so the card steps aside rather than repeating it.
+      // The next approach replaces the logged card on every device in the shared slot.
       const detail = (overlay.slot.root as unknown as FakeElement).children[1].children[2];
-      if (touch) {
-        expect(texts(overlay.slot)).toMatchObject({ name: 'Next contact', kind: 'objective' });
-        expect(detail.textContent).toBe('TURN 90° STARBOARD');
-      } else {
-        expect(texts(overlay.slot)).toMatchObject({ hidden: true });
-      }
+      expect(texts(overlay.slot)).toMatchObject({
+        name: 'Next contact',
+        kind: 'objective',
+        detail: 'Get closer to scan · 100 m',
+      });
 
       // Free exploration retains its logged-contact confirmation without an objective.
       scanner.setObjective(null);
@@ -385,9 +429,11 @@ describe('guidance slot', () => {
       });
       f.targets[1].position.set(-300, 0, 0);
       f.position.set(0, 0, 1000);
-      expect(f.step()).toMatchObject(
-        touch ? { name: 'Stern', kind: 'objective' } : { hidden: true },
-      );
+      expect(f.step()).toMatchObject({
+        name: 'Stern',
+        kind: 'objective',
+        detail: 'Get closer to scan · 1044 m',
+      });
       f.position.set(0, 0, 0);
       expect(f.step()).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET · OPTIONAL' });
       // Removing both sources must withdraw guidance without a manual overlay clear.
@@ -429,9 +475,11 @@ describe('guidance slot', () => {
       expect(f.step(2.2)).toMatchObject({ name: 'Memorial', kicker: 'SCAN TARGET · OPTIONAL' });
       f.position.set(0, 0, 1000);
       f.step(DEFAULT_CONFIG.scan.completeBannerSeconds + 0.1);
-      expect(texts(f.overlay.slot)).toMatchObject(
-        touch ? { name: 'Stern', kind: 'objective' } : { hidden: true },
-      );
+      expect(texts(f.overlay.slot)).toMatchObject({
+        name: 'Stern',
+        kind: 'objective',
+        detail: 'Get closer to scan · 1044 m',
+      });
       f.position.set(0, 0, 0);
       expect(f.step().kicker).toBe('SCAN TARGET · OPTIONAL');
       f.step(0.2, true);

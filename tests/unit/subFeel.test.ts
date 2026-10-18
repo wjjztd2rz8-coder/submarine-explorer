@@ -19,7 +19,6 @@ function input(partial: Partial<InputState> = {}): InputState {
     lookDy: 0,
     toggleCamera: false,
     toggleSonar: false,
-    boost: false,
     toggleLights: false,
     scan: false,
     cycleSimSpeed: false,
@@ -54,12 +53,10 @@ describe('A3/1-2 thrust curve and terminal velocity', () => {
     expect(sub.velocity.length()).toBeGreaterThan(predicted * 0.95);
   });
 
-  it('2. cruises at ~6 m/s and sprints past 8 m/s on boost', () => {
+  it('2. cruises at ~6 m/s', () => {
     const cruise = terminalSpeed(cfg.thrustAccel);
-    const sprint = terminalSpeed(cfg.thrustAccel * cfg.boostMultiplier);
     expect(cruise).toBeGreaterThan(5.5);
     expect(cruise).toBeLessThan(6.5);
-    expect(sprint).toBeGreaterThan(8);
   });
 
   it('2b. the throttle curve gives fine control near centre but full thrust at 1', () => {
@@ -284,7 +281,7 @@ describe('A3/11 sim speed', () => {
 
 describe('Phase D mode profiles', () => {
   it.each(['research', 'fast'] as const)(
-    '%s cruise and boost stay inside the configured speed cap',
+    '%s cruise stays inside the configured speed cap',
     (name) => {
       const tuned = structuredClone(DEFAULT_CONFIG.submarine);
       const sub = new Submarine(tuned, flatSeabed(-20000));
@@ -293,10 +290,7 @@ describe('Phase D mode profiles', () => {
       sub.reset(0, -1000, 0);
       run(sub, input({ throttle: 1 }), 90 * 60);
       expect(Math.abs(sub.getState().speed - speed.cruiseSpeed)).toBeLessThan(0.15);
-      sub.reset(0, -1000, 0);
-      run(sub, input({ throttle: 1, boost: true }), 90 * 60);
       expect(sub.getState().speed).toBeLessThanOrEqual(speed.maxSpeed + 1e-6);
-      expect(sub.getState().speed).toBeGreaterThan(speed.cruiseSpeed);
     },
   );
 
@@ -314,7 +308,7 @@ describe('Phase D mode profiles', () => {
         ballastHalfLife: descent.ballastHalfLife,
       });
       sub.reset(0, -1000, 0);
-      run(sub, input({ ballast: -1, throttle: 1, boost: true, pitch: -1 }), 20 * 60);
+      run(sub, input({ ballast: -1, throttle: 1, pitch: -1 }), 20 * 60);
       expect(-sub.velocity.y).toBeLessThanOrEqual(descent.maxVerticalSpeed + 1e-6);
     },
   );
