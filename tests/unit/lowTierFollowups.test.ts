@@ -16,6 +16,7 @@ import { Props } from '../../src/world/Props.js';
 import { Terrain } from '../../src/world/Terrain.js';
 import poses from '../../tools/lowtier-poses.json';
 import blueHolePoses from '../../tools/blue-hole-poses.json';
+import titanicPoses from '../../tools/titanic-poses.json';
 import { withArcadeReach } from './helpers.js';
 
 const json = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
@@ -336,3 +337,66 @@ test('Blue Hole Low: both east poses guide to their local unscanned gallery befo
     terrain.dispose();
   }
 });
+
+test.each(['low', 'medium', 'high'] as const)(
+  'Titanic %s: authored approach and close poses keep hull and camera clear',
+  async (tier) => {
+    const { config, terrain, props } = await scene('titanic', tier);
+    try {
+      expect(props.stats.failed).toBe(0);
+      for (const [id, pose] of Object.entries(titanicPoses)) {
+        const hero = props.placed.find((p) => p.def.id === id)!;
+        expect(hero).toBeDefined();
+        expect(
+          [
+            ...pose.target,
+            ...pose.direction,
+            pose.above,
+            pose.approachRange,
+            pose.close.range,
+            pose.close.above,
+          ].every(Number.isFinite),
+        ).toBe(true);
+        expect(new Vector3().fromArray(pose.direction).length()).toBeCloseTo(1, 2);
+        expect(pose.close.range).toBeGreaterThan(0);
+        expect(pose.approachRange).toBeGreaterThan(pose.close.range);
+        const target = hero.root.localToWorld(new Vector3().fromArray(pose.target));
+        for (const [range, above] of [
+          [pose.approachRange, pose.above],
+          [pose.close.range, pose.close.above],
+        ]) {
+          const position = target
+            .clone()
+            .addScaledVector(new Vector3().fromArray(pose.direction), range);
+          position.y = hero.root.position.y + above;
+          expect(props.collide(position.clone(), config.submarine.hullRadius, new Vector3())).toBe(
+            false,
+          );
+          // Frozen capture physics must not conceal a hull embedded in the seabed.
+          expect
+            .soft(position.y - terrain.sampleHeight(position.x, position.z))
+            .toBeGreaterThan(config.submarine.hullRadius + config.submarine.seabedClearance);
+          const yaw = Math.atan2(target.x - position.x, -(target.z - position.z));
+          const pitch = Math.atan2(target.y - position.y, range);
+          const rig = new CameraRig(config.camera, 16 / 9, terrain);
+          rig.setMode('first-person');
+          rig.snap(position, yaw, pitch);
+          const eye = rig.camera.position;
+          rig.lookElevation =
+            (Math.atan2(target.y - eye.y, Math.hypot(target.x - eye.x, target.z - eye.z)) - pitch) /
+            0.55;
+          rig.snap(position, yaw, pitch);
+          expect(props.collide(eye.clone(), 0.3, new Vector3())).toBe(false);
+          rig.camera.updateMatrixWorld(true);
+          const projected = target.clone().project(rig.camera);
+          expect(Math.abs(projected.x)).toBeLessThan(0.1);
+          expect(Math.abs(projected.y)).toBeLessThan(0.1);
+          expect(projected.z).toBeGreaterThan(-1);
+          expect(projected.z).toBeLessThan(1);
+        }
+      }
+    } finally {
+      terrain.dispose();
+    }
+  },
+);

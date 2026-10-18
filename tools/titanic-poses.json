@@ -2,8 +2,8 @@
   "bow-hull": {
     "target": [16, 8, -22],
     "direction": [0.94, 0, 0.34],
-    "above": 4,
+    "above": 18,
     "approachRange": 40,
-    "close": { "range": 24, "above": 4 }
+    "close": { "range": 24, "above": 18 }
   }
 }
