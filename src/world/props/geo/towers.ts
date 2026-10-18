@@ -204,6 +204,15 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       if (r > 1.02) return lone || r > 1.25 ? 0 : 0.12;
       return 0.25 + 0.75 * (1 - smooth(0.5, 1, r));
     };
+    // Broken carbonate shed from the columns: larger blocks packed close round each foot.
+    const nearFoot = (x: number, z: number): number => {
+      let k = 0;
+      for (const s of spires) {
+        const t = Math.hypot(x - s.x, z - s.z) / s.r0;
+        if (t >= 0.9) k = Math.max(k, 1 - smooth(1.1, 2.4, t));
+      }
+      return k;
+    };
     const area = lone ? W * D : W * D * 1.1;
     const onGround = (x: number, z: number): number => Math.max(skirt(x, z), gnd(x, z) + 0.05);
     pieces.push(
@@ -214,6 +223,14 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
         size: lone ? 0.7 : 1.2,
         detail: Math.min(d.sphereDetail, 1),
         seed: seed + 313,
+      }),
+      ...scatterRubble(onGround, nearFoot, {
+        halfX: pw / 2,
+        halfZ: pd / 2,
+        count: Math.round((lone ? 12 : 70) * d.growth ** 0.5),
+        size: Math.max(1, main.r0 * 0.09),
+        detail: Math.min(d.sphereDetail, 1),
+        seed: seed + 419,
       }),
     );
   }
@@ -411,6 +428,11 @@ export function buildCarbonateTower(input: GeoBuildInput, lone = false): BuiltPr
       OCHRE,
       smooth(0.44, 0.62, fbm3(x * 0.2 + 9, y * 0.06, z * 0.2, seed ^ 0x0c4, 3)) * 0.8,
     );
+    // Mottling: broad grey and ochre patches break the white wall; the foot is dirtier.
+    const mottle = fbm3(x * 0.11 + 5, y * 0.09, z * 0.11 + 5, seed ^ 0x6d1, 3);
+    const foot = 1 - smooth(0.04, 0.4, (y - gnd(x, z)) / H);
+    out.lerp(TROUGH, (smooth(0.42, 0.6, mottle) * 0.55 + foot * 0.4) * (0.5 + 0.5 * (1 - up * 0.5)));
+    out.lerp(OCHRE, (1 - smooth(0.3, 0.42, mottle)) * 0.4);
     // Flow streaks: narrow vertical bands (high horizontal, very low vertical frequency)
     // alternating pale and shaded, as fluid ran down the walls.
     const wall = 1 - Math.abs(ny);
